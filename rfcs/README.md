@@ -64,17 +64,17 @@ The RFC numbering convention is: `<type>:<id>`. The list of types (`<type>`) is 
 | 03-003 | Fabric View                      | Format   | [Proposed](./formats/views/views-fabric.md)                     |
 | 03-004 | Corda View                       | Format   | [Proposed](./formats/views/views-corda.md)                      |
 | 03-005 | Besu View                        | Format   | [Draft](./formats/views/views-besu.md)                          |
-| 03-005 | Ethereum View                    | Format   | [Draft](./formats/views/views-ethereum.md)                      |
-| 03-006 | View Request                     | Format   | [Proposed](./formats/views/request.md)                          |
-| 03-007 | Access Control Policy            | Format   | [Proposed](./formats/policies/access-control.md)                |
-| 03-008 | Proof Verification Policy        | Format   | [Proposed](./formats/policies/proof-verification.md)            |
-| 03-009 | Verification Policy DSL          | Format   | [Draft](./formats/policies/dsl.md)                              |
-| 03-010 | Membership                       | Format   | [Proposed](./formats/network/membership.md)                     |
-| 03-011 | Asset Exchange Units             | Format   | [Proposed](./formats/assets/exchange.md)                        |
-| 03-012 | Asset Transfer Units             | Format   | [Proposed](./formats/assets/transfer.md)                        |
-| 03-013 | Relay Messages                   | Format   | [Proposed](./formats/communication/relay.md)                    |
-| 03-014 | Driver Messages                  | Format   | [Proposed](./formats/communication/driver.md)                   |
-| 03-015 | Network Identities               | Format   | [Proposed](./formats/network/identity.md)                       |
+| 03-006 | Ethereum View                    | Format   | [Draft](./formats/views/views-ethereum.md)                      |
+| 03-007 | View Request                     | Format   | [Proposed](./formats/views/request.md)                          |
+| 03-008 | Access Control Policy            | Format   | [Proposed](./formats/policies/access-control.md)                |
+| 03-009 | Proof Verification Policy        | Format   | [Proposed](./formats/policies/proof-verification.md)            |
+| 03-010 | Verification Policy DSL          | Format   | [Draft](./formats/policies/dsl.md)                              |
+| 03-011 | Membership                       | Format   | [Proposed](./formats/network/membership.md)                     |
+| 03-012 | Network Identities               | Format   | [Proposed](./formats/network/identity.md)                       |
+| 03-013 | Asset Exchange Units             | Format   | [Proposed](./formats/assets/exchange.md)                        |
+| 03-014 | Asset Transfer Units             | Format   | [Proposed](./formats/assets/transfer.md)                        |
+| 03-015 | Relay Messages                   | Format   | [Proposed](./formats/communication/relay.md)                    |
+| 03-016 | Driver Messages                  | Format   | [Proposed](./formats/communication/driver.md)                   |
 
 
 ## RFC Process

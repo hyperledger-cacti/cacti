@@ -5,9 +5,10 @@
  -->
 # Access Control Policies
 
--   Authors: Dileban Karunamoorthy, Ermyas Abebe, Venkatraman Ramakrishna, Nick Waywood
--   Status: Proposed
--   Since: 10-Aug-2020
+- RFC: 03-008
+- Authors: Dileban Karunamoorthy, Ermyas Abebe, Venkatraman Ramakrishna, Nick Waywood
+- Status: Proposed
+- Since: 10-Aug-2020
 
 ## Summary
 

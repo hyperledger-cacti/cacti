@@ -7,7 +7,7 @@
 
 - RFC: 02-011
 - Authors: Venkatraman Ramakrishna
-- Status: Superseded
+- Status: Superseded (by 02-012)
 - Since: 22-Oct-2020
 
 

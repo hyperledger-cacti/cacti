@@ -5,9 +5,10 @@
  -->
 # Identity Plane Data Formats
 
-* Authors: Bishakh Chandra Ghosh, Venkatraman Ramakrishna, Krishnasuri Narayanam, Ermyas Abebe
-* Status: Proposed
-* Since: 24-September-2021
+- RFC: 03-012
+- Authors: Bishakh Chandra Ghosh, Venkatraman Ramakrishna, Krishnasuri Narayanam, Ermyas Abebe
+- Status: Proposed
+- Since: 24-Sep-2021
 
 
 ## Participant Unit Identity

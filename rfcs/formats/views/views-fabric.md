@@ -5,6 +5,11 @@
  -->
 # Fabric Views
 
+- RFC: 03-003
+- Authors: Allison Irvin, Antony Targett, Christian Vecchiola, Dileban Karunamoorthy, Ermyas Abebe, Nick Waywood, Venkatraman Ramakrishna
+- Status: Proposed
+- Since: 13-Aug-2020
+
 ## Addressing a Fabric View
 
 ```

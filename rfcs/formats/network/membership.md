@@ -5,9 +5,10 @@
  -->
 # Memberships
 
--   Authors: Allision Irvin, Dileban Karunamoorthy, Ermyas Abebe, Venkatraman Ramakrishna, Nick Waywood
--   Status: Proposed
--   Since: 11-Aug-2020
+- RFC: 03-011
+- Authors: Allison Irvin, Dileban Karunamoorthy, Ermyas Abebe, Venkatraman Ramakrishna, Nick Waywood
+- Status: Proposed
+- Since: 11-Aug-2020
 
 ## Summary
 

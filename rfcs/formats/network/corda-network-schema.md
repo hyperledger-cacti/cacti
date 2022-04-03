@@ -5,6 +5,11 @@
  -->
 # Corda Network Schema
 
+- RFC: 03-011-appendix
+- Authors: Allison Irvin, Dileban Karunamoorthy, Ermyas Abebe, Venkatraman Ramakrishna, Nick Waywood
+- Status: Proposed
+- Since: 11-Aug-2020
+
 ## Compatibility Zone
 
 Corda networks (sometimes called compatibility zones) are a set of nodes that

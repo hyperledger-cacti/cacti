@@ -5,8 +5,10 @@
  -->
 # Corda Views
 
--   Authors: Allison Irvin, Nick Waywood
--   Status: proposed
+- RFC: 03-004
+- Authors: Allison Irvin, Nick Waywood
+- Status: Proposed
+- Since: 13-Aug-2020
 
 ## Addressing a Corda View
 
@@ -29,7 +31,7 @@ Requirements are:
 
 There are several potential approaches for doing this.
 
-1. a) The requesting network lists the RPC addresses the nodes in the view
+1. a) The requesting network lists the RPC addresses of the nodes in the view
    address and the relay driver uses these addresses to directly query the
    nodes. Endorsement policy in the request is optional. The relay driver sends
    the request out to all nodes individually and collates the responses. This
@@ -61,7 +63,7 @@ There are several potential approaches for doing this.
    request on to all other participants and collates the responses before
    sending back to the relay driver.
 
-We propose that approach 1b or 1c is supported by the interoperation protocol in the
+We propose that approach 1a is supported by the interoperation protocol in the
 initial implementation.
 
 ### Locating the view.

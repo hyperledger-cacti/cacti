@@ -5,6 +5,13 @@
  -->
 # Policy DSL
 
+- RFC: 03-010
+- Authors: Allison Irvin, Dileban Karunamoorthy, Ermyas Abebe, Venkatraman Ramakrishna, Nick Waywood
+- Status: Draft
+- Since: 10-Aug-2020
+
+## Summary
+
 A verification policy defines the proof criteria that a requesting network requires of a remote network (see [Proof Verification Policies](./proof-verification.md) for more information).
 
 This DSL defines the language that can be used to express these proof requirements.

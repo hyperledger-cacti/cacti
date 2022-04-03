@@ -5,6 +5,10 @@
  -->
 # View Definition
 
+- RFC: 03-002
+- Authors: Allison Irvin, Antony Targett, Christian Vecchiola, Dileban Karunamoorthy, Ermyas Abebe, Nick Waywood, Venkatraman Ramakrishna
+- Status: Proposed
+- Since: 13-Aug-2020
 
 ## Summary
 

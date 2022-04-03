@@ -5,6 +5,11 @@
  -->
 # Ethereum Views
 
+- RFC: 03-006
+- Authors: Ermyas Abebe
+- Status: Draft
+- Since: 13-Aug-2020
+
 ## Addressing an Ethereum View
 
 ```
