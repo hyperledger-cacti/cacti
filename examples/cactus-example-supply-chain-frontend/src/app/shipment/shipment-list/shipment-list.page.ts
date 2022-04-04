@@ -11,6 +11,8 @@ import { BESU_DEMO_LEDGER_ID } from "../../../constants";
 import { ShipmentDetailPage } from "../shipment-detail/shipment-detail.page";
 import { ModalController } from "@ionic/angular";
 
+import { AuthConfig } from "../../common/auth-config";
+
 @Component({
   selector: "app-shipment-list",
   templateUrl: "./shipment-list.page.html",
@@ -42,7 +44,11 @@ export class ShipmentListPage implements OnInit {
     this._supplyChainApi = await this.baseClient.ofLedger(
       this.ledgerId,
       SupplyChainApi,
-      {},
+      {
+        baseOptions: {
+          headers: { Authorization: `Bearer ${AuthConfig.authToken}` },
+        },
+      },
     );
     await this.loadData();
   }
