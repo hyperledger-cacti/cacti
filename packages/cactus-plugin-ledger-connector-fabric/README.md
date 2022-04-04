@@ -330,7 +330,7 @@ docker run \
   },
   "discoveryOptions": {
     "enabled": true,
-    "asLocalhost: true"
+    "asLocalhost": true
   }
   }}}]' \
   cplcb
@@ -356,7 +356,7 @@ docker run \
   },
   "discoveryOptions": {
     "enabled": true,
-    "asLocalhost: true"
+    "asLocalhost": true
   }
   }}}]'
 ```
@@ -376,7 +376,7 @@ echo '[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-fabric", "ty
   },
   "discoveryOptions": {
     "enabled": true,
-    "asLocalhost: true"
+    "asLocalhost": true
   }
   }}}]' > cactus.json
 
@@ -418,7 +418,7 @@ docker run \
   },
   "discoveryOptions": {
     "enabled": true,
-    "asLocalhost: true"
+    "asLocalhost": true
   }
   }}}]' \
   cplcb
