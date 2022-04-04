@@ -41,6 +41,11 @@ jobs:
           echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/node/jws >> urls.txt
           echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/consortium/jws >> urls.txt
           echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/get-prometheus-exporter-metrics >> urls.txt
+          echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction >> urls.txt
+          echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-transaction-receipt-by-txid >> urls.txt
+          echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract-go-source >> urls.txt
+          echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract >> urls.txt
+          echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-prometheus-exporter-metrics >> urls.txt
 
       - name: Show file content
         run: |
@@ -55,6 +60,9 @@ jobs:
 
       - run: echo "$(jq '.authorizationProtocol = "NONE"' .config.json)" > .config.json
 
+      - name: Install Fabric connector into the API server
+        run: echo "$(jq '.plugins += [{"packageName":"@hyperledger/cactus-plugin-ledger-connector-fabric", "type":"org.hyperledger.cactus.plugin_import_type.LOCAL", "action":"org.hyperledger.cactus.plugin_import_action.INSTALL",  "options":{"instanceId":"some-unique-fabric-connector-instance-id", "peerBinary":"/fabric-samples/bin/peer", "connectionProfile":"{}", "dockerBinary":"usr/local/bin/docker","cliContainerEnv":{"CORE_PEER_LOCALMSPID":"Org1MSP","CORE_PEER_ADDRESS":"peer0.org1.example.com:7051","CORE_PEER_MSPCONFIGPATH":"/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp","CORE_PEER_TLS_ROOTCERT_FILE":"/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt","ORDERER_TLS_ROOTCERT_FILE":"/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem"},"discoveryOptions":{"enabled":true,"asLocalhost":true}}}] ' .config.json)" > .config.json
+      
       # - run: |
       #     touch ~/nuclei-github-config.yaml \
       #     && echo -e "severity: critical,high" >> ~/nuclei-github-config.yaml \
