@@ -440,10 +440,10 @@ The following table summarizes the use cases that will be explained in more deta
 | Interworking patterns      | Value transfer                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | Type of Social Interaction | Escrowed Asset Transfer                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | Narrative                  | A person (`User A`) has multiple accounts on different ledgers (Ethereum, Quorum) and he wishes to send some assets from Ethereum ledger to a Quorum ledger with considering conversion rate. The sent asset on Ethereum will be received by Exchanger only when he successfully received converted asset on Quorum ledger. |
-| Actors                     | 1. `User A`: The person or entity who has ownership of the assets asscociated with its accounts on ledger.                                                                                                                                                                                                                                                                                                                                                                    |
-| Goals of Actors            | `User A` loses ownership of sent assets on Ethereum, but he will get ownnership of exchanged asset value on Quorum.                                                                                                                                                                                                                                                                                                                                                                                   |
+| Actors                     | 1. `User A`: The person or entity who has ownership of the assets associated with its accounts on ledger.                                                                                                                                                                                                                                                                                                                                                                    |
+| Goals of Actors            | `User A` loses ownership of sent assets on Ethereum, but he will get ownership of exchanged asset value on Quorum.                                                                                                                                                                                                                                                                                                                                                                                   |
 | Success Scenario           | Transfer succeeds without issues. Asset is available on both Ethereum and Quorum ledgers.                                                                                                                                                                                                                                                                                                                                                        |
-| Success Criteria           | Transfer asset on Quorum was successed.                                                                                                                                                                                                                                                                                                                                                |
+| Success Criteria           | Transfer asset on Quorum was succeeded.                                                                                                                                                                                                                                                                                                                                                |
 | Failure Criteria           | Transfer asset on Quorum was failed.                                                                                                                                                                                                                                                                                                                                                                                                       |
 | Prerequisites              | 1. Ledgers are provisioned<br>2. `User A` and `Exchanger` identities established on both ledgers<br>3. `Exchanger` authorized business logic plugin to operate the account on Quorum ledger.<br>4.`User A` has access to Hyperledger Cactus deployment                                                                                                                                                                                                                                                                                                               |
 | Comments                   |                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
@@ -490,7 +490,7 @@ Enabling the trading of fiat and virtual currencies in any permutation of possib
 | Type of Social Interaction  | Software Implementation Project |
 | Narrative                   | Someone launches a highly scalable ledger with their own coin called ExampleCoin that can consistently sustain throughput levels of a million transactions per second reliably, but they struggle with adoption because nobody wants to buy into their coin fearing that it will lose its value. They choose to put in place a two-way peg with Bitcoin which guarantees to holders of their coin that it can always be redeemed for a fixed number of Bitcoins/USDs. |
 | Actors                      | `User A`: Owner and/or operator of a ledger and currency that they wish to stabilize (peg) to other currencies |
-| Goals of Actors             | 1. Achieve credibility for their currency by backing funds.<br>2. Implement necessary software with minimal boilerplate code (most of which should be provided by Hyperldger Cactus) |
+| Goals of Actors             | 1. Achieve credibility for their currency by backing funds.<br>2. Implement necessary software with minimal boilerplate code (most of which should be provided by Hyperledger Cactus) |
 | Success Scenario            | `User A` stood up a Hyperledger Cactus deployment with their self-authored plugins and it is possible for end user application development to start by leveraging the Hyperledger Cactus REST APIs which now expose the functionalities provided by the plugin authored by ``User A`` |
 | Success Criteria            | Success scenario was achieved without significant extra development effort apart from creating the Hyperledger Cactus plugins. |
 | Failure Criteria            | Implementation complexity was high enough that it would've been easier to write something from scratch without the framework |
@@ -624,7 +624,7 @@ For migration to be effective, it should be possible to capture the necessary as
 <img width="700" src="./use-case-sequence-diagram-blockchain-migration.png">
 
 ### 3.11.2 Blockchain Smart Contract Migration
-The task of migrating a smart contract comprises the task of migrating the smart contract logic and data embedded in it. In specific, the data should be accessible and writeable on another blockchain. When the target blockchain can execute a smart contract written for the source blockchain, execution behaviour can be preserved by redeploying the same smart contract (e.g., reusing a smart contract written for Ethereum on Hyperldger Besu) and recreating its assets and data. If code reuse is not possible (either at source or binary code level), the target blockchain's virtual machine should support the computational complexity of the source blockchain (e.g., one cannot migrate all Ethereum smart contracts to Bitcoin, but the other way around is feasible).
+The task of migrating a smart contract comprises the task of migrating the smart contract logic and data embedded in it. In specific, the data should be accessible and writeable on another blockchain. When the target blockchain can execute a smart contract written for the source blockchain, execution behavior can be preserved by redeploying the same smart contract (e.g., reusing a smart contract written for Ethereum on Hyperledger Besu) and recreating its assets and data. If code reuse is not possible (either at source or binary code level), the target blockchain's virtual machine should support the computational complexity of the source blockchain (e.g., one cannot migrate all Ethereum smart contracts to Bitcoin, but the other way around is feasible).
 Automatic smart contract migration (with or without translation) yields risks for enterprise blockchain systems, and thus the solution is nontrivial [[4](#8-references)].
 
 ### 3.11.3 Semi-Automatic Blockchain Migration
@@ -655,7 +655,7 @@ Identities, DLTs, service discovery. Minimize how opinionated we are to really e
 
 Two representations of the same asset do not exist across the ecosystems at the same time unless clearly labelled as such [As of Oct 30 limited to specific combinations of DLTs; e.g. not yet possible with Fabric + Bitcoin]
 
-### 4.1.4 DLT Feature Inclusivity
+### 4.1.4 DLT Feature Inclusivity 
 
 Each DLT has certain unique features that are partially or completely missing from other DLTs.
 Hyperledger Cactus - where possible - should be designed in a way so that these unique features are accessible even when interacting with a DLT through Hyperledger Cactus. A good example of this principle in practice would be Kubernetes CRDs and operators that allow the community to extend the Kubernetes core APIs in a reusable way.
@@ -798,7 +798,7 @@ grade environment, ever, but it is great for demos and integration tests where
 you have to simulate a fully functioning consortium with as little hardware footprint
 as possible to save on time and cost.
 
-The individual nodes/API servers are isolated by listening on seperate TCP ports
+The individual nodes/API servers are isolated by listening on separate TCP ports
 of the machine they are hosted on:
 
 <img width="700" src="./deployment-low-resource-example.png">
@@ -826,14 +826,14 @@ Key components are defined as follows:
 - **Validator**: The entity monitors transaction records of Ledger operation, and it determines the result(success, failed, timeouted) from the transaction records.
 Validator ensure the determined result with attaching digital signature with "Validator key" which can be verified by "Verifier".
 - **Validator Server**: The server accepts a connection from Verifier, and it provides Validator API, which can be used for issuing signed transactions and monitoring Ledger behind it. The LedgerConnector will be implemented for interacting with the Ledger nodes.
-- **Verifier**: The entity accepts only sucussfully verified operation results by verifying the digital signature of the validator. Verifier will be instantiated by calling the VerifierFactory#create method with associated with the Validator to connect. Each Verifier may be temporarily enabled or disabled. Note that "Validator" is apart from "Verifier" over a bi-directional channel.
+- **Verifier**: The entity accepts only successfully verified operation results by verifying the digital signature of the validator. Verifier will be instantiated by calling the VerifierFactory#create method with associated with the Validator to connect. Each Verifier may be temporarily enabled or disabled. Note that "Validator" is apart from "Verifier" over a bi-directional channel.
 - **Verifier Registry**: The information about active Verifier. The VerifierFactory uses this information to instantiate Verifier for the Business Logic Plugin.
 
 ### 5.2.2 Bootstrapping Cactus application
 
 Key components defined in 4.2.1 becomes ready to serve Cactus application service after  following procedures:
 1. Start `Validator`: The `Validator` of `Ledger Plugin` which is chosen for each `Ledger` depending the platform technology used (ex. Fabric, Besu, etc.) will be started by the administrator of `Validator`. `Validator` becomes ready status to accept connection from `Verifier` after initialization process is done.
-2. Start `Business Logic Plugin` implementation: The administrator of Cactus application service starts `Business Logic Plugin` which is implemented to execute business logic(s). `Business Logic Plugin` implementation first checks availability of depended `Ledger Plugin(s)`, then it trys to enable each `Ledger Plugin` with customized profile for actual integrating `Ledger`. This availability checks also covers determination on the status of connectivity from `Verifier` to `Validator`. The availability of each `Ledger` is registered and maintained at `Cactus Routing Interface`, and it allows bi-directional message communication between `Business Logic Plugin` and `Ledger`.
+2. Start `Business Logic Plugin` implementation: The administrator of Cactus application service starts `Business Logic Plugin` which is implemented to execute business logic(s). `Business Logic Plugin` implementation first checks availability of depended `Ledger Plugin(s)`, then it tries to enable each `Ledger Plugin` with customized profile for actual integrating `Ledger`. This availability checks also covers determination on the status of connectivity from `Verifier` to `Validator`. The availability of each `Ledger` is registered and maintained at `Cactus Routing Interface`, and it allows bi-directional message communication between `Business Logic Plugin` and `Ledger`.
 
 ### 5.2.3 Processing Service API call
 
@@ -869,7 +869,7 @@ Open endpoints require no authentication
 
 #### Restricted Endpoints
 
-Restricted endpoints requre a valid Token to be included in the headder of the request. A Token can be acquired by calling [Login]().
+Restricted endpoints require a valid Token to be included in the headder of the request. A Token can be acquired by calling [Login]().
 
 * [Request Execution of Trade(instance of business logic)]() : `POST /api/v1/bl/trades/`
 * [Show Current Status of Trade]() : `GET /api/v1/bl/trades/(id)`
@@ -972,7 +972,7 @@ The detail information is described as following:
         - Send a request to the ledger that takes time to finish e.g. writing to the ledger.
           The implementer of a validator for new distributed ledger technology (DLT) is expected to extract parameters from `args` object and cal the API (of the target DLT).
       - input parameter:
-        - `args` (Ojbect): parameters of verifier's `sendAsyncRequest` API are included in this object.
+        - `args` (Object): parameters of verifier's `sendAsyncRequest` API are included in this object.
       - returns:
         - Object
         - Editor's Note: check return type
@@ -981,7 +981,7 @@ The detail information is described as following:
       - description:
         - Send a request to a validator, e.g. searching a datablock.
       - input parameter:
-        - `args` (Object): parameters of verifier's `sendSyncRequest` API are inlucded in this object.
+        - `args` (Object): parameters of verifier's `sendSyncRequest` API are included in this object.
       - returns:
         - Object: result of the requested operation.
 
@@ -994,7 +994,7 @@ The detail information is described as following:
       - input parameter:
         - `cb` (function): callback function called when there are new data in the ledger.
       - returns:
-        - Promise: `resolve()` when it successfully started monitorinig the ledger, `reject()` otherwise.
+        - Promise: `resolve()` when it successfully started monitoring the ledger, `reject()` otherwise.
 
     - function `stopMonitor(void): void`:
       - description:
@@ -1354,10 +1354,10 @@ HTLC use hashlocks and timelocks to make payments. Requires that the receiver of
 
 #### 5.6.2.1 HTLC-ETH-Besu Plugin
 
-For the network Besu case, this plugin uses [Leger Connector Besu Plugin](#5611-ledger-connector-besu-plugin) to deploy an HTLC contarct on the network and provides an API to interact with the HTLC ETH swap contracts.
+For the network Besu case, this plugin uses [Leger Connector Besu Plugin](#5611-ledger-connector-besu-plugin) to deploy an HTLC contract on the network and provides an API to interact with the HTLC ETH swap contracts.
 
 #### 5.6.2.2 HTLC-ETH-ERC20-Besu Plugin
-For the network Besu case, this plugin uses [Leger Connector Besu Plugin](#5611-ledger-connector-besu-plugin) to deploy an HTLC and ERC20 contarct on the network and provides an API to interact with this.
+For the network Besu case, this plugin uses [Leger Connector Besu Plugin](#5611-ledger-connector-besu-plugin) to deploy an HTLC and ERC20 contract on the network and provides an API to interact with this.
 This plugin allow `Cactus` to interact with ERC-20 tokens in HTLC ETH swap contracts.
 
 ### 5.6.3 Identity Federation Plugins
@@ -1533,7 +1533,7 @@ provided here for ease of understanding:
 
 ### 5.6.7 Test Tooling
 
-Provides `Cactus` with a tool to test the diferent plugins of the proyect.
+Provides `Cactus` with a tool to test the different plugins of the project.
 
 
 # 6. Identities, Authentication, Authorization
@@ -1651,12 +1651,12 @@ Web 3.0 applications (decentralized apps or *DApps*) which interact with blockch
 
 **Tx submitter**: The entity submits the remote transaction to the API server plug-in on one of the ledgers.
 
-**API Server**: A Cactus package that is the backbone of the plugin architecture and the host component for all plugins with the ability to automaticaly wire up plugins that come with their own web services (REST or asynchronous APIs through HTTP or WebSockets for example)
+**API Server**: A Cactus package that is the backbone of the plugin architecture and the host component for all plugins with the ability to automatically wire up plugins that come with their own web services (REST or asynchronous APIs through HTTP or WebSockets for example)
 
 **Cactus Node**: A set of identically configured API servers behind a single network host where the set size is customizable from 1 to infinity with the practical maximum being much lower of course. This logical distinction between node and API server is important because it allows consortium members to abstract away their private infrastructure details from the public consortium definition.
 
-For example if a consortium member wants to have a highly available, high throughput service, they will be forced to run a cluster of API servers behind a load balancer and/or reverse proxy to achieve these system properties and their API servers may also be in an auto-scaling group of a cloud provider or (in the future) even run as Lambda functions. To avoid having to update the consortium definition (which requires a potentially costly consesus from other members) every time let's say an auto-scaling group adds a new API server to a node, the consortium member can define their presence in the consortium by declaring a single `Cactus Node` and then customize the underlying deployment as they see fit so long as they ensure that the previously agreed upon keys are used by the node and it is indeed accessible through the network host as declared by the `Cactus Node`.
-To get a better understanding of the various, near-infinite deplyoment scenarios, head over to the [Deployment Scenarios](#57-deployment-scenarios) sub-section of the [Architecture](#5-architecture) top level section.
+For example if a consortium member wants to have a highly available, high throughput service, they will be forced to run a cluster of API servers behind a load balancer and/or reverse proxy to achieve these system properties and their API servers may also be in an auto-scaling group of a cloud provider or (in the future) even run as Lambda functions. To avoid having to update the consortium definition (which requires a potentially costly consensus from other members) every time let's say an auto-scaling group adds a new API server to a node, the consortium member can define their presence in the consortium by declaring a single `Cactus Node` and then customize the underlying deployment as they see fit so long as they ensure that the previously agreed upon keys are used by the node and it is indeed accessible through the network host as declared by the `Cactus Node`.
+To get a better understanding of the various, near-infinite deployment scenarios, head over to the [Deployment Scenarios](#57-deployment-scenarios) sub-section of the [Architecture](#5-architecture) top level section.
 
 **Validator**: A module of Hyperledger Cactus which verifies validity of transaction to be sent out to the blockchain application.
 
