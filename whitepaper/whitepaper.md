@@ -119,8 +119,14 @@ Photo by Pontus Wellgraf on Unsplash
   - [5.6 Plugin Architecture](#56-plugin-architecture)
     - [5.6.1 Ledger Connector Plugins](#561-ledger-connector-plugins)
       - [5.6.1.1 Ledger Connector Besu Plugin](#5611-ledger-connector-besu-plugin)
-      - [5.6.1.2 Ledger Connector Fabric Plugin](#5612-ledger-connector-fabric-plugin)
-      - [5.6.1.3 Ledger Connector Quorum Plugin](#5613-ledger-connector-quorum-plugin)
+      - [5.6.1.2 Ledger Connector Connector Corda](#5612-ledger-connector-connector-corda)
+      - [5.6.1.3 Ledger Connector Fabric Socketio](#5613-ledger-connector-fabric-socketio)
+      - [5.6.1.4 Ledger Connector Fabric Plugin](#5614-ledger-connector-fabric-plugin)
+      - [5.6.1.5 Ledger Connector Go Ethereum Socketio](#5615-ledger-connector-go-ethereum-socketio)
+      - [5.6.1.6 Ledger Connector Iroha Plugin](#5616-ledger-connector-iroha-plugin)
+      - [5.6.1.7 Ledger Connector Quorum Plugin](#5617-ledger-connector-quorum-plugin)
+      - [5.6.1.8 Ledger Connector Sawtooth Socketio Plugin](#5618-ledger-connector-sawtooth-socketio-plugin)
+      - [5.6.1.9 Ledger Connector Xdai Plugin](#5619-ledger-connector-xdai-plugin)
     - [5.6.2 HTLCs Plugins](#562-htlcs-plugins)
       - [5.6.2.1 HTLC-ETH-Besu Plugin](#5621-htlc-eth-besu-plugin)
       - [5.6.2.2 HTLC-ETH-ERC20-Besu Plugin](#5622-htlc-eth-erc20-besu-plugin)
@@ -1285,19 +1291,61 @@ This plugin provides `Cactus` a way to interact with Besu networks. Using this w
 * Build and sign transactions using different keystores.
 * Invoke smart-contract functions that we have deployed on the network.
 
-#### 5.6.1.2 Ledger Connector Fabric Plugin
+#### 5.6.1.2 Ledger Connector Connector Corda
+
+This plugin provides `Cactus` a way to interact with Corda networks. Using this we can perform:
+* Deploy mentioned JVM application in addition to the Cactus API server with the desired plugins configured.
+* Invoke contract flow with different kinds of parameters
+
+#### 5.6.1.3 Ledger Connector Fabric Socketio
+
+This plugin provides `Cactus` a way to interact with Hyperledger Fabric networks. Using this we can perform:
+* `sendSyncRequest`: Send sync-typed requests to the ledgers (e.g. getBalance)
+* `sendAsyncRequest`: Send async-typed requests to the ledgers (e.g. sendTransaction)
+* `startMonitor`: Start monitoring blocks on the ledgers
+* `stopMonitor`: Stop the block monitoring
+
+#### 5.6.1.4 Ledger Connector Fabric Plugin
 
 This plugin provides `Cactus` a way to interact with Fabric networks. Using this we can perform:
 * Deploy Golang chaincodes.
-* Make transactions.
+* Execute transactions on the ledger.
 * Invoke chaincodes functions that we have deployed on the network.
 
-#### 5.6.1.3 Ledger Connector Quorum Plugin
+#### 5.6.1.5 Ledger Connector Go Ethereum Socketio
+
+This plugin provides `Cactus` a way to interact with Go-Ethereum networks. Using this we can perform:
+* `sendSyncRequest`: Send sync-typed requests to the ledgers (e.g. getBalance)
+* `sendAsyncRequest`: Send async-typed requests to the ledgers (e.g. sendTransaction)
+* `startMonitor`: Start monitoring blocks on the ledgers
+* `stopMonitor`: Stop the block monitoring
+
+#### 5.6.1.6 Ledger Connector Iroha Plugin
+
+This plugin provides `Cactus` a way to interact with Iroha networks. Using this we can perform:
+* Run various Iroha leger commands and queries.
+* Build and sign transactions using any arbitrary credential.
+
+#### 5.6.1.7 Ledger Connector Quorum Plugin
 
 This plugin provides `Cactus` a way to interact with Quorum networks. Using this we can perform:
 * Deploy Smart-contracts through bytecode.
 * Build and sign transactions using different keystores.
 * Invoke smart-contract functions that we have deployed on the network.
+
+#### 5.6.1.8 Ledger Connector Sawtooth Socketio Plugin
+
+This plugin provides `Cactus` a way to interact with Hyperledger Sawtooth. Using this we can perform:
+* `startMonitor`: Start monitoring blocks on the ledgers
+* `stopMonitor`: Stop the block monitoring
+
+#### 5.6.1.9 Ledger Connector Xdai Plugin
+
+This plugin provides `Cactus` a way to interact with Xdai networks. Using this we can perform:
+* Deploy Smart-contracts through bytecode.
+* Build and sign transactions using different keystores.
+* Invoke smart-contract functions that we have deployed on the network.
+
 
 ### 5.6.2 HTLCs Plugins
 
