@@ -456,7 +456,7 @@
                 "required": [
                     "success",
                     "callOutput",
-                    "flowId"                    
+                    "flowId"
                 ],
                 "properties": {
                     "success": {
@@ -487,6 +487,220 @@
                     "flowId": {
                         "type": "string",
                         "description": "The id for the flow handle"
+                    }
+                }
+            },
+            "StartMonitorV1Request": {
+                "type": "object",
+                "required": [
+                    "clientAppId",
+                    "stateFullClassName"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "clientAppId": {
+                        "description": "ID of a client application that wants to monitor the state changes",
+                        "example": "frond_v1_x_7Hdg6s",
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    },
+                    "stateFullClassName": {
+                        "description": "The fully qualified name of the Corda state to monitor",
+                        "example": "net.corda.samples.example.states.IOUState",
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    }
+                }
+            },
+            "StartMonitorV1Response": {
+                "type": "object",
+                "required": [
+                    "success",
+                    "msg"
+                ],
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "description": "Flag set to true if monitoring started correctly.",
+                        "nullable": false
+                    },
+                    "msg": {
+                        "type": "string",
+                        "description": "Message describing operation status or any errors that occurred.",
+                        "nullable": false
+                    }
+                }
+            },
+            "GetMonitorTransactionsV1Request": {
+                "type": "object",
+                "required": [
+                    "clientAppId",
+                    "stateFullClassName"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "clientAppId": {
+                        "description": "ID of a client application that wants to monitor the state changes",
+                        "example": "frond_v1_x_7Hdg6s",
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    },
+                    "stateFullClassName": {
+                        "description": "The fully qualified name of the Corda state to monitor",
+                        "example": "net.corda.samples.example.states.IOUState",
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    }
+                }
+            },
+            "GetMonitorTransactionsV1Response": {
+                "type": "object",
+                "required": [
+                    "success",
+                    "msg"
+                ],
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "description": "Flag set to true if operation completed correctly.",
+                        "nullable": false
+                    },
+                    "msg": {
+                        "type": "string",
+                        "description": "Message describing operation status or any errors that occurred.",
+                        "nullable": false
+                    },
+                    "stateFullClassName": {
+                        "description": "The fully qualified name of the Corda state to monitor",
+                        "example": "net.corda.samples.example.states.IOUState",
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    },
+                    "tx": {
+                        "type": "array",
+                        "default": [],
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "index": {
+                                    "type": "string"
+                                },
+                                "data": {
+                                    "type": "string",
+                                    "minItems": 0,
+                                    "maxItems": 10e6
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "ClearMonitorTransactionsV1Request": {
+                "type": "object",
+                "required": [
+                    "clientAppId",
+                    "stateFullClassName",
+                    "txIndexes"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "clientAppId": {
+                        "description": "ID of a client application that wants to monitor the state changes",
+                        "example": "frond_v1_x_7Hdg6s",
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    },
+                    "stateFullClassName": {
+                        "description": "The fully qualified name of the Corda state to monitor",
+                        "example": "net.corda.samples.example.states.IOUState",
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    },
+                    "txIndexes": {
+                        "type": "array",
+                        "default": [],
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "ClearMonitorTransactionsV1Response": {
+                "type": "object",
+                "required": [
+                    "success",
+                    "msg"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "description": "Flag set to true if operation completed correctly.",
+                        "nullable": false
+                    },
+                    "msg": {
+                        "type": "string",
+                        "description": "Message describing operation status or any errors that occurred.",
+                        "nullable": false
+                    }
+                }
+            },
+            "StopMonitorV1Request": {
+                "type": "object",
+                "required": [
+                    "clientAppId",
+                    "stateFullClassName"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "clientAppId": {
+                        "description": "ID of a client application that wants to monitor the state changes",
+                        "example": "frond_v1_x_7Hdg6s",
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    },
+                    "stateFullClassName": {
+                        "description": "The fully qualified name of the Corda state to monitor",
+                        "example": "net.corda.samples.example.states.IOUState",
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    }
+                }
+            },
+            "StopMonitorV1Response": {
+                "type": "object",
+                "required": [
+                    "success",
+                    "msg"
+                ],
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "description": "Flag set to true if operation completed correctly.",
+                        "nullable": false
+                    },
+                    "msg": {
+                        "type": "string",
+                        "description": "Message describing operation status or any errors that occurred.",
+                        "nullable": false
                     }
                 }
             },
@@ -794,6 +1008,142 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/InvokeContractV1Response"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/start-monitor": {
+            "post": {
+                "operationId": "startMonitorV1",
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/start-monitor",
+                        "verbLowerCase": "post"
+                    }
+                },
+                "summary": "Start monitoring corda changes (transactions) of given state class",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StartMonitorV1Request"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StartMonitorV1Response"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-monitor-transactions": {
+            "get": {
+                "operationId": "GetMonitorTransactionsV1",
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-monitor-transactions",
+                        "verbLowerCase": "get"
+                    }
+                },
+                "summary": "Get transactions for monitored state classes.",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/GetMonitorTransactionsV1Request"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GetMonitorTransactionsV1Response"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/clear-monitor-transactions": {
+            "delete": {
+                "operationId": "ClearMonitorTransactionsV1",
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/clear-monitor-transactions",
+                        "verbLowerCase": "delete"
+                    }
+                },
+                "summary": "Clear transactions from internal store so they'll not be available by GetMonitorTransactionsV1 anymore.",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ClearMonitorTransactionsV1Request"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ClearMonitorTransactionsV1Response"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/stop-monitor": {
+            "delete": {
+                "operationId": "stopMonitorV1",
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/stop-monitor",
+                        "verbLowerCase": "delete"
+                    }
+                },
+                "summary": "Stop monitoring corda changes (transactions) of given state class",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StopMonitorV1Request"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StopMonitorV1Response"
                                 }
                             }
                         }

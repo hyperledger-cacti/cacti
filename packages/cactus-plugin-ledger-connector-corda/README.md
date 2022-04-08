@@ -293,6 +293,37 @@ const res = await apiClient.invokeContractV1({
 });
 ```
 
+### Transaction Monitoring
+- There are two interfaces to monitor changes of vault states - reactive `watchBlocksV1` method, and low-level HTTP API calls.
+- Note: The monitoring APIs are implemented only on kotlin-server connector (`main-server`), not typescript connector!
+- For usage examples review the functional test file: `packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/monitor-transactions-v4.8.test.ts`
+- Because transactions read from corda are stored on the connector, they will be lost if connector is closed/killed before transaction were read by the clients.
+- Each client has own set of state monitors that are managed independently. After starting the monitoring, each new transaction is queued on the connector until read and explicitly cleared by `watchBlocksV1` or direct HTTP API call.
+- Client monitors can be periodically removed by the connector, if there was no action from the client for specified amount of time.
+- Client expiration delay can be configured with `cactus.sessionExpireMinutes` option. It default to 30 minutes.
+- Each transaction has own index assigned by the corda connector. Index is unique for each client monitoring session. For instance:
+  - Stopping monitoring for given state will reset the transaction index counter for given client. After restart, it will report first transaction with index 0.
+  - Each client can see tha same transaction with different index.
+  - Index can be used to determine the transaction order for given client session.
+
+#### watchBlocksV1
+- `watchBlocksV1(options: watchBlocksV1Options): Observable<CordaBlock>`
+- Reactive (RxJS) interface to observe state changes.
+- Internally, it uses polling of low-level HTTP APIs.
+- Watching block should return each block at least once, no blocks should be missed after startMonitor has started. The only case when transaction is lost is when connector we were connected to died.
+- Transactions can be duplicated in case internal `ClearMonitorTransactionsV1` call was not successful (for instance, because of connection problems).
+- Options:
+  - `stateFullClassName: string`: state to monitor.
+  - `pollRate?: number`: how often poll the kotlin server for changes (default 5 seconds).
+
+#### Low-level HTTP API
+- These should not be used when watchBlocks API is sufficient.
+- Consists of the following methods:
+  - `startMonitorV1`: Start monitoring for specified state changes. All changes after calling this function will be stored in internal kotlin-server buffer, ready to be read by calls to `GetMonitorTransactionsV1`. Transactions occuring before the call to startMonitorV1 will not be reported.
+  - `GetMonitorTransactionsV1`: Read all transactions for given state name still remaining in internal buffer.
+  - `ClearMonitorTransactionsV1`: Remove transaction for given state name with specified index number from internal buffer. Should be used to acknowledge receiving specified transactions in user code, so that transactions are not reported multiple times.
+  - `stopMonitorV1`: Don't watch for transactions changes anymore, remove any transactions that were not read until now.
+
 ### Custom Configuration via Env Variables
 
 ```json

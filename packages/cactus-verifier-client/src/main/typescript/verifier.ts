@@ -72,59 +72,63 @@ export class Verifier<LedgerApiType extends ISocketApiClient<unknown>>
    *
    * @todo Change return type from Promise<void> to void, this method is already async by design.
    */
-  startMonitor(
+  async startMonitor(
     appId: string,
     options: Record<string, unknown>,
     eventListener: IVerifierEventListener<
       BlockTypeFromSocketApi<LedgerApiType>
     >,
   ): Promise<void> {
-    return new Promise((resolve) => {
-      if (!this.ledgerApi.watchBlocksV1) {
-        throw new Error("startMonitor not supported on this ledger");
-      }
+    if (!(this.ledgerApi.watchBlocksV1 || this.ledgerApi.watchBlocksAsyncV1)) {
+      throw new Error("startMonitor not supported on this ledger");
+    }
 
-      if (this.runningMonitors.has(appId)) {
-        throw new Error(`Monitor with appId '${appId}' is already running!`);
-      }
+    if (this.runningMonitors.has(appId)) {
+      throw new Error(`Monitor with appId '${appId}' is already running!`);
+    }
 
-      this.log.debug("call : startMonitor appId =", appId);
+    this.log.debug("call : startMonitor appId =", appId);
 
-      try {
-        const blocksObservable = this.ledgerApi.watchBlocksV1(options);
+    try {
+      const blocksObservable = this.ledgerApi.watchBlocksV1
+        ? this.ledgerApi.watchBlocksV1(options)
+        : await this.ledgerApi.watchBlocksAsyncV1?.(options);
 
-        const watchBlocksSub = blocksObservable.subscribe({
-          next: (blockData: unknown) => {
-            const event = {
-              id: "",
-              verifierId: this.verifierID,
-              data: blockData as BlockTypeFromSocketApi<LedgerApiType>,
-            };
-            eventListener.onEvent(event);
-          },
-          error: (err) => {
-            this.log.error("Error when watching for new blocks, err:", err);
-            if (eventListener.onError) {
-              eventListener.onError(err);
-            }
-          },
-          complete: () => {
-            this.log.info("Watch completed");
-          },
-        });
-
-        this.runningMonitors.set(appId, watchBlocksSub);
-        this.log.debug(
-          "New monitor added, runningMonitors.size ==",
-          this.runningMonitors.size,
+      if (!blocksObservable) {
+        throw new Error(
+          "Could not get a valid blocks observable in startMonitor",
         );
-      } catch (err) {
-        this.log.error(`##Error: startMonitor, ${err}`);
-        this.runningMonitors.delete(appId);
       }
 
-      resolve();
-    });
+      const watchBlocksSub = blocksObservable.subscribe({
+        next: (blockData: unknown) => {
+          const event = {
+            id: "",
+            verifierId: this.verifierID,
+            data: blockData as BlockTypeFromSocketApi<LedgerApiType>,
+          };
+          eventListener.onEvent(event);
+        },
+        error: (err) => {
+          this.log.error("Error when watching for new blocks, err:", err);
+          if (eventListener.onError) {
+            eventListener.onError(err);
+          }
+        },
+        complete: () => {
+          this.log.info("Watch completed");
+        },
+      });
+
+      this.runningMonitors.set(appId, watchBlocksSub);
+      this.log.debug(
+        "New monitor added, runningMonitors.size ==",
+        this.runningMonitors.size,
+      );
+    } catch (err) {
+      this.log.error(`##Error: startMonitor, ${err}`);
+      this.runningMonitors.delete(appId);
+    }
   }
 
   /**
@@ -158,18 +162,16 @@ export class Verifier<LedgerApiType extends ISocketApiClient<unknown>>
    *
    * @todo Change return type from Promise<void> to void, this method is already async by design.
    */
-  sendAsyncRequest(
+  async sendAsyncRequest(
     contract: Record<string, unknown>,
     method: Record<string, unknown>,
     args: any,
   ): Promise<void> {
-    return new Promise((resolve) => {
-      if (!this.ledgerApi.sendAsyncRequest) {
-        throw new Error("sendAsyncRequest not supported on this ledger");
-      }
+    if (!this.ledgerApi.sendAsyncRequest) {
+      throw new Error("sendAsyncRequest not supported on this ledger");
+    }
 
-      resolve(this.ledgerApi.sendAsyncRequest(contract, method, args));
-    });
+    return this.ledgerApi.sendAsyncRequest(contract, method, args);
   }
 
   /**
@@ -179,15 +181,13 @@ export class Verifier<LedgerApiType extends ISocketApiClient<unknown>>
    * @param args - arguments.
    * @returns Promise that will resolve with response from the ledger, or reject when error occurred.
    */
-  sendSyncRequest(
+  async sendSyncRequest(
     contract: Record<string, unknown>,
     method: Record<string, unknown>,
     args: any,
   ): Promise<any> {
     if (!this.ledgerApi.sendSyncRequest) {
-      return new Promise(() => {
-        throw new Error("sendSyncRequest not supported on this ledger");
-      });
+      throw new Error("sendSyncRequest not supported on this ledger");
     }
 
     return this.ledgerApi.sendSyncRequest(contract, method, args);

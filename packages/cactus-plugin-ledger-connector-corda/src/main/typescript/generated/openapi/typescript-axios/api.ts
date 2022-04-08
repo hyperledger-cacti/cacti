@@ -24,6 +24,50 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
 /**
  * 
  * @export
+ * @interface ClearMonitorTransactionsV1Request
+ */
+export interface ClearMonitorTransactionsV1Request {
+    /**
+     * ID of a client application that wants to monitor the state changes
+     * @type {string}
+     * @memberof ClearMonitorTransactionsV1Request
+     */
+    clientAppId: string;
+    /**
+     * The fully qualified name of the Corda state to monitor
+     * @type {string}
+     * @memberof ClearMonitorTransactionsV1Request
+     */
+    stateFullClassName: string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof ClearMonitorTransactionsV1Request
+     */
+    txIndexes: Array<string>;
+}
+/**
+ * 
+ * @export
+ * @interface ClearMonitorTransactionsV1Response
+ */
+export interface ClearMonitorTransactionsV1Response {
+    /**
+     * Flag set to true if operation completed correctly.
+     * @type {boolean}
+     * @memberof ClearMonitorTransactionsV1Response
+     */
+    success: boolean;
+    /**
+     * Message describing operation status or any errors that occurred.
+     * @type {string}
+     * @memberof ClearMonitorTransactionsV1Response
+     */
+    msg: string;
+}
+/**
+ * 
+ * @export
  * @interface CordaNodeSshCredentials
  */
 export interface CordaNodeSshCredentials {
@@ -324,6 +368,75 @@ export enum FlowInvocationType {
     FlowDynamic = 'FLOW_DYNAMIC'
 }
 
+/**
+ * 
+ * @export
+ * @interface GetMonitorTransactionsV1Request
+ */
+export interface GetMonitorTransactionsV1Request {
+    /**
+     * ID of a client application that wants to monitor the state changes
+     * @type {string}
+     * @memberof GetMonitorTransactionsV1Request
+     */
+    clientAppId: string;
+    /**
+     * The fully qualified name of the Corda state to monitor
+     * @type {string}
+     * @memberof GetMonitorTransactionsV1Request
+     */
+    stateFullClassName: string;
+}
+/**
+ * 
+ * @export
+ * @interface GetMonitorTransactionsV1Response
+ */
+export interface GetMonitorTransactionsV1Response {
+    /**
+     * Flag set to true if operation completed correctly.
+     * @type {boolean}
+     * @memberof GetMonitorTransactionsV1Response
+     */
+    success: boolean;
+    /**
+     * Message describing operation status or any errors that occurred.
+     * @type {string}
+     * @memberof GetMonitorTransactionsV1Response
+     */
+    msg: string;
+    /**
+     * The fully qualified name of the Corda state to monitor
+     * @type {string}
+     * @memberof GetMonitorTransactionsV1Response
+     */
+    stateFullClassName?: string;
+    /**
+     * 
+     * @type {Array<GetMonitorTransactionsV1ResponseTx>}
+     * @memberof GetMonitorTransactionsV1Response
+     */
+    tx?: Array<GetMonitorTransactionsV1ResponseTx>;
+}
+/**
+ * 
+ * @export
+ * @interface GetMonitorTransactionsV1ResponseTx
+ */
+export interface GetMonitorTransactionsV1ResponseTx {
+    /**
+     * 
+     * @type {string}
+     * @memberof GetMonitorTransactionsV1ResponseTx
+     */
+    index?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetMonitorTransactionsV1ResponseTx
+     */
+    data?: string;
+}
 /**
  * 
  * @export
@@ -677,6 +790,82 @@ export interface SHA256 {
 /**
  * 
  * @export
+ * @interface StartMonitorV1Request
+ */
+export interface StartMonitorV1Request {
+    /**
+     * ID of a client application that wants to monitor the state changes
+     * @type {string}
+     * @memberof StartMonitorV1Request
+     */
+    clientAppId: string;
+    /**
+     * The fully qualified name of the Corda state to monitor
+     * @type {string}
+     * @memberof StartMonitorV1Request
+     */
+    stateFullClassName: string;
+}
+/**
+ * 
+ * @export
+ * @interface StartMonitorV1Response
+ */
+export interface StartMonitorV1Response {
+    /**
+     * Flag set to true if monitoring started correctly.
+     * @type {boolean}
+     * @memberof StartMonitorV1Response
+     */
+    success: boolean;
+    /**
+     * Message describing operation status or any errors that occurred.
+     * @type {string}
+     * @memberof StartMonitorV1Response
+     */
+    msg: string;
+}
+/**
+ * 
+ * @export
+ * @interface StopMonitorV1Request
+ */
+export interface StopMonitorV1Request {
+    /**
+     * ID of a client application that wants to monitor the state changes
+     * @type {string}
+     * @memberof StopMonitorV1Request
+     */
+    clientAppId: string;
+    /**
+     * The fully qualified name of the Corda state to monitor
+     * @type {string}
+     * @memberof StopMonitorV1Request
+     */
+    stateFullClassName: string;
+}
+/**
+ * 
+ * @export
+ * @interface StopMonitorV1Response
+ */
+export interface StopMonitorV1Response {
+    /**
+     * Flag set to true if operation completed correctly.
+     * @type {boolean}
+     * @memberof StopMonitorV1Response
+     */
+    success: boolean;
+    /**
+     * Message describing operation status or any errors that occurred.
+     * @type {string}
+     * @memberof StopMonitorV1Response
+     */
+    msg: string;
+}
+/**
+ * 
+ * @export
  * @interface X500Principal
  */
 export interface X500Principal {
@@ -700,6 +889,40 @@ export interface X500Principal {
  */
 export const DefaultApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
+        /**
+         * 
+         * @summary Clear transactions from internal store so they\'ll not be available by GetMonitorTransactionsV1 anymore.
+         * @param {ClearMonitorTransactionsV1Request} [clearMonitorTransactionsV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        clearMonitorTransactionsV1: async (clearMonitorTransactionsV1Request?: ClearMonitorTransactionsV1Request, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/clear-monitor-transactions`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(clearMonitorTransactionsV1Request, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
         /**
          * 
          * @summary Deploys a set of jar files (Cordapps, e.g. the contracts in Corda speak).
@@ -761,6 +984,40 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(diagnoseNodeV1Request, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get transactions for monitored state classes.
+         * @param {GetMonitorTransactionsV1Request} [getMonitorTransactionsV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getMonitorTransactionsV1: async (getMonitorTransactionsV1Request?: GetMonitorTransactionsV1Request, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-monitor-transactions`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(getMonitorTransactionsV1Request, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -897,6 +1154,74 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * 
+         * @summary Start monitoring corda changes (transactions) of given state class
+         * @param {StartMonitorV1Request} [startMonitorV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        startMonitorV1: async (startMonitorV1Request?: StartMonitorV1Request, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/start-monitor`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(startMonitorV1Request, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Stop monitoring corda changes (transactions) of given state class
+         * @param {StopMonitorV1Request} [stopMonitorV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        stopMonitorV1: async (stopMonitorV1Request?: StopMonitorV1Request, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/stop-monitor`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(stopMonitorV1Request, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -907,6 +1232,17 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
 export const DefaultApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = DefaultApiAxiosParamCreator(configuration)
     return {
+        /**
+         * 
+         * @summary Clear transactions from internal store so they\'ll not be available by GetMonitorTransactionsV1 anymore.
+         * @param {ClearMonitorTransactionsV1Request} [clearMonitorTransactionsV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async clearMonitorTransactionsV1(clearMonitorTransactionsV1Request?: ClearMonitorTransactionsV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ClearMonitorTransactionsV1Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.clearMonitorTransactionsV1(clearMonitorTransactionsV1Request, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
         /**
          * 
          * @summary Deploys a set of jar files (Cordapps, e.g. the contracts in Corda speak).
@@ -926,6 +1262,17 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          */
         async diagnoseNodeV1(diagnoseNodeV1Request?: DiagnoseNodeV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DiagnoseNodeV1Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.diagnoseNodeV1(diagnoseNodeV1Request, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Get transactions for monitored state classes.
+         * @param {GetMonitorTransactionsV1Request} [getMonitorTransactionsV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getMonitorTransactionsV1(getMonitorTransactionsV1Request?: GetMonitorTransactionsV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetMonitorTransactionsV1Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getMonitorTransactionsV1(getMonitorTransactionsV1Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -969,6 +1316,28 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.networkMapV1(body, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
+        /**
+         * 
+         * @summary Start monitoring corda changes (transactions) of given state class
+         * @param {StartMonitorV1Request} [startMonitorV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async startMonitorV1(startMonitorV1Request?: StartMonitorV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<StartMonitorV1Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.startMonitorV1(startMonitorV1Request, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary Stop monitoring corda changes (transactions) of given state class
+         * @param {StopMonitorV1Request} [stopMonitorV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async stopMonitorV1(stopMonitorV1Request?: StopMonitorV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<StopMonitorV1Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.stopMonitorV1(stopMonitorV1Request, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
     }
 };
 
@@ -979,6 +1348,16 @@ export const DefaultApiFp = function(configuration?: Configuration) {
 export const DefaultApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = DefaultApiFp(configuration)
     return {
+        /**
+         * 
+         * @summary Clear transactions from internal store so they\'ll not be available by GetMonitorTransactionsV1 anymore.
+         * @param {ClearMonitorTransactionsV1Request} [clearMonitorTransactionsV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        clearMonitorTransactionsV1(clearMonitorTransactionsV1Request?: ClearMonitorTransactionsV1Request, options?: any): AxiosPromise<ClearMonitorTransactionsV1Response> {
+            return localVarFp.clearMonitorTransactionsV1(clearMonitorTransactionsV1Request, options).then((request) => request(axios, basePath));
+        },
         /**
          * 
          * @summary Deploys a set of jar files (Cordapps, e.g. the contracts in Corda speak).
@@ -997,6 +1376,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         diagnoseNodeV1(diagnoseNodeV1Request?: DiagnoseNodeV1Request, options?: any): AxiosPromise<DiagnoseNodeV1Response> {
             return localVarFp.diagnoseNodeV1(diagnoseNodeV1Request, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get transactions for monitored state classes.
+         * @param {GetMonitorTransactionsV1Request} [getMonitorTransactionsV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getMonitorTransactionsV1(getMonitorTransactionsV1Request?: GetMonitorTransactionsV1Request, options?: any): AxiosPromise<GetMonitorTransactionsV1Response> {
+            return localVarFp.getMonitorTransactionsV1(getMonitorTransactionsV1Request, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -1035,6 +1424,26 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         networkMapV1(body?: object, options?: any): AxiosPromise<Array<NodeInfo>> {
             return localVarFp.networkMapV1(body, options).then((request) => request(axios, basePath));
         },
+        /**
+         * 
+         * @summary Start monitoring corda changes (transactions) of given state class
+         * @param {StartMonitorV1Request} [startMonitorV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        startMonitorV1(startMonitorV1Request?: StartMonitorV1Request, options?: any): AxiosPromise<StartMonitorV1Response> {
+            return localVarFp.startMonitorV1(startMonitorV1Request, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Stop monitoring corda changes (transactions) of given state class
+         * @param {StopMonitorV1Request} [stopMonitorV1Request] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        stopMonitorV1(stopMonitorV1Request?: StopMonitorV1Request, options?: any): AxiosPromise<StopMonitorV1Response> {
+            return localVarFp.stopMonitorV1(stopMonitorV1Request, options).then((request) => request(axios, basePath));
+        },
     };
 };
 
@@ -1045,6 +1454,18 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
  * @extends {BaseAPI}
  */
 export class DefaultApi extends BaseAPI {
+    /**
+     * 
+     * @summary Clear transactions from internal store so they\'ll not be available by GetMonitorTransactionsV1 anymore.
+     * @param {ClearMonitorTransactionsV1Request} [clearMonitorTransactionsV1Request] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public clearMonitorTransactionsV1(clearMonitorTransactionsV1Request?: ClearMonitorTransactionsV1Request, options?: any) {
+        return DefaultApiFp(this.configuration).clearMonitorTransactionsV1(clearMonitorTransactionsV1Request, options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * 
      * @summary Deploys a set of jar files (Cordapps, e.g. the contracts in Corda speak).
@@ -1066,6 +1487,18 @@ export class DefaultApi extends BaseAPI {
      */
     public diagnoseNodeV1(diagnoseNodeV1Request?: DiagnoseNodeV1Request, options?: any) {
         return DefaultApiFp(this.configuration).diagnoseNodeV1(diagnoseNodeV1Request, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get transactions for monitored state classes.
+     * @param {GetMonitorTransactionsV1Request} [getMonitorTransactionsV1Request] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getMonitorTransactionsV1(getMonitorTransactionsV1Request?: GetMonitorTransactionsV1Request, options?: any) {
+        return DefaultApiFp(this.configuration).getMonitorTransactionsV1(getMonitorTransactionsV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1111,6 +1544,30 @@ export class DefaultApi extends BaseAPI {
      */
     public networkMapV1(body?: object, options?: any) {
         return DefaultApiFp(this.configuration).networkMapV1(body, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Start monitoring corda changes (transactions) of given state class
+     * @param {StartMonitorV1Request} [startMonitorV1Request] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public startMonitorV1(startMonitorV1Request?: StartMonitorV1Request, options?: any) {
+        return DefaultApiFp(this.configuration).startMonitorV1(startMonitorV1Request, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Stop monitoring corda changes (transactions) of given state class
+     * @param {StopMonitorV1Request} [stopMonitorV1Request] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public stopMonitorV1(stopMonitorV1Request?: StopMonitorV1Request, options?: any) {
+        return DefaultApiFp(this.configuration).stopMonitorV1(stopMonitorV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

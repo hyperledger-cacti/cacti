@@ -1,15 +1,23 @@
 package org.hyperledger.cactus.plugin.ledger.connector.corda.server.api
 
+import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.ClearMonitorTransactionsV1Request
+import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.ClearMonitorTransactionsV1Response
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.DeployContractJarsBadRequestV1Response
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.DeployContractJarsSuccessV1Response
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.DeployContractJarsV1Request
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.DiagnoseNodeV1Request
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.DiagnoseNodeV1Response
+import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.GetMonitorTransactionsV1Request
+import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.GetMonitorTransactionsV1Response
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.InvokeContractV1Request
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.InvokeContractV1Response
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.ListFlowsV1Request
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.ListFlowsV1Response
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.NodeInfo
+import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.StartMonitorV1Request
+import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.StartMonitorV1Response
+import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.StopMonitorV1Request
+import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.StopMonitorV1Response
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -37,6 +45,17 @@ import kotlin.collections.Map
 class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) val service: ApiPluginLedgerConnectorCordaService) {
 
 
+    @DeleteMapping(
+        value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/clear-monitor-transactions"],
+        produces = ["application/json"],
+        consumes = ["application/json"]
+    )
+    fun clearMonitorTransactionsV1( @Valid @RequestBody(required = false) clearMonitorTransactionsV1Request: ClearMonitorTransactionsV1Request?
+): ResponseEntity<ClearMonitorTransactionsV1Response> {
+        return ResponseEntity(service.clearMonitorTransactionsV1(clearMonitorTransactionsV1Request), HttpStatus.valueOf(200))
+    }
+
+
     @PostMapping(
         value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/deploy-contract-jars"],
         produces = ["application/json"],
@@ -56,6 +75,17 @@ class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) val se
     fun diagnoseNodeV1( @Valid @RequestBody(required = false) diagnoseNodeV1Request: DiagnoseNodeV1Request?
 ): ResponseEntity<DiagnoseNodeV1Response> {
         return ResponseEntity(service.diagnoseNodeV1(diagnoseNodeV1Request), HttpStatus.valueOf(200))
+    }
+
+
+    @GetMapping(
+        value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-monitor-transactions"],
+        produces = ["application/json"],
+        consumes = ["application/json"]
+    )
+    fun getMonitorTransactionsV1( @Valid @RequestBody(required = false) getMonitorTransactionsV1Request: GetMonitorTransactionsV1Request?
+): ResponseEntity<GetMonitorTransactionsV1Response> {
+        return ResponseEntity(service.getMonitorTransactionsV1(getMonitorTransactionsV1Request), HttpStatus.valueOf(200))
     }
 
 
@@ -98,5 +128,27 @@ class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) val se
     fun networkMapV1( @Valid @RequestBody(required = false) body: kotlin.Any?
 ): ResponseEntity<List<NodeInfo>> {
         return ResponseEntity(service.networkMapV1(body), HttpStatus.valueOf(200))
+    }
+
+
+    @PostMapping(
+        value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/start-monitor"],
+        produces = ["application/json"],
+        consumes = ["application/json"]
+    )
+    fun startMonitorV1( @Valid @RequestBody(required = false) startMonitorV1Request: StartMonitorV1Request?
+): ResponseEntity<StartMonitorV1Response> {
+        return ResponseEntity(service.startMonitorV1(startMonitorV1Request), HttpStatus.valueOf(200))
+    }
+
+
+    @DeleteMapping(
+        value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/stop-monitor"],
+        produces = ["application/json"],
+        consumes = ["application/json"]
+    )
+    fun stopMonitorV1( @Valid @RequestBody(required = false) stopMonitorV1Request: StopMonitorV1Request?
+): ResponseEntity<StopMonitorV1Response> {
+        return ResponseEntity(service.stopMonitorV1(stopMonitorV1Request), HttpStatus.valueOf(200))
     }
 }
