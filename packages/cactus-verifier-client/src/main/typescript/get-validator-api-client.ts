@@ -20,6 +20,11 @@ import {
   QuorumApiClientOptions,
 } from "@hyperledger/cactus-plugin-ledger-connector-quorum";
 
+import {
+  CordaApiClient,
+  CordaApiClientOptions,
+} from "@hyperledger/cactus-plugin-ledger-connector-corda";
+
 /**
  * Configuration of ApiClients currently supported by Verifier and VerifierFactory
  * Each entry key defines the name of the connection type that has to be specified in VerifierFactory config.
@@ -42,6 +47,10 @@ export type ClientApiConfig = {
   QUORUM_2X: {
     in: QuorumApiClientOptions;
     out: QuorumApiClient;
+  };
+  CORDA_4X: {
+    in: CordaApiClientOptions;
+    out: CordaApiClient;
   };
 };
 
@@ -66,6 +75,8 @@ export function getValidatorApiClient<K extends keyof ClientApiConfig>(
       return new BesuApiClient(options as BesuApiClientOptions);
     case "QUORUM_2X":
       return new QuorumApiClient(options as QuorumApiClientOptions);
+    case "CORDA_4X":
+      return new CordaApiClient(options as CordaApiClientOptions);
     default:
       // Will not compile if any ClientApiConfig key was not handled by this switch
       const _: never = validatorType;

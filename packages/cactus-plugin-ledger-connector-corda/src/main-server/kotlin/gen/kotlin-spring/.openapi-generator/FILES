@@ -4,6 +4,8 @@ settings.gradle
 src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/api/ApiPluginLedgerConnectorCorda.kt
 src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/api/ApiPluginLedgerConnectorCordaService.kt
 src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/api/ApiUtil.kt
+src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/ClearMonitorTransactionsV1Request.kt
+src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/ClearMonitorTransactionsV1Response.kt
 src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/CordaNodeSshCredentials.kt
 src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/CordaRpcCredentials.kt
 src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/CordaX500Name.kt
@@ -15,6 +17,9 @@ src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/mode
 src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/DiagnoseNodeV1Request.kt
 src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/DiagnoseNodeV1Response.kt
 src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/FlowInvocationType.kt
+src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/GetMonitorTransactionsV1Request.kt
+src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/GetMonitorTransactionsV1Response.kt
+src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/GetMonitorTransactionsV1ResponseTx.kt
 src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/InvokeContractV1Request.kt
 src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/InvokeContractV1Response.kt
 src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/JarFile.kt
@@ -29,5 +34,9 @@ src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/mode
 src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/Party.kt
 src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/PublicKey.kt
 src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/SHA256.kt
+src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/StartMonitorV1Request.kt
+src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/StartMonitorV1Response.kt
+src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/StopMonitorV1Request.kt
+src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/StopMonitorV1Response.kt
 src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/X500Principal.kt
 src/main/resources/application.yaml

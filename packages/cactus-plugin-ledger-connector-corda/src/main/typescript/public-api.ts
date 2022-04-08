@@ -20,3 +20,9 @@ export async function createPluginFactory(
 ): Promise<PluginFactoryLedgerConnector> {
   return new PluginFactoryLedgerConnector(pluginFactoryOptions);
 }
+
+export {
+  CordaApiClient,
+  CordaApiClientOptions,
+  watchBlocksV1Options,
+} from "./api-client/corda-api-client";

@@ -10,10 +10,12 @@ import org.springframework.context.annotation.ComponentScan
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.context.annotation.Bean
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
+import org.springframework.scheduling.annotation.EnableScheduling
 
 
 @SpringBootApplication
 @ComponentScan(basePackages = ["org.hyperledger.cactus.plugin.ledger.connector.corda.server", "org.hyperledger.cactus.plugin.ledger.connector.corda.server.api", "org.hyperledger.cactus.plugin.ledger.connector.corda.server.model"])
+@EnableScheduling
 class Application {
     /**
      * Spring Bean that binds a Corda Jackson object-mapper to HTTP message types used in Spring.

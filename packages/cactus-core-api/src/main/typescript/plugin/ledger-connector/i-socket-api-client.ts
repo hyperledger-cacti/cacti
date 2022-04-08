@@ -22,4 +22,8 @@ export interface ISocketApiClient<BlockType> {
   watchBlocksV1?(
     monitorOptions?: Record<string, unknown>,
   ): Observable<BlockType>;
+
+  watchBlocksAsyncV1?(
+    monitorOptions?: Record<string, unknown>,
+  ): Promise<Observable<BlockType>>;
 }
