@@ -56,7 +56,7 @@ Drivers are ledger-specific and DLT protocol-aware relay plug-ins, which can be 
 - Generate a ledger view in response to a relay query.
 - Translate a DLT-neutral event into a DLT-specific event and vice versa.
 
-For example, in the [data sharing protocol](../../protocols/data-sharing/generic.md), a driver are tasked with orchestrating the generation of a view in response to a view address and collecting authenticity proof to satisfy the [verification policy] within the request.
+For example, in the [data sharing protocol](../../protocols/data-sharing/generic.md), a driver are tasked with orchestrating the generation of a view in response to a view address and collecting [authenticity proof](../ledger/cryptographic-proofs.md) to satisfy the [verification policy](../../formats/policies/proof-verification.md) within the request.
 
 Drivers are implemented as typical client applications on a given DLT platform. Some examples are as follows:
 - In Hyperledger Fabric, a driver is implemented on the Fabric SDK (in Node.js or Java or Go) through the `fabric-network` package and Gateway API, using which it can invoke chaincode deployed on the network's channels.
