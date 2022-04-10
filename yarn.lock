@@ -4447,7 +4447,7 @@
   resolved "https://registry.yarnpkg.com/@types/ms/-/ms-0.7.31.tgz#31b7ca6407128a3d2bbc27fe2d21b345397f6197"
   integrity sha512-iiUgKzV9AuaEkZqkOLDIvlQiL6ltuZd9tGcW3gwpnX8JbuiuhFlEGmmFXEXkN50Cvq7Os88IY2v0dkDqXYWVgA==
 
-"@types/multer@1.4.7", "@types/multer@^1.4.5":
+"@types/multer@1.4.7", "@types/multer@^1.4.5", "@types/multer@^1.4.7":
   version "1.4.7"
   resolved "https://registry.yarnpkg.com/@types/multer/-/multer-1.4.7.tgz#89cf03547c28c7bbcc726f029e2a76a7232cc79e"
   integrity sha512-/SNsDidUFCvqqcWDwxv2feww/yqhNeTRL5CVoL3jU4Goc4kKEL10T7Eye65ZqPNi4HRx8sAEX59pV1aEH7drNA==
@@ -10479,6 +10479,24 @@ express-openapi-validator@4.12.12:
     ono "^7.1.3"
     path-to-regexp "^6.2.0"
 
+express-openapi-validator@4.13.7:
+  version "4.13.7"
+  resolved "https://registry.yarnpkg.com/express-openapi-validator/-/express-openapi-validator-4.13.7.tgz#1b888f3e406c2f4d7aa9e92d8c280ee800e2479d"
+  integrity sha512-MMTwGT5RyDyQJ2IWzdLkoKwTAqnHKUOQF+9pYrKqXaVmCIhHyjM1woenO4UkfV/kRLbqauWEE4yj+Urvy4//lg==
+  dependencies:
+    "@types/multer" "^1.4.7"
+    ajv "^6.12.6"
+    content-type "^1.0.4"
+    json-schema-ref-parser "^9.0.9"
+    lodash.clonedeep "^4.5.0"
+    lodash.get "^4.4.2"
+    lodash.uniq "^4.5.0"
+    lodash.zipobject "^4.1.3"
+    media-typer "^1.1.0"
+    multer "^1.4.4"
+    ono "^7.1.3"
+    path-to-regexp "^6.2.0"
+
 express-rate-limit@6.3.0:
   version "6.3.0"
   resolved "https://registry.yarnpkg.com/express-rate-limit/-/express-rate-limit-6.3.0.tgz#253387ce4d36c9c2cc77c7c676068deb36cc0821"
@@ -14519,7 +14537,7 @@ json-schema-ref-parser@^8.0.0:
   dependencies:
     "@apidevtools/json-schema-ref-parser" "8.0.0"
 
-json-schema-ref-parser@^9.0.7:
+json-schema-ref-parser@^9.0.7, json-schema-ref-parser@^9.0.9:
   version "9.0.9"
   resolved "https://registry.yarnpkg.com/json-schema-ref-parser/-/json-schema-ref-parser-9.0.9.tgz#66ea538e7450b12af342fa3d5b8458bc1e1e013f"
   integrity sha512-qcP2lmGy+JUoQJ4DOQeLaZDqH9qSkeGCK3suKWxJXS82dg728Mn3j97azDMaOUmJAN4uCq91LdPx4K7E8F1a7Q==
@@ -16278,7 +16296,7 @@ multer@1.4.3:
     type-is "^1.6.4"
     xtend "^4.0.0"
 
-multer@^1.4.2:
+multer@^1.4.2, multer@^1.4.4:
   version "1.4.4"
   resolved "https://registry.yarnpkg.com/multer/-/multer-1.4.4.tgz#e2bc6cac0df57a8832b858d7418ccaa8ebaf7d8c"
   integrity sha512-2wY2+xD4udX612aMqMcB8Ws2Voq6NIUPEtD1be6m411T4uDH/VtL9i//xvcyFlTVfRdaBsk7hV5tgrGQqhuBiw==

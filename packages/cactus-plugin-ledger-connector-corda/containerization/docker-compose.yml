@@ -1,0 +1,133 @@
+version: '3.6'
+
+services:
+
+  # service for Corda ledger
+  corda-aio:
+    container_name: corda-aio
+    image: "ghcr.io/hyperledger/cactus-corda-4-8-all-in-one-obligation:2021-08-31--feat-889"
+    ports:
+      - "10003:10003"
+      - "10008:10008"
+      - "10011:10011"
+      - "10014:10014"
+      - "22:22"
+      - "2375:2375"
+      - "2376:2376"
+      - "7005:7005"
+      - "7006:7006"
+      - "7007:7007"
+      - "7008:7008"
+      - "9001:9001"
+    privileged: true
+
+  # service for corda connector
+  corda-connector:
+    network_mode: "host"
+    container_name: corda-connector
+    # image: "ghcr.io/hyperledger/cactus-connector-corda-server:2021-11-23--feat-1493"
+    # optionally, can create image from Dockerfile
+    build:
+      dockerfile: Dockerfile
+      context: ../src/main-server/
+    depends_on:
+      - corda-aio
+    environment:
+      - SPRING_APPLICATION_JSON=${SPRING_APPLICATION_JSON}
+    privileged: true
+
+  # service to use when sending plugins as environment variable
+  cmd-api-server-corda-env:
+    container_name: cmd-api-server-corda
+    profiles:
+      - env
+    build:
+      dockerfile: Dockerfile
+      context: .
+      args:
+        NPM_PKG_VERSION: ${NPM_PKG_VERSION}
+    depends_on:
+      - corda-connector
+    ports:
+      - "3000:3000"
+      - "4000:4000"
+    links:
+      - "corda-connector:connector"
+      - "corda-aio:ledger"
+    environment: 
+      - AUTHORIZATION_PROTOCOL=${AUTHORIZATION_PROTOCOL}
+      - AUTHORIZATION_CONFIG_JSON=${AUTHORIZATION_CONFIG_JSON}
+      - GRPC_TLS_ENABLED=${GRPC_TLS_ENABLED}
+      - KEY_PAIR_PEM=${KEY_PAIR_PEM}
+      - PLUGINS=${PLUGINS}
+      - LOG_LEVEL=${LOG_LEVEL}
+    secrets:
+      - aio-key
+    privileged: true
+
+  # service to use when sending plugins as cli argument
+  cmd-api-server-corda-cli:
+    container_name: cmd-api-server-corda
+    profiles:
+      - cli
+    build:
+      dockerfile: Dockerfile
+      context: .
+      args:
+        NPM_PKG_VERSION: ${NPM_PKG_VERSION}
+    depends_on:
+      - corda-connector
+    ports:
+      - "3000:3000"
+      - "4000:4000"
+    links:
+      - "corda-connector:connector"
+      - "corda-aio:ledger"
+    environment: 
+      - AUTHORIZATION_PROTOCOL=${AUTHORIZATION_PROTOCOL}
+      - AUTHORIZATION_CONFIG_JSON=${AUTHORIZATION_CONFIG_JSON}
+      - GRPC_TLS_ENABLED=${GRPC_TLS_ENABLED}
+      - KEY_PAIR_PEM=${KEY_PAIR_PEM}
+      - LOG_LEVEL=${LOG_LEVEL}
+    command: ./node_modules/@hyperledger/cactus-cmd-api-server/dist/lib/main/typescript/cmd/cactus-api.js --plugins='${PLUGINS}'
+    secrets:
+      - aio-key
+    privileged: true
+
+  # service to use when sending plugins as configuration file mounted from host machine
+  cmd-api-server-corda-file:
+    container_name: cmd-api-server-corda
+    profiles:
+      - file
+    # image: "ghcr.io/hyperledger/cactus-cmd-api-server:v1.0.0-rc.3"
+    build:
+      dockerfile: Dockerfile
+      context: .
+      args:
+        NPM_PKG_VERSION: ${NPM_PKG_VERSION}
+    depends_on:
+      - corda-connector
+    ports:
+      - "3000:3000"
+      - "4000:4000"
+    links:
+      - "corda-connector:connector"
+      - "corda-aio:ledger"
+    environment: 
+      - AUTHORIZATION_PROTOCOL=${AUTHORIZATION_PROTOCOL}
+      - AUTHORIZATION_CONFIG_JSON=${AUTHORIZATION_CONFIG_JSON}
+      - GRPC_TLS_ENABLED=${GRPC_TLS_ENABLED}
+      - KEY_PAIR_PEM=${KEY_PAIR_PEM}
+      - LOG_LEVEL=${LOG_LEVEL}
+    volumes:
+    - type: bind
+      source: ./${FILE_NAME}
+      target: ${APP_PATH}/${FILE_NAME}
+    command: ./node_modules/@hyperledger/cactus-cmd-api-server/dist/lib/main/typescript/cmd/cactus-api.js --config-file=./${FILE_NAME}
+    secrets:
+      - aio-key
+    privileged: true
+
+secrets:
+  aio-key:
+    file: corda-aio-image.key

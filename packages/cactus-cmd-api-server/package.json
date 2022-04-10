@@ -73,7 +73,7 @@
     "express": "4.17.1",
     "express-http-proxy": "1.6.2",
     "express-jwt": "6.0.0",
-    "express-openapi-validator": "4.12.12",
+    "express-openapi-validator": "4.13.7",
     "express-rate-limit": "6.3.0",
     "fs-extra": "10.0.0",
     "google-protobuf": "3.18.0-rc.2",

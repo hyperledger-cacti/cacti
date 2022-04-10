@@ -1,0 +1,23 @@
+{
+    "plugins": [
+      {
+        "packageName":"@hyperledger/cactus-plugin-ledger-connector-corda",
+        "type":"org.hyperledger.cactus.plugin_import_type.LOCAL",
+        "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",
+        "options": {
+          "logLevel":"TRACE",
+          "sshConfigAdminShell": {
+            "host":"ledger",
+            "port":"22",
+            "username":"root",
+            "privateKey":""
+          },
+          "sshPrivateKeyPath":"/run/secrets/aio-key",
+          "corDappsDir":"/samples-kotlin/Advanced/obligation-cordapp/build/nodes/ParticipantA/cordapps",
+          "version":"1.0.0",
+          "instanceId":"some-unique-corda-instance-id",
+          "apiUrl":"http://connector:8080"
+        }
+      }
+    ]
+}
