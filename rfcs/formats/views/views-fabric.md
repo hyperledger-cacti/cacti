@@ -60,7 +60,7 @@ message InteropPayload {
 }
 ```
 
-The interop chaincode will wrap the response from the application chaincode up in this `InteropPayload` structure. The reason for this is so that we can leverage the `Endorsement`'s from the peers to verify that the `ProposalResponsePayload` corresponds to the correct query address. By doing this, the `ProposalHash` inside of the `ProposalResponsePayload` doesn't need to be matched with the `Proposal` (and therefore the `Proposal` no longer needs to be included in the `FabricView`).
+The interop chaincode will wrap the response from the application chaincode up in this `InteropPayload` structure. The reason for this is so that we can leverage the `Endorsement`s from the peers to verify that the `ProposalResponsePayload` corresponds to the correct query address. By doing this, the `ProposalHash` inside of the `ProposalResponsePayload` doesn't need to be matched with the `Proposal` (and therefore the `Proposal` no longer needs to be included in the `FabricView`).
 
 -   Fabric protobuf reference (from current snapshot of `release-2.1` branch):
     -   [Response](https://github.com/hyperledger/fabric-protos/blob/release-2.1/peer/proposal_response.proto#L45)
