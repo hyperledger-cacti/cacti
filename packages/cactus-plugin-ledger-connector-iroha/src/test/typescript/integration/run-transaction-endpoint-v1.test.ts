@@ -50,7 +50,7 @@ test("BEFORE " + testCase, async (t: Test) => {
 });
 
 // Test fails because Iroha is unable to connect to Postgres for some reason.
-test.skip(testCase, async (t: Test) => {
+test(testCase, async (t: Test) => {
   const postgres = new PostgresTestContainer({ logLevel });
 
   test.onFinish(async () => {
@@ -1086,59 +1086,6 @@ test.skip(testCase, async (t: Test) => {
     t.equal(res.status, 200);
     t.equal(res.data.transactionReceipt.status, "COMMITTED");
   }
-
-  // //  Use Promise.race to cancel the promise
-  // {
-  //   const req1 = {
-  //     commandName: "producePendingTx",
-  //     params: [],
-  //   };
-  //   Promise.race([
-  //     //FIXME - the Iroha Javascript SDK does not give any output if we try to produce a pending transaction
-  //     // This results in an infinite loop and thus the following code cannot be executed.
-  //     // This fix is not perfect. It cancels the request with a timeout, but will result in grpc "Error: 14 UNAVAILABLE: GOAWAY received
-  //     // Once the Iroha Javascript SDK is justitied. We can safely produce a pending transaction.
-  //     apiClient.runTransactionV1(req1),
-  //     new Promise((resolve) => setTimeout(resolve, 1000)),
-  //   ]);
-  // }
-
-  // use bluebird to cancel Promise
-  // {
-  //   const req1 = {
-  //     commandName: "producePendingTx",
-  //     params: [],
-  //   };
-  //   const promise = apiClient.runTransactionV1(req1);
-  //   const p2 = new Promise((onCancel) => {
-  //     promise;
-  //     onCancel(() => console.log("p2 canceled"));
-  //   });
-  //   p2.cancel();
-  // }
-
-  // // {
-  // //   const req = {
-  // //     commandName: "removePeer",
-  // //     params: [
-  // //       "0000000000000000000000000000000000000000000000000000000000000002",
-  // //     ],
-  // //   };
-  // //   const res = await apiClient.runTransactionV1(req);
-  // //   console.log(res.data.transactionReceipt);
-  // // }
-
-  // // {
-  // //   const req = {
-  // //     commandName: "fetchCommits",
-  // //     params: [],
-  // //   };
-  // //   const res = await apiClient.runTransactionV1(req);
-  // //   t.ok(res);
-  // //   t.ok(res.data);
-  // //   t.equal(res.status, 200);
-  // //   console.log(res.data.transactionReceipt);
-  // // }
   t.end();
 });
 
