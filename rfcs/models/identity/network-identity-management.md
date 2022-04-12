@@ -13,16 +13,16 @@
 
 # Overview
 
-During interoperation through the [data transfer protocol 1.0](../../protocols/data-transfer/readme.md), the primary functions performed through consensus in the _endpoint_ peer networks, namely _request access control_ and _view proof validation_, depend on the availability of authentic information about the counterparty network's identity providers and their credentials. Snapshots of these _identity configurations_, changing at punctuated intervals, act as essential trust basis for access control checks and proof validations. As Fig.1 indicates, our protocol has two distinct planes of operation, an _identity plane_ that syncs identity information as necessary and a _data plane_ where requests and responses occur. (_Note_: data query is just one example of a protocol operating in the data plane, independent of the protocol operating in the identity plane yet dependent on the information obtained through the latter.)
+During interoperation through the [data sharing protocol](../../protocols/data-sharing/generic.md), the primary functions performed through consensus in the _endpoint_ peer networks, namely _request access control_ and _view proof validation_, depend on the availability of authentic information about the counterparty network's identity providers and their credentials. Snapshots of these _identity configurations_, changing at punctuated intervals, act as essential trust basis for access control checks and proof validations. As Fig.1 indicates, our protocol has two distinct planes of operation, an _identity plane_ that syncs identity information as necessary and a _data plane_ where requests and responses occur. (_Note_: data query is just one example of a protocol operating in the data plane, independent of the protocol operating in the identity plane yet dependent on the information obtained through the latter.)
 
 <div align="center">
 <img src="../../resources/images/protocol-functional-view.png" width=60%>
 <br/>
-<figcaption>Fig.1 - Data plane and identity plane in cross network data transfer protocol.</figcaption>
+<figcaption>Fig.1 - Data plane and identity plane in cross network data sharing protocol.</figcaption>
 </div>
 <br/>
 
-In the [data transfer protocol 1.0](../../protocols/data-transfer/readme.md), the protocol in the identity plane is implemented through the simplistic means of each network exposing a single public (i.e., without any access control) REST API function, from one of its active web servers, that reveals portions of the latest network configuration:
+In the data sharing protocol, the protocol in the identity plane is implemented through the simplistic means of each network exposing a single public (i.e., without any access control) REST API function, from one of its active web servers, that reveals portions of the latest network configuration:
 * In Fabric, this is the channel configuration containing root CA and intermediate CA certificates and other possibly relevant metadata for every organization participating in the channel.
 * In Corda, this is a set of certificate chains, typically network root --> doorman --> node for each network node.
 

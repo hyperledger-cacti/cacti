@@ -3,7 +3,7 @@
 
  SPDX-License-Identifier: CC-BY-4.0
  -->
-# Data Transfer Protocol
+# Data Sharing Protocol
 
 - RFC: 02-001
 - Authors: Antony Targett, Nick Waywood
@@ -16,16 +16,16 @@ A protocol (request-response protocol) to request and receive data between two n
 
 ## Motivation
 
-Data transfer (i.e. querying data) across ledgers is one of the fundamental features of interoperability.
+Data sharing (i.e. querying data) across ledgers is one of the fundamental features of interoperability.
 
 ## Name and Version
 
-Data Transfer v0.1
-data_transfer_v0.1
+Data Sharing v0.1
+data_sharing_v0.1
 
 ## Key Concepts
 
--   [Discovery protocol](../discovery/readme.md) - Before a data transfer can occur between two networks, the requesting network needs to be aware of other networks. The discovery protocol is responsible for this.
+-   [Discovery protocol](../discovery/readme.md) - Before a data sharing can occur between two networks, the requesting network needs to be aware of other networks. The discovery protocol is responsible for this.
 -   [Addressing](../../formats/addressing.md) - Addressing is how a network can
     specify the data it wants from another network. The [view](../../models/views.md)
     is also closely related to this concept.
@@ -33,13 +33,13 @@ data_transfer_v0.1
 
 ## Roles
 
-There are two roles in the `data-transfer` protocol: `requester` and `responder`. The requester asks the responder for some data, and the responder answers. Each role uses a single message type.
+There are two roles in the `data-sharing` protocol: `requester` and `responder`. The requester asks the responder for some data, and the responder answers. Each role uses a single message type.
 
 ## States
 
 This is a classic two-step request~response interaction, so it uses the predefined state machines for any `requester` and `responder`:
 
-<img src="../../resources/images/data-transfer-states.png" height="550" width="700">
+<img src="../../resources/images/data-sharing-states.png" height="550" width="700">
 
 \*\* Should this state diagram include validation of messages?
 
@@ -47,7 +47,7 @@ This is a classic two-step request~response interaction, so it uses the predefin
 
 ### `query` message type
 
-A `data-transfer/query` message constructed by the requesting relay looks like this:
+A `data-sharing/query` message constructed by the requesting relay looks like this:
 
 ```protobuf
 message Query {
@@ -84,7 +84,7 @@ message Query {
 
 ### Response message type
 
-A `data-transfer/ViewPayload` messaged is returned to the requester and looks like this:
+A `data-sharing/ViewPayload` messaged is returned to the requester and looks like this:
 
 ```protobuf
 message ViewPayload {

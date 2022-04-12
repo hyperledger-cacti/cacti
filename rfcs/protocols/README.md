@@ -7,7 +7,7 @@
 
 This folder contains specifications of the protocols that Weaver supports.
 
-The cross-network data transfer protocol specifications are described in the [data-transfer](./data-transfer) folder.
+The cross-network data sharing protocol specifications are described in the [data-sharing](./data-sharing) folder.
 
 The cross-network asset exchange protocol specifications are described in the [asset-exchange](./asset-exchange) folder.
 

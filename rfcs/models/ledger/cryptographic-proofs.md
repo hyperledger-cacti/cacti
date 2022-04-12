@@ -12,7 +12,7 @@
 
 ## Summary
 
-Many of the messages defined in various protocols in this repository require an associated proof (for example, [data transfer](/protocols/data-transfer-protocol/readme.md)). This associated proof ensures that the guarantees a single ledger provides are still preserved in a multi-network interoperability scenario. This protocol defines what the proof message looks like and how it behaves. The proof required can differ between networks depending on supported proofs, the types of proofs that would be supported are  Zero-Knowledge proof, proof by computation, SPV Proof, NiPoPow proof and Proof by notarisation.
+Many of the messages defined in various protocols in this repository require an associated proof (for example, [data sharing](../../protocols/data-sharing/generic.md)). This associated proof ensures that the guarantees a single ledger provides are still preserved in a multi-network interoperability scenario. This protocol defines what the proof message looks like and how it behaves. The proof required can differ between networks depending on supported proofs, the types of proofs that would be supported are  Zero-Knowledge proof, proof by computation, SPV Proof, NiPoPow proof and Proof by notarisation.
 
 ## Motivation
 
@@ -31,4 +31,4 @@ The structure of the message is network dependant. For the details on the messag
 
 ## Examples
 
-For example, in the data transfer protocol, this message structure would be embedded in the [response message type](/protocols/data-transfer-protocol/readme.md#response-message-type)
+For example, in the data sharing protocol, this message structure would be embedded in the [response message type](../../protocols/data-sharing/generic.md#response-message-type)

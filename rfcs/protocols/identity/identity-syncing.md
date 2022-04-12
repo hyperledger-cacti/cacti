@@ -14,7 +14,7 @@
 
 ## Summary
 
-This is an identity plane protocol to exchange identity information between two interoperating blockchain networks. This establishes a basis (or trust anchor) for proof-based data transfer. For background and component information, start [here](../../models/identity/network-identity-management.md).
+This is an identity plane protocol to exchange identity information between two interoperating blockchain networks. This establishes a basis (or trust anchor) for proof-based data sharing. For background and component information, start [here](../../models/identity/network-identity-management.md).
 
 The entire Network Identity Discovery and Management protocol involves the following protocols for different steps:
 

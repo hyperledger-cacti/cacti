@@ -3,7 +3,7 @@
 
  SPDX-License-Identifier: CC-BY-4.0
  -->
-# Data Transfer Protocol Units in Corda Networks
+# Data Sharing Protocol Units in Corda Networks
 
 - RFC: 02-003
 - Authors: Venkatraman Ramakrishna, Sandeep Nishad, Krishnasuri Narayanam, Dhinakaran Vinayagamurthy

@@ -3,7 +3,7 @@
 
  SPDX-License-Identifier: CC-BY-4.0
  -->
-# Data Transfer Protocol Units in Fabric Networks
+# Data Sharing Protocol Units in Fabric Networks
 
 - RFC: 02-002
 - Authors: Venkatraman Ramakrishna, Sandeep Nishad, Krishnasuri Narayanam, Dhinakaran Vinayagamurthy

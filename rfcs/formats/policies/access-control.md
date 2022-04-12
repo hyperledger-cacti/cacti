@@ -13,7 +13,7 @@
 ## Summary
 
 -   Access control policies are a means to control what objects on a ledger are accessbile to external entities and the type of actions these entities can exercise.
--   Access control policies are applied against a [security domain](../models/security-domains.md#security-groups), which can represent entities such as a thing, an individual, an organization or a group of entities such as network.
+-   Access control policies are applied against a [security domain](../../models/security/security-domains.md), which can represent entities such as a thing, an individual, an organization or a group of entities such as network.
 
 ## Defining Access Control Policies
 

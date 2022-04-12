@@ -87,7 +87,7 @@ For creation of Network DID, the IIN registry must authenticate the DID creation
 
 ### verificationMethod for dataplane credentials
 
-Blockchain interoperation in the data plane by means of verifiable data transfer rely on verification of some format of proofs that comes associated with the data from another network in response to a query ([cryptographic-proofs](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/rfcs/models/cryptographic-proofs.md)). In proof by notarisation, and also most other proof formats, the foreign blockchain networks' members' cryptographic keys and certificates has to be known for validating the proofs. Therefore, to map these data plane cryptographic certificates to the identity plane, the Network DID may have a verifcation method that contains these directly, or provide pointers to them.
+Blockchain interoperation in the data plane by means of verifiable data sharing rely on verification of some format of proofs that comes associated with the data from another network in response to a query ([cryptographic-proofs](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/rfcs/models/cryptographic-proofs.md)). In proof by notarisation, and also most other proof formats, the foreign blockchain networks' members' cryptographic keys and certificates has to be known for validating the proofs. Therefore, to map these data plane cryptographic certificates to the identity plane, the Network DID may have a verifcation method that contains these directly, or provide pointers to them.
 Depending on the blockchain platform being used by a network in the data plane, the type of the credentials may vary.
 
 This verification policy will have the parameters:
