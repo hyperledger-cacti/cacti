@@ -60,6 +60,24 @@ Once the last command has finished executing, open link printed on the console w
   ![Build Script Decision Tree](./docs/images/build-script-decision-tree-2021-03-06.png)
 * [FAQ](./FAQ.md): A collection of frequently asked questions
 
+## Inclusive Language Statement
+
+These guiding principles are very important to the maintainers and therefore 
+we respectfully ask all contributors to abide by them as well: 
+
+- Consider that users who will read the docs are from different backgrounds and
+cultures and that they have different preferences.
+- Avoid potential offensive terms and, for instance, prefer "allow list and
+deny list" to "white list and black list".
+- We believe that we all have a role to play to improve our world, and even if
+writing inclusive documentation might not look like a huge improvement, it's a
+first step in the right direction.
+- We suggest to refer to
+[Microsoft bias free writing guidelines](https://docs.microsoft.com/en-us/style-guide/bias-free-communication) 
+and 
+[Google inclusive doc writing guide](https://developers.google.com/style/inclusive-documentation) 
+as starting points.
+
 ## Roadmap
 
 Can be found here: [ROADMAP.md](./ROADMAP.md)
