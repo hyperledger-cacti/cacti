@@ -24,7 +24,7 @@ This protocol uses as its building blocks:
 
 The ledgers, participants, and sequence of states they go through to either effect an asset transfer or revert to the original state (upon failure of any kind) are illustrated in the figure below. (_Note_: Alice and Bob may represent the same real-world entity. Asset _S_ in both ledgers are assumed to be equivalent in a global sense, though their internal representations may vary from Ledger A to Ledger B, especially if the two ledgers are built on different DLT platforms.
 
-<img src="../../resources/images/asset-transfer-states.png" width=100%>
+<img src="../../resources/images/asset-transfer-states.png" width=80%>
 
 ## Generic Asset Transfer Flow
 
