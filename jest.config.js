@@ -85,7 +85,6 @@ module.exports = {
     `./packages/cactus-common/src/test/typescript/unit/key-converter.test.ts`,
     `./packages/cactus-common/src/test/typescript/unit/logging/logger.test.ts`,
     `./packages/cactus-plugin-keychain-aws-sm/src/test/typescript/integration/plugin-keychain-aws-sm.test.ts`,
-    `./packages/cactus-test-api-client/src/test/typescript/integration/api-client-routing-node-to-node.test.ts`,
     `./packages/cactus-plugin-keychain-memory/src/test/typescript/unit/plugin-keychain-memory.test.ts`,
     `./packages/cactus-api-client/src/test/typescript/integration/default-consortium-provider.test.ts`,
     `./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/get-balance-endpoint.test.ts`,
