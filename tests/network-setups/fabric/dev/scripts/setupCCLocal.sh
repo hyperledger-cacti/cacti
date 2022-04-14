@@ -23,6 +23,10 @@ cd contracts/interop/libs/assetexchange
 mv go.mod.local go.mod
 rm go.sum
 go mod tidy
+cd ../utils
+mv go.mod.local go.mod
+rm go.sum
+go mod tidy
 cd ../..
 mv go.mod.local go.mod
 rm go.sum
