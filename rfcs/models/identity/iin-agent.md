@@ -5,9 +5,10 @@
  -->
 # IIN Agents in a DLT Network
 
-* Authors: Venkatraman Ramakrishna, Krishnasuri Narayanam, Bishakh Chandra Ghosh, Ermyas Abebe
-* Status: Proposed
-* Since: 24-September-2021
+- RFC: 01-013
+- Authors: Venkatraman Ramakrishna, Krishnasuri Narayanam, Bishakh Chandra Ghosh, Ermyas Abebe
+- Status: Proposed
+- Since: 24-Sep-2021
 
 
 # Summary
@@ -36,7 +37,7 @@ The following artifacts in the data plane are relevant to identity plane protoco
 * _Identity trust store_: this is a set of IINs and Trust anchors `<IIN>,<Trust-Anchor-DID>`. It implies that the network trusts a given trust anchor or all trust anchors in a given IIN to certify the identity/membership credentials of foreign network units. 
 
 * The IIN definition can additionally contain peer connectivity information (to access the IIN ledger). This data will be looked up in the identity sharing protocol, while fetching membership information for a foreign network. It can also be used in proof verification (or view validation) in data plane protocols.
-* _Foreign network identities and configurations_: these are [security groups](../security.md), containing identities and certificates corresponding to a foreign network's units. (_Each security group is augmented with a DID attribute denoting the identity owned by the IIN Agent associated with this network unit/security group_). The IIN Agent of the network participants together update these configurations from the identity plane information.
+* _Foreign network identities and configurations_: these are [security domains](../security-domains.md), containing identities and certificates corresponding to a foreign network's units. (_Each security domain is augmented with a DID attribute denoting the identity owned by the IIN Agent associated with this network unit/security domain_). The IIN Agent of the network participants together update these configurations from the identity plane information.
 
 
 # Hyperledger Indy implementation of IIN Agent
@@ -61,12 +62,20 @@ The IIN Agent can be built and deployed in the following configurations:
   At this point, the IIN Agent has ownership of its DID that is recorded on its IIN's ledger. Its IIN Steward Agent now recognizes it as a member of its network and is ready to make a presentation of the member list of the network to any requestor.
 * Start a network client service (if this is to be a standalone service) or initialize one according to the network's native procedure. Example: in Fabric, do the following:
   1. Initialize a Fabric wallet to store keys, certificates, and MSP configurations
-  2. Initialize configuration information with the network's interoperation contract deployment ID: this is needed to record security group info on the ledger
+  2. Initialize configuration information with the network's interoperation contract deployment ID: this is needed to record security domain info on the ledger
   3. Import a connection profile and connect to a network gateway
 
 ## Interact with Network Units' IIN Agents
 The IIN Agent interacts with other IIN Agents in the following ways:
-* With local network agents: to launch or participate in a flow that collects a multi-signature over a foreign network's unit's security group
-* With foreign network agents: to request/offer membership and security group presentations, prove membership within its network, and prove ownership of a security group
+* With local network agents: to launch or participate in a flow that collects a multi-signature over a foreign network's unit's security domain
+* With foreign network agents: to request/offer membership and security domain presentations, prove membership within its network, and prove ownership of a security domain
 
 Details of these protocols can be found [here](../../protocols/identity/readme.md).
+
+## IIN Agents for Trust Anchors
+Trust anchors associated with IINs, or DID registries in general, and which issue identity and membership VCs to individual network participants (see [IIN model](./iin.md)), also must run an agent to interact with network members' IIN agents. The model for an IIN agent specified earlier in this document can be used for trust anchor agents with some salient differences:
+* The trust anchor agent will need to be equipped with the capability to issue VCs, and return VPs when an IIN agent sends a valid request for one.
+* The trust anchor agent will not need to understand a DLT protocol for the purpose of recording identities to a network's ledger.
+
+(_Note_: If the IIN is built on Hyperledger Indy, where trust anchors are referred to as _stewards_, the corresponding agent will register the verinym (DID) for its steward along with key-generation seed values (generated using a random number generator) in the Indy ledger. This registration occurs at genesis (or bootstrap) time.)
+

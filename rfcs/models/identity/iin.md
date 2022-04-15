@@ -5,9 +5,10 @@
  -->
 # Interoperation Identity Network
 
-* Authors: Venkatraman Ramakrishna, Bishakh Chandra Ghosh, Krishnasuri Narayanam, Ermyas Abebe
-* Status: Proposed
-* Since: 24-September-2021
+- RFC: 01-012
+- Authors: Venkatraman Ramakrishna, Bishakh Chandra Ghosh, Krishnasuri Narayanam, Ermyas Abebe
+- Status: Proposed
+- Since: 24-Sep-2021
 
 
 # Summary
@@ -45,7 +46,7 @@ See specifications of *Network Identity* and *Participant Unit Identity* DID for
 
 ## Credential Schema, Verification Keys and Revocation Lists
 
-A DID Document is not inherently mapped to any entity's physical identity [[did-core](https://www.w3.org/TR/did-core/#binding-to-physical-identity)] and the DID Documents are not supposed to contain any personal data. In order to bind a person's / organization's identity to the DID, or assert any other claims about the DID's subject, verifiable credentials are used.
+A DID Document is not inherently mapped to any entity's physical identity [did-core](https://www.w3.org/TR/did-core/#binding-to-physical-identity) and the DID Documents are not supposed to contain any personal data. In order to bind a person's / organization's identity to the DID, or assert any other claims about the DID's subject, verifiable credentials are used.
 
 The IIN must support two kinds of claims to be issued by trust anchors to the DIDs:
 

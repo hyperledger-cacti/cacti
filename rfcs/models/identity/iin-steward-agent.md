@@ -5,9 +5,10 @@
  -->
 # IIN Steward Agent in an Interoperation Identity Network
 
-* Authors: Venkatraman Ramakrishna
-* Status: Draft
-* Since: 20-Oct-2020
+- RFC: 01-014
+- Authors: Venkatraman Ramakrishna
+- Status: Retired
+- Since: 20-Oct-2020
 
 
 # Summary
