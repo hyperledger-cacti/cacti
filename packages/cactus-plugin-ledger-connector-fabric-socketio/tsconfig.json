@@ -4,11 +4,7 @@
     "rootDir": "./src/main/typescript",
     "composite": true,
     "outDir": "./dist",
-    "sourceMap": false,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "tsBuildInfoFile": "../../.build-cache/cactus-plugin-ledger-connector-fabric-socketio.tsbuildinfo",
-    "strict": false // TODO - True, fix warnings
+    "tsBuildInfoFile": "../../.build-cache/cactus-plugin-ledger-connector-fabric-socketio.tsbuildinfo"
   },
   "include": [
     "./src/main/typescript/common/core/*.ts",

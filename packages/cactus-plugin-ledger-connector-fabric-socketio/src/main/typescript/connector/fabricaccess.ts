@@ -20,7 +20,7 @@ import FabricClient, { User } from "fabric-client";
 import copService, { TLSOptions } from "fabric-ca-client";
 
 // list of fabric-client objects
-const clients = {};
+const clients = new Map<string, FabricClient>();
 
 // Log settings
 import { getLogger } from "log4js";
@@ -95,11 +95,11 @@ export async function getClientAndChannel(
   logger.info("##fabricaccess_getClientAndChannel");
   // Since only one KVS can be set in the client, management in CA units as well as KVS path
   let isNewClient = false;
-  let client = clients[config.read<string>("fabric.ca.name")];
+  let client = clients.get(config.read<string>("fabric.ca.name"));
   if (!client) {
     logger.info("create new fabric-client");
     client = new FabricClient();
-    clients[config.read<string>("fabric.ca.name")] = client;
+    clients.set(config.read<string>("fabric.ca.name"), client);
     isNewClient = true;
   }
 

@@ -28,20 +28,19 @@ logger.level = config.read<string>("logLevel", "info");
 import { ValidatorAuthentication } from "./ValidatorAuthentication";
 import safeStringify from "fast-safe-stringify";
 
+export type MonitorCallback = (callback: {
+  status: number;
+  blockData?: string;
+  errorDetail?: string;
+}) => void;
+
 /*
  * ServerMonitorPlugin
  * Server monitoring class definition
  */
 export class ServerMonitorPlugin {
-  _filterTable: object;
-  _eh: FabricClient.ChannelEventHub;
-
-  constructor() {
-    // Define settings specific to the dependent part
-    // Initializing filter during monitoring
-    this._filterTable = {};
-    this._eh = null;
-  }
+  _filterTable = new Map<string, FabricClient>();
+  _eh?: FabricClient.ChannelEventHub;
 
   /*
    * startMonitor
@@ -50,17 +49,17 @@ export class ServerMonitorPlugin {
    * @param {function} cb : Callback function that receives the monitoring result at any time
    * @note Always listens on the first peer from config.
    */
-  startMonitor(clientId, cb) {
+  startMonitor(clientId: string, cb: MonitorCallback) {
     logger.info("*** START MONITOR ***");
     logger.info("Client ID :" + clientId);
-    const filter = this._filterTable[clientId];
-    let channel: FabricClient.Channel = null;
+    const filter = this._filterTable.get(clientId);
+    let channel: FabricClient.Channel;
 
     if (!filter) {
       getClientAndChannel()
         .then((retobj) => {
           channel = retobj.channel; //Set the returned channel
-          this._filterTable[clientId] = retobj.client;
+          this._filterTable.set(clientId, retobj.client);
           return getSubmitterAndEnroll(retobj.client);
         })
         .then(() => {
@@ -69,9 +68,17 @@ export class ServerMonitorPlugin {
           );
           logger.info("Connecting the event hub");
           this._eh.registerBlockEvent(
-            (block: FabricClient.Block) => {
+            (block) => {
               const txlist = [];
               logger.info("*** Block Event ***");
+
+              if (!("header" in block && "data" in block)) {
+                logger.warn(
+                  "Invalid block type fromregisterBlockEvent - expected FabricClient.Block",
+                );
+                return;
+              }
+
               console.log("##[HL-BC] Notify new block data(D2)");
               logger.info(
                 "chain id :" + config.read<string>("fabric.channelName"),
@@ -160,8 +167,8 @@ export class ServerMonitorPlugin {
    * Stop monitoring
    * @param {string} clientId : Client ID of the monitoring stop request source
    */
-  stopMonitor(clientId) {
-    const filter = this._filterTable[clientId];
+  stopMonitor(clientId: string) {
+    const filter = this._filterTable.get(clientId);
 
     if (filter) {
       // Stop filter & remove from table
@@ -173,7 +180,7 @@ export class ServerMonitorPlugin {
         logger.info("Disconnecting the event hub");
         this._eh.disconnect();
       }
-      delete this._filterTable[clientId];
+      this._filterTable.delete(clientId);
     }
   }
 }
