@@ -248,6 +248,13 @@ export class FabricTestLedgerV1 implements ITestLedger {
     }
   }
 
+  /**
+   * Tuple of [adminUsername, adminSecret]
+   */
+  public get adminCredentials(): [string, string] {
+    return ["admin", "adminpw"];
+  }
+
   public async enrollAdmin(): Promise<[X509Identity, Wallet]> {
     const fnTag = `${this.className}#enrollAdmin()`;
     try {
@@ -255,7 +262,10 @@ export class FabricTestLedgerV1 implements ITestLedger {
       const wallet = await Wallets.newInMemoryWallet();
 
       // Enroll the admin user, and import the new identity into the wallet.
-      const request = { enrollmentID: "admin", enrollmentSecret: "adminpw" };
+      const request = {
+        enrollmentID: this.adminCredentials[0],
+        enrollmentSecret: this.adminCredentials[1],
+      };
       const enrollment = await ca.enroll(request);
 
       const mspId = this.getDefaultMspId();
@@ -983,7 +993,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
     const fnTag = `FabricTestLedger#addOrgX()`;
     const { log } = this;
     log.debug(`
-    Adding ${orgName} on ${channel}, with state database ${database}. 
+    Adding ${orgName} on ${channel}, with state database ${database}.
     Certification authority: ${certificateAuthority}.
     Default port: ${peerPort}
     Path to original source files: ${addOrgXDirectoryPath}`);

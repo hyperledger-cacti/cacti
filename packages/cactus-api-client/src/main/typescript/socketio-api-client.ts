@@ -17,7 +17,7 @@ import {
 import { ISocketApiClient } from "@hyperledger/cactus-core-api";
 
 import { Socket, SocketOptions, ManagerOptions, io } from "socket.io-client";
-import { readFile } from "fs";
+import { readFileSync } from "fs";
 import { resolve as resolvePath } from "path";
 import { verify, VerifyOptions, VerifyErrors, JwtPayload } from "jsonwebtoken";
 import { Observable, ReplaySubject } from "rxjs";
@@ -26,40 +26,31 @@ import { finalize } from "rxjs/operators";
 /**
  * Default logic for validating responses from socketio connector (validator).
  * Assumes that message is JWT signed with validator private key.
- * @param keyPath - Absolute or relative path to validator public key.
+ * @param publicKey - Validator public key.
  * @param targetData - Signed JWT message to be decoded.
  * @returns Promise resolving to decoded JwtPayload.
  */
 export function verifyValidatorJwt(
-  keyPath: string,
+  publicKey: string,
   targetData: string,
 ): Promise<JwtPayload> {
   return new Promise((resolve, reject) => {
-    readFile(
-      resolvePath(__dirname, keyPath),
-      (fileError: Error | null, publicKey: Buffer) => {
-        if (fileError) {
-          reject(fileError);
+    const option: VerifyOptions = {
+      algorithms: ["ES256"],
+    };
+
+    verify(
+      targetData,
+      publicKey,
+      option,
+      (err: VerifyErrors | null, decoded: JwtPayload | undefined) => {
+        if (err) {
+          reject(err);
+        } else if (decoded === undefined) {
+          reject(Error("Decoded message is undefined"));
+        } else {
+          resolve(decoded);
         }
-
-        const option: VerifyOptions = {
-          algorithms: ["ES256"],
-        };
-
-        verify(
-          targetData,
-          publicKey,
-          option,
-          (err: VerifyErrors | null, decoded: JwtPayload | undefined) => {
-            if (err) {
-              reject(err);
-            } else if (decoded === undefined) {
-              reject(Error("Decoded message is undefined"));
-            } else {
-              resolve(decoded);
-            }
-          },
-        );
       },
     );
   });
@@ -71,7 +62,8 @@ export function verifyValidatorJwt(
 export type SocketIOApiClientOptions = {
   readonly validatorID: string;
   readonly validatorURL: string;
-  readonly validatorKeyPath: string;
+  readonly validatorKeyValue?: string;
+  readonly validatorKeyPath?: string;
   readonly logLevel?: LogLevelDesc;
   readonly maxCounterRequestID?: number;
   readonly syncFunctionTimeoutMillisecond?: number;
@@ -94,20 +86,23 @@ export type SocketLedgerEvent = {
 export class SocketIOApiClient implements ISocketApiClient<SocketLedgerEvent> {
   private readonly log: Logger;
   private readonly socket: Socket;
+  private readonly validatorKey: string;
+
   // @todo - Why replay only last one? Maybe make it configurable?
   private monitorSubject: ReplaySubject<SocketLedgerEvent> | undefined;
 
   readonly className: string;
   counterReqID = 1;
   checkValidator: (
-    key: string,
+    publicKey: string,
     data: string,
   ) => Promise<JwtPayload> = verifyValidatorJwt;
 
   /**
    * @param validatorID - (required) ID of validator.
    * @param validatorURL - (required) URL to validator socketio endpoint.
-   * @param validatorKeyPath - (required) Path to validator public key in local storage.
+   * @param validatorKeyValue - (required if no validatorKeyPath) Validator public key.
+   * @param validatorKeyPath - (required if no validatorKeyValue) Path to validator public key in local storage.
    */
   constructor(public readonly options: SocketIOApiClientOptions) {
     this.className = this.constructor.name;
@@ -120,15 +115,23 @@ export class SocketIOApiClient implements ISocketApiClient<SocketLedgerEvent> {
       options.validatorURL,
       `${this.className}::constructor() validatorURL`,
     );
-    Checks.nonBlankString(
-      // TODO - checks path exists?
-      options.validatorKeyPath,
-      `${this.className}::constructor() validatorKeyPath`,
-    );
 
     const level = this.options.logLevel || "INFO";
     const label = this.className;
     this.log = LoggerProvider.getOrCreate({ level, label });
+
+    if (options.validatorKeyValue) {
+      this.validatorKey = options.validatorKeyValue;
+    } else if (options.validatorKeyPath) {
+      this.validatorKey = readFileSync(
+        resolvePath(__dirname, options.validatorKeyPath),
+        "ascii",
+      );
+    } else {
+      throw new Error(
+        "Either validatorKeyValue or validatorKeyPath must be defined",
+      );
+    }
 
     this.log.info(
       `Created ApiClient for Validator ID: ${options.validatorID}, URL ${options.validatorURL}, KeyPath ${options.validatorKeyPath}`,
@@ -215,25 +218,30 @@ export class SocketIOApiClient implements ISocketApiClient<SocketLedgerEvent> {
           if (reqID === result.id) {
             responseFlag = true;
 
-            this.checkValidator(
-              this.options.validatorKeyPath,
-              result.resObj.data,
-            )
-              .then((decodedData) => {
-                this.log.debug("checkValidator decodedData:", decodedData);
-                const resultObj = {
-                  status: result.resObj.status,
-                  data: decodedData.result,
-                };
-                this.log.debug("resultObj =", resultObj);
-                // Result reply
-                resolve(resultObj);
-              })
-              .catch((err) => {
-                responseFlag = false;
-                this.log.debug("checkValidator error:", err);
-                this.log.error(err);
-              });
+            if (typeof result.resObj.data !== "string") {
+              this.log.debug(
+                "Response data is probably not encrypted. resultObj =",
+                result.resObj,
+              );
+              resolve(result.resObj);
+            } else {
+              this.checkValidator(this.validatorKey, result.resObj.data)
+                .then((decodedData) => {
+                  this.log.debug("checkValidator decodedData:", decodedData);
+                  const resultObj = {
+                    status: result.resObj.status,
+                    data: decodedData.result,
+                  };
+                  this.log.debug("resultObj =", resultObj);
+                  // Result reply
+                  resolve(resultObj);
+                })
+                .catch((err) => {
+                  responseFlag = false;
+                  this.log.debug("checkValidator error:", err);
+                  this.log.error(err);
+                });
+            }
           }
         });
 
@@ -327,7 +335,7 @@ export class SocketIOApiClient implements ISocketApiClient<SocketLedgerEvent> {
           // output the data received from the client
           this.log.debug("#[recv]eventReceived, res:", res);
 
-          this.checkValidator(this.options.validatorKeyPath, res.blockData)
+          this.checkValidator(this.validatorKey, res.blockData)
             .then((decodedData) => {
               const resultObj = {
                 status: res.status,

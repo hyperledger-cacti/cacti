@@ -11,5 +11,10 @@
     "./src/main/typescript/common/core/bin/*.ts",
     "./src/main/typescript/common/core/config/*.ts",
     "./src/main/typescript/connector/*.ts"
+  ],
+  "references": [
+    {
+      "path": "../cactus-api-client/tsconfig.json"
+    }
   ]
 }

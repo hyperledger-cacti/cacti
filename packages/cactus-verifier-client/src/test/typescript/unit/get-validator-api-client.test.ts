@@ -18,7 +18,7 @@ test("Create legacy socketio client", () => {
   const clientOptions: SocketIOApiClientOptions = {
     validatorID: "someValId",
     validatorURL: "invalid-url123asd",
-    validatorKeyPath: "key.pem",
+    validatorKeyValue: "xxxxxxxxxxxxx",
   };
 
   const clientApi: SocketIOApiClient = getValidatorApiClient(
