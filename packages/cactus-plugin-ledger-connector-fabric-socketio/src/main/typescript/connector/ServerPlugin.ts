@@ -21,7 +21,7 @@ import { ValidatorAuthentication } from "./ValidatorAuthentication";
 // Read the library, SDK, etc. according to EC specifications as needed
 
 import { getClientAndChannel, getSubmitterAndEnroll } from "./fabricaccess.js";
-import { ProposalRequest } from "fabric-client";
+import Client, { ProposalRequest } from "fabric-client";
 import safeStringify from "fast-safe-stringify";
 
 const path = require("path");
@@ -61,8 +61,8 @@ export class ServerPlugin {
    *       Make sure that the support status of your class can be determined by your class.
    *       Functions that you do not want to call directly need to be devised such as implemented outside of this class like utilities.
    */
-  isExistFunction(funcName) {
-    if (this[funcName] != undefined) {
+  isExistFunction(funcName: string) {
+    if ((this as any)[funcName]) {
       return true;
     } else {
       return false;
@@ -93,11 +93,11 @@ export class ServerPlugin {
    * }
    * @return {Object} JSON object
    */
-  contractTransaction(args) {
+  contractTransaction(args: any) {
     return new Promise((resolve, reject) => {
       logger.info("evaluateTransaction start");
       // logger.debug(`##evaluateTransaction(A)`);
-      let retObj = {};
+      let retObj: Record<string, any>;
       let reqID = args["reqID"];
       if (reqID === undefined) {
         reqID = null;
@@ -177,7 +177,7 @@ export class ServerPlugin {
    * }
    * @return {Object} JSON object
    */
-  sendSignedTransaction(args) {
+  sendSignedTransaction(args: any) {
     return new Promise((resolve, reject) => {
       logger.info("sendSignedTransaction start");
       let retObj = {};
@@ -243,10 +243,10 @@ export class ServerPlugin {
    * }
    * @return {Object} JSON object
    */
-  sendSignedProposal(args) {
+  sendSignedProposal(args: any) {
     return new Promise((resolve, reject) => {
       logger.info("sendSignedProposal start");
-      let retObj = {};
+      let retObj: Record<string, any>;
 
       const channelName = args.contract.channelName;
       const transactionProposalReq = args.args.args.transactionProposalReq;
@@ -305,7 +305,7 @@ export class ServerPlugin {
  * @return [string] Success: Chain code execution result
  *                  Failure: Chain code error or internal error
  */
-async function Invoke(reqBody) {
+async function Invoke(reqBody: any) {
   let txId = null;
   const theUser = null;
   const eventhubs = [];
@@ -375,7 +375,7 @@ async function Invoke(reqBody) {
  * @return [string] Success: Chain code execution result
  *                  Failure: Chain code error or internal error
  */
-async function InvokeSync(reqBody) {
+async function InvokeSync(reqBody: any) {
   return new Promise(async function (resolve, reject) {
     try {
       logger.info("##fablicaccess: InvokeSync start");
@@ -387,7 +387,9 @@ async function InvokeSync(reqBody) {
 
       // Create a new file system based wallet for managing identities.
       // logger.debug(`##InvokeSync(B)`);
-      const wallet = new FileSystemWallet(config.read<string>("fabric.keystore"));
+      const wallet = new FileSystemWallet(
+        config.read<string>("fabric.keystore"),
+      );
       console.log(`Wallet path: ${config.read<string>("fabric.keystore")}`);
 
       // Check to see if we've already enrolled the user.
@@ -502,7 +504,7 @@ async function InvokeSync(reqBody) {
 // BEGIN Signature process=====================================================================================
 // this ordersForCurve comes from CryptoSuite_ECDSA_AES.js and will be part of the
 // stand alone fabric-sig package in future.
-const ordersForCurve = {
+const ordersForCurve: Record<string, any> = {
   secp256r1: {
     halfOrder: elliptic.curves.p256.n.shrn(1),
     order: elliptic.curves.p256.n,
@@ -515,7 +517,7 @@ const ordersForCurve = {
 
 // this function comes from CryptoSuite_ECDSA_AES.js and will be part of the
 // stand alone fabric-sig package in future.
-function preventMalleability(sig, curveParams) {
+function preventMalleability(sig: any, curveParams: { name: string }) {
   const halfOrder = ordersForCurve[curveParams.name].halfOrder;
   if (!halfOrder) {
     throw new Error(
@@ -543,7 +545,12 @@ function preventMalleability(sig, curveParams) {
  * @param {string} privateKey PEM encoded private key
  * @param {Buffer} proposalBytes proposal bytes
  */
-function sign(privateKey, proposalBytes, algorithm, keySize) {
+function sign(
+  privateKey: string,
+  proposalBytes: Buffer,
+  algorithm: string,
+  keySize: number,
+) {
   const hashAlgorithm = algorithm.toUpperCase();
   const hashFunction = hash[`${hashAlgorithm}_${keySize}`];
   const ecdsaCurve = elliptic.curves[`p${keySize}`];
@@ -559,7 +566,7 @@ function sign(privateKey, proposalBytes, algorithm, keySize) {
   return Buffer.from(sig.toDER());
 }
 
-function signProposal(proposalBytes, paramPrivateKeyPem) {
+function signProposal(proposalBytes: Buffer, paramPrivateKeyPem: string) {
   logger.debug("signProposal start");
 
   const signature = sign(paramPrivateKeyPem, proposalBytes, "sha2", 256);
@@ -574,7 +581,7 @@ function signProposal(proposalBytes, paramPrivateKeyPem) {
  * @return [string] Success: Chain code execution result
  *                 Failure: Chain code error or internal error
  */
-async function InvokeSendSignedTransaction(reqBody) {
+async function InvokeSendSignedTransaction(reqBody: any) {
   return new Promise(async function (resolve, reject) {
     logger.info("InvokeSendSignedTransaction start");
 
@@ -591,7 +598,8 @@ async function InvokeSendSignedTransaction(reqBody) {
       const response = await channel.sendSignedTransaction({
         signedProposal: reqBody.signedCommitProposal,
         request: reqBody.commitReq,
-      });
+      } as any);
+
       // logger.debug(`##InvokeSendSignedTransaction: (B)`);
       logger.info("successfully send signedCommitProposal");
       // logger.info("response : " + JSON.stringify(response));
@@ -634,7 +642,9 @@ async function InvokeSendSignedProposal(
   // Low-level access to local-store cert and private key of submitter (in case request is missing those)
   if (!certPem || !privateKeyPem) {
     const wallet = new FileSystemWallet(config.read<string>("fabric.keystore"));
-    logger.debug(`Wallet path: ${path.resolve(config.read<string>("fabric.keystore"))}`);
+    logger.debug(
+      `Wallet path: ${path.resolve(config.read<string>("fabric.keystore"))}`,
+    );
 
     const submitterName = user.getName();
     const submitterExists = await wallet.exists(submitterName);
@@ -649,11 +659,16 @@ async function InvokeSendSignedProposal(
     }
   }
 
+  if (!certPem || !privateKeyPem) {
+    throw Error("Could not read certificate and private key of the submitter.");
+  }
+
   const { proposal, txId } = channel.generateUnsignedProposal(
     transactionProposalReq,
     config.read<string>("fabric.mspid"),
     certPem,
-  );
+    false,
+  ) as any;
   logger.debug(`##InvokeSendSignedProposal; txId: ${txId.getTransactionID()}`);
   const signedProposal = signProposal(proposal.toBuffer(), privateKeyPem);
 
@@ -662,7 +677,7 @@ async function InvokeSendSignedProposal(
     const peer = channel.getPeer(peerInfo.requests.split("//")[1]);
     targets.push(peer);
   }
-  const sendSignedProposalReq = { signedProposal, targets } as unknown;
+  const sendSignedProposalReq = { signedProposal, targets } as any;
   const proposalResponses = await channel.sendSignedProposal(
     sendSignedProposalReq,
   );
@@ -671,13 +686,14 @@ async function InvokeSendSignedProposal(
   let allGood = true;
   for (const proposalResponse of proposalResponses) {
     let oneGood = false;
+    const propResponse = (proposalResponse as unknown) as Client.ProposalResponse;
     if (
-      proposalResponses &&
-      proposalResponse.response &&
-      proposalResponse.response.status === 200
+      propResponse &&
+      propResponse.response &&
+      propResponse.response.status === 200
     ) {
-      if (proposalResponse.response.payload) {
-        invokeResponse2 = proposalResponse.response.payload;
+      if (propResponse.response.payload) {
+        invokeResponse2 = propResponse.response.payload;
       }
       oneGood = true;
     } else {
@@ -690,7 +706,7 @@ async function InvokeSendSignedProposal(
   }
 
   // If the return value of invoke is an empty string, store txID
-  if (invokeResponse2 === "") {
+  if (!invokeResponse2 || invokeResponse2.length == 0) {
     invokeResponse2 = txId.getTransactionID();
   }
 
@@ -711,7 +727,9 @@ async function InvokeSendSignedProposal(
     proposal,
   };
 
-  const commitProposal = channel.generateUnsignedTransaction(commitReq);
+  const commitProposal = await channel.generateUnsignedTransaction(
+    commitReq as any,
+  );
   logger.debug(
     `##InvokeSendSignedProposal: Successfully build commit transaction proposal`,
   );

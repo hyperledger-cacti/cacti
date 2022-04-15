@@ -32,7 +32,7 @@ app.use(
     err: { message: string; status?: number },
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) => {
     // set locals, only providing error in development
     res.locals.message = err.message;
@@ -47,7 +47,7 @@ app.use(
     // render the error page
     res.status(err.status || 500);
     res.send(err);
-  }
+  },
 );
 
 export default app;
