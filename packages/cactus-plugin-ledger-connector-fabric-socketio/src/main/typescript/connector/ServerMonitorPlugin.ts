@@ -17,7 +17,7 @@
 const process = require("process");
 import FabricClient from "fabric-client";
 // IF declaration for fabric
-import { getClientAndChannel, getSubmitterAndEnroll } from "./fabricaccess.js";
+import { getClientAndChannel, getSubmitterAndEnroll } from "./fabricaccess";
 // config file
 import * as config from "../common/core/config";
 // Log settings

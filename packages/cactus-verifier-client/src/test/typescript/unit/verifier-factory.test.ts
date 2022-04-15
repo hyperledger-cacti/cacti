@@ -17,7 +17,7 @@ describe("Constructor Tests", () => {
         validatorID: "sUr7d10R",
         validatorType: "legacy-socketio",
         validatorURL: "https://sawtooth-validator:5140",
-        validatorKeyPath: "./validatorKey/sUr7d10R/keysUr7d10R.crt",
+        validatorKeyValue: "xxxxxxxx",
         ledgerInfo: {
           ledgerAbstract: "Sawtooth Ledger",
         },
@@ -46,7 +46,7 @@ describe("Constructor Tests", () => {
         validatorID: "sUr7d10R",
         validatorType: "legacy-socketio",
         validatorURL: "https://sawtooth-validator:5140",
-        validatorKeyPath: "./validatorKey/sUr7d10R/keysUr7d10R.crt",
+        validatorKeyValue: "xxxxxxxx",
         ledgerInfo: {
           ledgerAbstract: "Sawtooth Ledger",
         },
@@ -75,7 +75,7 @@ describe("getVerifier Tests", () => {
       validatorID: "mySocketSawtoothValidatorId",
       validatorType: "legacy-socketio",
       validatorURL: "https://sawtooth-validator:5140",
-      validatorKeyPath: "./validatorKey/sUr7d10R/keysUr7d10R.crt",
+      validatorKeyValue: "xxxxxxxx",
       ledgerInfo: {
         ledgerAbstract: "Sawtooth Ledger",
       },

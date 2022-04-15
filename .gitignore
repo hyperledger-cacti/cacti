@@ -60,7 +60,6 @@ site/
 !.yarn/versions
 .pnp.*
 
-!packages/cactus-plugin-verifier-cc/src/main/typescript/ledger-plugin/*/validator/src/build
-!packages/cactus-plugin-verifier-cc/src/main/typescript/ledger-plugin/*/validator/src/core/bin
+!packages/cactus-plugin-ledger-connector-*-socketio/src/main/typescript/common/core/bin
 
 tools/docker/geth-testnet/data-geth1/

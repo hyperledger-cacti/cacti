@@ -34,6 +34,7 @@ const log: Logger = LoggerProvider.getOrCreate({
 const defaultConfigOptions = {
   validatorID: "123validatorId321",
   validatorURL: "https://example:1234",
+  validatorKeyValue: "",
   validatorKeyPath: "./nonexistent/path/somekey.crt",
   logLevel: sutLogLevel,
   maxCounterRequestID: 3,
@@ -50,19 +51,16 @@ import { generateKeyPairSync } from "crypto";
 const { publicKey, privateKey } = generateKeyPairSync("ec", {
   namedCurve: "P-256",
 });
+const publicKeyString = publicKey.export({
+  type: "spki",
+  format: "pem",
+}) as string;
 
 import { SocketIOTestSetupHelpers } from "@hyperledger/cactus-test-tooling";
 
 // Mock public key reading
 import fs from "fs";
-jest
-  .spyOn(fs, "readFile")
-  .mockImplementation((_: unknown, callback: any) =>
-    callback(
-      null,
-      Buffer.from(publicKey.export({ type: "spki", format: "pem" })),
-    ),
-  );
+jest.spyOn(fs, "readFileSync").mockReturnValue(publicKeyString);
 
 import {
   SocketIOApiClient,
@@ -81,7 +79,6 @@ jest.setTimeout(testTimeout);
 //////////////////////////////////
 
 describe("verifyValidatorJwt tests", () => {
-  const mockKeyPath = "someKeyPath.pem";
   const message = {
     message: "Hello",
     from: "Someone",
@@ -107,7 +104,7 @@ describe("verifyValidatorJwt tests", () => {
   test("Decrypts the payload from the validator using it's public key", async () => {
     // Verify (decrypt)
     const decryptedMessage = await verifyValidatorJwt(
-      mockKeyPath,
+      publicKeyString,
       signedMessage,
     );
 
@@ -117,12 +114,6 @@ describe("verifyValidatorJwt tests", () => {
     const decryptedJwt = decryptedMessage as JwtPayload;
     expect(decryptedJwt.iat).toBeNumber();
     expect(decryptedJwt.exp).toBeNumber();
-
-    // Assert reading correct public key
-    expect(((fs.readFile as unknown) as jest.Mock).mock.calls.length).toBe(1);
-    expect(((fs.readFile as unknown) as jest.Mock).mock.calls[0][0]).toContain(
-      mockKeyPath,
-    );
   });
 
   test("Rejects malicious message", () => {
@@ -131,7 +122,9 @@ describe("verifyValidatorJwt tests", () => {
     log.debug("maliciousMessage", maliciousMessage);
 
     // Verify (decrypt)
-    return expect(verifyValidatorJwt(mockKeyPath, maliciousMessage)).toReject();
+    return expect(
+      verifyValidatorJwt(publicKeyString, maliciousMessage),
+    ).toReject();
   });
 
   test("Rejects expired message", (done) => {
@@ -148,9 +141,11 @@ describe("verifyValidatorJwt tests", () => {
 
     setTimeout(async () => {
       // Verify after short timeout
-      await expect(verifyValidatorJwt(mockKeyPath, signedMessage)).toReject();
+      await expect(
+        verifyValidatorJwt(publicKeyString, signedMessage),
+      ).toReject();
       done();
-    }, 100);
+    }, 1000);
   });
 });
 
@@ -184,8 +179,9 @@ describe("Construction Tests", () => {
     configOptions.validatorURL = "";
     expect(() => new SocketIOApiClient(configOptions)).toThrow();
 
-    // Empty validatorKeyPath
+    // Empty validatorKeyValue and validatorKeyPath
     configOptions = cloneDeep(defaultConfigOptions);
+    configOptions.validatorKeyValue = "";
     configOptions.validatorKeyPath = "";
     expect(() => new SocketIOApiClient(configOptions)).toThrow();
   });
@@ -367,10 +363,7 @@ describe("SocketIOApiClient Tests", function () {
         .resolves.toEqual({ status: responseStatus, data: decryptedData })
         .then(() => {
           expect(verifyMock).toHaveBeenCalledTimes(1);
-          expect(verifyMock).toBeCalledWith(
-            defaultConfigOptions.validatorKeyPath,
-            encryptedData,
-          );
+          expect(verifyMock).toBeCalledWith(publicKeyString, encryptedData);
         });
     });
 

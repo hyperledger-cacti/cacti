@@ -20,7 +20,7 @@ logger.level = config.read<string>("logLevel", "info");
 import { ValidatorAuthentication } from "./ValidatorAuthentication";
 // Read the library, SDK, etc. according to EC specifications as needed
 
-import { getClientAndChannel, getSubmitterAndEnroll } from "./fabricaccess.js";
+import { getClientAndChannel, getSubmitterAndEnroll } from "./fabricaccess";
 import Client, { ProposalRequest } from "fabric-client";
 import safeStringify from "fast-safe-stringify";
 
@@ -180,7 +180,8 @@ export class ServerPlugin {
   sendSignedTransaction(args: any) {
     return new Promise((resolve, reject) => {
       logger.info("sendSignedTransaction start");
-      let retObj = {};
+      let retObj: Record<string, any>;
+
       // parameter check
       logger.info("sendSignedTransaction parameter check");
       const channelName = args.contract.channelName;
@@ -208,9 +209,15 @@ export class ServerPlugin {
         .then((returnvalue) => {
           if (returnvalue != null) {
             retObj = {
-              status: 200,
-              data: returnvalue,
+              resObj: {
+                status: 200,
+                data: returnvalue,
+              },
             };
+
+            if (args.reqID) {
+              retObj["id"] = args.reqID;
+            }
             return resolve(retObj);
           }
         })
@@ -331,7 +338,6 @@ async function Invoke(reqBody: any) {
     }
 
     // Create a new gateway for connecting to our peer node.
-    // TODO - Allow both cactus config and fabric connection.json profile
     let { client } = await getClientAndChannel(reqBody.channelName);
     await getSubmitterAndEnroll(client);
 
@@ -361,9 +367,6 @@ async function Invoke(reqBody: any) {
 
     // const respData = await contract.submitTransaction(fcn, args[0], args[1]);
     logger.info("Transaction has been submitted");
-
-    // Disconnect from the gateway.
-    await gateway.disconnect();
   } catch (error) {
     logger.error(`Failed to submit transaction: ${error}`);
   }
@@ -405,7 +408,6 @@ async function InvokeSync(reqBody: any) {
       }
 
       // Create a new gateway for connecting to our peer node.
-      // TODO - Allow both cactus config and fabric connection.json profile
       let { client } = await getClientAndChannel(reqBody.channelName);
       await getSubmitterAndEnroll(client);
 
@@ -485,10 +487,6 @@ async function InvokeSync(reqBody: any) {
       }
       logger.info(`##fablicaccess: InvokeSync result: ${result}`);
       console.log(`##fablicaccess: InvokeSync result: ${result}`);
-
-      // Disconnect from the gateway.
-      // logger.debug(`##InvokeSync(H)`);
-      await gateway.disconnect();
 
       logger.debug(`##InvokeSync(I)`);
       return resolve(result);

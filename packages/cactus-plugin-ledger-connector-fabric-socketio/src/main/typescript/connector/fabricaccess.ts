@@ -113,10 +113,14 @@ export async function getClientAndChannel(
     if (channel == null) {
       logger.info("create new channel, name=" + channelName);
       channel = client.newChannel(channelName);
-      const ordererCA = fs.readFileSync(
-        config.read<string>("fabric.orderer.tlsca"),
-        "utf8",
-      );
+
+      let ordererCA: string;
+      try {
+        ordererCA = config.read<string>('fabric.orderer.tlscaValue');
+      } catch {
+        ordererCA = fs.readFileSync(config.read('fabric.orderer.tlsca'), 'ascii');
+      }
+
       const orderer = client.newOrderer(
         config.read<string>("fabric.orderer.url"),
         {
@@ -130,11 +134,18 @@ export async function getClientAndChannel(
       // EP settings
       const peersConfig = config.read<any[]>("fabric.peers");
       for (let i = 0; i < peersConfig.length; i++) {
-        const peerCA = fs.readFileSync(peersConfig[i].tlsca, "utf8");
+        let peerCA: string;
+        if ("tlscaValue" in peersConfig[i]) {
+          peerCA = peersConfig[i].tlscaValue;
+        } else {
+          peerCA = fs.readFileSync(peersConfig[i].tlsca, 'ascii');
+        }
+
         const peer = client.newPeer(peersConfig[i].requests, {
           pem: peerCA,
           "ssl-target-name-override": peersConfig[i].name,
         });
+
         channel.addPeer(peer, config.read<string>("fabric.mspid"));
       }
 
