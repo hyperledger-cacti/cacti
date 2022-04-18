@@ -1,11 +1,10 @@
-import test, { Test } from "tape-promise/tape";
+import "jest-extended";
 import { v4 as uuidv4 } from "uuid";
 import { generateKeyPair, exportSPKI, SignJWT } from "jose";
 import type { Params as ExpressJwtOptions } from "express-jwt";
 import type { AuthorizeOptions as SocketIoJwtOptions } from "@thream/socketio-jwt";
 
 import { Constants } from "@hyperledger/cactus-core-api";
-import { LoggerProvider, LogLevelDesc } from "@hyperledger/cactus-common";
 import { IJoseFittingJwtParams } from "@hyperledger/cactus-common";
 
 import {
@@ -16,18 +15,25 @@ import {
 } from "../../../main/typescript/public-api";
 import { ApiServerApiClient } from "../../../main/typescript/public-api";
 import { ApiServerApiClientConfiguration } from "../../../main/typescript/public-api";
+import { LogLevelDesc } from "@hyperledger/cactus-common";
 import { AuthorizationProtocol } from "../../../main/typescript/config/authorization-protocol";
 import { IAuthorizationConfig } from "../../../main/typescript/authzn/i-authorization-config";
+import { lastValueFrom } from "rxjs";
 
 const testCase = "API server enforces authorization for SocketIO endpoints";
-const logLevel: LogLevelDesc = "TRACE";
-const log = LoggerProvider.getOrCreate({
-  level: logLevel,
-  label: __filename,
-});
+describe("cmd-api-server:ApiServer", () => {
+  let apiServer: ApiServer;
+  let apiClientFixable: ApiServerApiClient;
+  let apiHost: string;
+  let validBearerToken: string;
 
-test(testCase, async (t: Test) => {
-  try {
+  const logLevel: LogLevelDesc = "WARN";
+
+  afterAll(async () => {
+    apiServer.shutdown();
+  });
+
+  beforeAll(async () => {
     const jwtKeyPair = await generateKeyPair("RS256", { modulusLength: 4096 });
     const jwtPublicKey = await exportSPKI(jwtKeyPair.publicKey);
     const expressJwtOptions: ExpressJwtOptions & IJoseFittingJwtParams = {
@@ -40,7 +46,7 @@ test(testCase, async (t: Test) => {
       secret: jwtPublicKey,
       algorithms: ["RS256"],
     };
-    t.ok(expressJwtOptions, "Express JWT config truthy OK");
+    expect(expressJwtOptions).toBeTruthy();
 
     const authorizationConfig: IAuthorizationConfig = {
       unprotectedEndpointExemptions: [],
@@ -58,23 +64,24 @@ test(testCase, async (t: Test) => {
     apiSrvOpts.apiPort = 0;
     apiSrvOpts.cockpitPort = 0;
     apiSrvOpts.grpcPort = 0;
+    apiSrvOpts.logLevel = logLevel;
     apiSrvOpts.apiTlsEnabled = false;
     apiSrvOpts.plugins = [];
     const config = await configService.newExampleConfigConvict(apiSrvOpts);
 
-    const apiServer = new ApiServer({
+    apiServer = new ApiServer({
       config: config.getProperties(),
     });
-    test.onFinish(async () => await apiServer.shutdown());
 
-    const startResponse = apiServer.start();
-    await t.doesNotReject(startResponse, "API server started OK");
-    t.ok(startResponse, "API server start response truthy OK");
+    const startResponsePromise = apiServer.start();
+    await expect(startResponsePromise).toResolve();
+    const startResponse = await startResponsePromise;
+    expect(startResponse).toBeTruthy();
 
-    const addressInfoApi = (await startResponse).addressInfoApi;
+    const addressInfoApi = (await startResponsePromise).addressInfoApi;
     const protocol = apiSrvOpts.apiTlsEnabled ? "https" : "http";
     const { address, port } = addressInfoApi;
-    const apiHost = `${protocol}://${address}:${port}`;
+    apiHost = `${protocol}://${address}:${port}`;
 
     const jwtPayload = { name: "Peter", location: "Albertirsa" };
     const validJwt = await new SignJWT(jwtPayload)
@@ -82,27 +89,29 @@ test(testCase, async (t: Test) => {
       .setIssuer(expressJwtOptions.issuer)
       .setAudience(expressJwtOptions.audience)
       .sign(jwtKeyPair.privateKey);
-    t.ok(validJwt, "JWT signed truthy OK");
+    expect(validJwt).toBeTruthy();
 
-    const validBearerToken = `Bearer ${validJwt}`;
-    t.ok(validBearerToken, "validBearerToken truthy OK");
+    validBearerToken = `Bearer ${validJwt}`;
+    expect(validBearerToken).toBeTruthy();
 
+    apiClientFixable = new ApiServerApiClient(
+      new ApiServerApiClientConfiguration({
+        basePath: apiHost,
+        baseOptions: { headers: { Authorization: "Mr. Invalid Token" } },
+        logLevel,
+        tokenProvider: {
+          get: () => Promise.resolve(validBearerToken),
+        },
+      }),
+    );
+  });
+
+  test(testCase, async () => {
     const apiClientBad = new ApiServerApiClient(
       new ApiServerApiClientConfiguration({
         basePath: apiHost,
         baseOptions: { headers: { Authorization: "Mr. Invalid Token" } },
-        logLevel: "TRACE",
-      }),
-    );
-
-    const apiClientFixable = new ApiServerApiClient(
-      new ApiServerApiClientConfiguration({
-        basePath: apiHost,
-        baseOptions: { headers: { Authorization: "Mr. Invalid Token" } },
-        logLevel: "TRACE",
-        tokenProvider: {
-          get: () => Promise.resolve(validBearerToken),
-        },
+        logLevel,
       }),
     );
 
@@ -110,7 +119,7 @@ test(testCase, async (t: Test) => {
       new ApiServerApiClientConfiguration({
         basePath: apiHost,
         baseOptions: { headers: { Authorization: validBearerToken } },
-        logLevel: "TRACE",
+        logLevel,
         tokenProvider: {
           get: () => Promise.resolve(validBearerToken),
         },
@@ -134,21 +143,22 @@ test(testCase, async (t: Test) => {
         });
       });
 
-      await t.rejects(
-        watchHealthcheckV1WithBadToken,
-        /Format is Authorization: Bearer \[token\]/,
-        "SocketIO connection rejected when JWT is invalid OK",
+      await expect(watchHealthcheckV1WithBadToken).rejects.toHaveProperty(
+        "message",
+        "Format is Authorization: Bearer [token]",
       );
+    }
 
+    {
       const resHc = await apiClientGood.getHealthCheckV1();
-      t.ok(resHc, "healthcheck response truthy OK");
-      t.equal(resHc.status, 200, "healthcheck response status === 200 OK");
-      t.equal(typeof resHc.data, "object", "typeof resHc.data is 'object' OK");
-      t.ok(resHc.data.createdAt, "resHc.data.createdAt truthy OK");
-      t.ok(resHc.data.memoryUsage, "resHc.data.memoryUsage truthy OK");
-      t.ok(resHc.data.memoryUsage.rss, "resHc.data.memoryUsage.rss truthy OK");
-      t.ok(resHc.data.success, "resHc.data.success truthy OK");
-      t.true(isHealthcheckResponse(resHc.data), "isHealthcheckResponse OK");
+      expect(resHc).toBeTruthy();
+      expect(resHc.status).toEqual(200);
+      expect(typeof resHc.data).toBe("object");
+      expect(resHc.data.createdAt).toBeTruthy();
+      expect(resHc.data.memoryUsage).toBeTruthy();
+      expect(resHc.data.memoryUsage.rss).toBeTruthy();
+      expect(resHc.data.success).toBeTruthy();
+      expect(isHealthcheckResponse(resHc.data)).toBeTruthy();
     }
 
     {
@@ -156,35 +166,30 @@ test(testCase, async (t: Test) => {
       const healthchecks = await apiClientFixable.watchHealthcheckV1();
       const sub = healthchecks.subscribe((next: HealthCheckResponse) => {
         idx++;
-        t.ok(next, idx + " next healthcheck truthy OK");
-        t.equal(typeof next, "object", idx + "typeof next is 'object' OK");
-        t.ok(next.createdAt, idx + " next.createdAt truthy OK");
-        t.ok(next.memoryUsage, idx + " next.memoryUsage truthy OK");
-        t.ok(next.memoryUsage.rss, idx + " next.memoryUsage.rss truthy OK");
-        t.ok(next.success, idx + " next.success truthy OK");
-        t.true(isHealthcheckResponse(next), idx + " isHealthcheckResponse OK");
         if (idx > 2) {
           sub.unsubscribe();
         }
+        expect(next).toBeTruthy();
+        expect(typeof next).toBe("object");
+        expect(next.createdAt).toBeTruthy();
+        expect(next.memoryUsage).toBeTruthy();
+        expect(next.memoryUsage.rss).toBeTruthy();
+        expect(next.success).toBeTruthy();
+        expect(isHealthcheckResponse(next)).toBeTrue();
       });
 
-      const all = await healthchecks.toPromise();
-      t.comment("all=" + JSON.stringify(all));
+      const hcr = await lastValueFrom(healthchecks);
+      expect(isHealthcheckResponse(hcr)).toBeTruthy();
 
       const resHc = await apiClientFixable.getHealthCheckV1();
-      t.ok(resHc, "healthcheck response truthy OK");
-      t.equal(resHc.status, 200, "healthcheck response status === 200 OK");
-      t.equal(typeof resHc.data, "object", "typeof resHc.data is 'object' OK");
-      t.ok(resHc.data.createdAt, "resHc.data.createdAt truthy OK");
-      t.ok(resHc.data.memoryUsage, "resHc.data.memoryUsage truthy OK");
-      t.ok(resHc.data.memoryUsage.rss, "resHc.data.memoryUsage.rss truthy OK");
-      t.ok(resHc.data.success, "resHc.data.success truthy OK");
-      t.true(isHealthcheckResponse(resHc.data), "isHealthcheckResponse OK");
+      expect(resHc).toBeTruthy();
+      expect(resHc.status).toEqual(200);
+      expect(typeof resHc.data).toBe("object");
+      expect(resHc.data.createdAt).toBeTruthy();
+      expect(resHc.data.memoryUsage).toBeTruthy();
+      expect(resHc.data.memoryUsage.rss).toBeTruthy();
+      expect(resHc.data.success).toBeTruthy();
+      expect(isHealthcheckResponse(resHc.data)).toBeTruthy();
     }
-    t.end();
-  } catch (ex) {
-    log.error(ex);
-    t.fail("Exception thrown during test execution, see above for details!");
-    throw ex;
-  }
+  });
 });

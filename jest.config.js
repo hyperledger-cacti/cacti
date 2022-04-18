@@ -114,7 +114,6 @@ module.exports = {
     `./packages/cactus-test-plugin-htlc-eth-besu/src/test/typescript/integration/plugin-htlc-eth-besu/get--status-endpoint-invalid.test.ts`,
     `./packages/cactus-test-plugin-htlc-eth-besu/src/test/typescript/integration/plugin-htlc-eth-besu/openapi/openapi-validation.test.ts`,
     `./packages/cactus-cmd-api-server/src/test/typescript/benchmark/artillery-api-benchmark.test.ts`,
-    `./packages/cactus-cmd-api-server/src/test/typescript/integration/jwt-socketio-endpoint-authorization.test.ts`,
     `./packages/cactus-cmd-api-server/src/test/typescript/integration/remote-plugin-imports.test.ts`,
     `./packages/cactus-cmd-api-server/src/test/typescript/integration/plugin-import-from-github.test.ts`,
     `./packages/cactus-cmd-api-server/src/test/typescript/integration/plugin-import-without-install.test.ts`,
