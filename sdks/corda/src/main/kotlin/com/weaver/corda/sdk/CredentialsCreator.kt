@@ -51,9 +51,9 @@ class CredentialsCreator(
         val jsonConfig = JSONObject(config)
         for (i in 0..nodes.size-1) {
             val node0Json = jsonConfig.getJSONObject(nodes[i])
-            val root_cert = Base64.getDecoder().decode(node0Json.getJSONArray("root_certs").getString(i)).toString(Charsets.UTF_8)
-            val doorman_cert = Base64.getDecoder().decode(node0Json.getJSONArray("doorman_certs").getString(i)).toString(Charsets.UTF_8)
-            val nodeca_cert = Base64.getDecoder().decode(node0Json.getJSONArray("nodeca_certs").getString(i)).toString(Charsets.UTF_8)
+            val root_cert = Base64.getDecoder().decode(node0Json.getJSONArray("root_certs").getString(0)).toString(Charsets.UTF_8)
+            val doorman_cert = Base64.getDecoder().decode(node0Json.getJSONArray("doorman_certs").getString(0)).toString(Charsets.UTF_8)
+            val nodeca_cert = Base64.getDecoder().decode(node0Json.getJSONArray("nodeca_certs").getString(0)).toString(Charsets.UTF_8)
             
             // Initialising class variables
             this.nodeid_cert += mapOf(nodes[i] to Base64.getDecoder().decode(node0Json.getJSONArray("nodeid_cert").getString(0)).toString(Charsets.UTF_8))

@@ -41,10 +41,11 @@ const command: GluegunCommand = {
 			print.error('Lock contract ID not provided.')
 			return
 		}
+		const lockContractId = '0x' + options.lock_contract_id
 
 		console.log('Parameters')
 		console.log('networkConfig', networkConfig)
-		console.log('Lock Contract ID', options.lock_contract_id)
+		console.log('Lock Contract ID', lockContractId)
 		
 		const provider = new Web3.providers.HttpProvider('http://'+networkConfig.networkHost+':'+networkConfig.networkPort)
 		const web3N = new Web3(provider)
@@ -52,12 +53,12 @@ const command: GluegunCommand = {
 		const accounts = await web3N.eth.getAccounts()
 		var sender = accounts[networkConfig.senderAccountIndex]
 
-		var isLocked = await interopContract.isFungibleAssetLocked(options.lock_contract_id, {
+		var isLocked = await interopContract.isFungibleAssetLocked(lockContractId, {
 			from: sender
 		}).catch(function () {
 			console.log("isFungibleAssetLocked threw an error");
 		})
-		console.log(`Is there an asset locked in ${options.lock_contract_id} in Network ${options.network}: ${isLocked}`) //Todo: Debug. isLocked is not printing correctly.
+		console.log(`Is there an asset locked in ${lockContractId} in Network ${options.network}: ${isLocked}`) //Todo: Debug. isLocked is not printing correctly.
 	}
 }
 
