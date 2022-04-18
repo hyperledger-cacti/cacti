@@ -92,6 +92,11 @@ export class ApiServerApiClient extends DefaultApi {
       subject.error(ex);
     });
 
+    socket.on("disconnect", (reason: string) => {
+      const { active } = socket;
+      log.error("[SocketIOClient] DISCONNECT=%s Active=%b", reason, active);
+    });
+
     socket.on("connect_error", async (err) => {
       log.debug("[SocketIOClient] CONNECT_ERROR: %o", err);
       if (tokenProvider.isPresent()) {
