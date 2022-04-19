@@ -22,13 +22,13 @@ The figure below illustrates our layered view of what a general-purpose interope
 <img src="./resources/images/layers-use-cases.png">
 
 Toward the right of the figure, you can see functions in the semantic layer called out as distinct use cases involving some exchange of information across two networks, leading to ledger record updates in those networks. The three scenarios are:
-- Data transfers
-- Asset transfers
-- Asset exchanges
+- Data sharing
+- Asset transfer
+- Asset exchange
 
 You can find details on these use cases (or _modes_ of interoperation) in [Interoperability Modes](https://hyperledger-labs.github.io/weaver-dlt-interoperability/docs/external/interoperability-modes).
 
-_Relay_ modules owned and managed by networks enable cross-network communications or even communications between networks and enterprises systems of record. Cross-network identity management occurs on a separate plane from the information exchanges, and our vision for this is described in [Decentralized Identity](https://hyperledger-labs.github.io/weaver-dlt-interoperability/docs/external/architecture-and-design/decentralized-identity) and [Distributed Identity Management for Interoperation](./rfcs/models/identity/distributed-identity-management.md).
+_Relay_ modules owned and managed by networks enable cross-network communications or even communications between networks and enterprises systems of record. Cross-network identity management occurs on a separate plane from the information exchanges, and our vision for this is described in [Decentralized Identity](https://hyperledger-labs.github.io/weaver-dlt-interoperability/docs/external/architecture-and-design/decentralized-identity) and [Distributed Identity Management for Interoperation](./rfcs/models/identity/decentralized-network-identity-discovery-management.md).
 
 ## Architecture and Deployment
 
@@ -38,7 +38,7 @@ Because DLTs can be highly divergent, it is difficult to create components that 
 
 In the middle, for cross-network communications, lie DLT-agnostic relays, which can have one or more DLT-specific _drivers_ to interpret requests and orchestrate response collection from the network. _Interoperation modules_ lie within the network and operate the way smart contracts for that platform natively do. Hence, in a Fabric network, these are implemented and deployed as _chaincode_ on all peers, whereas in a Corda network, they are implemented and deployed within a special _Interop Cordapp_ that can trigger flows across the network. Lastly, for applications that are already deployed on these networks to exercise interoperation capabilities, Weaver provides SDK extensions and libraries.
 
-For a data transfer use case, the following are the functions that are performed network-wide using the interoperation modules (i.e., through consensus):
+For a data sharing use case, the following are the functions that are performed network-wide using the interoperation modules (i.e., through consensus):
 - Access control of requests for data from another network
 - Proof of response data authenticity generated in the form of peers' digital signatures
 - Optionally, encryption of repsonse data and signatures to avoid confidentiality and integrity attacks mounted by relays
@@ -56,9 +56,21 @@ Because relays are additional components introduced by Weaver into a DLT network
 
 <img src="./resources/images/relay-deployment-models.png">
 
-## Publications
+## Articles
 
-1. Dileban Karunamoorthy and Ermyas Abebe, [On the Interoperability of Distributed Ledgers](https://medium.com/thinkdecentralized/on-the-interoperability-of-distributed-ledgers-15f584b79808), _Medium.com_
-2. Ermyas Abebe, Dushyant Behl, Chander Govindarajan, Yining Hu, Dileban Karunamoorthy, Petr Novotny, Vinayaka Pandit, Venkatraman Ramakrishna, Christian Vecchiola, [Enabling Enterprise Blockchain Interoperability with Trusted Data Transfer](https://arxiv.org/abs/1911.01064), _Middleware 2019 - Industry Track_
-3. Ermyas Abebe, Yining Hu, Allison Irvin, Dileban Karunamoorthy, Vinayaka Pandit, Venkatraman Ramakrishna, Jiangshan Yu, [Verifiable Observation of Permissioned Ledgers](https://arxiv.org/abs/2012.07339), _ICBC 2021_
-4. Bishakh Chandra Ghosh, Venkatraman Ramakrishna, Chander Govindarajan, Dushyant Behl, Dileban Karunamoorthy, Ermyas Abebe, Sandip Chakraborty, [Decentralized Cross-Network Identity Management for Blockchain Interoperation](https://arxiv.org/abs/2104.03277), _ICBC 2021_
+1. Venkatraman Ramakrishna and Vinayaka Pandit, [Making permissioned blockchains interoperable with Weaver](https://www.ibm.com/blogs/blockchain/2021/07/making-permissioned-blockchains-interoperable-with-weaver/), _Blockchain Pulse: IBM Blockchain Blog_
+2. Venkatraman Ramakrishna, [Meet Weaver, one of the new Hyperledger Labs taking on cross-chain and off-chain operations](https://www.hyperledger.org/blog/2021/06/09/meet-weaver-one-the-new-hyperledger-labs-projects-taking-on-cross-chain-and-off-chain-operations), _Hyperledger Global Forum 2021 Blog_
+3. Dileban Karunamoorthy and Ermyas Abebe, [On the Interoperability of Distributed Ledgers](https://medium.com/thinkdecentralized/on-the-interoperability-of-distributed-ledgers-15f584b79808), _Medium.com_
+
+## Presentations
+
+1. [Blockchain Interoperability with Hyperledger Cactus & Weaver](https://www.youtube.com/watch?v=l-nZlLK8IMM), Peter Somogyvari and Venkatraman Ramakrishna, _Hyperledger NYC Meetup_, October 14, 2021
+2. Panel discussion on Blockchain Interoperability: Moderator: Vinayaka Pandit; Panelists: Rafael Belchior, Hart Montgomery, and Venkatraman Ramakrishna, _IEEE Services 2021: Blockchain Interoperability_, September 8, 2021
+3. Blockchain Interoperability: Challenges, Ongoing Efforts, and Potential Solutions: Vinayaka Pandit, _Hyperledger Global Forum 2021_, June 9, 2021
+4. Hosted Discussion: The Future of Blockchain Interoperability: Hart Montgomery, Tracy Kuhrt, Susumu Toriumi, and Venkatraman Ramakrishna, _Hyperledger Global Forum 2021_, June 8, 2021
+
+## Peer-Reviewed Research Publications
+
+1. Ermyas Abebe, Dushyant Behl, Chander Govindarajan, Yining Hu, Dileban Karunamoorthy, Petr Novotny, Vinayaka Pandit, Venkatraman Ramakrishna, Christian Vecchiola, [Enabling Enterprise Blockchain Interoperability with Trusted Data Transfer](https://arxiv.org/abs/1911.01064), _Middleware 2019 - Industry Track_
+2. Ermyas Abebe, Yining Hu, Allison Irvin, Dileban Karunamoorthy, Vinayaka Pandit, Venkatraman Ramakrishna, Jiangshan Yu, [Verifiable Observation of Permissioned Ledgers](https://arxiv.org/abs/2012.07339), _ICBC 2021_
+3. Bishakh Chandra Ghosh, Venkatraman Ramakrishna, Chander Govindarajan, Dushyant Behl, Dileban Karunamoorthy, Ermyas Abebe, Sandip Chakraborty, [Decentralized Cross-Network Identity Management for Blockchain Interoperation](https://arxiv.org/abs/2104.03277), _ICBC 2021_

@@ -5,8 +5,9 @@
  -->
 # Design Choices for Identity Management
 
+- RFC: 01-011-appendix
 - Authors: Dileban Karunamoorthy, Ermyas Abebe, Venkatraman Ramakrishna
-- Status: Draft
+- Status: Proposed
 - Since: 21-Jan-2021
 
 ## Summary

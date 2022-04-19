@@ -16,8 +16,8 @@ const command: GluegunCommand = {
 			commandHelp(
 				print,
 				toolbox,
-				`besu-cli asset claim --network=network1 --lock_contract_id=lockContractID --recipient_account=2 --preimage_base64=preimage`,
-				'besu-cli asset claim --network=<network1|network2> --lock_contract_id=<lockContractID> --recipient_account=<2|1> --preimage_base64=<preimage>',
+				`besu-cli asset claim --network=network1 --lock_contract_id=lockContractID --recipient_account=2 --preimage=preimage`,
+				'besu-cli asset claim --network=<network1|network2> --lock_contract_id=<lockContractID> --recipient_account=<2|1> --preimage=<preimage>',
 				[
 					{
 						name: '--network',
@@ -35,9 +35,9 @@ const command: GluegunCommand = {
 							'The index of the account of the recipient of the asset from the list obtained through web3.eth.getAccounts(). For example, we can set Alice as accounts[1] and hence value of this parameter for Alice can be 1.'
 					},
 					{
-						name: '--preimage_base64',
+						name: '--preimage',
 						description:
-							'The preimage of hash with which the asset was locked with. Input format supported: base64.'
+							'The preimage of hash with which the asset was locked with.'
 					}
 				],
 				command,
@@ -76,26 +76,26 @@ const command: GluegunCommand = {
 			print.error('Lock contract ID not provided.')
 			return
 		}
-		const lockContractId = options.lock_contract_id
-		if(!options.preimage_base64){
+		const lockContractId = '0x' + options.lock_contract_id
+		if(!options.preimage){
 			print.error('Preimage not provided.')
 			return
 		}
-		const preimage_base64 = options.preimage_base64
-		const preimage = Buffer.from(preimage_base64, 'base64')
-		console.log('Length of preimage:', preimage.length)	
 
 		console.log('Parameters')
 		console.log('networkConfig', networkConfig)
 		console.log('Receiver', recipient)
 		console.log('Lock Contract ID', lockContractId)
-		console.log('Preimage', preimage)
+		console.log('Preimage', options.preimage)
+
+		const preimage_bytes32 = web3N.utils.utf8ToHex(options.preimage)
+		console.log('Preimage bytes32:', preimage_bytes32)	
 
 		// Balance of the recipient before claiming
 		var recipientBalance = await tokenContract.balanceOf(recipient)
 		console.log(`Account balance of the recipient in Network ${options.network} before claiming: ${recipientBalance.toString()}`)
 
-		await interopContract.claimFungibleAsset(lockContractId, preimage, {
+		await interopContract.claimFungibleAsset(lockContractId, options.preimage, {
 			from: recipient,
 		}).catch((error) => {
 			console.log("claimFungibleAsset threw an error:", error);

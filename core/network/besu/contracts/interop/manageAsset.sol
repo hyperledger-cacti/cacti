@@ -40,7 +40,7 @@ contract InteroperationBaseClassERC20 {
 		address indexed receiver,
 		bytes32 indexed lockContractId,
 		bytes32 hashLock,
-		bytes32 preimage
+		string preimage
     	);
 
 	event Unlock(
@@ -109,7 +109,7 @@ contract InteroperationBaseClassERC20 {
 
 
 	// The receiver claims the ownership of an asset locked for them once they obtain the preimage of the hashlock
-	function claimFungibleAsset(bytes32 lockContractId, bytes32 preimage)
+	function claimFungibleAsset(bytes32 lockContractId, string memory preimage)
 		external
 		returns (bool)
 	{

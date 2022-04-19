@@ -44,7 +44,7 @@ besu-cli asset lock --network=network1 --sender_account=1 --recipient_account=2 
 A random preimage and its corresponding hash will be generated and the preimage will be output, along with the lockContractID, to be used during Claim.
 - asset claim: Claim assets (fungible assets for now)
 ```
-besu-cli asset claim --network=network1 --lock_contract_id=lockContractID --recipient_account=2 --preimage_base64=preimage
+besu-cli asset claim --network=network1 --lock_contract_id=lockContractID --recipient_account=2 --preimage=preimage
 ```
 - asset unlock: Unlock and reclaim assets after timeout (fungible assets for now)
 ```

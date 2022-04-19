@@ -5,9 +5,10 @@
  -->
 # Network Identity Update Policies
 
-* Authors: Bishakh Chandra Ghosh, Venkatraman Ramakrishna, Krishnasuri Narayanam, Ermyas Abebe
-* Status: Proposed
-* Since: 24-September-2021
+- RFC: 01-015
+- Authors: Bishakh Chandra Ghosh, Venkatraman Ramakrishna, Krishnasuri Narayanam, Ermyas Abebe
+- Status: Proposed
+- Since: 24-Sep-2021
 
 ## updatePolicy
 
