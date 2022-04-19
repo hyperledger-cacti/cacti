@@ -5,9 +5,9 @@ on:
     branches:
       - main
     paths:
-      - common/protos-java-kt/gradle.properties
-      - core/network/corda-interop-app/gradle.properties
-      - sdks/corda/gradle.properties
+      - 'common/protos-java-kt/gradle.properties'
+      - 'core/network/corda-interop-app/gradle.properties'
+      - 'sdks/corda/gradle.properties'
       
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
