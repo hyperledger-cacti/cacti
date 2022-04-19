@@ -67,6 +67,19 @@ allprojects {
                     password github_password
                 }
             }
+        } else if (file("$projectDir/../github.properties").exists()) {
+            Properties constants = new Properties()
+            file("$projectDir/../github.properties").withInputStream { constants.load(it) }
+            github_username = constants.getProperty("username")
+            github_password = constants.getProperty("password")
+            github_url = constants.getProperty("url")
+            maven {
+                url github_url
+                credentials {
+                    username github_username
+                    password github_password
+                }
+            }
         }
         else {
             flatDir {
