@@ -12,12 +12,7 @@ export async function runCustomChecks(
   let overallSuccess = true;
   let overallErrors: string[] = [];
 
-  const [majorVersion] = version.split(".");
-  const nodeV12OrOlder = parseInt(majorVersion) <= 12;
-  if (nodeV12OrOlder) {
-    console.log(`${TAG} Checks skipped due to old NodeJS (v${version}) OK.`);
-    return;
-  }
+  console.log("${TAG} Current NodeJS version is v", version);
 
   {
     const [success, errors] = await checkOpenApiJsonSpecs({ argv, env });
