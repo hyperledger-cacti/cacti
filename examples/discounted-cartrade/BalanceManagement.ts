@@ -6,8 +6,11 @@
  */
 
 import { LPInfoHolder } from "@hyperledger/cactus-cmd-socket-server";
-import { Verifier } from "@hyperledger/cactus-cmd-socket-server";
 import { ConfigUtil } from "@hyperledger/cactus-cmd-socket-server";
+import {
+  VerifierFactory,
+  VerifierFactoryConfig,
+} from "@hyperledger/cactus-verifier-client";
 
 const fs = require("fs");
 const path = require("path");
@@ -19,21 +22,18 @@ logger.level = config.logLevel;
 
 export class BalanceManagement {
   private connectInfo: LPInfoHolder = null; // connection information
-  private verifierEthereum: Verifier = null;
+  private readonly verifierFactory: VerifierFactory;
 
   constructor() {
     this.connectInfo = new LPInfoHolder();
+    this.verifierFactory = new VerifierFactory(
+      this.connectInfo.ledgerPluginInfo as VerifierFactoryConfig,
+      config.logLevel,
+    );
   }
 
   getBalance(account: string): Promise<any> {
     return new Promise((resolve, reject) => {
-      if (this.verifierEthereum === null) {
-        logger.debug("create verifierEthereum");
-        const ledgerPluginInfo: string =
-          this.connectInfo.getLegerPluginInfo("84jUisrs");
-        this.verifierEthereum = new Verifier(ledgerPluginInfo);
-      }
-
       // for LedgerOperation
       // const execData = {"referedAddress": account};
       // const ledgerOperation: LedgerOperation = new LedgerOperation("getNumericBalance", "", execData);
@@ -46,7 +46,8 @@ export class BalanceManagement {
       // const method = "default";
       // const args = {"method": {type: "web3Eth", command: "getBalance"},"args": {"args": [account]}};
 
-      this.verifierEthereum
+      this.verifierFactory
+        .getVerifier("84jUisrs")
         .sendSyncRequest(contract, method, args)
         .then((result) => {
           const response = {

@@ -6,8 +6,11 @@
  */
 
 import { LPInfoHolder } from "@hyperledger/cactus-cmd-socket-server";
-import { Verifier } from "@hyperledger/cactus-cmd-socket-server";
 import { ConfigUtil } from "@hyperledger/cactus-cmd-socket-server";
+import {
+  VerifierFactory,
+  VerifierFactoryConfig,
+} from "@hyperledger/cactus-verifier-client";
 
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
@@ -17,28 +20,26 @@ logger.level = config.logLevel;
 
 export class CarsManagement {
   private connectInfo: LPInfoHolder = null; // connection information
-  private verifierFabric: Verifier = null;
+  private readonly verifierFactory: VerifierFactory;
 
   constructor() {
     this.connectInfo = new LPInfoHolder();
+    this.verifierFactory = new VerifierFactory(
+      this.connectInfo.ledgerPluginInfo as VerifierFactoryConfig,
+      config.logLevel,
+    );
   }
 
   queryCar(carID: string): Promise<any> {
     return new Promise((resolve, reject) => {
-      if (this.verifierFabric === null) {
-        logger.debug("create verifierFabric");
-        const ledgerPluginInfo: string =
-          this.connectInfo.getLegerPluginInfo("r9IS4dDf");
-        this.verifierFabric = new Verifier(ledgerPluginInfo);
-      }
-
       const contract = { channelName: "mychannel", contractName: "basic" };
       const method = { type: "evaluateTransaction", command: "ReadAsset" };
       const args = { args: [carID] };
       // const method = "default";
       // const args = {"method": {type: "evaluateTransaction", command: "queryCar"},"args": {"args": [carID]}};
 
-      this.verifierFabric
+      this.verifierFactory
+        .getVerifier("r9IS4dDf")
         .sendSyncRequest(contract, method, args)
         .then((result) => {
           resolve(result);
@@ -52,20 +53,14 @@ export class CarsManagement {
 
   queryAllCars(): Promise<any> {
     return new Promise((resolve, reject) => {
-      if (this.verifierFabric === null) {
-        logger.debug("create verifierFabric");
-        const ledgerPluginInfo: string =
-          this.connectInfo.getLegerPluginInfo("r9IS4dDf");
-        this.verifierFabric = new Verifier(ledgerPluginInfo);
-      }
-
       const contract = { channelName: "mychannel", contractName: "basic" };
       const method = { type: "evaluateTransaction", command: "GetAllAssets" };
       const args = { args: [] };
       // const method = "default";
       // const args = {"method": {type: "evaluateTransaction", command: "queryAllCars"}, "args": {"args": []}};
 
-      this.verifierFabric
+      this.verifierFactory
+        .getVerifier("r9IS4dDf")
         .sendSyncRequest(contract, method, args)
         .then((result) => {
           resolve(result);

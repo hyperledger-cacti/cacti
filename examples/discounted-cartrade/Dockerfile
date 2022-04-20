@@ -1,5 +1,7 @@
 FROM cactus-cmd-socketio-server:latest
 
+ARG NPM_PKG_VERSION=latest
+
 ENV CARTRADE_HOME=/root/cactus
 
 WORKDIR ${CARTRADE_HOME}
@@ -15,8 +17,9 @@ RUN apt-get update \
 # Note - indy_sdk:latest  must be ABI compatible with this image OS
 COPY --from=indy-sdk-cli:latest /usr/lib/libindy.so /usr/lib/
 
-COPY ./dist/yarn.lock ./package.json ./
-RUN yarn add "${CACTUS_CMD_SOCKETIO_PATH}" --production --ignore-engines --non-interactive --cache-folder ./.yarnCache && \
+COPY ./package.json ./dist/yarn.lock ./dist/fabric-connector.crt ./dist/ethereum-connector.crt ./dist/indy-connector.crt ./
+RUN yarn add "${CACTUS_CMD_SOCKETIO_PATH}" "@hyperledger/cactus-verifier-client@${NPM_PKG_VERSION}" \
+        --production --ignore-engines --non-interactive --cache-folder ./.yarnCache && \
     rm -rf ./.yarnCache
 
 COPY ./dist ./dist/

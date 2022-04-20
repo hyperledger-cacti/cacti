@@ -6,9 +6,12 @@
  */
 
 import { LPInfoHolder } from "@hyperledger/cactus-cmd-socket-server";
-import { Verifier } from "@hyperledger/cactus-cmd-socket-server";
 import { ContractInfoHolder } from "@hyperledger/cactus-cmd-socket-server";
 import { ConfigUtil } from "@hyperledger/cactus-cmd-socket-server";
+import {
+  VerifierFactory,
+  VerifierFactoryConfig,
+} from "@hyperledger/cactus-verifier-client";
 
 const fs = require("fs");
 const path = require("path");
@@ -21,22 +24,19 @@ logger.level = config.logLevel;
 export class AssetManagement {
   private connectInfo: LPInfoHolder = null; // connection information
   private contractInfoholder: ContractInfoHolder = null; // contract information
-  private verifierEthereum: Verifier = null;
+  private readonly verifierFactory: VerifierFactory;
 
   constructor() {
     this.connectInfo = new LPInfoHolder();
     this.contractInfoholder = new ContractInfoHolder();
+    this.verifierFactory = new VerifierFactory(
+      this.connectInfo.ledgerPluginInfo as VerifierFactoryConfig,
+      config.logLevel,
+    );
   }
 
   addAsset(amount: string): Promise<any> {
     return new Promise((resolve, reject) => {
-      if (this.verifierEthereum === null) {
-        logger.debug("create verifierEthereum");
-        const ledgerPluginInfo: string =
-          this.connectInfo.getLegerPluginInfo("84jUisrs");
-        this.verifierEthereum = new Verifier(ledgerPluginInfo);
-      }
-
       // for Neo
       const contractInfo: string =
         this.contractInfoholder.getContractInfo("AssetContract");
@@ -58,7 +58,8 @@ export class AssetManagement {
       // const method = "default";
       // const args = {"method": {type: "contract", command: "addAsset", function: "sendTransaction"}, "args": {"args": [amount, {from: coinbase}]}};
 
-      this.verifierEthereum
+      this.verifierFactory
+        .getVerifier("84jUisrs")
         .sendSyncRequest(contract, method, args)
         .then((result) => {
           const response = {
@@ -76,13 +77,6 @@ export class AssetManagement {
 
   getAsset(): Promise<any> {
     return new Promise((resolve, reject) => {
-      if (this.verifierEthereum === null) {
-        logger.debug("create verifierEthereum");
-        const ledgerPluginInfo: string =
-          this.connectInfo.getLegerPluginInfo("84jUisrs");
-        this.verifierEthereum = new Verifier(ledgerPluginInfo);
-      }
-
       // for Neo
       const contractInfo: string =
         this.contractInfoholder.getContractInfo("AssetContract");
@@ -103,7 +97,8 @@ export class AssetManagement {
       // const method = "default";
       // const args = {"method": {type: "contract", command: "getAsset", function: "call"}, "args": {"args": []}};
 
-      this.verifierEthereum
+      this.verifierFactory
+        .getVerifier("84jUisrs")
         .sendSyncRequest(contract, method, args)
         .then((result) => {
           const response = {

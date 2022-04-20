@@ -1,9 +1,15 @@
 ledgerPluginInfo:
   -
     validatorID: 84jUisrs
-    validatorType: socketio
+    validatorType: legacy-socketio
     validatorURL: https://ethereum-validator:5050
-    validatorKeyPath: /etc/cactus/connector-go-ethereum-socketio/CA/connector.crt
+    validatorKeyPath: /root/cactus/ethereum-connector.crt
+    maxCounterRequestID: 100
+    syncFunctionTimeoutMillisecond: 5000
+    socketOptions:
+      rejectUnauthorized: false
+      reconnection: false
+      timeout: 20000
     ledgerInfo:
       ledgerAbstract: Go-Ethereum Ledger
     apiInfo:
@@ -34,9 +40,15 @@ ledgerPluginInfo:
 
   -
     validatorID: r9IS4dDf
-    validatorType: socketio
+    validatorType: legacy-socketio
     validatorURL: https://fabric-socketio-validator:5040
-    validatorKeyPath: /etc/cactus/connector-fabric-socketio/CA/connector.crt
+    validatorKeyPath: /root/cactus/fabric-connector.crt
+    maxCounterRequestID: 100
+    syncFunctionTimeoutMillisecond: 5000
+    socketOptions:
+      rejectUnauthorized: false
+      reconnection: false
+      timeout: 20000
     ledgerInfo:
        ledgerAbstract: Fabric Ledger
     apiInfo:
@@ -61,9 +73,15 @@ ledgerPluginInfo:
 
   -
     validatorID: 3PfTJw8g
-    validatorType: socketio
+    validatorType: legacy-socketio
     validatorURL: http://indy-validator-nginx:10080
-    validatorKeyPath: /etc/cactus/validator_socketio_indy/CA/connector.crt
+    validatorKeyPath: /root/cactus/indy-connector.crt
+    maxCounterRequestID: 100
+    syncFunctionTimeoutMillisecond: 5000
+    socketOptions:
+      rejectUnauthorized: false
+      reconnection: false
+      timeout: 20000
     ledgerInfo:
       ledgerAbstract: "Indy Ledger"
     apiInfo: []

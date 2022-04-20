@@ -14,15 +14,19 @@ import { TransactionData } from "./TransactionData";
 import { BusinessLogicInquireCartradeStatus } from "./BusinessLogicInquireCartradeStatus";
 import { TxInfoData } from "./TxInfoData";
 import { routesTransactionManagement } from "@hyperledger/cactus-cmd-socket-server";
-import { routesVerifierFactory } from "@hyperledger/cactus-cmd-socket-server";
 import { LedgerOperation } from "@hyperledger/cactus-cmd-socket-server";
 import { BusinessLogicBase } from "@hyperledger/cactus-cmd-socket-server";
+import { LPInfoHolder } from "@hyperledger/cactus-cmd-socket-server";
 import { makeRawTransaction } from "./TransactionEthereum";
 import { makeSignedProposal } from "./TransactionFabric";
 import { getDataFromIndy } from "./TransactionIndy";
 import { LedgerEvent, ConfigUtil } from "@hyperledger/cactus-cmd-socket-server";
 import { json2str } from "@hyperledger/cactus-cmd-socket-server";
 import { CartradeStatus } from "./define";
+import {
+  VerifierFactory,
+  VerifierFactoryConfig,
+} from "@hyperledger/cactus-verifier-client";
 
 const fs = require("fs");
 const path = require("path");
@@ -34,6 +38,12 @@ import { getLogger } from "log4js";
 const moduleName = "BusinessLogicCartrade";
 const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;
+
+const connectInfo = new LPInfoHolder();
+const routesVerifierFactory = new VerifierFactory(
+  connectInfo.ledgerPluginInfo as VerifierFactoryConfig,
+  config.logLevel,
+);
 
 const indy = require("indy-sdk");
 const assert = require("assert");
@@ -285,7 +295,11 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
     //        const verifierEthereum = routesTransactionManagement.getVerifier(useValidator['validatorID'][0]);
     const verifierEthereum = routesVerifierFactory.getVerifier(
       useValidator["validatorID"][0],
-      "BusinessLogicCartrade"
+    );
+    verifierEthereum.startMonitor(
+      "BusinessLogicCartrade",
+      {},
+      routesTransactionManagement,
     );
     logger.debug("getVerifierEthereum");
 
@@ -374,7 +388,11 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
     //        const verifierFabric = routesTransactionManagement.getVerifier(useValidator['validatorID'][1]);
     const verifierFabric = routesVerifierFactory.getVerifier(
       useValidator["validatorID"][1],
-      "BusinessLogicCartrade"
+    );
+    verifierFabric.startMonitor(
+      "BusinessLogicCartrade",
+      {},
+      routesTransactionManagement,
     );
     logger.debug("getVerifierFabric");
 
@@ -449,7 +467,6 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
     //        const verifierEthereum = routesTransactionManagement.getVerifier(useValidator['validatorID'][0]);
     const verifierEthereum = routesVerifierFactory.getVerifier(
       useValidator["validatorID"][0],
-      "BusinessLogicCartrade"
     );
     logger.debug("getVerifierEthereum");
 

@@ -7,9 +7,13 @@
 
 import {
   LPInfoHolder,
-  Verifier,
   ConfigUtil,
 } from "@hyperledger/cactus-cmd-socket-server";
+
+import {
+  VerifierFactory,
+  VerifierFactoryConfig,
+} from "@hyperledger/cactus-verifier-client";
 
 const libWeb3 = require("web3");
 
@@ -24,8 +28,12 @@ const moduleName = "TransactionIndy";
 const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;
 
-let xConnectInfo: LPInfoHolder = null; // connection information
-let xVerifierIndy: Verifier = null;
+const xConnectInfo = new LPInfoHolder();
+const verifierFactory = new VerifierFactory(
+  xConnectInfo.ledgerPluginInfo as VerifierFactoryConfig,
+  config.logLevel,
+);
+
 
 export function getDataFromIndy(
   arg_request: {},
@@ -68,17 +76,6 @@ function sendRequest(arg_request: {}, identifier: string): Promise<{}> {
     try {
       logger.debug(`##sendRequest: arg_request: ${arg_request}`);
 
-      if (xConnectInfo === null) {
-        xConnectInfo = new LPInfoHolder();
-      }
-
-      if (xVerifierIndy === null) {
-        logger.debug("create verifierIndy");
-        const ledgerPluginInfo: string =
-          xConnectInfo.getLegerPluginInfo("3PfTJw8g");
-        xVerifierIndy = new Verifier(ledgerPluginInfo);
-      }
-
       let commandName = "";
 
       if (identifier === "schema") {
@@ -96,9 +93,12 @@ function sendRequest(arg_request: {}, identifier: string): Promise<{}> {
 
       const args = { args: arg_request };
 
-      xVerifierIndy.sendSyncRequest(contract, method, args).then((result) => {
-        return resolve(result);
-      });
+      verifierFactory
+        .getVerifier("3PfTJw8g")
+        .sendSyncRequest(contract, method, args)
+        .then((result) => {
+          return resolve(result);
+        });
     } catch (err) {
       logger.error(err);
       return reject(err);
