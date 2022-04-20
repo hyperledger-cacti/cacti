@@ -7,10 +7,14 @@
 
 import {
   LPInfoHolder,
-  Verifier,
   TransactionSigner,
   ConfigUtil,
 } from "@hyperledger/cactus-cmd-socket-server";
+
+import {
+  VerifierFactory,
+  VerifierFactoryConfig,
+} from "@hyperledger/cactus-verifier-client";
 
 const fs = require("fs");
 const yaml = require("js-yaml");
@@ -23,7 +27,7 @@ logger.level = config.logLevel;
 
 const mapFromAddressNonce: Map<string, number> = new Map();
 let xConnectInfo: LPInfoHolder = null; // connection information
-let xVerifierEthereum: Verifier = null;
+let xVerifierFactory: VerifierFactory = null;
 
 export function makeRawTransaction(txParam: {
   fromAddress: string;
@@ -81,11 +85,12 @@ function getNewNonce(fromAddress: string): Promise<{ txnCountHex: string }> {
         xConnectInfo = new LPInfoHolder();
       }
 
-      if (xVerifierEthereum === null) {
-        logger.debug("create verifierEthereum");
-        const ledgerPluginInfo: string =
-          xConnectInfo.getLegerPluginInfo("84jUisrs");
-        xVerifierEthereum = new Verifier(ledgerPluginInfo);
+      if (xVerifierFactory === null) {
+        logger.debug("create verifier factory");
+        xVerifierFactory = new VerifierFactory(
+          xConnectInfo.ledgerPluginInfo as VerifierFactoryConfig,
+          config.logLevel,
+        );
       }
 
       // Get the number of transactions in account
@@ -95,7 +100,8 @@ function getNewNonce(fromAddress: string): Promise<{ txnCountHex: string }> {
       const args = { args: { args: [fromAddress] } };
 
       logger.debug(`##getNewNonce(A): call validator#getNonce()`);
-      xVerifierEthereum
+      xVerifierFactory
+        .getVerifier("84jUisrs")
         .sendSyncRequest(contract, method, args)
         .then((result) => {
           // logger.debug(`##getNewNonce(A): result: ${JSON.stringify(result)}`);
@@ -116,7 +122,8 @@ function getNewNonce(fromAddress: string): Promise<{ txnCountHex: string }> {
             const args = { args: { args: [txnCount] } };
 
             logger.debug(`##getNewNonce(D): call validator#toHex()`);
-            xVerifierEthereum
+            xVerifierFactory
+              .getVerifier("84jUisrs")
               .sendSyncRequest(contract, method, args)
               .then((result) => {
                 txnCountHex = result.data.hexStr;

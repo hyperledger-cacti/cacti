@@ -25,7 +25,7 @@ services:
     build:
       context: ../../packages/cactus-plugin-ledger-connector-sawtooth-socketio/
     ports:
-      - "5040:5040"
+      - "5140:5140"
     networks:
       - sawtooth_net
       - electricity-trade-net
