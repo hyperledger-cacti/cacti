@@ -7,8 +7,11 @@
 
 import { Request } from "express";
 import { LPInfoHolder } from "@hyperledger/cactus-cmd-socket-server";
-import { Verifier } from "@hyperledger/cactus-cmd-socket-server";
 import { ConfigUtil } from "@hyperledger/cactus-cmd-socket-server";
+import {
+  VerifierFactory,
+  VerifierFactoryConfig,
+} from "@hyperledger/cactus-verifier-client";
 
 const fs = require("fs");
 const path = require("path");
@@ -20,21 +23,18 @@ logger.level = config.logLevel;
 
 export class TemplateTradeManagement {
   private connectInfo: LPInfoHolder = null; // connection information
-  private verifier: Verifier = null;
+  private readonly verifierFactory: VerifierFactory;
 
   constructor() {
     this.connectInfo = new LPInfoHolder();
+    this.verifierFactory = new VerifierFactory(
+      this.connectInfo.ledgerPluginInfo as VerifierFactoryConfig,
+      config.logLevel,
+    );
   }
 
   execTemplateTrade(functionName: string, req: Request): Promise<any> {
     return new Promise((resolve, reject) => {
-      if (this.verifier === null) {
-        logger.debug("create verifier");
-        const ledgerPluginInfo: string =
-          this.connectInfo.getLegerPluginInfo("84jUisrs");
-        this.verifier = new Verifier(ledgerPluginInfo);
-      }
-
       const contract = {}; // NOTE: Since contract does not need to be specified, specify an empty object.
       const method = {};
       const template = req.body.template;
@@ -50,7 +50,8 @@ export class TemplateTradeManagement {
       //    method: "name"
       //    args: {"tokenID": "token-12345", "contractID": "contract-123456"}
 
-      this.verifier
+      this.verifierFactory
+        .getVerifier("84jUisrs")
         .sendSyncRequest(contract, method, args)
         .then((result) => {
           const response = {
@@ -71,13 +72,6 @@ export class TemplateTradeManagement {
     // TODO
     const tradeID = this.createTradeID();
 
-    if (this.verifier === null) {
-      logger.debug("create verifier");
-      const ledgerPluginInfo: string =
-        this.connectInfo.getLegerPluginInfo("84jUisrs");
-      this.verifier = new Verifier(ledgerPluginInfo);
-    }
-
     const contract = {}; // NOTE: Since contract does not need to be specified, specify an empty object.
     const method = {};
     const template = req.body.template;
@@ -93,7 +87,8 @@ export class TemplateTradeManagement {
     //    method: "transfer"
     //    args: {"_from": "account1", "_to": "account2", "value": 100, "tokenID": "token-12345", "contractID": "contract-123456"}
 
-    this.verifier
+    this.verifierFactory
+      .getVerifier("84jUisrs")
       .sendAsyncRequest(contract, method, args)
       .then(() => {
         logger.debug(`##thirdTransaction sendAsyncRequest finish`);

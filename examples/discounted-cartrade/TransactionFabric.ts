@@ -15,7 +15,8 @@
  * In this case, it is used only when transferring assets.
  */
 
-import { Verifier, ConfigUtil } from "@hyperledger/cactus-cmd-socket-server";
+import { ConfigUtil } from "@hyperledger/cactus-cmd-socket-server";
+import { Verifier } from "@hyperledger/cactus-verifier-client";
 
 const fs = require("fs");
 const path = require("path");
@@ -29,10 +30,10 @@ const moduleName = "TransactionFabric";
 const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;
 
-export function makeSignedProposal(
+export function makeSignedProposal<T>(
   ccFncName: string,
   ccArgs: string[],
-  verifierFabric: Verifier,
+  verifierFabric: Verifier<T>,
 ): Promise<{ data: {}; txId: string }> {
   // exports.Invoke = async function(reqBody, isWait){
   // let eventhubs = []; // For the time being, give up the eventhub connection of multiple peers.
