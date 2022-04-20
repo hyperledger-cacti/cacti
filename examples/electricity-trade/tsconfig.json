@@ -76,5 +76,8 @@
     {
       "path": "../../packages/cactus-cmd-socketio-server/tsconfig.json"
     },
+    {
+      "path": "../../packages/cactus-verifier-client/tsconfig.json"
+    }
   ]
 }

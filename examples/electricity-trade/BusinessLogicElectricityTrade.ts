@@ -12,11 +12,11 @@ import { MeterInfo } from "./MeterInfo";
 import {
   TradeInfo,
   routesTransactionManagement,
-  routesVerifierFactory,
   BusinessLogicBase,
   LedgerEvent,
   json2str,
   ConfigUtil,
+  LPInfoHolder,
 } from "@hyperledger/cactus-cmd-socket-server";
 import { makeRawTransaction } from "./TransactionEthereum";
 
@@ -25,9 +25,19 @@ const yaml = require("js-yaml");
 //const config: any = JSON.parse(fs.readFileSync("/etc/cactus/default.json", 'utf8'));
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
+import {
+  VerifierFactory,
+  VerifierFactoryConfig,
+} from "@hyperledger/cactus-verifier-client";
+
 const moduleName = "BusinessLogicElectricityTrade";
 const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;
+const connectInfo = new LPInfoHolder();
+const routesVerifierFactory = new VerifierFactory(
+  connectInfo.ledgerPluginInfo as VerifierFactoryConfig,
+  config.logLevel,
+);
 
 export class BusinessLogicElectricityTrade extends BusinessLogicBase {
   businessLogicID: string;
@@ -75,8 +85,11 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
     //        const verifierSawtooth = transactionManagement.getVerifier(useValidator['validatorID'][0], options);
     const verifierSawtooth = routesVerifierFactory.getVerifier(
       useValidator["validatorID"][0],
+    );
+    verifierSawtooth.startMonitor(
       "BusinessLogicElectricityTrade",
       options,
+      routesTransactionManagement,
     );
     logger.debug("getVerifierSawtooth");
   }
@@ -119,7 +132,11 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
     //        const verifierEthereum = routesTransactionManagement.getVerifier(useValidator['validatorID'][1]);
     const verifierEthereum = routesVerifierFactory.getVerifier(
       useValidator["validatorID"][1],
+    );
+    verifierEthereum.startMonitor(
       "BusinessLogicElectricityTrade",
+      {},
+      routesTransactionManagement,
     );
     logger.debug("getVerifierEthereum");
 
