@@ -117,16 +117,6 @@ function mainTask()
 
   yarn run configure
 
-  # Obtains the major NodeJS version such as "12" from "v12.14.1"
-  # We only run the custom checks above v12 because the globby dependency's
-  # latest version is forcing us to use Ecmascript Modules which do not work
-  # on NodeJS 12 even with the additional flags passed in.
-  nodejs_version=`node --version | awk -v range=1 '{print substr($0,range+1,2)}'`
-  if [ "$nodejs_version" -gt "12" ]; then
-    echo "$(date +%FT%T%z) [CI] NodeJS is newer than v12, running custom checks..."
-    yarn run custom-checks
-  fi
-
   yarn tools:validate-bundle-names
 
   dumpDiskUsageInfo
