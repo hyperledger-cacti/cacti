@@ -57,9 +57,9 @@ jobs:
           tag_name: ${{ env.MODULE_TAG }}/${{ github.event.inputs.version }}
           release_name: ${{ github.event.inputs.version }} - ${{ env.MODULE_DESC }} - ${{ env.RELEASE_DATE }}
           body: |
-            - Go Module: `github.com/${GITHUB_REPOSITORY_OWNER}/weaver-dlt-interoperability/${{ env.MODULE_TAG }}`
+            - Go Module: `github.com/${{ github.repository_owner }}/weaver-dlt-interoperability/${{ env.MODULE_TAG }}`
             - Release: ${{ github.event.inputs.version }}
-            - Readme: [Here](https://github.com/${GITHUB_REPOSITORY_OWNER}/weaver-dlt-interoperability/blob/${{ env.MODULE_TAG }}/${{ github.event.inputs.version }}/${{ env.MODULE_TAG }}/README.md).
-            - Source: [Here](https://github.com/${GITHUB_REPOSITORY_OWNER}/weaver-dlt-interoperability/blob/${{ env.MODULE_TAG }}/${{ github.event.inputs.version }}/${{ env.MODULE_TAG }})
+            - Readme: [Here](https://github.com/${{ github.repository_owner }}/weaver-dlt-interoperability/blob/${{ env.MODULE_TAG }}/${{ github.event.inputs.version }}/${{ env.MODULE_TAG }}/README.md).
+            - Source: [Here](https://github.com/${{ github.repository_owner }}/weaver-dlt-interoperability/blob/${{ env.MODULE_TAG }}/${{ github.event.inputs.version }}/${{ env.MODULE_TAG }})
           draft: false
           prerelease: false
