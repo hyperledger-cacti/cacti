@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: Data Transfer Tests
+name: Test Data Transfer
 
 # Controls when the workflow will run
 on:
