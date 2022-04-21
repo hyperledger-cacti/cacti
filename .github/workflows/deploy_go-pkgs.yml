@@ -27,22 +27,22 @@ jobs:
         run: |
           if [ "${{ github.event.inputs.module }}" = "protos-go" ]; then
             echo "MODULE_TAG=common/protos-go" >> $GITHUB_ENV
-            echo "MODULE_DESC='GO Weaver Protos'" >> $GITHUB_ENV
+            echo "MODULE_DESC=GO Weaver Protos" >> $GITHUB_ENV
           elif [ "${{ github.event.inputs.module }}" = "interop" ]; then
             echo "MODULE_TAG=core/network/fabric-interop-cc/contracts/interop" >> $GITHUB_ENV
-            echo "MODULE_DESC='GO Fabric Interop Chaincode'" >> $GITHUB_ENV
+            echo "MODULE_DESC=GO Fabric Interop Chaincode" >> $GITHUB_ENV
           elif [ "${{ github.event.inputs.module }}" = "utils" ]; then
             echo "MODULE_TAG=core/network/fabric-interop-cc/libs/utils" >> $GITHUB_ENV
-            echo "MODULE_DESC='GO Fabric Utils Library for Interoperation'" >> $GITHUB_ENV
+            echo "MODULE_DESC=GO Fabric Utils Library for Interoperation" >> $GITHUB_ENV
           elif [ "${{ github.event.inputs.module }}" = "assetexchange" ]; then
             echo "MODULE_TAG=core/network/fabric-interop-cc/libs/assetexchange" >> $GITHUB_ENV
-            echo "MODULE_DESC='GO Fabric Library for Asset Exchange'" >> $GITHUB_ENV
+            echo "MODULE_DESC=GO Fabric Library for Asset Exchange" >> $GITHUB_ENV
           elif [ "${{ github.event.inputs.module }}" = "asset-mgmt" ]; then
             echo "MODULE_TAG=core/network/fabric-interop-cc/interfaces/asset-mgmt" >> $GITHUB_ENV
-            echo "MODULE_DESC='GO Fabric Asset Management Interface'" >> $GITHUB_ENV
+            echo "MODULE_DESC=GO Fabric Asset Management Interface" >> $GITHUB_ENV
           elif [ "${{ github.event.inputs.module }}" = "go-sdk" ]; then
             echo "MODULE_TAG=sdks/fabric/go-sdk" >> $GITHUB_ENV
-            echo "MODULE_DESC='GO Fabric Weaver SDK'" >> $GITHUB_ENV
+            echo "MODULE_DESC=GO Fabric Weaver SDK" >> $GITHUB_ENV
           else
             echo "Module not known to the workflow. Exiting."
             exit 1
