@@ -37,7 +37,9 @@ jobs:
         working-directory: common/protos-js
         
       - name: Build
-        run: make build
+        run: |
+          export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
+          make build
         working-directory: common/protos-js
         
       - name: Publish
