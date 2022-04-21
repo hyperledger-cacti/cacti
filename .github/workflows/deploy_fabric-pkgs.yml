@@ -1,4 +1,4 @@
-name: Deploy Protos Java-Kotlin
+name: Deploy Fabric Packages
 
 on:
   push:
