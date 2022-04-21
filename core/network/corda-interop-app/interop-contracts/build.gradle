@@ -10,6 +10,15 @@ plugins {
 
 apply plugin: 'net.corda.plugins.cordapp'
 
+repositories {
+    if (github_url == "") {
+        println("Fetching Locally built Weaver packages.")
+        flatDir {
+            dirs '../../../../common/protos-java-kt/build/libs'
+        }
+    }
+}
+
 cordapp {
     targetPlatformVersion corda_platform_version
     minimumPlatformVersion corda_platform_version
