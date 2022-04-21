@@ -1,7 +1,5 @@
-DOCKER_IMAGE_NAME ?= weaver-corda-driver
-DOCKER_TAG ?= 1.2.4-alpha.7
-DOCKER_REGISTRY ?= ghcr.io/hyperledger-labs
-GIT_URL = https://github.com/hyperledger-labs/weaver-dlt-interoperability/core/drivers/corda-driver
+include makefile.variables.docker
+
 COMPOSE_ARG ?=
 
 .PHONY: build-local

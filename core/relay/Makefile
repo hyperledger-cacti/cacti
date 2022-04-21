@@ -1,6 +1,5 @@
-DOCKER_IMAGE_NAME ?= weaver-relay
-DOCKER_TAG ?= 1.2.4
-DOCKER_REGISTRY ?= ghcr.io/hyperledger-labs
+include Makefile.variables.docker
+
 PROTOS_TAG ?= v0.7
 
 DOCKER_IMAGE_ALL = $(DOCKER_IMAGE_NAME):$(DOCKER_TAG)
@@ -11,7 +10,6 @@ DOCKER_IMAGE_DRIVER = $(DOCKER_IMAGE_NAME)-driver:$(DOCKER_TAG)
 COMMIT = $(shell git log -1 --oneline | cut -d ' ' -f 1)
 BRANCH = $(shell git rev-parse --abbrev-ref HEAD)
 TIMESTAMP = $(shell date +%FT%T%z)
-GIT_URL = https://github.com/hyperledger-labs/weaver-dlt-interoperability
 COMPOSE_ARG ?=
 
 .PHONY: all
