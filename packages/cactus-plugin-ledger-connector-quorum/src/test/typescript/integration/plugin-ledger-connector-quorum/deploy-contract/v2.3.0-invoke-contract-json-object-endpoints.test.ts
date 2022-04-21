@@ -28,7 +28,8 @@ import express from "express";
 import bodyParser from "body-parser";
 import http from "http";
 import { AddressInfo } from "net";
-import { Configuration } from "@hyperledger/cactus-core-api";
+import { Configuration, Constants } from "@hyperledger/cactus-core-api";
+import { Server as SocketIoServer } from "socket.io";
 
 const logLevel: LogLevelDesc = "INFO";
 
@@ -87,8 +88,12 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
   const apiConfig = new Configuration({ basePath: apiHost });
   const apiClient = new QuorumApi(apiConfig);
 
+  const wsApi = new SocketIoServer(server, {
+    path: Constants.SocketIoConnectionPathV1,
+  });
+
   await connector.getOrCreateWebServices();
-  await connector.registerWebServices(expressApp);
+  await connector.registerWebServices(expressApp, wsApi);
 
   await connector.transact({
     web3SigningCredential: {

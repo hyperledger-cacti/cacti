@@ -3,6 +3,7 @@ import type { Server } from "http";
 import type { Server as SecureServer } from "https";
 import { Optional } from "typescript-optional";
 import type { Express } from "express";
+import { v4 as uuidV4 } from "uuid";
 import OAS from "../../json/openapi.json";
 import {
   Secp256k1Keys,
@@ -13,7 +14,10 @@ import {
   IJsObjectSignerOptions,
 } from "@hyperledger/cactus-common";
 import { DefaultApi as ObjectStoreIpfsApi } from "@hyperledger/cactus-plugin-object-store-ipfs";
-import { initiateTransfer } from "./common/initiate-transfer-helper";
+import {
+  checkValidInitializationRequest,
+  sendTransferInitializationResponse,
+} from "./server/transfer-initialization";
 import {
   ICactusPlugin,
   IPluginWebService,
@@ -21,30 +25,22 @@ import {
   Configuration,
 } from "@hyperledger/cactus-core-api";
 import {
-  CommitFinalV1Request,
-  CommitFinalV1Response,
-  CommitPreparationV1Request,
-  CommitPreparationV1Response,
-  TransferInitializationV1Request,
   TransferInitializationV1Response,
-  LockEvidenceV1Request,
-  LockEvidenceV1Response,
-  SendClientV1Request,
-  TransferCommenceV1Request,
-  TransferCommenceV1Response,
-  TransferCompleteV1Request,
   DefaultApi as OdapApi,
   SessionData,
-  TransferCompleteV1Response,
+  ClientV1Request,
+  TransferCommenceV1Request,
+  TransferCommenceV1Response,
+  LockEvidenceV1Request,
+  LockEvidenceV1Response,
+  CommitPreparationV1Request,
+  CommitFinalV1Request,
+  CommitPreparationV1Response,
+  CommitFinalV1Response,
+  TransferCompleteV1Request,
+  TransferInitializationV1Request,
 } from "../generated/openapi/typescript-axios";
-import { SHA256 } from "crypto-js";
-import { CommitFinalEndpointV1 } from "../web-services/commit-final-endpoint";
-import { CommitPrepareEndpointV1 } from "../web-services/commite-prepare-endpoint";
-import { LockEvidenceEndpointV1 } from "../web-services/lock-evidence-endpoint";
-import { TransferCommenceEndpointV1 } from "../web-services/transfer-commence-endpoint";
-import { TransferCompleteEndpointV1 } from "../web-services/transfer-complete-endpoint";
-import { TransferInitiationEndpointV1 } from "../web-services/transfer-initiation-endpoint";
-import { SendClientRequestEndpointV1 } from "../web-services/send-client-request";
+import { CommitFinalRequestEndpointV1 } from "../web-services/server-side/commit-final-request-endpoint";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import {
   DefaultApi as FabricApi,
@@ -58,13 +54,56 @@ import {
   EthContractInvocationType,
   InvokeContractV1Request as BesuInvokeContractV1Request,
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
-import { lockEvidence } from "./common/lock-evidence-helper";
-import { commitFinal } from "./common/commit-final-helper";
-import { transferComplete } from "./common/transfer-complete-helper";
-import { v4 as uuidV4 } from "uuid";
-import { transferCommence } from "./common/transfer-commence-helper";
-import { commitPrepare } from "./common/commit-prepare-helper";
+import { CommitFinalResponseEndpointV1 } from "../web-services/client-side/commit-final-response-endpoint";
+import { CommitPreparationResponseEndpointV1 } from "../web-services/client-side/commite-prepare-response-endpoint";
+import { LockEvidenceResponseEndpointV1 } from "../web-services/client-side/lock-evidence-response-endpoint";
+import { TransferCommenceResponseEndpointV1 } from "../web-services/client-side/transfer-commence-response-endpoint";
+import { TransferInitiationResponseEndpointV1 } from "../web-services/client-side/transfer-initiation-response-endpoint";
+import { LockEvidenceRequestEndpointV1 } from "../web-services/server-side/lock-evidence-request-endpoint";
+import { TransferCommenceRequestEndpointV1 } from "../web-services/server-side/transfer-commence-request-endpoint";
+import { TransferCompleteRequestEndpointV1 } from "../web-services/server-side/transfer-complete-request-endpoint";
+import { TransferInitiationRequestEndpointV1 } from "../web-services/server-side/transfer-initiation-request-endpoint";
+import { CommitPreparationRequestEndpointV1 } from "../web-services/server-side/commite-prepare-request-endpoint";
 import { randomInt } from "crypto";
+import {
+  checkValidInitializationResponse,
+  sendTransferInitializationRequest,
+} from "./client/transfer-initialization";
+import { ClientRequestEndpointV1 } from "../web-services/client-side/client-request-endpoint";
+import {
+  checkValidTransferCommenceResponse,
+  sendTransferCommenceRequest,
+} from "./client/transfer-commence";
+import {
+  checkValidtransferCommenceRequest,
+  sendTransferCommenceResponse,
+} from "./server/transfer-commence";
+import {
+  checkValidLockEvidenceResponse,
+  sendLockEvidenceRequest,
+} from "./client/lock-evidence";
+import {
+  checkValidLockEvidenceRequest,
+  sendLockEvidenceResponse,
+} from "./server/lock-evidence";
+import {
+  checkValidCommitFinalResponse,
+  sendCommitFinalRequest,
+} from "./client/commit-final";
+import {
+  checkValidCommitPreparationResponse,
+  sendCommitPreparationRequest,
+} from "./client/commit-preparation";
+import {
+  checkValidCommitFinalRequest,
+  sendCommitFinalResponse,
+} from "./server/commit-final";
+import { sendTransferCompleteRequest } from "./client/transfer-complete";
+import { checkValidTransferCompleteRequest } from "./server/transfer-complete";
+import {
+  checkValidCommitPreparationRequest,
+  sendCommitPreparationResponse,
+} from "./server/commit-preparation";
 
 export enum OdapMessageType {
   InitializationRequest = "urn:ietf:odap:msgtype:init-transfer-msg",
@@ -110,6 +149,7 @@ interface IOdapHermesLog {
   operation: string;
   nodes: string;
 }
+
 export class PluginOdapGateway implements ICactusPlugin, IPluginWebService {
   name: string;
   sessions: Map<string, SessionData>;
@@ -319,18 +359,23 @@ export class PluginOdapGateway implements ICactusPlugin, IPluginWebService {
     }
     return;
   }
+
   public get className(): string {
     return PluginOdapGateway.CLASS_NAME;
   }
+
   public getOpenApiSpec(): unknown {
     return OAS;
   }
+
   /*public getAspect(): PluginAspect {
     return PluginAspect.WEB_SERVICE;
   }*/
+
   public async onPluginInit(): Promise<unknown> {
     return;
   }
+
   async registerWebServices(app: Express): Promise<IWebServiceEndpoint[]> {
     const webServices = await this.getOrCreateWebServices();
     await Promise.all(webServices.map((ws) => ws.registerExpress(app)));
@@ -342,31 +387,73 @@ export class PluginOdapGateway implements ICactusPlugin, IPluginWebService {
       return this.endpoints;
     }
 
-    const transferinitiation = new TransferInitiationEndpointV1({
+    // Server endpoints
+    const transferInitiationRequestEndpoint = new TransferInitiationRequestEndpointV1(
+      {
+        gateway: this,
+      },
+    );
+    const transferCommenceRequestEndpoint = new TransferCommenceRequestEndpointV1(
+      {
+        gateway: this,
+      },
+    );
+    const lockEvidenceRequestEndpoint = new LockEvidenceRequestEndpointV1({
       gateway: this,
     });
-    const lockEvidencePreparation = new TransferCommenceEndpointV1({
+    const commitPreparationRequestEndpoint = new CommitPreparationRequestEndpointV1(
+      {
+        gateway: this,
+      },
+    );
+    const commitFinalRequestEndpoint = new CommitFinalRequestEndpointV1({
       gateway: this,
     });
-    const lockEvidence = new LockEvidenceEndpointV1({ gateway: this });
-    const commitPreparation = new CommitPrepareEndpointV1({
+    const transferCompleteRequestEndpoint = new TransferCompleteRequestEndpointV1(
+      {
+        gateway: this,
+      },
+    );
+
+    // Client endpoints
+    const clientRequestEndpoint = new ClientRequestEndpointV1({
       gateway: this,
     });
-    const commitFinal = new CommitFinalEndpointV1({ gateway: this });
-    const transferComplete = new TransferCompleteEndpointV1({
+    const transferInitiationResponseEndpoint = new TransferInitiationResponseEndpointV1(
+      {
+        gateway: this,
+      },
+    );
+    const transferCommenceResponseEndpoint = new TransferCommenceResponseEndpointV1(
+      {
+        gateway: this,
+      },
+    );
+    const lockEvidenceResponseEndpoint = new LockEvidenceResponseEndpointV1({
       gateway: this,
     });
-    const sendClientrequest = new SendClientRequestEndpointV1({
+    const commitPreparationResponseEndpoint = new CommitPreparationResponseEndpointV1(
+      {
+        gateway: this,
+      },
+    );
+    const commitFinalResponseEndpoint = new CommitFinalResponseEndpointV1({
       gateway: this,
     });
+
     this.endpoints = [
-      transferinitiation,
-      lockEvidencePreparation,
-      lockEvidence,
-      commitPreparation,
-      commitFinal,
-      transferComplete,
-      sendClientrequest,
+      transferInitiationRequestEndpoint,
+      transferCommenceRequestEndpoint,
+      lockEvidenceRequestEndpoint,
+      commitPreparationRequestEndpoint,
+      commitFinalRequestEndpoint,
+      transferCompleteRequestEndpoint,
+      clientRequestEndpoint,
+      transferInitiationResponseEndpoint,
+      transferCommenceResponseEndpoint,
+      lockEvidenceResponseEndpoint,
+      commitPreparationResponseEndpoint,
+      commitFinalResponseEndpoint,
     ];
     return this.endpoints;
   }
@@ -433,111 +520,188 @@ export class PluginOdapGateway implements ICactusPlugin, IPluginWebService {
     }
   }
 
-  public async initiateTransferReceived(
+  public getOdapAPI(basePath: string): OdapApi {
+    const odapServerApiConfig = new Configuration({
+      basePath: basePath,
+    });
+
+    return new OdapApi(odapServerApiConfig);
+  }
+
+  //Server-side
+  public async onTransferInitiationRequestReceived(
     request: TransferInitializationV1Request,
-  ): Promise<TransferInitializationV1Response> {
-    const fnTag = `${this.className}#initiateTransferReceived()`;
+  ): Promise<void> {
+    const fnTag = `${this.className}#onTransferInitiationRequestReceived()`;
     this.log.info(`${fnTag}, start processing, time: ${Date.now()}`);
-    const initiateTransferResponse = await initiateTransfer(request, this);
-    this.log.info(`${fnTag}, complete processing, time: ${Date.now()}`);
-    return initiateTransferResponse;
+    this.log.info(
+      `server gateway received TransferInitializationRequest: ${JSON.stringify(
+        request,
+      )}`,
+    );
+
+    await checkValidInitializationRequest(request, this);
+    await sendTransferInitializationResponse(request.sessionID, this);
   }
 
-  public async transferCommenceReceived(
+  public async onTransferCommenceRequestReceived(
     request: TransferCommenceV1Request,
-  ): Promise<TransferCommenceV1Response> {
-    const fnTag = `${this.className}#transferCommenceReceived()`;
+  ): Promise<void> {
+    const fnTag = `${this.className}#onTransferCommenceRequestReceived()`;
     this.log.info(`${fnTag}, start processing, time: ${Date.now()}`);
-    const TransferCommenceResponse = await transferCommence(request, this);
-    this.log.info(`${fnTag}, complete processing, time: ${Date.now()}`);
-    return TransferCommenceResponse;
+    this.log.info(
+      `server gateway received TransferCommenceRequest: ${JSON.stringify(
+        request,
+      )}`,
+    );
+
+    await checkValidtransferCommenceRequest(request, this);
+    await sendTransferCommenceResponse(request.sessionID, this);
   }
 
-  public async lockEvidenceReceived(
+  public async onLockEvidenceRequestReceived(
     request: LockEvidenceV1Request,
-  ): Promise<LockEvidenceV1Response> {
-    const fnTag = `${this.className}#LockEvidence()`;
+  ): Promise<void> {
+    const fnTag = `${this.className}#onLockEvidenceRequestReceived()`;
     this.log.info(`${fnTag}, start processing, time: ${Date.now()}`);
-    const lockEvidenceResponse = await lockEvidence(request, this);
-    this.log.info(`${fnTag}, complete processing, time: ${Date.now()}`);
-    return lockEvidenceResponse;
+    this.log.info(
+      `server gateway received LockEvidenceRequest: ${JSON.stringify(request)}`,
+    );
+
+    await checkValidLockEvidenceRequest(request, this);
+    await sendLockEvidenceResponse(request.sessionID, this);
   }
 
-  public async commitPrepareReceived(
+  public async onCommitPrepareRequestReceived(
     request: CommitPreparationV1Request,
-  ): Promise<CommitPreparationV1Response> {
-    const fnTag = `${this.className}#CommitPrepare()`;
+  ): Promise<void> {
+    const fnTag = `${this.className}#onCommitPrepareRequestReceived()`;
     this.log.info(`${fnTag}, start processing, time: ${Date.now()}`);
-    const commitPrepareResponse = await commitPrepare(request, this);
-    this.log.info(`${fnTag}, complete processing, time: ${Date.now()}`);
-    return commitPrepareResponse;
+    this.log.info(
+      `server gateway received CommitPrepareRequest: ${JSON.stringify(
+        request,
+      )}`,
+    );
+
+    await checkValidCommitPreparationRequest(request, this);
+    await sendCommitPreparationResponse(request.sessionID, this);
   }
 
-  public async commitFinalReceived(
+  public async onCommitFinalRequestReceived(
     request: CommitFinalV1Request,
-  ): Promise<CommitFinalV1Response> {
-    const fnTag = `${this.className}#CommitFinal()`;
+  ): Promise<void> {
+    const fnTag = `${this.className}#onCommitFinalRequestReceived()`;
     this.log.info(`${fnTag}, start processing, time: ${Date.now()}`);
-    const commitFinalResponse = await commitFinal(request, this);
-    this.log.info(`${fnTag}, complete processing, time: ${Date.now()}`);
-    return commitFinalResponse;
+    this.log.info(
+      `server gateway received CommitFinalRequest: ${JSON.stringify(request)}`,
+    );
+
+    await checkValidCommitFinalRequest(request, this);
+    await sendCommitFinalResponse(request.sessionID, this);
   }
 
-  public async transferCompleteReceived(
+  public async onTransferCompleteRequestReceived(
     request: TransferCompleteV1Request,
-  ): Promise<TransferCompleteV1Response> {
-    const fnTag = `${this.className}#transferCompleteRequest()`;
+  ): Promise<void> {
+    const fnTag = `${this.className}#onTransferCompleteRequestReceived()`;
     this.log.info(`${fnTag}, start processing, time: ${Date.now()}`);
-    const transferCompleteResponse = await transferComplete(request, this);
-    this.log.info(`${fnTag}, complete processing, time: ${Date.now()}`);
-    return transferCompleteResponse;
+    this.log.info(
+      `server gateway received TransferCompleteRequest: ${JSON.stringify(
+        request,
+      )}`,
+    );
+
+    await checkValidTransferCompleteRequest(request, this);
   }
 
-  public async runOdap(request: SendClientV1Request): Promise<void> {
+  //Client-side
+  public async onTransferInitiationResponseReceived(
+    request: TransferInitializationV1Response,
+  ): Promise<void> {
+    const fnTag = `${this.className}#onTransferInitiationResponseReceived()`;
+    this.log.info(`${fnTag}, start processing, time: ${Date.now()}`);
+    this.log.info(
+      `client gateway received TransferInitiationResponse: ${JSON.stringify(
+        request,
+      )}`,
+    );
+
+    await checkValidInitializationResponse(request, this);
+    await sendTransferCommenceRequest(request.sessionID, this);
+  }
+
+  public async onTransferCommenceResponseReceived(
+    request: TransferCommenceV1Response,
+  ): Promise<void> {
+    const fnTag = `${this.className}#onTransferCommenceResponseReceived()`;
+    this.log.info(`${fnTag}, start processing, time: ${Date.now()}`);
+    this.log.info(
+      `client gateway received TransferCommenceResponse: ${JSON.stringify(
+        request,
+      )}`,
+    );
+
+    await checkValidTransferCommenceResponse(request, this);
+    await sendLockEvidenceRequest(request.sessionID, this);
+  }
+
+  public async onLockEvidenceResponseReceived(
+    request: LockEvidenceV1Response,
+  ): Promise<void> {
+    const fnTag = `${this.className}#onLockEvidenceResponseReceived()`;
+    this.log.info(`${fnTag}, start processing, time: ${Date.now()}`);
+    this.log.info(
+      `client gateway received LockEvidenceResponse: ${JSON.stringify(
+        request,
+      )}`,
+    );
+
+    await checkValidLockEvidenceResponse(request, this);
+    await sendCommitPreparationRequest(request.sessionID, this);
+  }
+
+  public async onCommitPrepareResponseReceived(
+    request: CommitPreparationV1Response,
+  ): Promise<void> {
+    const fnTag = `${this.className}#onCommitPrepareResponseReceived()`;
+    this.log.info(`${fnTag}, start processing, time: ${Date.now()}`);
+
+    await checkValidCommitPreparationResponse(request, this);
+    await sendCommitFinalRequest(request.sessionID, this);
+  }
+
+  public async onCommitFinalResponseReceived(
+    request: CommitFinalV1Response,
+  ): Promise<void> {
+    const fnTag = `${this.className}#onCommitFinalResponseReceived()`;
+    this.log.info(`${fnTag}, start processing, time: ${Date.now()}`);
+    this.log.info(
+      `client gateway received CommitFinalResponse: ${JSON.stringify(request)}`,
+    );
+
+    await checkValidCommitFinalResponse(request, this);
+    await sendTransferCompleteRequest(request.sessionID, this);
+  }
+
+  public async runOdap(request: ClientV1Request): Promise<void> {
     const fnTag = `${this.className}#runOdap()`;
     this.log.info(`${fnTag}, start processing, time: ${Date.now()}`);
-
-    const { sessionID, odapServerApiClient } = this.configureOdapSession(
-      request,
+    this.log.info(
+      `client gateway received ClientRequest: ${JSON.stringify(request)}`,
     );
+
+    const sessionID = this.configureOdapSession(request);
 
     if (sessionID == undefined) {
       throw new Error(
-        `${fnTag}, session id undefined after TransferInitiationMessages`,
+        `${fnTag}, session id undefined after session configuration`,
       );
     }
 
-    // Phase 1
-    await this.sendInitiationRequestMessage(sessionID, odapServerApiClient);
-
-    // Phase 2
-    await this.sendTransferCommenceRequestMessage(
-      sessionID,
-      odapServerApiClient,
-    );
-
-    await this.sendLockEvidenceRequestMessage(sessionID, odapServerApiClient);
-
-    // Phase 3
-    await this.sendCommitPreparationRequestMessage(
-      sessionID,
-      odapServerApiClient,
-    );
-
-    await this.sendCommitFinalRequestMessage(sessionID, odapServerApiClient);
-
-    await this.sendTransferCompleteRequestMessage(
-      sessionID,
-      odapServerApiClient,
-    );
+    await sendTransferInitializationRequest(sessionID, this);
   }
 
-  private configureOdapSession(request: SendClientV1Request) {
-    const odapServerApiConfig = new Configuration({
-      basePath: request.serverGatewayConfiguration.apiHost,
-    });
-
-    const odapServerApiClient = new OdapApi(odapServerApiConfig);
+  private configureOdapSession(request: ClientV1Request) {
     const sessionData: SessionData = {};
 
     const sessionID = uuidV4();
@@ -546,6 +710,8 @@ export class PluginOdapGateway implements ICactusPlugin, IPluginWebService {
     sessionData.step = 1;
     sessionData.version = request.version;
     sessionData.lastSequenceNumber = randomInt(4294967295);
+    sessionData.sourceBasePath = request.clientGatewayConfiguration.apiHost;
+    sessionData.recipientBasePath = request.serverGatewayConfiguration.apiHost;
 
     sessionData.payloadProfile = request.payloadProfile;
     sessionData.loggingProfile = request.loggingProfile;
@@ -561,966 +727,10 @@ export class PluginOdapGateway implements ICactusPlugin, IPluginWebService {
 
     this.sessions.set(sessionID, sessionData);
 
-    return { sessionID, odapServerApiClient };
+    return sessionID;
   }
 
-  private async sendInitiationRequestMessage(
-    sessionID: string,
-    odapServerApiClient: OdapApi,
-  ): Promise<void> {
-    const fnTag = `${this.className}#sendInitiationRequestMessage()`;
-
-    const sessionData = this.sessions.get(sessionID);
-
-    if (
-      sessionData == undefined ||
-      sessionData.id == undefined ||
-      sessionData.step == undefined ||
-      sessionData.version == undefined ||
-      sessionData.payloadProfile == undefined ||
-      sessionData.loggingProfile == undefined ||
-      sessionData.accessControlProfile == undefined ||
-      sessionData.applicationProfile == undefined ||
-      sessionData.lastSequenceNumber == undefined ||
-      sessionData.sourceGatewayDltSystem == undefined ||
-      sessionData.recipientGatewayPubkey == undefined ||
-      sessionData.recipientGatewayDltSystem == undefined
-    ) {
-      throw new Error(`${fnTag}, session data is not correctly initialized`);
-    }
-
-    await this.storeOdapLog(
-      {
-        phase: "p1",
-        step: sessionData.step.toString(),
-        type: "init",
-        operation: "validate",
-        nodes: `${this.pubKey}->${sessionData.recipientGatewayPubkey}`,
-      },
-      `${sessionData.id}-${sessionData.step.toString()}`,
-    );
-
-    const initializationRequestMessage: TransferInitializationV1Request = {
-      messageType: OdapMessageType.InitializationRequest,
-      sessionID: sessionData.id,
-      version: sessionData.version,
-      // developer urn
-      // credential profile
-      payloadProfile: sessionData.payloadProfile,
-      applicationProfile: sessionData.applicationProfile,
-      loggingProfile: sessionData.loggingProfile,
-      accessControlProfile: sessionData.accessControlProfile,
-      clientSignature: "",
-      sourceGatewayPubkey: this.pubKey,
-      sourceGatewayDltSystem: sessionData.sourceGatewayDltSystem,
-      recipientGatewayPubkey: sessionData.recipientGatewayPubkey,
-      recipientGatewayDltSystem: sessionData.recipientGatewayDltSystem,
-      sequenceNumber: sessionData.lastSequenceNumber,
-      // escrow type
-      // expiry time (related to the escrow)
-      // multiple claims allowed
-      // multiple cancels allowed
-      // permissions
-    };
-
-    if (!this.supportedDltIDs.includes(sessionData.recipientGatewayDltSystem)) {
-      throw new Error(
-        `${fnTag}, recipient gateway dlt system is not supported by this gateway`,
-      );
-    }
-
-    this.log.info(
-      `${fnTag}, creating TransferInitializationRequest message signature`,
-    );
-
-    const messageSignature = this.bufArray2HexStr(
-      this.sign(JSON.stringify(initializationRequestMessage)),
-    );
-
-    this.log.info(
-      `${fnTag}, created TransferInitializationRequest message signature with value: ${messageSignature}`,
-    );
-
-    initializationRequestMessage.clientSignature = messageSignature;
-
-    this.log.info(
-      `${fnTag}, TransferInitializationRequest message sent, time: ${Date.now()}`,
-    );
-
-    const transferInitiationResponse = await odapServerApiClient.phase1TransferInitiationV1(
-      initializationRequestMessage,
-    );
-
-    this.log.info(
-      `${fnTag}, TransferInitializationResponse message received, time: ${Date.now()}`,
-    );
-
-    if (transferInitiationResponse.status != 200) {
-      throw new Error(
-        `${fnTag}, TransferInitializationResponse message failed`,
-      );
-    }
-
-    const transferInitiationResponseData: TransferInitializationV1Response =
-      transferInitiationResponse.data;
-
-    if (
-      transferInitiationResponseData.messageType !=
-      OdapMessageType.InitializationResponse
-    ) {
-      throw new Error(
-        `${fnTag}, wrong message type for TransferInitializationResponse`,
-      );
-    }
-
-    const sentMessageHash = SHA256(
-      JSON.stringify(initializationRequestMessage),
-    ).toString();
-
-    if (
-      transferInitiationResponseData.sequenceNumber !=
-      initializationRequestMessage.sequenceNumber
-    ) {
-      throw new Error(
-        `${fnTag}, TransferInitializationResponse sequence number incorrect`,
-      );
-    }
-
-    if (
-      transferInitiationResponseData.initialRequestMessageHash !=
-      sentMessageHash
-    ) {
-      throw new Error(
-        `${fnTag}, TransferInitializationResponse previous message hash does not match the one that was sent`,
-      );
-    }
-
-    if (
-      transferInitiationResponseData.serverIdentityPubkey !=
-      initializationRequestMessage.recipientGatewayPubkey
-    ) {
-      throw new Error(
-        `${fnTag}, TransferInitializationResponse serverIdentity public key does not match the one that was sent`,
-      );
-    }
-
-    const transferInitiationResponseDataSignature =
-      transferInitiationResponseData.serverSignature;
-
-    const sourceServerSignature = new Uint8Array(
-      Buffer.from(transferInitiationResponseDataSignature, "hex"),
-    );
-
-    const sourceServerPubkey = new Uint8Array(
-      Buffer.from(initializationRequestMessage.recipientGatewayPubkey, "hex"),
-    );
-
-    transferInitiationResponseData.serverSignature = "";
-
-    if (
-      !this.verifySignature(
-        JSON.stringify(transferInitiationResponseData),
-        sourceServerSignature,
-        sourceServerPubkey,
-      )
-    ) {
-      throw new Error(
-        `${fnTag}, TransferInitializationResponse message signature verification failed`,
-      );
-    }
-
-    const serverIdentityPubkey =
-      transferInitiationResponseData.serverIdentityPubkey;
-
-    sessionData.step++;
-
-    sessionData.id = transferInitiationResponseData.sessionID;
-
-    sessionData.recipientGatewayPubkey = serverIdentityPubkey;
-
-    sessionData.initializationRequestMessageHash = sentMessageHash;
-
-    sessionData.initializationResponseMessageHash = SHA256(
-      JSON.stringify(transferInitiationResponseData),
-    ).toString();
-
-    sessionData.clientSignatureInitializationRequestMessage =
-      initializationRequestMessage.clientSignature;
-
-    sessionData.serverSignatureInitializationResponseMessage =
-      transferInitiationResponseData.serverSignature;
-
-    sessionData.fabricAssetSize = "1";
-
-    this.sessions.set(sessionData.id, sessionData);
-  }
-
-  private async sendTransferCommenceRequestMessage(
-    sessionID: string,
-    odapServerApiClient: OdapApi,
-  ): Promise<void> {
-    const fnTag = `${this.className}#sendTransferCommenceMessage()`;
-
-    const sessionData = this.sessions.get(sessionID);
-
-    if (
-      sessionData == undefined ||
-      sessionData.step == undefined ||
-      sessionData.assetProfile == undefined ||
-      sessionData.originatorPubkey == undefined ||
-      sessionData.beneficiaryPubkey == undefined ||
-      sessionData.lastSequenceNumber == undefined ||
-      sessionData.sourceGatewayPubkey == undefined ||
-      sessionData.recipientGatewayPubkey == undefined ||
-      sessionData.sourceGatewayDltSystem == undefined ||
-      sessionData.recipientGatewayDltSystem == undefined ||
-      sessionData.initializationRequestMessageHash == undefined
-    ) {
-      throw new Error(`${fnTag}, session data is not correctly initialized`);
-    }
-
-    await this.storeOdapLog(
-      {
-        phase: "p2",
-        step: sessionData.step.toString(),
-        type: "init",
-        operation: "commence",
-        nodes: `${this.pubKey}->${sessionData.recipientGatewayPubkey}`,
-      },
-      `${sessionData.id}-${sessionData.step.toString()}`,
-    );
-
-    const hashAssetProfile = SHA256(
-      JSON.stringify(sessionData.assetProfile),
-    ).toString();
-
-    const transferCommenceRequestMessage: TransferCommenceV1Request = {
-      messageType: OdapMessageType.TransferCommenceRequest,
-      originatorPubkey: sessionData.originatorPubkey,
-      beneficiaryPubkey: sessionData.beneficiaryPubkey,
-      senderDltSystem: sessionData.sourceGatewayDltSystem,
-      recipientDltSystem: sessionData.recipientGatewayDltSystem,
-      sessionID: sessionID,
-      clientIdentityPubkey: sessionData.sourceGatewayPubkey,
-      serverIdentityPubkey: sessionData.recipientGatewayPubkey,
-      hashAssetProfile: hashAssetProfile,
-      hashPrevMessage: sessionData.initializationRequestMessageHash,
-      // clientTransferNumber
-      clientSignature: "",
-      sequenceNumber: sessionData.lastSequenceNumber,
-    };
-
-    const messageSignature = this.bufArray2HexStr(
-      this.sign(JSON.stringify(transferCommenceRequestMessage)),
-    );
-
-    this.log.info(
-      `${fnTag}, created TransferCommenceRequest message signature with value: ${messageSignature}`,
-    );
-
-    transferCommenceRequestMessage.clientSignature = messageSignature;
-
-    this.log.info(
-      `${fnTag}, TransferCommenceRequest message sent, time: ${Date.now()}`,
-    );
-
-    const transferCommenceResponse = await odapServerApiClient.phase2TransferCommenceV1(
-      transferCommenceRequestMessage,
-    );
-
-    this.log.info(
-      `${fnTag}, TransferCommenceResponse message received, time: ${Date.now()}`,
-    );
-
-    if (transferCommenceResponse.status != 200) {
-      await this.Revert(sessionID);
-      throw new Error(`${fnTag}, TransferCommenceResponse message failed`);
-    }
-
-    const transferCommenceResponseData: TransferCommenceV1Response =
-      transferCommenceResponse.data;
-
-    if (
-      transferCommenceResponseData.messageType !=
-      OdapMessageType.TransferCommenceResponse
-    ) {
-      throw new Error(
-        `${fnTag}, wrong message type for TransferCommenceResponse`,
-      );
-    }
-
-    const sentMessageHash = SHA256(
-      JSON.stringify(transferCommenceRequestMessage),
-    ).toString();
-
-    if (
-      transferCommenceResponseData.sequenceNumber !=
-      transferCommenceRequestMessage.sequenceNumber
-    ) {
-      throw new Error(
-        `${fnTag}, TransferInitializationResponse sequence number incorrect`,
-      );
-    }
-
-    if (sentMessageHash != transferCommenceResponseData.hashCommenceRequest) {
-      await this.Revert(sessionID);
-      throw new Error(
-        `${fnTag}, TransferCommenceResponse previous message hash does not match the one that was sent`,
-      );
-    }
-
-    if (
-      transferCommenceRequestMessage.serverIdentityPubkey !=
-      transferCommenceResponseData.serverIdentityPubkey
-    ) {
-      await this.Revert(sessionID);
-      throw new Error(
-        `${fnTag}, TransferCommenceResponse serverIdentity public key does not match the one that was sent`,
-      );
-    }
-
-    if (
-      transferCommenceRequestMessage.clientIdentityPubkey !=
-      transferCommenceResponseData.clientIdentityPubkey
-    ) {
-      await this.Revert(sessionID);
-      throw new Error(
-        `${fnTag}, TransferCommenceResponse clientIdentity public key does not match the one that was sent`,
-      );
-    }
-
-    const transferCommenceResponseDataSignature =
-      transferCommenceResponseData.serverSignature;
-
-    const sourceServerSignature = new Uint8Array(
-      Buffer.from(transferCommenceResponseDataSignature, "hex"),
-    );
-
-    const sourceServerPubkey = new Uint8Array(
-      Buffer.from(sessionData.recipientGatewayPubkey, "hex"),
-    );
-
-    transferCommenceResponseData.serverSignature = "";
-
-    if (
-      !this.verifySignature(
-        JSON.stringify(transferCommenceResponseData),
-        sourceServerSignature,
-        sourceServerPubkey,
-      )
-    ) {
-      await this.Revert(sessionID);
-      throw new Error(
-        `${fnTag}, TransferCommenceResponse message signature verification failed`,
-      );
-    }
-
-    transferCommenceResponseData.serverSignature = transferCommenceResponseDataSignature;
-
-    sessionData.step++;
-
-    sessionData.transferCommenceMessageRequestHash = sentMessageHash;
-
-    sessionData.transferCommenceMessageResponseHash = SHA256(
-      JSON.stringify(transferCommenceResponseData),
-    ).toString();
-
-    sessionData.clientSignatureTransferCommenceRequestMessage =
-      transferCommenceRequestMessage.clientSignature;
-
-    sessionData.serverSignatureTransferCommenceResponseMessage =
-      transferCommenceResponseData.serverSignature;
-
-    this.sessions.set(sessionID, sessionData);
-  }
-
-  private async sendLockEvidenceRequestMessage(
-    sessionID: string,
-    odapServerApiClient: OdapApi,
-  ) {
-    const fnTag = `${this.className}#sendLockEvidenceRequestMessage()`;
-
-    const sessionData = this.sessions.get(sessionID);
-
-    if (
-      sessionData == undefined ||
-      sessionData.step == undefined ||
-      sessionData.lastSequenceNumber == undefined ||
-      sessionData.sourceGatewayPubkey == undefined ||
-      sessionData.recipientGatewayPubkey == undefined ||
-      sessionData.transferCommenceMessageResponseHash == undefined
-    ) {
-      throw new Error(`${fnTag}, session data is not correctly initialized`);
-    }
-
-    await this.storeOdapLog(
-      {
-        phase: "p2",
-        step: sessionData.step.toString(),
-        type: "init",
-        operation: "lock",
-        nodes: `${this.pubKey}->${sessionData.recipientGatewayPubkey}`,
-      },
-      `${sessionData.id}-${sessionData.step.toString()}`,
-    );
-
-    const fabricLockAssetProof = await this.lockFabricAsset(sessionID);
-
-    this.log.info(`${fnTag}, proof of the asset lock: ${fabricLockAssetProof}`);
-
-    const lockEvidenceRequestMessage: LockEvidenceV1Request = {
-      sessionID: sessionID,
-      messageType: OdapMessageType.LockEvidenceRequest,
-      clientIdentityPubkey: sessionData.sourceGatewayPubkey,
-      serverIdentityPubkey: sessionData.recipientGatewayPubkey,
-      lockEvidenceClaim: fabricLockAssetProof,
-      // lock claim format
-      lockEvidenceExpiration: new Date()
-        .setDate(new Date().getDate() + 1)
-        .toString(), // a day from now
-      hashCommenceAckRequest: sessionData.transferCommenceMessageResponseHash,
-      clientSignature: "",
-      sequenceNumber: sessionData.lastSequenceNumber,
-    };
-
-    const messageSignature = this.bufArray2HexStr(
-      this.sign(JSON.stringify(lockEvidenceRequestMessage)),
-    );
-
-    this.log.info(
-      `${fnTag}, created LockEvidenceRequest message signature with value: ${messageSignature}`,
-    );
-
-    lockEvidenceRequestMessage.clientSignature = messageSignature;
-
-    this.log.info(
-      `${fnTag}, LockEvidenceRequest message sent, time: ${Date.now()}`,
-    );
-
-    const lockEvidenceResponseMesssage = await odapServerApiClient.phase2LockEvidenceV1(
-      lockEvidenceRequestMessage,
-    );
-
-    this.log.info(
-      `${fnTag}, LockEvidenceRequest message received, time: ${Date.now()}`,
-    );
-
-    if (lockEvidenceResponseMesssage.status != 200) {
-      await this.Revert(sessionID);
-      throw new Error(`${fnTag}, LockEvidenceResponse message failed`);
-    }
-
-    const lockEvidenceResponseMesssageData: LockEvidenceV1Response =
-      lockEvidenceResponseMesssage.data;
-
-    if (
-      lockEvidenceResponseMesssageData.messageType !=
-      OdapMessageType.LockEvidenceResponse
-    ) {
-      throw new Error(`${fnTag}, wrong message type for LockEvidenceResponse`);
-    }
-
-    const sentMessageHash = SHA256(
-      JSON.stringify(lockEvidenceRequestMessage),
-    ).toString();
-
-    if (
-      lockEvidenceResponseMesssageData.sequenceNumber !=
-      lockEvidenceRequestMessage.sequenceNumber
-    ) {
-      throw new Error(
-        `${fnTag}, TransferInitializationResponse sequence number incorrect`,
-      );
-    }
-
-    if (
-      sentMessageHash !=
-      lockEvidenceResponseMesssageData.hashLockEvidenceRequest
-    ) {
-      await this.Revert(sessionID);
-      throw new Error(
-        `${fnTag}, LockEvidenceResponse previous message hash does not match the one that was sent`,
-      );
-    }
-
-    if (
-      lockEvidenceRequestMessage.serverIdentityPubkey !=
-      lockEvidenceResponseMesssageData.serverIdentityPubkey
-    ) {
-      await this.Revert(sessionID);
-      throw new Error(
-        `${fnTag}, LockEvidenceResponse serverIdentity public key does not match the one that was sent`,
-      );
-    }
-
-    if (
-      lockEvidenceRequestMessage.clientIdentityPubkey !=
-      lockEvidenceResponseMesssageData.clientIdentityPubkey
-    ) {
-      await this.Revert(sessionID);
-      throw new Error(
-        `${fnTag}, LockEvidenceResponse clientIdentity public key does not match the one that was sent`,
-      );
-    }
-
-    const lockEvidenceResponseMesssageDataSignature =
-      lockEvidenceResponseMesssageData.serverSignature;
-
-    const sourceServerSignature = new Uint8Array(
-      Buffer.from(lockEvidenceResponseMesssageDataSignature, "hex"),
-    );
-
-    const sourceServerPubkey = new Uint8Array(
-      Buffer.from(sessionData.recipientGatewayPubkey, "hex"),
-    );
-
-    lockEvidenceResponseMesssageData.serverSignature = "";
-
-    if (
-      !this.verifySignature(
-        JSON.stringify(lockEvidenceResponseMesssageData),
-        sourceServerSignature,
-        sourceServerPubkey,
-      )
-    ) {
-      await this.Revert(sessionID);
-      throw new Error(
-        `${fnTag}, LockEvidenceResponse message signature verification failed`,
-      );
-    }
-
-    lockEvidenceResponseMesssageData.serverSignature = lockEvidenceResponseMesssageDataSignature;
-
-    sessionData.step++;
-
-    sessionData.lockEvidenceRequestMessageHash = sentMessageHash;
-
-    sessionData.lockEvidenceResponseMessageHash = SHA256(
-      JSON.stringify(lockEvidenceResponseMesssageData),
-    ).toString();
-
-    sessionData.clientSignatureLockEvidenceRequestMessage =
-      lockEvidenceRequestMessage.clientSignature;
-
-    sessionData.serverSignatureLockEvidenceResponseMessage =
-      lockEvidenceResponseMesssageData.serverSignature;
-
-    sessionData.lockEvidenceClaim = fabricLockAssetProof;
-
-    this.sessions.set(sessionID, sessionData);
-  }
-
-  private async sendCommitPreparationRequestMessage(
-    sessionID: string,
-    odapServerApiClient: OdapApi,
-  ) {
-    const fnTag = `${this.className}#sendCommitPreparationRequestMessage()`;
-
-    const sessionData = this.sessions.get(sessionID);
-
-    if (
-      sessionData == undefined ||
-      sessionData.step == undefined ||
-      sessionData.lastSequenceNumber == undefined ||
-      sessionData.sourceGatewayPubkey == undefined ||
-      sessionData.recipientGatewayPubkey == undefined ||
-      sessionData.lockEvidenceResponseMessageHash == undefined
-    ) {
-      throw new Error(`${fnTag}, session data is not correctly initialized`);
-    }
-
-    await this.storeOdapLog(
-      {
-        phase: "p3",
-        step: sessionData.step.toString(),
-        type: "init",
-        operation: "commit-prepare",
-        nodes: `${this.pubKey}->${sessionData.recipientGatewayPubkey}`,
-      },
-      `${sessionData.id}-${sessionData.step.toString()}`,
-    );
-
-    const commitPrepareRequestMessage: CommitPreparationV1Request = {
-      sessionID: sessionID,
-      messageType: OdapMessageType.CommitPreparationRequest,
-      clientIdentityPubkey: sessionData.sourceGatewayPubkey,
-      serverIdentityPubkey: sessionData.recipientGatewayPubkey,
-      hashLockEvidenceAck: sessionData.lockEvidenceResponseMessageHash,
-      clientSignature: "",
-      sequenceNumber: sessionData.lastSequenceNumber,
-    };
-
-    const messageSignature = this.bufArray2HexStr(
-      this.sign(JSON.stringify(commitPrepareRequestMessage)),
-    );
-
-    this.log.info(
-      `${fnTag}, created CommitPreparationRequest message signature with value: ${messageSignature}`,
-    );
-
-    commitPrepareRequestMessage.clientSignature = messageSignature;
-
-    this.log.info(
-      `${fnTag}, CommitPreparationRequest message sent, time: ${Date.now()}`,
-    );
-
-    const commitPrepareResponseMessage = await odapServerApiClient.phase3CommitPreparationV1(
-      commitPrepareRequestMessage,
-    );
-
-    this.log.info(
-      `${fnTag}, CommitPreparationRequest message received, time: ${Date.now()}`,
-    );
-
-    if (commitPrepareResponseMessage.status != 200) {
-      await this.Revert(sessionID);
-      throw new Error(`${fnTag}, CommitPreparationRequest message failed`);
-    }
-
-    const commitPrepareResponseMessageData: CommitPreparationV1Response =
-      commitPrepareResponseMessage.data;
-
-    if (
-      commitPrepareResponseMessageData.messageType !=
-      OdapMessageType.CommitPreparationResponse
-    ) {
-      throw new Error(
-        `${fnTag}, wrong message type for CommitPreparationResponse`,
-      );
-    }
-
-    const sentMessageHash = SHA256(
-      JSON.stringify(commitPrepareRequestMessage),
-    ).toString();
-
-    if (
-      commitPrepareResponseMessageData.sequenceNumber !=
-      commitPrepareRequestMessage.sequenceNumber
-    ) {
-      throw new Error(
-        `${fnTag}, TransferInitializationResponse sequence number incorrect`,
-      );
-    }
-
-    if (sentMessageHash != commitPrepareResponseMessageData.hashCommitPrep) {
-      await this.Revert(sessionID);
-      throw new Error(
-        `${fnTag}, CommitPreparationResponse previous message hash does not match the one that was sent`,
-      );
-    }
-
-    if (
-      commitPrepareRequestMessage.serverIdentityPubkey !=
-      commitPrepareResponseMessageData.serverIdentityPubkey
-    ) {
-      await this.Revert(sessionID);
-      throw new Error(
-        `${fnTag}, CommitPreparationResponse serverIdentity public key does not match the one that was sent`,
-      );
-    }
-
-    if (
-      commitPrepareRequestMessage.clientIdentityPubkey !=
-      commitPrepareResponseMessageData.clientIdentityPubkey
-    ) {
-      await this.Revert(sessionID);
-      throw new Error(
-        `${fnTag}, CommitPreparationResponse clientIdentity public key does not match the one that was sent`,
-      );
-    }
-
-    const commitPrepareResponseMessageDataSignature =
-      commitPrepareResponseMessageData.serverSignature;
-
-    const sourceServerSignature = new Uint8Array(
-      Buffer.from(commitPrepareResponseMessageDataSignature, "hex"),
-    );
-
-    const sourceServerPubkey = new Uint8Array(
-      Buffer.from(sessionData.recipientGatewayPubkey, "hex"),
-    );
-
-    commitPrepareResponseMessageData.serverSignature = "";
-
-    if (
-      !this.verifySignature(
-        JSON.stringify(commitPrepareResponseMessageData),
-        sourceServerSignature,
-        sourceServerPubkey,
-      )
-    ) {
-      await this.Revert(sessionID);
-      throw new Error(
-        `${fnTag}, LockEvidenceResponse message signature verification failed`,
-      );
-    }
-
-    commitPrepareResponseMessageData.serverSignature = commitPrepareResponseMessageDataSignature;
-
-    sessionData.step++;
-
-    sessionData.commitPrepareRequestMessageHash = sentMessageHash;
-
-    sessionData.commitPrepareResponseMessageHash = SHA256(
-      JSON.stringify(commitPrepareResponseMessageData),
-    ).toString();
-
-    sessionData.clientSignatureCommitPreparationRequestMessage =
-      commitPrepareRequestMessage.clientSignature;
-
-    sessionData.serverSignatureCommitPreparationResponseMessage =
-      commitPrepareResponseMessageData.serverSignature;
-
-    this.sessions.set(sessionID, sessionData);
-  }
-
-  private async sendCommitFinalRequestMessage(
-    sessionID: string,
-    odapServerApiClient: OdapApi,
-  ) {
-    const fnTag = `${this.className}#sendCommitFinalRequestMessage()`;
-
-    const sessionData = this.sessions.get(sessionID);
-
-    if (
-      sessionData == undefined ||
-      sessionData.step == undefined ||
-      sessionData.lastSequenceNumber == undefined ||
-      sessionData.sourceGatewayPubkey == undefined ||
-      sessionData.recipientGatewayPubkey == undefined ||
-      sessionData.commitPrepareResponseMessageHash == undefined
-    ) {
-      throw new Error(`${fnTag}, session data is not correctly initialized`);
-    }
-
-    await this.storeOdapLog(
-      {
-        phase: "p3",
-        step: sessionData.step.toString(),
-        type: "init",
-        operation: "commit-final",
-        nodes: `${this.pubKey}->${sessionData.recipientGatewayPubkey}`,
-      },
-      `${sessionData.id}-${sessionData.step.toString()}`,
-    );
-
-    const fabricDeleteAssetProof = await this.deleteFabricAsset(sessionID);
-
-    const commitFinalRequestMessage: CommitFinalV1Request = {
-      sessionID: sessionID,
-      messageType: OdapMessageType.CommitFinalRequest,
-      clientIdentityPubkey: sessionData.sourceGatewayPubkey,
-      serverIdentityPubkey: sessionData.recipientGatewayPubkey,
-      commitFinalClaim: fabricDeleteAssetProof,
-      // commit final claim format
-      hashCommitPrepareAck: sessionData.commitPrepareResponseMessageHash,
-      clientSignature: "",
-      sequenceNumber: sessionData.lastSequenceNumber,
-    };
-
-    const messageSignature = this.bufArray2HexStr(
-      this.sign(JSON.stringify(commitFinalRequestMessage)),
-    );
-
-    this.log.info(
-      `${fnTag}, created CommitFinalRequest message signature with value: ${messageSignature}`,
-    );
-
-    commitFinalRequestMessage.clientSignature = messageSignature;
-
-    this.log.info(
-      `${fnTag}, CommitFinalRequest message sent, time: ${Date.now()}`,
-    );
-
-    const commitFinalResponseMessage = await odapServerApiClient.phase3CommitFinalV1(
-      commitFinalRequestMessage,
-    );
-
-    this.log.info(
-      `${fnTag}, CommitFinalRequest message received, time: ${Date.now()}`,
-    );
-
-    if (commitFinalResponseMessage.status != 200) {
-      await this.Revert(sessionID);
-      throw new Error(`${fnTag}, CommitFinalRequest message failed`);
-    }
-
-    const commitFinalResponseMessageData: CommitFinalV1Response =
-      commitFinalResponseMessage.data;
-
-    if (
-      commitFinalResponseMessageData.messageType !=
-      OdapMessageType.CommitFinalResponse
-    ) {
-      throw new Error(`${fnTag}, wrong message type for CommitFinalResponse`);
-    }
-
-    const sentMessageHash = SHA256(
-      JSON.stringify(commitFinalRequestMessage),
-    ).toString();
-
-    if (
-      commitFinalResponseMessageData.sequenceNumber !=
-      commitFinalRequestMessage.sequenceNumber
-    ) {
-      throw new Error(
-        `${fnTag}, TransferInitializationResponse sequence number incorrect`,
-      );
-    }
-
-    if (sentMessageHash != commitFinalResponseMessageData.hashCommitFinal) {
-      await this.Revert(sessionID);
-      throw new Error(
-        `${fnTag}, CommitFinalResponse previous message hash does not match the one that was sent`,
-      );
-    }
-
-    if (
-      commitFinalRequestMessage.serverIdentityPubkey !=
-      commitFinalResponseMessageData.serverIdentityPubkey
-    ) {
-      await this.Revert(sessionID);
-      throw new Error(
-        `${fnTag}, CommitFinalResponse serverIdentity public key does not match the one that was sent`,
-      );
-    }
-
-    if (
-      commitFinalRequestMessage.clientIdentityPubkey !=
-      commitFinalResponseMessageData.clientIdentityPubkey
-    ) {
-      await this.Revert(sessionID);
-      throw new Error(
-        `${fnTag}, CommitFinalResponse clientIdentity public key does not match the one that was sent`,
-      );
-    }
-
-    const commitFinalResponseMessageDataSignature =
-      commitFinalResponseMessageData.serverSignature;
-
-    const sourceServerSignature = new Uint8Array(
-      Buffer.from(commitFinalResponseMessageDataSignature, "hex"),
-    );
-
-    const sourceServerPubkey = new Uint8Array(
-      Buffer.from(sessionData.recipientGatewayPubkey, "hex"),
-    );
-
-    commitFinalResponseMessageData.serverSignature = "";
-
-    if (
-      !this.verifySignature(
-        JSON.stringify(commitFinalResponseMessageData),
-        sourceServerSignature,
-        sourceServerPubkey,
-      )
-    ) {
-      await this.Revert(sessionID);
-      throw new Error(
-        `${fnTag}, CommitFinalResponse message signature verification failed`,
-      );
-    }
-
-    commitFinalResponseMessageData.serverSignature = commitFinalResponseMessageDataSignature;
-
-    sessionData.step++;
-
-    sessionData.commitFinalRequestMessageHash = sentMessageHash;
-
-    sessionData.commitFinalResponseMessageHash = SHA256(
-      JSON.stringify(commitFinalResponseMessageData),
-    ).toString();
-
-    sessionData.clientSignatureCommitFinalRequestMessage =
-      commitFinalRequestMessage.clientSignature;
-
-    sessionData.serverSignatureCommitFinalResponseMessage =
-      commitFinalResponseMessageData.serverSignature;
-
-    this.sessions.set(sessionID, sessionData);
-  }
-
-  private async sendTransferCompleteRequestMessage(
-    sessionID: string,
-    odapServerApiClient: OdapApi,
-  ) {
-    const fnTag = `${this.className}#sendTransferCompleteRequestMessage()`;
-
-    const sessionData = this.sessions.get(sessionID);
-
-    if (
-      sessionData == undefined ||
-      sessionData.step == undefined ||
-      sessionData.lastSequenceNumber == undefined ||
-      sessionData.sourceGatewayPubkey == undefined ||
-      sessionData.recipientGatewayPubkey == undefined ||
-      sessionData.commitFinalResponseMessageHash == undefined ||
-      sessionData.transferCommenceMessageRequestHash == undefined
-    ) {
-      throw new Error(`${fnTag}, session data is not correctly initialized`);
-    }
-
-    await this.storeOdapLog(
-      {
-        phase: "p3",
-        step: sessionData.step.toString(),
-        type: "init",
-        operation: "transfer-complete",
-        nodes: `${this.pubKey}`,
-      },
-      `${sessionData.id}-${sessionData.step.toString()}`,
-    );
-
-    const transferCompleteRequestMessage: TransferCompleteV1Request = {
-      sessionID: sessionID,
-      messageType: OdapMessageType.TransferCompleteRequest,
-      clientIdentityPubkey: sessionData.sourceGatewayPubkey,
-      serverIdentityPubkey: sessionData.recipientGatewayPubkey,
-      hashCommitFinalAck: sessionData.commitFinalResponseMessageHash,
-      hashTransferCommence: sessionData.transferCommenceMessageRequestHash,
-      clientSignature: "",
-      sequenceNumber: sessionData.lastSequenceNumber,
-    };
-
-    const messageSignature = this.bufArray2HexStr(
-      this.sign(JSON.stringify(transferCompleteRequestMessage)),
-    );
-
-    this.log.info(
-      `${fnTag}, created TransferCompleteRequest message signature with value: ${messageSignature}`,
-    );
-
-    transferCompleteRequestMessage.clientSignature = messageSignature;
-
-    this.log.info(
-      `${fnTag}, TransferCompleteRequest message sent, time: ${Date.now()}`,
-    );
-
-    const transferCompleteResponseMessage = await odapServerApiClient.phase3TransferCompleteV1(
-      transferCompleteRequestMessage,
-    );
-
-    this.log.info(
-      `${fnTag}, TransferCompleteRequest message received, time: ${Date.now()}`,
-    );
-
-    if (transferCompleteResponseMessage.status != 200) {
-      throw new Error(`${fnTag}, TransferCompleteRequest message failed`);
-    }
-
-    sessionData.step++;
-
-    sessionData.transferCompleteMessageHash = SHA256(
-      JSON.stringify(transferCompleteRequestMessage),
-    ).toString();
-
-    sessionData.clientSignatureCommitFinalRequestMessage =
-      transferCompleteRequestMessage.clientSignature;
-
-    this.sessions.set(sessionID, sessionData);
-  }
-
-  private async lockFabricAsset(sessionID: string) {
+  public async lockFabricAsset(sessionID: string) {
     const fnTag = `${this.className}#lockFabricAsset()`;
 
     const sessionData = this.sessions.get(sessionID);
@@ -1560,7 +770,66 @@ export class PluginOdapGateway implements ICactusPlugin, IPluginWebService {
     return fabricLockAssetProof;
   }
 
-  private async deleteFabricAsset(sessionID: string) {
+  public async createBesuAsset(sessionID: string) {
+    const fnTag = `${this.className}#createBesuAsset()`;
+
+    const sessionData = this.sessions.get(sessionID);
+
+    if (sessionData == undefined) {
+      throw new Error(`${fnTag}, session data is not correctly initialized`);
+    }
+
+    if (this.besuApi == undefined) {
+      //throw new Error(`${fnTag}, connection to Fabric is not defined`);
+      return "";
+    }
+
+    let besuCreateAssetProof = "";
+
+    if (this.besuApi != undefined) {
+      const besuCreateRes = await this.besuApi.invokeContractV1({
+        contractName: this.besuContractName,
+        invocationType: EthContractInvocationType.Send,
+        methodName: "createAsset",
+        gas: 1000000,
+        params: [this.besuAssetID, 100], //the second is size, may need to pass this from client?
+        signingCredential: this.besuWeb3SigningCredential,
+        keychainId: this.besuKeychainId,
+      } as BesuInvokeContractV1Request);
+
+      if (besuCreateRes.status != 200) {
+        //await this.Revert(sessionID);
+        throw new Error(`${fnTag}, besu create asset error`);
+      }
+
+      const besuCreateResDataJson = JSON.parse(
+        JSON.stringify(besuCreateRes.data),
+      );
+
+      if (besuCreateResDataJson.out == undefined) {
+        throw new Error(`${fnTag}, besu res data out undefined`);
+      }
+
+      if (besuCreateResDataJson.out.transactionReceipt == undefined) {
+        throw new Error(`${fnTag}, undefined besu transact receipt`);
+      }
+
+      const besuCreateAssetReceipt =
+        besuCreateResDataJson.out.transactionReceipt;
+      besuCreateAssetProof = JSON.stringify(besuCreateAssetReceipt);
+      const besuCreateProofID = `${sessionID}-proof-of-create`;
+
+      await this.publishOdapProof(
+        besuCreateProofID,
+        JSON.stringify(besuCreateAssetReceipt),
+      );
+
+      sessionData.isBesuAssetCreated = true;
+    }
+    return besuCreateAssetProof;
+  }
+
+  public async deleteFabricAsset(sessionID: string) {
     const fnTag = `${this.className}#deleteFabricAsset()`;
 
     const sessionData = this.sessions.get(sessionID);

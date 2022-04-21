@@ -29,6 +29,8 @@ import {
   Configuration,
 } from "../../../main/typescript/generated/openapi/typescript-axios/index";
 
+import { K_CACTUS_KEYCHAIN_AWSSM_MANAGED_KEY_COUNT } from "../../../main/typescript/prometheus-exporter/metrics";
+
 import fs from "fs";
 import path from "path";
 import os from "os";
@@ -91,6 +93,9 @@ test("get,set,has,delete alters state as expected", async (t: Test) => {
     test.onFinish(async () => await Servers.shutdown(server));
     const { address, port } = addressInfo;
     const apiHost = `http://${address}:${port}`;
+    t.comment(
+      `Metrics URL: ${apiHost}/api/v1/plugins/@hyperledger/cactus-plugin-keychain-aws-sm/get-prometheus-exporter-metrics`,
+    );
     const config = new Configuration({ basePath: apiHost });
     const apiClient = new KeychainAwsSmApi(config);
 
@@ -130,6 +135,28 @@ test("get,set,has,delete alters state as expected", async (t: Test) => {
     t.ok(res3.data.checkedAt, "res3.data.checkedAt truthy OK");
     t.equal(res3.data.key, key, "res3.data.key === key OK");
 
+    {
+      const res = await apiClient.getPrometheusMetricsV1();
+      const promMetricsOutput =
+        "# HELP " +
+        K_CACTUS_KEYCHAIN_AWSSM_MANAGED_KEY_COUNT +
+        " The number of keys that were set in the backing Aws Secret Manager deployment via this specific keychain plugin instance\n" +
+        "# TYPE " +
+        K_CACTUS_KEYCHAIN_AWSSM_MANAGED_KEY_COUNT +
+        " gauge\n" +
+        K_CACTUS_KEYCHAIN_AWSSM_MANAGED_KEY_COUNT +
+        '{type="' +
+        K_CACTUS_KEYCHAIN_AWSSM_MANAGED_KEY_COUNT +
+        '"} 1';
+      t.ok(res);
+      t.ok(res.data);
+      t.equal(res.status, 200);
+      t.true(
+        res.data.includes(promMetricsOutput),
+        "Total Key Count 1 recorded as expected. RESULT OK",
+      );
+    }
+
     const res4 = await apiClient.getKeychainEntryV1({
       key: key,
     });
@@ -150,6 +177,28 @@ test("get,set,has,delete alters state as expected", async (t: Test) => {
     t.false(res6.data.isPresent, "res6.data.isPresent === false OK");
     t.ok(res6.data.checkedAt, "res6.data.checkedAt truthy OK");
     t.equal(res6.data.key, key, "res6.data.key === key OK");
+
+    {
+      const res = await apiClient.getPrometheusMetricsV1();
+      const promMetricsOutput =
+        "# HELP " +
+        K_CACTUS_KEYCHAIN_AWSSM_MANAGED_KEY_COUNT +
+        " The number of keys that were set in the backing Aws Secret Manager deployment via this specific keychain plugin instance\n" +
+        "# TYPE " +
+        K_CACTUS_KEYCHAIN_AWSSM_MANAGED_KEY_COUNT +
+        " gauge\n" +
+        K_CACTUS_KEYCHAIN_AWSSM_MANAGED_KEY_COUNT +
+        '{type="' +
+        K_CACTUS_KEYCHAIN_AWSSM_MANAGED_KEY_COUNT +
+        '"} 0';
+      t.ok(res);
+      t.ok(res.data);
+      t.equal(res.status, 200);
+      t.true(
+        res.data.includes(promMetricsOutput),
+        "Total Key Count 0 recorded as expected. RESULT OK",
+      );
+    }
 
     try {
       await apiClient.getKeychainEntryV1({ key });

@@ -16,16 +16,18 @@ import {
   IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
 
+import { SetKeychainEntryEndpoint } from "./web-services/set-keychain-entry-endpoint";
+import { GetKeychainEntryEndpoint } from "./web-services/get-keychain-entry-endpoint";
+import { DeleteKeychainEntryEndpoint } from "./web-services/delete-keychain-entry-endpoint";
+
 import { KeyVaultSecret, SecretClient } from "@azure/keyvault-secrets";
 import {
   UsernamePasswordCredential,
   DefaultAzureCredential,
 } from "@azure/identity";
+import { HasKeychainEntryEndpoint } from "./web-services/has-keychain-entry-endpoint";
 
 // TODO: Writing the getExpressRequestHandler() method for
-// GetKeychainEntryEndpointV1 and SetKeychainEntryEndpointV1
-// import { GetKeychainEntryEndpointV1 } from "./web-services/get-keychain-entry-endpoint-v1";
-// import { SetKeychainEntryEndpointV1 } from "./web-services/set-keychain-entry-endpoint-v1";
 
 export enum AzureCredentialType {
   LocalFile = "LOCAL_FILE",
@@ -136,7 +138,24 @@ export class PluginKeychainAzureKv
     if (Array.isArray(this.endpoints)) {
       return this.endpoints;
     }
-    const endpoints: IWebServiceEndpoint[] = [];
+    const endpoints: IWebServiceEndpoint[] = [
+      new SetKeychainEntryEndpoint({
+        connector: this,
+        logLevel: this.opts.logLevel,
+      }),
+      new GetKeychainEntryEndpoint({
+        connector: this,
+        logLevel: this.opts.logLevel,
+      }),
+      new DeleteKeychainEntryEndpoint({
+        connector: this,
+        logLevel: this.opts.logLevel,
+      }),
+      new HasKeychainEntryEndpoint({
+        connector: this,
+        logLevel: this.opts.logLevel,
+      }),
+    ];
 
     // TODO: Writing the getExpressRequestHandler() method for
     // GetKeychainEntryEndpointV1 and SetKeychainEntryEndpointV1

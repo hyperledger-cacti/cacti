@@ -11,6 +11,8 @@ import { QUORUM_DEMO_LEDGER_ID } from "../../../constants";
 import { BambooHarvestDetailPage } from "../bamboo-harvest-detail/bamboo-harvest-detail.page";
 import { ModalController } from "@ionic/angular";
 
+import { AuthConfig } from "../../common/auth-config";
+
 @Component({
   selector: "app-bamboo-harvest-list",
   templateUrl: "./bamboo-harvest-list.page.html",
@@ -42,7 +44,11 @@ export class BambooHarvestListPage implements OnInit {
     this._supplyChainApi = await this.baseClient.ofLedger(
       this.quorumLedgerId,
       SupplyChainApi,
-      {},
+      {
+        baseOptions: {
+          headers: { Authorization: `Bearer ${AuthConfig.authToken}` },
+        },
+      },
     );
     await this.loadData();
   }

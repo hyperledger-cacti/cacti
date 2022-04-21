@@ -26,6 +26,10 @@ This is a video guide to setup Hyperledger Cactus on your local machine.
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/94xoV9Vfu14/0.jpg)](https://www.youtube.com/watch?v=94xoV9Vfu14)
 
+### Installing jdk 8
+
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/V8YBQoxdyiE/0.jpg)](https://youtube.com/watch?v=t4y57Qvrdcc)
+
 ### Installing VSCode and plugins
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/RHQLhZRlAR0/0.jpg)](https://www.youtube.com/watch?v=RHQLhZRlAR0)

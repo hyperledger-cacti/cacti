@@ -2,11 +2,18 @@ FROM ubuntu:20.04 as builder
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN set -e && apt-get update && apt-get install -y --no-install-recommends \
-    file build-essential ninja-build git ca-certificates tar curl unzip cmake pkg-config zip
-RUN git clone https://github.com/hyperledger/iroha.git -b 1.2.0 
-RUN iroha/vcpkg/build_iroha_deps.sh && vcpkg/vcpkg integrate install
+    file build-essential ninja-build ca-certificates tar curl unzip cmake pkg-config zip software-properties-common
+
+RUN add-apt-repository ppa:git-core/ppa
+RUN apt-get update
+RUN apt-get install -y --no-install-recommends git
+
+RUN git clone https://github.com/hyperledger/iroha.git -b 1.4.0 
+RUN iroha/vcpkg/build_iroha_deps.sh
+RUN /vcpkg-build/vcpkg integrate install
 WORKDIR /iroha/build/
-RUN cmake -DCMAKE_TOOLCHAIN_FILE=/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TYPE=Release -DPACKAGE_DEB=ON -G "Ninja" ..
+
+RUN cmake -DCMAKE_TOOLCHAIN_FILE=/vcpkg-build/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TYPE=Release -DPACKAGE_DEB=ON -G "Ninja" ..
 RUN cmake --build . --target package -- -j$(nproc)
 
 FROM ubuntu:20.04

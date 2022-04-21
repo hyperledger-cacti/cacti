@@ -6,7 +6,7 @@
 
 # Hyperledger Cactus<br>Whitepaper <!-- omit in toc -->
 
-## Version 0.1 (Early Draft) <!-- omit in toc -->
+## Version 0.2<!-- omit in toc -->
 
 <img src="./pontus-wellgraf-agCzLSG4_gE-unsplash-cropped-compressed.jpg" width="700">
 Photo by Pontus Wellgraf on Unsplash
@@ -25,12 +25,13 @@ Photo by Pontus Wellgraf on Unsplash
 | Shingo Fujimoto                | shingo_fujimoto@fujitsu.com               |
 | Takuma Takeuchi                | takeuchi.takuma@fujitsu.com               |
 | Tracy Kuhrt                    | tracy.a.kuhrt@accenture.com               |
-| Rafael Belchior                | rafael.belchior@tecnico.ulisboa.pt        |
+| Rafael Belchior                | rbelchior@blockdaemon.com      |
 
 # Document Revisions <!-- omit in toc -->
 
 | Date of Revision      | Description of Changes Made                            |
 |-----------------------|--------------------------------------------------------|
+| March 2022         | Abstract, theoretical framework draft                                          |
 | February 2020         | Initial draft                                          |
 
 
@@ -38,11 +39,11 @@ Photo by Pontus Wellgraf on Unsplash
 
 - [1. Abstract](#1-abstract)
 - [2. Introduction to Blockchain Interoperability](#2-introduction-to-blockchain-interoperability)
-  - [2.1 Terminology of Blockchain Interoperability](#21-terminology-of-blockchain-interoperability)
-    - [2.1.1 Ledger Object Types](#211-ledger-object-types)
-    - [2.1.2 Blockchain Interoperability Types](#212-blockchain-interoperability-types)
-    - [2.1.3 Burning or Locking of Assets](#213-burning-or-locking-of-assets)
-  - [2.2 Footnotes (Introduction)](#22-footnotes-introduction)
+  - [2.2 Interoperability mode](#22-interoperability-mode)
+  - [2.3 Connection mode](#23-connection-mode)
+  - [2.4 Blockchain Interoperability Solution Types](#24-blockchain-interoperability-solution-types)
+  - [2.5 Blockchain Interoperability Design Patterns](#25-blockchain-interoperability-design-patterns)
+  - [2.6 General Workflow to Build a cross-chain decentralized application](#26-general-workflow-to-build-a-cross-chain-decentralized-application)
 - [3. Example Use Cases](#3-example-use-cases)
   - [3.1 Car Trade](#31-car-trade)
   - [3.2 Electricity Trade](#32-electricity-trade)
@@ -118,8 +119,14 @@ Photo by Pontus Wellgraf on Unsplash
   - [5.6 Plugin Architecture](#56-plugin-architecture)
     - [5.6.1 Ledger Connector Plugins](#561-ledger-connector-plugins)
       - [5.6.1.1 Ledger Connector Besu Plugin](#5611-ledger-connector-besu-plugin)
-      - [5.6.1.2 Ledger Connector Fabric Plugin](#5612-ledger-connector-fabric-plugin)
-      - [5.6.1.3 Ledger Connector Quorum Plugin](#5613-ledger-connector-quorum-plugin)
+      - [5.6.1.2 Ledger Connector Connector Corda](#5612-ledger-connector-connector-corda)
+      - [5.6.1.3 Ledger Connector Fabric Socketio](#5613-ledger-connector-fabric-socketio)
+      - [5.6.1.4 Ledger Connector Fabric Plugin](#5614-ledger-connector-fabric-plugin)
+      - [5.6.1.5 Ledger Connector Go Ethereum Socketio](#5615-ledger-connector-go-ethereum-socketio)
+      - [5.6.1.6 Ledger Connector Iroha Plugin](#5616-ledger-connector-iroha-plugin)
+      - [5.6.1.7 Ledger Connector Quorum Plugin](#5617-ledger-connector-quorum-plugin)
+      - [5.6.1.8 Ledger Connector Sawtooth Socketio Plugin](#5618-ledger-connector-sawtooth-socketio-plugin)
+      - [5.6.1.9 Ledger Connector Xdai Plugin](#5619-ledger-connector-xdai-plugin)
     - [5.6.2 HTLCs Plugins](#562-htlcs-plugins)
       - [5.6.2.1 HTLC-ETH-Besu Plugin](#5621-htlc-eth-besu-plugin)
       - [5.6.2.2 HTLC-ETH-ERC20-Besu Plugin](#5622-htlc-eth-erc20-besu-plugin)
@@ -145,58 +152,80 @@ Photo by Pontus Wellgraf on Unsplash
 
 # 1. Abstract
 
-Blockchain technologies are growing in usage, but fragmentation is a big problem that may hinder reaching critical levels of adoption in the future.
+"Before a technology unlocks its full range of applications, it first undergoes underestimation. Distributed Ledger Technology (DLT), including blockchain, is no exception and is here to stay". 
+Hundreds of blockchains exist, supporting diverse use cases: from cryptocurrencies, to digital identity, supply chain, and education certification. The trends towards using blockchain for those are increasing. A recent report from Gartner predicts that by 2023, 35% of enterprise
+blockchain applications will integrate with decentralized applications and services. Many blockchain ecosystems. Blockchain is slowly but steadily becoming an infrastructure for global value exchange and distributed computation" [[6](#8-references)].
 
-We propose a protocol and it's implementation to connect as many of them as possible in an attempt to solve the fragmentation problem by creating a heterogeneous system architecture <sup>[1](#8-references)</sup>.
+
+
+It allows communication between systems to exchange data and digital assets, leading to more diverse and innovative solutions to real-world problems. It allows synergies across ecosystems and leverages network effects, leading to a similar boom that the rise of the Internet has seen. This way, no blockchain should become a single point of failure, and we contribute directly to the decentralization of the technology.
+
+However, most blockchains were not createed with interoperability in mind, being standalone networks. Connecting those efficiently and securely remains an open problem. 
+
+
+
+Hyperledger Cactus is an open-source project connecting distributed ledgers to enterprise systems via a set of plugins. Plugins can be  _business logic plugins_, _connector plugins_, _tooling plugins_, or _core packages_. Business logic plugins implement cross-chain use cases (e.g., asset exchange across DLTs). Connector plugins implement blockchain clients, allowing Cactus nodes to connect to blockchains (e.g., Hyperledger Fabric connector). Tooling plugins support the development of business logic plugins (e.g., cryptography plugins, storage plugins). Core packages support the creation of Cactus nodes and their consortia (e.g., cactus-core).  
+
+Cactus is blockchain-agnostic and provides a modular architecture for bespoke cross-chain business logic to be deployed on multiple heterogeneous blockchain infrastructures. Cactus then aims to be the foundation of mature blockchain ecosystems by directly supporting businessses that are inherently multi-system. By integrating blockchains with other systems in a systematic and unified approach, Cactus minimizes security risks.
+
+Cactus also introduces an innovation on the space: the possibility to run decentralized cross-chain use cases by leveraging a consortium Cactus nodes. Current efforts are on studying this scheme from an academic perspective.
 
 # 2. Introduction to Blockchain Interoperability
 
-There are two inherent problems<sup>[a](#22-footnotes-introduction)</sup> that have to be solved when connecting different blockchains:
-* How to provide a proof of the networkwide<sup>[b](#22-footnotes-introduction)</sup> ledger state of a connected blockchain from the outside?
-* How can other entities verify a given proof of the state of a connected blockchain
-from the outside?
+This section acts as a building block to describe the different key components of blockchain interoperability: the problem of interoperability, interoperability mode, connection mode, and solution type.
 
-The `Cactus` consortium operates for each connected blockchain a group of validator nodes, which as a group provides the proofs of the state of the connected ledger. The group of validator nodes runs a consensus algorithm to agree on the state of the underlying blockchain. Since a proof of the state of the blockchain is produced and signed by several validator nodes<sup>[c](#22-footnotes-introduction)</sup> with respect to the rules of the consensus algorithm, the state of the underlying blockchain is evaluated networkwide.
+Interoperating blockchains imply two fundamental problems:
+1) how to represent internal state to third-party blockchains, and 2) how to guarantee that business logic operating in multiple blockchains is sound.
 
-The validator nodes are ledger-specific plug-ins, hence a smart contract on the connected blockchain can enable the ledger-specific functionalities necessary for a validator node to observe the ledger state to finalize a proof. The validator nodes are easier discovered from the outside than the blockchain nodes. Hence, the benefit of operating the `Cactus` network to enable blockchain interoperability relies on the fact that for any cross-blockchain interaction the same type of validator node signatures can be used. That means, the cross-blockchain interaction can be done canonically with the validator node signatures in  `Cactus` rather than having to deal with many different ledger-specific types of blockchain node signatures.
-
-Outside entities (verifier nodes) can request and register the public keys of the validator
-nodes of a blockchain network that they want to connect to. Therefore, they can verify the signed proofs of the state of the blockchain since they have the public keys of the validator nodes. This implies that the verifier nodes trust the validator nodes as such they trust the `Cactus` consortium operating the validator nodes.
+The first point is important so the interoperation system can act upon reliable and up-to-date data. The second point depends on the specific cross-chain use case to be implemented. For instance, if the cross-chain use case is a bridge, then cross-chain double spend must be avoided.
 
 
+## 2.2 Interoperability mode
 
 
-<img src="./cactus_overview.png" width="400"><br>Figure description: V1, V2, and V3 are validator nodes which provide proofs of the underlying blockchain network through ledger-specific plug-ins. V1, V2, and V3 run a consensus algorithm which is independent of the consensus algorithm run by the blockchain network nodes N1, N2, N3, N4, and N5.</img>
-
-## 2.1 Terminology of Blockchain Interoperability
-
-
-This section acts as a building block to describe the different flavors of blockchain interoperability. Business use cases will be built on these simple foundation blocks leveraging a mix of them simultaneously and even expanding to several blockchains interacting concurrently.
+The interoperability mode answers the “what” question: what is the artifact managed by the blockchain
+interoperability solution. Modes are (based on [[6](#8-references)]):
 
 
-### 2.1.1 Ledger Object Types
+1. Data Transfer: data is copied from one DLT to another, with an optional intermediate processing step. For example, copying price information from one DLT into another. Data can be copied from one ledger to the other (typically no cross-chain conditions are implied in data transfers)
 
+2. Asset Transfer: unilateral or bilateral asset transfers. Assets are transferred from one DLT
+network to another (implies burning or locking the asset on the source DLT network). For example, locking Bitcoin to a multi-signature address on the bitcoin
+blockchain and minting a representative asset on the Ethereum blockchain.
 
-To describe typical interoperability patterns between different blockchains, the types of objects stored on a ledger have to be distinguished. The following three types of objects stored on a ledger are differentiated as follows:
+3. Asset Exchange: atomic asset transfers. Assets are exchanged in their respective DLT network,
+i.e., no transfers across DLT networks occur. Participants need to be present in both chains
+for this exchange to happen. For example, using hash time lock contracts.
 
-* FA: Fungible asset (value token/coin)  – cannot be duplicated on different ledgers
-* NFA: Non-fungible asset – cannot be duplicated on different ledgers<sup>[d](#22-footnotes-introduction)</sup>
-* D: Data – can be duplicated on different ledgers
-
-
-Difference between a fungible (FA) and a non-fungible asset (NFA)
-
-A fungible asset is an asset that can be used interchangeably with another asset of the same type, like a currency. For example, a 1 USD bill can be swapped for any other 1 USD bill. Cryptocurrencies, such as ETH (Ether) and BTC (Bitcoin), are FAs. A non-fungible asset is an asset that cannot be swapped as it is unique and has specific properties. For example, a car is a non-fungible asset as it has unique properties, such as color and price. CryptoKitties are NFAs as well. There are two standards for fungible and non-fungible assets on the Ethereum network (ERC-20 Fungible Token Standard and ERC-721 Non-Fungible Token Standard).
-
-Difference between an asset (FA or NFA) and data (D)
+Assets typically imply cross-chain logic to preserve their value in both source and target chains. Asset types include fungible assets (value token/coin) non-fungibles assets (non dividable assets).  A fungible asset is an asset that can be used interchangeably with another asset of the same type, like a currency. For example, a 1 USD bill can be swapped for any other 1 USD bill. Cryptocurrencies, such as ETH (Ether) and BTC (Bitcoin), are FAs. A non-fungible asset is an asset that cannot be swapped as it is unique and has specific properties. For example, a car is a non-fungible asset as it has unique properties, such as color and price. CryptoKitties are NFAs as well. There are two standards for fungible and non-fungible assets on the Ethereum network (ERC-20 Fungible Token Standard and ERC-721 Non-Fungible Token Standard).
 
 Unicity applies to FAs and NFAs meaning it guarantees that only one valid representation of a given asset exists in the system. It prevents double-spending of the same token/coin in different blockchains. The same data package can have several representations on different ledgers while an asset (FA or NFA) can have only one representation active at any time, i.e., an asset exists only on one blockchain while it is locked/burned on all other blockchains. If fundamental disagreement persists in the community about the purpose or operational upgrades of a blockchain, a hard fork can split a blockchain creating two representations of the same asset to coexist. For example, Bitcoin split into Bitcoin and Bitcoin Cash in 2017. Forks are not addressing blockchain interoperability so the definition of unicity applies in a blockchain interoperability context. A data package that was once created as a copy of another data package might divert from its original one over time because different blockchains might execute different state changes on their data packages.
 
 
-### 2.1.2 Blockchain Interoperability Types
+## 2.3 Connection mode
 
-Blockchain interoperability implementations can be classified into the following types:
+There are three methods for a dApp or mdApp to connect to a DLT.
+These mechanisms are called the connection modes. Those are:
 
+1. DLT Nodes: DLT nodes are the software systems that run a DLT protocol. 
+
+2. DLT Proxy: "a DLT node proxy manages the routing and load balancing issues between
+an application and one or more DLT nodes, creating logical separation. To an application,
+interacting with a DLT node proxy is nearly identical to interacting with a DLT node as the
+message requests and responses will be virtually the same. The only possible difference may
+be identifying metadata in the messages to track the DLT node proxy users (e.g., for rate
+limiting reasons)". [[6](#8-references)]
+
+3. DLT Gateways: Like a DLT node proxy, a DLT gateway also manages the routing and load
+balancing issues between an application and one or more DLT nodes, creating logical separation. Example: Polkadot’s block explorer; Self-hosted ODAP gateways; Quant Network’s
+Overledger. [[6](#8-references)]
+
+## 2.4 Blockchain Interoperability Solution Types
+
+Please refer to [[5](#8-references)] or [[6](#8-references)] for a comprehensive and systematic taxonomies.
+
+
+## 2.5 Blockchain Interoperability Design Patterns
 
 * Ledger transfer:
 
@@ -269,47 +298,25 @@ Legend:
 
 
 
-### 2.1.3 Burning or Locking of Assets
+* Burning or Locking of Assets
 
 
 To guarantee unicity, an asset (NFA or FA) has to be burned or locked before being transferred into another blockchain. Locked assets can be unlocked in case the asset is retransferred back to its original blockchain, whereas the burning of assets is an irreversible process. It is worth noting that locking/burning of assets is happening during a ledger transfer but can be avoided in use cases where both parties have wallets/accounts on both ledgers by using atomic swaps instead. Hence, most cryptocurrency exchange platforms rely on atomic swaps and do not burn FAs. For example, ordinary coins, such as Bitcoin or Ethereum, can only be generated by mining a block. Therefore, Bitcoin or Ethereum exchanges have to rely on atomic swaps rather than two-way ledger transfers because it is not possible to create BTC or ETH on the fly. In contrast, if the minting process of an FA token can be leveraged on during a ledger transfer, burning/locking of an asset becomes a possible implementation option, such as in the ETH token ledger transfer from the old PoW chain (Ethereum 1.0) to the PoS chain (aka Beacon Chain in Ethereum 2.0). Burning of assets usually applies more to tokens/coins (FAs) and can be seen as a donation to the community since the overall value of the cryptocurrency increases.
 
 Burning of assets can be implemented as follows:
 
-* Assets are sent to the address of the coinbase/generation transaction<sup>[h](#22-footnotes-introduction)</sup> in the genesis block. A coinbase/generation transaction is in every block of blockchains that rely on mining. It is the address where the reward for mining the block is sent to. Hence, this will burn the tokens/coins in the address of the miner that mined the genesis block. In many blockchain platforms, it is proven that nobody has the private key to this special address.
+1. Assets are sent to the address of the coinbase/generation transaction<sup>[h](#22-footnotes-introduction)</sup> in the genesis block. A coinbase/generation transaction is in every block of blockchains that rely on mining. It is the address where the reward for mining the block is sent to. Hence, this will burn the tokens/coins in the address of the miner that mined the genesis block. In many blockchain platforms, it is proven that nobody has the private key to this special address.
 
-* Tokens/Coins are subtracted from the user account as well as optionally from the total token/coin supply value.
-
-
+2. Tokens/Coins are subtracted from the user account as well as optionally from the total token/coin supply value.
 
 
+## 2.6 General Workflow to Build a cross-chain decentralized application 
+Cactus streamlines the development of cross-chain decentralized application, also known as multiple DLT apps (mDapps) by having three major pilars: 1) robust testing infrastructure (tooling plugins), 2) a modular architecture 
+enabling to combine plugins according to each use case necessity into a set of API servers encapsulated by a Cactus node. Cactus nodes can integrate innovative core plugins that combine them in different ways. Finally 3), business logic plugins that implement the core logic of a business utilizing infrastructure that Cactus provides access. 
 
-## 2.2 Footnotes (Introduction)
-a: There is an alternative approach for an outside entity A to verify the state of a connected blockchain if this connected blockchain uses Merkle Trees to store its blockchain state. An outside entity A can store the Merkle Tree roots from the headers of committed blocks of a connected blockchain locally to verify any state claims about the connected blockchain. Any untrusted entity can then provide a state of the connected blockchain, such as a specific account balance on the connected blockchain, because the outside entity A can act as a lightweight client and use concepts like simple payment verification (SPV) to verify that the state claim provided by the untrusted entity is valid. SPV can be done without checking the entire blockchain history. Polkadot uses this approach in its Relay Chain and the BTCRelay on the Ethereum blockchain uses this approach as well. Private blockchains do not always keep track of their state through Merkel trees and signatures produced by nodes participating in such private blockchains are rarely understood by outside parties not participating in the network. For that reason, the design principle of `Cactus` is to rely on the canonical validator node signatures for verifying proofs of blockchain states. Since `Cactus` should be able to incorporate any type of blockchain in the future, `Cactus` can not use the approach based on Merkle Trees.
+In more technical terms, a `ConfigService`object is initialized for each Cactus node (describing, for example, the private keys for that Cactus node, public keys of the members of the consortium, protocols supported). Then, multiple plugins that expose a REST API can be installed on the node.  Those plugins are accessible to the node via the plugin registry: an abstraction that allows one to easily manage and configure installed plugins, including business logic plugins.
 
-b: A networkwide ledger view means that all network nodes have to be considered to derive the state of the blockchain which means that it is not the state of just one single blockchain node.
-
-c: The validator nodes in `Cactus` have similarities with trusted third-party intermediaries. The terminology trusted third-party intermediaries, federation schemes, and notary schemes are used when a blockchain can retrieve the state of another blockchain through these intermediaries. In contrast, the terminology relay is used when a chain can retrieve the state of another blockchain through reading, writing, or event listening operations directly rather than relying on intermediaries. This terminology is used in the central Relay Chain in Polkadot and the BTCRelay on the Ethereum network.
-
-d: There might be use cases where it is desired to duplicate an NFA on different ledgers. Nonetheless, we stick to the terminology that an NFA cannot be duplicated on a different ledger because an NFA can be represented as data packages on different ledgers in such cases. Data is a superset of NFAs.
-
-e: In the case of data, the data can be copied from Blockchain A to Blockchain B. It is optional to lock/burn/delete the data object on Blockchain A after copying.
-
-
-f: The process in Blockchain A and the process in Blockchain B can be seen to happen concurrently, and consecutively, in atomic swaps, and ledger interactions, respectively.
-
-g: An action can be either a read transaction or a write transaction performed on Blockchain A or an event that is emitted by Blockchain A.
-Some examples of that type of ledger interoperability are as follows:
-* Cross-chain oracles which are smart contracts that read the state of another blockchain before acting on it.
-* Smart contracts that wait until an event happens on another blockchain before acting on it.
-* Asset encumbrance smart contracts which are smart contracts that lock up assets on Blockchain A with unlocking conditions depending on actions happening in Blockchain B.
-
-
-
-
-h: Alternatively, any address from that assets cannot be recovered anymore can be used. A verifiable proof for the irreversible property of that address should be given.
-
-
+Client applications can then be built to operate the Cactus nodes, manage deployments, and call business logic plugins.
 
 # 3. Example Use Cases
 
@@ -464,7 +471,7 @@ The following table summarizes the use cases that will be explained in more deta
 | Comments                    | Hyperledger Private Data: https://hyperledger-fabric.readthedocs.io/en/release-1.4/private_data_tutorial.html <br> Besu Privacy Groups: https://besu.hyperledger.org/en/stable/Concepts/Privacy/Privacy-Groups/ |
 
 <br>
-<img width="700" src="https://www.plantuml.com/plantuml/png/0/jPF1Qi9048Rl-nI3nu07FNee6cseq8FKzYR899dOnNKtdTreVVlEnb1ZeI257ZF_jpCVEvkf3yYXEHXOqqT3jY1OQDmn7c08ZxvWTw8IrcW8N0KB30YLOvWxRRrIVgzjZH6UiP2Pis4TpiBgW4ONIWKTvElfN1CRAdV4a1fNx8jtr1QMDf1C2jfPoAG9dHplD_Ol8bW4-NZpnDiPe0ViLz9OoPNAtIUaoqoH5Qqp36QhvQ25Qosr4YI_G8FdrjKFL2bpSlG46UQiY-qbY8VAqJLCoJVzQ7njXqrmegAF64JSIW663t7Y15RiQYUdNncjZup4JA5Xsozr61gOCqcJijzYhNUtS73TNK7MsD8hY5p4ox7GqQgjNpaXkfdTkNwtkRELveFCl8TH-JrUSNCzhL6drIxqNwnkDr1LgXlTYYR92ncAEwpQUq5HYMjDaerD4l5XAaWVjTs1lFEWoL-I-AvWrkAfCBwcE87CEKc--qz-61rgGt5_NPx_bgkfN8ZyaLy0">
+<img width="700" src="./escrowedSaleDataforCoins.png">
 <div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
 
 ## 3.6 Money Exchanges
@@ -499,7 +506,7 @@ onto their ExampleCoin wallet on the other network.
 
 An ExampleCoin holder can redeem their funds to BTC by receiving a Proof of Burn on the ExampleCoin ledger and getting sent the matching amount of BTC from the `ExampleCoin Reserve Wallet` to their BTC wallet.
 
-<img width="700" src="https://www.plantuml.com/plantuml/png/0/XP9FIyH03CNlyoc2dhmiui6JY5ln7tWG4KJmaft6TkWqgJFfrbNyxgPBLzP5yLQQlFpoNkOiAoRjsmWNRzXsaSubCDnHLL49Ab04zVR7EGqQ2QvN7QL8PKK9YYY-yJLQ_mqhLGar2CDbmfO6ISqp_pCoDu4xj7R8zDeJUvgd9CD37Np3b3CSRRKawRdqajZ8HuTRXHRVMcl6Yd9u9pW-_6NkdNaCFdJ82ZR6B0Gcvrx6LM7lGHH_-h_X9R5AMkq1Pb3o0VPlGrNhLS8LV3W0bjAKyuCViaUCaJIlHUI7RmqHhqMVxdC7EcMn2rpynOiHHEin_4cuZKHPR9XF5ACC4tIZBWvsZmptb2ajAKzpfisxzCVkewcJsMnskcbQrnsB4jZfBTN6pG6vX08iUZDed2N6dc117ljChe2GOO7URbI1MPdAyW9po09Hk79Z15OPrZj1BT4kDieGDFLPxHbPM45NCqU66kdEdTcdFUCl">
+<img width="700" src="exampleCoinPeggedtoBitcoin.png">
 
 ### 3.7.2 With Fiat Money (USD)
 
@@ -524,7 +531,7 @@ gets replaced by a traditional bank account holding USD.
 | Prerequisites               | `User A` and `User B` are registered on a ledger or two separate ledgers that support the concept of individual data ownership, access controls and sharing. |
 | Comments                    | It makes most sense for best privacy if `User A` and `User B` are both present with an identity on the same permissioned, privacy-enabled ledger rather than on two separate ones. This gives `User A` an additional layer of security since they can know that their data is still only stored on one ledger instead of two (albeit both being privacy-enabled)|
 
-<img width="700" src="https://www.plantuml.com/plantuml/png/0/hLHDRzf04BtxLupefJtaa1mjX69IaQ16AYfgUeaK3Ui1Zx1ttTd1b7_VMK1WL9NcqAFtVSsyNVa-AefkcXhcz7D3tX5yPbm9Dd03JuIrLWx53b4HvXKA-nLiMIiedACOuI5ubL33CqUDMHRNx5jCya8aR2U6pdLN4x1YpIxBbDM-ddOjIKtbYWJ6TN1hLo5xc7eborOE7YPcGjiWwrV_VqP3fq7WUoHvAm0Z80o7hMMHrz6eZuuJkZ2qEeUq4ZekIOoPBS8l64ydyE57nKhp9gmfCnFM7GoAsNImDs_vTFPYcvTezX_ZfptO6LI2sHoy1i_x8kBWmj4KkC18CC65i7ixa9Ayl3s3OugRFdHtjiQD1jkAErI2u2qBRaPfi1o-fKAZ7gexj9LbaB0z9OUPXAPLM5ebVGw0a6x4mwEWLvYHD1mZ9_EJkhpBuP4KYXX9N_r5YsbiQ_1aSuMJ32yMM2xF6LqEBoIyt5rFSSBA3krjyygZ9LA4_MKO1j2TwXYwK0V9LqBaHxQw8qeKggtWddJgkx-BXSfHiGYYIUZBFyRlLsJZFmYbuwlZ7rFAs_VI-wqU9ILy_VAUI_WdFJkoUy_Xy0gigkpUDhP_o6y0">
+<img width="700" src="healthcareDataSharingwithAccessControlList.png">
 <div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
 
 ## 3.9 Integrate Existing Food Traceability Solutions
@@ -543,11 +550,11 @@ gets replaced by a traditional bank account holding USD.
 | Prerequisites               | 1. `Organization A` and `Organization B` are both signed up for blockchain enabled software services that provide end to end food traceability solutions on their own but require all participants in the chain to use a single solution in order to work.<br>2. Both solutions of `Organization A` and `B` have terms and conditions such that it is possible technically and legally to integrate the software with each other and `Cactus`. |
 | Comments                    | |
 
-<img width="700" src="https://www.plantuml.com/plantuml/png/0/rPRBRjim44Nt_8g1ksaNIM4jWzY8dS1eW0PDcqSt0G9A6jc4QL8bgQJkrtT8oefVifnTkxDy3uSpbyF7XNNSk6eXuGv_LQWoX2l1fuOlu0GcMkTmRtY6F1LIk2LSAuSaEg4LOtOkLCazEZ96lqwqSdTkAH64ur9aZ3dXwElBiaGZCP-YWR7KsJoRSQ7MGy64Wk2hDlCdzVuqUEQqWGUBvda4t0A7y_DCArijq0o7w_BOood9saov4lnFd7q4P49HRBANdirss773ibJ_Xb5PKgLH-l1p9XmoLCwds9iOyWDLtlE1YlgZKSSycw_4DFucBGSA6YEFhoVR4KUtru7dfMZ-UoIdSqvPVxIVWlYo6QRtDHXlUwjW1FEKMmokFaVrkUz7vltzOXB4v2qkhvmcfyGBTmX-1GO3-86PDZbSKG0O36XkE1asLPzvd_pmi9A1YJo3Xl5yRSGX75QGvyc8monun9Dvlmiqw2gZTjHw54Ri2AWJwGHOzezvb_n7tb4htg2PubidIgrBkDLI2ZNzV6_4b7ewpBPjnlSApH9YqqEVRNNF7dKzcpeHEWRMa0wWAuU4RQt27lNW50dh13PpQ9heKY_AojKkNecYs5FMNgsbmsw4jUH_7EDqgyl7uFNqg__WeQHZQxr_TfJt5faSA38vj95QyjvPo6FmpMAIrZBVb712-tOFso1Sc77Tlr7N2sN3Tk2RXqjigK25VPDtd2u7-BPkRe7txAvMigwubhQtlwqffMan9HQk_XuvS3DXeTH2-Py8_dxpDrRKGvocMJWbde2TwKgkfaqHw3L2zvoawpO05CHWeGskIb1BYaUtOE6b1MHSqQXQf8UC4PHlkWotEIsmJfr_-X1Q8ncre4HAk_2vkB1a9XPrMYFUK5yPEyw8Bg9BZmt2pu3UK5ARiwb1LCCRFaTuHIb1A2f_WVcJsW3Aoj2pBdHpZfcmz23Q8lox8fmzeLGTM_AKCNP15T83z2y0">
+<img width="700" src="foodTraceIntergration.png">
 
 ---
 
-<img width="700" src="https://www.plantuml.com/plantuml/png/0/fLNHQjj047pNLopk1xIqzCKa9b6eKqCBflPB8I-dqvvyzUbMtJlLLKh-lIl5IjHOTXC20e6OdPsTcrjTXAWurgM3EL4EQrPQPTRPsC32HonOHKi-IQAD3k5pKo4xp0jaI1tfhTuewuT8cBCgSKUylV6d6SFM-ae96WB-hD5hl6IctNfZzTPZ2F1-066gVQw9lJJ-EFXUgj-bO5M1mTuYV7WtGhkK0QssbV8HX4K6i1vb8geW4cGK8vMGMqPzBqpfI0oJRnYLTTBlgWw2G9w02i0wIKmx8aokg1JE1Yvl_DaPSQ6ylUrccyqwg5RmveijDl6QLGD_4W1FkTGTsB8YLtVUTKo1JDmfnZsBYQ7d-OxEqQvZkalk3dIantHaBzMHZkl8Jkle-7hNZcXXV9KMoB5or9JeuzjGPq6phGRiRY3ocX7zNcFVPPXJ8sVyoUTj1DhNKm4lw6eDHZHnttUrRL9NuxWxNvMlZUIhvgCEcV9LgNc6Gsh4eKUTgoP4B1-kghYqpzSHlS7gSS5FYAIYPLYivLxoBwlxN8LW3pGCrioHhXittlJ_I-aWs9ar_-Pw8AU4y_DPTv4xiwQmh5dO0yA9uqZa5DeoKqxbgnIWX4tGXgbTM8y9w87j1Nq-VzgNYVE3WaExOSdqGvPQmhh3xtCwxMWnt8iYjeNr8McFiGLjt1JIshfSSZsWagVTbsGWNSoJv09zBl-Clm00">
+<img width="700" src="foodTraceIntegration2.png">
 
 <div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
 
@@ -571,7 +578,7 @@ gets replaced by a traditional bank account holding USD.
 
 ---
 
-<img width="700" src="https://www.plantuml.com/plantuml/png/0/fPPBRnen483l-oj6oRMYXQIN24KXXBIeBqHegqgvp7fd5ul5Tcrl2Qduxntl0sW2IMWlI1xFVFFmp2mNpgFrnJo7Nk6dfBmKwALMhygpjlA-F4AgBOp8pgLpVAG4-bEKoaMHbpudUByqP7DACh9mcMin4-4QXifJPYl2jSKvBRITtQf_T9LJwi5hi3ARUaYa9H4CeiZDf3B8V73qio0bg6UjNaocKimKEGUTBHMh2vK8RHM7-dPBFiUxEUjYHaxU4voysO4TSQsaa0QL1wPmob9H5AKXDJWQg0I-EiRsZCdhv8u07L01loC059vJE-fsPHAozqlG2uxY_BnKaffLb4uOD6pkHrRh5DgtgjiTt_JW0x48PMDXpCoquNY4ENsJEYS_vc85Hwjzf4uW3VfNkrcTWrWdWJL2v_XDauPI7my2dGRGb-5L7oPwHgf68VU43-VTh5MqBdjVp_b1bj0B76qpL7KdrII1SFmnjCmxYylIl0hZ-JxjTfrE_G8jGK8cryiv1rvJOvdMs1-KvtfHWXlqU70pWTve610BYhb_x2yfQ6DgYUVEo7LWn7bMW5NvwtL6F2Es5ZRSp-H3P5MgwouoUP59jO7Bf9AeIXjtU6dyF0HV7WAE3m2N4GlDfkKGF2IlR_ulyaCTF9N1gkcpkit-oiHixwTgxzM-r9vk-uuvDp2qWJk-MHI1X4d2pU1gwmKL-BYjTeLn-KmOyPDXT9uD8zuJXjJGQfrlzV0PZCDsTBoQBIg7vKvsaTAUWCU9D-ICRTcFuoEBBCmr3nJxvmRdcqstXMtWolLFAAPyPHlm53rS3gzPz8iizo6vrs7LC19phR8WbnXuW8OnnafaxzLJExwDAGq--U1jmG6gh7PkceLUogeA1WF-oj0TYO8fsrcTyLMx1OCxeor_WT0Z2pejc0ITbCTLwChXIGi-eU9l2MoUACXFMq1Uj2BYqeSAHLkxe5lNTSyil5mrtgNwS2cyGAVax9lCOABmZ6lnk4pH4mDNsiLxxA8BBWp_6Va3">
+<img width="700" src="authorizationPermissionedChains.png">
 
 <div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
 
@@ -1169,7 +1176,7 @@ Provides structured or unstructured document storage and analytics capabilities 
 Comes with its own API surface that serves as an adapter for different storage backends via plugins.
 By default, `Open Distro for ElasticSearch` is used as the storage backend: https://aws.amazon.com/blogs/aws/new-open-distro-for-elasticsearch/
 
-<img width="700" src="https://www.plantuml.com/plantuml/png/0/ZLLHRzem47xthxZHXsrIWQ5gRmWL1jsgLHegQ4-L9cDVWaLYPxPJngR-zrsSX990QP5uyDtd-xwxyrskdUVMvsa2KoFo5BM7XJUMnmXJp1Ap2wQfuh7bAMDU-GJXsov3cw2CqS8aCM8ZrbnfkDKU2UQLqN13SDmQktdGRmhy7jn6wOpJ0UwKHayKOAnV6_RiSFWxHormRAtPBjTAR3Gw1rS746joBOMncgHzFh2d_4zAMA9twY_2rQSJOUTK2ILKnaaOHQ4KIGXxfxH8Seamz7d6fRtg2vEcHezEU2AZVPTlqPaK-v9xlk8EHun5HJMWyrgjEZ0SEXFvBRS8Sb-bqGWkxbIyzbzsNCC_nW0oBZP5AJlP9kwAL7PvfheExIFQ3d07P2Oh6KjRTV-hHIm20FqeYSpeeWUTFk7wZuE-adHKVjVdKdQ5nN3aoOCU3kzdYoMCvxSmqp8pgj0KU0Zv3CJAzr9yMJs4hYiVGbzfQeS_5xz470H-Eig-LbtdNP_FvtnReHPK7oMmq20IxbpDMxbTwJv9lC5Tw6LDN9_F4t-lK2yGrq5QnDx4wDVKo39UGuUtN52TQXdLyOIAXew9YfQ4HDjMi5AH3uvm9x2t27akbQ_fmk4DPEC2TsVY-2HZY984RqLR_XkyxVTJIwZjbVcLneSNLLN_v-2eyS5TLVznqBxz8qCzLSvRCrlCapnMkXt044861Bei848gJ_ibSBGE9vGZtNbv-2cgTAlc3W3GXZPF40Ib8eWCbNP6McYBBP1RiIuLoGZTlYXyLzNaPlnhEbwE9-F5x8DS3IuxdSjwOrrkryhZHxYuDpkUJ98SwnoqyGWhuxr9mKH7rIeckDeukKF7wi45QgqIZ6uqUeW508gOZ3Kd7NfvrXiTnM-TeIVDLXFkHD6FJNiq5PEnavjh3pdO8wor2munzRIorjX2xm0KtlPPH3MoZErdhv7_Njr1FvepyogSNPELllB_0G00">
+<img width="700" src="documentStorageDeploymentDiag.png">
 
 > The API surface provided by this package is kept intentionally simple and feature-poor so that different underlying storage backends remain an option long term through the plugin architecture of `Cactus`.
 
@@ -1189,11 +1196,11 @@ Contains components responsible for providing access to immutable storage such a
 
 Source file: `./docs/architecture/deployment-diagram.puml`
 
-<img width="700" src="https://www.plantuml.com/plantuml/png/0/ZLNHRjem57tFLzpnqasYJF3SeYQ43ZGAQ6LxgXGvpWKi73jo73eqzTzt7GA4aj4X8N1yphat9ySt3xbbnXQfX10pgNSfAWkXO2l3KXXD81W_UfxtIIWkYmJXBcKMZM3oAzTfgbNVku651f5csbYmQuGyCy8YB8L4sEa2mjdqPW4ACG6h8PEC8p3832x5xq-DmYXbjjOA-qsxacLMPn5V6vrYhFMc4PKmosAMauHdXQLEBc_kHOrs6Hg9oGeD15Bp3LypeM2iB1B02gtWaO3ugis6F5Yw_ywFg2R6SeZ5Ce4_dWTWa5kcLbIkzMorOIk4kT5RaQ1fEMIUTGa8z7doez1V-87_FFpypR1T6xhjKYXkdrJQq0eOtmYrWf3k1vmcjhvK4c-U-vvN_SMae5lN1gQQ_1Z88hTLxQtY5R4HFz4iWO19flY18EDZfN_pkftEjDAlq6V0WLQALjgyA0Wd2-XMs2YHjXln8-NjOsglHkrTK9lSyETZU4QpfSTRTu9b8c_meeQ-DCDnp3L7QkoZ9NkIEdjUnEHI5mcqvaKi1I_JPXJQaa6_X7uxPAqrJYXZmWhCosrnN9QQjV8BmrJEk7LPgKWxy4kI5QpgW3atOQYIw6UE9lBTBXRi4CZ1S3APZsRJMYAFH_4ybKyw5kMPsWf-FP2DVGLLNt5pNy6-h_ZGryIVBsRpQ33wCNiQ1hFPzrD_-s5mtbo8-SPDYC3eLv9xrzx9sr3areYui3IO9kKGs9jCyRfgxod6reNuse6c_IJklclleYof_Q-5ftFWQlS-hDtxi7RlqX_FZQcxJgVJtnyLpusEvZKX2UzIUtT_Vz-l1RHsqHbQMxefvtcKExYzxPyIHbVYyih-cPBi0wg4taj_0G00">
+<img width="700" src="deployIntegrationFramework.png">
 
 ### 5.4.3 Component Diagram
 
-<img width="700" src="https://www.plantuml.com/plantuml/png/0/ZLN1Rjim3BthAmXVrWQhiVGO546pPaK7x32i1NOPCCWownYH9LTKbdX9_tsKx2JsihRBIT9xV7mYAUUQl7H-LMaXVEarmesjQclGU9YNid2o-c7kcXgTnhn01n-rLKkraAM1pyOZ4tnf3Tmo4TVMBONWqD8taDnOGsXeHJDTM5VwHPM0951I5x0L02Cm73C1ZniVjzv9Gr85lTlIICqg4yYirIYDU1P2PiGKvI6PVtc8MhdsFQcue5LTM-SnFqrF4vWv9vkhKsZQnbPS2WPZbWFxld_Q4jTIQpmoliTj2sMXFWSaLciQpE-hmjP_ph7MjgduQ7-BlBl6Yg9nDNGtWLF7VSqsVzHQTq8opnqITTNjSGUtYI6aNeefkS7kKIg4v1CfPzTVdVrLvkXY7DOSDsJTU-jaWGCQdT8OzrPPVITDJWkvn6_uj49gxVZDWXm-HKzIAQozp3GEyn_gEpoUlfs7wb39NYAAYGWrAXwQeTu4XliWhxGaWkJXEAkTM7lB3evzZq2S1yO2ACAysekBsF49N5t9ed1OI8_JQOS-CxpRnaSYte6n7eE86VC6O0OyFOoP_PJ36Ao3oZfc7QOyRRdcU1H3CZo-3SWQaAQ9HBEgCdxNzX7EVgEpu2rKZ9s7N54BJHwDyFACBRwFviuXJOCj4OVtUSUN-jlpvT5pR-B3YFFiRBXskc7_1vClsmwFudyTzpAzPVwoCpzYxwH2ErJuz54PcieDEO3hLx3OtbTmgaz1qSv4CavWjqjJk-LbceuI7YB-26_ONBf_1SCjXMto8KqvahN3YgEm5litq-cC_W7oK8uX_aBM0K5SSvNu7-0F">
+<img width="700" src="hyperledgerBCIntegrationFramework.png">
 
 ### 5.4.4 Class Diagram
 
@@ -1239,7 +1246,7 @@ An overarching theme for all aspects that are covered by the plugin architecture
 
 ---
 
-<img src="https://www.plantuml.com/plantuml/png/0/dLHDRzD043tZNp6O0wr4LQ3YKaLHdP90fBH4RRWXLPlrn5bblMjcn_dWrpEsK-mYIq5S8ddcpPjvRsPp4rWHbxc5kIqpuo0XlJQCcal2A7fjdBPbYZ3Wib0fNLrgd-VU3NioA-_uGkqm-1mlSxyq5a_2KiLggS9fu0OF9p41QOiqZ28sR16-7WeaYsc612FhzKQlbGYSEiQC51llO48gnvsdpG_NA_yjM5mni0SosPeXDIGfgPICijRlddApDowBmiQuGWaRVCQLAYqlSC-9DPdBqJ5e-K7ge6R68Sjyu8dNlfC8-BD4fp4Xyhl5skYDmn3WOmT2ldIfzkH4rwTEF5VxNB0gms1-8Lozxw6ToxADDeMIeOH5_951AfrAioU8awAmHZVcV1S_Or2XoNs0mS2aeiFm0VnEcW-7KZT9dkw-ZQQpyLcpyHItHkEx-Ax-4ZUgp_WyYfP-3_7OfJLjYE7Dh79qP4kCNZNDHtuPeG04UOIFfXDXAAm_L2u-rtmXF4G0sblRB2F8tFCfFDRhXtkVubauhoTF2jD41Lzqf4_Kaeo-zSvXrRhP_L_DPytbjFt_3Fseh3m1eNo-NeWRGhX7hgwfxjs4Zf6MMrJ2nR2T3AxXeLfEO5YGSa7Lac2yHrtMbrO5jegn8wOj5gPUBTTmA_VPptXywIrnlnkzqRRXKTW_J__I3a9vOEv5pGC6UJVXFrFHZJWiVsE_0G00" width="700" >
+<img src="integration-framework-plugin-architecture.png" width="700" >
 
 ---
 
@@ -1284,19 +1291,61 @@ This plugin provides `Cactus` a way to interact with Besu networks. Using this w
 * Build and sign transactions using different keystores.
 * Invoke smart-contract functions that we have deployed on the network.
 
-#### 5.6.1.2 Ledger Connector Fabric Plugin
+#### 5.6.1.2 Ledger Connector Connector Corda
+
+This plugin provides `Cactus` a way to interact with Corda networks. Using this we can perform:
+* Deploy mentioned JVM application in addition to the Cactus API server with the desired plugins configured.
+* Invoke contract flow with different kinds of parameters
+
+#### 5.6.1.3 Ledger Connector Fabric Socketio
+
+This plugin provides `Cactus` a way to interact with Hyperledger Fabric networks. Using this we can perform:
+* `sendSyncRequest`: Send sync-typed requests to the ledgers (e.g. getBalance)
+* `sendAsyncRequest`: Send async-typed requests to the ledgers (e.g. sendTransaction)
+* `startMonitor`: Start monitoring blocks on the ledgers
+* `stopMonitor`: Stop the block monitoring
+
+#### 5.6.1.4 Ledger Connector Fabric Plugin
 
 This plugin provides `Cactus` a way to interact with Fabric networks. Using this we can perform:
 * Deploy Golang chaincodes.
-* Make transactions.
+* Execute transactions on the ledger.
 * Invoke chaincodes functions that we have deployed on the network.
 
-#### 5.6.1.3 Ledger Connector Quorum Plugin
+#### 5.6.1.5 Ledger Connector Go Ethereum Socketio
+
+This plugin provides `Cactus` a way to interact with Go-Ethereum networks. Using this we can perform:
+* `sendSyncRequest`: Send sync-typed requests to the ledgers (e.g. getBalance)
+* `sendAsyncRequest`: Send async-typed requests to the ledgers (e.g. sendTransaction)
+* `startMonitor`: Start monitoring blocks on the ledgers
+* `stopMonitor`: Stop the block monitoring
+
+#### 5.6.1.6 Ledger Connector Iroha Plugin
+
+This plugin provides `Cactus` a way to interact with Iroha networks. Using this we can perform:
+* Run various Iroha leger commands and queries.
+* Build and sign transactions using any arbitrary credential.
+
+#### 5.6.1.7 Ledger Connector Quorum Plugin
 
 This plugin provides `Cactus` a way to interact with Quorum networks. Using this we can perform:
 * Deploy Smart-contracts through bytecode.
 * Build and sign transactions using different keystores.
 * Invoke smart-contract functions that we have deployed on the network.
+
+#### 5.6.1.8 Ledger Connector Sawtooth Socketio Plugin
+
+This plugin provides `Cactus` a way to interact with Hyperledger Sawtooth. Using this we can perform:
+* `startMonitor`: Start monitoring blocks on the ledgers
+* `stopMonitor`: Stop the block monitoring
+
+#### 5.6.1.9 Ledger Connector Xdai Plugin
+
+This plugin provides `Cactus` a way to interact with Xdai networks. Using this we can perform:
+* Deploy Smart-contracts through bytecode.
+* Build and sign transactions using different keystores.
+* Invoke smart-contract functions that we have deployed on the network.
+
 
 ### 5.6.2 HTLCs Plugins
 
@@ -1546,7 +1595,7 @@ Usually a better fit for consumer-based applications where end users have higher
 
 ---
 
-<img src="https://www.plantuml.com/plantuml/png/0/XLHXQnf14Fs-ls9geKt1n3JIBt8SEHkb0KD3jFqKaBtTKGVtTktiNjJI7z-vCr0j0Ry8i_FcxNjlvxoDINEgAmTV7Q5FC2MBC6FjepQ9WfU3fIU_LEeTUUDgwMQftcZB_Pu9LHLy_aPd4Nowr5kCeS9U5KfoU1PcTTAbZkU1QzoVnKJa5-IpCFABC3V4fj6d4YM7y6s_GNPebyWmTC6ipKgJXtkVSCcwpMJCki9juFMpFnkRmqM2581fkKfWYR45g8-WdGlRUKMx1XVNv3TQUE4E5xfsQOQxL3XXgHf-8p_8HwW9UKoY50AdLJXgHFnLepTOC8VjR4LcxJ56k3c2SAYzDO6zEFnoT5xfNILOlSH8ln7wrs_GFigwaA6D5b728ac94AN4TM3e59kD8tC8wOUyGGTqXBRt6R9CClAIyHx2LgxE9V5nCN_uFhoVZ2uEIsBnXGnsEmzj9L4qvRFF6Zs3_dMUVMWUF-irTTxvf7n826L8ALGG5d1C0kydJUBJzNxeQbG01vAR_qYoCeT7fXSjH78CBDujHX03vl2qhtH2NukZh5Vc2hs5vkhMm7Jqz7FqT57Iuh1qpNotCxmVmxIjszqGhGtshfWLms8wkh0kTJjt51DJMIUqC6aNhe6zndLrzIS_CJIGE4ohJRO9TsXa3jA_bLCdxjln4qq3qIEwjMFKTWzHLalkFIA0vWjK9pC76X4xW77WhMRxrfoEbnILkXLw-IVv2m00" width="700" >
+<img src="integration-framework-client-side-transaction-signing.png" width="700" >
 
 ---
 
@@ -1563,7 +1612,7 @@ Usually a better fit for enterprise applications where end users have most likel
 
 ---
 
-<img src="https://www.plantuml.com/plantuml/png/0/XLHTQzj047pNhzYgqBhWncbCNu8GaR5D3GuDiTkdG3YTrlAXqvrxj_97w8_ldXIeN5ByOhZTsTdPsPNlF0b7JQrXXMwF3bQgG5WxORoGfApXG6cKAQFedJ9IDvnDgDc9mer7qjQrDUaRcOqrz5aSqDiQHxNDbSQBi4AGo8M_3ApmT17ZssdIA2956k7RQOTEOr7oX1DjPIMtGXbO6CBIYNREkHCr7gohdin5ApHk2CY2K-MMe50EMq3q4OJMzl1SgsF0-KgPdM1UcE96D9hMUAHCCqkDXa3o3xeUQgaC4Yi5wsXhUmcFlneq4ZFdx66zLR8ow3tSz23EDgQGrXaM_hKNhyMnPgmeqQiNXF7r6xGFV09AgfrWKSp2Jh6GAEAfhOCus-sqafr9FzZN68I7DlS5aeGzCkpn2Uo1MwVi-3nxlly-MIndWsxn1UwLn65ytxxOYl2CFxN0rUpnv-nnaAjDjp3FTCDuifZtp_79947xxVWwJJw4vIUZy4wPmrX2o2sHhS5ku8m7tY_3UbRLQQ8RZ00wbfj_M239qmUdzeAPE1ne6YO1Xu740qyTz7Iy46B9A4yZD0M4xkqOqsoTJRBLR51e6iPJvScfl24iODdUN9ZsrR6hgzyfz8svPKTasuaF2eyekGxexzL5VN1NVZRcBLl5MXhZ-QwuOwyKmYSLdPlI4h3CrxB_5KLtdEM_XJy0" width="700" >
+<img src="integration-framework-server-side-transaction-signing.png" width="700" >
 
 ---
 
@@ -1585,7 +1634,7 @@ Example: A user can register for a Hyperledger Cactus account, import their priv
 
 > Native mobile applications may not need to use the server-side keychain since they usually come equipped with an OS provided one (Android, iOS does).
 
-<img width="700" src="https://www.plantuml.com/plantuml/png/0/bLLDRnen4BtlhnZHGqz0eUgbGYYaJLhKjAfASaEg77i0TxrZnpOXjCf_x-ooNqeMqXwGy7ZcpRmtuzcp48MFsyp03UcLHWLpXHHrtCDNGMAD6PyIFXk4ptk7tg1QeuTpOsKgDq8Jp2dYsekeBS6b5ndkh4-NT0elUGq6Ln6Y1Q_NcmXAUvGvGduLKarEC19SQSB8MS7wkB59Sn7mReiaSUQztLrlj4m9Gu1noyNRBIbfFN6rxrhsJ3naxCkb1FqRuUsR3jZlh8cMsWcAm2ZCcWj94c6CtVtCz8EcTP8u8LD6WTxv_B9csGCHu9QPLwnVNUK4FtcnXpy9WBtznKIXz_7gkb5cL4Gf4_K89XFfiRWGPZez5Z6k8yR_6F6jZg2d4O_CJ4RheJTppcXvQELDG5_457TvOJKdksDHEJ1PvUrc0LuOXXu71xkAE-4H53fZz_aOJAUbEX_sWbWTBhtMrANhld2EVxhFXToNjR2PhMmys6fr4QcG5q3Qp5bYTEWDsMzuFnfMTG_5DcxolymGbpIP_BXONCFi-nmkI3chyueEZ5j-M5wz3AvKlv7r9BnIZMCB__6P0hezLMnuDbMTlAkUBrWZBGkcqeWGolGLI3XSToOETwOVkErig7ApgRISphwuCuk3tv7y3T2f2bBS5nDLfQ_EfvD_ARsEfAv0sechwH_1GF5W3mxliCCsxh1H4rmiii7qI7V9HjvY1Bn8qlSm2y5ApTC5_4QNL3zIteUyJ9PKjOZHkz1Wm7bQu_04FPSVwpP34nzuQRM6g4IfHFaFb9DLDVtjH6I2mtmprSWUJR4lmaOxnZvZFFuU_GK0" >
+<img width="700" src="integration-framework-unified-identity-management.png" >
 
 In web 2.0 applications the prevalent authentication/authorization solution is Open ID Connect which bases authentication on passwords and tokens which are derived from the passwords.
 Web 3.0 applications (decentralized apps or *DApps*) which interact with blockchain networks rely on private keys instead of passwords.
@@ -1669,16 +1718,24 @@ The blockchain migrator feature paves the way for building a solution that perfo
 
 4: H.M.N. Dilum Bandara, Xiwei Xu, and Ingo Weber. 2020. [Patterns for blockchain data migration](https://arxiv.org/abs/1906.00239). European Conf. on Pattern Languages of Programs 2020 (EuroPLoP 2020).
 
-5: Belchior,  A.  Vasconcelos,  S.  Guerreiro,  and  M.  Correia,  “A  Surveyon Blockchain Interoperability: Past, Present, and Future Trends,”arXiv,2020. [Online]. Available: http://arxiv.org/abs/2005.14282
+5: Rafael Belchior, André Vasconcelos, Sérgio Guerreiro, and Miguel Correia. 2021. A Survey on Blockchain Interoperability: Past, Present, and Future Trends. ACM Comput. Surv. 54, 8, Article 168 (November 2022), 41 pages. DOI:https://doi.org/10.1145/3471140
+
+6: Belchior, Rafael; Riley, Luke; Hardjono, Thomas; Vasconcelos, André; Correia, Miguel (2022): Do You Need a Distributed Ledger Technology Interoperability Solution?. TechRxiv. Preprint. https://doi.org/10.36227/techrxiv.18786527.v1 
+
+7: Rafael Belchior, André Vasconcelos, Miguel Correia, Thomas Hardjono, Hermes: Fault-tolerant middleware for blockchain interoperability,
+Future Generation Computer Systems,
+Volume 129, 2022, Pages 236-251
 
 <div style="page-break-after: always; visibility: hidden"><!-- \pagebreak --></div>
 
 # 10. Recommended Reference
 Please use the following BibTex entry to cite this whitepaper:
 
-@article{hyperledgercactus,
-  title={Hyperledger Cactus Whitepaper v0.1},
-  author={Montgomery, Hart and Borne-Pons, Hugo and Hamilton, Jonathan and Bowman, Mic and Somogyvari, Peter and Fujimoto, Shingo and Takeuchi, Takuma and Kuhrt, Tracy and Belchior, Rafael},
-  journal={URL: https://github. com/hyperledger/cactus/blob/main/whitepaper/whitepaper. md},
-  year={2020}
+@report{montgomery_hyperledger_2022,
+	title = {Hyperledger Cactus Whitepaper},
+	url = {https://github.com/hyperledger/cactus/blob/main/docs/whitepaper/whitepaper.md},
+	number = {2},
+	institution = {Hyperledger},
+	author = {Montgomery, Hart and Borne-Pons, Hugo and Hamilton, Jonathan and Bowman, Mic and Somogyvari, Peter and Fujimoto, Shingo and Takeuchi, Takuma and Kuhrt, Tracy and Belchior, Rafael},
+	date = {2022},
 }

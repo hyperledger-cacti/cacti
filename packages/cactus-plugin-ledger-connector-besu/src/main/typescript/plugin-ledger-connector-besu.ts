@@ -11,7 +11,8 @@ import OAS from "../json/openapi.json";
 import Web3 from "web3";
 
 import type { WebsocketProvider } from "web3-core";
-import EEAClient, { ICallOptions, IWeb3InstanceExtended } from "web3-eea";
+//import EEAClient, { ICallOptions, IWeb3InstanceExtended } from "web3-eea";
+import Web3JsQuorum, { IWeb3Quorum } from "web3js-quorum";
 
 import { Contract, ContractSendMethod } from "web3-eth-contract";
 import { TransactionReceipt } from "web3-eth";
@@ -120,7 +121,7 @@ export class PluginLedgerConnectorBesu
   private readonly log: Logger;
   private readonly web3Provider: WebsocketProvider;
   private readonly web3: Web3;
-  private web3EEA: IWeb3InstanceExtended | undefined;
+  private web3Quorum: IWeb3Quorum | undefined;
   private readonly pluginRegistry: PluginRegistry;
   private contracts: {
     [name: string]: Contract;
@@ -183,8 +184,7 @@ export class PluginLedgerConnectorBesu
   }
 
   public async onPluginInit(): Promise<void> {
-    const chainId = await this.web3.eth.getChainId();
-    this.web3EEA = EEAClient(this.web3, chainId);
+    this.web3Quorum = Web3JsQuorum(this.web3);
   }
 
   public async shutdown(): Promise<void> {
@@ -471,18 +471,19 @@ export class PluginLedgerConnectorBesu
           privateKey: privKey,
           privateFor: req.privateTransactionConfig.privateFor,
         };
-        if (!this.web3EEA) {
-          throw new RuntimeError(`InvalidState: web3EEA not initialized.`);
+        if (!this.web3Quorum) {
+          throw new RuntimeError(`InvalidState: web3Quorum not initialized.`);
         }
 
-        const privacyGroupId = this.web3EEA.priv.generatePrivacyGroup(fnParams);
+        const privacyGroupId = this.web3Quorum.utils.generatePrivacyGroup(
+          fnParams,
+        );
         this.log.debug("Generated privacyGroupId: ", privacyGroupId);
-        callOutput = await this.web3EEA.priv.call({
-          privacyGroupId,
+        callOutput = await this.web3Quorum.priv.call(privacyGroupId, {
           to: contractInstance.options.address,
           data,
           // TODO: Update the "from" property of ICallOptions to be optional
-        } as ICallOptions);
+        });
 
         success = true;
         this.log.debug(`Web3 EEA Call output: `, callOutput);
@@ -636,11 +637,13 @@ export class PluginLedgerConnectorBesu
   public async transactPrivate(options: any): Promise<RunTransactionResponse> {
     const fnTag = `${this.className}#transactPrivate()`;
 
-    if (!this.web3EEA) {
+    if (!this.web3Quorum) {
       throw new Error(`${fnTag} Web3 EEA client not initialized.`);
     }
 
-    const txHash = await this.web3EEA.eea.sendRawTransaction(options);
+    const txHash = await this.web3Quorum.priv.generateAndSendRawTransaction(
+      options,
+    );
 
     if (!txHash) {
       throw new Error(`${fnTag} eea.sendRawTransaction provided no tx hash.`);
@@ -654,13 +657,12 @@ export class PluginLedgerConnectorBesu
   ): Promise<RunTransactionResponse> {
     const fnTag = `${this.className}#getPrivateTxReceipt()`;
 
-    if (!this.web3EEA) {
-      throw new Error(`${fnTag} Web3 EEA client not initialized.`);
+    if (!this.web3Quorum) {
+      throw new Error(`${fnTag} Web3 Quorum client not initialized.`);
     }
 
-    const txPoolReceipt = await this.web3EEA.priv.getTransactionReceipt(
+    const txPoolReceipt = await this.web3Quorum.priv.waitForTransactionReceipt(
       txHash,
-      privateFrom,
     );
     if (!txPoolReceipt) {
       throw new RuntimeError(`priv.getTransactionReceipt provided no receipt.`);
