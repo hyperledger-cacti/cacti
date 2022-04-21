@@ -4,12 +4,12 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
     inputs:
-      tag:
-        description: 'Go Module path wrt root of repo'
-        default: 'common/protos-go'
+      module:
+        description: 'Go Module name'
+        default: 'protos-go'
         required: true
-      name:
-        description: 'Go Module Name'
+      module_description:
+        description: 'Small Go Module Description for Release Text'
         default: 'Weaver Protos Go'
         required: true
       version:
@@ -27,18 +27,37 @@ jobs:
       - name: Set current date as env
         run: echo "RELEASE_DATE=$(date +%b\ %d,\ %Y)" >> $GITHUB_ENV
         
+      - name: Get Full path
+        run: |
+          if [ "${{ github.event.inputs.module }}" = "protos-go" ]; then
+            echo "MODULE_TAG=common/protos-go" >> $GITHUB_ENV
+          elif [ "${{ github.event.inputs.module }}" = "interop" ]; then
+            echo "MODULE_TAG=core/network/fabric-interop-cc/contracts/interop" >> $GITHUB_ENV
+          elif [ "${{ github.event.inputs.module }}" = "utils" ]; then
+            echo "MODULE_TAG=core/network/fabric-interop-cc/libs/utils" >> $GITHUB_ENV
+          elif [ "${{ github.event.inputs.module }}" = "assetexchange" ]; then
+            echo "MODULE_TAG=core/network/fabric-interop-cc/libs/assetexchange" >> $GITHUB_ENV
+          elif [ "${{ github.event.inputs.module }}" = "asset-mgmt" ]; then
+            echo "MODULE_TAG=core/network/fabric-interop-cc/interfaces/asset-mgmt" >> $GITHUB_ENV
+          elif [ "${{ github.event.inputs.module }}" = "go-sdk" ]; then
+            echo "MODULE_TAG=sdks/fabric/go-sdk" >> $GITHUB_ENV
+          else
+            echo "Module not known to the workflow. Exiting."
+            exit 1
+          fi
+        
       - name: Create GO Release
         id: go-release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
-          tag_name: ${{ github.event.inputs.tag }}/${{ github.event.inputs.version }}
-          release_name: ${{ github.event.inputs.version }} - ${{ github.event.inputs.name }} - ${{ env.RELEASE_DATE }}
+          tag_name: ${{ env.MODULE_TAG }}/${{ github.event.inputs.version }}
+          release_name: ${{ github.event.inputs.version }} - ${{ github.event.inputs.module_description }} - ${{ env.RELEASE_DATE }}
           body: |
-            - Go Module: `github.com/${GITHUB_REPOSITORY_OWNER}/weaver-dlt-interoperability/${{ github.event.inputs.tag }}`
+            - Go Module: `github.com/${GITHUB_REPOSITORY_OWNER}/weaver-dlt-interoperability/${{ env.MODULE_TAG }}`
             - Release: ${{ github.event.inputs.version }}
-            - Readme: [Here](https://github.com/${GITHUB_REPOSITORY_OWNER}/weaver-dlt-interoperability/blob/${{ github.event.inputs.tag }}/${{ github.event.inputs.version }}/${{ github.event.inputs.tag }}/README.md).
-            - Source: [Here](https://github.com/${GITHUB_REPOSITORY_OWNER}/weaver-dlt-interoperability/blob/${{ github.event.inputs.tag }}/${{ github.event.inputs.version }}/${{ github.event.inputs.tag }})
+            - Readme: [Here](https://github.com/${GITHUB_REPOSITORY_OWNER}/weaver-dlt-interoperability/blob/${{ env.MODULE_TAG }}/${{ github.event.inputs.version }}/${{ env.MODULE_TAG }}/README.md).
+            - Source: [Here](https://github.com/${GITHUB_REPOSITORY_OWNER}/weaver-dlt-interoperability/blob/${{ env.MODULE_TAG }}/${{ github.event.inputs.version }}/${{ env.MODULE_TAG }})
           draft: false
           prerelease: false
