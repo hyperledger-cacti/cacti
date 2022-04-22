@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: Data Transfer Tests
+name: Test Data Transfer
 
 # Controls when the workflow will run
 on:
@@ -14,7 +14,7 @@ on:
   workflow_dispatch:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
-jobs:   
+jobs:
   data-transfer:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
@@ -76,6 +76,280 @@ jobs:
         working-directory: tests/network-setups/corda
       
       # FABRIC NETWORK
+      - name: Start Fabric Network
+        run: make start-interop
+        working-directory: tests/network-setups/fabric/dev
+        
+      - name: Corda Network logs
+        run: |
+          cat tests/network-setups/corda/corda-net.out
+          docker logs corda_partya_1
+        
+      # RELAY
+      - name: Edit Relay docker compose
+        run: make convert-compose-method2
+        working-directory: core/relay
+        
+      - name: Start Relay for network1
+        run: make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.n1'
+        working-directory: core/relay
+      
+      - name: Start Relay for network2
+        run: make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.n2'
+        working-directory: core/relay
+        
+      - name: Start Relay for Corda_Network
+        run: make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.corda'
+        working-directory: core/relay
+                
+      - name: Start Relay for Corda_Network2
+        run: make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.corda2'
+        working-directory: core/relay
+        
+      # FABRIC DRIVER
+      - name: Setup Fabric Driver .env
+        run: |
+          sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}#g" docker-testnet-envs/.env.n1
+          sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}#g" docker-testnet-envs/.env.n2
+        working-directory: core/drivers/fabric-driver
+        
+      - name: Start Fabric Driver for network1
+        run: make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.n1'
+        working-directory: core/drivers/fabric-driver
+      
+      - name: Start Fabric Driver for network2
+        run: make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.n2'
+        working-directory: core/drivers/fabric-driver
+        
+      # CORDA DRIVER
+      - name: Start Corda Driver
+        run: make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.corda'
+        working-directory: core/drivers/corda-driver
+        
+      - name: Start Corda_Network2 Driver
+        run: make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.corda2'
+        working-directory: core/drivers/corda-driver
+        
+      # FABRIC CLI
+      - name: Setup Fabric CLI .npmrc
+        run: |
+          cp .npmrc.template .npmrc
+          sed -i "s/<personal-access-token>/${{ secrets.GITHUB_TOKEN }}/g" .npmrc
+          cat .npmrc
+        working-directory: samples/fabric/fabric-cli
+      - name: Build Fabric CLI
+        run: |
+          npm install --global yarn
+          make build
+        working-directory: samples/fabric/fabric-cli
+      - name: Setup Fabric CLI Config
+        run: |
+          echo ${GITHUB_WORKSPACE}
+          cp config.template.json config.json
+          sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}#g" config.json
+        working-directory: samples/fabric/fabric-cli
+      - name: Setup Fabric CLI ENV
+        run: |
+          echo ${GITHUB_WORKSPACE}
+          cp .env.template .env
+          sed -i "s/CHAINCODE_PATH=.*/CHAINCODE_PATH=\.\/chaincode\.json/g" .env
+          ./bin/fabric-cli env set MEMBER_CREDENTIAL_FOLDER ${GITHUB_WORKSPACE}/samples/fabric/fabric-cli/src/data/credentials_docker
+          ./bin/fabric-cli env set CONFIG_PATH ${GITHUB_WORKSPACE}/samples/fabric/fabric-cli/config.json
+          cat .env
+        working-directory: samples/fabric/fabric-cli
+        
+      - name: Fabric CLI Configure ALL
+        run: ./bin/fabric-cli configure all network1 network2
+        working-directory: samples/fabric/fabric-cli
+        
+      # CORDA CLIENT
+      - name: Corda CLI Initialize Vault
+        run: make initialise-vault-docker
+        working-directory: samples/corda/corda-simple-application
+    
+      - name: Data Transfer Corda Client Tests
+        run: |
+          COUNT=0
+          TOTAL=8
+          
+          # CORDA-CORDA2
+          ./clients/build/install/clients/bin/clients request-state localhost:9081 relay-corda2:9082/Corda_Network2/corda_network2_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:H 1> tmp.out    
+          cat tmp.out | grep "SimpleState(key=H, value=\[SimpleState(key=H, value=1" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          ./clients/build/install/clients/bin/clients get-state H 1> tmp.out
+          cat tmp.out | grep "SimpleState(key=H, value=\[SimpleState(key=H, value=1" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          # CORDA2-CORDA
+
+          NETWORK_NAME=Corda_Network2 CORDA_PORT=30006 ./clients/build/install/clients/bin/clients request-state localhost:9082 relay-corda:9081/Corda_Network/corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:C 1> tmp.out  
+          cat tmp.out | grep "SimpleState(key=C, value=\[SimpleState(key=C, value=20" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          NETWORK_NAME=Corda_Network2 CORDA_PORT=30006 ./clients/build/install/clients/bin/clients get-state C 1> tmp.out
+          cat tmp.out | grep "SimpleState(key=C, value=\[SimpleState(key=C, value=20" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          # CORDA - FABRIC1
+          ./clients/build/install/clients/bin/clients request-state localhost:9081 relay-network1:9080/network1/mychannel:simplestate:Read:a 1> tmp.out
+          cat tmp.out | grep "SimpleState(key=a, value=Arcturus" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          ./clients/build/install/clients/bin/clients get-state a 1> tmp.out
+          cat tmp.out | grep "SimpleState(key=a, value=Arcturus" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          # CORDA - FABRIC2
+          ./clients/build/install/clients/bin/clients request-state localhost:9081 relay-network2:9083/network2/mychannel:simplestate:Read:Arcturus 1> tmp.out
+          cat tmp.out | grep "SimpleState(key=Arcturus, value=17.671" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          ./clients/build/install/clients/bin/clients get-state Arcturus 1> tmp.out
+          cat tmp.out | grep "SimpleState(key=Arcturus, value=17.671" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          # RESULT
+          echo "Passed $COUNT/$TOTAL Tests."
+
+          if [ $COUNT == $TOTAL ]; then
+              exit 0
+          else
+              exit 1
+          fi
+        working-directory: samples/corda/corda-simple-application
+        
+      # FABRIC CLI
+      - name: Data Transfer Fabric CLI Tests
+        run: |
+          COUNT=0
+          TOTAL=8
+
+          # FABRIC2 - FABRIC1
+          cp chaincode.json.template chaincode.json
+          ./bin/fabric-cli interop --local-network=network2 --requesting-org=Org1MSP relay-network1:9080/network1/mychannel:simplestate:Read:a &> tmp.out
+          tail -n 1 tmp.out | grep "Args: a, Arcturus" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          ./bin/fabric-cli chaincode query mychannel simplestate read '["a"]' --local-network=network2 &> tmp.out
+          tail -n 1 tmp.out | grep "Result from network query: Arcturus" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          # FABRIC1 - FABRIC2
+          sed -i "s/\"args\"\: \[\"a\"/\"args\"\: \[\"Arcturus\"/g" chaincode.json
+          ./bin/fabric-cli interop --local-network=network1 --requesting-org=Org1MSP relay-network2:9083/network2/mychannel:simplestate:Read:Arcturus &> tmp.out
+          tail -n 1 tmp.out | grep "Args: Arcturus, 17.671" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          ./bin/fabric-cli chaincode query mychannel simplestate read '["Arcturus"]' --local-network=network1 &> tmp.out
+          tail -n 1 tmp.out | grep "Result from network query: 17.671" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          # FABRIC1 - CORDA
+          cp chaincode.json.template chaincode.json
+          sed -i "s/\"args\"\: \[\"a\"/\"args\"\: \[\"H\"/g" chaincode.json
+          ./bin/fabric-cli interop --local-network=network1 --sign=true --requesting-org=Org1MSP relay-corda:9081/Corda_Network/corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:H --debug=true &> tmp.out
+          tail -n 1 tmp.out | grep "Args: H, \[SimpleState(key=H, value=1" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          ./bin/fabric-cli chaincode query mychannel simplestate read '["H"]' --local-network=network1 &> tmp.out
+          tail -n 1 tmp.out | grep "Result from network query: \[SimpleState(key=H, value=1" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          # FABRIC2 - CORDA
+          cp chaincode.json.template chaincode.json
+          sed -i "s/\"args\"\: \[\"a\"/\"args\"\: \[\"C\"/g" chaincode.json
+          ./bin/fabric-cli interop --local-network=network2 --sign=true --requesting-org=Org1MSP relay-corda:9081/Corda_Network/corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:C --debug=true &> tmp.out
+          tail -n 1 tmp.out | grep "Args: C, \[SimpleState(key=C, value=20" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          ./bin/fabric-cli chaincode query mychannel simplestate read '["C"]' --local-network=network2 &> tmp.out
+          tail -n 1 tmp.out | grep "Result from network query: \[SimpleState(key=C, value=20" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+
+          # RESULT
+          echo "Passed $COUNT/$TOTAL Tests."
+
+          if [ $COUNT == $TOTAL ]; then
+              exit 0
+          else
+              exit 1
+          fi
+        working-directory: samples/fabric/fabric-cli
+        
+  data-transfer-semi-local:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+        
+      - name: Set up JDK 8
+        uses: actions/setup-java@v2
+        with:
+          java-version: '8'
+          distribution: 'adopt'
+          
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
+          
+      - name: Use Node.js 14.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14.x
+          
+      # CORDA NETWORK
+      - name: Generate github.properties (on pull_request)
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          echo "Using ${GITHUB_ACTOR} user."
+          echo "username=${GITHUB_ACTOR}" >> github.properties
+          echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.properties
+          echo "url=https://maven.pkg.github.com/${GITHUB_ACTOR}/weaver-dlt-interoperability" >> github.properties
+          
+          echo "Using ${GITHUB_ACTOR} user."
+          echo "username=${GITHUB_ACTOR}" >> github.main.properties
+          echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.main.properties
+          echo "url=https://maven.pkg.github.com/hyperledger-labs/weaver-dlt-interoperability" >> github.main.properties
+          
+          ./scripts/get-cordapps.sh || mv github.main.properties github.properties
+          
+          cat github.properties
+        working-directory: tests/network-setups/corda
+ 
+      - name: Generate github.properties (else)
+        if: ${{ github.event_name != 'pull_request' }}
+        run: |
+          echo "Using ${GITHUB_ACTOR} user."
+          echo "username=${GITHUB_ACTOR}" >> github.properties
+          echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.properties
+          echo "url=https://maven.pkg.github.com/hyperledger-labs/weaver-dlt-interoperability" >> github.properties
+          cat github.properties
+        working-directory: tests/network-setups/corda
+        
+      - name: Start Corda Network
+        run: |
+          sed -i "/docker logs corda_partya_1 -f/"' s/^/#/' "scripts/start-nodes.sh"
+          make start &> corda-net.out &
+        working-directory: tests/network-setups/corda
+      
+      # FABRIC NETWORK
+      # Use local InteropCC as Remote with go.mod instead of go.mod.local
+      - name: Setup interopcc
+        run: |
+          GOMODCACHE=`go env GOMODCACHE`
+          echo "GO MOD Path: ${GOMODCACHE}"
+          go get -d github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop
+          chmod +wr -R ${GOMODCACHE}
+          rm -rf ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop*/*
+          cp -r contracts/interop/* ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop*/
+          ls -lh ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop*
+        working-directory: core/network/fabric-interop-cc
       - name: Start Fabric Network
         run: make start-interop
         working-directory: tests/network-setups/fabric/dev

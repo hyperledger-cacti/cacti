@@ -1,0 +1,134 @@
+name: Deploy Corda Packages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'common/protos-java-kt/gradle.properties'
+      - 'core/network/corda-interop-app/gradle.properties'
+      - 'sdks/corda/gradle.properties'
+      - 'core/drivers/corda-driver/makefile.variables.docker'
+      
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  publish-protos:
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      
+      - name: Set up JDK 8
+        uses: actions/setup-java@v2
+        with:
+          java-version: '8'
+          distribution: 'adopt'
+          
+      - name: Generate github.properties
+        run: |
+          echo "Using ${GITHUB_ACTOR} user."
+          echo "username=${GITHUB_ACTOR}" >> github.properties
+          echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.properties
+          echo "url=https://maven.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/weaver-dlt-interoperability" >> github.properties
+          cat github.properties
+        working-directory: common/protos-java-kt
+        
+      - name: Build
+        run: make build
+        working-directory: common/protos-java-kt
+        
+      - name: Publish
+        run: make publish
+        working-directory: common/protos-java-kt
+        
+
+  publish-interop-app:
+    needs: publish-protos
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      
+      - name: Set up JDK 8
+        uses: actions/setup-java@v2
+        with:
+          java-version: '8'
+          distribution: 'adopt'
+          
+      - name: Generate github.properties
+        run: |
+          echo "Using ${GITHUB_ACTOR} user."
+          echo "username=${GITHUB_ACTOR}" >> github.properties
+          echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.properties
+          echo "url=https://maven.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/weaver-dlt-interoperability" >> github.properties
+          cat github.properties
+        working-directory: core/network/corda-interop-app
+        
+      - name: Build
+        run: make build
+        working-directory: core/network/corda-interop-app
+        
+      - name: Publish
+        run: make publish
+        working-directory: core/network/corda-interop-app
+        
+  publish-sdk:
+    needs: [publish-protos, publish-interop-app]
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      
+      - name: Set up JDK 8
+        uses: actions/setup-java@v2
+        with:
+          java-version: '8'
+          distribution: 'adopt'
+          
+      - name: Generate github.properties
+        run: |
+          echo "Using ${GITHUB_ACTOR} user."
+          echo "username=${GITHUB_ACTOR}" >> github.properties
+          echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.properties
+          echo "url=https://maven.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/weaver-dlt-interoperability" >> github.properties
+          cat github.properties
+        working-directory: sdks/corda
+        
+      - name: Build
+        run: make build
+        working-directory: sdks/corda
+        
+      - name: Publish
+        run: make publish
+        working-directory: sdks/corda
+    
+  publish-driver:
+    needs: [publish-protos, publish-interop-app]
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Generate github.properties
+        run: |
+          echo "Using ${GITHUB_ACTOR} user."
+          echo "username=${GITHUB_ACTOR}" >> github.properties
+          echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.properties
+          echo "url=https://maven.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/weaver-dlt-interoperability" >> github.properties
+          cat github.properties
+        working-directory: core/drivers/corda-driver
+          
+      - name: Build and Push
+        run: make push-image
+        working-directory: core/drivers/corda-driver
+          
+        

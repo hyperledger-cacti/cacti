@@ -1,0 +1,101 @@
+name: Deploy Fabric Packages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'common/protos-js/package.json'
+      - 'sdks/fabric/interoperation-node-sdk/package.json'
+      - 'core/drivers/fabric-driver/makefile.variables.docker'
+      
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  publish-protos:
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      
+      - name: Use Node.js 14.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14.x
+          
+      - name: Use Protoc 3.15
+        run: |
+          curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.15.6/protoc-3.15.6-linux-x86_64.zip
+          unzip protoc-3.15.6-linux-x86_64.zip -d protoc
+          
+      - name: Generate .npmrc
+        run: |
+          cp .npmrc.template .npmrc
+          sed -i "s/<personal-access-token>/${{ secrets.GITHUB_TOKEN }}/g" .npmrc
+          cat .npmrc
+        working-directory: common/protos-js
+        
+      - name: Build
+        run: |
+          export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
+          make build
+        working-directory: common/protos-js
+        
+      - name: Publish
+        run: make publish
+        working-directory: common/protos-js
+        
+  publish-sdk:
+    needs: [publish-protos]
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      
+      - name: Use Node.js 14.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14.x
+          
+      - name: Generate .npmrc
+        run: |
+          cp .npmrc.template .npmrc
+          sed -i "s/<personal-access-token>/${{ secrets.GITHUB_TOKEN }}/g" .npmrc
+          cat .npmrc
+        working-directory: sdks/fabric/interoperation-node-sdk
+        
+      - name: Build
+        run: make build
+        working-directory: sdks/fabric/interoperation-node-sdk
+        
+      - name: Publish
+        run: make publish
+        working-directory: sdks/fabric/interoperation-node-sdk
+    
+  publish-driver:
+    needs: [publish-protos]
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Generate .npmrc
+        run: |
+          cp .npmrc.template .npmrc
+          sed -i "s/<personal-access-token>/${{ secrets.GITHUB_TOKEN }}/g" .npmrc
+          cat .npmrc
+        working-directory: core/drivers/fabric-driver
+          
+      - name: Build and Push
+        run: make push-image
+        working-directory: core/drivers/fabric-driver
+          
+        

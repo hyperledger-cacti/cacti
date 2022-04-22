@@ -19,6 +19,15 @@ buildscript {
         github_password = ""
         github_url = ""
     }
+    if (file("$projectDir/./github.properties").exists()) {
+        Properties githubConsts = new Properties()
+        file("$projectDir/./github.properties").withInputStream { githubConsts.load(it) }
+        ext {
+            github_username = githubConsts.getProperty("username")
+            github_password = githubConsts.getProperty("password")
+            github_url = githubConsts.getProperty("url")
+        }
+    }
 
     repositories {
         mavenLocal()
@@ -54,12 +63,8 @@ allprojects {
         maven { url 'https://repo1.maven.org/maven2' }
         maven { url 'https://software.r3.com/artifactory/corda' }
         maven { url 'https://jitpack.io' }
-        if (file("$projectDir/./github.properties").exists()) {
-            Properties constants = new Properties()
-            file("$projectDir/./github.properties").withInputStream { constants.load(it) }
-            github_username = constants.getProperty("username")
-            github_password = constants.getProperty("password")
-            github_url = constants.getProperty("url")
+        if (github_url != "") {
+            println("Fetching Weaver packages from: $github_url")
             maven {
                 url github_url
                 credentials {
@@ -69,9 +74,9 @@ allprojects {
             }
         }
         else {
+            println("Fetching Locally built Weaver packages.")
             flatDir {
                 dirs '../../../common/protos-java-kt/build/libs'
-                dirs '../../../../common/protos-java-kt/build/libs'
             }
         }
     }
