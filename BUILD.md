@@ -93,10 +93,10 @@ The `npm run watch` script in action:
   * Windows Only
     * WSL2 or any virtual machine running Ubuntu 20.04 LTS
   * Git
-  * NodeJS v16.13.1, npm v8.1.2 (we recommend using the Node Version Manager (nvm) if available for your OS)
+  * NodeJS v16.14.2, npm v8.5.0 (we recommend using the Node Version Manager (nvm) if available for your OS)
     ```
-    nvm install 16.13.1
-    nvm use 16.13.1
+    nvm install 16.14.2
+    nvm use 16.14.2
     ```
   * Yarn 
     * `npm run install-yarn` (from within the project directory)
