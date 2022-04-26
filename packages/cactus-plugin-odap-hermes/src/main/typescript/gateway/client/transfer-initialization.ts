@@ -14,7 +14,8 @@ const log = LoggerProvider.getOrCreate({
 export async function sendTransferInitializationRequest(
   sessionID: string,
   odap: PluginOdapGateway,
-): Promise<void> {
+  remote: boolean,
+): Promise<void | TransferInitializationV1Request> {
   const fnTag = `${odap.className}#sendTransferInitializationRequest()`;
 
   const sessionData = odap.sessions.get(sessionID);
@@ -24,6 +25,8 @@ export async function sendTransferInitializationRequest(
     sessionData.id == undefined ||
     sessionData.step == undefined ||
     sessionData.version == undefined ||
+    sessionData.maxRetries == undefined ||
+    sessionData.maxTimeout == undefined ||
     sessionData.payloadProfile == undefined ||
     sessionData.loggingProfile == undefined ||
     sessionData.recipientBasePath == undefined ||
@@ -43,17 +46,6 @@ export async function sendTransferInitializationRequest(
     );
   }
 
-  await odap.storeOdapLog(
-    {
-      phase: "p1",
-      step: sessionData.step.toString(),
-      type: "init",
-      operation: "validate",
-      nodes: `${odap.pubKey}->${sessionData.recipientGatewayPubkey}`,
-    },
-    `${sessionData.id}-${sessionData.step.toString()}`,
-  );
-
   const initializationRequestMessage: TransferInitializationV1Request = {
     messageType: OdapMessageType.InitializationRequest,
     sessionID: sessionData.id,
@@ -64,25 +56,28 @@ export async function sendTransferInitializationRequest(
     applicationProfile: sessionData.applicationProfile,
     loggingProfile: sessionData.loggingProfile,
     accessControlProfile: sessionData.accessControlProfile,
-    clientSignature: "",
+    signature: "",
     sourceGatewayPubkey: odap.pubKey,
     sourceGatewayDltSystem: sessionData.sourceGatewayDltSystem,
     recipientGatewayPubkey: sessionData.recipientGatewayPubkey,
     recipientGatewayDltSystem: sessionData.recipientGatewayDltSystem,
     sequenceNumber: sessionData.lastSequenceNumber,
     sourceGatewayPath: sessionData.sourceBasePath,
+    recipientBasePath: sessionData.recipientBasePath,
     // escrow type
     // expiry time (related to the escrow)
     // multiple claims allowed
     // multiple cancels allowed
     // permissions
+    maxRetries: sessionData.maxRetries,
+    maxTimeout: sessionData.maxTimeout,
   };
 
-  const messageSignature = odap.bufArray2HexStr(
+  const messageSignature = PluginOdapGateway.bufArray2HexStr(
     odap.sign(JSON.stringify(initializationRequestMessage)),
   );
 
-  initializationRequestMessage.clientSignature = messageSignature;
+  initializationRequestMessage.signature = messageSignature;
 
   sessionData.initializationRequestMessageHash = SHA256(
     JSON.stringify(initializationRequestMessage),
@@ -92,15 +87,26 @@ export async function sendTransferInitializationRequest(
 
   odap.sessions.set(sessionID, sessionData);
 
+  await odap.storeOdapLog({
+    sessionID: sessionID,
+    type: "init",
+    operation: "validate",
+    data: JSON.stringify(sessionData),
+  });
+
   log.info(`${fnTag}, sending TransferInitializationRequest...`);
 
-  const response = await odap
-    .getOdapAPI(sessionData.recipientBasePath)
-    .phase1TransferInitiationRequestV1(initializationRequestMessage);
-
-  if (response.status != 200) {
-    throw new Error(`${fnTag}, TransferInitializationRequest message failed`);
+  if (!remote) {
+    return initializationRequestMessage;
   }
+
+  await odap.makeRequest(
+    sessionID,
+    PluginOdapGateway.getOdapAPI(
+      sessionData.recipientBasePath,
+    ).phase1TransferInitiationRequestV1(initializationRequestMessage),
+    "TransferInitializationRequest",
+  );
 }
 
 export async function checkValidInitializationResponse(
@@ -142,41 +148,21 @@ export async function checkValidInitializationResponse(
     );
   }
 
-  const transferInitiationResponseDataSignature = response.serverSignature;
-
-  const sourceServerSignature = new Uint8Array(
-    Buffer.from(transferInitiationResponseDataSignature, "hex"),
-  );
-
-  const sourceServerPubkey = new Uint8Array(
-    Buffer.from(sessionData.recipientGatewayPubkey, "hex"),
-  );
-
-  response.serverSignature = "";
-
-  if (
-    !odap.verifySignature(
-      JSON.stringify(response),
-      sourceServerSignature,
-      sourceServerPubkey,
-    )
-  ) {
+  if (!odap.verifySignature(response, sessionData.recipientGatewayPubkey)) {
     throw new Error(
       `${fnTag}, TransferInitializationResponse message signature verification failed`,
     );
   }
-
-  response.serverSignature = transferInitiationResponseDataSignature;
 
   storeSessionData(response, odap);
 
   log.info(`TransferInitializationResponse passed all checks.`);
 }
 
-async function storeSessionData(
+function storeSessionData(
   response: TransferInitializationV1Response,
   odap: PluginOdapGateway,
-): Promise<void> {
+): void {
   const fnTag = `${odap.className}#storeSessionData`;
   const sessionData = odap.sessions.get(response.sessionID);
 
@@ -188,8 +174,6 @@ async function storeSessionData(
 
   const serverIdentityPubkey = response.serverIdentityPubkey;
 
-  sessionData.step++;
-
   sessionData.id = response.sessionID;
 
   sessionData.recipientGatewayPubkey = serverIdentityPubkey;
@@ -198,10 +182,11 @@ async function storeSessionData(
     JSON.stringify(response),
   ).toString();
 
-  sessionData.serverSignatureInitializationResponseMessage =
-    response.serverSignature;
+  sessionData.serverSignatureInitializationResponseMessage = response.signature;
 
   sessionData.fabricAssetSize = "1";
+
+  sessionData.step = 3;
 
   odap.sessions.set(sessionData.id, sessionData);
 }

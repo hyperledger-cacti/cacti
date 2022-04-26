@@ -1,7 +1,10 @@
 import { randomInt } from "crypto";
 import { SHA256 } from "crypto-js";
 import { v4 as uuidV4 } from "uuid";
-import { checkValidCommitPreparationResponse } from "../../../../main/typescript/gateway/client/commit-preparation";
+import {
+  checkValidCommitPreparationResponse,
+  sendCommitPreparationRequest,
+} from "../../../../main/typescript/gateway/client/commit-preparation";
 import {
   OdapMessageType,
   PluginOdapGateway,
@@ -10,6 +13,9 @@ import {
   CommitPreparationV1Response,
   SessionData,
 } from "../../../../main/typescript/public-api";
+
+const MAX_RETRIES = 5;
+const MAX_TIMEOUT = 5000;
 
 const COMMIT_PREPARATION_REQUEST_MESSAGE_HASH =
   "dummyCommitPreparationRequestMessageHash";
@@ -22,7 +28,7 @@ let sequenceNumber: number;
 let sessionID: string;
 let step: number;
 
-beforeEach(() => {
+beforeEach(async () => {
   sourceGatewayConstructor = {
     name: "plugin-odap-gateway#sourceGateway",
     dltIDs: ["DLT2"],
@@ -37,6 +43,18 @@ beforeEach(() => {
   pluginSourceGateway = new PluginOdapGateway(sourceGatewayConstructor);
   pluginRecipientGateway = new PluginOdapGateway(recipientGatewayConstructor);
 
+  if (
+    pluginSourceGateway.database == undefined ||
+    pluginRecipientGateway.database == undefined
+  ) {
+    throw new Error("Database is not correctly initialized");
+  }
+
+  await pluginSourceGateway.database.migrate.rollback();
+  await pluginSourceGateway.database.migrate.latest();
+  await pluginRecipientGateway.database.migrate.rollback();
+  await pluginRecipientGateway.database.migrate.latest();
+
   sequenceNumber = randomInt(100);
   sessionID = uuidV4();
   step = 1;
@@ -48,6 +66,12 @@ beforeEach(() => {
     recipientGatewayPubkey: pluginRecipientGateway.pubKey,
     commitPrepareRequestMessageHash: COMMIT_PREPARATION_REQUEST_MESSAGE_HASH,
     lastSequenceNumber: sequenceNumber,
+    maxTimeout: 0,
+    maxRetries: 0,
+    rollbackProofs: [],
+    sourceBasePath: "",
+    recipientBasePath: "",
+    rollbackActionsPerformed: [],
   };
 
   pluginSourceGateway.sessions.set(sessionID, sessionData);
@@ -60,11 +84,11 @@ test("valid commit preparation response", async () => {
     serverIdentityPubkey: pluginRecipientGateway.pubKey,
     clientIdentityPubkey: pluginSourceGateway.pubKey,
     hashCommitPrep: COMMIT_PREPARATION_REQUEST_MESSAGE_HASH,
-    serverSignature: "",
+    signature: "",
     sequenceNumber: sequenceNumber,
   };
 
-  commitPreparationResponse.serverSignature = pluginRecipientGateway.bufArray2HexStr(
+  commitPreparationResponse.signature = PluginOdapGateway.bufArray2HexStr(
     await pluginRecipientGateway.sign(
       JSON.stringify(commitPreparationResponse),
     ),
@@ -84,13 +108,12 @@ test("valid commit preparation response", async () => {
   if (retrievedSessionData == undefined) throw new Error("Test Failed.");
 
   expect(retrievedSessionData.id).toBe(sessionID);
-  expect(retrievedSessionData.step).toBe(step + 1);
   expect(retrievedSessionData.commitPrepareResponseMessageHash).toBe(
     messageHash,
   );
   expect(
     retrievedSessionData.serverSignatureCommitPreparationResponseMessage,
-  ).toBe(commitPreparationResponse.serverSignature);
+  ).toBe(commitPreparationResponse.signature);
 });
 
 test("commit preparation response invalid because of wrong previous message hash", async () => {
@@ -100,11 +123,11 @@ test("commit preparation response invalid because of wrong previous message hash
     serverIdentityPubkey: pluginRecipientGateway.pubKey,
     clientIdentityPubkey: pluginSourceGateway.pubKey,
     hashCommitPrep: "wrongMessageHash",
-    serverSignature: "",
+    signature: "",
     sequenceNumber: sequenceNumber,
   };
 
-  commitPreparationResponse.serverSignature = pluginRecipientGateway.bufArray2HexStr(
+  commitPreparationResponse.signature = PluginOdapGateway.bufArray2HexStr(
     await pluginRecipientGateway.sign(
       JSON.stringify(commitPreparationResponse),
     ),
@@ -131,11 +154,11 @@ test("commit preparation response invalid because of wrong signature", async () 
     serverIdentityPubkey: pluginRecipientGateway.pubKey,
     clientIdentityPubkey: pluginSourceGateway.pubKey,
     hashCommitPrep: COMMIT_PREPARATION_REQUEST_MESSAGE_HASH,
-    serverSignature: "",
+    signature: "",
     sequenceNumber: sequenceNumber,
   };
 
-  commitPreparationResponse.serverSignature = pluginRecipientGateway.bufArray2HexStr(
+  commitPreparationResponse.signature = PluginOdapGateway.bufArray2HexStr(
     await pluginRecipientGateway.sign("somethingWrong"),
   );
 
@@ -149,4 +172,37 @@ test("commit preparation response invalid because of wrong signature", async () 
     .catch((ex: Error) =>
       expect(ex.message).toMatch("message signature verification failed"),
     );
+});
+
+test("timeout in commit preparation request because no server gateway is connected", async () => {
+  const sessionData: SessionData = {
+    id: sessionID,
+    step: 1,
+    maxRetries: MAX_RETRIES,
+    maxTimeout: MAX_TIMEOUT,
+    sourceBasePath: "",
+    recipientBasePath: "http://wrongpath",
+    lastSequenceNumber: 77,
+    sourceGatewayPubkey: pluginSourceGateway.pubKey,
+    recipientGatewayPubkey: pluginRecipientGateway.pubKey,
+    lockEvidenceResponseMessageHash: "dummyLockEvidenceResponseMessageHash",
+    lastMessageReceivedTimestamp: new Date().toString(),
+    rollbackProofs: [],
+    rollbackActionsPerformed: [],
+  };
+
+  pluginSourceGateway.sessions.set(sessionID, sessionData);
+
+  await sendCommitPreparationRequest(sessionID, pluginSourceGateway, true)
+    .then(() => {
+      throw new Error("Test Failed");
+    })
+    .catch((ex: Error) => {
+      expect(ex.message).toMatch("Timeout exceeded.");
+    });
+});
+
+afterEach(() => {
+  pluginSourceGateway.database?.destroy();
+  pluginRecipientGateway.database?.destroy();
 });

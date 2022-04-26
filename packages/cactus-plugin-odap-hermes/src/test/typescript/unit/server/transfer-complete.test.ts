@@ -22,7 +22,7 @@ let sessionData: SessionData;
 let sessionID: string;
 let sequenceNumber: number;
 
-beforeEach(() => {
+beforeEach(async () => {
   sourceGatewayConstructor = {
     name: "plugin-odap-gateway#sourceGateway",
     dltIDs: ["DLT2"],
@@ -36,6 +36,18 @@ beforeEach(() => {
 
   pluginSourceGateway = new PluginOdapGateway(sourceGatewayConstructor);
   pluginRecipientGateway = new PluginOdapGateway(recipientGatewayConstructor);
+
+  if (
+    pluginSourceGateway.database == undefined ||
+    pluginRecipientGateway.database == undefined
+  ) {
+    throw new Error("Database is not correctly initialized");
+  }
+
+  await pluginSourceGateway.database.migrate.rollback();
+  await pluginSourceGateway.database.migrate.latest();
+  await pluginRecipientGateway.database.migrate.rollback();
+  await pluginRecipientGateway.database.migrate.latest();
 
   dummyCommitFinalResponseMessageHash = SHA256(
     "commitFinalResponseMessageData",
@@ -56,6 +68,12 @@ beforeEach(() => {
     transferCommenceMessageRequestHash: dummyTransferCommenceResponseMessageHash,
     step: 2,
     lastSequenceNumber: sequenceNumber,
+    maxTimeout: 0,
+    maxRetries: 0,
+    rollbackProofs: [],
+    sourceBasePath: "",
+    recipientBasePath: "",
+    rollbackActionsPerformed: [],
   };
 
   pluginSourceGateway.sessions.set(sessionID, sessionData);
@@ -68,13 +86,13 @@ test("dummy test for transfer complete flow", async () => {
     messageType: OdapMessageType.TransferCompleteRequest,
     clientIdentityPubkey: pluginSourceGateway.pubKey,
     serverIdentityPubkey: pluginRecipientGateway.pubKey,
-    clientSignature: "",
+    signature: "",
     hashTransferCommence: dummyTransferCommenceResponseMessageHash,
     hashCommitFinalAck: dummyCommitFinalResponseMessageHash,
     sequenceNumber: sequenceNumber + 1,
   };
 
-  transferCompleteRequestMessage.clientSignature = pluginSourceGateway.bufArray2HexStr(
+  transferCompleteRequestMessage.signature = PluginOdapGateway.bufArray2HexStr(
     pluginSourceGateway.sign(JSON.stringify(transferCompleteRequestMessage)),
   );
 
@@ -84,4 +102,9 @@ test("dummy test for transfer complete flow", async () => {
   ).catch(() => {
     throw new Error("Test failed");
   });
+});
+
+afterEach(() => {
+  pluginSourceGateway.database?.destroy();
+  pluginRecipientGateway.database?.destroy();
 });

@@ -49,7 +49,7 @@ export class LockEvidenceRequestEndpointV1 implements IWebServiceEndpoint {
   public getPath(): string {
     const apiPath =
       OAS.paths[
-        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase2/lockevidencerequest"
+        "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase2/lockevidencerequest"
       ];
     return apiPath.post["x-hyperledger-cactus"].http.path;
   }
@@ -57,14 +57,14 @@ export class LockEvidenceRequestEndpointV1 implements IWebServiceEndpoint {
   public getVerbLowerCase(): string {
     const apiPath =
       OAS.paths[
-        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase2/lockevidencerequest"
+        "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase2/lockevidencerequest"
       ];
     return apiPath.post["x-hyperledger-cactus"].http.verbLowerCase;
   }
 
   public getOperationId(): string {
     return OAS.paths[
-      "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase2/lockevidencerequest"
+      "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase2/lockevidencerequest"
     ].post.operationId;
   }
 

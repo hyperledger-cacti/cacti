@@ -1,15 +1,27 @@
 # @hyperledger/cactus-plugin-odap-hermes
-The package provides `Cactus` a way to standardize cross-chain transactions between two ledgers (Fabric and Besu in this implementation). Using this we could perform:
-- Make unidirectional atomic asset transfer between 2 parties in different ledgers.
+The package provides `Cactus` a way to standardize cross-chain transactions between two ledgers (Fabric and Besu in this implementation). Using this we can perform:
+- A unidirectional atomic asset transfer between 2 parties in different ledgers.
 - Lock of the asset in the source ledger and proof is sent to the counterparty.
 - Extinguishment of the asset in the source blockchain and regeneration of the asset in the recipient blockchain.
+
+At the moment, we assume a crash-fault environment under some assumptions detailed in section [Assumptions](#assumptions)
 ## Summary
 
+  - [Assumptions](#assumptions)
   - [Getting Started](#getting-started)
   - [Architecture](#architecture)
   - [Use Case](#use-case)
   - [Running the tests](#running-the-tests)
   - [Usage](#usage)
+
+
+## Assumptions
+Regarding the crash recovery procedure in place, at the moment we only support crashes of gateways under certain assumptions detailed as follows:
+  - Gateways crash only after receiving a message (and before sending the next one)
+  - Gateways crash only after logging to the Log Storage the previously received message
+  - Gateways never loose their long term keys
+  - Gateways do not have byzantine behavior
+  - Gateways are assumed to always recover from a crash
 
 ## Getting Started
 
@@ -25,73 +37,133 @@ npm run configure
 
 Know how to use the following plugins of the project:
 
-- [cactus-plugin-ledger-connector-fabric](https://github.com/hyperledger/cactus/tree/main/packages/cactus-plugin-ledger-connector-fabric)
-- [cactus-plugin-ledger-connector-besu](https://github.com/hyperledger/cactus/tree/main/packages/cactus-plugin-ledger-connector-besu)
-- [cactus-plugin-object-store-ipfs](https://github.com/hyperledger/cactus/tree/main/extensions/cactus-plugin-object-store-ipfs)
+  - [cactus-plugin-ledger-connector-fabric](https://github.com/hyperledger/cactus/tree/main/packages/cactus-plugin-ledger-connector-fabric)
+  - [cactus-plugin-ledger-connector-besu](https://github.com/hyperledger/cactus/tree/main/packages/cactus-plugin-ledger-connector-besu)
+  - [cactus-plugin-object-store-ipfs](https://github.com/hyperledger/cactus/tree/main/extensions/cactus-plugin-object-store-ipfs)
 
 ## Architecture
 
-The sequence diagram of ODAP is pictured above.
+### Entities
+Firstly let us identify the different entities involved in the protocol and what is their function:
+- Two gateways in each side of the protocol: they implement endpoints to exchange the messages defined in the protocol.
+- Ledgers connectors in each side (each connected to a different gateway): they expose the API so that gateways can interact the respective ledgers (e.g., locking, deleting and creating assets).
+- SQLite3 database: persistent log and proofs storage in each gateway.
+- IPFS connector: is exposed the API so that both gateways have access to the same structure. This is used to store the hashes and signatures of the logs and proofs, so that accountability is guaranteed.
 
-![odap-sequence-diagram](https://mermaid.ink/img/eyJjb2RlIjoic2VxdWVuY2VEaWFncmFtXG4gICAgcGFydGljaXBhbnQgRW5kVXNlclxuICAgIHBhcnRpY2lwYW50IENsaWVudE9EQVBHYXRld2F5XG4gICAgcGFydGljaXBhbnQgSHlwZXJsZWRnZXJGYWJyaWNcbiAgICBwYXJ0aWNpcGFudCBTZXJ2ZXJPREFQR2F0ZXdheVxuICAgIHBhcnRpY2lwYW50IEh5cGVybGVkZ2VyQmVzdVxuICAgIEVuZFVzZXItPj5DbGllbnRPREFQR2F0ZXdheTogc2VuZCBjbGllbnQgcmVxdWVzdFxuICAgIENsaWVudE9EQVBHYXRld2F5LT4-U2VydmVyT0RBUEdhdGV3YXk6ICB0cmFuc2ZlciBpbml0aWF0aW9uIHJlcXVlc3RcbiAgICBTZXJ2ZXJPREFQR2F0ZXdheS0tPj5DbGllbnRPREFQR2F0ZXdheTogdHJhbnNmZXIgaW5pdGlhdGlvbiBhY2tcbiAgICBDbGllbnRPREFQR2F0ZXdheS0-PlNlcnZlck9EQVBHYXRld2F5OiAgdHJhbnNmZXIgY29tbWVuY2UgcmVxdWVzdFxuICAgIFNlcnZlck9EQVBHYXRld2F5LS0-PkNsaWVudE9EQVBHYXRld2F5OiB0cmFuc2ZlciBjb21tZW5jZSBhY2tcbiAgICBDbGllbnRPREFQR2F0ZXdheS0-Pkh5cGVybGVkZ2VyRmFicmljOiBsb2NrIGFzc2V0XG4gICAgSHlwZXJsZWRnZXJGYWJyaWMtLT4-Q2xpZW50T0RBUEdhdGV3YXk6IHRyYW5zYWN0aW9uIHJlY2VpcHQgZm9yIGxvY2tpbmcgYXNzZXRcbiAgICBDbGllbnRPREFQR2F0ZXdheS0-PlNlcnZlck9EQVBHYXRld2F5OiAgbG9jayBldmlkZW5jZSByZXF1ZXN0XG4gICAgU2VydmVyT0RBUEdhdGV3YXktPj5DbGllbnRPREFQR2F0ZXdheTogbG9jayBldmlkZW5jZSBhY2tcbiAgICBDbGllbnRPREFQR2F0ZXdheS0-PlNlcnZlck9EQVBHYXRld2F5OiAgY29tbWl0IHByZXBhcmUgcmVxdWVzdFxuICAgIFNlcnZlck9EQVBHYXRld2F5LS0-PkNsaWVudE9EQVBHYXRld2F5OiBjb21taXQgcHJlcGFyZSBhY2tcbiAgICBDbGllbnRPREFQR2F0ZXdheS0-Pkh5cGVybGVkZ2VyRmFicmljOiBkZWxldGUgYXNzZXRcbiAgICBIeXBlcmxlZGdlckZhYnJpYy0tPj5DbGllbnRPREFQR2F0ZXdheTogdHJhbnNhY3Rpb24gcmVjZWlwdCBmb3IgZGVsZXRpbmcgYXNzZXRcbiAgICBDbGllbnRPREFQR2F0ZXdheS0-PlNlcnZlck9EQVBHYXRld2F5OiAgY29tbWl0IGZpbmFsIHJlcXVlc3RcbiAgICBTZXJ2ZXJPREFQR2F0ZXdheS0-Pkh5cGVybGVkZ2VyQmVzdTogY3JlYXRlIGFzc2V0XG4gICAgSHlwZXJsZWRnZXJCZXN1LS0-PlNlcnZlck9EQVBHYXRld2F5OiB0cmFuc2FjdGlvbiByZWNlaXB0IGZvciBjcmVhdGluZyBhc3NldFxuICAgIFNlcnZlck9EQVBHYXRld2F5LS0-PkNsaWVudE9EQVBHYXRld2F5OiBjb21taXQgZmluYWwgYWNrXG4gICAgQ2xpZW50T0RBUEdhdGV3YXktPj5TZXJ2ZXJPREFQR2F0ZXdheTogIHRyYW5zZmVyIGNvbXBsZXRlXG4gICAgQ2xpZW50T0RBUEdhdGV3YXktLT4-RW5kVXNlcjogIHNlbmQgY2xpZW50IGFja1xuXG4iLCJtZXJtYWlkIjp7InRoZW1lIjoiZGVmYXVsdCJ9LCJ1cGRhdGVFZGl0b3IiOnRydWUsImF1dG9TeW5jIjp0cnVlLCJ1cGRhdGVEaWFncmFtIjp0cnVlfQ "odap-sequence-diagram")
+The sequence diagram of ODAP is pictured below.
+
+![odap-sequence-diagram](https://imgur.com/a/NN62LyL)
 
 ### API Endpoints
-This plugin uses OpenAPI to generate the API paths. At the moment, only the server endpoints are defined:
+This plugin uses OpenAPI to generate the API paths.
+There are Client and Server Endpoints for each type of message detailed in the ODAP protocol:
 
-- Phase1TransferInitiationV1
-- Phase2TransferCommenceV1
-- Phase2LockEvidenceV1
-- Phase3CommitPreparationV1
-- Phase3CommitFinalV1
-- Phase3TransferCompleteV1
-- SendClientRequestV1
+  - TransferInitializationV1Request
+  - TransferInitializationV1Response
+  - TransferCommenceV1Request
+  - TransferCommenceV1Response
+  - LockEvidenceV1Request
+  - LockEvidenceV1Response
+  - CommitPreparationV1Request
+  - CommitPreparationV1Response
+  - CommitFinalV1Request
+  - CommitFinalV1Response
+  - TransferCompleteV1Request
+  - ClientV1Request
+
+There are also defined the endpoints for the crash recovery procedure (there is still missing the endpoint to receive the Rollback mesage):
+  - RecoverV1Message
+  - RecoverUpdateV1Message
+  - RecoverUpdateAckV1Message
+  - RecoverSuccessV1Message
+  - RollbackV1Message
+
 ## Use case
 Alice and Bob, in blockchains A and B, respectively, want to make a transfer of an asset from one to the other. Gateway A represents the gateway connected to Alice's blockchain. Gateway B represents the gateway connected to Bob's blockchain. Alice and Bob will run ODAP, which will execute the transfer of the asset from blockchain A to blockchain B. The above endpoints will be called in sequence. Notice that the asset will first be locked on blockchain A and a proof is sent to the server-side. Afterward, the asset on the original blockchain is extinguished, followed by its regeneration on blockchain B.
 
 ## Running the tests
 
-A test with ledger connectors (Fabric and Besu):
+For developers that want to test separate steps/phases of the ODAP protocol, please refer to the following test files (client and server side along with the recovery procedure):
+
+https://github.com/hyperledger/cactus/tree/main/packages/cactus-plugin-odap-hermes/src/test/typescript/unit/
+
+A test of the entire protocol with manual calls to the methods, i.e. without ledger connectors and Open API:
+
+https://github.com/hyperledger/cactus/tree/main/packages/cactus-plugin-odap-hermes/src/test/typescript/integration/odap-test.ts
+
+A test of the entire protocol using Open API but with no ledger connectors:
+
+https://github.com/hyperledger/cactus/tree/main/packages/cactus-plugin-odap-hermes/src/test/typescript/integration/odap-api-call.test.ts
+
+A test of the entire protocol with ledger connectors (Fabric and Besu) and Open API:
 
 https://github.com/hyperledger/cactus/blob/main/packages/cactus-plugin-odap-hermes/src/test/typescript/integration/odap/odap-api-call-with-ledger-connector.test.ts
 
-Without ledger connectors:
+A test with a simulated crash of the client gateway after the transfer initiation flow:
 
-https://github.com/hyperledger/cactus/blob/main/packages/cactus-plugin-odap-hermes/src/test/typescript/integration/odap/odap-api-call.test.ts
+https://github.com/hyperledger/cactus/blob/main/packages/cactus-plugin-odap-hermes/src/test/typescript/integration/odap/client-crash-after-transfer-initiation.test.ts
 
-For developers who would want to test separate steps of odap please refer to other test files in:
+A test with a simulated crash of the client gateway after the lock of the asset in the source blockchain (Fabric):
 
-https://github.com/hyperledger/cactus/tree/main/packages/cactus-plugin-odap-hermes/src/test/typescript/integration/odap
+https://github.com/hyperledger/cactus/blob/main/packages/cactus-plugin-odap-hermes/src/test/typescript/integration/odap/client-crash-after-lock-asset.test.ts
+
+A test with a simulated crash of the client gateway after the deletion of the asset in the source blockchain (Fabric):
+
+https://github.com/hyperledger/cactus/blob/main/packages/cactus-plugin-odap-hermes/src/test/typescript/integration/odap/client-crash-after-delete-asset.test.ts
+
+A test with a simulated crash of the server gateway after the creation of the the asset in the recipient blockchain (Besu):
+
+https://github.com/hyperledger/cactus/blob/main/packages/cactus-plugin-odap-hermes/src/test/typescript/integration/odap/server-crash-after-create-asset.test.ts
+
+A test with a simulated crash of the server gateway after the transfer initiation flow:
+
+https://github.com/hyperledger/cactus/blob/main/packages/cactus-plugin-odap-hermes/src/test/typescript/integration/odap/server-crash-after-transfer-initiation.test.ts
+
+A test with a rollback after a timeout (client crashed):
+
+https://github.com/hyperledger/cactus/blob/main/packages/cactus-plugin-odap-hermes/src/test/typescript/integration/odap/odap-rollback.test.ts
 
 ## Usage
 
-Let us consider:
+Let us consider two gateways. The client gateway connected to Hyperledger Fabric and the server gateway connected to Hyperledger Besu. Let us also consider:
 
-- A Hyperledger Fabric API client on URL: http://localhost:8045
-- A Hyperledger Besu API client on URL: http://localhost:8046
-- An IPFS API client on URL: http://localhost:8047
+  - A Hyperledger Fabric API client on URL: http://localhost:8045
+  - A Hyperledger Besu API client on URL: http://localhost:8046
+  - An IPFS API client on URL: http://localhost:8047
+  - The local databases configuration provided in the file [knex.config.ts](https://github.com/hyperledger/cactus/blob/main/packages/cactus-plugin-odap-hermes/src/test/typescript/knex.config.ts) (if running locally both gateways will use the same database file so it is not advised to leave it as the default if that is the case)
 
-Then the ODAP gateway should be created as follows:
+Then the ODAP gateways should be created as follows:
 
-```
-const odapPluginOptions: OdapGatewayConstructorOptions = {
+```typescript
+const clientOdapPluginOptions: OdapGatewayConstructorOptions = {
      name: "cactus-plugin#odapGateway",
-     dltIDs: ["supported dlts here"],
+     dltIDs: ["DLT2"],
      instanceId: uuidV4(),    
-     ipfsPath: http://localhost:8047,  
-     besuAssetID: "whatever",
-     besuPath: http://localhost:8046,
-     besuWeb3SigningCredential:
-     besuWeb3SigningCredential,
-     besuContractName: besuContractName,
-     besuKeychainId: besuKeychainId,
-     fabricPath: http://localhost:8045,
+     ipfsPath: "http://localhost:8047",
+     fabricPath: "http://localhost:8045",
      fabricSigningCredential: fabricSigningCredential,
      fabricChannelName: fabricChannelName,
      fabricContractName: fabricContractName,
      fabricAssetID: fabricAssetID,
+     knexConfig: knexClientConnection, // if not specified the default will be used
+   };
+
+const serverOdapPluginOptions: OdapGatewayConstructorOptions = {
+     name: "cactus-plugin#odapGateway",
+     dltIDs: ["DLT1"],
+     instanceId: uuidV4(),    
+     ipfsPath: "http://localhost:8047",
+     besuAssetID: "whatever",
+     besuPath: "http://localhost:8046",
+     besuWeb3SigningCredential:
+     besuWeb3SigningCredential,
+     besuContractName: besuContractName,
+     besuKeychainId: besuKeychainId,
+     knexConfig: knexServerConnection, // if not specified the default will be used
    };
    
-   const odapGateway = new OdapGateway(odapPluginOptions);
+   const clientGateway = new OdapGateway(clientOdapPluginOptions);
+   const serverGateway = new OdapGateway(serverOdapPluginOptions);
 ```
 
 ## Contributing
@@ -101,6 +173,3 @@ Please review [CONTIRBUTING.md](https://github.com/hyperledger/cactus/blob/main/
 
 ## License
 This distribution is published under the Apache License Version 2.0 found in the [LICENSE ](https://github.com/hyperledger/cactus/blob/main/LICENSE "LICENSE ")file.
-
-
-

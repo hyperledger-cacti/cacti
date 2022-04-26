@@ -28,6 +28,9 @@ coverage/
 # next.js build output
 .next
 
+# sqlite database files
+**/*.sqlite3
+
 # vscode files
 .vscode/*
 !.vscode/template.launch.json

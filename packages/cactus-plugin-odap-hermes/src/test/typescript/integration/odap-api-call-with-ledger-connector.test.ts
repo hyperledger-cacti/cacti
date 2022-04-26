@@ -1,11 +1,9 @@
-import http from "http";
 import fs from "fs-extra";
+import "jest-extended";
+import http, { Server } from "http";
 import { Server as SocketIoServer } from "socket.io";
 import { AddressInfo } from "net";
-import secp256k1 from "secp256k1";
-import test, { Test } from "tape-promise/tape";
 import { v4 as uuidv4 } from "uuid";
-import { randomBytes } from "crypto";
 import { PluginObjectStoreIpfs } from "@hyperledger/cactus-plugin-object-store-ipfs";
 import { create } from "ipfs-http-client";
 import bodyParser from "body-parser";
@@ -20,7 +18,6 @@ import {
   Servers,
 } from "@hyperledger/cactus-common";
 import { DiscoveryOptions } from "fabric-network";
-
 import {
   Containers,
   FabricTestLedgerV1,
@@ -63,6 +60,9 @@ import {
   Web3SigningCredential,
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 import Web3 from "web3";
+import { knexClientConnection, knexServerConnection } from "../knex.config";
+import { makeSessionDataChecks } from "../make-checks";
+import { besuAssetExists, fabricAssetExists } from "../make-checks-ledgers";
 /**
  * Use this to debug issues with the fabric node SDK
  * ```sh
@@ -70,34 +70,107 @@ import Web3 from "web3";
  * ```
  */
 let ipfsApiHost: string;
-const testCase = "runs odap gateway tests via openApi";
+
 let fabricSigningCredential: FabricSigningCredential;
 const logLevel: LogLevelDesc = "TRACE";
+
+let ipfsServer: Server;
+let sourceGatewayServer: Server;
+let recipientGatewayServer: Server;
+let besuServer: Server;
+let fabricServer: Server;
+
+let ipfsContainer: GoIpfsTestContainer;
+
 let fabricLedger: FabricTestLedgerV1;
 let fabricContractName: string;
 let fabricChannelName: string;
 let fabricPath: string;
-let fabricAssetID: string;
-let ipfsContainer: GoIpfsTestContainer;
+
 let besuTestLedger: BesuTestLedger;
 let besuPath: string;
 let besuContractName: string;
 let besuWeb3SigningCredential: Web3SigningCredential;
 let besuKeychainId: string;
-const level = "INFO";
-const label = "fabric run transaction test";
-const log = LoggerProvider.getOrCreate({ level, label });
-log.info("setting up containers");
-test("BEFORE " + testCase, async (t: Test) => {
-  const pruning = pruneDockerAllIfGithubAction({ logLevel });
-  await t.doesNotReject(pruning, "Pruning didn't throw OK");
-  test.onFailure(async () => {
-    await Containers.logDiagnostics({ logLevel });
-  });
+
+let fabricConnector: PluginLedgerConnectorFabric;
+let besuConnector: PluginLedgerConnectorBesu;
+let pluginSourceGateway: PluginOdapGateway;
+let pluginRecipientGateway: PluginOdapGateway;
+
+let odapClientGatewayApiHost: string;
+let odapServerGatewayApiHost: string;
+
+const MAX_RETRIES = 5;
+const MAX_TIMEOUT = 5000;
+
+const FABRIC_ASSET_ID = uuidv4();
+const BESU_ASSET_ID = uuidv4();
+
+const log = LoggerProvider.getOrCreate({
+  level: "INFO",
+  label: "odapTestWithLedgerConnectors",
+});
+
+beforeAll(async () => {
+  pruneDockerAllIfGithubAction({ logLevel })
+    .then(() => {
+      log.info("Pruning throw OK");
+    })
+    .catch(async () => {
+      await Containers.logDiagnostics({ logLevel });
+      fail("Pruning didn't throw OK");
+    });
+
   {
+    // IPFS configuration
+    ipfsContainer = new GoIpfsTestContainer({ logLevel });
+    expect(ipfsContainer).not.toBeUndefined();
+
+    const container = await ipfsContainer.start();
+    expect(container).not.toBeUndefined();
+
+    const expressApp = express();
+    expressApp.use(bodyParser.json({ limit: "250mb" }));
+    ipfsServer = http.createServer(expressApp);
+    const listenOptions: IListenOptions = {
+      hostname: "localhost",
+      port: 0,
+      server: ipfsServer,
+    };
+
+    const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
+    const { address, port } = addressInfo;
+    ipfsApiHost = `http://${address}:${port}`;
+
+    const config = new Configuration({ basePath: ipfsApiHost });
+    const apiClient = new ObjectStoreIpfsApi(config);
+
+    expect(apiClient).not.toBeUndefined();
+
+    const ipfsApiUrl = await ipfsContainer.getApiUrl();
+
+    const ipfsClientOrOptions = create({
+      url: ipfsApiUrl,
+    });
+
+    const instanceId = uuidv4();
+    const pluginIpfs = new PluginObjectStoreIpfs({
+      parentDir: `/${uuidv4()}/${uuidv4()}/`,
+      logLevel,
+      instanceId,
+      ipfsClientOrOptions,
+    });
+
+    await pluginIpfs.getOrCreateWebServices();
+    await pluginIpfs.registerWebServices(expressApp);
+  }
+
+  {
+    // Fabric ledger connection
     const channelId = "mychannel";
-    const channelName = channelId;
-    fabricChannelName = channelName;
+    fabricChannelName = channelId;
+
     fabricLedger = new FabricTestLedgerV1({
       emitContainerLogs: true,
       publishAllPorts: true,
@@ -105,9 +178,12 @@ test("BEFORE " + testCase, async (t: Test) => {
       envVars: new Map([["FABRIC_VERSION", "2.2.0"]]),
       logLevel,
     });
+
     await fabricLedger.start();
+
     const connectionProfile = await fabricLedger.getConnectionProfileOrg1();
-    t.ok(connectionProfile, "getConnectionProfileOrg1() out truthy OK");
+    expect(connectionProfile).not.toBeUndefined();
+
     const enrollAdminOut = await fabricLedger.enrollAdmin();
     const adminWallet = enrollAdminOut[1];
     const [userIdentity] = await fabricLedger.enrollUser(adminWallet);
@@ -188,30 +264,30 @@ test("BEFORE " + testCase, async (t: Test) => {
         commitTimeout: 300,
       },
     };
-    const plugin = new PluginLedgerConnectorFabric(pluginOptions);
+
+    fabricConnector = new PluginLedgerConnectorFabric(pluginOptions);
 
     const expressApp = express();
     expressApp.use(bodyParser.json({ limit: "250mb" }));
-    const server = http.createServer(expressApp);
+    fabricServer = http.createServer(expressApp);
     const listenOptions: IListenOptions = {
       hostname: "localhost",
-      port: 0,
-      server,
+      port: 3000,
+      server: fabricServer,
     };
     const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
-    const { port } = addressInfo;
-    test.onFinish(async () => await Servers.shutdown(server));
+    const { address, port } = addressInfo;
 
-    await plugin.getOrCreateWebServices();
-    await plugin.registerWebServices(expressApp);
-    const apiUrl = `http://localhost:${port}`;
+    await fabricConnector.getOrCreateWebServices();
+    await fabricConnector.registerWebServices(expressApp);
+
+    const apiUrl = `http://${address}:${port}`;
     fabricPath = apiUrl;
     const config = new Configuration({ basePath: apiUrl });
 
     const apiClient = new FabricApi(config);
 
-    const contractName = "basic-asset-transfer-2";
-    fabricContractName = contractName;
+    fabricContractName = "basic-asset-transfer-2";
     const contractRelPath =
       "../fabric-contracts/lock-asset/chaincode-typescript";
     const contractDir = path.join(__dirname, contractRelPath);
@@ -279,12 +355,11 @@ test("BEFORE " + testCase, async (t: Test) => {
       });
     }
 
-    const res = await apiClient.deployContractV1({
+    const response = await apiClient.deployContractV1({
       channelId,
       ccVersion: "1.0.0",
-      // constructorArgs: { Args: ["john", "99"] },
       sourceFiles,
-      ccName: contractName,
+      ccName: fabricContractName,
       targetOrganizations: [org1Env, org2Env],
       caFile: `${orgCfgDir}ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem`,
       ccLabel: "basic-asset-transfer-2",
@@ -295,9 +370,10 @@ test("BEFORE " + testCase, async (t: Test) => {
       connTimeout: 60,
     });
 
-    const { packageIds, lifecycle, success } = res.data;
-    t.equal(res.status, 200, "res.status === 200 OK");
-    t.true(success, "res.data.success === true");
+    const { packageIds, lifecycle, success } = response.data;
+    expect(response.status).toBe(200);
+    expect(success).toBe(true);
+    expect(lifecycle).not.toBeUndefined();
 
     const {
       approveForMyOrgList,
@@ -339,78 +415,30 @@ test("BEFORE " + testCase, async (t: Test) => {
     // absolutely should not have timeouts like this, anywhere...
     await new Promise((resolve) => setTimeout(resolve, 10000));
 
-    const assetId = uuidv4();
     fabricSigningCredential = {
       keychainId,
       keychainRef: keychainEntryKey,
     };
-    fabricAssetID = assetId;
-    const createRes = await apiClient.runTransactionV1({
-      contractName,
-      channelName,
-      params: [assetId, "19"],
+
+    const createResponse = await apiClient.runTransactionV1({
+      contractName: fabricContractName,
+      channelName: fabricChannelName,
+      params: [FABRIC_ASSET_ID, "19"],
       methodName: "CreateAsset",
       invocationType: FabricContractInvocationType.Send,
       signingCredential: fabricSigningCredential,
     });
-    t.ok(createRes, "setRes truthy OK");
-    t.true(createRes.status > 199, "createRes status > 199 OK");
-    t.true(createRes.status < 300, "createRes status < 300 OK");
-    t.comment(
-      `BassicAssetTransfer.Create(): ${JSON.stringify(createRes.data)}`,
+
+    expect(createResponse).not.toBeUndefined();
+    expect(createResponse.status).toBeGreaterThan(199);
+    expect(createResponse.status).toBeLessThan(300);
+
+    log.info(
+      `BassicAssetTransfer.Create(): ${JSON.stringify(createResponse.data)}`,
     );
   }
-  ipfsContainer = new GoIpfsTestContainer({ logLevel });
-  t.ok(ipfsContainer, "GoIpfsTestContainer instance truthy OK");
   {
-    const container = await ipfsContainer.start();
-    t.ok(container, "Container returned by start() truthy OK");
-    t.ok(container, "Started GoIpfsTestContainer OK");
-
-    const expressApp = express();
-    expressApp.use(bodyParser.json({ limit: "250mb" }));
-    const server = http.createServer(expressApp);
-    const listenOptions: IListenOptions = {
-      hostname: "localhost",
-      port: 0,
-      server,
-    };
-    const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
-    test.onFinish(async () => await Servers.shutdown(server));
-    const { address, port } = addressInfo;
-    const apiHost = `http://${address}:${port}`;
-    ipfsApiHost = apiHost;
-    const config = new Configuration({ basePath: apiHost });
-    const apiClient = new ObjectStoreIpfsApi(config);
-    t.ok(apiClient, "ObjectStoreIpfsApi truthy OK");
-
-    const ipfsApiUrl = await ipfsContainer.getApiUrl();
-    const ipfsGatewayUrl = await ipfsContainer.getWebGatewayUrl();
-    t.comment(`Go IPFS Test Container API URL: ${ipfsApiUrl}`);
-    t.comment(`Go IPFS Test Container Gateway URL: ${ipfsGatewayUrl}`);
-
-    const ipfsClientOrOptions = create({
-      url: ipfsApiUrl,
-    });
-    const instanceId = uuidv4();
-    const plugin = new PluginObjectStoreIpfs({
-      parentDir: `/${uuidv4()}/${uuidv4()}/`,
-      logLevel,
-      instanceId,
-      ipfsClientOrOptions,
-    });
-
-    await plugin.getOrCreateWebServices();
-    await plugin.registerWebServices(expressApp);
-
-    const packageName = plugin.getPackageName();
-    t.ok(packageName, "packageName truthy OK");
-
-    const theInstanceId = plugin.getInstanceId();
-    t.ok(theInstanceId, "theInstanceId truthy OK");
-    t.equal(theInstanceId, instanceId, "instanceId === theInstanceId OK");
-  }
-  {
+    // Besu ledger connection
     besuTestLedger = new BesuTestLedger();
     await besuTestLedger.start();
 
@@ -445,37 +473,38 @@ test("BEFORE " + testCase, async (t: Test) => {
       LockAssetContractJson.contractName,
       JSON.stringify(LockAssetContractJson),
     );
+
     const factory = new PluginFactoryLedgerConnector({
       pluginImportType: PluginImportType.Local,
     });
-    const connector: PluginLedgerConnectorBesu = await factory.create({
+
+    besuConnector = await factory.create({
       rpcApiHttpHost,
       rpcApiWsHost,
       instanceId: uuidv4(),
       pluginRegistry: new PluginRegistry({ plugins: [keychainPlugin] }),
     });
-    await connector.onPluginInit();
+
     const expressApp = express();
     expressApp.use(bodyParser.json({ limit: "250mb" }));
-    const server = http.createServer(expressApp);
+    besuServer = http.createServer(expressApp);
     const listenOptions: IListenOptions = {
       hostname: "localhost",
-      port: 0,
-      server,
+      port: 4000,
+      server: besuServer,
     };
-    const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
-    const { port } = addressInfo;
-    test.onFinish(async () => await Servers.shutdown(server));
 
-    await connector.getOrCreateWebServices();
-    const wsApi = new SocketIoServer(server, {
+    const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
+    const { address, port } = addressInfo;
+
+    await besuConnector.getOrCreateWebServices();
+    const wsApi = new SocketIoServer(besuServer, {
       path: Constants.SocketIoConnectionPathV1,
     });
-    await connector.registerWebServices(expressApp, wsApi);
-    const apiUrl = `http://localhost:${port}`;
-    // eslint-disable-next-line prefer-const
-    besuPath = apiUrl;
-    await connector.transact({
+    await besuConnector.registerWebServices(expressApp, wsApi);
+    besuPath = `http://${address}:${port}`;
+
+    await besuConnector.transact({
       web3SigningCredential: {
         ethAccount: firstHighNetWorthAccount,
         secret: besuKeyPair.privateKey,
@@ -494,15 +523,16 @@ test("BEFORE " + testCase, async (t: Test) => {
     });
 
     const balance = await web3.eth.getBalance(testEthAccount.address);
-    t.ok(balance, "Retrieved balance of test account OK");
-    t.equals(parseInt(balance, 10), 10e9, "Balance of test account is OK");
-    // eslint-disable-next-line prefer-const
+    expect(balance).not.toBeUndefined();
+    expect(parseInt(balance, 10)).toBe(10e9);
+
     besuWeb3SigningCredential = {
       ethAccount: firstHighNetWorthAccount,
       secret: besuKeyPair.privateKey,
       type: Web3SigningCredentialType.PrivateKeyHex,
     };
-    const deployOut = await connector.deployContract({
+
+    const deployContractResponse = await besuConnector.deployContract({
       keychainId: keychainPlugin.getKeychainId(),
       contractName: LockAssetContractJson.contractName,
       contractAbi: LockAssetContractJson.abi,
@@ -511,145 +541,204 @@ test("BEFORE " + testCase, async (t: Test) => {
       bytecode: LockAssetContractJson.bytecode,
       gas: 1000000,
     });
+
+    expect(deployContractResponse).not.toBeUndefined();
+    expect(deployContractResponse.transactionReceipt).not.toBeUndefined();
+    expect(
+      deployContractResponse.transactionReceipt.contractAddress,
+    ).not.toBeUndefined();
+
     besuKeychainId = keychainPlugin.getKeychainId();
     besuContractName = LockAssetContractJson.contractName;
-    t.ok(deployOut, "deployContract() output is truthy OK");
-    t.ok(
-      deployOut.transactionReceipt,
-      "deployContract() output.transactionReceipt is truthy OK",
-    );
-    t.ok(
-      deployOut.transactionReceipt.contractAddress,
-      "deployContract() output.transactionReceipt.contractAddress is truthy OK",
-    );
 
-    const contractAddress: string = deployOut.transactionReceipt
+    const contractAddress: string = deployContractResponse.transactionReceipt
       .contractAddress as string;
-    t.ok(
-      typeof contractAddress === "string",
-      "contractAddress typeof string OK",
-    );
-    t.end();
+
+    expect(typeof contractAddress).toBe("string");
   }
-});
 
-test(testCase, async (t: Test) => {
-  //const logLevel: LogLevelDesc = "TRACE";
-  test.onFinish(async () => {
-    await ipfsContainer.stop();
-    await ipfsContainer.destroy();
-    await besuTestLedger.stop();
-    await besuTestLedger.destroy();
-  });
-  const tearDown = async () => {
-    await fabricLedger.stop();
-    await fabricLedger.destroy();
-    await pruneDockerAllIfGithubAction({ logLevel });
-  };
-
-  test.onFinish(tearDown);
-  const odapClientGatewayPluginID = uuidv4();
-  const odapPluginOptions: IPluginOdapGatewayConstructorOptions = {
-    name: "cactus-plugin#odapGateway",
-    dltIDs: ["dummy"],
-    instanceId: odapClientGatewayPluginID,
-    ipfsPath: ipfsApiHost,
-    fabricPath: fabricPath,
-    fabricSigningCredential: fabricSigningCredential,
-    fabricChannelName: fabricChannelName,
-    fabricContractName: fabricContractName,
-    fabricAssetID: fabricAssetID,
-  };
-  const clientOdapGateway = new PluginOdapGateway(odapPluginOptions);
-
-  const odapServerGatewayInstanceID = uuidv4();
-  // the block below adds the server odap gateway to the plugin registry
-  let odapServerGatewayPubKey: string;
-  let odapServerGatewayApiHost: string;
   {
-    const expressApp = express();
-    expressApp.use(bodyParser.json({ limit: "250mb" }));
-    const server = http.createServer(expressApp);
-    const listenOptions: IListenOptions = {
-      hostname: "localhost",
-      port: 0,
-      server,
-    };
-    const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
-    test.onFinish(async () => await Servers.shutdown(server));
-    const { address, port } = addressInfo;
-    odapServerGatewayApiHost = `http://${address}:${port}`;
-    const odapPluginOptions: IPluginOdapGatewayConstructorOptions = {
+    // Gateways configuration
+    const odapClientGatewayPluginOptions: IPluginOdapGatewayConstructorOptions = {
       name: "cactus-plugin#odapGateway",
-      dltIDs: ["dummy"],
-      instanceId: odapServerGatewayInstanceID,
+      dltIDs: ["DLT2"],
+      instanceId: uuidv4(),
       ipfsPath: ipfsApiHost,
-      besuAssetID: "whatever",
+      fabricPath: fabricPath,
+      fabricSigningCredential: fabricSigningCredential,
+      fabricChannelName: fabricChannelName,
+      fabricContractName: fabricContractName,
+      fabricAssetID: FABRIC_ASSET_ID,
+      knexConfig: knexClientConnection,
+    };
+
+    const odapServerGatewayPluginOptions: IPluginOdapGatewayConstructorOptions = {
+      name: "cactus-plugin#odapGateway",
+      dltIDs: ["DLT1"],
+      instanceId: uuidv4(),
+      ipfsPath: ipfsApiHost,
+      besuAssetID: BESU_ASSET_ID,
       besuPath: besuPath,
       besuWeb3SigningCredential: besuWeb3SigningCredential,
       besuContractName: besuContractName,
       besuKeychainId: besuKeychainId,
+      knexConfig: knexServerConnection,
     };
 
-    const plugin = new PluginOdapGateway(odapPluginOptions);
-    odapServerGatewayPubKey = plugin.pubKey;
-    await plugin.getOrCreateWebServices();
-    await plugin.registerWebServices(expressApp);
+    pluginSourceGateway = new PluginOdapGateway(odapClientGatewayPluginOptions);
+    pluginRecipientGateway = new PluginOdapGateway(
+      odapServerGatewayPluginOptions,
+    );
+
+    if (
+      pluginSourceGateway.database == undefined ||
+      pluginRecipientGateway.database == undefined
+    ) {
+      throw new Error("Database is not correctly initialized");
+    }
+
+    await pluginSourceGateway.database.migrate.rollback();
+    await pluginSourceGateway.database.migrate.latest();
+    await pluginRecipientGateway.database.migrate.rollback();
+    await pluginRecipientGateway.database.migrate.latest();
   }
   {
+    // Server Gateway configuration
     const expressApp = express();
     expressApp.use(bodyParser.json({ limit: "250mb" }));
-    const server = http.createServer(expressApp);
+    recipientGatewayServer = http.createServer(expressApp);
     const listenOptions: IListenOptions = {
       hostname: "localhost",
-      port: 0,
-      server,
+      port: 5000,
+      server: recipientGatewayServer,
     };
+
     const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
-    test.onFinish(async () => await Servers.shutdown(server));
+
     const { address, port } = addressInfo;
-    const apiHost = `http://${address}:${port}`;
-    const apiConfig = new Configuration({ basePath: apiHost });
-    const apiClient = new OdapApi(apiConfig);
-    await clientOdapGateway.getOrCreateWebServices();
-    await clientOdapGateway.registerWebServices(expressApp);
-    let dummyPrivKeyBytes = randomBytes(32);
-    while (!secp256k1.privateKeyVerify(dummyPrivKeyBytes)) {
-      dummyPrivKeyBytes = randomBytes(32);
-    }
-    const dummyPubKeyBytes = secp256k1.publicKeyCreate(dummyPrivKeyBytes);
-    const dummyPubKey = clientOdapGateway.bufArray2HexStr(dummyPubKeyBytes);
-    const expiryDate = new Date("23/25/2060").toString();
-    const assetProfile: AssetProfile = { expirationDate: expiryDate };
-    const odapClientRequest: ClientV1Request = {
-      clientGatewayConfiguration: {
-        apiHost: apiHost,
-      },
-      serverGatewayConfiguration: {
-        apiHost: odapServerGatewayApiHost,
-      },
-      version: "0.0.0",
-      loggingProfile: "dummy",
-      accessControlProfile: "dummy",
-      applicationProfile: "dummy",
-      payloadProfile: {
-        assetProfile: assetProfile,
-        capabilities: "",
-      },
-      assetProfile: assetProfile,
-      assetControlProfile: "dummy",
-      beneficiaryPubkey: dummyPubKey,
-      clientDltSystem: "dummy",
-      clientIdentityPubkey: clientOdapGateway.pubKey,
-      originatorPubkey: dummyPubKey,
-      recipientGatewayDltSystem: "dummy",
-      recipientGatewayPubkey: odapServerGatewayPubKey,
-      serverDltSystem: "dummy",
-      serverIdentityPubkey: dummyPubKey,
-      sourceGatewayDltSystem: "dummy",
-    };
-    const res = await apiClient.clientRequestV1(odapClientRequest);
-    t.ok(res);
+    odapServerGatewayApiHost = `http://${address}:${port}`;
+
+    await pluginRecipientGateway.getOrCreateWebServices();
+    await pluginRecipientGateway.registerWebServices(expressApp);
   }
-  t.end();
+  {
+    // Client Gateway configuration
+    const expressApp = express();
+    expressApp.use(bodyParser.json({ limit: "250mb" }));
+    sourceGatewayServer = http.createServer(expressApp);
+    const listenOptions: IListenOptions = {
+      hostname: "localhost",
+      port: 3001,
+      server: sourceGatewayServer,
+    };
+
+    const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
+
+    const { address, port } = addressInfo;
+    odapClientGatewayApiHost = `http://${address}:${port}`;
+
+    await pluginSourceGateway.getOrCreateWebServices();
+    await pluginSourceGateway.registerWebServices(expressApp);
+  }
+});
+
+test("runs ODAP between two gateways via openApi", async () => {
+  const odapApiConfig = new Configuration({
+    basePath: odapClientGatewayApiHost,
+  });
+  const apiClient = new OdapApi(odapApiConfig);
+
+  const expiryDate = new Date(2060, 11, 24).toString();
+  const assetProfile: AssetProfile = { expirationDate: expiryDate };
+
+  const odapClientRequest: ClientV1Request = {
+    clientGatewayConfiguration: {
+      apiHost: odapClientGatewayApiHost,
+    },
+    serverGatewayConfiguration: {
+      apiHost: odapServerGatewayApiHost,
+    },
+    version: "0.0.0",
+    loggingProfile: "dummyLoggingProfile",
+    accessControlProfile: "dummyAccessControlProfile",
+    applicationProfile: "dummyApplicationProfile",
+    payloadProfile: {
+      assetProfile: assetProfile,
+      capabilities: "",
+    },
+    assetProfile: assetProfile,
+    assetControlProfile: "dummyAssetControlProfile",
+    beneficiaryPubkey: "dummyPubKey",
+    clientDltSystem: "DLT1",
+    originatorPubkey: "dummyPubKey",
+    recipientGatewayDltSystem: "DLT2",
+    recipientGatewayPubkey: pluginRecipientGateway.pubKey,
+    serverDltSystem: "DLT2",
+    sourceGatewayDltSystem: "DLT1",
+    clientIdentityPubkey: "",
+    serverIdentityPubkey: "",
+    maxRetries: MAX_RETRIES,
+    maxTimeout: MAX_TIMEOUT,
+  };
+
+  const res = await apiClient.clientRequestV1(odapClientRequest);
+  expect(res.status).toBe(200);
+
+  expect(pluginSourceGateway.sessions.size).toBe(1);
+  expect(pluginRecipientGateway.sessions.size).toBe(1);
+
+  const [sessionID] = pluginSourceGateway.sessions.keys();
+
+  await makeSessionDataChecks(
+    pluginSourceGateway,
+    pluginRecipientGateway,
+    sessionID,
+  );
+
+  expect(
+    await fabricAssetExists(
+      pluginSourceGateway,
+      fabricContractName,
+      fabricChannelName,
+      FABRIC_ASSET_ID,
+      fabricSigningCredential,
+    ),
+  ).toBe(false);
+
+  expect(
+    await besuAssetExists(
+      pluginRecipientGateway,
+      besuContractName,
+      besuKeychainId,
+      BESU_ASSET_ID,
+      besuWeb3SigningCredential,
+    ),
+  ).toBe(true);
+});
+
+afterAll(async () => {
+  await ipfsContainer.stop();
+  await ipfsContainer.destroy();
+  await fabricLedger.stop();
+  await fabricLedger.destroy();
+  await besuTestLedger.stop();
+  await besuTestLedger.destroy();
+
+  pluginSourceGateway.database?.destroy();
+  pluginRecipientGateway.database?.destroy();
+
+  await Servers.shutdown(ipfsServer);
+  await Servers.shutdown(besuServer);
+  await Servers.shutdown(fabricServer);
+  await Servers.shutdown(sourceGatewayServer);
+  await Servers.shutdown(recipientGatewayServer);
+
+  await pruneDockerAllIfGithubAction({ logLevel })
+    .then(() => {
+      log.info("Pruning throw OK");
+    })
+    .catch(async () => {
+      await Containers.logDiagnostics({ logLevel });
+      fail("Pruning didn't throw OK");
+    });
 });

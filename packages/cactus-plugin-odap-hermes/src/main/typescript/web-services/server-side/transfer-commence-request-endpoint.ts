@@ -24,7 +24,7 @@ export interface ITransferCommenceRequestEndpointOptions {
 }
 
 export class TransferCommenceRequestEndpointV1 implements IWebServiceEndpoint {
-  public static readonly CLASS_NAME = "LockEvidencePrepareEndpointV1";
+  public static readonly CLASS_NAME = "TransferCommenceRequestEndpointV1";
 
   private readonly log: Logger;
 
@@ -47,7 +47,7 @@ export class TransferCommenceRequestEndpointV1 implements IWebServiceEndpoint {
   public getPath(): string {
     const apiPath =
       OAS.paths[
-        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase2/transfercommencerequest"
+        "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase2/transfercommencerequest"
       ];
     return apiPath.post["x-hyperledger-cactus"].http.path;
   }
@@ -55,14 +55,14 @@ export class TransferCommenceRequestEndpointV1 implements IWebServiceEndpoint {
   public getVerbLowerCase(): string {
     const apiPath =
       OAS.paths[
-        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase2/transfercommencerequest"
+        "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase2/transfercommencerequest"
       ];
     return apiPath.post["x-hyperledger-cactus"].http.verbLowerCase;
   }
 
   public getOperationId(): string {
     return OAS.paths[
-      "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase2/transfercommencerequest"
+      "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase2/transfercommencerequest"
     ].post.operationId;
   }
 

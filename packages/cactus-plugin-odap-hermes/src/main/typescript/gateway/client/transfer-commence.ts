@@ -14,7 +14,8 @@ const log = LoggerProvider.getOrCreate({
 export async function sendTransferCommenceRequest(
   sessionID: string,
   odap: PluginOdapGateway,
-): Promise<void> {
+  remote: boolean,
+): Promise<void | TransferCommenceV1Request> {
   const fnTag = `${odap.className}#sendTransferCommenceRequest()`;
 
   const sessionData = odap.sessions.get(sessionID);
@@ -22,10 +23,12 @@ export async function sendTransferCommenceRequest(
   if (
     sessionData == undefined ||
     sessionData.step == undefined ||
+    sessionData.maxTimeout == undefined ||
+    sessionData.maxRetries == undefined ||
     sessionData.assetProfile == undefined ||
     sessionData.recipientBasePath == undefined ||
-    sessionData.originatorPubkey == undefined ||
-    sessionData.beneficiaryPubkey == undefined ||
+    // sessionData.originatorPubkey == undefined ||
+    // sessionData.beneficiaryPubkey == undefined ||
     sessionData.lastSequenceNumber == undefined ||
     sessionData.sourceGatewayPubkey == undefined ||
     sessionData.recipientGatewayPubkey == undefined ||
@@ -36,25 +39,16 @@ export async function sendTransferCommenceRequest(
     throw new Error(`${fnTag}, session data is not correctly initialized`);
   }
 
-  await odap.storeOdapLog(
-    {
-      phase: "p2",
-      step: sessionData.step.toString(),
-      type: "init",
-      operation: "commence",
-      nodes: `${odap.pubKey}->${sessionData.recipientGatewayPubkey}`,
-    },
-    `${sessionData.id}-${sessionData.step.toString()}`,
-  );
-
   const hashAssetProfile = SHA256(
     JSON.stringify(sessionData.assetProfile),
   ).toString();
 
   const transferCommenceRequestMessage: TransferCommenceV1Request = {
     messageType: OdapMessageType.TransferCommenceRequest,
-    originatorPubkey: sessionData.originatorPubkey,
-    beneficiaryPubkey: sessionData.beneficiaryPubkey,
+    // originatorPubkey: sessionData.originatorPubkey,
+    // beneficiaryPubkey: sessionData.beneficiaryPubkey,
+    originatorPubkey: "sessionData.originatorPubkey",
+    beneficiaryPubkey: "sessionData.beneficiaryPubkey",
     senderDltSystem: sessionData.sourceGatewayDltSystem,
     recipientDltSystem: sessionData.recipientGatewayDltSystem,
     sessionID: sessionID,
@@ -63,15 +57,15 @@ export async function sendTransferCommenceRequest(
     hashAssetProfile: hashAssetProfile,
     hashPrevMessage: sessionData.initializationResponseMessageHash,
     // clientTransferNumber
-    clientSignature: "",
+    signature: "",
     sequenceNumber: ++sessionData.lastSequenceNumber,
   };
 
-  const messageSignature = odap.bufArray2HexStr(
+  const messageSignature = PluginOdapGateway.bufArray2HexStr(
     odap.sign(JSON.stringify(transferCommenceRequestMessage)),
   );
 
-  transferCommenceRequestMessage.clientSignature = messageSignature;
+  transferCommenceRequestMessage.signature = messageSignature;
 
   sessionData.transferCommenceMessageRequestHash = SHA256(
     JSON.stringify(transferCommenceRequestMessage),
@@ -81,15 +75,26 @@ export async function sendTransferCommenceRequest(
 
   odap.sessions.set(sessionID, sessionData);
 
+  await odap.storeOdapLog({
+    sessionID: sessionID,
+    type: "init",
+    operation: "commence",
+    data: JSON.stringify(sessionData),
+  });
+
   log.info(`${fnTag}, sending TransferCommenceRequest...`);
 
-  const response = await odap
-    .getOdapAPI(sessionData.recipientBasePath)
-    .phase2TransferCommenceRequestV1(transferCommenceRequestMessage);
-
-  if (response.status != 200) {
-    throw new Error(`${fnTag}, TransferCommenceRequest message failed`);
+  if (!remote) {
+    return transferCommenceRequestMessage;
   }
+
+  await odap.makeRequest(
+    sessionID,
+    PluginOdapGateway.getOdapAPI(
+      sessionData.recipientBasePath,
+    ).phase2TransferCommenceRequestV1(transferCommenceRequestMessage),
+    "TransferCommenceRequest",
+  );
 }
 
 export async function checkValidTransferCommenceResponse(
@@ -137,31 +142,11 @@ export async function checkValidTransferCommenceResponse(
     );
   }
 
-  const transferCommenceResponseDataSignature = response.serverSignature;
-
-  const sourceServerSignature = new Uint8Array(
-    Buffer.from(transferCommenceResponseDataSignature, "hex"),
-  );
-
-  const sourceServerPubkey = new Uint8Array(
-    Buffer.from(sessionData.recipientGatewayPubkey, "hex"),
-  );
-
-  response.serverSignature = "";
-
-  if (
-    !odap.verifySignature(
-      JSON.stringify(response),
-      sourceServerSignature,
-      sourceServerPubkey,
-    )
-  ) {
+  if (!odap.verifySignature(response, sessionData.recipientGatewayPubkey)) {
     throw new Error(
       `${fnTag}, TransferCommenceResponse message signature verification failed`,
     );
   }
-
-  response.serverSignature = transferCommenceResponseDataSignature;
 
   storeSessionData(response, odap);
 
@@ -185,14 +170,14 @@ function storeSessionData(
     );
   }
 
-  sessionData.step++;
-
   sessionData.transferCommenceMessageResponseHash = SHA256(
     JSON.stringify(response),
   ).toString();
 
   sessionData.serverSignatureTransferCommenceResponseMessage =
-    response.serverSignature;
+    response.signature;
+
+  sessionData.step = 5;
 
   odap.sessions.set(sessionData.id, sessionData);
 }

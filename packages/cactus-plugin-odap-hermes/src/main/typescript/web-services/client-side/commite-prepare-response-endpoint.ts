@@ -49,7 +49,7 @@ export class CommitPreparationResponseEndpointV1
   public getPath(): string {
     const apiPath =
       OAS.paths[
-        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase3/commitpreparationresponse"
+        "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase3/commitpreparationresponse"
       ];
     return apiPath.post["x-hyperledger-cactus"].http.path;
   }
@@ -57,14 +57,14 @@ export class CommitPreparationResponseEndpointV1
   public getVerbLowerCase(): string {
     const apiPath =
       OAS.paths[
-        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase3/commitpreparationresponse"
+        "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase3/commitpreparationresponse"
       ];
     return apiPath.post["x-hyperledger-cactus"].http.verbLowerCase;
   }
 
   public getOperationId(): string {
     return OAS.paths[
-      "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase3/commitpreparationresponse"
+      "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase3/commitpreparationresponse"
     ].post.operationId;
   }
 

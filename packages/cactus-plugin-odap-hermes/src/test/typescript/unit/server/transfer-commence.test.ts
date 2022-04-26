@@ -11,7 +11,13 @@ import {
 } from "../../../../main/typescript/generated/openapi/typescript-axios/api";
 import { v4 as uuidV4 } from "uuid";
 import { SHA256 } from "crypto-js";
-import { checkValidtransferCommenceRequest } from "../../../../main/typescript/gateway/server/transfer-commence";
+import {
+  checkValidtransferCommenceRequest,
+  sendTransferCommenceResponse,
+} from "../../../../main/typescript/gateway/server/transfer-commence";
+
+const MAX_RETRIES = 5;
+const MAX_TIMEOUT = 5000;
 
 let sourceGatewayConstructor: IPluginOdapGatewayConstructorOptions;
 let recipientGatewayConstructor: IPluginOdapGatewayConstructorOptions;
@@ -25,7 +31,7 @@ let sessionData: SessionData;
 let sessionID: string;
 let sequenceNumber: number;
 
-beforeEach(() => {
+beforeEach(async () => {
   sourceGatewayConstructor = {
     name: "plugin-odap-gateway#sourceGateway",
     dltIDs: ["DLT2"],
@@ -40,9 +46,24 @@ beforeEach(() => {
   pluginSourceGateway = new PluginOdapGateway(sourceGatewayConstructor);
   pluginRecipientGateway = new PluginOdapGateway(recipientGatewayConstructor);
 
+  if (
+    pluginSourceGateway.database == undefined ||
+    pluginRecipientGateway.database == undefined
+  ) {
+    throw new Error("Database is not correctly initialized");
+  }
+
+  await pluginSourceGateway.database.migrate.rollback();
+  await pluginSourceGateway.database.migrate.latest();
+  await pluginRecipientGateway.database.migrate.rollback();
+  await pluginRecipientGateway.database.migrate.latest();
+
   dummyInitializationResponseMessageHash = SHA256(
     "initializationResponseMessageData",
   ).toString();
+
+  sessionID = uuidV4();
+  sequenceNumber = randomInt(100);
 
   expiryDate = new Date(2060, 11, 24).toString();
   assetProfile = { expirationDate: expiryDate };
@@ -61,6 +82,12 @@ beforeEach(() => {
     assetProfile: assetProfile,
     step: 1,
     lastSequenceNumber: sequenceNumber,
+    maxTimeout: 0,
+    maxRetries: 0,
+    rollbackProofs: [],
+    sourceBasePath: "",
+    recipientBasePath: "",
+    rollbackActionsPerformed: [],
   };
 
   pluginSourceGateway.sessions.set(sessionID, sessionData);
@@ -79,11 +106,11 @@ test("valid transfer commence request", async () => {
     hashAssetProfile: assetProfileHash,
     senderDltSystem: "dummy",
     recipientDltSystem: "dummy",
-    clientSignature: "",
+    signature: "",
     sequenceNumber: sequenceNumber + 1,
   };
 
-  transferCommenceRequest.clientSignature = pluginSourceGateway.bufArray2HexStr(
+  transferCommenceRequest.signature = PluginOdapGateway.bufArray2HexStr(
     pluginSourceGateway.sign(JSON.stringify(transferCommenceRequest)),
   );
 
@@ -102,7 +129,7 @@ test("valid transfer commence request", async () => {
 
   expect(sessionInfo.transferCommenceMessageRequestHash).toBe(requestHash);
   expect(sessionInfo.clientSignatureTransferCommenceRequestMessage).toBe(
-    transferCommenceRequest.clientSignature,
+    transferCommenceRequest.signature,
   );
   expect(sessionInfo.serverSignatureTransferCommenceResponseMessage).not.toBe(
     "",
@@ -124,11 +151,11 @@ test("transfer commence request with wrong sessionId", async () => {
     hashAssetProfile: assetProfileHash,
     senderDltSystem: "dummy",
     recipientDltSystem: "dummy",
-    clientSignature: "",
+    signature: "",
     sequenceNumber: sequenceNumber + 1,
   };
 
-  transferCommenceRequest.clientSignature = pluginSourceGateway.bufArray2HexStr(
+  transferCommenceRequest.signature = PluginOdapGateway.bufArray2HexStr(
     pluginSourceGateway.sign(JSON.stringify(transferCommenceRequest)),
   );
 
@@ -158,11 +185,11 @@ test("transfer commence request with wrong message type", async () => {
     hashAssetProfile: assetProfileHash,
     senderDltSystem: "dummy",
     recipientDltSystem: "dummy",
-    clientSignature: "",
+    signature: "",
     sequenceNumber: sequenceNumber + 1,
   };
 
-  transferCommenceRequest.clientSignature = pluginSourceGateway.bufArray2HexStr(
+  transferCommenceRequest.signature = PluginOdapGateway.bufArray2HexStr(
     pluginSourceGateway.sign(JSON.stringify(transferCommenceRequest)),
   );
 
@@ -192,11 +219,11 @@ test("transfer commence request with wrong signature", async () => {
     hashAssetProfile: assetProfileHash,
     senderDltSystem: "dummy",
     recipientDltSystem: "dummy",
-    clientSignature: "",
+    signature: "",
     sequenceNumber: sequenceNumber + 1,
   };
 
-  transferCommenceRequest.clientSignature = pluginSourceGateway.bufArray2HexStr(
+  transferCommenceRequest.signature = PluginOdapGateway.bufArray2HexStr(
     pluginSourceGateway.sign(JSON.stringify("wrongData")),
   );
 
@@ -226,11 +253,11 @@ test("transfer commence request with wrong previous message hash", async () => {
     hashAssetProfile: assetProfileHash,
     senderDltSystem: "dummy",
     recipientDltSystem: "dummy",
-    clientSignature: "",
+    signature: "",
     sequenceNumber: sequenceNumber + 1,
   };
 
-  transferCommenceRequest.clientSignature = pluginSourceGateway.bufArray2HexStr(
+  transferCommenceRequest.signature = PluginOdapGateway.bufArray2HexStr(
     pluginSourceGateway.sign(JSON.stringify(transferCommenceRequest)),
   );
 
@@ -260,11 +287,11 @@ test("transfer commence request with wrong asset profile hash", async () => {
     hashAssetProfile: "wrongAssetProfileHash",
     senderDltSystem: "dummy",
     recipientDltSystem: "dummy",
-    clientSignature: "",
+    signature: "",
     sequenceNumber: sequenceNumber + 1,
   };
 
-  transferCommenceRequest.clientSignature = pluginSourceGateway.bufArray2HexStr(
+  transferCommenceRequest.signature = PluginOdapGateway.bufArray2HexStr(
     pluginSourceGateway.sign(JSON.stringify(transferCommenceRequest)),
   );
 
@@ -278,4 +305,38 @@ test("transfer commence request with wrong asset profile hash", async () => {
     .catch((ex: Error) =>
       expect(ex.message).toMatch("assetProfile hash not match"),
     );
+});
+
+test("timeout in transfer commence response because no client gateway is connected", async () => {
+  const sessionData: SessionData = {
+    id: sessionID,
+    step: 1,
+    maxRetries: MAX_RETRIES,
+    maxTimeout: MAX_TIMEOUT,
+    sourceBasePath: "http://wrongpath",
+    recipientBasePath: "",
+    lastSequenceNumber: 77,
+    sourceGatewayPubkey: pluginSourceGateway.pubKey,
+    recipientGatewayPubkey: pluginRecipientGateway.pubKey,
+    transferCommenceMessageRequestHash:
+      "dummyTransferCommenceMessageRequestHash",
+    lastMessageReceivedTimestamp: new Date().toString(),
+    rollbackProofs: [],
+    rollbackActionsPerformed: [],
+  };
+
+  pluginSourceGateway.sessions.set(sessionID, sessionData);
+
+  await sendTransferCommenceResponse(sessionID, pluginSourceGateway, true)
+    .then(() => {
+      throw new Error("Test Failed");
+    })
+    .catch((ex: Error) => {
+      expect(ex.message).toMatch("Timeout exceeded.");
+    });
+});
+
+afterEach(() => {
+  pluginSourceGateway.database?.destroy();
+  pluginRecipientGateway.database?.destroy();
 });

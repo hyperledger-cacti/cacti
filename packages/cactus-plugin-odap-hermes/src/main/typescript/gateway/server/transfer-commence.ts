@@ -1,7 +1,5 @@
 import { LoggerProvider } from "@hyperledger/cactus-common";
 import {
-  // Configuration,
-  // DefaultApi as OdapApi,
   TransferCommenceV1Request,
   TransferCommenceV1Response,
 } from "../../generated/openapi/typescript-axios";
@@ -16,7 +14,8 @@ const log = LoggerProvider.getOrCreate({
 export async function sendTransferCommenceResponse(
   sessionID: string,
   odap: PluginOdapGateway,
-): Promise<void> {
+  remote: boolean,
+): Promise<void | TransferCommenceV1Response> {
   const fnTag = `${odap.className}#sendTransferCommenceResponse()`;
 
   const sessionData = odap.sessions.get(sessionID);
@@ -24,6 +23,8 @@ export async function sendTransferCommenceResponse(
   if (
     sessionData == undefined ||
     sessionData.step == undefined ||
+    sessionData.maxTimeout == undefined ||
+    sessionData.maxRetries == undefined ||
     sessionData.sourceBasePath == undefined ||
     sessionData.lastSequenceNumber == undefined ||
     sessionData.sourceGatewayPubkey == undefined ||
@@ -40,11 +41,11 @@ export async function sendTransferCommenceResponse(
     serverIdentityPubkey: sessionData.recipientGatewayPubkey,
     hashCommenceRequest: sessionData.transferCommenceMessageRequestHash,
     // serverTransferNumber??
-    serverSignature: "",
+    signature: "",
     sequenceNumber: ++sessionData.lastSequenceNumber,
   };
 
-  transferCommenceResponse.serverSignature = odap.bufArray2HexStr(
+  transferCommenceResponse.signature = PluginOdapGateway.bufArray2HexStr(
     odap.sign(JSON.stringify(transferCommenceResponse)),
   );
 
@@ -53,28 +54,28 @@ export async function sendTransferCommenceResponse(
   ).toString();
 
   sessionData.serverSignatureTransferCommenceResponseMessage =
-    transferCommenceResponse.serverSignature;
+    transferCommenceResponse.signature;
 
-  await odap.storeOdapLog(
-    {
-      phase: "p2",
-      step: sessionData.step.toString(),
-      type: "ack",
-      operation: "commence",
-      nodes: `${odap.pubKey}->${sessionData.sourceGatewayPubkey}`,
-    },
-    `${sessionID}-${sessionData.step.toString()}`,
-  );
+  await odap.storeOdapLog({
+    sessionID: sessionID,
+    type: "ack",
+    operation: "commence",
+    data: JSON.stringify(sessionData),
+  });
 
   log.info(`${fnTag}, sending TransferCommenceResponse...`);
 
-  const response = await odap
-    .getOdapAPI(sessionData.sourceBasePath)
-    .phase2TransferCommenceResponseV1(transferCommenceResponse);
-
-  if (response.status != 200) {
-    throw new Error(`${fnTag}, TransferCommenceResponse message failed`);
+  if (!remote) {
+    return transferCommenceResponse;
   }
+
+  await odap.makeRequest(
+    sessionID,
+    PluginOdapGateway.getOdapAPI(
+      sessionData.sourceBasePath,
+    ).phase2TransferCommenceResponseV1(transferCommenceResponse),
+    "TransferCommenceResponse",
+  );
 }
 
 export async function checkValidtransferCommenceRequest(
@@ -85,26 +86,18 @@ export async function checkValidtransferCommenceRequest(
 
   const sessionID = request.sessionID;
   const sessionData = odap.sessions.get(sessionID);
-  if (
-    sessionData == undefined ||
-    sessionData.step == undefined ||
-    sessionData.lastSequenceNumber == undefined
-  ) {
+  if (sessionData == undefined || sessionData.lastSequenceNumber == undefined) {
     throw new Error(
       `${fnTag}, session Id does not correspond to any open session`,
     );
   }
 
-  await odap.storeOdapLog(
-    {
-      phase: "p2",
-      step: sessionData.step.toString(),
-      type: "exec",
-      operation: "commence",
-      nodes: `${odap.pubKey}`,
-    },
-    `${sessionData.id}-${sessionData.step.toString()}`,
-  );
+  await odap.storeOdapLog({
+    sessionID: sessionID,
+    type: "exec",
+    operation: "commence",
+    data: JSON.stringify(sessionData),
+  });
 
   if (request.messageType != OdapMessageType.TransferCommenceRequest) {
     throw new Error(`${fnTag}, wrong message type for TransferCommenceRequest`);
@@ -143,41 +136,23 @@ export async function checkValidtransferCommenceRequest(
     throw new Error(`${fnTag}, assetProfile hash not match`);
   }
 
-  const sourceClientSignature = new Uint8Array(
-    Buffer.from(request.clientSignature, "hex"),
-  );
-
-  const sourceClientPubkey = new Uint8Array(
-    Buffer.from(request.clientIdentityPubkey, "hex"),
-  );
-
-  const signature = request.clientSignature;
-  request.clientSignature = "";
-  if (
-    !odap.verifySignature(
-      JSON.stringify(request),
-      sourceClientSignature,
-      sourceClientPubkey,
-    )
-  ) {
+  if (!odap.verifySignature(request, request.clientIdentityPubkey)) {
     throw new Error(
       `${fnTag}, TransferCommenceRequest message signature verification failed`,
     );
   }
-  request.clientSignature = signature;
 
   storeSessionData(request, odap);
 
-  await odap.storeOdapLog(
-    {
-      phase: "p2",
-      step: sessionData.step.toString(),
-      type: "done",
-      operation: "commence",
-      nodes: `${odap.pubKey}`,
-    },
-    `${sessionData.id}-${sessionData.step.toString()}`,
-  );
+  await odap.storeOdapLog({
+    sessionID: sessionID,
+    type: "done",
+    operation: "commence",
+    data: JSON.stringify(sessionData),
+  });
+
+  sessionData.step = 4;
+  odap.sessions.set(sessionID, sessionData);
 
   log.info(`TransferCommenceRequest passed all checks.`);
 }
@@ -197,8 +172,7 @@ async function storeSessionData(
     JSON.stringify(request),
   ).toString();
 
-  sessionData.clientSignatureTransferCommenceRequestMessage =
-    request.clientSignature;
+  sessionData.clientSignatureTransferCommenceRequestMessage = request.signature;
 
   sessionData.originatorPubkey = request.originatorPubkey;
   sessionData.beneficiaryPubkey = request.beneficiaryPubkey;

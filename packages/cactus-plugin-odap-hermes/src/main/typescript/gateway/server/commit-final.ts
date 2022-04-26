@@ -14,37 +14,38 @@ const log = LoggerProvider.getOrCreate({
 export async function sendCommitFinalResponse(
   sessionID: string,
   odap: PluginOdapGateway,
-): Promise<void> {
+  remote: boolean,
+): Promise<void | CommitFinalV1Response> {
   const fnTag = `${odap.className}#sendCommitFinalResponse()`;
 
   const sessionData = odap.sessions.get(sessionID);
   if (
     sessionData == undefined ||
     sessionData.step == undefined ||
+    sessionData.maxTimeout == undefined ||
+    sessionData.maxRetries == undefined ||
     sessionData.sourceBasePath == undefined ||
     sessionData.lastSequenceNumber == undefined ||
     sessionData.sourceGatewayPubkey == undefined ||
     sessionData.recipientGatewayPubkey == undefined ||
+    sessionData.commitAcknowledgementClaim == undefined ||
     sessionData.commitFinalRequestMessageHash == undefined
   ) {
     throw new Error(`${fnTag}, session data is undefined`);
   }
-
-  const besuCreateAssetProof = await odap.createBesuAsset(sessionID);
-  sessionData.commitAcknowledgementClaim = besuCreateAssetProof;
 
   const commitFinalResponseMessage: CommitFinalV1Response = {
     sessionID: sessionID,
     messageType: OdapMessageType.CommitFinalResponse,
     clientIdentityPubkey: sessionData.sourceGatewayPubkey,
     serverIdentityPubkey: sessionData.recipientGatewayPubkey,
-    commitAcknowledgementClaim: besuCreateAssetProof,
+    commitAcknowledgementClaim: sessionData.commitAcknowledgementClaim,
     hashCommitFinal: sessionData.commitFinalRequestMessageHash,
-    serverSignature: "",
+    signature: "",
     sequenceNumber: ++sessionData.lastSequenceNumber,
   };
 
-  commitFinalResponseMessage.serverSignature = odap.bufArray2HexStr(
+  commitFinalResponseMessage.signature = PluginOdapGateway.bufArray2HexStr(
     await odap.sign(JSON.stringify(commitFinalResponseMessage)),
   );
 
@@ -53,34 +54,30 @@ export async function sendCommitFinalResponse(
   ).toString();
 
   sessionData.serverSignatureCommitFinalResponseMessage =
-    commitFinalResponseMessage.serverSignature;
+    commitFinalResponseMessage.signature;
 
-  await odap.storeOdapLog(
-    {
-      phase: "p3",
-      step: sessionData.step.toString(),
-      type: "ack",
-      operation: "commit-prepare",
-      nodes: `${odap.pubKey}`,
-    },
-    `${sessionData.id}-${sessionData.step.toString()}`,
-  );
-
-  sessionData.step++;
+  await odap.storeOdapLog({
+    sessionID: sessionID,
+    type: "ack",
+    operation: "final",
+    data: JSON.stringify(sessionData),
+  });
 
   odap.sessions.set(sessionID, sessionData);
 
-  // Log init???
-
   log.info(`${fnTag}, sending CommitFinalResponse...`);
 
-  const response = await odap
-    .getOdapAPI(sessionData.sourceBasePath)
-    .phase3CommitFinalResponseV1(commitFinalResponseMessage);
-
-  if (response.status != 200) {
-    throw new Error(`${fnTag}, CommitFinalResponse message failed`);
+  if (!remote) {
+    return commitFinalResponseMessage;
   }
+
+  await odap.makeRequest(
+    sessionID,
+    PluginOdapGateway.getOdapAPI(
+      sessionData.sourceBasePath,
+    ).phase3CommitFinalResponseV1(commitFinalResponseMessage),
+    "CommitFinalResponse",
+  );
 }
 
 export async function checkValidCommitFinalRequest(
@@ -102,41 +99,32 @@ export async function checkValidCommitFinalRequest(
     );
   }
 
-  await odap.storeOdapLog(
-    {
-      phase: "p3",
-      step: sessionData.step.toString(),
-      type: "exec",
-      operation: "commit-final",
-      nodes: `${odap.pubKey}`,
-    },
-    `${sessionData.id}-${sessionData.step.toString()}`,
-  );
+  await odap.storeOdapLog({
+    sessionID: sessionID,
+    type: "exec",
+    operation: "final",
+    data: JSON.stringify(sessionData),
+  });
 
   if (request.messageType != OdapMessageType.CommitFinalRequest) {
-    await odap.Revert(sessionID);
     throw new Error(`${fnTag}, wrong message type for CommitFinalRequest`);
   }
 
   if (request.sequenceNumber != sessionData.lastSequenceNumber + 1) {
-    await odap.Revert(sessionID);
     throw new Error(`${fnTag}, CommitFinalRequest sequence number incorrect`);
   }
 
   if (request.commitFinalClaim == undefined) {
-    await odap.Revert(sessionID);
     throw new Error(`${fnTag}, claim presented by client is invalid`);
   }
 
   if (sessionData.recipientGatewayPubkey != request.serverIdentityPubkey) {
-    await odap.Revert(sessionID);
     throw new Error(
       `${fnTag}, CommitFinalRequest serverIdentity public key does not match the one that was sent`,
     );
   }
 
   if (sessionData.sourceGatewayPubkey != request.clientIdentityPubkey) {
-    await odap.Revert(sessionID);
     throw new Error(
       `${fnTag}, CommitFinalRequest clientIdentity public key does not match the one that was sent`,
     );
@@ -145,48 +133,44 @@ export async function checkValidCommitFinalRequest(
   if (
     sessionData.commitPrepareResponseMessageHash != request.hashCommitPrepareAck
   ) {
-    await odap.Revert(sessionID);
     throw new Error(`${fnTag}, previous message hash does not match`);
   }
 
-  const sourceClientSignature = new Uint8Array(
-    Buffer.from(request.clientSignature, "hex"),
-  );
-
-  const sourceClientPubkey = new Uint8Array(
-    Buffer.from(request.clientIdentityPubkey, "hex"),
-  );
-
-  const signature = request.clientSignature;
-  request.clientSignature = "";
-  if (
-    !odap.verifySignature(
-      JSON.stringify(request),
-      sourceClientSignature,
-      sourceClientPubkey,
-    )
-  ) {
-    await odap.Revert(sessionID);
+  if (!odap.verifySignature(request, request.clientIdentityPubkey)) {
     throw new Error(
       `${fnTag}, CommitFinalRequest message signature verification failed`,
     );
   }
-  request.clientSignature = signature;
 
   // We need to check somewhere if this phase is completed within the asset-lock duration.
+  const claimHash = SHA256(request.commitFinalClaim).toString();
+  const retrievedClaim = await odap.getLogFromIPFS(
+    PluginOdapGateway.getOdapLogKey(sessionID, "proof", "delete"),
+  );
+
+  if (claimHash != retrievedClaim.hash) {
+    throw new Error(
+      `${fnTag}, Commit Final Claim hash does not match the one stored in IPFS`,
+    );
+  }
+
+  if (!odap.verifySignature(retrievedClaim, request.clientIdentityPubkey)) {
+    throw new Error(
+      `${fnTag}, Commit Final Claim signature verification failed`,
+    );
+  }
 
   storeSessionData(request, odap);
 
-  await odap.storeOdapLog(
-    {
-      phase: "p3",
-      step: sessionData.step.toString(),
-      type: "done",
-      operation: "commit-final",
-      nodes: `${odap.pubKey}}`,
-    },
-    `${sessionData.id}-${sessionData.step.toString()}`,
-  );
+  await odap.storeOdapLog({
+    sessionID: sessionID,
+    type: "done",
+    operation: "final",
+    data: JSON.stringify(sessionData),
+  });
+
+  sessionData.step = 10;
+  odap.sessions.set(sessionID, sessionData);
 
   log.info(`CommitFinalRequest passed all checks.`);
 }
@@ -208,8 +192,7 @@ async function storeSessionData(
     JSON.stringify(request),
   ).toString();
 
-  sessionData.clientSignatureCommitFinalRequestMessage =
-    request.clientSignature;
+  sessionData.clientSignatureCommitFinalRequestMessage = request.signature;
 
   odap.sessions.set(request.sessionID, sessionData);
 }

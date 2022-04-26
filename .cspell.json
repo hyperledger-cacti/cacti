@@ -106,6 +106,7 @@
         "protoc",
         "protos",
         "qscc",
+        "recoverupdateackmessage",
         "RUSTC",
         "Rwset",
         "sbjpubkey",

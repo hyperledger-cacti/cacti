@@ -47,7 +47,7 @@ export class TransferCompleteRequestEndpointV1 implements IWebServiceEndpoint {
   public getPath(): string {
     const apiPath =
       OAS.paths[
-        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase3/transfercompleterequest"
+        "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase3/transfercompleterequest"
       ];
     return apiPath.get["x-hyperledger-cactus"].http.path;
   }
@@ -55,14 +55,14 @@ export class TransferCompleteRequestEndpointV1 implements IWebServiceEndpoint {
   public getVerbLowerCase(): string {
     const apiPath =
       OAS.paths[
-        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase3/transfercompleterequest"
+        "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase3/transfercompleterequest"
       ];
     return apiPath.get["x-hyperledger-cactus"].http.verbLowerCase;
   }
 
   public getOperationId(): string {
     return OAS.paths[
-      "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase3/transfercompleterequest"
+      "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase3/transfercompleterequest"
     ].get.operationId;
   }
 

@@ -26,16 +26,12 @@ export async function checkValidTransferCompleteRequest(
     );
   }
 
-  await odap.storeOdapLog(
-    {
-      phase: "p3",
-      step: sessionData.step.toString(),
-      type: "exec",
-      operation: "complete",
-      nodes: `${odap.pubKey}`,
-    },
-    `${sessionData.id}-${sessionData.step.toString()}`,
-  );
+  await odap.storeOdapLog({
+    sessionID: sessionID,
+    type: "exec",
+    operation: "complete",
+    data: JSON.stringify(sessionData),
+  });
 
   if (request.messageType != OdapMessageType.TransferCompleteRequest) {
     throw new Error(`${fnTag}, wrong message type for TransferCompleteRequest`);
@@ -53,41 +49,20 @@ export async function checkValidTransferCompleteRequest(
     throw new Error(`${fnTag}, previous message hash not match`);
   }
 
-  const sourceClientSignature = new Uint8Array(
-    Buffer.from(request.clientSignature, "hex"),
-  );
-
-  const sourceClientPubkey = new Uint8Array(
-    Buffer.from(request.clientIdentityPubkey, "hex"),
-  );
-
-  const signature = request.clientSignature;
-  request.clientSignature = "";
-  if (
-    !odap.verifySignature(
-      JSON.stringify(request),
-      sourceClientSignature,
-      sourceClientPubkey,
-    )
-  ) {
+  if (!odap.verifySignature(request, request.clientIdentityPubkey)) {
     throw new Error(
       `${fnTag}, TransferCompleteRequest message signature verification failed`,
     );
   }
-  request.clientSignature = signature;
 
   storeSessionData(request, odap);
 
-  await odap.storeOdapLog(
-    {
-      phase: "p3",
-      step: sessionData.step.toString(),
-      type: "done",
-      operation: "complete",
-      nodes: `${odap.pubKey}`,
-    },
-    `${sessionData.id}-${sessionData.step.toString()}`,
-  );
+  await odap.storeOdapLog({
+    sessionID: sessionID,
+    type: "done",
+    operation: "complete",
+    data: JSON.stringify(sessionData),
+  });
 
   log.info(`TransferCompleteRequest passed all checks.`);
 }
@@ -107,7 +82,7 @@ async function storeSessionData(
     JSON.stringify(request),
   ).toString();
 
-  sessionData.clientSignatureTransferCompleteMessage = request.clientSignature;
+  sessionData.clientSignatureTransferCompleteMessage = request.signature;
 
   odap.sessions.set(request.sessionID, sessionData);
 }
