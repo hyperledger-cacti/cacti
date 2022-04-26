@@ -46,6 +46,16 @@ jobs:
           echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract-go-source >> urls.txt
           echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract >> urls.txt
           echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-prometheus-exporter-metrics >> urls.txt
+          echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/deploy-contract-solidity-bytecode >> urls.txt
+          echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-balance >> urls.txt
+          echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-block >> urls.txt
+          echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/run-transaction >> urls.txt
+          echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-transaction >> urls.txt
+          echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-past-logs >> urls.txt
+          echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract >> urls.txt
+          echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/sign-transaction >> urls.txt
+          echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-prometheus-exporter-metrics >> urls.txt
+          echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-besu-record >> urls.txt
 
       - name: Show file content
         run: |
@@ -63,6 +73,14 @@ jobs:
       - name: Install Fabric connector into the API server
         run: echo "$(jq '.plugins += [{"packageName":"@hyperledger/cactus-plugin-ledger-connector-fabric", "type":"org.hyperledger.cactus.plugin_import_type.LOCAL", "action":"org.hyperledger.cactus.plugin_import_action.INSTALL",  "options":{"instanceId":"some-unique-fabric-connector-instance-id", "peerBinary":"/fabric-samples/bin/peer", "connectionProfile":"{}", "dockerBinary":"usr/local/bin/docker","cliContainerEnv":{"CORE_PEER_LOCALMSPID":"Org1MSP","CORE_PEER_ADDRESS":"peer0.org1.example.com:7051","CORE_PEER_MSPCONFIGPATH":"/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp","CORE_PEER_TLS_ROOTCERT_FILE":"/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt","ORDERER_TLS_ROOTCERT_FILE":"/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem"},"discoveryOptions":{"enabled":true,"asLocalhost":true}}}] ' .config.json)" > .config.json
       
+      - name: Install Besu connector into the API server
+        run: echo "$(jq '.plugins += [{"packageName":"@hyperledger/cactus-plugin-ledger-connector-besu","type":"org.hyperledger.cactus.plugin_import_type.LOCAL","action":"org.hyperledger.cactus.plugin_import_action.INSTALL","options":{"rpcApiHttpHost":"http://localhost:8545", "rpcApiWsHost":"ws://localhost:8546", "instanceId":"some-unique-besu-connector-instance-id"}}]' .config.json)" > .config.json
+
+      - name: Run Besu all-in-one image
+        run: |
+          docker run -d -p 0.0.0.0:8545:8545/tcp  -p 0.0.0.0:8546:8546/tcp  -p 0.0.0.0:8888:8888/tcp  -p 0.0.0.0:9001:9001/tcp  -p 0.0.0.0:9545:9545/tcp ghcr.io/hyperledger/cactus-besu-all-in-one:2022-04-14-dda3f00
+          until curl --fail -X POST --data '{"jsonrpc":"2.0","method":"eth_chainId","params":[],"id":1}' localhost:8545; do sleep 5;  done
+
       # - run: |
       #     touch ~/nuclei-github-config.yaml \
       #     && echo -e "severity: critical,high" >> ~/nuclei-github-config.yaml \
