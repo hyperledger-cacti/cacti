@@ -17,7 +17,7 @@ const command: GluegunCommand = {
 				print,
 				toolbox,
 				`besu-cli asset is-locked --network=network1 --lock_contract_id=lockContractID`,
-				'besu-cli asset is-locked --network=<network1|network2> --lock_contract_id=<lockContractID>',
+				'besu-cli asset is-locked --network=<network1|network2> --lock_contract_id=<lockContractID>  --network_port=<port> --network_host=<host>',
 				[
 					{
 						name: '--network',
@@ -29,6 +29,16 @@ const command: GluegunCommand = {
 						description:
 							'The address / ID of the lock contract.'
 					},
+					{
+						name: '--network_host',
+						description:
+							'The network host. Default value is taken from config.json'
+					},
+					{
+						name: '--network_port',
+						description:
+							'The network port. Default value is taken from config.json'
+					}
 				],
 				command,
 				['asset', 'is-locked']
@@ -46,9 +56,20 @@ const command: GluegunCommand = {
 		console.log('Parameters')
 		console.log('networkConfig', networkConfig)
 		console.log('Lock Contract ID', lockContractId)
-		
-		const provider = new Web3.providers.HttpProvider('http://'+networkConfig.networkHost+':'+networkConfig.networkPort)
-		const web3N = new Web3(provider)
+
+        var networkPort = networkConfig.networkPort
+        if(options.network_port){
+            networkPort = options.network_port
+            console.log('Use network port : ', networkPort)
+    	}
+    	var networkHost = networkConfig.networkHost
+    	if(options.network_host){
+    	    networkHost = options.network_host
+    	    console.log('Use network host : ', networkHost)
+        }
+
+		const provider = new Web3.providers.HttpProvider('http://'+networkHost+':'+networkPort)
+        const web3N = new Web3(provider)
 		const interopContract = await getContractInstance(provider, networkConfig.interopContract)	
 		const accounts = await web3N.eth.getAccounts()
 		var sender = accounts[networkConfig.senderAccountIndex]
