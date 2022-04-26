@@ -10,7 +10,13 @@ import {
 } from "../../../../main/typescript/generated/openapi/typescript-axios/api";
 import { v4 as uuidV4 } from "uuid";
 import { SHA256 } from "crypto-js";
-import { checkValidCommitPreparationRequest } from "../../../../main/typescript/gateway/server/commit-preparation";
+import {
+  checkValidCommitPreparationRequest,
+  sendCommitPreparationResponse,
+} from "../../../../main/typescript/gateway/server/commit-preparation";
+
+const MAX_RETRIES = 5;
+const MAX_TIMEOUT = 5000;
 
 let sourceGatewayConstructor: IPluginOdapGatewayConstructorOptions;
 let recipientGatewayConstructor: IPluginOdapGatewayConstructorOptions;
@@ -21,7 +27,7 @@ let sessionData: SessionData;
 let sessionID: string;
 let sequenceNumber: number;
 
-beforeEach(() => {
+beforeEach(async () => {
   sourceGatewayConstructor = {
     name: "plugin-odap-gateway#sourceGateway",
     dltIDs: ["DLT2"],
@@ -35,6 +41,18 @@ beforeEach(() => {
 
   pluginSourceGateway = new PluginOdapGateway(sourceGatewayConstructor);
   pluginRecipientGateway = new PluginOdapGateway(recipientGatewayConstructor);
+
+  if (
+    pluginSourceGateway.database == undefined ||
+    pluginRecipientGateway.database == undefined
+  ) {
+    throw new Error("Database is not correctly initialized");
+  }
+
+  await pluginSourceGateway.database.migrate.rollback();
+  await pluginSourceGateway.database.migrate.latest();
+  await pluginRecipientGateway.database.migrate.rollback();
+  await pluginRecipientGateway.database.migrate.latest();
 
   dummyLockEvidenceResponseMessageHash = SHA256(
     "lockEvidenceResponseMessageData",
@@ -50,6 +68,12 @@ beforeEach(() => {
     lockEvidenceResponseMessageHash: dummyLockEvidenceResponseMessageHash,
     step: 2,
     lastSequenceNumber: sequenceNumber,
+    maxTimeout: 0,
+    maxRetries: 0,
+    rollbackProofs: [],
+    sourceBasePath: "",
+    recipientBasePath: "",
+    rollbackActionsPerformed: [],
   };
 
   pluginSourceGateway.sessions.set(sessionID, sessionData);
@@ -62,12 +86,12 @@ test("valid commit prepare request", async () => {
     messageType: OdapMessageType.CommitPreparationRequest,
     clientIdentityPubkey: pluginSourceGateway.pubKey,
     serverIdentityPubkey: pluginRecipientGateway.pubKey,
-    clientSignature: "",
+    signature: "",
     hashLockEvidenceAck: dummyLockEvidenceResponseMessageHash,
     sequenceNumber: sequenceNumber + 1,
   };
 
-  commitPrepareRequestMessage.clientSignature = pluginSourceGateway.bufArray2HexStr(
+  commitPrepareRequestMessage.signature = PluginOdapGateway.bufArray2HexStr(
     pluginSourceGateway.sign(JSON.stringify(commitPrepareRequestMessage)),
   );
 
@@ -87,7 +111,7 @@ test("valid commit prepare request", async () => {
   expect(sessionInfo.commitPrepareRequestMessageHash).toBe(requestHash);
 
   expect(sessionInfo.clientSignatureCommitPreparationRequestMessage).toBe(
-    commitPrepareRequestMessage.clientSignature,
+    commitPrepareRequestMessage.signature,
   );
 });
 
@@ -99,12 +123,12 @@ test("commit prepare request with wrong sessionId", async () => {
     messageType: OdapMessageType.CommitPreparationRequest,
     clientIdentityPubkey: pluginSourceGateway.pubKey,
     serverIdentityPubkey: pluginRecipientGateway.pubKey,
-    clientSignature: "",
+    signature: "",
     hashLockEvidenceAck: dummyLockEvidenceResponseMessageHash,
     sequenceNumber: sequenceNumber + 1,
   };
 
-  commitPrepareRequestMessage.clientSignature = pluginSourceGateway.bufArray2HexStr(
+  commitPrepareRequestMessage.signature = PluginOdapGateway.bufArray2HexStr(
     pluginSourceGateway.sign(JSON.stringify(commitPrepareRequestMessage)),
   );
 
@@ -128,12 +152,12 @@ test("commit prepare request with wrong message type", async () => {
     messageType: OdapMessageType.CommitFinalResponse,
     clientIdentityPubkey: pluginSourceGateway.pubKey,
     serverIdentityPubkey: pluginRecipientGateway.pubKey,
-    clientSignature: "",
+    signature: "",
     hashLockEvidenceAck: dummyLockEvidenceResponseMessageHash,
     sequenceNumber: sequenceNumber + 1,
   };
 
-  commitPrepareRequestMessage.clientSignature = pluginSourceGateway.bufArray2HexStr(
+  commitPrepareRequestMessage.signature = PluginOdapGateway.bufArray2HexStr(
     pluginSourceGateway.sign(JSON.stringify(commitPrepareRequestMessage)),
   );
 
@@ -157,12 +181,12 @@ test("commit prepare request with wrong previous message hash", async () => {
     messageType: OdapMessageType.CommitPreparationRequest,
     clientIdentityPubkey: pluginSourceGateway.pubKey,
     serverIdentityPubkey: pluginRecipientGateway.pubKey,
-    clientSignature: "",
+    signature: "",
     hashLockEvidenceAck: "wrongLockEvidenceResponseMessageHash",
     sequenceNumber: sequenceNumber + 1,
   };
 
-  commitPrepareRequestMessage.clientSignature = pluginSourceGateway.bufArray2HexStr(
+  commitPrepareRequestMessage.signature = PluginOdapGateway.bufArray2HexStr(
     pluginSourceGateway.sign(JSON.stringify(commitPrepareRequestMessage)),
   );
 
@@ -176,4 +200,37 @@ test("commit prepare request with wrong previous message hash", async () => {
     .catch((ex: Error) =>
       expect(ex.message).toMatch("previous message hash does not match"),
     );
+});
+
+test("timeout in commit preparation response because no client gateway is connected", async () => {
+  const sessionData: SessionData = {
+    id: sessionID,
+    step: 1,
+    maxRetries: MAX_RETRIES,
+    maxTimeout: MAX_TIMEOUT,
+    sourceBasePath: "http://wrongpath",
+    recipientBasePath: "",
+    lastSequenceNumber: 77,
+    sourceGatewayPubkey: pluginSourceGateway.pubKey,
+    recipientGatewayPubkey: pluginRecipientGateway.pubKey,
+    commitPrepareRequestMessageHash: "dummyCommitPrepareRequestMessageHash",
+    lastMessageReceivedTimestamp: new Date().toString(),
+    rollbackProofs: [],
+    rollbackActionsPerformed: [],
+  };
+
+  pluginSourceGateway.sessions.set(sessionID, sessionData);
+
+  await sendCommitPreparationResponse(sessionID, pluginSourceGateway, true)
+    .then(() => {
+      throw new Error("Test Failed");
+    })
+    .catch((ex: Error) => {
+      expect(ex.message).toMatch("Timeout exceeded.");
+    });
+});
+
+afterEach(() => {
+  pluginSourceGateway.database?.destroy();
+  pluginRecipientGateway.database?.destroy();
 });

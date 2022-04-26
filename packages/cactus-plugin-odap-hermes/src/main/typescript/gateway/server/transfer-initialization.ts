@@ -15,13 +15,16 @@ const log = LoggerProvider.getOrCreate({
 export async function sendTransferInitializationResponse(
   sessionID: string,
   odap: PluginOdapGateway,
-): Promise<void> {
+  remote: boolean,
+): Promise<void | TransferInitializationV1Response> {
   const fnTag = `${odap.className}#sendTransferInitiationResponse()`;
 
   const sessionData = odap.sessions.get(sessionID);
   if (
     sessionData == undefined ||
     sessionData.step == undefined ||
+    sessionData.maxTimeout == undefined ||
+    sessionData.maxRetries == undefined ||
     sessionData.sourceBasePath == undefined ||
     sessionData.lastSequenceNumber == undefined ||
     sessionData.initializationRequestMessageHash == undefined ||
@@ -40,10 +43,10 @@ export async function sendTransferInitializationResponse(
       sessionData.initializationRequestMessageProcessedTimeStamp,
     serverIdentityPubkey: odap.pubKey,
     sequenceNumber: sessionData.lastSequenceNumber,
-    serverSignature: "",
+    signature: "",
   };
 
-  transferInitializationResponse.serverSignature = odap.bufArray2HexStr(
+  transferInitializationResponse.signature = PluginOdapGateway.bufArray2HexStr(
     odap.sign(JSON.stringify(transferInitializationResponse)),
   );
 
@@ -52,20 +55,14 @@ export async function sendTransferInitializationResponse(
   ).toString();
 
   sessionData.serverSignatureInitializationResponseMessage =
-    transferInitializationResponse.serverSignature;
+    transferInitializationResponse.signature;
 
-  await odap.storeOdapLog(
-    {
-      phase: "p1",
-      step: sessionData.step.toString(),
-      type: "ack",
-      operation: "validate",
-      nodes: `${odap.pubKey}->${sessionData.sourceGatewayPubkey}`,
-    },
-    `${sessionData.id}-${sessionData.step.toString()}`,
-  );
-
-  sessionData.step++;
+  await odap.storeOdapLog({
+    sessionID: sessionID,
+    type: "ack",
+    operation: "validate",
+    data: JSON.stringify(sessionData),
+  });
 
   odap.sessions.set(sessionID, sessionData);
 
@@ -73,13 +70,17 @@ export async function sendTransferInitializationResponse(
 
   log.info(`${fnTag}, sending TransferInitializationResponse...`);
 
-  const response = await odap
-    .getOdapAPI(sessionData.sourceBasePath)
-    .phase1TransferInitiationResponseV1(transferInitializationResponse);
-
-  if (response.status != 200) {
-    throw new Error(`${fnTag}, TransferInitializationResponse message failed`);
+  if (!remote) {
+    return transferInitializationResponse;
   }
+
+  await odap.makeRequest(
+    sessionID,
+    PluginOdapGateway.getOdapAPI(
+      sessionData.sourceBasePath,
+    ).phase1TransferInitiationResponseV1(transferInitializationResponse),
+    "TransferInitializationResponse",
+  );
 }
 
 export async function checkValidInitializationRequest(
@@ -93,21 +94,17 @@ export async function checkValidInitializationRequest(
   const sessionID = request.sessionID;
 
   sessionData.id = sessionID;
-  sessionData.step = 0;
+  sessionData.step = 2;
   sessionData.initializationRequestMessageRcvTimeStamp = recvTimestamp;
 
   odap.sessions.set(sessionID, sessionData);
 
-  await odap.storeOdapLog(
-    {
-      phase: "p1",
-      step: sessionData.step.toString(),
-      type: "exec",
-      operation: "validate",
-      nodes: `${odap.pubKey}`,
-    },
-    `${sessionData.id}-${sessionData.step.toString()}`,
-  );
+  await odap.storeOdapLog({
+    sessionID: sessionID,
+    type: "exec",
+    operation: "validate",
+    data: JSON.stringify(sessionData),
+  });
 
   if (request.messageType != OdapMessageType.InitializationRequest) {
     throw new Error(
@@ -115,27 +112,11 @@ export async function checkValidInitializationRequest(
     );
   }
 
-  const sourceClientSignature = new Uint8Array(
-    Buffer.from(request.clientSignature, "hex"),
-  );
-  const sourceClientPubkey = new Uint8Array(
-    Buffer.from(request.sourceGatewayPubkey, "hex"),
-  );
-
-  const signature = request.clientSignature;
-  request.clientSignature = "";
-  if (
-    !odap.verifySignature(
-      JSON.stringify(request),
-      sourceClientSignature,
-      sourceClientPubkey,
-    )
-  ) {
+  if (!odap.verifySignature(request, request.sourceGatewayPubkey)) {
     throw new Error(
       `${fnTag}, TransferInitializationRequest message signature verification failed`,
     );
   }
-  request.clientSignature = signature;
 
   if (!odap.supportedDltIDs.includes(request.sourceGatewayDltSystem)) {
     throw new Error(
@@ -151,16 +132,12 @@ export async function checkValidInitializationRequest(
 
   storeSessionData(request, odap);
 
-  await odap.storeOdapLog(
-    {
-      phase: "p1",
-      step: sessionData.step.toString(),
-      type: "done",
-      operation: "validate",
-      nodes: `${odap.pubKey}`,
-    },
-    `${sessionData.id}-${sessionData.step.toString()}`,
-  );
+  await odap.storeOdapLog({
+    sessionID: sessionID,
+    type: "done",
+    operation: "validate",
+    data: JSON.stringify(sessionData),
+  });
 
   log.info(`TransferInitializationRequest passed all checks.`);
 }
@@ -178,24 +155,30 @@ async function storeSessionData(
     );
   }
 
-  sessionData.step = 1;
+  sessionData.version = request.version;
+  sessionData.maxRetries = request.maxRetries;
+  sessionData.maxTimeout = request.maxTimeout;
   sessionData.sourceBasePath = request.sourceGatewayPath;
+  sessionData.recipientBasePath = request.recipientBasePath;
   sessionData.lastSequenceNumber = request.sequenceNumber;
   sessionData.loggingProfile = request.loggingProfile;
   sessionData.accessControlProfile = request.accessControlProfile;
+  sessionData.payloadProfile = request.payloadProfile;
   sessionData.applicationProfile = request.applicationProfile;
   sessionData.assetProfile = request.payloadProfile.assetProfile;
   sessionData.sourceGatewayPubkey = request.sourceGatewayPubkey;
   sessionData.sourceGatewayDltSystem = request.sourceGatewayDltSystem;
   sessionData.recipientGatewayPubkey = request.recipientGatewayPubkey;
   sessionData.recipientGatewayDltSystem = request.recipientGatewayDltSystem;
+  sessionData.rollbackActionsPerformed = [];
+  sessionData.rollbackProofs = [];
+  sessionData.lastMessageReceivedTimestamp = new Date().toString();
 
   sessionData.initializationRequestMessageHash = SHA256(
     JSON.stringify(request),
   ).toString();
 
-  sessionData.clientSignatureInitializationRequestMessage =
-    request.clientSignature;
+  sessionData.clientSignatureInitializationRequestMessage = request.signature;
 
   sessionData.initializationRequestMessageProcessedTimeStamp = Date.now().toString();
 

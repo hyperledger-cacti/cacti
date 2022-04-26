@@ -14,7 +14,8 @@ const log = LoggerProvider.getOrCreate({
 export async function sendLockEvidenceResponse(
   sessionID: string,
   odap: PluginOdapGateway,
-): Promise<void> {
+  remote: boolean,
+): Promise<void | LockEvidenceV1Response> {
   const fnTag = `${odap.className}#sendLockEvidenceResponse()`;
 
   const sessionData = odap.sessions.get(sessionID);
@@ -22,6 +23,8 @@ export async function sendLockEvidenceResponse(
   if (
     sessionData == undefined ||
     sessionData.step == undefined ||
+    sessionData.maxTimeout == undefined ||
+    sessionData.maxRetries == undefined ||
     sessionData.sourceBasePath == undefined ||
     sessionData.lastSequenceNumber == undefined ||
     sessionData.sourceGatewayPubkey == undefined ||
@@ -38,11 +41,11 @@ export async function sendLockEvidenceResponse(
     serverIdentityPubkey: sessionData.recipientGatewayPubkey,
     hashLockEvidenceRequest: sessionData.lockEvidenceRequestMessageHash,
     // server transfer number
-    serverSignature: "",
+    signature: "",
     sequenceNumber: ++sessionData.lastSequenceNumber,
   };
 
-  lockEvidenceResponseMessage.serverSignature = odap.bufArray2HexStr(
+  lockEvidenceResponseMessage.signature = PluginOdapGateway.bufArray2HexStr(
     await odap.sign(JSON.stringify(lockEvidenceResponseMessage)),
   );
 
@@ -51,28 +54,28 @@ export async function sendLockEvidenceResponse(
   ).toString();
 
   sessionData.serverSignatureLockEvidenceResponseMessage =
-    lockEvidenceResponseMessage.serverSignature;
+    lockEvidenceResponseMessage.signature;
 
-  await odap.storeOdapLog(
-    {
-      phase: "p2",
-      step: sessionData.step.toString(),
-      type: "ack",
-      operation: "lock",
-      nodes: `${odap.pubKey}->${sessionData.sourceGatewayPubkey}`,
-    },
-    `${sessionData.id}-${sessionData.step.toString()}`,
-  );
+  await odap.storeOdapLog({
+    sessionID: sessionID,
+    type: "ack",
+    operation: "lock",
+    data: JSON.stringify(sessionData),
+  });
 
   log.info(`${fnTag}, sending LockEvidenceResponse...`);
 
-  const response = await odap
-    .getOdapAPI(sessionData.sourceBasePath)
-    .phase2LockEvidenceResponseV1(lockEvidenceResponseMessage);
-
-  if (response.status != 200) {
-    throw new Error(`${fnTag}, LockEvidenceResponse message failed`);
+  if (!remote) {
+    return lockEvidenceResponseMessage;
   }
+
+  await odap.makeRequest(
+    sessionID,
+    PluginOdapGateway.getOdapAPI(
+      sessionData.sourceBasePath,
+    ).phase2LockEvidenceResponseV1(lockEvidenceResponseMessage),
+    "LockEvidenceResponse",
+  );
 }
 
 export async function checkValidLockEvidenceRequest(
@@ -93,24 +96,18 @@ export async function checkValidLockEvidenceRequest(
     );
   }
 
-  await odap.storeOdapLog(
-    {
-      phase: "p2",
-      step: sessionData.step.toString(),
-      type: "exec",
-      operation: "lock",
-      nodes: `${odap.pubKey}`,
-    },
-    `${sessionData.id}-${sessionData.step.toString()}`,
-  );
+  await odap.storeOdapLog({
+    sessionID: sessionID,
+    type: "exec",
+    operation: "lock",
+    data: JSON.stringify(sessionData),
+  });
 
   if (request.messageType != OdapMessageType.LockEvidenceRequest) {
-    await odap.Revert(sessionID);
     throw new Error(`${fnTag}, wrong message type for LockEvidenceRequest`);
   }
 
   if (request.sequenceNumber != sessionData.lastSequenceNumber + 1) {
-    await odap.Revert(sessionID);
     throw new Error(
       `${fnTag}, LockEvidenceRequestMessage sequence number incorrect`,
     );
@@ -120,21 +117,18 @@ export async function checkValidLockEvidenceRequest(
     sessionData.transferCommenceMessageResponseHash !=
     request.hashCommenceAckRequest
   ) {
-    await odap.Revert(sessionID);
     throw new Error(
       `${fnTag}, previous message hash does not match the one that was sent`,
     );
   }
 
   if (sessionData.recipientGatewayPubkey != request.serverIdentityPubkey) {
-    await odap.Revert(sessionID);
     throw new Error(
       `${fnTag}, LockEvidenceRequest serverIdentity public key does not match the one that was sent`,
     );
   }
 
   if (sessionData.sourceGatewayPubkey != request.clientIdentityPubkey) {
-    await odap.Revert(sessionID);
     throw new Error(
       `${fnTag}, LockEvidenceRequest clientIdentity public key does not match the one that was sent`,
     );
@@ -144,46 +138,43 @@ export async function checkValidLockEvidenceRequest(
     request.lockEvidenceClaim == undefined ||
     new Date() > new Date(request.lockEvidenceExpiration)
   ) {
-    await odap.Revert(sessionID);
     throw new Error(`${fnTag}, invalid or expired lock evidence claim`);
   }
 
-  const sourceClientSignature = new Uint8Array(
-    Buffer.from(request.clientSignature, "hex"),
-  );
-
-  const sourceClientPubkey = new Uint8Array(
-    Buffer.from(request.clientIdentityPubkey, "hex"),
-  );
-
-  const signature = request.clientSignature;
-  request.clientSignature = "";
-  if (
-    !odap.verifySignature(
-      JSON.stringify(request),
-      sourceClientSignature,
-      sourceClientPubkey,
-    )
-  ) {
-    await odap.Revert(sessionID);
+  if (!odap.verifySignature(request, request.clientIdentityPubkey)) {
     throw new Error(
       `${fnTag}, LockEvidenceRequest message signature verification failed`,
     );
   }
-  request.clientSignature = signature;
+
+  const claimHash = SHA256(request.lockEvidenceClaim).toString();
+  const retrievedClaim = await odap.getLogFromIPFS(
+    PluginOdapGateway.getOdapLogKey(sessionID, "proof", "lock"),
+  );
+
+  if (claimHash != retrievedClaim.hash) {
+    throw new Error(
+      `${fnTag}, LockEvidence Claim hash does not match the one stored in IPFS`,
+    );
+  }
+
+  if (!odap.verifySignature(retrievedClaim, request.clientIdentityPubkey)) {
+    throw new Error(
+      `${fnTag}, LockEvidence Claim message signature verification failed`,
+    );
+  }
 
   storeSessionData(request, odap);
 
-  await odap.storeOdapLog(
-    {
-      phase: "p2",
-      step: sessionData.step.toString(),
-      type: "done",
-      operation: "lock",
-      nodes: `${odap.pubKey}`,
-    },
-    `${sessionData.id}-${sessionData.step.toString()}`,
-  );
+  await odap.storeOdapLog({
+    sessionID: sessionID,
+    type: "done",
+    operation: "lock",
+    data: JSON.stringify(sessionData),
+  });
+
+  sessionData.step = 6;
+  odap.sessions.set(sessionID, sessionData);
 
   log.info(`LockEvidenceRequest passed all checks.`);
 }
@@ -203,8 +194,7 @@ function storeSessionData(
     JSON.stringify(request),
   ).toString();
 
-  sessionData.clientSignatureLockEvidenceRequestMessage =
-    request.clientSignature;
+  sessionData.clientSignatureLockEvidenceRequestMessage = request.signature;
 
   sessionData.lockEvidenceClaim = request.lockEvidenceClaim;
 

@@ -21,13 +21,13 @@ export class AssetTransferContract extends Contract {
     const assets: Asset[] = [
       {
         ID: "asset1",
-        Size: 5,
-        IsLock: false,
+        size: 5,
+        isLocked: false,
       },
       {
         ID: "asset2",
-        Size: 5,
-        IsLock: false,
+        size: 5,
+        isLocked: false,
       },
     ];
 
@@ -47,8 +47,8 @@ export class AssetTransferContract extends Contract {
   ): Promise<void> {
     const asset: Asset = {
       ID: id,
-      Size: size,
-      IsLock: false,
+      size: size,
+      isLocked: false,
     };
     await ctx.stub.putState(id, Buffer.from(JSON.stringify(asset)));
   }
@@ -75,9 +75,13 @@ export class AssetTransferContract extends Contract {
       throw new Error(`The asset ${id} does not exist`);
     }
 
+    if (this.IsAssetLocked(ctx, id)) {
+      throw new Error(`The asset ${id} is locked`);
+    }
+
     // overwriting original asset with new asset
     const assetString = await this.ReadAsset(ctx, id);
-    const asset = JSON.parse(assetString);
+    const asset: Asset = JSON.parse(assetString);
     asset.size = size;
     return ctx.stub.putState(id, Buffer.from(JSON.stringify(asset)));
   }
@@ -89,6 +93,7 @@ export class AssetTransferContract extends Contract {
     if (!exists) {
       throw new Error(`The asset ${id} does not exist`);
     }
+
     return ctx.stub.deleteState(id);
   }
 
@@ -99,29 +104,53 @@ export class AssetTransferContract extends Contract {
     const assetJSON = await ctx.stub.getState(id);
     return assetJSON && assetJSON.length > 0;
   }
+
+  // IsAssetLocked returns true when asset with given ID is locked in world state.
+  @Transaction(false)
+  @Returns("boolean")
+  public async IsAssetLocked(ctx: Context, id: string): Promise<boolean> {
+    const assetJSON = await ctx.stub.getState(id);
+
+    if (assetJSON && assetJSON.length > 0) {
+      const asset = JSON.parse(assetJSON.toString());
+      return asset.isLocked;
+    } else {
+      throw new Error(`The asset ${id} does not exist`);
+    }
+  }
+
   @Transaction(false)
   @Returns("boolean")
   public async LockAsset(ctx: Context, id: string): Promise<boolean> {
     const exists = await this.AssetExists(ctx, id);
+
     if (!exists) {
       throw new Error(`The asset ${id} does not exist`);
     }
+
+    // if (this.IsAssetLocked(ctx, id)) {
+    //   throw new Error(`The asset ${id} is already locked`);
+    // }
+
     const assetString = await this.ReadAsset(ctx, id);
-    const asset = JSON.parse(assetString);
-    asset.isLock = true;
+    const asset: Asset = JSON.parse(assetString);
+    asset.isLocked = true;
     await ctx.stub.putState(id, Buffer.from(JSON.stringify(asset)));
     return true;
   }
+
   @Transaction(false)
   @Returns("boolean")
-  public async UnLockAsset(ctx: Context, id: string): Promise<boolean> {
+  public async UnlockAsset(ctx: Context, id: string): Promise<boolean> {
     const exists = await this.AssetExists(ctx, id);
+
     if (!exists) {
       throw new Error(`The asset ${id} does not exist`);
     }
+
     const assetString = await this.ReadAsset(ctx, id);
-    const asset = JSON.parse(assetString);
-    asset.isLock = false;
+    const asset: Asset = JSON.parse(assetString);
+    asset.isLocked = false;
     await ctx.stub.putState(id, Buffer.from(JSON.stringify(asset)));
     return true;
   }

@@ -14,7 +14,8 @@ const log = LoggerProvider.getOrCreate({
 export async function sendCommitFinalRequest(
   sessionID: string,
   odap: PluginOdapGateway,
-): Promise<void> {
+  remote: boolean,
+): Promise<void | CommitFinalV1Request> {
   const fnTag = `${odap.className}#sendCommitFinalRequest()`;
 
   const sessionData = odap.sessions.get(sessionID);
@@ -22,6 +23,9 @@ export async function sendCommitFinalRequest(
   if (
     sessionData == undefined ||
     sessionData.step == undefined ||
+    sessionData.maxTimeout == undefined ||
+    sessionData.maxRetries == undefined ||
+    sessionData.commitFinalClaim == undefined ||
     sessionData.recipientBasePath == undefined ||
     sessionData.lastSequenceNumber == undefined ||
     sessionData.sourceGatewayPubkey == undefined ||
@@ -31,37 +35,23 @@ export async function sendCommitFinalRequest(
     throw new Error(`${fnTag}, session data is not correctly initialized`);
   }
 
-  await odap.storeOdapLog(
-    {
-      phase: "p3",
-      step: sessionData.step.toString(),
-      type: "init",
-      operation: "commit-final",
-      nodes: `${odap.pubKey}->${sessionData.recipientGatewayPubkey}`,
-    },
-    `${sessionData.id}-${sessionData.step.toString()}`,
-  );
-
-  const fabricDeleteAssetProof = await odap.deleteFabricAsset(sessionID);
-  sessionData.commitFinalClaim = fabricDeleteAssetProof;
-
   const commitFinalRequestMessage: CommitFinalV1Request = {
     sessionID: sessionID,
     messageType: OdapMessageType.CommitFinalRequest,
     clientIdentityPubkey: sessionData.sourceGatewayPubkey,
     serverIdentityPubkey: sessionData.recipientGatewayPubkey,
-    commitFinalClaim: fabricDeleteAssetProof,
+    commitFinalClaim: sessionData.commitFinalClaim,
     // commit final claim format
     hashCommitPrepareAck: sessionData.commitPrepareResponseMessageHash,
-    clientSignature: "",
+    signature: "",
     sequenceNumber: ++sessionData.lastSequenceNumber,
   };
 
-  const messageSignature = odap.bufArray2HexStr(
+  const messageSignature = PluginOdapGateway.bufArray2HexStr(
     odap.sign(JSON.stringify(commitFinalRequestMessage)),
   );
 
-  commitFinalRequestMessage.clientSignature = messageSignature;
+  commitFinalRequestMessage.signature = messageSignature;
 
   sessionData.commitFinalRequestMessageHash = SHA256(
     JSON.stringify(commitFinalRequestMessage),
@@ -71,15 +61,26 @@ export async function sendCommitFinalRequest(
 
   odap.sessions.set(sessionID, sessionData);
 
+  await odap.storeOdapLog({
+    sessionID: sessionID,
+    type: "init",
+    operation: "final",
+    data: JSON.stringify(sessionData),
+  });
+
   log.info(`${fnTag}, sending CommitFinalRequest...`);
 
-  const response = await odap
-    .getOdapAPI(sessionData.recipientBasePath)
-    .phase3CommitFinalRequestV1(commitFinalRequestMessage);
-
-  if (response.status != 200) {
-    throw new Error(`${fnTag}, CommitFinalRequest message failed`);
+  if (!remote) {
+    return commitFinalRequestMessage;
   }
+
+  await odap.makeRequest(
+    sessionID,
+    PluginOdapGateway.getOdapAPI(
+      sessionData.recipientBasePath,
+    ).phase3CommitFinalRequestV1(commitFinalRequestMessage),
+    "CommitFinalRequest",
+  );
 }
 
 export async function checkValidCommitFinalResponse(
@@ -97,67 +98,57 @@ export async function checkValidCommitFinalResponse(
   }
 
   if (response.messageType != OdapMessageType.CommitFinalResponse) {
-    await odap.Revert(sessionID);
     throw new Error(`${fnTag}, wrong message type for CommitFinalResponse`);
   }
 
   if (response.sequenceNumber != sessionData.lastSequenceNumber) {
-    await odap.Revert(sessionID);
     throw new Error(`${fnTag}, CommitFinalResponse sequence number incorrect`);
   }
 
   if (response.commitAcknowledgementClaim == undefined) {
-    await odap.Revert(sessionID);
     throw new Error(`${fnTag}, the claim provided is not valid`);
   }
 
   if (sessionData.commitFinalRequestMessageHash != response.hashCommitFinal) {
-    await odap.Revert(sessionID);
     throw new Error(
       `${fnTag}, CommitFinalResponse previous message hash does not match the one that was sent`,
     );
   }
 
   if (sessionData.recipientGatewayPubkey != response.serverIdentityPubkey) {
-    await odap.Revert(sessionID);
     throw new Error(
       `${fnTag}, CommitFinalResponse serverIdentity public key does not match the one that was sent`,
     );
   }
 
   if (sessionData.sourceGatewayPubkey != response.clientIdentityPubkey) {
-    await odap.Revert(sessionID);
     throw new Error(
       `${fnTag}, CommitFinalResponse clientIdentity public key does not match the one that was sent`,
     );
   }
 
-  const commitFinalResponseMessageDataSignature = response.serverSignature;
-
-  const sourceServerSignature = new Uint8Array(
-    Buffer.from(commitFinalResponseMessageDataSignature, "hex"),
-  );
-
-  const sourceServerPubkey = new Uint8Array(
-    Buffer.from(sessionData.recipientGatewayPubkey, "hex"),
-  );
-
-  response.serverSignature = "";
-
-  if (
-    !odap.verifySignature(
-      JSON.stringify(response),
-      sourceServerSignature,
-      sourceServerPubkey,
-    )
-  ) {
-    await odap.Revert(sessionID);
+  if (!odap.verifySignature(response, sessionData.recipientGatewayPubkey)) {
     throw new Error(
       `${fnTag}, CommitFinalResponse message signature verification failed`,
     );
   }
 
-  response.serverSignature = commitFinalResponseMessageDataSignature;
+  const claimHash = SHA256(response.commitAcknowledgementClaim).toString();
+  const retrievedClaim = await odap.getLogFromIPFS(
+    PluginOdapGateway.getOdapLogKey(sessionID, "proof", "create"),
+  );
+
+  if (claimHash != retrievedClaim.hash) {
+    throw new Error(
+      `${fnTag}, Commit Acknowledgement Claim hash does not match the one stored in IPFS`,
+    );
+  }
+
+  if (!odap.verifySignature(retrievedClaim, response.serverIdentityPubkey)) {
+    throw new Error(
+      `${fnTag}, Commit Acknowledgement Claim signature verification failed`,
+    );
+  }
 
   storeSessionData(response, odap);
 
@@ -181,16 +172,15 @@ function storeSessionData(
     );
   }
 
-  sessionData.step++;
-
   sessionData.commitAcknowledgementClaim = response.commitAcknowledgementClaim;
 
   sessionData.commitFinalResponseMessageHash = SHA256(
     JSON.stringify(response),
   ).toString();
 
-  sessionData.serverSignatureCommitFinalResponseMessage =
-    response.serverSignature;
+  sessionData.serverSignatureCommitFinalResponseMessage = response.signature;
+
+  sessionData.step = 11;
 
   odap.sessions.set(sessionData.id, sessionData);
 }

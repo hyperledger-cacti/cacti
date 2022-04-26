@@ -1,7 +1,10 @@
 import { randomInt } from "crypto";
 import { SHA256 } from "crypto-js";
 import { v4 as uuidV4 } from "uuid";
-import { checkValidInitializationResponse } from "../../../../main/typescript/gateway/client/transfer-initialization";
+import {
+  checkValidInitializationResponse,
+  sendTransferInitializationRequest,
+} from "../../../../main/typescript/gateway/client/transfer-initialization";
 import {
   OdapMessageType,
   PluginOdapGateway,
@@ -9,7 +12,11 @@ import {
 import {
   TransferInitializationV1Response,
   SessionData,
+  AssetProfile,
 } from "../../../../main/typescript/public-api";
+
+const MAX_RETRIES = 5;
+const MAX_TIMEOUT = 5000;
 
 const INITIALIZATION_REQUEST_MESSAGE_HASH =
   "dummyInitializationRequestMessageHash";
@@ -22,7 +29,7 @@ let sequenceNumber: number;
 let sessionID: string;
 let step: number;
 
-beforeEach(() => {
+beforeEach(async () => {
   sourceGatewayConstructor = {
     name: "plugin-odap-gateway#sourceGateway",
     dltIDs: ["DLT2"],
@@ -37,6 +44,18 @@ beforeEach(() => {
   pluginSourceGateway = new PluginOdapGateway(sourceGatewayConstructor);
   pluginRecipientGateway = new PluginOdapGateway(recipientGatewayConstructor);
 
+  if (
+    pluginSourceGateway.database == undefined ||
+    pluginRecipientGateway.database == undefined
+  ) {
+    throw new Error("Database is not correctly initialized");
+  }
+
+  await pluginSourceGateway.database.migrate.rollback();
+  await pluginSourceGateway.database.migrate.latest();
+  await pluginRecipientGateway.database.migrate.rollback();
+  await pluginRecipientGateway.database.migrate.latest();
+
   sequenceNumber = randomInt(100);
   sessionID = uuidV4();
   step = 1;
@@ -48,6 +67,12 @@ beforeEach(() => {
     recipientGatewayPubkey: pluginRecipientGateway.pubKey,
     initializationRequestMessageHash: INITIALIZATION_REQUEST_MESSAGE_HASH,
     lastSequenceNumber: sequenceNumber,
+    maxTimeout: 0,
+    maxRetries: 0,
+    rollbackProofs: [],
+    sourceBasePath: "",
+    recipientBasePath: "",
+    rollbackActionsPerformed: [],
   };
 
   pluginSourceGateway.sessions.set(sessionID, sessionData);
@@ -61,11 +86,11 @@ test("valid transfer initiation response", async () => {
     timeStamp: Date.now().toString(),
     processedTimeStamp: Date.now().toString(),
     serverIdentityPubkey: pluginRecipientGateway.pubKey,
-    serverSignature: "",
+    signature: "",
     sequenceNumber: sequenceNumber,
   };
 
-  initializationResponseMessage.serverSignature = pluginRecipientGateway.bufArray2HexStr(
+  initializationResponseMessage.signature = PluginOdapGateway.bufArray2HexStr(
     await pluginRecipientGateway.sign(
       JSON.stringify(initializationResponseMessage),
     ),
@@ -85,7 +110,6 @@ test("valid transfer initiation response", async () => {
   if (retrievedSessionData == undefined) throw new Error("Test Failed.");
 
   expect(retrievedSessionData.id).toBe(sessionID);
-  expect(retrievedSessionData.step).toBe(step + 1);
   expect(retrievedSessionData.recipientGatewayPubkey).toBe(
     pluginRecipientGateway.pubKey,
   );
@@ -108,11 +132,11 @@ test("transfer initiation response invalid because of wrong previous message has
     timeStamp: Date.now().toString(),
     processedTimeStamp: Date.now().toString(),
     serverIdentityPubkey: pluginRecipientGateway.pubKey,
-    serverSignature: "",
+    signature: "",
     sequenceNumber: sequenceNumber,
   };
 
-  initializationResponseMessage.serverSignature = pluginSourceGateway.bufArray2HexStr(
+  initializationResponseMessage.signature = PluginOdapGateway.bufArray2HexStr(
     await pluginSourceGateway.sign(
       JSON.stringify(initializationResponseMessage),
     ),
@@ -140,11 +164,11 @@ test("transfer initiation response invalid because it does not match transfer in
     timeStamp: Date.now().toString(),
     processedTimeStamp: Date.now().toString(),
     serverIdentityPubkey: pluginRecipientGateway.pubKey,
-    serverSignature: "",
+    signature: "",
     sequenceNumber: sequenceNumber,
   };
 
-  initializationResponseMessage.serverSignature = pluginSourceGateway.bufArray2HexStr(
+  initializationResponseMessage.signature = PluginOdapGateway.bufArray2HexStr(
     await pluginSourceGateway.sign(
       JSON.stringify(initializationResponseMessage),
     ),
@@ -160,4 +184,48 @@ test("transfer initiation response invalid because it does not match transfer in
     .catch((ex: Error) =>
       expect(ex.message).toMatch("session data is undefined"),
     );
+});
+
+test("timeout in transfer initiation request because no server gateway is connected", async () => {
+  const expiryDate = new Date(2060, 11, 24).toString();
+  const assetProfile: AssetProfile = { expirationDate: expiryDate };
+
+  const sessionData: SessionData = {
+    id: sessionID,
+    step: 1,
+    version: "0.0.0",
+    maxRetries: MAX_RETRIES,
+    maxTimeout: MAX_TIMEOUT,
+    payloadProfile: {
+      assetProfile: assetProfile,
+      capabilities: "",
+    },
+    loggingProfile: "dummyLoggingProfile",
+    sourceBasePath: "",
+    recipientBasePath: "http://wrongpath",
+    accessControlProfile: "dummyAccessControlProfile",
+    applicationProfile: "dummyApplicationProfile",
+    lastSequenceNumber: 77,
+    sourceGatewayDltSystem: "DLT1",
+    recipientGatewayPubkey: pluginRecipientGateway.pubKey,
+    recipientGatewayDltSystem: "DLT2",
+    lastMessageReceivedTimestamp: new Date().toString(),
+    rollbackProofs: [],
+    rollbackActionsPerformed: [],
+  };
+
+  pluginSourceGateway.sessions.set(sessionID, sessionData);
+
+  await sendTransferInitializationRequest(sessionID, pluginSourceGateway, true)
+    .then(() => {
+      throw new Error("Test Failed");
+    })
+    .catch((ex: Error) => {
+      expect(ex.message).toMatch("Timeout exceeded.");
+    });
+});
+
+afterEach(() => {
+  pluginSourceGateway.database?.destroy();
+  pluginRecipientGateway.database?.destroy();
 });

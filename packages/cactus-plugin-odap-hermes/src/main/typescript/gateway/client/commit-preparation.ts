@@ -14,7 +14,8 @@ const log = LoggerProvider.getOrCreate({
 export async function sendCommitPreparationRequest(
   sessionID: string,
   odap: PluginOdapGateway,
-): Promise<void> {
+  remote: boolean,
+): Promise<void | CommitPreparationV1Request> {
   const fnTag = `${odap.className}#sendCommitPreparationRequest()`;
 
   const sessionData = odap.sessions.get(sessionID);
@@ -22,6 +23,8 @@ export async function sendCommitPreparationRequest(
   if (
     sessionData == undefined ||
     sessionData.step == undefined ||
+    sessionData.maxTimeout == undefined ||
+    sessionData.maxRetries == undefined ||
     sessionData.recipientBasePath == undefined ||
     sessionData.lastSequenceNumber == undefined ||
     sessionData.sourceGatewayPubkey == undefined ||
@@ -31,32 +34,21 @@ export async function sendCommitPreparationRequest(
     throw new Error(`${fnTag}, session data is not correctly initialized`);
   }
 
-  await odap.storeOdapLog(
-    {
-      phase: "p3",
-      step: sessionData.step.toString(),
-      type: "init",
-      operation: "commit-prepare",
-      nodes: `${odap.pubKey}->${sessionData.recipientGatewayPubkey}`,
-    },
-    `${sessionData.id}-${sessionData.step.toString()}`,
-  );
-
   const commitPrepareRequestMessage: CommitPreparationV1Request = {
     sessionID: sessionID,
     messageType: OdapMessageType.CommitPreparationRequest,
     clientIdentityPubkey: sessionData.sourceGatewayPubkey,
     serverIdentityPubkey: sessionData.recipientGatewayPubkey,
     hashLockEvidenceAck: sessionData.lockEvidenceResponseMessageHash,
-    clientSignature: "",
+    signature: "",
     sequenceNumber: ++sessionData.lastSequenceNumber,
   };
 
-  const messageSignature = odap.bufArray2HexStr(
+  const messageSignature = PluginOdapGateway.bufArray2HexStr(
     odap.sign(JSON.stringify(commitPrepareRequestMessage)),
   );
 
-  commitPrepareRequestMessage.clientSignature = messageSignature;
+  commitPrepareRequestMessage.signature = messageSignature;
 
   sessionData.commitPrepareRequestMessageHash = SHA256(
     JSON.stringify(commitPrepareRequestMessage),
@@ -66,15 +58,26 @@ export async function sendCommitPreparationRequest(
 
   odap.sessions.set(sessionID, sessionData);
 
+  await odap.storeOdapLog({
+    sessionID: sessionID,
+    type: "init",
+    operation: "prepare",
+    data: JSON.stringify(sessionData),
+  });
+
   log.info(`${fnTag}, sending CommitPreparationRequest...`);
 
-  const response = await odap
-    .getOdapAPI(sessionData.recipientBasePath)
-    .phase3CommitPreparationRequestV1(commitPrepareRequestMessage);
-
-  if (response.status != 200) {
-    throw new Error(`${fnTag}, CommitPreparationRequest message failed`);
+  if (!remote) {
+    return commitPrepareRequestMessage;
   }
+
+  await odap.makeRequest(
+    sessionID,
+    PluginOdapGateway.getOdapAPI(
+      sessionData.recipientBasePath,
+    ).phase3CommitPreparationRequestV1(commitPrepareRequestMessage),
+    "CommitPreparationRequest",
+  );
 }
 
 export async function checkValidCommitPreparationResponse(
@@ -92,66 +95,40 @@ export async function checkValidCommitPreparationResponse(
   }
 
   if (response.messageType != OdapMessageType.CommitPreparationResponse) {
-    await odap.Revert(sessionID);
     throw new Error(
       `${fnTag}, wrong message type for CommitPreparationResponse`,
     );
   }
 
   if (response.sequenceNumber != sessionData.lastSequenceNumber) {
-    await odap.Revert(sessionID);
     throw new Error(
       `${fnTag}, CommitPreparationResponse sequence number incorrect`,
     );
   }
 
   if (sessionData.commitPrepareRequestMessageHash != response.hashCommitPrep) {
-    await odap.Revert(sessionID);
     throw new Error(
       `${fnTag}, CommitPreparationResponse previous message hash does not match the one that was sent`,
     );
   }
 
   if (sessionData.recipientGatewayPubkey != response.serverIdentityPubkey) {
-    await odap.Revert(sessionID);
     throw new Error(
       `${fnTag}, CommitPreparationResponse serverIdentity public key does not match the one that was sent`,
     );
   }
 
   if (sessionData.sourceGatewayPubkey != response.clientIdentityPubkey) {
-    await odap.Revert(sessionID);
     throw new Error(
       `${fnTag}, CommitPreparationResponse clientIdentity public key does not match the one that was sent`,
     );
   }
 
-  const commitPrepareResponseMessageDataSignature = response.serverSignature;
-
-  const sourceServerSignature = new Uint8Array(
-    Buffer.from(commitPrepareResponseMessageDataSignature, "hex"),
-  );
-
-  const sourceServerPubkey = new Uint8Array(
-    Buffer.from(sessionData.recipientGatewayPubkey, "hex"),
-  );
-
-  response.serverSignature = "";
-
-  if (
-    !odap.verifySignature(
-      JSON.stringify(response),
-      sourceServerSignature,
-      sourceServerPubkey,
-    )
-  ) {
-    await odap.Revert(sessionID);
+  if (!odap.verifySignature(response, sessionData.recipientGatewayPubkey)) {
     throw new Error(
       `${fnTag}, CommitPreparationResponse message signature verification failed`,
     );
   }
-
-  response.serverSignature = commitPrepareResponseMessageDataSignature;
 
   storeSessionData(response, odap);
 
@@ -175,14 +152,14 @@ function storeSessionData(
     );
   }
 
-  sessionData.step++;
-
   sessionData.commitPrepareResponseMessageHash = SHA256(
     JSON.stringify(response),
   ).toString();
 
   sessionData.serverSignatureCommitPreparationResponseMessage =
-    response.serverSignature;
+    response.signature;
+
+  sessionData.step = 9;
 
   odap.sessions.set(sessionData.id, sessionData);
 }

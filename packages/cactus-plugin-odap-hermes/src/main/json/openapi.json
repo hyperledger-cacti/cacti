@@ -165,162 +165,6 @@
             "CommitAcknowledgementClaimFormat":{
                 "type":"object"
             },
-            "TransferInitializationV1Request":{
-                "type":"object",
-                "properties":{
-                    "messageType":{
-                        "type": "string"
-                    },
-                    "sessionID":{
-                        "type":"string"
-                    },
-                    "version":{
-                        "type":"string"
-                    },
-                    "developerURN":{
-                        "type":"string"
-                    },
-                    "credentialProfile":{
-                        "$ref":"#/components/schemas/CredentialProfile"
-                    },
-                    "payloadProfile":{
-                        "$ref":  "#/components/schemas/PayloadProfile"
-                    },
-                    "applicationProfile":{
-                        "type": "string"
-                    },
-                    "loggingProfile":{
-                        "type": "string"
-                    },
-                    "accessControlProfile":{
-                        "type": "string"
-                    },
-                    "clientSignature":{
-                        "type":"string"
-                    },
-                    "sourceGatewayPubkey":{
-                        "type":"string"
-                    },
-                    "sourceGatewayDltSystem":{
-                        "type":"string"
-                    },
-                    "recipientGatewayPubkey":{
-                        "type":"string"
-                    },
-                    "recipientGatewayDltSystem":{
-                        "type":"string"
-                    },
-                    "escrowType":{
-                        "type":"string",
-                        "enum":[
-                            "FAUCET",
-                            "TIMELOCK",
-                            "HASHLOCK",
-                            "HASHTIMELOCK",
-                            "MULTICLAIMPC",
-                            "DESTROY",
-                            "BURN"
-                        ]
-                    },
-                    "expiryTime":{
-                        "type":"string"
-                    },
-                    "multipleClaimsAllowed":{
-                        "type":"boolean"
-                    },
-                    "multipleCancelsAllowed":{
-                        "type":"boolean"
-                    },
-                    "permissions":{
-                        "$ref":"#/components/schemas/Permissions"
-                    },
-                    "origin":{
-                        "type":"string"
-                    },
-                    "destination":{
-                        "type":"string"
-                    },
-                    "subsequentCalls":{
-                        "type":"object"
-                    },
-                    "histories":{
-                        "type":"array",
-                        "items":{
-                            "$ref":"#/components/schemas/History"
-                        }
-                    },
-                    "sequenceNumber":{
-                        "type":"integer"
-                    },
-                    "sourceGatewayPath": {
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "messageType",
-                    "sessionID",
-                    "loggingProfile",
-                    "accessControlProfile",
-                    "payloadProfile",
-                    "applicationProfile",
-                    "clientSignature",
-                    "sourceGatewayPubkey",
-                    "sourceGatewayDltSystem",
-                    "recipientGatewayPubkey",
-                    "recipientGatewayDltSystem",
-                    "sequenceNumber"
-                ]
-            },
-            "TransferInitializationV1Response":{
-                "type":"object",
-                "properties": {
-                    "messageType":{
-                        "type": "string"
-                    },
-                    "sessionID":{
-                        "type":"string"
-                    },
-                    "sequenceNumber":{
-                        "type":"number"
-                    },
-                    "odapPhase":{
-                        "type":"string",
-                        "enum":[
-                            "TransferInitialization",
-                            "LockEvidenceVerification",
-                            "CommitmentEstablishment"
-                        ]
-                    },
-                    "initialRequestMessageHash":{
-                        "type":"string"
-                    },
-                    "destination":{
-                        "type":"string"
-                    },
-                    "timeStamp":{
-                        "type":"string"
-                    },
-                    "processedTimeStamp":{
-                        "type":"string"
-                    },
-                    "serverIdentityPubkey":{
-                        "type":"string"
-                    },
-                    "serverSignature":{
-                        "type":"string"
-                    }
-                },
-                "required": [
-                    "messageType",
-                    "initialRequestMessageHash",
-                    "timeStamp",
-                    "processedTimeStamp",
-                    "sessionID",
-                    "serverIdentityPubkey",
-                    "sequenceNumber",
-                    "serverSignature"
-                ]
-            },
             "SessionData":{
                 "type":"object",
                 "properties":{
@@ -462,34 +306,230 @@
                     "clientSignatureTransferCompleteMessage": {
                         "type":"string"
                     },
+                    "maxRetries":{
+                        "type": "number"
+                    },
                     "besuAssetID": {
                         "type":"string"
                     },
                     "fabricAssetID": {
                         "type":"string"
                     },
-                    "isFabricAssetDeleted": {
-                        "type":"boolean"
-                    },
-                    "isFabricAssetLocked": {
-                        "type":"boolean"
-                    },
-                    "isFabricAssetCreated": {
-                        "type":"boolean"
-                    },
-                    "isBesuAssetCreated": {
-                        "type":"boolean"
-                    },
-                    "isBesuAssetDeleted": {
-                        "type":"boolean"
-                    },
-                    "isBesuAssetLocked": {
-                        "type":"boolean"
-                    },
                     "fabricAssetSize": {
                         "type":"string"
+                    },
+                    "maxTimeout": {
+                        "type": "number"
+                    },
+                    "lastLogEntryTimestamp": {
+                        "type": "string"
+                    },
+                    "unlockAssetClaim": {
+                        "type": "string"
+                    },
+                    "recreateAssetClaim": {
+                        "type": "string"
+                    },
+                    "deleteAssetClaim": {
+                        "type": "string"
+                    },
+                    "lastMessageReceivedTimestamp": {
+                        "type": "string"
+                    },
+                    "rollback": {
+                        "type": "boolean"
+                    },
+                    "rollbackMessageHash": {
+                        "type": "string"
+                    },
+                    "rollbackProofs": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "rollbackActionsPerformed": {
+                        "type": "array",
+                        "items": {
+                            "type":"string",
+                            "enum": [
+                                "CREATE",
+                                "DELETE",
+                                "LOCK",
+                                "UNLOCK"
+                            ]
+                        }
                     }
                 }
+            },
+            "TransferInitializationV1Request":{
+                "type":"object",
+                "properties":{
+                    "messageType":{
+                        "type": "string"
+                    },
+                    "sessionID":{
+                        "type":"string"
+                    },
+                    "version":{
+                        "type":"string"
+                    },
+                    "developerURN":{
+                        "type":"string"
+                    },
+                    "credentialProfile":{
+                        "$ref":"#/components/schemas/CredentialProfile"
+                    },
+                    "payloadProfile":{
+                        "$ref":  "#/components/schemas/PayloadProfile"
+                    },
+                    "applicationProfile":{
+                        "type": "string"
+                    },
+                    "loggingProfile":{
+                        "type": "string"
+                    },
+                    "accessControlProfile":{
+                        "type": "string"
+                    },
+                    "signature":{
+                        "type":"string"
+                    },
+                    "sourceGatewayPubkey":{
+                        "type":"string"
+                    },
+                    "sourceGatewayDltSystem":{
+                        "type":"string"
+                    },
+                    "recipientGatewayPubkey":{
+                        "type":"string"
+                    },
+                    "recipientGatewayDltSystem":{
+                        "type":"string"
+                    },
+                    "escrowType":{
+                        "type":"string",
+                        "enum":[
+                            "FAUCET",
+                            "TIMELOCK",
+                            "HASHLOCK",
+                            "HASHTIMELOCK",
+                            "MULTICLAIMPC",
+                            "DESTROY",
+                            "BURN"
+                        ]
+                    },
+                    "expiryTime":{
+                        "type":"string"
+                    },
+                    "multipleClaimsAllowed":{
+                        "type":"boolean"
+                    },
+                    "multipleCancelsAllowed":{
+                        "type":"boolean"
+                    },
+                    "permissions":{
+                        "$ref":"#/components/schemas/Permissions"
+                    },
+                    "origin":{
+                        "type":"string"
+                    },
+                    "destination":{
+                        "type":"string"
+                    },
+                    "subsequentCalls":{
+                        "type":"object"
+                    },
+                    "histories":{
+                        "type":"array",
+                        "items":{
+                            "$ref":"#/components/schemas/History"
+                        }
+                    },
+                    "sequenceNumber":{
+                        "type":"integer"
+                    },
+                    "sourceGatewayPath": {
+                        "type": "string"
+                    },
+                    "recipientBasePath": {
+                        "type": "string"
+                    },
+                    "maxRetries": {
+                        "type": "number"
+                    },
+                    "maxTimeout": {
+                        "type": "number"
+                    }
+                },
+                "required": [
+                    "messageType",
+                    "sessionID",
+                    "loggingProfile",
+                    "accessControlProfile",
+                    "payloadProfile",
+                    "applicationProfile",
+                    "signature",
+                    "sourceGatewayPubkey",
+                    "sourceGatewayDltSystem",
+                    "recipientGatewayPubkey",
+                    "recipientGatewayDltSystem",
+                    "sequenceNumber",
+                    "sourceBasePath",
+                    "recipientBasePath",
+                    "maxRetries",
+                    "maxTimeout"
+                ]
+            },
+            "TransferInitializationV1Response":{
+                "type":"object",
+                "properties": {
+                    "messageType":{
+                        "type": "string"
+                    },
+                    "sessionID":{
+                        "type":"string"
+                    },
+                    "sequenceNumber":{
+                        "type":"number"
+                    },
+                    "odapPhase":{
+                        "type":"string",
+                        "enum":[
+                            "TransferInitialization",
+                            "LockEvidenceVerification",
+                            "CommitmentEstablishment"
+                        ]
+                    },
+                    "initialRequestMessageHash":{
+                        "type":"string"
+                    },
+                    "destination":{
+                        "type":"string"
+                    },
+                    "timeStamp":{
+                        "type":"string"
+                    },
+                    "processedTimeStamp":{
+                        "type":"string"
+                    },
+                    "serverIdentityPubkey":{
+                        "type":"string"
+                    },
+                    "signature":{
+                        "type":"string"
+                    }
+                },
+                "required": [
+                    "messageType",
+                    "initialRequestMessageHash",
+                    "timeStamp",
+                    "processedTimeStamp",
+                    "sessionID",
+                    "serverIdentityPubkey",
+                    "sequenceNumber",
+                    "signature"
+                ]
             },
             "TransferCommenceV1Request":{
                 "type":"object",
@@ -531,7 +571,7 @@
                         "type":"integer",
                         "nullable": true
                     },
-                    "clientSignature":{
+                    "signature":{
                         "type":"string"
                     },
                     "sequenceNumber":{
@@ -549,7 +589,7 @@
                     "serverIdentityPubkey",
                     "hashAssetProfile",
                     "hashPrevMessage",
-                    "clientSignature",
+                    "signature",
                     "sequenceNumber"
                 ]
             },
@@ -572,7 +612,7 @@
                         "type":"integer",
                         "nullable":true
                     },
-                    "serverSignature":{
+                    "signature":{
                         "type":"string"
                     },
                     "messageType":{
@@ -591,7 +631,7 @@
                     "serverIdentityPubkey",
                     "clientIdentityPubkey",
                     "hashCommenceRequest",
-                    "serverSignature",
+                    "signature",
                     "sequenceNumber"
                 ]
             },
@@ -624,7 +664,7 @@
                         "type":"integer",
                         "nullable":true
                     },
-                    "clientSignature":{
+                    "signature":{
                         "type":"string"
                     },
                     "messageType":{
@@ -645,7 +685,7 @@
                     "lockEvidenceClaim",
                     "lockEvidenceExpiration",
                     "hashCommenceAckRequest",
-                    "clientSignature",
+                    "signature",
                     "sequenceNumber"
                 ]
             },
@@ -668,7 +708,7 @@
                         "type":"integer",
                         "nullable":true
                     },
-                    "serverSignature":{
+                    "signature":{
                         "type":"string"
                     },
                     "messageType":{
@@ -684,7 +724,7 @@
                     "clientIdentityPubkey",
                     "serverIdentityPubkey",
                     "hashLockEvidenceRequest",
-                    "serverSignature",
+                    "signature",
                     "sequenceNumber"
                 ]
             },
@@ -709,7 +749,7 @@
                     "clientTransferNumber":{
                         "type":"integer"
                     },
-                    "clientSignature":{
+                    "signature":{
                         "type":"string"
                     },
                     "sequenceNumber":{
@@ -722,7 +762,7 @@
                     "clientIdentityPubkey",
                     "serverIdentityPubkey",
                     "hashLockEvidenceAck",
-                    "clientSignature",
+                    "signature",
                     "sequenceNumber"
                 ]
             },
@@ -747,7 +787,7 @@
                     "serverTransferNumber":{
                         "type":"string"
                     },
-                    "serverSignature":{
+                    "signature":{
                         "type":"string"
                     },
                     "sequenceNumber":{
@@ -760,7 +800,7 @@
                     "clientIdentityPubkey",
                     "serverIdentityPubkey",
                     "hashCommitPrep",
-                    "serverSignature",
+                    "signature",
                     "sequenceNumber"
                 ]
             },
@@ -792,7 +832,7 @@
                         "type":"integer",
                         "nullable": true
                     },
-                    "clientSignature":{
+                    "signature":{
                         "type":"string"
                     },
                     "sequenceNumber":{
@@ -806,7 +846,7 @@
                     "serverIdentityPubkey",
                     "commitFinalClaim",
                     "hashCommitPrepareAck",
-                    "clientSignature",
+                    "signature",
                     "sequenceNumber"
                 ]
             },
@@ -837,7 +877,7 @@
                     "serverTransferNumber":{
                         "type":"integer"
                     },
-                    "serverSignature":{
+                    "signature":{
                         "type":"string"
                     },
                     "sequenceNumber":{
@@ -851,7 +891,7 @@
                     "serverIdentityPubkey",
                     "commitAcknowledgementClaim",
                     "hashCommitFinal",
-                    "serverSignature",
+                    "signature",
                     "sequenceNumber"
                 ]
             },
@@ -877,7 +917,7 @@
                         "type":"integer",
                         "nullable":true
                     },
-                    "clientSignature":{
+                    "signature":{
                         "type":"string"
                     },
                     "hashTransferCommence":{
@@ -893,7 +933,7 @@
                     "clientIdentityPubkey",
                     "serverIdentityPubkey",
                     "hashCommitFinalAck",
-                    "clientSignature",
+                    "signature",
                     "hashTransferCommence",
                     "sequenceNumber"
                 ]
@@ -970,6 +1010,12 @@
                         "required": [
                             "apiHost"
                         ]
+                    },
+                    "maxRetries": {
+                        "type": "number"
+                    },
+                    "maxTimeout": {
+                        "type": "number"
                     }
                 },
                 "required": [
@@ -991,7 +1037,183 @@
                     "serverDltSystem",
                     "serverGatewayInstanceID",
                     "clientGatewayConfiguration",
-                    "serverGatewayConfiguration"
+                    "serverGatewayConfiguration",
+                    "maxRetries",
+                    "maxTimeout"
+                ]
+            },
+            "RecoverV1Message":{
+                "type":"object",
+                "properties": {
+                    "sessionID": {
+                        "type":"string"
+                    },
+                    "odapPhase": {
+                        "type":"string"
+                    },
+                    "sequenceNumber": {
+                        "type": "number"
+                    },
+                    "lastLogEntryTimestamp": {
+                        "type": "string"
+                    },
+                    "signature": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "sessionID",
+                    "odapPhase",
+                    "sequenceNumber",
+                    "lastLogEntryHash",
+                    "signature"
+                ]
+            },
+            "RecoverUpdateV1Message":{
+                "type":"object",
+                "properties": {
+                    "sessionID": {
+                        "type":"string"
+                    },
+                    "recoveredLogs": {
+                        "type": "array",
+                        "items":{
+                            "$ref": "#/components/schemas/OdapLocalLog"
+                        }
+                    },
+                    "signature": {
+                        "type":"string"
+                    }
+                },
+                "required": [
+                    "sessionID",
+                    "recoveredLogs",
+                    "signature"
+                ]
+            },
+            "RecoverUpdateAckV1Message":{
+                "type":"object",
+                "properties": {
+                    "sessionID": {
+                        "type":"string"
+                    },
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "changedEntriesHash": {
+                        "type": "array",
+                        "items":{
+                            "type": "string"
+                        }
+                    },
+                    "signature": {
+                        "type":"string"
+                    }
+                },
+                "required": [
+                    "sessionID",
+                    "success",
+                    "changedEntriesHash",
+                    "signature"
+                ]
+            },
+            "RecoverSuccessV1Message":{
+                "type":"object",
+                "properties": {
+                    "sessionID": {
+                        "type":"string"
+                    },
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "signature": {
+                        "type":"string"
+                    }
+                },
+                "required": [
+                    "sessionID",
+                    "success",
+                    "signature"
+                ]
+            },
+            "RollbackV1Message":{
+                "type":"object",
+                "properties": {
+                    "sessionID": {
+                        "type":"string"
+                    },
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "actionPerformed": {
+                        "type": "array",
+                        "items":{
+                            "type": "string"
+                        }
+                    },
+                    "proofs": {
+                        "type": "array",
+                        "items":{
+                            "type": "string"
+                        }
+                    },
+                    "signature": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "sessionID",
+                    "success",
+                    "actionPerformed",
+                    "proofs",
+                    "signature"
+                ]
+            },
+            "RollbackAckV1Message":{
+                "type":"object",
+                "properties": {
+                    "sessionID": {
+                        "type":"string"
+                    },
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "signature": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "sessionID",
+                    "success",
+                    "signature"
+                ]
+            },
+            "OdapLocalLog": {
+                "type":"object",
+                "properties": {
+                    "key": {
+                        "type": "string"
+                    },
+                    "sessionID": {
+                        "type": "string"
+                    },
+                    "data": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "type": "string"
+                    },
+                    "operation": {
+                        "type": "string"
+                    },
+                    "timestamp": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "sessionID",
+                    "type",
+                    "operation"
                 ]
             },
             "OdapMessage":{
@@ -1066,12 +1288,12 @@
         }
     },
     "paths": {
-        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase1/transferinitiationrequest":{
+        "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase1/transferinitiationrequest":{
             "post":{
                 "x-hyperledger-cactus": {
                     "http": {
                         "verbLowerCase": "post",
-                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase1/transferinitiationrequest"
+                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase1/transferinitiationrequest"
                     }
                 },
                 "operationId": "phase1TransferInitiationRequestV1",
@@ -1092,12 +1314,12 @@
                 }
             }
         },
-        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase2/transfercommencerequest":{
+        "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase2/transfercommencerequest":{
             "post":{
                 "x-hyperledger-cactus": {
                     "http": {
                         "verbLowerCase": "post",
-                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase2/transfercommencerequest"
+                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase2/transfercommencerequest"
                     }
                 },
                 "operationId": "phase2TransferCommenceRequestV1",
@@ -1118,12 +1340,12 @@
                 }
             }
         },
-        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase2/lockevidencerequest":{
+        "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase2/lockevidencerequest":{
             "post":{
                 "x-hyperledger-cactus": {
                     "http": {
                         "verbLowerCase": "post",
-                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase2/lockevidencerequest"
+                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase2/lockevidencerequest"
                     }
                 },
                 "operationId": "phase2LockEvidenceRequestV1",
@@ -1144,12 +1366,12 @@
                 }
             }
         },
-        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase3/commitpreparationrequest":{
+        "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase3/commitpreparationrequest":{
             "post":{
                 "x-hyperledger-cactus": {
                     "http": {
                         "verbLowerCase": "post",
-                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase3/commitpreparationrequest"
+                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase3/commitpreparationrequest"
                     }
                 },
                 "operationId": "phase3CommitPreparationRequestV1",
@@ -1170,12 +1392,12 @@
                 }
             }
         },
-        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase3/commitfinalrequest":{
+        "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase3/commitfinalrequest":{
             "post":{
                 "x-hyperledger-cactus": {
                     "http": {
                         "verbLowerCase": "post",
-                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase3/commitfinalrequest"
+                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase3/commitfinalrequest"
                     }
                 },
                 "operationId": "phase3CommitFinalRequestV1",
@@ -1196,12 +1418,12 @@
                 }
             }
         },
-        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase3/transfercompleterequest":{
+        "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase3/transfercompleterequest":{
             "get":{
                 "x-hyperledger-cactus": {
                     "http": {
                         "verbLowerCase": "get",
-                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase3/transfercompleterequest"
+                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase3/transfercompleterequest"
                     }
                 },
                 "operationId": "phase3TransferCompleteRequestV1",
@@ -1222,12 +1444,12 @@
                 }
             }
         },
-        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/clientrequest":{
+        "/api/v1/@hyperledger/cactus-plugin-odap-hermes/clientrequest":{
             "post":{
                 "x-hyperledger-cactus": {
                     "http": {
                         "verbLowerCase": "post",
-                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hemres/clientrequest"
+                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hermes/clientrequest"
                     }
                 },
                 "operationId": "clientRequestV1",
@@ -1254,12 +1476,12 @@
                 }
             }
         },
-        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase1/transferinitiationresponse":{
+        "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase1/transferinitiationresponse":{
             "post":{
                 "x-hyperledger-cactus": {
                     "http": {
                         "verbLowerCase": "post",
-                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase1/transferinitiationresponse"
+                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase1/transferinitiationresponse"
                     }
                 },
                 "operationId": "phase1TransferInitiationResponseV1",
@@ -1280,12 +1502,12 @@
                 }
             }
         },
-        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase2/transfercommenceresponse":{
+        "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase2/transfercommenceresponse":{
             "post":{
                 "x-hyperledger-cactus": {
                     "http": {
                         "verbLowerCase": "post",
-                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase2/transfercommenceresponse"
+                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase2/transfercommenceresponse"
                     }
                 },
                 "operationId": "phase2TransferCommenceResponseV1",
@@ -1306,12 +1528,12 @@
                 }
             }
         },
-        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase2/lockevidenceresponse":{
+        "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase2/lockevidenceresponse":{
             "post":{
                 "x-hyperledger-cactus": {
                     "http": {
                         "verbLowerCase": "post",
-                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase2/lockevidenceresponse"
+                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase2/lockevidenceresponse"
                     }
                 },
                 "operationId": "phase2LockEvidenceResponseV1",
@@ -1332,12 +1554,12 @@
                 }
             }
         },
-        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase3/commitpreparationresponse":{
+        "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase3/commitpreparationresponse":{
             "post":{
                 "x-hyperledger-cactus": {
                     "http": {
                         "verbLowerCase": "post",
-                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase3/commitpreparationresponse"
+                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase3/commitpreparationresponse"
                     }
                 },
                 "operationId": "phase3CommitPreparationResponseV1",
@@ -1358,12 +1580,12 @@
                 }
             }
         },
-        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase3/commitfinalresponse":{
+        "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase3/commitfinalresponse":{
             "post":{
                 "x-hyperledger-cactus": {
                     "http": {
                         "verbLowerCase": "post",
-                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase3/commitfinalresponse"
+                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase3/commitfinalresponse"
                     }
                 },
                 "operationId": "phase3CommitFinalResponseV1",
@@ -1383,6 +1605,162 @@
                     }
                 }
             }
+        },
+        "/api/v1/@hyperledger/cactus-plugin-odap-hermes/recovermessage":{
+            "post":{
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hermes/recovermessage"
+                    }
+                },
+                "operationId": "RecoverV1Message",
+                "description":"",
+                "requestBody":{
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref":  "#/components/schemas/RecoverV1Message"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/v1/@hyperledger/cactus-plugin-odap-hermes/recoverupdatemessage":{
+            "post":{
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hermes/recoverupdatemessage"
+                    }
+                },
+                "operationId": "RecoverUpdateV1Message",
+                "description":"",
+                "requestBody":{
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref":  "#/components/schemas/RecoverUpdateV1Message"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/v1/@hyperledger/cactus-plugin-odap-hermes/recoverupdateackmessage":{
+            "post":{
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hermes/recoverupdateackmessage"
+                    }
+                },
+                "operationId": "RecoverUpdateAckV1Message",
+                "description":"",
+                "requestBody":{
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref":  "#/components/schemas/RecoverUpdateAckV1Message"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/v1/@hyperledger/cactus-plugin-odap-hermes/recoversuccessmessage":{
+            "post":{
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hermes/recoversuccessmessage"
+                    }
+                },
+                "operationId": "RecoverV1Success",
+                "description":"",
+                "requestBody":{
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref":  "#/components/schemas/RecoverSuccessV1Message"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/v1/@hyperledger/cactus-plugin-odap-hermes/rollbackmessage":{
+            "post":{
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hermes/rollbackmessage"
+                    }
+                },
+                "operationId": "RollbackV1Message",
+                "description":"",
+                "requestBody":{
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref":  "#/components/schemas/RollbackV1Message"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/v1/@hyperledger/cactus-plugin-odap-hermes/rollbackackmessage":{
+            "post":{
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/@hyperledger/cactus-plugin-odap-hermes/rollbackackmessage"
+                    }
+                },
+                "operationId": "RollbackAckV1Message",
+                "description":"",
+                "requestBody":{
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref":  "#/components/schemas/RollbackAckV1Message"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
         }
-    }   
+    }
 }

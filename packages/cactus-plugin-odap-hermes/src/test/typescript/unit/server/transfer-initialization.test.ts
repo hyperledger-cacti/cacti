@@ -5,11 +5,18 @@ import {
   OdapMessageType,
   PluginOdapGateway,
 } from "../../../../main/typescript/gateway/plugin-odap-gateway";
-import { checkValidInitializationRequest } from "../../../../main/typescript/gateway/server/transfer-initialization";
+import {
+  checkValidInitializationRequest,
+  sendTransferInitializationResponse,
+} from "../../../../main/typescript/gateway/server/transfer-initialization";
 import {
   TransferInitializationV1Request,
   AssetProfile,
+  SessionData,
 } from "../../../../main/typescript/public-api";
+
+const MAX_RETRIES = 5;
+const MAX_TIMEOUT = 5000;
 
 let sourceGatewayConstructor;
 let recipientGatewayConstructor;
@@ -20,7 +27,7 @@ let assetProfile: AssetProfile;
 let sequenceNumber: number;
 let sessionID: string;
 
-beforeAll(() => {
+beforeEach(async () => {
   sourceGatewayConstructor = {
     name: "plugin-odap-gateway#sourceGateway",
     dltIDs: ["DLT2"],
@@ -34,6 +41,19 @@ beforeAll(() => {
 
   pluginSourceGateway = new PluginOdapGateway(sourceGatewayConstructor);
   pluginRecipientGateway = new PluginOdapGateway(recipientGatewayConstructor);
+
+  if (
+    pluginSourceGateway.database == undefined ||
+    pluginRecipientGateway.database == undefined
+  ) {
+    throw new Error("Database is not correctly initialized");
+  }
+
+  await pluginSourceGateway.database.migrate.rollback();
+  await pluginSourceGateway.database.migrate.latest();
+  await pluginRecipientGateway.database.migrate.rollback();
+  await pluginRecipientGateway.database.migrate.latest();
+
   expiryDate = new Date(2060, 11, 24).toString();
   assetProfile = { expirationDate: expiryDate };
 
@@ -43,6 +63,8 @@ beforeAll(() => {
 
 test("valid transfer initiation request", async () => {
   const initializationRequestMessage: TransferInitializationV1Request = {
+    maxRetries: MAX_RETRIES,
+    maxTimeout: MAX_TIMEOUT,
     messageType: OdapMessageType.InitializationRequest,
     sessionID: sessionID,
     version: "0.0.0",
@@ -53,15 +75,17 @@ test("valid transfer initiation request", async () => {
       assetProfile: assetProfile,
       capabilities: "",
     },
-    clientSignature: "",
+    signature: "",
     sourceGatewayPubkey: pluginSourceGateway.pubKey,
     sourceGatewayDltSystem: "DLT1",
     recipientGatewayPubkey: pluginRecipientGateway.pubKey,
     recipientGatewayDltSystem: "DLT2",
     sequenceNumber: sequenceNumber,
+    recipientBasePath: "",
+    sourceGatewayPath: "",
   };
 
-  initializationRequestMessage.clientSignature = pluginSourceGateway.bufArray2HexStr(
+  initializationRequestMessage.signature = PluginOdapGateway.bufArray2HexStr(
     await pluginSourceGateway.sign(
       JSON.stringify(initializationRequestMessage),
     ),
@@ -98,12 +122,14 @@ test("valid transfer initiation request", async () => {
   expect(sessionData.initializationRequestMessageHash).toBe(messageHash);
 
   expect(sessionData.clientSignatureInitializationRequestMessage).toBe(
-    initializationRequestMessage.clientSignature,
+    initializationRequestMessage.signature,
   );
 });
 
 test("transfer initiation request invalid because of incompatible DLTs", async () => {
   const initializationRequestMessage: TransferInitializationV1Request = {
+    maxRetries: MAX_RETRIES,
+    maxTimeout: MAX_TIMEOUT,
     messageType: OdapMessageType.InitializationRequest,
     sessionID: sessionID,
     version: "0.0.0",
@@ -114,15 +140,17 @@ test("transfer initiation request invalid because of incompatible DLTs", async (
       assetProfile: assetProfile,
       capabilities: "",
     },
-    clientSignature: "",
+    signature: "",
     sourceGatewayPubkey: pluginSourceGateway.pubKey,
     sourceGatewayDltSystem: "DLT2",
     recipientGatewayPubkey: pluginRecipientGateway.pubKey,
     recipientGatewayDltSystem: "DLT1",
     sequenceNumber: sequenceNumber,
+    recipientBasePath: "",
+    sourceGatewayPath: "",
   };
 
-  initializationRequestMessage.clientSignature = pluginSourceGateway.bufArray2HexStr(
+  initializationRequestMessage.signature = PluginOdapGateway.bufArray2HexStr(
     await pluginSourceGateway.sign(
       JSON.stringify(initializationRequestMessage),
     ),
@@ -147,6 +175,8 @@ test("transfer initiation request invalid because of asset expired", async () =>
   assetProfile = { expirationDate: expiryDate };
 
   const initializationRequestMessage: TransferInitializationV1Request = {
+    maxRetries: MAX_RETRIES,
+    maxTimeout: MAX_TIMEOUT,
     messageType: OdapMessageType.InitializationRequest,
     sessionID: sessionID,
     version: "0.0.0",
@@ -157,15 +187,17 @@ test("transfer initiation request invalid because of asset expired", async () =>
       assetProfile: assetProfile,
       capabilities: "",
     },
-    clientSignature: "",
+    signature: "",
     sourceGatewayPubkey: pluginSourceGateway.pubKey,
     sourceGatewayDltSystem: "DLT1",
     recipientGatewayPubkey: pluginRecipientGateway.pubKey,
     recipientGatewayDltSystem: "DLT2",
     sequenceNumber: sequenceNumber,
+    recipientBasePath: "",
+    sourceGatewayPath: "",
   };
 
-  initializationRequestMessage.clientSignature = pluginSourceGateway.bufArray2HexStr(
+  initializationRequestMessage.signature = PluginOdapGateway.bufArray2HexStr(
     pluginSourceGateway.sign(JSON.stringify(initializationRequestMessage)),
   );
 
@@ -177,4 +209,40 @@ test("transfer initiation request invalid because of asset expired", async () =>
       throw new Error("Test Failed");
     })
     .catch((ex: Error) => expect(ex.message).toMatch("asset has expired"));
+});
+
+test("timeout in commit final response because no client gateway is connected", async () => {
+  const sessionData: SessionData = {
+    id: sessionID,
+    step: 1,
+    maxRetries: MAX_RETRIES,
+    maxTimeout: MAX_TIMEOUT,
+    sourceBasePath: "http://wrongpath",
+    recipientBasePath: "",
+    lastSequenceNumber: 77,
+    initializationRequestMessageHash:
+      "dummyInitializationRequestMessageProcessedTimeStamp",
+    initializationRequestMessageRcvTimeStamp:
+      "dummyInitializationRequestMessageProcessedTimeStamp",
+    initializationRequestMessageProcessedTimeStamp:
+      "dummyInitializationRequestMessageProcessedTimeStamp",
+    lastMessageReceivedTimestamp: new Date().toString(),
+    rollbackProofs: [],
+    rollbackActionsPerformed: [],
+  };
+
+  pluginSourceGateway.sessions.set(sessionID, sessionData);
+
+  await sendTransferInitializationResponse(sessionID, pluginSourceGateway, true)
+    .then(() => {
+      throw new Error("Test Failed");
+    })
+    .catch((ex: Error) => {
+      expect(ex.message).toMatch("Timeout exceeded.");
+    });
+});
+
+afterEach(() => {
+  pluginSourceGateway.database?.destroy();
+  pluginRecipientGateway.database?.destroy();
 });

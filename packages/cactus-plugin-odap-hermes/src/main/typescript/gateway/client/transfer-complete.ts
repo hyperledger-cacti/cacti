@@ -11,7 +11,8 @@ const log = LoggerProvider.getOrCreate({
 export async function sendTransferCompleteRequest(
   sessionID: string,
   odap: PluginOdapGateway,
-): Promise<void> {
+  remote: boolean,
+): Promise<void | TransferCompleteV1Request> {
   const fnTag = `${odap.className}#sendTransferCompleteRequest()`;
 
   const sessionData = odap.sessions.get(sessionID);
@@ -19,6 +20,8 @@ export async function sendTransferCompleteRequest(
   if (
     sessionData == undefined ||
     sessionData.step == undefined ||
+    sessionData.maxTimeout == undefined ||
+    sessionData.maxRetries == undefined ||
     sessionData.recipientBasePath == undefined ||
     sessionData.lastSequenceNumber == undefined ||
     sessionData.sourceGatewayPubkey == undefined ||
@@ -29,17 +32,6 @@ export async function sendTransferCompleteRequest(
     throw new Error(`${fnTag}, session data is not correctly initialized`);
   }
 
-  await odap.storeOdapLog(
-    {
-      phase: "p3",
-      step: sessionData.step.toString(),
-      type: "init",
-      operation: "complete",
-      nodes: `${odap.pubKey}`,
-    },
-    `${sessionData.id}-${sessionData.step.toString()}`,
-  );
-
   const transferCompleteRequestMessage: TransferCompleteV1Request = {
     sessionID: sessionID,
     messageType: OdapMessageType.TransferCompleteRequest,
@@ -47,15 +39,15 @@ export async function sendTransferCompleteRequest(
     serverIdentityPubkey: sessionData.recipientGatewayPubkey,
     hashCommitFinalAck: sessionData.commitFinalResponseMessageHash,
     hashTransferCommence: sessionData.transferCommenceMessageRequestHash,
-    clientSignature: "",
+    signature: "",
     sequenceNumber: ++sessionData.lastSequenceNumber,
   };
 
-  const messageSignature = odap.bufArray2HexStr(
+  const messageSignature = PluginOdapGateway.bufArray2HexStr(
     odap.sign(JSON.stringify(transferCompleteRequestMessage)),
   );
 
-  transferCompleteRequestMessage.clientSignature = messageSignature;
+  transferCompleteRequestMessage.signature = messageSignature;
 
   sessionData.transferCompleteMessageHash = SHA256(
     JSON.stringify(transferCompleteRequestMessage),
@@ -65,13 +57,24 @@ export async function sendTransferCompleteRequest(
 
   odap.sessions.set(sessionID, sessionData);
 
+  await odap.storeOdapLog({
+    sessionID: sessionID,
+    type: "init",
+    operation: "complete",
+    data: JSON.stringify(sessionData),
+  });
+
   log.info(`${fnTag}, sending TransferCompleteRequest...`);
 
-  const response = await odap
-    .getOdapAPI(sessionData.recipientBasePath)
-    .phase3TransferCompleteRequestV1(transferCompleteRequestMessage);
-
-  if (response.status != 200) {
-    throw new Error(`${fnTag}, TransferCompleteRequest message failed`);
+  if (!remote) {
+    return transferCompleteRequestMessage;
   }
+
+  await odap.makeRequest(
+    sessionID,
+    PluginOdapGateway.getOdapAPI(
+      sessionData.recipientBasePath,
+    ).phase3TransferCompleteRequestV1(transferCompleteRequestMessage),
+    "TransferCompleteRequest",
+  );
 }

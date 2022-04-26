@@ -13,8 +13,8 @@ export class Asset {
   public ID: string;
 
   @Property()
-  public IsLock: boolean;
+  public isLocked: boolean;
 
   @Property()
-  public Size: number;
+  public size: number;
 }

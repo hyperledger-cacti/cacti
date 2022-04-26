@@ -4,6 +4,7 @@ import type { Server as SecureServer } from "https";
 import { Optional } from "typescript-optional";
 import type { Express } from "express";
 import { v4 as uuidV4 } from "uuid";
+import knex, { Knex } from "knex";
 import OAS from "../../json/openapi.json";
 import {
   Secp256k1Keys,
@@ -39,6 +40,13 @@ import {
   CommitFinalV1Response,
   TransferCompleteV1Request,
   TransferInitializationV1Request,
+  OdapLocalLog,
+  RecoverV1Message,
+  RecoverUpdateV1Message,
+  RecoverUpdateAckV1Message,
+  RollbackV1Message,
+  SessionDataRollbackActionsPerformedEnum,
+  RollbackAckV1Message,
 } from "../generated/openapi/typescript-axios";
 import { CommitFinalRequestEndpointV1 } from "../web-services/server-side/commit-final-request-endpoint";
 import { PluginRegistry } from "@hyperledger/cactus-core";
@@ -104,6 +112,42 @@ import {
   checkValidCommitPreparationRequest,
   sendCommitPreparationResponse,
 } from "./server/commit-preparation";
+import {
+  checkValidRecoverMessage,
+  sendRecoverMessage,
+} from "./recovery/recover";
+import {
+  checkValidRecoverUpdateMessage,
+  sendRecoverUpdateMessage,
+} from "./recovery/recover-update";
+import {
+  checkValidRecoverUpdateAckMessage,
+  sendRecoverUpdateAckMessage,
+} from "./recovery/recover-update-ack";
+import {
+  checkValidRecoverSuccessMessage,
+  sendRecoverSuccessMessage,
+} from "./recovery/recover-success";
+import { SHA256 } from "crypto-js";
+import { RecoverMessageEndpointV1 } from "../web-services/recovery/recover-message-endpoint";
+import { RecoverUpdateMessageEndpointV1 } from "../web-services/recovery/recover-update-message-endpoint";
+import { RecoverUpdateAckMessageEndpointV1 } from "../web-services/recovery/recover-update-ack-message-endpoint";
+import { RecoverSuccessMessageEndpointV1 } from "../web-services/recovery/recover-success-message-endpoint";
+import { RollbackMessageEndpointV1 } from "../web-services/recovery/rollback-message-endpoint";
+import {
+  checkValidRollbackMessage,
+  sendRollbackMessage,
+} from "./recovery/rollback";
+import {
+  besuAssetExists,
+  fabricAssetExists,
+  isFabricAssetLocked,
+} from "../../../test/typescript/make-checks-ledgers";
+import { AxiosResponse } from "axios";
+import {
+  checkValidRollbackAckMessage,
+  sendRollbackAckMessage,
+} from "./recovery/rollback-ack";
 
 export enum OdapMessageType {
   InitializationRequest = "urn:ietf:odap:msgtype:init-transfer-msg",
@@ -123,31 +167,34 @@ export interface IPluginOdapGatewayConstructorOptions {
   name: string;
   dltIDs: string[];
   instanceId: string;
-  ipfsPath?: string;
+  keyPair?: IOdapGatewayKeyPairs;
 
+  ipfsPath?: string;
   fabricPath?: string;
   besuPath?: string;
+
   fabricSigningCredential?: FabricSigningCredential;
   fabricChannelName?: string;
   fabricContractName?: string;
   besuContractName?: string;
   besuWeb3SigningCredential?: Web3SigningCredential;
   besuKeychainId?: string;
-
   fabricAssetID?: string;
   fabricAssetSize?: string;
   besuAssetID?: string;
+
+  knexConfig?: Knex.Config;
 }
 export interface IOdapGatewayKeyPairs {
   publicKey: Uint8Array;
   privateKey: Uint8Array;
 }
-interface IOdapHermesLog {
-  phase: string;
-  step: string;
-  type: string;
-  operation: string;
-  nodes: string;
+
+export interface IOdapLogIPFS {
+  key: string;
+  hash: string;
+  signature: string;
+  signerPubKey: string;
 }
 
 export class PluginOdapGateway implements ICactusPlugin, IPluginWebService {
@@ -158,10 +205,12 @@ export class PluginOdapGateway implements ICactusPlugin, IPluginWebService {
   public static readonly CLASS_NAME = "OdapGateway";
   private readonly log: Logger;
   private readonly instanceId: string;
+
   public ipfsApi?: ObjectStoreIpfsApi;
   public fabricApi?: FabricApi;
   public besuApi?: BesuApi;
   public pluginRegistry: PluginRegistry;
+  public database?: Knex;
 
   private endpoints: IWebServiceEndpoint[] | undefined;
   //map[]object, object refer to a state
@@ -190,13 +239,17 @@ export class PluginOdapGateway implements ICactusPlugin, IPluginWebService {
     const level = "INFO";
     const label = this.className;
     this.log = LoggerProvider.getOrCreate({ level, label });
+
     this.instanceId = options.instanceId;
+
     this.name = options.name;
     this.supportedDltIDs = options.dltIDs;
     this.sessions = new Map();
-    const keyPairs: IOdapGatewayKeyPairs = Secp256k1Keys.generateKeyPairsBuffer();
-    this.pubKey = this.bufArray2HexStr(keyPairs.publicKey);
-    this.privKey = this.bufArray2HexStr(keyPairs.privateKey);
+    const keyPairs = options.keyPair
+      ? options.keyPair
+      : Secp256k1Keys.generateKeyPairsBuffer();
+    this.pubKey = PluginOdapGateway.bufArray2HexStr(keyPairs.publicKey);
+    this.privKey = PluginOdapGateway.bufArray2HexStr(keyPairs.privateKey);
     const odapSignerOptions: IJsObjectSignerOptions = {
       privateKey: this.privKey,
       logLevel: "debug",
@@ -211,6 +264,17 @@ export class PluginOdapGateway implements ICactusPlugin, IPluginWebService {
     if (options.ipfsPath != undefined) this.defineIpfsConnection(options);
     if (options.fabricPath != undefined) this.defineFabricConnection(options);
     if (options.besuPath != undefined) this.defineBesuConnection(options);
+
+    this.defineKnexConnection(options.knexConfig);
+  }
+
+  public defineKnexConnection(knexConfig?: Knex.Config): void {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const config = require("../../../../knex/knexfile.ts")[
+      process.env.ENVIRONMENT || "development"
+    ];
+
+    this.database = knex(knexConfig || config);
   }
 
   private defineIpfsConnection(
@@ -270,94 +334,6 @@ export class PluginOdapGateway implements ICactusPlugin, IPluginWebService {
     this.besuWeb3SigningCredential = options.besuWeb3SigningCredential;
     this.besuKeychainId = options.besuKeychainId;
     this.besuAssetID = options.besuAssetID;
-  }
-
-  public async Revert(sessionID: string): Promise<void> {
-    const sessionData = this.sessions.get(sessionID);
-    if (sessionData == undefined) return;
-    if (
-      sessionData.isFabricAssetDeleted != undefined &&
-      sessionData.isFabricAssetDeleted
-    ) {
-      if (this.fabricApi == undefined) return;
-      await this.fabricApi.runTransactionV1({
-        signingCredential: this.fabricSigningCredential,
-        channelName: this.fabricChannelName,
-        contractName: this.fabricContractName,
-        invocationType: FabricContractInvocationType.Send,
-        methodName: "CreateAsset",
-        params: [sessionData.fabricAssetID, sessionData.fabricAssetSize],
-      } as FabricRunTransactionRequest);
-    } else if (
-      sessionData.isFabricAssetLocked != undefined &&
-      sessionData.isFabricAssetLocked
-    ) {
-      if (this.fabricApi == undefined) return;
-      await this.fabricApi.runTransactionV1({
-        signingCredential: this.fabricSigningCredential,
-        channelName: this.fabricChannelName,
-        contractName: this.fabricContractName,
-        invocationType: FabricContractInvocationType.Send,
-        methodName: "UnLockAsset",
-        params: [sessionData.fabricAssetID],
-      } as FabricRunTransactionRequest);
-    } else if (
-      sessionData.isFabricAssetCreated != undefined &&
-      sessionData.isFabricAssetCreated
-    ) {
-      if (this.fabricApi == undefined) return;
-      await this.fabricApi.runTransactionV1({
-        signingCredential: this.fabricSigningCredential,
-        channelName: this.fabricChannelName,
-        contractName: this.fabricContractName,
-        invocationType: FabricContractInvocationType.Send,
-        methodName: "CreateAsset",
-        params: [sessionData.fabricAssetID],
-      } as FabricRunTransactionRequest);
-    } else if (
-      sessionData.isBesuAssetCreated != undefined &&
-      sessionData.isBesuAssetCreated
-    ) {
-      if (this.besuApi == undefined) return;
-      await this.besuApi.invokeContractV1({
-        contractName: this.besuContractName,
-        invocationType: EthContractInvocationType.Send,
-        methodName: "deleteAsset",
-        gas: 1000000,
-        params: [this.besuAssetID],
-        signingCredential: this.besuWeb3SigningCredential,
-        keychainId: this.besuKeychainId,
-      } as BesuInvokeContractV1Request);
-    } else if (
-      sessionData.isBesuAssetDeleted != undefined &&
-      sessionData.isBesuAssetDeleted
-    ) {
-      if (this.besuApi == undefined) return;
-      await this.besuApi.invokeContractV1({
-        contractName: this.besuContractName,
-        invocationType: EthContractInvocationType.Send,
-        methodName: "createAsset",
-        gas: 1000000,
-        params: [this.besuAssetID],
-        signingCredential: this.besuWeb3SigningCredential,
-        keychainId: this.besuKeychainId,
-      } as BesuInvokeContractV1Request);
-    } else if (
-      sessionData.isBesuAssetLocked != undefined &&
-      sessionData.isBesuAssetLocked
-    ) {
-      if (this.besuApi == undefined) return;
-      await this.besuApi.invokeContractV1({
-        contractName: this.besuContractName,
-        invocationType: EthContractInvocationType.Send,
-        methodName: "unLockAsset",
-        gas: 1000000,
-        params: [this.besuAssetID],
-        signingCredential: this.besuWeb3SigningCredential,
-        keychainId: this.besuKeychainId,
-      } as BesuInvokeContractV1Request);
-    }
-    return;
   }
 
   public get className(): string {
@@ -441,6 +417,27 @@ export class PluginOdapGateway implements ICactusPlugin, IPluginWebService {
       gateway: this,
     });
 
+    // Recovery endpoints
+    const recoverEndpoint = new RecoverMessageEndpointV1({
+      gateway: this,
+    });
+
+    const recoverUpdateEndpoint = new RecoverUpdateMessageEndpointV1({
+      gateway: this,
+    });
+
+    const recoverUpdateAckEndpoint = new RecoverUpdateAckMessageEndpointV1({
+      gateway: this,
+    });
+
+    const recoverSuccessEndpoint = new RecoverSuccessMessageEndpointV1({
+      gateway: this,
+    });
+
+    const rollbackEndpoint = new RollbackMessageEndpointV1({
+      gateway: this,
+    });
+
     this.endpoints = [
       transferInitiationRequestEndpoint,
       transferCommenceRequestEndpoint,
@@ -454,6 +451,11 @@ export class PluginOdapGateway implements ICactusPlugin, IPluginWebService {
       lockEvidenceResponseEndpoint,
       commitPreparationResponseEndpoint,
       commitFinalResponseEndpoint,
+      recoverEndpoint,
+      recoverUpdateEndpoint,
+      recoverUpdateAckEndpoint,
+      recoverSuccessEndpoint,
+      rollbackEndpoint,
     ];
     return this.endpoints;
   }
@@ -471,56 +473,268 @@ export class PluginOdapGateway implements ICactusPlugin, IPluginWebService {
   }
 
   public getPackageName(): string {
-    return "@hyperledger/cactus-odap-odap-gateway-business-logic-plugin";
+    return "@hyperledger/cactus-odap-gateway-business-logic-plugin";
   }
 
-  public sign(msg: string): Uint8Array {
+  getDatabaseInstance(): Knex.QueryBuilder {
+    const fnTag = `${this.className}#getDatabaseInstance()`;
+
+    if (this.database == undefined) {
+      throw new Error(`${fnTag}, database is undefined`);
+    }
+
+    return this.database("logs");
+  }
+
+  isClientGateway(sessionID: string): boolean {
+    const fnTag = `${this.className}#isClientGateway()`;
+
+    const sessionData = this.sessions.get(sessionID);
+
+    if (sessionData == undefined) {
+      throw new Error(`${fnTag}, session data is undefined`);
+    }
+
+    return sessionData.sourceGatewayPubkey == this.pubKey;
+  }
+
+  sign(msg: string): Uint8Array {
     return this.odapSigner.sign(msg);
   }
 
-  public verifySignature(
-    msg: string,
-    signature: Uint8Array,
-    pubKey: Uint8Array,
-  ): boolean {
-    return this.odapSigner.verify(msg, signature, pubKey);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  verifySignature(obj: any, pubKey: string): boolean {
+    const sourceSignature = new Uint8Array(Buffer.from(obj.signature, "hex"));
+    const sourcePubkey = new Uint8Array(Buffer.from(pubKey, "hex"));
+
+    const signature = obj.signature;
+    obj.signature = "";
+    if (
+      !this.odapSigner.verify(
+        JSON.stringify(obj),
+        sourceSignature,
+        sourcePubkey,
+      )
+    ) {
+      return false;
+    }
+
+    obj.signature = signature;
+    return true;
   }
 
-  public bufArray2HexStr(array: Uint8Array): string {
+  static bufArray2HexStr(array: Uint8Array): string {
     return Buffer.from(array).toString("hex");
   }
 
-  public async publishOdapProof(ID: string, proof: string): Promise<void> {
-    if (this.ipfsApi == undefined) return;
-    const res = await this.ipfsApi.setObjectV1({
-      key: ID,
-      value: proof,
-    });
-    const resStatusOk = res.status > 199 && res.status < 300;
-    if (!resStatusOk) {
-      throw new Error("${fnTag}, error when logging to ipfs");
+  static getOdapLogKey(
+    sessionID: string,
+    type: string,
+    operation: string,
+  ): string {
+    return `${sessionID}-${type}-${operation}`;
+  }
+
+  async recoverOpenSessions(remote: boolean) {
+    const fnTag = `${this.className}#recoverOpenSessions()`;
+
+    this.log.info(`${fnTag}, recovering open sessions...`);
+
+    if (this.database == undefined) {
+      throw new Error(`${fnTag}, database is undefined`);
+    }
+
+    const logs: OdapLocalLog[] = await this.getDatabaseInstance()
+      .select(
+        this.database.raw(
+          "sessionId, key, data, type, operation, MAX(timestamp) as timestamp",
+        ),
+      )
+      .whereNot({ type: "proof" })
+      .groupBy("sessionID");
+
+    for (const log of logs) {
+      const sessionID = log.sessionID;
+      this.log.info(`${fnTag}, recovering session ${sessionID}...`);
+
+      if (log == undefined || log.data == undefined) {
+        throw new Error(`${fnTag}, invalid log}`);
+      }
+
+      const sessionData: SessionData = JSON.parse(log.data);
+
+      sessionData.lastLogEntryTimestamp = log.timestamp;
+      this.sessions.set(sessionID, sessionData);
+      if (remote) await sendRecoverMessage(sessionID, this, true);
     }
   }
 
-  public async storeOdapLog(
-    odapHermesLog: IOdapHermesLog,
-    ID: string,
-  ): Promise<void> {
+  async storeInDatabase(odapLocalLog: OdapLocalLog) {
+    const fnTag = `${this.className}#storeInDatabase()`;
     this.log.info(
-      `<${odapHermesLog.phase}, ${odapHermesLog.step}, ${odapHermesLog.type}-${odapHermesLog.operation}, ${odapHermesLog.nodes}>`,
+      `${fnTag}, Storing locally log: ${JSON.stringify(odapLocalLog)}`,
     );
+
+    await this.getDatabaseInstance().insert(odapLocalLog);
+  }
+
+  async storeInIPFS(key: string, hash: string) {
+    const fnTag = `${this.className}#storeInIPFS()`;
+
     if (this.ipfsApi == undefined) return;
-    const res = await this.ipfsApi.setObjectV1({
-      key: ID,
-      value: `${odapHermesLog.phase}, ${odapHermesLog.step}, ${odapHermesLog.type}-${odapHermesLog.operation}, ${odapHermesLog.nodes}`,
+
+    const ipfsLog: IOdapLogIPFS = {
+      key: key,
+      hash: hash,
+      signature: "",
+      signerPubKey: this.pubKey,
+    };
+
+    ipfsLog.signature = PluginOdapGateway.bufArray2HexStr(
+      await this.sign(JSON.stringify(ipfsLog)),
+    );
+
+    const logBase64 = Buffer.from(JSON.stringify(ipfsLog)).toString("base64");
+
+    this.log.info(`${fnTag}, Storing in ipfs log: ${JSON.stringify(ipfsLog)}`);
+
+    const response = await this.ipfsApi.setObjectV1({
+      key: key,
+      value: logBase64,
     });
-    const resStatusOk = res.status > 199 && res.status < 300;
-    if (!resStatusOk) {
-      throw new Error("${fnTag}, error when logging to ipfs");
+
+    if (response.status < 200 && response.status > 299) {
+      throw new Error(`${fnTag}, error when logging to ipfs`);
     }
   }
 
-  public getOdapAPI(basePath: string): OdapApi {
+  async storeOdapLog(odapLocalLog: OdapLocalLog): Promise<void> {
+    if (this.ipfsApi == undefined) return;
+
+    odapLocalLog.key = PluginOdapGateway.getOdapLogKey(
+      odapLocalLog.sessionID,
+      odapLocalLog.type,
+      odapLocalLog.operation,
+    );
+    odapLocalLog.timestamp = Date.now().toString();
+
+    await this.storeInDatabase(odapLocalLog);
+
+    // Keep the order consistent with the order of the fields in the table
+    // so that the hash matches when retrieving from the database
+    const hash = SHA256(
+      JSON.stringify(odapLocalLog, [
+        "sessionID",
+        "type",
+        "key",
+        "operation",
+        "timestamp",
+        "data",
+      ]),
+    ).toString();
+
+    await this.storeInIPFS(odapLocalLog.key, hash);
+  }
+
+  async storeOdapProof(odapLocalLog: OdapLocalLog): Promise<void> {
+    if (this.ipfsApi == undefined || odapLocalLog.data == undefined) return;
+
+    odapLocalLog.key = PluginOdapGateway.getOdapLogKey(
+      odapLocalLog.sessionID,
+      odapLocalLog.type,
+      odapLocalLog.operation,
+    );
+    odapLocalLog.timestamp = Date.now().toString();
+
+    await this.storeInDatabase(odapLocalLog);
+
+    const hash = SHA256(odapLocalLog.data).toString();
+
+    await this.storeInIPFS(odapLocalLog.key, hash);
+  }
+
+  async getLogFromDatabase(logKey: string): Promise<OdapLocalLog | undefined> {
+    const fnTag = `${this.className}#getLogFromDatabase()`;
+    this.log.info(`${fnTag}, retrieving log with key ${logKey}`);
+
+    return await this.getDatabaseInstance()
+      .where({ key: logKey })
+      .first()
+      .then((row) => {
+        this.log.info(`${fnTag}, retrieved log ${JSON.stringify(row)}`);
+
+        return row;
+      });
+  }
+
+  async getLastLogFromDatabase(
+    sessionID: string,
+  ): Promise<OdapLocalLog | undefined> {
+    const fnTag = `${this.className}#getLastLog()`;
+    this.log.info(`${fnTag}, retrieving last log from sessionID ${sessionID}`);
+
+    return await this.getDatabaseInstance()
+      .orderBy("timestamp", "desc")
+      .where({ sessionID: sessionID })
+      .first()
+      .then((row) => {
+        this.log.info(`${fnTag}, retrieved log ${JSON.stringify(row)}`);
+
+        return row;
+      });
+  }
+
+  async getLogsMoreRecentThanTimestamp(
+    timestamp: string,
+  ): Promise<OdapLocalLog[]> {
+    const fnTag = `${this.className}#getLogsMoreRecentThanTimestamp()`;
+    this.log.info(`${fnTag}, retrieving logs more recent than ${timestamp}`);
+
+    const logs: OdapLocalLog[] = await this.getDatabaseInstance()
+      .where("timestamp", ">", timestamp)
+      .whereNot("type", "like", "%proof%");
+
+    if (logs == undefined) {
+      throw new Error(`${fnTag}, error when retrieving log from database`);
+    }
+
+    this.log.info(`${fnTag}, there are ${logs.length} more recent logs`);
+
+    return logs;
+  }
+
+  async getLogFromIPFS(logKey: string): Promise<IOdapLogIPFS> {
+    const fnTag = `${this.className}#getOdapLogFromIPFS()`;
+    this.log.info(`Retrieving log with key: <${logKey}>`);
+
+    if (this.ipfsApi == undefined) {
+      throw new Error(`${fnTag}, ipfs is not defined`);
+    }
+
+    const response = await this.ipfsApi.getObjectV1({
+      key: logKey,
+    });
+
+    if (response.status < 200 && response.status > 299) {
+      throw new Error(`${fnTag}, error when logging to ipfs`);
+    }
+
+    const log: IOdapLogIPFS = JSON.parse(
+      Buffer.from(response.data.value, "base64").toString(),
+    );
+
+    if (log == undefined || log.signature == undefined) {
+      throw new Error(`${fnTag}, the log or its signature is not defined`);
+    }
+
+    if (!this.verifySignature(log, log.signerPubKey)) {
+      throw new Error(`${fnTag}, received log with invalid signature`);
+    }
+
+    return log;
+  }
+
+  static getOdapAPI(basePath: string): OdapApi {
     const odapServerApiConfig = new Configuration({
       basePath: basePath,
     });
@@ -528,8 +742,105 @@ export class PluginOdapGateway implements ICactusPlugin, IPluginWebService {
     return new OdapApi(odapServerApiConfig);
   }
 
+  async deleteDatabaseEntries(sessionID: string) {
+    this.log.info(
+      `deleting logs from database associated with sessionID: ${sessionID}`,
+    );
+
+    await this.getDatabaseInstance().where({ sessionID: sessionID }).del();
+  }
+
+  async resumeOdapSession(sessionID: string, remote: boolean) {
+    const fnTag = `${this.className}#continueOdapSession()`;
+    const sessionData = this.sessions.get(sessionID);
+
+    if (
+      sessionData == undefined ||
+      sessionData.step == undefined ||
+      sessionData.lastSequenceNumber == undefined
+    ) {
+      throw new Error(`${fnTag}, session data is undefined`);
+    }
+
+    // if the other gateway made the rollback, we will do it as well
+    if (sessionData.rollback) {
+      await this.rollback(sessionID);
+      await sendRollbackAckMessage(sessionID, this, true);
+      return;
+    }
+
+    this.log.info(
+      `${fnTag}, recovering session ${sessionID} that was in step ${sessionData.step}`,
+    );
+
+    // If step is even then the last log was inserted by the server
+    // so we need to increase the step
+    if (this.isClientGateway(sessionID) && sessionData.step % 2 == 0) {
+      sessionData.step++;
+    }
+
+    this.sessions.set(sessionID, sessionData);
+
+    switch (sessionData.step) {
+      case 1:
+        return await sendTransferInitializationRequest(sessionID, this, remote);
+
+      case 2:
+        return await sendTransferInitializationResponse(
+          sessionID,
+          this,
+          remote,
+        );
+
+      case 3:
+        return await sendTransferCommenceRequest(sessionID, this, remote);
+
+      case 4:
+        return await sendTransferCommenceResponse(sessionID, this, remote);
+
+      case 5:
+        return await sendLockEvidenceRequest(sessionID, this, remote);
+
+      case 6:
+        return await sendLockEvidenceResponse(sessionID, this, remote);
+
+      case 7:
+        return await sendCommitPreparationRequest(sessionID, this, remote);
+
+      case 8:
+        return await sendCommitPreparationResponse(sessionID, this, remote);
+
+      case 9:
+        return await sendCommitFinalRequest(sessionID, this, remote);
+
+      case 10:
+        return await sendCommitFinalResponse(sessionID, this, remote);
+
+      case 11:
+        return await sendTransferCompleteRequest(sessionID, this, remote);
+
+      default:
+        this.sessions.delete(sessionID);
+        throw new Error(
+          `${fnTag}, invalid session data step. A new session should be initiated by the client gateway.`,
+        );
+    }
+  }
+
+  private updateLastMessageReceivedTimestamp(sessionID: string) {
+    const fnTag = `${this.className}#updateLastMessageReceivedTimestamp()`;
+    const sessionData = this.sessions.get(sessionID);
+
+    if (sessionData == undefined) {
+      throw new Error(`${fnTag}, session data is not correctly initialized`);
+    }
+
+    sessionData.lastMessageReceivedTimestamp = new Date().toString();
+    this.sessions.set(sessionID, sessionData);
+  }
+
   //Server-side
-  public async onTransferInitiationRequestReceived(
+  async onTransferInitiationRequestReceived(
     request: TransferInitializationV1Request,
   ): Promise<void> {
     const fnTag = `${this.className}#onTransferInitiationRequestReceived()`;
@@ -541,10 +852,10 @@ export class PluginOdapGateway implements ICactusPlugin, IPluginWebService {
     );
 
     await checkValidInitializationRequest(request, this);
-    await sendTransferInitializationResponse(request.sessionID, this);
+    await sendTransferInitializationResponse(request.sessionID, this, true);
   }
 
-  public async onTransferCommenceRequestReceived(
+  async onTransferCommenceRequestReceived(
     request: TransferCommenceV1Request,
   ): Promise<void> {
     const fnTag = `${this.className}#onTransferCommenceRequestReceived()`;
@@ -555,11 +866,12 @@ export class PluginOdapGateway implements ICactusPlugin, IPluginWebService {
       )}`,
     );
 
+    this.updateLastMessageReceivedTimestamp(request.sessionID);
     await checkValidtransferCommenceRequest(request, this);
-    await sendTransferCommenceResponse(request.sessionID, this);
+    await sendTransferCommenceResponse(request.sessionID, this, true);
   }
 
-  public async onLockEvidenceRequestReceived(
+  async onLockEvidenceRequestReceived(
     request: LockEvidenceV1Request,
   ): Promise<void> {
     const fnTag = `${this.className}#onLockEvidenceRequestReceived()`;
@@ -568,11 +880,12 @@ export class PluginOdapGateway implements ICactusPlugin, IPluginWebService {
       `server gateway received LockEvidenceRequest: ${JSON.stringify(request)}`,
     );
 
+    this.updateLastMessageReceivedTimestamp(request.sessionID);
     await checkValidLockEvidenceRequest(request, this);
-    await sendLockEvidenceResponse(request.sessionID, this);
+    await sendLockEvidenceResponse(request.sessionID, this, true);
   }
 
-  public async onCommitPrepareRequestReceived(
+  async onCommitPrepareRequestReceived(
     request: CommitPreparationV1Request,
   ): Promise<void> {
     const fnTag = `${this.className}#onCommitPrepareRequestReceived()`;
@@ -583,11 +896,12 @@ export class PluginOdapGateway implements ICactusPlugin, IPluginWebService {
       )}`,
     );
 
+    this.updateLastMessageReceivedTimestamp(request.sessionID);
     await checkValidCommitPreparationRequest(request, this);
-    await sendCommitPreparationResponse(request.sessionID, this);
+    await sendCommitPreparationResponse(request.sessionID, this, true);
   }
 
-  public async onCommitFinalRequestReceived(
+  async onCommitFinalRequestReceived(
     request: CommitFinalV1Request,
   ): Promise<void> {
     const fnTag = `${this.className}#onCommitFinalRequestReceived()`;
@@ -596,11 +910,13 @@ export class PluginOdapGateway implements ICactusPlugin, IPluginWebService {
       `server gateway received CommitFinalRequest: ${JSON.stringify(request)}`,
     );
 
+    this.updateLastMessageReceivedTimestamp(request.sessionID);
     await checkValidCommitFinalRequest(request, this);
-    await sendCommitFinalResponse(request.sessionID, this);
+    await this.createBesuAsset(request.sessionID);
+    await sendCommitFinalResponse(request.sessionID, this, true);
   }
 
-  public async onTransferCompleteRequestReceived(
+  async onTransferCompleteRequestReceived(
     request: TransferCompleteV1Request,
   ): Promise<void> {
     const fnTag = `${this.className}#onTransferCompleteRequestReceived()`;
@@ -611,11 +927,13 @@ export class PluginOdapGateway implements ICactusPlugin, IPluginWebService {
       )}`,
     );
 
+    this.updateLastMessageReceivedTimestamp(request.sessionID);
     await checkValidTransferCompleteRequest(request, this);
+    //this.deleteDatabaseEntries(request.sessionID);
   }
 
   //Client-side
-  public async onTransferInitiationResponseReceived(
+  async onTransferInitiationResponseReceived(
     request: TransferInitializationV1Response,
   ): Promise<void> {
     const fnTag = `${this.className}#onTransferInitiationResponseReceived()`;
@@ -626,11 +944,12 @@ export class PluginOdapGateway implements ICactusPlugin, IPluginWebService {
       )}`,
     );
 
+    this.updateLastMessageReceivedTimestamp(request.sessionID);
     await checkValidInitializationResponse(request, this);
-    await sendTransferCommenceRequest(request.sessionID, this);
+    await sendTransferCommenceRequest(request.sessionID, this, true);
   }
 
-  public async onTransferCommenceResponseReceived(
+  async onTransferCommenceResponseReceived(
     request: TransferCommenceV1Response,
   ): Promise<void> {
     const fnTag = `${this.className}#onTransferCommenceResponseReceived()`;
@@ -641,11 +960,13 @@ export class PluginOdapGateway implements ICactusPlugin, IPluginWebService {
       )}`,
     );
 
+    this.updateLastMessageReceivedTimestamp(request.sessionID);
     await checkValidTransferCommenceResponse(request, this);
-    await sendLockEvidenceRequest(request.sessionID, this);
+    await this.lockFabricAsset(request.sessionID);
+    await sendLockEvidenceRequest(request.sessionID, this, true);
   }
 
-  public async onLockEvidenceResponseReceived(
+  async onLockEvidenceResponseReceived(
     request: LockEvidenceV1Response,
   ): Promise<void> {
     const fnTag = `${this.className}#onLockEvidenceResponseReceived()`;
@@ -656,21 +977,24 @@ export class PluginOdapGateway implements ICactusPlugin, IPluginWebService {
       )}`,
     );
 
+    this.updateLastMessageReceivedTimestamp(request.sessionID);
     await checkValidLockEvidenceResponse(request, this);
-    await sendCommitPreparationRequest(request.sessionID, this);
+    await sendCommitPreparationRequest(request.sessionID, this, true);
   }
 
-  public async onCommitPrepareResponseReceived(
+  async onCommitPrepareResponseReceived(
     request: CommitPreparationV1Response,
   ): Promise<void> {
     const fnTag = `${this.className}#onCommitPrepareResponseReceived()`;
     this.log.info(`${fnTag}, start processing, time: ${Date.now()}`);
 
+    this.updateLastMessageReceivedTimestamp(request.sessionID);
     await checkValidCommitPreparationResponse(request, this);
-    await sendCommitFinalRequest(request.sessionID, this);
+    await this.deleteFabricAsset(request.sessionID);
+    await sendCommitFinalRequest(request.sessionID, this, true);
   }
 
-  public async onCommitFinalResponseReceived(
+  async onCommitFinalResponseReceived(
     request: CommitFinalV1Response,
   ): Promise<void> {
     const fnTag = `${this.className}#onCommitFinalResponseReceived()`;
@@ -679,11 +1003,94 @@ export class PluginOdapGateway implements ICactusPlugin, IPluginWebService {
       `client gateway received CommitFinalResponse: ${JSON.stringify(request)}`,
     );
 
+    this.updateLastMessageReceivedTimestamp(request.sessionID);
     await checkValidCommitFinalResponse(request, this);
-    await sendTransferCompleteRequest(request.sessionID, this);
+    await sendTransferCompleteRequest(request.sessionID, this, true);
   }
 
-  public async runOdap(request: ClientV1Request): Promise<void> {
+  //Recover
+  async onRecoverMessageReceived(request: RecoverV1Message): Promise<void> {
+    const fnTag = `${this.className}#onRecoverMessageReceived()`;
+    this.log.info(`${fnTag}, start processing, time: ${Date.now()}`);
+    this.log.info(
+      `gateway received Recover message: ${JSON.stringify(request)}`,
+    );
+
+    this.updateLastMessageReceivedTimestamp(request.sessionID);
+    await checkValidRecoverMessage(request, this);
+    await sendRecoverUpdateMessage(request.sessionID, this, true);
+  }
+
+  async onRecoverUpdateMessageReceived(
+    request: RecoverUpdateV1Message,
+  ): Promise<void> {
+    const fnTag = `${this.className}#onRecoverUpdateMessageReceived()`;
+    this.log.info(`${fnTag}, start processing, time: ${Date.now()}`);
+    this.log.info(
+      `gateway received RecoverUpdate message: ${JSON.stringify(request)}`,
+    );
+
+    this.updateLastMessageReceivedTimestamp(request.sessionID);
+    await checkValidRecoverUpdateMessage(request, this);
+    await sendRecoverUpdateAckMessage(request.sessionID, this, true);
+  }
+
+  async onRecoverUpdateAckMessageReceived(
+    request: RecoverUpdateAckV1Message,
+  ): Promise<void> {
+    const fnTag = `${this.className}#onRecoverUpdateAckMessageReceived()`;
+    this.log.info(`${fnTag}, start processing, time: ${Date.now()}`);
+    this.log.info(
+      `gateway received RecoverUpdateAck message: ${JSON.stringify(request)}`,
+    );
+
+    this.updateLastMessageReceivedTimestamp(request.sessionID);
+    await checkValidRecoverUpdateAckMessage(request, this);
+    await sendRecoverSuccessMessage(request.sessionID, this, true);
+  }
+
+  async onRecoverSuccessMessageReceived(
+    request: RecoverUpdateAckV1Message,
+  ): Promise<void> {
+    const fnTag = `${this.className}#onRecoverSuccessMessageReceived()`;
+    this.log.info(`${fnTag}, start processing, time: ${Date.now()}`);
+    this.log.info(
+      `gateway received RecoverSuccess message: ${JSON.stringify(request)}`,
+    );
+
+    this.updateLastMessageReceivedTimestamp(request.sessionID);
+    await checkValidRecoverSuccessMessage(request, this);
+    await this.resumeOdapSession(request.sessionID, true);
+  }
+
+  async onRollbackMessageReceived(request: RollbackV1Message): Promise<void> {
+    const fnTag = `${this.className}#onRollbackMessageReceived()`;
+    this.log.info(`${fnTag}, start processing, time: ${Date.now()}`);
+    this.log.info(
+      `gateway received Rollback message: ${JSON.stringify(request)}`,
+    );
+
+    this.updateLastMessageReceivedTimestamp(request.sessionID);
+    await checkValidRollbackMessage(request, this);
+    await this.rollback(request.sessionID);
+    await sendRollbackAckMessage(request.sessionID, this, true);
+  }
+
+  async onRollbackAckMessageReceived(
+    request: RollbackAckV1Message,
+  ): Promise<void> {
+    const fnTag = `${this.className}#onRollbackAckMessageReceived()`;
+    this.log.info(`${fnTag}, start processing, time: ${Date.now()}`);
+    this.log.info(
+      `gateway received Rollback Ack message: ${JSON.stringify(request)}`,
+    );
+
+    this.updateLastMessageReceivedTimestamp(request.sessionID);
+    await checkValidRollbackAckMessage(request, this);
+    //this.deleteDatabaseEntries(request.sessionID);
+  }
+
+  async runOdap(request: ClientV1Request): Promise<void> {
     const fnTag = `${this.className}#runOdap()`;
     this.log.info(`${fnTag}, start processing, time: ${Date.now()}`);
     this.log.info(
@@ -698,10 +1105,10 @@ export class PluginOdapGateway implements ICactusPlugin, IPluginWebService {
       );
     }
 
-    await sendTransferInitializationRequest(sessionID, this);
+    await sendTransferInitializationRequest(sessionID, this, true);
   }
 
-  private configureOdapSession(request: ClientV1Request) {
+  configureOdapSession(request: ClientV1Request) {
     const sessionData: SessionData = {};
 
     const sessionID = uuidV4();
@@ -724,13 +1131,19 @@ export class PluginOdapGateway implements ICactusPlugin, IPluginWebService {
     sessionData.sourceGatewayDltSystem = request.sourceGatewayDltSystem;
     sessionData.recipientGatewayPubkey = request.recipientGatewayPubkey;
     sessionData.recipientGatewayDltSystem = request.recipientGatewayDltSystem;
+    sessionData.rollbackActionsPerformed = [];
+    sessionData.rollbackProofs = [];
+    sessionData.lastMessageReceivedTimestamp = Date.now().toString();
+
+    sessionData.maxRetries = request.maxRetries;
+    sessionData.maxTimeout = request.maxTimeout;
 
     this.sessions.set(sessionID, sessionData);
 
     return sessionID;
   }
 
-  public async lockFabricAsset(sessionID: string) {
+  async lockFabricAsset(sessionID: string): Promise<string> {
     const fnTag = `${this.className}#lockFabricAsset()`;
 
     const sessionData = this.sessions.get(sessionID);
@@ -739,38 +1152,283 @@ export class PluginOdapGateway implements ICactusPlugin, IPluginWebService {
       throw new Error(`${fnTag}, session data is not correctly initialized`);
     }
 
-    if (this.fabricApi == undefined) {
-      //throw new Error(`${fnTag}, connection to Fabric is not defined`);
-      return "";
+    let fabricLockAssetProof = "";
+
+    await this.storeOdapLog({
+      sessionID: sessionID,
+      type: "exec",
+      operation: "lock-asset",
+      data: JSON.stringify(sessionData),
+    });
+
+    if (this.fabricApi != undefined) {
+      const response = await this.fabricApi.runTransactionV1({
+        signingCredential: this.fabricSigningCredential,
+        channelName: this.fabricChannelName,
+        contractName: this.fabricContractName,
+        invocationType: FabricContractInvocationType.Send,
+        methodName: "LockAsset",
+        params: [this.fabricAssetID],
+      } as FabricRunTransactionRequest);
+
+      const receiptLockRes = await this.fabricApi.getTransactionReceiptByTxIDV1(
+        {
+          signingCredential: this.fabricSigningCredential,
+          channelName: this.fabricChannelName,
+          contractName: "qscc",
+          invocationType: FabricContractInvocationType.Call,
+          methodName: "GetBlockByTxID",
+          params: [this.fabricChannelName, response.data.transactionId],
+        } as FabricRunTransactionRequest,
+      );
+
+      this.log.warn(receiptLockRes.data);
+      fabricLockAssetProof = JSON.stringify(receiptLockRes.data);
     }
 
-    const lockRes = await this.fabricApi.runTransactionV1({
-      signingCredential: this.fabricSigningCredential,
-      channelName: this.fabricChannelName,
-      contractName: this.fabricContractName,
-      invocationType: FabricContractInvocationType.Send,
-      methodName: "LockAsset",
-      params: [this.fabricAssetID],
-    } as FabricRunTransactionRequest);
+    sessionData.lockEvidenceClaim = fabricLockAssetProof;
 
-    const receiptLockRes = await this.fabricApi.getTransactionReceiptByTxIDV1({
-      signingCredential: this.fabricSigningCredential,
-      channelName: this.fabricChannelName,
-      contractName: "qscc",
-      invocationType: FabricContractInvocationType.Call,
-      methodName: "GetBlockByTxID",
-      params: [this.fabricChannelName, lockRes.data.transactionId],
-    } as FabricRunTransactionRequest);
+    this.sessions.set(sessionID, sessionData);
 
-    this.log.warn(receiptLockRes.data);
-    const fabricLockAssetProof = JSON.stringify(receiptLockRes.data);
+    this.log.info(`${fnTag}, proof of the asset lock: ${fabricLockAssetProof}`);
 
-    sessionData.isFabricAssetLocked = true;
+    await this.storeOdapProof({
+      sessionID: sessionID,
+      type: "proof",
+      operation: "lock",
+      data: fabricLockAssetProof,
+    });
+
+    await this.storeOdapLog({
+      sessionID: sessionID,
+      type: "done",
+      operation: "lock-asset",
+      data: JSON.stringify(sessionData),
+    });
 
     return fabricLockAssetProof;
   }
 
-  public async createBesuAsset(sessionID: string) {
+  async unlockFabricAsset(sessionID: string): Promise<string> {
+    const fnTag = `${this.className}#unlockFabricAsset()`;
+
+    const sessionData = this.sessions.get(sessionID);
+
+    if (
+      sessionData == undefined ||
+      sessionData.rollbackActionsPerformed == undefined ||
+      sessionData.rollbackProofs == undefined
+    ) {
+      throw new Error(`${fnTag}, session data is not correctly initialized`);
+    }
+
+    let fabricUnlockAssetProof = "";
+
+    await this.storeOdapLog({
+      sessionID: sessionID,
+      type: "exec-rollback",
+      operation: "unlock-asset",
+      data: JSON.stringify(sessionData),
+    });
+
+    if (this.fabricApi != undefined) {
+      const response = await this.fabricApi.runTransactionV1({
+        signingCredential: this.fabricSigningCredential,
+        channelName: this.fabricChannelName,
+        contractName: this.fabricContractName,
+        invocationType: FabricContractInvocationType.Send,
+        methodName: "UnlockAsset",
+        params: [this.fabricAssetID],
+      } as FabricRunTransactionRequest);
+
+      const receiptUnlock = await this.fabricApi.getTransactionReceiptByTxIDV1({
+        signingCredential: this.fabricSigningCredential,
+        channelName: this.fabricChannelName,
+        contractName: "qscc",
+        invocationType: FabricContractInvocationType.Call,
+        methodName: "GetBlockByTxID",
+        params: [this.fabricChannelName, response.data.transactionId],
+      } as FabricRunTransactionRequest);
+
+      this.log.warn(receiptUnlock.data);
+      fabricUnlockAssetProof = JSON.stringify(receiptUnlock.data);
+    }
+
+    sessionData.rollbackActionsPerformed.push(
+      SessionDataRollbackActionsPerformedEnum.Unlock,
+    );
+    sessionData.rollbackProofs.push(fabricUnlockAssetProof);
+
+    this.sessions.set(sessionID, sessionData);
+
+    this.log.info(
+      `${fnTag}, proof of the asset unlock: ${fabricUnlockAssetProof}`,
+    );
+
+    await this.storeOdapProof({
+      sessionID: sessionID,
+      type: "proof-rollback",
+      operation: "unlock",
+      data: fabricUnlockAssetProof,
+    });
+
+    await this.storeOdapLog({
+      sessionID: sessionID,
+      type: "done-rollback",
+      operation: "unlock-asset",
+      data: JSON.stringify(sessionData),
+    });
+
+    return fabricUnlockAssetProof;
+  }
+
+  async createFabricAsset(sessionID: string): Promise<string> {
+    const fnTag = `${this.className}#createFabricAsset()`;
+
+    const sessionData = this.sessions.get(sessionID);
+
+    if (
+      sessionData == undefined ||
+      this.fabricAssetID == undefined ||
+      this.fabricChannelName == undefined ||
+      this.fabricContractName == undefined ||
+      this.fabricSigningCredential == undefined ||
+      sessionData.rollbackProofs == undefined ||
+      sessionData.rollbackActionsPerformed == undefined
+    ) {
+      throw new Error(`${fnTag}, session data is not correctly initialized`);
+    }
+
+    let fabricCreateAssetProof = "";
+
+    await this.storeOdapLog({
+      sessionID: sessionID,
+      type: "exec-rollback",
+      operation: "create-asset",
+      data: JSON.stringify(sessionData),
+    });
+
+    if (this.fabricApi != undefined) {
+      const response = await this.fabricApi.runTransactionV1({
+        contractName: this.fabricContractName,
+        channelName: this.fabricChannelName,
+        params: [this.fabricAssetID, "19"],
+        methodName: "CreateAsset",
+        invocationType: FabricContractInvocationType.Send,
+        signingCredential: this.fabricSigningCredential,
+      });
+
+      const receiptCreate = await this.fabricApi.getTransactionReceiptByTxIDV1({
+        signingCredential: this.fabricSigningCredential,
+        channelName: this.fabricChannelName,
+        contractName: "qscc",
+        invocationType: FabricContractInvocationType.Call,
+        methodName: "GetBlockByTxID",
+        params: [this.fabricChannelName, response.data.transactionId],
+      } as FabricRunTransactionRequest);
+
+      this.log.warn(receiptCreate.data);
+      fabricCreateAssetProof = JSON.stringify(receiptCreate.data);
+    }
+
+    sessionData.rollbackActionsPerformed.push(
+      SessionDataRollbackActionsPerformedEnum.Create,
+    );
+
+    sessionData.rollbackProofs.push(fabricCreateAssetProof);
+
+    this.sessions.set(sessionID, sessionData);
+
+    this.log.info(
+      `${fnTag}, proof of the asset creation: ${fabricCreateAssetProof}`,
+    );
+
+    await this.storeOdapProof({
+      sessionID: sessionID,
+      type: "proof-rollback",
+      operation: "create",
+      data: fabricCreateAssetProof,
+    });
+
+    await this.storeOdapLog({
+      sessionID: sessionID,
+      type: "done-rollback",
+      operation: "create-asset",
+      data: JSON.stringify(sessionData),
+    });
+
+    return fabricCreateAssetProof;
+  }
+
+  async deleteFabricAsset(sessionID: string): Promise<string> {
+    const fnTag = `${this.className}#deleteFabricAsset()`;
+
+    const sessionData = this.sessions.get(sessionID);
+
+    if (sessionData == undefined) {
+      throw new Error(`${fnTag}, session data is not correctly initialized`);
+    }
+
+    let fabricDeleteAssetProof = "";
+
+    await this.storeOdapLog({
+      sessionID: sessionID,
+      type: "exec",
+      operation: "delete-asset",
+      data: JSON.stringify(sessionData),
+    });
+
+    if (this.fabricApi != undefined) {
+      const deleteRes = await this.fabricApi.runTransactionV1({
+        signingCredential: this.fabricSigningCredential,
+        channelName: this.fabricChannelName,
+        contractName: this.fabricContractName,
+        invocationType: FabricContractInvocationType.Send,
+        methodName: "DeleteAsset",
+        params: [this.fabricAssetID],
+      } as FabricRunTransactionRequest);
+
+      const receiptDeleteRes = await this.fabricApi.getTransactionReceiptByTxIDV1(
+        {
+          signingCredential: this.fabricSigningCredential,
+          channelName: this.fabricChannelName,
+          contractName: "qscc",
+          invocationType: FabricContractInvocationType.Call,
+          methodName: "GetBlockByTxID",
+          params: [this.fabricChannelName, deleteRes.data.transactionId],
+        } as FabricRunTransactionRequest,
+      );
+
+      this.log.warn(receiptDeleteRes.data);
+      fabricDeleteAssetProof = JSON.stringify(receiptDeleteRes.data);
+    }
+
+    sessionData.commitFinalClaim = fabricDeleteAssetProof;
+
+    this.sessions.set(sessionID, sessionData);
+
+    this.log.info(
+      `${fnTag}, proof of the asset deletion: ${fabricDeleteAssetProof}`,
+    );
+
+    await this.storeOdapProof({
+      sessionID: sessionID,
+      type: "proof",
+      operation: "delete",
+      data: fabricDeleteAssetProof,
+    });
+
+    await this.storeOdapLog({
+      sessionID: sessionID,
+      type: "done",
+      operation: "delete-asset",
+      data: JSON.stringify(sessionData),
+    });
+
+    return fabricDeleteAssetProof;
+  }
+
+  async createBesuAsset(sessionID: string): Promise<string> {
     const fnTag = `${this.className}#createBesuAsset()`;
 
     const sessionData = this.sessions.get(sessionID);
@@ -779,12 +1437,14 @@ export class PluginOdapGateway implements ICactusPlugin, IPluginWebService {
       throw new Error(`${fnTag}, session data is not correctly initialized`);
     }
 
-    if (this.besuApi == undefined) {
-      //throw new Error(`${fnTag}, connection to Fabric is not defined`);
-      return "";
-    }
-
     let besuCreateAssetProof = "";
+
+    await this.storeOdapLog({
+      sessionID: sessionID,
+      type: "exec",
+      operation: "create-asset",
+      data: JSON.stringify(sessionData),
+    });
 
     if (this.besuApi != undefined) {
       const besuCreateRes = await this.besuApi.invokeContractV1({
@@ -817,57 +1477,279 @@ export class PluginOdapGateway implements ICactusPlugin, IPluginWebService {
       const besuCreateAssetReceipt =
         besuCreateResDataJson.out.transactionReceipt;
       besuCreateAssetProof = JSON.stringify(besuCreateAssetReceipt);
-      const besuCreateProofID = `${sessionID}-proof-of-create`;
-
-      await this.publishOdapProof(
-        besuCreateProofID,
-        JSON.stringify(besuCreateAssetReceipt),
-      );
-
-      sessionData.isBesuAssetCreated = true;
     }
+
+    sessionData.commitAcknowledgementClaim = besuCreateAssetProof;
+
+    this.sessions.set(sessionID, sessionData);
+
+    this.log.info(
+      `${fnTag}, proof of the asset creation: ${besuCreateAssetProof}`,
+    );
+
+    await this.storeOdapProof({
+      sessionID: sessionID,
+      type: "proof",
+      operation: "create",
+      data: besuCreateAssetProof,
+    });
+
+    await this.storeOdapLog({
+      sessionID: sessionID,
+      type: "done",
+      operation: "create-asset",
+      data: JSON.stringify(sessionData),
+    });
+
     return besuCreateAssetProof;
   }
 
-  public async deleteFabricAsset(sessionID: string) {
-    const fnTag = `${this.className}#deleteFabricAsset()`;
+  async deleteBesuAsset(sessionID: string): Promise<string> {
+    const fnTag = `${this.className}#deleteBesuAsset()`;
 
     const sessionData = this.sessions.get(sessionID);
 
-    if (sessionData == undefined) {
+    if (
+      sessionData == undefined ||
+      sessionData.rollbackActionsPerformed == undefined ||
+      sessionData.rollbackProofs == undefined
+    ) {
       throw new Error(`${fnTag}, session data is not correctly initialized`);
     }
 
-    if (this.fabricApi == undefined) {
-      //throw new Error(`${fnTag}, connection to Fabric is not defined`);
-      return "";
+    let besuDeleteAssetProof = "";
+
+    await this.storeOdapLog({
+      sessionID: sessionID,
+      type: "exec-rollback",
+      operation: "delete-asset",
+      data: JSON.stringify(sessionData),
+    });
+
+    if (this.besuApi != undefined) {
+      // we need to lock the asset first
+      await this.besuApi.invokeContractV1({
+        contractName: this.besuContractName,
+        invocationType: EthContractInvocationType.Send,
+        methodName: "lockAsset",
+        gas: 1000000,
+        params: [this.besuAssetID],
+        signingCredential: this.besuWeb3SigningCredential,
+        keychainId: this.besuKeychainId,
+      } as BesuInvokeContractV1Request);
+
+      const assetCreationResponse = await this.besuApi.invokeContractV1({
+        contractName: this.besuContractName,
+        invocationType: EthContractInvocationType.Send,
+        methodName: "deleteAsset",
+        gas: 1000000,
+        params: [this.besuAssetID],
+        signingCredential: this.besuWeb3SigningCredential,
+        keychainId: this.besuKeychainId,
+      } as BesuInvokeContractV1Request);
+
+      if (assetCreationResponse.status != 200) {
+        throw new Error(`${fnTag}, besu delete asset error`);
+      }
+
+      const assetCreationResponseDataJson = JSON.parse(
+        JSON.stringify(assetCreationResponse.data),
+      );
+
+      if (assetCreationResponseDataJson.out == undefined) {
+        throw new Error(`${fnTag}, besu res data out undefined`);
+      }
+
+      if (assetCreationResponseDataJson.out.transactionReceipt == undefined) {
+        throw new Error(`${fnTag}, undefined besu transact receipt`);
+      }
+
+      const besuCreateAssetReceipt =
+        assetCreationResponseDataJson.out.transactionReceipt;
+      besuDeleteAssetProof = JSON.stringify(besuCreateAssetReceipt);
     }
 
-    const deleteRes = await this.fabricApi.runTransactionV1({
-      signingCredential: this.fabricSigningCredential,
-      channelName: this.fabricChannelName,
-      contractName: this.fabricContractName,
-      invocationType: FabricContractInvocationType.Send,
-      methodName: "DeleteAsset",
-      params: [this.fabricAssetID],
-    } as FabricRunTransactionRequest);
+    sessionData.rollbackActionsPerformed.push(
+      SessionDataRollbackActionsPerformedEnum.Delete,
+    );
+    sessionData.rollbackProofs.push(besuDeleteAssetProof);
 
-    const receiptDeleteRes = await this.fabricApi.getTransactionReceiptByTxIDV1(
-      {
-        signingCredential: this.fabricSigningCredential,
-        channelName: this.fabricChannelName,
-        contractName: "qscc",
-        invocationType: FabricContractInvocationType.Call,
-        methodName: "GetBlockByTxID",
-        params: [this.fabricChannelName, deleteRes.data.transactionId],
-      } as FabricRunTransactionRequest,
+    this.sessions.set(sessionID, sessionData);
+
+    this.log.info(
+      `${fnTag}, proof of the asset deletion: ${besuDeleteAssetProof}`,
     );
 
-    this.log.warn(receiptDeleteRes.data);
-    const fabricDeleteAssetProof = JSON.stringify(receiptDeleteRes.data);
+    await this.storeOdapProof({
+      sessionID: sessionID,
+      type: "proof-rollback",
+      operation: "delete",
+      data: besuDeleteAssetProof,
+    });
 
-    sessionData.isFabricAssetDeleted = true;
+    await this.storeOdapLog({
+      sessionID: sessionID,
+      type: "done-rollback",
+      operation: "delete-asset",
+      data: JSON.stringify(sessionData),
+    });
 
-    return fabricDeleteAssetProof;
+    return besuDeleteAssetProof;
+  }
+
+  async Revert(sessionID: string): Promise<void> {
+    await this.rollback(sessionID);
+    await sendRollbackMessage(sessionID, this, true);
+  }
+
+  async rollback(sessionID: string) {
+    const fnTag = `${this.className}#rollback()`;
+    const sessionData = this.sessions.get(sessionID);
+
+    if (
+      sessionData == undefined ||
+      sessionData.step == undefined ||
+      sessionData.lastSequenceNumber == undefined
+    ) {
+      throw new Error(`${fnTag}, session data is undefined`);
+    }
+
+    sessionData.rollback = true;
+
+    this.log.info(`${fnTag}, rolling back session ${sessionID}`);
+
+    if (this.isClientGateway(sessionID)) {
+      if (
+        this.fabricApi == undefined ||
+        this.fabricContractName == undefined ||
+        this.fabricChannelName == undefined ||
+        this.fabricAssetID == undefined ||
+        this.fabricSigningCredential == undefined
+      )
+        return;
+
+      if (
+        await fabricAssetExists(
+          this,
+          this.fabricContractName,
+          this.fabricChannelName,
+          this.fabricAssetID,
+          this.fabricSigningCredential,
+        )
+      ) {
+        if (
+          await isFabricAssetLocked(
+            this,
+            this.fabricContractName,
+            this.fabricChannelName,
+            this.fabricAssetID,
+            this.fabricSigningCredential,
+          )
+        ) {
+          // Rollback locking of the asset
+          await this.unlockFabricAsset(sessionID);
+        }
+      } else {
+        // Rollback extinguishment of the asset
+        await this.createFabricAsset(sessionID);
+      }
+    } else {
+      if (
+        this.besuApi == undefined ||
+        this.besuContractName == undefined ||
+        this.besuKeychainId == undefined ||
+        this.besuAssetID == undefined ||
+        this.besuWeb3SigningCredential == undefined
+      )
+        return;
+
+      if (
+        await besuAssetExists(
+          this,
+          this.besuContractName,
+          this.besuKeychainId,
+          this.besuAssetID,
+          this.besuWeb3SigningCredential,
+        )
+      ) {
+        // Rollback creation of the asset
+        await this.deleteBesuAsset(sessionID);
+      }
+    }
+  }
+
+  async makeRequest(
+    sessionID: string,
+    request: Promise<AxiosResponse>,
+    message: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): Promise<any> {
+    const fnTag = `${this.className}#makeRequest()`;
+
+    const sessionData = this.sessions.get(sessionID);
+
+    if (
+      sessionData == undefined ||
+      sessionData.maxTimeout == undefined ||
+      sessionData.maxRetries == undefined
+    ) {
+      throw new Error(`${fnTag}, session data is not correctly initialized`);
+    }
+
+    let numberOfTries = 0;
+    let response = undefined;
+
+    while (numberOfTries < sessionData.maxRetries) {
+      response = await request.catch(() => {
+        this.log.info(`${fnTag}, ${message} message failed. Trying again...`);
+        numberOfTries++;
+      });
+
+      if (response != void 0) break;
+    }
+
+    if (response != void 0 && response.status == 200) {
+      return;
+    }
+
+    // When rolling back there is no problem of not receiving an answer
+    if (!message.match("Rollback")) {
+      this.log.info(
+        `${fnTag}, ${message} message was not sent. Initiating time...`,
+      );
+      await new Promise((resolve) =>
+        setTimeout(resolve, sessionData.maxTimeout),
+      ).then(async () => {
+        // we check if a message was received, otherwise we have a timeout and rollback
+        const sessionData = this.sessions.get(sessionID);
+
+        if (
+          sessionData == undefined ||
+          sessionData.lastMessageReceivedTimestamp == undefined ||
+          sessionData.maxTimeout == undefined
+        ) {
+          throw new Error(
+            `${fnTag}, session data is not correctly initialized`,
+          );
+        }
+
+        const differenceOfTime =
+          new Date().getTime() -
+          new Date(sessionData.lastMessageReceivedTimestamp).getTime();
+
+        if (differenceOfTime > sessionData.maxTimeout) {
+          this.log.info(`${fnTag}, no response received, rolling back`);
+          await this.Revert(sessionID);
+          throw new Error(
+            `${fnTag}, ${message} message failed. Timeout exceeded. Check connection with server gateway.`,
+          );
+        }
+
+        this.log.info(`${fnTag}, a response was received`);
+        return;
+      });
+    }
+
+    return response;
   }
 }

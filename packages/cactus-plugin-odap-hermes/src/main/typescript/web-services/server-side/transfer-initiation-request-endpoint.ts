@@ -48,7 +48,7 @@ export class TransferInitiationRequestEndpointV1
   public getPath(): string {
     const apiPath =
       OAS.paths[
-        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase1/transferinitiationrequest"
+        "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase1/transferinitiationrequest"
       ];
     return apiPath.post["x-hyperledger-cactus"].http.path;
   }
@@ -56,14 +56,14 @@ export class TransferInitiationRequestEndpointV1
   public getVerbLowerCase(): string {
     const apiPath =
       OAS.paths[
-        "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase1/transferinitiationrequest"
+        "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase1/transferinitiationrequest"
       ];
     return apiPath.post["x-hyperledger-cactus"].http.verbLowerCase;
   }
 
   public getOperationId(): string {
     return OAS.paths[
-      "/api/v1/@hyperledger/cactus-plugin-odap-hemres/phase1/transferinitiationrequest"
+      "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase1/transferinitiationrequest"
     ].post.operationId;
   }
 
