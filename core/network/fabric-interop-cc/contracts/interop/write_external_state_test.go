@@ -91,17 +91,17 @@ func TestWriteExternalState(t *testing.T) {
 		Payload: []byte("I am a result"),
 	})
 
-	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{fabricViewAddress}, []string{b64View})
+	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{fabricViewAddress}, []string{b64View}, []string{""})
 	require.NoError(t, err)
 
 	// Test failures when invalid or insufficient arguments are supplied
-	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{2}, []string{fabricViewAddress}, []string{b64View})
+	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{2}, []string{fabricViewAddress}, []string{b64View}, []string{""})
 	require.EqualError(t, err, "Index 2 out of bounds of array (length 2)")
 
-	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{0, 1}, []string{fabricViewAddress}, []string{b64View})
+	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{0, 1}, []string{fabricViewAddress}, []string{b64View}, []string{""})
 	require.EqualError(t, err, "Number of argument indices for substitution (2) does not match number of addresses (1)")
 
-	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{fabricViewAddress}, []string{})
+	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{fabricViewAddress}, []string{}, []string{""})
 	require.EqualError(t, err, "Number of addresses (1) does not match number of views (0)")
 
 	// Happy case: Corda
@@ -119,7 +119,7 @@ func TestWriteExternalState(t *testing.T) {
 		Message: "",
 		Payload: []byte("I am a result"),
 	})
-	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{"localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:H"}, []string{cordaB64View})
+	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{"localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:H"}, []string{cordaB64View}, []string{""})
 	require.NoError(t, err)
 
 	// Test case: Invalid cert in Membership
@@ -130,7 +130,7 @@ func TestWriteExternalState(t *testing.T) {
 	require.NoError(t, err)
 	chaincodeStub.GetStateReturnsOnCall(0, network1VerificationPolicyBytes, nil)
 	chaincodeStub.GetStateReturnsOnCall(1, invalidMembershipBytes, nil)
-	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{fabricViewAddress}, []string{b64View})
+	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{fabricViewAddress}, []string{b64View}, []string{""})
 	require.EqualError(t, err, "VerifyView error: Verify membership failed. Certificate not valid: Client cert not in a known PEM format")
 
 	// Test case: Invalid policy in verification policy
@@ -140,6 +140,6 @@ func TestWriteExternalState(t *testing.T) {
 	invalidVerificationPolicyBytes, err := json.Marshal(&network1VerificationPolicy)
 	require.NoError(t, err)
 	chaincodeStub.GetStateReturnsOnCall(0, invalidVerificationPolicyBytes, nil)
-	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{fabricViewAddress}, []string{b64View})
+	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{fabricViewAddress}, []string{b64View}, []string{""})
 	require.EqualError(t, err, "VerifyView error: Unable to resolve verification policy: Verification Policy Error: Failed to find verification policy matching view address: " + fabricPattern)
 }

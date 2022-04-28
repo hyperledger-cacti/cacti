@@ -18,6 +18,7 @@ import (
 )
 
 const applicationCCKey = "applicationccid"
+const e2eConfidentialityKey = "e2eConfidentialityFlag"
 
 // SmartContract provides functions for managing arbitrary key-value pairs
 type SmartContract struct {
@@ -37,11 +38,12 @@ func init() {
 // call the application chaincode.
 func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface) error {
 	var err error
+	var confFlag string
 
 	_, args := ctx.GetStub().GetFunctionAndParameters()
 
-	if len(args) != 1 {
-		err = fmt.Errorf("Incorrect number of arguments. Expecting 1: {APPLICATION Chaincode ID/hash}. Found %d", len(args))
+	if len(args) < 1 {
+		err = fmt.Errorf("Incorrect number of arguments. Expecting at least 1: {APPLICATION Chaincode ID/hash}. Found %d", len(args))
 		fmt.Printf("Error %s", err.Error())
 		return err
 	}
@@ -49,6 +51,18 @@ func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface) 
 	err = ctx.GetStub().PutState(applicationCCKey, []byte(args[0]))
 	if err != nil {
 		errMsg := fmt.Sprintf("Error saving APPLICATION ID: %s", err.Error())
+		fmt.Printf(errMsg)
+		return errors.New(errMsg)
+	}
+
+	if len(args) > 1 {
+		confFlag = "true"
+	} else {
+		confFlag = "false"
+	}
+	err = ctx.GetStub().PutState(e2eConfidentialityKey, []byte(confFlag))
+	if err != nil {
+		errMsg := fmt.Sprintf("Error saving E2E-Confidentiality Flag: %s", err.Error())
 		fmt.Printf(errMsg)
 		return errors.New(errMsg)
 	}

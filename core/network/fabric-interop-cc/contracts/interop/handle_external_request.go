@@ -104,9 +104,10 @@ func (s *SmartContract) HandleExternalRequest(ctx contractapi.TransactionContext
 	// 4. Calls application chaincode
 	arr := append([]string{viewAddress.CCFunc}, viewAddress.Args...)
 	byteArgs := strArrToBytesArr(arr)
-	
+
 	localCCId, err := wutils.GetLocalChaincodeID(ctx.GetStub())
 	payload := []byte("")
+	confidential := false
 	if localCCId == viewAddress.Contract {
 		// Interop call to InteropCC itself.
 		resp := ""
@@ -155,12 +156,32 @@ func (s *SmartContract) HandleExternalRequest(ctx contractapi.TransactionContext
 			log.Error(errorMessage)
 			return "", errors.New(errorMessage)
 		}
-		payload = pbResp.Payload
+		// 5. Encrypt payload if necessary
+		confFlag, err := ctx.GetStub().GetState(e2eConfidentialityKey)
+		if err != nil {
+			log.Error(err)
+			return "", err
+		}
+		if query.Confidential || string(confFlag) == "true" {
+			confidential = true
+			// Generate encrypted payload and corroborating hash (HMAC)
+			// Use already authenticated certificate as the source of the public key for encryption
+			payload, err = generateConfidentialInteropPayloadAndHash(pbResp.Payload, query.Certificate)
+			if err != nil {
+				log.Error(err)
+				return "", err
+			}
+		} else {
+			payload = pbResp.Payload
+		}
 	}
 
 	interopPayloadStruct := common.InteropPayload{
 		Address: query.Address,
 		Payload: payload,
+		Confidential: confidential,
+		RequestorCertificate: query.Certificate,
+		Nonce: query.Nonce,
 	}
 	interopPayloadBytes, err := protoV2.Marshal(&interopPayloadStruct)
 	if err != nil {

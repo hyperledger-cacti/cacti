@@ -71,6 +71,12 @@ const decryptRemoteChaincodeOutput = (proposalResponseBytes64, eciesPrivateKeyPE
     return propResp;
 };
 
+const decryptData = (dataBytes, eciesPrivateKeyPEM) => {
+    const privKey = keyutil.getKeyFromPlainPrivatePKCS8PEM(eciesPrivateKeyPEM);
+    const decryptionOptions = { hashAlgorithm: "SHA2" };
+    return eciesCrypto.eciesDecryptMessage(privKey, dataBytes, decryptionOptions);
+};
+
 /* Validate proposal response received from remote network
  *
  * @param {ProposalResponse} proposalResponse - The endorsement response from the remote peer,
@@ -157,18 +163,25 @@ const verifyRemoteProposalResponse = async (proposalResponseBase64, isEncrypted,
 };
 
 /**
- * Extracts actual remote query response embedded in view structure.
- * Argument is a View protobuf ('statePb.View')
+ * Extracts actual remote query response (along with full decrypted contents, if the response is encrypted) embedded in view structure.
+ * Arguments are a View protobuf ('statePb.View') and a certificate in the form of a PEM string
  **/
-const getResponseDataFromView = (view) => {
+const getResponseDataFromView = (view, privKeyPEM) => {
     if (view.getMeta().getProtocol() == statePb.Meta.Protocol.FABRIC) {
         const fabricView = fabricViewPb.FabricView.deserializeBinary(view.getData());
         const interopPayload = interopPayloadPb.InteropPayload.deserializeBinary(Uint8Array.from(Buffer.from(fabricView.getResponse().getPayload())));
-        return Buffer.from(interopPayload.getPayload()).toString();
+        if (interopPayload.getConfidential()) {    // Currently this is only supported for Fabric because it uses ECDSA keys in wallets
+            const confidentialPayload = interopPayloadPb.ConfidentialPayload.deserializeBinary(Uint8Array.from(Buffer.from(interopPayload.getPayload())));
+            const decryptedPayload = decryptData(Buffer.from(confidentialPayload.getEncryptedPayload()), privKeyPEM);
+            const decryptedPayloadContents = interopPayloadPb.ConfidentialPayloadContents.deserializeBinary(Uint8Array.from(Buffer.from(decryptedPayload)));
+            return { data: Buffer.from(decryptedPayloadContents.getPayload()).toString(), contents: decryptedPayload };
+        } else {
+            return { data: Buffer.from(interopPayload.getPayload()).toString() };
+        }
     } else if (view.getMeta().getProtocol() == statePb.Meta.Protocol.CORDA) {
         const cordaView = cordaViewPb.ViewData.deserializeBinary(view.getData());
         const interopPayload = interopPayloadPb.InteropPayload.deserializeBinary(Uint8Array.from(Buffer.from(cordaView.getPayload())));
-        return Buffer.from(interopPayload.getPayload()).toString();
+        return { data: Buffer.from(interopPayload.getPayload()).toString() };
     } else {
         const protocolType = view.getMeta().getProtocol();
         throw new Error(`Unsupported DLT type: ${protocolType}`);
@@ -387,12 +400,13 @@ const interopFlow = async (
     returnWithoutLocalInvocation: boolean = false,
     useTls: boolean = false,
     tlsRootCACertPaths?: Array<string>,
+    confidential: boolean = false,
 ): Promise<{ views: Array<any>; result: any }> => {
     if (interopArgIndices.length !== interopJSONs.length) {
         throw new Error(`Number of argument indices ${interopArgIndices.length} does not match number of view addresses ${interopJSONs.length}`);
     }
     // Step 1: Iterate through the view addresses, and send remote requests and get views in response for each
-    let views = [], viewsSerializedBase64 = [], computedAddresses = [];
+    let views = [], viewsSerializedBase64 = [], computedAddresses = [], viewContentsBase64 = [];
     for(let i = 0 ; i < interopJSONs.length ; i++) {
         const [requestResponse, requestResponseError] = await helpers.handlePromise(
             getRemoteView(
@@ -403,7 +417,8 @@ const interopFlow = async (
                 interopJSONs[i],
                 keyCert,
                 useTls,
-                tlsRootCACertPaths
+                tlsRootCACertPaths,
+                confidential
             ),
         );
         if (requestResponseError) {
@@ -412,6 +427,12 @@ const interopFlow = async (
         views.push(requestResponse.view);
         viewsSerializedBase64.push(Buffer.from(requestResponse.view.serializeBinary()).toString("base64"));
         computedAddresses.push(requestResponse.address);
+        const respData = getResponseDataFromView(requestResponse.view, keyCert.key.toBytes());
+        if (respData.contents) {
+            viewContentsBase64.push(respData.contents.toString("base64"));
+        } else {
+            viewContentsBase64.push("");
+        }
     }
     // Return here if caller just wants the views and doesn't want to invoke a local chaincode
     if (returnWithoutLocalInvocation) {
@@ -420,6 +441,7 @@ const interopFlow = async (
             interopArgIndices,
             computedAddresses,
             viewsSerializedBase64,
+            viewContentsBase64,
         );
         return { views, result: ccArgs };
     }
@@ -430,6 +452,7 @@ const interopFlow = async (
         interopArgIndices,
         computedAddresses,
         viewsSerializedBase64,
+        viewContentsBase64,
     );
     return { views, result };
 };
@@ -442,6 +465,7 @@ const getCCArgsForProofVerification = (
     interopArgIndices: Array<number>,
     viewAddresses: Array<string>,
     viewsSerializedBase64: Array<string>,
+    viewContentsBase64: Array<string>,
 ): Array<any> => {
     const {
         ccArgs: localCCArgs,
@@ -457,6 +481,7 @@ const getCCArgsForProofVerification = (
         JSON.stringify(interopArgIndices),
         JSON.stringify(viewAddresses),
         JSON.stringify(viewsSerializedBase64),
+        JSON.stringify(viewContentsBase64),
     ];
     return ccArgs;
 };
@@ -471,12 +496,14 @@ const submitTransactionWithRemoteViews = async (
     interopArgIndices: Array<number>,
     viewAddresses: Array<string>,
     viewsSerializedBase64: Array<string>,
+    viewContentsBase64: Array<string>,
 ): Promise<any> => {
     const ccArgs = getCCArgsForProofVerification(
         invokeObject,
         interopArgIndices,
         viewAddresses,
         viewsSerializedBase64,
+        viewContentsBase64,
     );
     const [result, submitError] = await helpers.handlePromise(
         interopContract.submitTransaction("WriteExternalState", ...ccArgs),
@@ -503,6 +530,7 @@ const getRemoteView = async (
     keyCert: { key: ICryptoKey; cert: any },
     useTls: boolean = false,
     tlsRootCACertPaths?: Array<string>,
+    confidential: boolean = false,
 ): Promise<{ view: any; address: any }> => {
     const {
         address,
@@ -543,6 +571,7 @@ const getRemoteView = async (
             uuidValue,
             // Org is empty as the name is in the certs for
             org,
+            confidential,
         ),
     );
     if (relayResponseError) {
