@@ -100,7 +100,7 @@ router.delete(
   "/api/v1/bl/wallets/:id",
   (req: Request, res: Response, next: NextFunction) => {
     try {
-      res.send(
+      res.render(
         "Not Implemented (Delete a Wallet" + ", id=" + escapeHtml(req.params.id) + ")\n",
       );
     } catch (err) {
