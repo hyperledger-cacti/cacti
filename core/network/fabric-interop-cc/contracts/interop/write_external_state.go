@@ -127,6 +127,9 @@ func (s *SmartContract) WriteExternalState(ctx contractapi.TransactionContextInt
 	if len(addresses) != len(b64ViewProtos) {
 		return fmt.Errorf("Number of addresses (%d) does not match number of views (%d)", len(addresses), len(b64ViewProtos))
 	}
+	if len(addresses) != len(b64ViewContents) {
+		return fmt.Errorf("Number of addresses (%d) does not match number of view contents (%d)", len(addresses), len(b64ViewContents))
+	}
 
 	arr := append([]string{applicationFunction}, applicationArgs...)
 
