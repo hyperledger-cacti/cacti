@@ -367,7 +367,7 @@ describe("Iroha SocketIo TestSuite", () => {
 
     // Create new asset to check if request was successfull
     const assetID = "eth";
-    const commandName = IrohaCommand.CreateAsset;
+    const commandName = { methodName: IrohaCommand.CreateAsset };
     const baseConfig = {
       irohaHost: iroha.host,
       irohaPort: iroha.port,
@@ -379,7 +379,7 @@ describe("Iroha SocketIo TestSuite", () => {
     const params = [assetID, iroha.domain, 3];
 
     log.debug(`Sending Async Request with ${commandName} command.`);
-    apiClient.sendAsyncRequest(params, baseConfig, commandName);
+    apiClient.sendAsyncRequest(params, commandName, baseConfig);
 
     const arrivedBlock = await new Promise<IrohaBlockResponse>(
       (resolve, reject) => {
@@ -406,7 +406,7 @@ describe("Iroha SocketIo TestSuite", () => {
   test("Sync Request", async () => {
     // Get asset info on previously created coolcoin
     const assetID = "btc";
-    const commandName = IrohaCommand.CreateAsset;
+    const commandName = { methodName: IrohaCommand.CreateAsset };
     const baseConfig = {
       irohaHost: iroha.host,
       irohaPort: iroha.port,
@@ -420,8 +420,8 @@ describe("Iroha SocketIo TestSuite", () => {
     log.debug(`Sending Sync Request with ${commandName} command.`);
     const response = await apiClient.sendSyncRequest(
       params,
-      baseConfig,
       commandName,
+      baseConfig,
     );
 
     expect(response).not.toBe(undefined || " ");
@@ -431,12 +431,13 @@ describe("Iroha SocketIo TestSuite", () => {
     log.debug("Sync call successfully completed");
   });
 
-  afterAll(async () => await Servers.shutdown(server));
-
   afterAll(async () => {
     // Remove Iroha after all tests are done
     await iroha.testLedger.stop();
     await iroha.testLedger.destroy();
+
+    await postgres.container.stop();
+    await postgres.container.destroy();
 
     const pruning = await pruneDockerAllIfGithubAction({ logLevel });
     expect(pruning).toBeTruthy();

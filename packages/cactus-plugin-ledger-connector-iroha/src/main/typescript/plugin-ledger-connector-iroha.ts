@@ -5,7 +5,7 @@ import type { Socket as SocketIoSocket } from "socket.io";
 
 import type { Express } from "express";
 
-import { Transaction } from "./transaction";
+import { IrohaTransactionWrapper } from "./iroha-transaction-wrapper";
 
 import OAS from "../json/openapi.json";
 
@@ -35,12 +35,12 @@ import { RuntimeError } from "run-time-error";
 import {
   RunTransactionRequestV1,
   RunTransactionResponse,
-  IrohaSocketSession,
+  IrohaSocketSessionEvent,
 } from "./generated/openapi/typescript-axios";
 
 import { RunTransactionEndpoint } from "./web-services/run-transaction-endpoint";
 import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
-import { SocketSessionEndpoint } from "./web-services/socket-session-endpoint";
+import { IrohaSocketIOEndpoint } from "./web-services/iroha-socketio-endpoint";
 import {
   GetPrometheusExporterMetricsEndpointV1,
   IGetPrometheusExporterMetricsEndpointV1Options,
@@ -76,7 +76,7 @@ export class PluginLedgerConnectorIroha
   private httpServer: Server | SecureServer | null = null;
 
   public static readonly CLASS_NAME = "PluginLedgerConnectorIroha";
-  private socketSessionDictionary: { [char: string]: SocketSessionEndpoint };
+  private socketSessionDictionary: { [char: string]: IrohaSocketIOEndpoint };
 
   public get className(): string {
     return PluginLedgerConnectorIroha.CLASS_NAME;
@@ -149,44 +149,50 @@ export class PluginLedgerConnectorIroha
     await Promise.all(webServices.map((ws) => ws.registerExpress(app)));
 
     wsApi.on("connection", (socket: SocketIoSocket) => {
-      let socketEndpoint: SocketSessionEndpoint;
+      let irohaSocketEndpoint: IrohaSocketIOEndpoint;
 
       if (socket.id in this.socketSessionDictionary) {
         this.log.debug(`Connected to existing socket session ID=${socket.id}`);
-        socketEndpoint = this.socketSessionDictionary[socket.id];
+        irohaSocketEndpoint = this.socketSessionDictionary[socket.id];
       } else {
         this.log.debug(`New Socket connected. ID=${socket.id}`);
-        socketEndpoint = new SocketSessionEndpoint({ socket, logLevel });
-        this.socketSessionDictionary[socket.id] = socketEndpoint;
+        irohaSocketEndpoint = new IrohaSocketIOEndpoint({ socket, logLevel });
+        this.socketSessionDictionary[socket.id] = irohaSocketEndpoint;
       }
 
       let monitorFlag: boolean;
 
-      socket.on(IrohaSocketSession.Subscribe, (monitorOptions) => {
+      socket.on(IrohaSocketSessionEvent.Subscribe, (monitorOptions: any) => {
         this.log.debug(`Caught event: Subscribe`);
         monitorFlag = true;
-        socketEndpoint.startMonitor(monitorOptions);
+        irohaSocketEndpoint.startMonitor(monitorOptions);
       });
 
-      socket.on(IrohaSocketSession.Unsubscribe, () => {
+      socket.on(IrohaSocketSessionEvent.Unsubscribe, () => {
         this.log.debug(`Caught event: Unsubscribe`);
-        socketEndpoint.stopMonitor();
+        irohaSocketEndpoint.stopMonitor();
       });
 
-      socket.on(IrohaSocketSession.SendAsyncRequest, (asyncRequestData) => {
-        this.log.debug(`Caught event: SendAsyncRequest`);
-        socketEndpoint.sendAsyncRequest(asyncRequestData);
-      });
+      socket.on(
+        IrohaSocketSessionEvent.SendAsyncRequest,
+        (asyncRequestData: any) => {
+          this.log.debug(`Caught event: SendAsyncRequest`);
+          irohaSocketEndpoint.sendRequest(asyncRequestData, true);
+        },
+      );
 
-      socket.on(IrohaSocketSession.SendSyncRequest, (syncRequestData) => {
-        this.log.debug(`Caught event: SendSyncRequest`);
-        socketEndpoint.sendSyncRequest(syncRequestData);
-      });
+      socket.on(
+        IrohaSocketSessionEvent.SendSyncRequest,
+        (syncRequestData: any) => {
+          this.log.debug(`Caught event: SendSyncRequest`);
+          irohaSocketEndpoint.sendRequest(syncRequestData, false);
+        },
+      );
 
       socket.on("disconnect", async (reason: string) => {
         this.log.info(`Session: ${socket.id} disconnected. Reason: ${reason}`);
         if (monitorFlag) {
-          socketEndpoint.stopMonitor();
+          irohaSocketEndpoint.stopMonitor();
           monitorFlag = false;
         }
       });
@@ -236,7 +242,9 @@ export class PluginLedgerConnectorIroha
   public async transact(
     req: RunTransactionRequestV1,
   ): Promise<RunTransactionResponse> {
-    const transaction = new Transaction(this.options.logLevel);
+    const transaction = new IrohaTransactionWrapper({
+      logLevel: this.options.logLevel,
+    });
     return await transaction.transact(req);
   }
 }

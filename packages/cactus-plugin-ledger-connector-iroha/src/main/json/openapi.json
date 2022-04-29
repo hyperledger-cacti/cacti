@@ -208,7 +208,9 @@
             "description": "Can only be set to false for an insecure grpc connection."
           },
           "monitorMode": {
-            "type": "boolean"
+            "type": "boolean",
+            "nullable": true,
+            "description": "Flag used for monitoring. It changes default beahviour of transaction wrapper so it return error to caller instead of throwing RuntimeError straight away."
           }
         }
       },
@@ -235,7 +237,7 @@
         "type": "string",
         "nullable": false
       },
-      "IrohaSocketSession": {
+      "IrohaSocketSessionEvent": {
         "type": "string",
         "enum": [
             "org.hyperledger.cactus.api.async.iroha.SocketSession.Subscribe",

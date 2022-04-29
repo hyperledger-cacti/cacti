@@ -10,31 +10,34 @@ import {
   IrohaBaseConfig,
 } from "../generated/openapi/typescript-axios";
 import {
-  IrohaSocketSession,
+  IrohaSocketSessionEvent,
   IrohaQuery,
 } from "../generated/openapi/typescript-axios";
 
-import { Transaction } from "../transaction";
-export interface IWatchBlocksV1EndpointOptions {
+import {
+  IrohaTransactionWrapper,
+  IIrohaTransactionWrapperOptions,
+} from "../iroha-transaction-wrapper";
+export interface IIrohaSocketIOEndpoint {
   logLevel?: LogLevelDesc;
   socket: SocketIoSocket;
 }
 
-export class SocketSessionEndpoint {
-  public static readonly CLASS_NAME = "SocketSessionEndpoint";
+export class IrohaSocketIOEndpoint {
+  public static readonly CLASS_NAME = "IrohaSocketIOEndpoint";
 
   private readonly log: Logger;
   private readonly socket: SocketIoSocket;
-  private transaction: Transaction;
+  private transaction: IrohaTransactionWrapper;
   private currentBlockHeight: number;
-  private monitorMode: boolean;
+  private monitorModeEnabled: boolean;
   private monitoringInterval: any;
 
   public get className(): string {
-    return SocketSessionEndpoint.CLASS_NAME;
+    return IrohaSocketIOEndpoint.CLASS_NAME;
   }
 
-  constructor(public readonly options: IWatchBlocksV1EndpointOptions) {
+  constructor(public readonly options: IIrohaSocketIOEndpoint) {
     const fnTag = `${this.className}#constructor()`;
 
     Checks.truthy(options, `${fnTag} arg options`);
@@ -45,9 +48,11 @@ export class SocketSessionEndpoint {
     const level = this.options.logLevel || "INFO";
     const label = this.className;
     this.log = LoggerProvider.getOrCreate({ level, label });
-    this.transaction = new Transaction(level);
+
+    const irohaOptions: IIrohaTransactionWrapperOptions = { logLevel: level };
+    this.transaction = new IrohaTransactionWrapper(irohaOptions);
     this.currentBlockHeight = 1;
-    this.monitorMode = false;
+    this.monitorModeEnabled = false;
   }
 
   private createRequestBody(
@@ -55,8 +60,8 @@ export class SocketSessionEndpoint {
     methodName: string,
     params: Array<any>,
   ): RunTransactionRequestV1 {
-    if (this.monitorMode === true) {
-      config.monitorMode = this.monitorMode;
+    if (this.monitorModeEnabled === true) {
+      config.monitorModeEnabled = this.monitorModeEnabled;
     }
     const requestBody = {
       commandName: methodName,
@@ -121,16 +126,16 @@ export class SocketSessionEndpoint {
       this.log.debug(`New block found`);
       transactionReceipt = response.transactionReceipt;
       next = { transactionReceipt };
-      this.socket.emit(IrohaSocketSession.Next, next);
+      this.socket.emit(IrohaSocketSessionEvent.Next, next);
       this.currentBlockHeight++;
     }
   }
 
   public async startMonitor(monitorOptions: any): Promise<void> {
-    this.log.debug(`${IrohaSocketSession.Subscribe} => ${this.socket.id}`);
+    this.log.debug(`${IrohaSocketSessionEvent.Subscribe} => ${this.socket.id}`);
     this.log.info(`Starting monitoring blocks...`);
 
-    this.monitorMode = true;
+    this.monitorModeEnabled = true;
     await this.getInitialMaxBlockHeight(monitorOptions.baseConfig);
 
     this.monitoringInterval = setInterval(() => {
@@ -154,50 +159,39 @@ export class SocketSessionEndpoint {
 
   public async stopMonitor(): Promise<void> {
     this.log.info(`Stopping monitor...`);
-    this.monitorMode = false;
+    this.monitorModeEnabled = false;
     clearInterval(this.monitoringInterval);
   }
 
-  public async sendAsyncRequest(asyncRequestData: any): Promise<any> {
-    this.log.debug(`Inside ##sendAsyncRequest()`);
-    this.log.debug(
-      `asyncRequestData: ${JSON.stringify(asyncRequestData, null, 4)}`,
-    );
+  public async sendRequest(requestData: any, async: boolean) {
+    this.log.debug(`Inside ##sendRequest(), async = ${async}`);
+    this.log.debug(`requestData: ${JSON.stringify(requestData, null, 4)}`);
 
-    this.log.debug(asyncRequestData.methodName);
-    this.log.debug(asyncRequestData.args);
-    this.log.debug(asyncRequestData.baseConfig);
+    this.log.debug(requestData.methodName);
+    this.log.debug(requestData.args);
+    this.log.debug(requestData.baseConfig);
 
-    // Validate method name
-    if ((await this.validateMethodName(asyncRequestData.methodName)) === true) {
+    if ((await this.validateMethodName(requestData.methodName)) === true) {
       const requestBody = this.createRequestBody(
-        asyncRequestData.baseConfig,
-        asyncRequestData.methodName,
-        asyncRequestData.args,
+        requestData.baseConfig,
+        requestData.methodName,
+        requestData.args,
       );
 
       const response = await this.transaction.transact(requestBody);
-      if (asyncRequestData?.syncRequest) {
-        this.log.debug(response);
+      this.log.debug(response);
+      if (async) {
         return response;
+      } else {
+        try {
+          this.socket.emit("response", response.transactionReceipt);
+        } catch (err: unknown) {
+          this.socket.emit("error", err);
+        }
       }
     } else {
-      const error = `Unrecognized method name: ${asyncRequestData.methodName}`;
+      const error = `Unrecognized method name: ${requestData.methodName}`;
       this.log.debug(error);
-    }
-  }
-
-  public async sendSyncRequest(syncRequestData: any): Promise<void> {
-    this.log.debug(`Inside ##sendSyncRequest()`);
-
-    syncRequestData["syncRequest"] = true;
-
-    try {
-      const block = await this.sendAsyncRequest(syncRequestData);
-      this.log.debug(block);
-      this.socket.emit("response", block.transactionReceipt);
-    } catch (err: any) {
-      this.socket.emit("error", err);
     }
   }
 }

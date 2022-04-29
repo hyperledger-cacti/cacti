@@ -25,16 +25,20 @@ import { QueryService_v1Client as QueryService } from "iroha-helpers-ts/lib/prot
 import commands from "iroha-helpers-ts/lib/commands/index";
 import queries from "iroha-helpers-ts/lib/queries";
 
-export class Transaction {
+export interface IIrohaTransactionWrapperOptions {
+  logLevel?: LogLevelDesc;
+}
+
+export class IrohaTransactionWrapper {
   private readonly log: Logger;
-  public static readonly CLASS_NAME = "Transaction";
+  public static readonly CLASS_NAME = "IrohaTransactionWrapper";
 
   public get className(): string {
-    return Transaction.CLASS_NAME;
+    return IrohaTransactionWrapper.CLASS_NAME;
   }
 
-  constructor(logLevel?: LogLevelDesc) {
-    const level = logLevel || "INFO";
+  constructor(options: IIrohaTransactionWrapperOptions) {
+    const level = options.logLevel || "INFO";
     const label = this.className;
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
@@ -413,7 +417,10 @@ export class Transaction {
           });
           return { transactionReceipt: response };
         } catch (err: any) {
-          if ("monitorMode" in baseConfig && baseConfig.monitorMode === true) {
+          if (
+            "monitorModeEnabled" in baseConfig &&
+            baseConfig.monitorModeEnabled === true
+          ) {
             return { transactionReceipt: err };
           } else {
             this.log.error(err);

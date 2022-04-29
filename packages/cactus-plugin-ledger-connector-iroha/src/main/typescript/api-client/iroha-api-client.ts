@@ -6,7 +6,7 @@ import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
 import { Constants, ISocketApiClient } from "@hyperledger/cactus-core-api";
 import {
   DefaultApi,
-  IrohaSocketSession,
+  IrohaSocketSessionEvent,
   IrohaBlockProgress,
   IrohaBaseConfig,
 } from "../generated/openapi/typescript-axios";
@@ -67,13 +67,13 @@ export class IrohaApiClient
     const socket: Socket = io(this.wsApiHost, { path: this.wsApiPath });
     const subject = new ReplaySubject<IrohaBlockProgress>(0);
     this.log.debug(monitorOptions);
-    socket.on(IrohaSocketSession.Next, (data: IrohaBlockProgress) => {
+    socket.on(IrohaSocketSessionEvent.Next, (data: IrohaBlockProgress) => {
       subject.next(data);
     });
 
     socket.on("connect", () => {
       this.log.debug("connected OK...");
-      socket.emit(IrohaSocketSession.Subscribe, monitorOptions);
+      socket.emit(IrohaSocketSessionEvent.Subscribe, monitorOptions);
     });
 
     socket.connect();
@@ -93,7 +93,7 @@ export class IrohaApiClient
     return subject.pipe(
       finalize(() => {
         this.log.info("FINALIZE - unsubscribing from the stream...");
-        socket.emit(IrohaSocketSession.Unsubscribe);
+        socket.emit(IrohaSocketSessionEvent.Unsubscribe);
         socket.disconnect();
       }),
       share(),
@@ -103,17 +103,18 @@ export class IrohaApiClient
   /**
    * Immediately sends request to the validator, doesn't report any error or responses.
    * @param args - arguments.
+   * @param method - function / method to be executed by validator.
    * @param baseConfig - baseConfig needed to properly connect to ledger
-   * @param methodName - function / method to be executed by validator.
+   
    */
   public sendAsyncRequest(
     args: any,
+    method: Record<string, unknown>,
     baseConfig?: IrohaBaseConfig,
-    methodName?: string,
   ): void {
     this.log.debug(`inside: sendAsyncRequest()`);
     this.log.debug(`baseConfig=${baseConfig}`);
-    this.log.debug(`methodName=${methodName}`);
+    this.log.debug(`methodName=${method.methodName}`);
     this.log.debug(`args=${args}`);
 
     if (baseConfig === undefined || baseConfig === {}) {
@@ -131,21 +132,21 @@ export class IrohaApiClient
       throw new RuntimeError("Some fields in baseConfig are undefined");
     }
 
-    if (methodName === undefined || methodName === "") {
+    if (method.methodName === undefined || method.methodName === "") {
       throw new RuntimeError("methodName parameter must be specified");
     }
 
     const socket: Socket = io(this.wsApiHost, { path: this.wsApiPath });
     const asyncRequestData = {
       baseConfig: baseConfig,
-      methodName: methodName,
+      methodName: method.methodName,
       args: args,
     };
 
     this.log.debug("requestData:", asyncRequestData);
 
     try {
-      socket.emit(IrohaSocketSession.SendAsyncRequest, asyncRequestData);
+      socket.emit(IrohaSocketSessionEvent.SendAsyncRequest, asyncRequestData);
     } catch (err) {
       this.log.error("Exception in: sendAsyncRequest(): ", err);
       throw err;
@@ -155,18 +156,18 @@ export class IrohaApiClient
   /**
    * Sends request to be executed on the ledger, watches and reports any error and the response from a ledger.
    * @param args - arguments.
+   * @param method - function / method to be executed by validator.
    * @param baseConfig - baseConfig needed to properly connect to ledger
-   * @param methodName - function / method to be executed by validator.
    * @returns Promise that will resolve with response from the ledger, or reject when error occurred.
    */
   public sendSyncRequest(
     args: any,
+    method: Record<string, unknown>,
     baseConfig?: IrohaBaseConfig,
-    methodName?: string,
   ): Promise<any> {
     this.log.debug(`inside: sendSyncRequest()`);
     this.log.debug(`baseConfig=${baseConfig}`);
-    this.log.debug(`method=${methodName}`);
+    this.log.debug(`method=${method}`);
     this.log.debug(`args=${args}`);
 
     if (baseConfig === undefined || baseConfig === {}) {
@@ -184,7 +185,7 @@ export class IrohaApiClient
       throw new RuntimeError("Some fields in baseConfig are undefined");
     }
 
-    if (methodName === undefined || methodName === "") {
+    if (method.methodName === undefined || method.methodName === "") {
       throw new RuntimeError("methodName parameter must be specified");
     }
 
@@ -219,14 +220,14 @@ export class IrohaApiClient
 
         const syncRequestData = {
           baseConfig: baseConfig,
-          methodName: methodName,
+          methodName: method.methodName,
           args: args,
         };
 
         this.log.debug("requestData:", syncRequestData);
 
         try {
-          socket.emit(IrohaSocketSession.SendSyncRequest, syncRequestData);
+          socket.emit(IrohaSocketSessionEvent.SendSyncRequest, syncRequestData);
         } catch (err) {
           this.log.error("Exception in: sendAsyncRequest(): ", err);
           throw err;

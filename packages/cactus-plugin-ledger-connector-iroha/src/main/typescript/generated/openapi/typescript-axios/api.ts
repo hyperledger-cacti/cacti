@@ -97,6 +97,87 @@ export interface IrohaBaseConfig {
      * @memberof IrohaBaseConfig
      */
     tls?: boolean;
+    /**
+     * Flag used for monitoring. It changes default beahviour of transaction wrapper so it return error to caller instead of throwing RuntimeError straight away.
+     * @type {boolean}
+     * @memberof IrohaBaseConfig
+     */
+    monitorMode?: boolean | null;
+}
+/**
+ * 
+ * @export
+ * @interface IrohaBlockProgress
+ */
+export interface IrohaBlockProgress {
+    /**
+     * 
+     * @type {IrohaBlockResponse}
+     * @memberof IrohaBlockProgress
+     */
+    transactionReceipt: IrohaBlockResponse;
+}
+/**
+ * 
+ * @export
+ * @interface IrohaBlockResponse
+ */
+export interface IrohaBlockResponse {
+    /**
+     * 
+     * @type {IrohaBlockResponsePayload}
+     * @memberof IrohaBlockResponse
+     */
+    payload: IrohaBlockResponsePayload;
+    /**
+     * 
+     * @type {Array<any>}
+     * @memberof IrohaBlockResponse
+     */
+    signaturesList: Array<any>;
+}
+/**
+ * 
+ * @export
+ * @interface IrohaBlockResponsePayload
+ */
+export interface IrohaBlockResponsePayload {
+    /**
+     * 
+     * @type {Array<any>}
+     * @memberof IrohaBlockResponsePayload
+     */
+    transactionsList: Array<any>;
+    /**
+     * 
+     * @type {number}
+     * @memberof IrohaBlockResponsePayload
+     */
+    txNumber: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof IrohaBlockResponsePayload
+     */
+    height: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof IrohaBlockResponsePayload
+     */
+    prevBlockHash: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof IrohaBlockResponsePayload
+     */
+    createdTime: number;
+    /**
+     * 
+     * @type {Array<any>}
+     * @memberof IrohaBlockResponsePayload
+     */
+    rejectedTransactionsHashesList: Array<any>;
 }
 /**
  * 
@@ -254,6 +335,22 @@ export enum IrohaQuery {
     * A query that returns a list of peers in Iroha network.
     */
     GetPeers = 'getPeers'
+}
+
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export enum IrohaSocketSessionEvent {
+    Subscribe = 'org.hyperledger.cactus.api.async.iroha.SocketSession.Subscribe',
+    Next = 'org.hyperledger.cactus.api.async.iroha.SocketSession.Next',
+    Unsubscribe = 'org.hyperledger.cactus.api.async.iroha.SocketSession.Unsubscribe',
+    Error = 'org.hyperledger.cactus.api.async.iroha.SocketSession.Error',
+    Complete = 'org.hyperledger.cactus.api.async.iroha.SocketSession.Complete',
+    SendAsyncRequest = 'org.hyperledger.cactus.api.async.iroha.SocketSession.SendAsyncRequest',
+    SendSyncRequest = 'org.hyperledger.cactus.api.async.iroha.SocketSession.SendSyncRequest'
 }
 
 /**
