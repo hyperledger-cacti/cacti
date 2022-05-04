@@ -832,14 +832,18 @@ const interopHelper = async (
       keyCert,
       false,
       options['relay-tls'] === 'true',
-      relayTlsCAFiles
+      relayTlsCAFiles,
+      options['e2e-confidentiality'] === 'true' ? true : false
     )
     logger.info(
       `View from remote network: ${JSON.stringify(
         interopFlowResponse.views[0].toObject()
       )}. Interop Flow result: ${interopFlowResponse.result || 'successful'}`
     )
-    const remoteValue = InteroperableHelper.getResponseDataFromView(interopFlowResponse.views[0])
+    const remoteValue =  (options['e2e-confidentiality'] === 'true' ?
+        InteroperableHelper.getResponseDataFromView(interopFlowResponse.views[0], keyCert.key.toBytes()) :
+        InteroperableHelper.getResponseDataFromView(interopFlowResponse.views[0])
+    )
     spinner.succeed(
       `Called Function ${applicationFunction}. With Args: ${invokeObject.ccArgs} ${remoteValue}`
     )

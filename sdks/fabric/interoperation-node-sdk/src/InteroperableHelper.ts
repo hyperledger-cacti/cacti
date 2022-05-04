@@ -166,7 +166,7 @@ const verifyRemoteProposalResponse = async (proposalResponseBase64, isEncrypted,
  * Extracts actual remote query response (along with full decrypted contents, if the response is encrypted) embedded in view structure.
  * Arguments are a View protobuf ('statePb.View') and a certificate in the form of a PEM string
  **/
-const getResponseDataFromView = (view, privKeyPEM) => {
+const getResponseDataFromView = (view, privKeyPEM = null) => {
     if (view.getMeta().getProtocol() == statePb.Meta.Protocol.FABRIC) {
         const fabricView = fabricViewPb.FabricView.deserializeBinary(view.getData());
         const interopPayload = interopPayloadPb.InteropPayload.deserializeBinary(Uint8Array.from(Buffer.from(fabricView.getResponse().getPayload())));

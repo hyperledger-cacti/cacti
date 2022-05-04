@@ -74,6 +74,10 @@ const command: GluegunCommand = {
             description: 'Colon-separated list of root CA certificate paths used to connect to the relay over TLS.'
           },
           {
+            name: '--e2e-confidentiality',
+            description: 'Flag indicating whether or not the view contents are confidential end-to-end across networks (client-to-interop-module).'
+          },
+          {
             name: '--debug',
             description:
               'Shows debug logs when running. Disabled by default. To enable --debug=true'
