@@ -52,7 +52,7 @@ Firstly let us identify the different entities involved in the protocol and what
 
 The sequence diagram of ODAP is pictured below.
 
-![odap-sequence-diagram](https://imgur.com/a/NN62LyL)
+![odap-sequence-diagram](https://i.imgur.com/AFNvL9v.png)
 
 ### API Endpoints
 This plugin uses OpenAPI to generate the API paths.
@@ -83,45 +83,27 @@ Alice and Bob, in blockchains A and B, respectively, want to make a transfer of 
 
 ## Running the tests
 
-For developers that want to test separate steps/phases of the ODAP protocol, please refer to the following test files (client and server side along with the recovery procedure):
+[A test of the entire protocol with manual calls to the methods, i.e. without ledger connectors and Open API.](https://github.com/hyperledger/cactus/blob/2e94ef8d3b34449c7b4d48e37d81245851477a3e/packages/cactus-plugin-odap-hermes/src/test/typescript/integration/odap.test.ts)
 
-https://github.com/hyperledger/cactus/tree/main/packages/cactus-plugin-odap-hermes/src/test/typescript/unit/
+[A test of the entire protocol using Open API but with no ledger connectors.](https://github.com/hyperledger/cactus/blob/2e94ef8d3b34449c7b4d48e37d81245851477a3e/packages/cactus-plugin-odap-hermes/src/test/typescript/integration/odap-api-call.test.ts)
 
-A test of the entire protocol with manual calls to the methods, i.e. without ledger connectors and Open API:
+[A test of the entire protocol with ledger connectors (Fabric and Besu) and Open API.](https://github.com/hyperledger/cactus/blob/2e94ef8d3b34449c7b4d48e37d81245851477a3e/packages/cactus-plugin-odap-hermes/src/test/typescript/integration/odap-api-call-with-ledger-connector.test.ts)
 
-https://github.com/hyperledger/cactus/tree/main/packages/cactus-plugin-odap-hermes/src/test/typescript/integration/odap-test.ts
+[A test with a simulated crash of the client gateway after the transfer initiation flow.](https://github.com/hyperledger/cactus/blob/2e94ef8d3b34449c7b4d48e37d81245851477a3e/packages/cactus-plugin-odap-hermes/src/test/typescript/integration/client-crash-after-transfer-initiation.test.ts)
 
-A test of the entire protocol using Open API but with no ledger connectors:
+[A test with a simulated crash of the client gateway after the lock of the asset in the source blockchain (Fabric).](https://github.com/hyperledger/cactus/blob/2e94ef8d3b34449c7b4d48e37d81245851477a3e/packages/cactus-plugin-odap-hermes/src/test/typescript/integration/client-crash-after-lock-asset.test.ts)
 
-https://github.com/hyperledger/cactus/tree/main/packages/cactus-plugin-odap-hermes/src/test/typescript/integration/odap-api-call.test.ts
+[A test with a simulated crash of the client gateway after the deletion of the asset in the source blockchain (Fabric).](https://github.com/hyperledger/cactus/blob/2e94ef8d3b34449c7b4d48e37d81245851477a3e/packages/cactus-plugin-odap-hermes/src/test/typescript/integration/client-crash-after-delete-asset.test.ts)
 
-A test of the entire protocol with ledger connectors (Fabric and Besu) and Open API:
+[A test with a simulated crash of the server gateway after the creation of the the asset in the recipient blockchain (Besu).](https://github.com/hyperledger/cactus/blob/2e94ef8d3b34449c7b4d48e37d81245851477a3e/packages/cactus-plugin-odap-hermes/src/test/typescript/integration/server-crash-after-create-asset.test.ts)
 
-https://github.com/hyperledger/cactus/blob/main/packages/cactus-plugin-odap-hermes/src/test/typescript/integration/odap/odap-api-call-with-ledger-connector.test.ts
+[A test with a simulated crash of the server gateway after the transfer initiation flow.](https://github.com/hyperledger/cactus/blob/2e94ef8d3b34449c7b4d48e37d81245851477a3e/packages/cactus-plugin-odap-hermes/src/test/typescript/integration/server-crash-after-transfer-initiation.test.ts)
 
-A test with a simulated crash of the client gateway after the transfer initiation flow:
+[A test with a rollback after a timeout (client crashed).](https://github.com/hyperledger/cactus/blob/2e94ef8d3b34449c7b4d48e37d81245851477a3e/packages/cactus-plugin-odap-hermes/src/test/typescript/integration/odap-rollback.test.ts)
 
-https://github.com/hyperledger/cactus/blob/main/packages/cactus-plugin-odap-hermes/src/test/typescript/integration/odap/client-crash-after-transfer-initiation.test.ts
+[A test with a backup gateway resuming the protocol after the client gateway crashed.](https://github.com/hyperledger/cactus/tree/main/packages/cactus-plugin-odap-hermes/src/test/typescript/integration/backup-gateway-after-client-crash.test.ts)
 
-A test with a simulated crash of the client gateway after the lock of the asset in the source blockchain (Fabric):
-
-https://github.com/hyperledger/cactus/blob/main/packages/cactus-plugin-odap-hermes/src/test/typescript/integration/odap/client-crash-after-lock-asset.test.ts
-
-A test with a simulated crash of the client gateway after the deletion of the asset in the source blockchain (Fabric):
-
-https://github.com/hyperledger/cactus/blob/main/packages/cactus-plugin-odap-hermes/src/test/typescript/integration/odap/client-crash-after-delete-asset.test.ts
-
-A test with a simulated crash of the server gateway after the creation of the the asset in the recipient blockchain (Besu):
-
-https://github.com/hyperledger/cactus/blob/main/packages/cactus-plugin-odap-hermes/src/test/typescript/integration/odap/server-crash-after-create-asset.test.ts
-
-A test with a simulated crash of the server gateway after the transfer initiation flow:
-
-https://github.com/hyperledger/cactus/blob/main/packages/cactus-plugin-odap-hermes/src/test/typescript/integration/odap/server-crash-after-transfer-initiation.test.ts
-
-A test with a rollback after a timeout (client crashed):
-
-https://github.com/hyperledger/cactus/blob/main/packages/cactus-plugin-odap-hermes/src/test/typescript/integration/odap/odap-rollback.test.ts
+For developers that want to test separate steps/phases of the ODAP protocol, please refer to [these](https://github.com/hyperledger/cactus/blob/2e94ef8d3b34449c7b4d48e37d81245851477a3e/packages/cactus-plugin-odap-hermes/src/test/typescript/unit/) test files (client and server side along with the recovery procedure).
 
 ## Usage
 

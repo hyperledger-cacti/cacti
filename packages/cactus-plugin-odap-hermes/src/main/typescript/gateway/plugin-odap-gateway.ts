@@ -168,6 +168,7 @@ export interface IPluginOdapGatewayConstructorOptions {
   dltIDs: string[];
   instanceId: string;
   keyPair?: IOdapGatewayKeyPairs;
+  backupGatewaysAllowed?: string[];
 
   ipfsPath?: string;
   fabricPath?: string;
@@ -216,6 +217,8 @@ export class PluginOdapGateway implements ICactusPlugin, IPluginWebService {
   //map[]object, object refer to a state
   //of a specific comminications
   public supportedDltIDs: string[];
+  public backupGatewaysAllowed: string[];
+
   private odapSigner: JsObjectSigner;
   public fabricAssetLocked: boolean;
   public fabricAssetDeleted: boolean;
@@ -245,6 +248,8 @@ export class PluginOdapGateway implements ICactusPlugin, IPluginWebService {
     this.name = options.name;
     this.supportedDltIDs = options.dltIDs;
     this.sessions = new Map();
+
+    this.backupGatewaysAllowed = options.backupGatewaysAllowed || [];
     const keyPairs = options.keyPair
       ? options.keyPair
       : Secp256k1Keys.generateKeyPairsBuffer();
@@ -564,8 +569,19 @@ export class PluginOdapGateway implements ICactusPlugin, IPluginWebService {
       const sessionData: SessionData = JSON.parse(log.data);
 
       sessionData.lastLogEntryTimestamp = log.timestamp;
+
+      let amIBackup = false;
+      if (
+        this.pubKey != sessionData.sourceGatewayPubkey &&
+        this.pubKey != sessionData.recipientGatewayPubkey
+      ) {
+        // this is a backup gateway -> for now we assume backup gateways only on the client side
+        sessionData.sourceGatewayPubkey = this.pubKey;
+        amIBackup = true;
+      }
+
       this.sessions.set(sessionID, sessionData);
-      if (remote) await sendRecoverMessage(sessionID, this, true);
+      if (remote) await sendRecoverMessage(sessionID, this, amIBackup, true);
     }
   }
 
@@ -1117,8 +1133,12 @@ export class PluginOdapGateway implements ICactusPlugin, IPluginWebService {
     sessionData.step = 1;
     sessionData.version = request.version;
     sessionData.lastSequenceNumber = randomInt(4294967295);
+
     sessionData.sourceBasePath = request.clientGatewayConfiguration.apiHost;
     sessionData.recipientBasePath = request.serverGatewayConfiguration.apiHost;
+
+    sessionData.allowedSourceBackupGateways = this.backupGatewaysAllowed;
+    sessionData.allowedRecipientBackupGateways = [];
 
     sessionData.payloadProfile = request.payloadProfile;
     sessionData.loggingProfile = request.loggingProfile;

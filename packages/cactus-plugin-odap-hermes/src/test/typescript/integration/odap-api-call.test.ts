@@ -109,17 +109,13 @@ test("runs ODAP between two gateways via openApi", async () => {
     odapServerGatewayPluginOptions,
   );
 
-  if (
-    pluginSourceGateway.database == undefined ||
-    pluginRecipientGateway.database == undefined
-  ) {
-    throw new Error("Database is not correctly initialized");
-  }
+  expect(pluginSourceGateway.database).not.toBeUndefined();
+  expect(pluginRecipientGateway.database).not.toBeUndefined();
 
-  await pluginSourceGateway.database.migrate.rollback();
-  await pluginSourceGateway.database.migrate.latest();
-  await pluginRecipientGateway.database.migrate.rollback();
-  await pluginRecipientGateway.database.migrate.latest();
+  await pluginSourceGateway.database?.migrate.rollback();
+  await pluginSourceGateway.database?.migrate.latest();
+  await pluginRecipientGateway.database?.migrate.rollback();
+  await pluginRecipientGateway.database?.migrate.latest();
 
   let odapServerGatewayApiHost: string;
 

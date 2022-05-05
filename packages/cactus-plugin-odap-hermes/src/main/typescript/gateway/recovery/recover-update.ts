@@ -127,7 +127,17 @@ export async function checkValidRecoverUpdateMessage(
 
     if (parseInt(recLog.timestamp) > parseInt(maxTimestamp)) {
       maxTimestamp = recLog.timestamp;
-      odap.sessions.set(sessionID, JSON.parse(recLog.data));
+
+      const data = JSON.parse(recLog.data);
+
+      // don't override new gateway public keys in case of being a backup gateway
+      if (odap.isClientGateway(sessionID)) {
+        data.sourceGatewayPubkey = odap.pubKey;
+      } else {
+        data.recipientGatewayPubkey = odap.pubKey;
+      }
+
+      odap.sessions.set(sessionID, data);
     }
   }
 

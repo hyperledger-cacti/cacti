@@ -10,6 +10,7 @@ const log = LoggerProvider.getOrCreate({
 export async function sendRecoverMessage(
   sessionID: string,
   odap: PluginOdapGateway,
+  backup: boolean,
   remote: boolean,
 ): Promise<void | RecoverV1Message> {
   const fnTag = `${odap.className}#sendRecoverMessage()`;
@@ -33,6 +34,9 @@ export async function sendRecoverMessage(
     odapPhase: "sessionData.odapPhase",
     sequenceNumber: sessionData.lastSequenceNumber,
     lastLogEntryTimestamp: sessionData.lastLogEntryTimestamp,
+    isBackup: backup,
+    newBasePath: "",
+    newGatewayPubKey: sessionData.sourceGatewayPubkey,
     signature: "",
   };
 
@@ -71,9 +75,45 @@ export async function checkValidRecoverMessage(
     throw new Error(`${fnTag}, session data is undefined`);
   }
 
-  const pubKey = odap.isClientGateway(response.sessionID)
-    ? sessionData.recipientGatewayPubkey
-    : sessionData.sourceGatewayPubkey;
+  let pubKey = undefined;
+
+  if (odap.isClientGateway(response.sessionID)) {
+    if (
+      response.isBackup &&
+      sessionData.recipientGatewayPubkey != response.newGatewayPubKey
+    ) {
+      // this is a backup gateway
+      sessionData.recipientGatewayPubkey = response.newGatewayPubKey;
+
+      if (
+        !sessionData.recipientGatewayPubkey ||
+        !sessionData.allowedSourceBackupGateways?.includes(
+          sessionData.recipientGatewayPubkey,
+        )
+      ) {
+        throw new Error(`${fnTag}, backup gateway not allowed`);
+      }
+    }
+    pubKey = sessionData.recipientGatewayPubkey;
+  } else {
+    if (
+      response.isBackup &&
+      sessionData.sourceGatewayPubkey != response.newGatewayPubKey
+    ) {
+      // this is a backup gateway
+      sessionData.sourceGatewayPubkey = response.newGatewayPubKey;
+
+      if (
+        !sessionData.sourceGatewayPubkey ||
+        !sessionData.allowedSourceBackupGateways?.includes(
+          sessionData.sourceGatewayPubkey,
+        )
+      ) {
+        throw new Error(`${fnTag}, backup gateway not allowed`);
+      }
+    }
+    pubKey = sessionData.sourceGatewayPubkey;
+  }
 
   if (pubKey == undefined) {
     throw new Error(`${fnTag}, session data is undefined`);
@@ -94,6 +134,8 @@ export async function checkValidRecoverMessage(
   }
 
   sessionData.lastLogEntryTimestamp = response.lastLogEntryTimestamp;
+
+  odap.sessions.set(sessionID, sessionData);
 
   log.info(`RecoverMessage passed all checks.`);
 }

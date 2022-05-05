@@ -60,10 +60,6 @@ import Web3 from "web3";
 import { knexClientConnection, knexServerConnection } from "../knex.config";
 import { makeSessionDataChecks } from "../make-checks";
 import {
-  checkValidLockEvidenceRequest,
-  sendLockEvidenceResponse,
-} from "../../../main/typescript/gateway/server/lock-evidence";
-import {
   sendTransferCommenceRequest,
   checkValidTransferCommenceResponse,
 } from "../../../main/typescript/gateway/client/transfer-commence";
@@ -79,21 +75,15 @@ import {
   checkValidInitializationRequest,
   sendTransferInitializationResponse,
 } from "../../../main/typescript/gateway/server/transfer-initialization";
-import {
-  sendCommitPreparationRequest,
-  checkValidCommitPreparationResponse,
-} from "../../../main/typescript/gateway/client/commit-preparation";
+import { fabricAssetExists, besuAssetExists } from "../make-checks-ledgers";
 import {
   sendLockEvidenceRequest,
   checkValidLockEvidenceResponse,
 } from "../../../main/typescript/gateway/client/lock-evidence";
 import {
-  checkValidCommitPreparationRequest,
-  sendCommitPreparationResponse,
-} from "../../../main/typescript/gateway/server/commit-preparation";
-import { besuAssetExists, fabricAssetExists } from "../make-checks-ledgers";
-import { sendCommitFinalRequest } from "../../../main/typescript/gateway/client/commit-final";
-import { checkValidCommitFinalRequest } from "../../../main/typescript/gateway/server/commit-final";
+  checkValidLockEvidenceRequest,
+  sendLockEvidenceResponse,
+} from "../../../main/typescript/gateway/server/lock-evidence";
 /**
  * Use this to debug issues with the fabric node SDK
  * ```sh
@@ -127,12 +117,15 @@ let besuKeychainId: string;
 let fabricConnector: PluginLedgerConnectorFabric;
 let besuConnector: PluginLedgerConnectorBesu;
 
+let odapClientGatewayPluginOptions: IPluginOdapGatewayConstructorOptions;
 let odapServerGatewayPluginOptions: IPluginOdapGatewayConstructorOptions;
 let pluginSourceGateway: PluginOdapGateway;
 let pluginRecipientGateway: PluginOdapGateway;
 
 let odapClientGatewayApiHost: string;
 let odapServerGatewayApiHost: string;
+
+const backupGatewayKeys = Secp256k1Keys.generateKeyPairsBuffer();
 
 const MAX_RETRIES = 5;
 const MAX_TIMEOUT = 5000;
@@ -142,7 +135,7 @@ const BESU_ASSET_ID = uuidv4();
 
 const log = LoggerProvider.getOrCreate({
   level: "INFO",
-  label: "odapTestWithLedgerConnectors",
+  label: "odapTestWithBackupGateway",
 });
 
 beforeAll(async () => {
@@ -198,6 +191,7 @@ beforeAll(async () => {
     await pluginIpfs.getOrCreateWebServices();
     await pluginIpfs.registerWebServices(expressApp);
   }
+
   {
     // Fabric ledger connection
     const channelId = "mychannel";
@@ -461,6 +455,7 @@ beforeAll(async () => {
       `BassicAssetTransfer.Create(): ${JSON.stringify(createResponse.data)}`,
     );
   }
+
   {
     // Besu ledger connection
     besuTestLedger = new BesuTestLedger();
@@ -580,12 +575,14 @@ beforeAll(async () => {
 
     expect(typeof contractAddress).toBe("string");
   }
-});
-
-beforeEach(async () => {
   {
     // Gateways configuration
-    const odapClientGatewayPluginOptions: IPluginOdapGatewayConstructorOptions = {
+    const allowedGateways = [];
+    allowedGateways.push(
+      PluginOdapGateway.bufArray2HexStr(backupGatewayKeys.publicKey),
+    );
+
+    odapClientGatewayPluginOptions = {
       name: "cactus-plugin#odapGateway",
       dltIDs: ["DLT2"],
       instanceId: uuidv4(),
@@ -597,6 +594,7 @@ beforeEach(async () => {
       fabricContractName: fabricContractName,
       fabricAssetID: FABRIC_ASSET_ID,
       knexConfig: knexClientConnection,
+      backupGatewaysAllowed: allowedGateways,
     };
 
     odapServerGatewayPluginOptions = {
@@ -666,7 +664,7 @@ beforeEach(async () => {
   }
 });
 
-test("server gateway crashes after creating besu asset", async () => {
+test("client gateway crashes after lock fabric asset", async () => {
   const expiryDate = new Date(2060, 11, 24).toString();
   const assetProfile: AssetProfile = { expirationDate: expiryDate };
 
@@ -800,80 +798,44 @@ test("server gateway crashes after creating besu asset", async () => {
     pluginSourceGateway,
   );
 
-  const commitPreparationRequest = await sendCommitPreparationRequest(
-    sessionID,
-    pluginSourceGateway,
-    false,
-  );
-
-  if (commitPreparationRequest == void 0) {
-    expect(false);
-    return;
-  }
-
-  await checkValidCommitPreparationRequest(
-    commitPreparationRequest,
-    pluginRecipientGateway,
-  );
-
-  const commitPreparationResponse = await sendCommitPreparationResponse(
-    lockEvidenceRequest.sessionID,
-    pluginRecipientGateway,
-    false,
-  );
-
-  if (commitPreparationResponse == void 0) {
-    expect(false);
-    return;
-  }
-
-  await checkValidCommitPreparationResponse(
-    commitPreparationResponse,
-    pluginSourceGateway,
-  );
-
-  await pluginSourceGateway.deleteFabricAsset(sessionID);
-
-  const commitFinalRequest = await sendCommitFinalRequest(
-    sessionID,
-    pluginSourceGateway,
-    false,
-  );
-
-  if (commitFinalRequest == void 0) {
-    expect(false);
-    return;
-  }
-
-  await checkValidCommitFinalRequest(
-    commitFinalRequest,
-    pluginRecipientGateway,
-  );
-
-  await pluginRecipientGateway.createBesuAsset(sessionID);
-
-  // now we simulate the crash of the server gateway
-  pluginRecipientGateway.database?.destroy();
-  await Servers.shutdown(recipientGatewayServer);
+  // now we simulate the crash of the client gateway
+  pluginSourceGateway.database?.destroy();
+  await Servers.shutdown(sourceGatewayServer);
 
   const expressApp = express();
   expressApp.use(bodyParser.json({ limit: "250mb" }));
-  recipientGatewayServer = http.createServer(expressApp);
+  sourceGatewayServer = http.createServer(expressApp);
   const listenOptions: IListenOptions = {
     hostname: "localhost",
-    port: 5000,
-    server: recipientGatewayServer,
+    port: 3001,
+    server: sourceGatewayServer,
   };
 
   await Servers.listen(listenOptions);
 
-  pluginRecipientGateway = new PluginOdapGateway(
-    odapServerGatewayPluginOptions,
-  );
-  await pluginRecipientGateway.registerWebServices(expressApp);
+  // Backup gateway configuration
+  odapClientGatewayPluginOptions = {
+    name: "cactus-plugin#odapGateway",
+    dltIDs: ["DLT2"],
+    instanceId: uuidv4(),
+    keyPair: backupGatewayKeys,
+    ipfsPath: ipfsApiHost,
+    fabricPath: fabricPath,
+    fabricSigningCredential: fabricSigningCredential,
+    fabricChannelName: fabricChannelName,
+    fabricContractName: fabricContractName,
+    fabricAssetID: FABRIC_ASSET_ID,
+    knexConfig: knexClientConnection,
+  };
 
-  // client gateway self-healed and is back online
-  await pluginRecipientGateway.recoverOpenSessions(true);
+  pluginSourceGateway = new PluginOdapGateway(odapClientGatewayPluginOptions);
+  await pluginSourceGateway.getOrCreateWebServices();
+  await pluginSourceGateway.registerWebServices(expressApp);
+
+  // backup client gateway back online
+  await pluginSourceGateway.recoverOpenSessions(true);
+
+  expect(pluginSourceGateway.database).not.toBeUndefined();
 
   await makeSessionDataChecks(
     pluginSourceGateway,
@@ -910,8 +872,8 @@ afterAll(async () => {
   await besuTestLedger.stop();
   await besuTestLedger.destroy();
 
-  await pluginSourceGateway.database?.destroy();
-  await pluginRecipientGateway.database?.destroy();
+  pluginSourceGateway.database?.destroy();
+  pluginRecipientGateway.database?.destroy();
 
   await Servers.shutdown(ipfsServer);
   await Servers.shutdown(besuServer);

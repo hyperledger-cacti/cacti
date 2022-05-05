@@ -44,6 +44,7 @@ export async function sendTransferInitializationResponse(
     serverIdentityPubkey: odap.pubKey,
     sequenceNumber: sessionData.lastSequenceNumber,
     signature: "",
+    backupGatewaysAllowed: odap.backupGatewaysAllowed,
   };
 
   transferInitializationResponse.signature = PluginOdapGateway.bufArray2HexStr(
@@ -158,6 +159,10 @@ async function storeSessionData(
   sessionData.version = request.version;
   sessionData.maxRetries = request.maxRetries;
   sessionData.maxTimeout = request.maxTimeout;
+
+  sessionData.allowedSourceBackupGateways = request.backupGatewaysAllowed;
+  sessionData.allowedRecipientBackupGateways = odap.backupGatewaysAllowed;
+
   sessionData.sourceBasePath = request.sourceGatewayPath;
   sessionData.recipientBasePath = request.recipientBasePath;
   sessionData.lastSequenceNumber = request.sequenceNumber;
