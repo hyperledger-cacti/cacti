@@ -17,7 +17,6 @@ import (
 	wutils "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/utils"
 )
 
-const applicationCCKey = "applicationccid"
 const e2eConfidentialityKey = "e2eConfidentialityFlag"
 
 // SmartContract provides functions for managing arbitrary key-value pairs
@@ -41,19 +40,6 @@ func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface) 
 	var confFlag string
 
 	_, args := ctx.GetStub().GetFunctionAndParameters()
-
-	if len(args) < 1 {
-		err = fmt.Errorf("Incorrect number of arguments. Expecting at least 1: {APPLICATION Chaincode ID/hash}. Found %d", len(args))
-		fmt.Printf("Error %s", err.Error())
-		return err
-	}
-
-	err = ctx.GetStub().PutState(applicationCCKey, []byte(args[0]))
-	if err != nil {
-		errMsg := fmt.Sprintf("Error saving APPLICATION ID: %s", err.Error())
-		fmt.Printf(errMsg)
-		return errors.New(errMsg)
-	}
 
 	if len(args) > 1 {
 		confFlag = "true"
@@ -90,15 +76,6 @@ func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface) 
 	}
 
 	return nil
-}
-
-// GetApplicationID retrieves the app CC id from the ledger
-func (s *SmartContract) GetApplicationID(ctx contractapi.TransactionContextInterface) (string, error) {
-	bytes, err := ctx.GetStub().GetState(applicationCCKey)
-	if err != nil {
-		return "", err
-	}
-	return string(bytes), nil
 }
 
 func main() {

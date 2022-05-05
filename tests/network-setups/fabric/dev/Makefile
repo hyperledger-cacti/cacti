@@ -3,6 +3,7 @@ FABRIC_CA_VERSION=1.4.7
 FABRIC_COUCH_VERSION=0.4.20
 CHAINCODE_NAME?=simplestate
 NW?=network1
+E2E_CONFIDENTIALITY?=false
 
 .PHONY:	all
 all: start
