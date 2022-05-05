@@ -35,7 +35,8 @@ export async function sendTransferInitializationRequest(
     sessionData.lastSequenceNumber == undefined ||
     sessionData.sourceGatewayDltSystem == undefined ||
     sessionData.recipientGatewayPubkey == undefined ||
-    sessionData.recipientGatewayDltSystem == undefined
+    sessionData.recipientGatewayDltSystem == undefined ||
+    sessionData.allowedSourceBackupGateways == undefined
   ) {
     throw new Error(`${fnTag}, session data is not correctly initialized`);
   }
@@ -71,6 +72,7 @@ export async function sendTransferInitializationRequest(
     // permissions
     maxRetries: sessionData.maxRetries,
     maxTimeout: sessionData.maxTimeout,
+    backupGatewaysAllowed: sessionData.allowedSourceBackupGateways,
   };
 
   const messageSignature = PluginOdapGateway.bufArray2HexStr(
@@ -184,6 +186,7 @@ function storeSessionData(
 
   sessionData.serverSignatureInitializationResponseMessage = response.signature;
 
+  sessionData.allowedRecipientBackupGateways = response.backupGatewaysAllowed;
   sessionData.fabricAssetSize = "1";
 
   sessionData.step = 3;

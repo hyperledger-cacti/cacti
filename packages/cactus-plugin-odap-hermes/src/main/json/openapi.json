@@ -195,6 +195,18 @@
                     "assetProfile": {
                         "$ref":"#/components/schemas/AssetProfile"
                     },
+                    "allowedSourceBackupGateways": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "allowedRecipientBackupGateways": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
                     "sourceBasePath": {
                         "type":"string"
                     },
@@ -460,6 +472,12 @@
                     },
                     "maxTimeout": {
                         "type": "number"
+                    },
+                    "backupGatewaysAllowed": {
+                        "type":"array",
+                        "items":{
+                            "type":"string"
+                        }
                     }
                 },
                 "required": [
@@ -478,7 +496,8 @@
                     "sourceBasePath",
                     "recipientBasePath",
                     "maxRetries",
-                    "maxTimeout"
+                    "maxTimeout",
+                    "backupGatewaysAllowed"
                 ]
             },
             "TransferInitializationV1Response":{
@@ -518,6 +537,12 @@
                     },
                     "signature":{
                         "type":"string"
+                    },
+                    "backupGatewaysAllowed": {
+                        "type":"array",
+                        "items":{
+                            "type":"string"
+                        }
                     }
                 },
                 "required": [
@@ -528,7 +553,8 @@
                     "sessionID",
                     "serverIdentityPubkey",
                     "sequenceNumber",
-                    "signature"
+                    "signature",
+                    "backupGatewaysAllowed"
                 ]
             },
             "TransferCommenceV1Request":{
@@ -1057,6 +1083,15 @@
                     "lastLogEntryTimestamp": {
                         "type": "string"
                     },
+                    "isBackup": {
+                        "type": "boolean"
+                    },
+                    "newBasePath": {
+                        "type": "string"
+                    },
+                    "newGatewayPubKey": {
+                        "type": "string"
+                    },
                     "signature": {
                         "type": "string"
                     }
@@ -1066,6 +1101,8 @@
                     "odapPhase",
                     "sequenceNumber",
                     "lastLogEntryHash",
+                    "isBackup",
+                    "newBasePath",
                     "signature"
                 ]
             },

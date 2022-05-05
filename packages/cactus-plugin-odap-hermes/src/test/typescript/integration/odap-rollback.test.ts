@@ -11,7 +11,6 @@ import express from "express";
 import { DefaultApi as ObjectStoreIpfsApi } from "@hyperledger/cactus-plugin-object-store-ipfs";
 import { AssetProfile } from "../../../main/typescript/generated/openapi/typescript-axios";
 import {
-  Checks,
   IListenOptions,
   LoggerProvider,
   LogLevelDesc,
@@ -422,29 +421,21 @@ beforeAll(async () => {
       queryCommitted,
     } = lifecycle;
 
-    Checks.truthy(packageIds, `packageIds truthy OK`);
-    Checks.truthy(
-      Array.isArray(packageIds),
-      `Array.isArray(packageIds) truthy OK`,
-    );
-    Checks.truthy(approveForMyOrgList, `approveForMyOrgList truthy OK`);
-    Checks.truthy(
-      Array.isArray(approveForMyOrgList),
-      `Array.isArray(approveForMyOrgList) truthy OK`,
-    );
-    Checks.truthy(installList, `installList truthy OK`);
-    Checks.truthy(
-      Array.isArray(installList),
-      `Array.isArray(installList) truthy OK`,
-    );
-    Checks.truthy(queryInstalledList, `queryInstalledList truthy OK`);
-    Checks.truthy(
-      Array.isArray(queryInstalledList),
-      `Array.isArray(queryInstalledList) truthy OK`,
-    );
-    Checks.truthy(commit, `commit truthy OK`);
-    Checks.truthy(packaging, `packaging truthy OK`);
-    Checks.truthy(queryCommitted, `queryCommitted truthy OK`);
+    expect(packageIds).toBeTruthy();
+    expect(packageIds).toBeArray();
+
+    expect(approveForMyOrgList).toBeTruthy();
+    expect(approveForMyOrgList).toBeArray();
+
+    expect(installList).toBeTruthy();
+    expect(installList).toBeArray();
+
+    expect(queryInstalledList).toBeTruthy();
+    expect(queryInstalledList).toBeArray();
+
+    expect(commit).toBeTruthy();
+    expect(packaging).toBeTruthy();
+    expect(queryCommitted).toBeTruthy();
 
     // FIXME - without this wait it randomly fails with an error claiming that
     // the endorsement was impossible to be obtained. The fabric-samples script
@@ -629,17 +620,13 @@ beforeAll(async () => {
       odapServerGatewayPluginOptions,
     );
 
-    if (
-      pluginSourceGateway.database == undefined ||
-      pluginRecipientGateway.database == undefined
-    ) {
-      throw new Error("Database is not correctly initialized");
-    }
+    expect(pluginSourceGateway.database).not.toBeUndefined();
+    expect(pluginRecipientGateway.database).not.toBeUndefined();
 
-    await pluginSourceGateway.database.migrate.rollback();
-    await pluginSourceGateway.database.migrate.latest();
-    await pluginRecipientGateway.database.migrate.rollback();
-    await pluginRecipientGateway.database.migrate.latest();
+    await pluginSourceGateway.database?.migrate.rollback();
+    await pluginSourceGateway.database?.migrate.latest();
+    await pluginRecipientGateway.database?.migrate.rollback();
+    await pluginRecipientGateway.database?.migrate.latest();
   }
   {
     // Server Gateway configuration
@@ -898,25 +885,25 @@ test("client sends rollback message at the end of the protocol", async () => {
 
   await pluginSourceGateway.recoverOpenSessions(true);
 
-  expect(
-    await fabricAssetExists(
+  await expect(
+    fabricAssetExists(
       pluginSourceGateway,
       fabricContractName,
       fabricChannelName,
       FABRIC_ASSET_ID,
       fabricSigningCredential,
     ),
-  ).toBe(true);
+  ).resolves.toBe(true);
 
-  expect(
-    await besuAssetExists(
+  await expect(
+    besuAssetExists(
       pluginRecipientGateway,
       besuContractName,
       besuKeychainId,
       BESU_ASSET_ID,
       besuWeb3SigningCredential,
     ),
-  ).toBe(false);
+  ).resolves.toBe(false);
 });
 
 afterAll(async () => {

@@ -982,6 +982,24 @@ export interface RecoverV1Message {
     lastLogEntryTimestamp?: string;
     /**
      * 
+     * @type {boolean}
+     * @memberof RecoverV1Message
+     */
+    isBackup: boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof RecoverV1Message
+     */
+    newBasePath: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RecoverV1Message
+     */
+    newGatewayPubKey?: string;
+    /**
+     * 
      * @type {string}
      * @memberof RecoverV1Message
      */
@@ -1109,6 +1127,18 @@ export interface SessionData {
      * @memberof SessionData
      */
     assetProfile?: AssetProfile;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof SessionData
+     */
+    allowedSourceBackupGateways?: Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof SessionData
+     */
+    allowedRecipientBackupGateways?: Array<string>;
     /**
      * 
      * @type {string}
@@ -1815,6 +1845,12 @@ export interface TransferInitializationV1Request {
      * @memberof TransferInitializationV1Request
      */
     maxTimeout: number;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof TransferInitializationV1Request
+     */
+    backupGatewaysAllowed: Array<string>;
 }
 
 /**
@@ -1897,6 +1933,12 @@ export interface TransferInitializationV1Response {
      * @memberof TransferInitializationV1Response
      */
     signature: string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof TransferInitializationV1Response
+     */
+    backupGatewaysAllowed: Array<string>;
 }
 
 /**

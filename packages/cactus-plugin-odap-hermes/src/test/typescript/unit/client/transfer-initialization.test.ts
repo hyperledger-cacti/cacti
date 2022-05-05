@@ -88,6 +88,7 @@ test("valid transfer initiation response", async () => {
     serverIdentityPubkey: pluginRecipientGateway.pubKey,
     signature: "",
     sequenceNumber: sequenceNumber,
+    backupGatewaysAllowed: [],
   };
 
   initializationResponseMessage.signature = PluginOdapGateway.bufArray2HexStr(
@@ -134,6 +135,7 @@ test("transfer initiation response invalid because of wrong previous message has
     serverIdentityPubkey: pluginRecipientGateway.pubKey,
     signature: "",
     sequenceNumber: sequenceNumber,
+    backupGatewaysAllowed: [],
   };
 
   initializationResponseMessage.signature = PluginOdapGateway.bufArray2HexStr(
@@ -166,6 +168,7 @@ test("transfer initiation response invalid because it does not match transfer in
     serverIdentityPubkey: pluginRecipientGateway.pubKey,
     signature: "",
     sequenceNumber: sequenceNumber,
+    backupGatewaysAllowed: [],
   };
 
   initializationResponseMessage.signature = PluginOdapGateway.bufArray2HexStr(
@@ -212,6 +215,7 @@ test("timeout in transfer initiation request because no server gateway is connec
     lastMessageReceivedTimestamp: new Date().toString(),
     rollbackProofs: [],
     rollbackActionsPerformed: [],
+    allowedSourceBackupGateways: [],
   };
 
   pluginSourceGateway.sessions.set(sessionID, sessionData);

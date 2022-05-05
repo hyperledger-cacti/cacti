@@ -138,12 +138,10 @@ beforeAll(async () => {
       odapServerGatewayPluginOptions,
     );
 
-    if (pluginRecipientGateway.database == undefined) {
-      throw new Error("Database is not correctly initialized");
-    }
+    expect(pluginRecipientGateway.database).not.toBeUndefined();
 
-    await pluginRecipientGateway.database.migrate.rollback();
-    await pluginRecipientGateway.database.migrate.latest();
+    await pluginRecipientGateway.database?.migrate.rollback();
+    await pluginRecipientGateway.database?.migrate.latest();
 
     await pluginRecipientGateway.registerWebServices(serverExpressApp);
   }

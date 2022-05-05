@@ -148,6 +148,8 @@ test("valid recover message request from client", async () => {
     sequenceNumber: sequenceNumber,
     lastLogEntryTimestamp: "sometimestamp",
     signature: "",
+    isBackup: false,
+    newBasePath: "",
   };
 
   recoverMessage.signature = PluginOdapGateway.bufArray2HexStr(
@@ -164,6 +166,8 @@ test("valid recover message request from server", async () => {
     sequenceNumber: sequenceNumber,
     lastLogEntryTimestamp: "sometimestamp",
     signature: "",
+    isBackup: false,
+    newBasePath: "",
   };
 
   recoverMessage.signature = PluginOdapGateway.bufArray2HexStr(
@@ -184,6 +188,8 @@ test("recover message request from client with wrong signature", async () => {
     sequenceNumber: sequenceNumber,
     lastLogEntryTimestamp: "sometimestamp",
     signature: "",
+    isBackup: false,
+    newBasePath: "",
   };
 
   recoverMessage.signature = PluginOdapGateway.bufArray2HexStr(

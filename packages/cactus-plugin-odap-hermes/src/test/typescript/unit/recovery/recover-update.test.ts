@@ -234,6 +234,8 @@ test("check valid built of recover update message", async () => {
     sequenceNumber: sequenceNumber,
     lastLogEntryTimestamp: firstTimestamp,
     signature: "",
+    isBackup: false,
+    newBasePath: "",
   };
 
   expect(1).toBe(1);

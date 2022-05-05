@@ -83,6 +83,7 @@ test("valid transfer initiation request", async () => {
     sequenceNumber: sequenceNumber,
     recipientBasePath: "",
     sourceGatewayPath: "",
+    backupGatewaysAllowed: [],
   };
 
   initializationRequestMessage.signature = PluginOdapGateway.bufArray2HexStr(
@@ -148,6 +149,7 @@ test("transfer initiation request invalid because of incompatible DLTs", async (
     sequenceNumber: sequenceNumber,
     recipientBasePath: "",
     sourceGatewayPath: "",
+    backupGatewaysAllowed: [],
   };
 
   initializationRequestMessage.signature = PluginOdapGateway.bufArray2HexStr(
@@ -195,6 +197,7 @@ test("transfer initiation request invalid because of asset expired", async () =>
     sequenceNumber: sequenceNumber,
     recipientBasePath: "",
     sourceGatewayPath: "",
+    backupGatewaysAllowed: [],
   };
 
   initializationRequestMessage.signature = PluginOdapGateway.bufArray2HexStr(
