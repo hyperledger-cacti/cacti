@@ -82,7 +82,7 @@ export class RefundEndpoint implements IWebServiceEndpoint {
     try {
       const request: RefundRequest = req.body as RefundRequest;
       const result = await this.options.plugin.refund(request);
-      res.send(result);
+      res.render(result);
     } catch (ex) {
       this.log.error(`${fnTag} failed to serve request`, ex);
       res.status(400).json({

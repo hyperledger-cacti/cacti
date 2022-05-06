@@ -42,7 +42,7 @@ router.get(
   "/api/v1/bl/logics/:id",
   (req: Request, res: Response, next: NextFunction) => {
     try {
-      res.send(
+      res.render(
         "Not Implemented (Show Specification of Business Logic" +
           ", id=" +
           escapeHtml(req.params.id) +
@@ -83,7 +83,7 @@ router.put(
   "/api/v1/bl/wallets/:id",
   (req: Request, res: Response, next: NextFunction) => {
     try {
-      res.send(
+      res.render(
         "Not Implemented (Update Existing Wallets" +
           ", id=" +
           escapeHtml(req.params.id) +

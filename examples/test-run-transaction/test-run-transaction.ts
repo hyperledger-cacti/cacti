@@ -34,7 +34,7 @@ router.post("/", (req: Request, res: Response, next: NextFunction) => {
   } catch (err) {
     if (err instanceof RIFError) {
       res.status(err.statusCode);
-      res.send(escapeHtml(err.message));
+      res.render(escapeHtml(err.message));
       return;
     }
 

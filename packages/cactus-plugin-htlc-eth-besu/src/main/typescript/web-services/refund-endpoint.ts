@@ -88,7 +88,7 @@ export class RefundEndpoint implements IWebServiceEndpoint {
           error: result.transactionReceipt,
         });
       } else {
-        res.send(result);
+        res.render(result);
       }
     } catch (ex) {
       this.log.error(`${fnTag} failed to serve request`, ex);

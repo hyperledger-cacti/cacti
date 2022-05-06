@@ -82,7 +82,7 @@ export class WithdrawEndpoint implements IWebServiceEndpoint {
     try {
       const request: WithdrawRequest = req.body as WithdrawRequest;
       const result = await this.options.plugin.withdraw(request);
-      res.send(result);
+      res.render(result);
     } catch (ex) {
       this.log.error(`${fnTag} failed to serve request`, ex);
       res.status(400).json({

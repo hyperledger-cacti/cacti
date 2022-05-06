@@ -94,7 +94,7 @@ export class DiagnoseNodeEndpointV1 implements IWebServiceEndpoint {
       if (this.apiUrl === undefined) throw "apiUrl option is necessary";
       const resBody = await this.callInternalContainer(req.body);
       res.status(200);
-      res.send(resBody);
+      res.render(resBody);
     } catch (ex) {
       this.log.error(`${fnTag} failed to serve request`, ex);
       res.status(500);

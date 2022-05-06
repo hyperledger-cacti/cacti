@@ -74,7 +74,7 @@ router.post(
       if (err instanceof RIFError) {
         logger.debug(`##catch RIFError, ${err.statusCode}, ${err.message}`);
         res.status(err.statusCode);
-        res.send(err.message);
+        res.render(err.message);
         return;
       }
 
@@ -104,7 +104,7 @@ router.post(
       if (err instanceof RIFError) {
         logger.debug(`##catch RIFError, ${err.statusCode}, ${err.message}`);
         res.status(err.statusCode);
-        res.send(err.message);
+        res.render(err.message);
         return;
       }
 

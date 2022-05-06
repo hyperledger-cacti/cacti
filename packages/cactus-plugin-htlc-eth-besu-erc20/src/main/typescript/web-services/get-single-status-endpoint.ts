@@ -82,7 +82,7 @@ export class GetSingleStatusEndpoint implements IWebServiceEndpoint {
         req.body,
       );
 
-      res.send(callOutput);
+      res.render(callOutput);
     } catch (ex) {
       this.log.error(`${fnTag} failed to serve request`, ex);
       res.status(400).json({

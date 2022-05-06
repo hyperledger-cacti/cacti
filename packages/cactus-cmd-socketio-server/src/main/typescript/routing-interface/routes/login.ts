@@ -44,14 +44,14 @@ router.post("/", (req: Request, res: Response, next: NextFunction) => {
     const respData = { authToken: authToken };
 
     res.status(201);
-    res.send(respData);
+    res.render(respData);
   } catch (err: any) {
     logger.error(`##err name: ${err.constructor.name}`);
 
     if (err instanceof RIFError) {
       logger.debug(`##catch RIFError, ${err.statusCode}, ${err.message}`);
       res.status(err.statusCode);
-      res.send(err.message);
+      res.render(err.message);
       return;
     }
 
