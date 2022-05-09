@@ -379,6 +379,7 @@ fun verifyAccessToFlow(query: QueryOuterClass.Query, serviceHub: ServiceHub): Ei
             }
         })
         if (bestMatch.isNotEmpty()) {
+            println("Access Control Policy PERMITS the request '${query.address}' from '${query.requestingNetwork}:${query.certificate}'\n")
             Right(Unit)
         } else {
             println("Access Control Error: No suitable access control policy rule found.")
