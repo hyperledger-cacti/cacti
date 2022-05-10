@@ -72,5 +72,20 @@ On the terminal, issue the following commands (steps 1 to 6) and then perform th
 8. Within that file locate the entry named `"Example: Supply Chain App"`
 9. Copy the VSCode debug definition object from 2) to your `.vscode/launch.json` file
 10. At this point the VSCode `Run and Debug` panel on the left should have an option also titled `"Example: Supply Chain App"` which starts the application
-11. When the application finishes loading, token generated is displayed on the terminal
+11. When the application finishes loading, the JWT token generated is displayed on the terminal
 12. Visit http://localhost:3200 in a web browser with Javascript enabled and insert the token when prompted
+
+## Live Reloading the GUI Application
+
+1. `npm run install-yarn`
+2. `yarn configure`
+3. `yarn build:dev`
+4. Locate the `.vscode/template.launch.json` file
+5. Within that file locate the entry named `"Example: Supply Chain App"`
+6. Copy the VSCode debug definition object from 2) to your `.vscode/launch.json` file
+7. At this point the VSCode `Run and Debug` panel on the left should have an option also titled `"Example: Supply Chain App"` which starts the application
+8. `cd ./examples/cactus-example-supply-chain-frontend/`
+9. `yarn serve:proxy`
+10. When the application finishes loading, the JWT token generated is displayed on the terminal
+11. Visit http://localhost:8000 in a web browser with Javascript enabled and insert the token when prompted
+12. At this point if you modify the source code of the GUI application under the `./examples/cactus-example-supply-chain-frontend/` path it will automatically reload the browser window (you will need to paste in the JWT again when this happens)
