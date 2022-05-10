@@ -41,7 +41,7 @@ At the point, the view has reached the destination network in plaintext without 
 
 This protocol ensures confidentiality against potentially malicious relays and also ensures integrity against a potentially malicious decrypter (the application client in the destination network).
 
-There are different ways in which the above protocol can be realized, and these are listed and discussed in the [appendix](confidentiality-design-choices.md). We recommend __Protocol #5__ as the most secure and usable option and provide a reference implementation of it in Weaver.
+There are different ways in which the above protocol can be realized, and these are listed and discussed in the [appendix](confidentiality-design-choices.md). We recommend [Protocol #5](./confidentiality-design-choices.md#protocol-5) as the most secure and usable option and provide a reference implementation of it in Weaver.
 
 Additional notes:
 - Initially, Weaver will support encryption and decryption using [ECIES](https://github.com/ethereum/go-ethereum/tree/master/crypto/ecies) but other asymmetric key algorithms may be supported in the future, including with Ed25519 keys.
