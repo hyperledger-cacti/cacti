@@ -54,7 +54,7 @@
     "webpack": "lerna run webpack:dev",
     "webpack:dev:web": "lerna run webpack:dev:web",
     "webpack:dev:node": "lerna run webpack:dev:node",
-    "test:jest:all": "jest",
+    "test:jest:all": "NODE_OPTIONS=--max_old_space_size=3072 jest",
     "test:tap:all": "tap",
     "test:all": "yarn test:jest:all && yarn test:tap:all",
     "posttest:all": "tap --no-check-coverage --coverage-report=lcov && codecov",
