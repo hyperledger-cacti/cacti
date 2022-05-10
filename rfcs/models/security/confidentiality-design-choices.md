@@ -37,43 +37,78 @@ There are different mechanisms and protocols for hash creation and verification.
 - _M_: Message, i.e., confidential view contents
 - _C_: Ciphertext, i.e., encrypted data
 - _P_: Payload, i.e., of the view
-- _$\sigma$_: Signature
+- _Sigma_: Signature over view payload
 
-1. SIM computes:
-   ```
-   C = Encrypt(M)
-   P = C || SHA256Hash(M)
-   ```
-   SP computes:
-   ```
-   $\sigma$ = Sign(P)
-   ```
-   DC computes:
-   ```
-   M' = Decrypt(C)
-   ```
-   DIM computes:
-   ```
-   Verify: $\sigma$ = Sign(P)
-   (C', H) = Parse(P)
-   Verify: H = SHA256Hash(M')
-   ```
-   _Comments_: SHA256 is insecure as a hashing mechanism when confidentiality of M is required.
+### Protocol #1
 
-2. SP computes:
-   ```
-   S = Sign(SHA256Hash(M))
-   C = Encrypt(M || S)
-   $\sigma$ = Sign(C)
-   ```
-   DC computes:
-   ```
-   C' = Decrypt(C)
-   ```
-   DIM computes:
-   ```
-   Verify: $\sigma$ = Sign(C)
-   (M', S') = Parse(C')
-   Verify: S' = Sign(SHA256Hash(M'))
-   ```
-   _Comments_: Because further data manipulation is required after signing, the view generation logic above cannot be done in an interoperation module, and instead must be done by the peer process that has signing privileges. Therefore, this protocol requires customization of the peer's signing process, which may involve modification of the DLT platform code. E.g., in Hyperledger Fabric, this can be done using a [custom ESCC](https://hyperledger-fabric.readthedocs.io/en/latest/pluggable_endorsement_and_validation.html). Overall, this is more intrusive and less usable than if all logic bar the final signature were restricted to the SIM.
+Use SHA256 to hash the confidential view contents, and supply the hash as plaintext in the view.
+
+SIM computes:
+```
+C = Encrypt(M)
+P = C || SHA256Hash(M)
+```
+SP computes:
+```
+Sigma = Sign(P)
+```
+DC computes:
+```
+M' = Decrypt(C)
+```
+DIM computes:
+```
+Verify: Sigma == Sign(P)
+(C', H) = Parse(P)
+Verify: H == SHA256Hash(M')
+```
+_Comments_: SHA256 is insecure as a hashing mechanism when confidentiality of M is required.
+
+### Protocol #2
+
+Use SHA256 to hash the confidential view contents, sign the hash, and encrypt the hash, within thr view.
+
+SP computes:
+```
+S = Sign(SHA256Hash(M))
+C = Encrypt(M || S)
+Sigma = Sign(C)
+```
+DC computes:
+```
+C' = Decrypt(C)
+```
+DIM computes:
+```
+Verify: Sigma == Sign(C)
+M' || S' = Parse(C')
+Verify: S' == Sign(SHA256Hash(M'))
+```
+_Comments_: Because further data manipulation is required after signing, the view generation logic above cannot be done in an interoperation module, and instead must be done by the peer process that has signing privileges. Therefore, this protocol requires customization of the peer's signing process, which may involve modification of the DLT platform code. E.g., in Hyperledger Fabric, this can be done using a [custom ESCC](https://hyperledger-fabric.readthedocs.io/en/latest/pluggable_endorsement_and_validation.html). Overall, this is more intrusive and less usable than if all logic bar the final signature were restricted to the SIM.
+
+### Protocol #5
+
+Use HMAC to hash the confidential view contents along with a randomly sampled value, and encrypt the random value in the view.
+
+SIM computes:
+```
+M' = M || r             ; 'r' is sampled randomly by SIM
+C = Encrypt(M')
+P = C || HMAC(r, M)
+```
+SP computes:
+```
+Sigma = Sign(P)
+```
+DC computes:
+```
+M1 = Decrypt(C)
+```
+DIM computes:
+```
+Verify: Sigma == Sign(P)
+C' || H = Parse(P)
+M2 || r' = Parse(M1)
+Verify: H == HMAC(r', M2)
+```
+_Comments_: The hashing is secure and the protocol requires no peer modification or custom signing logic.
