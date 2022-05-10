@@ -44,7 +44,7 @@
     "ng": "ng",
     "prepublishOnly": "ng build",
     "serve": "ng serve",
-    "serve:proxy": "ng serve -- --proxy-config proxy.conf.json",
+    "serve:proxy": "ng serve -- --port 8000 --proxy-config proxy.conf.json",
     "start": "ng serve"
   },
   "dependencies": {

@@ -65,6 +65,7 @@
     "@hyperledger/cactus-test-tooling": "1.0.0",
     "async-exit-hook": "2.0.1",
     "axios": "0.21.4",
+    "dotenv": "16.0.0",
     "express": "4.17.1",
     "fabric-network": "2.2.10",
     "jose": "4.1.0",
