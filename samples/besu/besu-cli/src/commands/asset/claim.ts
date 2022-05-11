@@ -17,7 +17,7 @@ const command: GluegunCommand = {
 				print,
 				toolbox,
 				`besu-cli asset claim --network=network1 --lock_contract_id=lockContractID --recipient_account=2 --preimage=preimage`,
-				'besu-cli asset claim --network=<network1|network2> --lock_contract_id=<lockContractID> --recipient_account=<2|1> --preimage=<preimage>',
+				'besu-cli asset claim --network=<network1|network2> --lock_contract_id=<lockContractID> --recipient_account=<2|1> --preimage=<preimage> --recipient_account_address=<recipient-account-address> --network_port=<port> --network_host=<host>',
 				[
 					{
 						name: '--network',
@@ -38,7 +38,22 @@ const command: GluegunCommand = {
 						name: '--preimage',
 						description:
 							'The preimage of hash with which the asset was locked with.'
-					}
+					},
+					{
+					     name: '--recipient_account_address',
+					     description:
+                    		 'The address of the recipient account. We can set this parameter if we want to use account address instead of account index '
+                    },
+ 					{
+ 						name: '--network_host',
+ 						description:
+ 							'The network host. Default value is taken from config.json'
+ 					},
+ 					{
+ 						name: '--network_port',
+ 						description:
+ 							'The network port. Default value is taken from config.json'
+ 					}
 				],
 				command,
 				['asset', 'claim']
@@ -53,7 +68,21 @@ const command: GluegunCommand = {
 			return
 		}
 		const networkConfig = getNetworkConfig(options.network)
-		const provider = new Web3.providers.HttpProvider('http://'+networkConfig.networkHost+':'+networkConfig.networkPort)
+
+        var networkPort = networkConfig.networkPort
+        if (options.network_port){
+          networkPort = options.network_port
+          console.log('Use network port : ', networkPort)
+        }
+        var networkHost = networkConfig.networkHost
+        if(options.network_host){
+          networkHost = options.network_host
+          console.log('Use network host : ', networkHost)
+        }
+
+        const provider = new Web3.providers.HttpProvider('http://'+networkHost+':'+networkPort)
+
+
 		const web3N = new Web3(provider)
 		const interopContract = await getContractInstance(provider, networkConfig.interopContract).catch(function () {
 			console.log("Failed getting interopContract!");
@@ -67,6 +96,9 @@ const command: GluegunCommand = {
 		var recipient
 		if(options.recipient_account){
 			recipient = accounts[options.recipient_account]
+		}
+		else if(options.recipient_account_address){
+		     recipient = '0x'+ options.recipient_account_address
 		}
 		else{
 			print.info('Recipient account index not provided. Taking from networkConfig..')
@@ -89,7 +121,7 @@ const command: GluegunCommand = {
 		console.log('Preimage', options.preimage)
 
 		const preimage_bytes32 = web3N.utils.utf8ToHex(options.preimage)
-		console.log('Preimage bytes32:', preimage_bytes32)	
+		console.log('Preimage bytes32:', preimage_bytes32)
 
 		// Balance of the recipient before claiming
 		var recipientBalance = await tokenContract.balanceOf(recipient)
