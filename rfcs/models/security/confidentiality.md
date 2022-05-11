@@ -25,23 +25,23 @@ As the figure below illustrates, the data sharing protocol first involves a roun
 
 <img src="../../resources/images/e2e-confidentiality.png" width=100%>
 
-The steps to achieve end-to-end confidentiality, as illustrated in the figure above, are as follows:
+The steps to achieve end-to-end confidentiality, as illustrated in the figure above, are as follows, with more specific details:
 - The client application in the destination network (left) that initiates the view request supplies its certificate with an embedded public key with that request.
 - The interoperation module, or the contract/app running on the nodes on which that module is deployed, in the source network (right):
   * encrypts view contents obtained from the contract (or distributed app) using the public key within the certificate, and
-  * hashes the view contents.
-- The nodes on which the interoperation module is deployed digitally sign both the encrypted view contents and the hash as part of the proof generation process.
-- The source network's driver packages the encrypted view contents and signatures (proof) into a view and passes it through the source network's relay, which only sees ciphertext.
-- The source network's relay communicates the view with ciphertext contents to the destination network's relay, which also sees only the ciphertext.
+  * hashes the view contents with a randomly sampled value to produce an [HMAC](https://en.wikipedia.org/wiki/HMAC).
+- The nodes on which the interoperation module is deployed digitally sign both the encrypted view contents and the HMAC as part of the proof generation process.
+- The source network's driver packages the encrypted view contents, the HMACs, and signatures (proof) into a view and passes it through the source network's relay, which only sees ciphertext, hashes, and signatures.
+- The source network's relay communicates the view with ciphertext contents to the destination network's relay, which also sees only ciphertext, hashes, and signatures.
 - The destination network's relay queues up the view to the client application, which, using its private key corresponding to the public key within the certificate, decrypts the ciphertext embedded within the contents.
 
 (_Note_: only the view contents obtained from the contract, or distributed app, are encrypted. The view metadata, which is used by the relays and drivers, is not encrypted.)
 
-At the point, the view has reached the destination network in plaintext without being exposed to the intermediary relays. Now the client application must submit the view and the proof embedded within it for validation and processing to the destination network's interoperation module. But because the signatures constituting the proof were created over encrypted view data, the nodes running the interoperation module must be able to associate the signed messages with the decrypted data supplied by the client application. Here the hash created by the source network's interoperation module comes to the rescue. The interoperation module now just needs to validate the decrypted data supplied by the client against this hash (in addition to validating the signatures in the proof) to verify its authenticity.
+At the point, the view has reached the destination network in plaintext without being exposed to the intermediary relays. Now the client application must submit the view and the proof embedded within it for validation and processing to the destination network's interoperation module. But because the signatures constituting the proof were created over encrypted view data, the nodes running the interoperation module must be able to associate the signed messages with the decrypted data supplied by the client application. Here the HMAC created by the source network's interoperation module comes to the rescue. The interoperation module now just needs to validate the decrypted data supplied by the client against this HMAC (in addition to validating the signatures in the proof) to verify its authenticity.
 
 This protocol ensures confidentiality against potentially malicious relays and also ensures integrity against a potentially malicious decrypter (the application client in the destination network).
 
-There are different ways in which the above protocol can be realized, and these are listed and discussed in the [appendix](confidentiality-design-choices.md). We recommend [Protocol #5](./confidentiality-design-choices.md#protocol-5) as the most secure and usable option and provide a reference implementation of it in Weaver.
+There are different ways in which the above protocol can be realized, and these are listed and discussed in the [appendix](confidentiality-design-choices.md). We use [Protocol #5](./confidentiality-design-choices.md#protocol-5) in the above model, as it is the most secure and usable option, and this is implemented in Weaver as a reference.
 
 Additional notes:
 - Initially, Weaver will support encryption and decryption using [ECIES](https://github.com/ethereum/go-ethereum/tree/master/crypto/ecies) but other asymmetric key algorithms may be supported in the future, including with Ed25519 keys.

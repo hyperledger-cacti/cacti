@@ -86,9 +86,69 @@ Verify: S' == Sign(SHA256Hash(M'))
 ```
 _Comments_: Because further data manipulation is required after signing, the view generation logic above cannot be done in an interoperation module, and instead must be done by the peer process that has signing privileges. Therefore, this protocol requires customization of the peer's signing process, which may involve modification of the DLT platform code. E.g., in Hyperledger Fabric, this can be done using a [custom ESCC](https://hyperledger-fabric.readthedocs.io/en/latest/pluggable_endorsement_and_validation.html). Overall, this is more intrusive and less usable than if all logic bar the final signature were restricted to the SIM.
 
+### Protocol #3
+
+Encrypt and hash (with SHA256) the confidential view contents, and encrypt and hash this pair again in order to increase the entropy of the final hash's preimage.
+
+SIM computes:
+```
+C = Encrypt(M)
+H = SHA256Hash(M)
+C1 = C || H
+C2 = Encrypt(C1)
+H1 = SHA256Hash(C1)
+P = C2 || H1
+```
+SP computes:
+```
+Sigma = Sign(P)
+```
+DC computes:
+```
+C2 || H1 = Parse(P)
+C2` = Decrypt(C2)
+C1' || H' = Parse(C2')
+M' = Decrypt(C1')
+```
+DIM computes:
+```
+Verify: Sigma == Sign(P)
+Verify: H1 == SHA256Hash(C2')
+Verify: H' == SHA256Hash(M')
+```
+_Comments_: Secure but somewhat convoluted and inefficient, as it required multiple encryptions and hashes, and the protocol requires no peer modification or custom signing logic.
+
+### Protocol #4
+
+Simplified and more efficient form of Protocol #3: append a random value to the message to increase entropy, and just do one round of encryption and hashing.
+
+SIM computes:
+```
+M1 = M || r             ; 'r' is sampled randomly by SIM
+C = Encrypt(M1)
+H = SHA256Hash(M1)
+P = C || H
+```
+SP computes:
+```
+Sigma = Sign(P)
+```
+DC computes:
+```
+C || H = Parse(P)
+M1 = Decrypt(C)
+```
+DIM computes:
+```
+Verify: Sigma == Sign(P)
+M' || r' = Parse(M1)
+Verify: H == SHA256Hash(M' || r')
+```
+_Comments_: Security is dependent on the randomness of the sampled value, and the protocol requires no peer modification or custom signing logic.
+
 ### Protocol #5
 
-Use HMAC to hash the confidential view contents along with a randomly sampled value, and encrypt the random value in the view.
+Specific variation of Protocol #4: use HMAC to hash the confidential view contents along with a randomly sampled value, and encrypt the random value in the view.
 
 SIM computes:
 ```
@@ -111,4 +171,4 @@ C' || H = Parse(P)
 M2 || r' = Parse(M1)
 Verify: H == HMAC(r', M2)
 ```
-_Comments_: The hashing is secure and the protocol requires no peer modification or custom signing logic.
+_Comments_: The hashing is secure (HMAC provides assured randomness, or entropy) and the protocol requires no peer modification or custom signing logic.
