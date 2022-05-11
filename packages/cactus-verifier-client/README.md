@@ -5,9 +5,11 @@
 This package provides `Verifier` and `VerifierFactory` components that can be used to communicate with compatible Cactus ledger connectors (validators) through single, unified interface.
 
 ### Supported ledger connectors
-| validatorType          | cactus ledger connector plugin |
-| ---------------------- | ------------------------------ |
-| BESU_1X<br />BESU_2X   | cactus-plugin-ledger-connector-besu |
+| validatorType          | cactus ledger connector plugin                  |
+| ---------------------- | ----------------------------------------------- |
+| BESU_1X<br />BESU_2X   | cactus-plugin-ledger-connector-besu             |
+| QUORUM_2X              | cactus-test-plugin-ledger-connector-quorum      |
+| CORDA_4X               | cactus-plugin-ledger-connector-corda            |
 | legacy-socketio        | cactus-plugin-ledger-connector-fabric-socketio<br />cactus-plugin-ledger-connector-go-ethereum-socketio<br />cactus-plugin-ledger-connector-sawtooth-socketio |
 
 ## VerifierFactory
