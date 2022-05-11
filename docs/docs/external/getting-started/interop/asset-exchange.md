@@ -80,7 +80,9 @@ run the following steps:
 We will demonstrate asset exchange of a bond in Fabric `network1` with tokens on `Corda_Network`.
 For Fabric commands, run from `samples/fabric/fabric-cli` folder, and for Corda commands, run from `samples/corda/corda-simple-application` folder. Here `Alice` and `Bob` in Fabric `network1` correspond to `PartyA` (`CORDA_PORT=10006`) and `PartyB` (`CORDA_PORT=10009`) in `Corda_Network` respectively. Following are the step-by-step asset exchange process:
 
-(_Note: the hash used in following steps can be replaced by any valid `sha256` hash_)
+| Notes |
+|:------|
+| The hash used in following steps can be replaced by any valid `SHA256` hash. |
 
 - Run the following to verify the status of the bond assets owned by `alice` and `bob` in the Fabric network `network1` from `samples/fabric/fabric-cli` folder:
  ```bash
@@ -111,7 +113,7 @@ For Fabric commands, run from `samples/fabric/fabric-cli` folder, and for Corda 
   ```bash
   CORDA_PORT=10006 ./clients/build/install/clients/bin/clients claim-asset --secret=secrettext --contract-id=<contract-id>
   ```
-  (_Note: Here the `PartyB` can see the node's log to get the revealed the hash preimage, to use it to claim bond in Fabric network._)
+  `PartyB` can see its node's logs to get the revealed hash preimage, and use it to claim the bond in the Fabric network.
 - Run the following to trigger `bob`'s claim for `bond01:a03` locked by `alice` in `network1`:
   ```bash
   ./bin/fabric-cli asset exchange-step --step=6 --recipient=bob --locker=alice --target-network=network1 --param=bond01:a03 --secret=secrettext
@@ -140,7 +142,10 @@ In addition to the above commands, following are the extra options:
 
 We will demonstrate asset exchange of a tokens in `Corda_Network` with tokens on `Corda_Network2`. Here `PartyA` (`CORDA_PORT=10006`) and `PartyB` (`CORDA_PORT=10009`) in `Corda_Network` correspond to `PartyA` (`CORDA_PORT=30006`) and `PartyB` (`CORDA_PORT=30009`) in `Corda_Network2` respectively. Following are the step-by-step asset exchange process:
 
-  (_Note: the hash used in following steps can be replaced by any valid `sha256` hash_)
+| Notes |
+|:------|
+| The hash used in following steps can be replaced by any valid `SHA256` hash. |
+
 - Navigate to `samples/corda/corda-simple-application` folder. 
 - Run the following to verify the status of the tokens owned by `PartyA` and `PartyB` in the `Corda_Network` and `Corda_Network2`:
   ```bash
@@ -168,7 +173,7 @@ We will demonstrate asset exchange of a tokens in `Corda_Network` with tokens on
   ```bash
   CORDA_PORT=30006 ./clients/build/install/clients/bin/clients claim-asset --secret=secrettext --contract-id=<contract-id-2>
   ```
-  (_Note: Here the `PartyB` can see the node's log to get the revealed the hash preimage, to use it to claim bond in Fabric network._)
+  `PartyB` can see its node's logs to get the revealed hash preimage, and use it to claim the bond in the Fabric network.
 - Run the following to trigger `PartyB`'s claim for `30` units of token type `t1` locked by `PartyA` in `Corda_Network`:
   ```bash
   CORDA_PORT=10006 ./clients/build/install/clients/bin/clients claim-asset --secret=secrettext --contract-id=<contract-id-1>

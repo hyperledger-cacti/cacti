@@ -37,7 +37,7 @@ A Corda distributed application's business logic code spans three layers as illu
 - _Flows CorDapp_: no code changes are required for Weaver enablement, as mentioned above
 - _Contracts CorDapp_: no code changes are required for Weaver enablement, as mentioned above
 - _Client Layer applications_: let us examine the adaptations required in detail:
-  * **Identity Service**: A Corda network needs to share its security group (or membership) configuration, i.e., its nodes' CA certificate chains, with a foreign network with which it seeks to interoperate. Though such sharing can be implemented using several different mechanisms, ranging from manual to automated, the simplest and most modular way is to expose a REST endpoint that agents in foreign networks can reach. Further, this REST endpoint can be implemented as a standalone web application or it can be an extension of one or more of the existing client layer applications. (Multiple apps can expose the same endpoint serving the same information for redundancy.) We will demonstrate an example of this while leaving other implementation modes to the user.
+  * **Identity Service**: A Corda network needs to share its security domain (or membership) configuration, i.e., its nodes' CA certificate chains, with a foreign network with which it seeks to interoperate. Though such sharing can be implemented using several different mechanisms, ranging from manual to automated, the simplest and most modular way is to expose a REST endpoint that agents in foreign networks can reach. Further, this REST endpoint can be implemented as a standalone web application or it can be an extension of one or more of the existing client layer applications. (Multiple apps can expose the same endpoint serving the same information for redundancy.) We will demonstrate an example of this while leaving other implementation modes to the user.
     Let's say a Corda network consists of two nodes called `PartyA` and `PartyB`, each running a client layer application with a web server whose URL prefixes are `http://partya.mynetwork.com:9000` and `http://partyb.mynetwork.com:9000` respectively. Each app then can expose a REST endpoint (again, as an example) `http://partya.mynetwork.com:9000/node_sec_grp` and `http://partyb.mynetwork.com:9000/node_sec_grp` respectively.
     At each web server's backend, you need to implement logic to retrieve the node's ID and it's associated certificated chains. Sample code is given below for a Kotlin implementation built on `weaver-corda-sdk`. You can use this code verbatim, except for some minor changes like `<path-to-root-corda-net-folder>`, other parameters like security domain, and list of names of nodes as appropriate for your environment:
     
@@ -69,7 +69,7 @@ A Corda distributed application's business logic code spans three layers as illu
         }
     }
     ```
-    An agent from a foreign network can query either `http://partya.mynetwork.com:9000/sec_group` or `http://partyb.mynetwork.com:9000/sec_group` and obtain the security group (or membership) configuration of the entire network.
+    An agent from a foreign network can query either `http://partya.mynetwork.com:9000/sec_group` or `http://partyb.mynetwork.com:9000/sec_group` and obtain the security domain (or membership) configuration of the entire network.
   * **Interoperation Helpers**: Your Corda network's client layer applications have business logic embedded in them that, broadly speaking, accept data from users and other external agents and invoke workflows. With the option of interoperability with other networks available through Weaver, other options can be added, namely requesting and accepting data from foreign networks, and triggering locks and claims for atomic exchanges spanning two networks. Weaver's Corda SDK (currently implemented both in Java and Kotlin) offers a library to exercise these options. But this will involve modification to the application's logic. The following examples will illustrate how you can adapt your applications.
     - _Data sharing_: Consider a scenario inspired by the [global trade use case](../../user-stories/global-trade.md) where a letter of credit (L/C) management business logic is installed in the `trade-finance-network` network, supports a flow named `UploadBillOfLading`, which validates and records a bill of lading (B/L) supplied by a user via a UI. Weaver will enable such a B/L to be fetched from a different network `trade-logistics-network` by querying the function `GetBillOfLading` exposed by the chaincode `shipmentcc` installed in the `tradelogisticschannel` channel (_The trade logistics network can be built on Corda as well. The steps for Weaver-enablement will mostly be the same, with the exception of view address creation logic. Here, for demonstration purposes, we assume that that counter-party network is built on Fabric_).
       
@@ -202,7 +202,10 @@ Typically, pre-configuration involves:
 * _Install Interoperation CorDapp on Nodes_: After bootstrapping the nodes folder, copy the following two CorDapps in `build/nodes/PartyA/cordapps` and `build/nodes/PartyB/cordapps` folders (`PartyA` and `PartyB` node names are for example only):
     - [com.weaver.corda.app.interop.interop-contracts](https://github.com/hyperledger-labs/weaver-dlt-interoperability/packages/906215)
     - [com.weaver.corda.app.interop.interop-workflows](https://github.com/hyperledger-labs/weaver-dlt-interoperability/packages/906216)
-  _Note_: You can follow any installation process for this CorDapp, but make sure it is installed on all the nodes that maintain the states involved in cross-network operations in their vaults.
+
+  | Notes |
+  |:------|
+  | You can follow any installation process for this CorDapp, but make sure it is installed on all the nodes that maintain the states involved in cross-network operations in their vaults. |
 
 ### Startup and Bootstrap Weaver components
 
@@ -269,9 +272,14 @@ You can start a relay within a Docker container using a [pre-built image](https:
 
   `<network-name>` is a unique identifier for your local network. You can set it to whatever value you wish.
 
-  `<driver-name>` refers to the driver used by this relay to respond to requests. This also refers to one of the drivers's specifications in the `drivers` section further below. In this code snippet, we have defined one driver. Under `[drivers.<driver-name>]`, you should also specify the hostname and port for the driver (whose configuration we will handle later). (_Note_: you can specify more than one driver instance in the `drivers` section.)
+  `<driver-name>` refers to the driver used by this relay to respond to requests. This also refers to one of the drivers's specifications in the `drivers` section further below. In this code snippet, we have defined one driver. Under `[drivers.<driver-name>]`, you should also specify the hostname and port for the driver (whose configuration we will handle later).
 
-  The `relays` section specifies all foreign relays this relay can connect to. The `<foreign-relay-name>` value should be a unique ID for a given foreign relay, and this value will be used by your client layer applications when constructing view addresses for data sharing requests. Under `[relays.<foreign-relay-name>]`, you should specify the hostname and port for the foreign relay. (_Note_: you can specify more than one foreign relay instance in the `relays` section.)
+  The `relays` section specifies all foreign relays this relay can connect to. The `<foreign-relay-name>` value should be a unique ID for a given foreign relay, and this value will be used by your client layer applications when constructing view addresses for data sharing requests. Under `[relays.<foreign-relay-name>]`, you should specify the hostname and port for the foreign relay.
+
+  | Notes |
+  |:------|
+  | You can specify more than one driver instance in the `drivers` section. |
+  | You can specify more than one foreign relay instance in the `relays` section. |
 - `docker-compose.yaml`: This specifies the properties of the relay container. You can use the [file in the repository](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/core/relay/docker-compose.yaml) verbatim.
 
 To start the relay server, navigate to the folder containing the above files and run the following:
@@ -353,13 +361,19 @@ To prepare your network for interoperation with a foreign network, you need to r
           ]
   }
   ```
-  In this sample, a single verification policy rule is specified for data views coming from `trade-logistics-network`: it states that the data returned by the `GetBillOfLading` query made to the `shipmentcc` chaincode on the `tradelogisticschannel` channel requires as proof two signatures, one from a peer in the organization whose MSP ID is `ExporterMSP` and another from a peer in the organization whose MSP ID is `CarrierMSP`. (Note: if remote network is built on Corda, the resource from access control policy can be used here as pattern, along with changing the node names in criteria.)
+  In this sample, a single verification policy rule is specified for data views coming from `trade-logistics-network`: it states that the data returned by the `GetBillOfLading` query made to the `shipmentcc` chaincode on the `tradelogisticschannel` channel requires as proof two signatures, one from a peer in the organization whose MSP ID is `ExporterMSP` and another from a peer in the organization whose MSP ID is `CarrierMSP`.
+
+  | Notes |
+  |:------|
+  | If the remote network is built on Corda, the resource specified in the access control policy can be used here as the `pattern`, with different node names specified in the `criteria`. |
 
   You need to record this policy rule on your Corda network's vault by invoking Corda sdk's function `VerificationPolicyManager.createVerificationPolicyState(proxy, verificationPolicyProto)`, where `proxy` is an instance of `CordaRPCOps` as described in previous sections, and `verificationPolicyProto` is an object of protobuf `com.weaver.protos.common.verification_policy.VerificationPolicyOuterClass.VerificationPolicy`. You can examine the full proto structure [here](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/common/protos/common/verification_policy.proto). (_Google's protobuf library can be used to convert above JSON to protobuf object._)
 
-  **Note**: For any cross-network data request, make sure an access control policy is recorded in the _source network_ (`trade-logistics-network` in the above example) and a corresponding verification policy is recorded in the _destination network_ (`trade-finance-network` in the above example) before any relay request is triggered.
-- **Foreign network security group (membership) configuration**:
-  Run the following procedure (pseudocode) to record security group configuration for every foreign network you wish your Corda network to interoperate with (you will need to collect the identity service URLs for all the foreign networks first):
+  | Notes |
+  |:------|
+  | For any cross-network data request, make sure an access control policy is recorded in the _source network_ (`trade-logistics-network` in the above example) and a corresponding verification policy is recorded in the _destination network_ (`trade-finance-network` in the above example) before any relay request is triggered. |
+- **Foreign network security domain (membership) configuration**:
+  Run the following procedure (pseudocode) to record security domain configuration for every foreign network you wish your Corda network to interoperate with (you will need to collect the identity service URLs for all the foreign networks first):
   ```
   for each foreign network:
       send an HTTP GET request to the network's identity service (using 'curl' or 'wget' from a shell script or equivalent programming language APIs).
@@ -368,7 +382,9 @@ To prepare your network for interoperation with a foreign network, you need to r
   ```
   As in the above two cases, use `createMembershipState` to record a confiuration for the first time for a given `securityDomain` and `updateMembershipState` to overwrite a configuration.
 
-  _Note_: security group configurations (organization lists and their certificate chains) for any Fabric/Corda network are subject to change, so you should run the above procedure periodically in a loop.
+  | Notes |
+  |:------|
+  | Security domain configurations (organization lists and their certificate chains) for any Fabric/Corda network are subject to change, so you should run the above procedure periodically in a loop. |
 
 Your Corda network is now up and running with the necessary Weaver components, and your network's vault is bootstrapped with the initial configuration necessary for cross-network interactions!
 
