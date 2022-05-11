@@ -15,11 +15,13 @@ build-local:
 		cp -r ../../../common/protos-js/peer ./protos-js/ && \
 		cp -r ../../../common/protos-js/relay ./protos-js/ && \
 		cp -r ../../../common/protos-js/package.json ./protos-js/
-	cp package.json package-remote.json && \
+	(cp package.json package-remote.json && \
 		cp package-local.json package.json && \
 		npm install && \
-		mv package-remote.json package.json && \
-	npm run build && cp -r protos-js build/
+		npm run build && \
+		cp -r protos-js build/) || true
+	mv package-remote.json package.json
+	
 
 .PHONE: publish
 publish: .npmrc
