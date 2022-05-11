@@ -46,7 +46,7 @@ class SHA256 implements Hash {
         // {
         //     strLength = 20;         // Default length
         // }
-        return crypto.randomBytes(20).toString();
+        this.setPreimage(crypto.randomBytes(22).toString('base64'));
     }
     
     setPreimage(preimage: string) {
