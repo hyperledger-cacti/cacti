@@ -21,7 +21,7 @@ const testAppId = "monitor-transactions-test-app";
 // Contants: Kotlin connector server
 const kotlinServerImageName =
   "ghcr.io/hyperledger/cactus-connector-corda-server";
-const kotlinServerImageVersion = "2022-04-18-a8a7ed1--1956";
+const kotlinServerImageVersion = "2022-05-26-0ff7407--pr-2021";
 
 import "jest-extended";
 import { v4 as internalIpV4 } from "internal-ip";
@@ -263,6 +263,7 @@ describe("Monitor Tests", () => {
         },
       },
       cactus: {
+        threadCount: 2,
         sessionExpireMinutes: 10,
         corda: {
           node: { host: internalIp },

@@ -329,6 +329,8 @@ const res = await apiClient.invokeContractV1({
 ```json
 {
   "cactus": {
+    "threadCount": 3,
+    "sessionExpireMinutes": 10,
     "corda": {
       "node": {
         "host": "localhost"
