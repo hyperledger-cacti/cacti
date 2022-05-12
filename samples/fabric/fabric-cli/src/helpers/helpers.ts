@@ -845,10 +845,10 @@ const interopHelper = async (
         InteroperableHelper.getResponseDataFromView(interopFlowResponse.views[0])
     )
     spinner.succeed(
-      `Called Function ${applicationFunction}. With Args: ${invokeObject.ccArgs} ${remoteValue}`
+      `Called Function ${applicationFunction}. With Args: ${invokeObject.ccArgs} ${remoteValue.data}`
     )
     await gateway.disconnect()
-    return remoteValue
+    return remoteValue.data
   } catch (e) {
     spinner.fail(`Error verifying and storing state`)
     logger.error(`Error verifying and storing state: ${e}`)
