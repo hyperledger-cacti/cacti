@@ -793,7 +793,7 @@ jobs:
       - name: Data Transfer Fabric CLI Tests
         run: |
           COUNT=0
-          TOTAL=8
+          TOTAL=12
 
           # FABRIC2 - FABRIC1
           cp chaincode.json.template chaincode.json
@@ -806,6 +806,7 @@ jobs:
           cat tmp.out
 
           # FABRIC2 - FABRIC1 - CONFIDENTIAL
+          sed -i "s/\"args\"\: \[\"a\"/\"args\"\: \[\"b\"/g" chaincode.json
           cp chaincode.json.template chaincode.json
           ./bin/fabric-cli interop --local-network=network2 --requesting-org=Org1MSP --e2e-confidentiality=true localhost:9080/network1/mychannel:simplestate:Read:b &> tmp.out
           tail -n 1 tmp.out | grep "Args: b, Betelgeuse" && COUNT=$(( COUNT + 1 )) && echo "PASS"
@@ -816,7 +817,7 @@ jobs:
           cat tmp.out
 
           # FABRIC1 - FABRIC2
-          sed -i "s/\"args\"\: \[\"a\"/\"args\"\: \[\"Arcturus\"/g" chaincode.json
+          sed -i "s/\"args\"\: \[\"b\"/\"args\"\: \[\"Arcturus\"/g" chaincode.json
           ./bin/fabric-cli interop --local-network=network1 --requesting-org=Org1MSP localhost:9083/network2/mychannel:simplestate:Read:Arcturus &> tmp.out
           tail -n 1 tmp.out | grep "Args: Arcturus, 17.671" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
