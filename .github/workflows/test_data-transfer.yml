@@ -805,6 +805,16 @@ jobs:
           tail -n 1 tmp.out | grep "Result from network query: Arcturus" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
 
+          # FABRIC2 - FABRIC1 - CONFIDENTIAL
+          cp chaincode.json.template chaincode.json
+          ./bin/fabric-cli interop --local-network=network2 --requesting-org=Org1MSP --e2e-confidentiality=true localhost:9080/network1/mychannel:simplestate:Read:b &> tmp.out
+          tail -n 1 tmp.out | grep "Args: b, Betelgeuse" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          ./bin/fabric-cli chaincode query mychannel simplestate read '["b"]' --local-network=network2 &> tmp.out
+          tail -n 1 tmp.out | grep "Result from network query: Betelgeuse" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
           # FABRIC1 - FABRIC2
           sed -i "s/\"args\"\: \[\"a\"/\"args\"\: \[\"Arcturus\"/g" chaincode.json
           ./bin/fabric-cli interop --local-network=network1 --requesting-org=Org1MSP localhost:9083/network2/mychannel:simplestate:Read:Arcturus &> tmp.out
@@ -813,6 +823,16 @@ jobs:
 
           ./bin/fabric-cli chaincode query mychannel simplestate read '["Arcturus"]' --local-network=network1 &> tmp.out
           tail -n 1 tmp.out | grep "Result from network query: 17.671" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          # FABRIC1 - FABRIC2 - CONFIDENTIAL
+          sed -i "s/\"args\"\: \[\"Arcturus\"/\"args\"\: \[\"Betelgeuse\"/g" chaincode.json
+          ./bin/fabric-cli interop --local-network=network1 --requesting-org=Org1MSP localhost:9083/network2/mychannel:simplestate:Read:Betelgeuse &> tmp.out
+          tail -n 1 tmp.out | grep "Args: Betelgeuse, 617.1" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          ./bin/fabric-cli chaincode query mychannel simplestate read '["Betelgeuse"]' --local-network=network1 &> tmp.out
+          tail -n 1 tmp.out | grep "Result from network query: 617.1" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
 
           # FABRIC1 - CORDA
