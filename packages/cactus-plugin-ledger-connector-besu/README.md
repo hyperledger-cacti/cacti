@@ -138,7 +138,7 @@ DOCKER_BUILDKIT=1 docker build -f ./packages/cactus-plugin-ledger-connector-besu
 
 Build with a specific version of the npm package:
 ```sh
-DOCKER_BUILDKIT=1 docker build --build-arg NPM_PKG_VERSION=0.4.1 -f ./packages/cactus-plugin-ledger-connector-besu/Dockerfile . -t cplcb
+DOCKER_BUILDKIT=1 docker build --build-arg NPM_PKG_VERSION=1.0.0 -f ./packages/cactus-plugin-ledger-connector-besu/Dockerfile . -t cplcb
 ```
 
 #### Running the container
@@ -185,7 +185,13 @@ Don't have a Besu network on hand to test with? Test or develop against our Besu
 
 **Terminal Window 1 (Ledger)**
 ```sh
-docker run -p 0.0.0.0:8545:8545/tcp  -p 0.0.0.0:8546:8546/tcp  -p 0.0.0.0:8888:8888/tcp  -p 0.0.0.0:9001:9001/tcp  -p 0.0.0.0:9545:9545/tcp hyperledger/cactus-besu-all-in-one:latest
+docker run \
+  --publish 0.0.0.0:8545:8545/tcp \
+  --publish 0.0.0.0:8546:8546/tcp \
+  --publish 0.0.0.0:8888:8888/tcp \
+  --publish 0.0.0.0:9001:9001/tcp \
+  --publish 0.0.0.0:9545:9545/tcp \
+  ghcr.io/hyperledger/cactus-besu-all-in-one:2022-05-12-2330a96
 ```
 
 **Terminal Window 2 (Cactus API Server)**
@@ -195,6 +201,9 @@ docker run \
   --rm \
   --publish 3000:3000 \
   --publish 4000:4000 \
+  --env AUTHORIZATION_PROTOCOL='NONE' \
+  --env AUTHORIZATION_CONFIG_JSON='{}' \
+  --env GRPC_TLS_ENABLED=false \
   --env PLUGINS='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "rpcApiWsHost":"ws://localhost:8546", "instanceId": "some-unique-besu-connector-instance-id"}}]' \
   cplcb
 ```
