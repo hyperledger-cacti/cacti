@@ -1,6 +1,10 @@
 package org.hyperledger.cactus.plugin.ledger.connector.corda.server.impl
 
 import net.corda.core.contracts.ContractState
+import net.corda.core.node.services.Vault
+import net.corda.core.node.services.vault.DEFAULT_PAGE_NUM
+import net.corda.core.node.services.vault.PageSpecification
+import net.corda.core.node.services.vault.QueryCriteria
 import net.corda.core.utilities.loggerFor
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.GetMonitorTransactionsV1ResponseTx
 import rx.Subscription
@@ -48,12 +52,13 @@ class StateMonitorClientSession(private val rpc: NodeRPCConnection, private val 
             return
         }
 
-        // FIXME: "valutTrack(xxx).updates" occurs an error if Corda ledger has already over 200 transactions using the stateName that you set above.
-        // Please refer to "https://r3-cev.atlassian.net/browse/CORDA-2956" to get more infomation.
-        val stateObservable = this.rpc.proxy.vaultTrack(cordaState).updates
+        val criteria = QueryCriteria.VaultQueryCriteria(status = Vault.StateStatus.UNCONSUMED)
+        val pagingSpec = PageSpecification(DEFAULT_PAGE_NUM, 1)
+        val stateUpdates = this.rpc.proxy.vaultTrackByWithPagingSpec(cordaState, criteria, pagingSpec).updates
+
         var indexCounter = BigInteger.valueOf(0)
         val stateChanges = mutableSetOf<GetMonitorTransactionsV1ResponseTx>()
-        val monitorSub = stateObservable.subscribe { update ->
+        val monitorSub = stateUpdates.subscribe { update ->
             update.produced.forEach { change ->
                 val txResponse = GetMonitorTransactionsV1ResponseTx(indexCounter.toString(), change.toString())
                 indexCounter = indexCounter.add(BigInteger.valueOf(1))
