@@ -90,7 +90,6 @@ files:
   - ./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/get-block-endpoint.test.ts
   - ./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/v21-get-transaction-endpoint.test.ts
   - ./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/v21-sign-transaction-endpoint.test.ts
-  - ./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/sign-transaction-endpoint.test.ts
   - ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/identity-client.test.ts
   - ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v1-4-x/run-transaction-endpoint-v1.test.ts
   - ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v1-4-x/deploy-cc-from-golang-source.test.ts
