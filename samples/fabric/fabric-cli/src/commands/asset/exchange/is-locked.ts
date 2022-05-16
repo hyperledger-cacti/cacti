@@ -132,7 +132,7 @@ const command: GluegunCommand = {
 
     if (options['contract-id']) {
         try {
-            spinner.info(`Querying ${asset} Is Locked: ${contractId}`)
+            spinner.info(`Querying ${asset} Is Locked with ContractId: ${contractId}`)
             const res = await funcToCall(network.contract,
                           contractId)
             if (!res) {
@@ -150,7 +150,7 @@ const command: GluegunCommand = {
             const lockerCert = Buffer.from((lockerId).credentials.certificate).toString('base64')
             const recipientId = await network.wallet.get(options['recipient'])
             const recipientCert = Buffer.from((recipientId).credentials.certificate).toString('base64')
-            spinner.info(`Querying ${asset} Is Locked: ${params[0]}, ${params[1]} locked by ${options.locker} for ${options.recipient}`)
+            spinner.info(`Querying ${asset} Is Locked with params: ${params[0]}, ${params[1]} locked by ${options.locker} for ${options.recipient}`)
             const res = await AssetManager.isAssetLockedInHTLC(network.contract,
                           params[0],
                           params[1],

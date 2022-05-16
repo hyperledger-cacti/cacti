@@ -39,40 +39,45 @@ run the following steps:
        ./scripts/getAssetStatus.sh 2
        ```
    * Using step-by-step commands:
+     - Generate Secret-Hash Pair using following command (prints hash in base64):
+       ```
+       ./bin/fabric-cli hash --hash_fn=SHA256 secrettext
+       ```
      - Run the following to trigger `alice` locking `bond01:a03` for `bob` in `network1`
        ```bash
-       ./bin/fabric-cli asset exchange-step --step=1 --timeout-duration=3600 --locker=alice --recipient=bob --secret=<hash-pre-image> --target-network=network1 --param=bond01:a03
+       ./bin/fabric-cli asset exchange lock --timeout-duration=3600 --locker=alice --recipient=bob --hashBase64=<hash-value-base64> --target-network=network1 --param=bond01:a03
        ```
      - Run the following to verify `alice`'s lock:
        ```bash
-       ./bin/fabric-cli asset exchange-step --step=2 --locker=alice --recipient=bob --target-network=network1 --param=bond01:a03
+       ./bin/fabric-cli asset exchange is-locked --locker=alice --recipient=bob --target-network=network1 --param=bond01:a03
        ```
      - Run the following to trigger `bob` locking `100` units of `token1` for `alice` in `network2`:
        ```bash
-       ./bin/fabric-cli asset exchange-step --step=3 --timeout-duration=1800 --locker=bob --recipient=alice --hash=<hash-value> --target-network=network2 --param=token1:100
+       ./bin/fabric-cli asset exchange lock --fungible --timeout-duration=1800 --locker=bob --recipient=alice --hashBase64=<hash-value-base64> --target-network=network2 --param=token1:100
        ```
+       Note the contract id printed as output in above command.
      - Run the following to verify `bob`'s lock:
        ```bash
-       ./bin/fabric-cli asset exchange-step --step=4 --locker=bob --recipient=alice --target-network=network2 --contract-id=<contract-id>
+       ./bin/fabric-cli asset exchange is-locked --fungible --locker=bob --recipient=alice --target-network=network2 --contract-id=<contract-id>
        ```
      - Run the following to trigger `alice`'s claim for `100` units of `token1` locked by `bob` in `network2`:
        ```bash
-       ./bin/fabric-cli asset exchange-step --step=5 --recipient=alice --locker=bob --target-network=network2 --contract-id=<contract-id> --secret=<hash-pre-image>
+       ./bin/fabric-cli asset exchange claim --fungible --recipient=alice --target-network=network2 --contract-id=<contract-id> --secret=<hash-pre-image>
        ```
      - Run the following to trigger `bob`'s claim for `bond01:a03` locked by `alice` in `network1`:
        ```bash
-       ./bin/fabric-cli asset exchange-step --step=6 --recipient=bob --locker=alice --target-network=network1 --param=bond01:a03 --secret=<hash-pre-image>
+       ./bin/fabric-cli asset exchange-step claim --recipient=bob --locker=alice --target-network=network1 --param=bond01:a03 --secret=<hash-pre-image>
        ```
        
      The above steps complete a successful asset exchange between two Fabric networks. 
      In addition to the above commands, following are the extra options:
      - If `alice` wants to unlock the bond asset, run the following to trigger `alice`'s re-claim for `bond01:a03` locked in `network1`:
        ```bash
-       ./bin/fabric-cli asset exchange-step --step=7 --locker=alice --recipient=bob --target-network=network1 --param=bond01:a03
+       ./bin/fabric-cli asset exchange unlock --locker=alice --recipient=bob --target-network=network1 --param=bond01:a03
        ```
      - If `bob` wants to unlock the token asset, run the following to trigger `bob`'s re-claim for `token1:100` locked in `network2`:
        ```bash
-       ./bin/fabric-cli asset exchange-step --step=8 --locker=bob --recipient=alice --target-network=network2 --contract-id=<contract-id>
+       ./bin/fabric-cli asset exchange unlock --fungible --locker=bob --target-network=network2 --contract-id=<contract-id>
        ```
        
 ## Fabric with Corda
@@ -90,13 +95,17 @@ For Fabric commands, run from `samples/fabric/fabric-cli` folder, and for Corda 
 ```bash
 ./scripts/getAssetStatus.sh
 ```
+- Generate Secret-Hash Pair using following command (prints hash in base64):
+  ```
+  ./bin/fabric-cli hash --hash_fn=SHA256 secrettext
+  ```
 - Run the following to trigger `alice` locking `bond01:a03` for `bob` in `network1` for 60 mins:
   ```bash
-  ./bin/fabric-cli asset exchange-step --step=1 --timeout-duration=3600 --locker=alice --recipient=bob --hash==ivHErp1x4bJDKuRo6L5bApO/DdoyD/dG0mAZrzLZEIs= --target-network=network1 --param=bond01:a03
+  ./bin/fabric-cli asset exchange lock --timeout-duration=3600 --locker=alice --recipient=bob --hashBase64=ivHErp1x4bJDKuRo6L5bApO/DdoyD/dG0mAZrzLZEIs= --target-network=network1 --param=bond01:a03
   ```
 - Run the following to verify `alice`'s lock:
   ```bash
-  ./bin/fabric-cli asset exchange-step --step=2 --locker=alice --recipient=bob --target-network=network1 --param=bond01:a03
+  ./bin/fabric-cli asset exchange is-locked --locker=alice --recipient=bob --target-network=network1 --param=bond01:a03
   ```
 - Run the following to trigger `PartyB` locking `50` units of token type `t1` for `PartyA` in `Corda_Network` for 30 mins:
   ```bash
@@ -114,7 +123,7 @@ For Fabric commands, run from `samples/fabric/fabric-cli` folder, and for Corda 
   (_Note: Here the `PartyB` can see the node's log to get the revealed the hash preimage, to use it to claim bond in Fabric network._)
 - Run the following to trigger `bob`'s claim for `bond01:a03` locked by `alice` in `network1`:
   ```bash
-  ./bin/fabric-cli asset exchange-step --step=6 --recipient=bob --locker=alice --target-network=network1 --param=bond01:a03 --secret=secrettext
+  ./bin/fabric-cli asset exchange claim --recipient=bob --locker=alice --target-network=network1 --param=bond01:a03 --secret=secrettext
   ```
 - Run the following to verify the status of the bond assets owned by `alice` and `bob` in the Fabric network `network1` from `samples/fabric/fabric-cli` folder:
    ```bash
@@ -129,7 +138,7 @@ The above steps complete a successful asset exchange between Fabric and Corda ne
 In addition to the above commands, following are the extra options:
 - If `alice` wants to unlock the bond asset, run the following to trigger `alice`'s re-claim for `bond01:a03` locked in `network1`:
   ```bash
-  ./bin/fabric-cli asset exchange-step --step=7 --locker=alice --recipient=bob --target-network=network1 --param=bond01:a03
+  ./bin/fabric-cli asset exchange unlock --locker=alice --recipient=bob --target-network=network1 --param=bond01:a03
   ```
 - If `PartyB` wants to unlock the token asset, run the following to trigger unlock for `t1:50` locked in `Corda_Network`:
   ```bash

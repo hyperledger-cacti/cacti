@@ -149,7 +149,7 @@ const command: GluegunCommand = {
 
     if (options['contract-id']) {
         try {
-            spinner.info(`Trying ${asset} Claim: ${contractId}`)
+            spinner.info(`Trying ${asset} Claim with Contract ID: ${contractId}`)
             const res = await funcToCall(network.contract,
                           contractId,
                           hash)
@@ -166,7 +166,7 @@ const command: GluegunCommand = {
         try {
             const lockerId = await network.wallet.get(options['locker'])
             const lockerCert = Buffer.from((lockerId).credentials.certificate).toString('base64')
-            spinner.info(`Trying ${asset} Claim: ${params[0]}, ${params[1]} locked by ${options.locker} for ${options.recipient}`)
+            spinner.info(`Trying ${asset} Claim with params: ${params[0]}, ${params[1]} locked by ${options.locker} for ${options.recipient}`)
             const res = await AssetManager.claimAssetInHTLC(network.contract,
                           params[0],
                           params[1],

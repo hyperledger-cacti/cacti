@@ -23,8 +23,8 @@ const command: GluegunCommand = {
       commandHelp(
         print,
         toolbox,
-        `fabric-cli asset exchange lock --target-network=network1 --hash=ivHErp1x4bJDKuRo6L5bApO/DdoyD/dG0mAZrzLZEIs= --timeout-duration=100 --locker=bob --recipient=alice --param=Type1:a04`,
-        'fabric-cli asset exchange lock --fungible --target-network=<network1|network2> --hash_fn=<hash-function-name> --hash=<hashvalue> --timeout-epoch=<timeout-epoch> --timeout-duration=<timeout-duration> --locker=<locker-userid> --recipient=<recipient-userid> --param=<param>',
+        `fabric-cli asset exchange lock --target-network=network1 --hashBase64=ivHErp1x4bJDKuRo6L5bApO/DdoyD/dG0mAZrzLZEIs= --timeout-duration=100 --locker=bob --recipient=alice --param=Type1:a04`,
+        'fabric-cli asset exchange lock --fungible --target-network=<network1|network2> --hash_fn=<hash-function-name> --hashBase64=<hashvalue-in-base64> --timeout-epoch=<timeout-epoch> --timeout-duration=<timeout-duration> --locker=<locker-userid> --recipient=<recipient-userid> --param=<param>',
         [
           {
             name: '--fungible',
@@ -42,7 +42,7 @@ const command: GluegunCommand = {
               'hash function to be used for HTLC. Supported: SHA256. (Optional: Default: SHA256)'
           },
           {
-            name: '--hash',
+            name: '--hashBase64',
             description:
               'Serialized Hash value in base64 to be used for HTLC. (use only one of secret or hash, do not use both options)'
           },
@@ -117,9 +117,9 @@ const command: GluegunCommand = {
         hash = new HashFunctions.SHA256()
     }
     
-    if (options['hash'])
+    if (options['hashBase64'])
     {
-        hash.setSerializedHashBase64(options['hash'])
+        hash.setSerializedHashBase64(options['hashBase64'])
     }
     else {
         print.info(`No hash provided, using random preimage`)
@@ -187,7 +187,7 @@ const command: GluegunCommand = {
         if (!res.result) {
             throw new Error()
         }
-        spinner.info(`${asset} Locked: ${res.result}, preimage: ${res.hash.getPreimage()}, hashvalue: ${res.hash.getSerializedHashBase64()}`)
+        spinner.info(`${asset} Locked with Contract Id: ${res.result}, preimage: ${res.hash.getPreimage()}, hashvalue: ${res.hash.getSerializedHashBase64()}`)
         spinner.succeed('Asset Exchange: Lock Complete.')
     } catch(error) {
         print.error(`Could not Lock ${asset} in ${options['target-network']}`)
