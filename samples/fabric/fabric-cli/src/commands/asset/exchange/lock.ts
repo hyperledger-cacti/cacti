@@ -23,7 +23,7 @@ const command: GluegunCommand = {
       commandHelp(
         print,
         toolbox,
-        `fabric-cli asset exchange lock --target-network=network1 --secret=secrettext --timeout-duration=100 --locker=bob --recipient=alice --param=Type1:a04`,
+        `fabric-cli asset exchange lock --target-network=network1 --hash=ivHErp1x4bJDKuRo6L5bApO/DdoyD/dG0mAZrzLZEIs= --timeout-duration=100 --locker=bob --recipient=alice --param=Type1:a04`,
         'fabric-cli asset exchange lock --fungible --target-network=<network1|network2> --hash_fn=<hash-function-name> --hash=<hashvalue> --timeout-epoch=<timeout-epoch> --timeout-duration=<timeout-duration> --locker=<locker-userid> --recipient=<recipient-userid> --param=<param>',
         [
           {
@@ -49,27 +49,27 @@ const command: GluegunCommand = {
           {
             name: '--timeout-epoch',
             description:
-              'Timeout in epoch in seconds. Use only one of the timeout options. (Only required for Step 1,3)'
+              'Timeout in epoch in seconds. Use only one of the timeout options.'
           },
           {
             name: '--timeout-duration',
             description:
-              'Timeout duration in seconds. Use only one of the timeout options. (Only required for Step 1,3)'
+              'Timeout duration in seconds. Use only one of the timeout options.'
           },
           {
             name: '--locker',
             description:
-              'Locker User Id: Must be already registered in target-network (Required for All steps)'
+              'Locker User Id: Must be already registered in target-network'
           },
           {
             name: '--recipient',
             description:
-              'Recipient User Id: Must be already registered in target-network (Required for All steps)'
+              'Recipient User Id: Must be already registered in target-network'
           },
           {
             name: '--param',
             description:
-              'Param: AssetType:AssetId for Non-Fungible Assets \nFungibleAssetType:NumUnits for Fungible Assets \n(Required for steps 1-3)'
+              'Param: AssetType:AssetId for Non-Fungible Assets \nFungibleAssetType:NumUnits for Fungible Assets'
           },
           {
             name: '--debug',
@@ -117,17 +117,12 @@ const command: GluegunCommand = {
         hash = new HashFunctions.SHA256()
     }
     
-    if (options['secret'])
+    if (options['hash'])
     {
-      hash.setPreimage(options['secret'])
-    }
-    else if (options['hash'])
-    {
-      hash.setSerializedHashBase64(options['hash'])
+        hash.setSerializedHashBase64(options['hash'])
     }
     else {
-        print.error(`Neither hash nor secret provided`)
-        return
+        print.info(`No hash provided, using random preimage`)
     }
 
     // Timeout
