@@ -67,7 +67,7 @@ const command: GluegunCommand = {
         }
     }
     if(options['random'])
-        hash.generateRandomPreimage()
+        hash.generateRandomPreimage(22)
         
     const hashValue = hash.getSerializedHashBase64()
     console.log(`HashValue: ${hash.getSerializedHashBase64()} \nPreimage: ${hash.getPreimage()}`)
