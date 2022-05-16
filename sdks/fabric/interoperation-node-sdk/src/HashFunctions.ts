@@ -17,7 +17,7 @@ interface Hash {
     HASH_NAME: string
     preimage: any           // Preimage for Hash
     hash64: string          // Serialized Hash in base64
-    generateRandomPreimage(lengths): void;
+    generateRandomPreimage(length): void;
     setPreimage(preimage: any): void;
     getPreimage(): any;
     getSerializedPreimageBase64(): string;
@@ -39,14 +39,9 @@ class SHA256 implements Hash {
     hash64: string = null;
     
     // Create a secure pseudo-random preimage of a given length
-    generateRandomPreimage(lengths)
+    generateRandomPreimage(length)
     {
-        let strLength = 22;
-        if (lengths || lengths.length > 0)
-        {
-            strLength = lengths[0];         // Default length
-        }
-        this.setPreimage(crypto.randomBytes(strLength).toString('base64'));
+        this.setPreimage(crypto.randomBytes(length).toString('base64'));
     }
     
     setPreimage(preimage: string) {

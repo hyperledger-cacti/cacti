@@ -118,8 +118,8 @@ const createHTLC = async (
     if (hash == null || !hash.HASH_NAME) {
         hash = new SHA256()
     }
-    if (hash.preimage == null) {
-        hash.generateRandomPreimage();
+    if (hash.hash64 == null) {
+        hash.generateRandomPreimage(22);
     }
 
     const assetExchangeAgreementStr = createAssetExchangeAgreementSerialized(assetType, assetID, recipientECert, "");
@@ -186,8 +186,8 @@ const createFungibleHTLC = async (
     if (!hash || !hash.HASH_NAME) {
         hash = new SHA256()
     }
-    if (hash.preimage == null) {
-        hash.generateRandomPreimage();
+    if (hash.hash64 == null) {
+        hash.generateRandomPreimage(22);
     }
 
     const assetExchangeAgreementStr = createFungibleAssetExchangeAgreementSerialized(assetType, numUnits, recipientECert, "");
