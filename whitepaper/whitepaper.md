@@ -45,7 +45,7 @@ Photo by Pontus Wellgraf on Unsplash
   - [2.5 Blockchain Interoperability Design Patterns](#25-blockchain-interoperability-design-patterns)
   - [2.6 General Workflow to Build a cross-chain decentralized application](#26-general-workflow-to-build-a-cross-chain-decentralized-application)
 - [3. Example Use Cases](#3-example-use-cases)
-  - [3.1 Car Trade](#31-car-trade)
+  - [3.1 Asset Trade](#31-asset-trade)
   - [3.2 Electricity Trade](#32-electricity-trade)
   - [3.3 Supply chain](#33-supply-chain)
   - [3.4 Ethereum to Quorum Asset Transfer](#34-ethereum-to-quorum-asset-transfer)
@@ -152,7 +152,7 @@ Photo by Pontus Wellgraf on Unsplash
 
 # 1. Abstract
 
-"Before a technology unlocks its full range of applications, it first undergoes underestimation. Distributed Ledger Technology (DLT), including blockchain, is no exception and is here to stay". 
+"Before a technology unlocks its full range of applications, it first undergoes underestimation. Distributed Ledger Technology (DLT), including blockchain, is no exception and is here to stay".
 Hundreds of blockchains exist, supporting diverse use cases: from cryptocurrencies, to digital identity, supply chain, and education certification. The trends towards using blockchain for those are increasing. A recent report from Gartner predicts that by 2023, 35% of enterprise
 blockchain applications will integrate with decentralized applications and services. Many blockchain ecosystems. Blockchain is slowly but steadily becoming an infrastructure for global value exchange and distributed computation" [[6](#8-references)].
 
@@ -160,11 +160,11 @@ blockchain applications will integrate with decentralized applications and servi
 
 It allows communication between systems to exchange data and digital assets, leading to more diverse and innovative solutions to real-world problems. It allows synergies across ecosystems and leverages network effects, leading to a similar boom that the rise of the Internet has seen. This way, no blockchain should become a single point of failure, and we contribute directly to the decentralization of the technology.
 
-However, most blockchains were not createed with interoperability in mind, being standalone networks. Connecting those efficiently and securely remains an open problem. 
+However, most blockchains were not createed with interoperability in mind, being standalone networks. Connecting those efficiently and securely remains an open problem.
 
 
 
-Hyperledger Cactus is an open-source project connecting distributed ledgers to enterprise systems via a set of plugins. Plugins can be  _business logic plugins_, _connector plugins_, _tooling plugins_, or _core packages_. Business logic plugins implement cross-chain use cases (e.g., asset exchange across DLTs). Connector plugins implement blockchain clients, allowing Cactus nodes to connect to blockchains (e.g., Hyperledger Fabric connector). Tooling plugins support the development of business logic plugins (e.g., cryptography plugins, storage plugins). Core packages support the creation of Cactus nodes and their consortia (e.g., cactus-core).  
+Hyperledger Cactus is an open-source project connecting distributed ledgers to enterprise systems via a set of plugins. Plugins can be  _business logic plugins_, _connector plugins_, _tooling plugins_, or _core packages_. Business logic plugins implement cross-chain use cases (e.g., asset exchange across DLTs). Connector plugins implement blockchain clients, allowing Cactus nodes to connect to blockchains (e.g., Hyperledger Fabric connector). Tooling plugins support the development of business logic plugins (e.g., cryptography plugins, storage plugins). Core packages support the creation of Cactus nodes and their consortia (e.g., cactus-core).
 
 Cactus is blockchain-agnostic and provides a modular architecture for bespoke cross-chain business logic to be deployed on multiple heterogeneous blockchain infrastructures. Cactus then aims to be the foundation of mature blockchain ecosystems by directly supporting businessses that are inherently multi-system. By integrating blockchains with other systems in a systematic and unified approach, Cactus minimizes security risks.
 
@@ -207,7 +207,7 @@ Unicity applies to FAs and NFAs meaning it guarantees that only one valid repres
 There are three methods for a dApp or mdApp to connect to a DLT.
 These mechanisms are called the connection modes. Those are:
 
-1. DLT Nodes: DLT nodes are the software systems that run a DLT protocol. 
+1. DLT Nodes: DLT nodes are the software systems that run a DLT protocol.
 
 2. DLT Proxy: "a DLT node proxy manages the routing and load balancing issues between
 an application and one or more DLT nodes, creating logical separation. To an application,
@@ -310,9 +310,9 @@ Burning of assets can be implemented as follows:
 2. Tokens/Coins are subtracted from the user account as well as optionally from the total token/coin supply value.
 
 
-## 2.6 General Workflow to Build a cross-chain decentralized application 
-Cactus streamlines the development of cross-chain decentralized application, also known as multiple DLT apps (mDapps) by having three major pilars: 1) robust testing infrastructure (tooling plugins), 2) a modular architecture 
-enabling to combine plugins according to each use case necessity into a set of API servers encapsulated by a Cactus node. Cactus nodes can integrate innovative core plugins that combine them in different ways. Finally 3), business logic plugins that implement the core logic of a business utilizing infrastructure that Cactus provides access. 
+## 2.6 General Workflow to Build a cross-chain decentralized application
+Cactus streamlines the development of cross-chain decentralized application, also known as multiple DLT apps (mDapps) by having three major pilars: 1) robust testing infrastructure (tooling plugins), 2) a modular architecture
+enabling to combine plugins according to each use case necessity into a set of API servers encapsulated by a Cactus node. Cactus nodes can integrate innovative core plugins that combine them in different ways. Finally 3), business logic plugins that implement the core logic of a business utilizing infrastructure that Cactus provides access.
 
 In more technical terms, a `ConfigService`object is initialized for each Cactus node (describing, for example, the private keys for that Cactus node, public keys of the members of the consortium, protocols supported). Then, multiple plugins that expose a REST API can be installed on the node.  Those plugins are accessible to the node via the plugin registry: an abstraction that allows one to easily manage and configure installed plugins, including business logic plugins.
 
@@ -380,11 +380,11 @@ The following table summarizes the use cases that will be explained in more deta
 
 </table>
 
-## 3.1 Car Trade
+## 3.1 Asset Trade
 
 | Use Case Attribute Name    | Use Case Attribute Value                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Use Case Title             | Car Trade |
+| Use Case Title             | Asset Trade |
 | Use Case                   | TBD |
 | Interworking patterns      | TBD |
 | Type of Social Interaction | TBD |
@@ -1720,7 +1720,7 @@ The blockchain migrator feature paves the way for building a solution that perfo
 
 5: Rafael Belchior, André Vasconcelos, Sérgio Guerreiro, and Miguel Correia. 2021. A Survey on Blockchain Interoperability: Past, Present, and Future Trends. ACM Comput. Surv. 54, 8, Article 168 (November 2022), 41 pages. DOI:https://doi.org/10.1145/3471140
 
-6: Belchior, Rafael; Riley, Luke; Hardjono, Thomas; Vasconcelos, André; Correia, Miguel (2022): Do You Need a Distributed Ledger Technology Interoperability Solution?. TechRxiv. Preprint. https://doi.org/10.36227/techrxiv.18786527.v1 
+6: Belchior, Rafael; Riley, Luke; Hardjono, Thomas; Vasconcelos, André; Correia, Miguel (2022): Do You Need a Distributed Ledger Technology Interoperability Solution?. TechRxiv. Preprint. https://doi.org/10.36227/techrxiv.18786527.v1
 
 7: Rafael Belchior, André Vasconcelos, Miguel Correia, Thomas Hardjono, Hermes: Fault-tolerant middleware for blockchain interoperability,
 Future Generation Computer Systems,

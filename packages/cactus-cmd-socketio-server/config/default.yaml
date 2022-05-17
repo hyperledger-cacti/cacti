@@ -1,6 +1,6 @@
 # Default cactus-cmd-socketio-server configuration
 # Do not change this, update the settings in usersetting.yaml
-# Check examples/discounted-cartrade/config for working example
+# Check examples/cactus-example-discounted-asset-trade/config for working example
 
 # List of Bussiness Logic Plugin and it's validators
 blpRegistry: []

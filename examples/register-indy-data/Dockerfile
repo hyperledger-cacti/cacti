@@ -1,4 +1,4 @@
-# Simple tool for setup and sending requests to discounted-cartrade sample app
+# Simple tool for setup and sending requests to cactus-example-discounted-asset-trade sample app
 # Run as part of docker-compose or remember to use host network
 
 FROM indy-sdk-cli
@@ -12,7 +12,7 @@ VOLUME [ "/etc/cactus/" ]
 
 USER indy
 WORKDIR /home/indy
-COPY --chown=indy:indy './req_discounted_cartrade.py' './src/'
+COPY --chown=indy:indy './register-indy-data.py' './src/'
 RUN cp 'from-indy-sdk/utils.py' './src/'
 
-ENTRYPOINT [ "python3", "-m", "src.req_discounted_cartrade" ]
+ENTRYPOINT [ "python3", "-m", "src.register-indy-data" ]

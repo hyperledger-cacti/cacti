@@ -6,5 +6,5 @@ pushd ../../tools/docker/indy-sdk-cli/
 docker build . -t indy-sdk-cli
 popd
 
-echo "# Build req_discounted_cartrade tool"
-docker build . -t req_discounted_cartrade
+echo "# Build register-indy-data tool"
+docker build . -t register-indy-data

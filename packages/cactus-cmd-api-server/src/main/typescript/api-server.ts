@@ -537,7 +537,7 @@ export class ApiServer {
     this.httpServerCockpit?.on("request", app);
 
     // the address() method returns a string for unix domain sockets and null
-    // if the server is not listening but we don't car about any of those cases
+    // if the server is not listening but we don't care about any of those cases
     // so the casting here should be safe. Famous last words... I know.
     const addressInfo = this.httpServerCockpit?.address() as AddressInfo;
     this.log.info(`Cactus Cockpit net.AddressInfo`, addressInfo);

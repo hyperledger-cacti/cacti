@@ -88,8 +88,9 @@ The `npm run watch` script in action:
 ![Fast Developer Flow / Code Iterations](./docs/hyperledger-cactus-watch-script-tutorial-2021-03-06.gif)
 
 ## Getting Started
-
-* Install OS level dependencies:
+* Use preset environment:
+  * [VSCode docker container](./.devcontainer)
+* ... or install OS level dependencies manually:
   * Windows Only
     * WSL2 or any virtual machine running Ubuntu 20.04 LTS
   * Git
@@ -98,13 +99,15 @@ The `npm run watch` script in action:
     nvm install 16.14.2
     nvm use 16.14.2
     ```
-  * Yarn 
+  * Yarn
     * `npm run install-yarn` (from within the project directory)
-  * [Docker Engine](https://docs.docker.com/engine/install/ubuntu/). Make sure that Docker is working and running, for example, running ``docker ps -aq``  
-  * Docker Compose  
-
+  * [Docker Engine](https://docs.docker.com/engine/install/ubuntu/). Make sure that Docker is working and running, for example, running ``docker ps -aq``
+  * Docker Compose
   * OpenJDK (Corda support Java 8 JDK but do not currently support Java 9 or higher)
     * `sudo apt install openjdk-8-jdk-headless`
+  * Indy SDK
+    * [Installing the SDK](https://github.com/hyperledger/indy-sdk#installing-the-sdk)
+    * [Build the SDK from source](https://github.com/hyperledger/indy-sdk#how-to-build-indy-sdk-from-source)
 
 * Clone the repository
 
@@ -220,16 +223,16 @@ the following decision tree (and keep in mind that we have `npm run watch` too)
 ## Configuring SSH to use upterm
 Upload your public key onto github if not done so already. A public key is necessary to join the ssh connection to use upterm. For a comprehensive guide, see the [Generating a new SSH key and adding it to the ssh-agent](https://docs.github.com/en/github/authenticating-to-github/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent).
 
-Locate the `ci.yml` within `.github/workflows` and add to the `ci.yml` code listed below: 
+Locate the `ci.yml` within `.github/workflows` and add to the `ci.yml` code listed below:
   - name: Setup upterm session
     uses: lhotari/action-upterm@v1
-    with: 
+    with:
       repo-token: ${{ secrets.GITHUB_TOKEN }}
 
-Keep in mind that the SSH upterm session should come after the checkout step (uses: actions/checkout@v2.3.4) to ensure that the CI doesn't hang without before the debugging step occurs. Editing the `ci.yml` will create a new upterm session within `.github/workflows` by adding a new build step. For more details, see the [Debug your GitHub Actions by using ssh](https://github.com/marketplace/actions/debugging-with-ssh). 
+Keep in mind that the SSH upterm session should come after the checkout step (uses: actions/checkout@v2.3.4) to ensure that the CI doesn't hang without before the debugging step occurs. Editing the `ci.yml` will create a new upterm session within `.github/workflows` by adding a new build step. For more details, see the [Debug your GitHub Actions by using ssh](https://github.com/marketplace/actions/debugging-with-ssh).
 
-By creating a PR for the edited `ci.yml` file, this will the CI to run their tests. There are two ways to navigate to CIs. 
+By creating a PR for the edited `ci.yml` file, this will the CI to run their tests. There are two ways to navigate to CIs.
   1) Go to the PR and click the `checks` tab
   2) Go to the `Actions` tab within the main Hyperledger Cactus Repository
 
-Click on the `CI Cactus workflow`. There should be a new job you've created be listed underneath the `build (ubuntu-20.04)` jobs. Click on the the new job (what's you've named your build) and locate the SSH Session within the `Setup Upterm Session` dropdown. Copy the SSH command that start with `ssh` and ends in `.dev` (ex. ssh **********:***********@uptermd.upterm.dev). Open your OS and paste the SSH command script in order to begin an upterm session. 
+Click on the `CI Cactus workflow`. There should be a new job you've created be listed underneath the `build (ubuntu-20.04)` jobs. Click on the the new job (what's you've named your build) and locate the SSH Session within the `Setup Upterm Session` dropdown. Copy the SSH command that start with `ssh` and ends in `.dev` (ex. ssh **********:***********@uptermd.upterm.dev). Open your OS and paste the SSH command script in order to begin an upterm session.
