@@ -4,6 +4,6 @@ This module is responsible for providing the cactus node server using socket.io 
 
 ## Usage samples
 - To confirm the operation of this package, please refer to the following business-logic sample application:
-	- [electricity-trade](../../examples/electricity-trade)
-	- [discounted-cartrade](../../examples/discounted-cartrade)
+	- [cactus-example-electricity-trade](../../examples/cactus-example-electricity-trade)
+	- [cactus-example-discounted-asset-trade](../../examples/cactus-example-discounted-asset-trade)
 

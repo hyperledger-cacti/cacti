@@ -19,7 +19,7 @@
 
     ./script-build-docker.sh
 
-    docker run --rm -ti -v/etc/cactus/:/etc/cactus/ --net="host" req_discounted_cartrade --proof_only
+    docker run --rm -ti -v/etc/cactus/:/etc/cactus/ --net="host" register-indy-data --proof_only
     ```
 1. Copy indy validator config
     ```
@@ -68,4 +68,4 @@
     ```
 
 ## Manual Test
-- Validator used by `discounted-cartrade` sample app.
+- Validator used by `cactus-example-discounted-asset-trade` sample app.

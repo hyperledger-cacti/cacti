@@ -105,6 +105,17 @@ function mainTask()
   npm --version
   java -version
 
+  # Install Indy SDK
+  sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CE7709D068DB5E88 \
+    && sudo add-apt-repository "deb https://repo.sovrin.org/sdk/deb bionic stable" \
+    && sudo apt-get update \
+    && sudo apt-get install -y \
+        libindy \
+        libnullpay \
+        libvcx \
+        indy-cli \
+    && sudo rm -f /etc/apt/sources.list.d/sovrin.list*
+
   # install npm 7 globally - needed because Node v12, v14 default to npm v6
   npm install -g npm@7.19.1
   npm --version

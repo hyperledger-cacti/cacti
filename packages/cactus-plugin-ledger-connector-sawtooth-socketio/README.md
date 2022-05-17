@@ -63,7 +63,7 @@ npm run start
 
 ## Usage samples
 - To confirm the operation of this package, please refer to the following business-logic sample application:
-    - [electricity-trade](../../examples/electricity-trade)
+    - [cactus-example-electricity-trade](../../examples/cactus-example-electricity-trade)
 
 ## Contributing
 
