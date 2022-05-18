@@ -81,7 +81,6 @@ module.exports = {
     `./packages/cactus-plugin-ledger-connector-xdai/src/test/typescript/integration/invoke-contract-xdai-json-object.test.ts`,
     `./packages/cactus-plugin-ledger-connector-xdai/src/test/typescript/integration/openapi/openapi-validation.test.ts`,
     `./packages/cactus-plugin-ledger-connector-xdai/src/test/typescript/integration/openapi/openapi-validation-no-keychain.test.ts`,
-    `./packages/cactus-common/src/test/typescript/unit/servers.test.ts`,
     `./packages/cactus-common/src/test/typescript/unit/key-converter.test.ts`,
     `./packages/cactus-common/src/test/typescript/unit/logging/logger.test.ts`,
     `./packages/cactus-plugin-keychain-aws-sm/src/test/typescript/integration/plugin-keychain-aws-sm.test.ts`,
