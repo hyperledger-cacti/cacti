@@ -76,13 +76,15 @@
     "keycloak-admin": "1.14.21",
     "lodash": "4.17.21",
     "node-ssh": "12.0.0",
+    "node-forge": "1.3.0",
     "p-retry": "4.6.1",
     "run-time-error": "1.4.0",
     "tar-stream": "2.2.0",
     "temp": "0.9.4",
     "typescript-optional": "2.0.1",
     "web3": "1.5.2",
-    "web3-core": "1.5.2"
+    "web3-core": "1.5.2",
+    "uuid": "8.3.2"
   },
   "devDependencies": {
     "@types/dockerode": "3.2.7",

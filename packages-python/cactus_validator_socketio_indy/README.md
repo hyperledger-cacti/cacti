@@ -15,22 +15,25 @@
 1. Start indy testnet pool (follow instructions from `../../tools/docker/indy-testnet/` README). It should create docker network `indy-testnet_indy_net`, pool should be available at `172.16.0.2`.
 1. Generate proof and store it in local `/etc/cactus`:
     ```
+    rm -r /etc/cactus/validator_socketio_indy/*
     cd ../../examples/register-indy-data/
-
     ./script-build-docker.sh
-
     docker run --rm -ti -v/etc/cactus/:/etc/cactus/ --net="host" register-indy-data --proof_only
     ```
 1. Copy indy validator config
     ```
-    mkdir -p /etc/cactus/validator_socketio_indy/
-    rm -r /etc/cactus/validator_socketio_indy/*
     cp -rf ./config/* /etc/cactus/validator_socketio_indy/
     ```
-1. Copy default validator CA
+1. Generate validator certificate using OpenSSL tool
     ```
-    rm -r /etc/cactus/validator_socketio_indy/CA
-    cp -rf ./sample-CA/ /etc/cactus/validator_socketio_indy/CA
+    mkdir -p "/etc/cactus/validator_socketio_indy/CA/"
+    openssl ecparam -genkey -name "prime256v1" -out "/etc/cactus/validator_socketio_indy/CA/connector.priv"
+    openssl req -new -sha256 -key "/etc/cactus/validator_socketio_indy/CA/connector.priv" \
+        -out "/etc/cactus/validator_socketio_indy/CA/connector.csr" \
+        -subj "/C=JP/ST=Tokyo/L=Minato-Ku/O=CactusSamples/CN=IndyValidator"
+    openssl req -x509 -sha256 -days 365 -key "/etc/cactus/validator_socketio_indy/CA/connector.priv" \
+        -in "/etc/cactus/validator_socketio_indy/CA/connector.csr" \
+        -out "/etc/cactus/validator_socketio_indy/CA/connector.crt"
     ```
 1. Build and run validator container:
     ```
@@ -41,9 +44,8 @@
 1. Open separate console, install dependencies and run the testing script:
     ```
     cd testcli/
-
+    ln -s /etc/cactus/validator_socketio_indy/CA/connector.crt .
     npm install
-
     node testsock.js
     ```
 

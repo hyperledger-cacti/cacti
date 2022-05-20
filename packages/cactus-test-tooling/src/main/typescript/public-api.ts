@@ -130,6 +130,15 @@ export {
 } from "./openethereum/openethereum-test-ledger";
 
 export {
+  SelfSignedPkiGenerator,
+  ForgeCertificateField,
+  ForgeCertificate,
+  ForgeKeyPair,
+  ForgePrivateKey,
+  IPki,
+} from "./pki/self-signed-pki-generator";
+
+export {
   GoIpfsTestContainer,
   IGoIpfsTestContainerOptions,
 } from "./go-ipfs/go-ipfs-test-container";

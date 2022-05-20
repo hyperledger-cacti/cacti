@@ -20,6 +20,7 @@
     "cookie-parser": "1.4.6",
     "debug": "4.1.1",
     "express": "4.17.3",
+    "fs-extra": "10.0.0",
     "fabric-ca-client": "1.4.19",
     "fabric-client": "1.4.19",
     "fabric-network": "1.4.19",
@@ -34,6 +35,7 @@
   },
   "devDependencies": {
     "@hyperledger/cactus-api-client": "1.0.0",
+    "@hyperledger/cactus-test-tooling": "1.0.0",
     "@types/config": "0.0.41",
     "ts-node": "9.1.1"
   }
