@@ -74,7 +74,6 @@ The RFC numbering convention is: `<type>:<id>`. The list of types (`<type>`) is 
 | 03-013 | Asset Exchange Units             | Format   | [Proposed](./formats/assets/exchange.md)                        |
 | 03-014 | Asset Transfer Units             | Format   | [Proposed](./formats/assets/transfer.md)                        |
 | 03-015 | Relay Messages                   | Format   | [Proposed](./formats/communication/relay.md)                    |
-| 03-016 | Driver Messages                  | Format   | [Proposed](./formats/communication/driver.md)                   |
 | 03-017 | Fabric Interop Chaincode API     | Format   | [Proposed](./formats/network/fabric-interop-chaincode.md)       |
 | 03-018 | Interoperation CorDapp API       | Format   | [Proposed](./formats/network/interop-cordapp.md)                |
 | 03-019 | Besu Interop Contract API        | Format   | [Proposed](./formats/network/besu-interop-contract.md)          |

@@ -6,7 +6,7 @@
 # Relays
 
 - RFC: 01-009
-- Authors: Allison Irvin, Antony Targett, Christian Vecchiola, Dileban Karunamoorthy, Ermyas Abebe, Nick Waywood, Venkatraman Ramakrishna
+- Authors: Allison Irvin, Antony Targett, Christian Vecchiola, Dileban Karunamoorthy, Ermyas Abebe, Nick Waywood, Venkatraman Ramakrishna, Sandeep Nishad
 - Status: Proposal
 - Since: 13-Aug-2020
 
@@ -21,11 +21,10 @@
 
 ## Relays for Cross-Ledger Communication
 
-Relays are the fulcra (or mediums) of communication across networks maintaining distributed ledgers. They perform the following functions:
+Relays are the fulcra (or media) of communication across networks maintaining distributed ledgers. They perform the following functions:
 - Pass messages conveying queries, instructions, and information from one network to another.
 - Mediate end-to-end protocols corresponding to [basic interoperability modes](../ledger/cross-ledger-operations.md) supported by Weaver.
 - Discover foreign networks' relays.
-- Route messages to foregn networks' relays if direct inter-relay communication is not possible.
 
 A relay runs both a server and a client, to serve and to initiate requests respectively. Both server and client should be built on a common transport protocol, and the protocol chosen in Weaver for this purpose is [gRPC](https://grpc.io/), because it is ubiquitous, standardizes, and actively supported in all popular programming languages.
 
@@ -73,11 +72,32 @@ Once a driver is designed for a given DLT, it can be reused in any network built
 
 ## Relay Functional API
 
-_TBD: List API function specs exposed to application clients, relays, and drivers respectively. Message formats will be described in 'formats/communication'_
+### API for Application Client
+
+- **RequestState(networks.networks.NetworkQuery): returns common.ack.Ack**
+    This endpoint is for the client application to request remote state via local relay. Since this request is asynchronous w.r.t the network, the request info/state machine is stored in a database on the requesting relay indexed via `request_id`. This `request_id` can be used to poll for status and the response using `GetState` endpoint. The local relay then sends the Query to the remote relay via an API available for relay-relay communication (explained below). This API takes a message of type [NetworkQuery](../../formats/communication/relay.md#networkquery) as argument, and returns [Ack](../../formats/views/request.md#ack) message.
+    
+- **GetState(networks.networks.GetStateMessage): returns common.state.RequestState**
+    This RPC endpoint is used by client application for polling the local relay to get the response to the query by using `request_id` returned in previous API. The local relay fetches the database state based on provided `request_id` and prepares the response. It takes a message of type [GetStateMessage](../../formats/communication/relay.md#getstatemessage) as argument, and returns [RequestState](../../formats/views/request.md#requeststate) message.
+
+### API for other Relays
+
+- **RequestState(common.query.Query): returns common.ack.Ack**
+    The requesting relay sends a data sharing request, using RequestState API, to the remote relay with a query defining the data it wants to receive. The remote relay calls the driver using the gRPC endpoint provided by driver server (RequestDriverState, details below), passing on the query to the driver. It takes a message of type [Query](../../formats/views/request.md#query) as argument, and returns [Ack](../../formats/views/request.md#ack) message.
+
+- **SendState(common.state.ViewPayload): returns common.ack.Ack**
+    The remote relay, after receiving the response from the driver, asynchronously sends it to requesting relay using this RPC endpoint. The requesting relay upon receiving the response, stores it in the database corresponding to the `request_id` key. It takes a message of type [ViewPayload](../../formats/views/request.md#viewpayload) as argument, and returns [Ack](../../formats/views/request.md#ack) message.
+
+### API for Driver
+
+- **SendDriverState(common.state.ViewPayload): returns common.ack.Ack**
+    This RPC endpoint is used by the driver to send back the response of the query, to the remote relay. The remote relay then passes this response to the requesting relay using previous API (SendState). It takes a message of type [ViewPayload](../../formats/views/request.md#viewpayload) as argument, and returns [Ack](../../formats/views/request.md#ack) message.
+
 
 ## Driver Functional API
 
-_TBD: List API function specs exposed to relays. Message formats will be described in 'formats/communication'_
+- **RequestDriverState(common.query.Query): returns (common.ack.Ack)**
+    The remote relay sends a RequestDriverState request to its driver with a query defining the data it wants to receive. This is where driver unpacks the view address, makes a call to the requested contract using given arguments, and collects the response along with the proof, packages them into a DLT-specific view message, and then encapsulating it to a DLT-neutral view message. This final message is then sent back to remote relay using above relay's API (SendDriverState). It takes a message of type takes [Query](../../formats/views/request.md#query) as argument, and returns [Ack](../../formats/views/request.md#ack).
 
 ## Deployment Models and Considerations
 

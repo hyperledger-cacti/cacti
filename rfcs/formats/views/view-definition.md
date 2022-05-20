@@ -6,7 +6,7 @@
 # View Definition
 
 - RFC: 03-002
-- Authors: Allison Irvin, Antony Targett, Christian Vecchiola, Dileban Karunamoorthy, Ermyas Abebe, Nick Waywood, Venkatraman Ramakrishna
+- Authors: Allison Irvin, Antony Targett, Christian Vecchiola, Dileban Karunamoorthy, Ermyas Abebe, Nick Waywood, Venkatraman Ramakrishna, Sandeep Nishad
 - Status: Proposed
 - Since: 13-Aug-2020
 
@@ -19,52 +19,37 @@
 - What encoding do we use?
 - Encodings can be specifid by the creator (driver) and specified in `meta`.
 
-NOTE: initial proposal
-
 ```protobuf
-enum Protocol {
-  BITCOIN = 0;
-  ETHEREUM = 1;
-  FABRIC = 3;
-  CORDA = 4;
+message Meta {
+    enum Protocol {
+        BITCOIN = 0;
+        ETHEREUM = 1;
+        FABRIC = 3;
+        CORDA = 4;
+    }
+    
+    // Underlying distributed ledger protocol.
+    Protocol protocol = 1; 
+    
+    // What notion of time? 
+    // If the observer and network are synchronizing on a global clock
+    // there won't be a need to distinguish between static and dynamic views.
+    string timestamp = 2; 
+    
+    // Notorization, SPV, ZKP, etc. Possibly enum
+    string proof_type = 3; 
+    
+    // The data field's serialization format (e.g. JSON, XML, Protobuf)
+    string serialization_format = 4;
 }
 
 message View {
-  message Meta {
-    // Singleton, collection, computation
-    string type = 1;
-
-    // Underlying distributed ledger protocol.
-    Protocol protocol = 2;
-
-    // What notion of time?
-    // If the observer and network are synchronizing on a global clock
-    // there won't be a need to distinguish between static and dynamic views.
-    string timestamp = 3;
-
-    // Notorization, SPV, ZKP, etc. Possibly enum
-    string proof_type = 4;
-
-    // The data field's serialization format (e.g. JSON, XML, Protobuf)
-    string serialization_format = 5;
-
-    // External commitments made on this view
-    Commitment commitment = 6;
-  }
   Meta meta = 1;
-
-  // Represents the data playload of this view.
+  
+  // Represents the data playload of this view. 
   // The representation of Fabric, Corda etc will be captured elsewhere.
   // For some protocols, like Bitcoin, the structure of an SPV proof is well known.
   bytes data = 2;
-}
-
-message Commitment {
-    // How is the commitment exchanged/located?
-    string address = 3;
-
-	// Cryptographic commitment scheme
-    string scheme = 1;
 }
 ```
 
