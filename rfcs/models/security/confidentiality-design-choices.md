@@ -13,7 +13,7 @@
 
 ## Summary
 
-To fulfil the requirements described in the [end-to-end confidentiality spec](./confidentiality.md), the view contents returned by the source ledger must contain some unencrypted portions in the signed payload that can validate the plaintext contents as decrypted by the destination client. This allows the destination peers to validate the plaintext against tampering by the client. The solution for this was to add a hash of some form within the interoperation payload in the view.
+To fulfil the requirements described in the [end-to-end confidentiality spec](./confidentiality.md), the view contents returned by the source ledger must contain some authentication of the payload that can validate the plaintext contents as decrypted by the destination client. This allows the destination peers to validate the plaintext against tampering by the client. The solution for this was to add a hash of some form within the interoperation payload in the view.
 
 ## General Considerations
 
@@ -21,10 +21,10 @@ For private (confidential) portions of a view's contents:
 - They should be encrypted with the receiver's public key.
 - If they only need tamper protection, they should be hashed.
 - If they need tamper protection and need to be authenticated by the receiver, they should be hashed and signed.
+
 For public (non-confidential) portions of a view's contents:
 - If they need to be authenticated by the receiver, they should be signed.
 - If they only need tamper protection, they can be either hashed or signed.
-(_Note_: "hashed" implies "HMAC")
 
 ## View Generation Options
 
@@ -38,6 +38,8 @@ There are different mechanisms and protocols for hash creation and verification.
 - _C_: Ciphertext, i.e., encrypted data
 - _P_: Payload, i.e., of the view
 - _Sigma_: Signature over view payload
+
+_Note_: we will not explicitly mention the keys and certificates used to generate and verify digital signatures below. The fact that peers possess certificates and corresponding private keys for signing is implied.
 
 ### Protocol #1
 
@@ -58,11 +60,11 @@ M' = Decrypt(C)
 ```
 DIM computes:
 ```
-Verify: Sigma == Sign(P)
+Verify(Sigma, P)
 (C', H) = Parse(P)
 Verify: H == SHA256Hash(M')
 ```
-_Comments_: SHA256 is insecure as a hashing mechanism when confidentiality of M is required.
+_Comments_: This protocol provides authenticity of message to the DIM, but the confidentiality vis-a-vis the relays and potential network eavesdroppers is weak since SHA256 doesn't provide ``semantic security'' guarantees that are expected from an encryption scheme. Semantic security provides assurance of M being confidential even if the message space is finite and known to an adversary. Hash functions like SHA256 don't (and are not expected to) provide this property.
 
 ### Protocol #2
 
@@ -80,7 +82,7 @@ C' = Decrypt(C)
 ```
 DIM computes:
 ```
-Verify: Sigma == Sign(C)
+Verify(Sigma, C)
 M' || S' = Parse(C')
 Verify: S' == Sign(SHA256Hash(M'))
 ```
@@ -112,7 +114,7 @@ M' = Decrypt(C1')
 ```
 DIM computes:
 ```
-Verify: Sigma == Sign(P)
+Verify(Sigma, P)
 Verify: H1 == SHA256Hash(C2')
 Verify: H' == SHA256Hash(M')
 ```
@@ -140,7 +142,7 @@ M1 = Decrypt(C)
 ```
 DIM computes:
 ```
-Verify: Sigma == Sign(P)
+Verify(Sigma, P)
 M' || r' = Parse(M1)
 Verify: H == SHA256Hash(M' || r')
 ```
@@ -166,7 +168,7 @@ M1 = Decrypt(C)
 ```
 DIM computes:
 ```
-Verify: Sigma == Sign(P)
+Verify(Sigma, P)
 C' || H = Parse(P)
 M2 || r' = Parse(M1)
 Verify: H == HMAC(r', M2)

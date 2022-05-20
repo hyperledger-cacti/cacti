@@ -833,7 +833,7 @@ const interopHelper = async (
       false,
       options['relay-tls'] === 'true',
       relayTlsCAFiles,
-      options['e2e-confidentiality'] === 'true' ? true : false
+      options['e2e-confidentiality'] === 'true'
     )
     logger.info(
       `View from remote network: ${JSON.stringify(
