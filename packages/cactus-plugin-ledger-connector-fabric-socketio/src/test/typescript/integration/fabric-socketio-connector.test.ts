@@ -24,6 +24,7 @@ const sutLogLevel: LogLevelDesc = "info";
 import {
   FabricTestLedgerV1,
   pruneDockerAllIfGithubAction,
+  SelfSignedPkiGenerator,
 } from "@hyperledger/cactus-test-tooling";
 
 import {
@@ -51,17 +52,6 @@ const log: Logger = LoggerProvider.getOrCreate({
   label: "fabric-socketio-connector.test",
   level: testLogLevel,
 });
-
-// Path to sample CA used by the test - creating new EC certs for each run is to verbose for our purpose
-const sampleFabricCAPath = path.join(
-  process.cwd(),
-  "packages",
-  "cactus-plugin-ledger-connector-fabric-socketio",
-  "sample-config",
-  "CA",
-);
-const connectorCertPath = path.join(sampleFabricCAPath, "connector.crt");
-const connectorPrivKeyPath = path.join(sampleFabricCAPath, "connector.priv");
 
 /**
  * Main test suite
@@ -91,6 +81,7 @@ describe("Fabric-SocketIO connector tests", () => {
     connectionProfile: Record<string, any>,
     connectorCert: string,
     connectorPrivKey: string,
+    jwtAlgo: string,
     walletDir: string,
     adminName: string,
     adminSecret: string,
@@ -108,6 +99,7 @@ describe("Fabric-SocketIO connector tests", () => {
         port: 0, // random port
         keyValue: connectorPrivKey,
         certValue: connectorCert,
+        jwtAlgo: jwtAlgo,
       },
       logLevel: sutLogLevel,
       fabric: {
@@ -119,7 +111,7 @@ describe("Fabric-SocketIO connector tests", () => {
         orderer: {
           name:
             connectionProfile.orderers[ordererId].grpcOptions[
-              "ssl-target-name-override"
+            "ssl-target-name-override"
             ],
           url: connectionProfile.orderers[ordererId].url,
           tlscaValue: connectionProfile.orderers[ordererId].tlsCACerts.pem,
@@ -193,9 +185,12 @@ describe("Fabric-SocketIO connector tests", () => {
       adminName,
     );
 
-    // Read connector private key and certificate
-    connectorCertValue = fs.readFileSync(connectorCertPath, "ascii");
-    connectorPrivKeyValue = fs.readFileSync(connectorPrivKeyPath, "ascii");
+    // Generate connector private key and certificate
+    const pkiGenerator = new SelfSignedPkiGenerator();
+    const pki = pkiGenerator.create("localhost");
+    connectorCertValue = pki.certificatePem;
+    connectorPrivKeyValue = pki.privateKeyPem;
+    const jwtAlgo = "RS512";
 
     // Get connector config
     log.info("Export connector config before loading the module...");
@@ -203,6 +198,7 @@ describe("Fabric-SocketIO connector tests", () => {
       connectionProfile,
       connectorCertValue,
       connectorPrivKeyValue,
+      jwtAlgo,
       tmpWalletDir,
       adminName,
       adminSecret,

@@ -73,6 +73,7 @@ if __name__ == '__main__':
     # Copy supervisord.conf file
     if __copy(source=f'{SITE_PACKAGES}/other/supervisord.conf', destination='/etc'):
         print('supervisord file successfully copied')
+
     # Copy utils.py
     if __copy(source=f'{UTILS_LOCATION}/utils.py',
               destination=f'{VALIDATOR_DST_DIR}/validator_socketio_module'):

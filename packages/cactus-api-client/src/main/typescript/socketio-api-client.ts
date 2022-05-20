@@ -36,7 +36,7 @@ export function verifyValidatorJwt(
 ): Promise<JwtPayload> {
   return new Promise((resolve, reject) => {
     const option: VerifyOptions = {
-      algorithms: ["ES256"],
+      algorithms: ["ES256", "ES384", "ES512", "RS256", "RS384", "RS512"],
     };
 
     verify(

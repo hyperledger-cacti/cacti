@@ -10,11 +10,7 @@
     "start": "docker-compose build && docker-compose up",
     "build": "npm run build-ts && npm run build:dev:backend:postbuild",
     "build-ts": "tsc",
-    "build:dev:backend:postbuild": "npm run copy-yarn-lock && npm run copy-validator-keys",
-    "copy-yarn-lock": "cp -f ../../yarn.lock ./dist/",
-    "copy-validator-keys": "npm run copy-ethereum-key && npm run copy-sawtooth-key",
-    "copy-ethereum-key": "cp -fr ../../packages/cactus-plugin-ledger-connector-go-ethereum-socketio/sample-config/CA/connector.crt ./dist/ethereum-connector.crt",
-    "copy-sawtooth-key": "cp -fr ../../packages/cactus-plugin-ledger-connector-sawtooth-socketio/sample-config/CA/connector.crt ./dist/sawtooth-connector.crt"
+    "build:dev:backend:postbuild": "cp -f ../../yarn.lock ./dist/"
   },
   "dependencies": {
     "@types/node": "14.18.12",

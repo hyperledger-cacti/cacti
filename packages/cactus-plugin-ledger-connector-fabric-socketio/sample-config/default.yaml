@@ -1,8 +1,17 @@
 sslParam:
+  # Port on which the validator will listen for requests.
   port: 5040
+  # Private and public keys used by HTTPS server and to sign JWT messages.
+  # Must be either RSA or ECDSA.
   key: "/etc/cactus/connector-fabric-socketio/CA/connector.priv"
   cert: "/etc/cactus/connector-fabric-socketio/CA/connector.crt"
+  # JWT signing algorithm, must correspond to the private keys specified above.
+  # See more: https://www.rfc-editor.org/rfc/rfc7518#section-3.1
+  # Default: ES256 (key must be ECDSA using P-256 and SHA-256)
+  # jwtAlgo: "ES256"
+# log4js log level
 logLevel: "debug"
+# Fabric ledger configuration
 fabric:
   mspid: "Org1MSP"
   keystore: "/etc/cactus/connector-fabric-socketio/wallet"

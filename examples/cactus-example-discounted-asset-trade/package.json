@@ -11,12 +11,7 @@
     "build": "npm run build-ts && npm run build:dev:backend:postbuild",
     "build-ts": "tsc",
     "build_pip_indy_package": "cd ../../packages-python/cactus_validator_socketio_indy && python3 setup.py bdist_wheel",
-    "build:dev:backend:postbuild": "npm run copy-yarn-lock && npm run copy-validator-keys",
-    "copy-yarn-lock": "cp -f ../../yarn.lock ./dist/",
-    "copy-validator-keys": "npm run copy-fabric-key && npm run copy-ethereum-key && npm run copy-indy-key",
-    "copy-fabric-key": "cp -fr ../../packages/cactus-plugin-ledger-connector-fabric-socketio/sample-config/CA/connector.crt ./dist/fabric-connector.crt",
-    "copy-ethereum-key": "cp -fr ../../packages/cactus-plugin-ledger-connector-go-ethereum-socketio/sample-config/CA/connector.crt ./dist/ethereum-connector.crt",
-    "copy-indy-key": "cp -fr ../../packages-python/cactus_validator_socketio_indy/sample-CA/connector.crt ./dist/indy-connector.crt"
+    "build:dev:backend:postbuild": "cp -f ../../yarn.lock ./dist/"
   },
   "dependencies": {
     "axios": "0.24.0",

@@ -5,9 +5,9 @@
  * ValidatorAuthentication.ts
  */
 
-const fs = require("fs");
-const path = require("path");
-const jwt = require("jsonwebtoken");
+import fs from "fs";
+import crypto from "crypto";
+import jwt from "jsonwebtoken";
 import * as config from "../common/core/config";
 import { getLogger } from "log4js";
 const logger = getLogger("ValidatorAuthentication[" + process.pid + "]");
@@ -25,12 +25,24 @@ export class ValidatorAuthentication {
       }
     }
 
-    const option = {
-      algorithm: "ES256",
+    const jwtAlgo = config.read<jwt.Algorithm>('sslParam.jwtAlgo', 'ES256');
+    const keyType = crypto.createPrivateKey(privateKey).asymmetricKeyType;
+    if (keyType === 'rsa' && jwtAlgo.startsWith('RS')) {
+      logger.debug(`Using RSA key with JWT algorithm ${jwtAlgo}`);
+    }
+    else if (keyType === 'ec' && jwtAlgo.startsWith('ES')) {
+      logger.debug(`Using ECDSA key with JWT algorithm ${jwtAlgo}`);
+    }
+    else {
+      throw new Error(`Not supported combination ${keyType}/${jwtAlgo}. Please use either RSA or ECDSA key.`);
+    }
+
+    const option: jwt.SignOptions = {
+      algorithm: jwtAlgo,
       expiresIn: 60 * 15, // 15 minutes
     };
 
-    const signature: string = jwt.sign(payload, privateKey, option);
+    const signature = jwt.sign(payload, privateKey, option);
     logger.debug(`signature: OK`);
     return signature;
   }

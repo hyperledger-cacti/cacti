@@ -64,6 +64,10 @@ docker run -v/etc/cactus/:/etc/cactus -p 5040:5040 --net=fabric-all-in-one_testn
 npm run start
 ```
 
+## Configuration
+- Validator can be configured in `/etc/cactus/connector-fabric-socketio/default.yaml` (see [sample-config](./sample-config/default.yaml) for details).
+- This configuration can be overwriten in `NODE_CONFIG` environment variable (JSON format). See functional tests for example of that.
+
 ## Usage samples
 - To confirm the operation of this package, please refer to the following business-logic sample application:
     - [cactus-example-discounted-asset-trade](../../examples/cactus-example-discounted-asset-trade)

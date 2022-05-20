@@ -3,7 +3,7 @@ ledgerPluginInfo:
     validatorID: 84jUisrs
     validatorType: legacy-socketio
     validatorURL: https://ethereum-validator:5050
-    validatorKeyPath: /root/cactus/ethereum-connector.crt
+    validatorKeyPath: /etc/cactus/connector-go-ethereum-socketio/CA/connector.crt
     maxCounterRequestID: 100
     syncFunctionTimeoutMillisecond: 5000
     socketOptions:
@@ -42,7 +42,7 @@ ledgerPluginInfo:
     validatorID: r9IS4dDf
     validatorType: legacy-socketio
     validatorURL: https://fabric-socketio-validator:5040
-    validatorKeyPath: /root/cactus/fabric-connector.crt
+    validatorKeyPath: /etc/cactus/connector-fabric-socketio/CA/connector.crt
     maxCounterRequestID: 100
     syncFunctionTimeoutMillisecond: 5000
     socketOptions:
@@ -57,7 +57,7 @@ ledgerPluginInfo:
     validatorID: 3PfTJw8g
     validatorType: legacy-socketio
     validatorURL: http://indy-validator-nginx:10080
-    validatorKeyPath: /root/cactus/indy-connector.crt
+    validatorKeyPath: /etc/cactus/validator_socketio_indy/CA/connector.crt
     maxCounterRequestID: 100
     syncFunctionTimeoutMillisecond: 5000
     socketOptions:

@@ -13,6 +13,50 @@ export CACTUS_FABRIC_ALL_IN_ONE_CONTAINER_NAME="asset_trade_faio2x_testnet"
 export CACTUS_FABRIC_ALL_IN_ONE_VERSION="2.2.0"
 export CACTUS_FABRIC_TEST_LOOSE_MEMBERSHIP=1
 
+# Cert options
+CERT_CURVE_NAME="prime256v1"
+CERT_COUNTRY="JP"
+CERT_STATE="Tokyo"
+CERT_LOCALITY="Minato-Ku"
+CERT_ORG="CactusSamples"
+
+# generate_certificate <common-name> <destination>
+function generate_certificate() {
+    # Check OpenSSL command existance
+    if ! openssl version > /dev/null; then
+        echo "Could not execute [openssl version], check if OpenSSL tool is available on the system."
+        exit 1;
+    fi
+
+    # Check input parameters
+    ARGS_NUMBER=2
+    if [ "$#" -lt "$ARGS_NUMBER" ]; then
+        echo "generate_certificate called with wrong number of arguments (expected - $ARGS_NUMBER, actual - $#)";
+        exit 2
+    fi
+
+    common_name=$1
+    destination=$2
+    subject="/C=$CERT_COUNTRY/ST=$CERT_STATE/L=$CERT_LOCALITY/O=$CERT_ORG/CN=$common_name"
+    echo "Create new cert in '${destination}' with subject '${subject}'"
+
+    # Crete destination path
+    if [ ! -d "$destination" ]; then
+        echo "Re-create destination dir..."
+        rm -rf "$destination"
+        mkdir -p "$destination"
+    fi
+
+    keyPath="${destination}/connector.priv"
+    csrPath="${destination}/connector.csr"
+    certPath="${destination}/connector.crt"
+
+    # Generate keys
+    openssl ecparam -genkey -name "$CERT_CURVE_NAME" -out "$keyPath"
+    openssl req -new -sha256 -key "$keyPath" -out "$csrPath" -subj "$subject"
+    openssl req -x509 -sha256 -days 365 -key "$keyPath" -in "$csrPath" -out "$certPath"
+}
+
 function start_fabric_testnet() {
     echo ">> start_fabric_testnet()"
     pushd "${ROOT_DIR}/tools/docker/fabric-all-in-one"
@@ -54,6 +98,7 @@ function copy_fabric_validator_config() {
     echo ">> copy_fabric_validator_config()"
     cp -fr ${ROOT_DIR}/packages/cactus-plugin-ledger-connector-fabric-socketio/sample-config/* \
         "${CONFIG_VOLUME_PATH}/connector-fabric-socketio/"
+    generate_certificate "FabricSocketIOCactusValidator" "${CONFIG_VOLUME_PATH}/connector-fabric-socketio/CA/"
     echo ">> copy_fabric_validator_config() done."
 
     echo ">> copy_fabric_wallet()"
@@ -71,6 +116,7 @@ function copy_ethereum_validator_config() {
     echo ">> copy_ethereum_validator_config()"
     cp -fr ${ROOT_DIR}/packages/cactus-plugin-ledger-connector-go-ethereum-socketio/sample-config/* \
         "${CONFIG_VOLUME_PATH}/connector-go-ethereum-socketio/"
+    generate_certificate "GoEthereumCactusValidator" "${CONFIG_VOLUME_PATH}/connector-go-ethereum-socketio/CA/"
     echo ">> copy_ethereum_validator_config() done."
 }
 
@@ -91,7 +137,7 @@ function copy_indy_validator_config() {
 
 function copy_indy_validator_ca() {
     echo ">> copy_indy_validator_ca()"
-    cp -fr "${ROOT_DIR}/packages-python/cactus_validator_socketio_indy/sample-CA/" "${CONFIG_VOLUME_PATH}/validator_socketio_indy/CA"
+    generate_certificate "IndyCactusValidator" "${CONFIG_VOLUME_PATH}/validator_socketio_indy/CA/"
     echo ">> copy_indy_validator_ca() done."
 }
 
