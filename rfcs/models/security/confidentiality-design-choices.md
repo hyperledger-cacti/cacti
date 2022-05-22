@@ -60,7 +60,7 @@ M' = Decrypt(C)
 ```
 DIM computes:
 ```
-Verify(Sigma, P)
+Verify(Sigma, P) == TRUE
 (C', H) = Parse(P)
 Verify: H == SHA256Hash(M')
 ```
@@ -82,7 +82,7 @@ C' = Decrypt(C)
 ```
 DIM computes:
 ```
-Verify(Sigma, C)
+Verify(Sigma, C) == TRUE
 M' || S' = Parse(C')
 Verify: S' == Sign(SHA256Hash(M'))
 ```
@@ -114,7 +114,7 @@ M' = Decrypt(C1')
 ```
 DIM computes:
 ```
-Verify(Sigma, P)
+Verify(Sigma, P) == TRUE
 Verify: H1 == SHA256Hash(C2')
 Verify: H' == SHA256Hash(M')
 ```
@@ -142,7 +142,7 @@ M1 = Decrypt(C)
 ```
 DIM computes:
 ```
-Verify(Sigma, P)
+Verify(Sigma, P) == TRUE
 M' || r' = Parse(M1)
 Verify: H == SHA256Hash(M' || r')
 ```
@@ -168,9 +168,13 @@ M1 = Decrypt(C)
 ```
 DIM computes:
 ```
-Verify(Sigma, P)
+Verify(Sigma, P) == TRUE
 C' || H = Parse(P)
 M2 || r' = Parse(M1)
 Verify: H == HMAC(r', M2)
 ```
-_Comments_: The hashing is secure (HMAC provides assured randomness, or entropy) and the protocol requires no peer modification or custom signing logic.
+_Comments_: The hashing is secure (HMAC provides assured randomness, or entropy) and the protocol requires no peer modification or custom signing logic. Using HMAC enables provable security [1] of the [authenticity property](./confidentiality.md#security-concerns-and-threat-model) we strive for in our system.
+
+
+## References
+1. New Proofs for NMAC and HMAC: Security without Collision-Resistance, Mihir Bellare, Crypto 2006 eprint: https://eprint.iacr.org/2006/043.pdf.
