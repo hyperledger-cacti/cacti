@@ -107,7 +107,6 @@ module.exports = {
     `./packages/cactus-test-tooling/src/test/typescript/integration/substrate/substrate-test-ledger-multiple-concurrent.test.ts`,
     `./packages/cactus-test-tooling/src/test/typescript/integration/iroha/iroha-test-ledger/constructor-validates-options.test.ts`,
     `./packages/cactus-test-tooling/src/test/typescript/integration/rustc-container/rustc-container-target-bundler.test.ts`,
-    `./packages/cactus-test-tooling/src/test/typescript/integration/common/containers.test.ts`,
     `./packages/cactus-test-tooling/src/test/typescript/integration/besu/besu-test-ledger/constructor-validates-options.test.ts`,
     `./packages/cactus-test-plugin-htlc-eth-besu/src/test/typescript/integration/plugin-htlc-eth-besu/get-single-status-endpoint.test.ts`,
     `./packages/cactus-test-plugin-htlc-eth-besu/src/test/typescript/integration/plugin-htlc-eth-besu/get--status-endpoint-invalid.test.ts`,
