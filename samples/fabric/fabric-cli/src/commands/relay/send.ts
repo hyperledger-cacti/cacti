@@ -69,6 +69,10 @@ const command: GluegunCommand = {
           {
             name: '--mspId',
             description: 'mspId for the local fabric network'
+          },
+          {
+            name: '--e2e-confidentiality',
+            description: 'Flag indicating whether or not the view contents are confidential end-to-end across networks (client-to-interop-module).'
           }
         ],
         command,
@@ -149,7 +153,8 @@ const command: GluegunCommand = {
               signMessage(array[0], keyCert.key.toBytes()).toString('base64')
           : '',
         '',
-        options['requesting-org'] || ''
+        options['requesting-org'] || '',
+        options['e2e-confidentiality'] === 'true' ? true : false
       )
       .then(test => {
         console.log('Result: ', test)

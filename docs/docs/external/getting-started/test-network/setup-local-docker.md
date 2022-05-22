@@ -13,7 +13,9 @@ SPDX-License-Identifier: CC-BY-4.0
 
 In this document, we detail the steps using which you can bring up networks using the default configuration settings and by fetching pre-built Weaver interoperation modules, SDK libraries, and relay docker image, drivers docker images from Github Package repositories. To customize these settings (e.g., hostnames, ports), refer to the [Advanced Configuration page](./advanced-configuration.md).
 
-_Note_: All components are run within Docker containers, except client applications.
+| Notes |
+|:------|
+| All components are run within Docker containers, except client applications. |
 
 Follow the instructions below to build and run components followed by interoperation flows. These instructions have been tested on Ubuntu Linux (bash shell) and Mac OS. In general, they should work on any system and shell as long as the various dependencies have been installed and configured.
 
@@ -46,7 +48,9 @@ Before starting, make sure you have the following software installed on your hos
     go get -u google.golang.org/protobuf/cmd/protoc-gen-go
     go get -u google.golang.org/grpc/cmd/protoc-gen-go-grpc
     ```
-    _Note_: The latest version at present is `3.15.6`, but you should check the above link to find the most current version before running the above steps.
+    | Notes |
+    |:------|
+    | The latest version at present is `3.15.6`, but you should check the above link to find the most current version before running the above steps. |
 
 ### Credentials
 Make sure you have an SSH or GPG key registered in https://github.com to allow seamless cloning of repositories (at present, various setup scripts clone repositories using the `https://` prefix but this may change to `git@` in the future).
@@ -82,7 +86,9 @@ To compile the protobufs for Java, do the following:
 
 ## Securing Components
 
-_Note_: The relays and drivers corresponding to the different test networks you will encounter below can be run with or without TLS enabled. But the default files used in the demonstrations assume that either all relays and drivers are TLS-enabled or none are. Therefore, you should determine at the outset whether or not you wish to run the entire set of components in TLS-enabled mode, and select appropriate commands in the provided instructions.
+| Notes |
+|:------|
+| The relays and drivers corresponding to the different test networks you will encounter below can be run with or without TLS enabled. But the default files used in the demonstrations assume that either all relays and drivers are TLS-enabled or none are. Therefore, you should determine at the outset whether or not you wish to run the entire set of components in TLS-enabled mode, and select appropriate commands in the provided instructions. |
 
 ## Hyperledger Fabric Components
 
@@ -113,7 +119,9 @@ This folder contains code to create and launch networks `network1` and `network2
   * `simpleassetandinterop` ([Asset Exchange](../interop/asset-exchange.md)): identical to `simpleasset` but where the locking, unlocking, and claiming logic is imported as a library in the chaincode rather than available in the common Fabric Interoperation Chaincode (a Weaver component).
   * `simpleassettransfer` ([Asset Exchange](../interop/asset-exchange.md) or [Asset Transfer](../interop/asset-transfer.md)): augmentation of `simpleasset` with asset pledging, claiming, and reclaiming features for cross-network transfers.
 
-_Note_: for new users, we recommend testing the Data Sharing feature first with the `simplestate` contract. To test the other modes, you can simply [tear down](#tear-down-the-setup) the Fabric networks and restart them with the appropriate chaincodes installed.
+| Notes |
+|:------|
+| For new users, we recommend testing the Data Sharing feature first with the `simplestate` contract. To test the other modes, you can simply [tear down](#tear-down-the-setup) the Fabric networks and restart them with the appropriate chaincodes installed. |
 
 Follow the instructions below to build and launch the networks:
 - Navigate to the `tests/network-setups/fabric/dev` folder.
@@ -125,7 +133,11 @@ Follow the instructions below to build and launch the networks:
   ```bash
   make start-interop-local CHAINCODE_NAME=<chaincode-name>
   ```
-- (_Note_: If you do not wish to test Fabric-Fabric interoperation, you can choose to launch only one of the two networks along with its interoperation chaincode. For `network1`, run `make start-interop-network1-local`, and for `network2`, run `make start-interop-network2-local`.)
+
+| Notes |
+|:------|
+| If you do not wish to test Fabric-Fabric interoperation, you can choose to launch only one of the two networks along with its interoperation chaincode. For `network1`, run `make start-interop-network1-local`, and for `network2`, run `make start-interop-network2-local` |
+| If you wish to enable end-to-end confidentiality by default in the interoperation modules that are deployed during network launch, set the environment variable `E2E_CONFIDENTIALITY` to `true` in the command line as follows: `E2E_CONFIDENTIALITY=true make start-interop-local` |
 
 For more information, refer to the associated [README](https://github.com/hyperledger-labs/weaver-dlt-interoperability/tree/master/tests/network-setups/fabric/dev).
 
@@ -228,7 +240,9 @@ The `fabric-cli` Node.js source code is located in the `samples/fabric/fabric-cl
 
 If you are using a Linux system, make sure that lib64 is installed.
 
-_Note_: For the Node.js version of the `fabric-cli`, the setup and running instructions below were tested with all Node.js versions from v11.14.0 to v14.17.3.
+| Notes |
+|:------|
+| For the Node.js version of the `fabric-cli`, the setup and running instructions below were tested with all Node.js versions from v11.14.0 to v14.17.3. |
 
 #### Installation
 
@@ -298,7 +312,10 @@ Follow the instructions below to build and launch both networks:
     ```bash
     make start-local PROFILE="3-nodes"
     ```
-- (_Note_: If you do not wish to test Corda-Corda interoperation, you can choose to launch only one of the two networks along with its interoperation CorDapp. For `Corda_Network`, run `make start-network1-local`, and for `Corda_Network2`, run `make start-network2-local`.)
+
+| Notes |
+|:------|
+| If you do not wish to test Corda-Corda interoperation, you can choose to launch only one of the two networks along with its interoperation CorDapp. For `Corda_Network`, run `make start-network1-local`, and for `Corda_Network2`, run `make start-network2-local`. |
 
 You should see the following message in the terminal:
 ```

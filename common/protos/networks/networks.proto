@@ -40,4 +40,5 @@ message NetworkQuery {
   string requestor_signature = 6;
   string nonce = 7;
   string requesting_org = 8;
+  bool confidential = 9;
 }

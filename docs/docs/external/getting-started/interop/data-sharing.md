@@ -135,14 +135,9 @@ To test the scenario where `Corda_Network` requests the value of the state (key)
   NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients get-state Arcturus
   ```
   
-**Note:** You can test the above data transfer scenario with `Corda_Network2` instead of `Corda_Network` by changing the following in the `request-state` or `get-state` command:
-- Network name environment variable:
-  * `NETWORK_NAME=Corda_Network` to `NETWORK_NAME=Corda_Network2`
-- Corda node's RPC endpoint port environment variable:
-  * `CORDA_PORT=10006` to `CORDA_PORT=30006`
-- Local relay address:
-  * `localhost:9081` to `localhost:9082` (host deployment of relays and drivers)
-  * `relay-corda2:9081` to `relay-corda2:9082` (Docker container deployment of relays and drivers)
+| Notes |
+|:------|
+| You can test the above data transfer scenario with `Corda_Network2` instead of `Corda_Network` by changing the following in the `request-state` or `get-state` command:<ul><li>Network name environment variable:<ul><li>`NETWORK_NAME=Corda_Network` to `NETWORK_NAME=Corda_Network2`</li></ul></li><li>Corda node's RPC endpoint port environment variable:<ul><li>`CORDA_PORT=10006` to `CORDA_PORT=30006`</li></ul></li><li>Local relay address<ul><li>`localhost:9081` to `localhost:9082` (host deployment of relays and drivers)</li><li>`relay-corda2:9081` to `relay-corda2:9082` (Docker container deployment of relays and drivers)</li></ul></li></ul> |
 
 ## Fabric to Corda
 
@@ -218,15 +213,9 @@ To test the scenario where `network2` requests the value of the state (key) `H` 
   ./bin/fabric-cli chaincode query mychannel simplestate read '["H"]' --local-network=network2
   ```
 
-**Note:** You can test the above data transfer scenario with `Corda_Network2` instead of `Corda_Network` by changing the following in the view address (last parameter in the `interop` command):
-- Local relay address (prefix):
-  * `localhost:9081` to `localhost:9082` (host deployment of relays and drivers)
-  * `relay-corda2:9081` to `relay-corda2:9082` (Docker container deployment of relays and drivers)
-- Network name:
-  * `Corda_Network` to `Corda_Network2`
-- Corda node's RPC endpoint:
-  * `localhost:10006` to `localhost:30006` (host deployment of relays and drivers)
-  * `corda_partya_1:10003` to `corda_network2_partya_1:10003` (Docker container deployment of relays and drivers)
+| Notes |
+|:------|
+| You can test the above data transfer scenario with `Corda_Network2` instead of `Corda_Network` by changing the following in the view address (last parameter in the `interop` command):<ul><li>Local relay address (prefix):<ul><li>`localhost:9081` to `localhost:9082` (host deployment of relays and drivers)</li><li>`relay-corda2:9081` to `relay-corda2:9082` (Docker container deployment of relays and drivers)</li></ul></li><li>Network name:<ul><li>`Corda_Network` to `Corda_Network2`</li></ul></li><li>Corda node's RPC endpoint:<ul><li>`localhost:10006` to `localhost:30006` (host deployment of relays and drivers)</li><li>`corda_partya_1:10003` to `corda_network2_partya_1:10003` (Docker container deployment of relays and drivers)</li></ul></li></ul> |
 
 ## Fabric to Fabric
 
@@ -261,6 +250,10 @@ To test the scenario where `network1` requests the value of the state (key) `Arc
       ```bash
       ./bin/fabric-cli interop --local-network=network1 --requesting-org=Org1MSP --relay-tls=true --relay-tls-ca-files=../../../core/relay/credentials/docker/ca-cert.pem relay-network2:9083/network2/mychannel:simplestate:Read:Arcturus
       ```
+
+| Notes |
+|:------|
+| If you wish to enable end-to-end confidentiality for this data sharing session, add the `--e2e-confidentiality=true` switch to any of the above commands. For example: `./bin/fabric-cli interop --local-network=network1 --requesting-org=Org1MSP --e2e-confidentiality=true localhost:9083/network2/mychannel:simplestate:Read:Arcturus` |
 - Query the value of the requested state (key) `Arcturus` in `network1` using the following:
   ```bash
   ./bin/fabric-cli chaincode query mychannel simplestate read '["Arcturus"]' --local-network=network1
@@ -290,6 +283,10 @@ To test the scenario where `network2` requests the value of the state (key) `a` 
       ```bash
       ./bin/fabric-cli interop --local-network=network2 --requesting-org=Org1MSP --relay-tls=true --relay-tls-ca-files=../../../core/relay/credentials/docker/ca-cert.pem relay-network1:9080/network1/mychannel:simplestate:Read:a:173
       ```
+
+| Notes |
+|:------|
+| If you wish to enable end-to-end confidentiality for this data sharing session, add the `--e2e-confidentiality=true` switch to any of the above commands. For example: `./bin/fabric-cli interop --local-network=network2 --requesting-org=Org1MSP --e2e-confidentiality=true localhost:9080/network1/mychannel:simplestate:Read:a` |
 - Query the value of the requested state (key) `a` in `network2` using the following:
   ```bash
   ./bin/fabric-cli chaincode query mychannel simplestate read '["a"]' --local-network=network2

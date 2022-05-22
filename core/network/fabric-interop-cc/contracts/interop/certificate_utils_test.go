@@ -12,17 +12,23 @@ import (
 	"crypto/ecdsa"
 	"crypto/ed25519"
 	"crypto/elliptic"
+	"crypto/hmac"
 	"crypto/rand"
 	"crypto/rsa"
+	"crypto/sha256"
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/pem"
 	"fmt"
+	"io/ioutil"
 	"math/big"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
+	"github.com/ethereum/go-ethereum/crypto/ecies"
+	"github.com/golang/protobuf/proto"
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
 )
 
 func TestVerifyCertificateChain(t *testing.T) {
@@ -181,6 +187,64 @@ func TestEd25519SignatureValidation(t *testing.T) {
 	require.NoError(t, err)
 }
 
+func TestECDSAEncryption(t *testing.T) {
+	// Load certificate with embedded public key
+	certBytes, _ := ioutil.ReadFile("./test_data/signCertFabric.pem")
+	cert, _ := parseCert(string(certBytes))
+
+	// Encrypt some random bytes
+	message := []byte("random-message")
+	encBytes, err := encryptWithCert(message, cert)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Printf("Original message: %s\n", string(message))
+	fmt.Printf("Encrypted message: %s\n", string(encBytes))
+
+	decBytes, err := decryptDataWithPrivKeyFile("./test_data/privKey.pem", encBytes)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Printf("Decrypted message: %s\n", string(decBytes))
+	require.Equal(t, message, decBytes)
+}
+
+func TestConfidentialInteropPayload(t *testing.T) {
+	// Load certificate with embedded public key
+	certBytes, _ := ioutil.ReadFile("./test_data/signCertFabric.pem")
+
+	// Generate confidential view with random data
+	viewContents := []byte("random-message")
+	confBytes, err := generateConfidentialInteropPayloadAndHash(viewContents, string(certBytes))
+	require.NoError(t, err)
+
+	// Parse result
+	var confPayload common.ConfidentialPayload
+	err = proto.Unmarshal(confBytes, &confPayload)
+	if err != nil {
+		t.Fatal(err)
+	}
+	require.Equal(t, confPayload.HashType, common.ConfidentialPayload_HMAC)
+
+	// Decrypt and validate payload
+	decPayload, err := decryptDataWithPrivKeyFile("./test_data/privKey.pem", confPayload.EncryptedPayload)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var confPayloadContents common.ConfidentialPayloadContents
+	err = proto.Unmarshal(decPayload, &confPayloadContents)
+	if err != nil {
+		t.Fatal(err)
+	}
+	require.Equal(t, confPayloadContents.Payload, viewContents)
+
+	// Authenticate hash
+	mac := hmac.New(sha256.New, confPayloadContents.Random)
+	mac.Write(confPayloadContents.Payload)
+	fmac := mac.Sum(nil)
+	require.Equal(t, confPayload.Hash, fmac)
+}
+
 func generateCertFromTemplate(template x509.Certificate, keyType string) ([]byte, error) {
 	random := rand.Reader
 	switch keyType {
@@ -263,4 +327,26 @@ func createECDSACertAndKeyFromTemplate(template x509.Certificate) ([]byte, *ecds
 	certBytes, err := x509.CreateCertificate(random, &template, &template, &testKey.PublicKey, testKey)
 	return certBytes, testKey, err
 
+}
+
+func decryptDataWithPrivKeyFile(privKeyFile string, data []byte) ([]byte, error) {
+	// Load decryption key
+	signkeyPEM, err := ioutil.ReadFile(privKeyFile)
+	if err != nil {
+		return nil, err
+	}
+	signkeyBytes, _ := pem.Decode([]byte(signkeyPEM))
+	signkeyPriv, err := x509.ParsePKCS8PrivateKey(signkeyBytes.Bytes)
+	if err != nil {
+		return nil, err
+	}
+	signkeyPrivEC := signkeyPriv.(*ecdsa.PrivateKey)
+	return decryptDataWithPrivKey(signkeyPrivEC, data)
+}
+
+func decryptDataWithPrivKey(privKeyECDSA *ecdsa.PrivateKey, data []byte) ([]byte, error) {
+	privKey := ecies.ImportECDSA(privKeyECDSA)
+
+	// Decrypt response and match
+	return privKey.Decrypt(data, nil, nil)
 }

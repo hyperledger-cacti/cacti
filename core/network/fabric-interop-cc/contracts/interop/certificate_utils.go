@@ -9,6 +9,8 @@ package main
 
 import (
 	"crypto/ecdsa"
+	"crypto/hmac"
+	"crypto/rand"
 	"crypto/sha256"
 	"crypto/sha512"
 	"crypto/x509"
@@ -19,9 +21,13 @@ import (
 	"fmt"
 	"hash"
 	"math/big"
+	mrand "math/rand"
 	"time"
 
 	"golang.org/x/crypto/ed25519"
+	"github.com/ethereum/go-ethereum/crypto/ecies"
+	"github.com/golang/protobuf/proto"
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
 )
 
 const (
@@ -259,4 +265,71 @@ func isCertificateWithinExpiry(cert *x509.Certificate) error {
 		return nil
 	}
 	return errors.New("Cert is invalid")
+}
+
+func encryptWithCert(message []byte, cert *x509.Certificate) ([]byte, error) {
+	// Check if the public key in the cert is an ECDSA public key
+	pubKey := getECDSAPublicKeyFromCertificate(cert)
+	if pubKey != nil {
+		return encryptWithECDSAPublicKey(message, pubKey)
+	} else if (cert.RawSubjectPublicKeyInfo != nil && len(cert.RawSubjectPublicKeyInfo) == 44) {	// ed25519 public key
+		// We expect the key to be 44 bytes, but only the last 32 bytes (multiple of 8) comprise the public key
+		return encryptWithEd25519PublicKey(message, cert.RawSubjectPublicKeyInfo[12:])
+	} else {
+		return []byte(""), errors.New("Missing or unsupported public key type for encryption")
+	}
+}
+
+func encryptWithECDSAPublicKey(message []byte, pubKey *ecdsa.PublicKey) ([]byte, error) {
+	if pubKey != nil {
+		publicKey := ecies.ImportECDSAPublic(pubKey)
+		encBytes, err := ecies.Encrypt(rand.Reader, publicKey, message, nil, nil)
+		if err != nil {
+			return []byte(""), err
+		}
+		return encBytes, nil
+	}
+	return []byte(""), errors.New("Missing or invalid ECDSA public key")
+}
+
+func encryptWithEd25519PublicKey(message []byte, pubKey []byte) ([]byte, error) {
+	return []byte(""), nil
+}
+
+func generateConfidentialInteropPayloadAndHash(message []byte, cert string) ([]byte, error) {
+	// Generate a 16-byte random key for the HMAC
+	hashKey := make([]byte, 16)
+	for i := 0; i < 16 ; i++ {
+		hashKey[i] = byte(mrand.Intn(255))
+	}
+	confidentialPayloadContents := common.ConfidentialPayloadContents{
+		Payload: message,
+		Random: hashKey,
+	}
+	confidentialPayloadContentsBytes, err := proto.Marshal(&confidentialPayloadContents)
+	if err != nil {
+		return []byte(""), err
+	}
+	x509Cert, err := parseCert(cert)
+	if err != nil {
+		return []byte(""), err
+	}
+	encryptedPayload, err := encryptWithCert(confidentialPayloadContentsBytes, x509Cert)
+	if err != nil {
+		return []byte(""), err
+	}
+
+	payloadHMAC := hmac.New(sha256.New, hashKey)
+	payloadHMAC.Write(message)
+	payloadHMACBytes := payloadHMAC.Sum(nil)
+	confidentialPayload := common.ConfidentialPayload{
+		EncryptedPayload: encryptedPayload,
+		HashType: common.ConfidentialPayload_HMAC,
+		Hash: payloadHMACBytes,
+	}
+	confidentialPayloadBytes, err := proto.Marshal(&confidentialPayload)
+	if err != nil {
+		return []byte(""), err
+	}
+	return confidentialPayloadBytes, nil
 }

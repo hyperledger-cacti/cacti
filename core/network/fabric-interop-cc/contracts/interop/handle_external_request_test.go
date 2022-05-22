@@ -10,7 +10,9 @@ import (
 	"bytes"
 	"crypto"
 	"crypto/ecdsa"
+	"crypto/hmac"
 	"crypto/rand"
+	"crypto/sha256"
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/base64"
@@ -127,7 +129,7 @@ func TestHandleExternalRequest(t *testing.T) {
 	// No matching Membership for requesting network
 	testHandleExternalRequestNoMembership(t, &query, validCertificate, signature, pbResp)
 	// Happy case. ECDSA Cert and Valid Signature
-	testHandleExternalRequestECDSAHappyCase(t, &query, validCertificate, signature, pbResp, &accessControlAsset, &membershipAsset)
+	testHandleExternalRequestECDSAHappyCase(t, &query, validCertificate, key, signature, pbResp, &accessControlAsset, &membershipAsset)
 	// ed25519 Cert and Signature
 	testHandleExternalRequestED25519Signature(t, &query, pbResp, &accessControlAsset, &membershipAsset, template)
 }
@@ -193,7 +195,7 @@ func testHandleExternalRequestInvalidCert(t *testing.T, query *common.Query) {
 	require.EqualError(t, err, fmt.Sprintf("Unable to parse certificate: Client cert not in a known PEM format"))
 }
 
-func testHandleExternalRequestECDSAHappyCase(t *testing.T, query *common.Query, validCertificate string, signature []byte, pbResp pb.Response, accessControl *common.AccessControlPolicy, membership *common.Membership) {
+func testHandleExternalRequestECDSAHappyCase(t *testing.T, query *common.Query, validCertificate string, validPrivateKey *ecdsa.PrivateKey, signature []byte, pbResp pb.Response, accessControl *common.AccessControlPolicy, membership *common.Membership) {
 	ctx, chaincodeStub := wtest.PrepMockStub()
 	interopcc := SmartContract{}
 	chaincodeStub.GetCreatorReturns([]byte(getRelayCreator()), nil)
@@ -210,6 +212,9 @@ func testHandleExternalRequestECDSAHappyCase(t *testing.T, query *common.Query, 
 	interopPayload := common.InteropPayload{
 		Payload: []byte("17.12"),
 		Address: "localhost:9080/network1/mychannel:interop:Read:a",
+		Confidential: false,
+		RequestorCertificate: query.Certificate,
+		Nonce: query.Nonce,
 	}
 	interopPayloadBytes, err := protoV2.Marshal(&interopPayload)
 	require.NoError(t, err)
@@ -224,8 +229,42 @@ func testHandleExternalRequestECDSAHappyCase(t *testing.T, query *common.Query, 
 	chaincodeStub.InvokeChaincodeReturns(pbResp)
 
 	interopResponse, err := interopcc.HandleExternalRequest(ctx, string(b64QueryBytes))
+	var interopPayloadResp common.InteropPayload
+	err = protoV2.Unmarshal([]byte(interopResponse), &interopPayloadResp)
+	require.NoError(t, err)
+	require.False(t, interopPayloadResp.Confidential)
 	require.Equal(t, interopPayloadBytes, []byte(interopResponse))
 	require.NoError(t, err)
+
+	// test the same request-response with encryption on
+	query.Confidential = true
+	queryBytes, err = protoV2.Marshal(query)
+	require.NoError(t, err)
+	b64QueryBytes = base64.StdEncoding.EncodeToString(queryBytes)
+	chaincodeStub.GetStateReturnsOnCall(3, membershipBytes, nil)
+	chaincodeStub.GetStateReturnsOnCall(4, accessControlBytes, nil)
+	chaincodeStub.InvokeChaincodeReturns(pbResp)
+	interopResponse, err = interopcc.HandleExternalRequest(ctx, string(b64QueryBytes))
+	err = protoV2.Unmarshal([]byte(interopResponse), &interopPayloadResp)
+	require.NoError(t, err)
+	require.NotEqual(t, interopPayload.Payload, interopPayloadResp.Payload)
+	require.True(t, interopPayloadResp.Confidential)
+	require.Equal(t, interopPayloadResp.RequestorCertificate, validCertificate)
+	require.Equal(t, interopPayloadResp.Nonce, query.Nonce)
+	var confPayload common.ConfidentialPayload
+	err = protoV2.Unmarshal(interopPayloadResp.Payload, &confPayload)
+	require.NoError(t, err)
+	require.Equal(t, confPayload.HashType, common.ConfidentialPayload_HMAC)
+	decConfPayload, err := decryptDataWithPrivKey(validPrivateKey, confPayload.EncryptedPayload)
+	require.NoError(t, err)
+	var confPayloadContents common.ConfidentialPayloadContents
+	err = protoV2.Unmarshal(decConfPayload, &confPayloadContents)
+	require.NoError(t, err)
+	require.Equal(t, interopPayload.Payload, confPayloadContents.Payload)
+	mac := hmac.New(sha256.New, confPayloadContents.Random)
+	mac.Write(confPayloadContents.Payload)
+	fmac := mac.Sum(nil)
+	require.Equal(t, confPayload.Hash, fmac)
 }
 
 func testHandleExternalRequestED25519Signature(t *testing.T, query *common.Query, pbResp pb.Response, accessControl *common.AccessControlPolicy, fabricMembership *common.Membership, template x509.Certificate) {
