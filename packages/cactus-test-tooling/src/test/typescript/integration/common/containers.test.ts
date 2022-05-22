@@ -1,6 +1,6 @@
 import os from "os";
 import path from "path";
-import test, { Test } from "tape-promise/tape";
+import "jest-extended";
 import type { IncomingMessage } from "http";
 import { v4 as uuidV4 } from "uuid";
 import fs from "fs-extra";
@@ -12,114 +12,115 @@ import {
 
 LoggerProvider.setLogLevel("DEBUG");
 const log: Logger = LoggerProvider.getOrCreate({ label: "containers-test" });
+const testCase = "pushes file to container unharmed";
 
-test("pushes file to container unharmed", async (t: Test) => {
+describe(testCase, () => {
+  let container: any;
   const anHttpEchoContainer = new HttpEchoContainer();
-  log.debug("Starting HttpEchoContainer...");
-  const container = await anHttpEchoContainer.start();
-  log.debug("Container started OK.");
+  console.log("Starting HttpEchoContainer...");
+  const httpEchoContainer = new HttpEchoContainer();
 
-  test.onFinish(async () => {
+  beforeAll(async () => {
+    container = await anHttpEchoContainer.start();
+    log.debug("Container started OK.");
+  });
+
+  afterAll(async () => {
     await anHttpEchoContainer.stop();
     await anHttpEchoContainer.destroy();
-  });
-
-  const srcFileName = uuidV4();
-  const srcFileDir = os.tmpdir();
-  const dstFileDir = "/";
-  const dstFileName = srcFileName;
-  const srcFilePath = path.join(srcFileDir, srcFileName);
-  const dstFilePath = path.join(dstFileDir, dstFileName);
-
-  const fileContents = {
-    id: srcFileName,
-    message: "Hello world!",
-  };
-
-  const srcFileAsString = JSON.stringify(fileContents);
-  fs.writeFileSync(srcFilePath, srcFileAsString);
-
-  const res: IncomingMessage = await Containers.putFile({
-    containerOrId: container,
-    srcFileDir,
-    srcFileName,
-    dstFileDir,
-    dstFileName,
-  });
-
-  t.ok(res, "putArchive() Docker API response OK");
-  t.ok(typeof res.statusCode === "number", "API response.statusCode OK");
-  const statusCode: number = res.statusCode as number;
-
-  t.ok(statusCode > 199, "putArchive() API res.statusCode > 199");
-  t.ok(statusCode < 300, "putArchive() API res.statusCode < 300");
-  t.equal(res.statusMessage, "OK", "putArchive() res.statusMessage OK");
-
-  log.debug("Put file result: %o %o", res.statusCode, res.statusMessage);
-
-  const fileAsString2 = await Containers.pullFile(container, dstFilePath);
-  t.ok(fileAsString2, "Read back file contents truthy");
-
-  const fileContents2 = JSON.parse(fileAsString2);
-  t.ok(fileContents2, "Read back file JSON.parse() OK");
-  t.equal(fileContents2.id, fileContents.id, "File UUIDs OK");
-
-  t.end();
-});
-
-test("Can obtain docker diagnostics info", async (t: Test) => {
-  const httpEchoContainer = new HttpEchoContainer();
-  test.onFinish(async () => {
     await httpEchoContainer.stop();
     await httpEchoContainer.destroy();
   });
-  t.ok(httpEchoContainer, "httpEchoContainer truthy OK");
-  const container = await httpEchoContainer.start();
-  t.ok(container, "container truthy OK");
 
-  const diag = await Containers.getDiagnostics({ logLevel: "TRACE" });
-  t.ok(diag, "diag truthy OK");
+  test(testCase, async () => {
+    const srcFileName = uuidV4();
+    const srcFileDir = os.tmpdir();
+    const dstFileDir = "/";
+    const dstFileName = srcFileName;
+    const srcFilePath = path.join(srcFileDir, srcFileName);
+    const dstFilePath = path.join(dstFileDir, dstFileName);
 
-  t.ok(diag.containers, "diag.containers truthy OK");
-  t.ok(Array.isArray(diag.containers), "diag.containers is Array OK");
-  t.ok(diag.containers.length > 0, "diag.containers not empty array OK");
+    const fileContents = {
+      id: srcFileName,
+      message: "Hello world!",
+    };
 
-  t.ok(diag.images, "diag.images truthy OK");
-  t.ok(diag.images.length > 0, "diag.images not empty array OK");
-  t.ok(Array.isArray(diag.images), "diag.images is Array OK");
+    const srcFileAsString = JSON.stringify(fileContents);
+    fs.writeFileSync(srcFilePath, srcFileAsString);
+    {
+      const res: IncomingMessage = await Containers.putFile({
+        containerOrId: container,
+        srcFileDir,
+        srcFileName,
+        dstFileDir,
+        dstFileName,
+      });
 
-  t.ok(diag.info, "diag.info truthy OK");
+      expect(res).toBeTruthy();
+      expect(typeof res.statusCode).toBe("number");
+      const statusCode: number = res.statusCode as number;
 
-  t.ok(diag.networks, "diag.networks truthy OK");
-  t.ok(diag.networks.length > 0, "diag.networks not empty array OK");
-  t.ok(Array.isArray(diag.networks), "diag.networks is Array OK");
+      expect(statusCode).toBeGreaterThan(199);
+      expect(statusCode).toBeLessThan(300);
+      expect(res.statusMessage).toEqual("OK");
 
-  t.ok(diag.version, "diag.version truthy OK");
+      log.debug("Put file result: %o %o", res.statusCode, res.statusMessage);
 
-  t.ok(diag.volumes, "diag.volumes truthy OK");
-  t.ok(diag.volumes.Volumes, "diag.volumes.Volumes truthy OK");
-  t.ok(Array.isArray(diag.volumes.Volumes), "diag.volumes.Volumes is Array OK");
-  t.end();
-});
+      const fileAsString2 = await Containers.pullFile(container, dstFilePath);
+      expect(fileAsString2).toBeTruthy();
 
-test("Can report error if docker daemon is not accessable", async (t: Test) => {
-  const badSocketPath = "/some-non-existent-path/to-make-it-trip-up/";
-  try {
-    await Containers.getDiagnostics({
-      logLevel: "TRACE",
-      // pass in an incorrect value for the port so that it fails for sure
-      dockerodeOptions: {
-        port: 9999,
-        socketPath: badSocketPath,
-      },
-    });
-    t.fail("Containers.getDiagnostics was supposed to fail but did not.");
-  } catch (ex) {
-    t.ok(ex, "exception thrown is truthy OK");
-    t.ok(ex.cause, "ex.cause truthy OK");
-    t.ok(ex.cause.message, "ex.cause.message truthy OK");
-    const causeMsgIsInformative = ex.cause.message.includes(badSocketPath);
-    t.true(causeMsgIsInformative, "causeMsgIsInformative");
-  }
-  t.end();
+      const fileContents2 = JSON.parse(fileAsString2);
+      expect(fileContents2).toBeTruthy();
+      expect(fileContents2.id).toEqual(fileContents.id);
+    }
+
+    {
+      expect(httpEchoContainer).toBeTruthy();
+      const container = await httpEchoContainer.start();
+      expect(container).toBeTruthy();
+
+      const diag = await Containers.getDiagnostics({ logLevel: "TRACE" });
+      expect(diag).toBeTruthy();
+
+      expect(diag.containers).toBeTruthy();
+      expect(Array.isArray(diag.containers)).toBeTruthy();
+      expect(diag.containers.length > 0).toBeTruthy();
+
+      expect(diag.images).toBeTruthy();
+      expect(diag.images.length > 0).toBeTruthy();
+      expect(Array.isArray(diag.images)).toBeTruthy();
+
+      expect(diag.info).toBeTruthy();
+
+      expect(diag.networks).toBeTruthy();
+      expect(diag.networks.length > 0).toBeTruthy();
+      expect(Array.isArray(diag.networks)).toBeTruthy();
+
+      expect(diag.version).toBeTruthy();
+
+      expect(diag.volumes).toBeTruthy();
+      expect(diag.volumes.Volumes).toBeTruthy();
+      expect(Array.isArray(diag.volumes.Volumes)).toBeTruthy();
+    }
+
+    {
+      const badSocketPath = "/some-non-existent-path/to-make-it-trip-up/";
+      try {
+        await Containers.getDiagnostics({
+          logLevel: "TRACE",
+          // pass in an incorrect value for the port so that it fails for sure
+          dockerodeOptions: {
+            port: 9999,
+            socketPath: badSocketPath,
+          },
+        });
+        fail(Containers.getDiagnostics);
+      } catch (ex: unknown) {
+        expect(ex).toBeTruthy();
+        const connectEN = "connect ENOENT ";
+        const fullBadPath = connectEN.concat(badSocketPath);
+        expect(ex).toHaveProperty(["cause", "message"], fullBadPath);
+      }
+    }
+  });
 });
