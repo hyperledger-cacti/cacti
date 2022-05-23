@@ -72,6 +72,15 @@ func GenerateSHA256HashInBase64Form(preimage string) string {
 	return shaHashBase64
 }
 
+// function to generate a "SHA512" hash in base64 format for a given preimage
+func GenerateSHA512HashInBase64Form(preimage string) string {
+	hasher := sha512.New()
+	hasher.Write([]byte(preimage))
+	shaHash := hasher.Sum(nil)
+	shaHashBase64 := base64.StdEncoding.EncodeToString(shaHash)
+	return shaHashBase64
+}
+
 // function to return the key to fetch an element from the map using contractId
 func generateContractIdMapKey(contractId string) string {
 	return contractIdPrefix + contractId
@@ -91,7 +100,7 @@ func GenerateAssetLockKeyAndContractId(ctx contractapi.TransactionContextInterfa
 		return "", "", logThenErrorf("error while creating composite key: %+v", err)
 	}
 
-	contractId := GenerateSHA256HashInBase64Form(assetLockKey)
+	contractId := GenerateSHA256HashInBase64Form(assetLockKey + ctx.GetStub().GetTxID())
 	return assetLockKey, contractId, nil
 }
 /*
@@ -113,7 +122,7 @@ func GenerateClaimAssetLockKey(ctx contractapi.TransactionContextInterface, chai
 func GenerateFungibleAssetLockContractId(ctx contractapi.TransactionContextInterface, chaincodeId string, assetAgreement *common.FungibleAssetExchangeAgreement) string {
 	preimage := chaincodeId + assetAgreement.Type + strconv.Itoa(int(assetAgreement.NumUnits)) +
 		assetAgreement.Locker + assetAgreement.Recipient + ctx.GetStub().GetTxID()
-	contractId := GenerateSHA256HashInBase64Form(preimage)
+	contractId := GenerateSHA256HashInBase64Form(preimage + ctx.GetStub().GetTxID())
 	return contractId
 }
 
@@ -428,6 +437,8 @@ func checkIfCorrectPreimage(preimageBase64 string, hashBase64 string, hashMechan
 	shaHashBase64 := ""
 	if hashMechanism == common.HashMechanism_SHA256 {
 		shaHashBase64 = GenerateSHA256HashInBase64Form(string(preimage))
+	} else if hashMechanism == common.HashMechanism_SHA512 {
+		shaHashBase64 = GenerateSHA512HashInBase64Form(string(preimage))
 	} else {
 		log.Infof("hashMechanism %d is not supported currently", hashMechanism)
 		return false, nil
