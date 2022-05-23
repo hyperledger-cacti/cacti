@@ -1,4 +1,4 @@
-import test, { Test } from "tape";
+import "jest-extended";
 import Web3 from "web3";
 import { v4 as uuidV4 } from "uuid";
 
@@ -24,150 +24,123 @@ import { PluginRegistry } from "@hyperledger/cactus-core";
 
 const logLevel: LogLevelDesc = "INFO";
 const contractName = "HelloWorld";
+const testCase = "Quorum Ledger Connector Plugin";
 
-test("Quorum Ledger Connector Plugin", async (t: Test) => {
-  const containerImageVersion = "2021-05-03-quorum-v21.4.1";
-  const ledgerOptions = { containerImageVersion };
-  const ledger = new QuorumTestLedger(ledgerOptions);
-  test.onFinish(async () => {
+describe(testCase, () => {
+  afterAll(async () => {
     await ledger.stop();
     await ledger.destroy();
   });
-  await ledger.start();
 
-  const rpcApiHttpHost = await ledger.getRpcApiHttpHost();
-  const quorumGenesisOptions: IQuorumGenesisOptions = await ledger.getGenesisJsObject();
-  t.ok(quorumGenesisOptions);
-  t.ok(quorumGenesisOptions.alloc);
+  const containerImageVersion = "2021-05-03-quorum-v21.4.1";
+  const ledgerOptions = { containerImageVersion };
+  const ledger = new QuorumTestLedger(ledgerOptions);
 
-  const highNetWorthAccounts: string[] = Object.keys(
-    quorumGenesisOptions.alloc,
-  ).filter((address: string) => {
-    const anAccount: IAccount = quorumGenesisOptions.alloc[address];
-    const theBalance = parseInt(anAccount.balance, 10);
-    return theBalance > 10e7;
-  });
-  const [firstHighNetWorthAccount] = highNetWorthAccounts;
+  test(testCase, async () => {
+    await ledger.start();
+    const rpcApiHttpHost = await ledger.getRpcApiHttpHost();
+    const quorumGenesisOptions: IQuorumGenesisOptions = await ledger.getGenesisJsObject();
+    expect(quorumGenesisOptions).toBeTruthy();
+    expect(quorumGenesisOptions.alloc).toBeTruthy();
 
-  const web3 = new Web3(rpcApiHttpHost);
-  const testEthAccount = web3.eth.accounts.create(uuidV4());
+    const highNetWorthAccounts: string[] = Object.keys(
+      quorumGenesisOptions.alloc,
+    ).filter((address: string) => {
+      const anAccount: IAccount = quorumGenesisOptions.alloc[address];
+      const theBalance = parseInt(anAccount.balance, 10);
+      return theBalance > 10e7;
+    });
+    const [firstHighNetWorthAccount] = highNetWorthAccounts;
 
-  const keychainEntryKey = uuidV4();
-  const keychainEntryValue = testEthAccount.privateKey;
-  const keychainPlugin = new PluginKeychainMemory({
-    instanceId: uuidV4(),
-    keychainId: uuidV4(),
-    // pre-provision keychain with mock backend holding the private key of the
-    // test account that we'll reference while sending requests with the
-    // signing credential pointing to this keychain entry.
-    backend: new Map([[keychainEntryKey, keychainEntryValue]]),
-    logLevel,
-  });
-  keychainPlugin.set(
-    HelloWorldContractJson.contractName,
-    JSON.stringify(HelloWorldContractJson),
-  );
-  // Instantiate connector with the keychain plugin that already has the
-  // private key we want to use for one of our tests
-  const connector: PluginLedgerConnectorQuorum = new PluginLedgerConnectorQuorum(
-    {
+    const web3 = new Web3(rpcApiHttpHost);
+    const testEthAccount = web3.eth.accounts.create(uuidV4());
+
+    const keychainEntryKey = uuidV4();
+    const keychainEntryValue = testEthAccount.privateKey;
+    const keychainPlugin = new PluginKeychainMemory({
       instanceId: uuidV4(),
-      rpcApiHttpHost,
+      keychainId: uuidV4(),
+      // pre-provision keychain with mock backend holding the private key of the
+      // test account that we'll reference while sending requests with the
+      // signing credential pointing to this keychain entry.
+      backend: new Map([[keychainEntryKey, keychainEntryValue]]),
       logLevel,
-      pluginRegistry: new PluginRegistry({ plugins: [keychainPlugin] }),
-    },
-  );
+    });
+    keychainPlugin.set(
+      HelloWorldContractJson.contractName,
+      JSON.stringify(HelloWorldContractJson),
+    );
+    // Instantiate connector with the keychain plugin that already has the
+    // private key we want to use for one of our tests
+    const connector: PluginLedgerConnectorQuorum = new PluginLedgerConnectorQuorum(
+      {
+        instanceId: uuidV4(),
+        rpcApiHttpHost,
+        logLevel,
+        pluginRegistry: new PluginRegistry({ plugins: [keychainPlugin] }),
+      },
+    );
 
-  await connector.transact({
-    web3SigningCredential: {
-      ethAccount: firstHighNetWorthAccount,
-      secret: "",
-      type: Web3SigningCredentialType.GethKeychainPassword,
-    },
-    transactionConfig: {
-      from: firstHighNetWorthAccount,
-      to: testEthAccount.address,
-      value: 10e9,
-    },
-  });
-
-  const balance = await web3.eth.getBalance(testEthAccount.address);
-  t.ok(balance, "Retrieved balance of test account OK");
-  t.equals(parseInt(balance, 10), 10e9, "Balance of test account is OK");
-
-  let contractAddress: string;
-
-  test("deploys contract via .json file", async (t2: Test) => {
-    const deployOut = await connector.deployContract({
-      keychainId: keychainPlugin.getKeychainId(),
-      contractName: HelloWorldContractJson.contractName,
+    await connector.transact({
       web3SigningCredential: {
         ethAccount: firstHighNetWorthAccount,
         secret: "",
         type: Web3SigningCredentialType.GethKeychainPassword,
       },
-      gas: 1000000,
-    });
-    t2.ok(deployOut, "deployContract() output is truthy OK");
-    t2.ok(
-      deployOut.transactionReceipt,
-      "deployContract() output.transactionReceipt is truthy OK",
-    );
-    t2.ok(
-      deployOut.transactionReceipt.contractAddress,
-      "deployContract() output.transactionReceipt.contractAddress is truthy OK",
-    );
-
-    contractAddress = deployOut.transactionReceipt.contractAddress as string;
-    t2.ok(
-      typeof contractAddress === "string",
-      "contractAddress typeof string OK",
-    );
-
-    const { callOutput: helloMsg } = await connector.getContractInfoKeychain({
-      contractName,
-      keychainId: keychainPlugin.getKeychainId(),
-      invocationType: EthContractInvocationType.Call,
-      methodName: "sayHello",
-      params: [],
-      web3SigningCredential: {
-        ethAccount: firstHighNetWorthAccount,
-        secret: "",
-        type: Web3SigningCredentialType.GethKeychainPassword,
+      transactionConfig: {
+        from: firstHighNetWorthAccount,
+        to: testEthAccount.address,
+        value: 10e9,
       },
     });
-    t2.ok(helloMsg, "sayHello() output is truthy");
-    t2.true(
-      typeof helloMsg === "string",
-      "sayHello() output is type of string",
-    );
-  });
 
-  test("invoke Web3SigningCredentialType.GETHKEYCHAINPASSWORD", async (t2: Test) => {
-    const newName = `DrCactus${uuidV4()}`;
-    const setNameOut = await connector.getContractInfoKeychain({
-      contractName,
-      keychainId: keychainPlugin.getKeychainId(),
-      invocationType: EthContractInvocationType.Send,
-      methodName: "setName",
-      params: [newName],
-      web3SigningCredential: {
-        ethAccount: firstHighNetWorthAccount,
-        secret: "",
-        type: Web3SigningCredentialType.GethKeychainPassword,
-      },
-      nonce: 2,
-    });
-    t2.ok(setNameOut, "setName() invocation #1 output is truthy OK");
+    const balance = await web3.eth.getBalance(testEthAccount.address);
+    expect(balance).toBeTruthy();
+    expect(parseInt(balance, 10)).toEqual(10e9);
+    let contractAddress: string;
 
-    try {
-      const setNameOutInvalid = await connector.getContractInfoKeychain({
+    {
+      const deployOut = await connector.deployContract({
+        keychainId: keychainPlugin.getKeychainId(),
+        contractName: HelloWorldContractJson.contractName,
+        web3SigningCredential: {
+          ethAccount: firstHighNetWorthAccount,
+          secret: "",
+          type: Web3SigningCredentialType.GethKeychainPassword,
+        },
+        gas: 1000000,
+      });
+      expect(deployOut).toBeTruthy();
+      expect(deployOut.transactionReceipt).toBeTruthy();
+      expect(deployOut.transactionReceipt.contractAddress).toBeTruthy();
+
+      contractAddress = deployOut.transactionReceipt.contractAddress as string;
+      expect(typeof contractAddress === "string").toBeTrue();
+
+      const { callOutput: helloMsg } = await connector.getContractInfoKeychain({
+        contractName,
+        keychainId: keychainPlugin.getKeychainId(),
+        invocationType: EthContractInvocationType.Call,
+        methodName: "sayHello",
+        params: [],
+        web3SigningCredential: {
+          ethAccount: firstHighNetWorthAccount,
+          secret: "",
+          type: Web3SigningCredentialType.GethKeychainPassword,
+        },
+      });
+      expect(helloMsg).toBeTruthy();
+      expect(typeof helloMsg === "string").toBeTrue();
+    }
+
+    {
+      const newName = `DrCactus${uuidV4()}`;
+      const setNameOut = await connector.getContractInfoKeychain({
         contractName,
         keychainId: keychainPlugin.getKeychainId(),
         invocationType: EthContractInvocationType.Send,
         methodName: "setName",
         params: [newName],
-        gas: 1000000,
         web3SigningCredential: {
           ethAccount: firstHighNetWorthAccount,
           secret: "",
@@ -175,31 +148,45 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
         },
         nonce: 2,
       });
-      t2.ifError(setNameOutInvalid.transactionReceipt);
-    } catch (error) {
-      t2.notStrictEqual(
-        error,
-        "Nonce too low",
-        "setName() invocation with invalid nonce",
-      );
-    }
+      expect(setNameOut).toBeTruthy();
 
-    const getNameOut = await connector.getContractInfoKeychain({
-      contractName,
-      keychainId: keychainPlugin.getKeychainId(),
-      invocationType: EthContractInvocationType.Send,
-      methodName: "getName",
-      params: [],
-      web3SigningCredential: {
-        ethAccount: firstHighNetWorthAccount,
-        secret: "",
-        type: Web3SigningCredentialType.GethKeychainPassword,
-      },
-    });
-    t2.ok(getNameOut.success, `getName() SEND invocation produced receipt OK`);
+      try {
+        const setNameOutInvalid = await connector.getContractInfoKeychain({
+          contractName,
+          keychainId: keychainPlugin.getKeychainId(),
+          invocationType: EthContractInvocationType.Send,
+          methodName: "setName",
+          params: [newName],
+          gas: 1000000,
+          web3SigningCredential: {
+            ethAccount: firstHighNetWorthAccount,
+            secret: "",
+            type: Web3SigningCredentialType.GethKeychainPassword,
+          },
+          nonce: 2,
+        });
+        expect(setNameOutInvalid.transactionReceipt).toBeFalsy();
+      } catch (error) {
+        expect(error.message).toMatch(/nonce too low/);
+      }
 
-    const { callOutput: getNameOut2 } = await connector.getContractInfoKeychain(
-      {
+      const getNameOut = await connector.getContractInfoKeychain({
+        contractName,
+        keychainId: keychainPlugin.getKeychainId(),
+        invocationType: EthContractInvocationType.Send,
+        methodName: "getName",
+        params: [],
+        web3SigningCredential: {
+          ethAccount: firstHighNetWorthAccount,
+          secret: "",
+          type: Web3SigningCredentialType.GethKeychainPassword,
+        },
+      });
+      expect(getNameOut.success).toBeTruthy();
+
+      const {
+        callOutput: getNameOut2,
+      } = await connector.getContractInfoKeychain({
         contractName,
         keychainId: keychainPlugin.getKeychainId(),
         invocationType: EthContractInvocationType.Call,
@@ -210,70 +197,44 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
           secret: "",
           type: Web3SigningCredentialType.GethKeychainPassword,
         },
-      },
-    );
-    t2.equal(
-      getNameOut2,
-      newName,
-      "setName() invocation #2 output is truthy OK",
-    );
+      });
+      expect(getNameOut2).toEqual(newName);
+    }
 
-    t2.end();
-  });
+    {
+      const testEthAccount2 = web3.eth.accounts.create(uuidV4());
+      const { rawTransaction } = await web3.eth.accounts.signTransaction(
+        {
+          from: testEthAccount.address,
+          to: testEthAccount2.address,
+          value: 10e6,
+          gas: 1000000,
+        },
+        testEthAccount.privateKey,
+      );
 
-  test("invoke Web3SigningCredentialType.NONE", async (t2: Test) => {
-    const testEthAccount2 = web3.eth.accounts.create(uuidV4());
+      await connector.transact({
+        web3SigningCredential: {
+          type: Web3SigningCredentialType.None,
+        },
+        transactionConfig: {
+          rawTransaction,
+        },
+      });
 
-    const { rawTransaction } = await web3.eth.accounts.signTransaction(
-      {
-        from: testEthAccount.address,
-        to: testEthAccount2.address,
-        value: 10e6,
-        gas: 1000000,
-      },
-      testEthAccount.privateKey,
-    );
+      const balance2 = await web3.eth.getBalance(testEthAccount2.address);
+      expect(balance2).toBeTruthy();
+      expect(parseInt(balance2, 10)).toEqual(10e6);
+    }
 
-    await connector.transact({
-      web3SigningCredential: {
-        type: Web3SigningCredentialType.None,
-      },
-      transactionConfig: {
-        rawTransaction,
-      },
-    });
-
-    const balance2 = await web3.eth.getBalance(testEthAccount2.address);
-    t2.ok(balance2, "Retrieved balance of test account 2 OK");
-    t2.equals(parseInt(balance2, 10), 10e6, "Balance of test account2 is OK");
-    t2.end();
-  });
-
-  test("invoke Web3SigningCredentialType.PrivateKeyHex", async (t2: Test) => {
-    const newName = `DrCactus${uuidV4()}`;
-    const setNameOut = await connector.getContractInfoKeychain({
-      contractName,
-      keychainId: keychainPlugin.getKeychainId(),
-      invocationType: EthContractInvocationType.Send,
-      methodName: "setName",
-      params: [newName],
-      web3SigningCredential: {
-        ethAccount: testEthAccount.address,
-        secret: testEthAccount.privateKey,
-        type: Web3SigningCredentialType.PrivateKeyHex,
-      },
-      nonce: 1,
-    });
-    t2.ok(setNameOut, "setName() invocation #1 output is truthy OK");
-
-    try {
-      const setNameOutInvalid = await connector.getContractInfoKeychain({
+    {
+      const newName = `DrCactus${uuidV4()}`;
+      const setNameOut = await connector.getContractInfoKeychain({
         contractName,
         keychainId: keychainPlugin.getKeychainId(),
         invocationType: EthContractInvocationType.Send,
         methodName: "setName",
         params: [newName],
-        gas: 1000000,
         web3SigningCredential: {
           ethAccount: testEthAccount.address,
           secret: testEthAccount.privateKey,
@@ -281,116 +242,124 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
         },
         nonce: 1,
       });
-      t2.ifError(setNameOutInvalid.transactionReceipt);
-    } catch (error) {
-      t2.notStrictEqual(
-        error,
-        "Nonce too low",
-        "setName() invocation with invalid nonce",
-      );
+      expect(setNameOut).toBeTruthy();
+
+      try {
+        const setNameOutInvalid = await connector.getContractInfoKeychain({
+          contractName,
+          keychainId: keychainPlugin.getKeychainId(),
+          invocationType: EthContractInvocationType.Send,
+          methodName: "setName",
+          params: [newName],
+          gas: 1000000,
+          web3SigningCredential: {
+            ethAccount: testEthAccount.address,
+            secret: testEthAccount.privateKey,
+            type: Web3SigningCredentialType.PrivateKeyHex,
+          },
+          nonce: 1,
+        });
+        expect(setNameOutInvalid.transactionReceipt).toBeFalsy();
+      } catch (error) {
+        expect(error.message).toMatch(/nonce too low/);
+      }
+      const {
+        callOutput: getNameOut,
+      } = await connector.getContractInfoKeychain({
+        contractName,
+        keychainId: keychainPlugin.getKeychainId(),
+        invocationType: EthContractInvocationType.Call,
+        methodName: "getName",
+        params: [],
+        gas: 1000000,
+        web3SigningCredential: {
+          ethAccount: testEthAccount.address,
+          secret: testEthAccount.privateKey,
+          type: Web3SigningCredentialType.PrivateKeyHex,
+        },
+      });
+      expect(getNameOut).toEqual(newName);
+
+      const getNameOut2 = await connector.getContractInfoKeychain({
+        contractName,
+        keychainId: keychainPlugin.getKeychainId(),
+        invocationType: EthContractInvocationType.Send,
+        methodName: "getName",
+        params: [],
+        gas: 1000000,
+        web3SigningCredential: {
+          ethAccount: testEthAccount.address,
+          secret: testEthAccount.privateKey,
+          type: Web3SigningCredentialType.PrivateKeyHex,
+        },
+      });
+      expect(getNameOut2).toBeTruthy();
     }
-    const { callOutput: getNameOut } = await connector.getContractInfoKeychain({
-      contractName,
-      keychainId: keychainPlugin.getKeychainId(),
-      invocationType: EthContractInvocationType.Call,
-      methodName: "getName",
-      params: [],
-      gas: 1000000,
-      web3SigningCredential: {
+
+    {
+      const newName = `DrCactus${uuidV4()}`;
+
+      const web3SigningCredential: Web3SigningCredentialCactusKeychainRef = {
         ethAccount: testEthAccount.address,
-        secret: testEthAccount.privateKey,
-        type: Web3SigningCredentialType.PrivateKeyHex,
-      },
-    });
-    t2.equal(getNameOut, newName, `getName() output reflects the update OK`);
+        keychainEntryKey,
+        keychainId: keychainPlugin.getKeychainId(),
+        type: Web3SigningCredentialType.CactusKeychainRef,
+      };
 
-    const getNameOut2 = await connector.getContractInfoKeychain({
-      contractName,
-      keychainId: keychainPlugin.getKeychainId(),
-      invocationType: EthContractInvocationType.Send,
-      methodName: "getName",
-      params: [],
-      gas: 1000000,
-      web3SigningCredential: {
-        ethAccount: testEthAccount.address,
-        secret: testEthAccount.privateKey,
-        type: Web3SigningCredentialType.PrivateKeyHex,
-      },
-    });
-    t2.ok(getNameOut2, "getName() invocation #2 output is truthy OK");
-
-    t2.end();
-  });
-
-  test("invoke Web3SigningCredentialType.CactusKeychainRef", async (t2: Test) => {
-    const newName = `DrCactus${uuidV4()}`;
-
-    const web3SigningCredential: Web3SigningCredentialCactusKeychainRef = {
-      ethAccount: testEthAccount.address,
-      keychainEntryKey,
-      keychainId: keychainPlugin.getKeychainId(),
-      type: Web3SigningCredentialType.CactusKeychainRef,
-    };
-
-    const setNameOut = await connector.getContractInfoKeychain({
-      contractName,
-      keychainId: keychainPlugin.getKeychainId(),
-      invocationType: EthContractInvocationType.Send,
-      methodName: "setName",
-      params: [newName],
-      gas: 1000000,
-      web3SigningCredential,
-      nonce: 3,
-    });
-    t2.ok(setNameOut, "setName() invocation #1 output is truthy OK");
-
-    try {
-      const setNameOutInvalid = await connector.getContractInfoKeychain({
+      const setNameOut = await connector.getContractInfoKeychain({
         contractName,
         keychainId: keychainPlugin.getKeychainId(),
         invocationType: EthContractInvocationType.Send,
         methodName: "setName",
         params: [newName],
         gas: 1000000,
-        web3SigningCredential: {
-          ethAccount: firstHighNetWorthAccount,
-          secret: "",
-          type: Web3SigningCredentialType.GethKeychainPassword,
-        },
+        web3SigningCredential,
         nonce: 3,
       });
-      t2.ifError(setNameOutInvalid.transactionReceipt);
-    } catch (error) {
-      t2.notStrictEqual(
-        error,
-        "Nonce too low",
-        "setName() invocation with invalid nonce",
-      );
+      expect(setNameOut).toBeTruthy();
+
+      try {
+        const setNameOutInvalid = await connector.getContractInfoKeychain({
+          contractName,
+          keychainId: keychainPlugin.getKeychainId(),
+          invocationType: EthContractInvocationType.Send,
+          methodName: "setName",
+          params: [newName],
+          gas: 1000000,
+          web3SigningCredential: {
+            ethAccount: firstHighNetWorthAccount,
+            secret: "",
+            type: Web3SigningCredentialType.GethKeychainPassword,
+          },
+          nonce: 3,
+        });
+        expect(setNameOutInvalid.transactionReceipt).toBeFalsy();
+      } catch (error) {
+        expect(error.message).toMatch(/nonce too low/);
+      }
+      const {
+        callOutput: getNameOut,
+      } = await connector.getContractInfoKeychain({
+        contractName,
+        keychainId: keychainPlugin.getKeychainId(),
+        invocationType: EthContractInvocationType.Call,
+        methodName: "getName",
+        params: [],
+        gas: 1000000,
+        web3SigningCredential,
+      });
+      expect(getNameOut).toEqual(newName);
+
+      const getNameOut2 = await connector.getContractInfoKeychain({
+        contractName,
+        keychainId: keychainPlugin.getKeychainId(),
+        invocationType: EthContractInvocationType.Send,
+        methodName: "getName",
+        params: [],
+        gas: 1000000,
+        web3SigningCredential,
+      });
+      expect(getNameOut2).toBeTruthy();
     }
-    const { callOutput: getNameOut } = await connector.getContractInfoKeychain({
-      contractName,
-      keychainId: keychainPlugin.getKeychainId(),
-      invocationType: EthContractInvocationType.Call,
-      methodName: "getName",
-      params: [],
-      gas: 1000000,
-      web3SigningCredential,
-    });
-    t2.equal(getNameOut, newName, `getName() output reflects the update OK`);
-
-    const getNameOut2 = await connector.getContractInfoKeychain({
-      contractName,
-      keychainId: keychainPlugin.getKeychainId(),
-      invocationType: EthContractInvocationType.Send,
-      methodName: "getName",
-      params: [],
-      gas: 1000000,
-      web3SigningCredential,
-    });
-    t2.ok(getNameOut2, "getName() invocation #2 output is truthy OK");
-
-    t2.end();
   });
-
-  t.end();
 });
