@@ -47,11 +47,11 @@ jobs:
         cp -r ../../../../../common/protos-go/* ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go*/
         ls -lh ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go*
         
-        go mod download github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt
+        go mod download github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange
         chmod +wr -R ${GOMODCACHE}
-        rm -rf ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt*/*
-        cp -r ../../../../../core/network/fabric-interop-cc/interfaces/asset-mgmt/* ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt*/
-        ls -lh ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt*
+        rm -rf ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange*/*
+        cp -r ../../../../../core/network/fabric-interop-cc/libs/assetexchange/* ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange*/
+        ls -lh ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange*
         
         go mod download github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils
         chmod +wr -R ${GOMODCACHE}
