@@ -66,10 +66,6 @@ class SHA256 implements Hash {
     }
 }
 
-class ECDLP {
-    
-}
-
 export {
     Hash,
     SHA256
