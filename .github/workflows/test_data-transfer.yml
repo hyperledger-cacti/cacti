@@ -42,13 +42,12 @@ jobs:
           node-version: 14.x
           
       # CORDA NETWORK
-      - name: Generate github.properties (on pull_request)
-        if: ${{ github.event_name == 'pull_request' }}
+      - name: Generate github.properties
         run: |
           echo "Using ${GITHUB_ACTOR} user."
           echo "username=${GITHUB_ACTOR}" >> github.properties
           echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.properties
-          echo "url=https://maven.pkg.github.com/${GITHUB_ACTOR}/weaver-dlt-interoperability" >> github.properties
+          echo "url=https://maven.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/weaver-dlt-interoperability" >> github.properties
           
           echo "Using ${GITHUB_ACTOR} user."
           echo "username=${GITHUB_ACTOR}" >> github.main.properties
@@ -57,16 +56,6 @@ jobs:
           
           ./scripts/get-cordapps.sh || mv github.main.properties github.properties
           
-          cat github.properties
-        working-directory: tests/network-setups/corda
- 
-      - name: Generate github.properties (else)
-        if: ${{ github.event_name != 'pull_request' }}
-        run: |
-          echo "Using ${GITHUB_ACTOR} user."
-          echo "username=${GITHUB_ACTOR}" >> github.properties
-          echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.properties
-          echo "url=https://maven.pkg.github.com/hyperledger-labs/weaver-dlt-interoperability" >> github.properties
           cat github.properties
         working-directory: tests/network-setups/corda
         
@@ -325,13 +314,12 @@ jobs:
         working-directory: sdks/fabric/interoperation-node-sdk
           
       # CORDA NETWORK
-      - name: Generate github.properties (on pull_request)
-        if: ${{ github.event_name == 'pull_request' }}
+      - name: Generate github.properties
         run: |
           echo "Using ${GITHUB_ACTOR} user."
           echo "username=${GITHUB_ACTOR}" >> github.properties
           echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.properties
-          echo "url=https://maven.pkg.github.com/${GITHUB_ACTOR}/weaver-dlt-interoperability" >> github.properties
+          echo "url=https://maven.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/weaver-dlt-interoperability" >> github.properties
           
           echo "Using ${GITHUB_ACTOR} user."
           echo "username=${GITHUB_ACTOR}" >> github.main.properties
@@ -341,17 +329,7 @@ jobs:
           ./scripts/get-cordapps.sh || mv github.main.properties github.properties
           
           cat github.properties
-        working-directory: tests/network-setups/corda
- 
-      - name: Generate github.properties (else)
-        if: ${{ github.event_name != 'pull_request' }}
-        run: |
-          echo "Using ${GITHUB_ACTOR} user."
-          echo "username=${GITHUB_ACTOR}" >> github.properties
-          echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.properties
-          echo "url=https://maven.pkg.github.com/hyperledger-labs/weaver-dlt-interoperability" >> github.properties
-          cat github.properties
-        working-directory: tests/network-setups/corda
+        working-directory: tests/network-setups/corda          
         
       - name: Start Corda Network
         run: |
