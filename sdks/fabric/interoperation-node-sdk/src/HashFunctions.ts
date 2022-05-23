@@ -24,11 +24,6 @@ interface Hash {
     setSerializedHashBase64(hash64: string): void;
     getSerializedHashBase64(): string;
 }
-// interface HashPreimage {
-//     HASH_NAME: string
-//     setPreimage(preimage: string): void;
-//     getPreimage(): string;
-// }
 
 /*
  * SHA256 Hash for HTLC, implementing above Hash Interface
