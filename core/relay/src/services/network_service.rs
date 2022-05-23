@@ -309,6 +309,7 @@ async fn data_transfer_call(
         requestor_signature: network_query.requestor_signature,
         nonce: network_query.nonce,
         request_id: request_id.to_string(),
+        confidential: network_query.confidential,
     });
     println!("Query: {:?}", query_request);
     let response = client.request_state(query_request).await?;

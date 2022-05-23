@@ -155,13 +155,17 @@ Examples of cross-network queries (via relays) are as follows (the last part of 
   ```bash
   ./bin/fabric-cli interop --local-network=network2 --sign=true --requesting-org=Org1MSP localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:H --debug=true
   ```
-- Both of the above examples assume an insecure (plaintext) gRPC connection with the local network's relay. If the relay is TLS-enabled, you will need to specify the server's LS CA certificates as follows:
+- Both of the above examples assume an insecure (plaintext) gRPC connection with the local network's relay. If the relay is TLS-enabled, you will need to specify the server's TLS CA certificates as follows:
   ```bash
   ./bin/fabric-cli interop --local-network=network1 --requesting-org=Org1MSP --relay-tls=true --relay-tls-ca-files=ca_cert.pem localhost:9083/network2/mychannel:simplestate:Read:Arcturus
   ./bin/fabric-cli interop --local-network=network1 --sign=true --requesting-org=Org1MSP --relay-tls=true --relay-tls-ca-files=ca_cert1.pem:ca_cert2.pem localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:H --debug=true
   ```
   * The `--relay-tls` switch indicates whether or not the local network relay requires a TLS connection
   * The `--relay-tls-ca-files` switch indicates the path to the relay server's TLS CA certificates. Specify a colon-separated list if there are more than one.
+- Fabric network `network1` requesting a view from Fabric network `network2` with the view contents confidential between the `network1` client and the `network2` peers
+  ```bash
+  ./bin/fabric-cli interop --local-network=network1 --requesting-org=Org1MSP --e2e-confidentiality=true localhost:9083/network2/mychannel:simplestate:Read:Arcturus
+  ```
 
 
 ## Asset Exchange

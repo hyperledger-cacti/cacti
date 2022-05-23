@@ -64,10 +64,9 @@ Prepare `fabric-cli` for configuration suitably as follows.
   ```bash
   ./bin/fabric-cli env set-file ./.env
   ```
-- _Note_: If you don't set the `CONFIG_PATH` environment variable in `.env` appropriately, then you should also run:
-  ```bash
-  ./bin/fabric-cli config set-file ./config.json
-  ```
+| Notes |
+|:------|
+| If the `CONFIG_PATH` environment variable is omitted from `.env`, then you must also run:<br/>```./bin/fabric-cli config set-file ./config.json``` |
 
 #### Bootstrapping Network and Application State
 
@@ -141,10 +140,9 @@ Prepare `fabric-cli` for configuration suitably as follows.
   ```bash
   ./bin/fabric-cli env set-file ./.env
   ```
-- _Note_: If you don't set the `CONFIG_PATH` environment variable in `.env` appropriately, then you should also run:
-  ```bash
-  ./bin/fabric-cli config set-file ./config.json
-  ```
+| Notes |
+|:------|
+| If the `CONFIG_PATH` environment variable is omitted from `.env`, then you must also run:<br/>```./bin/fabric-cli config set-file ./config.json``` |
 
 #### Bootstrapping Network and Application State
 
@@ -229,10 +227,9 @@ Prepare `fabric-cli` for configuration suitably as follows.
   ```
   ./bin/fabric-cli env set-file ./.env
   ```
-- _Note_: If you don't set the `CONFIG_PATH` environment variable in `.env` appropriately, then you should also run:
-  ```
-  ./bin/fabric-cli config set-file ./config.json
-  ```
+| Notes |
+|:------|
+| If the `CONFIG_PATH` environment variable is omitted from `.env`, then you must also run:<br/>```./bin/fabric-cli config set-file ./config.json``` |
 
 #### Bootstrapping Network and Application State
 

@@ -107,6 +107,13 @@ To Deploy the chaincode, follow the below steps.
    N1_PEER_PORT=XXXX network.sh ...
    ```
 
+   To instantiate the Fabric Interoperation Chaincode on a channel within either network,
+   specify the environment variable `E2E_CONFIDENTIALITY` as `true` in the command line.
+   For example:
+   ```
+   E2E_CONFIDENTIALITY=true make start-interop
+   ```
+
 ### Troubleshooting
    Incase of an abrupt shutdown of the network, chances are there to fail the susequent startup.
    This is due to the fact that remnants of previous network is still active in docker.

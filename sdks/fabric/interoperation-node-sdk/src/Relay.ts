@@ -74,6 +74,7 @@ class Relay {
         signature: string,
         nonce: string,
         org: string,
+        confidential: boolean,
     ): Promise<string> {
         try {
             const networkClient = new networksGrpcPb.NetworkClient(
@@ -97,6 +98,7 @@ class Relay {
             query.setRequestingRelay("");
             query.setRequestingNetwork(requestingNetwork);
             query.setRequestingOrg(org || "");
+            query.setConfidential(confidential || false);
             if (typeof requestState === "function") {
                 const [resp, error] = await helpers.handlePromise(requestState(query));
                 if (error) {
@@ -123,10 +125,11 @@ class Relay {
         signature: string,
         nonce: string,
         org: string,
+        confidential: boolean,
     ): Promise<any> {
         try {
             const [requestID, error] = await helpers.handlePromise(
-                this.SendRequest(address, policy, requestingNetwork, certificate, signature, nonce, org),
+                this.SendRequest(address, policy, requestingNetwork, certificate, signature, nonce, org, confidential),
             );
             if (error) {
                 throw new Error(`Request state error: ${error}`);

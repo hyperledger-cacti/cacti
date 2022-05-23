@@ -38,7 +38,9 @@ To ensure that the relay can connect to this driver:
 
 ### Network
 
-_Note_: Currently, all the Corda nodes must be running on the same machine (`localhost` or some other) for seamless communication.
+| Notes |
+|:------|
+| In our sample setup, all the Corda nodes must be running on the same machine (`localhost` or some other) for seamless communication. |
 
 To change the ports the Corda nodes are listening on, do the following:
 - Navigate to the `tests/network-setups/corda` folder.

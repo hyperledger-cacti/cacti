@@ -35,7 +35,7 @@ The RFC numbering convention is: `<type>:<id>`. The list of types (`<type>`) is 
 | 01-005 | Cross-Ledger Operations          | Model    | [Draft](./models/ledger/cross-ledger-operations.md)             |
 | 01-006 | Atomic Cross-Ledger Transactions | Model    | [Proposed](./models/ledger/atomic-cross-ledger-transactions.md) |
 | 01-007 | Security Domains                 | Model    | [Proposed](./models/security/security-domains.md)               |
-| 01-008 | End-to-End Confidentiality       | Model    | [Draft](./models/security/confidentiality.md)                   |
+| 01-008 | End-to-End Confidentiality       | Model    | [Proposed](./models/security/confidentiality.md)                |
 | 01-009 | Relays                           | Model    | [Proposed](./models/infrastructure/relays.md)                   |
 | 01-010 | Interoperation Modules           | Model    | [Proposed](./models/infrastructure/interoperation-modules.md)   |
 | 01-011 | Identity Management              | Model    | [Proposed](./models/identity/network-identity-management.md)    |

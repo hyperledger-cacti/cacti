@@ -26,6 +26,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         certificate: "test".to_string(),
         requestor_signature: "test".to_string(),
         nonce: "test".to_string(),
+        confidential: false,
     });
     let response = network_client.request_state(request).await?;
     println!("RESPONSE={:?}", response);
