@@ -312,6 +312,25 @@ jobs:
       - name: Build Fabric Interop SDK
         run: make build-local
         working-directory: sdks/fabric/interoperation-node-sdk
+        
+      # BUILD RELAY AND DRIVERS Image
+      - name: Build Relay Image
+        run: |
+          make build-server-local
+          sed -i "s#ghcr.io/hyperledger-labs/weaver-relay-server#weaver-relay-server#g" docker/testnet-envs/*
+        working-directory: core/relay
+        
+      - name: Build Fabric Driver Image
+        run: |
+          make build-image-local
+          sed -i "s#ghcr.io/hyperledger-labs/weaver-fabric-driver#weaver-fabric-driver#g" docker-testnet-envs/*
+        working-directory: core/drivers/fabric-driver
+        
+      - name: Build Corda Driver Image
+        run: |
+          make image-local
+          sed -i "s#ghcr.io/hyperledger-labs/weaver-corda-driver#weaver-corda-driver#g" docker-testnet-envs/*
+        working-directory: core/drivers/corda-driver
           
       # CORDA NETWORK
       - name: Generate github.properties
