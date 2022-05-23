@@ -437,6 +437,71 @@ func TestClaimAsset(t *testing.T) {
 	log.Info(fmt.Println("Test failed as expected with error:", err))
 }
 
+func TestHashSHA512(t *testing.T) {
+	ctx, chaincodeStub := wtest.PrepMockStub()
+	localCCId := "mycc"
+	wtest.SetMockStubCCId(chaincodeStub, localCCId)
+	interopcc := SmartContract{}
+
+	assetType := "bond"
+	assetId := "A001"
+	recipient := getTxCreatorECertBase64()
+	locker := "Alice"
+	preimage := "abcd"
+	hashBase64 := assetexchange.GenerateSHA512HashInBase64Form(preimage)
+	preimageBase64 := base64.StdEncoding.EncodeToString([]byte(preimage))
+	currentTimeSecs := uint64(time.Now().Unix())
+	chaincodeStub.GetCreatorReturns([]byte(getCreator()), nil)
+
+	assetAgreement := &common.AssetExchangeAgreement{
+		Type:      assetType,
+		Id:        assetId,
+		Recipient: recipient,
+		Locker:    locker,
+	}
+	assetAgreementBytes, _ := proto.Marshal(assetAgreement)
+
+	var hashLock interface{}
+	hashLock = assetexchange.HashLock{HashMechanism: common.HashMechanism_SHA512, HashBase64: hashBase64}
+	assetLockVal := assetexchange.AssetLockValue{Locker: locker, Recipient: recipient, LockInfo: hashLock, ExpiryTimeSecs: currentTimeSecs + defaultTimeLockSecs}
+	assetLockValBytes, _ := json.Marshal(assetLockVal)
+	chaincodeStub.GetStateReturnsOnCall(0, assetLockValBytes, nil)
+
+	// Test failure with hash mechanism not specified properly
+	wrongClaimInfoHTLC := &common.AssetClaimHTLC{
+		HashMechanism: common.HashMechanism_SHA256,
+		HashPreimageBase64: []byte(preimageBase64),
+	}
+	wrongClaimInfoHTLCBytes, _ := proto.Marshal(wrongClaimInfoHTLC)
+	wrongClaimInfo := &common.AssetClaim{
+		LockMechanism: common.LockMechanism_HTLC,
+		ClaimInfo:     wrongClaimInfoHTLCBytes,
+	}
+	wrongClaimInfoBytes, _ := proto.Marshal(wrongClaimInfo)
+
+	err := interopcc.ClaimAsset(ctx, base64.StdEncoding.EncodeToString(assetAgreementBytes), base64.StdEncoding.EncodeToString(wrongClaimInfoBytes))
+	require.Error(t, err)
+	require.EqualError(t, err, "claim asset of type bond and ID " + assetId + " error: hash mechanism used while locking is different from the one supplied: 0")
+	log.Info(fmt.Println("Test failed as expected with error:", err))
+
+	// Test success with hash mechanism specified properly
+	chaincodeStub.GetStateReturnsOnCall(1, assetLockValBytes, nil)
+	claimInfoHTLC := &common.AssetClaimHTLC{
+		HashMechanism: common.HashMechanism_SHA512,
+		HashPreimageBase64: []byte(preimageBase64),
+	}
+	claimInfoHTLCBytes, _ := proto.Marshal(claimInfoHTLC)
+	claimInfo := &common.AssetClaim{
+		LockMechanism: common.LockMechanism_HTLC,
+		ClaimInfo:     claimInfoHTLCBytes,
+	}
+	claimInfoBytes, _ := proto.Marshal(claimInfo)
+
+	err = interopcc.ClaimAsset(ctx, base64.StdEncoding.EncodeToString(assetAgreementBytes), base64.StdEncoding.EncodeToString(claimInfoBytes))
+	require.NoError(t, err)
+	log.Info(fmt.Println("Test success as expected since the hash mechanism is specified properly."))
+}
+
 func TestUnlockAssetUsingContractId(t *testing.T) {
 	ctx, chaincodeStub := wtest.PrepMockStub()
 	localCCId := "mycc"
