@@ -971,8 +971,9 @@ func TestAssetClaim(t *testing.T) {
     recipient := "Bob"
     locker := clientId
     hash := []byte("MBQGA1UEBxMNU2FuIEZyYW5jaXNjbzEPMA0GA1UECxMGY2xpZW50MSQwIgYDVQQD")
-    hashPreimage := []byte("YW5jaXNjbzEeMBwGA1UE")
+    hashPreimage := []byte("YW5jaXNjbzEeMBwGA1UE" + "dummy")
     claimInfoHTLC := &common.AssetClaimHTLC {
+        HashMechanism: common.HashMechanism_SHA512,
         HashPreimageBase64: nil,
     }
     claimInfoBytes, _ := proto.Marshal(claimInfoHTLC)
@@ -1041,6 +1042,7 @@ func TestAssetClaim(t *testing.T) {
     // Test success
     // First, lock an asset
     lockInfoHTLC := &common.AssetLockHTLC {
+        HashMechanism: common.HashMechanism_SHA512,
         HashBase64: hash,
         ExpiryTimeSecs: 0,
     }
