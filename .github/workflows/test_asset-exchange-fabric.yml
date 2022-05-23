@@ -137,13 +137,18 @@ jobs:
       # Use local InteropCC as Remote with go.mod instead of go.mod.local
       - name: Setup interopcc
         run: |
-          GOMODCACHE=`go env GOMODCACHE`
-          echo "GO MOD Path: ${GOMODCACHE}"
+          TMP_PATH=../../../tests/network-setups/fabric/shared/tmp
+          mkdir -p $TMP_PATH
+          OLD_GOPATH=$GOPATH
+          export GOPATH=$TMP_PATH
+          echo "GO Path: ${GOPATH}"
           go get -d github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop
-          chmod +wr -R ${GOMODCACHE}
-          rm -rf ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop*/*
-          cp -r contracts/interop/* ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop*/
-          ls -lh ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop*
+          chmod +wr -R $TMP_PATH/pkg/mod
+          ls -lh $TMP_PATH/pkg/mod/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts
+          rm -rf $TMP_PATH/pkg/mod/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop*/*
+          cp -r contracts/interop/* $TMP_PATH/pkg/mod/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop*/
+          ls -lh $TMP_PATH/pkg/mod/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop*
+          export GOPATH=$OLD_GOPATH
         working-directory: core/network/fabric-interop-cc
       
       - name: Setup Simpleasset
