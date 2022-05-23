@@ -137,7 +137,7 @@ jobs:
       # Use local InteropCC as Remote with go.mod instead of go.mod.local
       - name: Setup interopcc
         run: |
-          TMP_PATH=../../../tests/network-setups/fabric/shared/tmp
+          TMP_PATH=$PWD/../../../tests/network-setups/fabric/shared/tmp
           mkdir -p $TMP_PATH
           OLD_GOPATH=$GOPATH
           export GOPATH=$TMP_PATH
