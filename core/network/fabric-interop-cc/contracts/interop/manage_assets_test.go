@@ -502,6 +502,100 @@ func TestHashSHA512(t *testing.T) {
 	log.Info(fmt.Println("Test success as expected since the hash mechanism is specified properly."))
 }
 
+func TestGetHTLCHash(t *testing.T) {
+	ctx, chaincodeStub := wtest.PrepMockStub()
+	localCCId := "mycc"
+	wtest.SetMockStubCCId(chaincodeStub, localCCId)
+	interopcc := SmartContract{}
+
+	assetType := "bond"
+	assetId := "A001"
+	recipient := getTxCreatorECertBase64()
+	locker := "Alice"
+	preimage := "abcd"
+	hashBase64 := assetexchange.GenerateSHA512HashInBase64Form(preimage)
+	currentTimeSecs := uint64(time.Now().Unix())
+	chaincodeStub.GetCreatorReturns([]byte(getCreator()), nil)
+
+	assetAgreement := &common.AssetExchangeAgreement{
+		Type:      assetType,
+		Id:        assetId,
+		Recipient: recipient,
+		Locker:    locker,
+	}
+	assetAgreementBytes, _ := proto.Marshal(assetAgreement)
+
+	hashLock := assetexchange.HashLock{HashMechanism: common.HashMechanism_SHA512, HashBase64: hashBase64}
+	assetLockVal := assetexchange.AssetLockValue{Locker: locker, Recipient: recipient, LockInfo: hashLock, ExpiryTimeSecs: currentTimeSecs + defaultTimeLockSecs}
+	assetLockValBytes, _ := json.Marshal(assetLockVal)
+
+	// Test failure with no associated asset that is already locked
+	chaincodeStub.GetStateReturnsOnCall(0, nil, nil)
+
+	retVal, err := interopcc.GetHTLCHash(ctx, localCCId, base64.StdEncoding.EncodeToString(assetAgreementBytes))
+	require.Error(t, err)
+	require.EqualError(t, err, "no asset of type " + assetType + " and ID " + assetId + " is locked")
+	log.Info(fmt.Println("Test failed as expected with error:", err))
+
+	// Test success querying an asset that is already locked
+	chaincodeStub.GetStateReturnsOnCall(1, assetLockValBytes, nil)
+
+	retVal, err = interopcc.GetHTLCHash(ctx, localCCId, base64.StdEncoding.EncodeToString(assetAgreementBytes))
+	require.NoError(t, err)
+	log.Info(fmt.Println("retVal: ", retVal))
+	lockInfoVal := assetexchange.HashLock{}
+	_ = json.Unmarshal([]byte(retVal), &lockInfoVal)
+	require.Equal(t, lockInfoVal.HashMechanism, hashLock.HashMechanism)
+	require.Equal(t, lockInfoVal.HashBase64, hashLock.HashBase64)
+	log.Info(fmt.Println("Test success as expected since querying an asset that is already locked."))
+}
+
+func TestGetHTLCHashByContractId(t *testing.T) {
+	ctx, chaincodeStub := wtest.PrepMockStub()
+	localCCId := "mycc"
+	wtest.SetMockStubCCId(chaincodeStub, localCCId)
+	interopcc := SmartContract{}
+
+	assetType := "cbdc"
+	numUnits := uint64(10)
+	locker := "Alice"
+	recipient := "Bob"
+	preimage := "abcd"
+
+	hashBase64 := assetexchange.GenerateSHA256HashInBase64Form(preimage)
+	currentTimeSecs := uint64(time.Now().Unix())
+
+	assetAgreement := &common.FungibleAssetExchangeAgreement{
+		Type:      assetType,
+		NumUnits:  numUnits,
+		Locker:    locker,
+		Recipient: recipient,
+	}
+	contractId := assetexchange.GenerateFungibleAssetLockContractId(ctx, localCCId, assetAgreement)
+
+	// Test failure with no associated asset that is already locked
+	chaincodeStub.GetStateReturnsOnCall(0, nil, nil)
+	_, err := interopcc.GetHTLCHashByContractId(ctx, contractId)
+	require.Error(t, err)
+	require.EqualError(t, err, "contractId " + contractId + " is not associated with any currently locked fungible asset")
+	fmt.Printf("Test failed as expected with error: %s\n", err)
+
+	// Test success querying an asset that is already locked
+	hashLock := assetexchange.HashLock{HashMechanism: common.HashMechanism_SHA256, HashBase64: hashBase64}
+	assetLockVal := assetexchange.FungibleAssetLockValue{Type: assetType, NumUnits: numUnits, Locker: locker, Recipient: recipient,
+		LockInfo: hashLock, ExpiryTimeSecs: currentTimeSecs + defaultTimeLockSecs}
+	assetLockValBytes, _ := json.Marshal(assetLockVal)
+	chaincodeStub.GetStateReturnsOnCall(1, assetLockValBytes, nil)
+	retVal, err := interopcc.GetHTLCHashByContractId(ctx, contractId)
+	require.NoError(t, err)
+	log.Info(fmt.Println("retVal: ", retVal))
+	lockInfoVal := assetexchange.HashLock{}
+	_ = json.Unmarshal([]byte(retVal), &lockInfoVal)
+	require.Equal(t, lockInfoVal.HashMechanism, hashLock.HashMechanism)
+	require.Equal(t, lockInfoVal.HashBase64, hashLock.HashBase64)
+	log.Info(fmt.Println("Test success as expected since querying an asset that is already locked."))
+}
+
 func TestUnlockAssetUsingContractId(t *testing.T) {
 	ctx, chaincodeStub := wtest.PrepMockStub()
 	localCCId := "mycc"
