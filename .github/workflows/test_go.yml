@@ -103,6 +103,7 @@ jobs:
       working-directory: core/network/fabric-interop-cc/contracts/interop
 
   test_assetmgmt:
+    if: ${{ false }}  # disable for now
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
