@@ -19,7 +19,7 @@ const features = [
     description: (
       <>
 		  Weaver is designed to be agnostic to the underlying distributed ledger
-		  protocol and is based on as set of standard specifications.
+		  protocol and is based on a set of standard specifications.
       </>
     ),
   },

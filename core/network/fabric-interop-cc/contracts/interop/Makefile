@@ -1,7 +1,7 @@
 assetexchange:
 	cp -r ../../libs .
 test-manage-assets: assetexchange
-	go test manage_assets.go manage_assets_test.go main.go setup_test.go -v
+	go test manage_assets.go manage_assets_test.go main.go -v
 clean:
 	rm -rf libs protos-go
 build-local:
