@@ -42,7 +42,7 @@ function createFungibleAssetExchangeAgreementSerialized(assetType, numUnits, rec
 }
 
 // Create an asset lock structure
-function createAssetLockInfoSerialized(hash: Hash, expiryTimeSecs)
+function createAssetLockInfoSerialized(hash, expiryTimeSecs)
 {
     const lockInfoHTLC = new assetLocksPb.AssetLockHTLC();
     lockInfoHTLC.setHashmechanism(hash.HASH_MECHANISM);
@@ -57,7 +57,7 @@ function createAssetLockInfoSerialized(hash: Hash, expiryTimeSecs)
 }
 
 // Create an asset claim structure
-function createAssetClaimInfoSerialized(hash: Hash)
+function createAssetClaimInfoSerialized(hash)
 {
     const claimInfoHTLC = new assetLocksPb.AssetClaimHTLC();
     claimInfoHTLC.setHashmechanism(hash.HASH_MECHANISM);
@@ -110,7 +110,7 @@ const createHTLC = async (
         return { hash: null, result: false };
     }
     
-    if (hash == null || !hash.HASH_MECHANISM) {
+    if (hash == null) {
         hash = new SHA256()
     }
     if (hash.hash64 == null) {
@@ -178,7 +178,7 @@ const createFungibleHTLC = async (
         return { hash: null, result: "" };
     }
     
-    if (!hash || !hash.HASH_MECHANISM) {
+    if (!hash) {
         hash = new SHA256()
     }
     if (hash.hash64 == null) {
@@ -237,7 +237,7 @@ const claimAssetInHTLC = async (
         logger.error("Locker ECert not supplied");
         return false;
     }
-    if(!hash || !hash.HASH_MECHANISM)
+    if(!hash)
     {
         logger.error("Instance of Hash interface not supplied")
         return false
@@ -281,7 +281,7 @@ const claimAssetInHTLCusingContractId = async (
         logger.error("contract ID not supplied");
         return false;
     }
-    if(!hash || !hash.HASH_MECHANISM)
+    if(!hash)
     {
         logger.error("Instance of Hash interface not supplied")
         return false
@@ -325,7 +325,7 @@ const claimFungibleAssetInHTLC = async (
         logger.error("contract ID not supplied");
         return false;
     }
-    if(!hash || !hash.HASH_MECHANISM)
+    if(!hash)
     {
         logger.error("Instance of Hash interface not supplied")
         return false

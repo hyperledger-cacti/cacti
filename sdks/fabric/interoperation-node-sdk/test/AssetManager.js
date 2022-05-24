@@ -110,7 +110,7 @@ describe("AssetManager", () => {
             const hash = new hashFunctions.SHA256()
             hash.setSerializedHashBase64(hashValue)
             let expiryTimeSecs = Math.floor(Date.now()/1000) + 300;   // Convert epoch milliseconds to seconds and add 5 minutes
-            let lockInfoStr = assetManager.createAssetLockInfoSerialized(hashValue, expiryTimeSecs);
+            let lockInfoStr = assetManager.createAssetLockInfoSerialized(hash, expiryTimeSecs);
             amcStub.withArgs("LockAsset", assetAgreementStr, lockInfoStr).resolves(true);
             let assetLockInvocation = await assetManager.createHTLC(amc, assetType, assetID, recipientECert, hash, expiryTimeSecs);
             expect(assetLockInvocation).to.be.an('object').that.has.all.keys('hash', 'result');
@@ -202,7 +202,7 @@ describe("AssetManager", () => {
             const hash = new hashFunctions.SHA256()
             hash.setSerializedHashBase64(hashValue)
             let expiryTimeSecs = Math.floor(Date.now()/1000) + 300;   // Convert epoch milliseconds to seconds and add 5 minutes
-            let lockInfoStr = assetManager.createAssetLockInfoSerialized(hashValue, expiryTimeSecs);
+            let lockInfoStr = assetManager.createAssetLockInfoSerialized(hash, expiryTimeSecs);
             const contractId = "CONTRACT-1234";
             amcStub.withArgs("LockFungibleAsset", assetAgreementStr, lockInfoStr).resolves(contractId);
             let assetLockInvocation = await assetManager.createFungibleHTLC(amc, fungibleAssetType, numUnits, recipientECert, hash, expiryTimeSecs);
@@ -282,7 +282,7 @@ describe("AssetManager", () => {
 
         it("submit asset claim invocation", async () => {
             let assetAgreementStr = assetManager.createAssetExchangeAgreementSerialized(assetType, assetID, "", lockerECert);
-            let claimInfoStr = assetManager.createAssetClaimInfoSerialized(hash.getSerializedPreimageBase64());
+            let claimInfoStr = assetManager.createAssetClaimInfoSerialized(hash);
             amcStub.withArgs("ClaimAsset", assetAgreementStr, claimInfoStr).resolves(true);
             let assetClaimInvocation = await assetManager.claimAssetInHTLC(amc, assetType, assetID, lockerECert, hash);
             expect(assetClaimInvocation).to.be.a('boolean');
@@ -314,7 +314,7 @@ describe("AssetManager", () => {
         });
 
         it("submit asset claim invocation", async () => {
-            let claimInfoStr = assetManager.createAssetClaimInfoSerialized(hash.getSerializedPreimageBase64());
+            let claimInfoStr = assetManager.createAssetClaimInfoSerialized(hash);
             amcStub.withArgs("ClaimAssetUsingContractId", contractId, claimInfoStr).resolves(true);
             let assetClaimInvocation = await assetManager.claimAssetInHTLCusingContractId(amc, contractId, hash);
             expect(assetClaimInvocation).to.be.a('boolean');
@@ -346,7 +346,7 @@ describe("AssetManager", () => {
         });
 
         it("submit asset claim invocation", async () => {
-            let claimInfoStr = assetManager.createAssetClaimInfoSerialized(hash.getSerializedPreimageBase64());
+            let claimInfoStr = assetManager.createAssetClaimInfoSerialized(hash);
             amcStub.withArgs("ClaimFungibleAsset", contractId, claimInfoStr).resolves(true);
             let assetClaimInvocation = await assetManager.claimFungibleAssetInHTLC(amc, contractId, hash);
             expect(assetClaimInvocation).to.be.a('boolean');
