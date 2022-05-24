@@ -10,6 +10,7 @@ package assetexchange
 
 import (
 	"crypto/sha256"
+	"crypto/sha512"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
@@ -26,6 +27,7 @@ import (
 
 // Object used to capture the HashLock details used in Asset Locking
 type HashLock struct {
+	HashMechanism common.HashMechanism `json:"hashMechanism"`
 	HashBase64 string `json:"hashBase64"`
 }
 
@@ -71,6 +73,15 @@ func GenerateSHA256HashInBase64Form(preimage string) string {
 	return shaHashBase64
 }
 
+// function to generate a "SHA512" hash in base64 format for a given preimage
+func GenerateSHA512HashInBase64Form(preimage string) string {
+	hasher := sha512.New()
+	hasher.Write([]byte(preimage))
+	shaHash := hasher.Sum(nil)
+	shaHashBase64 := base64.StdEncoding.EncodeToString(shaHash)
+	return shaHashBase64
+}
+
 // function to return the key to fetch an element from the map using contractId
 func generateContractIdMapKey(contractId string) string {
 	return contractIdPrefix + contractId
@@ -90,7 +101,7 @@ func GenerateAssetLockKeyAndContractId(ctx contractapi.TransactionContextInterfa
 		return "", "", logThenErrorf("error while creating composite key: %+v", err)
 	}
 
-	contractId := GenerateSHA256HashInBase64Form(assetLockKey)
+	contractId := GenerateSHA256HashInBase64Form(assetLockKey + ctx.GetStub().GetTxID())
 	return assetLockKey, contractId, nil
 }
 /*
@@ -112,7 +123,7 @@ func GenerateClaimAssetLockKey(ctx contractapi.TransactionContextInterface, chai
 func GenerateFungibleAssetLockContractId(ctx contractapi.TransactionContextInterface, chaincodeId string, assetAgreement *common.FungibleAssetExchangeAgreement) string {
 	preimage := chaincodeId + assetAgreement.Type + strconv.Itoa(int(assetAgreement.NumUnits)) +
 		assetAgreement.Locker + assetAgreement.Recipient + ctx.GetStub().GetTxID()
-	contractId := GenerateSHA256HashInBase64Form(preimage)
+	contractId := GenerateSHA256HashInBase64Form(preimage + ctx.GetStub().GetTxID())
 	return contractId
 }
 
@@ -217,7 +228,7 @@ func getLockInfoAndExpiryTimeSecs(lockInfoBytesBase64 string) (interface{}, uint
 		}
 		//display the passed hash lock information
 		log.Infof("lockInfoHTLC: %+v", lockInfoHTLC)
-		lockInfoVal = HashLock{HashBase64: string(lockInfoHTLC.HashBase64)}
+		lockInfoVal = HashLock{HashMechanism: lockInfoHTLC.HashMechanism, HashBase64: string(lockInfoHTLC.HashBase64)}
 		// process time lock details here
 		if lockInfoHTLC.TimeSpec != common.AssetLockHTLC_EPOCH {
 			return lockInfoVal, 0, logThenErrorf("only EPOCH time is supported at present")
@@ -417,14 +428,22 @@ func IsAssetLocked(ctx contractapi.TransactionContextInterface, callerChaincodeI
  * Function to check if hashBase64 is the hash for the preimage preimageBase64.
  * Both the preimage and hash are passed in base64 form.
  */
-func checkIfCorrectPreimage(preimageBase64 string, hashBase64 string) (bool, error) {
+func checkIfCorrectPreimage(preimageBase64 string, hashBase64 string, hashMechanism common.HashMechanism) (bool, error) {
 	funName := "checkIfCorrectPreimage"
 	preimage, err := base64.StdEncoding.DecodeString(preimageBase64)
 	if err != nil {
 		return false, logThenErrorf("base64 decode preimage error: %s", err)
 	}
 
-	shaHashBase64 := GenerateSHA256HashInBase64Form(string(preimage))
+	shaHashBase64 := ""
+	if hashMechanism == common.HashMechanism_SHA256 {
+		shaHashBase64 = GenerateSHA256HashInBase64Form(string(preimage))
+	} else if hashMechanism == common.HashMechanism_SHA512 {
+		shaHashBase64 = GenerateSHA512HashInBase64Form(string(preimage))
+	} else {
+		log.Infof("hashMechanism %d is not supported currently", hashMechanism)
+		return false, nil
+	}
 	if shaHashBase64 == hashBase64 {
 		log.Infof("%s: preimage %s is passed correctly", funName, preimage)
 	} else {
@@ -453,8 +472,12 @@ func validateHashPreimage(claimInfo *common.AssetClaim, lockInfo interface{}) (b
 	}
 	log.Infof("HashLock: %+v\n", lockInfoVal)
 
+	if lockInfoVal.HashMechanism != claimInfoHTLC.HashMechanism {
+		return false, logThenErrorf("hash mechanism used while locking is different from the one supplied: %d", claimInfoHTLC.HashMechanism)
+	}
+
 	// match the hash passed during claim with the hash stored during asset locking
-	return checkIfCorrectPreimage(string(claimInfoHTLC.HashPreimageBase64), lockInfoVal.HashBase64)
+	return checkIfCorrectPreimage(string(claimInfoHTLC.HashPreimageBase64), lockInfoVal.HashBase64, lockInfoVal.HashMechanism)
 }
 
 // fetches common.AssetClaim from the input parameter and checks if the lock mechanism is valid or not
@@ -542,7 +565,7 @@ func ClaimAsset(ctx contractapi.TransactionContextInterface, callerChaincodeID, 
 		if !isCorrectPreimage {
 			return "", logThenErrorf("cannot claim asset of type %s and ID %s as the hash preimage is not matching", assetAgreement.Type, assetAgreement.Id)
 		}
-		
+
 		// Record Hash Preimage into ledger
 		claimInfoHTLC := &common.AssetClaimHTLC{}
 		err = proto.Unmarshal(claimInfo.ClaimInfo, claimInfoHTLC)
@@ -679,7 +702,7 @@ func ClaimAssetUsingContractId(ctx contractapi.TransactionContextInterface, cont
 		if !isCorrectPreimage {
 			return logThenErrorf("cannot claim asset associated with contractId %s as the hash preimage is not matching", contractId)
 		}
-		
+
 		// Write HashPreimage to the ledger
 		claimInfoHTLC := &common.AssetClaimHTLC{}
 		err = proto.Unmarshal(claimInfo.ClaimInfo, claimInfoHTLC)
@@ -853,7 +876,7 @@ func ClaimFungibleAsset(ctx contractapi.TransactionContextInterface, contractId,
 		if !isCorrectPreimage {
 			return logThenErrorf("cannot claim fungible asset associated with contractId %s as the hash preimage is not matching", contractId)
 		}
-		
+
 		// Write HashPreimage to the ledger
 		claimInfoHTLC := &common.AssetClaimHTLC{}
 		err = proto.Unmarshal(claimInfo.ClaimInfo, claimInfoHTLC)
@@ -941,7 +964,7 @@ func GetHTLCHash(ctx contractapi.TransactionContextInterface, callerChaincodeID,
 		return "", logThenErrorf("unmarshal error: %s", err)
 	}
 	log.Infof("assetLockVal: %+v", assetLockVal)
-	
+
 	return getHTLCHashHelper(ctx, assetLockVal.LockInfo)
 }
 
@@ -950,7 +973,7 @@ func GetHTLCHashByContractId(ctx contractapi.TransactionContextInterface, contra
 	if err != nil {
 		return "", logThenErrorf(err.Error())
 	}
-	
+
 	return getHTLCHashHelper(ctx, assetLockVal.LockInfo)
 }
 
@@ -967,12 +990,12 @@ func GetHTLCHashPreImage(ctx contractapi.TransactionContextInterface, callerChai
 	}
 	//display the requested asset agreement
 	log.Infof("assetExchangeAgreement: %+v", assetAgreement)
-	
+
 	claimAssetLockKey, err := GenerateClaimAssetLockKey(ctx, callerChaincodeID, assetAgreement)
 	if err != nil {
 		return "", logThenErrorf(err.Error())
 	}
-	
+
 	return getHashPreImageHelper(ctx, claimAssetLockKey)
 }
 
@@ -990,8 +1013,8 @@ func getHTLCHashHelper(ctx contractapi.TransactionContextInterface, lockInfo int
 	if err != nil {
 		return "", logThenErrorf("unmarshal lockInfoBytes error: %s", err)
 	}
-	
-	return lockInfoVal.HashBase64, nil
+
+	return string(lockInfoBytes), nil
 }
 
 func getHashPreImageHelper(ctx contractapi.TransactionContextInterface, key string) (string, error) {
@@ -1003,6 +1026,6 @@ func getHashPreImageHelper(ctx contractapi.TransactionContextInterface, key stri
 	if hashPreImageBase64Bytes == nil {
 		return "", logThenErrorf("key %s is not associated with any claimed asset", key)
 	}
-	
+
 	return string(hashPreImageBase64Bytes), nil
 }

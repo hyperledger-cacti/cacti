@@ -19,18 +19,25 @@ message AssetClaim {
   bytes claimInfo = 2;
 }
 
+enum HashMechanism {
+  SHA256 = 0;
+  SHA512 = 1;
+}
+
 message AssetLockHTLC {
-  bytes hashBase64 = 1;
-  uint64 expiryTimeSecs = 2;
+  HashMechanism hashMechanism = 1;
+  bytes hashBase64 = 2;
+  uint64 expiryTimeSecs = 3;
   enum TimeSpec {
     EPOCH = 0;
     DURATION = 1;
   }
-  TimeSpec timeSpec = 3;
+  TimeSpec timeSpec = 4;
 }
 
 message AssetClaimHTLC {
-  bytes hashPreimageBase64 = 1;
+  HashMechanism hashMechanism = 1;
+  bytes hashPreimageBase64 = 2;
 }
 
 message AssetExchangeAgreement {
