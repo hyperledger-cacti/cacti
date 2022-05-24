@@ -42,10 +42,11 @@ function createFungibleAssetExchangeAgreementSerialized(assetType, numUnits, rec
 }
 
 // Create an asset lock structure
-function createAssetLockInfoSerialized(hashValue, expiryTimeSecs)
+function createAssetLockInfoSerialized(hash: Hash, expiryTimeSecs)
 {
     const lockInfoHTLC = new assetLocksPb.AssetLockHTLC();
-    lockInfoHTLC.setHashbase64(Buffer.from(hashValue));
+    lockInfoHTLC.setHashmechanism(hash.HASH_MECHANISM);
+    lockInfoHTLC.setHashbase64(Buffer.from(hash.getSerializedHashBase64()));
     lockInfoHTLC.setExpirytimesecs(expiryTimeSecs);
     lockInfoHTLC.setTimespec(assetLocksPb.AssetLockHTLC.TimeSpec.EPOCH)
     const lockInfoHTLCSerialized = lockInfoHTLC.serializeBinary();
@@ -56,23 +57,17 @@ function createAssetLockInfoSerialized(hashValue, expiryTimeSecs)
 }
 
 // Create an asset claim structure
-function createAssetClaimInfoSerialized(hashPreimageBase64)
+function createAssetClaimInfoSerialized(hash: Hash)
 {
     const claimInfoHTLC = new assetLocksPb.AssetClaimHTLC();
-    claimInfoHTLC.setHashpreimagebase64(Buffer.from(hashPreimageBase64));
+    claimInfoHTLC.setHashmechanism(hash.HASH_MECHANISM);
+    claimInfoHTLC.setHashpreimagebase64(Buffer.from(hash.getSerializedPreimageBase64()));
     const claimInfoHTLCSerialized = claimInfoHTLC.serializeBinary();
     const claimInfo = new assetLocksPb.AssetClaim();
     claimInfo.setLockmechanism(assetLocksPb.LockMechanism.HTLC);
     claimInfo.setClaiminfo(claimInfoHTLCSerialized);
     return Buffer.from(claimInfo.serializeBinary()).toString('base64');
 }
-
-// Create a SHA-256 hash over an ASCII string
-function createSHA256HashBase64(preimage: string)
-{
-    return crypto.createHash('sha256').update(preimage).digest('base64');
-}
-
 
 /**
  * First/second step of a Hashed Time Lock Contract
@@ -115,7 +110,7 @@ const createHTLC = async (
         return { hash: null, result: false };
     }
     
-    if (hash == null || !hash.HASH_NAME) {
+    if (hash == null || !hash.HASH_MECHANISM) {
         hash = new SHA256()
     }
     if (hash.hash64 == null) {
@@ -123,7 +118,7 @@ const createHTLC = async (
     }
 
     const assetExchangeAgreementStr = createAssetExchangeAgreementSerialized(assetType, assetID, recipientECert, "");
-    const lockInfoStr = createAssetLockInfoSerialized(hash.getSerializedHashBase64(), expiryTimeSecs);
+    const lockInfoStr = createAssetLockInfoSerialized(hash, expiryTimeSecs);
 
     // Normal invoke function
     const [result, submitError] = await helpers.handlePromise(
@@ -183,7 +178,7 @@ const createFungibleHTLC = async (
         return { hash: null, result: "" };
     }
     
-    if (!hash || !hash.HASH_NAME) {
+    if (!hash || !hash.HASH_MECHANISM) {
         hash = new SHA256()
     }
     if (hash.hash64 == null) {
@@ -191,7 +186,7 @@ const createFungibleHTLC = async (
     }
 
     const assetExchangeAgreementStr = createFungibleAssetExchangeAgreementSerialized(assetType, numUnits, recipientECert, "");
-    const lockInfoStr = createAssetLockInfoSerialized(hash.getSerializedHashBase64(), expiryTimeSecs);
+    const lockInfoStr = createAssetLockInfoSerialized(hash, expiryTimeSecs);
 
     // Normal invoke function
     const [contractId, submitError] = await helpers.handlePromise(
@@ -242,7 +237,7 @@ const claimAssetInHTLC = async (
         logger.error("Locker ECert not supplied");
         return false;
     }
-    if(!hash || !hash.HASH_NAME)
+    if(!hash || !hash.HASH_MECHANISM)
     {
         logger.error("Instance of Hash interface not supplied")
         return false
@@ -254,7 +249,7 @@ const claimAssetInHTLC = async (
     }
 
     const assetExchangeAgreementStr = createAssetExchangeAgreementSerialized(assetType, assetID, "", lockerECert);
-    const claimInfoStr = createAssetClaimInfoSerialized(hash.getSerializedPreimageBase64());
+    const claimInfoStr = createAssetClaimInfoSerialized(hash);
 
     // Normal invoke function
     const [result, submitError] = await helpers.handlePromise(
@@ -286,7 +281,7 @@ const claimAssetInHTLCusingContractId = async (
         logger.error("contract ID not supplied");
         return false;
     }
-    if(!hash || !hash.HASH_NAME)
+    if(!hash || !hash.HASH_MECHANISM)
     {
         logger.error("Instance of Hash interface not supplied")
         return false
@@ -297,7 +292,7 @@ const claimAssetInHTLCusingContractId = async (
         return false;
     }
 
-    const claimInfoStr = createAssetClaimInfoSerialized(hash.getSerializedPreimageBase64());
+    const claimInfoStr = createAssetClaimInfoSerialized(hash);
 
     // Normal invoke function
     const [result, submitError] = await helpers.handlePromise(
@@ -330,7 +325,7 @@ const claimFungibleAssetInHTLC = async (
         logger.error("contract ID not supplied");
         return false;
     }
-    if(!hash || !hash.HASH_NAME)
+    if(!hash || !hash.HASH_MECHANISM)
     {
         logger.error("Instance of Hash interface not supplied")
         return false
@@ -341,7 +336,7 @@ const claimFungibleAssetInHTLC = async (
         return false;
     }
 
-    const claimInfoStr = createAssetClaimInfoSerialized(hash.getSerializedPreimageBase64());
+    const claimInfoStr = createAssetClaimInfoSerialized(hash);
 
     // Normal invoke function
     const [result, submitError] = await helpers.handlePromise(

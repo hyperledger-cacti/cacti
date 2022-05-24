@@ -5,6 +5,7 @@
  */
 
 import crypto from "crypto";
+import { HashMechanism } from "@hyperledger-labs/weaver-protos-js/common/asset_locks_pb";
 
 /*
  * Interface for all hash functions to be used for HTLC
@@ -14,7 +15,7 @@ import crypto from "crypto";
  * and serialize the protobuf in base64 in getSerializedHashBase64 function.
  */
 interface Hash {
-    HASH_NAME: string
+    HASH_MECHANISM: HashMechanism
     preimage: any           // Preimage for Hash
     hash64: string          // Serialized Hash in base64
     generateRandomPreimage(length): void;
@@ -29,7 +30,7 @@ interface Hash {
  * SHA256 Hash for HTLC, implementing above Hash Interface
  */
 class SHA256 implements Hash {
-    HASH_NAME = 'SHA256';
+    HASH_MECHANISM = HashMechanism.SHA256;
     preimage: string = null;
     hash64: string = null;
     
