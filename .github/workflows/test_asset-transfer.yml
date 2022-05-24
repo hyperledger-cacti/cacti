@@ -430,22 +430,15 @@ jobs:
           sed -i "s#ghcr.io/hyperledger-labs/weaver-fabric-driver#weaver-fabric-driver#g" docker-testnet-envs/.env.n1
           sed -i "s#ghcr.io/hyperledger-labs/weaver-fabric-driver#weaver-fabric-driver#g" docker-testnet-envs/.env.n2
         working-directory: core/drivers/fabric-driver
-        
-      - name: Build Corda Driver Image
-        run: |
-          make image-local
-          sed -i "s#ghcr.io/hyperledger-labs/weaver-corda-driver#weaver-corda-driver#g" docker-testnet-envs/.env.corda
-          sed -i "s#ghcr.io/hyperledger-labs/weaver-corda-driver#weaver-corda-driver#g" docker-testnet-envs/.env.corda2
-        working-directory: core/drivers/corda-driver
       
       # # CORDA NETWORK
-      # - name: Generate github.properties (on pull_request)
-      #   if: ${{ github.event_name == 'pull_request' }}
+        
+      # - name: Generate github.properties
       #   run: |
       #     echo "Using ${GITHUB_ACTOR} user."
       #     echo "username=${GITHUB_ACTOR}" >> github.properties
       #     echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.properties
-      #     echo "url=https://maven.pkg.github.com/${GITHUB_ACTOR}/weaver-dlt-interoperability" >> github.properties
+      #     echo "url=https://maven.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/weaver-dlt-interoperability" >> github.properties
       # 
       #     echo "Using ${GITHUB_ACTOR} user."
       #     echo "username=${GITHUB_ACTOR}" >> github.main.properties
@@ -457,16 +450,15 @@ jobs:
       #     cat github.properties
       #   working-directory: tests/network-setups/corda
       # 
-      # - name: Generate github.properties (else)
-      #   if: ${{ github.event_name != 'pull_request' }}
+      
+      # - name: Build Corda Driver Image
       #   run: |
-      #     echo "Using ${GITHUB_ACTOR} user."
-      #     echo "username=${GITHUB_ACTOR}" >> github.properties
-      #     echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.properties
-      #     echo "url=https://maven.pkg.github.com/hyperledger-labs/weaver-dlt-interoperability" >> github.properties
-      #     cat github.properties
-      #   working-directory: tests/network-setups/corda
-      # 
+      #     cp ../../../tests/network-setups/corda/github.properties .
+      #     make image-local
+      #     sed -i "s#ghcr.io/hyperledger-labs/weaver-corda-driver#weaver-corda-driver#g" docker-testnet-envs/.env.corda
+      #     sed -i "s#ghcr.io/hyperledger-labs/weaver-corda-driver#weaver-corda-driver#g" docker-testnet-envs/.env.corda2
+      #   working-directory: core/drivers/corda-driver
+      
       # - name: Start Corda Network
       #   run: |
       #     sed -i "/docker logs corda_partya_1 -f/"' s/^/#/' "scripts/start-nodes.sh"
