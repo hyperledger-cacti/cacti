@@ -5,3 +5,4 @@ config.json
 helpers/wallets
 keystore
 wallets
+vendor
