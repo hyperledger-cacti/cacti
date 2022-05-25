@@ -5,7 +5,7 @@
  -->
 # Weaver: DLT Interoperability
 
-![Data Transfer Status](https://github.com/hyperledger-labs/weaver-dlt-interoperability/actions/workflows/test_data-transfer.yml/badge.svg?event=push)
+![Data Sharing Status](https://github.com/hyperledger-labs/weaver-dlt-interoperability/actions/workflows/test_data-sharing.yml/badge.svg?event=push)
 ![Fabric Asset Exchange Status](https://github.com/hyperledger-labs/weaver-dlt-interoperability/actions/workflows/test_asset-exchange-fabric.yml/badge.svg?event=push)
 ![Corda Asset Exchange Status](https://github.com/hyperledger-labs/weaver-dlt-interoperability/actions/workflows/test_asset-exchange-corda.yml/badge.svg?event=push)
 ![Asset Transfer Status](https://github.com/hyperledger-labs/weaver-dlt-interoperability/actions/workflows/test_asset-transfer.yml/badge.svg?event=push)
