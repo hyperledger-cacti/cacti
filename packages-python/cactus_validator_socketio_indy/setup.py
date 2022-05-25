@@ -79,7 +79,7 @@ setup(
         'Jinja2==3.0.1',
         'MarkupSafe==2.0.1',
         'pycparser==2.20',
-        'PyJWT==2.1.0',
+        'PyJWT==2.4.0',
         'python-engineio==4.3.0',
         'python-socketio==5.5.0',
         'python3-indy==1.16.0',
