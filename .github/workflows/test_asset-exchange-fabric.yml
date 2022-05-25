@@ -153,23 +153,10 @@ jobs:
       
       - name: Setup Simpleasset
         run: |
-          GOMODCACHE=`go env GOMODCACHE`
-          echo "GO MOD Path: ${GOMODCACHE}"
-          go mod download github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go
-          chmod +wr -R ${GOMODCACHE}
-          rm -rf ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go*/*
-          cp -r ../../../common/protos-go/* ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go*/
-          ls -lh ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go*
-          go mod download github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt
-          chmod +wr -R ${GOMODCACHE}
-          rm -rf ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt*/*
-          cp -r ../../../core/network/fabric-interop-cc/interfaces/asset-mgmt/* ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt*/
-          ls -lh ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt*
-          go mod download github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils
-          chmod +wr -R ${GOMODCACHE}
-          rm -rf ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils*/*
-          cp -r ../../../core/network/fabric-interop-cc/libs/testutils/* ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils*/
-          ls -lh ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils*
+          go mod vendor          
+          cp -r ../../../common/protos-go/* vendor/github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/
+          cp -r ../../../core/network/fabric-interop-cc/interfaces/asset-mgmt/* vendor/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt/
+          cp -r ../../../core/network/fabric-interop-cc/libs/testutils/* vendor/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils/
         working-directory: samples/fabric/simpleasset
       
       - name: Start Fabric Network
