@@ -1,15 +1,18 @@
-assetexchange:
-	cp -r ../../libs .
-test-manage-assets: assetexchange
+run-vendor:
+	go mod vendor
+	cp -r ../../../../../common/protos-go/* vendor/github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/
+	cp -r ../../libs/* vendor/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/
+
+build-local: run-vendor
+	go build -v .
+	
+test-local: run-vendor test
+	
+test:
+	go test -v .
+	
+test-manage-assets: run-vendor
 	go test manage_assets.go manage_assets_test.go main.go -v
+	
 clean:
-	rm -rf libs protos-go
-build-local:
-	mv go.mod go.mod.rm
-	mv go.sum go.sum.rm
-	cp go.mod.local go.mod
-	cp -r ../../libs .
-	cp -r ../../../../../common/protos-go .
-	(go mod tidy && go build -v .) || true
-	mv go.mod.rm go.mod
-	mv go.sum.rm go.sum
+	rm -rf vendor

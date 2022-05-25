@@ -1,11 +1,8 @@
 test-local:
-	cp -r ../../../core/network/fabric-interop-cc/libs/testutils .
-	cp go.mod go.mod.bk
-	cp go.mod.local go.mod
-	go mod tidy
+	go mod vendor
+	cp -r ../../../core/network/fabric-interop-cc/libs/testutils/* vendor/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils/
 	go test -v .
-	mv go.mod.bk go.mod
-	rm -rf testutils
+	rm -rf vendor
 test:
 	go mod tidy
 	go test -v .
