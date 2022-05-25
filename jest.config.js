@@ -3,7 +3,7 @@ module.exports = {
   testEnvironment: "node",
   maxWorkers: 1,
   maxConcurrency: 1,
-  setupFilesAfterEnv: ["jest-extended"],
+  setupFilesAfterEnv: ["jest-extended/all"],
   testTimeout: 60 * 60 * 1000,
   testMatch: [
     `**/cactus-*/src/test/typescript/{unit,integration,benchmark}/**/*.test.ts`,
