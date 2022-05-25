@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: Test Data Transfer
+name: Test Data Sharing
 
 # Controls when the workflow will run
 on:
@@ -15,7 +15,7 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  data-transfer:
+  data-sharing:
     # if: ${{ false }}  # disable
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
@@ -268,7 +268,7 @@ jobs:
           fi
         working-directory: samples/fabric/fabric-cli
         
-  data-transfer-semi-local:
+  data-sharing-semi-local:
     # if: ${{ false }}  # disable
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
@@ -364,7 +364,7 @@ jobs:
       
       # FABRIC NETWORK
       # Use local InteropCC as Remote with go.mod instead of go.mod.local
-      - name: Setup interopcc
+      - name: Fetch interopcc
         run: |
           TMP_PATH=$PWD/../../../tests/network-setups/fabric/shared/tmp
           mkdir -p $TMP_PATH
@@ -379,6 +379,16 @@ jobs:
           ls -lh $TMP_PATH/pkg/mod/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop*
           export GOPATH=$OLD_GOPATH
         working-directory: core/network/fabric-interop-cc
+        
+      - name: Setup Interopcc
+        run: |
+            cd interop*
+            go mod vendor
+            cp -r ../../../common/protos-go/* vendor/github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/
+            cp -r ../../../core/network/fabric-interop-cc/libs/assetexchange/* vendor/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange/
+            cp -r ../../../core/network/fabric-interop-cc/libs/utils/* vendor/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/utils/
+            cp -r ../../../core/network/fabric-interop-cc/libs/testutils/* vendor/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils/
+        working-directory: tests/network-setups/fabric/shared/tmp/pkg/mod/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts
         
       - name: Start Fabric Network
         run: make start-interop
@@ -582,7 +592,7 @@ jobs:
           fi
         working-directory: samples/fabric/fabric-cli
              
-  data-transfer-local:
+  data-sharing-local:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
