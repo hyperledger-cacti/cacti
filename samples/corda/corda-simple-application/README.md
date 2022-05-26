@@ -168,6 +168,13 @@ If the relay expects a TLS connection over gRPC, you need to specify the followi
 ./scripts/getAssetStatus.sh 
 ```
 
+* Generate Secret-Hash Pair using following command (prints hash in base64):
+```
+./clients/build/install/clients/bin/clients utils hash --hash_fn=SHA256 -s secrettext
+```
+
+NOTE: Hash function can be modified by passing argument `--hash-fn=<SHA256|SHA512>` (only SHA256, SHA512 supported currently.) in following lock and claim commands.
+
 * Lock 50 tokens of type t1 in corda by PartyB for PartyA:
 ```
 CORDA_PORT=10009 ./clients/build/install/clients/bin/clients lock-asset --fungible --hashBase64=<hash-in-base64> --timeout=1800 --recipient="O=PartyA,L=London,C=GB" --param=<token-type>:<token-amount>
@@ -226,6 +233,13 @@ Commands:
 ```
 ./scripts/getHouseTokenStatus.sh 
 ```
+
+* Generate Secret-Hash Pair using following command (prints hash in base64):
+```
+./clients/build/install/clients/bin/clients utils hash --hash_fn=SHA256 -s secrettext
+```
+
+NOTE: Hash function can be modified by passing argument `--hash-fn=<SHA256|SHA512>` (only SHA256, SHA512 supported currently.) in following lock and claim commands.
 
 * Lock 10 tokens of type house in corda by PartyB for PartyA:
 ```

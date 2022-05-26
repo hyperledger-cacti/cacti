@@ -6,6 +6,7 @@
 
 package com.weaver.corda.app.interop.states
 
+import com.weaver.protos.common.asset_locks.AssetLocks.HashMechanism
 import com.weaver.corda.app.interop.contracts.AssetExchangeHTLCStateContract
 import com.weaver.corda.app.interop.contracts.AssetExchangeTxStateContract
 import net.corda.core.contracts.BelongsToContract
@@ -45,12 +46,14 @@ data class AssetExchangeHTLCState(
 
 @CordaSerializable
 data class AssetLockHTLCData(
+    val hashMechanism: HashMechanism,
     val hash: OpaqueBytes,
     val expiryTime: Instant
 )
 
 @CordaSerializable
 data class AssetClaimHTLCData(
+    val hashMechanism: HashMechanism,
     val hashPreimage: OpaqueBytes
 )
 
@@ -70,3 +73,4 @@ data class AssetExchangeTxState(
 ) : LinearState {
     override val participants: List<AbstractParty> get() = listOf(locker)
 }
+

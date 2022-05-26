@@ -165,6 +165,10 @@ We will demonstrate asset exchange of a tokens in `Corda_Network` with tokens on
   ```bash
   ./scripts/getAssetStatus.sh 2
   ```
+- Generate Secret-Hash Pair using following command (prints hash in base64):
+```
+./clients/build/install/clients/bin/clients utils hash --hash-fn=SHA256 -s secrettext
+```
 - Run the following to trigger `PartyA` locking `30` units of token type `t1` for `PartyB` in `Corda_Network` for 60 mins:
   ```bash
   CORDA_PORT=10006 ./clients/build/install/clients/bin/clients lock-asset --fungible --hashBase64=ivHErp1x4bJDKuRo6L5bApO/DdoyD/dG0mAZrzLZEIs= --timeout=3600 --recipient="O=PartyB,L=London,C=GB" --param=t1:30

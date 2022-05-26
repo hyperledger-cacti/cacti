@@ -9,6 +9,8 @@ package com.weaver.corda.app.interop.contracts
 import com.weaver.corda.app.interop.states.AssetExchangeHTLCState
 import com.weaver.corda.app.interop.states.AssetClaimHTLCData
 import com.weaver.corda.app.interop.states.AssetExchangeTxState
+import com.weaver.corda.app.interop.states.sha512
+import com.weaver.protos.common.asset_locks.AssetLocks.HashMechanism
 import net.corda.core.contracts.CommandData
 import net.corda.core.contracts.Contract
 import net.corda.core.contracts.requireSingleCommand
@@ -72,12 +74,20 @@ class AssetExchangeHTLCStateContract : Contract {
                 
                 // Check if timeWindow <= expiryTime
                 val untilTime = tx.timeWindow!!.untilTime!!
-                "Time Window for claim shoule be before expiry time." using (untilTime.isBefore(htlcState.lockInfo.expiryTime) || untilTime.equals(htlcState.lockInfo.expiryTime))
+                "Time Window for claim should be before expiry time." using (untilTime.isBefore(htlcState.lockInfo.expiryTime) || untilTime.equals(htlcState.lockInfo.expiryTime))
                 
                 // Verify if (hash, preimage) pair matches
-                val computedHash = claimCmd.value.assetClaimHTLC.hashPreimage.sha256().bytes
+                "HashMechanism must be same in Lock and Claim." using (claimCmd.value.assetClaimHTLC.hashMechanism == htlcState.lockInfo.hashMechanism)
+                var computedHash: ByteArray? = null
+                if (claimCmd.value.assetClaimHTLC.hashMechanism == HashMechanism.SHA256) {
+                    computedHash = claimCmd.value.assetClaimHTLC.hashPreimage.sha256().bytes
+                } else if (claimCmd.value.assetClaimHTLC.hashMechanism == HashMechanism.SHA512) {
+                    computedHash = claimCmd.value.assetClaimHTLC.hashPreimage.sha512().bytes
+                }
+                "Hash Mechanism must be among the supported mechanisms." using (computedHash != null)
+                
                 val expectedHash = htlcState.lockInfo.hash.bytes
-                "Hash match with pre-image." using (Arrays.equals(computedHash, expectedHash))
+                "Hash must match with hash of pre-image." using (Arrays.equals(computedHash!!, expectedHash))
                 
                 // Check if owner is recipient
                 val outputState = tx.outputs[0].data

@@ -105,7 +105,8 @@ jobs:
         working-directory: sdks/corda
     
   publish-driver:
-    needs: [publish-protos, publish-interop-app]
+    if: github.repository_owner == 'hyperledger-labs'
+    needs: [publish-protos, publish-interop-app, publish-sdk]
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
