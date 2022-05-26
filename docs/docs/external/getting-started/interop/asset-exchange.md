@@ -23,6 +23,11 @@ Assuming that one of the following chaincodes have been deployed in both network
 * `simpleassetandinterop`
 * `simpleassettransfer`
 run the following steps:
+
+| Notes |
+|:------|
+| The hash used in following steps can be replaced by any valid `SHA256` hash. |
+
 1. Navigate to either the `samples/fabric/fabric-cli` folder or the `samples/fabric/go-cli` folder in your clone of the Weaver repository.
 2. Run the following to verify the status of the assets owned by `alice` and `bob` in the two networks:
    ```bash
@@ -45,7 +50,7 @@ run the following steps:
        ```
      - Run the following to trigger `alice` locking `bond01:a03` for `bob` in `network1`
        ```bash
-       ./bin/fabric-cli asset exchange lock --timeout-duration=3600 --locker=alice --recipient=bob --hashBase64=<hash-value-base64> --target-network=network1 --param=bond01:a03
+       ./bin/fabric-cli asset exchange lock --timeout-duration=3600 --locker=alice --recipient=bob --hashBase64=ivHErp1x4bJDKuRo6L5bApO/DdoyD/dG0mAZrzLZEIs= --target-network=network1 --param=bond01:a03
        ```
      - Run the following to verify `alice`'s lock:
        ```bash
@@ -53,7 +58,7 @@ run the following steps:
        ```
      - Run the following to trigger `bob` locking `100` units of `token1` for `alice` in `network2`:
        ```bash
-       ./bin/fabric-cli asset exchange lock --fungible --timeout-duration=1800 --locker=bob --recipient=alice --hashBase64=<hash-value-base64> --target-network=network2 --param=token1:100
+       ./bin/fabric-cli asset exchange lock --fungible --timeout-duration=1800 --locker=bob --recipient=alice --hashBase64=ivHErp1x4bJDKuRo6L5bApO/DdoyD/dG0mAZrzLZEIs= --target-network=network2 --param=token1:100
        ```
        Note the contract id printed as output in above command.
      - Run the following to verify `bob`'s lock:
@@ -185,7 +190,7 @@ We will demonstrate asset exchange of a tokens in `Corda_Network` with tokens on
   `PartyB` can see its node's logs to get the revealed hash preimage, and use it to claim the bond in the Fabric network.
 - Run the following to trigger `PartyB`'s claim for `30` units of token type `t1` locked by `PartyA` in `Corda_Network`:
   ```bash
-  CORDA_PORT=10006 ./clients/build/install/clients/bin/clients claim-asset --secret=secrettext --contract-id=<contract-id-1>
+  CORDA_PORT=10009 ./clients/build/install/clients/bin/clients claim-asset --secret=secrettext --contract-id=<contract-id-1>
   ```
 - Run the following to verify the status of the tokens owned by `PartyA` and `PartyB` in the `Corda_Network` and `Corda_Network2`:
   ```bash
