@@ -21,13 +21,13 @@ const command: GluegunCommand = {
       commandHelp(
         print,
         toolbox,
-        `fabric-cli hash --hash_fn=ECDLP x y`,
+        `fabric-cli hash --hash_fn=SHA256 abc`,
         'fabric-cli hash --hash_fn=<hash-function-name> --random <preimage-array-of-strings-seprated-by-space>',
         [
           {
             name: '--hash_fn',
             description:
-              'hash function to be used for HTLC. Supported: SHA256. (Optional: Default: SHA256)'
+              'hash function to be used for HTLC. Supported: SHA256, SHA512. (Optional: Default: SHA256)'
           },
           {
             name: '--random',
@@ -55,10 +55,10 @@ const command: GluegunCommand = {
     }    
     // Hash
     let hash: HashFunctions.Hash
-    if(options['hash_fn'] == 'ECDLP') {
-        //TODO: create instance of ECDLP
+    if(options['hash_fn'] == 'SHA512') {
+        hash = new HashFunctions.SHA512()
         if(!options['random']) {
-            //TODO: Set preimage from array
+            hash.setPreimage(array[0])
         }
     } else {
         hash = new HashFunctions.SHA256()
