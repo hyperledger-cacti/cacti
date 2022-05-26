@@ -200,14 +200,14 @@ Below are the steps to exercise asset exchange using the `fabric-cli` tool.
     ```
     ./bin/fabric-cli hash --hash_fn=SHA256 secrettext
     ```
-6. The same asset exchange experiment in the above step, can be carried out by manually triggering below commands in serial order (with the help of `fabric-cli asset exchange-step` CLI commands) (change hash function by specifying `--hash_fn=<SHA256|SHA512>` in lock and claim commands):
+6. The same asset exchange experiment in the above step, can be carried out by manually triggering below commands in serial order (with the help of `fabric-cli asset exchange <operation>` CLI commands) (change hash function by specifying `--hash_fn=<SHA256|SHA512>` in lock and claim commands):
    ```bash
    ./bin/fabric-cli asset exchange lock --timeout-duration=3600 --locker=alice --recipient=bob --hashBase64=<hash-value-base64> --target-network=network1 --param=bond01:a03
    ./bin/fabric-cli asset exchange is-locked --locker=alice --recipient=bob --target-network=network1 --param=bond01:a03
    ./bin/fabric-cli asset exchange lock --fungible --timeout-duration=1800 --locker=bob --recipient=alice --hashBase64=<hash-value-base64> --target-network=network2 --param=token1:100
    ./bin/fabric-cli asset exchange is-locked --fungible --locker=bob --recipient=alice --target-network=network2 --contract-id=<contract-id>
    ./bin/fabric-cli asset exchange claim --fungible --recipient=alice --target-network=network2 --contract-id=<contract-id> --secret=<hash-pre-image>
-   ./bin/fabric-cli asset exchange-step claim --recipient=bob --locker=alice --target-network=network1 --param=bond01:a03 --secret=<hash-pre-image>
+   ./bin/fabric-cli asset exchange claim --recipient=bob --locker=alice --target-network=network1 --param=bond01:a03 --secret=<hash-pre-image>
    ./bin/fabric-cli asset exchange unlock --locker=alice --recipient=bob --target-network=network1 --param=bond01:a03
    ./bin/fabric-cli asset exchange unlock --fungible --locker=bob --target-network=network2 --contract-id=<contract-id>
    ```
