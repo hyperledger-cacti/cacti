@@ -47,7 +47,7 @@ jobs:
           echo "Using ${GITHUB_ACTOR} user."
           echo "username=${GITHUB_ACTOR}" >> github.properties
           echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.properties
-          echo "url=https://maven.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/weaver-dlt-interoperability" >> github.properties
+          echo "url=https://maven.pkg.github.com/${GITHUB_ACTOR}/weaver-dlt-interoperability" >> github.properties
           
           echo "Using ${GITHUB_ACTOR} user."
           echo "username=${GITHUB_ACTOR}" >> github.main.properties
@@ -335,7 +335,7 @@ jobs:
           echo "Using ${GITHUB_ACTOR} user."
           echo "username=${GITHUB_ACTOR}" >> github.properties
           echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.properties
-          echo "url=https://maven.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/weaver-dlt-interoperability" >> github.properties
+          echo "url=https://maven.pkg.github.com/${GITHUB_ACTOR}/weaver-dlt-interoperability" >> github.properties
           
           echo "Using ${GITHUB_ACTOR} user."
           echo "username=${GITHUB_ACTOR}" >> github.main.properties
