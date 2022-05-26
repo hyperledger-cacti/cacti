@@ -112,3 +112,7 @@ publishing {
         }
     }
 }
+
+test {
+    maxHeapSize = "4096m"
+}
