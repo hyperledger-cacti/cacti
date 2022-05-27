@@ -69,7 +69,7 @@ server.on("listening", onListening);
  * Normalize a port into a number, string, or false.
  */
 
-function normalizePort(val) {
+function normalizePort(val: string) {
   const port = parseInt(val, 10);
 
   if (isNaN(port)) {
@@ -89,7 +89,7 @@ function normalizePort(val) {
  * Event listener for HTTPS server "error" event.
  */
 
-function onError(error) {
+function onError(error: any) {
   if (error.syscall !== "listen") {
     throw error;
   }
@@ -118,6 +118,12 @@ function onError(error) {
 
 function onListening() {
   const addr = server.address();
+
+  if (!addr) {
+    logger.error("Could not get running server address - exit.");
+    process.exit(1);
+  }
+
   const bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
   debug("Listening on " + bind);
 }
@@ -144,14 +150,14 @@ io.on("connection", function (client) {
     // Check for the existence of the specified function and call it if it exists.
     if (Splug.isExistFunction(func)) {
       // Can be called with Server plugin function name.
-      Splug[func](args)
-        .then((respObj) => {
+      (Splug as any)[func](args)
+        .then((respObj: unknown) => {
           logger.info("*** RESPONSE ***");
           logger.info("Client ID :" + client.id);
           logger.info("Response  :" + JSON.stringify(respObj));
           client.emit("response", respObj);
         })
-        .catch((errObj) => {
+        .catch((errObj: unknown) => {
           logger.error("*** ERROR ***");
           logger.error("Client ID :" + client.id);
           logger.error("Detail    :" + JSON.stringify(errObj));
@@ -172,11 +178,12 @@ io.on("connection", function (client) {
   // TODO: "request2" -> "request"
   client.on("request2", function (data) {
     const methodType = data.method.type;
-    // const args = data.args;
-    const args = {};
-    args["contract"] = data.contract;
-    args["method"] = data.method;
-    args["args"] = data.args;
+    let args: Record<string, any> = {
+      contract: data.contract,
+      method: data.method,
+      args: data.args,
+    };
+
     if (data.reqID !== undefined) {
       logger.info(`##add reqID: ${data.reqID}`);
       args["reqID"] = data.reqID;
@@ -223,14 +230,14 @@ io.on("connection", function (client) {
       // Check for the existence of the specified function and call it if it exists.
       if (Splug.isExistFunction(func)) {
         // Can be called with Server plugin function name.
-        Splug[func](args)
-          .then((respObj) => {
+        (Splug as any)[func](args)
+          .then((respObj: unknown) => {
             logger.info("*** RESPONSE ***");
             logger.info("Client ID :" + client.id);
             logger.info("Response  :" + JSON.stringify(respObj));
             client.emit("response", respObj);
           })
-          .catch((errObj) => {
+          .catch((errObj: unknown) => {
             logger.error("*** ERROR ***");
             logger.error("Client ID :" + client.id);
             logger.error("Detail    :" + JSON.stringify(errObj));
@@ -262,19 +269,16 @@ io.on("connection", function (client) {
    * startMonitor: starting block generation event monitoring
    **/
   client.on("startMonitor", function () {
-    // Callback to receive monitoring results
-    const cb = function (callbackData) {
+    Smonitor.startMonitor(client.id, (event) => {
       let emitType = "";
-      if (callbackData.status == 200) {
+      if (event.status == 200) {
         emitType = "eventReceived";
         logger.info("event data callbacked.");
       } else {
         emitType = "monitor_error";
       }
-      client.emit(emitType, callbackData);
-    };
-
-    Smonitor.startMonitor(client.id, cb);
+      client.emit(emitType, event);
+    });
   });
 
   /**
