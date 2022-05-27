@@ -60,7 +60,10 @@ run the following steps:
        ```bash
        ./bin/fabric-cli asset exchange lock --fungible --timeout-duration=1800 --locker=bob --recipient=alice --hashBase64=ivHErp1x4bJDKuRo6L5bApO/DdoyD/dG0mAZrzLZEIs= --target-network=network2 --param=token1:100
        ```
-       Note the contract id printed as output in above command.
+       Note the `contract-id` printed as output in above command. The output line containing `contract-id` (text in base64 after `Contract Id:`) would like this:
+       ```bash
+       ℹ Fungible Asset Locked with Contract Id: E0JZq8Z+eS//2Bt4WU0pU210MvNgDC2hdUT1RgszOq0=, preimage: null, hashvalue: ivHErp1x4bJDKuRo6L5bApO/DdoyD/dG0mAZrzLZEIs=
+       ```
      - Run the following to verify `bob`'s lock:
        ```bash
        ./bin/fabric-cli asset exchange is-locked --fungible --locker=bob --recipient=alice --target-network=network2 --contract-id=<contract-id>
@@ -71,11 +74,11 @@ run the following steps:
        ```
      - Run the following to trigger `bob`'s claim for `bond01:a03` locked by `alice` in `network1`:
        ```bash
-       ./bin/fabric-cli asset exchange-step claim --recipient=bob --locker=alice --target-network=network1 --param=bond01:a03 --secret=<hash-pre-image>
+       ./bin/fabric-cli asset exchange claim --recipient=bob --locker=alice --target-network=network1 --param=bond01:a03 --secret=<hash-pre-image>
        ```
        
      The above steps complete a successful asset exchange between two Fabric networks. 
-     In addition to the above commands, following are the extra options:
+     In addition to the above commands, following commands can be run if specified timeout has expired and the locked asset remains unclaimed.
      - If `alice` wants to unlock the bond asset, run the following to trigger `alice`'s re-claim for `bond01:a03` locked in `network1`:
        ```bash
        ./bin/fabric-cli asset exchange unlock --locker=alice --recipient=bob --target-network=network1 --param=bond01:a03
@@ -118,7 +121,11 @@ For Fabric commands, run from `samples/fabric/fabric-cli` folder, and for Corda 
   ```bash
   CORDA_PORT=10009 ./clients/build/install/clients/bin/clients lock-asset --fungible --hashBase64=ivHErp1x4bJDKuRo6L5bApO/DdoyD/dG0mAZrzLZEIs= --timeout=1800 --recipient="O=PartyA,L=London,C=GB" --param=t1:50
   ```
-  Note the `contract-id` displayed after successful execution of the command, will be used in next steps.
+  Note the `contract-id` displayed after successful execution of the command, will be used in next steps. The output containing `contract-id` would like this:
+  ```bash
+  HTLC Lock State created with contract ID Right(b=10448674_80d2bee7-5a5d-45df-b14e-60bac4ba1bf3).
+  ```
+  `contract-id` is the alphanumeric text (with underscore and hyphens) after `b=` within parenthesis.
 - Run the following to verify `PartyB`'s lock (can be verified by both parties):
   ```bash
   CORDA_PORT=10006 ./clients/build/install/clients/bin/clients is-asset-locked --contract-id=<contract-id>
@@ -142,7 +149,7 @@ For Fabric commands, run from `samples/fabric/fabric-cli` folder, and for Corda 
   ```
 
 The above steps complete a successful asset exchange between Fabric and Corda networks. 
-In addition to the above commands, following are the extra options:
+In addition to the above commands, following commands can be run if specified timeout has expired and the locked asset remains unclaimed.
 - If `alice` wants to unlock the bond asset, run the following to trigger `alice`'s re-claim for `bond01:a03` locked in `network1`:
   ```bash
   ./bin/fabric-cli asset exchange unlock --locker=alice --recipient=bob --target-network=network1 --param=bond01:a03
@@ -173,7 +180,11 @@ We will demonstrate asset exchange of a tokens in `Corda_Network` with tokens on
   ```bash
   CORDA_PORT=10006 ./clients/build/install/clients/bin/clients lock-asset --fungible --hashBase64=ivHErp1x4bJDKuRo6L5bApO/DdoyD/dG0mAZrzLZEIs= --timeout=3600 --recipient="O=PartyB,L=London,C=GB" --param=t1:30
   ```
-  Note the `contract-id` displayed after successful execution of the command, will be used in next steps. Let's denote it `<contract-id-1>`.
+  Note the `contract-id` displayed after successful execution of the command, will be used in next steps. The output containing `contract-id` would like this:
+  ```bash
+  HTLC Lock State created with contract ID Right(b=10448674_80d2bee7-5a5d-45df-b14e-60bac4ba1bf3).
+  ```
+  `contract-id` is the alphanumeric text (with underscore and hyphens) after `b=` within parenthesis. Let's denote it `<contract-id-1>`.
 - Run the following to verify `PartyA`'s lock (can be verified by both parties):
   ```bash
   CORDA_PORT=10009 ./clients/build/install/clients/bin/clients is-asset-locked --contract-id=<contract-id-1>
@@ -203,7 +214,7 @@ We will demonstrate asset exchange of a tokens in `Corda_Network` with tokens on
 
 
 The above steps complete a successful asset exchange between two Corda networks. 
-In addition to the above commands, following are the extra options:
+In addition to the above commands, following commands can be run if specified timeout has expired and the locked asset remains unclaimed.
 - If `PartyA` wants to unlock the token `t1:30` asset, run the following to trigger `PartyA`'s re-claim in `Corda_Network`:
   ```bash
   CORDA_PORT=10006 ./clients/build/install/clients/bin/clients unlock-asset --contract-id=<contract-id-1>
