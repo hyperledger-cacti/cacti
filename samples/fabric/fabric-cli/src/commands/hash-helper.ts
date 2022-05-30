@@ -11,7 +11,7 @@ import { HashFunctions } from '@hyperledger-labs/weaver-fabric-interop-sdk'
 
 const command: GluegunCommand = {
   name: 'hash',
-  description: 'Get Hash for given pre image',
+  description: 'Get Hash for given pre image in base64',
   run: async toolbox => {
     const {
       print,

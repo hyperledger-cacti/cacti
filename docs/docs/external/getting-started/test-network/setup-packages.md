@@ -137,9 +137,8 @@ Build the generic (i.e., common to all DLTs) relay module as follows:
   make
   ```
 - To avoid errors during Weaver Relay compilation, update certain packages (on which the Weaver Relay is dependent) to their latest versions as follows:
-  ```
-  cargo update -p nom
-  cargo update -p lexical-core
+  ```bash
+  make update-pkgs
   ```
   
 #### Deployment
