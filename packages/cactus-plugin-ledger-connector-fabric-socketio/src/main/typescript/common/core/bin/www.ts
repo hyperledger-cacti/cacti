@@ -18,13 +18,14 @@
 import app from "../app";
 const debug = require("debug")("connector:server");
 import https = require("https");
-import { config } from "../config/default";
+import * as config from "../config";
 import fs = require("fs");
+import { Server } from "socket.io"
 
 // Log settings
 import { getLogger } from "log4js";
 const logger = getLogger("connector_main[" + process.pid + "]");
-logger.level = config.logLevel;
+logger.level = config.read('logLevel', 'info');
 
 // implementation class of a part dependent of end-chains (server plugin)
 import { ServerPlugin } from "../../../connector/ServerPlugin";
@@ -38,13 +39,13 @@ const Smonitor = new ServerMonitorPlugin();
  * Get port from environment and store in Express.
  */
 
-const sslport = normalizePort(process.env.PORT || config.sslParam.port);
+const sslport = normalizePort(process.env.PORT || config.read('sslParam.port'));
 app.set("port", sslport);
 
 // Specify private key and certificate
 const sslParam = {
-  key: fs.readFileSync(config.sslParam.key),
-  cert: fs.readFileSync(config.sslParam.cert),
+  key: fs.readFileSync(config.read('sslParam.key')),
+  cert: fs.readFileSync(config.read('sslParam.cert')),
 };
 
 /**
@@ -52,7 +53,7 @@ const sslParam = {
  */
 
 const server = https.createServer(sslParam, app); // Start as an https server.
-const io = require("socket.io")(server);
+const io = new Server(server);
 
 /**
  * Listen on provided port, on all network interfaces.

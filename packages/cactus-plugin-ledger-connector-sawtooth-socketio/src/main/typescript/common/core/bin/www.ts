@@ -18,17 +18,14 @@
 import app from "../app";
 const debug = require("debug")("connector:server");
 import https = require("https");
-import { config } from "../config/default";
+import * as config from "../config";
 import fs = require("fs");
+import { Server } from "socket.io"
 
 // Log settings
 import { getLogger } from "log4js";
 const logger = getLogger("connector_main[" + process.pid + "]");
-logger.level = config.logLevel;
-
-// implementation class of a part dependent of end-chains (server plugin)
-import { ServerPlugin } from "../../../connector/ServerPlugin";
-//const Splug = new ServerPlugin();
+logger.level = config.read('logLevel', 'info');
 
 // destination dependency (MONITOR) implementation class
 import { ServerMonitorPlugin } from "../../../connector/ServerMonitorPlugin";
@@ -38,13 +35,13 @@ const Smonitor = new ServerMonitorPlugin();
  * Get port from environment and store in Express.
  */
 
-const sslport = normalizePort(process.env.PORT || config.sslParam.port);
+const sslport = normalizePort(process.env.PORT || config.read('sslParam.port'));
 app.set("port", sslport);
 
 // Specify private key and certificate
 const sslParam = {
-  key: fs.readFileSync(config.sslParam.key),
-  cert: fs.readFileSync(config.sslParam.cert),
+  key: fs.readFileSync(config.read('sslParam.key')),
+  cert: fs.readFileSync(config.read('sslParam.cert')),
 };
 
 /**
@@ -52,7 +49,7 @@ const sslParam = {
  */
 
 const server = https.createServer(sslParam, app); // Start as an https server.
-const io = require("socket.io")(server);
+const io = new Server(server);
 
 /**
  * Listen on provided port, on all network interfaces.
@@ -125,114 +122,6 @@ io.on("connection", function (client) {
   logger.info("Client " + client.id + " connected.");
 
   /**
-   * request: The server plugin's request to execute a function
-   * @param {JSON} data: Request Body (following format)
-   * JSON: {
-   *          "func":        (string) Function name ,// For example : "transferNumericAsset"
-   *          "args":        (Object) argument// for example , {"from" : "xxx" , "to" : "yyy" , "value" : "10,000"}
-   *       }
-   **/
-  /*
-    client.on('request', function(data) {
-        const func = data.func;
-        const args = data.args;
-        console.log('##[HL-BC] Invoke smart contract to transfer asset(D1)');
-        logger.info('*** REQUEST ***');
-        logger.info('Client ID :' + client.id);
-        logger.info('Data  :' + JSON.stringify(data));
-
-        // Check for the existence of the specified function and call it if it exists.
-        if (Splug.isExistFunction(func)) {
-            // Can be called with Server plugin function name.
-            Splug[func](args)
-            .then((respObj) => {
-                logger.info('*** RESPONSE ***');
-                logger.info('Client ID :' + client.id);
-                logger.info('Response  :' + JSON.stringify(respObj));
-                client.emit("response", respObj);
-            })
-            .catch((errObj) => {
-                logger.error('*** ERROR ***');
-                logger.error('Client ID :' + client.id);
-                logger.error('Detail    :' + JSON.stringify(errObj));
-                client.emit("connector_error", errObj);
-            });
-        } else {
-            // No such function
-            const emsg = "Function " + func + " not found!";
-            logger.error(emsg);
-            const retObj = {
-                "status" : 504,
-                "errorDetail" : emsg
-            };
-            client.emit("connector_error", retObj);
-        }
-    });
-
-    // TODO: "request2" -> "request"
-    client.on('request2', function(data) {
-        const methodType = data.method.type;
-        // const args = data.args;
-        const args = {};
-        args["contract"] = data.contract;
-        args["method"] = data.method;
-        args["args"] = data.args;
-        if (data.reqID !== undefined) {
-            logger.info(`##add reqID: ${data.reqID}`);
-            args["reqID"] = data.reqID;
-        }
-
-
-        console.log('##[HL-BC] Invoke smart contract to transfer asset(D1)');
-        logger.info('*** REQUEST ***');
-        logger.info('Client ID :' + client.id);
-        logger.info('Data  :' + JSON.stringify(data));
-
-        // Check for the existence of the specified function and call it if it exists.
-        if (methodType === "web3Eth") {
-            // Can be called with Server plugin function name.
-            Splug.web3Eth(args)
-            .then((respObj) => {
-                logger.info('*** RESPONSE ***');
-                logger.info('Client ID :' + client.id);
-                logger.info('Response  :' + JSON.stringify(respObj));
-                client.emit("response", respObj);
-            })
-            .catch((errObj) => {
-                logger.error('*** ERROR ***');
-                logger.error('Client ID :' + client.id);
-                logger.error('Detail    :' + JSON.stringify(errObj));
-                client.emit("connector_error", errObj);
-            });
-        } else if (methodType === "contract") {
-            // Can be called with Server plugin function name.
-            Splug.contract(args)
-            .then((respObj) => {
-                logger.info('*** RESPONSE ***');
-                logger.info('Client ID :' + client.id);
-                logger.info('Response  :' + JSON.stringify(respObj));
-                client.emit("response", respObj);
-            })
-            .catch((errObj) => {
-                logger.error('*** ERROR ***');
-                logger.error('Client ID :' + client.id);
-                logger.error('Detail    :' + JSON.stringify(errObj));
-                client.emit("connector_error", errObj);
-            });
-        } else {
-            // No such function
-            const emsg = "method.type " + methodType + " not found!";
-            logger.error(emsg);
-            const retObj = {
-                "status" : 504,
-                "errorDetail" : emsg
-            };
-            client.emit("connector_error", retObj);
-        }
-    });
-*/
-
-  /**
    * startMonitor: starting block generation event monitoring
    **/
   client.on("startMonitor", function (data) {
@@ -250,22 +139,4 @@ io.on("connection", function (client) {
 
     Smonitor.startMonitor(client.id, data.filterKey, cb);
   });
-
-  /**
-   * stopMonitor: block generation events monitoring stopping
-   **/
-  /*
-    // I think it is more common to stop from the disconnect described later, but I will prepare for it.
-    client.on('stopMonitor', function(reason) {
-        Smonitor.stopMonitor(client.id);
-    });
-
-    client.on('disconnect', function(reason) {
-        // Unexpected disconnect as well as explicit disconnect request can be received here
-        logger.info('Client ' + client.id + ' disconnected.');
-        logger.info('Reason    :' + reason);
-        // Stop monitoring if disconnected client is for event monitoring
-        Smonitor.stopMonitor(client.id);
-    });
-*/
 });

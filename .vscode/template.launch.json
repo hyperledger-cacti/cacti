@@ -1,5 +1,5 @@
 {
-  "version": "0.2.0",
+  "version": "0.2.1",
   "configurations": [
     {
       "type": "node",
@@ -11,7 +11,11 @@
         "${relativeFile}"
       ],
       "console": "integratedTerminal",
-      "internalConsoleOptions": "neverOpen"
+      "internalConsoleOptions": "neverOpen",
+      "outFiles": [
+        "${workspaceFolder}/**/*.js",
+        "!**/node_modules/**"
+      ]
     },
     {
       "name": "TAP: Current TS Test File",
@@ -30,7 +34,11 @@
       ],
       "console": "integratedTerminal",
       "sourceMaps": true,
-      "cwd": "${workspaceRoot}"
+      "cwd": "${workspaceRoot}",
+      "outFiles": [
+        "${workspaceFolder}/**/*.js",
+        "!**/node_modules/**"
+      ]
     },
     {
       "name": "Example: Supply Chain App",
@@ -52,7 +60,11 @@
       ],
       "console": "integratedTerminal",
       "sourceMaps": true,
-      "cwd": "${workspaceFolder}/examples/supply-chain-app/"
+      "cwd": "${workspaceFolder}/examples/supply-chain-app/",
+      "outFiles": [
+        "${workspaceFolder}/**/*.js",
+        "!**/node_modules/**"
+      ]
     }
   ]
 }

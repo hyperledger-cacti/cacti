@@ -3,10 +3,9 @@
 
 ## Abstract
 
-Cactus discounted-cartrade is a sample application that adds employee discounts to the original Cactus cartrade. In this application, when the users transfer the car ownership in the cactus cartrade, they present their employee proofs to the rent-a-car company to receive an employee discount. We implement the employee proofs by proofs on Hyperledger Indy. As with the original application, car ownership is represented by a Fabcar chaincodetoken on Hyperledger Fabric, which can be exchanged for ETH currency on a private Ethereum blockchain. This Business Logic Plugin (BLP) application controls a process from employee certification using Hyperledger Indy to payment using Ethereum.
+Cactus discounted-cartrade is a sample application that adds employee discounts to the original Cactus cartrade. In this application, when the users transfer the car ownership in the cactus cartrade, they present their employee proofs to the rent-a-car company to receive an employee discount. We implement the employee proofs by proofs on Hyperledger Indy. Car ownership is represented by a [asset-transfer-basic](https://github.com/hyperledger/fabric-samples/tree/release-2.2/asset-transfer-basic) chaincodetoken on Hyperledger Fabric, which can be exchanged for ETH currency on a private Ethereum blockchain. This Business Logic Plugin (BLP) application controls a process from employee certification using Hyperledger Indy to payment using Ethereum.
 
 ![discounted-cartrade image](./image/discounted-cartrade-image.png)
-
 
 ## Scenario
 
@@ -26,171 +25,203 @@ Alice knows that Acme Corp. provides digital certificates. She asks Acme Corp. t
 
 Alice will use credentials and other Indy formats such as schema and definition to create an employee proof that she will present when applying the lent-a-car service. Alice then sends a car usage application and her employee proof to the Cactus Node Server via an End User Application. The employee proofs consist of proof requests and proofs on Hyperledger Indy. The Cactus Node server receives the schema and definition from the Indy ledger via Validator and uses this information to verify the proof with the BLP. Once verified, the BLP will decide what she should pay based on the price list and then proceed with the original cartrade application using cactus as an escrow to transfer ETH currencies and car ownership tokens to each other.
 
+## Setup Overview
+
+### fabric-socketio-validator
+- Validator for fabric ledger.
+- Docker networks: `fabric-all-in-one_testnet-14`, `discounted-cartrade-net`
+
+### ethereum-validator
+- Validator for ethereum ledger.
+- Docker network: `geth1net`, `discounted-cartrade-net`
+
+### indy-sdk-cli-base-image
+- Base image for indy validator.
+- It will build the image and immediately exit on run.
+
+### indy-validator
+- Validator for indy ledger.
+- Assumes ledger runs at `172.16.0.2`
+- Docker network: `indy-testnet_indy_net`
+- Accessed only by nginx proxy container.
+
+### indy-validator-nginx
+- Load balancer / gateway for indy validator.
+- Use it's endpoint to talk to indy validator.
+- Uses config from `./nginx/nginx.conf`
+- Docker network: `indy-testnet_indy_net`, `discounted-cartrade-net`
+
+### cmd-socketio-base-image
+- Base image for `discounted-cartrade` BLP.
+- Contains cactus cmd socketio server module
+- It will build the image and immediately exit on run.
+
+### discounted-cartrade-blp
+- Main logic for this sample application.
+- Use it's endpoint (`localhost:5034`) to interact the bussiness logic.
+- Docker network: `discounted-cartrade-net`
+
+### req_discounted_cartrade
+- Setup application.
+- Will generate proof and store it in local configuration on startup.
+- This application can also be used to send requests to the BLP.
+
+## Indy Schema
+![Indy node pool and validator](./image/indy-setup-schema.svg)
+
 ## Preparations
-
-1. Clone source files from GitHub.
-
-    ```bash
-    mkdir /tmp/work
-    cd /tmp/work
-    git clone https://github.com/hyperledger/cactus.git
+1. Configure Cactus:
+    ```
+    # execute in root cactus dir
+    pushd ../..
+    npm run configure
+    popd
     ```
 
-1. Start Ledger containers and validators
+1. Start the ledgers:
+    ```
+    ./script-start-ledgers.sh
+    ```
+    - This script will start all ledger docker containers, networks, and will setup configuration needed to operate the sample app.
+    - (NOTICE: Before executing the above, your account needs to be added to the docker group (`usermod -a -G docker YourAccount` from root user))
+    - On success, this should start three containers:
+        - `geth1`
+        - `discounted_cartrade_faio2x_testnet`
+        - `indy-testnet-pool`
 
-    Follow the instructions in the linked pages to start ledger containers and validators:
-    - Launch [Hyperledger Fabric docker containers](https://github.com/hyperledger/cactus/tree/main/tools/docker/fabric14-fabcar-testnet)
-    - Launch Hyperledger Fabric validator ([@hyperledger/cactus-plugin-ledger-connector-fabric-socketio](https://github.com/hyperledger/cactus/tree/main/packages/cactus-plugin-ledger-connector-fabric-socketio))
-    - Launch [Go-Ethereum docker containers](https://github.com/hyperledger/cactus/tree/main/tools/docker/geth-testnet)
-    - Launch Go-Ethereum validator ([@hyperledger/cactus-plugin-ledger-connector-go-ethereum-socketio](https://github.com/hyperledger/cactus/tree/main/packages/cactus-plugin-ledger-connector-go-ethereum-socketio))
-    - Launch [Hyperledger Indy and validator containers](https://github.com/hyperledger/cactus/tree/main/tools/docker/indy-testnet)
-
-1. Install Indy-SDK libraries
-
-    Install Indy-SDK libraries by following the instructions in its [README](https://github.com/hyperledger/indy-sdk/#installing-the-sdk) page. For example, you will need to install `libindy.so` in `/usr/lib/` directory if you are using Ubuntu18. This will be called from the application and the script you are going to set up in the following steps.
-
-1. Setup and Start the application
-
-    1. Create config files directory in your host environment
-
-        ```bash
-        cd /etc
-        sudo mkdir /etc/cactus
-        sudo chmod 777 /etc/cactus
-        ```
-
-    1. Move back to source tree location
-
-        ```bash
-        cd /tmp/work
-        ```
-
-    1. Build `cactus-cmd-socketio-server`
-
-        1. Edit configuration file
-
-            Edit `cactus/etc/cactus/default.yaml` file.
-
-            ```bash
-            vi cactus/etc/cactus/default.yaml
-            ```
-
-            Edit value of `applicationHostInfo.hostName` from `http://aaa.bbb.ccc.ddd` to `http://localhost`:
-
-            ```yaml
-            applicationHostInfo:
-              hostName: http://localhost # please change hostName to your IP address
-              hostPort: 5034
-            ```
-
-        1. Install npm packages and build
-
-            ```bash
-            cd packages/cactus-cmd-socketio-server
-            npm install
-            npm run build
-            ```
-
-    1. Build `discounted-cartrade`
-
-        1. change directory
-
-            Change your current directory to `examples/discounted-cartrade`.
-
-            ```bash
-            cd ../../examples/discounted-cartrade
-            ```
-
-        1. edit config file
-
-            ```bash
-            vi config/usersettings.yaml
-            ```
-
-            Edit value of `applicationHostInfo.hostName`  in `usersettings.yaml` from `http://aaa.bbb.ccc.ddd` to `http://localhost`:
-
-            ```yaml
-            applicationHostInfo:
-              hostName: http://localhost # please change hostName to your IP address
-              hostPort: 5034
-            ```
-
-            **Note**: Variables you write in `usersetting.yaml` overwrite variables in `default.yaml`.
-
-        1. build discounted-cartrade
-
-            The `init-discount-cartrade` step is for creating symbolic links. Therefore you need to run this step only once.
-
-            ```bash
-            npm install
-            npm run build
-            npm run init-discounted-cartrade
-            ```
-
-    1. Start the application server
-
-        Run this command in `examples/discounted-cartrade` directory:
-
-        ```bash
-        npm run start
-        ```
-
-        The discounted-cartrade application will wait on port `5034`.
-
-1. Prepare script environment
-
-    Create a working directory and copy files and install python packages.
-
-    ```bash
-    mkdir -p /tmp/scriptdir/src
-    cd /tmp/scriptdir/src
-    touch __init__.py
-    cp /tmp/work/cactus/tools/docker/indy-testnet/clientbase/from-indy-sdk/utils.py  .
-    cp /tmp/work/cactus/examples/register-indy-data/req_discounted_cartrade.py .
-    cd ..
-    python3 -m venv .venv
-    . .venv/bin/activate
-    pip install python3-indy requests
+1. Build cartrade:
+    ```
+    ./script-build-discounted-cartrade.sh
     ```
 
-    **Note**: python3.6 or higher is required.
-
-## Run the scenario
-
-1. Start the car trade
-
-    Run this command:
-
-    ```bash
-    cd /tmp/scriptdir
-    . .venv/bin/activate
-    TEST_POOL_IP=172.16.0.2 python -m src.req_discounted_cartrade
+1. Launch cartrade and validators from local `docker-compose.yml` (use separate console for that, docker-compose will block your prompt):
+    ```
+    docker-compose build && docker-compose up
+    # or
+    npm run start
     ```
 
-    The script creates a proof that user Alice is employed by Acme Corp. This script then `POST`s the proof to the application. The application decides the price of the car depending on success / failure of proof verification. After that, the application moves ETH token on the Go-Ethereum and moves the car ownership on the Hyperledger Fabric.
+    This will build and launch all needed containers, the final output should look like this:
 
-    **Note**: the address `172.16.0.2` is the address of the container Hyperledger Indy pool is running on.
-
-    **Note**: the script will save the proof in `myproof.json` in current directory. Once you have the file, you can instruct the script to skip the time consuming steps and directly `POST` the proof to the application by adding an option: `TEST_POOL_IP=172.16.0.2 python -m src.req_discounted_cartrade --mode http`
-
-    **Note**: If your environment defines http proxy environment variables and the script / curl complains about it, unset them by `unset http_proxy https_proxy HTTP_PROXY HTTPS_PROXY`.
-
-1. See the status in the ledger after the car trade
-
-    To see trade record (the src.req_discounted_cartrade will print the ID at the end of script):
-
-    ```bash
-    curl localhost:5034/api/v1/bl/trades/XXXXXXXXXXXXXX-XXX -XGET
+    ```
+    discounted-cartrade-ethereum-validator | listening on *:5050
+    ...
+    discounted-cartrade-fabric-socketio-validator | listening on *:5040
+    ...
+    discounted-cartrade-indy-validator | 2022-01-31 16:00:49,552 INFO success: validator entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+    ...
+    discounted-cartrade-indy-validator-nginx | 2022/01/31 16:00:49 [notice] 1#1: start worker process 35
+    ...
+    cmd-socketio-base-dummy exited with code 0
+    ...
+    indy-sdk-cli-base-dummy exited with code 0
+    ...
+    req_discounted_cartrade      | Done.
+    req_discounted_cartrade exited with code 0
+    ...
+    discounted-cartrade-blp      | [2022-01-31T16:00:56.208] [INFO] www - listening on *: 5034
     ```
 
-    To see the balance (last element of the URL is the account ID):
+## How to use this application
 
-    ```bash
-    curl localhost:5034/api/v1/bl/balance/9d624f7995e8bd70251f8265f2f9f2b49f169c55
+1. (Optional) Check the balance on Ethereum and the car ownership on Fabric using the following script:
+    ```
+    node ./read-ledger-state.js
     ```
 
-    To see the status of the car:
+    The result looks like the following (simplified output):
 
-    ```bash
-    curl localhost:5034/api/v1/bl/cars/CAR1 -XGET
+    ```
+    # Ethereum fromAccount:
+    { status: 200, amount: 100000 }
+
+    # Ethereum toAccount:
+    { status: 200, amount: 0 }
+
+    # Fabric:
+    [
+        {
+            ...
+        },
+        {
+            ID: 'asset2',
+            color: 'red',
+            size: 5,
+            owner: 'Brad',
+            appraisedValue: 400
+        },
+        ...
+    ]
+    ```
+
+1. Run the transaction execution using the following script:
+    ```
+    ./script-post-discounted-cartrade-sample.sh
+    ```
+
+    ... or send request manually:
+
+    ```
+    docker run --rm -ti -v "$(pwd)/etc/cactus/":"/etc/cactus/" --net="host" req_discounted_cartrade
+    ```
+
+    After this, the transactions are executed by order. When the following log appears on the console where you executed `docker-compose`, the transactions are completed.
+
+    ```
+    [INFO] BusinessLogicCartrade - ##INFO: completed cartrade, businessLogicID: guks32pf, tradeID: *******-001
+    ```
+
+1. (Optional) Check the balance on Ethereum and the car ownership on Fabric using the following script
+    ```
+    node ./read-ledger-state.js
+    ```
+
+    The result looks like the following (simplified output). In the following case, 50 coins from `fromAccount` was transferred to `toAccount`, and the car ownership ("owner") was transferred from Brad to Cathy.
+
+    ```
+    # Ethereum fromAccount:
+    { status: 200, amount: 99950 }
+
+    # Ethereum toAccount:
+    { status: 200, amount: 50 }
+
+    # Fabric:
+    [
+        {
+            ...
+        },
+        {
+            ID: 'asset2',
+            color: 'red',
+            size: 5,
+            owner: 'Cathy',
+            appraisedValue: 400
+        },
+        ...
+    ]
+    ```
+
+## How to stop the application and Docker containers
+
+1. Press `Ctrl+C` in `docker-compose` console to stop the application.
+1. Run cleanup script
+    ```
+    sudo ./script-cleanup.sh
+    ```
+
+#### Manual cleanup instructions
+
+1. Remove the config files on your machine
+    ```
+    sudo rm -r ./etc/cactus/
+    ```
+1. Stop the docker containers of Ethereum, Fabric and Indy
+    - `docker stop geth1 cartrade_faio2x_testnet indy-testnet-pool`
+    - `docker rm geth1 cartrade_faio2x_testnet indy-testnet-pool`
+
+1. Clear indy testnet sandbox
+    ```
+    pushd ../../tools/docker/indy-testnet/
+    ./script-cleanup.sh
+    popd
     ```

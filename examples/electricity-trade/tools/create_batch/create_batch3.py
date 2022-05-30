@@ -241,7 +241,7 @@ def do_create_batch(args):
     # do_generate(args, batches, keys)
     # print("##args.value_inc", args.value_inc)
     # print("##args.value_inc_rand", args.value_inc_rand)
-    
+
     value_inc = args.value_inc
     if args.value_inc_rand >= 1:
         value_inc = random.randint(1, args.value_inc_rand)
@@ -250,7 +250,7 @@ def do_create_batch(args):
     if value_inc >= 0:
         # print("##call do_generate()")
         do_generate(args, batches, keys, value_inc, args.value_set >= 0)
-    
+
     # print("##args", args)
     write_batch_file(args, batches)
 

@@ -11,6 +11,8 @@ import { BESU_DEMO_LEDGER_ID } from "../../../constants";
 import { BookshelfDetailPage } from "../bookshelf-detail/bookshelf-detail.page";
 import { ModalController } from "@ionic/angular";
 
+import { AuthConfig } from "../../common/auth-config";
+
 @Component({
   selector: "app-bookshelf-list",
   templateUrl: "./bookshelf-list.page.html",
@@ -42,6 +44,11 @@ export class BookshelfListPage implements OnInit {
     this._supplyChainApi = await this.baseClient.ofLedger(
       this.ledgerId,
       SupplyChainApi,
+      {
+        baseOptions: {
+          headers: { Authorization: `Bearer ${AuthConfig.authToken}` },
+        },
+      },
     );
     await this.loadData();
   }

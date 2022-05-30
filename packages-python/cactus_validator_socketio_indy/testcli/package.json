@@ -1,0 +1,9 @@
+{
+  "name": "testcli",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "jsonwebtoken": "8.5.1",
+    "socket.io-client": "4.1.3"
+  }
+}

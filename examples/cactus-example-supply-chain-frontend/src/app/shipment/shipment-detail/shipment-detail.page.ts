@@ -15,6 +15,8 @@ import {
 import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
 import { QUORUM_DEMO_LEDGER_ID } from "src/constants";
 
+import { AuthConfig } from "../../common/auth-config";
+
 @Component({
   selector: "app-shipment-detail",
   templateUrl: "./shipment-detail.page.html",
@@ -52,6 +54,11 @@ export class ShipmentDetailPage implements OnInit {
     this._supplyChainApi = await this.baseClient.ofLedger(
       this.quorumLedgerId,
       SupplyChainApi,
+      {
+        baseOptions: {
+          headers: { Authorization: `Bearer ${AuthConfig.authToken}` },
+        },
+      },
     );
 
     if (!this.shipment) {

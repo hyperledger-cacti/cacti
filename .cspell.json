@@ -8,6 +8,7 @@
         "Albertirsa",
         "ALLFORTX",
         "ANYFORTX",
+        "AWSSM",
         "APIV",
         "approveformyorg",
         "Authz",
@@ -130,7 +131,8 @@
         "uuidv",
         "vscc",
         "wasm",
-        "Xdai"
+        "Xdai",
+        "goquorum"
     ],
     "dictionaries": [
         "typescript,node,npm,go,rust"

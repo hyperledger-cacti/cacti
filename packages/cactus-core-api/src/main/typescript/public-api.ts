@@ -5,6 +5,7 @@ export * from "./generated/openapi/typescript-axios/index";
 export * from "./generated/openapi/typescript-axios/base";
 
 export { IPluginLedgerConnector } from "./plugin/ledger-connector/i-plugin-ledger-connector";
+export { ISocketApiClient } from "./plugin/ledger-connector/i-socket-api-client";
 export { IPluginConsortium } from "./plugin/consortium/i-plugin-consortium";
 export { IPluginKeychain } from "./plugin/keychain/i-plugin-keychain";
 export { isIPluginKeychain } from "./plugin/keychain/is-i-plugin-keychain";
@@ -35,3 +36,9 @@ export {
 
 export { IPluginObjectStore } from "./plugin/object-store/i-plugin-object-store";
 export { isIPluginObjectStore } from "./plugin/object-store/is-i-plugin-object-store";
+
+export {
+  IVerifier,
+  LedgerEvent,
+  IVerifierEventListener,
+} from "./client/i-verifier";

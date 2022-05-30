@@ -144,7 +144,7 @@ export class FilesApiMock implements FilesAPI {
   public async flush(
     ipfsPath: string,
     options?: AbortOptions | undefined,
-  ): Promise<CID> {
+  ): Promise<any> {
     throw new RuntimeError("Method flush() not implemented");
   }
 

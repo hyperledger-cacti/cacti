@@ -1,6 +1,6 @@
-import test, { Test } from "tape-promise/tape";
 import { v4 as uuidv4 } from "uuid";
 import { generateKeyPair, exportSPKI } from "jose";
+import "jest-extended";
 import expressJwt from "express-jwt";
 
 import { LoggerProvider, LogLevelDesc } from "@hyperledger/cactus-common";
@@ -23,7 +23,7 @@ const log = LoggerProvider.getOrCreate({
   label: __filename,
 });
 
-test(testCase, async (t: Test) => {
+test(testCase, async () => {
   try {
     const jwtKeyPair = await generateKeyPair("RS256", { modulusLength: 4096 });
     const jwtPublicKey = await exportSPKI(jwtKeyPair.publicKey);
@@ -33,7 +33,7 @@ test(testCase, async (t: Test) => {
       audience: uuidv4(),
       issuer: uuidv4(),
     };
-    t.ok(expressJwtOptions, "Express JWT config truthy OK");
+    expect(expressJwtOptions).toBeTruthy();
 
     const authorizationConfig: IAuthorizationConfig = {
       unprotectedEndpointExemptions: [],
@@ -67,17 +67,13 @@ test(testCase, async (t: Test) => {
       pluginRegistry,
     });
 
-    const mainAssertion =
-      "API server refuses to start when non-exempt unprotected endpoints are present OK";
-    await t.rejects(
-      apiServer.start(),
-      new RegExp(ApiServer.E_NON_EXEMPT_UNPROTECTED_ENDPOINTS),
-      mainAssertion,
+    const startPromise = apiServer.start();
+
+    await expect(startPromise).rejects.toThrow(
+      ApiServer.E_NON_EXEMPT_UNPROTECTED_ENDPOINTS,
     );
-    t.end();
   } catch (ex) {
     log.error(ex);
-    t.fail("Exception thrown during test execution, see above for details!");
-    throw ex;
+    fail("Exception thrown during test execution, see above for details!");
   }
 });

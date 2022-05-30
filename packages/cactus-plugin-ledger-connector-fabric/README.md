@@ -288,11 +288,11 @@ The above diagram shows the sequence diagram of run-transaction-endpoint. User A
 
 ![run-transaction-endpoint transact() method](docs/architecture/images/run-transaction-endpoint-transact.png)
 
-The above diagram shows the sequence diagraom of transact() method of the PluginLedgerConnectorFabric class. The caller to this function, which in reference to the above sequence diagram is API server, sends RunTransactionRequest object as an argument to the transact() method. Based on the invocationType (FabricContractInvocationType.CALL, FabricCOntractInvocationType.SEND), corresponding responses are send back to the caller.
+The above diagram shows the sequence diagram of transact() method of the PluginLedgerConnectorFabric class. The caller to this function, which in reference to the above sequence diagram is API server, sends RunTransactionRequest object as an argument to the transact() method. Based on the invocationType (FabricContractInvocationType.CALL, FabricCOntractInvocationType.SEND), corresponding responses are send back to the caller.
 
 ![run-transaction-endpoint-enroll](docs/architecture/images/run-transaction-endpoint-enroll.png)
 
-The above diagram shows the sequence diagraom of enroll() method of the PluginLedgerConnectorFabric class. The caller to this function, which in reference to the above sequence diagram is API server, sends Signer object along with EnrollmentRequest as an argument to the enroll() method. Based on the singerType (FabricSigningCredentialType.X509, FabricSigningCredentialType.VaultX509, FabricSigningCredentialType.WsX509), corresponding identity is enrolled and stored inside keychain. 
+The above diagram shows the sequence diagram of enroll() method of the PluginLedgerConnectorFabric class. The caller to this function, which in reference to the above sequence diagram is API server, sends Signer object along with EnrollmentRequest as an argument to the enroll() method. Based on the singerType (FabricSigningCredentialType.X509, FabricSigningCredentialType.VaultX509, FabricSigningCredentialType.WsX509), corresponding identity is enrolled and stored inside keychain. 
 
 
 
@@ -396,7 +396,7 @@ Don't have a fabric network on hand to test with? Test or develop against our fa
 
 **Terminal Window 1 (Ledger)**
 ```sh
-docker run -p 0.0.0.0:8545:8545/tcp  -p 0.0.0.0:8546:8546/tcp  -p 0.0.0.0:8888:8888/tcp  -p 0.0.0.0:9001:9001/tcp  -p 0.0.0.0:9545:9545/tcp hyperledger/cactus-fabric-all-in-one:latest
+docker run --privileged -p 0.0.0.0:8545:8545/tcp  -p 0.0.0.0:8546:8546/tcp  -p 0.0.0.0:8888:8888/tcp  -p 0.0.0.0:9001:9001/tcp  -p 0.0.0.0:9545:9545/tcp ghcr.io/hyperledger/cactus-fabric-all-in-one:v1.0.0-rc.2
 ```
 
 **Terminal Window 2 (Cactus API Server)**

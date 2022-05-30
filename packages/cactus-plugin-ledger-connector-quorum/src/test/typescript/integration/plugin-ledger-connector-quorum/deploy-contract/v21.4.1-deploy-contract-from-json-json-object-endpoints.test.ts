@@ -43,9 +43,8 @@ test("BEFORE " + testCase, async (t: Test) => {
 });
 
 test(testCase, async (t: Test) => {
-  const containerImageName = "hyperledger/cactus-quorum-all-in-one";
   const containerImageVersion = "2021-05-03-quorum-v21.4.1";
-  const ledgerOptions = { containerImageName, containerImageVersion };
+  const ledgerOptions = { containerImageVersion };
   const ledger = new QuorumTestLedger(ledgerOptions);
   test.onFinish(async () => {
     await ledger.stop();
@@ -85,7 +84,7 @@ test(testCase, async (t: Test) => {
   expressApp.use(bodyParser.json({ limit: "250mb" }));
   const server = http.createServer(expressApp);
   const listenOptions: IListenOptions = {
-    hostname: "0.0.0.0",
+    hostname: "localhost",
     port: 0,
     server,
   };

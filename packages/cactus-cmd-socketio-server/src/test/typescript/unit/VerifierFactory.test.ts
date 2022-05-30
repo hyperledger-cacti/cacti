@@ -26,6 +26,7 @@ const log: Logger = LoggerProvider.getOrCreate({
 });
 
 // Mock ledger data
+jest.mock("fs");
 import { LPInfoHolder } from "../../../main/typescript/routing-interface/util/LPInfoHolder";
 jest.mock("../../../main/typescript/routing-interface/util/LPInfoHolder");
 const mockLedgerData = "{mockLedgerData}"
@@ -41,14 +42,14 @@ import { Verifier } from "../../../main/typescript/verifier/Verifier";
 jest.mock("../../../main/typescript/verifier/Verifier");
 
 import { VerifierFactory } from "../../../main/typescript/verifier/VerifierFactory";
-import { VerifierEventListener } from "../../../main/typescript/verifier/LedgerPlugin";
+import { IVerifierEventListener } from "../../../main/typescript/verifier/LedgerPlugin";
 
 //////////////////////////
 // UNIT TESTS
 /////////////////////////
 
 describe("VerifierFactory getVerifier tests", () => {
-  const listenerMock: VerifierEventListener = {
+  const listenerMock: IVerifierEventListener = {
     onEvent: () => log.warn("listenerMock::onEvent() called!"),
   };
   const mockInfoHolder = new LPInfoHolder();
@@ -77,12 +78,21 @@ describe("VerifierFactory getVerifier tests", () => {
   test("Starts monitoring when requested on newly added verifier", () => {
     const verifierId = "someVerifierId";
     const appId = "myAppId";
-    const monitorOptions = {name: "debug", debug: true};
+    const monitorOptions = { name: "debug", debug: true };
 
-    const newVerifier = sut.getVerifier(verifierId, appId, monitorOptions, true);
+    const newVerifier = sut.getVerifier(
+      verifierId,
+      appId,
+      monitorOptions,
+      true,
+    );
 
     expect(Object.keys(VerifierFactory.verifierHash).length).toBe(1);
-    expect(newVerifier.startMonitor).toBeCalledWith(appId, monitorOptions, listenerMock);
+    expect(newVerifier.startMonitor).toBeCalledWith(
+      appId,
+      monitorOptions,
+      listenerMock,
+    );
   });
 
   test("Reuses already seen verifier from the hash", () => {

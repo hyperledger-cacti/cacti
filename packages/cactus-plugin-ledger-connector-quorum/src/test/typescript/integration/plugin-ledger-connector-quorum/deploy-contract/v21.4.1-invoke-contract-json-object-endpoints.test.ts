@@ -34,8 +34,8 @@ const logLevel: LogLevelDesc = "INFO";
 
 test("Quorum Ledger Connector Plugin", async (t: Test) => {
   const containerImageVersion = "2021-05-03-quorum-v21.4.1";
-  const containerImageName = "hyperledger/cactus-quorum-all-in-one";
-  const ledgerOptions = { containerImageName, containerImageVersion };
+
+  const ledgerOptions = { containerImageVersion };
   const ledger = new QuorumTestLedger(ledgerOptions);
   test.onFinish(async () => {
     await ledger.stop();
@@ -73,7 +73,7 @@ test("Quorum Ledger Connector Plugin", async (t: Test) => {
   expressApp.use(bodyParser.json({ limit: "250mb" }));
   const server = http.createServer(expressApp);
   const listenOptions: IListenOptions = {
-    hostname: "0.0.0.0",
+    hostname: "localhost",
     port: 0,
     server,
   };

@@ -17,7 +17,7 @@ function main()
   if [ "$MAJOR" -gt 1 ]; then
     # Major version is 2 or newer (we'll deal with 3.x when it is released)
     cd /fabric-samples/test-network/
-    peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile "${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem" -C mychannel -n basic --peerAddresses localhost:7051 --tlsRootCertFiles "${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt" --peerAddresses localhost:9051 --tlsRootCertFiles "${PWD}/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt" -c '{"function":"InitLedger","Args":[]}'
+    peer chaincode query -C mychannel -n basic -c '{"Args": [], "Function": "GetAllAssets"}'
   else
     # Major version is 1.x or earlier (assumption is 1.4.x only)
     docker exec cli peer chaincode query --channelID mychannel --name fabcar --ctor '{"Args": [], "Function": "queryAllCars"}'

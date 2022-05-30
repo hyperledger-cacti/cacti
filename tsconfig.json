@@ -8,6 +8,9 @@
       "path": "./packages/cactus-cmd-api-server/tsconfig.json"
     },
     {
+      "path": "./packages/cactus-cmd-socketio-server/tsconfig.json"
+    },
+    {
       "path": "./packages/cactus-common/tsconfig.json"
     },
     {
@@ -55,9 +58,20 @@
     {
       "path": "./packages/cactus-plugin-ledger-connector-fabric/tsconfig.json"
     },
-    { "path": "./packages/cactus-plugin-ledger-connector-iroha/tsconfig.json" },
+    {
+      "path": "./packages/cactus-plugin-ledger-connector-fabric-socketio/tsconfig.json"
+    },
+    {
+      "path": "./packages/cactus-plugin-ledger-connector-go-ethereum-socketio/tsconfig.json"
+    },
+    {
+      "path": "./packages/cactus-plugin-ledger-connector-iroha/tsconfig.json"
+    },
     {
       "path": "./packages/cactus-plugin-ledger-connector-xdai/tsconfig.json"
+    },
+    {
+      "path": "./packages/cactus-verifier-client/tsconfig.json"
     },
     {
       "path": "./packages/cactus-test-api-client/tsconfig.json"
@@ -79,6 +93,9 @@
     },
     {
       "path": "./packages/cactus-test-plugin-ledger-connector-quorum/tsconfig.json"
+    },
+    {
+      "path": "./packages/cactus-plugin-ledger-connector-sawtooth-socketio/tsconfig.json"
     },
     {
       "path": "./packages/cactus-test-tooling/tsconfig.json"

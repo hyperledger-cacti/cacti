@@ -1,0 +1,24 @@
+blpRegistry:
+  - 
+    businessLogicID: jLn76rgB
+    validatorID: [84jUisrs]
+
+logLevel: debug
+
+applicationHostInfo:
+  hostName: http://aaa.bbb.ccc.ddd
+  hostPort: 5034
+
+appRouters:
+  -
+    path: /api/v1/bl/check-ethereum-validator/
+    routerJs: ../../../../../../examples/cactus-check-connection-ethereum-validator/check-ethereum-validator.js
+
+verifier:
+  maxCounterRequestID: 100
+  syncFunctionTimeoutMillisecond: 5000
+
+socketOptions:
+  rejectUnauthorized: false
+  reconnection: false
+  timeout: 20000

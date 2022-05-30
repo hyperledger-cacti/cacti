@@ -5,9 +5,11 @@
  * TransactionIndy.ts
  */
 
-import { LPInfoHolder } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/util/LPInfoHolder";
-import { Verifier } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/verifier/Verifier";
-import { TransactionSigner } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/util/TransactionSigner";
+import {
+  LPInfoHolder,
+  Verifier,
+  ConfigUtil,
+} from "@hyperledger/cactus-cmd-socket-server";
 
 const libWeb3 = require("web3");
 
@@ -15,9 +17,7 @@ const fs = require("fs");
 const path = require("path");
 const yaml = require("js-yaml");
 //const config: any = JSON.parse(fs.readFileSync("/etc/cactus/default.json", 'utf8'));
-const config: any = yaml.safeLoad(
-  fs.readFileSync("/etc/cactus/default.yaml", "utf8")
-);
+const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
 import { stringify } from "querystring";
 const moduleName = "TransactionIndy";

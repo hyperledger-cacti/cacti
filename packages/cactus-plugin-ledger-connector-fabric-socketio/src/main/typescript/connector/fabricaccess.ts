@@ -11,14 +11,13 @@
  */
 
 //Dependent library
-import { SplugConfig } from "./PluginConfig";
-import { config } from "../common/core/config/default";
+import * as config from "../common/core/config";
 const path = require("path");
+import fs from "fs";
 
 //fabric client dependent library
-const FabricClient = require("fabric-client");
-const User = require("fabric-client/lib/User.js");
-const copService = require("fabric-ca-client");
+import FabricClient, { User } from "fabric-client";
+import copService, { TLSOptions } from "fabric-ca-client";
 
 // list of fabric-client objects
 const clients = {};
@@ -26,48 +25,54 @@ const clients = {};
 // Log settings
 import { getLogger } from "log4js";
 const logger = getLogger("fabricaccess[" + process.pid + "]");
-logger.level = config.logLevel;
+logger.level = config.read<string>("logLevel", "info");
 
 // Get user object to send Proposal to EP
-function getSubmitter(cli) {
+export function getSubmitterAndEnroll(cli: FabricClient): Promise<User> {
   logger.info("##fabricaccess_getSubmitter");
-  const caUrl = SplugConfig.fabric.ca.url;
-  const caName = SplugConfig.fabric.ca.name;
-  const submitter = SplugConfig.fabric.submitter;
-  return cli.getUserContext(submitter.name, true).then((user) => {
+  const caUrl = config.read<string>("fabric.ca.url");
+  const caName = config.read<string>("fabric.ca.name");
+  // Returns Promise<User> when checkPersistence is true (poor typing)
+  return (cli.getUserContext(
+    config.read<string>("fabric.submitter.name"),
+    true,
+  ) as Promise<User>).then((user) => {
     return new Promise((resolve, reject) => {
       if (user && user.isEnrolled()) {
         return resolve(user);
       }
-      const member = new User(submitter.name);
+      const member = new User(config.read<string>("fabric.submitter.name"));
       let cryptoSuite = cli.getCryptoSuite();
       if (!cryptoSuite) {
-        const storePath = path.join(__dirname, SplugConfig.fabric.keystore);
+        const storePath = path.join(
+          config.read<string>("fabric.keystore"),
+          config.read<string>("fabric.submitter.name"),
+        );
         cryptoSuite = FabricClient.newCryptoSuite();
         cryptoSuite.setCryptoKeyStore(
           FabricClient.newCryptoKeyStore({
             path: storePath,
-          })
+          }),
         );
         cli.setCryptoSuite(cryptoSuite);
       }
       member.setCryptoSuite(cryptoSuite);
 
-      const tlsOptions = {
-        trustedRoots: [],
+      const tlsOptions: TLSOptions = {
+        trustedRoots: Buffer.from([]),
         verify: false,
       };
       const cop = new copService(caUrl, tlsOptions, caName, cryptoSuite);
       return cop
         .enroll({
-          enrollmentID: submitter.name,
-          enrollmentSecret: submitter.secret,
+          enrollmentID: config.read<string>("fabric.submitter.name"),
+          enrollmentSecret: config.read<string>("fabric.submitter.secret"),
         })
         .then((enrollment) => {
           return member.setEnrollment(
             enrollment.key,
             enrollment.certificate,
-            SplugConfig.fabric.mspid
+            config.read<string>("fabric.mspid"),
           );
         })
         .then(() => {
@@ -83,23 +88,18 @@ function getSubmitter(cli) {
   });
 }
 
-// Export also for use with ServerMonitorPlugin
-exports.GetSubmitter = function (cli) {
-  return getSubmitter(cli);
-};
-
 // fabric-client and Channel object generation
-function getClientAndChannel() {
+export async function getClientAndChannel(
+  channelName = config.read<string>("fabric.channelName"),
+) {
   logger.info("##fabricaccess_getClientAndChannel");
-  const retObj = { client: null, channel: null };
-  const channelName = SplugConfig.fabric.channelName;
   // Since only one KVS can be set in the client, management in CA units as well as KVS path
   let isNewClient = false;
-  let client = clients[SplugConfig.fabric.ca.name];
+  let client = clients[config.read<string>("fabric.ca.name")];
   if (!client) {
     logger.info("create new fabric-client");
     client = new FabricClient();
-    clients[SplugConfig.fabric.ca.name] = client;
+    clients[config.read<string>("fabric.ca.name")] = client;
     isNewClient = true;
   }
 
@@ -113,49 +113,53 @@ function getClientAndChannel() {
     if (channel == null) {
       logger.info("create new channel, name=" + channelName);
       channel = client.newChannel(channelName);
-      const orderer = client.newOrderer(SplugConfig.fabric.orderer.url);
+      const ordererCA = fs.readFileSync(
+        config.read<string>("fabric.orderer.tlsca"),
+        "utf8",
+      );
+      const orderer = client.newOrderer(
+        config.read<string>("fabric.orderer.url"),
+        {
+          pem: ordererCA,
+          "ssl-target-name-override": config.read<string>(
+            "fabric.orderer.name",
+          ),
+        },
+      );
       channel.addOrderer(orderer);
       // EP settings
-      for (let i = 0; i < SplugConfig.fabric.peers.length; i++) {
-        const peer = client.newPeer(SplugConfig.fabric.peers[i].requests);
-        channel.addPeer(peer);
+      const peersConfig = config.read<any[]>("fabric.peers");
+      for (let i = 0; i < peersConfig.length; i++) {
+        const peerCA = fs.readFileSync(peersConfig[i].tlsca, "utf8");
+        const peer = client.newPeer(peersConfig[i].requests, {
+          pem: peerCA,
+          "ssl-target-name-override": peersConfig[i].name,
+        });
+        channel.addPeer(peer, config.read<string>("fabric.mspid"));
       }
+
+      const storePath = path.join(
+        config.read<string>("fabric.keystore"),
+        config.read<string>("fabric.submitter.name"),
+      );
+      const cryptoSuite = FabricClient.newCryptoSuite();
+      cryptoSuite.setCryptoKeyStore(
+        FabricClient.newCryptoKeyStore({
+          path: storePath,
+        }),
+      );
+      client.setCryptoSuite(cryptoSuite);
+
+      // Generate enrollment information storage location
+      let store = await FabricClient.newDefaultKeyValueStore({
+        path: storePath,
+      });
+      client.setStateStore(store);
     } else {
       // Exception when reflecting connection destination information difference
       logger.error(e);
     }
   }
-  retObj.channel = channel;
 
-  return new Promise((resolve, reject) => {
-    if (isNewClient) {
-      //var storePath = "/tmp/" + SplugConfig.fabric.keystore;
-      const storePath = SplugConfig.fabric.keystore;
-      const cryptoSuite = FabricClient.newCryptoSuite();
-      cryptoSuite.setCryptoKeyStore(
-        FabricClient.newCryptoKeyStore({
-          path: storePath,
-        })
-      );
-      client.setCryptoSuite(cryptoSuite);
-
-      // Generate enrollment information storage location
-      return FabricClient.newDefaultKeyValueStore({
-        path: storePath,
-      }).then((store) => {
-        // Set KeyValue Store
-        client.setStateStore(store);
-        retObj.client = client;
-        resolve(retObj);
-      });
-    } else {
-      retObj.client = client;
-      resolve(retObj);
-    }
-  });
+  return { client, channel };
 }
-
-// Export also for use with ServerMonitorPlugin
-exports.GetClientAndChannel = function () {
-  return getClientAndChannel();
-};

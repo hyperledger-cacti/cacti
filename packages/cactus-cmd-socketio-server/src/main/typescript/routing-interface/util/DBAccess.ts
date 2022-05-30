@@ -15,7 +15,6 @@ const fs = require("fs");
 const path = require("path");
 const yaml = require("js-yaml");
 const configDefault: any = ConfigUtil.getConfig();
-// const configVerifier: any = yaml.safeLoad(fs.readFileSync("/etc/cactus/validator-registry-config.yaml", 'utf8'));
 const configVerifier: ValidatorRegistry = new ValidatorRegistry(
   path.resolve(__dirname, "/etc/cactus/validator-registry-config.yaml")
 );
@@ -24,9 +23,9 @@ const configContract: any = yaml.safeLoad(
 );
 
 export class DBAccess {
-  ledgerPluginInfo: LedgerPluginInfo[];
-  contractInfo: [];
-  blpRegistryInfo: [];
+  ledgerPluginInfo: LedgerPluginInfo[] = [];
+  contractInfo: [] = [];
+  blpRegistryInfo: [] = [];
 
   constructor() {
     // TODO: DB Access Initialization

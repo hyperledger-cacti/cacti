@@ -6,17 +6,9 @@
  */
 
 import { Router, NextFunction, Request, Response } from "express";
-import { RIFUtil } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/util/RIFUtil";
-import { ConfigUtil } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/util/ConfigUtil";
-import {
-  RIFError,
-  BadRequestError,
-  InternalServerError,
-} from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/RIFError";
+import { ConfigUtil, RIFError } from "@hyperledger/cactus-cmd-socket-server";
 import { BalanceManagement } from "./BalanceManagement";
 
-const fs = require("fs");
-const path = require("path");
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
 const moduleName = "balance";

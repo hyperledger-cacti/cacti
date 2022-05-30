@@ -1,35 +1,7 @@
 {
   "name": "@hyperledger/cactus-core",
-  "version": "1.0.0-rc.3",
+  "version": "1.0.0",
   "description": "Contains lower level abstractions/implementation that is to be shared by multiple other, higher level packages of the project.",
-  "main": "dist/lib/main/typescript/index.js",
-  "mainMinified": "dist/cactus-core.node.umd.min.js",
-  "browser": "dist/cactus-core.web.umd.js",
-  "browserMinified": "dist/cactus-core.web.umd.min.js",
-  "module": "dist/lib/main/typescript/index.js",
-  "types": "dist/lib/main/typescript/index.d.ts",
-  "files": [
-    "dist/*"
-  ],
-  "scripts": {
-    "watch": "npm-watch",
-    "webpack": "npm-run-all webpack:dev",
-    "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
-    "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js",
-    "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js"
-  },
-  "watch": {},
-  "publishConfig": {
-    "access": "public"
-  },
-  "engines": {
-    "node": ">=10",
-    "npm": ">=6"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/hyperledger/cactus.git"
-  },
   "keywords": [
     "Hyperledger",
     "Cactus",
@@ -37,6 +9,15 @@
     "Blockchain",
     "Distributed Ledger Technology"
   ],
+  "homepage": "https://github.com/hyperledger/cactus#readme",
+  "bugs": {
+    "url": "https://github.com/hyperledger/cactus/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger/cactus.git"
+  },
+  "license": "Apache-2.0",
   "author": {
     "name": "Hyperledger Cactus Contributors",
     "email": "cactus@lists.hyperledger.org",
@@ -54,14 +35,23 @@
       "url": "https://accenture.com"
     }
   ],
-  "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/hyperledger/cactus/issues"
+  "main": "dist/lib/main/typescript/index.js",
+  "module": "dist/lib/main/typescript/index.js",
+  "browser": "dist/cactus-core.web.umd.js",
+  "types": "dist/lib/main/typescript/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "scripts": {
+    "watch": "npm-watch",
+    "webpack": "npm-run-all webpack:dev",
+    "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
+    "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
+    "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
-  "homepage": "https://github.com/hyperledger/cactus#readme",
   "dependencies": {
-    "@hyperledger/cactus-common": "1.0.0-rc.3",
-    "@hyperledger/cactus-core-api": "1.0.0-rc.3",
+    "@hyperledger/cactus-common": "1.0.0",
+    "@hyperledger/cactus-core-api": "1.0.0",
     "express": "4.17.1",
     "express-jwt-authz": "2.4.1",
     "express-openapi-validator": "4.12.12",
@@ -70,5 +60,15 @@
   "devDependencies": {
     "@types/express": "4.17.13",
     "uuid": "8.3.2"
-  }
+  },
+  "engines": {
+    "node": ">=10",
+    "npm": ">=6"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "browserMinified": "dist/cactus-core.web.umd.min.js",
+  "mainMinified": "dist/cactus-core.node.umd.min.js",
+  "watch": {}
 }

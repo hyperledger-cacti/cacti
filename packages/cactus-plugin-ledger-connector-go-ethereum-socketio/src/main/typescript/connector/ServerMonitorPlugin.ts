@@ -14,16 +14,16 @@
  */
 
 // configuration file
-import { SplugConfig } from "./PluginConfig";
-import { config } from "../common/core/config/default";
+import * as config from "../common/core/config";
 // Log settings
 import { getLogger } from "log4js";
 const logger = getLogger("ServerMonitorPlugin[" + process.pid + "]");
-logger.level = config.logLevel;
+logger.level = config.read("logLevel", "info");
 // utility
 import { ValidatorAuthentication } from "./ValidatorAuthentication";
 // Load libraries, SDKs, etc. according to specifications of endchains as needed
 const Web3 = require("web3");
+import safeStringify from "fast-safe-stringify";
 
 /*
  * ServerMonitorPlugin
@@ -56,7 +56,9 @@ export class ServerMonitorPlugin {
       logger.info("create new web3 filter and start watching.");
       try {
         const web3 = new Web3();
-        const provider = new web3.providers.HttpProvider(SplugConfig.provider);
+        const provider = new web3.providers.HttpProvider(
+          config.read("ledgerUrl"),
+        );
         web3.setProvider(provider);
         filter = web3.eth.filter("latest");
         // filter should be managed by client ID
@@ -68,7 +70,7 @@ export class ServerMonitorPlugin {
             const blockData = web3.eth.getBlock(blockHash, true);
             const trLength = blockData.transactions.length;
             logger.info(
-              trLength + " transactions in block " + blockData.number
+              trLength + " transactions in block " + blockData.number,
             );
             console.log("##[HL-BC] Validate transactions(D3)");
             console.log("##[HL-BC] digital sign on valid transaction(D4)");
@@ -96,11 +98,11 @@ export class ServerMonitorPlugin {
           }
         });
       } catch (e) {
-        const emsg = e.toString().replace(/Error: /g, "");
         const errObj = {
           status: 504,
-          errorDetail: emsg,
+          errorDetail: safeStringify(e),
         };
+        logger.error(errObj);
         cb(errObj);
       }
     } else {

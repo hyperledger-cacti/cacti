@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0](https://github.com/hyperledger/cactus/compare/v1.0.0-rc.3...v1.0.0) (2022-03-16)
+
+
+### Features
+
+* **connector-corda:** enable Flow Database Access CorDapp ([60dfe1a](https://github.com/hyperledger/cactus/commit/60dfe1a772d06436132f79bf3e89589e181a783e)), closes [#1493](https://github.com/hyperledger/cactus/issues/1493)
+* **connector-corda:** read privateKey from filesystem ([e7e39fd](https://github.com/hyperledger/cactus/commit/e7e39fd5f7ef2d6ec49b4ebebde35875bbf1df44)), closes [#789](https://github.com/hyperledger/cactus/issues/789)
+
+
+
+
+
 # [1.0.0-rc.3](https://github.com/hyperledger/cactus/compare/v1.0.0-rc.2...v1.0.0-rc.3) (2021-12-07)
 
 

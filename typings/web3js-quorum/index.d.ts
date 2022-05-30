@@ -5,7 +5,12 @@ declare module "web3js-quorum" {
   import type {Utils} from "web3-utils";
   import * as Buffer from "buffer";
   
-  export default function Web3Quorum(web3: Web3, enclaveOptions?: EnclaveOptions, isQuorum?: boolean): IWeb3Quorum;
+  export default function Web3Quorum(web3: IWeb3Instance, enclaveOptions?: EnclaveOptions, isQuorum?: boolean): IWeb3Quorum;
+  
+  export interface IWeb3Instance {
+    currentProvider: any;
+    extend: (...args: any[]) => any;
+}
 
   export interface IWeb3Quorum extends Web3 {
     utils: IUtilsWeb3;
@@ -313,14 +318,14 @@ declare module "web3js-quorum" {
   }
 
   export interface ISendRawTransaction extends IDistributeRawTransaction {
-    readonly gasLimit: number;
-    readonly gasPrice: number;
+    readonly gasLimit?: string;
+    readonly gasPrice?: string;
   }
 
   export interface IEthWeb3 extends Eth {
     flexiblePrivacyGroup: IFlexiblePrivacyGroup
     sendRawPrivateTransaction(signed: string, privateData: IPrivateData): Promise<string>
-    getTransactionCount(address: string, privacyGroupId?: string): Promise<number>
+    
     fillTransaction(tx: ITransaction): Promise<{ raw: string, tx: IPrivateTransactionObject }>
 
     storageRoot(address: string, block?: string): Promise<string>

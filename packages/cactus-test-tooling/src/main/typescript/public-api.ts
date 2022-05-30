@@ -26,6 +26,11 @@ export {
 } from "./quorum/quorum-test-ledger";
 
 export {
+  QuorumMultiPartyTestLedger,
+  IQuorumMultiPartyTestLedgerOptions,
+} from "./quorum/quorum-mp-test-ledger";
+
+export {
   CordaTestLedger,
   ICordaTestLedgerConstructorOptions,
   CORDA_TEST_LEDGER_DEFAULT_OPTIONS,
@@ -161,3 +166,4 @@ export { IDockerPullProgressDetail } from "./common/i-docker-pull-progress";
 export { envNodeToDocker } from "./common/env-node-to-docker";
 export { envMapToDocker } from "./common/env-map-to-docker";
 export { envNodeToMap } from "./common/env-node-to-map";
+export * as SocketIOTestSetupHelpers from "./socketio-test-setup-helpers/socketio-test-setup-helpers";

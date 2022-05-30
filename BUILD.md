@@ -26,6 +26,10 @@ This is a video guide to setup Hyperledger Cactus on your local machine.
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/94xoV9Vfu14/0.jpg)](https://www.youtube.com/watch?v=94xoV9Vfu14)
 
+### Installing jdk 8
+
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/V8YBQoxdyiE/0.jpg)](https://youtube.com/watch?v=t4y57Qvrdcc)
+
 ### Installing VSCode and plugins
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/RHQLhZRlAR0/0.jpg)](https://www.youtube.com/watch?v=RHQLhZRlAR0)
@@ -89,11 +93,18 @@ The `npm run watch` script in action:
   * Windows Only
     * WSL2 or any virtual machine running Ubuntu 20.04 LTS
   * Git
-  * NodeJS 16, npm 7 (we recommend using the Node Version Manager (nvm) if available for your OS)
+  * NodeJS v16.13.1, npm v8.1.2 (we recommend using the Node Version Manager (nvm) if available for your OS)
+    ```
+    nvm install 16.13.1
+    nvm use 16.13.1
+    ```
   * Yarn 
     * `npm run install-yarn` (from within the project directory)
-  * Docker Engine
-  * Docker Compose
+  * [Docker Engine](https://docs.docker.com/engine/install/ubuntu/). Make sure that Docker is working and running, for example, running ``docker ps -aq``  
+  * Docker Compose  
+
+  * OpenJDK (Corda support Java 8 JDK but do not currently support Java 9 or higher)
+    * `sudo apt install openjdk-8-jdk-headless`
 
 * Clone the repository
 
@@ -118,7 +129,7 @@ cd cactus
 * Run the initial configuration script (can take a long time, 10+ minutes on a low-spec laptop)
 
 ```sh
-npm run configure
+yarn run configure
 ```
 
 At this point you should have all packages built for development.
@@ -126,11 +137,11 @@ At this point you should have all packages built for development.
 You can start making your changes (use your own fork and a feature branch)
 or just run existing tests and debug them to see how things fit together.
 
-For example you can *run a ledger contract deployment test* via the
+For example you can *run a ledger single status endpoint test* via the
 REST API with this command:
 
 ```sh
-npx tap --ts --timeout=600 packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/deploy-contract-via-web-service.test.ts
+npx tap --ts --timeout=600 packages/cactus-test-plugin-htlc-eth-besu/src/test/typescript/integration/plugin-htlc-eth-besu/get-single-status-endpoint.test.ts
 ```
 
 *You can also start the API server* and verify more complex scenarios with an
@@ -206,7 +217,7 @@ the following decision tree (and keep in mind that we have `npm run watch` too)
 
 ![Build Script Decision Tree](./docs/images/build-script-decision-tree-2021-03-06.png)
 
-## Getting into the SSH connection
+## Configuring SSH to use upterm
 Upload your public key onto github if not done so already. A public key is necessary to join the ssh connection to use upterm. For a comprehensive guide, see the [Generating a new SSH key and adding it to the ssh-agent](https://docs.github.com/en/github/authenticating-to-github/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent).
 
 Locate the `ci.yml` within `.github/workflows` and add to the `ci.yml` code listed below: 

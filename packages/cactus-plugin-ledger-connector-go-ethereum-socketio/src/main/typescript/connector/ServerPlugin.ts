@@ -12,17 +12,17 @@
  */
 
 // configuration file
-const SplugConfig = require("./PluginConfig.js");
-import { config } from "../common/core/config/default";
+import * as config from "../common/core/config";
 // Log settings
 import { getLogger } from "log4js";
 const logger = getLogger("ServerPlugin[" + process.pid + "]");
-logger.level = config.logLevel;
+logger.level = config.read("logLevel", "info");
 // utility
-const SplugUtil = require("./PluginUtil.js");
+import * as SplugUtil from "./PluginUtil";
 import { ValidatorAuthentication } from "./ValidatorAuthentication";
 // Load libraries, SDKs, etc. according to specifications of endchains as needed
 const Web3 = require("web3");
+import safeStringify from "fast-safe-stringify";
 
 /*
  * ServerPlugin
@@ -91,7 +91,9 @@ export class ServerPlugin {
       // Handling exceptions to absorb the difference of interest.
       try {
         const web3 = new Web3();
-        web3.setProvider(new web3.providers.HttpProvider(SplugConfig.SplugConfig.provider));
+        web3.setProvider(
+          new web3.providers.HttpProvider(config.read("ledgerUrl")),
+        );
         const balance = web3.eth.getBalance(ethargs);
         const amountVal = balance.toNumber();
         retObj = {
@@ -106,18 +108,19 @@ export class ServerPlugin {
         logger.debug(`##getNumericBalance: retObj: ${JSON.stringify(retObj)}`);
         return resolve(retObj);
       } catch (e) {
-        const emsg = e.toString().replace(/Error: /g, "");
-        logger.error(emsg);
         retObj = {
           resObj: {
             status: 504,
-            errorDetail: emsg,
+            errorDetail: safeStringify(e),
           },
         };
+        logger.error(retObj);
+
         if (reqID !== undefined) {
           retObj["id"] = reqID;
         }
         logger.debug(`##getNumericBalance: retObj: ${JSON.stringify(retObj)}`);
+
         return reject(retObj);
       }
     });
@@ -178,7 +181,9 @@ export class ServerPlugin {
       // Handle the exception once to absorb the difference of interest.
       try {
         const web3 = new Web3();
-        web3.setProvider(new web3.providers.HttpProvider(SplugConfig.SplugConfig.provider));
+        web3.setProvider(
+          new web3.providers.HttpProvider(config.read("ledgerUrl")),
+        );
         const res = web3.eth[sendFunction](sendArgs);
 
         retObj = {
@@ -191,24 +196,25 @@ export class ServerPlugin {
           retObj["reqID"] = reqID;
         }
         logger.debug(
-          `##transferNumericAsset: retObj: ${JSON.stringify(retObj)}`
+          `##transferNumericAsset: retObj: ${JSON.stringify(retObj)}`,
         );
         return resolve(retObj);
       } catch (e) {
-        const emsg = e.toString().replace(/Error: /g, "");
-        logger.error(emsg);
         retObj = {
           resObj: {
             status: 504,
-            errorDetail: emsg,
+            errorDetail: safeStringify(e),
           },
         };
+        logger.error(retObj);
+
         if (reqID !== undefined) {
           retObj["reqID"] = reqID;
         }
         logger.debug(
-          `##transferNumericAsset: retObj: ${JSON.stringify(retObj)}`
+          `##transferNumericAsset: retObj: ${JSON.stringify(retObj)}`,
         );
+
         return reject(retObj);
       }
     });
@@ -249,12 +255,14 @@ export class ServerPlugin {
       // var ethargs = '0x' + targetAddress;
       const ethargs = targetAddress;
       logger.debug(
-        `getNonce(): ethargs: ${ethargs}, targetAddress: ${targetAddress}`
+        `getNonce(): ethargs: ${ethargs}, targetAddress: ${targetAddress}`,
       );
       // Handling exceptions to absorb the difference of interest.
       try {
         const web3 = new Web3();
-        web3.setProvider(new web3.providers.HttpProvider(SplugConfig.SplugConfig.provider));
+        web3.setProvider(
+          new web3.providers.HttpProvider(config.read("ledgerUrl")),
+        );
         const txnCount = web3.eth.getTransactionCount(ethargs);
         logger.info(`getNonce(): txnCount: ${txnCount}`);
         const hexStr = web3.toHex(txnCount);
@@ -279,18 +287,19 @@ export class ServerPlugin {
         logger.debug(`##getNonce: retObj: ${JSON.stringify(retObj)}`);
         return resolve(retObj);
       } catch (e) {
-        const emsg = e.toString().replace(/Error: /g, "");
-        logger.error(emsg);
         retObj = {
           resObj: {
             status: 504,
-            errorDetail: emsg,
+            errorDetail: safeStringify(e),
           },
         };
+        logger.error(retObj);
+
         if (reqID !== undefined) {
           retObj["id"] = reqID;
         }
         logger.debug(`##getNonce: retObj: ${JSON.stringify(retObj)}`);
+
         return reject(retObj);
       }
     });
@@ -332,7 +341,9 @@ export class ServerPlugin {
       // Handling exceptions to absorb the difference of interest.
       try {
         const web3 = new Web3();
-        web3.setProvider(new web3.providers.HttpProvider(SplugConfig.SplugConfig.provider));
+        web3.setProvider(
+          new web3.providers.HttpProvider(config.read("ledgerUrl")),
+        );
         const hexStr = web3.toHex(targetValue);
         logger.info(`toHex(): hexStr: ${hexStr}`);
         const result = {
@@ -354,18 +365,19 @@ export class ServerPlugin {
         logger.debug(`##toHex: retObj: ${JSON.stringify(retObj)}`);
         return resolve(retObj);
       } catch (e) {
-        const emsg = e.toString().replace(/Error: /g, "");
-        logger.error(emsg);
         retObj = {
           resObj: {
             status: 504,
-            errorDetail: emsg,
+            errorDetail: safeStringify(e),
           },
         };
+        logger.error(retObj);
+
         if (reqID !== undefined) {
           retObj["id"] = reqID;
         }
         logger.debug(`##toHex: retObj: ${JSON.stringify(retObj)}`);
+
         return reject(retObj);
       }
     });
@@ -406,7 +418,9 @@ export class ServerPlugin {
       // Handle the exception once to absorb the difference of interest.
       try {
         const web3 = new Web3();
-        web3.setProvider(new web3.providers.HttpProvider(SplugConfig.SplugConfig.provider));
+        web3.setProvider(
+          new web3.providers.HttpProvider(config.read("ledgerUrl")),
+        );
         const res = web3.eth.sendRawTransaction(serializedTx);
 
         retObj = {
@@ -415,12 +429,12 @@ export class ServerPlugin {
         };
         return resolve(retObj);
       } catch (e) {
-        const emsg = e.toString().replace(/Error: /g, "");
-        logger.error(emsg);
         retObj = {
           status: 504,
-          errorDetail: emsg,
+          errorDetail: safeStringify(e),
         };
+        logger.error(retObj);
+
         return reject(retObj);
       }
     });
@@ -452,7 +466,9 @@ export class ServerPlugin {
       // Handle the exception once to absorb the difference of interest.
       try {
         const web3 = new Web3();
-        web3.setProvider(new web3.providers.HttpProvider(SplugConfig.SplugConfig.provider));
+        web3.setProvider(
+          new web3.providers.HttpProvider(config.read("ledgerUrl")),
+        );
         let result: any = null;
         if (sendArgs !== undefined) {
           result = web3.eth[sendFunction](sendArgs);
@@ -472,18 +488,19 @@ export class ServerPlugin {
         logger.debug(`##web3Eth: retObj: ${JSON.stringify(retObj)}`);
         return resolve(retObj);
       } catch (e) {
-        const emsg = e.toString().replace(/Error: /g, "");
-        logger.error(emsg);
         retObj = {
           resObj: {
             status: 504,
-            errorDetail: emsg,
+            errorDetail: safeStringify(e),
           },
         };
+        logger.error(retObj);
+
         if (reqID !== undefined) {
           retObj["id"] = reqID;
         }
         logger.debug(`##web3Eth: retObj: ${JSON.stringify(retObj)}`);
+
         return reject(retObj);
       }
     });
@@ -518,7 +535,9 @@ export class ServerPlugin {
       // Handle the exception once to absorb the difference of interest.
       try {
         const web3 = new Web3();
-        web3.setProvider(new web3.providers.HttpProvider(SplugConfig.SplugConfig.provider));
+        web3.setProvider(
+          new web3.providers.HttpProvider(config.read("ledgerUrl")),
+        );
         const contract = web3.eth
           .contract(args.contract.abi)
           .at(args.contract.address);
@@ -537,7 +556,7 @@ export class ServerPlugin {
             logger.debug(`##contract: Two args.`);
             result = contract[sendCommand][sendFunction](
               sendArgs[0],
-              sendArgs[1]
+              sendArgs[1],
             );
             break;
           case 3:
@@ -545,7 +564,7 @@ export class ServerPlugin {
             result = contract[sendCommand][sendFunction](
               sendArgs[0],
               sendArgs[1],
-              sendArgs[2]
+              sendArgs[2],
             );
             break;
         }
@@ -564,18 +583,19 @@ export class ServerPlugin {
         logger.debug(`##contract: retObj: ${JSON.stringify(retObj)}`);
         return resolve(retObj);
       } catch (e) {
-        const emsg = e.toString().replace(/Error: /g, "");
-        logger.error(emsg);
         retObj = {
           resObj: {
             status: 504,
-            errorDetail: emsg,
+            errorDetail: safeStringify(e),
           },
         };
+        logger.error(retObj);
+
         if (reqID !== undefined) {
           retObj["id"] = reqID;
         }
         logger.debug(`##contract: retObj: ${JSON.stringify(retObj)}`);
+
         return reject(retObj);
       }
     });

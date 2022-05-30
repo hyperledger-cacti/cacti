@@ -2,7 +2,7 @@ import test, { Test } from "tape-promise/tape";
 import { v4 as uuidv4 } from "uuid";
 import HelloWorldContractJson from "../../../../solidity/hello-world-contract/HelloWorld.json";
 import Web3 from "web3";
-import Web3EEAClient, { IPrivateTransactionReceipt } from "web3-eea";
+import Web3JsQuorum, { IPrivateTransactionReceipt } from "web3js-quorum";
 import { BesuMpTestLedger } from "@hyperledger/cactus-test-tooling";
 import { LogLevelDesc } from "@hyperledger/cactus-common";
 import {
@@ -189,14 +189,14 @@ test(testCase, async (t: Test) => {
   const chainIdMember3 = await web3Member3.eth.getChainId();
   t.comment(`chainIdMember3=${chainIdMember3}`);
 
-  const web3EeaMember1 = Web3EEAClient(web3Member1, chainIdMember1);
-  t.ok(web3EeaMember1, "web3EeaMember1 truthy OK");
+  const web3QuorumMember1 = Web3JsQuorum(web3Member1);
+  t.ok(web3QuorumMember1, "web3QuorumMember1 truthy OK");
 
-  const web3EeaMember2 = Web3EEAClient(web3Member2, chainIdMember2);
-  t.ok(web3EeaMember2, "web3EeaMember2 truthy OK");
+  const web3QuorumMember2 = Web3JsQuorum(web3Member2);
+  t.ok(web3QuorumMember2, "web3QuorumMember2 truthy OK");
 
-  const web3EeaMember3 = Web3EEAClient(web3Member3, chainIdMember3);
-  t.ok(web3EeaMember3, "web3EeaMember3 truthy OK");
+  const web3QuorumMember3 = Web3JsQuorum(web3Member3);
+  t.ok(web3QuorumMember3, "web3QuorumMember3 truthy OK");
 
   const deployRes = await connector1.deployContract({
     bytecode: HelloWorldContractJson.bytecode,
@@ -239,9 +239,8 @@ test(testCase, async (t: Test) => {
 
   // t.ok(privacyMarkerTxHash, "privacyMarkerTxHash truthy OK");
 
-  const contractDeployReceipt = (await web3EeaMember1.priv.getTransactionReceipt(
+  const contractDeployReceipt = (await web3QuorumMember1.priv.waitForTransactionReceipt(
     deployRes.transactionReceipt.commitmentHash,
-    keys.tessera.member1.publicKey,
   )) as IPrivateTransactionReceipt;
 
   t.ok(contractDeployReceipt, "contractDeployReceipt truthy OK");
@@ -253,29 +252,26 @@ test(testCase, async (t: Test) => {
 
   // Check that the third node does not see the transaction of the contract
   // deployment that was sent to node 1 and 2 only, not 3.
-  const txReceiptNever = await web3EeaMember3.priv.getTransactionReceipt(
+  const txReceiptNever = await web3QuorumMember3.priv.waitForTransactionReceipt(
     deployRes.transactionReceipt.commitmentHash,
-    keys.tessera.member3.publicKey,
   );
   t.notok(txReceiptNever, "txReceiptNever falsy OK");
 
   // Check that node 1 and 2 can indeed see the transaction for the contract
   // deployment that was sent to them and them only (node 3 was left out)
 
-  // Note that changing this to use web3EeaMember3 breaks it and I'm suspecting
+  // Note that changing this to use web3QuorumMember3 breaks it and I'm suspecting
   // that this is what's plaguing the tests that are based on the connector
-  // which is instantiated with a single web3+web3 EEA client.
-  // What I will try next is to have 3 connectors each with a web3 EEA client
+  // which is instantiated with a single web3+web3 Quorum client.
+  // What I will try next is to have 3 connectors each with a web3 Quorum client
   // that points to one of the 3 nodes and see if that makes it work.
-  const txReceiptAlways1 = await web3EeaMember1.priv.getTransactionReceipt(
+  const txReceiptAlways1 = await web3QuorumMember1.priv.waitForTransactionReceipt(
     deployRes.transactionReceipt.commitmentHash,
-    keys.tessera.member1.publicKey,
   );
   t.ok(txReceiptAlways1, "txReceiptAlways1 truthy OK");
 
-  const txReceiptAlways2 = await web3EeaMember2.priv.getTransactionReceipt(
+  const txReceiptAlways2 = await web3QuorumMember2.priv.waitForTransactionReceipt(
     deployRes.transactionReceipt.commitmentHash,
-    keys.tessera.member2.publicKey,
   );
   t.ok(txReceiptAlways2, "txReceiptAlways2 truthy OK");
 
@@ -293,15 +289,14 @@ test(testCase, async (t: Test) => {
       privateFor: [keys.tessera.member2.publicKey],
       privateKey: keys.besu.member1.privateKey,
     };
-    const transactionHash = await web3EeaMember1.eea.sendRawTransaction(
+    const transactionHash = await web3QuorumMember1.priv.generateAndSendRawTransaction(
       functionParams,
     );
     t.comment(`Transaction hash: ${transactionHash}`);
     t.ok(transactionHash, "transactionHash truthy OK");
 
-    const result = await web3EeaMember1.priv.getTransactionReceipt(
+    const result = await web3QuorumMember1.priv.waitForTransactionReceipt(
       transactionHash,
-      keys.tessera.member1.publicKey,
     );
     t.comment(`Transaction receipt for set() call: ${JSON.stringify(result)}`);
     t.ok(result, "set() result member 1 truthy OK");
@@ -318,16 +313,19 @@ test(testCase, async (t: Test) => {
       privateKey: keys.besu.member1.privateKey,
     };
 
-    const privacyGroupId = web3EeaMember1.priv.generatePrivacyGroup(fnParams);
-    const callOutput = await web3EeaMember1.priv.call({
-      privacyGroupId,
+    const privacyGroupId = web3QuorumMember1.utils.generatePrivacyGroup(
+      fnParams,
+    );
+    const callOutput = await web3QuorumMember1.priv.call(privacyGroupId, {
       to: contractDeployReceipt.contractAddress,
       data: contract.methods.getName().encodeABI(),
-      from: "LieutenantCactus",
     });
     t.comment(`getName Call output: ${JSON.stringify(callOutput)}`);
     t.ok(callOutput, "callOutput truthy OK");
-    const name = web3EeaMember1.eth.abi.decodeParameter("string", callOutput);
+    const name = web3QuorumMember1.eth.abi.decodeParameter(
+      "string",
+      callOutput,
+    );
     t.equal(name, "ProfessorCactus - #1", "getName() member 1 equals #1");
   }
 
@@ -344,12 +342,12 @@ test(testCase, async (t: Test) => {
       privateKey: keys.besu.member3.privateKey,
     };
 
-    const privacyGroupId = web3EeaMember3.priv.generatePrivacyGroup(fnParams);
-    const callOutput = await web3EeaMember3.priv.call({
-      privacyGroupId,
+    const privacyGroupId = web3QuorumMember3.utils.generatePrivacyGroup(
+      fnParams,
+    );
+    const callOutput = await web3QuorumMember3.priv.call(privacyGroupId, {
       to: contractDeployReceipt.contractAddress,
       data,
-      from: "LieutenantCactus",
     });
     t.comment(`getName member3 output: ${JSON.stringify(callOutput)}`);
     t.equal(callOutput, "0x", "member3 getName callOutput === 0x OK");
@@ -365,15 +363,14 @@ test(testCase, async (t: Test) => {
       privateFor: [keys.tessera.member2.publicKey],
       privateKey: keys.besu.member2.privateKey,
     };
-    const transactionHash = await web3EeaMember2.eea.sendRawTransaction(
+    const transactionHash = await web3QuorumMember2.priv.generateAndSendRawTransaction(
       functionParams,
     );
     t.comment(`Transaction hash: ${transactionHash}`);
     t.ok(transactionHash, "transactionHash truthy OK");
 
-    const result = await web3EeaMember2.priv.getTransactionReceipt(
+    const result = await web3QuorumMember2.priv.waitForTransactionReceipt(
       transactionHash,
-      keys.tessera.member1.publicKey,
     );
     t.comment(`Transaction receipt for set() call: ${JSON.stringify(result)}`);
     t.ok(result, "set() result member 2 truthy OK");
@@ -389,15 +386,14 @@ test(testCase, async (t: Test) => {
       privateKey: keys.besu.member3.privateKey,
       privateFor: [keys.tessera.member2.publicKey],
     };
-    const transactionHash = await web3EeaMember3.eea.sendRawTransaction(
+    const transactionHash = await web3QuorumMember3.priv.generateAndSendRawTransaction(
       functionParams,
     );
     t.comment(`setName tx hash for member 3: ${transactionHash}`);
     t.ok(transactionHash, "setName tx hash for member 3 truthy OK");
 
-    const result = await web3EeaMember3.priv.getTransactionReceipt(
+    const result = await web3QuorumMember3.priv.waitForTransactionReceipt(
       transactionHash,
-      keys.tessera.member1.publicKey,
     );
     t.comment(`Transaction receipt for set() call: ${JSON.stringify(result)}`);
     t.ok(result, "set() result for member 3 truthy OK");

@@ -6,12 +6,13 @@
  */
 
 import { Router, NextFunction, Request, Response } from "express";
-import { TransactionManagement } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/TransactionManagement";
-import { RIFError } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/RIFError";
-import { ConfigUtil } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/util/ConfigUtil";
+import { TransactionManagement } from "@hyperledger/cactus-cmd-socket-server";
+import { RIFError } from "@hyperledger/cactus-cmd-socket-server";
+import { ConfigUtil } from "@hyperledger/cactus-cmd-socket-server";
 
 const fs = require("fs");
 const path = require("path");
+import escapeHtml from "escape-html";
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
 const moduleName = "trades";
@@ -25,19 +26,22 @@ export const transactionManagement: TransactionManagement =
 // Request Execution of Trade
 router.post("/", (req: Request, res: Response, next: NextFunction) => {
   try {
-    const tradeID: string = transactionManagement.startBusinessLogic(req);
+    const tradeID = transactionManagement.startBusinessLogic(req);
+    if (!tradeID) {
+      throw new RIFError(`Could not run BLP, tradeId = ${tradeID}`);
+    }
 
     const result = { tradeID: tradeID };
     res
       .status(201)
       .location(
-        config.applicationHostInfo.hostName + "/api/v1/trades/" + tradeID
+        config.applicationHostInfo.hostName + "/api/v1/trades/" + tradeID,
       )
       .json(result);
   } catch (err) {
     if (err instanceof RIFError) {
       res.status(err.statusCode);
-      res.send(err.message);
+      res.send(escapeHtml(err.message));
       return;
     }
 
@@ -49,11 +53,15 @@ router.post("/", (req: Request, res: Response, next: NextFunction) => {
 router.get("/:id", (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = transactionManagement.getOperationStatus(req.params.id);
-    res.status(200).json(result);
+    if (result) {
+      res.status(200).json(result);
+    } else {
+      throw new RIFError("Could not get operation status");
+    }
   } catch (err) {
     if (err instanceof RIFError) {
       res.status(err.statusCode);
-      res.send(err.message);
+      res.send(escapeHtml(err.message));
       return;
     }
 

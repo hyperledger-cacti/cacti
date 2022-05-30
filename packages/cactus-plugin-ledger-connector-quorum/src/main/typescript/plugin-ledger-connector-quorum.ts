@@ -4,9 +4,12 @@ import { Server as SecureServer } from "https";
 
 import { Express } from "express";
 import Web3 from "web3";
-import Web3JsQuorum, { IWeb3Quorum, ISendRawTransaction, IPrivateTransactionReceipt } from "web3js-quorum";
-import path from "path";
-import fs from "fs";
+import Web3JsQuorum, {
+  IWeb3Quorum,
+  ISendRawTransaction,
+  IPrivateTransactionReceipt,
+} from "web3js-quorum";
+
 // The strange way of obtaining the contract class here is like this because
 // web3-eth internally sub-classes the Contract class at runtime
 // @see https://stackoverflow.com/a/63639280/698470
@@ -66,6 +69,7 @@ import {
   GetPrometheusExporterMetricsEndpointV1,
   IGetPrometheusExporterMetricsEndpointV1Options,
 } from "./web-services/get-prometheus-exporter-metrics-endpoint-v1";
+import { RuntimeError } from "run-time-error";
 
 export interface IPluginLedgerConnectorQuorumOptions
   extends ICactusPluginOptions {
@@ -91,8 +95,8 @@ export class PluginLedgerConnectorQuorum
   private readonly instanceId: string;
   private readonly privateUrl: string;
   private readonly log: Logger;
-  private readonly web3Raw: Web3;
-  private readonly web3JsQ: IWeb3Quorum;
+  private readonly web3: Web3;
+  private readonly web3JsQuorum: IWeb3Quorum;
   private httpServer: Server | SecureServer | null = null;
   private endpoints: IWebServiceEndpoint[] | undefined;
   public static readonly CLASS_NAME = "PluginLedgerConnectorQuorum";
@@ -117,9 +121,9 @@ export class PluginLedgerConnectorQuorum
     const web3Provider = new Web3.providers.HttpProvider(
       this.options.rpcApiHttpHost,
     );
-    this.web3Raw = new Web3(web3Provider);
-    this.web3JsQ = Web3JsQuorum(
-      this.web3Raw,
+    this.web3 = new Web3(web3Provider);
+    this.web3JsQuorum = Web3JsQuorum(
+      this.web3,
       { privateUrl: this.privateUrl },
       true,
     );
@@ -236,6 +240,38 @@ export class PluginLedgerConnectorQuorum
     return consensusHasTransactionFinality(currentConsensusAlgorithmFamily);
   }
 
+  /**
+   * Verifies that it is safe to call a specific method of a Web3 Contract.
+   *
+   * @param contract The Web3 Contract instance to check whether it has a method with a specific name or not.
+   * @param name The name of the method that will be checked if it's usable on `contract` or not.
+   * @returns Boolean `true` when it IS safe to call the method named `name` on the contract.
+   * @throws If the contract instance is falsy or it's methods object is falsy. Also throws if the method name is a blank string.
+   */
+  public async isSafeToCallContractMethod(
+    contract: InstanceType<typeof Contract>,
+    name: string,
+  ): Promise<boolean> {
+    Checks.truthy(
+      contract,
+      `${this.className}#isSafeToCallContractMethod():contract`,
+    );
+
+    Checks.truthy(
+      contract.methods,
+      `${this.className}#isSafeToCallContractMethod():contract.methods`,
+    );
+
+    Checks.nonBlankString(
+      name,
+      `${this.className}#isSafeToCallContractMethod():name`,
+    );
+
+    const { methods } = contract;
+
+    return Object.prototype.hasOwnProperty.call(methods, name);
+  }
+
   public async getContractInfoKeychain(
     req: InvokeContractV1Request,
   ): Promise<any> {
@@ -319,6 +355,16 @@ export class PluginLedgerConnectorQuorum
       abi,
       contractAddress,
     );
+
+    const isSafeToCall = await this.isSafeToCallContractMethod(
+      contractInstance,
+      req.methodName,
+    );
+    if (!isSafeToCall) {
+      throw new RuntimeError(
+        `Invalid method name provided in request. ${req.methodName} does not exist on the Web3 contract object's "methods" property.`,
+      );
+    }
 
     const methodRef = contractInstance.methods[req.methodName];
     Checks.truthy(methodRef, `${fnTag} YourContract.${req.methodName}`);
@@ -458,7 +504,7 @@ export class PluginLedgerConnectorQuorum
       return this.transactPrivate(req);
     }
 
-    const signedTx = await this.web3JsQ.eth.accounts.signTransaction(
+    const signedTx = await this.web3.eth.accounts.signTransaction(
       transactionConfig,
       secret,
     );
@@ -478,21 +524,19 @@ export class PluginLedgerConnectorQuorum
   ): Promise<RunTransactionResponse> {
     const { web3SigningCredential } = req;
     const {
-      ethAccount,
       secret,
     } = web3SigningCredential as Web3SigningCredentialPrivateKeyHex;
-    
-    const accountKeyPath = path.resolve(
-      __dirname,
-      "../../test/resources/network-files/member1",
-      "accountkey");
-    const accountKey = JSON.parse(fs.readFileSync(accountKeyPath, "utf8"));
-    const txCount = await this.web3JsQ.eth.getTransactionCount(ethAccount);
-    const signingAccount = this.web3JsQ.eth.accounts.decrypt(accountKey, "");
+
+    const signingAccount = this.web3JsQuorum.eth.accounts.privateKeyToAccount(
+      secret,
+    );
+    const txCount = await this.web3JsQuorum.eth.getTransactionCount(
+      signingAccount.address,
+    );
     const txn = {
       gasLimit: req.transactionConfig.gas, //max number of gas units the tx is allowed to use
       gasPrice: req.transactionConfig.gasPrice, //ETH per unit of gas
-      data: req.transactionConfig.data, 
+      data: req.transactionConfig.data,
       privateKey: secret,
       privateFrom: req.privateTransactionConfig?.privateFrom,
       privateFor: req.privateTransactionConfig?.privateFor,
@@ -502,9 +546,13 @@ export class PluginLedgerConnectorQuorum
       value: 0,
     } as ISendRawTransaction;
 
-    const block = await this.web3JsQ.priv.generateAndSendRawTransaction(txn) as unknown;
+    const block = (await this.web3JsQuorum.priv.generateAndSendRawTransaction(
+      txn,
+    )) as unknown;
     const { transactionHash } = block as IPrivateTransactionReceipt;
-    const transactionReceipt = await this.web3JsQ.priv.waitForTransactionReceipt(transactionHash);
+    const transactionReceipt = await this.web3JsQuorum.priv.waitForTransactionReceipt(
+      transactionHash,
+    );
 
     return { transactionReceipt: transactionReceipt };
   }
@@ -596,16 +644,15 @@ export class PluginLedgerConnectorQuorum
   }
 
   private async generateBytecode(req: any): Promise<string> {
-    // const tmpContract = new this.web3JsQ.eth.Contract(req.contractJSON.abi);
-    // const deployment = tmpContract.deploy({
-    //   data: req.contractJSON.bytecode,
-    //   arguments: req.constructorArgs,
-    // });
-    // const abi = deployment.encodeABI();
-    // return abi.startsWith("0x") ? abi : `0x${abi}`;
-    const tmpContract = req.contractJSON.bytecode;
-    return tmpContract;
-
+    const tmpContracts = new this.web3JsQuorum.eth.Contract(
+      req.contractJSON.abi,
+    );
+    const deployment = tmpContracts.deploy({
+      data: req.contractJSON.bytecode,
+      arguments: req.constructorArgs,
+    });
+    const abi = deployment.encodeABI();
+    return abi.startsWith("0x") ? abi : `0x${abi}`;
   }
 
   async runDeploy(req: any): Promise<DeployContractSolidityBytecodeV1Response> {
@@ -617,12 +664,14 @@ export class PluginLedgerConnectorQuorum
     if (req.privateTransactionConfig) {
       const privacyGroupId =
         req.privateTransactionConfig.privacyGroupId ||
-        this.web3JsQ.utils.generatePrivacyGroup(req.privateTransactionConfig);
+        this.web3JsQuorum.utils.generatePrivacyGroup(
+          req.privateTransactionConfig,
+        );
       this.log.info("privacyGroupId=%o", privacyGroupId);
       const receipt = await this.transactPrivate({
         privateTransactionConfig: req.privateTransactionConfig,
         transactionConfig: {
-          data: "0x" + bytecode,
+          data: bytecode,
           from: web3SigningCredential.ethAccount,
           gas: req.gas,
           gasPrice: req.gasPrice,
@@ -630,38 +679,6 @@ export class PluginLedgerConnectorQuorum
         web3SigningCredential,
       });
       return receipt;
-
-      // const chainId = 1337;
-      // const accountAddress = "f0e2db6c8dc6c681bb5d6ad121a107f300e9b2b5";
-      // const txCount = await this.web3JsQ.eth.getTransactionCount(`0x${accountAddress}`);
-      
-      // const contractConstructorInit = "000000000000000000000000000000000000000000000000000000000000002F";
-
-      // const accountKeyPath = path.resolve(
-      //   __dirname,
-      //   "../../test/resources/network-files/member1",
-      //   "accountkey");
-      // const accountKey = JSON.parse(fs.readFileSync(accountKeyPath, "utf8"));
-      // const signingAccounts = this.web3JsQ.eth.accounts.decrypt(accountKey, "");
-      // const tx = {
-      //   chainId,
-      //   nonce: txCount,
-      //   gasPrice: 0, //ETH per unit of gas
-      //   gasLimit: 10000000, //max number of gas units the tx is allowed to use
-      //   value: 0,
-      //   data: '0x'+bytecode+contractConstructorInit,
-      //   from: signingAccounts,
-      //   isPrivate: true,
-      //   privateKey: "b9a4bd1539c15bcc83fa9078fe89200b6e9e802ae992f13cd83c853f16e8bed4",
-      //   privateFrom: "BULeR8JyUWhiuuCMU/HLA0Q5pzkYT+cHII3ZKBey3Bo=",
-      //   privateFor: ["1iTZde/ndBHvzhcl7V68x44Vx7pl8nwx9LqnM/AfJUg="],
-      // };
-      // const block = await this.web3JsQ.priv.generateAndSendRawTransaction(tx);
-      // const { transactionHash } = block;
-      // const receipt = await this.web3JsQ.priv.waitForTransactionReceipt(
-      //   transactionHash,
-      // );
-      // return { transactionReceipt: receipt };
     } else {
       const receipt = await this.transact({
         privateTransactionConfig: req.privateTransactionConfig,

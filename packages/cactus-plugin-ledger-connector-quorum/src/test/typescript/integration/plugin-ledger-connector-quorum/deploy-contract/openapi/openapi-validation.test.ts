@@ -44,8 +44,8 @@ test("BEFORE " + testCase, async (t: Test) => {
 test(testCase, async (t: Test) => {
   // create the test quorumTestLedger
   const containerImageVersion = "2021-01-08-7a055c3"; // Quorum v2.3.0, Tessera v0.10.0
-  const containerImageName = "hyperledger/cactus-quorum-all-in-one";
-  const ledgerOptions = { containerImageName, containerImageVersion };
+
+  const ledgerOptions = { containerImageVersion };
   const quorumTestLedger = new QuorumTestLedger(ledgerOptions);
   test.onFinish(async () => {
     await quorumTestLedger.stop();
@@ -105,7 +105,7 @@ test(testCase, async (t: Test) => {
   expressApp.use(bodyParser.json({ limit: "250mb" }));
   const server = http.createServer(expressApp);
   const listenOptions: IListenOptions = {
-    hostname: "0.0.0.0",
+    hostname: "localhost",
     port: 0,
     server,
   };
@@ -366,7 +366,7 @@ test(testCase, async (t: Test) => {
         400,
         `Endpoint ${fRun} without required transactionConfig: response.status === 400 OK`,
       );
-      const fields = e.response.data.map((param: any) =>
+      const fields = e.response.data.map((param: { path: string }) =>
         param.path.replace(".body.", ""),
       );
       t2.ok(
@@ -401,7 +401,7 @@ test(testCase, async (t: Test) => {
         400,
         `Endpoint ${fRun} with fake=4: response.status === 400 OK`,
       );
-      const fields = e.response.data.map((param: any) =>
+      const fields = e.response.data.map((param: { path: string }) =>
         param.path.replace(".body.", ""),
       );
       t2.ok(

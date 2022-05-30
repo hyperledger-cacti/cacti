@@ -1,5 +1,6 @@
 import { Express, Request, Response } from "express";
 import HttpStatus from "http-status-codes";
+import sanitizeFilename from "sanitize-filename";
 
 import {
   Logger,
@@ -84,6 +85,24 @@ export class DeployContractGoSourceEndpointV1 implements IWebServiceEndpoint {
     return this;
   }
 
+  /**
+   * Important: This function mutates the input object in an attempt to sanitize
+   * the user provided data in case it was malicious.
+   *
+   *
+   * @param reqBody The HTTP request body that will have it's filenames and
+   * filepaths mutated if they contain invalid/unsafe user input. The passed
+   * in object will have it's values updated once the function has returned.
+   */
+  protected async sanitizeFilenamesInRequest(
+    reqBody: DeployContractGoSourceV1Request,
+  ): Promise<void> {
+    reqBody.goSource.filename = sanitizeFilename(reqBody.goSource.filename);
+    if (reqBody.goSource.filepath) {
+      reqBody.goSource.filepath = sanitizeFilename(reqBody.goSource.filepath);
+    }
+  }
+
   async handleRequest(req: Request, res: Response): Promise<void> {
     const fnTag = `${this.className}#handleRequest()`;
     const verbUpper = this.getVerbLowerCase().toUpperCase();
@@ -92,6 +111,7 @@ export class DeployContractGoSourceEndpointV1 implements IWebServiceEndpoint {
     try {
       const { connector } = this.opts;
       const reqBody = req.body as DeployContractGoSourceV1Request;
+      await this.sanitizeFilenamesInRequest(reqBody);
       const resBody = await connector.deployContractGoSourceV1(reqBody);
       res.status(HttpStatus.OK);
       res.json(resBody);

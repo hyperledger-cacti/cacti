@@ -40,7 +40,7 @@ describe(testCase, () => {
   expressApp.use(bodyParser.json({ limit: "250mb" }));
   const server = http.createServer(expressApp);
   const listenOptions: IListenOptions = {
-    hostname: "0.0.0.0",
+    hostname: "localhost",
     port: 0,
     server,
   };
@@ -125,18 +125,13 @@ describe(testCase, () => {
     await pluginHtlc.getOrCreateWebServices();
     await pluginHtlc.registerWebServices(expressApp);
 
-    try {
-      const initRequest: InitializeRequest = {
-        connectorId: "JORDI",
-        keychainId,
-        constructorArgs: ["FAKE"],
-        web3SigningCredential,
-        gas: DataTest.estimated_gas,
-      };
-      const deployOut = await pluginHtlc.initialize(initRequest);
-      expect(deployOut.transactionReceipt).toBeTruthy();
-    } catch (error) {
-      expect(error).toBeTruthy();
-    }
+    const initRequest: InitializeRequest = {
+      connectorId: "JORDI",
+      keychainId,
+      constructorArgs: ["FAKE"],
+      web3SigningCredential,
+      gas: DataTest.estimated_gas,
+    };
+    await expect(pluginHtlc.initialize(initRequest)).toReject();
   });
 });

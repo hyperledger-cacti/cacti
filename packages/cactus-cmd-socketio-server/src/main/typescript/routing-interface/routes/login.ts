@@ -45,7 +45,7 @@ router.post("/", (req: Request, res: Response, next: NextFunction) => {
 
     res.status(201);
     res.send(respData);
-  } catch (err) {
+  } catch (err: any) {
     logger.error(`##err name: ${err.constructor.name}`);
 
     if (err instanceof RIFError) {

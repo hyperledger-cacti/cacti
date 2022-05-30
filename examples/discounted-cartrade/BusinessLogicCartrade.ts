@@ -6,37 +6,29 @@
  */
 
 import { Request } from "express";
-import { RequestInfo } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/RequestInfo";
-import { TradeInfo } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/TradeInfo";
+import { RequestInfo } from "@hyperledger/cactus-cmd-socket-server";
+import { TradeInfo } from "@hyperledger/cactus-cmd-socket-server";
 import { TransactionInfoManagement } from "./TransactionInfoManagement";
 import { TransactionInfo } from "./TransactionInfo";
 import { TransactionData } from "./TransactionData";
 import { BusinessLogicInquireCartradeStatus } from "./BusinessLogicInquireCartradeStatus";
 import { TxInfoData } from "./TxInfoData";
-import { transactionManagement } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/routes/index";
-import { verifierFactory } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/routes/index";
-import { LedgerOperation } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/business-logic-plugin/LedgerOperation";
-import { BusinessLogicBase } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/business-logic-plugin/BusinessLogicBase";
+import { routesTransactionManagement } from "@hyperledger/cactus-cmd-socket-server";
+import { routesVerifierFactory } from "@hyperledger/cactus-cmd-socket-server";
+import { LedgerOperation } from "@hyperledger/cactus-cmd-socket-server";
+import { BusinessLogicBase } from "@hyperledger/cactus-cmd-socket-server";
 import { makeRawTransaction } from "./TransactionEthereum";
 import { makeSignedProposal } from "./TransactionFabric";
 import { getDataFromIndy } from "./TransactionIndy";
-import {
-  ApiInfo,
-  LedgerEvent,
-} from "../../packages/cactus-cmd-socketio-server/src/main/typescript/verifier/LedgerPlugin";
-import { json2str } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/verifier/DriverCommon";
+import { LedgerEvent, ConfigUtil } from "@hyperledger/cactus-cmd-socket-server";
+import { json2str } from "@hyperledger/cactus-cmd-socket-server";
 import { CartradeStatus } from "./define";
-import { RIFUtil } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/util/RIFUtil";
-import { LPInfoHolder } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/util/LPInfoHolder";
-import { Verifier } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/verifier/Verifier";
 
 const fs = require("fs");
 const path = require("path");
 const yaml = require("js-yaml");
 //const config: any = JSON.parse(fs.readFileSync("/etc/cactus/default.json", 'utf8'));
-const config: any = yaml.safeLoad(
-  fs.readFileSync("/etc/cactus/default.yaml", "utf8")
-);
+const config: any = ConfigUtil.getConfig();
 
 import { getLogger } from "log4js";
 const moduleName = "BusinessLogicCartrade";
@@ -101,7 +93,7 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
         );
 
         // Get varidator information
-        // this.useValidator = JSON.parse(transactionManagement.getValidatorToUse(requestInfo.businessLogicID));
+        // this.useValidator = JSON.parse(routesTransactionManagement.getValidatorToUse(requestInfo.businessLogicID));
 
         // this.dummyTransaction(requestInfo, tradeInfo);
         this.firstTransaction(requestInfo, tradeInfo);
@@ -288,10 +280,10 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
       `##firstTransaction(): businessLogicID: ${tradeInfo.businessLogicID}`
     );
     const useValidator = JSON.parse(
-      transactionManagement.getValidatorToUse(tradeInfo.businessLogicID)
+      routesTransactionManagement.getValidatorToUse(tradeInfo.businessLogicID)
     );
-    //        const verifierEthereum = transactionManagement.getVerifier(useValidator['validatorID'][0]);
-    const verifierEthereum = verifierFactory.getVerifier(
+    //        const verifierEthereum = routesTransactionManagement.getVerifier(useValidator['validatorID'][0]);
+    const verifierEthereum = routesVerifierFactory.getVerifier(
       useValidator["validatorID"][0],
       "BusinessLogicCartrade"
     );
@@ -377,17 +369,17 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
       `##secondTransaction(): businessLogicID: ${tradeInfo.businessLogicID}`
     );
     const useValidator = JSON.parse(
-      transactionManagement.getValidatorToUse(tradeInfo.businessLogicID)
+      routesTransactionManagement.getValidatorToUse(tradeInfo.businessLogicID)
     );
-    //        const verifierFabric = transactionManagement.getVerifier(useValidator['validatorID'][1]);
-    const verifierFabric = verifierFactory.getVerifier(
+    //        const verifierFabric = routesTransactionManagement.getVerifier(useValidator['validatorID'][1]);
+    const verifierFabric = routesVerifierFactory.getVerifier(
       useValidator["validatorID"][1],
       "BusinessLogicCartrade"
     );
     logger.debug("getVerifierFabric");
 
-    // Generate parameters for sendSignedProposal(changeCarOwner)
-    const ccFncName = "changeCarOwner";
+    // Generate parameters for sendSignedProposal(TransferAsset)
+    const ccFncName = "TransferAsset";
 
     const ccArgs: string[] = [
       carID, // CarID
@@ -452,10 +444,10 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
       `##thirdTransaction(): businessLogicID: ${tradeInfo.businessLogicID}`
     );
     const useValidator = JSON.parse(
-      transactionManagement.getValidatorToUse(tradeInfo.businessLogicID)
+      routesTransactionManagement.getValidatorToUse(tradeInfo.businessLogicID)
     );
-    //        const verifierEthereum = transactionManagement.getVerifier(useValidator['validatorID'][0]);
-    const verifierEthereum = verifierFactory.getVerifier(
+    //        const verifierEthereum = routesTransactionManagement.getVerifier(useValidator['validatorID'][0]);
+    const verifierEthereum = routesVerifierFactory.getVerifier(
       useValidator["validatorID"][0],
       "BusinessLogicCartrade"
     );
@@ -537,7 +529,7 @@ export class BusinessLogicCartrade extends BusinessLogicBase {
       `##completedTransaction(): businessLogicID: ${tradeInfo.businessLogicID}`
     );
     const useValidator = JSON.parse(
-      transactionManagement.getValidatorToUse(tradeInfo.businessLogicID)
+      routesTransactionManagement.getValidatorToUse(tradeInfo.businessLogicID)
     );
     const validatorId = useValidator["validatorID"][0];
   }

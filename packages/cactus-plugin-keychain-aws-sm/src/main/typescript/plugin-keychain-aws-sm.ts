@@ -23,6 +23,9 @@ import {
   IPluginKeychain,
 } from "@hyperledger/cactus-core-api";
 
+import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
+import { GetPrometheusExporterMetricsEndpointV1 } from "./webservices/get-prometheus-exporter-metrics-endpoint-v1";
+
 import { homedir } from "os";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { SetKeychainEntryV1Endpoint } from "./webservices/set-keychain-entry-endpoint-v1";
@@ -60,6 +63,11 @@ export interface IPluginKeychainAwsSmOptions extends ICactusPluginOptions {
    *   awsCredentialType == AwsCredentialType.InMemory
    */
   awsSecretAccessKey?: string;
+  /**
+   * Prometheus Exporter object for metrics monitoring
+   */
+
+  prometheusExporter?: PrometheusExporter;
 }
 
 const SECRETMANAGER_STATUS_KEY_NOT_FOUND =
@@ -84,6 +92,7 @@ export class PluginKeychainAwsSm
   private readonly awsClient: SecretsManager;
   private endpoints: IWebServiceEndpoint[] | undefined;
   private awsCredentialType: AwsCredentialType;
+  public prometheusExporter: PrometheusExporter;
 
   public get className(): string {
     return PluginKeychainAwsSm.CLASS_NAME;
@@ -143,11 +152,29 @@ export class PluginKeychainAwsSm
       endpoint: this.awsEndpoint,
     });
 
+    this.prometheusExporter =
+      opts.prometheusExporter ||
+      new PrometheusExporter({ pollingIntervalInMin: 1 });
+    Checks.truthy(
+      this.prometheusExporter,
+      `${fnTag} options.prometheusExporter`,
+    );
+    this.prometheusExporter.startMetricsCollection();
+
     this.log.info(`Created ${this.className}. KeychainID=${opts.keychainId}`);
   }
 
   public getOpenApiSpec(): unknown {
     return OAS;
+  }
+
+  public getPrometheusExporter(): PrometheusExporter {
+    return this.prometheusExporter;
+  }
+
+  public async getPrometheusExporterMetrics(): Promise<string> {
+    const res: string = await this.prometheusExporter.getPrometheusMetrics();
+    return res;
   }
 
   public getAwsClient(): SecretsManager {
@@ -179,6 +206,10 @@ export class PluginKeychainAwsSm
       }),
       new HasKeychainEntryV1Endpoint({
         connector: this,
+        logLevel: this.opts.logLevel,
+      }),
+      new GetPrometheusExporterMetricsEndpointV1({
+        plugin: this,
         logLevel: this.opts.logLevel,
       }),
     ];
@@ -276,6 +307,7 @@ export class PluginKeychainAwsSm
           SecretString: value,
         })
         .promise();
+      this.prometheusExporter.setTotalKeyCounter(key, "set");
     } catch (ex) {
       this.log.error(` ${fnTag}: Error writing secret "${key}"`);
       throw ex;
@@ -292,6 +324,7 @@ export class PluginKeychainAwsSm
           ForceDeleteWithoutRecovery: true,
         })
         .promise();
+      this.prometheusExporter.setTotalKeyCounter(key, "delete");
     } catch (ex) {
       this.log.error(`${fnTag} Error deleting secret "${key}"`);
       throw ex;

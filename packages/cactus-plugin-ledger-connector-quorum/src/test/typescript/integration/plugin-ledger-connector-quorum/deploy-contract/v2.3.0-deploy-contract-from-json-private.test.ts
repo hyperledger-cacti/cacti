@@ -55,7 +55,7 @@ const keyStatic = {
   },
 };
 
-import { QuorumMpTestLedger } from "@hyperledger/cactus-test-tooling";
+import { QuorumMultiPartyTestLedger } from "@hyperledger/cactus-test-tooling";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import {
   PluginFactoryLedgerConnector,
@@ -68,7 +68,7 @@ import { PluginImportType } from "@hyperledger/cactus-core-api";
 const logLevel: LogLevelDesc = "INFO";
 
 describe("PluginLedgerConnectorQuorum", () => {
-  const preWarmedLedger = true; //process.env.CACTUS_TEST_PRE_WARMED_LEDGER === "true";
+  const preWarmedLedger = process.env.CACTUS_TEST_PRE_WARMED_LEDGER === "true";
   const keychainId1 = "keychain1_" + uuidV4();
   const keychainId2 = "keychain2_" + uuidV4();
 
@@ -77,7 +77,7 @@ describe("PluginLedgerConnectorQuorum", () => {
   let webQJsMember1: IWeb3Quorum;
   let webQJsMember2: IWeb3Quorum;
   let webQJsMember3: IWeb3Quorum;
-  let ledger: QuorumMpTestLedger;
+  let ledger: QuorumMultiPartyTestLedger;
   let connector1: PluginLedgerConnectorQuorum;
   let connector2: PluginLedgerConnectorQuorum;
   let connector3: PluginLedgerConnectorQuorum;
@@ -101,7 +101,7 @@ describe("PluginLedgerConnectorQuorum", () => {
   });
 
   beforeAll(async () => {
-    ledger = new QuorumMpTestLedger({ logLevel });
+    ledger = new QuorumMultiPartyTestLedger({ logLevel });
 
     if (preWarmedLedger) {
       keys = keyStatic;
@@ -124,10 +124,18 @@ describe("PluginLedgerConnectorQuorum", () => {
     );
     expect(webQJsMember1).toBeTruthy();
 
-    webQJsMember2 = Web3JsQuorum(web3Member2);
+    webQJsMember2 = Web3JsQuorum(
+      web3Member2,
+      { privateUrl: keys.quorum.member2.privateUrl },
+      true,
+    );
     expect(webQJsMember2).toBeTruthy();
 
-    webQJsMember3 = Web3JsQuorum(web3Member3);
+    webQJsMember3 = Web3JsQuorum(
+      web3Member3,
+      { privateUrl: keys.quorum.member3.privateUrl },
+      true,
+    );
     expect(webQJsMember3).toBeTruthy();
 
     const pluginRegistry1 = new PluginRegistry();
@@ -242,35 +250,13 @@ describe("PluginLedgerConnectorQuorum", () => {
       );
       signingAccount = webQJsMember1.eth.accounts.decrypt(accountKey, "");
     }
-    // const fnParams = {
-    //   to:
-    //   data:
-    //   privateFrom: keys.tessera.member1.publicKey,
-    //   privateFor: [
-    //     keys.tessera.member1.publicKey,
-    //     keys.tessera.member2.publicKey,
-    //   ],
-    //   privateKey: keys.quorum.member1.privateKey,
-    // };
-    //const privacyGroupId = webQJsMember1.utils.generatePrivacyGroup(fnParams);
-    // const accountAddress = keys.quorum.member1.accountAddress;
-    // const txCount = await webQJsMember1.eth.getTransactionCount(
-    //   `0x13a52aab892e1322e8b52506276363d4754c122e`,
-    //   privacyGroupId,
-    // );
-    //const privacyGroupId = webQJsMember1.utils.generatePrivacyGroup(fnParams);
-    // const participantList = [
-    //   keys.tessera.member1.publicKey,
-    //   keys.tessera.member3.publicKey,
-    // ];
-    // const privacyGroupId = await webQJsMember1.priv.createPrivacyGroup(keys.quorum.member1.url, participantList);
+
     const accountAddress = keys.quorum.member1.accountAddress;
     const txCount = await webQJsMember1.eth.getTransactionCount(accountAddress);
 
     const deployRes = await connector1.deployContract({
       contractName: HelloWorldContractJson.contractName,
       privateTransactionConfig: {
-        privateKey: "",
         privateFrom: keys.tessera.member1.publicKey,
         privateFor: [
           keys.tessera.member1.publicKey,
@@ -308,21 +294,18 @@ describe("PluginLedgerConnectorQuorum", () => {
     const mem1Response = await member1Contract.methods.getName().call();
     expect(mem1Response).toStrictEqual("CaptainCactus");
 
-    // const member2Contract = new webQJsMember2.eth.Contract(
-    //   HelloWorldContractJson.abi as AbiItem[],
-    //   contractAddress,
-    // );
-    // const mem2Response = await member2Contract.methods.getName().call();
-    // expect(mem2Response).toStrictEqual("CaptainCactus");
+    const member2Contract = new webQJsMember2.eth.Contract(
+      HelloWorldContractJson.abi as AbiItem[],
+      contractAddress,
+    );
+    const mem2Response = await member2Contract.methods.getName().call();
+    expect(mem2Response).toStrictEqual("CaptainCactus");
 
     const member3Contract = new webQJsMember3.eth.Contract(
       HelloWorldContractJson.abi as AbiItem[],
       contractAddress,
     );
 
-    const output = await member3Contract.methods.getName().call();
-    expect(output).toBeTruthy();
-    const invocationOfMember3 = member3Contract.methods.getName().call();
-    await expect(invocationOfMember3).toReject();
+    await expect(member3Contract.methods.getName().call()).rejects.toThrow();
   });
 });

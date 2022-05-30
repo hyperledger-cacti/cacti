@@ -1,35 +1,7 @@
 {
   "name": "@hyperledger/cactus-test-tooling",
-  "version": "1.0.0-rc.3",
+  "version": "1.0.0",
   "description": "Swiss army knife for test development. Main goal is to make pulling up test/dummy ledgers on the fly for tests easy, especially for test cases that are about simulating clean ledger state or wiped ledger state, etc.",
-  "main": "dist/lib/main/typescript/index.js",
-  "mainMinified": "dist/cactus-test-tooling.node.umd.min.js",
-  "browser": "dist/cactus-test-tooling.web.umd.js",
-  "browserMinified": "dist/cactus-test-tooling.web.umd.min.js",
-  "module": "dist/lib/main/typescript/index.js",
-  "types": "dist/lib/main/typescript/index.d.ts",
-  "files": [
-    "dist/*"
-  ],
-  "scripts": {
-    "watch": "npm-watch",
-    "webpack": "npm-run-all webpack:dev",
-    "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
-    "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js",
-    "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js"
-  },
-  "watch": {},
-  "publishConfig": {
-    "access": "public"
-  },
-  "engines": {
-    "node": ">=10",
-    "npm": ">=6"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/hyperledger/cactus.git"
-  },
   "keywords": [
     "Hyperledger",
     "Cactus",
@@ -37,6 +9,15 @@
     "Blockchain",
     "Distributed Ledger Technology"
   ],
+  "homepage": "https://github.com/hyperledger/cactus#readme",
+  "bugs": {
+    "url": "https://github.com/hyperledger/cactus/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger/cactus.git"
+  },
+  "license": "Apache-2.0",
   "author": {
     "name": "Hyperledger Cactus Contributors",
     "email": "cactus@lists.hyperledger.org",
@@ -64,13 +45,22 @@
       "url": "https://accenture.com"
     }
   ],
-  "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/hyperledger/cactus/issues"
+  "main": "dist/lib/main/typescript/index.js",
+  "module": "dist/lib/main/typescript/index.js",
+  "browser": "dist/cactus-test-tooling.web.umd.js",
+  "types": "dist/lib/main/typescript/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "scripts": {
+    "watch": "npm-watch",
+    "webpack": "npm-run-all webpack:dev",
+    "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
+    "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
+    "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
-  "homepage": "https://github.com/hyperledger/cactus#readme",
   "dependencies": {
-    "@hyperledger/cactus-common": "1.0.0-rc.3",
+    "@hyperledger/cactus-common": "1.0.0",
     "axios": "0.21.4",
     "compare-versions": "3.6.0",
     "dockerode": "3.3.0",
@@ -107,5 +97,15 @@
     "@types/temp": "0.9.1",
     "esm": "3.2.25",
     "temp": "0.9.4"
-  }
+  },
+  "engines": {
+    "node": ">=10",
+    "npm": ">=6"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "browserMinified": "dist/cactus-test-tooling.web.umd.min.js",
+  "mainMinified": "dist/cactus-test-tooling.node.umd.min.js",
+  "watch": {}
 }

@@ -33,7 +33,7 @@ test("json2str return stringified JSON", () => {
 test("json2str return null when given wrong input", () => {
   // Circular reference input
   const input = {};
-  input["field"] = input;
+  (input as any)["field"] = input;
   expect(DriverCommon.json2str(input)).toBeNull();
 
   // Undefined input

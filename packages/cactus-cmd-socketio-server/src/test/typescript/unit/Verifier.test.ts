@@ -10,6 +10,9 @@
 // TEST CONSTANTS
 /////////////////////////
 
+const testTimeout = 1000 * 5; // 5 second timeout per test
+const setupTimeout = 1000 * 60; // 1 minute timeout for setup
+
 const defaultConfig = {
   socketOptions: {
     rejectUnauthorized: false,
@@ -48,7 +51,7 @@ import { cloneDeep } from "lodash";
 // Mock default config
 import * as ConfigUtil from "../../../main/typescript/routing-interface/util/ConfigUtil";
 jest.mock("../../../main/typescript/routing-interface/util/ConfigUtil");
-ConfigUtil["__configMock"] = defaultConfig;
+(ConfigUtil as any)["__configMock"] = defaultConfig;
 
 const XMLHttpRequest = require("xmlhttprequest");
 jest.mock("xmlhttprequest");
@@ -70,21 +73,16 @@ import { Verifier } from "../../../main/typescript/verifier/Verifier";
 
 import {
   LedgerEvent,
-  VerifierEventListener,
+  IVerifierEventListener,
 } from "../../../main/typescript/verifier/LedgerPlugin";
 
-import {
-  createListeningMockServer,
-  createClientSocket,
-  connectTestClient,
-  ioServer,
-} from "./TestSocketHelpers";
+import { SocketIOTestSetupHelpers } from "@hyperledger/cactus-test-tooling";
 
 //////////////////////////////
 // TEST TIMEOUT
 //////////////////////////////
 
-jest.setTimeout(3000);
+jest.setTimeout(testTimeout);
 
 //////////////////////////////
 // CONSTRUCTOR TESTS
@@ -95,11 +93,11 @@ describe("Construction Tests", () => {
 
   beforeEach(() => {
     testLedgerData = cloneDeep(defaultLedgerData);
-  });
+  }, setupTimeout);
 
   afterEach(() => {
     Verifier.mapUrlSocket.clear();
-  });
+  }, setupTimeout);
 
   test("Fields set from passed ledger info", () => {
     const sut = new Verifier(JSON.stringify(testLedgerData));
@@ -167,30 +165,33 @@ describe("SocketIO Validator Tests", function () {
   const reqMethod = { type: "web3Eth", command: "getBalance" };
   const reqArgs = ["06fc56347d91c6ad2dae0c3ba38eb12ab0d72e97"];
 
-  let testServer: SocketIO.Server;
+  let testServer: SocketIOTestSetupHelpers.Server;
   let testServerPort: string;
-  let clientSocket: SocketIOClient.Socket;
-  let serverSocket: ioServer.Socket;
+  let clientSocket: SocketIOTestSetupHelpers.ClientSocket;
+  let serverSocket: SocketIOTestSetupHelpers.ServerSocket;
   let sut: Verifier;
 
   beforeAll(async () => {
-    [testServer, testServerPort] = await createListeningMockServer();
-  });
+    [
+      testServer,
+      testServerPort,
+    ] = await SocketIOTestSetupHelpers.createListeningMockServer();
+  }, setupTimeout);
 
   afterAll((done) => {
     testServer.close(() => {
       log.debug("Test server closed");
       done();
     });
-  });
+  }, setupTimeout);
 
   beforeEach(async () => {
-    clientSocket = createClientSocket(testServerPort);
+    clientSocket = SocketIOTestSetupHelpers.createClientSocket(testServerPort);
 
     // Mock client socket in verifier
     sut = new Verifier(JSON.stringify(defaultLedgerData));
     Verifier.mapUrlSocket.set(defaultLedgerData.validatorID, clientSocket);
-  });
+  }, setupTimeout);
 
   afterEach(() => {
     if (clientSocket) {
@@ -204,7 +205,7 @@ describe("SocketIO Validator Tests", function () {
     testServer.sockets.removeAllListeners();
 
     Verifier.mapUrlSocket.clear();
-  });
+  }, setupTimeout);
 
   //////////////////////////////
   // SYNC REQUEST
@@ -218,37 +219,14 @@ describe("SocketIO Validator Tests", function () {
         serverSocket = socket;
       });
 
-      await connectTestClient(clientSocket);
+      await SocketIOTestSetupHelpers.connectTestClient(clientSocket);
       expect(clientSocket.connected).toBeTrue();
       expect(serverSocket.connected).toBeTrue();
-    });
+    }, setupTimeout);
 
     test("Returns 504 on request timeout", async () => {
       const reqPromise = sut.sendSyncRequest(reqContract, reqMethod, reqArgs);
       await expect(reqPromise).resolves.toEqual({ status: 504, amount: 0 }); // timeout
-    });
-
-    test.each(["connect_error", "connect_timeout"])(
-      "Handles socketio error event '%s'",
-      async (errorEvent) => {
-        const error = { code: 123, message: "Some test error A" };
-
-        const reqPromise = sut.sendSyncRequest(reqContract, reqMethod, reqArgs);
-        serverSocket.emit(errorEvent, error);
-
-        await expect(reqPromise).rejects.toEqual(error);
-        expect(clientSocket.disconnected).toBeTrue();
-      },
-    );
-
-    test("Handles socketio client generic error", async () => {
-      const error = { code: 123, message: "Some test error B" };
-
-      const reqPromise = sut.sendSyncRequest(reqContract, reqMethod, reqArgs);
-      clientSocket.emit("error", error);
-
-      await expect(reqPromise).rejects.toEqual(error);
-      expect(clientSocket.disconnected).toBeTrue();
     });
 
     test("Sends request2 with valid arguments", () => {
@@ -382,7 +360,7 @@ describe("SocketIO Validator Tests", function () {
     const appId = "TestTrade";
     const options = { opt: "yes" };
     const onEventMock = jest.fn();
-    const listenerMock: VerifierEventListener = {
+    const listenerMock: IVerifierEventListener = {
       onEvent: onEventMock,
     };
 
@@ -402,7 +380,7 @@ describe("SocketIO Validator Tests", function () {
           expect(sut.eventListenerHash[appId]).toBe(listenerMock);
 
           // Connection error for monitor exit
-          serverSocket.emit("connect_error", {
+          serverSocket.emit("monitor_error", {
             code: 123,
             message: "Force exit error",
           });
@@ -410,34 +388,6 @@ describe("SocketIO Validator Tests", function () {
       });
 
       return expect(sut.startMonitor(appId, options, listenerMock)).toReject();
-    });
-
-    test.each(["connect_error", "connect_timeout"])(
-      "Handles socketio error event '%s'",
-      async (errorEvent) => {
-        const error = { code: 123, message: "Some test error" };
-
-        testServer.on("connection", (socket) => {
-          log.debug("Server socket connected", socket.id);
-          serverSocket = socket;
-          serverSocket.emit(errorEvent, error);
-        });
-
-        await expect(
-          sut.startMonitor(appId, options, listenerMock),
-        ).rejects.toEqual(error);
-        expect(clientSocket.disconnected).toBeTrue();
-      },
-    );
-
-    test("Handles socketio client generic error", async () => {
-      const error = { code: 123, message: "Some test error D" };
-
-      const reqPromise = sut.startMonitor(appId, options, listenerMock);
-      clientSocket.emit("error", error);
-
-      await expect(reqPromise).rejects.toEqual(error);
-      expect(clientSocket.disconnected).toBeTrue();
     });
 
     test("Triggers listener callbacks when received a message from a validator", (done) => {
@@ -457,12 +407,8 @@ describe("SocketIO Validator Tests", function () {
         if (!ev.data) {
           done("Event data is empty or null!");
         } else {
-          expect((ev.data as { [key: string]: number })["status"]).toEqual(
-            eventStatus,
-          );
-          expect((ev.data as { [key: string]: string })["blockData"]).toEqual(
-            decryptedBlockData,
-          );
+          expect(ev.data.status).toEqual(eventStatus);
+          expect(ev.data.blockData).toEqual(decryptedBlockData);
         }
 
         if (onEventCalledTimes === 2) {
@@ -471,8 +417,8 @@ describe("SocketIO Validator Tests", function () {
       };
 
       // Two listeners
-      const listenerMockFirst: VerifierEventListener = { onEvent: onEventMock };
-      const listenerMockSecond: VerifierEventListener = {
+      const listenerMockFirst: IVerifierEventListener = { onEvent: onEventMock };
+      const listenerMockSecond: IVerifierEventListener = {
         onEvent: onEventMock,
       };
 
@@ -519,7 +465,9 @@ describe("SocketIO Validator Tests", function () {
 
           setTimeout(
             () =>
-              serverSocket.emit("connect_error", { message: "Force close" }),
+              serverSocket.emit("monitor_error", {
+                message: "Force close",
+              }),
             150,
           );
         });
@@ -586,10 +534,10 @@ describe("SocketIO Validator Tests", function () {
         serverSocket = socket;
       });
 
-      await connectTestClient(clientSocket);
+      await SocketIOTestSetupHelpers.connectTestClient(clientSocket);
       expect(clientSocket.connected).toBeTrue();
       expect(serverSocket.connected).toBeTrue();
-    });
+    }, setupTimeout);
 
     test("Sends request2 with valid args for socketio verifier", () => {
       let reqReceived = new Promise<any>((resolve) => {
@@ -626,15 +574,9 @@ test("makeOpenApiEvent creates valid ledger event", () => {
 
   expect(event.id).toEqual("");
   expect(event.verifierId).toEqual(validatorId);
-  expect(
-    (event.data as { [key: string]: string })["txId"].length,
-  ).toBeGreaterThan(0);
-  expect(
-    (event.data as { [key: string]: Array<object> })["blockData"].length,
-  ).toEqual(1);
-  expect(
-    (event.data as { [key: string]: Array<object> })["blockData"][0],
-  ).toEqual(response);
+  expect(event.data!.txId!.length).toBeGreaterThan(0);
+  expect(event.data!.blockData.length).toEqual(1);
+  expect(event.data!.blockData[0]).toEqual(response);
 });
 
 describe("OpenAPI Async Request Tests", function () {
@@ -658,12 +600,12 @@ describe("OpenAPI Async Request Tests", function () {
     (XMLHttpRequest.XMLHttpRequest as jest.Mock).mockImplementation(
       () => XMLReqMock,
     );
-  });
+  }, setupTimeout);
 
   beforeEach(async () => {
     sut = new Verifier(JSON.stringify(defaultLedgerData));
     sut.validatorType = "openapi";
-  });
+  }, setupTimeout);
 
   test("Sends valid HTTP request for openapi verifier", async () => {
     sut.validatorUrl = "https://example:1234/"; // TODO - bug - fails when URL without trailing backslash
@@ -683,7 +625,7 @@ describe("OpenAPI Async Request Tests", function () {
 
   test("Sends event from ledger to listeners for openapi verifier", async () => {
     const onEventMock = jest.fn();
-    const listenerMock: VerifierEventListener = {
+    const listenerMock: IVerifierEventListener = {
       onEvent: onEventMock,
     };
     sut.eventListenerHash["TestApp"] = listenerMock;

@@ -40,9 +40,9 @@ const testCase = "Quorum Ledger Connector Plugin";
 describe(testCase, () => {
   const logLevel: LogLevelDesc = "INFO";
   const contractName = "HelloWorld";
-  const containerImageName = "hyperledger/cactus-quorum-all-in-one";
+
   const containerImageVersion = "2021-05-03-quorum-v21.4.1";
-  const ledgerOptions = { containerImageName, containerImageVersion };
+  const ledgerOptions = { containerImageVersion };
   const ledger = new QuorumTestLedger(ledgerOptions);
   const expressApp = express();
   expressApp.use(bodyParser.json({ limit: "250mb" }));
@@ -109,7 +109,7 @@ describe(testCase, () => {
       pluginRegistry: new PluginRegistry({ plugins: [keychainPlugin] }),
     });
     const listenOptions: IListenOptions = {
-      hostname: "0.0.0.0",
+      hostname: "localhost",
       port: 0,
       server,
     };

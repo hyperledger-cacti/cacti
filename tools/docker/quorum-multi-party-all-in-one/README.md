@@ -4,15 +4,15 @@
 
 - [Summary](#summary)
 - [Usage via Public Container Registry](#usage-via-public-container-registry)
-- [List endpoints and services](#list-endpoints-and-services)
-- [2021-08-17 09:39:45,048 DEBG 'quorum-network' stdout output:](#2021-08-17-093945048-debg-quorum-network-stdout-output)
-- [List endpoints and services](#list-endpoints-and-services-1)
+  - [Note on --tty flag](#note-on---tty-flag)
+- [Endpoints](#endpoints)
+- [Building the Image Locally](#building-the-image-locally)
 
 ## Summary
-
 A container image that hosts a Quorum network which is
-- Has multiple nodes and validators
-- Supports transaction privacy (`privateFrom` and `privateFor`)
+- Has multiple nodes and validators.
+- Supports transaction privacy (`privateFrom` and `privateFor`).
+- Based on official `quorum-dev-quickstart` setup.
 
 ## Usage via Public Container Registry
 
@@ -20,6 +20,7 @@ A container image that hosts a Quorum network which is
 docker run \
   --rm \
   --privileged \
+  --tty \
   --publish 2222:22 \
   --publish 3000:3000 \
   --publish 8545:8545 \
@@ -38,38 +39,19 @@ docker run \
   --publish 20004:20004 \
   --publish 20005:20005 \
   --publish 25000:25000 \
-  ghcr.io/hyperledger/cactus-quorum-multi-party-all-in-one:2021-08-20--quorum-multi-party-ledger
-
+  ghcr.io/hyperledger/cactus-quorum-multi-party-all-in-one:latest
 ```
 
-*************************************
-Quorum Dev Quickstart 
-*************************************
+### Note on --tty flag
+Underlying software used by the image requires pseudo-TTY to be allocated in a container. Without it, there'll be no log output from the Quorum Dev Quickstart application. The quorum services should work anyway, but use of `--tty` is convenient and recommended.
 
-----------------------------------
-List endpoints and services
-----------------------------------
+## Endpoints
+```sh
 JSON-RPC HTTP service endpoint                 : http://localhost:8545
-2021-08-17 09:39:45,048 DEBG 'quorum-network' stdout output:
-----------------------------------
-List endpoints and services
-----------------------------------
-JSON-RPC HTTP service endpoint                 : http://localhost:8545
-
 JSON-RPC WebSocket service endpoint            : ws://localhost:8546
 Web block explorer address                     : http://localhost:25000/
-2021-08-17 09:39:45,049 DEBG 'quorum-network' stdout output:
-JSON-RPC WebSocket service endpoint            : ws://localhost:8546
-Web block explorer address                     : http://localhost:25000/
-
-
-For more information on the endpoints and services, refer to README.md in the installation directory.
-****************************************************************
-2021-08-17 09:39:47,429 DEBG 'quorum-network' stdout output:
-
-For more information on the endpoints and services, refer to README.md in the installation directory.
-****************************************************************
-
+Prometheus address                             : http://localhost:9090/graph
+Grafana address                                : http://localhost:3000/d/a1lVy7ycin9Yv/goquorum-overview?orgId=1&refresh=10s&from=now-30m&to=now&var-system=All
 ```
 
 ## Building the Image Locally
@@ -79,13 +61,14 @@ DOCKER_BUILDKIT=1 docker build ./tools/docker/quorum-multi-party-all-in-one/ --p
 ```
 
 ```sh
-docker run --rm --privileged --publish-all cqmpaio
+docker run --rm --privileged --tty --publish-all cqmpaio
 ```
 
 ```sh
 docker run \
   --rm \
   --privileged \
+  --tty \
   --publish 2222:22 \
   --publish 3000:3000 \
   --publish 8545:8545 \

@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "dependencies": {
-    "json-bigint": "^1.0.0",
-    "jsonwebtoken": "^8.5.1",
-    "socket.io-client": "^2.4.0"
+    "json-bigint": "1.0.0",
+    "jsonwebtoken": "8.5.1",
+    "socket.io-client": "4.1.3"
   }
 }

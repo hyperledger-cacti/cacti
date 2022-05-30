@@ -1,5 +1,4 @@
-import test, { Test } from "tape";
-
+import "jest-extended";
 import {
   JsObjectSigner,
   IJsObjectSignerOptions,
@@ -37,7 +36,7 @@ const verifySignFunction = (
   );
 };
 
-test("Simple JSON Test", async (assert: Test) => {
+test("Simple JSON Test", async () => {
   const jsObjectSignerOptions: IJsObjectSignerOptions = {
     privateKey: keyPairs.privateKey,
     logLevel: "debug",
@@ -50,11 +49,10 @@ test("Simple JSON Test", async (assert: Test) => {
   const payload2 = { field3: 13, field2: "test12", field1: "test11" };
   const sign2 = jsObjectSigner.sign(payload2);
 
-  assert.equals(sign1.toString, sign2.toString);
-  assert.end();
+  expect(sign1.toString).toEqual(sign2.toString);
 });
 
-test("Simple Nested JSON Test", async (assert: Test) => {
+test("Simple Nested JSON Test", async () => {
   const jsObjectSignerOptions: IJsObjectSignerOptions = {
     privateKey: keyPairs.privateKey,
     logLevel: "debug",
@@ -69,11 +67,10 @@ test("Simple Nested JSON Test", async (assert: Test) => {
   const outer2 = { outerProperty: "test", innerProperty: inner2 };
   const sign2 = jsObjectSigner.sign(outer2);
 
-  assert.equals(sign1.toString, sign2.toString);
-  assert.end();
+  expect(sign1.toString).toEqual(sign2.toString);
 });
 
-test("Simple Date JSON Test", async (assert: Test) => {
+test("Simple Date JSON Test", async () => {
   const jsObjectSignerOptions: IJsObjectSignerOptions = {
     privateKey: keyPairs.privateKey,
     logLevel: "debug",
@@ -106,11 +103,10 @@ test("Simple Date JSON Test", async (assert: Test) => {
   };
   const sign2 = jsObjectSigner.sign(outer2);
 
-  assert.equals(sign1.toString, sign2.toString);
-  assert.end();
+  expect(sign1.toString).toEqual(sign2.toString);
 });
 
-test("Circular JSON Test", async (assert: Test) => {
+test("Circular JSON Test", async () => {
   const jsObjectSignerOptions: IJsObjectSignerOptions = {
     privateKey: keyPairs.privateKey,
     logLevel: "debug",
@@ -121,12 +117,10 @@ test("Circular JSON Test", async (assert: Test) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const obj: any = { a: "foo" };
   obj.b = obj;
-
-  assert.throws(() => jsObjectSigner.sign(obj));
-  assert.end();
+  expect(() => jsObjectSigner.sign(obj)).toThrow(Error);
 });
 
-test("Very Signature Test", async (assert: Test) => {
+test("Very Signature Test", async () => {
   const jsObjectSignerOptions: IJsObjectSignerOptions = {
     privateKey: keyPairs.privateKey,
     logLevel: "debug",
@@ -138,11 +132,10 @@ test("Very Signature Test", async (assert: Test) => {
 
   const verify = jsObjectSigner.verify(payload1, sign1, keyPairs.publicKey);
 
-  assert.equals(true, verify);
-  assert.end();
+  expect(verify).toBe(true);
 });
 
-test("Test optional sign function", async (assert: Test) => {
+test("Test optional sign function", async () => {
   const jsObjectSignerOptions: IJsObjectSignerOptions = {
     privateKey: keyPairs.privateKey,
     logLevel: "debug",
@@ -159,11 +152,10 @@ test("Test optional sign function", async (assert: Test) => {
   const outer2 = { outerProperty: "test", innerProperty: inner2 };
   const sign2 = jsObjectSigner.sign(outer2);
 
-  assert.equals(sign1.toString, sign2.toString);
-  assert.end();
+  expect(sign1.toString()).toEqual(sign2.toString());
 });
 
-test("Test optional verify sign function", async (assert: Test) => {
+test("Test optional verify sign function", async () => {
   const jsObjectSignerOptions: IJsObjectSignerOptions = {
     privateKey: keyPairs.privateKey,
     logLevel: "debug",
@@ -179,11 +171,10 @@ test("Test optional verify sign function", async (assert: Test) => {
 
   const verify = jsObjectSigner.verify(outer1, sign1, keyPairs.publicKey);
 
-  assert.equals(true, verify);
-  assert.end();
+  expect(verify).toBe(true);
 });
 
-test("Test optional hash function", async (assert: Test) => {
+test("Test optional hash function", async () => {
   const jsObjectSignerOptions: IJsObjectSignerOptions = {
     privateKey: keyPairs.privateKey,
     logLevel: "debug",
@@ -200,21 +191,22 @@ test("Test optional hash function", async (assert: Test) => {
   const outer2 = { outerProperty: "test", innerProperty: inner2 };
   const sign2 = jsObjectSigner.sign(outer2);
 
-  assert.equals(sign1.toString, sign2.toString);
-  assert.end();
+  expect(sign1.toString).toEqual(sign2.toString);
 });
 
-test("Test missing required constructor field", async (assert: Test) => {
+test("Test missing required constructor field", async () => {
   try {
     const pkey: unknown = undefined;
     const jsObjectSignerOptions: IJsObjectSignerOptions = {
       privateKey: pkey as Uint8Array,
     };
     new JsObjectSigner(jsObjectSignerOptions);
-  } catch (e) {
-    if (e instanceof Error) {
-      assert.equal(e.message, "JsObjectSigner#ctor options.privateKey falsy.");
-    }
+  } catch (e: unknown) {
+    expect(e).toBeInstanceOf(Error);
+    expect(e).toContainEntry([
+      "message",
+
+      "JsObjectSigner#ctor options.privateKey falsy.",
+    ]);
   }
-  assert.end();
 });

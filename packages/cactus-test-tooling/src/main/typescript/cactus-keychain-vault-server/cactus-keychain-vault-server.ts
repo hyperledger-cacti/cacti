@@ -19,8 +19,8 @@ export interface ICactusKeychainVaultServerOptions {
 }
 
 export const K_DEFAULT_KEYCHAIN_VAULT_IMAGE_NAME =
-  "petermetz/cactus-keychain-vault-server";
-export const K_DEFAULT_KEYCHAIN_VAULT_IMAGE_VERSION = "2021-01-13-56e2dd1";
+  "ghcr.io/hyperledger/cactus-keychain-vault-server";
+export const K_DEFAULT_KEYCHAIN_VAULT_IMAGE_VERSION = "v1.0.0-rc.3";
 export const K_DEFAULT_KEYCHAIN_VAULT_HTTP_PORT = 8080;
 
 /**
@@ -109,8 +109,8 @@ export class CactusKeychainVaultServer {
     });
   }
 
-  public async stop(): Promise<any> {
-    await Containers.stop(this.container as any);
+  public async stop(): Promise<void> {
+    await Containers.stop(this.container as Container);
   }
 
   public destroy(): Promise<unknown> {

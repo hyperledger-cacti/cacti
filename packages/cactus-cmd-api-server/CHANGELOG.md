@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0](https://github.com/hyperledger/cactus/compare/v1.0.0-rc.3...v1.0.0) (2022-03-16)
+
+
+### Bug Fixes
+
+* **cmd-api-server:** add express static rate limiting ([190cf12](https://github.com/hyperledger/cactus/commit/190cf12f16345e06fbb6d1ccb428ad0ad8958a3e)), closes [#1840](https://github.com/hyperledger/cactus/issues/1840)
+* **cmd-api-server:** disable validateKeyPairMatch ([7deaa22](https://github.com/hyperledger/cactus/commit/7deaa229ca0cdb4ef31fcc033ef08128fcb9e5b1))
+* **cmd-api-server:** upgrade socket.io - CVE-2022-21676 ([8e1c69e](https://github.com/hyperledger/cactus/commit/8e1c69e7b8ab5e4ccc31a0ec183a9777ccc22cdc)), closes [#1914](https://github.com/hyperledger/cactus/issues/1914)
+* config-service validator throws warnings ([877dcab](https://github.com/hyperledger/cactus/commit/877dcabc82dbc583f0d7e05813ce375c85b66f83))
+* fix faulty shutdownHook definition in the Config-Schema ([fbae2da](https://github.com/hyperledger/cactus/commit/fbae2da4071ebbf40cc1941a1d2261b8b06fe8f0)), closes [#1648](https://github.com/hyperledger/cactus/issues/1648)
+* **security:** upgrade to yarn > 1.22.0 - CVE-2019-10773, CVE-2020-8131 ([43d591d](https://github.com/hyperledger/cactus/commit/43d591d2eff576cb581a2a92d98edf7f4f6ecf13)), closes [#1922](https://github.com/hyperledger/cactus/issues/1922)
+* set apiServerOptions.configFile="" ([5c5a1e1](https://github.com/hyperledger/cactus/commit/5c5a1e16ad92a882b9e99f5413411b4cc7793be6)), closes [#1619](https://github.com/hyperledger/cactus/issues/1619)
+* shutdown hook configuration is using wrong config key ([e760e04](https://github.com/hyperledger/cactus/commit/e760e04a9ba946b45b65c68455eedcc2694f8fae)), closes [#1619](https://github.com/hyperledger/cactus/issues/1619)
+
+
+
+
+
 # [1.0.0-rc.3](https://github.com/hyperledger/cactus/compare/v1.0.0-rc.2...v1.0.0-rc.3) (2021-12-07)
 
 

@@ -486,18 +486,27 @@ export class Containers {
     });
   }
 
+  public static async getByPredicate(
+    pred: (ci: ContainerInfo) => boolean,
+  ): Promise<ContainerInfo> {
+    const docker = new Dockerode();
+    const containerList = await docker.listContainers();
+    const containerInfo = containerList.find(pred);
+
+    if (!containerInfo) {
+      throw new Error(`No container that matches given predicate!`);
+    }
+
+    return containerInfo;
+  }
+
   public static async getById(containerId: string): Promise<ContainerInfo> {
     const fnTag = `Containers#getById()`;
-
     Checks.nonBlankString(containerId, `${fnTag}:containerId`);
 
-    const docker = new Dockerode();
-    const containerInfos = await docker.listContainers({});
-    const aContainerInfo = containerInfos.find((ci) => ci.Id === containerId);
-
-    if (aContainerInfo) {
-      return aContainerInfo;
-    } else {
+    try {
+      return this.getByPredicate((ci) => ci.Id === containerId);
+    } catch {
       throw new Error(`${fnTag} no container by ID"${containerId}"`);
     }
   }

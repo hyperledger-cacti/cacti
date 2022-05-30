@@ -86,7 +86,7 @@ describe(testCase, () => {
     await besuTestLedger.start();
 
     const listenOptions: IListenOptions = {
-      hostname: "0.0.0.0",
+      hostname: "localhost",
       port: 0,
       server,
     };

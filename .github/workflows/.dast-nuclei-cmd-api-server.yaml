@@ -1,0 +1,101 @@
+name: DAST_Scan_Nuclei
+
+on:
+  push:
+    branches: [main, dev]
+
+  pull_request:
+    branches: [main, dev]
+
+jobs:
+  nuclei-scan:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Set up NodeJS v16.9.1
+        uses: actions/setup-node@v2.1.2
+        with:
+          node-version: v16.9.1
+
+      - name: Install jq
+        run: sudo apt update && sudo apt install -y jq
+
+      - name: Verify jq
+        run: jq --version
+
+      - uses: actions/checkout@v2.3.4
+
+      - uses: actions/setup-go@v3.0.0
+        with:
+          go-version: 1.17
+      
+      - run: go install -v github.com/projectdiscovery/nuclei/v2/cmd/nuclei@v2.6.3
+
+      - run: nuclei --version
+
+      - run: yarn configure
+
+      - name: Create URLs file for Nuclei
+        run: |
+          echo https://localhost:4000/ > urls.txt
+          echo https://localhost:4000/api/v1/api-server/healthcheck >> urls.txt
+          echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/node/jws >> urls.txt
+          echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/consortium/jws >> urls.txt
+          echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/get-prometheus-exporter-metrics >> urls.txt
+
+      - name: Show file content
+        run: |
+          pwd
+          ls -la
+          cat urls.txt
+
+      # TODO: Clean up comments
+      # TODO: Remove --debug flag
+
+      - run: yarn generate-api-server-config
+
+      - run: echo "$(jq '.authorizationProtocol = "NONE"' .config.json)" > .config.json
+
+      # - run: |
+      #     touch ~/nuclei-github-config.yaml \
+      #     && echo -e "severity: critical,high" >> ~/nuclei-github-config.yaml \
+      #     && echo -e "github:" >> ~/nuclei-github-config.yaml \
+      #     && echo -e "  username: \"$GITHUB_ACTOR\"" >> ~/nuclei-github-config.yaml \
+      #     && echo -e "  owner: \"${GITHUB_REPOSITORY%%/*}\"" >> ~/nuclei-github-config.yaml \
+      #     && echo -e "  token: \"${{ inputs.github-token }}\"" >> ~/nuclei-github-config.yaml \
+      #     && echo -e "  project-name: \"${GITHUB_REPOSITORY#*/}\"" >> ~/nuclei-github-config.yaml \
+      #     && echo -e "  issue-label: \"Nuclei\"" >> ~/nuclei-github-config.yaml \
+      #     && echo "githubconfig=-rc ~/nuclei-github-config.yaml" >> $GITHUB_ENV
+          
+      #   shell: bash
+
+      # - run: ls -alt
+
+      - name: Start API Server & Run DAST
+        uses: BerniWittmann/background-server-action@v1.0.4
+        env:
+            # Needed because the wait-on syntax otherwise keeps thinking that
+            # there is a problem due to our self signed certificates on the
+            # test instance of the API server
+            NODE_TLS_REJECT_UNAUTHORIZED: 0 
+        with:
+          build: yarn --version
+          start: yarn start:api-server
+          command: "nuclei --config=.nuclei-config.yaml --list=urls.txt --sarif-export ~/nuclei.sarif --output nuclei.log"
+          wait-on: "https://localhost:4000/api/v1/api-server/healthcheck"
+          # wait for 10 minutes for the server to respond
+          wait-on-timeout: 120
+
+      - run: pwd
+
+      - run: ls -alt
+
+      - name: GitHub Workflow artifacts
+        uses: actions/upload-artifact@v3.0.0
+        with:
+          name: nuclei.log
+          path: nuclei.log
+
+      # - name: GitHub Security Dashboard Alerts update
+      #   uses: github/codeql-action/upload-sarif@v1
+      #   with:
+      #     sarif_file: ~/nuclei.sarif

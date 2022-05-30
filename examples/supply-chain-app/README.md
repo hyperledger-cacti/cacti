@@ -14,20 +14,20 @@
       -p 4000:4000 \
       -p 4100:4100 \
       -p 4200:4200 \
-      ghcr.io/hyperledger/cactus-example-supply-chain-app:2021-09-08--docs-1312
+      ghcr.io/hyperledger/cactus-example-supply-chain-app:2022-04-05--feat-1579
     ```
 2. Observe the example application pulling up in the logs
    1. the test ledger containers,
    2. a test consortium with multiple members and their Cactus nodes
-3. Wait for the output to show the message `INFO (api-server): Cactus Cockpit reachable http://0.0.0.0:3100`
-4. Visit http://0.0.0.0:3100 in your web browser with Javascript enabled
+3. Wait for the output to show the message `INFO (api-server): Cactus Cockpit reachable http://0.0.0.0:3200`
+4. Visit http://0.0.0.0:3200 in your web browser with Javascript enabled
 
 ## Building and running the container locally
 
 ```sh
 # Change directories to the project root
 
-# Build the dockar image and tag it as "scaeb" for supply chain app example backend
+# Build the docker image and tag it as "scaeb" for supply chain app example backend
 DOCKER_BUILDKIT=1 docker build -f ./examples/supply-chain-app/Dockerfile . -t scaeb
 
 # Run the built image with ports mapped to the host machine as you see fit
@@ -36,6 +36,16 @@ DOCKER_BUILDKIT=1 docker build -f ./examples/supply-chain-app/Dockerfile . -t sc
 # be completely self-contained where you don't need to worry about running
 # multiple different ledgers jus this one container.
 docker run --rm -it --privileged -p 3000:3000 -p 3100:3100 -p 3200:3200 -p 4000:4000 -p 4100:4100 -p 4200:4200 scaeb
+```
+
+Building the image with a specific npm package version:
+
+```sh
+DOCKER_BUILDKIT=1 docker build \
+  --build-arg NPM_PKG_VERSION=jwt-supply-chain \
+  --file ./examples/supply-chain-app/Dockerfile \
+  --tag scaeb \
+  ./
 ```
 
 ## Running the Example Application Locally
@@ -61,4 +71,6 @@ On the terminal, issue the following commands (steps 1 to 6) and then perform th
 7. Locate the `.vscode/template.launch.json` file
 8. Within that file locate the entry named `"Example: Supply Chain App"`
 9. Copy the VSCode debug definition object from 2) to your `.vscode/launch.json` file
-10. At this point the VSCode `Run and Debug` panel on the left should have an option also titled `"Example: Supply Chain App"` which
+10. At this point the VSCode `Run and Debug` panel on the left should have an option also titled `"Example: Supply Chain App"` which starts the application
+11. When the application finishes loading, token generated is displayed on the terminal
+12. Visit http://localhost:3200 in a web browser with Javascript enabled and insert the token when prompted

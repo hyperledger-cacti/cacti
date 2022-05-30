@@ -1,149 +1,155 @@
+import { EventEmitter } from "events";
+import Docker, { Container, ContainerCreateOptions } from "dockerode";
 import {
   Bools,
   Logger,
   LoggerProvider,
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
-import Dockerode, { Container } from "dockerode";
-import { RuntimeError } from "run-time-error";
-import { Optional } from "typescript-optional";
 import { ITestLedger } from "../i-test-ledger";
-import { Containers } from "../public-api";
-import { EventEmitter } from "events";
+import { Containers } from "../common/containers";
 
-export interface IQuorumMpTestLedgerConstructorOptions {
+export interface IQuorumMultiPartyTestLedgerOptions {
+  readonly containerImageName?: string;
+  readonly containerImageVersion?: string;
   readonly logLevel?: LogLevelDesc;
-  readonly imageName?: string;
-  readonly imageTag?: string;
   readonly emitContainerLogs?: boolean;
-  readonly autoRemove?: boolean;
-  readonly envVars?: Map<string, string>;
+  readonly envVars?: string[];
+  // For test development, attach to ledger that is already running, don't spin up new one
+  readonly useRunningLedger?: boolean;
 }
 
-export class QuorumMpTestLedger implements ITestLedger {
-  public static readonly CLASS_NAME = "QuorumMpTestLedger";
-
-  private readonly _imageName: string;
-  private readonly _imageTag: string;
-  private readonly _imageFqn: string;
-  private readonly _emitContainerLogs: boolean;
-  private readonly _autoRemove: boolean;
-  private readonly _envVars: Map<string, string>;
-  private _containerId: Optional<string>;
+export class QuorumMultiPartyTestLedger implements ITestLedger {
+  public readonly containerImageName: string;
+  public readonly containerImageVersion: string;
+  private readonly logLevel: LogLevelDesc;
+  private readonly emitContainerLogs: boolean;
+  private readonly useRunningLedger: boolean;
+  private readonly envVars: string[];
 
   private readonly log: Logger;
+  public container: Container | undefined;
+  public containerId: string | undefined;
 
-  constructor(public readonly options: IQuorumMpTestLedgerConstructorOptions) {
-    this._containerId = Optional.empty();
-
-    this._imageName =
-      options.imageName ||
+  constructor(public readonly options: IQuorumMultiPartyTestLedgerOptions) {
+    // @todo Replace with hyperledger ghcr link when available
+    this.containerImageName =
+      options?.containerImageName ||
       "ghcr.io/hyperledger/cactus-quorum-multi-party-all-in-one";
-    this._imageTag =
-      options.imageTag || "2021-08-20--quorum-multi-party-ledger";
-    this._imageFqn = `${this._imageName}:${this._imageTag}`;
 
-    this._envVars = options.envVars || new Map();
-    this._emitContainerLogs = Bools.isBooleanStrict(options.emitContainerLogs)
+    this.containerImageVersion =
+      options?.containerImageVersion || "2021-08-20--quorum-multi-party-ledger";
+
+    this.logLevel = options?.logLevel || "info";
+
+    this.emitContainerLogs = Bools.isBooleanStrict(options.emitContainerLogs)
       ? (options.emitContainerLogs as boolean)
       : true;
-    this._autoRemove = Bools.isBooleanStrict(options.autoRemove)
-      ? (options.autoRemove as boolean)
-      : true;
-    const level = this.options.logLevel || "INFO";
-    const label = QuorumMpTestLedger.CLASS_NAME;
 
-    this.log = LoggerProvider.getOrCreate({ level, label });
-    this.log.debug(`Instantiated ${label} OK`);
+    this.useRunningLedger = Bools.isBooleanStrict(options.useRunningLedger)
+      ? (options.useRunningLedger as boolean)
+      : false;
+
+    this.envVars = options?.envVars || [];
+
+    this.log = LoggerProvider.getOrCreate({
+      level: this.logLevel,
+      label: "quorum-multi-party-test-ledger",
+    });
   }
 
-  public get containerId(): Optional<string> {
-    return this._containerId;
-  }
-
-  public get envVars(): Map<string, string> {
-    return this._envVars;
-  }
-
-  public get imageTag(): string {
-    return this._imageTag;
-  }
-
-  public get imageName(): string {
-    return this._imageName;
-  }
-
-  public get imageFqn(): string {
-    return this._imageFqn;
-  }
-
-  public get autoRemove(): boolean {
-    return this._autoRemove;
-  }
-
-  public get emitContainerLogs(): boolean {
-    return this._emitContainerLogs;
+  public get fullContainerImageName(): string {
+    return [this.containerImageName, this.containerImageVersion].join(":");
   }
 
   public async start(omitPull = false): Promise<Container> {
-    const docker = new Dockerode();
-    if (this.containerId.isPresent()) {
-      this.log.warn(`Container ID provided. Will not start new one.`);
-      const container = docker.getContainer(this.containerId.get());
-      return container;
+    if (this.useRunningLedger) {
+      this.log.info(
+        "Search for already running Quorum Test Ledger because 'useRunningLedger' flag is enabled.",
+      );
+      this.log.info(
+        "Search criteria - image name: ",
+        this.fullContainerImageName,
+        ", state: running",
+      );
+      const containerInfo = await Containers.getByPredicate(
+        (ci) =>
+          ci.Image === this.fullContainerImageName && ci.State === "running",
+      );
+      const docker = new Docker();
+      this.containerId = containerInfo.Id;
+      this.container = docker.getContainer(this.containerId);
+      return this.container;
     }
+
+    if (this.container) {
+      await this.container.stop();
+      await this.container.remove();
+      this.container = undefined;
+      this.containerId = undefined;
+    }
+
     if (!omitPull) {
-      await Containers.pullImage(this.imageFqn);
+      await Containers.pullImage(
+        this.fullContainerImageName,
+        {},
+        this.logLevel,
+      );
     }
 
-    const dockerEnvVars: string[] = new Array(...this.envVars).map(
-      (pairs) => `${pairs[0]}=${pairs[1]}`,
-    );
+    const createOptions: ContainerCreateOptions = {
+      ExposedPorts: {
+        "8545/tcp": {}, // HTTP RPC
+        "8546/tcp": {}, // WS RPC
+        "20000/tcp": {}, // Member1 HTTP RPC
+        "20001/tcp": {}, // Member1 WS RPC
+        "9081/tcp": {}, // Member1 Tessera
+        "20002/tcp": {}, // Member2 HTTP RPC
+        "20003/tcp": {}, // Member2 WS RPC
+        "9082/tcp": {}, // Member2 Tessera
+        "20004/tcp": {}, // Member3 HTTP RPC
+        "20005/tcp": {}, // Member3 WS RPC
+        "9083/tcp": {}, // Member3 Tessera
+      },
 
-    const createOptions = {
+      Env: this.envVars,
+
       HostConfig: {
-        AutoRemove: this.autoRemove,
-        Env: dockerEnvVars,
-        Privileged: true,
         PublishAllPorts: true,
+        Privileged: true,
       },
     };
 
-    this.log.debug(`Starting ${this.imageFqn} with options: `, createOptions);
-
     return new Promise<Container>((resolve, reject) => {
+      const docker = new Docker();
       const eventEmitter: EventEmitter = docker.run(
-        this.imageFqn,
+        this.fullContainerImageName,
         [],
         [],
         createOptions,
         {},
-        (err: Error) => {
+        (err: any) => {
           if (err) {
-            const errorMessage = `Failed to start container ${this.imageFqn}`;
-            const exception = new RuntimeError(errorMessage, err);
-            this.log.error(exception);
-            reject(exception);
+            reject(err);
           }
         },
       );
 
       eventEmitter.once("start", async (container: Container) => {
-        const { id } = container;
-        this.log.debug(`Started ${this.imageFqn} successfully. ID=${id}`);
-        this._containerId = Optional.ofNonNull(id);
+        this.container = container;
+        this.containerId = container.id;
 
         if (this.emitContainerLogs) {
-          const logOptions = { follow: true, stderr: true, stdout: true };
-          const logStream = await container.logs(logOptions);
-          logStream.on("data", (data: Buffer) => {
-            const fnTag = `[${this.imageFqn}]`;
-            this.log.debug(`${fnTag} %o`, data.toString("utf-8"));
+          const fnTag = `[${this.fullContainerImageName}]`;
+          await Containers.streamLogs({
+            container: this.container,
+            tag: fnTag,
+            log: this.log,
           });
         }
 
         try {
-          await Containers.waitForHealthCheck(this.containerId.get());
+          await Containers.waitForHealthCheck(this.containerId);
           resolve(container);
         } catch (ex) {
           this.log.error(ex);
@@ -153,57 +159,66 @@ export class QuorumMpTestLedger implements ITestLedger {
     });
   }
 
-  public get container(): Optional<Container> {
-    const docker = new Dockerode();
-    return this.containerId.isPresent()
-      ? Optional.ofNonNull(docker.getContainer(this.containerId.get()))
-      : Optional.empty();
-  }
-
   public async pullFile(filePath: string): Promise<string> {
-    const docker = new Dockerode();
-    const container = docker.getContainer(this.containerId.get());
+    const docker = new Docker();
+    this.container = docker.getContainer(this.containerId as string);
 
-    return await Containers.pullFile(container, filePath);
+    return await Containers.pullFile(this.container, filePath);
   }
 
-  public async stop(): Promise<unknown> {
-    return Containers.stop(this.container.get());
+  public stop(): Promise<unknown> {
+    if (this.useRunningLedger) {
+      this.log.info("Ignore stop request because useRunningLedger is enabled.");
+      return Promise.resolve();
+    } else if (this.container) {
+      return Containers.stop(this.container);
+    } else {
+      return Promise.reject(
+        new Error(
+          `QuorumMultiPartyTestLedger#destroy() Container was never created, nothing to stop.`,
+        ),
+      );
+    }
   }
 
-  public async destroy(): Promise<unknown> {
-    return this.container.get().remove();
+  public destroy(): Promise<unknown> {
+    if (this.useRunningLedger) {
+      this.log.info(
+        "Ignore destroy request because useRunningLedger is enabled.",
+      );
+      return Promise.resolve();
+    } else if (this.container) {
+      return this.container.remove();
+    } else {
+      return Promise.reject(
+        new Error(
+          `QuorumMultiPartyTestLedger#destroy() Container was never created, nothing to destroy.`,
+        ),
+      );
+    }
   }
 
-  public async getKeys(): Promise<unknown> {
-    const containerId = this.containerId.orElseThrow(
-      () => new RuntimeError("Invalid state: Dockerode Container ID not set."),
-    );
-    const container = await Containers.getById(containerId);
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  public async getKeys() {
+    if (!this.containerId) {
+      throw new Error("Missing container ID");
+    }
+
+    const container = await Containers.getById(this.containerId);
 
     const member1HttpPort = await Containers.getPublicPort(20000, container);
     const member1WsPort = await Containers.getPublicPort(20001, container);
-    const member1PrivateUrlPort = await Containers.getPublicPort(
-      9081,
-      container,
-    );
+    const member1PrivPort = await Containers.getPublicPort(9081, container);
 
     const member2HttpPort = await Containers.getPublicPort(20002, container);
     const member2WsPort = await Containers.getPublicPort(20003, container);
-    const member2PrivateUrlPort = await Containers.getPublicPort(
-      9082,
-      container,
-    );
+    const member2PrivPort = await Containers.getPublicPort(9082, container);
 
     const member3HttpPort = await Containers.getPublicPort(20004, container);
     const member3WsPort = await Containers.getPublicPort(20005, container);
-    const member3PrivateUrlPort = await Containers.getPublicPort(
-      9083,
-      container,
-    );
+    const member3PrivPort = await Containers.getPublicPort(9083, container);
 
-    // WARNING: the keys here are demo purposes ONLY.
-    // Please use a tool like Orchestrate or EthSigner for production, rather than hard coding private keys
+    // This configuration comes from quorum-dev-quickstart@smart_contracts/scripts/keys.js
     return {
       tessera: {
         member1: {
@@ -218,28 +233,25 @@ export class QuorumMpTestLedger implements ITestLedger {
       },
       quorum: {
         member1: {
-          name: "member1",
           url: `http://127.0.0.1:${member1HttpPort}`,
-          wsUrl: `http://127.0.0.1:${member1WsPort}`,
-          privateUrl: `http://127.0.0.1:${member1PrivateUrlPort}`,
+          wsUrl: `ws://127.0.0.1:${member1WsPort}`,
+          privateUrl: `http://127.0.0.1:${member1PrivPort}`,
           privateKey:
             "b9a4bd1539c15bcc83fa9078fe89200b6e9e802ae992f13cd83c853f16e8bed4",
           accountAddress: "f0e2db6c8dc6c681bb5d6ad121a107f300e9b2b5",
         },
         member2: {
-          name: "member2",
           url: `http://127.0.0.1:${member2HttpPort}`,
-          wsUrl: `http://127.0.0.1:${member2WsPort}`,
-          privateUrl: `http://127.0.0.1:${member2PrivateUrlPort}`,
+          wsUrl: `ws://127.0.0.1:${member2WsPort}`,
+          privateUrl: `http://127.0.0.1:${member2PrivPort}`,
           privateKey:
             "f18166704e19b895c1e2698ebc82b4e007e6d2933f4b31be23662dd0ec602570",
           accountAddress: "ca843569e3427144cead5e4d5999a3d0ccf92b8e",
         },
         member3: {
-          name: "member3",
           url: `http://127.0.0.1:${member3HttpPort}`,
-          wsUrl: `http://127.0.0.1:${member3WsPort}`,
-          privateUrl: `http://127.0.0.1:${member3PrivateUrlPort}`,
+          wsUrl: `ws://127.0.0.1:${member3WsPort}`,
+          privateUrl: `http://127.0.0.1:${member3PrivPort}`,
           privateKey:
             "4107f0b6bf67a3bc679a15fe36f640415cf4da6a4820affaac89c8b280dfd1b3",
           accountAddress: "0fbdc686b912d7722dc86510934589e0aaf3b55a",

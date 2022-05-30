@@ -1,0 +1,28 @@
+# Default cactus-cmd-socketio-server configuration
+# Do not change this, update the settings in usersetting.yaml
+# Check examples/discounted-cartrade/config for working example
+
+# List of Bussiness Logic Plugin and it's validators
+blpRegistry: []
+
+# log4js log levels used by cactus-cmd-socketio-server and smaple BLPs
+logLevel: info
+
+# Connection info
+applicationHostInfo:
+  hostName: 0.0.0.0
+  hostPort: 5034
+
+# Socket.IO Manager options
+socketOptions:
+  rejectUnauthorized: false
+  reconnection: false
+  timeout: 20000
+
+# Verifier component configuration
+verifier:
+  maxCounterRequestID: 100
+  syncFunctionTimeoutMillisecond: 5000
+
+# API route path and JS file to handle that route logic
+appRouters: []

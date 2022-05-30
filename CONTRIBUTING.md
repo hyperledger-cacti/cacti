@@ -358,14 +358,16 @@ for both them separately anyway:
   - An integration test:
 
       ```sh
-      npx tap --ts --timeout=600 packages/cactus-test-plugin-consortium-manual/src/test/typescript/integration/plugin-consortium-manual/security-isolation-via-api-server-ports.ts
+      npx tap --ts --timeout=600 packages/cactus-test-plugin-consortium-manual/src/test/typescript/integration/plugin-consortium-manual/get-consortium-jws-endpoint.test.ts
       ```
 
   - A unit test:
 
       ```sh
-      npx tap --ts --timeout=600 packages/cactus-common/src/test/typescript/unit/objects/get-all-method-names.test.ts
+      npx jest packages/cactus-common/src/test/typescript/unit/objects/get-all-method-names.test.ts
       ```
+
+      You can also run tests via the VS Code user interface. To do so, make sure you rename ``template.launch.json`` to ``launch.json`. Under the "Run and Debug" window of VS Code, select "JEST: Current TS file" to test the currently opened file.
 
 #### Running all test cases (unit+integration)
 
@@ -419,12 +421,12 @@ need to develop this yourself, but this is rarely the case so YMMV.
 
 To see an existing set of examples for `besu` and `quorum` images take a peek at
 the `tools/docker/besu-all-in-one` and `tools/docker/quorum-all-in-one` folders.
-These produce the `hyperledger/cactus-besu-all-in-one` and
-`hyperledger/cactus-quorum-all-in-one` images respectively. Both of these are
+These produce the `ghcr.io/hyperledger/cactus-besu-all-in-one` and
+`ghcr.io/hyperledger/cactus-quorum-all-in-one` images respectively. Both of these are
 used in the test cases that are written for the specific ledger connector
 plugins at:
 * `packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/deploy-contract-via-web-service.test.ts`
-* `packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/deploy-contract-from-json.ts`
+* `packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/deploy-contract-from-json.test.ts`
 
 The specific classes that utilize the `all-in-one` images can be found in the
 `test-tooling` package under these paths:

@@ -6,12 +6,13 @@
  */
 
 import { Router, NextFunction, Request, Response } from "express";
-import { TransactionManagement } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/TransactionManagement";
-import { RIFError } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/RIFError";
-import { ConfigUtil } from "../../packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/util/ConfigUtil";
+import {
+  TransactionManagement,
+  RIFError,
+  ConfigUtil,
+} from "@hyperledger/cactus-cmd-socket-server";
+import escapeHtml from "escape-html";
 
-const fs = require("fs");
-const path = require("path");
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
 const moduleName = "trades";
@@ -25,14 +26,16 @@ export const transactionManagement: TransactionManagement =
 // Request Execution of Trade
 router.post("/", (req: Request, res: Response, next: NextFunction) => {
   try {
-    const tradeID: string = transactionManagement.startBusinessLogic(req);
-
+    const tradeID = transactionManagement.startBusinessLogic(req);
+    if (!tradeID) {
+      throw new RIFError(`Could not run BLP, tradeId = ${tradeID}`);
+    }
     const result = { tradeID: tradeID };
     res.status(200).json(result);
   } catch (err) {
     if (err instanceof RIFError) {
       res.status(err.statusCode);
-      res.send(err.message);
+      res.send(escapeHtml(err.message));
       return;
     }
 
@@ -45,7 +48,12 @@ router.post(
   "/meter/register/",
   (req: Request, res: Response, next: NextFunction) => {
     try {
-      const result: object = transactionManagement.setBusinessLogicConfig(req);
+      const result = transactionManagement.setBusinessLogicConfig(req);
+
+      if (!result) {
+        throw new RIFError("Error when running setBusinessLogicConfig");
+      }
+
       let status = 200;
       if (result["action"] === "add") {
         status = 201;
@@ -54,7 +62,7 @@ router.post(
     } catch (err) {
       if (err instanceof RIFError) {
         res.status(err.statusCode);
-        res.send(err.message);
+        res.send(escapeHtml(err.message));
         return;
       }
 

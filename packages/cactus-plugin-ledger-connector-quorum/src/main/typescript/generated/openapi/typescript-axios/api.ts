@@ -170,6 +170,12 @@ export interface DeployContractSolidityBytecodeV1Request {
      */
     web3SigningCredential: Web3SigningCredential;
     /**
+     * See https://ethereum.stackexchange.com/a/47556 regarding the maximum length of the bytecode
+     * @type {string}
+     * @memberof DeployContractSolidityBytecodeV1Request
+     */
+    bytecode?: string;
+    /**
      * The keychainId for retrieve the contracts json.
      * @type {string}
      * @memberof DeployContractSolidityBytecodeV1Request
@@ -187,6 +193,18 @@ export interface DeployContractSolidityBytecodeV1Request {
      * @memberof DeployContractSolidityBytecodeV1Request
      */
     gasPrice?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof DeployContractSolidityBytecodeV1Request
+     */
+    nonce?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof DeployContractSolidityBytecodeV1Request
+     */
+    value?: number;
     /**
      * 
      * @type {number}
@@ -466,7 +484,7 @@ export interface QuorumPrivateTransactionConfig {
      * @type {string}
      * @memberof QuorumPrivateTransactionConfig
      */
-    privateKey: string;
+    privateKey?: string;
     /**
      * 
      * @type {string}

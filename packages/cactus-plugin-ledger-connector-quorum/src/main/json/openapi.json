@@ -510,7 +510,7 @@
                     "transactionReceipt": {
                         "$ref": "#/components/schemas/Web3TransactionReceipt"
                     }
-                }
+                } 
             },
             "DeployContractSolidityBytecodeV1Request": {
                 "type": "object",
@@ -531,6 +531,13 @@
                     "web3SigningCredential": {
                         "$ref": "#/components/schemas/Web3SigningCredential",
                         "nullable": false
+                    },
+                    "bytecode": {
+                        "type": "string",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 24576,
+                        "description": "See https://ethereum.stackexchange.com/a/47556 regarding the maximum length of the bytecode"
                     },
                     "keychainId": {
                         "type": "string",
