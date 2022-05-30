@@ -16,7 +16,7 @@
 ## NetworkQuery
 
 This message is created by client application to encapsulate the query for the relay.
-Whenever a client application needs to query a foreign network for a [ledger state view](../../models/ledger/views.md), it must wrap the query comprising of a [view address](../views/addressing.md), a [verification policy](../policies/proofs-verification), and other metadata, into a DLT-neutral structure as follows for the [relays](../../models/infrastructure/relay.md) that will accept and route the request.
+Whenever a client application needs to query a foreign network for a [ledger state view](../../models/ledger/views.md), it must wrap the query comprising of a [view address](../views/addressing.md), a [verification policy](../policies/proofs-verification.md), and other metadata, into a DLT-neutral structure as follows for the [relays](../../models/infrastructure/relay.md) that will accept and route the request.
 
 ```protobuf
 message NetworkQuery {
@@ -32,8 +32,8 @@ message NetworkQuery {
 }
 ```
 
-* `policy`: specifies the [verification policy](../policies/proofs-verification) to be used for this query.
-* `address`: stores the view address. More on addressing [here](../views/addressing).
+* `policy`: specifies the [verification policy](../policies/proofs-verification.md) to be used for this query.
+* `address`: stores the view address. More on addressing [here](../views/addressing.md).
 * `requesting_relay`: id for the local relay (Optional, by default is filled by the relay to which this message is sent). 
 * `requesting_network`: id for the local network to which this client application belongs.
 * `certificate`: X509 Certificate in PEM format of the requesting client (to authenticate membership of the client to the requesting network, and also used for access control).
@@ -103,3 +103,5 @@ service DataTransfer {
 ```
 
 `RequestState` and `SendState` APIs are explained in more details [here](../../models/infrastructure/relays.md#api-for-other-relays), while `SendDriverState` API is explained [here](../../models/infrastructure/relays.md#api-for-driver).
+
+## Database
