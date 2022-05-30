@@ -28,6 +28,7 @@ message NetworkQuery {
   string requestor_signature = 6;
   string nonce = 7;
   string requesting_org = 8;
+  bool confidential = 9;
 }
 ```
 
@@ -39,9 +40,25 @@ message NetworkQuery {
 * `requestor_signature`: Digital signature over concatenation of `address` and `nonce` by client, to ensure that the query has not been tampered with.
 * `nonce`: used to avoid replay attacks by entities masquerading as an application.
 * `requesting_org`: Organization id to which this client application belongs.
+* `confidential`: indicating whether to enable [confidentiality](../../models/security/confidentiality.md) i.e. encrypt the payload using the above certificate.
 
-**Example:**
+**Examples:**
 
+Testnet Demo (Corda):
+```
+NetworkQuery {
+  policy: ["PartyA"],
+  address: "localhost:9082/Corda_Network2/localhost:30006#com.cordaSimpleApplication.flow.GetStateByKey:H",
+  requesting_relay: "",
+  requesting_network: "Corda_Network",
+  certificate: "-----BEGIN CERTIFICATE-----\nMIIByzCCAWegAwIBAgIQaqyrhCxlulMXQ2ERwrN5FjAUBggqhkjOPQQDAgYIKoZI\nzj0DAQcwLzELMAkGA1UEBhMCR0IxDzANBgNVBAcMBkxvbmRvbjEPMA0GA1UECgwG\nUGFydHlBMB4XDTIxMTAyMDAwMDAwMFoXDTI3MDUyMDAwMDAwMFowLzELMAkGA1UE\nBhMCR0IxDzANBgNVBAcMBkxvbmRvbjEPMA0GA1UECgwGUGFydHlBMCowBQYDK2Vw\nAyEAMaHQI58Jjpugv6uIZ1qej2YDAkYOd+8IngOkp1AXioCjgYkwgYYwHQYDVR0O\nBBYEFPI4LMY1d+hDVGJTXnDJuQviBQ59MA8GA1UdEwEB/wQFMAMBAf8wCwYDVR0P\nBAQDAgKEMBMGA1UdJQQMMAoGCCsGAQUFBwMCMB8GA1UdIwQYMBaAFM1cH1AsPx3G\nP0cFiOfCyk/ezevUMBEGCisGAQQBg4piAQEEAwIBBjAUBggqhkjOPQQDAgYIKoZI\nzj0DAQcDSAAwRQIgcKAtTPzmuGtwGHTx4Gq07K0R96lGFgQhFCycFNgxcj4CIQD2\nE1rZxLU2pKar/MC86c+LNF1F55ehf9egcDUzJO8Bjg==\n-----END CERTIFICATE-----",
+  requestor_signature: "ZL0pLnAqPVIL4ZSfYAHFcO+D/oAz1+GTNrJTV4mppZVxkPdK3EbhpqN79CC2MbQ1Pz8z+8DwmpYP2kbbKKL7Aw==", nonce: "4ba140e3-3bc2-4d77-91f0-3ca16e604487",
+  requesting_org: "PartyA",
+  confidential: false
+}
+```
+
+Trade Demo (Fabric):
 ```
 NetworkQuery { 
   policy: ["CarrierMSP", "SellerMSP"], 
@@ -51,8 +68,11 @@ NetworkQuery {
   certificate: "-----BEGIN CERTIFICATE-----\nMIIB2zCCAXegAwIBAgIQfrI6AbTtEhuJa9XzLy1L/TAUBggqhkjOPQQDAgYIKoZI\nzj0DAQcwNzELMAkGA1UEBhMCR0IxDzANBgNVBAcMBkxvbmRvbjEXMBUGA1UECgwO\nU2VsbGVyQmFua05vZGUwHhcNMjIwMzIyMDAwMDAwWhcNMjcwNTIwMDAwMDAwWjA3\nMQswCQYDVQQGEwJHQjEPMA0GA1UEBwwGTG9uZG9uMRcwFQYDVQQKDA5TZWxsZXJC\nYW5rTm9kZTAqMAUGAytlcAMhAMkMVTNq8lr1I4o4ivrPUNLoeV2Ab4U9PsReYo+w\n6nEio4GJMIGGMB0GA1UdDgQWBBQaqL67Z4elSpuWHjc0wfShLEBPdDAPBgNVHRMB\nAf8EBTADAQH/MAsGA1UdDwQEAwIChDATBgNVHSUEDDAKBggrBgEFBQcDAjAfBgNV\nHSMEGDAWgBSUmpz6AYRj0sgN5TPBwA1CSs34ZDARBgorBgEEAYOKYgEBBAMCAQYw\nFAYIKoZIzj0EAwIGCCqGSM49AwEHA0gAMEUCIQCnEpDO8MNL5vL5Uiig0+9iQHX4\nBLPJZXw591f3bB8xlQIgC5ieNFiV126RvjAmuq3R6bkl//3vECCcEOzDvK424y8=\n-----END CERTIFICATE-----", 
   requestor_signature: "c+5UYaA4bZB7AI4msFdo0DTZFMnEskhlPWhB8/2IFSzwJmOopz980kxcuC/KjF3T8GQyjgMNqadaLEnKtZm3Aw==",
   nonce: "f34bc09f-8ae1-439f-ab34-5414a289e1dd", 
-  requesting_org: "SellerBankNode" }
+  requesting_org: "SellerBankNode",
+  confidential: false
+}
 ```
+
 
 ## GetStateMessage
 

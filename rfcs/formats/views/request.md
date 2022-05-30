@@ -27,6 +27,7 @@ message Query {
   string nonce = 7;
   string request_id = 8;
   string requesting_org = 9;
+  bool confidential = 10;
 }
 ```
 
