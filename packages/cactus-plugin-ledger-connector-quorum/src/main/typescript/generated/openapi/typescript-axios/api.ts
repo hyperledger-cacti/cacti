@@ -206,18 +206,6 @@ export interface DeployContractSolidityBytecodeV1Request {
      */
     value?: number;
     /**
-     * 
-     * @type {number}
-     * @memberof DeployContractSolidityBytecodeV1Request
-     */
-    nonce?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof DeployContractSolidityBytecodeV1Request
-     */
-    value?: number;
-    /**
      * The amount of milliseconds to wait for a transaction receipt with theaddress of the contract(which indicates successful deployment) beforegiving up and crashing.
      * @type {number}
      * @memberof DeployContractSolidityBytecodeV1Request
