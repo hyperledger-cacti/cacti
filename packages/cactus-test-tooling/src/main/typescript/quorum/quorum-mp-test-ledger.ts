@@ -38,7 +38,7 @@ export class QuorumMultiPartyTestLedger implements ITestLedger {
       "ghcr.io/hyperledger/cactus-quorum-multi-party-all-in-one";
 
     this.containerImageVersion =
-      options?.containerImageVersion || "2022-03-30--1928";
+      options?.containerImageVersion || "2021-08-20--quorum-multi-party-ledger";
 
     this.logLevel = options?.logLevel || "info";
 
@@ -157,6 +157,13 @@ export class QuorumMultiPartyTestLedger implements ITestLedger {
         }
       });
     });
+  }
+
+  public async pullFile(filePath: string): Promise<string> {
+    const docker = new Docker();
+    this.container = docker.getContainer(this.containerId as string);
+
+    return await Containers.pullFile(this.container, filePath);
   }
 
   public stop(): Promise<unknown> {

@@ -3,6 +3,12 @@ import { Server as SecureServer } from "https";
 
 import { Express } from "express";
 import Web3 from "web3";
+import Web3JsQuorum, {
+  IWeb3Quorum,
+  ISendRawTransaction,
+  IPrivateTransactionReceipt,
+} from "web3js-quorum";
+
 // The strange way of obtaining the contract class here is like this because
 // web3-eth internally sub-classes the Contract class at runtime
 // @see https://stackoverflow.com/a/63639280/698470
@@ -67,6 +73,7 @@ import { RuntimeError } from "run-time-error";
 export interface IPluginLedgerConnectorQuorumOptions
   extends ICactusPluginOptions {
   rpcApiHttpHost: string;
+  privateUrl: string;
   logLevel?: LogLevelDesc;
   prometheusExporter?: PrometheusExporter;
   pluginRegistry: PluginRegistry;
@@ -85,8 +92,10 @@ export class PluginLedgerConnectorQuorum
   private readonly pluginRegistry: PluginRegistry;
   public prometheusExporter: PrometheusExporter;
   private readonly instanceId: string;
+  private readonly privateUrl: string;
   private readonly log: Logger;
   private readonly web3: Web3;
+  private readonly web3JsQuorum: IWeb3Quorum;
   private httpServer: Server | SecureServer | null = null;
 
   private endpoints: IWebServiceEndpoint[] | undefined;
@@ -107,10 +116,18 @@ export class PluginLedgerConnectorQuorum
     const label = this.className;
     this.log = LoggerProvider.getOrCreate({ level, label });
 
+    this.privateUrl = options.privateUrl;
+
     const web3Provider = new Web3.providers.HttpProvider(
       this.options.rpcApiHttpHost,
     );
     this.web3 = new Web3(web3Provider);
+    this.web3JsQuorum = Web3JsQuorum(
+      this.web3,
+      { privateUrl: this.privateUrl },
+      true,
+    );
+
     this.instanceId = options.instanceId;
     this.pluginRegistry = options.pluginRegistry as PluginRegistry;
     this.prometheusExporter =
@@ -380,6 +397,7 @@ export class PluginLedgerConnectorQuorum
       const txReq: RunTransactionRequest = {
         transactionConfig,
         web3SigningCredential,
+        privateTransactionConfig: req.privateTransactionConfig,
         timeoutMs: req.timeoutMs || 60000,
       };
       const out = await this.transact(txReq);
@@ -454,6 +472,11 @@ export class PluginLedgerConnectorQuorum
     const {
       secret,
     } = web3SigningCredential as Web3SigningCredentialGethKeychainPassword;
+
+    if (txIn.privateTransactionConfig) {
+      return this.transactPrivate(txIn);
+    }
+
     try {
       const txHash = await sendTransaction(transactionConfig, secret);
       const transactionReceipt = await this.pollForTxReceipt(txHash);
@@ -475,6 +498,10 @@ export class PluginLedgerConnectorQuorum
       secret,
     } = web3SigningCredential as Web3SigningCredentialPrivateKeyHex;
 
+    if (req.privateTransactionConfig) {
+      return this.transactPrivate(req);
+    }
+
     const signedTx = await this.web3.eth.accounts.signTransaction(
       transactionConfig,
       secret,
@@ -490,11 +517,65 @@ export class PluginLedgerConnectorQuorum
     }
   }
 
+  public async transactPrivate(
+    req: RunTransactionRequest,
+  ): Promise<RunTransactionResponse> {
+    const { web3SigningCredential } = req;
+    const {
+      secret,
+    } = web3SigningCredential as Web3SigningCredentialPrivateKeyHex;
+
+    const signingAccount = this.web3JsQuorum.eth.accounts.privateKeyToAccount(
+      secret,
+    );
+    const txCount = await this.web3JsQuorum.eth.getTransactionCount(
+      signingAccount.address,
+    );
+    const txn = {
+      gasLimit: req.transactionConfig.gas, //max number of gas units the tx is allowed to use
+      gasPrice: req.transactionConfig.gasPrice, //ETH per unit of gas
+      data: req.transactionConfig.data,
+      privateKey: secret,
+      privateFrom: req.privateTransactionConfig?.privateFrom,
+      privateFor: req.privateTransactionConfig?.privateFor,
+      from: signingAccount,
+      isPrivate: true,
+      nonce: txCount,
+      value: 0,
+    } as ISendRawTransaction;
+
+    const block = (await this.web3JsQuorum.priv.generateAndSendRawTransaction(
+      txn,
+    )) as unknown;
+    const { transactionHash } = block as IPrivateTransactionReceipt;
+    const transactionReceipt = await this.web3JsQuorum.priv.waitForTransactionReceipt(
+      transactionHash,
+    );
+
+    return { transactionReceipt: transactionReceipt };
+  }
+
+  public async getPrivateTxReceipt(
+    privateFrom: string,
+    txHash: string,
+  ): Promise<RunTransactionResponse> {
+    const txPoolReceipt = {} as any;
+
+    console.log(privateFrom);
+    console.log(txHash);
+
+    return { transactionReceipt: txPoolReceipt };
+  }
+
   public async transactCactusKeychainRef(
     req: RunTransactionRequest,
   ): Promise<RunTransactionResponse> {
     const fnTag = `${this.className}#transactCactusKeychainRef()`;
-    const { transactionConfig, web3SigningCredential } = req;
+    const {
+      transactionConfig,
+      web3SigningCredential,
+      privateTransactionConfig,
+    } = req;
     const {
       ethAccount,
       keychainEntryKey,
@@ -527,6 +608,7 @@ export class PluginLedgerConnectorQuorum
     }
 
     return this.transactPrivateKey({
+      privateTransactionConfig,
       transactionConfig,
       web3SigningCredential: {
         ethAccount,
@@ -560,10 +642,10 @@ export class PluginLedgerConnectorQuorum
   }
 
   private async generateBytecode(req: any): Promise<string> {
-    const tmpContract = new this.web3.eth.Contract(
-      (req.contractJSON as any).abi,
+    const tmpContracts = new this.web3JsQuorum.eth.Contract(
+      req.contractJSON.abi,
     );
-    const deployment = tmpContract.deploy({
+    const deployment = tmpContracts.deploy({
       data: req.contractJSON.bytecode,
       arguments: req.constructorArgs,
     });
@@ -575,17 +657,39 @@ export class PluginLedgerConnectorQuorum
     const web3SigningCredential = req.web3SigningCredential as
       | Web3SigningCredentialGethKeychainPassword
       | Web3SigningCredentialPrivateKeyHex;
+    const bytecode = await this.generateBytecode(req);
 
-    const receipt = await this.transact({
-      transactionConfig: {
-        data: await this.generateBytecode(req),
-        from: web3SigningCredential.ethAccount,
-        gas: req.gas,
-        gasPrice: req.gasPrice,
-      },
-      web3SigningCredential,
-    });
-    return receipt;
+    if (req.privateTransactionConfig) {
+      const privacyGroupId =
+        req.privateTransactionConfig.privacyGroupId ||
+        this.web3JsQuorum.utils.generatePrivacyGroup(
+          req.privateTransactionConfig,
+        );
+      this.log.info("privacyGroupId=%o", privacyGroupId);
+      const receipt = await this.transactPrivate({
+        privateTransactionConfig: req.privateTransactionConfig,
+        transactionConfig: {
+          data: bytecode,
+          from: web3SigningCredential.ethAccount,
+          gas: req.gas,
+          gasPrice: req.gasPrice,
+        },
+        web3SigningCredential,
+      });
+      return receipt;
+    } else {
+      const receipt = await this.transact({
+        privateTransactionConfig: req.privateTransactionConfig,
+        transactionConfig: {
+          data: bytecode,
+          from: web3SigningCredential.ethAccount,
+          gas: req.gas,
+          gasPrice: req.gasPrice,
+        },
+        web3SigningCredential,
+      });
+      return receipt;
+    }
   }
 
   public async deployContract(

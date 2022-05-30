@@ -183,6 +183,7 @@ export class SupplyChainAppDummyInfrastructure {
         const pluginRegistry = new PluginRegistry();
         pluginRegistry.add(this.keychain);
         const connector = new PluginLedgerConnectorQuorum({
+          privateUrl: rpcApiHttpHost,
           instanceId: "PluginLedgerConnectorQuorum_Contract_Deployment",
           rpcApiHttpHost,
           logLevel: this.options.logLevel,

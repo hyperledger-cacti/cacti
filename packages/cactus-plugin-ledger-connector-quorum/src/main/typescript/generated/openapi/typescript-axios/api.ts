@@ -170,6 +170,12 @@ export interface DeployContractSolidityBytecodeV1Request {
      */
     web3SigningCredential: Web3SigningCredential;
     /**
+     * See https://ethereum.stackexchange.com/a/47556 regarding the maximum length of the bytecode
+     * @type {string}
+     * @memberof DeployContractSolidityBytecodeV1Request
+     */
+    bytecode?: string;
+    /**
      * The keychainId for retrieve the contracts json.
      * @type {string}
      * @memberof DeployContractSolidityBytecodeV1Request
@@ -188,6 +194,18 @@ export interface DeployContractSolidityBytecodeV1Request {
      */
     gasPrice?: string;
     /**
+     * 
+     * @type {number}
+     * @memberof DeployContractSolidityBytecodeV1Request
+     */
+    nonce?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof DeployContractSolidityBytecodeV1Request
+     */
+    value?: number;
+    /**
      * The amount of milliseconds to wait for a transaction receipt with theaddress of the contract(which indicates successful deployment) beforegiving up and crashing.
      * @type {number}
      * @memberof DeployContractSolidityBytecodeV1Request
@@ -205,6 +223,12 @@ export interface DeployContractSolidityBytecodeV1Request {
      * @memberof DeployContractSolidityBytecodeV1Request
      */
     constructorArgs?: Array<any>;
+    /**
+     * 
+     * @type {QuorumPrivateTransactionConfig}
+     * @memberof DeployContractSolidityBytecodeV1Request
+     */
+    privateTransactionConfig?: QuorumPrivateTransactionConfig;
 }
 /**
  * 
@@ -302,6 +326,12 @@ export interface InvokeContractJsonObjectV1Request {
      * @memberof InvokeContractJsonObjectV1Request
      */
     contractJSON: ContractJSON;
+    /**
+     * 
+     * @type {QuorumPrivateTransactionConfig}
+     * @memberof InvokeContractJsonObjectV1Request
+     */
+    privateTransactionConfig?: QuorumPrivateTransactionConfig;
 }
 /**
  * 
@@ -404,6 +434,55 @@ export interface InvokeContractV1Response {
 /**
  * 
  * @export
+ * @interface QuorumPrivateTransactionConfig
+ */
+export interface QuorumPrivateTransactionConfig {
+    /**
+     * 
+     * @type {string}
+     * @memberof QuorumPrivateTransactionConfig
+     */
+    privateFrom?: string;
+    /**
+     * 
+     * @type {Array<any>}
+     * @memberof QuorumPrivateTransactionConfig
+     */
+    privateFor: Array<any>;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof QuorumPrivateTransactionConfig
+     */
+    isPrivate?: boolean;
+    /**
+     * 
+     * @type {number}
+     * @memberof QuorumPrivateTransactionConfig
+     */
+    gasPrice?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof QuorumPrivateTransactionConfig
+     */
+    gasLimit?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof QuorumPrivateTransactionConfig
+     */
+    privateKey?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof QuorumPrivateTransactionConfig
+     */
+    privacyGroupId?: string;
+}
+/**
+ * 
+ * @export
  * @interface QuorumTransactionConfig
  */
 export interface QuorumTransactionConfig {
@@ -482,6 +561,12 @@ export interface RunTransactionRequest {
      * @memberof RunTransactionRequest
      */
     timeoutMs?: number;
+    /**
+     * 
+     * @type {QuorumPrivateTransactionConfig}
+     * @memberof RunTransactionRequest
+     */
+    privateTransactionConfig?: QuorumPrivateTransactionConfig;
 }
 /**
  * 

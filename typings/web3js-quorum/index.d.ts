@@ -5,13 +5,13 @@ declare module "web3js-quorum" {
   import type {Utils} from "web3-utils";
   import * as Buffer from "buffer";
   
-    export default function Web3Quorum(web3: IWeb3Instance, enclaveOptions?: EnclaveOptions, isQuorum?: boolean): IWeb3Quorum;
+  export default function Web3Quorum(web3: IWeb3Instance, enclaveOptions?: EnclaveOptions, isQuorum?: boolean): IWeb3Quorum;
   
-    export interface IWeb3Instance {
-      currentProvider: any;
-      extend: (...args: any[]) => any;
-  }
-  
+  export interface IWeb3Instance {
+    currentProvider: any;
+    extend: (...args: any[]) => any;
+}
+
   export interface IWeb3Quorum extends Web3 {
     utils: IUtilsWeb3;
     ptm: IPtm
@@ -21,12 +21,12 @@ declare module "web3js-quorum" {
     istanbul: IIstanbulWeb3;
     permission: IPermissionWeb3;
   }
-  
+
   export interface EnclaveOptions {
     /**
      *      absolute file path to the ipc of the transaction manager
      */
-    ipcPath: string
+    ipcPath?: string
     /**
      *   http url to the transaction manager
      */
@@ -35,9 +35,9 @@ declare module "web3js-quorum" {
      * TLS configuration for the transaction manager when using HTTPS in privateUrl
      *
      */
-    tlsSettings: TlsSettings
+    tlsSettings?: TlsSettings
   }
-  
+
   export interface TlsSettings {
     /**
      * client key buffer
@@ -53,116 +53,116 @@ declare module "web3js-quorum" {
     cacert: Buffer
     allowInsecure: boolean
   }
-  
+
   export interface IUtilsWeb3 extends Utils {
     /**
      * Generate a privacyGroupId
      */
     generatePrivacyGroup(options: IPrivacyOptions): string
-  
+
     /**
      * @function setPrivate
      */
     setPrivate(rawTransaction: string): Buffer
   }
-  
+
   export interface IPrivacyOptions {
     readonly privateFor: string[];
     readonly privateFrom: string;
   }
-  
+
   export interface IPtm {
     send(options: IPtmSend): Promise<string>
-  
+
     storeRaw(options: IPtmStoreRaw): Promise<string>
-  
+
     keys(): Promise<string[]>
-  
+
     partyInfoKeys(): Promise<string[]>
-  
+
     upCheck(): Promise<string>
   }
-  
+
   export interface IPtmSend extends IOptions {
     readonly privateFor: string;
   }
-  
+
   // export interface IPtmStoreRaw extends IOptions {
   // }
-  
+
   interface IOptions {
     readonly data: string;
     readonly privateFrom: string;
   }
-  
+
   export interface IPrivWeb3 {
     call(privacyGroupId: string, call: TransactionConfig, blockNumber?: string): Promise<string>
-  
+
     debugGetStateRoot(privacyGroupId: string, blockNumber: string | number): Promise<string>
-  
+
     distributeRawTransaction(transaction: string): Promise<string>;
-  
+
     /**
      * Send the Raw transaction to the Besu node
      */
     sendRawTransaction(transaction: string): Promise<string>;
-  
+
     getEeaTransactionCount(address: string, sender: string, recipients: string[]): Promise<string>
-  
+
     getFilterChanges(privacyGroupId: string, filterId: string): Promise<ILogObject[]>
-  
+
     getFilterLogs(privacyGroupId: string, filterId: string): Promise<ILogObject[]>
-  
+
     getLogs(privacyGroupId: string, filterOptions: PastLogsOptions): Promise<ILogObject[]>
-  
+
     getPrivacyPrecompileAddress(): Promise<string>
-  
+
     getPrivateTransaction(transaction: string): Promise<IPrivateTransactionObject>
-  
+
     getTransactionCount(address: string, privacyGroupId: string): Promise<number>;
-  
+
     /**
      * Get the private transaction Receipt.
      * @param {String} transactionHash 32-byte hash of a transaction
      */
     getTransactionReceipt(transactionHash: string): Promise<IPrivateTransactionReceipt | null>;
-  
+
     getCode(privacyGroupId: string, address: string, blockNumber: string | number): Promise<string>
-  
+
     newFilter(privacyGroupId: string, filter: PastLogsOptions): Promise<string>;
-  
+
     uninstallFilter(privacyGroupId: string, filter: PastLogsOptions): Promise<boolean>;
-  
+
     /**
      * Creates an on chain privacy group
      */
     createPrivacyGroup(options: ICreatePrivacyGroupOptions): Promise<string>;
-  
+
     /**
      * Returns with the deleted group's ID (same one that was passed in).
      */
     deletePrivacyGroup(privacyGroupId: string): Promise<string>;
-  
+
     /**
      * Returns a list of privacy groups containing only the listed members.
      * For example, if the listed members are A and B, a privacy group
      * containing A, B, and C is not returned.
      */
     findPrivacyGroup(members: string[]): Promise<IPrivacyGroup[]>;
-  
+
     subscribe(privacyGroupId: string, type: string, filter: unknown): Promise<string>;
-  
+
     unsubscribe(privacyGroupId: string, subscriptionId: string): Promise<boolean>;
-  
+
     waitForTransactionReceipt(txHash: string, retries?: number, delay?: number): Promise<IPrivateTransactionReceipt>
-  
+
     generateAndDistributeRawTransaction(options: IDistributeRawTransaction): Promise<string>
-  
+
     generateAndSendRawTransaction(options: ISendRawTransaction): Promise<string>
-  
-    subscribeWithPooling(privacyGroupId: string, filter: unknown, callback: (error, result) => any): Promise<unknown>
+
+    subscribeWithPooling(privacyGroupId: string, filter: unknown, callback: (error, result) => unknown): Promise<unknown>
   }
-  
+
   export interface IPrivacyGroup {
     readonly privacyGroupId: string;
     readonly type: PrivacyGroupType;
@@ -170,19 +170,19 @@ declare module "web3js-quorum" {
     readonly description: string;
     readonly members: string[];
   }
-  
+
   export const enum PrivacyGroupType {
     LEGACY,
     ONCHAIN,
     PANTHEON
   }
-  
+
   export interface ICreatePrivacyGroupOptions {
     readonly addresses: string[];
     readonly name?: string;
     readonly description?: string;
   }
-  
+
   interface IBasicPrivateTransaction {
     /**
      * Data, 20 bytes  Address of the sender.
@@ -201,7 +201,7 @@ declare module "web3js-quorum" {
      */
     readonly privateFor: string | string[];
   }
-  
+
   export interface IPrivateTransactionReceipt extends IBasicPrivateTransaction {
     /**
      * Data, 32 bytes  Hash of block containing this transaction.
@@ -247,10 +247,11 @@ declare module "web3js-quorum" {
      * Data, 32 bytes  Hash of the privacy marker transaction.
      */
     readonly commitmentHash: string;
-  
+
     readonly gasUsed: number;
+    readonly cumulativeGasUSed: number;
   }
-  
+
   export interface IPrivateTransactionObject extends IBasicPrivateTransaction {
     readonly gas: number;
     readonly gasPrice: number;
@@ -263,7 +264,7 @@ declare module "web3js-quorum" {
     readonly privacyGroupId: string;
     readonly restriction: string;
   }
-  
+
   /**
    * @see https://besu.hyperledger.org/en/stable/Reference/API-Objects/#log-object
    */
@@ -305,49 +306,49 @@ declare module "web3js-quorum" {
      */
     readonly topics: string[];
   }
-  
+
   export interface IDistributeRawTransaction {
     readonly privateKey: string;
     readonly privateFrom: string;
     readonly privateFor: string[];
     readonly privacyGroupId?: string;
-    readonly nonce?: string;
+    readonly nonce?: number;
     readonly to?: string;
     readonly data: string;
   }
-  
+
   export interface ISendRawTransaction extends IDistributeRawTransaction {
     readonly gasLimit?: string;
     readonly gasPrice?: string;
   }
-  
+
   export interface IEthWeb3 extends Eth {
     flexiblePrivacyGroup: IFlexiblePrivacyGroup
     sendRawPrivateTransaction(signed: string, privateData: IPrivateData): Promise<string>
-  
+    
     fillTransaction(tx: ITransaction): Promise<{ raw: string, tx: IPrivateTransactionObject }>
-  
+
     storageRoot(address: string, block?: string): Promise<string>
-  
+
     getQuorumPayload(id: string): Promise<string>
-  
+
     sendTransactionAsync(tx: ITransaction): Promise<string>
-  
+
     getContractPrivacyMetadata(contractAddress: string): Promise<IContractPrivacyMetadata>
-  
+
     distributePrivateTransaction(privateTx: string, privateData: IDistributePrivateData): Promise<string>
-  
+
     getPrivacyPrecompileAddress(): Promise<string>
-  
+
     getPrivateTransactionByHash(hash: string): Promise<IPrivateTransactionReceipt>
-  
+
     getPrivateTransactionReceipt(hash: string): Promise<IPrivateTransactionReceipt>
-  
+
     getPSI(): Promise<string>
-  
+
     sendGoQuorumTransaction(tx: TransactionConfig): Promise<IPrivateTransactionReceipt>
   }
-  
+
   export interface IFlexiblePrivacyGroup {
     find(enclaveKeys: string[]): Promise<IPrivacyGroup[]>
     getParticipants({privacyGroupId: string}): Promise<string[]>
@@ -356,7 +357,7 @@ declare module "web3js-quorum" {
     setLockState(options: ISetLockStateFlexiblePrivacyGroup): Promise<IPrivateTransactionReceipt>
     addTo(options: ICreateFlexiblePrivacyGroup): Promise<IPrivateTransactionReceipt>
   }
-  
+
   export interface IBaseFlexiblePrivacyGroup {
     readonly privacyGroupId: string
     readonly privateKey: string
@@ -365,32 +366,32 @@ declare module "web3js-quorum" {
   export interface ICreateFlexiblePrivacyGroup extends IBaseFlexiblePrivacyGroup {
     readonly participants: string[]
   }
-  
+
   export interface IRemoveFromFlexiblePrivacyGroup extends IBaseFlexiblePrivacyGroup {
     readonly participants: string
   }
-  
+
   export interface ISetLockStateFlexiblePrivacyGroup extends IBaseFlexiblePrivacyGroup {
     readonly lock: boolean
   }
-  
+
   export interface IPrivateData {
     readonly privacyFlag: PrivacyFlag;
     readonly privateFor: string[];
     readonly mandatoryFor: string[];
   }
-  
+
   export interface IDistributePrivateData extends IPrivateData {
     readonly privateFrom: string[];
   }
-  
+
   export const enum PrivacyFlag {
     SP,
     PP,
     MPP,
     PSV
   }
-  
+
   export interface ITransaction {
     readonly from: string;
     readonly to?: string;
@@ -398,29 +399,29 @@ declare module "web3js-quorum" {
     readonly data?: string;
     readonly privateFor?: string[];
   }
-  
+
   export interface IContractPrivacyMetadata {
     readonly creationTxHash: string;
     readonly privacyFlag: PrivacyFlag;
     readonly mandatoryFor: string[];
   }
-  
+
   export interface IRaftWeb3 {
     cluster(): Promise<ICluster[]>
-  
+
     role(): Promise<RaftRole>
-  
+
     leader(): Promise<string>
-  
+
     addPeer(enodeId: string): Promise<number>
-  
+
     removePeer(raftId: number): Promise<null>
-  
+
     addLearner(enodeId: string): Promise<number>
-  
+
     promoteToPeer(raftId: number): Promise<boolean>
   }
-  
+
   export interface ICluster {
     readonly hostName: string;
     readonly nodeActive: boolean;
@@ -430,88 +431,88 @@ declare module "web3js-quorum" {
     readonly raftPort: number;
     readonly role: RaftRole;
   }
-  
+
   export const enum RaftRole {
     Minter = "minter",
     Verifier = "verifier",
     Learner = "learner"
   }
-  
+
   export interface IIstanbulWeb3 {
     discard(address: string): Promise<null>
-  
+
     propose(address: string, auth: boolean): Promise<null>
-  
+
     getValidatorsAtHash(blockHash: string): Promise<string[]>
-  
+
     getValidators(block: string | number): Promise<string[]>
-  
+
     candidates(): Promise<{[address: string]: boolean}>
-  
+
     getSnapshot(block: string | number): Promise<unknown>
-  
+
     getSnapshotAtHash(blockHash: string): Promise<unknown>
-  
+
     nodeAddress(): Promise<string>
-  
+
     getSignersFromBlock(block: number): Promise<unknown>
-  
+
     getSignersFromBlockByHash(block: string): Promise<unknown>
-  
+
     status(startBlock: number, endBlock: number): Promise<unknown>
-  
+
     isValidator(block: number): Promise<boolean>
   }
-  
+
   export interface IPermissionWeb3 {
     orgList(): Promise<unknown[]>
-  
+
     acctList(): Promise<unknown[]>
-  
+
     nodeList(): Promise<unknown[]>
-  
+
     roleList(): Promise<unknown[]>
-  
+
     getOrgDetails(orgId: string): Promise<unknown[]>
-  
+
     addOrg(orgId: string, enodeId: string, accountId: string): Promise<string>
-  
+
     approveOrg(orgId: string, enodeId: string, accountId: string): Promise<string>
-  
+
     updateOrgStatus(orgId: string, action: number): Promise<string>
-  
+
     approveOrgStatus(orgId: string, action: number): Promise<string>
-  
+
     addSubOrg(parentOrgId: string, subOrgId: string, enodeId: string): Promise<unknown[]>
-  
+
     addNewRole(orgId: string, roleId: string, accountAccess: string, isVoter: boolean, isAdminRole: boolean): Promise<string>
-  
+
     removeRole(orgId: string, roleId: string): Promise<string>
-  
+
     addAccountToOrg(acctId: string, orgId: string, roleId: string): Promise<string>
-  
+
     changeAccountRole(acctId: string, orgId: string, roleId: string): Promise<string>
-  
+
     updateAccountStatus(orgId: string, acctId: string, action: string): Promise<string>
-  
+
     recoverBlackListedAccount(orgId: string, acctId: string): Promise<string>
-  
+
     approveBlackListedAccountRecovery(orgId: string, acctId: string): Promise<string>
-  
+
     assignAdminRole(orgId: string, acctId: string, roleId: string): Promise<string>
-  
+
     approveAdminRole(orgId: string, acctId: string): Promise<string>
-  
+
     addNode(orgId: string, enodeId: string): Promise<string>
-  
+
     updateNodeStatus(orgId: string, enodeId: string, action: string): Promise<string>
-  
+
     recoverBlackListedNode(orgId: string, enodeId: string): Promise<string>
-  
+
     approveBlackListedNodeRecovery(orgId: string, enodeId: string): Promise<string>
-  
+
     transactionAllowed(tx: TransactionConfig): Promise<boolean>
-  
+
     connectionAllowed(enodeId: string, ip: string, port: number): Promise<boolean>
   }
-  }
+}

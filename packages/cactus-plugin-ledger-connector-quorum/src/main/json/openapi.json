@@ -292,6 +292,46 @@
                     }
                 }
             },
+            "QuorumPrivateTransactionConfig" : {
+                "type": "object",
+                "required" : [
+                    "privateFor"
+                ],
+                "properties" : {
+                    "privateFrom": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "privateFor": {
+                        "type": "array",
+                        "default": [],
+                        "items": {},
+                        "nullable": false
+                    },
+                    "isPrivate": {
+                        "type": "boolean",
+                        "default": false,
+                        "nullable": false
+                    },
+                    "gasPrice": {
+                        "type": "number",
+                        "nullable": false
+                    },
+                    "gasLimit": {
+                        "type": "number",
+                        "nullable": false
+                    },
+                    "privateKey": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "privacyGroupId": {
+                        "type": "string",
+                        "nullable": false
+                    }
+
+                }
+            },
             "Web3TransactionReceipt": {
                 "type": "object",
                 "required": [
@@ -427,6 +467,9 @@
                         "minimum": 0,
                         "default": 60000,
                         "nullable": false
+                    },
+                    "privateTransactionConfig": {
+                        "$ref": "#/components/schemas/QuorumPrivateTransactionConfig"
                     }
                 }
             },
@@ -439,7 +482,7 @@
                     "transactionReceipt": {
                         "$ref": "#/components/schemas/Web3TransactionReceipt"
                     }
-                }
+                } 
             },
             "DeployContractSolidityBytecodeV1Request": {
                 "type": "object",
@@ -461,6 +504,13 @@
                         "$ref": "#/components/schemas/Web3SigningCredential",
                         "nullable": false
                     },
+                    "bytecode": {
+                        "type": "string",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 24576,
+                        "description": "See https://ethereum.stackexchange.com/a/47556 regarding the maximum length of the bytecode"
+                    },
                     "keychainId": {
                         "type": "string",
                         "description": "The keychainId for retrieve the contracts json.",
@@ -474,6 +524,14 @@
                     },
                     "gasPrice": {
                         "type": "string",
+                        "nullable": false
+                    },
+                    "nonce": {
+                        "type": "number",
+                        "nullable": false
+                    },
+                    "value": {
+                        "type": "number",
                         "nullable": false
                     },
                     "timeoutMs": {
@@ -493,6 +551,9 @@
                         "type": "array",
                         "default": [],
                         "items": {}
+                    },
+                    "privateTransactionConfig": {
+                        "$ref": "#/components/schemas/QuorumPrivateTransactionConfig"
                     }
                 }
             },
@@ -717,6 +778,9 @@
                         "$ref": "#/components/schemas/ContractJSON",
                         "description": "For use when not using keychain, pass the contract in as this variable",
                         "nullable": false
+                    },
+                    "privateTransactionConfig": {
+                        "$ref": "#/components/schemas/QuorumPrivateTransactionConfig"
                     }
                 }
             },
