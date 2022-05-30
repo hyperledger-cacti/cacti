@@ -16,7 +16,7 @@
 ## NetworkQuery
 
 This message is created by client application to encapsulate the query for the relay.
-Whenever a client application needs to query a foreign network for a [ledger state view](../../models/ledger/views.md), it must wrap the query comprising of a [view address](../views/addressing.md), a [verification policy](../policies/proofs-verification.md), and other metadata, into a DLT-neutral structure as follows for the [relays](../../models/infrastructure/relay.md) that will accept and route the request.
+Whenever a client application needs to query a foreign network for a [ledger state view](../../models/ledger/views.md), it must wrap the query comprising of a [view address](../views/addressing.md), a [verification policy](../policies/proof-verification.md), and other metadata, into a DLT-neutral structure as follows for the [relays](../../models/infrastructure/relay.md) that will accept and route the request.
 
 ```protobuf
 message NetworkQuery {
@@ -32,7 +32,7 @@ message NetworkQuery {
 }
 ```
 
-* `policy`: specifies the [verification policy](../policies/proofs-verification.md) to be used for this query.
+* `policy`: specifies the [verification policy](../policies/proof-verification.md) to be used for this query.
 * `address`: stores the view address. More on addressing [here](../views/addressing.md).
 * `requesting_relay`: id for the local relay (Optional, by default is filled by the relay to which this message is sent). 
 * `requesting_network`: id for the local network to which this client application belongs.
