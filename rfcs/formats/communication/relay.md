@@ -62,7 +62,7 @@ Trade Demo (Fabric):
 ```
 NetworkQuery { 
   policy: ["CarrierMSP", "SellerMSP"], 
-  address: "bc-interop-wtln-test.sl.cloud9.ibm.com:9089/wtln/wtln-channel:wtlncc:GetBillOfLadingByPurchaseOrder:PO59133361", 
+  address: "trade-logistics.com:9089/wtln/wtln-channel:wtlncc:GetBillOfLadingByPurchaseOrder:PO59133361", 
   requesting_relay: "", 
   requesting_network: "americantfn", 
   certificate: "-----BEGIN CERTIFICATE-----\nMIIB2zCCAXegAwIBAgIQfrI6AbTtEhuJa9XzLy1L/TAUBggqhkjOPQQDAgYIKoZI\nzj0DAQcwNzELMAkGA1UEBhMCR0IxDzANBgNVBAcMBkxvbmRvbjEXMBUGA1UECgwO\nU2VsbGVyQmFua05vZGUwHhcNMjIwMzIyMDAwMDAwWhcNMjcwNTIwMDAwMDAwWjA3\nMQswCQYDVQQGEwJHQjEPMA0GA1UEBwwGTG9uZG9uMRcwFQYDVQQKDA5TZWxsZXJC\nYW5rTm9kZTAqMAUGAytlcAMhAMkMVTNq8lr1I4o4ivrPUNLoeV2Ab4U9PsReYo+w\n6nEio4GJMIGGMB0GA1UdDgQWBBQaqL67Z4elSpuWHjc0wfShLEBPdDAPBgNVHRMB\nAf8EBTADAQH/MAsGA1UdDwQEAwIChDATBgNVHSUEDDAKBggrBgEFBQcDAjAfBgNV\nHSMEGDAWgBSUmpz6AYRj0sgN5TPBwA1CSs34ZDARBgorBgEEAYOKYgEBBAMCAQYw\nFAYIKoZIzj0EAwIGCCqGSM49AwEHA0gAMEUCIQCnEpDO8MNL5vL5Uiig0+9iQHX4\nBLPJZXw591f3bB8xlQIgC5ieNFiV126RvjAmuq3R6bkl//3vECCcEOzDvK424y8=\n-----END CERTIFICATE-----", 
