@@ -5,8 +5,9 @@ build:
 build-local:
 	(cp package.json package-remote.json && \
 		cp package-local.json package.json && \
-		npm install) || true
-	mv package-remote.json package.json
+		npm install) || \
+		(mv package-remote.json package.json && exit 1)	# Runs if failure
+	mv package-remote.json package.json					# Runs if success
 	yarn link
 
 build-image:
