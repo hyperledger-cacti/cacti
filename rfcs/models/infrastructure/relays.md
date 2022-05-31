@@ -78,10 +78,10 @@ Here we list API function specs exposed to [application clients](#api-for-applic
 ### API for Application Client
 
 - **RequestState(networks.networks.NetworkQuery): returns common.ack.Ack**
-    This endpoint is for a client application (i.e., above the contracts) running in a DLT network, to [request remote state](../../protocols/data-sharing/generic.md) via local relay. Since this request is asynchronous w.r.t the network, the request info/state machine is stored in a database on the requesting relay indexed via uniquely generated random id called `request_id`. This `request_id` is used to uniquely identify this query request in all the other endpoints' arguments or return messages. The local relay then sends the query to the remote relay via an API available for relay-relay communication (explained below). This API takes a message of type [NetworkQuery](../../formats/communication/relay.md#networkquery) as argument, and returns [Ack](../../formats/views/request.md#ack) message.
+    This endpoint is for a client application (i.e., above the contracts) running in a DLT network, to [request remote state](../../protocols/data-sharing/generic.md) via local relay. Since this request is asynchronous w.r.t the network, the request info/state machine is stored in a database on the requesting relay indexed via uniquely generated random id called `request_id`. This `request_id` is used to uniquely identify this query request in all the other endpoints' arguments or return messages. The local relay then sends the query to the remote relay via an API available for relay-relay communication (explained below).  This API takes a message of type [NetworkQuery](../../formats/communication/relay.md#networkquery) as argument, and returns [Ack](../../formats/views/request.md#ack) message. The local relays returns positive [Ack](../../formats/views/request.md#ack) to the client application when query is sent successfully to the remote relay, else a negative Ack with error message. On positive `Ack` client application can poll for the response by calling `GetState` API of the relay.
     
 - **GetState(networks.networks.GetStateMessage): returns common.state.RequestState**
-    This endpoint is used by client application for polling the local relay to get the response to the query by using `request_id` returned by `RequestState` API (called by the same client earlier initiating data sharing protocol). The local relay fetches the database state based on provided `request_id` and prepares the response. It takes a message of type [GetStateMessage](../../formats/communication/relay.md#getstatemessage) as argument, and returns [RequestState](../../formats/views/request.md#requeststate) message.
+    This endpoint is used by client application for polling the local relay to get the response to the query by using `request_id` returned in positive [Ack](../../formats/views/request.md#ack) by `RequestState` API (called by the same client earlier initiating data sharing protocol). The local relay fetches the database state based on provided `request_id` and prepares the response. It takes a message of type [GetStateMessage](../../formats/communication/relay.md#getstatemessage) as argument, and returns [RequestState](../../formats/views/request.md#requeststate) message. The `RequestState` can be in 4 states, indicated by `status` field, depending upon whether the local relay has received Ack from remote relay, or it is still pending; there is an error in the protocol or protocol is successfully completed and response view is available.
 
 ### API for other Relays
 
@@ -103,6 +103,33 @@ Here we list API function specs exposed to relays by the drivers. These are RPC 
 
 - **RequestDriverState(common.query.Query): returns (common.ack.Ack)**
     The remote relay sends a request to the driver, identified by the [view address](../../formats/views/addressing), with a query defining the data it wants to receive. This is where driver unpacks the view address, makes a call to the requested contract using given arguments, and collects the response along with the proof, packages them into a DLT-specific view message, and then encapsulating it to a DLT-neutral view message. This final message is then sent back to remote relay using above relay's API (SendDriverState). It takes a message of type takes [Query](../../formats/views/request.md#query) as argument, and returns [Ack](../../formats/views/request.md#ack).
+
+## Flow
+
+<img src="../../resources/images/relay-flow.png" width=100%>
+
+The end-to-end flow is explained in figure above. The steps numbers from figure are illustrated below:
+
+1. Client prepares `NetworkQuery` and sends it to Destination Relay via `RequestState` (Client App) API.
+  * **1.1:** Destination relay (inside Client’s `RequestState`) generates unique `request_id` for the query and stores the `RequestState` message with current status as `PENDING_ACK` in local database at key `request_id`.
+  * **1.2:** Destination relay (inside Client’s `RequestState`) prepares `Query` and spawns a thread to send the Query to source relay via `RequestState` (Relay Service) API. When destination relay will receive `Ack` from source relay, it will update the status of `RequestState` as `PENDING` in database at key `request_id`
+  * **1.3:** Destination relay (inside Client’s `RequestState`) returns Ack to the client at the end of this API (happens asynchronously with step **1.2**).
+    * **1.2.1:** Source relay (inside Relay’s `RequestState`) upon receiving the `Query`, stores it in remote database at key `request_id`.
+    * **1.2.2:** Source relay (inside Relay’s `RequestState`) then spawns a thread to send `Query` to the intended driver based on Query via `RequestDriverState` API exposed by the driver.
+    * **1.2.3:** Source relay (inside Relay’s `RequestState`) Returns `Ack` back to the destination relay (happens asynchronously with step **1.2.2**).
+    * **1.2.4:** Driver (inside `RequestDriverState`) based on `Query`, asynchronously spawns a thread that submits transaction to DLT network using [interoperation module](./interoperation-modules.md).
+    * **1.2.5:** Driver returns `Ack` back to the source relay (happens asynchronously with step **1.2.4**).
+    * **1.2.6:** On the thread spawned at step **1.2.4**, Driver obtains the response payload from `interoperation module`, creates a `View` payload based on DLT platform (e.g. [Fabric View](../../formats/views/views-fabric.md), [Corda View](../../formats/views/views-corda.md) or [Besu View](../../formats/views/views-besu.md) ), and then encapsulate it to DLT-neutral [View](../../formats/views/view-definition.md) along with meta-data.
+    * **1.2.7:** Driver (inside `RequestDriverState`) then prepares and sends the `ViewPayload` to the source relay via `SendDriverState` API.
+    * **1.2.8:** Source relay (inside `SendDriverState`) then fetches the `Query` from remote database using `request_id` from `ViewPayload`.
+    * **1.2.9:** Source relay (inside `SendDriverState`) spawns a thread to send the `ViewPayload` back to the destination relay via `SendState` API.
+    * **1.2.10:** Source relay (inside `SendDriverState`) returns `Ack` back to the driver (happens asynchronously with step **1.2.9**).
+    * **1.2.11:** Destination relay (inside `SendState`) stores the `RequestState` message with updated `state` (storing view) and `status` as `COMPLETED`, in the local database at key `request_id`.
+    * **1.2.12:** Destination relay (inside `SendState`) returns `Ack` back to the source relay.
+2. Client polls for response from Destination Relay via `GetState` API, passing `GetStateMessage` containing `request_id`.
+  * **2.1:** Destination relay fetches the `RequestState` message stored in local database at key `request_id`.
+  * **2.2:** Destination relay returns the `RequestState` obtained in step **2.1** to the client.
+
 
 ## Deployment Models and Considerations
 
