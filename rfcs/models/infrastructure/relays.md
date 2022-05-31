@@ -99,6 +99,8 @@ Here we list API function specs exposed to [application clients](#api-for-applic
 
 ## Driver Functional API
 
+Here we list API function specs exposed to relays by the drivers. These are RPC endpoints that can be implemented directly in a well-known protocol like gRPC. Message formats will be described in [request](../../formats/views/request.md).
+
 - **RequestDriverState(common.query.Query): returns (common.ack.Ack)**
     The remote relay sends a request to the driver, identified by the [view address](../../formats/views/addressing), with a query defining the data it wants to receive. This is where driver unpacks the view address, makes a call to the requested contract using given arguments, and collects the response along with the proof, packages them into a DLT-specific view message, and then encapsulating it to a DLT-neutral view message. This final message is then sent back to remote relay using above relay's API (SendDriverState). It takes a message of type takes [Query](../../formats/views/request.md#query) as argument, and returns [Ack](../../formats/views/request.md#ack).
 

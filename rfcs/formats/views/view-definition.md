@@ -21,31 +21,31 @@
 
 ```protobuf
 message Meta {
-    enum Protocol {
-        BITCOIN = 0;
-        ETHEREUM = 1;
-        FABRIC = 3;
-        CORDA = 4;
-    }
-    
-    // Underlying distributed ledger protocol.
-    Protocol protocol = 1;
-    
-    // What notion of time?
-    // If the observer and network are synchronizing on a global clock
-    // there won't be a need to distinguish between static and dynamic views.
-    string timestamp = 2;
-    
-    // Notorization, SPV, ZKP, etc. Possibly enum
-    string proof_type = 3;
-    
-    // The data field's serialization format (e.g. JSON, XML, Protobuf)
-    string serialization_format = 4;
+  enum Protocol {
+      BITCOIN = 0;
+      ETHEREUM = 1;
+      FABRIC = 3;
+      CORDA = 4;
+  }
+
+  // Underlying distributed ledger protocol.
+  Protocol protocol = 1;
+
+  // What notion of time?
+  // If the observer and network are synchronizing on a global clock
+  // there won't be a need to distinguish between static and dynamic views.
+  string timestamp = 2;
+
+  // Notorization, SPV, ZKP, etc. Possibly enum
+  string proof_type = 3;
+
+  // The data field's serialization format (e.g. JSON, XML, Protobuf)
+  string serialization_format = 4;
 }
 
 message View {
   Meta meta = 1;
-  
+
   // Represents the data playload of this view.
   // The representation of Fabric, Corda etc will be captured elsewhere.
   // For some protocols, like Bitcoin, the structure of an SPV proof is well known.
