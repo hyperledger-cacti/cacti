@@ -1,11 +1,11 @@
 ARG BUILD_TAG
 
 # Local Build
-FROM node:14 AS builder-local
+# FROM node:14 AS builder-local
+# 
+# WORKDIR /fabric-driver
 
-WORKDIR /fabric-driver
-
-ADD protos-js /fabric-driver/protos-js
+# ADD protos-js /fabric-driver/protos-js
 
 # Remote build
 FROM node:14 AS builder-remote
