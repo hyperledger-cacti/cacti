@@ -6,9 +6,9 @@
 # Data Sharing Protocol
 
 - RFC: 02-001
-- Authors: Antony Targett, Nick Waywood
+- Authors: Antony Targett, Nick Waywood, Sandeep Nishad
 - Status: Proposed
-- Since: 01-Dec-2020
+- Since: 30-May-2022
 
 ## Summary
 
