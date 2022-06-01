@@ -56,13 +56,13 @@ The end-to-end flow is explained in figure above. The steps numbers from figure 
   * **1.3:** Destination relay (inside Client’s `RequestState`) returns Ack to the client at the end of this API (happens asynchronously with step **1.2**).
   * **1.4:** Source relay (inside Relay’s `RequestState`) upon receiving the `Query`, stores it in remote database at key `request_id`.
   * **1.5:** Source relay (inside Relay’s `RequestState`) then spawns a thread to send `Query` to the intended driver based on Query via `RequestDriverState` API exposed by the driver.
-  * **1.6:** Source relay (inside Relay’s `RequestState`) returns `Ack` back to the destination relay (happens asynchronously with step **1.2.2**).
+  * **1.6:** Source relay (inside Relay’s `RequestState`) returns `Ack` back to the destination relay (happens asynchronously with step **1.5**).
   * **1.7:** Driver (inside `RequestDriverState`) based on `Query`, asynchronously spawns a thread that submits transaction to DLT network using [interoperation module](./interoperation-modules.md). The response payload from `interoperation module` is received by the driver, then it creates a `View` payload based on DLT platform (e.g. [Fabric View](../../formats/views/fabric.md), [Corda View](../../formats/views/corda.md) or [Besu View](../../formats/views/besu.md) ), and then encapsulate it to DLT-neutral [View](../../formats/views/definition.md) along with meta-data. 
-  * **1.8:** Driver returns `Ack` back to the source relay (happens asynchronously with step **1.2.4**).
+  * **1.8:** Driver returns `Ack` back to the source relay (happens asynchronously with step **1.7**).
   * **1.9:** Driver (inside `RequestDriverState`) and then prepares and sends the `ViewPayload` to the source relay via `SendDriverState` API.
   * **1.10:** Source relay (inside `SendDriverState`) then fetches the `Query` from remote database using `request_id` from `ViewPayload`.
   * **1.11:** Source relay (inside `SendDriverState`) spawns a thread to send the `ViewPayload` back to the destination relay via `SendState` API.
-  * **1.12:** Source relay (inside `SendDriverState`) returns `Ack` back to the driver (happens asynchronously with step **1.2.9**).
+  * **1.12:** Source relay (inside `SendDriverState`) returns `Ack` back to the driver (happens asynchronously with step **1.11**).
   * **1.13:** Destination relay (inside `SendState`) stores the `RequestState` message with updated `state` (storing view) and `status` as `COMPLETED`, in the local database at key `request_id`.
   * **1.14:** Destination relay (inside `SendState`) returns `Ack` back to the source relay.
 2. Client polls for response from Destination Relay via `GetState` API, passing `GetStateMessage` containing `request_id`.
