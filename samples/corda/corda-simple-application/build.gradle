@@ -13,7 +13,8 @@ buildscript {
         log4j_version = constants.getProperty("log4jVersion")
         slf4j_version = constants.getProperty("slf4jVersion")
         corda_platform_version = constants.getProperty("platformVersion").toInteger()
-        weaver_version = constants.getProperty("weaverVersion")        
+        weaver_protos_version = constants.getProperty("weaverProtosVersion")        
+        weaver_corda_version = constants.getProperty("weaverCordaVersion")        
     }
 
     repositories {

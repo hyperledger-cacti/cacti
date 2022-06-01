@@ -10,11 +10,11 @@ import { commandHelp } from '../helpers/helpers'
 const command: GluegunCommand = {
   name: 'asset',
   alias: ['a'],
-  description: 'Asset Exchange',
+  description: 'Asset Exchange Or Transfer',
   run: async toolbox => {
     const { print } = toolbox
     print.info('Command does nothing by itself')
-    commandHelp(print, toolbox, 'fabric-cli asset exchange', '', [], command, [
+    commandHelp(print, toolbox, 'fabric-cli asset', '', [], command, [
       'asset'
     ])
     return

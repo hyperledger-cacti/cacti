@@ -27,16 +27,11 @@ Before starting, make sure you have the following software installed on your hos
 - Git: [sample instructions](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - Docker: [sample instructions](https://docs.docker.com/engine/install/) (Latest version)
 - Docker-Compose: [sample instructions](https://docs.docker.com/compose/install/) (Version 1.28.2 or above)
-- Golang: [sample instructions](https://golang.org/dl/) (Version 1.15 or above)
+- Golang: [sample instructions](https://golang.org/dl/) (Version 1.17 or below)
 - Java (JDK and JRE): [sample instructions](https://openjdk.java.net/install/) (Version 8)
 - Node.js and NPM: [sample instructions](https://nodejs.org/en/download/package-manager/) (Version 11 to Version 14 Supported)
 - Yarn: [sample instructions](https://classic.yarnpkg.com/en/docs/install/)
 - Rust: [sample instructions](https://www.rust-lang.org/tools/install)
-  * To avoid errors during Weaver Relay compilation, update certain packages (on which the Weaver Relay is dependent) to their latest versions as follows:
-    ```
-    cargo update -p nom
-    cargo update -p lexical-core
-    ```
 - Protoc (Protobuf compiler): _Golang should already be installed and configured._
   * Default method: Run the following with `sudo` if necessary. This will install both the protobuf compiler and the Go code generator plugins.
     ```
@@ -189,6 +184,10 @@ Build the generic (i.e., common to all DLTs) relay module as follows:
 - Run the following:
   ```bash
   make
+  ```
+- To avoid errors during Weaver Relay compilation, update certain packages (on which the Weaver Relay is dependent) to their latest versions as follows:
+  ```bash
+  make update-pkgs
   ```
 
 #### Deployment

@@ -15,6 +15,7 @@ import fabproto6 from "fabric-protos";
 import * as helpers from "./helpers";
 import assetLocksPb from "@hyperledger-labs/weaver-protos-js/common/asset_locks_pb";
 import { Contract, ContractListener } from "fabric-network";
+import { Hash, SHA256 } from "./HashFunctions"
 const logger = log4js.getLogger("InteroperableHelper");
 
 
@@ -41,10 +42,11 @@ function createFungibleAssetExchangeAgreementSerialized(assetType, numUnits, rec
 }
 
 // Create an asset lock structure
-function createAssetLockInfoSerialized(hashValue, expiryTimeSecs)
+function createAssetLockInfoSerialized(hash, expiryTimeSecs)
 {
     const lockInfoHTLC = new assetLocksPb.AssetLockHTLC();
-    lockInfoHTLC.setHashbase64(Buffer.from(hashValue));
+    lockInfoHTLC.setHashmechanism(hash.HASH_MECHANISM);
+    lockInfoHTLC.setHashbase64(Buffer.from(hash.getSerializedHashBase64()));
     lockInfoHTLC.setExpirytimesecs(expiryTimeSecs);
     lockInfoHTLC.setTimespec(assetLocksPb.AssetLockHTLC.TimeSpec.EPOCH)
     const lockInfoHTLCSerialized = lockInfoHTLC.serializeBinary();
@@ -55,31 +57,16 @@ function createAssetLockInfoSerialized(hashValue, expiryTimeSecs)
 }
 
 // Create an asset claim structure
-function createAssetClaimInfoSerialized(hashPreimage)
+function createAssetClaimInfoSerialized(hash)
 {
     const claimInfoHTLC = new assetLocksPb.AssetClaimHTLC();
-    claimInfoHTLC.setHashpreimagebase64(Buffer.from(Buffer.from(hashPreimage).toString('base64')));
+    claimInfoHTLC.setHashmechanism(hash.HASH_MECHANISM);
+    claimInfoHTLC.setHashpreimagebase64(Buffer.from(hash.getSerializedPreimageBase64()));
     const claimInfoHTLCSerialized = claimInfoHTLC.serializeBinary();
     const claimInfo = new assetLocksPb.AssetClaim();
     claimInfo.setLockmechanism(assetLocksPb.LockMechanism.HTLC);
     claimInfo.setClaiminfo(claimInfoHTLCSerialized);
     return Buffer.from(claimInfo.serializeBinary()).toString('base64');
-}
-
-// Create a SHA-256 hash over an ASCII string
-function createSHA256HashBase64(preimage: string)
-{
-    return crypto.createHash('sha256').update(preimage).digest('base64');
-}
-
-// Create a secure pseudo-random preimage of a given length
-function generateRandomHashPreimage(strLength: number)
-{
-    if (!strLength || strLength <= 0)
-    {
-        strLength = 20;         // Default length
-    }
-    return crypto.randomBytes(strLength).toString();
 }
 
 /**
@@ -91,52 +78,47 @@ const createHTLC = async (
     assetType: string,
     assetID: string,
     recipientECert: string,
-    hashPreimage: string,
-    hashValue: string,
+    hash: Hash,
     expiryTimeSecs: number,
-    timeoutCallback: (c: Contract, t: string, i: string, r: string, p: string, v: string) => any,
-): Promise<{ preimage: any; hash: any; result: any }> => {
+    timeoutCallback: (c: Contract, t: string, i: string, r: string, h: Hash) => any,
+): Promise<{ hash: Hash; result: any }> => {
 
     if (!contract)
     {
         logger.error("Contract handle not supplied");
-        return { preimage: "", hash: "", result: false };
+        return { hash: null, result: false };
     }
     if (!assetType)
     {
         logger.error("Asset type not supplied");
-        return { preimage: "", hash: "", result: false };
+        return { hash: null, result: false };
     }
     if (!assetID)
     {
         logger.error("Asset ID not supplied");
-        return { preimage: "", hash: "", result: false };
+        return { hash: null, result: false };
     }
     if (!recipientECert)
     {
         logger.error("Recipient ECert not supplied");
-        return { preimage: "", hash: "", result: false };
+        return { hash: null, result: false };
     }
     const currTimeSecs = Math.floor(Date.now()/1000);   // Convert epoch milliseconds to seconds
     if (expiryTimeSecs <= currTimeSecs)
     {
         logger.error("Supplied expiry time invalid or in the past: %s; current time: %s", new Date(expiryTimeSecs).toISOString(), new Date(currTimeSecs).toISOString());
-        return { preimage: "", hash: "", result: false };
+        return { hash: null, result: false };
     }
-
-    if (!hashValue || hashValue.length == 0)
-    {
-        if (!hashPreimage || hashPreimage.length == 0)
-        {
-            // Generate the preimage
-            hashPreimage = generateRandomHashPreimage(-1);
-        }
-        // Hash the preimage
-        hashValue = createSHA256HashBase64(hashPreimage);
+    
+    if (hash == null) {
+        hash = new SHA256()
+    }
+    if (hash.hash64 == null) {
+        hash.generateRandomPreimage(22);
     }
 
     const assetExchangeAgreementStr = createAssetExchangeAgreementSerialized(assetType, assetID, recipientECert, "");
-    const lockInfoStr = createAssetLockInfoSerialized(hashValue, expiryTimeSecs);
+    const lockInfoStr = createAssetLockInfoSerialized(hash, expiryTimeSecs);
 
     // Normal invoke function
     const [result, submitError] = await helpers.handlePromise(
@@ -149,10 +131,10 @@ const createHTLC = async (
     if (timeoutCallback)
     {
         // Start timer for lock expiration
-        setTimeout(timeoutCallback, (expiryTimeSecs * 1000) - Date.now(), contract, assetType, assetID, recipientECert, hashPreimage, hashValue);
+        setTimeout(timeoutCallback, (expiryTimeSecs * 1000) - Date.now(), contract, assetType, assetID, recipientECert, hash);
     }
 
-    return { preimage: hashPreimage, hash: hashValue, result: result };
+    return { hash: hash, result: result };
 };
 
 /**
@@ -164,52 +146,47 @@ const createFungibleHTLC = async (
     assetType: string,
     numUnits: number,
     recipientECert: string,
-    hashPreimage: string,
-    hashValue: string,
+    hash: Hash,
     expiryTimeSecs: number,
-    timeoutCallback: (c: Contract, i: string, t: string, n: number, r: string, p: string, v: string) => any,
-): Promise<{ preimage: any; hash:any; result: any }> => {
+    timeoutCallback: (c: Contract, i: string, t: string, n: number, r: string, h: Hash) => any,
+): Promise<{ hash: Hash; result: any }> => {
 
     if (!contract)
     {
         logger.error("Contract handle not supplied");
-        return { preimage: "", hash: "", result: "" };
+        return { hash: null, result: "" };
     }
     if (!assetType)
     {
         logger.error("Asset type not supplied");
-        return { preimage: "", hash: "", result: "" };
+        return { hash: null, result: "" };
     }
     if (numUnits <= 0)
     {
         logger.error("Asset count must be a positive integer");
-        return { preimage: "", hash: "", result: "" };
+        return { hash: null, result: "" };
     }
     if (!recipientECert)
     {
         logger.error("Recipient ECert not supplied");
-        return { preimage: "", hash: "", result: "" };
+        return { hash: null, result: "" };
     }
     const currTimeSecs = Math.floor(Date.now()/1000);   // Convert epoch milliseconds to seconds
     if (expiryTimeSecs <= currTimeSecs)
     {
         logger.error("Supplied expiry time invalid or in the past: %s; current time: %s", new Date(expiryTimeSecs).toISOString(), new Date(currTimeSecs).toISOString());
-        return { preimage: "", hash: "", result: "" };
+        return { hash: null, result: "" };
     }
-
-    if (!hashValue || hashValue.length == 0)
-    {
-        if (!hashPreimage || hashPreimage.length == 0)
-        {
-            // Generate the preimage
-            hashPreimage = generateRandomHashPreimage(-1);
-        }
-        // Hash the preimage
-        hashValue = createSHA256HashBase64(hashPreimage);
+    
+    if (!hash) {
+        hash = new SHA256()
+    }
+    if (hash.hash64 == null) {
+        hash.generateRandomPreimage(22);
     }
 
     const assetExchangeAgreementStr = createFungibleAssetExchangeAgreementSerialized(assetType, numUnits, recipientECert, "");
-    const lockInfoStr = createAssetLockInfoSerialized(hashValue, expiryTimeSecs);
+    const lockInfoStr = createAssetLockInfoSerialized(hash, expiryTimeSecs);
 
     // Normal invoke function
     const [contractId, submitError] = await helpers.handlePromise(
@@ -222,10 +199,10 @@ const createFungibleHTLC = async (
     if (timeoutCallback)
     {
         // Start timer for lock expiration
-        setTimeout(timeoutCallback, (expiryTimeSecs * 1000) - Date.now(), contract, contractId, assetType, numUnits, recipientECert, hashPreimage, hashValue);
+        setTimeout(timeoutCallback, (expiryTimeSecs * 1000) - Date.now(), contract, contractId, assetType, numUnits, recipientECert, hash);
     }
 
-    return { preimage: hashPreimage, hash: hashValue, result: contractId };
+    return { hash: hash, result: contractId };
 };
 
 /**
@@ -237,7 +214,7 @@ const claimAssetInHTLC = async (
     assetType: string,
     assetID: string,
     lockerECert: string,
-    hashPreimage: string,
+    hash: Hash,
 ): Promise<any> => {
 
     if (!contract)
@@ -260,14 +237,19 @@ const claimAssetInHTLC = async (
         logger.error("Locker ECert not supplied");
         return false;
     }
-    if (!hashPreimage)
+    if(!hash)
+    {
+        logger.error("Instance of Hash interface not supplied")
+        return false
+    }
+    if (!hash.preimage)
     {
         logger.error("Hash Preimage not supplied");
         return false;
     }
 
     const assetExchangeAgreementStr = createAssetExchangeAgreementSerialized(assetType, assetID, "", lockerECert);
-    const claimInfoStr = createAssetClaimInfoSerialized(hashPreimage);
+    const claimInfoStr = createAssetClaimInfoSerialized(hash);
 
     // Normal invoke function
     const [result, submitError] = await helpers.handlePromise(
@@ -286,7 +268,7 @@ const claimAssetInHTLC = async (
 const claimAssetInHTLCusingContractId = async (
     contract: Contract,
     contractId: string,
-    hashPreimage: string,
+    hash: Hash,
 ): Promise<any> => {
 
     if (!contract)
@@ -299,13 +281,18 @@ const claimAssetInHTLCusingContractId = async (
         logger.error("contract ID not supplied");
         return false;
     }
-    if (!hashPreimage)
+    if(!hash)
+    {
+        logger.error("Instance of Hash interface not supplied")
+        return false
+    }
+    if (!hash.preimage)
     {
         logger.error("Hash Preimage not supplied");
         return false;
     }
 
-    const claimInfoStr = createAssetClaimInfoSerialized(hashPreimage);
+    const claimInfoStr = createAssetClaimInfoSerialized(hash);
 
     // Normal invoke function
     const [result, submitError] = await helpers.handlePromise(
@@ -325,7 +312,7 @@ const claimAssetInHTLCusingContractId = async (
 const claimFungibleAssetInHTLC = async (
     contract: Contract,
     contractId: string,
-    hashPreimage: string,
+    hash: Hash,
 ): Promise<any> => {
 
     if (!contract)
@@ -338,13 +325,18 @@ const claimFungibleAssetInHTLC = async (
         logger.error("contract ID not supplied");
         return false;
     }
-    if (!hashPreimage)
+    if(!hash)
+    {
+        logger.error("Instance of Hash interface not supplied")
+        return false
+    }
+    if (!hash.preimage)
     {
         logger.error("Hash Preimage not supplied");
         return false;
     }
 
-    const claimInfoStr = createAssetClaimInfoSerialized(hashPreimage);
+    const claimInfoStr = createAssetClaimInfoSerialized(hash);
 
     // Normal invoke function
     const [result, submitError] = await helpers.handlePromise(
@@ -643,11 +635,11 @@ const StartHTLCEventListener = (
             // All filters passed
             if (eventName === 'LockAsset' || eventName === 'LockFungibleAsset') {
                 const hashBase64 = assetLockContractInfo.getLock().getHashbase64();
-                const hashValue: string = Buffer.from(hashBase64.toString(), 'base64').toString('utf8');
+                //const hashValue: string = Buffer.from(hashBase64.toString(), 'base64').toString('utf8');
                 if (eventName === 'LockAsset') {
-                    eventCallback(contract, infoContractId, infoAssetType, infoAssetId, infoRecipient, infoLocker, hashValue);
+                    eventCallback(contract, infoContractId, infoAssetType, infoAssetId, infoRecipient, infoLocker, hashBase64);
                 } else {
-                    eventCallback(contract, infoContractId, infoAssetType, infoNumUnits, infoRecipient, infoLocker, hashValue);
+                    eventCallback(contract, infoContractId, infoAssetType, infoNumUnits, infoRecipient, infoLocker, hashBase64);
                 }
             } else if (eventName === 'ClaimAsset' || eventName === 'ClaimFungibleAsset') {
                 const hashPreimageBase64 = assetLockContractInfo.getClaim().getHashpreimagebase64();

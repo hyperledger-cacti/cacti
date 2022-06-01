@@ -73,7 +73,7 @@ dependencies {
     compile "io.arrow-kt:arrow-syntax:$arrow_version"
     
     // weaver-protos
-    implementation "com.weaver:protos-java-kt:$weaver_version"
+    compile "com.weaver:protos-java-kt:$weaver_version"
     
     compile "com.google.protobuf:protobuf-java:$protobuf_version"
     compile "com.google.protobuf:protobuf-java-util:$protobuf_version"
@@ -111,4 +111,8 @@ publishing {
             }
         }
     }
+}
+
+test {
+    maxHeapSize = "4096m"
 }

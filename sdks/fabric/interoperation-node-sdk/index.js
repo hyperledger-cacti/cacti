@@ -25,3 +25,4 @@
 module.exports.RelayHelper = require("./src/Relay.js");
 module.exports.InteroperableHelper = require("./src/InteroperableHelper.js");
 module.exports.AssetManager = require("./src/AssetManager.js");
+module.exports.HashFunctions = require("./src/HashFunctions.js");

@@ -8,13 +8,13 @@ import { GluegunCommand } from 'gluegun'
 import { fabricHelper, invoke } from '../../helpers/fabric-functions'
 import logger from '../../helpers/logger'
 import { commandHelp, getNetworkConfig, handlePromise } from '../../helpers/helpers'
-import { AssetManager } from '@hyperledger-labs/weaver-fabric-interop-sdk'
+import { AssetManager, HashFunctions } from '@hyperledger-labs/weaver-fabric-interop-sdk'
 
 var crypto = require('crypto');
 
 const command: GluegunCommand = {
   name: 'exchange-all',
-  alias: ['-e'],
+  alias: ['-eall'],
   description: 'Asset Exchange All steps.',
   run: async toolbox => {
     const {
@@ -78,13 +78,12 @@ const command: GluegunCommand = {
       return
     }
 
-    // Hash Pre-image
-    let secret = ''
-    let hash_secret = ''
+    // Hash
+    let hash = new HashFunctions.SHA256()
+    
     if (options['secret'])
     {
-      secret = options['secret']
-      hash_secret = crypto.createHash('sha256').update(secret).digest('base64');
+        hash.setPreimage(options['secret'])
     }
 
     // Timeout
@@ -190,8 +189,7 @@ const command: GluegunCommand = {
                       assetType,
                       assetId,
                       user2CertN1,
-                      secret,
-                      hash_secret,
+                      hash,
                       timeout2,
                       null)
       if (!res.result) {
@@ -210,8 +208,7 @@ const command: GluegunCommand = {
                       fungibleAssetType,
                       fungibleAssetAmt,
                       user1CertN2,
-                      secret,
-                      hash_secret,
+                      hash,
                       timeout,
                       null)
       if (!res.result) {
@@ -230,7 +227,7 @@ const command: GluegunCommand = {
       spinner.info(`Trying Fungible Asset Claim: ${contractId}`)
       res = await AssetManager.claimFungibleAssetInHTLC(network2U1.contract,
                       contractId,
-                      secret)
+                      hash)
       if (!res) {
         throw new Error()
       }
@@ -250,7 +247,7 @@ const command: GluegunCommand = {
                       assetType,
                       assetId,
                       user1CertN1,
-                      secret)
+                      hash)
       if (!res) {
         throw new Error()
       }

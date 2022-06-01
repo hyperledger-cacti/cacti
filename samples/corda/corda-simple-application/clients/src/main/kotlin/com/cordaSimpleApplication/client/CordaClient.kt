@@ -83,7 +83,6 @@ fun main(args: Array<String>) = App()
             RetrieveAssetStateAndRefCommand(),
             SplitAssetStateCommand(),
             TransferAssetStateCommand(),
-            GetHashCommand(),
             LockAssetCommand(),
             ClaimAssetCommand(),
             UnlockAssetCommand(),
@@ -92,6 +91,7 @@ fun main(args: Array<String>) = App()
             GetHTLCHashCommand(),
             GetHTLCPreImageCommand(),
             UtilsCommand().subcommands(
+                GetHashCommand(),
                 SaveUserCertToFileCommand(),
                 FetchPartyNameCommand(),
                 FetchCertBase64Command()

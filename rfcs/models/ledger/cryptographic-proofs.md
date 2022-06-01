@@ -26,8 +26,8 @@ The format of the proof provided by each network needs to be as generic as possi
 
 The structure of the message is network dependant. For the details on the message structure for fabric and corda, refer to their view documentation:
 
-- [fabric](/formats/views-fabric.md)
-- [corda](/formats/views-corda.md)
+- [fabric](/formats/fabric.md)
+- [corda](/formats/corda.md)
 
 ## Examples
 

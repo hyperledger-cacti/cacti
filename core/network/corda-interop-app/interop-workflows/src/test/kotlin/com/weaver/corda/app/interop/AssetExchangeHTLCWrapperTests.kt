@@ -80,6 +80,7 @@ class AssetExchangeHTLCWrapperTests {
         alice
     )
     val lockInfoHTLC = AssetLocks.AssetLockHTLC.newBuilder()
+        .setHashMechanism(AssetLocks.HashMechanism.SHA256)
         .setHashBase64(ByteString.copyFrom(hash.toByteArray()))
         .setExpiryTimeSecs(10)
         .setTimeSpec(AssetLocks.AssetLockHTLC.TimeSpec.DURATION)
@@ -91,6 +92,7 @@ class AssetExchangeHTLCWrapperTests {
         .build()
         
     val claimInfoHTLC = AssetLocks.AssetClaimHTLC.newBuilder()
+        .setHashMechanism(AssetLocks.HashMechanism.SHA256)
         .setHashPreimageBase64(ByteString.copyFrom(Base64.getEncoder().encodeToString(preimage.toByteArray()).toByteArray()))
         .build()
         
@@ -225,6 +227,7 @@ class AssetExchangeHTLCWrapperTests {
         }
         
         val wrongClaimInfoHTLC = AssetLocks.AssetClaimHTLC.newBuilder()
+            .setHashMechanism(AssetLocks.HashMechanism.SHA256)
             .setHashPreimageBase64(ByteString.copyFrom(Base64.getEncoder().encodeToString("wrongsecret".toByteArray()).toByteArray()))
             .build()
         val wrongClaimInfo = AssetLocks.AssetClaim.newBuilder()
