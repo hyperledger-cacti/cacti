@@ -3,8 +3,7 @@
 
  SPDX-License-Identifier: CC-BY-4.0
  -->
-# IIN DID Method
-
+# DID Method for DLT Networks
 
 - RFC: 03-021
 - Authors: Bishakh Chandra Ghosh, Venkatraman Ramakrishna, Krishnasuri Narayanam, Ermyas Abebe
@@ -15,22 +14,22 @@
 
 ## Introduction
 
-An Interoperation Identity Network (IIN), is a system built on a distributed shared ledger that supports registration of DIDs to networks (e.g. permissioned consortium networks) and their units, as well as resolution of network DID documents form their DID. The IIN also has reputed trust anchors, which play the important role of certifying (or validating) the identity of owners of those DIDs, as well as their memberships in their respective networks, in effect creating roots of trust for cross-network interoperations. Thus, the IIN provides the foundation for our architecture to enable blockchain network-identity discovery and validation. The IIN DID Method specification conforms to the requirements specified in [Decentralized Identifiers (DIDs) v1.0](https://w3c.github.io/did-core/). The IIN as a system is detailed further [here](./iin.md).
+An Interoperation Identity Network (IIN) is a system built on a distributed shared ledger that supports registration of DIDs representing networks (e.g. permissioned consortium networks) and their units, as well as resolution of network DID documents from their DID. An IIN is also associated with one or more reputed [trust anchors](https://hyperledger-indy.readthedocs.io/projects/sdk/en/latest/docs/getting-started/indy-walkthrough.html#step-1-getting-trust-anchor-credentials-for-faber-acme-thrift-and-government), which play the important role of certifying (or validating) the identity of owners of those DIDs, as well as their memberships in their respective networks, in effect creating roots of trust for cross-network interoperations. Thus, IINs provide a foundation to enable the discovery and validation of blockchain/DLT networks and their participants. The IIN DID Method specification conforms to the requirements specified in [Decentralized Identifiers (DIDs) v1.0](https://w3c.github.io/did-core/). The IIN as a system is detailed further [here](./iin.md).
 
 ## IIN Method Syntax
 
 The IIN Method scheme MUST begin with the prefix `did:iin`, and is defined by the following ABNF based on the [DID Syntax](https://www.w3.org/TR/did-core/#did-syntax):
 
 ```
-iin-did                = "did:iin" iin-name ":" iin-specific-id
-iin-name        = 1*idchar
-iin-specific-id = *( *idchar ":" ) 1*idchar
-idchar             = ALPHA / DIGIT / "." / "-" / "_" / pct-encoded
-pct-encoded        = "%" HEXDIG HEXDIG
+iin-did           = "did:iin" iin-name ":" iin-specific-id
+iin-name          = 1*idchar
+iin-specific-id   = *( *idchar ":" ) 1*idchar
+idchar            = ALPHA / DIGIT / "." / "-" / "_" / pct-encoded
+pct-encoded       = "%" HEXDIG HEXDIG
 ```
 ### DID Types
 
-In an IIN there can be two types of identifiers. 
+In an IIN, there can be two types of identifiers. 
 
 - First, for individuals / organizations which may participate in a blockchain network, called *Participant Unit DID*. 
 
@@ -56,7 +55,7 @@ For creating a new DID and a DID Document in the IIN, the DID method of the IIN 
 
 #### For Participant Unit DID
 
-The DID registration (create method) request must contain the DID document, as well as a signature that can be verified against the `authentication` verification method specified in the DID document. This request is sent by the [`IIN Agent`](./iin-agent.md) of the participant. The underlying protocol dictating how the DID registration request will be sent to the IIN depends on the implementation the IIN registry.
+The DID registration ("create" method) request must contain the DID document, as well as a signature that can be verified against the `authentication` verification method specified in the DID document. This request is sent by a client associated with the participant, which, in the context of blockchain interoperability, can be an IIN Agent. The underlying protocol dictating how the DID registration request will be sent to the IIN depends on the implementation of the IIN registry.
 
 Example DID registration request:
 ```json
@@ -76,7 +75,7 @@ Example DID registration request:
 }
 ```
 
-A DID registration request, that is the DID create method of the IIN registry, must authenticate the request. This authentication is to be done by validating the signature in the request with the help of the authentication method present in the DID Document of the request.
+A DID registration request, or the DID "create" method of the IIN registry, must authenticate the request. This authentication is to be done by validating the signature in the request with the help of the authentication method present in the DID Document of the request.
 
 
 #### For Network DID
