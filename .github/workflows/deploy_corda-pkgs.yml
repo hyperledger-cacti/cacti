@@ -104,8 +104,6 @@ jobs:
     if: github.repository_owner == 'hyperledger-labs'
     needs: [publish-protos, publish-interop-app, publish-sdk]
     runs-on: ubuntu-latest
-    permissions:
-      packages: write
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
