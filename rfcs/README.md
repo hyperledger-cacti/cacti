@@ -60,11 +60,11 @@ The RFC numbering convention is: `<type>:<id>`. The list of types (`<type>`) is 
 | 02-015 | Transaction Invocation           | Protocol | [Draft](./protocols/contract-invocation/invocation.md)          |
 | 02-016 | Event Bus                        | Protocol | [Draft](./protocols/events/event-bus.md)                        |
 | 03-001 | View Address                     | Format   | [Proposed](./formats/views/addressing.md)                       |
-| 03-002 | Generic View                     | Format   | [Proposed](./formats/views/view-definition.md)                  |
-| 03-003 | Fabric View                      | Format   | [Proposed](./formats/views/views-fabric.md)                     |
-| 03-004 | Corda View                       | Format   | [Proposed](./formats/views/views-corda.md)                      |
-| 03-005 | Besu View                        | Format   | [Draft](./formats/views/views-besu.md)                          |
-| 03-006 | Ethereum View                    | Format   | [Draft](./formats/views/views-ethereum.md)                      |
+| 03-002 | Generic View                     | Format   | [Proposed](./formats/views/definition.md)                  |
+| 03-003 | Fabric View                      | Format   | [Proposed](./formats/views/fabric.md)                     |
+| 03-004 | Corda View                       | Format   | [Proposed](./formats/views/corda.md)                      |
+| 03-005 | Besu View                        | Format   | [Draft](./formats/views/besu.md)                          |
+| 03-006 | Ethereum View                    | Format   | [Draft](./formats/views/ethereum.md)                      |
 | 03-007 | View Request                     | Format   | [Proposed](./formats/views/request.md)                          |
 | 03-008 | Access Control Policy            | Format   | [Proposed](./formats/policies/access-control.md)                |
 | 03-009 | Proof Verification Policy        | Format   | [Proposed](./formats/policies/proof-verification.md)            |
