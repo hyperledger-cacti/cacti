@@ -10,7 +10,7 @@ houseTokenAppVersion="1.0"
 tokenVersion="1.2"
 
 weaverCordaVersion="1.2.9"
-weaverProtosVersion="1.3.0"
+weaverProtosVersion="1.3.1"
 
 parties="Notary PartyA PartyB PartyC"
 
