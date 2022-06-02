@@ -17,7 +17,7 @@ on:
 jobs:
 
   asset-exchange-fabric:
-    if: ${{ false }}  # disable
+    # if: ${{ false }}  # disable
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
@@ -90,130 +90,6 @@ jobs:
           fi
         working-directory: samples/fabric/fabric-cli
 
-  asset-exchange-fabric-semi-local:
-    # if: ${{ false }}  # disable
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
-      
-      - name: Set up Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.16
-          
-      - name: Use Node.js 14.x
-        uses: actions/setup-node@v2
-        with:
-          node-version: 14.x
-          
-      - name: Use Protoc 3.15
-        run: |
-          curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.15.6/protoc-3.15.6-linux-x86_64.zip
-          unzip protoc-3.15.6-linux-x86_64.zip -d protoc
-          go get -u google.golang.org/protobuf/cmd/protoc-gen-go
-          go get -u google.golang.org/grpc/cmd/protoc-gen-go-grpc
-          
-      # PROTOS
-      - name: Build JS Protos
-        run: |
-          export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
-          make build
-        working-directory: common/protos-js
-        
-      # Build Dependencies
-      - name: Build Fabric Interop SDK
-        run: make build-local
-        working-directory: sdks/fabric/interoperation-node-sdk
-    
-      - name: Build Fabric CLI
-        run: make build-local
-        working-directory: samples/fabric/fabric-cli
-        
-      # FABRIC NETWORK
-      # Use local InteropCC as Remote with go.mod instead of go.mod.local
-      - name: Fetch interopcc
-        run: |
-          TMP_PATH=$PWD/../../../tests/network-setups/fabric/shared/tmp
-          mkdir -p $TMP_PATH
-          OLD_GOPATH=$GOPATH
-          export GOPATH=$TMP_PATH
-          echo "GO Path: ${GOPATH}"
-          go get -d github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop
-          chmod +wr -R $TMP_PATH/pkg/mod
-          ls -lh $TMP_PATH/pkg/mod/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts
-          rm -rf $TMP_PATH/pkg/mod/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop*/*
-          cp -r contracts/interop/* $TMP_PATH/pkg/mod/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop*/
-          ls -lh $TMP_PATH/pkg/mod/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop*
-          export GOPATH=$OLD_GOPATH
-        working-directory: core/network/fabric-interop-cc
-        
-      - name: Setup Interopcc
-        run: |
-            cd interop*
-            go mod vendor
-            ROOT_DIR=../../../../../../../../../../../../../../..
-            cp -r $ROOT_DIR/common/protos-go/* vendor/github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/
-            cp -r $ROOT_DIR/core/network/fabric-interop-cc/libs/assetexchange/* vendor/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange/
-            cp -r $ROOT_DIR/core/network/fabric-interop-cc/libs/utils/* vendor/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/utils/
-            cp -r $ROOT_DIR/core/network/fabric-interop-cc/libs/testutils/* vendor/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils/
-        working-directory: tests/network-setups/fabric/shared/tmp/pkg/mod/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts
-      
-      - name: Setup Simpleasset
-        run: |
-          go mod vendor          
-          cp -r ../../../common/protos-go/* vendor/github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/
-          cp -r ../../../core/network/fabric-interop-cc/interfaces/asset-mgmt/* vendor/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt/
-          cp -r ../../../core/network/fabric-interop-cc/libs/testutils/* vendor/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils/
-        working-directory: samples/fabric/simpleasset
-      
-      - name: Start Fabric Network
-        run: make start-interop CHAINCODE_NAME=simpleasset
-        working-directory: tests/network-setups/fabric/dev
-        
-      # FABRIC CLI
-      - name: Setup Fabric CLI Config
-        run: |
-          echo ${GITHUB_WORKSPACE}
-          cp config.template.json config.json
-          sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}#g" config.json
-        working-directory: samples/fabric/fabric-cli
-      - name: Setup Fabric CLI ENV
-        run: |
-          echo ${GITHUB_WORKSPACE}
-          cp .env.template .env
-          ./bin/fabric-cli env set MEMBER_CREDENTIAL_FOLDER ${GITHUB_WORKSPACE}/samples/fabric/fabric-cli/src/data/credentials_docker
-          ./bin/fabric-cli env set CONFIG_PATH ${GITHUB_WORKSPACE}/samples/fabric/fabric-cli/config.json
-          cat .env
-        working-directory: samples/fabric/fabric-cli
-        
-      - name: Fabric CLI Init
-        run: ./scripts/initAsset.sh
-        working-directory: samples/fabric/fabric-cli
-        
-      - name: Asset Exchange Fabric CLI Tests
-        run: |
-          COUNT=0
-          TOTAL=1
-
-          # FABRIC2 - FABRIC1
-          ./bin/fabric-cli asset exchange-all --network1=network1 --network2=network2 --secret=secrettext --timeout-duration=100 bob:bond01:a04:alice:token1:100 &> tmp.out
-          tail -n 2 tmp.out | grep "Asset Exchange Complete." && COUNT=$(( COUNT + 1 )) && echo "PASS"
-          cat tmp.out
-
-          # RESULT
-          echo "Passed $COUNT/$TOTAL Tests."
-
-          if [ $COUNT == $TOTAL ]; then
-              exit 0
-          else
-              exit 1
-          fi
-        working-directory: samples/fabric/fabric-cli
-  
   asset-exchange-fabric-local:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest

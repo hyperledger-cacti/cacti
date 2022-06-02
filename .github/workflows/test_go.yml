@@ -7,26 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  test_interopcc_github:
-    # if: ${{ false }}  # disable
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Set up Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: 1.16
- 
-    - name: Build
-      run: go build -v ./...
-      working-directory: core/network/fabric-interop-cc/contracts/interop
-
-    - name: Test
-      run: go test -v ./...
-      working-directory: core/network/fabric-interop-cc/contracts/interop
-      
-  test_interopcc_semi-local:
+  test_interopcc:
     # if: ${{ false }}  # disable
     runs-on: ubuntu-latest
     steps:
@@ -37,63 +18,10 @@ jobs:
       with:
         go-version: 1.16
         
-    - name: Setup
-      run: |
-        GOMODCACHE=`go env GOMODCACHE`
-        echo "GO MOD Path: ${GOMODCACHE}"
-        go mod download github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go
-        chmod +wr -R ${GOMODCACHE}
-        rm -rf ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go*/*
-        cp -r ../../../../../common/protos-go/* ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go*/
-        ls -lh ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go*
-        
-        go mod download github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange
-        chmod +wr -R ${GOMODCACHE}
-        rm -rf ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange*/*
-        cp -r ../../../../../core/network/fabric-interop-cc/libs/assetexchange/* ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange*/
-        ls -lh ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange*
-        
-        go mod download github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils
-        chmod +wr -R ${GOMODCACHE}
-        rm -rf ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils*/*
-        cp -r ../../../../../core/network/fabric-interop-cc/libs/testutils/* ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils*/
-        ls -lh ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils*
-        
-        go mod download github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/utils
-        chmod +wr -R ${GOMODCACHE}
-        rm -rf ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/utils*/*
-        cp -r ../../../../../core/network/fabric-interop-cc/libs/utils/* ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/utils*/
-        ls -lh ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/utils*
-      working-directory: core/network/fabric-interop-cc/contracts/interop
- 
-    - name: Build
-      run: go build -v ./...
-      working-directory: core/network/fabric-interop-cc/contracts/interop
-
-    - name: Test
-      run: go test -v ./...
+    - name: Vendor
+      run: make run-vendor
       working-directory: core/network/fabric-interop-cc/contracts/interop
       
-  test_interopcc_local:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Set up Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: 1.16
-
-    - name: Local Setup
-      run: |
-        mv go.mod go.mod.bkp
-        cp go.mod.local go.mod
-        cp -r ../../../../../common/protos-go ./protos-go
-        cp -r ../../libs ./libs
-        rm go.sum
-        go mod tidy
-      working-directory: core/network/fabric-interop-cc/contracts/interop
-
     - name: Build
       run: go build -v ./...
       working-directory: core/network/fabric-interop-cc/contracts/interop
@@ -112,6 +40,10 @@ jobs:
       uses: actions/setup-go@v2
       with:
         go-version: 1.16
+        
+    - name: Vendor
+      run: make run-vendor
+      working-directory: core/network/fabric-interop-cc/interfaces/asset-mgmt
 
     - name: Build
       run: go build -v ./...
@@ -131,6 +63,10 @@ jobs:
       with:
         go-version: 1.16
 
+    - name: Vendor
+      run: make run-vendor
+      working-directory: samples/fabric/simplestate
+
     - name: Build
       run: go build -v ./...
       working-directory: samples/fabric/simplestate
@@ -139,7 +75,7 @@ jobs:
       run: make test
       working-directory: samples/fabric/simplestate
  
-  test_simpleasset_github:
+  test_simpleasset:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -149,43 +85,8 @@ jobs:
       with:
         go-version: 1.16
 
-    - name: Build
-      run: go build -v ./...
-      working-directory: samples/fabric/simpleasset
-
-    - name: Test
-      run: go test -v ./...
-      working-directory: samples/fabric/simpleasset
-
-  test_simpleasset_local:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Set up Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: 1.16
-
-    - name: Setup
-      run: |
-        GOMODCACHE=`go env GOMODCACHE`
-        echo "GO MOD Path: ${GOMODCACHE}"
-        go mod download github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go
-        chmod +wr -R ${GOMODCACHE}
-        rm -rf ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go*/*
-        cp -r ../../../common/protos-go/* ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go*/
-        ls -lh ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go*
-        go mod download github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt
-        chmod +wr -R ${GOMODCACHE}
-        rm -rf ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt*/*
-        cp -r ../../../core/network/fabric-interop-cc/interfaces/asset-mgmt/* ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt*/
-        ls -lh ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt*
-        go mod download github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils
-        chmod +wr -R ${GOMODCACHE}
-        rm -rf ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils*/*
-        cp -r ../../../core/network/fabric-interop-cc/libs/testutils/* ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils*/
-        ls -lh ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils*
+    - name: Vendor
+      run: make run-vendor
       working-directory: samples/fabric/simpleasset
 
     - name: Build
@@ -196,7 +97,7 @@ jobs:
       run: go test -v ./...
       working-directory: samples/fabric/simpleasset
 
-  test_simpleassetandinterop_github:
+  test_simpleassetandinterop:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -206,43 +107,8 @@ jobs:
       with:
         go-version: 1.16
 
-    - name: Build
-      run: go build -v ./...
-      working-directory: samples/fabric/simpleassetandinterop
-
-    - name: Test
-      run: go test -v ./...
-      working-directory: samples/fabric/simpleassetandinterop
-
-  test_simpleassetandinterop_local:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Set up Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: 1.16
-
-    - name: Setup
-      run: |
-        GOMODCACHE=`go env GOMODCACHE`
-        echo "GO MOD Path: ${GOMODCACHE}"
-        go mod download github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go
-        chmod +wr -R ${GOMODCACHE}
-        rm -rf ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go*/*
-        cp -r ../../../common/protos-go/* ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go*/
-        ls -lh ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go*
-        go mod download github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange
-        chmod +wr -R ${GOMODCACHE}
-        rm -rf ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange*/*
-        cp -r ../../../core/network/fabric-interop-cc/libs/assetexchange/* ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange*/
-        ls -lh ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange*
-        go mod download github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils
-        chmod +wr -R ${GOMODCACHE}
-        rm -rf ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils*/*
-        cp -r ../../../core/network/fabric-interop-cc/libs/testutils/* ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils*/
-        ls -lh ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils*
+    - name: Vendor
+      run: make run-vendor
       working-directory: samples/fabric/simpleassetandinterop
 
     - name: Build
@@ -253,7 +119,7 @@ jobs:
       run: go test -v ./...
       working-directory: samples/fabric/simpleassetandinterop
 
-  test_simpleassettransfer_github:
+  test_simpleassettransfer:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -263,31 +129,9 @@ jobs:
       with:
         go-version: 1.16
 
-    - name: Setup
-      run: |
-        GOMODCACHE=`go env GOMODCACHE`
-        echo "GO MOD Path: ${GOMODCACHE}"
-        go mod download github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go
-        chmod +wr -R ${GOMODCACHE}
-        rm -rf ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go*/*
-        cp -r ../../../common/protos-go/* ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go*/
-        ls -lh ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go*
-        go mod download github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt
-        chmod +wr -R ${GOMODCACHE}
-        rm -rf ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt*/*
-        cp -r ../../../core/network/fabric-interop-cc/interfaces/asset-mgmt/* ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt*/
-        ls -lh ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt*
-        go mod download github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils
-        chmod +wr -R ${GOMODCACHE}
-        rm -rf ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils*/*
-        cp -r ../../../core/network/fabric-interop-cc/libs/testutils/* ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils*/
-        ls -lh ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils*
-        go mod download github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/utils
-        chmod +wr -R ${GOMODCACHE}
-        rm -rf ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/utils*/*
-        cp -r ../../../core/network/fabric-interop-cc/libs/utils/* ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/utils*/
-        ls -lh ${GOMODCACHE}/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/utils*
-      working-directory: samples/fabric/simpleassettransfer
+    - name: Vendor
+      run: make run-vendor
+      working-directory: samples/fabric/simpleassetandinterop
 
     - name: Build
       run: go build -v ./...
@@ -296,22 +140,3 @@ jobs:
     - name: Test
       run: go test -v ./...
       working-directory: samples/fabric/simpleassettransfer
-
-  test_simpleassettransfer_local:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Set up Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: 1.16
-
-    - name: Build
-      run: make build-local
-      working-directory: samples/fabric/simpleassettransfer
-
-    - name: Test
-      run: make test-local
-      working-directory: samples/fabric/simpleassettransfer
-

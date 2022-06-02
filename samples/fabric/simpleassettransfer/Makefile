@@ -3,27 +3,20 @@ build:
 test:
 	go test -v .
 clean:
+	rm -rf vendor
 	rm simpleasset
-build-local:
-	mv go.mod go.mod.rm
-	mv go.sum go.sum.rm
-	cp go.mod.local go.mod
-	cp -r ../../../core/network/fabric-interop-cc/libs .
-	cp -r ../../../core/network/fabric-interop-cc/interfaces .
-	cp -r ../../../common/protos-go .
-	(go mod tidy && go build -v .) || true
-	mv go.mod.rm go.mod
-	mv go.sum.rm go.sum
 	
-test-local:
-	mv go.mod go.mod.rm
-	mv go.sum go.sum.rm
-	cp go.mod.local go.mod
-	cp -r ../../../core/network/fabric-interop-cc/libs .
-	cp -r ../../../core/network/fabric-interop-cc/interfaces .
-	cp -r ../../../common/protos-go .
-	(go mod tidy && go test -v .) || true
-	mv go.mod.rm go.mod
-	mv go.sum.rm go.sum
+run-vendor:
+	go mod vendor
+	cp -r ../../../common/protos-go/* vendor/github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/
+	cp -r ../../../core/network/fabric-interop-cc/interfaces/asset-mgmt/* vendor/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt/
+	cp -r ../../../core/network/fabric-interop-cc/libs/utils/* vendor/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/utils/
+	cp -r ../../../core/network/fabric-interop-cc/libs/testutils/* vendor/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils/
+
+build-local: run-vendor
+	go build -v .
+	
+test-local: run-vendor
+	go test -v .
 
 

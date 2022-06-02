@@ -1,0 +1,116 @@
+name: Test All Docker Images Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  relay:
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+          
+      - name: Build Image
+        run: make build-server-local
+        working-directory: core/relay
+        
+  fabric-driver-local:
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      - name: Use Node.js 14.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14.x
+          
+      - name: Use Protoc 3.15
+        run: |
+          curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.15.6/protoc-3.15.6-linux-x86_64.zip
+          unzip protoc-3.15.6-linux-x86_64.zip -d protoc
+          
+      - name: Build JS Protos (Local)
+        run: |
+          export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
+          make build
+        working-directory: common/protos-js
+        
+      - name: Build Image (Local)
+        run: make build-image-local
+        working-directory: core/drivers/fabric-driver
+        
+  fabric-driver-packages:
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      
+      - name: Setup .npmrc
+        run: |
+          cp .npmrc.template .npmrc
+          sed -i "s/<personal-access-token>/${{ secrets.GITHUB_TOKEN }}/g" .npmrc
+          cat .npmrc
+        working-directory: core/drivers/fabric-driver
+        
+      - name: Build Image
+        run: make build-image
+        working-directory: core/drivers/fabric-driver
+        
+  corda-driver-local:
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+            
+      - name: Set up JDK 8
+        uses: actions/setup-java@v2
+        with:
+          java-version: '8'
+          distribution: 'adopt'
+          
+      - name: Build Protos (Local)
+        run: make build
+        working-directory: common/protos-java-kt
+        
+      - name: Build Corda Interop App (Local)
+        run: make build-local
+        working-directory: core/network/corda-interop-app
+        
+      - name: Build Corda Interop SDK (Local)
+        run: make build
+        working-directory: sdks/corda
+        
+      - name: Build Image (Local)
+        run: make image-local
+        working-directory: core/drivers/corda-driver
+          
+  corda-driver-packages:
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      
+      - name: Generate github.properties
+        run: |
+          echo "Using ${GITHUB_ACTOR} user."
+          echo "username=${GITHUB_ACTOR}" >> github.properties
+          echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.properties
+          echo "url=https://maven.pkg.github.com/${GITHUB_ACTOR}/weaver-dlt-interoperability" >> github.properties
+          
+          echo "Using ${GITHUB_ACTOR} user."
+          echo "username=${GITHUB_ACTOR}" >> github.main.properties
+          echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.main.properties
+          echo "url=https://maven.pkg.github.com/hyperledger-labs/weaver-dlt-interoperability" >> github.main.properties
+          
+          make build || mv github.main.properties github.properties
+          make clean
+          
+          cat github.properties
+        working-directory: core/drivers/corda-driver
+        
+      - name: Build Image
+        run: make image
+        working-directory: core/drivers/corda-driver

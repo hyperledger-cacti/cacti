@@ -126,13 +126,6 @@ jobs:
           java-version: '8'
           distribution: 'adopt'
           
-      - name: Use Protoc 3.15
-        run: |
-          curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.15.6/protoc-3.15.6-linux-x86_64.zip
-          unzip protoc-3.15.6-linux-x86_64.zip -d protoc
-          go get -u google.golang.org/protobuf/cmd/protoc-gen-go
-          go get -u google.golang.org/grpc/cmd/protoc-gen-go-grpc
-          
       - name: Build Java Protos
         run: make build
         working-directory: common/protos-java-kt

@@ -1,4 +1,2 @@
-vendor/
 interop
-libs
-protos-go
+vendor
