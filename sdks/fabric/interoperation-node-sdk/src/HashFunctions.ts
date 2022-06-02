@@ -26,13 +26,12 @@ interface Hash {
     getSerializedHashBase64(): string;
 }
 
-/*
- * SHA256 Hash for HTLC, implementing above Hash Interface
- */
-class SHA256 implements Hash {
-    HASH_MECHANISM = HashMechanism.SHA256;
+abstract class SHA implements Hash {
+    abstract HASH_MECHANISM: HashMechanism
     preimage: string = null;
     hash64: string = null;
+    
+    abstract computeHash(): string
     
     // Create a secure pseudo-random preimage of a given length
     generateRandomPreimage(length)
@@ -42,7 +41,7 @@ class SHA256 implements Hash {
     
     setPreimage(preimage: string) {
         this.preimage = preimage
-        this.hash64 = crypto.createHash('sha256').update(preimage).digest('base64');
+        this.hash64 = this.computeHash()
     }
     getPreimage(): string {
         return this.preimage;
@@ -62,7 +61,29 @@ class SHA256 implements Hash {
     }
 }
 
+/*
+ * SHA256 Hash for HTLC, implementing above Hash Interface
+ */
+class SHA256 extends SHA {
+    HASH_MECHANISM = HashMechanism.SHA256;
+    
+    computeHash(): string {
+        return crypto.createHash('sha256').update(this.preimage).digest('base64');
+    }
+}
+/*
+ * SHA512 Hash for HTLC, implementing above Hash Interface
+ */
+class SHA512 extends SHA {
+    HASH_MECHANISM = HashMechanism.SHA512;
+    
+    computeHash(): string {
+        return crypto.createHash('sha512').update(this.preimage).digest('base64');
+    }
+}
+
 export {
     Hash,
-    SHA256
+    SHA256,
+    SHA512
 };

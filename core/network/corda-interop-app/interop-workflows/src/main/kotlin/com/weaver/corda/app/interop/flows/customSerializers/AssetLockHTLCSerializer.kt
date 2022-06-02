@@ -16,6 +16,7 @@ class AssetLockHTLCSerializer: SerializationCustomSerializer<AssetLocks.AssetLoc
      * The Proxy class is a serializable counterpart of the AssetLocks.AssetLockHTLC class.
      */
     data class Proxy(
+        val hashMechanism: AssetLocks.HashMechanism,
         val hashBase64: ByteArray,
         val expiryTimeSecs: Long,
         val timeSpec: AssetLocks.AssetLockHTLC.TimeSpec
@@ -26,6 +27,7 @@ class AssetLockHTLCSerializer: SerializationCustomSerializer<AssetLocks.AssetLoc
      * class so that it can be serialized and transferred across the wire.
      */
     override fun toProxy(obj: AssetLocks.AssetLockHTLC) = Proxy(
+            hashMechanism = obj.hashMechanism,
             hashBase64 = obj.hashBase64.toByteArray(),
             expiryTimeSecs = obj.expiryTimeSecs,
             timeSpec = obj.timeSpec
@@ -36,6 +38,7 @@ class AssetLockHTLCSerializer: SerializationCustomSerializer<AssetLocks.AssetLoc
      */
     override fun fromProxy(proxy: Proxy) : AssetLocks.AssetLockHTLC {
         return AssetLocks.AssetLockHTLC.newBuilder()
+                .setHashMechanism(proxy.hashMechanism)
                 .setHashBase64(ByteString.copyFrom(proxy.hashBase64))
                 .setExpiryTimeSecs(proxy.expiryTimeSecs)
                 .setTimeSpec(proxy.timeSpec)

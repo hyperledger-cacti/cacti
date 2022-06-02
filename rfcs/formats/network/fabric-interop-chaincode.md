@@ -5,7 +5,7 @@
  -->
 # Fabric Interoperation Chaincode API
 
-- RFC: 03-017
+- RFC: 03-016
 - Authors: Venkatraman Ramakrishna, Krishnasuri Narayanam, Sandeep Nishad, Dhinakaran Vinayagamurthy
 - Status: Proposed
 - Since: 02-Apr-2022

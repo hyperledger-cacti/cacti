@@ -16,6 +16,7 @@ class AssetClaimHTLCSerializer: SerializationCustomSerializer<AssetLocks.AssetCl
      * The Proxy class is a serializable counterpart of the AssetLocks.AssetClaimHTLC class.
      */
     data class Proxy(
+        val hashMechanism: AssetLocks.HashMechanism,
         val hashPreimageBase64: ByteArray
     )
 
@@ -24,6 +25,7 @@ class AssetClaimHTLCSerializer: SerializationCustomSerializer<AssetLocks.AssetCl
      * class so that it can be serialized and transferred across the wire.
      */
     override fun toProxy(obj: AssetLocks.AssetClaimHTLC) = Proxy(
+        hashMechanism = obj.hashMechanism,
         hashPreimageBase64 = obj.hashPreimageBase64.toByteArray()
     )
 
@@ -32,6 +34,7 @@ class AssetClaimHTLCSerializer: SerializationCustomSerializer<AssetLocks.AssetCl
      */
     override fun fromProxy(proxy: Proxy) : AssetLocks.AssetClaimHTLC {
         return AssetLocks.AssetClaimHTLC.newBuilder()
+                .setHashMechanism(proxy.hashMechanism)
                 .setHashPreimageBase64(ByteString.copyFrom(proxy.hashPreimageBase64))
                 .build()
     }

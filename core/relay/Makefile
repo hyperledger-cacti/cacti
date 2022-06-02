@@ -177,3 +177,7 @@ clean:
 	-docker rmi $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_ALL)
 	-docker rmi $(DOCKER_IMAGE_ALL)
 	cargo clean
+
+update-pkgs:
+	cargo update -p nom
+	cargo update -p lexical-core

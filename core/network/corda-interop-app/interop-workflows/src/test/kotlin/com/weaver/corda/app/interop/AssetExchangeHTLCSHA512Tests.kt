@@ -11,10 +11,9 @@ import com.weaver.corda.app.interop.flows.*
 import com.weaver.corda.app.interop.states.AssetExchangeHTLCState
 import com.weaver.corda.app.interop.states.AssetLockHTLCData
 import com.weaver.corda.app.interop.states.AssetClaimHTLCData
+import com.weaver.protos.common.asset_locks.AssetLocks.HashMechanism
 
 import com.weaver.corda.app.interop.test.*
-
-import com.weaver.protos.common.asset_locks.AssetLocks
 
 import com.weaver.protos.common.query.QueryOuterClass
 import net.corda.core.contracts.UniqueIdentifier
@@ -32,13 +31,12 @@ import net.corda.core.contracts.StateAndRef
 import java.util.Base64
 import java.time.Instant
 import net.corda.core.utilities.OpaqueBytes
-import com.google.protobuf.ByteString
 
 import net.corda.core.contracts.TransactionState
 import net.corda.core.contracts.StateRef
 import net.corda.core.crypto.SecureHash
 
-class AssetExchangeHTLCWrapperTests {
+class AssetExchangeHTLCSHA512Tests {
     companion object {
         lateinit var network: MockNetwork
         lateinit var partyA: StartedMockNode
@@ -72,41 +70,23 @@ class AssetExchangeHTLCWrapperTests {
     val charlie = partyC.info.legalIdentities.first()
     val issuer = charlie
     
-    val preimage = "secrettext"
-    val hash = "ivHErp1x4bJDKuRo6L5bApO/DdoyD/dG0mAZrzLZEIs="
+    val preimage = OpaqueBytes("secrettext".toByteArray())
+    val hash = OpaqueBytes(Base64.getDecoder().decode("C2Eebv+5ANup+OFSol2igMpbLIvcZVxdWgrCgcSYGWbpfdNCwg7jI7xrQbVUKhDwxtRQ4uCivarra05qkdvOGQ=="))
+    val hashResponse = "{\"hashMechanism\":\"SHA512\", \"hashBase64\":\"C2Eebv+5ANup+OFSol2igMpbLIvcZVxdWgrCgcSYGWbpfdNCwg7jI7xrQbVUKhDwxtRQ4uCivarra05qkdvOGQ==\"}"
     
     val asset = AssetState(
         "a01",
         alice
     )
-    val lockInfoHTLC = AssetLocks.AssetLockHTLC.newBuilder()
-        .setHashMechanism(AssetLocks.HashMechanism.SHA256)
-        .setHashBase64(ByteString.copyFrom(hash.toByteArray()))
-        .setExpiryTimeSecs(10)
-        .setTimeSpec(AssetLocks.AssetLockHTLC.TimeSpec.DURATION)
-        .build()
-        
-    val lockInfo = AssetLocks.AssetLock.newBuilder()
-        .setLockMechanism(AssetLocks.LockMechanism.HTLC)
-        .setLockInfo(ByteString.copyFrom(Base64.getEncoder().encodeToString(lockInfoHTLC.toByteArray()).toByteArray()))
-        .build()
-        
-    val claimInfoHTLC = AssetLocks.AssetClaimHTLC.newBuilder()
-        .setHashMechanism(AssetLocks.HashMechanism.SHA256)
-        .setHashPreimageBase64(ByteString.copyFrom(Base64.getEncoder().encodeToString(preimage.toByteArray()).toByteArray()))
-        .build()
-        
-    val claimInfo = AssetLocks.AssetClaim.newBuilder()
-        .setLockMechanism(AssetLocks.LockMechanism.HTLC)
-        .setClaimInfo(ByteString.copyFrom(Base64.getEncoder().encodeToString(claimInfoHTLC.toByteArray()).toByteArray()))
-        .build()
-        
-    val assetExchangeAgreement = AssetLocks.AssetExchangeAgreement.newBuilder()
-        .setType("Asset")
-        .setId("a01")
-        .setLocker("")
-        .setRecipient(bob.nameOrNull().toString())
-        .build()
+    var lockInfo = AssetLockHTLCData(
+        HashMechanism.SHA512,
+        hash,
+        Instant.now().plusSeconds(10)
+    )
+    val claimInfo = AssetClaimHTLCData(
+        HashMechanism.SHA512,
+        preimage
+    )
     
     fun createAssetTx(id: String): StateAndRef<AssetState> {
         val tmp = partyA.startFlow(CreateAsset(id, alice))
@@ -114,27 +94,16 @@ class AssetExchangeHTLCWrapperTests {
         return tmp.getOrThrow()
     }
     
-    val getAssetFlow = "com.weaver.corda.app.interop.test.GetAssetRef"
-    val updateOwnerFlow = "com.weaver.corda.app.interop.test.UpdateOwnerFlow"
-    
-    
     @Test
-    fun `LockAsset tests`() {        
-        val assetStateRef = createAssetTx("lock01")
-        assertEquals(alice, assetStateRef.state.data.owner)
-
+    fun `LockAssetHTLC tests`() {
+        val assetStateRef = createAssetTx("l01")
+        
         // UnHappy case: Third party trying to lock asset of alice.
-        val failAssetExchangeAgreement = AssetLocks.AssetExchangeAgreement.newBuilder()
-            .setType("Asset")
-            .setId("lock01")
-            .setLocker("")
-            .setRecipient(charlie.nameOrNull().toString())
-            .build()
-        val futureFail = partyB.startFlow(LockAsset(
+        val futureFail = partyB.startFlow(LockAssetHTLC.Initiator(
             lockInfo,
-            failAssetExchangeAgreement,
-            getAssetFlow,
+            assetStateRef,
             AssetStateContract.Commands.Delete(),
+            charlie,
             issuer
         ))
         network.runNetwork()
@@ -142,18 +111,11 @@ class AssetExchangeHTLCWrapperTests {
         assert(linearIdFail.isLeft()) { "Can not lock someone else's asset" }
         
         // Happy case.
-        val assetExchangeAgreementLock = AssetLocks.AssetExchangeAgreement.newBuilder()
-            .setType("Asset")
-            .setId("lock01")
-            .setLocker("")
-            .setRecipient(bob.nameOrNull().toString())
-            .build()
-        
-        val future = partyA.startFlow(LockAsset(
+        val future = partyA.startFlow(LockAssetHTLC.Initiator(
             lockInfo,
-            assetExchangeAgreementLock,
-            getAssetFlow,
+            assetStateRef,
             AssetStateContract.Commands.Delete(),
+            bob,
             issuer
         ))
         network.runNetwork()
@@ -168,17 +130,18 @@ class AssetExchangeHTLCWrapperTests {
             println(states.single().toString())
             assertEquals(1, states.size)
             val state = states.single().state.data
+            assertEquals(lockInfo, state.lockInfo)
             assertEquals(alice, state.locker)
             assertEquals(bob, state.recipient)
         })
         
 
         // Unhappy case: asset is already locked
-        val futureTwo = partyA.startFlow(LockAsset(
+        val futureTwo = partyA.startFlow(LockAssetHTLC.Initiator(
             lockInfo,
-            assetExchangeAgreementLock,
-            getAssetFlow,
+            assetStateRef,
             AssetStateContract.Commands.Delete(),
+            bob,
             issuer
         ))
         network.runNetwork()
@@ -194,11 +157,11 @@ class AssetExchangeHTLCWrapperTests {
         lockAsset().map{ id ->
             lockId = id.toString()
         }
-        val future = partyB.startFlow(ClaimAsset(
+        val future = partyB.startFlow(ClaimAssetHTLC.Initiator(
             lockId,
             claimInfo,
             AssetStateContract.Commands.Issue(),
-            updateOwnerFlow,
+            "com.weaver.corda.app.interop.test.UpdateOwnerFlow",
             issuer
         ))
         network.runNetwork()
@@ -226,41 +189,37 @@ class AssetExchangeHTLCWrapperTests {
             lockId = id.toString()
         }
         
-        val wrongClaimInfoHTLC = AssetLocks.AssetClaimHTLC.newBuilder()
-            .setHashMechanism(AssetLocks.HashMechanism.SHA256)
-            .setHashPreimageBase64(ByteString.copyFrom(Base64.getEncoder().encodeToString("wrongsecret".toByteArray()).toByteArray()))
-            .build()
-        val wrongClaimInfo = AssetLocks.AssetClaim.newBuilder()
-            .setLockMechanism(AssetLocks.LockMechanism.HTLC)
-            .setClaimInfo(ByteString.copyFrom(Base64.getEncoder().encodeToString(wrongClaimInfoHTLC.toByteArray()).toByteArray()))
-            .build()
-        val futureOne = partyB.startFlow(ClaimAsset(
+        val wrongClaimInfo = AssetClaimHTLCData(
+            HashMechanism.SHA512,
+            OpaqueBytes("secretwrong".toByteArray())
+        )
+        val futureOne = partyB.startFlow(ClaimAssetHTLC.Initiator(
             lockId,
             wrongClaimInfo,
             AssetStateContract.Commands.Issue(),
-            updateOwnerFlow,
+            "com.weaver.corda.app.interop.test.UpdateOwnerFlow",
             issuer
         ))
         network.runNetwork()
         val stxOne = futureOne.getOrThrow()
         assert(stxOne.isLeft()) { "ClaimAsset should be unsuccessfull as preimage is not correct" }
         
-        val futureTwo = partyA.startFlow(ClaimAsset(
+        val futureTwo = partyA.startFlow(ClaimAssetHTLC.Initiator(
             lockId,
             claimInfo,
             AssetStateContract.Commands.Issue(),
-            updateOwnerFlow,
+            "com.weaver.corda.app.interop.test.UpdateOwnerFlow",
             issuer
         ))
         network.runNetwork()
         val stxTwo = futureTwo.getOrThrow()
         assert(stxTwo.isLeft()) { "ClaimAsset should be unsuccessfull as only recipient can claim" }
         
-        val futureTwo2 = partyC.startFlow(ClaimAsset(
+        val futureTwo2 = partyC.startFlow(ClaimAssetHTLC.Initiator(
             lockId,
             claimInfo,
             AssetStateContract.Commands.Issue(),
-            updateOwnerFlow,
+            "com.weaver.corda.app.interop.test.UpdateOwnerFlow",
             issuer
         ))
         network.runNetwork()
@@ -269,16 +228,47 @@ class AssetExchangeHTLCWrapperTests {
         
         Thread.sleep(10000L)
         
-        val futureThree = partyB.startFlow(ClaimAsset(
+        val futureThree = partyB.startFlow(ClaimAssetHTLC.Initiator(
             lockId,
             claimInfo,
             AssetStateContract.Commands.Issue(),
-            updateOwnerFlow,
+            "com.weaver.corda.app.interop.test.UpdateOwnerFlow",
             issuer
         ))
         network.runNetwork()
         val stxThree = futureThree.getOrThrow()
         assert(stxThree.isLeft()) { "ClaimAsset should be unsuccessfull after timeout" }
+        
+        val wrongClaimInfo2 = AssetClaimHTLCData(
+            HashMechanism.SHA256,
+            OpaqueBytes("secrettext".toByteArray())
+        )
+        val futureFour = partyB.startFlow(ClaimAssetHTLC.Initiator(
+            lockId,
+            wrongClaimInfo2,
+            AssetStateContract.Commands.Issue(),
+            "com.weaver.corda.app.interop.test.UpdateOwnerFlow",
+            issuer
+        ))
+        network.runNetwork()
+        val stxFour = futureFour.getOrThrow()
+        assert(stxFour.isLeft()) { "HashMechanism must be same in Lock and Claim." }
+        
+        
+        val wrongClaimInfo3 = AssetClaimHTLCData(
+            HashMechanism.UNRECOGNIZED,
+            OpaqueBytes("secrettext".toByteArray())
+        )
+        val futureFive = partyB.startFlow(ClaimAssetHTLC.Initiator(
+            lockId,
+            wrongClaimInfo3,
+            AssetStateContract.Commands.Issue(),
+            "com.weaver.corda.app.interop.test.UpdateOwnerFlow",
+            issuer
+        ))
+        network.runNetwork()
+        val stxFive = futureFive.getOrThrow()
+        assert(stxFive.isLeft()) { "Hash Mechanism must be among the supported mechanisms." }
     }
     
     @Test
@@ -290,7 +280,7 @@ class AssetExchangeHTLCWrapperTests {
         }
         
         // Unhappy case: Unlock before Timeout
-        val futureOne = partyA.startFlow(UnlockAsset(
+        val futureOne = partyA.startFlow(UnlockAssetHTLC.Initiator(
             lockId,
             AssetStateContract.Commands.Issue(),
             issuer
@@ -301,8 +291,8 @@ class AssetExchangeHTLCWrapperTests {
         
         Thread.sleep(10000L)
         
-        // Unhappy case: charlie trying to unlock        
-        val futureTwo2 = partyC.startFlow(UnlockAsset(
+        // Unhappy case: charlie trying to unlock
+        val futureTwo2 = partyC.startFlow(UnlockAssetHTLC.Initiator(
             lockId,
             AssetStateContract.Commands.Issue(),
             issuer
@@ -312,7 +302,7 @@ class AssetExchangeHTLCWrapperTests {
         assert(stxTwo2.isLeft()) { "UnlockAsset fails as only locker can unlock" }
         
         // Happy Case
-        val future = partyA.startFlow(UnlockAsset(
+        val future = partyA.startFlow(UnlockAssetHTLC.Initiator(
             lockId,
             AssetStateContract.Commands.Issue(),
             issuer
@@ -333,16 +323,48 @@ class AssetExchangeHTLCWrapperTests {
         })
     }
     
+    @Test
+    fun `QueryHTLC tests`() {
+        var lockId: String = ""
+        
+        lockAsset("q01").map{ id ->
+            lockId = id.toString()
+        }
+        
+        val futureOne = partyB.startFlow(GetAssetExchangeHTLCHashById(
+            lockId
+        ))
+        network.runNetwork()
+        val hash: String = futureOne.getOrThrow().toString(Charsets.UTF_8)
+        assertEquals(hash, hashResponse)
+        
+        partyB.startFlow(ClaimAssetHTLC.Initiator(
+            lockId,
+            claimInfo,
+            AssetStateContract.Commands.Issue(),
+            "com.weaver.corda.app.interop.test.UpdateOwnerFlow",
+            issuer
+        ))
+        network.runNetwork()
+        
+        val futureTwo = partyA.startFlow(GetAssetExchangeHTLCHashPreImageById(
+            lockId
+        ))
+        network.runNetwork()
+        val hashPreimage: String = futureTwo.getOrThrow().toString(Charsets.UTF_8)
+        assertEquals(hashPreimage, "secrettext")
+    }
+    
     // Helper to successfully lock the asset
-    fun lockAsset(): Either<Error, UniqueIdentifier> {
-        val assetStateRef = createAssetTx("a01")
+    fun lockAsset(id:String = "a01"): Either<Error, UniqueIdentifier> {
+        val assetStateRef = createAssetTx(id)
         // Assert Initial Owner of asset to be alice
         assertEquals(alice, assetStateRef.state.data.owner)
-        val future = partyA.startFlow(LockAsset(
+        val future = partyA.startFlow(LockAssetHTLC.Initiator(
             lockInfo,
-            assetExchangeAgreement,
-            getAssetFlow,
+            assetStateRef,
             AssetStateContract.Commands.Delete(),
+            bob,
             issuer
         ))
         network.runNetwork()

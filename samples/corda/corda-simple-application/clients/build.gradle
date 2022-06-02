@@ -83,10 +83,10 @@ dependencies {
     
     implementation(group: 'com.fungiblehousetoken', name: 'contracts', version: "1.0")
     implementation(group: 'com.fungiblehousetoken', name: 'workflows', version: "1.0")
-    implementation(group: 'com.weaver.corda.app.interop', name: 'interop-contracts', version: "$weaver_version")
-    implementation(group: 'com.weaver.corda.app.interop', name: 'interop-workflows', version: "$weaver_version")
-    implementation(group: 'com.weaver.corda.sdk', name: 'weaver-corda-sdk', version: "$weaver_version")
-    implementation(group: 'com.weaver', name: 'protos-java-kt', version: "$weaver_version")
+    implementation(group: 'com.weaver.corda.app.interop', name: 'interop-contracts', version: "$weaver_corda_version")
+    implementation(group: 'com.weaver.corda.app.interop', name: 'interop-workflows', version: "$weaver_corda_version")
+    implementation(group: 'com.weaver.corda.sdk', name: 'weaver-corda-sdk', version: "$weaver_corda_version")
+    implementation(group: 'com.weaver', name: 'protos-java-kt', version: "$weaver_protos_version")
 
     // gRPC and protobuf dependencies
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"

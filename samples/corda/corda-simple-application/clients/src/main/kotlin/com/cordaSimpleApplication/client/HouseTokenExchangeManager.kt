@@ -26,6 +26,7 @@ import net.corda.core.crypto.sha256
 import java.time.Instant
 
 import com.weaver.corda.sdk.AssetManager
+import com.weaver.corda.sdk.HashFunctions
 import com.cordaSimpleApplication.state.AssetState
 import com.cordaSimpleApplication.contract.AssetContract
 
@@ -46,6 +47,7 @@ import net.corda.core.identity.Party
 class LockHouseTokenCommand : CliktCommand(name="lock",
         help = "Locks an asset. lock --fungible --hashBase64=hashbase64 --timeout=10 --recipient='PartyA' --param=type:amount ") {
     val config by requireObject<Map<String, String>>()
+    val hash_fn: String? by option("-hfn", "--hash-fn", help="Hash Function to be used. Default: SHA256")
     val hashBase64: String? by option("-h64", "--hashBase64", help="Hash in base64 for HTLC")
     val timeout: String? by option("-t", "--timeout", help="Timeout duration in seconds.")
     val recipient: String? by option("-r", "--recipient", help="Party Name for recipient")
@@ -53,6 +55,12 @@ class LockHouseTokenCommand : CliktCommand(name="lock",
     val param: String? by option("-p", "--param", help="Parameter AssetType:AssetId for non-fungible, AssetType:Quantity for fungible.")
     val observer: String? by option("-o", "--observer", help="Party Name for Observer")
     override fun run() = runBlocking {
+        var hash: HashFunctions.Hash = HashFunctions.SHA256()
+        if(hash_fn == "SHA256") {
+            hash = HashFunctions.SHA256()
+        } else if ( hash_fn == "SHA512") {
+            hash = HashFunctions.SHA512()
+        }
         if (hashBase64 == null || recipient == null || param == null) {
             println("One of HashBase64, Recipient, or param argument is missing.")
         } else {
@@ -77,13 +85,14 @@ class LockHouseTokenCommand : CliktCommand(name="lock",
                 if (observer != null)   {
                    obs += rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse(observer!!))!!
                 }
+                hash.setSerializedHashBase64(hashBase64!!)
                 if (fungible) {
                     id = AssetManager.createFungibleHTLC(
                         rpc.proxy, 
                         params[0],          // Type
                         params[1].toLong(), // Quantity
                         recipient!!, 
-                        hashBase64!!, 
+                        hash, 
                         nTimeout, 
                         1,                  //Duration
                         "net.corda.samples.tokenizedhouse.flows.RetrieveStateAndRef", 
@@ -97,7 +106,7 @@ class LockHouseTokenCommand : CliktCommand(name="lock",
                         params[0],      // Type
                         params[1],      // ID
                         recipient!!, 
-                        hashBase64!!, 
+                        hash, 
                         nTimeout,  
                         1,              //Duration
                         "com.cordaSimpleApplication.flow.RetrieveStateAndRef", 
@@ -122,9 +131,16 @@ class LockHouseTokenCommand : CliktCommand(name="lock",
 class ClaimHouseTokenCommand : CliktCommand(name="claim", help = "Claim a locked asset. Only Recipient's call will work.") {
     val config by requireObject<Map<String, String>>()
     val contractId: String? by option("-cid", "--contract-id", help="Contract/Linear Id for HTLC State")
+    val hash_fn: String? by option("-hfn", "--hash-fn", help="Hash Function to be used. Default: SHA256")
     val secret: String? by option("-s", "--secret", help="Hash Pre-Image for the HTLC Claim")
     val observer: String? by option("-o", "--observer", help="Party Name for Observer")
     override fun run() = runBlocking {
+        var hash: HashFunctions.Hash = HashFunctions.SHA256()
+        if(hash_fn == "SHA256") {
+            hash = HashFunctions.SHA256()
+        } else if ( hash_fn == "SHA512") {
+            hash = HashFunctions.SHA512()
+        }
         if (contractId == null || secret == null) {
             println("Arguments required: --contract-id and --secret.")
         } else {
@@ -140,10 +156,11 @@ class ClaimHouseTokenCommand : CliktCommand(name="claim", help = "Claim a locked
                 if (observer != null)   {
                    obs += rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse(observer!!))!!
                 }
+                hash.setPreimage(secret!!)
                 val res = AssetManager.claimAssetInHTLC(
                     rpc.proxy, 
                     contractId!!, 
-                    secret!!,
+                    hash,
                     IssueTokenCommand(issuedTokenType, listOf(0)),
                     "net.corda.samples.tokenizedhouse.flows.UpdateOwnerFromPointer",
                     issuer,

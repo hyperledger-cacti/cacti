@@ -35,10 +35,6 @@ jobs:
           cat github.properties
         working-directory: common/protos-java-kt
         
-      - name: Build
-        run: make build
-        working-directory: common/protos-java-kt
-        
       - name: Publish
         run: make publish
         working-directory: common/protos-java-kt
@@ -105,7 +101,8 @@ jobs:
         working-directory: sdks/corda
     
   publish-driver:
-    needs: [publish-protos, publish-interop-app]
+    if: github.repository_owner == 'hyperledger-labs'
+    needs: [publish-protos, publish-interop-app, publish-sdk]
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it

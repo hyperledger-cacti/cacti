@@ -11,6 +11,7 @@ import com.weaver.corda.app.interop.flows.*
 import com.weaver.corda.app.interop.states.AssetExchangeHTLCState
 import com.weaver.corda.app.interop.states.AssetLockHTLCData
 import com.weaver.corda.app.interop.states.AssetClaimHTLCData
+import com.weaver.protos.common.asset_locks.AssetLocks.HashMechanism
 
 import com.weaver.corda.app.interop.test.*
 
@@ -35,7 +36,7 @@ import net.corda.core.contracts.TransactionState
 import net.corda.core.contracts.StateRef
 import net.corda.core.crypto.SecureHash
 
-class AssetExchangeHTLCTests {
+class AssetExchangeHTLCSHA256Tests {
     companion object {
         lateinit var network: MockNetwork
         lateinit var partyA: StartedMockNode
@@ -71,16 +72,19 @@ class AssetExchangeHTLCTests {
     
     val preimage = OpaqueBytes("secrettext".toByteArray())
     val hash = OpaqueBytes(Base64.getDecoder().decode("ivHErp1x4bJDKuRo6L5bApO/DdoyD/dG0mAZrzLZEIs="))
+    val hashResponse = "{\"hashMechanism\":\"SHA256\", \"hashBase64\":\"ivHErp1x4bJDKuRo6L5bApO/DdoyD/dG0mAZrzLZEIs=\"}"
     
     val asset = AssetState(
         "a01",
         alice
     )
     var lockInfo = AssetLockHTLCData(
+        HashMechanism.SHA256,
         hash,
         Instant.now().plusSeconds(10)
     )
     val claimInfo = AssetClaimHTLCData(
+        HashMechanism.SHA256,
         preimage
     )
     
@@ -186,6 +190,7 @@ class AssetExchangeHTLCTests {
         }
         
         val wrongClaimInfo = AssetClaimHTLCData(
+            HashMechanism.SHA256,
             OpaqueBytes("secretwrong".toByteArray())
         )
         val futureOne = partyB.startFlow(ClaimAssetHTLC.Initiator(
@@ -300,9 +305,9 @@ class AssetExchangeHTLCTests {
         ))
         network.runNetwork()
         val hash: String = futureOne.getOrThrow().toString(Charsets.UTF_8)
-        assertEquals(hash, "ivHErp1x4bJDKuRo6L5bApO/DdoyD/dG0mAZrzLZEIs=")
+        assertEquals(hash, hashResponse)
         
-        val tmp = partyB.startFlow(ClaimAssetHTLC.Initiator(
+        partyB.startFlow(ClaimAssetHTLC.Initiator(
             lockId,
             claimInfo,
             AssetStateContract.Commands.Issue(),

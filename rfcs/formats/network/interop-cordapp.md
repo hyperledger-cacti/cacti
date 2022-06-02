@@ -5,7 +5,7 @@
  -->
 # Interoperation CorDapp API
 
-- RFC: 03-018
+- RFC: 03-017
 - Authors: Venkatraman Ramakrishna, Krishnasuri Narayanam, Sandeep Nishad, Dhinakaran Vinayagamurthy
 - Status: Proposed
 - Since: 02-Apr-2022

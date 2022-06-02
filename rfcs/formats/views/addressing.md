@@ -100,9 +100,9 @@ name = *HEXDIGIT ; hex-encoded ASCII string
 Because the function-spec and input-argument are allowed to contain special characters, the specification of the view-segment requires them to be hex-encoded.
 
 For a given DLT, we can be more specific about the definition of the view-segment, using knowledge of the ledger structure and smart contract interface. See the following links for details on how viewi-segment identifiers are constructed for the three DLTs that Weaver presently supports:
-* [Fabric View Address Encoding](./views-fabric.md)
-* [Corda View Address Encoding](./views-corda.md)
-* [Ethereum View Address Encoding](./views-ethereum.md)
+* [Fabric View Address Encoding](./fabric.md)
+* [Corda View Address Encoding](./corda.md)
+* [Ethereum View Address Encoding](./ethereum.md)
 The general specification of a view-segment is a non-blank alphanumeric string with optional separators (the list below in the below specification is suggestive and not exchaustive).
 
 ### Examples

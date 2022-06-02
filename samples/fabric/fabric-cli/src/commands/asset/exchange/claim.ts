@@ -39,7 +39,7 @@ const command: GluegunCommand = {
           {
             name: '--hash_fn',
             description:
-              'hash function to be used for HTLC. Supported: SHA256. (Optional: Default: SHA256)'
+              'hash function to be used for HTLC. Supported: SHA256, SHA512. (Optional: Default: SHA256)'
           },
           {
             name: '--secret',
@@ -105,8 +105,8 @@ const command: GluegunCommand = {
     }
     // Hash
     let hash: HashFunctions.Hash
-    if(options['hash_fn'] == 'SHA256') {
-        hash = new HashFunctions.SHA256()
+    if(options['hash_fn'] == 'SHA512') {
+        hash = new HashFunctions.SHA512()
     } else {
         hash = new HashFunctions.SHA256()
     }

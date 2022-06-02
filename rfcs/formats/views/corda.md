@@ -166,7 +166,7 @@ AliceNode;BobNode#QueryBillOfLadingByPurchaseOrderNumber:PO12345678
 
 The `view` returned from a Corda network in response to a request from an
 external network is represented as metadata and data, as described in the [view
-definition](/models/views.md#view-definition).
+definition](./definition.md).
 
 For the initial implementation of the interoperability CorDapp, the default proof
 returned by the Corda network will be notarization, and the default
