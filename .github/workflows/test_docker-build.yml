@@ -85,7 +85,7 @@ jobs:
         
       - name: Build Image (Local)
         run: make image-local
-        working-directory: core/drivers/fabric-driver
+        working-directory: core/drivers/corda-driver
           
   corda-driver-packages:
     runs-on: ubuntu-latest
