@@ -29,7 +29,7 @@ jobs:
     - name: Test
       run: go test -v ./...
       working-directory: core/network/fabric-interop-cc/contracts/interop
-      
+
   test_assetmgmt:
     # if: ${{ false }}  # disable
     runs-on: ubuntu-latest
