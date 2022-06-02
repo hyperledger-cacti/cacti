@@ -35,10 +35,6 @@ jobs:
           cat github.properties
         working-directory: common/protos-java-kt
         
-      - name: Build
-        run: make build
-        working-directory: common/protos-java-kt
-        
       - name: Publish
         run: make publish
         working-directory: common/protos-java-kt

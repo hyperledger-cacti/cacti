@@ -8,9 +8,9 @@ WORKDIR /fabric-driver
 ADD protos-js /fabric-driver/protos-js
 
 # Remote build
-FROM node:14 AS builder-remote
+# FROM node:14 AS builder-remote
 
-WORKDIR /fabric-driver
+# WORKDIR /fabric-driver
 
 # Common Build for both
 FROM builder-${BUILD_TAG} AS prod
