@@ -105,11 +105,11 @@ jobs:
           echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.main.properties
           echo "url=https://maven.pkg.github.com/hyperledger-labs/weaver-dlt-interoperability" >> github.main.properties
           
-          ./scripts/get-cordapps.sh || mv github.main.properties github.properties
+          make build || mv github.main.properties github.properties
+          make clean
           
           cat github.properties
-          mv github.properties ../../../core/drivers/corda-driver/
-        working-directory: tests/network-setups/corda
+        working-directory: tcore/drivers/corda-driver
         
       - name: Build Image
         run: make image
