@@ -30,7 +30,7 @@ router.get(
   "/api/v1/bl/logics/",
   (req: Request, res: Response, next: NextFunction) => {
     try {
-      res.send("Not Implemented (Show Business Logics)\n");
+      res.render("Not Implemented (Show Business Logics)\n");
     } catch (err) {
       next(err);
     }
@@ -42,7 +42,7 @@ router.get(
   "/api/v1/bl/logics/:id",
   (req: Request, res: Response, next: NextFunction) => {
     try {
-      res.send(
+      res.render(
         "Not Implemented (Show Specification of Business Logic" +
           ", id=" +
           escapeHtml(req.params.id) +
@@ -59,7 +59,7 @@ router.post(
   "/api/v1/bl/wallets/",
   (req: Request, res: Response, next: NextFunction) => {
     try {
-      res.send("Not Implemented (Register a Wallet)\n");
+      res.render("Not Implemented (Register a Wallet)\n");
     } catch (err) {
       next(err);
     }
@@ -71,7 +71,7 @@ router.get(
   "/api/v1/bl/wallets/",
   (req: Request, res: Response, next: NextFunction) => {
     try {
-      res.send("Not Implemented (Show Wallet List)\n");
+      res.render("Not Implemented (Show Wallet List)\n");
     } catch (err) {
       next(err);
     }
@@ -83,7 +83,7 @@ router.put(
   "/api/v1/bl/wallets/:id",
   (req: Request, res: Response, next: NextFunction) => {
     try {
-      res.send(
+      res.render(
         "Not Implemented (Update Existing Wallets" +
           ", id=" +
           escapeHtml(req.params.id) +
