@@ -72,7 +72,7 @@ describe("AssetManager", () => {
         let amcStub;
 
         beforeEach(() => {
-            amcStub = sinon.stub(amc, "submitTransaction").resolves("");
+            amcStub = sinon.stub(amc, "submitTransaction").resolves(false);
         });
 
         it("asset lock fails with invalid parameters", async () => {
@@ -109,7 +109,6 @@ describe("AssetManager", () => {
             const hashValue = "abcdef123456"
             const hash = new hashFunctions.SHA256()
             hash.setSerializedHashBase64(hashValue)
-            const contractId = "CONTRACT-1234";
             let expiryTimeSecs = Math.floor(Date.now()/1000) + 300;   // Convert epoch milliseconds to seconds and add 5 minutes
             let lockInfoStr = assetManager.createAssetLockInfoSerialized(hash, expiryTimeSecs);
             amcStub.withArgs("LockAsset", assetAgreementStr, lockInfoStr).resolves(true);
