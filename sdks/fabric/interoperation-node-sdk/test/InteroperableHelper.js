@@ -29,13 +29,17 @@ const {
     getPolicyCriteriaForAddress,
     getSignatoryNodeFromCertificate,
     invokeHandler,
+    interopFlow
 } = require("../src/InteroperableHelper");
 const { deserializeRemoteProposalResponseBase64, serializeRemoteProposalResponse } = require("../src/decoders");
+import { Relay } from "../src/Relay";
+import statePb from "@hyperledger-labs/weaver-protos-js/common/state_pb";
 
 describe("InteroperableHelper", () => {
     const mspId = "mspId";
     const foreignNetworkId = "foreignNetworkId";
     const userName = "user_name";
+    const localRelayEndpoint = "localhost:9081";
 
     let wallet;
     let interopcc;
@@ -222,7 +226,7 @@ describe("InteroperableHelper", () => {
             const vpJSON = {
                 securityDomain: "network1",
                 identifiers: [
-                    { pattern: "mychannel:simplestate:Read*", policy: { type: "Signature", criteria: ["Org1MSP"] } },
+                    { pattern: "mychannel:simplestate:Read:*", policy: { type: "Signature", criteria: ["Org1MSP"] } },
                     { pattern: "notmatching", policy: { type: "Signature", criteria: ["NotMatching"] } },
                 ],
                 viewPatterns: [],
@@ -230,6 +234,7 @@ describe("InteroperableHelper", () => {
             const vpResult = JSON.stringify(vpJSON);
             const interopccStub = sinon.stub(interopcc, "evaluateTransaction").resolves(vpResult);
             interopccStub.withArgs("GetVerificationPolicyBySecurityDomain", "network1").resolves(vpResult);
+            interopccStub.withArgs("GetVerificationPolicyBySecurityDomain", "network2").resolves("");
         });
 
         it("validate policy syntax and attributes", async () => {
@@ -240,6 +245,24 @@ describe("InteroperableHelper", () => {
             expect(policyJSON).to.be.an("array");
             expect(policyJSON.length).to.equal(1);
             expect(policyJSON[0]).to.be.equal("Org1MSP");
+        });
+        it("fail to match verificationPolicy", async () => {
+            // no match found
+            let policyJSON = await getPolicyCriteriaForAddress(
+                interopcc,
+                "localhost:9080/network1/mychannel:simplestate:ReadWrong:Arcturus",
+            );
+            expect(policyJSON).to.equal(null);
+            
+            // no policy found
+            try {
+                policyJSON = await getPolicyCriteriaForAddress(
+                    interopcc,
+                    "localhost:9080/network2/mychannel:simplestate:ReadWrong:Arcturus",
+                );
+            } catch(error) {
+                expect(error.toString()).to.equal('Error: Error during getPolicyCriteriaForAddress: Error: No verification policy for address localhost:9080/network2/mychannel:simplestate:ReadWrong:Arcturus');
+            }
         });
     });
 
@@ -298,6 +321,207 @@ describe("InteroperableHelper", () => {
             );
             expect(invokeHandlerResponse).to.be.a("boolean");
             expect(invokeHandlerResponse).to.equal(true);
+        });
+    });
+    
+    describe("test interopFlow", () => {
+        const appId = "simplestate";
+        const channel = "mychannel";
+        const appFn = "Write";
+        const appArgs = ["w", "value", "", ""];
+        const argsIndices = [2, 3];
+        const viewAddresses = ["localhost:9080/network1/mychannel:simplestate:Read:Arcturus",
+            "localhost:9080/network1/mychannel:simplestate:Read:Betelguese:1"];
+            
+        const meta = new statePb.Meta()
+        meta.setProtocol(statePb.Meta.Protocol.FABRIC)
+        meta.setTimestamp(new Date().toISOString())
+        meta.setProofType('Notarization');
+        meta.setSerializationFormat('STRING');
+        
+        const view1 = new statePb.View();
+        view1.setMeta(meta);
+        view1.setData(Buffer.from('1'));
+        const relayResponse1 = new statePb.RequestState();
+        relayResponse1.setRequestId("ABC-123")
+        relayResponse1.setStatus(statePb.RequestState.COMPLETED)
+        relayResponse1.setView(view1)
+        
+        const view2 = new statePb.View();
+        view2.setMeta(meta);
+        view2.setData(Buffer.from('2'));
+        const relayResponse2 = new statePb.RequestState();
+        relayResponse2.setRequestId("ABC-124")
+        relayResponse2.setStatus(statePb.RequestState.COMPLETED)
+        relayResponse2.setView(view2)
+        
+        const views64 = [Buffer.from(view1.serializeBinary()).toString("base64"), 
+            Buffer.from(view2.serializeBinary()).toString("base64")]
+        
+        beforeEach(() => {
+            const vpJSON = {
+                securityDomain: "network1",
+                identifiers: [
+                    { pattern: "mychannel:simplestate:Read:*", policy: { type: "Signature", criteria: ["Org1MSP"] } }
+                ],
+                viewPatterns: [],
+            };
+            const interopccStub = sinon.stub(interopcc, "submitTransaction").resolves(false);
+            // interopccStub.withArgs("Write", "w", "value").resolves(true);
+            interopccStub
+                .withArgs(
+                    "WriteExternalState",
+                    appId,
+                    channel,
+                    appFn,
+                    JSON.stringify(appArgs),
+                    JSON.stringify(argsIndices),
+                    JSON.stringify(viewAddresses),
+                    JSON.stringify(views64),
+                    JSON.stringify(["", ""])
+                ).resolves(true);
+            
+            const vpResult = JSON.stringify(vpJSON);
+            const interopccStub2 = sinon.stub(interopcc, "evaluateTransaction").rejects("interopcc error");
+            interopccStub2.withArgs("GetVerificationPolicyBySecurityDomain", "network1").resolves(vpResult);
+            interopccStub2.withArgs("VerifyView", views64[0], viewAddresses[0]).resolves(true);
+            interopccStub2.withArgs("VerifyView", views64[1], viewAddresses[1]).resolves(true);
+            
+            //Relay Stub response
+            // const relayStub = sinon.stub(relaySDK, "ProcessRequest")
+            const relayStub = sinon.stub(Relay.prototype, "ProcessRequest")
+            relayStub.onCall(1).resolves(relayResponse2)
+            relayStub.onCall(2).rejects(new Error("relay error"))
+            relayStub.resolves(relayResponse1)
+        });
+
+        
+        it("successful data sharing query", async () => {
+            const invokeObject = {
+                channel: channel,
+                ccFunc: appFn,
+                ccArgs: appArgs,
+                contractName: appId
+            };
+            const remoteJSON1 = {
+                address: viewAddresses[0],
+                Sign: true
+            }
+            const remoteJSON2 = {
+                ChaincodeFunc: "Read",
+                ChaincodeID: "simplestate",
+                ChannelID: "mychannel",
+                RemoteEndpoint: "localhost:9080",
+                NetworkID: "network1",
+                Sign: true,
+                ccArgs: ["Betelguese", "1"]
+            }
+            const keyCert = await getKeyAndCertForRemoteRequestbyUserName(wallet, userName);
+            const interopResponse = await interopFlow(
+                interopcc,
+                "network-id",
+                invokeObject,
+                "org",
+                localRelayEndpoint,
+                argsIndices,
+                [remoteJSON1, remoteJSON2],
+                keyCert
+            );
+            expect(interopResponse).to.be.an('object').that.has.all.keys('views', 'result');
+            expect(interopResponse.views).to.be.an('array');
+            expect(interopResponse.views).to.have.lengthOf(viewAddresses.length);
+            expect(interopResponse.views[0]).to.equal(view1);
+            expect(interopResponse.views[1]).to.equal(view2);
+            expect(interopResponse.result).to.be.a('boolean');
+            expect(interopResponse.result).to.equal(true);
+        });
+        
+        it("fail data sharing query: relay error", async () => {
+            const invokeObject = {
+                channel: channel,
+                ccFunc: appFn,
+                ccArgs: appArgs,
+                contractName: appId
+            };
+            const remoteJSON = {
+                address: viewAddresses[0],
+                Sign: true
+            }
+            const keyCert = await getKeyAndCertForRemoteRequestbyUserName(wallet, userName);
+            try {
+                const interopResponse = await interopFlow(
+                    interopcc,
+                    "network-id",
+                    invokeObject,
+                    "org",
+                    localRelayEndpoint,
+                    [0],
+                    [remoteJSON],
+                    keyCert
+                );
+            } catch (error) {
+                const expectedErrMsg = 'Error: InteropFlow remote view request error: Error: InteropFlow relay response error: Error: relay error'
+                expect(error.toString()).to.equal(expectedErrMsg)
+            }
+        });
+        
+        it("fail data sharing query: view verification error", async () => {
+            const invokeObject = {
+                channel: channel,
+                ccFunc: appFn,
+                ccArgs: appArgs,
+                contractName: appId
+            };
+            const remoteJSON = {
+                address: "localhost:9080/network1/mychannel:simplestate:ReadWrong:Arcturus",
+                Sign: true
+            }
+            const keyCert = await getKeyAndCertForRemoteRequestbyUserName(wallet, userName);
+            try {
+                const interopResponse = await interopFlow(
+                    interopcc,
+                    "network-id",
+                    invokeObject,
+                    "org",
+                    localRelayEndpoint,
+                    [0],
+                    [remoteJSON],
+                    keyCert
+                );
+            } catch (error) {
+                const expectedErrMsg = 'Error: InteropFlow remote view request error: Error: View verification failed Error: Unable to verify view: interopcc error'
+                expect(error.toString()).to.equal(expectedErrMsg)
+            }
+        });
+        
+        it("fail data sharing query: write external state error", async () => {
+            const invokeObject = {
+                channel: channel,
+                ccFunc: appFn,
+                ccArgs: appArgs,
+                contractName: appId
+            };
+            const remoteJSON = {
+                address: "localhost:9080/network1/mychannel:simplestate:Read:Arcturus",
+                Sign: true
+            }
+            const keyCert = await getKeyAndCertForRemoteRequestbyUserName(wallet, userName);
+            const interopResponse = await interopFlow(
+                interopcc,
+                "network-id",
+                invokeObject,
+                "org",
+                localRelayEndpoint,
+                [0],
+                [remoteJSON],
+                keyCert
+            );
+            expect(interopResponse).to.be.an('object').that.has.all.keys('views', 'result');
+            expect(interopResponse.views).to.be.an('array');
+            expect(interopResponse.views).to.have.lengthOf(1);
+            expect(interopResponse.views[0]).to.equal(view1);
+            expect(interopResponse.result).to.be.a('boolean');
+            expect(interopResponse.result).to.equal(false);
         });
     });
 });

@@ -427,8 +427,8 @@ const interopFlow = async (
         views.push(requestResponse.view);
         viewsSerializedBase64.push(Buffer.from(requestResponse.view.serializeBinary()).toString("base64"));
         computedAddresses.push(requestResponse.address);
-        const respData = getResponseDataFromView(requestResponse.view, keyCert.key.toBytes());
-        if (respData.contents) {
+        if (confidential) {
+            const respData = getResponseDataFromView(requestResponse.view, keyCert.key.toBytes());
             viewContentsBase64.push(respData.contents.toString("base64"));
         } else {
             viewContentsBase64.push("");
