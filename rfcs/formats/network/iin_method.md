@@ -149,7 +149,7 @@ Example NetworkDID creation request:
     "authentication": [
       "did:iin:<iin_name>:<network_name>#multisig"
     ],
-    "relayEndpoints": [{
+    "networkGatewayEndpoints": [{
         "hostname": "10.0.0.8",
         "port": "8888"
       },
@@ -169,32 +169,34 @@ Example NetworkDID creation request:
 
 ```
 
-How this request is created is out of the scopt of this specification. However, generally it is recommended that the signatures of the request are collected through a smart contract in the network blockchain itself.
+`networkGatewayEndpoints` refer to the address of [relays](../../models/infrastructure/relays.md) which are the components facilatiting communication across DLT networks.
+
+How this request is created is beyond the scope of this specification. However, generally it is recommended that the signatures of the request are collected through a smart contract in the network blockchain itself. 
 
 #####  Validation of Network DID creation request by the IIN
 
-The DID create method of the IIN registry must authenticate the a Network DID creation request differently from other DIDs. For a Network DID, the IIN first validates if the DID Document has the requisite properties: `networkParticipants`, and a verificationMethod of type `GroupMultiSig`. Additionally, the request must contain the signatures from all participants of the network authenticating it.
+The DID "create" method of the IIN registry must authenticate a Network DID creation request differently from other DIDs. The IIN first validates if the DID Document has the `networkParticipants` property and the `verificationMethod` property of value `GroupMultiSig`. Additionally, the request must contain the signatures from all the network participants.
 
-The authentication process is carried out by validating signature from each participant in the `networkParticipants` as follows:
+The authentication process is carried out by validating the signature from each participant in the `networkParticipants` as follows:
 
 1. The participant DID is obtained from `networkParticipants`.
    - Example: `did:iin:<iin_name>:<network_participant_1>`
-2. From the `GroupMultiSig` verification, which verification method for the participant will be used is determined.
+2. From the `GroupMultiSig` verification method, which verification method for the participant will be used is determined from the `multisigKeys` property.
    - Example: `did:iin:<iin_name>:<network_participant_1>#key1` indicates that key1 will be used which is specified by the fragment at the end of the URI.
-3. The DID Document of the participant is obtained by resolving the DID, and the required verification method is obtained.
+3. The DID Document of the participant is obtained by resolving the DID from the DID registry. It is to be noted that the participant DID may be registered in a different registry from the Network DID. The participant DID document resolution protocol is based on the did method of the concerned participant DID. The required verification method of the participant is then obtained from the DID document of the participant.
    - Example:
    ```json
     {​
       "id": "did:iin:<iin_name>:<network_participant_1>",​
-      ...​
+      //...​
       "verificationMethod": [
         {
           "id": "did:iin:<iin_name>:<network_participant_1>#key1",
           "type": "Bls12381G2Key2020",
           "controller": "did:iin:<iin_name>:<network_participant_1>",
-          "publicKeyBase58": "25ETdUZDVnME6yYuAMjFRCnCPcDmYQcoZDcZuXAfeMhXPvjZg35QmZ7uctBcovA69YDM3Jf7s5BHo4u1y89nY6mHiji8yphZ4AMm4iNCRh35edSg76Dkasu3MY2VS9LnuaVQ",
+          "publicKeyBase58": "25ETdUZDVnME6yYuAMjFRCnCPcDmYQcoZDcZuXAfeMhXPvjZg35QmZ7uctBcovA69YDM3Jf7s5BHo4u1y89nY6mHiji8yphZ4AMm4iNCRh35edSg76Dkasu3MY2VS9LnuaVQ"
 
-        }]
+        }],
     "assertionMethod": ["did:example:org1#key1"],
     "authentication": ["did:example:org1#key2"]​
     }​
@@ -205,13 +207,11 @@ The authentication process is carried out by validating signature from each part
 
 Once each participant's signature is validated, the Network DID is registered in the IIN registry.
 
-Since the IIN registry is a decentralized registry, the validation of a Network DID creation request is carried out by multiple peers so that consensus is reached, and the DID is committed in the registry.
+Since the IIN registry is a decentralized registry, the validation of a Network DID creation request is carried out by multiple peers so that consensus is reached before the DID is committed in the registry.
 
 ### Read
 
-
-
-Given the DID in the format `did:iin:<iin_name>:<network_name>` or `did:iin:<iin_name>:<participant_name>` (example `did:iinindy:tradelens`), the corresponding DID Document can be resolved.
+Given a DID in the format `did:iin:<iin_name>:<network_name>` or `did:iin:<iin_name>:<participant_name>` (example `did:iinindy:tradelens`), the corresponding DID Document can be resolved.
 
 Example Read request:
 
@@ -225,7 +225,7 @@ Example Read request:
 
 ### Update
 
-#### Preparing Network DID updation request
+#### Preparing a Network DID updation request
 
 Updating a Network DID requires the request to be authenticated against the `GroupMultiSig` verification method's `updatePolicy`.
 
