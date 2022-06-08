@@ -171,7 +171,7 @@ Example NetworkDID creation request:
 
 `networkGatewayEndpoints` refer to the address of [relays](../../models/infrastructure/relays.md) which are the components facilatiting communication across DLT networks.
 
-How this request is created is beyond the scope of this specification. However, generally it is recommended that the signatures of the request are collected through a smart contract in the network blockchain itself. 
+How this request is created is beyond the scope of this specification. The signatures of the requesters can potentially be collected and aggregated through smart contracts on the blockchain maintained by the network. 
 
 #####  Validation of Network DID creation request by the IIN
 
@@ -202,7 +202,7 @@ The authentication process is carried out by validating the signature from each 
     }​
    ```
 
-4. From `singatures` in Network DID creation request, the participant is validated with the help of the verificationMethod obtained in the previous step.
+4. From `signatures` in Network DID creation request, the participant is validated with the help of the verificationMethod property determined in the previous step.
 
 
 Once each participant's signature is validated, the Network DID is registered in the IIN registry.
