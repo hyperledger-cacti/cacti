@@ -236,12 +236,14 @@ The updation request can be made by IIN agent of any participant of the network.
 #### Validation of a Network DID updation request by the IIN
 
 The IIN registry authenticates a Network DID updation request based on two conditions:
-(1) The signatures must  satisfy the `updatePolicy` in the `GroupMultiSig` verification method of the existing Network DID document.
+(1) The signatures must satisfy the `updatePolicy` in the `GroupMultiSig` verification method of the existing Network DID document.
+(2) The request must be attested by any new participant included in the `networkParticipants` list which is not present in the existing Network DID document.
+
 
 
 ### Delete
 
-A Delete request only requires the DID and is authenticated in the same way as an Update request.
+A "Delete" request only requires the DID and is authenticated in the same way as an "Update" request.
 
 
 ```json
