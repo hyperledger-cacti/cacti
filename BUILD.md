@@ -1,91 +1,84 @@
-# Hyperledger Cactus Build Instructions
+### Cactus BUILD instruction
 
-This is the place to start if you want to give Cactus a spin on your local
-machine or if you are planning on contributing.
+#### Installing Git
+Git is a tool for version control that you will need to build and maintain Hyperledger Cactus from source. To install Git on a Debian-based Linux system, you should run the following command.
 
-> This is not a guide for `using` Cactus for your projects that have business logic
-> but rather a guide for people who want to make changes to the code of Cactus.
-> If you are just planning on using Cactus as an npm dependency for your project,
-> then you might not need this guide at all.
+```shell
+sudo apt install git-all
+```
 
-The project uses Typescript for both back-end and front-end components.
+Installation methods for other systems can be found [here](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
 
-## Developers guide
+#### Installing Docker
+ 
+Docker is a tool for containerization of softwares. It helps ship software and mitigates compatibility issues. To install Docker, please follow the installation guide provided [here](https://docs.docker.com/engine/install/).
 
-This is a video guide to setup Hyperledger Cactus on your local machine.
+To install Docker on Debian, one would follow the following steps.
 
-### Installing git
+```shell=
+### Uninstall old Docker versions
+sudo apt-get remove docker docker-engine docker.io containerd runc
 
-[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/RJhifrmSiNA/0.jpg)](https://www.youtube.com/watch?v=RJhifrmSiNA)
+### Setup your repositories
+sudo apt-get update
+sudo apt-get install \
+    ca-certificates \
+    curl \
+    gnupg \
+    lsb-release
+    
+### Add Docker's GPG keys
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \ $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+  
+### Install the Docker Engine
+sudo apt-get update
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
 
-### Installing and configuring docker
+### Check that the package has been correctly installed
+sudo docker run hello-world
 
-[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/V8YBQoxdyiE/0.jpg)](https://www.youtube.com/watch?v=V8YBQoxdyiE)
+```
 
-### Installing npm and node
+#### Installing NPM and Node
 
-[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/94xoV9Vfu14/0.jpg)](https://www.youtube.com/watch?v=94xoV9Vfu14)
+NPM is Node Package Manager and essential to building Cactus. There are many different methods of installing Node depending on your system and thus it is recommended you follow the guide provided [here](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm).
 
-### Installing jdk 8
+```
+sudo apt-get update
+sudo apt install nodejs
+sudo apt install npm
+```
 
-[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/V8YBQoxdyiE/0.jpg)](https://youtube.com/watch?v=t4y57Qvrdcc)
+#### Installing JDK 8
 
-### Installing VSCode and plugins
+```
+sudo apt-get update
+sudo apt-get install openjdk-8-jdk
 
-[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/RHQLhZRlAR0/0.jpg)](https://www.youtube.com/watch?v=RHQLhZRlAR0)
+### Check the version of Java
+java -version
 
-### Clone the repository
+### If you're using bash, you may need to set this in your bashrc file
+export JAVA_HOME=<path_to_java_home>
+```
 
-[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/n_HiEwgzPsM/0.jpg)](https://www.youtube.com/watch?v=n_HiEwgzPsM)
+#### Installing VS Code 
 
-### Compiling all packages
+You can download and install VS Code from [here](https://code.visualstudio.com/download). It is suggested to install the git-graph and Docker plugins. 
 
-[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/5v82MAHPQmM/0.jpg)](https://www.youtube.com/watch?v=5v82MAHPQmM)
+#### Clone and compile the Cactus repository 🌵
 
-### Testing all packages
+```
+git clone https://github.com/hyperledger/cactus
+npm install
+npm run configure
 
-[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/mVuk8txh-JE/0.jpg)](https://www.youtube.com/watch?v=mVuk8txh-JE)
-
-### Compiling a specific packages
-
-[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/e7vkd9i-I4c/0.jpg)](https://www.youtube.com/watch?v=e7vkd9i-I4c)
-
-### Testing a specific package
-
-[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/Jzw9JQZu6c8/0.jpg)](https://www.youtube.com/watch?v=Jzw9JQZu6c8)
-
-### Package structure - OpenAPI
-
-[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/5uuRTc3X4MM/0.jpg)](https://www.youtube.com/watch?v=5uuRTc3X4MM)
-
-### Package structure - Web Services
-
-[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/DAML56rx5yQ/0.jpg)](https://www.youtube.com/watch?v=DAML56rx5yQ)
-
-### Package structure - Main and Factory Plugin class
-
-[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/w0bmkpge2Dw/0.jpg)](https://www.youtube.com/watch?v=w0bmkpge2Dw)
-
-### Package structure - Test class
-
-[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/3XpBYhN-8qs/0.jpg)](https://www.youtube.com/watch?v=3XpBYhN-8qs)
-
-## Fast Developer Flow / Code Iterations
-
-We put a lot of thought and effort into making sure that fast developer iterations can be
-achieved (please file a bug if you feel otherwise) while working **on** the framework.
-
-If you find yourself waiting too much for builds to finish, most of the time
-that can be helped by using the `npm run watch` script which can automatically
-recompile packages as you modify them (and only the packages that you have
-modified, not everything).
-
-It also supports re-running the OpenAPI generator when you update any
-`openapi.json` spec files that we use to describe our endpoints.
-
-The `npm run watch` script in action:
-
-![Fast Developer Flow / Code Iterations](./docs/hyperledger-cactus-watch-script-tutorial-2021-03-06.gif)
+### To test all your packages, you can run
+npm run test:all
+```
 
 ## Getting Started
 
