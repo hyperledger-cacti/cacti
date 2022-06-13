@@ -1,5 +1,7 @@
 ### Cactus BUILD instruction
 
+`apt` is available on Debian and its downstream distros. Windows and Mac installation instructions are provided below. Alternatively, you can use `choco` on Windows and `brew` on MacOS (although they aren't as maintained as `apt`).
+
 #### Installing Git
 Git is a tool for version control that you will need to build and maintain Hyperledger Cactus from source. To install Git on a Debian-based Linux system, you should run the following command.
 
@@ -42,28 +44,29 @@ sudo docker run hello-world
 
 ```
 
-#### Installing NPM and Node
-
-NPM is Node Package Manager and essential to building Cactus. There are many different methods of installing Node depending on your system and thus it is recommended you follow the guide provided [here](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm).
+#### Installing nvm, nodejs and yarn
 
 ```
-sudo apt-get update
-sudo apt install nodejs
-sudo apt install npm
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+nvm install --lts
+
+curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+sudo apt update && sudo apt install yarn
 ```
 
-#### Installing JDK 8
+#### Installing JDK 11
 
 ```
-sudo apt-get update
-sudo apt-get install openjdk-8-jdk
-
-### Check the version of Java
+sudo apt-get update && sudo apt-get upgrade
+sudo apt-get install openjdk-11-jdk
 java -version
 
 ### If you're using bash, you may need to set this in your bashrc file
 export JAVA_HOME=<path_to_java_home>
 ```
+
+For Windows, you can follow the guide provided [here](https://docs.oracle.com/en/java/javase/11/install/installation-jdk-microsoft-windows-platforms.html#GUID-371F38CC-248F-49EC-BB9C-C37FC89E52A0). For MacOS, you can follow the instructions [here](https://docs.oracle.com/en/java/javase/11/install/installation-jdk-macos.html#GUID-F575EB4A-70D3-4AB4-A20E-DBE95171AB5F).
 
 #### Installing VS Code 
 
@@ -73,11 +76,11 @@ You can download and install VS Code from [here](https://code.visualstudio.com/d
 
 ```
 git clone https://github.com/hyperledger/cactus
-npm install
-npm run configure
+yarn add
+yarn configure
 
 ### To test all your packages, you can run
-npm run test:all
+yarn test:all
 ```
 
 ## Getting Started
