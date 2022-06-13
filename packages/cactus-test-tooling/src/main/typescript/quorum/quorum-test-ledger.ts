@@ -106,14 +106,16 @@ export class QuorumTestLedger implements ITestLedger {
   }
 
   public async getFileContents(filePath: string): Promise<string> {
-    const response: any = await this.getContainer().getArchive({
-      path: filePath,
-    });
+    const response: NodeJS.ReadableStream = await this.getContainer().getArchive(
+      {
+        path: filePath,
+      },
+    );
     const extract: tar.Extract = tar.extract({ autoDestroy: true });
 
     return new Promise((resolve, reject) => {
       let fileContents = "";
-      extract.on("entry", async (header: any, stream, next) => {
+      extract.on("entry", async (header: unknown, stream, next) => {
         stream.on("error", (err: Error) => {
           reject(err);
         });
