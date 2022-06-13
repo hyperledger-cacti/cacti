@@ -2,6 +2,10 @@
 
 `apt` is available on Debian and its downstream distros. Windows and Mac installation instructions are provided below. Alternatively, you can use `choco` on Windows and `brew` on MacOS (although they aren't as maintained as `apt`).
 
+This is the place to start if you want to give Cactus a spin on your local machine or if you are planning on contributing.
+
+This is not a guide for `using` Cactus for your projects that have business logic but rather a guide for people who want to make changes to the code of Cactus. If you are just planning on using Cactus as an npm dependency for your project, then you might not need this guide at all.
+ 
 #### Installing Git
 Git is a tool for version control that you will need to build and maintain Hyperledger Cactus from source. To install Git on a Debian-based Linux system, you should run the following command.
 
