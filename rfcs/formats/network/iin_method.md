@@ -231,7 +231,7 @@ Updating a Network DID requires the request to be authenticated against the `Gro
 
 Similar to the Network DID creation request, the updation request has a NetworkDIDDocument and signatures. NetworkDIDDocument contains the updated Network DID document and signatures is a set of signatures satisfying the  `updatePolicy` in the `GroupMultiSig` verification method of the existing DID document, as well as the `networkParticipants`.
 
-The updation request can be made by IIN agent of any participant of the network.
+The updation request can be made by an IIN agent of any participant of the network.
 
 #### Validation of a Network DID updation request by the IIN
 
