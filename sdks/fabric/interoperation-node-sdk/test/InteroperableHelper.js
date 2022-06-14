@@ -333,9 +333,9 @@ describe("InteroperableHelper", () => {
         const viewAddresses = ["localhost:9080/network1/mychannel:simplestate:Read:Arcturus",
             "localhost:9080/network1/mychannel:simplestate:Read:Betelguese:1"];
             
-        const meta = new statePb.Meta()
-        meta.setProtocol(statePb.Meta.Protocol.FABRIC)
-        meta.setTimestamp(new Date().toISOString())
+        const meta = new statePb.Meta();
+        meta.setProtocol(statePb.Meta.Protocol.FABRIC);
+        meta.setTimestamp(new Date().toISOString());
         meta.setProofType('Notarization');
         meta.setSerializationFormat('STRING');
         
@@ -343,17 +343,17 @@ describe("InteroperableHelper", () => {
         view1.setMeta(meta);
         view1.setData(Buffer.from('1'));
         const relayResponse1 = new statePb.RequestState();
-        relayResponse1.setRequestId("ABC-123")
-        relayResponse1.setStatus(statePb.RequestState.COMPLETED)
-        relayResponse1.setView(view1)
+        relayResponse1.setRequestId("ABC-123");
+        relayResponse1.setStatus(statePb.RequestState.COMPLETED);
+        relayResponse1.setView(view1);
         
         const view2 = new statePb.View();
         view2.setMeta(meta);
         view2.setData(Buffer.from('2'));
         const relayResponse2 = new statePb.RequestState();
-        relayResponse2.setRequestId("ABC-124")
-        relayResponse2.setStatus(statePb.RequestState.COMPLETED)
-        relayResponse2.setView(view2)
+        relayResponse2.setRequestId("ABC-124");
+        relayResponse2.setStatus(statePb.RequestState.COMPLETED);
+        relayResponse2.setView(view2);
         
         const views64 = [Buffer.from(view1.serializeBinary()).toString("base64"), 
             Buffer.from(view2.serializeBinary()).toString("base64")]
