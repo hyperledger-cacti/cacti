@@ -5,7 +5,7 @@
  -->
 # DID Method for DLT Networks
 
-- RFC: 03-021
+- RFC: 03-020
 - Authors: Bishakh Chandra Ghosh, Venkatraman Ramakrishna, Krishnasuri Narayanam, Ermyas Abebe
 - Status: Proposed
 - Since: 10-March-2022
