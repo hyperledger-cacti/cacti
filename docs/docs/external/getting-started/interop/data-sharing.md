@@ -11,7 +11,7 @@ pagination_next: external/getting-started/enabling-weaver-network/overview
  SPDX-License-Identifier: CC-BY-4.0
  -->
 
-This document lists sample ways in which you can exercise the data-sharing interoperation protocol on the test network [launched earlier](../test-network/overview.md).
+This document lists sample ways in which you can exercise the data-sharing interoperation protocol on the test network [launched earlier](external/getting-started/test-network/overview.md).
 
 Once the networks, relays, and drivers have been launched, and the ledgers bootstrapped, you can trigger four different interoperation flows corresponding to distinct data-sharing combinations as follows:
 1. **Corda to Corda**: Either Corda network requests state and proof from another Corda network

@@ -11,7 +11,7 @@ pagination_next: external/getting-started/enabling-weaver-network/overview
  SPDX-License-Identifier: CC-BY-4.0
  -->
 
-This document lists sample ways in which you can exercise the asset-exchange interoperation protocol on the test network [launched earlier](../test-network/overview.md).
+This document lists sample ways in which you can exercise the asset-exchange interoperation protocol on the test network [launched earlier](external/getting-started/test-network/overview.md).
 
 For this scenario, you only need the networks to be running with the appropriate contracts deployed and the ledgers bootstrapped. You do not need to run relays and drivers. You can run the following combinations of exchanges (_other combinations of DLTs will be supported soon_).
 
