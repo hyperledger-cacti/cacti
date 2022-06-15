@@ -11,7 +11,7 @@ pagination_next: external/getting-started/enabling-weaver-network/overview
  SPDX-License-Identifier: CC-BY-4.0
  -->
 
-This document lists sample ways in which you can exercise the asset-transfer interoperation protocol on the test network [launched earlier](../test-network/overview).
+This document lists sample ways in which you can exercise the asset-transfer interoperation protocol on the test network [launched earlier](../test-network/overview.md).
 
 Once the networks, relays, and drivers have been launched, and the ledgers bootstrapped, you can trigger the following interoperation flows corresponding to distinct asset-sharing combinations _other combinations of DLTs will be supported soon_):
 ## 1. Fabric with Fabric
