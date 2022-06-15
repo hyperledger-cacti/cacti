@@ -114,7 +114,8 @@ describe("Relay", () => {
     });
     
     describe("#successful relay api calls", () => {
-        const relay = new Relay("localhost:19080");
+        const localRelayEndpoint = "localhost:19080"
+        const relay = new Relay(localRelayEndpoint);
         // Sample Request Id
         const requestId = "ABC-123"
         // Prepare Sample View
@@ -157,7 +158,7 @@ describe("Relay", () => {
                     callback(null, ack);
                 }
             });
-            relayServer.bindAsync('0.0.0.0:19080', grpc.ServerCredentials.createInsecure(), () => {
+            relayServer.bindAsync(localRelayEndpoint, grpc.ServerCredentials.createInsecure(), () => {
                 relayServer.start();
             });
         });
@@ -190,7 +191,8 @@ describe("Relay", () => {
         });
     });
     describe("#fail relay api calls 1", () => {
-        const relay = new Relay("localhost:19081");
+        const localRelayEndpoint = "localhost:19081"
+        const relay = new Relay(localRelayEndpoint);
         
         let relayServer;
         before(() => {
@@ -209,7 +211,7 @@ describe("Relay", () => {
                     callback(new Error("mock error"), null);
                 }
             });
-            relayServer.bindAsync('0.0.0.0:19081', grpc.ServerCredentials.createInsecure(), () => {
+            relayServer.bindAsync(localRelayEndpoint, grpc.ServerCredentials.createInsecure(), () => {
                 relayServer.start();
             });
         });
@@ -238,7 +240,8 @@ describe("Relay", () => {
             
     });
     describe("#fail relay api calls 2", () => {
-        const relay = new Relay("localhost:19082", 2000);
+        const localRelayEndpoint = "localhost:19082"
+        const relay = new Relay(localRelayEndpoint, 2000);
         const requestId = "ABC-123"
 
         const ack = {
@@ -271,7 +274,7 @@ describe("Relay", () => {
                     callback(null, ack);
                 }
             });
-            relayServer.bindAsync('0.0.0.0:19082', grpc.ServerCredentials.createInsecure(), () => {
+            relayServer.bindAsync(localRelayEndpoint, grpc.ServerCredentials.createInsecure(), () => {
                 relayServer.start();
             });
         });

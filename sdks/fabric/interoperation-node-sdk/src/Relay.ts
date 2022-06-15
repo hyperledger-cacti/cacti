@@ -145,11 +145,13 @@ class Relay {
             if (stateError) {
                 throw new Error(`State error: ${stateError}`);
             }
-            if (finalState.getStatus() === statePb.RequestState.STATUS.ERROR && finalState.getError()) {
-                throw new Error(`Error from view payload : ${finalState.getError()}`);
-            }
             if (finalState.getStatus() === statePb.RequestState.STATUS.ERROR) {
-                throw new Error(`Error from view payload : UNKNOWN REASON}`);
+                if (finalState.getError()) {
+                    throw new Error(`Error from view payload : ${finalState.getError()}`);
+                }
+                else {
+                    throw new Error(`Error from view payload : UNKNOWN REASON}`);
+                }
             }
             return finalState;
         } catch (e) {

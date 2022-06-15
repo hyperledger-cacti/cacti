@@ -40,6 +40,9 @@ describe("InteroperableHelper", () => {
     const foreignNetworkId = "foreignNetworkId";
     const userName = "user_name";
     const localRelayEndpoint = "localhost:9081";
+    const viewAddresses = ["localhost:9080/network1/mychannel:simplestate:Read:Arcturus",
+        "localhost:9080/network1/mychannel:simplestate:Read:Betelguese:1"];
+    const wrongViewAddress = "localhost:9080/network1/mychannel:simplestate:ReadWrong:Arcturus";
 
     let wallet;
     let interopcc;
@@ -240,7 +243,7 @@ describe("InteroperableHelper", () => {
         it("validate policy syntax and attributes", async () => {
             const policyJSON = await getPolicyCriteriaForAddress(
                 interopcc,
-                "localhost:9080/network1/mychannel:simplestate:Read:Arcturus",
+                viewAddresses[0],
             );
             expect(policyJSON).to.be.an("array");
             expect(policyJSON.length).to.equal(1);
@@ -250,7 +253,7 @@ describe("InteroperableHelper", () => {
             // no match found
             let policyJSON = await getPolicyCriteriaForAddress(
                 interopcc,
-                "localhost:9080/network1/mychannel:simplestate:ReadWrong:Arcturus",
+                wrongViewAddress,
             );
             expect(policyJSON).to.equal(null);
             
@@ -258,10 +261,10 @@ describe("InteroperableHelper", () => {
             try {
                 policyJSON = await getPolicyCriteriaForAddress(
                     interopcc,
-                    "localhost:9080/network2/mychannel:simplestate:ReadWrong:Arcturus",
+                    wrongViewAddress,
                 );
             } catch(error) {
-                expect(error.toString()).to.equal('Error: Error during getPolicyCriteriaForAddress: Error: No verification policy for address localhost:9080/network2/mychannel:simplestate:ReadWrong:Arcturus');
+                expect(error.toString()).to.equal('Error: Error during getPolicyCriteriaForAddress: Error: No verification policy for address ' + wrongViewAddress);
             }
         });
     });
@@ -295,7 +298,7 @@ describe("InteroperableHelper", () => {
                     "interop",
                     "mychannel",
                     "Write",
-                    JSON.stringify(["w"], "localhost:9080/network1/mychannel:simplestate:Read:Arcturus"),
+                    JSON.stringify(["w"], viewAddresses[0]),
                 )
                 .resolves(true);
             const vpResult = JSON.stringify(vpJSON);
@@ -330,8 +333,6 @@ describe("InteroperableHelper", () => {
         const appFn = "Write";
         const appArgs = ["w", "value", "", ""];
         const argsIndices = [2, 3];
-        const viewAddresses = ["localhost:9080/network1/mychannel:simplestate:Read:Arcturus",
-            "localhost:9080/network1/mychannel:simplestate:Read:Betelguese:1"];
             
         const meta = new statePb.Meta();
         meta.setProtocol(statePb.Meta.Protocol.FABRIC);
@@ -473,7 +474,7 @@ describe("InteroperableHelper", () => {
                 contractName: appId
             };
             const remoteJSON = {
-                address: "localhost:9080/network1/mychannel:simplestate:ReadWrong:Arcturus",
+                address: wrongViewAddress,
                 Sign: true
             }
             const keyCert = await getKeyAndCertForRemoteRequestbyUserName(wallet, userName);
@@ -502,7 +503,7 @@ describe("InteroperableHelper", () => {
                 contractName: appId
             };
             const remoteJSON = {
-                address: "localhost:9080/network1/mychannel:simplestate:Read:Arcturus",
+                address: viewAddresses[0],
                 Sign: true
             }
             const keyCert = await getKeyAndCertForRemoteRequestbyUserName(wallet, userName);
