@@ -78,7 +78,7 @@ The RFC numbering convention is: `<type>:<id>`. The list of types (`<type>`) is 
 | 03-017 | Interoperation CorDapp API       | Format   | [Proposed](./formats/network/interop-cordapp.md)                |
 | 03-018 | Besu Interop Contract API        | Format   | [Proposed](./formats/network/besu-interop-contract.md)          |
 | 03-019 | Application SDK                  | Format   | [Proposed](./formats/network/application-sdk.md)                |
-
+| 03-020 | DID Method for DLT Networks      | Format   | [Proposed](./formats/network/iin_method.md)                |
 
 ## RFC Process
 
