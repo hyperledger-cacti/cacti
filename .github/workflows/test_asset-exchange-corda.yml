@@ -250,7 +250,9 @@ jobs:
         
       # CORDA CLI
       - name: Build CLI
-        run: make build-cli
+        run: |
+            cp ../../../tests/network-setups/corda/github.properties .
+            make build-cli
         working-directory: samples/corda/corda-simple-application
         
       - name: Setup Corda CLI init
