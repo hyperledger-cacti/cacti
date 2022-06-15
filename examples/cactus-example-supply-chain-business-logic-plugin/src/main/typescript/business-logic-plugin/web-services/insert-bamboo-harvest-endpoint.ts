@@ -6,6 +6,7 @@ import {
   LogLevelDesc,
   LoggerProvider,
   IAsyncProvider,
+  safeStringifyException,
 } from "@hyperledger/cactus-common";
 import {
   IEndpointAuthzOptions,
@@ -74,7 +75,7 @@ export class InsertBambooHarvestEndpoint implements IWebServiceEndpoint {
     this.log.debug(`Instantiated ${this.className} OK`);
   }
 
-  public getOasPath() {
+  public getOasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-bamboo-harvest"] {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-bamboo-harvest"
     ];
@@ -126,10 +127,11 @@ export class InsertBambooHarvestEndpoint implements IWebServiceEndpoint {
       const body = { success, callOutput, transactionReceipt };
       res.status(200);
       res.json(body);
-    } catch (ex) {
+    } catch (ex: unknown) {
+      const exStr = safeStringifyException(ex);
       this.log.debug(`${tag} Failed to serve request:`, ex);
       res.status(500);
-      res.json({ error: ex.stack });
+      res.json({ error: exStr });
     }
   }
 }

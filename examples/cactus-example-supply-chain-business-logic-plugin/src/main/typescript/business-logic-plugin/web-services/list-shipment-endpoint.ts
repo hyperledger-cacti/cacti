@@ -6,6 +6,7 @@ import {
   LogLevelDesc,
   LoggerProvider,
   IAsyncProvider,
+  safeStringifyException,
 } from "@hyperledger/cactus-common";
 import {
   IEndpointAuthzOptions,
@@ -37,7 +38,7 @@ export class ListShipmentEndpoint implements IWebServiceEndpoint {
     return ListShipmentEndpoint.CLASS_NAME;
   }
 
-  public getOasPath() {
+  public getOasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-shipment"] {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-shipment"
     ];
@@ -112,10 +113,11 @@ export class ListShipmentEndpoint implements IWebServiceEndpoint {
       const body = { data: output };
       res.status(200);
       res.json(body);
-    } catch (ex) {
+    } catch (ex: unknown) {
+      const exStr = safeStringifyException(ex);
       this.log.debug(`${tag} Failed to serve request:`, ex);
       res.status(500);
-      res.json({ error: ex.stack });
+      res.json({ error: exStr });
     }
   }
 }
