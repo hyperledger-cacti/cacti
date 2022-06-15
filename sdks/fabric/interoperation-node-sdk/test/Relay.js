@@ -114,7 +114,7 @@ describe("Relay", () => {
     });
     
     describe("#successful relay api calls", () => {
-        const relay = new Relay("localhost:9080");
+        const relay = new Relay("localhost:19080");
         // Sample Request Id
         const requestId = "ABC-123"
         // Prepare Sample View
@@ -157,7 +157,7 @@ describe("Relay", () => {
                     callback(null, ack);
                 }
             });
-            relayServer.bindAsync('0.0.0.0:9080', grpc.ServerCredentials.createInsecure(), () => {
+            relayServer.bindAsync('0.0.0.0:19080', grpc.ServerCredentials.createInsecure(), () => {
                 relayServer.start();
             });
         });
@@ -190,7 +190,7 @@ describe("Relay", () => {
         });
     });
     describe("#fail relay api calls 1", () => {
-        const relay = new Relay("localhost:9081");
+        const relay = new Relay("localhost:19081");
         
         let relayServer;
         before(() => {
@@ -209,7 +209,7 @@ describe("Relay", () => {
                     callback(new Error("mock error"), null);
                 }
             });
-            relayServer.bindAsync('0.0.0.0:9081', grpc.ServerCredentials.createInsecure(), () => {
+            relayServer.bindAsync('0.0.0.0:19081', grpc.ServerCredentials.createInsecure(), () => {
                 relayServer.start();
             });
         });
@@ -238,7 +238,7 @@ describe("Relay", () => {
             
     });
     describe("#fail relay api calls 2", () => {
-        const relay = new Relay("localhost:9082", 2000);
+        const relay = new Relay("localhost:19082", 2000);
         const requestId = "ABC-123"
 
         const ack = {
@@ -271,7 +271,7 @@ describe("Relay", () => {
                     callback(null, ack);
                 }
             });
-            relayServer.bindAsync('0.0.0.0:9082', grpc.ServerCredentials.createInsecure(), () => {
+            relayServer.bindAsync('0.0.0.0:19082', grpc.ServerCredentials.createInsecure(), () => {
                 relayServer.start();
             });
         });
