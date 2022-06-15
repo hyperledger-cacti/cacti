@@ -575,4 +575,4 @@ export class EmissionsChaincode {
   }
 }
 
-export const contracts: any[] = [EmissionsChaincode];
+export const contracts: unknown[] = [EmissionsChaincode];

@@ -55,7 +55,7 @@ export class GetAllowanceEndpoint implements IWebServiceEndpoint {
     };
   }
 
-  public get oasPath(): { post: any } {
+  public get oasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-example-carbon-accounting-backend/dao-token/get-allowance"] {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-example-carbon-accounting-backend/dao-token/get-allowance"
     ];
@@ -81,10 +81,12 @@ export class GetAllowanceEndpoint implements IWebServiceEndpoint {
       const resBody = await Promise.resolve("dummy-response-fixme");
       res.status(200);
       res.json(resBody);
-    } catch (ex) {
-      this.log.debug(`${tag} Failed to serve request:`, ex);
-      res.status(500);
-      res.json({ error: ex.stack });
+    } catch (ex: unknown) {
+      if (ex instanceof Error) {
+        this.log.debug(`${tag} Failed to serve request:`, ex);
+        res.status(500);
+        res.json({ error: ex.stack });
+      }
     }
   }
 }
