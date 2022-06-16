@@ -7072,6 +7072,7 @@ __metadata:
     karma-electron: 7.0.0
     karma-tap: 4.2.0
     karma-webpack: 5.0.0
+    license-report: 6.4.0
     lint-staged: 11.1.2
     make-dir-cli: 3.0.0
     node-polyfill-webpack-plugin: 1.1.4
@@ -8148,6 +8149,13 @@ __metadata:
   version: 7.1.3
   resolution: "@jsdevtools/ono@npm:7.1.3"
   checksum: 2297fcd472ba810bffe8519d2249171132844c7174f3a16634f9260761c8c78bc0428a4190b5b6d72d45673c13918ab9844d706c3ed4ef8f62ab11a2627a08ad
+  languageName: node
+  linkType: hard
+
+"@kessler/tableify@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "@kessler/tableify@npm:1.0.2"
+  checksum: 3c6ae10ce210f1f9ac2320b057f7d651b9facfe1f3974107bd8c783c24243667bd840a69f124b8c7c8b758d81762b57f671812fc2e14fbe99cc0390139b33f43
   languageName: node
   linkType: hard
 
@@ -9563,6 +9571,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@sindresorhus/is@npm:^5.2.0":
+  version: 5.5.2
+  resolution: "@sindresorhus/is@npm:5.5.2"
+  checksum: 609a38ed040ed4c13560862aa0fcc67452bea6928edc60600cd78fb84f2f6e335148e0a8b2ca27ba70fabb102c1fbeab860579b24a505b7ab71ba900ac8642c6
+  languageName: node
+  linkType: hard
+
 "@sinonjs/commons@npm:^1, @sinonjs/commons@npm:^1.0.2, @sinonjs/commons@npm:^1.3.0":
   version: 1.8.6
   resolution: "@sinonjs/commons@npm:1.8.6"
@@ -10637,7 +10652,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/http-cache-semantics@npm:*":
+"@types/http-cache-semantics@npm:*, @types/http-cache-semantics@npm:^4.0.1":
   version: 4.0.1
   resolution: "@types/http-cache-semantics@npm:4.0.1"
   checksum: 1048aacf627829f0d5f00184e16548205cd9f964bf0841c29b36bc504509230c40bc57c39778703a1c965a6f5b416ae2cbf4c1d4589c889d2838dd9dbfccf6e9
@@ -15295,6 +15310,28 @@ __metadata:
   languageName: node
   linkType: hard
 
+"cacheable-lookup@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "cacheable-lookup@npm:7.0.0"
+  checksum: 9e2856763fc0a7347ab34d704c010440b819d4bb5e3593b664381b7433e942dd22e67ee5581f12256f908e79b82d30b86ebbacf40a081bfe10ee93fbfbc2d6a9
+  languageName: node
+  linkType: hard
+
+"cacheable-request@npm:^10.2.8":
+  version: 10.2.12
+  resolution: "cacheable-request@npm:10.2.12"
+  dependencies:
+    "@types/http-cache-semantics": ^4.0.1
+    get-stream: ^6.0.1
+    http-cache-semantics: ^4.1.1
+    keyv: ^4.5.2
+    mimic-response: ^4.0.0
+    normalize-url: ^8.0.0
+    responselike: ^3.0.0
+  checksum: 106f6da294c7e39e222ceb89d9857a2b0bbf95d92f6a24a242de7690245c103ffadc2e181fc4abe5d0d6878d90f62ceb8277a6b9b95a71e5b689d348ea0e1558
+  languageName: node
+  linkType: hard
+
 "cacheable-request@npm:^6.0.0":
   version: 6.1.0
   resolution: "cacheable-request@npm:6.1.0"
@@ -19055,6 +19092,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"eol@npm:^0.9.1":
+  version: 0.9.1
+  resolution: "eol@npm:0.9.1"
+  checksum: ba9fa998bc8148b935dcf85585eacf049eeaf18d2ab6196710d4d1f59e7dfd0e87b18508dc67144ff8ba12f835a4a4989aeea64c98b13cca77b74b9d4b33bce5
+  languageName: node
+  linkType: hard
+
 "err-code@npm:^2.0.2":
   version: 2.0.3
   resolution: "err-code@npm:2.0.3"
@@ -21998,6 +22042,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"form-data-encoder@npm:^2.1.2":
+  version: 2.1.4
+  resolution: "form-data-encoder@npm:2.1.4"
+  checksum: e0b3e5950fb69b3f32c273944620f9861f1933df9d3e42066e038e26dfb343d0f4465de9f27e0ead1a09d9df20bc2eed06a63c2ca2f8f00949e7202bae9e29dd
+  languageName: node
+  linkType: hard
+
 "form-data@npm:4.0.0, form-data@npm:^4.0.0":
   version: 4.0.0
   resolution: "form-data@npm:4.0.0"
@@ -22604,6 +22655,13 @@ __metadata:
   bin:
     get-pkg-repo: src/cli.js
   checksum: 5abf169137665e45b09a857b33ad2fdcf2f4a09f0ecbd0ebdd789a7ce78c39186a21f58621127eb724d2d4a3a7ee8e6bd4ac7715efda01ad5200665afc218e0d
+  languageName: node
+  linkType: hard
+
+"get-stdin@npm:^5.0.1":
+  version: 5.0.1
+  resolution: "get-stdin@npm:5.0.1"
+  checksum: f9784638ad3e68a0a8bdc031aedf0fca749843cd134956fbd4f3bbac17c359e0fb9210343fcbed72ee79fb19d8e4c49b7a6e742cc5d44e94ac1405e9371d4b3e
   languageName: node
   linkType: hard
 
@@ -23262,6 +23320,25 @@ gluegun@latest:
     p-cancelable: ^2.0.0
     responselike: ^2.0.0
   checksum: bbc783578a8d5030c8164ef7f57ce41b5ad7db2ed13371e1944bef157eeca5a7475530e07c0aaa71610d7085474d0d96222c9f4268d41db333a17e39b463f45d
+  languageName: node
+  linkType: hard
+
+"got@npm:^12.6.0":
+  version: 12.6.1
+  resolution: "got@npm:12.6.1"
+  dependencies:
+    "@sindresorhus/is": ^5.2.0
+    "@szmarczak/http-timer": ^5.0.1
+    cacheable-lookup: ^7.0.0
+    cacheable-request: ^10.2.8
+    decompress-response: ^6.0.0
+    form-data-encoder: ^2.1.2
+    get-stream: ^6.0.1
+    http2-wrapper: ^2.1.10
+    lowercase-keys: ^3.0.0
+    p-cancelable: ^3.0.0
+    responselike: ^3.0.0
+  checksum: 3c37f5d858aca2859f9932e7609d35881d07e7f2d44c039d189396f0656896af6c77c22f2c51c563f8918be483f60ff41e219de742ab4642d4b106711baccbd5
   languageName: node
   linkType: hard
 
@@ -28515,6 +28592,15 @@ gluegun@latest:
   languageName: node
   linkType: hard
 
+"keyv@npm:^4.5.2":
+  version: 4.5.3
+  resolution: "keyv@npm:4.5.3"
+  dependencies:
+    json-buffer: 3.0.1
+  checksum: 3ffb4d5b72b6b4b4af443bbb75ca2526b23c750fccb5ac4c267c6116888b4b65681015c2833cb20d26cf3e6e32dac6b988c77f7f022e1a571b7d90f1442257da
+  languageName: node
+  linkType: hard
+
 "kind-of@npm:^3.0.2, kind-of@npm:^3.0.3, kind-of@npm:^3.2.0":
   version: 3.2.2
   resolution: "kind-of@npm:3.2.2"
@@ -29066,6 +29152,25 @@ gluegun@latest:
     tcompare: ^5.0.6
     trivial-deferred: ^1.0.1
   checksum: 25d6cfa20948cef3032598f0c7c35a80f55e02ff8bcb7e72668fcb43a79406d20cb198bc1247bf735468193f7bee76cbcadf3ba16185935c64fd5d64180e7916
+  languageName: node
+  linkType: hard
+
+"license-report@npm:6.4.0":
+  version: 6.4.0
+  resolution: "license-report@npm:6.4.0"
+  dependencies:
+    "@kessler/tableify": ^1.0.2
+    debug: ^4.3.4
+    eol: ^0.9.1
+    got: ^12.6.0
+    rc: ^1.2.8
+    semver: ^7.3.8
+    tablemark: ^3.0.0
+    text-table: ^0.2.0
+    visit-values: ^2.0.0
+  bin:
+    license-report: index.js
+  checksum: ed8d72b64983e291bd58a63b4e649c057231976756e678dacf67ccfbe75933fd5f65489a28c1bdf33a5f4ff8ff8b35891caadc30a2bd718d5e0badc7e30811e9
   languageName: node
   linkType: hard
 
@@ -29745,6 +29850,15 @@ gluegun@latest:
   version: 1.1.4
   resolution: "lower-case@npm:1.1.4"
   checksum: 1ca9393b5eaef94a64e3f89e38b63d15bc7182a91171e6ad1550f51d710ec941540a065b274188f2e6b4576110cc2d11b50bc4bb7c603a040ddeb1db4ca95197
+  languageName: node
+  linkType: hard
+
+"lower-case@npm:^2.0.2":
+  version: 2.0.2
+  resolution: "lower-case@npm:2.0.2"
+  dependencies:
+    tslib: ^2.0.3
+  checksum: 83a0a5f159ad7614bee8bf976b96275f3954335a84fad2696927f609ddae902802c4f3312d86668722e668bef41400254807e1d3a7f2e8c3eede79691aa1f010
   languageName: node
   linkType: hard
 
@@ -30460,6 +30574,13 @@ gluegun@latest:
   version: 3.1.0
   resolution: "mimic-response@npm:3.1.0"
   checksum: 25739fee32c17f433626bf19f016df9036b75b3d84a3046c7d156e72ec963dd29d7fc8a302f55a3d6c5a4ff24259676b15d915aad6480815a969ff2ec0836867
+  languageName: node
+  linkType: hard
+
+"mimic-response@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "mimic-response@npm:4.0.0"
+  checksum: 33b804cc961efe206efdb1fca6a22540decdcfce6c14eb5c0c50e5ae9022267ab22ce8f5568b1f7247ba67500fe20d523d81e0e9f009b321ccd9d472e78d1850
   languageName: node
   linkType: hard
 
@@ -31550,6 +31671,16 @@ gluegun@latest:
   languageName: node
   linkType: hard
 
+"no-case@npm:^3.0.4":
+  version: 3.0.4
+  resolution: "no-case@npm:3.0.4"
+  dependencies:
+    lower-case: ^2.0.2
+    tslib: ^2.0.3
+  checksum: 0b2ebc113dfcf737d48dde49cfebf3ad2d82a8c3188e7100c6f375e30eafbef9e9124aadc3becef237b042fd5eb0aad2fd78669c20972d045bbe7fea8ba0be5c
+  languageName: node
+  linkType: hard
+
 "node-abi@npm:^2.7.0":
   version: 2.30.1
   resolution: "node-abi@npm:2.30.1"
@@ -32092,6 +32223,13 @@ gluegun@latest:
   version: 6.1.0
   resolution: "normalize-url@npm:6.1.0"
   checksum: 4a4944631173e7d521d6b80e4c85ccaeceb2870f315584fa30121f505a6dfd86439c5e3fdd8cd9e0e291290c41d0c3599f0cb12ab356722ed242584c30348e50
+  languageName: node
+  linkType: hard
+
+"normalize-url@npm:^8.0.0":
+  version: 8.0.0
+  resolution: "normalize-url@npm:8.0.0"
+  checksum: 24c20b75ebfd526d8453084692720b49d111c63c0911f1b7447427829597841eef5a8ba3f6bb93d6654007b991c1f5cd85da2c907800e439e2e2ec6c2abd0fc0
   languageName: node
   linkType: hard
 
@@ -36565,6 +36703,15 @@ gluegun@latest:
   languageName: node
   linkType: hard
 
+"responselike@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "responselike@npm:3.0.0"
+  dependencies:
+    lowercase-keys: ^3.0.0
+  checksum: e0cc9be30df4f415d6d83cdede3c5c887cd4a73e7cc1708bcaab1d50a28d15acb68460ac5b02bcc55a42f3d493729c8856427dcf6e57e6e128ad05cba4cfb95e
+  languageName: node
+  linkType: hard
+
 "restore-cursor@npm:^2.0.0":
   version: 2.0.0
   resolution: "restore-cursor@npm:2.0.0"
@@ -37401,6 +37548,17 @@ gluegun@latest:
     no-case: ^2.2.0
     upper-case-first: ^1.1.2
   checksum: ce5ca48804051e056a6956ad75a1a7d833e5d8f5021a015d380a22d3cf04496d5238de2e5c876d9701a9218633052c3a65911ca1b6460d36a41ecad46e81d139
+  languageName: node
+  linkType: hard
+
+"sentence-case@npm:^3.0.4":
+  version: 3.0.4
+  resolution: "sentence-case@npm:3.0.4"
+  dependencies:
+    no-case: ^3.0.4
+    tslib: ^2.0.3
+    upper-case-first: ^2.0.2
+  checksum: 3cfe6c0143e649132365695706702d7f729f484fa7b25f43435876efe7af2478243eefb052bacbcce10babf9319fd6b5b6bc59b94c80a1c819bcbb40651465d5
   languageName: node
   linkType: hard
 
@@ -38557,6 +38715,18 @@ gluegun@latest:
   languageName: node
   linkType: hard
 
+"split-text-to-chunks@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "split-text-to-chunks@npm:1.0.0"
+  dependencies:
+    get-stdin: ^5.0.1
+    minimist: ^1.2.0
+  bin:
+    wordwrap: cli.js
+  checksum: 944a2defff4eccf193216177b284bd8d3da0d83391827d89efa4250d4c0a0729e63fecfc0cf56fa2c50acba2b8017753b332b13d0aebdb9fb5c1c2164a943ce5
+  languageName: node
+  linkType: hard
+
 "split2@npm:^3.0.0":
   version: 3.2.2
   resolution: "split2@npm:3.2.2"
@@ -39536,6 +39706,16 @@ gluegun@latest:
     string-width: ^4.2.3
     strip-ansi: ^6.0.1
   checksum: 5b07fe462ee03d2e1fac02cbb578efd2e0b55ac07e3d3db2e950aa9570ade5a4a2b8d3c15e9f25c89e4e50b646bc4269934601ee1eef4ca7968ad31960977690
+  languageName: node
+  linkType: hard
+
+"tablemark@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "tablemark@npm:3.0.0"
+  dependencies:
+    sentence-case: ^3.0.4
+    split-text-to-chunks: ^1.0.0
+  checksum: 9195af70c032ef2efbf05b40ca73df88054dace9102628fab9ed57a025a8f285225c5f6074c8a35ddfeed5dc4ecc1eba8d9f9080ec208170ec4ff0aadeaa0e20
   languageName: node
   linkType: hard
 
@@ -40726,6 +40906,13 @@ gluegun@latest:
   languageName: node
   linkType: hard
 
+"tslib@npm:^2.0.3":
+  version: 2.6.0
+  resolution: "tslib@npm:2.6.0"
+  checksum: c01066038f950016a18106ddeca4649b4d76caa76ec5a31e2a26e10586a59fceb4ee45e96719bf6c715648e7c14085a81fee5c62f7e9ebee68e77a5396e5538f
+  languageName: node
+  linkType: hard
+
 "tslib@npm:~2.1.0":
   version: 2.1.0
   resolution: "tslib@npm:2.1.0"
@@ -41581,6 +41768,15 @@ gluegun@latest:
   languageName: node
   linkType: hard
 
+"upper-case-first@npm:^2.0.2":
+  version: 2.0.2
+  resolution: "upper-case-first@npm:2.0.2"
+  dependencies:
+    tslib: ^2.0.3
+  checksum: 4487db4701effe3b54ced4b3e4aa4d9ab06c548f97244d04aafb642eedf96a76d5a03cf5f38f10f415531d5792d1ac6e1b50f2a76984dc6964ad530f12876409
+  languageName: node
+  linkType: hard
+
 "upper-case@npm:^1.0.3, upper-case@npm:^1.1.0, upper-case@npm:^1.1.1, upper-case@npm:^1.1.3":
   version: 1.1.3
   resolution: "upper-case@npm:1.1.3"
@@ -41971,6 +42167,13 @@ gluegun@latest:
     core-util-is: 1.0.2
     extsprintf: ^1.2.0
   checksum: c431df0bedf2088b227a4e051e0ff4ca54df2c114096b0c01e1cbaadb021c30a04d7dd5b41ab277bcd51246ca135bf931d4c4c796ecae7a4fef6d744ecef36ea
+  languageName: node
+  linkType: hard
+
+"visit-values@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "visit-values@npm:2.0.0"
+  checksum: 9422c453864c363a93421f94342ce7c53fbd3e52b7dcd1f4df63c45e2ac1a71332047f1153fbdad2d9544867fa835f4029e2dca9415ee58437513fdb64895618
   languageName: node
   linkType: hard
 
