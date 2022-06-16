@@ -104,6 +104,9 @@ class Relay {
                 if (error) {
                     throw new Error(`Request state error: ${error}`);
                 }
+                if (resp.getStatus() === common_ack_pb.Ack.STATUS.ERROR) {
+                    throw new Error(`Request state received negative Ack error: ${resp.getMessage()}`);
+                }
                 return resp.getRequestId();
             }
             throw new Error("Error with requeststate in NetworkClient");
@@ -142,8 +145,13 @@ class Relay {
             if (stateError) {
                 throw new Error(`State error: ${stateError}`);
             }
-            if (finalState.getError()) {
-                throw new Error(`Error from view payload : ${finalState.getError()}`);
+            if (finalState.getStatus() === statePb.RequestState.STATUS.ERROR) {
+                if (finalState.getError()) {
+                    throw new Error(`Error from view payload : ${finalState.getError()}`);
+                }
+                else {
+                    throw new Error(`Error from view payload : UNKNOWN REASON}`);
+                }
             }
             return finalState;
         } catch (e) {
@@ -196,5 +204,6 @@ class Relay {
         return asJson ? state.toObject() : state;
     }
 }
+
 
 export { Relay };

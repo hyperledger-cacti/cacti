@@ -72,7 +72,7 @@ jobs:
       working-directory: samples/fabric/simplestate
 
     - name: Test
-      run: make test
+      run: go test -v ./...
       working-directory: samples/fabric/simplestate
  
   test_simpleasset:

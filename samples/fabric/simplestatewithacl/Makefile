@@ -5,10 +5,14 @@ run-vendor:
 	
 build-local: run-vendor
 	go build -v .
+build: clean-vendor
+	go build -v .
 test-local: run-vendor
 	go test -v .
-test:
-	go mod tidy
+test: clean-vendor
 	go test -v .
-clean:
-	rm -rf mocks simplestate vendor
+
+clean-vendor:
+	rm -rf vendor
+clean: clean-vendor
+	rm -rf mocks simplestate

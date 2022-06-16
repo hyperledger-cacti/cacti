@@ -6,10 +6,15 @@ run-vendor:
 
 build-local: run-vendor
 	go build -v .
-build:
+
+build: clean-vendor
 	go build -v .
+
 test:
 	go test -v .
-clean:
+
+clean-vendor:
 	rm -rf vendor
+
+clean: clean-vendor
 	rm simpleasset

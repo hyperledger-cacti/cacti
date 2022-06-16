@@ -1,11 +1,3 @@
-build:
-	go build -v .
-test:
-	go test -v .
-clean:
-	rm -rf vendor
-	rm simpleasset
-	
 run-vendor:
 	go mod vendor
 	cp -r ../../../common/protos-go/* vendor/github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/
@@ -15,7 +7,19 @@ run-vendor:
 
 build-local: run-vendor
 	go build -v .
+
+build: clean-vendor
+	go build -v .
 	
+test: clean-vendor
+	go test -v .
+
+clean-vendor:
+	rm -rf vendor
+
+clean: clean-vendor
+	rm simpleassettransfer
+
 test-local: run-vendor
 	go test -v .
 

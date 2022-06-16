@@ -7,7 +7,10 @@ build-local: run-vendor
 	go build -v .
 	
 test-local: run-vendor test
-	
+
+build: clean
+	go build -v .
+
 test:
 	go test -v .
 	
