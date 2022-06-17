@@ -287,7 +287,7 @@ test(testCase, async (t: Test) => {
   // does the same thing, it just waits 10 seconds for good measure so there
   // might not be a way for us to avoid doing this, but if there is a way we
   // absolutely should not have timeouts like this, anywhere...
-  await new Promise((resolve) => setTimeout(resolve, 10000));
+  await new Promise((resolve) => setTimeout(resolve, 30000));
 
   const assetId = uuidv4();
   const assetOwner = uuidv4();

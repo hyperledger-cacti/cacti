@@ -366,7 +366,7 @@ test("run-transaction-with-identities", async (t: Test) => {
       });
       t.true(resp.success);
       const asset = JSON.parse(resp.functionOutput);
-      t.equal(asset.owner, "client2");
+      t.equal(asset.Owner, "client2");
     }
     t.end();
   });

@@ -228,8 +228,8 @@ describe(testCase, () => {
       const assets = JSON.parse(res.data.functionOutput);
       const asset277 = assets.find((c: { ID: string }) => c.ID === assetId);
       expect(asset277).toBeTruthy();
-      expect(asset277.owner).toBeTruthy();
-      expect(asset277.owner).toEqual(assetOwner);
+      expect(asset277.Owner).toBeTruthy();
+      expect(asset277.Owner).toEqual(assetOwner);
     }
 
     {
@@ -302,8 +302,8 @@ describe(testCase, () => {
       const assets = JSON.parse(res.data.functionOutput);
       const asset277 = assets.find((c: { ID: string }) => c.ID === assetId);
       expect(asset277).toBeTruthy();
-      expect(asset277.owner).toBeTruthy();
-      expect(asset277.owner).toEqual(assetOwner);
+      expect(asset277.Owner).toBeTruthy();
+      expect(asset277.Owner).toEqual(assetOwner);
     }
   });
 });

@@ -1,12 +1,10 @@
-# We need to use the older, more stable v18 here because of
-# https://github.com/docker-library/docker/issues/170
 FROM docker:24.0.5-dind
 
-ARG FABRIC_VERSION=2.2.13
+ARG FABRIC_VERSION=2.4.4
 ARG FABRIC_NODEENV_VERSION=2.4.2
-ARG CA_VERSION=1.4.9
+ARG CA_VERSION=1.5.3
 ARG COUCH_VERSION_FABRIC=0.4
-ARG COUCH_VERSION=3.1.1
+ARG COUCH_VERSION=3.2.2
 
 WORKDIR /
 
@@ -172,10 +170,10 @@ RUN /bootstrap.sh ${FABRIC_VERSION} ${CA_VERSION} -d
 # Update the image version used by the Fabric peers when installing chaincodes.
 # This is necessary because the older (default) image uses NodeJS v12 and npm v6
 # But we need at least NodeJS 16 and npm v7 for the dependency installation to work.
-RUN sed -i "s/fabric-nodeenv:\$(TWO_DIGIT_VERSION)/fabric-nodeenv:${FABRIC_NODEENV_VERSION}/g" /fabric-samples/config/core.yaml
+RUN sed -i "s/fabric-nodeenv:\$(TWO_DIGIT_VERSION)/fabric-nodeenv:${FABRIC_NODEENV_VERSION}/g" /fabric-samples/test-network/compose/docker/peercfg/core.yaml
 
 # Set the log level of the peers and other containers to DEBUG instead of the default INFO
-RUN sed -i "s/FABRIC_LOGGING_SPEC=INFO/FABRIC_LOGGING_SPEC=DEBUG/g" /fabric-samples/test-network/docker/docker-compose-test-net.yaml
+RUN sed -i "s/FABRIC_LOGGING_SPEC=INFO/FABRIC_LOGGING_SPEC=DEBUG/g" /fabric-samples/test-network/compose/docker/docker-compose-test-net.yaml
 
 # Update the docker-compose file of the fabric-samples repo so that the 
 # core.yaml configuration file of the peer containers can be customized.
@@ -185,13 +183,13 @@ RUN sed -i "s/FABRIC_LOGGING_SPEC=INFO/FABRIC_LOGGING_SPEC=DEBUG/g" /fabric-samp
 # an error when the peer tries to install the dependencies as part of the
 # chaincode installation.
 RUN yq '.services."peer0.org1.example.com".volumes += "../..:/opt/gopath/src/github.com/hyperledger/fabric-samples"' \
-    --inplace /fabric-samples/test-network/docker/docker-compose-test-net.yaml
+    --inplace /fabric-samples/test-network/compose/docker/docker-compose-test-net.yaml
 RUN yq '.services."peer0.org1.example.com".volumes += "../../config/core.yaml:/etc/hyperledger/fabric/core.yaml"' \
-    --inplace /fabric-samples/test-network/docker/docker-compose-test-net.yaml
+    --inplace /fabric-samples/test-network/compose/docker/docker-compose-test-net.yaml
 RUN yq '.services."peer0.org2.example.com".volumes += "../..:/opt/gopath/src/github.com/hyperledger/fabric-samples"' \
-    --inplace /fabric-samples/test-network/docker/docker-compose-test-net.yaml
+    --inplace /fabric-samples/test-network/compose/docker/docker-compose-test-net.yaml
 RUN yq '.services."peer0.org2.example.com".volumes += "../../config/core.yaml:/etc/hyperledger/fabric/core.yaml"' \
-    --inplace /fabric-samples/test-network/docker/docker-compose-test-net.yaml
+    --inplace /fabric-samples/test-network/compose/docker/docker-compose-test-net.yaml
 
 # Install supervisord because we need to run the docker daemon and also the fabric network
 # meaning that we have multiple processes to run.
