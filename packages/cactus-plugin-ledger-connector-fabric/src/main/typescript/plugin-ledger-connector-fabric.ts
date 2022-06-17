@@ -1108,7 +1108,7 @@ export class PluginLedgerConnectorFabric
     req: RunTransactionRequest,
   ): Promise<RunTransactionResponse> {
     const fnTag = `${this.className}#transact()`;
-
+    this.log.debug("%s ENTER", fnTag);
     const {
       channelName,
       contractName,
@@ -1121,12 +1121,26 @@ export class PluginLedgerConnectorFabric
     } = req;
 
     try {
+      this.log.debug("%s Creating Fabric Gateway instance...", fnTag);
       const gateway = await this.createGateway(req);
       // const gateway = await this.createGatewayLegacy(req.signingCredential);
+      this.log.debug("%s Obtaining Fabric gateway network instance...", fnTag);
       const network = await gateway.getNetwork(channelName);
-      // const channel = network.getChannel();
-      // const endorsers = channel.getEndorsers();
+      this.log.debug("%s Obtaining Fabric contract instance...", fnTag);
       const contract = network.getContract(contractName);
+
+      const channel = network.getChannel();
+      const endorsers = channel.getEndorsers();
+
+      const endorsersMetadata = endorsers.map((x) => ({
+        mspid: x.mspid,
+        discovered: x.discovered,
+        endpoint: x.endpoint,
+        name: x.name,
+        hasChaincode: x.hasChaincode(contractName),
+        isTLS: x.isTLS(),
+      }));
+      this.log.debug("%s Endorsers metadata: %o", fnTag, endorsersMetadata);
 
       let out: Buffer;
       let success: boolean;
@@ -1138,7 +1152,10 @@ export class PluginLedgerConnectorFabric
           break;
         }
         case FabricContractInvocationType.Send: {
+          this.log.debug("%s Creating tx instance on %s", fnTag, contractName);
+          this.log.debug("%s Endorsing peers: %o", fnTag, req.endorsingPeers);
           const tx = contract.createTransaction(fnName);
+          this.log.debug("%s Created TX OK %o", fnTag, tx);
           if (req.endorsingPeers) {
             const { endorsingPeers } = req;
             const channel = network.getChannel();
@@ -1168,8 +1185,11 @@ export class PluginLedgerConnectorFabric
             );
             tx.setEndorsingPeers(endorsers);
           }
+          this.log.debug("%s Submitting TX... (%o)", fnTag, params);
           out = await tx.submit(...params);
+          this.log.debug("%s Submitted TX OK (%o)", fnTag, params);
           transactionId = tx.getTransactionId();
+          this.log.debug("%s Obtained TX ID OK (%s)", fnTag, transactionId);
           success = true;
           break;
         }

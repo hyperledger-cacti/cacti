@@ -80,8 +80,8 @@ export interface LedgerStartOptions {
 
 export const DEFAULT_FABRIC_2_AIO_IMAGE_NAME =
   "ghcr.io/hyperledger/cactus-fabric2-all-in-one";
-export const DEFAULT_FABRIC_2_AIO_IMAGE_VERSION = "2023-08-05-issue2358";
-export const DEFAULT_FABRIC_2_AIO_FABRIC_VERSION = "2.2.13";
+export const DEFAULT_FABRIC_2_AIO_IMAGE_VERSION = "2023-08-17-issue2057-pr2135";
+export const DEFAULT_FABRIC_2_AIO_FABRIC_VERSION = "2.4.4";
 
 /*
  * Provides default options for Fabric container
