@@ -26,7 +26,7 @@ export class LoggerProvider {
     LoggerProvider.logLevel = logLevel;
     if (applyToCachedLoggers) {
       LoggerProvider.loggers.forEach((logger: Logger) =>
-        logger.setLogLevel(logLevel as any),
+        logger.setLogLevel(logLevel as LogLevelDesc),
       );
     }
   }

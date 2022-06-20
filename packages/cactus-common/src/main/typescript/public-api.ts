@@ -25,3 +25,5 @@ export {
   IJoseFittingJwtParams,
   isIJoseFittingJwtParams,
 } from "./authzn/i-jose-fitting-jwt-params";
+
+export { isRecord } from "./types/is-record";
