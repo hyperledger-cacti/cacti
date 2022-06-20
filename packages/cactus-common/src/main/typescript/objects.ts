@@ -29,18 +29,19 @@ export class Objects {
    *
    * @param anObject
    */
-  public static getAllMethodNames(anObject: any): string[] {
+  public static getAllMethodNames(anObject: unknown): string[] {
+    let aRecord = anObject as Readonly<Record<string, unknown>>;
     let properties: string[] = [];
     do {
-      const symbols = Object.getOwnPropertySymbols(anObject);
+      const symbols = Object.getOwnPropertySymbols(aRecord);
       const symbolPropertyNames = symbols.map((aSymbol) => aSymbol.toString());
 
-      const propertyNamesCurrent = Object.getOwnPropertyNames(anObject)
+      const propertyNamesCurrent = Object.getOwnPropertyNames(aRecord)
         .concat(symbolPropertyNames)
         .sort()
         .filter((propertyName: string, index: number, arr) => {
           return (
-            typeof anObject[propertyName] === "function" &&
+            typeof aRecord[propertyName] === "function" &&
             propertyName !== "constructor" &&
             (index === 0 || propertyName !== arr[index - 1]) &&
             properties.indexOf(propertyName) === -1
@@ -48,12 +49,12 @@ export class Objects {
         });
 
       properties = properties.concat(propertyNamesCurrent);
-      anObject = Object.getPrototypeOf(anObject);
-    } while (anObject && Object.getPrototypeOf(anObject));
+      aRecord = Object.getPrototypeOf(aRecord);
+    } while (aRecord && Object.getPrototypeOf(aRecord));
     return properties;
   }
 
-  public static getAllFieldNames(anObject: any): string[] {
+  public static getAllFieldNames(anObject: Record<string, unknown>): string[] {
     const allFieldNames = [];
     for (const propertyKey in anObject) {
       if (Object.prototype.hasOwnProperty.call(anObject, propertyKey)) {
