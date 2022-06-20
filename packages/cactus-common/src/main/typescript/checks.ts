@@ -9,7 +9,7 @@ export class Checks {
    * @param code The code of the error if `checkResult is falsy.
    */
   public static truthy(
-    checkResult: any,
+    checkResult: unknown,
     subjectOfCheck = "variable",
     code = "-1",
   ): void {
@@ -28,7 +28,7 @@ export class Checks {
    * @param code The code of the error if `checkResult is falsy.
    */
   public static nonBlankString(
-    value: any,
+    value: string,
     subject = "variable",
     code = "-1",
   ): void {
