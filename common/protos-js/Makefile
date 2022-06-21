@@ -10,7 +10,7 @@ publish:
 
 .PHONY: clean-build
 clean-build:
-	rm -rf common corda driver fabric msp networks peer relay
+	rm -rf common corda driver fabric msp networks peer relay identity
 
 .PHONY: clean
 clean: clean-build
