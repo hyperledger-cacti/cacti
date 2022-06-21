@@ -12,41 +12,12 @@ import iin_agent_pb_grpc from '@hyperledger-labs/weaver-protos-js/identity/agent
 import 'dotenv/config';
 import { Certificate } from '@fidm/x509';
 import * as path from 'path';
+import { syncExternalStateFromIINAgent } from './externalOperations';
+import { flowAndRecordAttestationsOnLedger, requestAttestation, sendAttestation } from './localOperations';
+
 
 const iinAgentServer = new Server();
 console.log('iin agent def', JSON.stringify(iin_agent_pb_grpc));
-
-
-// A better way to handle errors for promises
-function handlePromise<T>(promise: Promise<T>): Promise<[T?, Error?]> {
-    const result: Promise<[T?, Error?]> = promise
-        .then((data) => {
-            const response: [T?, Error?] = [data, undefined];
-            return response;
-        })
-        .catch((error) => Promise.resolve([undefined, error]));
-    return result;
-}
-
-// Handles communication with foreign IIN agents
-const syncExternalStateFromIINAgent = async (networkUnit: iin_agent_pb.NetworkUnitIdentity) => {
-    console.log('syncExternalStateFromIINAgent:', networkUnit.getNetworkId(), '-', networkUnit.getParticipantId());
-};
-
-// Runs flows through local IIN agents
-const flowAndRecordAttestationsOnLedger = async (networkUnit: iin_agent_pb.NetworkUnitIdentity) => {
-    console.log('flowAndRecordAttestationsOnLedger:', networkUnit.getNetworkId(), '-', networkUnit.getParticipantId());
-};
-
-// Generates attestations on a foreign network unit's state
-const requestAttestation = async (networkUnit: iin_agent_pb.NetworkUnitIdentity) => {
-    console.log('requestAttestation:', networkUnit.getNetworkId(), '-', networkUnit.getParticipantId());
-};
-
-// Processes attestations on a foreign network unit's state received from a local IIN agent
-const sendAttestation = async (networkUnit: iin_agent_pb.NetworkUnitIdentity) => {
-    console.log('sendAttestation:', networkUnit.getNetworkId(), '-', networkUnit.getParticipantId());
-};
 
 //@ts-ignore
 iinAgentServer.addService(iin_agent_pb_grpc.IINAgentService, {
