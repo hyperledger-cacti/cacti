@@ -12,8 +12,9 @@ title: Using Weaver
 The easiest way to understand how Weaver works is to run it at a small scale:
 - First, [launch a set of basic test networks](./test-network/overview.md) built on Fabric and Corda. These networks offer the most basic capabilities of their DLT platforms and run toy applications (contracts and Layer-2) that can easily be tracked and debugged. You can launch these networks in one of several different ways: building Weaver components and dependencies locally or importing pre-built ones from Github packages, running core components in the host or in Docker containers. The choice depends on whether you just want to get these networks up and running or if you wish to customize the setup by modifying source code and configurations.
 - Once the test networks are launched, you can test two distinct kinds of interoperation modes:
-  * [Data sharing](./interop/data-sharing.md): Fabric-Fabric and Fabric-Corda supported
-  * [Asset exchange](./interop/asset-exchange.md): Fabric-Fabric supported
+  * [Data sharing](./interop/data-sharing.md): all combinations of Fabric and Corda networks supported
+  * [Asset exchange](./interop/asset-exchange.md): all combinations of Fabric and Corda networks supported
+  * [Asset transfer](./interop/asset-transfer.md): all combinations of Fabric and Corda networks supported
 - (To bring down the test networks, go back to the "Setup" pages and follow instructions in the respective "Teardown" sections.)
 - After you run these tests and get a flavor of how the system and protocols work, you will be ready to move on to "real" networks, enhancing them with interoperation capabilities by incorporating Weaver into them. Check out the guidelines and templates for [Fabric](./enabling-weaver-network/fabric.md), [Corda](./enabling-weaver-network/corda.md), and [Besu](./enabling-weaver-network/besu.md) networks.
 

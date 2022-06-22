@@ -16,7 +16,7 @@ The agent is presently implemented using TypeScript, though there is no limitati
 To build using code purely from this clone of Weaver, do the following:
 - If the JavaScript protobufs have not alredy been built, run the following:
   ```bash
-  cd ../../../common/protos-js`
+  cd ../../../common/protos-js
   make build
   cd ../../core/identity-management/iin-agent
   ```

@@ -12,7 +12,7 @@ import iin_agent_pb_grpc from '@hyperledger-labs/weaver-protos-js/identity/agent
 import 'dotenv/config';
 import { Certificate } from '@fidm/x509';
 import * as path from 'path';
-import { syncExternalStateFromIINAgent } from './protocols/externalOperations';
+import { syncExternalStateFromIINAgent, requestIdentityConfiguration, sendIdentityConfiguration } from './protocols/externalOperations';
 import { flowAndRecordAttestationsOnLedger, requestAttestation, sendAttestation } from './protocols/localOperations';
 
 
@@ -26,6 +26,48 @@ iinAgentServer.addService(iin_agent_pb_grpc.IINAgentService, {
         const ack_response = new ack_pb.Ack();
         try {
             syncExternalStateFromIINAgent(call.request);
+            ack_response.setMessage('');
+            ack_response.setStatus(ack_pb.Ack.STATUS.OK);
+            ack_response.setRequestId('');
+            // gRPC response.
+            console.log('Responding to caller');
+            callback(null, ack_response);
+        } catch (e) {
+            console.log(e);
+            ack_response.setMessage(`Error: ${e}`);
+            ack_response.setStatus(ack_pb.Ack.STATUS.ERROR);
+            ack_response.setRequestId('');
+            // gRPC response.
+            console.log('Responding to caller');
+            callback(null, ack_response);
+        }
+    },
+    // Service for receiving requests for one's network unit's state from foreign IIN agents. Will communicate with the IIN agent caller and respond with an ack while the attestation is being generated.
+    requestIdentityConfiguration: (call: { request: iin_agent_pb.NetworkUnitIdentity }, callback: (_: any, object: ack_pb.Ack) => void) => {
+        const ack_response = new ack_pb.Ack();
+        try {
+            requestIdentityConfiguration(call.request);
+            ack_response.setMessage('');
+            ack_response.setStatus(ack_pb.Ack.STATUS.OK);
+            ack_response.setRequestId('');
+            // gRPC response.
+            console.log('Responding to caller');
+            callback(null, ack_response);
+        } catch (e) {
+            console.log(e);
+            ack_response.setMessage(`Error: ${e}`);
+            ack_response.setStatus(ack_pb.Ack.STATUS.ERROR);
+            ack_response.setRequestId('');
+            // gRPC response.
+            console.log('Responding to caller');
+            callback(null, ack_response);
+        }
+    },
+    // Service for receiving network unit states from foreign IIN agents. Will communicate with the IIN agent caller and respond with an ack while the attestation is being processed.
+    sendIdentityConfiguration: (call: { request: iin_agent_pb.NetworkUnitIdentity }, callback: (_: any, object: ack_pb.Ack) => void) => {
+        const ack_response = new ack_pb.Ack();
+        try {
+            sendIdentityConfiguration(call.request);
             ack_response.setMessage('');
             ack_response.setStatus(ack_pb.Ack.STATUS.OK);
             ack_response.setRequestId('');
@@ -116,7 +158,7 @@ const configSetup = async () => {
 if (process.env.IIN_AGENT_TLS === 'true') {
     if (!(process.env.IIN_AGENT_TLS_CERT_PATH && fs.existsSync(process.env.IIN_AGENT_TLS_CERT_PATH) &&
          (process.env.IIN_AGENT_TLS_KEY_PATH && fs.existsSync(process.env.IIN_AGENT_TLS_KEY_PATH)))) {
-        throw new Error("Missing or invalid IIN agent TLS credentials");
+        throw new Error("Missing or invalid IIN agent TLS credentials on " + process.env.IIN_AGENT_ENDPOINT);
     }
     const keyCertPair = {
         cert_chain: fs.readFileSync(process.env.IIN_AGENT_TLS_CERT_PATH),
@@ -124,14 +166,14 @@ if (process.env.IIN_AGENT_TLS === 'true') {
     };
     iinAgentServer.bindAsync(`${process.env.IIN_AGENT_ENDPOINT}`, ServerCredentials.createSsl(null, [ keyCertPair ], false), (cb) => {
         configSetup().then(() => {
-            console.log('Starting IIN agent server with TLS');
+            console.log('Starting IIN agent server with TLS on', process.env.IIN_AGENT_ENDPOINT);
             iinAgentServer.start();
         });
     });
 } else {
     iinAgentServer.bindAsync(`${process.env.IIN_AGENT_ENDPOINT}`, ServerCredentials.createInsecure(), (cb) => {
         configSetup().then(() => {
-            console.log('Starting IIN agent server without TLS');
+            console.log('Starting IIN agent server without TLS on', process.env.IIN_AGENT_ENDPOINT);
             iinAgentServer.start();
         });
     });
