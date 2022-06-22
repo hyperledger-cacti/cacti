@@ -9,6 +9,14 @@
 
 _TODO_
 
+## Serving Network Unit State Requests from Foreign IIN Agents: `requestIdentityConfiguration`
+
+_TODO_
+
+## Processing Network Unit States from Foreign IIN Agents: `sendIdentityConfiguration`
+
+_TODO_
+
 ## Flow Through Local IIN Agents for Attestation Consensus: `flowAndRecordAttestations`
 
 _TODO_

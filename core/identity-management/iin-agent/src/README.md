@@ -7,6 +7,8 @@
 
 The core IIN agent module is built as a gRPC server exposing the following services:
 - `syncExternalState`
+- `requestIdentityConfiguration`
+- `sendIdentityConfiguration`
 - `flowAndRecordAttestations`
 - `requestAttestation`
 - `sendAttestation`
