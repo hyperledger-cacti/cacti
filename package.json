@@ -148,6 +148,7 @@
     "lodash": ">=4.17.21",
     "minimist": ">=1.2.6",
     "node-forge": ">=1.3.0",
-    "underscore": "1.13.2"
+    "underscore": "1.13.2",
+    "@types/ssh2": "0.5.52"
   }
 }
