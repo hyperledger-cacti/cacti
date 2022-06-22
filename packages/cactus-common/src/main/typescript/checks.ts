@@ -28,7 +28,7 @@ export class Checks {
    * @param code The code of the error if `checkResult is falsy.
    */
   public static nonBlankString(
-    value: string,
+    value: unknown,
     subject = "variable",
     code = "-1",
   ): void {
