@@ -5,6 +5,6 @@
  -->
 # IIN Agent Extension for Corda
 
-In this folder lies an implementation of an extension of an IIN agent to connect to a Corda ledger.
+Corda-specific ways of creating wallet identities, connecting to ledgers, and invoking contracts, are implemented in this folder.
 
 _This is currently a placeholder._

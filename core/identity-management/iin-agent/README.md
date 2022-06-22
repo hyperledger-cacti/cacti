@@ -5,12 +5,8 @@
  -->
 # IIN Agent Implementation
 
-Implementations of platform-specific IIN Agents lie in this folder.
+In this folder lies an implementation of the IIN agent according to the [RFC specification](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/rfcs/models/identity/iin-agent.md).
 
-Implementation of the core IIN agent lies in the [common](./common) folder.
+The core part of this module is built in a DLT-neutral manner and can be used by a participant of a network running on any DLT platform. The module also has extensions that can be activated for specific DLT platforms.
 
-Implementation of an IIN agent extension for Hyperledger Fabric lies in the [fabric](./fabric) folder.
-
-Implementation of an IIN agent extension for Corda lies in the [corda](./corda) folder.
-
-Implementation of an IIN agent extension for Hyperledger Besu lies in the [besu](./besu) folder.
+The agent is presently implemented using TypeScript, though there is no limitation that prevents it from being ported to a different programming language.

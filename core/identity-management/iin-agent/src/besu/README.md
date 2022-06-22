@@ -5,6 +5,6 @@
  -->
 # IIN Agent Extension for Hyperledger Besu 
 
-In this folder lies an implementation of an extension of an IIN agent to connect to a Hyperledger Besu ledger.
+Besu-specific ways of creating wallet identities, connecting to ledgers, and invoking contracts, are implemented in this folder.
 
 _This is currently a placeholder._

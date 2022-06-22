@@ -12,8 +12,8 @@ import iin_agent_pb_grpc from '@hyperledger-labs/weaver-protos-js/identity/agent
 import 'dotenv/config';
 import { Certificate } from '@fidm/x509';
 import * as path from 'path';
-import { syncExternalStateFromIINAgent } from './externalOperations';
-import { flowAndRecordAttestationsOnLedger, requestAttestation, sendAttestation } from './localOperations';
+import { syncExternalStateFromIINAgent } from './protocols/externalOperations';
+import { flowAndRecordAttestationsOnLedger, requestAttestation, sendAttestation } from './protocols/localOperations';
 
 
 const iinAgentServer = new Server();

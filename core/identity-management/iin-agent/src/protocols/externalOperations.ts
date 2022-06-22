@@ -5,7 +5,7 @@
  */
 
 import iin_agent_pb from '@hyperledger-labs/weaver-protos-js/identity/agent_pb';
-import { handlePromise} from './utils';
+import { handlePromise} from '../common/utils';
 
 
 // Handles communication with foreign IIN agents

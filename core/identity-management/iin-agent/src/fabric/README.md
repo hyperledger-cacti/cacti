@@ -5,4 +5,4 @@
  -->
 # IIN Agent Extension for Hyperledger Fabric
 
-In this folder lies an implementation of an extension of an IIN agent to connect to a Hyperledger Fabric ledger.
+Fabric-specific ways of creating wallet identities, connecting to ledgers, and invoking contracts, are implemented in this folder.
