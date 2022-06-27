@@ -8,15 +8,10 @@
 import { Request } from "express";
 import { BusinessLogicPlugin } from "../business-logic-plugin/BusinessLogicPlugin";
 import { BLPRegistry } from "./util/BLPRegistry";
-import { LPInfoHolder } from "./util/LPInfoHolder";
-import { json2str } from "../verifier/DriverCommon";
-import { Verifier } from "../verifier/Verifier";
 import { IVerifierEventListener, LedgerEvent } from "../verifier/LedgerPlugin";
 import { getTargetBLPInstance } from "../business-logic-plugin/BLP_config";
 import { ConfigUtil } from "./util/ConfigUtil";
 
-const fs = require("fs");
-const path = require("path");
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
 const moduleName = "TransactionManagement";
@@ -117,22 +112,20 @@ export class TransactionManagement implements IVerifierEventListener {
 
     // object judgment
     let result: {} = {};
-    if (businessLogicID === "h40Q9eMD") {
-      const blp = getTargetBLPInstance(businessLogicID);
-      if (blp === null) {
-        logger.warn(
-          `##startBusinessLogic(): not found BusinessLogicPlugin. businessLogicID: ${businessLogicID}`,
-        );
-        return undefined;
-      }
-
-      logger.debug("created instance");
-
-      // Set business logic config
-      logger.debug(`meterParams = ${req.body.meterParams}`);
-      result = blp.setConfig(req.body.meterParams);
-      logger.debug("set business logic config");
+    const blp = getTargetBLPInstance(businessLogicID);
+    if (blp === null) {
+      logger.warn(
+        `##startBusinessLogic(): not found BusinessLogicPlugin. businessLogicID: ${businessLogicID}`,
+      );
+      return undefined;
     }
+
+    logger.debug("created instance");
+
+    // Set business logic config
+    logger.debug(`meterParams = ${req.body.meterParams}`);
+    result = blp.setConfig(req.body.meterParams);
+    logger.debug("set business logic config");
 
     return result;
   }
@@ -271,12 +264,12 @@ export class TransactionManagement implements IVerifierEventListener {
         continue;
       }
 
-      //            if (blp.hasTxIDInTransactions(txID)) {
-      logger.debug(
-        `####getBLPInstanceFromTxID(): found!, businessLogicID: ${businessLogicID}`,
-      );
-      return blp;
-      //            }
+      if (blp.hasTxIDInTransactions(txID)) {
+        logger.debug(
+          `####getBLPInstanceFromTxID(): found!, businessLogicID: ${businessLogicID}`,
+        );
+        return blp;
+      }
     }
 
     // not found.

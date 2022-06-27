@@ -20,7 +20,7 @@ import {
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
 
-const logLevel: LogLevelDesc = "error";
+const logLevel: LogLevelDesc = "info";
 const log: Logger = LoggerProvider.getOrCreate({
   label: "test-cmd-socketio-verifier",
   level: logLevel,
