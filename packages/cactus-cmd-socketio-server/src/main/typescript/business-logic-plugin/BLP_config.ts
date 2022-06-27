@@ -7,17 +7,24 @@
 
 import { BusinessLogicPlugin } from "./BusinessLogicPlugin";
 
-let _blp: BusinessLogicPlugin | null = null;
+// Singleton of BLPs
+let _blpMapping = new Map<string, BusinessLogicPlugin>();
 
 export function getTargetBLPInstance(
   businessLogicID: string,
 ): BusinessLogicPlugin | null {
-  return _blp;
+  return _blpMapping.get(businessLogicID) ?? null;
 }
 
 export function setTargetBLPInstance(
   businessLogicID: string,
   blp: BusinessLogicPlugin,
 ) {
-  _blp = blp;
+  _blpMapping.set(businessLogicID, blp);
+}
+
+export function deleteTargetBLPInstance(
+  businessLogicID: string,
+) {
+  return _blpMapping.delete(businessLogicID);
 }

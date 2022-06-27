@@ -83,8 +83,10 @@ export class BusinessLogicBase implements BusinessLogicPlugin {
     return null;
   }
 
+  // This function is optional in setup with single BLP,
+  // that's why value true is returned (to indicate that given Tx always belong to this BLP)
   hasTxIDInTransactions(txID: string): boolean {
     // NOTE: This method implements the BisinessLogcPlugin operation(* Override by subclass)
-    return false;
+    return true;
   }
 }

@@ -29,10 +29,17 @@ export type BLPConfig = {
   plugin: BusinessLogicPlugin;
 };
 
-export function startCactusSocketIOServer(blp?: BLPConfig) {
+export function startCactusSocketIOServer(blp?: BLPConfig | BLPConfig[], onListening?: () => void) {
   if (blp) {
-    logger.info("Using BLP with id =", blp.id);
-    setTargetBLPInstance(blp.id, blp.plugin);
+      // Support both single and multiple BLPs
+      if(!Array.isArray(blp)) {
+        blp = [blp];
+      }
+
+      blp.forEach((cfg) => {
+        logger.info("Using BLP with id =", cfg.id);
+        setTargetBLPInstance(cfg.id, cfg.plugin);
+      });
   }
 
   runExpressApp();
@@ -85,15 +92,16 @@ export function startCactusSocketIOServer(blp?: BLPConfig) {
   /**
    * Event listener for HTTP server "listening" event.
    */
-
-  function onListening(): void {
-    const addr = server.address();
-    if (addr) {
-      const bind =
-        typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
-      debugModule("Listening on " + bind);
-    } else {
-      throw new Error("Could not get server address!");
+  if (!onListening) {
+    onListening = () => {
+      const addr = server.address();
+      if (addr) {
+        const bind =
+          typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
+        debugModule("Listening on " + bind);
+      } else {
+        throw new Error("Could not get server address!");
+      }
     }
   }
 

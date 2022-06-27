@@ -42,7 +42,8 @@
     "@types/escape-html": "1.0.1",
     "@types/http-errors": "1.6.3",
     "@types/morgan": "1.9.1",
-    "@types/shelljs": "^0.8.11",
+    "@types/shelljs": "0.8.11",
+    "http-terminator": "3.2.0",
     "ts-node": "8.9.1"
   },
   "publishConfig": {
