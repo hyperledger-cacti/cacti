@@ -5,7 +5,7 @@
  -->
 # IIN Agent Server and Extensions
 
-The core IIN agent module is built as a gRPC server exposing the following services:
+The IIN agent module is built as a gRPC server exposing the following services:
 - `syncExternalState`
 - `requestIdentityConfiguration`
 - `sendIdentityConfiguration`
@@ -13,7 +13,6 @@ The core IIN agent module is built as a gRPC server exposing the following servi
 - `requestAttestation`
 - `sendAttestation`
 
-Extensions for the following platforms are supported:
-- [Hyperledger Fabric](./fabric)
-- [Corda](./corda)
-- [Hyperledger Besu](./besu)
+To read or write to the shared ledger, the agent must exercise DLT-specific logic. Since [platform-specific drivers](../../../drivers) already exist to carry out similar tasks (for the relay), we will augment those drivers to support the basic mechanisms needed by IIN agents. The following DLT drivers are currently implemented in Weaver and will be augmented to fulfil the above protcols:
+- [Hyperledger Fabric](../../../drivers/fabric-driver)
+- [Corda](../../../drivers/corda-driver)
