@@ -11,7 +11,7 @@ If you are new to Weaver (or to blockchain interoperability), we recommend start
 
 If you wish to see Weaver in action, test it, or apply it to your own application, you can switch to the [Getting Started Tutorial](https://labs.hyperledger.org/weaver-dlt-interoperability/docs/external/getting-started/guide).
 
-Instead, if you wish to find out more details about the Weaver design and wish to contribute to the code base, you can explore these RFCs, beginning with the  [models](./models). Protocol engineers will find in [RFC: 01-009](./models/infrastructure/relays.md) a useful overview of the relay model, and may then progress on to reading one of the existing protocols' design and implementation; e.g., the data sharing protocol in [RFC: 02-001](./protocols/data-sharing/generic.md). If you are interested in adding support for a new ledger technology, see the [existing driver implementations](../core/drivers) and [existing interoperability module implementations](../core/network). Where relevant we use [ABNF](https://tools.ietf.org/html/rfc5234) for formal syntax definitions.
+Instead, if you wish to find out more details about the Weaver design and wish to contribute to the code base, you can explore these RFCs, beginning with the [models](./models). Protocol engineers will find in [RFC: 01-009](./models/infrastructure/relays.md) a useful overview of the relay model, and may then progress on to reading one of the existing protocols' design and implementation; e.g., the data sharing protocol in [RFC: 02-001](./protocols/data-sharing/generic.md). If you are interested in adding support for a new ledger technology, see the [existing driver implementations](../core/drivers) and [existing interoperability module implementations](../core/network). Where relevant we use [ABNF](https://tools.ietf.org/html/rfc5234) for formal syntax definitions.
 
 Precise definitions of terms you may encounter in these RFCs can be found in the [terminology page](terminology.md).
 
@@ -60,11 +60,11 @@ The RFC numbering convention is: `<type>:<id>`. The list of types (`<type>`) is 
 | 02-015 | Transaction Invocation           | Protocol | [Draft](./protocols/contract-invocation/invocation.md)          |
 | 02-016 | Event Bus                        | Protocol | [Draft](./protocols/events/event-bus.md)                        |
 | 03-001 | View Address                     | Format   | [Proposed](./formats/views/addressing.md)                       |
-| 03-002 | Generic View                     | Format   | [Proposed](./formats/views/definition.md)                  |
-| 03-003 | Fabric View                      | Format   | [Proposed](./formats/views/fabric.md)                     |
-| 03-004 | Corda View                       | Format   | [Proposed](./formats/views/corda.md)                      |
-| 03-005 | Besu View                        | Format   | [Draft](./formats/views/besu.md)                          |
-| 03-006 | Ethereum View                    | Format   | [Draft](./formats/views/ethereum.md)                      |
+| 03-002 | Generic View                     | Format   | [Proposed](./formats/views/definition.md)                       |
+| 03-003 | Fabric View                      | Format   | [Proposed](./formats/views/fabric.md)                           |
+| 03-004 | Corda View                       | Format   | [Proposed](./formats/views/corda.md)                            |
+| 03-005 | Besu View                        | Format   | [Draft](./formats/views/besu.md)                                |
+| 03-006 | Ethereum View                    | Format   | [Draft](./formats/views/ethereum.md)                            |
 | 03-007 | View Request                     | Format   | [Proposed](./formats/views/request.md)                          |
 | 03-008 | Access Control Policy            | Format   | [Proposed](./formats/policies/access-control.md)                |
 | 03-009 | Proof Verification Policy        | Format   | [Proposed](./formats/policies/proof-verification.md)            |
@@ -78,7 +78,7 @@ The RFC numbering convention is: `<type>:<id>`. The list of types (`<type>`) is 
 | 03-017 | Interoperation CorDapp API       | Format   | [Proposed](./formats/network/interop-cordapp.md)                |
 | 03-018 | Besu Interop Contract API        | Format   | [Proposed](./formats/network/besu-interop-contract.md)          |
 | 03-019 | Application SDK                  | Format   | [Proposed](./formats/network/application-sdk.md)                |
-| 03-020 | DID Method for DLT Networks      | Format   | [Proposed](./formats/network/iin_method.md)                |
+| 03-020 | DID Method for DLT Networks      | Format   | [Proposed](./formats/network/iin_method.md)                     |
 
 ## RFC Process
 

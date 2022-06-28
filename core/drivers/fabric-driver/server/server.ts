@@ -138,7 +138,7 @@ const fabricCommunication = async (query: query_pb.Query, networkName: string) =
     }
 };
 
-// Service for recieving communication from a relay. Will communicate with the network and respond with an ack to the relay while the fabric communication is being completed
+// Service for receiving communication from a relay. Will communicate with the network and respond with an ack to the relay while the fabric communication is being completed.
 //@ts-ignore
 server.addService(driver_pb_grpc.DriverCommunicationService, {
     requestDriverState: (call: { request: query_pb.Query }, callback: (_: any, object: ack_pb.Ack) => void) => {

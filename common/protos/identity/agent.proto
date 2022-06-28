@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package identity.agent;
+
+import "common/ack.proto";
+
+option java_package = "com.weaver.protos.identity.agent";
+option go_package = "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/identity";
+
+// definitions of all messages used in the datatransfer protocol
+service IINAgent {
+  // user or agent triggers a sync of external/foreign network unit's state
+  rpc SyncExternalState(NetworkUnitIdentity) returns (common.ack.Ack) {}
+  // Requesting network unit's state from a foreign IIN agent.
+  rpc RequestIdentityConfiguration(NetworkUnitIdentity) returns (common.ack.Ack){}
+  // Handling network unit's state sent by a foreign IIN agent.
+  rpc SendIdentityConfiguration(NetworkUnitIdentity) returns (common.ack.Ack){}
+  // user or agent triggers a flow to collect signatures attesting an
+  // external/foreign network unit's state and recording to ledger
+  rpc FlowAndRecordAttestations(NetworkUnitIdentity) returns (common.ack.Ack) {}
+  // Requesting attestation from a local IIN agent.
+  rpc RequestAttestation(NetworkUnitIdentity) returns (common.ack.Ack){}
+  // Handling attestation sent by a local IIN agent.
+  rpc SendAttestation(NetworkUnitIdentity) returns (common.ack.Ack){}
+}
+
+message NetworkUnitIdentity {
+  string network_id = 1;
+  string participant_id = 2;
+}

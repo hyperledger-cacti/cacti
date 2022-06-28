@@ -10,3 +10,4 @@ protoc --proto_path=$PROTOSDIR --proto_path=$FABRIC_PROTOSDIR --go_out=$BUILDDIR
 protoc --proto_path=$PROTOSDIR --proto_path=$FABRIC_PROTOSDIR --go-grpc_out=paths=source_relative:$BUILDDIR --go_out=paths=source_relative:$BUILDDIR $PROTOSDIR/networks/networks.proto
 protoc --proto_path=$PROTOSDIR --proto_path=$FABRIC_PROTOSDIR --go-grpc_out=paths=source_relative:$BUILDDIR --go_out=paths=source_relative:$BUILDDIR $PROTOSDIR/relay/datatransfer.proto
 protoc --proto_path=$PROTOSDIR --proto_path=$FABRIC_PROTOSDIR --go-grpc_out=paths=source_relative:$BUILDDIR --go_out=paths=source_relative:$BUILDDIR $PROTOSDIR/driver/driver.proto
+protoc --proto_path=$PROTOSDIR --proto_path=$FABRIC_PROTOSDIR --go-grpc_out=paths=source_relative:$BUILDDIR --go_out=paths=source_relative:$BUILDDIR $PROTOSDIR/identity/agent.proto

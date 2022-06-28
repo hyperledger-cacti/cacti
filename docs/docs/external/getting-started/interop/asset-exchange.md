@@ -18,11 +18,12 @@ For this scenario, you only need the networks to be running with the appropriate
 ## Fabric with Fabric
 
 One Fabric network transfers a bond from Alice to Bob in exchange for a transfer of tokens from Bob to Alice in the other network
-Assuming that one of the following chaincodes have been deployed in both networks:
+Ensure that one of the following chaincodes have been deployed in both networks:
 * `simpleasset`
 * `simpleassetandinterop`
 * `simpleassettransfer`
-run the following steps:
+
+Run the following steps:
 
 | Notes |
 |:------|
