@@ -295,10 +295,12 @@ Bring down the various components as follows (_Navigate to the root folder of yo
 To bring down the relays (for all 3 networks), run:
 ```bash
 cd core/relay
+make convert-compose-method2
 make stop COMPOSE_ARG='--env-file docker/testnet-envs/.env.n1'
 make stop COMPOSE_ARG='--env-file docker/testnet-envs/.env.n2'
 make stop COMPOSE_ARG='--env-file docker/testnet-envs/.env.corda'
 make stop COMPOSE_ARG='--env-file docker/testnet-envs/.env.corda2'
+make convert-compose-method1
 cd -
 ```
 
