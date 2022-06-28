@@ -18,10 +18,10 @@ build-local:
 	(cp package.json package-remote.json && \
 		cp package-local.json package.json && \
 		npm install && \
-		npm run build && \
 		cp -r protos-js build/) || \
 		(mv package-remote.json package.json && exit 1)	# Runs if failure
-	mv package-remote.json package.json					# Runs if success
+	mv package-remote.json package.json	                # Runs if success
+	npm run build
 	
 
 .PHONE: publish
