@@ -24,28 +24,89 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
 /**
  * 
  * @export
- * @interface InlineResponse501
+ * @interface ErrorExceptionJsonResponseV1
  */
-export interface InlineResponse501 {
+export interface ErrorExceptionJsonResponseV1 {
     /**
      * 
      * @type {string}
-     * @memberof InlineResponse501
+     * @memberof ErrorExceptionJsonResponseV1
      */
-    message?: string;
+    message: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ErrorExceptionJsonResponseV1
+     */
+    name?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ErrorExceptionJsonResponseV1
+     */
+    error?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ErrorExceptionJsonResponseV1
+     */
+    stack?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ErrorExceptionJsonResponseV1
+     */
+    cause?: string;
 }
 /**
  * 
  * @export
- * @interface InvokeContractV1Request
+ * @interface ErrorExceptionResponseV1
  */
-export interface InvokeContractV1Request {
+export interface ErrorExceptionResponseV1 {
     /**
      * 
-     * @type {any}
-     * @memberof InvokeContractV1Request
+     * @type {string}
+     * @memberof ErrorExceptionResponseV1
      */
-    contractName?: any | null;
+    message: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ErrorExceptionResponseV1
+     */
+    error: string;
+}
+/**
+ * 
+ * @export
+ * @interface GenerateTransactionRequestV1
+ */
+export interface GenerateTransactionRequestV1 {
+    /**
+     * Iroha command name.
+     * @type {IrohaCommand}
+     * @memberof GenerateTransactionRequestV1
+     */
+    commandName: IrohaCommand;
+    /**
+     * Parameters for iroha command specified in commandName
+     * @type {object}
+     * @memberof GenerateTransactionRequestV1
+     */
+    commandParams: object;
+    /**
+     * Sender account id
+     * @type {string}
+     * @memberof GenerateTransactionRequestV1
+     */
+    creatorAccountId: string;
+    /**
+     * Requested transaction quorum
+     * @type {number}
+     * @memberof GenerateTransactionRequestV1
+     */
+    quorum?: number;
 }
 /**
  * 
@@ -292,7 +353,7 @@ export interface RunTransactionRequestV1 {
      * @type {IrohaBaseConfig}
      * @memberof RunTransactionRequestV1
      */
-    baseConfig?: IrohaBaseConfig;
+    baseConfig: IrohaBaseConfig;
     /**
      * The list of arguments to pass in to the transaction request.
      * @type {Array<any>}
@@ -313,6 +374,25 @@ export interface RunTransactionResponse {
      */
     transactionReceipt: any | null;
 }
+/**
+ * 
+ * @export
+ * @interface RunTransactionSignedRequestV1
+ */
+export interface RunTransactionSignedRequestV1 {
+    /**
+     * Signed transaction binary data received from generate-transaction endpoint.
+     * @type {any}
+     * @memberof RunTransactionSignedRequestV1
+     */
+    signedTransaction: any;
+    /**
+     * 
+     * @type {IrohaBaseConfig}
+     * @memberof RunTransactionSignedRequestV1
+     */
+    baseConfig?: IrohaBaseConfig;
+}
 
 /**
  * DefaultApi - axios parameter creator
@@ -320,6 +400,40 @@ export interface RunTransactionResponse {
  */
 export const DefaultApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
+        /**
+         * 
+         * @summary Generate transaction that can be signed locally.
+         * @param {GenerateTransactionRequestV1} [generateTransactionRequestV1] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        generateTransactionV1: async (generateTransactionRequestV1?: GenerateTransactionRequestV1, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha/generate-transaction`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(generateTransactionRequestV1, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
         /**
          * 
          * @summary Get the Prometheus Metrics
@@ -352,46 +466,12 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @summary Invokes a contract on a Iroha ledger
-         * @param {InvokeContractV1Request} [invokeContractV1Request] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        invokeContractV1: async (invokeContractV1Request?: InvokeContractV1Request, options: any = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha/invoke-contract`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(invokeContractV1Request, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
          * @summary Executes a transaction on a Iroha ledger
-         * @param {RunTransactionRequestV1} [runTransactionRequestV1] 
+         * @param {RunTransactionRequestV1 | RunTransactionSignedRequestV1} [runTransactionRequestV1RunTransactionSignedRequestV1] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        runTransactionV1: async (runTransactionRequestV1?: RunTransactionRequestV1, options: any = {}): Promise<RequestArgs> => {
+        runTransactionV1: async (runTransactionRequestV1RunTransactionSignedRequestV1?: RunTransactionRequestV1 | RunTransactionSignedRequestV1, options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha/run-transaction`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -411,7 +491,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(runTransactionRequestV1, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(runTransactionRequestV1RunTransactionSignedRequestV1, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -430,6 +510,17 @@ export const DefaultApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
+         * @summary Generate transaction that can be signed locally.
+         * @param {GenerateTransactionRequestV1} [generateTransactionRequestV1] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async generateTransactionV1(generateTransactionRequestV1?: GenerateTransactionRequestV1, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.generateTransactionV1(generateTransactionRequestV1, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @summary Get the Prometheus Metrics
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -440,24 +531,13 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @summary Invokes a contract on a Iroha ledger
-         * @param {InvokeContractV1Request} [invokeContractV1Request] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async invokeContractV1(invokeContractV1Request?: InvokeContractV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.invokeContractV1(invokeContractV1Request, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * 
          * @summary Executes a transaction on a Iroha ledger
-         * @param {RunTransactionRequestV1} [runTransactionRequestV1] 
+         * @param {RunTransactionRequestV1 | RunTransactionSignedRequestV1} [runTransactionRequestV1RunTransactionSignedRequestV1] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async runTransactionV1(runTransactionRequestV1?: RunTransactionRequestV1, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RunTransactionResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.runTransactionV1(runTransactionRequestV1, options);
+        async runTransactionV1(runTransactionRequestV1RunTransactionSignedRequestV1?: RunTransactionRequestV1 | RunTransactionSignedRequestV1, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RunTransactionResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.runTransactionV1(runTransactionRequestV1RunTransactionSignedRequestV1, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -472,6 +552,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
     return {
         /**
          * 
+         * @summary Generate transaction that can be signed locally.
+         * @param {GenerateTransactionRequestV1} [generateTransactionRequestV1] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        generateTransactionV1(generateTransactionRequestV1?: GenerateTransactionRequestV1, options?: any): AxiosPromise<any> {
+            return localVarFp.generateTransactionV1(generateTransactionRequestV1, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Get the Prometheus Metrics
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -481,23 +571,13 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
-         * @summary Invokes a contract on a Iroha ledger
-         * @param {InvokeContractV1Request} [invokeContractV1Request] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        invokeContractV1(invokeContractV1Request?: InvokeContractV1Request, options?: any): AxiosPromise<void> {
-            return localVarFp.invokeContractV1(invokeContractV1Request, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
          * @summary Executes a transaction on a Iroha ledger
-         * @param {RunTransactionRequestV1} [runTransactionRequestV1] 
+         * @param {RunTransactionRequestV1 | RunTransactionSignedRequestV1} [runTransactionRequestV1RunTransactionSignedRequestV1] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        runTransactionV1(runTransactionRequestV1?: RunTransactionRequestV1, options?: any): AxiosPromise<RunTransactionResponse> {
-            return localVarFp.runTransactionV1(runTransactionRequestV1, options).then((request) => request(axios, basePath));
+        runTransactionV1(runTransactionRequestV1RunTransactionSignedRequestV1?: RunTransactionRequestV1 | RunTransactionSignedRequestV1, options?: any): AxiosPromise<RunTransactionResponse> {
+            return localVarFp.runTransactionV1(runTransactionRequestV1RunTransactionSignedRequestV1, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -511,6 +591,18 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
 export class DefaultApi extends BaseAPI {
     /**
      * 
+     * @summary Generate transaction that can be signed locally.
+     * @param {GenerateTransactionRequestV1} [generateTransactionRequestV1] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public generateTransactionV1(generateTransactionRequestV1?: GenerateTransactionRequestV1, options?: any) {
+        return DefaultApiFp(this.configuration).generateTransactionV1(generateTransactionRequestV1, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary Get the Prometheus Metrics
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -522,26 +614,14 @@ export class DefaultApi extends BaseAPI {
 
     /**
      * 
-     * @summary Invokes a contract on a Iroha ledger
-     * @param {InvokeContractV1Request} [invokeContractV1Request] 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApi
-     */
-    public invokeContractV1(invokeContractV1Request?: InvokeContractV1Request, options?: any) {
-        return DefaultApiFp(this.configuration).invokeContractV1(invokeContractV1Request, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
      * @summary Executes a transaction on a Iroha ledger
-     * @param {RunTransactionRequestV1} [runTransactionRequestV1] 
+     * @param {RunTransactionRequestV1 | RunTransactionSignedRequestV1} [runTransactionRequestV1RunTransactionSignedRequestV1] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public runTransactionV1(runTransactionRequestV1?: RunTransactionRequestV1, options?: any) {
-        return DefaultApiFp(this.configuration).runTransactionV1(runTransactionRequestV1, options).then((request) => request(this.axios, this.basePath));
+    public runTransactionV1(runTransactionRequestV1RunTransactionSignedRequestV1?: RunTransactionRequestV1 | RunTransactionSignedRequestV1, options?: any) {
+        return DefaultApiFp(this.configuration).runTransactionV1(runTransactionRequestV1RunTransactionSignedRequestV1, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

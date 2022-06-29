@@ -136,7 +136,10 @@
       },
       "KeyPair": {
         "type": "object",
-        "required": ["publicKey", "privateKey"],
+        "required": [
+          "publicKey",
+          "privateKey"
+        ],
         "properties": {
           "publicKey": {
             "description": "SHA-3 ed25519 public keys of length 64 are recommended.",
@@ -154,7 +157,11 @@
       },
       "RunTransactionRequestV1": {
         "type": "object",
-        "required": ["commandName", "params"],
+        "required": [
+          "commandName",
+          "baseConfig",
+          "params"
+        ],
         "additionalProperties": false,
         "properties": {
           "commandName": {
@@ -169,6 +176,54 @@
             "description": "The list of arguments to pass in to the transaction request.",
             "type": "array",
             "items": {}
+          }
+        }
+      },
+      "RunTransactionSignedRequestV1": {
+        "type": "object",
+        "required": [
+          "signedTransaction"
+        ],
+        "properties": {
+          "signedTransaction": {
+            "description": "Signed transaction binary data received from generate-transaction endpoint.",
+            "type": "string",
+            "format": "binary"
+          },
+          "baseConfig": {
+            "$ref": "#/components/schemas/IrohaBaseConfig",
+            "nullable": false
+          }
+        }
+      },
+      "GenerateTransactionRequestV1": {
+        "type": "object",
+        "required": [
+          "commandName",
+          "commandParams",
+          "creatorAccountId"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "commandName": {
+            "description": "Iroha command name.",
+            "type": "IrohaCommand",
+            "nullable": false
+          },
+          "commandParams": {
+            "description": "Parameters for iroha command specified in commandName",
+            "type": "object"
+          },
+          "creatorAccountId": {
+            "description": "Sender account id",
+            "type": "string",
+            "nullable": false
+          },
+          "quorum": {
+            "description": "Requested transaction quorum",
+            "type": "number",
+            "nullable": false,
+            "default": 1
           }
         }
       },
@@ -211,26 +266,61 @@
       },
       "RunTransactionResponse": {
         "type": "object",
-        "required": ["transactionReceipt"],
+        "required": [
+          "transactionReceipt"
+        ],
         "properties": {
           "transactionReceipt": {}
         }
       },
-      "InvokeContractV1Request": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "contractName": {}
-        }
-      },
-      "InvokeContractV1Response": {
-        "type": "object",
-        "required": ["success"],
-        "properties": {}
-      },
       "PrometheusExporterMetricsResponse": {
         "type": "string",
         "nullable": false
+      },
+      "ErrorExceptionJsonResponseV1": {
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "message": {
+            "type": "string",
+            "nullable": false
+          },
+          "name": {
+            "type": "string",
+            "nullable": false
+          },
+          "error": {
+            "type": "string",
+            "nullable": false
+          },
+          "stack": {
+            "type": "string",
+            "nullable": false
+          },
+          "cause": {
+            "type": "string",
+            "nullable": false
+          }
+        }
+      },
+      "ErrorExceptionResponseV1": {
+        "type": "object",
+        "required": [
+          "message",
+          "error"
+        ],
+        "properties": {
+          "message": {
+            "type": "string",
+            "nullable": false
+          },
+          "error": {
+            "type": "string",
+            "nullable": false
+          }
+        }
       }
     }
   },
@@ -250,7 +340,14 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/RunTransactionRequestV1"
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/RunTransactionRequestV1"
+                  },
+                  {
+                    "$ref": "#/components/schemas/RunTransactionSignedRequestV1"
+                  }
+                ]
               }
             }
           }
@@ -265,45 +362,88 @@
                 }
               }
             }
+          },
+          "405": {
+            "description": "Method Not Allowed error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorExceptionJsonResponseV1"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorExceptionJsonResponseV1"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorExceptionJsonResponseV1"
+                }
+              }
+            }
           }
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha/invoke-contract": {
+    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha/generate-transaction": {
       "post": {
         "x-hyperledger-cactus": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha/invoke-contract"
+            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha/generate-transaction"
           }
         },
-        "operationId": "invokeContractV1",
-        "summary": "Invokes a contract on a Iroha ledger",
+        "operationId": "generateTransactionV1",
+        "summary": "Generate transaction that can be signed locally.",
         "parameters": [],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/InvokeContractV1Request"
+                "$ref": "#/components/schemas/GenerateTransactionRequestV1"
               }
             }
           }
         },
         "responses": {
-          "501": {
-            "description": "Not implemented",
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request Error",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "nullable": false,
-                      "minLength": 1,
-                      "maxLength": 2048
-                    }
-                  }
+                  "$ref": "#/components/schemas/ErrorExceptionResponseV1"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorExceptionResponseV1"
                 }
               }
             }
