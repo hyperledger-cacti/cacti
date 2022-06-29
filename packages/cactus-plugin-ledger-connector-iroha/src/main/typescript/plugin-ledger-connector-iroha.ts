@@ -1,10 +1,10 @@
-import { Server } from "http";
 import * as grpc from "grpc";
-import { Server as SecureServer } from "https";
 import { CommandService_v1Client as CommandService } from "iroha-helpers-ts/lib/proto/endpoint_grpc_pb";
 import { QueryService_v1Client as QueryService } from "iroha-helpers-ts/lib/proto/endpoint_grpc_pb";
+import { Transaction } from "iroha-helpers-ts/lib/proto/transaction_pb";
 import commands from "iroha-helpers-ts/lib/commands/index";
 import queries from "iroha-helpers-ts/lib/queries";
+import { TxBuilder } from "iroha-helpers-ts/lib/chain";
 import type { Express } from "express";
 import {
   GrantablePermission,
@@ -39,10 +39,13 @@ import {
   IrohaCommand,
   IrohaQuery,
   RunTransactionRequestV1,
+  RunTransactionSignedRequestV1,
+  GenerateTransactionRequestV1,
   RunTransactionResponse,
 } from "./generated/openapi/typescript-axios";
 
 import { RunTransactionEndpoint } from "./web-services/run-transaction-endpoint";
+import { GenerateTransactionEndpoint } from "./web-services/generate-transaction-endpoint";
 import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
 import {
   GetPrometheusExporterMetricsEndpointV1,
@@ -64,7 +67,7 @@ export class PluginLedgerConnectorIroha
     IPluginLedgerConnector<
       never,
       never,
-      RunTransactionRequestV1,
+      RunTransactionSignedRequestV1 | RunTransactionRequestV1,
       RunTransactionResponse
     >,
     ICactusPlugin,
@@ -72,10 +75,8 @@ export class PluginLedgerConnectorIroha
   private readonly instanceId: string;
   public prometheusExporter: PrometheusExporter;
   private readonly log: Logger;
-  private readonly pluginRegistry: PluginRegistry;
 
   private endpoints: IWebServiceEndpoint[] | undefined;
-  private httpServer: Server | SecureServer | null = null;
 
   public static readonly CLASS_NAME = "PluginLedgerConnectorIroha";
 
@@ -90,7 +91,6 @@ export class PluginLedgerConnectorIroha
       options.rpcToriiPortHost,
       `${fnTag} options.rpcToriiPortHost`,
     );
-    Checks.truthy(options.pluginRegistry, `${fnTag} options.pluginRegistry`);
     Checks.truthy(options.instanceId, `${fnTag} options.instanceId`);
 
     const level = this.options.logLevel || "INFO";
@@ -98,7 +98,6 @@ export class PluginLedgerConnectorIroha
     this.log = LoggerProvider.getOrCreate({ level, label });
 
     this.instanceId = options.instanceId;
-    this.pluginRegistry = options.pluginRegistry;
     this.prometheusExporter =
       options.prometheusExporter ||
       new PrometheusExporter({ pollingIntervalInMin: 1 });
@@ -166,6 +165,14 @@ export class PluginLedgerConnectorIroha
       const endpoint = new GetPrometheusExporterMetricsEndpointV1(opts);
       endpoints.push(endpoint);
     }
+    {
+      const endpoint = new GenerateTransactionEndpoint({
+        connector: this,
+        logLevel: this.options.logLevel,
+      });
+      endpoints.push(endpoint);
+    }
+
     this.endpoints = endpoints;
     return endpoints;
   }
@@ -185,38 +192,31 @@ export class PluginLedgerConnectorIroha
     return consensusHasTransactionFinality(currentConsensusAlgorithmFamily);
   }
 
-  public async transact(
+  /**
+   * Create and run Iroha transaction based on input arguments.
+   * Transaction is signed with a private key supplied in the input argument.
+   *
+   * @param req `RunTransactionSignedRequestV1`
+   * @param commandService Iroha SDK `CommandService_v1Client` instance
+   * @param queryService Iroha SDK `QueryService_v1Client` instance
+   * @returns `Promise<RunTransactionResponse>`
+   */
+  private async transactRequest(
     req: RunTransactionRequestV1,
+    commandService: CommandService,
+    queryService: QueryService,
   ): Promise<RunTransactionResponse> {
     const { baseConfig } = req;
     if (
       !baseConfig ||
       !baseConfig.privKey ||
       !baseConfig.creatorAccountId ||
-      !baseConfig.irohaHost ||
-      !baseConfig.irohaPort ||
       !baseConfig.quorum ||
       !baseConfig.timeoutLimit
     ) {
-      this.log.debug(
-        "Certain field within the Iroha basic configuration is missing!",
-      );
       throw new RuntimeError("Some fields in baseConfig is undefined");
     }
-    const irohaHostPort = `${baseConfig.irohaHost}:${baseConfig.irohaPort}`;
 
-    let grpcCredentials;
-    if (baseConfig.tls) {
-      throw new RuntimeError("TLS option is not supported");
-    } else {
-      grpcCredentials = grpc.credentials.createInsecure();
-    }
-    const commandService = new CommandService(
-      irohaHostPort,
-      //TODO:do something in the production environment
-      grpcCredentials,
-    );
-    const queryService = new QueryService(irohaHostPort, grpcCredentials);
     const commandOptions = {
       privateKeys: baseConfig.privKey, //need an array of keys for command
       creatorAccountId: baseConfig.creatorAccountId,
@@ -224,6 +224,7 @@ export class PluginLedgerConnectorIroha
       commandService: commandService,
       timeoutLimit: baseConfig.timeoutLimit,
     };
+
     const queryOptions = {
       privateKey: baseConfig.privKey[0], //only need 1 key for query
       creatorAccountId: baseConfig.creatorAccountId as string,
@@ -241,7 +242,7 @@ export class PluginLedgerConnectorIroha
           });
           return { transactionReceipt: response };
         } catch (err) {
-          throw new RuntimeError(err);
+          throw new RuntimeError(err as any);
         }
       }
       case IrohaCommand.SetAccountDetail: {
@@ -253,7 +254,7 @@ export class PluginLedgerConnectorIroha
           });
           return { transactionReceipt: response };
         } catch (err) {
-          throw new RuntimeError(err);
+          throw new RuntimeError(err as any);
         }
       }
       case IrohaCommand.CompareAndSetAccountDetail: {
@@ -269,7 +270,7 @@ export class PluginLedgerConnectorIroha
           );
           return { transactionReceipt: response };
         } catch (err) {
-          throw new RuntimeError(err);
+          throw new RuntimeError(err as any);
         }
       }
       case IrohaCommand.CreateAsset: {
@@ -282,7 +283,7 @@ export class PluginLedgerConnectorIroha
             });
           return { transactionReceipt: response };
         } catch (err) {
-          throw new RuntimeError(err);
+          throw new RuntimeError(err as any);
         }
       }
       case IrohaCommand.CreateDomain: {
@@ -293,7 +294,7 @@ export class PluginLedgerConnectorIroha
           });
           return { transactionReceipt: response };
         } catch (err) {
-          throw new RuntimeError(err);
+          throw new RuntimeError(err as any);
         }
       }
       case IrohaCommand.SetAccountQuorum: {
@@ -304,7 +305,7 @@ export class PluginLedgerConnectorIroha
           });
           return { transactionReceipt: response };
         } catch (err) {
-          throw new RuntimeError(err);
+          throw new RuntimeError(err as any);
         }
       }
       case IrohaCommand.AddAssetQuantity: {
@@ -315,7 +316,7 @@ export class PluginLedgerConnectorIroha
           });
           return { transactionReceipt: response };
         } catch (err) {
-          throw new RuntimeError(err);
+          throw new RuntimeError(err as any);
         }
       }
       case IrohaCommand.SubtractAssetQuantity: {
@@ -329,7 +330,7 @@ export class PluginLedgerConnectorIroha
           );
           return { transactionReceipt: response };
         } catch (err) {
-          throw new RuntimeError(err);
+          throw new RuntimeError(err as any);
         }
       }
       case IrohaCommand.TransferAsset: {
@@ -343,7 +344,7 @@ export class PluginLedgerConnectorIroha
           });
           return { transactionReceipt: response };
         } catch (err) {
-          throw new RuntimeError(err);
+          throw new RuntimeError(err as any);
         }
       }
       case IrohaQuery.GetSignatories: {
@@ -353,7 +354,7 @@ export class PluginLedgerConnectorIroha
           });
           return { transactionReceipt: queryRes };
         } catch (err) {
-          throw new RuntimeError(err);
+          throw new RuntimeError(err as any);
         }
       }
       case IrohaQuery.GetAccount: {
@@ -363,7 +364,7 @@ export class PluginLedgerConnectorIroha
           });
           return { transactionReceipt: queryRes };
         } catch (err) {
-          throw new RuntimeError(err);
+          throw new RuntimeError(err as any);
         }
       }
       case IrohaQuery.GetAccountDetail: {
@@ -378,7 +379,7 @@ export class PluginLedgerConnectorIroha
           });
           return { transactionReceipt: queryRes };
         } catch (err) {
-          throw new RuntimeError(err);
+          throw new RuntimeError(err as any);
         }
       }
       case IrohaQuery.GetAssetInfo: {
@@ -388,7 +389,7 @@ export class PluginLedgerConnectorIroha
           });
           return { transactionReceipt: queryRes };
         } catch (err) {
-          throw new RuntimeError(err);
+          throw new RuntimeError(err as any);
         }
       }
       case IrohaQuery.GetAccountAssets: {
@@ -400,7 +401,7 @@ export class PluginLedgerConnectorIroha
           });
           return { transactionReceipt: queryRes };
         } catch (err) {
-          throw new RuntimeError(err);
+          throw new RuntimeError(err as any);
         }
       }
       case IrohaCommand.AddSignatory: {
@@ -411,7 +412,7 @@ export class PluginLedgerConnectorIroha
           });
           return { transactionReceipt: response };
         } catch (err) {
-          throw new RuntimeError(err);
+          throw new RuntimeError(err as any);
         }
       }
       case IrohaCommand.RemoveSignatory: {
@@ -422,7 +423,7 @@ export class PluginLedgerConnectorIroha
           });
           return { transactionReceipt: response };
         } catch (err) {
-          throw new RuntimeError(err);
+          throw new RuntimeError(err as any);
         }
       }
       case IrohaQuery.GetRoles: {
@@ -430,7 +431,7 @@ export class PluginLedgerConnectorIroha
           const response = await queries.getRoles(queryOptions);
           return { transactionReceipt: response };
         } catch (err) {
-          throw new RuntimeError(err);
+          throw new RuntimeError(err as any);
         }
       }
       case IrohaCommand.CreateRole: {
@@ -441,7 +442,7 @@ export class PluginLedgerConnectorIroha
           });
           return { transactionReceipt: response };
         } catch (err) {
-          throw new RuntimeError(err);
+          throw new RuntimeError(err as any);
         }
       }
       case IrohaCommand.AppendRole: {
@@ -452,7 +453,7 @@ export class PluginLedgerConnectorIroha
           });
           return { transactionReceipt: response };
         } catch (err) {
-          throw new RuntimeError(err);
+          throw new RuntimeError(err as any);
         }
       }
       case IrohaCommand.DetachRole: {
@@ -463,7 +464,7 @@ export class PluginLedgerConnectorIroha
           });
           return { transactionReceipt: response };
         } catch (err) {
-          throw new RuntimeError(err);
+          throw new RuntimeError(err as any);
         }
       }
       case IrohaQuery.GetRolePermissions: {
@@ -473,7 +474,7 @@ export class PluginLedgerConnectorIroha
           });
           return { transactionReceipt: response };
         } catch (err) {
-          throw new RuntimeError(err);
+          throw new RuntimeError(err as any);
         }
       }
       case IrohaCommand.GrantPermission: {
@@ -485,7 +486,7 @@ export class PluginLedgerConnectorIroha
           });
           return { transactionReceipt: response };
         } catch (err) {
-          throw new RuntimeError(err);
+          throw new RuntimeError(err as any);
         }
       }
       case IrohaCommand.RevokePermission: {
@@ -497,7 +498,7 @@ export class PluginLedgerConnectorIroha
           });
           return { transactionReceipt: response };
         } catch (err) {
-          throw new RuntimeError(err);
+          throw new RuntimeError(err as any);
         }
       }
       case IrohaCommand.SetSettingValue: {
@@ -510,7 +511,7 @@ export class PluginLedgerConnectorIroha
           });
           return { transactionReceipt: response };
         } catch (err) {
-          throw new RuntimeError(err);
+          throw new RuntimeError(err as any);
         }
       }
       case IrohaQuery.GetPendingTransactions: {
@@ -521,7 +522,7 @@ export class PluginLedgerConnectorIroha
           });
           return { transactionReceipt: response };
         } catch (err) {
-          throw new RuntimeError(err);
+          throw new RuntimeError(err as any);
         }
       }
       case IrohaQuery.GetAccountTransactions: {
@@ -533,7 +534,7 @@ export class PluginLedgerConnectorIroha
           });
           return { transactionReceipt: response };
         } catch (err) {
-          throw new RuntimeError(err);
+          throw new RuntimeError(err as any);
         }
       }
       case IrohaQuery.GetAccountAssetTransactions: {
@@ -549,7 +550,7 @@ export class PluginLedgerConnectorIroha
           );
           return { transactionReceipt: response };
         } catch (err) {
-          throw new RuntimeError(err);
+          throw new RuntimeError(err as any);
         }
       }
       case IrohaQuery.GetBlock: {
@@ -559,7 +560,7 @@ export class PluginLedgerConnectorIroha
           });
           return { transactionReceipt: response };
         } catch (err) {
-          throw new RuntimeError(err);
+          throw new RuntimeError(err as any);
         }
       }
       case IrohaCommand.CallEngine: {
@@ -572,7 +573,7 @@ export class PluginLedgerConnectorIroha
           });
           return { transactionReceipt: response };
         } catch (err) {
-          throw new RuntimeError(err);
+          throw new RuntimeError(err as any);
         }
       }
       case IrohaQuery.GetEngineReceipts: {
@@ -582,7 +583,7 @@ export class PluginLedgerConnectorIroha
           });
           return { transactionReceipt: response };
         } catch (err) {
-          throw new RuntimeError(err);
+          throw new RuntimeError(err as any);
         }
       }
       case IrohaQuery.FetchCommits: {
@@ -590,7 +591,7 @@ export class PluginLedgerConnectorIroha
           const response = await queries.fetchCommits(queryOptions);
           return { transactionReceipt: response };
         } catch (err) {
-          throw new RuntimeError(err);
+          throw new RuntimeError(err as any);
         }
       }
       case IrohaCommand.AddPeer: {
@@ -601,7 +602,7 @@ export class PluginLedgerConnectorIroha
           });
           return { transactionReceipt: response };
         } catch (err) {
-          throw new RuntimeError(err);
+          throw new RuntimeError(err as any);
         }
       }
       case IrohaCommand.RemovePeer: {
@@ -611,7 +612,7 @@ export class PluginLedgerConnectorIroha
           });
           return { transactionReceipt: response };
         } catch (err) {
-          throw new RuntimeError(err);
+          throw new RuntimeError(err as any);
         }
       }
       case IrohaQuery.GetPeers: {
@@ -619,7 +620,7 @@ export class PluginLedgerConnectorIroha
           const response = await queries.getPeers(queryOptions);
           return { transactionReceipt: response };
         } catch (err) {
-          throw new RuntimeError(err);
+          throw new RuntimeError(err as any);
         }
       }
       default: {
@@ -627,6 +628,127 @@ export class PluginLedgerConnectorIroha
           "command or query does not exist, or is not supported in current version",
         );
       }
+    }
+  }
+
+  /**
+   * Run Iroha transaction based on already signed transaction received from the client.
+   *
+   * @param req RunTransactionSignedRequestV1
+   * @param commandService Iroha SDK `CommandService_v1Client` instance
+   * @returns `Promise<RunTransactionResponse>`
+   */
+  private async transactSigned(
+    req: RunTransactionSignedRequestV1,
+    commandService: CommandService,
+  ): Promise<RunTransactionResponse> {
+    if (!req.baseConfig || !req.baseConfig.timeoutLimit) {
+      throw new RuntimeError("baseConfig.timeoutLimit is undefined");
+    }
+
+    try {
+      const transactionBinary = Uint8Array.from(
+        Object.values(req.signedTransaction),
+      );
+      const signedTransaction = Transaction.deserializeBinary(
+        transactionBinary,
+      );
+      this.log.debug("Received signed transaction:", signedTransaction);
+
+      const sendResponse = await new TxBuilder(signedTransaction).send(
+        commandService,
+        req.baseConfig.timeoutLimit,
+      );
+
+      return { transactionReceipt: sendResponse };
+    } catch (error) {
+      throw new RuntimeError(error as any);
+    }
+  }
+
+  /**
+   * Entry point for transact endpoint.
+   * Validate common `baseConfig` arguments and perapre command and query services.
+   * Call different transaction logic depending on input arguments.
+   *
+   * @note TLS connections are not supported yet.
+   * @param req `RunTransactionSignedRequestV1 | RunTransactionRequestV1`
+   * @returns `Promise<RunTransactionResponse>`
+   */
+  public async transact(
+    req: RunTransactionSignedRequestV1 | RunTransactionRequestV1,
+  ): Promise<RunTransactionResponse> {
+    const { baseConfig } = req;
+    if (!baseConfig || !baseConfig.irohaHost || !baseConfig.irohaPort) {
+      throw new RuntimeError("Missing Iroha URL information.");
+    }
+    const irohaHostPort = `${baseConfig.irohaHost}:${baseConfig.irohaPort}`;
+
+    let grpcCredentials;
+    if (baseConfig.tls) {
+      throw new RuntimeError("TLS option is not supported");
+    } else {
+      grpcCredentials = grpc.credentials.createInsecure();
+    }
+
+    const commandService = new CommandService(
+      irohaHostPort,
+      //TODO:do something in the production environment
+      grpcCredentials,
+    );
+    const queryService = new QueryService(irohaHostPort, grpcCredentials);
+
+    if ("signedTransaction" in req) {
+      return this.transactSigned(req, commandService);
+    } else {
+      return this.transactRequest(req, commandService, queryService);
+    }
+  }
+
+  /**
+   * Check if given Iroha command is supported and can be safely called on the `TxBuilder`.
+   * Command must be listend in OpenAPI interface and be present on the builder object.
+   * @param builder `TxBuilder` that will be used to call the command on.
+   * @param command Iroha command name in string format.
+   * @returns `true` if command is safe, `false` otherwise.
+   */
+  private isSafeIrohaCommand(builder: TxBuilder, command: string): boolean {
+    // Check if command is listen in the OpenAPI interface
+    if (!Object.values(IrohaCommand).includes(command as IrohaCommand)) {
+      this.log.debug("Command not listed in OpenAPI interface");
+      return false;
+    }
+
+    // Check if function is present in builder object
+    return (
+      command in builder && typeof (builder as any)[command] === "function"
+    );
+  }
+
+  /**
+   * Entry point for generate unsigned transaction endpoint.
+   * Transaction must be deserialized and signed on the client side.
+   * It can be then send to transact endpoint for futher processing.
+   * @param req `GenerateTransactionRequestV1`
+   * @returns `Uint8Array` of serialized transaction.
+   */
+  public generateTransaction(req: GenerateTransactionRequestV1): Uint8Array {
+    req.quorum = req.quorum ?? 1;
+    const builder = new TxBuilder();
+
+    if (!this.isSafeIrohaCommand(builder, req.commandName)) {
+      throw new RuntimeError(
+        `Bad Request: Not supported Iroha command '${req.commandName}' - aborted.`,
+      );
+    }
+
+    try {
+      return (builder as any)
+        [req.commandName](req.commandParams)
+        .addMeta(req.creatorAccountId, req.quorum)
+        .tx.serializeBinary();
+    } catch (error) {
+      throw new RuntimeError(error as any);
     }
   }
 }
