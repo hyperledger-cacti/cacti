@@ -25,7 +25,7 @@ This plugin provides `Cactus` a way to interact with Hyperledger Sawtooth networ
 - node.js v12 (recommend: v12.20.2 or greater)
 
 ### Prerequisites
-- Please ensure that the destination ledger (default: [sawtooth-testnet](../../tools/docker/sawtooth-testnet)) is already launched.
+- Please ensure that the destination ledger (default: [sawtooth-all-in-one](../../tools/docker/sawtooth-all-in-one)) is already launched.
 
 ## Boot methods
 

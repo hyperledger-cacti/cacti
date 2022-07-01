@@ -13,6 +13,8 @@
 # limitations under the License.
 # ------------------------------------------------------------------------------
 
+# Upstream source: https://github.com/hyperledger/sawtooth-core/blob/1-2/docker/compose/sawtooth-default.yaml
+
 version: "2.1"
 
 services:
@@ -23,8 +25,6 @@ services:
     depends_on:
       - validator
     entrypoint: settings-tp -vv -C tcp://validator:4004
-    networks:
-      - sawtooth_net
 
   intkey-tp-python:
     image: hyperledger/sawtooth-intkey-tp-python:1.2.3
@@ -32,8 +32,6 @@ services:
     depends_on:
       - validator
     entrypoint: intkey-tp-python -vv -C tcp://validator:4004
-    networks:
-      - sawtooth_net
 
   xo-tp-python:
     image: hyperledger/sawtooth-xo-tp-python:1.2.3
@@ -41,8 +39,6 @@ services:
     depends_on:
       - validator
     entrypoint: xo-tp-python -vv -C tcp://validator:4004
-    networks:
-      - sawtooth_net
 
   validator:
     image: hyperledger/sawtooth-validator:1.2.6
@@ -68,8 +64,6 @@ services:
           --bind network:tcp://eth0:8800 \
           --bind consensus:tcp://eth0:5050 \
         \""
-    networks:
-      - sawtooth_net
 
   devmode-engine:
     image: hyperledger/sawtooth-devmode-engine-rust:1.2.3
@@ -77,8 +71,6 @@ services:
     depends_on:
       - validator
     entrypoint: devmode-engine-rust -C tcp://validator:5050
-    networks:
-      - sawtooth_net
 
   rest-api:
     image: hyperledger/sawtooth-rest-api:1.2.6
@@ -88,8 +80,6 @@ services:
     depends_on:
       - validator
     entrypoint: sawtooth-rest-api -C tcp://validator:4004 --bind rest-api:8008
-    networks:
-      - sawtooth_net
 
   shell:
     image: hyperledger/sawtooth-shell:1.2.6
@@ -100,9 +90,3 @@ services:
         sawtooth keygen && \
         tail -f /dev/null \
         \""
-    networks:
-      - sawtooth_net
-
-networks:
-  sawtooth_net:
-    external: true
