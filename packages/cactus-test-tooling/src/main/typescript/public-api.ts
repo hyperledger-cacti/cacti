@@ -155,6 +155,12 @@ export {
 } from "./rustc-container/rustc-container";
 
 export {
+  ISawtoothTestLedgerOptions,
+  SAWTOOTH_LEDGER_DEFAULT_OPTIONS,
+  SawtoothTestLedger,
+} from "./sawtooth/sawtooth-test-ledger";
+
+export {
   ISubstrateTestLedgerOptions,
   SubstrateTestLedger,
 } from "./substrate-test-ledger/substrate-test-ledger";

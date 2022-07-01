@@ -32,7 +32,6 @@ export class QuorumMultiPartyTestLedger implements ITestLedger {
   public containerId: string | undefined;
 
   constructor(public readonly options: IQuorumMultiPartyTestLedgerOptions) {
-    // @todo Replace with hyperledger ghcr link when available
     this.containerImageName =
       options?.containerImageName ||
       "ghcr.io/hyperledger/cactus-quorum-multi-party-all-in-one";

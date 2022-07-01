@@ -39,13 +39,7 @@ In this example, we use the Sawtooth intkey transaction processor as an applicat
     - This script will start all ledger docker containers, networks, and will setup configuration needed to operate the sample app.
     - (NOTICE: Before executing the above, your account needs to be added to the docker group (`usermod -a -G docker YourAccount` from root user))
     - On success, this should start the following containers:
-        - `sawtooth-shell-default`
-        - `sawtooth-settings-tp-default`
-        - `sawtooth-intkey-tp-python-default`
-        - `sawtooth-xo-tp-python-default`
-        - `sawtooth-rest-api-default`
-        - `sawtooth-devmode-engine-rust-default`
-        - `sawtooth-validator-default`
+        - `sawtooth_all_in_one_ledger_1x`
         - `geth1`
 
 1. Launch electricity-trade and validators from local `docker-compose.yml` (use separate console for that, docker-compose will block your prompt):
@@ -131,10 +125,13 @@ In this example, we use the Sawtooth intkey transaction processor as an applicat
 
     ```
     # Create intkey batch representing electricity usage
-    Writing to batches.intkey...
-
-    # Sumbit electricity usage
-    batches: 2,  batch/sec: 159.92313264955962
+    {
+    "link": "http://rest-api:8008/batch_statuses?id=4e85337e170917c138e4f7de44c85c9dea9c5e17916fded672b90adb85a07ca009002580f8629660e26e1117e9ac15f4c1164d9dc05fc77ac8e212672dc5e97a"
+    }
+    # Increase usage
+    {
+    "link": "http://rest-api:8008/batch_statuses?id=88b4dfa2128c7ad4b646b4fe6be878948f7c17651baf9c6384080a9eaae5036e219c432b46f74331a2d56b80bf2dcc94496ff261d1a941f23210d637badacf14"
+    }
     ```
 
 1. (Optional) Check the balance on Ethereum accounts using the following script

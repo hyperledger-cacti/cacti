@@ -5,7 +5,7 @@ sslParam:
 blockMonitor:
   request:
     method: "GET"
-    host: "http://rest-api:8008/"
+    host: "http://sawtooth_all_in_one_ledger_1x:8008/"
     getLatestBlockNumberCommand: "blocks?limit=1"
     periodicMonitoringCommand1: "blocks?start="
     periodicMonitoringCommand2: "&reverse"

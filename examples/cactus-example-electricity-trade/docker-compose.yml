@@ -27,7 +27,7 @@ services:
     ports:
       - "5140:5140"
     networks:
-      - sawtooth_net
+      - sawtooth_aio_testnet_1x
       - cactus-example-electricity-trade-net
     volumes:
         - type: bind
@@ -61,7 +61,7 @@ services:
           target: /etc/cactus
 
 networks:
-  sawtooth_net:
+  sawtooth_aio_testnet_1x:
     external: true
   geth1net:
     external: true

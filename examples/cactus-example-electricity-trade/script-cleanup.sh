@@ -6,13 +6,7 @@ echo ">> Remove the config files on your machine"
 rm -rf ./etc/cactus/
 
 echo ">> Stop and remove the docker containers"
-docker rm -f sawtooth-shell-default \
-                sawtooth-settings-tp-default \
-                sawtooth-intkey-tp-python-default \
-                sawtooth-xo-tp-python-default \
-                sawtooth-rest-api-default \
-                sawtooth-devmode-engine-rust-default \
-                sawtooth-validator-default \
+docker rm -f sawtooth_all_in_one_ledger_1x \
                 geth1 \
                 cactus-example-electricity-trade-blp \
                 cactus-example-electricity-trade-ethereum-validator \
@@ -20,9 +14,9 @@ docker rm -f sawtooth-shell-default \
                 cmd-socketio-base-dummy
 
 echo ">> Remove docker networks"
-docker network rm sawtooth_net \
-                    electricity-trade_default \
-                    electricity-trade_electricity-trade-net \
+docker network rm sawtooth_aio_testnet_1x \
+                    cactus-example-electricity-trade_default \
+                    cactus-example-electricity-trade_cactus-example-electricity-trade-net \
                     geth1net \
                     geth-testnet_default
 
