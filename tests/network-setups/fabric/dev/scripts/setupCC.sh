@@ -13,7 +13,7 @@ OLD_GOPATH=$GOPATH
 export GOPATH=$TMP_PATH
 
 # Download interopcc and copy it into correct folder
-go get -d "${INTEROPCC_MOD}"
+go install "${INTEROPCC_MOD}@latest"
 cp -r $TMP_PATH/pkg/mod/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop* $CHAINCODE_PATH/interop
 chmod -R +w $CHAINCODE_PATH/interop
 

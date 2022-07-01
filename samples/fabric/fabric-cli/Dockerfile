@@ -13,4 +13,4 @@ COPY .npmrc /root
 # RUN yarn
 RUN npm install
 RUN yarn link
-
+RUN rm /root/.npmrc

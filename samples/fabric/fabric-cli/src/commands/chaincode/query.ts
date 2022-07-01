@@ -83,7 +83,12 @@ const command: GluegunCommand = {
         userid,
         true
       )
-      logger.info(`Result from network query: ${result}`)
+      try {             // If the result is a JSON
+        const resultJSON = JSON.stringify(JSON.parse(result), null, 4)
+        logger.info(`Result from network query: ${resultJSON}`)
+      } catch(err) {    // If the result is not a JSON
+        logger.info(`Result from network query: ${result}`)
+      }
     } catch (err) {
       logger.error(`Error during fabric query: ${JSON.stringify(err)}`)
     }
