@@ -8,7 +8,6 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "tsBuildInfoFile": "../../.build-cache/cactus-plugin-ledger-connector-sawtooth-socketio.tsbuildinfo",
-    "strict": false // TODO - True, fix warnings
   },
   "include": [
     "./src/main/typescript/common/core/*.ts",

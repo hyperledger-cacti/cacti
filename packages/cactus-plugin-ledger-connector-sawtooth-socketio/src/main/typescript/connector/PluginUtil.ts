@@ -25,7 +25,7 @@ const cbor = require("cbor");
  *         3.78*10^14
  *         3.78e14
  */
-exports.convNum = function (value, defaultValue) {
+exports.convNum = function convNum(value: number | string, defaultValue: number | string) {
   let retValue = 0;
   let defValue = 0;
 
@@ -71,7 +71,7 @@ exports.convNum = function (value, defaultValue) {
   return retValue;
 };
 
-exports.convertBlockNumber = function (value) {
+exports.convertBlockNumber = function (value: number) {
   return "0x" + ("0000000000000000" + value.toString(16)).substr(-16);
 };
 

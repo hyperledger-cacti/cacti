@@ -24,6 +24,11 @@ logger.level = config.read("logLevel", "info");
 import { ValidatorAuthentication } from "./ValidatorAuthentication";
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
+export type MonitorCallback = (callback: {
+  status: number;
+  blockData: string;
+}) => void;
+
 /*
  * ServerMonitorPlugin
  * Class definitions of server monitoring
@@ -46,7 +51,7 @@ export class ServerMonitorPlugin {
    * @param {string} filterKey: Key to filter blocks
    * @param {function} cb: A callback function that receives monitoring results at any time.
    */
-  startMonitor(clientId, filterKey, cb) {
+  startMonitor(clientId: string, filterKey: string, cb: MonitorCallback) {
     logger.info("*** START MONITOR ***");
     logger.info("Client ID :" + clientId);
     logger.debug(`filterKey = ${filterKey}`);
@@ -75,7 +80,7 @@ export class ServerMonitorPlugin {
    * @param {string} filterKey: Key to filter blocks
    * @param {function} cb: A callback function that receives monitoring results at any time.
    */
-  periodicMonitoring(clientId, filterKey, cb) {
+  periodicMonitoring(clientId: string, filterKey: string, cb: MonitorCallback) {
     logger.info("*** START PERIODIC MONITORING ***");
 
     const that = this;

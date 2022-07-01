@@ -65,7 +65,7 @@ server.on("listening", onListening);
  * Normalize a port into a number, string, or false.
  */
 
-function normalizePort(val) {
+function normalizePort(val: string) {
   const port = parseInt(val, 10);
 
   if (isNaN(port)) {
@@ -85,7 +85,7 @@ function normalizePort(val) {
  * Event listener for HTTPS server "error" event.
  */
 
-function onError(error) {
+function onError(error: any) {
   if (error.syscall !== "listen") {
     throw error;
   }
@@ -114,6 +114,12 @@ function onError(error) {
 
 function onListening() {
   const addr = server.address();
+
+  if (!addr) {
+    logger.error("Could not get running server address - exit.");
+    process.exit(1);
+  }
+
   const bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
   debug("Listening on " + bind);
 }
@@ -125,8 +131,7 @@ io.on("connection", function (client) {
    * startMonitor: starting block generation event monitoring
    **/
   client.on("startMonitor", function (data) {
-    // Callback to receive monitoring results
-    const cb = function (callbackData) {
+    Smonitor.startMonitor(client.id, data.filterKey, (callbackData) => {
       let emitType = "";
       if (callbackData.status == 200) {
         emitType = "eventReceived";
@@ -135,8 +140,6 @@ io.on("connection", function (client) {
         emitType = "monitor_error";
       }
       client.emit(emitType, callbackData);
-    };
-
-    Smonitor.startMonitor(client.id, data.filterKey, cb);
+    });
   });
 });
