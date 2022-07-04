@@ -15,7 +15,7 @@ service Network {
   // Data Sharing endpoints
   // endpoint for a network to request remote relay state via local relay
   rpc RequestState(NetworkQuery) returns (common.ack.Ack) {}
-  // This rpc endpooint is for polling the local relay for request state.
+  // This rpc endpoint is for polling the local relay for request state.
   rpc GetState(GetStateMessage) returns(common.state.RequestState) {}
   // NOTE: This rpc is just for debugging.
   rpc RequestDatabase(DbName) returns (RelayDatabase) {}
@@ -23,7 +23,7 @@ service Network {
   // Event endpoints
   // endpoint for a client to subscribe to event via local relay initiating subscription flow.
   rpc SubscribeEvent(NetworkEventSubscription) returns (common.ack.Ack) {}
-  // This rpc endpooint is for polling the local relay for subscription state.
+  // This rpc endpoint is for polling the local relay for subscription state.
   rpc GetEventSubscriptionState(GetStateMessage) returns(common.events.EventSubscriptionState) {}
 }
 

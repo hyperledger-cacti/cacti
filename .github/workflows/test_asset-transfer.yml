@@ -359,6 +359,7 @@ jobs:
         working-directory: samples/fabric/fabric-cli
 
   fabric-asset-transfer-local:
+    if: ${{ false }}
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
