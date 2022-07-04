@@ -2,8 +2,9 @@
 use crate::pb::common::ack::{ack, Ack};
 use crate::pb::common::query::Query;
 use crate::pb::common::state::{request_state, RequestState};
+use crate::pb::common::events::{event_subscription_state, EventSubscriptionState};
 use crate::pb::networks::networks::network_server::Network;
-use crate::pb::networks::networks::{DbName, GetStateMessage, NetworkQuery, RelayDatabase};
+use crate::pb::networks::networks::{DbName, GetStateMessage, NetworkQuery, RelayDatabase, NetworkEventSubscription};
 use crate::pb::relay::datatransfer::data_transfer_client::DataTransferClient;
 use crate::relay_proto::{parse_address, LocationSegment};
 // Internal modules
@@ -163,6 +164,17 @@ impl Network for NetworkService {
                 Ok(Response::new(reply))
             }
         }
+    }
+    
+    // Subscribe Event Endpoints
+    async fn subscribe_event(&self, request: Request<NetworkEventSubscription>) -> Result<Response<Ack>, Status> {
+        Err(tonic::Status::unimplemented("method not implemented"))
+    }
+    async fn get_event_subscription_state(
+        &self,
+        request: Request<GetStateMessage>,
+    ) -> Result<Response<EventSubscriptionState>, Status> {
+        Err(tonic::Status::unimplemented("method not implemented"))
     }
 }
 

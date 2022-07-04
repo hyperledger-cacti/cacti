@@ -3,6 +3,7 @@
 // Internal modules
 use common::ack::{ack, Ack};
 use common::query::Query;
+use common::events::EventSubscription;
 use common::state::{view_payload, Meta, meta, ViewPayload, View};
 use driver::driver::driver_communication_server::{DriverCommunication, DriverCommunicationServer};
 
@@ -112,6 +113,9 @@ impl DriverCommunication for DriverCommunicationService {
         };
 
         return Ok(Response::new(reply));
+    }
+    async fn subscribe_event(&self, request: Request<EventSubscription>) -> Result<Response<Ack>, Status> {
+        Err(tonic::Status::unimplemented("method not implemented"))
     }
 }
 
