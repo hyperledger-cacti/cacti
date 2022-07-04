@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package common.events;
+
+import "common/query.proto";
+
+option java_package = "com.weaver.protos.common.events";
+option go_package = "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common";
+
+enum EventType {
+  LedgerState = 0;
+  AssetLock = 1;
+  AssetClaim = 2;
+}
+
+message EventMatcher {
+  EventType type = 1;
+  string transaction_func = 2;
+}
+message EventSubscription {
+  EventMatcher eventMatcher = 1;
+  common.query.Query query = 2;
+}
+message EventSubscriptionState {
+  enum STATUS {
+    // pending ACK from remote relay
+    PENDING_ACK = 0;
+    // Received ACK, waiting for event subscription confirmation from remote relay
+    PENDING = 1;
+    ERROR = 2;
+    SUCCESS = 3;
+  };
+  string request_id = 1;
+  STATUS status = 2;
+  string message = 3;
+  EventMatcher eventMatcher = 4;
+  EventPublication eventPublicationSpec = 5;
+}
+
+message ContractTransaction {
+  string driverId = 1;
+  string ledgerId = 2;
+  string contractId = 3;
+  string func = 4;
+  repeated bytes args = 5;
+  uint64 replaceArgIndex = 6;
+}
+
+message EventPublication {
+  oneof publication_target {
+    ContractTransaction ctx = 1;
+    string app_url = 2;
+  }
+}
