@@ -26,6 +26,9 @@ pub mod relay {
     pub mod datatransfer {
         include!(concat!("../proto-rs", "/relay.datatransfer.rs"));
     }
+    pub mod events {
+        include!(concat!("../proto-rs", "/relay.events.rs"));
+    }
 }
 pub mod common {
     pub mod ack {
@@ -36,6 +39,9 @@ pub mod common {
     }
     pub mod query {
         include!(concat!("../proto-rs", "/common.query.rs"));
+    }
+    pub mod events {
+        include!(concat!("../proto-rs", "/common.events.rs"));
     }
 }
 pub struct DriverCommunicationService {
