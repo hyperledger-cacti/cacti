@@ -4,6 +4,7 @@ package networks.networks;
 
 import "common/ack.proto";
 import "common/state.proto";
+import "common/events.proto";
 
 option java_package = "com.weaver.protos.networks.networks";
 option go_package = "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/networks";
@@ -11,12 +12,19 @@ option go_package = "github.com/hyperledger-labs/weaver-dlt-interoperability/com
 // This service is the interface for how the network communicates with
 // its relay.
 service Network {
+  // Data Sharing endpoints
   // endpoint for a network to request remote relay state via local relay
   rpc RequestState(NetworkQuery) returns (common.ack.Ack) {}
-  // This rpc endpooint is for polling the local relay for request state.
+  // This rpc endpoint is for polling the local relay for request state.
   rpc GetState(GetStateMessage) returns(common.state.RequestState) {}
   // NOTE: This rpc is just for debugging.
   rpc RequestDatabase(DbName) returns (RelayDatabase) {}
+  
+  // Event endpoints
+  // endpoint for a client to subscribe to event via local relay initiating subscription flow.
+  rpc SubscribeEvent(NetworkEventSubscription) returns (common.ack.Ack) {}
+  // This rpc endpoint is for polling the local relay for subscription state.
+  rpc GetEventSubscriptionState(GetStateMessage) returns(common.events.EventSubscriptionState) {}
 }
 
 message DbName {
@@ -41,4 +49,9 @@ message NetworkQuery {
   string nonce = 7;
   string requesting_org = 8;
   bool confidential = 9;
+}
+message NetworkEventSubscription {
+  common.events.EventMatcher eventMatcher = 1;
+  NetworkQuery query = 2;
+  common.events.EventPublication eventPublicationSpec = 3;
 }
