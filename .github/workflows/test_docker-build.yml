@@ -8,7 +8,7 @@ on:
 
 jobs:
   relay:
-    if: ${{ false }}
+    # if: ${{ false }}
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
