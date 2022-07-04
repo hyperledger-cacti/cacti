@@ -5,7 +5,7 @@ use pb::relay::events::event_subscribe_server::EventSubscribeServer;
 
 // Internal modules
 use services::data_transfer_service::DataTransferService;
-use services::events_subscribe_service::EventSubscribeService;
+use services::event_subscribe_service::EventSubscribeService;
 use services::network_service::NetworkService;
 
 // External modules
