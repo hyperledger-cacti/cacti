@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package relay.events;
+
+import "common/ack.proto";
+import "common/events.proto";
+
+option java_package = "com.weaver.protos.relay.events";
+option go_package = "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/events";
+
+service EventSubscribe {
+  // the dest-relay forwards the request from client as EventSubscription to the src-relay
+  rpc SubscribeEvent(common.events.EventSubscription) returns (common.ack.Ack) {}
+  // Src-relay based upon query (EventSubscription) forwards the same response (Ack) 
+  // from driver to the dest-relay by calling a new endpoint in dest-relay
+  rpc SendSubscriptionStatus(common.ack.Ack) returns (common.ack.Ack) {}
+}

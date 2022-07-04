@@ -4,12 +4,18 @@ package driver.driver;
 
 import "common/ack.proto";
 import "common/query.proto";
+import "common/events.proto";
 
 option java_package = "com.weaver.protos.driver.driver";
 option go_package = "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/driver";
 
 service DriverCommunication {
+  // Data Sharing 
   // the remote relay sends a RequestDriverState request to its driver with a
   // query defining the data it wants to receive
   rpc RequestDriverState(common.query.Query) returns (common.ack.Ack) {}
+  
+  // Events Subscription
+  // the src-relay uses this endpoint to forward the event subscription request from dest-relay to driver
+  rpc SubscribeEvent(common.events.EventSubscription) returns (common.ack.Ack) {}
 }
