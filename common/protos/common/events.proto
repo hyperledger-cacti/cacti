@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package common.events;
 
+import "common/query.proto";
+
 option java_package = "com.weaver.protos.common.events";
 option go_package = "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/events";
 
@@ -17,7 +19,7 @@ message EventMatcher {
 }
 message EventSubscription {
   EventMatcher eventMatcher = 1;
-  Query query = 2;
+  common.query.Query query = 2;
 }
 message EventSubscriptionState {
   enum STATUS {
@@ -30,9 +32,9 @@ message EventSubscriptionState {
   };
   string request_id = 1;
   STATUS status = 2;
-  string respMessage = 3;
-  EventMatcher eventMatcher = 3;
-  EventPublication eventPublicationSpec = 4;
+  string message = 3;
+  EventMatcher eventMatcher = 4;
+  EventPublication eventPublicationSpec = 5;
 }
 
 message ContractTransaction {
@@ -41,8 +43,9 @@ message ContractTransaction {
   string contractId = 3;
   string func = 4;
   repeated bytes args = 5;
-  int replaceArgIndex = 6;
+  uint64 replaceArgIndex = 6;
 }
+
 message EventPublication {
   oneof publication_target {
     ContractTransaction ctx = 1;

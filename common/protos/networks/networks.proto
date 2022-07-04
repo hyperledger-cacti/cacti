@@ -4,7 +4,7 @@ package networks.networks;
 
 import "common/ack.proto";
 import "common/state.proto";
-import "common/events.proto"
+import "common/events.proto";
 
 option java_package = "com.weaver.protos.networks.networks";
 option go_package = "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/networks";
