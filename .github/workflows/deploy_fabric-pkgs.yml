@@ -14,7 +14,7 @@ on:
 
 jobs:
   publish-protos:
-    if: github.repository_owner == 'hyperledger-labs'
+    if: github.repository_owner == 'sanvenDev'
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -48,7 +48,7 @@ jobs:
         working-directory: common/protos-js
         
   publish-sdk:
-    if: ${{ always() && (needs.publish-protos.result=='failure' || needs.publish-protos.result=='success') && github.repository_owner == 'hyperledger-labs' }}
+    if: ${{ always() && (needs.publish-protos.result=='failure' || needs.publish-protos.result=='success') && github.repository_owner == 'sanvenDev' }}
     needs: [publish-protos]
     runs-on: ubuntu-latest
     steps:
@@ -76,7 +76,7 @@ jobs:
         working-directory: sdks/fabric/interoperation-node-sdk
     
   publish-driver:
-    if: ${{ always() && (needs.publish-protos.result=='failure' || needs.publish-protos.result=='success') && github.repository_owner == 'hyperledger-labs' }}
+    if: ${{ always() && (needs.publish-protos.result=='failure' || needs.publish-protos.result=='success') && github.repository_owner == 'sanvenDev' }}
     needs: [publish-protos]
     runs-on: ubuntu-latest
     steps:
