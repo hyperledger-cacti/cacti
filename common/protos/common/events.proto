@@ -15,7 +15,8 @@ enum EventType {
 
 message EventMatcher {
   EventType type = 1;
-  string transaction_func = 2;
+  string event_name = 2;
+  string transaction_func = 3;
 }
 message EventSubscription {
   EventMatcher eventMatcher = 1;
