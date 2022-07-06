@@ -14,4 +14,7 @@ service EventSubscribe {
   // Src-relay based upon query (EventSubscription) forwards the same response (Ack) 
   // from driver to the dest-relay by calling a new endpoint in dest-relay
   rpc SendSubscriptionStatus(common.ack.Ack) returns (common.ack.Ack) {}
+  // Src-driver status of event subscription (Ack) 
+  // to the src-relay by calling a new endpoint in src-relay
+  rpc SendDriverSubscriptionStatus(common.ack.Ack) returns (common.ack.Ack) {}
 }

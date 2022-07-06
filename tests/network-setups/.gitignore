@@ -14,3 +14,11 @@ shared/charts/username
 *.tar.gz
 *.env
 fabric/dev/log.txt
+
+fabric/shared/*/ordererOrganizations
+fabric/shared/*/peerOrganizations
+fabric/shared/*/wallet/*
+fabric/shared/*/system-genesis-block/*
+fabric/shared/*/channel-artifacts
+fabric/shared/*/fabric-ca/ordererOrg/*
+fabric/shared/*/fabric-ca/org1/*

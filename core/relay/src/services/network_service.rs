@@ -1,12 +1,15 @@
 // Internal generated modules
 use crate::pb::common::ack::{ack, Ack};
 use crate::pb::common::query::Query;
+use crate::pb::common::events::EventSubscription;
 use crate::pb::common::state::{request_state, RequestState};
 use crate::pb::common::events::{event_subscription_state, EventSubscriptionState};
 use crate::pb::networks::networks::network_server::Network;
 use crate::pb::networks::networks::{DbName, GetStateMessage, NetworkQuery, RelayDatabase, NetworkEventSubscription};
 use crate::pb::relay::datatransfer::data_transfer_client::DataTransferClient;
+use crate::pb::relay::events::event_subscribe_client::EventSubscribeClient;
 use crate::relay_proto::{parse_address, LocationSegment};
+use crate::services::helpers::update_event_subscription_status;
 // Internal modules
 use crate::db::Database;
 
@@ -168,13 +171,109 @@ impl Network for NetworkService {
     
     // Subscribe Event Endpoints
     async fn subscribe_event(&self, request: Request<NetworkEventSubscription>) -> Result<Response<Ack>, Status> {
-        Err(tonic::Status::unimplemented("method not implemented"))
+        println!(
+            "Got a Network Event Subscription request from {:?} - {:?}",
+            request.remote_addr(),
+            request
+        );
+        let conf = self.config_lock.read().await.clone();
+        // Database access/storage
+        let db = Database {
+            db_path: conf.get_str("db_path").unwrap(),
+        };
+
+        let request_id = Uuid::new_v4();
+        let network_event_subscription = request.into_inner().clone();
+        
+        // Initial request state stored in DB.
+        let target: EventSubscriptionState = EventSubscriptionState {
+            status: event_subscription_state::Status::PendingAck as i32,
+            request_id: request_id.to_string(),
+            message: "".to_string(),
+            event_matcher: network_event_subscription.event_matcher.clone(),
+            event_publication_spec: network_event_subscription.event_publication_spec.clone()
+        };
+        let message_insert = db.set(&request_id.to_string(), &target);
+        // Kept this as a match as the error case returns an Ok.
+        match message_insert {
+            Ok(_) => println!(
+                "Successfully stored NetworkEventSubscription in db with request_id: {}",
+                request_id.to_string()
+            ),
+            Err(e) => {
+                // Internal failure of sled. Send Error response
+                println!(
+                    "Error storing NetworkEventSubscription in db for request_id: {}",
+                    request_id.to_string()
+                );
+                let reply = Ok(Response::new(Ack {
+                    status: ack::Status::Error as i32,
+                    request_id: request_id.to_string(),
+                    message: format!("{:?}", e),
+                }));
+                println!("Sending Ack back to network: {:?}\n", reply);
+                return reply;
+            }
+        }
+
+        let network_query = network_event_subscription.query.clone().expect("No query passed with NetworkEventSubscription request");
+        let parsed_address = parse_address(network_query.address.to_string());
+        match parsed_address {
+            Ok(address) => {
+                // TODO: verify that host and port are valid
+                // Spawns a child process to handle sending request
+                spawn_send_event_subscription_request(
+                    conf,
+                    network_event_subscription,
+                    request_id.to_string(),
+                    address.location.hostname.to_string(),
+                    address.location.port.to_string()
+                );
+                // Send Ack back to network while request is happening in a thread
+                let reply = Ack {
+                    status: ack::Status::Ok as i32,
+                    request_id: request_id.to_string(),
+                    message: "".to_string(),
+                };
+                println!("Sending Ack back to network: {:?}\n", reply);
+                Ok(Response::new(reply))
+            }
+            Err(e) => {
+                println!("Invalid Address");
+                let reply = Ack {
+                    status: ack::Status::Error as i32,
+                    request_id: request_id.to_string(),
+                    message: format!("Error: {:?}", e),
+                };
+                println!("Sending Ack back to network: {:?}\n", reply);
+                Ok(Response::new(reply))
+            }
+        }
     }
     async fn get_event_subscription_state(
         &self,
         request: Request<GetStateMessage>,
     ) -> Result<Response<EventSubscriptionState>, Status> {
-        Err(tonic::Status::unimplemented("method not implemented"))
+        println!("\nReceived GetEventSubscriptionState request from network: {:?}", request);
+        let conf = self.config_lock.read().await.clone();
+        let db = Database {
+            db_path: conf.get_str("db_path").unwrap(),
+        };
+        let result = db.get::<EventSubscriptionState>(request.into_inner().request_id);
+        match result {
+            Ok(event_subscription_state) => {
+                println!("Sending back EventSubscriptionState to network: Request ID = {:?}, Status = {:?}",
+                         event_subscription_state.request_id,
+                         event_subscription_state.status
+                         );
+                
+                return Ok(Response::new(event_subscription_state));
+            },
+            Err(e) => Err(Status::new(
+                Code::NotFound,
+                format!("Event Subscription Request not found. Error: {:?}", e),
+            )),
+        }
     }
 }
 
@@ -325,5 +424,132 @@ async fn data_transfer_call(
     });
     println!("Query: {:?}", query_request);
     let response = client.request_state(query_request).await?;
+    Ok(response)
+}
+
+// Sends a request to the remote relay
+fn spawn_send_event_subscription_request(
+    conf: config::Config,
+    network_event_subscription: NetworkEventSubscription,
+    request_id: String,
+    relay_host: String,
+    relay_port: String,
+) {
+    println!("Sending EventSubscription to remote relay: {:?}:{:?}", relay_host, relay_port);
+    
+    // Spawning new thread to make the subscribe_event_call to remote relay
+    tokio::spawn(async move {
+        let db_path = conf.get_str("db_path").unwrap();
+
+        // Iterate through the relay entries in the configuration to find a match
+        let relays_table = conf.get_table("relays").unwrap();
+        let mut relay_tls = false;
+        let mut relay_tlsca_cert_path = "".to_string();
+        for (_relay_name, relay_spec) in relays_table {
+            let relay_uri = relay_spec.clone().try_into::<LocationSegment>().unwrap();
+            if relay_host == relay_uri.hostname && relay_port == relay_uri.port {
+                relay_tls = relay_uri.tls;
+                relay_tlsca_cert_path = relay_uri.tlsca_cert_path;
+            }
+        }
+
+        let result = suscribe_event_call(
+            conf.get_str("name").unwrap(),
+            relay_host,
+            relay_port,
+            network_event_subscription,
+            request_id.clone(),
+            relay_tls,
+            relay_tlsca_cert_path.to_string(),
+        )
+        .await;
+        println!("Received Ack from remote relay: {:?}\n", result);
+        // Potentially clean up when more skilled at Rust.
+        // Updates the request in the DB depending on the response status from the remote relay
+        match result {
+            Ok(ack_response) => {
+                let ack_response_into_inner = ack_response.into_inner().clone();
+                // This match first checks if the status is valid.
+                match ack::Status::from_i32(ack_response_into_inner.status) {
+                    Some(status) => match status {
+                        ack::Status::Ok => update_event_subscription_status(
+                            request_id.to_string(),
+                            event_subscription_state::Status::Pending,
+                            db_path.to_string(),
+                            "".to_string(),
+                        ),
+                        ack::Status::Error => update_event_subscription_status(
+                            request_id.to_string(),
+                            event_subscription_state::Status::Error,
+                            db_path.to_string(),
+                            ack_response_into_inner.message.to_string(),
+                        ),
+                    },
+                    None => update_event_subscription_status(
+                        request_id.to_string(),
+                        event_subscription_state::Status::Error,
+                        db_path.to_string(),
+                        "Status is not supported or is invalid".to_string(),
+                    ),
+                }
+            }
+            Err(result_error) => update_event_subscription_status(
+                request_id.to_string(),
+                event_subscription_state::Status::Error,
+                db_path.to_string(),
+                format!("{:?}", result_error).to_string(),
+            ),
+        }
+    });
+}
+// // Call to remote relay for the event subscription protocol.
+async fn suscribe_event_call(
+    relay_name: String,
+    relay_host: String,
+    relay_port: String,
+    network_event_subscription: NetworkEventSubscription,
+    request_id: String,
+    use_tls: bool,
+    tlsca_cert_path: String,
+) -> Result<Response<Ack>, Box<dyn std::error::Error>> {
+    let client_addr = format!("http://{}:{}", relay_host, relay_port);
+    let mut client;
+    if use_tls {
+        let pem = tokio::fs::read(tlsca_cert_path).await?;
+        let ca = Certificate::from_pem(pem);
+    
+        let tls = ClientTlsConfig::new()
+            .ca_certificate(ca)
+            .domain_name(relay_host);
+    
+        let channel = Channel::from_shared(client_addr)?
+            .tls_config(tls)
+            .connect()
+            .await?;
+    
+        client = EventSubscribeClient::new(channel);
+    } else {
+        client = EventSubscribeClient::connect(client_addr).await?;
+    }
+    
+    let network_query = network_event_subscription.query.clone().expect("No query passed with NetworkEventSubscription request");
+    let query: Query = Query {
+        policy: network_query.policy,
+        address: network_query.address,
+        requesting_relay: relay_name,
+        requesting_org: network_query.requesting_org,
+        requesting_network: network_query.requesting_network,
+        certificate: network_query.certificate,
+        requestor_signature: network_query.requestor_signature,
+        nonce: network_query.nonce,
+        request_id: request_id.to_string(),
+        confidential: network_query.confidential,
+    };
+    let event_subscription_request = tonic::Request::new(EventSubscription {
+        event_matcher: network_event_subscription.event_matcher,
+        query: Some(query),
+    });
+    println!("EventSubscription: {:?}", event_subscription_request);
+    let response = client.subscribe_event(event_subscription_request).await?;
     Ok(response)
 }

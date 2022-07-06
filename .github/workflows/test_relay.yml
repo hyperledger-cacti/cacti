@@ -1,0 +1,49 @@
+name: Unit Test Relay
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  relay:
+    # if: ${{ false }}
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      
+      - name: Install RUST Toolchain minimal stable with clippy and rustfmt
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          components: rustfmt, clippy
+          
+      - name: Get Latest Relay Dependencies
+        run: |
+          cargo update -p nom
+          cargo update -p lexical-core
+        working-directory: core/relay
+          
+      - name: Use Protoc 3.15
+        run: |
+          curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.15.6/protoc-3.15.6-linux-x86_64.zip
+          unzip protoc-3.15.6-linux-x86_64.zip -d protoc
+          
+      - name: Build Image
+        run: make
+        working-directory: core/relay
+    
+      - name: Run Dummy Relay
+        run: RELAY_CONFIG=config/Dummy_Relay.toml  cargo run --bin server &> relay-dummy.out &
+        working-directory: core/relay
+    
+      - name: Run Dummy Driver
+        run: RELAY_CONFIG=config/Dummy_Relay.toml  cargo run --bin dummy-driver &> driver-dummy.out &
+        working-directory: core/relay
+    
+      - name: Mock Client Test
+        run: cargo run --bin client 9085 localhost:9085/Dummy_Network/abc:abc:abc:abc
+        working-directory: core/relay
