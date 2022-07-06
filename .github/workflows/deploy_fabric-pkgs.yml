@@ -14,7 +14,7 @@ on:
 
 jobs:
   publish-protos:
-    if: github.repository_owner == 'sanvenDev'
+    if: github.repository_owner == 'hyperledger-labs'
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -33,7 +33,7 @@ jobs:
       - name: Generate .npmrc
         run: |
           cp .npmrc.template .npmrc
-          #sed -i "s/<personal-access-token>/${{ secrets.GITHUB_TOKEN }}/g" .npmrc
+          sed -i "s/<personal-access-token>/${{ secrets.GITHUB_TOKEN }}/g" .npmrc
           cat .npmrc
         working-directory: common/protos-js
         
@@ -48,7 +48,7 @@ jobs:
         working-directory: common/protos-js
         
   publish-sdk:
-    if: ${{ always() && github.repository_owner == 'sanvenDev' }}
+    if: github.repository_owner == 'hyperledger-labs'
     needs: [publish-protos]
     runs-on: ubuntu-latest
     steps:
@@ -63,7 +63,7 @@ jobs:
       - name: Generate .npmrc
         run: |
           cp .npmrc.template .npmrc
-          #sed -i "s/<personal-access-token>/${{ secrets.GITHUB_TOKEN }}/g" .npmrc
+          sed -i "s/<personal-access-token>/${{ secrets.GITHUB_TOKEN }}/g" .npmrc
           cat .npmrc
         working-directory: sdks/fabric/interoperation-node-sdk
         
@@ -76,7 +76,7 @@ jobs:
         working-directory: sdks/fabric/interoperation-node-sdk
     
   publish-driver:
-    if: ${{ always() && github.repository_owner == 'sanvenDev' }}
+    if: github.repository_owner == 'hyperledger-labs'
     needs: [publish-protos]
     runs-on: ubuntu-latest
     steps:
@@ -93,7 +93,7 @@ jobs:
       - name: Generate .npmrc
         run: |
           cp .npmrc.template .npmrc
-          #sed -i "s/<personal-access-token>/${{ secrets.GITHUB_TOKEN }}/g" .npmrc
+          sed -i "s/<personal-access-token>/${{ secrets.GITHUB_TOKEN }}/g" .npmrc
           cat .npmrc
         working-directory: core/drivers/fabric-driver
         
