@@ -41,6 +41,7 @@ jobs:
         
 
   publish-interop-app:
+    if: always()
     needs: publish-protos
     runs-on: ubuntu-latest
     steps:
@@ -71,6 +72,7 @@ jobs:
         working-directory: core/network/corda-interop-app
         
   publish-sdk:
+    if: always()
     needs: [publish-protos, publish-interop-app]
     runs-on: ubuntu-latest
     steps:
@@ -101,7 +103,7 @@ jobs:
         working-directory: sdks/corda
     
   publish-driver:
-    if: github.repository_owner == 'hyperledger-labs'
+    if: ${{ always() && github.repository_owner == 'hyperledger-labs' }}
     needs: [publish-protos, publish-interop-app, publish-sdk]
     runs-on: ubuntu-latest
     steps:
@@ -127,5 +129,3 @@ jobs:
       - name: Build and Push
         run: make push-image
         working-directory: core/drivers/corda-driver
-          
-        

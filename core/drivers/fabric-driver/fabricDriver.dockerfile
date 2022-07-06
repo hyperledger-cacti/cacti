@@ -31,6 +31,7 @@ ADD .prettierrc .
 
 RUN npm run build
 RUN npm run postinstall
+RUN rm /fabric-driver/.npmrc
 
 ARG GIT_URL
 LABEL org.opencontainers.image.source ${GIT_URL}

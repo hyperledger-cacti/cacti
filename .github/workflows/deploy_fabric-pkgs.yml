@@ -48,7 +48,7 @@ jobs:
         working-directory: common/protos-js
         
   publish-sdk:
-    if: github.repository_owner == 'hyperledger-labs'
+    if: ${{ always() && github.repository_owner == 'hyperledger-labs' }}
     needs: [publish-protos]
     runs-on: ubuntu-latest
     steps:
@@ -76,7 +76,7 @@ jobs:
         working-directory: sdks/fabric/interoperation-node-sdk
     
   publish-driver:
-    if: github.repository_owner == 'hyperledger-labs'
+    if: ${{ always() && github.repository_owner == 'hyperledger-labs' }}
     needs: [publish-protos]
     runs-on: ubuntu-latest
     steps:
@@ -100,5 +100,3 @@ jobs:
       - name: Build and Push
         run: make push-image
         working-directory: core/drivers/fabric-driver
-          
-        
