@@ -7,9 +7,17 @@ E2E_CONFIDENTIALITY?=false
 
 .PHONY:	all
 all: start
+	
+.PHONY: artifacts-network1
+artifacts-network1:
+	cp -r ../network-artifacts/network1/* ../shared/network1/
+	
+.PHONY: artifacts-network2
+artifacts-network2:
+	cp -r ../network-artifacts/network2/* ../shared/network2/
 
 .PHONY: start
-start:	start-network1 start-network2
+start: start-network1 start-network2
 
 .PHONY: start-interop
 start-interop: start-interop-network1 start-interop-network2
@@ -18,22 +26,22 @@ start-interop: start-interop-network1 start-interop-network2
 start-interop-local: start-interop-network1-local start-interop-network2-local
 
 .PHONY: start-network1
-start-network1:	.fabric-setup setup-cc
+start-network1:	.fabric-setup artifacts-network1 setup-cc
 	./network.sh up createChannel -ca -nw network1
 	./network.sh deployCC -ch $(CHAINCODE_NAME) -nw network1
 
 .PHONY: start-network1-local
-start-network1-local: .fabric-setup setup-cc-local
+start-network1-local: .fabric-setup artifacts-network1 setup-cc-local
 	./network.sh up createChannel -ca -nw network1
 	./network.sh deployCC -ch $(CHAINCODE_NAME) -nw network1
 
 .PHONY: start-network2
-start-network2: .fabric-setup setup-cc
+start-network2: .fabric-setup artifacts-network2 setup-cc
 	./network.sh up createChannel -ca -nw network2
 	./network.sh deployCC -ch $(CHAINCODE_NAME) -nw network2
 
 .PHONY: start-network2-local
-start-network2-local: .fabric-setup setup-cc-local
+start-network2-local: .fabric-setup artifacts-network2 setup-cc-local
 	./network.sh up createChannel -ca -nw network2
 	./network.sh deployCC -ch $(CHAINCODE_NAME) -nw network2
 
@@ -111,13 +119,15 @@ remove:	remove-network1 remove-network2
 .PHONY: remove-network1
 remove-network1:
 	./network.sh clean -nw network1
+	rm -rf ../shared/network1/wallet/*.id
 
 .PHONY: remove-network2
 remove-network2:
 	./network.sh clean -nw network2
+	rm -rf ../shared/network2/wallet/*.id
 
 .PHONY: clean
-clean:	stop
+clean: stop remove
 	+rm -rf bin || true
 	+rm -rf config || true
 	+rm .fabric-setup || true
