@@ -127,7 +127,7 @@ remove-network2:
 	rm -rf ../shared/network2/wallet/*.id
 
 .PHONY: clean
-clean: stop remove
+clean: remove
 	+rm -rf bin || true
 	+rm -rf config || true
 	+rm .fabric-setup || true
