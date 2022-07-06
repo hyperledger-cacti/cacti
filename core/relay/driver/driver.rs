@@ -52,6 +52,8 @@ pub struct DriverCommunicationService {
 pub struct URI {
     port: String,
     hostname: String,
+    tls: bool,
+    tlsca_cert_path: String,
 }
 
 #[tonic::async_trait]
@@ -115,7 +117,57 @@ impl DriverCommunication for DriverCommunicationService {
         return Ok(Response::new(reply));
     }
     async fn subscribe_event(&self, request: Request<EventSubscription>) -> Result<Response<Ack>, Status> {
-        Err(tonic::Status::unimplemented("method not implemented"))
+        println!("Driver: Got a event subscription request from {:?}", request.remote_addr());
+        let into_inner = request.into_inner().clone();
+        let query = into_inner.query.clone().expect("");
+        let request_id = query.clone().request_id.to_string();
+
+        let relay_port = self
+            .config_lock
+            .read()
+            .await
+            .get_str("port")
+            .expect("Port table does not exist");
+        let relay_hostname = self
+            .config_lock
+            .read()
+            .await
+            .get_str("hostname")
+            .expect("Hostname table does not exist");
+        let client_addr = format!("http://{}:{}", relay_hostname, relay_port);
+        println!("Remote relay... {:?}", client_addr.clone());
+        let client_result =
+            relay::events::event_subscribe_client::EventSubscribeClient::connect(client_addr)
+                .await;
+        match client_result {
+            Ok(client) => {
+                // Sends Mocked payload back.
+                tokio::spawn(async move {
+                    let my_time = time::Duration::from_millis(3000);
+                    sleep(my_time);
+                    let ack = Ack {
+                        status: ack::Status::Ok as i32,
+                        request_id: request_id,
+                        message: "".to_string(),
+                    };
+                    println!("Sending ack to remote relay... {:?}", ack.clone());
+                    let response = client.clone().send_driver_subscription_status(ack).await;
+                    println!("Ack from remote relay={:?}", response);
+                });
+            }
+            Err(e) => {
+                // TODO: Add better error handling (Attempt a few times?)
+                panic!("Failed to connect to client. Error: {}", e.to_string());
+            }
+        }
+
+        let reply = Ack {
+            status: ack::Status::Ok as i32,
+            request_id: query.clone().request_id.to_string(),
+            message: "".to_string(),
+        };
+
+        return Ok(Response::new(reply));
     }
 }
 
