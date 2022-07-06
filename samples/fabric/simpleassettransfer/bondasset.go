@@ -571,7 +571,7 @@ func (s *SmartContract) GetAllAssets(ctx contractapi.TransactionContextInterface
 		var asset BondAsset
 		err = json.Unmarshal(queryResponse.Value, &asset)
 		if err != nil {
-			return nil, err
+			continue
 		}
 		assets = append(assets, &asset)
 	}

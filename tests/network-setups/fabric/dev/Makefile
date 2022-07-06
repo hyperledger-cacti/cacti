@@ -127,7 +127,8 @@ remove-network2:
 	rm -rf ../shared/network2/wallet/*.id
 
 .PHONY: clean
-clean: remove
+clean:	remove
+	+docker system prune -f || true
 	+rm -rf bin || true
 	+rm -rf config || true
 	+rm .fabric-setup || true
