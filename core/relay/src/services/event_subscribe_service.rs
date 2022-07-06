@@ -36,8 +36,8 @@ pub struct Network {
     network: String,
 }
 
-/// DataTransferService is the gRPC server implementation that handles the logic for
-/// communication of the data transfer protocol between two relays.
+/// EventSubscribeService is the gRPC server implementation that handles the logic for
+/// communicating event subscription request between two relays and driver.
 #[tonic::async_trait]
 impl EventSubscribe for EventSubscribeService {
     async fn subscribe_event(&self, request: Request<EventSubscription>) -> Result<Response<Ack>, Status> {
@@ -139,7 +139,7 @@ impl EventSubscribe for EventSubscribeService {
 }
 
 
-/// request_state is run on the remote relay to retrieve the state that was
+/// subscribe_event is run on the remote relay to subscribe to the event that was
 /// requested from the requesting relay
 fn subscribe_event_helper(
     remote_db: Database,
@@ -194,7 +194,7 @@ fn subscribe_event_helper(
     });
 }
 
-// Function that starts a thread which sends the query information to the driver
+// Function that starts a thread which sends the event subscription request to the driver
 fn spawn_driver_subscribe_event(event_subscription: EventSubscription, hostname: String, port: String, use_tls: bool, tlsca_cert_path: String, conf: config::Config) {
     tokio::spawn(async move {
         let result = spawn_driver_subscribe_event_helper(event_subscription.clone(), hostname, port, use_tls, tlsca_cert_path).await;
@@ -205,7 +205,7 @@ fn spawn_driver_subscribe_event(event_subscription: EventSubscription, hostname:
             }
             Err(e) => {
                 println!("Error sending event subscription request to driver: {:?}\n", e);
-                // In Error case we send an error_state to requesting relay.
+                // In Error case we send an error_ack to requesting relay.
                 let query = event_subscription.query.clone().expect("No query passed with EventSubscription request");
                 let request_id = query.request_id.to_string();
                 // Database access/storage
