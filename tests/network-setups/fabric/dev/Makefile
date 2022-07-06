@@ -118,6 +118,7 @@ remove-network2:
 
 .PHONY: clean
 clean:	stop
+	+docker system prune -f || true
 	+rm -rf bin || true
 	+rm -rf config || true
 	+rm .fabric-setup || true
