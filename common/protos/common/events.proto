@@ -14,11 +14,11 @@ enum EventType {
 }
 
 message EventMatcher {
-  EventType event_type = 1;
-  string event_name = 2;
-  string ledger_id = 3;
-  string contract_id = 4;
-  string transaction_func = 5;
+    EventType event_type = 1;
+    string event_class_id = 2;
+    string transaction_ledger_id = 3;
+    string transaction_contract_id = 4;
+    string transaction_func = 5;
 }
 message EventSubscription {
   EventMatcher event_matcher = 1;
