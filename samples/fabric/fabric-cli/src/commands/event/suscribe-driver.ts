@@ -15,9 +15,9 @@ import * as fs from 'fs'
 import * as path from 'path'
 
 const command: GluegunCommand = {
-  name: 'subscribe-driver',
+  name: 'subscribe',
   alias: ['-sd'],
-  description: 'Initiate event subscribe for driver',
+  description: 'Initiate event subscribe',
   run: async toolbox => {
     const {
       print,
@@ -27,8 +27,8 @@ const command: GluegunCommand = {
       commandHelp(
         print,
         toolbox,
-        `fabric-cli event subscribe --network=<network1|network2> --user=<relay> src/data/event_sub_sample.json`,
-        'fabric-cli event subscribe --network=<network-name> --user=<user-id> <filename>',
+        `fabric-cli event subscribe --network=<network1|network2> --user=user1 --driver src/data/event_sub_sample.json`,
+        'fabric-cli event subscribe --network=<network-name> --user=<user-id> --driver <filename>',
         [
             {
                 name: '--network',
@@ -38,7 +38,12 @@ const command: GluegunCommand = {
             {
                 name: '--user',
                 description:
-                    'User for subscription. Default: relay'
+                    'User for subscription. Default: user1'
+            },
+            {
+                name: '--driver',
+                description:
+                    'Flag to indicate subscribing on behalf of driver'
             },
             {
                 name: '--debug',
@@ -47,21 +52,21 @@ const command: GluegunCommand = {
             }
         ],
         command,
-        ['event', 'subscribe-driver']
+        ['event', 'subscribe']
       )
       return
     }
     console.log("Event Subscription")
     if (options.debug === 'true') {
-      logger.level = 'debug'
-      logger.debug('Debugging is enabled')
+        logger.level = 'debug'
+        logger.debug('Debugging is enabled')
     }
     if (array.length != 1) {
-      print.error('Not enough arguments supplied')
-      return
+        print.error('Not enough arguments supplied')
+        return
     }
     if (!options['user']) {
-      options['user'] = `relay`     //Default user
+        options['user'] = `user1`     //Default user
     }
     
     const networkName = options['network']
@@ -69,6 +74,20 @@ const command: GluegunCommand = {
     
     const filepath = path.resolve(array[0])
     const data = JSON.parse(fs.readFileSync(filepath).toString())
+    
+    if (options['driver']) {
+        const walletPath = process.env.WALLET_PATH
+          ? process.env.WALLET_PATH
+          : path.join(__dirname, '../../', `wallet-${networkName}`)
+        const relayIdTargetPath = path.join(walletPath, 'relay.id')
+        if (!fs.existsSync(relayIdTargetPath)) {
+            const relayIdSrcPath = path.join(__dirname, '../../../../../../', 'core/drivers/fabric-driver/', `wallet-${networkName}`, 'relay.id')
+            fs.copyFile(relayIdSrcPath, relayIdTargetPath, (err) => {
+                if (err) throw err;
+                console.log('Relay id copied from fabric-driver directory');
+            });
+        }
+    }
     
     const netConfig = getNetworkConfig(networkName)
     if (!netConfig.connProfilePath || !netConfig.channelName || !netConfig.chaincode) {
@@ -92,6 +111,16 @@ const command: GluegunCommand = {
     if (keyCertError) {
       throw new Error(`Error getting key and cert ${keyCertError}`)
     }
+    let cert = keyCert.cert
+    if (options['driver']) {
+        const [driverKeyCert, driverKeyCertError] = await handlePromise(
+          getKeyAndCertForRemoteRequestbyUserName(wallet, 'relay')
+        )
+        if (driverKeyCertError) {
+          throw new Error(`Error getting key and cert ${driverKeyCertError}`)
+        }
+        cert = driverKeyCert.cert
+    }
     
     const eventMatcher = EventsManager.createEventMatcher(data.event_matcher)
     const eventPublicationSpec = EventsManager.createEventPublicationSpec(data.event_publication_spec)
@@ -105,7 +134,7 @@ const command: GluegunCommand = {
             netConfig.mspId,
             netConfig.relayEndpoint,
             { address: data.view_address, Sign: true },
-            keyCert
+            { key: keyCert.key, cert: cert }
         )
         
         if (response.getStatus() == EventSubscriptionState.STATUS.SUCCESS) {
