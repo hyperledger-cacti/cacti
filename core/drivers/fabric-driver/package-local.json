@@ -29,7 +29,8 @@
         "eslint-config-prettier": "^6.11.0",
         "eslint-plugin-prettier": "^3.1.4",
         "fabric-ca-client": "2.2.5",
-        "fabric-network": "2.2.5"
+        "fabric-network": "2.2.5",
+        "level": "^8.0.0"
     },
     "devDependencies": {
         "patch-package": "^6.2.2",

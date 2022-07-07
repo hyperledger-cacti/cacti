@@ -9,6 +9,7 @@ import { Server, ServerCredentials, credentials } from '@grpc/grpc-js';
 import ack_pb from '@hyperledger-labs/weaver-protos-js/common/ack_pb';
 import fabricView from '@hyperledger-labs/weaver-protos-js/fabric/view_data_pb';
 import query_pb from '@hyperledger-labs/weaver-protos-js/common/query_pb';
+import eventsPb from '@hyperledger-labs/weaver-protos-js/common/events_pb';
 import driver_pb_grpc from '@hyperledger-labs/weaver-protos-js/driver/driver_grpc_pb';
 import datatransfer_grpc_pb from '@hyperledger-labs/weaver-protos-js/relay/datatransfer_grpc_pb';
 import state_pb from '@hyperledger-labs/weaver-protos-js/common/state_pb';
@@ -17,11 +18,50 @@ import 'dotenv/config';
 import { walletSetup } from './walletSetup';
 import { Certificate } from '@fidm/x509';
 import * as path from 'path';
+
+import { LevelDBConnector } from "./dbConnector"
+import { addEventSubscription, lookupEventSubscriptions } from "./dbUtils"
+
 const server = new Server();
 console.log('driver def', JSON.stringify(driver_pb_grpc));
 
 const mockedB64Data =
     'CkIIyAEaPRI7bG9jYWxob3N0OjkwODAvbmV0d29yazEvbXljaGFubmVsOnNpbXBsZXN0YXRlOlJlYWQ6QXJjdHVydXMa/AIKIFhDpf9CYfrxPkEtSWR8Kf+K5pBkSbx7VNYsAzijB+pnEtcCCoICEmYKCl9saWZlY3ljbGUSWAooCiJuYW1lc3BhY2VzL2ZpZWxkcy9pbnRlcm9wL1NlcXVlbmNlEgIIAwosCiZuYW1lc3BhY2VzL2ZpZWxkcy9zaW1wbGVzdGF0ZS9TZXF1ZW5jZRICCAYSYwoHaW50ZXJvcBJYCh4KGABhY2Nlc3NDb250cm9sAG5ldHdvcmsxABICCAsKHgoYAHNlY3VyaXR5R3JvdXAAbmV0d29yazEAEgIIDQoWChAA9I+/v2luaXRpYWxpemVkEgIIBBIzCgtzaW1wbGVzdGF0ZRIkChYKEAD0j7+/aW5pdGlhbGl6ZWQSAggHCgoKCEFyY3R1cnVzGkIIyAEaPRI7bG9jYWxob3N0OjkwODAvbmV0d29yazEvbXljaGFubmVsOnNpbXBsZXN0YXRlOlJlYWQ6QXJjdHVydXMiDBIHaW50ZXJvcBoBMSK1CArpBwoHT3JnMU1TUBLdBy0tLS0tQkVHSU4gQ0VSVElGSUNBVEUtLS0tLQpNSUlDckRDQ0FsT2dBd0lCQWdJVVdNUkUyTEJwdnY1TkdSRi9hMy82cWZTcE9TNHdDZ1lJS29aSXpqMEVBd0l3CmNqRUxNQWtHQTFVRUJoTUNWVk14RnpBVkJnTlZCQWdURGs1dmNuUm9JRU5oY205c2FXNWhNUTh3RFFZRFZRUUgKRXdaRWRYSm9ZVzB4R2pBWUJnTlZCQW9URVc5eVp6RXVibVYwZDI5eWF6RXVZMjl0TVIwd0d3WURWUVFERXhSagpZUzV2Y21jeExtNWxkSGR2Y21zeExtTnZiVEFlRncweU1EQTNNamt3TkRNMk1EQmFGdzB5TVRBM01qa3dORFF4Ck1EQmFNRnN4Q3pBSkJnTlZCQVlUQWxWVE1SY3dGUVlEVlFRSUV3NU9iM0owYUNCRFlYSnZiR2x1WVRFVU1CSUcKQTFVRUNoTUxTSGx3WlhKc1pXUm5aWEl4RFRBTEJnTlZCQXNUQkhCbFpYSXhEakFNQmdOVkJBTVRCWEJsWlhJdwpNRmt3RXdZSEtvWkl6ajBDQVFZSUtvWkl6ajBEQVFjRFFnQUU1RlFrSDgzRVdnYW9DZ2U5azhISU1Jd0NUVGVZCnFCR25xNFAzWHJCUGZQSFdXeE1oWGhBaDNvUHNUOXdna1dHcFVmYWlybkd0bmRBQ3ZrSitNQi9nMUtPQjNUQ0IKMmpBT0JnTlZIUThCQWY4RUJBTUNCNEF3REFZRFZSMFRBUUgvQkFJd0FEQWRCZ05WSFE0RUZnUVVLMkFuM3RCTAprMVQyRGord0hHZ1RIQ3NiYmlZd0h3WURWUjBqQkJnd0ZvQVUxZyt0UG5naDJ3OGc5OXoxbXdzVmJrS2pBS2t3CklnWURWUjBSQkJzd0dZSVhjR1ZsY2pBdWIzSm5NUzV1WlhSM2IzSnJNUzVqYjIwd1ZnWUlLZ01FQlFZSENBRUUKU25zaVlYUjBjbk1pT25zaWFHWXVRV1ptYVd4cFlYUnBiMjRpT2lJaUxDSm9aaTVGYm5KdmJHeHRaVzUwU1VRaQpPaUp3WldWeU1DSXNJbWhtTGxSNWNHVWlPaUp3WldWeUluMTlNQW9HQ0NxR1NNNDlCQU1DQTBjQU1FUUNJQmFRCjhoTmRXd2xYeUhxY2htQzdzVUpWaER6Mkg2enh3M1BQS1I5M3lCL3NBaUJKMnpnQlhzL1lsMGZubnJNUXVCQUQKcDFBS1RKTkpsMVYwWUVHMFhiNXFwZz09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0KEkcwRQIhAMyyvrcjHVc1oQmCNqZpH6nc0O+8wssXjwRcfmgxlhQAAiAqa0C8pSFNZNXiSVJHe948dJ0NU/y+7i5A55O0Frkz2Q==';
+
+async function dbConnectionTest(
+    dbName: string
+): Promise<boolean> {
+    console.debug(`Start testing LevelDBConnector for ${dbName}`)
+
+    try {
+        // Create connection to a database
+        const db = new LevelDBConnector(dbName)
+
+        // Add an entry with key 'a' and value 1
+        await db.insert('a', 1)
+
+        // Get value of key 'a': 1
+        const value = await db.read('a')
+        console.info(`got value: ${value}`)
+    } catch (error) {
+        console.log(`failed testing LevelDBConnector, with error: ${error}`)
+    }
+
+    console.debug(`End testing LevelDBConnector for ${dbName}`)
+    return true;
+}
+
+async function dbUtilsTest(
+    call: any
+): Promise<boolean> {
+    console.debug(`Start testing dbUtils`)
+
+    await addEventSubscription(call.request)
+    await lookupEventSubscriptions(call.request.getEventmatcher()!)
+
+    console.debug(`End testing dbUtils`)
+    return true;
+}
 
 // Mocked fabric communication function
 function mockCommunication(query: query_pb.Query) {
@@ -160,6 +200,30 @@ server.addService(driver_pb_grpc.DriverCommunicationService, {
             ack_response.setMessage(`Error: ${e}`);
             ack_response.setStatus(ack_pb.Ack.STATUS.ERROR);
             ack_response.setRequestId(call.request.getRequestId());
+            // gRPC response.
+            console.log('Responding to caller');
+            callback(null, ack_response);
+        }
+    },
+    subscribeEvent: (call: { request: eventsPb.EventSubscription }, callback: (_: any, object: ack_pb.Ack) => void) => {
+        const ack_response = new ack_pb.Ack();
+        try {
+            if (process.env.MOCK === 'true') {
+                //dbConnectionTest("mydb");
+                dbUtilsTest(call);
+            } else {
+                console.log('Support is yet be added');
+            }
+            ack_response.setMessage('');
+            ack_response.setStatus(ack_pb.Ack.STATUS.OK);
+            ack_response.setRequestId(call.request.getQuery()!.getRequestId());
+            // gRPC response.
+            console.log('Responding to caller');
+            callback(null, ack_response);
+        } catch (e) {
+            console.log(e);
+            ack_response.setMessage(`Error: ${e}`);
+            ack_response.setStatus(ack_pb.Ack.STATUS.ERROR);
             // gRPC response.
             console.log('Responding to caller');
             callback(null, ack_response);
