@@ -99,8 +99,10 @@ async fn event_suscribe() -> Result<(), Box<dyn std::error::Error>> {
         confidential: false,
     };
     let event_matcher = EventMatcher {
-        r#type: 0,
+        event_type: 0,
         event_name: "test".to_string(),
+        ledger_id: "test".to_string(),
+        contract_id: "test".to_string(),
         transaction_func: "test".to_string(),
     };
     let tmp = event_publication::PublicationTarget::AppUrl("abc".to_string());

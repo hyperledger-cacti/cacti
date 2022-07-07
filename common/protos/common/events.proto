@@ -8,18 +8,20 @@ option java_package = "com.weaver.protos.common.events";
 option go_package = "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common";
 
 enum EventType {
-  LedgerState = 0;
-  AssetLock = 1;
-  AssetClaim = 2;
+  LEDGER_STATE = 0;
+  ASSET_LOCK = 1;
+  ASSET_CLAIM = 2;
 }
 
 message EventMatcher {
-  EventType type = 1;
+  EventType event_type = 1;
   string event_name = 2;
-  string transaction_func = 3;
+  string ledger_id = 3;
+  string contract_id = 4;
+  string transaction_func = 5;
 }
 message EventSubscription {
-  EventMatcher eventMatcher = 1;
+  EventMatcher event_matcher = 1;
   common.query.Query query = 2;
 }
 message EventSubscriptionState {
@@ -34,17 +36,17 @@ message EventSubscriptionState {
   string request_id = 1;
   STATUS status = 2;
   string message = 3;
-  EventMatcher eventMatcher = 4;
-  EventPublication eventPublicationSpec = 5;
+  EventMatcher event_matcher = 4;
+  EventPublication event_publication_spec = 5;
 }
 
 message ContractTransaction {
-  string driverId = 1;
-  string ledgerId = 2;
-  string contractId = 3;
+  string driver_id = 1;
+  string ledger_id = 2;
+  string contract_id = 3;
   string func = 4;
   repeated bytes args = 5;
-  uint64 replaceArgIndex = 6;
+  uint64 replace_arg_index = 6;
 }
 
 message EventPublication {

@@ -51,7 +51,7 @@ message NetworkQuery {
   bool confidential = 9;
 }
 message NetworkEventSubscription {
-  common.events.EventMatcher eventMatcher = 1;
+  common.events.EventMatcher event_matcher = 1;
   NetworkQuery query = 2;
-  common.events.EventPublication eventPublicationSpec = 3;
+  common.events.EventPublication event_publication_spec = 3;
 }
