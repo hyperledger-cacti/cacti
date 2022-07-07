@@ -45,5 +45,8 @@ jobs:
         working-directory: core/relay
     
       - name: Mock Client Test
-        run: cargo run --bin client 9085 localhost:9085/Dummy_Network/abc:abc:abc:abc
+        run: |
+            echo "Waiting for Dummy Relay and Driver to come up"
+            sleep 30
+            cargo run --bin client 9085 localhost:9085/Dummy_Network/abc:abc:abc:abc
         working-directory: core/relay
