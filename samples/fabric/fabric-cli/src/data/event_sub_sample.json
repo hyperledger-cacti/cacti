@@ -1,0 +1,19 @@
+{
+    "event_matcher": {
+        "event_type": 1,
+        "event_class_id": "",
+        "transaction_ledger_id": "mychannel"
+        "transaction_contract_id": "simplestate",
+        "transaction_func": "Create",
+    },
+    "event_publication_spec": {
+        "args": [],
+        "contract_id": "simplestate",
+        "driver_id": "network2",
+        "func": "Create",
+        "ledger_id": "mychannel",
+        "replace_arg_index": "0"
+    },
+    "view_address": "localhost:9083/Dummy_Network/mychannel:simplestate:Read:a",
+    "confidential": false
+}

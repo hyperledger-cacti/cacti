@@ -669,4 +669,5 @@ export {
     submitTransactionWithRemoteViews,
     getRemoteView,
     createFlowAddress,
+    createAddress,
 };
