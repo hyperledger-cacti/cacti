@@ -20,7 +20,8 @@ import { Certificate } from '@fidm/x509';
 import * as path from 'path';
 
 import { LevelDBConnector } from "./dbConnector"
-import { addEventSubscription, lookupEventSubscriptions } from "./dbUtils"
+import { addEventSubscription, deleteEventSubscription, lookupEventSubscriptions } from "./dbUtils"
+import { Query } from "@hyperledger-labs/weaver-protos-js/common/query_pb";
 
 const server = new Server();
 console.log('driver def', JSON.stringify(driver_pb_grpc));
@@ -57,8 +58,10 @@ async function dbUtilsTest(
     console.debug(`Start testing dbUtils`)
 
     await addEventSubscription(call.request)
-    await lookupEventSubscriptions(call.request.getEventmatcher()!)
-
+    var subscriptions: Array<Query> = <Array<Query>> await lookupEventSubscriptions(call.request.getEventmatcher()!);
+    //let subscription: Query = subscriptions[0]
+    //await deleteEventSubscription(call.request.getEventmatcher()!, subscription.getRequestId());
+    await deleteEventSubscription(call.request.getEventmatcher()!, "anim");
     console.debug(`End testing dbUtils`)
     return true;
 }
