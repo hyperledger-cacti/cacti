@@ -391,7 +391,7 @@ To suscribe for event, generate a JSON file like: [Sample Event Sub JSON](./src/
 
 Then run following command:
 ```
-./bin/fabric-cli event subscribe --network=network1 --driver src/data/event_sub_sample.json
+./bin/fabric-cli event subscribe --network=network1 src/data/event_sub_sample.json
 ```
 
 ## NOTE
