@@ -41,11 +41,6 @@ const command: GluegunCommand = {
                     'User for subscription. Default: user1'
             },
             {
-                name: '--driver',
-                description:
-                    'Flag to indicate subscribing on behalf of driver'
-            },
-            {
                 name: '--debug',
                 description:
                     'Shows debug logs when running. Disabled by default. To enable --debug=true'

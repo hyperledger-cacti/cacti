@@ -124,7 +124,7 @@ const subscribeRemoteEvent = async (
         event: ${eventMatcher} and publication spec: ${eventPublicationSpec}")
     
     const [relayResponse, relayResponseError] = await helpers.handlePromise(
-        relay.ProcessSuscribeEventRequest(
+        relay.ProcessSubscribeEventRequest(
             eventMatcher,
             eventPublicationSpec,
             computedAddress,
@@ -147,9 +147,83 @@ const subscribeRemoteEvent = async (
     return relayResponse
 }
 
+
+const unsubscribeRemoteEvent = async (
+    interopContract: Contract,
+    eventMatcher: eventsPb.EventMatcher,
+    eventPublicationSpec: eventsPb.EventPublication,
+    requestID: string,
+    networkID: string,
+    org: string,
+    localRelayEndpoint: string,
+    interopJSON: InteropJSON,
+    keyCert: { key: ICryptoKey; cert: any },
+    useTls: boolean = false,
+    tlsRootCACertPaths?: Array<string>,
+    confidential: boolean = false,
+): Promise<any> => {
+    logger.debug("Remote Event Unsubscription")
+    const {
+        address,
+        ChaincodeFunc,
+        ChaincodeID,
+        ChannelID,
+        RemoteEndpoint,
+        NetworkID: RemoteNetworkID,
+        Sign,
+        ccArgs: args,
+    } = interopJSON;
+    // Step 1
+    const computedAddress =
+        address ||
+        createAddress(
+            { ccFunc: ChaincodeFunc, contractName: ChaincodeID, channel: ChannelID, ccArgs: args },
+            RemoteNetworkID,
+            RemoteEndpoint,
+        );
+        
+    const [policyCriteria, policyCriteriaError] = await helpers.handlePromise(
+        getPolicyCriteriaForAddress(interopContract, computedAddress),
+    );
+    if (policyCriteriaError) {
+        throw new Error(`InteropFlow failed to get policy criteria: ${policyCriteriaError}`);
+    }
+
+    const relay = useTls ? new Relay(localRelayEndpoint, Relay.defaultTimeout, true, tlsRootCACertPaths) : new Relay(localRelayEndpoint);
+    const uuidValue = uuidv4();
+    
+    logger.debug("Making event unsubscription call to relay for \
+        event: ${eventMatcher} and publication spec: ${eventPublicationSpec}")
+    
+    const [relayResponse, relayResponseError] = await helpers.handlePromise(
+        relay.ProcessUnsubscribeEventRequest(
+            eventMatcher,
+            eventPublicationSpec,
+            requestID,
+            computedAddress,
+            policyCriteria,
+            networkID,
+            keyCert.cert,
+            Sign ? signMessage(computedAddress + uuidValue, keyCert.key.toBytes()).toString("base64") : "",
+            uuidValue,
+            // Org is empty as the name is in the certs for
+            org,
+            confidential,
+        ),
+    );
+    if (relayResponseError) {
+        throw new Error(`Event Unsubscription relay response error: ${relayResponseError}`);
+    }
+    
+    logger.debug(`Event Unsubscription Successfull: ${JSON.stringify(relayResponse)}`)
+    
+    return relayResponse
+}
+
 export {
     createEventMatcher,
     createEventPublicationSpec,
     subscribeRemoteEvent,
+    unsubscribeRemoteEvent,
 }
 
