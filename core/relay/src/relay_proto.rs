@@ -15,6 +15,7 @@ pub struct Address {
     pub network_id: String,
 }
 
+#[allow(dead_code)]
 pub fn parse_address(address: String) -> Result<Address, Error> {
     println!("Address to be parsed: {}", address);
     let v: Vec<&str> = address.split('/').collect();
@@ -31,6 +32,7 @@ pub fn parse_address(address: String) -> Result<Address, Error> {
     })
 }
 
+#[allow(dead_code)]
 fn parse_location(location: String) -> Result<LocationSegment, Error> {
     let v: Vec<&str> = location.split(":").collect();
     if v.len() != 2 {
@@ -47,6 +49,7 @@ fn parse_location(location: String) -> Result<LocationSegment, Error> {
     })
 }
 
+#[allow(dead_code)]
 pub fn get_url(args: &[String]) -> String {
     let port = if args.len() >= 2 {
         args[1].clone()

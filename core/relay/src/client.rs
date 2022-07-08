@@ -3,7 +3,7 @@ mod relay_proto;
 use futures::future::{BoxFuture, FutureExt};
 use pb::common::ack::ack;
 use pb::common::state::request_state;
-use pb::common::events::{event_subscription_state, EventType, EventMatcher, EventPublication, event_publication};
+use pb::common::events::{event_subscription_state, EventMatcher, EventPublication, event_publication};
 use pb::networks::networks::{network_client::NetworkClient, GetStateMessage, NetworkQuery, NetworkEventSubscription, NetworkEventUnsubscription};
 use relay_proto::get_url;
 use std::env;
@@ -73,7 +73,7 @@ fn poll_for_state(
                     None => println!("No status returned from get state request"),
                 };
             }
-            Err(error) => println!("Error getting state response"),
+            Err(_error) => println!("Error getting state response"),
         }
     }
     .boxed()
@@ -127,7 +127,7 @@ async fn event_suscribe() -> Result<(), Box<dyn std::error::Error>> {
         },
         None => println!("The returned Ack has no status"),
     }
-    event_unsuscribe(request_id.to_string()).await;
+    let _res = event_unsuscribe(request_id.to_string()).await;
     Ok(())
 }
 
@@ -209,7 +209,7 @@ fn poll_for_event_subscription(
                     None => println!("No status returned from get state request"),
                 };
             }
-            Err(error) => println!("Error getting state response"),
+            Err(_error) => println!("Error getting state response"),
         }
     }
     .boxed()

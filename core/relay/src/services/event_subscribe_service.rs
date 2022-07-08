@@ -2,22 +2,19 @@
 use crate::pb::common::ack::{ack, Ack};
 use crate::pb::common::query::Query;
 use crate::pb::common::events::EventSubscription;
-use crate::pb::driver::driver::driver_communication_client::DriverCommunicationClient;
 use crate::pb::relay::events::event_subscribe_client::EventSubscribeClient;
 use crate::pb::relay::events::event_subscribe_server::EventSubscribe;
-use crate::pb::common::events::{event_subscription_state, EventSubscriptionState};
+use crate::pb::common::events::{event_subscription_state};
 // Internal modules
 use crate::db::Database;
 use crate::error::Error;
 use crate::relay_proto::{parse_address, LocationSegment};
 use crate::services::helpers::{update_event_subscription_status, get_driver, get_driver_client};
-use crate::services::types::{Driver, Network};
+use crate::services::types::{Driver};
 // external modules
 use config;
-use serde;
 use tokio::sync::RwLock;
 use tonic::{Request, Response, Status};
-use base64::{encode, decode};
 
 use tonic::transport::{Certificate, Channel, ClientTlsConfig};
 

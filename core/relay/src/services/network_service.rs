@@ -10,7 +10,6 @@ use crate::pb::relay::events::event_subscribe_client::EventSubscribeClient;
 use crate::relay_proto::{parse_address, LocationSegment};
 // Internal modules
 use crate::db::Database;
-use crate::error::Error;
 use crate::services::helpers::update_event_subscription_status;
 use crate::services::helpers::driver_sign_subscription_helper;
 
@@ -20,7 +19,6 @@ use sled::open;
 use tokio::sync::RwLock;
 use tonic::{Code, Request, Response, Status};
 use uuid::Uuid;
-use base64::{encode, decode};
 
 use tonic::transport::{Certificate, Channel, ClientTlsConfig};
 
@@ -611,7 +609,6 @@ fn spawn_send_event_subscription_request(
             relay_host,
             relay_port,
             event_subscription,
-            request_id.clone(),
             relay_tls,
             relay_tlsca_cert_path.to_string(),
         )
@@ -660,7 +657,6 @@ async fn suscribe_event_call(
     relay_host: String,
     relay_port: String,
     event_subscription: EventSubscription,
-    request_id: String,
     use_tls: bool,
     tlsca_cert_path: String,
 ) -> Result<Response<Ack>, Box<dyn std::error::Error>> {

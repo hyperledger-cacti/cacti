@@ -2,7 +2,6 @@
 use crate::pb::common::ack::{ack, Ack};
 use crate::pb::common::query::Query;
 use crate::pb::common::state::{request_state, view_payload, RequestState, ViewPayload};
-use crate::pb::driver::driver::driver_communication_client::DriverCommunicationClient;
 use crate::pb::relay::datatransfer::data_transfer_client::DataTransferClient;
 use crate::pb::relay::datatransfer::data_transfer_server::DataTransfer;
 // Internal modules
@@ -10,13 +9,11 @@ use crate::db::Database;
 use crate::error::Error;
 use crate::relay_proto::{parse_address, LocationSegment};
 use crate::services::helpers::{get_driver, get_driver_client};
-use crate::services::types::{Driver, Network};
+use crate::services::types::{Driver};
 // external modules
 use config;
-use serde;
 use tokio::sync::RwLock;
 use tonic::{Request, Response, Status};
-use base64::{encode, decode};
 
 use tonic::transport::{Certificate, Channel, ClientTlsConfig};
 

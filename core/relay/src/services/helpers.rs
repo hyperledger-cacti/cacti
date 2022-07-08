@@ -1,6 +1,6 @@
 use crate::pb::common::query::Query;
 use crate::pb::common::events::{event_subscription_state, EventSubscriptionState};
-use crate::pb::common::events::{EventSubOperation, EventSubscription};
+use crate::pb::common::events::{EventSubscription};
 use crate::pb::driver::driver::driver_communication_client::DriverCommunicationClient;
 
 use crate::db::Database;
@@ -8,8 +8,6 @@ use crate::services::types::{Driver, Network};
 use crate::error::Error;
 
 use config;
-use tokio::sync::RwLock;
-use tonic::{Code, Request, Response, Status};
 use tonic::transport::{Certificate, Channel, ClientTlsConfig};
 
 // Locally scoped function to update request status in db. This function is
