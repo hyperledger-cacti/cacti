@@ -9,6 +9,7 @@ use crate::pb::relay::datatransfer::data_transfer_server::DataTransfer;
 use crate::db::Database;
 use crate::error::Error;
 use crate::relay_proto::{parse_address, LocationSegment};
+use crate::services::types::{Driver, Network};
 // external modules
 use config;
 use serde;
@@ -20,18 +21,6 @@ use tonic::transport::{Certificate, Channel, ClientTlsConfig};
 
 pub struct DataTransferService {
     pub config_lock: RwLock<config::Config>,
-}
-#[derive(Clone, PartialEq, serde::Serialize, serde::Deserialize, Debug)]
-pub struct Driver {
-    port: String,
-    hostname: String,
-    tls: bool,
-    tlsca_cert_path: String,
-}
-
-#[derive(Clone, PartialEq, serde::Serialize, serde::Deserialize, Debug)]
-pub struct Network {
-    network: String,
 }
 
 /// DataTransferService is the gRPC server implementation that handles the logic for

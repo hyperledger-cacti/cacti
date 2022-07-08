@@ -1,5 +1,29 @@
+use crate::pb::common::query::Query;
 use crate::pb::common::events::{event_subscription_state, EventSubscriptionState};
+use crate::pb::common::events::{EventSubOperation, EventSubscription};
+use crate::pb::driver::driver::driver_communication_client::DriverCommunicationClient;
+
 use crate::db::Database;
+use crate::services::types::{Driver, Network};
+use crate::error::Error;
+
+use config;
+use tokio::sync::RwLock;
+use tonic::{Code, Request, Response, Status};
+use tonic::transport::{Certificate, Channel, ClientTlsConfig};
+
+#[derive(Clone, PartialEq, serde::Serialize, serde::Deserialize, Debug)]
+pub struct Driver {
+    pub port: String,
+    pub hostname: String,
+    pub tls: bool,
+    pub tlsca_cert_path: String,
+}
+
+#[derive(Clone, PartialEq, serde::Serialize, serde::Deserialize, Debug)]
+pub struct Network {
+    pub network: String,
+}
 
 // Locally scoped function to update request status in db. This function is
 // called for the first time after an Ack is received from the remote relay.
@@ -38,4 +62,78 @@ pub fn update_event_subscription_status(
             println!("EventSubscription Request not found. Error: {:?}", e);
         },
     }
+}
+
+
+pub async fn driver_sign_subscription_helper(
+    event_subscription: EventSubscription,
+    request_id: String,
+    driver_id: String,
+    conf: config::Config,
+) -> Result<Response<Query>, Error> {
+    let networks_table = conf
+        .get_table("networks")
+        .map_err(|e| Error::Simple(format!("Unable to find networks table. Error: {:?}", e)))?;
+    let network_table = networks_table
+        .get::<String>(&driver_id.to_string())
+        .ok_or(Error::Simple(format!(
+            "Unable to find Network_id \"{}\" in config",
+            driver_id.to_string()
+        )))?;
+    let network_type = network_table
+        .clone()
+        .try_into::<Network>()
+        .expect("Error in config file networks table")
+        .clone();
+    // get the driver host:port from the drivers map
+    let drivers_table = conf
+        .get_table("drivers")
+        .map_err(|e| Error::Simple(format!("Unable to find driver table. Error: {:?}", e)))?;
+    let driver_table = drivers_table
+        .get::<String>(&network_type.network)
+        .ok_or(Error::Simple(format!(
+            "Unable to find driver port for network: {}",
+            driver_id.to_string()
+        )))?;
+    let driver_info = driver_table
+        .clone()
+        .try_into::<Driver>()
+        .expect("Error in config file drivers table")
+        .clone();
+    let port = driver_info.port.to_string();
+    let hostname = driver_info.hostname.to_string();
+    let use_tls = driver_info.tls;
+    let tlsca_cert_path = driver_info.tlsca_cert_path.to_string();
+    
+    let driver_address = format!("http://{}:{}", hostname, port);
+    let client;
+    if use_tls {
+        let pem = tokio::fs::read(tlsca_cert_path).await?;
+        let ca = Certificate::from_pem(pem);
+
+        let tls = ClientTlsConfig::new()
+            .ca_certificate(ca)
+            .domain_name(hostname);
+
+        let channel = Channel::from_shared(driver_address).unwrap()
+            .tls_config(tls)
+            .connect()
+            .await
+            .unwrap();
+
+        client = DriverCommunicationClient::new(channel);
+    } else {
+        client = DriverCommunicationClient::connect(driver_address).await?;
+    }
+    println!("Sending Sign EventSubscription Request to driver: {:?}", event_subscription.clone());
+    let signed_query = client
+        .clone()
+        .request_signed_event_subscription_query(event_subscription)
+        .await?
+        .into_inner();
+    if signed_query.clone().request_id.to_string() == request_id.to_string() {
+        println!("Signed Query Response from driver={:?}\n", signed_query);
+        return Ok(tonic::Response::new(signed_query))
+    }
+    Err(Error::Simple(format!("Error while requesting signature from driver: {:?}", signed_query)))
 }

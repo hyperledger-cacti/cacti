@@ -169,6 +169,22 @@ impl DriverCommunication for DriverCommunicationService {
 
         return Ok(Response::new(reply));
     }
+    async fn request_signed_event_subscription_query(&self, request: Request<EventSubscription>) -> Result<Response<Query>, Status> {
+        let received_query = request.into_inner().clone().query.expect("Err");
+        let signed_query: Query = Query {
+            policy: received_query.policy,
+            address: received_query.address,
+            requesting_relay: received_query.requesting_relay,
+            requesting_org: received_query.requesting_org,
+            requesting_network: received_query.requesting_network,
+            certificate: "dummy-driver-certificate".to_string(),
+            requestor_signature: "dummy-driver-signature".to_string(),
+            nonce: received_query.nonce,
+            request_id: received_query.request_id,
+            confidential: received_query.confidential,
+        };
+        return Ok(Response::new(signed_query));
+    }
 }
 
 #[tokio::main]
