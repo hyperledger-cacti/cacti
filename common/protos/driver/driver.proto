@@ -18,4 +18,9 @@ service DriverCommunication {
   // Events Subscription
   // the src-relay uses this endpoint to forward the event subscription request from dest-relay to driver
   rpc SubscribeEvent(common.events.EventSubscription) returns (common.ack.Ack) {}
+  
+  // Recommended to have TLS mode on for this unsafe endpoint
+  // Relay uses this to get Query.requestor_signature and 
+  // Query.certificate required for event subscription
+  rpc RequestSignedEventSubscriptionQuery(common.events.EventSubscription) returns (common.query.Query) {}
 }

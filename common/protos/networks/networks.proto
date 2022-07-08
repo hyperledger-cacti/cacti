@@ -24,7 +24,9 @@ service Network {
   // endpoint for a client to subscribe to event via local relay initiating subscription flow.
   rpc SubscribeEvent(NetworkEventSubscription) returns (common.ack.Ack) {}
   // This rpc endpoint is for polling the local relay for subscription state.
-  rpc GetEventSubscriptionState(GetStateMessage) returns(common.events.EventSubscriptionState) {}
+  rpc GetEventSubscriptionState(GetStateMessage) returns (common.events.EventSubscriptionState) {}
+  // endpoint for a client to subscribe to event via local relay initiating subscription flow.
+  rpc UnsubscribeEvent(NetworkEventUnsubscription) returns (common.ack.Ack) {}
 }
 
 message DbName {
@@ -50,8 +52,15 @@ message NetworkQuery {
   string requesting_org = 8;
   bool confidential = 9;
 }
+
+// Below message is used for network/client to dest-relay communication
 message NetworkEventSubscription {
   common.events.EventMatcher event_matcher = 1;
   NetworkQuery query = 2;
   common.events.EventPublication event_publication_spec = 3;
+}
+
+message NetworkEventUnsubscription {
+  NetworkEventSubscription request = 1;
+  string request_id = 2;
 }

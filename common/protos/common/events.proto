@@ -20,10 +20,21 @@ message EventMatcher {
     string transaction_contract_id = 4;
     string transaction_func = 5;
 }
-message EventSubscription {
-  EventMatcher event_matcher = 1;
-  common.query.Query query = 2;
+
+enum EventSubOperation {
+    SUBSCRIBE = 0;
+    UNSUBSCRIBE = 1;
+    UPDATE = 2;
 }
+
+// Below message is used to communicate between dest-relay and src-relay;
+// and src-relay and src-driver.
+message EventSubscription {
+    EventMatcher event_matcher = 1;
+    common.query.Query query = 2;
+    EventSubOperation operation = 3;
+}
+
 message EventSubscriptionState {
   enum STATUS {
     // pending ACK from remote relay
@@ -32,6 +43,8 @@ message EventSubscriptionState {
     PENDING = 1;
     ERROR = 2;
     SUCCESS = 3;
+    UNSUBSCRIBE_PENDING = 4;
+    UNSUBSCRIBED = 5;
   };
   string request_id = 1;
   STATUS status = 2;
