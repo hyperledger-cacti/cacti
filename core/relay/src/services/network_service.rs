@@ -3,9 +3,9 @@ use crate::pb::common::ack::{ack, Ack};
 use crate::pb::common::query::Query;
 use crate::pb::common::events::EventSubscription;
 use crate::pb::common::state::{request_state, RequestState};
-use crate::pb::common::events::{event_subscription_state, EventSubscriptionState};
+use crate::pb::common::events::{event_subscription_state, EventSubscriptionState, EventSubOperation};
 use crate::pb::networks::networks::network_server::Network;
-use crate::pb::networks::networks::{DbName, GetStateMessage, NetworkQuery, RelayDatabase, NetworkEventSubscription};
+use crate::pb::networks::networks::{DbName, GetStateMessage, NetworkQuery, RelayDatabase, NetworkEventSubscription, NetworkEventUnsubscription};
 use crate::pb::relay::datatransfer::data_transfer_client::DataTransferClient;
 use crate::pb::relay::events::event_subscribe_client::EventSubscribeClient;
 use crate::relay_proto::{parse_address, LocationSegment};
@@ -274,6 +274,14 @@ impl Network for NetworkService {
                 format!("Event Subscription Request not found. Error: {:?}", e),
             )),
         }
+    }
+    async fn unsubscribe_event(&self, request: Request<NetworkEventUnsubscription>) -> Result<Response<Ack>, Status> {
+        println!(
+            "Got a Network Event Unubscription request from {:?} - {:?}",
+            request.remote_addr(),
+            request
+        );
+        Err(tonic::Status::unimplemented("method not implemented"))
     }
 }
 
@@ -548,6 +556,7 @@ async fn suscribe_event_call(
     let event_subscription_request = tonic::Request::new(EventSubscription {
         event_matcher: network_event_subscription.event_matcher,
         query: Some(query),
+        operation: EventSubOperation::Subscribe as i32,
     });
     println!("EventSubscription: {:?}", event_subscription_request);
     let response = client.subscribe_event(event_subscription_request).await?;

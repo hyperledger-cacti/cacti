@@ -9,6 +9,8 @@ use crate::pb::relay::datatransfer::data_transfer_server::DataTransfer;
 use crate::db::Database;
 use crate::error::Error;
 use crate::relay_proto::{parse_address, LocationSegment};
+use crate::services::helpers::{get_driver, get_driver_client};
+use crate::services::types::{Driver, Network};
 // external modules
 use config;
 use serde;
@@ -20,18 +22,6 @@ use tonic::transport::{Certificate, Channel, ClientTlsConfig};
 
 pub struct DataTransferService {
     pub config_lock: RwLock<config::Config>,
-}
-#[derive(Clone, PartialEq, serde::Serialize, serde::Deserialize, Debug)]
-pub struct Driver {
-    port: String,
-    hostname: String,
-    tls: bool,
-    tlsca_cert_path: String,
-}
-
-#[derive(Clone, PartialEq, serde::Serialize, serde::Deserialize, Debug)]
-pub struct Network {
-    network: String,
 }
 
 /// DataTransferService is the gRPC server implementation that handles the logic for
@@ -206,46 +196,19 @@ fn request_state_helper(
         .set(&request_id.to_string(), &query)
         .map_err(|e| Error::Simple(format!("DB Failure: {:?}", e)))?;
     let parsed_address = parse_address(query.address.to_string())?;
-    // get the driver type from the networks map
-    let networks_table = conf
-        .get_table("networks")
-        .map_err(|e| Error::Simple(format!("Unable to find networks table. Error: {:?}", e)))?;
-    let network_table = networks_table
-        .get::<String>(&parsed_address.network_id.to_string())
-        .ok_or(Error::Simple(format!(
-            "Unable to find Network_id \"{}\" in config",
-            parsed_address.network_id.to_string()
-        )))?;
-    let network_type = network_table
-        .clone()
-        .try_into::<Network>()
-        .expect("Error in config file networks table")
-        .clone();
-    // get the driver host:port from the drivers map
-    let drivers_table = conf
-        .get_table("drivers")
-        .map_err(|e| Error::Simple(format!("Unable to find driver table. Error: {:?}", e)))?;
-    let driver_table = drivers_table
-        .get::<String>(&network_type.network)
-        .ok_or(Error::Simple(format!(
-            "Unable to find driver port for network: {}",
-            parsed_address.network_id.to_string()
-        )))?;
-    let driver_info = driver_table
-        .clone()
-        .try_into::<Driver>()
-        .expect("Error in config file drivers table")
-        .clone();
-    let port = driver_info.port.to_string();
-    let hostname = driver_info.hostname.to_string();
-    let tls = driver_info.tls;
-    let tlsca_cert_path = driver_info.tlsca_cert_path.to_string();
-    spawn_request_driver_state(query, hostname, port, tls, tlsca_cert_path, conf.clone());
-    return Ok(Ack {
-        status: ack::Status::Ok as i32,
-        request_id,
-        message: "".to_string(),
-    });
+    let result = get_driver(parsed_address.network_id.to_string(), conf.clone());
+    match result {
+        Ok(driver_info) => {
+            spawn_request_driver_state(query, driver_info, conf.clone());
+            return Ok(Ack {
+                status: ack::Status::Ok as i32,
+                request_id,
+                message: "".to_string(),
+            });
+        },
+        Err(e) => Err(e),
+    }
+    
 }
 
 /// send_driver_state is run on the remote relay. Runs when the driver sends the
@@ -283,31 +246,9 @@ fn send_driver_state_helper(
 
 async fn spawn_request_driver_state_helper(
     query: Query,
-    hostname: String,
-    port: String,
-    use_tls: bool,
-    tlsca_cert_path: String,
+    driver_info: Driver,
 ) -> Result<(), Error> {
-    let driver_address = format!("http://{}:{}", hostname, port);
-    let client;
-    if use_tls {
-        let pem = tokio::fs::read(tlsca_cert_path).await?;
-        let ca = Certificate::from_pem(pem);
-
-        let tls = ClientTlsConfig::new()
-            .ca_certificate(ca)
-            .domain_name(hostname);
-
-        let channel = Channel::from_shared(driver_address).unwrap()
-            .tls_config(tls)
-            .connect()
-            .await
-            .unwrap();
-
-        client = DriverCommunicationClient::new(channel);
-    } else {
-        client = DriverCommunicationClient::connect(driver_address).await?;
-    }
+    let client = get_driver_client(driver_info).await?;
     println!("Sending request to driver with query {:?}", query.clone());
     let ack = client
         .clone()
@@ -327,9 +268,9 @@ async fn spawn_request_driver_state_helper(
 }
 
 // Function that starts a thread which sends the query information to the driver
-fn spawn_request_driver_state(query: Query, hostname: String, port: String, use_tls: bool, tlsca_cert_path: String, conf: config::Config) {
+fn spawn_request_driver_state(query: Query, driver_info: Driver, conf: config::Config) {
     tokio::spawn(async move {
-        let result = spawn_request_driver_state_helper(query.clone(), hostname, port, use_tls, tlsca_cert_path).await;
+        let result = spawn_request_driver_state_helper(query.clone(), driver_info).await;
         match result {
             Ok(_) => {
                 // Do nothing
