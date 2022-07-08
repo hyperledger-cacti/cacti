@@ -1,17 +1,18 @@
 // Internal generated modules
 use crate::pb::common::ack::{ack, Ack};
 use crate::pb::common::query::Query;
-use crate::pb::common::events::EventSubscription;
 use crate::pb::common::state::{request_state, RequestState};
-use crate::pb::common::events::{event_subscription_state, EventSubscriptionState, EventSubOperation};
+use crate::pb::common::events::{EventSubscription, event_subscription_state, EventSubscriptionState, EventSubOperation, event_publication, EventPublication};
 use crate::pb::networks::networks::network_server::Network;
 use crate::pb::networks::networks::{DbName, GetStateMessage, NetworkQuery, RelayDatabase, NetworkEventSubscription, NetworkEventUnsubscription};
 use crate::pb::relay::datatransfer::data_transfer_client::DataTransferClient;
 use crate::pb::relay::events::event_subscribe_client::EventSubscribeClient;
 use crate::relay_proto::{parse_address, LocationSegment};
-use crate::services::helpers::update_event_subscription_status;
 // Internal modules
 use crate::db::Database;
+use crate::error::Error;
+use crate::services::helpers::update_event_subscription_status;
+use crate::services::helpers::driver_sign_subscription_helper;
 
 // External modules
 use config;
@@ -193,63 +194,32 @@ impl Network for NetworkService {
             event_matcher: network_event_subscription.event_matcher.clone(),
             event_publication_spec: network_event_subscription.event_publication_spec.clone()
         };
-        let message_insert = db.set(&request_id.to_string(), &target);
-        // Kept this as a match as the error case returns an Ok.
-        match message_insert {
-            Ok(_) => println!(
-                "Successfully stored NetworkEventSubscription in db with request_id: {}",
-                request_id.to_string()
-            ),
-            Err(e) => {
-                // Internal failure of sled. Send Error response
-                println!(
-                    "Error storing NetworkEventSubscription in db for request_id: {}",
-                    request_id.to_string()
-                );
-                let reply = Ok(Response::new(Ack {
-                    status: ack::Status::Error as i32,
-                    request_id: request_id.to_string(),
-                    message: format!("{:?}", e),
-                }));
-                println!("Sending Ack back to network: {:?}\n", reply);
-                return reply;
-            }
-        }
-
+        
+        // Create EventSubscription
         let network_query = network_event_subscription.query.clone().expect("No query passed with NetworkEventSubscription request");
-        let parsed_address = parse_address(network_query.address.to_string());
-        match parsed_address {
-            Ok(address) => {
-                // TODO: verify that host and port are valid
-                // Spawns a child process to handle sending request
-                spawn_send_event_subscription_request(
-                    conf,
-                    network_event_subscription,
-                    request_id.to_string(),
-                    address.location.hostname.to_string(),
-                    address.location.port.to_string()
-                );
-                // Send Ack back to network while request is happening in a thread
-                let reply = Ack {
-                    status: ack::Status::Ok as i32,
-                    request_id: request_id.to_string(),
-                    message: "".to_string(),
-                };
-                println!("Sending Ack back to network: {:?}\n", reply);
-                Ok(Response::new(reply))
-            }
-            Err(e) => {
-                println!("Invalid Address");
-                let reply = Ack {
-                    status: ack::Status::Error as i32,
-                    request_id: request_id.to_string(),
-                    message: format!("Error: {:?}", e),
-                };
-                println!("Sending Ack back to network: {:?}\n", reply);
-                Ok(Response::new(reply))
-            }
-        }
+        let relay_name = conf.get_str("name").unwrap();
+        let query: Query = Query {
+            policy: network_query.policy,
+            address: network_query.address,
+            requesting_relay: relay_name,
+            requesting_org: network_query.requesting_org,
+            requesting_network: network_query.requesting_network,
+            certificate: network_query.certificate,
+            requestor_signature: network_query.requestor_signature,
+            nonce: network_query.nonce,
+            request_id: request_id.to_string(),
+            confidential: network_query.confidential,
+        };
+        let event_subscription: EventSubscription = EventSubscription {
+            event_matcher: network_event_subscription.event_matcher,
+            query: Some(query),
+            operation: EventSubOperation::Subscribe as i32,
+        };
+        let event_publication_spec = network_event_subscription.event_publication_spec.clone().expect("No Event Publication Specification passed with NetworkEventSubscription request");
+
+        return event_subscription_helper(event_subscription, event_publication_spec, target, request_id.to_string(), db, conf).await;
     }
+    
     async fn get_event_subscription_state(
         &self,
         request: Request<GetStateMessage>,
@@ -261,13 +231,30 @@ impl Network for NetworkService {
         };
         let result = db.get::<EventSubscriptionState>(request.into_inner().request_id);
         match result {
-            Ok(event_subscription_state) => {
+            Ok(fetched_event_sub_state) => {
+                match event_subscription_state::Status::from_i32(fetched_event_sub_state.status) {
+                    Some(status) => match status {
+                        event_subscription_state::Status::Unsubscribed => {
+                            let result = db.unset::<EventSubscriptionState>(fetched_event_sub_state.clone().request_id);
+                            match result {
+                                Ok(old_state) => {
+                                    println!("Removed EventSubscription from database: {:?}", old_state);
+                                },
+                                Err(e) => {
+                                    println!("EventSubscription Request not found. Error: {:?}", e);
+                                }
+                            }
+                        },
+                        _ => {},
+                    },
+                    None => {},
+                }
+
                 println!("Sending back EventSubscriptionState to network: Request ID = {:?}, Status = {:?}",
-                         event_subscription_state.request_id,
-                         event_subscription_state.status
+                         fetched_event_sub_state.request_id,
+                         fetched_event_sub_state.status
                          );
-                
-                return Ok(Response::new(event_subscription_state));
+                return Ok(Response::new(fetched_event_sub_state));
             },
             Err(e) => Err(Status::new(
                 Code::NotFound,
@@ -275,13 +262,171 @@ impl Network for NetworkService {
             )),
         }
     }
+    // Unsubscribe Event Endpoints
     async fn unsubscribe_event(&self, request: Request<NetworkEventUnsubscription>) -> Result<Response<Ack>, Status> {
         println!(
             "Got a Network Event Unubscription request from {:?} - {:?}",
             request.remote_addr(),
             request
         );
-        Err(tonic::Status::unimplemented("method not implemented"))
+        let conf = self.config_lock.read().await.clone();
+        // Database access/storage
+        let db = Database {
+            db_path: conf.get_str("db_path").unwrap(),
+        };
+        
+        let net_event_sub = request.into_inner().clone();
+        let network_event_subscription = net_event_sub.request.clone().expect("No network event subscription passed");
+        let request_id = net_event_sub.request_id.to_string();
+        
+        // Initial request state stored in DB.
+        let target: EventSubscriptionState = EventSubscriptionState {
+            status: event_subscription_state::Status::UnsubscribePending as i32,
+            request_id: request_id.to_string(),
+            message: "".to_string(),
+            event_matcher: network_event_subscription.event_matcher.clone(),
+            event_publication_spec: network_event_subscription.event_publication_spec.clone()
+        };
+        
+        // Create EventSubscription
+        let network_query = network_event_subscription.query.clone().expect("No query passed with NetworkEventSubscription request");
+        let relay_name = conf.get_str("name").unwrap();
+        let query: Query = Query {
+            policy: network_query.policy,
+            address: network_query.address,
+            requesting_relay: relay_name,
+            requesting_org: network_query.requesting_org,
+            requesting_network: network_query.requesting_network,
+            certificate: network_query.certificate,
+            requestor_signature: network_query.requestor_signature,
+            nonce: network_query.nonce,
+            request_id: request_id.to_string(),
+            confidential: network_query.confidential,
+        };
+        let event_subscription: EventSubscription = EventSubscription {
+            event_matcher: network_event_subscription.event_matcher,
+            query: Some(query),
+            operation: EventSubOperation::Unsubscribe as i32,
+        };
+        let event_publication_spec = network_event_subscription.event_publication_spec.clone().expect("No Event Publication Specification passed with NetworkEventSubscription request");
+
+        return event_subscription_helper(event_subscription, event_publication_spec, target, request_id.to_string(), db, conf).await;
+    }
+}
+
+async fn event_subscription_helper(
+    req_event_subscription: EventSubscription,
+    event_publication_spec: EventPublication,
+    target_status: EventSubscriptionState,
+    request_id: String,
+    db: Database,
+    conf: config::Config,
+) -> Result<Response<Ack>, Status> {
+    let event_subscription;
+    
+    // Check if driver is subscribing/unsubscribing
+    match event_publication_spec.publication_target {
+        Some(data) => match data {
+            event_publication::PublicationTarget::Ctx(ctx) => {
+                let driver_id = ctx.clone().driver_id.to_string();
+                println!("Requesting Driver {} to sign", driver_id.clone().to_string());
+                let result = driver_sign_subscription_helper(
+                    req_event_subscription.clone(),
+                    request_id.to_string(),
+                    driver_id.to_string(),
+                    conf.clone(),
+                ).await;
+                match result {
+                    Ok(signed_query) => {
+                        event_subscription = EventSubscription {
+                            event_matcher: req_event_subscription.event_matcher,
+                            query: Some(signed_query),
+                            operation: req_event_subscription.operation,
+                        };
+                    }
+                    Err(e) => {
+                        println!("Driver did not signed the subscription request");
+                        let reply = Ack {
+                            status: ack::Status::Error as i32,
+                            request_id: request_id.to_string(),
+                            message: format!("Error: {:?}", e),
+                        };
+                        println!("Sending Ack back to network: {:?}\n", reply);
+                        return Ok(Response::new(reply))
+                    }
+                }
+            }
+            event_publication::PublicationTarget::AppUrl(app_url) => {
+                println!("Registering for Client using App URL: {}", app_url.to_string());
+                event_subscription = req_event_subscription;
+            }
+        },
+        None => {
+            println!("No Publication Target");
+            let reply = Ack {
+                status: ack::Status::Error as i32,
+                request_id: request_id.to_string(),
+                message: format!("No Publication Target provided"),
+            };
+            println!("Sending Ack back to network: {:?}\n", reply);
+            return Ok(Response::new(reply))
+        }
+    };
+    
+    let message_insert = db.set(&request_id.to_string(), &target_status);
+    // Kept this as a match as the error case returns an Ok.
+    match message_insert {
+        Ok(_) => println!(
+            "Successfully stored EventSubscriptionState in db with request_id: {}",
+            request_id.to_string()
+        ),
+        Err(e) => {
+            // Internal failure of sled. Send Error response
+            println!(
+                "Error storing EventSubscriptionState in db for request_id: {}",
+                request_id.to_string()
+            );
+            let reply = Ok(Response::new(Ack {
+                status: ack::Status::Error as i32,
+                request_id: request_id.to_string(),
+                message: format!("{:?}", e),
+            }));
+            println!("Sending Ack back to network: {:?}\n", reply);
+            return reply;
+        }
+    }
+    let query = event_subscription.clone().query.expect("");
+    let parsed_address = parse_address(query.address.to_string());
+    match parsed_address {
+        Ok(address) => {
+            // TODO: verify that host and port are valid
+            // Spawns a child process to handle sending request
+            spawn_send_event_subscription_request(
+                conf,
+                event_subscription,
+                request_id.to_string(),
+                address.location.hostname.to_string(),
+                address.location.port.to_string(),
+            );
+            // Send Ack back to network while request is happening in a thread
+            let reply = Ack {
+                status: ack::Status::Ok as i32,
+                request_id: request_id.to_string(),
+                message: "".to_string(),
+            };
+            println!("Sending Ack back to network: {:?}\n", reply);
+            Ok(Response::new(reply))
+        }
+        Err(e) => {
+            println!("Invalid Address");
+            let reply = Ack {
+                status: ack::Status::Error as i32,
+                request_id: request_id.to_string(),
+                message: format!("Error: {:?}", e),
+            };
+            println!("Sending Ack back to network: {:?}\n", reply);
+            Ok(Response::new(reply))
+        }
     }
 }
 
@@ -435,10 +580,11 @@ async fn data_transfer_call(
     Ok(response)
 }
 
+
 // Sends a request to the remote relay
 fn spawn_send_event_subscription_request(
     conf: config::Config,
-    network_event_subscription: NetworkEventSubscription,
+    event_subscription: EventSubscription,
     request_id: String,
     relay_host: String,
     relay_port: String,
@@ -462,10 +608,9 @@ fn spawn_send_event_subscription_request(
         }
 
         let result = suscribe_event_call(
-            conf.get_str("name").unwrap(),
             relay_host,
             relay_port,
-            network_event_subscription,
+            event_subscription,
             request_id.clone(),
             relay_tls,
             relay_tlsca_cert_path.to_string(),
@@ -512,10 +657,9 @@ fn spawn_send_event_subscription_request(
 }
 // // Call to remote relay for the event subscription protocol.
 async fn suscribe_event_call(
-    relay_name: String,
     relay_host: String,
     relay_port: String,
-    network_event_subscription: NetworkEventSubscription,
+    event_subscription: EventSubscription,
     request_id: String,
     use_tls: bool,
     tlsca_cert_path: String,
@@ -540,24 +684,7 @@ async fn suscribe_event_call(
         client = EventSubscribeClient::connect(client_addr).await?;
     }
     
-    let network_query = network_event_subscription.query.clone().expect("No query passed with NetworkEventSubscription request");
-    let query: Query = Query {
-        policy: network_query.policy,
-        address: network_query.address,
-        requesting_relay: relay_name,
-        requesting_org: network_query.requesting_org,
-        requesting_network: network_query.requesting_network,
-        certificate: network_query.certificate,
-        requestor_signature: network_query.requestor_signature,
-        nonce: network_query.nonce,
-        request_id: request_id.to_string(),
-        confidential: network_query.confidential,
-    };
-    let event_subscription_request = tonic::Request::new(EventSubscription {
-        event_matcher: network_event_subscription.event_matcher,
-        query: Some(query),
-        operation: EventSubOperation::Subscribe as i32,
-    });
+    let event_subscription_request = tonic::Request::new(event_subscription);
     println!("EventSubscription: {:?}", event_subscription_request);
     let response = client.subscribe_event(event_subscription_request).await?;
     Ok(response)

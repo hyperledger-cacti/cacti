@@ -28,16 +28,41 @@ pub fn update_event_subscription_status(
     };
     let result = db.get::<EventSubscriptionState>(curr_request_id.clone());
     match result {
-        Ok(event_subscription_state) => {
+        Ok(fetched_event_sub_state) => {
 
-            let target: EventSubscriptionState = EventSubscriptionState {
-                status: new_status as i32,
-                request_id: curr_request_id.clone(),
-                message: message.to_string(),
-                event_matcher: event_subscription_state.event_matcher.clone(),
-                event_publication_spec: event_subscription_state.event_publication_spec.clone(),
-            };
-
+            let target: EventSubscriptionState;
+            match event_subscription_state::Status::from_i32(fetched_event_sub_state.status) {
+                Some(status) => match status {
+                    event_subscription_state::Status::UnsubscribePending => {
+                        target = EventSubscriptionState {
+                            status: event_subscription_state::Status::Unsubscribed as i32,
+                            request_id: curr_request_id.clone(),
+                            message: message.to_string(),
+                            event_matcher: fetched_event_sub_state.event_matcher,
+                            event_publication_spec: fetched_event_sub_state.event_publication_spec
+                        };
+                    },
+                    _ => {
+                        target = EventSubscriptionState {
+                            status: new_status as i32,
+                            request_id: curr_request_id.clone(),
+                            message: message.to_string(),
+                            event_matcher: fetched_event_sub_state.event_matcher.clone(),
+                            event_publication_spec: fetched_event_sub_state.event_publication_spec.clone(),
+                        };
+                    },
+                },
+                None => {
+                    target = EventSubscriptionState {
+                        status: new_status as i32,
+                        request_id: curr_request_id.clone(),
+                        message: message.to_string(),
+                        event_matcher: fetched_event_sub_state.event_matcher.clone(),
+                        event_publication_spec: fetched_event_sub_state.event_publication_spec.clone(),
+                    };
+                },
+            }
+            
             // Panic if this fails, atm the panic is just logged by the tokio runtime
             db.set(&curr_request_id, &target)
                 .expect("Failed to insert into DB");
@@ -123,7 +148,7 @@ pub async fn driver_sign_subscription_helper(
     request_id: String,
     driver_id: String,
     conf: config::Config,
-) -> Result<Response<Query>, Error> {
+) -> Result<Query, Error> {
     let result = get_driver(driver_id.to_string(), conf.clone());
     match result {
         Ok(driver_info) => {
@@ -136,7 +161,7 @@ pub async fn driver_sign_subscription_helper(
                 .into_inner();
             if signed_query.clone().request_id.to_string() == request_id.to_string() {
                 println!("Signed Query Response from driver={:?}\n", signed_query);
-                return Ok(tonic::Response::new(signed_query))
+                return Ok(signed_query)
             }
             Err(Error::Simple(format!("Error while requesting signature from driver: {:?}", signed_query)))
         },
