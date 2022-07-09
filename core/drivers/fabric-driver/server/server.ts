@@ -21,7 +21,7 @@ import { Certificate } from '@fidm/x509';
 import * as path from 'path';
 
 import { LevelDBConnector } from "./dbConnector"
-import { addEventSubscription, deleteEventSubscription, lookupEventSubscriptions } from "./dbUtils"
+import { addEventSubscription, deleteEventSubscription, lookupEventSubscriptions } from "./utils"
 import { Query } from "@hyperledger-labs/weaver-protos-js/common/query_pb";
 
 const server = new Server();

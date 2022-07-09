@@ -12,6 +12,30 @@ import { LevelDBConnector } from "./dbConnector"
 // Create connection to a database
 const db = new LevelDBConnector("mydb")
 
+function checkIfArraysAreEqual(x: Array<any>, y: Array<any>): boolean {
+    if (x == y) {
+        return true;
+    } else if (x == null || y == null || (x.length != y.length)) {
+        return false;
+    } else {
+        // check if all elements of x are present in y 
+        for (const element of x) {
+            const index = y.indexOf(element);
+            if (index == -1) {
+                return false;
+            } else {
+                y.splice(index, 1);
+            }
+        }
+        
+        if (y.length != 0) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 async function addEventSubscription(
     eventSub: eventsPb.EventSubscription
 ): Promise<string> {
@@ -39,7 +63,8 @@ async function addEventSubscription(
             // check if the event to be subscribed is already present in the DB
             for (const subscriptionSerialized of subscriptions) {
                 var subscription: queryPb.Query =  queryPb.Query.deserializeBinary(Buffer.from(subscriptionSerialized, 'base64'));
-                if (subscription.getAddress() == query.getAddress() &&
+                if (checkIfArraysAreEqual(subscription.getPolicyList(), query.getPolicyList()) &&
+                    subscription.getAddress() == query.getAddress() &&
                     subscription.getRequestingRelay() == query.getRequestingRelay() &&
                     subscription.getRequestingNetwork() == query.getRequestingNetwork() &&
                     subscription.getCertificate() == query.getCertificate() &&
