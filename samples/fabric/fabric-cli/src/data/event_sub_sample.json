@@ -1,18 +1,18 @@
 {
     "event_matcher": {
-        "event_type": 1,
-        "event_class_id": "",
-        "transaction_ledger_id": "mychannel",
-        "transaction_contract_id": "simplestate",
-        "transaction_func": "Create"
+        "eventType": 1,
+        "eventClassId": "",
+        "transactionLedgerId": "mychannel",
+        "transactionContractId": "simplestate",
+        "transactionFunc": "Create"
     },
     "event_publication_spec": {
-        "args": [],
-        "contract_id": "simplestate",
-        "driver_id": "network1",
-        "func": "Create",
-        "ledger_id": "mychannel",
-        "replace_arg_index": "0"
+        "ccArgs": [],
+        "contractId": "simplestate",
+        "driverId": "network1",
+        "ccFunc": "Create",
+        "ledgerId": "mychannel",
+        "replaceArgIndex": "0"
     },
     "view_address": "localhost:9083/network2/mychannel:simplestate:Read:a",
     "confidential": false

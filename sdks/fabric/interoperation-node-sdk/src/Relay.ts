@@ -298,7 +298,8 @@ class Relay {
         }
         if (
             state.getStatus() === eventsPb.EventSubscriptionState.STATUS.PENDING ||
-            state.getStatus() === eventsPb.EventSubscriptionState.STATUS.PENDING_ACK
+            state.getStatus() === eventsPb.EventSubscriptionState.STATUS.PENDING_ACK ||
+            state.getStatus() === eventsPb.EventSubscriptionState.STATUS.UNSUBSCRIBE_PENDING
         ) {
             if (dateObj.getTime() < Date.now()) {
                 throw new Error("Timeout: State is still pending.");
