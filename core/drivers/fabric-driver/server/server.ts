@@ -9,9 +9,10 @@ import { Server, ServerCredentials, credentials } from '@grpc/grpc-js';
 import ack_pb from '@hyperledger-labs/weaver-protos-js/common/ack_pb';
 import fabricView from '@hyperledger-labs/weaver-protos-js/fabric/view_data_pb';
 import query_pb from '@hyperledger-labs/weaver-protos-js/common/query_pb';
-import eventsPb from '@hyperledger-labs/weaver-protos-js/common/events_pb';
+import eventsPb, { EventMatcher } from '@hyperledger-labs/weaver-protos-js/common/events_pb';
 import driver_pb_grpc from '@hyperledger-labs/weaver-protos-js/driver/driver_grpc_pb';
 import datatransfer_grpc_pb from '@hyperledger-labs/weaver-protos-js/relay/datatransfer_grpc_pb';
+import events_grpc_pb from '@hyperledger-labs/weaver-protos-js/relay/events_grpc_pb';
 import state_pb from '@hyperledger-labs/weaver-protos-js/common/state_pb';
 import invoke from './fabric-code';
 import 'dotenv/config';
@@ -32,38 +33,44 @@ const mockedB64Data =
 async function dbConnectionTest(
     dbName: string
 ): Promise<boolean> {
-    console.debug(`Start testing LevelDBConnector for ${dbName}`)
-
+    console.log(`Start testing LevelDBConnector for ${dbName}`)
     try {
         // Create connection to a database
-        const db = new LevelDBConnector(dbName)
-
-        // Add an entry with key 'a' and value 1
-        await db.insert('a', 1)
-
-        // Get value of key 'a': 1
-        const value = await db.read('a')
-        console.info(`got value: ${value}`)
+        const db = new LevelDBConnector(dbName);
+        const key: string = 'a';
+        // Add the key with value 1 to the database
+        await db.insert(key, 1);
+        // Fetch the value of the key
+        const value = await db.read(key);
+        console.log(`obtained <key, value>: <${key}, ${value}>`)
     } catch (error) {
-        console.log(`failed testing LevelDBConnector, with error: ${error}`)
+        console.error(`failed testing LevelDBConnector, with error: ${JSON.stringify(error)}`)
     }
 
-    console.debug(`End testing LevelDBConnector for ${dbName}`)
+    console.log(`End testing LevelDBConnector for ${dbName}`)
     return true;
 }
 
 async function dbUtilsTest(
     call: any
-): Promise<boolean> {
-    console.debug(`Start testing dbUtils`)
+): Promise<any> {
+    console.debug(`Start dbUtilsTest()`)
 
-    await addEventSubscription(call.request)
-    var subscriptions: Array<Query> = <Array<Query>> await lookupEventSubscriptions(call.request.getEventmatcher()!);
+    var eventMatcher: eventsPb.EventMatcher = call.request.getEventmatcher()!;
+    await addEventSubscription(call.request);
+    var subscriptions: Array<Query> = await lookupEventSubscriptions(eventMatcher) as Array<Query>;
+
+    for (const subscription of subscriptions) {
+        if (subscription.getRequestId() == call.request.getQuery().getRequestId()) {
+            await deleteEventSubscription(eventMatcher, subscription.getRequestId());
+            break;
+        }
+    }
     //let subscription: Query = subscriptions[0]
-    //await deleteEventSubscription(call.request.getEventmatcher()!, subscription.getRequestId());
-    await deleteEventSubscription(call.request.getEventmatcher()!, "anim");
-    console.debug(`End testing dbUtils`)
-    return true;
+    //await deleteEventSubscription(eventMatcher, subscription.getRequestId());
+
+    console.debug(`End dbUtilsTest()`)
+    return "true";
 }
 
 // Mocked fabric communication function
@@ -210,25 +217,73 @@ server.addService(driver_pb_grpc.DriverCommunicationService, {
     },
     subscribeEvent: (call: { request: eventsPb.EventSubscription }, callback: (_: any, object: ack_pb.Ack) => void) => {
         const ack_response = new ack_pb.Ack();
+        var newRequestId: string = call.request.getQuery()!.getRequestId()
+        console.log(`newRequestId: ${newRequestId}`);
         try {
-            if (process.env.MOCK === 'true') {
-                //dbConnectionTest("mydb");
-                dbUtilsTest(call);
+            if (process.env.MOCK === 'false') {
+                addEventSubscription(call.request).then((requestId) => {
+                    if (newRequestId == requestId) {
+                        // event being subscribed for the first time
+                        ack_response.setMessage('Event subscription is successful!');
+                        ack_response.setStatus(ack_pb.Ack.STATUS.OK);
+
+                        // the event listener logic follows here
+                    } else {
+                        // event being subscribed already exists
+                        ack_response.setMessage(`Event subscription already exists with requestId: ${requestId}`);
+                        ack_response.setStatus(ack_pb.Ack.STATUS.ERROR);
+                    }
+                    ack_response.setRequestId(newRequestId);
+
+                    // gRPC response.
+                    console.log(`Responding to the relay the eventSubscription Ack: ${JSON.stringify(ack_response.toObject())}`);
+
+                    if (!process.env.RELAY_ENDPOINT) {
+                        throw new Error('RELAY_ENDPOINT is not set.');
+                    }
+                    let client;
+                    if (process.env.RELAY_TLS === 'true') {
+                        if (!(process.env.RELAY_TLSCA_CERT_PATH && fs.existsSync(process.env.RELAY_TLSCA_CERT_PATH))) {
+                            throw new Error("Missing or invalid RELAY_TLSCA_CERT_PATH: " + process.env.RELAY_TLSCA_CERT_PATH);
+                        }
+                        const rootCert = fs.readFileSync(process.env.RELAY_TLSCA_CERT_PATH);
+                        client = new events_grpc_pb.EventSubscribeClient(
+                            process.env.RELAY_ENDPOINT,
+                            credentials.createSsl(rootCert)
+                        );
+                    } else {
+                        client = new events_grpc_pb.EventSubscribeClient(
+                            process.env.RELAY_ENDPOINT,
+                            credentials.createInsecure()
+                        );
+                    }
+
+                    // Sending the fabric state to the relay.
+                    //client.sendDriverSubscriptionStatus(ack_response, function (err: any, response: any) {
+                    //    console.log('Response:', response, 'Error: ', err);
+                    //});
+
+                });
+
+                const ack_submitted = new ack_pb.Ack();
+                ack_submitted.setMessage('Procesing addEventSubscription');
+                ack_submitted.setRequestId(newRequestId);
+                ack_submitted.setStatus(ack_pb.Ack.STATUS.OK);
+                // gRPC response.
+                console.log(`Responding to caller with Ack: ${JSON.stringify(ack_submitted.toObject())}`);
+                callback(null, ack_submitted);
             } else {
+                //dbConnectionTest("mydb");
+                //dbUtilsTest(call);
                 console.log('Support is yet be added');
             }
-            ack_response.setMessage('');
-            ack_response.setStatus(ack_pb.Ack.STATUS.OK);
-            ack_response.setRequestId(call.request.getQuery()!.getRequestId());
-            // gRPC response.
-            console.log('Responding to caller');
-            callback(null, ack_response);
         } catch (e) {
             console.log(e);
+            ack_response.setMessage(newRequestId);
             ack_response.setMessage(`Error: ${e}`);
             ack_response.setStatus(ack_pb.Ack.STATUS.ERROR);
             // gRPC response.
-            console.log('Responding to caller');
+            console.error(`Responding to caller Ack: ${JSON.stringify(ack_response.toObject())}`);
             callback(null, ack_response);
         }
     },

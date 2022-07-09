@@ -26,12 +26,12 @@ interface DBConnector {
 class LevelDBConnector implements DBConnector {
 
     DB_TYPE: string = "Level";
-    dbHandle: any
+    dbHandle: any;
     
     constructor(
         dbName: string
     ) {
-        this.dbHandle = new Level(dbName, { valueEncoding: 'json' })
+        this.dbHandle = new Level(dbName, { valueEncoding: 'json' });
     }
 
     async insert(
@@ -41,7 +41,7 @@ class LevelDBConnector implements DBConnector {
         try {
             await this.dbHandle.put(key, value);
         } catch (error: any) {
-            console.log(`failed to insert key ${key} with error: ${error}`);
+            console.error(`failed to insert key ${JSON.stringify(key)} with error: ${JSON.stringify(error)}`);
             throw new Error(error);
         }
 
@@ -54,9 +54,9 @@ class LevelDBConnector implements DBConnector {
         var value: any
         try {
             value = await this.dbHandle.get(key);
-            console.debug(`read() got value: ${value}`)
+            console.debug(`read() got value: ${JSON.stringify(value)}`)
         } catch (error: any) {
-            console.log(`failed to read key ${key} with error: ${error}`);
+            console.error(`failed to read key ${JSON.stringify(key)} with error: ${JSON.stringify(error)}`);
             throw new Error(error);
         }
         
@@ -70,7 +70,7 @@ class LevelDBConnector implements DBConnector {
         try {
             await this.dbHandle.put(key, value);
         } catch (error: any) {
-            console.log(`failed to update key ${key} with error: ${error}`);
+            console.error(`failed to update key ${JSON.stringify(key)} with error: ${JSON.stringify(error)}`);
             throw new Error(error);
         }
 
@@ -85,7 +85,7 @@ class LevelDBConnector implements DBConnector {
             value = this.read(key);
             await this.dbHandle.del(key);
         } catch (error: any) {
-            console.log(`failed to delete key ${key} with error: ${error}`);
+            console.error(`failed to delete key ${JSON.stringify(key)} with error: ${JSON.stringify(error)}`);
             throw new Error(error);
         }
         
