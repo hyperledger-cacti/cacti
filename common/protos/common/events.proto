@@ -38,13 +38,14 @@ message EventSubscription {
 message EventSubscriptionState {
   enum STATUS {
     // pending ACK from remote relay
-    PENDING_ACK = 0;
+    SUBSCRIBE_PENDING_ACK = 0;
     // Received ACK, waiting for event subscription confirmation from remote relay
-    PENDING = 1;
-    ERROR = 2;
-    SUCCESS = 3;
+    SUBSCRIBE_PENDING = 1;
+    SUBSCRIBED = 2;
+    UNSUBSCRIBE_PENDING_ACK = 3;
     UNSUBSCRIBE_PENDING = 4;
     UNSUBSCRIBED = 5;
+    ERROR = 6;
   };
   string request_id = 1;
   STATUS status = 2;

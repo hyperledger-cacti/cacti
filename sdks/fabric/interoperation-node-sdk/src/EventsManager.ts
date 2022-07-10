@@ -220,10 +220,40 @@ const unsubscribeRemoteEvent = async (
     return relayResponse
 }
 
+const getSubscriptionStatus = async (
+    requestID: string,
+    localRelayEndpoint: string,
+    asJson: boolean = true,
+    useTls: boolean = false,
+    tlsRootCACertPaths?: Array<string>,
+    confidential: boolean = false,
+): Promise<any> => {
+    logger.debug("Get Event Subscription Status")
+
+    const relay = useTls ? new Relay(localRelayEndpoint, Relay.defaultTimeout, true, tlsRootCACertPaths) : new Relay(localRelayEndpoint);
+    
+    const [relayResponse, relayResponseError] = await helpers.handlePromise(
+        relay.GetEventSubscriptionState(
+            requestID,
+            asJson
+        ),
+    );
+    if (relayResponseError) {
+        throw new Error(`Get event subscription relay response error: ${relayResponseError}`);
+    }
+    
+    logger.debug(`Get event subscription status response: ${JSON.stringify(relayResponse)}`)
+    
+    return relayResponse
+}
+
+
+
 export {
     createEventMatcher,
     createEventPublicationSpec,
     subscribeRemoteEvent,
     unsubscribeRemoteEvent,
+    getSubscriptionStatus,
 }
 

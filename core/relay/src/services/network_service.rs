@@ -186,7 +186,7 @@ impl Network for NetworkService {
         
         // Initial request state stored in DB.
         let target: EventSubscriptionState = EventSubscriptionState {
-            status: event_subscription_state::Status::PendingAck as i32,
+            status: event_subscription_state::Status::SubscribePendingAck as i32,
             request_id: request_id.to_string(),
             message: "".to_string(),
             event_matcher: network_event_subscription.event_matcher.clone(),
@@ -279,7 +279,7 @@ impl Network for NetworkService {
         
         // Initial request state stored in DB.
         let target: EventSubscriptionState = EventSubscriptionState {
-            status: event_subscription_state::Status::UnsubscribePending as i32,
+            status: event_subscription_state::Status::UnsubscribePendingAck as i32,
             request_id: request_id.to_string(),
             message: "".to_string(),
             event_matcher: network_event_subscription.event_matcher.clone(),
@@ -621,23 +621,15 @@ fn spawn_send_event_subscription_request(
                 let ack_response_into_inner = ack_response.into_inner().clone();
                 // This match first checks if the status is valid.
                 match ack::Status::from_i32(ack_response_into_inner.status) {
-                    Some(status) => match status {
-                        ack::Status::Ok => update_event_subscription_status(
+                    Some(status) => update_event_subscription_status(
                             request_id.to_string(),
-                            event_subscription_state::Status::Pending,
-                            db_path.to_string(),
-                            "".to_string(),
-                        ),
-                        ack::Status::Error => update_event_subscription_status(
-                            request_id.to_string(),
-                            event_subscription_state::Status::Error,
+                            status,
                             db_path.to_string(),
                             ack_response_into_inner.message.to_string(),
-                        ),
-                    },
+                    ),
                     None => update_event_subscription_status(
                         request_id.to_string(),
-                        event_subscription_state::Status::Error,
+                        ack::Status::Error,
                         db_path.to_string(),
                         "Status is not supported or is invalid".to_string(),
                     ),
@@ -645,7 +637,7 @@ fn spawn_send_event_subscription_request(
             }
             Err(result_error) => update_event_subscription_status(
                 request_id.to_string(),
-                event_subscription_state::Status::Error,
+                ack::Status::Error,
                 db_path.to_string(),
                 format!("{:?}", result_error).to_string(),
             ),

@@ -16,7 +16,7 @@ import * as path from 'path'
 
 const command: GluegunCommand = {
   name: 'subscribe',
-  alias: ['-sd'],
+  alias: ['-s'],
   description: 'Initiate event subscribe',
   run: async toolbox => {
     const {
@@ -59,6 +59,11 @@ const command: GluegunCommand = {
     if (array.length != 1) {
         print.error('Not enough arguments supplied')
         return
+    }
+    if (!options['network'])
+    {
+      print.error('--network needs to be specified')
+      return
     }
     if (!options['user']) {
         options['user'] = `user1`     //Default user
@@ -108,7 +113,7 @@ const command: GluegunCommand = {
             keyCert
         )
         
-        if (response.getStatus() == EventSubscriptionState.STATUS.SUCCESS) {
+        if (response.getStatus() == EventSubscriptionState.STATUS.SUBSCRIBED) {
             console.log("Event Subscription Status Success with requestId:", response.getRequestId())
         } else {
             console.log("Unknown error")

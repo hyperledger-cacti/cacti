@@ -8,10 +8,10 @@
     },
     "event_publication_spec": {
         "ccArgs": [],
-        "contractId": "simplestate",
+        "chaincodeId": "simplestate",
         "driverId": "network1",
         "ccFunc": "Create",
-        "ledgerId": "mychannel",
+        "channelId": "mychannel",
         "replaceArgIndex": "0"
     },
     "view_address": "localhost:9083/network2/mychannel:simplestate:Read:a",

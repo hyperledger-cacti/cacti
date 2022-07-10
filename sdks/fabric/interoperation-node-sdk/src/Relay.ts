@@ -297,9 +297,10 @@ class Relay {
             throw new Error(`Get event subscription state error: ${error}`);
         }
         if (
-            state.getStatus() === eventsPb.EventSubscriptionState.STATUS.PENDING ||
-            state.getStatus() === eventsPb.EventSubscriptionState.STATUS.PENDING_ACK ||
-            state.getStatus() === eventsPb.EventSubscriptionState.STATUS.UNSUBSCRIBE_PENDING
+            state.getStatus() === eventsPb.EventSubscriptionState.STATUS.SUBSCRIBE_PENDING ||
+            state.getStatus() === eventsPb.EventSubscriptionState.STATUS.SUBSCRIBE_PENDING_ACK ||
+            state.getStatus() === eventsPb.EventSubscriptionState.STATUS.UNSUBSCRIBE_PENDING ||
+            state.getStatus() === eventsPb.EventSubscriptionState.STATUS.UNSUBSCRIBE_PENDING_ACK
         ) {
             if (dateObj.getTime() < Date.now()) {
                 throw new Error("Timeout: State is still pending.");

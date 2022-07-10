@@ -16,7 +16,7 @@ import * as path from 'path'
 
 const command: GluegunCommand = {
   name: 'unsubscribe',
-  alias: ['-sd'],
+  alias: ['-u'],
   description: 'Initiate event unsubscribe',
   run: async toolbox => {
     const {
@@ -56,7 +56,7 @@ const command: GluegunCommand = {
       )
       return
     }
-    console.log("Event Subscription")
+    console.log("Event Unsubscription")
     if (options.debug === 'true') {
         logger.level = 'debug'
         logger.debug('Debugging is enabled')
@@ -64,6 +64,11 @@ const command: GluegunCommand = {
     if (array.length != 1) {
         print.error('Not enough arguments supplied')
         return
+    }
+    if (!options['network'])
+    {
+      print.error('--network needs to be specified')
+      return
     }
     if (!options['request-id'])
     {

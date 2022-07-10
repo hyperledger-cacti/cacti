@@ -1,3 +1,4 @@
+use crate::pb::common::ack::{ack};
 use crate::pb::common::query::Query;
 use crate::pb::common::events::{event_subscription_state, EventSubscriptionState};
 use crate::pb::common::events::{EventSubscription};
@@ -17,7 +18,7 @@ use tonic::transport::{Certificate, Channel, ClientTlsConfig};
 // returned EventSubscriptionState with status SUCCESS or ERROR.
 pub fn update_event_subscription_status(
     curr_request_id: String,
-    new_status: event_subscription_state::Status,
+    new_status: ack::Status,
     curr_db_path: String,
     message: String,
 ) {
@@ -27,38 +28,74 @@ pub fn update_event_subscription_status(
     let result = db.get::<EventSubscriptionState>(curr_request_id.clone());
     match result {
         Ok(fetched_event_sub_state) => {
-
             let target: EventSubscriptionState;
-            match event_subscription_state::Status::from_i32(fetched_event_sub_state.status) {
-                Some(status) => match status {
-                    event_subscription_state::Status::UnsubscribePending => {
-                        target = EventSubscriptionState {
-                            status: event_subscription_state::Status::Unsubscribed as i32,
-                            request_id: curr_request_id.clone(),
-                            message: message.to_string(),
-                            event_matcher: fetched_event_sub_state.event_matcher,
-                            event_publication_spec: fetched_event_sub_state.event_publication_spec
-                        };
+            if new_status == ack::Status::Ok {
+                match event_subscription_state::Status::from_i32(fetched_event_sub_state.status) {
+                    Some(status) => match status {
+                        event_subscription_state::Status::UnsubscribePendingAck => {
+                            target = EventSubscriptionState {
+                                status: event_subscription_state::Status::UnsubscribePending as i32,
+                                request_id: curr_request_id.clone(),
+                                message: message.to_string(),
+                                event_matcher: fetched_event_sub_state.event_matcher,
+                                event_publication_spec: fetched_event_sub_state.event_publication_spec
+                            };
+                        },
+                        event_subscription_state::Status::UnsubscribePending => {
+                            target = EventSubscriptionState {
+                                status: event_subscription_state::Status::Unsubscribed as i32,
+                                request_id: curr_request_id.clone(),
+                                message: message.to_string(),
+                                event_matcher: fetched_event_sub_state.event_matcher,
+                                event_publication_spec: fetched_event_sub_state.event_publication_spec
+                            };
+                        },
+                        event_subscription_state::Status::SubscribePendingAck  => {
+                            target = EventSubscriptionState {
+                                status: event_subscription_state::Status::SubscribePending as i32,
+                                request_id: curr_request_id.clone(),
+                                message: message.to_string(),
+                                event_matcher: fetched_event_sub_state.event_matcher.clone(),
+                                event_publication_spec: fetched_event_sub_state.event_publication_spec.clone(),
+                            };
+                        },
+                        event_subscription_state::Status::SubscribePending  => {
+                            target = EventSubscriptionState {
+                                status: event_subscription_state::Status::Subscribed as i32,
+                                request_id: curr_request_id.clone(),
+                                message: message.to_string(),
+                                event_matcher: fetched_event_sub_state.event_matcher.clone(),
+                                event_publication_spec: fetched_event_sub_state.event_publication_spec.clone(),
+                            };
+                        },
+                        _ => {
+                            target = EventSubscriptionState {
+                                status: event_subscription_state::Status::Error as i32,
+                                request_id: curr_request_id.clone(),
+                                message: "Status is not supported or is invalid".to_string(),
+                                event_matcher: fetched_event_sub_state.event_matcher.clone(),
+                                event_publication_spec: fetched_event_sub_state.event_publication_spec.clone(),
+                            };
+                        },
                     },
-                    _ => {
+                    None => {
                         target = EventSubscriptionState {
-                            status: new_status as i32,
+                            status: event_subscription_state::Status::Error as i32,
                             request_id: curr_request_id.clone(),
-                            message: message.to_string(),
+                            message: "No event subscription status set in database".to_string(),
                             event_matcher: fetched_event_sub_state.event_matcher.clone(),
                             event_publication_spec: fetched_event_sub_state.event_publication_spec.clone(),
                         };
                     },
-                },
-                None => {
-                    target = EventSubscriptionState {
-                        status: new_status as i32,
-                        request_id: curr_request_id.clone(),
-                        message: message.to_string(),
-                        event_matcher: fetched_event_sub_state.event_matcher.clone(),
-                        event_publication_spec: fetched_event_sub_state.event_publication_spec.clone(),
-                    };
-                },
+                }
+            } else {
+                target = EventSubscriptionState {
+                    status: event_subscription_state::Status::Error as i32,
+                    request_id: curr_request_id.clone(),
+                    message: message.to_string(),
+                    event_matcher: fetched_event_sub_state.event_matcher.clone(),
+                    event_publication_spec: fetched_event_sub_state.event_publication_spec.clone(),
+                };
             }
             
             // Panic if this fails, atm the panic is just logged by the tokio runtime

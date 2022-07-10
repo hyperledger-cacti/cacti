@@ -26,6 +26,10 @@ type DriverCommunicationClient interface {
 	// Events Subscription
 	// the src-relay uses this endpoint to forward the event subscription request from dest-relay to driver
 	SubscribeEvent(ctx context.Context, in *common.EventSubscription, opts ...grpc.CallOption) (*common.Ack, error)
+	// Recommended to have TLS mode on for this unsafe endpoint
+	// Relay uses this to get Query.requestor_signature and
+	// Query.certificate required for event subscription
+	RequestSignedEventSubscriptionQuery(ctx context.Context, in *common.EventSubscription, opts ...grpc.CallOption) (*common.Query, error)
 }
 
 type driverCommunicationClient struct {
@@ -54,6 +58,15 @@ func (c *driverCommunicationClient) SubscribeEvent(ctx context.Context, in *comm
 	return out, nil
 }
 
+func (c *driverCommunicationClient) RequestSignedEventSubscriptionQuery(ctx context.Context, in *common.EventSubscription, opts ...grpc.CallOption) (*common.Query, error) {
+	out := new(common.Query)
+	err := c.cc.Invoke(ctx, "/driver.driver.DriverCommunication/RequestSignedEventSubscriptionQuery", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // DriverCommunicationServer is the server API for DriverCommunication service.
 // All implementations must embed UnimplementedDriverCommunicationServer
 // for forward compatibility
@@ -65,6 +78,10 @@ type DriverCommunicationServer interface {
 	// Events Subscription
 	// the src-relay uses this endpoint to forward the event subscription request from dest-relay to driver
 	SubscribeEvent(context.Context, *common.EventSubscription) (*common.Ack, error)
+	// Recommended to have TLS mode on for this unsafe endpoint
+	// Relay uses this to get Query.requestor_signature and
+	// Query.certificate required for event subscription
+	RequestSignedEventSubscriptionQuery(context.Context, *common.EventSubscription) (*common.Query, error)
 	mustEmbedUnimplementedDriverCommunicationServer()
 }
 
@@ -77,6 +94,9 @@ func (UnimplementedDriverCommunicationServer) RequestDriverState(context.Context
 }
 func (UnimplementedDriverCommunicationServer) SubscribeEvent(context.Context, *common.EventSubscription) (*common.Ack, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SubscribeEvent not implemented")
+}
+func (UnimplementedDriverCommunicationServer) RequestSignedEventSubscriptionQuery(context.Context, *common.EventSubscription) (*common.Query, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RequestSignedEventSubscriptionQuery not implemented")
 }
 func (UnimplementedDriverCommunicationServer) mustEmbedUnimplementedDriverCommunicationServer() {}
 
@@ -127,6 +147,24 @@ func _DriverCommunication_SubscribeEvent_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _DriverCommunication_RequestSignedEventSubscriptionQuery_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(common.EventSubscription)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DriverCommunicationServer).RequestSignedEventSubscriptionQuery(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/driver.driver.DriverCommunication/RequestSignedEventSubscriptionQuery",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DriverCommunicationServer).RequestSignedEventSubscriptionQuery(ctx, req.(*common.EventSubscription))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // DriverCommunication_ServiceDesc is the grpc.ServiceDesc for DriverCommunication service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -141,6 +179,10 @@ var DriverCommunication_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SubscribeEvent",
 			Handler:    _DriverCommunication_SubscribeEvent_Handler,
+		},
+		{
+			MethodName: "RequestSignedEventSubscriptionQuery",
+			Handler:    _DriverCommunication_RequestSignedEventSubscriptionQuery_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -44,9 +44,15 @@ async fn datasharing() -> Result<(), Box<dyn std::error::Error>> {
                 poll_for_state(request_id.to_string(), network_client).await;
                 println!("Data Sharing: Success!");
             }
-            ack::Status::Error => println!("An error occurred in request_state call"),
+            ack::Status::Error => {
+                println!("An error occurred in request_state call");
+                std::process::exit(1);
+            }
         },
-        None => println!("The returned Ack has no status"),
+        None => {
+            println!("The returned Ack has no status");
+            std::process::exit(1);
+        }
     }
     Ok(())
 }
@@ -68,12 +74,21 @@ fn poll_for_state(
                     Some(request_status) => {
                         if request_status == request_state::Status::Pending {
                             poll_for_state(request_id, network_client).await;
+                        } else if request_status == request_state::Status::Error {
+                            println!("Error");
+                            std::process::exit(1);
                         }
                     }
-                    None => println!("No status returned from get state request"),
+                    None => {
+                        println!("No status returned from get state request");
+                        std::process::exit(1);
+                    }
                 };
             }
-            Err(_error) => println!("Error getting state response"),
+            Err(_error) => {
+                println!("Error getting state response");
+                std::process::exit(1);
+            }
         }
     }
     .boxed()
@@ -121,14 +136,18 @@ async fn event_suscribe() -> Result<(), Box<dyn std::error::Error>> {
         Some(ack_status) => match ack_status {
             ack::Status::Ok => {
                 poll_for_event_subscription(request_id.clone().to_string(), network_client).await;
-                println!("Event Subscription: Success!");
             }
-            ack::Status::Error => println!("An error occurred in subscribe_event call"),
+            ack::Status::Error => {
+                println!("An error occurred in subscribe_event call");
+                std::process::exit(1);
+            }
         },
-        None => println!("The returned Ack has no status"),
+        None => {
+            println!("The returned Ack has no status");
+            std::process::exit(1);
+        }
     }
-    let _res = event_unsuscribe(request_id.to_string()).await;
-    Ok(())
+    return event_unsuscribe(request_id.to_string()).await;
 }
 
 async fn event_unsuscribe(request_id: String) -> Result<(), Box<dyn std::error::Error>> {
@@ -176,11 +195,16 @@ async fn event_unsuscribe(request_id: String) -> Result<(), Box<dyn std::error::
         Some(ack_status) => match ack_status {
             ack::Status::Ok => {
                 poll_for_event_subscription(request_id.to_string(), network_client).await;
-                println!("Event Unsubscription: Success!");
             }
-            ack::Status::Error => println!("An error occurred in unsubscribe_event call"),
+            ack::Status::Error => {
+                println!("An error occurred in unsubscribe_event call");
+                std::process::exit(1);
+            }
         },
-        None => println!("The returned Ack has no status"),
+        None => {
+            println!("The returned Ack has no status");
+            std::process::exit(1);
+        }
     }
     Ok(())
 }
@@ -200,16 +224,31 @@ fn poll_for_event_subscription(
                 println!("Get Event Subscription State response: {:?}", response);
                 match event_subscription_state::Status::from_i32(response.get_ref().status) {
                     Some(request_status) => {
-                        if request_status == event_subscription_state::Status::Pending {
+                        println!("Received status: {:?}", response);
+                        if request_status == event_subscription_state::Status::SubscribePending ||
+                            request_status == event_subscription_state::Status::UnsubscribePending ||
+                            request_status == event_subscription_state::Status::SubscribePendingAck ||
+                            request_status == event_subscription_state::Status::SubscribePendingAck {
                             poll_for_event_subscription(request_id, network_client).await;
+                        } else if request_status == event_subscription_state::Status::Subscribed {
+                            println!("Event Subscription: Success!");
+                        } else if request_status == event_subscription_state::Status::Unsubscribed {
+                            println!("Event Unsubscription: Success!");
                         } else {
-                            println!("Received status: {:?}", response);
+                            println!("Error: {:?}", response.get_ref().message.to_string());
+                            std::process::exit(1);
                         }
                     }
-                    None => println!("No status returned from get state request"),
+                    None => {
+                        println!("No status returned from get state request");
+                        std::process::exit(1);
+                    }
                 };
             }
-            Err(_error) => println!("Error getting state response"),
+            Err(_error) => { 
+                println!("Error getting state response");
+                std::process::exit(1);
+            }
         }
     }
     .boxed()

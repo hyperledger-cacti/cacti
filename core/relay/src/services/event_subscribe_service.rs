@@ -4,7 +4,6 @@ use crate::pb::common::query::Query;
 use crate::pb::common::events::EventSubscription;
 use crate::pb::relay::events::event_subscribe_client::EventSubscribeClient;
 use crate::pb::relay::events::event_subscribe_server::EventSubscribe;
-use crate::pb::common::events::{event_subscription_state};
 // Internal modules
 use crate::db::Database;
 use crate::error::Error;
@@ -26,6 +25,7 @@ pub struct EventSubscribeService {
 /// communicating event subscription request between two relays and driver.
 #[tonic::async_trait]
 impl EventSubscribe for EventSubscribeService {
+    // Dest-relay will call this endpoint of src-relay to request for event Subscription/Unsubscription
     async fn subscribe_event(&self, request: Request<EventSubscription>) -> Result<Response<Ack>, Status> {
         println!(
             "Got a Event Subscription request from {:?} - {:?}",
@@ -60,7 +60,8 @@ impl EventSubscribe for EventSubscribeService {
         }
     }
     
-    /// send_driver_subscription_status is run on the remote relay. Run when the driver sends the ack back to the remote relay
+    // send_driver_subscription_status is run on the src relay. 
+    // Run when the src driver sends the ack back to the src relay
     async fn send_driver_subscription_status(
         &self,
         request: Request<Ack>,
@@ -96,6 +97,8 @@ impl EventSubscribe for EventSubscribeService {
             }
         }
     }
+    
+    // Src-relay will call this endpoint of dest-relay to send Subscription/Unsubscription response.
     async fn send_subscription_status(&self, request: Request<Ack>) -> Result<Response<Ack>, Status> {
         let request_ack = request.into_inner().clone();
         println!(
@@ -305,23 +308,15 @@ fn send_subscription_status_helper(
     db_path: String,
 ) -> Result<(), Error> {
     match ack::Status::from_i32(request_ack.status) {
-        Some(status) => match status {
-            ack::Status::Ok => update_event_subscription_status(
+        Some(status) => update_event_subscription_status(
                 request_id.to_string(),
-                event_subscription_state::Status::Success,
-                db_path.to_string(),
-                "".to_string(),
-            ),
-            ack::Status::Error => update_event_subscription_status(
-                request_id.to_string(),
-                event_subscription_state::Status::Error,
+                status,
                 db_path.to_string(),
                 request_ack.message.to_string(),
-            ),
-        },
+        ),
         None => update_event_subscription_status(
             request_id.to_string(),
-            event_subscription_state::Status::Error,
+            ack::Status::Error,
             db_path.to_string(),
             "Status is not supported or is invalid".to_string(),
         ),
