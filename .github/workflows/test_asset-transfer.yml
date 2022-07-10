@@ -265,7 +265,8 @@ jobs:
           cat tmp.out
           
           ./bin/fabric-cli chaincode query --user=bob mychannel simpleassettransfer ReadAsset '["bond01","a03"]' --local-network=network2 &> tmp.out
-          tail -n 1 tmp.out | grep "Result from network query: {\"type\":\"bond01\",\"id\":\"a03\"" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          #tail -n 1 tmp.out | grep "Result from network query: {\"type\":\"bond01\",\"id\":\"a03\"" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out | tr '\n' ' ' | grep "Result from network query: {     \"type\": \"bond01\",     \"id\": \"a03\"" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
           
           ./bin/fabric-cli asset transfer pledge --source-network=network1 --dest-network=network2 --recipient=bob --expiry-secs=20 --type=bond --ref=a04 --data-file=src/data/assetsForTransfer.json &> tmp.out
@@ -283,7 +284,8 @@ jobs:
           cat tmp.out
           
           ./bin/fabric-cli chaincode query --user=alice mychannel simpleassettransfer ReadAsset '["bond01","a04"]' --local-network=network1 &> tmp.out
-          tail -n 1 tmp.out | grep "Result from network query: {\"type\":\"bond01\",\"id\":\"a04\"" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          #tail -n 1 tmp.out | grep "Result from network query: {\"type\":\"bond01\",\"id\":\"a04\"" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out | tr '\n' ' ' | grep "Result from network query: {     \"type\": \"bond01\",     \"id\": \"a04\"" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
           
           ./bin/fabric-cli chaincode query --user=bob mychannel simpleassettransfer ReadAsset '["bond01","a04"]' --local-network=network2 &> tmp.out
@@ -632,7 +634,8 @@ jobs:
           cat tmp.out
           
           ./bin/fabric-cli chaincode query --user=bob mychannel simpleassettransfer ReadAsset '["bond01","a03"]' --local-network=network2 &> tmp.out
-          tail -n 1 tmp.out | grep "Result from network query: {\"type\":\"bond01\",\"id\":\"a03\"" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          #tail -n 1 tmp.out | grep "Result from network query: {\"type\":\"bond01\",\"id\":\"a03\"" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out | tr '\n' ' ' | grep "Result from network query: {     \"type\": \"bond01\",     \"id\": \"a03\"" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
           
           ./bin/fabric-cli asset transfer pledge --source-network=network1 --dest-network=network2 --recipient=bob --expiry-secs=20 --type=bond --ref=a04 --data-file=src/data/assetsForTransfer.json &> tmp.out
@@ -650,7 +653,8 @@ jobs:
           cat tmp.out
           
           ./bin/fabric-cli chaincode query --user=alice mychannel simpleassettransfer ReadAsset '["bond01","a04"]' --local-network=network1 &> tmp.out
-          tail -n 1 tmp.out | grep "Result from network query: {\"type\":\"bond01\",\"id\":\"a04\"" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          #tail -n 1 tmp.out | grep "Result from network query: {\"type\":\"bond01\",\"id\":\"a04\"" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out | tr '\n' ' ' | grep "Result from network query: {     \"type\": \"bond01\",     \"id\": \"a04\"" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
           
           ./bin/fabric-cli chaincode query --user=bob mychannel simpleassettransfer ReadAsset '["bond01","a04"]' --local-network=network2 &> tmp.out

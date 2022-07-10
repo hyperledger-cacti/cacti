@@ -13,6 +13,7 @@ import * as grpcJs from "@grpc/grpc-js";
 import networksGrpcPb from "@hyperledger-labs/weaver-protos-js/networks/networks_grpc_pb";
 import networksPb from "@hyperledger-labs/weaver-protos-js/networks/networks_pb";
 import common_ack_pb from "@hyperledger-labs/weaver-protos-js/common/ack_pb";
+import eventsPb from "@hyperledger-labs/weaver-protos-js/common/events_pb";
 import statePb from "@hyperledger-labs/weaver-protos-js/common/state_pb";
 import * as helpers from "./helpers";
 /**
@@ -202,6 +203,269 @@ class Relay {
         }
 
         return asJson ? state.toObject() : state;
+    }
+    
+    /**
+     * SendEventSubscribeRequest to send a request to a remote network using gRPC and the relay.
+     * @returns {string} The ID of the request
+     */
+    async SendEventSubscribeRequest(
+        eventMatcher: eventsPb.EventMatcher,
+        eventPublicationSpec: eventsPb.EventPublication,
+        address: string,
+        policy,
+        requestingNetwork: string,
+        certificate: string,
+        signature: string,
+        nonce: string,
+        org: string,
+        confidential: boolean,
+    ): Promise<string> {
+        try {
+            const networkClient = new networksGrpcPb.NetworkClient(
+                this.getEndpoint(),
+                this._useTls ? 
+                    (this._tlsRootCACerts.length == 0 ? grpcJs.credentials.createSsl() : grpcJs.credentials.createSsl(Buffer.from(this._tlsRootCACerts))) : 
+                    grpcJs.credentials.createInsecure()
+            );
+            const {
+                subscribeEvent,
+            }: {
+                subscribeEvent: (eventSubscription: networksPb.NetworkEventSubscription) => Promise<common_ack_pb.Ack>;
+            } = helpers.promisifyAll(networkClient);
+
+            const query = new networksPb.NetworkQuery();
+            query.setPolicyList(policy);
+            query.setAddress(address);
+            query.setCertificate(certificate);
+            query.setNonce(nonce);
+            query.setRequestorSignature(signature);
+            query.setRequestingRelay("");
+            query.setRequestingNetwork(requestingNetwork);
+            query.setRequestingOrg(org || "");
+            query.setConfidential(confidential || false);
+            
+            const eventSubscription = new networksPb.NetworkEventSubscription();
+            eventSubscription.setEventMatcher(eventMatcher);
+            eventSubscription.setQuery(query);
+            eventSubscription.setEventPublicationSpec(eventPublicationSpec);
+            
+            if (typeof subscribeEvent === "function") {
+                const [resp, error] = await helpers.handlePromise(subscribeEvent(eventSubscription));
+                if (error) {
+                    throw new Error(`Event Subscription error: ${error}`);
+                }
+                if (resp.getStatus() === common_ack_pb.Ack.STATUS.ERROR) {
+                    throw new Error(`Event Subscription request received negative Ack error: ${resp.getMessage()}`);
+                }
+                return resp.getRequestId();
+            }
+            throw new Error("Error with event subscription in NetworkClient");
+        } catch (e) {
+            throw new Error(`Error with Network Client: ${e}`);
+        }
+    }
+    /**
+     * GetSubscriptionStatus is used to get the request from the local network
+     * @returns {object} The request object from the relay
+     */
+    async GetEventSubscriptionState(requestId: string, asJson = true): Promise<any> {
+        const networkClient = new networksGrpcPb.NetworkClient(
+            this.getEndpoint(),
+            this._useTls ? 
+                (this._tlsRootCACerts.length == 0 ? grpcJs.credentials.createSsl() : grpcJs.credentials.createSsl(Buffer.from(this._tlsRootCACerts))) : 
+                grpcJs.credentials.createInsecure()
+        );
+        const {
+            getEventSubscriptionState,
+        }: { getEventSubscriptionState: (message: networksPb.GetStateMessage) => Promise<eventsPb.EventSubscriptionState> } = helpers.promisifyAll(
+            networkClient,
+        );
+        const getStateMessage = new networksPb.GetStateMessage();
+        getStateMessage.setRequestId(requestId);
+        const [state, error] = await helpers.handlePromise(getEventSubscriptionState(getStateMessage));
+        if (error) {
+            throw new Error(`Error: ${error}`);
+        }
+
+        return asJson ? state.toObject() : state;
+    }
+    
+    async recursiveEventSubscriptionState(requestID: string, dateObj: Date): Promise<any> {
+        const [state, error] = await helpers.handlePromise(this.GetEventSubscriptionState(requestID, false));
+        if (error) {
+            throw new Error(`Get event subscription state error: ${error}`);
+        }
+        if (
+            state.getStatus() === eventsPb.EventSubscriptionState.STATUS.SUBSCRIBE_PENDING ||
+            state.getStatus() === eventsPb.EventSubscriptionState.STATUS.SUBSCRIBE_PENDING_ACK ||
+            state.getStatus() === eventsPb.EventSubscriptionState.STATUS.UNSUBSCRIBE_PENDING ||
+            state.getStatus() === eventsPb.EventSubscriptionState.STATUS.UNSUBSCRIBE_PENDING_ACK
+        ) {
+            if (dateObj.getTime() < Date.now()) {
+                throw new Error("Timeout: State is still pending.");
+            } else {
+                return await this.recursiveEventSubscriptionState(requestID, dateObj);
+            }
+        } else {
+            return state;
+        }
+    }
+    /**
+     * ProcessEventSubscriptionRequest sends a event subscription request to a remote network using gRPC and the relay and polls for a response on the local network
+     * Uses the timeout provided by the class.
+     * @returns {string} The state returned by the remote request
+     */
+    async ProcessSubscribeEventRequest(
+        eventMatcher: eventsPb.EventMatcher,
+        eventPublicationSpec: eventsPb.EventPublication,
+        address: string,
+        policy,
+        requestingNetwork: string,
+        certificate: string,
+        signature: string,
+        nonce: string,
+        org: string,
+        confidential: boolean,
+    ): Promise<any> {
+        try {
+            const [requestID, error] = await helpers.handlePromise(
+                this.SendEventSubscribeRequest(eventMatcher, eventPublicationSpec, address, policy, requestingNetwork, certificate, signature, nonce, org, confidential),
+            );
+            if (error) {
+                throw new Error(`Event subscription error: ${error}`);
+            }
+            // Adds timout time to current time.
+            const dateObj = new Date();
+            dateObj.setMilliseconds(dateObj.getMilliseconds() + this.timeoutTime);
+            //TODO: SLOW DOWN
+            const [finalState, stateError] = await helpers.handlePromise(this.recursiveEventSubscriptionState(requestID, dateObj));
+            if (stateError) {
+                throw new Error(`Event Subscription error: ${stateError}`);
+            }
+            if (finalState.getStatus() === eventsPb.EventSubscriptionState.STATUS.ERROR) {
+                if (finalState.getMessage()) {
+                    throw new Error(`Error during event subscription : ${finalState.getMessage()}`);
+                }
+                else {
+                    throw new Error(`Error during event subscription : UNKNOWN REASON}`);
+                }
+            }
+            return finalState;
+        } catch (e) {
+            throw new Error(e);
+        }
+    }
+    /**
+     * SendEventUnsubscribeRequest to send a request to a remote network using gRPC and the relay.
+     * @returns {string} The ID of the request
+     */
+    async SendEventUnsubscribeRequest(
+        eventMatcher: eventsPb.EventMatcher,
+        eventPublicationSpec: eventsPb.EventPublication,
+        requestId: string,
+        address: string,
+        policy,
+        requestingNetwork: string,
+        certificate: string,
+        signature: string,
+        nonce: string,
+        org: string,
+        confidential: boolean,
+    ): Promise<string> {
+        try {
+            const networkClient = new networksGrpcPb.NetworkClient(
+                this.getEndpoint(),
+                this._useTls ? 
+                    (this._tlsRootCACerts.length == 0 ? grpcJs.credentials.createSsl() : grpcJs.credentials.createSsl(Buffer.from(this._tlsRootCACerts))) : 
+                    grpcJs.credentials.createInsecure()
+            );
+            const {
+                unsubscribeEvent,
+            }: {
+                unsubscribeEvent: (eventUnsubscription: networksPb.NetworkEventUnsubscription) => Promise<common_ack_pb.Ack>;
+            } = helpers.promisifyAll(networkClient);
+
+            const query = new networksPb.NetworkQuery();
+            query.setPolicyList(policy);
+            query.setAddress(address);
+            query.setCertificate(certificate);
+            query.setNonce(nonce);
+            query.setRequestorSignature(signature);
+            query.setRequestingRelay("");
+            query.setRequestingNetwork(requestingNetwork);
+            query.setRequestingOrg(org || "");
+            query.setConfidential(confidential || false);
+            
+            const eventSubscription = new networksPb.NetworkEventSubscription();
+            eventSubscription.setEventMatcher(eventMatcher);
+            eventSubscription.setQuery(query);
+            eventSubscription.setEventPublicationSpec(eventPublicationSpec);
+            
+            const eventUnsubscription = new networksPb.NetworkEventUnsubscription();
+            eventUnsubscription.setRequest(eventSubscription);
+            eventUnsubscription.setRequestId(requestId);
+            
+            if (typeof unsubscribeEvent === "function") {
+                const [resp, error] = await helpers.handlePromise(unsubscribeEvent(eventUnsubscription));
+                if (error) {
+                    throw new Error(`Event Unsubscription error: ${error}`);
+                }
+                if (resp.getStatus() === common_ack_pb.Ack.STATUS.ERROR) {
+                    throw new Error(`Event Unsubscription request received negative Ack error: ${resp.getMessage()}`);
+                }
+                return resp.getRequestId();
+            }
+            throw new Error("Error with event unsubscription in NetworkClient");
+        } catch (e) {
+            throw new Error(`Error with Network Client: ${e}`);
+        }
+    }
+    /**
+     * ProcessEventUnsubscriptionRequest sends a event unsubscription request to a remote network using gRPC and the relay and polls for a response on the local network
+     * Uses the timeout provided by the class.
+     * @returns {string} The state returned by the remote request
+     */
+    async ProcessUnsubscribeEventRequest(
+        eventMatcher: eventsPb.EventMatcher,
+        eventPublicationSpec: eventsPb.EventPublication,
+        requestId: string,
+        address: string,
+        policy,
+        requestingNetwork: string,
+        certificate: string,
+        signature: string,
+        nonce: string,
+        org: string,
+        confidential: boolean,
+    ): Promise<any> {
+        try {
+            const [requestID, error] = await helpers.handlePromise(
+                this.SendEventUnsubscribeRequest(eventMatcher, eventPublicationSpec, requestId, address, policy, requestingNetwork, certificate, signature, nonce, org, confidential),
+            );
+            if (error) {
+                throw new Error(`Event unsubscription error: ${error}`);
+            }
+            // Adds timout time to current time.
+            const dateObj = new Date();
+            dateObj.setMilliseconds(dateObj.getMilliseconds() + this.timeoutTime);
+            //TODO: SLOW DOWN
+            const [finalState, stateError] = await helpers.handlePromise(this.recursiveEventSubscriptionState(requestID, dateObj));
+            if (stateError) {
+                throw new Error(`Event unsubscription error: ${stateError}`);
+            }
+            if (finalState.getStatus() === eventsPb.EventSubscriptionState.STATUS.ERROR) {
+                if (finalState.getMessage()) {
+                    throw new Error(`Error during event unsubscription : ${finalState.getMessage()}`);
+                }
+                else {
+                    throw new Error(`Error during event unsubscription : UNKNOWN REASON}`);
+                }
+            }
+            return finalState;
+        } catch (e) {
+            throw new Error(e);
+        }
     }
 }
 
