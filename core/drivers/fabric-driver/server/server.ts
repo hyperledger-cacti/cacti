@@ -20,58 +20,13 @@ import { walletSetup } from './walletSetup';
 import { Certificate } from '@fidm/x509';
 import * as path from 'path';
 
-import { LevelDBConnector } from "./dbConnector"
-import { addEventSubscription, deleteEventSubscription, lookupEventSubscriptions } from "./utils"
-import { Query } from "@hyperledger-labs/weaver-protos-js/common/query_pb";
+import { addEventSubscription, dbConnectionTest, eventSubscriptionTest } from "./utils"
 
 const server = new Server();
 console.log('driver def', JSON.stringify(driver_pb_grpc));
 
 const mockedB64Data =
     'CkIIyAEaPRI7bG9jYWxob3N0OjkwODAvbmV0d29yazEvbXljaGFubmVsOnNpbXBsZXN0YXRlOlJlYWQ6QXJjdHVydXMa/AIKIFhDpf9CYfrxPkEtSWR8Kf+K5pBkSbx7VNYsAzijB+pnEtcCCoICEmYKCl9saWZlY3ljbGUSWAooCiJuYW1lc3BhY2VzL2ZpZWxkcy9pbnRlcm9wL1NlcXVlbmNlEgIIAwosCiZuYW1lc3BhY2VzL2ZpZWxkcy9zaW1wbGVzdGF0ZS9TZXF1ZW5jZRICCAYSYwoHaW50ZXJvcBJYCh4KGABhY2Nlc3NDb250cm9sAG5ldHdvcmsxABICCAsKHgoYAHNlY3VyaXR5R3JvdXAAbmV0d29yazEAEgIIDQoWChAA9I+/v2luaXRpYWxpemVkEgIIBBIzCgtzaW1wbGVzdGF0ZRIkChYKEAD0j7+/aW5pdGlhbGl6ZWQSAggHCgoKCEFyY3R1cnVzGkIIyAEaPRI7bG9jYWxob3N0OjkwODAvbmV0d29yazEvbXljaGFubmVsOnNpbXBsZXN0YXRlOlJlYWQ6QXJjdHVydXMiDBIHaW50ZXJvcBoBMSK1CArpBwoHT3JnMU1TUBLdBy0tLS0tQkVHSU4gQ0VSVElGSUNBVEUtLS0tLQpNSUlDckRDQ0FsT2dBd0lCQWdJVVdNUkUyTEJwdnY1TkdSRi9hMy82cWZTcE9TNHdDZ1lJS29aSXpqMEVBd0l3CmNqRUxNQWtHQTFVRUJoTUNWVk14RnpBVkJnTlZCQWdURGs1dmNuUm9JRU5oY205c2FXNWhNUTh3RFFZRFZRUUgKRXdaRWRYSm9ZVzB4R2pBWUJnTlZCQW9URVc5eVp6RXVibVYwZDI5eWF6RXVZMjl0TVIwd0d3WURWUVFERXhSagpZUzV2Y21jeExtNWxkSGR2Y21zeExtTnZiVEFlRncweU1EQTNNamt3TkRNMk1EQmFGdzB5TVRBM01qa3dORFF4Ck1EQmFNRnN4Q3pBSkJnTlZCQVlUQWxWVE1SY3dGUVlEVlFRSUV3NU9iM0owYUNCRFlYSnZiR2x1WVRFVU1CSUcKQTFVRUNoTUxTSGx3WlhKc1pXUm5aWEl4RFRBTEJnTlZCQXNUQkhCbFpYSXhEakFNQmdOVkJBTVRCWEJsWlhJdwpNRmt3RXdZSEtvWkl6ajBDQVFZSUtvWkl6ajBEQVFjRFFnQUU1RlFrSDgzRVdnYW9DZ2U5azhISU1Jd0NUVGVZCnFCR25xNFAzWHJCUGZQSFdXeE1oWGhBaDNvUHNUOXdna1dHcFVmYWlybkd0bmRBQ3ZrSitNQi9nMUtPQjNUQ0IKMmpBT0JnTlZIUThCQWY4RUJBTUNCNEF3REFZRFZSMFRBUUgvQkFJd0FEQWRCZ05WSFE0RUZnUVVLMkFuM3RCTAprMVQyRGord0hHZ1RIQ3NiYmlZd0h3WURWUjBqQkJnd0ZvQVUxZyt0UG5naDJ3OGc5OXoxbXdzVmJrS2pBS2t3CklnWURWUjBSQkJzd0dZSVhjR1ZsY2pBdWIzSm5NUzV1WlhSM2IzSnJNUzVqYjIwd1ZnWUlLZ01FQlFZSENBRUUKU25zaVlYUjBjbk1pT25zaWFHWXVRV1ptYVd4cFlYUnBiMjRpT2lJaUxDSm9aaTVGYm5KdmJHeHRaVzUwU1VRaQpPaUp3WldWeU1DSXNJbWhtTGxSNWNHVWlPaUp3WldWeUluMTlNQW9HQ0NxR1NNNDlCQU1DQTBjQU1FUUNJQmFRCjhoTmRXd2xYeUhxY2htQzdzVUpWaER6Mkg2enh3M1BQS1I5M3lCL3NBaUJKMnpnQlhzL1lsMGZubnJNUXVCQUQKcDFBS1RKTkpsMVYwWUVHMFhiNXFwZz09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0KEkcwRQIhAMyyvrcjHVc1oQmCNqZpH6nc0O+8wssXjwRcfmgxlhQAAiAqa0C8pSFNZNXiSVJHe948dJ0NU/y+7i5A55O0Frkz2Q==';
-
-async function dbConnectionTest(
-    dbName: string
-): Promise<boolean> {
-    console.log(`Start testing LevelDBConnector for ${dbName}`)
-    try {
-        // Create connection to a database
-        const db = new LevelDBConnector(dbName);
-        const key: string = 'a';
-        // Add the key with value 1 to the database
-        await db.insert(key, 1);
-        // Fetch the value of the key
-        const value = await db.read(key);
-        console.log(`obtained <key, value>: <${key}, ${value}>`)
-    } catch (error) {
-        console.error(`failed testing LevelDBConnector, with error: ${JSON.stringify(error)}`)
-    }
-
-    console.log(`End testing LevelDBConnector for ${dbName}`)
-    return true;
-}
-
-async function dbUtilsTest(
-    call: any
-): Promise<any> {
-    console.debug(`Start dbUtilsTest()`)
-
-    var eventMatcher: eventsPb.EventMatcher = call.request.getEventmatcher()!;
-    await addEventSubscription(call.request);
-    var subscriptions: Array<Query> = await lookupEventSubscriptions(eventMatcher) as Array<Query>;
-
-    for (const subscription of subscriptions) {
-        if (subscription.getRequestId() == call.request.getQuery().getRequestId()) {
-            await deleteEventSubscription(eventMatcher, subscription.getRequestId());
-            break;
-        }
-    }
-    //let subscription: Query = subscriptions[0]
-    //await deleteEventSubscription(eventMatcher, subscription.getRequestId());
-
-    console.debug(`End dbUtilsTest()`)
-    return "true";
-}
 
 // Mocked fabric communication function
 function mockCommunication(query: query_pb.Query) {
@@ -273,9 +228,18 @@ server.addService(driver_pb_grpc.DriverCommunicationService, {
                 console.log(`Responding to caller with Ack: ${JSON.stringify(ack_submitted.toObject())}`);
                 callback(null, ack_submitted);
             } else {
-                //dbConnectionTest("mydb");
-                //dbUtilsTest(call);
-                console.log('Support is yet be added');
+                dbConnectionTest().then((dbConnectTestStatus) => {
+                    if (dbConnectTestStatus == true) {
+                        eventSubscriptionTest(call).then((eventSubscribeTestStatus) => {
+                            if (eventSubscribeTestStatus == false) {
+                                console.error(`Failed eventSubscriptionTest()`);
+                            }
+                            // add code to support more functionalities here
+                        });
+                    } else {
+                        console.error(`Failed dbConnectionTest()`);
+                    }
+                });
             }
         } catch (e) {
             console.log(e);

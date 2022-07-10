@@ -5,15 +5,21 @@
  */
 
 const { Level } = require('level')
-//const { ClassicLevel } = require('classic-level')
 
 /*
  * Interfaces for all database connectors to be used for event subscriptions 
  */
 interface DBConnector {
+    // type of the DB (LevelDB, MongoDB, etc.)
     DB_TYPE: string;
+    // name of the <key/value> map
+    DB_NAME: string;
+    // connection to the DB
+    dbHandle: any;
 
-    // interface to  add a <key,value> pair to the database
+    // open the database connection
+    open(): Promise<boolean>;
+    // interface to add a <key,value> pair to the database
     insert(key: any, value: any): Promise<boolean>;
     // interface to read a key from the database
     read(key: any): Promise<any>;
@@ -21,17 +27,34 @@ interface DBConnector {
     update(key: any, value: any): Promise<boolean>;
     // interface to delete a key from the database
     delete(key: any): Promise<any>;
+    // close the database connection
+    close(): Promise<boolean>;
 }
 
+// Implementation of DBConnector for LevelDB
 class LevelDBConnector implements DBConnector {
 
     DB_TYPE: string = "Level";
+    DB_NAME: string;
     dbHandle: any;
     
     constructor(
         dbName: string
     ) {
+        this.DB_NAME = dbName;
         this.dbHandle = new Level(dbName, { valueEncoding: 'json' });
+    }
+
+    async open(
+    ): Promise<boolean> {
+        try {
+            await this.dbHandle.open();
+        } catch (error: any) {
+            console.error(`failed to open database connection with error: ${JSON.stringify(error)}`);
+            throw new Error(error);
+        }
+
+        return Promise.resolve(true);
     }
 
     async insert(
@@ -90,6 +113,18 @@ class LevelDBConnector implements DBConnector {
         }
         
         return value;
+    }
+
+    async close(
+    ): Promise<boolean> {
+        try {
+            await this.dbHandle.close();
+        } catch (error: any) {
+            console.error(`failed to close database connection with error: ${JSON.stringify(error)}`);
+            throw new Error(error);
+        }
+
+        return Promise.resolve(true);
     }
 }
 
