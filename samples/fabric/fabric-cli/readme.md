@@ -385,6 +385,20 @@ Below are the steps to exercise asset transfers from `network1` to `network2` us
    ./scripts/getTokenBalance.sh network2 bob
    ```
 
+## Events
+
+* To suscribe for event, generate a JSON file like: [Sample Event Sub JSON](./src/data/event_sub_sample.json). Sample provided here assumes driver of `network1` is subscribing to an event of `network2`. Then run following command (and note the request id which will be used to unsubscribe or get status):
+    ```
+    ./bin/fabric-cli event subscribe --network=network1 src/data/event_sub_sample.json
+    ```
+* To unsuscribe for event, use the same JSON file as in subscription like: [Sample Event Sub JSON](./src/data/event_sub_sample.json). Then run following command:
+    ```
+    ./bin/fabric-cli event unsubscribe --network=network1 --request-id=<request-id> src/data/event_sub_sample.json
+    ```
+* To get status for event subscription, run following command:
+    ```
+    ./bin/fabric-cli event get-subscription-status --network=network1 --request-id=<request-id>
+    ```
 
 ## NOTE
 
