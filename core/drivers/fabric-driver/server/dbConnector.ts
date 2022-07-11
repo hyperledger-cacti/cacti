@@ -4,7 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-const { Level } = require('level')
+import { Level } from 'level';
+import * as path from 'path';
 
 /*
  * Interfaces for all database connectors to be used for event subscriptions 
@@ -41,8 +42,11 @@ class LevelDBConnector implements DBConnector {
     constructor(
         dbName: string
     ) {
+        if (!dbName || dbName.length == 0) {
+            dbName = process.env.DB_NAME ? process.env.DB_NAME : "driverdb";
+        }
         this.DB_NAME = dbName;
-        this.dbHandle = new Level(dbName, { valueEncoding: 'json' });
+        this.dbHandle = new Level(path.join(process.env.DB_PATH ? process.env.DB_PATH : "./driverdbs", dbName), { valueEncoding: 'json' });
     }
 
     async open(

@@ -17,10 +17,11 @@ import state_pb from '@hyperledger-labs/weaver-protos-js/common/state_pb';
 import invoke from './fabric-code';
 import 'dotenv/config';
 import { walletSetup } from './walletSetup';
+import { subscribeEventHelper, unsubscribeEventHelper } from "./events"
 import { Certificate } from '@fidm/x509';
 import * as path from 'path';
 
-import { addEventSubscription, dbConnectionTest, eventSubscriptionTest } from "./utils"
+import { addEventSubscription, dbConnectionTest, eventSubscriptionTest, signEventSubscriptionQuery } from "./utils"
 
 const server = new Server();
 console.log('driver def', JSON.stringify(driver_pb_grpc));
@@ -138,10 +139,34 @@ const fabricCommunication = async (query: query_pb.Query, networkName: string) =
         console.log('Sending state');
         // Sending the fabric state to the relay.
         client.sendDriverState(viewPayload, function (err: any, response: any) {
-            console.log('Response:', response, 'Error: ', err);
+            console.log(`Response: ${JSON.stringify(response.toObject())} Error: ${JSON.stringify(err)}`);
         });
     }
 };
+
+// If the events_grpc_pb.EventSubscribeClient() failes, then it throws an error which will be caught by the caller
+async function getEventSubscriptionRelayClient(
+): Promise<events_grpc_pb.EventSubscribeClient> {
+    let client;
+
+    if (process.env.RELAY_TLS === 'true') {
+        if (!(process.env.RELAY_TLSCA_CERT_PATH && fs.existsSync(process.env.RELAY_TLSCA_CERT_PATH))) {
+            throw new Error("Missing or invalid RELAY_TLSCA_CERT_PATH: " + process.env.RELAY_TLSCA_CERT_PATH);
+        }
+        const rootCert = fs.readFileSync(process.env.RELAY_TLSCA_CERT_PATH);
+        client = new events_grpc_pb.EventSubscribeClient(
+            process.env.RELAY_ENDPOINT,
+            credentials.createSsl(rootCert)
+        );
+    } else {
+        client = new events_grpc_pb.EventSubscribeClient(
+            process.env.RELAY_ENDPOINT,
+            credentials.createInsecure()
+        );
+    }
+
+    return client;
+}
 
 // Service for receiving communication from a relay. Will communicate with the network and respond with an ack to the relay while the fabric communication is being completed.
 //@ts-ignore
@@ -171,66 +196,45 @@ server.addService(driver_pb_grpc.DriverCommunicationService, {
         }
     },
     subscribeEvent: (call: { request: eventsPb.EventSubscription }, callback: (_: any, object: ack_pb.Ack) => void) => {
-        const ack_response = new ack_pb.Ack();
-        var newRequestId: string = call.request.getQuery()!.getRequestId()
+        const newRequestId: string = call.request.getQuery()!.getRequestId()
+        const subscriptionOp: eventsPb.EventSubOperation = call.request.getOperation();
         console.log(`newRequestId: ${newRequestId}`);
         try {
             if (process.env.MOCK === 'false') {
-                addEventSubscription(call.request).then((requestId) => {
-                    if (newRequestId == requestId) {
-                        // event being subscribed for the first time
-                        ack_response.setMessage('Event subscription is successful!');
-                        ack_response.setStatus(ack_pb.Ack.STATUS.OK);
-
-                        // the event listener logic follows here
+                getEventSubscriptionRelayClient().then((client) => {
+                    if (subscriptionOp == eventsPb.EventSubOperation.SUBSCRIBE) {
+                        subscribeEventHelper(call.request, client);
+                    } else if (subscriptionOp == eventsPb.EventSubOperation.UNSUBSCRIBE) {
+                        unsubscribeEventHelper(call.request, client);
                     } else {
-                        // event being subscribed already exists
-                        ack_response.setMessage(`Event subscription already exists with requestId: ${requestId}`);
-                        ack_response.setStatus(ack_pb.Ack.STATUS.ERROR);
+                        const errorString: string = `Error: subscribe operation ${subscriptionOp.toString()} not supported`;
+                        console.error(errorString);
+                        const ack_send_error = new ack_pb.Ack();
+                        ack_send_error.setRequestId(newRequestId);
+                        ack_send_error.setMessage(errorString);
+                        ack_send_error.setStatus(ack_pb.Ack.STATUS.ERROR);
+                        // gRPC response.
+                        console.log(`Sending to the relay the eventSubscription error Ack: ${JSON.stringify(ack_send_error.toObject())}`);
+                        // Sending the fabric state to the relay.
+                        client.sendDriverSubscriptionStatus(ack_send_error, function (err: any, response: any) {
+                            console.log(`Response: ${JSON.stringify(response.toObject())} Error: ${JSON.stringify(err)}`);
+                        });
                     }
-                    ack_response.setRequestId(newRequestId);
-
-                    // gRPC response.
-                    console.log(`Responding to the relay the eventSubscription Ack: ${JSON.stringify(ack_response.toObject())}`);
-
-                    if (!process.env.RELAY_ENDPOINT) {
-                        throw new Error('RELAY_ENDPOINT is not set.');
-                    }
-                    let client;
-                    if (process.env.RELAY_TLS === 'true') {
-                        if (!(process.env.RELAY_TLSCA_CERT_PATH && fs.existsSync(process.env.RELAY_TLSCA_CERT_PATH))) {
-                            throw new Error("Missing or invalid RELAY_TLSCA_CERT_PATH: " + process.env.RELAY_TLSCA_CERT_PATH);
-                        }
-                        const rootCert = fs.readFileSync(process.env.RELAY_TLSCA_CERT_PATH);
-                        client = new events_grpc_pb.EventSubscribeClient(
-                            process.env.RELAY_ENDPOINT,
-                            credentials.createSsl(rootCert)
-                        );
-                    } else {
-                        client = new events_grpc_pb.EventSubscribeClient(
-                            process.env.RELAY_ENDPOINT,
-                            credentials.createInsecure()
-                        );
-                    }
-
-                    // Sending the fabric state to the relay.
-                    //client.sendDriverSubscriptionStatus(ack_response, function (err: any, response: any) {
-                    //    console.log('Response:', response, 'Error: ', err);
-                    //});
-
+                }).catch((error) => {
+                    console.error(`failed to get the relay client (as part of async processing) with error: ${JSON.stringify(error)}`);
                 });
 
-                const ack_submitted = new ack_pb.Ack();
-                ack_submitted.setMessage('Procesing addEventSubscription');
-                ack_submitted.setRequestId(newRequestId);
-                ack_submitted.setStatus(ack_pb.Ack.STATUS.OK);
+                const ack_response = new ack_pb.Ack();
+                ack_response.setRequestId(newRequestId);
+                ack_response.setMessage('Procesing addEventSubscription');
+                ack_response.setStatus(ack_pb.Ack.STATUS.OK);
                 // gRPC response.
-                console.log(`Responding to caller with Ack: ${JSON.stringify(ack_submitted.toObject())}`);
-                callback(null, ack_submitted);
+                console.log(`Responding to caller with Ack: ${JSON.stringify(ack_response.toObject())}`);
+                callback(null, ack_response);
             } else {
                 dbConnectionTest().then((dbConnectTestStatus) => {
                     if (dbConnectTestStatus == true) {
-                        eventSubscriptionTest(call).then((eventSubscribeTestStatus) => {
+                        eventSubscriptionTest(call.request).then((eventSubscribeTestStatus) => {
                             if (eventSubscribeTestStatus == false) {
                                 console.error(`Failed eventSubscriptionTest()`);
                             }
@@ -242,14 +246,33 @@ server.addService(driver_pb_grpc.DriverCommunicationService, {
                 });
             }
         } catch (e) {
-            console.log(e);
-            ack_response.setMessage(newRequestId);
-            ack_response.setMessage(`Error: ${e}`);
-            ack_response.setStatus(ack_pb.Ack.STATUS.ERROR);
+            const errorString: string = `${JSON.stringify(e)}`;
+            console.log(`error: ${errorString}`);
+            const ack_error_response = new ack_pb.Ack();
+            ack_error_response.setRequestId(newRequestId);
+            ack_error_response.setMessage(`Error: ${errorString}`);
+            ack_error_response.setStatus(ack_pb.Ack.STATUS.ERROR);
             // gRPC response.
-            console.error(`Responding to caller Ack: ${JSON.stringify(ack_response.toObject())}`);
-            callback(null, ack_response);
+            console.error(`Responding to caller with Ack: ${JSON.stringify(ack_error_response.toObject())}`);
+            callback(null, ack_error_response);
         }
+    },
+    requestSignedEventSubscriptionQuery: (call: { request: eventsPb.EventSubscription }, callback: (_: any, object: query_pb.Query) => void) => {
+        const ack_response = new ack_pb.Ack();
+
+        signEventSubscriptionQuery(call.request.getQuery()!).then((signedQuery) => {
+            // gRPC response.
+            console.log(`Responding to caller with signedQuery: ${JSON.stringify(signedQuery.toObject())}`);
+            callback(null, signedQuery);   
+        }).catch((error) => {
+            const errorString: string = `${JSON.stringify(error)}`;
+            console.log(`error: ${errorString}`);
+            var emptyQuery: query_pb.Query = new query_pb.Query();
+            emptyQuery.setRequestorSignature(errorString);
+            // gRPC response.
+            console.error(`Responding to caller with emptyQuery: ${JSON.stringify(emptyQuery.toObject())}`);
+            callback(null, emptyQuery);
+        });
     },
 });
 

@@ -18,10 +18,11 @@ build-local:
 		cp -r ../../../common/protos-js/peer ./protos-js/ && \
 		cp -r ../../../common/protos-js/relay ./protos-js/ && \
 		cp -r ../../../common/protos-js/package.json ./protos-js/
-	cp package.json package-remote.json && \
+	(cp package.json package-remote.json && \
 		cp package-local.json package.json && \
-		npm install && \
-		mv package-remote.json package.json
+		npm install) || \
+		(mv package-remote.json package.json && exit 1) # Runs if failure
+	mv package-remote.json package.json # Runs if success
 	npm run build
 	npm run postinstall
 	
@@ -38,8 +39,9 @@ build-image-local:
 		cp -r ../../../common/protos-js/package.json ./protos-js/
 	cp package.json package-remote.json
 	cp package-local.json package.json
-	docker build --build-arg BUILD_TAG="local" --build-arg GIT_URL=$(GIT_URL) -t ${DOCKER_IMAGE_NAME}:$(DOCKER_TAG) -f fabricDriver.dockerfile.local .
-	mv package-remote.json package.json
+	(docker build --build-arg BUILD_TAG="local" --build-arg GIT_URL=$(GIT_URL) -t ${DOCKER_IMAGE_NAME}:$(DOCKER_TAG) -f fabricDriver.dockerfile.local . ) || \
+		(mv package-remote.json package.json && exit 1) # Runs if failure
+	mv package-remote.json package.json  # Runs if success
 	rm -rf protos-js
 
 build-image: .npmrc

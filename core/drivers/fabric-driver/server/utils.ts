@@ -6,17 +6,19 @@
 
 import eventsPb from "@hyperledger-labs/weaver-protos-js/common/events_pb";
 import queryPb from '@hyperledger-labs/weaver-protos-js/common/query_pb';
+import { getDriverKeyCert } from "./walletSetup"
+import { InteroperableHelper } from '@hyperledger-labs/weaver-fabric-interop-sdk'
 
 import { LevelDBConnector } from "./dbConnector"
-
-// Create connection to a database
-var db: any = new LevelDBConnector(process.env.DB_NAME!);
 
 // test the LevelDB basic operations
 async function dbConnectionTest(
 ): Promise<boolean> {
-    console.log(`Start testing LevelDBConnector for ${db.DB_NAME}`)
+    console.log(`Start testing LevelDBConnector for ${process.env.DB_NAME!}`)
     try {
+        // Create connection to a database
+        const db: any = new LevelDBConnector(process.env.DB_NAME!);
+
         const key: string = 'key';
         var value: string = 'insert';
 
@@ -25,7 +27,7 @@ async function dbConnectionTest(
 
         // Fetch the value of the key
         value = await db.read(key);
-        console.log(`obtained <key, value>: <${key}, ${value}>`)
+        console.log(`obtained <key, value>: <${key}, ${value}>`);
 
         // Close the database connection
         await db.close();
@@ -50,27 +52,30 @@ async function dbConnectionTest(
         // Delete the key
         await db.delete(key);
     } catch (error) {
-        console.error(`Failed testing LevelDBConnector, with error: ${JSON.stringify(error)}`)
+        console.error(`Failed testing LevelDBConnector, with error: ${JSON.stringify(error)}`);
         return false;
     }
 
-    console.log(`End testing LevelDBConnector for ${db.DB_NAME}`)
+    console.log(`End testing LevelDBConnector for ${process.env.DB_NAME!}`);
     return true;
 }
 
 // test the event subscription operations: subscribeEvent, listEvents, deleteEvent
 async function eventSubscriptionTest(
-    call: any
+    eventSub: eventsPb.EventSubscription
 ): Promise<boolean> {
-    console.debug(`Start eventSubscriptionTest()`)
+    console.debug(`Start eventSubscriptionTest()`);
 
     try {
-        var eventMatcher: eventsPb.EventMatcher = call.request.getEventmatcher()!;
-        await addEventSubscription(call.request);
+        // Create connection to a database
+        const db: any = new LevelDBConnector(process.env.DB_NAME!);
+
+        var eventMatcher: eventsPb.EventMatcher = eventSub.getEventMatcher()!;
+        await addEventSubscription(eventSub);
         var subscriptions: Array<queryPb.Query> = await lookupEventSubscriptions(eventMatcher) as Array<queryPb.Query>;
 
         for (const subscription of subscriptions) {
-            if (subscription.getRequestId() == call.request.getQuery().getRequestId()) {
+            if (subscription.getRequestId() == eventSub.getQuery()!.getRequestId()) {
                 await deleteEventSubscription(eventMatcher, subscription.getRequestId());
                 break;
             }
@@ -80,7 +85,7 @@ async function eventSubscriptionTest(
         return false;
     }
 
-    console.debug(`End eventSubscriptionTest()`)
+    console.debug(`End eventSubscriptionTest()`);
     return true;
 }
 
@@ -113,10 +118,14 @@ async function addEventSubscription(
     eventSub: eventsPb.EventSubscription
 ): Promise<string> {
     console.log(`adding to driver, subscription of the eventSub: ${JSON.stringify(eventSub.toObject())}`);
-
+    let db;
     try {
+        // Create connection to a database
+        db = new LevelDBConnector(process.env.DB_NAME!);
+        await db.open();
+
         // eventMatcher need to be non-null, hence apply the NaN assertion operator '!'
-        var eventMatcher: eventsPb.EventMatcher = eventSub.getEventmatcher()!;
+        var eventMatcher: eventsPb.EventMatcher = eventSub.getEventMatcher()!;
         // the serialized protobuf for eventMatcher below can be decoded to other formats like 'utf8' [.toString('utf8')]
         const key: string = Buffer.from(eventMatcher.serializeBinary()).toString('base64');
 
@@ -141,11 +150,11 @@ async function addEventSubscription(
                     subscription.getRequestingRelay() == query.getRequestingRelay() &&
                     subscription.getRequestingNetwork() == query.getRequestingNetwork() &&
                     subscription.getCertificate() == query.getCertificate() &&
-                    subscription.getRequestorSignature() == query.getRequestorSignature() &&
                     subscription.getRequestingOrg() == query.getRequestingOrg() &&
                     subscription.getConfidential() == query.getConfidential()) {
 
                     console.log(`found subscription for query with requestId: ${subscription.getRequestId()}`);
+                    await db.close();
                     return subscription.getRequestId();
                 }
             }
@@ -163,6 +172,7 @@ async function addEventSubscription(
             } else {
                 // case of read failing due to some other issue
                 console.error(`re-throwing error: ${errorString}`);
+                await db.close();
                 throw new Error(error);
             }
         }
@@ -171,6 +181,7 @@ async function addEventSubscription(
         subscriptionsSerialized = JSON.stringify(subscriptions);
         // insert the value against key in the DB (it can be the scenario of a new key addition, or update to the value of an existing key)
         await db.insert(key, subscriptionsSerialized);
+        await db.close();
 
         // TODO: register the event with fabric sdk
         console.log(`end addEventSubscription() .. requestId: ${query.getRequestId()}`);
@@ -178,6 +189,7 @@ async function addEventSubscription(
 
     } catch(error: any) {
         console.error(`Error during addEventSubscription(): ${JSON.stringify(error)}`);
+        await db?.close();
         throw new Error(error);
     }
 }
@@ -189,8 +201,13 @@ const deleteEventSubscription = async (
     console.log(`deleting from driver subscription of the eventMatcher: ${JSON.stringify(eventMatcher.toObject())} with requestId: ${requestId}`);
     var subscriptions: Array<string>;
     var retVal: eventsPb.EventSubscription = new eventsPb.EventSubscription();
-    retVal.setEventmatcher(eventMatcher);
+    retVal.setEventMatcher(eventMatcher);
+    let db;
     try {
+        // Create connection to a database
+        db = new LevelDBConnector(process.env.DB_NAME!);
+        await db.open();
+
         const key: string = Buffer.from(eventMatcher.serializeBinary()).toString('base64');
         try {
             // fetch the current values in the DB against the given key
@@ -198,18 +215,25 @@ const deleteEventSubscription = async (
             subscriptions = JSON.parse(subscriptionsSerialized);
 
             console.debug(`subscriptions.length: ${subscriptions.length}`);
+            var foundEntry: boolean = false;
             for (var subscriptionSerialized of subscriptions) {
                 var subscription: queryPb.Query =  queryPb.Query.deserializeBinary(Buffer.from(subscriptionSerialized, 'base64'));
                 if (subscription.getRequestId() == requestId) {
                     console.debug(`deleting the subscription (with input requestId): ${JSON.stringify(subscription.toObject())}`);
                     subscriptions.splice(subscriptions.indexOf(subscriptionSerialized), 1);
                     retVal.setQuery(subscription);
+                    foundEntry = true;
                     break;
                 }
+            }
+
+            if (!foundEntry) {
+                throw new Error(`event subscription with requestId: ${requestId} is not found!`);
             }
         } catch (error: any) {
             // error could be either due to key not being present in the database or some other issue with database access
             console.error(`re-throwing error: ${JSON.stringify(error)}`);
+            await db.close();
             throw new Error(error);
         }
 
@@ -221,10 +245,12 @@ const deleteEventSubscription = async (
             await db.insert(key, subscriptionsSerialized);
         }
 
+        await db.close();
         console.log(`end deleteEventSubscription() .. retVal: ${JSON.stringify(retVal.toObject())}`);
         return retVal;
     } catch(error: any) {
-        console.error(`Error during lookup: ${JSON.stringify(error)}`);
+        console.error(`Error during delete: ${JSON.stringify(error)}`);
+        await db?.close();
         throw new Error(error);
     }
 }
@@ -235,8 +261,13 @@ async function lookupEventSubscriptions(
     console.info(`finding the subscriptions with eventMatcher: ${JSON.stringify(eventMatcher.toObject())}`);
     var subscriptions: Array<string>;
     var returnSubscriptions: Array<queryPb.Query> = new Array<queryPb.Query>();
+    let db;
 
     try {
+        // Create connection to a database
+        db = new LevelDBConnector(process.env.DB_NAME!);
+        await db.open();
+    
         var eventMatcher: eventsPb.EventMatcher = eventMatcher;
         const key: string = Buffer.from(eventMatcher.serializeBinary()).toString('base64');
 
@@ -251,10 +282,12 @@ async function lookupEventSubscriptions(
 
         console.debug(`returnSubscriptions.length: ${returnSubscriptions.length}`);
         console.log(`end lookupEventSubscriptions()`);
+        await db.close();
         return returnSubscriptions;
 
     } catch (error: any) {
         let errorString: string = `${JSON.stringify(error)}`
+        await db?.close();
         if (errorString.includes('Error: NotFound:')) {
             // case of read failing due to key not found
             returnSubscriptions = new Array<queryPb.Query>();
@@ -268,10 +301,55 @@ async function lookupEventSubscriptions(
     }
 }
 
+async function signEventSubscriptionQuery(
+    inputQuery: queryPb.Query
+): Promise<queryPb.Query> {
+    console.log(`driver ready to provide sign on query: ${JSON.stringify(inputQuery.toObject())}`);
+    let signedQuery = new queryPb.Query();
+
+    try {
+        signedQuery.setPolicyList(inputQuery.getPolicyList());
+        signedQuery.setAddress(inputQuery.getAddress());
+        signedQuery.setRequestingRelay(inputQuery.getRequestingRelay());
+        signedQuery.setRequestingOrg(inputQuery.getRequestingOrg());
+        signedQuery.setRequestingNetwork(inputQuery.getRequestingNetwork());
+        signedQuery.setNonce(inputQuery.getNonce());
+        signedQuery.setRequestId(inputQuery.getRequestId());
+        signedQuery.setConfidential(inputQuery.getConfidential());
+
+        const keyCert = await getDriverKeyCert()
+        signedQuery.setCertificate(keyCert.cert);
+        signedQuery.setRequestorSignature(
+            InteroperableHelper.signMessage(
+                inputQuery.getAddress() + inputQuery.getNonce(),
+                keyCert.key.toBytes()
+            ).toString("base64")
+        );
+        return signedQuery;
+    } catch (error: any) {
+        const errorString: string = `${JSON.stringify(error)}`;
+        console.error(`signing query failed with error: ${errorString}`);
+        throw new Error(error);
+    }
+}
+
+// A better way to handle errors for promises
+function handlePromise<T>(promise: Promise<T>): Promise<[T?, Error?]> {
+    const result: Promise<[T?, Error?]> = promise
+      .then(data => {
+        const response: [T?, Error?] = [data, undefined]
+        return response
+      })
+      .catch(error => Promise.resolve([undefined, error]))
+    return result
+}
+
 export {
     addEventSubscription,
     deleteEventSubscription,
     lookupEventSubscriptions,
     dbConnectionTest,
-    eventSubscriptionTest
+    eventSubscriptionTest,
+    signEventSubscriptionQuery,
+    handlePromise
 }

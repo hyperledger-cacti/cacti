@@ -21,6 +21,7 @@
     "license": "ISC",
     "dependencies": {
         "@hyperledger-labs/weaver-protos-js": "file:./protos-js",
+	"@hyperledger-labs/weaver-fabric-interop-sdk": "file:../../../sdks/fabric/interoperation-node-sdk",
         "@fidm/x509": "^1.2.1",
         "@grpc/grpc-js": "^1.1.1",
         "@typescript-eslint/eslint-plugin": "^3.5.0",
