@@ -29,7 +29,7 @@ services:
       - ../../relay/credentials:/fabric-driver/credentials
     ports:
       - "${DRIVER_PORT}:${DRIVER_PORT}"
-    command: sh -c "npm run dev"
+    command: sh -c "npm run start"
 # This networks section is required for when the peers have networks specified
 networks:
   default:

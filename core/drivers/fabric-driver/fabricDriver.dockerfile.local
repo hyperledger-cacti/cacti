@@ -6,6 +6,7 @@ FROM node:14 AS builder-local
 WORKDIR /fabric-driver
 
 ADD protos-js /fabric-driver/protos-js
+ADD weaver-fabric-interop-sdk /fabric-driver/weaver-fabric-interop-sdk
 
 # Remote build
 # FROM node:14 AS builder-remote

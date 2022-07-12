@@ -39,6 +39,10 @@ jobs:
           make build
         working-directory: common/protos-js
         
+      - name: Build Fabric Interop Node SDK (Local)
+        run: make build-local
+        working-directory: sdks/fabric/interoperation-node-sdk
+        
       - name: Build Image (Local)
         run: make build-image-local
         working-directory: core/drivers/fabric-driver
