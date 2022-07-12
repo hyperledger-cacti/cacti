@@ -199,9 +199,7 @@ server.addService(driver_pb_grpc.DriverCommunicationService, {
                         // gRPC response.
                         console.log(`Sending to the relay the eventSubscription error Ack: ${JSON.stringify(ack_send_error.toObject())}`);
                         // Sending the fabric state to the relay.
-                        client.sendDriverSubscriptionStatus(ack_send_error, function (err: any, response: any) {
-                            console.log(`Response: ${JSON.stringify(response.toObject())} Error: ${JSON.stringify(err)}`);
-                        });
+                        client.sendDriverSubscriptionStatus(ack_send_error, relayCallback);
                     }
                 }).catch((error) => {
                     console.error(`failed to get the relay client (as part of async processing) with error: ${JSON.stringify(error)}`);
