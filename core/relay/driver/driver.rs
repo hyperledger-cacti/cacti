@@ -6,6 +6,7 @@ use common::query::Query;
 use common::events::EventSubscription;
 use common::state::{view_payload, Meta, meta, ViewPayload, View};
 use driver::driver::driver_communication_server::{DriverCommunication, DriverCommunicationServer};
+use driver::driver::WriteExternalStateMessage;
 
 // External modules
 use config;
@@ -184,6 +185,9 @@ impl DriverCommunication for DriverCommunicationService {
             confidential: received_query.confidential,
         };
         return Ok(Response::new(signed_query));
+    }
+    async fn write_external_state(&self, request: Request<WriteExternalStateMessage>) -> Result<Response<Ack>, Status> {
+        Err(tonic::Status::unimplemented("method not implemented"))
     }
 }
 
