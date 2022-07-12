@@ -22,7 +22,6 @@ services:
       - DRIVER_TLS=${DRIVER_TLS}
       - DRIVER_TLS_CERT_PATH=${DRIVER_TLS_CERT_PATH}
       - DRIVER_TLS_KEY_PATH=${DRIVER_TLS_KEY_PATH}
-      - DB_NAME=${DB_NAME}
       - DB_PATH=${DB_PATH}
     volumes:
       - ${CONNECTION_PROFILE}:/fabric-driver/ccp.json

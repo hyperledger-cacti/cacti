@@ -43,7 +43,7 @@ class LevelDBConnector implements DBConnector {
         dbName: string
     ) {
         if (!dbName || dbName.length == 0) {
-            dbName = process.env.DB_NAME ? process.env.DB_NAME : "driverdb";
+            dbName = "driverdb";
         }
         this.DB_NAME = dbName;
         this.dbHandle = new Level(path.join(process.env.DB_PATH ? process.env.DB_PATH : "./driverdbs", dbName), { valueEncoding: 'json' });
@@ -133,5 +133,6 @@ class LevelDBConnector implements DBConnector {
 }
 
 export {
+    DBConnector,
     LevelDBConnector
 }

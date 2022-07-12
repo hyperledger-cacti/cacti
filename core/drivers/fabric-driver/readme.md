@@ -93,9 +93,7 @@ Can pass in a config file for the driver to be run with: `DRIVER_CONFIG` (ex: DR
 
 `INTEROP_CHAINCODE` stores the name of the interop chaincode installed.
 
-`DB_NAME` stores the name of the database used for storing the event subscription information.
-
-`DB_PATH` stores the path hosting the database files.
+`DB_PATH` stores the path hosting the database files containing the event subscription information.
 
 NOTE: When specifying ensure that they match the config that the relay is using.
 

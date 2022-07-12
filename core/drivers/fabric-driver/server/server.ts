@@ -17,11 +17,11 @@ import state_pb from '@hyperledger-labs/weaver-protos-js/common/state_pb';
 import invoke from './fabric-code';
 import 'dotenv/config';
 import { walletSetup } from './walletSetup';
-import { subscribeEventHelper, unsubscribeEventHelper } from "./events"
+import { subscribeEventHelper, unsubscribeEventHelper, signEventSubscriptionQuery } from "./events"
 import { Certificate } from '@fidm/x509';
 import * as path from 'path';
-
-import { addEventSubscription, dbConnectionTest, eventSubscriptionTest, signEventSubscriptionQuery } from "./utils"
+import { handlePromise, relayCallback } from './utils';
+import { dbConnectionTest, eventSubscriptionTest } from "./tests"
 
 const server = new Server();
 console.log('driver def', JSON.stringify(driver_pb_grpc));
@@ -57,21 +57,8 @@ function mockCommunication(query: query_pb.Query) {
             process.env.RELAY_ENDPOINT,
             credentials.createInsecure(),
         );
-        client.sendDriverState(viewPayload, function (err: any, response: any) {
-            console.log('Response:', response);
-        });
+        client.sendDriverState(viewPayload, relayCallback);
     }, 3000);
-}
-
-// A better way to handle errors for promises
-function handlePromise<T>(promise: Promise<T>): Promise<[T?, Error?]> {
-    const result: Promise<[T?, Error?]> = promise
-        .then((data) => {
-            const response: [T?, Error?] = [data, undefined];
-            return response;
-        })
-        .catch((error) => Promise.resolve([undefined, error]));
-    return result;
 }
 
 // Handles communication with fabric network and sends resulting data to the relay
@@ -117,9 +104,7 @@ const fabricCommunication = async (query: query_pb.Query, networkName: string) =
         errorViewPayload.setError(`Error: ${JSON.stringify(invokeError)}`);
         errorViewPayload.setRequestId(query.getRequestId());
         // Send the error state to the relay
-        client.sendDriverState(errorViewPayload, function (err: any, response: any) {
-            console.log('Response:', response, 'Error: ', err);
-        });
+        client.sendDriverState(errorViewPayload, relayCallback);
     } else {
         // Process response from invoke to send to relay
         console.log('Result of fabric invoke', result);
@@ -138,9 +123,7 @@ const fabricCommunication = async (query: query_pb.Query, networkName: string) =
 
         console.log('Sending state');
         // Sending the fabric state to the relay.
-        client.sendDriverState(viewPayload, function (err: any, response: any) {
-            console.log(`Response: ${JSON.stringify(response.toObject())} Error: ${JSON.stringify(err)}`);
-        });
+        client.sendDriverState(viewPayload, relayCallback);
     }
 };
 
