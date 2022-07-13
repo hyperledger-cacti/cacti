@@ -248,16 +248,21 @@ async function lookupEventSubscriptions(
         db = new LevelDBConnector(DB_NAME!);
         await db.open();
 
-        var eventMatcher: eventsPb.EventMatcher = eventMatcher;
-        const key: string = Buffer.from(eventMatcher.serializeBinary()).toString('base64');
+        for await (const [keySerialized, subscriptionsSerialized] of db.dbHandle.iterator()) {
+            var item: eventsPb.EventMatcher = eventsPb.EventMatcher.deserializeBinary(Buffer.from(keySerialized, 'base64'));
+            if ((eventMatcher.getEventClassId() == '*' || eventMatcher.getEventClassId() == item.getEventClassId()) &&
+                (eventMatcher.getTransactionContractId() == '*' || eventMatcher.getTransactionContractId() == item.getTransactionContractId()) &&
+                (eventMatcher.getTransactionLedgerId() == '*' || eventMatcher.getTransactionLedgerId() == item.getTransactionLedgerId()) &&
+                (eventMatcher.getTransactionFunc() == '*' || eventMatcher.getTransactionFunc() == item.getTransactionFunc())) {
 
-        // fetch the current values in the DB against the given key
-        var subscriptionsSerialized: string = await db.read(key) as string;
-        subscriptions = JSON.parse(subscriptionsSerialized)
-        for (const subscriptionSerialized of subscriptions) {
-            var subscription: queryPb.Query =  queryPb.Query.deserializeBinary(Buffer.from(subscriptionSerialized, 'base64'));
-            console.debug(`subscription: ${JSON.stringify(subscription.toObject())}`)
-            returnSubscriptions.push(subscription);
+                subscriptions = JSON.parse(subscriptionsSerialized)
+                for (const subscriptionSerialized of subscriptions) {
+                    var subscription: queryPb.Query =  queryPb.Query.deserializeBinary(Buffer.from(subscriptionSerialized, 'base64'));
+                    console.debug(`subscription: ${JSON.stringify(subscription.toObject())}`)
+                    returnSubscriptions.push(subscription);
+                }
+            }
+
         }
 
         console.debug(`returnSubscriptions.length: ${returnSubscriptions.length}`);

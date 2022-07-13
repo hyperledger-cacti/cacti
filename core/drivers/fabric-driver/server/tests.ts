@@ -12,10 +12,10 @@ import { LevelDBConnector } from "./dbConnector"
 // test the LevelDB basic operations
 async function dbConnectionTest(
 ): Promise<boolean> {
-    console.log(`Start testing LevelDBConnector for ${process.env.DB_NAME!}`)
+    console.log(`Start testing LevelDBConnector()`)
     try {
         // Create connection to a database
-        const db: any = new LevelDBConnector(process.env.DB_NAME!);
+        const db: any = new LevelDBConnector("");
 
         const key: string = 'key';
         var value: string = 'insert';
@@ -54,7 +54,7 @@ async function dbConnectionTest(
         return false;
     }
 
-    console.log(`End testing LevelDBConnector for ${process.env.DB_NAME!}`);
+    console.log(`End testing LevelDBConnector()`);
     return true;
 }
 
@@ -65,9 +65,6 @@ async function eventSubscriptionTest(
     console.debug(`Start eventSubscriptionTest()`);
 
     try {
-        // Create connection to a database
-        const db: any = new LevelDBConnector(process.env.DB_NAME!);
-
         var eventMatcher: eventsPb.EventMatcher = eventSub.getEventMatcher()!;
         await addEventSubscription(eventSub);
         var subscriptions: Array<queryPb.Query> = await lookupEventSubscriptions(eventMatcher) as Array<queryPb.Query>;

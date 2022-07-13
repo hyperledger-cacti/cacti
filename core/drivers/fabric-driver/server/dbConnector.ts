@@ -130,6 +130,12 @@ class LevelDBConnector implements DBConnector {
 
         return Promise.resolve(true);
     }
+
+    async readKeys(
+    ):Promise<any> {
+        const keys = await this.dbHandle.keys().all();
+        return keys;
+    }
 }
 
 export {
