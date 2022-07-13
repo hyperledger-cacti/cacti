@@ -13,6 +13,7 @@ protos-js:
 		cp -r ../../../common/protos-js/corda ./protos-js/ && \
 		cp -r ../../../common/protos-js/driver ./protos-js/ && \
 		cp -r ../../../common/protos-js/fabric ./protos-js/ && \
+		cp -r ../../../common/protos-js/identity ./protos-js/ && \
 		cp -r ../../../common/protos-js/msp ./protos-js/ && \
 		cp -r ../../../common/protos-js/networks ./protos-js/ && \
 		cp -r ../../../common/protos-js/peer ./protos-js/ && \
