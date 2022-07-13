@@ -6,6 +6,7 @@ FROM node:14 AS builder-local
 WORKDIR /fabric-driver
 
 ADD protos-js /fabric-driver/protos-js
+ADD weaver-fabric-interop-sdk /fabric-driver/weaver-fabric-interop-sdk
 
 # Remote build
 # FROM node:14 AS builder-remote
@@ -22,7 +23,6 @@ RUN npm install --unsafe-perm
 ADD patches /fabric-driver/patches
 ADD server /fabric-driver/server
 ADD config.json .
-ADD temp.pem .
 ADD tsconfig.json .
 ADD .eslintrc .
 ADD .prettierrc .

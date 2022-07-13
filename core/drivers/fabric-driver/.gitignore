@@ -6,3 +6,5 @@
 /fabric-protos
 package-lock.json
 .npmrc
+driverdbs
+weaver-fabric-interop-sdk
