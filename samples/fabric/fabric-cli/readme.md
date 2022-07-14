@@ -86,19 +86,19 @@ Then run `docker-compose up -d` to start fabric-cli container.
 Then run `docker exec -it fabric-cli bash`, to open interactive shell for fabric-cli, where regular fabric-cli calls can be made.
 
 Setting env is not required inside docker, as env variables are already declared, so next steps would be:
-* `fabric-cli config set-file $CONFG_PATH`
-* `fabric-cli configure all network1 network2`.
+* `./bin/fabric-cli config set-file $CONFG_PATH`
+* `./bin/fabric-cli configure all network1 network2`.
 
 
 ## Example Invoke
 
 To record a key `test` with the value `teststate` via the `simplestate` contract deployed on the `mychannel` channel in `network1`, run:
 ```
-$ fabric-cli chaincode invoke mychannel simplestate create '["test", "teststate"]'` --local-network=network1
+$ ./bin/fabric-cli chaincode invoke mychannel simplestate create '["test", "teststate"]' --local-network=network1
 ```
 To now query the value of the the `test` key, run:
 ```
-$ fabric-cli chaincode query mychannel simplestate read '["test"]' --local-network=network1
+$ ./bin/fabric-cli chaincode query mychannel simplestate read '["test"]' --local-network=network1
 ```
 
 NOTE: Use the `--help` flag with any command to view examples and usage.
@@ -387,7 +387,7 @@ Below are the steps to exercise asset transfers from `network1` to `network2` us
 
 ## Events
 
-* To suscribe for event, generate a JSON file like: [Sample Event Sub JSON](./src/data/event_sub_sample.json). Sample provided here assumes driver of `network1` is subscribing to an event of `network2`. Then run following command (and note the request id which will be used to unsubscribe or get status):
+* To subscribe for an event, generate a JSON file like: [Sample Event Sub JSON](./src/data/event_sub_sample.json). Sample provided here assumes driver of `network1` is subscribing to an event of `network2`. Then run following command (and note the request id which will be used to unsubscribe or get status):
     ```
     ./bin/fabric-cli event subscribe --network=network1 src/data/event_sub_sample.json
     ```
