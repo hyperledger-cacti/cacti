@@ -11,23 +11,37 @@ import queryPb from '@hyperledger-labs/weaver-protos-js/common/query_pb';
 import { InteroperableHelper } from '@hyperledger-labs/weaver-fabric-interop-sdk'
 import { getDriverKeyCert } from "./walletSetup"
 import { DBConnector, LevelDBConnector } from "./dbConnector"
-import { checkIfArraysAreEqual, relayCallback } from "./utils"
+import { checkIfArraysAreEqual, handlePromise, relayCallback } from "./utils"
 
 const DB_NAME: string = "driverdb";
 
-function subscribeEventHelper(
+async function subscribeEventHelper(
     call_request: eventsPb.EventSubscription,
     client: events_grpc_pb.EventSubscribeClient
 ) {
     const newRequestId = call_request.getQuery()!.getRequestId();
-    addEventSubscription(call_request).then((requestId) => {
+    const [requestId, error] = await handlePromise(addEventSubscription(call_request));
+    if (error) {
+        const errorString: string = `error (thrown as part of async processing while storing to DB during subscribeEvent): ${JSON.stringify(error)}`;
+        console.error(errorString);
+        const ack_send_error = new ack_pb.Ack();
+        ack_send_error.setRequestId(newRequestId);
+        ack_send_error.setMessage(errorString);
+        ack_send_error.setStatus(ack_pb.Ack.STATUS.ERROR);
+        // gRPC response.
+        console.log(`Sending to the relay the eventSubscription error Ack: ${JSON.stringify(ack_send_error.toObject())}`);
+        // Sending the fabric state to the relay.
+        client.sendDriverSubscriptionStatus(ack_send_error, relayCallback);
+    } else {
         const ack_send = new ack_pb.Ack();
         if (newRequestId == requestId) {
             // event being subscribed for the first time
+
+            // the event listener logic follows here
+            // set the following ack_send message below, only if the event listener logic is successful; else set to an error message
+
             ack_send.setMessage('Event subscription is successful!');
             ack_send.setStatus(ack_pb.Ack.STATUS.OK);
-    
-            // the event listener logic follows here
         } else {
             // event being subscribed already exists
             ack_send.setMessage(`Event subscription already exists with requestId: ${requestId}`);
@@ -44,8 +58,18 @@ function subscribeEventHelper(
     
         // Sending the fabric state to the relay.
         client.sendDriverSubscriptionStatus(ack_send, relayCallback);
-    }).catch((error) => {
-        const errorString: string = `error (thrown as part of async processing while storing to DB during subscribeEvent): ${JSON.stringify(error)}`;
+    }
+}
+
+async function unsubscribeEventHelper(
+    call_request: eventsPb.EventSubscription,
+    client: events_grpc_pb.EventSubscribeClient
+) {
+    const newRequestId = call_request.getQuery()!.getRequestId();
+    const [deletedSubscription, error] =
+        await handlePromise(deleteEventSubscription(call_request.getEventMatcher()!, newRequestId));
+    if (error) {
+        const errorString: string = `error (thrown as part of async processing while deleting from DB during unsubscribeEvent): ${JSON.stringify(error)}`;
         console.error(errorString);
         const ack_send_error = new ack_pb.Ack();
         ack_send_error.setRequestId(newRequestId);
@@ -55,15 +79,7 @@ function subscribeEventHelper(
         console.log(`Sending to the relay the eventSubscription error Ack: ${JSON.stringify(ack_send_error.toObject())}`);
         // Sending the fabric state to the relay.
         client.sendDriverSubscriptionStatus(ack_send_error, relayCallback);
-    });
-}
-
-function unsubscribeEventHelper(
-    call_request: eventsPb.EventSubscription,
-    client: events_grpc_pb.EventSubscribeClient
-) {
-    const newRequestId = call_request.getQuery()!.getRequestId();
-    deleteEventSubscription(call_request.getEventMatcher()!, newRequestId).then((deletedSubscription: eventsPb.EventSubscription) => {
+    } else {
         const ack_send = new ack_pb.Ack();
         
         // event got unsubscribed
@@ -80,18 +96,7 @@ function unsubscribeEventHelper(
     
         // Sending the fabric state to the relay.
         client.sendDriverSubscriptionStatus(ack_send, relayCallback);
-    }).catch((error) => {
-        const errorString: string = `error (thrown as part of async processing while deleting from DB during unsubscribeEvent): ${JSON.stringify(error)}`;
-        console.error(errorString);
-        const ack_send_error = new ack_pb.Ack();
-        ack_send_error.setRequestId(newRequestId);
-        ack_send_error.setMessage(errorString);
-        ack_send_error.setStatus(ack_pb.Ack.STATUS.ERROR);
-        // gRPC response.
-        console.log(`Sending to the relay the eventSubscription error Ack: ${JSON.stringify(ack_send_error.toObject())}`);
-        // Sending the fabric state to the relay.
-        client.sendDriverSubscriptionStatus(ack_send_error, relayCallback);
-    });
+    }
 }
 
 async function addEventSubscription(

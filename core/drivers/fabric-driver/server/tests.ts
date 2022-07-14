@@ -7,15 +7,16 @@
 import eventsPb from "@hyperledger-labs/weaver-protos-js/common/events_pb";
 import queryPb from '@hyperledger-labs/weaver-protos-js/common/query_pb';
 import { addEventSubscription, deleteEventSubscription, lookupEventSubscriptions } from "./events"
-import { LevelDBConnector } from "./dbConnector"
+import { LevelDBConnector, DBConnector } from "./dbConnector"
 
 // test the LevelDB basic operations
 async function dbConnectionTest(
 ): Promise<boolean> {
     console.log(`Start testing LevelDBConnector()`)
+    let db: DBConnector;
     try {
         // Create connection to a database
-        const db: any = new LevelDBConnector("");
+        db = new LevelDBConnector("");
 
         const key: string = 'key';
         var value: string = 'insert';
@@ -43,14 +44,17 @@ async function dbConnectionTest(
                 await db.update(key, value);
             } else {
                 console.error(`re-throwing the error: ${errorString}`);
+                db.close();
                 throw new Error(error);
             }
         }
 
         // Delete the key
         await db.delete(key);
+        await db.close();
     } catch (error) {
         console.error(`Failed testing LevelDBConnector, with error: ${JSON.stringify(error)}`);
+        db.close();
         return false;
     }
 
