@@ -8,16 +8,18 @@ import ack_pb from '@hyperledger-labs/weaver-protos-js/common/ack_pb';
 import eventsPb from '@hyperledger-labs/weaver-protos-js/common/events_pb';
 import events_grpc_pb from '@hyperledger-labs/weaver-protos-js/relay/events_grpc_pb';
 import queryPb from '@hyperledger-labs/weaver-protos-js/common/query_pb';
-import { InteroperableHelper } from '@hyperledger-labs/weaver-fabric-interop-sdk'
-import { getDriverKeyCert } from "./walletSetup"
-import { DBConnector, LevelDBConnector } from "./dbConnector"
-import { checkIfArraysAreEqual, handlePromise, relayCallback } from "./utils"
+import { InteroperableHelper } from '@hyperledger-labs/weaver-fabric-interop-sdk';
+import { getDriverKeyCert } from "./walletSetup";
+import { DBConnector, LevelDBConnector } from "./dbConnector";
+import { checkIfArraysAreEqual, handlePromise, relayCallback } from "./utils";
+import { registerListenerForEventSubscription } from "./listener";
 
 const DB_NAME: string = "driverdb";
 
 async function subscribeEventHelper(
     call_request: eventsPb.EventSubscription,
-    client: events_grpc_pb.EventSubscribeClient
+    client: events_grpc_pb.EventSubscribeClient,
+    network_name: string,
 ) {
     const newRequestId = call_request.getQuery()!.getRequestId();
     const [requestId, error] = await handlePromise(addEventSubscription(call_request));
@@ -38,6 +40,7 @@ async function subscribeEventHelper(
             // event being subscribed for the first time
 
             // the event listener logic follows here
+            await registerListenerForEventSubscription(call_request, network_name);
             // set the following ack_send message below, only if the event listener logic is successful; else set to an error message
 
             ack_send.setMessage('Event subscription is successful!');
@@ -63,7 +66,8 @@ async function subscribeEventHelper(
 
 async function unsubscribeEventHelper(
     call_request: eventsPb.EventSubscription,
-    client: events_grpc_pb.EventSubscribeClient
+    client: events_grpc_pb.EventSubscribeClient,
+    network_name: string,
 ) {
     const newRequestId = call_request.getQuery()!.getRequestId();
     const [deletedSubscription, error] =
@@ -148,8 +152,8 @@ async function addEventSubscription(
             console.debug(`eventMatcher: ${JSON.stringify(eventMatcher.toObject())} is already present in the database`);
             subscriptions.push(querySerialized);
         } catch (error: any) {
-            let errorString = `${JSON.stringify(error)}`;
-            if (errorString.includes('Error: NotFound:')) {
+            let errorString = error.toString();
+            if (errorString.includes('Error: NotFound:') || errorString.includes('LEVEL_NOT_FOUND')) {
                 // case of read failing due to key not found
                 console.debug(`eventMatcher: ${JSON.stringify(eventMatcher.toObject())} is not present before in the database`);
                 subscriptions = new Array<string>();
@@ -276,9 +280,9 @@ async function lookupEventSubscriptions(
         return returnSubscriptions;
 
     } catch (error: any) {
-        let errorString: string = `${JSON.stringify(error)}`
+        let errorString: string = error.toString();
         await db?.close();
-        if (errorString.includes('Error: NotFound:')) {
+        if (errorString.includes('Error: NotFound:') || errorString.includes('LEVEL_NOT_FOUND')) {
             // case of read failing due to key not found
             returnSubscriptions = new Array<queryPb.Query>();
             console.debug(`returnSubscriptions.length: ${returnSubscriptions.length}`);

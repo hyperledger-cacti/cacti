@@ -84,7 +84,7 @@ class LevelDBConnector implements DBConnector {
             console.debug(`read() got value: ${JSON.stringify(value)}`)
         } catch (error: any) {
             console.error(`failed to read key ${JSON.stringify(key)} with error: ${JSON.stringify(error)}`);
-            throw new Error(error);
+            throw error;
         }
         
         return value;

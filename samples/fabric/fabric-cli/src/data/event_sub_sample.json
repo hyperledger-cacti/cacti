@@ -4,7 +4,7 @@
         "eventClassId": "",
         "transactionLedgerId": "mychannel",
         "transactionContractId": "simplestate",
-        "transactionFunc": "Create"
+        "transactionFunc": "create"
     },
     "event_publication_spec": {
         "ccArgs": [],

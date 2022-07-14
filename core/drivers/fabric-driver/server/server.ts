@@ -14,7 +14,7 @@ import driver_pb_grpc from '@hyperledger-labs/weaver-protos-js/driver/driver_grp
 import datatransfer_grpc_pb from '@hyperledger-labs/weaver-protos-js/relay/datatransfer_grpc_pb';
 import events_grpc_pb from '@hyperledger-labs/weaver-protos-js/relay/events_grpc_pb';
 import state_pb from '@hyperledger-labs/weaver-protos-js/common/state_pb';
-import invoke from './fabric-code';
+import { invoke, getNetworkGateway } from './fabric-code';
 import 'dotenv/config';
 import { walletSetup } from './walletSetup';
 import { subscribeEventHelper, unsubscribeEventHelper, signEventSubscriptionQuery } from "./events"
@@ -183,12 +183,12 @@ server.addService(driver_pb_grpc.DriverCommunicationService, {
         const subscriptionOp: eventsPb.EventSubOperation = call.request.getOperation();
         console.log(`newRequestId: ${newRequestId}`);
         try {
-            if (process.env.MOCK === 'false') {
+            if (process.env.MOCK !== 'true') {
                 getEventSubscriptionRelayClient().then((client) => {
                     if (subscriptionOp == eventsPb.EventSubOperation.SUBSCRIBE) {
-                        subscribeEventHelper(call.request, client);
+                        subscribeEventHelper(call.request, client, process.env.NETWORK_NAME ? process.env.NETWORK_NAME : 'network1');
                     } else if (subscriptionOp == eventsPb.EventSubOperation.UNSUBSCRIBE) {
-                        unsubscribeEventHelper(call.request, client);
+                        unsubscribeEventHelper(call.request, client, process.env.NETWORK_NAME ? process.env.NETWORK_NAME : 'network1');
                     } else {
                         const errorString: string = `Error: subscribe operation ${subscriptionOp.toString()} not supported`;
                         console.error(errorString);
