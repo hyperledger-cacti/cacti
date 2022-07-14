@@ -11,7 +11,9 @@ import { Gateway, Wallets, Network, Contract, BlockListener, ContractListener } 
 import query_pb from '@hyperledger-labs/weaver-protos-js/common/query_pb';
 import events_pb from '@hyperledger-labs/weaver-protos-js/common/events_pb';
 import { lookupEventSubscriptions } from './events';
-import { getNetworkGateway } from './fabric-code';
+import { invoke, getNetworkGateway } from './fabric-code';
+import { getRelayClient, packageViewAndSendToRelay } from './server';
+import { handlePromise } from './utils';
 
 let channelBlockListenerMap = new Map<string, BlockListener>();
 let channelContractListenerMap = new Map<string, ContractListener>();
@@ -25,6 +27,7 @@ function getChannelContractKey(channelId: string, contractId: string) {
  **/
 const initBlockEventListenerForChannel = async (
     network: Network,
+    networkName: string,
     channelId: string,
 ): Promise<void> => {
     const listener: BlockListener = async (event) => {
@@ -51,10 +54,19 @@ const initBlockEventListenerForChannel = async (
                     eventMatcher.setTransactionFunc(chaincodeFunc);
                     const eventSubscriptionQueries = await lookupEventSubscriptions(eventMatcher);
                     // Iterate through the view requests in the matching event subscriptions
-                    eventSubscriptionQueries.forEach((eventSubscriptionQuery: query_pb.Query) => {
+                    eventSubscriptionQueries.forEach(async (eventSubscriptionQuery: query_pb.Query) => {
+                        console.log('Generating view and collecting proof for channel', channelId, 'chaincode', chaincodeId);
                         // Trigger proof collection
-                        // Package view and send to relay
-                        console.log('Generating view and collecting proof for event subscription');
+                        const [result, invokeError] = await handlePromise(
+                            invoke(
+                                eventSubscriptionQuery,
+                                networkName,
+                            ),
+                        );
+                        if (!invokeError) {
+                            // Package view and send to relay
+                            packageViewAndSendToRelay(eventSubscriptionQuery, result, getRelayClient());
+                        }
                     })
                 }
             })
@@ -70,16 +82,12 @@ const initBlockEventListenerForChannel = async (
  **/
 const initContractEventListener = (
     contract: Contract,
+    networkName: string,
     channelId: string,
     chaincodeId: string,
 ): void => {
     const listener: ContractListener = async (event) => {
-        console.log('Received event:', event.eventName);
-        if (event.eventName === 'CreateSimpleState') {
-            if (event.payload)
-                console.log('Event payload:', event.payload.toString());
-        }
-        console.log('Trying to find match for channel', channelId, 'chaincode', chaincodeId, 'event name', event.eventName);
+        console.log('Trying to find match for channel', channelId, 'chaincode', chaincodeId, 'event class', event.eventName);
         // Find all matching event subscriptions stored in the database
         let eventMatcher = new events_pb.EventMatcher();
         eventMatcher.setEventType(events_pb.EventType.LEDGER_STATE);
@@ -89,10 +97,21 @@ const initContractEventListener = (
         eventMatcher.setTransactionFunc('*');
         const eventSubscriptionQueries = await lookupEventSubscriptions(eventMatcher);
         // Iterate through the view requests in the matching event subscriptions
-        eventSubscriptionQueries.forEach((eventSubscriptionQuery: query_pb.Query) => {
+        eventSubscriptionQueries.forEach(async (eventSubscriptionQuery: query_pb.Query) => {
             // Trigger proof collection
             // Package view and send to relay
-            console.log('Generating view and collecting proof for event subscription');
+            console.log('Generating view and collecting proof for event class', event.eventName, 'channel', channelId, 'chaincode', chaincodeId);
+            // Trigger proof collection
+            const [result, invokeError] = await handlePromise(
+                invoke(
+                    eventSubscriptionQuery,
+                    networkName,
+                ),
+            );
+            if (!invokeError) {
+                // Package view and send to relay
+                packageViewAndSendToRelay(eventSubscriptionQuery, result, getRelayClient());
+            }
         })
     };
     contract.addContractListener(listener);
@@ -114,15 +133,6 @@ const registerListenerForEventSubscription = async (
         throw new Error('No event matcher in event subscription');
     }
 
-    /*const queries: Array<query_pb.Query> = await lookupEventSubscriptions(eventMatcher);
-    if (!queries || queries.length === 0) {
-        // If it doesn't exist, record it.
-        const requestId: string = await addEventSubscription(eventSubscription);
-        if (!requestId) {
-            throw new Error('Unable to record event subscription in storage');
-        }
-    }*/
-
     const channelId = eventMatcher.getTransactionLedgerId();
     const gateway = await getNetworkGateway(networkName);
     const network = await gateway.getNetwork(channelId);
@@ -131,7 +141,7 @@ const registerListenerForEventSubscription = async (
         // Check if there is an active block listener for the channel specified in this event subscription.
         if (!channelBlockListenerMap.has(channelId)) {
             // Start a block listener.
-            await initBlockEventListenerForChannel(network, channelId);
+            await initBlockEventListenerForChannel(network, networkName, channelId);
         }
     } else {
         // Check if there is an active contract listener for the contract function specified in this event subscription.
@@ -139,7 +149,7 @@ const registerListenerForEventSubscription = async (
         const contract = network.getContract(contractId);
         if (!channelContractListenerMap.has(getChannelContractKey(channelId, contractId))) {
             // Start a contract listener.
-            initContractEventListener(contract, channelId, contractId);
+            initContractEventListener(contract, networkName, channelId, contractId);
         }
     }
 }

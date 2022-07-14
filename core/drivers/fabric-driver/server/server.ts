@@ -7,8 +7,8 @@
 import fs from 'fs';
 import { Server, ServerCredentials, credentials } from '@grpc/grpc-js';
 import ack_pb from '@hyperledger-labs/weaver-protos-js/common/ack_pb';
-import fabricView from '@hyperledger-labs/weaver-protos-js/fabric/view_data_pb';
 import query_pb from '@hyperledger-labs/weaver-protos-js/common/query_pb';
+import fabricView from '@hyperledger-labs/weaver-protos-js/fabric/view_data_pb';
 import eventsPb, { EventMatcher } from '@hyperledger-labs/weaver-protos-js/common/events_pb';
 import driver_pb_grpc from '@hyperledger-labs/weaver-protos-js/driver/driver_grpc_pb';
 import datatransfer_grpc_pb from '@hyperledger-labs/weaver-protos-js/relay/datatransfer_grpc_pb';
@@ -18,7 +18,6 @@ import { invoke, getNetworkGateway } from './fabric-code';
 import 'dotenv/config';
 import { walletSetup } from './walletSetup';
 import { subscribeEventHelper, unsubscribeEventHelper, signEventSubscriptionQuery } from "./events"
-import { Certificate } from '@fidm/x509';
 import * as path from 'path';
 import { handlePromise, relayCallback } from './utils';
 import { dbConnectionTest, eventSubscriptionTest } from "./tests"
@@ -61,16 +60,30 @@ function mockCommunication(query: query_pb.Query) {
     }, 3000);
 }
 
-// Handles communication with fabric network and sends resulting data to the relay
-const fabricCommunication = async (query: query_pb.Query, networkName: string) => {
-    // Query object from requestor
-    console.log('query', query.getRequestId());
+// Package view and send to relay
+export function packageViewAndSendToRelay(
+    query: query_pb.Query,
+    viewData: fabricView.FabricView,
+    client: datatransfer_grpc_pb.DataTransferClient,
+) {
+    const meta = new state_pb.Meta();
+    meta.setTimestamp(new Date().toISOString());
+    meta.setProofType('Notarization');
+    meta.setSerializationFormat('STRING');
+    meta.setProtocol(state_pb.Meta.Protocol.FABRIC);
+    const view = new state_pb.View();
+    view.setMeta(meta);
+    view.setData(viewData ? viewData.serializeBinary() : Buffer.from(''));
+    const viewPayload = new state_pb.ViewPayload();
+    viewPayload.setView(view);
+    viewPayload.setRequestId(query.getRequestId());
 
-    // Client created using the relay_endpoint in the env.
-    // TODO: need credentials here to ensure the local relay is only communicating with local drivers
-    if (!process.env.RELAY_ENDPOINT) {
-        throw new Error('RELAY_ENDPOINT is not set.');
-    }
+    console.log('Sending state');
+    // Sending the fabric state to the relay.
+    client.sendDriverState(viewPayload, relayCallback);
+}
+
+export function getRelayClient() {
     let client;
     if (process.env.RELAY_TLS === 'true') {
         if (!(process.env.RELAY_TLSCA_CERT_PATH && fs.existsSync(process.env.RELAY_TLSCA_CERT_PATH))) {
@@ -87,15 +100,25 @@ const fabricCommunication = async (query: query_pb.Query, networkName: string) =
             credentials.createInsecure()
         );
     }
-    const cert = Certificate.fromPEM(Buffer.from(query.getCertificate()));
-    const orgName = cert.issuer.organizationName;
+    return client;
+}
+
+// Handles communication with fabric network and sends resulting data to the relay
+const fabricCommunication = async (query: query_pb.Query, networkName: string) => {
+    // Query object from requestor
+    console.log('query', query.getRequestId());
+
+    // Client created using the relay_endpoint in the env.
+    // TODO: need credentials here to ensure the local relay is only communicating with local drivers
+    if (!process.env.RELAY_ENDPOINT) {
+        throw new Error('RELAY_ENDPOINT is not set.');
+    }
+    const client = getRelayClient();
     // Invokes the fabric network
     const [result, invokeError] = await handlePromise(
         invoke(
             query,
             networkName,
-            query.getRequestingNetwork(),
-            query.getRequestingOrg() ? query.getRequestingOrg() : orgName,
         ),
     );
     if (invokeError) {
@@ -109,21 +132,7 @@ const fabricCommunication = async (query: query_pb.Query, networkName: string) =
         // Process response from invoke to send to relay
         console.log('Result of fabric invoke', result);
         console.log('Sending state');
-        const meta = new state_pb.Meta();
-        meta.setTimestamp(new Date().toISOString());
-        meta.setProofType('Notarization');
-        meta.setSerializationFormat('STRING');
-        meta.setProtocol(state_pb.Meta.Protocol.FABRIC);
-        const view = new state_pb.View();
-        view.setMeta(meta);
-        view.setData(result ? result.serializeBinary() : Buffer.from(''));
-        const viewPayload = new state_pb.ViewPayload();
-        viewPayload.setView(view);
-        viewPayload.setRequestId(query.getRequestId());
-
-        console.log('Sending state');
-        // Sending the fabric state to the relay.
-        client.sendDriverState(viewPayload, relayCallback);
+        packageViewAndSendToRelay(query, result, client);
     }
 };
 

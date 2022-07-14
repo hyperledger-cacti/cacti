@@ -76,8 +76,6 @@ const getNetworkGateway = async (networkName: string): Promise<Gateway> => {
 async function invoke(
     query: query_pb.Query,
     networkName: string,
-    requestingNetwork: string,
-    requestingOrg: string,
 ): Promise<view_data.FabricView> {
     console.log('Running invoke on fabric network');
     try {
@@ -100,12 +98,14 @@ async function invoke(
         const identities = query.getPolicyList();
 
         console.log('Message: ', query.getAddress() + query.getNonce(), identities);
+        const cert = Certificate.fromPEM(Buffer.from(query.getCertificate()));
+        const orgName = cert.issuer.organizationName;
         console.log(
             'CC ARGS',
             parsedAddress.ccFunc,
             ...parsedAddress.args,
-            requestingNetwork,
-            requestingOrg,
+            query.getRequestingNetwork(),
+            query.getRequestingOrg() ? query.getRequestingOrg() : orgName,
             query.getCertificate(),
             query.getRequestorSignature(),
             query.getAddress() + query.getNonce(),
