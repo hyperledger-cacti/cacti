@@ -25,21 +25,18 @@ import { ValidatorAuthentication } from "./ValidatorAuthentication";
 const Web3 = require("web3");
 import safeStringify from "fast-safe-stringify";
 
+export type MonitorCallback = (callback: {
+  status: number;
+  blockData?: string;
+  errorDetail?: string;
+}) => void;
+
 /*
  * ServerMonitorPlugin
  * Class definitions of server monitoring
  */
 export class ServerMonitorPlugin {
-  _filterTable: object;
-
-  /*
-   * constructors
-   */
-  constructor() {
-    // Define dependent specific settings
-    // Initialize monitored filter
-    this._filterTable = {};
-  }
+  _filterTable = new Map<string, any>();
 
   /*
    * startMonitor
@@ -47,11 +44,11 @@ export class ServerMonitorPlugin {
    * @param {string} clientId: Client ID from which monitoring start request was made
    * @param {function} cb: A callback function that receives monitoring results at any time.
    */
-  startMonitor(clientId, cb) {
+  startMonitor(clientId: string, cb: MonitorCallback) {
     logger.info("*** START MONITOR ***");
     logger.info("Client ID :" + clientId);
     // Implement handling to receive events from an end-chain and return them in a callback function
-    let filter = this._filterTable[clientId];
+    let filter = this._filterTable.get(clientId);
     if (!filter) {
       logger.info("create new web3 filter and start watching.");
       try {
@@ -63,8 +60,8 @@ export class ServerMonitorPlugin {
         filter = web3.eth.filter("latest");
         // filter should be managed by client ID
         // (You should never watch multiple urls from the same client)
-        this._filterTable[clientId] = filter;
-        filter.watch(function (error, blockHash) {
+        this._filterTable.set(clientId, filter);
+        filter.watch(function (error: any, blockHash: string) {
           if (!error) {
             console.log("##[HL-BC] Notify new block data(D2)");
             const blockData = web3.eth.getBlock(blockHash, true);
@@ -92,7 +89,7 @@ export class ServerMonitorPlugin {
           } else {
             const errObj = {
               status: 504,
-              errorDetail: error,
+              errorDetail: safeStringify(error),
             };
             cb(errObj);
           }
@@ -115,14 +112,14 @@ export class ServerMonitorPlugin {
    * monitoring stop
    * @param {string} clientId: Client ID from which monitoring stop request was made
    */
-  stopMonitor(clientId) {
+  stopMonitor(clientId: string) {
     // Implement a process to end EC monitoring
-    const filter = this._filterTable[clientId];
+    let filter = this._filterTable.get(clientId);
     if (filter) {
       // Stop the filter & Remove it from table
       logger.info("stop watching and remove filter.");
       filter.stopWatching();
-      delete this._filterTable[clientId];
+      this._filterTable.delete(clientId);
     }
   }
 }
