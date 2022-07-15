@@ -5,7 +5,7 @@
 # Exit on error
 set -e
 
-FABRIC_CONTAINER_NAME=${CACTUS_FABRIC_ALL_IN_ONE_CONTAINER_NAME:-cartrade_faio2x_testnet}
+FABRIC_CONTAINER_NAME=${CACTUS_FABRIC_ALL_IN_ONE_CONTAINER_NAME:-asset_trade_faio2x_testnet}
 
 if ! [ "$(docker inspect -f '{{.State.Running}}' ${FABRIC_CONTAINER_NAME})" == "true" ]
 then

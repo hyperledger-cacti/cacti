@@ -35,6 +35,21 @@ RUN apt-get update \
 RUN apt-get update \
     && apt-get -y install curl git mercurial make binutils bison gcc build-essential
 
+# Install Indy-SDK
+# Add Sovrin repository (only bionic release available, but works in recent ubuntu as well)
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CE7709D068DB5E88 \
+    && add-apt-repository "deb https://repo.sovrin.org/sdk/deb bionic stable" \
+    # Install Indy SDK
+    && apt-get update \
+    && apt-get install -y \
+        libindy \
+        libnullpay \
+        libvcx \
+        indy-cli \
+    # Remove auto repo entry for focal release (use one from /etc/apt/sources.list)
+    && rm -f /etc/apt/sources.list.d/sovrin.list* \
+    # Clean up
+    && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/* /tmp/library-scripts/
 
 VOLUME [ "/var/lib/docker" ]
 
@@ -46,7 +61,7 @@ CMD [ "sleep", "infinity" ]
 
 # [Optional] Uncomment this section to install additional OS packages.
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-    && apt-get -y install --no-install-recommends openjdk-11-jdk
+    && apt-get -y install --no-install-recommends openjdk-11-jdk cmake
 
 COPY post-create-commands.sh /home/vscode/bin/
 

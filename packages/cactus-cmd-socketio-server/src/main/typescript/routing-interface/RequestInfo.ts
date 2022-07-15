@@ -12,7 +12,7 @@ class TradeInfo {
   fabricAccountFrom: string = "";
   fabricAccountTo: string = "";
   tradingValue: string = "";
-  carID: string = "";
+  assetID: string = "";
   proofJson: object = {};
 }
 

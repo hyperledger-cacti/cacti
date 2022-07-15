@@ -1,0 +1,6 @@
+# BLP artifacts
+transaction-Info.json
+etc/
+
+# don't commit package-lock
+package-lock.json

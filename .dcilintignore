@@ -8,7 +8,7 @@ tools/docker/besu-all-in-one/supervisord.conf
 docs/source/conf.py
 
 # Cannot be edited due to configuration schema of third party software
-examples/register-indy-data/req_discounted_cartrade.py
+examples/register-indy-data/register-indy-data.py
 
 # Cannot be edited due to configuration schema of third party software
 tools/docker/indy-testnet/Dockerfile
