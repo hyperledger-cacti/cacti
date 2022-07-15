@@ -4,13 +4,11 @@ import { Logger, Checks } from "@hyperledger/cactus-common";
 import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
 import {
   RunTransactionRequestV1,
-  RunTransactionResponse,
-  IrohaBlockProgress,
   IrohaCommand,
   IrohaBaseConfig,
 } from "../generated/openapi/typescript-axios";
 import {
-  IrohaSocketSessionEvent,
+  WatchBlocksV1,
   IrohaQuery,
 } from "../generated/openapi/typescript-axios";
 
@@ -71,68 +69,89 @@ export class IrohaSocketIOEndpoint {
     return requestBody;
   }
 
+  private isLastBlockDetected(irohaResponse: unknown) {
+    const irohaResponseStr = JSON.stringify(irohaResponse).replace(/\\/g, "");
+    const responseMatch = irohaResponseStr.match(/Reason: ({.*?})/);
+    if (!responseMatch || !responseMatch[1]) {
+      this.log.debug(
+        "Could not match error reason in response:",
+        irohaResponseStr,
+      );
+      return false;
+    }
+
+    const responseObject = JSON.parse(responseMatch[1]);
+    if (!responseObject) {
+      this.log.debug(
+        "Could not parse error object in response:",
+        irohaResponseStr,
+      );
+      return false;
+    }
+
+    if (responseObject.reason === 1 && responseObject.errorCode === 3) {
+      this.log.info(`Initial max block height is: ${this.currentBlockHeight}`);
+      return true;
+    } else {
+      throw responseObject;
+    }
+  }
+
   private async getInitialMaxBlockHeight(requestData: any): Promise<void> {
     this.log.debug("Checking max block height...");
     const methodName: string = IrohaQuery.GetBlock;
 
     let args: Array<string | number>;
     let requestBody: RunTransactionRequestV1;
-    let response: RunTransactionResponse;
-    let str_response: string;
 
-    while (true) {
-      args = [this.currentBlockHeight];
+    try {
+      while (true) {
+        args = [this.currentBlockHeight];
 
-      requestBody = this.createRequestBody(requestData, methodName, args);
-      this.log.debug(`Iroha requestBody: ${requestBody}`);
-
-      response = await this.transaction.transact(requestBody);
-      str_response = String(response.transactionReceipt);
-
-      if (str_response.includes("Query response error")) {
-        if (str_response.includes(`"errorCode":3`)) {
-          this.log.info(
-            `Initial max block height is: ${this.currentBlockHeight}`,
-          );
-          break;
-        } else {
-          this.log.error(`Runtime error caught: ${str_response}`);
+        requestBody = this.createRequestBody(requestData, methodName, args);
+        this.log.debug(`Iroha requestBody: ${requestBody}`);
+        const response = await this.transaction.transact(requestBody);
+        if (this.isLastBlockDetected(response.transactionReceipt)) {
           break;
         }
+        this.currentBlockHeight++;
       }
-      this.currentBlockHeight++;
+    } catch (error) {
+      if (!this.isLastBlockDetected(error)) {
+        throw error;
+      }
     }
   }
 
   private async monitoringRoutine(baseConfig: any) {
-    let transactionReceipt: any;
-    let next: IrohaBlockProgress;
+    try {
+      const args = [this.currentBlockHeight];
+      const methodName: string = IrohaQuery.GetBlock;
+      this.log.debug(`Current block: ${this.currentBlockHeight}`);
 
-    const args = [this.currentBlockHeight];
-    const methodName: string = IrohaQuery.GetBlock;
-    this.log.debug(`Current block: ${this.currentBlockHeight}`);
+      const requestBody = this.createRequestBody(baseConfig, methodName, args);
+      const response = await this.transaction.transact(requestBody);
 
-    const requestBody = this.createRequestBody(baseConfig, methodName, args);
-    const response = await this.transaction.transact(requestBody);
-    const str_response = String(response.transactionReceipt);
-
-    if (str_response.includes("Query response error")) {
-      if (str_response.includes(`"errorCode":3`)) {
+      if (this.isLastBlockDetected(response.transactionReceipt)) {
         this.log.debug("Waiting for new blocks...");
       } else {
-        this.log.error(`Runtime error caught: ${str_response}`);
+        this.log.debug(`New block found`);
+        const transactionReceipt = response.transactionReceipt;
+        const next = { transactionReceipt };
+        this.socket.emit(WatchBlocksV1.Next, next);
+        this.currentBlockHeight++;
       }
-    } else {
-      this.log.debug(`New block found`);
-      transactionReceipt = response.transactionReceipt;
-      next = { transactionReceipt };
-      this.socket.emit(IrohaSocketSessionEvent.Next, next);
-      this.currentBlockHeight++;
+    } catch (error) {
+      if (this.isLastBlockDetected(error)) {
+        this.log.debug("Waiting for new blocks...");
+      } else {
+        throw error;
+      }
     }
   }
 
   public async startMonitor(monitorOptions: any): Promise<void> {
-    this.log.debug(`${IrohaSocketSessionEvent.Subscribe} => ${this.socket.id}`);
+    this.log.debug(`${WatchBlocksV1.Subscribe} => ${this.socket.id}`);
     this.log.info(`Starting monitoring blocks...`);
 
     this.monitorModeEnabled = true;

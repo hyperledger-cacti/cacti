@@ -57,7 +57,7 @@ export type ClientApiConfig = {
     in: CordaApiClientOptions;
     out: CordaApiClient;
   };
-  IROHA: {
+  IROHA_1X: {
     in: IrohaApiClientOptions;
     out: IrohaApiClient;
   };
@@ -86,7 +86,7 @@ export function getValidatorApiClient<K extends keyof ClientApiConfig>(
       return new QuorumApiClient(options as QuorumApiClientOptions);
     case "CORDA_4X":
       return new CordaApiClient(options as CordaApiClientOptions);
-    case "IROHA":
+    case "IROHA_1X":
       return new IrohaApiClient(options as IrohaApiClientOptions);
     default:
       // Will not compile if any ClientApiConfig key was not handled by this switch

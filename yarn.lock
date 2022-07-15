@@ -2814,11 +2814,6 @@
     secp256k1 "4.0.2"
     sha3 "2.1.4"
 
-"@improbable-eng/grpc-web-node-http-transport@^0.13.0":
-  version "0.13.0"
-  resolved "https://registry.yarnpkg.com/@improbable-eng/grpc-web-node-http-transport/-/grpc-web-node-http-transport-0.13.0.tgz#a8680c7a8bce4c2b44fe48ba4b7c55b320cf5f54"
-  integrity sha512-Ev8pfMs7FbsBWc4FAY8N4dd8xQRowHFyu2AzEHl++8orrB4KSx6NonMqlsLDPBHLKwlYs7EEI6uxGwpjnYiS2Q==
-
 "@improbable-eng/grpc-web@^0.12.0":
   version "0.12.0"
   resolved "https://registry.yarnpkg.com/@improbable-eng/grpc-web/-/grpc-web-0.12.0.tgz#9b10a7edf2a1d7672f8997e34a60e7b70e49738f"
@@ -13001,13 +12996,12 @@ ipfs-utils@^8.1.2, ipfs-utils@^8.1.4:
     react-native-fetch-api "^2.0.0"
     stream-to-it "^0.2.2"
 
-iroha-helpers-ts@0.9.25-ss:
-  version "0.9.25-ss"
-  resolved "https://registry.yarnpkg.com/iroha-helpers-ts/-/iroha-helpers-ts-0.9.25-ss.tgz#3091e4ee3009ef3ddd13ae9134e55f1b9edd308c"
-  integrity sha512-bbmhgrlf1B/TlWyBNd9EQVJLYfL/mXWohxsVu9jDVV1L21B4uM0CtSdllGsEncKbNBheLjYQ4Z7zgxKDxn6+zA==
+iroha-helpers@1.5.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/iroha-helpers/-/iroha-helpers-1.5.0.tgz#91a50e260853e2f78b643fefe40217fddbe1aa16"
+  integrity sha512-RdZC4V3/94a4+jh+mwBVm/bGb7V4wC1ENCVmnPUjUaSSg4aFgf4jYTfCuS0p2ioVd23UZoClB2qymLRofKoSxw==
   dependencies:
     "@improbable-eng/grpc-web" "^0.12.0"
-    "@improbable-eng/grpc-web-node-http-transport" "^0.13.0"
     babel-preset-minify "^0.5.1"
     buffer "^5.4.0"
     ed25519.js "^1.3.0"
