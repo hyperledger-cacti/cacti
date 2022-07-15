@@ -26,7 +26,7 @@
     "http-errors": "1.6.3",
     "js-yaml": "3.14.1",
     "jsonwebtoken": "8.5.1",
-    "jsrsasign": "10.5.0",
+    "jsrsasign": "10.5.25",
     "log4js": "6.4.1",
     "morgan": "1.10.0",
     "shelljs": "0.8.5",
