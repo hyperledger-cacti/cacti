@@ -23,7 +23,7 @@
  *         3.78*10^14
  *         3.78e14
  */
-export function convNum(value, defaultValue) {
+export function convNum(value: number | string, defaultValue: number | string) {
   let retValue = 0;
   let defValue = 0;
 

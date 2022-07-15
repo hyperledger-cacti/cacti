@@ -83,8 +83,6 @@ function mainTask()
   # Check if the modified files are only for documentation.
   checkOnlyDocumentation
 
-  dumpDiskUsageInfo
-
   # If we are running in a GitHub Actions runner, then free up 30 GB space by
   # removing things we do not need such as the Android SDK and .NET.
   #
@@ -107,6 +105,17 @@ function mainTask()
   npm --version
   java -version
 
+  # Install Indy SDK
+  sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CE7709D068DB5E88 \
+    && sudo add-apt-repository "deb https://repo.sovrin.org/sdk/deb bionic stable" \
+    && sudo apt-get update \
+    && sudo apt-get install -y \
+        libindy \
+        libnullpay \
+        libvcx \
+        indy-cli \
+    && sudo rm -f /etc/apt/sources.list.d/sovrin.list*
+
   # install npm 7 globally - needed because Node v12, v14 default to npm v6
   npm install -g npm@7.19.1
   npm --version
@@ -115,15 +124,27 @@ function mainTask()
   ### COMMON
   cd $PROJECT_ROOT_DIR
 
-  yarn run configure
+  if [ "${DEV_BUILD_DISABLED:-false}" = "true" ]; then
+    echo "$(date +%FT%T%z) [CI] Dev build disabled. Skipping..."
+  else
+    yarn configure
+  fi
 
   yarn tools:validate-bundle-names
 
+  if [ "${JEST_TEST_RUNNER_DISABLED:-false}" = "true" ]; then
+    echo "$(date +%FT%T%z) [CI] Jest test runner disabled. Skipping..."
+  else
+    yarn test:jest:all $JEST_TEST_PATTERN
+  fi
+
   dumpDiskUsageInfo
 
-  yarn test:jest:all
-  
-  yarn test:tap:all -- --bail
+  if [ "${TAPE_TEST_RUNNER_DISABLED:-false}" = "true" ]; then
+    echo "$(date +%FT%T%z) [CI] Tape test runner disabled. Skipping..."
+  else
+    yarn test:tap:all --bail $TAPE_TEST_PATTERN
+  fi
 
   dumpDiskUsageInfo
 
@@ -134,7 +155,11 @@ function mainTask()
   # of providing feedback about failing tests as early as possible we run the
   # dev:backend build first and then the tests which is the fastest way to get
   # to a failed test if there was one.
-  yarn run build
+  if [ "${FULL_BUILD_DISABLED:-false}" = "true" ]; then
+    echo "$(date +%FT%T%z) [CI] Full build disabled. Skipping..."
+  else
+    yarn run build
+  fi
 
   ENDED_AT=`date +%s`
   runtime=$((ENDED_AT-STARTED_AT))

@@ -119,6 +119,12 @@
       "path": "./examples/cactus-example-supply-chain-frontend/tsconfig.json"
     },
     {
+      "path": "./examples/cactus-example-electricity-trade/tsconfig.json"
+    },
+    {
+      "path": "./examples/cactus-example-discounted-asset-trade/tsconfig.json"
+    },
+    {
       "path": "./extensions/cactus-plugin-object-store-ipfs/tsconfig.json"
     },
     {

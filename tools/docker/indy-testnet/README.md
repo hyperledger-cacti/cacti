@@ -26,7 +26,7 @@ docker-compose down
 - Follow build instructions described in `register-indy-data` README.
 - Run container to generate proof only, use force flag to overwrite possible leftovers from previous runs. It will save the proof in `/etc/cactus/validator_socketio_indy/myproof.json`
 ```
-docker run --rm -ti -v/etc/cactus/:/etc/cactus/ --net="host" req_discounted_cartrade --force --proof_only
+docker run --rm -ti -v/etc/cactus/:/etc/cactus/ --net="host" register-indy-data --force --proof_only
 ```
 
 ## Cleanup

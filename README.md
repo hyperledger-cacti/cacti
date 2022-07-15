@@ -41,13 +41,13 @@ As blockchain technology proliferates, blockchain integration will become an inc
 
 Once the last command has finished executing, open link printed on the console with a web browser of your choice
 
-### Discounted Car Trade Example
+### Discounted Asset Trade Example
 
-- The guidance is [here](./examples/discounted-cartrade/README.md).
+- The guidance is [here](./examples/cactus-example-discounted-asset-trade/README.md).
 
 ### Electricity Trade Example
 
-- The guidance is [here](./examples/electricity-trade/README.md).
+- The guidance is [here](./examples/cactus-example-electricity-trade/README.md).
 
 
 ## Documentation
@@ -62,8 +62,8 @@ Once the last command has finished executing, open link printed on the console w
 
 ## Inclusive Language Statement
 
-These guiding principles are very important to the maintainers and therefore 
-we respectfully ask all contributors to abide by them as well: 
+These guiding principles are very important to the maintainers and therefore
+we respectfully ask all contributors to abide by them as well:
 
 - Consider that users who will read the docs are from different backgrounds and
 cultures and that they have different preferences.
@@ -73,9 +73,9 @@ deny list" to "white list and black list".
 writing inclusive documentation might not look like a huge improvement, it's a
 first step in the right direction.
 - We suggest to refer to
-[Microsoft bias free writing guidelines](https://docs.microsoft.com/en-us/style-guide/bias-free-communication) 
-and 
-[Google inclusive doc writing guide](https://developers.google.com/style/inclusive-documentation) 
+[Microsoft bias free writing guidelines](https://docs.microsoft.com/en-us/style-guide/bias-free-communication)
+and
+[Google inclusive doc writing guide](https://developers.google.com/style/inclusive-documentation)
 as starting points.
 
 ## Roadmap
