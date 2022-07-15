@@ -1,17 +1,5 @@
-import * as grpc from "grpc";
-import { CommandService_v1Client as CommandService } from "iroha-helpers/lib/proto/endpoint_grpc_pb";
-import { QueryService_v1Client as QueryService } from "iroha-helpers/lib/proto/endpoint_grpc_pb";
 import { Transaction } from "iroha-helpers/lib/proto/transaction_pb";
-import commands from "iroha-helpers/lib/commands/index";
-import queries from "iroha-helpers/lib/queries";
 import { TxBuilder } from "iroha-helpers/lib/chain";
-import {
-  GrantablePermission,
-  GrantablePermissionMap,
-} from "iroha-helpers/lib/proto/primitive_pb";
-
-import { Server } from "http";
-import { Server as SecureServer } from "https";
 import type { Server as SocketIoServer } from "socket.io";
 import type { Socket as SocketIoSocket } from "socket.io";
 import type { Express } from "express";
@@ -44,11 +32,13 @@ import {
 import { RuntimeError } from "run-time-error";
 
 import {
+  IrohaCommand,
   RunTransactionRequestV1,
   RunTransactionSignedRequestV1,
   GenerateTransactionRequestV1,
   RunTransactionResponse,
-  IrohaSocketSessionEvent,
+  WatchBlocksV1,
+  IrohaSocketIOTransactV1,
 } from "./generated/openapi/typescript-axios";
 
 import { RunTransactionEndpoint } from "./web-services/run-transaction-endpoint";
@@ -65,7 +55,7 @@ export const E_KEYCHAIN_NOT_FOUND = "cactus.connector.iroha.keychain_not_found";
 export interface IPluginLedgerConnectorIrohaOptions
   extends ICactusPluginOptions {
   rpcToriiPortHost: string; //http host:port
-  rpcApiWsHost: string;
+  rpcApiWsHost?: string;
   pluginRegistry: PluginRegistry;
   prometheusExporter?: PrometheusExporter;
   logLevel?: LogLevelDesc;
@@ -87,11 +77,8 @@ export class PluginLedgerConnectorIroha
   private readonly log: Logger;
 
   private endpoints: IWebServiceEndpoint[] | undefined;
-  private readonly pluginRegistry: PluginRegistry;
-  private httpServer: Server | SecureServer | null = null;
 
   public static readonly CLASS_NAME = "PluginLedgerConnectorIroha";
-  private socketSessionDictionary: { [char: string]: IrohaSocketIOEndpoint };
 
   public get className(): string {
     return PluginLedgerConnectorIroha.CLASS_NAME;
@@ -100,7 +87,6 @@ export class PluginLedgerConnectorIroha
   constructor(public readonly options: IPluginLedgerConnectorIrohaOptions) {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
-    Checks.truthy(options.rpcApiWsHost, `${fnTag} options.rpcApiWsHost`);
     Checks.truthy(
       options.rpcToriiPortHost,
       `${fnTag} options.rpcToriiPortHost`,
@@ -119,7 +105,6 @@ export class PluginLedgerConnectorIroha
       this.prometheusExporter,
       `${fnTag} options.prometheusExporter`,
     );
-    this.socketSessionDictionary = {};
     this.prometheusExporter.startMetricsCollection();
   }
 
@@ -155,61 +140,61 @@ export class PluginLedgerConnectorIroha
 
   async registerWebServices(
     app: Express,
-    wsApi: SocketIoServer,
+    wsApi?: SocketIoServer,
   ): Promise<IWebServiceEndpoint[]> {
     const { logLevel } = this.options;
     const webServices = await this.getOrCreateWebServices();
     await Promise.all(webServices.map((ws) => ws.registerExpress(app)));
 
-    wsApi.on("connection", (socket: SocketIoSocket) => {
-      let irohaSocketEndpoint: IrohaSocketIOEndpoint;
-
-      if (socket.id in this.socketSessionDictionary) {
-        this.log.debug(`Connected to existing socket session ID=${socket.id}`);
-        irohaSocketEndpoint = this.socketSessionDictionary[socket.id];
-      } else {
+    if (wsApi) {
+      wsApi.on("connection", (socket: SocketIoSocket) => {
         this.log.debug(`New Socket connected. ID=${socket.id}`);
-        irohaSocketEndpoint = new IrohaSocketIOEndpoint({ socket, logLevel });
-        this.socketSessionDictionary[socket.id] = irohaSocketEndpoint;
-      }
+        const irohaSocketEndpoint = new IrohaSocketIOEndpoint({
+          socket,
+          logLevel,
+        });
+        let monitorFlag: boolean;
 
-      let monitorFlag: boolean;
+        socket.on(WatchBlocksV1.Subscribe, (monitorOptions: any) => {
+          this.log.debug(`Caught event: Subscribe`);
+          monitorFlag = true;
+          irohaSocketEndpoint.startMonitor(monitorOptions);
+        });
 
-      socket.on(IrohaSocketSessionEvent.Subscribe, (monitorOptions: any) => {
-        this.log.debug(`Caught event: Subscribe`);
-        monitorFlag = true;
-        irohaSocketEndpoint.startMonitor(monitorOptions);
-      });
-
-      socket.on(IrohaSocketSessionEvent.Unsubscribe, () => {
-        this.log.debug(`Caught event: Unsubscribe`);
-        irohaSocketEndpoint.stopMonitor();
-      });
-
-      socket.on(
-        IrohaSocketSessionEvent.SendAsyncRequest,
-        (asyncRequestData: any) => {
-          this.log.debug(`Caught event: SendAsyncRequest`);
-          irohaSocketEndpoint.sendRequest(asyncRequestData, true);
-        },
-      );
-
-      socket.on(
-        IrohaSocketSessionEvent.SendSyncRequest,
-        (syncRequestData: any) => {
-          this.log.debug(`Caught event: SendSyncRequest`);
-          irohaSocketEndpoint.sendRequest(syncRequestData, false);
-        },
-      );
-
-      socket.on("disconnect", async (reason: string) => {
-        this.log.info(`Session: ${socket.id} disconnected. Reason: ${reason}`);
-        if (monitorFlag) {
+        socket.on(WatchBlocksV1.Unsubscribe, () => {
+          this.log.debug(`Caught event: Unsubscribe`);
           irohaSocketEndpoint.stopMonitor();
-          monitorFlag = false;
-        }
+        });
+
+        socket.on(
+          IrohaSocketIOTransactV1.SendAsyncRequest,
+          (asyncRequestData: any) => {
+            this.log.debug(`Caught event: SendAsyncRequest`);
+            socket.disconnect(true);
+            irohaSocketEndpoint.sendRequest(asyncRequestData, true);
+          },
+        );
+
+        socket.on(
+          IrohaSocketIOTransactV1.SendSyncRequest,
+          (syncRequestData: any) => {
+            this.log.debug(`Caught event: SendSyncRequest`);
+            irohaSocketEndpoint.sendRequest(syncRequestData, false);
+          },
+        );
+
+        socket.on("disconnect", async (reason: string) => {
+          this.log.info(
+            `Session: ${socket.id} disconnected. Reason: ${reason}`,
+          );
+          if (monitorFlag) {
+            irohaSocketEndpoint.stopMonitor();
+            monitorFlag = false;
+          }
+        });
       });
-    });
+    }
+
     return webServices;
   }
 
@@ -282,16 +267,18 @@ export class PluginLedgerConnectorIroha
    * Run Iroha transaction based on already signed transaction received from the client.
    *
    * @param req RunTransactionSignedRequestV1
-   * @param commandService Iroha SDK `CommandService_v1Client` instance
    * @returns `Promise<RunTransactionResponse>`
    */
   private async transactSigned(
     req: RunTransactionSignedRequestV1,
-    commandService: CommandService,
   ): Promise<RunTransactionResponse> {
     if (!req.baseConfig || !req.baseConfig.timeoutLimit) {
       throw new RuntimeError("baseConfig.timeoutLimit is undefined");
     }
+
+    const { commandService } = IrohaTransactionWrapper.getIrohaServices(
+      req.baseConfig,
+    );
 
     try {
       const transactionBinary = Uint8Array.from(
@@ -325,30 +312,13 @@ export class PluginLedgerConnectorIroha
   public async transact(
     req: RunTransactionSignedRequestV1 | RunTransactionRequestV1,
   ): Promise<RunTransactionResponse> {
-    const { baseConfig } = req;
-    if (!baseConfig || !baseConfig.irohaHost || !baseConfig.irohaPort) {
-      throw new RuntimeError("Missing Iroha URL information.");
-    }
-    const irohaHostPort = `${baseConfig.irohaHost}:${baseConfig.irohaPort}`;
-
-    let grpcCredentials;
-    if (baseConfig.tls) {
-      throw new RuntimeError("TLS option is not supported");
-    } else {
-      grpcCredentials = grpc.credentials.createInsecure();
-    }
-
-    const commandService = new CommandService(
-      irohaHostPort,
-      //TODO:do something in the production environment
-      grpcCredentials,
-    );
-    const queryService = new QueryService(irohaHostPort, grpcCredentials);
-
     if ("signedTransaction" in req) {
-      return this.transactSigned(req, commandService);
+      return this.transactSigned(req);
     } else {
-      return this.transactRequest(req, commandService, queryService);
+      const transaction = new IrohaTransactionWrapper({
+        logLevel: this.options.logLevel,
+      });
+      return await transaction.transact(req);
     }
   }
 

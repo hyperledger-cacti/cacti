@@ -950,14 +950,9 @@ export enum IrohaQuery {
  * @enum {string}
  */
 
-export enum IrohaSocketSessionEvent {
-    Subscribe = 'org.hyperledger.cactus.api.async.iroha.SocketSession.Subscribe',
-    Next = 'org.hyperledger.cactus.api.async.iroha.SocketSession.Next',
-    Unsubscribe = 'org.hyperledger.cactus.api.async.iroha.SocketSession.Unsubscribe',
-    Error = 'org.hyperledger.cactus.api.async.iroha.SocketSession.Error',
-    Complete = 'org.hyperledger.cactus.api.async.iroha.SocketSession.Complete',
-    SendAsyncRequest = 'org.hyperledger.cactus.api.async.iroha.SocketSession.SendAsyncRequest',
-    SendSyncRequest = 'org.hyperledger.cactus.api.async.iroha.SocketSession.SendSyncRequest'
+export enum IrohaSocketIOTransactV1 {
+    SendAsyncRequest = 'org.hyperledger.cactus.api.async.iroha.IrohaSocketIOTransactV1.SendAsyncRequest',
+    SendSyncRequest = 'org.hyperledger.cactus.api.async.iroha.IrohaSocketIOTransactV1.SendSyncRequest'
 }
 
 /**
@@ -1187,6 +1182,20 @@ export interface TransferAssetRequestParameters {
      */
     amount: number;
 }
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export enum WatchBlocksV1 {
+    Subscribe = 'org.hyperledger.cactus.api.async.iroha.WatchBlocksV1.Subscribe',
+    Next = 'org.hyperledger.cactus.api.async.iroha.WatchBlocksV1.Next',
+    Unsubscribe = 'org.hyperledger.cactus.api.async.iroha.WatchBlocksV1.Unsubscribe',
+    Error = 'org.hyperledger.cactus.api.async.iroha.WatchBlocksV1.Error',
+    Complete = 'org.hyperledger.cactus.api.async.iroha.WatchBlocksV1.Complete'
+}
+
 
 /**
  * DefaultApi - axios parameter creator

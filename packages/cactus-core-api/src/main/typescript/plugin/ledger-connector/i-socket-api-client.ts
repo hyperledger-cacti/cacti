@@ -8,17 +8,17 @@ import type { Observable } from "rxjs";
  */
 export interface ISocketApiClient<BlockType> {
   sendAsyncRequest?(
-    args: any,
-    method: Record<string, unknown>,
-    baseConfig?: any,
     contract?: Record<string, unknown>,
+    method?: Record<string, unknown>,
+    args?: any,
+    baseConfig?: any,
   ): void;
 
   sendSyncRequest?(
-    args: any,
-    method: Record<string, unknown>,
-    baseConfig?: any,
     contract?: Record<string, unknown>,
+    method?: Record<string, unknown>,
+    args?: any,
+    baseConfig?: any,
   ): Promise<any>;
 
   watchBlocksV1?(

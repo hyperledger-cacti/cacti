@@ -293,6 +293,8 @@ export class IrohaTestLedger implements ITestLedger {
         {
           ExposedPorts: {
             [`${this.rpcToriiPort}/tcp`]: {}, // Iroha RPC - Torii
+            [`${this.toriiTlsPort}/tcp`]: {}, // Iroha TLS RPC
+            [`${this.rpcApiWsPort}/tcp`]: {}, // Iroha RPC WS
           },
           Env: this.envVars,
           Healthcheck: {

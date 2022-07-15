@@ -1,10 +1,11 @@
-import { Logger } from "@hyperledger/cactus-common";
+import { Checks, Logger } from "@hyperledger/cactus-common";
 import {
   LoggerProvider,
   LogLevelDesc,
   Http405NotAllowedError,
 } from "@hyperledger/cactus-common";
 import {
+  IrohaBaseConfig,
   IrohaCommand,
   IrohaQuery,
   RunTransactionRequestV1,
@@ -17,13 +18,13 @@ import * as grpc from "grpc";
 import {
   GrantablePermission,
   GrantablePermissionMap,
-} from "iroha-helpers-ts/lib/proto/primitive_pb";
+} from "iroha-helpers/lib/proto/primitive_pb";
 
-import { CommandService_v1Client as CommandService } from "iroha-helpers-ts/lib/proto/endpoint_grpc_pb";
-import { QueryService_v1Client as QueryService } from "iroha-helpers-ts/lib/proto/endpoint_grpc_pb";
+import { CommandService_v1Client as CommandService } from "iroha-helpers/lib/proto/endpoint_grpc_pb";
+import { QueryService_v1Client as QueryService } from "iroha-helpers/lib/proto/endpoint_grpc_pb";
 
-import commands from "iroha-helpers-ts/lib/commands/index";
-import queries from "iroha-helpers-ts/lib/queries";
+import commands from "iroha-helpers/lib/commands/index";
+import queries from "iroha-helpers/lib/queries";
 
 export interface IIrohaTransactionWrapperOptions {
   logLevel?: LogLevelDesc;
@@ -43,23 +44,20 @@ export class IrohaTransactionWrapper {
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public async transact(
-    req: RunTransactionRequestV1,
-  ): Promise<RunTransactionResponse> {
-    const { baseConfig } = req;
-    if (
-      !baseConfig ||
-      !baseConfig.privKey ||
-      !baseConfig.creatorAccountId ||
-      !baseConfig.irohaHost ||
-      !baseConfig.irohaPort ||
-      !baseConfig.quorum ||
-      !baseConfig.timeoutLimit
-    ) {
-      this.log.debug(
-        "Certain field within the Iroha basic configuration is missing!",
-      );
-      throw new RuntimeError("Some fields in baseConfig are undefined");
+  /**
+   * Create instances of Iroha SDK CommandService and QueryService from input base config.
+   *
+   * @param baseConfig iroha configuration from request, must contain Iroha URL information.
+   * @returns {commandService, queryService}
+   */
+  public static getIrohaServices(
+    baseConfig: IrohaBaseConfig,
+  ): {
+    commandService: CommandService;
+    queryService: QueryService;
+  } {
+    if (!baseConfig || !baseConfig.irohaHost || !baseConfig.irohaPort) {
+      throw new RuntimeError("Missing Iroha URL information.");
     }
     const irohaHostPort = `${baseConfig.irohaHost}:${baseConfig.irohaPort}`;
 
@@ -69,12 +67,40 @@ export class IrohaTransactionWrapper {
     } else {
       grpcCredentials = grpc.credentials.createInsecure();
     }
+
     const commandService = new CommandService(
       irohaHostPort,
       //TODO:do something in the production environment
       grpcCredentials,
     );
     const queryService = new QueryService(irohaHostPort, grpcCredentials);
+
+    return { commandService, queryService };
+  }
+
+  public async transact(
+    req: RunTransactionRequestV1,
+  ): Promise<RunTransactionResponse> {
+    const { baseConfig } = req;
+    Checks.truthy(baseConfig, "baseConfig");
+    Checks.truthy(baseConfig.privKey, "privKey in baseConfig");
+    Checks.truthy(
+      baseConfig.creatorAccountId,
+      "creatorAccountId in baseConfig",
+    );
+    Checks.truthy(baseConfig.quorum, "quorum in baseConfig");
+    Checks.truthy(baseConfig.timeoutLimit, "timeoutLimit in baseConfig");
+
+    if (!baseConfig.privKey || !baseConfig.timeoutLimit) {
+      // narrow the types
+      throw new Error("Should never happen - Checks should catch this first");
+    }
+
+    const {
+      commandService,
+      queryService,
+    } = IrohaTransactionWrapper.getIrohaServices(baseConfig);
+
     const commandOptions = {
       privateKeys: baseConfig.privKey, //need an array of keys for command
       creatorAccountId: baseConfig.creatorAccountId,
@@ -82,6 +108,7 @@ export class IrohaTransactionWrapper {
       commandService: commandService,
       timeoutLimit: baseConfig.timeoutLimit,
     };
+
     const queryOptions = {
       privateKey: baseConfig.privKey[0], //only need 1 key for query
       creatorAccountId: baseConfig.creatorAccountId as string,
@@ -90,402 +117,644 @@ export class IrohaTransactionWrapper {
     };
 
     switch (req.commandName) {
-      case IrohaCommand.CreateAccount: {
-        try {
-          const response = await commands.createAccount(commandOptions, {
-            accountName: req.params[0],
-            domainId: req.params[1],
-            publicKey: req.params[2],
-          });
-          return { transactionReceipt: response };
-        } catch (err: any) {
-          throw new RuntimeError(err);
-        }
-      }
-      case IrohaCommand.SetAccountDetail: {
-        try {
-          const response = await commands.setAccountDetail(commandOptions, {
-            accountId: req.params[0],
-            key: req.params[1],
-            value: req.params[2],
-          });
-          return { transactionReceipt: response };
-        } catch (err: any) {
-          throw new RuntimeError(err);
-        }
-      }
-      case IrohaCommand.CompareAndSetAccountDetail: {
-        try {
-          const response = await commands.compareAndSetAccountDetail(
-            commandOptions,
-            {
-              accountId: req.params[0],
-              key: req.params[1],
-              value: req.params[2],
-              oldValue: req.params[3],
-            },
-          );
-          return { transactionReceipt: response };
-        } catch (err: any) {
-          throw new RuntimeError(err);
-        }
-      }
-      case IrohaCommand.CreateAsset: {
-        try {
-          const response = await commands // (coolcoin#test; precision:3)
-            .createAsset(commandOptions, {
-              assetName: req.params[0],
-              domainId: req.params[1],
-              precision: req.params[2],
-            });
-          return { transactionReceipt: response };
-        } catch (err: any) {
-          throw new RuntimeError(err);
-        }
-      }
-      case IrohaCommand.CreateDomain: {
-        try {
-          const response = await commands.createDomain(commandOptions, {
-            domainId: req.params[0],
-            defaultRole: req.params[1],
-          });
-          return { transactionReceipt: response };
-        } catch (err: any) {
-          throw new RuntimeError(err);
-        }
-      }
-      case IrohaCommand.SetAccountQuorum: {
-        try {
-          const response = await commands.setAccountQuorum(commandOptions, {
-            accountId: req.params[0],
-            quorum: req.params[1],
-          });
-          return { transactionReceipt: response };
-        } catch (err: any) {
-          throw new RuntimeError(err);
-        }
-      }
       case IrohaCommand.AddAssetQuantity: {
         try {
-          const response = await commands.addAssetQuantity(commandOptions, {
-            assetId: req.params[0],
-            amount: req.params[1],
-          });
-          return { transactionReceipt: response };
-        } catch (err: any) {
-          throw new RuntimeError(err);
-        }
-      }
-      case IrohaCommand.SubtractAssetQuantity: {
-        try {
-          const response = await commands.subtractAssetQuantity(
-            commandOptions,
-            {
+          let params;
+          if (Array.isArray(req.params)) {
+            params = {
               assetId: req.params[0],
               amount: req.params[1],
-            },
+            };
+          } else {
+            params = req.params;
+          }
+          const response = await commands.addAssetQuantity(
+            commandOptions,
+            params,
           );
           return { transactionReceipt: response };
-        } catch (err: any) {
-          throw new RuntimeError(err);
+        } catch (err) {
+          throw new RuntimeError(err as any);
         }
       }
-      case IrohaCommand.TransferAsset: {
+      case IrohaCommand.AddPeer: {
         try {
-          const response = await commands.transferAsset(commandOptions, {
-            srcAccountId: req.params[0],
-            destAccountId: req.params[1],
-            assetId: req.params[2],
-            description: req.params[3],
-            amount: req.params[4],
-          });
+          let params;
+          if (Array.isArray(req.params)) {
+            params = {
+              address: req.params[0],
+              peerKey: req.params[1],
+            };
+          } else {
+            params = req.params;
+          }
+          const response = await commands.addPeer(commandOptions, params);
           return { transactionReceipt: response };
-        } catch (err: any) {
-          throw new RuntimeError(err);
-        }
-      }
-      case IrohaQuery.GetSignatories: {
-        try {
-          const queryRes = await queries.getSignatories(queryOptions, {
-            accountId: req.params[0],
-          });
-          return { transactionReceipt: queryRes };
-        } catch (err: any) {
-          throw new RuntimeError(err);
-        }
-      }
-      case IrohaQuery.GetAccount: {
-        try {
-          const queryRes = await queries.getAccount(queryOptions, {
-            accountId: req.params[0],
-          });
-          return { transactionReceipt: queryRes };
-        } catch (err: any) {
-          throw new RuntimeError(err);
-        }
-      }
-      case IrohaQuery.GetAccountDetail: {
-        try {
-          const queryRes = await queries.getAccountDetail(queryOptions, {
-            accountId: req.params[0],
-            key: req.params[1],
-            writer: req.params[2],
-            pageSize: req.params[3],
-            paginationKey: req.params[4],
-            paginationWriter: req.params[5],
-          });
-          return { transactionReceipt: queryRes };
-        } catch (err: any) {
-          throw new RuntimeError(err);
-        }
-      }
-      case IrohaQuery.GetAssetInfo: {
-        try {
-          const queryRes = await queries.getAssetInfo(queryOptions, {
-            assetId: req.params[0],
-          });
-          return { transactionReceipt: queryRes };
-        } catch (err: any) {
-          throw new RuntimeError(err);
-        }
-      }
-      case IrohaQuery.GetAccountAssets: {
-        try {
-          const queryRes = await queries.getAccountAssets(queryOptions, {
-            accountId: req.params[0],
-            pageSize: req.params[1],
-            firstAssetId: req.params[2],
-          });
-          return { transactionReceipt: queryRes };
-        } catch (err: any) {
-          throw new RuntimeError(err);
+        } catch (err) {
+          throw new RuntimeError(err as any);
         }
       }
       case IrohaCommand.AddSignatory: {
         try {
-          const response = await commands.addSignatory(commandOptions, {
-            accountId: req.params[0],
-            publicKey: req.params[1],
-          });
+          let params;
+          if (Array.isArray(req.params)) {
+            params = {
+              accountId: req.params[0],
+              publicKey: req.params[1],
+            };
+          } else {
+            params = req.params;
+          }
+          const response = await commands.addSignatory(commandOptions, params);
           return { transactionReceipt: response };
-        } catch (err: any) {
-          throw new RuntimeError(err);
+        } catch (err) {
+          throw new RuntimeError(err as any);
+        }
+      }
+      case IrohaCommand.AppendRole: {
+        try {
+          let params;
+          if (Array.isArray(req.params)) {
+            params = {
+              accountId: req.params[0],
+              roleName: req.params[1],
+            };
+          } else {
+            params = req.params;
+          }
+          const response = await commands.appendRole(commandOptions, params);
+          return { transactionReceipt: response };
+        } catch (err) {
+          throw new RuntimeError(err as any);
+        }
+      }
+      case IrohaCommand.CallEngine: {
+        try {
+          let params: any;
+          if (Array.isArray(req.params)) {
+            params = {
+              type: req.params[0],
+              caller: req.params[1],
+              callee: req.params[2],
+              input: req.params[3],
+            };
+          } else {
+            params = req.params;
+          }
+          const response = await commands.callEngine(commandOptions, params);
+          return { transactionReceipt: response };
+        } catch (err) {
+          throw new RuntimeError(err as any);
+        }
+      }
+      case IrohaCommand.CreateAccount: {
+        try {
+          let params;
+          if (Array.isArray(req.params)) {
+            params = {
+              accountName: req.params[0],
+              domainId: req.params[1],
+              publicKey: req.params[2],
+            };
+          } else {
+            params = req.params;
+          }
+          const response = await commands.createAccount(commandOptions, params);
+          return { transactionReceipt: response };
+        } catch (err) {
+          throw new RuntimeError(err as any);
+        }
+      }
+      case IrohaCommand.CreateAsset: {
+        try {
+          let params;
+          if (Array.isArray(req.params)) {
+            params = {
+              assetName: req.params[0],
+              domainId: req.params[1],
+              precision: req.params[2],
+            };
+          } else {
+            params = req.params;
+          }
+          const response = await commands.createAsset(commandOptions, params);
+          return { transactionReceipt: response };
+        } catch (err) {
+          throw new RuntimeError(err as any);
+        }
+      }
+      case IrohaCommand.CreateDomain: {
+        try {
+          let params;
+          if (Array.isArray(req.params)) {
+            params = {
+              domainId: req.params[0],
+              defaultRole: req.params[1],
+            };
+            params.domainId = req.params[0];
+            params.defaultRole = req.params[1];
+          } else {
+            params = req.params;
+          }
+          const response = await commands.createDomain(commandOptions, params);
+          return { transactionReceipt: response };
+        } catch (err) {
+          throw new RuntimeError(err as any);
+        }
+      }
+      case IrohaCommand.CreateRole: {
+        try {
+          let params;
+          if (Array.isArray(req.params)) {
+            params = {
+              roleName: req.params[0],
+              permissionsList: req.params[1],
+            };
+          } else {
+            params = req.params;
+          }
+          const response = await commands.createRole(commandOptions, params);
+          return { transactionReceipt: response };
+        } catch (err) {
+          throw new RuntimeError(err as any);
+        }
+      }
+      case IrohaCommand.DetachRole: {
+        try {
+          let params;
+          if (Array.isArray(req.params)) {
+            params = {
+              accountId: req.params[0],
+              roleName: req.params[1],
+            };
+          } else {
+            params = req.params;
+          }
+          const response = await commands.detachRole(commandOptions, params);
+          return { transactionReceipt: response };
+        } catch (err) {
+          throw new RuntimeError(err as any);
+        }
+      }
+      case IrohaCommand.GrantPermission: {
+        try {
+          let params;
+          type permission = keyof GrantablePermissionMap;
+          if (Array.isArray(req.params)) {
+            params = {
+              accountId: req.params[0],
+              permission: GrantablePermission[req.params[1] as permission],
+            };
+          } else {
+            params = req.params;
+            if ("permission" in params) {
+              params["permission"] =
+                GrantablePermission[params["permission"] as permission];
+            }
+          }
+          const response = await commands.grantPermission(
+            commandOptions,
+            params,
+          );
+          return { transactionReceipt: response };
+        } catch (err) {
+          throw new RuntimeError(err as any);
+        }
+      }
+      case IrohaCommand.RemovePeer: {
+        try {
+          let params: any;
+          if (Array.isArray(req.params)) {
+            params = {
+              publicKey: req.params[0],
+            };
+          } else {
+            params = req.params;
+          }
+          const response = await commands.removePeer(commandOptions, params);
+          return { transactionReceipt: response };
+        } catch (err) {
+          throw new RuntimeError(err as any);
         }
       }
       case IrohaCommand.RemoveSignatory: {
         try {
-          const response = await commands.removeSignatory(commandOptions, {
-            accountId: req.params[0],
-            publicKey: req.params[1],
-          });
+          let params;
+          if (Array.isArray(req.params)) {
+            params = {
+              accountId: req.params[0],
+              publicKey: req.params[1],
+            };
+          } else {
+            params = req.params;
+          }
+          const response = await commands.removeSignatory(
+            commandOptions,
+            params,
+          );
           return { transactionReceipt: response };
-        } catch (err: any) {
-          throw new RuntimeError(err);
+        } catch (err) {
+          throw new RuntimeError(err as any);
+        }
+      }
+      case IrohaCommand.RevokePermission: {
+        try {
+          let params;
+          type permission = keyof GrantablePermissionMap;
+          if (Array.isArray(req.params)) {
+            params = {
+              accountId: req.params[0],
+              permission: GrantablePermission[req.params[1] as permission],
+            };
+          } else {
+            params = req.params;
+            if ("permission" in params) {
+              params["permission"] =
+                GrantablePermission[params["permission"] as permission];
+            }
+          }
+          const response = await commands.revokePermission(
+            commandOptions,
+            params,
+          );
+          return { transactionReceipt: response };
+        } catch (err) {
+          throw new RuntimeError(err as any);
+        }
+      }
+      case IrohaCommand.SetAccountDetail: {
+        try {
+          let params;
+          if (Array.isArray(req.params)) {
+            params = {
+              accountId: req.params[0],
+              key: req.params[1],
+              value: req.params[2],
+            };
+          } else {
+            params = req.params;
+          }
+          const response = await commands.setAccountDetail(
+            commandOptions,
+            params,
+          );
+          return { transactionReceipt: response };
+        } catch (err) {
+          throw new RuntimeError(err as any);
+        }
+      }
+      case IrohaCommand.SetAccountQuorum: {
+        try {
+          let params;
+          if (Array.isArray(req.params)) {
+            params = {
+              accountId: req.params[0],
+              quorum: req.params[1],
+            };
+          } else {
+            params = req.params;
+          }
+          const response = await commands.setAccountQuorum(
+            commandOptions,
+            params,
+          );
+          return { transactionReceipt: response };
+        } catch (err) {
+          throw new RuntimeError(err as any);
+        }
+      }
+      case IrohaCommand.SubtractAssetQuantity: {
+        try {
+          let params;
+          if (Array.isArray(req.params)) {
+            params = {
+              assetId: req.params[0],
+              amount: req.params[1],
+            };
+          } else {
+            params = req.params;
+          }
+          const response = await commands.subtractAssetQuantity(
+            commandOptions,
+            params,
+          );
+          return { transactionReceipt: response };
+        } catch (err) {
+          throw new RuntimeError(err as any);
+        }
+      }
+      case IrohaCommand.TransferAsset: {
+        try {
+          let params;
+          if (Array.isArray(req.params)) {
+            params = {
+              srcAccountId: req.params[0],
+              destAccountId: req.params[1],
+              assetId: req.params[2],
+              description: req.params[3],
+              amount: req.params[4],
+            };
+          } else {
+            params = req.params;
+          }
+          const response = await commands.transferAsset(commandOptions, params);
+          return { transactionReceipt: response };
+        } catch (err) {
+          throw new RuntimeError(err as any);
+        }
+      }
+      case IrohaCommand.CompareAndSetAccountDetail: {
+        try {
+          let params: any;
+          if (Array.isArray(req.params)) {
+            params = {
+              accountId: req.params[0],
+              key: req.params[1],
+              value: req.params[2],
+              oldValue: req.params[3],
+              checkEmpty: req.params[4],
+            };
+          } else {
+            params = req.params;
+          }
+          const response = await commands.compareAndSetAccountDetail(
+            commandOptions,
+            params,
+          );
+          return { transactionReceipt: response };
+        } catch (err) {
+          throw new RuntimeError(err as any);
+        }
+      }
+      case IrohaCommand.SetSettingValue: {
+        throw new Http405NotAllowedError("SetSettingValue is not supported.");
+      }
+      case IrohaQuery.GetEngineReceipts: {
+        try {
+          let params;
+          if (Array.isArray(req.params)) {
+            params = {
+              txHash: req.params[0],
+            };
+          } else {
+            params = req.params;
+          }
+          const response = await queries.getEngineReceipts(
+            queryOptions,
+            params,
+          );
+          return { transactionReceipt: response };
+        } catch (err) {
+          throw new RuntimeError(err as any);
+        }
+      }
+      case IrohaQuery.GetAccount: {
+        try {
+          let params;
+          if (Array.isArray(req.params)) {
+            params = {
+              accountId: req.params[0],
+            };
+          } else {
+            params = req.params;
+          }
+          const queryRes = await queries.getAccount(queryOptions, params);
+          return { transactionReceipt: queryRes };
+        } catch (err) {
+          throw new RuntimeError(err as any);
+        }
+      }
+      case IrohaQuery.GetBlock: {
+        try {
+          let params;
+          if (Array.isArray(req.params)) {
+            params = {
+              height: req.params[0],
+            };
+          } else {
+            params = req.params;
+          }
+          const response = await queries.getBlock(queryOptions, params);
+          return { transactionReceipt: response };
+        } catch (err) {
+          throw new RuntimeError(err as any);
+        }
+      }
+      case IrohaQuery.GetSignatories: {
+        try {
+          let params;
+          if (Array.isArray(req.params)) {
+            params = {
+              accountId: req.params[0],
+            };
+          } else {
+            params = req.params;
+          }
+          const queryRes = await queries.getSignatories(queryOptions, params);
+          return { transactionReceipt: queryRes };
+        } catch (err) {
+          throw new RuntimeError(err as any);
+        }
+      }
+      case IrohaQuery.GetTransactions: {
+        try {
+          let params;
+          if (Array.isArray(req.params)) {
+            params = {
+              txHashesList: req.params[0],
+            };
+          } else {
+            params = req.params;
+          }
+          const response = await queries.getTransactions(queryOptions, params);
+          return { transactionReceipt: response };
+        } catch (err) {
+          throw new RuntimeError(err as any);
+        }
+      }
+      case IrohaQuery.GetPendingTransactions: {
+        try {
+          let params: any;
+          if (Array.isArray(req.params)) {
+            params = {
+              pageSize: req.params[0],
+              firstTxHash: req.params[1],
+              firstTxTime: req.params[2],
+              lastTxTime: req.params[3],
+              firstTxHeight: req.params[4],
+              lastTxHeight: req.params[5],
+              ordering: {
+                field: req.params[6],
+                direction: req.params[7],
+              },
+            };
+          } else {
+            params = req.params;
+          }
+          const response = await queries.getPendingTransactions(
+            queryOptions,
+            params,
+          );
+          return { transactionReceipt: response };
+        } catch (err) {
+          throw new RuntimeError(err as any);
+        }
+      }
+      case IrohaQuery.GetAccountTransactions: {
+        try {
+          let params: any;
+          if (Array.isArray(req.params)) {
+            params = {
+              accountId: req.params[0],
+              pageSize: req.params[1],
+              firstTxHash: req.params[2],
+              firstTxTime: req.params[3],
+              lastTxTime: req.params[4],
+              firstTxHeight: req.params[5],
+              lastTxHeight: req.params[6],
+              ordering: {
+                field: req.params[7],
+                direction: req.params[8],
+              },
+            };
+          } else {
+            params = req.params;
+          }
+          const response = await queries.getAccountTransactions(
+            queryOptions,
+            params,
+          );
+          return { transactionReceipt: response };
+        } catch (err) {
+          throw new RuntimeError(err as any);
+        }
+      }
+      case IrohaQuery.GetAccountAssetTransactions: {
+        try {
+          let params: any;
+          if (Array.isArray(req.params)) {
+            params = {
+              accountId: req.params[0],
+              assetId: req.params[1],
+              pageSize: req.params[2],
+              firstTxHash: req.params[3],
+              firstTxTime: req.params[4],
+              lastTxTime: req.params[5],
+              firstTxHeight: req.params[6],
+              lastTxHeight: req.params[7],
+              ordering: {
+                field: req.params[8],
+                direction: req.params[9],
+              },
+            };
+          } else {
+            params = req.params;
+          }
+          const response = await queries.getAccountAssetTransactions(
+            queryOptions,
+            params,
+          );
+          return { transactionReceipt: response };
+        } catch (err) {
+          throw new RuntimeError(err as any);
+        }
+      }
+      case IrohaQuery.GetAccountAssets: {
+        try {
+          let params: any;
+          if (Array.isArray(req.params)) {
+            params = {
+              accountId: req.params[0],
+              pageSize: req.params[1],
+              firstAssetId: req.params[2],
+            };
+          } else {
+            params = req.params;
+          }
+          const queryRes = await queries.getAccountAssets(queryOptions, params);
+          return { transactionReceipt: queryRes };
+        } catch (err) {
+          throw new RuntimeError(err as any);
+        }
+      }
+      case IrohaQuery.GetAccountDetail: {
+        try {
+          let params: any;
+          if (Array.isArray(req.params)) {
+            params = {
+              accountId: req.params[0],
+              key: req.params[1],
+              writer: req.params[2],
+              pageSize: req.params[3],
+              paginationKey: req.params[4],
+              paginationWriter: req.params[5],
+            };
+          } else {
+            params = req.params;
+          }
+          const queryRes = await queries.getAccountDetail(queryOptions, params);
+          return { transactionReceipt: queryRes };
+        } catch (err) {
+          throw new RuntimeError(err as any);
+        }
+      }
+      case IrohaQuery.GetAssetInfo: {
+        try {
+          let params;
+          if (Array.isArray(req.params)) {
+            params = {
+              assetId: req.params[0],
+            };
+          } else {
+            params = req.params;
+          }
+          const queryRes = await queries.getAssetInfo(queryOptions, params);
+          return { transactionReceipt: queryRes };
+        } catch (err) {
+          throw new RuntimeError(err as any);
         }
       }
       case IrohaQuery.GetRoles: {
         try {
           const response = await queries.getRoles(queryOptions);
           return { transactionReceipt: response };
-        } catch (err: any) {
-          throw new RuntimeError(err);
-        }
-      }
-      case IrohaCommand.CreateRole: {
-        try {
-          const response = await commands.createRole(commandOptions, {
-            roleName: req.params[0],
-            permissionsList: req.params[1],
-          });
-          return { transactionReceipt: response };
-        } catch (err: any) {
-          throw new RuntimeError(err);
-        }
-      }
-      case IrohaCommand.AppendRole: {
-        try {
-          const response = await commands.appendRole(commandOptions, {
-            accountId: req.params[0],
-            roleName: req.params[1],
-          });
-          return { transactionReceipt: response };
-        } catch (err: any) {
-          throw new RuntimeError(err);
-        }
-      }
-      case IrohaCommand.DetachRole: {
-        try {
-          const response = await commands.detachRole(commandOptions, {
-            accountId: req.params[0],
-            roleName: req.params[1],
-          });
-          return { transactionReceipt: response };
-        } catch (err: any) {
-          throw new RuntimeError(err);
+        } catch (err) {
+          throw new RuntimeError(err as any);
         }
       }
       case IrohaQuery.GetRolePermissions: {
         try {
-          const response = await queries.getRolePermissions(queryOptions, {
-            roleId: req.params[0],
-          });
-          return { transactionReceipt: response };
-        } catch (err: any) {
-          throw new RuntimeError(err);
-        }
-      }
-      case IrohaCommand.GrantPermission: {
-        try {
-          type permission = keyof GrantablePermissionMap;
-          const response = await commands.grantPermission(commandOptions, {
-            accountId: req.params[0],
-            permission: GrantablePermission[req.params[1] as permission],
-          });
-          return { transactionReceipt: response };
-        } catch (err: any) {
-          throw new RuntimeError(err);
-        }
-      }
-      case IrohaCommand.RevokePermission: {
-        try {
-          type permission = keyof GrantablePermissionMap;
-          const response = await commands.revokePermission(commandOptions, {
-            accountId: req.params[0],
-            permission: GrantablePermission[req.params[1] as permission],
-          });
-          return { transactionReceipt: response };
-        } catch (err: any) {
-          throw new RuntimeError(err);
-        }
-      }
-      case IrohaCommand.SetSettingValue: {
-        throw new Http405NotAllowedError("SetSettingValue is not supported.");
-      }
-      case IrohaQuery.GetTransactions: {
-        try {
-          const response = await queries.getTransactions(queryOptions, {
-            txHashesList: req.params[0],
-          });
-          return { transactionReceipt: response };
-        } catch (err: any) {
-          throw new RuntimeError(err);
-        }
-      }
-      case IrohaQuery.GetPendingTransactions: {
-        try {
-          const response = await queries.getPendingTransactions(queryOptions, {
-            pageSize: req.params[0],
-            firstTxHash: req.params[1],
-          });
-          return { transactionReceipt: response };
-        } catch (err: any) {
-          throw new RuntimeError(err);
-        }
-      }
-      case IrohaQuery.GetAccountTransactions: {
-        try {
-          const response = await queries.getAccountTransactions(queryOptions, {
-            accountId: req.params[0],
-            pageSize: req.params[1],
-            firstTxHash: req.params[2],
-          });
-          return { transactionReceipt: response };
-        } catch (err: any) {
-          throw new RuntimeError(err);
-        }
-      }
-      case IrohaQuery.GetAccountAssetTransactions: {
-        try {
-          const response = await queries.getAccountAssetTransactions(
+          let params;
+          if (Array.isArray(req.params)) {
+            params = {
+              roleId: req.params[0],
+            };
+          } else {
+            params = req.params;
+          }
+          const response = await queries.getRolePermissions(
             queryOptions,
-            {
-              accountId: req.params[0],
-              assetId: req.params[1],
-              pageSize: req.params[2],
-              firstTxHash: req.params[3],
-            },
+            params,
           );
           return { transactionReceipt: response };
-        } catch (err: any) {
-          throw new RuntimeError(err);
-        }
-      }
-      case IrohaQuery.GetBlock: {
-        try {
-          const response = await queries.getBlock(queryOptions, {
-            height: req.params[0],
-          });
-          return { transactionReceipt: response };
-        } catch (err: any) {
-          if (
-            "monitorModeEnabled" in baseConfig &&
-            baseConfig.monitorModeEnabled === true
-          ) {
-            return { transactionReceipt: err };
-          } else {
-            this.log.error(err);
-            throw new RuntimeError(err);
-          }
-        }
-      }
-      case IrohaCommand.CallEngine: {
-        try {
-          const response = await commands.callEngine(commandOptions, {
-            type: req.params[0],
-            caller: req.params[1],
-            callee: req.params[2],
-            input: req.params[3],
-          });
-          return { transactionReceipt: response };
-        } catch (err: any) {
-          throw new RuntimeError(err);
-        }
-      }
-      case IrohaQuery.GetEngineReceipts: {
-        try {
-          const response = await queries.getEngineReceipts(queryOptions, {
-            txHash: req.params[0],
-          });
-          return { transactionReceipt: response };
-        } catch (err: any) {
-          throw new RuntimeError(err);
-        }
-      }
-      case IrohaQuery.FetchCommits: {
-        try {
-          const response = await queries.fetchCommits(queryOptions);
-          return { transactionReceipt: response };
-        } catch (err: any) {
-          throw new RuntimeError(err);
-        }
-      }
-      case IrohaCommand.AddPeer: {
-        try {
-          const response = await commands.addPeer(commandOptions, {
-            address: req.params[0],
-            peerKey: req.params[1],
-          });
-          return { transactionReceipt: response };
-        } catch (err: any) {
-          throw new RuntimeError(err);
-        }
-      }
-      case IrohaCommand.RemovePeer: {
-        try {
-          const response = await commands.removePeer(commandOptions, {
-            publicKey: req.params[0],
-          });
-          return { transactionReceipt: response };
-        } catch (err: any) {
-          throw new RuntimeError(err);
+        } catch (err) {
+          throw new RuntimeError(err as any);
         }
       }
       case IrohaQuery.GetPeers: {
         try {
           const response = await queries.getPeers(queryOptions);
           return { transactionReceipt: response };
-        } catch (err: any) {
-          throw new RuntimeError(err);
+        } catch (err) {
+          throw new RuntimeError(err as any);
+        }
+      }
+      case IrohaQuery.FetchCommits: {
+        try {
+          const response = await queries.fetchCommits(queryOptions);
+          return { transactionReceipt: response };
+        } catch (err) {
+          throw new RuntimeError(err as any);
         }
       }
       default: {
