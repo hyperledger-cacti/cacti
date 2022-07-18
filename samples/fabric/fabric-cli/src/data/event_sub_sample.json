@@ -1,19 +1,40 @@
-{
-    "event_matcher": {
-        "eventType": 1,
-        "eventClassId": "",
-        "transactionLedgerId": "mychannel",
-        "transactionContractId": "simplestate",
-        "transactionFunc": "create"
+[
+    {
+        "event_matcher": {
+            "eventType": 1,
+            "eventClassId": "",
+            "transactionLedgerId": "mychannel",
+            "transactionContractId": "simplestate",
+            "transactionFunc": "create"
+        },
+        "event_publication_spec": {
+            "ccArgs": [],
+            "chaincodeId": "simplestate",
+            "driverId": "network1",
+            "ccFunc": "Create",
+            "channelId": "mychannel",
+            "replaceArgIndex": "0"
+        },
+        "view_address": "localhost:9083/network2/mychannel:simplestate:Read:a",
+        "confidential": false
     },
-    "event_publication_spec": {
-        "ccArgs": [],
-        "chaincodeId": "simplestate",
-        "driverId": "network1",
-        "ccFunc": "Create",
-        "channelId": "mychannel",
-        "replaceArgIndex": "0"
-    },
-    "view_address": "localhost:9083/network2/mychannel:simplestate:Read:a",
-    "confidential": false
-}
+    {
+        "event_matcher": {
+            "eventType": 1,
+            "eventClassId": "CreateSimpleState",
+            "transactionLedgerId": "mychannel",
+            "transactionContractId": "simplestate",
+            "transactionFunc": "create"
+        },
+        "event_publication_spec": {
+            "ccArgs": [],
+            "chaincodeId": "simplestate",
+            "driverId": "network1",
+            "ccFunc": "Create",
+            "channelId": "mychannel",
+            "replaceArgIndex": "0"
+        },
+        "view_address": "localhost:9083/network2/mychannel:simplestate:Read:a",
+        "confidential": false
+    }
+]

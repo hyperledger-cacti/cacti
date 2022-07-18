@@ -61,10 +61,9 @@ function mockCommunication(query: query_pb.Query) {
 }
 
 // Package view and send to relay
-export function packageViewAndSendToRelay(
+export function packageView(
     query: query_pb.Query,
     viewData: fabricView.FabricView,
-    client: datatransfer_grpc_pb.DataTransferClient,
 ) {
     const meta = new state_pb.Meta();
     meta.setTimestamp(new Date().toISOString());
@@ -77,13 +76,10 @@ export function packageViewAndSendToRelay(
     const viewPayload = new state_pb.ViewPayload();
     viewPayload.setView(view);
     viewPayload.setRequestId(query.getRequestId());
-
-    console.log('Sending state');
-    // Sending the fabric state to the relay.
-    client.sendDriverState(viewPayload, relayCallback);
+    return viewPayload;
 }
 
-export function getRelayClient() {
+export function getRelayClientForQueryResponse() {
     let client;
     if (process.env.RELAY_TLS === 'true') {
         if (!(process.env.RELAY_TLSCA_CERT_PATH && fs.existsSync(process.env.RELAY_TLSCA_CERT_PATH))) {
@@ -103,6 +99,26 @@ export function getRelayClient() {
     return client;
 }
 
+export function getRelayClientForEventPublish() {
+    let client;
+    if (process.env.RELAY_TLS === 'true') {
+        if (!(process.env.RELAY_TLSCA_CERT_PATH && fs.existsSync(process.env.RELAY_TLSCA_CERT_PATH))) {
+            throw new Error("Missing or invalid RELAY_TLSCA_CERT_PATH: " + process.env.RELAY_TLSCA_CERT_PATH);
+        }
+        const rootCert = fs.readFileSync(process.env.RELAY_TLSCA_CERT_PATH);
+        client = new events_grpc_pb.EventPublishClient(
+            process.env.RELAY_ENDPOINT,
+            credentials.createSsl(rootCert)
+        );
+    } else {
+        client = new events_grpc_pb.EventPublishClient(
+            process.env.RELAY_ENDPOINT,
+            credentials.createInsecure()
+        );
+    }
+    return client;
+}
+
 // Handles communication with fabric network and sends resulting data to the relay
 const fabricCommunication = async (query: query_pb.Query, networkName: string) => {
     // Query object from requestor
@@ -113,7 +129,6 @@ const fabricCommunication = async (query: query_pb.Query, networkName: string) =
     if (!process.env.RELAY_ENDPOINT) {
         throw new Error('RELAY_ENDPOINT is not set.');
     }
-    const client = getRelayClient();
     // Invokes the fabric network
     const [result, invokeError] = await handlePromise(
         invoke(
@@ -121,6 +136,7 @@ const fabricCommunication = async (query: query_pb.Query, networkName: string) =
             networkName,
         ),
     );
+    const client = getRelayClientForQueryResponse();
     if (invokeError) {
         console.log('Invoke Error');
         const errorViewPayload = new state_pb.ViewPayload();
@@ -132,7 +148,11 @@ const fabricCommunication = async (query: query_pb.Query, networkName: string) =
         // Process response from invoke to send to relay
         console.log('Result of fabric invoke', result);
         console.log('Sending state');
-        packageViewAndSendToRelay(query, result, client);
+        const viewPayload: state_pb.ViewPayload = packageView(query, result);
+
+        console.log('Sending state');
+        // Sending the fabric state to the relay.
+        client.sendDriverState(viewPayload, relayCallback);
     }
 };
 

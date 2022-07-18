@@ -84,7 +84,6 @@ const command: GluegunCommand = {
     const requestId = options['request-id']
     
     const filepath = path.resolve(array[0])
-    const data = JSON.parse(fs.readFileSync(filepath).toString())
     
     const netConfig = getNetworkConfig(networkName)
     if (!netConfig.connProfilePath || !netConfig.channelName || !netConfig.chaincode) {
@@ -109,29 +108,32 @@ const command: GluegunCommand = {
       throw new Error(`Error getting key and cert ${keyCertError}`)
     }
     
-    const eventMatcher = EventsManager.createEventMatcher(data.event_matcher)
-    const eventPublicationSpec = EventsManager.createEventPublicationSpec(data.event_publication_spec)
-    
-    try {
-        const response = await EventsManager.unsubscribeRemoteEvent(
-            contract,
-            eventMatcher,
-            eventPublicationSpec,
-            requestId,
-            networkName,
-            netConfig.mspId,
-            netConfig.relayEndpoint,
-            { address: data.view_address, Sign: true },
-            keyCert
-        )
-        
-        if (response.getStatus() == EventSubscriptionState.STATUS.UNSUBSCRIBED) {
-            console.log("Event Unsubscription Success for requestId:", response.getRequestId())
-        } else {
-            console.log("Unknown error")
+    const data = JSON.parse(fs.readFileSync(filepath).toString())
+    for (let i = 0 ; i < data.length ; i++) {
+        const eventMatcher = EventsManager.createEventMatcher(data[i].event_matcher)
+        const eventPublicationSpec = EventsManager.createEventPublicationSpec(data[i].event_publication_spec)
+
+        try {
+            const response = await EventsManager.unsubscribeRemoteEvent(
+                contract,
+                eventMatcher,
+                eventPublicationSpec,
+                requestId,
+                networkName,
+                netConfig.mspId,
+                netConfig.relayEndpoint,
+                { address: data[i].view_address, Sign: true },
+                keyCert
+            )
+
+            if (response.getStatus() == EventSubscriptionState.STATUS.UNSUBSCRIBED) {
+                console.log("Event Unsubscription Success for requestId:", response.getRequestId())
+            } else {
+                console.log("Unknown error")
+            }
+        } catch(e) {
+            console.log("Error: ", e.toString())
         }
-    } catch(e) {
-        console.log("Error: ", e.toString())
     }
 
     process.exit()

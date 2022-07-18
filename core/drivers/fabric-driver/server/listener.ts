@@ -12,8 +12,8 @@ import query_pb from '@hyperledger-labs/weaver-protos-js/common/query_pb';
 import events_pb from '@hyperledger-labs/weaver-protos-js/common/events_pb';
 import { lookupEventSubscriptions } from './events';
 import { invoke, getNetworkGateway } from './fabric-code';
-import { getRelayClient, packageViewAndSendToRelay } from './server';
-import { handlePromise } from './utils';
+import { getRelayClientForEventPublish, packageView } from './server';
+import { handlePromise, relayCallback } from './utils';
 
 let channelBlockListenerMap = new Map<string, BlockListener>();
 let channelContractListenerMap = new Map<string, ContractListener>();
@@ -48,11 +48,23 @@ const initBlockEventListenerForChannel = async (
                     // Find all matching event subscriptions stored in the database
                     let eventMatcher = new events_pb.EventMatcher();
                     eventMatcher.setEventType(events_pb.EventType.LEDGER_STATE);
-                    eventMatcher.setEventClassId('*');
+                    eventMatcher.setEventClassId('');       // Only match subscriptions where class ID is not specified
                     eventMatcher.setTransactionLedgerId(channelId);
                     eventMatcher.setTransactionContractId(chaincodeId);
                     eventMatcher.setTransactionFunc(chaincodeFunc);
-                    const eventSubscriptionQueries = await lookupEventSubscriptions(eventMatcher);
+                    let eventSubscriptionQueries;
+                    for (let i = 0 ; i < 10 ; i++) {
+                        try{
+                            eventSubscriptionQueries = await lookupEventSubscriptions(eventMatcher);
+                            break;
+                        } catch(error) {
+                            let errorString: string = error.toString();
+                            if (!errorString.includes('LEVEL_LOCKED')) {    // Check if contention was preventing DB access
+                                throw(error);
+                            }
+                            await new Promise(f => setTimeout(f, 2000));    // Sleep 2 seconds
+                        }
+                    }
                     // Iterate through the view requests in the matching event subscriptions
                     eventSubscriptionQueries.forEach(async (eventSubscriptionQuery: query_pb.Query) => {
                         console.log('Generating view and collecting proof for channel', channelId, 'chaincode', chaincodeId);
@@ -65,7 +77,12 @@ const initBlockEventListenerForChannel = async (
                         );
                         if (!invokeError) {
                             // Package view and send to relay
-                            packageViewAndSendToRelay(eventSubscriptionQuery, result, getRelayClient());
+                            const client = getRelayClientForEventPublish();
+                            const viewPayload = packageView(eventSubscriptionQuery, result);
+
+                            console.log('Sending block event');
+                            // Sending the Fabric event to the relay.
+                            client.sendDriverState(viewPayload, relayCallback);
                         }
                     })
                 }
@@ -78,7 +95,7 @@ const initBlockEventListenerForChannel = async (
 }
 
 /**
- * Register a block listener with a callback
+ * Register a chaincode event listener with a callback
  **/
 const initContractEventListener = (
     contract: Contract,
@@ -95,11 +112,21 @@ const initContractEventListener = (
         eventMatcher.setTransactionLedgerId(channelId);
         eventMatcher.setTransactionContractId(chaincodeId);
         eventMatcher.setTransactionFunc('*');
-        const eventSubscriptionQueries = await lookupEventSubscriptions(eventMatcher);
+        let eventSubscriptionQueries;
+        for (let i = 0 ; i < 10 ; i++) {
+            try{
+                eventSubscriptionQueries = await lookupEventSubscriptions(eventMatcher);
+                break;
+            } catch(error) {
+                let errorString: string = error.toString();
+                if (!errorString.includes('LEVEL_LOCKED')) {    // Check if contention was preventing DB access
+                    throw(error);
+                }
+                await new Promise(f => setTimeout(f, 2000));    // Sleep 2 seconds
+            }
+        }
         // Iterate through the view requests in the matching event subscriptions
         eventSubscriptionQueries.forEach(async (eventSubscriptionQuery: query_pb.Query) => {
-            // Trigger proof collection
-            // Package view and send to relay
             console.log('Generating view and collecting proof for event class', event.eventName, 'channel', channelId, 'chaincode', chaincodeId);
             // Trigger proof collection
             const [result, invokeError] = await handlePromise(
@@ -110,7 +137,12 @@ const initContractEventListener = (
             );
             if (!invokeError) {
                 // Package view and send to relay
-                packageViewAndSendToRelay(eventSubscriptionQuery, result, getRelayClient());
+                const client = getRelayClientForEventPublish();
+                const viewPayload = packageView(eventSubscriptionQuery, result);
+
+                console.log('Sending contract event');
+                // Sending the Fabric event to the relay.
+                client.sendDriverState(viewPayload, relayCallback);
             }
         })
     };

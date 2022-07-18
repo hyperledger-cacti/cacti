@@ -289,7 +289,7 @@ async function lookupEventSubscriptions(
             return returnSubscriptions;
         } else {
             // case of read failing due to some other issue
-            console.error(`Error during lookup: ${JSON.stringify(error)}`);
+            console.error(`Error during lookup: ${errorString}`);
             throw new Error(error);
         }
     }
