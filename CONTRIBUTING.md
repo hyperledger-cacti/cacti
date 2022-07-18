@@ -358,7 +358,7 @@ for both them separately anyway:
   - An integration test:
 
       ```sh
-      npx tap --ts --timeout=600 packages/cactus-test-plugin-consortium-manual/src/test/typescript/integration/plugin-consortium-manual/get-consortium-jws-endpoint.test.ts
+      yarn jest packages/cactus-test-plugin-consortium-manual/src/test/typescript/integration/plugin-consortium-manual/get-consortium-jws-endpoint.test.ts
       ```
 
   - A unit test:

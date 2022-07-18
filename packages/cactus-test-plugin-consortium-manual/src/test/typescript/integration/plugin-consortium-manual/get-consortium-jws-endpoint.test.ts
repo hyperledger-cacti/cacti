@@ -1,10 +1,14 @@
 import { createServer } from "http";
 import { AddressInfo } from "net";
-
-import test, { Test } from "tape-promise/tape";
-import { generateKeyPair, exportSPKI, exportPKCS8, generalVerify } from "jose";
+import {
+  generateKeyPair,
+  exportSPKI,
+  exportPKCS8,
+  generalVerify,
+  GenerateKeyPairResult,
+} from "jose";
 import { v4 as uuidV4 } from "uuid";
-
+import "jest-extended";
 import {
   ApiServer,
   AuthorizationProtocol,
@@ -23,355 +27,375 @@ import {
   ConsortiumMember,
 } from "@hyperledger/cactus-core-api";
 import { PluginRegistry } from "@hyperledger/cactus-core";
+const testCase = "Get Consortium JWS Endpoint";
 
-test("member node public keys and hosts are pre-shared", async (t: Test) => {
+describe(testCase, () => {
   const consortiumId = uuidV4();
   const consortiumName = "Example Corp. & Friends Crypto Consortium";
+  let keyPair1: GenerateKeyPairResult;
+  let keyPair2: GenerateKeyPairResult;
+  let keyPair3: GenerateKeyPairResult;
+  let pubKeyPem1: string;
+  let member1: ConsortiumMember;
+  let node1: CactusNode;
+
+  let pubKeyPem3: string;
 
   const memberId1 = uuidV4();
   const memberId2 = uuidV4();
   const memberId3 = uuidV4();
 
   const httpServer1 = createServer();
-  await new Promise((resolve, reject) => {
-    httpServer1.once("error", reject);
-    httpServer1.once("listening", resolve);
-    httpServer1.listen(0, "127.0.0.1");
-  });
-  const addressInfo1 = httpServer1.address() as AddressInfo;
-  t.comment(`HttpServer1 AddressInfo: ${JSON.stringify(addressInfo1)}`);
-  const node1Host = `http://${addressInfo1.address}:${addressInfo1.port}`;
-  t.comment(`Cactus Node 1 Host: ${node1Host}`);
 
-  const keyPair1 = await generateKeyPair("ES256K");
-  const pubKeyPem1 = await exportSPKI(keyPair1.publicKey);
-  t.comment(`Cactus Node 1 Public Key PEM: ${pubKeyPem1}`);
+  let apiServer1: ApiServer;
+  let apiServer2: ApiServer;
+  let apiServer3: ApiServer;
+  let addressInfo1: AddressInfo;
+  let addressInfo2: AddressInfo;
+  let addressInfo3: AddressInfo;
+  let node1Host: string;
+  let node2Host: string;
+  let node3Host: string;
+
+  afterAll(async () => {
+    await apiServer1.shutdown();
+  });
+  afterAll(async () => {
+    await apiServer2.shutdown();
+  });
+  afterAll(async () => {
+    await apiServer3.shutdown();
+  });
+
+  beforeAll(async () => {
+    keyPair1 = await generateKeyPair("ES256K");
+    keyPair2 = await generateKeyPair("ES256K");
+    keyPair3 = await generateKeyPair("ES256K");
+    await new Promise((resolve, reject) => {
+      httpServer1.once("error", reject);
+      httpServer1.once("listening", resolve);
+      httpServer1.listen(0, "127.0.0.1");
+    });
+    addressInfo1 = httpServer1.address() as AddressInfo;
+    node1Host = `http://${addressInfo1.address}:${addressInfo1.port}`;
+  });
+
+  afterAll(() => httpServer1.close());
+
+  beforeAll(async () => {
+    pubKeyPem1 = await exportSPKI(keyPair1.publicKey);
+    node1 = {
+      consortiumId,
+      memberId: memberId1,
+      id: "Example_Cactus_Node_1",
+      nodeApiHost: node1Host,
+      publicKeyPem: pubKeyPem1,
+      ledgerIds: [],
+      pluginInstanceIds: [],
+    };
+
+    member1 = {
+      id: memberId1,
+      name: "Example Corp 1",
+      nodeIds: [node1.id],
+    };
+  });
 
   const httpServer2 = createServer();
-  await new Promise((resolve, reject) => {
-    httpServer2.once("error", reject);
-    httpServer2.once("listening", resolve);
-    httpServer2.listen(0, "127.0.0.1");
+  beforeAll(async () => {
+    await new Promise((resolve, reject) => {
+      httpServer2.once("error", reject);
+      httpServer2.once("listening", resolve);
+      httpServer2.listen(0, "127.0.0.1");
+    });
+    addressInfo2 = httpServer2.address() as AddressInfo;
+    node2Host = `http://${addressInfo2.address}:${addressInfo2.port}`;
   });
-  const addressInfo2 = httpServer2.address() as AddressInfo;
-  t.comment(`HttpServer2 AddressInfo: ${JSON.stringify(addressInfo2)}`);
-  const node2Host = `http://${addressInfo2.address}:${addressInfo2.port}`;
 
-  const keyPair2 = await generateKeyPair("ES256K");
-  const pubKeyPem2 = await exportSPKI(keyPair2.publicKey);
-  t.comment(`Cactus Node 2 Public Key PEM: ${pubKeyPem2}`);
+  let pubKeyPem2: string;
+  beforeAll(async () => {
+    pubKeyPem2 = await exportSPKI(keyPair2.publicKey);
+  });
 
   const httpServer3 = createServer();
-  await new Promise((resolve, reject) => {
-    httpServer3.once("error", reject);
-    httpServer3.once("listening", resolve);
-    httpServer3.listen(0, "127.0.0.1");
+  beforeAll(async () => {
+    await new Promise((resolve, reject) => {
+      httpServer3.once("error", reject);
+      httpServer3.once("listening", resolve);
+      httpServer3.listen(0, "127.0.0.1");
+    });
+    addressInfo3 = httpServer3.address() as AddressInfo;
+    node3Host = `http://${addressInfo3.address}:${addressInfo3.port}`;
   });
-  const addressInfo3 = httpServer3.address() as AddressInfo;
-  t.comment(`HttpServer3 AddressInfo: ${JSON.stringify(addressInfo3)}`);
-  const node3Host = `http://${addressInfo3.address}:${addressInfo3.port}`;
 
-  const keyPair3 = await generateKeyPair("ES256K");
-  const pubKeyPem3 = await exportSPKI(keyPair3.publicKey);
-  t.comment(`Cactus Node 3 Public Key PEM: ${pubKeyPem3}`);
+  beforeAll(async () => {
+    pubKeyPem3 = await exportSPKI(keyPair3.publicKey);
+  });
 
-  const node1: CactusNode = {
-    consortiumId,
-    memberId: memberId1,
-    id: "Example_Cactus_Node_1",
-    nodeApiHost: node1Host,
-    publicKeyPem: pubKeyPem1,
-    ledgerIds: [],
-    pluginInstanceIds: [],
-  };
-
-  const member1: ConsortiumMember = {
-    id: memberId1,
-    name: "Example Corp 1",
-    nodeIds: [node1.id],
-  };
-
-  const node2: CactusNode = {
-    consortiumId,
-    memberId: memberId2,
-    id: "Example_Cactus_Node_2",
-    nodeApiHost: node2Host,
-    publicKeyPem: pubKeyPem2,
-    ledgerIds: [],
-    pluginInstanceIds: [],
-  };
-
-  const member2: ConsortiumMember = {
-    id: memberId2,
-    name: "Example Corp 2",
-    nodeIds: [node2.id],
-  };
-
-  const node3: CactusNode = {
-    consortiumId,
-    memberId: memberId3,
-    id: "Example_Cactus_Node_3",
-    nodeApiHost: node3Host,
-    publicKeyPem: pubKeyPem3,
-    ledgerIds: [],
-    pluginInstanceIds: [],
-  };
-
-  const member3: ConsortiumMember = {
-    id: memberId3,
-    name: "Example Corp 3",
-    nodeIds: [node3.id],
-  };
-
-  const consortium: Consortium = {
-    id: consortiumId,
-    mainApiHost: node1Host,
-    name: consortiumName,
-    memberIds: [memberId1, memberId2, memberId3],
-  };
-
-  const consortiumDatabase: ConsortiumDatabase = {
-    cactusNode: [node1, node2, node3],
-    consortium: [consortium],
-    consortiumMember: [member1, member2, member3],
-    ledger: [],
-    pluginInstance: [],
-  };
-
-  t.comment(`Setting up first node...`);
-  {
-    // 2. Instantiate plugin registry which will provide the web service plugin with the key value storage plugin
-    const pluginRegistry = new PluginRegistry({ plugins: [] });
-
-    // 3. Instantiate the web service consortium plugin
-    const keyPairPem = await exportPKCS8(keyPair1.privateKey);
-    const options: IPluginConsortiumManualOptions = {
-      instanceId: uuidV4(),
-      pluginRegistry,
-      keyPairPem: keyPairPem,
-      consortiumDatabase,
-      logLevel: "trace",
+  let node2: CactusNode;
+  let member2: ConsortiumMember;
+  beforeAll(() => {
+    node2 = {
+      consortiumId,
+      memberId: memberId2,
+      id: "Example_Cactus_Node_2",
+      nodeApiHost: node2Host,
+      publicKeyPem: pubKeyPem2,
+      ledgerIds: [],
+      pluginInstanceIds: [],
     };
-    const pluginConsortiumManual = new PluginConsortiumManual(options);
 
-    // 4. Create the API Server object that we embed in this test
-    const configService = new ConfigService();
-    const apiServerOptions = await configService.newExampleConfig();
-    apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
-    apiServerOptions.configFile = "";
-    apiServerOptions.apiCorsDomainCsv = "*";
-    apiServerOptions.apiPort = addressInfo1.port;
-    apiServerOptions.cockpitPort = 0;
-    apiServerOptions.grpcPort = 0;
-    apiServerOptions.apiTlsEnabled = false;
-    const config = await configService.newExampleConfigConvict(
-      apiServerOptions,
-    );
-
-    pluginRegistry.add(pluginConsortiumManual);
-
-    const apiServer = new ApiServer({
-      httpServerApi: httpServer1,
-      config: config.getProperties(),
-      pluginRegistry,
-    });
-
-    // 5. make sure the API server is shut down when the testing if finished.
-    test.onFinish(() => apiServer.shutdown());
-
-    // 6. Start the API server which is now listening on port A and it's healthcheck works through the main SDK
-    await apiServer.start();
-
-    // 7. Instantiate the main SDK dynamically with whatever port the API server ended up bound to (port 0)
-    t.comment(`AddressInfo: ${JSON.stringify(addressInfo1)}`);
-
-    const configuration = new Configuration({ basePath: node1Host });
-    const api = new DefaultApi(configuration);
-    const res = await api.getNodeJwsV1();
-    t.ok(res, "API response object is truthy");
-    t.equal(res.status, 200, "Node JWS response status code is 200");
-    t.ok(res.data, "Node JWS response.body is truthy");
-    t.ok(res.data.jws, "Node JWS response.body.jws is truthy");
-    const payload = await generalVerify(res.data.jws, keyPair1.publicKey);
-    t.ok(payload, "Verified Node JWS payload is truthy");
-    t.comment(`Node1 JWS Payload: ${JSON.stringify(payload)}`);
-  }
-  t.comment(`Set up first node OK`);
-
-  t.comment(`Setting up second node...`);
-  {
-    const pluginRegistry = new PluginRegistry({ plugins: [] });
-
-    const keyPairPem = await exportPKCS8(keyPair2.privateKey);
-    const options: IPluginConsortiumManualOptions = {
-      instanceId: uuidV4(),
-      pluginRegistry,
-      keyPairPem: keyPairPem,
-      consortiumDatabase,
-      logLevel: "TRACE",
+    member2 = {
+      id: memberId2,
+      name: "Example Corp 2",
+      nodeIds: [node2.id],
     };
-    const pluginConsortiumManual = new PluginConsortiumManual(options);
+  });
 
-    // 4. Create the API Server object that we embed in this test
-    const configService = new ConfigService();
-    const apiServerOptions = await configService.newExampleConfig();
-    apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
-    apiServerOptions.configFile = "";
-    apiServerOptions.apiCorsDomainCsv = "*";
-    apiServerOptions.apiPort = addressInfo2.port;
-    apiServerOptions.cockpitPort = 0;
-    apiServerOptions.grpcPort = 0;
-    apiServerOptions.apiTlsEnabled = false;
-    const config = await configService.newExampleConfigConvict(
-      apiServerOptions,
-    );
+  let node3: CactusNode;
+  let member3: ConsortiumMember;
 
-    pluginRegistry.add(pluginConsortiumManual);
-
-    const apiServer = new ApiServer({
-      httpServerApi: httpServer2,
-      config: config.getProperties(),
-      pluginRegistry,
-    });
-
-    // 5. make sure the API server is shut down when the testing if finished.
-    test.onFinish(() => apiServer.shutdown());
-
-    // 6. Start the API server which is now listening on port A and it's healthcheck works through the main SDK
-    await apiServer.start();
-
-    t.comment(`AddressInfo: ${JSON.stringify(addressInfo2)}`);
-
-    const configuration = new Configuration({ basePath: node2Host });
-    const api = new DefaultApi(configuration);
-    const res = await api.getNodeJwsV1();
-    t.ok(res, "API response object is truthy");
-    t.equal(res.status, 200, "Node JWS response status code is 200");
-    t.ok(res.data, "Node2 JWS response.body is truthy");
-    t.ok(res.data.jws, "Node JWS response.body.jws is truthy");
-    const payload = await generalVerify(res.data.jws, keyPair2.publicKey);
-    t.ok(payload, "Verified Node JWS payload is truthy");
-    t.comment(`Node2 JWS Payload: ${JSON.stringify(payload)}`);
-  }
-  t.comment(`Set up second node OK`);
-
-  t.comment(`Setting up third node...`);
-  {
-    // 2. Instantiate plugin registry which will provide the web service plugin with the key value storage plugin
-    const pluginRegistry = new PluginRegistry({ plugins: [] });
-
-    // 3. Instantiate the web service consortium plugin
-    const keyPairPem = await exportPKCS8(keyPair3.privateKey);
-    const options: IPluginConsortiumManualOptions = {
-      instanceId: uuidV4(),
-      pluginRegistry,
-      keyPairPem: keyPairPem,
-      consortiumDatabase,
-      logLevel: "TRACE",
+  beforeAll(() => {
+    node3 = {
+      consortiumId,
+      memberId: memberId3,
+      id: "Example_Cactus_Node_3",
+      nodeApiHost: node3Host,
+      publicKeyPem: pubKeyPem3,
+      ledgerIds: [],
+      pluginInstanceIds: [],
     };
-    const pluginConsortiumManual = new PluginConsortiumManual(options);
 
-    // 4. Create the API Server object that we embed in this test
-    const configService = new ConfigService();
-    const apiServerOptions = await configService.newExampleConfig();
-    apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
-    apiServerOptions.configFile = "";
-    apiServerOptions.apiCorsDomainCsv = "*";
-    apiServerOptions.apiPort = addressInfo3.port;
-    apiServerOptions.cockpitPort = 0;
-    apiServerOptions.grpcPort = 0;
-    apiServerOptions.apiTlsEnabled = false;
-    const config = await configService.newExampleConfigConvict(
-      apiServerOptions,
-    );
+    member3 = {
+      id: memberId3,
+      name: "Example Corp 3",
+      nodeIds: [node3.id],
+    };
+  });
 
-    pluginRegistry.add(pluginConsortiumManual);
+  let consortium: Consortium;
+  let consortiumDatabase: ConsortiumDatabase;
+  beforeAll(() => {
+    consortium = {
+      id: consortiumId,
+      mainApiHost: node1Host,
+      name: consortiumName,
+      memberIds: [memberId1, memberId2, memberId3],
+    };
 
-    const apiServer = new ApiServer({
-      httpServerApi: httpServer3,
-      config: config.getProperties(),
-      pluginRegistry,
-    });
+    consortiumDatabase = {
+      cactusNode: [node1, node2, node3],
+      consortium: [consortium],
+      consortiumMember: [member1, member2, member3],
+      ledger: [],
+      pluginInstance: [],
+    };
+  });
 
-    // 5. make sure the API server is shut down when the testing if finished.
-    test.onFinish(() => apiServer.shutdown());
+  test("member node public keys and hosts are pre-shared", async () => {
+    {
+      //Instantiate plugin registry which will provide the web service plugin with the key value storage plugin
+      const pluginRegistry = new PluginRegistry({ plugins: [] });
 
-    // 6. Start the API server which is now listening on port A and it's healthcheck works through the main SDK
-    await apiServer.start();
+      // Instantiate the web service consortium plugin
+      const keyPairPem = await exportPKCS8(keyPair1.privateKey);
+      const options: IPluginConsortiumManualOptions = {
+        instanceId: uuidV4(),
+        pluginRegistry,
+        keyPairPem: keyPairPem,
+        consortiumDatabase,
+        logLevel: "trace",
+      };
+      const pluginConsortiumManual = new PluginConsortiumManual(options);
 
-    // 7. Instantiate the main SDK dynamically with whatever port the API server ended up bound to (port 0)
-    t.comment(`AddressInfo: ${JSON.stringify(addressInfo3)}`);
+      //Create the API Server object that we embed in this test
+      const configService = new ConfigService();
+      const apiServerOptions = await configService.newExampleConfig();
+      apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
+      apiServerOptions.configFile = "";
+      apiServerOptions.apiCorsDomainCsv = "*";
+      apiServerOptions.apiPort = addressInfo1.port;
+      apiServerOptions.cockpitPort = 0;
+      apiServerOptions.grpcPort = 0;
+      apiServerOptions.apiTlsEnabled = false;
+      const config = await configService.newExampleConfigConvict(
+        apiServerOptions,
+      );
 
-    const configuration = new Configuration({ basePath: node3Host });
-    const api = new DefaultApi(configuration);
-    const res = await api.getNodeJwsV1();
-    t.ok(res, "API response object is truthy");
-    t.equal(res.status, 200, "Node JWS response status code is 200");
-    t.ok(res.data, "Node3 JWS response.body is truthy");
-    t.ok(res.data.jws, "Node3 JWS response.body.jws is truthy");
-    const payload = await generalVerify(res.data.jws, keyPair3.publicKey);
-    t.ok(payload, "Verified Node3 JWS payload is truthy");
-    t.comment(`Node3 JWS Payload: ${JSON.stringify(payload)}`);
-  }
-  t.comment(`Set up third node OK`);
+      pluginRegistry.add(pluginConsortiumManual);
 
-  {
-    const configuration = new Configuration({ basePath: node3Host });
-    const api = new DefaultApi(configuration);
-    const res = await api.getConsortiumJwsV1();
-    t.equal(res.status, 200, "Consortium JWS response status code is 200");
-    const getConsortiumJwsResponse = res.data;
-    const consortiumJws = getConsortiumJwsResponse.jws;
-    t.comment(`Consortium JWS: ${JSON.stringify(consortiumJws, null, 4)}`);
-    const payload1 = await generalVerify(consortiumJws, keyPair1.publicKey);
-    const payload2 = await generalVerify(consortiumJws, keyPair2.publicKey);
-    const payload3 = await generalVerify(consortiumJws, keyPair3.publicKey);
-    t.ok(payload1, "Verified Consortium JWS payload1 is truthy");
-    t.ok(payload2, "Verified Consortium JWS payload2 is truthy");
-    t.ok(payload3, "Verified Consortium JWS payload3 is truthy");
+      apiServer1 = new ApiServer({
+        httpServerApi: httpServer1,
+        config: config.getProperties(),
+        pluginRegistry,
+      });
 
-    const wrongKey = await generateKeyPair("ES256K");
-    await t.rejects(generalVerify(consortiumJws, wrongKey.publicKey));
-  }
+      //Start the API server which is now listening on port A and it's healthcheck works through the main SDK
+      await apiServer1.start();
 
-  {
-    const configuration = new Configuration({ basePath: node2Host });
-    const api = new DefaultApi(configuration);
-    const res = await api.getConsortiumJwsV1();
-    t.equal(res.status, 200, "Consortium JWS response status code is 200");
-    const getConsortiumJwsResponse = res.data;
-    const consortiumJws = getConsortiumJwsResponse.jws;
-    t.comment(`Consortium JWS: ${JSON.stringify(consortiumJws, null, 4)}`);
-    const payload1 = await generalVerify(consortiumJws, keyPair1.publicKey);
-    const payload2 = await generalVerify(consortiumJws, keyPair2.publicKey);
-    const payload3 = await generalVerify(consortiumJws, keyPair3.publicKey);
-    t.ok(payload1, "Verified Consortium JWS payload1 is truthy");
-    t.ok(payload2, "Verified Consortium JWS payload2 is truthy");
-    t.ok(payload3, "Verified Consortium JWS payload3 is truthy");
+      const configuration = new Configuration({ basePath: node1Host });
+      const api = new DefaultApi(configuration);
+      const res = await api.getNodeJwsV1();
+      expect(res).toBeTruthy();
+      expect(res.status).toEqual(200);
+      expect(res.data).toBeTruthy();
+      expect(res.data.jws).toBeTruthy();
+      const payload = await generalVerify(res.data.jws, keyPair1.publicKey);
+      expect(payload).toBeTruthy();
+    }
+    {
+      const pluginRegistry = new PluginRegistry({ plugins: [] });
 
-    const wrongKey = await generateKeyPair("ES256K");
-    await t.rejects(generalVerify(consortiumJws, wrongKey.publicKey));
-  }
+      const keyPairPem = await exportPKCS8(keyPair2.privateKey);
+      const options: IPluginConsortiumManualOptions = {
+        instanceId: uuidV4(),
+        pluginRegistry,
+        keyPairPem: keyPairPem,
+        consortiumDatabase,
+        logLevel: "TRACE",
+      };
+      const pluginConsortiumManual = new PluginConsortiumManual(options);
 
-  {
-    const configuration = new Configuration({ basePath: node1Host });
-    const api = new DefaultApi(configuration);
-    const res = await api.getConsortiumJwsV1();
-    t.equal(res.status, 200, "Consortium JWS response status code is 200");
-    const getConsortiumJwsResponse = res.data;
-    const consortiumJws = getConsortiumJwsResponse.jws;
-    t.comment(`Consortium JWS: ${JSON.stringify(consortiumJws, null, 4)}`);
-    const payload1 = await generalVerify(consortiumJws, keyPair1.publicKey);
-    const payload2 = await generalVerify(consortiumJws, keyPair2.publicKey);
-    const payload3 = await generalVerify(consortiumJws, keyPair3.publicKey);
-    t.ok(payload1, "Verified Consortium JWS payload1 is truthy");
-    t.ok(payload2, "Verified Consortium JWS payload2 is truthy");
-    t.ok(payload3, "Verified Consortium JWS payload3 is truthy");
+      // Create the API Server object that we embed in this test
+      const configService = new ConfigService();
+      const apiServerOptions = await configService.newExampleConfig();
+      apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
+      apiServerOptions.configFile = "";
+      apiServerOptions.apiCorsDomainCsv = "*";
+      apiServerOptions.apiPort = addressInfo2.port;
+      apiServerOptions.cockpitPort = 0;
+      apiServerOptions.grpcPort = 0;
+      apiServerOptions.apiTlsEnabled = false;
+      const config = await configService.newExampleConfigConvict(
+        apiServerOptions,
+      );
 
-    const wrongKey = await generateKeyPair("ES256K");
-    await t.rejects(generalVerify(consortiumJws, wrongKey.publicKey));
-    t.comment(JSON.stringify(payload1));
-  }
+      pluginRegistry.add(pluginConsortiumManual);
 
-  t.end();
+      apiServer2 = new ApiServer({
+        httpServerApi: httpServer2,
+        config: config.getProperties(),
+        pluginRegistry,
+      });
+
+      // Start the API server which is now listening on port A and it's healthcheck works through the main SDK
+      await apiServer2.start();
+
+      const configuration = new Configuration({ basePath: node2Host });
+      const api = new DefaultApi(configuration);
+      const res = await api.getNodeJwsV1();
+      expect(res).toBeTruthy();
+      expect(res.status).toEqual(200);
+      expect(res.data).toBeTruthy();
+      expect(res.data.jws).toBeTruthy();
+      const payload = await generalVerify(res.data.jws, keyPair2.publicKey);
+      expect(payload).toBeTruthy();
+    }
+
+    {
+      // Instantiate plugin registry which will provide the web service plugin with the key value storage plugin
+      const pluginRegistry = new PluginRegistry({ plugins: [] });
+
+      // Instantiate the web service consortium plugin
+      const keyPairPem = await exportPKCS8(keyPair3.privateKey);
+      const options: IPluginConsortiumManualOptions = {
+        instanceId: uuidV4(),
+        pluginRegistry,
+        keyPairPem: keyPairPem,
+        consortiumDatabase,
+        logLevel: "TRACE",
+      };
+      const pluginConsortiumManual = new PluginConsortiumManual(options);
+
+      // Create the API Server object that we embed in this test
+      const configService = new ConfigService();
+      const apiServerOptions = await configService.newExampleConfig();
+      apiServerOptions.authorizationProtocol = AuthorizationProtocol.NONE;
+      apiServerOptions.configFile = "";
+      apiServerOptions.apiCorsDomainCsv = "*";
+      apiServerOptions.apiPort = addressInfo3.port;
+      apiServerOptions.cockpitPort = 0;
+      apiServerOptions.grpcPort = 0;
+      apiServerOptions.apiTlsEnabled = false;
+      const config = await configService.newExampleConfigConvict(
+        apiServerOptions,
+      );
+      pluginRegistry.add(pluginConsortiumManual);
+
+      apiServer3 = new ApiServer({
+        httpServerApi: httpServer3,
+        config: config.getProperties(),
+        pluginRegistry,
+      });
+
+      // Start the API server which is now listening on port A and it's healthcheck works through the main SDK
+      await apiServer3.start();
+
+      // Instantiate the main SDK dynamically with whatever port the API server ended up bound to (port 0)
+
+      const configuration = new Configuration({ basePath: node3Host });
+      const api = new DefaultApi(configuration);
+      const res = await api.getNodeJwsV1();
+      expect(res).toBeTruthy();
+      expect(res.status).toEqual(200);
+      expect(res.data).toBeTruthy();
+      expect(res.data.jws).toBeTruthy();
+      const payload = await generalVerify(res.data.jws, keyPair3.publicKey);
+      expect(payload).toBeTruthy();
+    }
+
+    {
+      const configuration = new Configuration({ basePath: node3Host });
+      const api = new DefaultApi(configuration);
+      const res = await api.getConsortiumJwsV1();
+      expect(res.status).toEqual(200);
+      const getConsortiumJwsResponse = res.data;
+      const consortiumJws = getConsortiumJwsResponse.jws;
+      const payload1 = await generalVerify(consortiumJws, keyPair1.publicKey);
+      const payload2 = await generalVerify(consortiumJws, keyPair2.publicKey);
+      const payload3 = await generalVerify(consortiumJws, keyPair3.publicKey);
+      expect(payload1).toBeTruthy();
+      expect(payload2).toBeTruthy();
+      expect(payload3).toBeTruthy();
+
+      const wrongKey = await generateKeyPair("ES256K");
+      await expect(generalVerify(consortiumJws, wrongKey.publicKey)).toReject();
+    }
+
+    {
+      const configuration = new Configuration({ basePath: node2Host });
+      const api = new DefaultApi(configuration);
+      const res = await api.getConsortiumJwsV1();
+      expect(res.status).toEqual(200);
+      const getConsortiumJwsResponse = res.data;
+      const consortiumJws = getConsortiumJwsResponse.jws;
+      const payload1 = await generalVerify(consortiumJws, keyPair1.publicKey);
+      const payload2 = await generalVerify(consortiumJws, keyPair2.publicKey);
+      const payload3 = await generalVerify(consortiumJws, keyPair3.publicKey);
+      expect(payload1).toBeTruthy();
+      expect(payload2).toBeTruthy();
+      expect(payload3).toBeTruthy();
+
+      const wrongKey = await generateKeyPair("ES256K");
+      await expect(generalVerify(consortiumJws, wrongKey.publicKey)).toReject();
+    }
+
+    {
+      const configuration = new Configuration({ basePath: node1Host });
+      const api = new DefaultApi(configuration);
+      const res = await api.getConsortiumJwsV1();
+      expect(res.status).toEqual(200);
+      const getConsortiumJwsResponse = res.data;
+      const consortiumJws = getConsortiumJwsResponse.jws;
+      const payload1 = await generalVerify(consortiumJws, keyPair1.publicKey);
+      const payload2 = await generalVerify(consortiumJws, keyPair2.publicKey);
+      const payload3 = await generalVerify(consortiumJws, keyPair3.publicKey);
+      expect(payload1).toBeTruthy();
+      expect(payload2).toBeTruthy();
+      expect(payload3).toBeTruthy();
+
+      const wrongKey = await generateKeyPair("ES256K");
+      await expect(generalVerify(consortiumJws, wrongKey.publicKey)).toReject();
+    }
+  });
 });
