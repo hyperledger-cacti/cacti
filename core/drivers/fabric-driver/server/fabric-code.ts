@@ -13,6 +13,7 @@ import query_pb from '@hyperledger-labs/weaver-protos-js/common/query_pb';
 import view_data from '@hyperledger-labs/weaver-protos-js/fabric/view_data_pb';
 import proposalResponse from '@hyperledger-labs/weaver-protos-js/peer/proposal_response_pb';
 import interopPayload from '@hyperledger-labs/weaver-protos-js/common/interop_payload_pb';
+import state_pb from '@hyperledger-labs/weaver-protos-js/common/state_pb';
 import { Certificate } from '@fidm/x509';
 import { getConfig } from './walletSetup';
 
@@ -163,4 +164,23 @@ async function invoke(
     }
 }
 
-export { getNetworkGateway, invoke };
+// Package view and send to relay
+function packageFabricView(
+    query: query_pb.Query,
+    viewData: view_data.FabricView,
+) {
+    const meta = new state_pb.Meta();
+    meta.setTimestamp(new Date().toISOString());
+    meta.setProofType('Notarization');
+    meta.setSerializationFormat('STRING');
+    meta.setProtocol(state_pb.Meta.Protocol.FABRIC);
+    const view = new state_pb.View();
+    view.setMeta(meta);
+    view.setData(viewData ? viewData.serializeBinary() : Buffer.from(''));
+    const viewPayload = new state_pb.ViewPayload();
+    viewPayload.setView(view);
+    viewPayload.setRequestId(query.getRequestId());
+    return viewPayload;
+}
+
+export { getNetworkGateway, invoke, packageFabricView };

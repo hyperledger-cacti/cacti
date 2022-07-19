@@ -4,6 +4,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import fs from 'fs';
+import { credentials } from '@grpc/grpc-js';
+import datatransfer_grpc_pb from '@hyperledger-labs/weaver-protos-js/relay/datatransfer_grpc_pb';
+import events_grpc_pb from '@hyperledger-labs/weaver-protos-js/relay/events_grpc_pb';
+
 function checkIfArraysAreEqual(x: Array<any>, y: Array<any>): boolean {
     if (x == y) {
         return true;
@@ -49,8 +54,50 @@ function handlePromise<T>(promise: Promise<T>): Promise<[T?, Error?]> {
     return result
 }
 
+function getRelayClientForQueryResponse() {
+    let client;
+    if (process.env.RELAY_TLS === 'true') {
+        if (!(process.env.RELAY_TLSCA_CERT_PATH && fs.existsSync(process.env.RELAY_TLSCA_CERT_PATH))) {
+            throw new Error("Missing or invalid RELAY_TLSCA_CERT_PATH: " + process.env.RELAY_TLSCA_CERT_PATH);
+        }
+        const rootCert = fs.readFileSync(process.env.RELAY_TLSCA_CERT_PATH);
+        client = new datatransfer_grpc_pb.DataTransferClient(
+            process.env.RELAY_ENDPOINT,
+            credentials.createSsl(rootCert)
+        );
+    } else {
+        client = new datatransfer_grpc_pb.DataTransferClient(
+            process.env.RELAY_ENDPOINT,
+            credentials.createInsecure()
+        );
+    }
+    return client;
+}
+
+function getRelayClientForEventPublish() {
+    let client;
+    if (process.env.RELAY_TLS === 'true') {
+        if (!(process.env.RELAY_TLSCA_CERT_PATH && fs.existsSync(process.env.RELAY_TLSCA_CERT_PATH))) {
+            throw new Error("Missing or invalid RELAY_TLSCA_CERT_PATH: " + process.env.RELAY_TLSCA_CERT_PATH);
+        }
+        const rootCert = fs.readFileSync(process.env.RELAY_TLSCA_CERT_PATH);
+        client = new events_grpc_pb.EventPublishClient(
+            process.env.RELAY_ENDPOINT,
+            credentials.createSsl(rootCert)
+        );
+    } else {
+        client = new events_grpc_pb.EventPublishClient(
+            process.env.RELAY_ENDPOINT,
+            credentials.createInsecure()
+        );
+    }
+    return client;
+}
+
 export {
     checkIfArraysAreEqual,
     handlePromise,
-    relayCallback
+    relayCallback,
+    getRelayClientForQueryResponse,
+    getRelayClientForEventPublish
 }

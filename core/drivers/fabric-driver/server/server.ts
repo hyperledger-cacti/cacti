@@ -14,12 +14,12 @@ import driver_pb_grpc from '@hyperledger-labs/weaver-protos-js/driver/driver_grp
 import datatransfer_grpc_pb from '@hyperledger-labs/weaver-protos-js/relay/datatransfer_grpc_pb';
 import events_grpc_pb from '@hyperledger-labs/weaver-protos-js/relay/events_grpc_pb';
 import state_pb from '@hyperledger-labs/weaver-protos-js/common/state_pb';
-import { invoke, getNetworkGateway } from './fabric-code';
+import { invoke, getNetworkGateway, packageFabricView } from './fabric-code';
 import 'dotenv/config';
 import { walletSetup } from './walletSetup';
 import { subscribeEventHelper, unsubscribeEventHelper, signEventSubscriptionQuery } from "./events"
 import * as path from 'path';
-import { handlePromise, relayCallback } from './utils';
+import { handlePromise, relayCallback, getRelayClientForQueryResponse } from './utils';
 import { dbConnectionTest, eventSubscriptionTest } from "./tests"
 
 const server = new Server();
@@ -60,65 +60,6 @@ function mockCommunication(query: query_pb.Query) {
     }, 3000);
 }
 
-// Package view and send to relay
-export function packageView(
-    query: query_pb.Query,
-    viewData: fabricView.FabricView,
-) {
-    const meta = new state_pb.Meta();
-    meta.setTimestamp(new Date().toISOString());
-    meta.setProofType('Notarization');
-    meta.setSerializationFormat('STRING');
-    meta.setProtocol(state_pb.Meta.Protocol.FABRIC);
-    const view = new state_pb.View();
-    view.setMeta(meta);
-    view.setData(viewData ? viewData.serializeBinary() : Buffer.from(''));
-    const viewPayload = new state_pb.ViewPayload();
-    viewPayload.setView(view);
-    viewPayload.setRequestId(query.getRequestId());
-    return viewPayload;
-}
-
-export function getRelayClientForQueryResponse() {
-    let client;
-    if (process.env.RELAY_TLS === 'true') {
-        if (!(process.env.RELAY_TLSCA_CERT_PATH && fs.existsSync(process.env.RELAY_TLSCA_CERT_PATH))) {
-            throw new Error("Missing or invalid RELAY_TLSCA_CERT_PATH: " + process.env.RELAY_TLSCA_CERT_PATH);
-        }
-        const rootCert = fs.readFileSync(process.env.RELAY_TLSCA_CERT_PATH);
-        client = new datatransfer_grpc_pb.DataTransferClient(
-            process.env.RELAY_ENDPOINT,
-            credentials.createSsl(rootCert)
-        );
-    } else {
-        client = new datatransfer_grpc_pb.DataTransferClient(
-            process.env.RELAY_ENDPOINT,
-            credentials.createInsecure()
-        );
-    }
-    return client;
-}
-
-export function getRelayClientForEventPublish() {
-    let client;
-    if (process.env.RELAY_TLS === 'true') {
-        if (!(process.env.RELAY_TLSCA_CERT_PATH && fs.existsSync(process.env.RELAY_TLSCA_CERT_PATH))) {
-            throw new Error("Missing or invalid RELAY_TLSCA_CERT_PATH: " + process.env.RELAY_TLSCA_CERT_PATH);
-        }
-        const rootCert = fs.readFileSync(process.env.RELAY_TLSCA_CERT_PATH);
-        client = new events_grpc_pb.EventPublishClient(
-            process.env.RELAY_ENDPOINT,
-            credentials.createSsl(rootCert)
-        );
-    } else {
-        client = new events_grpc_pb.EventPublishClient(
-            process.env.RELAY_ENDPOINT,
-            credentials.createInsecure()
-        );
-    }
-    return client;
-}
-
 // Handles communication with fabric network and sends resulting data to the relay
 const fabricCommunication = async (query: query_pb.Query, networkName: string) => {
     // Query object from requestor
@@ -148,7 +89,7 @@ const fabricCommunication = async (query: query_pb.Query, networkName: string) =
         // Process response from invoke to send to relay
         console.log('Result of fabric invoke', result);
         console.log('Sending state');
-        const viewPayload: state_pb.ViewPayload = packageView(query, result);
+        const viewPayload: state_pb.ViewPayload = packageFabricView(query, result);
 
         console.log('Sending state');
         // Sending the fabric state to the relay.

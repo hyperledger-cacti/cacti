@@ -36,15 +36,16 @@ async function subscribeEventHelper(
         client.sendDriverSubscriptionStatus(ack_send_error, relayCallback);
     } else {
         const ack_send = new ack_pb.Ack();
-        if (newRequestId == requestId) {
-            // event being subscribed for the first time
-
-            // the event listener logic follows here
-            await registerListenerForEventSubscription(call_request, network_name);
-            // set the following ack_send message below, only if the event listener logic is successful; else set to an error message
-
-            ack_send.setMessage('Event subscription is successful!');
-            ack_send.setStatus(ack_pb.Ack.STATUS.OK);
+        if (newRequestId == requestId) {    // event being subscribed for the first time
+            // Start an appropriate type of event listener for this event subscription if one is not already active
+            const [listenerHandle, error] = await handlePromise(registerListenerForEventSubscription(call_request, network_name));
+            if (error) {
+                ack_send.setMessage('Event subscription succeeded but listener registration failed');
+                ack_send.setStatus(ack_pb.Ack.STATUS.ERROR);
+            } else {
+                ack_send.setMessage('Event subscription is successful!');
+                ack_send.setStatus(ack_pb.Ack.STATUS.OK);
+            }
         } else {
             // event being subscribed already exists
             ack_send.setMessage(`Event subscription already exists with requestId: ${requestId}`);
