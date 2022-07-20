@@ -265,7 +265,7 @@ pub fn try_mark_request_state_deleted(state: RequestState, request_id: String, d
     }
 }
 
-pub fn mark_event_states_deleted(fetched_event_states: EventStates, request_id: String, db: Database) {
+pub fn mark_event_states_deleted(fetched_event_states: EventStates, request_id: String, event_publish_key: String, db: Database) {
     let mut updated_event_states: Vec<EventState> = Vec::new();
     for fetched_event_state in fetched_event_states.states {
         let state_status = request_state::Status::from_i32(fetched_event_state.clone().state.expect("No State").status).expect("No Status");
@@ -283,10 +283,12 @@ pub fn mark_event_states_deleted(fetched_event_states: EventStates, request_id: 
                 message: fetched_event_state.message.to_string(),
             };
             updated_event_states.push(deleted_event_state);
+        } else {
+            updated_event_states.push(fetched_event_state);
         }
     }
     
-    db.set(&get_event_publication_key(request_id.to_string()), &updated_event_states)
+    db.set(&event_publish_key.to_string(), &updated_event_states)
         .expect("EventState Delete: Failed to insert into DB");
 }
 pub fn get_event_subscription_key(request_id: String) -> String {

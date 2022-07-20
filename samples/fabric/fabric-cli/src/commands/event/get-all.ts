@@ -15,9 +15,9 @@ import * as fs from 'fs'
 import * as path from 'path'
 
 const command: GluegunCommand = {
-  name: 'get-subscription-status',
-  alias: ['-g'],
-  description: 'Get event subscription status',
+  name: 'get-all',
+  alias: ['-gall'],
+  description: 'Get all received event states',
   run: async toolbox => {
     const {
       print,
@@ -27,8 +27,8 @@ const command: GluegunCommand = {
       commandHelp(
         print,
         toolbox,
-        `fabric-cli event unsubscribe --network=<network1|network2> --request-id="abc123"`,
-        'fabric-cli event unsubscribe --network=<network-name> --request-id=<request_id>',
+        `fabric-cli event get-all --network=<network1|network2> --request-id="abc123"`,
+        'fabric-cli event get-all --network=<network-name> --request-id=<request_id>',
         [
             {
                 name: '--network',
@@ -47,11 +47,11 @@ const command: GluegunCommand = {
             }
         ],
         command,
-        ['event', 'get-subscription-status']
+        ['event', 'get-all']
       )
       return
     }
-    console.log("Get Event Subscription Status")
+    console.log("Get All Received Event States")
     if (options.debug === 'true') {
         logger.level = 'debug'
         logger.debug('Debugging is enabled')
@@ -74,11 +74,11 @@ const command: GluegunCommand = {
         throw new Error(`No valid config entry found for ${networkName}`)
     }
     try {
-        const response = await EventsManager.getSubscriptionStatus(
+        const response = await EventsManager.getAllReceivedEvents(
             requestId,
             netConfig.relayEndpoint
         )
-        console.log("Event subscription status:", JSON.stringify(response))
+        console.log("Event States:", JSON.stringify(response, null, 4))
     } catch(e) {
         console.log("Error: ", e.toString())
     }

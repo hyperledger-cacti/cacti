@@ -348,7 +348,7 @@ impl Network for NetworkService {
         let result = db.get::<EventStates>(event_publish_key.to_string());
         match result {
             Ok(fetched_event_states) => {
-                mark_event_states_deleted(fetched_event_states.clone(), request_id.to_string(), db);
+                mark_event_states_deleted(fetched_event_states.clone(), request_id.to_string(), event_publish_key.to_string(), db);
                 println!("Sending back EventStates to network: Request ID = {:?}: {:?}",
                          request_id.to_string(),
                          fetched_event_states.clone()
