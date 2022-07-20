@@ -40,6 +40,13 @@ async function subscribeEventHelper(
             // Start an appropriate type of event listener for this event subscription if one is not already active
             const [listenerHandle, error] = await handlePromise(registerListenerForEventSubscription(call_request, network_name));
             if (error) {
+                // Need to delete subscription in database too, for consistency
+                const [deletedSubscription, err] =
+                    await handlePromise(deleteEventSubscription(call_request.getEventMatcher()!, newRequestId));
+                if (err) {
+                    const errorString: string = `${JSON.stringify(err)}`;
+                    console.error(errorString);
+                }
                 ack_send.setMessage('Event subscription succeeded but listener registration failed');
                 ack_send.setStatus(ack_pb.Ack.STATUS.ERROR);
             } else {
