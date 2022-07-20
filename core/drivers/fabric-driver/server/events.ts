@@ -12,7 +12,7 @@ import { InteroperableHelper } from '@hyperledger-labs/weaver-fabric-interop-sdk
 import { getDriverKeyCert } from "./walletSetup";
 import { DBConnector, LevelDBConnector } from "./dbConnector";
 import { checkIfArraysAreEqual, handlePromise, relayCallback } from "./utils";
-import { registerListenerForEventSubscription } from "./listener";
+import { registerListenerForEventSubscription, unregisterListenerForEventSubscription } from "./listener";
 
 const DB_NAME: string = "driverdb";
 
@@ -70,6 +70,15 @@ async function unsubscribeEventHelper(
     client: events_grpc_pb.EventSubscribeClient,
     network_name: string,
 ) {
+    const [unregister, err] =
+        await handlePromise(unregisterListenerForEventSubscription(call_request.getEventMatcher()!, network_name));
+    if (!unregister) {      // Just log a warning. This is not critical.
+        console.warn('No listener running for the given subscription or unable to stop listener');
+    }
+    if (err) {    // Just log the error. This is not critical.
+        const errorString: string = `${JSON.stringify(err)}`;
+        console.error(errorString);
+    }
     const newRequestId = call_request.getQuery()!.getRequestId();
     const [deletedSubscription, error] =
         await handlePromise(deleteEventSubscription(call_request.getEventMatcher()!, newRequestId));

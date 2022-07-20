@@ -393,7 +393,7 @@ Below are the steps to exercise asset transfers from `network1` to `network2` us
     ```
 * To unsuscribe for one or more events, use the same JSON file as in subscription like: [Sample Event Sub JSON](./src/data/event_sub_sample.json). Then run the following command:
     ```
-    ./bin/fabric-cli event unsubscribe --network=network1 --request-id=<request-id> src/data/event_sub_sample.json
+    ./bin/fabric-cli event unsubscribe --network=network1 --request-ids=<colon-separated-list-of-request-ids> src/data/event_sub_sample.json
     ```
 * To get the status of an event subscription, run the following command:
     ```

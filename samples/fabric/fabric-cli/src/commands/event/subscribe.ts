@@ -115,7 +115,7 @@ const command: GluegunCommand = {
             )
 
             if (response.getStatus() == EventSubscriptionState.STATUS.SUBSCRIBED) {
-                console.log("Event Subscription Status Success with requestId:", response.getRequestId())
+                console.log("Event Subscription Status Success with requestId:", response.getRequestId(), 'and event matcher:', eventMatcher)
             } else {
                 console.log("Unknown error")
             }

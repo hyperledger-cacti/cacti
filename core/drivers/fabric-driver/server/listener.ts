@@ -14,6 +14,9 @@ import { lookupEventSubscriptions } from './events';
 import { invoke, getNetworkGateway, packageFabricView } from './fabric-code';
 import { handlePromise, relayCallback, getRelayClientForEventPublish } from './utils';
 
+let networkGatewayMap = new Map<string, Gateway>();
+let networkChannelMap = new Map<string, Network>();
+let networkChannelContractMap = new Map<string, Contract>();
 let channelBlockListenerMap = new Map<string, BlockListener>();
 let channelBlockListenerCount = new Map<string, number>();
 let channelContractListenerMap = new Map<string, ContractListener>();
@@ -155,8 +158,7 @@ const initContractEventListener = (
 }
 
 /**
- * Record event subscription in the driver database.
- * Start an appropriate listener if there is currently none for the channel this event subscription refers to.
+ * Start an appropriate listener if there is currently none for the channel (or chaincode) this event subscription refers to.
  **/
 const registerListenerForEventSubscription = async (
     eventSubscription: events_pb.EventSubscription,
@@ -169,8 +171,19 @@ const registerListenerForEventSubscription = async (
     }
 
     const channelId = eventMatcher.getTransactionLedgerId();
-    const gateway = await getNetworkGateway(networkName);
-    const network = await gateway.getNetwork(channelId);
+    let gateway: Gateway, network: Network;
+    if (networkGatewayMap.has(networkName)) {
+        gateway = networkGatewayMap.get(networkName);
+        network = networkChannelMap.get(channelId);
+        if (!network) {
+            throw new Error('No network/channel handle found for existing gateway and channel ID: ' + channelId);
+        }
+    } else {
+        gateway = await getNetworkGateway(networkName);
+        networkGatewayMap.set(networkName, gateway);
+        network = await gateway.getNetwork(channelId);
+        networkChannelMap.set(channelId, network);
+    }
     // Check if the event_class_id is specified in the event matcher field.
     if (eventMatcher.getEventClassId().length === 0) {
         // Check if there is an active block listener for the channel specified in this event subscription.
@@ -179,23 +192,92 @@ const registerListenerForEventSubscription = async (
         } else {
             // Start a block listener.
             const listener = await initBlockEventListenerForChannel(network, networkName, channelId);
-            channelBlockListenerCount.set(channelId, 0);
+            channelBlockListenerCount.set(channelId, 1);
             return listener;
         }
     } else {
         // Check if there is an active contract listener for the contract function specified in this event subscription.
         const contractId = eventMatcher.getTransactionContractId();
-        const contract = network.getContract(contractId);
         const channelContractKey = getChannelContractKey(channelId, contractId);
+        let contract: Contract;
+        if (networkChannelContractMap.has(channelContractKey)) {
+            contract = networkChannelContractMap.get(channelContractKey);
+        } else {
+            contract = network.getContract(contractId);
+            networkChannelContractMap.set(channelContractKey, contract);
+        }
         if (channelContractListenerMap.has(channelContractKey)) {
             channelContractListenerCount.set(channelContractKey, channelContractListenerCount.get(channelContractKey) + 1);
         } else {
             // Start a contract listener.
             const listener = initContractEventListener(contract, networkName, channelId, contractId);
-            channelContractListenerCount.set(channelContractKey, 0);
+            channelContractListenerCount.set(channelContractKey, 1);
+            return listener;
         }
     }
     return null;    // Listener was already running. Nothing to do.
+}
+
+/**
+ * Decrement subscription count against an active listener. Stop the listener if the count is 0.
+ **/
+const unregisterListenerForEventSubscription = async (
+    eventMatcher: events_pb.EventMatcher,
+    networkName: string,
+): Promise<boolean> => {
+    if (!eventMatcher) {
+        throw new Error('No event matcher in event subscription');
+    }
+
+    const channelId = eventMatcher.getTransactionLedgerId();
+    let gateway: Gateway, network: Network;
+    if (networkGatewayMap.has(networkName)) {
+        gateway = networkGatewayMap.get(networkName);
+        network = networkChannelMap.get(channelId);
+        if (!network) {
+            throw new Error('No network/channel handle found for existing gateway and channel ID: ' + channelId);
+        }
+    } else {
+        gateway = await getNetworkGateway(networkName);
+        networkGatewayMap.set(networkName, gateway);
+        network = await gateway.getNetwork(channelId);
+        networkChannelMap.set(channelId, network);
+    }
+    // Check if the event_class_id is specified in the event matcher field.
+    if (eventMatcher.getEventClassId().length === 0) {
+        if (!channelBlockListenerMap.has(channelId)) {
+            return false;
+        }
+        channelBlockListenerCount.set(channelId, channelBlockListenerCount.get(channelId) - 1);
+        if (channelBlockListenerCount.get(channelId) === 0) {   // Remove listener and counter
+            network.removeBlockListener(channelBlockListenerMap.get(channelId));
+            channelBlockListenerCount.delete(channelId);
+            return channelBlockListenerMap.delete(channelId);
+        } else {
+            return true;
+        }
+    } else {
+        const contractId = eventMatcher.getTransactionContractId();
+        const channelContractKey = getChannelContractKey(channelId, contractId);
+        let contract: Contract;
+        if (networkChannelContractMap.has(channelContractKey)) {
+            contract = networkChannelContractMap.get(channelContractKey);
+        } else {
+            contract = network.getContract(contractId);
+            networkChannelContractMap.set(channelContractKey, contract);
+        }
+        if (!channelContractListenerMap.has(channelContractKey)) {
+            return false;
+        }
+        channelContractListenerCount.set(channelContractKey, channelContractListenerCount.get(channelContractKey) - 1);
+        if (channelContractListenerCount.get(channelContractKey) === 0) {   // Remove listener and counter
+            contract.removeContractListener(channelContractListenerMap.get(channelContractKey));
+            channelContractListenerCount.delete(channelContractKey);
+            return channelContractListenerMap.delete(channelContractKey);
+        } else {
+            return true;
+        }
+    }
 }
 
 /**
@@ -207,4 +289,4 @@ const loadEventSubscriptionsFromStorage = (
     // TODO
 }
 
-export { registerListenerForEventSubscription, loadEventSubscriptionsFromStorage };
+export { registerListenerForEventSubscription, unregisterListenerForEventSubscription, loadEventSubscriptionsFromStorage };
