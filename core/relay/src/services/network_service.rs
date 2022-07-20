@@ -2,7 +2,7 @@
 use crate::pb::common::ack::{ack, Ack};
 use crate::pb::common::query::Query;
 use crate::pb::common::state::{request_state, RequestState};
-use crate::pb::common::events::{EventSubscription, event_subscription_state, EventSubscriptionState, EventSubOperation, event_publication, EventPublication};
+use crate::pb::common::events::{EventSubscription, event_subscription_state, EventSubscriptionState, EventSubOperation, event_publication, EventPublication, EventStates};
 use crate::pb::networks::networks::network_server::Network;
 use crate::pb::networks::networks::{DbName, GetStateMessage, NetworkQuery, RelayDatabase, NetworkEventSubscription, NetworkEventUnsubscription};
 use crate::pb::relay::datatransfer::data_transfer_client::DataTransferClient;
@@ -10,8 +10,7 @@ use crate::pb::relay::events::event_subscribe_client::EventSubscribeClient;
 use crate::relay_proto::{parse_address, LocationSegment};
 // Internal modules
 use crate::db::Database;
-use crate::services::helpers::update_event_subscription_status;
-use crate::services::helpers::driver_sign_subscription_helper;
+use crate::services::helpers::{update_event_subscription_status, driver_sign_subscription_helper, try_mark_request_state_deleted, mark_event_states_deleted, get_event_publication_key, get_event_subscription_key};
 
 // External modules
 use config;
@@ -39,7 +38,8 @@ impl Network for NetworkService {
         let db = Database {
             db_path: conf.get_str("db_path").unwrap(),
         };
-        let result = db.get::<RequestState>(request.into_inner().request_id);
+        let request_id = request.into_inner().request_id;
+        let result = db.get::<RequestState>(request_id.to_string());
         match result {
             Ok(request_state) => {
                 println!("Sending back RequestState to network: Request ID = {:?}, Status = {:?}",
@@ -48,6 +48,7 @@ impl Network for NetworkService {
                          );
                 match request_state.state.as_ref() {
                     Some(state) => {
+                        try_mark_request_state_deleted(request_state.clone(), request_id.to_string(), db);
                         match state {
                             request_state::State::View(v) => println!("View Meta: {:?}, View Data: {:?}", v.meta, base64::encode(&v.data)),
                             request_state::State::Error(e) => println!("Error: {:?}", e),
@@ -75,14 +76,34 @@ impl Network for NetworkService {
         let mut curr_key = req_db.get_gt("").unwrap();
 
         while let Some(key) = curr_key {
-            let decoded_result: Result<RequestState, bincode::Error> =
-                bincode::deserialize(&key.1[..]);
             // println!("{:?}", key);
             let decoded_key = std::str::from_utf8(&key.0[..]).unwrap();
-            requests.insert(
-                format!("{:?}", decoded_key),
-                format!("{:?}", decoded_result),
-            );
+            
+            if decoded_key.to_string().contains(&"event_sub".to_string()) {
+                let decoded_result: Result<EventSubscriptionState, bincode::Error> =
+                    bincode::deserialize(&key.1[..]);
+                requests.insert(
+                    format!("{:?}", decoded_key),
+                    format!("{:?}", decoded_result),
+                );
+                println!("Event Sub {:?} => {:?}", decoded_key, decoded_result);
+            } else if decoded_key.to_string().contains(&"event_pub".to_string()) {
+                let decoded_result: Result<EventStates, bincode::Error> =
+                    bincode::deserialize(&key.1[..]);
+                requests.insert(
+                    format!("{:?}", decoded_key),
+                    format!("{:?}", decoded_result),
+                );
+                println!("Event Pub {:?} => {:?}", decoded_key, decoded_result);
+            } else {
+                let decoded_result: Result<RequestState, bincode::Error> =
+                    bincode::deserialize(&key.1[..]);
+                requests.insert(
+                    format!("{:?}", decoded_key),
+                    format!("{:?}", decoded_result),
+                );
+                println!("RequestState {:?} => {:?}", decoded_key, decoded_result);
+            }
             curr_key = req_db.get_gt(key.0).unwrap();
         }
         return Ok(Response::new(RelayDatabase { pairs: requests }));
@@ -227,13 +248,14 @@ impl Network for NetworkService {
         let db = Database {
             db_path: conf.get_str("db_path").unwrap(),
         };
-        let result = db.get::<EventSubscriptionState>(request.into_inner().request_id);
+        let event_sub_key = get_event_subscription_key(request.into_inner().request_id);
+        let result = db.get::<EventSubscriptionState>(event_sub_key.to_string());
         match result {
             Ok(fetched_event_sub_state) => {
                 match event_subscription_state::Status::from_i32(fetched_event_sub_state.status) {
                     Some(status) => match status {
                         event_subscription_state::Status::Unsubscribed => {
-                            let result = db.unset::<EventSubscriptionState>(fetched_event_sub_state.clone().request_id);
+                            let result = db.unset::<EventSubscriptionState>(event_sub_key.to_string());
                             match result {
                                 Ok(old_state) => {
                                     println!("Removed EventSubscription from database: {:?}", old_state);
@@ -310,6 +332,35 @@ impl Network for NetworkService {
 
         return event_subscription_helper(event_subscription, event_publication_spec, target, request_id.to_string(), db, conf).await;
     }
+    
+    // Fetch EventStates for given subscription request identified by request_id.
+    async fn get_event_states(
+        &self,
+        request: Request<GetStateMessage>,
+    ) -> Result<Response<EventStates>, Status> {
+        println!("\nReceived GetEventStates request from network: {:?}", request);
+        let conf = self.config_lock.read().await.clone();
+        let db = Database {
+            db_path: conf.get_str("db_path").unwrap(),
+        };
+        let request_id = request.into_inner().request_id;
+        let event_publish_key = get_event_publication_key(request_id.to_string());
+        let result = db.get::<EventStates>(event_publish_key.to_string());
+        match result {
+            Ok(fetched_event_states) => {
+                mark_event_states_deleted(fetched_event_states.clone(), request_id.to_string(), db);
+                println!("Sending back EventStates to network: Request ID = {:?}: {:?}",
+                         request_id.to_string(),
+                         fetched_event_states.clone()
+                        );
+                return Ok(Response::new(fetched_event_states));
+            },
+            Err(e) => Err(Status::new(
+                Code::NotFound,
+                format!("EventStates not found for request_id: {}. Error: {:?}", request_id.to_string(), e),
+            )),
+        }
+    }
 }
 
 async fn event_subscription_helper(
@@ -371,7 +422,8 @@ async fn event_subscription_helper(
         }
     };
     
-    let message_insert = db.set(&request_id.to_string(), &target_status);
+    let event_sub_key = get_event_subscription_key(request_id.to_string());
+    let message_insert = db.set(&event_sub_key.to_string(), &target_status);
     // Kept this as a match as the error case returns an Ok.
     match message_insert {
         Ok(_) => println!(

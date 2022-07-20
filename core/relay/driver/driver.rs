@@ -187,7 +187,12 @@ impl DriverCommunication for DriverCommunicationService {
         return Ok(Response::new(signed_query));
     }
     async fn write_external_state(&self, request: Request<WriteExternalStateMessage>) -> Result<Response<Ack>, Status> {
-        Err(tonic::Status::unimplemented("method not implemented"))
+        let reply = Ack {
+            status: ack::Status::Ok as i32,
+            request_id: request.into_inner().view_payload.expect("Error").request_id.to_string(),
+            message: "Successfully written".to_string(),
+        };
+        return Ok(Response::new(reply));
     }
 }
 

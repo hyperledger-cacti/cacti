@@ -1,14 +1,14 @@
 // Internal generated modules
 use crate::pb::common::ack::{ack, Ack};
 use crate::pb::common::query::Query;
-use crate::pb::common::events::EventSubscription;
+use crate::pb::common::events::{EventSubOperation, EventSubscription};
 use crate::pb::relay::events::event_subscribe_client::EventSubscribeClient;
 use crate::pb::relay::events::event_subscribe_server::EventSubscribe;
 // Internal modules
 use crate::db::Database;
 use crate::error::Error;
-use crate::relay_proto::{parse_address, LocationSegment};
-use crate::services::helpers::{update_event_subscription_status, get_driver, get_driver_client};
+use crate::relay_proto::{parse_address, LocationSegment}        ;
+use crate::services::helpers::{update_event_subscription_status, get_driver, get_driver_client, get_event_subscription_key};
 use crate::services::types::{Driver};
 // external modules
 use config;
@@ -41,7 +41,7 @@ impl EventSubscribe for EventSubscribeService {
         let remote_db = Database {
             db_path: conf.get_str("remote_db_path").unwrap(),
         };
-        match subscribe_event_helper(remote_db, request_id.to_string(), event_subscription, query, conf.clone()) {
+        match subscribe_event_helper(remote_db, request_id.to_string(), event_subscription, conf.clone()) {
             Ok(ack) => {
                 let reply = Ok(Response::new(ack));
                 println!("Sending back Ack: {:?}\n", reply);
@@ -134,12 +134,14 @@ fn subscribe_event_helper(
     remote_db: Database,
     request_id: String,
     event_subscription: EventSubscription,
-    query: Query,
     conf: config::Config,
 ) -> Result<Ack, Error> {
-    let _set_query = remote_db
-        .set(&request_id.to_string(), &query)
+    let event_sub_key = get_event_subscription_key(request_id.to_string());
+    let _set_event_sub = remote_db
+        .set(&event_sub_key.to_string(), &event_subscription)
         .map_err(|e| Error::Simple(format!("DB Failure: {:?}", e)))?;
+        
+    let query = event_subscription.query.clone().expect("No query passed with EventSubscription request");
     let parsed_address = parse_address(query.address.to_string())?;
     let result = get_driver(parsed_address.network_id.to_string(), conf.clone());
     match result {
@@ -230,9 +232,14 @@ fn send_driver_subscription_status_helper(
     conf: config::Config,
     ack: Ack,
 ) -> Result<Response<Ack>, Error> {
-    let query: Query = remote_db
-        .get::<Query>(request_id.to_string())
-        .map_err(|err| Error::GetQuery(format!("Failed to get query from db. Error: {:?}", err)))?;
+    let event_sub_key = get_event_subscription_key(request_id.to_string());
+    let event_sub: EventSubscription =  remote_db
+        .get::<EventSubscription>(event_sub_key.to_string())
+        .map_err(|err| Error::GetQuery(format!("Failed to get event subscription from db. Error: {:?}", err)))?;
+    let query: Query = event_sub.query.clone().expect("Unexpected Error: Query not found in event subscription");
+    let operation = EventSubOperation::from_i32(event_sub.operation)
+        .ok_or(Error::Simple("Error: No Event Subscription operation defined".to_string()))?;
+    let unsubscribe = operation == EventSubOperation::Unsubscribe;
     let relays_table = conf.get_table("relays")?;
     let relay_uri = relays_table
         .get(&query.requesting_relay.to_string())
@@ -244,6 +251,8 @@ fn send_driver_subscription_status_helper(
         uri.port.to_string(),
         uri.tls,
         uri.tlsca_cert_path.to_string(),
+        unsubscribe,
+        remote_db
     );
     let reply = Ack {
         status: ack::Status::Ok as i32,
@@ -258,10 +267,20 @@ fn send_driver_subscription_status_helper(
 // spawn_send_subscription_status sends event subscription status from the remote relay back 
 // to the requesting relay.
 // When it errors it currently logs to console. Needs improving
-fn spawn_send_subscription_status(ack: Ack, requestor_host: String, requester_port: String, use_tls: bool, tlsca_cert_path: String) {
+fn spawn_send_subscription_status(
+    ack: Ack,
+    requestor_host: String,
+    requester_port: String,
+    use_tls: bool,
+    tlsca_cert_path: String,
+    unsubscribe: bool,
+    remote_db: Database,
+) {
     tokio::spawn(async move {
-        println!("Sending Subscription Status back to requesting relay: Request ID = {:?}", ack.request_id);
+        let request_id = ack.clone().request_id;
+        println!("Sending Subscription Status back to requesting relay: Request ID = {:?}", request_id);
         let client_addr = format!("http://{}:{}", requestor_host, requester_port);
+        let mut response: Result<tonic::Response<Ack>, tonic::Status> = Err(tonic::Status::unimplemented("uninitialized"));
         if use_tls {
             let pem = tokio::fs::read(tlsca_cert_path).await.unwrap();
             let ca = Certificate::from_pem(pem);
@@ -270,20 +289,20 @@ fn spawn_send_subscription_status(ack: Ack, requestor_host: String, requester_po
                 .ca_certificate(ca)
                 .domain_name(requestor_host);
 
-            let channel = Channel::from_shared(client_addr).unwrap()
+            let channel = Channel::from_shared(client_addr.clone()).unwrap()
                 .tls_config(tls)
                 .connect()
                 .await
                 .unwrap();
 
             let mut client_result = EventSubscribeClient::new(channel);
-            let response = client_result.send_subscription_status(ack).await;
+            response = client_result.send_subscription_status(ack.clone()).await;
             println!("Response ACK from requesting relay={:?}\n", response);
         } else {
-            let client_result = EventSubscribeClient::connect(client_addr).await;
+            let client_result = EventSubscribeClient::connect(client_addr.clone()).await;
             match client_result {
                 Ok(client) => {
-                    let response = client.clone().send_subscription_status(ack).await;
+                    response = client.clone().send_subscription_status(ack.clone()).await;
                     println!("Response ACK from requesting relay={:?}\n", response);
                     // Not returning anything here
                 }
@@ -296,6 +315,39 @@ fn spawn_send_subscription_status(ack: Ack, requestor_host: String, requester_po
                     );
                     // TODO: Handle this error thorugh join handle after thread completes.
                     // Not actually returning anything here yet
+                }
+            }
+        }
+        if unsubscribe {
+            println!("\nUnsubscribe Operation, deleting entry from remote_db\n");
+            match response {
+                Ok(response_ack) => {
+                    println!("Response ACK from relay={:?}\n", ack);
+                    match ack::Status::from_i32(response_ack.into_inner().status) {
+                        Some(status) => match status {
+                            ack::Status::Ok => {
+                                let event_sub_key = get_event_subscription_key(request_id.to_string());
+                                let db_result = remote_db.unset::<EventSubscription>(event_sub_key);
+                                match db_result {
+                                    Ok(old_state) => {
+                                        println!("Removed EventSubscription from database: {:?}", old_state);
+                                    },
+                                    Err(e) => {
+                                        println!("EventSubscription Request not found. Error: {:?}", e);
+                                    }
+                                }
+                            },
+                            ack::Status::Error => {
+                                println!("Error from relay: {}", ack.message)
+                            }
+                        }
+                        None => {
+                            println!("Error: No Ack Status from relay")
+                        }
+                    }
+                }
+                Err(_e) => {
+                    println!("Error: error connecting to relay at {}", client_addr);
                 }
             }
         }

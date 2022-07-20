@@ -33,4 +33,9 @@ impl Database {
         req_db.remove(format!("b{}", key))?;
         decoded_result
     }
+    pub fn has_key(&self, key: String) -> Result<bool, Error> {
+        let req_db = open(&self.db_path).unwrap();
+        let result = req_db.contains_key(format!("b{}", key))?;
+        Ok(result)
+    }
 }
