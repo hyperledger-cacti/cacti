@@ -15,7 +15,7 @@ import {
   DefaultEventHandlerOptions,
   DefaultEventHandlerStrategies,
   Gateway,
-  GatewayOptions,
+  GatewayOptions as FabricGatewayOptions,
   Wallets,
   X509Identity,
   TransientMap,
@@ -72,6 +72,9 @@ import {
   DefaultEventHandlerStrategy,
   FabricSigningCredentialType,
   GetTransactionReceiptResponse,
+  GatewayOptions,
+  GetBlockRequestV1,
+  GetBlockResponseV1,
 } from "./generated/openapi/typescript-axios/index";
 
 import {
@@ -93,6 +96,7 @@ import FabricCAServices, {
 } from "fabric-ca-client";
 import { createGateway } from "./common/create-gateway";
 import { Endorser, ICryptoKey } from "fabric-common";
+
 import {
   IVaultConfig,
   IWebSocketConfig,
@@ -108,6 +112,9 @@ import {
   getTransactionReceiptByTxID,
   IGetTransactionReceiptByTxIDOptions,
 } from "./common/get-transaction-receipt-by-tx-id";
+import { GetBlockEndpointV1 } from "./get-block/get-block-endpoint-v1";
+import { querySystemChainCode } from "./common/query-system-chain-code";
+
 /**
  * Constant value holding the default $GOPATH in the Fabric CLI container as
  * observed on fabric deployments that are produced by the official examples
@@ -831,6 +838,13 @@ export class PluginLedgerConnectorFabric
       const endpoint = new GetTransactionReceiptByTxIDEndpointV1(opts);
       endpoints.push(endpoint);
     }
+    {
+      const endpoint = new GetBlockEndpointV1({
+        connector: this,
+        logLevel: this.opts.logLevel,
+      });
+      endpoints.push(endpoint);
+    }
 
     {
       const opts: IGetPrometheusExporterMetricsEndpointV1Options = {
@@ -847,30 +861,62 @@ export class PluginLedgerConnectorFabric
     return endpoints;
   }
 
+  /**
+   * Create gateway from request (will choose logic based on request)
+   *
+   * @node It seems that Gateway is not supposed to be created and destroyed rapidly, but
+   * rather kept around for longer. Possible issues:
+   *  - Disconnect is async and takes a while until all internal services are closed.
+   *  - Possible memory and connection pool leak (see https://github.com/hyperledger/fabric-sdk-node/issues/529).
+   *  - Performance: there's a setup overhead that might be significant after scaling up. Hence...
+   * @todo Cache and reuse gateways (destroy only ones not used for a while).
+   * Or maybe add separate methods "start/stopSession" that would leave session management to the client?
+   *
+   * @param req must contain either gatewayOptions or signingCredential.
+   * @returns Fabric SDK Gateway
+   */
   protected async createGateway(req: RunTransactionRequest): Promise<Gateway> {
     if (req.gatewayOptions) {
-      return createGateway({
-        logLevel: this.opts.logLevel,
-        pluginRegistry: this.opts.pluginRegistry,
-        defaultConnectionProfile: this.opts.connectionProfile,
-        defaultDiscoveryOptions: this.opts.discoveryOptions || {
-          enabled: true,
-          asLocalhost: true,
-        },
-        defaultEventHandlerOptions: this.opts.eventHandlerOptions || {
-          endorseTimeout: 300,
-          commitTimeout: 300,
-          strategy: DefaultEventHandlerStrategy.NetworkScopeAllfortx,
-        },
-        gatewayOptions: req.gatewayOptions,
-        secureIdentity: this.secureIdentity,
-        certStore: this.certStore,
-      });
+      return this.createGatewayWithOptions(req.gatewayOptions);
     } else {
       return this.createGatewayLegacy(req.signingCredential);
     }
   }
 
+  /**
+   * Create Gateway from dedicated gateway options.
+   *
+   * @param options gateway options
+   * @returns Fabric SDK Gateway
+   */
+  protected async createGatewayWithOptions(
+    options: GatewayOptions,
+  ): Promise<Gateway> {
+    return createGateway({
+      logLevel: this.opts.logLevel,
+      pluginRegistry: this.opts.pluginRegistry,
+      defaultConnectionProfile: this.opts.connectionProfile,
+      defaultDiscoveryOptions: this.opts.discoveryOptions || {
+        enabled: true,
+        asLocalhost: true,
+      },
+      defaultEventHandlerOptions: this.opts.eventHandlerOptions || {
+        endorseTimeout: 300,
+        commitTimeout: 300,
+        strategy: DefaultEventHandlerStrategy.NetworkScopeAllfortx,
+      },
+      gatewayOptions: options,
+      secureIdentity: this.secureIdentity,
+      certStore: this.certStore,
+    });
+  }
+
+  /**
+   * Create Gateway from signing credential (legacy, can be done with gateway options)
+   *
+   * @param signingCredential sign data.
+   * @returns Fabric SDK Gateway
+   */
   protected async createGatewayLegacy(
     signingCredential: FabricSigningCredential,
   ): Promise<Gateway> {
@@ -933,7 +979,7 @@ export class PluginLedgerConnectorFabric
         DefaultEventHandlerStrategies[eho.strategy];
     }
 
-    const gatewayOptions: GatewayOptions = {
+    const gatewayOptions: FabricGatewayOptions = {
       discovery: this.opts.discoveryOptions,
       eventHandlerOptions,
       identity: identity,
@@ -1346,5 +1392,84 @@ export class PluginLedgerConnectorFabric
       caId: request.caId,
       mspId: certData.mspId,
     });
+  }
+
+  /**
+   * Get fabric block from a channel, using one of selectors.
+   *
+   * @param req input parameters
+   * @returns Entire block object or encoded buffer (if req.skipDecode is true)
+   */
+  public async getBlock(req: GetBlockRequestV1): Promise<GetBlockResponseV1> {
+    this.log.debug(
+      "getBlock() called, channelName:",
+      req.channelName,
+      "query:",
+      JSON.stringify(req.query),
+    );
+
+    const gateway = await this.createGatewayWithOptions(req.gatewayOptions);
+    const { channelName, skipDecode } = req;
+    const connectionChannelName = req.connectionChannelName ?? channelName;
+    const queryConfig = {
+      gateway,
+      connectionChannelName,
+      skipDecode,
+    };
+
+    let responseData: unknown;
+    if (req.query.blockNumber) {
+      this.log.debug("getBlock by it's blockNumber:", req.query.blockNumber);
+      responseData = await querySystemChainCode(
+        queryConfig,
+        "GetBlockByNumber",
+        channelName,
+        req.query.blockNumber,
+      );
+    } else if (req.query.blockHash) {
+      const { buffer, encoding } = req.query.blockHash;
+      this.log.debug("getBlock by it's hash:", buffer);
+
+      if (encoding && !Buffer.isEncoding(encoding)) {
+        throw new Error(`Unknown buffer encoding provided: ${encoding}`);
+      }
+
+      responseData = await querySystemChainCode(
+        queryConfig,
+        "GetBlockByHash",
+        channelName,
+        Buffer.from(buffer, encoding as BufferEncoding),
+      );
+    } else if (req.query.transactionId) {
+      this.log.debug(
+        "getBlock by transactionId it contains:",
+        req.query.transactionId,
+      );
+      responseData = await querySystemChainCode(
+        queryConfig,
+        "GetBlockByTxID",
+        channelName,
+        req.query.transactionId,
+      );
+    } else {
+      throw new Error(
+        "Unsupported block query type - you must provide either number, hash or txId",
+      );
+    }
+
+    if (!responseData) {
+      throw new Error("Could not retrieve block data (got empty response)");
+    }
+    this.log.debug("responseData:", responseData);
+
+    if (skipDecode) {
+      return {
+        encodedBlock: responseData,
+      };
+    }
+
+    return {
+      decodedBlock: responseData,
+    };
   }
 }

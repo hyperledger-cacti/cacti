@@ -11,46 +11,46 @@
     },
     "components": {
         "schemas": {
-            "TransactReceiptTransactionEndorsement":{
-                "type":"object",
+            "TransactReceiptTransactionEndorsement": {
+                "type": "object",
                 "properties": {
-                    "mspid":{
-                        "type":"string"
+                    "mspid": {
+                        "type": "string"
                     },
-                    "endorserID":{
-                        "type":"string"
+                    "endorserID": {
+                        "type": "string"
                     },
-                    "signature":{
-                        "type":"string"
+                    "signature": {
+                        "type": "string"
                     }
                 }
             },
-            "TransactReceiptTransactionCreator":{
-                "type":"object",
+            "TransactReceiptTransactionCreator": {
+                "type": "object",
                 "properties": {
-                    "mspid":{
-                        "type":"string"
+                    "mspid": {
+                        "type": "string"
                     },
-                    "creatorID":{
-                        "type":"string"
+                    "creatorID": {
+                        "type": "string"
                     }
                 }
             },
-            "TransactReceiptBlockMetaData":{
-                "type":"object",
+            "TransactReceiptBlockMetaData": {
+                "type": "object",
                 "properties": {
-                    "mspid":{
-                        "type":"string"
+                    "mspid": {
+                        "type": "string"
                     },
-                    "blockCreatorID":{
-                        "type":"string"
+                    "blockCreatorID": {
+                        "type": "string"
                     },
-                    "signature":{
-                        "type":"string"
+                    "signature": {
+                        "type": "string"
                     }
                 }
             },
-            "VaultTransitKey" : {
+            "VaultTransitKey": {
                 "type": "object",
                 "nullable": false,
                 "required": [
@@ -75,7 +75,7 @@
                 },
                 "description": "vault key details for signing fabric message with private key stored with transit engine."
             },
-            "WebSocketKey" : {
+            "WebSocketKey": {
                 "type": "object",
                 "nullable": false,
                 "required": [
@@ -100,7 +100,7 @@
                 },
                 "description": "web-socket key details for signing fabric message with private key stored with external client"
             },
-            "FabricSigningCredentialType" : {
+            "FabricSigningCredentialType": {
                 "type": "string",
                 "enum": [
                     "X.509",
@@ -129,17 +129,17 @@
                         "maxLength": 100,
                         "nullable": false
                     },
-                    "type" : {
-                        "$ref" : "#/components/schemas/FabricSigningCredentialType",
-                        "description" : "singing identity type to be used for signing fabric message , by by default default is supported"
+                    "type": {
+                        "$ref": "#/components/schemas/FabricSigningCredentialType",
+                        "description": "singing identity type to be used for signing fabric message , by by default default is supported"
                     },
-                    "vaultTransitKey" : {
-                        "$ref" : "#/components/schemas/VaultTransitKey",
-                        "properties" : "vault key details , if Vault-X.509 identity provider to be used for singing fabric messages"
+                    "vaultTransitKey": {
+                        "$ref": "#/components/schemas/VaultTransitKey",
+                        "properties": "vault key details , if Vault-X.509 identity provider to be used for singing fabric messages"
                     },
-                    "webSocketKey" : {
-                        "$ref" : "#/components/schemas/WebSocketKey",
-                        "properties" : "web-socket key details , if WS-X.509 identity provider to be used for singing fabric messages"
+                    "webSocketKey": {
+                        "$ref": "#/components/schemas/WebSocketKey",
+                        "properties": "web-socket key details , if WS-X.509 identity provider to be used for singing fabric messages"
                     }
                 }
             },
@@ -278,7 +278,10 @@
             },
             "GatewayOptions": {
                 "type": "object",
-                "required": ["identity", "wallet"],
+                "required": [
+                    "identity",
+                    "wallet"
+                ],
                 "properties": {
                     "connectionProfile": {
                         "$ref": "#/components/schemas/ConnectionProfile"
@@ -503,7 +506,7 @@
                         "type": "boolean",
                         "nullable": false
                     },
-                    "transactionId":{
+                    "transactionId": {
                         "type": "string",
                         "nullable": false
                     }
@@ -512,39 +515,39 @@
             "GetTransactionReceiptResponse": {
                 "type": "object",
                 "properties": {
-                   "blockNumber":{
-                       "type":"string"
-                   },
-                   "channelID":{
-                       "type": "string"
-                   },
-                   "transactionCreator":{
-                    "$ref": "#/components/schemas/TransactReceiptTransactionCreator"
-                   },
-                   "transactionEndorsement":{
-                       "type":"array",
-                       "items":{
-                        "$ref": "#/components/schemas/TransactReceiptTransactionEndorsement"
-                        }
-                   },
-                   "blockMetaData":{
-                     "$ref": "#/components/schemas/TransactReceiptBlockMetaData"
+                    "blockNumber": {
+                        "type": "string"
                     },
-                   "chainCodeName":{
-                       "type":"string"
-                   },
-                   "chainCodeVersion":{
-                       "type":"string"
-                   },
-                   "responseStatus":{
-                       "type":"string"
-                   },
-                   "rwsetKey":{
-                       "type":"string"
-                   },
-                   "rwsetWriteData":{
-                       "type": "string"
-                   }
+                    "channelID": {
+                        "type": "string"
+                    },
+                    "transactionCreator": {
+                        "$ref": "#/components/schemas/TransactReceiptTransactionCreator"
+                    },
+                    "transactionEndorsement": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TransactReceiptTransactionEndorsement"
+                        }
+                    },
+                    "blockMetaData": {
+                        "$ref": "#/components/schemas/TransactReceiptBlockMetaData"
+                    },
+                    "chainCodeName": {
+                        "type": "string"
+                    },
+                    "chainCodeVersion": {
+                        "type": "string"
+                    },
+                    "responseStatus": {
+                        "type": "string"
+                    },
+                    "rwsetKey": {
+                        "type": "string"
+                    },
+                    "rwsetWriteData": {
+                        "type": "string"
+                    }
                 }
             },
             "DeploymentTargetOrganization": {
@@ -949,6 +952,136 @@
                     }
                 }
             },
+            "GetBlockRequestV1": {
+                "description": "Request for GetBlock endpoint.",
+                "type": "object",
+                "required": [
+                    "channelName",
+                    "gatewayOptions",
+                    "query"
+                ],
+                "properties": {
+                    "channelName": {
+                        "type": "string",
+                        "description": "Fabric channel which we want to query.",
+                        "minLength": 1,
+                        "maxLength": 100,
+                        "nullable": false
+                    },
+                    "connectionChannelName": {
+                        "type": "string",
+                        "description": "Fabric channel we want to connect to. If not provided, then one from channelName parameter will be used",
+                        "minLength": 1,
+                        "maxLength": 100,
+                        "nullable": false
+                    },
+                    "gatewayOptions": {
+                        "$ref": "#/components/schemas/GatewayOptions",
+                        "description": "Fabric SDK gateway options.",
+                        "nullable": false
+                    },
+                    "query": {
+                        "description": "Query selector, caller must provide at least one of them. First found will be used, rest will be ignored, so it's recommended to pass single selector.",
+                        "type": "object",
+                        "properties": {
+                            "blockNumber": {
+                                "type": "string",
+                                "description": "Select block by it's number.",
+                                "nullable": false
+                            },
+                            "blockHash": {
+                                "type": "object",
+                                "description": "Select block by it's hash.",
+                                "required": [
+                                    "buffer"
+                                ],
+                                "properties": {
+                                    "encoding": {
+                                        "type": "string",
+                                        "description": "NodeJS Buffer encoding (utf-8, hex, binary, base64, etc...). Passed directly to `Buffer.from()` call on hashBuffer. If not provided then JSON buffer format is assumed.",
+                                        "nullable": false
+                                    },
+                                    "buffer": {
+                                        "type": "string",
+                                        "format": "binary",
+                                        "description": "Buffer of blockHash. It's encoding should be described in `encoding` parameter.",
+                                        "nullable": false
+                                    }
+                                },
+                                "nullable": false
+                            },
+                            "transactionId": {
+                                "type": "string",
+                                "description": "Select block by id of transaction that it contains.",
+                                "nullable": false
+                            }
+                        }
+                    },
+                    "skipDecode": {
+                        "type": "boolean",
+                        "description": "If true, encoded buffer will be returned. Otherwise, entire block object is returned.",
+                        "default": false,
+                        "nullable": false
+                    }
+                }
+            },
+            "FabricFullBlockDataV1": {
+                "description": "Full hyperledger fabric block data."
+            },
+            "GetBlockResponseDecodedV1": {
+                "type": "object",
+                "description": "When skipDecode is false (default) then decoded block object is returned.",
+                "required": [
+                    "decodedBlock"
+                ],
+                "properties": {
+                    "decodedBlock": {
+                        "$ref": "#/components/schemas/FabricFullBlockDataV1",
+                        "nullable": false
+                    }
+                }
+            },
+            "GetBlockResponseEncodedV1": {
+                "type": "object",
+                "description": "When skipDecode is true then encoded block Buffer is returned.",
+                "required": [
+                    "encodedBlock"
+                ],
+                "properties": {
+                    "encodedBlock": {
+                        "type": "string",
+                        "format": "binary"
+                    }
+                }
+            },
+            "GetBlockResponseV1": {
+                "description": "Response from GetBlock endpoint.",
+                "oneOf": [
+                    {
+                        "$ref": "#/components/schemas/GetBlockResponseDecodedV1"
+                    },
+                    {
+                        "$ref": "#/components/schemas/GetBlockResponseEncodedV1"
+                    }
+                ]
+            },
+            "ErrorExceptionResponseV1": {
+                "type": "object",
+                "required": [
+                    "message",
+                    "error"
+                ],
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "error": {
+                        "type": "string",
+                        "nullable": false
+                    }
+                }
+            },
             "PrometheusExporterMetricsResponse": {
                 "type": "string",
                 "nullable": false
@@ -1131,6 +1264,50 @@
                                             "maxLength": 2048
                                         }
                                     }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-block": {
+            "post": {
+                "operationId": "getBlockV1",
+                "summary": "Get block from the channel using one of selectors from the input. Works only on Fabric 2.x.",
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-block"
+                    }
+                },
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/GetBlockRequestV1"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GetBlockResponseV1"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorExceptionResponseV1"
                                 }
                             }
                         }
