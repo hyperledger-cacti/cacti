@@ -37,7 +37,16 @@ func (s *SmartContract) Create(ctx contractapi.TransactionContextInterface, key 
 	bytes := []byte(value)
 	fmt.Printf("Create called. Key: %s Value: %s\n", key, value)
 
-	return ctx.GetStub().PutState(key, bytes)
+	err := ctx.GetStub().PutState(key, bytes)
+	if err != nil {
+		return err
+	} else {
+		err = ctx.GetStub().SetEvent("CreateSimpleState", []byte(key + ":" + value))
+		if err != nil {
+			fmt.Printf("Unable to set 'CreateSimpleState' event: %+v\n", err)
+		}
+	}
+	return nil
 }
 
 // Read returns the value of the entry with the specified key

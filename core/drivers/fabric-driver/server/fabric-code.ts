@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Gateway, Wallets } from 'fabric-network';
+import { Gateway, Wallets, Network } from 'fabric-network';
 import { Endorser } from 'fabric-common';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -13,6 +13,7 @@ import query_pb from '@hyperledger-labs/weaver-protos-js/common/query_pb';
 import view_data from '@hyperledger-labs/weaver-protos-js/fabric/view_data_pb';
 import proposalResponse from '@hyperledger-labs/weaver-protos-js/peer/proposal_response_pb';
 import interopPayload from '@hyperledger-labs/weaver-protos-js/common/interop_payload_pb';
+import state_pb from '@hyperledger-labs/weaver-protos-js/common/state_pb';
 import { Certificate } from '@fidm/x509';
 import { getConfig } from './walletSetup';
 
@@ -21,22 +22,13 @@ const parseAddress = (address: string) => {
     const fabricArgs = addressList[2].split(':');
     return { channel: fabricArgs[0], contract: fabricArgs[1], ccFunc: fabricArgs[2], args: fabricArgs.slice(3) };
 };
+
 const getWallet = (walletPath: string) => {
     return Wallets.newFileSystemWallet(walletPath);
 };
 
-// Main invoke function wtih logic to handle policy and turn response from chaincode into a view.
-// 1. Prepare credentials/gateway for communicating with fabric network
-// 2. prepare info required for invoke (address/policy)
-// 3. Set the endorser list for the transaction, this enforces that the list provided will endorse the proposed transaction
-// 4. Prepare the view and return.
-async function invoke(
-    query: query_pb.Query,
-    networkName: string,
-    requestingNetwork: string,
-    requestingOrg: string,
-): Promise<view_data.FabricView> {
-    console.log('Running invoke on fabric network');
+// Get a handle to a network gateway using existing wallet credentials
+const getNetworkGateway = async (networkName: string): Promise<Gateway> => {
     try {
         // load the network configuration
         const ccpPath = process.env.CONNECTION_PROFILE
@@ -51,8 +43,8 @@ async function invoke(
         }
         const ccp = JSON.parse(fs.readFileSync(ccpPath, 'utf8'));
         const config = getConfig();
-        // 1. Prepare credentials/gateway for communicating with fabric network
-        // Create a new file system based wallet for managing identities.
+
+        // Create a new file system-based wallet for managing identities.
         const walletPath = path.join(process.cwd(), `wallet-${networkName}`);
         const userName = config.relay.name;
         const wallet = await getWallet(walletPath);
@@ -70,8 +62,28 @@ async function invoke(
             identity: `${userName}`,
             discovery: { enabled: true, asLocalhost: process.env.local === 'false' ? false : true },
         });
-    // 2. prepare info required for invoke (address/policy)
+        return gateway;
+    } catch (error) {
+        console.error(`Failed to instantiate network (channel): ${error}`);
+        throw error;
+    }
+}
 
+// Main invoke function wtih logic to handle policy and turn response from chaincode into a view.
+// 1. Prepare credentials/gateway for communicating with fabric network
+// 2. Prepare info required for invoke (address/policy)
+// 3. Set the endorser list for the transaction, this enforces that the list provided will endorse the proposed transaction
+// 4. Prepare the view and return.
+async function invoke(
+    query: query_pb.Query,
+    networkName: string,
+): Promise<view_data.FabricView> {
+    console.log('Running invoke on fabric network');
+    try {
+        // 1. Prepare credentials/gateway for communicating with fabric network
+        const gateway = await getNetworkGateway(networkName);
+
+        // 2. Prepare info required for invoke (address/policy)
         const parsedAddress = parseAddress(query.getAddress());
         // Get the network (channel) our contract is deployed to.
         console.log(parsedAddress.channel);
@@ -87,12 +99,14 @@ async function invoke(
         const identities = query.getPolicyList();
 
         console.log('Message: ', query.getAddress() + query.getNonce(), identities);
+        const cert = Certificate.fromPEM(Buffer.from(query.getCertificate()));
+        const orgName = cert.issuer.organizationName;
         console.log(
             'CC ARGS',
             parsedAddress.ccFunc,
             ...parsedAddress.args,
-            requestingNetwork,
-            requestingOrg,
+            query.getRequestingNetwork(),
+            query.getRequestingOrg() ? query.getRequestingOrg() : orgName,
             query.getCertificate(),
             query.getRequestorSignature(),
             query.getAddress() + query.getNonce(),
@@ -150,4 +164,23 @@ async function invoke(
     }
 }
 
-export default invoke;
+// Package view and send to relay
+function packageFabricView(
+    query: query_pb.Query,
+    viewData: view_data.FabricView,
+) {
+    const meta = new state_pb.Meta();
+    meta.setTimestamp(new Date().toISOString());
+    meta.setProofType('Notarization');
+    meta.setSerializationFormat('STRING');
+    meta.setProtocol(state_pb.Meta.Protocol.FABRIC);
+    const view = new state_pb.View();
+    view.setMeta(meta);
+    view.setData(viewData ? viewData.serializeBinary() : Buffer.from(''));
+    const viewPayload = new state_pb.ViewPayload();
+    viewPayload.setView(view);
+    viewPayload.setRequestId(query.getRequestId());
+    return viewPayload;
+}
+
+export { getNetworkGateway, invoke, packageFabricView };
