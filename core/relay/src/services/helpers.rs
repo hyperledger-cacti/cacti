@@ -270,7 +270,7 @@ pub fn mark_event_states_deleted(fetched_event_states: EventStates, request_id: 
     for fetched_event_state in fetched_event_states.states {
         let state_status = request_state::Status::from_i32(fetched_event_state.clone().state.expect("No State").status).expect("No Status");
         if state_status == request_state::Status::Error ||
-            state_status == request_state::Status::Completed ||
+            state_status == request_state::Status::EventReceived ||
                 state_status == request_state::Status::EventWritten {
             let deleted_request_state = RequestState {
                 status: request_state::Status::Deleted as i32,

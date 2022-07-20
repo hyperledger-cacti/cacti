@@ -295,14 +295,6 @@ fn spawn_handle_event(state: ViewPayload, publication_spec: EventPublication, re
                         conf.get_str("db_path").unwrap(),
                         message.to_string(),
                     )
-                } else {
-                    update_event_state(
-                        request_id,
-                        event_id,
-                        request_state::Status::Completed,
-                        conf.get_str("db_path").unwrap(),
-                        message.to_string(),
-                    )
                 }
                 println!("Success: {}", message.to_string());
             }
