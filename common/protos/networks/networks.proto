@@ -27,6 +27,9 @@ service Network {
   rpc GetEventSubscriptionState(GetStateMessage) returns (common.events.EventSubscriptionState) {}
   // endpoint for a client to subscribe to event via local relay initiating subscription flow.
   rpc UnsubscribeEvent(NetworkEventUnsubscription) returns (common.ack.Ack) {}
+  // endpoint for a client to fetch received events. 
+  // Note: events are marked as deleted from relay database as soon as client fetches them.
+  rpc GetEventStates(GetStateMessage) returns(common.events.EventStates) {}
 }
 
 message DbName {

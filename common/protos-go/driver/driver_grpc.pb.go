@@ -30,6 +30,9 @@ type DriverCommunicationClient interface {
 	// Relay uses this to get Query.requestor_signature and
 	// Query.certificate required for event subscription
 	RequestSignedEventSubscriptionQuery(ctx context.Context, in *common.EventSubscription, opts ...grpc.CallOption) (*common.Query, error)
+	// Events Publication
+	// the dest-relay calls the dest-driver on this end point to write the remote network state to the local ledger
+	WriteExternalState(ctx context.Context, in *WriteExternalStateMessage, opts ...grpc.CallOption) (*common.Ack, error)
 }
 
 type driverCommunicationClient struct {
@@ -67,6 +70,15 @@ func (c *driverCommunicationClient) RequestSignedEventSubscriptionQuery(ctx cont
 	return out, nil
 }
 
+func (c *driverCommunicationClient) WriteExternalState(ctx context.Context, in *WriteExternalStateMessage, opts ...grpc.CallOption) (*common.Ack, error) {
+	out := new(common.Ack)
+	err := c.cc.Invoke(ctx, "/driver.driver.DriverCommunication/WriteExternalState", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // DriverCommunicationServer is the server API for DriverCommunication service.
 // All implementations must embed UnimplementedDriverCommunicationServer
 // for forward compatibility
@@ -82,6 +94,9 @@ type DriverCommunicationServer interface {
 	// Relay uses this to get Query.requestor_signature and
 	// Query.certificate required for event subscription
 	RequestSignedEventSubscriptionQuery(context.Context, *common.EventSubscription) (*common.Query, error)
+	// Events Publication
+	// the dest-relay calls the dest-driver on this end point to write the remote network state to the local ledger
+	WriteExternalState(context.Context, *WriteExternalStateMessage) (*common.Ack, error)
 	mustEmbedUnimplementedDriverCommunicationServer()
 }
 
@@ -97,6 +112,9 @@ func (UnimplementedDriverCommunicationServer) SubscribeEvent(context.Context, *c
 }
 func (UnimplementedDriverCommunicationServer) RequestSignedEventSubscriptionQuery(context.Context, *common.EventSubscription) (*common.Query, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RequestSignedEventSubscriptionQuery not implemented")
+}
+func (UnimplementedDriverCommunicationServer) WriteExternalState(context.Context, *WriteExternalStateMessage) (*common.Ack, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method WriteExternalState not implemented")
 }
 func (UnimplementedDriverCommunicationServer) mustEmbedUnimplementedDriverCommunicationServer() {}
 
@@ -165,6 +183,24 @@ func _DriverCommunication_RequestSignedEventSubscriptionQuery_Handler(srv interf
 	return interceptor(ctx, in, info, handler)
 }
 
+func _DriverCommunication_WriteExternalState_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(WriteExternalStateMessage)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DriverCommunicationServer).WriteExternalState(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/driver.driver.DriverCommunication/WriteExternalState",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DriverCommunicationServer).WriteExternalState(ctx, req.(*WriteExternalStateMessage))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // DriverCommunication_ServiceDesc is the grpc.ServiceDesc for DriverCommunication service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -183,6 +219,10 @@ var DriverCommunication_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RequestSignedEventSubscriptionQuery",
 			Handler:    _DriverCommunication_RequestSignedEventSubscriptionQuery_Handler,
+		},
+		{
+			MethodName: "WriteExternalState",
+			Handler:    _DriverCommunication_WriteExternalState_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
