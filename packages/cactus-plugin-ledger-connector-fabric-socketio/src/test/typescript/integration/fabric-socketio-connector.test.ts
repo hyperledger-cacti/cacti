@@ -388,6 +388,47 @@ describe("Fabric-SocketIO connector tests", () => {
   });
 
   /**
+   * Get block by number.
+   */
+  test("Get block by it's number works (both decoded and encoded)", async () => {
+    const contract = { channelName: ledgerChannelName };
+    const method = { type: "function", command: "getBlock" };
+    const argsParam = {
+      blockNumber: 0,
+    };
+
+    // Get decoded block
+    const response = await apiClient.sendSyncRequest(
+      contract,
+      method,
+      argsParam,
+    );
+    expect(response).toBeTruthy();
+    expect(response.status).toEqual(200);
+    expect(response.data).toBeTruthy();
+    expect(response.data.header).toBeTruthy();
+    expect(response.data.data).toBeTruthy();
+    expect(response.data.metadata).toBeTruthy();
+
+    // Get encoded block
+    const argsParamEncoded = {
+      ...argsParam,
+      skipDecode: true,
+    };
+
+    const responseEncoded = await apiClient.sendSyncRequest(
+      contract,
+      method,
+      argsParamEncoded,
+    );
+    expect(responseEncoded).toBeTruthy();
+    expect(responseEncoded.status).toEqual(200);
+    expect(responseEncoded.data).toBeTruthy();
+    expect(responseEncoded.data.type).toEqual("Buffer");
+    expect(responseEncoded.data.data).toBeTruthy();
+  });
+
+  /**
    * Send transaction proposal to be signed with keys attached to the request (managed by BLP),
    * and then send signed transaction to the ledger.
    */

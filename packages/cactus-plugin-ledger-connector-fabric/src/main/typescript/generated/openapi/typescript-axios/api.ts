@@ -512,6 +512,25 @@ export interface DeploymentTargetOrganization {
 /**
  * 
  * @export
+ * @interface ErrorExceptionResponseV1
+ */
+export interface ErrorExceptionResponseV1 {
+    /**
+     * 
+     * @type {string}
+     * @memberof ErrorExceptionResponseV1
+     */
+    message: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ErrorExceptionResponseV1
+     */
+    error: string;
+}
+/**
+ * 
+ * @export
  * @enum {string}
  */
 
@@ -695,6 +714,120 @@ export interface GatewayOptionsWallet {
      */
     json?: string;
 }
+/**
+ * Request for GetBlock endpoint.
+ * @export
+ * @interface GetBlockRequestV1
+ */
+export interface GetBlockRequestV1 {
+    /**
+     * Fabric channel which we want to query.
+     * @type {string}
+     * @memberof GetBlockRequestV1
+     */
+    channelName: string;
+    /**
+     * Fabric channel we want to connect to. If not provided, then one from channelName parameter will be used
+     * @type {string}
+     * @memberof GetBlockRequestV1
+     */
+    connectionChannelName?: string;
+    /**
+     * 
+     * @type {GatewayOptions}
+     * @memberof GetBlockRequestV1
+     */
+    gatewayOptions: GatewayOptions;
+    /**
+     * 
+     * @type {GetBlockRequestV1Query}
+     * @memberof GetBlockRequestV1
+     */
+    query: GetBlockRequestV1Query;
+    /**
+     * If true, encoded buffer will be returned. Otherwise, entire block object is returned.
+     * @type {boolean}
+     * @memberof GetBlockRequestV1
+     */
+    skipDecode?: boolean;
+}
+/**
+ * Query selector, caller must provide at least one of them. First found will be used, rest will be ignored, so it\'s recommended to pass single selector.
+ * @export
+ * @interface GetBlockRequestV1Query
+ */
+export interface GetBlockRequestV1Query {
+    /**
+     * Select block by it\'s number.
+     * @type {string}
+     * @memberof GetBlockRequestV1Query
+     */
+    blockNumber?: string;
+    /**
+     * 
+     * @type {GetBlockRequestV1QueryBlockHash}
+     * @memberof GetBlockRequestV1Query
+     */
+    blockHash?: GetBlockRequestV1QueryBlockHash;
+    /**
+     * Select block by id of transaction that it contains.
+     * @type {string}
+     * @memberof GetBlockRequestV1Query
+     */
+    transactionId?: string;
+}
+/**
+ * Select block by it\'s hash.
+ * @export
+ * @interface GetBlockRequestV1QueryBlockHash
+ */
+export interface GetBlockRequestV1QueryBlockHash {
+    /**
+     * NodeJS Buffer encoding (utf-8, hex, binary, base64, etc...). Passed directly to `Buffer.from()` call on hashBuffer. If not provided then JSON buffer format is assumed.
+     * @type {string}
+     * @memberof GetBlockRequestV1QueryBlockHash
+     */
+    encoding?: string;
+    /**
+     * Buffer of blockHash. It\'s encoding should be described in `encoding` parameter.
+     * @type {any}
+     * @memberof GetBlockRequestV1QueryBlockHash
+     */
+    buffer: any;
+}
+/**
+ * When skipDecode is false (default) then decoded block object is returned.
+ * @export
+ * @interface GetBlockResponseDecodedV1
+ */
+export interface GetBlockResponseDecodedV1 {
+    /**
+     * Full hyperledger fabric block data.
+     * @type {any}
+     * @memberof GetBlockResponseDecodedV1
+     */
+    decodedBlock: any | null;
+}
+/**
+ * When skipDecode is true then encoded block Buffer is returned.
+ * @export
+ * @interface GetBlockResponseEncodedV1
+ */
+export interface GetBlockResponseEncodedV1 {
+    /**
+     * 
+     * @type {any}
+     * @memberof GetBlockResponseEncodedV1
+     */
+    encodedBlock: any;
+}
+/**
+ * @type GetBlockResponseV1
+ * Response from GetBlock endpoint.
+ * @export
+ */
+export type GetBlockResponseV1 = GetBlockResponseDecodedV1 | GetBlockResponseEncodedV1;
+
 /**
  * 
  * @export
@@ -1082,6 +1215,40 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary Get block from the channel using one of selectors from the input. Works only on Fabric 2.x.
+         * @param {GetBlockRequestV1} [getBlockRequestV1] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getBlockV1: async (getBlockRequestV1?: GetBlockRequestV1, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-block`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(getBlockRequestV1, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Get the Prometheus Metrics
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1216,6 +1383,17 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Get block from the channel using one of selectors from the input. Works only on Fabric 2.x.
+         * @param {GetBlockRequestV1} [getBlockRequestV1] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getBlockV1(getBlockRequestV1?: GetBlockRequestV1, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetBlockResponseV1>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getBlockV1(getBlockRequestV1, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @summary Get the Prometheus Metrics
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1278,6 +1456,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @summary Get block from the channel using one of selectors from the input. Works only on Fabric 2.x.
+         * @param {GetBlockRequestV1} [getBlockRequestV1] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getBlockV1(getBlockRequestV1?: GetBlockRequestV1, options?: any): AxiosPromise<GetBlockResponseV1> {
+            return localVarFp.getBlockV1(getBlockRequestV1, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Get the Prometheus Metrics
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1337,6 +1525,18 @@ export class DefaultApi extends BaseAPI {
      */
     public deployContractV1(deployContractV1Request?: DeployContractV1Request, options?: any) {
         return DefaultApiFp(this.configuration).deployContractV1(deployContractV1Request, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get block from the channel using one of selectors from the input. Works only on Fabric 2.x.
+     * @param {GetBlockRequestV1} [getBlockRequestV1] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getBlockV1(getBlockRequestV1?: GetBlockRequestV1, options?: any) {
+        return DefaultApiFp(this.configuration).getBlockV1(getBlockRequestV1, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

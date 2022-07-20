@@ -7,13 +7,15 @@ import {
   TransactReceiptBlockMetaData,
 } from "../generated/openapi/typescript-axios";
 import { common } from "fabric-protos";
-const { BlockDecoder } = require("fabric-common");
+import { querySystemChainCode } from "./query-system-chain-code";
+
 export interface IGetTransactionReceiptByTxIDOptions {
   readonly logLevel?: LogLevelDesc;
   readonly gateway: Gateway;
   readonly channelName: string;
   readonly params: string[];
 }
+
 export async function getTransactionReceiptByTxID(
   req: IGetTransactionReceiptByTxIDOptions,
 ): Promise<GetTransactionReceiptResponse> {
@@ -23,22 +25,32 @@ export async function getTransactionReceiptByTxID(
     level: req.logLevel || "INFO",
   });
   log.info(`${fnTag}, start getting fabric transact receipt`);
-  const { gateway } = req;
 
-  const contractName = "qscc";
-  const methodName = "GetBlockByTxID";
   if (req.params.length != 2) {
     throw new Error(`${fnTag}, should have 2 params`);
   }
-  const network = await gateway.getNetwork(req.channelName);
 
-  const contract = network.getContract(contractName);
-  const out: Buffer = await contract.evaluateTransaction(
-    methodName,
-    ...req.params,
-  );
+  const { gateway } = req;
+  const paramChannelName = req.params[0];
   const reqTxID = req.params[1];
-  const block: common.Block = BlockDecoder.decode(out);
+
+  const queryConfig = {
+    gateway,
+    connectionChannelName: req.channelName,
+  };
+  const block: common.Block = await querySystemChainCode(
+    queryConfig,
+    "GetBlockByTxID",
+    paramChannelName,
+    reqTxID,
+  );
+
+  if (block instanceof Buffer) {
+    throw new Error(
+      "Unexpected encoded response from querySystemChainCode::GetBlockByTxID()",
+    );
+  }
+
   const blockJson = JSON.parse(JSON.stringify(block));
 
   const transactReceipt: GetTransactionReceiptResponse = {};

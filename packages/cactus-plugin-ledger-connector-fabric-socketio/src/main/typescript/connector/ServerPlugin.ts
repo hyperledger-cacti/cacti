@@ -21,12 +21,11 @@ import { ValidatorAuthentication } from "./ValidatorAuthentication";
 // Read the library, SDK, etc. according to EC specifications as needed
 
 import { getClientAndChannel, getSubmitterAndEnroll } from "./fabricaccess";
-import Client, { ProposalRequest } from "fabric-client";
+import Client, { ProposalRequest, Block } from "fabric-client";
 import safeStringify from "fast-safe-stringify";
 
 const path = require("path");
 const { FileSystemWallet, Gateway } = require("fabric-network");
-const fs = require("fs");
 const connUserName = config.read<string>("fabric.connUserName");
 
 // Cryptographic for fabric
@@ -303,6 +302,105 @@ export class ServerPlugin {
           return reject(retObj);
         });
     });
+  }
+
+  /**
+   * Get fabric block specified in args.
+   *
+   * @param args
+   * ``` javascript
+   * {
+   *     "args": {
+   *         "contract": {"channelName": string}, // Fabric channel to execute the request on
+   *         "args": {
+   *            // OneOf following fields is required. First one found will be used.
+   *            "blockNumber"?: number,
+   *            "blockHash"?: Array<byte>,
+   *            "txId"?: string,
+   *            // Optional. If true, this function returns an encoded block.
+   *            "skipDecode"?: boolean,
+   *          }
+   *     },
+   *     "reqID": string // optional requestID from verifier
+   * }
+   * ```
+   */
+  async getBlock(args: any) {
+    logger.info("getBlock start");
+
+    const channelName = args.contract.channelName;
+    const blockNumber = args.args.blockNumber;
+    const blockHash = args.args.blockHash;
+    const txId = args.args.txId;
+    const skipDecode = args.args.skipDecode ?? false;
+
+    const reqID = args.reqID ?? null;
+    logger.info(`##getBlock: reqID: ${reqID}`);
+
+    let { client, channel } = await getClientAndChannel(channelName);
+    await getSubmitterAndEnroll(client);
+
+    let block: Block;
+    if (typeof blockNumber === "number") {
+      block = await channel.queryBlock(
+        blockNumber,
+        undefined,
+        undefined,
+        skipDecode,
+      );
+    } else if (blockHash) {
+      block = await channel.queryBlockByHash(
+        blockHash,
+        undefined,
+        undefined,
+        skipDecode,
+      );
+    } else if (txId) {
+      block = await channel.queryBlockByTxID(
+        txId,
+        undefined,
+        undefined,
+        skipDecode,
+      );
+    } else {
+      const errObj = {
+        resObj: {
+          status: 400,
+          errorDetail:
+            "getBlock: Provide either blockNumber, blockHash, or txId",
+        },
+        id: reqID,
+      };
+      logger.error(errObj);
+      throw errObj;
+    }
+
+    if (!block) {
+      const errObj = {
+        resObj: {
+          status: 504,
+          errorDetail: "getBlock: Could not retrieve block",
+        },
+        id: reqID,
+      };
+      logger.error(errObj);
+      throw errObj;
+    }
+
+    const signedBlock = ValidatorAuthentication.sign({
+      result: block,
+    });
+
+    const retObj = {
+      resObj: {
+        status: 200,
+        data: signedBlock,
+      },
+      id: reqID,
+    };
+    logger.debug("##getBlock: response:", retObj);
+
+    return retObj;
   }
 } /* class */
 
