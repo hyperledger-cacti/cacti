@@ -55,7 +55,7 @@ class LevelDBConnector implements DBConnector {
             await this.dbHandle.open();
         } catch (error: any) {
             console.error(`failed to open database connection with error: ${JSON.stringify(error)}`);
-            throw new Error(error);
+            return Promise.reject(JSON.stringify(error));
         }
 
         return Promise.resolve(true);
@@ -69,7 +69,7 @@ class LevelDBConnector implements DBConnector {
             await this.dbHandle.put(key, value);
         } catch (error: any) {
             console.error(`failed to insert key ${JSON.stringify(key)} with error: ${JSON.stringify(error)}`);
-            throw new Error(error);
+            return Promise.reject(JSON.stringify(error));
         }
 
         return Promise.resolve(true);
@@ -84,7 +84,7 @@ class LevelDBConnector implements DBConnector {
             console.debug(`read() got value: ${JSON.stringify(value)}`)
         } catch (error: any) {
             console.error(`failed to read key ${JSON.stringify(key)} with error: ${JSON.stringify(error)}`);
-            throw new Error(error);
+            return Promise.reject(JSON.stringify(error));
         }
         
         return value;
@@ -98,7 +98,7 @@ class LevelDBConnector implements DBConnector {
             await this.dbHandle.put(key, value);
         } catch (error: any) {
             console.error(`failed to update key ${JSON.stringify(key)} with error: ${JSON.stringify(error)}`);
-            throw new Error(error);
+            return Promise.reject(JSON.stringify(error));
         }
 
         return true; 
@@ -113,7 +113,7 @@ class LevelDBConnector implements DBConnector {
             await this.dbHandle.del(key);
         } catch (error: any) {
             console.error(`failed to delete key ${JSON.stringify(key)} with error: ${JSON.stringify(error)}`);
-            throw new Error(error);
+            return Promise.reject(JSON.stringify(error));
         }
         
         return value;
@@ -125,7 +125,7 @@ class LevelDBConnector implements DBConnector {
             await this.dbHandle.close();
         } catch (error: any) {
             console.error(`failed to close database connection with error: ${JSON.stringify(error)}`);
-            throw new Error(error);
+            return Promise.reject(JSON.stringify(error));
         }
 
         return Promise.resolve(true);

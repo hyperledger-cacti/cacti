@@ -8,26 +8,51 @@ import ack_pb from '@hyperledger-labs/weaver-protos-js/common/ack_pb';
 import eventsPb from '@hyperledger-labs/weaver-protos-js/common/events_pb';
 import events_grpc_pb from '@hyperledger-labs/weaver-protos-js/relay/events_grpc_pb';
 import queryPb from '@hyperledger-labs/weaver-protos-js/common/query_pb';
-import { InteroperableHelper } from '@hyperledger-labs/weaver-fabric-interop-sdk'
-import { getDriverKeyCert } from "./walletSetup"
-import { DBConnector, LevelDBConnector } from "./dbConnector"
-import { checkIfArraysAreEqual, relayCallback } from "./utils"
+import { InteroperableHelper } from '@hyperledger-labs/weaver-fabric-interop-sdk';
+import { getDriverKeyCert } from "./walletSetup";
+import { DBConnector, LevelDBConnector } from "./dbConnector";
+import { checkIfArraysAreEqual, handlePromise, relayCallback } from "./utils";
+import { registerListenerForEventSubscription, unregisterListenerForEventSubscription } from "./listener";
 
 const DB_NAME: string = "driverdb";
 
-function subscribeEventHelper(
+async function subscribeEventHelper(
     call_request: eventsPb.EventSubscription,
-    client: events_grpc_pb.EventSubscribeClient
+    client: events_grpc_pb.EventSubscribeClient,
+    network_name: string,
 ) {
     const newRequestId = call_request.getQuery()!.getRequestId();
-    addEventSubscription(call_request).then((requestId) => {
+    const [requestId, error] = await handlePromise(addEventSubscription(call_request));
+    if (error) {
+        const errorString: string = `error (thrown as part of async processing while storing to DB during subscribeEvent): ${JSON.stringify(error)}`;
+        console.error(errorString);
+        const ack_send_error = new ack_pb.Ack();
+        ack_send_error.setRequestId(newRequestId);
+        ack_send_error.setMessage(errorString);
+        ack_send_error.setStatus(ack_pb.Ack.STATUS.ERROR);
+        // gRPC response.
+        console.log(`Sending to the relay the eventSubscription error Ack: ${JSON.stringify(ack_send_error.toObject())}`);
+        // Sending the fabric state to the relay.
+        client.sendDriverSubscriptionStatus(ack_send_error, relayCallback);
+    } else {
         const ack_send = new ack_pb.Ack();
-        if (newRequestId == requestId) {
-            // event being subscribed for the first time
-            ack_send.setMessage('Event subscription is successful!');
-            ack_send.setStatus(ack_pb.Ack.STATUS.OK);
-    
-            // the event listener logic follows here
+        if (newRequestId == requestId) {    // event being subscribed for the first time
+            // Start an appropriate type of event listener for this event subscription if one is not already active
+            const [listenerHandle, error] = await handlePromise(registerListenerForEventSubscription(call_request, network_name));
+            if (error) {
+                // Need to delete subscription in database too, for consistency
+                const [deletedSubscription, err] =
+                    await handlePromise(deleteEventSubscription(call_request.getEventMatcher()!, newRequestId));
+                if (err) {
+                    const errorString: string = `${JSON.stringify(err)}`;
+                    console.error(errorString);
+                }
+                ack_send.setMessage('Event subscription error: listener registration failed');
+                ack_send.setStatus(ack_pb.Ack.STATUS.ERROR);
+            } else {
+                ack_send.setMessage('Event subscription is successful!');
+                ack_send.setStatus(ack_pb.Ack.STATUS.OK);
+            }
         } else {
             // event being subscribed already exists
             ack_send.setMessage(`Event subscription already exists with requestId: ${requestId}`);
@@ -44,8 +69,28 @@ function subscribeEventHelper(
     
         // Sending the fabric state to the relay.
         client.sendDriverSubscriptionStatus(ack_send, relayCallback);
-    }).catch((error) => {
-        const errorString: string = `error (thrown as part of async processing while storing to DB during subscribeEvent): ${JSON.stringify(error)}`;
+    }
+}
+
+async function unsubscribeEventHelper(
+    call_request: eventsPb.EventSubscription,
+    client: events_grpc_pb.EventSubscribeClient,
+    network_name: string,
+) {
+    const [unregister, err] =
+        await handlePromise(unregisterListenerForEventSubscription(call_request.getEventMatcher()!, network_name));
+    if (!unregister) {      // Just log a warning. This is not critical.
+        console.warn('No listener running for the given subscription or unable to stop listener');
+    }
+    if (err) {    // Just log the error. This is not critical.
+        const errorString: string = `${JSON.stringify(err)}`;
+        console.error(errorString);
+    }
+    const newRequestId = call_request.getQuery()!.getRequestId();
+    const [deletedSubscription, error] =
+        await handlePromise(deleteEventSubscription(call_request.getEventMatcher()!, newRequestId));
+    if (error) {
+        const errorString: string = `error (thrown as part of async processing while deleting from DB during unsubscribeEvent): ${JSON.stringify(error)}`;
         console.error(errorString);
         const ack_send_error = new ack_pb.Ack();
         ack_send_error.setRequestId(newRequestId);
@@ -55,15 +100,7 @@ function subscribeEventHelper(
         console.log(`Sending to the relay the eventSubscription error Ack: ${JSON.stringify(ack_send_error.toObject())}`);
         // Sending the fabric state to the relay.
         client.sendDriverSubscriptionStatus(ack_send_error, relayCallback);
-    });
-}
-
-function unsubscribeEventHelper(
-    call_request: eventsPb.EventSubscription,
-    client: events_grpc_pb.EventSubscribeClient
-) {
-    const newRequestId = call_request.getQuery()!.getRequestId();
-    deleteEventSubscription(call_request.getEventMatcher()!, newRequestId).then((deletedSubscription: eventsPb.EventSubscription) => {
+    } else {
         const ack_send = new ack_pb.Ack();
         
         // event got unsubscribed
@@ -80,18 +117,7 @@ function unsubscribeEventHelper(
     
         // Sending the fabric state to the relay.
         client.sendDriverSubscriptionStatus(ack_send, relayCallback);
-    }).catch((error) => {
-        const errorString: string = `error (thrown as part of async processing while deleting from DB during unsubscribeEvent): ${JSON.stringify(error)}`;
-        console.error(errorString);
-        const ack_send_error = new ack_pb.Ack();
-        ack_send_error.setRequestId(newRequestId);
-        ack_send_error.setMessage(errorString);
-        ack_send_error.setStatus(ack_pb.Ack.STATUS.ERROR);
-        // gRPC response.
-        console.log(`Sending to the relay the eventSubscription error Ack: ${JSON.stringify(ack_send_error.toObject())}`);
-        // Sending the fabric state to the relay.
-        client.sendDriverSubscriptionStatus(ack_send_error, relayCallback);
-    });
+    }
 }
 
 async function addEventSubscription(
@@ -143,8 +169,8 @@ async function addEventSubscription(
             console.debug(`eventMatcher: ${JSON.stringify(eventMatcher.toObject())} is already present in the database`);
             subscriptions.push(querySerialized);
         } catch (error: any) {
-            let errorString = `${JSON.stringify(error)}`;
-            if (errorString.includes('Error: NotFound:')) {
+            let errorString = error.toString();
+            if (errorString.includes('Error: NotFound:') || errorString.includes('LEVEL_NOT_FOUND')) {
                 // case of read failing due to key not found
                 console.debug(`eventMatcher: ${JSON.stringify(eventMatcher.toObject())} is not present before in the database`);
                 subscriptions = new Array<string>();
@@ -271,16 +297,16 @@ async function lookupEventSubscriptions(
         return returnSubscriptions;
 
     } catch (error: any) {
-        let errorString: string = `${JSON.stringify(error)}`
+        let errorString: string = error.toString();
         await db?.close();
-        if (errorString.includes('Error: NotFound:')) {
+        if (errorString.includes('Error: NotFound:') || errorString.includes('LEVEL_NOT_FOUND')) {
             // case of read failing due to key not found
             returnSubscriptions = new Array<queryPb.Query>();
             console.debug(`returnSubscriptions.length: ${returnSubscriptions.length}`);
             return returnSubscriptions;
         } else {
             // case of read failing due to some other issue
-            console.error(`Error during lookup: ${JSON.stringify(error)}`);
+            console.error(`Error during lookup: ${errorString}`);
             throw new Error(error);
         }
     }

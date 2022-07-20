@@ -7,20 +7,19 @@
 import fs from 'fs';
 import { Server, ServerCredentials, credentials } from '@grpc/grpc-js';
 import ack_pb from '@hyperledger-labs/weaver-protos-js/common/ack_pb';
-import fabricView from '@hyperledger-labs/weaver-protos-js/fabric/view_data_pb';
 import query_pb from '@hyperledger-labs/weaver-protos-js/common/query_pb';
+import fabricView from '@hyperledger-labs/weaver-protos-js/fabric/view_data_pb';
 import eventsPb, { EventMatcher } from '@hyperledger-labs/weaver-protos-js/common/events_pb';
 import driver_pb_grpc from '@hyperledger-labs/weaver-protos-js/driver/driver_grpc_pb';
 import datatransfer_grpc_pb from '@hyperledger-labs/weaver-protos-js/relay/datatransfer_grpc_pb';
 import events_grpc_pb from '@hyperledger-labs/weaver-protos-js/relay/events_grpc_pb';
 import state_pb from '@hyperledger-labs/weaver-protos-js/common/state_pb';
-import invoke from './fabric-code';
+import { invoke, getNetworkGateway, packageFabricView } from './fabric-code';
 import 'dotenv/config';
 import { walletSetup } from './walletSetup';
 import { subscribeEventHelper, unsubscribeEventHelper, signEventSubscriptionQuery } from "./events"
-import { Certificate } from '@fidm/x509';
 import * as path from 'path';
-import { handlePromise, relayCallback } from './utils';
+import { handlePromise, relayCallback, getRelayClientForQueryResponse } from './utils';
 import { dbConnectionTest, eventSubscriptionTest } from "./tests"
 
 const server = new Server();
@@ -71,33 +70,14 @@ const fabricCommunication = async (query: query_pb.Query, networkName: string) =
     if (!process.env.RELAY_ENDPOINT) {
         throw new Error('RELAY_ENDPOINT is not set.');
     }
-    let client;
-    if (process.env.RELAY_TLS === 'true') {
-        if (!(process.env.RELAY_TLSCA_CERT_PATH && fs.existsSync(process.env.RELAY_TLSCA_CERT_PATH))) {
-            throw new Error("Missing or invalid RELAY_TLSCA_CERT_PATH: " + process.env.RELAY_TLSCA_CERT_PATH);
-        }
-        const rootCert = fs.readFileSync(process.env.RELAY_TLSCA_CERT_PATH);
-        client = new datatransfer_grpc_pb.DataTransferClient(
-            process.env.RELAY_ENDPOINT,
-            credentials.createSsl(rootCert)
-        );
-    } else {
-        client = new datatransfer_grpc_pb.DataTransferClient(
-            process.env.RELAY_ENDPOINT,
-            credentials.createInsecure()
-        );
-    }
-    const cert = Certificate.fromPEM(Buffer.from(query.getCertificate()));
-    const orgName = cert.issuer.organizationName;
     // Invokes the fabric network
     const [result, invokeError] = await handlePromise(
         invoke(
             query,
             networkName,
-            query.getRequestingNetwork(),
-            query.getRequestingOrg() ? query.getRequestingOrg() : orgName,
         ),
     );
+    const client = getRelayClientForQueryResponse();
     if (invokeError) {
         console.log('Invoke Error');
         const errorViewPayload = new state_pb.ViewPayload();
@@ -109,17 +89,7 @@ const fabricCommunication = async (query: query_pb.Query, networkName: string) =
         // Process response from invoke to send to relay
         console.log('Result of fabric invoke', result);
         console.log('Sending state');
-        const meta = new state_pb.Meta();
-        meta.setTimestamp(new Date().toISOString());
-        meta.setProofType('Notarization');
-        meta.setSerializationFormat('STRING');
-        meta.setProtocol(state_pb.Meta.Protocol.FABRIC);
-        const view = new state_pb.View();
-        view.setMeta(meta);
-        view.setData(result ? result.serializeBinary() : Buffer.from(''));
-        const viewPayload = new state_pb.ViewPayload();
-        viewPayload.setView(view);
-        viewPayload.setRequestId(query.getRequestId());
+        const viewPayload: state_pb.ViewPayload = packageFabricView(query, result);
 
         console.log('Sending state');
         // Sending the fabric state to the relay.
@@ -183,12 +153,12 @@ server.addService(driver_pb_grpc.DriverCommunicationService, {
         const subscriptionOp: eventsPb.EventSubOperation = call.request.getOperation();
         console.log(`newRequestId: ${newRequestId}`);
         try {
-            if (process.env.MOCK === 'false') {
+            if (process.env.MOCK !== 'true') {
                 getEventSubscriptionRelayClient().then((client) => {
                     if (subscriptionOp == eventsPb.EventSubOperation.SUBSCRIBE) {
-                        subscribeEventHelper(call.request, client);
+                        subscribeEventHelper(call.request, client, process.env.NETWORK_NAME ? process.env.NETWORK_NAME : 'network1');
                     } else if (subscriptionOp == eventsPb.EventSubOperation.UNSUBSCRIBE) {
-                        unsubscribeEventHelper(call.request, client);
+                        unsubscribeEventHelper(call.request, client, process.env.NETWORK_NAME ? process.env.NETWORK_NAME : 'network1');
                     } else {
                         const errorString: string = `Error: subscribe operation ${subscriptionOp.toString()} not supported`;
                         console.error(errorString);

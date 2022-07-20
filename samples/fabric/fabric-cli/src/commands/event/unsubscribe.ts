@@ -27,8 +27,8 @@ const command: GluegunCommand = {
       commandHelp(
         print,
         toolbox,
-        `fabric-cli event unsubscribe --network=<network1|network2> --user=user1 --request-id="abc123" src/data/event_sub_sample.json`,
-        'fabric-cli event unsubscribe --network=<network-name> --user=<user-id> --request-id=<request_id> <filename>',
+        `fabric-cli event unsubscribe --network=<network1|network2> --user=user1 --request-ids="abc123:efg456" src/data/event_sub_sample.json`,
+        'fabric-cli event unsubscribe --network=<network-name> --user=<user-id> --request-ids=<colon-separated-list-of-request-ids> <filename>',
         [
             {
                 name: '--network',
@@ -41,9 +41,9 @@ const command: GluegunCommand = {
                     'User for subscription. Default: user1'
             },
             {
-                name: '--request-id',
+                name: '--request-ids',
                 description:
-                    'Request ID received during subscription.'
+                    'Colon-separated list of request IDs received during subscriptions. A request ID can be left blank, indicating that the corresponding JSON (i.e., at the same index) in the file should not be unsubscribed'
             },
             {
                 name: '--debug',
@@ -70,9 +70,9 @@ const command: GluegunCommand = {
       print.error('--network needs to be specified')
       return
     }
-    if (!options['request-id'])
+    if (!options['request-ids'])
     {
-      print.error('--request-id needs to be specified')
+      print.error('--request-ids needs to be specified')
       return
     }
     if (!options['user']) {
@@ -81,10 +81,9 @@ const command: GluegunCommand = {
     
     const networkName = options['network']
     const user = options['user']
-    const requestId = options['request-id']
+    const requestIds = options['request-ids']
     
     const filepath = path.resolve(array[0])
-    const data = JSON.parse(fs.readFileSync(filepath).toString())
     
     const netConfig = getNetworkConfig(networkName)
     if (!netConfig.connProfilePath || !netConfig.channelName || !netConfig.chaincode) {
@@ -108,30 +107,43 @@ const command: GluegunCommand = {
     if (keyCertError) {
       throw new Error(`Error getting key and cert ${keyCertError}`)
     }
-    
-    const eventMatcher = EventsManager.createEventMatcher(data.event_matcher)
-    const eventPublicationSpec = EventsManager.createEventPublicationSpec(data.event_publication_spec)
-    
-    try {
-        const response = await EventsManager.unsubscribeRemoteEvent(
-            contract,
-            eventMatcher,
-            eventPublicationSpec,
-            requestId,
-            networkName,
-            netConfig.mspId,
-            netConfig.relayEndpoint,
-            { address: data.view_address, Sign: true },
-            keyCert
-        )
-        
-        if (response.getStatus() == EventSubscriptionState.STATUS.UNSUBSCRIBED) {
-            console.log("Event Unsubscription Success for requestId:", response.getRequestId())
-        } else {
-            console.log("Unknown error")
+
+    const requestIdList = requestIds.split(':')
+    const data = JSON.parse(fs.readFileSync(filepath).toString())
+    if (requestIdList.length !== data.length) {
+      throw new Error(`Mismatching request ID list and subscription JSON counts. #Request IDs = ${requestIdList.length}, #JSON items = ${data.length}.`)
+    }
+    for (let i = 0 ; i < data.length ; i++) {
+        if (requestIdList[i] === '') {
+            // Don't unsubscribe
+            continue;
         }
-    } catch(e) {
-        console.log("Error: ", e.toString())
+
+        // Unsubscribe
+        const eventMatcher = EventsManager.createEventMatcher(data[i].event_matcher)
+        const eventPublicationSpec = EventsManager.createEventPublicationSpec(data[i].event_publication_spec)
+
+        try {
+            const response = await EventsManager.unsubscribeRemoteEvent(
+                contract,
+                eventMatcher,
+                eventPublicationSpec,
+                requestIdList[i],
+                networkName,
+                netConfig.mspId,
+                netConfig.relayEndpoint,
+                { address: data[i].view_address, Sign: true },
+                keyCert
+            )
+
+            if (response.getStatus() == EventSubscriptionState.STATUS.UNSUBSCRIBED) {
+                console.log("Event Unsubscription Success for requestId:", response.getRequestId(), 'and event matcher:', eventMatcher)
+            } else {
+                console.log("Unknown error")
+            }
+        } catch(e) {
+            console.log("Error: ", e.toString())
+        }
     }
 
     process.exit()
