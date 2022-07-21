@@ -27,8 +27,6 @@ ARG NPM_PKG_VERSION=latest
 ENV TZ=Etc/UTC
 ENV NODE_ENV=production
 
-ENV CACTUS_NODE_ID=-
-ENV CONSORTIUM_ID=-
 ENV KEY_PAIR_PEM=-
 ENV COCKPIT_WWW_ROOT=${APP}node_modules/@hyperledger/cactus-cockpit/www/
 ENV COCKPIT_TLS_ENABLED=false

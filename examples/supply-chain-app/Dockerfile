@@ -47,8 +47,6 @@ COPY --chown=${APP_USER}:${APP_USER} ./examples/supply-chain-app/healthcheck.sh 
 
 ENV AUTHORIZATION_CONFIG_JSON="{}"
 ENV AUTHORIZATION_PROTOCOL=NONE
-ENV CACTUS_NODE_ID=-
-ENV CONSORTIUM_ID=-
 ENV KEY_PAIR_PEM=-
 ENV COCKPIT_WWW_ROOT=/usr/src/app/node_modules/@hyperledger/cactus-example-supply-chain-frontend/www/
 ENV COCKPIT_TLS_ENABLED=false

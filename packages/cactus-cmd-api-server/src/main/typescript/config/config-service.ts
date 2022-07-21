@@ -39,8 +39,6 @@ export interface ICactusApiServerOptions {
   authorizationProtocol: AuthorizationProtocol;
   authorizationConfigJson: IAuthorizationConfig;
   configFile: string;
-  cactusNodeId: string;
-  consortiumId: string;
   logLevel: LogLevelDesc;
   tlsDefaultMaxVersion: SecureVersion;
   cockpitEnabled: boolean;
@@ -66,7 +64,6 @@ export interface ICactusApiServerOptions {
   grpcMtlsEnabled: boolean;
   plugins: PluginImport[];
   keyPairPem: string;
-  keychainSuffixKeyPairPem: string;
   minNodeVersion: string;
   enableShutdownHook: boolean;
 }
@@ -179,24 +176,6 @@ export class ConfigService {
         default: "",
         env: "CONFIG_FILE",
         arg: "config-file",
-      },
-      consortiumId: {
-        doc:
-          "Identifier of the consortium your node is part of. " +
-          " Can be any string of characters such as a UUID",
-        format: ConfigService.formatNonBlankString,
-        default: null as string | null,
-        env: "CONSORTIUM_ID",
-        arg: "consortium-id",
-      },
-      cactusNodeId: {
-        doc:
-          "Identifier of this particular Cactus node. Must be unique among the total set of Cactus nodes running in any " +
-          "given Cactus deployment. Can be any string of characters such as a UUID or an Int64",
-        format: ConfigService.formatNonBlankString,
-        default: null as string | null,
-        env: "CACTUS_NODE_ID",
-        arg: "cactus-node-id",
       },
       logLevel: {
         doc:
@@ -427,17 +406,6 @@ export class ConfigService {
         format: ConfigService.formatNonBlankString,
         default: null as string | null,
       },
-      keychainSuffixKeyPairPem: {
-        doc:
-          "The key under which to store/retrieve the key pair PEM from the " +
-          " keychain of this Cactus node (API server) The complete lookup key" +
-          " is constructed from the ${CACTUS_NODE_ID}" +
-          "${KEYCHAIN_SUFFIX_KEY_PAIR_PEM} template.",
-        env: "KEYCHAIN_SUFFIX_KEY_PAIR_PEM",
-        arg: "keychain-suffix-key-pair-pem",
-        format: "*",
-        default: "CACTUS_NODE_KEY_PAIR_PEM",
-      },
       enableShutdownHook: {
         doc:
           "It will cause the API server to listen to OS process signals and will attempt " +
@@ -613,8 +581,6 @@ export class ConfigService {
       authorizationProtocol: AuthorizationProtocol.JSON_WEB_TOKEN,
       authorizationConfigJson,
       configFile: ".config.json",
-      cactusNodeId: uuidV4(),
-      consortiumId: uuidV4(),
       logLevel: "debug",
       minNodeVersion: (schema.minNodeVersion as SchemaObj).default,
       tlsDefaultMaxVersion: "TLSv1.3",
@@ -640,8 +606,6 @@ export class ConfigService {
       cockpitTlsKeyPem: pkiServer.privateKeyPem,
       cockpitTlsClientCaPem: "-", // Cockpit mTLS is off so this will not crash the server
       keyPairPem,
-      keychainSuffixKeyPairPem: (schema.keychainSuffixKeyPairPem as SchemaObj)
-        .default,
       plugins,
       enableShutdownHook,
     };

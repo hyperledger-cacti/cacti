@@ -511,11 +511,6 @@ $ npx ts-node -e "import {ConfigService} from './packages/cactus-cmd-api-server/
                 Default: Mandatory parameter without a default value.
                 Env: CONFIG_FILE
                 CLI: --config-file
-  cactusNodeId:
-                Description: Identifier of this particular Cactus node. Must be unique among the total set of Cactus nodes running in any given Cactus deployment. Can be any string of characters such as a UUID or an Int64
-                Default: Mandatory parameter without a default value.
-                Env: CACTUS_NODE_ID
-                CLI: --cactus-node-id
   logLevel:
                 Description: The level at which loggers should be configured. Supported values include the following: error, warn, info, debug, trace
                 Default: warn
@@ -562,12 +557,12 @@ $ npx ts-node -e "import {ConfigService} from './packages/cactus-cmd-api-server/
                 Env: PRIVATE_KEY
                 CLI: --private-key
   keychainSuffixPrivateKey:
-                Description: The key under which to store/retrieve the private key from the keychain of this Cactus node (API server)The complete lookup key is constructed from the ${CACTUS_NODE_ID}${KEYCHAIN_SUFFIX_PRIVATE_KEY} template.
+                Description: The key under which to store/retrieve the private key from the keychain of this Cactus node (API server)The complete lookup key is constructed from the ${KEYCHAIN_SUFFIX_PRIVATE_KEY} template.
                 Default: CACTUS_NODE_PRIVATE_KEY
                 Env: KEYCHAIN_SUFFIX_PRIVATE_KEY
                 CLI: --keychain-suffix-private-key
   keychainSuffixPublicKey:
-                Description: The key under which to store/retrieve the public key from the keychain of this Cactus node (API server)The complete lookup key is constructed from the ${CACTUS_NODE_ID}${KEYCHAIN_SUFFIX_PRIVATE_KEY} template.
+                Description: The key under which to store/retrieve the public key from the keychain of this Cactus node (API server)The complete lookup key is constructed from the ${KEYCHAIN_SUFFIX_PRIVATE_KEY} template.
                 Default: CACTUS_NODE_PUBLIC_KEY
                 Env: KEYCHAIN_SUFFIX_PUBLIC_KEY
                 CLI: --keychain-suffix-public-key
