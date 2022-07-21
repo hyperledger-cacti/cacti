@@ -33,6 +33,9 @@ type NetworkClient interface {
 	GetEventSubscriptionState(ctx context.Context, in *GetStateMessage, opts ...grpc.CallOption) (*common.EventSubscriptionState, error)
 	// endpoint for a client to subscribe to event via local relay initiating subscription flow.
 	UnsubscribeEvent(ctx context.Context, in *NetworkEventUnsubscription, opts ...grpc.CallOption) (*common.Ack, error)
+	// endpoint for a client to fetch received events.
+	// Note: events are marked as deleted from relay database as soon as client fetches them.
+	GetEventStates(ctx context.Context, in *GetStateMessage, opts ...grpc.CallOption) (*common.EventStates, error)
 }
 
 type networkClient struct {
@@ -97,6 +100,15 @@ func (c *networkClient) UnsubscribeEvent(ctx context.Context, in *NetworkEventUn
 	return out, nil
 }
 
+func (c *networkClient) GetEventStates(ctx context.Context, in *GetStateMessage, opts ...grpc.CallOption) (*common.EventStates, error) {
+	out := new(common.EventStates)
+	err := c.cc.Invoke(ctx, "/networks.networks.Network/GetEventStates", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // NetworkServer is the server API for Network service.
 // All implementations must embed UnimplementedNetworkServer
 // for forward compatibility
@@ -115,6 +127,9 @@ type NetworkServer interface {
 	GetEventSubscriptionState(context.Context, *GetStateMessage) (*common.EventSubscriptionState, error)
 	// endpoint for a client to subscribe to event via local relay initiating subscription flow.
 	UnsubscribeEvent(context.Context, *NetworkEventUnsubscription) (*common.Ack, error)
+	// endpoint for a client to fetch received events.
+	// Note: events are marked as deleted from relay database as soon as client fetches them.
+	GetEventStates(context.Context, *GetStateMessage) (*common.EventStates, error)
 	mustEmbedUnimplementedNetworkServer()
 }
 
@@ -139,6 +154,9 @@ func (UnimplementedNetworkServer) GetEventSubscriptionState(context.Context, *Ge
 }
 func (UnimplementedNetworkServer) UnsubscribeEvent(context.Context, *NetworkEventUnsubscription) (*common.Ack, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UnsubscribeEvent not implemented")
+}
+func (UnimplementedNetworkServer) GetEventStates(context.Context, *GetStateMessage) (*common.EventStates, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetEventStates not implemented")
 }
 func (UnimplementedNetworkServer) mustEmbedUnimplementedNetworkServer() {}
 
@@ -261,6 +279,24 @@ func _Network_UnsubscribeEvent_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Network_GetEventStates_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetStateMessage)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NetworkServer).GetEventStates(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/networks.networks.Network/GetEventStates",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NetworkServer).GetEventStates(ctx, req.(*GetStateMessage))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Network_ServiceDesc is the grpc.ServiceDesc for Network service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -291,6 +327,10 @@ var Network_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UnsubscribeEvent",
 			Handler:    _Network_UnsubscribeEvent_Handler,
+		},
+		{
+			MethodName: "GetEventStates",
+			Handler:    _Network_GetEventStates_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

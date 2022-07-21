@@ -226,7 +226,6 @@ const getSubscriptionStatus = async (
     asJson: boolean = true,
     useTls: boolean = false,
     tlsRootCACertPaths?: Array<string>,
-    confidential: boolean = false,
 ): Promise<any> => {
     logger.debug("Get Event Subscription Status")
 
@@ -247,6 +246,31 @@ const getSubscriptionStatus = async (
     return relayResponse
 }
 
+const getAllReceivedEvents = async (
+    requestID: string,
+    localRelayEndpoint: string,
+    asJson: boolean = true,
+    useTls: boolean = false,
+    tlsRootCACertPaths?: Array<string>,
+): Promise<any> => {
+    logger.debug("Get all received event states")
+
+    const relay = useTls ? new Relay(localRelayEndpoint, Relay.defaultTimeout, true, tlsRootCACertPaths) : new Relay(localRelayEndpoint);
+    
+    const [relayResponse, relayResponseError] = await helpers.handlePromise(
+        relay.GetEventStates(
+            requestID,
+            asJson
+        ),
+    );
+    if (relayResponseError) {
+        throw new Error(`Get event states relay response error: ${relayResponseError}`);
+    }
+    
+    logger.debug(`Get event states response: ${JSON.stringify(relayResponse)}`)
+    
+    return relayResponse
+}
 
 
 export {
@@ -255,5 +279,6 @@ export {
     subscribeRemoteEvent,
     unsubscribeRemoteEvent,
     getSubscriptionStatus,
+    getAllReceivedEvents,
 }
 

@@ -1,7 +1,8 @@
 use crate::pb::common::ack::{ack};
 use crate::pb::common::query::Query;
+use crate::pb::common::state::{request_state, RequestState};
 use crate::pb::common::events::{event_subscription_state, EventSubscriptionState};
-use crate::pb::common::events::{EventSubscription};
+use crate::pb::common::events::{EventSubscription, EventStates, EventState};
 use crate::pb::driver::driver::driver_communication_client::DriverCommunicationClient;
 
 use crate::db::Database;
@@ -25,7 +26,8 @@ pub fn update_event_subscription_status(
     let db = Database {
         db_path: curr_db_path,
     };
-    let result = db.get::<EventSubscriptionState>(curr_request_id.clone());
+    let event_sub_key = get_event_subscription_key(curr_request_id.clone());
+    let result = db.get::<EventSubscriptionState>(event_sub_key.to_string());
     match result {
         Ok(fetched_event_sub_state) => {
             let target: EventSubscriptionState;
@@ -99,10 +101,10 @@ pub fn update_event_subscription_status(
             }
             
             // Panic if this fails, atm the panic is just logged by the tokio runtime
-            db.set(&curr_request_id, &target)
+            db.set(&event_sub_key.to_string(), &target)
                 .expect("Failed to insert into DB");
             println!("Successfully written EventSubscriptionState to database");
-            println!("{:?}\n", db.get::<EventSubscriptionState>(curr_request_id).unwrap())
+            println!("{:?}\n", db.get::<EventSubscriptionState>(event_sub_key.to_string()).unwrap())
 
         },
         Err(e) => {
@@ -202,4 +204,89 @@ pub async fn driver_sign_subscription_helper(
         },
         Err(e) => Err(e),
     }
+}
+
+pub fn update_event_state(
+    request_id: String,
+    event_id: String,
+    new_status: request_state::Status,
+    curr_db_path: String,
+    message: String,
+) {
+    let db = Database {
+        db_path: curr_db_path,
+    };
+    let event_publish_key = get_event_publication_key(request_id.to_string());
+    let result = db.get::<EventStates>(event_publish_key.to_string());
+    match result {
+        Ok(fetched_event_states) => {
+            let mut updated_event_states: Vec<EventState> = Vec::new();
+            for fetched_event_state in fetched_event_states.states {
+                if fetched_event_state.event_id.to_string() == event_id.to_string() {
+                    let new_request_state: RequestState = RequestState {
+                        status: new_status as i32,
+                        request_id: request_id.to_string(),
+                        state: fetched_event_state.state.expect("No State found").state,
+                    };
+                    let new_event_state: EventState = EventState {
+                        state: Some(new_request_state),
+                        event_id: event_id.to_string(),
+                        message: message.to_string(),
+                    };
+                    updated_event_states.push(new_event_state);
+                }
+                else {
+                    updated_event_states.push(fetched_event_state);
+                }
+            }
+            // Panic if this fails, atm the panic is just logged by the tokio runtime
+            db.set(&event_publish_key.to_string(), &updated_event_states)
+                .expect("Failed to insert into DB");
+            println!("Successfully updated EventStates in database");
+            println!("{:?}\n", updated_event_states);
+        },
+        Err(e) => {
+            println!("EventStates not found. Error: {:?}", e);
+        },
+    }
+}
+
+pub fn try_mark_request_state_deleted(state: RequestState, request_id: String, db: Database) {
+    let state_status = request_state::Status::from_i32(state.clone().status).expect("No Status");
+    if state_status == request_state::Status::Error ||
+        state_status == request_state::Status::Completed {
+        let deleted_request_state = RequestState {
+            status: request_state::Status::Deleted as i32,
+            request_id: request_id.to_string(),
+            state: state.state,
+        };
+        db.set(&request_id, &deleted_request_state)
+            .expect("RequestState Delete: Failed to insert into DB");
+    }
+}
+
+pub fn mark_event_states_deleted(fetched_event_states: EventStates, request_id: String, event_publish_key: String, db: Database) {
+    let mut updated_event_states: Vec<EventState> = Vec::new();
+    for fetched_event_state in fetched_event_states.states {
+        let deleted_request_state = RequestState {
+            status: request_state::Status::Deleted as i32,
+            request_id: request_id.to_string(),
+            state: fetched_event_state.state.expect("No State found").state,
+        };
+        let deleted_event_state = EventState {
+            state: Some(deleted_request_state),
+            event_id: fetched_event_state.event_id,
+            message: fetched_event_state.message.to_string(),
+        };
+        updated_event_states.push(deleted_event_state);
+    }
+    
+    db.set(&event_publish_key.to_string(), &updated_event_states)
+        .expect("EventState Delete: Failed to insert into DB");
+}
+pub fn get_event_subscription_key(request_id: String) -> String {
+    return format!("event_sub_{}", request_id);
+}
+pub fn get_event_publication_key(request_id: String) -> String {
+    return format!("event_pub_{}", request_id);
 }

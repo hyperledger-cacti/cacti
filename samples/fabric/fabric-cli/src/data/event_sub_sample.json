@@ -36,5 +36,19 @@
         },
         "view_address": "localhost:9083/network2/mychannel:simplestate:Read:a",
         "confidential": false
+    },
+    {
+        "event_matcher": {
+            "eventType": 1,
+            "eventClassId": "CreateSimpleState",
+            "transactionLedgerId": "mychannel",
+            "transactionContractId": "simplestate",
+            "transactionFunc": "create"
+        },
+        "event_publication_spec": {
+            "appUrl": "http://localhost:8080/simple-event-callback"
+        },
+        "view_address": "localhost:9083/network2/mychannel:simplestate:Read:a",
+        "confidential": false
     }
 ]

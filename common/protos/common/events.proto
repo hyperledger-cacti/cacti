@@ -3,6 +3,7 @@ syntax = "proto3";
 package common.events;
 
 import "common/query.proto";
+import "common/state.proto";
 
 option java_package = "com.weaver.protos.common.events";
 option go_package = "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common";
@@ -68,4 +69,16 @@ message EventPublication {
     ContractTransaction ctx = 1;
     string app_url = 2;
   }
+}
+
+message EventStates {
+    repeated EventState states = 1;
+}
+
+// the payload that is used for the communication between the requesting relay
+// and its network
+message EventState {
+  common.state.RequestState state = 1;
+  string event_id = 2;
+  string message = 3;
 }

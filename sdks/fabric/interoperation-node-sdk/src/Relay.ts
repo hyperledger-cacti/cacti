@@ -467,6 +467,31 @@ class Relay {
             throw new Error(e);
         }
     }
+    /**
+     * GetSubscriptionStatus is used to get the request from the local network
+     * @returns {object} The request object from the relay
+     */
+    async GetEventStates(requestId: string, asJson = true): Promise<any> {
+        const networkClient = new networksGrpcPb.NetworkClient(
+            this.getEndpoint(),
+            this._useTls ? 
+                (this._tlsRootCACerts.length == 0 ? grpcJs.credentials.createSsl() : grpcJs.credentials.createSsl(Buffer.from(this._tlsRootCACerts))) : 
+                grpcJs.credentials.createInsecure()
+        );
+        const {
+            getEventStates,
+        }: { getEventStates: (message: networksPb.GetStateMessage) => Promise<eventsPb.EventStates> } = helpers.promisifyAll(
+            networkClient,
+        );
+        const getStateMessage = new networksPb.GetStateMessage();
+        getStateMessage.setRequestId(requestId);
+        const [state, error] = await helpers.handlePromise(getEventStates(getStateMessage));
+        if (error) {
+            throw new Error(`Error: ${error}`);
+        }
+
+        return asJson ? state.toObject() : state;
+    }
 }
 
 

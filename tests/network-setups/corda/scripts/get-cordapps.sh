@@ -4,7 +4,7 @@ directory=$(dirname $0)
 app=${1:-simple}
 local=$2
 weaverCordaVersion="1.2.9"
-weaverProtosVersion="1.4.1"
+weaverProtosVersion="1.4.2"
 
 if [ "simple" = "$app" ]; then
   cordappPath=$directory/../../../../samples/corda/corda-simple-application

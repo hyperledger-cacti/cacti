@@ -187,7 +187,35 @@ impl DriverCommunication for DriverCommunicationService {
         return Ok(Response::new(signed_query));
     }
     async fn write_external_state(&self, request: Request<WriteExternalStateMessage>) -> Result<Response<Ack>, Status> {
-        Err(tonic::Status::unimplemented("method not implemented"))
+        let view_payload = request.into_inner().view_payload.expect("Error");
+        let request_id = view_payload.clone().request_id.to_string();
+        match view_payload.state {
+            Some(state) => match state {
+                view_payload::State::Error(error) => {
+                    let reply = Ack {
+                        status: ack::Status::Error as i32,
+                        request_id: request_id.to_string(),
+                        message: format!("Error received: {:?}", error).to_string(),
+                    };
+                    return Ok(Response::new(reply));
+                }
+                view_payload::State::View(_view) => {
+                    let reply = Ack {
+                        status: ack::Status::Ok as i32,
+                        request_id: request_id.to_string(),
+                        message: "Successfully written".to_string(),
+                    };
+                    return Ok(Response::new(reply));
+                }
+            }
+            None => {}
+        }
+        let reply_error = Ack {
+            status: ack::Status::Error as i32,
+            request_id: request_id.to_string(),
+            message: "Error".to_string(),
+        };
+        return Ok(Response::new(reply_error));
     }
 }
 

@@ -13,11 +13,13 @@ import { EventsManager } from '@hyperledger-labs/weaver-fabric-interop-sdk'
 import { EventSubscriptionState, EventType } from "@hyperledger-labs/weaver-protos-js/common/events_pb";
 import * as fs from 'fs'
 import * as path from 'path'
+import * as express from 'express';
+import * as bodyParser from 'body-parser';
 
 const command: GluegunCommand = {
-  name: 'get-subscription-status',
-  alias: ['-g'],
-  description: 'Get event subscription status',
+  name: 'receive',
+  alias: ['-r'],
+  description: 'Start simple http server to receive event',
   run: async toolbox => {
     const {
       print,
@@ -27,8 +29,8 @@ const command: GluegunCommand = {
       commandHelp(
         print,
         toolbox,
-        `fabric-cli event unsubscribe --network=<network1|network2> --request-id="abc123"`,
-        'fabric-cli event unsubscribe --network=<network-name> --request-id=<request_id>',
+        `fabric-cli event receive --port=8080"`,
+        'fabric-cli event receive --port=<port_num>',
         [
             {
                 name: '--network',
@@ -36,9 +38,9 @@ const command: GluegunCommand = {
                     'Local network for command. <network1|network2>'
             },
             {
-                name: '--request-id',
+                name: '--port',
                 description:
-                    'Request ID received during subscription.'
+                    'Port at which to start http server (Optional). Default: 8080'
             },
             {
                 name: '--debug',
@@ -47,43 +49,39 @@ const command: GluegunCommand = {
             }
         ],
         command,
-        ['event', 'get-subscription-status']
+        ['event', 'receive']
       )
       return
     }
-    console.log("Get Event Subscription Status")
+    console.log("Start HTTP Server for handling events from remote network")
     if (options.debug === 'true') {
         logger.level = 'debug'
         logger.debug('Debugging is enabled')
     }
-    if (!options['network'])
-    {
-      print.error('--network needs to be specified')
-      return
+    var port = 8080
+    if (options.port) {
+        port = options.port
     }
-    if (!options['request-id'])
-    {
-      print.error('--request-id needs to be specified')
-      return
-    }
-    const networkName = options['network']
-    const requestId = options['request-id']
     
-    const netConfig = getNetworkConfig(networkName)
-    if (!netConfig.connProfilePath || !netConfig.channelName || !netConfig.chaincode) {
-        throw new Error(`No valid config entry found for ${networkName}`)
-    }
-    try {
-        const response = await EventsManager.getSubscriptionStatus(
-            requestId,
-            netConfig.relayEndpoint
-        )
-        console.log("Event subscription status:", JSON.stringify(response))
-    } catch(e) {
-        console.log("Error: ", e.toString())
-    }
-
-    process.exit()
+    const app = express();
+    app.use(bodyParser.json());
+    app.use(bodyParser.urlencoded({
+        extended: false
+    }));
+    
+    app.post('/simple-event-callback', (req, res) => {
+        console.log("Received Event State: ", req.body.state)
+        if (req.body.state) {
+            const data = Buffer.from(req.body.state.View.data).toString('utf8');
+            console.log("Received Event Data:", data);
+        } else {
+            console.log("Received Error Event:", req.body.error);
+        }
+        res.status(200).send('Ok');
+    });
+    console.log(`Server is running at https://localhost:${port}`);
+    console.log(`Use endpoint '/simple-event-callback' for event publishing`);
+    await app.listen(port);
   }
 }
 

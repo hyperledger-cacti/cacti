@@ -37,10 +37,10 @@ const walletSetup = async (walletPath: string, conn_profile_path: string, networ
     const config = getConfig();
     // Create a new CA client for interacting with the CA.
     const org = ccp.client["organization"];
-    console.log('Org ', org);
+    console.log('Org', org);
     const caName =  ccp.organizations[org]["certificateAuthorities"][0];
-    console.log('CA Name ', caName);
-    const caURL = ccp.certificateAuthorities[config.caUrl ? config.caUrl : caName].url;
+    console.log('CA Name', caName);
+    const caURL = config.caUrl ? config.caUrl : ccp.certificateAuthorities[caName].url;
     console.log('CA URL', caURL);
     const ca = new FabricCAServices(caURL);
     const ident = ca.newIdentityService();

@@ -11,6 +11,7 @@ pub enum Error {
     StatusError(tonic::Status),
     SledError(sled::Error),
     ConfigError(config::ConfigError),
+    ReqwestError(reqwest::Error),
 }
 
 impl From<std::io::Error> for Error {
@@ -44,5 +45,11 @@ impl From<tonic::transport::Error> for Error {
 impl From<tonic::Status> for Error {
     fn from(e: tonic::Status) -> Self {
         Error::StatusError(e)
+    }
+}
+
+impl From<reqwest::Error> for Error {
+    fn from(e: reqwest::Error) -> Self {
+        Error::ReqwestError(e)
     }
 }
