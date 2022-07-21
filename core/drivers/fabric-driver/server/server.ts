@@ -8,19 +8,23 @@ import fs from 'fs';
 import { Server, ServerCredentials, credentials } from '@grpc/grpc-js';
 import ack_pb from '@hyperledger-labs/weaver-protos-js/common/ack_pb';
 import query_pb from '@hyperledger-labs/weaver-protos-js/common/query_pb';
-import fabricView from '@hyperledger-labs/weaver-protos-js/fabric/view_data_pb';
+import fabricViewPb from '@hyperledger-labs/weaver-protos-js/fabric/view_data_pb';
 import eventsPb, { EventMatcher } from '@hyperledger-labs/weaver-protos-js/common/events_pb';
 import driver_pb_grpc from '@hyperledger-labs/weaver-protos-js/driver/driver_grpc_pb';
 import datatransfer_grpc_pb from '@hyperledger-labs/weaver-protos-js/relay/datatransfer_grpc_pb';
 import events_grpc_pb from '@hyperledger-labs/weaver-protos-js/relay/events_grpc_pb';
 import state_pb from '@hyperledger-labs/weaver-protos-js/common/state_pb';
-import { invoke, getNetworkGateway, packageFabricView } from './fabric-code';
+import { invoke, packageFabricView } from './fabric-code';
 import 'dotenv/config';
 import { walletSetup } from './walletSetup';
 import { subscribeEventHelper, unsubscribeEventHelper, signEventSubscriptionQuery } from "./events"
 import * as path from 'path';
 import { handlePromise, relayCallback, getRelayClientForQueryResponse } from './utils';
 import { dbConnectionTest, eventSubscriptionTest } from "./tests"
+import driverPb from '@hyperledger-labs/weaver-protos-js/driver/driver_pb';
+import { getDriverKeyCert } from "./walletSetup";
+import { getResponseDataFromView, submitTransactionWithRemoteViews } from '@hyperledger-labs/weaver-fabric-interop-sdk';
+import { getNetworkGateway } from "./fabric-code";
 
 const server = new Server();
 console.log('driver def', JSON.stringify(driver_pb_grpc));
@@ -43,7 +47,7 @@ function mockCommunication(query: query_pb.Query) {
         const view = new state_pb.View();
         view.setMeta(meta);
         //@ts-ignore
-        const viewDataBinary = fabricView.FabricView.deserializeBinary(mockedB64Data).serializeBinary();
+        const viewDataBinary = fabricViewPb.FabricView.deserializeBinary(mockedB64Data).serializeBinary();
         console.log('viewData', viewDataBinary);
         view.setData(viewDataBinary);
         const viewPayload = new state_pb.ViewPayload();
@@ -100,7 +104,7 @@ const fabricCommunication = async (query: query_pb.Query, networkName: string) =
 // If the events_grpc_pb.EventSubscribeClient() failes, then it throws an error which will be caught by the caller
 async function getEventSubscriptionRelayClient(
 ): Promise<events_grpc_pb.EventSubscribeClient> {
-    let client;
+    let client: events_grpc_pb.EventSubscribeClient;
 
     if (process.env.RELAY_TLS === 'true') {
         if (!(process.env.RELAY_TLSCA_CERT_PATH && fs.existsSync(process.env.RELAY_TLSCA_CERT_PATH))) {
@@ -225,7 +229,84 @@ server.addService(driver_pb_grpc.DriverCommunicationService, {
             callback(null, emptyQuery);
         });
     },
+    writeExternalState: (call: { request: driverPb.WriteExternalStateMessage }, callback: (_: any, object: ack_pb.Ack) => void) => {
+        const viewPayload: state_pb.ViewPayload = call.request.getViewPayload();
+        const requestId: string = viewPayload.getRequestId();
+
+        writeExternalStateHelper(call.request, process.env.NETWORK_NAME ? process.env.NETWORK_NAME : 'network1').then(() => {
+            const ack_response = new ack_pb.Ack();
+            ack_response.setRequestId(requestId);
+            ack_response.setMessage('Successfully written to the ledger');
+            ack_response.setStatus(ack_pb.Ack.STATUS.OK);
+            // gRPC response.
+            console.log(`Responding to caller with Ack: ${JSON.stringify(ack_response.toObject())}`);
+            callback(null, ack_response);
+        }).catch((error) => {
+            const ack_err_response = new ack_pb.Ack();
+            ack_err_response.setRequestId(requestId);
+            ack_err_response.setMessage(JSON.stringify(error));
+            ack_err_response.setStatus(ack_pb.Ack.STATUS.ERROR);
+            // gRPC response.
+            console.log(`Responding to caller with error Ack: ${JSON.stringify(ack_err_response.toObject())}`);
+            callback(null, ack_err_response);
+        });
+    },
 });
+
+async function writeExternalStateHelper(
+    writeExternalStateMessage: driverPb.WriteExternalStateMessage,
+    networkName: string
+) : Promise<void> {
+    const viewPayload: state_pb.ViewPayload = writeExternalStateMessage.getViewPayload();
+    const ctx: eventsPb.ContractTransaction = writeExternalStateMessage.getCtx();
+    const keyCert = await getDriverKeyCert();
+
+    const requestId: string = viewPayload.getRequestId();
+    if (!viewPayload.getError()) {
+
+        let interopArgIndices = [], viewsSerializedBase64 = [], addresses = [], viewContentsBase64 = [];
+        const view: state_pb.View = viewPayload.getView();
+
+        const result = getResponseDataFromView(view, keyCert.key.toBytes());
+        if (result.interopPayload.getConfidential()) {
+            viewContentsBase64.push(result.contents.toString("base64"));
+        } else {
+            viewContentsBase64.push("");
+        }
+
+        interopArgIndices.push(ctx.getReplaceArgIndex());
+        addresses.push(result.interopPayload.getAddress());
+        viewsSerializedBase64.push(Buffer.from(viewPayload.getView().serializeBinary()).toString("base64"));
+
+        const invokeObject = {
+            channel: ctx.getLedgerId(),
+            ccFunc: ctx.getFunc(),
+            ccArgs: ctx.getArgsList(),
+            contractName: ctx.getContractId()
+        }
+
+        const gateway = await getNetworkGateway(networkName);
+        const network = await gateway.getNetwork(ctx.getLedgerId());
+        const interopContract = network.getContract(process.env.INTEROP_CHAINCODE ? process.env.INTEROP_CHAINCODE : 'interop');
+
+        const [ response, responseError ] = await handlePromise(submitTransactionWithRemoteViews(
+            interopContract,
+            invokeObject,
+            interopArgIndices,
+            addresses,
+            viewsSerializedBase64,
+            viewContentsBase64
+        ));
+        if (responseError) {
+            console.log(`Failed writing to the ledger with error: ${responseError}`);
+            throw responseError;
+        }
+    } else {
+        const errorString: string = 'erroneous viewPayload identified in WriteExternalState processing';
+        console.log(`error viewPayload.getError(): ${JSON.stringify(viewPayload.getError())}`);
+        throw new Error(errorString);
+    }
+}
 
 // Prepares required crypto material for communication with the fabric network
 const configSetup = async () => {
