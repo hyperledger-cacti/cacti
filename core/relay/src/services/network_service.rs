@@ -48,6 +48,7 @@ impl Network for NetworkService {
                          );
                 match request_state.state.as_ref() {
                     Some(state) => {
+                        // Because already state is passed to client, deleting the state if status is completed or error
                         try_mark_request_state_deleted(request_state.clone(), request_id.to_string(), db);
                         match state {
                             request_state::State::View(v) => println!("View Meta: {:?}, View Data: {:?}", v.meta, base64::encode(&v.data)),

@@ -113,8 +113,7 @@ impl EventPublish for EventPublishService {
 
 
 /// send_driver_state is run on the remote relay. Runs when the driver sends the
-/// state back to the remote relay or if there was an error making the
-/// request_driver_state gRPC call.
+/// state or error back to the remote relay.
 fn send_driver_state_helper(
     request_id: String,
     remote_db: Database,
@@ -276,6 +275,7 @@ fn send_state_helper(
     return Ok(());
 }
 
+// Calls handle_event and updates status of event_state depending upon the success or failure.
 fn spawn_handle_event(state: ViewPayload, publication_spec: EventPublication, request_id: String, event_id: String, conf: config::Config) {
     tokio::spawn(async move {
         println!("Event Publish: Sending state to subscriber: Request ID = {:?}", request_id.to_string());
@@ -313,6 +313,7 @@ fn spawn_handle_event(state: ViewPayload, publication_spec: EventPublication, re
     });
 }
 
+// Sends event payload to either driver or app_url depending upon publication spec during subscription
 async fn handle_event(
     state: ViewPayload, 
     publication_spec: EventPublication,

@@ -1,8 +1,8 @@
-FROM rust:1.45.2-slim-stretch AS builder
+FROM rust:1.62.1-slim-bullseye AS builder
 
 RUN apt-get update
 
-RUN apt-get install musl-tools -y
+RUN apt-get install curl musl-tools perl build-essential -y
 
 # adding the musl library target so that we can build
 # the components for busybox/alpine environments
@@ -13,10 +13,28 @@ RUN rustup target add x86_64-unknown-linux-musl
 # toolchain than the target we are building, but given that we are building
 # on linux (debian), we can use the toolchain mentioned below also because
 # custom toolchains are not supported.
-#
-RUN rustup component add rustfmt --toolchain 1.45.2-x86_64-unknown-linux-gnu
+# 
+RUN rustup component add rustfmt --toolchain 1.62.1-x86_64-unknown-linux-gnu
 RUN mkdir -p /opt/relay
 COPY . /opt/relay
+
+# Build OpenSSL
+
+ENV SSL_VERSION=1.1.1f
+    
+RUN ln -s /usr/include/x86_64-linux-gnu/asm /usr/include/x86_64-linux-musl/asm && \
+    ln -s /usr/include/asm-generic /usr/include/x86_64-linux-musl/asm-generic && \
+    ln -s /usr/include/linux /usr/include/x86_64-linux-musl/linux
+RUN mkdir /musl && \
+    curl https://www.openssl.org/source/openssl-$SSL_VERSION.tar.gz -O && \
+    tar zxvf openssl-$SSL_VERSION.tar.gz && \
+    cd openssl-$SSL_VERSION/ && \
+    CC="musl-gcc -fPIE -pie" ./Configure no-shared no-async --prefix=/musl --openssldir=/musl/ssl linux-x86_64 && \
+    make depend && make -j$(nproc) && make install
+    
+ENV PKG_CONFIG_ALLOW_CROSS=1 \
+    OPENSSL_STATIC=true \
+    OPENSSL_DIR=/musl
 
 # We install missing dependencies within the
 # the same layer where we do the compilation
