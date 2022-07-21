@@ -1126,7 +1126,7 @@ checksum = "a3f87b73ce11b1619a3c6332f45341e0047173771e8b8b73f87bfeefb7b56244"
 
 [[package]]
 name = "relay"
-version = "1.4.0"
+version = "1.4.2"
 dependencies = [
  "base64 0.13.0",
  "bincode",
@@ -1136,6 +1136,7 @@ dependencies = [
  "prost",
  "reqwest",
  "serde 1.0.139",
+ "serde_json",
  "sled",
  "tokio",
  "tonic",

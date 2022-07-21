@@ -268,24 +268,17 @@ pub fn try_mark_request_state_deleted(state: RequestState, request_id: String, d
 pub fn mark_event_states_deleted(fetched_event_states: EventStates, request_id: String, event_publish_key: String, db: Database) {
     let mut updated_event_states: Vec<EventState> = Vec::new();
     for fetched_event_state in fetched_event_states.states {
-        let state_status = request_state::Status::from_i32(fetched_event_state.clone().state.expect("No State").status).expect("No Status");
-        if state_status == request_state::Status::Error ||
-            state_status == request_state::Status::EventReceived ||
-                state_status == request_state::Status::EventWritten {
-            let deleted_request_state = RequestState {
-                status: request_state::Status::Deleted as i32,
-                request_id: request_id.to_string(),
-                state: fetched_event_state.state.expect("No State found").state,
-            };
-            let deleted_event_state = EventState {
-                state: Some(deleted_request_state),
-                event_id: fetched_event_state.event_id,
-                message: fetched_event_state.message.to_string(),
-            };
-            updated_event_states.push(deleted_event_state);
-        } else {
-            updated_event_states.push(fetched_event_state);
-        }
+        let deleted_request_state = RequestState {
+            status: request_state::Status::Deleted as i32,
+            request_id: request_id.to_string(),
+            state: fetched_event_state.state.expect("No State found").state,
+        };
+        let deleted_event_state = EventState {
+            state: Some(deleted_request_state),
+            event_id: fetched_event_state.event_id,
+            message: fetched_event_state.message.to_string(),
+        };
+        updated_event_states.push(deleted_event_state);
     }
     
     db.set(&event_publish_key.to_string(), &updated_event_states)
