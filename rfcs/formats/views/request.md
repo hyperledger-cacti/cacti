@@ -59,8 +59,12 @@ message RequestState {
     PENDING_ACK = 0;
     // Received ACK, waiting for data to be sent from remote relay
     PENDING = 1;
-    ERROR = 2;
-    COMPLETED = 3;
+    ERROR = 2;                // View is not there, received error from remote relay
+    COMPLETED = 3;            // Data Sharing completed Successfully
+    EVENT_RECEIVED = 4;       // View is there and event is received from remote relay
+    EVENT_WRITTEN = 5;        // Driver Successfully wrote the view to ledger
+    EVENT_WRITE_ERROR = 6;    // View is there but driver failed to write
+    DELETED = 7;              // Once network fetches this request state, mark it delete for cleanup later on
   };
   string request_id = 1;
   STATUS status = 2;
