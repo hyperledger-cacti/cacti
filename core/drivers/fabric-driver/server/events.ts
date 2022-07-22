@@ -13,6 +13,9 @@ import { getDriverKeyCert } from "./walletSetup";
 import { DBConnector, LevelDBConnector } from "./dbConnector";
 import { checkIfArraysAreEqual, handlePromise, relayCallback } from "./utils";
 import { registerListenerForEventSubscription, unregisterListenerForEventSubscription } from "./listener";
+import { getNetworkGateway } from "./fabric-code";
+import state_pb from '@hyperledger-labs/weaver-protos-js/common/state_pb';
+import driverPb from '@hyperledger-labs/weaver-protos-js/driver/driver_pb';
 
 const DB_NAME: string = "driverdb";
 
@@ -344,11 +347,67 @@ async function signEventSubscriptionQuery(
     }
 }
 
+async function writeExternalStateHelper(
+    writeExternalStateMessage: driverPb.WriteExternalStateMessage,
+    networkName: string
+) : Promise<any> {
+    const viewPayload: state_pb.ViewPayload = writeExternalStateMessage.getViewPayload();
+    const ctx: eventsPb.ContractTransaction = writeExternalStateMessage.getCtx();
+    const keyCert = await getDriverKeyCert();
+
+    const requestId: string = viewPayload.getRequestId();
+    if (!viewPayload.getError()) {
+
+        let interopArgIndices = [], viewsSerializedBase64 = [], addresses = [], viewContentsBase64 = [];
+        const view: state_pb.View = viewPayload.getView();
+
+        const result = InteroperableHelper.getResponseDataFromView(view, keyCert.key.toBytes());
+        if (result.interopPayload.getConfidential()) {
+            viewContentsBase64.push(result.contents.toString("base64"));
+        } else {
+            viewContentsBase64.push("");
+        }
+
+        interopArgIndices.push(ctx.getReplaceArgIndex());
+        addresses.push(result.interopPayload.getAddress());
+        viewsSerializedBase64.push(Buffer.from(viewPayload.getView().serializeBinary()).toString("base64"));
+
+        const invokeObject = {
+            channel: ctx.getLedgerId(),
+            ccFunc: ctx.getFunc(),
+            ccArgs: ctx.getArgsList(),
+            contractName: ctx.getContractId()
+        }
+
+        const gateway = await getNetworkGateway(networkName);
+        const network = await gateway.getNetwork(ctx.getLedgerId());
+        const interopContract = network.getContract(process.env.INTEROP_CHAINCODE ? process.env.INTEROP_CHAINCODE : 'interop');
+
+        const [ response, responseError ] = await handlePromise(InteroperableHelper.submitTransactionWithRemoteViews(
+            interopContract,
+            invokeObject,
+            interopArgIndices,
+            addresses,
+            viewsSerializedBase64,
+            viewContentsBase64
+        ));
+        if (responseError) {
+            console.log(`Failed writing to the ledger with error: ${responseError}`);
+            throw responseError;
+        }
+    } else {
+        const errorString: string = `erroneous viewPayload identified in WriteExternalState processing`;
+        console.log(`error viewPayload.getError(): ${JSON.stringify(viewPayload.getError())}`);
+        throw new Error(errorString);
+    }
+}
+
 export {
     subscribeEventHelper,
     unsubscribeEventHelper,
     addEventSubscription,
     deleteEventSubscription,
     lookupEventSubscriptions,
-    signEventSubscriptionQuery
+    signEventSubscriptionQuery,
+    writeExternalStateHelper
 }
