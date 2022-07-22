@@ -15,7 +15,7 @@
  * In this case, it is used only when transferring assets.
  */
 
-import { ConfigUtil } from "@hyperledger/cactus-cmd-socket-server";
+import { ConfigUtil } from "@hyperledger/cactus-cmd-socketio-server";
 import { Verifier } from "@hyperledger/cactus-verifier-client";
 
 const fs = require("fs");

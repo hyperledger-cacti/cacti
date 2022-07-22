@@ -8,7 +8,7 @@
 import { TransactionInfo } from "./transaction-info";
 import { TransactionData } from "./transaction-data";
 import { TxInfoData } from "./tx-info-data";
-import { TradeInfo, ConfigUtil } from "@hyperledger/cactus-cmd-socket-server";
+import { TradeInfo, ConfigUtil } from "@hyperledger/cactus-cmd-socketio-server";
 import { AssetTradeStatus } from "./define";
 
 const fs = require("fs");

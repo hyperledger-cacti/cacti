@@ -9,7 +9,7 @@ import {
   ConfigUtil,
   LPInfoHolder,
   TransactionSigner,
-} from "@hyperledger/cactus-cmd-socket-server";
+} from "@hyperledger/cactus-cmd-socketio-server";
 
 import {
   VerifierFactory,

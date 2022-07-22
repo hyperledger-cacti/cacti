@@ -6,7 +6,7 @@
  */
 
 import { MeterInfo } from "./MeterInfo";
-import { ConfigUtil } from "@hyperledger/cactus-cmd-socket-server";
+import { ConfigUtil } from "@hyperledger/cactus-cmd-socketio-server";
 const fs = require("fs");
 const yaml = require("js-yaml");
 const config: any = ConfigUtil.getConfig();

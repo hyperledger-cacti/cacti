@@ -8,7 +8,7 @@
 import { TransactionInfo } from "./transaction-info";
 import { TransactionStatus } from "./transaction-status";
 import { ResultTransactionStatusData } from "./result-transactions-status-data";
-import { BusinessLogicBase } from "@hyperledger/cactus-cmd-socket-server";
+import { BusinessLogicBase } from "@hyperledger/cactus-cmd-socketio-server";
 import fs = require("fs");
 
 export class BusinessLogicInquireAssetTradeStatus extends BusinessLogicBase {

@@ -6,7 +6,7 @@
  */
 
 import { Router, NextFunction, Request, Response } from "express";
-import { ConfigUtil, RIFError } from "@hyperledger/cactus-cmd-socket-server";
+import { ConfigUtil, RIFError } from "@hyperledger/cactus-cmd-socketio-server";
 import { BalanceManagement } from "./BalanceManagement";
 
 const config: any = ConfigUtil.getConfig();

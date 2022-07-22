@@ -6,9 +6,9 @@
  */
 
 import { Router, NextFunction, Request, Response } from "express";
-import { TransactionManagement } from "@hyperledger/cactus-cmd-socket-server";
-import { RIFError } from "@hyperledger/cactus-cmd-socket-server";
-import { ConfigUtil } from "@hyperledger/cactus-cmd-socket-server";
+import { TransactionManagement } from "@hyperledger/cactus-cmd-socketio-server";
+import { RIFError } from "@hyperledger/cactus-cmd-socketio-server";
+import { ConfigUtil } from "@hyperledger/cactus-cmd-socketio-server";
 
 const fs = require("fs");
 const path = require("path");

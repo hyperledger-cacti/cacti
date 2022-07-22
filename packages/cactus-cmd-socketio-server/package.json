@@ -1,5 +1,5 @@
 {
-  "name": "@hyperledger/cactus-cmd-socket-server",
+  "name": "@hyperledger/cactus-cmd-socketio-server",
   "version": "1.0.0",
   "license": "Apache-2.0",
   "main": "dist/src/main/typescript/index.js",

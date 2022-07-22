@@ -21,7 +21,7 @@ In this example, we use the Sawtooth intkey transaction processor as an applicat
     - `5140`: the port of `cactus-plugin-ledger-connector-sawtooth-socketio`
     - You can modify port exported to the host in `./docker-compose.yml`
 - Available directory (This directory must be empty):
-    - `./etc/cactus`: the directory for storing the config files of `cactus-cmd-socket-server`, will be mounted by the containers.
+    - `./etc/cactus`: the directory for storing the config files of `cactus-cmd-socketio-server`, will be mounted by the containers.
 
 ## Setup
 1. Configure Cactus:

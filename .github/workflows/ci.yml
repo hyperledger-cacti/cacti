@@ -96,7 +96,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
       - run: ./tools/ci.sh
-  cactus-cmd-socket-server:
+  cactus-cmd-socketio-server:
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
