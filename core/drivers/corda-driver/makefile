@@ -28,10 +28,19 @@ image-local: build-local
 image: github.properties
 	docker build --build-arg GIT_URL=$(GIT_URL) -f Dockerfile.remote -t $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) .
 
+.PHONY: check-if-tag-exists
+check-if-tag-exists:
+	!(DOCKER_CLI_EXPERIMENTAL=enabled docker manifest inspect $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_NAME):$(DOCKER_TAG) > /dev/null)
+
 .PHONY: push-image	
-push-image: image
+push-image: check-if-tag-exists image
 	docker tag $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_NAME):$(DOCKER_TAG)
 	docker push $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_NAME):$(DOCKER_TAG)
+	
+.PHONY: push-image-latest
+push-image-latest:
+	docker tag $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_NAME):latest
+	docker push $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_NAME):latest
 
 .PHONY: run
 run:

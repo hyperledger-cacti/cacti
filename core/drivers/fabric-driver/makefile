@@ -45,10 +45,17 @@ build-image-local: protos-js weaver-fabric-interop-sdk
 
 build-image: .npmrc
 	docker build --build-arg BUILD_TAG="remote" --build-arg GIT_URL=$(GIT_URL) -t ${DOCKER_IMAGE_NAME}:$(DOCKER_TAG) -f fabricDriver.dockerfile .
+
+check-if-tag-exists:
+	!(DOCKER_CLI_EXPERIMENTAL=enabled docker manifest inspect $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_NAME):$(DOCKER_TAG) > /dev/null)
 	
-push-image: build-image
+push-image: check-if-tag-exists build-image
 	docker tag ${DOCKER_IMAGE_NAME}:$(DOCKER_TAG) $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_NAME):$(DOCKER_TAG)
 	docker push $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_NAME):$(DOCKER_TAG)
+
+push-image-latest:
+	docker tag ${DOCKER_IMAGE_NAME}:$(DOCKER_TAG) $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_NAME):latest
+	docker push $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_NAME):latest
 
 deploy:
 	docker-compose $(COMPOSE_ARG) up -d
