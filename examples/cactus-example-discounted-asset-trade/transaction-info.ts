@@ -5,7 +5,7 @@
  * transaction-info.ts
  */
 
-import { RequestInfo } from "@hyperledger/cactus-cmd-socket-server";
+import { RequestInfo } from "@hyperledger/cactus-cmd-socketio-server";
 
 export class TransactionInfo {
   businessLogicID: string;

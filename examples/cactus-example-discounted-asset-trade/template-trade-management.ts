@@ -6,8 +6,8 @@
  */
 
 import { Request } from "express";
-import { LPInfoHolder } from "@hyperledger/cactus-cmd-socket-server";
-import { ConfigUtil } from "@hyperledger/cactus-cmd-socket-server";
+import { LPInfoHolder } from "@hyperledger/cactus-cmd-socketio-server";
+import { ConfigUtil } from "@hyperledger/cactus-cmd-socketio-server";
 import {
   VerifierFactory,
   VerifierFactoryConfig,

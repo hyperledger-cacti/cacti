@@ -8,7 +8,7 @@
 import {
   LPInfoHolder,
   ConfigUtil,
-} from "@hyperledger/cactus-cmd-socket-server";
+} from "@hyperledger/cactus-cmd-socketio-server";
 import {
   VerifierFactory,
   VerifierFactoryConfig,

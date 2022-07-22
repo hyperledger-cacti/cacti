@@ -17,7 +17,7 @@ import {
   json2str,
   ConfigUtil,
   LPInfoHolder,
-} from "@hyperledger/cactus-cmd-socket-server";
+} from "@hyperledger/cactus-cmd-socketio-server";
 import { makeRawTransaction } from "./TransactionEthereum";
 
 const fs = require("fs");

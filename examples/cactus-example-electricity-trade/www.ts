@@ -1,5 +1,5 @@
 import { BusinessLogicElectricityTrade } from "./BusinessLogicElectricityTrade";
-import { startCactusSocketIOServer } from "@hyperledger/cactus-cmd-socket-server";
+import { startCactusSocketIOServer } from "@hyperledger/cactus-cmd-socketio-server";
 
 startCactusSocketIOServer({
   id: "h40Q9eMD",
