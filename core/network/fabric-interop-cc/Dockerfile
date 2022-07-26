@@ -19,3 +19,6 @@ USER 1000
 
 WORKDIR /app
 CMD ./interop
+
+ARG GIT_URL
+LABEL org.opencontainers.image.source ${GIT_URL}
