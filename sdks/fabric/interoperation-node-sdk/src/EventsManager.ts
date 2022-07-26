@@ -66,18 +66,12 @@ function createEventPublicationSpec ({
         eventPublicationSpec.setAppUrl(appUrl)
     } else {
 
-        let ccArgsB64 = [];
-        for (const ccArg of ccArgs) {
-            ccArgsB64.push(Buffer.from(ccArg).toString('base64'));
-        }
-        console.log(`ccArgs: ${ccArgs} ccArgsB64: ${ccArgsB64}`)
-
         const ctx = new eventsPb.ContractTransaction()
         ctx.setDriverId(driverId)
         ctx.setLedgerId(channelId)
         ctx.setContractId(chaincodeId)
         ctx.setFunc(ccFunc)
-        ctx.setArgsList(ccArgsB64)
+        ctx.setArgsList(ccArgs)
         ctx.setReplaceArgIndex(replaceArgIndex)
         eventPublicationSpec.setCtx(ctx)
     }
