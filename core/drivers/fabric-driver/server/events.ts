@@ -372,12 +372,18 @@ async function writeExternalStateHelper(
         addresses.push(result.interopPayload.getAddress());
         viewsSerializedBase64.push(Buffer.from(viewPayload.getView().serializeBinary()).toString("base64"));
 
+	let ccArgsB64 = ctx.getArgsList_asB64();
+	let ccArgsStr = [];
+	for (const ccArgB64 of ccArgsB64) {
+	    ccArgsStr.push(Buffer.from(ccArgB64, 'base64').toString('utf8'));
+	}
         const invokeObject = {
             channel: ctx.getLedgerId(),
             ccFunc: ctx.getFunc(),
-            ccArgs: ctx.getArgsList(),
+            ccArgs: ccArgsStr,
             contractName: ctx.getContractId()
         }
+        console.debug(`invokeObject.ccArgs: ${invokeObject.ccArgs}`)
 
         const gateway = await getNetworkGateway(networkName);
         const network = await gateway.getNetwork(ctx.getLedgerId());

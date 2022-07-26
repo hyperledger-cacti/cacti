@@ -399,6 +399,14 @@ Below are the steps to exercise asset transfers from `network1` to `network2` us
     ```
     ./bin/fabric-cli event get-subscription-status --network=network1 --request-id=<request-id>
     ```
+* To start the HTTP server to listen to the published events by the destination/importing relay (fetched from the source/exporting network), run the following command:
+    ```
+    ./bin/fabric-cli event receive
+    ```
+  By default, it will start the below endpoint:
+    ```
+    http://localhost:8080/simple-event-callback
+    ```
 
 ## NOTE
 
