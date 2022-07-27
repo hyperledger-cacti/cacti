@@ -14,6 +14,7 @@ import { DBConnector, LevelDBConnector } from "./dbConnector";
 import { checkIfArraysAreEqual, handlePromise, relayCallback } from "./utils";
 import { registerListenerForEventSubscription, unregisterListenerForEventSubscription } from "./listener";
 import { getNetworkGateway } from "./fabric-code";
+import { Gateway, Network, Contract } from "fabric-network";
 import state_pb from '@hyperledger-labs/weaver-protos-js/common/state_pb';
 import driverPb from '@hyperledger-labs/weaver-protos-js/driver/driver_pb';
 
@@ -354,6 +355,7 @@ async function writeExternalStateHelper(
     const viewPayload: state_pb.ViewPayload = writeExternalStateMessage.getViewPayload();
     const ctx: eventsPb.ContractTransaction = writeExternalStateMessage.getCtx();
     const keyCert = await getDriverKeyCert();
+    let gateway: Gateway;
 
     const requestId: string = viewPayload.getRequestId();
     if (!viewPayload.getError()) {
@@ -380,9 +382,9 @@ async function writeExternalStateHelper(
         }
         console.debug(`invokeObject.ccArgs: ${invokeObject.ccArgs}`)
 
-        const gateway = await getNetworkGateway(networkName);
-        const network = await gateway.getNetwork(ctx.getLedgerId());
-        const interopContract = network.getContract(process.env.INTEROP_CHAINCODE ? process.env.INTEROP_CHAINCODE : 'interop');
+        gateway = await getNetworkGateway(networkName);
+        const network: Network = await gateway.getNetwork(ctx.getLedgerId());
+        const interopContract: Contract = network.getContract(process.env.INTEROP_CHAINCODE ? process.env.INTEROP_CHAINCODE : 'interop');
 
         const [ response, responseError ] = await handlePromise(InteroperableHelper.submitTransactionWithRemoteViews(
             interopContract,
@@ -396,9 +398,11 @@ async function writeExternalStateHelper(
             console.log(`Failed writing to the ledger with error: ${responseError}`);
             throw responseError;
         }
+	gateway.disconnect();
     } else {
         const errorString: string = `erroneous viewPayload identified in WriteExternalState processing`;
         console.log(`error viewPayload.getError(): ${JSON.stringify(viewPayload.getError())}`);
+	gateway.disconnect();
         throw new Error(errorString);
     }
 }
