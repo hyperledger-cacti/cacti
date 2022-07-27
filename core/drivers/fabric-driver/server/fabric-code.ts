@@ -78,12 +78,12 @@ async function invoke(
     query: query_pb.Query,
     networkName: string,
 ): Promise<view_data.FabricView> {
-    console.log('Running invoke on fabric network');
+    console.log('Running query on fabric network');
     try {
         // 1. Prepare credentials/gateway for communicating with fabric network
         const gateway = await getNetworkGateway(networkName);
 
-        // 2. Prepare info required for invoke (address/policy)
+        // 2. Prepare info required for query (address/policy)
         const parsedAddress = parseAddress(query.getAddress());
         // Get the network (channel) our contract is deployed to.
         console.log(parsedAddress.channel);
@@ -93,7 +93,7 @@ async function invoke(
         console.log(endorsers);
         // Get the contract from the network.
         console.log('policy', query.getPolicyList());
-        const contract = network.getContract(process.env.INTEROP_CHAINCODE ? process.env.INTEROP_CHAINCODE : 'interop');
+        const chaincodeId = process.env.INTEROP_CHAINCODE ? process.env.INTEROP_CHAINCODE : 'interop';
 
         // LOGIC for getting identities from the provided policy. If none can be found it will default to all.
         const identities = query.getPolicyList();
@@ -111,8 +111,19 @@ async function invoke(
             query.getRequestorSignature(),
             query.getAddress() + query.getNonce(),
         );
+        const b64QueryBytes = Buffer.from(query.serializeBinary()).toString('base64');
+
+        const idx = gateway.identityContext.calculateTransactionId();
+        const queryProposal = currentChannel.newQuery(chaincodeId);
+        const request = {
+                fcn: 'HandleExternalRequest',
+                args: [b64QueryBytes],
+                generateTransactionId: false
+        };
+        queryProposal.build(idx, request);
+        queryProposal.sign(idx);
         // 3. Set the endorser list for the transaction, this enforces that the list provided will endorse the proposed transaction
-        const transaction = contract.createTransaction('HandleExternalRequest');
+        let proposalRequest;
         if (identities.length > 0) {
             const endorserList = endorsers.filter((endorser: Endorser) => {
                 //@ts-ignore
@@ -120,23 +131,30 @@ async function invoke(
                 const orgName = cert.issuer.organizationName;
                 return identities.includes(endorser.mspid) || identities.includes(orgName);
             });
-            console.log('Endorsers', endorserList);
-            transaction.setEndorsingPeers(endorserList);
-            console.log('Set endorsers');
+            console.log('Set endorserList', endorserList);
+            proposalRequest = {
+                    targets: endorserList,
+                    requestTimeout: 30000
+            };
         } else {
             // When no identities provided it will default to all peers
-            transaction.setEndorsingPeers(endorsers);
+            console.log('Set endorsers', endorsers);
+            proposalRequest = {
+                    targets: endorsers,
+                    requestTimeout: 30000
+            };
         }
-        const b64QueryBytes = Buffer.from(query.serializeBinary()).toString('base64');
-        // submit transaction and get result from chaincode
-        const read = await transaction.submit(b64QueryBytes);
-        console.log('Submittransactionresponse', read);
+
+        // submit query transaction and get result from chaincode
+        const proposalResponseResult = await queryProposal.send(proposalRequest);
+        console.log(JSON.stringify(proposalResponse, null, 2))
+
         // 4. Prepare the view and return.
         const viewPayload = new view_data.FabricView();
         const endorsements: proposalResponse.Endorsement[] = [];
         //TODO Fix ts error
         //@ts-ignore
-        read.proposalResponse.forEach((response) => {
+        proposalResponseResult.responses.forEach((response) => {
             console.log('Response', response);
             viewPayload.setProposalResponsePayload(
                 proposalResponse.ProposalResponsePayload.deserializeBinary(response.payload),

@@ -6,7 +6,6 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "build": "npm run tsc",
-        "postinstall": "patch-package",
         "tsc": "tsc",
         "start": "node out/server.js",
         "watch": "tsc --watch",
