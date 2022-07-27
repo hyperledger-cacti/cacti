@@ -24,21 +24,12 @@ index 24e66f2..12dbb43 100644
          endorsement.sign(this.identityContext);
          // ------- S E N D   P R O P O S A L
          // This is where the request gets sent to the peers
-@@ -253,7 +253,7 @@ class Transaction {
-         const proposalResponse = await endorsement.send(proposalSendRequest);
-         try {
-             const result = getResponsePayload(proposalResponse);
--            // ------- E V E N T   M O N I T O R
-+            /* // ------- E V E N T   M O N I T O R
-             const eventHandler = this.eventHandlerStrategyFactory(endorsement.getTransactionId(), this.contract.network);
-             await eventHandler.startListening();
-             const commit = endorsement.newCommit();
 @@ -288,7 +288,8 @@ class Transaction {
              }
              logger.debug('%s - wait for the transaction to be committed on the peer', method);
              await eventHandler.waitForEvents();
 -            return result;
-+            return result;*/
++            // need this dummy comment line for the patch to work
 +            return {result, proposalResponse: proposalResponse.responses, proposal: proposal} ;
          }
          catch (err) {
