@@ -1,6 +1,6 @@
 {
     "name": "fabric-driver",
-    "version": "1.4.0",
+    "version": "1.4.2",
     "description": "",
     "main": "out/server.js",
     "scripts": {
@@ -19,8 +19,8 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
-        "@hyperledger-labs/weaver-protos-js": "^1.4.0",
-        "@hyperledger-labs/weaver-fabric-interop-sdk": "^1.4.0",
+        "@hyperledger-labs/weaver-protos-js": "^1.4.2",
+        "@hyperledger-labs/weaver-fabric-interop-sdk": "^1.4.2",
         "@fidm/x509": "^1.2.1",
         "@grpc/grpc-js": "^1.1.1",
         "@typescript-eslint/eslint-plugin": "^3.5.0",

@@ -68,7 +68,7 @@ function createEventPublicationSpec ({
 
         let ccArgsB64 = [];
 	for (const ccArg of ccArgs) {
-            ccArgsB64.push(Buffer.from(ccArg).toString('base64'));
+            ccArgsB64.push(Buffer.from(ccArg));
 	}
         console.log(`ccArgs: ${ccArgs} ccArgsB64: ${ccArgsB64}`)
 
@@ -249,10 +249,10 @@ const getSubscriptionStatus = async (
     }
 
     let eventSubscriptionState: eventsPb.EventSubscriptionState = relayResponse;
-    let ccArgsB64 = eventSubscriptionState.getEventPublicationSpec().getCtx().getArgsList_asB64();
+    let ccArgsB64 = eventSubscriptionState.getEventPublicationSpec().getCtx().getArgsList();
     let ccArgsStr = [];
     for (const ccArgB64 of ccArgsB64) {
-        ccArgsStr.push(Buffer.from(ccArgB64, 'base64').toString('utf8'));
+        ccArgsStr.push(Buffer.from(ccArgB64).toString('utf8'));
     }
 
     eventSubscriptionState.getEventPublicationSpec().getCtx().setArgsList(ccArgsStr);

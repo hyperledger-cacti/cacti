@@ -374,10 +374,10 @@ async function writeExternalStateHelper(
         addresses.push(result.interopPayload.getAddress());
         viewsSerializedBase64.push(Buffer.from(viewPayload.getView().serializeBinary()).toString("base64"));
 
-        let ccArgsB64 = ctx.getArgsList_asB64();
+        let ccArgsB64 = ctx.getArgsList();
         let ccArgsStr = [];
         for (const ccArgB64 of ccArgsB64) {
-            ccArgsStr.push(Buffer.from(ccArgB64, 'base64').toString('utf8'));
+            ccArgsStr.push(Buffer.from(ccArgB64).toString('utf8'));
         }
 
         const invokeObject = {

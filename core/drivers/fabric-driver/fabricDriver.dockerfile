@@ -21,7 +21,6 @@ ADD package.json .
 
 RUN npm install --unsafe-perm
 
-ADD patches /fabric-driver/patches
 ADD server /fabric-driver/server
 ADD config.json .
 ADD tsconfig.json .
@@ -29,7 +28,6 @@ ADD .eslintrc .
 ADD .prettierrc .
 
 RUN npm run build
-RUN npm run postinstall
 RUN rm /fabric-driver/.npmrc
 
 ARG GIT_URL
