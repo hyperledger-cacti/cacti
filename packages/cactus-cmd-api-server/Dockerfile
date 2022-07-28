@@ -50,7 +50,7 @@ ENV API_PORT=4000
 ENV LOG_LEVEL=INFO
 
 ENV NVM_DIR /home/${APP_USER}/.nvm
-ENV NODE_VERSION 16.3.0
+ENV NODE_VERSION 16.15.1
 ENV NODE_PATH $NVM_DIR/v$NODE_VERSION/lib/node_modules
 ENV PATH      $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 
@@ -61,7 +61,7 @@ RUN curl https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash 
   && nvm install $NODE_VERSION \
   && nvm alias default $NODE_VERSION \
   && nvm use default \
-  && npm install -g npm@7.19.1
+  && npm install -g npm@8.11.0
 
 RUN npm install -g yarn@1.22.17
 RUN yarn add @hyperledger/cactus-cmd-api-server@${NPM_PKG_VERSION} --production

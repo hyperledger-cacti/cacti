@@ -35,7 +35,7 @@ SHELL ["/bin/bash", "--login", "-i", "-c"]
 # Installing Node Version Manager (nvm)
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
 RUN source ~/.bashrc && \
-    nvm install 16.8.0 && \
+    nvm install 16.15.1 && \
     npm install -g yarn && \
     yarn add @hyperledger/cactus-example-carbon-accounting-backend@0.9.1-ci-942.cbb849c6.35 --ignore-engines --production
 

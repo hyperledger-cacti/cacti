@@ -36,7 +36,7 @@ SHELL ["/bin/bash", "--login", "-i", "-c"]
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
 ARG NPM_PKG_VERSION=latest
 RUN source ~/.bashrc && \
-    nvm install 16.8.0 && \
+    nvm install 16.15.1 && \
     npm install -g yarn && \
     yarn add @hyperledger/cactus-example-supply-chain-backend@${NPM_PKG_VERSION} --ignore-engines --production
 
