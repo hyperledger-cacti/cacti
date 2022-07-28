@@ -60,7 +60,7 @@ message ContractTransaction {
   string ledger_id = 2;
   string contract_id = 3;
   string func = 4;
-  repeated string args = 5;
+  repeated bytes args = 5;
   uint64 replace_arg_index = 6;
 }
 

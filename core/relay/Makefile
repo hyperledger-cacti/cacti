@@ -1,6 +1,6 @@
 include Makefile.variables.docker
 
-PROTOS_TAG ?= v0.7
+PROTOS_TAG ?= v1.4.2
 
 DOCKER_IMAGE_ALL = $(DOCKER_IMAGE_NAME):$(DOCKER_TAG)
 DOCKER_IMAGE_SERVER = $(DOCKER_IMAGE_NAME)-server:$(DOCKER_TAG)
