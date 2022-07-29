@@ -58,7 +58,7 @@ const walletSetup = async (
     : path.join(__dirname, '../', `wallet-${networkName}`)
   const wallet = await Wallets.newFileSystemWallet(walletPath)
 
-  logger.info(`Wallet Setup: wallet path: ${walletPath}`)
+  logger.debug(`Wallet Setup: wallet path: ${walletPath}`)
 
   // build a user object for authenticating with the CA        // Check to see if we've already enrolled the admin user.
   let adminIdentity = await wallet.get('admin')
@@ -87,7 +87,7 @@ const walletSetup = async (
   const provider = wallet.getProviderRegistry().getProvider(adminIdentity.type)
   const adminUser = await provider.getUserContext(adminIdentity, 'admin')
   const identity = await wallet.get(userName)
-  logger.info(`user ${userName}`)
+  logger.debug(`user ${userName}`)
   if (!identity) {
     // Register the user, enroll the user, and import the new identity into the wallet.
     if (!register) {
@@ -156,7 +156,7 @@ const walletSetup = async (
     await wallet.put(userName, x509Identity)
   }
   else {
-    logger.info(`Identity ${userName} already exists.\n`)
+    logger.debug(`Identity ${userName} already exists.\n`)
   }
 
   return wallet

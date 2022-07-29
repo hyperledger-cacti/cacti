@@ -5,7 +5,6 @@ COMPOSE_ARG ?=
 build: .npmrc
 	npm install
 	npm run build
-	npm run postinstall
 
 protos-js:
 	mkdir -p protos-js && \
@@ -33,7 +32,6 @@ build-local: protos-js weaver-fabric-interop-sdk
 		(mv package-remote.json package.json && exit 1) # Only if fails	
 	mv package-remote.json package.json # Only if success
 	npm run build
-	npm run postinstall
 	
 build-image-local: protos-js weaver-fabric-interop-sdk
 	cp package.json package-remote.json

@@ -55,7 +55,7 @@ function handlePromise<T>(promise: Promise<T>): Promise<[T?, Error?]> {
 }
 
 function getRelayClientForQueryResponse() {
-    let client;
+    let client: datatransfer_grpc_pb.DataTransferClient;
     if (process.env.RELAY_TLS === 'true') {
         if (!(process.env.RELAY_TLSCA_CERT_PATH && fs.existsSync(process.env.RELAY_TLSCA_CERT_PATH))) {
             throw new Error("Missing or invalid RELAY_TLSCA_CERT_PATH: " + process.env.RELAY_TLSCA_CERT_PATH);
@@ -75,7 +75,7 @@ function getRelayClientForQueryResponse() {
 }
 
 function getRelayClientForEventPublish() {
-    let client;
+    let client: events_grpc_pb.EventPublishClient;
     if (process.env.RELAY_TLS === 'true') {
         if (!(process.env.RELAY_TLSCA_CERT_PATH && fs.existsSync(process.env.RELAY_TLSCA_CERT_PATH))) {
             throw new Error("Missing or invalid RELAY_TLSCA_CERT_PATH: " + process.env.RELAY_TLSCA_CERT_PATH);

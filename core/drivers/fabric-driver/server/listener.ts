@@ -4,15 +4,14 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import * as $protobuf from "protobufjs";
-import ByteBuffer from 'bytebuffer';
 import * as fabproto6 from 'fabric-protos';
-import { Gateway, Wallets, Network, Contract, BlockListener, ContractListener } from 'fabric-network';
+import { Gateway, Network, Contract, BlockListener, ContractListener } from 'fabric-network';
 import query_pb from '@hyperledger-labs/weaver-protos-js/common/query_pb';
 import events_pb from '@hyperledger-labs/weaver-protos-js/common/events_pb';
 import { lookupEventSubscriptions } from './events';
 import { invoke, getNetworkGateway, packageFabricView } from './fabric-code';
 import { handlePromise, relayCallback, getRelayClientForEventPublish } from './utils';
+import { DBLockedError } from './dbConnector';
 
 let networkGatewayMap = new Map<string, Gateway>();
 let networkChannelMap = new Map<string, Network>();
@@ -63,7 +62,7 @@ const initBlockEventListenerForChannel = async (
                             break;
                         } catch(error) {
                             let errorString: string = error.toString();
-                            if (!errorString.includes('LEVEL_LOCKED')) {    // Check if contention was preventing DB access
+                            if (!(error instanceof DBLockedError)) {    // Check if contention was preventing DB access
                                 throw(error);
                             }
                             await new Promise(f => setTimeout(f, 2000));    // Sleep 2 seconds
@@ -124,7 +123,7 @@ const initContractEventListener = (
                 break;
             } catch(error) {
                 let errorString: string = error.toString();
-                if (!errorString.includes('LEVEL_LOCKED')) {    // Check if contention was preventing DB access
+                if (!(error instanceof DBLockedError)) {    // Check if contention was preventing DB access
                     throw(error);
                 }
                 await new Promise(f => setTimeout(f, 2000));    // Sleep 2 seconds

@@ -65,12 +65,19 @@ function createEventPublicationSpec ({
     if (appUrl) {
         eventPublicationSpec.setAppUrl(appUrl)
     } else {
+
+        let ccArgsBytes = [];
+	for (const ccArg of ccArgs) {
+        ccArgsBytes.push(Buffer.from(ccArg));
+	}
+        console.log(`ccArgs: ${ccArgs} ccArgsBytes: ${ccArgsBytes}`)
+
         const ctx = new eventsPb.ContractTransaction()
         ctx.setDriverId(driverId)
         ctx.setLedgerId(channelId)
         ctx.setContractId(chaincodeId)
         ctx.setFunc(ccFunc)
-        ctx.setArgsList(ccArgs)
+        ctx.setArgsList(ccArgsBytes)
         ctx.setReplaceArgIndex(replaceArgIndex)
         eventPublicationSpec.setCtx(ctx)
     }
@@ -230,20 +237,29 @@ const getSubscriptionStatus = async (
     logger.debug("Get Event Subscription Status")
 
     const relay = useTls ? new Relay(localRelayEndpoint, Relay.defaultTimeout, true, tlsRootCACertPaths) : new Relay(localRelayEndpoint);
-    
+
     const [relayResponse, relayResponseError] = await helpers.handlePromise(
         relay.GetEventSubscriptionState(
             requestID,
-            asJson
+            false
         ),
     );
     if (relayResponseError) {
         throw new Error(`Get event subscription relay response error: ${relayResponseError}`);
     }
-    
+
+    let eventSubscriptionState: eventsPb.EventSubscriptionState = relayResponse;
+    let ccArgsBytes = eventSubscriptionState.getEventPublicationSpec().getCtx().getArgsList();
+    let ccArgsStr = [];
+    for (const ccArgBytes of ccArgsBytes) {
+        ccArgsStr.push(Buffer.from(ccArgBytes).toString('utf8'));
+    }
+
+    eventSubscriptionState.getEventPublicationSpec().getCtx().setArgsList(ccArgsStr);
+
     logger.debug(`Get event subscription status response: ${JSON.stringify(relayResponse)}`)
-    
-    return relayResponse
+
+    return asJson? eventSubscriptionState.toObject() : relayResponse;
 }
 
 const getAllReceivedEvents = async (

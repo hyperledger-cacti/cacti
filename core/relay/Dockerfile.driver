@@ -40,7 +40,7 @@ ENV PKG_CONFIG_ALLOW_CROSS=1 \
 # the same layer where we do the compilation
 # to then remove it from the image in the
 # same docker command.
-RUN cd /opt/relay && RUSTFLAGS=-Clinker=musl-gcc cargo build --release --target x86_64-unknown-linux-musl
+RUN cd /opt/relay && RUSTFLAGS="-Clinker=musl-gcc -Crelocation-model=static" cargo build --release --target x86_64-unknown-linux-musl
 
 
 

@@ -137,7 +137,7 @@ const command: GluegunCommand = {
             )
 
             if (response.getStatus() == EventSubscriptionState.STATUS.UNSUBSCRIBED) {
-                console.log("Event Unsubscription Success for requestId:", response.getRequestId(), 'and event matcher:', eventMatcher)
+                console.log("Event Unsubscription Success for requestId:", response.getRequestId(), 'and event matcher:', JSON.stringify(eventMatcher.toObject()))
             } else {
                 console.log("Unknown error")
             }

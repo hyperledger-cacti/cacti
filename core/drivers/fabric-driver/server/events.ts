@@ -10,9 +10,13 @@ import events_grpc_pb from '@hyperledger-labs/weaver-protos-js/relay/events_grpc
 import queryPb from '@hyperledger-labs/weaver-protos-js/common/query_pb';
 import { InteroperableHelper } from '@hyperledger-labs/weaver-fabric-interop-sdk';
 import { getDriverKeyCert } from "./walletSetup";
-import { DBConnector, LevelDBConnector } from "./dbConnector";
+import { DBConnector, DBKeyNotFoundError, LevelDBConnector } from "./dbConnector";
 import { checkIfArraysAreEqual, handlePromise, relayCallback } from "./utils";
 import { registerListenerForEventSubscription, unregisterListenerForEventSubscription } from "./listener";
+import { getNetworkGateway } from "./fabric-code";
+import { Gateway, Network, Contract } from "fabric-network";
+import state_pb from '@hyperledger-labs/weaver-protos-js/common/state_pb';
+import driverPb from '@hyperledger-labs/weaver-protos-js/driver/driver_pb';
 
 const DB_NAME: string = "driverdb";
 
@@ -170,7 +174,7 @@ async function addEventSubscription(
             subscriptions.push(querySerialized);
         } catch (error: any) {
             let errorString = error.toString();
-            if (errorString.includes('Error: NotFound:') || errorString.includes('LEVEL_NOT_FOUND')) {
+            if (error instanceof DBKeyNotFoundError) {
                 // case of read failing due to key not found
                 console.debug(`eventMatcher: ${JSON.stringify(eventMatcher.toObject())} is not present before in the database`);
                 subscriptions = new Array<string>();
@@ -261,6 +265,19 @@ const deleteEventSubscription = async (
     }
 }
 
+function filterEventMatcher(keySerialized: string, eventMatcher: eventsPb.EventMatcher) : boolean {
+    var item: eventsPb.EventMatcher = eventsPb.EventMatcher.deserializeBinary(Buffer.from(keySerialized, 'base64'));
+    if ((eventMatcher.getEventClassId() == '*' || eventMatcher.getEventClassId() == item.getEventClassId()) &&
+        (eventMatcher.getTransactionContractId() == '*' || eventMatcher.getTransactionContractId() == item.getTransactionContractId()) &&
+        (eventMatcher.getTransactionLedgerId() == '*' || eventMatcher.getTransactionLedgerId() == item.getTransactionLedgerId()) &&
+        (eventMatcher.getTransactionFunc() == '*' || eventMatcher.getTransactionFunc() == item.getTransactionFunc())) {
+
+        return true;
+    } else {
+        return false;
+    }
+}
+
 async function lookupEventSubscriptions(
     eventMatcher: eventsPb.EventMatcher
 ): Promise<Array<queryPb.Query>> {
@@ -274,21 +291,13 @@ async function lookupEventSubscriptions(
         db = new LevelDBConnector(DB_NAME!);
         await db.open();
 
-        for await (const [keySerialized, subscriptionsSerialized] of db.dbHandle.iterator()) {
-            var item: eventsPb.EventMatcher = eventsPb.EventMatcher.deserializeBinary(Buffer.from(keySerialized, 'base64'));
-            if ((eventMatcher.getEventClassId() == '*' || eventMatcher.getEventClassId() == item.getEventClassId()) &&
-                (eventMatcher.getTransactionContractId() == '*' || eventMatcher.getTransactionContractId() == item.getTransactionContractId()) &&
-                (eventMatcher.getTransactionLedgerId() == '*' || eventMatcher.getTransactionLedgerId() == item.getTransactionLedgerId()) &&
-                (eventMatcher.getTransactionFunc() == '*' || eventMatcher.getTransactionFunc() == item.getTransactionFunc())) {
-
-                subscriptions = JSON.parse(subscriptionsSerialized)
-                for (const subscriptionSerialized of subscriptions) {
-                    var subscription: queryPb.Query =  queryPb.Query.deserializeBinary(Buffer.from(subscriptionSerialized, 'base64'));
-                    console.debug(`subscription: ${JSON.stringify(subscription.toObject())}`)
-                    returnSubscriptions.push(subscription);
-                }
+        for (const subscriptionsSerialized of await db.filteredRead(filterEventMatcher, eventMatcher)) {
+            subscriptions = JSON.parse(subscriptionsSerialized)
+            for (const subscriptionSerialized of subscriptions) {
+                var subscription: queryPb.Query =  queryPb.Query.deserializeBinary(Buffer.from(subscriptionSerialized, 'base64'));
+                console.debug(`subscription: ${JSON.stringify(subscription.toObject())}`)
+                returnSubscriptions.push(subscription);
             }
-
         }
 
         console.debug(`returnSubscriptions.length: ${returnSubscriptions.length}`);
@@ -299,7 +308,7 @@ async function lookupEventSubscriptions(
     } catch (error: any) {
         let errorString: string = error.toString();
         await db?.close();
-        if (errorString.includes('Error: NotFound:') || errorString.includes('LEVEL_NOT_FOUND')) {
+        if (error instanceof DBKeyNotFoundError) {
             // case of read failing due to key not found
             returnSubscriptions = new Array<queryPb.Query>();
             console.debug(`returnSubscriptions.length: ${returnSubscriptions.length}`);
@@ -344,11 +353,76 @@ async function signEventSubscriptionQuery(
     }
 }
 
+async function writeExternalStateHelper(
+    writeExternalStateMessage: driverPb.WriteExternalStateMessage,
+    networkName: string
+) : Promise<any> {
+    const viewPayload: state_pb.ViewPayload = writeExternalStateMessage.getViewPayload();
+    const ctx: eventsPb.ContractTransaction = writeExternalStateMessage.getCtx();
+    const keyCert = await getDriverKeyCert();
+
+    const requestId: string = viewPayload.getRequestId();
+    if (!viewPayload.getError()) {
+
+        let interopArgIndices = [], viewsSerializedBase64 = [], addresses = [], viewContentsBase64 = [];
+        const view: state_pb.View = viewPayload.getView();
+
+        const result = InteroperableHelper.getResponseDataFromView(view, keyCert.key.toBytes());
+        if (result.interopPayload.getConfidential()) {
+            viewContentsBase64.push(result.contents.toString("base64"));
+        } else {
+            viewContentsBase64.push("");
+        }
+
+        interopArgIndices.push(ctx.getReplaceArgIndex());
+        addresses.push(result.interopPayload.getAddress());
+        viewsSerializedBase64.push(Buffer.from(viewPayload.getView().serializeBinary()).toString("base64"));
+
+        let ccArgsB64 = ctx.getArgsList();
+        let ccArgsStr = [];
+        for (const ccArgB64 of ccArgsB64) {
+            ccArgsStr.push(Buffer.from(ccArgB64).toString('utf8'));
+        }
+
+        const invokeObject = {
+            channel: ctx.getLedgerId(),
+            ccFunc: ctx.getFunc(),
+            ccArgs: ccArgsStr,
+            contractName: ctx.getContractId()
+        }
+        console.debug(`invokeObject.ccArgs: ${invokeObject.ccArgs}`)
+
+        let gateway: Gateway = await getNetworkGateway(networkName);
+        const network: Network = await gateway.getNetwork(ctx.getLedgerId());
+        const interopContract: Contract = network.getContract(process.env.INTEROP_CHAINCODE ? process.env.INTEROP_CHAINCODE : 'interop');
+
+        const [ response, responseError ] = await handlePromise(InteroperableHelper.submitTransactionWithRemoteViews(
+            interopContract,
+            invokeObject,
+            interopArgIndices,
+            addresses,
+            viewsSerializedBase64,
+            viewContentsBase64
+        ));
+        if (responseError) {
+            console.log(`Failed writing to the ledger with error: ${responseError}`);
+            gateway.disconnect();
+            throw responseError;
+        }
+	    gateway.disconnect();
+    } else {
+        const errorString: string = `erroneous viewPayload identified in WriteExternalState processing`;
+        console.log(`error viewPayload.getError(): ${JSON.stringify(viewPayload.getError())}`);
+        throw new Error(errorString);
+    }
+}
+
 export {
     subscribeEventHelper,
     unsubscribeEventHelper,
     addEventSubscription,
     deleteEventSubscription,
     lookupEventSubscriptions,
-    signEventSubscriptionQuery
+    signEventSubscriptionQuery,
+    writeExternalStateHelper
 }
