@@ -407,6 +407,10 @@ Below are the steps to exercise asset transfers from `network1` to `network2` us
     ```
     http://localhost:8080/simple-event-callback
     ```
+* To fetch the statuses of all the events received, run the following command:
+    ```
+    ./bin/fabric-cli event get-all --network=network1 --request-id=<request-id>
+    ```
 
 ## NOTE
 

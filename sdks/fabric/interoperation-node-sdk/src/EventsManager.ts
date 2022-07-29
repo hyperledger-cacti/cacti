@@ -66,18 +66,18 @@ function createEventPublicationSpec ({
         eventPublicationSpec.setAppUrl(appUrl)
     } else {
 
-        let ccArgsB64 = [];
+        let ccArgsBytes = [];
 	for (const ccArg of ccArgs) {
-            ccArgsB64.push(Buffer.from(ccArg));
+        ccArgsBytes.push(Buffer.from(ccArg));
 	}
-        console.log(`ccArgs: ${ccArgs} ccArgsB64: ${ccArgsB64}`)
+        console.log(`ccArgs: ${ccArgs} ccArgsBytes: ${ccArgsBytes}`)
 
         const ctx = new eventsPb.ContractTransaction()
         ctx.setDriverId(driverId)
         ctx.setLedgerId(channelId)
         ctx.setContractId(chaincodeId)
         ctx.setFunc(ccFunc)
-        ctx.setArgsList(ccArgsB64)
+        ctx.setArgsList(ccArgsBytes)
         ctx.setReplaceArgIndex(replaceArgIndex)
         eventPublicationSpec.setCtx(ctx)
     }
@@ -249,10 +249,10 @@ const getSubscriptionStatus = async (
     }
 
     let eventSubscriptionState: eventsPb.EventSubscriptionState = relayResponse;
-    let ccArgsB64 = eventSubscriptionState.getEventPublicationSpec().getCtx().getArgsList();
+    let ccArgsBytes = eventSubscriptionState.getEventPublicationSpec().getCtx().getArgsList();
     let ccArgsStr = [];
-    for (const ccArgB64 of ccArgsB64) {
-        ccArgsStr.push(Buffer.from(ccArgB64).toString('utf8'));
+    for (const ccArgBytes of ccArgsBytes) {
+        ccArgsStr.push(Buffer.from(ccArgBytes).toString('utf8'));
     }
 
     eventSubscriptionState.getEventPublicationSpec().getCtx().setArgsList(ccArgsStr);

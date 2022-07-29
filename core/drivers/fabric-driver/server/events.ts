@@ -360,7 +360,6 @@ async function writeExternalStateHelper(
     const viewPayload: state_pb.ViewPayload = writeExternalStateMessage.getViewPayload();
     const ctx: eventsPb.ContractTransaction = writeExternalStateMessage.getCtx();
     const keyCert = await getDriverKeyCert();
-    let gateway: Gateway;
 
     const requestId: string = viewPayload.getRequestId();
     if (!viewPayload.getError()) {
@@ -393,7 +392,7 @@ async function writeExternalStateHelper(
         }
         console.debug(`invokeObject.ccArgs: ${invokeObject.ccArgs}`)
 
-        gateway = await getNetworkGateway(networkName);
+        let gateway: Gateway = await getNetworkGateway(networkName);
         const network: Network = await gateway.getNetwork(ctx.getLedgerId());
         const interopContract: Contract = network.getContract(process.env.INTEROP_CHAINCODE ? process.env.INTEROP_CHAINCODE : 'interop');
 
@@ -407,13 +406,13 @@ async function writeExternalStateHelper(
         ));
         if (responseError) {
             console.log(`Failed writing to the ledger with error: ${responseError}`);
+            gateway.disconnect();
             throw responseError;
         }
-	gateway.disconnect();
+	    gateway.disconnect();
     } else {
         const errorString: string = `erroneous viewPayload identified in WriteExternalState processing`;
         console.log(`error viewPayload.getError(): ${JSON.stringify(viewPayload.getError())}`);
-	gateway.disconnect();
         throw new Error(errorString);
     }
 }
