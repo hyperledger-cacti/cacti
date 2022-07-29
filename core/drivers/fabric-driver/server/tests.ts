@@ -7,7 +7,7 @@
 import eventsPb from "@hyperledger-labs/weaver-protos-js/common/events_pb";
 import queryPb from '@hyperledger-labs/weaver-protos-js/common/query_pb';
 import { addEventSubscription, deleteEventSubscription, lookupEventSubscriptions } from "./events"
-import { LevelDBConnector, DBConnector } from "./dbConnector"
+import { LevelDBConnector, DBConnector, DBNotOpenError, DBKeyNotFoundError, DBLockedError } from "./dbConnector"
 
 // test the LevelDB basic operations
 async function dbConnectionTest(
@@ -37,7 +37,8 @@ async function dbConnectionTest(
             await db.update(key, value);
         } catch (error: any) {
             const errorString: string = `${JSON.stringify(error)}`;
-            if (errorString.includes(`is not open`)) {
+            if (error instanceof DBNotOpenError) {
+                console.log(`test success for DBNotOpenError`);
                 // open the database connection
                 await db.open();
                 // try to update again the key
@@ -51,6 +52,35 @@ async function dbConnectionTest(
 
         // Delete the key
         await db.delete(key);
+
+        // Try to read key that is already deleted
+        try {
+            await db.read(key);
+        } catch (error: any) {
+            const errorString: string = `${JSON.stringify(error)}`;
+            if (error instanceof DBKeyNotFoundError) {
+                console.log(`test success for DBKeyNotFoundError`);
+            } else {
+                console.error(`re-throwing the error: ${errorString}`);
+                db.close();
+                throw new Error(error);
+            }
+        }
+
+        // Try to open another connection which should fail
+        try {
+            let db2 = new LevelDBConnector("");
+            await db2.open();
+        } catch (error: any) {
+            const errorString: string = `${JSON.stringify(error)}`;
+            if (error instanceof DBLockedError) {
+                console.log(`test success for DBLockedError`);
+            } else {
+                console.error(`re-throwing the error: ${errorString}`);
+                throw new Error(error);
+            }
+        }
+
         await db.close();
     } catch (error) {
         console.error(`Failed testing LevelDBConnector, with error: ${JSON.stringify(error)}`);
