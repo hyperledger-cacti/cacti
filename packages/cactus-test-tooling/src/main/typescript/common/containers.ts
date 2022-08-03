@@ -653,6 +653,25 @@ export class Containers {
       }
     });
   }
+
+  /**
+   * Get all environment variables defined in container provided in argument.
+   *
+   * @param container Running dockerode container instance
+   * @returns Map between environment variable name and it's value.
+   */
+  public static async getEnvVars(
+    container: Container,
+  ): Promise<Map<string, string>> {
+    Checks.truthy(container);
+
+    const inspectInfo = await container.inspect();
+    return new Map(
+      inspectInfo.Config.Env.map(
+        (entry) => entry.split("=") as [string, string],
+      ),
+    );
+  }
 }
 
 export interface IStreamLogsRequest {

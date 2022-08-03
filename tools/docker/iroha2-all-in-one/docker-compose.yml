@@ -1,0 +1,20 @@
+version: "3.5"
+
+services:
+ iroha2-aio-testnet:
+    container_name: ${CACTUS_IROHA2_LEDGER_CONTAINER_NAME:-iroha2_aio_testnet}
+    image: ${CACTUS_IROHA2_LEDGER_IMAGE_NAME:-cactus_iroha2_all_in_one:1.0.0}
+    privileged: true
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+        - "8080:8080"   # Api
+        - "8180:8180"   # Telemetry
+    networks:
+       - iroha2-network
+
+networks:
+  iroha2-network:
+    name: iroha2_aio_network
+    driver: bridge
