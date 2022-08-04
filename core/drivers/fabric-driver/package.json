@@ -1,12 +1,11 @@
 {
     "name": "fabric-driver",
-    "version": "1.4.0",
+    "version": "1.4.2",
     "description": "",
     "main": "out/server.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "build": "npm run tsc",
-        "postinstall": "patch-package",
         "tsc": "tsc",
         "start": "node out/server.js",
         "watch": "tsc --watch",
@@ -20,7 +19,7 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
-        "@hyperledger-labs/weaver-protos-js": "^1.4.0",
+        "@hyperledger-labs/weaver-protos-js": "^1.4.2",
         "@hyperledger-labs/weaver-fabric-interop-sdk": "^1.4.0",
         "@fidm/x509": "^1.2.1",
         "@grpc/grpc-js": "^1.1.1",

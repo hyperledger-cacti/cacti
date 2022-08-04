@@ -174,14 +174,14 @@ const getResponseDataFromView = (view, privKeyPEM = null) => {
             const confidentialPayload = interopPayloadPb.ConfidentialPayload.deserializeBinary(Uint8Array.from(Buffer.from(interopPayload.getPayload())));
             const decryptedPayload = decryptData(Buffer.from(confidentialPayload.getEncryptedPayload()), privKeyPEM);
             const decryptedPayloadContents = interopPayloadPb.ConfidentialPayloadContents.deserializeBinary(Uint8Array.from(Buffer.from(decryptedPayload)));
-            return { data: Buffer.from(decryptedPayloadContents.getPayload()).toString(), contents: decryptedPayload };
+            return { interopPayload: interopPayload, data: Buffer.from(decryptedPayloadContents.getPayload()).toString(), contents: decryptedPayload };
         } else {
-            return { data: Buffer.from(interopPayload.getPayload()).toString() };
+            return { interopPayload: interopPayload, data: Buffer.from(interopPayload.getPayload()).toString() };
         }
     } else if (view.getMeta().getProtocol() == statePb.Meta.Protocol.CORDA) {
         const cordaView = cordaViewPb.ViewData.deserializeBinary(view.getData());
         const interopPayload = interopPayloadPb.InteropPayload.deserializeBinary(Uint8Array.from(Buffer.from(cordaView.getPayload())));
-        return { data: Buffer.from(interopPayload.getPayload()).toString() };
+        return { interopPayload: interopPayload, data: Buffer.from(interopPayload.getPayload()).toString() };
     } else {
         const protocolType = view.getMeta().getProtocol();
         throw new Error(`Unsupported DLT type: ${protocolType}`);
@@ -670,4 +670,5 @@ export {
     getRemoteView,
     createFlowAddress,
     createAddress,
+    decryptData
 };
