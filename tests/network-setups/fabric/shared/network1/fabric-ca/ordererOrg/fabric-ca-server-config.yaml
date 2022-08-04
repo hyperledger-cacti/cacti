@@ -269,13 +269,13 @@ signing:
     default:
       usage:
         - digital signature
-      expiry: 8760h
+      expiry: 87660h
     profiles:
       ca:
          usage:
            - cert sign
            - crl sign
-         expiry: 43800h
+         expiry: 87660h
          caconstraint:
            isca: true
            maxpathlen: 0
@@ -286,7 +286,7 @@ signing:
             - server auth
             - client auth
             - key agreement
-         expiry: 8760h
+         expiry: 87660h
 
 ###########################################################################
 #  Certificate Signing Request (CSR) section.
