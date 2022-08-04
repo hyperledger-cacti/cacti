@@ -134,3 +134,47 @@ clean:	remove
 	+rm .fabric-setup || true
 	+chmod -R 755 ../shared/chaincode/interop
 	+rm -rf ../shared/chaincode/*
+
+chmod-artifacts:
+	sudo chmod 644 ../shared/network1/fabric-ca/ordererOrg/msp/keystore/*
+	sudo chmod 644 ../shared/network1/fabric-ca/org1/msp/keystore/*
+	sudo chmod 644 ../shared/network2/fabric-ca/ordererOrg/msp/keystore/*
+	sudo chmod 644 ../shared/network2/fabric-ca/org1/msp/keystore/*
+
+docker-ccp:
+	(cd ../shared/network1/peerOrganizations/org1.network1.com && \
+		cp connection-org1.json connection-org1.docker.json && \
+		sed -i'.bkp' -e 27' s/localhost/peer0.org1.network1.com/' connection-org1.docker.json && \
+		sed -i'.bkp' -e 39' s/localhost/ca.org1.network1.com/' connection-org1.docker.json && \
+		rm -rf connection-org1.docker.json.bkp)
+	(cd ../shared/network2/peerOrganizations/org1.network2.com && \
+		cp connection-org1.json connection-org1.docker.json && \
+		sed -i'.bkp' -e 27' s/localhost/peer0.org1.network2.com/' connection-org1.docker.json && \
+		sed -i'.bkp' -e 39' s/localhost/ca.org1.network2.com/' connection-org1.docker.json && \
+		rm -rf connection-org1.docker.json.bkp)
+	
+
+backup-network1:
+	cp -r ../shared/network1/ordererOrganizations ../network-artifacts/network1/
+	cp -r ../shared/network1/peerOrganizations ../network-artifacts/network1/
+	cp ../shared/network1/system-genesis-block/genesis.block ../network-artifacts/network1/system-genesis-block/
+	cp -r ../shared/network1/channel-artifacts ../network-artifacts/network1/
+	cp -r ../shared/network1/fabric-ca/ordererOrg ../network-artifacts/network1/fabric-ca
+	cp -r ../shared/network1/fabric-ca/org1 ../network-artifacts/network1/fabric-ca
+	rm ../network-artifacts/network1/fabric-ca/ordererOrg/fabric-ca-server-config.yaml ../network-artifacts/network1/fabric-ca/org1/fabric-ca-server-config.yaml
+	
+backup-network2:
+	cp -r ../shared/network2/ordererOrganizations ../network-artifacts/network2/
+	cp -r ../shared/network2/peerOrganizations ../network-artifacts/network2/
+	cp ../shared/network2/system-genesis-block/genesis.block ../network-artifacts/network2/system-genesis-block/
+	cp -r ../shared/network2/channel-artifacts ../network-artifacts/network2/
+	cp -r ../shared/network2/fabric-ca/ordererOrg ../network-artifacts/network2/fabric-ca
+	cp -r ../shared/network2/fabric-ca/org1 ../network-artifacts/network2/fabric-ca
+	rm ../network-artifacts/network2/fabric-ca/ordererOrg/fabric-ca-server-config.yaml ../network-artifacts/network2/fabric-ca/org1/fabric-ca-server-config.yaml
+
+backup: backup-network1 backup-network2
+
+delete-artifacts:
+	(cd ../network-artifacts/network1 && rm -rf ordererOrganizations peerOrganizations system-genesis-block/* channel-artifacts fabric-ca/ordererOrg fabric-ca/org1)
+	(cd ../network-artifacts/network2 && rm -rf ordererOrganizations peerOrganizations system-genesis-block/* channel-artifacts fabric-ca/ordererOrg fabric-ca/org1)
+    
