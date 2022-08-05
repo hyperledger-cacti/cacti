@@ -1,4 +1,4 @@
-FROM ghcr.io/hyperledger/cactus-cmd-api-server:2022-08-05-7309f2a
+FROM ghcr.io/hyperledger/cactus-cmd-api-server:2022-11-15-f4ae605
 RUN npm install -g yarn@1.22.17
 
 ENV NODE_ENV=production

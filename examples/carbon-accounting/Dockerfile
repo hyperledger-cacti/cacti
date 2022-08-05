@@ -37,7 +37,7 @@ RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | b
 RUN source ~/.bashrc && \
     nvm install 16.15.1 && \
     npm install -g yarn && \
-    yarn add @hyperledger/cactus-example-carbon-accounting-backend@0.9.1-ci-942.cbb849c6.35 --ignore-engines --production
+    yarn add @hyperledger/cactus-example-carbon-accounting-backend@1.1.0 --ignore-engines --production
 
 SHELL ["/bin/bash", "--login", "-c"]
 

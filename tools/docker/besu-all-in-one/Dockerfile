@@ -6,6 +6,8 @@ FROM quorumengineering/tessera:$TESSERA_VERSION AS tessera
 
 COPY --from=besu /opt/besu/ /opt/besu/
 
+USER root
+
 RUN mkdir /config/
 RUN mkdir /config/orion/
 RUN mkdir /config/besu/

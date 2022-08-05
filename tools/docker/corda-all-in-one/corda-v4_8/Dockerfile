@@ -1,10 +1,10 @@
 FROM docker:24.0.2-dind
 
-# cordaVersion=4.8.5
-# cordaCoreVersion=4.8.5
+# cordaVersion=4.9
+# cordaCoreVersion=4.9
 ARG SAMPLES_KOTLIN_SHA=1504878ce446555bd861bbe4dd3d1154e905a07f
 ARG SAMPLES_KOTLIN_CORDAPP_SUB_DIR_PATH="./Advanced/obligation-cordapp/"
-ARG CORDA_TOOLS_SHELL_CLI_VERSION=4.8
+ARG CORDA_TOOLS_SHELL_CLI_VERSION=4.8.7
 
 WORKDIR /
 

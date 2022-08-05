@@ -2,10 +2,11 @@
 # https://github.com/docker-library/docker/issues/170
 FROM docker:24.0.2-dind
 
-ARG FABRIC_VERSION=2.2.0
-ARG CA_VERSION=1.4.9
+ARG FABRIC_VERSION=2.4.4
+ARG CA_VERSION=1.5.3
 ARG COUCH_VERSION_FABRIC=0.4
-ARG COUCH_VERSION=3.1.1
+ARG COUCH_VERSION=3.2.2
+ARG FABRIC_NODEENV=2.4.2
 
 WORKDIR /
 
@@ -46,8 +47,8 @@ RUN apk add --no-cache file
 RUN apk add --no-cache npm nodejs
 
 # Download and setup path variables for Go
-RUN wget https://golang.org/dl/go1.15.5.linux-amd64.tar.gz
-RUN tar -xvf go1.15.5.linux-amd64.tar.gz
+RUN wget https://golang.org/dl/go1.18.3.linux-amd64.tar.gz
+RUN tar -xvf go1.18.3.linux-amd64.tar.gz
 RUN mv go /usr/local
 ENV GOROOT=/usr/local/go
 ENV GOPATH=/usr/local/go
@@ -149,7 +150,7 @@ RUN mkdir -p /etc/couchdb/
 RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/fabric-peer/ hyperledger/fabric-peer:${FABRIC_VERSION}
 RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/fabric-orderer/ hyperledger/fabric-orderer:${FABRIC_VERSION}
 RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/fabric-ccenv/ hyperledger/fabric-ccenv:${FABRIC_VERSION}
-RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/fabric-nodeenv/ hyperledger/fabric-nodeenv:${FABRIC_VERSION}
+RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/fabric-nodeenv/ hyperledger/fabric-nodeenv:${FABRIC_NODEENV}
 RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/fabric-tools/ hyperledger/fabric-tools:${FABRIC_VERSION}
 RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/fabric-baseos/ hyperledger/fabric-baseos:${FABRIC_VERSION}
 RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/fabric-ca/ hyperledger/fabric-ca:${CA_VERSION}
