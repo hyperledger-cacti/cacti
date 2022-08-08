@@ -49,5 +49,5 @@ All paths in following steps are relative to this folder (`tests/network-setups/
     ```
     make backup
     ```
-Note: Do Update the certs in `fabric-interop-cc` and `corda-interop-app` unit tests for `WriteExternalState`.
+Note: Do Update the certs in `fabric-interop-cc/contracts/interop/test_data` and `corda-interop-app/interop-workflows/src/test/resources/test_data` folders for unit tests of `WriteExternalState`.
 ---
