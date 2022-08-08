@@ -840,10 +840,14 @@ const interopHelper = async (
         interopFlowResponse.views[0].toObject()
       )}. Interop Flow result: ${interopFlowResponse.result || 'successful'}`
     )
+    logger.debug(`ViewB64: ${Buffer.from(interopFlowResponse.views[0].serializeBinary()).toString('base64')}`)
     const remoteValue =  (options['e2e-confidentiality'] === 'true' ?
         InteroperableHelper.getResponseDataFromView(interopFlowResponse.views[0], keyCert.key.toBytes()) :
         InteroperableHelper.getResponseDataFromView(interopFlowResponse.views[0])
     )
+    if (remoteValue.contents) {
+        logger.debug(`ViewB64Contents: ${Buffer.from(remoteValue.contents).toString('base64')}`)
+    }
     spinner.succeed(
       `Called Function ${applicationFunction}. With Args: ${invokeObject.ccArgs} ${remoteValue.data}`
     )

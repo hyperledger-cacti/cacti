@@ -100,3 +100,7 @@ jobs:
       - name: Build and Push
         run: make push-image
         working-directory: core/drivers/fabric-driver
+        
+      - name: Push latest tag
+        run: make push-image-latest
+        working-directory: core/drivers/fabric-driver

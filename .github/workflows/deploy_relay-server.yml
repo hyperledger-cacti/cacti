@@ -28,3 +28,7 @@ jobs:
       - name: Build and Push
         run: make push-server
         working-directory: core/relay
+        
+      - name: Push latest tag
+        run: make push-server-latest
+        working-directory: core/relay
