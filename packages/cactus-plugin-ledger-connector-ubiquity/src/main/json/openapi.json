@@ -1,0 +1,64 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Hyperledger Cactus Plugin - Ubiquity",
+        "description": "Ubiquity wrapper for Hyperledger Cactus",
+        "version": "0.0.1",
+        "license": {
+            "name": "Apache 2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "components": {
+        "schemas": {
+            "GetTransactionsByAddressEndpoint": {
+                "type": "object",
+                "description": "Gets transactions that an address was involved with, from newest to oldest. This call uses pagination. Source: https://ubiquity.docs.blockdaemon.com/swagger-ui/#/Accounts/GetTxsByAddress",
+                "properties": {
+                    "protocol": {
+                        "type": "string"
+                    },
+                    "network": {
+                        "type": "string"
+                    },
+                    "address": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "protocol",
+                    "network",
+                    "address"
+                ]
+            }
+        }
+    },
+    "paths": {
+        "/api/v1/@hyperledger/cactus-plugin-ledger-connector-ubiquity/GetTransactionByAddress": {
+            "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/@hyperledger/cactus-plugin-ledger-connector-ubiquity/GetTransactionByAddress"
+                    }
+                },
+                "operationId": "GetTransactionByAddressV1",
+                "description": "",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/GetTransactionsByAddressEndpoint"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        }
+    }
+}

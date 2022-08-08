@@ -132,6 +132,9 @@
     },
     {
       "path": "./extensions/cactus-plugin-htlc-coordinator-besu/tsconfig.json"
+    },
+    {
+      "path": "./packages/cactus-plugin-ledger-connector-ubiquity/tsconfig.json"
     }
   ],
   "compilerOptions": {
