@@ -11,6 +11,7 @@ package main
 import (
 	"encoding/json"
 	"testing"
+	"io/ioutil"
 
 	"github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/stretchr/testify/require"
@@ -18,67 +19,76 @@ import (
 	wtest "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils"
 )
 
-var cordaB64View = `CjQIBBIcVHVlIE5vdiAxNyAwMDoxMzo0NiBHTVQgMjAyMBoMTm90YXJpemF0aW9uIgRKU09OEtYHCoQGClhhMjZHVW9WYythenlIMENUYjN2K2pTdmp3Y255M0hFd3AyMlJrdDkvZC9GcXN4WVVvYXhVWTdUOWNKRk9TVTZiVW42UFIwNmFVckxxdjZLbzZ1NG5CUT09Ep8FLS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUJ3akNDQVYrZ0F3SUJBZ0lJVUprUXZtS20zNVl3RkFZSUtvWkl6ajBFQXdJR0NDcUdTTTQ5QXdFSE1DOHgKQ3pBSkJnTlZCQVlUQWtkQ01ROHdEUVlEVlFRSERBWk1iMjVrYjI0eER6QU5CZ05WQkFvTUJsQmhjblI1UVRBZQpGdzB5TURBM01qUXdNREF3TURCYUZ3MHlOekExTWpBd01EQXdNREJhTUM4eEN6QUpCZ05WQkFZVEFrZENNUTh3CkRRWURWUVFIREFaTWIyNWtiMjR4RHpBTkJnTlZCQW9NQmxCaGNuUjVRVEFxTUFVR0F5dGxjQU1oQU1NS2FSRUsKaGNUZ1NCTU16Szgxb1BVU1BvVm1HL2ZKTUxYcS91alNtc2U5bzRHSk1JR0dNQjBHQTFVZERnUVdCQlJNWHREcwpLRlp6VUxkUTNjMkRDVUV4M1QxQ1VEQVBCZ05WSFJNQkFmOEVCVEFEQVFIL01Bc0dBMVVkRHdRRUF3SUNoREFUCkJnTlZIU1VFRERBS0JnZ3JCZ0VGQlFjREFqQWZCZ05WSFNNRUdEQVdnQlI0aHdMdUxnZklaTUVXekc0bjNBeHcKZmdQYmV6QVJCZ29yQmdFRUFZT0tZZ0VCQkFNQ0FRWXdGQVlJS29aSXpqMEVBd0lHQ0NxR1NNNDlBd0VIQTBjQQpNRVFDSUM3SjQ2U3hERHozTGpETnJFUGpqd1AycHJnTUVNaDdyL2dKcG91UUhCaytBaUErS3pYRDBkNW1pSTg2CkQybVlLNEMzdFJsaTNYM1ZnbkNlOENPcWZZeXVRZz09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0aBlBhcnR5QRLMAQpsW1NpbXBsZVN0YXRlKGtleT1ILCB2YWx1ZT0xLCBvd25lcj1PPVBhcnR5QSwgTD1Mb25kb24sIEM9R0IsIGxpbmVhcklkPTIzMTRkNmI3LTFlY2EtNDg5Mi04OGY4LTc2ZDg1YjhhODVjZCldElxsb2NhbGhvc3Q6OTA4MC9Db3JkYV9OZXR3b3JrL2xvY2FsaG9zdDoxMDAwNiNjb20uY29yZGFTaW1wbGVBcHBsaWNhdGlvbi5mbG93LkdldFN0YXRlQnlLZXk6SA==`
-
-var cordaMember = common.Member{
-	Value: "-----BEGIN CERTIFICATE-----\nMIIBwjCCAV+gAwIBAgIIUJkQvmKm35YwFAYIKoZIzj0EAwIGCCqGSM49AwEHMC8x\nCzAJBgNVBAYTAkdCMQ8wDQYDVQQHDAZMb25kb24xDzANBgNVBAoMBlBhcnR5QTAe\nFw0yMDA3MjQwMDAwMDBaFw0yNzA1MjAwMDAwMDBaMC8xCzAJBgNVBAYTAkdCMQ8w\nDQYDVQQHDAZMb25kb24xDzANBgNVBAoMBlBhcnR5QTAqMAUGAytlcAMhAMMKaREK\nhcTgSBMMzK81oPUSPoVmG/fJMLXq/ujSmse9o4GJMIGGMB0GA1UdDgQWBBRMXtDs\nKFZzULdQ3c2DCUEx3T1CUDAPBgNVHRMBAf8EBTADAQH/MAsGA1UdDwQEAwIChDAT\nBgNVHSUEDDAKBggrBgEFBQcDAjAfBgNVHSMEGDAWgBR4hwLuLgfIZMEWzG4n3Axw\nfgPbezARBgorBgEEAYOKYgEBBAMCAQYwFAYIKoZIzj0EAwIGCCqGSM49AwEHA0cA\nMEQCIC7J46SxDDz3LjDNrEPjjwP2prgMEMh7r/gJpouQHBk+AiA+KzXD0d5miI86\nD2mYK4C3tRli3X3VgnCe8COqfYyuQg==\n-----END CERTIFICATE-----",
-	Type:  "certificate",
-	Chain: []string{},
-}
-
-var cordaMembership = common.Membership{
-	SecurityDomain: "Corda_Network",
-	Members:        map[string]*common.Member{"PartyA": &cordaMember},
-}
-
-var cordaVerificationPolicy = common.VerificationPolicy{
-	SecurityDomain: "Corda_Network",
-	Identifiers: []*common.Identifier{{
-		Pattern: "localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:*",
-		Policy: &common.Policy{
-			Criteria: []string{"PartyA"},
-			Type:     "signature",
-		},
-	}},
-}
-
-var fabricNetwork = "network1"
-var fabricRelayEndpoint = "relay-network1:9080"
-var fabricPattern = "mychannel:simplestate:Read:a"
-var fabricViewAddress = fabricRelayEndpoint + "/" + fabricNetwork + "/" + fabricPattern
-
-var b64View = "CjIIAxIYMjAyMi0wOC0wNFQxMDoyNDo0Ny42MDVaGgxOb3Rhcml6YXRpb24iBlNUUklORxKLGgrFBwjIARq/BwoGMTcuNjcxEjlyZWxheS1uZXR3b3JrMTo5MDgwL25ldHdvcmsxL215Y2hhbm5lbDpzaW1wbGVzdGF0ZTpSZWFkOmEi0wYtLS0tLUJFR0lOIENFUlRJRklDQVRFLS0tLS0KTUlJQ1JqQ0NBZTJnQXdJQkFnSVVSUlJDZGJaNjNpNTlNM3c2OFA1STI1cnoyTEF3Q2dZSUtvWkl6ajBFQXdJdwphREVMTUFrR0ExVUVCaE1DVlZNeEZ6QVZCZ05WQkFnVERrNXZjblJvSUVOaGNtOXNhVzVoTVJRd0VnWURWUVFLCkV3dEllWEJsY214bFpHZGxjakVQTUEwR0ExVUVDeE1HUm1GaWNtbGpNUmt3RndZRFZRUURFeEJtWVdKeWFXTXQKWTJFdGMyVnlkbVZ5TUI0WERUSXlNRGd3TkRBMk5USXdNRm9YRFRJek1EZ3dOREEyTlRjd01Gb3dJVEVQTUEwRwpBMVVFQ3hNR1kyeHBaVzUwTVE0d0RBWURWUVFERXdWMWMyVnlNVEJaTUJNR0J5cUdTTTQ5QWdFR0NDcUdTTTQ5CkF3RUhBMElBQk5PZ29SYnJndGZYeHFhL21iQlFObXl4MVBJWExBdWFNV3BxQUl1MUx3MUxNMjh0SnRoT0pxWFUKejZFd0hMR2VMbGJ2U0VUNnhtb1hyZ0l2QkIxWndHNmpnYnN3Z2Jnd0RnWURWUjBQQVFIL0JBUURBZ2VBTUF3RwpBMVVkRXdFQi93UUNNQUF3SFFZRFZSME9CQllFRk1zWFA3QmpNc21mVXVLZnVlVXNyWTc0cFgwR01COEdBMVVkCkl3UVlNQmFBRlB3ZTFMck51STMzVm0rRWRnTy9FL2pKaWhVMU1GZ0dDQ29EQkFVR0J3Z0JCRXg3SW1GMGRISnoKSWpwN0ltaG1Ma0ZtWm1sc2FXRjBhVzl1SWpvaUlpd2lhR1l1Ulc1eWIyeHNiV1Z1ZEVsRUlqb2lkWE5sY2pFaQpMQ0pvWmk1VWVYQmxJam9pWTJ4cFpXNTBJbjE5TUFvR0NDcUdTTTQ5QkFNQ0EwY0FNRVFDSUJCLzY4MVdmQlIrClFXSUdmaVlLT2szSHVSdE84SkZ3YlRpRWpuQWdDUnZuQWlCYTY5d1dZYVoyNVpSK0dheTY5ZVYrdkRaa1BNSFMKZ2RSakFJdGNLR3N0Rmc9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCiokZWE3OWU2NjQtYTJmMi00YzlmLTg2NDMtZTYwNjAwODhmYzlhGpgKCiBVNNh9oMmGr6mjpkClfw32G8jILQMdz9o0hFOMbTk7vRLzCQqaAhJmCgpfbGlmZWN5Y2xlElgKKAoibmFtZXNwYWNlcy9maWVsZHMvaW50ZXJvcC9TZXF1ZW5jZRICCAYKLAombmFtZXNwYWNlcy9maWVsZHMvc2ltcGxlc3RhdGUvU2VxdWVuY2USAggDEn4KB2ludGVyb3AScwoeChgAYWNjZXNzQ29udHJvbABuZXR3b3JrMgASAggUChsKFQBtZW1iZXJzaGlwAG5ldHdvcmsyABICCBYKFgoQAPSPv79pbml0aWFsaXplZBICCAcKHAoWZTJlQ29uZmlkZW50aWFsaXR5RmxhZxICCAcSMAoLc2ltcGxlc3RhdGUSIQoWChAA9I+/v2luaXRpYWxpemVkEgIIBAoHCgFhEgIIGhrFBwjIARq/BwoGMTcuNjcxEjlyZWxheS1uZXR3b3JrMTo5MDgwL25ldHdvcmsxL215Y2hhbm5lbDpzaW1wbGVzdGF0ZTpSZWFkOmEi0wYtLS0tLUJFR0lOIENFUlRJRklDQVRFLS0tLS0KTUlJQ1JqQ0NBZTJnQXdJQkFnSVVSUlJDZGJaNjNpNTlNM3c2OFA1STI1cnoyTEF3Q2dZSUtvWkl6ajBFQXdJdwphREVMTUFrR0ExVUVCaE1DVlZNeEZ6QVZCZ05WQkFnVERrNXZjblJvSUVOaGNtOXNhVzVoTVJRd0VnWURWUVFLCkV3dEllWEJsY214bFpHZGxjakVQTUEwR0ExVUVDeE1HUm1GaWNtbGpNUmt3RndZRFZRUURFeEJtWVdKeWFXTXQKWTJFdGMyVnlkbVZ5TUI0WERUSXlNRGd3TkRBMk5USXdNRm9YRFRJek1EZ3dOREEyTlRjd01Gb3dJVEVQTUEwRwpBMVVFQ3hNR1kyeHBaVzUwTVE0d0RBWURWUVFERXdWMWMyVnlNVEJaTUJNR0J5cUdTTTQ5QWdFR0NDcUdTTTQ5CkF3RUhBMElBQk5PZ29SYnJndGZYeHFhL21iQlFObXl4MVBJWExBdWFNV3BxQUl1MUx3MUxNMjh0SnRoT0pxWFUKejZFd0hMR2VMbGJ2U0VUNnhtb1hyZ0l2QkIxWndHNmpnYnN3Z2Jnd0RnWURWUjBQQVFIL0JBUURBZ2VBTUF3RwpBMVVkRXdFQi93UUNNQUF3SFFZRFZSME9CQllFRk1zWFA3QmpNc21mVXVLZnVlVXNyWTc0cFgwR01COEdBMVVkCkl3UVlNQmFBRlB3ZTFMck51STMzVm0rRWRnTy9FL2pKaWhVMU1GZ0dDQ29EQkFVR0J3Z0JCRXg3SW1GMGRISnoKSWpwN0ltaG1Ma0ZtWm1sc2FXRjBhVzl1SWpvaUlpd2lhR1l1Ulc1eWIyeHNiV1Z1ZEVsRUlqb2lkWE5sY2pFaQpMQ0pvWmk1VWVYQmxJam9pWTJ4cFpXNTBJbjE5TUFvR0NDcUdTTTQ5QkFNQ0EwY0FNRVFDSUJCLzY4MVdmQlIrClFXSUdmaVlLT2szSHVSdE84SkZ3YlRpRWpuQWdDUnZuQWlCYTY5d1dZYVoyNVpSK0dheTY5ZVYrdkRaa1BNSFMKZ2RSakFJdGNLR3N0Rmc9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCiokZWE3OWU2NjQtYTJmMi00YzlmLTg2NDMtZTYwNjAwODhmYzlhIgwSB2ludGVyb3AaATEipQgK2QcKB09yZzFNU1ASzQctLS0tLUJFR0lOIENFUlRJRklDQVRFLS0tLS0KTUlJQ29qQ0NBa21nQXdJQkFnSVVHeDlQUksyN0ZOR0RVN012S3V3eGFRZXRaMTh3Q2dZSUtvWkl6ajBFQXdJdwphREVMTUFrR0ExVUVCaE1DVlZNeEZ6QVZCZ05WQkFnVERrNXZjblJvSUVOaGNtOXNhVzVoTVJRd0VnWURWUVFLCkV3dEllWEJsY214bFpHZGxjakVQTUEwR0ExVUVDeE1HUm1GaWNtbGpNUmt3RndZRFZRUURFeEJtWVdKeWFXTXQKWTJFdGMyVnlkbVZ5TUI0WERUSXlNRGd3TkRBMk1ESXdNRm9YRFRJek1EZ3dOREEyTURjd01Gb3dXekVMTUFrRwpBMVVFQmhNQ1ZWTXhGekFWQmdOVkJBZ1REazV2Y25Sb0lFTmhjbTlzYVc1aE1SUXdFZ1lEVlFRS0V3dEllWEJsCmNteGxaR2RsY2pFTk1Bc0dBMVVFQ3hNRWNHVmxjakVPTUF3R0ExVUVBeE1GY0dWbGNqQXdXVEFUQmdjcWhrak8KUFFJQkJnZ3Foa2pPUFFNQkJ3TkNBQVF5ZmFPOFJSUW1JNzY1MXBlOUliU0diSGc5dHh0QUpQS1F6cHIzYzBmQgpZV0tFWmZTR2hUYWVnb21jNkhUVCtGNXhpMkV1YVZkZFo2cTBwMlh4MmRKRm80SGRNSUhhTUE0R0ExVWREd0VCCi93UUVBd0lIZ0RBTUJnTlZIUk1CQWY4RUFqQUFNQjBHQTFVZERnUVdCQlNNVDJ2c0xQVm1xV0xMbEFwbVpmSGIKSnFEamlEQWZCZ05WSFNNRUdEQVdnQlFxRWRTWmIzMEYzckFLWjRsRnJYSXRYRjRqakRBaUJnTlZIUkVFR3pBWgpnaGR3WldWeU1DNXZjbWN4TG01bGRIZHZjbXN4TG1OdmJUQldCZ2dxQXdRRkJnY0lBUVJLZXlKaGRIUnljeUk2CmV5Sm9aaTVCWm1acGJHbGhkR2x2YmlJNklpSXNJbWhtTGtWdWNtOXNiRzFsYm5SSlJDSTZJbkJsWlhJd0lpd2kKYUdZdVZIbHdaU0k2SW5CbFpYSWlmWDB3Q2dZSUtvWkl6ajBFQXdJRFJ3QXdSQUlnWlE1YTNtekpaK3pmUDlyTwpjWU9vWEQ5UDVqeE1oUmNMQlBQZ0dnL2JLbllDSUNyM3FlSmdzeFgrRWlBV2drSjNHeFdjK1pRRnNzbTlqTWJBCnIxWGJmK0tJCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0KEkcwRQIhAM1Gyv7e+SYniXLgB8iBuRqS4C/A9D36SLl4Zj/AkxrpAiByAoaBFpRIMEJsmGasggaQ4AUST+M2n8ctBZCHjDwRxQ=="
-
-var b64ViewConfidential = "CjIIAxIYMjAyMi0wOC0wNFQxMDozMjoyMC4zMTlaGgxOb3Rhcml6YXRpb24iBlNUUklORxLrHAr0CAjIARruCAqyAQqNAQRdCc5yPbVtY77Ow/6sH6V8AOwbumdSxFq5T62tOT8LIThrPue3yCQBp7P5/6NoKRZR9grAbP9mVHiZ5814qf/DnXULpdh5O5EbVKSZX5BtmXCqTwpmZaqrQzAGgNXVzB8L6QSEVz48fp9X9SuA3r74mzNM5Ip6WbsNXnENpfifEbUfHcDUK28KHN9U+xogYzlOibmMtRdSuUyam+LQmZ5Y4/9X7AyhqEGNe0INblsSOXJlbGF5LW5ldHdvcmsxOjkwODAvbmV0d29yazEvbXljaGFubmVsOnNpbXBsZXN0YXRlOlJlYWQ6YRgBItMGLS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNSakNDQWUyZ0F3SUJBZ0lVUlJSQ2RiWjYzaTU5TTN3NjhQNUkyNXJ6MkxBd0NnWUlLb1pJemowRUF3SXcKYURFTE1Ba0dBMVVFQmhNQ1ZWTXhGekFWQmdOVkJBZ1REazV2Y25Sb0lFTmhjbTlzYVc1aE1SUXdFZ1lEVlFRSwpFd3RJZVhCbGNteGxaR2RsY2pFUE1BMEdBMVVFQ3hNR1JtRmljbWxqTVJrd0Z3WURWUVFERXhCbVlXSnlhV010ClkyRXRjMlZ5ZG1WeU1CNFhEVEl5TURnd05EQTJOVEl3TUZvWERUSXpNRGd3TkRBMk5UY3dNRm93SVRFUE1BMEcKQTFVRUN4TUdZMnhwWlc1ME1RNHdEQVlEVlFRREV3VjFjMlZ5TVRCWk1CTUdCeXFHU000OUFnRUdDQ3FHU000OQpBd0VIQTBJQUJOT2dvUmJyZ3RmWHhxYS9tYkJRTm15eDFQSVhMQXVhTVdwcUFJdTFMdzFMTTI4dEp0aE9KcVhVCno2RXdITEdlTGxidlNFVDZ4bW9YcmdJdkJCMVp3RzZqZ2Jzd2diZ3dEZ1lEVlIwUEFRSC9CQVFEQWdlQU1Bd0cKQTFVZEV3RUIvd1FDTUFBd0hRWURWUjBPQkJZRUZNc1hQN0JqTXNtZlV1S2Z1ZVVzclk3NHBYMEdNQjhHQTFVZApJd1FZTUJhQUZQd2UxTHJOdUkzM1ZtK0VkZ08vRS9qSmloVTFNRmdHQ0NvREJBVUdCd2dCQkV4N0ltRjBkSEp6CklqcDdJbWhtTGtGbVptbHNhV0YwYVc5dUlqb2lJaXdpYUdZdVJXNXliMnhzYldWdWRFbEVJam9pZFhObGNqRWkKTENKb1ppNVVlWEJsSWpvaVkyeHBaVzUwSW4xOU1Bb0dDQ3FHU000OUJBTUNBMGNBTUVRQ0lCQi82ODFXZkJSKwpRV0lHZmlZS09rM0h1UnRPOEpGd2JUaUVqbkFnQ1J2bkFpQmE2OXdXWWFaMjVaUitHYXk2OWVWK3ZEWmtQTUhTCmdkUmpBSXRjS0dzdEZnPT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQoqJDQwZTFjMGUxLWJkZDctNDQ2MC04YzhhLWRlMTZhOWQyOGYwYRrJCwogZOyCYqcgmQJccj0IkSL3t+oNKIzv0PmJqnzbH2jfIV8SpAsKnAISZgoKX2xpZmVjeWNsZRJYCigKIm5hbWVzcGFjZXMvZmllbGRzL2ludGVyb3AvU2VxdWVuY2USAggGCiwKJm5hbWVzcGFjZXMvZmllbGRzL3NpbXBsZXN0YXRlL1NlcXVlbmNlEgIIAxJ+CgdpbnRlcm9wEnMKHgoYAGFjY2Vzc0NvbnRyb2wAbmV0d29yazIAEgIIJwobChUAbWVtYmVyc2hpcABuZXR3b3JrMgASAggpChYKEAD0j7+/aW5pdGlhbGl6ZWQSAggHChwKFmUyZUNvbmZpZGVudGlhbGl0eUZsYWcSAggHEjIKC3NpbXBsZXN0YXRlEiMKFgoQAPSPv79pbml0aWFsaXplZBICCAQKCQoBYRIECBsQARr0CAjIARruCAqyAQqNAQRdCc5yPbVtY77Ow/6sH6V8AOwbumdSxFq5T62tOT8LIThrPue3yCQBp7P5/6NoKRZR9grAbP9mVHiZ5814qf/DnXULpdh5O5EbVKSZX5BtmXCqTwpmZaqrQzAGgNXVzB8L6QSEVz48fp9X9SuA3r74mzNM5Ip6WbsNXnENpfifEbUfHcDUK28KHN9U+xogYzlOibmMtRdSuUyam+LQmZ5Y4/9X7AyhqEGNe0INblsSOXJlbGF5LW5ldHdvcmsxOjkwODAvbmV0d29yazEvbXljaGFubmVsOnNpbXBsZXN0YXRlOlJlYWQ6YRgBItMGLS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNSakNDQWUyZ0F3SUJBZ0lVUlJSQ2RiWjYzaTU5TTN3NjhQNUkyNXJ6MkxBd0NnWUlLb1pJemowRUF3SXcKYURFTE1Ba0dBMVVFQmhNQ1ZWTXhGekFWQmdOVkJBZ1REazV2Y25Sb0lFTmhjbTlzYVc1aE1SUXdFZ1lEVlFRSwpFd3RJZVhCbGNteGxaR2RsY2pFUE1BMEdBMVVFQ3hNR1JtRmljbWxqTVJrd0Z3WURWUVFERXhCbVlXSnlhV010ClkyRXRjMlZ5ZG1WeU1CNFhEVEl5TURnd05EQTJOVEl3TUZvWERUSXpNRGd3TkRBMk5UY3dNRm93SVRFUE1BMEcKQTFVRUN4TUdZMnhwWlc1ME1RNHdEQVlEVlFRREV3VjFjMlZ5TVRCWk1CTUdCeXFHU000OUFnRUdDQ3FHU000OQpBd0VIQTBJQUJOT2dvUmJyZ3RmWHhxYS9tYkJRTm15eDFQSVhMQXVhTVdwcUFJdTFMdzFMTTI4dEp0aE9KcVhVCno2RXdITEdlTGxidlNFVDZ4bW9YcmdJdkJCMVp3RzZqZ2Jzd2diZ3dEZ1lEVlIwUEFRSC9CQVFEQWdlQU1Bd0cKQTFVZEV3RUIvd1FDTUFBd0hRWURWUjBPQkJZRUZNc1hQN0JqTXNtZlV1S2Z1ZVVzclk3NHBYMEdNQjhHQTFVZApJd1FZTUJhQUZQd2UxTHJOdUkzM1ZtK0VkZ08vRS9qSmloVTFNRmdHQ0NvREJBVUdCd2dCQkV4N0ltRjBkSEp6CklqcDdJbWhtTGtGbVptbHNhV0YwYVc5dUlqb2lJaXdpYUdZdVJXNXliMnhzYldWdWRFbEVJam9pZFhObGNqRWkKTENKb1ppNVVlWEJsSWpvaVkyeHBaVzUwSW4xOU1Bb0dDQ3FHU000OUJBTUNBMGNBTUVRQ0lCQi82ODFXZkJSKwpRV0lHZmlZS09rM0h1UnRPOEpGd2JUaUVqbkFnQ1J2bkFpQmE2OXdXWWFaMjVaUitHYXk2OWVWK3ZEWmtQTUhTCmdkUmpBSXRjS0dzdEZnPT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQoqJDQwZTFjMGUxLWJkZDctNDQ2MC04YzhhLWRlMTZhOWQyOGYwYSIMEgdpbnRlcm9wGgExIqUICtkHCgdPcmcxTVNQEs0HLS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNvakNDQWttZ0F3SUJBZ0lVR3g5UFJLMjdGTkdEVTdNdkt1d3hhUWV0WjE4d0NnWUlLb1pJemowRUF3SXcKYURFTE1Ba0dBMVVFQmhNQ1ZWTXhGekFWQmdOVkJBZ1REazV2Y25Sb0lFTmhjbTlzYVc1aE1SUXdFZ1lEVlFRSwpFd3RJZVhCbGNteGxaR2RsY2pFUE1BMEdBMVVFQ3hNR1JtRmljbWxqTVJrd0Z3WURWUVFERXhCbVlXSnlhV010ClkyRXRjMlZ5ZG1WeU1CNFhEVEl5TURnd05EQTJNREl3TUZvWERUSXpNRGd3TkRBMk1EY3dNRm93V3pFTE1Ba0cKQTFVRUJoTUNWVk14RnpBVkJnTlZCQWdURGs1dmNuUm9JRU5oY205c2FXNWhNUlF3RWdZRFZRUUtFd3RJZVhCbApjbXhsWkdkbGNqRU5NQXNHQTFVRUN4TUVjR1ZsY2pFT01Bd0dBMVVFQXhNRmNHVmxjakF3V1RBVEJnY3Foa2pPClBRSUJCZ2dxaGtqT1BRTUJCd05DQUFReWZhTzhSUlFtSTc2NTFwZTlJYlNHYkhnOXR4dEFKUEtRenByM2MwZkIKWVdLRVpmU0doVGFlZ29tYzZIVFQrRjV4aTJFdWFWZGRaNnEwcDJYeDJkSkZvNEhkTUlIYU1BNEdBMVVkRHdFQgovd1FFQXdJSGdEQU1CZ05WSFJNQkFmOEVBakFBTUIwR0ExVWREZ1FXQkJTTVQydnNMUFZtcVdMTGxBcG1aZkhiCkpxRGppREFmQmdOVkhTTUVHREFXZ0JRcUVkU1piMzBGM3JBS1o0bEZyWEl0WEY0ampEQWlCZ05WSFJFRUd6QVoKZ2hkd1pXVnlNQzV2Y21jeExtNWxkSGR2Y21zeExtTnZiVEJXQmdncUF3UUZCZ2NJQVFSS2V5SmhkSFJ5Y3lJNgpleUpvWmk1QlptWnBiR2xoZEdsdmJpSTZJaUlzSW1obUxrVnVjbTlzYkcxbGJuUkpSQ0k2SW5CbFpYSXdJaXdpCmFHWXVWSGx3WlNJNkluQmxaWElpZlgwd0NnWUlLb1pJemowRUF3SURSd0F3UkFJZ1pRNWEzbXpKWit6ZlA5ck8KY1lPb1hEOVA1anhNaFJjTEJQUGdHZy9iS25ZQ0lDcjNxZUpnc3hYK0VpQVdna0ozR3hXYytaUUZzc205ak1iQQpyMVhiZitLSQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tChJHMEUCIQC4MR1TNTeK+FHqEStQkXTM+9kgF4v3SldTn8G3T8Wb1wIgWnDGTnmhr4gL/UmYdB+uQrYaF3IvGtlKZ4r0rDhczxg="
-
-var b64ViewContents = "CghBcmN0dXJ1cxIQTZKuC0jTLZxn3JowK/x2Xg=="
-
-var fabricCaCertNetwork1 = "-----BEGIN CERTIFICATE-----\nMIICFzCCAb2gAwIBAgIUPB3O2Bl2ZRliIeSEesdgX0WDahwwCgYIKoZIzj0EAwIw\naDELMAkGA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMRQwEgYDVQQK\nEwtIeXBlcmxlZGdlcjEPMA0GA1UECxMGRmFicmljMRkwFwYDVQQDExBmYWJyaWMt\nY2Etc2VydmVyMB4XDTIyMDgwNDA2MDIwMFoXDTM3MDczMTA2MDIwMFowaDELMAkG\nA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMRQwEgYDVQQKEwtIeXBl\ncmxlZGdlcjEPMA0GA1UECxMGRmFicmljMRkwFwYDVQQDExBmYWJyaWMtY2Etc2Vy\ndmVyMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEpn9XxzOTE3QD0G6q5i9dEnbR\nynT6X5YaFVEwAsdgQylYK7MbmmlkS2ZHBP4Qi5krf+Zwz9yU6zYAPqEZCemLFaNF\nMEMwDgYDVR0PAQH/BAQDAgEGMBIGA1UdEwEB/wQIMAYBAf8CAQEwHQYDVR0OBBYE\nFCoR1JlvfQXesApniUWtci1cXiOMMAoGCCqGSM49BAMCA0gAMEUCIQCiBaH7Javq\nm2FVNqBXsVn1uwbKYZVHxXH9CE7ANnUF3wIgJ4gjBRrPK4pwHFCd5Yg9Pn383pbd\nzQkhznMIF4SBF4k=\n-----END CERTIFICATE-----\n"
-
-
-var network1Member = common.Member{
-	Value: fabricCaCertNetwork1,
-	Type:  "ca",
-	Chain: []string{},
-}
-
-var network1Membership = common.Membership{
-	SecurityDomain: fabricNetwork,
-	Members:        map[string]*common.Member{"Org1MSP": &network1Member},
-}
-
-var network1VerificationPolicy = common.VerificationPolicy{
-	SecurityDomain: fabricNetwork,
-	Identifiers: []*common.Identifier{{
-		Pattern: fabricPattern,
-		Policy: &common.Policy{
-			Criteria: []string{"Org1MSP"},
-			Type:     "signature",
-		},
-	}},
+type TestData struct {
+	B64View				string	`json:"view64"`
+	B64ViewConfidential string	`json:"confidential_view64"`
+	B64ViewContents 	string	`json:"confidential_view_content64"`
 }
 
 func TestWriteExternalState(t *testing.T) {
+	
+	
+	var cordaTestDataBytes, _ = ioutil.ReadFile("./test_data/corda_viewdata.json")
+	var cordaTestData TestData
+	json.Unmarshal(cordaTestDataBytes, &cordaTestData)
+	var cordaRootCACert, _ = ioutil.ReadFile("./test_data/corda_cacert_root.pem")
+	var cordaDoormanCACert, _ = ioutil.ReadFile("./test_data/corda_cacert_doorman.pem")
+	var cordaNodeCACert, _ = ioutil.ReadFile("./test_data/corda_cacert_node.pem")
+	
+	var cordaMember = common.Member{
+		Value: "",
+		Type:  "certificate",
+		Chain: []string{string(cordaRootCACert), string(cordaDoormanCACert), string(cordaNodeCACert)},
+	}
+
+	var cordaMembership = common.Membership{
+		SecurityDomain: "Corda_Network",
+		Members:        map[string]*common.Member{"PartyA": &cordaMember},
+	}
+
+	var cordaVerificationPolicy = common.VerificationPolicy{
+		SecurityDomain: "Corda_Network",
+		Identifiers: []*common.Identifier{{
+			Pattern: "localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:*",
+			Policy: &common.Policy{
+				Criteria: []string{"PartyA"},
+				Type:     "signature",
+			},
+		}},
+	}
+
+	var fabricNetwork = "network1"
+	var fabricRelayEndpoint = "relay-network1:9080"
+	var fabricPattern = "mychannel:simplestate:Read:a"
+	var fabricViewAddress = fabricRelayEndpoint + "/" + fabricNetwork + "/" + fabricPattern
+	
+	var fabricTestDataBytes, _ = ioutil.ReadFile("./test_data/fabric_viewdata.json")
+	var fabricTestData TestData
+	json.Unmarshal(fabricTestDataBytes, &fabricTestData)
+	
+	var fabricCaCertNetwork1, _ = ioutil.ReadFile("./test_data/fabric_cacert.pem")
+
+	var network1Member = common.Member{
+		Value: string(fabricCaCertNetwork1),
+		Type:  "ca",
+		Chain: []string{},
+	}
+
+	var network1Membership = common.Membership{
+		SecurityDomain: fabricNetwork,
+		Members:        map[string]*common.Member{"Org1MSP": &network1Member},
+	}
+
+	var network1VerificationPolicy = common.VerificationPolicy{
+		SecurityDomain: fabricNetwork,
+		Identifiers: []*common.Identifier{{
+			Pattern: fabricPattern,
+			Policy: &common.Policy{
+				Criteria: []string{"Org1MSP"},
+				Type:     "signature",
+			},
+		}},
+	}
 	// Happy case: Fabric
 	ctx, chaincodeStub := wtest.PrepMockStub()
 	interopcc := SmartContract{}
@@ -95,26 +105,26 @@ func TestWriteExternalState(t *testing.T) {
 		Payload: []byte("I am a result"),
 	})
 
-	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{fabricViewAddress}, []string{b64View}, []string{""})
+	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{fabricViewAddress}, []string{fabricTestData.B64View}, []string{""})
 	require.NoError(t, err)
 
 	// Test success with encrypted view payload
 	chaincodeStub.GetStateReturnsOnCall(2, network1VerificationPolicyBytes, nil)
 	chaincodeStub.GetStateReturnsOnCall(3, network1MembershipBytes, nil)
-	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{fabricViewAddress}, []string{b64ViewConfidential}, []string{b64ViewContents})
+	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{fabricViewAddress}, []string{fabricTestData.B64ViewConfidential}, []string{fabricTestData.B64ViewContents})
 	require.NoError(t, err)
 
 	// Test failures when invalid or insufficient arguments are supplied
-	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{2}, []string{fabricViewAddress}, []string{b64View}, []string{""})
+	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{2}, []string{fabricViewAddress}, []string{fabricTestData.B64View}, []string{""})
 	require.EqualError(t, err, "Index 2 out of bounds of array (length 2)")
 
-	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{0, 1}, []string{fabricViewAddress}, []string{b64View}, []string{""})
+	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{0, 1}, []string{fabricViewAddress}, []string{fabricTestData.B64View}, []string{""})
 	require.EqualError(t, err, "Number of argument indices for substitution (2) does not match number of addresses (1)")
 
 	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{fabricViewAddress}, []string{}, []string{""})
 	require.EqualError(t, err, "Number of addresses (1) does not match number of views (0)")
 
-	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{fabricViewAddress}, []string{b64View}, []string{})
+	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{fabricViewAddress}, []string{fabricTestData.B64View}, []string{})
 	require.EqualError(t, err, "Number of addresses (1) does not match number of view contents (0)")
 
 	// Happy case: Corda
@@ -132,7 +142,7 @@ func TestWriteExternalState(t *testing.T) {
 		Message: "",
 		Payload: []byte("I am a result"),
 	})
-	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{"localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:H"}, []string{cordaB64View}, []string{""})
+	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{"localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:H"}, []string{cordaTestData.B64View}, []string{""})
 	require.NoError(t, err)
 
 	// Test case: Invalid cert in Membership
@@ -143,7 +153,7 @@ func TestWriteExternalState(t *testing.T) {
 	require.NoError(t, err)
 	chaincodeStub.GetStateReturnsOnCall(0, network1VerificationPolicyBytes, nil)
 	chaincodeStub.GetStateReturnsOnCall(1, invalidMembershipBytes, nil)
-	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{fabricViewAddress}, []string{b64View}, []string{""})
+	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{fabricViewAddress}, []string{fabricTestData.B64View}, []string{""})
 	require.EqualError(t, err, "VerifyView error: Verify membership failed. Certificate not valid: Client cert not in a known PEM format")
 
 	// Test case: Invalid policy in verification policy
@@ -153,6 +163,6 @@ func TestWriteExternalState(t *testing.T) {
 	invalidVerificationPolicyBytes, err := json.Marshal(&network1VerificationPolicy)
 	require.NoError(t, err)
 	chaincodeStub.GetStateReturnsOnCall(0, invalidVerificationPolicyBytes, nil)
-	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{fabricViewAddress}, []string{b64View}, []string{""})
+	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{fabricViewAddress}, []string{fabricTestData.B64View}, []string{""})
 	require.EqualError(t, err, "VerifyView error: Unable to resolve verification policy: Verification Policy Error: Failed to find verification policy matching view address: " + fabricPattern)
 }
