@@ -19,6 +19,7 @@ import (
 	wtest "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils"
 )
 
+
 type TestData struct {
 	B64View				string	`json:"view64"`
 	B64ViewConfidential string	`json:"confidential_view64"`
