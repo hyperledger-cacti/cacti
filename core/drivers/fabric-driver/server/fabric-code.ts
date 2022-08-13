@@ -16,6 +16,7 @@ import interopPayload from '@hyperledger-labs/weaver-protos-js/common/interop_pa
 import state_pb from '@hyperledger-labs/weaver-protos-js/common/state_pb';
 import { Certificate } from '@fidm/x509';
 import { getConfig } from './walletSetup';
+import { createEventQuerySerialized } from './utils';
 
 const parseAddress = (address: string) => {
     const addressList = address.split('/');
@@ -77,6 +78,8 @@ const getNetworkGateway = async (networkName: string): Promise<Gateway> => {
 async function invoke(
     query: query_pb.Query,
     networkName: string,
+    funName: string,
+    dynamicArg: Buffer | undefined
 ): Promise<view_data.FabricView> {
     console.log('Running query on fabric network');
     try {
@@ -115,11 +118,21 @@ async function invoke(
 
         const idx = gateway.identityContext.calculateTransactionId();
         const queryProposal = currentChannel.newQuery(chaincodeId);
-        const request = {
-                fcn: 'HandleExternalRequest',
+        let request;
+        if (funName == 'HandleExternalRequest') {
+            request = {
+                fcn: funName,
                 args: [b64QueryBytes],
                 generateTransactionId: false
-        };
+            };
+        } else {
+            const b64EventQueryBytes = createEventQuerySerialized(b64QueryBytes, dynamicArg)
+            request = {
+                fcn: funName,
+                args: [b64EventQueryBytes],
+                generateTransactionId: false
+            };
+        }
         queryProposal.build(idx, request);
         queryProposal.sign(idx);
         // 3. Set the endorser list for the transaction, this enforces that the list provided will endorse the proposed transaction

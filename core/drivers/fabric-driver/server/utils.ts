@@ -8,6 +8,7 @@ import fs from 'fs';
 import { credentials } from '@grpc/grpc-js';
 import datatransfer_grpc_pb from '@hyperledger-labs/weaver-protos-js/relay/datatransfer_grpc_pb';
 import events_grpc_pb from '@hyperledger-labs/weaver-protos-js/relay/events_grpc_pb';
+import eventsPb from '@hyperledger-labs/weaver-protos-js/common/events_pb';
 
 function checkIfArraysAreEqual(x: Array<any>, y: Array<any>): boolean {
     if (x == y) {
@@ -94,10 +95,20 @@ function getRelayClientForEventPublish() {
     return client;
 }
 
+// Create an asset exchange agreement structure
+function createEventQuerySerialized(queryBytes64: string, dynamicQueryArg: Buffer)
+{
+    const eventQuery = new eventsPb.EventQuery();
+    eventQuery.setQueryBytes64(queryBytes64);
+    eventQuery.setDynamicQueryArg(dynamicQueryArg);
+    return Buffer.from(eventQuery.serializeBinary()).toString('base64');
+}
+
 export {
     checkIfArraysAreEqual,
     handlePromise,
     relayCallback,
     getRelayClientForQueryResponse,
-    getRelayClientForEventPublish
+    getRelayClientForEventPublish,
+    createEventQuerySerialized
 }

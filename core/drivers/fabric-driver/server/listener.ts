@@ -45,6 +45,7 @@ const initBlockEventListenerForChannel = async (
                 // Get transaction chaincode ID
                 const chaincodeId = transaction.payload.chaincode_proposal_payload.input.chaincode_spec.chaincode_id.name;
                 if (transaction.payload.chaincode_proposal_payload.input.chaincode_spec.input.args.length > 0) {
+                    const responsePayload = transaction.payload.action.proposal_response_payload.extension.response.payload;
                     // Get transaction function name: first argument according to convention
                     const chaincodeFunc = transaction.payload.chaincode_proposal_payload.input.chaincode_spec.input.args[0].toString();
                     console.log('Trying to find match for channel', channelId, 'chaincode', chaincodeId, 'function', chaincodeFunc);
@@ -76,6 +77,8 @@ const initBlockEventListenerForChannel = async (
                             invoke(
                                 eventSubscriptionQuery,
                                 networkName,
+                                'HandleEventRequest',
+                                Buffer.from(responsePayload)
                             ),
                         );
                         if (!invokeError) {
@@ -131,12 +134,14 @@ const initContractEventListener = (
         }
         // Iterate through the view requests in the matching event subscriptions
         eventSubscriptionQueries.forEach(async (eventSubscriptionQuery: query_pb.Query) => {
-            console.log('Generating view and collecting proof for event class', event.eventName, 'channel', channelId, 'chaincode', chaincodeId);
+            console.log('Generating view and collecting proof for event class', event.eventName, 'channel', channelId, 'chaincode', chaincodeId, 'event.payload', event.payload.toString());
             // Trigger proof collection
             const [result, invokeError] = await handlePromise(
                 invoke(
                     eventSubscriptionQuery,
                     networkName,
+                    'HandleEventRequest',
+                    event.payload
                 ),
             );
             if (!invokeError) {

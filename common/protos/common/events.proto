@@ -28,6 +28,11 @@ enum EventSubOperation {
     UPDATE = 2;
 }
 
+message EventQuery {
+  string query_bytes64 = 1;
+  bytes dynamic_query_arg = 2;
+}
+
 // Below message is used to communicate between dest-relay and src-relay;
 // and src-relay and src-driver.
 message EventSubscription {

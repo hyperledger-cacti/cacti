@@ -76,6 +76,8 @@ const fabricCommunication = async (query: query_pb.Query, networkName: string) =
         invoke(
             query,
             networkName,
+            'HandleExternalRequest',
+            undefined
         ),
     );
     const client = getRelayClientForQueryResponse();
@@ -253,7 +255,7 @@ server.addService(driver_pb_grpc.DriverCommunicationService, {
 // Prepares required crypto material for communication with the fabric network
 const configSetup = async () => {
     // uses the network name to create a unique wallet path
-    const walletPath = path.join(process.cwd(), `wallet-${process.env.NETWORK_NAME}`);
+    const walletPath = path.join(process.cwd(), `wallet-${process.env.NETWORK_NAME ? process.env.NETWORK_NAME : 'network1'}`);
     if (process.env.CONNECTION_PROFILE) {
         walletSetup(
             walletPath,

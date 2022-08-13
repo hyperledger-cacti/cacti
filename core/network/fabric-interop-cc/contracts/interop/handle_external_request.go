@@ -12,13 +12,14 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"strings"
 
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
+	wutils "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/utils"
 	"github.com/hyperledger/fabric-chaincode-go/shim"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 	log "github.com/sirupsen/logrus"
-	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
 	protoV2 "google.golang.org/protobuf/proto"
-	wutils "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/utils"
 )
 
 // HandleExternalRequest chaincode processes requests that come from external networks.
@@ -29,47 +30,85 @@ import (
 // 3. Checks the access control policy for the requester and view address is met
 // 4. Calls application chaincode
 func (s *SmartContract) HandleExternalRequest(ctx contractapi.TransactionContextInterface, b64QueryBytes string) (string, error) {
+	queryBytes, err := base64.StdEncoding.DecodeString(b64QueryBytes)
+	if err != nil {
+		return "", logThenErrorf("Unable to base64 decode data: %s", err.Error())
+	}
+	var query common.Query
+	err = protoV2.Unmarshal(queryBytes, &query)
+	if err != nil {
+		return "", logThenErrorf("Unable to unmarshal query: %s", err.Error())
+	}
+	resp, err := handleRequest(s, ctx, query, query.Address)
+	return resp, err
+}
+
+func (s *SmartContract) HandleEventRequest(ctx contractapi.TransactionContextInterface, b64EventQueryBytes string) (string, error) {
+	eventQueryBytes, err := base64.StdEncoding.DecodeString(b64EventQueryBytes)
+	if err != nil {
+		return "", logThenErrorf("Unable to base64 decode data: %s", err.Error())
+	}
+	var eventQuery common.EventQuery
+	err = protoV2.Unmarshal(eventQueryBytes, &eventQuery)
+	if err != nil {
+		return "", logThenErrorf("Unable to unmarshal eventQuery: %s", err.Error())
+	}
+
+	queryBytes, err := base64.StdEncoding.DecodeString(eventQuery.QueryBytes64)
+	if err != nil {
+		return "", logThenErrorf("Unable to base64 decode data: %s", err.Error())
+	}
+	var query common.Query
+	err = protoV2.Unmarshal(queryBytes, &query)
+	if err != nil {
+		return "", logThenErrorf("Unable to unmarshal query: %s", err.Error())
+	}
+
+	queryAddress := query.Address
+	dynamicArgCount := strings.Count(query.Address, ":?")
+	if dynamicArgCount > 1 {
+		return "", logThenErrorf("Expected 1 dynamic arg, but found %d", dynamicArgCount)
+	} else if dynamicArgCount == 1 {
+		queryArg := string(eventQuery.DynamicQueryArg)
+		queryAddress = strings.Replace(query.Address, ":?", ":"+queryArg, 1)
+	} else {
+		fmt.Println("There are no dynamic arguments in the event query. queryArg: ", string(eventQuery.DynamicQueryArg))
+	}
+
+	resp, err := handleRequest(s, ctx, query, queryAddress)
+	return resp, err
+}
+
+// handleRequest function requests that come from external networks.
+//
+// The flow coordinates the following:
+// 1. Checks the validity of query signature
+// 2. Checks that the certificate of the requester is valid according to the network's Membership
+// 3. Checks the access control policy for the requester and view address is met
+// 4. Calls application chaincode
+func handleRequest(s *SmartContract, ctx contractapi.TransactionContextInterface, query common.Query, queryAddress string) (string, error) {
 	// Ensure that this function cannot be called by a client without relay permissions
 	relayAccessCheck, err := wutils.IsClientRelay(ctx.GetStub())
 	if err != nil {
 		return "", err
 	}
 	if !relayAccessCheck {
-		return "", fmt.Errorf("Illegal access by relay")
+		return "", fmt.Errorf("Illegal access by client without relay permissions")
 	}
 	fmt.Println("Relay access check passed")
 
-	queryBytes, err := base64.StdEncoding.DecodeString(b64QueryBytes)
-	if err != nil {
-		errorMessage := fmt.Sprintf("Unable to base64 decode data: %s", err.Error())
-		log.Error(errorMessage)
-		return "", errors.New(errorMessage)
-	}
-	var query common.Query
-	err = protoV2.Unmarshal(queryBytes, &query)
-	if err != nil {
-		errorMessage := fmt.Sprintf("Unable to unmarshal query: %s", err.Error())
-		log.Error(errorMessage)
-		return "", errors.New(errorMessage)
-	}
 	x509Cert, err := parseCert(query.Certificate)
 	if err != nil {
-		errorMessage := fmt.Sprintf("Unable to parse certificate: %s", err)
-		log.Error(errorMessage)
-		return "", errors.New(errorMessage)
+		return "", logThenErrorf("Unable to parse certificate: %s", err)
 	}
 	// 1. Checks the validity of query signature
 	signatureBytes, err := base64.StdEncoding.DecodeString(query.RequestorSignature)
 	if err != nil {
-		errorMessage := fmt.Sprintf("Signature base64 decoding failed: %s", err)
-		log.Error(errorMessage)
-		return "", errors.New(errorMessage)
+		return "", logThenErrorf("Signature base64 decoding failed: %s", err)
 	}
 	err = validateSignature(query.Address+query.Nonce, x509Cert, string(signatureBytes))
 	if err != nil {
-		errorMessage := fmt.Sprintf("Invalid Signature: %s", err)
-		log.Error(errorMessage)
-		return "", errors.New(errorMessage)
+		return "", logThenErrorf("Invalid Signature: %s", err)
 	}
 	// 2. Checks that the certificate of the requester is valid according to the network's Membership
 	if query.RequestingOrg == "" {
@@ -78,28 +117,20 @@ func (s *SmartContract) HandleExternalRequest(ctx contractapi.TransactionContext
 
 	err = verifyMemberInSecurityDomain(s, ctx, x509Cert, query.RequestingNetwork, query.RequestingOrg)
 	if err != nil {
-		errorMessage := fmt.Sprintf("Membership Verification failed: %s", err)
-		log.Error(errorMessage)
-		return "", errors.New(errorMessage)
+		return "", logThenErrorf("Membership Verification failed: %s", err)
 	}
 	// 3. Checks the access control policy for the requester and view address is met
-	address, err := parseAddress(query.Address)
+	address, err := parseAddress(queryAddress)
 	if err != nil {
-		errorMessage := fmt.Sprintf("Invalid address: %s", err)
-		log.Error(errorMessage)
-		return "", errors.New(errorMessage)
+		return "", logThenErrorf("Invalid address: %s", err)
 	}
 	viewAddress, err := parseFabricViewAddress(address.ViewSegment)
 	if err != nil {
-		errorMessage := fmt.Sprintf("Invalid view address: %s", err)
-		log.Error(errorMessage)
-		return "", errors.New(errorMessage)
+		return "", logThenErrorf("Invalid view address: %s", err)
 	}
 	err = verifyAccessToCC(s, ctx, viewAddress, address.ViewSegment, &query)
 	if err != nil {
-		errorMessage := fmt.Sprintf("CC Access Denied: %s", err)
-		log.Error(errorMessage)
-		return "", errors.New(errorMessage)
+		return "", logThenErrorf("CC Access Denied: %s", err)
 	}
 	// 4. Calls application chaincode
 	arr := append([]string{viewAddress.CCFunc}, viewAddress.Args...)
@@ -113,30 +144,22 @@ func (s *SmartContract) HandleExternalRequest(ctx contractapi.TransactionContext
 		resp := ""
 		if viewAddress.CCFunc == "GetHTLCHash" {
 			if len(viewAddress.Args) > 2 {
-				errorMessage := fmt.Sprintf("Recieved more arguments than required 2 argument.")
-				log.Error(errorMessage)
-				return "", errors.New(errorMessage)
+				return "", logThenErrorf("Recieved more arguments than required 2 argument.")
 			}
 			resp, err = s.GetHTLCHash(ctx, viewAddress.Args[0], viewAddress.Args[1])
 		} else if viewAddress.CCFunc == "GetHTLCHashByContractId" {
 			if len(viewAddress.Args) > 1 {
-				errorMessage := fmt.Sprintf("Recieved more arguments than required 1 argument.")
-				log.Error(errorMessage)
-				return "", errors.New(errorMessage)
+				return "", logThenErrorf("Recieved more arguments than required 1 argument.")
 			}
 			resp, err = s.GetHTLCHashByContractId(ctx, viewAddress.Args[0])
 		} else if viewAddress.CCFunc == "GetHTLCHashPreImage" {
 			if len(viewAddress.Args) > 2 {
-				errorMessage := fmt.Sprintf("Recieved more arguments than required 2 argument.")
-				log.Error(errorMessage)
-				return "", errors.New(errorMessage)
+				return "", logThenErrorf("Recieved more arguments than required 2 argument.")
 			}
 			resp, err = s.GetHTLCHashPreImage(ctx, viewAddress.Args[0], viewAddress.Args[1])
 		} else if viewAddress.CCFunc == "GetHTLCHashPreImageByContractId" {
 			if len(viewAddress.Args) > 1 {
-				errorMessage := fmt.Sprintf("Recieved more arguments than required 1 argument.")
-				log.Error(errorMessage)
-				return "", errors.New(errorMessage)
+				return "", logThenErrorf("Recieved more arguments than required 1 argument.")
 			}
 			resp, err = s.GetHTLCHashPreImageByContractId(ctx, viewAddress.Args[0])
 		} else {
@@ -152,9 +175,7 @@ func (s *SmartContract) HandleExternalRequest(ctx contractapi.TransactionContext
 		// General Interop Call to AppCC
 		pbResp := ctx.GetStub().InvokeChaincode(viewAddress.Contract, byteArgs, viewAddress.Channel)
 		if pbResp.Status != shim.OK {
-			errorMessage := fmt.Sprintf("Application chaincode invoke error: %s", string(pbResp.GetMessage()))
-			log.Error(errorMessage)
-			return "", errors.New(errorMessage)
+			return "", logThenErrorf("Application chaincode invoke error: %s", string(pbResp.GetMessage()))
 		}
 		// 5. Encrypt payload if necessary
 		confFlag, err := ctx.GetStub().GetState(e2eConfidentialityKey)
@@ -168,8 +189,7 @@ func (s *SmartContract) HandleExternalRequest(ctx contractapi.TransactionContext
 			// Use already authenticated certificate as the source of the public key for encryption
 			payload, err = generateConfidentialInteropPayloadAndHash(pbResp.Payload, query.Certificate)
 			if err != nil {
-				log.Error(err)
-				return "", err
+				return "", logThenErrorf(err.Error())
 			}
 		} else {
 			payload = pbResp.Payload
@@ -177,17 +197,15 @@ func (s *SmartContract) HandleExternalRequest(ctx contractapi.TransactionContext
 	}
 
 	interopPayloadStruct := common.InteropPayload{
-		Address: query.Address,
-		Payload: payload,
-		Confidential: confidential,
+		Address:              queryAddress,
+		Payload:              payload,
+		Confidential:         confidential,
 		RequestorCertificate: query.Certificate,
-		Nonce: query.Nonce,
+		Nonce:                query.Nonce,
 	}
 	interopPayloadBytes, err := protoV2.Marshal(&interopPayloadStruct)
 	if err != nil {
-		errorMessage := fmt.Sprintf("Unable to marshal interop payload: %s", err)
-		log.Error(errorMessage)
-		return "", errors.New(errorMessage)
+		return "", logThenErrorf("Unable to marshal interop payload: %s", err)
 	}
 	return string(interopPayloadBytes), nil
 }
