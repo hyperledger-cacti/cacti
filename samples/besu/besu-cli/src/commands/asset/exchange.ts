@@ -141,7 +141,7 @@ const command: GluegunCommand = {
 			return
 		})
 
-		const lockTx1 = await interopContract1.lockFungibleAsset(
+		const lockTx1 = await interopContract1.lockAsset(
 			recipient1,
 			tokenContract1.address,
 			amount,
@@ -151,7 +151,7 @@ const command: GluegunCommand = {
 				from: sender1
 			}
 		).catch(function () {
-			console.log("lockFungibleAsset threw an error in Network 1");
+			console.log("lockAsset threw an error in Network 1");
 			return
 		})
 		const lockContractId1 = lockTx1.logs[0].args.lockContractId
@@ -169,15 +169,15 @@ const command: GluegunCommand = {
 		// Locking the asset (works only for ERC20 at this point)
 		await tokenContract2.approve(interopContract2.address, amount, {from: sender2}).catch(async function () {
 			console.log("Token2 approval failed!!!");
-			await interopContract1.unlockFungibleAsset(lockContractId1, {
+			await interopContract1.unlockAsset(lockContractId1, {
 				from: sender1
 			}).catch(function () {
-				console.log("unlockFungibleAsset threw an error in Network 1");
+				console.log("unlockAsset threw an error in Network 1");
 			})
 			return
 		})
 
-		const lockTx2 = await interopContract2.lockFungibleAsset(
+		const lockTx2 = await interopContract2.lockAsset(
 			recipient2,
 			tokenContract2.address,
 			amount,
@@ -187,11 +187,11 @@ const command: GluegunCommand = {
 				from: sender2
 			}
 		).catch(async function () {
-			console.log("lockFungibleAsset threw an error in Network 2");
-			await interopContract1.unlockFungibleAsset(lockContractId1, {
+			console.log("lockAsset threw an error in Network 2");
+			await interopContract1.unlockAsset(lockContractId1, {
 				from: sender1
 			}).catch(function () {
-				console.log("unlockFungibleAsset threw an error in Network 1");
+				console.log("unlockAsset threw an error in Network 1");
 			})
 			return
 		})
@@ -203,17 +203,17 @@ const command: GluegunCommand = {
 		await getBalances(tokenContract2, sender2, recipient2)
 
 		// ------------ Withdrawal in Network 1 -------------
-		await interopContract1.claimFungibleAsset(lockContractId1, preimage, {from: recipient1}).catch(async function () {
-			console.log("claimFungibleAsset threw an error in Network 1");
-			await interopContract1.unlockFungibleAsset(lockContractId1, {
+		await interopContract1.claimAsset(lockContractId1, preimage, {from: recipient1}).catch(async function () {
+			console.log("claimAsset threw an error in Network 1");
+			await interopContract1.unlockAsset(lockContractId1, {
 				from: sender1
 			}).catch(function () {
-				console.log("unlockFungibleAsset threw an error in Network 1");
+				console.log("unlockAsset threw an error in Network 1");
 			})
-			await interopContract2.unlockFungibleAsset(lockContractId2, {
+			await interopContract2.unlockAsset(lockContractId2, {
 				from: sender2
 			}).catch(function () {
-				console.log("unlockFungibleAsset threw an error in Network 2");
+				console.log("unlockAsset threw an error in Network 2");
 			})
 			return
 		})
@@ -221,8 +221,8 @@ const command: GluegunCommand = {
 		await getBalances(tokenContract1, sender1, recipient1)
 
 		// ------------ Withdrawal in Network 2 -------------
-		await interopContract2.claimFungibleAsset(lockContractId2, preimage, {from: recipient2}).catch(function () {
-			console.log("claimFungibleAsset threw an error in Network 2");
+		await interopContract2.claimAsset(lockContractId2, preimage, {from: recipient2}).catch(function () {
+			console.log("claimAsset threw an error in Network 2");
 			return
 		})
 		console.log(`Account balances after withdrawal in Network 2`)

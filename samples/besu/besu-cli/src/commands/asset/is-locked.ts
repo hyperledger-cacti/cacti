@@ -74,10 +74,10 @@ const command: GluegunCommand = {
 		const accounts = await web3N.eth.getAccounts()
 		var sender = accounts[networkConfig.senderAccountIndex]
 
-		var isLocked = await interopContract.isFungibleAssetLocked(lockContractId, {
+		var isLocked = await interopContract.isAssetLocked(lockContractId, {
 			from: sender
 		}).catch(function () {
-			console.log("isFungibleAssetLocked threw an error");
+			console.log("isAssetLocked threw an error");
 		})
 		console.log(`Is there an asset locked in ${lockContractId} in Network ${options.network}: ${isLocked}`) //Todo: Debug. isLocked is not printing correctly.
 	}

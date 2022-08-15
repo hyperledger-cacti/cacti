@@ -60,7 +60,7 @@ const command: GluegunCommand = {
 			)
 			return
 		}
-		print.info('Claim assets (fungible assets for now)')
+		print.info('Claim assets')
 
 		// Retrieving networkConfig
 		if(!options.network){
@@ -127,10 +127,10 @@ const command: GluegunCommand = {
 		var recipientBalance = await tokenContract.balanceOf(recipient)
 		console.log(`Account balance of the recipient in Network ${options.network} before claiming: ${recipientBalance.toString()}`)
 
-		await interopContract.claimFungibleAsset(lockContractId, options.preimage, {
+		await interopContract.claimAsset(lockContractId, preimage_bytes32, {
 			from: recipient,
 		}).catch((error) => {
-			console.log("claimFungibleAsset threw an error:", error);
+			console.log("claimAsset threw an error:", error);
 		})
 
 		// Balance of the recipient after claiming

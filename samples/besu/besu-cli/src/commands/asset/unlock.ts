@@ -112,10 +112,11 @@ const command: GluegunCommand = {
 		var senderBalance = await tokenContract.balanceOf(sender)
 		console.log(`Account balance of the sender in Network ${options.network} before unlocking: ${senderBalance.toString()}`)
 
-		await interopContract.unlockFungibleAsset(lockContractId, {
+		await interopContract.unlockAsset(lockContractId, {
 			from: sender
-		}).catch(function () {
-			console.log("unlockFungibleAsset threw an error");
+		}).catch(function (e) {
+			console.log(e)
+			console.log("unlockAsset threw an error");
 		})
 
 		// Balance of the recipient after claiming

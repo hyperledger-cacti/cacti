@@ -6,7 +6,7 @@ const crypto = require('crypto')
 
 const command: GluegunCommand = {
 	name: 'lock',
- 	description: 'Lock assets (fungible assets for now)',
+ 	description: 'Lock assets',
 
 	run: async toolbox => {
 		const {
@@ -69,6 +69,16 @@ const command: GluegunCommand = {
 						name: '--network_port',
 						description:
 							'The network port. Default value is taken from config.json'
+					},
+					{
+						name: '--token_id',
+						description:
+							'Specify the token id for which the asset is to be locked. This is an optional parameter only for ERC721 & ERC1155.'
+					},
+					{
+						name: '--data',
+						description:
+							'Specify the data for ERC1155 token. This is an optional parameter only for ERC1155.'
 					}
 				],
 				command,
@@ -76,7 +86,7 @@ const command: GluegunCommand = {
 			)
 			return
 		}
-		print.info('Lock assets (fungible assets for now)')
+		print.info('Lock assets')
 
 		// Retrieving networkConfig
 		if(!options.network){
@@ -138,6 +148,12 @@ const command: GluegunCommand = {
 			print.error('Timeout not provided.')
 			return
 		}
+		if(!options.token_id){
+			options.token_id = 0
+		}
+		if(!options.data){
+			options.data = ""
+		}
 		const timeLock = Math.floor(Date.now() / 1000) + options.timeout
 		// The hash input has to be dealt with care. The smart contracts take in bytes as input. But the cli takes in strings as input. So to handle that, we take in the hash in its base64 version as input and then obtain the byte array from this. If a hash is not provided, we generate a base 64 encoding and then generate its corresponding byte array from it. This byte array will be input to generate the hash. 
 		var hash
@@ -173,20 +189,22 @@ const command: GluegunCommand = {
 		console.log(`Account balance of the recipient in Network ${options.network}: ${recipientBalance.toString()}`)
 
 		// Locking the asset (works only for ERC20 at this point)
-		await tokenContract.approve(interopContract.address, amount, {from: sender}).catch(function () {
+		await tokenContract.approve(tokenContract.address, amount, {from: sender}).catch(function () {
 			console.log("Token approval failed!!!");
 		})
-		const lockTx = await interopContract.lockFungibleAsset(
+		const lockTx = await interopContract.lockAsset(
 			recipient,
 			tokenContract.address,
 			amount,
 			hash,
 			timeLock,
+			options.token_id,
+			Web3.utils.utf8ToHex(options.data),
 			{
 				from: sender
 			}
-		).catch(function () {
-			console.log("lockFungibleAsset threw an error");
+		).catch(function (e) {
+			console.log("lockAsset threw an error");
 		})
 		const lockContractId = lockTx.logs[0].args.lockContractId
 		console.log(`Lock contract ID: ${lockContractId.toString().substring(2)}`)

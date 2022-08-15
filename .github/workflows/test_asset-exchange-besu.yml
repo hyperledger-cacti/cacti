@@ -1,0 +1,124 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Test Asset Exchange Besu
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+        
+  asset-exchange-corda:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+      
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+          
+      # CORDA NETWORK
+      - name: Generate github.properties
+        run: |
+          echo "Using ${GITHUB_ACTOR} user."
+          echo "username=${GITHUB_ACTOR}" >> github.properties
+          echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.properties
+          echo "url=https://maven.pkg.github.com/${GITHUB_ACTOR}/weaver-dlt-interoperability" >> github.properties
+          
+          echo "Using ${GITHUB_ACTOR} user."
+          echo "username=${GITHUB_ACTOR}" >> github.main.properties
+          echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.main.properties
+          echo "url=https://maven.pkg.github.com/hyperledger-labs/weaver-dlt-interoperability" >> github.main.properties
+          
+          ./scripts/get-cordapps.sh || mv github.main.properties github.properties
+          
+          cat github.properties
+        working-directory: tests/network-setups/besu
+          
+      # BESU NETWORK
+      - name: Start Besu Network
+        run: |
+          sudo apt install -y tmux jq
+          wget https://hyperledger.jfrog.io/artifactory/besu-binaries/besu/22.7.0/besu-22.7.0.zip 
+          unzip besu-22.7.0.zip 
+          export PATH="${PWD}/besu-22.7.0/bin:$PATH"
+          wget https://artifacts.consensys.net/public/ethsigner/raw/names/ethsigner.zip/versions/22.1.3/ethsigner-22.1.3.zip
+          unzip ethsigner-22.1.3.zip
+          export PATH="${PWD}/ethsigner-22.1.3/bin:$PATH"
+          make start
+          sleep 100
+        working-directory: tests/network-setups/besu
+      
+      # Deploy contracts
+      - name: Deploy contracts
+        run: |
+         make deploy-contracts
+        working-directory: samples/besu/simpleasset
+
+       # BESU CLI
+      - name: Setup BESU CLI init
+        run: |
+         npm install .
+         export PATH="${PWD}/bin:$PATH"
+         cp config.template.json tmp.json
+         cp config.template.json tmp.json
+         jq -r '.network1.tokenContract |= "../simpleasset/build/contracts/AliceERC20.json"' tmp.json > config.json
+         cp config.json tmp.json
+         jq -r '.network2.tokenContract |= "../simpleasset/build/contracts/BobERC20.json"' tmp.json > config.json
+         rm tmp.json
+        working-directory: samples/besu/besu-cli  
+        
+      - name: Asset Exchange Besu CLI Tests
+        run: |
+          COUNT=0
+          TOTAL=3
+
+          # issue 10 tokens to account 1
+          besu-cli asset issue --network=network1 --account=1 --amount=10 
+          
+          # lock 1 token for account 2 in network 2
+          besu-cli asset lock --network=network1 --sender_account=1 --recipient_account=2 --amount=1 --timeout=1000 1> tmp.out
+          cat tmp.out | grep "Account balance of the sender in Network network1: 9" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          tmp_string=$(cat tmp.out | grep "Lock contract ID:")
+          arrIN=(${tmp_string//:/ })
+          LOCK_ID=${arrIN[3]}
+          tmp_string=$(cat tmp.out | grep "Preimage:")
+          arrIN=(${tmp_string//:/ })
+          PREIMAGE=${arrIN[1]}
+
+          # Is Asset locked
+          besu-cli asset is-locked --network=network1 --lock_contract_id=$LOCK_ID 1> tmp.out
+          cat tmp.out | grep "in Network network1: true" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+          
+          # Claim asset
+          besu-cli asset claim --network=network1 --lock_contract_id=$LOCK_ID --recipient_account=2 --preimage=&PREIMAGE 1> tmp.out
+          cat tmp.out | grep "Account balance of the recipient in Network network1 after claiming: 1" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          # RESULT
+          echo "Passed $COUNT/$TOTAL Tests."
+
+          if [ $COUNT == $TOTAL ]; then
+              exit 0
+          else
+              exit 1
+          fi
+        working-directory: samples/besu/besu-cli
+
