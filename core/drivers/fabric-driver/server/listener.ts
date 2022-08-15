@@ -45,7 +45,10 @@ const initBlockEventListenerForChannel = async (
                 // Get transaction chaincode ID
                 const chaincodeId = transaction.payload.chaincode_proposal_payload.input.chaincode_spec.chaincode_id.name;
                 if (transaction.payload.chaincode_proposal_payload.input.chaincode_spec.input.args.length > 0) {
-                    const responsePayload = transaction.payload.action.proposal_response_payload.extension.response.payload;
+                    // below way of fetching payload requires that the response has been set by the chaincode function via return value
+                    //const responsePayload = transaction.payload.action.proposal_response_payload.extension.response.payload;
+                    // below way of fetching payload is similar to ContractEventListener in which we fetch event.payload
+                    const responsePayload = transaction.payload.action.proposal_response_payload.extension.events.payload;
                     // Get transaction function name: first argument according to convention
                     const chaincodeFunc = transaction.payload.chaincode_proposal_payload.input.chaincode_spec.input.args[0].toString();
                     console.log('Trying to find match for channel', channelId, 'chaincode', chaincodeId, 'function', chaincodeFunc);
@@ -71,14 +74,14 @@ const initBlockEventListenerForChannel = async (
                     }
                     // Iterate through the view requests in the matching event subscriptions
                     eventSubscriptionQueries.forEach(async (eventSubscriptionQuery: query_pb.Query) => {
-                        console.log('Generating view and collecting proof for channel', channelId, 'chaincode', chaincodeId, 'function', chaincodeFunc);
+                        console.log('Generating view and collecting proof for channel', channelId, 'chaincode', chaincodeId, 'function', chaincodeFunc, 'responsePayload', responsePayload.toString());
                         // Trigger proof collection
                         const [result, invokeError] = await handlePromise(
                             invoke(
                                 eventSubscriptionQuery,
                                 networkName,
                                 'HandleEventRequest',
-                                Buffer.from(responsePayload)
+                                responsePayload
                             ),
                         );
                         if (!invokeError) {
