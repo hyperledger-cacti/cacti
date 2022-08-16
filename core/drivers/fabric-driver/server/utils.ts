@@ -95,20 +95,10 @@ function getRelayClientForEventPublish() {
     return client;
 }
 
-// Create an asset exchange agreement structure
-function createEventQuerySerialized(queryBytes64: string, dynamicQueryArg: Buffer)
-{
-    const eventQuery = new eventsPb.EventQuery();
-    eventQuery.setQueryBytes64(queryBytes64);
-    eventQuery.setDynamicQueryArg(dynamicQueryArg);
-    return Buffer.from(eventQuery.serializeBinary()).toString('base64');
-}
-
 export {
     checkIfArraysAreEqual,
     handlePromise,
     relayCallback,
     getRelayClientForQueryResponse,
-    getRelayClientForEventPublish,
-    createEventQuerySerialized
+    getRelayClientForEventPublish
 }

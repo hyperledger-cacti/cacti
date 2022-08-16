@@ -16,7 +16,6 @@ import interopPayload from '@hyperledger-labs/weaver-protos-js/common/interop_pa
 import state_pb from '@hyperledger-labs/weaver-protos-js/common/state_pb';
 import { Certificate } from '@fidm/x509';
 import { getConfig } from './walletSetup';
-import { createEventQuerySerialized } from './utils';
 
 const parseAddress = (address: string) => {
     const addressList = address.split('/');
@@ -126,10 +125,9 @@ async function invoke(
                 generateTransactionId: false
             };
         } else {
-            const b64EventQueryBytes = createEventQuerySerialized(b64QueryBytes, dynamicArg)
             request = {
                 fcn: funName,
-                args: [b64EventQueryBytes],
+                args: [b64QueryBytes, dynamicArg ? dynamicArg.toString() : ""],
                 generateTransactionId: false
             };
         }
@@ -160,7 +158,7 @@ async function invoke(
 
         // submit query transaction and get result from chaincode
         const proposalResponseResult = await queryProposal.send(proposalRequest);
-        console.log(JSON.stringify(proposalResponse, null, 2))
+        console.log(JSON.stringify(proposalResponseResult, null, 2))
 
         // 4. Prepare the view and return.
         const viewPayload = new view_data.FabricView();

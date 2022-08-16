@@ -43,18 +43,8 @@ func (s *SmartContract) HandleExternalRequest(ctx contractapi.TransactionContext
 	return resp, err
 }
 
-func (s *SmartContract) HandleEventRequest(ctx contractapi.TransactionContextInterface, b64EventQueryBytes string) (string, error) {
-	eventQueryBytes, err := base64.StdEncoding.DecodeString(b64EventQueryBytes)
-	if err != nil {
-		return "", logThenErrorf("Unable to base64 decode data: %s", err.Error())
-	}
-	var eventQuery common.EventQuery
-	err = protoV2.Unmarshal(eventQueryBytes, &eventQuery)
-	if err != nil {
-		return "", logThenErrorf("Unable to unmarshal eventQuery: %s", err.Error())
-	}
-
-	queryBytes, err := base64.StdEncoding.DecodeString(eventQuery.QueryBytes64)
+func (s *SmartContract) HandleEventRequest(ctx contractapi.TransactionContextInterface, b64QueryBytes string, dynamicQueryArg string) (string, error) {
+	queryBytes, err := base64.StdEncoding.DecodeString(b64QueryBytes)
 	if err != nil {
 		return "", logThenErrorf("Unable to base64 decode data: %s", err.Error())
 	}
@@ -67,12 +57,12 @@ func (s *SmartContract) HandleEventRequest(ctx contractapi.TransactionContextInt
 	queryAddress := query.Address
 	dynamicArgCount := strings.Count(query.Address, ":?")
 	if dynamicArgCount > 1 {
-		return "", logThenErrorf("Expected 1 dynamic arg, but found %d", dynamicArgCount)
+		return "", logThenErrorf("Expected 1 dynamic argument in the event query address, but found %d", dynamicArgCount)
 	} else if dynamicArgCount == 1 {
-		queryArg := string(eventQuery.DynamicQueryArg)
-		queryAddress = strings.Replace(query.Address, ":?", ":"+queryArg, 1)
+		queryAddress = strings.Replace(query.Address, ":?", ":"+dynamicQueryArg, 1)
+		fmt.Println("There is 1 dynamic argument in the event query address, queryArg: ", dynamicQueryArg)
 	} else {
-		fmt.Println("There are no dynamic arguments in the event query. queryArg: ", string(eventQuery.DynamicQueryArg))
+		fmt.Println("There are no dynamic arguments in the event query address, queryArg: ", dynamicQueryArg)
 	}
 
 	resp, err := handleRequest(s, ctx, query, queryAddress)
