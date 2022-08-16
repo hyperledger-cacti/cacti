@@ -22,6 +22,263 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from './base';
 
 /**
+ * The list of arguments to pass in to the transaction request to Add Asset Quantity.
+ * @export
+ * @interface AddAssetQuantityRequestParameters
+ */
+export interface AddAssetQuantityRequestParameters {
+    /**
+     * 
+     * @type {string}
+     * @memberof AddAssetQuantityRequestParameters
+     */
+    assetId: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof AddAssetQuantityRequestParameters
+     */
+    amount: number;
+}
+/**
+ * The list of arguments to pass in to the transaction request to Add Peer.
+ * @export
+ * @interface AddPeerRequestParameters
+ */
+export interface AddPeerRequestParameters {
+    /**
+     * 
+     * @type {string}
+     * @memberof AddPeerRequestParameters
+     */
+    address: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AddPeerRequestParameters
+     */
+    peerKey: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AddPeerRequestParameters
+     */
+    tlsCertificate?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof AddPeerRequestParameters
+     */
+    syncingPeer?: boolean;
+}
+/**
+ * The list of arguments to pass in to the transaction request to Add Signatory.
+ * @export
+ * @interface AddSignatoryRequestParameters
+ */
+export interface AddSignatoryRequestParameters {
+    /**
+     * 
+     * @type {string}
+     * @memberof AddSignatoryRequestParameters
+     */
+    accountId: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AddSignatoryRequestParameters
+     */
+    publicKey: string;
+}
+/**
+ * The list of arguments to pass in to the transaction request to Append Role.
+ * @export
+ * @interface AppendRoleRequestParameters
+ */
+export interface AppendRoleRequestParameters {
+    /**
+     * 
+     * @type {string}
+     * @memberof AppendRoleRequestParameters
+     */
+    accountId: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AppendRoleRequestParameters
+     */
+    roleName: string;
+}
+/**
+ * The list of arguments to pass in to the transaction request to Call Engine.
+ * @export
+ * @interface CallEngineRequestParameters
+ */
+export interface CallEngineRequestParameters {
+    /**
+     * 
+     * @type {string}
+     * @memberof CallEngineRequestParameters
+     */
+    caller: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CallEngineRequestParameters
+     */
+    callee: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CallEngineRequestParameters
+     */
+    input: string;
+}
+/**
+ * The list of arguments to pass in to the transaction request to Compare And Set Account Detail.
+ * @export
+ * @interface CompareAndSetAccountDetailRequestParameters
+ */
+export interface CompareAndSetAccountDetailRequestParameters {
+    /**
+     * 
+     * @type {string}
+     * @memberof CompareAndSetAccountDetailRequestParameters
+     */
+    accountId: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CompareAndSetAccountDetailRequestParameters
+     */
+    key: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CompareAndSetAccountDetailRequestParameters
+     */
+    value: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CompareAndSetAccountDetailRequestParameters
+     */
+    oldValue?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof CompareAndSetAccountDetailRequestParameters
+     */
+    check_empty: boolean;
+}
+/**
+ * The list of arguments to pass in to the transaction request to Create Account.
+ * @export
+ * @interface CreateAccountRequestParameters
+ */
+export interface CreateAccountRequestParameters {
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateAccountRequestParameters
+     */
+    accountName: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateAccountRequestParameters
+     */
+    domainId: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateAccountRequestParameters
+     */
+    publicKey: string;
+}
+/**
+ * The list of arguments to pass in to the transaction request to Create Asset.
+ * @export
+ * @interface CreateAssetRequestParameters
+ */
+export interface CreateAssetRequestParameters {
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateAssetRequestParameters
+     */
+    assetName: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateAssetRequestParameters
+     */
+    domainId: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof CreateAssetRequestParameters
+     */
+    precision: number;
+}
+/**
+ * The list of arguments to pass in to the transaction request to Create Domain.
+ * @export
+ * @interface CreateDomainRequestParameters
+ */
+export interface CreateDomainRequestParameters {
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateDomainRequestParameters
+     */
+    domainId: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateDomainRequestParameters
+     */
+    defaultRole: string;
+}
+/**
+ * The list of arguments to pass in to the transaction request to Create Role.
+ * @export
+ * @interface CreateRoleRequestParameters
+ */
+export interface CreateRoleRequestParameters {
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateRoleRequestParameters
+     */
+    roleName: string;
+    /**
+     * 
+     * @type {Array<number>}
+     * @memberof CreateRoleRequestParameters
+     */
+    permissionsList: Array<number>;
+}
+/**
+ * The list of arguments to pass in to the transaction request to Detach Role.
+ * @export
+ * @interface DetachRoleRequestParameters
+ */
+export interface DetachRoleRequestParameters {
+    /**
+     * 
+     * @type {string}
+     * @memberof DetachRoleRequestParameters
+     */
+    accountId: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof DetachRoleRequestParameters
+     */
+    roleName: string;
+}
+/**
  * 
  * @export
  * @interface ErrorExceptionJsonResponseV1
@@ -107,6 +364,295 @@ export interface GenerateTransactionRequestV1 {
      * @memberof GenerateTransactionRequestV1
      */
     quorum?: number;
+}
+/**
+ * The list of arguments to pass in to the transaction request to Get Account Asset Transactions.
+ * @export
+ * @interface GetAccountAssetTransactionsRequestParameters
+ */
+export interface GetAccountAssetTransactionsRequestParameters {
+    /**
+     * 
+     * @type {string}
+     * @memberof GetAccountAssetTransactionsRequestParameters
+     */
+    accountId: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetAccountAssetTransactionsRequestParameters
+     */
+    assetId: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof GetAccountAssetTransactionsRequestParameters
+     */
+    pageSize: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetAccountAssetTransactionsRequestParameters
+     */
+    firstTxHash: string;
+}
+/**
+ * The list of arguments to pass in to the transaction request to Get Account Assets.
+ * @export
+ * @interface GetAccountAssetsRequestParameters
+ */
+export interface GetAccountAssetsRequestParameters {
+    /**
+     * 
+     * @type {string}
+     * @memberof GetAccountAssetsRequestParameters
+     */
+    accountId: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof GetAccountAssetsRequestParameters
+     */
+    pageSize: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetAccountAssetsRequestParameters
+     */
+    firstAssetId?: string;
+}
+/**
+ * The list of arguments to pass in to the transaction request to Get Account Detail.
+ * @export
+ * @interface GetAccountDetailRequestParameters
+ */
+export interface GetAccountDetailRequestParameters {
+    /**
+     * 
+     * @type {string}
+     * @memberof GetAccountDetailRequestParameters
+     */
+    accountId?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetAccountDetailRequestParameters
+     */
+    key?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetAccountDetailRequestParameters
+     */
+    writer?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof GetAccountDetailRequestParameters
+     */
+    pageSize: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetAccountDetailRequestParameters
+     */
+    paginationKey: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetAccountDetailRequestParameters
+     */
+    paginationWriter: string;
+}
+/**
+ * The list of arguments to pass in to the transaction request to Get Account.
+ * @export
+ * @interface GetAccountRequestParameters
+ */
+export interface GetAccountRequestParameters {
+    /**
+     * 
+     * @type {string}
+     * @memberof GetAccountRequestParameters
+     */
+    accountId: string;
+}
+/**
+ * The list of arguments to pass in to the transaction request to Get Account Transactions.
+ * @export
+ * @interface GetAccountTransactionsRequestParameters
+ */
+export interface GetAccountTransactionsRequestParameters {
+    /**
+     * 
+     * @type {string}
+     * @memberof GetAccountTransactionsRequestParameters
+     */
+    accountId: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof GetAccountTransactionsRequestParameters
+     */
+    pageSize: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetAccountTransactionsRequestParameters
+     */
+    firstTxHash: string;
+    /**
+     * 
+     * @type {object}
+     * @memberof GetAccountTransactionsRequestParameters
+     */
+    firstTxTime?: object;
+    /**
+     * 
+     * @type {object}
+     * @memberof GetAccountTransactionsRequestParameters
+     */
+    lastTxTime?: object;
+    /**
+     * 
+     * @type {number}
+     * @memberof GetAccountTransactionsRequestParameters
+     */
+    firstTxHeight?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof GetAccountTransactionsRequestParameters
+     */
+    lastTxHeight?: number;
+}
+/**
+ * The list of arguments to pass in to the transaction request to Get Asset Info.
+ * @export
+ * @interface GetAssetInfoRequestParameters
+ */
+export interface GetAssetInfoRequestParameters {
+    /**
+     * 
+     * @type {string}
+     * @memberof GetAssetInfoRequestParameters
+     */
+    assetId: string;
+}
+/**
+ * The list of arguments to pass in to the transaction request to Get Block.
+ * @export
+ * @interface GetBlockRequestParameters
+ */
+export interface GetBlockRequestParameters {
+    /**
+     * 
+     * @type {number}
+     * @memberof GetBlockRequestParameters
+     */
+    height: number;
+}
+/**
+ * The list of arguments to pass in to the transaction request to Get Engine Receipts.
+ * @export
+ * @interface GetEngineReceiptsRequestParameters
+ */
+export interface GetEngineReceiptsRequestParameters {
+    /**
+     * 
+     * @type {string}
+     * @memberof GetEngineReceiptsRequestParameters
+     */
+    txHash: string;
+}
+/**
+ * The list of arguments to pass in to the transaction request to Get Pending Transactions.
+ * @export
+ * @interface GetPendingTransactionsRequestParameters
+ */
+export interface GetPendingTransactionsRequestParameters {
+    /**
+     * 
+     * @type {number}
+     * @memberof GetPendingTransactionsRequestParameters
+     */
+    pageSize: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetPendingTransactionsRequestParameters
+     */
+    firstTxHash?: string;
+    /**
+     * 
+     * @type {object}
+     * @memberof GetPendingTransactionsRequestParameters
+     */
+    firstTxTime?: object;
+    /**
+     * 
+     * @type {object}
+     * @memberof GetPendingTransactionsRequestParameters
+     */
+    lastTxTime?: object;
+}
+/**
+ * The list of arguments to pass in to the transaction request to Get Role Permissions.
+ * @export
+ * @interface GetRolePermissionsRequestParameters
+ */
+export interface GetRolePermissionsRequestParameters {
+    /**
+     * 
+     * @type {string}
+     * @memberof GetRolePermissionsRequestParameters
+     */
+    roleId: string;
+}
+/**
+ * The list of arguments to pass in to the transaction request to Get Signatories.
+ * @export
+ * @interface GetSignatoriesRequestParameters
+ */
+export interface GetSignatoriesRequestParameters {
+    /**
+     * 
+     * @type {string}
+     * @memberof GetSignatoriesRequestParameters
+     */
+    accountId: string;
+}
+/**
+ * The list of arguments to pass in to the transaction request to Get Transactions.
+ * @export
+ * @interface GetTransactionsRequestParameters
+ */
+export interface GetTransactionsRequestParameters {
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof GetTransactionsRequestParameters
+     */
+    txHashesList: Array<string>;
+}
+/**
+ * The list of arguments to pass in to the transaction request to Grant Permission.
+ * @export
+ * @interface GrantPermissionRequestParameters
+ */
+export interface GrantPermissionRequestParameters {
+    /**
+     * 
+     * @type {string}
+     * @memberof GrantPermissionRequestParameters
+     */
+    accountId: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GrantPermissionRequestParameters
+     */
+    permission: string;
 }
 /**
  * 
@@ -337,6 +883,57 @@ export interface KeyPair {
     privateKey: string;
 }
 /**
+ * The list of arguments to pass in to the transaction request to Remove Peer.
+ * @export
+ * @interface RemovePeerRequestParameters
+ */
+export interface RemovePeerRequestParameters {
+    /**
+     * 
+     * @type {string}
+     * @memberof RemovePeerRequestParameters
+     */
+    publicKey: string;
+}
+/**
+ * The list of arguments to pass in to the transaction request to Remove Signatory.
+ * @export
+ * @interface RemoveSignatoryRequestParameters
+ */
+export interface RemoveSignatoryRequestParameters {
+    /**
+     * 
+     * @type {string}
+     * @memberof RemoveSignatoryRequestParameters
+     */
+    accountId: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RemoveSignatoryRequestParameters
+     */
+    publicKey: string;
+}
+/**
+ * The list of arguments to pass in to the transaction request to Revoke Permission.
+ * @export
+ * @interface RevokePermissionRequestParameters
+ */
+export interface RevokePermissionRequestParameters {
+    /**
+     * 
+     * @type {string}
+     * @memberof RevokePermissionRequestParameters
+     */
+    accountId: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof RevokePermissionRequestParameters
+     */
+    permission: number;
+}
+/**
  * 
  * @export
  * @interface RunTransactionRequestV1
@@ -355,11 +952,11 @@ export interface RunTransactionRequestV1 {
      */
     baseConfig: IrohaBaseConfig;
     /**
-     * The list of arguments to pass in to the transaction request.
-     * @type {Array<any>}
+     * 
+     * @type {Array<any> | AddAssetQuantityRequestParameters | AddPeerRequestParameters | AddSignatoryRequestParameters | AppendRoleRequestParameters | CallEngineRequestParameters | CreateAccountRequestParameters | CreateAssetRequestParameters | CreateDomainRequestParameters | CreateRoleRequestParameters | DetachRoleRequestParameters | GrantPermissionRequestParameters | RemovePeerRequestParameters | RemoveSignatoryRequestParameters | RevokePermissionRequestParameters | SetAccountDetailRequestParameters | SetAccountQuorumRequestParameters | SubtractAssetQuantityRequestParameters | TransferAssetRequestParameters | CompareAndSetAccountDetailRequestParameters | GetAccountRequestParameters | GetBlockRequestParameters | GetSignatoriesRequestParameters | GetTransactionsRequestParameters | GetPendingTransactionsRequestParameters | GetAccountTransactionsRequestParameters | GetAccountAssetTransactionsRequestParameters | GetAccountAssetsRequestParameters | GetAccountDetailRequestParameters | GetAssetInfoRequestParameters | GetRolePermissionsRequestParameters | GetEngineReceiptsRequestParameters}
      * @memberof RunTransactionRequestV1
      */
-    params: Array<any>;
+    params: Array<any> | AddAssetQuantityRequestParameters | AddPeerRequestParameters | AddSignatoryRequestParameters | AppendRoleRequestParameters | CallEngineRequestParameters | CreateAccountRequestParameters | CreateAssetRequestParameters | CreateDomainRequestParameters | CreateRoleRequestParameters | DetachRoleRequestParameters | GrantPermissionRequestParameters | RemovePeerRequestParameters | RemoveSignatoryRequestParameters | RevokePermissionRequestParameters | SetAccountDetailRequestParameters | SetAccountQuorumRequestParameters | SubtractAssetQuantityRequestParameters | TransferAssetRequestParameters | CompareAndSetAccountDetailRequestParameters | GetAccountRequestParameters | GetBlockRequestParameters | GetSignatoriesRequestParameters | GetTransactionsRequestParameters | GetPendingTransactionsRequestParameters | GetAccountTransactionsRequestParameters | GetAccountAssetTransactionsRequestParameters | GetAccountAssetsRequestParameters | GetAccountDetailRequestParameters | GetAssetInfoRequestParameters | GetRolePermissionsRequestParameters | GetEngineReceiptsRequestParameters;
 }
 /**
  * 
@@ -392,6 +989,106 @@ export interface RunTransactionSignedRequestV1 {
      * @memberof RunTransactionSignedRequestV1
      */
     baseConfig?: IrohaBaseConfig;
+}
+/**
+ * The list of arguments to pass in to the transaction request to Set Account Detail.
+ * @export
+ * @interface SetAccountDetailRequestParameters
+ */
+export interface SetAccountDetailRequestParameters {
+    /**
+     * 
+     * @type {string}
+     * @memberof SetAccountDetailRequestParameters
+     */
+    accountId: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SetAccountDetailRequestParameters
+     */
+    key: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SetAccountDetailRequestParameters
+     */
+    value: string;
+}
+/**
+ * The list of arguments to pass in to the transaction request to Set Account Quorum.
+ * @export
+ * @interface SetAccountQuorumRequestParameters
+ */
+export interface SetAccountQuorumRequestParameters {
+    /**
+     * 
+     * @type {string}
+     * @memberof SetAccountQuorumRequestParameters
+     */
+    accountId: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof SetAccountQuorumRequestParameters
+     */
+    quorum: number;
+}
+/**
+ * The list of arguments to pass in to the transaction request to Subtract Asset Quantity.
+ * @export
+ * @interface SubtractAssetQuantityRequestParameters
+ */
+export interface SubtractAssetQuantityRequestParameters {
+    /**
+     * 
+     * @type {string}
+     * @memberof SubtractAssetQuantityRequestParameters
+     */
+    assetId: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof SubtractAssetQuantityRequestParameters
+     */
+    amount: number;
+}
+/**
+ * The list of arguments to pass in to the transaction request to Transfer Asset.
+ * @export
+ * @interface TransferAssetRequestParameters
+ */
+export interface TransferAssetRequestParameters {
+    /**
+     * 
+     * @type {string}
+     * @memberof TransferAssetRequestParameters
+     */
+    srcAccountId: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TransferAssetRequestParameters
+     */
+    destAccountId: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TransferAssetRequestParameters
+     */
+    assetId: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TransferAssetRequestParameters
+     */
+    description: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof TransferAssetRequestParameters
+     */
+    amount: number;
 }
 
 /**

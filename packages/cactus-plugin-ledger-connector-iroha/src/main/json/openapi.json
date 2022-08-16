@@ -173,9 +173,665 @@
             "nullable": false
           },
           "params": {
-            "description": "The list of arguments to pass in to the transaction request.",
+            "oneOf": [
+              {
+                "type": "array",
+                "items": {}
+              },
+              {
+                "$ref": "#/components/schemas/AddAssetQuantityRequestParameters"
+              },
+              {
+                "$ref": "#/components/schemas/AddPeerRequestParameters"
+              },
+              {
+                "$ref": "#/components/schemas/AddSignatoryRequestParameters"
+              },
+              {
+                "$ref": "#/components/schemas/AppendRoleRequestParameters"
+              },
+              {
+                "$ref": "#/components/schemas/CallEngineRequestParameters"
+              },
+              {
+                "$ref": "#/components/schemas/CreateAccountRequestParameters"
+              },
+              {
+                "$ref": "#/components/schemas/CreateAssetRequestParameters"
+              },
+              {
+                "$ref": "#/components/schemas/CreateDomainRequestParameters"
+              },
+              {
+                "$ref": "#/components/schemas/CreateRoleRequestParameters"
+              },
+              {
+                "$ref": "#/components/schemas/DetachRoleRequestParameters"
+              },
+              {
+                "$ref": "#/components/schemas/GrantPermissionRequestParameters"
+              },
+              {
+                "$ref": "#/components/schemas/RemovePeerRequestParameters"
+              },
+              {
+                "$ref": "#/components/schemas/RemoveSignatoryRequestParameters"
+              },
+              {
+                "$ref": "#/components/schemas/RevokePermissionRequestParameters"
+              },
+              {
+                "$ref": "#/components/schemas/SetAccountDetailRequestParameters"
+              },
+              {
+                "$ref": "#/components/schemas/SetAccountQuorumRequestParameters"
+              },
+              {
+                "$ref": "#/components/schemas/SubtractAssetQuantityRequestParameters"
+              },
+              {
+                "$ref": "#/components/schemas/TransferAssetRequestParameters"
+              },
+              {
+                "$ref": "#/components/schemas/CompareAndSetAccountDetailRequestParameters"
+              },
+              {
+                "$ref": "#/components/schemas/GetAccountRequestParameters"
+              },
+              {
+                "$ref": "#/components/schemas/GetBlockRequestParameters"
+              },
+              {
+                "$ref": "#/components/schemas/GetSignatoriesRequestParameters"
+              },
+              {
+                "$ref": "#/components/schemas/GetTransactionsRequestParameters"
+              },
+              {
+                "$ref": "#/components/schemas/GetPendingTransactionsRequestParameters"
+              },
+              {
+                "$ref": "#/components/schemas/GetAccountTransactionsRequestParameters"
+              },
+              {
+                "$ref": "#/components/schemas/GetAccountAssetTransactionsRequestParameters"
+              },
+              {
+                "$ref": "#/components/schemas/GetAccountAssetsRequestParameters"
+              },
+              {
+                "$ref": "#/components/schemas/GetAccountDetailRequestParameters"
+              },
+              {
+                "$ref": "#/components/schemas/GetAssetInfoRequestParameters"
+              },
+              {
+                "$ref": "#/components/schemas/GetRolePermissionsRequestParameters"
+              },
+              {
+                "$ref": "#/components/schemas/GetEngineReceiptsRequestParameters"
+              }
+            ]
+          }
+        }
+      },
+      "AddAssetQuantityRequestParameters": {
+        "description": "The list of arguments to pass in to the transaction request to Add Asset Quantity.",
+        "type": "object",
+        "required": [
+          "assetId",
+          "amount"
+        ],
+        "properties": {
+          "assetId": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          }
+        }
+      },
+      "AddPeerRequestParameters": {
+        "description": "The list of arguments to pass in to the transaction request to Add Peer.",
+        "type": "object",
+        "required": [
+          "address",
+          "peerKey"
+        ],
+        "properties": {
+          "address": {
+            "type": "string"
+          },
+          "peerKey":{
+            "type": "string"
+          },
+          "tlsCertificate":{
+            "type": "string"
+          },
+          "syncingPeer": {
+            "type": "boolean"
+          }
+        }
+      },
+      "AddSignatoryRequestParameters": {
+        "description": "The list of arguments to pass in to the transaction request to Add Signatory.",
+        "type": "object",
+        "required": [
+          "accountId",
+          "publicKey"
+        ],
+        "properties": {
+          "accountId": {
+            "type": "string"
+          },
+          "publicKey": {
+            "type": "string"
+          }
+        }
+      },
+      "AppendRoleRequestParameters": {
+        "description": "The list of arguments to pass in to the transaction request to Append Role.",
+        "type": "object",
+        "required": [
+          "accountId",
+          "roleName"
+        ],
+        "properties": {
+          "accountId": {
+            "type": "string"
+          },
+          "roleName": {
+            "type": "string"
+          }
+        }
+      },
+      "CallEngineRequestParameters": {
+        "description": "The list of arguments to pass in to the transaction request to Call Engine.",
+        "type": "object",
+        "required": [
+          "caller",
+          "callee",
+          "input"
+        ],
+        "properties": {
+          "caller": {
+            "type": "string"
+          },
+          "callee": {
+            "type": "string"
+          },
+          "input": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateAccountRequestParameters": {
+        "description": "The list of arguments to pass in to the transaction request to Create Account.",
+        "type": "object",
+        "required": [
+          "accountName",
+          "domainId",
+          "publicKey"
+        ],
+        "properties": {
+          "accountName": {
+            "type": "string"
+          },
+          "domainId": {
+            "type": "string"
+          },
+          "publicKey": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateAssetRequestParameters": {
+        "description": "The list of arguments to pass in to the transaction request to Create Asset.",
+        "type": "object",
+        "required": [
+          "assetName",
+          "domainId",
+          "precision"
+        ],
+        "properties": {
+          "assetName": {
+            "type": "string"
+          },
+          "domainId": {
+            "type": "string"
+          },
+          "precision": {
+            "type": "integer"
+          }
+        }
+      },
+      "CreateDomainRequestParameters": {
+        "description": "The list of arguments to pass in to the transaction request to Create Domain.",
+        "type": "object",
+        "required": [
+          "domainId",
+          "defaultRole"
+        ],
+        "properties": {
+          "domainId": {
+            "type": "string"
+          },
+          "defaultRole": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateRoleRequestParameters": {
+        "description": "The list of arguments to pass in to the transaction request to Create Role.",
+        "type": "object",
+        "required": [
+          "roleName",
+          "permissionsList"
+        ],
+        "properties": {
+          "roleName": {
+            "type": "string"
+          },
+          "permissionsList": {
             "type": "array",
-            "items": {}
+            "items": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "DetachRoleRequestParameters": {
+        "description": "The list of arguments to pass in to the transaction request to Detach Role.",
+        "type": "object",
+        "required": [
+          "accountId",
+          "roleName"
+        ],
+        "properties": {
+          "accountId": {
+            "type": "string"
+          },
+          "roleName": {
+            "type": "string"
+          }
+        }
+      },
+      "GrantPermissionRequestParameters": {
+        "description": "The list of arguments to pass in to the transaction request to Grant Permission.",
+        "type": "object",
+        "required": [
+          "accountId",
+          "permission"
+        ],
+        "properties": {
+          "accountId": {
+            "type": "string"
+          },
+          "permission": {
+            "type": "string"
+          }
+        }
+      },
+      "RemovePeerRequestParameters": {
+        "description": "The list of arguments to pass in to the transaction request to Remove Peer.",
+        "type": "object",
+        "required": [
+          "publicKey"
+        ],
+        "properties": {
+          "publicKey": {
+            "type": "string"
+          }
+        }
+      },
+      "RemoveSignatoryRequestParameters": {
+        "description": "The list of arguments to pass in to the transaction request to Remove Signatory.",
+        "type": "object",
+        "required": [
+          "accountId",
+          "publicKey"
+        ],
+        "properties": {
+          "accountId": {
+            "type": "string"
+          },
+          "publicKey": {
+            "type": "string"
+          }
+        }
+      },
+      "RevokePermissionRequestParameters": {
+        "description": "The list of arguments to pass in to the transaction request to Revoke Permission.",
+        "type": "object",
+        "required": [
+          "accountId",
+          "permission"
+        ],
+        "properties": {
+          "accountId": {
+            "type": "string"
+          },
+          "permission": {
+            "type": "number"
+          }
+        }
+      },
+      "SetAccountDetailRequestParameters": {
+        "description": "The list of arguments to pass in to the transaction request to Set Account Detail.",
+        "type": "object",
+        "required": [
+          "accountId",
+          "key",
+          "value"
+        ],
+        "properties": {
+          "accountId": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        }
+      },
+      "SetAccountQuorumRequestParameters": {
+        "description": "The list of arguments to pass in to the transaction request to Set Account Quorum.",
+        "type": "object",
+        "required": [
+          "accountId",
+          "quorum"
+        ],
+        "properties": {
+          "accountId": {
+            "type": "string"
+          },
+          "quorum": {
+            "type": "integer"
+          }
+        }
+      },
+      "SubtractAssetQuantityRequestParameters": {
+        "description": "The list of arguments to pass in to the transaction request to Subtract Asset Quantity.",
+        "type": "object",
+        "required": [
+          "assetId",
+          "amount"
+        ],
+        "properties": {
+          "assetId": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          }
+        }
+      },
+      "TransferAssetRequestParameters": {
+        "description": "The list of arguments to pass in to the transaction request to Transfer Asset.",
+        "type": "object",
+        "required": [
+          "srcAccountId",
+          "destAccountId",
+          "assetId",
+          "description",
+          "amount"
+        ],
+        "properties": {
+          "srcAccountId": {
+            "type": "string"
+          },
+          "destAccountId": {
+            "type": "string"
+          },
+          "assetId": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          }
+        }
+      },
+      "CompareAndSetAccountDetailRequestParameters": {
+        "description": "The list of arguments to pass in to the transaction request to Compare And Set Account Detail.",
+        "type": "object",
+        "required": [
+          "accountId",
+          "key",
+          "value",
+          "check_empty"
+        ],
+        "properties": {
+          "accountId": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          },
+          "oldValue": {
+            "type": "string"
+          },
+          "check_empty": {
+            "type": "boolean"
+          }
+        }
+      },
+      "GetAccountRequestParameters": {
+        "description": "The list of arguments to pass in to the transaction request to Get Account.",
+        "type": "object",
+        "required": [
+          "accountId"
+        ],
+        "properties": {
+          "accountId": {
+            "type": "string"
+          }
+        }
+      },
+      "GetBlockRequestParameters": {
+        "description": "The list of arguments to pass in to the transaction request to Get Block.",
+        "type": "object",
+        "required": [
+          "height"
+        ],
+        "properties": {
+          "height": {
+            "type": "integer"
+          }
+        }
+      },
+      "GetSignatoriesRequestParameters": {
+        "description": "The list of arguments to pass in to the transaction request to Get Signatories.",
+        "type": "object",
+        "required": [
+          "accountId"
+        ],
+        "properties": {
+          "accountId": {
+            "type": "string"
+          }
+        }
+      },
+      "GetTransactionsRequestParameters": {
+        "description": "The list of arguments to pass in to the transaction request to Get Transactions.",
+        "type": "object",
+        "required": [
+          "txHashesList"
+        ],
+        "properties": {
+          "txHashesList": {
+            "type": "array",
+            "items":{
+              "type": "string"
+            }
+          }
+        }
+      },
+      "GetPendingTransactionsRequestParameters": {
+        "description": "The list of arguments to pass in to the transaction request to Get Pending Transactions.",
+        "type": "object",
+        "required": [
+          "pageSize"
+        ],
+        "properties": {
+          "pageSize": {
+            "type": "integer"
+          },
+          "firstTxHash": {
+            "type": "string"
+          },
+          "firstTxTime": {
+            "type": "object"
+          },
+          "lastTxTime": {
+            "type": "object"
+          }
+        }
+      },
+      "GetAccountTransactionsRequestParameters": {
+        "description": "The list of arguments to pass in to the transaction request to Get Account Transactions.",
+        "type": "object",
+        "required": [
+          "accountId",
+          "pageSize",
+          "firstTxHash"
+        ],
+        "properties": {
+          "accountId": {
+            "type": "string"
+          },
+          "pageSize": {
+            "type": "integer"
+          },
+          "firstTxHash": {
+            "type": "string"
+          },
+          "firstTxTime": {
+            "type": "object"
+          },
+          "lastTxTime": {
+            "type": "object"
+          },
+          "firstTxHeight": {
+            "type": "integer"
+          },
+          "lastTxHeight": {
+            "type": "integer"
+          }
+        }
+      },
+      "GetAccountAssetTransactionsRequestParameters": {
+        "description": "The list of arguments to pass in to the transaction request to Get Account Asset Transactions.",
+        "type": "object",
+        "required": [
+          "accountId",
+          "assetId",
+          "pageSize",
+          "firstTxHash"
+        ],
+        "properties": {
+          "accountId": {
+            "type": "string"
+          },
+          "assetId": {
+            "type": "string"
+          },
+          "pageSize": {
+            "type": "integer"
+          },
+          "firstTxHash": {
+            "type": "string"
+          }
+        }
+      },
+      "GetAccountAssetsRequestParameters": {
+        "description": "The list of arguments to pass in to the transaction request to Get Account Assets.",
+        "type": "object",
+        "required": [
+          "accountId",
+          "pageSize"
+        ],
+        "properties": {
+          "accountId": {
+            "type": "string"
+          },
+          "pageSize": {
+            "type": "number"
+          },
+          "firstAssetId": {
+            "type": "string"
+          }
+        }
+      },
+      "GetAccountDetailRequestParameters": {
+        "description": "The list of arguments to pass in to the transaction request to Get Account Detail.",
+        "type": "object",
+        "required": [
+          "pageSize",
+          "paginationKey",
+          "paginationWriter"
+        ],
+        "properties": {
+          "accountId": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "writer": {
+            "type": "string"
+          },
+          "pageSize": {
+            "type": "integer"
+          },
+          "paginationKey": {
+            "type": "string"
+          },
+          "paginationWriter": {
+            "type": "string"
+          }
+        }
+      },
+      "GetAssetInfoRequestParameters": {
+        "description": "The list of arguments to pass in to the transaction request to Get Asset Info.",
+        "type": "object",
+        "required": [
+          "assetId"
+        ],
+        "properties": {
+          "assetId": {
+            "type": "string"
+          }
+        }
+      },
+      "GetRolePermissionsRequestParameters": {
+        "description": "The list of arguments to pass in to the transaction request to Get Role Permissions.",
+        "type": "object",
+        "required": [
+          "roleId"
+        ],
+        "properties": {
+          "roleId": {
+            "type": "string"
+          }
+        }
+      },
+      "GetEngineReceiptsRequestParameters": {
+        "description": "The list of arguments to pass in to the transaction request to Get Engine Receipts.",
+        "type": "object",
+        "required": [
+          "txHash"
+        ],
+        "properties": {
+          "txHash":{
+            "type": "string"
           }
         }
       },
