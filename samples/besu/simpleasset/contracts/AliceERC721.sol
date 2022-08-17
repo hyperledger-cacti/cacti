@@ -15,19 +15,19 @@ contract AliceERC721 is ERC721, transferInterface {
     address owner;
 
     constructor() ERC721("Alice NFT", "AliceNFT") {
-        for (uint256 i = 0; i < 5; i++) {
-            _tokenIds.increment();
-            uint256 newItemId = _tokenIds.current();
-            _safeMint(msg.sender, newItemId);
-        }
+        // for (uint256 i = 0; i < 5; i++) {
+        //     _tokenIds.increment();
+        //     uint256 newItemId = _tokenIds.current();
+        //     _safeMint(msg.sender, newItemId);
+        // }
         owner = msg.sender;
     }
 
     function mint(address to) public {
         require(msg.sender == owner);
-        _tokenIds.increment();
         uint256 newItemId = _tokenIds.current();
         _safeMint(to, newItemId);
+        _tokenIds.increment();
     }
 
     function transferInterop(transferStruct.Info memory info)
@@ -35,7 +35,7 @@ contract AliceERC721 is ERC721, transferInterface {
         override
         returns (bool success)
     {
-        this.transferFrom(info.sender, info.receiver, info.amount);
+        this.transferFrom(info.sender, info.receiver, info.tokenId);
         return true;
     }
 

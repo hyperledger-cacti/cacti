@@ -1,12 +1,18 @@
 import { GluegunCommand } from 'gluegun'
 import { getNetworkConfig, commandHelp } from '../../helper/helper'
 import { getContractInstance } from '../../helper/besu-functions'
-const Web3 = require ("web3")
+const Web3 = require("web3")
 const crypto = require('crypto')
+
+async function getBalances(tokenContract, address, token_id=0, asset_type="ERC20"){
+	if (asset_type=="ERC1155")
+		return tokenContract.balanceOf(address, token_id)
+	return tokenContract.balanceOf(address)
+}
 
 const command: GluegunCommand = {
 	name: 'lock',
- 	description: 'Lock assets',
+	description: 'Lock assets',
 
 	run: async toolbox => {
 		const {
@@ -79,6 +85,11 @@ const command: GluegunCommand = {
 						name: '--data',
 						description:
 							'Specify the data for ERC1155 token. This is an optional parameter only for ERC1155.'
+					},
+					{
+						name: '--asset_type',
+						description:
+							'Specify the asset type. This is an optional parameter only for ERC721 & ERC1155.'
 					}
 				],
 				command,
@@ -89,24 +100,28 @@ const command: GluegunCommand = {
 		print.info('Lock assets')
 
 		// Retrieving networkConfig
-		if(!options.network){
+		if (!options.network) {
 			print.error('Network ID not provided.')
 			return
 		}
 		const networkConfig = getNetworkConfig(options.network)
 
-        var networkPort = networkConfig.networkPort
-        if(options.network_port){
-            networkPort = options.network_port
-            console.log('Use network port : ', networkPort)
-    	}
-    	var networkHost = networkConfig.networkHost
-    	if(options.network_host){
-    	    networkHost = options.network_host
-    	    console.log('Use network host : ', networkHost)
-        }
+		var networkPort = networkConfig.networkPort
+		if (options.network_port) {
+			networkPort = options.network_port
+			console.log('Use network port : ', networkPort)
+		}
+		var networkHost = networkConfig.networkHost
+		if (options.network_host) {
+			networkHost = options.network_host
+			console.log('Use network host : ', networkHost)
+		}
 
-		const provider = new Web3.providers.HttpProvider('http://'+networkHost+':'+networkPort)
+		if (!options.asset_type) {
+			options.asset_type = "ERC20";
+		}
+
+		const provider = new Web3.providers.HttpProvider('http://' + networkHost + ':' + networkPort)
 		const web3N = new Web3(provider)
 		const interopContract = await getContractInstance(provider, networkConfig.interopContract).catch(function () {
 			console.log("Failed getting interopContract!");
@@ -117,41 +132,41 @@ const command: GluegunCommand = {
 		const accounts = await web3N.eth.getAccounts()
 
 		// Receving the input parameters
-		if(!options.amount){
+		if (!options.amount) {
 			print.error('Amount not provided.')
 			return
 		}
 		const amount = options.amount
 		var sender
-		if(options.sender_account){
+		if (options.sender_account) {
 			sender = accounts[options.sender_account]
 		}
-		else if(options.sender_account_address){
-		    sender = '0x'+ options.sender_account_address
+		else if (options.sender_account_address) {
+			sender = '0x' + options.sender_account_address
 		}
-		else{
+		else {
 			print.info('Sender account index not provided. Taking from networkConfig..')
 			sender = accounts[networkConfig.senderAccountIndex]
 		}
 		var recipient
-		if(options.recipient_account){
+		if (options.recipient_account) {
 			recipient = accounts[options.recipient_account]
 		}
-		else if(options.recipient_account_address){
-		     recipient = '0x'+ options.recipient_account_address
+		else if (options.recipient_account_address) {
+			recipient = '0x' + options.recipient_account_address
 		}
-		else{
+		else {
 			print.info('Recipient account index not provided. Taking from networkConfig..')
 			recipient = accounts[networkConfig.recipientAccountIndex]
 		}
-		if(!options.timeout){
+		if (!options.timeout) {
 			print.error('Timeout not provided.')
 			return
 		}
-		if(!options.token_id){
+		if (!options.token_id) {
 			options.token_id = 0
 		}
-		if(!options.data){
+		if (!options.data) {
 			options.data = ""
 		}
 		const timeLock = Math.floor(Date.now() / 1000) + options.timeout
@@ -160,10 +175,10 @@ const command: GluegunCommand = {
 		var preimage
 		var hash_base64
 		var preimage_bytes
-		if(options.hash_base64){
+		if (options.hash_base64) {
 			hash_base64 = options.hash_base64
 		}
-		else{
+		else {
 			// Generate a hash pair if not provided as an input parameter
 			preimage = crypto.randomBytes(22).toString('base64')
 			hash_base64 = crypto.createHash('sha256').update(preimage).digest('base64')
@@ -171,7 +186,7 @@ const command: GluegunCommand = {
 			console.log('Length of preimage byte array', preimage_bytes.length)
 		}
 		hash = Buffer.from(hash_base64, 'base64')
-		
+
 		console.log('Parameters:')
 		console.log('networkConfig', networkConfig)
 		console.log('Sender', sender)
@@ -180,18 +195,30 @@ const command: GluegunCommand = {
 		console.log('Timeout', timeLock)
 		console.log('Hash (base64): ', hash_base64)
 		console.log('Preimage: ', preimage)
-
+		
 		// Balances of sender and receiver before locking
 		console.log(`Account balances before locking`)
-		var senderBalance = await tokenContract.balanceOf(sender)
+		var senderBalance = await getBalances(tokenContract, sender, options.token_id, options.asset_type)
 		console.log(`Account balance of the sender in Network ${options.network}: ${senderBalance.toString()}`)
-		var recipientBalance = await tokenContract.balanceOf(recipient)
+		var recipientBalance = await getBalances(tokenContract, recipient, options.token_id, options.asset_type)
 		console.log(`Account balance of the recipient in Network ${options.network}: ${recipientBalance.toString()}`)
 
 		// Locking the asset (works only for ERC20 at this point)
-		await tokenContract.approve(tokenContract.address, amount, {from: sender}).catch(function () {
-			console.log("Token approval failed!!!");
-		})
+		if (options.asset_type == "ERC721") {
+			await tokenContract.approve(tokenContract.address, options.token_id, { from: sender }).catch(function () {
+				console.log("ERC 721 Token approval failed!!!");
+				return false;
+			})
+		} else if (options.asset_type == "ERC1155") {
+			await tokenContract.setApprovalForAll(tokenContract.address, true, { from: sender }).catch(function () {
+				console.log("Token approval failed!!!");
+			})
+		}else{
+			await tokenContract.approve(tokenContract.address, amount, { from: sender }).catch(function () {
+				console.log("Token approval failed!!!");
+			})
+		}
+
 		const lockTx = await interopContract.lockAsset(
 			recipient,
 			tokenContract.address,
@@ -204,6 +231,7 @@ const command: GluegunCommand = {
 				from: sender
 			}
 		).catch(function (e) {
+			console.log(e)
 			console.log("lockAsset threw an error");
 		})
 		const lockContractId = lockTx.logs[0].args.lockContractId
@@ -211,9 +239,9 @@ const command: GluegunCommand = {
 
 		// Balances of sender and receiver after locking
 		console.log(`Account balances after locking`)
-		var senderBalance = await tokenContract.balanceOf(sender)
+		var senderBalance = await getBalances(tokenContract, sender, options.token_id, options.asset_type)
 		console.log(`Account balance of the sender in Network ${options.network}: ${senderBalance.toString()}`)
-		var recipientBalance = await tokenContract.balanceOf(recipient)
+		var recipientBalance = await getBalances(tokenContract, recipient, options.token_id, options.asset_type)
 		console.log(`Account balance of the recipient in Network ${options.network}: ${recipientBalance.toString()}`)
 	}
 }

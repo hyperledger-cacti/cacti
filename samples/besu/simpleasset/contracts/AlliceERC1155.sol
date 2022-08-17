@@ -11,10 +11,12 @@ import "./transferInterface.sol";
 contract AliceERC1155 is ERC1155, transferInterface {
     uint256 public constant AliceToken = 0;
     uint256 public constant AliceNFT = 1;
+    address owner;
 
     constructor() ERC1155("") {
         _mint(msg.sender, AliceToken, 10**18, "");
         _mint(msg.sender, AliceNFT, 1, "");
+        owner = msg.sender;
     }
 
     function transferInterop(transferStruct.Info memory info)
@@ -39,5 +41,10 @@ contract AliceERC1155 is ERC1155, transferInterface {
         returns (bool success)
     {
         return this.isApprovedForAll(info.sender, address(this));
+    }
+
+    function mint(address to, uint256 tokenId, uint256 amount, bytes memory data) public {
+        require(msg.sender == owner);
+        _mint(to, tokenId, amount, data);
     }
 }
