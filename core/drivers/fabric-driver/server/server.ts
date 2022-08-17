@@ -76,8 +76,7 @@ const fabricCommunication = async (query: query_pb.Query, networkName: string) =
         invoke(
             query,
             networkName,
-            'HandleExternalRequest',
-            undefined
+            'HandleExternalRequest'
         ),
     );
     const client = getRelayClientForQueryResponse();

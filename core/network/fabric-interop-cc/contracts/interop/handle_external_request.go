@@ -56,6 +56,7 @@ func (s *SmartContract) HandleEventRequest(ctx contractapi.TransactionContextInt
 
 	queryAddress := query.Address
 	dynamicArgCount := strings.Count(query.Address, ":?")
+	// TODO: this is a stopgap logic and will be reviewed and possibly changed later
 	if dynamicArgCount > 1 {
 		return "", logThenErrorf("Expected 1 dynamic argument in the event query address, but found %d", dynamicArgCount)
 	} else if dynamicArgCount == 1 {
@@ -69,7 +70,7 @@ func (s *SmartContract) HandleEventRequest(ctx contractapi.TransactionContextInt
 	return resp, err
 }
 
-// handleRequest function requests that come from external networks.
+// This function handleRequest handle requests that originate in external requests and have come through relays.
 //
 // The flow coordinates the following:
 // 1. Checks the validity of query signature

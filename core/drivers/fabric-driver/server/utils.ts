@@ -8,7 +8,6 @@ import fs from 'fs';
 import { credentials } from '@grpc/grpc-js';
 import datatransfer_grpc_pb from '@hyperledger-labs/weaver-protos-js/relay/datatransfer_grpc_pb';
 import events_grpc_pb from '@hyperledger-labs/weaver-protos-js/relay/events_grpc_pb';
-import eventsPb from '@hyperledger-labs/weaver-protos-js/common/events_pb';
 
 function checkIfArraysAreEqual(x: Array<any>, y: Array<any>): boolean {
     if (x == y) {

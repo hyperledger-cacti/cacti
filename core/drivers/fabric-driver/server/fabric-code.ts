@@ -4,11 +4,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Gateway, Wallets, Network } from 'fabric-network';
+import { Gateway, Wallets } from 'fabric-network';
 import { Endorser } from 'fabric-common';
 import * as path from 'path';
 import * as fs from 'fs';
-import * as fabproto6 from 'fabric-protos';
 import query_pb from '@hyperledger-labs/weaver-protos-js/common/query_pb';
 import view_data from '@hyperledger-labs/weaver-protos-js/fabric/view_data_pb';
 import proposalResponse from '@hyperledger-labs/weaver-protos-js/peer/proposal_response_pb';
@@ -77,8 +76,8 @@ const getNetworkGateway = async (networkName: string): Promise<Gateway> => {
 async function invoke(
     query: query_pb.Query,
     networkName: string,
-    funName: string,
-    dynamicArg: Buffer | undefined
+    funcName: string,
+    dynamicArg?: Buffer
 ): Promise<view_data.FabricView> {
     console.log('Running query on fabric network');
     try {
@@ -118,15 +117,15 @@ async function invoke(
         const idx = gateway.identityContext.calculateTransactionId();
         const queryProposal = currentChannel.newQuery(chaincodeId);
         let request;
-        if (funName == 'HandleExternalRequest') {
+        if (funcName == 'HandleExternalRequest') {
             request = {
-                fcn: funName,
+                fcn: funcName,
                 args: [b64QueryBytes],
                 generateTransactionId: false
             };
         } else {
             request = {
-                fcn: funName,
+                fcn: funcName,
                 args: [b64QueryBytes, dynamicArg ? dynamicArg.toString() : ""],
                 generateTransactionId: false
             };
@@ -158,7 +157,7 @@ async function invoke(
 
         // submit query transaction and get result from chaincode
         const proposalResponseResult = await queryProposal.send(proposalRequest);
-        console.log(JSON.stringify(proposalResponseResult, null, 2))
+        //console.debug(JSON.stringify(proposalResponseResult, null, 2))
 
         // 4. Prepare the view and return.
         const viewPayload = new view_data.FabricView();

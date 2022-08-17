@@ -5,7 +5,7 @@
  */
 
 import * as fabproto6 from 'fabric-protos';
-import { Gateway, Network, Contract, BlockListener, ContractListener } from 'fabric-network';
+import { Gateway, Network, Contract, ContractEvent, BlockListener, ContractListener, BlockEvent } from 'fabric-network';
 import query_pb from '@hyperledger-labs/weaver-protos-js/common/query_pb';
 import events_pb from '@hyperledger-labs/weaver-protos-js/common/events_pb';
 import { lookupEventSubscriptions } from './events';
@@ -33,7 +33,7 @@ const initBlockEventListenerForChannel = async (
     networkName: string,
     channelId: string,
 ): Promise<any> => {
-    const listener: BlockListener = async (event) => {
+    const listener: BlockListener = async (event: BlockEvent) => {
         // Parse the block data; typically there is only one element in this array but we will interate over it just to be safe
         const blockData = ((event.blockData as fabproto6.common.Block).data as fabproto6.common.BlockData).data;
         blockData.forEach((item) => {
@@ -113,7 +113,7 @@ const initContractEventListener = (
     channelId: string,
     chaincodeId: string,
 ): any => {
-    const listener: ContractListener = async (event) => {
+    const listener: ContractListener = async (event: ContractEvent) => {
         console.log('Trying to find match for channel', channelId, 'chaincode', chaincodeId, 'event class', event.eventName);
         // Find all matching event subscriptions stored in the database
         let eventMatcher = new events_pb.EventMatcher();
