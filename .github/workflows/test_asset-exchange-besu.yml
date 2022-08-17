@@ -16,7 +16,7 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
         
-  asset-exchange-corda:
+  asset-exchange-besu:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
@@ -30,24 +30,6 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
-          
-      # CORDA NETWORK
-      - name: Generate github.properties
-        run: |
-          echo "Using ${GITHUB_ACTOR} user."
-          echo "username=${GITHUB_ACTOR}" >> github.properties
-          echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.properties
-          echo "url=https://maven.pkg.github.com/${GITHUB_ACTOR}/weaver-dlt-interoperability" >> github.properties
-          
-          echo "Using ${GITHUB_ACTOR} user."
-          echo "username=${GITHUB_ACTOR}" >> github.main.properties
-          echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.main.properties
-          echo "url=https://maven.pkg.github.com/hyperledger-labs/weaver-dlt-interoperability" >> github.main.properties
-          
-          ./scripts/get-cordapps.sh || mv github.main.properties github.properties
-          
-          cat github.properties
-        working-directory: tests/network-setups/besu
           
       # BESU NETWORK
       - name: Start Besu Network
@@ -73,7 +55,6 @@ jobs:
       - name: Setup BESU CLI init
         run: |
          npm install .
-         export PATH="${PWD}/bin:$PATH"
          cp config.template.json tmp.json
          cp config.template.json tmp.json
          jq -r '.network1.tokenContract |= "../simpleasset/build/contracts/AliceERC20.json"' tmp.json > config.json
@@ -84,6 +65,7 @@ jobs:
         
       - name: Asset Exchange Besu CLI Tests
         run: |
+          export PATH="${PWD}/bin:$PATH"
           COUNT=0
           TOTAL=3
 
@@ -106,6 +88,8 @@ jobs:
           besu-cli asset is-locked --network=network1 --lock_contract_id=$LOCK_ID 1> tmp.out
           cat tmp.out | grep "in Network network1: true" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
+
+          sleep 30
           
           # Claim asset
           besu-cli asset claim --network=network1 --lock_contract_id=$LOCK_ID --recipient_account=2 --preimage=&PREIMAGE 1> tmp.out
