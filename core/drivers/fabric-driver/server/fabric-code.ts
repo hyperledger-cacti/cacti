@@ -44,7 +44,7 @@ const getNetworkGateway = async (networkName: string): Promise<Gateway> => {
         const config = getConfig();
 
         // Create a new file system-based wallet for managing identities.
-        const walletPath = path.join(process.cwd(), `wallet-${networkName}`);
+        const walletPath = process.env.WALLET_PATH ? process.env.WALLET_PATH : path.join(process.cwd(), `wallet-${networkName}`);
         const userName = config.relay.name;
         const wallet = await getWallet(walletPath);
         console.log(`Wallet path: ${walletPath}`);
