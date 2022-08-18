@@ -23,14 +23,14 @@ import (
 	"testing"
 	"time"
 
+	"github.com/golang/protobuf/proto"
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
+	wtest "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils"
 	"github.com/hyperledger/fabric-chaincode-go/shim"
+	mspProtobuf "github.com/hyperledger/fabric-protos-go/msp"
 	pb "github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/stretchr/testify/require"
-	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
-	"github.com/golang/protobuf/proto"
 	protoV2 "google.golang.org/protobuf/proto"
-	mspProtobuf "github.com/hyperledger/fabric-protos-go/msp"
-	wtest "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils"
 )
 
 // function that supplies value that is to be returned by ctx.GetStub().GetCreator()
@@ -132,6 +132,11 @@ func TestHandleExternalRequest(t *testing.T) {
 	testHandleExternalRequestECDSAHappyCase(t, &query, validCertificate, key, signature, pbResp, &accessControlAsset, &membershipAsset)
 	// ed25519 Cert and Signature
 	testHandleExternalRequestED25519Signature(t, &query, pbResp, &accessControlAsset, &membershipAsset, template)
+	// Test event requests
+	// Invalid Cert
+	testHandleEventRequestInvalidDynamicQueryArgs(t, &query, validCertificate, signature)
+	// Happy case. ECDSA Cert and Valid Signature
+	testHandleEventRequestECDSAHappyCase(t, &query, validCertificate, key, signature, pbResp, &accessControlAsset, &membershipAsset)
 }
 
 func testHandleExternalRequestInvalidJSON(t *testing.T) {
@@ -195,6 +200,30 @@ func testHandleExternalRequestInvalidCert(t *testing.T, query *common.Query) {
 	require.EqualError(t, err, fmt.Sprintf("Unable to parse certificate: Client cert not in a known PEM format"))
 }
 
+func testHandleEventRequestInvalidDynamicQueryArgs(t *testing.T, query *common.Query, validCertificate string, signature []byte) {
+	ctx, chaincodeStub := wtest.PrepMockStub()
+	interopcc := SmartContract{}
+	chaincodeStub.GetCreatorReturns([]byte(getRelayCreator()), nil)
+	interopCCId := "interopcc"
+	wtest.SetMockStubCCId(chaincodeStub, interopCCId)
+
+	// set incorrect values for this test case
+	queryAddress := query.Address
+	query.Address = "localhost:9080/network1/mychannel:interop:Read:?:?"
+	query.Certificate = validCertificate
+	b64Signature := base64.StdEncoding.EncodeToString(signature)
+	query.RequestorSignature = b64Signature
+	queryBytes, err := protoV2.Marshal(query)
+	require.NoError(t, err)
+	b64QueryBytes := base64.StdEncoding.EncodeToString(queryBytes)
+
+	_, err = interopcc.HandleEventRequest(ctx, string(b64QueryBytes), "a")
+	require.EqualError(t, err, fmt.Sprintf("Expected 1 dynamic argument in the event query address, but found 2"))
+
+	// restore the value of query.Address
+	query.Address = queryAddress
+}
+
 func testHandleExternalRequestECDSAHappyCase(t *testing.T, query *common.Query, validCertificate string, validPrivateKey *ecdsa.PrivateKey, signature []byte, pbResp pb.Response, accessControl *common.AccessControlPolicy, membership *common.Membership) {
 	ctx, chaincodeStub := wtest.PrepMockStub()
 	interopcc := SmartContract{}
@@ -210,11 +239,11 @@ func testHandleExternalRequestECDSAHappyCase(t *testing.T, query *common.Query, 
 	require.NoError(t, err)
 	b64QueryBytes := base64.StdEncoding.EncodeToString(queryBytes)
 	interopPayload := common.InteropPayload{
-		Payload: []byte("17.12"),
-		Address: "localhost:9080/network1/mychannel:interop:Read:a",
-		Confidential: false,
+		Payload:              []byte("17.12"),
+		Address:              "localhost:9080/network1/mychannel:interop:Read:a",
+		Confidential:         false,
 		RequestorCertificate: query.Certificate,
-		Nonce: query.Nonce,
+		Nonce:                query.Nonce,
 	}
 	interopPayloadBytes, err := protoV2.Marshal(&interopPayload)
 	require.NoError(t, err)
@@ -245,6 +274,109 @@ func testHandleExternalRequestECDSAHappyCase(t *testing.T, query *common.Query, 
 	chaincodeStub.GetStateReturnsOnCall(4, accessControlBytes, nil)
 	chaincodeStub.InvokeChaincodeReturns(pbResp)
 	interopResponse, err = interopcc.HandleExternalRequest(ctx, string(b64QueryBytes))
+	err = protoV2.Unmarshal([]byte(interopResponse), &interopPayloadResp)
+	require.NoError(t, err)
+	require.NotEqual(t, interopPayload.Payload, interopPayloadResp.Payload)
+	require.True(t, interopPayloadResp.Confidential)
+	require.Equal(t, interopPayloadResp.RequestorCertificate, validCertificate)
+	require.Equal(t, interopPayloadResp.Nonce, query.Nonce)
+	var confPayload common.ConfidentialPayload
+	err = protoV2.Unmarshal(interopPayloadResp.Payload, &confPayload)
+	require.NoError(t, err)
+	require.Equal(t, confPayload.HashType, common.ConfidentialPayload_HMAC)
+	decConfPayload, err := decryptDataWithPrivKey(validPrivateKey, confPayload.EncryptedPayload)
+	require.NoError(t, err)
+	var confPayloadContents common.ConfidentialPayloadContents
+	err = protoV2.Unmarshal(decConfPayload, &confPayloadContents)
+	require.NoError(t, err)
+	require.Equal(t, interopPayload.Payload, confPayloadContents.Payload)
+	mac := hmac.New(sha256.New, confPayloadContents.Random)
+	mac.Write(confPayloadContents.Payload)
+	fmac := mac.Sum(nil)
+	require.Equal(t, confPayload.Hash, fmac)
+}
+
+func testHandleEventRequestECDSAHappyCase(t *testing.T, query *common.Query, validCertificate string, validPrivateKey *ecdsa.PrivateKey, signature []byte, pbResp pb.Response, accessControl *common.AccessControlPolicy, membership *common.Membership) {
+	ctx, chaincodeStub := wtest.PrepMockStub()
+	interopcc := SmartContract{}
+	chaincodeStub.GetCreatorReturns([]byte(getRelayCreator()), nil)
+	interopCCId := "interopcc"
+	wtest.SetMockStubCCId(chaincodeStub, interopCCId)
+	query.Confidential = false
+
+	// set correct values for the success case
+	query.Certificate = validCertificate
+	// This tests the case of no dynamic arguments in the event query address (and signature is on query with no dynamic args)
+	b64Signature := base64.StdEncoding.EncodeToString(signature)
+	query.RequestorSignature = b64Signature
+	queryBytes, err := protoV2.Marshal(query)
+	require.NoError(t, err)
+	b64QueryBytes := base64.StdEncoding.EncodeToString(queryBytes)
+	interopPayload := common.InteropPayload{
+		Payload:              []byte("17.12"),
+		Address:              "localhost:9080/network1/mychannel:interop:Read:a",
+		Confidential:         false,
+		RequestorCertificate: query.Certificate,
+		Nonce:                query.Nonce,
+	}
+	interopPayloadBytes, err := protoV2.Marshal(&interopPayload)
+	require.NoError(t, err)
+
+	// mock all the calls to the chaincode stub
+	membershipBytes, err := json.Marshal(membership)
+	require.NoError(t, err)
+	accessControlBytes, err := json.Marshal(accessControl)
+	require.NoError(t, err)
+	chaincodeStub.GetStateReturnsOnCall(0, membershipBytes, nil)
+	chaincodeStub.GetStateReturnsOnCall(1, accessControlBytes, nil)
+	chaincodeStub.InvokeChaincodeReturns(pbResp)
+
+	interopResponse, err := interopcc.HandleEventRequest(ctx, string(b64QueryBytes), "a")
+	require.NoError(t, err)
+	var interopPayloadResp common.InteropPayload
+	err = protoV2.Unmarshal([]byte(interopResponse), &interopPayloadResp)
+	require.NoError(t, err)
+	require.False(t, interopPayloadResp.Confidential)
+	require.Equal(t, interopPayloadBytes, []byte(interopResponse))
+	require.NoError(t, err)
+
+	// This tests the case of one dynamic argument in the event query address (and signature is on query with one dynamic arg)
+	query.Address = "localhost:9080/network1/mychannel:interop:Read:?"
+	random := rand.Reader
+	hashed, err := computeSHA2Hash([]byte(query.Address+query.Nonce), validPrivateKey.PublicKey.Params().BitSize)
+	require.NoError(t, err)
+	signatureDynamicArg, err := ecdsa.SignASN1(random, validPrivateKey, hashed)
+	require.NoError(t, err)
+
+	b64Signature = base64.StdEncoding.EncodeToString(signatureDynamicArg)
+	query.RequestorSignature = b64Signature
+	queryBytes, err = protoV2.Marshal(query)
+	require.NoError(t, err)
+	b64QueryBytes = base64.StdEncoding.EncodeToString(queryBytes)
+
+	// mock all the calls to the chaincode stub
+	chaincodeStub.GetStateReturnsOnCall(3, membershipBytes, nil)
+	chaincodeStub.GetStateReturnsOnCall(4, accessControlBytes, nil)
+	chaincodeStub.InvokeChaincodeReturns(pbResp)
+
+	interopResponse, err = interopcc.HandleEventRequest(ctx, string(b64QueryBytes), "a")
+	require.NoError(t, err)
+	err = protoV2.Unmarshal([]byte(interopResponse), &interopPayloadResp)
+	require.NoError(t, err)
+	require.False(t, interopPayloadResp.Confidential)
+	require.Equal(t, interopPayloadBytes, []byte(interopResponse))
+	require.NoError(t, err)
+
+	// test the same request-response with encryption on
+	query.Confidential = true
+	queryBytes, err = protoV2.Marshal(query)
+	require.NoError(t, err)
+	b64QueryBytes = base64.StdEncoding.EncodeToString(queryBytes)
+	chaincodeStub.GetStateReturnsOnCall(6, membershipBytes, nil)
+	chaincodeStub.GetStateReturnsOnCall(7, accessControlBytes, nil)
+	chaincodeStub.InvokeChaincodeReturns(pbResp)
+	interopResponse, err = interopcc.HandleEventRequest(ctx, string(b64QueryBytes), "a")
+	require.NoError(t, err)
 	err = protoV2.Unmarshal([]byte(interopResponse), &interopPayloadResp)
 	require.NoError(t, err)
 	require.NotEqual(t, interopPayload.Payload, interopPayloadResp.Payload)
