@@ -19,6 +19,12 @@ export const requestIdentityConfiguration = async (networkUnit: iin_agent_pb.Net
 };
 
 // Processes foreign network unit's state/configuration received from a foreign IIN agent
-export const sendIdentityConfiguration = async (networkUnit: iin_agent_pb.NetworkUnitIdentity) => {
-    console.log('sendIdentityConfiguration:', networkUnit.getNetworkId(), '-', networkUnit.getParticipantId());
+export const sendIdentityConfiguration = async (attestedMembership: iin_agent_pb.AttestedMembership) => {
+    const attestation = attestedMembership.getAttestation();
+    if (attestation) {
+        const networkUnit = attestation.getUnitIdentity();
+        if (networkUnit) {
+            console.log('sendIdentityConfiguration:', networkUnit.getNetworkId(), '-', networkUnit.getParticipantId());
+        }
+    }
 };

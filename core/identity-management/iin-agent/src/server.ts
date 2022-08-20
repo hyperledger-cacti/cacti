@@ -64,7 +64,7 @@ iinAgentServer.addService(iin_agent_pb_grpc.IINAgentService, {
         }
     },
     // Service for receiving network unit states from foreign IIN agents. Will communicate with the IIN agent caller and respond with an ack while the attestation is being processed.
-    sendIdentityConfiguration: (call: { request: iin_agent_pb.NetworkUnitIdentity }, callback: (_: any, object: ack_pb.Ack) => void) => {
+    sendIdentityConfiguration: (call: { request: iin_agent_pb.AttestedMembership }, callback: (_: any, object: ack_pb.Ack) => void) => {
         const ack_response = new ack_pb.Ack();
         try {
             sendIdentityConfiguration(call.request);
@@ -106,7 +106,7 @@ iinAgentServer.addService(iin_agent_pb_grpc.IINAgentService, {
         }
     },
     // Service for receiving requests for attestations on foreign network unit states from local IIN agents. Will communicate with the IIN agent caller and respond with an ack while the attestation is being generated.
-    requestAttestation: (call: { request: iin_agent_pb.NetworkUnitIdentity }, callback: (_: any, object: ack_pb.Ack) => void) => {
+    requestAttestation: (call: { request: iin_agent_pb.AttestedSecurityDomain }, callback: (_: any, object: ack_pb.Ack) => void) => {
         const ack_response = new ack_pb.Ack();
         try {
             requestAttestation(call.request);
@@ -127,7 +127,7 @@ iinAgentServer.addService(iin_agent_pb_grpc.IINAgentService, {
         }
     },
     // Service for receiving attestations on foreign network unit states from local IIN agents. Will communicate with the IIN agent caller and respond with an ack while the attestation is being processed.
-    sendAttestation: (call: { request: iin_agent_pb.NetworkUnitIdentity }, callback: (_: any, object: ack_pb.Ack) => void) => {
+    sendAttestation: (call: { request: iin_agent_pb.AttestedSecurityDomain }, callback: (_: any, object: ack_pb.Ack) => void) => {
         const ack_response = new ack_pb.Ack();
         try {
             sendAttestation(call.request);
