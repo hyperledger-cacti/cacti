@@ -95,6 +95,8 @@ Can pass in a config file for the driver to be run with: `DRIVER_CONFIG` (ex: DR
 
 `DB_PATH` stores the path hosting the database files containing the event subscription information.
 
+`WALLET_PATH` stores the path hosting the user wallets to access a network.
+
 NOTE: When specifying ensure that they match the config that the relay is using.
 
 **For docker-compose:***
