@@ -25,12 +25,18 @@ export class LedgerBase {
     async setupWalletIdentity() {
     }
 
+    // Collect security domain membership info
+    async getSecurityDomainMembership(): Promise<object> {
+        return {};
+    }
+
     // Invoke a contract to drive a transaction
     // TODO: Add parameters corresponding to the output of a flow among IIN agents
     async invokeContract() {
     }
 
     // Query a contract to fetch information from the ledger
-    async queryContract() {
+    async queryContract(): Promise<string> {
+        return "";
     }
 }

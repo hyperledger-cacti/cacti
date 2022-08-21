@@ -5,6 +5,7 @@
  */
 
 import { Gateway } from 'fabric-network';
+import { Channel } from 'fabric-common';
 import * as path from 'path';
 import * as fs from 'fs';
 import { getWallet } from './walletUtils';
@@ -72,6 +73,87 @@ const getNetworkContract = async (
     }
 }
 
+function getMembershipUnit(channel: Channel, mspId: string) {
+    const mspConfig = channel.getMsp(mspId);
+    let certs = [];
+    if (Array.isArray(mspConfig.rootCerts)) {
+        for (let i = 0; i < mspConfig.rootCerts.length; i++) {
+            certs.push(mspConfig.rootCerts[i]);
+        }
+    } else if (mspConfig.rootCerts.length !== 0) {
+        certs.push(mspConfig.rootCerts);
+    }
+    if (Array.isArray(mspConfig.intermediateCerts)) {
+        for (let i = 0; i < mspConfig.intermediateCerts.length; i++) {
+            certs.push(mspConfig.intermediateCerts[i]);
+        }
+    } else if (mspConfig.intermediateCerts.length !== 0) {
+        certs.push(mspConfig.intermediateCerts);
+    }
+    let membershipUnit: {[key:string]: object} = {};
+    membershipUnit[mspId] = {
+        type: "certificate",
+        value: "",
+        chain: certs,
+    };
+    return membershipUnit;
+}
+
+async function getMSPConfiguration(
+    walletPath: string,
+    connectionProfilePath: string,
+    configFilePath: string,
+    channelId: string,
+): Promise<any> {
+    console.log('Running invocation on Fabric channel and chaincode');
+    try {
+        const gateway = await getNetworkGateway(walletPath, connectionProfilePath, configFilePath);
+        if (!gateway) {
+            throw new Error('Unable to connect to the ledger!');
+        }
+        const network = await gateway.getNetwork(channelId);
+        const config = JSON.parse(fs.readFileSync(configFilePath, 'utf8').toString());
+        const membership = getMembershipUnit(network.getChannel(), config.mspId);
+        // Disconnect from the gateway.
+        gateway.disconnect();
+        return membership;
+    } catch (error) {
+        console.error(`Failed to submit transaction: ${error}`);
+        throw error;
+    }
+}
+
+async function getAllMSPConfigurations(
+    walletPath: string,
+    connectionProfilePath: string,
+    configFilePath: string,
+    channelId: string,
+): Promise<any> {
+    console.log('Running invocation on Fabric channel and chaincode');
+    try {
+        const gateway = await getNetworkGateway(walletPath, connectionProfilePath, configFilePath);
+        if (!gateway) {
+            throw new Error('Unable to connect to the ledger!');
+        }
+        const network = await gateway.getNetwork(channelId);
+        const config = JSON.parse(fs.readFileSync(configFilePath, 'utf8').toString());
+        const mspIds = network.getChannel().getMspids();
+        let memberships: {[key:string]: object} = {};
+        for (let i = 0 ; i < mspIds.length ; i++) {
+            if (!config.ordererMspIds.includes(mspIds[i])) {
+                const membership = getMembershipUnit(network.getChannel(), config.mspId);
+                memberships[mspIds[i]] = membership[mspIds[i]];
+            }
+        }
+        // Disconnect from the gateway.
+        gateway.disconnect();
+        return memberships;
+    } catch (error) {
+        console.error(`Failed to submit transaction: ${error}`);
+        throw error;
+    }
+}
+
 async function invokeFabricChaincode(
     walletPath: string,
     connectionProfilePath: string,
@@ -114,4 +196,4 @@ async function queryFabricChaincode(
     }
 }
 
-export { getNetworkGateway, getNetworkContract, invokeFabricChaincode, queryFabricChaincode };
+export { getNetworkGateway, getNetworkContract, getMSPConfiguration, getAllMSPConfigurations, invokeFabricChaincode, queryFabricChaincode };

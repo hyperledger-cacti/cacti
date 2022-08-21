@@ -10,5 +10,6 @@
         "attrs": [{ "name": "iin-agent", "value": "true", "ecert": true }]
     },
     "mspId":"Org1MSP",
+    "ordererMspIds": ["OrdererMSP"],
     "caUrl":""
 }

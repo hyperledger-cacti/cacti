@@ -7,7 +7,7 @@
 import { Contract } from 'fabric-network';
 import { LedgerBase } from '../common/ledgerBase';
 import { walletSetup } from './walletUtils';
-import { invokeFabricChaincode, queryFabricChaincode } from './networkUtils';
+import { getAllMSPConfigurations, invokeFabricChaincode, queryFabricChaincode } from './networkUtils';
 import * as path from 'path';
 import * as fs from 'fs';
 
@@ -35,6 +35,16 @@ export class FabricConnector extends LedgerBase {
         walletSetup(this.walletPath, this.connectionProfilePath, this.configFilePath, this.networkId);
     }
 
+    // Collect security domain membership info
+    async getSecurityDomainMembership(): Promise<object> {
+        const memberships = getAllMSPConfigurations(this.walletPath, this.connectionProfilePath, this.configFilePath, this.ledgerId);
+        const securityDomainInfo = {
+            securityDomain: this.networkId,
+            members: memberships,
+        }
+        return securityDomainInfo;
+    }
+
     // Invoke a contract to drive a transaction
     // TODO: Add parameters corresponding to the output of a flow among IIN agents
     async invokeContract() {
@@ -42,7 +52,7 @@ export class FabricConnector extends LedgerBase {
     }
 
     // Query a contract to fetch information from the ledger
-    async queryContract() {
+    async queryContract(): Promise<string> {
         const result = await queryFabricChaincode(this.walletPath, this.connectionProfilePath, this.configFilePath, this.ledgerId, this.contractId, "", []);
         return result;
     }
