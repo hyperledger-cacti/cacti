@@ -248,7 +248,7 @@ func verifyCordaNotarization(s *SmartContract, ctx contractapi.TransactionContex
 		}
 		signerList = append(signerList, value.Id)
 		// 4. Check the certificates are valid according to the Membership.
-		err = verifyMemberInSecurityDomain(s, ctx, x509Cert, securityDomain, value.Id)
+		err = verifyMemberInSecurityDomain(s, ctx, value.Certificate, securityDomain, value.Id)
 		if err != nil {
 			return fmt.Errorf("Verify membership failed. Certificate not valid: %s", err.Error())
 		}
@@ -312,7 +312,7 @@ func verifyFabricNotarization(s *SmartContract, ctx contractapi.TransactionConte
 		}
 		org := serialisedIdentity.Mspid
 		// 4. Check each of the endorser certificates matches the member's entry in the network's Membership.
-		err = verifyMemberInSecurityDomain(s, ctx, x509Cert, securityDomain, org)
+		err = verifyMemberInSecurityDomain(s, ctx, string(serialisedIdentity.IdBytes), securityDomain, org)
 		if err != nil {
 			return fmt.Errorf("Verify membership failed. Certificate not valid: %s", err.Error())
 		}

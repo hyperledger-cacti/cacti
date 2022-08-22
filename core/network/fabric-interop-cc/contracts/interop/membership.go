@@ -9,21 +9,37 @@
 package main
 
 import (
-	"crypto/x509"
 	"encoding/json"
 	"fmt"
 
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
 )
 
 const membershipObjectType = "membership"
 
+func validateMemberCertChains(members map[string]*common.Member, securityDomain string) error {
+	for member, creds := range members {
+		if len(creds.Chain) > 1 {
+			err := verifyCertificateChain(nil, creds.Chain)
+			if err != nil {
+				return fmt.Errorf("Certificate chain corresponding to member %s in security domain %s is invalid: %s", member, securityDomain, err)
+			}
+		}
+	}
+	return nil
+}
+
 // CreateMembership cc is used to store a Membership in the ledger
-// TODO: Should we check here if certificates are valid
 func (s *SmartContract) CreateMembership(ctx contractapi.TransactionContextInterface, membershipJSON string) error {
 	membership, err := decodeMembership([]byte(membershipJSON))
 	if err != nil {
 		return fmt.Errorf("Unmarshal error: %s", err)
+	}
+	// Check if certificates chains in this membership record are valid
+	err = validateMemberCertChains(membership.Members, membership.SecurityDomain)
+	if err != nil {
+		return err
 	}
 	membershipKey, err := ctx.GetStub().CreateCompositeKey(membershipObjectType, []string{membership.SecurityDomain})
 	acp, getErr := ctx.GetStub().GetState(membershipKey)
@@ -46,6 +62,11 @@ func (s *SmartContract) UpdateMembership(ctx contractapi.TransactionContextInter
 	membership, err := decodeMembership([]byte(membershipJSON))
 	if err != nil {
 		return fmt.Errorf("Unmarshal error: %s", err)
+	}
+	// Check if certificates chains in this membership record are valid
+	err = validateMemberCertChains(membership.Members, membership.SecurityDomain)
+	if err != nil {
+		return err
 	}
 	membershipKey, err := ctx.GetStub().CreateCompositeKey(membershipObjectType, []string{membership.SecurityDomain})
 	_, getErr := s.GetMembershipBySecurityDomain(ctx, membership.SecurityDomain)
@@ -96,8 +117,12 @@ func (s *SmartContract) GetMembershipBySecurityDomain(ctx contractapi.Transactio
 
 // verifyMemberInSecurityDomain function verifies the identity of the requester according to
 // the Membership for the external network the request originated from.
-func verifyMemberInSecurityDomain(s *SmartContract, ctx contractapi.TransactionContextInterface, cert *x509.Certificate, securityDomain string, requestingOrg string) error {
-	err := isCertificateWithinExpiry(cert)
+func verifyMemberInSecurityDomain(s *SmartContract, ctx contractapi.TransactionContextInterface, certPEM string, securityDomain string, requestingOrg string) error {
+	cert, err := parseCert(certPEM)
+	if err != nil {
+		return fmt.Errorf("Unable to parse certificate: %s", err.Error())
+	}
+	err = isCertificateWithinExpiry(cert)
 	if err != nil {
 		return err
 	}
@@ -115,10 +140,11 @@ func verifyMemberInSecurityDomain(s *SmartContract, ctx contractapi.TransactionC
 	}
 	switch member.Type {
 	case "ca":
-		// TODO: Add check for if cert and member.Value are the same verifyCaCertificate(cert, member.Value, true)
-		err := verifyCaCertificate(cert, member.Value)
-		if err != nil {
-			return err
+		if certPEM != member.Value {	// The CA is automatically a member of the security domain
+			err := verifyCaCertificate(cert, member.Value)
+			if err != nil {
+				return err
+			}
 		}
 	case "certificate":
 		chain := member.Chain

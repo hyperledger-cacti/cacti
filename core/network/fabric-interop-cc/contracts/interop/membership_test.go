@@ -136,6 +136,7 @@ func TestVerifyMembership(t *testing.T) {
 	// convert pem cert to x509 cert
 	x509Cert, err := parseCert(string(pemCert))
 	require.NoError(t, err)
+	require.NotNil(t, x509Cert)
 
 	// make membership
 	var member = common.Member{
@@ -155,11 +156,11 @@ func TestVerifyMembership(t *testing.T) {
 
 	// Test: Happy case
 	chaincodeStub.GetStateReturns(membershipBytes, nil)
-	err = verifyMemberInSecurityDomain(&interopcc, ctx, x509Cert, "test", "member1")
+	err = verifyMemberInSecurityDomain(&interopcc, ctx, string(pemCert), "test", "member1")
 	require.NoError(t, err)
 
 	// Test: Unknown requesting Org
-	err = verifyMemberInSecurityDomain(&interopcc, ctx, x509Cert, "test", "unknown_member")
+	err = verifyMemberInSecurityDomain(&interopcc, ctx, string(pemCert), "test", "unknown_member")
 	require.EqualError(t, err, "Member does not exist for org: unknown_member")
 
 	// Test: Unknown cert type
@@ -167,6 +168,6 @@ func TestVerifyMembership(t *testing.T) {
 	membershipBytes, err = json.Marshal(&membershipAsset)
 	require.NoError(t, err)
 	chaincodeStub.GetStateReturns(membershipBytes, nil)
-	err = verifyMemberInSecurityDomain(&interopcc, ctx, x509Cert, "test", "member1")
+	err = verifyMemberInSecurityDomain(&interopcc, ctx, string(pemCert), "test", "member1")
 	require.EqualError(t, err, "Certificate type not supported: unknown")
 }

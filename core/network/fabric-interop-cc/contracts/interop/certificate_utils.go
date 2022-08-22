@@ -112,7 +112,7 @@ func verifyCertificateChain(cert *x509.Certificate, certPEMs []string) error {
 				errMsg := fmt.Sprintf("Certificate link for Subject %s with Parent Subject %s invalid", caCert.Subject.String(), parentCert.Subject.String())
 				return errors.New(errMsg)
 			}
-			if i == len(certPEMs)-1 {
+			if i == len(certPEMs)-1 && cert != nil {
 				err := validateCertificateUsingCA(cert, caCert, i == 1)
 				if err != nil {
 					return errors.New("Certificate link invalid for endorser")
