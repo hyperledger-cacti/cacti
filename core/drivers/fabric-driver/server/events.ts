@@ -270,7 +270,7 @@ function filterEventMatcher(keySerialized: string, eventMatcher: eventsPb.EventM
     if ((eventMatcher.getEventClassId() == '*' || eventMatcher.getEventClassId() == item.getEventClassId()) &&
         (eventMatcher.getTransactionContractId() == '*' || eventMatcher.getTransactionContractId() == item.getTransactionContractId()) &&
         (eventMatcher.getTransactionLedgerId() == '*' || eventMatcher.getTransactionLedgerId() == item.getTransactionLedgerId()) &&
-        (eventMatcher.getTransactionFunc() == '*' || eventMatcher.getTransactionFunc() == item.getTransactionFunc())) {
+        (eventMatcher.getTransactionFunc() == '*' || eventMatcher.getTransactionFunc() == item.getTransactionFunc().toLowerCase())) {
 
         return true;
     } else {

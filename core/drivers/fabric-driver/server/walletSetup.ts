@@ -113,7 +113,7 @@ const walletSetup = async (walletPath: string, conn_profile_path: string, networ
 
 const getDriverKeyCert = async (): Promise<any> => {
 
-    const walletPath = path.join(process.cwd(), `wallet-${process.env.NETWORK_NAME ? process.env.NETWORK_NAME : 'network1'}`);
+    const walletPath = process.env.WALLET_PATH ? process.env.WALLET_PATH : path.join(process.cwd(), `wallet-${process.env.NETWORK_NAME ? process.env.NETWORK_NAME : 'network1'}`);
     const config = getConfig();
     const wallet = await Wallets.newFileSystemWallet(walletPath);
     console.log(`Wallet path: ${walletPath}`);

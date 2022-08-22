@@ -5,7 +5,7 @@
  */
 
 import * as fabproto6 from 'fabric-protos';
-import { Gateway, Network, Contract, BlockListener, ContractListener } from 'fabric-network';
+import { Gateway, Network, Contract, ContractEvent, BlockListener, ContractListener, BlockEvent } from 'fabric-network';
 import query_pb from '@hyperledger-labs/weaver-protos-js/common/query_pb';
 import events_pb from '@hyperledger-labs/weaver-protos-js/common/events_pb';
 import { lookupEventSubscriptions } from './events';
@@ -33,7 +33,7 @@ const initBlockEventListenerForChannel = async (
     networkName: string,
     channelId: string,
 ): Promise<any> => {
-    const listener: BlockListener = async (event) => {
+    const listener: BlockListener = async (event: BlockEvent) => {
         // Parse the block data; typically there is only one element in this array but we will interate over it just to be safe
         const blockData = ((event.blockData as fabproto6.common.Block).data as fabproto6.common.BlockData).data;
         blockData.forEach((item) => {
@@ -45,6 +45,10 @@ const initBlockEventListenerForChannel = async (
                 // Get transaction chaincode ID
                 const chaincodeId = transaction.payload.chaincode_proposal_payload.input.chaincode_spec.chaincode_id.name;
                 if (transaction.payload.chaincode_proposal_payload.input.chaincode_spec.input.args.length > 0) {
+                    // below way of fetching payload requires that the response has been set by the chaincode function via return value
+                    const responsePayload = transaction.payload.action.proposal_response_payload.extension.response.payload;
+                    // below way of fetching payload is similar to ContractEventListener in which we fetch event.payload
+                    // const responsePayload = transaction.payload.action.proposal_response_payload.extension.events.payload;
                     // Get transaction function name: first argument according to convention
                     const chaincodeFunc = transaction.payload.chaincode_proposal_payload.input.chaincode_spec.input.args[0].toString();
                     console.log('Trying to find match for channel', channelId, 'chaincode', chaincodeId, 'function', chaincodeFunc);
@@ -70,12 +74,14 @@ const initBlockEventListenerForChannel = async (
                     }
                     // Iterate through the view requests in the matching event subscriptions
                     eventSubscriptionQueries.forEach(async (eventSubscriptionQuery: query_pb.Query) => {
-                        console.log('Generating view and collecting proof for channel', channelId, 'chaincode', chaincodeId, 'function', chaincodeFunc);
+                        console.log('Generating view and collecting proof for channel', channelId, 'chaincode', chaincodeId, 'function', chaincodeFunc, 'responsePayload', responsePayload.toString());
                         // Trigger proof collection
                         const [result, invokeError] = await handlePromise(
                             invoke(
                                 eventSubscriptionQuery,
                                 networkName,
+                                'HandleEventRequest',
+                                responsePayload
                             ),
                         );
                         if (!invokeError) {
@@ -107,7 +113,7 @@ const initContractEventListener = (
     channelId: string,
     chaincodeId: string,
 ): any => {
-    const listener: ContractListener = async (event) => {
+    const listener: ContractListener = async (event: ContractEvent) => {
         console.log('Trying to find match for channel', channelId, 'chaincode', chaincodeId, 'event class', event.eventName);
         // Find all matching event subscriptions stored in the database
         let eventMatcher = new events_pb.EventMatcher();
@@ -131,12 +137,14 @@ const initContractEventListener = (
         }
         // Iterate through the view requests in the matching event subscriptions
         eventSubscriptionQueries.forEach(async (eventSubscriptionQuery: query_pb.Query) => {
-            console.log('Generating view and collecting proof for event class', event.eventName, 'channel', channelId, 'chaincode', chaincodeId);
+            console.log('Generating view and collecting proof for event class', event.eventName, 'channel', channelId, 'chaincode', chaincodeId, 'event.payload', event.payload.toString());
             // Trigger proof collection
             const [result, invokeError] = await handlePromise(
                 invoke(
                     eventSubscriptionQuery,
                     networkName,
+                    'HandleEventRequest',
+                    event.payload
                 ),
             );
             if (!invokeError) {
