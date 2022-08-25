@@ -9,7 +9,7 @@
       "extensions/cactus-*"
     ],
     "nohoist": [
-      "**/iroha-helpers-ts"
+      "**/iroha-helpers"
     ]
   },
   "scripts": {
