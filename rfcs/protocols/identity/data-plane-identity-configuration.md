@@ -20,7 +20,7 @@ The Security Domain DID of a foreign security domain contains `relayEndpoints` a
 
 Consider two security domains governing ledgers `Ledger A` and Ledger B` respectively. The first has two IIN Agents `A1` and `A2` representing two organizational units that are members of its security domain. The second has agents `B1` and `B2`. The security domain governing `Ledger A` is trying to sync the latest identity and membership info of the security domain governing `Ledger B`. Without loss of generality, we can pick `A2` as the initiator of the cross-network identity plane protocol that results in `Ledger B`'s security domain membership and relay endpoints info getting recorded in `Ledger A`. The protocol is illustrated in the figure below. (_Note_: this represents the "happy path". We will add more diagrams subsequently illustrating failures and race conditions.)
 
-<img src="../../resources/images/identity-sync.png" width=60%>
+<img src="../../resources/images/identity-sync.png" width=100%>
 
 The first phase in the above diagram, involving [registration](./identity-syncing.md), [discovery](../discovery/discovery.md), and [validation])(./network-identity-validation.md) are covered in other specifications. In this draft, we only specify the bilateral protocol occurring between sets of IIN Agents representing two independent security domains' members.
 

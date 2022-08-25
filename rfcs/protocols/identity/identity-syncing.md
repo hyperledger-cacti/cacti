@@ -309,7 +309,7 @@ The IIN registry authenticates a Network DID updation request based on two condi
 
 The security domain validation and membership syncing protocols must be re-run every time there is a change in a security domain's identity (DID document) or in its membership configuration. The flow diagram below illustrates the complete process from the time a change occurs in one network up to the point where its updated identity and membership info is reflected in another network's ledger as a prerequisite for data plane interoperation. Each step in this diagram represents a separate protocol: (1) is described in this document above, (2) is described in the [security domain identity validation specification](./network-identity-validation.md), and (3) in the [membership syncing specification](./data-plane-identity-configuration.md).
 
-<img src="../../resources/images/protocol-identity-overview.jpg" width=60%>
+<img src="../../resources/images/protocol-identity-overview.jpg" width=100%>
 
 The trigger for Step 2 can be any of the following:
 * Manual trigger applied by a network administrator
