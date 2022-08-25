@@ -51,7 +51,9 @@ async function subscribeEventHelper(
                     const errorString: string = `${JSON.stringify(err)}`;
                     console.error(errorString);
                 }
-                ack_send.setMessage('Event subscription error: listener registration failed');
+                const errorString2 = JSON.stringify(error);
+                console.error(errorString2);
+                ack_send.setMessage(`Event subscription error: listener registration failed with error: ${errorString2}`);
                 ack_send.setStatus(ack_pb.Ack.STATUS.ERROR);
             } else {
                 ack_send.setMessage('Event subscription is successful!');

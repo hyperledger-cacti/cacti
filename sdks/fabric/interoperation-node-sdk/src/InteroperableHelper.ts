@@ -365,6 +365,18 @@ const verifyView = async (contract: Contract, base64ViewProto: string, address: 
 };
 
 /**
+ * Verifies a view's contents and extracts confidential payload by using chaincode function in interop chaincode. Verification is based on verification policy of the network, proof type and protocol type.
+ **/
+const parseAndValidateView = async (contract: Contract, address: string, base64ViewProto: string, b64ViewContent: string): Promise<Buffer> => {
+    try {
+        const viewPayload = await contract.evaluateTransaction("ParseAndValidateView", address, base64ViewProto, b64ViewContent);
+        return viewPayload;
+    } catch (e) {
+        throw new Error(`Unable to parse and validate view: ${e}`);
+    }
+};
+
+/**
  * Creates an address string based on a query object, networkid and remote url.
  **/
 const createAddress = (query: Query, networkID, remoteURL) => {
@@ -652,6 +664,7 @@ export {
     getKeyAndCertForRemoteRequestbyUserName,
     getPolicyCriteriaForAddress,
     verifyView,
+    parseAndValidateView,
     decryptRemoteChaincodeOutput,
     decryptRemoteProposalResponse,
     verifyRemoteProposalResponse,
