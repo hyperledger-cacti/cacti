@@ -16,9 +16,6 @@ service IINAgent {
   rpc RequestIdentityConfiguration(NetworkUnitIdentity) returns (common.ack.Ack){}
   // Handling network unit's state sent by a foreign IIN agent.
   rpc SendIdentityConfiguration(AttestedMembership) returns (common.ack.Ack){}
-  // user or agent triggers a flow to collect signatures attesting an
-  // external/foreign network unit's state and recording to ledger
-  rpc FlowAndRecordAttestations(NetworkUnitIdentity) returns (common.ack.Ack) {}
   // Requesting attestation from a local IIN agent.
   rpc RequestAttestation(AttestedSecurityDomain) returns (common.ack.Ack){}
   // Handling attestation sent by a local IIN agent.

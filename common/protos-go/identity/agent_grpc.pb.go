@@ -25,9 +25,6 @@ type IINAgentClient interface {
 	RequestIdentityConfiguration(ctx context.Context, in *NetworkUnitIdentity, opts ...grpc.CallOption) (*common.Ack, error)
 	// Handling network unit's state sent by a foreign IIN agent.
 	SendIdentityConfiguration(ctx context.Context, in *AttestedMembership, opts ...grpc.CallOption) (*common.Ack, error)
-	// user or agent triggers a flow to collect signatures attesting an
-	// external/foreign network unit's state and recording to ledger
-	FlowAndRecordAttestations(ctx context.Context, in *NetworkUnitIdentity, opts ...grpc.CallOption) (*common.Ack, error)
 	// Requesting attestation from a local IIN agent.
 	RequestAttestation(ctx context.Context, in *AttestedSecurityDomain, opts ...grpc.CallOption) (*common.Ack, error)
 	// Handling attestation sent by a local IIN agent.
@@ -69,15 +66,6 @@ func (c *iINAgentClient) SendIdentityConfiguration(ctx context.Context, in *Atte
 	return out, nil
 }
 
-func (c *iINAgentClient) FlowAndRecordAttestations(ctx context.Context, in *NetworkUnitIdentity, opts ...grpc.CallOption) (*common.Ack, error) {
-	out := new(common.Ack)
-	err := c.cc.Invoke(ctx, "/identity.agent.IINAgent/FlowAndRecordAttestations", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *iINAgentClient) RequestAttestation(ctx context.Context, in *AttestedSecurityDomain, opts ...grpc.CallOption) (*common.Ack, error) {
 	out := new(common.Ack)
 	err := c.cc.Invoke(ctx, "/identity.agent.IINAgent/RequestAttestation", in, out, opts...)
@@ -106,9 +94,6 @@ type IINAgentServer interface {
 	RequestIdentityConfiguration(context.Context, *NetworkUnitIdentity) (*common.Ack, error)
 	// Handling network unit's state sent by a foreign IIN agent.
 	SendIdentityConfiguration(context.Context, *AttestedMembership) (*common.Ack, error)
-	// user or agent triggers a flow to collect signatures attesting an
-	// external/foreign network unit's state and recording to ledger
-	FlowAndRecordAttestations(context.Context, *NetworkUnitIdentity) (*common.Ack, error)
 	// Requesting attestation from a local IIN agent.
 	RequestAttestation(context.Context, *AttestedSecurityDomain) (*common.Ack, error)
 	// Handling attestation sent by a local IIN agent.
@@ -128,9 +113,6 @@ func (UnimplementedIINAgentServer) RequestIdentityConfiguration(context.Context,
 }
 func (UnimplementedIINAgentServer) SendIdentityConfiguration(context.Context, *AttestedMembership) (*common.Ack, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendIdentityConfiguration not implemented")
-}
-func (UnimplementedIINAgentServer) FlowAndRecordAttestations(context.Context, *NetworkUnitIdentity) (*common.Ack, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method FlowAndRecordAttestations not implemented")
 }
 func (UnimplementedIINAgentServer) RequestAttestation(context.Context, *AttestedSecurityDomain) (*common.Ack, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RequestAttestation not implemented")
@@ -205,24 +187,6 @@ func _IINAgent_SendIdentityConfiguration_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
-func _IINAgent_FlowAndRecordAttestations_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(NetworkUnitIdentity)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(IINAgentServer).FlowAndRecordAttestations(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/identity.agent.IINAgent/FlowAndRecordAttestations",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IINAgentServer).FlowAndRecordAttestations(ctx, req.(*NetworkUnitIdentity))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _IINAgent_RequestAttestation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AttestedSecurityDomain)
 	if err := dec(in); err != nil {
@@ -277,10 +241,6 @@ var IINAgent_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SendIdentityConfiguration",
 			Handler:    _IINAgent_SendIdentityConfiguration_Handler,
-		},
-		{
-			MethodName: "FlowAndRecordAttestations",
-			Handler:    _IINAgent_FlowAndRecordAttestations_Handler,
 		},
 		{
 			MethodName: "RequestAttestation",

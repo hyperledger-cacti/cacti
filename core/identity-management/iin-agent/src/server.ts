@@ -13,7 +13,7 @@ import 'dotenv/config';
 import { Certificate } from '@fidm/x509';
 import * as path from 'path';
 import { syncExternalStateFromIINAgent, requestIdentityConfiguration, sendIdentityConfiguration } from './protocols/externalOperations';
-import { flowAndRecordAttestationsOnLedger, requestAttestation, sendAttestation } from './protocols/localOperations';
+import { requestAttestation, sendAttestation } from './protocols/localOperations';
 
 
 const iinAgentServer = new Server();
@@ -68,27 +68,6 @@ iinAgentServer.addService(iin_agent_pb_grpc.IINAgentService, {
         const ack_response = new ack_pb.Ack();
         try {
             sendIdentityConfiguration(call.request);
-            ack_response.setMessage('');
-            ack_response.setStatus(ack_pb.Ack.STATUS.OK);
-            ack_response.setRequestId('');
-            // gRPC response.
-            console.log('Responding to caller');
-            callback(null, ack_response);
-        } catch (e) {
-            console.log(e);
-            ack_response.setMessage(`Error: ${e}`);
-            ack_response.setStatus(ack_pb.Ack.STATUS.ERROR);
-            ack_response.setRequestId('');
-            // gRPC response.
-            console.log('Responding to caller');
-            callback(null, ack_response);
-        }
-    },
-    // Service for starting a flow among local IIN agents to collect attestations on a foreign network unit's state. Will communicate with the user/agent triggering this process and respond with an ack to the caller while the flow is occurring.
-    flowAndRecordAttestations: (call: { request: iin_agent_pb.NetworkUnitIdentity }, callback: (_: any, object: ack_pb.Ack) => void) => {
-        const ack_response = new ack_pb.Ack();
-        try {
-            flowAndRecordAttestationsOnLedger(call.request);
             ack_response.setMessage('');
             ack_response.setStatus(ack_pb.Ack.STATUS.OK);
             ack_response.setRequestId('');

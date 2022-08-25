@@ -8,7 +8,7 @@
 - RFC: 01-011
 - Authors: Venkatraman Ramakrishna, Krishnasuri Narayanam, Bishakh Chandra Ghosh, Ermyas Abebe
 - Status: Proposed
-- Since: 24-Sep-2021
+- Since: 25-Aug-2022
 
 
 # Overview
@@ -71,9 +71,6 @@ The below figure (Fig. 3) illustrates our identity plane architecture:
 
 _Some Notes on IINs (Pertaining to the Design Choices Described Earlier)_:
 
-
-
-
 * _The term 'Interoperation Identity Network' is a placeholder to describe a unit of our proposed architecture, and is subject to change in the future. A term that may replace it is 'Distributed Identity Registry', which captures both the role and the nature of this entity, and which practitioners may already be familiar with_.
 * _An IIN is not a new concept or system we are inventing for interoperation purposes but is rather an extrapolation of the concept of a DID registry, many varieties of which exist today, to a distributed system that may maintain DID records through consensus among a committee on a shared ledger rather than maintain them in a centralized repository_.
 * _An IIN brings within its purview both a DID registry maintained as a shared ledger as well as well-known issuers of DIDs and verifiable credentials (VCs) who collectively maintain that ledger. In the real-world, registries as well as issuers already exist, though not necessarily part of a single network. The design and protocol we describe can accommodate existing DID registries and VC issuers, even though they be independent (and centralized) entities, but in our discussion we will assume, without loss of generality, that they belong to one or the other network (labeled as an IIN). Our mechanisms rely on the ability to negotiate with issuers and read/write to DID registries; neither function is constrained by the nature of the issuers or the registries_.
@@ -113,22 +110,22 @@ See specification for IINs [here](./iin.md).
 ## Forms of Identity
 
 Our framework consists of both hierarchical and decentralized identities. Decentralized identities belong to constituent units of participating DLT networks, each of whom is assumed to be an independent actor with an identity that is may not owe its existence to the network in question. Yet, for interoperation purposes, that decentralized identity will be associated with the corresponding network's identity, as will the identities of all the other units of that network. Below are the different identities that will be maintained and used in identity plane protocols:
-* _Participant Unit Identity_: In a participating DLT network, each participant entity (individual/organization) of that network will have its independent identity. This identity is also a decentralized identity in the form of a DID, registered in an IIN DID registry.
-* _Network Identity_: The identity of a network in the form of a DID, registered in an IIN. This identity is controlled by the participants of the network.
-* _Trust Anchors_: Trust anchors are well known identities of units that  issue VCs to attest the real identity of both Participant Unit Identities and Network Identities.
-* _Data Plane Participant Identity_: In the data plane, DLT network participants may use different identities according to the DLT platform in use. Such identities are not a requirement in the identity plane. But participant units use _Participant Unit Identity_ of the identity plane to self attest their _Data Plane Participant Identity_.
+* _Organizational Unit Identity_: Each member (individual/organization) of a DLT network will have a real world identity independent of its affiliation with that network. This identity is also a decentralized identity (DID), registered in an IIN DID registry.
+* _Security Domain Identity_: The identity of a network, which is also a [security domain](../security/security-domains.md), in the form of a DID, registered in an IIN. This identity is controlled collectively by the members of the network.
+* _Trust Anchors_: Trust anchors are identities of well-known entities that issue VCs to attest the real world identities of both Organizational Units and Security Domains.
+* _Security Domain Member Identity_: In the data plane, network members may use different identities scoped within their security domain as necessitated by the DLT platform on which the network is built. Such identities are not a requirement in the identity plane. But a member uses its _Organizational Unit Identity_ (in the identity plane) to self attest its _Security Domain Member Identity_.
 
-The the data format specifications [here](../../formats/identity.md). 
+See the [data format specifications](../../network/identity.md) for more details.
 
 
+## Security Domain Identity Creation, Exchange and Validation
 
-## Network Identity Creation, Exchange and Validation
+DLT networks and their members must create and configure their respective identities in the identity plane. See the protocols for [cross-network identity exchange and validation](../../protocols/identity/readme.md) for more details.
 
-The DLT networks and its participant units must create and configure their identities in the identity plane. During interoperation, two different networks have to exchange their identity information and validate them. These are carried out with through the protocols specified [here](../../protocols/identity/readme.md).
 
-## Network Identity Discovery
+## Security Domain Identity Discovery
 
-To allow seamless interoperation across two different DLT networks, the identity of the counterparty networks have to be configured. But, even before that, some means of discovering the networks is required through which any identity protocol can start. Discovery of networks in the identity plane is facilitated by discovery of the Network Identities, which are represented as Network DIDs and registered in the IINs. Each Network thus has a unique Network DID which can be considered equivalent to a domain name in Internet parlance. Thus Network DID facilitates discovery of networks with the help of the IIN infrastructure.
+For two different DLT networks to interoperate seamlessly, a network must fetch, validate, and record its counterparty network's members' identities on its ledger. But discovering the counterparty network and obtaining its security domain identity is a prerequisite for any identity plane protocol in which members' identities can be synced. IIN infrastructure facilitates such discovery by allowing networks to register and record their security domain identities in the forms of Network DIDs. We will assume that each network will have a unique Network DID, analogous to a domain name in the Internet.
 
-The network discovery protocols specifications are elaborated [here](../../protocols/discovery/readme.md).
+See the [network discovery protocols specifications](../../protocols/discovery/discovery.md) for more details.
 
