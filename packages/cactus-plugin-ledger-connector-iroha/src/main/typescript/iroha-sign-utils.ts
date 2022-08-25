@@ -5,8 +5,8 @@
  * Signing utility functions for HL Iroha ledger.
  */
 
-import txHelper from "iroha-helpers-ts/lib/txHelper";
-import { Transaction } from "iroha-helpers-ts/lib/proto/transaction_pb";
+import { txHelper } from "iroha-helpers";
+import { Transaction } from "iroha-helpers/lib/proto/transaction_pb";
 
 /**
  * Sign transaction binary received from `generateTransactionV1()` call.

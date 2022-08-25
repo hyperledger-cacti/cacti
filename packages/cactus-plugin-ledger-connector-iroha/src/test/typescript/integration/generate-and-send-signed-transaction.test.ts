@@ -43,7 +43,7 @@ import { v4 as uuidv4 } from "uuid";
 import { v4 as internalIpV4 } from "internal-ip";
 import "jest-extended";
 
-import cryptoHelper from "iroha-helpers-ts/lib/cryptoHelper";
+import cryptoHelper from "iroha-helpers/lib/cryptoHelper";
 
 import {
   PluginLedgerConnectorIroha,
@@ -258,7 +258,7 @@ describe("Generate and send signed transaction tests", () => {
     expect(createAccResponse).toBeTruthy();
     expect(createAccResponse.data).toBeTruthy();
     expect(createAccResponse.status).toEqual(200);
-    expect(createAccResponse.data.transactionReceipt.status).toEqual(
+    expect(createAccResponse.data.transactionReceipt.status[0]).toEqual(
       "COMMITTED",
     );
 
@@ -331,7 +331,7 @@ describe("Generate and send signed transaction tests", () => {
     expect(sendTransactionResponse.data).toBeTruthy();
     expect(sendTransactionResponse.data.transactionReceipt).toBeTruthy();
     expect(sendTransactionResponse.data.transactionReceipt.txHash).toBeTruthy();
-    expect(sendTransactionResponse.data.transactionReceipt.status).toEqual(
+    expect(sendTransactionResponse.data.transactionReceipt.status[0]).toEqual(
       "COMMITTED",
     );
 

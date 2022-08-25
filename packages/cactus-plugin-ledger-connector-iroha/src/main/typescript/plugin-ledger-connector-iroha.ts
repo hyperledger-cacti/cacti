@@ -1,15 +1,15 @@
 import * as grpc from "grpc";
-import { CommandService_v1Client as CommandService } from "iroha-helpers-ts/lib/proto/endpoint_grpc_pb";
-import { QueryService_v1Client as QueryService } from "iroha-helpers-ts/lib/proto/endpoint_grpc_pb";
-import { Transaction } from "iroha-helpers-ts/lib/proto/transaction_pb";
-import commands from "iroha-helpers-ts/lib/commands/index";
-import queries from "iroha-helpers-ts/lib/queries";
-import { TxBuilder } from "iroha-helpers-ts/lib/chain";
+import { CommandService_v1Client as CommandService } from "iroha-helpers/lib/proto/endpoint_grpc_pb";
+import { QueryService_v1Client as QueryService } from "iroha-helpers/lib/proto/endpoint_grpc_pb";
+import { Transaction } from "iroha-helpers/lib/proto/transaction_pb";
+import commands from "iroha-helpers/lib/commands/index";
+import queries from "iroha-helpers/lib/queries";
+import { TxBuilder } from "iroha-helpers/lib/chain";
 import type { Express } from "express";
 import {
   GrantablePermission,
   GrantablePermissionMap,
-} from "iroha-helpers-ts/lib/proto/primitive_pb";
+} from "iroha-helpers/lib/proto/primitive_pb";
 
 import OAS from "../json/openapi.json";
 
@@ -588,6 +588,7 @@ export class PluginLedgerConnectorIroha
               key: req.params[1],
               value: req.params[2],
               oldValue: req.params[3],
+              checkEmpty: req.params[4],
             };
           } else {
             params = req.params;
@@ -694,6 +695,14 @@ export class PluginLedgerConnectorIroha
             params = {
               pageSize: req.params[0],
               firstTxHash: req.params[1],
+              firstTxTime: req.params[2],
+              lastTxTime: req.params[3],
+              firstTxHeight: req.params[4],
+              lastTxHeight: req.params[5],
+              ordering: {
+                field: req.params[6],
+                direction: req.params[7],
+              },
             };
           } else {
             params = req.params;
@@ -715,6 +724,14 @@ export class PluginLedgerConnectorIroha
               accountId: req.params[0],
               pageSize: req.params[1],
               firstTxHash: req.params[2],
+              firstTxTime: req.params[3],
+              lastTxTime: req.params[4],
+              firstTxHeight: req.params[5],
+              lastTxHeight: req.params[6],
+              ordering: {
+                field: req.params[7],
+                direction: req.params[8],
+              },
             };
           } else {
             params = req.params;
@@ -737,6 +754,14 @@ export class PluginLedgerConnectorIroha
               assetId: req.params[1],
               pageSize: req.params[2],
               firstTxHash: req.params[3],
+              firstTxTime: req.params[4],
+              lastTxTime: req.params[5],
+              firstTxHeight: req.params[6],
+              lastTxHeight: req.params[7],
+              ordering: {
+                field: req.params[8],
+                direction: req.params[9],
+              },
             };
           } else {
             params = req.params;

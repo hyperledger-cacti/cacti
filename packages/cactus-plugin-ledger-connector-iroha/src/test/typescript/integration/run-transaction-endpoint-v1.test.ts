@@ -5,7 +5,6 @@ import { v4 as uuidv4 } from "uuid";
 import { v4 as internalIpV4 } from "internal-ip";
 import bodyParser from "body-parser";
 import express from "express";
-import { Timestamp } from "google-protobuf/google/protobuf/timestamp_pb";
 
 import {
   Containers,
@@ -35,7 +34,7 @@ import {
   IrohaQuery,
   KeyPair,
 } from "../../../main/typescript/generated/openapi/typescript-axios";
-import cryptoHelper from "iroha-helpers-ts/lib/cryptoHelper";
+import cryptoHelper from "iroha-helpers/lib/cryptoHelper";
 
 const testCase = "runs tx on an Iroha v1.2.0 ledger";
 const logLevel: LogLevelDesc = "INFO";
@@ -147,7 +146,7 @@ test(testCase, async (t: Test) => {
     t.ok(res);
     t.ok(res.data);
     t.equal(res.status, 200);
-    t.equal(res.data.transactionReceipt.status, "COMMITTED");
+    t.equal(res.data.transactionReceipt.status[0], "COMMITTED");
   }
 
   {
@@ -172,7 +171,7 @@ test(testCase, async (t: Test) => {
     t.ok(res);
     t.ok(res.data);
     t.equal(res.status, 200);
-    t.equal(res.data.transactionReceipt.status, "COMMITTED");
+    t.equal(res.data.transactionReceipt.status[0], "COMMITTED");
   }
 
   {
@@ -247,7 +246,7 @@ test(testCase, async (t: Test) => {
     t.ok(res);
     t.ok(res.data);
     t.equal(res.status, 200);
-    t.equal(res.data.transactionReceipt.status, "COMMITTED");
+    t.equal(res.data.transactionReceipt.status[0], "COMMITTED");
   }
 
   {
@@ -268,7 +267,7 @@ test(testCase, async (t: Test) => {
     t.ok(res);
     t.ok(res.data);
     t.equal(res.status, 200);
-    t.equal(res.data.transactionReceipt.status, "COMMITTED");
+    t.equal(res.data.transactionReceipt.status[0], "COMMITTED");
   }
 
   let asset = "coolcoin";
@@ -295,7 +294,7 @@ test(testCase, async (t: Test) => {
     t.ok(res);
     t.ok(res.data);
     t.equal(res.status, 200);
-    t.equal(res.data.transactionReceipt.status, "COMMITTED");
+    t.equal(res.data.transactionReceipt.status[0], "COMMITTED");
   }
 
   asset = "testcoin";
@@ -318,7 +317,7 @@ test(testCase, async (t: Test) => {
     t.ok(res);
     t.ok(res.data);
     t.equal(res.status, 200);
-    t.equal(res.data.transactionReceipt.status, "COMMITTED");
+    t.equal(res.data.transactionReceipt.status[0], "COMMITTED");
   }
 
   {
@@ -389,7 +388,7 @@ test(testCase, async (t: Test) => {
     t.ok(res);
     t.ok(res.data);
     t.equal(res.status, 200);
-    t.equal(res.data.transactionReceipt.status, "COMMITTED");
+    t.equal(res.data.transactionReceipt.status[0], "COMMITTED");
   }
 
   {
@@ -410,7 +409,7 @@ test(testCase, async (t: Test) => {
     t.ok(res);
     t.ok(res.data);
     t.equal(res.status, 200);
-    t.equal(res.data.transactionReceipt.status, "COMMITTED");
+    t.equal(res.data.transactionReceipt.status[0], "COMMITTED");
   }
 
   const txDescription = uuidv4().substring(0, 5) + Date.now();
@@ -432,8 +431,9 @@ test(testCase, async (t: Test) => {
     t.ok(res);
     t.ok(res.data);
     t.equal(res.status, 200);
-    t.equal(res.data.transactionReceipt.status, "COMMITTED");
-    firstTxHash = res.data.transactionReceipt.txHash;
+    t.equal(res.data.transactionReceipt.status[0], "COMMITTED");
+    console.log(res.data.transactionReceipt.txHash);
+    firstTxHash = res.data.transactionReceipt.txHash[0];
     console.log(firstTxHash);
   }
 
@@ -461,8 +461,8 @@ test(testCase, async (t: Test) => {
     t.ok(res);
     t.ok(res.data);
     t.equal(res.status, 200);
-    t.equal(res.data.transactionReceipt.status, "COMMITTED");
-    firstTxHash = res.data.transactionReceipt.txHash;
+    t.equal(res.data.transactionReceipt.status[0], "COMMITTED");
+    firstTxHash = res.data.transactionReceipt.txHash[0];
     console.log(firstTxHash);
   }
 
@@ -565,7 +565,7 @@ test(testCase, async (t: Test) => {
     t.ok(res);
     t.ok(res.data);
     t.equal(res.status, 200);
-    t.equal(res.data.transactionReceipt.status, "COMMITTED");
+    t.equal(res.data.transactionReceipt.status[0], "COMMITTED");
   }
 
   {
@@ -586,7 +586,7 @@ test(testCase, async (t: Test) => {
     t.ok(res);
     t.ok(res.data);
     t.equal(res.status, 200);
-    t.equal(res.data.transactionReceipt.status, "COMMITTED");
+    t.equal(res.data.transactionReceipt.status[0], "COMMITTED");
   }
 
   {
@@ -657,7 +657,7 @@ test(testCase, async (t: Test) => {
     t.ok(res);
     t.ok(res.data);
     t.equal(res.status, 200);
-    t.equal(res.data.transactionReceipt.status, "COMMITTED");
+    t.equal(res.data.transactionReceipt.status[0], "COMMITTED");
   }
 
   const testKeyPair: KeyPair = cryptoHelper.generateKeyPair();
@@ -680,7 +680,7 @@ test(testCase, async (t: Test) => {
     t.ok(res);
     t.ok(res.data);
     t.equal(res.status, 200);
-    t.equal(res.data.transactionReceipt.status, "COMMITTED");
+    t.equal(res.data.transactionReceipt.status[0], "COMMITTED");
   }
 
   {
@@ -746,7 +746,7 @@ test(testCase, async (t: Test) => {
     t.ok(res);
     t.ok(res.data);
     t.equal(res.status, 200);
-    t.equal(res.data.transactionReceipt.status, "COMMITTED");
+    t.equal(res.data.transactionReceipt.status[0], "COMMITTED");
   }
 
   {
@@ -767,7 +767,7 @@ test(testCase, async (t: Test) => {
     t.ok(res);
     t.ok(res.data);
     t.equal(res.status, 200);
-    t.equal(res.data.transactionReceipt.status, "COMMITTED");
+    t.equal(res.data.transactionReceipt.status[0], "COMMITTED");
   }
 
   {
@@ -942,7 +942,17 @@ test(testCase, async (t: Test) => {
         timeoutLimit: 5000,
         tls: false,
       },
-      params: [adminID, 100, firstTxHash],
+      params: [
+        adminID,
+        100,
+        firstTxHash,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+      ],
     };
     const res = await apiClient.runTransactionV1(req);
     t.ok(res);
@@ -971,51 +981,6 @@ test(testCase, async (t: Test) => {
   }
 
   {
-    const req = {
-      commandName: IrohaQuery.GetAccountTransactions,
-      baseConfig: {
-        irohaHost: irohaHost,
-        irohaPort: irohaPort,
-        creatorAccountId: adminID,
-        privKey: [adminPriv],
-        quorum: 1,
-        timeoutLimit: 5000,
-        tls: false,
-      },
-      params: { accountId: adminID, pageSize: 100, firstTxHash: firstTxHash },
-    };
-    const res = await apiClient.runTransactionV1(req);
-    t.ok(res);
-    t.ok(res.data);
-    t.equal(res.status, 200);
-    t.deepEqual(
-      res.data.transactionReceipt.transactionsList[0].payload.reducedPayload
-        .commandsList,
-      [
-        {
-          transferAsset: {
-            srcAccountId: adminID,
-            destAccountId: userID,
-            assetId: assetID,
-            description: txDescription,
-            amount: "57.75",
-          },
-        },
-      ],
-    );
-    t.equal(
-      res.data.transactionReceipt.transactionsList[0].signaturesList[0]
-        .publicKey,
-      adminPubA,
-    );
-  }
-
-  {
-    function timestampToProtobufTimestamp(timeMS: number) {
-      return Timestamp.fromDate(new Date(timeMS));
-    }
-    const firstTxTime = timestampToProtobufTimestamp(Date.now() - 1);
-    const lastTxTime = timestampToProtobufTimestamp(Date.now() + 1);
     const req = {
       commandName: IrohaQuery.GetAccountTransactions,
       baseConfig: {
@@ -1031,8 +996,14 @@ test(testCase, async (t: Test) => {
         accountId: adminID,
         pageSize: 100,
         firstTxHash: firstTxHash,
-        firstTxTime,
-        lastTxTime,
+        firstTxTime: undefined,
+        lastTxTime: undefined,
+        firstTxHeight: undefined,
+        lastTxHeight: undefined,
+        ordering: {
+          field: undefined,
+          direction: undefined,
+        },
       },
     };
     const res = await apiClient.runTransactionV1(req);
@@ -1073,7 +1044,18 @@ test(testCase, async (t: Test) => {
         timeoutLimit: 5000,
         tls: false,
       },
-      params: [adminID, assetID, 100, undefined],
+      params: [
+        adminID,
+        assetID,
+        100,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+      ],
     };
     const res = await apiClient.runTransactionV1(req);
     t.deepEqual(
@@ -1115,6 +1097,14 @@ test(testCase, async (t: Test) => {
         assetId: assetID,
         pageSize: 100,
         firstTxHash: undefined,
+        firstTxTime: undefined,
+        lastTxTime: undefined,
+        firstTxHeight: undefined,
+        lastTxHeight: undefined,
+        ordering: {
+          field: undefined,
+          direction: undefined,
+        },
       },
     };
     const res = await apiClient.runTransactionV1(req);
@@ -1243,7 +1233,7 @@ test(testCase, async (t: Test) => {
     t.ok(res);
     t.ok(res.data);
     t.equal(res.status, 200);
-    t.equal(res.data.transactionReceipt.status, "COMMITTED");
+    t.equal(res.data.transactionReceipt.status[0], "COMMITTED");
   }
 
   {
@@ -1264,7 +1254,7 @@ test(testCase, async (t: Test) => {
     t.ok(res);
     t.ok(res.data);
     t.equal(res.status, 200);
-    t.equal(res.data.transactionReceipt.status, "COMMITTED");
+    t.equal(res.data.transactionReceipt.status[0], "COMMITTED");
   }
 
   {
@@ -1285,7 +1275,7 @@ test(testCase, async (t: Test) => {
     t.ok(res);
     t.ok(res.data);
     t.equal(res.status, 200);
-    t.equal(res.data.transactionReceipt.status, "COMMITTED");
+    t.equal(res.data.transactionReceipt.status[0], "COMMITTED");
   }
 
   {
@@ -1306,7 +1296,7 @@ test(testCase, async (t: Test) => {
     t.ok(res);
     t.ok(res.data);
     t.equal(res.status, 200);
-    t.equal(res.data.transactionReceipt.status, "COMMITTED");
+    t.equal(res.data.transactionReceipt.status[0], "COMMITTED");
   }
 
   let testRole = uuidv4().substring(0, 5);
@@ -1328,7 +1318,7 @@ test(testCase, async (t: Test) => {
     t.ok(res);
     t.ok(res.data);
     t.equal(res.status, 200);
-    t.equal(res.data.transactionReceipt.status, "COMMITTED");
+    t.equal(res.data.transactionReceipt.status[0], "COMMITTED");
   }
   testRole = uuidv4().substring(0, 5) + Date.now();
   {
@@ -1349,7 +1339,7 @@ test(testCase, async (t: Test) => {
     t.ok(res);
     t.ok(res.data);
     t.equal(res.status, 200);
-    t.equal(res.data.transactionReceipt.status, "COMMITTED");
+    t.equal(res.data.transactionReceipt.status[0], "COMMITTED");
   }
 
   {
@@ -1370,7 +1360,7 @@ test(testCase, async (t: Test) => {
     t.ok(res);
     t.ok(res.data);
     t.equal(res.status, 200);
-    t.equal(res.data.transactionReceipt.status, "COMMITTED");
+    t.equal(res.data.transactionReceipt.status[0], "COMMITTED");
   }
 
   {
@@ -1391,7 +1381,7 @@ test(testCase, async (t: Test) => {
     t.ok(res);
     t.ok(res.data);
     t.equal(res.status, 200);
-    t.equal(res.data.transactionReceipt.status, "COMMITTED");
+    t.equal(res.data.transactionReceipt.status[0], "COMMITTED");
   }
 
   {
@@ -1412,7 +1402,7 @@ test(testCase, async (t: Test) => {
     t.ok(res);
     t.ok(res.data);
     t.equal(res.status, 200);
-    t.equal(res.data.transactionReceipt.status, "COMMITTED");
+    t.equal(res.data.transactionReceipt.status[0], "COMMITTED");
   }
 
   {
@@ -1433,7 +1423,7 @@ test(testCase, async (t: Test) => {
     t.ok(res);
     t.ok(res.data);
     t.equal(res.status, 200);
-    t.equal(res.data.transactionReceipt.status, "COMMITTED");
+    t.equal(res.data.transactionReceipt.status[0], "COMMITTED");
   }
 
   {
@@ -1501,13 +1491,13 @@ test(testCase, async (t: Test) => {
         timeoutLimit: 5000,
         tls: false,
       },
-      params: [userID, "age", "118", "21"], //change age from 21 to 118
+      params: [userID, "age", "118", "21", false], //change age from 21 to 118
     };
     const res = await apiClient.runTransactionV1(req);
     t.ok(res);
     t.ok(res.data);
     t.equal(res.status, 200);
-    t.equal(res.data.transactionReceipt.status, "COMMITTED");
+    t.equal(res.data.transactionReceipt.status[0], "COMMITTED");
   }
 
   {
@@ -1522,13 +1512,13 @@ test(testCase, async (t: Test) => {
         timeoutLimit: 5000,
         tls: false,
       },
-      params: [userID, "age", "21", "118"], //change age from 118 to 21
+      params: [userID, "age", "21", "118", false], //change age from 118 to 21
     };
     const res = await apiClient.runTransactionV1(req);
     t.ok(res);
     t.ok(res.data);
     t.equal(res.status, 200);
-    t.equal(res.data.transactionReceipt.status, "COMMITTED");
+    t.equal(res.data.transactionReceipt.status[0], "COMMITTED");
   }
 
   {
@@ -1682,7 +1672,16 @@ test(testCase, async (t: Test) => {
         timeoutLimit: 5000,
         tls: false,
       },
-      params: [5, undefined],
+      params: [
+        5,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+      ],
     };
     const res = await apiClient.runTransactionV1(req);
     t.ok(res);
@@ -1703,33 +1702,18 @@ test(testCase, async (t: Test) => {
         timeoutLimit: 5000,
         tls: false,
       },
-      params: { pageSize: 5, firstTxHash: undefined },
-    };
-    const res = await apiClient.runTransactionV1(req);
-    t.ok(res);
-    t.ok(res.data);
-    t.equal(res.status, 200);
-    t.deepEqual(res.data.transactionReceipt, []);
-  }
-
-  {
-    function timestampToProtobufTimestamp(timeMS: number) {
-      return Timestamp.fromDate(new Date(timeMS));
-    }
-    const firstTxTime = timestampToProtobufTimestamp(Date.now() - 1);
-    const lastTxTime = timestampToProtobufTimestamp(Date.now() + 1);
-    const req = {
-      commandName: IrohaQuery.GetPendingTransactions,
-      baseConfig: {
-        irohaHost: irohaHost,
-        irohaPort: irohaPort,
-        creatorAccountId: adminID,
-        privKey: [adminPriv],
-        quorum: 1,
-        timeoutLimit: 5000,
-        tls: false,
+      params: {
+        pageSize: 5,
+        firstTxHash: undefined,
+        firstTxTime: undefined,
+        lastTxTime: undefined,
+        firstTxHeight: undefined,
+        lastTxHeight: undefined,
+        ordering: {
+          field: undefined,
+          direction: undefined,
+        },
       },
-      params: { pageSize: 5, firstTxHash: undefined, firstTxTime, lastTxTime },
     };
     const res = await apiClient.runTransactionV1(req);
     t.ok(res);
@@ -1759,7 +1743,7 @@ test(testCase, async (t: Test) => {
     t.ok(res);
     t.ok(res.data);
     t.equal(res.status, 200);
-    t.equal(res.data.transactionReceipt.status, "COMMITTED");
+    t.equal(res.data.transactionReceipt.status[0], "COMMITTED");
   }
 
   {
@@ -1781,7 +1765,7 @@ test(testCase, async (t: Test) => {
     t.ok(res.data);
     t.equal(res.status, 200);
     console.log(res.data.transactionReceipt);
-    t.equal(res.data.transactionReceipt.status, "COMMITTED");
+    t.equal(res.data.transactionReceipt.status[0], "COMMITTED");
   }
 
   const keyPair6: KeyPair = cryptoHelper.generateKeyPair();
@@ -1809,7 +1793,7 @@ test(testCase, async (t: Test) => {
     t.ok(res);
     t.ok(res.data);
     t.equal(res.status, 200);
-    t.equal(res.data.transactionReceipt.status, "COMMITTED");
+    t.equal(res.data.transactionReceipt.status[0], "COMMITTED");
   }
   t.end();
 });
