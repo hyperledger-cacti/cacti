@@ -24,14 +24,11 @@ type IINAgentClient interface {
 	// Requesting network unit's state from a foreign IIN agent.
 	RequestIdentityConfiguration(ctx context.Context, in *NetworkUnitIdentity, opts ...grpc.CallOption) (*common.Ack, error)
 	// Handling network unit's state sent by a foreign IIN agent.
-	SendIdentityConfiguration(ctx context.Context, in *NetworkUnitIdentity, opts ...grpc.CallOption) (*common.Ack, error)
-	// user or agent triggers a flow to collect signatures attesting an
-	// external/foreign network unit's state and recording to ledger
-	FlowAndRecordAttestations(ctx context.Context, in *NetworkUnitIdentity, opts ...grpc.CallOption) (*common.Ack, error)
+	SendIdentityConfiguration(ctx context.Context, in *AttestedMembership, opts ...grpc.CallOption) (*common.Ack, error)
 	// Requesting attestation from a local IIN agent.
-	RequestAttestation(ctx context.Context, in *NetworkUnitIdentity, opts ...grpc.CallOption) (*common.Ack, error)
+	RequestAttestation(ctx context.Context, in *AttestedSecurityDomain, opts ...grpc.CallOption) (*common.Ack, error)
 	// Handling attestation sent by a local IIN agent.
-	SendAttestation(ctx context.Context, in *NetworkUnitIdentity, opts ...grpc.CallOption) (*common.Ack, error)
+	SendAttestation(ctx context.Context, in *AttestedSecurityDomain, opts ...grpc.CallOption) (*common.Ack, error)
 }
 
 type iINAgentClient struct {
@@ -60,7 +57,7 @@ func (c *iINAgentClient) RequestIdentityConfiguration(ctx context.Context, in *N
 	return out, nil
 }
 
-func (c *iINAgentClient) SendIdentityConfiguration(ctx context.Context, in *NetworkUnitIdentity, opts ...grpc.CallOption) (*common.Ack, error) {
+func (c *iINAgentClient) SendIdentityConfiguration(ctx context.Context, in *AttestedMembership, opts ...grpc.CallOption) (*common.Ack, error) {
 	out := new(common.Ack)
 	err := c.cc.Invoke(ctx, "/identity.agent.IINAgent/SendIdentityConfiguration", in, out, opts...)
 	if err != nil {
@@ -69,16 +66,7 @@ func (c *iINAgentClient) SendIdentityConfiguration(ctx context.Context, in *Netw
 	return out, nil
 }
 
-func (c *iINAgentClient) FlowAndRecordAttestations(ctx context.Context, in *NetworkUnitIdentity, opts ...grpc.CallOption) (*common.Ack, error) {
-	out := new(common.Ack)
-	err := c.cc.Invoke(ctx, "/identity.agent.IINAgent/FlowAndRecordAttestations", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *iINAgentClient) RequestAttestation(ctx context.Context, in *NetworkUnitIdentity, opts ...grpc.CallOption) (*common.Ack, error) {
+func (c *iINAgentClient) RequestAttestation(ctx context.Context, in *AttestedSecurityDomain, opts ...grpc.CallOption) (*common.Ack, error) {
 	out := new(common.Ack)
 	err := c.cc.Invoke(ctx, "/identity.agent.IINAgent/RequestAttestation", in, out, opts...)
 	if err != nil {
@@ -87,7 +75,7 @@ func (c *iINAgentClient) RequestAttestation(ctx context.Context, in *NetworkUnit
 	return out, nil
 }
 
-func (c *iINAgentClient) SendAttestation(ctx context.Context, in *NetworkUnitIdentity, opts ...grpc.CallOption) (*common.Ack, error) {
+func (c *iINAgentClient) SendAttestation(ctx context.Context, in *AttestedSecurityDomain, opts ...grpc.CallOption) (*common.Ack, error) {
 	out := new(common.Ack)
 	err := c.cc.Invoke(ctx, "/identity.agent.IINAgent/SendAttestation", in, out, opts...)
 	if err != nil {
@@ -105,14 +93,11 @@ type IINAgentServer interface {
 	// Requesting network unit's state from a foreign IIN agent.
 	RequestIdentityConfiguration(context.Context, *NetworkUnitIdentity) (*common.Ack, error)
 	// Handling network unit's state sent by a foreign IIN agent.
-	SendIdentityConfiguration(context.Context, *NetworkUnitIdentity) (*common.Ack, error)
-	// user or agent triggers a flow to collect signatures attesting an
-	// external/foreign network unit's state and recording to ledger
-	FlowAndRecordAttestations(context.Context, *NetworkUnitIdentity) (*common.Ack, error)
+	SendIdentityConfiguration(context.Context, *AttestedMembership) (*common.Ack, error)
 	// Requesting attestation from a local IIN agent.
-	RequestAttestation(context.Context, *NetworkUnitIdentity) (*common.Ack, error)
+	RequestAttestation(context.Context, *AttestedSecurityDomain) (*common.Ack, error)
 	// Handling attestation sent by a local IIN agent.
-	SendAttestation(context.Context, *NetworkUnitIdentity) (*common.Ack, error)
+	SendAttestation(context.Context, *AttestedSecurityDomain) (*common.Ack, error)
 	mustEmbedUnimplementedIINAgentServer()
 }
 
@@ -126,16 +111,13 @@ func (UnimplementedIINAgentServer) SyncExternalState(context.Context, *NetworkUn
 func (UnimplementedIINAgentServer) RequestIdentityConfiguration(context.Context, *NetworkUnitIdentity) (*common.Ack, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RequestIdentityConfiguration not implemented")
 }
-func (UnimplementedIINAgentServer) SendIdentityConfiguration(context.Context, *NetworkUnitIdentity) (*common.Ack, error) {
+func (UnimplementedIINAgentServer) SendIdentityConfiguration(context.Context, *AttestedMembership) (*common.Ack, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendIdentityConfiguration not implemented")
 }
-func (UnimplementedIINAgentServer) FlowAndRecordAttestations(context.Context, *NetworkUnitIdentity) (*common.Ack, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method FlowAndRecordAttestations not implemented")
-}
-func (UnimplementedIINAgentServer) RequestAttestation(context.Context, *NetworkUnitIdentity) (*common.Ack, error) {
+func (UnimplementedIINAgentServer) RequestAttestation(context.Context, *AttestedSecurityDomain) (*common.Ack, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RequestAttestation not implemented")
 }
-func (UnimplementedIINAgentServer) SendAttestation(context.Context, *NetworkUnitIdentity) (*common.Ack, error) {
+func (UnimplementedIINAgentServer) SendAttestation(context.Context, *AttestedSecurityDomain) (*common.Ack, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendAttestation not implemented")
 }
 func (UnimplementedIINAgentServer) mustEmbedUnimplementedIINAgentServer() {}
@@ -188,7 +170,7 @@ func _IINAgent_RequestIdentityConfiguration_Handler(srv interface{}, ctx context
 }
 
 func _IINAgent_SendIdentityConfiguration_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(NetworkUnitIdentity)
+	in := new(AttestedMembership)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -200,31 +182,13 @@ func _IINAgent_SendIdentityConfiguration_Handler(srv interface{}, ctx context.Co
 		FullMethod: "/identity.agent.IINAgent/SendIdentityConfiguration",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IINAgentServer).SendIdentityConfiguration(ctx, req.(*NetworkUnitIdentity))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _IINAgent_FlowAndRecordAttestations_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(NetworkUnitIdentity)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(IINAgentServer).FlowAndRecordAttestations(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/identity.agent.IINAgent/FlowAndRecordAttestations",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IINAgentServer).FlowAndRecordAttestations(ctx, req.(*NetworkUnitIdentity))
+		return srv.(IINAgentServer).SendIdentityConfiguration(ctx, req.(*AttestedMembership))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _IINAgent_RequestAttestation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(NetworkUnitIdentity)
+	in := new(AttestedSecurityDomain)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -236,13 +200,13 @@ func _IINAgent_RequestAttestation_Handler(srv interface{}, ctx context.Context, 
 		FullMethod: "/identity.agent.IINAgent/RequestAttestation",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IINAgentServer).RequestAttestation(ctx, req.(*NetworkUnitIdentity))
+		return srv.(IINAgentServer).RequestAttestation(ctx, req.(*AttestedSecurityDomain))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _IINAgent_SendAttestation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(NetworkUnitIdentity)
+	in := new(AttestedSecurityDomain)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -254,7 +218,7 @@ func _IINAgent_SendAttestation_Handler(srv interface{}, ctx context.Context, dec
 		FullMethod: "/identity.agent.IINAgent/SendAttestation",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IINAgentServer).SendAttestation(ctx, req.(*NetworkUnitIdentity))
+		return srv.(IINAgentServer).SendAttestation(ctx, req.(*AttestedSecurityDomain))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -277,10 +241,6 @@ var IINAgent_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SendIdentityConfiguration",
 			Handler:    _IINAgent_SendIdentityConfiguration_Handler,
-		},
-		{
-			MethodName: "FlowAndRecordAttestations",
-			Handler:    _IINAgent_FlowAndRecordAttestations_Handler,
 		},
 		{
 			MethodName: "RequestAttestation",

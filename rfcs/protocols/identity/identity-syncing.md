@@ -3,18 +3,18 @@
 
  SPDX-License-Identifier: CC-BY-4.0
  -->
-# Protocols for Decentralized Network-Identity Configuration, Exchannge and Validation, for Interoperation
+# Security Domain Identity and Membership Exchanges
 
 - RFC: 02-012
 - Authors: Venkatraman Ramakrishna, Krishnasuri Narayanam, Bishakh Chandra Ghosh, Ermyas Abebe
 - Status: Proposed
 - Supersedes: 02-011
-- Since: 24-Sep-2021
+- Since: 25-Aug-2022
 
 
 ## Summary
 
-This is an identity plane protocol to exchange identity information between two interoperating blockchain networks. This establishes a basis (or trust anchor) for proof-based data sharing. For background and component information, start [here](../../models/identity/network-identity-management.md).
+This is an identity plane protocol to exchange identity information between two interoperating blockchain networks. This establishes a trust basis for proof-based data sharing. For background and component information, start [here](../../models/identity/network-identity-management.md).
 
 The entire Network Identity Discovery and Management protocol involves the following protocols for different steps:
 
@@ -110,7 +110,7 @@ A DID registration request, that is the DID create method of the IIN registry, m
 
 **Step 5. Trust anchors issue identity VC to participant DID.**
 
-A DID and a DID document do not inherently carry any personal data such as physical identity / real worl identity ([binding did to physical identity](https://w3c.github.io/did-core/#binding-to-physical-identity)). Therefore, to map a participant's did to its physical identity, some trust anchor must issue VCs attesting the real world physical identity of the participant , to the participant's DID. The participant itself becomes the holder of those identity VCs and can present it to others to prove its physical identity.
+A DID and a DID document do not inherently carry any personal data such as physical identity / real world identity ([binding did to physical identity](https://w3c.github.io/did-core/#binding-to-physical-identity)). Therefore, to map a participant's did to its physical identity, some trust anchor must issue VCs attesting the real world physical identity of the participant , to the participant's DID. The participant itself becomes the holder of those identity VCs and can present it to others to prove its physical identity.
 
 > Step 5 has flexibility in terms of how many trust anchors and which trust anchors issue identity VC to a particular participant. These identity VCs might be used for validating network identity by other network participants.  See *Network Identity Validation* step.
 
@@ -266,16 +266,17 @@ The first step towards interoperation between two blockchain networks is discove
 
 Given the DID of a foreign network in the format `did:<iin_name>:<network_name>` (example `did:iinindy:tradelens`), the foreign network can be discovered by standard DID resolution. The IIN agent of a participant of a local network contacts the DID registry (example: `iinindy`) and resolves the DID to download the Network DID document.
 
-Find the network discovery protocol specifications [here](../discovery/readme.md). 
+See the [network discovery protocol specifications](../discovery/discovery.md) for more details. 
 
 
-## Network Identity Validation
+## Security Domain Identity Validation
 
-After discovery of the network and fetching the Network DID document, the authenticity of it has to be verified by validating the identity of the network. This is carried out through the Network Identity Validation protocol described [here](./network-identity-validation.md).
+After a network has been discovered, and its Security Domain DID document has been fetched, the authenticity of that DID must be verified. See the [Security Domain Identity Validation protocol](./network-identity-validation.md) for details of how the network's identity is validated.
+
 
 ## Data Plane Identity Configuration
 
-After foreign network identities are validated, it has to be configured in the data plane for interoperation. A single participant unit cannot update identity information in the network's ledger. This needs agreement among all the participanting units. This agreement is ensured through collection of signatures through an application level flow as discussed in detail [here](./data-plane-identity-configuration.md).
+After a foreign network's (or security domain's) identity is validated, its membership information must be configured in the network's ledger for interoperation protocols to work in the data plane. A single organizational unit (or network member) cannot unilaterally update this membership information; instead, members must agree on that information before it is deemed acceptable for recording on the ledger. See the [Membership Syncing protocol specifications](./data-plane-identity-configuration.md) for details on how this is achieved by the IIN Agents representing the members self-orchestrating a flow to collect attestations.
 
 ## Updating Network DID with changing Network Structure
 
@@ -304,6 +305,13 @@ The IIN registry authenticates a Network DID updation request based on two condi
 (1) The signatures must  satisfy the `updatePolicy` in the `BlockchainNetworkMultiSig` verification method of the existing Network DID document.
 
 
-## Dataplane credentials update with changes in identity plane
+## Data Plane credentials update with changes in identity plane
 
-The identity exchange and validation has to be done whenever there is a change in the identity of any network. Thus, the identity exchange protocol steps explained in this document must be triggered within a network whenever the identities of the participant units of any network it wishes to interoperate with change. This is further explained [here](./identity-change-updates.md).
+The security domain validation and membership syncing protocols must be re-run every time there is a change in a security domain's identity (DID document) or in its membership configuration. The flow diagram below illustrates the complete process from the time a change occurs in one network up to the point where its updated identity and membership info is reflected in another network's ledger as a prerequisite for data plane interoperation. Each step in this diagram represents a separate protocol: (1) is described in this document above, (2) is described in the [security domain identity validation specification](./network-identity-validation.md), and (3) in the [membership syncing specification](./data-plane-identity-configuration.md).
+
+<img src="../../resources/images/protocol-identity-overview.jpg" width=100%>
+
+The trigger for Step 2 can be any of the following:
+* Manual trigger applied by a network administrator
+* Timeout after a poll interval: the network unit in `SECURITY DOMAIN 1` polls for updates to `SECURITY DOMAIN 2`
+* Event notification: a network unit in `SECURITY DOMAIN 1` receives an event notifying it about a change in `SECURITY DOMAIN 2`

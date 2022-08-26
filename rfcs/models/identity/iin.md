@@ -8,7 +8,7 @@
 - RFC: 01-012
 - Authors: Venkatraman Ramakrishna, Bishakh Chandra Ghosh, Krishnasuri Narayanam, Ermyas Abebe
 - Status: Proposed
-- Since: 24-Sep-2021
+- Since: 25-Aug-2022
 
 
 # Summary
@@ -30,7 +30,7 @@ The IIN can be built on existing DLT based DID registry technologies such as  [H
 # IIN Ledger Artifacts
 
 An IIN must have be able to record the following artifacts perferably in a distributed ledger:
-* _DID Documents_ where each document is associated with a single unique DID. The DID Document can be for a blockchain network as a whole - [*Network Identity*](../../formats/identity.md) or member participant units - [*Participant Unit Identity*](../../formats/identity.md).
+* _DID Documents_ where each document is associated with a single unique DID. The DID Document can be for a blockchain network as a whole - [*Security Domain Identity*](../../formats/network/identity.md#security-domain-identity) or member participant units - [*Organizational Unit Identity*](../../formats/network/identity.md#organizational-unit-identity).
 
 * _Verifiable Credential Schemas_: data structure describing a verifiable credential. ([vc-data-model](https://www.w3.org/TR/vc-data-model/#dfn-verifiable-data-registries))
   
@@ -38,10 +38,10 @@ An IIN must have be able to record the following artifacts perferably in a distr
 
 * _Revocation Registry_: to allow VC issuers to revoke credentials.
 
-## Participant Unit Identity and Network Identity
+## Organizational Unit Identity and Security Domain Identity
 
-The IIN ledger holds the DID documents of network participants as well as the network as a whole. 
-See specifications of *Network Identity* and *Participant Unit Identity* DID formats [here](../../formats/identity.md). 
+The IIN ledger holds the DID documents of individual network members as well as that of the network as a whole.
+See [specifications of these DID formats](../../formats/network/identity.md) for details.
 
 
 ## Credential Schema, Verification Keys and Revocation Lists
@@ -50,8 +50,7 @@ A DID Document is not inherently mapped to any entity's physical identity [did-c
 
 The IIN must support two kinds of claims to be issued by trust anchors to the DIDs:
 
-1. Identity VCs - for associating real world identity to individuals/organizations which are participating units -  *Participant Identity VC*, or to a network as a whole - *Network Identity VC*. (See [Network Identity Validation
- protocol](../../protocols/identity/network-identity-validation.md) for details.) 
+1. Identity VCs - for associating real world identity to individuals/organizations which are members of networks -  *Organizational Unit Identity VC*, or to a network as a whole - *security Domain Identity VC*. (See [Network Identity Validation protocol](../../protocols/identity/network-identity-validation.md) for details.)
 
 2. Membership VCs - to assert the membership of an individual/organization in a blockchain network.
 
@@ -92,4 +91,4 @@ These trust anchors are entities that the participants trust and whose identity 
 
 ## IIN Agents
 
-DLT networks interact with the IINs through a components called IIN Agent. Each participant unit in a DLT network has have atleast one IIN Agent using which it exposes its identity as well as discovers and verifies foreign network identities. The IIN Agents are detailed [here](./iin-agent.md).
+DLT networks interact with the IINs and with each other through components called IIN Agents. Each participant unit in a DLT network must have at least one IIN Agent using which it exposes its identity as well as discovers and verifies foreign network identities. The IIN Agents are detailed [here](./iin-agent.md).

@@ -106,7 +106,7 @@ func handleRequest(s *SmartContract, ctx contractapi.TransactionContextInterface
 		query.RequestingOrg = x509Cert.Issuer.Organization[0]
 	}
 
-	err = verifyMemberInSecurityDomain(s, ctx, x509Cert, query.RequestingNetwork, query.RequestingOrg)
+	err = verifyMemberInSecurityDomain(s, ctx, query.Certificate, query.RequestingNetwork, query.RequestingOrg)
 	if err != nil {
 		return "", logThenErrorf("Membership Verification failed: %s", err)
 	}

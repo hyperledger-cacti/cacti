@@ -3,31 +3,33 @@
 
  SPDX-License-Identifier: CC-BY-4.0
  -->
-# Data Plane Identity Configuration
+# Security Domain Membership Syncing
 
 - RFC: 02-012-appendix-b
 - Authors: Venkatraman Ramakrishna, Krishnasuri Narayanam, Bishakh Chandra Ghosh, Ermyas Abebe
 - Status: Proposed
-- Since: 24-Sep-2021
+- Since: 25-Aug-2022
 
 ## Overview
 
-For interoperation in the data plane, the identities in terms of data plane certificates/credentials of the foreign network units have to be configured. Along with that, the relay endopint information has to be configured.
+Data plane interoperation requires the syncing and configuration of a foreign security domain's [membership information](../../formats/network/membership.md) as well as the relay endpoints for that security domain (or network).
 
-The Network DID of a foreign network contains `relayEndpoints` and `DataplaneCredentials` verification method which are used to configure the realys and the data plane certidicates required for interoperation respectively.
+The Security Domain DID of a foreign security domain contains `relayEndpoints` and `DataplaneCredentials` verification methods, used to configure relay endpoints and certificates (part of membership info) respectively.
 
-## Protocol
+## Sync Protocol
 
-Considering two networks `NETWORK 1` and `NETWORK 2`, we specify a protocol where the IIN Agent of a participant unit, say `Org2` in `NETWORK 1`  is configuring the identity and relay for `NETWORK 2`.
+Consider two security domains governing ledgers `Ledger A` and Ledger B` respectively. The first has two IIN Agents `A1` and `A2` representing two organizational units that are members of its security domain. The second has agents `B1` and `B2`. The security domain governing `Ledger A` is trying to sync the latest identity and membership info of the security domain governing `Ledger B`. Without loss of generality, we can pick `A2` as the initiator of the cross-network identity plane protocol that results in `Ledger B`'s security domain membership and relay endpoints info getting recorded in `Ledger A`. The protocol is illustrated in the figure below. (_Note_: this represents the "happy path". We will add more diagrams subsequently illustrating failures and race conditions.)
 
-* IIN Agent of a network unit that intends to update the foreign network identity information in the data plane initiates a flow to collect signatures over the identity (Security Domain info) of the network units of `NETWORK 2`. These are obtained from `relayEndpoints` and `DataplaneCredentials` verification method of the Network DID, after the Network DID is validated (see [protocol](./network-identity-validation.md)).
-* IIN Agent of a network unit starts a flow to collect signatures over the identity (Security Domain info) and relay endpoint of `NETWORK 2`.
+<img src="../../resources/images/identity-sync.png" width=100%>
 
-The steps of this application level flow for updating data plane identity information are as follows:
-1. `IIN Agent Org2` constructs a _signature collection procedure_ request message consisting of the following: `{<Network-ID>, [<Network-Relay-Endpoint>],[<Network-Unit-DID> -> <Network-Unit-Security-Domain>]},<Signature>` (here, `<Signature>` is generated over the preceding structure.
-2. `IIN Agent Org2` triggers a _signature collection procedure_ by sending the request to every other IIN Agent in `NETWORK 1`. For example, on if `Org1` is another unit of `NETWORK 1`, it is sent to `IIN Agent Org1`. The requestees return signatures over the structure generated above to `IIN Agent Org2`.
-  * This can be orchestrated completely by the triggering agent, which sends requests and receives responses from every other IIN Agent.
-  * Alternatively, this could be a flow, where the trigger agent is simply the first node to generate a signature after which the request is handed off to another node. Eventually, when enough signatures are collected, a ledger update can be triggered (see Step 6 further below)
-3. (_Optional_) Requestee's IIN Agent (`IIN Agent Org1`) confirms the presence and validity of the Network DID of `NETWORK 2` on the IIN ledger and fetches the network DID document. This replicates what `IIN Agent Org2` did in Network Identity Validation [protocol](./network-identity-validation.md). This step is optional since the identity validation might already be done by the requestee and hence the validation information might be cached and used for providing the attestation.
-4. The requestee (`IIN Agent Org1`) validates the Security Domain info for `NETWORK 2` units, as well as the relay endpoints.
-5. When the requester unit - `IIN Agent Org2` obtains signatures from all IIN Agents in `NETWORK 1`, it updates the Security Domain info on the network ledger by submitting a transaction to the Interoperation module (a chaincode in the Fabric implementation, a Cordapp in the Corda implementation). The transaction payload consists of: `{<Network-ID>, [<Network-Relay-Endpoint>],[<Network-Unit-DID> -> <Network-Unit-Security-Domain>]},[<Signature-Org1>,<Signature-Org2>]}`. The signatures are validated by multiple peers and committed to the ledger after passing through a consensus protocol.
+The first phase in the above diagram, involving [registration](./identity-syncing.md), [discovery](../discovery/discovery.md), and [validation](./network-identity-validation.md) are covered in other specifications. In this draft, we only specify the bilateral protocol occurring between sets of IIN Agents representing two independent security domains' members.
+
+The communication among IIN Agents of the security domain governing `Ledger A` to collect attestations can occur in one of two ways:
+  * It can be orchestrated completely by the triggering agent (in this case `A2`), which sends requests and receives responses from every other local IIN Agent.
+  * Alternatively, it could be a flow, where the trigger agent is simply the first node to produce an attestation after which the request is passed to another agent. This proces concludes when enough attestations are collected.
+
+(We recommend the first approach in Weaver for simplicity of implementation.)
+
+The validation procedures marked in the figure above may include an agent confirming the presence and validity of its security domain's DID record in an IIN. But in case two networks are attempting to interoperate without relying on DID infrastructure (IINs and trust anchors), these checks can be skipped. Even if DID infrastructure is present and relied upon, these checks need not be done as part of the protocol; the result of a past check can be cached and retrieved as needed (assuming freshness of cached records is ascertained).
+
+Finally, a foreign security domain's membership info is recorded via the [interoperation module](../../models/infrastructure/interoperation-modules.md) deployed in the network (a chaincode in Fabric, a CorDapp in Corda, etc.). The logic in this module must validate and authenticate the various signatures in the transaction payload before committing to the ledger via the network's native consensus protocol.
