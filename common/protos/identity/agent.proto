@@ -26,6 +26,7 @@ service IINAgent {
 message NetworkUnitIdentity {
   string network_id = 1;
   string participant_id = 2;
+  string nonce = 3;
 }
 
 // Association of signature (over arbitrary data) and signer identity

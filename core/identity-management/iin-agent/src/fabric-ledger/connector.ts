@@ -18,11 +18,11 @@ export class FabricConnector extends LedgerBase {
     orgMspId: string;
     walletPath: string;
 
-    constructor(ledgerId: string, contractId: string, connectionProfilePath: string, configFilePath: string, walletPath: string) {
+    constructor(ledgerId: string, contractId: string, networkId: string, connectionProfilePath: string, configFilePath: string, walletPath: string) {
         super(ledgerId, contractId);
         this.connectionProfilePath = connectionProfilePath ? connectionProfilePath : path.resolve(__dirname, './', 'connection_profile.json');
         this.configFilePath = configFilePath ? configFilePath : path.resolve(__dirname, './', 'config.json');
-        this.networkId = process.env.NETWORK_NAME ? process.env.NETWORK_NAME : 'network1';
+        this.networkId = networkId ? networkId : 'network1';
         if (!fs.existsSync(configFilePath)) {
             throw new Error('Config does not exist at path: ' + configFilePath);
         }
@@ -47,13 +47,12 @@ export class FabricConnector extends LedgerBase {
 
     // Invoke a contract to drive a transaction
     // TODO: Add parameters corresponding to the output of a flow among IIN agents
-    async invokeContract() {
-        await invokeFabricChaincode(this.walletPath, this.connectionProfilePath, this.configFilePath, this.ledgerId, this.contractId, "", []);
+    async invokeContract(): Promise<any> {
+        return await invokeFabricChaincode(this.walletPath, this.connectionProfilePath, this.configFilePath, this.ledgerId, this.contractId, "", []);
     }
 
     // Query a contract to fetch information from the ledger
     async queryContract(): Promise<string> {
-        const result = await queryFabricChaincode(this.walletPath, this.connectionProfilePath, this.configFilePath, this.ledgerId, this.contractId, "", []);
-        return result;
+        return await queryFabricChaincode(this.walletPath, this.connectionProfilePath, this.configFilePath, this.ledgerId, this.contractId, "", []);
     }
 }

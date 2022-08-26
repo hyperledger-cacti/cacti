@@ -9,6 +9,7 @@ import { Channel } from 'fabric-common';
 import * as path from 'path';
 import * as fs from 'fs';
 import { getWallet } from './walletUtils';
+import * as utils from "../common/utils";
 
 // Get a handle to a network gateway using existing wallet credentials
 const getNetworkGateway = async (
@@ -166,9 +167,15 @@ async function invokeFabricChaincode(
     console.log('Running invocation on Fabric channel and chaincode');
     try {
         const gatewayAndContract = await getNetworkContract(walletPath, connectionProfilePath, configFilePath, channelId, chaincodeId);
-        await gatewayAndContract.contract.submitTransaction(functionName, ...args);
+        const [result, submitError] = await utils.handlePromise(
+            gatewayAndContract.contract.submitTransaction(functionName, ...args),
+        );
+        if (submitError) {
+            throw new Error(`submitTransaction Error: ${submitError}`);
+        }
         // Disconnect from the gateway.
         gatewayAndContract.gateway.disconnect();
+        return result;
     } catch (error) {
         console.error(`Failed to submit transaction: ${error}`);
         throw error;
@@ -187,9 +194,15 @@ async function queryFabricChaincode(
     console.log('Running query on Fabric channel and chaincode');
     try {
         const gatewayAndContract = await getNetworkContract(walletPath, connectionProfilePath, configFilePath, channelId, chaincodeId);
-        const result = await gatewayAndContract.contract.evaluateTransaction(functionName, ...args);
+        const [result, evalError] = await utils.handlePromise(
+            gatewayAndContract.contract.evaluateTransaction(functionName, ...args),
+        );
+        if (evalError) {
+            throw new Error(`evaluateTransaction Error: ${evalError}`);
+        }
         // Disconnect from the gateway.
         gatewayAndContract.gateway.disconnect();
+        return result;
     } catch (error) {
         console.error(`Failed to submit query: ${error}`);
         throw error;
