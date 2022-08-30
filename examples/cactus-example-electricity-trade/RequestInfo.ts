@@ -7,19 +7,19 @@
 
 // transaction information
 class TradeInfo {
-  ethereumAccountA: string;
-  ethereumAccountB: string;
+  ethereumAccountA!: string;
+  ethereumAccountB!: string;
 }
 
 // authorization information
 class AuthInfo {
-  company: string;
+  company!: string;
 }
 
 // request information
 export class RequestInfo {
-  businessLogicID: string;
-  tradeID: string;
+  businessLogicID!: string;
+  tradeID!: string;
   tradeInfo: TradeInfo;
   authInfo: AuthInfo;
   constructor() {
@@ -27,7 +27,7 @@ export class RequestInfo {
     this.authInfo = new AuthInfo();
   }
 
-  setTradeID(tradeID: string) {
+  setTradeID(tradeID: string): void {
     this.tradeID = tradeID;
   }
 }

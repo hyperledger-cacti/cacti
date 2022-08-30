@@ -8,7 +8,6 @@
 import { MeterInfo } from "./MeterInfo";
 import { ConfigUtil } from "@hyperledger/cactus-cmd-socketio-server";
 const fs = require("fs");
-const yaml = require("js-yaml");
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
 const moduleName = "MeterManagement";
@@ -19,16 +18,18 @@ logger.level = config.logLevel;
 export class MeterManagement {
   fileName = "MeterInfo.json";
 
-  constructor() {}
+  constructor() {
+    // do nothing.
+  }
 
   // For debugging
-  fileDump() {
+  fileDump(): void {
     const confirmData: string = fs.readFileSync(this.fileName, "utf8");
     const arrayData: MeterInfo[] = JSON.parse(confirmData).table as MeterInfo[];
     logger.debug(arrayData);
   }
 
-  addMeterInfo(addMeterInfo: MeterInfo): object {
+  addMeterInfo(addMeterInfo: MeterInfo): Record<string, string> {
     // Existence check of table file
     try {
       fs.statSync(this.fileName);
@@ -47,12 +48,12 @@ export class MeterManagement {
       .table as string[];
 
     // Search target records / replace data
-    const meterInfoTableNew = {
+    const meterInfoTableNew: Record<string, string[]> = {
       table: [],
     };
     let existFlag = false;
     let action = "";
-    meterInfoTable.forEach((meterInfoJSON, index) => {
+    meterInfoTable.forEach((meterInfoJSON) => {
       const meterInfo: MeterInfo = JSON.parse(meterInfoJSON) as MeterInfo;
 
       // Determine if it is a target record
@@ -90,7 +91,7 @@ export class MeterManagement {
     return result;
   }
 
-  getMeterInfo(meterID: string): MeterInfo {
+  getMeterInfo(meterID: string): MeterInfo | null {
     // Existence check of table file
     try {
       fs.statSync(this.fileName);
@@ -105,7 +106,7 @@ export class MeterManagement {
 
     // Search target records
     let retMeterInfo: MeterInfo | null = null;
-    meterInfoTable.forEach((meterInfoJSON, index) => {
+    meterInfoTable.forEach((meterInfoJSON) => {
       const meterInfo: MeterInfo = JSON.parse(meterInfoJSON) as MeterInfo;
 
       // Determine if it is a target record
