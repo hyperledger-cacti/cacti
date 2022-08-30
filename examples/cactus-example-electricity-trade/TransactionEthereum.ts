@@ -16,18 +16,21 @@ import {
   VerifierFactoryConfig,
 } from "@hyperledger/cactus-verifier-client";
 
-const fs = require("fs");
-const yaml = require("js-yaml");
 //const config: any = JSON.parse(fs.readFileSync("/etc/cactus/default.json", 'utf8'));
-const config: any = ConfigUtil.getConfig();
+const config: any = ConfigUtil.getConfig() as any;
 import { getLogger } from "log4js";
 const moduleName = "TransactionEthereum";
 const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;
 
 const mapFromAddressNonce: Map<string, number> = new Map();
-let xConnectInfo: LPInfoHolder = null; // connection information
-let xVerifierFactory: VerifierFactory = null;
+let xConnectInfo: LPInfoHolder | null = null; // connection information
+let xVerifierFactory: VerifierFactory | null = null;
+
+export interface EthSigner {
+  serializedTx: string;
+  txId: string;
+}
 
 export function makeRawTransaction(txParam: {
   fromAddress: string;
@@ -35,7 +38,7 @@ export function makeRawTransaction(txParam: {
   toAddress: string;
   amount: number;
   gas: number;
-}): Promise<{ data: {}; txId: string }> {
+}): Promise<{ data: Record<string, unknown>; txId: string }> {
   return new Promise(async (resolve, reject) => {
     try {
       logger.debug(`makeRawTransaction: txParam: ${JSON.stringify(txParam)}`);
@@ -47,13 +50,17 @@ export function makeRawTransaction(txParam: {
 
         const txnCountHex: string = result.txnCountHex;
 
-        const rawTx: { nonce: string; to: string; value: number; gas: number } =
-          {
-            nonce: txnCountHex,
-            to: txParam.toAddress,
-            value: txParam.amount,
-            gas: txParam.gas,
-          };
+        const rawTx: {
+          nonce: string;
+          to: string;
+          value: number;
+          gas: number;
+        } = {
+          nonce: txnCountHex,
+          to: txParam.toAddress,
+          value: txParam.amount,
+          gas: txParam.gas,
+        };
         logger.debug(
           `##makeRawTransaction(B), rawTx: ${JSON.stringify(rawTx)}`,
         );
@@ -62,9 +69,10 @@ export function makeRawTransaction(txParam: {
           rawTx,
           txParam.fromAddressPkey,
         );
-        const resp: { data: {}; txId: string } = {
-          data: { serializedTx: signedTx["serializedTx"] },
-          txId: signedTx["txId"],
+
+        const resp = {
+          data: { serializedTx: signedTx.serializedTx },
+          txId: signedTx.txId,
         };
 
         return resolve(resp);
@@ -96,7 +104,7 @@ function getNewNonce(fromAddress: string): Promise<{ txnCountHex: string }> {
       // Get the number of transactions in account
       const contract = {}; // NOTE: Since contract does not need to be specified, specify an empty object.
       const method = { type: "function", command: "getNonce" };
-      const template = "default";
+      // const template = "default";
       const args = { args: { args: [fromAddress] } };
 
       logger.debug(`##getNewNonce(A): call validator#getNonce()`);
@@ -111,7 +119,8 @@ function getNewNonce(fromAddress: string): Promise<{ txnCountHex: string }> {
 
           const latestNonce = getLatestNonce(fromAddress);
           // logger.debug(`##getNewNonce(B): fromAddress: ${fromAddress}, txnCount: ${txnCount}, latestNonce: ${latestNonce}`);
-          if (txnCount <= latestNonce) {
+
+          if (txnCount <= latestNonce && xVerifierFactory) {
             // nonce correction
             txnCount = latestNonce + 1;
             logger.debug(
@@ -122,6 +131,7 @@ function getNewNonce(fromAddress: string): Promise<{ txnCountHex: string }> {
             const args = { args: { args: [txnCount] } };
 
             logger.debug(`##getNewNonce(D): call validator#toHex()`);
+
             xVerifierFactory
               .getVerifier("84jUisrs")
               .sendSyncRequest(contract, method, args)
@@ -151,7 +161,7 @@ function getNewNonce(fromAddress: string): Promise<{ txnCountHex: string }> {
 
 function getLatestNonce(fromAddress: string): number {
   if (mapFromAddressNonce.has(fromAddress)) {
-    return mapFromAddressNonce.get(fromAddress);
+    return mapFromAddressNonce.get(fromAddress) ?? -1;
   }
   //return 0;
   return -1;

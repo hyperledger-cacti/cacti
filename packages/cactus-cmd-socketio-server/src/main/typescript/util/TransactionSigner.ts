@@ -38,13 +38,7 @@ const EC = elliptic.ec;
 let fabricChannel: any = undefined;
 
 export class TransactionSigner {
-  static signTxEthereum(
-    rawTx: object,
-    signPkey: string,
-  ): {
-    serializedTx: string;
-    txId: string;
-  } {
+  static signTxEthereum(rawTx: object, signPkey: string) {
     logger.debug(`####in signTxEthereum()`);
     // ethereumjs-tx2.1.2_support
     const customCommon = ethJsCommon.forCustomChain(

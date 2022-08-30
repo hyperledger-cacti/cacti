@@ -20,10 +20,8 @@ import {
 } from "@hyperledger/cactus-cmd-socketio-server";
 import { makeRawTransaction } from "./TransactionEthereum";
 
-const fs = require("fs");
-const yaml = require("js-yaml");
 //const config: any = JSON.parse(fs.readFileSync("/etc/cactus/default.json", 'utf8'));
-const config: any = ConfigUtil.getConfig();
+const config: any = ConfigUtil.getConfig() as any;
 import { getLogger } from "log4js";
 import {
   VerifierFactory,
@@ -39,6 +37,27 @@ const routesVerifierFactory = new VerifierFactory(
   config.logLevel,
 );
 
+interface SawtoothEventData {
+  status: number | string;
+  blockData: [];
+}
+
+interface EthData {
+  hash: string;
+}
+
+interface EthEvent {
+  blockData: { transactions: { [key: string]: EthData } };
+  hash: string;
+  status: number;
+}
+
+interface SawtoothBlockDataData {
+  header_signature: string;
+  hash: string;
+  payload_decoded: { Verb: string; Name: string; Value: string }[];
+}
+
 export class BusinessLogicElectricityTrade extends BusinessLogicBase {
   businessLogicID: string;
   meterManagement: MeterManagement;
@@ -49,7 +68,11 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
     this.meterManagement = new MeterManagement();
   }
 
-  startTransaction(req: Request, businessLogicID: string, tradeID: string) {
+  startTransaction(
+    req: Request,
+    businessLogicID: string,
+    tradeID: string,
+  ): void {
     logger.debug("called startTransaction()");
 
     // set RequestInfo
@@ -68,7 +91,7 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
     this.startMonitor(tradeInfo);
   }
 
-  startMonitor(tradeInfo: TradeInfo) {
+  startMonitor(tradeInfo: TradeInfo): void {
     // Get Verifier Instance
     logger.debug(
       `##startMonitor(): businessLogicID: ${tradeInfo.businessLogicID}`,
@@ -94,7 +117,7 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
     logger.debug("getVerifierSawtooth");
   }
 
-  remittanceTransaction(transactionSubset: object) {
+  remittanceTransaction(transactionSubset: Record<string, string>): void {
     logger.debug(
       `called remittanceTransaction(), accountInfo = ${json2str(
         transactionSubset,
@@ -140,17 +163,21 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
     );
     logger.debug("getVerifierEthereum");
 
+    interface RawTransationResultData {
+      args: unknown;
+    }
     // Generate parameters for// sendRawTransaction
     logger.debug(`####exec makeRawTransaction!!`);
     makeRawTransaction(txParam)
       .then((result) => {
         logger.info("remittanceTransaction txId : " + result.txId);
-
         // Set Parameter
         logger.debug("remittanceTransaction data : " + json2str(result.data));
         const contract = {}; // NOTE: Since contract does not need to be specified, specify an empty object.
         const method = { type: "web3Eth", command: "sendRawTransaction" };
-        const args = { args: [result.data["serializedTx"]] };
+        const args: RawTransationResultData = {
+          args: [result.data["serializedTx"]],
+        };
 
         // Run Verifier (Ethereum)
         verifierEthereum
@@ -179,6 +206,7 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
         break;
       case config.electricityTradeInfo.ethereum.validatorID:
         this.onEventEthereum(ledgerEvent.data, targetIndex);
+
         break;
       default:
         logger.error(
@@ -188,7 +216,7 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
     }
   }
 
-  onEventSawtooth(event: object, targetIndex: number): void {
+  onEventSawtooth(event: SawtoothEventData, targetIndex: number): void {
     logger.debug(`##in onEventSawtooth()`);
     const tx = this.getTransactionFromSawtoothEvent(event, targetIndex);
     if (tx == null) {
@@ -216,15 +244,18 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
   }
 
   getTransactionFromSawtoothEvent(
-    event: object,
-    targetIndex: number,
-  ): object | null {
+    event: SawtoothEventData,
+    targetIndex: number | string,
+  ): SawtoothBlockDataData | undefined {
     try {
-      const retTransaction = event["blockData"][targetIndex];
-      logger.debug(
-        `##getTransactionFromSawtoothEvent(), retTransaction: ${retTransaction}`,
-      );
-      return retTransaction;
+      if (typeof targetIndex === "number") {
+        const retTransaction = event["blockData"][targetIndex];
+
+        logger.debug(
+          `##getTransactionFromSawtoothEvent(), retTransaction: ${retTransaction}`,
+        );
+        return retTransaction;
+      }
     } catch (err) {
       logger.error(
         `##getTransactionFromSawtoothEvent(): invalid even, err:${err}, event:${event}`,
@@ -232,7 +263,7 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
     }
   }
 
-  onEventEthereum(event: object, targetIndex: number): void {
+  onEventEthereum(event: EthEvent, targetIndex: number): void {
     logger.debug(`##in onEventEthereum()`);
     const tx = this.getTransactionFromEthereumEvent(event, targetIndex);
     if (tx == null) {
@@ -243,6 +274,7 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
     try {
       const txId = tx["hash"];
       const status = event["status"];
+
       logger.debug(`##txId = ${txId}`);
       logger.debug(`##status =${status}`);
 
@@ -260,15 +292,16 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
   }
 
   getTransactionFromEthereumEvent(
-    event: object,
+    event: EthEvent,
     targetIndex: number,
-  ): object | null {
+  ): EthData | undefined {
     try {
       const retTransaction = event["blockData"]["transactions"][targetIndex];
       logger.debug(
         `##getTransactionFromEthereumEvent(), retTransaction: ${retTransaction}`,
       );
       return retTransaction;
+      // return (retTransaction as unknown) as EthEvent;
     } catch (err) {
       logger.error(
         `##getTransactionFromEthereumEvent(): invalid even, err:${err}, event:${event}`,
@@ -276,7 +309,7 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
     }
   }
 
-  getOperationStatus(tradeID: string): object {
+  getOperationStatus(): Record<string, unknown> {
     logger.debug(`##in getOperationStatus()`);
     return {};
   }
@@ -301,7 +334,10 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
     return null;
   }
 
-  getTxIDFromEventSawtooth(event: object, targetIndex: number): string | null {
+  getTxIDFromEventSawtooth(
+    event: SawtoothEventData,
+    targetIndex: number | string,
+  ): string | null {
     logger.debug(`##in getTxIDFromEventSawtooth()`);
     const tx = this.getTransactionFromSawtoothEvent(event, targetIndex);
     if (tx == null) {
@@ -331,7 +367,7 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
     }
   }
 
-  getTxIDFromEventEtherem(event: object, targetIndex: number): string | null {
+  getTxIDFromEventEtherem(event: EthEvent, targetIndex: number): string | null {
     logger.debug(`##in getTxIDFromEventEtherem()`);
     const tx = this.getTransactionFromEthereumEvent(event, targetIndex);
     if (tx == null) {
@@ -348,10 +384,12 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
             event,
           )}`,
         );
+
         return null;
       }
 
       logger.debug(`###getTxIDFromEventEtherem(): txId: ${txId}`);
+
       return txId;
     } catch (err) {
       logger.error(
@@ -369,6 +407,8 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
     let retEventNum = 0;
 
     try {
+      logger.error(ledgerEvent.data);
+
       switch (ledgerEvent.verifierId) {
         case config.electricityTradeInfo.sawtooth.validatorID:
           retEventNum = event["blockData"].length;
@@ -394,8 +434,10 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
     }
   }
 
-  getAccountInfo(transactionSubset: object): object {
-    const transactionInfo = {};
+  getAccountInfo(
+    transactionSubset: Record<string, string>,
+  ): Record<string, string> {
+    const transactionInfo: Record<string, string> = {};
 
     // Get Meter Information.
     const meterInfo: MeterInfo | null = this.meterManagement.getMeterInfo(
@@ -417,12 +459,12 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
     return transactionInfo;
   }
 
-  setConfig(meterParams: string[]): object {
+  setConfig(meterParams: string[]): Record<string, string> {
     logger.debug("called setConfig()");
 
     // add MeterInfo
     const meterInfo = new MeterInfo(meterParams);
-    const result: {} = this.meterManagement.addMeterInfo(meterInfo);
+    const result = this.meterManagement.addMeterInfo(meterInfo);
     return result;
   }
 }
