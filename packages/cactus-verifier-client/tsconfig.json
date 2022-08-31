@@ -22,6 +22,9 @@
     },
     {
       "path": "../cactus-plugin-ledger-connector-besu/tsconfig.json"
+    },
+    {
+      "path": "../cactus-plugin-ledger-connector-iroha2/tsconfig.json"
     }
   ]
 }
