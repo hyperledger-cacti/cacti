@@ -134,7 +134,8 @@
         "wasm",
         "Xdai",
         "goquorum",
-        "outsh"
+        "hada",
+        "undici"
     ],
     "dictionaries": [
         "typescript,node,npm,go,rust"
