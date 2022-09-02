@@ -14,8 +14,8 @@ export const syncExternalStateFromIINAgent = async (securityDomainUnit: iin_agen
 };
 
 // Generates security domain unit's state/configuration
-export const requestIdentityConfiguration = async (securityDomainUnit: iin_agent_pb.SecurityDomainMemberIdentityRequest) => {
-    console.log('requestIdentityConfiguration:', securityDomainUnit.getSourceNetwork()!.getSecurityDomain(), '-', securityDomainUnit.getSourceNetwork()!.getMemberId());
+export const requestIdentityConfiguration = async (request: iin_agent_pb.SecurityDomainMemberIdentityRequest) => {
+    console.log('requestIdentityConfiguration:', request.getSourceNetwork()!.getSecurityDomain(), '-', request.getSourceNetwork()!.getMemberId());
 };
 
 // Processes foreign security domain unit's state/configuration received from a foreign IIN agent
