@@ -1,4 +1,4 @@
-name: connector-fabric-publish
+name: connector-besu-publish
 
 on:
   push:
@@ -11,7 +11,7 @@ on:
       - v*
 
 env:
-  IMAGE_NAME: cactus-connector-fabric
+  IMAGE_NAME: cactus-connector-besu
 
 jobs:
   # Push image to GitHub Packages.
@@ -20,8 +20,8 @@ jobs:
     runs-on: ubuntu-20.04
     env:
       DOCKER_BUILDKIT: 1
-      DOCKERFILE_PATH: ./packages/cactus-plugin-ledger-connector-fabric/Dockerfile
-      DOCKER_BUILD_DIR: ./packages/cactus-plugin-ledger-connector-fabric/
+      DOCKERFILE_PATH: ./packages/cactus-plugin-ledger-connector-besu/Dockerfile
+      DOCKER_BUILD_DIR: ./packages/cactus-plugin-ledger-connector-besu/
     permissions:
       packages: write
       contents: read
