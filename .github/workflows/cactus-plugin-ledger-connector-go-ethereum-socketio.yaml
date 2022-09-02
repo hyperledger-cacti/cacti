@@ -1,4 +1,4 @@
-name: connector-besu-publish
+name: plugin-ledger-connector-go-ethereum-socketio-publish
 
 on:
   push:
@@ -11,7 +11,7 @@ on:
       - v*
 
 env:
-  IMAGE_NAME: cactus-plugin-connector-fabric-socketio
+  IMAGE_NAME: cactus-plugin-connector-go-ethereum-socketio
 
 jobs:
   # Push image to GitHub Packages.
@@ -20,8 +20,8 @@ jobs:
     runs-on: ubuntu-20.04
     env:
       DOCKER_BUILDKIT: 1
-      DOCKERFILE_PATH: ./packages/cactus-plugin-ledger-connector-besu/Dockerfile
-      DOCKER_BUILD_DIR: ./packages/cactus-plugin-ledger-connector-besu/
+      DOCKERFILE_PATH: ./packages/cactus-plugin-ledger-connector-go-ethereum-socketio/Dockerfile
+      DOCKER_BUILD_DIR: ./packages/cactus-plugin-ledger-connector-go-ethereum-socketio
     permissions:
       packages: write
       contents: read
