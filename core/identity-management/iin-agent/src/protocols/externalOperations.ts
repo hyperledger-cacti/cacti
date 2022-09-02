@@ -9,22 +9,22 @@ import { handlePromise} from '../common/utils';
 
 
 // Handles communication with foreign IIN agents
-export const syncExternalStateFromIINAgent = async (networkUnit: iin_agent_pb.NetworkUnitIdentity) => {
-    console.log('syncExternalStateFromIINAgent:', networkUnit.getNetworkId(), '-', networkUnit.getParticipantId());
+export const syncExternalStateFromIINAgent = async (securityDomainUnit: iin_agent_pb.SecurityDomainMemberIdentity) => {
+    console.log('syncExternalStateFromIINAgent:', securityDomainUnit.getSecurityDomain(), '-', securityDomainUnit.getMemberId());
 };
 
-// Generates network unit's state/configuration
-export const requestIdentityConfiguration = async (networkUnit: iin_agent_pb.NetworkUnitIdentity) => {
-    console.log('requestIdentityConfiguration:', networkUnit.getNetworkId(), '-', networkUnit.getParticipantId());
+// Generates security domain unit's state/configuration
+export const requestIdentityConfiguration = async (request: iin_agent_pb.SecurityDomainMemberIdentityRequest) => {
+    console.log('requestIdentityConfiguration:', request.getSourceNetwork()!.getSecurityDomain(), '-', request.getSourceNetwork()!.getMemberId());
 };
 
-// Processes foreign network unit's state/configuration received from a foreign IIN agent
+// Processes foreign security domain unit's state/configuration received from a foreign IIN agent
 export const sendIdentityConfiguration = async (attestedMembership: iin_agent_pb.AttestedMembership) => {
     const attestation = attestedMembership.getAttestation();
     if (attestation) {
-        const networkUnit = attestation.getUnitIdentity();
-        if (networkUnit) {
-            console.log('sendIdentityConfiguration:', networkUnit.getNetworkId(), '-', networkUnit.getParticipantId());
+        const securityDomainUnit = attestation.getUnitIdentity();
+        if (securityDomainUnit) {
+            console.log('sendIdentityConfiguration:', securityDomainUnit.getSecurityDomain(), '-', securityDomainUnit.getMemberId());
         }
     }
 };

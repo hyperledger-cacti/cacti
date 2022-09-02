@@ -26,7 +26,7 @@ export class LedgerBase {
     }
 
     // Collect security domain membership info
-    async getSecurityDomainMembership(): Promise<object> {
+    async getSecurityDomainMembership(securityDomain: string): Promise<object> {
         return {};
     }
 
