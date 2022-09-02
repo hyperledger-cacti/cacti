@@ -9,7 +9,7 @@ option go_package = "github.com/hyperledger-labs/weaver-dlt-interoperability/com
 // network need to provide proof of a view in order for it to be deemed valid by
 // the Fabric network
 message VerificationPolicy {
-  string security_domain = 1;
+  string securityDomain = 1;
   repeated Identifier identifiers = 2;
 }
 

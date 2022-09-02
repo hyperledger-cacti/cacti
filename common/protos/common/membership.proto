@@ -8,7 +8,7 @@ option go_package = "github.com/hyperledger-labs/weaver-dlt-interoperability/com
 // Membership captures the members of an external entity such as a thing,
 // person, organization or groups of entities such as networks
 message Membership {
-  string security_domain = 1;
+  string securityDomain = 1;
   map<string, Member> members = 2;
 }
 

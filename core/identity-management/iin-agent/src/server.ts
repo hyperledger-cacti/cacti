@@ -85,7 +85,7 @@ iinAgentServer.addService(iin_agent_pb_grpc.IINAgentService, {
         }
     },
     // Service for receiving requests for attestations on foreign security domain unit states from local IIN agents. Will communicate with the IIN agent caller and respond with an ack while the attestation is being generated.
-    requestAttestation: (call: { request: iin_agent_pb.AttestedSecurityDomain }, callback: (_: any, object: ack_pb.Ack) => void) => {
+    requestAttestation: (call: { request: iin_agent_pb.CounterAttestedMembership }, callback: (_: any, object: ack_pb.Ack) => void) => {
         const ack_response = new ack_pb.Ack();
         try {
             requestAttestation(call.request);
@@ -106,7 +106,7 @@ iinAgentServer.addService(iin_agent_pb_grpc.IINAgentService, {
         }
     },
     // Service for receiving attestations on foreign security domain unit states from local IIN agents. Will communicate with the IIN agent caller and respond with an ack while the attestation is being processed.
-    sendAttestation: (call: { request: iin_agent_pb.AttestedSecurityDomain }, callback: (_: any, object: ack_pb.Ack) => void) => {
+    sendAttestation: (call: { request: iin_agent_pb.CounterAttestedMembership }, callback: (_: any, object: ack_pb.Ack) => void) => {
         const ack_response = new ack_pb.Ack();
         try {
             sendAttestation(call.request);

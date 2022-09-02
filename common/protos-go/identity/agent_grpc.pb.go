@@ -26,9 +26,9 @@ type IINAgentClient interface {
 	// Handling network unit's state sent by a foreign IIN agent.
 	SendIdentityConfiguration(ctx context.Context, in *AttestedMembership, opts ...grpc.CallOption) (*common.Ack, error)
 	// Requesting attestation from a local IIN agent.
-	RequestAttestation(ctx context.Context, in *AttestedSecurityDomain, opts ...grpc.CallOption) (*common.Ack, error)
+	RequestAttestation(ctx context.Context, in *CounterAttestedMembership, opts ...grpc.CallOption) (*common.Ack, error)
 	// Handling attestation sent by a local IIN agent.
-	SendAttestation(ctx context.Context, in *AttestedSecurityDomain, opts ...grpc.CallOption) (*common.Ack, error)
+	SendAttestation(ctx context.Context, in *CounterAttestedMembership, opts ...grpc.CallOption) (*common.Ack, error)
 }
 
 type iINAgentClient struct {
@@ -66,7 +66,7 @@ func (c *iINAgentClient) SendIdentityConfiguration(ctx context.Context, in *Atte
 	return out, nil
 }
 
-func (c *iINAgentClient) RequestAttestation(ctx context.Context, in *AttestedSecurityDomain, opts ...grpc.CallOption) (*common.Ack, error) {
+func (c *iINAgentClient) RequestAttestation(ctx context.Context, in *CounterAttestedMembership, opts ...grpc.CallOption) (*common.Ack, error) {
 	out := new(common.Ack)
 	err := c.cc.Invoke(ctx, "/identity.agent.IINAgent/RequestAttestation", in, out, opts...)
 	if err != nil {
@@ -75,7 +75,7 @@ func (c *iINAgentClient) RequestAttestation(ctx context.Context, in *AttestedSec
 	return out, nil
 }
 
-func (c *iINAgentClient) SendAttestation(ctx context.Context, in *AttestedSecurityDomain, opts ...grpc.CallOption) (*common.Ack, error) {
+func (c *iINAgentClient) SendAttestation(ctx context.Context, in *CounterAttestedMembership, opts ...grpc.CallOption) (*common.Ack, error) {
 	out := new(common.Ack)
 	err := c.cc.Invoke(ctx, "/identity.agent.IINAgent/SendAttestation", in, out, opts...)
 	if err != nil {
@@ -95,9 +95,9 @@ type IINAgentServer interface {
 	// Handling network unit's state sent by a foreign IIN agent.
 	SendIdentityConfiguration(context.Context, *AttestedMembership) (*common.Ack, error)
 	// Requesting attestation from a local IIN agent.
-	RequestAttestation(context.Context, *AttestedSecurityDomain) (*common.Ack, error)
+	RequestAttestation(context.Context, *CounterAttestedMembership) (*common.Ack, error)
 	// Handling attestation sent by a local IIN agent.
-	SendAttestation(context.Context, *AttestedSecurityDomain) (*common.Ack, error)
+	SendAttestation(context.Context, *CounterAttestedMembership) (*common.Ack, error)
 	mustEmbedUnimplementedIINAgentServer()
 }
 
@@ -114,10 +114,10 @@ func (UnimplementedIINAgentServer) RequestIdentityConfiguration(context.Context,
 func (UnimplementedIINAgentServer) SendIdentityConfiguration(context.Context, *AttestedMembership) (*common.Ack, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendIdentityConfiguration not implemented")
 }
-func (UnimplementedIINAgentServer) RequestAttestation(context.Context, *AttestedSecurityDomain) (*common.Ack, error) {
+func (UnimplementedIINAgentServer) RequestAttestation(context.Context, *CounterAttestedMembership) (*common.Ack, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RequestAttestation not implemented")
 }
-func (UnimplementedIINAgentServer) SendAttestation(context.Context, *AttestedSecurityDomain) (*common.Ack, error) {
+func (UnimplementedIINAgentServer) SendAttestation(context.Context, *CounterAttestedMembership) (*common.Ack, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendAttestation not implemented")
 }
 func (UnimplementedIINAgentServer) mustEmbedUnimplementedIINAgentServer() {}
@@ -188,7 +188,7 @@ func _IINAgent_SendIdentityConfiguration_Handler(srv interface{}, ctx context.Co
 }
 
 func _IINAgent_RequestAttestation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AttestedSecurityDomain)
+	in := new(CounterAttestedMembership)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -200,13 +200,13 @@ func _IINAgent_RequestAttestation_Handler(srv interface{}, ctx context.Context, 
 		FullMethod: "/identity.agent.IINAgent/RequestAttestation",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IINAgentServer).RequestAttestation(ctx, req.(*AttestedSecurityDomain))
+		return srv.(IINAgentServer).RequestAttestation(ctx, req.(*CounterAttestedMembership))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _IINAgent_SendAttestation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AttestedSecurityDomain)
+	in := new(CounterAttestedMembership)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -218,7 +218,7 @@ func _IINAgent_SendAttestation_Handler(srv interface{}, ctx context.Context, dec
 		FullMethod: "/identity.agent.IINAgent/SendAttestation",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IINAgentServer).SendAttestation(ctx, req.(*AttestedSecurityDomain))
+		return srv.(IINAgentServer).SendAttestation(ctx, req.(*CounterAttestedMembership))
 	}
 	return interceptor(ctx, in, info, handler)
 }
