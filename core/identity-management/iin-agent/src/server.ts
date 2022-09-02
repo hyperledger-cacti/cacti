@@ -43,7 +43,7 @@ iinAgentServer.addService(iin_agent_pb_grpc.IINAgentService, {
         }
     },
     // Service for receiving requests for one's security domain unit's state from foreign IIN agents. Will communicate with the IIN agent caller and respond with an ack while the attestation is being generated.
-    requestIdentityConfiguration: (call: { request: iin_agent_pb.SecurityDomainMemberIdentity }, callback: (_: any, object: ack_pb.Ack) => void) => {
+    requestIdentityConfiguration: (call: { request: iin_agent_pb.SecurityDomainMemberIdentityRequest }, callback: (_: any, object: ack_pb.Ack) => void) => {
         const ack_response = new ack_pb.Ack();
         try {
             requestIdentityConfiguration(call.request);

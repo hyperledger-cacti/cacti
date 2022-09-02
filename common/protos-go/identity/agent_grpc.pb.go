@@ -22,7 +22,7 @@ type IINAgentClient interface {
 	// user or agent triggers a sync of external/foreign network unit's state
 	SyncExternalState(ctx context.Context, in *SecurityDomainMemberIdentity, opts ...grpc.CallOption) (*common.Ack, error)
 	// Requesting network unit's state from a foreign IIN agent.
-	RequestIdentityConfiguration(ctx context.Context, in *SecurityDomainMemberIdentity, opts ...grpc.CallOption) (*common.Ack, error)
+	RequestIdentityConfiguration(ctx context.Context, in *SecurityDomainMemberIdentityRequest, opts ...grpc.CallOption) (*common.Ack, error)
 	// Handling network unit's state sent by a foreign IIN agent.
 	SendIdentityConfiguration(ctx context.Context, in *AttestedMembership, opts ...grpc.CallOption) (*common.Ack, error)
 	// Requesting attestation from a local IIN agent.
@@ -48,7 +48,7 @@ func (c *iINAgentClient) SyncExternalState(ctx context.Context, in *SecurityDoma
 	return out, nil
 }
 
-func (c *iINAgentClient) RequestIdentityConfiguration(ctx context.Context, in *SecurityDomainMemberIdentity, opts ...grpc.CallOption) (*common.Ack, error) {
+func (c *iINAgentClient) RequestIdentityConfiguration(ctx context.Context, in *SecurityDomainMemberIdentityRequest, opts ...grpc.CallOption) (*common.Ack, error) {
 	out := new(common.Ack)
 	err := c.cc.Invoke(ctx, "/identity.agent.IINAgent/RequestIdentityConfiguration", in, out, opts...)
 	if err != nil {
@@ -91,7 +91,7 @@ type IINAgentServer interface {
 	// user or agent triggers a sync of external/foreign network unit's state
 	SyncExternalState(context.Context, *SecurityDomainMemberIdentity) (*common.Ack, error)
 	// Requesting network unit's state from a foreign IIN agent.
-	RequestIdentityConfiguration(context.Context, *SecurityDomainMemberIdentity) (*common.Ack, error)
+	RequestIdentityConfiguration(context.Context, *SecurityDomainMemberIdentityRequest) (*common.Ack, error)
 	// Handling network unit's state sent by a foreign IIN agent.
 	SendIdentityConfiguration(context.Context, *AttestedMembership) (*common.Ack, error)
 	// Requesting attestation from a local IIN agent.
@@ -108,7 +108,7 @@ type UnimplementedIINAgentServer struct {
 func (UnimplementedIINAgentServer) SyncExternalState(context.Context, *SecurityDomainMemberIdentity) (*common.Ack, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SyncExternalState not implemented")
 }
-func (UnimplementedIINAgentServer) RequestIdentityConfiguration(context.Context, *SecurityDomainMemberIdentity) (*common.Ack, error) {
+func (UnimplementedIINAgentServer) RequestIdentityConfiguration(context.Context, *SecurityDomainMemberIdentityRequest) (*common.Ack, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RequestIdentityConfiguration not implemented")
 }
 func (UnimplementedIINAgentServer) SendIdentityConfiguration(context.Context, *AttestedMembership) (*common.Ack, error) {
@@ -152,7 +152,7 @@ func _IINAgent_SyncExternalState_Handler(srv interface{}, ctx context.Context, d
 }
 
 func _IINAgent_RequestIdentityConfiguration_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SecurityDomainMemberIdentity)
+	in := new(SecurityDomainMemberIdentityRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -164,7 +164,7 @@ func _IINAgent_RequestIdentityConfiguration_Handler(srv interface{}, ctx context
 		FullMethod: "/identity.agent.IINAgent/RequestIdentityConfiguration",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(IINAgentServer).RequestIdentityConfiguration(ctx, req.(*SecurityDomainMemberIdentity))
+		return srv.(IINAgentServer).RequestIdentityConfiguration(ctx, req.(*SecurityDomainMemberIdentityRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
