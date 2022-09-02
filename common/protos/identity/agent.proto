@@ -11,9 +11,9 @@ option go_package = "github.com/hyperledger-labs/weaver-dlt-interoperability/com
 // definitions of all messages used in the datatransfer protocol
 service IINAgent {
   // user or agent triggers a sync of external/foreign network unit's state
-  rpc SyncExternalState(NetworkUnitIdentity) returns (common.ack.Ack) {}
+  rpc SyncExternalState(SecurityDomainMemberIdentity) returns (common.ack.Ack) {}
   // Requesting network unit's state from a foreign IIN agent.
-  rpc RequestIdentityConfiguration(NetworkUnitIdentity) returns (common.ack.Ack){}
+  rpc RequestIdentityConfiguration(SecurityDomainMemberIdentity) returns (common.ack.Ack){}
   // Handling network unit's state sent by a foreign IIN agent.
   rpc SendIdentityConfiguration(AttestedMembership) returns (common.ack.Ack){}
   // Requesting attestation from a local IIN agent.
@@ -23,15 +23,20 @@ service IINAgent {
 }
 
 // Unique identifier for a unit of a network that runs an IIN agent
-message NetworkUnitIdentity {
-  string network_id = 1;
-  string participant_id = 2;
-  string nonce = 3;
+message SecurityDomainMemberIdentity {
+  string security_domain = 1;
+  string member_id = 2;
+}
+
+message SecurityDomainMemberIdentityRequest{
+    SecurityDomainMemberIdentity source_network = 1;
+    SecurityDomainMemberIdentity requesting_network = 2;
+    string nonce = 3;
 }
 
 // Association of signature (over arbitrary data) and signer identity
 message Attestation {
-  NetworkUnitIdentity unit_identity = 1;
+  SecurityDomainMemberIdentity unit_identity = 1;
   string certificate = 2;
   string signature = 3;
 }
