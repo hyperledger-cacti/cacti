@@ -28,7 +28,7 @@ message SecurityDomainMemberIdentity {
   string member_id = 2;
 }
 
-message SecurityDomainMemberIdentityRequest{
+message SecurityDomainMemberIdentityRequest {
     SecurityDomainMemberIdentity source_network = 1;
     SecurityDomainMemberIdentity requesting_network = 2;
     string nonce = 3;
