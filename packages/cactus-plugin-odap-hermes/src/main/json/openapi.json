@@ -321,13 +321,10 @@
                     "maxRetries":{
                         "type": "number"
                     },
-                    "besuAssetID": {
+                    "recipientLedgerAssetID": {
                         "type":"string"
                     },
-                    "fabricAssetID": {
-                        "type":"string"
-                    },
-                    "fabricAssetSize": {
+                    "sourceLedgerAssetID": {
                         "type":"string"
                     },
                     "maxTimeout": {
@@ -461,7 +458,7 @@
                     "sequenceNumber":{
                         "type":"integer"
                     },
-                    "sourceGatewayPath": {
+                    "sourceBasePath": {
                         "type": "string"
                     },
                     "recipientBasePath": {
@@ -478,6 +475,12 @@
                         "items":{
                             "type":"string"
                         }
+                    },
+                    "recipientLedgerAssetID": {
+                        "type": "string"
+                    },
+                    "sourceLedgerAssetID": {
+                        "type": "string"
                     }
                 },
                 "required": [
@@ -497,7 +500,9 @@
                     "recipientBasePath",
                     "maxRetries",
                     "maxTimeout",
-                    "backupGatewaysAllowed"
+                    "backupGatewaysAllowed",
+                    "recipientLedgerAssetID",
+                    "sourceLedgerAssetID"
                 ]
             },
             "TransferInitializationV1Response":{
@@ -913,7 +918,7 @@
                 "required": [
                     "sessionID",
                     "messageType",
-                    "ClientIdentityPubkey",
+                    "clientIdentityPubkey",
                     "serverIdentityPubkey",
                     "commitAcknowledgementClaim",
                     "hashCommitFinal",
@@ -1042,6 +1047,12 @@
                     },
                     "maxTimeout": {
                         "type": "number"
+                    },
+                    "sourceLedgerAssetID": {
+                        "type": "string"
+                    },
+                    "recipientLedgerAssetID": {
+                        "type": "string"
                     }
                 },
                 "required": [
@@ -1061,11 +1072,12 @@
                     "serverIdentityPubkey",
                     "clientDltSystem",
                     "serverDltSystem",
-                    "serverGatewayInstanceID",
                     "clientGatewayConfiguration",
                     "serverGatewayConfiguration",
                     "maxRetries",
-                    "maxTimeout"
+                    "maxTimeout",
+                    "sourceLedgerAssetID",
+                    "recipientLedgerAssetID"
                 ]
             },
             "RecoverV1Message":{
@@ -1100,7 +1112,7 @@
                     "sessionID",
                     "odapPhase",
                     "sequenceNumber",
-                    "lastLogEntryHash",
+                    "lastLogEntryTimestamp",
                     "isBackup",
                     "newBasePath",
                     "signature"

@@ -15,22 +15,28 @@ import {
 } from "@hyperledger/cactus-common";
 import { v4 as uuidV4 } from "uuid";
 import { Configuration } from "@hyperledger/cactus-core-api";
-import {
-  IPluginOdapGatewayConstructorOptions,
-  PluginOdapGateway,
-} from "../../../../main/typescript/gateway/plugin-odap-gateway";
+import { PluginOdapGateway } from "../../../../main/typescript/gateway/plugin-odap-gateway";
 import { GoIpfsTestContainer } from "@hyperledger/cactus-test-tooling";
 import {
   OdapLocalLog,
   SessionData,
 } from "../../../../main/typescript/public-api";
 import { SHA256 } from "crypto-js";
-import { knexClientConnection, knexServerConnection } from "../../knex.config";
+import {
+  BesuOdapGateway,
+  IBesuOdapGatewayConstructorOptions,
+} from "../../../../main/typescript/gateway/besu-odap-gateway";
+import {
+  FabricOdapGateway,
+  IFabricOdapGatewayConstructorOptions,
+} from "../../../../main/typescript/gateway/fabric-odap-gateway";
+import { ClientGatewayHelper } from "../../../../main/typescript/gateway/client/client-helper";
+import { ServerGatewayHelper } from "../../../../main/typescript/gateway/server/server-helper";
 
 const logLevel: LogLevelDesc = "TRACE";
 
-let sourceGatewayConstructor: IPluginOdapGatewayConstructorOptions;
-let recipientGatewayConstructor: IPluginOdapGatewayConstructorOptions;
+let sourceGatewayConstructor: IFabricOdapGatewayConstructorOptions;
+let recipientGatewayConstructor: IBesuOdapGatewayConstructorOptions;
 
 let pluginSourceGateway: PluginOdapGateway;
 let pluginRecipientGateway: PluginOdapGateway;
@@ -99,16 +105,16 @@ beforeAll(async () => {
     instanceId: uuidV4(),
     ipfsPath: ipfsApiHost,
     keyPair: Secp256k1Keys.generateKeyPairsBuffer(),
-    knexConfig: knexClientConnection,
+    clientHelper: new ClientGatewayHelper(),
+    serverHelper: new ServerGatewayHelper(),
   };
-
   recipientGatewayConstructor = {
     name: "plugin-odap-gateway#recipientGateway",
     dltIDs: ["DLT1"],
     instanceId: uuidV4(),
     ipfsPath: ipfsApiHost,
-    keyPair: Secp256k1Keys.generateKeyPairsBuffer(),
-    knexConfig: knexServerConnection,
+    clientHelper: new ClientGatewayHelper(),
+    serverHelper: new ServerGatewayHelper(),
   };
 });
 
@@ -118,8 +124,8 @@ beforeEach(async () => {
   type = "type1";
   operation = "operation1";
 
-  pluginSourceGateway = new PluginOdapGateway(sourceGatewayConstructor);
-  pluginRecipientGateway = new PluginOdapGateway(recipientGatewayConstructor);
+  pluginSourceGateway = new FabricOdapGateway(sourceGatewayConstructor);
+  pluginRecipientGateway = new BesuOdapGateway(recipientGatewayConstructor);
 
   sessionData = {
     id: sessionID,
@@ -413,7 +419,7 @@ test("successful recover of sessions after crash", async () => {
 
   // simulate the crash of one gateway
   pluginSourceGateway.database?.destroy();
-  const newPluginSourceGateway = new PluginOdapGateway(
+  const newPluginSourceGateway = new FabricOdapGateway(
     sourceGatewayConstructor,
   );
 

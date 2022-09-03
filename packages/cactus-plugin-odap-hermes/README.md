@@ -112,7 +112,7 @@ Let us consider two gateways. The client gateway connected to Hyperledger Fabric
   - A Hyperledger Fabric API client on URL: http://localhost:8045
   - A Hyperledger Besu API client on URL: http://localhost:8046
   - An IPFS API client on URL: http://localhost:8047
-  - The local databases configuration provided in the file [knex.config.ts](https://github.com/hyperledger/cactus/blob/main/packages/cactus-plugin-odap-hermes/src/test/typescript/knex.config.ts) (if running locally both gateways will use the same database file so it is not advised to leave it as the default if that is the case)
+  - The local databases configuration provided in the file [knex.config.ts](https://github.com/hyperledger/cactus/blob/main/packages/cactus-plugin-odap-hermes/src/test/typescript/knex.config.ts)
 
 Then the ODAP gateways should be created as follows:
 
@@ -127,7 +127,6 @@ const clientOdapPluginOptions: OdapGatewayConstructorOptions = {
      fabricChannelName: fabricChannelName,
      fabricContractName: fabricContractName,
      fabricAssetID: fabricAssetID,
-     knexConfig: knexClientConnection, // if not specified the default will be used
    };
 
 const serverOdapPluginOptions: OdapGatewayConstructorOptions = {
@@ -141,7 +140,6 @@ const serverOdapPluginOptions: OdapGatewayConstructorOptions = {
      besuWeb3SigningCredential,
      besuContractName: besuContractName,
      besuKeychainId: besuKeychainId,
-     knexConfig: knexServerConnection, // if not specified the default will be used
    };
    
    const clientGateway = new OdapGateway(clientOdapPluginOptions);

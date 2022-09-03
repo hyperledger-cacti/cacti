@@ -15,10 +15,6 @@ import {
   SessionData,
 } from "../../../../main/typescript/generated/openapi/typescript-axios/api";
 import {
-  checkValidCommitFinalRequest,
-  sendCommitFinalResponse,
-} from "../../../../main/typescript/gateway/server/commit-final";
-import {
   IListenOptions,
   LogLevelDesc,
   Servers,
@@ -28,7 +24,11 @@ import { PluginObjectStoreIpfs } from "@hyperledger/cactus-plugin-object-store-i
 import { GoIpfsTestContainer } from "@hyperledger/cactus-test-tooling";
 import express from "express";
 import { AddressInfo } from "net";
-import { knexClientConnection, knexServerConnection } from "../../knex.config";
+
+import { BesuOdapGateway } from "../../../../main/typescript/gateway/besu-odap-gateway";
+import { FabricOdapGateway } from "../../../../main/typescript/gateway/fabric-odap-gateway";
+import { ServerGatewayHelper } from "../../../../main/typescript/gateway/server/server-helper";
+import { ClientGatewayHelper } from "../../../../main/typescript/gateway/client/client-helper";
 
 const MAX_RETRIES = 5;
 const MAX_TIMEOUT = 5000;
@@ -99,7 +99,8 @@ beforeEach(async () => {
     dltIDs: ["DLT2"],
     instanceId: uuidv4(),
     ipfsPath: ipfsApiHost,
-    knexConfig: knexClientConnection,
+    clientHelper: new ClientGatewayHelper(),
+    serverHelper: new ServerGatewayHelper(),
   };
 
   recipientGatewayConstructor = {
@@ -107,11 +108,12 @@ beforeEach(async () => {
     dltIDs: ["DLT1"],
     instanceId: uuidv4(),
     ipfsPath: ipfsApiHost,
-    knexConfig: knexServerConnection,
+    clientHelper: new ClientGatewayHelper(),
+    serverHelper: new ServerGatewayHelper(),
   };
 
-  pluginSourceGateway = new PluginOdapGateway(sourceGatewayConstructor);
-  pluginRecipientGateway = new PluginOdapGateway(recipientGatewayConstructor);
+  pluginSourceGateway = new FabricOdapGateway(sourceGatewayConstructor);
+  pluginRecipientGateway = new BesuOdapGateway(recipientGatewayConstructor);
 
   if (
     pluginSourceGateway.database == undefined ||
@@ -195,7 +197,7 @@ test("valid commit final request", async () => {
     JSON.stringify(commitFinalRequestMessage),
   ).toString();
 
-  await checkValidCommitFinalRequest(
+  await pluginRecipientGateway.serverHelper.checkValidCommitFinalRequest(
     commitFinalRequestMessage,
     pluginRecipientGateway,
   );
@@ -231,10 +233,11 @@ test("commit final request with wrong sessionId", async () => {
     pluginSourceGateway.sign(JSON.stringify(commitFinalRequestMessage)),
   );
 
-  await checkValidCommitFinalRequest(
-    commitFinalRequestMessage,
-    pluginRecipientGateway,
-  )
+  await pluginRecipientGateway.serverHelper
+    .checkValidCommitFinalRequest(
+      commitFinalRequestMessage,
+      pluginRecipientGateway,
+    )
     .then(() => {
       throw new Error("Test Failed");
     })
@@ -261,10 +264,11 @@ test("commit final request with wrong message type", async () => {
     pluginSourceGateway.sign(JSON.stringify(commitFinalRequestMessage)),
   );
 
-  await checkValidCommitFinalRequest(
-    commitFinalRequestMessage,
-    pluginRecipientGateway,
-  )
+  await pluginRecipientGateway.serverHelper
+    .checkValidCommitFinalRequest(
+      commitFinalRequestMessage,
+      pluginRecipientGateway,
+    )
     .then(() => {
       throw new Error("Test Failed");
     })
@@ -289,10 +293,11 @@ test("commit final request with wrong previous message hash", async () => {
     pluginSourceGateway.sign(JSON.stringify(commitFinalRequestMessage)),
   );
 
-  await checkValidCommitFinalRequest(
-    commitFinalRequestMessage,
-    pluginRecipientGateway,
-  )
+  await pluginRecipientGateway.serverHelper
+    .checkValidCommitFinalRequest(
+      commitFinalRequestMessage,
+      pluginRecipientGateway,
+    )
     .then(() => {
       throw new Error("Test Failed");
     })
@@ -321,12 +326,13 @@ test("timeout in commit final response because no client gateway is connected", 
 
   pluginSourceGateway.sessions.set(sessionID, sessionData);
 
-  await sendCommitFinalResponse(sessionID, pluginSourceGateway, true)
+  await pluginRecipientGateway.serverHelper
+    .sendCommitFinalResponse(sessionID, pluginSourceGateway, true)
     .then(() => {
       throw new Error("Test Failed");
     })
     .catch((ex: Error) => {
-      expect(ex.message).toMatch("Timeout exceeded.");
+      expect(ex.message).toMatch("message failed.");
     });
 });
 

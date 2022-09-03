@@ -28,8 +28,12 @@ import {
   checkValidRecoverUpdateMessage,
   sendRecoverUpdateMessage,
 } from "../../../../main/typescript/gateway/recovery/recover-update";
-import { knexClientConnection, knexServerConnection } from "../../knex.config";
+
 import { checkValidRecoverMessage } from "../../../../main/typescript/gateway/recovery/recover";
+import { BesuOdapGateway } from "../../../../main/typescript/gateway/besu-odap-gateway";
+import { FabricOdapGateway } from "../../../../main/typescript/gateway/fabric-odap-gateway";
+import { ClientGatewayHelper } from "../../../../main/typescript/gateway/client/client-helper";
+import { ServerGatewayHelper } from "../../../../main/typescript/gateway/server/server-helper";
 
 const logLevel: LogLevelDesc = "TRACE";
 
@@ -98,7 +102,8 @@ beforeEach(async () => {
     instanceId: uuidV4(),
     ipfsPath: ipfsApiHost,
     keyPair: Secp256k1Keys.generateKeyPairsBuffer(),
-    knexConfig: knexClientConnection,
+    clientHelper: new ClientGatewayHelper(),
+    serverHelper: new ServerGatewayHelper(),
   };
   const recipientGatewayConstructor = {
     name: "plugin-odap-gateway#recipientGateway",
@@ -106,11 +111,12 @@ beforeEach(async () => {
     instanceId: uuidV4(),
     ipfsPath: ipfsApiHost,
     keyPair: Secp256k1Keys.generateKeyPairsBuffer(),
-    knexConfig: knexServerConnection,
+    clientHelper: new ClientGatewayHelper(),
+    serverHelper: new ServerGatewayHelper(),
   };
 
-  pluginSourceGateway = new PluginOdapGateway(sourceGatewayConstructor);
-  pluginRecipientGateway = new PluginOdapGateway(recipientGatewayConstructor);
+  pluginSourceGateway = new FabricOdapGateway(sourceGatewayConstructor);
+  pluginRecipientGateway = new BesuOdapGateway(recipientGatewayConstructor);
 
   if (
     pluginSourceGateway.database == undefined ||
@@ -238,7 +244,6 @@ test("check valid built of recover update message", async () => {
     newBasePath: "",
   };
 
-  expect(1).toBe(1);
   recoverMessage.signature = PluginOdapGateway.bufArray2HexStr(
     pluginSourceGateway.sign(JSON.stringify(recoverMessage)),
   );

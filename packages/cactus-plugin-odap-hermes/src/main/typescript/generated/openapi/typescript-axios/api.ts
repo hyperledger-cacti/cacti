@@ -226,6 +226,18 @@ export interface ClientV1Request {
      * @memberof ClientV1Request
      */
     maxTimeout: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof ClientV1Request
+     */
+    sourceLedgerAssetID: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ClientV1Request
+     */
+    recipientLedgerAssetID: string;
 }
 /**
  * 
@@ -330,7 +342,7 @@ export interface CommitFinalV1Response {
      * @type {string}
      * @memberof CommitFinalV1Response
      */
-    clientIdentityPubkey?: string;
+    clientIdentityPubkey: string;
     /**
      * 
      * @type {string}
@@ -979,7 +991,7 @@ export interface RecoverV1Message {
      * @type {string}
      * @memberof RecoverV1Message
      */
-    lastLogEntryTimestamp?: string;
+    lastLogEntryTimestamp: string;
     /**
      * 
      * @type {boolean}
@@ -1372,19 +1384,13 @@ export interface SessionData {
      * @type {string}
      * @memberof SessionData
      */
-    besuAssetID?: string;
+    recipientLedgerAssetID?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    fabricAssetID?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof SessionData
-     */
-    fabricAssetSize?: string;
+    sourceLedgerAssetID?: string;
     /**
      * 
      * @type {number}
@@ -1826,7 +1832,7 @@ export interface TransferInitializationV1Request {
      * @type {string}
      * @memberof TransferInitializationV1Request
      */
-    sourceGatewayPath?: string;
+    sourceBasePath: string;
     /**
      * 
      * @type {string}
@@ -1851,6 +1857,18 @@ export interface TransferInitializationV1Request {
      * @memberof TransferInitializationV1Request
      */
     backupGatewaysAllowed: Array<string>;
+    /**
+     * 
+     * @type {string}
+     * @memberof TransferInitializationV1Request
+     */
+    recipientLedgerAssetID: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TransferInitializationV1Request
+     */
+    sourceLedgerAssetID: string;
 }
 
 /**

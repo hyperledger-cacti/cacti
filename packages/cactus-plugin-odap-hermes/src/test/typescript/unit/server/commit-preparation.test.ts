@@ -10,10 +10,10 @@ import {
 } from "../../../../main/typescript/generated/openapi/typescript-axios/api";
 import { v4 as uuidV4 } from "uuid";
 import { SHA256 } from "crypto-js";
-import {
-  checkValidCommitPreparationRequest,
-  sendCommitPreparationResponse,
-} from "../../../../main/typescript/gateway/server/commit-preparation";
+import { BesuOdapGateway } from "../../../../main/typescript/gateway/besu-odap-gateway";
+import { FabricOdapGateway } from "../../../../main/typescript/gateway/fabric-odap-gateway";
+import { ClientGatewayHelper } from "../../../../main/typescript/gateway/client/client-helper";
+import { ServerGatewayHelper } from "../../../../main/typescript/gateway/server/server-helper";
 
 const MAX_RETRIES = 5;
 const MAX_TIMEOUT = 5000;
@@ -32,15 +32,19 @@ beforeEach(async () => {
     name: "plugin-odap-gateway#sourceGateway",
     dltIDs: ["DLT2"],
     instanceId: uuidV4(),
+    clientHelper: new ClientGatewayHelper(),
+    serverHelper: new ServerGatewayHelper(),
   };
   recipientGatewayConstructor = {
     name: "plugin-odap-gateway#recipientGateway",
     dltIDs: ["DLT1"],
     instanceId: uuidV4(),
+    clientHelper: new ClientGatewayHelper(),
+    serverHelper: new ServerGatewayHelper(),
   };
 
-  pluginSourceGateway = new PluginOdapGateway(sourceGatewayConstructor);
-  pluginRecipientGateway = new PluginOdapGateway(recipientGatewayConstructor);
+  pluginSourceGateway = new FabricOdapGateway(sourceGatewayConstructor);
+  pluginRecipientGateway = new BesuOdapGateway(recipientGatewayConstructor);
 
   if (
     pluginSourceGateway.database == undefined ||
@@ -99,7 +103,7 @@ test("valid commit prepare request", async () => {
     JSON.stringify(commitPrepareRequestMessage),
   ).toString();
 
-  await checkValidCommitPreparationRequest(
+  await pluginRecipientGateway.serverHelper.checkValidCommitPreparationRequest(
     commitPrepareRequestMessage,
     pluginRecipientGateway,
   );
@@ -132,10 +136,11 @@ test("commit prepare request with wrong sessionId", async () => {
     pluginSourceGateway.sign(JSON.stringify(commitPrepareRequestMessage)),
   );
 
-  await checkValidCommitPreparationRequest(
-    commitPrepareRequestMessage,
-    pluginRecipientGateway,
-  )
+  await pluginRecipientGateway.serverHelper
+    .checkValidCommitPreparationRequest(
+      commitPrepareRequestMessage,
+      pluginRecipientGateway,
+    )
     .then(() => {
       throw new Error("Test Failed");
     })
@@ -161,10 +166,11 @@ test("commit prepare request with wrong message type", async () => {
     pluginSourceGateway.sign(JSON.stringify(commitPrepareRequestMessage)),
   );
 
-  await checkValidCommitPreparationRequest(
-    commitPrepareRequestMessage,
-    pluginRecipientGateway,
-  )
+  await pluginRecipientGateway.serverHelper
+    .checkValidCommitPreparationRequest(
+      commitPrepareRequestMessage,
+      pluginRecipientGateway,
+    )
     .then(() => {
       throw new Error("Test Failed");
     })
@@ -190,10 +196,11 @@ test("commit prepare request with wrong previous message hash", async () => {
     pluginSourceGateway.sign(JSON.stringify(commitPrepareRequestMessage)),
   );
 
-  await checkValidCommitPreparationRequest(
-    commitPrepareRequestMessage,
-    pluginRecipientGateway,
-  )
+  await pluginRecipientGateway.serverHelper
+    .checkValidCommitPreparationRequest(
+      commitPrepareRequestMessage,
+      pluginRecipientGateway,
+    )
     .then(() => {
       throw new Error("Test Failed");
     })
@@ -221,12 +228,13 @@ test("timeout in commit preparation response because no client gateway is connec
 
   pluginSourceGateway.sessions.set(sessionID, sessionData);
 
-  await sendCommitPreparationResponse(sessionID, pluginSourceGateway, true)
+  await pluginRecipientGateway.serverHelper
+    .sendCommitPreparationResponse(sessionID, pluginSourceGateway, true)
     .then(() => {
       throw new Error("Test Failed");
     })
     .catch((ex: Error) => {
-      expect(ex.message).toMatch("Timeout exceeded.");
+      expect(ex.message).toMatch("message failed.");
     });
 });
 

@@ -5,10 +5,6 @@ import { v4 as uuidv4 } from "uuid";
 import http, { Server } from "http";
 import { create } from "ipfs-http-client";
 import {
-  checkValidCommitFinalResponse,
-  sendCommitFinalRequest,
-} from "../../../../main/typescript/gateway/client/commit-final";
-import {
   OdapMessageType,
   PluginOdapGateway,
 } from "../../../../main/typescript/gateway/plugin-odap-gateway";
@@ -27,7 +23,11 @@ import { PluginObjectStoreIpfs } from "@hyperledger/cactus-plugin-object-store-i
 import { GoIpfsTestContainer } from "@hyperledger/cactus-test-tooling";
 import express from "express";
 import { AddressInfo } from "net";
-import { knexClientConnection, knexServerConnection } from "../../knex.config";
+
+import { FabricOdapGateway } from "../../../../main/typescript/gateway/fabric-odap-gateway";
+import { BesuOdapGateway } from "../../../../main/typescript/gateway/besu-odap-gateway";
+import { ServerGatewayHelper } from "../../../../main/typescript/gateway/server/server-helper";
+import { ClientGatewayHelper } from "../../../../main/typescript/gateway/client/client-helper";
 
 const MAX_RETRIES = 5;
 const MAX_TIMEOUT = 5000;
@@ -98,18 +98,20 @@ beforeEach(async () => {
     dltIDs: ["DLT2"],
     instanceId: uuidv4(),
     ipfsPath: ipfsApiHost,
-    knexConfig: knexClientConnection,
+    clientHelper: new ClientGatewayHelper(),
+    serverHelper: new ServerGatewayHelper(),
   };
   recipientGatewayConstructor = {
     name: "plugin-odap-gateway#recipientGateway",
     dltIDs: ["DLT1"],
     instanceId: uuidv4(),
     ipfsPath: ipfsApiHost,
-    knexConfig: knexServerConnection,
+    clientHelper: new ClientGatewayHelper(),
+    serverHelper: new ServerGatewayHelper(),
   };
 
-  pluginSourceGateway = new PluginOdapGateway(sourceGatewayConstructor);
-  pluginRecipientGateway = new PluginOdapGateway(recipientGatewayConstructor);
+  pluginSourceGateway = new FabricOdapGateway(sourceGatewayConstructor);
+  pluginRecipientGateway = new BesuOdapGateway(recipientGatewayConstructor);
 
   if (
     pluginSourceGateway.database == undefined ||
@@ -187,7 +189,10 @@ test("valid commit final response", async () => {
 
   const messageHash = SHA256(JSON.stringify(commitFinalResponse)).toString();
 
-  await checkValidCommitFinalResponse(commitFinalResponse, pluginSourceGateway);
+  await pluginSourceGateway.clientHelper.checkValidCommitFinalResponse(
+    commitFinalResponse,
+    pluginSourceGateway,
+  );
 
   const retrievedSessionData = pluginSourceGateway.sessions.get(sessionID);
 
@@ -219,7 +224,8 @@ test("commit final response invalid because of wrong previous message hash", asy
     await pluginRecipientGateway.sign(JSON.stringify(commitFinalResponse)),
   );
 
-  await checkValidCommitFinalResponse(commitFinalResponse, pluginSourceGateway)
+  await pluginSourceGateway.clientHelper
+    .checkValidCommitFinalResponse(commitFinalResponse, pluginSourceGateway)
     .then(() => {
       throw new Error("Test Failed");
     })
@@ -246,7 +252,8 @@ test("commit final response invalid because of wrong signature", async () => {
     await pluginRecipientGateway.sign("somethingWrong"),
   );
 
-  await checkValidCommitFinalResponse(commitFinalResponse, pluginSourceGateway)
+  await pluginSourceGateway.clientHelper
+    .checkValidCommitFinalResponse(commitFinalResponse, pluginSourceGateway)
     .then(() => {
       throw new Error("Test Failed");
     })
@@ -275,12 +282,13 @@ test("timeout in commit final request because no server gateway is connected", a
 
   pluginSourceGateway.sessions.set(sessionID, sessionData);
 
-  await sendCommitFinalRequest(sessionID, pluginSourceGateway, true)
+  await pluginSourceGateway.clientHelper
+    .sendCommitFinalRequest(sessionID, pluginSourceGateway, true)
     .then(() => {
       throw new Error("Test Failed");
     })
     .catch((ex: Error) => {
-      expect(ex.message).toMatch("Timeout exceeded.");
+      expect(ex.message).toMatch("message failed.");
     });
 });
 

@@ -5,10 +5,12 @@
     "declarationDir": "dist/lib",
     "rootDir": "./src",
     "tsBuildInfoFile": "../../.build-cache/cactus-plugin-object-store-ipfs.tsbuildinfo",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "composite": true,
   },
   "include": [
-    "./src"
+    "./src",
+    "src/**/*.json",
   ],
   "references": [
     {

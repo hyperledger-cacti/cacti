@@ -27,15 +27,22 @@ import {
   ClientV1Request,
 } from "../../../main/typescript/public-api";
 import { makeSessionDataChecks } from "../make-checks";
-import { knexClientConnection, knexServerConnection } from "../knex.config";
+
+import { BesuOdapGateway } from "../../../main/typescript/gateway/besu-odap-gateway";
+import { FabricOdapGateway } from "../../../main/typescript/gateway/fabric-odap-gateway";
+import { ClientGatewayHelper } from "../../../main/typescript/gateway/client/client-helper";
+import { ServerGatewayHelper } from "../../../main/typescript/gateway/server/server-helper";
 
 const MAX_RETRIES = 5;
 const MAX_TIMEOUT = 5000;
 
+const FABRIC_ASSET_ID = uuidv4();
+const BESU_ASSET_ID = uuidv4();
+
 let ipfsApiHost: string;
 let ipfsContainer: GoIpfsTestContainer;
 
-const logLevel: LogLevelDesc = "TRACE";
+const logLevel: LogLevelDesc = "INFO";
 
 let sourceGatewayServer: Server;
 let recipientGatewayserver: Server;
@@ -93,7 +100,8 @@ test("runs ODAP between two gateways via openApi", async () => {
     dltIDs: ["DLT2"],
     instanceId: uuidv4(),
     ipfsPath: ipfsApiHost,
-    knexConfig: knexClientConnection,
+    clientHelper: new ClientGatewayHelper(),
+    serverHelper: new ServerGatewayHelper(),
   };
 
   const odapServerGatewayPluginOptions: IPluginOdapGatewayConstructorOptions = {
@@ -101,13 +109,12 @@ test("runs ODAP between two gateways via openApi", async () => {
     dltIDs: ["DLT1"],
     instanceId: uuidv4(),
     ipfsPath: ipfsApiHost,
-    knexConfig: knexServerConnection,
+    clientHelper: new ClientGatewayHelper(),
+    serverHelper: new ServerGatewayHelper(),
   };
 
-  pluginSourceGateway = new PluginOdapGateway(odapClientGatewayPluginOptions);
-  pluginRecipientGateway = new PluginOdapGateway(
-    odapServerGatewayPluginOptions,
-  );
+  pluginSourceGateway = new FabricOdapGateway(odapClientGatewayPluginOptions);
+  pluginRecipientGateway = new BesuOdapGateway(odapServerGatewayPluginOptions);
 
   expect(pluginSourceGateway.database).not.toBeUndefined();
   expect(pluginRecipientGateway.database).not.toBeUndefined();
@@ -193,6 +200,8 @@ test("runs ODAP between two gateways via openApi", async () => {
       serverIdentityPubkey: "",
       maxRetries: MAX_RETRIES,
       maxTimeout: MAX_TIMEOUT,
+      sourceLedgerAssetID: FABRIC_ASSET_ID,
+      recipientLedgerAssetID: BESU_ASSET_ID,
     };
     const res = await apiClient.clientRequestV1(odapClientRequest);
     expect(res.status).toBe(200);

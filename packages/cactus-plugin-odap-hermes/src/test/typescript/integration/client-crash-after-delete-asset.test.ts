@@ -35,10 +35,6 @@ import {
   Constants,
 } from "@hyperledger/cactus-core-api";
 import {
-  IPluginOdapGatewayConstructorOptions,
-  PluginOdapGateway,
-} from "../../../main/typescript/gateway/plugin-odap-gateway";
-import {
   ChainCodeProgrammingLanguage,
   DefaultEventHandlerStrategy,
   FabricContractInvocationType,
@@ -57,41 +53,18 @@ import {
   Web3SigningCredential,
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 import Web3 from "web3";
-import { knexClientConnection, knexServerConnection } from "../knex.config";
+
 import { makeSessionDataChecks } from "../make-checks";
 import {
-  checkValidLockEvidenceRequest,
-  sendLockEvidenceResponse,
-} from "../../../main/typescript/gateway/server/lock-evidence";
+  IFabricOdapGatewayConstructorOptions,
+  FabricOdapGateway,
+} from "../../../main/typescript/gateway/fabric-odap-gateway";
 import {
-  sendTransferCommenceRequest,
-  checkValidTransferCommenceResponse,
-} from "../../../main/typescript/gateway/client/transfer-commence";
-import {
-  sendTransferInitializationRequest,
-  checkValidInitializationResponse,
-} from "../../../main/typescript/gateway/client/transfer-initialization";
-import {
-  checkValidtransferCommenceRequest,
-  sendTransferCommenceResponse,
-} from "../../../main/typescript/gateway/server/transfer-commence";
-import {
-  checkValidInitializationRequest,
-  sendTransferInitializationResponse,
-} from "../../../main/typescript/gateway/server/transfer-initialization";
-import {
-  sendCommitPreparationRequest,
-  checkValidCommitPreparationResponse,
-} from "../../../main/typescript/gateway/client/commit-preparation";
-import {
-  sendLockEvidenceRequest,
-  checkValidLockEvidenceResponse,
-} from "../../../main/typescript/gateway/client/lock-evidence";
-import {
-  checkValidCommitPreparationRequest,
-  sendCommitPreparationResponse,
-} from "../../../main/typescript/gateway/server/commit-preparation";
-import { besuAssetExists, fabricAssetExists } from "../make-checks-ledgers";
+  IBesuOdapGatewayConstructorOptions,
+  BesuOdapGateway,
+} from "../../../main/typescript/gateway/besu-odap-gateway";
+import { ClientGatewayHelper } from "../../../main/typescript/gateway/client/client-helper";
+import { ServerGatewayHelper } from "../../../main/typescript/gateway/server/server-helper";
 /**
  * Use this to debug issues with the fabric node SDK
  * ```sh
@@ -101,7 +74,7 @@ import { besuAssetExists, fabricAssetExists } from "../make-checks-ledgers";
 let ipfsApiHost: string;
 
 let fabricSigningCredential: FabricSigningCredential;
-const logLevel: LogLevelDesc = "TRACE";
+const logLevel: LogLevelDesc = "INFO";
 
 let ipfsServer: Server;
 let sourceGatewayServer: Server;
@@ -125,10 +98,10 @@ let besuKeychainId: string;
 let fabricConnector: PluginLedgerConnectorFabric;
 let besuConnector: PluginLedgerConnectorBesu;
 
-let odapClientGatewayPluginOptions: IPluginOdapGatewayConstructorOptions;
-let odapServerGatewayPluginOptions: IPluginOdapGatewayConstructorOptions;
-let pluginSourceGateway: PluginOdapGateway;
-let pluginRecipientGateway: PluginOdapGateway;
+let odapClientGatewayPluginOptions: IFabricOdapGatewayConstructorOptions;
+let odapServerGatewayPluginOptions: IBesuOdapGatewayConstructorOptions;
+let pluginSourceGateway: FabricOdapGateway;
+let pluginRecipientGateway: BesuOdapGateway;
 
 let odapClientGatewayApiHost: string;
 let odapServerGatewayApiHost: string;
@@ -592,8 +565,8 @@ beforeAll(async () => {
       fabricSigningCredential: fabricSigningCredential,
       fabricChannelName: fabricChannelName,
       fabricContractName: fabricContractName,
-      fabricAssetID: FABRIC_ASSET_ID,
-      knexConfig: knexClientConnection,
+      clientHelper: new ClientGatewayHelper(),
+      serverHelper: new ServerGatewayHelper(),
     };
 
     odapServerGatewayPluginOptions = {
@@ -602,16 +575,16 @@ beforeAll(async () => {
       instanceId: uuidv4(),
       keyPair: Secp256k1Keys.generateKeyPairsBuffer(),
       ipfsPath: ipfsApiHost,
-      besuAssetID: BESU_ASSET_ID,
       besuPath: besuPath,
       besuWeb3SigningCredential: besuWeb3SigningCredential,
       besuContractName: besuContractName,
       besuKeychainId: besuKeychainId,
-      knexConfig: knexServerConnection,
+      clientHelper: new ClientGatewayHelper(),
+      serverHelper: new ServerGatewayHelper(),
     };
 
-    pluginSourceGateway = new PluginOdapGateway(odapClientGatewayPluginOptions);
-    pluginRecipientGateway = new PluginOdapGateway(
+    pluginSourceGateway = new FabricOdapGateway(odapClientGatewayPluginOptions);
+    pluginRecipientGateway = new BesuOdapGateway(
       odapServerGatewayPluginOptions,
     );
 
@@ -695,11 +668,13 @@ test("client gateway crashes after deleting fabric asset", async () => {
     serverIdentityPubkey: "",
     maxRetries: MAX_RETRIES,
     maxTimeout: MAX_TIMEOUT,
+    sourceLedgerAssetID: FABRIC_ASSET_ID,
+    recipientLedgerAssetID: BESU_ASSET_ID,
   };
 
   const sessionID = pluginSourceGateway.configureOdapSession(odapClientRequest);
 
-  const transferInitializationRequest = await sendTransferInitializationRequest(
+  const transferInitializationRequest = await pluginSourceGateway.clientHelper.sendTransferInitializationRequest(
     sessionID,
     pluginSourceGateway,
     false,
@@ -710,12 +685,12 @@ test("client gateway crashes after deleting fabric asset", async () => {
     return;
   }
 
-  await checkValidInitializationRequest(
+  await pluginRecipientGateway.serverHelper.checkValidInitializationRequest(
     transferInitializationRequest,
     pluginRecipientGateway,
   );
 
-  const transferInitializationResponse = await sendTransferInitializationResponse(
+  const transferInitializationResponse = await pluginRecipientGateway.serverHelper.sendTransferInitializationResponse(
     transferInitializationRequest.sessionID,
     pluginRecipientGateway,
     false,
@@ -726,12 +701,12 @@ test("client gateway crashes after deleting fabric asset", async () => {
     return;
   }
 
-  await checkValidInitializationResponse(
+  await pluginSourceGateway.clientHelper.checkValidInitializationResponse(
     transferInitializationResponse,
     pluginSourceGateway,
   );
 
-  const transferCommenceRequest = await sendTransferCommenceRequest(
+  const transferCommenceRequest = await pluginSourceGateway.clientHelper.sendTransferCommenceRequest(
     sessionID,
     pluginSourceGateway,
     false,
@@ -742,12 +717,12 @@ test("client gateway crashes after deleting fabric asset", async () => {
     return;
   }
 
-  await checkValidtransferCommenceRequest(
+  await pluginRecipientGateway.serverHelper.checkValidtransferCommenceRequest(
     transferCommenceRequest,
     pluginRecipientGateway,
   );
 
-  const transferCommenceResponse = await sendTransferCommenceResponse(
+  const transferCommenceResponse = await pluginRecipientGateway.serverHelper.sendTransferCommenceResponse(
     transferCommenceRequest.sessionID,
     pluginRecipientGateway,
     false,
@@ -758,14 +733,14 @@ test("client gateway crashes after deleting fabric asset", async () => {
     return;
   }
 
-  await checkValidTransferCommenceResponse(
+  await pluginSourceGateway.clientHelper.checkValidTransferCommenceResponse(
     transferCommenceResponse,
     pluginSourceGateway,
   );
 
-  await pluginSourceGateway.lockFabricAsset(sessionID);
+  await pluginSourceGateway.lockAsset(sessionID);
 
-  const lockEvidenceRequest = await sendLockEvidenceRequest(
+  const lockEvidenceRequest = await pluginSourceGateway.clientHelper.sendLockEvidenceRequest(
     sessionID,
     pluginSourceGateway,
     false,
@@ -776,12 +751,12 @@ test("client gateway crashes after deleting fabric asset", async () => {
     return;
   }
 
-  await checkValidLockEvidenceRequest(
+  await pluginRecipientGateway.serverHelper.checkValidLockEvidenceRequest(
     lockEvidenceRequest,
     pluginRecipientGateway,
   );
 
-  const lockEvidenceResponse = await sendLockEvidenceResponse(
+  const lockEvidenceResponse = await pluginRecipientGateway.serverHelper.sendLockEvidenceResponse(
     lockEvidenceRequest.sessionID,
     pluginRecipientGateway,
     false,
@@ -792,12 +767,12 @@ test("client gateway crashes after deleting fabric asset", async () => {
     return;
   }
 
-  await checkValidLockEvidenceResponse(
+  await pluginSourceGateway.clientHelper.checkValidLockEvidenceResponse(
     lockEvidenceResponse,
     pluginSourceGateway,
   );
 
-  const commitPreparationRequest = await sendCommitPreparationRequest(
+  const commitPreparationRequest = await pluginSourceGateway.clientHelper.sendCommitPreparationRequest(
     sessionID,
     pluginSourceGateway,
     false,
@@ -808,12 +783,12 @@ test("client gateway crashes after deleting fabric asset", async () => {
     return;
   }
 
-  await checkValidCommitPreparationRequest(
+  await pluginRecipientGateway.serverHelper.checkValidCommitPreparationRequest(
     commitPreparationRequest,
     pluginRecipientGateway,
   );
 
-  const commitPreparationResponse = await sendCommitPreparationResponse(
+  const commitPreparationResponse = await pluginRecipientGateway.serverHelper.sendCommitPreparationResponse(
     lockEvidenceRequest.sessionID,
     pluginRecipientGateway,
     false,
@@ -824,12 +799,12 @@ test("client gateway crashes after deleting fabric asset", async () => {
     return;
   }
 
-  await checkValidCommitPreparationResponse(
+  await pluginSourceGateway.clientHelper.checkValidCommitPreparationResponse(
     commitPreparationResponse,
     pluginSourceGateway,
   );
 
-  await pluginSourceGateway.deleteFabricAsset(sessionID);
+  await pluginSourceGateway.deleteAsset(sessionID);
 
   // now we simulate the crash of the client gateway
   pluginSourceGateway.database?.destroy();
@@ -846,7 +821,7 @@ test("client gateway crashes after deleting fabric asset", async () => {
 
   await Servers.listen(listenOptions);
 
-  pluginSourceGateway = new PluginOdapGateway(odapClientGatewayPluginOptions);
+  pluginSourceGateway = new FabricOdapGateway(odapClientGatewayPluginOptions);
   await pluginSourceGateway.registerWebServices(expressApp);
 
   // client gateway self-healed and is back online
@@ -859,23 +834,11 @@ test("client gateway crashes after deleting fabric asset", async () => {
   );
 
   await expect(
-    fabricAssetExists(
-      pluginSourceGateway,
-      fabricContractName,
-      fabricChannelName,
-      FABRIC_ASSET_ID,
-      fabricSigningCredential,
-    ),
+    pluginSourceGateway.fabricAssetExists(FABRIC_ASSET_ID),
   ).resolves.toBe(false);
 
   await expect(
-    besuAssetExists(
-      pluginRecipientGateway,
-      besuContractName,
-      besuKeychainId,
-      BESU_ASSET_ID,
-      besuWeb3SigningCredential,
-    ),
+    pluginRecipientGateway.besuAssetExists(BESU_ASSET_ID),
   ).resolves.toBe(true);
 });
 

@@ -20,55 +20,17 @@ import {
   AssetProfile,
   ClientV1Request,
 } from "../../../main/typescript/public-api";
-import {
-  checkValidInitializationResponse,
-  sendTransferInitializationRequest,
-} from "../../../main/typescript/gateway/client/transfer-initialization";
-import {
-  checkValidInitializationRequest,
-  sendTransferInitializationResponse,
-} from "../../../main/typescript/gateway/server/transfer-initialization";
-import {
-  checkValidTransferCommenceResponse,
-  sendTransferCommenceRequest,
-} from "../../../main/typescript/gateway/client/transfer-commence";
-import {
-  checkValidtransferCommenceRequest,
-  sendTransferCommenceResponse,
-} from "../../../main/typescript/gateway/server/transfer-commence";
-import {
-  checkValidLockEvidenceResponse,
-  sendLockEvidenceRequest,
-} from "../../../main/typescript/gateway/client/lock-evidence";
-import {
-  checkValidLockEvidenceRequest,
-  sendLockEvidenceResponse,
-} from "../../../main/typescript/gateway/server/lock-evidence";
-import {
-  checkValidCommitPreparationResponse,
-  sendCommitPreparationRequest,
-} from "../../../main/typescript/gateway/client/commit-preparation";
-import {
-  checkValidCommitPreparationRequest,
-  sendCommitPreparationResponse,
-} from "../../../main/typescript/gateway/server/commit-preparation";
-import {
-  checkValidCommitFinalResponse,
-  sendCommitFinalRequest,
-} from "../../../main/typescript/gateway/client/commit-final";
-import {
-  checkValidCommitFinalRequest,
-  sendCommitFinalResponse,
-} from "../../../main/typescript/gateway/server/commit-final";
-import { sendTransferCompleteRequest } from "../../../main/typescript/gateway/client/transfer-complete";
-import { checkValidTransferCompleteRequest } from "../../../main/typescript/gateway/server/transfer-complete";
 import { makeSessionDataChecks } from "../make-checks";
-import { knexClientConnection, knexServerConnection } from "../knex.config";
+
+import { BesuOdapGateway } from "../../../main/typescript/gateway/besu-odap-gateway";
+import { FabricOdapGateway } from "../../../main/typescript/gateway/fabric-odap-gateway";
+import { ClientGatewayHelper } from "../../../main/typescript/gateway/client/client-helper";
+import { ServerGatewayHelper } from "../../../main/typescript/gateway/server/server-helper";
 
 const MAX_RETRIES = 5;
 const MAX_TIMEOUT = 5000;
 
-const logLevel: LogLevelDesc = "TRACE";
+const logLevel: LogLevelDesc = "INFO";
 
 let pluginSourceGateway: PluginOdapGateway;
 let pluginRecipientGateway: PluginOdapGateway;
@@ -126,18 +88,20 @@ test("successful run ODAP instance", async () => {
     dltIDs: ["DLT2"],
     instanceId: uuidV4(),
     ipfsPath: ipfsApiHost,
-    knexConfig: knexClientConnection,
+    clientHelper: new ClientGatewayHelper(),
+    serverHelper: new ServerGatewayHelper(),
   };
   const recipientGatewayConstructor = {
     name: "plugin-odap-gateway#recipientGateway",
     dltIDs: ["DLT1"],
     instanceId: uuidV4(),
     ipfsPath: ipfsApiHost,
-    knexConfig: knexServerConnection,
+    clientHelper: new ClientGatewayHelper(),
+    serverHelper: new ServerGatewayHelper(),
   };
 
-  pluginSourceGateway = new PluginOdapGateway(sourceGatewayConstructor);
-  pluginRecipientGateway = new PluginOdapGateway(recipientGatewayConstructor);
+  pluginSourceGateway = new FabricOdapGateway(sourceGatewayConstructor);
+  pluginRecipientGateway = new BesuOdapGateway(recipientGatewayConstructor);
 
   expect(pluginSourceGateway.database).not.toBeUndefined();
   expect(pluginRecipientGateway.database).not.toBeUndefined();
@@ -176,11 +140,13 @@ test("successful run ODAP instance", async () => {
     serverIdentityPubkey: "",
     maxRetries: MAX_RETRIES,
     maxTimeout: MAX_TIMEOUT,
+    sourceLedgerAssetID: uuidV4(),
+    recipientLedgerAssetID: uuidV4(),
   };
 
   const sessionID = pluginSourceGateway.configureOdapSession(odapClientRequest);
 
-  const transferInitializationRequest = await sendTransferInitializationRequest(
+  const transferInitializationRequest = await pluginSourceGateway.clientHelper.sendTransferInitializationRequest(
     sessionID,
     pluginSourceGateway,
     false,
@@ -191,12 +157,12 @@ test("successful run ODAP instance", async () => {
     return;
   }
 
-  await checkValidInitializationRequest(
+  await pluginRecipientGateway.serverHelper.checkValidInitializationRequest(
     transferInitializationRequest,
     pluginRecipientGateway,
   );
 
-  const transferInitializationResponse = await sendTransferInitializationResponse(
+  const transferInitializationResponse = await pluginRecipientGateway.serverHelper.sendTransferInitializationResponse(
     transferInitializationRequest.sessionID,
     pluginRecipientGateway,
     false,
@@ -207,12 +173,12 @@ test("successful run ODAP instance", async () => {
     return;
   }
 
-  await checkValidInitializationResponse(
+  await pluginSourceGateway.clientHelper.checkValidInitializationResponse(
     transferInitializationResponse,
     pluginSourceGateway,
   );
 
-  const transferCommenceRequest = await sendTransferCommenceRequest(
+  const transferCommenceRequest = await pluginSourceGateway.clientHelper.sendTransferCommenceRequest(
     sessionID,
     pluginSourceGateway,
     false,
@@ -223,12 +189,12 @@ test("successful run ODAP instance", async () => {
     return;
   }
 
-  await checkValidtransferCommenceRequest(
+  await pluginRecipientGateway.serverHelper.checkValidtransferCommenceRequest(
     transferCommenceRequest,
     pluginRecipientGateway,
   );
 
-  const transferCommenceResponse = await sendTransferCommenceResponse(
+  const transferCommenceResponse = await pluginRecipientGateway.serverHelper.sendTransferCommenceResponse(
     transferCommenceRequest.sessionID,
     pluginRecipientGateway,
     false,
@@ -239,14 +205,14 @@ test("successful run ODAP instance", async () => {
     return;
   }
 
-  await checkValidTransferCommenceResponse(
+  await pluginSourceGateway.clientHelper.checkValidTransferCommenceResponse(
     transferCommenceResponse,
     pluginSourceGateway,
   );
 
-  await pluginSourceGateway.lockFabricAsset(sessionID);
+  await pluginSourceGateway.lockAsset(sessionID);
 
-  const lockEvidenceRequest = await sendLockEvidenceRequest(
+  const lockEvidenceRequest = await pluginSourceGateway.clientHelper.sendLockEvidenceRequest(
     sessionID,
     pluginSourceGateway,
     false,
@@ -257,12 +223,12 @@ test("successful run ODAP instance", async () => {
     return;
   }
 
-  await checkValidLockEvidenceRequest(
+  await pluginRecipientGateway.serverHelper.checkValidLockEvidenceRequest(
     lockEvidenceRequest,
     pluginRecipientGateway,
   );
 
-  const lockEvidenceResponse = await sendLockEvidenceResponse(
+  const lockEvidenceResponse = await pluginRecipientGateway.serverHelper.sendLockEvidenceResponse(
     lockEvidenceRequest.sessionID,
     pluginRecipientGateway,
     false,
@@ -273,12 +239,12 @@ test("successful run ODAP instance", async () => {
     return;
   }
 
-  await checkValidLockEvidenceResponse(
+  await pluginSourceGateway.clientHelper.checkValidLockEvidenceResponse(
     lockEvidenceResponse,
     pluginSourceGateway,
   );
 
-  const commitPreparationRequest = await sendCommitPreparationRequest(
+  const commitPreparationRequest = await pluginSourceGateway.clientHelper.sendCommitPreparationRequest(
     sessionID,
     pluginSourceGateway,
     false,
@@ -289,12 +255,12 @@ test("successful run ODAP instance", async () => {
     return;
   }
 
-  await checkValidCommitPreparationRequest(
+  await pluginRecipientGateway.serverHelper.checkValidCommitPreparationRequest(
     commitPreparationRequest,
     pluginRecipientGateway,
   );
 
-  const commitPreparationResponse = await sendCommitPreparationResponse(
+  const commitPreparationResponse = await pluginRecipientGateway.serverHelper.sendCommitPreparationResponse(
     lockEvidenceRequest.sessionID,
     pluginRecipientGateway,
     false,
@@ -305,14 +271,14 @@ test("successful run ODAP instance", async () => {
     return;
   }
 
-  await checkValidCommitPreparationResponse(
+  await pluginSourceGateway.clientHelper.checkValidCommitPreparationResponse(
     commitPreparationResponse,
     pluginSourceGateway,
   );
 
-  await pluginSourceGateway.deleteFabricAsset(sessionID);
+  await pluginSourceGateway.deleteAsset(sessionID);
 
-  const commitFinalRequest = await sendCommitFinalRequest(
+  const commitFinalRequest = await pluginSourceGateway.clientHelper.sendCommitFinalRequest(
     sessionID,
     pluginSourceGateway,
     false,
@@ -323,14 +289,14 @@ test("successful run ODAP instance", async () => {
     return;
   }
 
-  await checkValidCommitFinalRequest(
+  await pluginRecipientGateway.serverHelper.checkValidCommitFinalRequest(
     commitFinalRequest,
     pluginRecipientGateway,
   );
 
-  await pluginRecipientGateway.createBesuAsset(sessionID);
+  await pluginRecipientGateway.createAsset(sessionID);
 
-  const commitFinalResponse = await sendCommitFinalResponse(
+  const commitFinalResponse = await pluginRecipientGateway.serverHelper.sendCommitFinalResponse(
     lockEvidenceRequest.sessionID,
     pluginRecipientGateway,
     false,
@@ -341,9 +307,12 @@ test("successful run ODAP instance", async () => {
     return;
   }
 
-  await checkValidCommitFinalResponse(commitFinalResponse, pluginSourceGateway);
+  await pluginSourceGateway.clientHelper.checkValidCommitFinalResponse(
+    commitFinalResponse,
+    pluginSourceGateway,
+  );
 
-  const transferCompleteRequest = await sendTransferCompleteRequest(
+  const transferCompleteRequest = await pluginSourceGateway.clientHelper.sendTransferCompleteRequest(
     sessionID,
     pluginSourceGateway,
     false,
@@ -354,7 +323,7 @@ test("successful run ODAP instance", async () => {
     return;
   }
 
-  await checkValidTransferCompleteRequest(
+  await pluginRecipientGateway.serverHelper.checkValidTransferCompleteRequest(
     transferCompleteRequest,
     pluginRecipientGateway,
   );
