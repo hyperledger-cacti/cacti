@@ -27,19 +27,19 @@ export class FabricConnector extends LedgerBase {
             throw new Error('Config does not exist at path: ' + configFilePath);
         }
         this.orgMspId = JSON.parse(fs.readFileSync(configFilePath, 'utf8').toString()).mspId;
-        this.walletPath = walletPath ? walletPath : path.join(process.cwd(), `wallet-${this.networkId}`);
+        this.walletPath = walletPath ? walletPath : path.join(process.cwd(), `wallet-${this.networkId}-${this.orgMspId}`);
     }
 
     // Setup a user (with wallet and one or more identities) with contract invocation credentials
     async setupWalletIdentity() {
-        walletSetup(this.walletPath, this.connectionProfilePath, this.configFilePath, this.networkId);
+        walletSetup(this.walletPath, this.connectionProfilePath, this.configFilePath);
     }
 
     // Collect security domain membership info
-    async getSecurityDomainMembership(): Promise<object> {
+    async getSecurityDomainMembership(securityDomain: string): Promise<object> {
         const memberships = getAllMSPConfigurations(this.walletPath, this.connectionProfilePath, this.configFilePath, this.ledgerId);
         const securityDomainInfo = {
-            securityDomain: this.networkId,
+            securityDomain: securityDomain,
             members: memberships,
         }
         return securityDomainInfo;

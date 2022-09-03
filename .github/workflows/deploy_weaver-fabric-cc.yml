@@ -1,3 +1,7 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: CC-BY-4.0
+
 name: Deploy Weaver Fabric CC Docker Image
 
 on:
@@ -5,13 +9,13 @@ on:
     branches:
       - main
     paths:
-      - 'core/network/fabric-interop-cc/Makefile.variables.docker'
+      - 'core/network/fabric-interop-cc/contracts/interop'
       
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
-  relay-image:
+  weaver-fabric-cc-image:
     if: github.repository_owner == 'hyperledger-labs'
     runs-on: ubuntu-latest
     steps:

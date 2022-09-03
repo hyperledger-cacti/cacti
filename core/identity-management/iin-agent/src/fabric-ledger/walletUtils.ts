@@ -13,7 +13,7 @@ const getWallet = async (walletPath: string) => {
     return await Wallets.newFileSystemWallet(walletPath);
 };
 
-const walletSetup = async (walletPath: string, conn_profile_path: string, config_file_path: string, networkName: string): Promise<any> => {
+const walletSetup = async (walletPath: string, conn_profile_path: string, config_file_path: string): Promise<any> => {
     if (!fs.existsSync(conn_profile_path)) {
         throw new Error('Connection profile does not exist at path: ' + conn_profile_path);
     }

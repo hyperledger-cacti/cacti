@@ -1,5 +1,7 @@
-run-vendor:
+vendor:
 	go mod vendor
+
+run-vendor: vendor
 	cp -r ../../../../../common/protos-go/* vendor/github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/
 	cp -r ../../libs/* vendor/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/
 

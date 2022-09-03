@@ -82,9 +82,9 @@ const (
 	RequestState_ERROR             RequestState_STATUS = 2 // View is not there, received error from remote relay
 	RequestState_COMPLETED         RequestState_STATUS = 3 // Data Sharing completed Successfully
 	RequestState_EVENT_RECEIVED    RequestState_STATUS = 4 // View is there and event is received from remote relay
-	RequestState_EVENT_WRITTEN     RequestState_STATUS = 5 // Driver Successfully wrote the view to ledger, hence view is not stored anymore.
+	RequestState_EVENT_WRITTEN     RequestState_STATUS = 5 // Driver Successfully wrote the view to ledger
 	RequestState_EVENT_WRITE_ERROR RequestState_STATUS = 6 // View is there but driver failed to write
-	RequestState_DELETED           RequestState_STATUS = 7 // Once network fetches this request state, mark it delete for cleanup later on.
+	RequestState_DELETED           RequestState_STATUS = 7 // Once network fetches this request state, mark it delete for cleanup later on
 )
 
 // Enum value maps for RequestState_STATUS.
