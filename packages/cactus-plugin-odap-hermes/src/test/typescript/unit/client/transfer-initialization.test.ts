@@ -2,10 +2,6 @@ import { randomInt } from "crypto";
 import { SHA256 } from "crypto-js";
 import { v4 as uuidV4 } from "uuid";
 import {
-  checkValidInitializationResponse,
-  sendTransferInitializationRequest,
-} from "../../../../main/typescript/gateway/client/transfer-initialization";
-import {
   OdapMessageType,
   PluginOdapGateway,
 } from "../../../../main/typescript/gateway/plugin-odap-gateway";
@@ -14,6 +10,10 @@ import {
   SessionData,
   AssetProfile,
 } from "../../../../main/typescript/public-api";
+import { BesuOdapGateway } from "../../../../main/typescript/gateway/besu-odap-gateway";
+import { FabricOdapGateway } from "../../../../main/typescript/gateway/fabric-odap-gateway";
+import { ClientGatewayHelper } from "../../../../main/typescript/gateway/client/client-helper";
+import { ServerGatewayHelper } from "../../../../main/typescript/gateway/server/server-helper";
 
 const MAX_RETRIES = 5;
 const MAX_TIMEOUT = 5000;
@@ -34,15 +34,19 @@ beforeEach(async () => {
     name: "plugin-odap-gateway#sourceGateway",
     dltIDs: ["DLT2"],
     instanceId: uuidV4(),
+    clientHelper: new ClientGatewayHelper(),
+    serverHelper: new ServerGatewayHelper(),
   };
   recipientGatewayConstructor = {
     name: "plugin-odap-gateway#recipientGateway",
     dltIDs: ["DLT1"],
     instanceId: uuidV4(),
+    clientHelper: new ClientGatewayHelper(),
+    serverHelper: new ServerGatewayHelper(),
   };
 
-  pluginSourceGateway = new PluginOdapGateway(sourceGatewayConstructor);
-  pluginRecipientGateway = new PluginOdapGateway(recipientGatewayConstructor);
+  pluginSourceGateway = new FabricOdapGateway(sourceGatewayConstructor);
+  pluginRecipientGateway = new BesuOdapGateway(recipientGatewayConstructor);
 
   if (
     pluginSourceGateway.database == undefined ||
@@ -101,7 +105,7 @@ test("valid transfer initiation response", async () => {
     JSON.stringify(initializationResponseMessage),
   ).toString();
 
-  await checkValidInitializationResponse(
+  await pluginSourceGateway.clientHelper.checkValidInitializationResponse(
     initializationResponseMessage,
     pluginSourceGateway,
   );
@@ -144,10 +148,11 @@ test("transfer initiation response invalid because of wrong previous message has
     ),
   );
 
-  await checkValidInitializationResponse(
-    initializationResponseMessage,
-    pluginSourceGateway,
-  )
+  await pluginSourceGateway.clientHelper
+    .checkValidInitializationResponse(
+      initializationResponseMessage,
+      pluginSourceGateway,
+    )
     .then(() => {
       throw new Error("Test Failed");
     })
@@ -177,10 +182,11 @@ test("transfer initiation response invalid because it does not match transfer in
     ),
   );
 
-  await checkValidInitializationResponse(
-    initializationResponseMessage,
-    pluginSourceGateway,
-  )
+  await pluginSourceGateway.clientHelper
+    .checkValidInitializationResponse(
+      initializationResponseMessage,
+      pluginSourceGateway,
+    )
     .then(() => {
       throw new Error("Test Failed");
     })
@@ -216,16 +222,19 @@ test("timeout in transfer initiation request because no server gateway is connec
     rollbackProofs: [],
     rollbackActionsPerformed: [],
     allowedSourceBackupGateways: [],
+    recipientLedgerAssetID: "",
+    sourceLedgerAssetID: "",
   };
 
   pluginSourceGateway.sessions.set(sessionID, sessionData);
 
-  await sendTransferInitializationRequest(sessionID, pluginSourceGateway, true)
+  await pluginSourceGateway.clientHelper
+    .sendTransferInitializationRequest(sessionID, pluginSourceGateway, true)
     .then(() => {
       throw new Error("Test Failed");
     })
     .catch((ex: Error) => {
-      expect(ex.message).toMatch("Timeout exceeded.");
+      expect(ex.message).toMatch("message failed.");
     });
 });
 

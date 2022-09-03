@@ -119,6 +119,9 @@
       "path": "./examples/cactus-example-supply-chain-frontend/tsconfig.json"
     },
     {
+      "path": "./packages/cactus-plugin-odap-hermes/tsconfig.json"
+    },
+    {
       "path": "./examples/cactus-example-electricity-trade/tsconfig.json"
     },
     {

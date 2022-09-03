@@ -35,10 +35,6 @@ import {
   Constants,
 } from "@hyperledger/cactus-core-api";
 import {
-  IPluginOdapGatewayConstructorOptions,
-  PluginOdapGateway,
-} from "../../../main/typescript/gateway/plugin-odap-gateway";
-import {
   ChainCodeProgrammingLanguage,
   DefaultEventHandlerStrategy,
   FabricContractInvocationType,
@@ -57,45 +53,17 @@ import {
   Web3SigningCredential,
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 import Web3 from "web3";
-import { knexClientConnection, knexServerConnection } from "../knex.config";
-import { besuAssetExists, fabricAssetExists } from "../make-checks-ledgers";
+
 import {
-  sendLockEvidenceRequest,
-  checkValidLockEvidenceResponse,
-} from "../../../main/typescript/gateway/client/lock-evidence";
+  IFabricOdapGatewayConstructorOptions,
+  FabricOdapGateway,
+} from "../../../main/typescript/gateway/fabric-odap-gateway";
 import {
-  sendTransferCommenceRequest,
-  checkValidTransferCommenceResponse,
-} from "../../../main/typescript/gateway/client/transfer-commence";
-import {
-  sendTransferInitializationRequest,
-  checkValidInitializationResponse,
-} from "../../../main/typescript/gateway/client/transfer-initialization";
-import {
-  checkValidLockEvidenceRequest,
-  sendLockEvidenceResponse,
-} from "../../../main/typescript/gateway/server/lock-evidence";
-import {
-  checkValidtransferCommenceRequest,
-  sendTransferCommenceResponse,
-} from "../../../main/typescript/gateway/server/transfer-commence";
-import {
-  checkValidInitializationRequest,
-  sendTransferInitializationResponse,
-} from "../../../main/typescript/gateway/server/transfer-initialization";
-import {
-  sendCommitPreparationRequest,
-  checkValidCommitPreparationResponse,
-} from "../../../main/typescript/gateway/client/commit-preparation";
-import {
-  checkValidCommitPreparationRequest,
-  sendCommitPreparationResponse,
-} from "../../../main/typescript/gateway/server/commit-preparation";
-import {
-  checkValidCommitFinalRequest,
-  sendCommitFinalResponse,
-} from "../../../main/typescript/gateway/server/commit-final";
-import { sendCommitFinalRequest } from "../../../main/typescript/gateway/client/commit-final";
+  IBesuOdapGatewayConstructorOptions,
+  BesuOdapGateway,
+} from "../../../main/typescript/gateway/besu-odap-gateway";
+import { ClientGatewayHelper } from "../../../main/typescript/gateway/client/client-helper";
+import { ServerGatewayHelper } from "../../../main/typescript/gateway/server/server-helper";
 
 /**
  * Use this to debug issues with the fabric node SDK
@@ -106,7 +74,7 @@ import { sendCommitFinalRequest } from "../../../main/typescript/gateway/client/
 let ipfsApiHost: string;
 
 let fabricSigningCredential: FabricSigningCredential;
-const logLevel: LogLevelDesc = "TRACE";
+const logLevel: LogLevelDesc = "INFO";
 
 let ipfsServer: Server;
 let sourceGatewayServer: Server;
@@ -129,14 +97,14 @@ let besuKeychainId: string;
 
 let fabricConnector: PluginLedgerConnectorFabric;
 let besuConnector: PluginLedgerConnectorBesu;
-let pluginSourceGateway: PluginOdapGateway;
-let pluginRecipientGateway: PluginOdapGateway;
 
 let odapClientGatewayApiHost: string;
 let odapServerGatewayApiHost: string;
 
-let odapClientGatewayPluginOptions: IPluginOdapGatewayConstructorOptions;
-let odapServerGatewayPluginOptions: IPluginOdapGatewayConstructorOptions;
+let odapClientGatewayPluginOptions: IFabricOdapGatewayConstructorOptions;
+let odapServerGatewayPluginOptions: IBesuOdapGatewayConstructorOptions;
+let pluginSourceGateway: FabricOdapGateway;
+let pluginRecipientGateway: BesuOdapGateway;
 
 const MAX_RETRIES = 5;
 const MAX_TIMEOUT = 5000;
@@ -597,8 +565,8 @@ beforeAll(async () => {
       fabricSigningCredential: fabricSigningCredential,
       fabricChannelName: fabricChannelName,
       fabricContractName: fabricContractName,
-      fabricAssetID: FABRIC_ASSET_ID,
-      knexConfig: knexClientConnection,
+      clientHelper: new ClientGatewayHelper(),
+      serverHelper: new ServerGatewayHelper(),
     };
 
     odapServerGatewayPluginOptions = {
@@ -607,16 +575,16 @@ beforeAll(async () => {
       instanceId: uuidv4(),
       keyPair: Secp256k1Keys.generateKeyPairsBuffer(),
       ipfsPath: ipfsApiHost,
-      besuAssetID: BESU_ASSET_ID,
       besuPath: besuPath,
       besuWeb3SigningCredential: besuWeb3SigningCredential,
       besuContractName: besuContractName,
       besuKeychainId: besuKeychainId,
-      knexConfig: knexServerConnection,
+      clientHelper: new ClientGatewayHelper(),
+      serverHelper: new ServerGatewayHelper(),
     };
 
-    pluginSourceGateway = new PluginOdapGateway(odapClientGatewayPluginOptions);
-    pluginRecipientGateway = new PluginOdapGateway(
+    pluginSourceGateway = new FabricOdapGateway(odapClientGatewayPluginOptions);
+    pluginRecipientGateway = new BesuOdapGateway(
       odapServerGatewayPluginOptions,
     );
 
@@ -700,11 +668,13 @@ test("client sends rollback message at the end of the protocol", async () => {
     serverIdentityPubkey: "",
     maxRetries: MAX_RETRIES,
     maxTimeout: MAX_TIMEOUT,
+    sourceLedgerAssetID: FABRIC_ASSET_ID,
+    recipientLedgerAssetID: BESU_ASSET_ID,
   };
 
   const sessionID = pluginSourceGateway.configureOdapSession(odapClientRequest);
 
-  const transferInitializationRequest = await sendTransferInitializationRequest(
+  const transferInitializationRequest = await pluginSourceGateway.clientHelper.sendTransferInitializationRequest(
     sessionID,
     pluginSourceGateway,
     false,
@@ -715,12 +685,12 @@ test("client sends rollback message at the end of the protocol", async () => {
     return;
   }
 
-  await checkValidInitializationRequest(
+  await pluginRecipientGateway.serverHelper.checkValidInitializationRequest(
     transferInitializationRequest,
     pluginRecipientGateway,
   );
 
-  const transferInitializationResponse = await sendTransferInitializationResponse(
+  const transferInitializationResponse = await pluginRecipientGateway.serverHelper.sendTransferInitializationResponse(
     transferInitializationRequest.sessionID,
     pluginRecipientGateway,
     false,
@@ -731,12 +701,12 @@ test("client sends rollback message at the end of the protocol", async () => {
     return;
   }
 
-  await checkValidInitializationResponse(
+  await pluginSourceGateway.clientHelper.checkValidInitializationResponse(
     transferInitializationResponse,
     pluginSourceGateway,
   );
 
-  const transferCommenceRequest = await sendTransferCommenceRequest(
+  const transferCommenceRequest = await pluginSourceGateway.clientHelper.sendTransferCommenceRequest(
     sessionID,
     pluginSourceGateway,
     false,
@@ -747,12 +717,12 @@ test("client sends rollback message at the end of the protocol", async () => {
     return;
   }
 
-  await checkValidtransferCommenceRequest(
+  await pluginRecipientGateway.serverHelper.checkValidtransferCommenceRequest(
     transferCommenceRequest,
     pluginRecipientGateway,
   );
 
-  const transferCommenceResponse = await sendTransferCommenceResponse(
+  const transferCommenceResponse = await pluginRecipientGateway.serverHelper.sendTransferCommenceResponse(
     transferCommenceRequest.sessionID,
     pluginRecipientGateway,
     false,
@@ -763,14 +733,14 @@ test("client sends rollback message at the end of the protocol", async () => {
     return;
   }
 
-  await checkValidTransferCommenceResponse(
+  await pluginSourceGateway.clientHelper.checkValidTransferCommenceResponse(
     transferCommenceResponse,
     pluginSourceGateway,
   );
 
-  await pluginSourceGateway.lockFabricAsset(sessionID);
+  await pluginSourceGateway.lockAsset(sessionID);
 
-  const lockEvidenceRequest = await sendLockEvidenceRequest(
+  const lockEvidenceRequest = await pluginSourceGateway.clientHelper.sendLockEvidenceRequest(
     sessionID,
     pluginSourceGateway,
     false,
@@ -781,12 +751,12 @@ test("client sends rollback message at the end of the protocol", async () => {
     return;
   }
 
-  await checkValidLockEvidenceRequest(
+  await pluginRecipientGateway.serverHelper.checkValidLockEvidenceRequest(
     lockEvidenceRequest,
     pluginRecipientGateway,
   );
 
-  const lockEvidenceResponse = await sendLockEvidenceResponse(
+  const lockEvidenceResponse = await pluginRecipientGateway.serverHelper.sendLockEvidenceResponse(
     lockEvidenceRequest.sessionID,
     pluginRecipientGateway,
     false,
@@ -797,12 +767,12 @@ test("client sends rollback message at the end of the protocol", async () => {
     return;
   }
 
-  await checkValidLockEvidenceResponse(
+  await pluginSourceGateway.clientHelper.checkValidLockEvidenceResponse(
     lockEvidenceResponse,
     pluginSourceGateway,
   );
 
-  const commitPreparationRequest = await sendCommitPreparationRequest(
+  const commitPreparationRequest = await pluginSourceGateway.clientHelper.sendCommitPreparationRequest(
     sessionID,
     pluginSourceGateway,
     false,
@@ -813,12 +783,12 @@ test("client sends rollback message at the end of the protocol", async () => {
     return;
   }
 
-  await checkValidCommitPreparationRequest(
+  await pluginRecipientGateway.serverHelper.checkValidCommitPreparationRequest(
     commitPreparationRequest,
     pluginRecipientGateway,
   );
 
-  const commitPreparationResponse = await sendCommitPreparationResponse(
+  const commitPreparationResponse = await pluginRecipientGateway.serverHelper.sendCommitPreparationResponse(
     lockEvidenceRequest.sessionID,
     pluginRecipientGateway,
     false,
@@ -829,14 +799,14 @@ test("client sends rollback message at the end of the protocol", async () => {
     return;
   }
 
-  await checkValidCommitPreparationResponse(
+  await pluginSourceGateway.clientHelper.checkValidCommitPreparationResponse(
     commitPreparationResponse,
     pluginSourceGateway,
   );
 
-  await pluginSourceGateway.deleteFabricAsset(sessionID);
+  await pluginSourceGateway.deleteAsset(sessionID);
 
-  const commitFinalRequest = await sendCommitFinalRequest(
+  const commitFinalRequest = await pluginSourceGateway.clientHelper.sendCommitFinalRequest(
     sessionID,
     pluginSourceGateway,
     false,
@@ -847,13 +817,17 @@ test("client sends rollback message at the end of the protocol", async () => {
     return;
   }
 
-  await checkValidCommitFinalRequest(
+  await pluginRecipientGateway.serverHelper.checkValidCommitFinalRequest(
     commitFinalRequest,
     pluginRecipientGateway,
   );
 
-  await pluginRecipientGateway.createBesuAsset(sessionID);
+  await pluginRecipientGateway.createAsset(sessionID);
 
+  const r1 = await pluginSourceGateway.fabricAssetExists(FABRIC_ASSET_ID);
+  const r2 = await pluginRecipientGateway.besuAssetExists(BESU_ASSET_ID);
+  console.log(r1);
+  console.log(r2);
   // now we simulate the crash of the client gateway
   pluginSourceGateway.database?.destroy();
   await Servers.shutdown(sourceGatewayServer);
@@ -862,11 +836,11 @@ test("client sends rollback message at the end of the protocol", async () => {
 
   // the server gateway sends the message and the
   // rollback will be triggered after the timeout
-  await sendCommitFinalResponse(sessionID, pluginRecipientGateway, true).catch(
-    (ex: Error) => {
-      expect(ex.message).toMatch("Timeout exceeded.");
-    },
-  );
+  await pluginRecipientGateway.serverHelper
+    .sendCommitFinalResponse(sessionID, pluginRecipientGateway, true)
+    .catch((ex: Error) => {
+      expect(ex.message).toMatch("message failed.");
+    });
 
   // the client is back online and rollback after seeing the counterparty rollback
   const expressApp = express();
@@ -880,29 +854,17 @@ test("client sends rollback message at the end of the protocol", async () => {
 
   await Servers.listen(listenOptions);
 
-  pluginSourceGateway = new PluginOdapGateway(odapClientGatewayPluginOptions);
+  pluginSourceGateway = new FabricOdapGateway(odapClientGatewayPluginOptions);
   await pluginSourceGateway.registerWebServices(expressApp);
 
   await pluginSourceGateway.recoverOpenSessions(true);
 
   await expect(
-    fabricAssetExists(
-      pluginSourceGateway,
-      fabricContractName,
-      fabricChannelName,
-      FABRIC_ASSET_ID,
-      fabricSigningCredential,
-    ),
+    pluginSourceGateway.fabricAssetExists(FABRIC_ASSET_ID),
   ).resolves.toBe(true);
 
   await expect(
-    besuAssetExists(
-      pluginRecipientGateway,
-      besuContractName,
-      besuKeychainId,
-      BESU_ASSET_ID,
-      besuWeb3SigningCredential,
-    ),
+    pluginRecipientGateway.besuAssetExists(BESU_ASSET_ID),
   ).resolves.toBe(false);
 });
 

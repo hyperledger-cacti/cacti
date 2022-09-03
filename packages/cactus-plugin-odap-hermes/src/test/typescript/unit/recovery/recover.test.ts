@@ -23,7 +23,11 @@ import { GoIpfsTestContainer } from "@hyperledger/cactus-test-tooling";
 import { RecoverV1Message } from "../../../../main/typescript/public-api";
 import { randomInt } from "crypto";
 import { checkValidRecoverMessage } from "../../../../main/typescript/gateway/recovery/recover";
-import { knexClientConnection, knexServerConnection } from "../../knex.config";
+
+import { BesuOdapGateway } from "../../../../main/typescript/gateway/besu-odap-gateway";
+import { FabricOdapGateway } from "../../../../main/typescript/gateway/fabric-odap-gateway";
+import { ClientGatewayHelper } from "../../../../main/typescript/gateway/client/client-helper";
+import { ServerGatewayHelper } from "../../../../main/typescript/gateway/server/server-helper";
 
 const logLevel: LogLevelDesc = "TRACE";
 
@@ -88,7 +92,8 @@ beforeAll(async () => {
     instanceId: uuidV4(),
     ipfsPath: ipfsApiHost,
     keyPair: Secp256k1Keys.generateKeyPairsBuffer(),
-    knexConfig: knexClientConnection,
+    clientHelper: new ClientGatewayHelper(),
+    serverHelper: new ServerGatewayHelper(),
   };
   recipientGatewayConstructor = {
     name: "plugin-odap-gateway#recipientGateway",
@@ -96,7 +101,8 @@ beforeAll(async () => {
     instanceId: uuidV4(),
     ipfsPath: ipfsApiHost,
     keyPair: Secp256k1Keys.generateKeyPairsBuffer(),
-    knexConfig: knexServerConnection,
+    clientHelper: new ClientGatewayHelper(),
+    serverHelper: new ServerGatewayHelper(),
   };
 });
 
@@ -104,8 +110,8 @@ beforeEach(async () => {
   sessionID = uuidv4();
   sequenceNumber = randomInt(100);
 
-  pluginSourceGateway = new PluginOdapGateway(sourceGatewayConstructor);
-  pluginRecipientGateway = new PluginOdapGateway(recipientGatewayConstructor);
+  pluginSourceGateway = new FabricOdapGateway(sourceGatewayConstructor);
+  pluginRecipientGateway = new BesuOdapGateway(recipientGatewayConstructor);
 
   const sessionData = {
     lastSequenceNumber: sequenceNumber,

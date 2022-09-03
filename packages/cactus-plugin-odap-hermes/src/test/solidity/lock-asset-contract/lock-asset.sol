@@ -59,4 +59,12 @@ contract LockAsset {
   function isPresent(string calldata id) public view returns (bool) {
       return assetExists[id];
   }
+
+  function isAssetLocked(string calldata id) public view returns (bool) {
+      bool exists = assetExists[id];
+      require(exists);
+
+      //an asset could only be deleted if it is already locked
+      return assets[id].isLock;
+  }
 }

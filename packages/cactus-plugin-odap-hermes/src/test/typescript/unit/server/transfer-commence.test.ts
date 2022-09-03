@@ -11,10 +11,10 @@ import {
 } from "../../../../main/typescript/generated/openapi/typescript-axios/api";
 import { v4 as uuidV4 } from "uuid";
 import { SHA256 } from "crypto-js";
-import {
-  checkValidtransferCommenceRequest,
-  sendTransferCommenceResponse,
-} from "../../../../main/typescript/gateway/server/transfer-commence";
+import { FabricOdapGateway } from "../../../../main/typescript/gateway/fabric-odap-gateway";
+import { BesuOdapGateway } from "../../../../main/typescript/gateway/besu-odap-gateway";
+import { ClientGatewayHelper } from "../../../../main/typescript/gateway/client/client-helper";
+import { ServerGatewayHelper } from "../../../../main/typescript/gateway/server/server-helper";
 
 const MAX_RETRIES = 5;
 const MAX_TIMEOUT = 5000;
@@ -36,15 +36,19 @@ beforeEach(async () => {
     name: "plugin-odap-gateway#sourceGateway",
     dltIDs: ["DLT2"],
     instanceId: uuidV4(),
+    clientHelper: new ClientGatewayHelper(),
+    serverHelper: new ServerGatewayHelper(),
   };
   recipientGatewayConstructor = {
     name: "plugin-odap-gateway#recipientGateway",
     dltIDs: ["DLT1"],
     instanceId: uuidV4(),
+    clientHelper: new ClientGatewayHelper(),
+    serverHelper: new ServerGatewayHelper(),
   };
 
-  pluginSourceGateway = new PluginOdapGateway(sourceGatewayConstructor);
-  pluginRecipientGateway = new PluginOdapGateway(recipientGatewayConstructor);
+  pluginSourceGateway = new FabricOdapGateway(sourceGatewayConstructor);
+  pluginRecipientGateway = new BesuOdapGateway(recipientGatewayConstructor);
 
   if (
     pluginSourceGateway.database == undefined ||
@@ -118,7 +122,7 @@ test("valid transfer commence request", async () => {
     JSON.stringify(transferCommenceRequest),
   ).toString();
 
-  await checkValidtransferCommenceRequest(
+  await pluginRecipientGateway.serverHelper.checkValidtransferCommenceRequest(
     transferCommenceRequest,
     pluginRecipientGateway,
   );
@@ -159,10 +163,11 @@ test("transfer commence request with wrong sessionId", async () => {
     pluginSourceGateway.sign(JSON.stringify(transferCommenceRequest)),
   );
 
-  await checkValidtransferCommenceRequest(
-    transferCommenceRequest,
-    pluginRecipientGateway,
-  )
+  await pluginRecipientGateway.serverHelper
+    .checkValidtransferCommenceRequest(
+      transferCommenceRequest,
+      pluginRecipientGateway,
+    )
     .then(() => {
       throw new Error("Test Failed");
     })
@@ -193,10 +198,11 @@ test("transfer commence request with wrong message type", async () => {
     pluginSourceGateway.sign(JSON.stringify(transferCommenceRequest)),
   );
 
-  await checkValidtransferCommenceRequest(
-    transferCommenceRequest,
-    pluginRecipientGateway,
-  )
+  await pluginRecipientGateway.serverHelper
+    .checkValidtransferCommenceRequest(
+      transferCommenceRequest,
+      pluginRecipientGateway,
+    )
     .then(() => {
       throw new Error("Test Failed");
     })
@@ -227,10 +233,11 @@ test("transfer commence request with wrong signature", async () => {
     pluginSourceGateway.sign(JSON.stringify("wrongData")),
   );
 
-  await checkValidtransferCommenceRequest(
-    transferCommenceRequest,
-    pluginRecipientGateway,
-  )
+  await pluginRecipientGateway.serverHelper
+    .checkValidtransferCommenceRequest(
+      transferCommenceRequest,
+      pluginRecipientGateway,
+    )
     .then(() => {
       throw new Error("Test Failed");
     })
@@ -261,10 +268,11 @@ test("transfer commence request with wrong previous message hash", async () => {
     pluginSourceGateway.sign(JSON.stringify(transferCommenceRequest)),
   );
 
-  await checkValidtransferCommenceRequest(
-    transferCommenceRequest,
-    pluginRecipientGateway,
-  )
+  await pluginRecipientGateway.serverHelper
+    .checkValidtransferCommenceRequest(
+      transferCommenceRequest,
+      pluginRecipientGateway,
+    )
     .then(() => {
       throw new Error("Test Failed");
     })
@@ -295,10 +303,11 @@ test("transfer commence request with wrong asset profile hash", async () => {
     pluginSourceGateway.sign(JSON.stringify(transferCommenceRequest)),
   );
 
-  await checkValidtransferCommenceRequest(
-    transferCommenceRequest,
-    pluginRecipientGateway,
-  )
+  await pluginRecipientGateway.serverHelper
+    .checkValidtransferCommenceRequest(
+      transferCommenceRequest,
+      pluginRecipientGateway,
+    )
     .then(() => {
       throw new Error("Test Failed");
     })
@@ -327,12 +336,13 @@ test("timeout in transfer commence response because no client gateway is connect
 
   pluginSourceGateway.sessions.set(sessionID, sessionData);
 
-  await sendTransferCommenceResponse(sessionID, pluginSourceGateway, true)
+  await pluginRecipientGateway.serverHelper
+    .sendTransferCommenceResponse(sessionID, pluginSourceGateway, true)
     .then(() => {
       throw new Error("Test Failed");
     })
     .catch((ex: Error) => {
-      expect(ex.message).toMatch("Timeout exceeded.");
+      expect(ex.message).toMatch("message failed.");
     });
 });
 

@@ -1,7 +1,6 @@
 import { RecoverSuccessV1Message } from "../../generated/openapi/typescript-axios";
 import { LoggerProvider } from "@hyperledger/cactus-common";
 import { PluginOdapGateway } from "../plugin-odap-gateway";
-// import { SHA256 } from "crypto-js";
 
 const log = LoggerProvider.getOrCreate({
   level: "INFO",

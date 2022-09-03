@@ -22,6 +22,10 @@ import {
 } from "../../../../main/typescript/public-api";
 import { randomInt } from "crypto";
 import { checkValidRecoverUpdateAckMessage } from "../../../../main/typescript/gateway/recovery/recover-update-ack";
+import { BesuOdapGateway } from "../../../../main/typescript/gateway/besu-odap-gateway";
+import { FabricOdapGateway } from "../../../../main/typescript/gateway/fabric-odap-gateway";
+import { ClientGatewayHelper } from "../../../../main/typescript/gateway/client/client-helper";
+import { ServerGatewayHelper } from "../../../../main/typescript/gateway/server/server-helper";
 
 const logLevel: LogLevelDesc = "TRACE";
 
@@ -86,15 +90,19 @@ beforeEach(async () => {
     dltIDs: ["DLT2"],
     instanceId: uuidV4(),
     ipfsPath: ipfsApiHost,
+    clientHelper: new ClientGatewayHelper(),
+    serverHelper: new ServerGatewayHelper(),
   };
   const recipientGatewayConstructor = {
     name: "plugin-odap-gateway#recipientGateway",
     dltIDs: ["DLT1"],
     instanceId: uuidV4(),
+    clientHelper: new ClientGatewayHelper(),
+    serverHelper: new ServerGatewayHelper(),
   };
 
-  pluginSourceGateway = new PluginOdapGateway(sourceGatewayConstructor);
-  pluginRecipientGateway = new PluginOdapGateway(recipientGatewayConstructor);
+  pluginSourceGateway = new FabricOdapGateway(sourceGatewayConstructor);
+  pluginRecipientGateway = new BesuOdapGateway(recipientGatewayConstructor);
 
   if (
     pluginSourceGateway.database == undefined ||
