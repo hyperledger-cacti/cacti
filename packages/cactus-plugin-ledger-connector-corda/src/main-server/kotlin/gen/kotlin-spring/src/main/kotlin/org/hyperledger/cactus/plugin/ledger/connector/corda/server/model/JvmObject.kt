@@ -32,7 +32,7 @@ data class JvmObject(
     @field:JsonProperty("primitiveValue") val primitiveValue: kotlin.Any? = null,
 
     @field:Valid
-    @field:JsonProperty("jvmCtorArgs") val jvmCtorArgs: kotlin.collections.List<JvmObject>? = null
+    @field:JsonProperty("jvmCtorArgs") val jvmCtorArgs: kotlin.collections.List<JvmObject>? = arrayListOf()
 ) {
 
 }

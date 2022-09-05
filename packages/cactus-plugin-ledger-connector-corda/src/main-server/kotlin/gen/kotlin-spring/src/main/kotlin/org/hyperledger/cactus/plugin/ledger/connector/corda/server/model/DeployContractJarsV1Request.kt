@@ -21,7 +21,7 @@ import javax.validation.Valid
 data class DeployContractJarsV1Request(
 
     @field:Valid
-    @field:JsonProperty("cordappDeploymentConfigs", required = true) val cordappDeploymentConfigs: kotlin.collections.List<CordappDeploymentConfig>,
+    @field:JsonProperty("cordappDeploymentConfigs", required = true) val cordappDeploymentConfigs: kotlin.collections.List<CordappDeploymentConfig> = arrayListOf(),
 
     @field:Valid
     @field:JsonProperty("jarFiles", required = true) val jarFiles: kotlin.collections.List<JarFile>
