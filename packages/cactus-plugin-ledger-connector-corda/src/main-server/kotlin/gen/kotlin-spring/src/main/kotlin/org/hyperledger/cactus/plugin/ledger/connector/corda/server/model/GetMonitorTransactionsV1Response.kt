@@ -29,7 +29,7 @@ data class GetMonitorTransactionsV1Response(
     @field:JsonProperty("stateFullClassName") val stateFullClassName: kotlin.String? = null,
 
     @field:Valid
-    @field:JsonProperty("tx") val tx: kotlin.collections.List<GetMonitorTransactionsV1ResponseTx>? = null
+    @field:JsonProperty("tx") val tx: kotlin.collections.List<GetMonitorTransactionsV1ResponseTx>? = arrayListOf()
 ) {
 
 }

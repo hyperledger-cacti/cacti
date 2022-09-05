@@ -45,7 +45,8 @@ import kotlin.collections.Map
 class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) val service: ApiPluginLedgerConnectorCordaService) {
 
 
-    @DeleteMapping(
+    @RequestMapping(
+        method = [RequestMethod.DELETE],
         value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/clear-monitor-transactions"],
         produces = ["application/json"],
         consumes = ["application/json"]
@@ -56,7 +57,8 @@ class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) val se
     }
 
 
-    @PostMapping(
+    @RequestMapping(
+        method = [RequestMethod.POST],
         value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/deploy-contract-jars"],
         produces = ["application/json"],
         consumes = ["application/json"]
@@ -67,7 +69,8 @@ class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) val se
     }
 
 
-    @PostMapping(
+    @RequestMapping(
+        method = [RequestMethod.POST],
         value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/diagnose-node"],
         produces = ["application/json"],
         consumes = ["application/json"]
@@ -78,7 +81,8 @@ class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) val se
     }
 
 
-    @GetMapping(
+    @RequestMapping(
+        method = [RequestMethod.GET],
         value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-monitor-transactions"],
         produces = ["application/json"],
         consumes = ["application/json"]
@@ -89,7 +93,8 @@ class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) val se
     }
 
 
-    @GetMapping(
+    @RequestMapping(
+        method = [RequestMethod.GET],
         value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-prometheus-exporter-metrics"],
         produces = ["text/plain"]
     )
@@ -98,7 +103,8 @@ class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) val se
     }
 
 
-    @PostMapping(
+    @RequestMapping(
+        method = [RequestMethod.POST],
         value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/invoke-contract"],
         produces = ["application/json"],
         consumes = ["application/json"]
@@ -109,7 +115,8 @@ class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) val se
     }
 
 
-    @PostMapping(
+    @RequestMapping(
+        method = [RequestMethod.POST],
         value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-flows"],
         produces = ["application/json"],
         consumes = ["application/json"]
@@ -120,7 +127,8 @@ class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) val se
     }
 
 
-    @PostMapping(
+    @RequestMapping(
+        method = [RequestMethod.POST],
         value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/network-map"],
         produces = ["application/json"],
         consumes = ["application/json"]
@@ -131,7 +139,8 @@ class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) val se
     }
 
 
-    @PostMapping(
+    @RequestMapping(
+        method = [RequestMethod.POST],
         value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/start-monitor"],
         produces = ["application/json"],
         consumes = ["application/json"]
@@ -142,7 +151,8 @@ class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) val se
     }
 
 
-    @DeleteMapping(
+    @RequestMapping(
+        method = [RequestMethod.DELETE],
         value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/stop-monitor"],
         produces = ["application/json"],
         consumes = ["application/json"]

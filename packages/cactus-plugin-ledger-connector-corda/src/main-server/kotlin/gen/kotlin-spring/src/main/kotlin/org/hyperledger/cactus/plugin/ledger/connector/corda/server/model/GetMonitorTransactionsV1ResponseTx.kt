@@ -14,13 +14,13 @@ import javax.validation.Valid
 /**
  * 
  * @param index 
- * @param data 
+ * @param &#x60;data&#x60; 
  */
 data class GetMonitorTransactionsV1ResponseTx(
 
     @field:JsonProperty("index") val index: kotlin.String? = null,
 
-    @field:JsonProperty("data") val data: kotlin.String? = null
+    @field:JsonProperty("data") val `data`: kotlin.String? = null
 ) {
 
 }

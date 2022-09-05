@@ -29,7 +29,7 @@ data class InvokeContractV1Request(
     @field:JsonProperty("flowInvocationType", required = true) val flowInvocationType: FlowInvocationType,
 
     @field:Valid
-    @field:JsonProperty("params", required = true) val params: kotlin.collections.List<JvmObject>,
+    @field:JsonProperty("params", required = true) val params: kotlin.collections.List<JvmObject> = arrayListOf(),
 
     @get:Min(0)
     @field:JsonProperty("timeoutMs") val timeoutMs: kotlin.Int? = 60000

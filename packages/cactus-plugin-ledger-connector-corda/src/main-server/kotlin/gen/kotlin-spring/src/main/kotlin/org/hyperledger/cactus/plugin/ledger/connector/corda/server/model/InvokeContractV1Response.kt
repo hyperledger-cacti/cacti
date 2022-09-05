@@ -31,7 +31,7 @@ data class InvokeContractV1Response(
     @get:Size(min=1,max=1024)
     @field:JsonProperty("transactionId") val transactionId: kotlin.String? = null,
 
-    @field:JsonProperty("progress") val progress: kotlin.collections.List<kotlin.String>? = null
+    @field:JsonProperty("progress") val progress: kotlin.collections.List<kotlin.String>? = arrayListOf()
 ) {
 
 }

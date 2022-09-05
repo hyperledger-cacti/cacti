@@ -25,7 +25,7 @@ data class ClearMonitorTransactionsV1Request(
     @get:Size(min=1,max=1024)
     @field:JsonProperty("stateFullClassName", required = true) val stateFullClassName: kotlin.String,
 
-    @field:JsonProperty("txIndexes", required = true) val txIndexes: kotlin.collections.List<kotlin.String>
+    @field:JsonProperty("txIndexes", required = true) val txIndexes: kotlin.collections.List<kotlin.String> = arrayListOf()
 ) {
 
 }

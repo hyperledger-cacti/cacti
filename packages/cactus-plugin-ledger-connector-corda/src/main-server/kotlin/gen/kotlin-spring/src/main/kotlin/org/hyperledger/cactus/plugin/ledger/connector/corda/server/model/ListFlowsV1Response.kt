@@ -17,7 +17,7 @@ import javax.validation.Valid
  */
 data class ListFlowsV1Response(
 
-    @field:JsonProperty("flowNames", required = true) val flowNames: kotlin.collections.List<kotlin.String>
+    @field:JsonProperty("flowNames", required = true) val flowNames: kotlin.collections.List<kotlin.String> = arrayListOf()
 ) {
 
 }
