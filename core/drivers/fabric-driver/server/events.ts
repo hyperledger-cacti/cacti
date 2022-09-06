@@ -48,10 +48,10 @@ async function subscribeEventHelper(
                 const [deletedSubscription, err] =
                     await handlePromise(deleteEventSubscription(call_request.getEventMatcher()!, newRequestId));
                 if (err) {
-                    const errorString: string = `${JSON.stringify(err)}`;
+                    const errorString: string = err.toString();
                     console.error(errorString);
                 }
-                const errorString2 = JSON.stringify(error);
+                const errorString2 = error.toString();
                 console.error(errorString2);
                 ack_send.setMessage(`Event subscription error: listener registration failed with error: ${errorString2}`);
                 ack_send.setStatus(ack_pb.Ack.STATUS.ERROR);
@@ -386,6 +386,23 @@ async function writeExternalStateHelper(
             ccArgsStr.push(Buffer.from(ccArgB64).toString('utf8'));
         }
 
+        let gateway: Gateway = await getNetworkGateway(networkName);
+        const network: Network = await gateway.getNetwork(ctx.getLedgerId());
+        const interopContract: Contract = network.getContract(process.env.INTEROP_CHAINCODE ? process.env.INTEROP_CHAINCODE : 'interop');
+        
+        const endorsingOrgs = ctx.getParticipantsList();
+        // const endorsers = network.getChannel().getEndorsers();
+        // let endorserList = [];
+        // if (endorsingOrgs.length > 0) {
+        //     endorserList = endorsers.filter((endorser: Endorser) => {
+        //         //@ts-ignore
+        //         const cert = Certificate.fromPEM(endorser.options.pem);
+        //         const orgName = cert.issuer.organizationName;
+        //         return endorsingOrgs.includes(endorser.mspid) || endorsingOrgs.includes(orgName);
+        //     });
+        //     console.log('Set endorserList', endorserList);
+        // }
+        
         const invokeObject = {
             channel: ctx.getLedgerId(),
             ccFunc: ctx.getFunc(),
@@ -393,18 +410,15 @@ async function writeExternalStateHelper(
             contractName: ctx.getContractId()
         }
         console.debug(`invokeObject.ccArgs: ${invokeObject.ccArgs}`)
-
-        let gateway: Gateway = await getNetworkGateway(networkName);
-        const network: Network = await gateway.getNetwork(ctx.getLedgerId());
-        const interopContract: Contract = network.getContract(process.env.INTEROP_CHAINCODE ? process.env.INTEROP_CHAINCODE : 'interop');
-
+                
         const [ response, responseError ] = await handlePromise(InteroperableHelper.submitTransactionWithRemoteViews(
             interopContract,
             invokeObject,
             interopArgIndices,
             addresses,
             viewsSerializedBase64,
-            viewContentsBase64
+            viewContentsBase64,
+            endorsingOrgs
         ));
         if (responseError) {
             console.log(`Failed writing to the ledger with error: ${responseError}`);

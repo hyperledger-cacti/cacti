@@ -7,7 +7,7 @@ name: Deploy Go Modules
 on:
   push:
     branches:
-      - test
+      - main
     paths:
       - 'common/protos-go/VERSION'
       - 'core/network/fabric-interop-cc/libs/utils/VERSION'
@@ -15,6 +15,9 @@ on:
       - 'core/network/fabric-interop-cc/interfaces/asset-mgmt/VERSION'
       - 'core/network/fabric-interop-cc/contracts/interop/VERSION'
       - 'sdks/fabric/go-sdk/VERSION'
+      
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
 
 jobs:
   publish-protos:
