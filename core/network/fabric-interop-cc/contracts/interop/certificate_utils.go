@@ -14,7 +14,6 @@ import (
 	"crypto/sha256"
 	"crypto/sha512"
 	"crypto/x509"
-	"encoding/asn1"
 	"encoding/base64"
 	"encoding/pem"
 	"errors"
@@ -90,9 +89,9 @@ func verifyCaCertificate(cert *x509.Certificate, memberCertificate string) error
 	return nil
 }
 
-/* This function works for a Corda network's configuration
-   The assumption is that a Corda network has a single Root CA and Doorman CA, and one or more Node CAs corresponding to nodes.
-   This function will receive arguments for exactly one node with the following cert chain assumed: <root cert> -> <int cert 0> -> <int cert 1>
+/* This function will receive arguments for exactly one node with the following cert chain assumed: <root cert> -> <int cert 0> -> <int cert 1> -> ......
+   In a Fabric network, we assume that there are multiple MSPs, each having one or more Root CAs and zero or more Intermediate CAs.
+   In a Corda network, we assume that there is a single Root CA and Doorman CA, and one or more Node CAs corresponding to nodes.
 */
 func verifyCertificateChain(cert *x509.Certificate, certPEMs []string) error {
 	var parentCert *x509.Certificate
@@ -193,14 +192,7 @@ func getHashSHA2(bitsize int) (hash.Hash, error) {
 }
 
 func ecdsaVerify(verKey *ecdsa.PublicKey, msgHash, signature []byte) error {
-	ecdsaSignature := new(ECDSASignature)
-	_, err := asn1.Unmarshal(signature, ecdsaSignature)
-	if err != nil {
-		return err
-	}
-
-	result := ecdsa.Verify(verKey, msgHash, ecdsaSignature.R, ecdsaSignature.S)
-	// result := ecdsa.VerifyASN1(verKey, msgHash, signature)
+	result := ecdsa.VerifyASN1(verKey, msgHash, signature)
 	if result == false {
 		return errors.New("Signature Verification failed. ECDSA VERIFY")
 	}
@@ -227,7 +219,7 @@ func validateSignature(message string, cert *x509.Certificate, signature string)
 	pubKey := getECDSAPublicKeyFromCertificate(cert)
 	if pubKey != nil {
 		// Construct the message that was signed
-		hashed, err := computeSHA2Hash([]byte(message), 256)
+		hashed, err := computeSHA2Hash([]byte(message), pubKey.Params().BitSize)
 		if err != nil {
 			return err
 		}
@@ -241,6 +233,7 @@ func validateSignature(message string, cert *x509.Certificate, signature string)
 		return errors.New("Missing or unsupported public key type")
 	}
 }
+
 func parseCert(certString string) (*x509.Certificate, error) {
 	certBytes, _ := pem.Decode([]byte(certString))
 

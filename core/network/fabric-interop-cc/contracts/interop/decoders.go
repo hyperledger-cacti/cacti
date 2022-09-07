@@ -16,10 +16,22 @@ import (
 	"strings"
 
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/identity"
 )
 
 func decodeMembership(jsonBytes []byte) (*common.Membership, error) {
 	var decodeObj common.Membership
+	dec := json.NewDecoder(strings.NewReader(string(jsonBytes)))
+	dec.DisallowUnknownFields()
+	err := dec.Decode(&decodeObj)
+	if err != nil {
+		return nil, err
+	}
+	return &decodeObj, nil
+}
+
+func decodeCounterAttestedMembership(jsonBytes []byte) (*identity.CounterAttestedMembership, error) {
+	var decodeObj identity.CounterAttestedMembership
 	dec := json.NewDecoder(strings.NewReader(string(jsonBytes)))
 	dec.DisallowUnknownFields()
 	err := dec.Decode(&decodeObj)

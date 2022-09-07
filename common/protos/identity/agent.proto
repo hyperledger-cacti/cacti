@@ -43,16 +43,16 @@ message Attestation {
 
 // Attested security domain membership by a single member
 message AttestedMembership {
-  common.membership.Membership membership = 1;
+  bytes membership = 1;         // 'common.membership.Membership'
   Attestation attestation = 2;
 }
 
 // Counter attestation over security domain membership attested by its participants
 message CounterAttestedMembership {
   message AttestedMembershipSet {
-    common.membership.Membership membership = 1;
+    bytes membership = 1;                   // 'common.membership.Membership'
     repeated Attestation attestations = 2;
   }
-  AttestedMembershipSet attested_membership_set = 1;
+  bytes attested_membership_set = 1;        // 'AttestedMembershipSet'
   repeated Attestation attestations = 2;
 }
