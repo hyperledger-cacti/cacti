@@ -14,6 +14,7 @@ import (
 	"crypto/sha256"
 	"crypto/sha512"
 	"crypto/x509"
+	"encoding/asn1"
 	"encoding/base64"
 	"encoding/pem"
 	"errors"
@@ -192,7 +193,14 @@ func getHashSHA2(bitsize int) (hash.Hash, error) {
 }
 
 func ecdsaVerify(verKey *ecdsa.PublicKey, msgHash, signature []byte) error {
-	result := ecdsa.VerifyASN1(verKey, msgHash, signature)
+	ecdsaSignature := new(ECDSASignature)
+	_, err := asn1.Unmarshal(signature, ecdsaSignature)
+	if err != nil {
+		return err
+	}
+
+	result := ecdsa.Verify(verKey, msgHash, ecdsaSignature.R, ecdsaSignature.S)
+	// result := ecdsa.VerifyASN1(verKey, msgHash, signature)
 	if result == false {
 		return errors.New("Signature Verification failed. ECDSA VERIFY")
 	}

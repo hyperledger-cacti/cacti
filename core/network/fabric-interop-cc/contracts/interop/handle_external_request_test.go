@@ -180,7 +180,8 @@ func testHandleExternalRequestSignatureCertificateMismatch(t *testing.T, query *
 	b64QueryBytes := base64.StdEncoding.EncodeToString(queryBytes)
 
 	_, err = interopcc.HandleExternalRequest(ctx, string(b64QueryBytes))
-	require.EqualError(t, err, "Invalid Signature: Signature Verification failed. ECDSA VERIFY")
+	require.EqualError(t, err, fmt.Sprintf("Invalid Signature: asn1: structure error: tags don't match (16 vs {class:1 tag:19 length:105 isCompound:false}) {optional:false explicit:false application:false private:false defaultValue:<nil> tag:<nil> stringType:0 timeType:0 set:false omitEmpty:false} ECDSASignature @2"))
+	//require.EqualError(t, err, "Invalid Signature: Signature Verification failed. ECDSA VERIFY")
 }
 
 func testHandleExternalRequestInvalidCert(t *testing.T, query *common.Query) {
