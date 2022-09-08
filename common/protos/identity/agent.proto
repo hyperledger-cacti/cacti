@@ -29,9 +29,9 @@ message SecurityDomainMemberIdentity {
 }
 
 message SecurityDomainMemberIdentityRequest {
-    SecurityDomainMemberIdentity source_network = 1;
-    SecurityDomainMemberIdentity requesting_network = 2;
-    string nonce = 3;
+  SecurityDomainMemberIdentity source_network = 1;
+  SecurityDomainMemberIdentity requesting_network = 2;
+  string nonce = 3;
 }
 
 // Association of signature (over arbitrary data) and signer identity
@@ -39,20 +39,21 @@ message Attestation {
   SecurityDomainMemberIdentity unit_identity = 1;
   string certificate = 2;
   string signature = 3;
+  string nonce = 4;
 }
 
 // Attested security domain membership by a single member
 message AttestedMembership {
-  bytes membership = 1;         // 'common.membership.Membership'
+  bytes membership = 1;         // 'common.membership.Membership': Base64-encoded
   Attestation attestation = 2;
 }
 
 // Counter attestation over security domain membership attested by its participants
 message CounterAttestedMembership {
   message AttestedMembershipSet {
-    bytes membership = 1;                   // 'common.membership.Membership'
+    bytes membership = 1;                   // 'common.membership.Membership': Base64-encoded
     repeated Attestation attestations = 2;
   }
-  bytes attested_membership_set = 1;        // 'AttestedMembershipSet'
+  bytes attested_membership_set = 1;        // 'AttestedMembershipSet': Base64-encoded
   repeated Attestation attestations = 2;
 }

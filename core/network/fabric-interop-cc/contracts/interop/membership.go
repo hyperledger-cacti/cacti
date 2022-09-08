@@ -201,27 +201,47 @@ func (s *SmartContract) CreateMembership(ctx contractapi.TransactionContextInter
 	}
 	err = checkUserInMembership(callerCert, membershipLocalDecoded)
 	if err != nil {
-        return fmt.Errorf("Caller with identity %+v is not a designated IIN Agent: %+v", callerId, err)
+		return fmt.Errorf("Caller with identity %+v is not a designated IIN Agent: %+v", callerId, err)
 	}
 
 	counterAttestedMembership, err := decodeCounterAttestedMembership([]byte(counterAttestedMembershipJSON))
 	if err != nil {
 		return fmt.Errorf("Counter Attested Membership Unmarshal error: %s", err)
 	}
+	decodedAttestedMembershipSet, err := base64.StdEncoding.DecodeString(string(counterAttestedMembership.AttestedMembershipSet))
+	if err != nil {
+		return fmt.Errorf("Attested membership set could not be decoded from base64: %s", err.Error())
+	}
 	var attestedMembershipSet identity.CounterAttestedMembership_AttestedMembershipSet
-	err = protoV2.Unmarshal(counterAttestedMembership.AttestedMembershipSet, &attestedMembershipSet)
+	err = protoV2.Unmarshal(decodedAttestedMembershipSet, &attestedMembershipSet)
 	if err != nil {
 		return fmt.Errorf("Unable to unmarshal attested membership set: %s", err.Error())
 	}
+	decodedForeignMembership, err := base64.StdEncoding.DecodeString(string(attestedMembershipSet.Membership))
+	if err != nil {
+		return fmt.Errorf("Foreign membership could not be decoded from base64: %s", err.Error())
+	}
 	var foreignMembership common.Membership
-	err = protoV2.Unmarshal(attestedMembershipSet.Membership, &foreignMembership)
+	err = protoV2.Unmarshal(decodedForeignMembership, &foreignMembership)
 	if err != nil {
 		return fmt.Errorf("Unable to unmarshal membership: %s", err.Error())
 	}
 
+	// Match nonces across all attestations, local and foreign
+	matchedNonce := ""
+	for _, attestation := range append(counterAttestedMembership.Attestations, attestedMembershipSet.Attestations...) {
+		if matchedNonce == "" {
+			matchedNonce = attestation.Nonce
+		} else {
+			if matchedNonce != attestation.Nonce {
+				return fmt.Errorf("Mismatched nonces across two attestations: %s, %s", matchedNonce, attestation.Nonce)
+			}
+		}
+	}
+
 	// Ensure valid attestations from all local IIN Agents
 	for _, attestation := range counterAttestedMembership.Attestations {
-		err = validateAttestation(attestation, counterAttestedMembership.AttestedMembershipSet)
+		err = validateAttestation(attestation, append(counterAttestedMembership.AttestedMembershipSet, attestation.Nonce...))
 		if err != nil {
 			return err
 		}
@@ -239,7 +259,7 @@ func (s *SmartContract) CreateMembership(ctx contractapi.TransactionContextInter
 			return fmt.Errorf("Foreign agent security domain %s does not match attested membership security domain %s",
 				attestation.UnitIdentity.SecurityDomain, foreignMembership.SecurityDomain)
 		}
-        foundMemberMatch := false
+		foundMemberMatch := false
 		for _, member := range foreignMembership.Members {
 			var isSignerRoot bool
 			var leafCertPEM string
@@ -268,7 +288,7 @@ func (s *SmartContract) CreateMembership(ctx contractapi.TransactionContextInter
 			return fmt.Errorf("No matching member certificate chain found for attester")
 		}
 		// Validate signature
-		err = validateAttestation(attestation, attestedMembershipSet.Membership)
+		err = validateAttestation(attestation, append(attestedMembershipSet.Membership, attestation.Nonce...))
 		if err != nil {
 			return err
 		}
@@ -315,27 +335,47 @@ func (s *SmartContract) UpdateMembership(ctx contractapi.TransactionContextInter
 	}
 	err = checkUserInMembership(callerCert, membershipLocalDecoded)
 	if err != nil {
-        return fmt.Errorf("Caller with identity %+v is not a designated IIN Agent: %+v", callerId, err)
+		return fmt.Errorf("Caller with identity %+v is not a designated IIN Agent: %+v", callerId, err)
 	}
 
 	counterAttestedMembership, err := decodeCounterAttestedMembership([]byte(counterAttestedMembershipJSON))
 	if err != nil {
-		return fmt.Errorf("Unmarshal error: %s", err)
+		return fmt.Errorf("Counter Attested Membership Unmarshal error: %s", err)
+	}
+	decodedAttestedMembershipSet, err := base64.StdEncoding.DecodeString(string(counterAttestedMembership.AttestedMembershipSet))
+	if err != nil {
+		return fmt.Errorf("Attested membership set could not be decoded from base64: %s", err.Error())
 	}
 	var attestedMembershipSet identity.CounterAttestedMembership_AttestedMembershipSet
-	err = protoV2.Unmarshal(counterAttestedMembership.AttestedMembershipSet, &attestedMembershipSet)
+	err = protoV2.Unmarshal(decodedAttestedMembershipSet, &attestedMembershipSet)
 	if err != nil {
 		return fmt.Errorf("Unable to unmarshal attested membership set: %s", err.Error())
 	}
+	decodedForeignMembership, err := base64.StdEncoding.DecodeString(string(attestedMembershipSet.Membership))
+	if err != nil {
+		return fmt.Errorf("Foreign membership could not be decoded from base64: %s", err.Error())
+	}
 	var foreignMembership common.Membership
-	err = protoV2.Unmarshal(attestedMembershipSet.Membership, &foreignMembership)
+	err = protoV2.Unmarshal(decodedForeignMembership, &foreignMembership)
 	if err != nil {
 		return fmt.Errorf("Unable to unmarshal membership: %s", err.Error())
 	}
 
+	// Match nonces across all attestations, local and foreign
+	matchedNonce := ""
+	for _, attestation := range append(counterAttestedMembership.Attestations, attestedMembershipSet.Attestations...) {
+		if matchedNonce == "" {
+			matchedNonce = attestation.Nonce
+		} else {
+			if matchedNonce != attestation.Nonce {
+				return fmt.Errorf("Mismatched nonces across two attestations: %s, %s", matchedNonce, attestation.Nonce)
+			}
+		}
+	}
+
 	// Ensure valid attestations from all local IIN Agents
 	for _, attestation := range counterAttestedMembership.Attestations {
-		err = validateAttestation(attestation, counterAttestedMembership.AttestedMembershipSet)
+		err = validateAttestation(attestation, append(counterAttestedMembership.AttestedMembershipSet, attestation.Nonce...))
 		if err != nil {
 			return err
 		}
@@ -353,7 +393,7 @@ func (s *SmartContract) UpdateMembership(ctx contractapi.TransactionContextInter
 			return fmt.Errorf("Foreign agent security domain %s does not match attested membership security domain %s",
 				attestation.UnitIdentity.SecurityDomain, foreignMembership.SecurityDomain)
 		}
-        foundMemberMatch := false
+		foundMemberMatch := false
 		for _, member := range foreignMembership.Members {
 			var isSignerRoot bool
 			var leafCertPEM string
@@ -382,7 +422,7 @@ func (s *SmartContract) UpdateMembership(ctx contractapi.TransactionContextInter
 			return fmt.Errorf("No matching member certificate chain found for attester")
 		}
 		// Validate signature
-		err = validateAttestation(attestation, attestedMembershipSet.Membership)
+		err = validateAttestation(attestation, append(attestedMembershipSet.Membership, attestation.Nonce...))
 		if err != nil {
 			return err
 		}
