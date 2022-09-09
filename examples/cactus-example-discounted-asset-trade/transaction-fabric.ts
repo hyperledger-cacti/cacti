@@ -18,28 +18,29 @@
 import { ConfigUtil } from "@hyperledger/cactus-cmd-socketio-server";
 import { Verifier } from "@hyperledger/cactus-verifier-client";
 
-const fs = require("fs");
-const path = require("path");
-const yaml = require("js-yaml");
 import { FileSystemWallet } from "fabric-network";
 
-//const config: any = JSON.parse(fs.readFileSync("/etc/cactus/default.json", 'utf8'));
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
 const moduleName = "TransactionFabric";
 const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;
 
+interface SendSyncRequestResult {
+  data: {
+    signedCommitProposal: {
+      signature: string | Buffer;
+      proposal_bytes: string | Buffer;
+    };
+  };
+  txId: string;
+}
+
 export function makeSignedProposal<T>(
   ccFncName: string,
   ccArgs: string[],
   verifierFabric: Verifier<T>,
-): Promise<{ data: {}; txId: string }> {
-  // exports.Invoke = async function(reqBody, isWait){
-  // let eventhubs = []; // For the time being, give up the eventhub connection of multiple peers.
-  let invokeResponse; // Return value from chain code
-  let channel;
-
+): Promise<SendSyncRequestResult> {
   return new Promise(async (resolve, reject) => {
     try {
       /*
@@ -57,7 +58,9 @@ export function makeSignedProposal<T>(
       let certPem = undefined;
       let privateKeyPem = undefined;
       const submitter = config.assetTradeInfo.fabric.submitter.name;
-      const wallet = new FileSystemWallet(config.assetTradeInfo.fabric.keystore);
+      const wallet = new FileSystemWallet(
+        config.assetTradeInfo.fabric.keystore,
+      );
       logger.debug(`Wallet path: ${config.assetTradeInfo.fabric.keystore}`);
 
       const submitterExists = await wallet.exists(submitter);
@@ -67,11 +70,17 @@ export function makeSignedProposal<T>(
         privateKeyPem = (submitterIdentity as any).privateKey;
       }
 
-      // const signedTx = await TransactionSigner.signTxFabric(transactionProposalReq, certPem, privateKeyPem);
-      const contract = { channelName: config.assetTradeInfo.fabric.channelName };
+      const contract = {
+        channelName: config.assetTradeInfo.fabric.channelName,
+      };
       const method = { type: "function", command: "sendSignedProposal" };
-      const template = "default";
-      const argsParam: {} = {
+      const argsParam: {
+        args: {
+          transactionProposalReq: Record<string, unknown>;
+          certPem: undefined;
+          privateKeyPem: undefined;
+        };
+      } = {
         args: {
           transactionProposalReq: transactionProposalReq,
           certPem: certPem,
@@ -81,19 +90,14 @@ export function makeSignedProposal<T>(
       verifierFabric
         .sendSyncRequest(contract, method, argsParam)
         .then((resp) => {
-          // logger.debug(`##makeSignedProposal: resp: ${JSON.stringify(resp)}`);
-          // logger.debug(`##makeSignedProposal: resp.data: ${JSON.stringify(resp.data)}`);
           logger.debug(`Successfully build endorse and commit`);
 
-          const args: {} = {
-            // signedCommitProposal: resp["signedCommitProposal"],
+          const args = {
             signedCommitProposal: resp.data["signedCommitProposal"],
-            // commitReq: resp["commitReq"]
             commitReq: resp.data["commitReq"],
           };
-          const result: { data: {}; txId: string } = {
+          const result: SendSyncRequestResult = {
             data: args,
-            // txId: resp["txId"]
             txId: resp.data["txId"],
           };
           return resolve(result);

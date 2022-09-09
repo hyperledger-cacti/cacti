@@ -14,13 +14,15 @@ import { TransactionData } from "./transaction-data";
 import { BusinessLogicInquireAssetTradeStatus } from "./business-logic-inquire-asset-trade-status";
 import { TxInfoData } from "./tx-info-data";
 import { routesTransactionManagement } from "@hyperledger/cactus-cmd-socketio-server";
-import { LedgerOperation } from "@hyperledger/cactus-cmd-socketio-server";
 import { BusinessLogicBase } from "@hyperledger/cactus-cmd-socketio-server";
 import { LPInfoHolder } from "@hyperledger/cactus-cmd-socketio-server";
 import { makeRawTransaction } from "./transaction-ethereum";
 import { makeSignedProposal } from "./transaction-fabric";
 import { getDataFromIndy } from "./transaction-indy";
-import { LedgerEvent, ConfigUtil } from "@hyperledger/cactus-cmd-socketio-server";
+import {
+  LedgerEvent,
+  ConfigUtil,
+} from "@hyperledger/cactus-cmd-socketio-server";
 import { json2str } from "@hyperledger/cactus-cmd-socketio-server";
 import { AssetTradeStatus } from "./define";
 import {
@@ -28,10 +30,6 @@ import {
   VerifierFactoryConfig,
 } from "@hyperledger/cactus-verifier-client";
 
-const fs = require("fs");
-const path = require("path");
-const yaml = require("js-yaml");
-//const config: any = JSON.parse(fs.readFileSync("/etc/cactus/default.json", 'utf8'));
 const config: any = ConfigUtil.getConfig();
 
 import { getLogger } from "log4js";
@@ -50,6 +48,32 @@ const assert = require("assert");
 const identifierSchema = "schema";
 const identifierCredDef = "credDef";
 
+interface EthEvent {
+  blockData: { transactions: { [key: string]: EthData } };
+  hash: string;
+  status: number;
+}
+interface EthData {
+  hash: string;
+}
+
+interface FabricEvent {
+  txId: string;
+  blockData: [];
+  hash: string;
+  status: number;
+}
+
+interface TransactionStatusData {
+  stateInfo: number | undefined;
+  transactionStatus: {
+    state: string;
+    ledger: string;
+    txID: string;
+    txInfo: string; // JSON string
+  }[];
+}
+
 export class BusinessLogicAssetTrade extends BusinessLogicBase {
   transactionInfoManagement: TransactionInfoManagement;
   // useValidator: {};
@@ -59,7 +83,11 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
     this.transactionInfoManagement = new TransactionInfoManagement();
   }
 
-  startTransaction(req: Request, businessLogicID: string, tradeID: string) {
+  startTransaction(
+    req: Request,
+    businessLogicID: string,
+    tradeID: string,
+  ): void {
     logger.debug("called startTransaction");
 
     // set RequestInfo
@@ -85,27 +113,20 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
     // pricing of trade by user's status which is employee or not employee
     this.Pricing(requestInfo)
       .then((result) => {
-        // logger.debug(`Pricing.result: ${result}`);
-        // logger.debug(`##startTransaction(): requestInfo.tradeInfo.tradingValue : ${requestInfo.tradeInfo.tradingValue}`);
-
         requestInfo = result;
 
         // Create trade information
         const tradeInfo: TradeInfo = new TradeInfo(
           requestInfo.businessLogicID,
-          requestInfo.tradeID
+          requestInfo.tradeID,
         );
 
         // trade status update
         this.transactionInfoManagement.setStatus(
           tradeInfo,
-          AssetTradeStatus.UnderEscrow
+          AssetTradeStatus.UnderEscrow,
         );
 
-        // Get varidator information
-        // this.useValidator = JSON.parse(routesTransactionManagement.getValidatorToUse(requestInfo.businessLogicID));
-
-        // this.dummyTransaction(requestInfo, tradeInfo);
         this.firstTransaction(requestInfo, tradeInfo);
       })
       .catch((err) => {
@@ -113,48 +134,48 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
       });
   }
 
-  dummyTransaction(requestInfo: RequestInfo, tradeInfo: TradeInfo) {
+  dummyTransaction(requestInfo: RequestInfo, tradeInfo: TradeInfo): void {
     logger.debug("called dummyTransaction");
 
     let transactionData: TransactionData = new TransactionData(
       "escrow",
       "ledger001",
-      "tid001"
+      "tid001",
     );
     this.transactionInfoManagement.setTransactionData(
       tradeInfo,
-      transactionData
+      transactionData,
     );
 
     this.transactionInfoManagement.setStatus(
       tradeInfo,
-      AssetTradeStatus.UnderTransfer
+      AssetTradeStatus.UnderTransfer,
     );
 
     transactionData = new TransactionData("transfer", "ledger002", "tid002");
     this.transactionInfoManagement.setTransactionData(
       tradeInfo,
-      transactionData
+      transactionData,
     );
 
     this.transactionInfoManagement.setStatus(
       tradeInfo,
-      AssetTradeStatus.UnderSettlement
+      AssetTradeStatus.UnderSettlement,
     );
 
     transactionData = new TransactionData("settlement", "ledger003", "tid003");
     this.transactionInfoManagement.setTransactionData(
       tradeInfo,
-      transactionData
+      transactionData,
     );
 
     this.transactionInfoManagement.setStatus(
       tradeInfo,
-      AssetTradeStatus.Completed
+      AssetTradeStatus.Completed,
     );
   }
 
-  async Pricing(requestInfo: RequestInfo) {
+  async Pricing(requestInfo: RequestInfo): Promise<RequestInfo> {
     logger.debug("called Pricing");
 
     // price list
@@ -162,7 +183,7 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
 
     logger.debug(JSON.stringify(requestInfo.tradeInfo.proofJson));
     const isPreferredCustomer = await this.isPreferredCustomer(
-      requestInfo.tradeInfo.proofJson
+      requestInfo.tradeInfo.proofJson,
     );
 
     // decide the price from result of isPreferredCustomer
@@ -173,12 +194,15 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
       logger.debug("##isPreferredCustomer result : false");
       requestInfo.tradeInfo.tradingValue = priceList.default;
     }
-    // logger.debug(`##Pricing(): requestInfo.tradeInfo.tradingValue : ${requestInfo.tradeInfo.tradingValue}`);
 
     return requestInfo;
   }
 
-  async isPreferredCustomer(input_obj) {
+  async isPreferredCustomer(input_obj: {
+    tradeInfo: string;
+    proof_request: string;
+    proof: string;
+  }): Promise<boolean | unknown> {
     let proofRequestJson;
     let proofJson;
     try {
@@ -186,7 +210,7 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
       proofJson = JSON.parse(input_obj["proof"]);
     } catch (err) {
       logger.error(
-        "Error while reading proof and proof request. returning false."
+        "Error while reading proof and proof request. returning false.",
       );
       return false;
     }
@@ -194,33 +218,40 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
     // get schema & credential definition from indy
     // now verifierGetEntitiesFromLedger don't get revRegDefs & revRegs
     // did is null. If it is null, indy.buidlGetSchemaRequest API get data by default param.
-    const [schemasJson, credDefsJson, revRegDefsJson, revRegsJson] =
-      await this.verifierGetEntitiesFromLedger(null, proofJson["identifiers"]);
+    const [
+      schemasJson,
+      credDefsJson,
+      revRegDefsJson,
+      revRegsJson,
+    ] = await this.verifierGetEntitiesFromLedger(
+      null,
+      proofJson["identifiers"],
+    );
 
     assert(
       "Permanent" ===
-        proofJson["requested_proof"]["revealed_attrs"]["attr1_referent"]["raw"]
+        proofJson["requested_proof"]["revealed_attrs"]["attr1_referent"]["raw"],
     );
 
     logger.debug(
       `##isPreferredCustomer verifierGetEntitiesFromLedger schemasJson : ${JSON.stringify(
-        schemasJson
-      )}`
+        schemasJson,
+      )}`,
     );
     logger.debug(
       `##isPreferredCustomer verifierGetEntitiesFromLedger credDefsJson : ${JSON.stringify(
-        credDefsJson
-      )}`
+        credDefsJson,
+      )}`,
     );
     logger.debug(
       `##isPreferredCustomer verifierGetEntitiesFromLedger revRegDefsJson : ${JSON.stringify(
-        revRegDefsJson
-      )}`
+        revRegDefsJson,
+      )}`,
     );
     logger.debug(
       `##isPreferredCustomer verifierGetEntitiesFromLedger revRegsJson : ${JSON.stringify(
-        revRegsJson
-      )}`
+        revRegsJson,
+      )}`,
     );
 
     try {
@@ -230,32 +261,43 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
         schemasJson,
         credDefsJson,
         revRegDefsJson,
-        revRegsJson
+        revRegsJson,
       );
       logger.debug("verify proof: " + (verif_result ? "ok" : "not ok"));
       return verif_result;
     } catch (err) {
       logger.error(
-        "error raised during indy.verifierVerifyProof() invocation. defaulting to false (= NO DISCOUNT)"
+        "error raised during indy.verifierVerifyProof() invocation. defaulting to false (= NO DISCOUNT)",
       );
       logger.error(err);
       return false;
     }
   }
 
-  async verifierGetEntitiesFromLedger(did, identifiers) {
-    const schemas = {};
-    const credDefs = {};
+  async verifierGetEntitiesFromLedger(
+    did: string | null,
+    identifiers: {
+      [keyof: string]: { schema_id: string; cred_def_id: string };
+    },
+  ): Promise<
+    [
+      Record<string, unknown>,
+      Record<string, unknown>,
+      Record<string, unknown>,
+      Record<string, unknown>,
+    ]
+  > {
+    const schemas: { [keyof: string]: string } = {};
+    const credDefs: { [keyof: string]: string } = {};
     const revRegDefs = {};
     const revRegs = {};
 
     for (const referent of Object.keys(identifiers)) {
       const item = identifiers[referent];
       const args_request_getSchema = { did: did, schemaId: item["schema_id"] };
-      const responseSchema = await getDataFromIndy(
-        args_request_getSchema,
-        identifierSchema
-      );
+      const responseSchema: {
+        data: string[];
+      } = await getDataFromIndy(args_request_getSchema, identifierSchema);
       const [receivedSchemaId, receivedSchema] = responseSchema["data"];
       schemas[receivedSchemaId] = JSON.parse(receivedSchema);
 
@@ -263,16 +305,12 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
         did: did,
         schemaId: item["cred_def_id"],
       };
-      const responseCredDef = await getDataFromIndy(
-        args_request_getCredDef,
-        identifierCredDef
-      );
+      const responseCredDef: {
+        data: string[];
+      } = await getDataFromIndy(args_request_getCredDef, identifierCredDef);
+
       const [receivedCredDefId, receivedCredDef] = responseCredDef["data"];
       credDefs[receivedCredDefId] = JSON.parse(receivedCredDef);
-
-      if (item.rev_reg_seq_no) {
-        // TODO Get Revocation Definitions and Revocation Registries
-      }
     }
 
     logger.debug("finish get Data from indy");
@@ -280,19 +318,18 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
     return [schemas, credDefs, revRegDefs, revRegs];
   }
 
-  firstTransaction(requestInfo: RequestInfo, tradeInfo: TradeInfo) {
+  firstTransaction(requestInfo: RequestInfo, tradeInfo: TradeInfo): void {
     logger.debug("called firstTransaction");
 
     ///// Eth Escrow
 
     // Get Verifier Instance
     logger.debug(
-      `##firstTransaction(): businessLogicID: ${tradeInfo.businessLogicID}`
+      `##firstTransaction(): businessLogicID: ${tradeInfo.businessLogicID}`,
     );
     const useValidator = JSON.parse(
-      routesTransactionManagement.getValidatorToUse(tradeInfo.businessLogicID)
+      routesTransactionManagement.getValidatorToUse(tradeInfo.businessLogicID),
     );
-    //        const verifierEthereum = routesTransactionManagement.getVerifier(useValidator['validatorID'][0]);
     const verifierEthereum = routesVerifierFactory.getVerifier(
       useValidator["validatorID"][0],
     );
@@ -305,7 +342,7 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
 
     // TODO: get private key from
     logger.debug(
-      `####fromAddress: ${requestInfo.tradeInfo.ethereumAccountFrom}`
+      `####fromAddress: ${requestInfo.tradeInfo.ethereumAccountFrom}`,
     );
     const fromAddressPkey =
       config.assetTradeInfo.ethereum[
@@ -338,22 +375,19 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
         const transactionData: TransactionData = new TransactionData(
           "escrow",
           "ledger001",
-          result.txId
+          result.txId,
         );
         this.transactionInfoManagement.setTransactionData(
           tradeInfo,
-          transactionData
+          transactionData,
         );
 
         // Set Parameter
         logger.debug("firstTransaction data : " + JSON.stringify(result.data));
         const contract = {}; // NOTE: Since contract does not need to be specified, specify an empty object.
         const method = { type: "web3Eth", command: "sendRawTransaction" };
-        const template = "default";
-        const args = { args: [result.data["serializedTx"]] };
-        // const method = "default";
-        // const args = {"method": {type: "web3Eth", command: "sendRawTransaction"},"args": {"args": [result.data["serializedTx"]]}};
 
+        const args = { args: [result.data["serializedTx"]] };
         // Run Verifier (Ethereum)
         verifierEthereum
           .sendAsyncRequest(contract, method, args)
@@ -372,20 +406,19 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
   secondTransaction(
     assetID: string,
     fabricAccountTo: string,
-    tradeInfo: TradeInfo
-  ) {
+    tradeInfo: TradeInfo,
+  ): void {
     logger.debug("called secondTransaction");
 
     ///// Fab Transfer
 
     // Get Verifier Instance
     logger.debug(
-      `##secondTransaction(): businessLogicID: ${tradeInfo.businessLogicID}`
+      `##secondTransaction(): businessLogicID: ${tradeInfo.businessLogicID}`,
     );
     const useValidator = JSON.parse(
-      routesTransactionManagement.getValidatorToUse(tradeInfo.businessLogicID)
+      routesTransactionManagement.getValidatorToUse(tradeInfo.businessLogicID),
     );
-    //        const verifierFabric = routesTransactionManagement.getVerifier(useValidator['validatorID'][1]);
     const verifierFabric = routesVerifierFactory.getVerifier(
       useValidator["validatorID"][1],
     );
@@ -405,34 +438,32 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
     ];
     makeSignedProposal(ccFncName, ccArgs, verifierFabric)
       .then((result) => {
-        // logger.info(`##ret makeSignedProposal: result: ${JSON.stringify(result)}`);
         logger.info("secondTransaction txId : " + result.txId);
 
         // Register transaction data in DB
         const transactionData: TransactionData = new TransactionData(
           "transfer",
           "ledger002",
-          result.txId
+          result.txId,
         );
         this.transactionInfoManagement.setTransactionData(
           tradeInfo,
-          transactionData
+          transactionData,
         );
 
         // NOTE: Convert properties to binary.
         //       If you do not convert the following, you will get an error.
         result.data["signedCommitProposal"].signature = Buffer.from(
-          result.data["signedCommitProposal"].signature
+          result.data["signedCommitProposal"].signature,
         );
         result.data["signedCommitProposal"].proposal_bytes = Buffer.from(
-          result.data["signedCommitProposal"].proposal_bytes
+          result.data["signedCommitProposal"].proposal_bytes,
         );
 
         // Set Parameter
         //logger.debug('secondTransaction data : ' + JSON.stringify(result.data));
         const contract = { channelName: "mychannel" };
         const method = { type: "sendSignedTransaction" };
-        const template = "default";
         const args = { args: [result.data] };
 
         // Run Verifier (Fabric)
@@ -453,18 +484,17 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
   thirdTransaction(
     ethereumAccountTo: string,
     tradingValue: string,
-    tradeInfo: TradeInfo
-  ) {
+    tradeInfo: TradeInfo,
+  ): void {
     logger.debug("called thirdTransaction");
 
     // Get Verifier Instance
     logger.debug(
-      `##thirdTransaction(): businessLogicID: ${tradeInfo.businessLogicID}`
+      `##thirdTransaction(): businessLogicID: ${tradeInfo.businessLogicID}`,
     );
     const useValidator = JSON.parse(
-      routesTransactionManagement.getValidatorToUse(tradeInfo.businessLogicID)
+      routesTransactionManagement.getValidatorToUse(tradeInfo.businessLogicID),
     );
-    //        const verifierEthereum = routesTransactionManagement.getVerifier(useValidator['validatorID'][0]);
     const verifierEthereum = routesVerifierFactory.getVerifier(
       useValidator["validatorID"][0],
     );
@@ -497,20 +527,15 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
         const transactionData: TransactionData = new TransactionData(
           "settlement",
           "ledger003",
-          result.txId
+          result.txId,
         );
         this.transactionInfoManagement.setTransactionData(
           tradeInfo,
-          transactionData
+          transactionData,
         );
 
         // Set LedgerOperation
         logger.debug("thirdTransaction data : " + JSON.stringify(result.data));
-        const ledgerOperation: LedgerOperation = new LedgerOperation(
-          "sendRawTransaction",
-          "",
-          result.data
-        );
 
         // Run Verifier (Ethereum)
         // verifierEthereum.requestLedgerOperation(ledgerOperation);
@@ -519,10 +544,7 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
         // Set Parameter
         const contract = {}; // NOTE: Since contract does not need to be specified, specify an empty object.
         const method = { type: "web3Eth", command: "sendRawTransaction" };
-        const template = "default";
         const args = { args: [result.data["serializedTx"]] };
-        // const method = "default";
-        // const args = {"method": {type: "web3Eth", command: "sendRawTransaction"}, "args": {"args": [result.data["serializedTx"]]}};
 
         // Run Verifier (Ethereum)
         verifierEthereum
@@ -539,19 +561,15 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
       });
   }
 
-  completedTransaction(tradeInfo: TradeInfo) {
+  completedTransaction(tradeInfo: TradeInfo): void {
     logger.debug("called completedTransaction");
 
     logger.debug(
-      `##completedTransaction(): businessLogicID: ${tradeInfo.businessLogicID}`
+      `##completedTransaction(): businessLogicID: ${tradeInfo.businessLogicID}`,
     );
-    const useValidator = JSON.parse(
-      routesTransactionManagement.getValidatorToUse(tradeInfo.businessLogicID)
-    );
-    const validatorId = useValidator["validatorID"][0];
   }
 
-  finish() {
+  finish(): void {
     logger.debug("called finish");
   }
 
@@ -568,13 +586,13 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
         break;
       default:
         logger.error(
-          `##onEvent(), invalid verifierId: ${ledgerEvent.verifierId}`
+          `##onEvent(), invalid verifierId: ${ledgerEvent.verifierId}`,
         );
         return;
     }
   }
 
-  onEvenEtherem(event: object, targetIndex: number): void {
+  onEvenEtherem(event: EthEvent, targetIndex: number): void {
     logger.debug(`##in onEvenEtherem()`);
     const tx = this.getTransactionFromEthereumEvent(event, targetIndex);
     if (tx == null) {
@@ -590,7 +608,7 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
 
       if (status !== 200) {
         logger.error(
-          `##onEvenEtherem(): error event, status: ${status}, txId: ${txId}`
+          `##onEvenEtherem(): error event, status: ${status}, txId: ${txId}`,
         );
         return;
       }
@@ -603,25 +621,29 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
   }
 
   getTransactionFromEthereumEvent(
-    event: object,
-    targetIndex: number
-  ): object | null {
+    event: EthEvent,
+    targetIndex: number,
+  ): EthData | undefined {
     try {
       const retTransaction = event["blockData"]["transactions"][targetIndex];
       logger.debug(
-        `##getTransactionFromEthereumEvent(), retTransaction: ${retTransaction}`
+        `##getTransactionFromEthereumEvent(), retTransaction: ${retTransaction}`,
       );
       return retTransaction;
     } catch (err) {
       logger.error(
-        `##getTransactionFromEthereumEvent(): invalid even, err:${err}, event:${event}`
+        `##getTransactionFromEthereumEvent(): invalid even, err:${err}, event:${event}`,
       );
     }
   }
 
-  onEvenFabric(event: object, targetIndex: number): void {
+  onEvenFabric(event: FabricEvent, targetIndex: number): void {
     logger.debug(`##in onEvenFabric()`);
-    const tx = this.getTransactionFromFabricEvent(event, targetIndex);
+    const tx:
+      | {
+          txId: string;
+        }
+      | undefined = this.getTransactionFromFabricEvent(event, targetIndex);
     if (tx == null) {
       logger.warn(`##onEvenFabric(): invalid event: ${json2str(event)}`);
       return;
@@ -635,7 +657,7 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
 
       if (status !== 200) {
         logger.error(
-          `##onEvenFabric(): error event, status: ${status}, txId: ${txId}`
+          `##onEvenFabric(): error event, status: ${status}, txId: ${txId}`,
         );
         return;
       }
@@ -644,103 +666,109 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
       this.executeNextTransaction(tx, txId);
     } catch (err) {
       logger.error(
-        `##onEvenFabric(): onEvent, err: ${err}, event: ${json2str(event)}`
+        `##onEvenFabric(): onEvent, err: ${err}, event: ${json2str(event)}`,
       );
     }
   }
 
-  getTransactionFromFabricEvent(event: object, targetIndex): object | null {
+  getTransactionFromFabricEvent(
+    event: FabricEvent,
+    targetIndex: number,
+  ): FabricEvent | undefined {
     try {
       const retTransaction = event["blockData"][targetIndex];
       logger.debug(
-        `##getTransactionFromFabricEvent(): retTransaction: ${retTransaction}`
+        `##getTransactionFromFabricEvent(): retTransaction: ${retTransaction}`,
       );
       return retTransaction;
     } catch (err) {
       logger.error(
-        `##getTransactionFromFabricEvent(): invalid even, err:${err}, event:${event}`
+        `##getTransactionFromFabricEvent(): invalid even, err:${err}, event:${event}`,
       );
     }
   }
 
-  executeNextTransaction(txInfo: object, txId: string): void {
-    let transactionInfo: TransactionInfo = null;
+  executeNextTransaction(
+    txInfo: Record<string, unknown> | EthData,
+    txId: string,
+  ): void {
+    let transactionInfo: TransactionInfo | null = null;
     try {
       // Retrieve DB transaction information
-      transactionInfo =
-        this.transactionInfoManagement.getTransactionInfoByTxId(txId);
+      transactionInfo = this.transactionInfoManagement.getTransactionInfoByTxId(
+        txId,
+      );
       if (transactionInfo != null) {
         logger.debug(
-          `##onEvent(A), transactionInfo: ${json2str(transactionInfo)}`
+          `##onEvent(A), transactionInfo: ${json2str(transactionInfo)}`,
         );
       } else {
         logger.warn(`##onEvent(B), not found transactionInfo, txId: ${txId}`);
         return;
       }
       const txStatus = transactionInfo.status;
-      const tradeInfo =
-        this.createTradeInfoFromTransactionInfo(transactionInfo);
+      const tradeInfo = this.createTradeInfoFromTransactionInfo(
+        transactionInfo,
+      );
       let txInfoData: TxInfoData;
+
       switch (txStatus) {
         case AssetTradeStatus.UnderEscrow:
           // store transaction information in DB
-          txInfoData = new TxInfoData("escrow", json2str(txInfo));
+          txInfoData = new TxInfoData("escrow", JSON.stringify(txInfo));
           this.transactionInfoManagement.setTxInfo(tradeInfo, txInfoData);
 
           // underEscrow -> underTransfer
           logger.info(
-            `##INFO: underEscrow -> underTransfer, businessLogicID: ${transactionInfo.businessLogicID}, tradeID: ${transactionInfo.tradeID}`
+            `##INFO: underEscrow -> underTransfer, businessLogicID: ${transactionInfo.businessLogicID}, tradeID: ${transactionInfo.tradeID}`,
           );
-          // const tradeInfo = this.createTradeInfoFromTransactionInfo(transactionInfo);
           this.transactionInfoManagement.setStatus(
             tradeInfo,
-            AssetTradeStatus.UnderTransfer
+            AssetTradeStatus.UnderTransfer,
           );
           this.secondTransaction(
             transactionInfo.assetID,
             transactionInfo.fabricAccountTo,
-            tradeInfo
+            tradeInfo,
           );
           break;
         case AssetTradeStatus.UnderTransfer:
           // store transaction information in DB
-          txInfoData = new TxInfoData("transfer", json2str(txInfo));
+          txInfoData = new TxInfoData("transfer", JSON.stringify(txInfo));
           this.transactionInfoManagement.setTxInfo(tradeInfo, txInfoData);
 
           // underTransfer -> underSettlement
           logger.info(
-            `##INFO: underTransfer -> underSettlement, businessLogicID: ${transactionInfo.businessLogicID}, tradeID: ${transactionInfo.tradeID}`
+            `##INFO: underTransfer -> underSettlement, businessLogicID: ${transactionInfo.businessLogicID}, tradeID: ${transactionInfo.tradeID}`,
           );
-          // const tradeInfo = this.createTradeInfoFromTransactionInfo(transactionInfo);
           this.transactionInfoManagement.setStatus(
             tradeInfo,
-            AssetTradeStatus.UnderSettlement
+            AssetTradeStatus.UnderSettlement,
           );
           this.thirdTransaction(
             transactionInfo.ethereumAccountTo,
             transactionInfo.tradingValue,
-            tradeInfo
+            tradeInfo,
           );
           break;
         case AssetTradeStatus.UnderSettlement:
           // store transaction information in DB
-          txInfoData = new TxInfoData("settlement", json2str(txInfo));
+          txInfoData = new TxInfoData("settlement", JSON.stringify(txInfo));
           this.transactionInfoManagement.setTxInfo(tradeInfo, txInfoData);
 
           // underSettlement -> completed
-          // const tradeInfo = this.createTradeInfoFromTransactionInfo(transactionInfo);
           this.transactionInfoManagement.setStatus(
             tradeInfo,
-            AssetTradeStatus.Completed
+            AssetTradeStatus.Completed,
           );
           logger.info(
-            `##INFO: completed asset-trade, businessLogicID: ${transactionInfo.businessLogicID}, tradeID: ${transactionInfo.tradeID}`
+            `##INFO: completed asset-trade, businessLogicID: ${transactionInfo.businessLogicID}, tradeID: ${transactionInfo.tradeID}`,
           );
           this.completedTransaction(tradeInfo);
           break;
         case AssetTradeStatus.Completed:
           logger.warn(
-            `##WARN: already completed, txinfo: ${json2str(transactionInfo)}`
+            `##WARN: already completed, txinfo: ${json2str(transactionInfo)}`,
           );
           return;
         default:
@@ -749,9 +777,9 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
       }
     } catch (err) {
       logger.error(
-        `##ERR: executeNextTransaction(), err: ${err}, tx: ${json2str(
-          transactionInfo
-        )}`
+        `##ERR: executeNextTransaction(), err: ${err}, tx: ${JSON.stringify(
+          transactionInfo,
+        )}`,
       );
     }
   }
@@ -765,19 +793,19 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
     }
   }
 
-  getOperationStatus(tradeID: string): object {
+  getOperationStatus(tradeID: string): TransactionStatusData {
     logger.debug(`##in getOperationStatus()`);
-    const businessLogicInquireAssetTradeStatus: BusinessLogicInquireAssetTradeStatus =
-      new BusinessLogicInquireAssetTradeStatus();
-    const transactionStatusData =
-      businessLogicInquireAssetTradeStatus.getAssetTradeOperationStatus(tradeID);
+    const businessLogicInquireAssetTradeStatus: BusinessLogicInquireAssetTradeStatus = new BusinessLogicInquireAssetTradeStatus();
+    const transactionStatusData = businessLogicInquireAssetTradeStatus.getAssetTradeOperationStatus(
+      tradeID,
+    );
 
     return transactionStatusData;
   }
 
   getTxIDFromEvent(
     ledgerEvent: LedgerEvent,
-    targetIndex: number
+    targetIndex: number,
   ): string | null {
     logger.debug(`##in getTxIDFromEvent`);
     logger.debug(`##event: ${json2str(ledgerEvent)}`);
@@ -789,13 +817,13 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
         return this.getTxIDFromEventFabric(ledgerEvent.data, targetIndex);
       default:
         logger.error(
-          `##getTxIDFromEvent(): invalid verifierId: ${ledgerEvent.verifierId}`
+          `##getTxIDFromEvent(): invalid verifierId: ${ledgerEvent.verifierId}`,
         );
     }
     return null;
   }
 
-  getTxIDFromEventEtherem(event: object, targetIndex: number): string | null {
+  getTxIDFromEventEtherem(event: EthEvent, targetIndex: number): string | null {
     logger.debug(`##in getTxIDFromEventEtherem()`);
     const tx = this.getTransactionFromEthereumEvent(event, targetIndex);
     if (tx == null) {
@@ -809,8 +837,8 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
       if (typeof txId !== "string") {
         logger.warn(
           `#getTxIDFromEventEtherem(): skip(invalid block, not found txId.), event: ${json2str(
-            event
-          )}`
+            event,
+          )}`,
         );
         return null;
       }
@@ -819,13 +847,16 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
       return txId;
     } catch (err) {
       logger.error(
-        `##getTxIDFromEventEtherem(): err: ${err}, event: ${json2str(event)}`
+        `##getTxIDFromEventEtherem(): err: ${err}, event: ${json2str(event)}`,
       );
       return null;
     }
   }
 
-  getTxIDFromEventFabric(event: object, targetIndex: number): string | null {
+  getTxIDFromEventFabric(
+    event: FabricEvent,
+    targetIndex: number,
+  ): string | null {
     logger.debug(`##in getTxIDFromEventFabric()`);
     const tx = this.getTransactionFromFabricEvent(event, targetIndex);
     if (tx == null) {
@@ -839,8 +870,8 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
       if (typeof txId !== "string") {
         logger.warn(
           `#getTxIDFromEventFabric(): skip(invalid block, not found txId.), event: ${json2str(
-            event
-          )}`
+            event,
+          )}`,
         );
         return null;
       }
@@ -849,7 +880,7 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
       return txId;
     } catch (err) {
       logger.error(
-        `##getTxIDFromEventFabric(): err: ${err}, event: ${json2str(event)}`
+        `##getTxIDFromEventFabric(): err: ${err}, event: ${json2str(event)}`,
       );
       return null;
     }
@@ -857,15 +888,16 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
 
   hasTxIDInTransactions(txID: string): boolean {
     logger.debug(`##in hasTxIDInTransactions(), txID: ${txID}`);
-    const transactionInfo =
-      this.transactionInfoManagement.getTransactionInfoByTxId(txID);
+    const transactionInfo = this.transactionInfoManagement.getTransactionInfoByTxId(
+      txID,
+    );
     logger.debug(`##hasTxIDInTransactions(), ret: ${transactionInfo !== null}`);
     return transactionInfo !== null;
   }
 
   getEventDataNum(ledgerEvent: LedgerEvent): number {
     logger.debug(
-      `##in BLP:getEventDataNum(), ledgerEvent.verifierId: ${ledgerEvent.verifierId}`
+      `##in BLP:getEventDataNum(), ledgerEvent.verifierId: ${ledgerEvent.verifierId}`,
     );
     const event = ledgerEvent.data;
     let retEventNum = 0;
@@ -880,17 +912,17 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
           break;
         default:
           logger.error(
-            `##getEventDataNum(): invalid verifierId: ${ledgerEvent.verifierId}`
+            `##getEventDataNum(): invalid verifierId: ${ledgerEvent.verifierId}`,
           );
           break;
       }
       logger.debug(
-        `##getEventDataNum(): retEventNum: ${retEventNum}, verifierId: ${ledgerEvent.verifierId}`
+        `##getEventDataNum(): retEventNum: ${retEventNum}, verifierId: ${ledgerEvent.verifierId}`,
       );
       return retEventNum;
     } catch (err) {
       logger.error(
-        `##getEventDataNum(): invalid even, err: ${err}, event: ${event}`
+        `##getEventDataNum(): invalid even, err: ${err}, event: ${event}`,
       );
       return 0;
     }

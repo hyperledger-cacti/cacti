@@ -4,7 +4,6 @@
     "composite": true,
     "outDir": "./dist/",
     "tsBuildInfoFile": "../../.build-cache/cactus-example-discounted-asset-trade.tsbuildinfo",
-    "strict": false // TODO - true, fix warnings
   },
   "include": [
     "./*.ts",

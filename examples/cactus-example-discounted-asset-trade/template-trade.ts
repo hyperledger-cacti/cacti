@@ -10,8 +10,6 @@ import { ConfigUtil } from "@hyperledger/cactus-cmd-socketio-server";
 import { RIFError } from "@hyperledger/cactus-cmd-socketio-server";
 import { TemplateTradeManagement } from "./template-trade-management";
 
-const fs = require("fs");
-const path = require("path");
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
 const moduleName = "template-trade";
@@ -19,8 +17,7 @@ const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;
 
 const router: Router = Router();
-const templateTradeManagement: TemplateTradeManagement =
-  new TemplateTradeManagement();
+const templateTradeManagement: TemplateTradeManagement = new TemplateTradeManagement();
 
 /* POST template-trade. */
 // router.post('/:functionName', (req: Request, res: Response, next: NextFunction) => {
@@ -69,7 +66,9 @@ router.post(
           logger.error(err);
         });
     } catch (err) {
-      logger.error(`##err name: ${err.constructor.name}`);
+      if (err instanceof Error) {
+        logger.error(`##err name: ${err.constructor.name}`);
+      }
 
       if (err instanceof RIFError) {
         logger.debug(`##catch RIFError, ${err.statusCode}, ${err.message}`);
@@ -81,7 +80,7 @@ router.post(
       logger.error(`##err in balance: ${err}`);
       next(err);
     }
-  }
+  },
 );
 
 router.post(
@@ -93,13 +92,14 @@ router.post(
 
       const tradeID: string = templateTradeManagement.execTemplateTradeAsync(
         functionName,
-        req
+        req,
       );
       const result = { tradeID: tradeID };
-      //res.status(201).location(config.applicationHostInfo.hostName + "/api/v1/trades/" + tradeID).json(result);
       res.status(201).json(result);
     } catch (err) {
-      logger.error(`##err name: ${err.constructor.name}`);
+      if (err instanceof Error) {
+        logger.error(`##err name: ${err.constructor.name}`);
+      }
 
       if (err instanceof RIFError) {
         logger.debug(`##catch RIFError, ${err.statusCode}, ${err.message}`);
@@ -111,7 +111,7 @@ router.post(
       logger.error(`##err in balance: ${err}`);
       next(err);
     }
-  }
+  },
 );
 
 export default router;
