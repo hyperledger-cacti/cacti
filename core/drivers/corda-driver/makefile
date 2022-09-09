@@ -23,6 +23,7 @@ build-refresh-dependencies: github.properties
 .PHONY: image-local
 image-local: build-local
 	docker build -f Dockerfile.local -t $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) .
+	docker tag $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) $(DOCKER_IMAGE_NAME):latest
 
 .PHONY: image
 image: github.properties
