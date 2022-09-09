@@ -390,19 +390,7 @@ async function writeExternalStateHelper(
         const network: Network = await gateway.getNetwork(ctx.getLedgerId());
         const interopContract: Contract = network.getContract(process.env.INTEROP_CHAINCODE ? process.env.INTEROP_CHAINCODE : 'interop');
         
-        const endorsingOrgs = ctx.getParticipantsList();
-        // const endorsers = network.getChannel().getEndorsers();
-        // let endorserList = [];
-        // if (endorsingOrgs.length > 0) {
-        //     endorserList = endorsers.filter((endorser: Endorser) => {
-        //         //@ts-ignore
-        //         const cert = Certificate.fromPEM(endorser.options.pem);
-        //         const orgName = cert.issuer.organizationName;
-        //         return endorsingOrgs.includes(endorser.mspid) || endorsingOrgs.includes(orgName);
-        //     });
-        //     console.log('Set endorserList', endorserList);
-        // }
-        
+        const endorsingOrgs = ctx.getMembersList();
         const invokeObject = {
             channel: ctx.getLedgerId(),
             ccFunc: ctx.getFunc(),
