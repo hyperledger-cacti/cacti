@@ -4,7 +4,7 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
+        "test": "nyc mocha -r ts-node/register --exclude 'test/data/**/*.js' --recursive  -t 10000",
         "build": "npm run tsc",
         "tsc": "tsc",
         "start": "node out/server.js",
@@ -19,7 +19,8 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
-        "@hyperledger-labs/weaver-protos-js": "^1.3.0",
+        "@hyperledger-labs/weaver-protos-js": "^1.4.3",
+        "@hyperledger-labs/weaver-fabric-interop-sdk": "^1.4.3",
         "@fidm/x509": "^1.2.1",
         "@grpc/grpc-js": "^1.1.1",
         "@typescript-eslint/eslint-plugin": "^3.5.0",
@@ -35,6 +36,14 @@
         "@types/node": "^14.0.14",
         "typedoc": "^0.20.35",
         "typescript": "^4.3.5",
-        "nodemon": "^2.0.4"
+        "nodemon": "^2.0.4",
+        "chai": "^4.1.2",
+        "chai-as-promised": "^7.1.1",
+        "mocha": "^5.2.0",
+        "nyc": "^12.0.2",
+        "rewire": "^4.0.1",
+        "sinon": "^6.1.3",
+        "sinon-chai": "^3.3.0",
+        "ts-node": "^10.8.0"
     }
 }

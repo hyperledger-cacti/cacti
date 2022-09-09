@@ -1,0 +1,16 @@
+{
+    "network1": {
+        "iin-agent-org1": {
+            "endpoint": "localhost:9050",
+            "tls": false,
+            "tlsCACertPath": ""
+        }
+    }
+    "network2": {
+        "iin-agent-org1": {
+            "endpoint": "localhost:9051",
+            "tls": false,
+            "tlsCACertPath": ""
+        }
+    }
+}

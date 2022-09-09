@@ -46,10 +46,19 @@ iinAgentServer.addService(iin_agent_pb_grpc.IINAgentService, {
     requestIdentityConfiguration: (call: { request: iin_agent_pb.SecurityDomainMemberIdentityRequest }, callback: (_: any, object: ack_pb.Ack) => void) => {
         const ack_response = new ack_pb.Ack();
         try {
+            if (!request.hasSourceNetwork()) {
+                throw new Error('request does not have source network')
+            }
+            if (!request.hasRequestingNetwork()) {
+                throw new Error('request does not have requesting network')
+            }
+            if (request.getNonce().length == 0) {
+                throw new Error('request has empty nonce')
+            }
             requestIdentityConfiguration(call.request);
             ack_response.setMessage('');
             ack_response.setStatus(ack_pb.Ack.STATUS.OK);
-            ack_response.setRequestId('');
+            ack_response.setRequestId(request.nonce);
             // gRPC response.
             console.log('Responding to caller');
             callback(null, ack_response);
@@ -57,7 +66,7 @@ iinAgentServer.addService(iin_agent_pb_grpc.IINAgentService, {
             console.log(e);
             ack_response.setMessage(`Error: ${e}`);
             ack_response.setStatus(ack_pb.Ack.STATUS.ERROR);
-            ack_response.setRequestId('');
+            ack_response.setRequestId(request.nonce);
             // gRPC response.
             console.log('Responding to caller');
             callback(null, ack_response);
@@ -67,6 +76,13 @@ iinAgentServer.addService(iin_agent_pb_grpc.IINAgentService, {
     sendIdentityConfiguration: (call: { request: iin_agent_pb.AttestedMembership }, callback: (_: any, object: ack_pb.Ack) => void) => {
         const ack_response = new ack_pb.Ack();
         try {
+            if (!request.hasAttestation()) {
+                throw new Error('no attestation provided')
+            }
+            const attestation = attestedMembership.getAttestation()!;
+            if (!attestation.hasSecurityDomainUnit()) {
+                throw new Error('attestation has no SecurityDomainMemberIdentity associated with it')
+            }
             sendIdentityConfiguration(call.request);
             ack_response.setMessage('');
             ack_response.setStatus(ack_pb.Ack.STATUS.OK);

@@ -8,6 +8,9 @@ import { Gateway } from 'fabric-network';
 import { Channel } from 'fabric-common';
 import * as path from 'path';
 import * as fs from 'fs';
+
+import membershipPb from '@hyperledger-labs/weaver-protos-js/common/membership_pb';
+
 import { getWallet } from './walletUtils';
 import * as utils from "../common/utils";
 
@@ -74,7 +77,7 @@ const getNetworkContract = async (
     }
 }
 
-function getMembershipUnit(channel: Channel, mspId: string) {
+function getMembershipUnit(channel: Channel, mspId: string): membershipPb.Member {
     const mspConfig = channel.getMsp(mspId);
     let certs = [];
     if (Array.isArray(mspConfig.rootCerts)) {
@@ -91,13 +94,12 @@ function getMembershipUnit(channel: Channel, mspId: string) {
     } else if (mspConfig.intermediateCerts.length !== 0) {
         certs.push(mspConfig.intermediateCerts);
     }
-    let membershipUnit: {[key:string]: object} = {};
-    membershipUnit[mspId] = {
-        type: "certificate",
-        value: "",
-        chain: certs,
-    };
-    return membershipUnit;
+    let member = new membershipPb.Member()
+    member.setType("certificate")
+    member.setValue("")
+    member.setChainList(certs)
+    
+    return member;
 }
 
 async function getMSPConfiguration(
@@ -105,7 +107,7 @@ async function getMSPConfiguration(
     connectionProfilePath: string,
     configFilePath: string,
     channelId: string,
-): Promise<any> {
+): Promise<membershipPb.Membership> {
     console.log('Running invocation on Fabric channel and chaincode');
     try {
         const gateway = await getNetworkGateway(walletPath, connectionProfilePath, configFilePath);
@@ -114,7 +116,9 @@ async function getMSPConfiguration(
         }
         const network = await gateway.getNetwork(channelId);
         const config = JSON.parse(fs.readFileSync(configFilePath, 'utf8').toString());
-        const membership = getMembershipUnit(network.getChannel(), config.mspId);
+        const member = getMembershipUnit(network.getChannel(), config.mspId);
+        const membership = new membershipPb.Membership()
+        membership.getMembersMap().set(config.mspId, member)
         // Disconnect from the gateway.
         gateway.disconnect();
         return membership;
@@ -129,7 +133,7 @@ async function getAllMSPConfigurations(
     connectionProfilePath: string,
     configFilePath: string,
     channelId: string,
-): Promise<any> {
+): Promise<membershipPb.Membership> {
     console.log('Running invocation on Fabric channel and chaincode');
     try {
         const gateway = await getNetworkGateway(walletPath, connectionProfilePath, configFilePath);
@@ -139,16 +143,16 @@ async function getAllMSPConfigurations(
         const network = await gateway.getNetwork(channelId);
         const config = JSON.parse(fs.readFileSync(configFilePath, 'utf8').toString());
         const mspIds = network.getChannel().getMspids();
-        let memberships: {[key:string]: object} = {};
+        const membership = new membershipPb.Membership()
         for (let i = 0 ; i < mspIds.length ; i++) {
             if (!config.ordererMspIds.includes(mspIds[i])) {
-                const membership = getMembershipUnit(network.getChannel(), config.mspId);
-                memberships[mspIds[i]] = membership[mspIds[i]];
+                const member = getMembershipUnit(network.getChannel(), mspIds[i]);
+                membership.getMembersMap().set(mspIds[i], member)
             }
         }
         // Disconnect from the gateway.
         gateway.disconnect();
-        return memberships;
+        return membership;
     } catch (error) {
         console.error(`Failed to submit transaction: ${error}`);
         throw error;
