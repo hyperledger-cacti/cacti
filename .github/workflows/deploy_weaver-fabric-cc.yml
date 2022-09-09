@@ -9,7 +9,7 @@ on:
     branches:
       - main
     paths:
-      - 'core/network/fabric-interop-cc/contracts/interop'
+      - 'core/network/fabric-interop-cc/contracts/interop/VERSION'
       
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:

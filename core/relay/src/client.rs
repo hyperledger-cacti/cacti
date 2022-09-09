@@ -135,6 +135,7 @@ async fn event_suscribe(driver: bool) -> Result<(), Box<dyn std::error::Error>> 
             func: "abc".to_string(),
             args: vec![],
             replace_arg_index: 0,
+            members: vec![],
         };
         tmp = event_publication::PublicationTarget::Ctx(ctx);
     } else {
@@ -215,6 +216,7 @@ async fn event_unsuscribe(request_id: String, driver: bool) -> Result<(), Box<dy
             func: "abc".to_string(),
             args: vec![],
             replace_arg_index: 0,
+            members: vec![],
         };
         tmp = event_publication::PublicationTarget::Ctx(ctx);
     } else {

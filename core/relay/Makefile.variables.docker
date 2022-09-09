@@ -1,4 +1,0 @@
-DOCKER_IMAGE_NAME ?= weaver-relay
-DOCKER_TAG ?= 1.4.2
-DOCKER_REGISTRY ?= ghcr.io/hyperledger-labs
-GIT_URL = https://github.com/hyperledger-labs/weaver-dlt-interoperability

@@ -830,6 +830,7 @@ const interopHelper = async (
         Sign: true
       }],
       keyCert,
+      [],
       false,
       options['relay-tls'] === 'true',
       relayTlsCAFiles,

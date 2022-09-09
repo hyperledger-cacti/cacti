@@ -19,6 +19,7 @@ chai.should();
 const { Wallets } = require("fabric-network");
 const { ContractImpl } = require("fabric-network/lib/contract");
 const { NetworkImpl } = require("fabric-network/lib/network");
+const { Transaction } = require("fabric-network/lib/transaction");
 const ecies = require("../src/eciesCrypto");
 const {
     decryptRemoteProposalResponse,
@@ -46,6 +47,8 @@ describe("InteroperableHelper", () => {
 
     let wallet;
     let interopcc;
+    let interopccStub;
+    let writeExternalStateTransaction;
     // Initialize wallet with a single user identity
     async function initializeWallet() {
         const privKeyFile = `${__dirname}/data/privKey.pem`;
@@ -65,6 +68,8 @@ describe("InteroperableHelper", () => {
         await initializeWallet();
         const network = sinon.createStubInstance(NetworkImpl);
         interopcc = new ContractImpl(network, "interopcc", "InteroperableHelper");
+        writeExternalStateTransaction = sinon.createStubInstance(Transaction)
+        interopccStub = sinon.stub(interopcc, "createTransaction").withArgs('WriteExternalState').returns(writeExternalStateTransaction);
     });
 
     afterEach(() => {
@@ -367,11 +372,9 @@ describe("InteroperableHelper", () => {
                 ],
                 viewPatterns: [],
             };
-            const interopccStub = sinon.stub(interopcc, "submitTransaction").resolves(false);
-            // interopccStub.withArgs("Write", "w", "value").resolves(true);
-            interopccStub
+            writeExternalStateTransaction.submit.resolves(false);
+            writeExternalStateTransaction.submit
                 .withArgs(
-                    "WriteExternalState",
                     appId,
                     channel,
                     appFn,
