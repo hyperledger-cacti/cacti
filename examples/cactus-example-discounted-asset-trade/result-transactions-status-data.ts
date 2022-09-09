@@ -8,10 +8,9 @@
 import { TransactionStatus } from "./transaction-status";
 
 export class ResultTransactionStatusData {
+  stateInfo: number | undefined;
+  transactionStatus: TransactionStatus[];
   constructor() {
     this.transactionStatus = [];
   }
-
-  stateInfo: number;
-  transactionStatus: TransactionStatus[];
 }

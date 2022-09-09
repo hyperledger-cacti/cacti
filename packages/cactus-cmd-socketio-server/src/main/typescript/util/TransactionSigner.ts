@@ -17,7 +17,7 @@ const yaml = require("js-yaml");
 const config: any = ConfigUtil.getConfig();
 // const configVerifier: any = yaml.safeLoad(fs.readFileSync("", 'utf8'));
 const configVerifier: ValidatorRegistry = new ValidatorRegistry(
-  path.resolve(__dirname, "/etc/cactus/validator-registry-config.yaml")
+  path.resolve(__dirname, "/etc/cactus/validator-registry-config.yaml"),
 );
 import { getLogger } from "log4js";
 const moduleName = "TransactionEthereum";
@@ -38,7 +38,13 @@ const EC = elliptic.ec;
 let fabricChannel: any = undefined;
 
 export class TransactionSigner {
-  static signTxEthereum(rawTx: object, signPkey: string): object {
+  static signTxEthereum(
+    rawTx: object,
+    signPkey: string,
+  ): {
+    serializedTx: string;
+    txId: string;
+  } {
     logger.debug(`####in signTxEthereum()`);
     // ethereumjs-tx2.1.2_support
     const customCommon = ethJsCommon.forCustomChain(
@@ -185,9 +191,10 @@ export class TransactionSigner {
   // stand alone fabric-sig package in future.
   static _preventMalleability(
     sig: any,
-    curveParams: {name: keyof (typeof TransactionSigner.ordersForCurve)},
+    curveParams: { name: keyof typeof TransactionSigner.ordersForCurve },
   ) {
-    const halfOrder: any = TransactionSigner.ordersForCurve[curveParams.name].halfOrder;
+    const halfOrder: any =
+      TransactionSigner.ordersForCurve[curveParams.name].halfOrder;
     if (!halfOrder) {
       throw new Error(
         'Can not find the half order needed to calculate "s" value for immalleable signatures. Unsupported curve name: ' +
@@ -214,7 +221,12 @@ export class TransactionSigner {
    * @param {string} privateKey PEM encoded private key
    * @param {Buffer} proposalBytes proposal bytes
    */
-  static sign(privateKey: any, proposalBytes: any, algorithm: any, keySize: any) {
+  static sign(
+    privateKey: any,
+    proposalBytes: any,
+    algorithm: any,
+    keySize: any,
+  ) {
     const hashAlgorithm = algorithm.toUpperCase();
     const hashFunction = hash[`${hashAlgorithm}_${keySize}`];
     const ecdsaCurve = elliptic.curves[`p${keySize}`];

@@ -34,7 +34,9 @@ router.get("/:assetID", (req: Request, res: Response, next: NextFunction) => {
         logger.error(err);
       });
   } catch (err) {
-    logger.error(`##(queryAsset)err name: ${err.constructor.name}`);
+    if (err instanceof Error) {
+      logger.error(`##(queryAsset)err name: ${err.constructor.name}`);
+    }
 
     if (err instanceof RIFError) {
       logger.debug(`##catch RIFError, ${err.statusCode}, ${err.message}`);
@@ -63,7 +65,9 @@ router.get("/", (req: Request, res: Response, next: NextFunction) => {
         logger.error(err);
       });
   } catch (err) {
-    logger.error(`##(queryAllAssets)err name: ${err.constructor.name}`);
+    if (err instanceof Error) {
+      logger.error(`##(queryAllAssets)err name: ${err.constructor.name}`);
+    }
 
     if (err instanceof RIFError) {
       logger.debug(`##catch RIFError, ${err.statusCode}, ${err.message}`);
