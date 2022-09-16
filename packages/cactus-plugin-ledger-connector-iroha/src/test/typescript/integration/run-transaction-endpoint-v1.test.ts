@@ -14,6 +14,7 @@ import {
 } from "@hyperledger/cactus-test-tooling";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { PluginImportType } from "@hyperledger/cactus-core-api";
+import { SelfSignedPkiGenerator, IPki } from "./certificate.test";
 
 import {
   IListenOptions,
@@ -73,6 +74,7 @@ test(testCase, async (t: Test) => {
   const nodePubA = keyPair2.publicKey;
   const keyPair3: KeyPair = cryptoHelper.generateKeyPair();
   const userPub = keyPair3.publicKey;
+
   const iroha = new IrohaTestLedger({
     adminPriv: adminPriv,
     adminPub: adminPubA,
@@ -81,6 +83,8 @@ test(testCase, async (t: Test) => {
     postgresHost: postgresHost,
     postgresPort: postgresPort,
     logLevel: logLevel,
+    tlsCert: "/opt/iroha_data/torii_tls/server",
+    tlsKey: "/opt/iroha_data/torii_tls/server",
   });
 
   test.onFinish(async () => {
@@ -112,6 +116,17 @@ test(testCase, async (t: Test) => {
   test.onFinish(async () => await Servers.shutdown(server));
   const { address, port } = addressInfo;
   const apiHost = `http://${address}:${port}`;
+
+  /**
+   * Generate and add key/certificate pair for TLS communication
+   * @see https://iroha.readthedocs.io/en/develop/configure/torii-tls.html
+   */
+  const generator = new SelfSignedPkiGenerator();
+  const serverCertData: IPki = generator.create(address);
+  const cert = serverCertData.certificatePem;
+  const pKey = serverCertData.privateKeyPem;
+  await iroha.addCertificateToIrohaContainer(cert, pKey);
+
   const apiConfig = new Configuration({ basePath: apiHost });
   const apiClient = new IrohaApi(apiConfig);
 
@@ -138,7 +153,7 @@ test(testCase, async (t: Test) => {
         privKey: [adminPriv],
         quorum: 1,
         timeoutLimit: 5000,
-        tls: false,
+        tls: true,
       },
       params: [user, domain, userPub],
     };
@@ -147,6 +162,37 @@ test(testCase, async (t: Test) => {
     t.ok(res.data);
     t.equal(res.status, 200);
     t.equal(res.data.transactionReceipt.status, "COMMITTED");
+  }
+
+  /**
+   * Test for TLS communication.
+   * tlsCertificate is distributed to client.
+   */
+  {
+    const req = {
+      commandName: IrohaQuery.GetAccount,
+      baseConfig: {
+        irohaHost: irohaHost,
+        irohaPort: irohaPort,
+        creatorAccountId: adminID,
+        privKey: [adminPriv],
+        quorum: 1,
+        timeoutLimit: 5000,
+        tls: true,
+        tlsCertificate: cert,
+      },
+      params: [adminID],
+    };
+    const res = await apiClient.runTransactionV1(req);
+    t.ok(res);
+    t.ok(res.data);
+    t.equal(res.status, 200);
+    t.deepEqual(res.data.transactionReceipt, {
+      accountId: adminID,
+      domainId: domain,
+      quorum: 1,
+      jsonData: "{}",
+    });
   }
 
   {

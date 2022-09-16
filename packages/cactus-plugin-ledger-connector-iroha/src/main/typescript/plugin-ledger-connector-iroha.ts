@@ -685,8 +685,10 @@ export class PluginLedgerConnectorIroha
     const irohaHostPort = `${baseConfig.irohaHost}:${baseConfig.irohaPort}`;
 
     let grpcCredentials;
-    if (baseConfig.tls) {
-      throw new RuntimeError("TLS option is not supported");
+    if (baseConfig.tls && baseConfig.tlsCertificate) {
+      const certificate = baseConfig.tlsCertificate;
+      const buf = Buffer.from(certificate, "utf8");
+      grpcCredentials = grpc.credentials.createSsl(buf);
     } else {
       grpcCredentials = grpc.credentials.createInsecure();
     }

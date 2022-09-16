@@ -261,6 +261,9 @@
             "type": "boolean",
             "nullable": false,
             "description": "Can only be set to false for an insecure grpc connection."
+          },
+          "tlsCertificate": {
+            "type": "string"
           }
         }
       },

@@ -158,6 +158,12 @@ export interface IrohaBaseConfig {
      * @memberof IrohaBaseConfig
      */
     tls?: boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof IrohaBaseConfig
+     */
+    tlsCertificate?: string;
 }
 /**
  * 

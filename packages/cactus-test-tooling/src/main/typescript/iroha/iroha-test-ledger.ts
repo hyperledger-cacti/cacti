@@ -10,7 +10,7 @@ import {
 } from "@hyperledger/cactus-common";
 import { ITestLedger } from "../i-test-ledger";
 import { IKeyPair } from "../i-key-pair";
-import { Containers } from "../common/containers";
+import { Containers, IPushFileFromFsOptions } from "../common/containers";
 
 /*
  * Contains options for Iroha container
@@ -170,6 +170,32 @@ export class IrohaTestLedger implements ITestLedger {
    */
   public getDefaultToriiPort(): number {
     return 50051;
+  }
+
+  public async addCertificateToIrohaContainer(
+    cert: string,
+    key: string,
+  ): Promise<void> {
+    if (!this.container) {
+      const fnTag = `IrohaTestLedger#addCertificates()`;
+      throw new Error(`${fnTag} this.container cannot be falsy.`);
+    }
+    let containerOptions: IPushFileFromFsOptions = {
+      containerOrId: this.container,
+      srcFileName: "server.crt",
+      dstFileName: "server.crt",
+      srcFileAsString: cert,
+      dstFileDir: "/opt/iroha_data/torii_tls",
+    };
+    await Containers.putFile(containerOptions);
+    containerOptions = {
+      containerOrId: this.container,
+      srcFileName: "server.key",
+      dstFileName: "server.key",
+      srcFileAsString: key,
+      dstFileDir: "/opt/iroha_data/torii_tls",
+    };
+    await Containers.putFile(containerOptions);
   }
 
   /**
