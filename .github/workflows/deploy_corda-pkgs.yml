@@ -12,7 +12,7 @@ on:
       - 'common/protos-java-kt/gradle.properties'
       - 'core/network/corda-interop-app/gradle.properties'
       - 'sdks/corda/gradle.properties'
-      - 'core/drivers/corda-driver/makefile.variables.docker'
+      - 'core/drivers/corda-driver/VERSION'
       
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:

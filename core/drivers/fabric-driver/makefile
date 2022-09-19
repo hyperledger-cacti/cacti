@@ -1,7 +1,10 @@
-include makefile.variables.docker
+DOCKER_IMAGE_NAME ?= weaver-fabric-driver
+DOCKER_TAG ?= `cat ./VERSION`
+DOCKER_REGISTRY ?= ghcr.io/hyperledger-labs
+GIT_URL = https://github.com/hyperledger-labs/weaver-dlt-interoperability/core/drivers/fabric-driver
 
 COMPOSE_ARG ?=
-	
+
 build: .npmrc
 	npm install
 	npm run build

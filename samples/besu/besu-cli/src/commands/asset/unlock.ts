@@ -1,8 +1,19 @@
 import { GluegunCommand } from 'gluegun'
 import { getNetworkConfig, commandHelp } from '../../helper/helper'
 import { getContractInstance } from '../../helper/besu-functions'
+// import { send } from 'process'
 const Web3 = require ("web3")
-
+async function getBalances(tokenContract, address, token_id=0, asset_type="ERC20"){
+	try{
+		var balance = await tokenContract.balanceOf(address, token_id)
+	}catch{
+		var balance = null;
+	}
+	if (!balance)
+		return await tokenContract.balanceOf(address)
+	else
+		return balance;
+}
 const command: GluegunCommand = {
 	name: 'unlock',
 	description: 'Unlock and reclaim assets after timeout (fungible assets for now)',
@@ -48,7 +59,12 @@ const command: GluegunCommand = {
 						name: '--network_port',
 						description:
 							'The network port. Default value is taken from config.json'
-					}
+					},
+					{
+						name: '--token_id',
+						description:
+							'token ID for issuing tokens. Only applicable for ERC1155'
+					},
 				],
 				command,
 				['asset', 'unlock']
@@ -109,17 +125,18 @@ const command: GluegunCommand = {
 		console.log('Lock Contract ID', lockContractId)
 
 		// Balance of the recipient before claiming
-		var senderBalance = await tokenContract.balanceOf(sender)
+		var senderBalance = await getBalances(tokenContract, sender, options.token_id)
 		console.log(`Account balance of the sender in Network ${options.network} before unlocking: ${senderBalance.toString()}`)
 
-		await interopContract.unlockFungibleAsset(lockContractId, {
+		await interopContract.unlockAsset(lockContractId, {
 			from: sender
-		}).catch(function () {
-			console.log("unlockFungibleAsset threw an error");
+		}).catch(function (e) {
+			console.log(e)
+			console.log("unlockAsset threw an error");
 		})
 
 		// Balance of the recipient after claiming
-		var senderBalance = await tokenContract.balanceOf(sender)
+		var senderBalance = await getBalances(tokenContract, sender, options.token_id)
 		console.log(`Account balance of the sender in Network ${options.network} after unlocking: ${senderBalance.toString()}`)
 	}
 }
