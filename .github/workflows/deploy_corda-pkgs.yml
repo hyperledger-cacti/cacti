@@ -19,6 +19,7 @@ on:
 
 jobs:
   publish-protos:
+    if: github.repository_owner == 'hyperledger-labs'
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -45,7 +46,7 @@ jobs:
         
 
   publish-interop-app:
-    if: always()
+    if: ${{ always() && github.repository_owner == 'hyperledger-labs' }}
     needs: publish-protos
     runs-on: ubuntu-latest
     steps:
@@ -76,7 +77,7 @@ jobs:
         working-directory: core/network/corda-interop-app
         
   publish-sdk:
-    if: always()
+    if: ${{ always() && github.repository_owner == 'hyperledger-labs' }}
     needs: [publish-protos, publish-interop-app]
     runs-on: ubuntu-latest
     steps:
