@@ -8,7 +8,7 @@ import * as fabproto6 from 'fabric-protos';
 import { Gateway, Network, Contract, ContractEvent, BlockListener, ContractListener, BlockEvent } from 'fabric-network';
 import query_pb from '@hyperledger-labs/weaver-protos-js/common/query_pb';
 import events_pb from '@hyperledger-labs/weaver-protos-js/common/events_pb';
-import { lookupEventSubscriptions } from './events';
+import { lookupEventSubscriptions, readAllEventMatchers } from './events';
 import { invoke, getNetworkGateway, packageFabricView } from './fabric-code';
 import { handlePromise, relayCallback, getRelayClientForEventPublish } from './utils';
 import { DBLockedError } from './dbConnector';
@@ -168,15 +168,9 @@ const initContractEventListener = (
  * Start an appropriate listener if there is currently none for the channel (or chaincode) this event subscription refers to.
  **/
 const registerListenerForEventSubscription = async (
-    eventSubscription: events_pb.EventSubscription,
+    eventMatcher: events_pb.EventMatcher,
     networkName: string,
 ): Promise<any> => {
-    // Lookup the event suscription from the database.
-    const eventMatcher = eventSubscription.getEventMatcher();
-    if (!eventMatcher) {
-        throw new Error('No event matcher in event subscription');
-    }
-
     const channelId = eventMatcher.getTransactionLedgerId();
     let gateway: Gateway, network: Network;
     if (networkGatewayMap.has(networkName)) {
@@ -232,10 +226,6 @@ const unregisterListenerForEventSubscription = async (
     eventMatcher: events_pb.EventMatcher,
     networkName: string,
 ): Promise<boolean> => {
-    if (!eventMatcher) {
-        throw new Error('No event matcher in event subscription');
-    }
-
     const channelId = eventMatcher.getTransactionLedgerId();
     let gateway: Gateway, network: Network;
     if (networkGatewayMap.has(networkName)) {
@@ -291,9 +281,26 @@ const unregisterListenerForEventSubscription = async (
  * Load event subscriptions from the driver database.
  * Start a listener for each channel from which one of the subscribed events originate.
  **/
-const loadEventSubscriptionsFromStorage = (
-): void => {
-    // TODO
+const loadEventSubscriptionsFromStorage = async (networkName: string): Promise<boolean> => {
+    console.log('Starting event listeners for subscribed events in database...')
+    try {
+        const eventMatchers = await readAllEventMatchers();
+        for (const eventMatcher of eventMatchers) {
+            try {
+                const listenerHandle = await registerListenerForEventSubscription(
+                    eventMatcher,
+                    networkName
+                )
+            } catch(error) {
+                console.error(`Error: Could not start event listener for ${JSON.stringify(eventMatcher.toObject())} with error: ${error}`)
+                return false
+            }
+        }
+    } catch(error) {
+        console.error(`Error: event matcher read error: ${error}`)
+        return false
+    }
+    return true
 }
 
 export { registerListenerForEventSubscription, unregisterListenerForEventSubscription, loadEventSubscriptionsFromStorage };
