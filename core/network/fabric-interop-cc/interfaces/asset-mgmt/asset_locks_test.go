@@ -68,11 +68,11 @@ func (cc *InteropCC) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
         assetAgreement := &common.AssetExchangeAgreement{}
         arg0, _ := base64.StdEncoding.DecodeString(args[0])
         _ = proto.Unmarshal([]byte(arg0), assetAgreement)
-        key := assetAgreement.Type + ":" + assetAgreement.Id
+        key := assetAgreement.AssetType + ":" + assetAgreement.Id
         contractId := generateSHA256HashInBase64Form(key)
         val := key + ":" + string(caller) + ":" + assetAgreement.Recipient
         if cc.assetLockMap[contractId] != "" {
-            return shim.Error(fmt.Sprintf("Asset of type %s and ID %s is already locked", assetAgreement.Type, assetAgreement.Id))
+            return shim.Error(fmt.Sprintf("Asset of type %s and ID %s is already locked", assetAgreement.AssetType, assetAgreement.Id))
         }
         cc.assetLockMap[contractId] = val
         return shim.Success([]byte(contractId))
@@ -81,13 +81,13 @@ func (cc *InteropCC) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
         assetAgreement := &common.FungibleAssetExchangeAgreement{}
         arg0, _ := base64.StdEncoding.DecodeString(args[0])
         _ = proto.Unmarshal([]byte(arg0), assetAgreement)
-        val := assetAgreement.Type + ":" + strconv.Itoa(int(assetAgreement.NumUnits)) + ":" + string(caller) + ":" + assetAgreement.Recipient
+        val := assetAgreement.AssetType + ":" + strconv.Itoa(int(assetAgreement.NumUnits)) + ":" + string(caller) + ":" + assetAgreement.Recipient
         contractId := generateSHA256HashInBase64Form(val)
         cc.fungibleAssetLockMap[contractId] = val
-	if cc.fungibleAssetLockedCount[assetAgreement.Type] == 0 {
-		cc.fungibleAssetLockedCount[assetAgreement.Type] = int(assetAgreement.NumUnits)
+	if cc.fungibleAssetLockedCount[assetAgreement.AssetType] == 0 {
+		cc.fungibleAssetLockedCount[assetAgreement.AssetType] = int(assetAgreement.NumUnits)
 	} else {
-		cc.fungibleAssetLockedCount[assetAgreement.Type] += int(assetAgreement.NumUnits)
+		cc.fungibleAssetLockedCount[assetAgreement.AssetType] += int(assetAgreement.NumUnits)
 	}
         return shim.Success([]byte(contractId))
     }
@@ -95,7 +95,7 @@ func (cc *InteropCC) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
         assetAgreement := &common.AssetExchangeAgreement{}
         arg0, _ := base64.StdEncoding.DecodeString(args[0])
         _ = proto.Unmarshal([]byte(arg0), assetAgreement)
-        expectedKey := assetAgreement.Type + ":" + assetAgreement.Id
+        expectedKey := assetAgreement.AssetType + ":" + assetAgreement.Id
         contractId := generateSHA256HashInBase64Form(expectedKey)
         expectedVal := expectedKey + ":" + assetAgreement.Locker + ":" + assetAgreement.Recipient
         if cc.assetLockMap[contractId] == expectedVal {
@@ -130,13 +130,13 @@ func (cc *InteropCC) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
         assetAgreement := &common.AssetExchangeAgreement{}
         arg0, _ := base64.StdEncoding.DecodeString(args[0])
         _ = proto.Unmarshal([]byte(arg0), assetAgreement)
-        expectedKey := assetAgreement.Type + ":" + assetAgreement.Id
+        expectedKey := assetAgreement.AssetType + ":" + assetAgreement.Id
         contractId := generateSHA256HashInBase64Form(expectedKey)
         expectedVal := expectedKey + ":" + string(caller) + ":" + assetAgreement.Recipient
         if cc.assetLockMap[contractId] == "" {
-            return shim.Error(fmt.Sprintf("No asset of type %s and ID %s is locked", assetAgreement.Type, assetAgreement.Id))
+            return shim.Error(fmt.Sprintf("No asset of type %s and ID %s is locked", assetAgreement.AssetType, assetAgreement.Id))
         } else if cc.assetLockMap[contractId] != expectedVal {
-            return shim.Error(fmt.Sprintf("Cannot unlock asset of type %s and ID %s as it is locked by %s for %s", assetAgreement.Type, assetAgreement.Id, string(caller), assetAgreement.Recipient))
+            return shim.Error(fmt.Sprintf("Cannot unlock asset of type %s and ID %s as it is locked by %s for %s", assetAgreement.AssetType, assetAgreement.Id, string(caller), assetAgreement.Recipient))
         } else {
             delete(cc.assetLockMap, contractId)
             return shim.Success(nil)
@@ -174,13 +174,13 @@ func (cc *InteropCC) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
         assetAgreement := &common.AssetExchangeAgreement{}
         arg0, _ := base64.StdEncoding.DecodeString(args[0])
         _ = proto.Unmarshal([]byte(arg0), assetAgreement)
-        expectedKey := assetAgreement.Type + ":" + assetAgreement.Id
+        expectedKey := assetAgreement.AssetType + ":" + assetAgreement.Id
         contractId := generateSHA256HashInBase64Form(expectedKey)
         expectedVal := expectedKey + ":" + assetAgreement.Locker + ":" + string(caller)
         if cc.assetLockMap[contractId] == "" {
-            return shim.Error(fmt.Sprintf("No asset of type %s and ID %s is locked", assetAgreement.Type, assetAgreement.Id))
+            return shim.Error(fmt.Sprintf("No asset of type %s and ID %s is locked", assetAgreement.AssetType, assetAgreement.Id))
         } else if cc.assetLockMap[contractId] != expectedVal {
-            return shim.Error(fmt.Sprintf("Cannot unlock asset of type %s and ID %s as it is locked by %s for %s", assetAgreement.Type, assetAgreement.Id, assetAgreement.Locker, string(caller)))
+            return shim.Error(fmt.Sprintf("Cannot unlock asset of type %s and ID %s as it is locked by %s for %s", assetAgreement.AssetType, assetAgreement.Id, assetAgreement.Locker, string(caller)))
         } else {
             delete(cc.assetLockMap, contractId)
             return shim.Success(nil)
@@ -292,7 +292,7 @@ func TestAssetLock(t *testing.T) {
         LockInfo: lockInfoBytes,
     }
     assetAgreement := &common.AssetExchangeAgreement {
-        Type: assetType,
+        AssetType: assetType,
         Id: assetId,
         Recipient: recipient,
         Locker: locker,
@@ -316,12 +316,12 @@ func TestAssetLock(t *testing.T) {
     assetAgreement.Recipient = recipient
     lockInfoBytes, _ = proto.Marshal(lockInfoHTLC)
     lockInfo.LockInfo = lockInfoBytes
-    assetAgreement.Type = ""
+    assetAgreement.AssetType = ""
     contractId, err = amcc.LockAsset(amstub, assetAgreement, lockInfo)
     require.Error(t, err)
     require.Empty(t, contractId)
 
-    assetAgreement.Type = assetType
+    assetAgreement.AssetType = assetType
     assetAgreement.Id = ""
     contractId, err = amcc.LockAsset(amstub, assetAgreement, lockInfo)
     require.Error(t, err)
@@ -416,7 +416,7 @@ func TestFungibleAssetLock(t *testing.T) {
         LockInfo: lockInfoBytes,
     }
     assetAgreement := &common.FungibleAssetExchangeAgreement {
-        Type: assetType,
+        AssetType: assetType,
         NumUnits: numUnits,
         Recipient: recipient,
         Locker: locker,
@@ -438,11 +438,11 @@ func TestFungibleAssetLock(t *testing.T) {
     assetAgreement.Recipient = recipient
     lockInfoBytes, _ = proto.Marshal(lockInfoHTLC)
     lockInfo.LockInfo = lockInfoBytes
-    assetAgreement.Type = ""
+    assetAgreement.AssetType = ""
     _, err = amcc.LockFungibleAsset(amstub, assetAgreement, lockInfo)
     require.Error(t, err)
 
-    assetAgreement.Type = assetType
+    assetAgreement.AssetType = assetType
     assetAgreement.NumUnits = 0
     _, err = amcc.LockFungibleAsset(amstub, assetAgreement, lockInfo)
     require.Error(t, err)
@@ -499,7 +499,7 @@ func TestIsAssetLocked(t *testing.T) {
     hash := []byte("MBQGA1UEBxMNU2FuIEZyYW5jaXNjbzEPMA0GA1UECxMGY2xpZW50MSQwIgYDVQQD")
     hashPreimage := []byte("YW5jaXNjbzEeMBwGA1UE")
     assetAgreement := &common.AssetExchangeAgreement {
-        Type: assetType,
+        AssetType: assetType,
         Id: assetId,
         Recipient: recipient,
         Locker: locker,
@@ -536,12 +536,12 @@ func TestIsAssetLocked(t *testing.T) {
     _, istub := associateInteropCCInstance(amcc, amstub)
 
     // Test failures when any of the essential parameters are not supplied
-    assetAgreement.Type = ""
+    assetAgreement.AssetType = ""
     lockSuccess, err = amcc.IsAssetLocked(amstub, assetAgreement)
     require.Error(t, err)
     require.False(t, lockSuccess)
 
-    assetAgreement.Type = assetType
+    assetAgreement.AssetType = assetType
     assetAgreement.Id = ""
     lockSuccess, err = amcc.IsAssetLocked(amstub, assetAgreement)
     require.Error(t, err)
@@ -643,7 +643,7 @@ func TestIsFungibleAssetLocked(t *testing.T) {
     hash := []byte("MBQGA1UEBxMNU2FuIEZyYW5jaXNjbzEPMA0GA1UECxMGY2xpZW50MSQwIgYDVQQD")
     hashPreimage := []byte("YW5jaXNjbzEeMBwGA1UE")
     assetAgreement := &common.FungibleAssetExchangeAgreement {
-        Type: assetType,
+        AssetType: assetType,
         NumUnits: numUnits,
         Recipient: recipient,
         Locker: locker,
@@ -681,7 +681,7 @@ func TestIsFungibleAssetLocked(t *testing.T) {
     require.False(t, lockSuccess)
 
     // Create a valid fungible asset lock agreement and exercise lock
-    assetAgreement.Type = assetType
+    assetAgreement.AssetType = assetType
     assetAgreement.NumUnits = numUnits
     assetAgreement.Recipient = recipient
     assetAgreement.Locker = locker
@@ -727,7 +727,7 @@ func TestAssetUnlock(t *testing.T) {
     locker := clientId
     hash := []byte("MBQGA1UEBxMNU2FuIEZyYW5jaXNjbzEPMA0GA1UECxMGY2xpZW50MSQwIgYDVQQD")
     assetAgreement := &common.AssetExchangeAgreement {
-        Type: assetType,
+        AssetType: assetType,
         Id: assetId,
         Recipient: recipient,
         Locker: locker,
@@ -752,12 +752,12 @@ func TestAssetUnlock(t *testing.T) {
     _, istub := associateInteropCCInstance(amcc, amstub)
 
     // Test failures when any of the essential parameters are not supplied
-    assetAgreement.Type = ""
+    assetAgreement.AssetType = ""
     unlockSuccess, err = amcc.UnlockAsset(amstub, assetAgreement)
     require.Error(t, err)
     require.False(t, unlockSuccess)
 
-    assetAgreement.Type = assetType
+    assetAgreement.AssetType = assetType
     assetAgreement.Id = ""
     unlockSuccess, err = amcc.UnlockAsset(amstub, assetAgreement)
     require.Error(t, err)
@@ -819,7 +819,7 @@ func TestAssetUnlockUsingContractId(t *testing.T) {
     locker := clientId
     hash := []byte("MBQGA1UEBxMNU2FuIEZyYW5jaXNjbzEPMA0GA1UECxMGY2xpZW50MSQwIgYDVQQD")
     assetAgreement := &common.AssetExchangeAgreement {
-        Type: assetType,
+        AssetType: assetType,
         Id: assetId,
         Recipient: recipient,
         Locker: locker,
@@ -895,7 +895,7 @@ func TestFungibleAssetUnlock(t *testing.T) {
     locker := clientId
     hash := []byte("MBQGA1UEBxMNU2FuIEZyYW5jaXNjbzEPMA0GA1UECxMGY2xpZW50MSQwIgYDVQQD")
     assetAgreement := &common.FungibleAssetExchangeAgreement {
-        Type: assetType,
+        AssetType: assetType,
         NumUnits: numUnits,
         Recipient: recipient,
         Locker: locker,
@@ -921,7 +921,7 @@ func TestFungibleAssetUnlock(t *testing.T) {
     _, istub := associateInteropCCInstance(amcc, amstub)
 
     // Test failures when any of the essential parameters are not supplied
-    assetAgreement.Type = assetType
+    assetAgreement.AssetType = assetType
     assetAgreement.NumUnits = numUnits
 
     // Confirm that asset is not locked
@@ -982,7 +982,7 @@ func TestAssetClaim(t *testing.T) {
         ClaimInfo: claimInfoBytes,
     }
     assetAgreement := &common.AssetExchangeAgreement {
-        Type: assetType,
+        AssetType: assetType,
         Id: assetId,
         Recipient: recipient,
         Locker: locker,
@@ -1006,12 +1006,12 @@ func TestAssetClaim(t *testing.T) {
     assetAgreement.Locker = locker
     claimInfoBytes, _ = proto.Marshal(claimInfoHTLC)
     claimInfo.ClaimInfo = claimInfoBytes
-    assetAgreement.Type = ""
+    assetAgreement.AssetType = ""
     claimSuccess, err = amcc.ClaimAsset(amstub, assetAgreement, claimInfo)
     require.Error(t, err)
     require.False(t, claimSuccess)
 
-    assetAgreement.Type = assetType
+    assetAgreement.AssetType = assetType
     assetAgreement.Id = ""
     claimSuccess, err = amcc.ClaimAsset(amstub, assetAgreement, claimInfo)
     require.Error(t, err)
@@ -1096,7 +1096,7 @@ func TestAssetClaimUsingContractId(t *testing.T) {
         ClaimInfo: claimInfoBytes,
     }
     assetAgreement := &common.AssetExchangeAgreement {
-        Type: assetType,
+        AssetType: assetType,
         Id: assetId,
         Recipient: recipient,
         Locker: locker,
@@ -1203,7 +1203,7 @@ func TestFungibleAssetClaim(t *testing.T) {
         ClaimInfo: claimInfoBytes,
     }
     assetAgreement := &common.FungibleAssetExchangeAgreement {
-        Type: assetType,
+        AssetType: assetType,
         NumUnits: numUnits,
         Recipient: recipient,
         Locker: locker,
@@ -1266,7 +1266,7 @@ func TestFungibleAssetCountFunctions(t *testing.T) {
     recipient := "Bob"
     hash := []byte("MBQGA1UEBxMNU2FuIEZyYW5jaXNjbzEPMA0GA1UECxMGY2xpZW50MSQwIgYDVQQD")
     fungibleAssetExchangeAgreement := &common.FungibleAssetExchangeAgreement {
-        Type: assetType,
+        AssetType: assetType,
         NumUnits: numUnits,
         Recipient: recipient,
     }
@@ -1310,13 +1310,13 @@ func TestAssetListFunctions(t *testing.T) {
     locker := clientId
     hash := []byte("MBQGA1UEBxMNU2FuIEZyYW5jaXNjbzEPMA0GA1UECxMGY2xpZW50MSQwIgYDVQQD")
     assetAgreement := &common.AssetExchangeAgreement {
-        Type: assetType,
+        AssetType: assetType,
         Id: assetId,
         Recipient: recipient,
         Locker: locker,
     }
     fungibleAssetExchangeAgreement := &common.FungibleAssetExchangeAgreement {
-        Type: fungibleAssetType,
+        AssetType: fungibleAssetType,
         NumUnits: numUnits,
         Recipient: recipient,
         Locker: locker,
@@ -1452,13 +1452,13 @@ func TestAssetTimeFunctions(t *testing.T) {
     locker := clientId
     hash := []byte("MBQGA1UEBxMNU2FuIEZyYW5jaXNjbzEPMA0GA1UECxMGY2xpZW50MSQwIgYDVQQD")
     assetAgreement := &common.AssetExchangeAgreement {
-        Type: assetType,
+        AssetType: assetType,
         Id: assetId,
         Recipient: recipient,
         Locker: locker,
     }
     fungibleAssetExchangeAgreement := &common.FungibleAssetExchangeAgreement {
-        Type: assetType,
+        AssetType: assetType,
         NumUnits: numUnits,
         Recipient: recipient,
         Locker: locker,
@@ -1492,12 +1492,12 @@ func TestAssetTimeFunctions(t *testing.T) {
     associateInteropCCInstance(amcc, amstub)
 
     // Test failures when parameters are invalid
-    assetAgreement.Type = ""
+    assetAgreement.AssetType = ""
     getSuccess, err = amcc.GetAssetTimeToRelease(amstub, assetAgreement)
     require.Error(t, err)
     require.Equal(t, uint64(0), getSuccess)
 
-    assetAgreement.Type = assetType
+    assetAgreement.AssetType = assetType
     assetAgreement.Id = ""
     getSuccess, err = amcc.GetAssetTimeToRelease(amstub, assetAgreement)
     require.Error(t, err)
@@ -1522,12 +1522,12 @@ func TestAssetTimeFunctions(t *testing.T) {
     require.Error(t, err)
     require.Equal(t, uint64(0), getSuccess)
 
-    fungibleAssetExchangeAgreement.Type = ""
+    fungibleAssetExchangeAgreement.AssetType = ""
     getSuccess, err = amcc.GetFungibleAssetTimeToRelease(amstub, fungibleAssetExchangeAgreement)
     require.Error(t, err)
     require.Equal(t, uint64(0), getSuccess)
 
-    fungibleAssetExchangeAgreement.Type = fungibleAssetType
+    fungibleAssetExchangeAgreement.AssetType = fungibleAssetType
     fungibleAssetExchangeAgreement.NumUnits = 0
     getSuccess, err = amcc.GetFungibleAssetTimeToRelease(amstub, fungibleAssetExchangeAgreement)
     require.Error(t, err)

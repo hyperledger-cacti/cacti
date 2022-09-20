@@ -159,7 +159,7 @@ constructor(
  * The AssetTransferClaim flow is used to claim an asset (fungible/non-fungible) that is pledged in a remote network.
  *
  * @property claimArgs The details of the asset that is pledged in a remote network to be claimed as part of asset-transfer.
- *                          AssetType, numUnits & recipient are captured by the "agreement" structure.
+ *                          assettype, numUnits & recipient are captured by the "agreement" structure.
  *
  * pledgeId -- The unique identifier for the pledge of an asset for asset-transfer.
  * pledgeStatusLinearId -- The unique identifier to fetch pledge status (which was earlier obtained via interop query).

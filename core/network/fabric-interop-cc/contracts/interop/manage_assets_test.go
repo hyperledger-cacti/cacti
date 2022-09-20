@@ -65,7 +65,7 @@ func TestLockAsset(t *testing.T) {
 		HashBase64: []byte(hashBase64),
 		// lock for next 5 minutes
 		ExpiryTimeSecs: currentTimeSecs + defaultTimeLockSecs,
-		TimeSpec:       common.AssetLockHTLC_EPOCH,
+		TimeSpec:       common.TimeSpec_EPOCH,
 	}
 	lockInfoHTLCBytes, _ := proto.Marshal(lockInfoHTLC)
 	lockInfo := &common.AssetLock{
@@ -75,7 +75,7 @@ func TestLockAsset(t *testing.T) {
 	lockInfoBytes, _ := proto.Marshal(lockInfo)
 
 	assetAgreement := &common.AssetExchangeAgreement{
-		Type:      assetType,
+		AssetType: assetType,
 		Id:        assetId,
 		Recipient: recipient,
 		Locker:    locker,
@@ -106,7 +106,7 @@ func TestLockAsset(t *testing.T) {
 		// lock for next 5 mintues
 		ExpiryTimeSecs: currentTimeSecs + defaultTimeLockSecs,
 		// TimeSpec of AssetLockHTLC_DURATION is not currently supported
-		TimeSpec: common.AssetLockHTLC_DURATION,
+		TimeSpec: common.TimeSpec_DURATION,
 	}
 	lockInfoHTLCBytes, _ = proto.Marshal(lockInfoHTLC)
 	lockInfo = &common.AssetLock{
@@ -140,7 +140,7 @@ func TestUnlockAsset(t *testing.T) {
 		HashBase64: []byte(hashBase64),
 		// lock for sometime in the past for testing UnlockAsset functionality
 		ExpiryTimeSecs: currentTimeSecs - defaultTimeLockSecs,
-		TimeSpec:       common.AssetLockHTLC_EPOCH,
+		TimeSpec:       common.TimeSpec_EPOCH,
 	}
 	lockInfoHTLCBytes, _ := proto.Marshal(lockInfoHTLC)
 	lockInfo := &common.AssetLock{
@@ -150,7 +150,7 @@ func TestUnlockAsset(t *testing.T) {
 	lockInfoBytes, _ := proto.Marshal(lockInfo)
 
 	assetAgreement := &common.AssetExchangeAgreement{
-		Type:      assetType,
+		AssetType: assetType,
 		Id:        assetId,
 		Recipient: recipient,
 		Locker:    locker,
@@ -213,7 +213,7 @@ func TestIsAssetLocked(t *testing.T) {
 	currentTimeSecs := uint64(time.Now().Unix())
 
 	assetAgreement := &common.AssetExchangeAgreement{
-		Type:      assetType,
+		AssetType: assetType,
 		Id:        assetId,
 		Recipient: recipient,
 		Locker:    locker,
@@ -257,7 +257,7 @@ func TestIsAssetLocked(t *testing.T) {
 	log.Info(fmt.Println("Test failed as expected with error:", err))
 
 	assetAgreement = &common.AssetExchangeAgreement{
-		Type:      assetType,
+		AssetType: assetType,
 		Id:        assetId,
 		Recipient: recipient,
 		// arbitrary locker specification
@@ -271,7 +271,7 @@ func TestIsAssetLocked(t *testing.T) {
 	log.Info(fmt.Println("Test succeeded as expected since the asset agreement is specified to include arbitrary locker."))
 
 	assetAgreement = &common.AssetExchangeAgreement{
-		Type: assetType,
+		AssetType: assetType,
 		Id:   assetId,
 		// wrong recipient specification
 		Recipient: "Charlie",
@@ -286,7 +286,7 @@ func TestIsAssetLocked(t *testing.T) {
 	log.Info(fmt.Println("Test failed as expected with error:", err))
 
 	assetAgreement = &common.AssetExchangeAgreement{
-		Type: assetType,
+		AssetType: assetType,
 		Id:   assetId,
 		// arbitrary recipient specification
 		Recipient: "*",
@@ -300,7 +300,7 @@ func TestIsAssetLocked(t *testing.T) {
 	log.Info(fmt.Println("Test succeeded as expected since the asset agreement is specified to include arbitrary recipient."))
 
 	assetAgreement = &common.AssetExchangeAgreement{
-		Type: assetType,
+		AssetType: assetType,
 		Id:   assetId,
 		// arbitrary recipient specification
 		Recipient: "*",
@@ -315,7 +315,7 @@ func TestIsAssetLocked(t *testing.T) {
 	log.Info(fmt.Println("Test failed as expected with error:", err))
 
 	assetAgreement = &common.AssetExchangeAgreement{
-		Type: assetType,
+		AssetType: assetType,
 		Id:   assetId,
 		// arbitrary recipient specification
 		Recipient: "*",
@@ -347,7 +347,7 @@ func TestClaimAsset(t *testing.T) {
 	chaincodeStub.GetCreatorReturns([]byte(getCreator()), nil)
 
 	assetAgreement := &common.AssetExchangeAgreement{
-		Type:      assetType,
+		AssetType: assetType,
 		Id:        assetId,
 		Recipient: recipient,
 		Locker:    locker,
@@ -454,7 +454,7 @@ func TestHashSHA512(t *testing.T) {
 	chaincodeStub.GetCreatorReturns([]byte(getCreator()), nil)
 
 	assetAgreement := &common.AssetExchangeAgreement{
-		Type:      assetType,
+		AssetType: assetType,
 		Id:        assetId,
 		Recipient: recipient,
 		Locker:    locker,
@@ -518,7 +518,7 @@ func TestGetHTLCHash(t *testing.T) {
 	chaincodeStub.GetCreatorReturns([]byte(getCreator()), nil)
 
 	assetAgreement := &common.AssetExchangeAgreement{
-		Type:      assetType,
+		AssetType: assetType,
 		Id:        assetId,
 		Recipient: recipient,
 		Locker:    locker,
@@ -566,7 +566,7 @@ func TestGetHTLCHashByContractId(t *testing.T) {
 	currentTimeSecs := uint64(time.Now().Unix())
 
 	assetAgreement := &common.FungibleAssetExchangeAgreement{
-		Type:      assetType,
+		AssetType: assetType,
 		NumUnits:  numUnits,
 		Locker:    locker,
 		Recipient: recipient,
@@ -613,7 +613,7 @@ func TestUnlockAssetUsingContractId(t *testing.T) {
 	chaincodeStub.GetCreatorReturns([]byte(getCreator()), nil)
 
 	assetAgreement := &common.AssetExchangeAgreement{
-		Type:      assetType,
+		AssetType: assetType,
 		Id:        assetId,
 		Recipient: recipient,
 		Locker:    locker,
@@ -723,7 +723,7 @@ func TestClaimAssetUsingContractId(t *testing.T) {
 	chaincodeStub.GetCreatorReturns([]byte(getCreator()), nil)
 
 	assetAgreement := &common.AssetExchangeAgreement{
-		Type:      assetType,
+		AssetType: assetType,
 		Id:        assetId,
 		Recipient: recipient,
 		Locker:    locker,
@@ -877,7 +877,7 @@ func TestIsAssetLockedQueryUsingContractId(t *testing.T) {
 	currentTimeSecs := uint64(time.Now().Unix())
 
 	assetAgreement := &common.AssetExchangeAgreement{
-		Type:      assetType,
+		AssetType: assetType,
 		Id:        assetId,
 		Recipient: recipient,
 		Locker:    locker,
@@ -966,7 +966,7 @@ func TestLockFungibleAsset(t *testing.T) {
 	currentTimeSecs := uint64(time.Now().Unix())
 
 	assetAgreement := &common.FungibleAssetExchangeAgreement{
-		Type:      assetType,
+		AssetType: assetType,
 		NumUnits:  numUnits,
 		Locker:    locker,
 		Recipient: recipient,
@@ -983,7 +983,7 @@ func TestLockFungibleAsset(t *testing.T) {
 		// lock for next 5 mintues
 		ExpiryTimeSecs: currentTimeSecs + defaultTimeLockSecs,
 		// TimeSpec of AssetLockHTLC_DURATION is not currently supported
-		TimeSpec: common.AssetLockHTLC_DURATION,
+		TimeSpec: common.TimeSpec_DURATION,
 	}
 	lockInfoHTLCBytes, _ := proto.Marshal(lockInfoHTLC)
 	lockInfo := &common.AssetLock{
@@ -1004,7 +1004,7 @@ func TestLockFungibleAsset(t *testing.T) {
 		// lock for next 5 mintues
 		ExpiryTimeSecs: currentTimeSecs + defaultTimeLockSecs,
 		// TimeSpec of AssetLockHTLC_EPOCH is only supported currently
-		TimeSpec: common.AssetLockHTLC_EPOCH,
+		TimeSpec: common.TimeSpec_EPOCH,
 	}
 	lockInfoHTLCBytes, _ = proto.Marshal(lockInfoHTLC)
 	lockInfo = &common.AssetLock{
@@ -1064,7 +1064,7 @@ func TestIsFungibleAssetLocked(t *testing.T) {
 	currentTimeSecs := uint64(time.Now().Unix())
 
 	assetAgreement := &common.FungibleAssetExchangeAgreement{
-		Type:      assetType,
+		AssetType: assetType,
 		NumUnits:  numUnits,
 		Locker:    locker,
 		Recipient: recipient,
@@ -1134,7 +1134,7 @@ func TestClaimFungibleAsset(t *testing.T) {
 	chaincodeStub.GetCreatorReturns([]byte(getCreator()), nil)
 
 	assetAgreement := &common.FungibleAssetExchangeAgreement{
-		Type:      assetType,
+		AssetType: assetType,
 		NumUnits:  numUnits,
 		Locker:    locker,
 		Recipient: recipient,
@@ -1263,7 +1263,7 @@ func TestUnlockFungibleAsset(t *testing.T) {
 	chaincodeStub.GetCreatorReturns([]byte(getCreator()), nil)
 
 	assetAgreement := &common.FungibleAssetExchangeAgreement{
-		Type:      assetType,
+		AssetType: assetType,
 		NumUnits:  numUnits,
 		Locker:    locker,
 		Recipient: recipient,

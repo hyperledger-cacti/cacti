@@ -44,7 +44,7 @@ func (am *AssetManagement) validateInteropccAssetTypeAssetId(assetAgreement *com
     if len(am.interopChaincodeId) == 0 {
         return false, logThenErrorf("interoperation chaincode ID not set. Run the 'Configure(...)' function first.")
     }
-    if len(assetAgreement.Type) == 0 {
+    if len(assetAgreement.AssetType) == 0 {
         return false, logThenErrorf("empty asset type")
     }
     if len(assetAgreement.Id) == 0 {
@@ -78,7 +78,7 @@ func (am *AssetManagement) validateLockInfo(lockInfo *common.AssetLock) error {
         if len(lockInfoHTLC.HashBase64) == 0 {
             return logThenErrorf("empty lock hash value")
         }
-        if lockInfoHTLC.TimeSpec != common.AssetLockHTLC_EPOCH {
+        if lockInfoHTLC.TimeSpec != common.TimeSpec_EPOCH {
             return logThenErrorf("only EPOCH time is supported at present")
         }
     } else {
@@ -141,7 +141,7 @@ func (am *AssetManagement) LockAsset(stub shim.ChaincodeStubInterface, assetAgre
         return "", logThenErrorf(string(iccResp.GetMessage()))
     }
     contractId := string(iccResp.GetPayload())
-    fmt.Printf("Asset %s of type %s locked for %s using contractId %s\n", assetAgreement.Id, assetAgreement.Type, assetAgreement.Recipient, contractId)
+    fmt.Printf("Asset %s of type %s locked for %s using contractId %s\n", assetAgreement.Id, assetAgreement.AssetType, assetAgreement.Recipient, contractId)
     return contractId, nil
 }
 
@@ -150,7 +150,7 @@ func (am *AssetManagement) LockFungibleAsset(stub shim.ChaincodeStubInterface, a
         return "", logThenErrorf("interoperation chaincode ID not set. Run the 'Configure(...)' function first.")
     }
 
-    if len(assetAgreement.Type) == 0 {
+    if len(assetAgreement.AssetType) == 0 {
         return "", logThenErrorf("empty asset type")
     }
     if assetAgreement.NumUnits <= 0 {
@@ -181,7 +181,7 @@ func (am *AssetManagement) LockFungibleAsset(stub shim.ChaincodeStubInterface, a
         return "", errors.New(string(iccResp.GetMessage()))
     }
     contractId := string(iccResp.GetPayload())
-    fmt.Printf("%d units of asset type %s locked for %s using contractId %s\n", assetAgreement.NumUnits, assetAgreement.Type, assetAgreement.Recipient, contractId)
+    fmt.Printf("%d units of asset type %s locked for %s using contractId %s\n", assetAgreement.NumUnits, assetAgreement.AssetType, assetAgreement.Recipient, contractId)
     return contractId, nil
 }
 
@@ -221,9 +221,9 @@ func (am *AssetManagement) IsAssetLocked(stub shim.ChaincodeStubInterface, asset
     }
     isLocked := (string(iccResp.Payload) == fmt.Sprintf("%t", true))
     if isLocked {
-        fmt.Printf("Asset %s of type %s locked by %s for %s\n", assetAgreement.Id, assetAgreement.Type, assetAgreement.Locker, assetAgreement.Recipient)
+        fmt.Printf("Asset %s of type %s locked by %s for %s\n", assetAgreement.Id, assetAgreement.AssetType, assetAgreement.Locker, assetAgreement.Recipient)
     } else {
-        fmt.Printf("Asset %s of type %s not locked by %s for %s\n", assetAgreement.Id, assetAgreement.Type, assetAgreement.Locker, assetAgreement.Recipient)
+        fmt.Printf("Asset %s of type %s not locked by %s for %s\n", assetAgreement.Id, assetAgreement.AssetType, assetAgreement.Locker, assetAgreement.Recipient)
     }
     return isLocked, nil
 }
@@ -298,7 +298,7 @@ func (am *AssetManagement) ClaimAsset(stub shim.ChaincodeStubInterface, assetAgr
     if iccResp.GetStatus() != shim.OK {
         return false, logThenErrorf(string(iccResp.GetMessage()))
     }
-    fmt.Printf("Claimed asset %s of type %s locked by %s\n", assetAgreement.Id, assetAgreement.Type, assetAgreement.Locker)
+    fmt.Printf("Claimed asset %s of type %s locked by %s\n", assetAgreement.Id, assetAgreement.AssetType, assetAgreement.Locker)
     return true, nil
 }
 
@@ -371,7 +371,7 @@ func (am *AssetManagement) UnlockAsset(stub shim.ChaincodeStubInterface, assetAg
     if iccResp.GetStatus() != shim.OK {
         return false, logThenErrorf(string(iccResp.GetMessage()))
     }
-    fmt.Printf("Asset %s of type %s unlocked\n", assetAgreement.Id, assetAgreement.Type)
+    fmt.Printf("Asset %s of type %s unlocked\n", assetAgreement.Id, assetAgreement.AssetType)
     return true, nil
 }
 
@@ -489,7 +489,7 @@ func (am *AssetManagement) GetAssetTimeToRelease(stub shim.ChaincodeStubInterfac
         return 0, logThenErrorf("interoperation chaincode ID not set. Run the 'Configure(...)' function first.")
     }
 
-    if len(assetAgreement.Type) == 0 {
+    if len(assetAgreement.AssetType) == 0 {
         return 0, logThenErrorf("empty asset type")
     }
     if len(assetAgreement.Id) == 0 {
@@ -511,7 +511,7 @@ func (am *AssetManagement) GetAssetTimeToRelease(stub shim.ChaincodeStubInterfac
     if assetAgreement.Recipient == assetAgreement.Locker {
         return 0, logThenErrorf("invalid query: locker identical to recipient")
     }
-    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("GetAssetTimeToRelease"), []byte(assetAgreement.Type), []byte(assetAgreement.Id), []byte(assetAgreement.Recipient), []byte(assetAgreement.Locker)}, "")
+    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("GetAssetTimeToRelease"), []byte(assetAgreement.AssetType), []byte(assetAgreement.Id), []byte(assetAgreement.Recipient), []byte(assetAgreement.Locker)}, "")
     fmt.Printf("Response from Interop CC: %+v\n", iccResp)
     if iccResp.GetStatus() != shim.OK {
         return 0, errors.New(string(iccResp.GetMessage()))
@@ -523,7 +523,7 @@ func (am *AssetManagement) GetAssetTimeToRelease(stub shim.ChaincodeStubInterfac
     if timeToReleaseSecs < 0 {
         return 0, logThenErrorf("asset time to release must be a positive integer; found " + string(iccResp.Payload) + " instead")
     }
-    fmt.Printf("Asset %s of type %s locked until %+v\n", assetAgreement.Id, assetAgreement.Type, time.Unix(timeToReleaseSecs, 0))
+    fmt.Printf("Asset %s of type %s locked until %+v\n", assetAgreement.Id, assetAgreement.AssetType, time.Unix(timeToReleaseSecs, 0))
     return uint64(timeToReleaseSecs), nil
 }
 
@@ -534,7 +534,7 @@ func (am *AssetManagement) GetFungibleAssetTimeToRelease(stub shim.ChaincodeStub
         return 0, logThenErrorf("interoperation chaincode ID not set. Run the 'Configure(...)' function first.")
     }
 
-    if len(assetAgreement.Type) == 0 {
+    if len(assetAgreement.AssetType) == 0 {
         return 0, logThenErrorf("empty asset type")
     }
     if assetAgreement.NumUnits <= 0 {
@@ -556,7 +556,7 @@ func (am *AssetManagement) GetFungibleAssetTimeToRelease(stub shim.ChaincodeStub
     if assetAgreement.Recipient == assetAgreement.Locker {
         return 0, logThenErrorf("invalid query: locker identical to recipient")
     }
-    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("GetFungibleAssetTimeToRelease"), []byte(assetAgreement.Type), []byte(strconv.FormatInt(int64(assetAgreement.NumUnits), 10)), []byte(assetAgreement.Recipient), []byte(assetAgreement.Locker)}, "")
+    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("GetFungibleAssetTimeToRelease"), []byte(assetAgreement.AssetType), []byte(strconv.FormatInt(int64(assetAgreement.NumUnits), 10)), []byte(assetAgreement.Recipient), []byte(assetAgreement.Locker)}, "")
     fmt.Printf("Response from Interop CC: %+v\n", iccResp)
     if iccResp.GetStatus() != shim.OK {
         return 0, logThenErrorf(string(iccResp.GetMessage()))
@@ -568,7 +568,7 @@ func (am *AssetManagement) GetFungibleAssetTimeToRelease(stub shim.ChaincodeStub
     if timeToReleaseSecs < 0 {
         return 0, logThenErrorf("asset time to release must be a positive integer; found " + string(iccResp.Payload) + " instead")
     }
-    fmt.Printf("%d units of asset type %s locked until %+v\n", assetAgreement.NumUnits, assetAgreement.Type, time.Unix(timeToReleaseSecs, 0))
+    fmt.Printf("%d units of asset type %s locked until %+v\n", assetAgreement.NumUnits, assetAgreement.AssetType, time.Unix(timeToReleaseSecs, 0))
     return uint64(timeToReleaseSecs), nil
 }
 
