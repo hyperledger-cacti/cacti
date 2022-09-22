@@ -259,7 +259,7 @@ func TestUpdateLocalMembership(t *testing.T) {
 	clientIdentity.GetAttributeValueCalls(setClientAdmin)
 	ctx.GetClientIdentityReturns(clientIdentity)
 	err = interopcc.UpdateLocalMembership(ctx, string(membershipBytes))
-	require.EqualError(t, err, fmt.Sprintf("Membership with id: %s does not exist", membershipAsset.SecurityDomain))
+	require.EqualError(t, err, fmt.Sprintf("Membership with id: %s does not exist", membershipLocalSecurityDomain))
 
 	// Valid cert chain
 	member := &member1
@@ -267,7 +267,7 @@ func TestUpdateLocalMembership(t *testing.T) {
 	membershipBytes, err = json.Marshal(&membershipAsset)
 	require.NoError(t, err)
 	err = interopcc.UpdateLocalMembership(ctx, string(membershipBytes))
-	require.EqualError(t, err, fmt.Sprintf("Membership with id: %s does not exist", membershipAsset.SecurityDomain))
+	require.EqualError(t, err, fmt.Sprintf("Membership with id: %s does not exist", membershipLocalSecurityDomain))
 
 	// Membership already exists update the Membership
 	chaincodeStub.GetStateReturns(membershipBytes, nil)
@@ -294,7 +294,7 @@ func TestUpdateLocalMembership(t *testing.T) {
 }
 
 // TODO: Remove later. Keeping for backward compatibility.
-func TestCreateMembership(t *testing.T) {
+func TestCreateMembershipUnattested(t *testing.T) {
 	ctx, chaincodeStub := wtest.PrepMockStub()
 	interopcc := SmartContract{}
 
@@ -306,6 +306,14 @@ func TestCreateMembership(t *testing.T) {
 
 	membershipBytes, err := json.Marshal(&membershipAsset)
 	require.NoError(t, err)
+
+	// Case when caller is not an admin
+	err = interopcc.CreateMembership(ctx, string(membershipBytes))
+	require.EqualError(t, err, "Caller neither a network admin nor an IIN Agent; access denied")
+	// Case when no Membership is found
+	clientIdentity := &mocks.ClientIdentity{}
+	clientIdentity.GetAttributeValueCalls(setClientAdmin)
+	ctx.GetClientIdentityReturns(clientIdentity)
 	err = interopcc.CreateMembership(ctx, string(membershipBytes))
 	require.NoError(t, err)
 	// Invalid Input check
@@ -317,8 +325,7 @@ func TestCreateMembership(t *testing.T) {
 	require.EqualError(t, err, fmt.Sprintf("Membership already exists for membership id: %s. Use 'UpdateMembership' to update.", membershipAsset.SecurityDomain))
 }
 
-// TODO: Rename later.
-func TestCreateMembershipIIN(t *testing.T) {
+func TestCreateMembership(t *testing.T) {
 	ctx, chaincodeStub := wtest.PrepMockStub()
 	interopcc := SmartContract{}
 
@@ -458,16 +465,17 @@ func TestCreateMembershipIIN(t *testing.T) {
 	}
 
 	// Record membership info: should fail because the caller is not an IIN Agent
-	counterAttestedMembershipBytes, err := json.Marshal(&counterAttestedMembership)
+	counterAttestedMembershipBytesPlain, err := protoV2.Marshal(&counterAttestedMembership)
 	require.NoError(t, err)
-	err = interopcc.CreateMembershipIIN(ctx, string(counterAttestedMembershipBytes))
-	require.EqualError(t, err, "Caller not an IIN Agent; access denied")
+	counterAttestedMembershipBytes := base64.StdEncoding.EncodeToString(counterAttestedMembershipBytesPlain)
+	err = interopcc.CreateMembership(ctx, string(counterAttestedMembershipBytes))
+	require.EqualError(t, err, "Caller neither a network admin nor an IIN Agent; access denied")
 
 	// Record membership info: should fail because the local IIN Agent is not registered
 	clientIdentity := &mocks.ClientIdentity{}
 	clientIdentity.GetAttributeValueCalls(setClientIINAgent)
 	ctx.GetClientIdentityReturns(clientIdentity)
-	err = interopcc.CreateMembershipIIN(ctx, string(counterAttestedMembershipBytes))
+	err = interopcc.CreateMembership(ctx, string(counterAttestedMembershipBytes))
 	require.Error(t, err)
 
 	// Record local membership info
@@ -483,13 +491,13 @@ func TestCreateMembershipIIN(t *testing.T) {
 	chaincodeStub.GetStateReturnsOnCall(3, nil, nil)
 	clientIdentity.GetAttributeValueCalls(setClientIINAgent)
 	ctx.GetClientIdentityReturns(clientIdentity)
-	err = interopcc.CreateMembershipIIN(ctx, string(counterAttestedMembershipBytes))
+	err = interopcc.CreateMembership(ctx, string(counterAttestedMembershipBytes))
 	require.NoError(t, err)
 
 	// Record membership info again: should fail because membership has already been recorded against this security domain
 	chaincodeStub.GetStateReturnsOnCall(4, localMembershipBytes, nil)
 	chaincodeStub.GetStateReturnsOnCall(5, []byte{}, nil)
-	err = interopcc.CreateMembershipIIN(ctx, string(counterAttestedMembershipBytes))
+	err = interopcc.CreateMembership(ctx, string(counterAttestedMembershipBytes))
 	require.EqualError(t, err, fmt.Sprintf("Membership already exists for membership id: %s. Use 'UpdateMembership' to update.", membershipAsset.SecurityDomain))
 
 	// One of the local signatures is invalid: should fail
@@ -498,11 +506,12 @@ func TestCreateMembershipIIN(t *testing.T) {
 	signatureLocal2, err = ecdsa.SignASN1(randomLocal2, keyLocal2, hashedLocal2)
 	require.NoError(t, err)
 	attestationLocal2.Signature = base64.StdEncoding.EncodeToString(signatureLocal2)
-	counterAttestedMembershipBytes, err = json.Marshal(&counterAttestedMembership)
+	counterAttestedMembershipBytesPlain, err = protoV2.Marshal(&counterAttestedMembership)
 	require.NoError(t, err)
+	counterAttestedMembershipBytes = base64.StdEncoding.EncodeToString(counterAttestedMembershipBytesPlain)
 	chaincodeStub.GetStateReturnsOnCall(6, localMembershipBytes, nil)
 	chaincodeStub.GetStateReturnsOnCall(7, nil, nil)
-	err = interopcc.CreateMembershipIIN(ctx, string(counterAttestedMembershipBytes))
+	err = interopcc.CreateMembership(ctx, string(counterAttestedMembershipBytes))
 	require.EqualError(t, err, "Unable to Validate Signature: Signature Verification failed. ECDSA VERIFY")
 
 	// One of the foreign signatures is invalid: should fail
@@ -527,10 +536,11 @@ func TestCreateMembershipIIN(t *testing.T) {
 	require.NoError(t, err)
 	attestationLocal2.Signature = base64.StdEncoding.EncodeToString(signatureLocal2)
 	counterAttestedMembership.AttestedMembershipSet = attestedMembershipSetBytes
-	counterAttestedMembershipBytes, err = json.Marshal(&counterAttestedMembership)
+	counterAttestedMembershipBytesPlain, err = protoV2.Marshal(&counterAttestedMembership)
 	require.NoError(t, err)
+	counterAttestedMembershipBytes = base64.StdEncoding.EncodeToString(counterAttestedMembershipBytesPlain)
 	chaincodeStub.GetStateReturnsOnCall(7, localMembershipBytes, nil)
-	err = interopcc.CreateMembershipIIN(ctx, string(counterAttestedMembershipBytes))
+	err = interopcc.CreateMembership(ctx, string(counterAttestedMembershipBytes))
 	require.EqualError(t, err, "Unable to Validate Signature: Signature Verification failed. ECDSA VERIFY")
 
 	// One of the foreign attestations has an invalid nonce: should fail
@@ -556,10 +566,11 @@ func TestCreateMembershipIIN(t *testing.T) {
 	require.NoError(t, err)
 	attestationLocal2.Signature = base64.StdEncoding.EncodeToString(signatureLocal2)
 	counterAttestedMembership.AttestedMembershipSet = attestedMembershipSetBytes
-	counterAttestedMembershipBytes, err = json.Marshal(&counterAttestedMembership)
+	counterAttestedMembershipBytesPlain, err = protoV2.Marshal(&counterAttestedMembership)
 	require.NoError(t, err)
+	counterAttestedMembershipBytes = base64.StdEncoding.EncodeToString(counterAttestedMembershipBytesPlain)
 	chaincodeStub.GetStateReturnsOnCall(8, localMembershipBytes, nil)
-	err = interopcc.CreateMembershipIIN(ctx, string(counterAttestedMembershipBytes))
+	err = interopcc.CreateMembership(ctx, string(counterAttestedMembershipBytes))
 	require.EqualError(t, err, fmt.Sprintf("Mismatched nonces across two attestations: %s, %s", nonce, attestation1.Nonce))
 
 	// Foreign membership has an invalid cert chain: should fail
@@ -599,10 +610,11 @@ func TestCreateMembershipIIN(t *testing.T) {
 	require.NoError(t, err)
 	attestationLocal2.Signature = base64.StdEncoding.EncodeToString(signatureLocal2)
 	counterAttestedMembership.AttestedMembershipSet = attestedMembershipSetBytes
-	counterAttestedMembershipBytes, err = json.Marshal(&counterAttestedMembership)
+	counterAttestedMembershipBytesPlain, err = protoV2.Marshal(&counterAttestedMembership)
 	require.NoError(t, err)
+	counterAttestedMembershipBytes = base64.StdEncoding.EncodeToString(counterAttestedMembershipBytesPlain)
 	chaincodeStub.GetStateReturnsOnCall(9, localMembershipBytes, nil)
-	err = interopcc.CreateMembershipIIN(ctx, string(counterAttestedMembershipBytes))
+	err = interopcc.CreateMembership(ctx, string(counterAttestedMembershipBytes))
 	require.Error(t, err)
 
 	// Foreign attestation has invalid security domain: should fail
@@ -642,15 +654,16 @@ func TestCreateMembershipIIN(t *testing.T) {
 	require.NoError(t, err)
 	attestationLocal2.Signature = base64.StdEncoding.EncodeToString(signatureLocal2)
 	counterAttestedMembership.AttestedMembershipSet = attestedMembershipSetBytes
-	counterAttestedMembershipBytes, err = json.Marshal(&counterAttestedMembership)
+	counterAttestedMembershipBytesPlain, err = protoV2.Marshal(&counterAttestedMembership)
 	require.NoError(t, err)
+	counterAttestedMembershipBytes = base64.StdEncoding.EncodeToString(counterAttestedMembershipBytesPlain)
 	chaincodeStub.GetStateReturnsOnCall(10, localMembershipBytes, nil)
-	err = interopcc.CreateMembershipIIN(ctx, string(counterAttestedMembershipBytes))
+	err = interopcc.CreateMembership(ctx, string(counterAttestedMembershipBytes))
 	require.EqualError(t, err, fmt.Sprintf("Foreign agent security domain %s does not match attested membership security domain invalid", securityDomainId))
 }
 
 // TODO: Remove later. Keeping for backward compatibility.
-func TestUpdateMembership(t *testing.T) {
+func TestUpdateMembershipUnattested(t *testing.T) {
 	ctx, chaincodeStub := wtest.PrepMockStub()
 	interopcc := SmartContract{}
 
@@ -662,6 +675,14 @@ func TestUpdateMembership(t *testing.T) {
 
 	membershipBytes, err := json.Marshal(&membershipAsset)
 	require.NoError(t, err)
+
+	// Case when caller is not an admin
+	err = interopcc.UpdateMembership(ctx, string(membershipBytes))
+	require.EqualError(t, err, "Caller neither a network admin nor an IIN Agent; access denied")
+	// Case when no Membership is found
+	clientIdentity := &mocks.ClientIdentity{}
+	clientIdentity.GetAttributeValueCalls(setClientAdmin)
+	ctx.GetClientIdentityReturns(clientIdentity)
 	err = interopcc.UpdateMembership(ctx, string(membershipBytes))
 	require.EqualError(t, err, fmt.Sprintf("Membership with id: %s does not exist", membershipAsset.SecurityDomain))
 	// Invalid Input check
@@ -674,8 +695,7 @@ func TestUpdateMembership(t *testing.T) {
 	require.NoError(t, err)
 }
 
-// TODO: Rename later.
-func TestUpdateMembershipIIN(t *testing.T) {
+func TestUpdateMembership(t *testing.T) {
 	ctx, chaincodeStub := wtest.PrepMockStub()
 	interopcc := SmartContract{}
 
@@ -815,16 +835,18 @@ func TestUpdateMembershipIIN(t *testing.T) {
 	}
 
 	// Record membership info: should fail because the caller is not an IIN Agent
-	counterAttestedMembershipBytes, err := json.Marshal(&counterAttestedMembership)
+	counterAttestedMembershipBytesPlain, err := protoV2.Marshal(&counterAttestedMembership)
 	require.NoError(t, err)
-	err = interopcc.UpdateMembershipIIN(ctx, string(counterAttestedMembershipBytes))
-	require.EqualError(t, err, "Caller not an IIN Agent; access denied")
+	counterAttestedMembershipBytes := base64.StdEncoding.EncodeToString(counterAttestedMembershipBytesPlain)
+	require.NoError(t, err)
+	err = interopcc.UpdateMembership(ctx, string(counterAttestedMembershipBytes))
+	require.EqualError(t, err, "Caller neither a network admin nor an IIN Agent; access denied")
 
 	// Record membership info: should fail because the local IIN Agent is not registered
 	clientIdentity := &mocks.ClientIdentity{}
 	clientIdentity.GetAttributeValueCalls(setClientIINAgent)
 	ctx.GetClientIdentityReturns(clientIdentity)
-	err = interopcc.UpdateMembershipIIN(ctx, string(counterAttestedMembershipBytes))
+	err = interopcc.UpdateMembership(ctx, string(counterAttestedMembershipBytes))
 	require.Error(t, err)
 
 	// Record local membership info
@@ -840,13 +862,13 @@ func TestUpdateMembershipIIN(t *testing.T) {
 	chaincodeStub.GetStateReturnsOnCall(3, nil, nil)
 	clientIdentity.GetAttributeValueCalls(setClientIINAgent)
 	ctx.GetClientIdentityReturns(clientIdentity)
-	err = interopcc.UpdateMembershipIIN(ctx, string(counterAttestedMembershipBytes))
+	err = interopcc.UpdateMembership(ctx, string(counterAttestedMembershipBytes))
 	require.EqualError(t, err, fmt.Sprintf("Membership with id: %s does not exist", securityDomainId))
 
 	// Record membership info again: should succeed now
 	chaincodeStub.GetStateReturnsOnCall(4, localMembershipBytes, nil)
 	chaincodeStub.GetStateReturnsOnCall(5, []byte{}, nil)
-	err = interopcc.UpdateMembershipIIN(ctx, string(counterAttestedMembershipBytes))
+	err = interopcc.UpdateMembership(ctx, string(counterAttestedMembershipBytes))
 	require.NoError(t, err)
 
 	// One of the local signatures is invalid: should fail
@@ -855,11 +877,12 @@ func TestUpdateMembershipIIN(t *testing.T) {
 	signatureLocal2, err = ecdsa.SignASN1(randomLocal2, keyLocal2, hashedLocal2)
 	require.NoError(t, err)
 	attestationLocal2.Signature = base64.StdEncoding.EncodeToString(signatureLocal2)
-	counterAttestedMembershipBytes, err = json.Marshal(&counterAttestedMembership)
+	counterAttestedMembershipBytesPlain, err = protoV2.Marshal(&counterAttestedMembership)
 	require.NoError(t, err)
+	counterAttestedMembershipBytes = base64.StdEncoding.EncodeToString(counterAttestedMembershipBytesPlain)
 	chaincodeStub.GetStateReturnsOnCall(6, localMembershipBytes, nil)
 	chaincodeStub.GetStateReturnsOnCall(7, []byte{}, nil)
-	err = interopcc.UpdateMembershipIIN(ctx, string(counterAttestedMembershipBytes))
+	err = interopcc.UpdateMembership(ctx, string(counterAttestedMembershipBytes))
 	require.EqualError(t, err, "Unable to Validate Signature: Signature Verification failed. ECDSA VERIFY")
 
 	// One of the foreign signatures is invalid: should fail
@@ -884,10 +907,11 @@ func TestUpdateMembershipIIN(t *testing.T) {
 	require.NoError(t, err)
 	attestationLocal2.Signature = base64.StdEncoding.EncodeToString(signatureLocal2)
 	counterAttestedMembership.AttestedMembershipSet = attestedMembershipSetBytes
-	counterAttestedMembershipBytes, err = json.Marshal(&counterAttestedMembership)
+	counterAttestedMembershipBytesPlain, err = protoV2.Marshal(&counterAttestedMembership)
 	require.NoError(t, err)
+	counterAttestedMembershipBytes = base64.StdEncoding.EncodeToString(counterAttestedMembershipBytesPlain)
 	chaincodeStub.GetStateReturnsOnCall(7, localMembershipBytes, nil)
-	err = interopcc.UpdateMembershipIIN(ctx, string(counterAttestedMembershipBytes))
+	err = interopcc.UpdateMembership(ctx, string(counterAttestedMembershipBytes))
 	require.EqualError(t, err, "Unable to Validate Signature: Signature Verification failed. ECDSA VERIFY")
 
 	// One of the foreign attestations has an invalid nonce: should fail
@@ -913,10 +937,11 @@ func TestUpdateMembershipIIN(t *testing.T) {
 	require.NoError(t, err)
 	attestationLocal2.Signature = base64.StdEncoding.EncodeToString(signatureLocal2)
 	counterAttestedMembership.AttestedMembershipSet = attestedMembershipSetBytes
-	counterAttestedMembershipBytes, err = json.Marshal(&counterAttestedMembership)
+	counterAttestedMembershipBytesPlain, err = protoV2.Marshal(&counterAttestedMembership)
 	require.NoError(t, err)
+	counterAttestedMembershipBytes = base64.StdEncoding.EncodeToString(counterAttestedMembershipBytesPlain)
 	chaincodeStub.GetStateReturnsOnCall(8, localMembershipBytes, nil)
-	err = interopcc.UpdateMembershipIIN(ctx, string(counterAttestedMembershipBytes))
+	err = interopcc.UpdateMembership(ctx, string(counterAttestedMembershipBytes))
 	require.EqualError(t, err, fmt.Sprintf("Mismatched nonces across two attestations: %s, %s", nonce, attestation1.Nonce))
 
 	// Foreign membership has an invalid cert chain: should fail
@@ -956,10 +981,11 @@ func TestUpdateMembershipIIN(t *testing.T) {
 	require.NoError(t, err)
 	attestationLocal2.Signature = base64.StdEncoding.EncodeToString(signatureLocal2)
 	counterAttestedMembership.AttestedMembershipSet = attestedMembershipSetBytes
-	counterAttestedMembershipBytes, err = json.Marshal(&counterAttestedMembership)
+	counterAttestedMembershipBytesPlain, err = protoV2.Marshal(&counterAttestedMembership)
 	require.NoError(t, err)
+	counterAttestedMembershipBytes = base64.StdEncoding.EncodeToString(counterAttestedMembershipBytesPlain)
 	chaincodeStub.GetStateReturnsOnCall(9, localMembershipBytes, nil)
-	err = interopcc.UpdateMembershipIIN(ctx, string(counterAttestedMembershipBytes))
+	err = interopcc.UpdateMembership(ctx, string(counterAttestedMembershipBytes))
 	require.Error(t, err)
 
 	// Foreign attestation has invalid security domain: should fail
@@ -999,10 +1025,11 @@ func TestUpdateMembershipIIN(t *testing.T) {
 	require.NoError(t, err)
 	attestationLocal2.Signature = base64.StdEncoding.EncodeToString(signatureLocal2)
 	counterAttestedMembership.AttestedMembershipSet = attestedMembershipSetBytes
-	counterAttestedMembershipBytes, err = json.Marshal(&counterAttestedMembership)
+	counterAttestedMembershipBytesPlain, err = protoV2.Marshal(&counterAttestedMembership)
 	require.NoError(t, err)
+	counterAttestedMembershipBytes = base64.StdEncoding.EncodeToString(counterAttestedMembershipBytesPlain)
 	chaincodeStub.GetStateReturnsOnCall(10, localMembershipBytes, nil)
-	err = interopcc.UpdateMembershipIIN(ctx, string(counterAttestedMembershipBytes))
+	err = interopcc.UpdateMembership(ctx, string(counterAttestedMembershipBytes))
 	require.EqualError(t, err, fmt.Sprintf("Foreign agent security domain %s does not match attested membership security domain invalid", securityDomainId))
 }
 
@@ -1037,28 +1064,8 @@ func TestDeleteMembership(t *testing.T) {
 	ctx, chaincodeStub := wtest.PrepMockStub()
 	interopcc := SmartContract{}
 
-	// Case when a Membership exists
-	chaincodeStub.GetStateReturns([]byte{}, nil)
-	err := interopcc.DeleteMembership(ctx, securityDomainId)
-	require.NoError(t, err)
-
-	// Case when no Membership is found
-	chaincodeStub.GetStateReturns(nil, nil)
-	err = interopcc.DeleteMembership(ctx, securityDomainId)
-	require.EqualError(t, err, fmt.Sprintf("Membership with id: %s does not exist", securityDomainId))
-
-	// Handle GetState Error
-	chaincodeStub.GetStateReturns(nil, fmt.Errorf("unable to retrieve asset"))
-	err = interopcc.DeleteMembership(ctx, securityDomainId)
-	require.EqualError(t, err, fmt.Sprintf("unable to retrieve asset"))
-}
-
-func TestDeleteMembershipIIN(t *testing.T) {
-	ctx, chaincodeStub := wtest.PrepMockStub()
-	interopcc := SmartContract{}
-
 	// Case when caller is not an IIN Agent
-	err := interopcc.DeleteMembershipIIN(ctx, securityDomainId)
+	err := interopcc.DeleteMembership(ctx, securityDomainId)
 	require.EqualError(t, err, "Caller not an IIN Agent; access denied")
 
 	// Case when a Membership exists
@@ -1066,17 +1073,17 @@ func TestDeleteMembershipIIN(t *testing.T) {
 	clientIdentity.GetAttributeValueCalls(setClientIINAgent)
 	ctx.GetClientIdentityReturns(clientIdentity)
 	chaincodeStub.GetStateReturns([]byte{}, nil)
-	err = interopcc.DeleteMembershipIIN(ctx, securityDomainId)
+	err = interopcc.DeleteMembership(ctx, securityDomainId)
 	require.NoError(t, err)
 
 	// Case when no Membership is found
 	chaincodeStub.GetStateReturns(nil, nil)
-	err = interopcc.DeleteMembershipIIN(ctx, securityDomainId)
+	err = interopcc.DeleteMembership(ctx, securityDomainId)
 	require.EqualError(t, err, fmt.Sprintf("Membership with id: %s does not exist", securityDomainId))
 
 	// Handle GetState Error
 	chaincodeStub.GetStateReturns(nil, fmt.Errorf("unable to retrieve asset"))
-	err = interopcc.DeleteMembershipIIN(ctx, securityDomainId)
+	err = interopcc.DeleteMembership(ctx, securityDomainId)
 	require.EqualError(t, err, fmt.Sprintf("unable to retrieve asset"))
 }
 

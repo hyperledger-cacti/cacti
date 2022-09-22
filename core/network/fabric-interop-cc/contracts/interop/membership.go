@@ -157,7 +157,7 @@ func (s *SmartContract) UpdateLocalMembership(ctx contractapi.TransactionContext
 	}
 
 	membershipLocalKey, err := ctx.GetStub().CreateCompositeKey(membershipObjectType, []string{membershipLocalSecurityDomain})
-	_, getErr := s.GetMembershipBySecurityDomain(ctx, membership.SecurityDomain)
+	_, getErr := s.GetMembershipBySecurityDomain(ctx, membershipLocalSecurityDomain)
 	if getErr != nil {
 		return getErr
 	}
@@ -176,14 +176,20 @@ func (s *SmartContract) UpdateLocalMembership(ctx contractapi.TransactionContext
 
 }
 
-// CreateMembershipIIN cc is used to store a Membership in the ledger
-// TODO: Replace 'CreateMembership' with this function after updating the Fabric CLI.
-func (s *SmartContract) CreateMembershipIIN(ctx contractapi.TransactionContextInterface, counterAttestedMembershipJSON string) error {
+// CreateMembership cc is used to store a Membership in the ledger
+// TODO: Remove call to 'createMembership' after creating Corda IIN Agents.
+func (s *SmartContract) CreateMembership(ctx contractapi.TransactionContextInterface, counterAttestedMembershipSerialized string) error {
 	// Check if the caller has IIN agent privileges
 	if isIINAgent, err := isClientIINAgent(ctx); err != nil {
 		return fmt.Errorf("IIN Agent client check error: %s", err)
 	} else if !isIINAgent {
-		return fmt.Errorf("Caller not an IIN Agent; access denied")
+		// Check if the caller has network admin privileges
+		if isAdmin, err := isClientNetworkAdmin(ctx); err != nil {
+			return fmt.Errorf("Admin client check error: %s", err)
+		} else if !isAdmin {
+			return fmt.Errorf("Caller neither a network admin nor an IIN Agent; access denied")
+		}
+		return s.createMembership(ctx, counterAttestedMembershipSerialized)		// HACK to handle unattested memberships (for Corda) for backward compatibility
 	}
 
 	// Check if caller is one of the authorized IIN agents
@@ -205,7 +211,7 @@ func (s *SmartContract) CreateMembershipIIN(ctx contractapi.TransactionContextIn
 		return fmt.Errorf("Caller with identity %+v is not a designated IIN Agent: %+v", callerId, err)
 	}
 
-	counterAttestedMembership, err := decodeCounterAttestedMembership([]byte(counterAttestedMembershipJSON))
+	counterAttestedMembership, err := decodeCounterAttestedMembership(counterAttestedMembershipSerialized)
 	if err != nil {
 		return fmt.Errorf("Counter Attested Membership Unmarshal error: %s", err)
 	}
@@ -304,16 +310,16 @@ func (s *SmartContract) CreateMembershipIIN(ctx contractapi.TransactionContextIn
 		return fmt.Errorf("Membership already exists for membership id: %s. Use 'UpdateMembership' to update.", foreignMembership.SecurityDomain)
 	}
 
-	membershipBytes, err := json.Marshal(attestedMembershipSet.Membership)
+	membershipBytes, err := json.Marshal(foreignMembership)
 	if err != nil {
 		return fmt.Errorf("Marshal error: %s", err)
 	}
 	return ctx.GetStub().PutState(membershipKey, membershipBytes)
 }
 
-// CreateMembership cc is used to store a Membership in the ledger
-// TODO: Replace this function with 'CreateMembership' after updating the Fabric CLI. Retaining this temporarily for backward compatibility.
-func (s *SmartContract) CreateMembership(ctx contractapi.TransactionContextInterface, membershipJSON string) error {
+// createMembership is used by a network admin to store a Membership in the ledger with an unattested membership
+// TODO: Remove this function after creating Corda IIN Agents. Retaining this temporarily for backward compatibility.
+func (s *SmartContract) createMembership(ctx contractapi.TransactionContextInterface, membershipJSON string) error {
 	membership, err := decodeMembership([]byte(membershipJSON))
 	if err != nil {
 		return fmt.Errorf("Unmarshal error: %s", err)
@@ -340,14 +346,20 @@ func (s *SmartContract) CreateMembership(ctx contractapi.TransactionContextInter
 	return ctx.GetStub().PutState(membershipKey, membershipBytes)
 }
 
-// UpdateMembershipIIN cc is used to update an existing Membership in the ledger
-// TODO: Replace 'UpdateMembership' with this function after updating the Fabric CLI.
-func (s *SmartContract) UpdateMembershipIIN(ctx contractapi.TransactionContextInterface, counterAttestedMembershipJSON string) error {
+// UpdateMembership cc is used to update an existing Membership in the ledger
+// TODO: Remove call to 'updateMembership' after creating Corda IIN Agents.
+func (s *SmartContract) UpdateMembership(ctx contractapi.TransactionContextInterface, counterAttestedMembershipSerialized string) error {
 	// Check if the caller has IIN agent privileges
 	if isIINAgent, err := isClientIINAgent(ctx); err != nil {
 		return fmt.Errorf("IIN Agent client check error: %s", err)
 	} else if !isIINAgent {
-		return fmt.Errorf("Caller not an IIN Agent; access denied")
+		// Check if the caller has network admin privileges
+		if isAdmin, err := isClientNetworkAdmin(ctx); err != nil {
+			return fmt.Errorf("Admin client check error: %s", err)
+		} else if !isAdmin {
+			return fmt.Errorf("Caller neither a network admin nor an IIN Agent; access denied")
+		}
+		return s.updateMembership(ctx, counterAttestedMembershipSerialized)		// HACK to handle unattested memberships (for Corda) for backward compatibility
 	}
 
 	// Check if caller is one of the authorized IIN agents
@@ -369,7 +381,7 @@ func (s *SmartContract) UpdateMembershipIIN(ctx contractapi.TransactionContextIn
 		return fmt.Errorf("Caller with identity %+v is not a designated IIN Agent: %+v", callerId, err)
 	}
 
-	counterAttestedMembership, err := decodeCounterAttestedMembership([]byte(counterAttestedMembershipJSON))
+	counterAttestedMembership, err := decodeCounterAttestedMembership(counterAttestedMembershipSerialized)
 	if err != nil {
 		return fmt.Errorf("Counter Attested Membership Unmarshal error: %s", err)
 	}
@@ -465,7 +477,7 @@ func (s *SmartContract) UpdateMembershipIIN(ctx contractapi.TransactionContextIn
 		return getErr
 	}
 
-	membershipBytes, err := json.Marshal(attestedMembershipSet.Membership)
+	membershipBytes, err := json.Marshal(foreignMembership)
 	if err != nil {
 		return fmt.Errorf("Marshal error: %s", err)
 	}
@@ -473,9 +485,9 @@ func (s *SmartContract) UpdateMembershipIIN(ctx contractapi.TransactionContextIn
 
 }
 
-// UpdateMembership cc is used to update an existing Membership in the ledger
-// TODO: Replace this function with 'UpdateMembership' after updating the Fabric CLI. Retaining this temporarily for backward compatibility.
-func (s *SmartContract) UpdateMembership(ctx contractapi.TransactionContextInterface, membershipJSON string) error {
+// updateMembership is used by a network admin to update an existing Membership in the ledger with an unattested membership
+// TODO: Remove this function after creating Corda IIN Agents. Retaining this temporarily for backward compatibility.
+func (s *SmartContract) updateMembership(ctx contractapi.TransactionContextInterface, membershipJSON string) error {
 	membership, err := decodeMembership([]byte(membershipJSON))
 	if err != nil {
 		return fmt.Errorf("Unmarshal error: %s", err)
@@ -525,9 +537,8 @@ func (s *SmartContract) DeleteLocalMembership(ctx contractapi.TransactionContext
 	return nil
 }
 
-// DeleteMembershipIIN cc is used to delete an existing Membership in the ledger
-// TODO: Replace 'DeleteMembership' with this function after updating the Fabric CLI.
-func (s *SmartContract) DeleteMembershipIIN(ctx contractapi.TransactionContextInterface, membershipID string) error {
+// DeleteMembership cc is used to delete an existing Membership in the ledger
+func (s *SmartContract) DeleteMembership(ctx contractapi.TransactionContextInterface, membershipID string) error {
 	// Check if the caller has IIN agent privileges
 	if isIINAgent, err := isClientIINAgent(ctx); err != nil {
 		return fmt.Errorf("IIN Agent client check error: %s", err)
@@ -535,25 +546,6 @@ func (s *SmartContract) DeleteMembershipIIN(ctx contractapi.TransactionContextIn
 		return fmt.Errorf("Caller not an IIN Agent; access denied")
 	}
 
-	membershipKey, err := ctx.GetStub().CreateCompositeKey(membershipObjectType, []string{membershipID})
-	bytes, err := ctx.GetStub().GetState(membershipKey)
-	if err != nil {
-		return err
-	}
-	if bytes == nil {
-		return fmt.Errorf("Membership with id: %s does not exist", membershipID)
-	}
-	err = ctx.GetStub().DelState(membershipKey)
-	if err != nil {
-		return fmt.Errorf("failed to delete asset %s: %v", membershipKey, err)
-	}
-
-	return nil
-}
-
-// DeleteMembership cc is used to delete an existing Membership in the ledger
-// TODO: Replace this function with 'DeleteMembership' after updating the Fabric CLI. Retaining this temporarily for backward compatibility.
-func (s *SmartContract) DeleteMembership(ctx contractapi.TransactionContextInterface, membershipID string) error {
 	membershipKey, err := ctx.GetStub().CreateCompositeKey(membershipObjectType, []string{membershipID})
 	bytes, err := ctx.GetStub().GetState(membershipKey)
 	if err != nil {

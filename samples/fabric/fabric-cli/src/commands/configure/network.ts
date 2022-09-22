@@ -6,6 +6,7 @@
 
 import { GluegunCommand } from 'gluegun'
 import { commandHelp } from '../../helpers/helpers'
+import { enrollAndRecordWalletIdentity } from '../../helpers/fabric-functions'
 import { configureNetwork } from '../../helpers/interop-setup/configure-network'
 import logger from '../../helpers/logger'
 import * as path from 'path'
@@ -47,6 +48,8 @@ const command: GluegunCommand = {
       logger.level = 'debug'
       logger.debug('Debugging is enabled')
     }
+    await enrollAndRecordWalletIdentity('networkadmin', null, options['local-network'], true, false)   // Create a network admin
+    await enrollAndRecordWalletIdentity('iinagent', null, options['local-network'], false, true)       // Create an IIN Agent
     await configureNetwork(options['local-network'], logger)
     process.exit()
   }
