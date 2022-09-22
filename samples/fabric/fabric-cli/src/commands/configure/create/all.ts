@@ -6,6 +6,7 @@
 
 import { GluegunCommand } from 'gluegun'
 import { commandHelp, getNetworkConfig } from '../../../helpers/helpers'
+import { enrollAndRecordWalletIdentity } from '../../helpers/fabric-functions'
 import logger from '../../../helpers/logger'
 import * as path from 'path'
 import * as dotenv from 'dotenv'
@@ -64,6 +65,10 @@ const command: GluegunCommand = {
       )
       return
     }
+
+    // Create an IIN Agent
+    print.info(`Creating IIN Agent wallet identity for network: ${network}`)
+    await enrollAndRecordWalletIdentity('iinagent', null, options['local-network'], false, true)
 
     // Membership
     logger.info(`Generating membership for ${options['local-network']}`)
