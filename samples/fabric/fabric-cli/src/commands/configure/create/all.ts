@@ -67,7 +67,7 @@ const command: GluegunCommand = {
     }
 
     // Create an IIN Agent
-    print.info(`Creating IIN Agent wallet identity for network: ${network}`)
+    print.info(`Creating IIN Agent wallet identity for local network`)
     await enrollAndRecordWalletIdentity('iinagent', null, options['local-network'], false, true)
 
     // Membership
