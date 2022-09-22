@@ -6,7 +6,7 @@
 
 import { GluegunCommand } from 'gluegun'
 import { commandHelp, getNetworkConfig } from '../../../helpers/helpers'
-import { enrollAndRecordWalletIdentity } from '../../helpers/fabric-functions'
+import { enrollAndRecordWalletIdentity } from '../../../helpers/fabric-functions'
 import logger from '../../../helpers/logger'
 import * as path from 'path'
 import * as dotenv from 'dotenv'
