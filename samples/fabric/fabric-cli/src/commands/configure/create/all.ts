@@ -6,10 +6,11 @@
 
 import { GluegunCommand } from 'gluegun'
 import { commandHelp, getNetworkConfig } from '../../../helpers/helpers'
-import { enrollAndRecordWalletIdentity } from '../../../helpers/fabric-functions'
+import { getCredentialPath, enrollAndRecordWalletIdentity } from '../../../helpers/fabric-functions'
 import logger from '../../../helpers/logger'
 import * as path from 'path'
 import * as dotenv from 'dotenv'
+import * as fs from 'fs'
 dotenv.config({ path: path.resolve(__dirname, '../../.env') })
 
 import {
@@ -66,9 +67,19 @@ const command: GluegunCommand = {
       return
     }
 
-    // Create an IIN Agent
-    print.info(`Creating IIN Agent wallet identity for local network`)
-    await enrollAndRecordWalletIdentity('iinagent', null, options['local-network'], false, true)
+    // Create IIN Agents
+    const credentialFolderPath = getCredentialPath()
+    const networkNames = fs
+      .readdirSync(credentialFolderPath, { withFileTypes: true })
+      .filter(dirent => dirent.isDirectory())
+      .filter(item => item.name.startsWith('network'))    // HACK until we add IIN Agents for Corda networks
+      .map(item => item.name)
+    for (const networkName of networkNames) {
+      print.info(`Creating network admin wallet identity for network: ${networkName}`)
+      await enrollAndRecordWalletIdentity('networkadmin', null, networkName, false, true)
+      print.info(`Creating IIN Agent wallet identity for network ${networkName}`)
+      await enrollAndRecordWalletIdentity('iinagent', null, networkName, false, true)
+    }
 
     // Membership
     logger.info(`Generating membership for ${options['local-network']}`)
