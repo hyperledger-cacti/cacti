@@ -67,7 +67,7 @@ const command: GluegunCommand = {
       return
     }
 
-    // Create IIN Agents
+    // Create wallet credentials
     const credentialFolderPath = getCredentialPath()
     const networkNames = fs
       .readdirSync(credentialFolderPath, { withFileTypes: true })
@@ -76,9 +76,9 @@ const command: GluegunCommand = {
       .map(item => item.name)
     for (const networkName of networkNames) {
       print.info(`Creating network admin wallet identity for network: ${networkName}`)
-      await enrollAndRecordWalletIdentity('networkadmin', null, networkName, false, true)
+      await enrollAndRecordWalletIdentity('networkadmin', null, networkName, true, false)   // Create a network admin
       print.info(`Creating IIN Agent wallet identity for network ${networkName}`)
-      await enrollAndRecordWalletIdentity('iinagent', null, networkName, false, true)
+      await enrollAndRecordWalletIdentity('iinagent', null, networkName, false, true)       // Create an IIN Agent
     }
 
     // Membership
