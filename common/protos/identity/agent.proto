@@ -44,16 +44,16 @@ message Attestation {
 
 // Attested security domain membership by a single member
 message AttestedMembership {
-  bytes membership = 1;         // 'common.membership.Membership': Base64-encoded
+  string membership = 1;         // 'common.membership.Membership': Serialized and Base64-encoded
   Attestation attestation = 2;
 }
 
 // Counter attestation over security domain membership attested by its participants
 message CounterAttestedMembership {
   message AttestedMembershipSet {
-    bytes membership = 1;                   // 'common.membership.Membership': Base64-encoded
+    string membership = 1;                   // 'common.membership.Membership': Serialized and Base64-encoded
     repeated Attestation attestations = 2;
   }
-  bytes attested_membership_set = 1;        // 'AttestedMembershipSet': Base64-encoded
+  string attested_membership_set = 1;        // 'AttestedMembershipSet': Serialized and Base64-encoded
   repeated Attestation attestations = 2;
 }

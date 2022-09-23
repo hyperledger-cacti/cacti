@@ -371,7 +371,6 @@ func TestCreateMembership(t *testing.T) {
 	membershipBytesPlain, err := protoV2.Marshal(&membershipAsset)
 	require.NoError(t, err)
 	membershipBytesStr := base64.StdEncoding.EncodeToString(membershipBytesPlain)
-	membershipBytes := []byte(membershipBytesStr)
 	membershipBytesWithNonce := []byte(membershipBytesStr + nonce)
 	// Generate member 2 attestation
 	random1 := rand.Reader
@@ -389,8 +388,8 @@ func TestCreateMembership(t *testing.T) {
 	attestation2.Signature = base64.StdEncoding.EncodeToString(signature2)
 	// Generate attested foreign membership
 	attestedMembershipSet := identity.CounterAttestedMembership_AttestedMembershipSet {
-		Membership:		 membershipBytes,
-		Attestations:	 []*identity.Attestation{&attestation1, &attestation2},
+		Membership:    membershipBytesStr,
+		Attestations:  []*identity.Attestation{&attestation1, &attestation2},
 	}
 
 	// Generate local members
@@ -442,7 +441,6 @@ func TestCreateMembership(t *testing.T) {
 	attestedMembershipSetBytesPlain, err := protoV2.Marshal(&attestedMembershipSet)
 	require.NoError(t, err)
 	attestedMembershipSetBytesStr := base64.StdEncoding.EncodeToString(attestedMembershipSetBytesPlain)
-	attestedMembershipSetBytes := []byte(attestedMembershipSetBytesStr)
 	attestedMembershipSetBytesWithNonce := []byte(attestedMembershipSetBytesStr + nonce)
 	// Generate member 2 attestation
 	randomLocal1 := rand.Reader
@@ -460,7 +458,7 @@ func TestCreateMembership(t *testing.T) {
 	attestationLocal2.Signature = base64.StdEncoding.EncodeToString(signatureLocal2)
 	// Generate counter attested foreign membership
 	counterAttestedMembership := identity.CounterAttestedMembership{
-		AttestedMembershipSet: attestedMembershipSetBytes,
+		AttestedMembershipSet: attestedMembershipSetBytesStr,
 		Attestations: []*identity.Attestation{&attestationLocal1, &attestationLocal2},
 	}
 
@@ -468,14 +466,14 @@ func TestCreateMembership(t *testing.T) {
 	counterAttestedMembershipBytesPlain, err := protoV2.Marshal(&counterAttestedMembership)
 	require.NoError(t, err)
 	counterAttestedMembershipBytes := base64.StdEncoding.EncodeToString(counterAttestedMembershipBytesPlain)
-	err = interopcc.CreateMembership(ctx, string(counterAttestedMembershipBytes))
+	err = interopcc.CreateMembership(ctx, counterAttestedMembershipBytes)
 	require.EqualError(t, err, "Caller neither a network admin nor an IIN Agent; access denied")
 
 	// Record membership info: should fail because the local IIN Agent is not registered
 	clientIdentity := &mocks.ClientIdentity{}
 	clientIdentity.GetAttributeValueCalls(setClientIINAgent)
 	ctx.GetClientIdentityReturns(clientIdentity)
-	err = interopcc.CreateMembership(ctx, string(counterAttestedMembershipBytes))
+	err = interopcc.CreateMembership(ctx, counterAttestedMembershipBytes)
 	require.Error(t, err)
 
 	// Record local membership info
@@ -491,13 +489,13 @@ func TestCreateMembership(t *testing.T) {
 	chaincodeStub.GetStateReturnsOnCall(3, nil, nil)
 	clientIdentity.GetAttributeValueCalls(setClientIINAgent)
 	ctx.GetClientIdentityReturns(clientIdentity)
-	err = interopcc.CreateMembership(ctx, string(counterAttestedMembershipBytes))
+	err = interopcc.CreateMembership(ctx, counterAttestedMembershipBytes)
 	require.NoError(t, err)
 
 	// Record membership info again: should fail because membership has already been recorded against this security domain
 	chaincodeStub.GetStateReturnsOnCall(4, localMembershipBytes, nil)
 	chaincodeStub.GetStateReturnsOnCall(5, []byte{}, nil)
-	err = interopcc.CreateMembership(ctx, string(counterAttestedMembershipBytes))
+	err = interopcc.CreateMembership(ctx, counterAttestedMembershipBytes)
 	require.EqualError(t, err, fmt.Sprintf("Membership already exists for membership id: %s. Use 'UpdateMembership' to update.", membershipAsset.SecurityDomain))
 
 	// One of the local signatures is invalid: should fail
@@ -511,7 +509,7 @@ func TestCreateMembership(t *testing.T) {
 	counterAttestedMembershipBytes = base64.StdEncoding.EncodeToString(counterAttestedMembershipBytesPlain)
 	chaincodeStub.GetStateReturnsOnCall(6, localMembershipBytes, nil)
 	chaincodeStub.GetStateReturnsOnCall(7, nil, nil)
-	err = interopcc.CreateMembership(ctx, string(counterAttestedMembershipBytes))
+	err = interopcc.CreateMembership(ctx, counterAttestedMembershipBytes)
 	require.EqualError(t, err, "Unable to Validate Signature: Signature Verification failed. ECDSA VERIFY")
 
 	// One of the foreign signatures is invalid: should fail
@@ -523,7 +521,6 @@ func TestCreateMembership(t *testing.T) {
 	attestedMembershipSetBytesPlain, err = protoV2.Marshal(&attestedMembershipSet)
 	require.NoError(t, err)
 	attestedMembershipSetBytesStr = base64.StdEncoding.EncodeToString(attestedMembershipSetBytesPlain)
-	attestedMembershipSetBytes = []byte(attestedMembershipSetBytesStr)
 	attestedMembershipSetBytesWithNonce = []byte(attestedMembershipSetBytesStr + nonce)
 	hashedLocal1, err = computeSHA2Hash(attestedMembershipSetBytesWithNonce, keyLocal1.PublicKey.Params().BitSize)
 	require.NoError(t, err)
@@ -535,12 +532,12 @@ func TestCreateMembership(t *testing.T) {
 	signatureLocal2, err = ecdsa.SignASN1(randomLocal2, keyLocal2, hashedLocal2)
 	require.NoError(t, err)
 	attestationLocal2.Signature = base64.StdEncoding.EncodeToString(signatureLocal2)
-	counterAttestedMembership.AttestedMembershipSet = attestedMembershipSetBytes
+	counterAttestedMembership.AttestedMembershipSet = attestedMembershipSetBytesStr
 	counterAttestedMembershipBytesPlain, err = protoV2.Marshal(&counterAttestedMembership)
 	require.NoError(t, err)
 	counterAttestedMembershipBytes = base64.StdEncoding.EncodeToString(counterAttestedMembershipBytesPlain)
 	chaincodeStub.GetStateReturnsOnCall(7, localMembershipBytes, nil)
-	err = interopcc.CreateMembership(ctx, string(counterAttestedMembershipBytes))
+	err = interopcc.CreateMembership(ctx, counterAttestedMembershipBytes)
 	require.EqualError(t, err, "Unable to Validate Signature: Signature Verification failed. ECDSA VERIFY")
 
 	// One of the foreign attestations has an invalid nonce: should fail
@@ -553,7 +550,6 @@ func TestCreateMembership(t *testing.T) {
 	attestedMembershipSetBytesPlain, err = protoV2.Marshal(&attestedMembershipSet)
 	require.NoError(t, err)
 	attestedMembershipSetBytesStr = base64.StdEncoding.EncodeToString(attestedMembershipSetBytesPlain)
-	attestedMembershipSetBytes = []byte(attestedMembershipSetBytesStr)
 	attestedMembershipSetBytesWithNonce = []byte(attestedMembershipSetBytesStr + nonce)
 	hashedLocal1, err = computeSHA2Hash(attestedMembershipSetBytesWithNonce, keyLocal1.PublicKey.Params().BitSize)
 	require.NoError(t, err)
@@ -565,12 +561,12 @@ func TestCreateMembership(t *testing.T) {
 	signatureLocal2, err = ecdsa.SignASN1(randomLocal2, keyLocal2, hashedLocal2)
 	require.NoError(t, err)
 	attestationLocal2.Signature = base64.StdEncoding.EncodeToString(signatureLocal2)
-	counterAttestedMembership.AttestedMembershipSet = attestedMembershipSetBytes
+	counterAttestedMembership.AttestedMembershipSet = attestedMembershipSetBytesStr
 	counterAttestedMembershipBytesPlain, err = protoV2.Marshal(&counterAttestedMembership)
 	require.NoError(t, err)
 	counterAttestedMembershipBytes = base64.StdEncoding.EncodeToString(counterAttestedMembershipBytesPlain)
 	chaincodeStub.GetStateReturnsOnCall(8, localMembershipBytes, nil)
-	err = interopcc.CreateMembership(ctx, string(counterAttestedMembershipBytes))
+	err = interopcc.CreateMembership(ctx, counterAttestedMembershipBytes)
 	require.EqualError(t, err, fmt.Sprintf("Mismatched nonces across two attestations: %s, %s", nonce, attestation1.Nonce))
 
 	// Foreign membership has an invalid cert chain: should fail
@@ -581,7 +577,6 @@ func TestCreateMembership(t *testing.T) {
 	membershipBytesPlain, err = protoV2.Marshal(&membershipAsset)
 	require.NoError(t, err)
 	membershipBytesStr = base64.StdEncoding.EncodeToString(membershipBytesPlain)
-	membershipBytes = []byte(membershipBytesStr)
 	membershipBytesWithNonce = []byte(membershipBytesStr + nonce)
 	hashed1, err = computeSHA2Hash(membershipBytesWithNonce, key1.PublicKey.Params().BitSize)
 	require.NoError(t, err)
@@ -593,11 +588,10 @@ func TestCreateMembership(t *testing.T) {
 	signature2, err = ecdsa.SignASN1(random2, key2, hashed2)
 	require.NoError(t, err)
 	attestation2.Signature = base64.StdEncoding.EncodeToString(signature2)
-	attestedMembershipSet.Membership = membershipBytes
+	attestedMembershipSet.Membership = membershipBytesStr
 	attestedMembershipSetBytesPlain, err = protoV2.Marshal(&attestedMembershipSet)
 	require.NoError(t, err)
 	attestedMembershipSetBytesStr = base64.StdEncoding.EncodeToString(attestedMembershipSetBytesPlain)
-	attestedMembershipSetBytes = []byte(attestedMembershipSetBytesStr)
 	attestedMembershipSetBytesWithNonce = []byte(attestedMembershipSetBytesStr + nonce)
 	hashedLocal1, err = computeSHA2Hash(attestedMembershipSetBytesWithNonce, keyLocal1.PublicKey.Params().BitSize)
 	require.NoError(t, err)
@@ -609,12 +603,12 @@ func TestCreateMembership(t *testing.T) {
 	signatureLocal2, err = ecdsa.SignASN1(randomLocal2, keyLocal2, hashedLocal2)
 	require.NoError(t, err)
 	attestationLocal2.Signature = base64.StdEncoding.EncodeToString(signatureLocal2)
-	counterAttestedMembership.AttestedMembershipSet = attestedMembershipSetBytes
+	counterAttestedMembership.AttestedMembershipSet = attestedMembershipSetBytesStr
 	counterAttestedMembershipBytesPlain, err = protoV2.Marshal(&counterAttestedMembership)
 	require.NoError(t, err)
 	counterAttestedMembershipBytes = base64.StdEncoding.EncodeToString(counterAttestedMembershipBytesPlain)
 	chaincodeStub.GetStateReturnsOnCall(9, localMembershipBytes, nil)
-	err = interopcc.CreateMembership(ctx, string(counterAttestedMembershipBytes))
+	err = interopcc.CreateMembership(ctx, counterAttestedMembershipBytes)
 	require.Error(t, err)
 
 	// Foreign attestation has invalid security domain: should fail
@@ -625,7 +619,6 @@ func TestCreateMembership(t *testing.T) {
 	membershipBytesPlain, err = protoV2.Marshal(&membershipAsset)
 	require.NoError(t, err)
 	membershipBytesStr = base64.StdEncoding.EncodeToString(membershipBytesPlain)
-	membershipBytes = []byte(membershipBytesStr)
 	membershipBytesWithNonce = []byte(membershipBytesStr + nonce)
 	hashed1, err = computeSHA2Hash(membershipBytesWithNonce, key1.PublicKey.Params().BitSize)
 	require.NoError(t, err)
@@ -637,11 +630,10 @@ func TestCreateMembership(t *testing.T) {
 	signature2, err = ecdsa.SignASN1(random2, key2, hashed2)
 	require.NoError(t, err)
 	attestation2.Signature = base64.StdEncoding.EncodeToString(signature2)
-	attestedMembershipSet.Membership = membershipBytes
+	attestedMembershipSet.Membership = membershipBytesStr
 	attestedMembershipSetBytesPlain, err = protoV2.Marshal(&attestedMembershipSet)
 	require.NoError(t, err)
 	attestedMembershipSetBytesStr = base64.StdEncoding.EncodeToString(attestedMembershipSetBytesPlain)
-	attestedMembershipSetBytes = []byte(attestedMembershipSetBytesStr)
 	attestedMembershipSetBytesWithNonce = []byte(attestedMembershipSetBytesStr + nonce)
 	hashedLocal1, err = computeSHA2Hash(attestedMembershipSetBytesWithNonce, keyLocal1.PublicKey.Params().BitSize)
 	require.NoError(t, err)
@@ -653,12 +645,12 @@ func TestCreateMembership(t *testing.T) {
 	signatureLocal2, err = ecdsa.SignASN1(randomLocal2, keyLocal2, hashedLocal2)
 	require.NoError(t, err)
 	attestationLocal2.Signature = base64.StdEncoding.EncodeToString(signatureLocal2)
-	counterAttestedMembership.AttestedMembershipSet = attestedMembershipSetBytes
+	counterAttestedMembership.AttestedMembershipSet = attestedMembershipSetBytesStr
 	counterAttestedMembershipBytesPlain, err = protoV2.Marshal(&counterAttestedMembership)
 	require.NoError(t, err)
 	counterAttestedMembershipBytes = base64.StdEncoding.EncodeToString(counterAttestedMembershipBytesPlain)
 	chaincodeStub.GetStateReturnsOnCall(10, localMembershipBytes, nil)
-	err = interopcc.CreateMembership(ctx, string(counterAttestedMembershipBytes))
+	err = interopcc.CreateMembership(ctx, counterAttestedMembershipBytes)
 	require.EqualError(t, err, fmt.Sprintf("Foreign agent security domain %s does not match attested membership security domain invalid", securityDomainId))
 }
 
@@ -741,7 +733,6 @@ func TestUpdateMembership(t *testing.T) {
 	membershipBytesPlain, err := protoV2.Marshal(&membershipAsset)
 	require.NoError(t, err)
 	membershipBytesStr := base64.StdEncoding.EncodeToString(membershipBytesPlain)
-	membershipBytes := []byte(membershipBytesStr)
 	membershipBytesWithNonce := []byte(membershipBytesStr + nonce)
 	// Generate member 2 attestation
 	random1 := rand.Reader
@@ -759,8 +750,8 @@ func TestUpdateMembership(t *testing.T) {
 	attestation2.Signature = base64.StdEncoding.EncodeToString(signature2)
 	// Generate attested foreign membership
 	attestedMembershipSet := identity.CounterAttestedMembership_AttestedMembershipSet {
-		Membership:		 membershipBytes,
-		Attestations:	 []*identity.Attestation{&attestation1, &attestation2},
+		Membership:    membershipBytesStr,
+		Attestations:  []*identity.Attestation{&attestation1, &attestation2},
 	}
 
 	// Generate local members
@@ -812,7 +803,6 @@ func TestUpdateMembership(t *testing.T) {
 	attestedMembershipSetBytesPlain, err := protoV2.Marshal(&attestedMembershipSet)
 	require.NoError(t, err)
 	attestedMembershipSetBytesStr := base64.StdEncoding.EncodeToString(attestedMembershipSetBytesPlain)
-	attestedMembershipSetBytes := []byte(attestedMembershipSetBytesStr)
 	attestedMembershipSetBytesWithNonce := []byte(attestedMembershipSetBytesStr + nonce)
 	// Generate member 2 attestation
 	randomLocal1 := rand.Reader
@@ -830,7 +820,7 @@ func TestUpdateMembership(t *testing.T) {
 	attestationLocal2.Signature = base64.StdEncoding.EncodeToString(signatureLocal2)
 	// Generate counter attested foreign membership
 	counterAttestedMembership := identity.CounterAttestedMembership{
-		AttestedMembershipSet: attestedMembershipSetBytes,
+		AttestedMembershipSet: attestedMembershipSetBytesStr,
 		Attestations: []*identity.Attestation{&attestationLocal1, &attestationLocal2},
 	}
 
@@ -839,14 +829,14 @@ func TestUpdateMembership(t *testing.T) {
 	require.NoError(t, err)
 	counterAttestedMembershipBytes := base64.StdEncoding.EncodeToString(counterAttestedMembershipBytesPlain)
 	require.NoError(t, err)
-	err = interopcc.UpdateMembership(ctx, string(counterAttestedMembershipBytes))
+	err = interopcc.UpdateMembership(ctx, counterAttestedMembershipBytes)
 	require.EqualError(t, err, "Caller neither a network admin nor an IIN Agent; access denied")
 
 	// Record membership info: should fail because the local IIN Agent is not registered
 	clientIdentity := &mocks.ClientIdentity{}
 	clientIdentity.GetAttributeValueCalls(setClientIINAgent)
 	ctx.GetClientIdentityReturns(clientIdentity)
-	err = interopcc.UpdateMembership(ctx, string(counterAttestedMembershipBytes))
+	err = interopcc.UpdateMembership(ctx, counterAttestedMembershipBytes)
 	require.Error(t, err)
 
 	// Record local membership info
@@ -862,13 +852,13 @@ func TestUpdateMembership(t *testing.T) {
 	chaincodeStub.GetStateReturnsOnCall(3, nil, nil)
 	clientIdentity.GetAttributeValueCalls(setClientIINAgent)
 	ctx.GetClientIdentityReturns(clientIdentity)
-	err = interopcc.UpdateMembership(ctx, string(counterAttestedMembershipBytes))
+	err = interopcc.UpdateMembership(ctx, counterAttestedMembershipBytes)
 	require.EqualError(t, err, fmt.Sprintf("Membership with id: %s does not exist", securityDomainId))
 
 	// Record membership info again: should succeed now
 	chaincodeStub.GetStateReturnsOnCall(4, localMembershipBytes, nil)
 	chaincodeStub.GetStateReturnsOnCall(5, []byte{}, nil)
-	err = interopcc.UpdateMembership(ctx, string(counterAttestedMembershipBytes))
+	err = interopcc.UpdateMembership(ctx, counterAttestedMembershipBytes)
 	require.NoError(t, err)
 
 	// One of the local signatures is invalid: should fail
@@ -882,7 +872,7 @@ func TestUpdateMembership(t *testing.T) {
 	counterAttestedMembershipBytes = base64.StdEncoding.EncodeToString(counterAttestedMembershipBytesPlain)
 	chaincodeStub.GetStateReturnsOnCall(6, localMembershipBytes, nil)
 	chaincodeStub.GetStateReturnsOnCall(7, []byte{}, nil)
-	err = interopcc.UpdateMembership(ctx, string(counterAttestedMembershipBytes))
+	err = interopcc.UpdateMembership(ctx, counterAttestedMembershipBytes)
 	require.EqualError(t, err, "Unable to Validate Signature: Signature Verification failed. ECDSA VERIFY")
 
 	// One of the foreign signatures is invalid: should fail
@@ -894,7 +884,6 @@ func TestUpdateMembership(t *testing.T) {
 	attestedMembershipSetBytesPlain, err = protoV2.Marshal(&attestedMembershipSet)
 	require.NoError(t, err)
 	attestedMembershipSetBytesStr = base64.StdEncoding.EncodeToString(attestedMembershipSetBytesPlain)
-	attestedMembershipSetBytes = []byte(attestedMembershipSetBytesStr)
 	attestedMembershipSetBytesWithNonce = []byte(attestedMembershipSetBytesStr + nonce)
 	hashedLocal1, err = computeSHA2Hash(attestedMembershipSetBytesWithNonce, keyLocal1.PublicKey.Params().BitSize)
 	require.NoError(t, err)
@@ -906,12 +895,12 @@ func TestUpdateMembership(t *testing.T) {
 	signatureLocal2, err = ecdsa.SignASN1(randomLocal2, keyLocal2, hashedLocal2)
 	require.NoError(t, err)
 	attestationLocal2.Signature = base64.StdEncoding.EncodeToString(signatureLocal2)
-	counterAttestedMembership.AttestedMembershipSet = attestedMembershipSetBytes
+	counterAttestedMembership.AttestedMembershipSet = attestedMembershipSetBytesStr
 	counterAttestedMembershipBytesPlain, err = protoV2.Marshal(&counterAttestedMembership)
 	require.NoError(t, err)
 	counterAttestedMembershipBytes = base64.StdEncoding.EncodeToString(counterAttestedMembershipBytesPlain)
 	chaincodeStub.GetStateReturnsOnCall(7, localMembershipBytes, nil)
-	err = interopcc.UpdateMembership(ctx, string(counterAttestedMembershipBytes))
+	err = interopcc.UpdateMembership(ctx, counterAttestedMembershipBytes)
 	require.EqualError(t, err, "Unable to Validate Signature: Signature Verification failed. ECDSA VERIFY")
 
 	// One of the foreign attestations has an invalid nonce: should fail
@@ -924,7 +913,6 @@ func TestUpdateMembership(t *testing.T) {
 	attestedMembershipSetBytesPlain, err = protoV2.Marshal(&attestedMembershipSet)
 	require.NoError(t, err)
 	attestedMembershipSetBytesStr = base64.StdEncoding.EncodeToString(attestedMembershipSetBytesPlain)
-	attestedMembershipSetBytes = []byte(attestedMembershipSetBytesStr)
 	attestedMembershipSetBytesWithNonce = []byte(attestedMembershipSetBytesStr + nonce)
 	hashedLocal1, err = computeSHA2Hash(attestedMembershipSetBytesWithNonce, keyLocal1.PublicKey.Params().BitSize)
 	require.NoError(t, err)
@@ -936,12 +924,12 @@ func TestUpdateMembership(t *testing.T) {
 	signatureLocal2, err = ecdsa.SignASN1(randomLocal2, keyLocal2, hashedLocal2)
 	require.NoError(t, err)
 	attestationLocal2.Signature = base64.StdEncoding.EncodeToString(signatureLocal2)
-	counterAttestedMembership.AttestedMembershipSet = attestedMembershipSetBytes
+	counterAttestedMembership.AttestedMembershipSet = attestedMembershipSetBytesStr
 	counterAttestedMembershipBytesPlain, err = protoV2.Marshal(&counterAttestedMembership)
 	require.NoError(t, err)
 	counterAttestedMembershipBytes = base64.StdEncoding.EncodeToString(counterAttestedMembershipBytesPlain)
 	chaincodeStub.GetStateReturnsOnCall(8, localMembershipBytes, nil)
-	err = interopcc.UpdateMembership(ctx, string(counterAttestedMembershipBytes))
+	err = interopcc.UpdateMembership(ctx, counterAttestedMembershipBytes)
 	require.EqualError(t, err, fmt.Sprintf("Mismatched nonces across two attestations: %s, %s", nonce, attestation1.Nonce))
 
 	// Foreign membership has an invalid cert chain: should fail
@@ -952,7 +940,6 @@ func TestUpdateMembership(t *testing.T) {
 	membershipBytesPlain, err = protoV2.Marshal(&membershipAsset)
 	require.NoError(t, err)
 	membershipBytesStr = base64.StdEncoding.EncodeToString(membershipBytesPlain)
-	membershipBytes = []byte(membershipBytesStr)
 	membershipBytesWithNonce = []byte(membershipBytesStr + nonce)
 	hashed1, err = computeSHA2Hash(membershipBytesWithNonce, key1.PublicKey.Params().BitSize)
 	require.NoError(t, err)
@@ -964,11 +951,10 @@ func TestUpdateMembership(t *testing.T) {
 	signature2, err = ecdsa.SignASN1(random2, key2, hashed2)
 	require.NoError(t, err)
 	attestation2.Signature = base64.StdEncoding.EncodeToString(signature2)
-	attestedMembershipSet.Membership = membershipBytes
+	attestedMembershipSet.Membership = membershipBytesStr
 	attestedMembershipSetBytesPlain, err = protoV2.Marshal(&attestedMembershipSet)
 	require.NoError(t, err)
 	attestedMembershipSetBytesStr = base64.StdEncoding.EncodeToString(attestedMembershipSetBytesPlain)
-	attestedMembershipSetBytes = []byte(attestedMembershipSetBytesStr)
 	attestedMembershipSetBytesWithNonce = []byte(attestedMembershipSetBytesStr + nonce)
 	hashedLocal1, err = computeSHA2Hash(attestedMembershipSetBytesWithNonce, keyLocal1.PublicKey.Params().BitSize)
 	require.NoError(t, err)
@@ -980,12 +966,12 @@ func TestUpdateMembership(t *testing.T) {
 	signatureLocal2, err = ecdsa.SignASN1(randomLocal2, keyLocal2, hashedLocal2)
 	require.NoError(t, err)
 	attestationLocal2.Signature = base64.StdEncoding.EncodeToString(signatureLocal2)
-	counterAttestedMembership.AttestedMembershipSet = attestedMembershipSetBytes
+	counterAttestedMembership.AttestedMembershipSet = attestedMembershipSetBytesStr
 	counterAttestedMembershipBytesPlain, err = protoV2.Marshal(&counterAttestedMembership)
 	require.NoError(t, err)
 	counterAttestedMembershipBytes = base64.StdEncoding.EncodeToString(counterAttestedMembershipBytesPlain)
 	chaincodeStub.GetStateReturnsOnCall(9, localMembershipBytes, nil)
-	err = interopcc.UpdateMembership(ctx, string(counterAttestedMembershipBytes))
+	err = interopcc.UpdateMembership(ctx, counterAttestedMembershipBytes)
 	require.Error(t, err)
 
 	// Foreign attestation has invalid security domain: should fail
@@ -996,7 +982,6 @@ func TestUpdateMembership(t *testing.T) {
 	membershipBytesPlain, err = protoV2.Marshal(&membershipAsset)
 	require.NoError(t, err)
 	membershipBytesStr = base64.StdEncoding.EncodeToString(membershipBytesPlain)
-	membershipBytes = []byte(membershipBytesStr)
 	membershipBytesWithNonce = []byte(membershipBytesStr + nonce)
 	hashed1, err = computeSHA2Hash(membershipBytesWithNonce, key1.PublicKey.Params().BitSize)
 	require.NoError(t, err)
@@ -1008,11 +993,10 @@ func TestUpdateMembership(t *testing.T) {
 	signature2, err = ecdsa.SignASN1(random2, key2, hashed2)
 	require.NoError(t, err)
 	attestation2.Signature = base64.StdEncoding.EncodeToString(signature2)
-	attestedMembershipSet.Membership = membershipBytes
+	attestedMembershipSet.Membership = membershipBytesStr
 	attestedMembershipSetBytesPlain, err = protoV2.Marshal(&attestedMembershipSet)
 	require.NoError(t, err)
 	attestedMembershipSetBytesStr = base64.StdEncoding.EncodeToString(attestedMembershipSetBytesPlain)
-	attestedMembershipSetBytes = []byte(attestedMembershipSetBytesStr)
 	attestedMembershipSetBytesWithNonce = []byte(attestedMembershipSetBytesStr + nonce)
 	hashedLocal1, err = computeSHA2Hash(attestedMembershipSetBytesWithNonce, keyLocal1.PublicKey.Params().BitSize)
 	require.NoError(t, err)
@@ -1024,12 +1008,12 @@ func TestUpdateMembership(t *testing.T) {
 	signatureLocal2, err = ecdsa.SignASN1(randomLocal2, keyLocal2, hashedLocal2)
 	require.NoError(t, err)
 	attestationLocal2.Signature = base64.StdEncoding.EncodeToString(signatureLocal2)
-	counterAttestedMembership.AttestedMembershipSet = attestedMembershipSetBytes
+	counterAttestedMembership.AttestedMembershipSet = attestedMembershipSetBytesStr
 	counterAttestedMembershipBytesPlain, err = protoV2.Marshal(&counterAttestedMembership)
 	require.NoError(t, err)
 	counterAttestedMembershipBytes = base64.StdEncoding.EncodeToString(counterAttestedMembershipBytesPlain)
 	chaincodeStub.GetStateReturnsOnCall(10, localMembershipBytes, nil)
-	err = interopcc.UpdateMembership(ctx, string(counterAttestedMembershipBytes))
+	err = interopcc.UpdateMembership(ctx, counterAttestedMembershipBytes)
 	require.EqualError(t, err, fmt.Sprintf("Foreign agent security domain %s does not match attested membership security domain invalid", securityDomainId))
 }
 

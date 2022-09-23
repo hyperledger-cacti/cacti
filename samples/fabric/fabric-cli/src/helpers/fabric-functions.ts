@@ -375,7 +375,7 @@ const generateMembership = async (
     localAttestation.setSignature(localSig)
     localAttestation.setNonce(nonce)
     let attestedMembershipSet = new iin_agent_pb.CounterAttestedMembership.AttestedMembershipSet()
-    attestedMembershipSet.setMembership(Buffer.from(serializedMembershipBase64))
+    attestedMembershipSet.setMembership(serializedMembershipBase64)
     attestedMembershipSet.setAttestationsList( [ localAttestation ] )
     const serializedAttestedMembershipSet = attestedMembershipSet.serializeBinary()
     const serializedttestedMembershipSetBase64 = Buffer.from(serializedAttestedMembershipSet).toString('base64')
@@ -397,7 +397,7 @@ const generateMembership = async (
 
       // Generate chaincode argument and save it in a file
       let counterAttestedMembership = new iin_agent_pb.CounterAttestedMembership()
-      counterAttestedMembership.setAttestedMembershipSet(Buffer.from(serializedttestedMembershipSetBase64))
+      counterAttestedMembership.setAttestedMembershipSet(serializedttestedMembershipSetBase64)
       counterAttestedMembership.setAttestationsList( [ otherAttestation ] )
 
       fs.writeFileSync(

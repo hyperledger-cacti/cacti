@@ -84,7 +84,7 @@ func checkUserInMembership(userCert *x509.Certificate, membership *common.Member
 }
 
 // Validate 'identity.Attestation' object against a message byte array
-func validateAttestation(attestation *identity.Attestation, messageBytes []byte) error {
+func validateAttestation(attestation *identity.Attestation, messageBytes string) error {
 	// Parse local IIN Agent's certificate
 	certDecoded, _ := pem.Decode([]byte(attestation.Certificate))
 	if certDecoded == nil {
@@ -99,7 +99,7 @@ func validateAttestation(attestation *identity.Attestation, messageBytes []byte)
 	if err != nil {
 		return fmt.Errorf("Attestation signature could not be decoded from base64: %s", err.Error())
 	}
-	err = validateSignature(string(messageBytes), cert, string(decodedSignature))
+	err = validateSignature(messageBytes, cert, string(decodedSignature))
 	if err != nil {
 		return fmt.Errorf("Unable to Validate Signature: %s", err.Error())
 	}
@@ -215,7 +215,7 @@ func (s *SmartContract) CreateMembership(ctx contractapi.TransactionContextInter
 	if err != nil {
 		return fmt.Errorf("Counter Attested Membership Unmarshal error: %s", err)
 	}
-	decodedAttestedMembershipSet, err := base64.StdEncoding.DecodeString(string(counterAttestedMembership.AttestedMembershipSet))
+	decodedAttestedMembershipSet, err := base64.StdEncoding.DecodeString(counterAttestedMembership.AttestedMembershipSet)
 	if err != nil {
 		return fmt.Errorf("Attested membership set could not be decoded from base64: %s", err.Error())
 	}
@@ -224,7 +224,7 @@ func (s *SmartContract) CreateMembership(ctx contractapi.TransactionContextInter
 	if err != nil {
 		return fmt.Errorf("Unable to unmarshal attested membership set: %s", err.Error())
 	}
-	decodedForeignMembership, err := base64.StdEncoding.DecodeString(string(attestedMembershipSet.Membership))
+	decodedForeignMembership, err := base64.StdEncoding.DecodeString(attestedMembershipSet.Membership)
 	if err != nil {
 		return fmt.Errorf("Foreign membership could not be decoded from base64: %s", err.Error())
 	}
@@ -248,7 +248,7 @@ func (s *SmartContract) CreateMembership(ctx contractapi.TransactionContextInter
 
 	// Ensure valid attestations from all local IIN Agents
 	for _, attestation := range counterAttestedMembership.Attestations {
-		err = validateAttestation(attestation, append(counterAttestedMembership.AttestedMembershipSet, attestation.Nonce...))
+		err = validateAttestation(attestation, counterAttestedMembership.AttestedMembershipSet + attestation.Nonce)
 		if err != nil {
 			return err
 		}
@@ -295,7 +295,7 @@ func (s *SmartContract) CreateMembership(ctx contractapi.TransactionContextInter
 			return fmt.Errorf("No matching member certificate chain found for attester")
 		}
 		// Validate signature
-		err = validateAttestation(attestation, append(attestedMembershipSet.Membership, attestation.Nonce...))
+		err = validateAttestation(attestation, attestedMembershipSet.Membership + attestation.Nonce)
 		if err != nil {
 			return err
 		}
@@ -385,7 +385,7 @@ func (s *SmartContract) UpdateMembership(ctx contractapi.TransactionContextInter
 	if err != nil {
 		return fmt.Errorf("Counter Attested Membership Unmarshal error: %s", err)
 	}
-	decodedAttestedMembershipSet, err := base64.StdEncoding.DecodeString(string(counterAttestedMembership.AttestedMembershipSet))
+	decodedAttestedMembershipSet, err := base64.StdEncoding.DecodeString(counterAttestedMembership.AttestedMembershipSet)
 	if err != nil {
 		return fmt.Errorf("Attested membership set could not be decoded from base64: %s", err.Error())
 	}
@@ -394,7 +394,7 @@ func (s *SmartContract) UpdateMembership(ctx contractapi.TransactionContextInter
 	if err != nil {
 		return fmt.Errorf("Unable to unmarshal attested membership set: %s", err.Error())
 	}
-	decodedForeignMembership, err := base64.StdEncoding.DecodeString(string(attestedMembershipSet.Membership))
+	decodedForeignMembership, err := base64.StdEncoding.DecodeString(attestedMembershipSet.Membership)
 	if err != nil {
 		return fmt.Errorf("Foreign membership could not be decoded from base64: %s", err.Error())
 	}
@@ -418,7 +418,7 @@ func (s *SmartContract) UpdateMembership(ctx contractapi.TransactionContextInter
 
 	// Ensure valid attestations from all local IIN Agents
 	for _, attestation := range counterAttestedMembership.Attestations {
-		err = validateAttestation(attestation, append(counterAttestedMembership.AttestedMembershipSet, attestation.Nonce...))
+		err = validateAttestation(attestation, counterAttestedMembership.AttestedMembershipSet + attestation.Nonce)
 		if err != nil {
 			return err
 		}
@@ -465,7 +465,7 @@ func (s *SmartContract) UpdateMembership(ctx contractapi.TransactionContextInter
 			return fmt.Errorf("No matching member certificate chain found for attester")
 		}
 		// Validate signature
-		err = validateAttestation(attestation, append(attestedMembershipSet.Membership, attestation.Nonce...))
+		err = validateAttestation(attestation, attestedMembershipSet.Membership + attestation.Nonce)
 		if err != nil {
 			return err
 		}
