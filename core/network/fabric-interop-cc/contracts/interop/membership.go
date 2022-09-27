@@ -61,6 +61,88 @@ func validateAttestation(attestation *identity.Attestation, messageBytes string)
 	return nil
 }
 
+// Parse 'identity.CounterAttestedMembership' object and extract structures
+func parseCounterAttestedMembership(counterAttestedMembershipSerialized string) (*identity.CounterAttestedMembership, *identity.CounterAttestedMembership_AttestedMembershipSet, *common.Membership, error) {
+	counterAttestedMembership, err := decodeCounterAttestedMembership(counterAttestedMembershipSerialized)
+	if err != nil {
+		return nil, nil, nil, fmt.Errorf("Counter Attested Membership Unmarshal error: %s", err)
+	}
+	decodedAttestedMembershipSet, err := base64.StdEncoding.DecodeString(counterAttestedMembership.AttestedMembershipSet)
+	if err != nil {
+		return nil, nil, nil, fmt.Errorf("Attested membership set could not be decoded from base64: %s", err.Error())
+	}
+	var attestedMembershipSet identity.CounterAttestedMembership_AttestedMembershipSet
+	err = protoV2.Unmarshal(decodedAttestedMembershipSet, &attestedMembershipSet)
+	if err != nil {
+		return nil, nil, nil, fmt.Errorf("Unable to unmarshal attested membership set: %s", err.Error())
+	}
+	decodedForeignMembership, err := base64.StdEncoding.DecodeString(attestedMembershipSet.Membership)
+	if err != nil {
+		return nil, nil, nil, fmt.Errorf("Foreign membership could not be decoded from base64: %s", err.Error())
+	}
+	var foreignMembership common.Membership
+	err = protoV2.Unmarshal(decodedForeignMembership, &foreignMembership)
+	if err != nil {
+		return nil, nil, nil, fmt.Errorf("Unable to unmarshal membership: %s", err.Error())
+	}
+	return counterAttestedMembership, &attestedMembershipSet, &foreignMembership, nil
+}
+
+// Validate 'identity.CounterAttestedMembership' object and its embedded structures
+func validateCounterAttestedMembership(s *SmartContract, ctx contractapi.TransactionContextInterface, counterAttestedMembership *identity.CounterAttestedMembership, attestedMembershipSet *identity.CounterAttestedMembership_AttestedMembershipSet, foreignMembership *common.Membership) error {
+	var err error
+
+	// Match nonces across all attestations, local and foreign
+	matchedNonce := ""
+	for _, attestation := range append(counterAttestedMembership.Attestations, attestedMembershipSet.Attestations...) {
+		if matchedNonce == "" {
+			matchedNonce = attestation.Nonce
+		} else {
+			if matchedNonce != attestation.Nonce {
+				return fmt.Errorf("Mismatched nonces across two attestations: %s, %s", matchedNonce, attestation.Nonce)
+			}
+		}
+	}
+
+	// Ensure valid attestations from all local IIN Agents
+	for _, attestation := range counterAttestedMembership.Attestations {
+		err = validateAttestation(attestation, counterAttestedMembership.AttestedMembershipSet + attestation.Nonce)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Validate foreign membership cert chains
+	err = validateMemberCertChains(foreignMembership)
+	if err != nil {
+		return err
+	}
+
+	// Ensure authentic and valid attestations from all foreign IIN Agents
+	for _, attestation := range attestedMembershipSet.Attestations {
+		if attestation.UnitIdentity.SecurityDomain != foreignMembership.SecurityDomain {
+			return fmt.Errorf("Foreign agent security domain %s does not match attested membership security domain %s",
+				attestation.UnitIdentity.SecurityDomain, foreignMembership.SecurityDomain)
+		}
+		attesterCert, err := parseCert(attestation.Certificate)
+		if err != nil {
+			return fmt.Errorf("Unable to parse attester certificate")
+		}
+		err = verifyMemberInSecurityDomain2(s, ctx, "", attesterCert, foreignMembership, attestation.UnitIdentity.MemberId)
+		if err != nil {
+			return fmt.Errorf("Attester with certificate %+v is not a designated IIN Agent of org %s in security domain %s: %+v",
+				attesterCert, attestation.UnitIdentity.MemberId, attestation.UnitIdentity.SecurityDomain, err)
+		}
+		// Validate signature
+		err = validateAttestation(attestation, attestedMembershipSet.Membership + attestation.Nonce)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 // CreateLocalMembership cc is used to store the local security domain's Membership in the ledger
 func (s *SmartContract) CreateLocalMembership(ctx contractapi.TransactionContextInterface, membershipJSON string) error {
 	// Check if the caller has network admin privileges
@@ -162,27 +244,10 @@ func (s *SmartContract) CreateMembership(ctx contractapi.TransactionContextInter
 		return fmt.Errorf("Caller with identity %+v is not a designated IIN Agent of org %s: %+v", callerId, callerMemberUnit, err)
 	}
 
-	counterAttestedMembership, err := decodeCounterAttestedMembership(counterAttestedMembershipSerialized)
+	// Parse the counter attested membership structure and extract the relevant objects
+	counterAttestedMembership, attestedMembershipSet, foreignMembership, err := parseCounterAttestedMembership(counterAttestedMembershipSerialized)
 	if err != nil {
-		return fmt.Errorf("Counter Attested Membership Unmarshal error: %s", err)
-	}
-	decodedAttestedMembershipSet, err := base64.StdEncoding.DecodeString(counterAttestedMembership.AttestedMembershipSet)
-	if err != nil {
-		return fmt.Errorf("Attested membership set could not be decoded from base64: %s", err.Error())
-	}
-	var attestedMembershipSet identity.CounterAttestedMembership_AttestedMembershipSet
-	err = protoV2.Unmarshal(decodedAttestedMembershipSet, &attestedMembershipSet)
-	if err != nil {
-		return fmt.Errorf("Unable to unmarshal attested membership set: %s", err.Error())
-	}
-	decodedForeignMembership, err := base64.StdEncoding.DecodeString(attestedMembershipSet.Membership)
-	if err != nil {
-		return fmt.Errorf("Foreign membership could not be decoded from base64: %s", err.Error())
-	}
-	var foreignMembership common.Membership
-	err = protoV2.Unmarshal(decodedForeignMembership, &foreignMembership)
-	if err != nil {
-		return fmt.Errorf("Unable to unmarshal membership: %s", err.Error())
+		return err
 	}
 
 	// Check presence of membership on ledger first
@@ -195,52 +260,10 @@ func (s *SmartContract) CreateMembership(ctx contractapi.TransactionContextInter
 		return fmt.Errorf("Membership already exists for membership id: %s. Use 'UpdateMembership' to update.", foreignMembership.SecurityDomain)
 	}
 
-	// Match nonces across all attestations, local and foreign
-	matchedNonce := ""
-	for _, attestation := range append(counterAttestedMembership.Attestations, attestedMembershipSet.Attestations...) {
-		if matchedNonce == "" {
-			matchedNonce = attestation.Nonce
-		} else {
-			if matchedNonce != attestation.Nonce {
-				return fmt.Errorf("Mismatched nonces across two attestations: %s, %s", matchedNonce, attestation.Nonce)
-			}
-		}
-	}
-
-	// Ensure valid attestations from all local IIN Agents
-	for _, attestation := range counterAttestedMembership.Attestations {
-		err = validateAttestation(attestation, counterAttestedMembership.AttestedMembershipSet + attestation.Nonce)
-		if err != nil {
-			return err
-		}
-	}
-
-	// Validate foreign membership cert chains
-	err = validateMemberCertChains(&foreignMembership)
+	// Validate the counter attested membership structure and the structures embedded in it
+	err = validateCounterAttestedMembership(s, ctx, counterAttestedMembership, attestedMembershipSet, foreignMembership)
 	if err != nil {
 		return err
-	}
-
-	// Ensure authentic and valid attestations from all foreign IIN Agents
-	for _, attestation := range attestedMembershipSet.Attestations {
-		if attestation.UnitIdentity.SecurityDomain != foreignMembership.SecurityDomain {
-			return fmt.Errorf("Foreign agent security domain %s does not match attested membership security domain %s",
-				attestation.UnitIdentity.SecurityDomain, foreignMembership.SecurityDomain)
-		}
-		attesterCert, err := parseCert(attestation.Certificate)
-		if err != nil {
-			return fmt.Errorf("Unable to parse attester certificate")
-		}
-		err = verifyMemberInSecurityDomain2(s, ctx, "", attesterCert, &foreignMembership, attestation.UnitIdentity.MemberId)
-		if err != nil {
-			return fmt.Errorf("Attester with certificate %+v is not a designated IIN Agent of org %s in security domain %s: %+v",
-				attesterCert, attestation.UnitIdentity.MemberId, attestation.UnitIdentity.SecurityDomain, err)
-		}
-		// Validate signature
-		err = validateAttestation(attestation, attestedMembershipSet.Membership + attestation.Nonce)
-		if err != nil {
-			return err
-		}
 	}
 
 	membershipBytes, err := json.Marshal(foreignMembership)
@@ -310,27 +333,10 @@ func (s *SmartContract) UpdateMembership(ctx contractapi.TransactionContextInter
 		return fmt.Errorf("Caller with identity %+v is not a designated IIN Agent: %+v", callerId, err)
 	}
 
-	counterAttestedMembership, err := decodeCounterAttestedMembership(counterAttestedMembershipSerialized)
+	// Parse the counter attested membership structure and extract the relevant objects
+	counterAttestedMembership, attestedMembershipSet, foreignMembership, err := parseCounterAttestedMembership(counterAttestedMembershipSerialized)
 	if err != nil {
-		return fmt.Errorf("Counter Attested Membership Unmarshal error: %s", err)
-	}
-	decodedAttestedMembershipSet, err := base64.StdEncoding.DecodeString(counterAttestedMembership.AttestedMembershipSet)
-	if err != nil {
-		return fmt.Errorf("Attested membership set could not be decoded from base64: %s", err.Error())
-	}
-	var attestedMembershipSet identity.CounterAttestedMembership_AttestedMembershipSet
-	err = protoV2.Unmarshal(decodedAttestedMembershipSet, &attestedMembershipSet)
-	if err != nil {
-		return fmt.Errorf("Unable to unmarshal attested membership set: %s", err.Error())
-	}
-	decodedForeignMembership, err := base64.StdEncoding.DecodeString(attestedMembershipSet.Membership)
-	if err != nil {
-		return fmt.Errorf("Foreign membership could not be decoded from base64: %s", err.Error())
-	}
-	var foreignMembership common.Membership
-	err = protoV2.Unmarshal(decodedForeignMembership, &foreignMembership)
-	if err != nil {
-		return fmt.Errorf("Unable to unmarshal membership: %s", err.Error())
+		return err
 	}
 
 	// Check presence of membership on ledger first
@@ -340,52 +346,10 @@ func (s *SmartContract) UpdateMembership(ctx contractapi.TransactionContextInter
 		return getErr
 	}
 
-	// Match nonces across all attestations, local and foreign
-	matchedNonce := ""
-	for _, attestation := range append(counterAttestedMembership.Attestations, attestedMembershipSet.Attestations...) {
-		if matchedNonce == "" {
-			matchedNonce = attestation.Nonce
-		} else {
-			if matchedNonce != attestation.Nonce {
-				return fmt.Errorf("Mismatched nonces across two attestations: %s, %s", matchedNonce, attestation.Nonce)
-			}
-		}
-	}
-
-	// Ensure valid attestations from all local IIN Agents
-	for _, attestation := range counterAttestedMembership.Attestations {
-		err = validateAttestation(attestation, counterAttestedMembership.AttestedMembershipSet + attestation.Nonce)
-		if err != nil {
-			return err
-		}
-	}
-
-	// Validate foreign membership cert chains
-	err = validateMemberCertChains(&foreignMembership)
+	// Validate the counter attested membership structure and the structures embedded in it
+	err = validateCounterAttestedMembership(s, ctx, counterAttestedMembership, attestedMembershipSet, foreignMembership)
 	if err != nil {
 		return err
-	}
-
-	// Ensure authentic and valid attestations from all foreign IIN Agents
-	for _, attestation := range attestedMembershipSet.Attestations {
-		if attestation.UnitIdentity.SecurityDomain != foreignMembership.SecurityDomain {
-			return fmt.Errorf("Foreign agent security domain %s does not match attested membership security domain %s",
-				attestation.UnitIdentity.SecurityDomain, foreignMembership.SecurityDomain)
-		}
-		attesterCert, err := parseCert(attestation.Certificate)
-		if err != nil {
-			return fmt.Errorf("Unable to parse attester certificate")
-		}
-		err = verifyMemberInSecurityDomain2(s, ctx, "", attesterCert, &foreignMembership, attestation.UnitIdentity.MemberId)
-		if err != nil {
-			return fmt.Errorf("Attester with certificate %+v is not a designated IIN Agent of org %s in security domain %s: %+v",
-				attesterCert, attestation.UnitIdentity.MemberId, attestation.UnitIdentity.SecurityDomain, err)
-		}
-		// Validate signature
-		err = validateAttestation(attestation, attestedMembershipSet.Membership + attestation.Nonce)
-		if err != nil {
-			return err
-		}
 	}
 
 	membershipBytes, err := json.Marshal(foreignMembership)
@@ -521,7 +485,7 @@ func verifyMemberInSecurityDomain1(s *SmartContract, ctx contractapi.Transaction
 // This takes a decoded X.509 certificate as argument (and optionally the certificate in PEM format too).
 // It takes a membership structure as argument.
 func verifyMemberInSecurityDomain2(s *SmartContract, ctx contractapi.TransactionContextInterface, certPEM string, cert *x509.Certificate, membership *common.Membership, requestingOrg string) error {
-    err := isCertificateWithinExpiry(cert)
+	err := isCertificateWithinExpiry(cert)
 	if err != nil {
 		return err
 	}
