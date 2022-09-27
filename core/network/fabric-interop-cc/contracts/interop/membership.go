@@ -19,28 +19,11 @@ import (
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/identity"
 	protoV2 "google.golang.org/protobuf/proto"
+	wutils "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/utils"
 )
 
 const membershipObjectType = "membership"
 const membershipLocalSecurityDomain = "local-security-domain"
-
-// Check if the calling client has an attribute in its signing certificate indicating that it is a privileged network administrator
-//func isClientNetworkAdmin(stub shim.ChaincodeStubInterface) (bool, error) {
-func isClientNetworkAdmin(ctx contractapi.TransactionContextInterface) (bool, error) {
-	// check if caller certificate has the attribute "network-admin"
-	// we don't care about the actual value of the attribute for now
-	_, ok, err := ctx.GetClientIdentity().GetAttributeValue("network-admin")
-	return ok, err
-}
-
-// Check if the calling client has an IIN Agent attribute in its signing certificate
-//func isClientIINAgent(stub shim.ChaincodeStubInterface) (bool, error) {
-func isClientIINAgent(ctx contractapi.TransactionContextInterface) (bool, error) {
-	// check if caller certificate has the attribute "iin-agent"
-	// we don't care about the actual value of the attribute for now
-	_, ok, err := ctx.GetClientIdentity().GetAttributeValue("iin-agent")
-	return ok, err
-}
 
 // Check the validity of each certificate chain in this membership
 func validateMemberCertChains(membership *common.Membership) error {
@@ -53,34 +36,6 @@ func validateMemberCertChains(membership *common.Membership) error {
 		}
 	}
 	return nil
-}
-
-// Check whether the given user certificate belongs to the given security domain membership
-func checkUserInMembership(userCert *x509.Certificate, membership *common.Membership) error {
-	for _, member := range membership.Members {
-		if member.Type == "ca" && member.Value != "" {
-			decodedCACert, _ := pem.Decode([]byte(member.Value))
-			if decodedCACert == nil {
-				fmt.Printf("Unable to decode CA cert PEM: %s\n", member.Value)
-			}
-			caCert, err := x509.ParseCertificate(decodedCACert.Bytes)
-			if err != nil {
-				fmt.Printf("Unable to parse CA certificate: %s\n", member.Value)
-			}
-			err = validateCertificateUsingCA(userCert, caCert, true)
-			if err == nil {
-				return nil
-			}
-		} else if member.Type == "certificate" && len(member.Chain) > 0 {
-			err := verifyCertificateChain(userCert, member.Chain)
-			if err == nil {
-				return nil
-			}
-		} else {
-			fmt.Printf("Invalid member info: %+v\n", member)
-		}
-	}
-	return fmt.Errorf("User cert %+v could not be validated against any CA certificate chain in membership %+v", userCert, membership)
 }
 
 // Validate 'identity.Attestation' object against a message byte array
@@ -109,7 +64,7 @@ func validateAttestation(attestation *identity.Attestation, messageBytes string)
 // CreateLocalMembership cc is used to store the local security domain's Membership in the ledger
 func (s *SmartContract) CreateLocalMembership(ctx contractapi.TransactionContextInterface, membershipJSON string) error {
 	// Check if the caller has network admin privileges
-	if isAdmin, err := isClientNetworkAdmin(ctx); err != nil {
+	if isAdmin, err := wutils.IsClientNetworkAdmin(ctx); err != nil {
 		return fmt.Errorf("Admin client check error: %s", err)
 	} else if !isAdmin {
 		return fmt.Errorf("Caller not a network admin; access denied")
@@ -145,7 +100,7 @@ func (s *SmartContract) CreateLocalMembership(ctx contractapi.TransactionContext
 // UpdateLocalMembership cc is used to update the existing local security domain's Membership in the ledger
 func (s *SmartContract) UpdateLocalMembership(ctx contractapi.TransactionContextInterface, membershipJSON string) error {
 	// Check if the caller has network admin privileges
-	if isAdmin, err := isClientNetworkAdmin(ctx); err != nil {
+	if isAdmin, err := wutils.IsClientNetworkAdmin(ctx); err != nil {
 		return fmt.Errorf("Admin client check error: %+v", err)
 	} else if !isAdmin {
 		return fmt.Errorf("Caller not a network admin; access denied")
@@ -180,35 +135,31 @@ func (s *SmartContract) UpdateLocalMembership(ctx contractapi.TransactionContext
 // TODO: Remove call to 'createMembership' after creating Corda IIN Agents.
 func (s *SmartContract) CreateMembership(ctx contractapi.TransactionContextInterface, counterAttestedMembershipSerialized string) error {
 	// Check if the caller has IIN agent privileges
-	if isIINAgent, err := isClientIINAgent(ctx); err != nil {
+	if isIINAgent, err := wutils.IsClientIINAgent(ctx); err != nil {
 		return fmt.Errorf("IIN Agent client check error: %s", err)
 	} else if !isIINAgent {
 		// Check if the caller has network admin privileges
-		if isAdmin, err := isClientNetworkAdmin(ctx); err != nil {
+		if isAdmin, err := wutils.IsClientNetworkAdmin(ctx); err != nil {
 			return fmt.Errorf("Admin client check error: %s", err)
 		} else if !isAdmin {
 			return fmt.Errorf("Caller neither a network admin nor an IIN Agent; access denied")
 		}
-		return s.createMembership(ctx, counterAttestedMembershipSerialized)		// HACK to handle unattested memberships (for Corda) for backward compatibility
+		return createMembership(ctx, counterAttestedMembershipSerialized)		// HACK to handle unattested memberships (for Corda) for backward compatibility
 	}
 
 	// Check if caller is one of the authorized IIN agents
-	membershipLocal, err := s.GetMembershipBySecurityDomain(ctx, membershipLocalSecurityDomain)
-	if err != nil {
-		return err
-	}
-	membershipLocalDecoded, err := decodeMembership([]byte(membershipLocal))
-	if err != nil {
-		return fmt.Errorf("Local Membership JSON Unmarshal error: %s", err)
-	}
 	callerId := ctx.GetClientIdentity()
 	callerCert, err := callerId.GetX509Certificate()
 	if err != nil {
 		return err
 	}
-	err = checkUserInMembership(callerCert, membershipLocalDecoded)
+	callerMemberUnit, err := callerId.GetMSPID()
 	if err != nil {
-		return fmt.Errorf("Caller with identity %+v is not a designated IIN Agent: %+v", callerId, err)
+		return err
+	}
+	err = verifyMemberInSecurityDomain1(s, ctx, "", callerCert, membershipLocalSecurityDomain, callerMemberUnit)
+	if err != nil {
+		return fmt.Errorf("Caller with identity %+v is not a designated IIN Agent of org %s: %+v", callerId, callerMemberUnit, err)
 	}
 
 	counterAttestedMembership, err := decodeCounterAttestedMembership(counterAttestedMembershipSerialized)
@@ -232,6 +183,16 @@ func (s *SmartContract) CreateMembership(ctx contractapi.TransactionContextInter
 	err = protoV2.Unmarshal(decodedForeignMembership, &foreignMembership)
 	if err != nil {
 		return fmt.Errorf("Unable to unmarshal membership: %s", err.Error())
+	}
+
+	// Check presence of membership on ledger first
+	membershipKey, err := ctx.GetStub().CreateCompositeKey(membershipObjectType, []string{foreignMembership.SecurityDomain})
+	acp, getErr := ctx.GetStub().GetState(membershipKey)
+	if getErr != nil {
+		return getErr
+	}
+	if acp != nil {
+		return fmt.Errorf("Membership already exists for membership id: %s. Use 'UpdateMembership' to update.", foreignMembership.SecurityDomain)
 	}
 
 	// Match nonces across all attestations, local and foreign
@@ -266,48 +227,20 @@ func (s *SmartContract) CreateMembership(ctx contractapi.TransactionContextInter
 			return fmt.Errorf("Foreign agent security domain %s does not match attested membership security domain %s",
 				attestation.UnitIdentity.SecurityDomain, foreignMembership.SecurityDomain)
 		}
-		foundMemberMatch := false
-		for _, member := range foreignMembership.Members {
-			var isSignerRoot bool
-			var leafCertPEM string
-			if member.Type == "ca" {
-				leafCertPEM = member.Value
-				isSignerRoot = true
-			} else if member.Type == "certificate" {
-				leafCertPEM = member.Chain[len(member.Chain) - 1]
-				isSignerRoot = (len(member.Chain) == 1)
-			}
-			attesterCert, err := parseCert(attestation.Certificate)
-			if err != nil {
-				continue
-			}
-			leafCert, err := parseCert(leafCertPEM)
-			if err != nil {
-				continue
-			}
-			err = validateCertificateUsingCA(attesterCert, leafCert, isSignerRoot)
-			if err == nil {
-				foundMemberMatch = true
-				break
-			}
+		attesterCert, err := parseCert(attestation.Certificate)
+		if err != nil {
+			return fmt.Errorf("Unable to parse attester certificate")
 		}
-		if !foundMemberMatch {
-			return fmt.Errorf("No matching member certificate chain found for attester")
+		err = verifyMemberInSecurityDomain2(s, ctx, "", attesterCert, &foreignMembership, attestation.UnitIdentity.MemberId)
+		if err != nil {
+			return fmt.Errorf("Attester with certificate %+v is not a designated IIN Agent of org %s in security domain %s: %+v",
+				attesterCert, attestation.UnitIdentity.MemberId, attestation.UnitIdentity.SecurityDomain, err)
 		}
 		// Validate signature
 		err = validateAttestation(attestation, attestedMembershipSet.Membership + attestation.Nonce)
 		if err != nil {
 			return err
 		}
-	}
-
-	membershipKey, err := ctx.GetStub().CreateCompositeKey(membershipObjectType, []string{foreignMembership.SecurityDomain})
-	acp, getErr := ctx.GetStub().GetState(membershipKey)
-	if getErr != nil {
-		return getErr
-	}
-	if acp != nil {
-		return fmt.Errorf("Membership already exists for membership id: %s. Use 'UpdateMembership' to update.", foreignMembership.SecurityDomain)
 	}
 
 	membershipBytes, err := json.Marshal(foreignMembership)
@@ -319,7 +252,7 @@ func (s *SmartContract) CreateMembership(ctx contractapi.TransactionContextInter
 
 // createMembership is used by a network admin to store a Membership in the ledger with an unattested membership
 // TODO: Remove this function after creating Corda IIN Agents. Retaining this temporarily for backward compatibility.
-func (s *SmartContract) createMembership(ctx contractapi.TransactionContextInterface, membershipJSON string) error {
+func createMembership(ctx contractapi.TransactionContextInterface, membershipJSON string) error {
 	membership, err := decodeMembership([]byte(membershipJSON))
 	if err != nil {
 		return fmt.Errorf("Unmarshal error: %s", err)
@@ -350,33 +283,29 @@ func (s *SmartContract) createMembership(ctx contractapi.TransactionContextInter
 // TODO: Remove call to 'updateMembership' after creating Corda IIN Agents.
 func (s *SmartContract) UpdateMembership(ctx contractapi.TransactionContextInterface, counterAttestedMembershipSerialized string) error {
 	// Check if the caller has IIN agent privileges
-	if isIINAgent, err := isClientIINAgent(ctx); err != nil {
+	if isIINAgent, err := wutils.IsClientIINAgent(ctx); err != nil {
 		return fmt.Errorf("IIN Agent client check error: %s", err)
 	} else if !isIINAgent {
 		// Check if the caller has network admin privileges
-		if isAdmin, err := isClientNetworkAdmin(ctx); err != nil {
+		if isAdmin, err := wutils.IsClientNetworkAdmin(ctx); err != nil {
 			return fmt.Errorf("Admin client check error: %s", err)
 		} else if !isAdmin {
 			return fmt.Errorf("Caller neither a network admin nor an IIN Agent; access denied")
 		}
-		return s.updateMembership(ctx, counterAttestedMembershipSerialized)		// HACK to handle unattested memberships (for Corda) for backward compatibility
+		return updateMembership(s, ctx, counterAttestedMembershipSerialized)		// HACK to handle unattested memberships (for Corda) for backward compatibility
 	}
 
 	// Check if caller is one of the authorized IIN agents
-	membershipLocal, err := s.GetMembershipBySecurityDomain(ctx, membershipLocalSecurityDomain)
-	if err != nil {
-		return err
-	}
-	membershipLocalDecoded, err := decodeMembership([]byte(membershipLocal))
-	if err != nil {
-		return fmt.Errorf("Unmarshal error: %s", err)
-	}
 	callerId := ctx.GetClientIdentity()
 	callerCert, err := callerId.GetX509Certificate()
 	if err != nil {
 		return err
 	}
-	err = checkUserInMembership(callerCert, membershipLocalDecoded)
+	callerMemberUnit, err := callerId.GetMSPID()
+	if err != nil {
+		return err
+	}
+	err = verifyMemberInSecurityDomain1(s, ctx, "", callerCert, membershipLocalSecurityDomain, callerMemberUnit)
 	if err != nil {
 		return fmt.Errorf("Caller with identity %+v is not a designated IIN Agent: %+v", callerId, err)
 	}
@@ -402,6 +331,13 @@ func (s *SmartContract) UpdateMembership(ctx contractapi.TransactionContextInter
 	err = protoV2.Unmarshal(decodedForeignMembership, &foreignMembership)
 	if err != nil {
 		return fmt.Errorf("Unable to unmarshal membership: %s", err.Error())
+	}
+
+	// Check presence of membership on ledger first
+	membershipKey, err := ctx.GetStub().CreateCompositeKey(membershipObjectType, []string{foreignMembership.SecurityDomain})
+	_, getErr := s.GetMembershipBySecurityDomain(ctx, foreignMembership.SecurityDomain)
+	if getErr != nil {
+		return getErr
 	}
 
 	// Match nonces across all attestations, local and foreign
@@ -436,45 +372,20 @@ func (s *SmartContract) UpdateMembership(ctx contractapi.TransactionContextInter
 			return fmt.Errorf("Foreign agent security domain %s does not match attested membership security domain %s",
 				attestation.UnitIdentity.SecurityDomain, foreignMembership.SecurityDomain)
 		}
-		foundMemberMatch := false
-		for _, member := range foreignMembership.Members {
-			var isSignerRoot bool
-			var leafCertPEM string
-			if member.Type == "ca" {
-				leafCertPEM = member.Value
-				isSignerRoot = true
-			} else if member.Type == "certificate" {
-				leafCertPEM = member.Chain[len(member.Chain) - 1]
-				isSignerRoot = (len(member.Chain) == 1)
-			}
-			attesterCert, err := parseCert(attestation.Certificate)
-			if err != nil {
-				continue
-			}
-			leafCert, err := parseCert(leafCertPEM)
-			if err != nil {
-				continue
-			}
-			err = validateCertificateUsingCA(attesterCert, leafCert, isSignerRoot)
-			if err == nil {
-				foundMemberMatch = true
-				break
-			}
+		attesterCert, err := parseCert(attestation.Certificate)
+		if err != nil {
+			return fmt.Errorf("Unable to parse attester certificate")
 		}
-		if !foundMemberMatch {
-			return fmt.Errorf("No matching member certificate chain found for attester")
+		err = verifyMemberInSecurityDomain2(s, ctx, "", attesterCert, &foreignMembership, attestation.UnitIdentity.MemberId)
+		if err != nil {
+			return fmt.Errorf("Attester with certificate %+v is not a designated IIN Agent of org %s in security domain %s: %+v",
+				attesterCert, attestation.UnitIdentity.MemberId, attestation.UnitIdentity.SecurityDomain, err)
 		}
 		// Validate signature
 		err = validateAttestation(attestation, attestedMembershipSet.Membership + attestation.Nonce)
 		if err != nil {
 			return err
 		}
-	}
-
-	membershipKey, err := ctx.GetStub().CreateCompositeKey(membershipObjectType, []string{foreignMembership.SecurityDomain})
-	_, getErr := s.GetMembershipBySecurityDomain(ctx, foreignMembership.SecurityDomain)
-	if getErr != nil {
-		return getErr
 	}
 
 	membershipBytes, err := json.Marshal(foreignMembership)
@@ -487,7 +398,7 @@ func (s *SmartContract) UpdateMembership(ctx contractapi.TransactionContextInter
 
 // updateMembership is used by a network admin to update an existing Membership in the ledger with an unattested membership
 // TODO: Remove this function after creating Corda IIN Agents. Retaining this temporarily for backward compatibility.
-func (s *SmartContract) updateMembership(ctx contractapi.TransactionContextInterface, membershipJSON string) error {
+func updateMembership(s *SmartContract, ctx contractapi.TransactionContextInterface, membershipJSON string) error {
 	membership, err := decodeMembership([]byte(membershipJSON))
 	if err != nil {
 		return fmt.Errorf("Unmarshal error: %s", err)
@@ -515,7 +426,7 @@ func (s *SmartContract) updateMembership(ctx contractapi.TransactionContextInter
 // DeleteLocalMembership cc is used to delete the local security domain Membership in the ledger
 func (s *SmartContract) DeleteLocalMembership(ctx contractapi.TransactionContextInterface) error {
 	// Check if the caller has network admin privileges
-	if isAdmin, err := isClientNetworkAdmin(ctx); err != nil {
+	if isAdmin, err := wutils.IsClientNetworkAdmin(ctx); err != nil {
 		return fmt.Errorf("Admin client check error: %s", err)
 	} else if !isAdmin {
 		return fmt.Errorf("Caller not a network admin; access denied")
@@ -540,7 +451,7 @@ func (s *SmartContract) DeleteLocalMembership(ctx contractapi.TransactionContext
 // DeleteMembership cc is used to delete an existing Membership in the ledger
 func (s *SmartContract) DeleteMembership(ctx contractapi.TransactionContextInterface, membershipID string) error {
 	// Check if the caller has IIN agent privileges
-	if isIINAgent, err := isClientIINAgent(ctx); err != nil {
+	if isIINAgent, err := wutils.IsClientIINAgent(ctx); err != nil {
 		return fmt.Errorf("IIN Agent client check error: %s", err)
 	} else if !isIINAgent {
 		return fmt.Errorf("Caller not an IIN Agent; access denied")
@@ -579,15 +490,21 @@ func (s *SmartContract) GetMembershipBySecurityDomain(ctx contractapi.Transactio
 
 // verifyMemberInSecurityDomain function verifies the identity of the requester according to
 // the Membership for the external network the request originated from.
+// This takes a certificate encoded in PEM format as argument.
+// It assumes that the relevant membership info is on the ledger.
 func verifyMemberInSecurityDomain(s *SmartContract, ctx contractapi.TransactionContextInterface, certPEM string, securityDomain string, requestingOrg string) error {
 	cert, err := parseCert(certPEM)
 	if err != nil {
 		return fmt.Errorf("Unable to parse certificate: %s", err.Error())
 	}
-	err = isCertificateWithinExpiry(cert)
-	if err != nil {
-		return err
-	}
+	return verifyMemberInSecurityDomain1(s, ctx, certPEM, cert, securityDomain, requestingOrg)
+}
+
+// verifyMemberInSecurityDomain1 function verifies the identity of the requester according to
+// the Membership for the external network the request originated from.
+// This takes a decoded X.509 certificate as argument (and optionally the certificate in PEM format too).
+// It assumes that the relevant membership info is on the ledger.
+func verifyMemberInSecurityDomain1(s *SmartContract, ctx contractapi.TransactionContextInterface, certPEM string, cert *x509.Certificate, securityDomain string, requestingOrg string) error {
 	membershipString, err := s.GetMembershipBySecurityDomain(ctx, securityDomain)
 	if err != nil {
 		return err
@@ -596,12 +513,27 @@ func verifyMemberInSecurityDomain(s *SmartContract, ctx contractapi.TransactionC
 	if err != nil {
 		return fmt.Errorf("Failed to unmarshal membership: %s", err.Error())
 	}
+	return verifyMemberInSecurityDomain2(s, ctx, certPEM, cert, membership, requestingOrg)
+}
+
+// verifyMemberInSecurityDomain2 function verifies the identity of the requester according to
+// the Membership for the external network the request originated from.
+// This takes a decoded X.509 certificate as argument (and optionally the certificate in PEM format too).
+// It takes a membership structure as argument.
+func verifyMemberInSecurityDomain2(s *SmartContract, ctx contractapi.TransactionContextInterface, certPEM string, cert *x509.Certificate, membership *common.Membership, requestingOrg string) error {
+    err := isCertificateWithinExpiry(cert)
+	if err != nil {
+		return err
+	}
 	member, ok := membership.Members[requestingOrg]
 	if ok == false {
 		return fmt.Errorf("Member does not exist for org: %s", requestingOrg)
 	}
 	switch member.Type {
 	case "ca":
+		if member.Value == "" {
+			return fmt.Errorf("CA member certificate is blank")
+		}
 		if certPEM != member.Value {	// The CA is automatically a member of the security domain
 			err := verifyCaCertificate(cert, member.Value)
 			if err != nil {

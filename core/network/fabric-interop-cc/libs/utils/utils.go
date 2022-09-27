@@ -80,6 +80,22 @@ func IsClientRelay(stub shim.ChaincodeStubInterface) (bool, error) {
 	return ok, err
 }
 
+// Check if the calling client has an attribute in its signing certificate indicating that it is a privileged network administrator
+func IsClientNetworkAdmin(ctx contractapi.TransactionContextInterface) (bool, error) {
+	// check if caller certificate has the attribute "network-admin"
+	// we don't care about the actual value of the attribute for now
+	_, ok, err := ctx.GetClientIdentity().GetAttributeValue("network-admin")
+	return ok, err
+}
+
+// Check if the calling client has an IIN Agent attribute in its signing certificate
+func IsClientIINAgent(ctx contractapi.TransactionContextInterface) (bool, error) {
+	// check if caller certificate has the attribute "iin-agent"
+	// we don't care about the actual value of the attribute for now
+	_, ok, err := ctx.GetClientIdentity().GetAttributeValue("iin-agent")
+	return ok, err
+}
+
 // Check if the caller is the Interop Chaincode
 func IsCallerInteropChaincode(stub shim.ChaincodeStubInterface) (bool, error) {
 	interopChaincodeID, err := stub.GetState(GetInteropChaincodeIDKey())
