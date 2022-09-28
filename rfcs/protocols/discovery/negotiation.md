@@ -3,12 +3,12 @@
 
  SPDX-License-Identifier: CC-BY-4.0
  -->
-# Negotiation Protocol for End-to-End Connection Setup
+# Cross-Security Domain Negotiation for Data Plane Connection Setup
 
 - RFC: 02-014
 - Authors: Venkatraman Ramakrishna, Krishnasuri Narayanam, Sandeep Nishad, Dhinakaran Vinayagamurthy
 - Status: Draft
-- Since: 02-Apr-2022
+- Since: 27-Aug-2022
 
 
 ## Summary
