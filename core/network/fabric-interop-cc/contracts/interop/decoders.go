@@ -12,10 +12,14 @@
 package main
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"strings"
+	"fmt"
 
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/identity"
+	protoV2 "google.golang.org/protobuf/proto"
 )
 
 func decodeMembership(jsonBytes []byte) (*common.Membership, error) {
@@ -25,6 +29,19 @@ func decodeMembership(jsonBytes []byte) (*common.Membership, error) {
 	err := dec.Decode(&decodeObj)
 	if err != nil {
 		return nil, err
+	}
+	return &decodeObj, nil
+}
+
+func decodeCounterAttestedMembership(protoBytesBase64 string) (*identity.CounterAttestedMembership, error) {
+	var decodeObj identity.CounterAttestedMembership
+	protoBytes, err := base64.StdEncoding.DecodeString(protoBytesBase64)
+	if err != nil {
+		return nil, fmt.Errorf("Counter attested membership could not be decoded from base64: %s", err.Error())
+	}
+	err = protoV2.Unmarshal(protoBytes, &decodeObj)
+	if err != nil {
+		return nil, fmt.Errorf("Unable to unmarshal counter attested membership: %s", err.Error())
 	}
 	return &decodeObj, nil
 }

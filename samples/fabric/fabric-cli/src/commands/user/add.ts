@@ -5,10 +5,10 @@
  */
 
 import { GluegunCommand } from 'gluegun'
-import { commandHelp, getNetworkConfig, saveUserCertToFile } from '../../helpers/helpers'
+import { commandHelp } from '../../helpers/helpers'
 import * as fs from 'fs'
 import * as path from 'path'
-import { walletSetup } from '../../helpers/fabric-functions'
+import { enrollAndRecordWalletIdentity } from '../../helpers/fabric-functions'
 
 const command: GluegunCommand = {
   name: 'add',
@@ -23,7 +23,7 @@ const command: GluegunCommand = {
         print,
         toolbox,
         `fabric-cli user add --target-network=network1 --id=user --secret=userpw`,
-        `fabric-cli user add --target-network=<network-name> --id=<id> --secret=<secret>`,
+        `fabric-cli user add --target-network=<network-name> --id=<id> --secret=<secret> [--network-admin] [--iin-agent]`,
         [
           {
             name: '--target-network',
@@ -39,6 +39,16 @@ const command: GluegunCommand = {
             name: '--secret',
             description:
               'password for the username being added (Optional: random password is used)'
+          },
+          {
+            name: '--network-admin',
+            description:
+              'Flag to indicate whether this user should have a network admin attribute.'
+          },
+          {
+            name: '--iin-agent',
+            description:
+              'Flag to indicate whether this user should have an IIN agent attribute.'
           }
         ],
         command,
@@ -53,23 +63,7 @@ const command: GluegunCommand = {
       print.error('--id is required arguement, please specify the username here')
     }
 
-    const userName = options['id']
-    const userPwd = options['secret']
-    const net = getNetworkConfig(options['target-network'])
-
-    const ccpPath = path.resolve(__dirname, net.connProfilePath)
-    const ccp = JSON.parse(fs.readFileSync(ccpPath, 'utf8'))
-    console.log(net)
-
-    let wallet = await walletSetup(options['target-network'],
-                    ccp,
-                    net.mspId,
-                    userName,
-                    userPwd,
-                    true
-                  )
-
-    saveUserCertToFile(userName, options['target-network'])
+    await enrollAndRecordWalletIdentity(options['id'], options['secret'], options['target-network'], options['network-admin'], options['iin-agent'])
     process.exit()
   }
 }
