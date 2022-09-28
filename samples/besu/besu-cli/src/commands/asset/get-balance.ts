@@ -68,6 +68,7 @@ const command: GluegunCommand = {
 		const web3N = new Web3(provider)
 		const accounts = await web3N.eth.getAccounts()
 
+		console.log(networkConfig.tokenContract)
 		const tokenContract = await getContractInstance(provider, networkConfig.tokenContract).catch(function () {
 			console.log("Failed getting tokenContract!");
 		})

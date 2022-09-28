@@ -3,7 +3,7 @@
 		"networkHost": "localhost",
 		"networkPort": 8545,
 		"tokenContract": "../simpleasset/build/contracts/AliceERC20.json",
-		"interopContract": "../simpleasset/build/contracts/InteroperationBaseClassERC20.json",
+		"interopContract": "../simpleasset/build/contracts/AssetExchangeContract.json",
 		"senderAccountIndex": 1,
 		"recipientAccountIndex": 2
 	},
@@ -11,7 +11,7 @@
 		"networkHost": "localhost",
 		"networkPort": 9544,
 		"tokenContract": "../simpleasset/build/contracts/BobERC20.json",
-		"interopContract": "../simpleasset/build/contracts/InteroperationBaseClassERC20.json",
+		"interopContract": "../simpleasset/build/contracts/AssetExchangeContract.json",
 		"senderAccountIndex": 2,
 		"recipientAccountIndex": 1
 	}

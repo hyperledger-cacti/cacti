@@ -18,3 +18,7 @@ src/wallet-network1
 src/wallet-network2
 chaincode.json
 remote-network-config.json
+admin.id
+networkadmin.id
+iinagent.id
+*.proto.serialized

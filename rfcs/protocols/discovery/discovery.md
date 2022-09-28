@@ -3,19 +3,16 @@
 
  SPDX-License-Identifier: CC-BY-4.0
  -->
-# Discovery Protocol
+# Discovering Foreign Security Domains
 
 - RFC: 02-013
 - Authors: Bishakh Chandra Ghosh, Venkatraman Ramakrishna, Krishnasuri Narayanam, Ermyas Abebe
 - Status: Draft
-- Since: 25-Aug-2022
+- Since: 27-Aug-2022
 
 
 ## Summary
 
-When a network ("local network" from here on) tries to configure the identity of another network ("foreign network" from here on) for interoperation, the broad steps involved are (i) Network Discovery (ii) Security Domain Identity Validation. Both these steps are carried out by the IIN agent of the participants of the local network.
+This document covers the process by which a network (or security domain) discovers the identity of another as a prelude to [validation](../identity/network-identity-validation.md) and [syncing of membership information](../identity/membership-syncing.md).
 
-Whether each participant needs to carry out the discovery and validation, or a subset of participants will do it depends entirely on the trust basis of the network. This is covered in Security Domain Identity Configuration step.
-
-
-> Note: It is the IIN's responsibility to authenticate a Network DID creation or updation. Therefore, local network must trust the IIN to trust the fact that the resolved Network DID is created by proper attestations from its controller participants. Given a DLT based IIN which allows anyone to monitor the ledger, any IIN agent can validate the authenticity of a Network DID by validating the Network DID creation/updation requests from the ledger.
+At its simplest, this can be a trivial exercise of hitting a well-known website that serves DID records for the security domains one is interesting in interoperating with. But more complex situations are possible, involving multiple IINs and name resolution services.

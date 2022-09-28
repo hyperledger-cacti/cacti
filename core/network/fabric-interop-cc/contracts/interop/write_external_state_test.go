@@ -19,22 +19,23 @@ import (
 	wtest "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils"
 )
 
+
 type TestData struct {
-	B64View				string	`json:"view64"`
+	B64View             string	`json:"view64"`
 	B64ViewConfidential string	`json:"confidential_view64"`
-	B64ViewContents 	string	`json:"confidential_view_content64"`
+	B64ViewContents     string	`json:"confidential_view_content64"`
 }
 
 func TestWriteExternalState(t *testing.T) {
-	
-	
+
+
 	var cordaTestDataBytes, _ = ioutil.ReadFile("./test_data/corda_viewdata.json")
 	var cordaTestData TestData
 	json.Unmarshal(cordaTestDataBytes, &cordaTestData)
 	var cordaRootCACert, _ = ioutil.ReadFile("./test_data/corda_cacert_root.pem")
 	var cordaDoormanCACert, _ = ioutil.ReadFile("./test_data/corda_cacert_doorman.pem")
 	var cordaNodeCACert, _ = ioutil.ReadFile("./test_data/corda_cacert_node.pem")
-	
+
 	var cordaMember = common.Member{
 		Value: "",
 		Type:  "certificate",
@@ -61,11 +62,11 @@ func TestWriteExternalState(t *testing.T) {
 	var fabricRelayEndpoint = "relay-network1:9080"
 	var fabricPattern = "mychannel:simplestate:Read:a"
 	var fabricViewAddress = fabricRelayEndpoint + "/" + fabricNetwork + "/" + fabricPattern
-	
+
 	var fabricTestDataBytes, _ = ioutil.ReadFile("./test_data/fabric_viewdata.json")
 	var fabricTestData TestData
 	json.Unmarshal(fabricTestDataBytes, &fabricTestData)
-	
+
 	var fabricCaCertNetwork1, _ = ioutil.ReadFile("./test_data/fabric_cacert.pem")
 
 	var network1Member = common.Member{

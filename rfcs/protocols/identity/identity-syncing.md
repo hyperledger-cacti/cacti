@@ -3,7 +3,7 @@
 
  SPDX-License-Identifier: CC-BY-4.0
  -->
-# Security Domain Identity and Membership Exchanges
+# Cross-Domain Identity and Membership Syncing
 
 - RFC: 02-012
 - Authors: Venkatraman Ramakrishna, Krishnasuri Narayanam, Bishakh Chandra Ghosh, Ermyas Abebe
@@ -14,58 +14,55 @@
 
 ## Summary
 
-This is an identity plane protocol to exchange identity information between two interoperating blockchain networks. This establishes a trust basis for proof-based data sharing. For background and component information, start [here](../../models/identity/network-identity-management.md).
+This is set of identity plane protocols to enable two interoperating blockchain networks, i.e., two independent security domains, to discover, offer, and validate each other's identities and memberships. This establishes a trust basis for proof-based [data sharing](../data-sharing/generic.md) and [asset transfer](../asset-transfer/generic.md) data plane protocols. For background information and an overview of the architectural assumptions, start with the [identity management specs](../../models/identity/network-identity-management.md).
 
-The entire Network Identity Discovery and Management protocol involves the following protocols for different steps:
+We can list the protocols that comprise an end-to-end process from network creation to setting the basis for data plane interoperation in sequence as follows:
 
-1. Particpant Unit Identity Creation
-2. Network Identity Creation as Network DID
-3. Netwrok Discovery
-4. Network Identity Validation
-5. Data Plane Identity Configuration
-6. Updating Network DID with changing Network Structure
+1. Organizational Unit Identity Creation
+2. Creation of a Security Domain DID for a Network
+3. Security Domain Discovery
+4. Security Domain Identity Validation
+5. Security Domain Membership Syncing
+6. Syncing Identity and Membership upon Network Structure Change
 
 ## Roles
 
 There are different units in the identity plane with different roles as follows:
 
-**participant** - A blockchain network's participant unit such as an organization or individual.
+**member** - An organizationa unit that is also a blockchain/DLT network's member.
 
-**network** - A blockchain network that is formed of participants.
+**security domain** - A blockchain/DLT network or subgroup of a blockchain/DLT network that is self-sovereign for identity issuance and governance purposes.
 
-**IIN** - The Interoperation Identity Network consisting of the `IIN registry`, `IIN nodes`, and `trust anchors`.
+**IIN** - The Interoperation Identity Network consisting of an `IIN registry`, `IIN nodes`, and `trust anchors`. See the [IIN spec](../../models/identity/iin.md) for more details.
+
+**IIN registry** - Verifiable data registry maintaining DID records.
+
+**IIN nodes** - IIN nodes that maintain a shared DLT-based registry and act as validators/miners of transactions.
+
+**trust anchor** - A well-known entity (individual/organization) that issues VCs to assert claims about an organizational unit or security domain. These claims include, but are not limited to, identity and network membership. Different networks/domains and the organization units that constitute their memberships may trust different trust anchors.
+
+**IIN Agents** - Each security domain member controls at least one IIN Agent, which interfaces with at least one IIN and one trust anchor and with other members' (local or foreign) IIN Agents.
 
 
-**IIN registry** - DID registry and verifiable data registry provided by the IIN.
+## Network Member (Organizational Unit) Identity Creation
 
-**IIN nodes** - Nodes that maintain the IIN DLT based registry acting as validators/miners of transactions.
-
-**trust anchor** - An entity (individual/organization) that issues VCs to assert claims about identity or membership or others to participant as well as networks. Different networks and participants can trust different trust anchors.
-
-**IIN Agents** - Each `participant` has one or more IIN Agent, which is the identity plane component of the participant that interacts with the IIN and other participant's IIN Agents.
-
-## Particpant Unit Identity Creation
-
-Each network participant unit such as individuals or organizations participating in any blockchain network must have their DID registered in some IIN. To create a DID in an IIN registry, the following steps are performed.
-
+The organizational unit corresponding to each network member must have its DID record registered in some IIN. The following steps must be performed to create a DID record in an IIN registry.
 
 <img src="../../resources/images/participant_identity_configuration.jpg">
 
+**Step 1. member chooses a unique DID**
 
-**Step 1. participant chooses a unique DID**
-
-The DID is a globally unique [identifier](https://w3c.github.io/did-core/#identifier) (`did:<method-name>:<method-specific-id>`) which is constructed using a   `method-name` and a `method-specific-id` that is unique wthin the method. Each IIN registry will have its unique `method-name` and specify how to generate the `method-specific-id` component of a DID.
-
+The DID is a globally unique [identifier](https://w3c.github.io/did-core/#identifier) (`did:<method-name>:<method-specific-id>`) which is constructed using a `method-name` and a `method-specific-id` that is unique wthin the method. Each IIN registry will have its unique `method-name` and specify how to generate the `method-specific-id` component of a DID.
 
 Example:
 
-If `method-name` of an IIN registry is `exampleiin`, and the participant chooses a `method-specific-id` as `org1`, then `org1` must be unique within `exampleiin`, and `did:exampleiin:org1` must be unique globally.
+If `method-name` of an IIN registry is `exampleiin`, and the organizational unit chooses a `method-specific-id` as `org1`, then `org1` must be unique within `exampleiin`, and `did:exampleiin:org1` must be unique globally.
 
-> Note: An IIN registry may enforce participant DIDs to have a fixed prefix in the `method-specific-id` to determine that it is a participant DID and not a network DID. Eg: if the fixed prefix is `participant:`, then a valid participant did will be `did:exampleiin:participant:org1`. Similarly a network DID can be `did:exampleiin:network:tradelens`. 
+> Note: An IIN registry may mandate organizational unit DIDs to have a fixed prefix in the `method-specific-id` to signal that it is a network member's DID and not a network's (or security domain's) DID. Eg: if the fixed prefix is `member:`, then a valid participant did will be `did:exampleiin:member:org1`. Similarly a security domain DID can be `did:exampleiin:security-domain:tradelens`. 
 
-**Step 2. participant creates a DID Document**
+**Step 2. member creates a DID Document**
 
-The participant DID Document must specify one verification method with [authentication](https://w3c.github.io/did-core/#authentication) verification relationship. An example of participant DID document:
+The member DID Document must specify one verification method (`verificationMethod`) with its [authentication](https://w3c.github.io/did-core/#authentication) [verification relationship](https://w3c.github.io/did-core/#dfn-verification-relationship). An example of such a member DID document is as follows:
 
 ```json
 {
@@ -81,9 +78,9 @@ The participant DID Document must specify one verification method with [authenti
 }
 ```
 
-**Step 3. participant send a DID registration request to the IIN (IIN registry).**
+**Step 3. member send a DID registration request to the IIN (IIN registry)**
 
-The DID registration (create method) request must contain the DID document, as well as a signature that can be verified against the `authentication` verification method specified in the DID document. This request is sent by the `IIN Agent` of the participant. The underlying protocol dictating how the DID registration request will be sent to the IIN depends on the create method of the IIN registry.
+The DID registration (`create` method) request must contain the DID document as well as a signature that can be verified against the verification method associated with the `authentication` field specified in the DID document. This request is sent by the member's IIN Agent using the appropriate DID registration protocol (i.e., `create` method) for the IIN registry.
 
 Example DID registration request:
 ```json
@@ -102,67 +99,68 @@ Example DID registration request:
   "signature": "..."
 }
 ```
-Here signature is done on the DIDDocument.
+Here, the `signature` is generated over the `DIDDocument`.
 
 **Step 4. IIN validates a DID registration request and creates the DID**
 
-A DID registration request, that is the DID create method of the IIN registry, must authenticate the request. This authentication is to be done by validating the signature in the request with the help of the authentication method present in the DID Document of the request.
+When an IIN registry receives a DID registration request, i.e., the DID `create` method, it must first authenticate the request by validating the `signature` in the request with reference to the authentication method present in the DID Document of the request.
 
-**Step 5. Trust anchors issue identity VC to participant DID.**
+**Step 5. Trust anchors issue identity VC to member DID**
 
-A DID and a DID document do not inherently carry any personal data such as physical identity / real world identity ([binding did to physical identity](https://w3c.github.io/did-core/#binding-to-physical-identity)). Therefore, to map a participant's did to its physical identity, some trust anchor must issue VCs attesting the real world physical identity of the participant , to the participant's DID. The participant itself becomes the holder of those identity VCs and can present it to others to prove its physical identity.
+A DID document does not contain any personal information about its holderi, like physical identity or real world identity (see [binding DID to physical identity](https://w3c.github.io/did-core/#binding-to-physical-identity) for reference). Therefore, to map a participant's DID to its physical identity, some trust anchor must issue VCs attesting real world identities of the member to its DID. The member can hold these VCs in a wallet and present them to others to prove various identities or affiliations as required in particular scenarios.
 
-> Step 5 has flexibility in terms of how many trust anchors and which trust anchors issue identity VC to a particular participant. These identity VCs might be used for validating network identity by other network participants.  See *Network Identity Validation* step.
+> Any nummber of trust anchors may issue identity VCs to a member in Step 5. These identity VCs may be used for validating its security domain's identity by other members of that domain.  See the *Security Domain Identity Validation* section for more details.
 
 
-## Network Identity Creation as Network DID
+## Security Domain Identity Creation as Security Domain DID
 
 <img src="../../resources/images/network_did_creation.jpg">
 
-A network formed of participants creates its own Network DID in an IIN registry. The Network DID is controlled jointly by its participants ([group controller](https://w3c.github.io/did-core/#group-control)). This Network DID can be used as an address to the network, to discover and configure its identity during interoperation. 
+A security domain creates its own DID record in an IIN registry. The Security Domain DID is controlled jointly by its members according to the [group controller specification](https://w3c.github.io/did-core/#group-control). This DID can then be used as a way of addressing the network/domain, to discover and configure its identity and membership for interoperation. 
 
-Creation of a Network DID involves the following steps:
+Creation of a Security Domain DID involves the following steps:
 
-**Step 1. Creating Network DID Document**
+**Step 1. Creating Securtiy Domain DID Document**
 
-In addition to the usual fields of a DID Document, a Network DID document must contain a `verificationMethod` of type `BlockchainNetworkMultiSig`, and `networkParticipants` property listing the DIDs of the participants. 
-The `BlockchainNetworkMultiSig` verificationMethod defines the group controller of the Network DID.
+In addition to the typical fields found in a DID Document, a Security Domain DID document must contain a `verificationMethod` of type `BlockchainNetworkMultiSig`, and `networkMembers` property listing the DIDs of the network's members. This method defines the group controller of the Security Domain DID.
 
-Each participant in `networkParticipants` must already have a registered DID in some IIN registry.
+Each member in `networkMembers` must already have a registered DID in some IIN registry.
 
-The DID, that is the `id` property in the Network DID document can be chosen by the network.
+The unique identity in the DID document, i.e., the `id` property, can be chosen by the network.
 
-See  [Network DID Identity format](../../formats/identity.md) for details about Network DID format.
-
+See the [Security Domain DID Identity format specs](../../formats/identity.md) for more details.
 
 
-**Step 2. Preparing Network DID creation request**
 
-Creating a Network DID is only possible by the DID's controller. Therefore to create a Network DID for the first time, the request has to be authenticated by verifying attestations of all participants of the network. This is done while forming the Network DID creation request.
+**Step 2. Preparing Security Domain DID creation request**
 
-A Network DID creation request has a `NetworkDIDDocument` and `signatures`. `NetworkDIDDocument` contains the Network DID Document with the `networkParticipants` and a `BlockchainNetworkMultiSig` verificationMethod. The `signatures` is a set of signatures from all participants.
+A Security Group DID can only be created by its group controller. Therefore, to create such a DID for the first time, the `create` request must be authenticated by verifying attestations of all members of the network, which are included in the DID creation request.
 
-> Note: During NetworkDID creation, the `updatePolicy` of the `BlockchainNetworkMultiSig` verificationMethod is not used. Instead. the request has to be authenticated against all the participants in `networkParticipants` list.
+The Security Domain DID creation request must have the following fields:
+* `SecurityDomainDIDDocument`: the security domain's DID Document with a `networkMembers` field and a `verificationMethod` of type `BlockchainNetworkMultiSig`.
+* `signatures`: a set of signatures from all network members.
 
-Example NetworkDID creation request:
+> Note: During the DID creation, the `updatePolicy` field in the `verificationMethod` is not used. Instead. the request must be authorized by all the members listed in the `networkMembers` field using their signatures.
+
+Example Security Domain DID creation request:
 
 ```json
 {
-  "NetworkDIDDocument": {
+  "SecurityDomainDIDDocument": {
     "id": "did:<iin_name>:<network_name>",
-    "networkParticipants": [
-      "did:<iin_name>:<network_participant_1>",
-      "did:<iin_name>:<network_participant_2>",
-      "did:<iin_name>:<network_participant_3>"
+    "networkMembers": [
+      "did:<iin_name>:<network_member_1>",
+      "did:<iin_name>:<network_member_2>",
+      "did:<iin_name>:<network_member_3>"
     ],
     "verificationMethod": [{
         "id": "did:<iin_name>:<network_name>#multisig",
         "type": "BlockchainNetworkMultiSig",
         "controller": "did:<iin_name>:<network_name>",
         "multisigKeys": [
-          "did:<iin_name>:<network_participant_1>#key1",
-          "did:<iin_name>:<network_participant_2>#key3",
-          "did:<iin_name>:<network_participant_3>#key1"
+          "did:<iin_name>:<network_member_1>#key1",
+          "did:<iin_name>:<network_member_2>#key3",
+          "did:<iin_name>:<network_member_3>#key1"
         ],
         "updatePolicy": {
           "id": "did:<iin_name>:<network_name>#updatepolicy",
@@ -172,11 +170,11 @@ Example NetworkDID creation request:
               "id": "did:<iin_name>:<network_name>#updatepolicy-1",
               "controller": "did:<iin_name>:<network_name>",
               "type": "VerifiableCondition2021",
-              "conditionOr": ["did:<iin_name>:<network_participant_3>#key1",
-                "did:<iin_name>:<network_participant_2>#key3"
+              "conditionOr": ["did:<iin_name>:<network_member_3>#key1",
+                "did:<iin_name>:<network_member_2>#key3"
               ]
             },
-            "did:<iin_name>:<network_participant_1>#key1"
+            "did:<iin_name>:<network_member_1>#key1"
           ]
         }
       },
@@ -186,9 +184,9 @@ Example NetworkDID creation request:
         "type": "DataplaneCredentials",
         "controller": "did:<iin_name>:<network_name>",
         "FabricCredentials": {
-          "did:<iin_name>:<network_participant_1>": "Certificate3_Hash",
-          "did:<iin_name>:<network_participant_2>": "Certificate2_Hash",
-          "did:<iin_name>:<network_participant_3>": "Certificate3_Hash"
+          "did:<iin_name>:<network_member_1>": "Certificate3_Hash",
+          "did:<iin_name>:<network_member_2>": "Certificate2_Hash",
+          "did:<iin_name>:<network_member_3>": "Certificate3_Hash"
         }
       }
     ],
@@ -207,42 +205,43 @@ Example NetworkDID creation request:
     ]
   },
   "signatures": {
-    "did:<iin_name>:<network_participant_1>": "...",
-    "did:<iin_name>:<network_participant_2>": "...",
-    "did:<iin_name>:<network_participant_3>": "..."
+    "did:<iin_name>:<network_member_1>": "...",
+    "did:<iin_name>:<network_member_2>": "...",
+    "did:<iin_name>:<network_member_3>": "..."
   }
 }
 
 ```
 
-How this request is created is out of the scopt of this specification. However, generally it is recommended that the signatures of the request are collected through a smart contract in the network blockchain itself.
-
-**Step 3. Network sends the Network DID creation request to IIN**
-
-The Network DID creation request containing signatures from all the participants can then be sent to an IIN. This can be done by any entity's IIN agent, for example by the IIN agent of a participant of the network. How the participant is selected can vary from implementation to implementation.
+A protocol among network members to collectively create uch a request is out of scope for this specification. However, we recommended that request be collecteded using a multisig smart contract deployed in the IIN, where the smart contract state machine waits for a set of signatures before automatically composing and recording the DID document for a security domain.
 
 
-**Step 4. IIN validates a Network DID creation request**
+**Step 3. Security Domain sends the Security Domain DID creation request to IIN**
 
-The DID create method of the IIN registry must authenticate the a Network DID creation request differently from other DIDs. For a Network DID, the IIN first validates if the DID Document has the requisite properties: `networkParticipants`, and a verificationMethod of type `BlockchainNetworkMultiSig`. Additionally, the request must contain the signatures from all participants of the network authenticating it.
+The Security Domain DID creation request containing signatures from all the participants can be sent to an IIN by the IIN agent of any of the network members. The member selection criteria can vary across implementations. Multiple IIN agents may submit identical creation requests without causing any harm as these requests will be idempotent.
 
-The authentication process is carried out by validating signature from each participant in the `networkParticipants` as follows:
 
-1. The participant DID is obtained from `networkParticipants`.
-   - Example: `did:<iin_name>:<network_participant_1>`
-2. From the `BlockchainNetworkMultiSig` verification, which verification method for the participant will be used is determined.
-   - Example: `did:<iin_name>:<network_participant_1>#key1` indicates that key1 will be used which is specified by the fragment at the end of the URI.
-3. The DID Document of the participant is obtained by resolving the DID, and the required verification method is obtained.
+**Step 4. IIN validates a Security Domain DID creation request**
+
+An IIN registry must authenticate a Security Domain DID creation request differently from creation requests for other DID types. First, the IIN checks that the DID Document has the requisite properties: `networkMembers`, and a `verificationMethod` of type `BlockchainNetworkMultiSig`. Additionally, the request must contain the signatures from all members of the network as listed in the request structure.
+
+The authentication process is carried out by validating signature from each member listed in `networkMembers` as follows:
+
+1. The member's organizational unit DID is obtained from `networkMembers`.
+   - Example: `did:<iin_name>:<network_member_1>`
+2. The appropriate verification method for this member is looked up from the `BlockchainNetworkMultiSig` specification.
+   - Example: `did:<iin_name>:<network_member_1>#key1` indicates that key1 will be used which is specified by the fragment at the end of the URI.
+3. The DID Document of the member is obtained by resolving the DID, and its verification method is looked up.
    - Example:
    ```json
     {​
-      "id": "did:<iin_name>:<network_participant_1>",​
+      "id": "did:<iin_name>:<network_member_1>",​
       ...​
       "verificationMethod": [
         {
-          "id": "did:<iin_name>:<network_participant_1>#key1",
+          "id": "did:<iin_name>:<network_member_1>#key1",
           "type": "Bls12381G2Key2020",
-          "controller": "did:<iin_name>:<network_participant_1>",
+          "controller": "did:<iin_name>:<network_member_1>",
           "publicKeyBase58": "25ETdUZDVnME6yYuAMjFRCnCPcDmYQcoZDcZuXAfeMhXPvjZg35QmZ7uctBcovA69YDM3Jf7s5BHo4u1y89nY6mHiji8yphZ4AMm4iNCRh35edSg76Dkasu3MY2VS9LnuaVQ",
 
         }]
@@ -251,12 +250,12 @@ The authentication process is carried out by validating signature from each part
     }​
    ```
 
-4. From `singatures` in Network DID creation request, the participant is validated with the help of the verificationMethod obtained in the previous step.
+4. From the `signatures` field of the Security Domain DID creation request, the member's authenticity is verified using the `verificationMethod` obtained in the previous step.
 
 
-Once each participant's signature is validated, the Network DID is registered in the IIN registry.
+Once each member's signature is validated, the Security Domain DID is recorded in the IIN registry.
 
-Since the IIN registry is a decentralized registry, the validation of a Network DID creation request is carried out by multiple peers so that consensus is reached, and the DID is committed in the registry.
+Since the IIN registry is typically built on a decentralized ledger, the Security Domain DID creation request validation occurs through a consensus protocol among the IIN nodes before the DID record is committed in the registry.
 
 
 
@@ -274,42 +273,41 @@ See the [network discovery protocol specifications](../discovery/discovery.md) f
 After a network has been discovered, and its Security Domain DID document has been fetched, the authenticity of that DID must be verified. See the [Security Domain Identity Validation protocol](./network-identity-validation.md) for details of how the network's identity is validated.
 
 
-## Data Plane Identity Configuration
+## Security Domain Membership Fetching and Recording
 
-After a foreign network's (or security domain's) identity is validated, its membership information must be configured in the network's ledger for interoperation protocols to work in the data plane. A single organizational unit (or network member) cannot unilaterally update this membership information; instead, members must agree on that information before it is deemed acceptable for recording on the ledger. See the [Membership Syncing protocol specifications](./data-plane-identity-configuration.md) for details on how this is achieved by the IIN Agents representing the members self-orchestrating a flow to collect attestations.
-
-## Updating Network DID with changing Network Structure
-
-Permissioned blockchain networks might change with time with existing participants leaving and new participants joining the network. As a result, the Network DID also needs to be updated with the new list of participants forming the group controller. Updating the Network DID involves the following steps:
+After a foreign network's (or security domain's) identity is validated, its membership information must be configured in the network's ledger for interoperation protocols to work in the data plane. A single organizational unit (or network member) cannot unilaterally update this membership information; instead, members must agree on that information before it is deemed acceptable for recording on the ledger. See the [Membership Syncing protocol specifications](./membership-syncing.md) for details on how this is achieved by the IIN Agents representing the members self-orchestrating a flow to collect attestations.
 
 
-**Step 1. Creating updated Network DID Document**
+## Updating Security Domain DID upon a Change in Security Domain Identity or Structure
 
-While updating a Network DID for changing network structure, primarily two properties need to be updated: `BlockchainNetworkMultiSig` verification method, and `networkParticipants`.
+Permissioned blockchain networks might morph over time, with existing members leaving and new organizational units joining. The Security Domain DID must be updated whenever the members' list comprising the group controller changes. This is done through the following steps:
 
-The `networkParticipants` is updated with the new list of DIDs of  the network participants.
+**Step 1. Creating updated Security Domain DID Document**
 
-`BlockchainNetworkMultiSig` verification method is updated with the changed updation policy.
+The `BlockchainNetworkMultiSig` verification method, and `networkMembers` list must be updated to reflect the new network membership.
+* `networkMembers` is updated with the list of DIDs of the new network members.
+* A new update policy is associated with the `BlockchainNetworkMultiSig` verification method.
 
-**Step 2. Network DID updation request**
+**Step 2. Security Domain DID updation request**
 
-Updating a Network DID requires the request to be authenticated against the `BlockchainNetworkMultiSig` verification method's `updatePolicy`.
+A Security Domain DID update request must be validated against the `updatePolicy` associated with the current DID document's `BlockchainNetworkMultiSig` verification method.
 
-Similar to the Network DID creation request, the updation request has a NetworkDIDDocument and signatures. NetworkDIDDocument contains the updated Network DID document and signatures is a set of signatures satisfying the  `updatePolicy` in the `BlockchainNetworkMultiSig` verification method of the existing DID document, as well as the `networkParticipants`.
+Similar to the creation request, the update request has the following fields:
+* `SecurityDomainDIDDocument`: updated security domain's DID Document with a `networkMembers` field and a `verificationMethod` of type `BlockchainNetworkMultiSig`.
+* `signatures`: a set of signatures satisfying the `updatePolicy` in the `BlockchainNetworkMultiSig` verification method of the existing DID document.
 
-The updation request can be made by IIN agent of any participant of the network.
+The update request can be made by the IIN agent of any existing (i.e., before the change) member of the network.
 
-**Step 3. IIN validates a Network DID updation request**
+**Step 3. IIN validates a Security Domain DID updation request**
 
-The IIN registry authenticates a Network DID updation request based on two conditions:
-(1) The signatures must  satisfy the `updatePolicy` in the `BlockchainNetworkMultiSig` verification method of the existing Network DID document.
+The IIN registry authenticates a Security Domain DID update request the same way it validates a creation request except for one change: the signature set must be validated against the existing `updatePolicy` rather than against tne entire list of `networkMembers.
 
 
-## Data Plane credentials update with changes in identity plane
+## Syncing Security Domain Membership Changes
 
-The security domain validation and membership syncing protocols must be re-run every time there is a change in a security domain's identity (DID document) or in its membership configuration. The flow diagram below illustrates the complete process from the time a change occurs in one network up to the point where its updated identity and membership info is reflected in another network's ledger as a prerequisite for data plane interoperation. Each step in this diagram represents a separate protocol: (1) is described in this document above, (2) is described in the [security domain identity validation specification](./network-identity-validation.md), and (3) in the [membership syncing specification](./data-plane-identity-configuration.md).
+The security domain validation and membership syncing protocols must be re-run every time there is a change in a security domain's identity (DID document) or in its membership configuration. The flow diagram below illustrates the complete process from the time a change occurs in one network up to the point where its updated identity and membership info is reflected in another network's ledger as a prerequisite for data plane interoperation. Each step in this diagram represents a separate protocol: (1) is described in this document above, (2) is described in the [security domain identity validation specification](./network-identity-validation.md), and (3) in the [membership syncing specification](./membership-syncing.md).
 
-<img src="../../resources/images/protocol-identity-overview.jpg" width=100%>
+<img src="../../resources/images/protocol-identity-overview.jpg" width=70%>
 
 The trigger for Step 2 can be any of the following:
 * Manual trigger applied by a network administrator
