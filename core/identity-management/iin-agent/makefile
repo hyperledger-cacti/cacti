@@ -30,8 +30,11 @@ build-local: protos-js weaver-fabric-interop-sdk
 	mv package-remote.json package.json # Only if success
 	npm run build
 	
+test-local: build-local
+	npm run test
+
 clean:
 	rm -rf node_modules package-lock.json out
 	
 clean-local:
-	rm -rf node_modules package-lock.json out protos-js
+	rm -rf node_modules package-lock.json out protos-js weaver-fabric-interop-sdk

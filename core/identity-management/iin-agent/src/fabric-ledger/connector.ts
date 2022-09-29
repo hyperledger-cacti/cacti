@@ -12,7 +12,7 @@ import iin_agent_pb from '@hyperledger-labs/weaver-protos-js/identity/agent_pb';
 import { InteroperableHelper } from '@hyperledger-labs/weaver-fabric-interop-sdk'
 
 import { LedgerBase } from '../common/ledgerBase';
-import { handlePromise } from '../common/utils';
+import { handlePromise, signMessage } from '../common/utils';
 import { walletSetup, getWallet } from './walletUtils';
 import { getAllMSPConfigurations, invokeFabricChaincode, queryFabricChaincode } from './networkUtils';
 
@@ -51,7 +51,7 @@ export class FabricConnector extends LedgerBase {
         const membership = await getAllMSPConfigurations(this.walletPath, this.connectionProfilePath, this.configFilePath, this.ledgerId);
         membership.setSecuritydomain(securityDomain)
         const membershipSerializedBase64 = Buffer.from(membership.serializeBinary()).toString('base64');
-        const certAndSign = await this.signMessage(membershipSerializedBase64 + nonce)
+        const certAndSign = await this.agentSignMessage(membershipSerializedBase64 + nonce)
         
         const unitId = new iin_agent_pb.SecurityDomainMemberIdentity()
         unitId.setSecurityDomain(securityDomain)
@@ -61,9 +61,11 @@ export class FabricConnector extends LedgerBase {
         attestation.setUnitIdentity(unitId)
         attestation.setCertificate(certAndSign.certificate)
         attestation.setSignature(certAndSign.signature)
+        attestation.setNonce(nonce)
+        attestation.setTimestamp(Date.now())
         
         const attestedMembership = new iin_agent_pb.AttestedMembership()
-        attestedMembership.setMembership(membership)
+        attestedMembership.setMembership(membershipSerializedBase64)
         attestedMembership.setAttestation(attestation)
         return attestedMembership;
     }
@@ -71,7 +73,7 @@ export class FabricConnector extends LedgerBase {
     // Collect security domain membership info
     async counterAttestMembership(attestedMembershipSet: iin_agent_pb.CounterAttestedMembership.AttestedMembershipSet, securityDomain: string, nonce: string): Promise<iin_agent_pb.CounterAttestedMembership> {
         const attestedMembershipSetSerialized64 = Buffer.from(attestedMembershipSet.serializeBinary()).toString('base64')
-        const certAndSign = await this.signMessage(attestedMembershipSetSerialized64 + nonce)
+        const certAndSign = await this.agentSignMessage(attestedMembershipSetSerialized64 + nonce)
         
         const unitId = new iin_agent_pb.SecurityDomainMemberIdentity()
         unitId.setSecurityDomain(securityDomain)
@@ -81,6 +83,8 @@ export class FabricConnector extends LedgerBase {
         attestation.setUnitIdentity(unitId)
         attestation.setCertificate(certAndSign.certificate)
         attestation.setSignature(certAndSign.signature)
+        attestation.setNonce(nonce)
+        attestation.setTimestamp(Date.now())
         
         const counterAttestedMembership = new iin_agent_pb.CounterAttestedMembership()
         counterAttestedMembership.setAttestedMembershipSet(attestedMembershipSetSerialized64)
@@ -91,7 +95,7 @@ export class FabricConnector extends LedgerBase {
     // record Membership
     async recordMembershipInLedger(counterAttestedMembership: iin_agent_pb.CounterAttestedMembership): Promise<any> {
         const counterAttestedMembershipSerialized64 = Buffer.from(counterAttestedMembership.serializeBinary()).toString('base64')
-        return await invokeFabricChaincode(this.walletPath, this.connectionProfilePath, this.configFilePath, this.ledgerId, this.contractId, "CreateMembership", counterAttestedMembershipSerialized64);
+        return await invokeFabricChaincode(this.walletPath, this.connectionProfilePath, this.configFilePath, this.ledgerId, this.contractId, "CreateMembership", [counterAttestedMembershipSerialized64]);
     }
 
     // Invoke a contract to drive a transaction
@@ -105,14 +109,14 @@ export class FabricConnector extends LedgerBase {
         return await queryFabricChaincode(this.walletPath, this.connectionProfilePath, this.configFilePath, this.ledgerId, this.contractId, "", []);
     }
     
-    private async signMessage(message): Promise<{ certificate: string, signature: string }> {
+    private async agentSignMessage(message): Promise<{ certificate: string, signature: string }> {
         const wallet = await getWallet(this.walletPath);
         type KeyCert = { key: any, cert: any }
         const keyCert = await InteroperableHelper.getKeyAndCertForRemoteRequestbyUserName(wallet, this.iinAgentUserName)
-        const signature = InteroperableHelper.signMessage(
+        const signature = signMessage(
             message,
             keyCert.key.toBytes()
-        ).toString("base64")
+        )
         return { certificate: keyCert.cert, signature: signature};
     }
 }
