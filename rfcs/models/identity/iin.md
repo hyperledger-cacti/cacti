@@ -50,7 +50,7 @@ A DID Document is not inherently mapped to any entity's physical identity [did-c
 
 The IIN must support two kinds of claims to be issued by trust anchors to the DIDs:
 
-1. Identity VCs - for associating real world identity to individuals/organizations which are members of networks -  *Organizational Unit Identity VC*, or to a network as a whole - *security Domain Identity VC*. (See [Network Identity Validation protocol](../../protocols/identity/network-identity-validation.md) for details.)
+1. Identity VCs - for associating real world identity to individuals/organizations which are members of networks -  *Organizational Unit Identity VC*, or to a network as a whole - *security Domain Identity VC*. (See [Network Identity Validation protocol](../../protocols/identity/security-domain-identity-validation.md) for details.)
 
 2. Membership VCs - to assert the membership of an individual/organization in a blockchain network.
 
