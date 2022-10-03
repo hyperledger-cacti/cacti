@@ -135,8 +135,11 @@ export function verifySignature(message, certificate, signature) {
     return crypto.verify("SHA256", messageBuffer, publicKey, signBuffer);
 };
 
-export function deserializeMembership64(membershipSerialized64: string): membership_pb.Membership {
-    return membership_pb.Membership.deserializeBinary(Uint8Array.from(Buffer.from(membershipSerialized64, 'base64')))
+export function deserializeMembership64(dataSerialized64: string): membership_pb.Membership {
+    return membership_pb.Membership.deserializeBinary(Uint8Array.from(Buffer.from(dataSerialized64, 'base64')))
+}
+export function deserializeAttestedMembershipSet64(dataSerialized64: string): agent_pb.CounterAttestedMembership.AttestedMembershipSet {
+    return membership_pb.Membership.deserializeBinary(Uint8Array.from(Buffer.from(dataSerialized64, 'base64')))
 }
 
 export function validateAttestedMembership(membershipSerialized64: string, nonce: string, attestation: agent_pb.Attestation) {
@@ -217,4 +220,34 @@ function isCertificateWithinExpiry(x509Cert: typeof X509Certificate) {
     const validTo = new Date(x509Cert.validTo).valueOf()
     const currTime = Date.now()
     return (currTime <= validTo && currTime >= validFrom)
+}
+export function generateErrorAttestation(errorMsg, securityDomain, memberId, nonce) {
+    const unitId = new iin_agent_pb.SecurityDomainMemberIdentity()
+    unitId.setSecurityDomain(securityDomain)
+    unitId.setMemberId(memberId)
+    
+    const attestation = new iin_agent_pb.Attestation()
+    attestation.setUnitIdentity(unitId)
+    attestation.setNonce(nonce)
+    attestation.setTimestamp(Date.now())
+    
+    const errorAttestedMembership = new iin_agent_pb.AttestedMembership()
+    errorAttestedMembership.setError(errorMsg)
+    errorAttestedMembership.setAttestation(attestation)
+    return errorAttestedMembership;
+}
+export function generateErrorCounterAttestation(errorMsg, securityDomain, memberId, nonce) {
+    const unitId = new iin_agent_pb.SecurityDomainMemberIdentity()
+    unitId.setSecurityDomain(securityDomain)
+    unitId.setMemberId(memberId)
+    
+    const attestation = new iin_agent_pb.Attestation()
+    attestation.setUnitIdentity(unitId)
+    attestation.setNonce(nonce)
+    attestation.setTimestamp(Date.now())
+    
+    const errorCounterAttestedMembership = new iin_agent_pb.CounterAttestedMembership()
+    errorCounterAttestedMembership.setError(errorMsg)
+    errorCounterAttestedMembership.setAttestationsList([attestation])
+    return errorCounterAttestedMembership;
 }
