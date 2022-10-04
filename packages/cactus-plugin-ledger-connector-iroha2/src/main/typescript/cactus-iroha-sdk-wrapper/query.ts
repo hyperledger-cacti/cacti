@@ -3,7 +3,7 @@
  * Intended to be used through `CactusIrohaV2Client` interface but can be instantiated separately if needed.
  */
 
-import { Client, ToriiQueryResult } from "@iroha2/client";
+import { Client, Torii, Signer, ToriiQueryResult } from "@iroha2/client";
 import {
   DomainId,
   Expression,
@@ -47,10 +47,27 @@ import {
  * @todo Implement pagination once it's supported by the upstream iroha-javascript SDK.
  */
 export class CactusIrohaV2QueryClient {
+  /**
+   * Iroha lightweight client used to send queries to the ledger.
+   */
+  private irohaClient: Client;
+
   constructor(
-    private readonly irohaClient: Client,
+    irohaToriiClient: Torii,
+    irohaSigner: Signer,
     private readonly log: Logger,
   ) {
+    Checks.truthy(
+      irohaToriiClient,
+      "CactusIrohaV2QueryClient irohaToriiClient",
+    );
+    Checks.truthy(irohaSigner, "CactusIrohaV2QueryClient irohaSigner");
+
+    this.irohaClient = new Client({
+      torii: irohaToriiClient,
+      signer: irohaSigner,
+    });
+
     this.log.debug("CactusIrohaV2QueryClient created.");
   }
 

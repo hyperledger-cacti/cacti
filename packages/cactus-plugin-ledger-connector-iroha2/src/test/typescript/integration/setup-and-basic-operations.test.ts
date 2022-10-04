@@ -114,9 +114,11 @@ describe("Setup and basic endpoint tests", () => {
 
     // Create new domain
     const transactionResponse = await env.apiClient.transactV1({
-      instruction: {
-        name: IrohaInstruction.RegisterDomain,
-        params: [domainName],
+      transaction: {
+        instruction: {
+          name: IrohaInstruction.RegisterDomain,
+          params: [domainName],
+        },
       },
       baseConfig: env.defaultBaseConfig,
     });
@@ -146,9 +148,11 @@ describe("Setup and basic endpoint tests", () => {
 
     // Create new domain
     const transactionResponse = await env.apiClient.transactV1({
-      instruction: {
-        name: IrohaInstruction.RegisterDomain,
-        params: [domainName],
+      transaction: {
+        instruction: {
+          name: IrohaInstruction.RegisterDomain,
+          params: [domainName],
+        },
       },
       baseConfig: {
         ...env.defaultBaseConfig,
@@ -181,9 +185,11 @@ describe("Setup and basic endpoint tests", () => {
 
     // Create new domain
     const transactionResponse = await env.apiClient.transactV1({
-      instruction: {
-        name: IrohaInstruction.RegisterDomain,
-        params: [domainName],
+      transaction: {
+        instruction: {
+          name: IrohaInstruction.RegisterDomain,
+          params: [domainName],
+        },
       },
       baseConfig: {
         ...env.defaultBaseConfig,
@@ -216,16 +222,18 @@ describe("Setup and basic endpoint tests", () => {
     const firstDomainName = addRandomSuffix("multiTxFirstDomain");
     const secondDomainName = addRandomSuffix("multiTxSecondDomain");
     const transactionResponse = await env.apiClient.transactV1({
-      instruction: [
-        {
-          name: IrohaInstruction.RegisterDomain,
-          params: [firstDomainName],
-        },
-        {
-          name: IrohaInstruction.RegisterDomain,
-          params: [secondDomainName],
-        },
-      ],
+      transaction: {
+        instruction: [
+          {
+            name: IrohaInstruction.RegisterDomain,
+            params: [firstDomainName],
+          },
+          {
+            name: IrohaInstruction.RegisterDomain,
+            params: [secondDomainName],
+          },
+        ],
+      },
       baseConfig: env.defaultBaseConfig,
     });
     expect(transactionResponse).toBeTruthy();
@@ -256,9 +264,11 @@ describe("Setup and basic endpoint tests", () => {
     // Send invalid command
     return expect(
       env.apiClient.transactV1({
-        instruction: {
-          name: "foo" as IrohaInstruction,
-          params: [],
+        transaction: {
+          instruction: {
+            name: "foo" as IrohaInstruction,
+            params: [],
+          },
         },
         baseConfig: env.defaultBaseConfig,
       }),
@@ -271,9 +281,11 @@ describe("Setup and basic endpoint tests", () => {
     // Use config without account and keypair (only torii)
     await expect(
       env.apiClient?.transactV1({
-        instruction: {
-          name: IrohaInstruction.RegisterDomain,
-          params: [domainName],
+        transaction: {
+          instruction: {
+            name: IrohaInstruction.RegisterDomain,
+            params: [domainName],
+          },
         },
         baseConfig: {
           torii: env.defaultBaseConfig.torii,
@@ -284,9 +296,11 @@ describe("Setup and basic endpoint tests", () => {
     // Use config without keypair
     await expect(
       env.apiClient.transactV1({
-        instruction: {
-          name: IrohaInstruction.RegisterDomain,
-          params: [domainName],
+        transaction: {
+          instruction: {
+            name: IrohaInstruction.RegisterDomain,
+            params: [domainName],
+          },
         },
         baseConfig: {
           torii: env.defaultBaseConfig.torii,
