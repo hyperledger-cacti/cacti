@@ -1,8 +1,8 @@
-ARG BESU_VERSION=1.5.1
-ARG ORION_VERSION=1.6
+ARG BESU_VERSION=22.7.4
+ARG TESSERA_VERSION=22.1.7
 
 FROM hyperledger/besu:$BESU_VERSION AS besu
-FROM pegasyseng/orion:1.5.1 AS orion
+FROM quorumengineering/tessera:$TESSERA_VERSION AS tessera
 
 COPY --from=besu /opt/besu/ /opt/besu/
 
