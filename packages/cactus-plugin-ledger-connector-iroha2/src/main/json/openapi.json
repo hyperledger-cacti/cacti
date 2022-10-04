@@ -337,9 +337,31 @@
           }
         }
       },
-      "TransactRequestV1": {
+      "IrohaTransactionParametersV1": {
         "type": "object",
-        "description": "Request to transact endpoint, can be passed one or multiple instructions to be executed.",
+        "description": "Iroha V2 transaction payload parameters",
+        "additionalProperties": true,
+        "properties": {
+          "ttl": {
+            "type": "string",
+            "description": "BigInt time to live.",
+            "nullable": false
+          },
+          "creationTime": {
+            "type": "string",
+            "description": "BigInt creation time",
+            "nullable": false
+          },
+          "nonce": {
+            "type": "number",
+            "description": "Transaction nonce",
+            "nullable": false
+          }
+        }
+      },
+      "IrohaTransactionDefinitionV1": {
+        "type": "object",
+        "description": "Iroha V2 transaction definition",
         "required": [
           "instruction"
         ],
@@ -359,6 +381,29 @@
               }
             ]
           },
+          "params": {
+            "$ref": "#/components/schemas/IrohaTransactionParametersV1",
+            "description": "Transaction parameters",
+            "nullable": false
+          }
+        }
+      },
+      "TransactRequestV1": {
+        "type": "object",
+        "description": "Request to transact endpoint.",
+        "additionalProperties": false,
+        "properties": {
+          "signedTransaction": {
+            "description": "Signed transaction binary data received from generate-transaction endpoint.",
+            "type": "string",
+            "format": "binary",
+            "nullable": false
+          },
+          "transaction": {
+            "$ref": "#/components/schemas/IrohaTransactionDefinitionV1",
+            "description": "New transaction definition. Caller must provide signing credential in `baseConfig`.",
+            "nullable": false
+          },
           "baseConfig": {
             "$ref": "#/components/schemas/Iroha2BaseConfig",
             "description": "Iroha V2 connection configuration.",
@@ -375,6 +420,26 @@
         "properties": {
           "status": {
             "type": "string",
+            "nullable": false
+          }
+        }
+      },
+      "GenerateTransactionRequestV1": {
+        "type": "object",
+        "description": "Request for generating transaction payload that can be signed on the client side.",
+        "additionalProperties": false,
+        "required": [
+          "transaction"
+        ],
+        "properties": {
+          "transaction": {
+            "$ref": "#/components/schemas/IrohaTransactionDefinitionV1",
+            "description": "New transaction definition. Caller must provide signing credential in `baseConfig`.",
+            "nullable": false
+          },
+          "baseConfig": {
+            "$ref": "#/components/schemas/Iroha2BaseConfig",
+            "description": "Iroha V2 connection configuration.",
             "nullable": false
           }
         }
@@ -473,6 +538,51 @@
           },
           "500": {
             "description": "Internal Server Error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorExceptionResponseV1"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/generate-transaction": {
+      "post": {
+        "x-hyperledger-cactus": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/generate-transaction"
+          }
+        },
+        "operationId": "generateTransactionV1",
+        "summary": "Generate transaction that can be signed locally.",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateTransactionRequestV1"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
             "content": {
               "application/json": {
                 "schema": {

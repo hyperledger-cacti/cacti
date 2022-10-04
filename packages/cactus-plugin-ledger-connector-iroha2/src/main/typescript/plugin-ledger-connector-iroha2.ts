@@ -45,20 +45,24 @@ import {
   IrohaInstructionRequestV1,
   WatchBlocksV1,
   WatchBlocksOptionsV1,
+  GenerateTransactionRequestV1,
+  IrohaTransactionParametersV1,
 } from "./generated/openapi/typescript-axios";
 
 import { TransactEndpoint } from "./web-services/transact-endpoint";
 import { QueryEndpoint } from "./web-services/query-endpoint";
 import { WatchBlocksV1Endpoint } from "./web-services/watch-blocks-v1-endpoint";
+import { GenerateTransactionEndpoint } from "./web-services/generate-transaction-endpoint";
 
 import { KeyPair } from "@iroha2/crypto-core";
-import { AccountId, DomainId } from "@iroha2/data-model";
 import {
   CactusIrohaV2Client,
   generateIrohaV2KeyPair,
+  TransactionPayloadParameters,
 } from "./cactus-iroha-sdk-wrapper/client";
 import { CactusIrohaV2QueryClient } from "./cactus-iroha-sdk-wrapper/query";
 import { LengthOf, stringifyBigIntReplacer } from "./utils";
+import { createAccountId } from "./cactus-iroha-sdk-wrapper/data-factories";
 
 /**
  * Input options for PluginLedgerConnectorIroha2.
@@ -177,7 +181,7 @@ export class PluginLedgerConnectorIroha2
         const monitor = new WatchBlocksV1Endpoint({
           socket,
           logLevel: this.options.logLevel,
-          client: cactusIrohaClient.irohaClient,
+          torii: cactusIrohaClient.irohaToriiClient,
         });
         this.runningWatchBlocksMonitors.add(monitor);
         await monitor.subscribe(options);
@@ -245,6 +249,10 @@ export class PluginLedgerConnectorIroha2
         logLevel: this.options.logLevel,
       }),
       new QueryEndpoint({
+        connector: this,
+        logLevel: this.options.logLevel,
+      }),
+      new GenerateTransactionEndpoint({
         connector: this,
         logLevel: this.options.logLevel,
       }),
@@ -339,15 +347,13 @@ export class PluginLedgerConnectorIroha2
     }
 
     // Parse account ID
-    let accountId: AccountId | undefined;
-    if (mergedConfig.accountId) {
-      accountId = AccountId({
-        name: mergedConfig.accountId.name,
-        domain_id: DomainId({
-          name: mergedConfig.accountId.domainId,
-        }),
-      });
+    if (!mergedConfig.accountId) {
+      throw new Error("accountId is missing in combined configuration");
     }
+    const accountId = createAccountId(
+      mergedConfig.accountId.name,
+      mergedConfig.accountId.domainId,
+    );
 
     // TODO - confirm which args are optional and remove type casts accordingly
     return new CactusIrohaV2Client(
@@ -355,7 +361,8 @@ export class PluginLedgerConnectorIroha2
         apiURL: mergedConfig.torii.apiURL as string,
         telemetryURL: mergedConfig.torii.telemetryURL as string,
       },
-      [accountId as AccountId, keyPair as KeyPair],
+      accountId,
+      keyPair,
       this.options.logLevel,
     );
   }
@@ -418,96 +425,173 @@ export class PluginLedgerConnectorIroha2
   }
 
   /**
-   * Transact endpoint logic.
+   * Loop through each instruction in `reqInstruction` and add them to current transaction session in `client`.
    *
-   * @param req Request with a list of instructions to be executed from the client.
+   * @param client `CactusIrohaV2Client` instance.
+   * @param reqInstruction Single or list of Iroha instructions to be added.
+   */
+  private processInstructionsRequests(
+    client: CactusIrohaV2Client,
+    reqInstruction: IrohaInstructionRequestV1 | IrohaInstructionRequestV1[],
+  ): void {
+    Checks.truthy(client, "processInstructionsRequests client");
+    Checks.truthy(
+      reqInstruction,
+      "processInstructionsRequests instructions in request",
+    );
+
+    // Convert single instruction scenario to list with one element
+    // (both single and multiple instructions are supported)
+    let instructions: IrohaInstructionRequestV1[];
+    if (Array.isArray(reqInstruction)) {
+      instructions = reqInstruction;
+    } else {
+      instructions = [reqInstruction];
+    }
+
+    // Each command adds an instruction to a list included in the final transaction.
+    instructions.forEach((cmd) => {
+      switch (cmd.name) {
+        case IrohaInstruction.RegisterDomain:
+          this.addTransactionWithCheckedParams(
+            client,
+            CactusIrohaV2Client.prototype.registerDomain,
+            cmd.params,
+            1,
+          );
+          break;
+        case IrohaInstruction.RegisterAssetDefinition:
+          this.addTransactionWithCheckedParams(
+            client,
+            CactusIrohaV2Client.prototype.registerAssetDefinition,
+            cmd.params,
+            4,
+          );
+          break;
+        case IrohaInstruction.RegisterAsset:
+          this.addTransactionWithCheckedParams(
+            client,
+            CactusIrohaV2Client.prototype.registerAsset,
+            cmd.params,
+            5,
+          );
+          break;
+        case IrohaInstruction.MintAsset:
+          this.addTransactionWithCheckedParams(
+            client,
+            CactusIrohaV2Client.prototype.mintAsset,
+            cmd.params,
+            5,
+          );
+          break;
+        case IrohaInstruction.BurnAsset:
+          this.addTransactionWithCheckedParams(
+            client,
+            CactusIrohaV2Client.prototype.burnAsset,
+            cmd.params,
+            5,
+          );
+          break;
+        case IrohaInstruction.TransferAsset:
+          this.addTransactionWithCheckedParams(
+            client,
+            CactusIrohaV2Client.prototype.transferAsset,
+            cmd.params,
+            7,
+          );
+          break;
+        case IrohaInstruction.RegisterAccount:
+          this.addTransactionWithCheckedParams(
+            client,
+            CactusIrohaV2Client.prototype.registerAccount,
+            cmd.params,
+            4,
+          );
+          break;
+        default:
+          const unknownType: never = cmd.name;
+          throw new Error(
+            `Unknown IrohaV2 instruction - '${unknownType}'. Check name and connector version.`,
+          );
+      }
+    });
+  }
+
+  /**
+   * Try parsing transaction parameter from request to IrohaV2 SDK compatible format.
+   * If input is empty, undefined is returned.
+   *
+   * @param reqParams transaction parameters from connector request.
+   * @returns `TransactionPayloadParameters` or `undefined`
+   */
+  private tryParseTransactionParams(
+    reqParams?: IrohaTransactionParametersV1,
+  ): TransactionPayloadParameters | undefined {
+    if (!reqParams) {
+      return undefined;
+    }
+
+    return {
+      ttl: reqParams.ttl ? BigInt(reqParams.ttl) : undefined,
+      creationTime: reqParams.creationTime
+        ? BigInt(reqParams.creationTime)
+        : undefined,
+      nonce: reqParams.nonce,
+    };
+  }
+
+  /**
+   * Transact endpoint logic.
+   * To submit transaction you must provide either signed transaction payload or list of instructions with signingCredential.
+   *
+   * @param req Request object.
    * @returns Status of the operation.
    */
   public async transact(req: TransactRequestV1): Promise<TransactResponseV1> {
     const client = await this.getClient(req.baseConfig);
 
     try {
-      // Convert single instruction scenario to list with one element
-      // (both single and multiple instructions are supported)
-      let instructions: IrohaInstructionRequestV1[];
-      if (Array.isArray(req.instruction)) {
-        instructions = req.instruction;
+      if (req.transaction) {
+        this.processInstructionsRequests(client, req.transaction.instruction);
+        await client.send(
+          this.tryParseTransactionParams(req.transaction.params),
+        );
+      } else if (req.signedTransaction) {
+        const transactionBinary = Uint8Array.from(
+          Object.values(req.signedTransaction),
+        );
+        await client.sendSignedPayload(transactionBinary);
       } else {
-        instructions = [req.instruction];
+        throw new Error(
+          "To submit transaction you must provide either signed transaction payload or list of instructions with signingCredential",
+        );
       }
-
-      // Each command adds transaction to the list that will be sent to Iroha V2
-      instructions.forEach((cmd) => {
-        switch (cmd.name) {
-          case IrohaInstruction.RegisterDomain:
-            this.addTransactionWithCheckedParams(
-              client,
-              CactusIrohaV2Client.prototype.registerDomain,
-              cmd.params,
-              1,
-            );
-            break;
-          case IrohaInstruction.RegisterAssetDefinition:
-            this.addTransactionWithCheckedParams(
-              client,
-              CactusIrohaV2Client.prototype.registerAssetDefinition,
-              cmd.params,
-              4,
-            );
-            break;
-          case IrohaInstruction.RegisterAsset:
-            this.addTransactionWithCheckedParams(
-              client,
-              CactusIrohaV2Client.prototype.registerAsset,
-              cmd.params,
-              5,
-            );
-            break;
-          case IrohaInstruction.MintAsset:
-            this.addTransactionWithCheckedParams(
-              client,
-              CactusIrohaV2Client.prototype.mintAsset,
-              cmd.params,
-              5,
-            );
-            break;
-          case IrohaInstruction.BurnAsset:
-            this.addTransactionWithCheckedParams(
-              client,
-              CactusIrohaV2Client.prototype.burnAsset,
-              cmd.params,
-              5,
-            );
-            break;
-          case IrohaInstruction.TransferAsset:
-            this.addTransactionWithCheckedParams(
-              client,
-              CactusIrohaV2Client.prototype.transferAsset,
-              cmd.params,
-              7,
-            );
-            break;
-          case IrohaInstruction.RegisterAccount:
-            this.addTransactionWithCheckedParams(
-              client,
-              CactusIrohaV2Client.prototype.registerAccount,
-              cmd.params,
-              4,
-            );
-            break;
-          default:
-            const unknownType: never = cmd.name;
-            throw new Error(
-              `Unknown IrohaV2 instruction - '${unknownType}'. Check name and connector version.`,
-            );
-        }
-      });
-
-      await client.send();
 
       return {
         status: "OK",
       };
+    } finally {
+      client.free();
+    }
+  }
+
+  /**
+   * Generate raw, unsigned transaction payload from instructions in request.
+   * Can be signed on the client side and send to the transact endpoint.
+   *
+   * @param req Request object.
+   * @returns Binary unsigned transaction.
+   */
+  public async generateTransaction(
+    req: GenerateTransactionRequestV1,
+  ): Promise<Uint8Array> {
+    const client = await this.getClient(req.baseConfig);
+
+    try {
+      this.processInstructionsRequests(client, req.transaction.instruction);
+      return client.getTransactionPayloadBuffer(
+        this.tryParseTransactionParams(req.transaction.params),
+      );
     } finally {
       client.free();
     }

@@ -4,11 +4,12 @@
 
 import { crypto } from "@iroha2/crypto-target-node";
 import {
-  Client,
   Signer,
   Torii,
   setCrypto,
   CreateToriiProps,
+  makeTransactionPayload,
+  executableIntoSignedTransaction,
 } from "@iroha2/client";
 import {
   AssetDefinitionId,
@@ -39,8 +40,14 @@ import {
   NewAccount,
   VecPublicKey,
   TransferBox,
+  TransactionPayload,
+  AccountId,
+  VersionedTransaction,
 } from "@iroha2/data-model";
 import { Key, KeyPair } from "@iroha2/crypto-core";
+
+// This module can't be imported unless we use `nodenext` moduleResolution
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { adapter: irohaWSAdapter } = require("@iroha2/client/web-socket/node");
 
 import {
@@ -104,6 +111,22 @@ interface NamedIrohaV2Instruction {
 }
 
 /**
+ * Raw type of executableIntoSignedTransaction payloadParams parameter.
+ */
+type IrohaInPayloadParams = Parameters<
+  typeof executableIntoSignedTransaction
+>[0]["payloadParams"];
+
+/**
+ * Transaction parameters type to be send in payload.
+ * Comes from Iroha SDK.
+ */
+export type TransactionPayloadParameters = Exclude<
+  IrohaInPayloadParams,
+  undefined
+>;
+
+/**
  * Cactus wrapper around Iroha V2 SDK Client. Should not be used outside of this connector.
  * - Provides convenient functions to transact / query the ledger.
  * - Each transaction method adds the instruction to the transaction list that is executed together during `send()` call.
@@ -115,41 +138,59 @@ export class CactusIrohaV2Client {
   private readonly transactions: Array<NamedIrohaV2Instruction> = [];
 
   /**
-   * Upstream IrohaV2 SDK client used by this wrapper.
+   * Iroha Torii client used to send transactions to the ledger.
    */
-  public readonly irohaClient: Client;
+  public readonly irohaToriiClient: Torii;
 
   /**
-   * Separate interface for making the IrohaV2 queries.
+   * Iroha signer used to sign transaction with user private key and account.
    */
-  public readonly query: CactusIrohaV2QueryClient;
+  public readonly irohaSigner?: Signer;
+
+  private readonly _query?: CactusIrohaV2QueryClient;
+
+  /**
+   * Separate interface for sending IrohaV2 queries.
+   * Will throw if query interface is not available
+   * (when client was created without a signer)
+   */
+  public get query(): CactusIrohaV2QueryClient {
+    if (this._query) {
+      return this._query;
+    } else {
+      throw new Error("Query not available - you must provide signer key");
+    }
+  }
 
   constructor(
     public readonly toriiOptions: Omit<CreateToriiProps, "ws" | "fetch">,
-    public readonly signerOptions: ConstructorParameters<typeof Signer>,
+    public readonly accountId: AccountId,
+    private readonly keyPair?: KeyPair,
     private readonly logLevel: LogLevelDesc = "info",
   ) {
     Checks.truthy(toriiOptions.apiURL, "toriiOptions apiURL");
     Checks.truthy(toriiOptions.telemetryURL, "toriiOptions telemetryURL");
-    Checks.truthy(signerOptions[0], "signerOptions account");
-    Checks.truthy(signerOptions[1], "signerOptions keyPair");
+    Checks.truthy(accountId, "signerOptions accountId");
 
-    const torii = new Torii({
+    this.irohaToriiClient = new Torii({
       ...toriiOptions,
       ws: irohaWSAdapter,
       fetch: undiciFetch as any,
     });
 
-    const signer = new Signer(...signerOptions);
-
-    this.irohaClient = new Client({ torii, signer });
-
     const label = this.constructor.name;
     this.log = LoggerProvider.getOrCreate({ level: this.logLevel, label });
-
     this.log.debug(`${label} created`);
 
-    this.query = new CactusIrohaV2QueryClient(this.irohaClient, this.log);
+    if (keyPair) {
+      this.log.debug("KeyPair present, add Signer and Query function.");
+      this.irohaSigner = new Signer(accountId, keyPair);
+      this._query = new CactusIrohaV2QueryClient(
+        this.irohaToriiClient,
+        this.irohaSigner,
+        this.log,
+      );
+    }
   }
 
   /**
@@ -581,31 +622,93 @@ export class CactusIrohaV2Client {
   }
 
   /**
-   * Send all the stored instructions as single Iroha transaction.
+   * Create Iroha SDK compatible `Executable` from instructions saved in current client session.
    *
-   * @returns this
+   * @returns Iroha `Executable`
    */
-  public async send(): Promise<this> {
-    if (this.transactions.length === 0) {
-      this.log.warn("send() ignored - no instructions to be sent!");
-      return this;
-    }
-
+  private createIrohaExecutable(): Executable {
     const irohaInstructions = this.transactions.map(
       (entry) => entry.instruction,
     );
     this.log.info(
-      `Send transaction with ${irohaInstructions.length} instructions to Iroha ledger`,
+      `Created executable with ${irohaInstructions.length} instructions.`,
     );
+
+    return Executable("Instructions", VecInstruction(irohaInstructions));
+  }
+
+  /**
+   * Throw if there are no instructions in current client session.
+   */
+  private assertTransactionsNotEmpty() {
+    if (this.transactions.length === 0) {
+      throw new Error(
+        "assertTransactionsNotEmpty() failed - no instructions defined!",
+      );
+    }
+  }
+
+  /**
+   * Get transaction payload buffer that can be signed and then sent to the ledger.
+   *
+   * @param txParams Transaction parameters.
+   *
+   * @returns Buffer of encoded `TransactionPayload`
+   */
+  public getTransactionPayloadBuffer(
+    txParams?: TransactionPayloadParameters,
+  ): Uint8Array {
+    this.assertTransactionsNotEmpty();
+
+    const payload = makeTransactionPayload({
+      accountId: this.accountId,
+      executable: this.createIrohaExecutable(),
+      ...txParams,
+    });
+
+    return TransactionPayload.toBuffer(payload);
+  }
+
+  /**
+   * Send all the stored instructions as single Iroha transaction.
+   *
+   * @param txParams Transaction parameters.
+   *
+   * @returns void
+   */
+  public async send(txParams?: TransactionPayloadParameters): Promise<void> {
+    this.assertTransactionsNotEmpty();
+    if (!this.irohaSigner) {
+      throw new Error("send() failed - no Iroha Signer, keyPair was missing");
+    }
+
     this.log.debug(this.getTransactionSummary());
 
-    await this.irohaClient.submitExecutable(
-      Executable("Instructions", VecInstruction(irohaInstructions)),
-    );
+    const signedTx = executableIntoSignedTransaction({
+      signer: this.irohaSigner,
+      executable: this.createIrohaExecutable(),
+      payloadParams: txParams,
+    });
 
+    await this.sendSignedPayload(signedTx);
     this.clear();
+  }
 
-    return this;
+  /**
+   * Send signed transaction payload to the ledger.
+   *
+   * @param signedPayload encoded or plain `VersionedTransaction`
+   */
+  public async sendSignedPayload(
+    signedPayload: VersionedTransaction | ArrayBufferView,
+  ): Promise<void> {
+    Checks.truthy(signedPayload, "sendSignedPayload arg signedPayload");
+
+    if (ArrayBuffer.isView(signedPayload)) {
+      signedPayload = VersionedTransaction.fromBuffer(signedPayload);
+    }
+
+    await this.irohaToriiClient.submit(signedPayload);
   }
 
   /**
@@ -614,8 +717,7 @@ export class CactusIrohaV2Client {
    */
   public free(): void {
     this.log.debug("Free CactusIrohaV2Client key pair");
-    // TODO - Investigate if signer keypair not leaking now
-    //this.irohaClient.keyPair?.free();
+    this.keyPair?.free();
     this.clear();
   }
 }

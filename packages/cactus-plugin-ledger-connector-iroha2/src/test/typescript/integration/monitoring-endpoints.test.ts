@@ -96,9 +96,11 @@ describe("Block monitoring tests", () => {
     // Create new domain to trigger new block creation
     const domainName = addRandomSuffix("watchBlocksTest");
     const transactionResponse = await env.apiClient.transactV1({
-      instruction: {
-        name: IrohaInstruction.RegisterDomain,
-        params: [domainName],
+      transaction: {
+        instruction: {
+          name: IrohaInstruction.RegisterDomain,
+          params: [domainName],
+        },
       },
       baseConfig: env.defaultBaseConfig,
     });

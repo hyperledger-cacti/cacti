@@ -64,9 +64,11 @@ describe("Instructions and Queries test", () => {
 
       // Create new domain
       const transactionResponse = await env.apiClient.transactV1({
-        instruction: {
-          name: IrohaInstruction.RegisterDomain,
-          params: [domainName],
+        transaction: {
+          instruction: {
+            name: IrohaInstruction.RegisterDomain,
+            params: [domainName],
+          },
         },
         baseConfig: env.defaultBaseConfig,
       });
@@ -118,9 +120,11 @@ describe("Instructions and Queries test", () => {
 
       // Create new domain for our new account
       const registerDomainResponse = await env.apiClient.transactV1({
-        instruction: {
-          name: IrohaInstruction.RegisterDomain,
-          params: [newAccountDomainName],
+        transaction: {
+          instruction: {
+            name: IrohaInstruction.RegisterDomain,
+            params: [newAccountDomainName],
+          },
         },
         baseConfig: env.defaultBaseConfig,
       });
@@ -134,14 +138,16 @@ describe("Instructions and Queries test", () => {
 
       // Register new account
       const registerAccountResponse = await env.apiClient.transactV1({
-        instruction: {
-          name: IrohaInstruction.RegisterAccount,
-          params: [
-            newAccountName,
-            newAccountDomainName,
-            newAccountCredentials.publicKey,
-            newAccountCredentials.privateKey.digestFunction,
-          ],
+        transaction: {
+          instruction: {
+            name: IrohaInstruction.RegisterAccount,
+            params: [
+              newAccountName,
+              newAccountDomainName,
+              newAccountCredentials.publicKey,
+              newAccountCredentials.privateKey.digestFunction,
+            ],
+          },
         },
         baseConfig: env.defaultBaseConfig,
       });
@@ -201,9 +207,11 @@ describe("Instructions and Queries test", () => {
 
       // Create new domain for our new asset
       const registerDomainResponse = await env.apiClient.transactV1({
-        instruction: {
-          name: IrohaInstruction.RegisterDomain,
-          params: [domainName],
+        transaction: {
+          instruction: {
+            name: IrohaInstruction.RegisterDomain,
+            params: [domainName],
+          },
         },
         baseConfig: env.defaultBaseConfig,
       });
@@ -214,9 +222,11 @@ describe("Instructions and Queries test", () => {
 
       // Create new asset definition
       const registerAssetDefResponse = await env.apiClient.transactV1({
-        instruction: {
-          name: IrohaInstruction.RegisterAssetDefinition,
-          params: [assetName, domainName, valueType, mintable],
+        transaction: {
+          instruction: {
+            name: IrohaInstruction.RegisterAssetDefinition,
+            params: [assetName, domainName, valueType, mintable],
+          },
         },
         baseConfig: env.defaultBaseConfig,
       });
@@ -227,15 +237,17 @@ describe("Instructions and Queries test", () => {
 
       // Create new asset
       const registerAssetResponse = await env.apiClient.transactV1({
-        instruction: {
-          name: IrohaInstruction.RegisterAsset,
-          params: [
-            assetName,
-            domainName,
-            env.defaultBaseConfig.accountId?.name,
-            env.defaultBaseConfig.accountId?.domainId,
-            value,
-          ],
+        transaction: {
+          instruction: {
+            name: IrohaInstruction.RegisterAsset,
+            params: [
+              assetName,
+              domainName,
+              env.defaultBaseConfig.accountId?.name,
+              env.defaultBaseConfig.accountId?.domainId,
+              value,
+            ],
+          },
         },
         baseConfig: env.defaultBaseConfig,
       });
@@ -330,15 +342,17 @@ describe("Instructions and Queries test", () => {
 
       // Mint additional asset value
       const mintResponse = await env.apiClient.transactV1({
-        instruction: {
-          name: IrohaInstruction.MintAsset,
-          params: [
-            assetName,
-            domainName,
-            env.defaultBaseConfig.accountId?.name,
-            env.defaultBaseConfig.accountId?.domainId,
-            mintValue,
-          ],
+        transaction: {
+          instruction: {
+            name: IrohaInstruction.MintAsset,
+            params: [
+              assetName,
+              domainName,
+              env.defaultBaseConfig.accountId?.name,
+              env.defaultBaseConfig.accountId?.domainId,
+              mintValue,
+            ],
+          },
         },
         baseConfig: env.defaultBaseConfig,
       });
@@ -388,15 +402,17 @@ describe("Instructions and Queries test", () => {
 
       // Burn asset value
       const burnResponse = await env.apiClient.transactV1({
-        instruction: {
-          name: IrohaInstruction.BurnAsset,
-          params: [
-            assetName,
-            domainName,
-            env.defaultBaseConfig.accountId?.name,
-            env.defaultBaseConfig.accountId?.domainId,
-            burnValue,
-          ],
+        transaction: {
+          instruction: {
+            name: IrohaInstruction.BurnAsset,
+            params: [
+              assetName,
+              domainName,
+              env.defaultBaseConfig.accountId?.name,
+              env.defaultBaseConfig.accountId?.domainId,
+              burnValue,
+            ],
+          },
         },
         baseConfig: env.defaultBaseConfig,
       });
@@ -446,14 +462,16 @@ describe("Instructions and Queries test", () => {
       // Register new account to receive the assets
       const accountCredentials = generateTestIrohaCredentials();
       const registerAccountResponse = await env.apiClient.transactV1({
-        instruction: {
-          name: IrohaInstruction.RegisterAccount,
-          params: [
-            targetAccountName,
-            targetAccountDomain,
-            accountCredentials.publicKey,
-            accountCredentials.privateKey.digestFunction,
-          ],
+        transaction: {
+          instruction: {
+            name: IrohaInstruction.RegisterAccount,
+            params: [
+              targetAccountName,
+              targetAccountDomain,
+              accountCredentials.publicKey,
+              accountCredentials.privateKey.digestFunction,
+            ],
+          },
         },
         baseConfig: env.defaultBaseConfig,
       });
@@ -464,17 +482,19 @@ describe("Instructions and Queries test", () => {
 
       // Transfer asset to the newly created account
       const transferResponse = await env.apiClient.transactV1({
-        instruction: {
-          name: IrohaInstruction.TransferAsset,
-          params: [
-            assetName,
-            domainName,
-            sourceAccountName,
-            sourceAccountDomain,
-            targetAccountName,
-            targetAccountDomain,
-            transferValue,
-          ],
+        transaction: {
+          instruction: {
+            name: IrohaInstruction.TransferAsset,
+            params: [
+              assetName,
+              domainName,
+              sourceAccountName,
+              sourceAccountDomain,
+              targetAccountName,
+              targetAccountDomain,
+              transferValue,
+            ],
+          },
         },
         baseConfig: env.defaultBaseConfig,
       });

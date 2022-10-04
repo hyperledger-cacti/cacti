@@ -20,7 +20,7 @@ import {
 
 import { safeStringifyException, stringifyBigIntReplacer } from "../utils";
 
-import { Client as IrohaClient } from "@iroha2/client";
+import { Torii as ToriiClient } from "@iroha2/client";
 
 import safeStringify from "fast-safe-stringify";
 import { VersionedCommittedBlock } from "@iroha2/data-model";
@@ -31,7 +31,7 @@ import { VersionedCommittedBlock } from "@iroha2/data-model";
 export interface IWatchBlocksV1EndpointConfiguration {
   logLevel?: LogLevelDesc;
   socket: SocketIoSocket;
-  client: IrohaClient;
+  torii: ToriiClient;
 }
 
 /**
@@ -41,7 +41,7 @@ export interface IWatchBlocksV1EndpointConfiguration {
 export class WatchBlocksV1Endpoint {
   public readonly className = "WatchBlocksV1Endpoint";
   private readonly log: Logger;
-  private readonly client: IrohaClient;
+  private readonly torii: ToriiClient;
   private readonly socket: SocketIoSocket<
     Record<WatchBlocksV1, (next: WatchBlocksResponseV1) => void>
   >;
@@ -50,10 +50,10 @@ export class WatchBlocksV1Endpoint {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(config, `${fnTag} arg options`);
     Checks.truthy(config.socket, `${fnTag} arg options.socket`);
-    Checks.truthy(config.client, `${fnTag} arg options.client`);
+    Checks.truthy(config.torii, `${fnTag} arg options.client`);
 
     this.socket = config.socket;
-    this.client = config.client;
+    this.torii = config.torii;
 
     const level = this.config.logLevel || "info";
     this.log = LoggerProvider.getOrCreate({ level, label: this.className });
@@ -65,7 +65,7 @@ export class WatchBlocksV1Endpoint {
    * @param options Block monitoring options.
    */
   public async subscribe(options: WatchBlocksOptionsV1): Promise<void> {
-    const { client, socket, log } = this;
+    const { torii, socket, log } = this;
     const clientId = socket.id;
     log.info(
       `${WatchBlocksV1.Subscribe} => clientId: ${clientId}, startBlock: ${options.startBlock}`,
@@ -74,7 +74,7 @@ export class WatchBlocksV1Endpoint {
     try {
       const height = options.startBlock ?? "0";
       const blockType = options.type ?? BlockTypeV1.Raw;
-      const blockMonitor = await client.torii.listenForBlocksStream({
+      const blockMonitor = await torii.listenForBlocksStream({
         height: BigInt(height),
       });
 

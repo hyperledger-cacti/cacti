@@ -20,3 +20,5 @@ export {
   Iroha2ApiClient,
   Iroha2ApiClientOptions,
 } from "./api-client/iroha2-api-client";
+
+export { signIrohaV2Transaction } from "./iroha-sign-utils";

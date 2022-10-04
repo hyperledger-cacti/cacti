@@ -58,6 +58,25 @@ export interface ErrorExceptionResponseV1 {
     error: string;
 }
 /**
+ * Request for generating transaction payload that can be signed on the client side.
+ * @export
+ * @interface GenerateTransactionRequestV1
+ */
+export interface GenerateTransactionRequestV1 {
+    /**
+     * 
+     * @type {IrohaTransactionDefinitionV1}
+     * @memberof GenerateTransactionRequestV1
+     */
+    transaction: IrohaTransactionDefinitionV1;
+    /**
+     * 
+     * @type {Iroha2BaseConfig}
+     * @memberof GenerateTransactionRequestV1
+     */
+    baseConfig?: Iroha2BaseConfig;
+}
+/**
  * Iroha V2 account ID.
  * @export
  * @interface Iroha2AccountId
@@ -272,6 +291,52 @@ export enum IrohaQuery {
 }
 
 /**
+ * Iroha V2 transaction definition
+ * @export
+ * @interface IrohaTransactionDefinitionV1
+ */
+export interface IrohaTransactionDefinitionV1 {
+    /**
+     * 
+     * @type {IrohaInstructionRequestV1 | Array<IrohaInstructionRequestV1>}
+     * @memberof IrohaTransactionDefinitionV1
+     */
+    instruction: IrohaInstructionRequestV1 | Array<IrohaInstructionRequestV1>;
+    /**
+     * 
+     * @type {IrohaTransactionParametersV1}
+     * @memberof IrohaTransactionDefinitionV1
+     */
+    params?: IrohaTransactionParametersV1;
+}
+/**
+ * Iroha V2 transaction payload parameters
+ * @export
+ * @interface IrohaTransactionParametersV1
+ */
+export interface IrohaTransactionParametersV1 {
+    [key: string]: object | any;
+
+    /**
+     * BigInt time to live.
+     * @type {string}
+     * @memberof IrohaTransactionParametersV1
+     */
+    ttl?: string;
+    /**
+     * BigInt creation time
+     * @type {string}
+     * @memberof IrohaTransactionParametersV1
+     */
+    creationTime?: string;
+    /**
+     * Transaction nonce
+     * @type {number}
+     * @memberof IrohaTransactionParametersV1
+     */
+    nonce?: number;
+}
+/**
  * Reference to entry stored in Cactus keychain plugin.
  * @export
  * @interface KeychainReference
@@ -329,17 +394,23 @@ export interface QueryResponseV1 {
     response: any;
 }
 /**
- * Request to transact endpoint, can be passed one or multiple instructions to be executed.
+ * Request to transact endpoint.
  * @export
  * @interface TransactRequestV1
  */
 export interface TransactRequestV1 {
     /**
-     * 
-     * @type {IrohaInstructionRequestV1 | Array<IrohaInstructionRequestV1>}
+     * Signed transaction binary data received from generate-transaction endpoint.
+     * @type {any}
      * @memberof TransactRequestV1
      */
-    instruction: IrohaInstructionRequestV1 | Array<IrohaInstructionRequestV1>;
+    signedTransaction?: any;
+    /**
+     * 
+     * @type {IrohaTransactionDefinitionV1}
+     * @memberof TransactRequestV1
+     */
+    transaction?: IrohaTransactionDefinitionV1;
     /**
      * 
      * @type {Iroha2BaseConfig}
@@ -440,6 +511,40 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     return {
         /**
          * 
+         * @summary Generate transaction that can be signed locally.
+         * @param {GenerateTransactionRequestV1} [generateTransactionRequestV1] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        generateTransactionV1: async (generateTransactionRequestV1?: GenerateTransactionRequestV1, options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/generate-transaction`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(generateTransactionRequestV1, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Executes a query on a Iroha V2 ledger and returns it\'s results.
          * @param {QueryRequestV1} [queryRequestV1] 
          * @param {*} [options] Override http request option.
@@ -518,6 +623,17 @@ export const DefaultApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
+         * @summary Generate transaction that can be signed locally.
+         * @param {GenerateTransactionRequestV1} [generateTransactionRequestV1] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async generateTransactionV1(generateTransactionRequestV1?: GenerateTransactionRequestV1, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.generateTransactionV1(generateTransactionRequestV1, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @summary Executes a query on a Iroha V2 ledger and returns it\'s results.
          * @param {QueryRequestV1} [queryRequestV1] 
          * @param {*} [options] Override http request option.
@@ -550,6 +666,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
     return {
         /**
          * 
+         * @summary Generate transaction that can be signed locally.
+         * @param {GenerateTransactionRequestV1} [generateTransactionRequestV1] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        generateTransactionV1(generateTransactionRequestV1?: GenerateTransactionRequestV1, options?: any): AxiosPromise<any> {
+            return localVarFp.generateTransactionV1(generateTransactionRequestV1, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Executes a query on a Iroha V2 ledger and returns it\'s results.
          * @param {QueryRequestV1} [queryRequestV1] 
          * @param {*} [options] Override http request option.
@@ -578,6 +704,18 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
  * @extends {BaseAPI}
  */
 export class DefaultApi extends BaseAPI {
+    /**
+     * 
+     * @summary Generate transaction that can be signed locally.
+     * @param {GenerateTransactionRequestV1} [generateTransactionRequestV1] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public generateTransactionV1(generateTransactionRequestV1?: GenerateTransactionRequestV1, options?: any) {
+        return DefaultApiFp(this.configuration).generateTransactionV1(generateTransactionRequestV1, options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * 
      * @summary Executes a query on a Iroha V2 ledger and returns it\'s results.
