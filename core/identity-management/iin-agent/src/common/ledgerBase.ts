@@ -33,13 +33,13 @@ export class LedgerBase {
     }
     
     // Collect security domain membership info
-    async counterAttestMembership(attestedMembershipSet: iin_agent_pb.CounterAttestedMembership.AttestedMembershipSet, securityDomain: string, nonce: string): Promise<iin_agent_pb.CounterAttestedMembership> {
+    async counterAttestMembership(attestedMembershipSetSerialized64: string, securityDomain: string, nonce: string): Promise<iin_agent_pb.CounterAttestedMembership> {
         return new iin_agent_pb.CounterAttestedMembership();
     }
     
     // record Membership
     async recordMembershipInLedger(counterAttestedMembership: iin_agent_pb.CounterAttestedMembership): Promise<any> {
-        return ""
+        return "";
     }
 
     // Invoke a contract to drive a transaction

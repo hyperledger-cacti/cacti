@@ -6,7 +6,7 @@
 
 import iin_agent_pb from '@hyperledger-labs/weaver-protos-js/identity/agent_pb';
 import * as utils from '../common/utils';
-import { localAgentRequestMap } from './externalOperations.ts'
+import { localAgentResponseCount, counterAttestationsMap, getSecurityDomainMapKey } from './externalOperations';
 
 
 // Generates attestations on a foreign security domain unit's state
@@ -15,91 +15,120 @@ export const requestAttestation = async (counterAttestedMembership: iin_agent_pb
 };
 
 // Processes attestations on a foreign security domain unit's state received from a local IIN agent
-export const sendAttestation = async (counterAttestedMembership: iin_agent_pb.CounterAttestedMembership, securityDomain: string) => {
+export const sendAttestation = async (counterAttestedMembership: iin_agent_pb.CounterAttestedMembership, securityDomain: string, memberId: string) => {
     // Assuming only one counter attestation in the list
     const attestation = counterAttestedMembership.getAttestationsList()[0];
     if (!attestation.hasUnitIdentity()) {
-        console.error('Error: attestation has no SecurityDomainMemberIdentity associated with it')
-        return
+        console.error('Error: attestation has no SecurityDomainMemberIdentity associated with it');
+        return;
     }
     
     const securityDomainUnit = attestation.getUnitIdentity()!;
-    const localMemberId = securityDomainUnit.getMemberId()
+    const peerAgentMemberId = securityDomainUnit.getMemberId();
     if (securityDomain !== securityDomainUnit.getSecurityDomain()) {
-        console.error(`Error: received counter attestation from different security domain's member '${localMemberId}'. Expected: ${securityDomain}, Received: ${securityDomainUnit.getSecurityDomain()}`)
-        return
+        console.error(`Error: received counter attestation from different security domain's member '${peerAgentMemberId}'. Expected: ${securityDomain}, Received: ${securityDomainUnit.getSecurityDomain()}`);
+        return;
     }
     
-    const nonce = attestation.getNonce()
-    if (!(localAgentResponseCount.has(nonce)) {
-        console.error(`Error: Not expecting any response with received nonce: ${nonce}`)
-        return
+    const nonce = attestation.getNonce();
+    const localKey = getSecurityDomainMapKey('LOCAL_COUNTER_ATTESTATION_RESPONSE', memberId, nonce);
+    if (!(counterAttestationsMap.has(localKey) && localAgentResponseCount.has(nonce))) {
+        console.error(`Error: Not expecting any response with received nonce: ${nonce}`);
+        return;
     }
     
-    const secDomMapKey = getSecurityDomainMapKey('local', localMemberId, nonce)
-    console.log('sendAttestation:', localMemberId, '-', nonce);
+    const myCounterAttestedMembership = counterAttestationsMap.get(localKey) as iin_agent_pb.CounterAttestedMembership;
+    const attestedMembershipSet64 = myCounterAttestedMembership.getAttestedMembershipSet();
+    const attestedMembershipSet = iin_agent_pb.CounterAttestedMembership.AttestedMembershipSet.deserializeBinary(
+        Buffer.from(attestedMembershipSet64, 'base64')
+    );
+    const remoteSecurityDomain = attestedMembershipSet.getAttestationsList()[0].getUnitIdentity()!.getSecurityDomain();
+    
+    const counterAttestationsMapKey = getSecurityDomainMapKey(remoteSecurityDomain, peerAgentMemberId, nonce);
+    console.log('sendAttestation:', peerAgentMemberId, '-', nonce, 'for remote security domain', remoteSecurityDomain);
     try {
         if (counterAttestedMembership.hasError()) {
-            throw new Error(attestedMembership.getError())
+            throw new Error(counterAttestedMembership.getError());
         }
-        const attestedMembershipSet = utils.deserializeAttestedMembershipSet64(counterAttestedMembership.getAttestedMembershipSet())
-        const remoteSecurityDomain = attestedMembershipSet.getAttestationsList()[0].getUnitIdentity()!.getSecurityDomain()
-        
         if (attestation.getCertificate().length == 0) {
-            throw new Error('attestation has no certificate')
+            throw new Error('attestation has no certificate');
         }
         if (attestation.getSignature().length == 0) {
-            throw new Error('attestation has no signature')
+            throw new Error('attestation has no signature');
         }
-        securityDomainMap.set(secDomMapKey, counterAttestedMembership)
+        counterAttestationsMap.set(counterAttestationsMapKey, counterAttestedMembership);
     } catch (e) {
-        console.log(e);
-        if (secDomMapKey.length > 0) {
-            securityDomainMap.set(secDomMapKey, `${e} from SecurityDomain: ${securityDomain}, Member: ${localMemberId}, Nonce: ${nonce}`)
-        }
+        const errorMsg = `${e} from Local iin-agent with MemberId: ${peerAgentMemberId}, Nonce: ${nonce}`;
+        console.error(errorMsg);
+        counterAttestationsMap.set(counterAttestationsMapKey, errorMsg);
     }
-    const currForeignAgentResponsesCount = foreignAgentResponseCount.get(nonce).current
-    const totalForeignAgentResponsesCount = foreignAgentResponseCount.get(nonce).total
-    foreignAgentResponseCount.set(nonce, { current: currForeignAgentResponsesCount + 1, total: totalForeignAgentResponsesCount})
+    const currLocalAgentResponsesCount = localAgentResponseCount.get(nonce).current;
+    const totalLocalAgentResponsesCount = localAgentResponseCount.get(nonce).total;
+    localAgentResponseCount.set(nonce, { current: currLocalAgentResponsesCount + 1, total: totalLocalAgentResponsesCount });
     
-    if (currForeignAgentResponsesCount + 1 < totalForeignAgentResponsesCount) {
+    if (currLocalAgentResponsesCount + 1 < totalLocalAgentResponsesCount) {
         // Pending respones from other foreign iin-agents
-        return
+        return;
     }
-    if (currForeignAgentResponsesCount + 1 > totalForeignAgentResponsesCount) {
-        console.warn('Warning: Received extra response.')
+    if (currLocalAgentResponsesCount + 1 > totalLocalAgentResponsesCount) {
+        console.warn('Warning: Received extra responses.');
     }
     
     // Group Counter Attestations
-    let counterAttestations = counterAttestedMembership.getAttestationsList()
-    for (const key of secDomMapKeys) {
-        let counterAttestedMembershipOrError = securityDomainMap.get(key)
+    let counterAttestations = myCounterAttestedMembership.getAttestationsList();
+    const securityDomainDNS = utils.getSecurityDomainDNS(securityDomain);
+    let errorMsg = '';
+    for (const localAgent in securityDomainDNS) {
+        if (localAgent === memberId) {
+            continue;
+        }
+        const key = getSecurityDomainMapKey(remoteSecurityDomain, localAgent, nonce);
+        if (!counterAttestationsMap.has(key)) {
+            // count completed but still some foreign agents haven't responded.
+            console.log(`Waiting for response from ${localAgent}`);
+            return;
+        }
+        let counterAttestedMembershipOrError = counterAttestationsMap.get(key);
         if (typeof counterAttestedMembershipOrError === "string") {
-            throw new Error(counterAttestedMembershipOrError as string)
+            errorMsg = counterAttestedMembershipOrError as string;
         }
-        counterAttestedMembershipOrError = counterAttestedMembershipOrError as iin_agent_pb.CounterAttestedMembership
-        const attestation = counterAttestedMembershipOrError.getAttestationsList()[0]
-        const memberId = attestation.getUnitIdentity()!.getMemberId()
+        counterAttestedMembershipOrError = counterAttestedMembershipOrError as iin_agent_pb.CounterAttestedMembership;
+        const attestation = counterAttestedMembershipOrError.getAttestationsList()[0];
         if (nonce !== attestation.getNonce()) {
-            throw new Error(`received different nonce value in attestation from ${memberId}. Expected: ${nonce}, Received: ${attestation.getNonce()}`)
+            errorMsg = `received different nonce value in attestation from ${localAgent}. Expected: ${nonce}, Received: ${attestation.getNonce()}`;
         }
-        if (attestedMembershipSet !== counterAttestedMembershipOrError.getAttestedMembershipSet()) {
-            throw new Error(`received different attested membership set from ${memberId}`)
+        if (attestedMembershipSet64 !== counterAttestedMembershipOrError.getAttestedMembershipSet()) {
+            errorMsg = `received different attested membership set from ${memberId}`;
         }
-        counterAttestations.push(attestation)
+        counterAttestations.push(attestation);
     }
     
-    counterAttestedMembership.setAttestationsList(counterAttestations)
-    console.log('Received Counter Attested Membership', JSON.stringify(counterAttestedMembership.toObject()))
-    
-    // Submit record membership tx to ledger
-    const [result, resultError] = await utils.handlePromise(
-        ledgerBase.recordMembershipInLedger(counterAttestedMembership)
-    )
-    
-    if (resultError) {
-        throw resultError
+    if (errorMsg.length===0) {
+        myCounterAttestedMembership.setAttestationsList(counterAttestations);
+        console.log('Received Counter Attested Membership', JSON.stringify(counterAttestedMembership.toObject()));
+        
+        // Submit record membership tx to ledger
+        const ledgerBase = utils.getLedgerBase(securityDomain, memberId);
+        const [result, resultError] = await utils.handlePromise(
+            ledgerBase.recordMembershipInLedger(myCounterAttestedMembership)
+        );
+        
+        if (resultError) {
+            console.error('Error submitting counter attested membership to ledger:', resultError);
+        }
+        console.log(`Succesfully recorded membership of ${remoteSecurityDomain} with result: ${result}`);
+    } else {
+        console.error(`Sync Remote Membership Failed with error: ${errorMsg}`);
     }
-    console.log(`Succesfully recorded membership of ${remoteSecurityDomain}`)
-    return result
+    
+    // End of protocol for iin-agents: Map cleanup
+    counterAttestationsMap.delete(localKey);
+    localAgentResponseCount.delete(nonce);
+    for (const localAgent in securityDomainDNS) {
+        if (localAgent === memberId) {
+            continue;
+        }
+        const key = getSecurityDomainMapKey(remoteSecurityDomain, localAgent, nonce);
+        counterAttestationsMap.delete(key);
+    }
 };

@@ -33,9 +33,9 @@ export function handlePromise<T>(promise: Promise<T>): Promise<[T?, Error?]> {
 
 export function getIINAgentClient(securityDomain: string, participantId: string, securityDomainDNS?: Object): agent_grpc_pb.IINAgentClient {
     if (!securityDomainDNS) {
-        securityDomainDNS = getSecurityDomainDNS(securityDomain)
+        securityDomainDNS = getSecurityDomainDNS(securityDomain);
     }
-    const iinAgent = securityDomainDNS[participantId]
+    const iinAgent = securityDomainDNS[participantId];
     let client: agent_grpc_pb.IINAgentClient;
     if (iinAgent.tls === 'true') {
         if (iinAgent.tlsCACertPath && iinAgent.tlsCACertPath == "") {
@@ -63,38 +63,38 @@ export function getIINAgentClient(securityDomain: string, participantId: string,
 }
 
 export function getLedgerBase(securityDomain: string, memberId: string): LedgerBase {
-    const ledgerId = getLedgerId(securityDomain)
+    const ledgerId = getLedgerId(securityDomain);
     if(!process.env.DLT_TYPE) {
-        throw new Error(`Env DLT_TYPE not defined`)
+        throw new Error(`Env DLT_TYPE not defined`);
     }
-    const dltType = process.env.DLT_TYPE!.toLowerCase()
+    const dltType = process.env.DLT_TYPE!.toLowerCase();
     if(dltType == 'fabric') {
-        const ledgerBase = new FabricConnector(ledgerId, process.env.WEAVER_CONTRACT_ID, process.env.NETWORK_NAME, process.env.CONFIG_PATH)
+        const ledgerBase = new FabricConnector(ledgerId, process.env.WEAVER_CONTRACT_ID, process.env.NETWORK_NAME, process.env.CONFIG_PATH);
         if (ledgerBase.orgMspId != memberId) {
-            throw new Error(`This IIN Agent's member Id: ${ledgerBase.orgMspId} doesn't match with provided member Id: ${memberId} in request.`)
+            throw new Error(`This IIN Agent's member Id: ${ledgerBase.orgMspId} doesn't match with provided member Id: ${memberId} in request.`);
         }
-        return ledgerBase
+        return ledgerBase;
     } else {
-        throw new Error(`DLT Type ${process.env.DLT_TYPE} not implemented`)
+        throw new Error(`DLT Type ${process.env.DLT_TYPE} not implemented`);
     }
 }
 
 export function getLedgerId(securityDomain: string): any {
-    const secDomConfigPath = process.env.SECURITY_DOMAIN_CONFIG_PATH ? process.env.SECURITY_DOMAIN_CONFIG_PATH : path.resolve(__dirname, "../", "../", "security-domain-config.json")
+    const secDomConfigPath = process.env.SECURITY_DOMAIN_CONFIG_PATH ? process.env.SECURITY_DOMAIN_CONFIG_PATH : path.resolve(__dirname, "../", "../", "security-domain-config.json");
     if (!fs.existsSync(secDomConfigPath)) {
         throw new Error('Security Domain config does not exist at path: ' + secDomConfigPath);
     }
     const secDomConfig = JSON.parse(fs.readFileSync(secDomConfigPath, 'utf8').toString());
-    return secDomConfig[securityDomain]
+    return secDomConfig[securityDomain];
 }
 
 export function getSecurityDomainDNS(securityDomain: string): any {
-    const dnsConfigPath = process.env.DNS_CONFIG_PATH ? process.env.DNS_CONFIG_PATH : path.resolve(__dirname, "../", "../", "dnsconfig.json")
+    const dnsConfigPath = process.env.DNS_CONFIG_PATH ? process.env.DNS_CONFIG_PATH : path.resolve(__dirname, "../", "../", "dnsconfig.json");
     if (!fs.existsSync(dnsConfigPath)) {
         throw new Error('DNS config does not exist at path: ' + dnsConfigPath);
     }
     const dnsConfig = JSON.parse(fs.readFileSync(dnsConfigPath, 'utf8').toString());
-    return dnsConfig[securityDomain]
+    return dnsConfig[securityDomain];
 }
 
 export function defaultCallback(err: any, response: any) {
@@ -129,67 +129,67 @@ export function signMessage(message, privateKey) {
  * returns: True/False
  **/
 export function verifySignature(message, certificate, signature) {
-    const messageBuffer = Buffer.from(message)
-    const signBuffer = Buffer.from(signature, 'base64')
-    const publicKey = crypto.createPublicKey(certificate).export({type:'spki', format:'pem'})
+    const messageBuffer = Buffer.from(message);
+    const signBuffer = Buffer.from(signature, 'base64');
+    const publicKey = crypto.createPublicKey(certificate).export({type:'spki', format:'pem'});
     return crypto.verify("SHA256", messageBuffer, publicKey, signBuffer);
 };
 
 export function deserializeMembership64(dataSerialized64: string): membership_pb.Membership {
-    return membership_pb.Membership.deserializeBinary(Uint8Array.from(Buffer.from(dataSerialized64, 'base64')))
+    return membership_pb.Membership.deserializeBinary(Uint8Array.from(Buffer.from(dataSerialized64, 'base64')));
 }
 export function deserializeAttestedMembershipSet64(dataSerialized64: string): agent_pb.CounterAttestedMembership.AttestedMembershipSet {
-    return membership_pb.Membership.deserializeBinary(Uint8Array.from(Buffer.from(dataSerialized64, 'base64')))
+    return agent_pb.CounterAttestedMembership.AttestedMembershipSet.deserializeBinary(Uint8Array.from(Buffer.from(dataSerialized64, 'base64')));
 }
 
 export function validateAttestedMembership(membershipSerialized64: string, nonce: string, attestation: agent_pb.Attestation) {
-    const membership = deserializeMembership64(membershipSerialized64)
-    const nonce_attestation = attestation.getNonce()
+    const membership = deserializeMembership64(membershipSerialized64);
+    const nonce_attestation = attestation.getNonce();
     if (nonce !== nonce_attestation) {
-        console.error(`Error: Nonce doesn't match. Expected: ${nonce}, received: ${nonce_attestation}`)
-        return false
+        console.error(`Error: Nonce doesn't match. Expected: ${nonce}, received: ${nonce_attestation}`);
+        return false;
     }
-    const signature = attestation.getSignature()
-    const certificate = attestation.getCertificate()
-    const message = membershipSerialized64 + nonce
+    const signature = attestation.getSignature();
+    const certificate = attestation.getCertificate();
+    const message = membershipSerialized64 + nonce;
     if (!verifySignature(message, certificate, signature)) {
-        console.error(`Error: Fail to verify signature on membership`)
-        return false
+        console.error(`Error: Fail to verify signature on membership`);
+        return false;
     }
-    return verifyMemberInMembership(membership, attestation)
+    return verifyMemberInMembership(membership, attestation);
 }
 
 export function verifyMemberInMembership(membership: membership_pb.Membership, attestation: agent_pb.Attestation) {
-    const unitIdentity = attestation.getUnitIdentity()
-    const securityDomain = unitIdentity.getSecurityDomain()
+    const unitIdentity = attestation.getUnitIdentity();
+    const securityDomain = unitIdentity.getSecurityDomain();
     if (securityDomain !== membership.getSecuritydomain()) {
-        console.error(`Error: Security domain of attestor doesn't match. Expected: ${membership.getSecuritydomain()}, Attestor's: ${securityDomain}`)
-        return false
+        console.error(`Error: Security domain of attestor doesn't match. Expected: ${membership.getSecuritydomain()}, Attestor's: ${securityDomain}`);
+        return false;
     }
-    const memberId = unitIdentity.getMemberId()
+    const memberId = unitIdentity.getMemberId();
     const certificate = attestation.getCertificate() 
-    const member = membership.getMembersMap().get(memberId)
-	let isSignerRoot = false
-	let leafCACertPEM = ""
+    const member = membership.getMembersMap().get(memberId);
+	let isSignerRoot = false;
+	let leafCACertPEM = "";
 	if (member.getType() === "ca") {
-		leafCACertPEM = member.getValue()
-		isSignerRoot = true
+		leafCACertPEM = member.getValue();
+		isSignerRoot = true;
 	} else if (member.getType() == "certificate") {
-        const chain = member.getChainList()
-        let parentCert = chain[0]
+        const chain = member.getChainList();
+        let parentCert = chain[0];
         for (let i=1; i<chain.length; i++) {
-            let caCert = chain[i]
-    		isSignerRoot = (i == 1)
+            let caCert = chain[i];
+    		isSignerRoot = (i == 1);
             if(!validateCertificateUsingCA(caCert, parentCert, isSignerRoot)) {
-                console.error('Certificate link invalid')
+                console.error('Certificate link invalid');
                 return false;
             }
-            parentCert = caCert
+            parentCert = caCert;
         }
-		leafCACertPEM = chain[chain.length - 1]
-		isSignerRoot = (chain.length == 1)
+		leafCACertPEM = chain[chain.length - 1];
+		isSignerRoot = (chain.length == 1);
 	}
-	return validateCertificateUsingCA(certificate, leafCACertPEM, isSignerRoot)
+	return validateCertificateUsingCA(certificate, leafCACertPEM, isSignerRoot);
 }
 
 function validateCertificateUsingCA(cert: string, signerCACert: string, isSignerRootCA: boolean): boolean {
@@ -197,57 +197,57 @@ function validateCertificateUsingCA(cert: string, signerCACert: string, isSigner
     const x509SignerCACert = new X509Certificate(signerCACert);
 	if (isSignerRootCA) {
 		if (!x509SignerCACert.verify(x509SignerCACert.publicKey)) {
-            console.error(`Root CA Certificate isn't self-signed`)
-			return false
+            console.error(`Root CA Certificate isn't self-signed`);
+			return false;
 		}
 	}
 	if (!x509Cert.verify(x509SignerCACert.publicKey)) {
-        console.error(`Certificate isn't signed by the provided CA`)
-		return false
+        console.error(`Certificate isn't signed by the provided CA`);
+		return false;
 	}
 	if (!isCertificateWithinExpiry(x509Cert)) {
-        console.error(`Certificate is outside of validity. Cert validity from ${x509Cert.validFrom} to ${x509Cert.validTo}`)
-        return false
+        console.error(`Certificate is outside of validity. Cert validity from ${x509Cert.validFrom} to ${x509Cert.validTo}`);
+        return false;
     }
 	if (x509Cert.issuer !== x509SignerCACert.subject) {
-		console.error(`Certificate issuer ${x509Cert.issuer} does not match signer subject ${x509SignerCACert.subject}`)
-        return false
+		console.error(`Certificate issuer ${x509Cert.issuer} does not match signer subject ${x509SignerCACert.subject}`);
+        return false;
 	}
-	return true
+	return true;
 }
 function isCertificateWithinExpiry(x509Cert: typeof X509Certificate) {
-    const validFrom = new Date(x509Cert.validFrom).valueOf()
-    const validTo = new Date(x509Cert.validTo).valueOf()
-    const currTime = Date.now()
-    return (currTime <= validTo && currTime >= validFrom)
+    const validFrom = new Date(x509Cert.validFrom).valueOf();
+    const validTo = new Date(x509Cert.validTo).valueOf();
+    const currTime = Date.now();
+    return (currTime <= validTo && currTime >= validFrom);
 }
 export function generateErrorAttestation(errorMsg, securityDomain, memberId, nonce) {
-    const unitId = new iin_agent_pb.SecurityDomainMemberIdentity()
-    unitId.setSecurityDomain(securityDomain)
-    unitId.setMemberId(memberId)
+    const unitId = new agent_pb.SecurityDomainMemberIdentity();
+    unitId.setSecurityDomain(securityDomain);
+    unitId.setMemberId(memberId);
     
-    const attestation = new iin_agent_pb.Attestation()
-    attestation.setUnitIdentity(unitId)
-    attestation.setNonce(nonce)
-    attestation.setTimestamp(Date.now())
+    const attestation = new agent_pb.Attestation();
+    attestation.setUnitIdentity(unitId);
+    attestation.setNonce(nonce);
+    attestation.setTimestamp(Date.now());
     
-    const errorAttestedMembership = new iin_agent_pb.AttestedMembership()
-    errorAttestedMembership.setError(errorMsg)
-    errorAttestedMembership.setAttestation(attestation)
+    const errorAttestedMembership = new agent_pb.AttestedMembership();
+    errorAttestedMembership.setError(errorMsg);
+    errorAttestedMembership.setAttestation(attestation);
     return errorAttestedMembership;
 }
 export function generateErrorCounterAttestation(errorMsg, securityDomain, memberId, nonce) {
-    const unitId = new iin_agent_pb.SecurityDomainMemberIdentity()
-    unitId.setSecurityDomain(securityDomain)
-    unitId.setMemberId(memberId)
+    const unitId = new agent_pb.SecurityDomainMemberIdentity();
+    unitId.setSecurityDomain(securityDomain);
+    unitId.setMemberId(memberId);
     
-    const attestation = new iin_agent_pb.Attestation()
-    attestation.setUnitIdentity(unitId)
-    attestation.setNonce(nonce)
-    attestation.setTimestamp(Date.now())
+    const attestation = new agent_pb.Attestation();
+    attestation.setUnitIdentity(unitId);
+    attestation.setNonce(nonce);
+    attestation.setTimestamp(Date.now());
     
-    const errorCounterAttestedMembership = new iin_agent_pb.CounterAttestedMembership()
-    errorCounterAttestedMembership.setError(errorMsg)
-    errorCounterAttestedMembership.setAttestationsList([attestation])
+    const errorCounterAttestedMembership = new agent_pb.CounterAttestedMembership();
+    errorCounterAttestedMembership.setError(errorMsg);
+    errorCounterAttestedMembership.setAttestationsList([attestation]);
     return errorCounterAttestedMembership;
 }

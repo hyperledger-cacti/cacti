@@ -94,10 +94,10 @@ function getMembershipUnit(channel: Channel, mspId: string): membershipPb.Member
     } else if (mspConfig.intermediateCerts.length !== 0) {
         certs.push(mspConfig.intermediateCerts);
     }
-    let member = new membershipPb.Member()
-    member.setType("certificate")
-    member.setValue("")
-    member.setChainList(certs)
+    let member = new membershipPb.Member();
+    member.setType("certificate");
+    member.setValue("");
+    member.setChainList(certs);
     
     return member;
 }
@@ -117,8 +117,8 @@ async function getMSPConfiguration(
         const network = await gateway.getNetwork(channelId);
         const config = JSON.parse(fs.readFileSync(configFilePath, 'utf8').toString());
         const member = getMembershipUnit(network.getChannel(), config.mspId);
-        const membership = new membershipPb.Membership()
-        membership.getMembersMap().set(config.mspId, member)
+        const membership = new membershipPb.Membership();
+        membership.getMembersMap().set(config.mspId, member);
         // Disconnect from the gateway.
         gateway.disconnect();
         return membership;
@@ -143,11 +143,11 @@ async function getAllMSPConfigurations(
         const network = await gateway.getNetwork(channelId);
         const config = JSON.parse(fs.readFileSync(configFilePath, 'utf8').toString());
         const mspIds = network.getChannel().getMspids();
-        const membership = new membershipPb.Membership()
+        const membership = new membershipPb.Membership();
         for (let i = 0 ; i < mspIds.length ; i++) {
             if (!config.ordererMspIds.includes(mspIds[i])) {
                 const member = getMembershipUnit(network.getChannel(), mspIds[i]);
-                membership.getMembersMap().set(mspIds[i], member)
+                membership.getMembersMap().set(mspIds[i], member);
             }
         }
         // Disconnect from the gateway.

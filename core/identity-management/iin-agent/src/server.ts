@@ -25,8 +25,8 @@ iinAgentServer.addService(iin_agent_pb_grpc.IINAgentService, {
     syncExternalState: (call: { request: iin_agent_pb.SecurityDomainMemberIdentity }, callback: (_: any, object: ack_pb.Ack) => void) => {
         const ack_response = new ack_pb.Ack();
         try {
-            const securityDomain = process.env.SECURITY_DOMAIN ? process.env.SECURITY_DOMAIN : 'network1'
-            const memberId = process.env.MEMBER_ID ? process.env.MEMBER_ID : 'Org1MSP'
+            const securityDomain = process.env.SECURITY_DOMAIN ? process.env.SECURITY_DOMAIN : 'network1';
+            const memberId = process.env.MEMBER_ID ? process.env.MEMBER_ID : 'Org1MSP';
             syncExternalStateFromIINAgent(call.request, securityDomain, memberId);
             ack_response.setMessage('');
             ack_response.setStatus(ack_pb.Ack.STATUS.OK);
@@ -49,13 +49,13 @@ iinAgentServer.addService(iin_agent_pb_grpc.IINAgentService, {
         const ack_response = new ack_pb.Ack();
         try {
             if (!call.request.hasSourceNetwork()) {
-                throw new Error('request does not have source network')
+                throw new Error('request does not have source network');
             }
             if (!call.request.hasRequestingNetwork()) {
-                throw new Error('request does not have requesting network')
+                throw new Error('request does not have requesting network');
             }
             if (call.request.getNonce().length == 0) {
-                throw new Error('request has empty nonce')
+                throw new Error('request has empty nonce');
             }
             requestIdentityConfiguration(call.request);
             ack_response.setMessage('');
@@ -77,13 +77,15 @@ iinAgentServer.addService(iin_agent_pb_grpc.IINAgentService, {
     // Service for receiving security domain unit states from foreign IIN agents. Will communicate with the IIN agent caller and respond with an ack while the attestation is being processed.
     sendIdentityConfiguration: (call: { request: iin_agent_pb.AttestedMembership }, callback: (_: any, object: ack_pb.Ack) => void) => {
         const ack_response = new ack_pb.Ack();
-        let nonce = "";
+        let nonce = '';
         try {
+            const securityDomain = process.env.SECURITY_DOMAIN ? process.env.SECURITY_DOMAIN : 'network1';
+            const memberId = process.env.MEMBER_ID ? process.env.MEMBER_ID : 'Org1MSP';
             if (!call.request.hasAttestation()) {
-                throw new Error('no attestation provided')
+                throw new Error('no attestation provided');
             }
-            nonce = call.request.getAttestation().getNonce()
-            sendIdentityConfiguration(call.request);
+            nonce = call.request.getAttestation().getNonce();
+            sendIdentityConfiguration(call.request, securityDomain, memberId);
             ack_response.setMessage('');
             ack_response.setStatus(ack_pb.Ack.STATUS.OK);
             ack_response.setRequestId(nonce);
@@ -124,11 +126,15 @@ iinAgentServer.addService(iin_agent_pb_grpc.IINAgentService, {
     // Service for receiving attestations on foreign security domain unit states from local IIN agents. Will communicate with the IIN agent caller and respond with an ack while the attestation is being processed.
     sendAttestation: (call: { request: iin_agent_pb.CounterAttestedMembership }, callback: (_: any, object: ack_pb.Ack) => void) => {
         const ack_response = new ack_pb.Ack();
+        let nonce = '';
         try {
-            sendAttestation(call.request);
+            const securityDomain = process.env.SECURITY_DOMAIN ? process.env.SECURITY_DOMAIN : 'network1';
+            const memberId = process.env.MEMBER_ID ? process.env.MEMBER_ID : 'Org1MSP';
+            nonce = call.request.getAttestationsList()[0].getNonce();
+            sendAttestation(call.request, securityDomain, memberId);
             ack_response.setMessage('');
             ack_response.setStatus(ack_pb.Ack.STATUS.OK);
-            ack_response.setRequestId('');
+            ack_response.setRequestId(nonce);
             // gRPC response.
             console.log('Responding to caller');
             callback(null, ack_response);
@@ -136,7 +142,7 @@ iinAgentServer.addService(iin_agent_pb_grpc.IINAgentService, {
             console.log(e);
             ack_response.setMessage(`Error: ${e}`);
             ack_response.setStatus(ack_pb.Ack.STATUS.ERROR);
-            ack_response.setRequestId('');
+            ack_response.setRequestId(nonce);
             // gRPC response.
             console.log('Responding to caller');
             callback(null, ack_response);
