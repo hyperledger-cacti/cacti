@@ -14,6 +14,7 @@ import { Certificate } from '@fidm/x509';
 import * as path from 'path';
 import { syncExternalStateFromIINAgent, requestIdentityConfiguration, sendIdentityConfiguration } from './protocols/externalOperations';
 import { requestAttestation, sendAttestation } from './protocols/localOperations';
+import { getLedgerBase } from './common/utils'
 
 
 const iinAgentServer = new Server();
