@@ -37,8 +37,11 @@ export class FabricConnector extends LedgerBase {
         const config = JSON.parse(fs.readFileSync(configFilePath, 'utf8').toString());
         this.iinAgentUserName = config.agent.name;
         this.orgMspId = config.mspId;
-        this.connectionProfilePath = config.ccpPath ? config.ccpPath : path.resolve(__dirname, './', 'connection_profile.json');
-        this.walletPath = config.walletPath ? config.walletPath : path.join(process.cwd(), `wallet-${this.networkId}-${this.orgMspId}`);
+        this.connectionProfilePath = (config.ccpPath && config.ccpPath.length>0) ? config.ccpPath : path.resolve(__dirname, './', 'connection_profile.json');
+        if (!fs.existsSync(this.connectionProfilePath)) {
+            throw new Error('Connection profile does not exist at path: ' + configFilePath);
+        }
+        this.walletPath = (config.walletPath && config.walletPath.length>0) ? config.walletPath : path.join(process.cwd(), `wallet-${this.networkId}-${this.orgMspId}`);
     }
 
     // Setup a user (with wallet and one or more identities) with contract invocation credentials
