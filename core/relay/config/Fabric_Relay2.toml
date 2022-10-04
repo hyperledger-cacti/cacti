@@ -32,6 +32,11 @@ hostname="localhost"
 port="9080"
 tls=false
 tlsca_cert_path="credentials/fabric_ca_cert.pem"
+[relays.Fabric_Relay2]
+hostname="localhost"
+port="9083"
+tls=false
+tlsca_cert_path="credentials/fabric_ca_cert.pem"
 
 
 [drivers]
