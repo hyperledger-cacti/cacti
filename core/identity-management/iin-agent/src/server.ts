@@ -152,17 +152,12 @@ iinAgentServer.addService(iin_agent_pb_grpc.IINAgentService, {
 
 // Bootstrapping
 const configSetup = async () => {
-    // TODO
-    const dltType = process.env.DLT_TYPE!.toLowerCase();
+    // Initiate agent's ledger
+    const securityDomain = process.env.SECURITY_DOMAIN ? process.env.SECURITY_DOMAIN : 'network1';
     const memberId = process.env.MEMBER_ID ? process.env.MEMBER_ID : 'Org1MSP';
-    if(dltType == 'fabric') {
-        const ledgerBase = new FabricConnector(ledgerId, process.env.WEAVER_CONTRACT_ID, process.env.NETWORK_NAME, process.env.CONFIG_PATH);
-        if (ledgerBase.orgMspId != memberId) {
-            throw new Error(`This IIN Agent's member Id: ${ledgerBase.orgMspId} doesn't match with provided member Id: ${memberId} in request.`);
-        }
-    } else {
-        throw new Error(`DLT Type ${process.env.DLT_TYPE} not implemented`);
-    }
+    const ledgerBase = getLedgerBase(securityDomain, memberId)
+    
+    // TODO
 };
 
 // SERVER: Start the IIN agent server with the provided url.
