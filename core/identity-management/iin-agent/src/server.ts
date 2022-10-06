@@ -58,7 +58,9 @@ iinAgentServer.addService(iin_agent_pb_grpc.IINAgentService, {
             if (call.request.getNonce().length == 0) {
                 throw new Error('request has empty nonce');
             }
-            requestIdentityConfiguration(call.request);
+            requestIdentityConfiguration(call.request).then().catch((error) => {
+                console.error("Error:", error);
+            });
             ack_response.setMessage('');
             ack_response.setStatus(ack_pb.Ack.STATUS.OK);
             ack_response.setRequestId(call.request.getNonce());
@@ -157,6 +159,8 @@ const configSetup = async () => {
     const securityDomain = process.env.SECURITY_DOMAIN ? process.env.SECURITY_DOMAIN : 'network1';
     const memberId = process.env.MEMBER_ID ? process.env.MEMBER_ID : 'Org1MSP';
     const ledgerBase = getLedgerBase(securityDomain, memberId)
+    await ledgerBase.init();
+    console.log("Setup compelete.")
     
     // TODO
 };
@@ -175,6 +179,8 @@ if (process.env.IIN_AGENT_TLS === 'true') {
         configSetup().then(() => {
             console.log('Starting IIN agent server with TLS on', process.env.IIN_AGENT_ENDPOINT);
             iinAgentServer.start();
+        }).catch((error) => {
+            console.error("Could not setup iin-agent due to error:", error);
         });
     });
 } else {
@@ -182,6 +188,8 @@ if (process.env.IIN_AGENT_TLS === 'true') {
         configSetup().then(() => {
             console.log('Starting IIN agent server without TLS on', process.env.IIN_AGENT_ENDPOINT);
             iinAgentServer.start();
+        }).catch((error) => {
+            console.error("Could not setup iin-agent due to error:", error);
         });
     });
 }

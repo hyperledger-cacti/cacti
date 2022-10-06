@@ -42,12 +42,10 @@ export class FabricConnector extends LedgerBase {
             throw new Error('Connection profile does not exist at path: ' + configFilePath);
         }
         this.walletPath = (config.walletPath && config.walletPath.length>0) ? config.walletPath : path.join(process.cwd(), `wallet-${this.networkId}-${this.orgMspId}`);
-        this.setupWalletIdentity()
     }
 
-    // Setup a user (with wallet and one or more identities) with contract invocation credentials
-    async setupWalletIdentity() {
-        walletSetup(this.walletPath, this.connectionProfilePath, this.configFilePath);
+    async init() {
+        await walletSetup(this.walletPath, this.connectionProfilePath, this.configFilePath);
     }
 
     // Collect security domain membership info

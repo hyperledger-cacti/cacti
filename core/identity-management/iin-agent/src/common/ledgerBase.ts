@@ -14,6 +14,9 @@ export class LedgerBase {
         this.ledgerId = ledgerId;
         this.contractId = contractId;
     }
+    
+    async init() {
+    }
 
     getLedgerID(): string {
         return this.ledgerId;
