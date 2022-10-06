@@ -271,6 +271,12 @@ const signMessage = (message, privateKey) => {
     sign.end();
     return sign.sign(privateKey);
 };
+/**
+ * Verifies a signature over message using SHA256
+ **/
+const verifySignature = (message, publicKey, signature) => {
+    return crypto.verify("SHA256", message, publicKey, signature);
+};
 
 const validPatternString = (pattern: string): boolean => {
     // count number of stars in pattern
@@ -684,6 +690,7 @@ export {
     getSignatoryOrgMSPFromFabricEndorsementBase64,
     decodeView,
     signMessage,
+    verifySignature,
     invokeHandler,
     interopFlow,
     getCCArgsForProofVerification,

@@ -18,3 +18,5 @@ import * as HashFunctions from "../src/HashFunctions";
 export { HashFunctions };
 import * as EventsManager from "../src/EventsManager";
 export { EventsManager };
+import * as MembershipManager from "../src/MembershipManager";
+export { MembershipManager };
