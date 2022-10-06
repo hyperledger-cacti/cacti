@@ -35,6 +35,9 @@ export function getIINAgentClient(securityDomain: string, participantId: string,
     if (!securityDomainDNS) {
         securityDomainDNS = getSecurityDomainDNS(securityDomain);
     }
+    if (!(participantId in securityDomainDNS)) {
+        throw new Error(`DNS for member: ${participantId} of ${securityDomain} not defined in DNS Config`)
+    }
     const iinAgent = securityDomainDNS[participantId];
     let client: agent_grpc_pb.IINAgentClient;
     if (iinAgent.tls === 'true') {
@@ -69,7 +72,7 @@ export function getLedgerBase(securityDomain: string, memberId: string): LedgerB
     }
     const dltType = process.env.DLT_TYPE!.toLowerCase();
     if(dltType == 'fabric') {
-        const ledgerBase = new FabricConnector(ledgerId, process.env.WEAVER_CONTRACT_ID, process.env.NETWORK_NAME, process.env.CONFIG_PATH);
+        const ledgerBase = new FabricConnector(ledgerId, process.env.WEAVER_CONTRACT_ID, securityDomain, process.env.CONFIG_PATH);
         if (ledgerBase.orgMspId != memberId) {
             throw new Error(`This IIN Agent's member Id: ${ledgerBase.orgMspId} doesn't match with provided member Id: ${memberId} in request.`);
         }
@@ -99,9 +102,9 @@ export function getSecurityDomainDNS(securityDomain: string): any {
 
 export function defaultCallback(err: any, response: any) {
     if (response) {
-        console.log(`Response: ${JSON.stringify(response.toObject())}`);
+        console.log(`IIN Agent Response: ${JSON.stringify(response.toObject())}`);
     } else if (err) {
-        console.log(`Error: ${JSON.stringify(err)}`);
+        console.log(`IIN Agent Error: ${JSON.stringify(err)}`);
     }
 }
 

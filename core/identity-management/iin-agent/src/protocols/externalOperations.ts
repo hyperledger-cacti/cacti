@@ -40,7 +40,6 @@ export const syncExternalStateFromIINAgent = async (remoteSecurityDomainUnit: ii
     requestingSecurityDomain.setMemberId(memberId);
     
     const request = new iin_agent_pb.SecurityDomainMemberIdentityRequest();
-    request.setSourceNetwork(remoteSecurityDomainUnit);
     request.setRequestingNetwork(requestingSecurityDomain);
     request.setNonce(nonce);
     
@@ -49,6 +48,8 @@ export const syncExternalStateFromIINAgent = async (remoteSecurityDomainUnit: ii
     let c = 0;
     for (const iinAgent in remoteSecurityDomainDNS) {
         const iinAgentClient = utils.getIINAgentClient(remoteSecurityDomain, iinAgent, remoteSecurityDomainDNS);
+        remoteSecurityDomainUnit.setMemberId(iinAgent);
+        request.setSourceNetwork(remoteSecurityDomainUnit);
         console.log(`Requesting attested memberships from: ${remoteSecurityDomain} - ${iinAgent}`);
         iinAgentClient.requestIdentityConfiguration(request, utils.defaultCallback);
         // remoteSecDomMapKeys.push(getSecurityDomainMapKey(remoteSecurityDomain, iinAgent, nonce));
@@ -165,7 +166,7 @@ export const sendIdentityConfiguration = async (attestedMembership: iin_agent_pb
         const attestedMembershipSetSerialized64 = requestingMemberCounterAttestation.getAttestedMembershipSet();
         
         let counterAttestedMembership;
-        if (errorMsg.length > 0) {
+        if (errorMsg.length === 0) {
             counterAttestedMembership = await ledgerBase.counterAttestMembership(attestedMembershipSetSerialized64, securityDomain, nonce);
         } else {
             counterAttestedMembership = utils.generateErrorCounterAttestation(errorMsg, securityDomain, memberId, nonce);
@@ -177,7 +178,7 @@ export const sendIdentityConfiguration = async (attestedMembership: iin_agent_pb
     } else {
         // Else if Initiator, request counter attestation from other local iin-agents
         
-        if (errorMsg.length > 0) {
+        if (errorMsg.length === 0) {
             const attestedMembershipSet = new iin_agent_pb.CounterAttestedMembership.AttestedMembershipSet();
             attestedMembershipSet.setMembership(membership);
             attestedMembershipSet.setAttestationsList(attestations);
@@ -185,18 +186,32 @@ export const sendIdentityConfiguration = async (attestedMembership: iin_agent_pb
             
             console.log('Received Attested Membership Set', JSON.stringify(attestedMembershipSet.toObject()));
             
-            const counterAttestedMembership = await ledgerBase.counterAttestMembership(attestedMembershipSetSerialized64, securityDomain, nonce);
+            const myCounterAttestedMembership = await ledgerBase.counterAttestMembership(attestedMembershipSetSerialized64, securityDomain, nonce);
             
             let c = 0;
             const securityDomainDNS = utils.getSecurityDomainDNS(securityDomain);
             for (const iinAgent in securityDomainDNS) {
+                if (iinAgent === memberId) {
+                    continue;
+                }
                 const iinAgentClient = utils.getIINAgentClient(securityDomain, iinAgent);
                 console.log(`Requesting counter attested memberships from: ${securityDomain} - ${iinAgent}`);
-                iinAgentClient.requestAttestation(counterAttestedMembership, utils.defaultCallback);
+                iinAgentClient.requestAttestation(myCounterAttestedMembership, utils.defaultCallback);
                 c++;
             }
-            localAgentResponseCount.set(nonce, { current:0, total: c});
-            counterAttestationsMap.set(getSecurityDomainMapKey('LOCAL_COUNTER_ATTESTATION_RESPONSE', memberId, nonce), counterAttestedMembership);
+            if (c===0) {
+                const [result, resultError] = await utils.handlePromise(
+                    ledgerBase.recordMembershipInLedger(myCounterAttestedMembership)
+                );
+                
+                if (resultError) {
+                    console.error('Error submitting counter attested membership to ledger:', resultError);
+                }
+                console.log(`Succesfully recorded membership of ${remoteSecurityDomain} with result: ${result}`);
+            } else {
+                localAgentResponseCount.set(nonce, { current:0, total: c});
+                counterAttestationsMap.set(getSecurityDomainMapKey('LOCAL_COUNTER_ATTESTATION_RESPONSE', memberId, nonce), myCounterAttestedMembership);
+            }
         } else {
             console.error('Error while fetching attested membership from foreign network:', errorMsg);
             return;
