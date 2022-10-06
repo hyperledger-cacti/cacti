@@ -7,7 +7,7 @@ name: Deploy Go Modules
 on:
   push:
     branches:
-      - test
+      - main
     paths:
       - 'common/protos-go/VERSION'
       - 'core/network/fabric-interop-cc/libs/utils/VERSION'
@@ -15,6 +15,9 @@ on:
       - 'core/network/fabric-interop-cc/interfaces/asset-mgmt/VERSION'
       - 'core/network/fabric-interop-cc/contracts/interop/VERSION'
       - 'sdks/fabric/go-sdk/VERSION'
+      
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
 
 jobs:
   publish-protos:
@@ -33,7 +36,7 @@ jobs:
           echo "MODULE_DESC=GO Weaver Protos" >> $GITHUB_ENV
         
       - name: Set module version
-        run: echo "VERSION=$(cat VERSION)" >> $GITHUB_ENV
+        run: echo "VERSION=v$(cat VERSION)" >> $GITHUB_ENV
         working-directory: common/protos-go
             
       - name: Create Release
@@ -77,7 +80,7 @@ jobs:
           echo "MODULE_DESC=GO Fabric Utils Library for Interoperation" >> $GITHUB_ENV
         
       - name: Set module version
-        run: echo "VERSION=$(cat VERSION)" >> $GITHUB_ENV
+        run: echo "VERSION=v$(cat VERSION)" >> $GITHUB_ENV
         working-directory: core/network/fabric-interop-cc/libs/utils
         
       - name: Build test
@@ -125,7 +128,7 @@ jobs:
           echo "MODULE_DESC=GO Fabric Library for Asset Exchange" >> $GITHUB_ENV
         
       - name: Set module version
-        run: echo "VERSION=$(cat VERSION)" >> $GITHUB_ENV
+        run: echo "VERSION=v$(cat VERSION)" >> $GITHUB_ENV
         working-directory: core/network/fabric-interop-cc/libs/assetexchange
 
       - name: Build test
@@ -173,7 +176,7 @@ jobs:
           echo "MODULE_DESC=GO Fabric Asset Management Interface" >> $GITHUB_ENV
         
       - name: Set module version
-        run: echo "VERSION=$(cat VERSION)" >> $GITHUB_ENV
+        run: echo "VERSION=v$(cat VERSION)" >> $GITHUB_ENV
         working-directory: core/network/fabric-interop-cc/interfaces/asset-mgmt
       
       - name: Build test
@@ -221,7 +224,7 @@ jobs:
           echo "MODULE_DESC=GO Fabric Interop Chaincode" >> $GITHUB_ENV
         
       - name: Set module version
-        run: echo "VERSION=$(cat VERSION)" >> $GITHUB_ENV
+        run: echo "VERSION=v$(cat VERSION)" >> $GITHUB_ENV
         working-directory: core/network/fabric-interop-cc/contracts/interop
         
       - name: Build test
@@ -269,7 +272,7 @@ jobs:
             echo "MODULE_DESC=GO Fabric Weaver SDK" >> $GITHUB_ENV
         
       - name: Set module version
-        run: echo "VERSION=$(cat VERSION)" >> $GITHUB_ENV
+        run: echo "VERSION=v$(cat VERSION)" >> $GITHUB_ENV
         working-directory: sdks/fabric/go-sdk
         
       - name: Build test

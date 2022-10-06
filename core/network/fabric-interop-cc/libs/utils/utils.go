@@ -80,6 +80,22 @@ func IsClientRelay(stub shim.ChaincodeStubInterface) (bool, error) {
 	return ok, err
 }
 
+// Check if the calling client has an attribute in its signing certificate indicating that it is a privileged network administrator
+func IsClientNetworkAdmin(ctx contractapi.TransactionContextInterface) (bool, error) {
+	// check if caller certificate has the attribute "network-admin"
+	// we don't care about the actual value of the attribute for now
+	_, ok, err := ctx.GetClientIdentity().GetAttributeValue("network-admin")
+	return ok, err
+}
+
+// Check if the calling client has an IIN Agent attribute in its signing certificate
+func IsClientIINAgent(ctx contractapi.TransactionContextInterface) (bool, error) {
+	// check if caller certificate has the attribute "iin-agent"
+	// we don't care about the actual value of the attribute for now
+	_, ok, err := ctx.GetClientIdentity().GetAttributeValue("iin-agent")
+	return ok, err
+}
+
 // Check if the caller is the Interop Chaincode
 func IsCallerInteropChaincode(stub shim.ChaincodeStubInterface) (bool, error) {
 	interopChaincodeID, err := stub.GetState(GetInteropChaincodeIDKey())
@@ -150,7 +166,7 @@ func marshalAssetPledge(pledge *common.AssetPledge) (string, error) {
 		return "", err
 	}
 	assetPledgeBase64 := base64.StdEncoding.EncodeToString(assetPledgeBytes)
-	return assetPledgeBase64, nil	
+	return assetPledgeBase64, nil
 }
 func unmarshalAssetPledge(assetPledgeBase64 string) (*common.AssetPledge, error) {
 	pledge := &common.AssetPledge{}
@@ -190,7 +206,6 @@ func unmarshalAssetClaimStatus(claimStatusBase64 string) (*common.AssetClaimStat
 		return claimStatus, err
 	}
 	return claimStatus, nil
-	
 }
 
 // PledgeAsset locks an asset for transfer to a different ledger/network.
@@ -198,9 +213,9 @@ func PledgeAsset(ctx contractapi.TransactionContextInterface, assetJSON []byte, 
 	if assetIdOrQuantity == "" {
 		return "", fmt.Errorf("no asset ID or unit count provided")
 	}
-	
+
 	pledgeId := generatePledgeId(ctx, assetType, assetIdOrQuantity, owner, remoteNetworkId, recipientCert, expiryTimeSecs)
-	
+
 	pledgeKey := getAssetPledgeKey(pledgeId)
 	pledgeBytes, err := ctx.GetStub().GetState(pledgeKey)
 	if err != nil {
@@ -253,7 +268,7 @@ func ClaimRemoteAsset(ctx contractapi.TransactionContextInterface, pledgeId, cla
 	if pledgeId == "" {
 		return nil, fmt.Errorf("pledgeId can not be empty")
 	}
-	
+
 	pledge, err := unmarshalAssetPledge(pledgeBytes64)
 	if err != nil {
 		return nil, err
@@ -299,13 +314,13 @@ func ClaimRemoteAsset(ctx contractapi.TransactionContextInterface, pledgeId, cla
 	if err != nil {								// No Record of claim
 		return pledge.AssetDetails, ctx.GetStub().PutState(claimKey, claimBytes)
 	}
-	
+
 	lookupClaimStatus := &common.AssetClaimStatus{}
 	err = proto.Unmarshal(lookupClaimBytes, lookupClaimStatus)
 	if lookupClaimStatus.ClaimStatus {			// Previous claim was successful
 		return nil, fmt.Errorf("asset has already been claimed")
 	}
-	
+
 	// Else proceed to claim
 	return pledge.AssetDetails, ctx.GetStub().PutState(claimKey, claimBytes)
 }
@@ -420,12 +435,12 @@ func GetAssetPledgeStatus(ctx contractapi.TransactionContextInterface, pledgeId,
 	if lookupPledge.Recipient != recipientCert || lookupPledge.RemoteNetworkID != recipientNetworkId {
 		return nil, pledgeBytes64, pledgeBytes64, nil      // Return blank
 	}
-	
+
 	lookupPledgeBytes64, err := marshalAssetPledge(lookupPledge)
 	if err != nil {
 		return nil, pledgeBytes64, pledgeBytes64, err
 	}
-	
+
 	return lookupPledge.AssetDetails, lookupPledgeBytes64, pledgeBytes64, nil
 }
 
@@ -451,7 +466,7 @@ func GetAssetPledgeDetails(ctx contractapi.TransactionContextInterface, pledgeId
 	if err != nil {
 		return nil, "", err
 	}
-	
+
 	return lookupPledge.AssetDetails, lookupPledgeBytes64, nil
 }
 

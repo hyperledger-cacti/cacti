@@ -62,6 +62,7 @@ message ContractTransaction {
   string func = 4;
   repeated bytes args = 5;
   uint64 replace_arg_index = 6;
+  repeated string members = 7; 
 }
 
 message EventPublication {

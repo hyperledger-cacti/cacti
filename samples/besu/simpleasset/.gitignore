@@ -1,4 +1,5 @@
 build
 node_modules
-contracts/manageAsset.sol
+contracts/manageAssetAny.sol
+contracts/transferInterface.sol
 package-lock.json

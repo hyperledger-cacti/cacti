@@ -1,4 +1,7 @@
-include Makefile.variables.docker
+DOCKER_IMAGE_NAME ?= weaver-relay
+DOCKER_TAG ?= `cat ./VERSION`
+DOCKER_REGISTRY ?= ghcr.io/hyperledger-labs
+GIT_URL = https://github.com/hyperledger-labs/weaver-dlt-interoperability
 
 PROTOS_TAG ?= v1.4.2
 
@@ -85,6 +88,7 @@ build-local:	protos-local
 build-server-local: protos-local fingerprint.json
 	@echo -e "\033[1mBUILD\033[0m - Building Docker image (relay server)..."
 	docker build  --build-arg COMMIT=$(COMMIT) --build-arg BRANCH=$(BRANCH) --build-arg PROTOS_VERSION=$(PROTOS_TAG) --build-arg VERSION=$(DOCKER_TAG) --build-arg GIT_URL=$(GIT_URL) -t $(DOCKER_IMAGE_SERVER) -f Dockerfile.server .
+	docker tag $(DOCKER_IMAGE_SERVER) $(DOCKER_IMAGE_SERVER_LATEST)
 
 .PHONY: build-client-local
 build-client-local: protos-local fingerprint.json

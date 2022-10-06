@@ -1,4 +1,7 @@
-include makefile.variables.docker
+DOCKER_IMAGE_NAME ?= weaver-corda-driver
+DOCKER_TAG ?= `cat ./VERSION`
+DOCKER_REGISTRY ?= ghcr.io/hyperledger-labs
+GIT_URL = https://github.com/hyperledger-labs/weaver-dlt-interoperability/core/drivers/corda-driver
 
 COMPOSE_ARG ?=
 
@@ -23,6 +26,7 @@ build-refresh-dependencies: github.properties
 .PHONY: image-local
 image-local: build-local
 	docker build -f Dockerfile.local -t $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) .
+	docker tag $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) $(DOCKER_IMAGE_NAME):latest
 
 .PHONY: image
 image: github.properties

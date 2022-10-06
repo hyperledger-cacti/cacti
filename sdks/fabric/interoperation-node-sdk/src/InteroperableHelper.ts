@@ -409,6 +409,7 @@ const interopFlow = async (
     interopArgIndices: Array<number>,
     interopJSONs: Array<InteropJSON>,
     keyCert: { key: ICryptoKey; cert: any },
+    endorsingOrgs: Array<string> = [],
     returnWithoutLocalInvocation: boolean = false,
     useTls: boolean = false,
     tlsRootCACertPaths?: Array<string>,
@@ -465,6 +466,7 @@ const interopFlow = async (
         computedAddresses,
         viewsSerializedBase64,
         viewContentsBase64,
+        endorsingOrgs
     );
     return { views, result };
 };
@@ -509,6 +511,7 @@ const submitTransactionWithRemoteViews = async (
     viewAddresses: Array<string>,
     viewsSerializedBase64: Array<string>,
     viewContentsBase64: Array<string>,
+    endorsingOrgs: Array<string>
 ): Promise<any> => {
     const ccArgs = getCCArgsForProofVerification(
         invokeObject,
@@ -517,8 +520,13 @@ const submitTransactionWithRemoteViews = async (
         viewsSerializedBase64,
         viewContentsBase64,
     );
+    
+    const tx = interopContract.createTransaction("WriteExternalState")
+    if (endorsingOrgs.length > 0) {
+        tx.setEndorsingOrganizations(...endorsingOrgs)
+    }
     const [result, submitError] = await helpers.handlePromise(
-        interopContract.submitTransaction("WriteExternalState", ...ccArgs),
+        tx.submit(...ccArgs)
     );
     if (submitError) {
         throw new Error(`submitTransaction Error: ${submitError}`);
