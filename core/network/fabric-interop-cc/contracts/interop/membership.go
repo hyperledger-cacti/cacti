@@ -12,7 +12,6 @@ import (
 	"crypto/x509"
 	"encoding/base64"
 	"encoding/json"
-	"encoding/pem"
 	"fmt"
 
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
@@ -39,15 +38,12 @@ func validateMemberCertChains(membership *common.Membership) error {
 }
 
 // Validate 'identity.Attestation' object against a message byte array
+// Should be removed?: to be confirmed in PR
 func validateAttestation(attestation *identity.Attestation, messageBytes string) error {
 	// Parse local IIN Agent's certificate
-	certDecoded, _ := pem.Decode([]byte(attestation.Certificate))
-	if certDecoded == nil {
-		fmt.Printf("Unable to decode cert PEM: %s\n", attestation.Certificate)
-	}
-	cert, err := x509.ParseCertificate(certDecoded.Bytes)
+	cert, err := parseCert(attestation.Certificate)
 	if err != nil {
-		fmt.Printf("Unable to parse certificate: %s\n", attestation.Certificate)
+		return fmt.Errorf("Unable to parse attester certificate: %v", err)
 	}
 	// We assume the signature is base64-encoded as it is a string type in the 'Attestation' protobuf
 	decodedSignature, err := base64.StdEncoding.DecodeString(attestation.Signature)
@@ -67,7 +63,11 @@ func parseCounterAttestedMembership(counterAttestedMembershipSerialized string) 
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("Counter Attested Membership Unmarshal error: %s", err)
 	}
-	decodedAttestedMembershipSet, err := base64.StdEncoding.DecodeString(counterAttestedMembership.AttestedMembershipSet)
+	attestedMembershipSet64 := counterAttestedMembership.GetAttestedMembershipSet()
+	if attestedMembershipSet64 == "" {
+		return nil, nil, nil, fmt.Errorf("Attested Membership Set empty with error: %s", counterAttestedMembership.GetError())
+	}
+	decodedAttestedMembershipSet, err := base64.StdEncoding.DecodeString(attestedMembershipSet64)
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("Attested membership set could not be decoded from base64: %s", err.Error())
 	}
@@ -88,6 +88,48 @@ func parseCounterAttestedMembership(counterAttestedMembershipSerialized string) 
 	return counterAttestedMembership, &attestedMembershipSet, &foreignMembership, nil
 }
 
+/* Validate for each attester:
+ * 1. Membership of attester in the given membership
+ * 2. Attestation/Signature against a message byte array
+ * 3. One attester from each member of membership
+ */
+func validateAttestationsList(membership *common.Membership, attestations []*identity.Attestation, messageBytes string) error {
+	// Ensure authentic and valid attestations from all foreign IIN Agents
+	var attestationsMap = make(map[string]bool)
+	for _, attestation := range attestations {
+		if attestation.UnitIdentity.SecurityDomain != membership.SecurityDomain {
+			return fmt.Errorf("IIN Agent security domain %s does not match with membership security domain %s",
+				attestation.UnitIdentity.SecurityDomain, membership.SecurityDomain)
+		}
+		attesterCert, err := parseCert(attestation.Certificate)
+		if err != nil {
+			return fmt.Errorf("Unable to parse attester certificate")
+		}
+		err = verifyMemberInSecurityDomain2("", attesterCert, membership, attestation.UnitIdentity.MemberId)
+		if err != nil {
+			return fmt.Errorf("Attester with certificate %+v is not a designated IIN Agent of org %s in security domain %s: %+v",
+				attesterCert, attestation.UnitIdentity.MemberId, attestation.UnitIdentity.SecurityDomain, err)
+		}
+		
+		// Validate signature
+		decodedSignature, err := base64.StdEncoding.DecodeString(attestation.Signature)
+		if err != nil {
+			return fmt.Errorf("Attestation signature could not be decoded from base64: %s", err.Error())
+		}
+		err = validateSignature(messageBytes, attesterCert, string(decodedSignature))
+		if err != nil {
+			return fmt.Errorf("Unable to Validate Signature: %s", err.Error())
+		}
+		attestationsMap[attestation.UnitIdentity.MemberId] = true
+	}
+	for memberId := range membership.Members {
+		if _, ok := attestationsMap[memberId]; !ok {
+			return fmt.Errorf("Missing attestation from %s of security domain %s", memberId, membership.SecurityDomain)
+		}
+	}
+	return nil
+}
+
 // Validate 'identity.CounterAttestedMembership' object and its embedded structures
 func validateCounterAttestedMembership(s *SmartContract, ctx contractapi.TransactionContextInterface, counterAttestedMembership *identity.CounterAttestedMembership, attestedMembershipSet *identity.CounterAttestedMembership_AttestedMembershipSet, foreignMembership *common.Membership) error {
 	var err error
@@ -105,11 +147,17 @@ func validateCounterAttestedMembership(s *SmartContract, ctx contractapi.Transac
 	}
 
 	// Ensure valid attestations from all local IIN Agents
-	for _, attestation := range counterAttestedMembership.Attestations {
-		err = validateAttestation(attestation, counterAttestedMembership.AttestedMembershipSet + attestation.Nonce)
-		if err != nil {
-			return err
-		}
+	localMembershipString, err := s.GetMembershipBySecurityDomain(ctx, membershipLocalSecurityDomain)
+	if err != nil {
+		return err
+	}
+	localMembership, err := decodeMembership([]byte(localMembershipString))
+	if err != nil {
+		return fmt.Errorf("Failed to unmarshal membership: %s", err.Error())
+	}
+	err = validateAttestationsList(localMembership, counterAttestedMembership.Attestations, counterAttestedMembership.GetAttestedMembershipSet() + matchedNonce)
+	if err != nil {
+		return err
 	}
 
 	// Validate foreign membership cert chains
@@ -119,25 +167,9 @@ func validateCounterAttestedMembership(s *SmartContract, ctx contractapi.Transac
 	}
 
 	// Ensure authentic and valid attestations from all foreign IIN Agents
-	for _, attestation := range attestedMembershipSet.Attestations {
-		if attestation.UnitIdentity.SecurityDomain != foreignMembership.SecurityDomain {
-			return fmt.Errorf("Foreign agent security domain %s does not match attested membership security domain %s",
-				attestation.UnitIdentity.SecurityDomain, foreignMembership.SecurityDomain)
-		}
-		attesterCert, err := parseCert(attestation.Certificate)
-		if err != nil {
-			return fmt.Errorf("Unable to parse attester certificate")
-		}
-		err = verifyMemberInSecurityDomain2(s, ctx, "", attesterCert, foreignMembership, attestation.UnitIdentity.MemberId)
-		if err != nil {
-			return fmt.Errorf("Attester with certificate %+v is not a designated IIN Agent of org %s in security domain %s: %+v",
-				attesterCert, attestation.UnitIdentity.MemberId, attestation.UnitIdentity.SecurityDomain, err)
-		}
-		// Validate signature
-		err = validateAttestation(attestation, attestedMembershipSet.Membership + attestation.Nonce)
-		if err != nil {
-			return err
-		}
+	err = validateAttestationsList(foreignMembership, attestedMembershipSet.Attestations, attestedMembershipSet.Membership + matchedNonce)
+	if err != nil {
+		return err
 	}
 
 	return nil
@@ -171,7 +203,8 @@ func (s *SmartContract) CreateLocalMembership(ctx contractapi.TransactionContext
 	if err != nil {
 		return err
 	}
-
+	
+	fmt.Printf("Recording Foreign Membership with securityDomain: %s\n", membershipLocalSecurityDomain)
 	membershipBytes, err := json.Marshal(membership)
 	if err != nil {
 		return fmt.Errorf("Marshal error: %s", err)
@@ -229,21 +262,6 @@ func (s *SmartContract) CreateMembership(ctx contractapi.TransactionContextInter
 		return createMembership(ctx, counterAttestedMembershipSerialized)		// HACK to handle unattested memberships (for Corda) for backward compatibility
 	}
 
-	// Check if caller is one of the authorized IIN agents
-	callerId := ctx.GetClientIdentity()
-	callerCert, err := callerId.GetX509Certificate()
-	if err != nil {
-		return err
-	}
-	callerMemberUnit, err := callerId.GetMSPID()
-	if err != nil {
-		return err
-	}
-	err = verifyMemberInSecurityDomain1(s, ctx, "", callerCert, membershipLocalSecurityDomain, callerMemberUnit)
-	if err != nil {
-		return fmt.Errorf("Caller with identity %+v is not a designated IIN Agent of org %s: %+v", callerId, callerMemberUnit, err)
-	}
-
 	// Parse the counter attested membership structure and extract the relevant objects
 	counterAttestedMembership, attestedMembershipSet, foreignMembership, err := parseCounterAttestedMembership(counterAttestedMembershipSerialized)
 	if err != nil {
@@ -265,7 +283,8 @@ func (s *SmartContract) CreateMembership(ctx contractapi.TransactionContextInter
 	if err != nil {
 		return err
 	}
-
+	
+	fmt.Printf("Recording Foreign Membership with securityDomain: %s\n", foreignMembership.SecurityDomain)
 	membershipBytes, err := json.Marshal(foreignMembership)
 	if err != nil {
 		return fmt.Errorf("Marshal error: %s", err)
@@ -316,21 +335,6 @@ func (s *SmartContract) UpdateMembership(ctx contractapi.TransactionContextInter
 			return fmt.Errorf("Caller neither a network admin nor an IIN Agent; access denied")
 		}
 		return updateMembership(s, ctx, counterAttestedMembershipSerialized)		// HACK to handle unattested memberships (for Corda) for backward compatibility
-	}
-
-	// Check if caller is one of the authorized IIN agents
-	callerId := ctx.GetClientIdentity()
-	callerCert, err := callerId.GetX509Certificate()
-	if err != nil {
-		return err
-	}
-	callerMemberUnit, err := callerId.GetMSPID()
-	if err != nil {
-		return err
-	}
-	err = verifyMemberInSecurityDomain1(s, ctx, "", callerCert, membershipLocalSecurityDomain, callerMemberUnit)
-	if err != nil {
-		return fmt.Errorf("Caller with identity %+v is not a designated IIN Agent: %+v", callerId, err)
 	}
 
 	// Parse the counter attested membership structure and extract the relevant objects
@@ -477,14 +481,14 @@ func verifyMemberInSecurityDomain1(s *SmartContract, ctx contractapi.Transaction
 	if err != nil {
 		return fmt.Errorf("Failed to unmarshal membership: %s", err.Error())
 	}
-	return verifyMemberInSecurityDomain2(s, ctx, certPEM, cert, membership, requestingOrg)
+	return verifyMemberInSecurityDomain2(certPEM, cert, membership, requestingOrg)
 }
 
 // verifyMemberInSecurityDomain2 function verifies the identity of the requester according to
 // the Membership for the external network the request originated from.
 // This takes a decoded X.509 certificate as argument (and optionally the certificate in PEM format too).
 // It takes a membership structure as argument.
-func verifyMemberInSecurityDomain2(s *SmartContract, ctx contractapi.TransactionContextInterface, certPEM string, cert *x509.Certificate, membership *common.Membership, requestingOrg string) error {
+func verifyMemberInSecurityDomain2(certPEM string, cert *x509.Certificate, membership *common.Membership, requestingOrg string) error {
 	err := isCertificateWithinExpiry(cert)
 	if err != nil {
 		return err

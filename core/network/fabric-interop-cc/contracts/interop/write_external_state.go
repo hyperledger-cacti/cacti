@@ -89,32 +89,32 @@ func ExtractAndValidateDataFromView(view *common.View, b64ViewContent string) ([
 }
 
 // Validate view against address, and extract data (i.e., query response) from view
-func (s *SmartContract) ParseAndValidateView(ctx contractapi.TransactionContextInterface, address, b64ViewProto, b64ViewContent string) ([]byte, error) {
+func (s *SmartContract) ParseAndValidateView(ctx contractapi.TransactionContextInterface, address, b64ViewProto, b64ViewContent string) (string, error) {
 	viewB64Bytes, err := base64.StdEncoding.DecodeString(b64ViewProto)
 	if err != nil {
-		return nil, fmt.Errorf("Unable to base64 decode data: %s", err.Error())
+		return "", fmt.Errorf("Unable to base64 decode data: %s", err.Error())
 	}
 	var view common.View
 	err = protoV2.Unmarshal(viewB64Bytes, &view)
 	if err != nil {
-		return nil, fmt.Errorf("View Unmarshal error: %s", err)
+		return "", fmt.Errorf("View Unmarshal error: %s", err)
 	}
 
 	// 1. Verify proof
 	err = s.VerifyView(ctx, b64ViewProto, address)
 	if err != nil {
 		log.Errorf("Proof obtained from foreign network for query '%s' is INVALID", address)
-		return nil, fmt.Errorf("VerifyView error: %s", err)
+		return "", fmt.Errorf("VerifyView error: %s", err)
 	}
 
 	// 2. Extract response data for consumption by application chaincode
 	viewData, err := ExtractAndValidateDataFromView(&view, b64ViewContent)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	fmt.Printf("View data: %s\n", string(viewData))
 
-	return viewData, nil
+	return string(viewData), nil
 }
 
 // WriteExternalState flow is used to process a response from a foreign network for state.
@@ -145,7 +145,7 @@ func (s *SmartContract) WriteExternalState(ctx contractapi.TransactionContextInt
 			return err
 		}
 		// Substitute argument in list with view data
-		arr[argIndex + 1] = string(viewData)        // First argument is the CC function name
+		arr[argIndex + 1] = viewData        // First argument is the CC function name
 	}
 
 	// 2. Call application chaincode with created state as the argument
