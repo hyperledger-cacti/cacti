@@ -176,7 +176,7 @@ func validateCounterAttestedMembership(s *SmartContract, ctx contractapi.Transac
 }
 
 // CreateLocalMembership cc is used to store the local security domain's Membership in the ledger
-func (s *SmartContract) CreateLocalMembership(ctx contractapi.TransactionContextInterface, membershipJSON string) error {
+func (s *SmartContract) CreateLocalMembership(ctx contractapi.TransactionContextInterface, membershipSerialized64 string) error {
 	// Check if the caller has network admin privileges
 	if isAdmin, err := wutils.IsClientNetworkAdmin(ctx); err != nil {
 		return fmt.Errorf("Admin client check error: %s", err)
@@ -184,7 +184,7 @@ func (s *SmartContract) CreateLocalMembership(ctx contractapi.TransactionContext
 		return fmt.Errorf("Caller not a network admin; access denied")
 	}
 
-	membership, err := decodeMembership([]byte(membershipJSON))
+	membership, err := decodeMembershipSerialized64(membershipSerialized64)
 	if err != nil {
 		return fmt.Errorf("Unmarshal error: %s", err)
 	}
@@ -213,15 +213,15 @@ func (s *SmartContract) CreateLocalMembership(ctx contractapi.TransactionContext
 }
 
 // UpdateLocalMembership cc is used to update the existing local security domain's Membership in the ledger
-func (s *SmartContract) UpdateLocalMembership(ctx contractapi.TransactionContextInterface, membershipJSON string) error {
+func (s *SmartContract) UpdateLocalMembership(ctx contractapi.TransactionContextInterface, membershipSerialized64 string) error {
 	// Check if the caller has network admin privileges
 	if isAdmin, err := wutils.IsClientNetworkAdmin(ctx); err != nil {
 		return fmt.Errorf("Admin client check error: %+v", err)
 	} else if !isAdmin {
 		return fmt.Errorf("Caller not a network admin; access denied")
 	}
-
-	membership, err := decodeMembership([]byte(membershipJSON))
+	
+	membership, err := decodeMembershipSerialized64(membershipSerialized64)
 	if err != nil {
 		return fmt.Errorf("Unmarshal error: %s", err)
 	}

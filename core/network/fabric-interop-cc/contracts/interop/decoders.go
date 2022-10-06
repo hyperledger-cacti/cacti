@@ -22,6 +22,16 @@ import (
 	protoV2 "google.golang.org/protobuf/proto"
 )
 
+func decodeMembershipSerialized64(bytes64 string) (*common.Membership, error) {
+	var decodeObj common.Membership
+	protoBytes, err := base64.StdEncoding.DecodeString(bytes64)
+	err = protoV2.Unmarshal(protoBytes, &decodeObj)
+	if err != nil {
+		return nil, fmt.Errorf("Unable to unmarshal membership: %s", err.Error())
+	}
+	return &decodeObj, nil
+}
+
 func decodeMembership(jsonBytes []byte) (*common.Membership, error) {
 	var decodeObj common.Membership
 	dec := json.NewDecoder(strings.NewReader(string(jsonBytes)))

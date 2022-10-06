@@ -194,17 +194,18 @@ func TestCreateLocalMembership(t *testing.T) {
 		Members:		map[string]*common.Member{ "member1": &member1, "member2": &member2},
 	}
 
-	membershipBytes, err := json.Marshal(&membershipAsset)
+	membershipBytes, err := protoV2.Marshal(&membershipAsset)
 	require.NoError(t, err)
+	membershipSerialized64 := base64.StdEncoding.EncodeToString(membershipBytes)
 
 	// Case when caller is not an admin
-	err = interopcc.CreateLocalMembership(ctx, string(membershipBytes))
+	err = interopcc.CreateLocalMembership(ctx, membershipSerialized64)
 	require.EqualError(t, err, "Caller not a network admin; access denied")
 	// Case when no Membership is found
 	clientIdentity := &mocks.ClientIdentity{}
 	clientIdentity.GetAttributeValueCalls(setClientAdmin)
 	ctx.GetClientIdentityReturns(clientIdentity)
-	err = interopcc.CreateLocalMembership(ctx, string(membershipBytes))
+	err = interopcc.CreateLocalMembership(ctx, membershipSerialized64)
 	require.NoError(t, err)
 
 	// Valid cert chain
@@ -212,16 +213,17 @@ func TestCreateLocalMembership(t *testing.T) {
 	member.Chain, _, _ = generateCertChain(3)
 	membershipBytes, err = json.Marshal(&membershipAsset)
 	require.NoError(t, err)
-	err = interopcc.CreateLocalMembership(ctx, string(membershipBytes))
+	err = interopcc.CreateLocalMembership(ctx, membershipSerialized64)
 	require.NoError(t, err)
 
 	// Invalid cert chain
 	cert_0 := member.Chain[0]
 	member.Chain[0] = member.Chain[2]
 	member.Chain[2] = cert_0
-	membershipBytes, err = json.Marshal(&membershipAsset)
+	membershipBytes, err = protoV2.Marshal(&membershipAsset)
 	require.NoError(t, err)
-	err = interopcc.CreateLocalMembership(ctx, string(membershipBytes))
+	membershipSerialized64 = base64.StdEncoding.EncodeToString(membershipBytes)
+	err = interopcc.CreateLocalMembership(ctx, membershipSerialized64)
 	require.Error(t, err)
 
 	// Invalid Input check
@@ -231,10 +233,10 @@ func TestCreateLocalMembership(t *testing.T) {
 	membershipBytes, err = json.Marshal(&membershipAsset)
 	require.NoError(t, err)
 	err = interopcc.CreateLocalMembership(ctx, "Invalid Input")
-	require.EqualError(t, err, fmt.Sprintf("Unmarshal error: invalid character 'I' looking for beginning of value"))
+	require.EqualError(t, err, fmt.Sprintf("Unmarshal error: Unable to unmarshal membership: proto:\u00a0cannot parse invalid wire-format data"))
 	// Membership already exists
 	chaincodeStub.GetStateReturns([]byte{}, nil)
-	err = interopcc.CreateLocalMembership(ctx, string(membershipBytes))
+	err = interopcc.CreateLocalMembership(ctx, membershipSerialized64)
 	require.EqualError(t, err, fmt.Sprintf("Membership already exists for local membership id: %s. Use 'UpdateLocalMembership' to update.", membershipLocalSecurityDomain))
 }
 
@@ -247,50 +249,58 @@ func TestUpdateLocalMembership(t *testing.T) {
 		SecurityDomain: securityDomainId,
 		Members:		map[string]*common.Member{ "member1": &member1, "member2": &member2},
 	}
-
-	membershipBytes, err := json.Marshal(&membershipAsset)
+	
+	membershipBytes, err := protoV2.Marshal(&membershipAsset)
+	require.NoError(t, err)
+	membershipSerialized64 := base64.StdEncoding.EncodeToString(membershipBytes)
+	membershipJsonBytes, err := json.Marshal(&membershipAsset)
 	require.NoError(t, err)
 
 	// Case when caller is not an admin
-	err = interopcc.UpdateLocalMembership(ctx, string(membershipBytes))
+	err = interopcc.UpdateLocalMembership(ctx, membershipSerialized64)
 	require.EqualError(t, err, "Caller not a network admin; access denied")
 	// Case when no Membership is found
 	clientIdentity := &mocks.ClientIdentity{}
 	clientIdentity.GetAttributeValueCalls(setClientAdmin)
 	ctx.GetClientIdentityReturns(clientIdentity)
-	err = interopcc.UpdateLocalMembership(ctx, string(membershipBytes))
+	err = interopcc.UpdateLocalMembership(ctx, membershipSerialized64)
 	require.EqualError(t, err, fmt.Sprintf("Membership with id: %s does not exist", membershipLocalSecurityDomain))
 
 	// Valid cert chain
 	member := &member1
 	member.Chain, _, _ = generateCertChain(3)
-	membershipBytes, err = json.Marshal(&membershipAsset)
+	membershipBytes, err = protoV2.Marshal(&membershipAsset)
 	require.NoError(t, err)
-	err = interopcc.UpdateLocalMembership(ctx, string(membershipBytes))
+	membershipSerialized64 = base64.StdEncoding.EncodeToString(membershipBytes)
+	err = interopcc.UpdateLocalMembership(ctx, membershipSerialized64)
 	require.EqualError(t, err, fmt.Sprintf("Membership with id: %s does not exist", membershipLocalSecurityDomain))
 
 	// Membership already exists update the Membership
-	chaincodeStub.GetStateReturns(membershipBytes, nil)
-	err = interopcc.UpdateLocalMembership(ctx, string(membershipBytes))
+	chaincodeStub.GetStateReturns(membershipJsonBytes, nil)
+	err = interopcc.UpdateLocalMembership(ctx, membershipSerialized64)
 	require.NoError(t, err)
 
 	// Invalid cert chain
 	cert_0 := member.Chain[0]
 	member.Chain[0] = member.Chain[2]
 	member.Chain[2] = cert_0
-	membershipBytes, err = json.Marshal(&membershipAsset)
+	membershipBytes, err = protoV2.Marshal(&membershipAsset)
 	require.NoError(t, err)
-	err = interopcc.UpdateLocalMembership(ctx, string(membershipBytes))
+	membershipSerialized64 = base64.StdEncoding.EncodeToString(membershipBytes)
+	err = interopcc.UpdateLocalMembership(ctx, membershipSerialized64)
 	require.Error(t, err)
 
 	// Invalid Input check
 	cert_0 = member.Chain[0]
 	member.Chain[0] = member.Chain[2]
 	member.Chain[2] = cert_0
+	membershipBytes, err = protoV2.Marshal(&membershipAsset)
+	require.NoError(t, err)
+	membershipSerialized64 = base64.StdEncoding.EncodeToString(membershipBytes)
 	membershipBytes, err = json.Marshal(&membershipAsset)
 	require.NoError(t, err)
 	err = interopcc.UpdateLocalMembership(ctx, "Invalid Input")
-	require.EqualError(t, err, fmt.Sprintf("Unmarshal error: invalid character 'I' looking for beginning of value"))
+	require.EqualError(t, err, fmt.Sprintf("Unmarshal error: Unable to unmarshal membership: proto:\u00a0cannot parse invalid wire-format data"))
 }
 
 // TODO: Remove later. Keeping for backward compatibility.
@@ -471,16 +481,19 @@ func TestCreateMembership(t *testing.T) {
 
 	// Record local membership info
 	clientIdentity := &mocks.ClientIdentity{}
-	localMembershipBytes, err := json.Marshal(&localMembershipAsset)
+	localMembershipBytes, err := protoV2.Marshal(&localMembershipAsset)
+	require.NoError(t, err)
+	localMembershipSerialized64 := base64.StdEncoding.EncodeToString(localMembershipBytes)
+	localMembershipJsonBytes, err := json.Marshal(&localMembershipAsset)
 	require.NoError(t, err)
 	clientIdentity.GetAttributeValueCalls(setClientAdmin)
 	ctx.GetClientIdentityReturns(clientIdentity)
-	err = interopcc.CreateLocalMembership(ctx, string(localMembershipBytes))
+	err = interopcc.CreateLocalMembership(ctx, string(localMembershipSerialized64))
 	require.NoError(t, err)
 
 	// Record membership info: should succeed now
 	chaincodeStub.GetStateReturnsOnCall(1, nil, nil)
-	chaincodeStub.GetStateReturnsOnCall(2, localMembershipBytes, nil)
+	chaincodeStub.GetStateReturnsOnCall(2, localMembershipJsonBytes, nil)
 	clientIdentity.GetAttributeValueCalls(setClientIINAgent)
 	certLocalAgent2, _ := x509.ParseCertificate(certLocalBytes2)
 	clientIdentity.GetX509CertificateReturns(certLocalAgent2, nil)
@@ -504,7 +517,7 @@ func TestCreateMembership(t *testing.T) {
 	require.NoError(t, err)
 	counterAttestedMembershipBytes = base64.StdEncoding.EncodeToString(counterAttestedMembershipBytesPlain)
 	chaincodeStub.GetStateReturnsOnCall(4, nil, nil)
-	chaincodeStub.GetStateReturnsOnCall(5, localMembershipBytes, nil)
+	chaincodeStub.GetStateReturnsOnCall(5, localMembershipJsonBytes, nil)
 	err = interopcc.CreateMembership(ctx, counterAttestedMembershipBytes)
 	require.EqualError(t, err, "Unable to Validate Signature: Signature Verification failed. ECDSA VERIFY")
 
@@ -533,7 +546,7 @@ func TestCreateMembership(t *testing.T) {
 	require.NoError(t, err)
 	counterAttestedMembershipBytes = base64.StdEncoding.EncodeToString(counterAttestedMembershipBytesPlain)
 	chaincodeStub.GetStateReturnsOnCall(6, nil, nil)
-	chaincodeStub.GetStateReturnsOnCall(7, localMembershipBytes, nil)
+	chaincodeStub.GetStateReturnsOnCall(7, localMembershipJsonBytes, nil)
 	err = interopcc.CreateMembership(ctx, counterAttestedMembershipBytes)
 	require.EqualError(t, err, "Unable to Validate Signature: Signature Verification failed. ECDSA VERIFY")
 
@@ -563,7 +576,7 @@ func TestCreateMembership(t *testing.T) {
 	require.NoError(t, err)
 	counterAttestedMembershipBytes = base64.StdEncoding.EncodeToString(counterAttestedMembershipBytesPlain)
 	chaincodeStub.GetStateReturnsOnCall(8, nil, nil)
-	chaincodeStub.GetStateReturnsOnCall(9, localMembershipBytes, nil)
+	chaincodeStub.GetStateReturnsOnCall(9, localMembershipJsonBytes, nil)
 	err = interopcc.CreateMembership(ctx, counterAttestedMembershipBytes)
 	require.EqualError(t, err, fmt.Sprintf("Mismatched nonces across two attestations: %s, %s", nonce, attestation1.Nonce))
 
@@ -606,7 +619,7 @@ func TestCreateMembership(t *testing.T) {
 	require.NoError(t, err)
 	counterAttestedMembershipBytes = base64.StdEncoding.EncodeToString(counterAttestedMembershipBytesPlain)
 	chaincodeStub.GetStateReturnsOnCall(10, nil, nil)
-	chaincodeStub.GetStateReturnsOnCall(11, localMembershipBytes, nil)
+	chaincodeStub.GetStateReturnsOnCall(11, localMembershipJsonBytes, nil)
 	err = interopcc.CreateMembership(ctx, counterAttestedMembershipBytes)
 	require.Error(t, err)
 
@@ -649,7 +662,7 @@ func TestCreateMembership(t *testing.T) {
 	require.NoError(t, err)
 	counterAttestedMembershipBytes = base64.StdEncoding.EncodeToString(counterAttestedMembershipBytesPlain)
 	chaincodeStub.GetStateReturnsOnCall(12, nil, nil)
-	chaincodeStub.GetStateReturnsOnCall(13, localMembershipBytes, nil)
+	chaincodeStub.GetStateReturnsOnCall(13, localMembershipJsonBytes, nil)
 	err = interopcc.CreateMembership(ctx, counterAttestedMembershipBytes)
 	require.EqualError(t, err, fmt.Sprintf("IIN Agent security domain %s does not match with membership security domain invalid", securityDomainId))
 }
@@ -834,11 +847,14 @@ func TestUpdateMembership(t *testing.T) {
 
 	// Record local membership info
 	clientIdentity := &mocks.ClientIdentity{}
-	localMembershipBytes, err := json.Marshal(&localMembershipAsset)
+	localMembershipBytes, err := protoV2.Marshal(&localMembershipAsset)
+	require.NoError(t, err)
+	localMembershipSerialized64 := base64.StdEncoding.EncodeToString(localMembershipBytes)
+	localMembershipJsonBytes, err := json.Marshal(&localMembershipAsset)
 	require.NoError(t, err)
 	clientIdentity.GetAttributeValueCalls(setClientAdmin)
 	ctx.GetClientIdentityReturns(clientIdentity)
-	err = interopcc.CreateLocalMembership(ctx, string(localMembershipBytes))
+	err = interopcc.CreateLocalMembership(ctx, string(localMembershipSerialized64))
 	require.NoError(t, err)
 
 	// Record membership info: should fail because membership has not been recorded previously
@@ -853,7 +869,7 @@ func TestUpdateMembership(t *testing.T) {
 
 	// Record membership info again: should succeed now
 	chaincodeStub.GetStateReturnsOnCall(2, []byte{}, nil)
-	chaincodeStub.GetStateReturnsOnCall(3, localMembershipBytes, nil)
+	chaincodeStub.GetStateReturnsOnCall(3, localMembershipJsonBytes, nil)
 	err = interopcc.UpdateMembership(ctx, counterAttestedMembershipBytes)
 	require.NoError(t, err)
 	
@@ -867,7 +883,7 @@ func TestUpdateMembership(t *testing.T) {
 	require.NoError(t, err)
 	counterAttestedMembershipBytes = base64.StdEncoding.EncodeToString(counterAttestedMembershipBytesPlain)
 	chaincodeStub.GetStateReturnsOnCall(4, []byte{}, nil)
-	chaincodeStub.GetStateReturnsOnCall(5, localMembershipBytes, nil)
+	chaincodeStub.GetStateReturnsOnCall(5, localMembershipJsonBytes, nil)
 	err = interopcc.UpdateMembership(ctx, counterAttestedMembershipBytes)
 	require.EqualError(t, err, "Unable to Validate Signature: Signature Verification failed. ECDSA VERIFY")
 	
@@ -896,7 +912,7 @@ func TestUpdateMembership(t *testing.T) {
 	require.NoError(t, err)
 	counterAttestedMembershipBytes = base64.StdEncoding.EncodeToString(counterAttestedMembershipBytesPlain)
 	chaincodeStub.GetStateReturnsOnCall(6, []byte{}, nil)
-	chaincodeStub.GetStateReturnsOnCall(7, localMembershipBytes, nil)
+	chaincodeStub.GetStateReturnsOnCall(7, localMembershipJsonBytes, nil)
 	err = interopcc.UpdateMembership(ctx, counterAttestedMembershipBytes)
 	require.EqualError(t, err, "Unable to Validate Signature: Signature Verification failed. ECDSA VERIFY")
 	
@@ -968,7 +984,7 @@ func TestUpdateMembership(t *testing.T) {
 	require.NoError(t, err)
 	counterAttestedMembershipBytes = base64.StdEncoding.EncodeToString(counterAttestedMembershipBytesPlain)
 	chaincodeStub.GetStateReturnsOnCall(9, []byte{}, nil)
-	chaincodeStub.GetStateReturnsOnCall(10, localMembershipBytes, nil)
+	chaincodeStub.GetStateReturnsOnCall(10, localMembershipJsonBytes, nil)
 	err = interopcc.UpdateMembership(ctx, counterAttestedMembershipBytes)
 	require.Error(t, err)
 
@@ -1011,7 +1027,7 @@ func TestUpdateMembership(t *testing.T) {
 	require.NoError(t, err)
 	counterAttestedMembershipBytes = base64.StdEncoding.EncodeToString(counterAttestedMembershipBytesPlain)
 	chaincodeStub.GetStateReturnsOnCall(11, []byte{}, nil)
-	chaincodeStub.GetStateReturnsOnCall(12, localMembershipBytes, nil)
+	chaincodeStub.GetStateReturnsOnCall(12, localMembershipJsonBytes, nil)
 	err = interopcc.UpdateMembership(ctx, counterAttestedMembershipBytes)
 	require.EqualError(t, err, fmt.Sprintf("IIN Agent security domain %s does not match with membership security domain invalid", securityDomainId))
 }
