@@ -514,7 +514,7 @@ jobs:
       - name: Start Fabric Driver for network2
         run: CONNECTION_PROFILE=${GITHUB_WORKSPACE}/tests/network-setups/fabric/shared/network2/peerOrganizations/org1.network2.com/connection-org1.json NETWORK_NAME=network2 RELAY_ENDPOINT=localhost:9083 DRIVER_ENDPOINT=localhost:9095 npm run dev &> fdriver-n2.out &
         working-directory: core/drivers/fabric-driver
-                
+
       # IIN AGENT
       - name: Setup Fabric IIN Config
         run: |
