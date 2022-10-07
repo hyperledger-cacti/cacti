@@ -36,7 +36,7 @@ async function dbConnectionTest(
             value = 'update';
             await db.update(key, value);
         } catch (error: any) {
-            const errorString: string = `${JSON.stringify(error)}`;
+            const errorString: string = `${error.toString()}`;
             if (error instanceof DBNotOpenError) {
                 console.log(`test success for DBNotOpenError`);
                 // open the database connection
@@ -57,7 +57,7 @@ async function dbConnectionTest(
         try {
             await db.read(key);
         } catch (error: any) {
-            const errorString: string = `${JSON.stringify(error)}`;
+            const errorString: string = `${error.toString()}`;
             if (error instanceof DBKeyNotFoundError) {
                 console.log(`test success for DBKeyNotFoundError`);
             } else {
@@ -72,7 +72,7 @@ async function dbConnectionTest(
             let db2 = new LevelDBConnector("");
             await db2.open();
         } catch (error: any) {
-            const errorString: string = `${JSON.stringify(error)}`;
+            const errorString: string = `${error.toString()}`;
             if (error instanceof DBLockedError) {
                 console.log(`test success for DBLockedError`);
             } else {
@@ -83,7 +83,7 @@ async function dbConnectionTest(
 
         await db.close();
     } catch (error) {
-        console.error(`Failed testing LevelDBConnector, with error: ${JSON.stringify(error)}`);
+        console.error(`Failed testing LevelDBConnector, with error: ${error.toString()}`);
         db.close();
         return false;
     }
@@ -110,7 +110,7 @@ async function eventSubscriptionTest(
             }
         }
     } catch (error) {
-        console.error(`Failed testing event subscription operations, with error: ${JSON.stringify(error)}`);
+        console.error(`Failed testing event subscription operations, with error: ${error.toString()}`);
         return false;
     }
 
