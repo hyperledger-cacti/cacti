@@ -123,3 +123,20 @@ jobs:
       - name: Build Image
         run: make image
         working-directory: core/drivers/corda-driver
+
+  iin-agent:
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      
+      - name: Setup .npmrc
+        run: |
+          cp .npmrc.template .npmrc
+          sed -i "s/<personal-access-token>/${{ secrets.GITHUB_TOKEN }}/g" .npmrc
+          cat .npmrc
+        working-directory: core/identity-management/iin-agent
+        
+      - name: Build Image
+        run: make build-image
+        working-directory: core/identity-management/iin-agent
