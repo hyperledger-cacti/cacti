@@ -33,6 +33,8 @@ ENV NODE_ENV production
 WORKDIR /fabric-driver
 
 ADD package.json .
+ADD protos-js /fabric-driver/protos-js
+ADD weaver-fabric-interop-sdk /fabric-driver/weaver-fabric-interop-sdk
 
 COPY --from=builder /fabric-driver/package-lock.json /fabric-driver/
 COPY --from=builder /fabric-driver/node_modules /fabric-driver/node_modules
