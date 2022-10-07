@@ -877,7 +877,7 @@ func interop(key string, localNetwork string, requestingOrg string, address stri
 		signkeyPEM: []byte(keyUser),
 	}
 
-	interopFlowResponse, _, err := interoperablehelper.InteropFlow(contract, networkName, invokeObject, requestingOrg, relayEnv.RelayEndPoint, interopArgIndices, interopJSONs, signer, certUser, false)
+	interopFlowResponse, _, err := interoperablehelper.InteropFlow(contract, networkName, invokeObject, requestingOrg, relayEnv.RelayEndPoint, interopArgIndices, interopJSONs, signer, certUser, false, false)
 	if err != nil {
 		log.Fatalf("failed interoperablehelper.InteropFlow with error: %s", err.Error())
 	}
@@ -891,7 +891,9 @@ func interop(key string, localNetwork string, requestingOrg string, address stri
 
 func main() {
 
+	// need the chaincodes simplestate and interop to exercise the below interop calls
 	//interop("a", "network1", "Org1MSP", "localhost:9080/network1/mychannel:simplestate:Read:a")
+	//interop("a", "network1", "Org1MSP", "localhost:9083/network2/mychannel:simplestate:Read:Arcturus")
 
 	//configureNetwork("network1")
 	//fetchAccessControlPolicy("network1")
