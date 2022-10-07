@@ -55,14 +55,14 @@ const command: GluegunCommand = {
     }
     // for each network, generate network admin identity and IIN Agent identity (there's only one org per network)
     const networkAdminUser = 'networkadmin'
-    const iinAgentUser = 'iinagent'
+    //const iinAgentUser = 'iinagent'
     for (const network of array) {
       // Create a network admin
       print.info(`Creating network admin wallet identity for network: ${network}`)
       await enrollAndRecordWalletIdentity(networkAdminUser, null, network, true, false)
       // Create an IIN Agent
-      print.info(`Creating IIN Agent wallet identity for network: ${network}`)
-      await enrollAndRecordWalletIdentity(iinAgentUser, null, network, false, true)
+      //print.info(`Creating IIN Agent wallet identity for network: ${network}`)
+      //await enrollAndRecordWalletIdentity(iinAgentUser, null, network, false, true)
     }
     // for each network it
     // 1. Generate network configs (membership, access control, and verification policy)
@@ -81,7 +81,7 @@ const command: GluegunCommand = {
       }
 
       const username = currusername || `user1`
-      print.info(`Generating membership for network: ${network}`)
+      /*print.info(`Generating membership for network: ${network}`)
       // 1. Generate network configs (membership, access control, and verification policy)
       await generateMembership(
         process.env.DEFAULT_CHANNEL ? process.env.DEFAULT_CHANNEL : 'mychannel',
@@ -92,7 +92,7 @@ const command: GluegunCommand = {
         network,
         global.__DEFAULT_MSPID__,
         logger
-      )
+      )*/
       const appccid = process.env.DEFAULT_APPLICATION_CHAINCODE ? process.env.DEFAULT_APPLICATION_CHAINCODE : 'simplestate'
       await generateAccessControl(
         process.env.DEFAULT_CHANNEL ? process.env.DEFAULT_CHANNEL : 'mychannel',

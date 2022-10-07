@@ -77,12 +77,12 @@ const command: GluegunCommand = {
     for (const networkName of networkNames) {
       print.info(`Creating network admin wallet identity for network: ${networkName}`)
       await enrollAndRecordWalletIdentity('networkadmin', null, networkName, true, false)   // Create a network admin
-      print.info(`Creating IIN Agent wallet identity for network ${networkName}`)
-      await enrollAndRecordWalletIdentity('iinagent', null, networkName, false, true)       // Create an IIN Agent
+      //print.info(`Creating IIN Agent wallet identity for network ${networkName}`)
+      //await enrollAndRecordWalletIdentity('iinagent', null, networkName, false, true)       // Create an IIN Agent
     }
 
     // Membership
-    logger.info(`Generating membership for ${options['local-network']}`)
+    /*logger.info(`Generating membership for ${options['local-network']}`)
     await generateMembership(
       process.env.DEFAULT_CHANNEL ? process.env.DEFAULT_CHANNEL : 'mychannel',
       process.env.DEFAULT_CHAINCODE ? process.env.DEFAULT_CHAINCODE : 'interop',
@@ -95,7 +95,7 @@ const command: GluegunCommand = {
       } secuirty group at ${getCurrentNetworkCredentialPath(
         options['local-network']
       )} `
-    )
+    )*/
 
     // Access Control
     logger.info(

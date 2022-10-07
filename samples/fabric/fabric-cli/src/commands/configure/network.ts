@@ -60,8 +60,8 @@ const command: GluegunCommand = {
     for (const networkName of networkNames) {
       print.info(`Creating network admin wallet identity for network: ${networkName}`)
       await enrollAndRecordWalletIdentity('networkadmin', null, networkName, true, false)   // Create a network admin
-      print.info(`Creating IIN Agent wallet identity for network ${networkName}`)
-      await enrollAndRecordWalletIdentity('iinagent', null, networkName, false, true)       // Create an IIN Agent
+      //print.info(`Creating IIN Agent wallet identity for network ${networkName}`)i
+      //await enrollAndRecordWalletIdentity('iinagent', null, networkName, false, true)       // Create an IIN Agent
     }
 
     await configureNetwork(options['local-network'], logger)
