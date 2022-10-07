@@ -41,7 +41,7 @@ export function getIINAgentClient(securityDomain: string, participantId: string,
     const iinAgent = securityDomainDNS[participantId];
     let client: agent_grpc_pb.IINAgentClient;
     if (iinAgent.tls === 'true') {
-        if (iinAgent.tlsCACertPath && iinAgent.tlsCACertPath == "") {
+        if (!iinAgent.tlsCACertPath || iinAgent.tlsCACertPath == "") {
             client = new agent_grpc_pb.IINAgentClient(
                 iinAgent.endpoint,
                 credentials.createSsl()
