@@ -19,7 +19,6 @@ import { getLedgerBase, delay, getAllSecurityDomainDNS } from './common/utils'
 
 const iinAgentServer = new Server();
 console.log('iin agent def', JSON.stringify(iin_agent_pb_grpc));
-const flagSync = true;
 
 //@ts-ignore
 iinAgentServer.addService(iin_agent_pb_grpc.IINAgentService, {
@@ -170,6 +169,7 @@ const loopSyncExternalState = async () => {
     const delayTime: number = parseInt(process.env.SYNC_PERIOD ? process.env.SYNC_PERIOD : '3600');
     const securityDomain = process.env.SECURITY_DOMAIN ? process.env.SECURITY_DOMAIN : 'network1';
     const memberId = process.env.MEMBER_ID ? process.env.MEMBER_ID : 'Org1MSP';
+    const flagSync = process.env.AUTO_SYNC === false ? false : true
     while (flagSync) {
         const secDomDNS = getAllSecurityDomainDNS();
         for (const securityDomain in secDomDNS) {

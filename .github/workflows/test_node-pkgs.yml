@@ -5,7 +5,7 @@
 # This workflow will do a clean install of node dependencies, cache/restore them, build the source code and run tests across different versions of node
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
-name: Unit Test Weaver Interop Node SDK
+name: Unit Test Weaver Node Packages
 
 on:
   push:
@@ -20,7 +20,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [12.x, 14.x]
+        node-version: [12.x, 14.x, 16.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
@@ -44,3 +44,37 @@ jobs:
     - name: Tests
       run: npm run test
       working-directory: sdks/fabric/interoperation-node-sdk
+      
+iin_agent_local:
+  
+  runs-on: ubuntu-latest
+
+  strategy:
+    matrix:
+      node-version: [16.x]
+      # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+  steps:
+  - uses: actions/checkout@v2
+  - name: Use Node.js ${{ matrix.node-version }}
+    uses: actions/setup-node@v2
+    with:
+      node-version: ${{ matrix.node-version }}      
+  - name: Use Protoc 3.15
+    run: |
+      curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.15.6/protoc-3.15.6-linux-x86_64.zip
+      unzip protoc-3.15.6-linux-x86_64.zip -d protoc
+  - name: Build JS Protos
+    run: |
+      export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
+      make build
+    working-directory: common/protos-js
+  - name: Build
+    run: make build-local
+    working-directory: sdks/fabric/interoperation-node-sdk
+  - name: Build IIN Agent
+    run: make build-local
+    working-directory: core/identity-management/iin-agent
+  - name: Tests
+    run: npm run test
+    working-directory: core/identity-management/iin-agent

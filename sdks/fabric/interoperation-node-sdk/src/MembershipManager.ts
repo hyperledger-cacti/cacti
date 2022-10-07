@@ -8,10 +8,15 @@ import { Gateway, Network } from 'fabric-network';
 import { Channel } from 'fabric-common';
 import * as path from 'path';
 import * as fs from 'fs';
+import { credentials } from '@grpc/grpc-js';
 
-import membershipPb from '@hyperledger-labs/weaver-protos-js/common/membership_pb';
 
-import { handlePromise } from './helpers'
+import membership_pb from '@hyperledger-labs/weaver-protos-js/common/membership_pb';
+import agent_grpc_pb from '@hyperledger-labs/weaver-protos-js/identity/agent_grpc_pb';
+import agent_pb from '@hyperledger-labs/weaver-protos-js/identity/agent_pb';
+import common_ack_pb from "@hyperledger-labs/weaver-protos-js/common/ack_pb";
+
+import { handlePromise, promisifyAll } from './helpers'
 
 // Only Admin can create, update and delete local memberships
 async function createLocalMembership(
@@ -66,7 +71,7 @@ async function readLocalMembership(
     return await contract.submitTransaction("DeleteLocalMembership", securityDomain);
 }
 
-function getMembershipUnit(channel: Channel, mspId: string): membershipPb.Member {
+function getMembershipUnit(channel: Channel, mspId: string): membership_pb.Member {
     const mspConfig = channel.getMsp(mspId);
     let certs = [];
     if (Array.isArray(mspConfig.rootCerts)) {
@@ -83,7 +88,7 @@ function getMembershipUnit(channel: Channel, mspId: string): membershipPb.Member
     } else if (mspConfig.intermediateCerts.length !== 0) {
         certs.push(mspConfig.intermediateCerts);
     }
-    let member = new membershipPb.Member();
+    let member = new membership_pb.Member();
     member.setType("certificate");
     member.setValue("");
     member.setChainList(certs);
@@ -94,10 +99,10 @@ function getMembershipUnit(channel: Channel, mspId: string): membershipPb.Member
 function getMSPConfigurations(
     network: Network,
     memberMspIds: Array<string>
-): membershipPb.Membership {
+): membership_pb.Membership {
     try {
         const mspIds = network.getChannel().getMspids();
-        const membership = new membershipPb.Membership();
+        const membership = new membership_pb.Membership();
         for (let i = 0 ; i < mspIds.length ; i++) {
             if (memberMspIds.includes(mspIds[i])) {
                 const member = getMembershipUnit(network.getChannel(), mspIds[i]);
@@ -114,10 +119,10 @@ function getMSPConfigurations(
 function getAllMSPConfigurations(
     network: Network,
     ordererMspIds: Array<string>
-): membershipPb.Membership {
+): membership_pb.Membership {
     try {
         const mspIds = network.getChannel().getMspids();
-        const membership = new membershipPb.Membership();
+        const membership = new membership_pb.Membership();
         for (let i = 0 ; i < mspIds.length ; i++) {
             if (!ordererMspIds.includes(mspIds[i])) {
                 const member = getMembershipUnit(network.getChannel(), mspIds[i]);
@@ -131,10 +136,75 @@ function getAllMSPConfigurations(
     }
 }
 
+async function syncMembershipFromIINAgent(
+    securityDomain: string,
+    iinAgentEndpoint: string,
+    useTls: boolean = false,
+    tlsCACertPath?: string,
+) {
+    try {
+        const foreignSecurityDomain = new agent_pb.SecurityDomainMemberIdentity();
+        foreignSecurityDomain.setSecurityDomain(securityDomain);
+        
+        const iinAgentClient = getIINAgentClient(iinAgentEndpoint, useTls, tlsCACertPath)
+        const {
+            syncExternalState,
+        }: {
+            syncExternalState: (request: agent_pb.SecurityDomainMemberIdentity) => Promise<common_ack_pb.Ack>;
+        } = promisifyAll(iinAgentClient);
+        
+        if (typeof syncExternalState === "function") {
+            const [resp, error] = await handlePromise(syncExternalState(foreignSecurityDomain));
+            if (error) {
+                throw new Error(`Membership Sync error: ${error}`);
+            }
+            if (resp.getStatus() === common_ack_pb.Ack.STATUS.ERROR) {
+                throw new Error(`Membership Sync request received negative Ack error: ${resp.getMessage()}`);
+            }
+            return resp.toObject();
+        }
+        throw new Error("Error with Membership Sync in NetworkClient");
+    } catch (e) {
+        throw new Error(`Error with IIN Agent Client: ${e}`);
+    }
+}
+
+export function getIINAgentClient(
+    endpoint: string,
+    tls: boolean = false,
+    tlsCACertPath?: string
+): agent_grpc_pb.IINAgentClient {
+    let client: agent_grpc_pb.IINAgentClient;
+    if (tls) {
+        if (tlsCACertPath && tlsCACertPath == "") {
+            client = new agent_grpc_pb.IINAgentClient(
+                endpoint,
+                credentials.createSsl()
+            );
+        } else {
+            if (!(tlsCACertPath && fs.existsSync(tlsCACertPath))) {
+                throw new Error("Missing or invalid IIN Agent's tlsCACertPaths: " + tlsCACertPath);
+            }
+            const rootCert = fs.readFileSync(tlsCACertPath);
+            client = new agent_grpc_pb.IINAgentClient(
+                endpoint,
+                credentials.createSsl(rootCert)
+            );
+        }
+    } else {
+        client = new agent_grpc_pb.IINAgentClient(
+            endpoint,
+            credentials.createInsecure()
+        );
+    }
+    return client;
+}
+
 export {
     createLocalMembership,
     updateLocalMembership,
     deleteLocalMembership,
     getMembershipUnit,
-    getAllMSPConfigurations
+    getAllMSPConfigurations,
+    syncMembershipFromIINAgent
 }

@@ -384,10 +384,10 @@ jobs:
         with:
           go-version: 1.16
           
-      - name: Use Node.js 14.x
+      - name: Use Node.js 16.x
         uses: actions/setup-node@v2
         with:
-          node-version: 14.x
+          node-version: 16.x
       
       - name: Install RUST Toolchain minimal stable with clippy and rustfmt
         uses: actions-rs/toolchain@v1
@@ -455,7 +455,11 @@ jobs:
       - name: Build Fabric Driver
         run: make build-local
         working-directory: core/drivers/fabric-driver
-        
+                
+      - name: Build IIN Agent
+        run: make build-local
+        working-directory: core/identity-management/iin-agent
+
       # - name: Build Corda Driver
       #   run: make build-local
       #   working-directory: core/drivers/corda-driver
@@ -510,7 +514,33 @@ jobs:
       - name: Start Fabric Driver for network2
         run: CONNECTION_PROFILE=${GITHUB_WORKSPACE}/tests/network-setups/fabric/shared/network2/peerOrganizations/org1.network2.com/connection-org1.json NETWORK_NAME=network2 RELAY_ENDPOINT=localhost:9083 DRIVER_ENDPOINT=localhost:9095 npm run dev &> fdriver-n2.out &
         working-directory: core/drivers/fabric-driver
+                
+      # IIN AGENT
+      - name: Setup Fabric IIN Config
+        run: |
+          # FABRIC CONFIG
+          cp src/fabric-ledger/config.json.template src/fabric-ledger/config-n1.json
+          CCP_PATH=${GITHUB_WORKSPACE}/tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json
+          sed -i "s#path_to_connection_profile#${CCP_PATH}#g" src/fabric-ledger/config-n1.json
+          cp src/fabric-ledger/config.json.template src/fabric-ledger/config-n2.json
+          CCP_PATH=${GITHUB_WORKSPACE}/tests/network-setups/fabric/shared/network2/peerOrganizations/org1.network2.com/connection-org1.json
+          sed -i "s#path_to_connection_profile#${CCP_PATH}#g" src/fabric-ledger/config-n2.json
+          # DNS CONFIG
+          sed -i "s#iin-agent-Org1MSP-network1#localhost#g" docker-testnet/configs/dnsconfig.json
+        working-directory: core/identity-management/iin-agent
         
+        - name: Setup Fabric IIN Env
+          run: |
+            cp .env.template .env
+            sed -i "s#name-of-iin-agent/org-name#Org1MSP#g" .env
+            sed -i "s#DLT_TYPE=.*#DLT_TYPE=fabric#g" .env
+            sed -i "s#<weaver-contract-name>#interop#g" .env
+            sed -i "s#DNS_CONFIG_PATH=#DNS_CONFIG_PATH=./docker-testnet/configs/dnsconfig.json#g" .env
+            sed -i "s#SECURITY_DOMAIN_CONFIG_PATH=#SECURITY_DOMAIN_CONFIG_PATH=./docker-testnet/configs/security-domain-config.json#g" .env
+            sed -i "s#CONFIG_PATH=#CONFIG_PATH=src/fabric-ledger/config-n1.json#g" .env
+            sed -i "s#AUTO_SYNC=#AUTO_SYNC=false#g" .env
+          working-directory: core/identity-management/iin-agent
+
       # # CORDA DRIVER
       # - name: Start Corda_Network Driver
       #   run: ./build/install/corda-driver/bin/corda-driver &> corda-driver.out &
@@ -555,6 +585,13 @@ jobs:
           ./bin/fabric-cli configure network --local-network=network1
           ./bin/fabric-cli configure network --local-network=network2
           ./scripts/initAssetsForTransfer.sh
+        working-directory: samples/fabric/fabric-cli
+                
+      - name: Fabric Sync Membership using IIN Agent
+        run: |
+          ./bin/fabric-cli configure membership --local-network=network1 --target-network=network2 --iin-agent-endpoint=localhost:9050
+          ./bin/fabric-cli configure membership --local-network=network2 --target-network=network1 --iin-agent-endpoint=localhost:9051
+          sleep 10
         working-directory: samples/fabric/fabric-cli
         
       # # CORDA CLIENT

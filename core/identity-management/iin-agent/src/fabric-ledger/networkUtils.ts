@@ -46,7 +46,7 @@ const getNetworkGateway = async (
         await gateway.connect(ccp, {
             wallet,
             identity: `${userName}`,
-            discovery: { enabled: true, asLocalhost: process.env.local === 'false' ? false : true },
+            discovery: { enabled: true, asLocalhost: config.local === 'false' ? false : true },
         });
         return gateway;
     } catch (error) {
