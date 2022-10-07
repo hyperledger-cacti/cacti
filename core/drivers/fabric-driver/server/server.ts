@@ -84,7 +84,7 @@ const fabricCommunication = async (query: query_pb.Query, networkName: string) =
     if (invokeError) {
         console.log('Invoke Error');
         const errorViewPayload = new state_pb.ViewPayload();
-        errorViewPayload.setError(`Error: ${JSON.stringify(invokeError)}`);
+        errorViewPayload.setError(`Error: ${invokeError.toString()}`);
         errorViewPayload.setRequestId(query.getRequestId());
         // Send the error state to the relay
         client.sendDriverState(errorViewPayload, relayCallback);
