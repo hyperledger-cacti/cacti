@@ -14,11 +14,12 @@ import { Certificate } from '@fidm/x509';
 import * as path from 'path';
 import { syncExternalStateFromIINAgent, requestIdentityConfiguration, sendIdentityConfiguration } from './protocols/externalOperations';
 import { requestAttestation, sendAttestation } from './protocols/localOperations';
-import { getLedgerBase } from './common/utils'
+import { getLedgerBase, delay, getAllSecurityDomainDNS } from './common/utils'
 
 
 const iinAgentServer = new Server();
 console.log('iin agent def', JSON.stringify(iin_agent_pb_grpc));
+const flagSync = true;
 
 //@ts-ignore
 iinAgentServer.addService(iin_agent_pb_grpc.IINAgentService, {
@@ -158,12 +159,27 @@ const configSetup = async () => {
     // Initiate agent's ledger
     const securityDomain = process.env.SECURITY_DOMAIN ? process.env.SECURITY_DOMAIN : 'network1';
     const memberId = process.env.MEMBER_ID ? process.env.MEMBER_ID : 'Org1MSP';
-    const ledgerBase = getLedgerBase(securityDomain, memberId)
+    const ledgerBase = getLedgerBase(securityDomain, memberId);
     await ledgerBase.init();
-    console.log("Setup compelete.")
+    console.log("Setup compelete.");
     
     // TODO
 };
+
+const loopSyncExternalState = async () => {
+    const delayTime: number = parseInt(process.env.SYNC_PERIOD ? process.env.SYNC_PERIOD : '3600');
+    const securityDomain = process.env.SECURITY_DOMAIN ? process.env.SECURITY_DOMAIN : 'network1';
+    const memberId = process.env.MEMBER_ID ? process.env.MEMBER_ID : 'Org1MSP';
+    while (flagSync) {
+        const secDomDNS = getAllSecurityDomainDNS();
+        for (const securityDomain in secDomDNS) {
+            const foreignSecurityDomain = new iin_agent_pb.SecurityDomainMemberIdentity();
+            foreignSecurityDomain.setSecurityDomain(securityDomain);
+            syncExternalStateFromIINAgent(foreignSecurityDomain, securityDomain, memberId);
+        }
+        delay(delayTime * 1000)
+    }
+}
 
 // SERVER: Start the IIN agent server with the provided url.
 if (process.env.IIN_AGENT_TLS === 'true') {
@@ -179,6 +195,7 @@ if (process.env.IIN_AGENT_TLS === 'true') {
         configSetup().then(() => {
             console.log('Starting IIN agent server with TLS on', process.env.IIN_AGENT_ENDPOINT);
             iinAgentServer.start();
+            loopSyncExternalState();
         }).catch((error) => {
             console.error("Could not setup iin-agent due to error:", error);
         });
@@ -188,6 +205,7 @@ if (process.env.IIN_AGENT_TLS === 'true') {
         configSetup().then(() => {
             console.log('Starting IIN agent server without TLS on', process.env.IIN_AGENT_ENDPOINT);
             iinAgentServer.start();
+            loopSyncExternalState
         }).catch((error) => {
             console.error("Could not setup iin-agent due to error:", error);
         });

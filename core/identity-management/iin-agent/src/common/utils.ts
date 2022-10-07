@@ -100,6 +100,17 @@ export function getSecurityDomainDNS(securityDomain: string): any {
     return dnsConfig[securityDomain];
 }
 
+export function getAllSecurityDomainDNS(): any {
+    const dnsConfigPath = process.env.DNS_CONFIG_PATH ? process.env.DNS_CONFIG_PATH : path.resolve(__dirname, "../", "../", "dnsconfig.json");
+    if (!fs.existsSync(dnsConfigPath)) {
+        throw new Error('DNS config does not exist at path: ' + dnsConfigPath);
+    }
+    const dnsConfig = JSON.parse(fs.readFileSync(dnsConfigPath, 'utf8').toString());
+    return dnsConfig;
+}
+
+
+
 export function defaultCallback(err: any, response: any) {
     if (response) {
         console.log(`IIN Agent Response: ${JSON.stringify(response.toObject())}`);
