@@ -61,6 +61,7 @@ push-image-latest:
 	docker push $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_NAME):latest
 
 deploy:
+	docker network create iin || true
 	docker-compose $(COMPOSE_ARG) up -d
 
 stop:

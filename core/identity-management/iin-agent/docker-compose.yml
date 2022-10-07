@@ -32,8 +32,13 @@ services:
     ports:
       - "${IIN_AGENT_PORT}:${IIN_AGENT_PORT}"
     command: sh -c "npm run start"
+    networks:
+        - base-network
+        - iin
 # This networks section is required for when the peers have networks specified
 networks:
-  default:
+  base-network:
     external:
       name: ${EXTERNAL_NETWORK}
+  iin:
+    external: true

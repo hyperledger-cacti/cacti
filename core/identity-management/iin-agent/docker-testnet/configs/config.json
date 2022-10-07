@@ -11,7 +11,7 @@
     },
     "mspId":"Org1MSP",
     "ordererMspIds": ["OrdererMSP"],
-    "ccpPath": "/opt/iinagent/extra/connection-org1.json",
+    "ccpPath": "/opt/iinagent/extra/connection-org1.docker.json",
     "walletPath": "/opt/iinagent/extra/wallet-iin-agent",
     "caUrl": "",
     "local": "false"

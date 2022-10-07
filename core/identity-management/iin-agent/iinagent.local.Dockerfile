@@ -30,6 +30,8 @@ ENV NODE_ENV production
 WORKDIR /opt/iinagent
 
 ADD package.json .
+ADD protos-js /opt/iinagent/protos-js
+ADD weaver-fabric-interop-sdk /opt/iinagent/weaver-fabric-interop-sdk
 
 COPY --from=builder /opt/iinagent/package-lock.json /opt/iinagent/
 COPY --from=builder /opt/iinagent/node_modules /opt/iinagent/node_modules
