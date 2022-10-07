@@ -14,7 +14,7 @@ weaverProtosVersion="1.4.2"
 
 parties="Notary PartyA PartyB PartyC"
 
-echo "Starting Netowrk: ${nw}, profile: ${profile}, with App: ${app} Cordapp..."
+echo "Starting Network: ${nw}, profile: ${profile}, with App: ${app} Cordapp..."
 
 for party in ${parties}; do
   if [ "simple" = "$app" ]; then
