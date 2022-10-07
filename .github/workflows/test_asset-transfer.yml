@@ -113,6 +113,23 @@ jobs:
       - name: Start Fabric Driver for network2
         run: make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.n2'
         working-directory: core/drivers/fabric-driver
+        
+      # IIN AGENT
+      - name: Setup Fabric IIN Env
+        run: |
+          sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}#g" docker-testnet/envs/.env.n1
+          sed -i "s#AUTO_SYNC=true#AUTO_SYNC=false#g" docker-testnet/envs/.env.n1
+          sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}#g" docker-testnet/envs/.env.n2
+          sed -i "s#AUTO_SYNC=true#AUTO_SYNC=false#g" docker-testnet/envs/.env.n2
+        working-directory: core/identity-management/iin-agent
+       
+      - name: Start Fabric IIN Agent for network1
+       run: make deploy COMPOSE_ARG='--env-file docker-testnet/envs/.env.n1'
+       working-directory: core/identity-management/iin-agent
+
+      - name: Start Fabric IIN Agent for network2
+       run: make deploy COMPOSE_ARG='--env-file docker-testnet/envs/.env.n2'
+       working-directory: core/identity-management/iin-agent
   
       # CORDA DRIVER
       # - name: Start Corda Driver
@@ -175,6 +192,13 @@ jobs:
           ./bin/fabric-cli configure network --local-network=network1
           ./bin/fabric-cli configure network --local-network=network2
           ./scripts/initAssetsForTransfer.sh
+        working-directory: samples/fabric/fabric-cli
+        
+      - name: Fabric Sync Membership using IIN Agent
+        run: |
+          ./bin/fabric-cli configure membership --local-network=network1 --target-network=network2 --iin-agent-endpoint=localhost:9500
+          ./bin/fabric-cli configure membership --local-network=network2 --target-network=network1 --iin-agent-endpoint=localhost:9501
+          sleep 10
         working-directory: samples/fabric/fabric-cli
   
       # CORDA CLIENT
@@ -589,8 +613,8 @@ jobs:
                 
       - name: Fabric Sync Membership using IIN Agent
         run: |
-          ./bin/fabric-cli configure membership --local-network=network1 --target-network=network2 --iin-agent-endpoint=localhost:9050
-          ./bin/fabric-cli configure membership --local-network=network2 --target-network=network1 --iin-agent-endpoint=localhost:9051
+          ./bin/fabric-cli configure membership --local-network=network1 --target-network=network2 --iin-agent-endpoint=localhost:9500
+          ./bin/fabric-cli configure membership --local-network=network2 --target-network=network1 --iin-agent-endpoint=localhost:9501
           sleep 10
         working-directory: samples/fabric/fabric-cli
         
