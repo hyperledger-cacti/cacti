@@ -69,9 +69,9 @@ const command: GluegunCommand = {
     const [response, error] = await handlePromise(MembershipManager.syncMembershipFromIINAgent(
         options['target-network'],
         options['iin-agent-endpoint'],
-        options['tls'] === "false" ? false : true,
+        options['tls'] ? true : false,
         options['tls-ca-files']
-    )
+    ))
     if (error) {
         console.error("Error:", error)
     } else {

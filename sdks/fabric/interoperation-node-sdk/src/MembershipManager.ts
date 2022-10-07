@@ -176,7 +176,7 @@ export function getIINAgentClient(
 ): agent_grpc_pb.IINAgentClient {
     let client: agent_grpc_pb.IINAgentClient;
     if (tls) {
-        if (tlsCACertPath && tlsCACertPath == "") {
+        if (!tlsCACertPath || tlsCACertPath == "") {
             client = new agent_grpc_pb.IINAgentClient(
                 endpoint,
                 credentials.createSsl()
