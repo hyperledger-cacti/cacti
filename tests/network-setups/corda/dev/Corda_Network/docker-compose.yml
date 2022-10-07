@@ -22,7 +22,7 @@ services:
     ports:
       - 10003:10003
       - 22022
-    image: corda/corda-zulu-java1.8-4.8.4
+    image: corda/corda-zulu-java1.8-4.8
     container_name: corda_notary_1
   partya:
     profiles: ["1-node", "2-nodes", "3-nodes"]
@@ -41,7 +41,7 @@ services:
     ports:
       - 10006:10003
       - 22022
-    image: corda/corda-zulu-java1.8-4.8.4
+    image: corda/corda-zulu-java1.8-4.8
     container_name: corda_partya_1
   partyb:
     profiles: ["2-nodes", "3-nodes"]
@@ -60,7 +60,7 @@ services:
     ports:
       - 10009:10003
       - 22022
-    image: corda/corda-zulu-java1.8-4.8.4
+    image: corda/corda-zulu-java1.8-4.8
     container_name: corda_partyb_1
   partyc:
     profiles: ["3-nodes"]
@@ -79,5 +79,5 @@ services:
     ports:
       - 10012:10003
       - 22022
-    image: corda/corda-zulu-java1.8-4.8.4
+    image: corda/corda-zulu-java1.8-4.8
     container_name: corda_partyc_1

@@ -22,7 +22,7 @@ Consider two security domains governing ledgers `Ledger A` and `Ledger B` respec
 
 <img src="../../resources/images/identity-sync.png" width=100%>
 
-The first phase in the above diagram, involving [registration](./identity-syncing.md), [discovery](../discovery/discovery.md), and [validation](./network-identity-validation.md) are covered in other specifications. In this draft, we only specify the bilateral protocol occurring between sets of IIN Agents representing two independent security domains' members.
+The first phase in the above diagram, involving [registration](./identity-syncing.md), [discovery](../discovery/discovery.md), and [validation](./security-domain-identity-validation.md) are covered in other specifications. In this draft, we only specify the bilateral protocol occurring between sets of IIN Agents representing two independent security domains' members.
 
 The communication among IIN Agents of the security domain governing `Ledger A` to collect attestations can occur in one of two ways:
   * It can be orchestrated completely by the triggering agent (in this case `A2`), which sends requests and receives responses from every other local IIN Agent.
