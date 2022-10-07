@@ -529,17 +529,17 @@ jobs:
           sed -i "s#iin-agent-Org1MSP-network1#localhost#g" docker-testnet/configs/dnsconfig.json
         working-directory: core/identity-management/iin-agent
         
-        - name: Setup Fabric IIN Env
-          run: |
-            cp .env.template .env
-            sed -i "s#name-of-iin-agent/org-name#Org1MSP#g" .env
-            sed -i "s#DLT_TYPE=.*#DLT_TYPE=fabric#g" .env
-            sed -i "s#<weaver-contract-name>#interop#g" .env
-            sed -i "s#DNS_CONFIG_PATH=#DNS_CONFIG_PATH=./docker-testnet/configs/dnsconfig.json#g" .env
-            sed -i "s#SECURITY_DOMAIN_CONFIG_PATH=#SECURITY_DOMAIN_CONFIG_PATH=./docker-testnet/configs/security-domain-config.json#g" .env
-            sed -i "s#CONFIG_PATH=#CONFIG_PATH=src/fabric-ledger/config-n1.json#g" .env
-            sed -i "s#AUTO_SYNC=#AUTO_SYNC=false#g" .env
-          working-directory: core/identity-management/iin-agent
+      - name: Setup Fabric IIN Env
+        run: |
+          cp .env.template .env
+          sed -i "s#name-of-iin-agent/org-name#Org1MSP#g" .env
+          sed -i "s#DLT_TYPE=.*#DLT_TYPE=fabric#g" .env
+          sed -i "s#<weaver-contract-name>#interop#g" .env
+          sed -i "s#DNS_CONFIG_PATH=#DNS_CONFIG_PATH=./docker-testnet/configs/dnsconfig.json#g" .env
+          sed -i "s#SECURITY_DOMAIN_CONFIG_PATH=#SECURITY_DOMAIN_CONFIG_PATH=./docker-testnet/configs/security-domain-config.json#g" .env
+          sed -i "s#CONFIG_PATH=#CONFIG_PATH=src/fabric-ledger/config-n1.json#g" .env
+          sed -i "s#AUTO_SYNC=#AUTO_SYNC=false#g" .env
+        working-directory: core/identity-management/iin-agent
 
       # # CORDA DRIVER
       # - name: Start Corda_Network Driver
