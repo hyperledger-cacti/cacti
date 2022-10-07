@@ -58,7 +58,7 @@ Example:
 
 If `method-name` of an IIN registry is `exampleiin`, and the organizational unit chooses a `method-specific-id` as `org1`, then `org1` must be unique within `exampleiin`, and `did:exampleiin:org1` must be unique globally.
 
-> Note: An IIN registry may mandate organizational unit DIDs to have a fixed prefix in the `method-specific-id` to signal that it is a network member's DID and not a network's (or security domain's) DID. Eg: if the fixed prefix is `member:`, then a valid participant did will be `did:exampleiin:member:org1`. Similarly a security domain DID can be `did:exampleiin:security-domain:tradelens`. 
+> Note: An IIN registry may mandate organizational unit DIDs to have a fixed prefix in the `method-specific-id` to signal that it is a network member's DID and not a network's (or security domain's) DID. Eg: if the fixed prefix is `member:`, then a valid organizational unit DID will be `did:exampleiin:member:org1`. Similarly a security domain DID can be `did:exampleiin:security-domain:tradelens`. 
 
 **Step 2. member creates a DID Document**
 
@@ -107,7 +107,7 @@ When an IIN registry receives a DID registration request, i.e., the DID `create`
 
 **Step 5. Trust anchors issue identity VC to member DID**
 
-A DID document does not contain any personal information about its holderi, like physical identity or real world identity (see [binding DID to physical identity](https://w3c.github.io/did-core/#binding-to-physical-identity) for reference). Therefore, to map a participant's DID to its physical identity, some trust anchor must issue VCs attesting real world identities of the member to its DID. The member can hold these VCs in a wallet and present them to others to prove various identities or affiliations as required in particular scenarios.
+A DID document does not contain any personal information about its holder, like physical identity or real world identity (see [binding DID to physical identity](https://w3c.github.io/did-core/#binding-to-physical-identity) for reference). Therefore, to map an organization unit's DID to its physical identity, some trust anchor must issue VCs attesting real world identities of the member to its DID. The member can hold these VCs in a wallet and present them to others to prove various identities or affiliations as required in particular scenarios.
 
 > Any nummber of trust anchors may issue identity VCs to a member in Step 5. These identity VCs may be used for validating its security domain's identity by other members of that domain.  See the *Security Domain Identity Validation* section for more details.
 
@@ -261,16 +261,16 @@ Since the IIN registry is typically built on a decentralized ledger, the Securit
 
 ## Network Discovery
 
-The first step towards interoperation between two blockchain networks is discovery. Any network with a registered Network DID in an IIN can be discovered using the DID only.
+The first step towards interoperation between two blockchain networks is discovery. Any network with a registered Security Domain DID in an IIN can be discovered using the DID only.
 
-Given the DID of a foreign network in the format `did:<iin_name>:<network_name>` (example `did:iinindy:tradelens`), the foreign network can be discovered by standard DID resolution. The IIN agent of a participant of a local network contacts the DID registry (example: `iinindy`) and resolves the DID to download the Network DID document.
+Given the DID of a foreign network in the format `did:<iin_name>:<network_name>` (example `did:iinindy:tradelens`), the foreign network can be discovered by standard DID resolution. The IIN agent of a participant of a local network contacts the DID registry (example: `iinindy`) and resolves the DID to download the Security Domain DID document.
 
 See the [network discovery protocol specifications](../discovery/discovery.md) for more details. 
 
 
 ## Security Domain Identity Validation
 
-After a network has been discovered, and its Security Domain DID document has been fetched, the authenticity of that DID must be verified. See the [Security Domain Identity Validation protocol](./network-identity-validation.md) for details of how the network's identity is validated.
+After a network has been discovered, and its Security Domain DID document has been fetched, the authenticity of that DID must be verified. See the [Security Domain Identity Validation protocol](./security-domain-identity-validation.md) for details of how the network's identity is validated.
 
 
 ## Security Domain Membership Fetching and Recording
@@ -305,7 +305,7 @@ The IIN registry authenticates a Security Domain DID update request the same way
 
 ## Syncing Security Domain Membership Changes
 
-The security domain validation and membership syncing protocols must be re-run every time there is a change in a security domain's identity (DID document) or in its membership configuration. The flow diagram below illustrates the complete process from the time a change occurs in one network up to the point where its updated identity and membership info is reflected in another network's ledger as a prerequisite for data plane interoperation. Each step in this diagram represents a separate protocol: (1) is described in this document above, (2) is described in the [security domain identity validation specification](./network-identity-validation.md), and (3) in the [membership syncing specification](./membership-syncing.md).
+The security domain validation and membership syncing protocols must be re-run every time there is a change in a security domain's identity (DID document) or in its membership configuration. The flow diagram below illustrates the complete process from the time a change occurs in one network up to the point where its updated identity and membership info is reflected in another network's ledger as a prerequisite for data plane interoperation. Each step in this diagram represents a separate protocol: (1) is described in this document above, (2) is described in the [security domain identity validation specification](./security-domain-identity-validation.md), and (3) in the [membership syncing specification](./membership-syncing.md).
 
 <img src="../../resources/images/protocol-identity-overview.jpg" width=70%>
 

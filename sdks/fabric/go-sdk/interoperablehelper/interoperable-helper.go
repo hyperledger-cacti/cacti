@@ -41,7 +41,7 @@ func logThenErrorf(format string, args ...interface{}) error {
 }
 
 func InteropFlow(interopContract GatewayContract, networkId string, invokeObject types.Query, org, localRelayEndpoint string,
-	interopArgIndices []int, interopJSONs []types.InteropJSON, signer Signer, certUser string, returnWithoutLocalInvocation bool) ([]*common.View, []byte, error) {
+	interopArgIndices []int, interopJSONs []types.InteropJSON, signer Signer, certUser string, returnWithoutLocalInvocation bool, confidential bool) ([]*common.View, []byte, error) {
 	if len(interopArgIndices) != len(interopJSONs) {
 		logThenErrorf("number of argument indices %d does not match number of view addresses %d", len(interopArgIndices), len(interopJSONs))
 	}
@@ -50,6 +50,7 @@ func InteropFlow(interopContract GatewayContract, networkId string, invokeObject
 	var views []*common.View
 	var viewsSerializedBase64 []string
 	var computedAddresses []string
+	var viewContentsBase64 []string
 
 	for i := 0; i < len(interopJSONs); i++ {
 		requestResponseView, requestResponseAddress, err := getRemoteView(interopContract, networkId, org, localRelayEndpoint, interopJSONs[i], signer, certUser)
@@ -66,11 +67,18 @@ func InteropFlow(interopContract GatewayContract, networkId string, invokeObject
 		computedAddresses = append(computedAddresses, requestResponseAddress)
 		viewsSerializedBase64 = append(viewsSerializedBase64, base64.StdEncoding.EncodeToString(viewBytes))
 
+		if confidential {
+			// TODO
+			respDataContents, _ := GetResponseDataFromView(requestResponseView)
+			viewContentsBase64 = append(viewContentsBase64, base64.StdEncoding.EncodeToString(respDataContents))
+		} else {
+			viewContentsBase64 = append(viewContentsBase64, "")
+		}
 	}
 
 	// Return here if caller just wants the views and doesn't want to invoke a local chaincode
 	if returnWithoutLocalInvocation {
-		ccArgs, err := getCCArgsForProofVerification(invokeObject, interopArgIndices, computedAddresses, viewsSerializedBase64)
+		ccArgs, err := getCCArgsForProofVerification(invokeObject, interopArgIndices, computedAddresses, viewsSerializedBase64, viewContentsBase64)
 		if err != nil {
 			return views, nil, logThenErrorf("InteropFlow getCCArgsForProofVerification error: %s", err.Error())
 		}
@@ -82,7 +90,7 @@ func InteropFlow(interopContract GatewayContract, networkId string, invokeObject
 	}
 
 	// Step 2
-	result, err := submitTransactionWithRemoteViews(interopContract, invokeObject, interopArgIndices, computedAddresses, viewsSerializedBase64)
+	result, err := submitTransactionWithRemoteViews(interopContract, invokeObject, interopArgIndices, computedAddresses, viewsSerializedBase64, viewContentsBase64)
 	if err != nil {
 		return views, nil, logThenErrorf("InteropFlow submit transaction with remote view error: %s", err.Error())
 	}
@@ -95,8 +103,8 @@ func InteropFlow(interopContract GatewayContract, networkId string, invokeObject
  * - Prepare arguments and call WriteExternalState.
  **/
 func submitTransactionWithRemoteViews(interopContract GatewayContract, invokeObject types.Query,
-	interopArgIndices []int, viewAddresses []string, viewsSerializedBase64 []string) ([]byte, error) {
-	ccArgs, err := getCCArgsForProofVerification(invokeObject, interopArgIndices, viewAddresses, viewsSerializedBase64)
+	interopArgIndices []int, viewAddresses []string, viewsSerializedBase64 []string, viewContentsBase64 []string) ([]byte, error) {
+	ccArgs, err := getCCArgsForProofVerification(invokeObject, interopArgIndices, viewAddresses, viewsSerializedBase64, viewContentsBase64)
 	if err != nil {
 		return nil, logThenErrorf("failed calling getCCArgsForProofVerification with error: %s", err.Error())
 	}
@@ -104,6 +112,7 @@ func submitTransactionWithRemoteViews(interopContract GatewayContract, invokeObj
 	if err != nil {
 		return result, logThenErrorf("submitTransaction Error: %s", err.Error())
 	}
+
 	return result, nil
 }
 
@@ -250,7 +259,7 @@ func verifyView(contract GatewayContract, b64ViewProto string, address string) e
  * Prepare arguments for WriteExternalState chaincode transaction to verify a view and write data to ledger.
  **/
 func getCCArgsForProofVerification(invokeObject types.Query, interopArgIndices []int, viewAddresses []string,
-	viewsSerializedBase64 []string) ([]string, error) {
+	viewsSerializedBase64 []string, viewContentsBase64 []string) ([]string, error) {
 
 	invokeObjectCcArgsBytes, err := json.Marshal(invokeObject.CcArgs)
 	if err != nil {
@@ -272,6 +281,11 @@ func getCCArgsForProofVerification(invokeObject types.Query, interopArgIndices [
 		return nil, logThenErrorf("failed to Marshal viewsSerializedBase64: %s", viewsSerializedBase64)
 	}
 
+	viewContentsBase64Bytes, err := json.Marshal(viewContentsBase64)
+	if err != nil {
+		return nil, logThenErrorf("failed to Marshal viewContentsBase64: %s", viewContentsBase64)
+	}
+
 	ccArgs := []string{
 		invokeObject.ContractName,
 		invokeObject.Channel,
@@ -279,7 +293,8 @@ func getCCArgsForProofVerification(invokeObject types.Query, interopArgIndices [
 		string(invokeObjectCcArgsBytes),
 		string(interopArgIndicesBytes),
 		string(viewAddressesBytes),
-		string(viewsSerializedBase64Bytes)}
+		string(viewsSerializedBase64Bytes),
+		string(viewContentsBase64Bytes)}
 
 	return ccArgs, nil
 }

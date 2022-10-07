@@ -28,7 +28,7 @@ async function subscribeEventHelper(
     const newRequestId = call_request.getQuery()!.getRequestId();
     const [requestId, error] = await handlePromise(addEventSubscription(call_request));
     if (error) {
-        const errorString: string = `error (thrown as part of async processing while storing to DB during subscribeEvent): ${JSON.stringify(error)}`;
+        const errorString: string = `error (thrown as part of async processing while storing to DB during subscribeEvent): ${error.toString()}`;
         console.error(errorString);
         const ack_send_error = new ack_pb.Ack();
         ack_send_error.setRequestId(newRequestId);
@@ -42,7 +42,7 @@ async function subscribeEventHelper(
         const ack_send = new ack_pb.Ack();
         if (newRequestId == requestId) {    // event being subscribed for the first time
             // Start an appropriate type of event listener for this event subscription if one is not already active
-            const [listenerHandle, error] = await handlePromise(registerListenerForEventSubscription(call_request, network_name));
+            const [listenerHandle, error] = await handlePromise(registerListenerForEventSubscription(call_request.getEventMatcher()!, network_name));
             if (error) {
                 // Need to delete subscription in database too, for consistency
                 const [deletedSubscription, err] =
@@ -89,14 +89,14 @@ async function unsubscribeEventHelper(
         console.warn('No listener running for the given subscription or unable to stop listener');
     }
     if (err) {    // Just log the error. This is not critical.
-        const errorString: string = `${JSON.stringify(err)}`;
+        const errorString: string = err.toString();
         console.error(errorString);
     }
     const newRequestId = call_request.getQuery()!.getRequestId();
     const [deletedSubscription, error] =
         await handlePromise(deleteEventSubscription(call_request.getEventMatcher()!, newRequestId));
     if (error) {
-        const errorString: string = `error (thrown as part of async processing while deleting from DB during unsubscribeEvent): ${JSON.stringify(error)}`;
+        const errorString: string = `error (thrown as part of async processing while deleting from DB during unsubscribeEvent): ${error.toString()}`;
         console.error(errorString);
         const ack_send_error = new ack_pb.Ack();
         ack_send_error.setRequestId(newRequestId);
@@ -200,7 +200,7 @@ async function addEventSubscription(
         return query.getRequestId();
 
     } catch(error: any) {
-        console.error(`Error during addEventSubscription(): ${JSON.stringify(error)}`);
+        console.error(`Error during addEventSubscription(): ${error.toString()}`);
         await db?.close();
         throw new Error(error);
     }
@@ -244,7 +244,7 @@ const deleteEventSubscription = async (
             }
         } catch (error: any) {
             // error could be either due to key not being present in the database or some other issue with database access
-            console.error(`re-throwing error: ${JSON.stringify(error)}`);
+            console.error(`re-throwing error: ${error.toString()}`);
             await db.close();
             throw new Error(error);
         }
@@ -261,7 +261,7 @@ const deleteEventSubscription = async (
         console.log(`end deleteEventSubscription() .. retVal: ${JSON.stringify(retVal.toObject())}`);
         return retVal;
     } catch(error: any) {
-        console.error(`Error during delete: ${JSON.stringify(error)}`);
+        console.error(`Error during delete: ${error.toString()}`);
         await db?.close();
         throw new Error(error);
     }
@@ -323,6 +323,32 @@ async function lookupEventSubscriptions(
     }
 }
 
+async function readAllEventMatchers(): Promise<Array<eventsPb.EventMatcher>> {
+    var returnMatchers = []
+    let db: DBConnector;
+    console.debug(`start readAllEventMatchers()`);
+    try {
+        // Create connection to a database
+        db = new LevelDBConnector(DB_NAME!);
+        await db.open();
+        const keys = await db.getAllKeys()
+        for (const key of keys) {
+            const eventMatcher = eventsPb.EventMatcher.deserializeBinary(Uint8Array.from(Buffer.from(key, 'base64')))
+            returnMatchers.push(eventMatcher)
+        }
+        console.debug(`end readAllEventMatchers()`);
+        await db.close();
+        return returnMatchers;
+
+    } catch (error: any) {
+        let errorString: string = error.toString();
+        await db?.close();
+        // case of read failing due to some other issue
+        console.error(`Error during read: ${errorString}`);
+        throw new Error(error);
+    }
+}
+
 async function signEventSubscriptionQuery(
     inputQuery: queryPb.Query
 ): Promise<queryPb.Query> {
@@ -349,7 +375,7 @@ async function signEventSubscriptionQuery(
         );
         return signedQuery;
     } catch (error: any) {
-        const errorString: string = `${JSON.stringify(error)}`;
+        const errorString: string = `${error.toString()}`;
         console.error(`signing query failed with error: ${errorString}`);
         throw new Error(error);
     }
@@ -427,6 +453,7 @@ export {
     addEventSubscription,
     deleteEventSubscription,
     lookupEventSubscriptions,
+    readAllEventMatchers,
     signEventSubscriptionQuery,
     writeExternalStateHelper
 }
