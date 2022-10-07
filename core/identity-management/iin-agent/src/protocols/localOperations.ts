@@ -115,8 +115,9 @@ export const sendAttestation = async (counterAttestedMembership: iin_agent_pb.Co
         
         if (resultError) {
             console.error('Error submitting counter attested membership to ledger:', resultError);
+        } else {
+            console.log(`Succesfully recorded membership of ${remoteSecurityDomain} with result: ${result}`);
         }
-        console.log(`Succesfully recorded membership of ${remoteSecurityDomain} with result: ${result}`);
     } else {
         console.error(`Sync Remote Membership Failed with error: ${errorMsg}`);
     }

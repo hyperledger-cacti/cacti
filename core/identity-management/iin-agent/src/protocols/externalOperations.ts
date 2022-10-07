@@ -206,8 +206,9 @@ export const sendIdentityConfiguration = async (attestedMembership: iin_agent_pb
                 
                 if (resultError) {
                     console.error('Error submitting counter attested membership to ledger:', resultError);
+                } else {
+                    console.log(`Succesfully recorded membership of ${remoteSecurityDomain} with result: ${result}`);
                 }
-                console.log(`Succesfully recorded membership of ${remoteSecurityDomain} with result: ${result}`);
             } else {
                 localAgentResponseCount.set(nonce, { current:0, total: c});
                 counterAttestationsMap.set(getSecurityDomainMapKey('LOCAL_COUNTER_ATTESTATION_RESPONSE', memberId, nonce), myCounterAttestedMembership);

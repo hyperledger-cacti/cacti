@@ -1,6 +1,6 @@
 {
     "name": "fabric-driver",
-    "version": "1.4.4",
+    "version": "1.4.5",
     "description": "",
     "main": "out/server.js",
     "scripts": {
@@ -35,8 +35,8 @@
     "devDependencies": {
         "patch-package": "^6.2.2",
         "@types/node": "^14.0.14",
-        "typedoc": "^0.20.35",
-        "typescript": "^4.3.5",
+        "typedoc": "^0.23.15",
+        "typescript": "^4.8.4",
         "nodemon": "^2.0.4"
     }
 }

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
  
-import { Network } from 'fabric-network';
+import { Gateway, Network } from 'fabric-network';
 import { Channel } from 'fabric-common';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -15,11 +15,13 @@ import { handlePromise } from './helpers'
 
 // Only Admin can create, update and delete local memberships
 async function createLocalMembership(
-    network: Network,
+    gateway: Gateway,
     memberMspIds: Array<string>,
     securityDomain: string,
+    channelName: string,
     weaverCCId: string
 ): Promise<any> {
+    const network = await gateway.getNetwork(channelName)
     const membership = getMSPConfigurations(network, memberMspIds)
     membership.setSecuritydomain(securityDomain)
     const membership64 = Buffer.from(membership.serializeBinary()).toString('base64')
@@ -28,11 +30,13 @@ async function createLocalMembership(
 }
 
 async function updateLocalMembership(
-    network: Network,
+    gateway: Gateway,
     memberMspIds: Array<string>,
     securityDomain: string,
+    channelName: string,
     weaverCCId: string
 ): Promise<any> {
+    const network = await gateway.getNetwork(channelName)
     const membership = getMSPConfigurations(network, memberMspIds)
     membership.setSecuritydomain(securityDomain)
     const membership64 = Buffer.from(membership.serializeBinary()).toString('base64')
@@ -41,19 +45,23 @@ async function updateLocalMembership(
 }
 
 async function deleteLocalMembership(
-    network: Network,
+    gateway: Gateway,
     securityDomain: string,
+    channelName: string,
     weaverCCId: string
 ): Promise<any> {
+    const network = await gateway.getNetwork(channelName)
     const contract = network.getContract(weaverCCId)
     return await contract.submitTransaction("DeleteLocalMembership", securityDomain);
 }
 
 async function readLocalMembership(
-    network: Network,
+    gateway: Gateway,
     securityDomain: string,
+    channelName: string,
     weaverCCId: string
 ): Promise<any> {
+    const network = await gateway.getNetwork(channelName)
     const contract = network.getContract(weaverCCId)
     return await contract.submitTransaction("DeleteLocalMembership", securityDomain);
 }
