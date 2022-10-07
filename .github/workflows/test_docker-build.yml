@@ -124,19 +124,31 @@ jobs:
         run: make image
         working-directory: core/drivers/corda-driver
 
-  iin-agent:
+  iin-agent-local:
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-      
-      - name: Setup .npmrc
+      - name: Use Node.js 14.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14.x
+          
+      - name: Use Protoc 3.15
         run: |
-          cp .npmrc.template .npmrc
-          sed -i "s/<personal-access-token>/${{ secrets.GITHUB_TOKEN }}/g" .npmrc
-          cat .npmrc
-        working-directory: core/identity-management/iin-agent
+          curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.15.6/protoc-3.15.6-linux-x86_64.zip
+          unzip protoc-3.15.6-linux-x86_64.zip -d protoc
+          
+      - name: Build JS Protos (Local)
+        run: |
+          export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
+          make build
+        working-directory: common/protos-js
+        
+      - name: Build Fabric Interop Node SDK (Local)
+        run: make build-local
+        working-directory: sdks/fabric/interoperation-node-sdk
         
       - name: Build Image
-        run: make build-image
+        run: make build-image-local
         working-directory: core/identity-management/iin-agent
