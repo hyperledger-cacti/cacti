@@ -1,14 +1,14 @@
 ARG BUILD_TAG
 
 # Local Build
-# FROM node:14 AS builder-local
+# FROM node:16 AS builder-local
 # 
 # WORKDIR /fabric-driver
 
 # ADD protos-js /fabric-driver/protos-js
 
 # Remote build
-FROM node:14 AS builder-remote
+FROM node:16 AS builder-remote
 
 WORKDIR /fabric-driver
 
@@ -28,7 +28,7 @@ FROM builder-${BUILD_TAG} AS builder
 RUN rm -rf node_modules
 RUN npm ci --only=production
 
-FROM node:14-alpine AS prod
+FROM node:16-alpine AS prod
 
 RUN addgroup -g 1001 relay
 RUN adduser -D -s /bin/sh -u 1001 -G relay relay
