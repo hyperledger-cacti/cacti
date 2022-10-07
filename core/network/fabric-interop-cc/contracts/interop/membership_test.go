@@ -233,7 +233,7 @@ func TestCreateLocalMembership(t *testing.T) {
 	membershipBytes, err = json.Marshal(&membershipAsset)
 	require.NoError(t, err)
 	err = interopcc.CreateLocalMembership(ctx, "Invalid Input")
-	require.EqualError(t, err, fmt.Sprintf("Unmarshal error: Unable to unmarshal membership: proto: cannot parse invalid wire-format data"))
+	require.EqualError(t, err, fmt.Sprintf("Unmarshal error: Unable to unmarshal membership serialized proto"))
 	// Membership already exists
 	chaincodeStub.GetStateReturns([]byte{}, nil)
 	err = interopcc.CreateLocalMembership(ctx, membershipSerialized64)
@@ -300,7 +300,7 @@ func TestUpdateLocalMembership(t *testing.T) {
 	membershipBytes, err = json.Marshal(&membershipAsset)
 	require.NoError(t, err)
 	err = interopcc.UpdateLocalMembership(ctx, "Invalid Input")
-	require.EqualError(t, err, fmt.Sprintf("Unmarshal error: Unable to unmarshal membership: proto: cannot parse invalid wire-format data"))
+	require.EqualError(t, err, fmt.Sprintf("Unmarshal error: Unable to unmarshal membership serialized proto"))
 }
 
 // TODO: Remove later. Keeping for backward compatibility.
