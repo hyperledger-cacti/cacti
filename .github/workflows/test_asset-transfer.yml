@@ -564,6 +564,14 @@ jobs:
           sed -i "s#CONFIG_PATH=#CONFIG_PATH=src/fabric-ledger/config-n1.json#g" .env
           sed -i "s#AUTO_SYNC=#AUTO_SYNC=false#g" .env
         working-directory: core/identity-management/iin-agent
+        
+      - name: Start Fabric IIN Agent for network1
+        run: npm run dev &> iinagent-n1.out &
+        working-directory: core/identity-management/iin-agent
+      
+      - name: Start Fabric IIN Agent for network2
+        run: IIN_AGENT_ENDPOINT=localhost:9501 SECURITY_DOMAIN=network2 CONFIG_PATH=./src/fabric-ledger/config-n2.json npm run dev &> iinagent-n2.out &
+        working-directory: core/identity-management/iin-agent
 
       # # CORDA DRIVER
       # - name: Start Corda_Network Driver

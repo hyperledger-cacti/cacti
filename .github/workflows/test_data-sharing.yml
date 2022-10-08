@@ -478,7 +478,7 @@ jobs:
         working-directory: core/identity-management/iin-agent
       
       - name: Start Fabric IIN Agent for network2
-        run: IIN_AGENT_ENDPOINT=localhost:9051 SECURITY_DOMAIN=network2 CONFIG_PATH=./src/fabric-ledger/config-n2.json npm run dev &> iinagent-n2.out &
+        run: IIN_AGENT_ENDPOINT=localhost:9501 SECURITY_DOMAIN=network2 CONFIG_PATH=./src/fabric-ledger/config-n2.json npm run dev &> iinagent-n2.out &
         working-directory: core/identity-management/iin-agent
         
       # CORDA DRIVER
