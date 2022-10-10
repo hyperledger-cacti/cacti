@@ -334,6 +334,7 @@ const generateMembership = async (
   )
 
   // Generate protobufs and attestations for all other networks that have IIN Agents
+  /*
   const credentialFolderPath = getCredentialPath()
   const otherNetworkNames = fs
     .readdirSync(credentialFolderPath, { withFileTypes: true })
@@ -406,7 +407,7 @@ const generateMembership = async (
       )
     }
   }
-
+  */
   return membershipJSON
 }
 
