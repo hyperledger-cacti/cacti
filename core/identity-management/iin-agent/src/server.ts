@@ -171,9 +171,9 @@ const loopSyncExternalState = async () => {
     const memberId = process.env.MEMBER_ID ? process.env.MEMBER_ID : 'Org1MSP';
     const flagSync = process.env.AUTO_SYNC === 'false' ? false : true
     if (flagSync) {
-      print("Starting auto sync...")
+      console.log("Starting auto sync...")
     } else {
-      print("Auto sync off.")
+      console.log("Auto sync off.")
     }
     while (flagSync) {
         const secDomDNS = getAllSecurityDomainDNS();
