@@ -64,7 +64,7 @@ const command: GluegunCommand = {
       logger.level = 'debug'
       logger.debug('Debugging is enabled')
     }
-    if (!options['network']) {
+    if (!options['target-network']) {
       print.error('No target network specified.')
       return
     }
