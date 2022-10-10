@@ -169,6 +169,7 @@ const command: GluegunCommand = {
       } catch (err) {
         spinner.fail('Loading Chaincode failed')
         print.error(`Error: ${JSON.stringify(err)}`)
+        process.exit(1)
       }
     }
     print.info(`Finished configuring networks: ${JSON.stringify(array)}`)

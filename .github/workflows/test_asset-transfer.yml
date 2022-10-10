@@ -546,15 +546,15 @@ jobs:
           cp src/fabric-ledger/config.json.template src/fabric-ledger/config-n1.json
           CCP_PATH=${GITHUB_WORKSPACE}/tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json
           sed -i "s#path_to_connection_profile#${CCP_PATH}#g" src/fabric-ledger/config-n1.json
-          cat config-n1.json
+          cat src/fabric-ledger/config-n1.json
           cp src/fabric-ledger/config.json.template src/fabric-ledger/config-n2.json
           CCP_PATH=${GITHUB_WORKSPACE}/tests/network-setups/fabric/shared/network2/peerOrganizations/org1.network2.com/connection-org1.json
           sed -i "s#path_to_connection_profile#${CCP_PATH}#g" src/fabric-ledger/config-n2.json
-          cat config-n2.json
+          cat src/fabric-ledger/config-n2.json
           # DNS CONFIG
           sed -i "s#iin-agent-Org1MSP-network1#localhost#g" docker-testnet/configs/dnsconfig.json
           sed -i "s#iin-agent-Org1MSP-network2#localhost#g" docker-testnet/configs/dnsconfig.json
-          cat dnsconfig.json
+          cat docker-testnet/configs/dnsconfig.json
         working-directory: core/identity-management/iin-agent
         
       - name: Setup Fabric IIN Env

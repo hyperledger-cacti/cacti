@@ -82,7 +82,7 @@ const command: GluegunCommand = {
     }
 
     // Membership
-    /*logger.info(`Generating membership for ${options['local-network']}`)
+    logger.info(`Generating membership for ${options['local-network']}`)
     await generateMembership(
       process.env.DEFAULT_CHANNEL ? process.env.DEFAULT_CHANNEL : 'mychannel',
       process.env.DEFAULT_CHAINCODE ? process.env.DEFAULT_CHAINCODE : 'interop',
@@ -95,7 +95,7 @@ const command: GluegunCommand = {
       } secuirty group at ${getCurrentNetworkCredentialPath(
         options['local-network']
       )} `
-    )*/
+    )
 
     // Access Control
     logger.info(
