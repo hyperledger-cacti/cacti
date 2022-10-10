@@ -430,9 +430,9 @@ jobs:
       # FABRIC DRIVER
       - name: Setup Fabric Driver .env
         run: |
-          sed -i "s#^DOCKER_IMAGE_NAME=.*#DOCKER_IMAGE_NAME=weaver-fabric-driver#g" docker/testnet-envs/.env.n1
+          sed -i "s#^DOCKER_IMAGE_NAME=.*#DOCKER_IMAGE_NAME=weaver-fabric-driver#g" docker-testnet-envs/.env.n1
           sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}#g" docker-testnet-envs/.env.n1
-          sed -i "s#^DOCKER_IMAGE_NAME=.*#DOCKER_IMAGE_NAME=weaver-fabric-driver#g" docker/testnet-envs/.env.n2
+          sed -i "s#^DOCKER_IMAGE_NAME=.*#DOCKER_IMAGE_NAME=weaver-fabric-driver#g" docker-testnet-envs/.env.n2
           sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}#g" docker-testnet-envs/.env.n2
         working-directory: core/drivers/fabric-driver
         
@@ -447,10 +447,10 @@ jobs:
       # IIN AGENT
       - name: Setup Fabric IIN Env
         run: |
-          sed -i "s#^DOCKER_IMAGE_NAME=.*#DOCKER_IMAGE_NAME=weaver-iin-agent#g" docker/testnet-envs/.env.n1
+          sed -i "s#^DOCKER_IMAGE_NAME=.*#DOCKER_IMAGE_NAME=weaver-iin-agent#g" docker-testnet/envs/.env.n1
           sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}#g" docker-testnet/envs/.env.n1
           sed -i "s#^AUTO_SYNC=true#AUTO_SYNC=false#g" docker-testnet/envs/.env.n1
-          sed -i "s#^DOCKER_IMAGE_NAME=.*#DOCKER_IMAGE_NAME=weaver-iin-agent#g" docker/testnet-envs/.env.n2
+          sed -i "s#^DOCKER_IMAGE_NAME=.*#DOCKER_IMAGE_NAME=weaver-iin-agent#g" docker-testnet/envs/.env.n2
           sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}#g" docker-testnet/envs/.env.n2
           sed -i "s#^AUTO_SYNC=true#AUTO_SYNC=false#g" docker-testnet/envs/.env.n2
         working-directory: core/identity-management/iin-agent
@@ -466,13 +466,13 @@ jobs:
       # CORDA DRIVER
       - name: Start Corda Driver
         run: |
-          sed -i "s#^DOCKER_IMAGE_NAME=.*#DOCKER_IMAGE_NAME=weaver-corda-driver#g" docker/testnet-envs/.env.corda
+          sed -i "s#^DOCKER_IMAGE_NAME=.*#DOCKER_IMAGE_NAME=weaver-corda-driver#g" docker-testnet-envs/.env.corda
           make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.corda'
         working-directory: core/drivers/corda-driver
         
       - name: Start Corda_Network2 Driver
         run: |
-          sed -i "s#^DOCKER_IMAGE_NAME=.*#DOCKER_IMAGE_NAME=weaver-corda-driver#g" docker/testnet-envs/.env.corda2
+          sed -i "s#^DOCKER_IMAGE_NAME=.*#DOCKER_IMAGE_NAME=weaver-corda-driver#g" docker-testnet-envs/.env.corda2
           make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.corda2'
         working-directory: core/drivers/corda-driver
         
@@ -501,7 +501,7 @@ jobs:
         run: |
           ./bin/fabric-cli configure membership --local-network=network1 --target-network=network2 --iin-agent-endpoint=localhost:9500
           ./bin/fabric-cli configure membership --local-network=network2 --target-network=network1 --iin-agent-endpoint=localhost:9501
-          sleep 10
+          sleep 20
         working-directory: samples/fabric/fabric-cli
         
       # CORDA CLIENT
@@ -845,8 +845,11 @@ jobs:
       - name: Fabric Sync Membership using IIN Agent
         run: |
           ./bin/fabric-cli configure membership --local-network=network1 --target-network=network2 --iin-agent-endpoint=localhost:9500
+          sleep 10
+          docker logs iin-agent-Org1MSP-network1 --tail 10
           ./bin/fabric-cli configure membership --local-network=network2 --target-network=network1 --iin-agent-endpoint=localhost:9501
           sleep 10
+          docker logs iin-agent-Org1MSP-network2 --tail 10
         working-directory: samples/fabric/fabric-cli
         
       # CORDA CLIENT

@@ -28,7 +28,7 @@ services:
       - ${CONFIG_PATH}:/opt/iinagent/config.json
       - ${DNS_CONFIG_PATH}:/opt/iinagent/dnsconfig.json
       - ${SECURITY_DOMAIN_CONFIG_PATH}:/opt/iinagent/security-domain-config.json
-      - ../../relay/credentials:/opt/iinagent/credentials
+      - ${TLS_CREDENTIALS_DIR}:/opt/iinagent/credentials
     ports:
       - "${IIN_AGENT_PORT}:${IIN_AGENT_PORT}"
     command: sh -c "npm run start"

@@ -627,8 +627,11 @@ jobs:
       - name: Fabric Sync Membership using IIN Agent
         run: |
           ./bin/fabric-cli configure membership --local-network=network1 --target-network=network2 --iin-agent-endpoint=localhost:9500
+          sleep 10
+          docker logs iin-agent-Org1MSP-network1 --tail 10
           ./bin/fabric-cli configure membership --local-network=network2 --target-network=network1 --iin-agent-endpoint=localhost:9501
           sleep 10
+          docker logs iin-agent-Org1MSP-network2 --tail 10
         working-directory: samples/fabric/fabric-cli
         
       # # CORDA CLIENT

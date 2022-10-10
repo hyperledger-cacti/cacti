@@ -30,10 +30,6 @@ To build using existing Weaver Github packages, run the the following:
 make build
 ```
 
-## Running the IIN Agent
-
-Run `npm run dev` to start the agent in your terminal. (_Note_: we will support a containerized IIN agent in the future.)
-
 ## Configuration
 
 ### Security Domain Config
@@ -41,8 +37,8 @@ Run `npm run dev` to start the agent in your terminal. (_Note_: we will support 
 Sample `security-domain-config.json`:
 ```
 {
-    "securityDomainName": "<ledgerId>",
-    "securityDomainName": [
+    "<securityDomainName>": "<ledgerId>",
+    "<securityDomainName>": [
         "<node1/org1>",
         "<node2/org2>"
     ]
@@ -58,18 +54,24 @@ It is JSON, with specifying who are the members of a security domain, with keys 
 Discovery is not implemented yet, so DNS details are added during bootstrapping. A sample `dnsconfig.json` looks like this:
 ```
 {
-    "securityDomainName": {
-        "iin-agent1-name": {
-            "endpoint": "hostname:port",
-            "tls": false,
-            "tlsCACertPath": ""
+    "<securityDomainName>": {
+        "<iin-agent1-name>": {
+            "endpoint": "<hostname:port>",
+            "tls": <true/false>,
+            "tlsCACertPath": "<cacert-path-or-empty-string>"
         },
-        "iin-agent2-name": {
-            "endpoint": "hostname:port",
-            "tls": true,
-            "tlsCACertPath": "<cacert-path>"
+        "<iin-agent2-name>": {
+            "endpoint": "<hostname:port>",
+            "tls": <true/false>,
+            "tlsCACertPath": "<cacert-path-or-empty-string>"
         }
     }
 }
 ```
-For each security domain, there's a JSON object which contains elements with key as iin-agent's name, which can be Org MSP Id for Fabric, or Node Id for Corda, and value as another JSON object. This value contains `endpoint` for the iin-agent, boolean `tls` which is true if tls is enabled for that iin-agent, and `tlsCACertPath` which specified the path to file containing tls CA certs, keep it empty string if not known.
+For each security domain, there's a JSON object which contains elements with key as iin-agent's name, which can be Org MSP Id for Fabric, or Node Id for Corda, and value as another JSON object. This value contains `endpoint` for the iin-agent, boolean `tls` which is true if TLS is enabled for that iin-agent, and `tlsCACertPath` which specifies the path to file containing TLS CA certs, keep it empty string if not known.
+
+## Running the IIN Agent
+
+Run `npm run dev` to start the agent in your terminal. (_Note_: we will support a containerized IIN agent in the future.)
+
+---
