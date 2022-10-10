@@ -545,11 +545,11 @@ jobs:
           # FABRIC CONFIG
           cp src/fabric-ledger/config.json.template src/fabric-ledger/config-n1.json
           CCP_PATH=${GITHUB_WORKSPACE}/tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json
-          sed -i "s#path_to_connection_profile#${CCP_PATH}#g" src/fabric-ledger/config-n1.json
+          sed -i "s#path-to-connection-profile#${CCP_PATH}#g" src/fabric-ledger/config-n1.json
           cat src/fabric-ledger/config-n1.json
           cp src/fabric-ledger/config.json.template src/fabric-ledger/config-n2.json
           CCP_PATH=${GITHUB_WORKSPACE}/tests/network-setups/fabric/shared/network2/peerOrganizations/org1.network2.com/connection-org1.json
-          sed -i "s#path_to_connection_profile#${CCP_PATH}#g" src/fabric-ledger/config-n2.json
+          sed -i "s#path-to-connection-profile#${CCP_PATH}#g" src/fabric-ledger/config-n2.json
           cat src/fabric-ledger/config-n2.json
           # DNS CONFIG
           sed -i "s#iin-agent-Org1MSP-network1#localhost#g" docker-testnet/configs/dnsconfig.json
@@ -565,7 +565,7 @@ jobs:
           sed -i "s#<weaver-contract-name>#interop#g" .env
           sed -i "s#^DNS_CONFIG_PATH=#DNS_CONFIG_PATH=./docker-testnet/configs/dnsconfig.json#g" .env
           sed -i "s#^SECURITY_DOMAIN_CONFIG_PATH=#SECURITY_DOMAIN_CONFIG_PATH=./docker-testnet/configs/security-domain-config.json#g" .env
-          sed -i "s#^CONFIG_PATH=#CONFIG_PATH=.src/fabric-ledger/config-n1.json#g" .env
+          sed -i "s#^CONFIG_PATH=#CONFIG_PATH=./src/fabric-ledger/config-n1.json#g" .env
           sed -i "s#^AUTO_SYNC=#AUTO_SYNC=false#g" .env
           cat .env
         working-directory: core/identity-management/iin-agent
