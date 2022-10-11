@@ -20,6 +20,7 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:   
   fabric-asset-transfer:
+    if: ${{ false }}
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
   
@@ -628,10 +629,10 @@ jobs:
         run: |
           ./bin/fabric-cli configure membership --local-network=network1 --target-network=network2 --iin-agent-endpoint=localhost:9500
           sleep 10
-          docker logs iin-agent-Org1MSP-network1 --tail 10
+          tail -10 ../../../core/identity-management/iin-agent/iinagent-n1.out
           ./bin/fabric-cli configure membership --local-network=network2 --target-network=network1 --iin-agent-endpoint=localhost:9501
           sleep 10
-          docker logs iin-agent-Org1MSP-network2 --tail 10
+          tail -10 ../../../core/identity-management/iin-agent/iinagent-n2.out
         working-directory: samples/fabric/fabric-cli
         
       # # CORDA CLIENT
