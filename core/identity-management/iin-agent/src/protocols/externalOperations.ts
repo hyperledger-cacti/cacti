@@ -25,16 +25,26 @@ export function getSecurityDomainMapKey(securityDomain: string, iinAgent: string
     }
 }
 
-// Handles communication with foreign IIN agents
-export const syncExternalStateFromIINAgent = async (remoteSecurityDomainUnit: iin_agent_pb.SecurityDomainMemberIdentity, securityDomain: string, memberId: string) => {
-    const remoteSecurityDomain = remoteSecurityDomainUnit.getSecurityDomain();
+export function syncExternalStateFromIINAgent(remoteSecurityDomainUnit: iin_agent_pb.SecurityDomainMemberIdentity, securityDomain: string, memberId: string) {
     const nonce = uuidv4();
+    const remoteSecurityDomain = remoteSecurityDomainUnit.getSecurityDomain();
+    const remoteSecurityDomainDNS = utils.getSecurityDomainDNS(remoteSecurityDomain);
+    if (!remoteSecurityDomainDNS) {
+        const errorMsg = `no security domain: ${remoteSecurityDomain} found in SecurityDomain DNS config`
+        console.error("Error:", errorMsg)
+        throw new Error(errorMsg)
+    }
+    syncExternalStateFromIINAgentHelper(remoteSecurityDomainUnit, securityDomain, memberId, nonce, remoteSecurityDomainDNS).then().catch((error) => {
+        console.error("SyncExternalStateFromIINAgentHelper Error:", error);
+    });
+    return nonce
+}
+
+// Handles communication with foreign IIN agents
+const syncExternalStateFromIINAgentHelper = async (remoteSecurityDomainUnit: iin_agent_pb.SecurityDomainMemberIdentity, securityDomain: string, memberId: string, nonce: string, remoteSecurityDomainDNS: any) => {
+    const remoteSecurityDomain = remoteSecurityDomainUnit.getSecurityDomain();
     console.log('syncExternalStateFromIINAgent:', remoteSecurityDomain, '-', remoteSecurityDomainUnit.getMemberId(), ' nonce:', nonce);
-    
-    // const sleepTime = 2000 // 2 seconds
-    // const timeoutTime = 300 * 1000 // 5 minutes
-    // const timeoutIterations = timeoutTime/sleepTime // 5 minutes
-    
+
     const requestingSecurityDomain = new iin_agent_pb.SecurityDomainMemberIdentity();
     requestingSecurityDomain.setSecurityDomain(securityDomain);
     requestingSecurityDomain.setMemberId(memberId);
@@ -44,7 +54,6 @@ export const syncExternalStateFromIINAgent = async (remoteSecurityDomainUnit: ii
     request.setNonce(nonce);
     
     // Request Attested Membership from all members of remote security_domain
-    const remoteSecurityDomainDNS = utils.getSecurityDomainDNS(remoteSecurityDomain);
     let c = 0;
     for (const iinAgent in remoteSecurityDomainDNS) {
         const iinAgentClient = utils.getIINAgentClient(remoteSecurityDomain, iinAgent, remoteSecurityDomainDNS);
@@ -52,7 +61,6 @@ export const syncExternalStateFromIINAgent = async (remoteSecurityDomainUnit: ii
         request.setSourceNetwork(remoteSecurityDomainUnit);
         console.log(`Requesting attested memberships from: ${remoteSecurityDomain} - ${iinAgent}`);
         iinAgentClient.requestIdentityConfiguration(request, utils.defaultCallback);
-        // remoteSecDomMapKeys.push(getSecurityDomainMapKey(remoteSecurityDomain, iinAgent, nonce));
         c++;
     }
     foreignAgentResponseCount.set(nonce, { current:0, total: c});
@@ -82,21 +90,30 @@ export const requestIdentityConfiguration = async (request: iin_agent_pb.Securit
     }
 };
 
-// Processes foreign security domain unit's state/configuration received from a foreign IIN agent
-export const sendIdentityConfiguration = async (attestedMembership: iin_agent_pb.AttestedMembership, securityDomain: string, memberId: string) => {
+export function sendIdentityConfiguration(attestedMembership: iin_agent_pb.AttestedMembership, securityDomain: string, memberId: string) {
     const attestation = attestedMembership.getAttestation()!;
     if (!attestation.hasUnitIdentity()) {
-        console.error('Error: attestation has no SecurityDomainMemberIdentity associated with it');
-        return;
+        const errorMsg = `attestation has no SecurityDomainMemberIdentity associated with it`;
+        console.error('Error: ' + errorMsg);
+        throw new Error(errorMsg);
     }
+    const nonce = attestation.getNonce();
+    if (!foreignAgentResponseCount.has(nonce)) {
+        const errorMsg = `not expecting any response with received nonce: ${nonce}`;
+        console.error('Error: ' + errorMsg);
+        throw new Error(errorMsg);
+    }
+    sendIdentityConfigurationHelper(attestedMembership, securityDomain, memberId, nonce).then().catch((error) => {
+        console.error("SendIdentityConfigurationHelper Error:", error);
+    });
+}
+
+// Processes foreign security domain unit's state/configuration received from a foreign IIN agent
+const sendIdentityConfigurationHelper = async (attestedMembership: iin_agent_pb.AttestedMembership, securityDomain: string, memberId: string, nonce: string) => {
+    const attestation = attestedMembership.getAttestation()!;
     const securityDomainUnit = attestation.getUnitIdentity()!;
     const remoteSecurityDomain = securityDomainUnit.getSecurityDomain();
     const remoteMemberId = securityDomainUnit.getMemberId();
-    const nonce = attestation.getNonce();
-    if (!foreignAgentResponseCount.has(nonce)) {
-        console.error(`Error: Not expecting any response with received nonce: ${nonce}`);
-        return;
-    }
     const secDomMapKey = getSecurityDomainMapKey(remoteSecurityDomain, remoteMemberId, nonce);
     console.log('sendIdentityConfiguration:', remoteSecurityDomain, '-', remoteMemberId, '-', nonce);
     try {

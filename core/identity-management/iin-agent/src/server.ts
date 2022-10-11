@@ -28,10 +28,10 @@ iinAgentServer.addService(iin_agent_pb_grpc.IINAgentService, {
         try {
             const securityDomain = process.env.SECURITY_DOMAIN ? process.env.SECURITY_DOMAIN : 'network1';
             const memberId = process.env.MEMBER_ID ? process.env.MEMBER_ID : 'Org1MSP';
-            syncExternalStateFromIINAgent(call.request, securityDomain, memberId);
+            const nonce = syncExternalStateFromIINAgent(call.request, securityDomain, memberId);
             ack_response.setMessage('');
             ack_response.setStatus(ack_pb.Ack.STATUS.OK);
-            ack_response.setRequestId('');
+            ack_response.setRequestId(nonce);
             // gRPC response.
             console.log('Responding to caller');
             callback(null, ack_response);
@@ -133,6 +133,9 @@ iinAgentServer.addService(iin_agent_pb_grpc.IINAgentService, {
         try {
             const securityDomain = process.env.SECURITY_DOMAIN ? process.env.SECURITY_DOMAIN : 'network1';
             const memberId = process.env.MEMBER_ID ? process.env.MEMBER_ID : 'Org1MSP';
+            if (call.request.getAttestationsList().length === 0) {
+                throw new Error('no counter attestation provided');
+            }
             nonce = call.request.getAttestationsList()[0].getNonce();
             sendAttestation(call.request, securityDomain, memberId);
             ack_response.setMessage('');

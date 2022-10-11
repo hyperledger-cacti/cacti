@@ -14,29 +14,40 @@ export const requestAttestation = async (counterAttestedMembership: iin_agent_pb
     console.log('requestAttestation:');
 };
 
-// Processes attestations on a foreign security domain unit's state received from a local IIN agent
-export const sendAttestation = async (counterAttestedMembership: iin_agent_pb.CounterAttestedMembership, securityDomain: string, memberId: string) => {
+export function sendAttestation(counterAttestedMembership: iin_agent_pb.CounterAttestedMembership, securityDomain: string, memberId: string) {
     // Assuming only one counter attestation in the list
     const attestation = counterAttestedMembership.getAttestationsList()[0];
     if (!attestation.hasUnitIdentity()) {
-        console.error('Error: attestation has no SecurityDomainMemberIdentity associated with it');
-        return;
+        const errorMsg = 'attestation has no SecurityDomainMemberIdentity associated with it';
+        console.error('Error: ' + errorMsg);
+        throw new Error(errorMsg);
     }
     
     const securityDomainUnit = attestation.getUnitIdentity()!;
     const peerAgentMemberId = securityDomainUnit.getMemberId();
     if (securityDomain !== securityDomainUnit.getSecurityDomain()) {
-        console.error(`Error: received counter attestation from different security domain's member '${peerAgentMemberId}'. Expected: ${securityDomain}, Received: ${securityDomainUnit.getSecurityDomain()}`);
-        return;
+        const errorMsg = `received counter attestation from different security domain's member '${peerAgentMemberId}'. Expected: ${securityDomain}, Received: ${securityDomainUnit.getSecurityDomain()}`;
+        console.error('Error: ' + errorMsg);
+        throw new Error(errorMsg);
     }
     
     const nonce = attestation.getNonce();
     const localKey = getSecurityDomainMapKey('LOCAL_COUNTER_ATTESTATION_RESPONSE', memberId, nonce);
     if (!(counterAttestationsMap.has(localKey) && localAgentResponseCount.has(nonce))) {
-        console.error(`Error: Not expecting any response with received nonce: ${nonce}`);
-        return;
+        const errorMsg = `not expecting any response with received nonce: ${nonce}`;
+        console.error('Error: ' + errorMsg);
+        throw new Error(errorMsg);
     }
+    sendAttestationHelper(counterAttestedMembership, securityDomain, memberId, peerAgentMemberId, nonce).then().catch((error) => {
+        console.error("SendAttestationHelper Error:", error);
+    });
+}
+
+// Processes attestations on a foreign security domain unit's state received from a local IIN agent
+const sendAttestationHelper = async (counterAttestedMembership: iin_agent_pb.CounterAttestedMembership, securityDomain: string, memberId: string, peerAgentMemberId: string, nonce: string) => {
+    const attestation = counterAttestedMembership.getAttestationsList()[0];
     
+    const localKey = getSecurityDomainMapKey('LOCAL_COUNTER_ATTESTATION_RESPONSE', memberId, nonce);
     const myCounterAttestedMembership = counterAttestationsMap.get(localKey) as iin_agent_pb.CounterAttestedMembership;
     const attestedMembershipSet64 = myCounterAttestedMembership.getAttestedMembershipSet();
     const attestedMembershipSet = iin_agent_pb.CounterAttestedMembership.AttestedMembershipSet.deserializeBinary(

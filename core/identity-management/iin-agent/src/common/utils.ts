@@ -129,8 +129,8 @@ export async function delay(ms: number) {
  * privateKey: pem string
  * returns: signature in base64 string
 **/
-export function signMessage(message, privateKey) {
-    const sign = crypto.createSign("SHA256");
+export function signMessage(message, privateKey, algorithm: string = "SHA256") {
+    const sign = crypto.createSign(algorithm);
     sign.write(message);
     sign.end();
     return sign.sign(privateKey).toString('base64');
@@ -142,11 +142,11 @@ export function signMessage(message, privateKey) {
  * signature: base64 string
  * returns: True/False
  **/
-export function verifySignature(message, certificate, signature) {
+export function verifySignature(message, certificate, signature, algorithm: string = "SHA256") {
     const messageBuffer = Buffer.from(message);
     const signBuffer = Buffer.from(signature, 'base64');
     const publicKey = crypto.createPublicKey(certificate).export({type:'spki', format:'pem'});
-    return crypto.verify("SHA256", messageBuffer, publicKey, signBuffer);
+    return crypto.verify(algorithm, messageBuffer, publicKey, signBuffer);
 };
 
 export function deserializeMembership64(dataSerialized64: string): membership_pb.Membership {
@@ -183,51 +183,51 @@ export function verifyMemberInMembership(membership: membership_pb.Membership, a
     const memberId = unitIdentity.getMemberId();
     const certificate = attestation.getCertificate() 
     const member = membership.getMembersMap().get(memberId);
-	let isSignerRoot = false;
-	let leafCACertPEM = "";
-	if (member.getType() === "ca") {
-		leafCACertPEM = member.getValue();
-		isSignerRoot = true;
-	} else if (member.getType() == "certificate") {
+    let isSignerRoot = false;
+    let leafCACertPEM = "";
+    if (member.getType() === "ca") {
+        leafCACertPEM = member.getValue();
+        isSignerRoot = true;
+    } else if (member.getType() == "certificate") {
         const chain = member.getChainList();
         let parentCert = chain[0];
         for (let i=1; i<chain.length; i++) {
             let caCert = chain[i];
-    		isSignerRoot = (i == 1);
+            isSignerRoot = (i == 1);
             if(!validateCertificateUsingCA(caCert, parentCert, isSignerRoot)) {
                 console.error('Certificate link invalid');
                 return false;
             }
             parentCert = caCert;
         }
-		leafCACertPEM = chain[chain.length - 1];
-		isSignerRoot = (chain.length == 1);
-	}
-	return validateCertificateUsingCA(certificate, leafCACertPEM, isSignerRoot);
+        leafCACertPEM = chain[chain.length - 1];
+        isSignerRoot = (chain.length == 1);
+    }
+    return validateCertificateUsingCA(certificate, leafCACertPEM, isSignerRoot);
 }
 
 function validateCertificateUsingCA(cert: string, signerCACert: string, isSignerRootCA: boolean): boolean {
     const x509Cert = new X509Certificate(cert);
     const x509SignerCACert = new X509Certificate(signerCACert);
-	if (isSignerRootCA) {
-		if (!x509SignerCACert.verify(x509SignerCACert.publicKey)) {
+    if (isSignerRootCA) {
+        if (!x509SignerCACert.verify(x509SignerCACert.publicKey)) {
             console.error(`Root CA Certificate isn't self-signed`);
-			return false;
-		}
-	}
-	if (!x509Cert.verify(x509SignerCACert.publicKey)) {
+            return false;
+        }
+    }
+    if (!x509Cert.verify(x509SignerCACert.publicKey)) {
         console.error(`Certificate isn't signed by the provided CA`);
-		return false;
-	}
-	if (!isCertificateWithinExpiry(x509Cert)) {
+        return false;
+    }
+    if (!isCertificateWithinExpiry(x509Cert)) {
         console.error(`Certificate is outside of validity. Cert validity from ${x509Cert.validFrom} to ${x509Cert.validTo}`);
         return false;
     }
-	if (x509Cert.issuer !== x509SignerCACert.subject) {
-		console.error(`Certificate issuer ${x509Cert.issuer} does not match signer subject ${x509SignerCACert.subject}`);
+    if (x509Cert.issuer !== x509SignerCACert.subject) {
+        console.error(`Certificate issuer ${x509Cert.issuer} does not match signer subject ${x509SignerCACert.subject}`);
         return false;
-	}
-	return true;
+    }
+    return true;
 }
 function isCertificateWithinExpiry(x509Cert: typeof X509Certificate) {
     const validFrom = new Date(x509Cert.validFrom).valueOf();

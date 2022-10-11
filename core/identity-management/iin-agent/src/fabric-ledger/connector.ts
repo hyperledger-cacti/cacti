@@ -27,8 +27,6 @@ export class FabricConnector extends LedgerBase {
     constructor(ledgerId: string, contractId: string, networkId: string, configFilePath: string) {
         const weaverCCId = contractId ? contractId : 'interop';
         super(ledgerId, weaverCCId);
-        //this.connectionProfilePath = connectionProfilePath ? connectionProfilePath : path.resolve(__dirname, './', 'connection_profile.json');
-        //this.walletPath = walletPath ? walletPath : path.join(process.cwd(), `wallet-${this.networkId}`);
         this.configFilePath = configFilePath ? configFilePath : path.resolve(__dirname, './', 'config.json');
         this.networkId = networkId ? networkId : 'network1';
         if (!fs.existsSync(configFilePath)) {

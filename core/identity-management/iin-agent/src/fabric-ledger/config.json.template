@@ -11,7 +11,7 @@
     },
     "mspId":"Org1MSP",
     "ordererMspIds": ["OrdererMSP"],
-    "ccpPath": "path-to-connection-profile",
+    "ccpPath": "<path-to-connection-profile>",
     "walletPath": "",
     "caUrl": "",
     "local": "true"

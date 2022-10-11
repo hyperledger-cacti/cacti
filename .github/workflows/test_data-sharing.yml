@@ -177,7 +177,7 @@ jobs:
         run: |
           ./bin/fabric-cli configure membership --local-network=network1 --target-network=network2 --iin-agent-endpoint=localhost:9500
           ./bin/fabric-cli configure membership --local-network=network2 --target-network=network1 --iin-agent-endpoint=localhost:9501
-          sleep 10
+          sleep 20
         working-directory: samples/fabric/fabric-cli
         
       # CORDA CLIENT
@@ -779,11 +779,11 @@ jobs:
           # FABRIC CONFIG
           cp src/fabric-ledger/config.json.template src/fabric-ledger/config-n1.json
           CCP_PATH=${GITHUB_WORKSPACE}/tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json
-          sed -i "s#path-to-connection-profile#${CCP_PATH}#g" src/fabric-ledger/config-n1.json
+          sed -i "s#\<path-to-connection-profile\>#${CCP_PATH}#g" src/fabric-ledger/config-n1.json
           cat src/fabric-ledger/config-n1.json
           cp src/fabric-ledger/config.json.template src/fabric-ledger/config-n2.json
           CCP_PATH=${GITHUB_WORKSPACE}/tests/network-setups/fabric/shared/network2/peerOrganizations/org1.network2.com/connection-org1.json
-          sed -i "s#path-to-connection-profile#${CCP_PATH}#g" src/fabric-ledger/config-n2.json
+          sed -i "s#\<path-to-connection-profile\>#${CCP_PATH}#g" src/fabric-ledger/config-n2.json
           cat src/fabric-ledger/config-n2.json
           # DNS CONFIG
           sed -i "s#iin-agent-Org1MSP-network1#localhost#g" docker-testnet/configs/dnsconfig.json
