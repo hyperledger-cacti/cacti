@@ -9,10 +9,9 @@ The IIN agent module is built as a gRPC server exposing the following services:
 - `syncExternalState`
 - `requestIdentityConfiguration`
 - `sendIdentityConfiguration`
-- `flowAndRecordAttestations`
 - `requestAttestation`
 - `sendAttestation`
 
-To read or write to the shared ledger, the agent must exercise DLT-specific logic. Since [platform-specific drivers](../../../drivers) already exist to carry out similar tasks (for the relay), we will augment those drivers to support the basic mechanisms needed by IIN agents. The following DLT drivers are currently implemented in Weaver and will be augmented to fulfil the above protcols:
-- [Hyperledger Fabric](../../../drivers/fabric-driver)
-- [Corda](../../../drivers/corda-driver)
+To read or write to the shared ledger, the agent must exercise DLT-specific logic. The DLT specific logic are abstracted into an abtract class in `common/ledgerBase.ts`. All DLT should extend this. This code goes in different directories depending upon DLT. E.g.:
+* Hyperledger Fabric specific logic goes into `fabric-ledger` directory.
+* Corda specific logic goes into `corda-ledger` directory.

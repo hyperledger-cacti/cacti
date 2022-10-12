@@ -92,7 +92,7 @@ const configureNetwork = async (mainNetwork: string, logger: any = console, iinA
     } else if (iinAgent) {
       membershipPath = path.join(
         getCurrentNetworkCredentialPath(network),
-        'attested-membership-' + mainNetwork + '.proto.serialized')
+        'attested-membership-' + mainNetwork + '.proto.serialized'
       )
     }
     const verificationPolicyPath = path.join(
@@ -130,8 +130,7 @@ const loadLocalHelper = async (
   channelName: string,
   contractName: string,
   members: Array<string>,
-  logger: any = console,
-  iinAgent: boolean = false
+  logger: any = console
 ): Promise<void> => {
   //const localMembership = Buffer.from(fs.readFileSync(localMembershipPath)).toString()
   const { gateway } = await fabricHelper({
@@ -162,7 +161,8 @@ const configureNetworkHelper = async (
   accessControlPath: string,
   membershipPath: string,
   verificationPolicyPath: string,
-  logger: any = console
+  logger: any = console,
+  iinAgent: boolean = false
 ): Promise<void> => {
   logger.info(`Target Network: ${targetNetwork}`)
   const accessControl = Buffer.from(
@@ -214,7 +214,7 @@ const configureNetworkHelper = async (
   }
   if (iinAgent || !targetNetwork.startsWith('network')) {
     const membership = Buffer.from(fs.readFileSync(membershipPath)).toString()
-    const memberRecordingUser = iinAgent ? 'iinagent': 'networkadmin')    // HACK until we add IIN Agents for Corda networks
+    const memberRecordingUser = iinAgent ? 'iinagent': 'networkadmin'    // HACK until we add IIN Agents for Corda networks
     try {
       await helperInvoke(memberRecordingUser, 'CreateMembership', membership, ...helperInvokeArgs)
     } catch (e) {
