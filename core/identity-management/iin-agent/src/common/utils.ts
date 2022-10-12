@@ -15,6 +15,7 @@ const { X509Certificate } = require('crypto');
 import agent_grpc_pb from '@hyperledger-labs/weaver-protos-js/identity/agent_grpc_pb';
 import agent_pb from '@hyperledger-labs/weaver-protos-js/identity/agent_pb';
 import membership_pb from '@hyperledger-labs/weaver-protos-js/common/membership_pb';
+import { InteroperableHelper } from '@hyperledger-labs/weaver-fabric-interop-sdk'
 
 // Local modules
 import { LedgerBase } from './ledgerBase';
@@ -130,10 +131,7 @@ export async function delay(ms: number) {
  * returns: signature in base64 string
 **/
 export function signMessage(message, privateKey, algorithm: string = "SHA256") {
-    const sign = crypto.createSign(algorithm);
-    sign.write(message);
-    sign.end();
-    return sign.sign(privateKey).toString('base64');
+    return InteroperableHelper.signMessage(message, privateKey, algorithm);
 };
 /**
  * Verifies a signature over message using SHA256
@@ -143,10 +141,7 @@ export function signMessage(message, privateKey, algorithm: string = "SHA256") {
  * returns: True/False
  **/
 export function verifySignature(message, certificate, signature, algorithm: string = "SHA256") {
-    const messageBuffer = Buffer.from(message);
-    const signBuffer = Buffer.from(signature, 'base64');
-    const publicKey = crypto.createPublicKey(certificate).export({type:'spki', format:'pem'});
-    return crypto.verify(algorithm, messageBuffer, publicKey, signBuffer);
+    return InteroperableHelper.verifySignature(message, certificate, signature, algorithm);
 };
 
 export function deserializeMembership64(dataSerialized64: string): membership_pb.Membership {

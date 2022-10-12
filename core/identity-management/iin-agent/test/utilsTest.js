@@ -24,10 +24,6 @@ const agent_pb = require('@hyperledger-labs/weaver-protos-js/identity/agent_pb')
 
 const utils = require('../out/common/utils.js')
 
-function decodeMembershipJSON(membershipJSON) {
-    
-}
-
 describe("Membership", () => {
     const fabricMemberId = "Org1MSP";
     const cordaMemberId = 'PartyA'

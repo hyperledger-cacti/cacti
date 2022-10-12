@@ -44,6 +44,11 @@ const command: GluegunCommand = {
             description: 'User for interop.'
           },
           {
+            name: '--iin-agent',
+            description:
+              'Optional flag to indicate if iin-agent is recording attested membership.'
+          },
+          {
             name: '--debug',
             description:
               'Shows debug logs when running. Disabled by default. To enable --debug=true'
@@ -87,7 +92,10 @@ const command: GluegunCommand = {
       process.env.DEFAULT_CHANNEL ? process.env.DEFAULT_CHANNEL : 'mychannel',
       process.env.DEFAULT_CHAINCODE ? process.env.DEFAULT_CHAINCODE : 'interop',
       networkEnv.connProfilePath,
-      options['local-network']
+      options['local-network'],
+      global.__DEFAULT_MSPID__,
+      logger,
+      options['iin-agent']
     )
     logger.info(
       `Generated ${

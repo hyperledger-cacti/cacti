@@ -42,7 +42,7 @@ const helperInvoke = async (userId, ccFunc, ccArg, ...args) => {
   }
 }
 
-const configureNetwork = async (mainNetwork: string, logger: any = console) => {
+const configureNetwork = async (mainNetwork: string, logger: any = console, iinAgent: boolean = false) => {
   const networkEnv = getNetworkConfig(mainNetwork)
   logger.debug(`NetworkEnv: ${JSON.stringify(networkEnv)}`)
   if (!networkEnv.relayEndpoint || !networkEnv.connProfilePath) {
@@ -89,6 +89,11 @@ const configureNetwork = async (mainNetwork: string, logger: any = console) => {
           getCurrentNetworkCredentialPath(network),
           'membership.json'
         )
+    } else if (iinAgent) {
+      membershipPath = path.join(
+        getCurrentNetworkCredentialPath(network),
+        'attested-membership-' + mainNetwork + '.proto.serialized')
+      )
     }
     const verificationPolicyPath = path.join(
       getCurrentNetworkCredentialPath(network),
@@ -112,7 +117,8 @@ const configureNetwork = async (mainNetwork: string, logger: any = console) => {
         accessControlPath,
         membershipPath,
         verificationPolicyPath,
-        logger
+        logger,
+        iinAgent
       )
     }
   }
@@ -124,7 +130,8 @@ const loadLocalHelper = async (
   channelName: string,
   contractName: string,
   members: Array<string>,
-  logger: any = console
+  logger: any = console,
+  iinAgent: boolean = false
 ): Promise<void> => {
   //const localMembership = Buffer.from(fs.readFileSync(localMembershipPath)).toString()
   const { gateway } = await fabricHelper({
@@ -205,9 +212,9 @@ const configureNetworkHelper = async (
       ...helperInvokeArgs
     )
   }
-  if (!targetNetwork.startsWith('network')) {
+  if (iinAgent || !targetNetwork.startsWith('network')) {
     const membership = Buffer.from(fs.readFileSync(membershipPath)).toString()
-    const memberRecordingUser = 'networkadmin'    // HACK until we add IIN Agents for Corda networks
+    const memberRecordingUser = iinAgent ? 'iinagent': 'networkadmin')    // HACK until we add IIN Agents for Corda networks
     try {
       await helperInvoke(memberRecordingUser, 'CreateMembership', membership, ...helperInvokeArgs)
     } catch (e) {

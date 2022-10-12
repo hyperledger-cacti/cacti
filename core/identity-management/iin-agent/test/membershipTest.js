@@ -44,21 +44,7 @@ describe("Membership", () => {
         await wallet.put(userName, userIdentity);
         return userIdentity;
     }
-
-    async function sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-    // 
-    // beforeEach(async () => {
-    //     await initializeWallet();
-    //     const network = sinon.createStubInstance(NetworkImpl);
-    //     amc = new ContractImpl(network, "amc", "AssetManager");
-    // });
-    // 
-    // afterEach(() => {
-    //     sinon.restore();
-    // });
-
+    
     describe("serialize membership", () => {
 
         it("test 1", async () => {

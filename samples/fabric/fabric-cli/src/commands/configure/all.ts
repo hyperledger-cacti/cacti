@@ -34,13 +34,18 @@ const command: GluegunCommand = {
       commandHelp(
         print,
         toolbox,
-        'fabric-cli configure all network1 network2 ',
-        'fabric-cli configure all (space seperated network names matching config file)',
+        'fabric-cli configure all network1 network2',
+        'fabric-cli configure all [--iin-agent] (space seperated network names matching config file)',
         [
           {
             name: '--debug',
             description:
               'Shows debug logs when running. Disabled by default. To enable --debug=true'
+          },
+          {
+            name: '--iin-agent',
+            description:
+              'Optional flag to indicate if iin-agent is recording attested membership.'
           }
         ],
         command,
@@ -55,14 +60,16 @@ const command: GluegunCommand = {
     }
     // for each network, generate network admin identity and IIN Agent identity (there's only one org per network)
     const networkAdminUser = 'networkadmin'
-    //const iinAgentUser = 'iinagent'
+    const iinAgentUser = 'iinagent'
     for (const network of array) {
       // Create a network admin
       print.info(`Creating network admin wallet identity for network: ${network}`)
       await enrollAndRecordWalletIdentity(networkAdminUser, null, network, true, false)
-      // Create an IIN Agent
-      //print.info(`Creating IIN Agent wallet identity for network: ${network}`)
-      //await enrollAndRecordWalletIdentity(iinAgentUser, null, network, false, true)
+      if (options['iin-agent']===true) {
+          // Create an IIN Agent
+          print.info(`Creating IIN Agent wallet identity for network: ${network}`)
+          await enrollAndRecordWalletIdentity(iinAgentUser, null, network, false, true)
+      }
     }
     // for each network it
     // 1. Generate network configs (membership, access control, and verification policy)
@@ -81,7 +88,7 @@ const command: GluegunCommand = {
       }
 
       const username = currusername || `user1`
-      /*print.info(`Generating membership for network: ${network}`)
+      print.info(`Generating membership for network: ${network}`)
       // 1. Generate network configs (membership, access control, and verification policy)
       await generateMembership(
         process.env.DEFAULT_CHANNEL ? process.env.DEFAULT_CHANNEL : 'mychannel',
@@ -91,8 +98,9 @@ const command: GluegunCommand = {
         connProfilePath,
         network,
         global.__DEFAULT_MSPID__,
-        logger
-      )*/
+        logger,
+        options['iin-agent']
+      )
       const appccid = process.env.DEFAULT_APPLICATION_CHAINCODE ? process.env.DEFAULT_APPLICATION_CHAINCODE : 'simplestate'
       await generateAccessControl(
         process.env.DEFAULT_CHANNEL ? process.env.DEFAULT_CHANNEL : 'mychannel',
@@ -164,7 +172,7 @@ const command: GluegunCommand = {
         spinner.stop()
       }
       try {
-        await configureNetwork(network, logger)
+        await configureNetwork(network, logger, options['iin-agent'])
         spinner.succeed(`Loaded Chaincode for network: ${network}`)
       } catch (err) {
         spinner.fail('Loading Chaincode failed')

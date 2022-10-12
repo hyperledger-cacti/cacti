@@ -371,7 +371,7 @@ async function signEventSubscriptionQuery(
             InteroperableHelper.signMessage(
                 inputQuery.getAddress() + inputQuery.getNonce(),
                 keyCert.key.toBytes()
-            ).toString("base64")
+            )
         );
         return signedQuery;
     } catch (error: any) {

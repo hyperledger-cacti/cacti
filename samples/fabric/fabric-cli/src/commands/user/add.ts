@@ -23,7 +23,7 @@ const command: GluegunCommand = {
         print,
         toolbox,
         `fabric-cli user add --target-network=network1 --id=user --secret=userpw`,
-        `fabric-cli user add --target-network=<network-name> --id=<id> --secret=<secret> [--network-admin]`,
+        `fabric-cli user add --target-network=<network-name> --id=<id> --secret=<secret> [--network-admin] [--iin-agent]`,
         [
           {
             name: '--target-network',
@@ -44,6 +44,11 @@ const command: GluegunCommand = {
             name: '--network-admin',
             description:
               'Flag to indicate whether this user should have a network admin attribute.'
+          },
+          {
+            name: '--iin-agent',
+            description:
+              'Flag to indicate whether this user should have an IIN agent attribute.'
           }
         ],
         command,
@@ -58,7 +63,7 @@ const command: GluegunCommand = {
       print.error('--id is required arguement, please specify the username here')
     }
 
-    await enrollAndRecordWalletIdentity(options['id'], options['secret'], options['target-network'], options['network-admin'])
+    await enrollAndRecordWalletIdentity(options['id'], options['secret'], options['target-network'], options['network-admin'], options['iin-agent'])
     process.exit()
   }
 }
