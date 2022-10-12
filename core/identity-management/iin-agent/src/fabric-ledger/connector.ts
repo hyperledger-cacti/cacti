@@ -20,26 +20,25 @@ export class FabricConnector extends LedgerBase {
     connectionProfilePath: string;
     configFilePath: string;
     networkId: string;
-    orgMspId: string;
     walletPath: string;
     iinAgentUserName: string;
 
     constructor(ledgerId: string, contractId: string, networkId: string, configFilePath: string) {
         const weaverCCId = contractId ? contractId : 'interop';
-        super(ledgerId, weaverCCId);
         this.configFilePath = configFilePath ? configFilePath : path.resolve(__dirname, './', 'config.json');
-        this.networkId = networkId ? networkId : 'network1';
         if (!fs.existsSync(configFilePath)) {
             throw new Error('Config does not exist at path: ' + configFilePath);
         }
         const config = JSON.parse(fs.readFileSync(configFilePath, 'utf8').toString());
+        super(ledgerId, config.mspId, weaverCCId);
+        
+        this.networkId = networkId ? networkId : 'network1';
         this.iinAgentUserName = config.agent.name;
-        this.orgMspId = config.mspId;
         this.connectionProfilePath = (config.ccpPath && config.ccpPath.length>0) ? config.ccpPath : path.resolve(__dirname, './', 'connection_profile.json');
         if (!fs.existsSync(this.connectionProfilePath)) {
             throw new Error('Connection profile does not exist at path: ' + configFilePath);
         }
-        this.walletPath = (config.walletPath && config.walletPath.length>0) ? config.walletPath : path.join(process.cwd(), `wallet-${this.networkId}-${this.orgMspId}`);
+        this.walletPath = (config.walletPath && config.walletPath.length>0) ? config.walletPath : path.join(process.cwd(), `wallet-${this.networkId}-${this.memberId}`);
     }
 
     async init() {
@@ -55,7 +54,7 @@ export class FabricConnector extends LedgerBase {
         
         const unitId = new iin_agent_pb.SecurityDomainMemberIdentity();
         unitId.setSecurityDomain(securityDomain);
-        unitId.setMemberId(this.orgMspId);
+        unitId.setMemberId(this.memberId);
         
         const attestation = new iin_agent_pb.Attestation();
         attestation.setUnitIdentity(unitId);
@@ -76,7 +75,7 @@ export class FabricConnector extends LedgerBase {
         
         const unitId = new iin_agent_pb.SecurityDomainMemberIdentity();
         unitId.setSecurityDomain(securityDomain);
-        unitId.setMemberId(this.orgMspId);
+        unitId.setMemberId(this.memberId);
         
         const attestation = new iin_agent_pb.Attestation();
         attestation.setUnitIdentity(unitId);

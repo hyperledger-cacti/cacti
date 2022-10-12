@@ -14,7 +14,7 @@ import { Certificate } from '@fidm/x509';
 import * as path from 'path';
 import { syncExternalStateFromIINAgent, requestIdentityConfiguration, sendIdentityConfiguration } from './protocols/externalOperations';
 import { requestAttestation, sendAttestation } from './protocols/localOperations';
-import { getLedgerBase, delay, getAllSecurityDomainDNS } from './common/utils'
+import { getLedgerBase, delay, getAllRemoteSecurityDomainDNS } from './common/utils'
 
 
 const iinAgentServer = new Server();
@@ -179,7 +179,7 @@ const loopSyncExternalState = async () => {
       console.log("Auto sync off.")
     }
     while (flagSync) {
-        const secDomDNS = getAllSecurityDomainDNS();
+        const secDomDNS = getAllRemoteSecurityDomainDNS(securityDomain);
         for (const securityDomain in secDomDNS) {
             const foreignSecurityDomain = new iin_agent_pb.SecurityDomainMemberIdentity();
             foreignSecurityDomain.setSecurityDomain(securityDomain);

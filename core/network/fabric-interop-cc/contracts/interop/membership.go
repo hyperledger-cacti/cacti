@@ -38,23 +38,23 @@ func validateMemberCertChains(membership *common.Membership) error {
 }
 
 // Validate 'identity.Attestation' object against a message byte array
-// Should be removed?: to be confirmed in PR
-func validateAttestation(attestation *identity.Attestation, messageBytes string) error {
+// returns parsed Certificate if attestation is valid
+func parseAndValidateAttestation(attestation *identity.Attestation, messageBytes string) (*x509.Certificate, error) {
 	// Parse local IIN Agent's certificate
 	cert, err := parseCert(attestation.Certificate)
 	if err != nil {
-		return fmt.Errorf("Unable to parse attester certificate: %v", err)
+		return nil, fmt.Errorf("Unable to parse attester certificate: %v", err)
 	}
 	// We assume the signature is base64-encoded as it is a string type in the 'Attestation' protobuf
 	decodedSignature, err := base64.StdEncoding.DecodeString(attestation.Signature)
 	if err != nil {
-		return fmt.Errorf("Attestation signature could not be decoded from base64: %s", err.Error())
+		return nil, fmt.Errorf("Attestation signature could not be decoded from base64: %s", err.Error())
 	}
 	err = validateSignature(messageBytes, cert, string(decodedSignature))
 	if err != nil {
-		return fmt.Errorf("Unable to Validate Signature: %s", err.Error())
+		return nil, fmt.Errorf("Unable to Validate Signature: %s", err.Error())
 	}
-	return nil
+	return cert, nil
 }
 
 // Parse 'identity.CounterAttestedMembership' object and extract structures
@@ -89,8 +89,8 @@ func parseCounterAttestedMembership(counterAttestedMembershipSerialized string) 
 }
 
 /* Validate for each attester:
- * 1. Membership of attester in the given membership
- * 2. Attestation/Signature against a message byte array
+ * 1. Attestation/Signature against a message byte array
+ * 2. Membership of attester in the given membership
  * 3. One attester from each member of membership
  */
 func validateAttestationsList(membership *common.Membership, attestations []*identity.Attestation, messageBytes string) error {
@@ -101,25 +101,20 @@ func validateAttestationsList(membership *common.Membership, attestations []*ide
 			return fmt.Errorf("IIN Agent security domain %s does not match with membership security domain %s",
 				attestation.UnitIdentity.SecurityDomain, membership.SecurityDomain)
 		}
-		attesterCert, err := parseCert(attestation.Certificate)
+		
+		// Validate Attestation
+		attesterCert, err := parseAndValidateAttestation(attestation, messageBytes)
 		if err != nil {
-			return fmt.Errorf("Unable to parse attester certificate")
+			return err
 		}
+		
+		// Verify membership of attester
 		err = verifyMemberInSecurityDomain2("", attesterCert, membership, attestation.UnitIdentity.MemberId)
 		if err != nil {
 			return fmt.Errorf("Attester with certificate %+v is not a designated IIN Agent of org %s in security domain %s: %+v",
 				attesterCert, attestation.UnitIdentity.MemberId, attestation.UnitIdentity.SecurityDomain, err)
 		}
 		
-		// Validate signature
-		decodedSignature, err := base64.StdEncoding.DecodeString(attestation.Signature)
-		if err != nil {
-			return fmt.Errorf("Attestation signature could not be decoded from base64: %s", err.Error())
-		}
-		err = validateSignature(messageBytes, attesterCert, string(decodedSignature))
-		if err != nil {
-			return fmt.Errorf("Unable to Validate Signature: %s", err.Error())
-		}
 		attestationsMap[attestation.UnitIdentity.MemberId] = true
 	}
 	for memberId := range membership.Members {
@@ -220,7 +215,7 @@ func (s *SmartContract) UpdateLocalMembership(ctx contractapi.TransactionContext
 	} else if !isAdmin {
 		return fmt.Errorf("Caller not a network admin; access denied")
 	}
-	
+
 	membership, err := decodeMembershipSerialized64(membershipSerialized64)
 	if err != nil {
 		return fmt.Errorf("Unmarshal error: %s", err)

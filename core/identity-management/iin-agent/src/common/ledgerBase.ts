@@ -8,26 +8,31 @@ import iin_agent_pb from '@hyperledger-labs/weaver-protos-js/identity/agent_pb';
 
 export class LedgerBase {
     ledgerId: string;                   // Unique ID of a ledger in which the Weaver interoperation module is installed
+    memberId: string;                   // Unique ID of Member to which this IIN Agent belongs
     contractId: string;                 // Unique ID of the contract corresponding to the Weaver interoperation module installed in 'ledgerId'
 
-    constructor(ledgerId: string, contractId: string) {
+    constructor(ledgerId: string, memberId: string, contractId: string) {
         this.ledgerId = ledgerId;
+        this.memberId = memberId;
         this.contractId = contractId;
     }
     
+    /* To initialise ledgerBase 
+     * E.g. for Fabric: Setup a user (with wallet and one or more identities) with contract invocation credentials
+     */
     async init() {
     }
 
     getLedgerID(): string {
         return this.ledgerId;
     }
+    
+    getMemberID(): string {
+        return this.memberId;
+    }
 
     getContractID(): string {
         return this.contractId;
-    }
-
-    // Setup a user (with wallet and one or more identities) with contract invocation credentials
-    async setupWalletIdentity() {
     }
 
     // Collect security domain membership info

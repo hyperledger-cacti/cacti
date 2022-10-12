@@ -74,9 +74,6 @@ export function getLedgerBase(securityDomain: string, memberId: string): LedgerB
     const dltType = process.env.DLT_TYPE!.toLowerCase();
     if(dltType == 'fabric') {
         const ledgerBase = new FabricConnector(ledgerId, process.env.WEAVER_CONTRACT_ID, securityDomain, process.env.CONFIG_PATH);
-        if (ledgerBase.orgMspId != memberId) {
-            throw new Error(`This IIN Agent's member Id: ${ledgerBase.orgMspId} doesn't match with provided member Id: ${memberId} in request.`);
-        }
         return ledgerBase;
     } else {
         throw new Error(`DLT Type ${process.env.DLT_TYPE} not implemented`);
@@ -101,12 +98,15 @@ export function getSecurityDomainDNS(securityDomain: string): any {
     return dnsConfig[securityDomain];
 }
 
-export function getAllSecurityDomainDNS(): any {
+export function getAllRemoteSecurityDomainDNS(localSecurityDomain: string): any {
     const dnsConfigPath = process.env.DNS_CONFIG_PATH ? process.env.DNS_CONFIG_PATH : path.resolve(__dirname, "../", "../", "dnsconfig.json");
     if (!fs.existsSync(dnsConfigPath)) {
         throw new Error('DNS config does not exist at path: ' + dnsConfigPath);
     }
     const dnsConfig = JSON.parse(fs.readFileSync(dnsConfigPath, 'utf8').toString());
+    if (localSecurityDomain in dnsConfig) {
+        delete dnsConfig [localSecurityDomain]
+    }
     return dnsConfig;
 }
 
