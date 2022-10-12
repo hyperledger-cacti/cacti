@@ -73,8 +73,8 @@ export const requestIdentityConfiguration = async (request: iin_agent_pb.Securit
     console.log('requestIdentityConfiguration:', sourceSecurityDomain, '-', sourceMemberId);
     
     const ledgerBase = utils.getLedgerBase(sourceSecurityDomain, sourceMemberId);
-    if (ledgerBase.memberId != memberId) {
-        throw new Error(`This IIN Agent's member Id: ${ledgerBase.memberId} doesn't match with provided member Id: ${memberId} in request.`);
+    if (ledgerBase.memberId != sourceMemberId) {
+        throw new Error(`This IIN Agent's member Id: ${ledgerBase.memberId} doesn't match with provided member Id: ${sourceMemberId} in request.`);
     }
     const [attestedMembership, error] = await utils.handlePromise(ledgerBase.getAttestedMembership(sourceSecurityDomain, request.getNonce()));
     const iinAgentClient = utils.getIINAgentClient(request.getRequestingNetwork()!.getSecurityDomain(), request.getRequestingNetwork()!.getMemberId());

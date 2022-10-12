@@ -25,13 +25,14 @@ export class FabricConnector extends LedgerBase {
 
     constructor(ledgerId: string, contractId: string, networkId: string, configFilePath: string) {
         const weaverCCId = contractId ? contractId : 'interop';
-        this.configFilePath = configFilePath ? configFilePath : path.resolve(__dirname, './', 'config.json');
+        configFilePath = configFilePath ? configFilePath : path.resolve(__dirname, './', 'config.json');
         if (!fs.existsSync(configFilePath)) {
             throw new Error('Config does not exist at path: ' + configFilePath);
         }
         const config = JSON.parse(fs.readFileSync(configFilePath, 'utf8').toString());
         super(ledgerId, config.mspId, weaverCCId);
         
+        this.configFilePath = configFilePath;
         this.networkId = networkId ? networkId : 'network1';
         this.iinAgentUserName = config.agent.name;
         this.connectionProfilePath = (config.ccpPath && config.ccpPath.length>0) ? config.ccpPath : path.resolve(__dirname, './', 'connection_profile.json');
