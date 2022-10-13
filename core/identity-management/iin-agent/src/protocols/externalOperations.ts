@@ -129,7 +129,10 @@ const sendIdentityConfigurationHelper = async (attestedMembership: iin_agent_pb.
         if (attestation.getSignature().length == 0) {
             throw new Error('attestation has no signature');
         }
+        // store response with nonce for the protocol flow
         securityDomainMap.set(secDomMapKey, attestedMembership);
+        // Cache response without nonce for later use
+        securityDomainMap.set(getSecurityDomainMapKey(remoteSecurityDomain, remoteMemberId), attestedMembership);
     } catch (e) {
         const errorMsg = `${e} from SecurityDomain: ${remoteSecurityDomain}, Member: ${remoteMemberId}, Nonce: ${nonce}`;
         console.error(errorMsg);
@@ -174,7 +177,6 @@ const sendIdentityConfigurationHelper = async (attestedMembership: iin_agent_pb.
             errorMsg = `attested membership from ${remoteAgent} invalid.`;
         }
         attestations.push(attestation);
-        securityDomainMap.set(getSecurityDomainMapKey(remoteSecurityDomain, remoteAgent), attestedMembershipOrError);
     }
     
     const ledgerBase = utils.getLedgerBase(securityDomain, memberId);
