@@ -21,6 +21,7 @@ on:
 
 jobs:
   publish-protos:
+    if: github.repository_owner == 'hyperledger-labs'
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
