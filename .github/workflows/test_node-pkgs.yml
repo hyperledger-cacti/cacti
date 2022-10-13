@@ -45,36 +45,36 @@ jobs:
       run: npm run test
       working-directory: sdks/fabric/interoperation-node-sdk
       
-iin_agent_local:
-  
-  runs-on: ubuntu-latest
+  iin_agent_local:
+    
+    runs-on: ubuntu-latest
 
-  strategy:
-    matrix:
-      node-version: [16.x]
-      # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+    strategy:
+      matrix:
+        node-version: [16.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
-  steps:
-  - uses: actions/checkout@v2
-  - name: Use Node.js ${{ matrix.node-version }}
-    uses: actions/setup-node@v2
-    with:
-      node-version: ${{ matrix.node-version }}      
-  - name: Use Protoc 3.15
-    run: |
-      curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.15.6/protoc-3.15.6-linux-x86_64.zip
-      unzip protoc-3.15.6-linux-x86_64.zip -d protoc
-  - name: Build JS Protos
-    run: |
-      export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
-      make build
-    working-directory: common/protos-js
-  - name: Build
-    run: make build-local
-    working-directory: sdks/fabric/interoperation-node-sdk
-  - name: Build IIN Agent
-    run: make build-local
-    working-directory: core/identity-management/iin-agent
-  - name: Tests
-    run: npm run test
-    working-directory: core/identity-management/iin-agent
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}      
+    - name: Use Protoc 3.15
+      run: |
+        curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.15.6/protoc-3.15.6-linux-x86_64.zip
+        unzip protoc-3.15.6-linux-x86_64.zip -d protoc
+    - name: Build JS Protos
+      run: |
+        export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
+        make build
+      working-directory: common/protos-js
+    - name: Build
+      run: make build-local
+      working-directory: sdks/fabric/interoperation-node-sdk
+    - name: Build IIN Agent
+      run: make build-local
+      working-directory: core/identity-management/iin-agent
+    - name: Tests
+      run: npm run test
+      working-directory: core/identity-management/iin-agent
