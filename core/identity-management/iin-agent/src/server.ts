@@ -170,22 +170,23 @@ const configSetup = async () => {
 
 const loopSyncExternalState = async () => {
     const delayTime: number = parseInt(process.env.SYNC_PERIOD ? process.env.SYNC_PERIOD : '3600');
-    const securityDomain = process.env.SECURITY_DOMAIN ? process.env.SECURITY_DOMAIN : 'network1';
-    const memberId = process.env.MEMBER_ID ? process.env.MEMBER_ID : 'Org1MSP';
-    const flagSync = process.env.AUTO_SYNC === 'false' ? false : true
+    console.log("SYNC PERIOD: ", delayTime);
+    const localSecurityDomain = process.env.SECURITY_DOMAIN ? process.env.SECURITY_DOMAIN : 'network1';
+    const localMemberId = process.env.MEMBER_ID ? process.env.MEMBER_ID : 'Org1MSP';
+    const flagSync = process.env.AUTO_SYNC === 'false' ? false : true;
     if (flagSync) {
-      console.log("Starting auto sync...")
+      console.log("Starting auto sync...");
     } else {
-      console.log("Auto sync off.")
+      console.log("Auto sync off.");
     }
     while (flagSync) {
-        const secDomDNS = getAllRemoteSecurityDomainDNS(securityDomain);
+        const secDomDNS = getAllRemoteSecurityDomainDNS(localSecurityDomain);
         for (const securityDomain in secDomDNS) {
             const foreignSecurityDomain = new iin_agent_pb.SecurityDomainMemberIdentity();
             foreignSecurityDomain.setSecurityDomain(securityDomain);
-            syncExternalStateFromIINAgent(foreignSecurityDomain, securityDomain, memberId);
+            syncExternalStateFromIINAgent(foreignSecurityDomain, localSecurityDomain, localMemberId);
         }
-        delay(delayTime * 1000)
+        await delay(delayTime * 1000);
     }
 }
 
@@ -213,7 +214,7 @@ if (process.env.IIN_AGENT_TLS === 'true') {
         configSetup().then(() => {
             console.log('Starting IIN agent server without TLS on', process.env.IIN_AGENT_ENDPOINT);
             iinAgentServer.start();
-            loopSyncExternalState
+            loopSyncExternalState();
         }).catch((error) => {
             console.error("Could not setup iin-agent due to error:", error);
         });
