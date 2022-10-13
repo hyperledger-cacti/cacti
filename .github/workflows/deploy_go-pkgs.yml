@@ -38,8 +38,13 @@ jobs:
       - name: Set module version
         run: echo "VERSION=v$(cat VERSION)" >> $GITHUB_ENV
         working-directory: common/protos-go
+        
+      - name: Check if release already exists
+        run: (git ls-remote origin | grep "$MODULE_TAG/$VERSION" && echo "PROTOS_GO_RELEASE=false" >> $GITHUB_ENV) || echo "PROTOS_GO_RELEASE=true" >> $GITHUB_ENV
+        working-directory: common/protos-go
             
       - name: Create Release
+        if: ${{ env.PROTOS_GO_RELEASE == 'true' }}
         id: protos-go-release
         uses: actions/create-release@v1
         env:
@@ -56,6 +61,7 @@ jobs:
           prerelease: false
           
       - name: Wait for release to be reflected
+        if: ${{ env.PROTOS_GO_RELEASE == 'true' }}
         run: sleep 300
           
   publish-lib-utils:
@@ -86,8 +92,13 @@ jobs:
       - name: Build test
         run: go build -v ./...
         working-directory: core/network/fabric-interop-cc/libs/utils
+        
+      - name: Check if release already exists
+        run: (git ls-remote origin | grep "$MODULE_TAG/$VERSION" && echo "LIB_UTILS_RELEASE=false" >> $GITHUB_ENV) || echo "LIB_UTILS_RELEASE=true" >> $GITHUB_ENV
+        working-directory: core/network/fabric-interop-cc/libs/utils
             
       - name: Create Release
+        if: ${{ env.LIB_UTILS_RELEASE == 'true' }}
         id: lib-utils-release
         uses: actions/create-release@v1
         env:
@@ -104,6 +115,7 @@ jobs:
           prerelease: false    
       
       - name: Wait for release to be reflected
+        if: ${{ env.LIB_UTILS_RELEASE == 'true' }}
         run: sleep 300
 
   publish-lib-asset-exchange:
@@ -134,8 +146,13 @@ jobs:
       - name: Build test
         run: go build -v ./...
         working-directory: core/network/fabric-interop-cc/libs/assetexchange
+        
+      - name: Check if release already exists
+        run: (git ls-remote origin | grep "$MODULE_TAG/$VERSION" && echo "LIB_ASSET_EXCHANGE_RELEASE=false" >> $GITHUB_ENV) || echo "LIB_ASSET_EXCHANGE_RELEASE=true" >> $GITHUB_ENV
+        working-directory: core/network/fabric-interop-cc/libs/assetexchange
             
       - name: Create Release
+        if: ${{ env.LIB_ASSET_EXCHANGE_RELEASE == 'true' }}
         id: lib-asset-exchange-release
         uses: actions/create-release@v1
         env:
@@ -152,6 +169,7 @@ jobs:
           prerelease: false
                 
       - name: Wait for release to be reflected
+        if: ${{ env.LIB_ASSET_EXCHANGE_RELEASE == 'true' }}
         run: sleep 300
       
   publish-interface-asset-mgmt:
@@ -182,8 +200,13 @@ jobs:
       - name: Build test
         run: go build -v ./...
         working-directory: core/network/fabric-interop-cc/interfaces/asset-mgmt
+        
+      - name: Check if release already exists
+        run: (git ls-remote origin | grep "$MODULE_TAG/$VERSION" && echo "INTERFACE_ASSET_MGMT_RELEASE=false" >> $GITHUB_ENV) || echo "INTERFACE_ASSET_MGMT_RELEASE=true" >> $GITHUB_ENV
+        working-directory: core/network/fabric-interop-cc/interfaces/asset-mgmt
             
       - name: Create Release
+        if: ${{ env.INTERFACE_ASSET_MGMT_RELEASE == 'true' }}
         id: asset-mgmt-release
         uses: actions/create-release@v1
         env:
@@ -200,6 +223,7 @@ jobs:
           prerelease: false
                 
       - name: Wait for release to be reflected
+        if: ${{ env.INTERFACE_ASSET_MGMT_RELEASE == 'true' }}
         run: sleep 300
 
   publish-interop-cc:
@@ -230,8 +254,13 @@ jobs:
       - name: Build test
         run: make build
         working-directory: core/network/fabric-interop-cc/contracts/interop
+        
+      - name: Check if release already exists
+        run: (git ls-remote origin | grep "$MODULE_TAG/$VERSION" && echo "INTEROPCC_RELEASE=false" >> $GITHUB_ENV) || echo "INTEROPCC_RELEASE=true" >> $GITHUB_ENV
+        working-directory: core/network/fabric-interop-cc/contracts/interop
             
       - name: Create Release
+        if: ${{ env.INTEROPCC_RELEASE == 'true' }}
         id: interop-cc-release
         uses: actions/create-release@v1
         env:
@@ -248,6 +277,7 @@ jobs:
           prerelease: false
                 
       - name: Wait for release to be reflected
+        if: ${{ env.INTEROPCC_RELEASE == 'true' }}
         run: sleep 300
 
   publish-go-sdk:
@@ -278,8 +308,13 @@ jobs:
       - name: Build test
         run: go build -v ./...
         working-directory: sdks/fabric/go-sdk
+        
+      - name: Check if release already exists
+        run: (git ls-remote origin | grep "$MODULE_TAG/$VERSION" && echo "WEAVER_FABRIC_GO_SDK=false" >> $GITHUB_ENV) || echo "WEAVER_FABRIC_GO_SDK=true" >> $GITHUB_ENV
+        working-directory: sdks/fabric/go-sdk
             
       - name: Create Release
+        if: ${{ env.WEAVER_FABRIC_GO_SDK == 'true' }}
         id: go-sdk-release
         uses: actions/create-release@v1
         env:
@@ -296,6 +331,7 @@ jobs:
           prerelease: false
                 
       - name: Wait for release to be reflected
+        if: ${{ env.WEAVER_FABRIC_GO_SDK == 'true' }}
         run: sleep 300
         
   publish-weaver-fabric-cc-image:
@@ -312,11 +348,17 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-          
+
+      - name: Check if package already exists
+        run: (make check-if-tag-exists && echo "WEAVER_FABRIC_CC_PUSH=true" >> $GITHUB_ENV) || echo "WEAVER_FABRIC_CC_PUSH=false" >> $GITHUB_ENV
+        working-directory: core/network/fabric-interop-cc
+
       - name: Build and Push
+        if: ${{ env.WEAVER_FABRIC_CC_PUSH == 'true' }}
         run: make push-image
         working-directory: core/network/fabric-interop-cc
         
       - name: Push latest tag
+        if: ${{ env.WEAVER_FABRIC_CC_PUSH == 'true' }}
         run: make push-image-latest
         working-directory: core/network/fabric-interop-cc

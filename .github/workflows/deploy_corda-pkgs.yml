@@ -40,7 +40,10 @@ jobs:
         working-directory: common/protos-java-kt
         
       - name: Publish
-        run: make publish
+        run: |
+          make publish > out 2> error
+          exitStatus=$?
+          (cat error | grep "Received status code 409 from server: Conflict" && exit 0) || exit $exitStatus
         working-directory: common/protos-java-kt
         
 
@@ -72,7 +75,10 @@ jobs:
         working-directory: core/network/corda-interop-app
         
       - name: Publish
-        run: make publish
+        run: |
+          make publish > out 2> error
+          exitStatus=$?
+          (cat error | grep "Received status code 409 from server: Conflict" && exit 0) || exit $exitStatus
         working-directory: core/network/corda-interop-app
         
   publish-sdk:
@@ -103,10 +109,13 @@ jobs:
         working-directory: sdks/corda
         
       - name: Publish
-        run: make publish
+        run: |
+          make publish > out 2> error
+          exitStatus=$?
+          (cat error | grep "Received status code 409 from server: Conflict" && exit 0) || exit $exitStatus
         working-directory: sdks/corda
     
-  publish-driver:
+  publish-driver-image:
     if: ${{ always() && github.repository_owner == 'hyperledger-labs' }}
     needs: [publish-protos, publish-interop-app, publish-sdk]
     runs-on: ubuntu-latest
@@ -129,11 +138,17 @@ jobs:
           echo "url=https://maven.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/weaver-dlt-interoperability" >> github.properties
           cat github.properties
         working-directory: core/drivers/corda-driver
+
+      - name: Check if package already exists
+        run: (make check-if-tag-exists && echo "CORDA_DRIVER_PUSH=true" >> $GITHUB_ENV) || echo "CORDA_DRIVER_PUSH=false" >> $GITHUB_ENV
+        working-directory: core/drivers/corda-driver
           
       - name: Build and Push
+        if: ${{ env.CORDA_DRIVER_PUSH == 'true' }}
         run: make push-image
         working-directory: core/drivers/corda-driver
         
       - name: Push latest tag
+        if: ${{ env.CORDA_DRIVER_PUSH == 'true' }}
         run: make push-image-latest
         working-directory: core/drivers/corda-driver

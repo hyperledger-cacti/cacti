@@ -29,10 +29,16 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           
+      - name: Check if package already exists
+        run: (make check-if-tag-exists && echo "RELAY_PUSH=true" >> $GITHUB_ENV) || echo "RELAY_PUSH=false" >> $GITHUB_ENV
+        working-directory: core/relay
+          
       - name: Build and Push
+        if: ${{ env.RELAY_PUSH == 'true' }}
         run: make push-server
         working-directory: core/relay
         
       - name: Push latest tag
-        run: make push-server-latest
+        if: ${{ env.RELAY_PUSH == 'true' }}
+        run: (cat out | grep "exists") || make push-server-latest
         working-directory: core/relay

@@ -48,7 +48,20 @@ jobs:
           make build
         working-directory: common/protos-js
         
+      - name: Check if package already exists
+        run : |
+          PKG_NAME=$(node -p "require('./package.json').name")
+          PUBLISHED_VERSION=$(npm view $PKG_NAME version)
+          LOCAL_VERSION=$(node -p "require('./package.json').version")
+          if [[ "$PUBLISHED_VERSION" == "$LOCAL_VERSION" ]]; then
+            echo "PROTOS_JS_PUBLISH=false" >> $GITHUB_ENV
+          else
+            echo "PROTOS_JS_PUBLISH=true" >> $GITHUB_ENV
+          fi
+        working-directory: common/protos-js
+        
       - name: Publish
+        if: ${{ env.PROTOS_JS_PUBLISH == 'true' }}
         run: make publish
         working-directory: common/protos-js
         
@@ -76,7 +89,20 @@ jobs:
         run: make build
         working-directory: sdks/fabric/interoperation-node-sdk
         
+      - name: Check if package already exists
+        run : |
+          PKG_NAME=$(node -p "require('./package.json').name")
+          PUBLISHED_VERSION=$(npm view $PKG_NAME version)
+          LOCAL_VERSION=$(node -p "require('./package.json').version")
+          if [[ "$PUBLISHED_VERSION" == "$LOCAL_VERSION" ]]; then
+            echo "WEAVER_FABRIC_SDK_PUBLISH=false" >> $GITHUB_ENV
+          else
+            echo "WEAVER_FABRIC_SDK_PUBLISH=true" >> $GITHUB_ENV
+          fi
+        working-directory: sdks/fabric/interoperation-node-sdk
+        
       - name: Publish
+        if: ${{ env.WEAVER_FABRIC_SDK_PUBLISH == 'true' }}
         run: make publish
         working-directory: sdks/fabric/interoperation-node-sdk
     
@@ -101,12 +127,18 @@ jobs:
           sed -i "s/<personal-access-token>/${{ secrets.GITHUB_TOKEN }}/g" .npmrc
           cat .npmrc
         working-directory: core/drivers/fabric-driver
-        
+
+      - name: Check if package already exists
+        run: (make check-if-tag-exists && echo "FABRIC_DRIVER_PUSH=true" >> $GITHUB_ENV) || echo "FABRIC_DRIVER_PUSH=false" >> $GITHUB_ENV
+        working-directory: core/drivers/fabric-driver
+
       - name: Build and Push
+        if: ${{ env.FABRIC_DRIVER_PUSH == 'true' }}
         run: make push-image
         working-directory: core/drivers/fabric-driver
         
       - name: Push latest tag
+        if: ${{ env.FABRIC_DRIVER_PUSH == 'true' }}
         run: make push-image-latest
         working-directory: core/drivers/fabric-driver
         
@@ -131,11 +163,17 @@ jobs:
           sed -i "s/<personal-access-token>/${{ secrets.GITHUB_TOKEN }}/g" .npmrc
           cat .npmrc
         working-directory: core/identity-management/iin-agent
-        
+
+      - name: Check if package already exists
+        run: (make check-if-tag-exists && echo "IINAGENT_PUSH=true" >> $GITHUB_ENV) || echo "IINAGENT_PUSH=false" >> $GITHUB_ENV
+        working-directory: core/identity-management/iin-agent
+
       - name: Build and Push
+        if: ${{ env.IINAGENT_PUSH == 'true' }}
         run: make push-image
         working-directory: core/identity-management/iin-agent
         
       - name: Push latest tag
+        if: ${{ env.IINAGENT_PUSH == 'true' }}
         run: make push-image-latest
         working-directory: core/identity-management/iin-agent
