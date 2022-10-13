@@ -34,7 +34,7 @@ make build
 
 ### Security Domain Config
 
-Sample `security-domain-config.json`:
+Sample `security-domain-config.json` ([template file here](./security-domain-config.json.template)):
 ```
 {
     "<securityDomainName>": "<ledgerId>",
@@ -51,7 +51,7 @@ It is JSON, with specifying who are the members of a security domain, with keys 
 
 ### DNS Config
 
-Discovery is not implemented yet, so DNS details are added during bootstrapping. A sample `dnsconfig.json` looks like this:
+Discovery is not implemented yet, so DNS details are added during bootstrapping. A sample `dnsconfig.json` ([template file here](./dnsconfig.json.template)) looks like this:
 ```
 {
     "<securityDomainName>": {
@@ -88,11 +88,13 @@ Following are the list of environment variables for IIN Agent:
 * `SYNC_PERIOD`: Period at which auto synchronization of memberships from other security domains should happen
 * `AUTO_SYNC`: Set this to `true` to enable auto synchronization of memberships from other security domains
 
+These can be specified in the `.env`, whose template file is [.env.template](./.env.template). Alternatively these can be specified from command line as well.
+
 ### Ledger Specific Configurations:
 
 #### Fabric
 
-Sample `config.json` for fabric network:
+Sample `config.json` for fabric network ([template file here](./src/fabric-ledger/config.json.template)):
 ```
 {
     "admin":{
