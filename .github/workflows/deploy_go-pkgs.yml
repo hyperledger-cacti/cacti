@@ -297,3 +297,26 @@ jobs:
                 
       - name: Wait for release to be reflected
         run: sleep 300
+        
+  publish-weaver-fabric-cc-image:
+    if: ${{ always() && github.repository_owner == 'hyperledger-labs' }}
+    needs: [publish-protos, publish-lib-utils, publish-lib-asset-exchange]
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Build and Push
+        run: make push-image
+        working-directory: core/network/fabric-interop-cc
+        
+      - name: Push latest tag
+        run: make push-image-latest
+        working-directory: core/network/fabric-interop-cc

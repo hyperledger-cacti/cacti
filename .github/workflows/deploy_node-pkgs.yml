@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: CC-BY-4.0
 
-name: Deploy Fabric Packages
+name: Deploy Node JS Packages
 
 on:
   push:
@@ -12,6 +12,7 @@ on:
       - 'common/protos-js/package.json'
       - 'sdks/fabric/interoperation-node-sdk/package.json'
       - 'core/drivers/fabric-driver/VERSION'
+      - 'core/identity-management/iin-agent/VERSION'
       
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -79,7 +80,7 @@ jobs:
         run: make publish
         working-directory: sdks/fabric/interoperation-node-sdk
     
-  publish-driver:
+  publish-driver-image:
     if: ${{ always() && github.repository_owner == 'hyperledger-labs' }}
     needs: [publish-protos, publish-sdk]
     runs-on: ubuntu-latest
@@ -109,7 +110,7 @@ jobs:
         run: make push-image-latest
         working-directory: core/drivers/fabric-driver
         
-  iin-agent-image:
+  publish-iin-agent-image:
     if: ${{ always() && github.repository_owner == 'hyperledger-labs' }}
     needs: [publish-protos, publish-sdk]
     runs-on: ubuntu-latest
@@ -136,5 +137,5 @@ jobs:
         working-directory: core/identity-management/iin-agent
         
       - name: Push latest tag
-        run: push-image-latest
+        run: make push-image-latest
         working-directory: core/identity-management/iin-agent
