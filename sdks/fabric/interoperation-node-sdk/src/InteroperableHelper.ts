@@ -262,14 +262,31 @@ const decodeView = (viewBase64) => {
         throw new Error(`Decode view failed: ${e}`);
     }
 };
+
 /**
  * Sign a message using SHA256
- **/
-const signMessage = (message, privateKey) => {
-    const sign = crypto.createSign("SHA256");
+ * message: string
+ * privateKey: pem string
+ * returns: signature in base64 string
+**/
+function signMessage(message, privateKey, algorithm: string = "SHA256") {
+    const sign = crypto.createSign(algorithm);
     sign.write(message);
     sign.end();
-    return sign.sign(privateKey);
+    return sign.sign(privateKey).toString('base64');
+};
+/**
+ * Verifies a signature over message using SHA256
+ * message: string
+ * certificate: pem string
+ * signature: base64 string
+ * returns: True/False
+ **/
+function verifySignature(message, certificate, signature, algorithm: string = "SHA256") {
+    const messageBuffer = Buffer.from(message);
+    const signBuffer = Buffer.from(signature, 'base64');
+    const publicKey = crypto.createPublicKey(certificate).export({type:'spki', format:'pem'});
+    return crypto.verify(algorithm, messageBuffer, publicKey, signBuffer);
 };
 
 const validPatternString = (pattern: string): boolean => {
@@ -587,7 +604,7 @@ const getRemoteView = async (
             policyCriteria,
             networkID,
             keyCert.cert,
-            Sign ? signMessage(computedAddress + uuidValue, keyCert.key.toBytes()).toString("base64") : "",
+            Sign ? signMessage(computedAddress + uuidValue, keyCert.key.toBytes()) : "",
             uuidValue,
             // Org is empty as the name is in the certs for
             org,
@@ -684,6 +701,7 @@ export {
     getSignatoryOrgMSPFromFabricEndorsementBase64,
     decodeView,
     signMessage,
+    verifySignature,
     invokeHandler,
     interopFlow,
     getCCArgsForProofVerification,

@@ -1,0 +1,44 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+version: '2'
+services:
+  iin-agent:
+    image: ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}
+    container_name: iin-agent-${MEMBER_ID}-${SECURITY_DOMAIN}
+    environment:
+      - SECURITY_DOMAIN=${SECURITY_DOMAIN}
+      - MEMBER_ID=${MEMBER_ID}
+      - IIN_AGENT_ENDPOINT=0.0.0.0:${IIN_AGENT_PORT}
+      - WEAVER_CONTRACT_ID=${WEAVER_CONTRACT_ID}
+      - IIN_AGENT_TLS=${IIN_AGENT_TLS}
+      - IIN_AGENT_TLS_CERT_PATH=${IIN_AGENT_TLS_CERT_PATH}
+      - IIN_AGENT_TLS_KEY_PATH=${IIN_AGENT_TLS_KEY_PATH}
+      - DLT_TYPE=${DLT_TYPE}
+      - CONFIG_PATH=/opt/iinagent/config.json
+      - DNS_CONFIG_PATH=/opt/iinagent/dnsconfig.json
+      - SECURITY_DOMAIN_CONFIG_PATH=/opt/iinagent/security-domain-config.json
+      - SYNC_PERIOD=${SYNC_PERIOD}
+      - AUTO_SYNC=${AUTO_SYNC}
+    volumes:
+      - ${DLT_SPECIFIC_DIR}:/opt/iinagent/extra
+      - ${CONFIG_PATH}:/opt/iinagent/config.json
+      - ${DNS_CONFIG_PATH}:/opt/iinagent/dnsconfig.json
+      - ${SECURITY_DOMAIN_CONFIG_PATH}:/opt/iinagent/security-domain-config.json
+      - ${TLS_CREDENTIALS_DIR}:/opt/iinagent/credentials
+    ports:
+      - "${IIN_AGENT_PORT}:${IIN_AGENT_PORT}"
+    command: sh -c "npm run start"
+    networks:
+        - base-network
+        - iin
+# This networks section is required for when the peers have networks specified
+networks:
+  base-network:
+    external:
+      name: ${EXTERNAL_NETWORK}
+  iin:
+    external: true

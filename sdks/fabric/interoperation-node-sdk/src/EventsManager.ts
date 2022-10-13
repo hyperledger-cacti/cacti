@@ -143,7 +143,7 @@ const subscribeRemoteEvent = async (
             policyCriteria,
             networkID,
             keyCert.cert,
-            Sign ? signMessage(computedAddress + uuidValue, keyCert.key.toBytes()).toString("base64") : "",
+            Sign ? signMessage(computedAddress + uuidValue, keyCert.key.toBytes()) : "",
             uuidValue,
             // Org is empty as the name is in the certs for
             org,
@@ -216,7 +216,7 @@ const unsubscribeRemoteEvent = async (
             policyCriteria,
             networkID,
             keyCert.cert,
-            Sign ? signMessage(computedAddress + uuidValue, keyCert.key.toBytes()).toString("base64") : "",
+            Sign ? signMessage(computedAddress + uuidValue, keyCert.key.toBytes()) : "",
             uuidValue,
             // Org is empty as the name is in the certs for
             org,

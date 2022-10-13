@@ -44,6 +44,11 @@ const command: GluegunCommand = {
             description: 'User for interop.'
           },
           {
+            name: '--iin-agent',
+            description:
+              'Optional flag to indicate if iin-agent is recording attested membership.'
+          },
+          {
             name: '--debug',
             description:
               'Shows debug logs when running. Disabled by default. To enable --debug=true'
@@ -77,8 +82,8 @@ const command: GluegunCommand = {
     for (const networkName of networkNames) {
       print.info(`Creating network admin wallet identity for network: ${networkName}`)
       await enrollAndRecordWalletIdentity('networkadmin', null, networkName, true, false)   // Create a network admin
-      print.info(`Creating IIN Agent wallet identity for network ${networkName}`)
-      await enrollAndRecordWalletIdentity('iinagent', null, networkName, false, true)       // Create an IIN Agent
+      //print.info(`Creating IIN Agent wallet identity for network ${networkName}`)
+      //await enrollAndRecordWalletIdentity('iinagent', null, networkName, false, true)       // Create an IIN Agent
     }
 
     // Membership
@@ -87,7 +92,10 @@ const command: GluegunCommand = {
       process.env.DEFAULT_CHANNEL ? process.env.DEFAULT_CHANNEL : 'mychannel',
       process.env.DEFAULT_CHAINCODE ? process.env.DEFAULT_CHAINCODE : 'interop',
       networkEnv.connProfilePath,
-      options['local-network']
+      options['local-network'],
+      global.__DEFAULT_MSPID__,
+      logger,
+      options['iin-agent']
     )
     logger.info(
       `Generated ${

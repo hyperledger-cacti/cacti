@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: CC-BY-4.0
 
-name: Deploy Fabric Packages
+name: Deploy Node JS Packages
 
 on:
   push:
@@ -12,6 +12,7 @@ on:
       - 'common/protos-js/package.json'
       - 'sdks/fabric/interoperation-node-sdk/package.json'
       - 'core/drivers/fabric-driver/VERSION'
+      - 'core/identity-management/iin-agent/VERSION'
       
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -79,9 +80,9 @@ jobs:
         run: make publish
         working-directory: sdks/fabric/interoperation-node-sdk
     
-  publish-driver:
+  publish-driver-image:
     if: ${{ always() && github.repository_owner == 'hyperledger-labs' }}
-    needs: [publish-protos]
+    needs: [publish-protos, publish-sdk]
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -108,3 +109,33 @@ jobs:
       - name: Push latest tag
         run: make push-image-latest
         working-directory: core/drivers/fabric-driver
+        
+  publish-iin-agent-image:
+    if: ${{ always() && github.repository_owner == 'hyperledger-labs' }}
+    needs: [publish-protos, publish-sdk]
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+                    
+      - name: Generate .npmrc
+        run: |
+          cp .npmrc.template .npmrc
+          sed -i "s/<personal-access-token>/${{ secrets.GITHUB_TOKEN }}/g" .npmrc
+          cat .npmrc
+        working-directory: core/identity-management/iin-agent
+        
+      - name: Build and Push
+        run: make push-image
+        working-directory: core/identity-management/iin-agent
+        
+      - name: Push latest tag
+        run: make push-image-latest
+        working-directory: core/identity-management/iin-agent

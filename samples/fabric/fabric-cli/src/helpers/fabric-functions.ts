@@ -304,7 +304,8 @@ const generateMembership = async (
   connProfilePath: string,
   networkName: string,
   mspId = global.__DEFAULT_MSPID__,
-  logger: any = console
+  logger: any = console,
+  iinAgent: boolean = false
 ): Promise<any> => {
   const { gateway } = await fabricHelper({
     channel,
@@ -333,80 +334,81 @@ const generateMembership = async (
     membershipJSONStr
   )
 
-  // Generate protobufs and attestations for all other networks that have IIN Agents
-  const credentialFolderPath = getCredentialPath()
-  const otherNetworkNames = fs
-    .readdirSync(credentialFolderPath, { withFileTypes: true })
-    .filter(dirent => dirent.isDirectory())
-    .filter(item => item.name.startsWith('network'))    // HACK until we add IIN Agents for Corda networks
-    .map(item => item.name)
-  // Reorder the array so that the local network is the first element
-  // We need to record local membership before recording other networks' memberships
-  otherNetworkNames.splice(otherNetworkNames.indexOf(networkName), 1)
+  if (iinAgent) {
+    // Generate protobufs and attestations for all other networks that have IIN Agents
+    const credentialFolderPath = getCredentialPath()
+    const otherNetworkNames = fs
+      .readdirSync(credentialFolderPath, { withFileTypes: true })
+      .filter(dirent => dirent.isDirectory())
+      .filter(item => item.name.startsWith('network'))    // HACK until we add IIN Agents for Corda networks
+      .map(item => item.name)
+    // Reorder the array so that the local network is the first element
+    // We need to record local membership before recording other networks' memberships
+    otherNetworkNames.splice(otherNetworkNames.indexOf(networkName), 1)
 
-  if (otherNetworkNames.length > 0) {
-    // Convert membership object to protobuf
-    let membershipProto = new membership_pb.Membership()
-    membershipProto.setSecuritydomain(membershipJSON.securityDomain)
-    Object.keys(membershipJSON.members).forEach( (memberName, index) => {
-      const certInfo = membershipJSON.members[memberName]
-      let memberProto = new membership_pb.Member()
-      memberProto.setType(certInfo.type)
-      memberProto.setValue(certInfo.value)
-      membershipProto.getMembersMap().set(memberName, memberProto)
-    })
+    if (otherNetworkNames.length > 0) {
+      // Convert membership object to protobuf
+      let membershipProto = new membership_pb.Membership()
+      membershipProto.setSecuritydomain(membershipJSON.securityDomain)
+      Object.keys(membershipJSON.members).forEach( (memberName, index) => {
+        const certInfo = membershipJSON.members[memberName]
+        let memberProto = new membership_pb.Member()
+        memberProto.setType(certInfo.type)
+        memberProto.setValue(certInfo.value)
+        membershipProto.getMembersMap().set(memberName, memberProto)
+      })
 
-    // For every other network, generate a counter attested membership set
-    const serializedMembership = membershipProto.serializeBinary()
-    const serializedMembershipBase64 = Buffer.from(serializedMembership).toString('base64')
-    const nonce = 'j849j94j40f440fkfjkld0e043'    // Some random string
-    const membershipBase64WithNonce = serializedMembershipBase64 + nonce
-    // Get wallet key and cert for this network's IIN Agent
-    const localWallet = await getWalletForNetwork(networkName)
-    const localKeyCert = await getKeyAndCertForRemoteRequestbyUserName(localWallet, 'iinagent')
-    // Sign <membership + nonce> using wallet identity
-    let securityDomainMember = new iin_agent_pb.SecurityDomainMemberIdentity()
-    securityDomainMember.setSecurityDomain(membershipJSON.securityDomain)
-    securityDomainMember.setMemberId(Object.keys(membershipJSON.members)[0])
-    let localAttestation = new iin_agent_pb.Attestation()
-    localAttestation.setUnitIdentity(securityDomainMember)
-    localAttestation.setCertificate(localKeyCert.cert)
-    const localSig = InteroperableHelper.signMessage(membershipBase64WithNonce, localKeyCert.key.toBytes()).toString("base64")
-    localAttestation.setSignature(localSig)
-    localAttestation.setNonce(nonce)
-    let attestedMembershipSet = new iin_agent_pb.CounterAttestedMembership.AttestedMembershipSet()
-    attestedMembershipSet.setMembership(serializedMembershipBase64)
-    attestedMembershipSet.setAttestationsList( [ localAttestation ] )
-    const serializedAttestedMembershipSet = attestedMembershipSet.serializeBinary()
-    const serializedttestedMembershipSetBase64 = Buffer.from(serializedAttestedMembershipSet).toString('base64')
-    const serializedttestedMembershipSetBase64WithNonce = serializedttestedMembershipSetBase64 + nonce
-    for (const otherNetworkName of otherNetworkNames) {
-      // Get wallet key and cert for other network's IIN Agent
-      const otherWallet = await getWalletForNetwork(otherNetworkName)
-      const otherKeyCert = await getKeyAndCertForRemoteRequestbyUserName(otherWallet, 'iinagent')
-      // Sign <attested membership set + nonce> using wallet identity
-      let otherSecurityDomainMember = new iin_agent_pb.SecurityDomainMemberIdentity()
-      otherSecurityDomainMember.setSecurityDomain(otherNetworkName)
-      otherSecurityDomainMember.setMemberId(getNetworkConfig(otherNetworkName).mspId)
-      let otherAttestation = new iin_agent_pb.Attestation()
-      otherAttestation.setUnitIdentity(otherSecurityDomainMember)
-      otherAttestation.setCertificate(otherKeyCert.cert)
-      const otherSig = InteroperableHelper.signMessage(serializedttestedMembershipSetBase64WithNonce, otherKeyCert.key.toBytes()).toString("base64")
-      otherAttestation.setSignature(otherSig)
-      otherAttestation.setNonce(nonce)
+      // For every other network, generate a counter attested membership set
+      const serializedMembership = membershipProto.serializeBinary()
+      const serializedMembershipBase64 = Buffer.from(serializedMembership).toString('base64')
+      const nonce = 'j849j94j40f440fkfjkld0e043'    // Some random string
+      const membershipBase64WithNonce = serializedMembershipBase64 + nonce
+      // Get wallet key and cert for this network's IIN Agent
+      const localWallet = await getWalletForNetwork(networkName)
+      const localKeyCert = await getKeyAndCertForRemoteRequestbyUserName(localWallet, 'iinagent')
+      // Sign <membership + nonce> using wallet identity
+      let securityDomainMember = new iin_agent_pb.SecurityDomainMemberIdentity()
+      securityDomainMember.setSecurityDomain(membershipJSON.securityDomain)
+      securityDomainMember.setMemberId(Object.keys(membershipJSON.members)[0])
+      let localAttestation = new iin_agent_pb.Attestation()
+      localAttestation.setUnitIdentity(securityDomainMember)
+      localAttestation.setCertificate(localKeyCert.cert)
+      const localSig = InteroperableHelper.signMessage(membershipBase64WithNonce, localKeyCert.key.toBytes())
+      localAttestation.setSignature(localSig)
+      localAttestation.setNonce(nonce)
+      let attestedMembershipSet = new iin_agent_pb.CounterAttestedMembership.AttestedMembershipSet()
+      attestedMembershipSet.setMembership(serializedMembershipBase64)
+      attestedMembershipSet.setAttestationsList( [ localAttestation ] )
+      const serializedAttestedMembershipSet = attestedMembershipSet.serializeBinary()
+      const serializedttestedMembershipSetBase64 = Buffer.from(serializedAttestedMembershipSet).toString('base64')
+      const serializedttestedMembershipSetBase64WithNonce = serializedttestedMembershipSetBase64 + nonce
+      for (const otherNetworkName of otherNetworkNames) {
+        // Get wallet key and cert for other network's IIN Agent
+        const otherWallet = await getWalletForNetwork(otherNetworkName)
+        const otherKeyCert = await getKeyAndCertForRemoteRequestbyUserName(otherWallet, 'iinagent')
+        // Sign <attested membership set + nonce> using wallet identity
+        let otherSecurityDomainMember = new iin_agent_pb.SecurityDomainMemberIdentity()
+        otherSecurityDomainMember.setSecurityDomain(otherNetworkName)
+        otherSecurityDomainMember.setMemberId(getNetworkConfig(otherNetworkName).mspId)
+        let otherAttestation = new iin_agent_pb.Attestation()
+        otherAttestation.setUnitIdentity(otherSecurityDomainMember)
+        otherAttestation.setCertificate(otherKeyCert.cert)
+        const otherSig = InteroperableHelper.signMessage(serializedttestedMembershipSetBase64WithNonce, otherKeyCert.key.toBytes())
+        otherAttestation.setSignature(otherSig)
+        otherAttestation.setNonce(nonce)
 
-      // Generate chaincode argument and save it in a file
-      let counterAttestedMembership = new iin_agent_pb.CounterAttestedMembership()
-      counterAttestedMembership.setAttestedMembershipSet(serializedttestedMembershipSetBase64)
-      counterAttestedMembership.setAttestationsList( [ otherAttestation ] )
+        // Generate chaincode argument and save it in a file
+        let counterAttestedMembership = new iin_agent_pb.CounterAttestedMembership()
+        counterAttestedMembership.setAttestedMembershipSet(serializedttestedMembershipSetBase64)
+        counterAttestedMembership.setAttestationsList( [ otherAttestation ] )
 
-      fs.writeFileSync(
-        path.join(credentialsPath, `attested-membership-${otherNetworkName}.proto.serialized`),
-        Buffer.from(counterAttestedMembership.serializeBinary()).toString('base64')
-      )
+        fs.writeFileSync(
+          path.join(credentialsPath, `attested-membership-${otherNetworkName}.proto.serialized`),
+          Buffer.from(counterAttestedMembership.serializeBinary()).toString('base64')
+        )
+      }
     }
   }
-
   return membershipJSON
 }
 

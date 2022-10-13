@@ -3,7 +3,6 @@ syntax = "proto3";
 package identity.agent;
 
 import "common/ack.proto";
-import "common/membership.proto";
 
 option java_package = "com.weaver.protos.identity.agent";
 option go_package = "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/identity";
@@ -40,12 +39,16 @@ message Attestation {
   string certificate = 2;
   string signature = 3;
   string nonce = 4;
+  uint64 timestamp = 5;
 }
 
 // Attested security domain membership by a single member
 message AttestedMembership {
-  string membership = 1;         // 'common.membership.Membership': Serialized and Base64-encoded
-  Attestation attestation = 2;
+  oneof response {
+    string membership = 1;         // 'common.membership.Membership': Serialized and Base64-encoded
+    string error = 2;
+  }
+  Attestation attestation = 3;
 }
 
 // Counter attestation over security domain membership attested by its participants
@@ -54,6 +57,9 @@ message CounterAttestedMembership {
     string membership = 1;                   // 'common.membership.Membership': Serialized and Base64-encoded
     repeated Attestation attestations = 2;
   }
-  string attested_membership_set = 1;        // 'AttestedMembershipSet': Serialized and Base64-encoded
-  repeated Attestation attestations = 2;
+  oneof response {
+    string attested_membership_set = 1;         // 'AttestedMembershipSet': Serialized and Base64-encoded
+    string error = 2;
+  }
+  repeated Attestation attestations = 3;
 }

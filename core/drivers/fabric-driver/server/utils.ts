@@ -37,9 +37,9 @@ function checkIfArraysAreEqual(x: Array<any>, y: Array<any>): boolean {
 // handle callback
 function relayCallback(err: any, response: any) {
     if (response) {
-        console.log(`Response: ${JSON.stringify(response.toObject())}`);
+        console.log(`Relay Callback Response: ${JSON.stringify(response.toObject())}`);
     } else if (err) {
-        console.log(`Error: ${JSON.stringify(err)}`);
+        console.error(`Relay Callback Error: ${err}`);
     }
 }
 
@@ -57,14 +57,21 @@ function handlePromise<T>(promise: Promise<T>): Promise<[T?, Error?]> {
 function getRelayClientForQueryResponse() {
     let client: datatransfer_grpc_pb.DataTransferClient;
     if (process.env.RELAY_TLS === 'true') {
-        if (!(process.env.RELAY_TLSCA_CERT_PATH && fs.existsSync(process.env.RELAY_TLSCA_CERT_PATH))) {
-            throw new Error("Missing or invalid RELAY_TLSCA_CERT_PATH: " + process.env.RELAY_TLSCA_CERT_PATH);
+        if (!process.env.RELAY_TLSCA_CERT_PATH || process.env.RELAY_TLSCA_CERT_PATH == "") {
+            client = new datatransfer_grpc_pb.DataTransferClient(
+                process.env.RELAY_ENDPOINT,
+                credentials.createSsl()
+            );
+        } else {
+            if (!(process.env.RELAY_TLSCA_CERT_PATH && fs.existsSync(process.env.RELAY_TLSCA_CERT_PATH))) {
+                throw new Error("Missing or invalid RELAY_TLSCA_CERT_PATH: " + process.env.RELAY_TLSCA_CERT_PATH);
+            }
+            const rootCert = fs.readFileSync(process.env.RELAY_TLSCA_CERT_PATH);
+            client = new datatransfer_grpc_pb.DataTransferClient(
+                process.env.RELAY_ENDPOINT,
+                credentials.createSsl(rootCert)
+            );
         }
-        const rootCert = fs.readFileSync(process.env.RELAY_TLSCA_CERT_PATH);
-        client = new datatransfer_grpc_pb.DataTransferClient(
-            process.env.RELAY_ENDPOINT,
-            credentials.createSsl(rootCert)
-        );
     } else {
         client = new datatransfer_grpc_pb.DataTransferClient(
             process.env.RELAY_ENDPOINT,
@@ -74,17 +81,55 @@ function getRelayClientForQueryResponse() {
     return client;
 }
 
+
+// If the events_grpc_pb.EventSubscribeClient() failes, then it throws an error which will be caught by the caller
+function getRelayClientForEventSubscription() {
+    let client: events_grpc_pb.EventSubscribeClient;
+
+    if (process.env.RELAY_TLS === 'true') {
+        if (!process.env.RELAY_TLSCA_CERT_PATH || process.env.RELAY_TLSCA_CERT_PATH == "") {
+            client = new events_grpc_pb.EventSubscribeClient(
+                process.env.RELAY_ENDPOINT,
+                credentials.createSsl()
+            );
+        } else {
+            if (!(process.env.RELAY_TLSCA_CERT_PATH && fs.existsSync(process.env.RELAY_TLSCA_CERT_PATH))) {
+                throw new Error("Missing or invalid RELAY_TLSCA_CERT_PATH: " + process.env.RELAY_TLSCA_CERT_PATH);
+            }
+            const rootCert = fs.readFileSync(process.env.RELAY_TLSCA_CERT_PATH);
+            client = new events_grpc_pb.EventSubscribeClient(
+                process.env.RELAY_ENDPOINT,
+                credentials.createSsl(rootCert)
+            );
+        }
+    } else {
+        client = new events_grpc_pb.EventSubscribeClient(
+            process.env.RELAY_ENDPOINT,
+            credentials.createInsecure()
+        );
+    }
+
+    return client;
+}
+
 function getRelayClientForEventPublish() {
     let client: events_grpc_pb.EventPublishClient;
     if (process.env.RELAY_TLS === 'true') {
-        if (!(process.env.RELAY_TLSCA_CERT_PATH && fs.existsSync(process.env.RELAY_TLSCA_CERT_PATH))) {
-            throw new Error("Missing or invalid RELAY_TLSCA_CERT_PATH: " + process.env.RELAY_TLSCA_CERT_PATH);
+        if (!process.env.RELAY_TLSCA_CERT_PATH || process.env.RELAY_TLSCA_CERT_PATH == "") {
+            client = new events_grpc_pb.EventPublishClient(
+                process.env.RELAY_ENDPOINT,
+                credentials.createSsl()
+            );
+        } else {
+            if (!(process.env.RELAY_TLSCA_CERT_PATH && fs.existsSync(process.env.RELAY_TLSCA_CERT_PATH))) {
+                throw new Error("Missing or invalid RELAY_TLSCA_CERT_PATH: " + process.env.RELAY_TLSCA_CERT_PATH);
+            }
+            const rootCert = fs.readFileSync(process.env.RELAY_TLSCA_CERT_PATH);
+            client = new events_grpc_pb.EventPublishClient(
+                process.env.RELAY_ENDPOINT,
+                credentials.createSsl(rootCert)
+            );
         }
-        const rootCert = fs.readFileSync(process.env.RELAY_TLSCA_CERT_PATH);
-        client = new events_grpc_pb.EventPublishClient(
-            process.env.RELAY_ENDPOINT,
-            credentials.createSsl(rootCert)
-        );
     } else {
         client = new events_grpc_pb.EventPublishClient(
             process.env.RELAY_ENDPOINT,
@@ -99,5 +144,6 @@ export {
     handlePromise,
     relayCallback,
     getRelayClientForQueryResponse,
+    getRelayClientForEventSubscription,
     getRelayClientForEventPublish
 }

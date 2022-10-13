@@ -1,0 +1,7 @@
+{
+    "<securityDomainName>": "<ledgerId>",
+    "<securityDomainName>": [
+        "<node1/org1>",
+        "<node2/org2>"
+    ]
+}

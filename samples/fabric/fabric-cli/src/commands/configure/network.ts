@@ -35,6 +35,11 @@ const command: GluegunCommand = {
             description: 'Local network for command. <network1|network2>'
           },
           {
+            name: '--iin-agent',
+            description:
+              'Optional flag to indicate if iin-agent is recording attested membership.'
+          },
+          {
             name: '--debug',
             description:
               'Shows debug logs when running. Disabled by default. To enable --debug=true'
@@ -60,11 +65,13 @@ const command: GluegunCommand = {
     for (const networkName of networkNames) {
       print.info(`Creating network admin wallet identity for network: ${networkName}`)
       await enrollAndRecordWalletIdentity('networkadmin', null, networkName, true, false)   // Create a network admin
-      print.info(`Creating IIN Agent wallet identity for network ${networkName}`)
-      await enrollAndRecordWalletIdentity('iinagent', null, networkName, false, true)       // Create an IIN Agent
+      if (options['iin-agent']===true) {
+          print.info(`Creating IIN Agent wallet identity for network ${networkName}`)
+          await enrollAndRecordWalletIdentity('iinagent', null, networkName, false, true)       // Create an IIN Agent
+      }
     }
 
-    await configureNetwork(options['local-network'], logger)
+    await configureNetwork(options['local-network'], logger, options['iin-agent'])
     process.exit()
   }
 }

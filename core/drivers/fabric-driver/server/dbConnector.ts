@@ -30,6 +30,8 @@ interface DBConnector {
     delete(key: any): Promise<any>;
     // get iterator
     filteredRead(keyFilterCallback : (key: any, targetKey: any) => boolean, targetKey: any): Promise<Array<any>>;
+    // get All keys
+    getAllKeys(): Promise<Array<any>>;
     // close the database connection
     close(): Promise<boolean>;
 }
@@ -56,7 +58,7 @@ class LevelDBConnector implements DBConnector {
         try {
             await this.dbHandle.open();
         } catch (error: any) {
-            console.error(`failed to open database connection with error: ${JSON.stringify(error)}`);
+            console.error(`failed to open database connection with error: ${error.toString()}`);
             if (error.code == 'LEVEL_DATABASE_NOT_OPEN' && error.cause && error.cause.code == 'LEVEL_LOCKED') {
                 throw new DBLockedError(error.toString());
             } else {
@@ -74,7 +76,7 @@ class LevelDBConnector implements DBConnector {
         try {
             await this.dbHandle.put(key, value);
         } catch (error: any) {
-            console.error(`failed to insert key ${JSON.stringify(key)} with error: ${JSON.stringify(error)}`);
+            console.error(`failed to insert key ${JSON.stringify(key)} with error: ${error.toString()}`);
             if (error.code == 'LEVEL_DATABASE_NOT_OPEN') {
                 throw new  DBNotOpenError(error.toString());
             } else {
@@ -93,7 +95,7 @@ class LevelDBConnector implements DBConnector {
             value = await this.dbHandle.get(key);
             console.debug(`read() got value: ${JSON.stringify(value)}`)
         } catch (error: any) {
-            console.error(`failed to read key ${JSON.stringify(key)} with error: ${JSON.stringify(error)}`);
+            console.error(`failed to read key ${JSON.stringify(key)} with error: ${error.toString()}`);
             if (error.code == 'LEVEL_NOT_FOUND') {
                 throw new DBKeyNotFoundError(error.toString());
             } else if (error.code == 'LEVEL_DATABASE_NOT_OPEN') {
@@ -113,7 +115,7 @@ class LevelDBConnector implements DBConnector {
         try {
             await this.dbHandle.put(key, value);
         } catch (error: any) {
-            console.error(`failed to update key ${JSON.stringify(key)} with error: ${JSON.stringify(error)}`);
+            console.error(`failed to update key ${JSON.stringify(key)} with error: ${error.toString()}`);
             if (error.code == 'LEVEL_DATABASE_NOT_OPEN') {
                 throw new DBNotOpenError(error.toString());
             } else {
@@ -132,7 +134,7 @@ class LevelDBConnector implements DBConnector {
             value = this.read(key);
             await this.dbHandle.del(key);
         } catch (error: any) {
-            console.error(`failed to delete key ${JSON.stringify(key)} with error: ${JSON.stringify(error)}`);
+            console.error(`failed to delete key ${JSON.stringify(key)} with error: ${error.toString()}`);
             if (error.code == 'LEVEL_NOT_FOUND') {
                 throw new DBKeyNotFoundError(error.toString());
             } else if (error.code == 'LEVEL_DATABASE_NOT_OPEN') {
@@ -156,7 +158,7 @@ class LevelDBConnector implements DBConnector {
 
             return retVal;
         } catch (error: any) {
-            console.error(`filteredRead error: ${JSON.stringify(error)}`);
+            console.error(`filteredRead error: ${error.toString()}`);
             if (error.code == 'LEVEL_DATABASE_NOT_OPEN') {
                 throw new DBNotOpenError(error.toString());
             } else {
@@ -170,7 +172,7 @@ class LevelDBConnector implements DBConnector {
         try {
             await this.dbHandle.close();
         } catch (error: any) {
-            console.error(`failed to close database connection with error: ${JSON.stringify(error)}`);
+            console.error(`failed to close database connection with error: ${error.toString()}`);
             if (error.code == 'LEVEL_DATABASE_NOT_OPEN') {
                 throw new DBNotOpenError(error.toString());
             } else {
@@ -181,8 +183,7 @@ class LevelDBConnector implements DBConnector {
         return true;
     }
 
-    async readKeys(
-    ):Promise<any> {
+    async getAllKeys():Promise<Array<any>> {
         const keys = await this.dbHandle.keys().all();
         return keys;
     }

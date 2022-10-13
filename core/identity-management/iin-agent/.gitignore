@@ -2,6 +2,12 @@
 /out
 /protos
 /protos-js
+/weaver-fabric-interop-sdk
 .env
 package-lock.json
 .npmrc
+.nyc_output
+config*.json
+dnsconfig*.json
+security-domain-config*.json
+/wallet-*

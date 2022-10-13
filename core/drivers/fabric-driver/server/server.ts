@@ -16,10 +16,11 @@ import events_grpc_pb from '@hyperledger-labs/weaver-protos-js/relay/events_grpc
 import state_pb from '@hyperledger-labs/weaver-protos-js/common/state_pb';
 import { invoke, packageFabricView } from './fabric-code';
 import 'dotenv/config';
+import { loadEventSubscriptionsFromStorage } from './listener'
 import { walletSetup } from './walletSetup';
 import { subscribeEventHelper, unsubscribeEventHelper, signEventSubscriptionQuery, writeExternalStateHelper } from "./events"
 import * as path from 'path';
-import { handlePromise, relayCallback, getRelayClientForQueryResponse } from './utils';
+import { handlePromise, relayCallback, getRelayClientForQueryResponse, getRelayClientForEventSubscription } from './utils';
 import { dbConnectionTest, eventSubscriptionTest } from "./tests"
 import driverPb from '@hyperledger-labs/weaver-protos-js/driver/driver_pb';
 
@@ -83,7 +84,7 @@ const fabricCommunication = async (query: query_pb.Query, networkName: string) =
     if (invokeError) {
         console.log('Invoke Error');
         const errorViewPayload = new state_pb.ViewPayload();
-        errorViewPayload.setError(`Error: ${JSON.stringify(invokeError)}`);
+        errorViewPayload.setError(`Error: ${invokeError.toString()}`);
         errorViewPayload.setRequestId(query.getRequestId());
         // Send the error state to the relay
         client.sendDriverState(errorViewPayload, relayCallback);
@@ -99,28 +100,25 @@ const fabricCommunication = async (query: query_pb.Query, networkName: string) =
     }
 };
 
-// If the events_grpc_pb.EventSubscribeClient() failes, then it throws an error which will be caught by the caller
-async function getEventSubscriptionRelayClient(
-): Promise<events_grpc_pb.EventSubscribeClient> {
-    let client: events_grpc_pb.EventSubscribeClient;
-
-    if (process.env.RELAY_TLS === 'true') {
-        if (!(process.env.RELAY_TLSCA_CERT_PATH && fs.existsSync(process.env.RELAY_TLSCA_CERT_PATH))) {
-            throw new Error("Missing or invalid RELAY_TLSCA_CERT_PATH: " + process.env.RELAY_TLSCA_CERT_PATH);
-        }
-        const rootCert = fs.readFileSync(process.env.RELAY_TLSCA_CERT_PATH);
-        client = new events_grpc_pb.EventSubscribeClient(
-            process.env.RELAY_ENDPOINT,
-            credentials.createSsl(rootCert)
-        );
+const spawnSubscribeEventHelper = async (request: eventsPb.EventSubscription, newRequestId: string) => {
+    const subscriptionOp: eventsPb.EventSubOperation = request.getOperation();
+    const client = getRelayClientForEventSubscription()
+    if (subscriptionOp == eventsPb.EventSubOperation.SUBSCRIBE) {
+        subscribeEventHelper(request, client, process.env.NETWORK_NAME ? process.env.NETWORK_NAME : 'network1');
+    } else if (subscriptionOp == eventsPb.EventSubOperation.UNSUBSCRIBE) {
+        unsubscribeEventHelper(request, client, process.env.NETWORK_NAME ? process.env.NETWORK_NAME : 'network1');
     } else {
-        client = new events_grpc_pb.EventSubscribeClient(
-            process.env.RELAY_ENDPOINT,
-            credentials.createInsecure()
-        );
+        const errorString: string = `Error: subscribe operation ${subscriptionOp.toString()} not supported`;
+        console.error(errorString);
+        const ack_send_error = new ack_pb.Ack();
+        ack_send_error.setRequestId(newRequestId);
+        ack_send_error.setMessage(errorString);
+        ack_send_error.setStatus(ack_pb.Ack.STATUS.ERROR);
+        // gRPC response.
+        console.log(`Sending to the relay the eventSubscription error Ack: ${JSON.stringify(ack_send_error.toObject())}`);
+        // Sending the fabric state to the relay.
+        client.sendDriverSubscriptionStatus(ack_send_error, relayCallback);
     }
-
-    return client;
 }
 
 // Service for receiving communication from a relay. Will communicate with the network and respond with an ack to the relay while the fabric communication is being completed.
@@ -152,31 +150,10 @@ server.addService(driver_pb_grpc.DriverCommunicationService, {
     },
     subscribeEvent: (call: { request: eventsPb.EventSubscription }, callback: (_: any, object: ack_pb.Ack) => void) => {
         const newRequestId: string = call.request.getQuery()!.getRequestId()
-        const subscriptionOp: eventsPb.EventSubOperation = call.request.getOperation();
         console.log(`newRequestId: ${newRequestId}`);
         try {
             if (process.env.MOCK !== 'true') {
-                getEventSubscriptionRelayClient().then((client) => {
-                    if (subscriptionOp == eventsPb.EventSubOperation.SUBSCRIBE) {
-                        subscribeEventHelper(call.request, client, process.env.NETWORK_NAME ? process.env.NETWORK_NAME : 'network1');
-                    } else if (subscriptionOp == eventsPb.EventSubOperation.UNSUBSCRIBE) {
-                        unsubscribeEventHelper(call.request, client, process.env.NETWORK_NAME ? process.env.NETWORK_NAME : 'network1');
-                    } else {
-                        const errorString: string = `Error: subscribe operation ${subscriptionOp.toString()} not supported`;
-                        console.error(errorString);
-                        const ack_send_error = new ack_pb.Ack();
-                        ack_send_error.setRequestId(newRequestId);
-                        ack_send_error.setMessage(errorString);
-                        ack_send_error.setStatus(ack_pb.Ack.STATUS.ERROR);
-                        // gRPC response.
-                        console.log(`Sending to the relay the eventSubscription error Ack: ${JSON.stringify(ack_send_error.toObject())}`);
-                        // Sending the fabric state to the relay.
-                        client.sendDriverSubscriptionStatus(ack_send_error, relayCallback);
-                    }
-                }).catch((error) => {
-                    console.error(`failed to get the relay client (as part of async processing) with error: ${JSON.stringify(error)}`);
-                });
-
+                spawnSubscribeEventHelper(call.request, newRequestId)
                 const ack_response = new ack_pb.Ack();
                 ack_response.setRequestId(newRequestId);
                 ack_response.setMessage('Procesing addEventSubscription');
@@ -199,7 +176,7 @@ server.addService(driver_pb_grpc.DriverCommunicationService, {
                 });
             }
         } catch (e) {
-            const errorString: string = `${JSON.stringify(e)}`;
+            const errorString: string = e.toString();
             console.log(`error: ${errorString}`);
             const ack_error_response = new ack_pb.Ack();
             ack_error_response.setRequestId(newRequestId);
@@ -218,7 +195,7 @@ server.addService(driver_pb_grpc.DriverCommunicationService, {
             console.log(`Responding to caller with signedQuery: ${JSON.stringify(signedQuery.toObject())}`);
             callback(null, signedQuery);   
         }).catch((error) => {
-            const errorString: string = `${JSON.stringify(error)}`;
+            const errorString: string = error.toString();
             console.log(`error: ${errorString}`);
             var emptyQuery: query_pb.Query = new query_pb.Query();
             emptyQuery.setRequestorSignature(errorString);
@@ -256,7 +233,7 @@ const configSetup = async () => {
     // uses the network name to create a unique wallet path
     const walletPath = process.env.WALLET_PATH ? process.env.WALLET_PATH : path.join(process.cwd(), `wallet-${process.env.NETWORK_NAME ? process.env.NETWORK_NAME : 'network1'}`);
     if (process.env.CONNECTION_PROFILE) {
-        walletSetup(
+        await walletSetup(
             walletPath,
             process.env.CONNECTION_PROFILE,
             process.env.NETWORK_NAME ? process.env.NETWORK_NAME : 'network1',
@@ -264,6 +241,9 @@ const configSetup = async () => {
     } else {
         console.error('No CONNECTION_PROFILE provided in the .env');
     }
+    // Register all listeners again
+    const status = await loadEventSubscriptionsFromStorage(process.env.NETWORK_NAME ? process.env.NETWORK_NAME : 'network1');
+    console.debug('Load Event Subscriptions Status: ', status);
 };
 
 // SERVER: Start the server with the provided url.

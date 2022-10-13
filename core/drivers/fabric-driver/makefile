@@ -42,7 +42,7 @@ build-image-local: protos-js weaver-fabric-interop-sdk
 	(docker build --build-arg BUILD_TAG="local" --build-arg GIT_URL=$(GIT_URL) -t ${DOCKER_IMAGE_NAME}:$(DOCKER_TAG) -f fabricDriver.dockerfile.local . ) || \
 		(mv package-remote.json package.json && exit 1) # Only if fails
 	mv package-remote.json package.json # Only if success
-	rm -rf protos-js
+	rm -rf protos-js weaver-fabric-interop-sdk
 	docker tag ${DOCKER_IMAGE_NAME}:$(DOCKER_TAG) $(DOCKER_IMAGE_NAME):latest
 
 build-image: .npmrc

@@ -22,6 +22,16 @@ import (
 	protoV2 "google.golang.org/protobuf/proto"
 )
 
+func decodeMembershipSerialized64(bytes64 string) (*common.Membership, error) {
+	var decodeObj common.Membership
+	protoBytes, err := base64.StdEncoding.DecodeString(bytes64)
+	err = protoV2.Unmarshal(protoBytes, &decodeObj)
+	if err != nil {
+		return nil, fmt.Errorf("Unable to unmarshal membership serialized proto")
+	}
+	return &decodeObj, nil
+}
+
 func decodeMembership(jsonBytes []byte) (*common.Membership, error) {
 	var decodeObj common.Membership
 	dec := json.NewDecoder(strings.NewReader(string(jsonBytes)))
@@ -41,7 +51,7 @@ func decodeCounterAttestedMembership(protoBytesBase64 string) (*identity.Counter
 	}
 	err = protoV2.Unmarshal(protoBytes, &decodeObj)
 	if err != nil {
-		return nil, fmt.Errorf("Unable to unmarshal counter attested membership: %s", err.Error())
+		return nil, fmt.Errorf("Unable to unmarshal counter attested membership serialized proto")
 	}
 	return &decodeObj, nil
 }
