@@ -19,11 +19,11 @@ import {
   IrohaInstruction,
   IrohaQuery,
   Iroha2KeyPair,
+  TransactionStatus,
 } from "../../../main/typescript/public-api";
 import {
   IrohaV2TestEnv,
   generateTestIrohaCredentials,
-  waitForCommit,
 } from "../test-helpers/iroha2-env-setup";
 import { addRandomSuffix } from "../test-helpers/utils";
 
@@ -70,15 +70,16 @@ describe("Instructions and Queries test", () => {
             params: [domainName],
           },
         },
+        waitForCommit: true,
         baseConfig: env.defaultBaseConfig,
       });
       expect(transactionResponse).toBeTruthy();
       expect(transactionResponse.status).toEqual(200);
-      expect(transactionResponse.data.status).toBeTruthy();
-      expect(transactionResponse.data.status).toEqual("OK");
-
-      // Sleep
-      await waitForCommit();
+      expect(transactionResponse.data.rejectReason).toBeUndefined();
+      expect(transactionResponse.data.status).toEqual(
+        TransactionStatus.Committed,
+      );
+      expect(transactionResponse.data.hash).toBeTruthy();
     });
 
     test("Query single domain (FindDomainById)", async () => {
@@ -126,12 +127,16 @@ describe("Instructions and Queries test", () => {
             params: [newAccountDomainName],
           },
         },
+        waitForCommit: true,
         baseConfig: env.defaultBaseConfig,
       });
       expect(registerDomainResponse).toBeTruthy();
       expect(registerDomainResponse.status).toEqual(200);
-      expect(registerDomainResponse.data.status).toEqual("OK");
-      await waitForCommit();
+      expect(registerDomainResponse.data.rejectReason).toBeUndefined();
+      expect(registerDomainResponse.data.status).toEqual(
+        TransactionStatus.Committed,
+      );
+      expect(registerDomainResponse.data.hash).toBeTruthy();
 
       // Generate new account credentials
       newAccountCredentials = generateTestIrohaCredentials();
@@ -149,12 +154,16 @@ describe("Instructions and Queries test", () => {
             ],
           },
         },
+        waitForCommit: true,
         baseConfig: env.defaultBaseConfig,
       });
       expect(registerAccountResponse).toBeTruthy();
       expect(registerAccountResponse.status).toEqual(200);
-      expect(registerAccountResponse.data.status).toEqual("OK");
-      await waitForCommit();
+      expect(registerAccountResponse.data.rejectReason).toBeUndefined();
+      expect(registerAccountResponse.data.status).toEqual(
+        TransactionStatus.Committed,
+      );
+      expect(registerAccountResponse.data.hash).toBeTruthy();
     });
 
     test("Query single account (FindAccountById)", async () => {
@@ -213,12 +222,16 @@ describe("Instructions and Queries test", () => {
             params: [domainName],
           },
         },
+        waitForCommit: true,
         baseConfig: env.defaultBaseConfig,
       });
       expect(registerDomainResponse).toBeTruthy();
       expect(registerDomainResponse.status).toEqual(200);
-      expect(registerDomainResponse.data.status).toEqual("OK");
-      await waitForCommit();
+      expect(registerDomainResponse.data.rejectReason).toBeUndefined();
+      expect(registerDomainResponse.data.status).toEqual(
+        TransactionStatus.Committed,
+      );
+      expect(registerDomainResponse.data.hash).toBeTruthy();
 
       // Create new asset definition
       const registerAssetDefResponse = await env.apiClient.transactV1({
@@ -228,12 +241,16 @@ describe("Instructions and Queries test", () => {
             params: [assetName, domainName, valueType, mintable],
           },
         },
+        waitForCommit: true,
         baseConfig: env.defaultBaseConfig,
       });
       expect(registerAssetDefResponse).toBeTruthy();
       expect(registerAssetDefResponse.status).toEqual(200);
-      expect(registerAssetDefResponse.data.status).toEqual("OK");
-      await waitForCommit();
+      expect(registerAssetDefResponse.data.rejectReason).toBeUndefined();
+      expect(registerAssetDefResponse.data.status).toEqual(
+        TransactionStatus.Committed,
+      );
+      expect(registerAssetDefResponse.data.hash).toBeTruthy();
 
       // Create new asset
       const registerAssetResponse = await env.apiClient.transactV1({
@@ -249,12 +266,16 @@ describe("Instructions and Queries test", () => {
             ],
           },
         },
+        waitForCommit: true,
         baseConfig: env.defaultBaseConfig,
       });
       expect(registerAssetResponse).toBeTruthy();
       expect(registerAssetResponse.status).toEqual(200);
-      expect(registerAssetResponse.data.status).toEqual("OK");
-      await waitForCommit();
+      expect(registerAssetResponse.data.rejectReason).toBeUndefined();
+      expect(registerAssetResponse.data.status).toEqual(
+        TransactionStatus.Committed,
+      );
+      expect(registerAssetResponse.data.hash).toBeTruthy();
     });
 
     test("Query single asset definition (FindAssetDefinitionById)", async () => {
@@ -354,12 +375,14 @@ describe("Instructions and Queries test", () => {
             ],
           },
         },
+        waitForCommit: true,
         baseConfig: env.defaultBaseConfig,
       });
       expect(mintResponse).toBeTruthy();
       expect(mintResponse.status).toEqual(200);
-      expect(mintResponse.data.status).toEqual("OK");
-      await waitForCommit();
+      expect(mintResponse.data.rejectReason).toBeUndefined();
+      expect(mintResponse.data.status).toEqual(TransactionStatus.Committed);
+      expect(mintResponse.data.hash).toBeTruthy();
 
       // Get final asset value (after mint)
       const finalQueryResponse = await env.apiClient.queryV1({
@@ -414,12 +437,14 @@ describe("Instructions and Queries test", () => {
             ],
           },
         },
+        waitForCommit: true,
         baseConfig: env.defaultBaseConfig,
       });
       expect(burnResponse).toBeTruthy();
       expect(burnResponse.status).toEqual(200);
-      expect(burnResponse.data.status).toEqual("OK");
-      await waitForCommit();
+      expect(burnResponse.data.rejectReason).toBeUndefined();
+      expect(burnResponse.data.status).toEqual(TransactionStatus.Committed);
+      expect(burnResponse.data.hash).toBeTruthy();
 
       // Get final asset value (after burn)
       const finalQueryResponse = await env.apiClient.queryV1({
@@ -473,12 +498,16 @@ describe("Instructions and Queries test", () => {
             ],
           },
         },
+        waitForCommit: true,
         baseConfig: env.defaultBaseConfig,
       });
       expect(registerAccountResponse).toBeTruthy();
       expect(registerAccountResponse.status).toEqual(200);
-      expect(registerAccountResponse.data.status).toEqual("OK");
-      await waitForCommit();
+      expect(registerAccountResponse.data.rejectReason).toBeUndefined();
+      expect(registerAccountResponse.data.status).toEqual(
+        TransactionStatus.Committed,
+      );
+      expect(registerAccountResponse.data.hash).toBeTruthy();
 
       // Transfer asset to the newly created account
       const transferResponse = await env.apiClient.transactV1({
@@ -496,12 +525,14 @@ describe("Instructions and Queries test", () => {
             ],
           },
         },
+        waitForCommit: true,
         baseConfig: env.defaultBaseConfig,
       });
       expect(transferResponse).toBeTruthy();
       expect(transferResponse.status).toEqual(200);
-      expect(transferResponse.data.status).toEqual("OK");
-      await waitForCommit();
+      expect(transferResponse.data.rejectReason).toBeUndefined();
+      expect(transferResponse.data.status).toEqual(TransactionStatus.Committed);
+      expect(transferResponse.data.hash).toBeTruthy();
 
       // Get final asset value on source account (after transfer)
       const finalSourceQueryResponse = await env.apiClient.queryV1({

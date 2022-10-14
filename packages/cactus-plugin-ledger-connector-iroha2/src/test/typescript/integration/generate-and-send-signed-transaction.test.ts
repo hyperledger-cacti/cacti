@@ -20,6 +20,7 @@ import {
   IrohaInstruction,
   IrohaQuery,
   signIrohaV2Transaction,
+  TransactionStatus,
 } from "../../../main/typescript/public-api";
 import {
   IrohaV2TestEnv,
@@ -95,15 +96,15 @@ describe("Generate and send signed transaction tests", () => {
           params: [domainName],
         },
       },
+      waitForCommit: true,
       baseConfig: env.defaultBaseConfig,
     });
     expect(transactionResponse).toBeTruthy();
     expect(transactionResponse.status).toEqual(200);
-    expect(transactionResponse.data.status).toBeTruthy();
-    expect(transactionResponse.data.status).toEqual("OK");
-
-    // Sleep
-    await waitForCommit();
+    expect(transactionResponse.data.rejectReason).toBeUndefined();
+    expect(transactionResponse.data.status).toEqual(
+      TransactionStatus.Committed,
+    );
 
     // Check if domain was created
     await assertDomainExistence(domainName);
@@ -159,8 +160,10 @@ describe("Generate and send signed transaction tests", () => {
     });
     expect(transactionResponse).toBeTruthy();
     expect(transactionResponse.status).toEqual(200);
-    expect(transactionResponse.data.status).toBeTruthy();
-    expect(transactionResponse.data.status).toEqual("OK");
+    expect(transactionResponse.data.rejectReason).toBeUndefined();
+    expect(transactionResponse.data.status).toEqual(
+      TransactionStatus.Submitted,
+    );
 
     // Sleep
     await waitForCommit();

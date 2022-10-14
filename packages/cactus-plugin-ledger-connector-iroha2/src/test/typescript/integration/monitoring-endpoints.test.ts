@@ -21,6 +21,7 @@ import {
   BlockTypeV1,
   WatchBlocksOptionsV1,
   WatchBlocksResponseV1,
+  TransactionStatus,
 } from "../../../main/typescript/public-api";
 import {
   IrohaV2TestEnv,
@@ -107,7 +108,9 @@ describe("Block monitoring tests", () => {
     log.info("Watch block trigger tx sent to create domain", domainName);
     expect(transactionResponse).toBeTruthy();
     expect(transactionResponse.status).toEqual(200);
-    expect(transactionResponse.data.status).toEqual("OK");
+    expect(transactionResponse.data.status).toEqual(
+      TransactionStatus.Submitted,
+    );
 
     await expect(monitorPromise).toResolve();
   }

@@ -122,6 +122,25 @@
           "Binary"
         ]
       },
+      "TransactionStatus": {
+        "type": "string",
+        "description": "Status of Iroha V2 transaction.",
+        "enum": [
+          "submitted",
+          "committed",
+          "rejected"
+        ],
+        "x-enum-descriptions": [
+          "Transaction was submitted to the ledger - use other tools to check if it was accepted and committed.",
+          "Transaction was committed to the ledger.",
+          "Transaction was rejected."
+        ],
+        "x-enum-varnames": [
+          "Submitted",
+          "Committed",
+          "Rejected"
+        ]
+      },
       "WatchBlocksOptionsV1": {
         "type": "object",
         "description": "Options passed when subscribing to block monitoring.",
@@ -404,6 +423,12 @@
             "description": "New transaction definition. Caller must provide signing credential in `baseConfig`.",
             "nullable": false
           },
+          "waitForCommit": {
+            "description": "Wait unitl transaction is sent and return the final status (committed / rejected)",
+            "type": "boolean",
+            "default": false,
+            "nullable": false
+          },
           "baseConfig": {
             "$ref": "#/components/schemas/Iroha2BaseConfig",
             "description": "Iroha V2 connection configuration.",
@@ -415,10 +440,22 @@
         "type": "object",
         "description": "Response from transaction endpoint with operation status.",
         "required": [
+          "hash",
           "status"
         ],
         "properties": {
+          "hash": {
+            "type": "string",
+            "description": "Hexadecimal hash of the transaction sent to the ledger.",
+            "nullable": false
+          },
           "status": {
+            "$ref": "#/components/schemas/TransactionStatus",
+            "description": "Status of the sent transaction.",
+            "nullable": false
+          },
+          "rejectReason": {
+            "description": "When waitForCommit was suplied and the transaction was rejected, contains the reason of the rejection.",
             "type": "string",
             "nullable": false
           }

@@ -33,8 +33,8 @@ export interface IIroha2TestLedgerOptions {
  * Default values used by Iroha2TestLedger constructor.
  */
 export const IROHA2_TEST_LEDGER_DEFAULT_OPTIONS = Object.freeze({
-  containerImageName: "ghcr.io/hyperledger/cactus-iroha2-all-in-one",
-  containerImageVersion: "2022-08-24-b4d59707b",
+  containerImageName: "ghcr.io/outsh/cactus-iroha2-all-in-one",
+  containerImageVersion: "0.3",
   logLevel: "info" as LogLevelDesc,
   emitContainerLogs: true,
   envVars: [],

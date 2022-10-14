@@ -7,8 +7,8 @@
 //////////////////////////////////
 
 // Ledger settings
-const containerImageName = "ghcr.io/hyperledger/cactus-iroha2-all-in-one";
-const containerImageVersion = "2022-08-24-b4d59707b";
+const containerImageName = "ghcr.io/outsh/cactus-iroha2-all-in-one";
+const containerImageVersion = "0.3";
 const useRunningLedger = false;
 
 // Log settings

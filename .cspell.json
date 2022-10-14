@@ -135,7 +135,8 @@
         "Xdai",
         "goquorum",
         "hada",
-        "undici"
+        "undici",
+        "outsh"
     ],
     "dictionaries": [
         "typescript,node,npm,go,rust"

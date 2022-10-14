@@ -23,6 +23,7 @@ import {
   IrohaInstruction,
   IrohaQuery,
   PluginLedgerConnectorIroha2,
+  TransactionStatus,
 } from "../../../main/typescript/public-api";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { crypto } from "@iroha2/crypto-target-node";
@@ -109,7 +110,7 @@ describe("Setup and basic endpoint tests", () => {
     expect(overwrittenConfig).toEqual(requestConfig.torii);
   });
 
-  test("Simple transaction and query endpoints works", async () => {
+  test("Simple transaction without waiting and query endpoints works", async () => {
     const domainName = addRandomSuffix("singleTxTest");
 
     // Create new domain
@@ -125,7 +126,11 @@ describe("Setup and basic endpoint tests", () => {
     expect(transactionResponse).toBeTruthy();
     expect(transactionResponse.status).toEqual(200);
     expect(transactionResponse.data.status).toBeTruthy();
-    expect(transactionResponse.data.status).toEqual("OK");
+    expect(transactionResponse.data.status).toEqual(
+      TransactionStatus.Submitted,
+    );
+    expect(transactionResponse.data.hash).toBeTruthy();
+    expect(transactionResponse.data.hash.length).toEqual(64);
 
     // Sleep
     await waitForCommit();
@@ -143,6 +148,88 @@ describe("Setup and basic endpoint tests", () => {
     expect(queryResponse.data.response.id.name).toEqual(domainName);
   });
 
+  test("Waiting for transaction commit returns it's status", async () => {
+    const domainName = addRandomSuffix("waitForTx");
+
+    // Create new domain
+    const transactionResponse = await env.apiClient.transactV1({
+      transaction: {
+        instruction: {
+          name: IrohaInstruction.RegisterDomain,
+          params: [domainName],
+        },
+      },
+      waitForCommit: true,
+      baseConfig: env.defaultBaseConfig,
+    });
+    expect(transactionResponse).toBeTruthy();
+    expect(transactionResponse.status).toEqual(200);
+    expect(transactionResponse.data).toBeTruthy();
+    expect(transactionResponse.data.rejectReason).toBeUndefined();
+    expect(transactionResponse.data.status).toEqual(
+      TransactionStatus.Committed,
+    );
+    expect(transactionResponse.data.hash).toBeTruthy();
+    expect(transactionResponse.data.hash.length).toEqual(64);
+
+    // Query it
+    // Transaction should be committed so no waiting is needed.
+    const queryResponse = await env.apiClient.queryV1({
+      queryName: IrohaQuery.FindDomainById,
+      baseConfig: env.defaultBaseConfig,
+      params: [domainName],
+    });
+    expect(queryResponse).toBeTruthy();
+    expect(queryResponse.data).toBeTruthy();
+    expect(queryResponse.data.response).toBeTruthy();
+    expect(queryResponse.data.response.id).toBeTruthy();
+    expect(queryResponse.data.response.id.name).toEqual(domainName);
+  });
+
+  test("Rejected transaction returns a reason", async () => {
+    const domainName = addRandomSuffix("waitForRejectTx");
+
+    // Create new domain - first one is committed
+    const transactionResponse = await env.apiClient.transactV1({
+      transaction: {
+        instruction: {
+          name: IrohaInstruction.RegisterDomain,
+          params: [domainName],
+        },
+      },
+      waitForCommit: true,
+      baseConfig: env.defaultBaseConfig,
+    });
+    expect(transactionResponse).toBeTruthy();
+    expect(transactionResponse.status).toEqual(200);
+    expect(transactionResponse.data).toBeTruthy();
+    expect(transactionResponse.data.rejectReason).toBeUndefined();
+    expect(transactionResponse.data.status).toEqual(
+      TransactionStatus.Committed,
+    );
+
+    // Create existing domain again - should be rejected
+    const rejectResponse = await env.apiClient.transactV1({
+      transaction: {
+        instruction: {
+          name: IrohaInstruction.RegisterDomain,
+          params: [domainName],
+        },
+      },
+      waitForCommit: true,
+      baseConfig: env.defaultBaseConfig,
+    });
+    expect(rejectResponse).toBeTruthy();
+    expect(rejectResponse.status).toEqual(200);
+    expect(rejectResponse.data).toBeTruthy();
+    expect(rejectResponse.data.status).toEqual(TransactionStatus.Rejected);
+    expect(rejectResponse.data.rejectReason).toBeTruthy();
+    log.debug(
+      "OK - transaction rejected with reason:",
+      rejectResponse.data.rejectReason,
+    );
+  });
+
   test("Sending transaction with keychain signatory works", async () => {
     const domainName = addRandomSuffix("keychainSignatoryDomain");
 
@@ -154,6 +241,7 @@ describe("Setup and basic endpoint tests", () => {
           params: [domainName],
         },
       },
+      waitForCommit: true,
       baseConfig: {
         ...env.defaultBaseConfig,
         signingCredential: env.keychainCredentials,
@@ -161,11 +249,11 @@ describe("Setup and basic endpoint tests", () => {
     });
     expect(transactionResponse).toBeTruthy();
     expect(transactionResponse.status).toEqual(200);
-    expect(transactionResponse.data.status).toBeTruthy();
-    expect(transactionResponse.data.status).toEqual("OK");
-
-    // Sleep
-    await waitForCommit();
+    expect(transactionResponse.data.rejectReason).toBeUndefined();
+    expect(transactionResponse.data.status).toEqual(
+      TransactionStatus.Committed,
+    );
+    expect(transactionResponse.data.hash).toBeTruthy();
 
     // Query it
     const queryResponse = await env.apiClient.queryV1({
@@ -191,6 +279,7 @@ describe("Setup and basic endpoint tests", () => {
           params: [domainName],
         },
       },
+      waitForCommit: true,
       baseConfig: {
         ...env.defaultBaseConfig,
         signingCredential: env.keyPairCredential,
@@ -198,11 +287,11 @@ describe("Setup and basic endpoint tests", () => {
     });
     expect(transactionResponse).toBeTruthy();
     expect(transactionResponse.status).toEqual(200);
-    expect(transactionResponse.data.status).toBeTruthy();
-    expect(transactionResponse.data.status).toEqual("OK");
-
-    // Sleep
-    await waitForCommit();
+    expect(transactionResponse.data.rejectReason).toBeUndefined();
+    expect(transactionResponse.data.status).toEqual(
+      TransactionStatus.Committed,
+    );
+    expect(transactionResponse.data.hash).toBeTruthy();
 
     // Query it
     const queryResponse = await env.apiClient.queryV1({
@@ -234,15 +323,16 @@ describe("Setup and basic endpoint tests", () => {
           },
         ],
       },
+      waitForCommit: true,
       baseConfig: env.defaultBaseConfig,
     });
     expect(transactionResponse).toBeTruthy();
     expect(transactionResponse.status).toEqual(200);
-    expect(transactionResponse.data.status).toBeTruthy();
-    expect(transactionResponse.data.status).toEqual("OK");
-
-    // Sleep
-    await waitForCommit();
+    expect(transactionResponse.data.rejectReason).toBeUndefined();
+    expect(transactionResponse.data.status).toEqual(
+      TransactionStatus.Committed,
+    );
+    expect(transactionResponse.data.hash).toBeTruthy();
 
     // Query domains
     const queryResponse = await env.apiClient.queryV1({

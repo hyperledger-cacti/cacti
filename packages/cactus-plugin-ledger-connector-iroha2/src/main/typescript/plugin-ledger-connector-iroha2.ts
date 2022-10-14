@@ -553,23 +553,23 @@ export class PluginLedgerConnectorIroha2
     try {
       if (req.transaction) {
         this.processInstructionsRequests(client, req.transaction.instruction);
-        await client.send(
+        return await client.send(
           this.tryParseTransactionParams(req.transaction.params),
+          req.waitForCommit,
         );
       } else if (req.signedTransaction) {
         const transactionBinary = Uint8Array.from(
           Object.values(req.signedTransaction),
         );
-        await client.sendSignedPayload(transactionBinary);
+        return await client.sendSignedPayload(
+          transactionBinary,
+          req.waitForCommit,
+        );
       } else {
         throw new Error(
           "To submit transaction you must provide either signed transaction payload or list of instructions with signingCredential",
         );
       }
-
-      return {
-        status: "OK",
-      };
     } finally {
       client.free();
     }

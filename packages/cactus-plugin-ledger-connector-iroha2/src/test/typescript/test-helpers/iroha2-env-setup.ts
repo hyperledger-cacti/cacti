@@ -3,8 +3,8 @@
  */
 
 // Ledger settings
-const containerImageName = "ghcr.io/hyperledger/cactus-iroha2-all-in-one";
-const containerImageVersion = "2022-08-24-b4d59707b";
+const containerImageName = "ghcr.io/outsh/cactus-iroha2-all-in-one";
+const containerImageVersion = "0.3";
 const useRunningLedger = false;
 
 // Log settings
@@ -270,5 +270,8 @@ export class IrohaV2TestEnv {
 
     this.log.info("Prune Docker...");
     await pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
+
+    // Fix flaky tests when running on local (fast) machine
+    await new Promise((resolve) => setTimeout(resolve, 5000));
   }
 }

@@ -10,6 +10,8 @@ import {
   CreateToriiProps,
   makeTransactionPayload,
   executableIntoSignedTransaction,
+  computeTransactionHash,
+  makeSignedTransaction,
 } from "@iroha2/client";
 import {
   AssetDefinitionId,
@@ -43,6 +45,13 @@ import {
   TransactionPayload,
   AccountId,
   VersionedTransaction,
+  RejectionReason,
+  FilterBox,
+  PipelineEventFilter,
+  OptionPipelineEntityKind,
+  PipelineEntityKind,
+  OptionPipelineStatusKind,
+  OptionHash,
 } from "@iroha2/data-model";
 import { Key, KeyPair } from "@iroha2/crypto-core";
 
@@ -57,7 +66,7 @@ import {
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
 
-import { hexToBytes } from "hada";
+import { bytesToHex, hexToBytes } from "hada";
 import { fetch as undiciFetch } from "undici";
 
 import { CactusIrohaV2QueryClient } from "./query";
@@ -67,6 +76,10 @@ import {
   createAssetValue,
   createIrohaValue,
 } from "./data-factories";
+import {
+  TransactResponseV1,
+  TransactionStatus,
+} from "../generated/openapi/typescript-axios";
 
 setCrypto(crypto);
 
@@ -670,45 +683,197 @@ export class CactusIrohaV2Client {
   }
 
   /**
+   * Parse IrohaV2 `RejectionReason` and return plain string rejection description.
+   *
+   * @param reason Transaction rejection from the Iroha V2 ledger.
+   * @returns rejection description.
+   */
+  private getRejectionDescription(reason: RejectionReason): string {
+    Checks.truthy(reason, "getRejectionDescription arg reason");
+
+    return reason.as("Transaction").match({
+      NotPermitted: (error) => {
+        return `NotPermitted: ${error.reason}`;
+      },
+      UnsatisfiedSignatureCondition: (error) => {
+        return `UnsatisfiedSignatureCondition: ${error.reason}`;
+      },
+      LimitCheck: (error) => {
+        return `LimitCheck: ${error}`;
+      },
+      InstructionExecution: (error) => {
+        return `InstructionExecution: ${error.reason}`;
+      },
+      WasmExecution: (error) => {
+        return `WasmExecution: ${error.reason}`;
+      },
+      UnexpectedGenesisAccountSignature: () => {
+        return `UnexpectedGenesisAccountSignature`;
+      },
+    });
+  }
+
+  /**
+   * Wait until transaction with given hash is validated on the ledger and return it's final status.
+   *
+   * @param txHash transaction hash in bytes format.
+   * @returns transaction status (`TransactResponseV1` format).
+   */
+  private async waitForTransactionStatus(
+    txHash: Uint8Array,
+  ): Promise<TransactResponseV1> {
+    Checks.truthy(txHash, "waitForTransactionStatus arg txHash");
+    const txHashHex = bytesToHex([...txHash]);
+    this.log.debug("waitForTransactionStatus() - hash:", txHashHex);
+
+    const monitor = await this.irohaToriiClient.listenForEvents({
+      filter: FilterBox(
+        "Pipeline",
+        PipelineEventFilter({
+          entity_kind: OptionPipelineEntityKind(
+            "Some",
+            PipelineEntityKind("Transaction"),
+          ),
+          status_kind: OptionPipelineStatusKind("None"),
+          hash: OptionHash("Some", txHash),
+        }),
+      ),
+    });
+    this.log.debug("waitForTransactionStatus() - monitoring started.");
+
+    const txStatusPromise = new Promise<TransactResponseV1>(
+      (resolve, reject) => {
+        monitor.ee.on("error", (error) => {
+          this.log.warn("waitForTransactionStatus() - Received error", error);
+          reject(error);
+        });
+
+        monitor.ee.on("event", (event) => {
+          try {
+            const { hash, status } = event.as("Pipeline");
+            const hashHex = bytesToHex([...hash]);
+
+            status.match({
+              Validating: () => {
+                this.log.info(
+                  `waitForTransactionStatus() - Transaction '${hashHex}' [Validating]`,
+                );
+              },
+              Committed: () => {
+                const txStatus = TransactionStatus.Committed;
+                this.log.info(
+                  `waitForTransactionStatus() - Transaction '${hashHex}' [${txStatus}]`,
+                );
+                resolve({
+                  hash: hashHex,
+                  status: txStatus,
+                });
+              },
+              Rejected: (reason) => {
+                const txStatus = TransactionStatus.Rejected;
+                this.log.info(
+                  `waitForTransactionStatus() - Transaction '${hashHex}' [${txStatus}]`,
+                );
+                resolve({
+                  hash: hashHex,
+                  status: txStatus,
+                  rejectReason: this.getRejectionDescription(reason),
+                });
+              },
+            });
+          } catch (error) {
+            this.log.warn(
+              "waitForTransactionStatus() - Event handling error:",
+              error,
+            );
+            reject(error);
+          }
+        });
+      },
+    );
+
+    return txStatusPromise.finally(async () => {
+      this.log.debug(
+        `Transaction ${txHashHex} status received, stop the monitoring...`,
+      );
+      monitor.ee.clearListeners();
+      await monitor.stop();
+    });
+  }
+
+  /**
    * Send all the stored instructions as single Iroha transaction.
    *
    * @param txParams Transaction parameters.
+   * @param waitForCommit If `true` - block and return the final transaction status. Otherwise - return immediately.
    *
-   * @returns void
+   * @returns `TransactResponseV1`
    */
-  public async send(txParams?: TransactionPayloadParameters): Promise<void> {
+  public async send(
+    txParams?: TransactionPayloadParameters,
+    waitForCommit = false,
+  ): Promise<TransactResponseV1> {
     this.assertTransactionsNotEmpty();
     if (!this.irohaSigner) {
       throw new Error("send() failed - no Iroha Signer, keyPair was missing");
     }
-
     this.log.debug(this.getTransactionSummary());
 
-    const signedTx = executableIntoSignedTransaction({
-      signer: this.irohaSigner,
+    const txPayload = makeTransactionPayload({
+      accountId: this.irohaSigner.accountId,
       executable: this.createIrohaExecutable(),
-      payloadParams: txParams,
+      ...txParams,
     });
+    const hash = computeTransactionHash(txPayload);
+    let statusPromise;
+    if (waitForCommit) {
+      statusPromise = this.waitForTransactionStatus(hash);
+    }
 
-    await this.sendSignedPayload(signedTx);
+    const signedTx = makeSignedTransaction(txPayload, this.irohaSigner);
+    await this.irohaToriiClient.submit(signedTx);
     this.clear();
+
+    if (statusPromise) {
+      return await statusPromise;
+    } else {
+      return {
+        hash: bytesToHex([...hash]),
+        status: TransactionStatus.Submitted,
+      };
+    }
   }
 
   /**
    * Send signed transaction payload to the ledger.
    *
-   * @param signedPayload encoded or plain `VersionedTransaction`
+   * @param signedPayload Encoded or plain `VersionedTransaction`
+   * @param waitForCommit If `true` - block and return the final transaction status. Otherwise - return immediately.
+   *
+   * @returns `TransactResponseV1`
    */
   public async sendSignedPayload(
     signedPayload: VersionedTransaction | ArrayBufferView,
-  ): Promise<void> {
-    Checks.truthy(signedPayload, "sendSignedPayload arg signedPayload");
+    waitForCommit = false,
+  ): Promise<TransactResponseV1> {
+    Checks.truthy(signedPayload, "sendSigned arg signedPayload");
 
     if (ArrayBuffer.isView(signedPayload)) {
       signedPayload = VersionedTransaction.fromBuffer(signedPayload);
     }
 
-    await this.irohaToriiClient.submit(signedPayload);
+    const hash = computeTransactionHash(signedPayload.as("V1").payload);
+    if (waitForCommit) {
+      const statusPromise = this.waitForTransactionStatus(hash);
+      await this.irohaToriiClient.submit(signedPayload);
+      return await statusPromise;
+    } else {
+      await this.irohaToriiClient.submit(signedPayload);
+      return {
+        hash: bytesToHex([...hash]),
+        status: TransactionStatus.Submitted,
+      };
+    }
   }
 
   /**

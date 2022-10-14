@@ -412,6 +412,12 @@ export interface TransactRequestV1 {
      */
     transaction?: IrohaTransactionDefinitionV1;
     /**
+     * Wait unitl transaction is sent and return the final status (committed / rejected)
+     * @type {boolean}
+     * @memberof TransactRequestV1
+     */
+    waitForCommit?: boolean;
+    /**
      * 
      * @type {Iroha2BaseConfig}
      * @memberof TransactRequestV1
@@ -425,12 +431,45 @@ export interface TransactRequestV1 {
  */
 export interface TransactResponseV1 {
     /**
-     * 
+     * Hexadecimal hash of the transaction sent to the ledger.
      * @type {string}
      * @memberof TransactResponseV1
      */
-    status: string;
+    hash: string;
+    /**
+     * 
+     * @type {TransactionStatus}
+     * @memberof TransactResponseV1
+     */
+    status: TransactionStatus;
+    /**
+     * When waitForCommit was suplied and the transaction was rejected, contains the reason of the rejection.
+     * @type {string}
+     * @memberof TransactResponseV1
+     */
+    rejectReason?: string;
 }
+/**
+ * Status of Iroha V2 transaction.
+ * @export
+ * @enum {string}
+ */
+
+export enum TransactionStatus {
+    /**
+    * Transaction was submitted to the ledger - use other tools to check if it was accepted and committed.
+    */
+    Submitted = 'submitted',
+    /**
+    * Transaction was committed to the ledger.
+    */
+    Committed = 'committed',
+    /**
+    * Transaction was rejected.
+    */
+    Rejected = 'rejected'
+}
+
 /**
  * Binary encoded response of block data.
  * @export
