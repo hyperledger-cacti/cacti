@@ -21,7 +21,7 @@ import {
   BlockTypeV1,
   WatchBlocksOptionsV1,
   WatchBlocksResponseV1,
-  TransactionStatus,
+  TransactionStatusV1,
 } from "../../../main/typescript/public-api";
 import {
   IrohaV2TestEnv,
@@ -109,7 +109,7 @@ describe("Block monitoring tests", () => {
     expect(transactionResponse).toBeTruthy();
     expect(transactionResponse.status).toEqual(200);
     expect(transactionResponse.data.status).toEqual(
-      TransactionStatus.Submitted,
+      TransactionStatusV1.Submitted,
     );
 
     await expect(monitorPromise).toResolve();

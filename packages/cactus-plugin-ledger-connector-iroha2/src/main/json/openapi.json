@@ -122,7 +122,7 @@
           "Binary"
         ]
       },
-      "TransactionStatus": {
+      "TransactionStatusV1": {
         "type": "string",
         "description": "Status of Iroha V2 transaction.",
         "enum": [
@@ -407,6 +407,48 @@
           }
         }
       },
+      "IrohaQueryDefinitionV1": {
+        "type": "object",
+        "description": "Iroha V2 query definition.",
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "query": {
+            "type": "IrohaQuery",
+            "description": "Name of the query to be executed.",
+            "nullable": false
+          },
+          "params": {
+            "description": "The list of arguments to pass with the query.",
+            "type": "array",
+            "items": {}
+          }
+        }
+      },
+      "IrohaSignedQueryDefinitionV1": {
+        "type": "object",
+        "description": "Iroha V2 signed query definition",
+        "required": [
+          "query",
+          "payload"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "query": {
+            "type": "IrohaQuery",
+            "description": "Name of the query to be executed.",
+            "nullable": false
+          },
+          "payload": {
+            "description": "Signed query transaction binary data received from generate-transaction endpoint.",
+            "type": "string",
+            "format": "binary",
+            "nullable": false
+          }
+        }
+      },
       "TransactRequestV1": {
         "type": "object",
         "description": "Request to transact endpoint.",
@@ -450,7 +492,7 @@
             "nullable": false
           },
           "status": {
-            "$ref": "#/components/schemas/TransactionStatus",
+            "$ref": "#/components/schemas/TransactionStatusV1",
             "description": "Status of the sent transaction.",
             "nullable": false
           },
@@ -461,60 +503,66 @@
           }
         }
       },
-      "GenerateTransactionRequestV1": {
-        "type": "object",
-        "description": "Request for generating transaction payload that can be signed on the client side.",
-        "additionalProperties": false,
-        "required": [
-          "transaction"
-        ],
-        "properties": {
-          "transaction": {
-            "$ref": "#/components/schemas/IrohaTransactionDefinitionV1",
-            "description": "New transaction definition. Caller must provide signing credential in `baseConfig`.",
-            "nullable": false
-          },
-          "baseConfig": {
-            "$ref": "#/components/schemas/Iroha2BaseConfig",
-            "description": "Iroha V2 connection configuration.",
-            "nullable": false
-          }
-        }
-      },
       "QueryRequestV1": {
         "type": "object",
         "description": "Request to query endpoint.",
-        "required": [
-          "queryName"
-        ],
         "additionalProperties": false,
         "properties": {
-          "queryName": {
-            "type": "IrohaQuery",
-            "description": "Name of the query to be executed.",
+          "query": {
+            "$ref": "#/components/schemas/IrohaQueryDefinitionV1",
+            "description": "Query definition. Caller must provide signing credential in `baseConfig`",
+            "nullable": false
+          },
+          "signedQuery": {
+            "$ref": "#/components/schemas/IrohaSignedQueryDefinitionV1",
+            "description": "Query payload signed on the client side.",
             "nullable": false
           },
           "baseConfig": {
             "$ref": "#/components/schemas/Iroha2BaseConfig",
             "description": "Iroha V2 connection configuration.",
             "nullable": false
-          },
-          "params": {
-            "description": "The list of arguments to pass with the query.",
-            "type": "array",
-            "items": {}
           }
         }
       },
       "QueryResponseV1": {
         "type": "object",
-        "description": "Response with query results.",
+        "description": "Response with the query results.",
         "required": [
           "response"
         ],
         "properties": {
           "response": {
             "description": "Query response data that varies between different queries.",
+            "nullable": false
+          }
+        }
+      },
+      "GenerateTransactionRequestV1": {
+        "type": "object",
+        "description": "Request for generating transaction or query payload that can be signed on the client side.",
+        "additionalProperties": false,
+        "required": [
+          "request"
+        ],
+        "properties": {
+          "request": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/IrohaTransactionDefinitionV1",
+                "description": "New transaction definition. Caller must provide signing credential in `baseConfig`.",
+                "nullable": false
+              },
+              {
+                "$ref": "#/components/schemas/IrohaQueryDefinitionV1",
+                "description": "Query definition. Caller must provide signing credential in `baseConfig`.",
+                "nullable": false
+              }
+            ]
+          },
+          "baseConfig": {
+            "$ref": "#/components/schemas/Iroha2BaseConfig",
+            "description": "Iroha V2 connection configuration.",
             "nullable": false
           }
         }

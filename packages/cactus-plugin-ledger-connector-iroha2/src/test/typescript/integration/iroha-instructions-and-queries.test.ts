@@ -19,7 +19,7 @@ import {
   IrohaInstruction,
   IrohaQuery,
   Iroha2KeyPair,
-  TransactionStatus,
+  TransactionStatusV1,
 } from "../../../main/typescript/public-api";
 import {
   IrohaV2TestEnv,
@@ -77,16 +77,18 @@ describe("Instructions and Queries test", () => {
       expect(transactionResponse.status).toEqual(200);
       expect(transactionResponse.data.rejectReason).toBeUndefined();
       expect(transactionResponse.data.status).toEqual(
-        TransactionStatus.Committed,
+        TransactionStatusV1.Committed,
       );
       expect(transactionResponse.data.hash).toBeTruthy();
     });
 
     test("Query single domain (FindDomainById)", async () => {
       const queryResponse = await env.apiClient.queryV1({
-        queryName: IrohaQuery.FindDomainById,
+        query: {
+          query: IrohaQuery.FindDomainById,
+          params: [domainName],
+        },
         baseConfig: env.defaultBaseConfig,
-        params: [domainName],
       });
       expect(queryResponse).toBeTruthy();
       expect(queryResponse.data).toBeTruthy();
@@ -97,7 +99,9 @@ describe("Instructions and Queries test", () => {
 
     test("Query all domains (FindAllDomains)", async () => {
       const queryResponse = await env.apiClient.queryV1({
-        queryName: IrohaQuery.FindAllDomains,
+        query: {
+          query: IrohaQuery.FindAllDomains,
+        },
         baseConfig: env.defaultBaseConfig,
       });
       expect(queryResponse).toBeTruthy();
@@ -134,7 +138,7 @@ describe("Instructions and Queries test", () => {
       expect(registerDomainResponse.status).toEqual(200);
       expect(registerDomainResponse.data.rejectReason).toBeUndefined();
       expect(registerDomainResponse.data.status).toEqual(
-        TransactionStatus.Committed,
+        TransactionStatusV1.Committed,
       );
       expect(registerDomainResponse.data.hash).toBeTruthy();
 
@@ -161,16 +165,18 @@ describe("Instructions and Queries test", () => {
       expect(registerAccountResponse.status).toEqual(200);
       expect(registerAccountResponse.data.rejectReason).toBeUndefined();
       expect(registerAccountResponse.data.status).toEqual(
-        TransactionStatus.Committed,
+        TransactionStatusV1.Committed,
       );
       expect(registerAccountResponse.data.hash).toBeTruthy();
     });
 
     test("Query single account (FindAccountById)", async () => {
       const queryResponse = await env.apiClient.queryV1({
-        queryName: IrohaQuery.FindAccountById,
+        query: {
+          query: IrohaQuery.FindAccountById,
+          params: [newAccountName, newAccountDomainName],
+        },
         baseConfig: env.defaultBaseConfig,
-        params: [newAccountName, newAccountDomainName],
       });
       expect(queryResponse).toBeTruthy();
       expect(queryResponse.data).toBeTruthy();
@@ -187,7 +193,9 @@ describe("Instructions and Queries test", () => {
 
     test("Query all accounts (FindAllAccounts)", async () => {
       const queryResponse = await env.apiClient.queryV1({
-        queryName: IrohaQuery.FindAllAccounts,
+        query: {
+          query: IrohaQuery.FindAllAccounts,
+        },
         baseConfig: env.defaultBaseConfig,
       });
       expect(queryResponse).toBeTruthy();
@@ -229,7 +237,7 @@ describe("Instructions and Queries test", () => {
       expect(registerDomainResponse.status).toEqual(200);
       expect(registerDomainResponse.data.rejectReason).toBeUndefined();
       expect(registerDomainResponse.data.status).toEqual(
-        TransactionStatus.Committed,
+        TransactionStatusV1.Committed,
       );
       expect(registerDomainResponse.data.hash).toBeTruthy();
 
@@ -248,7 +256,7 @@ describe("Instructions and Queries test", () => {
       expect(registerAssetDefResponse.status).toEqual(200);
       expect(registerAssetDefResponse.data.rejectReason).toBeUndefined();
       expect(registerAssetDefResponse.data.status).toEqual(
-        TransactionStatus.Committed,
+        TransactionStatusV1.Committed,
       );
       expect(registerAssetDefResponse.data.hash).toBeTruthy();
 
@@ -273,16 +281,18 @@ describe("Instructions and Queries test", () => {
       expect(registerAssetResponse.status).toEqual(200);
       expect(registerAssetResponse.data.rejectReason).toBeUndefined();
       expect(registerAssetResponse.data.status).toEqual(
-        TransactionStatus.Committed,
+        TransactionStatusV1.Committed,
       );
       expect(registerAssetResponse.data.hash).toBeTruthy();
     });
 
     test("Query single asset definition (FindAssetDefinitionById)", async () => {
       const queryResponse = await env.apiClient.queryV1({
-        queryName: IrohaQuery.FindAssetDefinitionById,
+        query: {
+          query: IrohaQuery.FindAssetDefinitionById,
+          params: [assetName, domainName],
+        },
         baseConfig: env.defaultBaseConfig,
-        params: [assetName, domainName],
       });
       expect(queryResponse).toBeTruthy();
       expect(queryResponse.data).toBeTruthy();
@@ -296,7 +306,9 @@ describe("Instructions and Queries test", () => {
 
     test("Query all asset definitions (FindAllAssetsDefinitions)", async () => {
       const queryResponse = await env.apiClient.queryV1({
-        queryName: IrohaQuery.FindAllAssetsDefinitions,
+        query: {
+          query: IrohaQuery.FindAllAssetsDefinitions,
+        },
         baseConfig: env.defaultBaseConfig,
       });
       expect(queryResponse).toBeTruthy();
@@ -307,14 +319,16 @@ describe("Instructions and Queries test", () => {
 
     test("Query single asset (FindAssetById)", async () => {
       const queryResponse = await env.apiClient.queryV1({
-        queryName: IrohaQuery.FindAssetById,
+        query: {
+          query: IrohaQuery.FindAssetById,
+          params: [
+            assetName,
+            domainName,
+            env.defaultBaseConfig.accountId?.name,
+            env.defaultBaseConfig.accountId?.domainId,
+          ],
+        },
         baseConfig: env.defaultBaseConfig,
-        params: [
-          assetName,
-          domainName,
-          env.defaultBaseConfig.accountId?.name,
-          env.defaultBaseConfig.accountId?.domainId,
-        ],
       });
       expect(queryResponse).toBeTruthy();
       expect(queryResponse.data).toBeTruthy();
@@ -333,7 +347,9 @@ describe("Instructions and Queries test", () => {
 
     test("Query all assets (FindAllAssets)", async () => {
       const queryResponse = await env.apiClient.queryV1({
-        queryName: IrohaQuery.FindAllAssets,
+        query: {
+          query: IrohaQuery.FindAllAssets,
+        },
         baseConfig: env.defaultBaseConfig,
       });
       expect(queryResponse).toBeTruthy();
@@ -347,14 +363,16 @@ describe("Instructions and Queries test", () => {
 
       // Get initial asset value
       const initQueryResponse = await env.apiClient.queryV1({
-        queryName: IrohaQuery.FindAssetById,
+        query: {
+          query: IrohaQuery.FindAssetById,
+          params: [
+            assetName,
+            domainName,
+            env.defaultBaseConfig.accountId?.name,
+            env.defaultBaseConfig.accountId?.domainId,
+          ],
+        },
         baseConfig: env.defaultBaseConfig,
-        params: [
-          assetName,
-          domainName,
-          env.defaultBaseConfig.accountId?.name,
-          env.defaultBaseConfig.accountId?.domainId,
-        ],
       });
       expect(initQueryResponse).toBeTruthy();
       expect(initQueryResponse.data).toBeTruthy();
@@ -381,19 +399,21 @@ describe("Instructions and Queries test", () => {
       expect(mintResponse).toBeTruthy();
       expect(mintResponse.status).toEqual(200);
       expect(mintResponse.data.rejectReason).toBeUndefined();
-      expect(mintResponse.data.status).toEqual(TransactionStatus.Committed);
+      expect(mintResponse.data.status).toEqual(TransactionStatusV1.Committed);
       expect(mintResponse.data.hash).toBeTruthy();
 
       // Get final asset value (after mint)
       const finalQueryResponse = await env.apiClient.queryV1({
-        queryName: IrohaQuery.FindAssetById,
+        query: {
+          query: IrohaQuery.FindAssetById,
+          params: [
+            assetName,
+            domainName,
+            env.defaultBaseConfig.accountId?.name,
+            env.defaultBaseConfig.accountId?.domainId,
+          ],
+        },
         baseConfig: env.defaultBaseConfig,
-        params: [
-          assetName,
-          domainName,
-          env.defaultBaseConfig.accountId?.name,
-          env.defaultBaseConfig.accountId?.domainId,
-        ],
       });
       expect(finalQueryResponse).toBeTruthy();
       expect(finalQueryResponse.data).toBeTruthy();
@@ -408,14 +428,16 @@ describe("Instructions and Queries test", () => {
 
       // Get initial asset value
       const initQueryResponse = await env.apiClient.queryV1({
-        queryName: IrohaQuery.FindAssetById,
+        query: {
+          query: IrohaQuery.FindAssetById,
+          params: [
+            assetName,
+            domainName,
+            env.defaultBaseConfig.accountId?.name,
+            env.defaultBaseConfig.accountId?.domainId,
+          ],
+        },
         baseConfig: env.defaultBaseConfig,
-        params: [
-          assetName,
-          domainName,
-          env.defaultBaseConfig.accountId?.name,
-          env.defaultBaseConfig.accountId?.domainId,
-        ],
       });
       expect(initQueryResponse).toBeTruthy();
       expect(initQueryResponse.data).toBeTruthy();
@@ -443,19 +465,21 @@ describe("Instructions and Queries test", () => {
       expect(burnResponse).toBeTruthy();
       expect(burnResponse.status).toEqual(200);
       expect(burnResponse.data.rejectReason).toBeUndefined();
-      expect(burnResponse.data.status).toEqual(TransactionStatus.Committed);
+      expect(burnResponse.data.status).toEqual(TransactionStatusV1.Committed);
       expect(burnResponse.data.hash).toBeTruthy();
 
       // Get final asset value (after burn)
       const finalQueryResponse = await env.apiClient.queryV1({
-        queryName: IrohaQuery.FindAssetById,
+        query: {
+          query: IrohaQuery.FindAssetById,
+          params: [
+            assetName,
+            domainName,
+            env.defaultBaseConfig.accountId?.name,
+            env.defaultBaseConfig.accountId?.domainId,
+          ],
+        },
         baseConfig: env.defaultBaseConfig,
-        params: [
-          assetName,
-          domainName,
-          env.defaultBaseConfig.accountId?.name,
-          env.defaultBaseConfig.accountId?.domainId,
-        ],
       });
       expect(finalQueryResponse).toBeTruthy();
       expect(finalQueryResponse.data).toBeTruthy();
@@ -474,9 +498,16 @@ describe("Instructions and Queries test", () => {
 
       // Get initial asset value
       const initQueryResponse = await env.apiClient.queryV1({
-        queryName: IrohaQuery.FindAssetById,
+        query: {
+          query: IrohaQuery.FindAssetById,
+          params: [
+            assetName,
+            domainName,
+            sourceAccountName,
+            sourceAccountDomain,
+          ],
+        },
         baseConfig: env.defaultBaseConfig,
-        params: [assetName, domainName, sourceAccountName, sourceAccountDomain],
       });
       expect(initQueryResponse).toBeTruthy();
       expect(initQueryResponse.data).toBeTruthy();
@@ -505,7 +536,7 @@ describe("Instructions and Queries test", () => {
       expect(registerAccountResponse.status).toEqual(200);
       expect(registerAccountResponse.data.rejectReason).toBeUndefined();
       expect(registerAccountResponse.data.status).toEqual(
-        TransactionStatus.Committed,
+        TransactionStatusV1.Committed,
       );
       expect(registerAccountResponse.data.hash).toBeTruthy();
 
@@ -531,14 +562,23 @@ describe("Instructions and Queries test", () => {
       expect(transferResponse).toBeTruthy();
       expect(transferResponse.status).toEqual(200);
       expect(transferResponse.data.rejectReason).toBeUndefined();
-      expect(transferResponse.data.status).toEqual(TransactionStatus.Committed);
+      expect(transferResponse.data.status).toEqual(
+        TransactionStatusV1.Committed,
+      );
       expect(transferResponse.data.hash).toBeTruthy();
 
       // Get final asset value on source account (after transfer)
       const finalSourceQueryResponse = await env.apiClient.queryV1({
-        queryName: IrohaQuery.FindAssetById,
+        query: {
+          query: IrohaQuery.FindAssetById,
+          params: [
+            assetName,
+            domainName,
+            sourceAccountName,
+            sourceAccountDomain,
+          ],
+        },
         baseConfig: env.defaultBaseConfig,
-        params: [assetName, domainName, sourceAccountName, sourceAccountDomain],
       });
       expect(finalSourceQueryResponse).toBeTruthy();
       expect(finalSourceQueryResponse.data).toBeTruthy();
@@ -551,9 +591,16 @@ describe("Instructions and Queries test", () => {
 
       // Get final asset value on target account (after transfer)
       const finalTargetQueryResponse = await env.apiClient.queryV1({
-        queryName: IrohaQuery.FindAssetById,
+        query: {
+          query: IrohaQuery.FindAssetById,
+          params: [
+            assetName,
+            domainName,
+            targetAccountName,
+            targetAccountDomain,
+          ],
+        },
         baseConfig: env.defaultBaseConfig,
-        params: [assetName, domainName, targetAccountName, targetAccountDomain],
       });
       expect(finalTargetQueryResponse).toBeTruthy();
       expect(finalTargetQueryResponse.data).toBeTruthy();
@@ -570,7 +617,9 @@ describe("Instructions and Queries test", () => {
   describe("Transaction queries tests", () => {
     test("Query all transactions (FindAllTransactions)", async () => {
       const queryResponse = await env.apiClient.queryV1({
-        queryName: IrohaQuery.FindAllTransactions,
+        query: {
+          query: IrohaQuery.FindAllTransactions,
+        },
         baseConfig: env.defaultBaseConfig,
       });
       expect(queryResponse).toBeTruthy();
@@ -583,18 +632,36 @@ describe("Instructions and Queries test", () => {
       expect(singleTx.payload.instructions).toBeTruthy();
     });
 
-    /**
-     * @todo Find a way to calculate / retrieve hash of some transaction.
-     *       Right now it's hardcoded for manual testing.
-     */
-    test.skip("Query single transaction (FindAssetById)", async () => {
-      const hash =
-        "f1076e718309d9b54a9fc74f110b0d16111f7d1c4f9c470f18c56b9309ad873d";
+    test("Query single transaction (FindAssetById)", async () => {
+      const domainName = addRandomSuffix("querySingleTx");
+      expect(domainName).toBeTruthy();
+
+      // Create new domain to get a valid transaction hash
+      const transactionResponse = await env.apiClient.transactV1({
+        transaction: {
+          instruction: {
+            name: IrohaInstruction.RegisterDomain,
+            params: [domainName],
+          },
+        },
+        waitForCommit: true,
+        baseConfig: env.defaultBaseConfig,
+      });
+      expect(transactionResponse).toBeTruthy();
+      expect(transactionResponse.status).toEqual(200);
+      expect(transactionResponse.data.rejectReason).toBeUndefined();
+      expect(transactionResponse.data.status).toEqual(
+        TransactionStatusV1.Committed,
+      );
+      const txHash = transactionResponse.data.hash;
+      expect(txHash).toBeTruthy();
 
       const queryResponse = await env.apiClient.queryV1({
-        queryName: IrohaQuery.FindTransactionByHash,
+        query: {
+          query: IrohaQuery.FindTransactionByHash,
+          params: [txHash],
+        },
         baseConfig: env.defaultBaseConfig,
-        params: [hash],
       });
       expect(queryResponse).toBeTruthy();
       expect(queryResponse.data).toBeTruthy();
@@ -610,7 +677,9 @@ describe("Instructions and Queries test", () => {
   describe("Miscellaneous tests", () => {
     test("Query all peers (FindAllPeers)", async () => {
       const queryResponse = await env.apiClient.queryV1({
-        queryName: IrohaQuery.FindAllPeers,
+        query: {
+          query: IrohaQuery.FindAllPeers,
+        },
         baseConfig: env.defaultBaseConfig,
       });
       expect(queryResponse).toBeTruthy();
@@ -625,7 +694,9 @@ describe("Instructions and Queries test", () => {
 
     test("Query all blocks (FindAllBlocks)", async () => {
       const queryResponse = await env.apiClient.queryV1({
-        queryName: IrohaQuery.FindAllBlocks,
+        query: {
+          query: IrohaQuery.FindAllBlocks,
+        },
         baseConfig: env.defaultBaseConfig,
       });
       expect(queryResponse).toBeTruthy();

@@ -58,17 +58,17 @@ export interface ErrorExceptionResponseV1 {
     error: string;
 }
 /**
- * Request for generating transaction payload that can be signed on the client side.
+ * Request for generating transaction or query payload that can be signed on the client side.
  * @export
  * @interface GenerateTransactionRequestV1
  */
 export interface GenerateTransactionRequestV1 {
     /**
      * 
-     * @type {IrohaTransactionDefinitionV1}
+     * @type {IrohaTransactionDefinitionV1 | IrohaQueryDefinitionV1}
      * @memberof GenerateTransactionRequestV1
      */
-    transaction: IrohaTransactionDefinitionV1;
+    request: IrohaTransactionDefinitionV1 | IrohaQueryDefinitionV1;
     /**
      * 
      * @type {Iroha2BaseConfig}
@@ -291,6 +291,44 @@ export enum IrohaQuery {
 }
 
 /**
+ * Iroha V2 query definition.
+ * @export
+ * @interface IrohaQueryDefinitionV1
+ */
+export interface IrohaQueryDefinitionV1 {
+    /**
+     * Name of the query to be executed.
+     * @type {IrohaQuery}
+     * @memberof IrohaQueryDefinitionV1
+     */
+    query: IrohaQuery;
+    /**
+     * The list of arguments to pass with the query.
+     * @type {Array<any>}
+     * @memberof IrohaQueryDefinitionV1
+     */
+    params?: Array<any>;
+}
+/**
+ * Iroha V2 signed query definition
+ * @export
+ * @interface IrohaSignedQueryDefinitionV1
+ */
+export interface IrohaSignedQueryDefinitionV1 {
+    /**
+     * Name of the query to be executed.
+     * @type {IrohaQuery}
+     * @memberof IrohaSignedQueryDefinitionV1
+     */
+    query: IrohaQuery;
+    /**
+     * Signed query transaction binary data received from generate-transaction endpoint.
+     * @type {any}
+     * @memberof IrohaSignedQueryDefinitionV1
+     */
+    payload: any;
+}
+/**
  * Iroha V2 transaction definition
  * @export
  * @interface IrohaTransactionDefinitionV1
@@ -362,26 +400,26 @@ export interface KeychainReference {
  */
 export interface QueryRequestV1 {
     /**
-     * Name of the query to be executed.
-     * @type {IrohaQuery}
+     * 
+     * @type {IrohaQueryDefinitionV1}
      * @memberof QueryRequestV1
      */
-    queryName: IrohaQuery;
+    query?: IrohaQueryDefinitionV1;
+    /**
+     * 
+     * @type {IrohaSignedQueryDefinitionV1}
+     * @memberof QueryRequestV1
+     */
+    signedQuery?: IrohaSignedQueryDefinitionV1;
     /**
      * 
      * @type {Iroha2BaseConfig}
      * @memberof QueryRequestV1
      */
     baseConfig?: Iroha2BaseConfig;
-    /**
-     * The list of arguments to pass with the query.
-     * @type {Array<any>}
-     * @memberof QueryRequestV1
-     */
-    params?: Array<any>;
 }
 /**
- * Response with query results.
+ * Response with the query results.
  * @export
  * @interface QueryResponseV1
  */
@@ -438,10 +476,10 @@ export interface TransactResponseV1 {
     hash: string;
     /**
      * 
-     * @type {TransactionStatus}
+     * @type {TransactionStatusV1}
      * @memberof TransactResponseV1
      */
-    status: TransactionStatus;
+    status: TransactionStatusV1;
     /**
      * When waitForCommit was suplied and the transaction was rejected, contains the reason of the rejection.
      * @type {string}
@@ -455,7 +493,7 @@ export interface TransactResponseV1 {
  * @enum {string}
  */
 
-export enum TransactionStatus {
+export enum TransactionStatusV1 {
     /**
     * Transaction was submitted to the ledger - use other tools to check if it was accepted and committed.
     */

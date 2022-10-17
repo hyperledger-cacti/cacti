@@ -3,7 +3,13 @@
  * Intended to be used through `CactusIrohaV2Client` interface but can be instantiated separately if needed.
  */
 
-import { Client, Torii, Signer, ToriiQueryResult } from "@iroha2/client";
+import {
+  Torii,
+  Signer,
+  ToriiQueryResult,
+  makeQueryPayload,
+  makeSignedQuery,
+} from "@iroha2/client";
 import {
   DomainId,
   Expression,
@@ -21,13 +27,10 @@ import {
   EvaluatesToAccountId,
   FindTransactionByHash,
   EvaluatesToHash,
-  Domain,
   VecValue,
-  AssetDefinition,
-  Asset,
-  Account,
-  TransactionValue,
-  Peer,
+  VersionedSignedQueryRequest,
+  QueryPayload,
+  AccountId,
 } from "@iroha2/data-model";
 
 import { Checks, Logger } from "@hyperledger/cactus-common";
@@ -41,20 +44,45 @@ import {
 } from "./data-factories";
 
 /**
+ * Action context for specific query.
+ * Contains methods for sending request or generating payloads.
+ */
+interface QueryContext<
+  QueryBoxFactory extends (...args: any[]) => QueryBox,
+  QueryResponseType
+> {
+  /**
+   * Request query response from the ledger.
+   * You must provide a signer to the client (to sign the query transaction), or this method will fail.
+   */
+  request: (
+    ...params: Parameters<QueryBoxFactory>
+  ) => Promise<QueryResponseType>;
+
+  /**
+   * Generate unsigned query request payload using provided parameters.
+   * Payload must be signed, and then sent to the ledger with `QueryContext` method `requestSigned`.
+   */
+  payload: (...params: Parameters<QueryBoxFactory>) => Promise<Uint8Array>;
+
+  /**
+   * Send signed request payload to the ledger.
+   */
+  requestSigned: (
+    signedPayload: VersionedSignedQueryRequest | ArrayBufferView,
+  ) => Promise<QueryResponseType>;
+}
+
+/**
  * Cactus wrapper around IrohaV2 Client query utilities.
  * Intended to be used through `CactusIrohaV2Client` interface but can be instantiated separately if needed.
  *
  * @todo Implement pagination once it's supported by the upstream iroha-javascript SDK.
  */
 export class CactusIrohaV2QueryClient {
-  /**
-   * Iroha lightweight client used to send queries to the ledger.
-   */
-  private irohaClient: Client;
-
   constructor(
-    irohaToriiClient: Torii,
-    irohaSigner: Signer,
+    public readonly irohaToriiClient: Torii,
+    public readonly irohaSigner: Signer | AccountId,
     private readonly log: Logger,
   ) {
     Checks.truthy(
@@ -62,11 +90,7 @@ export class CactusIrohaV2QueryClient {
       "CactusIrohaV2QueryClient irohaToriiClient",
     );
     Checks.truthy(irohaSigner, "CactusIrohaV2QueryClient irohaSigner");
-
-    this.irohaClient = new Client({
-      torii: irohaToriiClient,
-      signer: irohaSigner,
-    });
+    Checks.truthy(log, "CactusIrohaV2QueryClient log");
 
     this.log.debug("CactusIrohaV2QueryClient created.");
   }
@@ -90,6 +114,80 @@ export class CactusIrohaV2QueryClient {
     });
   }
 
+  /**
+   * Get signer account either from directly supplied `accountId` or `irohaSigner`.
+   */
+  public get signerAccountId(): AccountId {
+    if ("accountId" in this.irohaSigner) {
+      return this.irohaSigner.accountId;
+    } else {
+      return this.irohaSigner;
+    }
+  }
+
+  /**
+   * Factory method for query context.
+   *
+   * @param args.getQueryBox Method for creating QueryBox for specific query.
+   * @param args.parseQueryResponse Method for parsing `ToriiQueryResult` for specific query.
+   *
+   * @returns `QueryContext`
+   */
+  private createQueryContext<
+    QueryBoxFactory extends (...args: any[]) => QueryBox,
+    QueryResponseType
+  >(args: {
+    getQueryBox: QueryBoxFactory;
+    parseQueryResponse: (result: ToriiQueryResult) => QueryResponseType;
+  }): QueryContext<QueryBoxFactory, QueryResponseType> {
+    // Request method
+    const request = async (...params: Parameters<QueryBoxFactory>) => {
+      if (!("accountId" in this.irohaSigner)) {
+        throw new Error(
+          "query request() failed - no irohaSigner, provide signing credentials or use different method",
+        );
+      }
+
+      const queryPayload = makeQueryPayload({
+        accountId: this.signerAccountId,
+        query: args.getQueryBox(...params),
+      });
+      const signedQuery = makeSignedQuery(queryPayload, this.irohaSigner);
+
+      const result = await this.irohaToriiClient.request(signedQuery);
+
+      return args.parseQueryResponse(result);
+    };
+
+    // Payload method
+    const payload = async (...params: Parameters<QueryBoxFactory>) => {
+      const queryBox = args.getQueryBox(...params);
+      const queryPayload = makeQueryPayload({
+        accountId: this.signerAccountId,
+        query: queryBox,
+      });
+      return QueryPayload.toBuffer(queryPayload);
+    };
+
+    // RequestSigned method
+    const requestSigned = async (
+      signedPayload: VersionedSignedQueryRequest | ArrayBufferView,
+    ) => {
+      if (ArrayBuffer.isView(signedPayload)) {
+        signedPayload = VersionedSignedQueryRequest.fromBuffer(signedPayload);
+      }
+
+      const result = await this.irohaToriiClient.request(signedPayload);
+      return args.parseQueryResponse(result);
+    };
+
+    return {
+      request,
+      payload,
+      requestSigned,
+    };
+  }
+
   // Domains
 
   /**
@@ -98,17 +196,20 @@ export class CactusIrohaV2QueryClient {
    *
    * @returns domain list
    */
-  public async findAllDomains(): Promise<Domain[]> {
-    const result = await this.irohaClient.requestWithQueryBox(
-      QueryBox("FindAllDomains", null),
-    );
+  public findAllDomains = this.createQueryContext({
+    getQueryBox: () => {
+      return QueryBox("FindAllDomains", null);
+    },
+    parseQueryResponse: (result: ToriiQueryResult) => {
+      const vectorResult = this.matchVectorResult(result, "findAllDomains");
+      const domains = vectorResult.map((i) =>
+        i.as("Identifiable").as("Domain"),
+      );
 
-    const vectorResult = this.matchVectorResult(result, "findAllDomains");
-    const domains = vectorResult.map((i) => i.as("Identifiable").as("Domain"));
-
-    this.log.debug("findAllDomains:", domains);
-    return domains;
-  }
+      this.log.debug("findAllDomains:", domains);
+      return domains;
+    },
+  });
 
   /**
    * Query single domain by it's name
@@ -116,11 +217,10 @@ export class CactusIrohaV2QueryClient {
    * @param domainName
    * @returns Domain data
    */
-  public async findDomainById(domainName: IrohaName): Promise<Domain> {
-    Checks.truthy(domainName, "findDomainById arg domainName");
-
-    const result = await this.irohaClient.requestWithQueryBox(
-      QueryBox(
+  public findDomainById = this.createQueryContext({
+    getQueryBox: (domainName: IrohaName) => {
+      Checks.truthy(domainName, "findDomainById arg domainName");
+      return QueryBox(
         "FindDomainById",
         FindDomainById({
           id: EvaluatesToDomainId({
@@ -138,21 +238,22 @@ export class CactusIrohaV2QueryClient {
             ),
           }),
         }),
-      ),
-    );
+      );
+    },
+    parseQueryResponse: (result: ToriiQueryResult) => {
+      const domain = result.match({
+        Ok: (res) => res.result.as("Identifiable").as("Domain"),
+        Err: (error) => {
+          throw new Error(
+            `findDomainById query error: ${safeStringify(error.toJSON())}`,
+          );
+        },
+      });
 
-    const domain = result.match({
-      Ok: (res) => res.result.as("Identifiable").as("Domain"),
-      Err: (error) => {
-        throw new Error(
-          `findDomainById query error: ${safeStringify(error.toJSON())}`,
-        );
-      },
-    });
-
-    this.log.debug("findDomainById:", domain);
-    return domain;
-  }
+      this.log.debug("findDomainById:", domain);
+      return domain;
+    },
+  });
 
   // Assets
 
@@ -163,15 +264,12 @@ export class CactusIrohaV2QueryClient {
    * @param domainName
    * @returns Asset definition
    */
-  public async findAssetDefinitionById(
-    name: IrohaName,
-    domainName: IrohaName,
-  ): Promise<AssetDefinition> {
-    Checks.truthy(name, "findAssetDefinitionById arg name");
-    Checks.truthy(domainName, "findAssetDefinitionById arg domainName");
+  public findAssetDefinitionById = this.createQueryContext({
+    getQueryBox: (name: IrohaName, domainName: IrohaName) => {
+      Checks.truthy(name, "findAssetDefinitionById arg name");
+      Checks.truthy(domainName, "findAssetDefinitionById arg domainName");
 
-    const result = await this.irohaClient.requestWithQueryBox(
-      QueryBox(
+      return QueryBox(
         "FindAssetDefinitionById",
         FindAssetDefinitionById({
           id: EvaluatesToAssetDefinitionId({
@@ -187,21 +285,22 @@ export class CactusIrohaV2QueryClient {
             ),
           }),
         }),
-      ),
-    );
+      );
+    },
+    parseQueryResponse: (result: ToriiQueryResult) => {
+      const assetDef = result.match({
+        Ok: (res) => res.result.as("Identifiable").as("AssetDefinition"),
+        Err: (error) => {
+          throw new Error(
+            `findAssetDefinitionById query error: ${safeStringify(error)}`,
+          );
+        },
+      });
 
-    const assetDef = result.match({
-      Ok: (res) => res.result.as("Identifiable").as("AssetDefinition"),
-      Err: (error) => {
-        throw new Error(
-          `findAssetDefinitionById query error: ${safeStringify(error)}`,
-        );
-      },
-    });
-
-    this.log.debug("findAssetDefinitionById:", assetDef);
-    return assetDef;
-  }
+      this.log.debug("findAssetDefinitionById:", assetDef);
+      return assetDef;
+    },
+  });
 
   /**
    * Query all defined asset definitions.
@@ -209,22 +308,23 @@ export class CactusIrohaV2QueryClient {
    *
    * @returns List of asset definitions.
    */
-  public async findAllAssetsDefinitions(): Promise<AssetDefinition[]> {
-    const result = await this.irohaClient.requestWithQueryBox(
-      QueryBox("FindAllAssetsDefinitions", null),
-    );
+  public findAllAssetsDefinitions = this.createQueryContext({
+    getQueryBox: () => {
+      return QueryBox("FindAllAssetsDefinitions", null);
+    },
+    parseQueryResponse: (result: ToriiQueryResult) => {
+      const vectorResult = this.matchVectorResult(
+        result,
+        "findAllAssetsDefinitions",
+      );
+      const assetDefs = vectorResult.map((d) =>
+        d.as("Identifiable").as("AssetDefinition"),
+      );
 
-    const vectorResult = this.matchVectorResult(
-      result,
-      "findAllAssetsDefinitions",
-    );
-    const assetDefs = vectorResult.map((d) =>
-      d.as("Identifiable").as("AssetDefinition"),
-    );
-
-    this.log.debug("findAllAssetsDefinitions:", assetDefs);
-    return assetDefs;
-  }
+      this.log.debug("findAllAssetsDefinitions:", assetDefs);
+      return assetDefs;
+    },
+  });
 
   /**
    * Query single asset by it's name, domain and account definition.
@@ -235,19 +335,19 @@ export class CactusIrohaV2QueryClient {
    * @param accountDomainName Owner account domain name
    * @returns Asset
    */
-  public async findAssetById(
-    assetName: IrohaName,
-    assetDomainName: IrohaName,
-    accountName: IrohaName,
-    accountDomainName: IrohaName,
-  ): Promise<Asset> {
-    Checks.truthy(assetName, "findAssetById arg assetName");
-    Checks.truthy(assetDomainName, "findAssetById arg assetDomainName");
-    Checks.truthy(accountName, "findAssetById arg accountName");
-    Checks.truthy(accountDomainName, "findAssetById arg accountDomainName");
+  public findAssetById = this.createQueryContext({
+    getQueryBox: (
+      assetName: IrohaName,
+      assetDomainName: IrohaName,
+      accountName: IrohaName,
+      accountDomainName: IrohaName,
+    ) => {
+      Checks.truthy(assetName, "findAssetById arg assetName");
+      Checks.truthy(assetDomainName, "findAssetById arg assetDomainName");
+      Checks.truthy(accountName, "findAssetById arg accountName");
+      Checks.truthy(accountDomainName, "findAssetById arg accountDomainName");
 
-    const result = await this.irohaClient.requestWithQueryBox(
-      QueryBox(
+      return QueryBox(
         "FindAssetById",
         FindAssetById({
           id: EvaluatesToAssetId({
@@ -268,19 +368,20 @@ export class CactusIrohaV2QueryClient {
             ),
           }),
         }),
-      ),
-    );
+      );
+    },
+    parseQueryResponse: (result: ToriiQueryResult) => {
+      const asset = result.match({
+        Ok: (res) => res.result.as("Identifiable").as("Asset"),
+        Err: (error) => {
+          throw new Error(`findAssetById query error: ${safeStringify(error)}`);
+        },
+      });
 
-    const asset = result.match({
-      Ok: (res) => res.result.as("Identifiable").as("Asset"),
-      Err: (error) => {
-        throw new Error(`findAssetById query error: ${safeStringify(error)}`);
-      },
-    });
-
-    this.log.debug("findAssetById:", asset);
-    return asset;
-  }
+      this.log.debug("findAssetById:", asset);
+      return asset;
+    },
+  });
 
   /**
    * Query all assets on the ledger.
@@ -288,17 +389,18 @@ export class CactusIrohaV2QueryClient {
    *
    * @returns List of assets.
    */
-  public async findAllAssets(): Promise<Asset[]> {
-    const result = await this.irohaClient.requestWithQueryBox(
-      QueryBox("FindAllAssets", null),
-    );
+  public findAllAssets = this.createQueryContext({
+    getQueryBox: () => {
+      return QueryBox("FindAllAssets", null);
+    },
+    parseQueryResponse: (result: ToriiQueryResult) => {
+      const vectorResult = this.matchVectorResult(result, "findAllAssets");
+      const assets = vectorResult.map((i) => i.as("Identifiable").as("Asset"));
 
-    const vectorResult = this.matchVectorResult(result, "findAllAssets");
-    const assets = vectorResult.map((i) => i.as("Identifiable").as("Asset"));
-
-    this.log.debug("findAllAssets:", assets);
-    return assets;
-  }
+      this.log.debug("findAllAssets:", assets);
+      return assets;
+    },
+  });
 
   // Account
 
@@ -309,15 +411,12 @@ export class CactusIrohaV2QueryClient {
    * @param domainName
    * @returns Account
    */
-  public async findAccountById(
-    name: IrohaName,
-    domainName: IrohaName,
-  ): Promise<Account> {
-    Checks.truthy(name, "findAccountById arg name");
-    Checks.truthy(domainName, "findAccountById arg domainName");
+  public findAccountById = this.createQueryContext({
+    getQueryBox: (name: IrohaName, domainName: IrohaName) => {
+      Checks.truthy(name, "findAccountById arg name");
+      Checks.truthy(domainName, "findAccountById arg domainName");
 
-    const result = await this.irohaClient.requestWithQueryBox(
-      QueryBox(
+      return QueryBox(
         "FindAccountById",
         FindAccountById({
           id: EvaluatesToAccountId({
@@ -330,19 +429,22 @@ export class CactusIrohaV2QueryClient {
             ),
           }),
         }),
-      ),
-    );
+      );
+    },
+    parseQueryResponse: (result: ToriiQueryResult) => {
+      const account = result.match({
+        Ok: (res) => res.result.as("Identifiable").as("Account"),
+        Err: (error) => {
+          throw new Error(
+            `findAccountById query error: ${safeStringify(error)}`,
+          );
+        },
+      });
 
-    const account = result.match({
-      Ok: (res) => res.result.as("Identifiable").as("Account"),
-      Err: (error) => {
-        throw new Error(`findAccountById query error: ${safeStringify(error)}`);
-      },
-    });
-
-    this.log.debug("findAccountById:", account);
-    return account;
-  }
+      this.log.debug("findAccountById:", account);
+      return account;
+    },
+  });
 
   /**
    * Query all accounts on the ledger.
@@ -350,19 +452,20 @@ export class CactusIrohaV2QueryClient {
    *
    * @returns List of accounts.
    */
-  public async findAllAccounts(): Promise<Account[]> {
-    const result = await this.irohaClient.requestWithQueryBox(
-      QueryBox("FindAllAccounts", null),
-    );
+  public findAllAccounts = this.createQueryContext({
+    getQueryBox: () => {
+      return QueryBox("FindAllAccounts", null);
+    },
+    parseQueryResponse: (result: ToriiQueryResult) => {
+      const vectorResult = this.matchVectorResult(result, "findAllAccounts");
+      const accounts = vectorResult.map((i) =>
+        i.as("Identifiable").as("Account"),
+      );
 
-    const vectorResult = this.matchVectorResult(result, "findAllAccounts");
-    const accounts = vectorResult.map((i) =>
-      i.as("Identifiable").as("Account"),
-    );
-
-    this.log.debug("findAllAccounts:", accounts);
-    return accounts;
-  }
+      this.log.debug("findAllAccounts:", accounts);
+      return accounts;
+    },
+  });
 
   // Transactions
 
@@ -372,17 +475,21 @@ export class CactusIrohaV2QueryClient {
    *
    * @returns List of transactions.
    */
-  public async findAllTransactions(): Promise<TransactionValue[]> {
-    const result = await this.irohaClient.requestWithQueryBox(
-      QueryBox("FindAllTransactions", null),
-    );
+  public findAllTransactions = this.createQueryContext({
+    getQueryBox: () => {
+      return QueryBox("FindAllTransactions", null);
+    },
+    parseQueryResponse: (result: ToriiQueryResult) => {
+      const vectorResult = this.matchVectorResult(
+        result,
+        "findAllTransactions",
+      );
+      const transactions = vectorResult.map((i) => i.as("TransactionValue"));
 
-    const vectorResult = this.matchVectorResult(result, "findAllTransactions");
-    const transactions = vectorResult.map((i) => i.as("TransactionValue"));
-
-    this.log.debug("findAllTransactions:", transactions);
-    return transactions;
-  }
+      this.log.debug("findAllTransactions:", transactions);
+      return transactions;
+    },
+  });
 
   /**
    * Query single transaction using it's hash.
@@ -390,42 +497,41 @@ export class CactusIrohaV2QueryClient {
    * @param hash Either HEX encoded string or raw `Uint8Array` bytes.
    * @returns Transaction
    */
-  public async findTransactionByHash(
-    hash: string | Uint8Array,
-  ): Promise<TransactionValue> {
-    Checks.truthy(hash, "findTransactionByHash arg hash");
+  public findTransactionByHash = this.createQueryContext({
+    getQueryBox: (hash: string | Uint8Array) => {
+      Checks.truthy(hash, "findTransactionByHash arg hash");
 
-    this.log.debug("findTransactionByHash - search for", hash);
-    let hashBytes: Uint8Array;
-    if (typeof hash === "string") {
-      hashBytes = Uint8Array.from(hexToBytes(hash));
-    } else {
-      hashBytes = hash;
-    }
+      this.log.debug("findTransactionByHash - search for", hash);
+      let hashBytes: Uint8Array;
+      if (typeof hash === "string") {
+        hashBytes = Uint8Array.from(hexToBytes(hash));
+      } else {
+        hashBytes = hash;
+      }
 
-    const result = await this.irohaClient.requestWithQueryBox(
-      QueryBox(
+      return QueryBox(
         "FindTransactionByHash",
         FindTransactionByHash({
           hash: EvaluatesToHash({
             expression: Expression("Raw", Value("Hash", hashBytes)),
           }),
         }),
-      ),
-    );
+      );
+    },
+    parseQueryResponse: (result: ToriiQueryResult) => {
+      const transaction = result.match({
+        Ok: (res) => res.result.as("TransactionValue"),
+        Err: (error) => {
+          throw new Error(
+            `findTransactionByHash query error: ${safeStringify(error)}`,
+          );
+        },
+      });
 
-    const transaction = result.match({
-      Ok: (res) => res.result.as("TransactionValue"),
-      Err: (error) => {
-        throw new Error(
-          `findTransactionByHash query error: ${safeStringify(error)}`,
-        );
-      },
-    });
-
-    this.log.debug("findTransactionByHash:", transaction);
-    return transaction;
-  }
+      this.log.debug("findTransactionByHash:", transaction);
+      return transaction;
+    },
+  });
 
   // Misc
 
@@ -435,17 +541,18 @@ export class CactusIrohaV2QueryClient {
    *
    * @returns List of peers.
    */
-  public async findAllPeers(): Promise<Peer[]> {
-    const result = await this.irohaClient.requestWithQueryBox(
-      QueryBox("FindAllPeers", null),
-    );
+  public findAllPeers = this.createQueryContext({
+    getQueryBox: () => {
+      return QueryBox("FindAllPeers", null);
+    },
+    parseQueryResponse: (result: ToriiQueryResult) => {
+      const vectorResult = this.matchVectorResult(result, "findAllPeers");
+      const peers = vectorResult.map((i) => i.as("Identifiable").as("Peer"));
 
-    const vectorResult = this.matchVectorResult(result, "findAllPeers");
-    const peers = vectorResult.map((i) => i.as("Identifiable").as("Peer"));
-
-    this.log.debug("findAllPeers:", peers);
-    return peers;
-  }
+      this.log.debug("findAllPeers:", peers);
+      return peers;
+    },
+  });
 
   /**
    * Query all blocks on the ledger.
@@ -453,15 +560,16 @@ export class CactusIrohaV2QueryClient {
    *
    * @returns List of blocks.
    */
-  public async findAllBlocks(): Promise<unknown> {
-    const result = await this.irohaClient.requestWithQueryBox(
-      QueryBox("FindAllBlocks", null),
-    );
+  public findAllBlocks = this.createQueryContext({
+    getQueryBox: () => {
+      return QueryBox("FindAllBlocks", null);
+    },
+    parseQueryResponse: (result: ToriiQueryResult) => {
+      const vectorResult = this.matchVectorResult(result, "findAllBlocks");
+      const blocks = vectorResult.map((i) => i.as("Block"));
 
-    const vectorResult = this.matchVectorResult(result, "findAllBlocks");
-    const blocks = vectorResult.map((i) => i.as("Block"));
-
-    this.log.debug(`findAllBlocks: Total ${blocks.length}`);
-    return blocks;
-  }
+      this.log.debug(`findAllBlocks: Total ${blocks.length}`);
+      return blocks;
+    },
+  });
 }

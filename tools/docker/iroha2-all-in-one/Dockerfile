@@ -35,8 +35,8 @@ EXPOSE 8080
 # Peer0 telemetry
 EXPOSE 8180
 
-ENV IROHA_VERSION="lts"
-ENV IROHA_CLI_VERSION="lts"
+ENV IROHA_VERSION="dev-nightly-75da907f66d5270f407a50e06bc76cec41d3d409"
+ENV IROHA_CLI_VERSION="dev-nightly-75da907f66d5270f407a50e06bc76cec41d3d409"
 
 # Setup supervisor entrypoint
 COPY supervisord.conf /etc/supervisord.conf

@@ -23,7 +23,7 @@ import {
   IrohaInstruction,
   IrohaQuery,
   PluginLedgerConnectorIroha2,
-  TransactionStatus,
+  TransactionStatusV1,
 } from "../../../main/typescript/public-api";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { crypto } from "@iroha2/crypto-target-node";
@@ -127,7 +127,7 @@ describe("Setup and basic endpoint tests", () => {
     expect(transactionResponse.status).toEqual(200);
     expect(transactionResponse.data.status).toBeTruthy();
     expect(transactionResponse.data.status).toEqual(
-      TransactionStatus.Submitted,
+      TransactionStatusV1.Submitted,
     );
     expect(transactionResponse.data.hash).toBeTruthy();
     expect(transactionResponse.data.hash.length).toEqual(64);
@@ -137,9 +137,11 @@ describe("Setup and basic endpoint tests", () => {
 
     // Query it
     const queryResponse = await env.apiClient.queryV1({
-      queryName: IrohaQuery.FindDomainById,
+      query: {
+        query: IrohaQuery.FindDomainById,
+        params: [domainName],
+      },
       baseConfig: env.defaultBaseConfig,
-      params: [domainName],
     });
     expect(queryResponse).toBeTruthy();
     expect(queryResponse.data).toBeTruthy();
@@ -167,7 +169,7 @@ describe("Setup and basic endpoint tests", () => {
     expect(transactionResponse.data).toBeTruthy();
     expect(transactionResponse.data.rejectReason).toBeUndefined();
     expect(transactionResponse.data.status).toEqual(
-      TransactionStatus.Committed,
+      TransactionStatusV1.Committed,
     );
     expect(transactionResponse.data.hash).toBeTruthy();
     expect(transactionResponse.data.hash.length).toEqual(64);
@@ -175,9 +177,11 @@ describe("Setup and basic endpoint tests", () => {
     // Query it
     // Transaction should be committed so no waiting is needed.
     const queryResponse = await env.apiClient.queryV1({
-      queryName: IrohaQuery.FindDomainById,
+      query: {
+        query: IrohaQuery.FindDomainById,
+        params: [domainName],
+      },
       baseConfig: env.defaultBaseConfig,
-      params: [domainName],
     });
     expect(queryResponse).toBeTruthy();
     expect(queryResponse.data).toBeTruthy();
@@ -205,7 +209,7 @@ describe("Setup and basic endpoint tests", () => {
     expect(transactionResponse.data).toBeTruthy();
     expect(transactionResponse.data.rejectReason).toBeUndefined();
     expect(transactionResponse.data.status).toEqual(
-      TransactionStatus.Committed,
+      TransactionStatusV1.Committed,
     );
 
     // Create existing domain again - should be rejected
@@ -222,7 +226,7 @@ describe("Setup and basic endpoint tests", () => {
     expect(rejectResponse).toBeTruthy();
     expect(rejectResponse.status).toEqual(200);
     expect(rejectResponse.data).toBeTruthy();
-    expect(rejectResponse.data.status).toEqual(TransactionStatus.Rejected);
+    expect(rejectResponse.data.status).toEqual(TransactionStatusV1.Rejected);
     expect(rejectResponse.data.rejectReason).toBeTruthy();
     log.debug(
       "OK - transaction rejected with reason:",
@@ -251,15 +255,17 @@ describe("Setup and basic endpoint tests", () => {
     expect(transactionResponse.status).toEqual(200);
     expect(transactionResponse.data.rejectReason).toBeUndefined();
     expect(transactionResponse.data.status).toEqual(
-      TransactionStatus.Committed,
+      TransactionStatusV1.Committed,
     );
     expect(transactionResponse.data.hash).toBeTruthy();
 
     // Query it
     const queryResponse = await env.apiClient.queryV1({
-      queryName: IrohaQuery.FindDomainById,
+      query: {
+        query: IrohaQuery.FindDomainById,
+        params: [domainName],
+      },
       baseConfig: env.defaultBaseConfig,
-      params: [domainName],
     });
     expect(queryResponse).toBeTruthy();
     expect(queryResponse.data).toBeTruthy();
@@ -289,15 +295,17 @@ describe("Setup and basic endpoint tests", () => {
     expect(transactionResponse.status).toEqual(200);
     expect(transactionResponse.data.rejectReason).toBeUndefined();
     expect(transactionResponse.data.status).toEqual(
-      TransactionStatus.Committed,
+      TransactionStatusV1.Committed,
     );
     expect(transactionResponse.data.hash).toBeTruthy();
 
     // Query it
     const queryResponse = await env.apiClient.queryV1({
-      queryName: IrohaQuery.FindDomainById,
+      query: {
+        query: IrohaQuery.FindDomainById,
+        params: [domainName],
+      },
       baseConfig: env.defaultBaseConfig,
-      params: [domainName],
     });
     expect(queryResponse).toBeTruthy();
     expect(queryResponse.data).toBeTruthy();
@@ -330,13 +338,15 @@ describe("Setup and basic endpoint tests", () => {
     expect(transactionResponse.status).toEqual(200);
     expect(transactionResponse.data.rejectReason).toBeUndefined();
     expect(transactionResponse.data.status).toEqual(
-      TransactionStatus.Committed,
+      TransactionStatusV1.Committed,
     );
     expect(transactionResponse.data.hash).toBeTruthy();
 
     // Query domains
     const queryResponse = await env.apiClient.queryV1({
-      queryName: IrohaQuery.FindAllDomains,
+      query: {
+        query: IrohaQuery.FindAllDomains,
+      },
       baseConfig: env.defaultBaseConfig,
     });
     expect(queryResponse).toBeTruthy();
@@ -402,9 +412,11 @@ describe("Setup and basic endpoint tests", () => {
     // Assert it was not created
     await expect(
       env.apiClient.queryV1({
-        queryName: IrohaQuery.FindDomainById,
+        query: {
+          query: IrohaQuery.FindDomainById,
+          params: [domainName],
+        },
         baseConfig: env.defaultBaseConfig,
-        params: [domainName],
       }),
     ).toReject();
   });
@@ -413,7 +425,9 @@ describe("Setup and basic endpoint tests", () => {
     // Send invalid query
     return expect(
       env.apiClient.queryV1({
-        queryName: "foo" as IrohaQuery,
+        query: {
+          query: "foo" as IrohaQuery,
+        },
         baseConfig: env.defaultBaseConfig,
       }),
     ).toReject();

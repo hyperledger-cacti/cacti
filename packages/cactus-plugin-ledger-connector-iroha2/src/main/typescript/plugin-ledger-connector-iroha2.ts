@@ -368,6 +368,55 @@ export class PluginLedgerConnectorIroha2
   }
 
   /**
+   * Get context for specific query (e.g. it `request` or `payload` methods.).
+   *
+   * @param client `CactusIrohaV2QueryClient` instance.
+   * @param query Name of the query (`IrohaQuery`).
+   *
+   * @returns Query Context
+   */
+  public getQueryContext(
+    client: CactusIrohaV2QueryClient,
+    query: IrohaQuery,
+  ): {
+    request: (...params: any[]) => Promise<unknown>;
+    payload: (...params: any[]) => Promise<Uint8Array>;
+    requestSigned: (signedPayload: ArrayBufferView) => Promise<unknown>;
+  } {
+    switch (query) {
+      case IrohaQuery.FindAllDomains:
+        return client.findAllDomains;
+      case IrohaQuery.FindDomainById:
+        return client.findDomainById;
+      case IrohaQuery.FindAssetDefinitionById:
+        return client.findAssetDefinitionById;
+      case IrohaQuery.FindAllAssetsDefinitions:
+        return client.findAllAssetsDefinitions;
+      case IrohaQuery.FindAssetById:
+        return client.findAssetById;
+      case IrohaQuery.FindAllAssets:
+        return client.findAllAssets;
+      case IrohaQuery.FindAllPeers:
+        return client.findAllPeers;
+      case IrohaQuery.FindAccountById:
+        return client.findAccountById;
+      case IrohaQuery.FindAllAccounts:
+        return client.findAllAccounts;
+      case IrohaQuery.FindAllTransactions:
+        return client.findAllTransactions;
+      case IrohaQuery.FindTransactionByHash:
+        return client.findTransactionByHash;
+      case IrohaQuery.FindAllBlocks:
+        return client.findAllBlocks;
+      default:
+        const unknownType: never = query;
+        throw new Error(
+          `Unknown IrohaV2 query - '${unknownType}'. Check name and connector version.`,
+        );
+    }
+  }
+
+  /**
    * Helper function used to safely check that required number of parameters were supplied in the request.
    *
    * @param params Parameter list from the request.
@@ -545,6 +594,7 @@ export class PluginLedgerConnectorIroha2
    * To submit transaction you must provide either signed transaction payload or list of instructions with signingCredential.
    *
    * @param req Request object.
+   *
    * @returns Status of the operation.
    */
   public async transact(req: TransactRequestV1): Promise<TransactResponseV1> {
@@ -576,7 +626,52 @@ export class PluginLedgerConnectorIroha2
   }
 
   /**
-   * Generate raw, unsigned transaction payload from instructions in request.
+   * Query endpoint logic.
+   * To send query request you must provide either signed query payload or query definition with signingCredential.
+   *
+   * @param req Request object.
+   *
+   * @returns Response from the query.
+   */
+  public async query(req: QueryRequestV1): Promise<QueryResponseV1> {
+    const client = await this.getClient(req.baseConfig);
+
+    try {
+      if (req.query) {
+        const queryContext = this.getQueryContext(
+          client.query,
+          req.query.query,
+        );
+
+        const params = req.query.params ?? [];
+        return {
+          response: await queryContext.request(...params),
+        };
+      } else if (req.signedQuery) {
+        const queryContext = this.getQueryContext(
+          client.query,
+          req.signedQuery.query,
+        );
+
+        const queryBinary = Uint8Array.from(
+          Object.values(req.signedQuery.payload),
+        );
+
+        return {
+          response: await queryContext.requestSigned(queryBinary),
+        };
+      } else {
+        throw new Error(
+          "To submit transaction you must provide either signed transaction payload or query description with signingCredential",
+        );
+      }
+    } finally {
+      client.free();
+    }
+  }
+
+  /**
+   * Generate raw, unsigned transaction or query payload from instructions in request.
    * Can be signed on the client side and send to the transact endpoint.
    *
    * @param req Request object.
@@ -588,123 +683,21 @@ export class PluginLedgerConnectorIroha2
     const client = await this.getClient(req.baseConfig);
 
     try {
-      this.processInstructionsRequests(client, req.transaction.instruction);
-      return client.getTransactionPayloadBuffer(
-        this.tryParseTransactionParams(req.transaction.params),
-      );
-    } finally {
-      client.free();
-    }
-  }
+      if ("instruction" in req.request) {
+        this.processInstructionsRequests(client, req.request.instruction);
+        return client.getTransactionPayloadBuffer(
+          this.tryParseTransactionParams(req.request.params),
+        );
+      } else if ("query" in req.request) {
+        const queryContext = this.getQueryContext(
+          client.query,
+          req.request.query,
+        );
 
-  /**
-   * Validate required parameters and call the query method.
-   * Do not use for queries that does not require any parameters.
-   *
-   * @note `expectedCount` must be equal to number of args required by `transactFunction`,
-   * otherwise the code will not compile (this is intended safety-check)
-   *
-   * @param client `CactusIrohaV2Client` object.
-   * @param queryFunction Query function to be executed
-   * @param params Parameter list from the request.
-   * @param expectedCount Expected parameter count
-   * @returns Query result.
-   */
-  private async runQueryWithCheckedParams<
-    T extends (...args: any[]) => Promise<unknown>
-  >(
-    client: CactusIrohaV2Client,
-    queryFunction: T,
-    params: unknown[] | undefined,
-    expectedCount: LengthOf<Parameters<T>>,
-  ): Promise<QueryResponseV1> {
-    return {
-      response: await queryFunction.apply(
-        client.query,
-        this.checkArgsCount(params, expectedCount, queryFunction.name),
-      ),
-    };
-  }
-
-  /**
-   * Query endpoint logic.
-   *
-   * @param req Request with a query name.
-   * @returns Response from the query.
-   */
-  public async query(req: QueryRequestV1): Promise<QueryResponseV1> {
-    const client = await this.getClient(req.baseConfig);
-
-    try {
-      switch (req.queryName) {
-        case IrohaQuery.FindAllDomains:
-          return {
-            response: await client.query.findAllDomains(),
-          };
-        case IrohaQuery.FindDomainById:
-          return await this.runQueryWithCheckedParams(
-            client,
-            CactusIrohaV2QueryClient.prototype.findDomainById,
-            req.params,
-            1,
-          );
-        case IrohaQuery.FindAssetDefinitionById:
-          return await this.runQueryWithCheckedParams(
-            client,
-            CactusIrohaV2QueryClient.prototype.findAssetDefinitionById,
-            req.params,
-            2,
-          );
-        case IrohaQuery.FindAllAssetsDefinitions:
-          return {
-            response: await client.query.findAllAssetsDefinitions(),
-          };
-        case IrohaQuery.FindAssetById:
-          return await this.runQueryWithCheckedParams(
-            client,
-            CactusIrohaV2QueryClient.prototype.findAssetById,
-            req.params,
-            4,
-          );
-        case IrohaQuery.FindAllAssets:
-          return {
-            response: await client.query.findAllAssets(),
-          };
-        case IrohaQuery.FindAllPeers:
-          return {
-            response: await client.query.findAllPeers(),
-          };
-        case IrohaQuery.FindAccountById:
-          return await this.runQueryWithCheckedParams(
-            client,
-            CactusIrohaV2QueryClient.prototype.findAccountById,
-            req.params,
-            2,
-          );
-        case IrohaQuery.FindAllAccounts:
-          return {
-            response: await client.query.findAllAccounts(),
-          };
-        case IrohaQuery.FindAllTransactions:
-          return {
-            response: await client.query.findAllTransactions(),
-          };
-        case IrohaQuery.FindTransactionByHash:
-          return await this.runQueryWithCheckedParams(
-            client,
-            CactusIrohaV2QueryClient.prototype.findTransactionByHash,
-            req.params,
-            1,
-          );
-        case IrohaQuery.FindAllBlocks:
-          return {
-            response: await client.query.findAllBlocks(),
-          };
-        default:
-          const unknownType: never = req.queryName;
-          throw new Error(
-            `Unknown IrohaV2 query - '${unknownType}'. Check name and connector version.`,
-          );
+        const params = req.request.params ?? [];
+        return await queryContext.payload(...params);
+      } else {
+        throw new Error("Missing required transaction or query definition");
       }
     } finally {
       client.free();

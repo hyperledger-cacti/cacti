@@ -78,7 +78,7 @@ import {
 } from "./data-factories";
 import {
   TransactResponseV1,
-  TransactionStatus,
+  TransactionStatusV1,
 } from "../generated/openapi/typescript-axios";
 
 setCrypto(crypto);
@@ -160,20 +160,10 @@ export class CactusIrohaV2Client {
    */
   public readonly irohaSigner?: Signer;
 
-  private readonly _query?: CactusIrohaV2QueryClient;
-
   /**
    * Separate interface for sending IrohaV2 queries.
-   * Will throw if query interface is not available
-   * (when client was created without a signer)
    */
-  public get query(): CactusIrohaV2QueryClient {
-    if (this._query) {
-      return this._query;
-    } else {
-      throw new Error("Query not available - you must provide signer key");
-    }
-  }
+  public readonly query: CactusIrohaV2QueryClient;
 
   constructor(
     public readonly toriiOptions: Omit<CreateToriiProps, "ws" | "fetch">,
@@ -198,12 +188,13 @@ export class CactusIrohaV2Client {
     if (keyPair) {
       this.log.debug("KeyPair present, add Signer and Query function.");
       this.irohaSigner = new Signer(accountId, keyPair);
-      this._query = new CactusIrohaV2QueryClient(
-        this.irohaToriiClient,
-        this.irohaSigner,
-        this.log,
-      );
     }
+
+    this.query = new CactusIrohaV2QueryClient(
+      this.irohaToriiClient,
+      this.irohaSigner ?? this.accountId,
+      this.log,
+    );
   }
 
   /**
@@ -760,7 +751,7 @@ export class CactusIrohaV2Client {
                 );
               },
               Committed: () => {
-                const txStatus = TransactionStatus.Committed;
+                const txStatus = TransactionStatusV1.Committed;
                 this.log.info(
                   `waitForTransactionStatus() - Transaction '${hashHex}' [${txStatus}]`,
                 );
@@ -770,7 +761,7 @@ export class CactusIrohaV2Client {
                 });
               },
               Rejected: (reason) => {
-                const txStatus = TransactionStatus.Rejected;
+                const txStatus = TransactionStatusV1.Rejected;
                 this.log.info(
                   `waitForTransactionStatus() - Transaction '${hashHex}' [${txStatus}]`,
                 );
@@ -839,7 +830,7 @@ export class CactusIrohaV2Client {
     } else {
       return {
         hash: bytesToHex([...hash]),
-        status: TransactionStatus.Submitted,
+        status: TransactionStatusV1.Submitted,
       };
     }
   }
@@ -871,7 +862,7 @@ export class CactusIrohaV2Client {
       await this.irohaToriiClient.submit(signedPayload);
       return {
         hash: bytesToHex([...hash]),
-        status: TransactionStatus.Submitted,
+        status: TransactionStatusV1.Submitted,
       };
     }
   }

@@ -20,7 +20,7 @@ import {
   IrohaInstruction,
   IrohaQuery,
   signIrohaV2Transaction,
-  TransactionStatus,
+  TransactionStatusV1,
 } from "../../../main/typescript/public-api";
 import {
   IrohaV2TestEnv,
@@ -30,6 +30,7 @@ import { addRandomSuffix } from "../test-helpers/utils";
 
 import "jest-extended";
 import { TransactionPayload } from "@iroha2/data-model";
+import { signIrohaV2Query } from "../../../main/typescript/iroha-sign-utils";
 
 // Logger setup
 const log: Logger = LoggerProvider.getOrCreate({
@@ -66,9 +67,11 @@ describe("Generate and send signed transaction tests", () => {
    */
   async function assertDomainExistence(domainName: string): Promise<void> {
     const queryResponse = await env.apiClient.queryV1({
-      queryName: IrohaQuery.FindDomainById,
+      query: {
+        query: IrohaQuery.FindDomainById,
+        params: [domainName],
+      },
       baseConfig: env.defaultBaseConfig,
-      params: [domainName],
     });
     expect(queryResponse).toBeTruthy();
     expect(queryResponse.data).toBeTruthy();
@@ -103,7 +106,7 @@ describe("Generate and send signed transaction tests", () => {
     expect(transactionResponse.status).toEqual(200);
     expect(transactionResponse.data.rejectReason).toBeUndefined();
     expect(transactionResponse.data.status).toEqual(
-      TransactionStatus.Committed,
+      TransactionStatusV1.Committed,
     );
 
     // Check if domain was created
@@ -119,7 +122,7 @@ describe("Generate and send signed transaction tests", () => {
 
     // 1. Generate transaction
     const genTxResponse = await env.apiClient.generateTransactionV1({
-      transaction: {
+      request: {
         instruction: {
           name: IrohaInstruction.RegisterDomain,
           params: [domainName],
@@ -162,7 +165,7 @@ describe("Generate and send signed transaction tests", () => {
     expect(transactionResponse.status).toEqual(200);
     expect(transactionResponse.data.rejectReason).toBeUndefined();
     expect(transactionResponse.data.status).toEqual(
-      TransactionStatus.Submitted,
+      TransactionStatusV1.Submitted,
     );
 
     // Sleep
@@ -186,7 +189,7 @@ describe("Generate and send signed transaction tests", () => {
 
     // Generate transaction with tx params
     const genTxResponse = await env.apiClient.generateTransactionV1({
-      transaction: {
+      request: {
         instruction: {
           name: IrohaInstruction.RegisterDomain,
           params: [domainName],
@@ -219,7 +222,81 @@ describe("Generate and send signed transaction tests", () => {
   });
 
   /**
-   * Test generateTransactionV1 error handling
+   * Create new domain and query it with query request signed on the client side.
+   */
+  test("Sign query on the client (BLP) side", async () => {
+    const domainName = addRandomSuffix("querySignDomain");
+    expect(domainName).toBeTruthy();
+
+    // Create new domain
+    const transactionResponse = await env.apiClient.transactV1({
+      transaction: {
+        instruction: {
+          name: IrohaInstruction.RegisterDomain,
+          params: [domainName],
+        },
+      },
+      waitForCommit: true,
+      baseConfig: env.defaultBaseConfig,
+    });
+    expect(transactionResponse).toBeTruthy();
+    expect(transactionResponse.status).toEqual(200);
+    expect(transactionResponse.data.rejectReason).toBeUndefined();
+    expect(transactionResponse.data.status).toEqual(
+      TransactionStatusV1.Committed,
+    );
+
+    // 1. Generate query request payload
+    const genQueryResponse = await env.apiClient.generateTransactionV1({
+      request: {
+        query: IrohaQuery.FindDomainById,
+        params: [domainName],
+      },
+      baseConfig: env.defaultBaseConfig,
+    });
+    expect(genQueryResponse).toBeTruthy();
+    expect(genQueryResponse.data).toBeTruthy();
+    expect(genQueryResponse.status).toEqual(200);
+    const unsignedQueryReq = Uint8Array.from(
+      Object.values(genQueryResponse.data),
+    );
+    expect(unsignedQueryReq).toBeTruthy();
+    log.info("Received unsigned query request");
+    log.debug("unsignedQueryReq:", unsignedQueryReq);
+
+    // 2. Sign
+    const signerAccountId = env.defaultBaseConfig.accountId;
+    if (!signerAccountId) {
+      throw new Error("No signer account ID in test environment");
+    }
+
+    const signedQueryReq = signIrohaV2Query(
+      unsignedQueryReq,
+      signerAccountId.name,
+      signerAccountId.domainId,
+      env.keyPairCredential,
+    );
+    expect(signedQueryReq).toBeTruthy();
+    log.info("Query request signed with a local private key");
+    log.debug("signedQueryReq:", signedQueryReq);
+
+    // 3. Send
+    const queryResponse = await env.apiClient.queryV1({
+      signedQuery: {
+        query: IrohaQuery.FindDomainById,
+        payload: signedQueryReq,
+      },
+      baseConfig: env.defaultBaseConfig,
+    });
+    expect(queryResponse).toBeTruthy();
+    expect(queryResponse.data).toBeTruthy();
+    expect(queryResponse.data.response).toBeTruthy();
+    expect(queryResponse.data.response.id).toBeTruthy();
+    expect(queryResponse.data.response.id.name).toEqual(domainName);
+  });
+
+  /**
+   * Test generateTransactionV1 transaction error handling
    */
   test("generateTransactionV1 returns error for invalid transaction content", async () => {
     const domainName = addRandomSuffix("errorCheckDomain");
@@ -228,11 +305,32 @@ describe("Generate and send signed transaction tests", () => {
     // Generate transaction with wrong instruction
     try {
       await env.apiClient.generateTransactionV1({
-        transaction: {
+        request: {
           instruction: {
             name: "foo" as IrohaInstruction,
             params: [domainName],
           },
+        },
+        baseConfig: env.defaultBaseConfig,
+      });
+      expect(false).toBe(true); // should always throw by now
+    } catch (err: any) {
+      expect(err.response.status).toBe(500);
+      expect(err.response.data.message).toEqual("Internal Server Error");
+      expect(err.response.data.error).toBeTruthy();
+    }
+  });
+
+  /**
+   * Test generateTransactionV1 query error handling
+   */
+  test("generateTransactionV1 returns error for invalid query parameter number", async () => {
+    // Query domain without it's ID
+    try {
+      await env.apiClient.generateTransactionV1({
+        request: {
+          query: IrohaQuery.FindDomainById,
+          params: [],
         },
         baseConfig: env.defaultBaseConfig,
       });
