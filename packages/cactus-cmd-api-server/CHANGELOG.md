@@ -3,8 +3,32 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [1.0.0](https://github.com/hyperledger/cactus/compare/v1.0.0-rc.3...v1.0.0) (2022-03-16)
+# [1.1.0](https://github.com/hyperledger/cactus/compare/v1.0.0...v1.1.0) (2022-10-17)
 
+### Bug Fixes
+
+* **api-server:** allow no authorization on socketio endpoints ([bf51960](https://github.com/hyperledger/cactus/commit/bf519608f39666e15cafd507c6defcfe956145a8)), closes [#1925](https://github.com/hyperledger/cactus/issues/1925)
+* **security:** address CVE-2022-29244, CVE-2021-39135 ([7309f2a](https://github.com/hyperledger/cactus/commit/7309f2a8dc07d20fbffc9a2562f11e3140c8d79d)), closes [#2136](https://github.com/hyperledger/cactus/issues/2136)
+* **security:** ensure node-forge > 1.3.0 for CVE-2022-24772 ([38fe287](https://github.com/hyperledger/cactus/commit/38fe287b958204d92a0353e369511120e38c625c)), closes [#1947](https://github.com/hyperledger/cactus/issues/1947)
+
+### Code Refactoring
+
+* **examples:** include sample apps in monorepo build ([51ac163](https://github.com/hyperledger/cactus/commit/51ac1630f53ca3ac881341c7f8847b6ae581b220))
+
+### Features
+
+* **secret:** remove Validator/Verifier secret keys from repository ([59b4af4](https://github.com/hyperledger/cactus/commit/59b4af44835e2babafe398040a280ed23e9b490e))
+
+### BREAKING CHANGES
+
+* **examples:** building discounted-asset-trade app (or any future app that use indy validator)
+                 requires Indy SDK to be installed on the build machine.
+
+Closes: 2029
+
+Signed-off-by: Michal Bajer <michal.bajer@fujitsu.com>
+
+# [1.0.0](https://github.com/hyperledger/cactus/compare/v1.0.0-rc.3...v1.0.0) (2022-03-16)
 
 ### Bug Fixes
 
@@ -17,12 +41,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * set apiServerOptions.configFile="" ([5c5a1e1](https://github.com/hyperledger/cactus/commit/5c5a1e16ad92a882b9e99f5413411b4cc7793be6)), closes [#1619](https://github.com/hyperledger/cactus/issues/1619)
 * shutdown hook configuration is using wrong config key ([e760e04](https://github.com/hyperledger/cactus/commit/e760e04a9ba946b45b65c68455eedcc2694f8fae)), closes [#1619](https://github.com/hyperledger/cactus/issues/1619)
 
-
-
-
-
 # [1.0.0-rc.3](https://github.com/hyperledger/cactus/compare/v1.0.0-rc.2...v1.0.0-rc.3) (2021-12-07)
-
 
 ### Bug Fixes
 
@@ -30,92 +49,55 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * **cmd-api-server:** build occasionally broken - protoc-gen-ts [#1563](https://github.com/hyperledger/cactus/issues/1563) ([c2ecba5](https://github.com/hyperledger/cactus/commit/c2ecba54396d5e72b28d9ad538460d3bde2ca6d0))
 * **cmd-api-server:** cockpit off by default [#1239](https://github.com/hyperledger/cactus/issues/1239) ([10344b5](https://github.com/hyperledger/cactus/commit/10344b574013209f1cb96e37a01d0d79e629be1f))
 
-
-
-
-
 # [1.0.0-rc.2](https://github.com/hyperledger/cactus/compare/v1.0.0-rc.1...v1.0.0-rc.2) (2021-11-01)
-
 
 ### Bug Fixes
 
 * fixes issue 1444 invoking the onPluginInit ([0b4dc2e](https://github.com/hyperledger/cactus/commit/0b4dc2eb121cb52d6038822efca434b9a0e4abcf)), closes [#1444](https://github.com/hyperledger/cactus/issues/1444)
 
-
 ### Features
 
 * option to enable a graceful shutdown via cli ([c345cb0](https://github.com/hyperledger/cactus/commit/c345cb0aeba4ae46440ba396bcd11ca0fa5a5c96))
 
-
-
-
-
 # [1.0.0-rc.1](https://github.com/hyperledger/cactus/compare/v0.10.0...v1.0.0-rc.1) (2021-10-11)
-
 
 ### Bug Fixes
 
 * **cmd-api-server:** enable version selection in plugins ([b982777](https://github.com/hyperledger/cactus/commit/b9827772fa6694381716686759f85f96b915662e)), closes [#839](https://github.com/hyperledger/cactus/issues/839) [#840](https://github.com/hyperledger/cactus/issues/840)
 * **webpack:** prod build chokes on upgraded ssh2 binaries [#1405](https://github.com/hyperledger/cactus/issues/1405) ([18979fb](https://github.com/hyperledger/cactus/commit/18979fb33880d8ca30e2fda01fb3d598deb839f9))
 
-
-
-
-
 # [0.10.0](https://github.com/hyperledger/cactus/compare/v0.9.0...v0.10.0) (2021-09-28)
-
 
 ### Features
 
 * **core-api:** discontinue dedicated HTTP listeners for web service plugins ([3fbd2fc](https://github.com/hyperledger/cactus/commit/3fbd2fcb60d49090bf4e986bea74d4e988348659)), closes [#358](https://github.com/hyperledger/cactus/issues/358)
 * **core:** add installOpenapiValidationMiddleware ([1f6ea5f](https://github.com/hyperledger/cactus/commit/1f6ea5fe3aa1ba997a655098d632034f13f232a5)), closes [#847](https://github.com/hyperledger/cactus/issues/847)
 
-
-
-
-
 # [0.9.0](https://github.com/hyperledger/cactus/compare/v0.8.0...v0.9.0) (2021-08-31)
-
 
 ### Bug Fixes
 
 * **cmd-api-server:** add missing deps remove unused ones [#1226](https://github.com/hyperledger/cactus/issues/1226) ([b348e42](https://github.com/hyperledger/cactus/commit/b348e4266369fed502610b4c0769d4d6b19f9115))
-
 
 ### Features
 
 * besu private transaction support ([53b4980](https://github.com/hyperledger/cactus/commit/53b49808615aced96b628bf1498a1b62c5c9ca42))
 * **cmd-api-server:** support grpc web services [#1189](https://github.com/hyperledger/cactus/issues/1189) ([4cace1d](https://github.com/hyperledger/cactus/commit/4cace1dca3377e09d2ed37fdadeec6b125d47896))
 
-
-
-
-
 # [0.8.0](https://github.com/hyperledger/cactus/compare/v0.7.0...v0.8.0) (2021-08-17)
-
 
 ### Bug Fixes
 
 * **cmd-api-server:** plugins interfere with API server deps [#1192](https://github.com/hyperledger/cactus/issues/1192) ([a96ce68](https://github.com/hyperledger/cactus/commit/a96ce689dae74345b41d5bd94dd46dd3e9bc3e71)), closes [#1203](https://github.com/hyperledger/cactus/issues/1203)
 * **prometheus:** metrics.ts leaks to global registry [#1202](https://github.com/hyperledger/cactus/issues/1202) ([ce076d7](https://github.com/hyperledger/cactus/commit/ce076d709f8e0cba143f8fe9d71f1de1df8f71dc))
 
-
-
-
-
 # [0.7.0](https://github.com/hyperledger/cactus/compare/v0.6.0...v0.7.0) (2021-08-04)
-
 
 ### Bug Fixes
 
 * **connector-corda:** fix build broken by operationId rename ([291dd3b](https://github.com/hyperledger/cactus/commit/291dd3bc666939fffbc3780eaefd9059c756878a))
 
-
-
-
-
 # [0.6.0](https://github.com/hyperledger/cactus/compare/v0.4.1...v0.6.0) (2021-07-19)
-
 
 ### Bug Fixes
 
@@ -123,7 +105,6 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * **cmd-api-server:** drop URI type alt name from self signed TLS cert ([eb5d1df](https://github.com/hyperledger/cactus/commit/eb5d1dfaf8523690008c1c1c0aaa0b0efedb2cba))
 * **cmd-api-server:** no CLI args causes crash [#794](https://github.com/hyperledger/cactus/issues/794) ([a285b96](https://github.com/hyperledger/cactus/commit/a285b96785792cd29f450bfc1cc066067c82f558))
 * **connector-corda:** container image kotlin compilation fails in model ([a8a4531](https://github.com/hyperledger/cactus/commit/a8a4531d379fe16d4c991802525ec573a7e3ede1))
-
 
 ### Features
 
@@ -142,28 +123,20 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * **keychain-vault:** add the missing endpoint classes [#676](https://github.com/hyperledger/cactus/issues/676) ([341cffc](https://github.com/hyperledger/cactus/commit/341cffcef72286169a4ceced69414618d5059d0e))
 * **plugin-object-store-ipfs:** add IPFS plugin implementation ([6d1de27](https://github.com/hyperledger/cactus/commit/6d1de274b45a3fd2cc5120588f9d8594d5d3ace6))
 
-
 ### Performance Improvements
 
 * **cmd-api-server:** shrink API server bundle with type-only imports ([4875fc3](https://github.com/hyperledger/cactus/commit/4875fc346bba70ee87d8fe033435035201d48b3e))
-
 
 ### BREAKING CHANGES
 
 * 🧨 Behaviour in a cloud environment is currently untested and could impact
 CI pipeline time.
 
-
-
-
-
 # [0.5.0](https://github.com/hyperledger/cactus/compare/v0.4.1...v0.5.0) (2021-05-19)
-
 
 ### Bug Fixes
 
 * **cmd-api-server:** no CLI args causes crash [#794](https://github.com/hyperledger/cactus/issues/794) ([a285b96](https://github.com/hyperledger/cactus/commit/a285b96785792cd29f450bfc1cc066067c82f558))
-
 
 ### Features
 
@@ -177,34 +150,22 @@ CI pipeline time.
 * **core-api:** decouple web service install & registration [#771](https://github.com/hyperledger/cactus/issues/771) ([b50e148](https://github.com/hyperledger/cactus/commit/b50e148f43c0b27138471c972aab391486e761e6))
 * **core-api:** jwt authorization [#770](https://github.com/hyperledger/cactus/issues/770) ([2016750](https://github.com/hyperledger/cactus/commit/2016750849b4333bb4dd78897468771f0642a4f5))
 
-
 ### BREAKING CHANGES
 
 * 🧨 Behaviour in a cloud environment is currently untested and could impact
 CI pipeline time.
 
-
-
-
-
 ## [0.4.1](https://github.com/hyperledger/cactus/compare/v0.4.0...v0.4.1) (2021-04-02)
-
 
 ### Bug Fixes
 
 * **release:** package.json publish config non-public [#753](https://github.com/hyperledger/cactus/issues/753) ([5a1b7a6](https://github.com/hyperledger/cactus/commit/5a1b7a6eba9a18d4f7474a3c44d4a4035fc99e84))
 
-
 ### Features
 
 * **api-server:** add prometheus exporter ([c348aa4](https://github.com/hyperledger/cactus/commit/c348aa4f858536bca350af6abd524a5d345aacc7)), closes [#539](https://github.com/hyperledger/cactus/issues/539)
 
-
-
-
-
 # [0.4.0](https://github.com/hyperledger/cactus/compare/v0.3.0...v0.4.0) (2021-03-30)
-
 
 ### Bug Fixes
 
@@ -212,18 +173,12 @@ CI pipeline time.
 * **cmd-api-server:** missing pretsc npm script [#500](https://github.com/hyperledger/cactus/issues/500) ([a79b11a](https://github.com/hyperledger/cactus/commit/a79b11a3a0001a9fb9732da295451f1b424e7b35))
 * **general:** fixed unused deps and updated them ([b76a970](https://github.com/hyperledger/cactus/commit/b76a9703341c5a4cabe056e743338cbedebbeaad))
 
-
 ### Features
 
 * **core-api:** plugin import types: LOCAL & REMOTE ([f4d51da](https://github.com/hyperledger/cactus/commit/f4d51dae5b28367e714a2b9aa35dd84a2cb4cb37))
 * **keychain:** add rust keychain plugin vault implementation ([6dcdb8a](https://github.com/hyperledger/cactus/commit/6dcdb8a02db30e4dfe3d912bd56d5979b0cb3bc3))
 
-
-
-
-
 # [0.3.0](https://github.com/hyperledger/cactus/compare/v0.1.0...v0.3.0) (2021-01-06)
-
 
 ### Bug Fixes
 
@@ -232,7 +187,6 @@ CI pipeline time.
 * **cmd-api-server:** bundle name typos ([711ad71](https://github.com/hyperledger/cactus/commit/711ad7168d9ff89dd2ad04ee43efe158200e8fbc)), closes [#376](https://github.com/hyperledger/cactus/issues/376)
 * **cmd-api-server:** disallow running on older than Node 12 but provide optional override ([332b306](https://github.com/hyperledger/cactus/commit/332b306c0c1a8cef21e27d116fc92158d3439128)), closes [#150](https://github.com/hyperledger/cactus/issues/150)
 * **cmd-api-server:** plugin imports via static config (env,cli,file) ([d7e550e](https://github.com/hyperledger/cactus/commit/d7e550ee9b9483995c95e7a43d175e82bfb1ab6e))
-
 
 ### Features
 
@@ -241,12 +195,7 @@ CI pipeline time.
 * **common:** Servers utility class ([ad01dee](https://github.com/hyperledger/cactus/commit/ad01dee4def65f47e6292d117eaece2b2ebc1c3c)), closes [#260](https://github.com/hyperledger/cactus/issues/260) [#267](https://github.com/hyperledger/cactus/issues/267)
 * **plugin-consortium-manual:** JSON Web Signatures for Nodes, Consortium ([caf60b3](https://github.com/hyperledger/cactus/commit/caf60b3f69c81617787afe73ca12165baa2dce50))
 
-
-
-
-
 # [0.2.0](https://github.com/hyperledger/cactus/compare/v0.1.0...v0.2.0) (2020-12-01)
-
 
 ### Bug Fixes
 
@@ -255,7 +204,6 @@ CI pipeline time.
 * **cmd-api-server:** bundle name typos ([711ad71](https://github.com/hyperledger/cactus/commit/711ad7168d9ff89dd2ad04ee43efe158200e8fbc)), closes [#376](https://github.com/hyperledger/cactus/issues/376)
 * **cmd-api-server:** disallow running on older than Node 12 but provide optional override ([332b306](https://github.com/hyperledger/cactus/commit/332b306c0c1a8cef21e27d116fc92158d3439128)), closes [#150](https://github.com/hyperledger/cactus/issues/150)
 * **cmd-api-server:** plugin imports via static config (env,cli,file) ([d7e550e](https://github.com/hyperledger/cactus/commit/d7e550ee9b9483995c95e7a43d175e82bfb1ab6e))
-
 
 ### Features
 

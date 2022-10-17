@@ -3,103 +3,61 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [1.0.0](https://github.com/hyperledger/cactus/compare/v1.0.0-rc.3...v1.0.0) (2022-03-16)
+# [1.1.0](https://github.com/hyperledger/cactus/compare/v1.0.0...v1.1.0) (2022-10-17)
 
 **Note:** Version bump only for package @hyperledger/cactus-common
 
+# [1.0.0](https://github.com/hyperledger/cactus/compare/v1.0.0-rc.3...v1.0.0) (2022-03-16)
 
-
-
+**Note:** Version bump only for package @hyperledger/cactus-common
 
 # [1.0.0-rc.3](https://github.com/hyperledger/cactus/compare/v1.0.0-rc.2...v1.0.0-rc.3) (2021-12-07)
 
 **Note:** Version bump only for package @hyperledger/cactus-common
 
-
-
-
-
 # [1.0.0-rc.2](https://github.com/hyperledger/cactus/compare/v1.0.0-rc.1...v1.0.0-rc.2) (2021-11-01)
-
 
 ### Features
 
 * **common:** add Strings#isNonBlank() ([8d7d247](https://github.com/hyperledger/cactus/commit/8d7d2473d749746e38931e27c8044889b0ce3394))
 
-
-
-
-
 # [1.0.0-rc.1](https://github.com/hyperledger/cactus/compare/v0.10.0...v1.0.0-rc.1) (2021-10-11)
-
 
 ### Bug Fixes
 
 * **webpack:** prod build chokes on upgraded ssh2 binaries [#1405](https://github.com/hyperledger/cactus/issues/1405) ([18979fb](https://github.com/hyperledger/cactus/commit/18979fb33880d8ca30e2fda01fb3d598deb839f9))
 
-
-
-
-
 # [0.10.0](https://github.com/hyperledger/cactus/compare/v0.9.0...v0.10.0) (2021-09-28)
 
 **Note:** Version bump only for package @hyperledger/cactus-common
 
-
-
-
-
 # [0.9.0](https://github.com/hyperledger/cactus/compare/v0.8.0...v0.9.0) (2021-08-31)
-
 
 ### Features
 
 * **connector-iroha:** adds connector plugin ([4745df0](https://github.com/hyperledger/cactus/commit/4745df0bee6b9ab5fb9e57bb603ae95d6baeb391))
 
-
-
-
-
 # [0.8.0](https://github.com/hyperledger/cactus/compare/v0.7.0...v0.8.0) (2021-08-17)
 
 **Note:** Version bump only for package @hyperledger/cactus-common
-
-
-
-
 
 # [0.7.0](https://github.com/hyperledger/cactus/compare/v0.6.0...v0.7.0) (2021-08-04)
 
 **Note:** Version bump only for package @hyperledger/cactus-common
 
-
-
-
-
 # [0.6.0](https://github.com/hyperledger/cactus/compare/v0.4.1...v0.6.0) (2021-07-19)
-
 
 ### Bug Fixes
 
 * **deps:** elliptic upgrade to >6.5.3 for CVE-2020-28498 ([d75b9af](https://github.com/hyperledger/cactus/commit/d75b9af764241ab2e10914769412201fb040b1ed))
-
-
-
-
 
 # [0.5.0](https://github.com/hyperledger/cactus/compare/v0.4.1...v0.5.0) (2021-05-19)
 
-
 ### Bug Fixes
 
 * **deps:** elliptic upgrade to >6.5.3 for CVE-2020-28498 ([d75b9af](https://github.com/hyperledger/cactus/commit/d75b9af764241ab2e10914769412201fb040b1ed))
 
-
-
-
-
 # [0.4.0](https://github.com/hyperledger/cactus/compare/v0.3.0...v0.4.0) (2021-03-30)
-
 
 ### Bug Fixes
 
@@ -107,24 +65,17 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * **common:** servers#startOnPreferredPort no graceful fallback [#683](https://github.com/hyperledger/cactus/issues/683) ([18f5af7](https://github.com/hyperledger/cactus/commit/18f5af756e1fcbcd55f0ade76ebcdcda77f443da))
 * **general:** fixed unused deps and updated them ([b76a970](https://github.com/hyperledger/cactus/commit/b76a9703341c5a4cabe056e743338cbedebbeaad))
 
-
 ### Features
 
 * **common:** servers.startOnPort() host arg [#527](https://github.com/hyperledger/cactus/issues/527) ([febc06f](https://github.com/hyperledger/cactus/commit/febc06f4baf6f1baf9bb4232c2ba700e8cce822d))
 
-
-
-
-
 # [0.3.0](https://github.com/hyperledger/cactus/compare/v0.1.0...v0.3.0) (2021-01-06)
-
 
 ### Bug Fixes
 
 * **common:** flaky KeyConverter unit tests ([43ec924](https://github.com/hyperledger/cactus/commit/43ec924875f161bb1308dca84a4f16d116212266)), closes [#299](https://github.com/hyperledger/cactus/issues/299) [/github.com/hyperledger/cactus/issues/299#issuecomment-720743950](https://github.com//github.com/hyperledger/cactus/issues/299/issues/issuecomment-720743950) [#238](https://github.com/hyperledger/cactus/issues/238)
 * **common:** servers.startOnPort() error handling ([51af78d](https://github.com/hyperledger/cactus/commit/51af78dbb6273b4ef4ee26147469fb3599391bb5)), closes [#317](https://github.com/hyperledger/cactus/issues/317)
 * **common:** servers#listen() port number validation ([ee28b50](https://github.com/hyperledger/cactus/commit/ee28b50f47a4e94937a29b1a7c843cc56c203329)), closes [#383](https://github.com/hyperledger/cactus/issues/383)
-
 
 ### Features
 
@@ -139,18 +90,12 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * **common:** Servers utility class ([ad01dee](https://github.com/hyperledger/cactus/commit/ad01dee4def65f47e6292d117eaece2b2ebc1c3c)), closes [#260](https://github.com/hyperledger/cactus/issues/260) [#267](https://github.com/hyperledger/cactus/issues/267)
 * **common:** Stable Signature Generation from JS Objects ([22b5f5c](https://github.com/hyperledger/cactus/commit/22b5f5ce05a82b80e067da327b47331ed34e289e))
 
-
-
-
-
 # [0.2.0](https://github.com/hyperledger/cactus/compare/v0.1.0...v0.2.0) (2020-12-01)
-
 
 ### Bug Fixes
 
 * **common:** flaky KeyConverter unit tests ([43ec924](https://github.com/hyperledger/cactus/commit/43ec924875f161bb1308dca84a4f16d116212266)), closes [#299](https://github.com/hyperledger/cactus/issues/299) [/github.com/hyperledger/cactus/issues/299#issuecomment-720743950](https://github.com//github.com/hyperledger/cactus/issues/299/issues/issuecomment-720743950) [#238](https://github.com/hyperledger/cactus/issues/238)
 * **common:** servers.startOnPort() error handling ([51af78d](https://github.com/hyperledger/cactus/commit/51af78dbb6273b4ef4ee26147469fb3599391bb5)), closes [#317](https://github.com/hyperledger/cactus/issues/317)
-
 
 ### Features
 
