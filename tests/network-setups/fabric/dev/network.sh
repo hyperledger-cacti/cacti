@@ -197,18 +197,18 @@ function createOrgs() {
       exit 1
     fi
 
-    #echo "##########################################################"
-    #echo "############ Create Org2 Identities ######################"
-    #echo "##########################################################"
+    echo "##########################################################"
+    echo "############ Create Org2 Identities ######################"
+    echo "##########################################################"
 
-    #set -x
-    #cryptogen generate --config=./organizations/cryptogen/crypto-config-org2.yaml --output="organizations"
-    #res=$?
-    #set +x
-    #if [ $res -ne 0 ]; then
-    #  echo "Failed to generate certificates..."
-    #  exit 1
-    #fi
+    set -x
+    cryptogen generate --config=$NW_CFG_PATH/cryptogen/crypto-config-org2.yaml --output="$NW_CFG_PATH"
+    res=$?
+    set +x
+    if [ $res -ne 0 ]; then
+     echo "Failed to generate certificates..."
+     exit 1
+    fi
 
     echo "##########################################################"
     echo "############ Create Orderer Org Identities ###############"
@@ -264,11 +264,11 @@ function createOrgs() {
 
     createOrg1 $NW_CFG_PATH
 
-    #echo "##########################################################"
-    #echo "############ Create Org2 Identities ######################"
-    #echo "##########################################################"
+    echo "##########################################################"
+    echo "############ Create Org2 Identities ######################"
+    echo "##########################################################"
 
-    #createOrg2
+    createOrg2 $NW_CFG_PATH
 
     echo "##########################################################"
     echo "############ Create Orderer Org Identities ###############"
@@ -279,8 +279,8 @@ function createOrgs() {
   fi
 
   echo
-  #echo "Generate CCP files for Org1 and Org2"
-  echo "Generate CCP files for Org1 in $NW_CFG_PATH"
+  echo "Generate CCP files for Org1 and Org2 in $NW_CFG_PATH"
+  # echo "Generate CCP files for Org1 in $NW_CFG_PATH"
   $NW_CFG_PATH/ccp-generate.sh $NW_CFG_PATH
 }
 
@@ -390,8 +390,8 @@ function createChannel() {
   # more to create the channel creation transaction and the anchor peer updates.
   # configtx.yaml is mounted in the cli container, which allows us to use it to
   # create the channel artifacts
-  echo "calling createChannel.sh ORDERER_PORT PEER_PORT : $ORDERER_PORT $PEER_PORT"
-  scripts/createChannel.sh $CHANNEL_NAME $CLI_DELAY $MAX_RETRY $VERBOSE $NW_CFG_PATH $ORDERER_PORT $PEER_PORT $COMPOSE_PROJECT_NAME
+  echo "calling createChannel.sh ORDERER_PORT PEER_ORG1_PORT : $ORDERER_PORT $PEER_ORG1_PORT"
+  scripts/createChannel.sh $CHANNEL_NAME $CLI_DELAY $MAX_RETRY $VERBOSE $NW_CFG_PATH $ORDERER_PORT $PEER_ORG1_PORT $PEER_ORG2_PORT $COMPOSE_PROJECT_NAME
   if [ $? -ne 0 ]; then
     echo "Error !!! Create channel failed"
     exit 1
@@ -402,7 +402,7 @@ function createChannel() {
 ## Call the script to isntall and instantiate a chaincode on the channel
 function deployCC() {
   echo "In function deployCC $APP_ROOT for $COMPOSE_PROJECT_NAME"
-  scripts/deployCC.sh $CHANNEL_NAME $CC_SRC_LANGUAGE $VERSION $CLI_DELAY $MAX_RETRY $VERBOSE $CC_CHAIN_CODE $NW_CFG_PATH $PEER_PORT $ORDERER_PORT $APP_ROOT $COMPOSE_PROJECT_NAME
+  scripts/deployCC.sh $CHANNEL_NAME $CC_SRC_LANGUAGE $VERSION $CLI_DELAY $MAX_RETRY $VERBOSE $CC_CHAIN_CODE $NW_CFG_PATH $PEER_ORG1_PORT $PEER_ORG2_PORT $ORDERER_PORT $APP_ROOT $COMPOSE_PROJECT_NAME
 
   if [ $? -ne 0 ]; then
     echo "ERROR !!! Deploying chaincode failed"
@@ -496,19 +496,23 @@ ROLE_FILE=""
 ORDERER_LISTENPORT="$ORDERER_LISTENPORT"
 
 export N1_CA_ORG1_PORT=${N1_CA_ORG1_PORT:-7054}
+export N1_CA_ORG2_PORT=${N1_CA_ORG2_PORT:-7064}
 export N1_CA_ORDERER_PORT=${N1_CA_ORDERER_PORT:-9054}
 export N1_CHAINCODELISTEN_PORT=${N1_CHAINCODELISTEN_PORT:-7052}
 export N1_COUCHDB_PORT=${N1_COUCHDB_PORT:-7084}
 export N1_ORDERER_PORT=${N1_ORDERER_PORT:-7050}
-export N1_PEER_PORT=${N1_PEER_PORT:-7051}
+export N1_PEER_ORG1_PORT=${N1_PEER_ORG1_PORT:-7051}
+export N1_PEER_ORG2_PORT=${N1_PEER_ORG2_PORT:-7061}
 
 
 export N2_CA_ORG1_PORT=${N2_CA_ORG1_PORT:-5054}
+export N2_CA_ORG2_PORT=${N2_CA_ORG2_PORT:-5064}
 export N2_CA_ORDERER_PORT=${N2_CA_ORDERER_PORT:-8054}
 export N2_CHAINCODELISTEN_PORT=${N2_CHAINCODELISTEN_PORT:-9052}
 export N2_COUCHDB_PORT=${N2_COUCHDB_PORT:-9999}
 export N2_ORDERER_PORT=${N2_ORDERER_PORT:-9050}
-export N2_PEER_PORT=${N2_PEER_PORT:-9051}
+export N2_PEER_ORG1_PORT=${N2_PEER_ORG1_PORT:-9051}
+export N2_PEER_ORG2_PORT=${N2_PEER_ORG2_PORT:-9061}
 
 export COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME}
 export IMAGE_TAG=$IMAGE_TAG
@@ -644,30 +648,38 @@ echo "- Application Root (APP_ROOT)                     : ${APP_ROOT}"
 echo "- Current Script Path (SCRIPT_PATH)               : ${SCRIPT_PATH}"
 echo "Network Parameters ${ROLE}"
 if [ "${ROLE}" = "network1" ]; then
-  echo " - Peer Port                                      : ${N1_PEER_PORT}"
+  echo " - Peer Org1 Port                                 : ${N1_PEER_ORG1_PORT}"
+  echo " - Peer Org2 Port                                 : ${N1_PEER_ORG2_PORT}"
   echo " - Peer CouchDb Port                              : ${N1_COUCHDB_PORT}"
-  echo " - CA Port                                        : ${N1_CA_ORG1_PORT}"
+  echo " - CA Org1 Port                                   : ${N1_CA_ORG1_PORT}"
+  echo " - CA Org2 Port                                   : ${N1_CA_ORG2_PORT}"
   echo " - Orderer Port                                   : ${N1_ORDERER_PORT}"
   echo " - Orderer CA Port                                : ${N1_CA_ORDERER_PORT}"
   export ORDERER_PORT=${N1_CA_ORDERER_PORT}
-  export PEER_PORT=${N1_PEER_PORT}
+  export PEER_ORG1_PORT=${N1_PEER_ORG1_PORT}
+  export PEER_ORG2_PORT=${N1_PEER_ORG2_PORT}
   export CHAINCODELISTENADDRESS=${N1_CHAINCODELISTEN_PORT}
   export NW_CFG_PATH=$NW_CFG_PATH
   export COUCHDB_PORT=${N1_COUCHDB_PORT}
   export CA_ORG1_PORT=${N1_CA_ORG1_PORT}
+  export CA_ORG2_PORT=${N1_CA_ORG2_PORT}
   export CA_ORDERER_PORT=${N1_CA_ORDERER_PORT}
 else
-  echo " - Peer Port                                      : ${N2_PEER_PORT}"
+  echo " - Peer Org1 Port                                 : ${N2_PEER_ORG1_PORT}"
+  echo " - Peer Org2 Port                                 : ${N2_PEER_ORG2_PORT}"
   echo " - Peer CouchDb Port                              : ${N2_COUCHDB_PORT}"
-  echo " - CA Port                                        : ${N2_CA_ORG1_PORT}"
+  echo " - CA Org1 Port                                   : ${N2_CA_ORG1_PORT}"
+  echo " - CA Org2 Port                                   : ${N2_CA_ORG2_PORT}"
   echo " - Orderer Port                                   : ${N2_ORDERER_PORT}"
   echo " - Orderer CA Port                                : ${N2_CA_ORDERER_PORT}"
   export ORDERER_PORT=${N2_CA_ORDERER_PORT}
-  export PEER_PORT=${N2_PEER_PORT}
+  export PEER_ORG1_PORT=${N2_PEER_ORG1_PORT}
+  export PEER_ORG2_PORT=${N2_PEER_ORG2_PORT}
   export CHAINCODELISTENADDRESS=${N2_CHAINCODELISTEN_PORT}
   export NW_CFG_PATH=$NW_CFG_PATH
   export COUCHDB_PORT=${N2_COUCHDB_PORT}
   export CA_ORG1_PORT=${N2_CA_ORG1_PORT}
+  export CA_ORG2_PORT=${N2_CA_ORG2_PORT}
   export CA_ORDERER_PORT=${N2_CA_ORDERER_PORT}
 fi
 echo " - Compose Env Path                               : ${SCRIPT_PATH}/${ROLE}.env"

@@ -7,8 +7,9 @@ MAX_RETRY="$3"
 VERBOSE="$4"
 NW_PATH="$5"
 ORDERER_PORT="$6"
-PEER_ADDRESS="$7"
-NW_NAME="$8"
+PEER_ORG1_PORT="$7"
+PEER_ORG2_PORT="$8"
+NW_NAME="$9"
 
 : ${CHANNEL_NAME:="mychannel"}
 : ${DELAY:="3"}
@@ -16,7 +17,7 @@ NW_NAME="$8"
 : ${VERBOSE:="false"}
 
 # import utils
-. scripts/envVar.sh $NW_PATH $PEER_ADDRESS $NW_NAME
+. scripts/envVar.sh $NW_PATH $PEER_ORG1_PORT $NW_NAME
 
 
 if [ ! -d "$NW_PATH/channel-artifacts" ]; then
@@ -39,9 +40,8 @@ createChannelTx() {
 }
 
 createAncorPeerTx() {
-
-	for orgmsp in Org1MSP; do
-
+  ORGMSPS=$1
+  for orgmsp in $ORGMSPS ; do
 	echo "#######    Generating anchor peer update for ${orgmsp}  ##########"
 	set -x
 	configtxgen -profile TwoOrgsChannel -outputAnchorPeersUpdate $NW_PATH/channel-artifacts/${orgmsp}anchors.tx -channelID $CHANNEL_NAME -asOrg ${orgmsp}
@@ -52,11 +52,11 @@ createAncorPeerTx() {
 		exit 1
 	fi
 	echo
-	done
+  done
 }
 
 createChannel() {
-  setGlobals 1 $PEER_ADDRESS $NW_NAME
+  setGlobals 1 $PEER_ORG1_PORT $NW_NAME
 	# Poll in case the raft leader is not set yet
 	echo "Create channel NW_NAME = ${NW_NAME}   ORDERER_CA = $ORDERER_CA"
 	local rc=1
@@ -80,9 +80,8 @@ createChannel() {
 # queryCommitted ORG
 joinChannel() {
   ORG=$1
-	#echo "JoinChannel - PEER_ADDRESS = $PEER_ADDRESS ORDERER_PORT= $ORDERER_PORT"
-	#echo "JoinChannel - FABRIC_CFG_PATH = $FABRIC_CFG_PATH"
-  setGlobals 1 $PEER_ADDRESS $NW_NAME
+  PEER_PORT=$2
+  setGlobals $ORG $PEER_PORT $NW_NAME
 	local rc=1
 	local COUNTER=1
 	## Sometimes Join takes time, hence retry
@@ -102,8 +101,8 @@ joinChannel() {
 
 updateAnchorPeers() {
   ORG=$1
-  #setGlobals $ORG
-	setGlobals 1 $PEER_ADDRESS $NW_NAME
+  PEER_PORT=$2
+  setGlobals $ORG $PEER_PORT $NW_NAME
 	local rc=1
 	local COUNTER=1
 	## Sometimes Join takes time, hence retry
@@ -140,7 +139,7 @@ createChannelTx
 
 ## Create anchorpeertx
 echo "### Generating channel configuration transaction '${CHANNEL_NAME}.tx' ###"
-createAncorPeerTx
+createAncorPeerTx "Org1MSP Org2MSP"
 
 FABRIC_CFG_PATH=$NW_PATH/config/
 echo "Fabric Config path for channel creation: "$FABRIC_CFG_PATH
@@ -151,15 +150,15 @@ createChannel
 
 ## Join all the peers to the channel
 echo "Join Org1 peers to the channel ..."
-joinChannel 1
-#echo "Join Org2 peers to the channel..."
-#joinChannel 2
+joinChannel 1 $PEER_ORG1_PORT
+echo "Join Org2 peers to the channel..."
+joinChannel 2 $PEER_ORG2_PORT
 
 ## Set the anchor peers for each org in the channel
 echo "Updating anchor peers for org1."
-updateAnchorPeers 1
-#echo "Updating anchor peers for org2..."
-#updateAnchorPeers 2
+updateAnchorPeers 1 $PEER_ORG1_PORT
+echo "Updating anchor peers for org2..."
+updateAnchorPeers 2 $PEER_ORG2_PORT
 
 echo "========= Channel successfully joined =========== "
 

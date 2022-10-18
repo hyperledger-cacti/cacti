@@ -8,10 +8,11 @@ MAX_RETRY="$5"
 VERBOSE="$6"
 CC_CHAIN_CODE="$7"
 NW_PATH="$8"
-AA="$9"
-ORD_P=${10}
-APP_R=${11}
-NW_NAME=${12}
+ORG1_P="$9"
+ORG2_P="$10"
+ORD_P=${11}
+APP_R=${12}
+NW_NAME=${13}
 
 : ${CHANNEL_NAME:="mychannel"}
 : ${CC_SRC_LANGUAGE:="golang"}
@@ -30,7 +31,7 @@ echo " - MAX_RETRY              :      ${MAX_RETRY}"
 echo " - VERBOSE                :      ${VERBOSE}"
 echo " - CC_CHAIN_CODE          :      ${CC_CHAIN_CODE}"
 echo " - NW_PATH                :      ${NW_PATH}"
-echo " - PEER_ADD               :      ${AA}"
+echo " - PEER_ADD               :      ${ORG1_P}"
 echo " - ORD_PORT               :      ${ORD_P}"
 echo " - APP_ROOT               :      ${APP_R}"
 echo " - NW_NAME                :      ${NW_NAME}"
@@ -82,12 +83,12 @@ else
 fi
 
 # import utils
-. scripts/envVar.sh $NW_PATH $AA $NW_NAME
+. scripts/envVar.sh $NW_PATH $ORG1_P $NW_NAME
 
 
 packageChaincode() {
   ORG=$1
-  setGlobals $ORG $AA $NW_NAME
+  setGlobals $ORG $ORG1_P $NW_NAME
   set -x
   # Select a different chaincode folder depending on whether it is regular chaincode or chaincode adapted to control access from relay clients
   peer lifecycle chaincode package $CC_CHAIN_CODE.tar.gz --path ${CC_SRC_PATH} --lang ${CC_RUNTIME_LANGUAGE} --label ${CC_CHAIN_CODE}_${VERSION} >&log.txt
@@ -342,43 +343,43 @@ chaincodeQuery() {
 packageChaincode 1
 
 ## Install chaincode on peer0
-echo "Installing chaincode on peer0.org1.$NW_NAME.com  port: $AA  NW: $NW_NAME"
-installChaincode 1 $AA $NW_NAME
+echo "Installing chaincode on peer0.org1.$NW_NAME.com  port: $ORG1_P  NW: $NW_NAME"
+installChaincode 1 $ORG1_P $NW_NAME
 
-#echo "Install chaincode on peer0.org2..."
-#installChaincode 2
+echo "Installing chaincode on peer0.org2.$NW_NAME.com  port: $ORG2_P  NW: $NW_NAME"
+installChaincode 2 $ORG2_P $NW_NAME
 
 ## query whether the chaincode is installed
-queryInstalled 1 $AA $NW_NAME
+queryInstalled 1 $ORG1_P $NW_NAME
 
 ## approve the definition for org1
-approveForMyOrg 1 $AA $ORD_PORT $NW_NAME
+approveForMyOrg 1 $ORG1_P $ORD_PORT $NW_NAME
 
 ## check whether the chaincode definition is ready to be committed
 ## expect org1 to have approved and org2 not to
-#checkCommitReadiness 1 "\"Org1MSP\": true" "\"Org2MSP\": false"
-checkCommitReadiness 1 "\"Org1MSP\": true" $AA $NW_NAME
-#checkCommitReadiness 2 "\"Org1MSP\": true" "\"Org2MSP\": false"
+checkCommitReadiness 1 "\"Org1MSP\": true" "\"Org2MSP\": false" $ORG1_P $NW_NAME
+# checkCommitReadiness 1 "\"Org1MSP\": true" $ORG1_P $NW_NAME
+checkCommitReadiness 2 "\"Org1MSP\": true" "\"Org2MSP\": false" $ORG2_P $NW_NAME
 
 ## now approve also for org2
-#approveForMyOrg 2
+approveForMyOrg 2 $ORG2_P $ORD_PORT $NW_NAME
 
 ## check whether the chaincode definition is ready to be committed
 ## expect them both to have approved
-#checkCommitReadiness 1 "\"Org1MSP\": true" "\"Org2MSP\": true"
-#checkCommitReadiness 2 "\"Org1MSP\": true" "\"Org2MSP\": true"
+checkCommitReadiness 1 "\"Org1MSP\": true" "\"Org2MSP\": true" $ORG1_P $NW_NAME
+checkCommitReadiness 2 "\"Org1MSP\": true" "\"Org2MSP\": true" $ORG2_P $NW_NAME
 
 ## now that we know for sure both orgs have approved, commit the definition
 #commitChaincodeDefinition 1 2
-commitChaincodeDefinition 1 $AA $NW_NAME
+commitChaincodeDefinition 1 $ORG1_P $NW_NAME 2 $ORG2_P $NW_NAME
 
 ## query on both orgs to see that the definition committed successfully
-queryCommitted 1 $AA $NW_NAME
-#queryCommitted 2
+queryCommitted 1 $ORG1_P $NW_NAME
+queryCommitted 2 $ORG2_P $NW_NAME
 
 ## Invoke the chaincode
 #chaincodeInvokeInit 1 2
-chaincodeInvokeInit 1 $AA $NW_NAME
+chaincodeInvokeInit 1 $ORG1_P $NW_NAME 2 $ORG2_P $NW_NAME
 
 # Query chaincode on peer0.org1
 #echo "Querying chaincode on peer0.org1..."

@@ -307,7 +307,7 @@ signing:
 #     CA certificates though it can still issue end entity certificates.
 ###########################################################################
 csr:
-   cn: ca.org1.network2.com
+   cn: ca.org2.network1.com
    keyrequest:
      algo: ecdsa
      size: 256
@@ -315,12 +315,12 @@ csr:
       - C: US
         ST: "North Carolina"
         L:
-        O: org1.network2.com
+        O: org2.network1.com
         OU: Fabric
    hosts:
-     - e7bbd10fb786
+     - 6bbd89430166
      - localhost
-     - org1.network2.com
+     - org2.network1.com
    ca:
       expiry: 131400h
       pathlength: 1

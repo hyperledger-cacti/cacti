@@ -39,11 +39,13 @@ echo "$(yaml_ccp $ORG $P0PORT $CAPORT $PEERPEM $CAPEM $1)" > $1/peerOrganization
 echo "PEER PEM:" $PEERPEM
 echo "CA PEM:" $CAPEM
 
-#ORG=2
-#P0PORT=9051
-#CAPORT=8054
-#PEERPEM=organizations/peerOrganizations/org2.network2.com/tlsca/tlsca.org2.network2.com-cert.pem
-#CAPEM=organizations/peerOrganizations/org2.network2.com/ca/ca.org2.network2.com-cert.pem
+ORG=2
+P0PORT=9061
+CAPORT=5064
+PEERPEM=$1/peerOrganizations/org2.network2.com/tlsca/tlsca.org2.network2.com-cert.pem
+CAPEM=$1/peerOrganizations/org2.network2.com/ca/ca.org2.network2.com-cert.pem
 
-#echo "$(json_ccp $ORG $P0PORT $CAPORT $PEERPEM $CAPEM)" > organizations/peerOrganizations/org2.network2.com/connection-org2.json
-#echo "$(yaml_ccp $ORG $P0PORT $CAPORT $PEERPEM $CAPEM)" > organizations/peerOrganizations/org2.network2.com/connection-org2.yaml
+echo "$(json_ccp $ORG $P0PORT $CAPORT $PEERPEM $CAPEM $1)" > $1/peerOrganizations/org2.network2.com/connection-org2.json
+echo "$(yaml_ccp $ORG $P0PORT $CAPORT $PEERPEM $CAPEM $1)" > $1/peerOrganizations/org2.network2.com/connection-org2.yaml
+echo "PEER PEM:" $PEERPEM
+echo "CA PEM:" $CAPEM
