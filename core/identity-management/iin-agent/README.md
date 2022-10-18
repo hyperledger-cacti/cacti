@@ -34,7 +34,7 @@ make build
 
 ### Security Domain Config
 
-Sample `security-domain-config.json`:
+Sample `security-domain-config.json` ([template file here](./security-domain-config.json.template)):
 ```
 {
     "<securityDomainName>": "<ledgerId>",
@@ -51,7 +51,7 @@ It is JSON, with specifying who are the members of a security domain, with keys 
 
 ### DNS Config
 
-Discovery is not implemented yet, so DNS details are added during bootstrapping. A sample `dnsconfig.json` looks like this:
+Discovery is not implemented yet, so DNS details are added during bootstrapping. A sample `dnsconfig.json` ([template file here](./dnsconfig.json.template)) looks like this:
 ```
 {
     "<securityDomainName>": {
@@ -69,6 +69,67 @@ Discovery is not implemented yet, so DNS details are added during bootstrapping.
 }
 ```
 For each security domain, there's a JSON object which contains elements with key as iin-agent's name, which can be Org MSP Id for Fabric, or Node Id for Corda, and value as another JSON object. This value contains `endpoint` for the iin-agent, boolean `tls` which is true if TLS is enabled for that iin-agent, and `tlsCACertPath` which specifies the path to file containing TLS CA certs, keep it empty string if not known.
+
+### Environment Variables
+
+Following are the list of environment variables for IIN Agent:
+
+* `IIN_AGENT_ENDPOINT`: The endpoint at which IIN Agent server should listen. E.g.: `0.0.0.0:9500`
+* `IIN_AGENT_TLS`: Set this to `true` to enable TLS on IIN Agent server
+* `IIN_AGENT_TLS_CERT_PATH`: Path to TLS certificate if TLS is enabled
+* `IIN_AGENT_TLS_KEY_PATH`: Path to TLS key if TLS is enabled
+* `MEMBER_ID`: Member Id for this IIN Agent. For fabric network, it should be the Organization's MSP ID
+* `SECURITY_DOMAIN`: Security domain to which this IIN Agent belongs
+* `DLT_TYPE`: To indicate the type of DLT for which this IIN Agent is running. E.g. `fabric`
+* `CONFIG_PATH`: Path to ledger specific config file (explained in next subsection)
+* `DNS_CONFIG_PATH`: Path to DNS config file explained in previous sub sections
+* `SECURITY_DOMAIN_CONFIG_PATH`: Path to security domain config file explained in previous sub sections
+* `WEAVER_CONTRACT_ID`: Contract ID for DLT specific weaver interoperation module installed on network
+* `SYNC_PERIOD`: Period at which auto synchronization of memberships from other security domains should happen
+* `AUTO_SYNC`: Set this to `true` to enable auto synchronization of memberships from other security domains
+
+These can be specified in the `.env`, whose template file is [.env.template](./.env.template). Alternatively these can be specified from command line as well.
+
+### Ledger Specific Configurations:
+
+#### Fabric
+
+Sample `config.json` for fabric network ([template file here](./src/fabric-ledger/config.json.template)):
+```
+{
+    "admin":{
+        "name":"admin",
+        "secret":"adminpw"
+    },
+    "agent": {
+        "name":"iin-agent",
+        "affiliation":"org1.department1",
+        "role": "client",
+        "attrs": [{ "name": "iin-agent", "value": "true", "ecert": true }]
+    },
+    "mspId":"Org1MSP",
+    "ordererMspIds": ["OrdererMSP"],
+    "ccpPath": "<path-to-connection-profile>",
+    "walletPath": "",
+    "caUrl": "",
+    "local": "true"
+}
+```
+
+* `admin`: Details of Org CA admin to register IIN Agent user:
+  * `name`: Name of Org CA admin
+  * `secret`: Secret of Org CA admin
+* `agent`: Details of IIN Agent user:
+  * `name`: Name of IIN Agent user
+  * `affiliation`: Affiliation for this user
+  * `role`: Role of IIN Agent user
+  * `attrs`: Attributes of IIN Agent user. Note: Don't change existing attribute
+* `mspId`: Org MSP ID to which this IIN Agent belongs
+* `ordererMspIds`: List of orderer MSP IDs on this network
+* `ccpPath`: Path to connection profile of the org whose MSP ID is set in `mspId` field
+* `walletPath`: Path to wallet directory. Default: `./wallet-<security-domain>-<member-id>`
+* `caUrl`: Url for Fabric CA of this org, if not present in connection profile, else leave it empty
+* `local`: Set this to `false` if iin-agent is deployed in a container
 
 ## Running the IIN Agent
 

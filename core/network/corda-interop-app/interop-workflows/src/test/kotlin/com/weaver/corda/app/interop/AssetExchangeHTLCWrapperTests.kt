@@ -83,7 +83,7 @@ class AssetExchangeHTLCWrapperTests {
         .setHashMechanism(AssetLocks.HashMechanism.SHA256)
         .setHashBase64(ByteString.copyFrom(hash.toByteArray()))
         .setExpiryTimeSecs(10)
-        .setTimeSpec(AssetLocks.AssetLockHTLC.TimeSpec.DURATION)
+        .setTimeSpec(AssetLocks.TimeSpec.DURATION)
         .build()
         
     val lockInfo = AssetLocks.AssetLock.newBuilder()

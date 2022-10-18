@@ -11,7 +11,7 @@ import com.weaver.protos.common.asset_locks.AssetLocks
 import net.corda.core.serialization.CordaSerializable
 import net.corda.core.serialization.SerializationCustomSerializer
 
-class TimeSpecSerializer : SerializationCustomSerializer<AssetLocks.AssetLockHTLC.TimeSpec, TimeSpecSerializer.Proxy> {
+class TimeSpecSerializer : SerializationCustomSerializer<AssetLocks.TimeSpec, TimeSpecSerializer.Proxy> {
 
    /**
     * The ProxyTimeSpec enum is a serializable counterpart of the TimeSpec enum defined in the
@@ -31,21 +31,21 @@ class TimeSpecSerializer : SerializationCustomSerializer<AssetLocks.AssetLockHTL
     * The function toProxy describes how the TimeSpec class should be converted to a Proxy
     * class so that it can be serialized and transferred across the wire.
     */
-   override fun fromProxy(proxy: Proxy): AssetLocks.AssetLockHTLC.TimeSpec {
+   override fun fromProxy(proxy: Proxy): AssetLocks.TimeSpec {
       return when(proxy.timeSpec) {
-          ProxyTimeSpec.EPOCH -> AssetLocks.AssetLockHTLC.TimeSpec.EPOCH
-          ProxyTimeSpec.DURATION -> AssetLocks.AssetLockHTLC.TimeSpec.DURATION
-          else -> AssetLocks.AssetLockHTLC.TimeSpec.UNRECOGNIZED
+          ProxyTimeSpec.EPOCH -> AssetLocks.TimeSpec.EPOCH
+          ProxyTimeSpec.DURATION -> AssetLocks.TimeSpec.DURATION
+          else -> AssetLocks.TimeSpec.UNRECOGNIZED
       }
    }
 
    /** The function fromProxy describes how the Proxy class should be converted back to a
     * TimeSpec class when it is received from across the wire.
     */
-   override fun toProxy(obj: AssetLocks.AssetLockHTLC.TimeSpec): Proxy {
+   override fun toProxy(obj: AssetLocks.TimeSpec): Proxy {
        return when(obj) {
-           AssetLocks.AssetLockHTLC.TimeSpec.EPOCH -> Proxy(ProxyTimeSpec.EPOCH)
-           AssetLocks.AssetLockHTLC.TimeSpec.DURATION -> Proxy(ProxyTimeSpec.DURATION)
+           AssetLocks.TimeSpec.EPOCH -> Proxy(ProxyTimeSpec.EPOCH)
+           AssetLocks.TimeSpec.DURATION -> Proxy(ProxyTimeSpec.DURATION)
            else -> Proxy(ProxyTimeSpec.UNRECOGNIZED)
        }
    }
