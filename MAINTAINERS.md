@@ -11,6 +11,11 @@ Maintainers
 | Takuma TAKEUCHI | [takeutak][takeutak] | takeutak#7220 |
 | Jagpreet Singh Sasan | [jagpreetsinghsasan][jagpreetsinghsasan] | jagpreetsinghsasan |
 | Venkatraman Ramakrishna | [VRamakrishna][VRamakrishna] | Ramakrishna#6645 |
+
+**Emeritus Maintainers**
+
+| Name | GitHub | Chat |
+|------|--------|------|
 | Sandeep Nishad | [sanvenDev][sanvenDev] | sanven#1092 |
 
 [jonathan-m-hamilton]: https://github.com/jonathan-m-hamilton
