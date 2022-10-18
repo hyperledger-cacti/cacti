@@ -16,6 +16,7 @@ export PATH=${PWD}/bin:${PWD}:$PATH
 export FABRIC_CFG_PATH=$NW_CFG_PATH/configtx
 export VERBOSE=false
 export NWPATH=$NW_CFG_PATH
+profile=${2:-"1-node"}
 
 # Print the usage message
 function printHelp() {
@@ -252,7 +253,7 @@ function createOrgs() {
     envsubst < docker/docker-compose-ca.yaml > docker/docker-compose-ca.real.yaml
     COMPOSE_FILE_CA=docker/docker-compose-ca.real.yaml
 
-    IMAGE_TAG=$IMAGETAG docker-compose -f $COMPOSE_FILE_CA --env-file=docker.real.env up -d 2>&1
+    IMAGE_TAG=$IMAGETAG docker-compose -f $COMPOSE_FILE_CA --env-file=docker.real.env --profile $DOCKER_PROFILES up -d 2>&1
 
     . $NW_CFG_PATH/fabric-ca/registerEnroll.sh
 
@@ -359,7 +360,7 @@ function networkUp() {
     envsubst < docker.env > docker.real.env
     envsubst < docker/docker-compose-ca.yaml > docker/docker-compose-ca.real.yaml
     COMPOSE_FILE_CA=docker/docker-compose-ca.real.yaml
-    IMAGE_TAG=$IMAGETAG docker-compose -f $COMPOSE_FILE_CA --env-file=docker.real.env up -d 2>&1
+    IMAGE_TAG=$IMAGETAG docker-compose -f $COMPOSE_FILE_CA --env-file=docker.real.env --profile $DOCKER_PROFILES up -d 2>&1
   fi
 
   envsubst < docker/docker-compose-test-net.yaml > docker/docker-compose-test-net.real.yaml
@@ -375,7 +376,7 @@ function networkUp() {
   echo "NW config path.. : "$NW_CFG_PATH
   cat docker.env
   envsubst < docker.env > docker.real.env
-  IMAGE_TAG=$IMAGETAG NW_CFG_PATH=$NW_CFG_PATH docker-compose ${COMPOSE_FILES} --env-file=docker.real.env up -d 2>&1
+  IMAGE_TAG=$IMAGETAG NW_CFG_PATH=$NW_CFG_PATH docker-compose ${COMPOSE_FILES} --env-file=docker.real.env --profile $DOCKER_PROFILES up -d 2>&1
 
   docker ps -a
   if [ $? -ne 0 ]; then
@@ -426,7 +427,7 @@ function networkDown() {
 
   cat docker.env
   envsubst < docker.env > docker.real.env
-  APP_ROOT=$APP_ROOT docker-compose -f $COMPOSE_FILE_BASE -f $COMPOSE_FILE_COUCH -f $COMPOSE_FILE_CA --env-file=docker.real.env down --volumes --remove-orphans
+  APP_ROOT=$APP_ROOT docker-compose -f $COMPOSE_FILE_BASE -f $COMPOSE_FILE_COUCH -f $COMPOSE_FILE_CA --env-file=docker.real.env --profile $DOCKER_PROFILES down --volumes --remove-orphans
   #docker-compose -f $COMPOSE_FILE_BASE -f $COMPOSE_FILE_COUCH -f $COMPOSE_FILE_CA --env-file=docker.env down --volumes --remove-orphans
   # docker-compose -f $COMPOSE_FILE_COUCH_ORG3 -f $COMPOSE_FILE_ORG3 down --volumes --remove-orphans
 
@@ -469,6 +470,8 @@ MAX_RETRY=5
 CLI_DELAY=3
 # channel name defaults to "mychannel"
 CHANNEL_NAME="mychannel"
+# Deploy 1 org or 2 org: profiles
+DOCKER_PROFILES="1-node"
 # use this as the default docker-compose yaml definition
 COMPOSE_FILE_BASE=docker/docker-compose-test-net.yaml
 # docker-compose.yaml file if you are using couchdb
@@ -499,7 +502,8 @@ export N1_CA_ORG1_PORT=${N1_CA_ORG1_PORT:-7054}
 export N1_CA_ORG2_PORT=${N1_CA_ORG2_PORT:-7064}
 export N1_CA_ORDERER_PORT=${N1_CA_ORDERER_PORT:-9054}
 export N1_CHAINCODELISTEN_PORT=${N1_CHAINCODELISTEN_PORT:-7052}
-export N1_COUCHDB_PORT=${N1_COUCHDB_PORT:-7084}
+export N1_COUCHDB0_PORT=${N1_COUCHDB0_PORT:-7084}
+export N1_COUCHDB1_PORT=${N1_COUCHDB1_PORT:-7094}
 export N1_ORDERER_PORT=${N1_ORDERER_PORT:-7050}
 export N1_PEER_ORG1_PORT=${N1_PEER_ORG1_PORT:-7051}
 export N1_PEER_ORG2_PORT=${N1_PEER_ORG2_PORT:-7061}
@@ -509,7 +513,8 @@ export N2_CA_ORG1_PORT=${N2_CA_ORG1_PORT:-5054}
 export N2_CA_ORG2_PORT=${N2_CA_ORG2_PORT:-5064}
 export N2_CA_ORDERER_PORT=${N2_CA_ORDERER_PORT:-8054}
 export N2_CHAINCODELISTEN_PORT=${N2_CHAINCODELISTEN_PORT:-9052}
-export N2_COUCHDB_PORT=${N2_COUCHDB_PORT:-9999}
+export N2_COUCHDB0_PORT=${N2_COUCHDB0_PORT:-9084}
+export N2_COUCHDB1_PORT=${N2_COUCHDB1_PORT:-9094}
 export N2_ORDERER_PORT=${N2_ORDERER_PORT:-9050}
 export N2_PEER_ORG1_PORT=${N2_PEER_ORG1_PORT:-9051}
 export N2_PEER_ORG2_PORT=${N2_PEER_ORG2_PORT:-9061}
@@ -562,6 +567,10 @@ while [[ $# -ge 1 ]] ; do
     ;;
   -c )
     CHANNEL_NAME="$2"
+    shift
+    ;;
+  -p )
+    DOCKER_PROFILES="$2"
     shift
     ;;
   -ca )
@@ -650,7 +659,8 @@ echo "Network Parameters ${ROLE}"
 if [ "${ROLE}" = "network1" ]; then
   echo " - Peer Org1 Port                                 : ${N1_PEER_ORG1_PORT}"
   echo " - Peer Org2 Port                                 : ${N1_PEER_ORG2_PORT}"
-  echo " - Peer CouchDb Port                              : ${N1_COUCHDB_PORT}"
+  echo " - Peer CouchDb0 Port                             : ${N1_COUCHDB0_PORT}"
+  echo " - Peer CouchDb1 Port                             : ${N1_COUCHDB1_PORT}"
   echo " - CA Org1 Port                                   : ${N1_CA_ORG1_PORT}"
   echo " - CA Org2 Port                                   : ${N1_CA_ORG2_PORT}"
   echo " - Orderer Port                                   : ${N1_ORDERER_PORT}"
@@ -660,14 +670,16 @@ if [ "${ROLE}" = "network1" ]; then
   export PEER_ORG2_PORT=${N1_PEER_ORG2_PORT}
   export CHAINCODELISTENADDRESS=${N1_CHAINCODELISTEN_PORT}
   export NW_CFG_PATH=$NW_CFG_PATH
-  export COUCHDB_PORT=${N1_COUCHDB_PORT}
+  export COUCHDB0_PORT=${N1_COUCHDB0_PORT}
+  export COUCHDB1_PORT=${N1_COUCHDB1_PORT}
   export CA_ORG1_PORT=${N1_CA_ORG1_PORT}
   export CA_ORG2_PORT=${N1_CA_ORG2_PORT}
   export CA_ORDERER_PORT=${N1_CA_ORDERER_PORT}
 else
   echo " - Peer Org1 Port                                 : ${N2_PEER_ORG1_PORT}"
   echo " - Peer Org2 Port                                 : ${N2_PEER_ORG2_PORT}"
-  echo " - Peer CouchDb Port                              : ${N2_COUCHDB_PORT}"
+  echo " - Peer CouchDb0 Port                             : ${N2_COUCHDB0_PORT}"
+  echo " - Peer CouchDb1 Port                             : ${N2_COUCHDB1_PORT}"
   echo " - CA Org1 Port                                   : ${N2_CA_ORG1_PORT}"
   echo " - CA Org2 Port                                   : ${N2_CA_ORG2_PORT}"
   echo " - Orderer Port                                   : ${N2_ORDERER_PORT}"
@@ -677,7 +689,8 @@ else
   export PEER_ORG2_PORT=${N2_PEER_ORG2_PORT}
   export CHAINCODELISTENADDRESS=${N2_CHAINCODELISTEN_PORT}
   export NW_CFG_PATH=$NW_CFG_PATH
-  export COUCHDB_PORT=${N2_COUCHDB_PORT}
+  export COUCHDB0_PORT=${N2_COUCHDB0_PORT}
+  export COUCHDB1_PORT=${N2_COUCHDB1_PORT}
   export CA_ORG1_PORT=${N2_CA_ORG1_PORT}
   export CA_ORG2_PORT=${N2_CA_ORG2_PORT}
   export CA_ORDERER_PORT=${N2_CA_ORDERER_PORT}
