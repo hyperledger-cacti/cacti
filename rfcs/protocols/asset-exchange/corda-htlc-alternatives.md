@@ -53,7 +53,7 @@ A generalised state class that encodes the properties of the HTLC such as the im
 The validation contract ensures that all attempts to spend the underlying asset is validated against the conditions of the hashed lock encumbrance state. That is, it ensures that only the owner or the designated counter party can make claims against the event, that the counter-party can only claim the state upon presentation of the pre-image of the stored secret within the specified validity window, and that the owner can only claim a refund of the asset if the specified time period has elapsed.
 
 #### Process
-The procedures for setting up an HTLC one one Corda network, which would need to be mirrored in the counter party network, involves the following:
+The procedures for setting up an HTLC with one Corda network, which would need to be mirrored in the counter party network, involves the following:
 - Party A and B agree on terms of the contract (i.e. secret, time window, asset amount etc.)
 - Party A creates a transaction that takes its asset state as input and produces i) a hash lock encumbrance state and ii) the asset state with a reference to the encumbrance. Party A sends this transaction to Party B.
 - **Claiming**: Party B submits a transaction to claim the locked asset with the pre-image of the secret. If the pre-image is valid and the transaction is within the defined time window (as validated by the encumbrance contract), the output of the transaction will be a new state representing the asset with Party B as its owner that no longer has the encumbrance state attached to it.

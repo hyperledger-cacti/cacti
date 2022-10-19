@@ -6,7 +6,7 @@
 # Asset Transfer Protocol
 
 - RFC: 02-008
-- Authors: Venkatraman Ramakrishna, Sandeep Nishad, Krishnasuri Narayanam, Dhinakaran Vinayagamurthy
+- Authors: Krishnasuri Narayanam, Sandeep Nishad, Venkatraman Ramakrishna, Dhinakaran Vinayagamurthy
 - Status: Proposed
 - Since: 01-Jun-2021
 
