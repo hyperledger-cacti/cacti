@@ -19,16 +19,16 @@ function createOrg1 {
   echo 'NodeOUs:
   Enable: true
   ClientOUIdentifier:
-    Certificate: cacerts/localhost-${CA_PORT}-ca-org1-network1-com.pem
+    Certificate: cacerts/localhost-'${CA_PORT}'-ca-org1-network1-com.pem
     OrganizationalUnitIdentifier: client
   PeerOUIdentifier:
-    Certificate: cacerts/localhost-${CA_PORT}-ca-org1-network1-com.pem
+    Certificate: cacerts/localhost-'${CA_PORT}'-ca-org1-network1-com.pem
     OrganizationalUnitIdentifier: peer
   AdminOUIdentifier:
-    Certificate: cacerts/localhost-${CA_PORT}-ca-org1-network1-com.pem
+    Certificate: cacerts/localhost-'${CA_PORT}'-ca-org1-network1-com.pem
     OrganizationalUnitIdentifier: admin
   OrdererOUIdentifier:
-    Certificate: cacerts/localhost-${CA_PORT}-ca-org1-network1-com.pem
+    Certificate: cacerts/localhost-'${CA_PORT}'-ca-org1-network1-com.pem
     OrganizationalUnitIdentifier: orderer' > $NW_CFG_PATH/peerOrganizations/org1.network1.com/msp/config.yaml
 
   echo
@@ -127,16 +127,16 @@ function createOrg2 {
   echo 'NodeOUs:
   Enable: true
   ClientOUIdentifier:
-    Certificate: cacerts/localhost-${CA_PORT}-ca-org2-network1-com.pem
+    Certificate: cacerts/localhost-'${CA_PORT}'-ca-org2-network1-com.pem
     OrganizationalUnitIdentifier: client
   PeerOUIdentifier:
-    Certificate: cacerts/localhost-${CA_PORT}-ca-org2-network1-com.pem
+    Certificate: cacerts/localhost-'${CA_PORT}'-ca-org2-network1-com.pem
     OrganizationalUnitIdentifier: peer
   AdminOUIdentifier:
-    Certificate: cacerts/localhost-${CA_PORT}-ca-org2-network1-com.pem
+    Certificate: cacerts/localhost-'${CA_PORT}'-ca-org2-network1-com.pem
     OrganizationalUnitIdentifier: admin
   OrdererOUIdentifier:
-    Certificate: cacerts/localhost-${CA_PORT}-ca-org2-network1-com.pem
+    Certificate: cacerts/localhost-'${CA_PORT}'-ca-org2-network1-com.pem
     OrganizationalUnitIdentifier: orderer' > $NW_CFG_PATH/peerOrganizations/org2.network1.com/msp/config.yaml
 
   echo
