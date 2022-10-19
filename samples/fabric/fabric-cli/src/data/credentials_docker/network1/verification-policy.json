@@ -1,1 +1,1 @@
-{"securityDomain":"network1","identifiers":[{"pattern":"mychannel:simplestate:Read:*","policy":{"type":"Signature","criteria":["Org1MSP"]}},{"pattern":"mychannel:simplestatewithacl:Read:*","policy":{"type":"Signature","criteria":["Org1MSP"]}}]}
+{"securityDomain":"network1","identifiers":[{"pattern":"mychannel:simplestate:Read:*","policy":{"type":"Signature","criteria":["Org1MSP","Org2MSP"]}}]}
