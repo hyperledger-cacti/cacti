@@ -10,6 +10,7 @@ ORDERER_PORT="$6"
 PEER_ORG1_PORT="$7"
 PEER_ORG2_PORT="$8"
 NW_NAME="$9"
+PROFILE="${10}"
 
 : ${CHANNEL_NAME:="mychannel"}
 : ${DELAY:="3"}
@@ -151,14 +152,18 @@ createChannel
 ## Join all the peers to the channel
 echo "Join Org1 peers to the channel ..."
 joinChannel 1 $PEER_ORG1_PORT
-echo "Join Org2 peers to the channel..."
-joinChannel 2 $PEER_ORG2_PORT
+if [ "$PROFILE" = "2-nodes" ]; then
+    echo "Join Org2 peers to the channel..."
+    joinChannel 2 $PEER_ORG2_PORT
+fi
 
 ## Set the anchor peers for each org in the channel
 echo "Updating anchor peers for org1."
 updateAnchorPeers 1 $PEER_ORG1_PORT
-echo "Updating anchor peers for org2..."
-updateAnchorPeers 2 $PEER_ORG2_PORT
+if [ "$PROFILE" = "2-nodes" ]; then
+    echo "Updating anchor peers for org2..."
+    updateAnchorPeers 2 $PEER_ORG2_PORT
+fi
 
 echo "========= Channel successfully joined =========== "
 

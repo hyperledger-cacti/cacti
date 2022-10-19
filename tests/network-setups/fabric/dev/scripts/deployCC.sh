@@ -13,6 +13,7 @@ ORG2_P="${10}"
 ORD_P=${11}
 APP_R=${12}
 NW_NAME=${13}
+PROFILE="${14}"
 
 : ${CHANNEL_NAME:="mychannel"}
 : ${CC_SRC_LANGUAGE:="golang"}
@@ -345,8 +346,11 @@ packageChaincode 1
 echo "Installing chaincode on peer0.org1.$NW_NAME.com  port: $ORG1_P  NW: $NW_NAME"
 installChaincode 1 $ORG1_P $NW_NAME
 
-echo "Installing chaincode on peer0.org2.$NW_NAME.com  port: $ORG2_P  NW: $NW_NAME"
-installChaincode 2 $ORG2_P $NW_NAME
+
+if [ "$PROFILE" = "2-nodes" ]; then
+    echo "Installing chaincode on peer0.org2.$NW_NAME.com  port: $ORG2_P  NW: $NW_NAME"
+    installChaincode 2 $ORG2_P $NW_NAME
+fi
 
 ## query whether the chaincode is installed
 queryInstalled 1 $ORG1_P $NW_NAME
@@ -356,29 +360,42 @@ approveForMyOrg 1 $ORG1_P $ORD_PORT $NW_NAME
 
 ## check whether the chaincode definition is ready to be committed
 ## expect org1 to have approved and org2 not to
-checkCommitReadiness 1 $ORG1_P $NW_NAME "\"Org1MSP\": true" "\"Org2MSP\": false"
-# checkCommitReadiness 1 "\"Org1MSP\": true" $ORG1_P $NW_NAME
-checkCommitReadiness 2 $ORG2_P $NW_NAME "\"Org1MSP\": true" "\"Org2MSP\": false"
+if [ "$PROFILE" = "2-nodes" ]; then
+    checkCommitReadiness 1 $ORG1_P $NW_NAME "\"Org1MSP\": true" "\"Org2MSP\": false"
+    checkCommitReadiness 2 $ORG2_P $NW_NAME "\"Org1MSP\": true" "\"Org2MSP\": false"
+else
+    checkCommitReadiness 1 $ORG1_P $NW_NAME "\"Org1MSP\": true"
+fi
 
-## now approve also for org2
-approveForMyOrg 2 $ORG2_P $ORD_PORT $NW_NAME
-
-## check whether the chaincode definition is ready to be committed
-## expect them both to have approved
-checkCommitReadiness 1 $ORG1_P $NW_NAME "\"Org1MSP\": true" "\"Org2MSP\": true"
-checkCommitReadiness 2 $ORG2_P $NW_NAME "\"Org1MSP\": true" "\"Org2MSP\": true"
+if [ "$PROFILE" = "2-nodes" ]; then
+    ## now approve also for org2
+    approveForMyOrg 2 $ORG2_P $ORD_PORT $NW_NAME
+    
+    ## check whether the chaincode definition is ready to be committed
+    ## expect them both to have approved
+    checkCommitReadiness 1 $ORG1_P $NW_NAME "\"Org1MSP\": true" "\"Org2MSP\": true"
+    checkCommitReadiness 2 $ORG2_P $NW_NAME "\"Org1MSP\": true" "\"Org2MSP\": true"
+fi
 
 ## now that we know for sure both orgs have approved, commit the definition
-#commitChaincodeDefinition 1 2
-commitChaincodeDefinition 1 $ORG1_P $NW_NAME 2 $ORG2_P $NW_NAME
+if [ "$PROFILE" = "2-nodes" ]; then
+    commitChaincodeDefinition 1 2
+else
+    commitChaincodeDefinition 1 $ORG1_P $NW_NAME 2 $ORG2_P $NW_NAME
+fi
 
 ## query on both orgs to see that the definition committed successfully
 queryCommitted 1 $ORG1_P $NW_NAME
-queryCommitted 2 $ORG2_P $NW_NAME
+if [ "$PROFILE" = "2-nodes" ]; then
+    queryCommitted 2 $ORG2_P $NW_NAME
+fi
 
 ## Invoke the chaincode
-#chaincodeInvokeInit 1 2
-chaincodeInvokeInit 1 $ORG1_P $NW_NAME 2 $ORG2_P $NW_NAME
+if [ "$PROFILE" = "2-nodes" ]; then
+    chaincodeInvokeInit 1 $ORG1_P $NW_NAME
+else
+    chaincodeInvokeInit 1 $ORG1_P $NW_NAME 2 $ORG2_P $NW_NAME
+fi
 
 # Query chaincode on peer0.org1
 #echo "Querying chaincode on peer0.org1..."
