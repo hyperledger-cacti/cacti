@@ -27,7 +27,7 @@ CC_CHAIN_CODE=`echo "$CC_CHAIN_CODE" | tr [:upper:] [:lower:]`
 
 CC_END_POLICY=""
 if [ "$PROFILE" = "2-nodes" ]; then
-	CC_END_POLICY="--signature-policy \"AND('Org1MSP.member', 'Org2MSP.member')\""
+	CC_END_POLICY="--signature-policy AND('Org1MSP.member', 'Org2MSP.member')"
 fi
 
 echo " - CHANNEL_NAME           :      ${CHANNEL_NAME}"
