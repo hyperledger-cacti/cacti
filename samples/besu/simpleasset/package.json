@@ -12,7 +12,7 @@
     "test": "test"
   },
   "scripts": {
-    "copy-interop-contracts": "cp ../../../core/network/besu/contracts/interop/manageAssetAny.sol contracts/ && cp ../../../core/network/besu/interface/asset-exchange/transferInterface.sol contracts/ && cp ../../../core/network/besu/contracts/interop/asset_locks.proto.sol contracts/",
+    "copy-interop-contracts": "cp ../../../core/network/besu/contracts/interop/manageAssetAny.sol contracts/ && cp ../../../core/network/besu/interface/asset-exchange/transferInterface.sol contracts/",
     "update-truffle-config": "node get-network-details.js",
     "deploy-contract": "npm run copy-interop-contracts && npm install && npm run update-truffle-config && truffle compile && truffle migrate",
     "clean-run": "rm -rf package-lock.json build",
@@ -28,12 +28,11 @@
   ],
   "homepage": "https://github.com/hyperledger-labs/weaver-dlt-interoperability/samples/besu/simpleasset",
   "dependencies": {
-    "@lazyledger/protobuf3-solidity-lib": "^0.6.0",
-    "@openzeppelin/contracts": "^4.3.2",
     "@truffle/contract": "^4.2.14",
     "chai": "^4.3.4",
     "dotenv": "latest",
     "ganache-cli": "^6.12.2",
+    "@openzeppelin/contracts": "^4.3.2",
     "solc": "^0.8.8"
   },
   "devDependencies": {

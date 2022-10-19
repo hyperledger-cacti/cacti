@@ -5,7 +5,6 @@ const path = require('path')
 const contract = require("@truffle/contract");
 const Web3 = require ("web3")
 const crypto = require('crypto')
-const assetLocksPb = require("@hyperledger-labs/weaver-protos-js/common/asset_locks_pb");
 
 const networkHost1 = "localhost"
 const networkPort1 = "8545"
@@ -34,17 +33,6 @@ async function getContractInstance(provider, pathToJson){
 	return instance
 }
 
-// Create an asset exchange agreement structure
-function createAssetExchangeAgreementSerialized(assetType, assetID, recipientECert, lockerECert)
-{
-    const assetExchangeAgreement = new assetLocksPb.AssetExchangeAgreement();
-    assetExchangeAgreement.setType(assetType);
-    assetExchangeAgreement.setId(assetID);
-    assetExchangeAgreement.setRecipient(recipientECert);
-	console.log("recipient", recipientECert)
-    assetExchangeAgreement.setLocker(lockerECert);
-    return Buffer.from(assetExchangeAgreement.serializeBinary())
-}
 
 // Initialization of the parameters
 async function init(provider1, provider2, contractOwner1, contractOwner2, Alice1, Bob2, tokenSupply, senderInitialBalance) {
@@ -112,47 +100,29 @@ async function unlockToken(interopContract, lockContractId, sender) {
 // 'sender' locks 'tokenAmount' number of tokens of type 'tokenContract'
 // for 'recipient' using the contract constructs of 'interopContract'
 // with hashLock and timeLock providing the conditions for claiming/unlocking
-async function lockToken(sender, recipient, tokenContract, tokenAmount, interopContract, hashLock, timeLock, tokenId=0, data="", web3N) {
+async function lockToken(sender, recipient, tokenContract, tokenAmount, interopContract, hashLock, timeLock, tokenId=0, data="") {
 	// initiator of the swap has to first designate the swap contract as a spender of his/her money
 	// with allowance matching the swap amount
 	await tokenContract.approve(tokenContract.address, tokenAmount, {from: sender}).catch(function () {
 		console.log("Token approval failed!!!");
 		return false
 	})
-	// var lockStatus = interopContract.lockAsset(
-    //   		recipient,
-	//       	tokenContract.address,
-    //   		tokenAmount,
-	//       	hashLock,
-    //   		timeLock,
-	// 		tokenId,
-	// 		Web3.utils.utf8ToHex(data),
-	//       	{
-    //     		from: sender
-	//       	}
-	// ).catch(function () {
- 	// 	console.log("lockAsset threw an error");
-	// 	lockStatus = false
-	// })
+	var lockStatus = interopContract.lockAsset(
+      		recipient,
+	      	tokenContract.address,
+      		tokenAmount,
+	      	hashLock,
+      		timeLock,
+			tokenId,
+			Web3.utils.utf8ToHex(data),
+	      	{
+        		from: sender
+	      	}
+	).catch(function () {
+ 		console.log("lockAsset threw an error");
+		lockStatus = false
+	})
 
-
-	const encodedRecipient = web3N.eth.abi.encodeParameter('address', recipient)
-	const params = createAssetExchangeAgreementSerialized("1","1", encodedRecipient, "")
-	var lockStatus = interopContract.lockAssetProtobuf(
-		params,
-		tokenContract.address,
-		tokenAmount,
-		hashLock,
-		timeLock,
-	  tokenId,
-	  Web3.utils.utf8ToHex(data),
-		{
-		  from: sender
-		}
-).catch(function () {
-   console.log("lockAsset threw an error");
-  lockStatus = false
-})
 	return lockStatus
 }
   
@@ -221,7 +191,7 @@ async function main() {
 	let timeLockSeconds = Math.floor(Date.now() / 1000) + 2*timeOut
 
 	// Creating a HTLC contract for Alice locking her AliceERC20 tokens for Bob
- 	let lockTx1 = await lockToken(Alice1, Bob1, AliceERC20, 1, interopContract1, hash, timeLockSeconds, tokenId, web3N1)
+ 	let lockTx1 = await lockToken(Alice1, Bob1, AliceERC20, 1, interopContract1, hash, timeLockSeconds, tokenId)
 	if (!lockTx1) {
 		console.log("\n !!! Locking of Alice's tokens failed in Netowrk 1. Aborting here !!!")
 		return
@@ -238,7 +208,7 @@ async function main() {
 	// claim Alice's tokens in Network 1 after she claims Bob's 
 	// tokens in Network 2.
 	timeLockSeconds = Math.floor(Date.now() / 1000) + timeOut
-	let lockTx2 = await lockToken(Bob2, Alice2, BobERC20, tokenAmount, interopContract2, hash, timeLockSeconds, web3N2)
+	let lockTx2 = await lockToken(Bob2, Alice2, BobERC20, tokenAmount, interopContract2, hash, timeLockSeconds, tokenId)
 	if (!lockTx2) {
 		console.log("\n !!! Locking of Bob's tokens failed in Netowrk 2. Aborting here !!!")
 		return

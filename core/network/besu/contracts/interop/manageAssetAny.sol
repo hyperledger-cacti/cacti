@@ -4,7 +4,6 @@ pragma solidity ^0.8.8;
 
 import "./transferInterface.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
-import "./asset_locks.proto.sol";
 
 /**
  * Hashed Timelock Contract on Assets in an Ethereum network (Support only for ERC20, ERC721 and ERC1155 tokens)
@@ -70,89 +69,6 @@ contract AssetExchangeContract is ERC1155Holder {
     ) external returns (bytes32 lockContractId) {
         address sender = msg.sender;
 
-        // Checking the validity of the input parameters
-        require(amount > 0, "Amount should be greater than zero");
-        transferStruct.Info memory transInfo = transferStruct.Info({
-            sender: sender,
-            receiver: address(this),
-            amount: amount,
-            tokenId: tokenId,
-            data: data
-        });
-        require(
-            transferInterface(assetContract).allowanceInterop(transInfo) ==
-                true,
-            "Allowance of assets from the sender for the lock contract must be greater than the amount to be locked"
-        );
-        require(
-            expirationTime > block.timestamp,
-            "Expiration time should be in the future"
-        );
-
-        // The identity of the lock contract is a hash of all the relevant parameters that will uniquely identify the contract
-        lockContractId = sha256(
-            abi.encodePacked(
-                sender,
-                receiver,
-                assetContract,
-                amount,
-                hashLock,
-                expirationTime
-            )
-        );
-
-        require(
-            lockContracts[lockContractId].status == UNUSED,
-            "An active lock contract already exists with the same parameters"
-        );
-
-        // Locking amount by transfering them to the lockContract
-
-        bool transferStatus = transferInterface(assetContract).transferInterop(
-            transInfo
-        );
-        // bool transferStatus = ERC20(assetContract).transferFrom(sender, address(this), amount);
-        require(
-            transferStatus == true,
-            "ERC20 transferFrom failed from the sender to the lockContract"
-        );
-
-        lockContracts[lockContractId] = LockContract(
-            sender,
-            receiver,
-            assetContract,
-            amount,
-            hashLock,
-            expirationTime,
-            LOCKED,
-            tokenId,
-            data
-        );
-
-        emit Lock(
-            sender,
-            receiver,
-            assetContract,
-            amount,
-            hashLock,
-            expirationTime,
-            lockContractId
-        );
-    }
-
-      function lockAssetProtobuf(
-        bytes memory rawParams,
-        address assetContract,
-        uint256 amount,
-        bytes32 hashLock,
-        uint256 expirationTime,
-        uint256 tokenId,
-        bytes memory data
-    ) external returns (bytes32 lockContractId) {
-        address sender = msg.sender;
-        AssetExchangeAgreement memory params;
-				(, , params) = AssetExchangeAgreementCodec.decode(0, rawParams, uint64(rawParams.length));
-        address receiver = abi.decode(abi.encode(params.recipient), (address));
         // Checking the validity of the input parameters
         require(amount > 0, "Amount should be greater than zero");
         transferStruct.Info memory transInfo = transferStruct.Info({

@@ -229,7 +229,7 @@ func (s *SmartContract) FetchAssetIdFromContractIdAssetLookupMap(ctx contractapi
 }
 
 type AssetExchangeAgreement struct {
-	Type      string `json:"type"`
+	AssetType      string `json:"type"`
 	Id        string `json:"id"`
 	Locker    string `json:"locker"`
 	Recipient string `json:"recipient"`
@@ -251,7 +251,7 @@ func (s *SmartContract) ValidateAndExtractAssetAgreement(assetAgreementSerialize
 		return &assetAgreementJson, logThenErrorf(err.Error())
 	}
 
-	assetAgreementJson.Type = assetAgreement.Type
+	assetAgreementJson.AssetType = assetAgreement.AssetType
 	assetAgreementJson.Id = assetAgreement.Id
 	assetAgreementJson.Locker = assetAgreement.Locker
 	assetAgreementJson.Recipient = assetAgreement.Recipient
@@ -260,7 +260,7 @@ func (s *SmartContract) ValidateAndExtractAssetAgreement(assetAgreementSerialize
 }
 
 type FungibleAssetExchangeAgreement struct {
-	Type      string `json:"type"`
+	AssetType      string `json:"type"`
 	NumUnits  uint64 `json:"numUnits"`
 	Locker    string `json:"locker"`
 	Recipient string `json:"recipient"`
@@ -282,7 +282,7 @@ func (s *SmartContract) ValidateAndExtractFungibleAssetAgreement(fungibleAssetEx
 		return &assetAgreementJson, logThenErrorf(err.Error())
 	}
 
-	assetAgreementJson.Type = assetAgreement.Type
+	assetAgreementJson.AssetType = assetAgreement.AssetType
 	assetAgreementJson.NumUnits = assetAgreement.NumUnits
 	assetAgreementJson.Locker = assetAgreement.Locker
 	assetAgreementJson.Recipient = assetAgreement.Recipient

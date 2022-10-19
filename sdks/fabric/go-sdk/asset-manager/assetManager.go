@@ -34,7 +34,7 @@ func logThenErrorf(format string, args ...interface{}) error {
 // Create an asset exchange agreement structure
 func createAssetExchangeAgreementSerializedBase64(assetType string, assetId string, recipientECertBase64 string, lockerECertBase64 string) (string, error) {
 	assetAgreement := &common.AssetExchangeAgreement{
-		Type:      assetType,
+		AssetType: assetType,
 		Id:        assetId,
 		Recipient: recipientECertBase64,
 		Locker:    lockerECertBase64,
@@ -50,7 +50,7 @@ func createAssetExchangeAgreementSerializedBase64(assetType string, assetId stri
 // Create a fungible asset exchange agreement structure
 func createFungibleAssetExchangeAgreementSerializedBase64(assetType string, numUnits uint64, recipientECertBase64 string, lockerECertBase64 string) (string, error) {
 	assetAgreement := &common.FungibleAssetExchangeAgreement{
-		Type:      assetType,
+		AssetType: assetType,
 		NumUnits:  numUnits,
 		Recipient: recipientECertBase64,
 		Locker:    lockerECertBase64,
@@ -68,7 +68,7 @@ func createAssetLockInfoSerializedBase64(hashBase64 string, expiryTimeSecs uint6
 	lockInfoHTLC := &common.AssetLockHTLC{
 		HashBase64:     []byte(hashBase64),
 		ExpiryTimeSecs: expiryTimeSecs,
-		TimeSpec:       common.AssetLockHTLC_EPOCH,
+		TimeSpec:       common.TimeSpec_EPOCH,
 	}
 	lockInfoHTLCBytes, err := proto.Marshal(lockInfoHTLC)
 	if err != nil {

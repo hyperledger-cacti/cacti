@@ -63,7 +63,7 @@ func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, a
 	if err != nil {
 		return "", err
 	}
-	err = s.BondAssetSpecificChecks(ctx, assetAgreement.Type, assetAgreement.Id, lockInfoSerializedProto64)
+	err = s.BondAssetSpecificChecks(ctx, assetAgreement.AssetType, assetAgreement.Id, lockInfoSerializedProto64)
 	if err != nil {
 		return "", logThenErrorf(err.Error())
 	}
@@ -74,7 +74,7 @@ func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, a
 	}
 
 	// write to the ledger the details needed at the time of unlock/claim
-	err = s.ContractIdAssetsLookupMap(ctx, assetAgreement.Type, assetAgreement.Id, contractId)
+	err = s.ContractIdAssetsLookupMap(ctx, assetAgreement.AssetType, assetAgreement.Id, contractId)
 	if err != nil {
 		return "", logThenErrorf(err.Error())
 	}
@@ -110,12 +110,12 @@ func (s *SmartContract) LockFungibleAsset(ctx contractapi.TransactionContextInte
 	}
 
 	// Check if locker/transaction-creator has enough quantity of token assets to lock
-	lockerHasEnoughTokens, err := s.TokenAssetsExist(ctx, assetAgreement.Type, assetAgreement.NumUnits)
+	lockerHasEnoughTokens, err := s.TokenAssetsExist(ctx, assetAgreement.AssetType, assetAgreement.NumUnits)
 	if err != nil {
 		return "", logThenErrorf(err.Error())
 	}
 	if !lockerHasEnoughTokens {
-		return "", logThenErrorf("cannot lock token asset of type %s as there are not enough tokens", assetAgreement.Type)
+		return "", logThenErrorf("cannot lock token asset of type %s as there are not enough tokens", assetAgreement.AssetType)
 	}
 
 	contractId, err := assetexchange.LockFungibleAsset(ctx, "", fungibleAssetExchangeAgreementSerializedProto64, lockInfoSerializedProto64)
@@ -123,13 +123,13 @@ func (s *SmartContract) LockFungibleAsset(ctx contractapi.TransactionContextInte
 		return "", logThenErrorf(err.Error())
 	}
 
-	err = s.DeleteTokenAssets(ctx, assetAgreement.Type, assetAgreement.NumUnits)
+	err = s.DeleteTokenAssets(ctx, assetAgreement.AssetType, assetAgreement.NumUnits)
 	if err != nil {
 		// not performing the operation UnlockFungibleAsset and let the TxCreator take care of it
 		return contractId, logThenErrorf(err.Error())
 	}
 
-	err = s.ContractIdFungibleAssetsLookupMap(ctx, assetAgreement.Type, assetAgreement.NumUnits, contractId)
+	err = s.ContractIdFungibleAssetsLookupMap(ctx, assetAgreement.AssetType, assetAgreement.NumUnits, contractId)
 	if err != nil {
 		return "", logThenErrorf(err.Error())
 	}
@@ -170,7 +170,7 @@ func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, 
 		if err != nil {
 			return false, logThenErrorf(err.Error())
 		}
-		asset, err := s.ReadAsset(ctx, assetAgreement.Type, assetAgreement.Id, true)
+		asset, err := s.ReadAsset(ctx, assetAgreement.AssetType, assetAgreement.Id, true)
 		if err != nil {
 			return false, logThenErrorf(err.Error())
 		}
@@ -179,19 +179,19 @@ func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, 
 		if err != nil {
 			return false, logThenErrorf(err.Error())
 		}
-		err = ctx.GetStub().PutState(getBondAssetKey(assetAgreement.Type, assetAgreement.Id), assetJSON)
+		err = ctx.GetStub().PutState(getBondAssetKey(assetAgreement.AssetType, assetAgreement.Id), assetJSON)
 		if err != nil {
 			return false, logThenErrorf(err.Error())
 		}
 
-		err = s.DeleteAssetLookupMaps(ctx, assetAgreement.Type, assetAgreement.Id)
+		err = s.DeleteAssetLookupMaps(ctx, assetAgreement.AssetType, assetAgreement.Id)
 		if err != nil {
 			return false, logThenErrorf("failed to delete bond asset lookup maps: %+v", err)
 		}
 
 		return true, nil
 	} else {
-		return false, logThenErrorf("claim on bond asset type %s with asset id %s failed", assetAgreement.Type, assetAgreement.Id)
+		return false, logThenErrorf("claim on bond asset type %s with asset id %s failed", assetAgreement.AssetType, assetAgreement.Id)
 	}
 }
 
@@ -300,12 +300,12 @@ func (s *SmartContract) UnlockAsset(ctx contractapi.TransactionContextInterface,
 		unlocked = true
 	}
 	if unlocked {
-		err = s.DeleteAssetLookupMaps(ctx, assetAgreement.Type, assetAgreement.Id)
+		err = s.DeleteAssetLookupMaps(ctx, assetAgreement.AssetType, assetAgreement.Id)
 		if err != nil {
 			return false, logThenErrorf("failed to delete bond asset lookup maps: %+v", err)
 		}
 	} else {
-		return false, logThenErrorf("unlock on bond asset type %s with asset id %s failed", assetAgreement.Type, assetAgreement.Id)
+		return false, logThenErrorf("unlock on bond asset type %s with asset id %s failed", assetAgreement.AssetType, assetAgreement.Id)
 	}
 
 	return true, nil
