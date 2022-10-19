@@ -40,7 +40,7 @@ createChannelTx() {
 
 }
 
-createAncorPeerTx() {
+createAnchorPeerTx() {
     ORGMSPS=$1
     for orgmsp in $ORGMSPS ; do
         echo "#######    Generating anchor peer update for ${orgmsp}  ##########"
@@ -140,7 +140,7 @@ createChannelTx
 
 ## Create anchorpeertx
 echo "### Generating channel configuration transaction '${CHANNEL_NAME}.tx' ###"
-createAncorPeerTx "Org1MSP Org2MSP"
+createAnchorPeerTx "Org1MSP Org2MSP"
 
 FABRIC_CFG_PATH=$NW_PATH/config/
 echo "Fabric Config path for channel creation: "$FABRIC_CFG_PATH

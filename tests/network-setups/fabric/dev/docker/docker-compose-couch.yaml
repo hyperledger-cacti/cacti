@@ -10,7 +10,6 @@ networks:
 
 services:
   couchdb0:
-    profiles: ["1-node", "2-nodes"]
     container_name: couchdb0-${COMPOSE_PROJECT_NAME}
     image: hyperledger/fabric-couchdb
     # Populate the COUCHDB_USER and COUCHDB_PASSWORD to set an admin user and password
@@ -26,7 +25,6 @@ services:
       - net
 
   peer0.org1.${COMPOSE_PROJECT_NAME}.com:
-    profiles: ["1-node", "2-nodes"]
     environment:
       - CORE_LEDGER_STATE_STATEDATABASE=CouchDB-${COUCHDB0_PORT}
       - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0:${COUCHDB0_PORT}

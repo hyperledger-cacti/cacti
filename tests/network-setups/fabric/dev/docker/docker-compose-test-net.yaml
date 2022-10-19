@@ -49,7 +49,6 @@ services:
       - net
 
   peer0.org1.${COMPOSE_PROJECT_NAME}.com:
-    profiles: ["1-node", "2-nodes"]
     container_name: peer0.org1.${COMPOSE_PROJECT_NAME}.com
     image: hyperledger/fabric-peer:$IMAGE_TAG
     environment:

@@ -281,7 +281,6 @@ function createOrgs() {
 
   echo
   echo "Generate CCP files for Org1 and Org2 in $NW_CFG_PATH"
-  # echo "Generate CCP files for Org1 in $NW_CFG_PATH"
   $NW_CFG_PATH/ccp-generate.sh $NW_CFG_PATH
 }
 

@@ -10,7 +10,6 @@ networks:
 
 services:
   ca_org1:
-    profiles: ["1-node", "2-nodes"]
     image: hyperledger/fabric-ca:$IMAGE_TAG
     environment:
       - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
