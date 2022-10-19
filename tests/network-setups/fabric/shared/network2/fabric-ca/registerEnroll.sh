@@ -3,6 +3,7 @@
 function createOrg1 {
 
   NW_CFG_PATH="$1"
+  CA_PORT="$2"
   echo "NW_CFG_PATH = $NW_CFG_PATH"
 	echo "Enroll the CA admin"
   echo
@@ -13,22 +14,22 @@ function createOrg1 {
 #  rm -rf $FABRIC_CA_CLIENT_HOME/msp
 
   set -x
-  fabric-ca-client enroll -u https://admin:adminpw@localhost:5054 --caname ca.org1.network2.com --tls.certfiles $NW_CFG_PATH/fabric-ca/org1/tls-cert.pem
+  fabric-ca-client enroll -u https://admin:adminpw@localhost:${CA_PORT} --caname ca.org1.network2.com --tls.certfiles $NW_CFG_PATH/fabric-ca/org1/tls-cert.pem
   set +x
 
   echo 'NodeOUs:
   Enable: true
   ClientOUIdentifier:
-    Certificate: cacerts/localhost-5054-ca-org1-network2-com.pem
+    Certificate: cacerts/localhost-'${CA_PORT}'-ca-org1-network2-com.pem
     OrganizationalUnitIdentifier: client
   PeerOUIdentifier:
-    Certificate: cacerts/localhost-5054-ca-org1-network2-com.pem
+    Certificate: cacerts/localhost-'${CA_PORT}'-ca-org1-network2-com.pem
     OrganizationalUnitIdentifier: peer
   AdminOUIdentifier:
-    Certificate: cacerts/localhost-5054-ca-org1-network2-com.pem
+    Certificate: cacerts/localhost-'${CA_PORT}'-ca-org1-network2-com.pem
     OrganizationalUnitIdentifier: admin
   OrdererOUIdentifier:
-    Certificate: cacerts/localhost-5054-ca-org1-network2-com.pem
+    Certificate: cacerts/localhost-'${CA_PORT}'-ca-org1-network2-com.pem
     OrganizationalUnitIdentifier: orderer' > $NW_CFG_PATH/peerOrganizations/org1.network2.com/msp/config.yaml
 
   echo
@@ -59,7 +60,7 @@ function createOrg1 {
   echo "## Generate the peer0 msp"
   echo
   set -x
-	fabric-ca-client enroll -u https://peer0:peer0pw@localhost:5054 --caname ca.org1.network2.com -M $NW_CFG_PATH/peerOrganizations/org1.network2.com/peers/peer0.org1.network2.com/msp --csr.hosts peer0.org1.network2.com --tls.certfiles $NW_CFG_PATH/fabric-ca/org1/tls-cert.pem
+	fabric-ca-client enroll -u https://peer0:peer0pw@localhost:${CA_PORT} --caname ca.org1.network2.com -M $NW_CFG_PATH/peerOrganizations/org1.network2.com/peers/peer0.org1.network2.com/msp --csr.hosts peer0.org1.network2.com --tls.certfiles $NW_CFG_PATH/fabric-ca/org1/tls-cert.pem
   set +x
 
   cp $NW_CFG_PATH/peerOrganizations/org1.network2.com/msp/config.yaml $NW_CFG_PATH/peerOrganizations/org1.network2.com/peers/peer0.org1.network2.com/msp/config.yaml
@@ -68,7 +69,7 @@ function createOrg1 {
   echo "## Generate the peer0-tls certificates"
   echo
   set -x
-  fabric-ca-client enroll -u https://peer0:peer0pw@localhost:5054 --caname ca.org1.network2.com -M $NW_CFG_PATH/peerOrganizations/org1.network2.com/peers/peer0.org1.network2.com/tls --enrollment.profile tls --csr.hosts peer0.org1.network2.com --csr.hosts localhost --tls.certfiles $NW_CFG_PATH/fabric-ca/org1/tls-cert.pem
+  fabric-ca-client enroll -u https://peer0:peer0pw@localhost:${CA_PORT} --caname ca.org1.network2.com -M $NW_CFG_PATH/peerOrganizations/org1.network2.com/peers/peer0.org1.network2.com/tls --enrollment.profile tls --csr.hosts peer0.org1.network2.com --csr.hosts localhost --tls.certfiles $NW_CFG_PATH/fabric-ca/org1/tls-cert.pem
   set +x
 
 
@@ -92,7 +93,7 @@ function createOrg1 {
   echo "## Generate the user msp"
   echo
   set -x
-	fabric-ca-client enroll -u https://user1:user1pw@localhost:5054 --caname ca.org1.network2.com -M $NW_CFG_PATH/peerOrganizations/org1.network2.com/users/User1@org1.network2.com/msp --tls.certfiles $NW_CFG_PATH/fabric-ca/org1/tls-cert.pem
+	fabric-ca-client enroll -u https://user1:user1pw@localhost:${CA_PORT} --caname ca.org1.network2.com -M $NW_CFG_PATH/peerOrganizations/org1.network2.com/users/User1@org1.network2.com/msp --tls.certfiles $NW_CFG_PATH/fabric-ca/org1/tls-cert.pem
   set +x
 
   mkdir -p $NW_CFG_PATH/peerOrganizations/org1.network2.com/users/Admin@org1.network2.com
@@ -101,7 +102,7 @@ function createOrg1 {
   echo "## Generate the org admin msp"
   echo
   set -x
-	fabric-ca-client enroll -u https://org1admin:org1adminpw@localhost:5054 --caname ca.org1.network2.com -M $NW_CFG_PATH/peerOrganizations/org1.network2.com/users/Admin@org1.network2.com/msp --tls.certfiles $NW_CFG_PATH/fabric-ca/org1/tls-cert.pem
+	fabric-ca-client enroll -u https://org1admin:org1adminpw@localhost:${CA_PORT} --caname ca.org1.network2.com -M $NW_CFG_PATH/peerOrganizations/org1.network2.com/users/Admin@org1.network2.com/msp --tls.certfiles $NW_CFG_PATH/fabric-ca/org1/tls-cert.pem
   set +x
 
   cp $NW_CFG_PATH/peerOrganizations/org1.network2.com/msp/config.yaml $NW_CFG_PATH/peerOrganizations/org1.network2.com/users/Admin@org1.network2.com/msp/config.yaml
@@ -112,6 +113,7 @@ function createOrg1 {
 function createOrg2 {
 
   NW_CFG_PATH="$1"
+  CA_PORT="$2"
   echo "NW_CFG_PATH = $NW_CFG_PATH"
 	echo "Enroll the CA admin"
   echo
@@ -122,22 +124,22 @@ function createOrg2 {
 #  rm -rf $FABRIC_CA_CLIENT_HOME/msp
 
   set -x
-  fabric-ca-client enroll -u https://admin:adminpw@localhost:5054 --caname ca.org2.network2.com --tls.certfiles $NW_CFG_PATH/fabric-ca/org2/tls-cert.pem
+  fabric-ca-client enroll -u https://admin:adminpw@localhost:${CA_PORT} --caname ca.org2.network2.com --tls.certfiles $NW_CFG_PATH/fabric-ca/org2/tls-cert.pem
   set +x
 
   echo 'NodeOUs:
   Enable: true
   ClientOUIdentifier:
-    Certificate: cacerts/localhost-5054-ca-org2-network2-com.pem
+    Certificate: cacerts/localhost-'${CA_PORT}'-ca-org2-network2-com.pem
     OrganizationalUnitIdentifier: client
   PeerOUIdentifier:
-    Certificate: cacerts/localhost-5054-ca-org2-network2-com.pem
+    Certificate: cacerts/localhost-'${CA_PORT}'-ca-org2-network2-com.pem
     OrganizationalUnitIdentifier: peer
   AdminOUIdentifier:
-    Certificate: cacerts/localhost-5054-ca-org2-network2-com.pem
+    Certificate: cacerts/localhost-'${CA_PORT}'-ca-org2-network2-com.pem
     OrganizationalUnitIdentifier: admin
   OrdererOUIdentifier:
-    Certificate: cacerts/localhost-5054-ca-org2-network2-com.pem
+    Certificate: cacerts/localhost-'${CA_PORT}'-ca-org2-network2-com.pem
     OrganizationalUnitIdentifier: orderer' > $NW_CFG_PATH/peerOrganizations/org2.network2.com/msp/config.yaml
 
   echo
@@ -168,7 +170,7 @@ function createOrg2 {
   echo "## Generate the peer0 msp"
   echo
   set -x
-	fabric-ca-client enroll -u https://peer0:peer0pw@localhost:5054 --caname ca.org2.network2.com -M $NW_CFG_PATH/peerOrganizations/org2.network2.com/peers/peer0.org2.network2.com/msp --csr.hosts peer0.org2.network2.com --tls.certfiles $NW_CFG_PATH/fabric-ca/org2/tls-cert.pem
+	fabric-ca-client enroll -u https://peer0:peer0pw@localhost:${CA_PORT} --caname ca.org2.network2.com -M $NW_CFG_PATH/peerOrganizations/org2.network2.com/peers/peer0.org2.network2.com/msp --csr.hosts peer0.org2.network2.com --tls.certfiles $NW_CFG_PATH/fabric-ca/org2/tls-cert.pem
   set +x
 
   cp $NW_CFG_PATH/peerOrganizations/org2.network2.com/msp/config.yaml $NW_CFG_PATH/peerOrganizations/org2.network2.com/peers/peer0.org2.network2.com/msp/config.yaml
@@ -177,7 +179,7 @@ function createOrg2 {
   echo "## Generate the peer0-tls certificates"
   echo
   set -x
-  fabric-ca-client enroll -u https://peer0:peer0pw@localhost:5054 --caname ca.org2.network2.com -M $NW_CFG_PATH/peerOrganizations/org2.network2.com/peers/peer0.org2.network2.com/tls --enrollment.profile tls --csr.hosts peer0.org2.network2.com --csr.hosts localhost --tls.certfiles $NW_CFG_PATH/fabric-ca/org2/tls-cert.pem
+  fabric-ca-client enroll -u https://peer0:peer0pw@localhost:${CA_PORT} --caname ca.org2.network2.com -M $NW_CFG_PATH/peerOrganizations/org2.network2.com/peers/peer0.org2.network2.com/tls --enrollment.profile tls --csr.hosts peer0.org2.network2.com --csr.hosts localhost --tls.certfiles $NW_CFG_PATH/fabric-ca/org2/tls-cert.pem
   set +x
 
 
@@ -201,7 +203,7 @@ function createOrg2 {
   echo "## Generate the user msp"
   echo
   set -x
-	fabric-ca-client enroll -u https://user1:user1pw@localhost:5054 --caname ca.org2.network2.com -M $NW_CFG_PATH/peerOrganizations/org2.network2.com/users/User1@org2.network2.com/msp --tls.certfiles $NW_CFG_PATH/fabric-ca/org2/tls-cert.pem
+	fabric-ca-client enroll -u https://user1:user1pw@localhost:${CA_PORT} --caname ca.org2.network2.com -M $NW_CFG_PATH/peerOrganizations/org2.network2.com/users/User1@org2.network2.com/msp --tls.certfiles $NW_CFG_PATH/fabric-ca/org2/tls-cert.pem
   set +x
 
   mkdir -p $NW_CFG_PATH/peerOrganizations/org2.network2.com/users/Admin@org2.network2.com
@@ -210,7 +212,7 @@ function createOrg2 {
   echo "## Generate the org admin msp"
   echo
   set -x
-	fabric-ca-client enroll -u https://org2admin:org2adminpw@localhost:5054 --caname ca.org2.network2.com -M $NW_CFG_PATH/peerOrganizations/org2.network2.com/users/Admin@org2.network2.com/msp --tls.certfiles $NW_CFG_PATH/fabric-ca/org2/tls-cert.pem
+	fabric-ca-client enroll -u https://org2admin:org2adminpw@localhost:${CA_PORT} --caname ca.org2.network2.com -M $NW_CFG_PATH/peerOrganizations/org2.network2.com/users/Admin@org2.network2.com/msp --tls.certfiles $NW_CFG_PATH/fabric-ca/org2/tls-cert.pem
   set +x
 
   cp $NW_CFG_PATH/peerOrganizations/org2.network2.com/msp/config.yaml $NW_CFG_PATH/peerOrganizations/org2.network2.com/users/Admin@org2.network2.com/msp/config.yaml
