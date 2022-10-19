@@ -71,7 +71,7 @@ jobs:
   
       # FABRIC NETWORK
       - name: Start Fabric Network
-        run: make start-interop CHAINCODE_NAME=simpleassettransfer
+        run: make start-interop CHAINCODE_NAME=simpleassettransfer PROFILE="2-nodes"
         working-directory: tests/network-setups/fabric/dev
   
       # - name: Corda Network logs

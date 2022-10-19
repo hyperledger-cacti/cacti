@@ -71,7 +71,7 @@ jobs:
       
       # FABRIC NETWORK
       - name: Start Fabric Network
-        run: make start-interop
+        run: make start-interop PROFILE="2-nodes"
         working-directory: tests/network-setups/fabric/dev
         
       - name: Corda Network logs
