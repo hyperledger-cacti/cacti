@@ -391,7 +391,7 @@ function createChannel() {
   # more to create the channel creation transaction and the anchor peer updates.
   # configtx.yaml is mounted in the cli container, which allows us to use it to
   # create the channel artifacts
-  echo "calling createChannel.sh ORDERER_PORT PEER_ORG1_PORT : $ORDERER_PORT $PEER_ORG1_PORT"
+  echo "calling createChannel.sh ORDERER_PORT PEER_ORG1_PORT PEER_ORG2_PORT: $ORDERER_PORT $PEER_ORG1_PORT $PEER_ORG2_PORT"
   scripts/createChannel.sh $CHANNEL_NAME $CLI_DELAY $MAX_RETRY $VERBOSE $NW_CFG_PATH $ORDERER_PORT $PEER_ORG1_PORT $PEER_ORG2_PORT $COMPOSE_PROJECT_NAME
   if [ $? -ne 0 ]; then
     echo "Error !!! Create channel failed"
