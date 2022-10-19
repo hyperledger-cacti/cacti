@@ -27,9 +27,10 @@ if [ ! -d "$NW_PATH/channel-artifacts" ]; then
 fi
 
 createChannelTx() {
-    echo "Generating channel-artifacts at : $NW_PATH/channel-artifacts"
+    CHANNEL_PROFILE=$1
+    echo "Generating channel-artifacts at : $NW_PATH/channel-artifacts: $CHANNEL_PROFILE"
     set -x
-    configtxgen -profile TwoOrgsChannel -outputCreateChannelTx $NW_PATH/channel-artifacts/${CHANNEL_NAME}.tx -channelID $CHANNEL_NAME
+    configtxgen -profile $CHANNEL_PROFILE -outputCreateChannelTx $NW_PATH/channel-artifacts/${CHANNEL_NAME}.tx -channelID $CHANNEL_NAME
     res=$?
     set +x
     if [ $res -ne 0 ]; then
@@ -42,10 +43,11 @@ createChannelTx() {
 
 createAncorPeerTx() {
     ORGMSPS=$1
+    CHANNEL_PROFILE=$2
     for orgmsp in $ORGMSPS ; do
         echo "#######    Generating anchor peer update for ${orgmsp}  ##########"
         set -x
-        configtxgen -profile TwoOrgsChannel -outputAnchorPeersUpdate $NW_PATH/channel-artifacts/${orgmsp}anchors.tx -channelID $CHANNEL_NAME -asOrg ${orgmsp}
+        configtxgen -profile $CHANNEL_PROFILE -outputAnchorPeersUpdate $NW_PATH/channel-artifacts/${orgmsp}anchors.tx -channelID $CHANNEL_NAME -asOrg ${orgmsp}
         res=$?
         set +x
         if [ $res -ne 0 ]; then
@@ -136,11 +138,19 @@ echo "Fabric Config path :"$FABRIC_CFG_PATH
 
 ## Create channeltx
 echo "### Generating channel configuration transaction '${CHANNEL_NAME}.tx' ###"
-createChannelTx
+if [ "$PROFILE" = "2-nodes" ]; then
+    createChannelTx "TwoOrgsChannel"
+else
+    createChannelTx "OneOrgChannel"
+fi 
 
 ## Create anchorpeertx
 echo "### Generating channel configuration transaction '${CHANNEL_NAME}.tx' ###"
-createAncorPeerTx "Org1MSP Org2MSP"
+if [ "$PROFILE" = "2-nodes" ]; then
+    createAncorPeerTx "Org1MSP Org2MSP" "TwoOrgsChannel"
+else
+    createAncorPeerTx "Org1MSP" "OneOrgChannel"
+fi
 
 FABRIC_CFG_PATH=$NW_PATH/config/
 echo "Fabric Config path for channel creation: "$FABRIC_CFG_PATH
