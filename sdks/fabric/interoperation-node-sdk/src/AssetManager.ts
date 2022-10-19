@@ -23,7 +23,7 @@ const logger = log4js.getLogger("InteroperableHelper");
 function createAssetExchangeAgreementSerialized(assetType, assetID, recipientECert, lockerECert)
 {
     const assetExchangeAgreement = new assetLocksPb.AssetExchangeAgreement();
-    assetExchangeAgreement.setType(assetType);
+    assetExchangeAgreement.setAssetType(assetType);
     assetExchangeAgreement.setId(assetID);
     assetExchangeAgreement.setRecipient(recipientECert);
     assetExchangeAgreement.setLocker(lockerECert);
@@ -34,7 +34,7 @@ function createAssetExchangeAgreementSerialized(assetType, assetID, recipientECe
 function createFungibleAssetExchangeAgreementSerialized(assetType, numUnits, recipientECert, lockerECert)
 {
     const assetExchangeAgreement = new assetLocksPb.FungibleAssetExchangeAgreement();
-    assetExchangeAgreement.setType(assetType);
+    assetExchangeAgreement.setAssetType(assetType);
     assetExchangeAgreement.setNumunits(numUnits);
     assetExchangeAgreement.setRecipient(recipientECert);
     assetExchangeAgreement.setLocker(lockerECert);
