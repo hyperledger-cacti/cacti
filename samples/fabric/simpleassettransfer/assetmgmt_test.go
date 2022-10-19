@@ -122,7 +122,7 @@ func TestExchangeBondAssetWithTokenAsset(t *testing.T) {
 	lockInfoHTLC := &common.AssetLockHTLC {
 		HashBase64: []byte(hashBase64),
 		ExpiryTimeSecs: currentTimeSecs + defaultTimeLockSecs,
-		TimeSpec: common.AssetLockHTLC_EPOCH,
+		TimeSpec: common.TimeSpec_EPOCH,
 	}
 	lockInfoHTLCBytes, _ := proto.Marshal(lockInfoHTLC)
 	lockInfo := &common.AssetLock{
@@ -130,7 +130,7 @@ func TestExchangeBondAssetWithTokenAsset(t *testing.T) {
 	}
 	lockInfoBytes, _ := proto.Marshal(lockInfo)
 	bondAgreement := &common.AssetExchangeAgreement {
-		Type: bondType,
+		AssetType: bondType,
 		Id: bondId,
 		Locker: bondLocker,
 		Recipient: bondRecipient,
@@ -158,7 +158,7 @@ func TestExchangeBondAssetWithTokenAsset(t *testing.T) {
 	fmt.Println("*** Lock token asset in network2 by Bob ***")
 	tokensContractId := "tokens-contract"
 	tokensAgreement := &common.FungibleAssetExchangeAgreement {
-		Type: tokenType,
+		AssetType: tokenType,
 		NumUnits: numTokens,
 		Locker: tokensLocker,
 		Recipient: tokensRecipient,
