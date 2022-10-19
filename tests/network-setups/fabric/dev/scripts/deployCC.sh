@@ -25,6 +25,11 @@ PROFILE="${14}"
 CC_SRC_LANGUAGE=`echo "$CC_SRC_LANGUAGE" | tr [:upper:] [:lower:]`
 CC_CHAIN_CODE=`echo "$CC_CHAIN_CODE" | tr [:upper:] [:lower:]`
 
+CC_END_POLICY=""
+if [ "$PROFILE" = "2-nodes" ]; then
+	CC_END_POLICY="--signature-policy \"AND('Org1MSP.member', 'Org2MSP.member')\""
+fi
+
 echo " - CHANNEL_NAME           :      ${CHANNEL_NAME}"
 echo " - CC_SRC_LANGUAGE        :      ${CC_SRC_LANGUAGE}"
 echo " - DELAY                  :      ${DELAY}"
@@ -181,7 +186,7 @@ checkCommitReadiness() {
 	    sleep $DELAY
 	    echo "Attempting to check the commit readiness of the chaincode definition on peer0.org${ORG} secs"
 	    set -x
-	    peer lifecycle chaincode checkcommitreadiness --channelID $CHANNEL_NAME --name $CC_CHAIN_CODE --version ${VERSION} --sequence ${VERSION} --output json --init-required >&log.txt
+	    peer lifecycle chaincode checkcommitreadiness --channelID $CHANNEL_NAME --name $CC_CHAIN_CODE --version ${VERSION} --sequence ${VERSION} --output json --init-required $CC_END_POLICY >&log.txt
 	    res=$?
 	    set +x
 	    let rc=0
@@ -219,7 +224,7 @@ commitChaincodeDefinition() {
     #echo "Peer pram: "$PEER_CONN_PARMS
     #setGlobals $ORG $P_ADDR
 	set -x
-	peer lifecycle chaincode commit -o localhost:${ORD_P} --ordererTLSHostnameOverride orderer.$NW_NAME.com --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA --channelID $CHANNEL_NAME --name $CC_CHAIN_CODE $PEER_CONN_PARMS --version ${VERSION} --sequence ${VERSION} --init-required >&log.txt
+	peer lifecycle chaincode commit -o localhost:${ORD_P} --ordererTLSHostnameOverride orderer.$NW_NAME.com --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA --channelID $CHANNEL_NAME --name $CC_CHAIN_CODE $PEER_CONN_PARMS --version ${VERSION} --sequence ${VERSION} --init-required $CC_END_POLICY >&log.txt
 	res=$?
 	set +x
 	cat log.txt

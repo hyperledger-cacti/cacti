@@ -6,7 +6,7 @@
       "policy": {
         "type": "Signature",
         "criteria": [
-          "Org1MSP","Org2MSP"
+          "Org1MSP"
         ]
       }
     },
@@ -15,7 +15,7 @@
       "policy": {
         "type": "Signature",
         "criteria": [
-          "Org1MSP","Org2MSP"
+          "Org1MSP"
         ]
       }
     },
@@ -24,7 +24,7 @@
       "policy": {
         "type": "Signature",
         "criteria": [
-          "Org1MSP","Org2MSP"
+          "Org1MSP"
         ]
       }
     },
@@ -33,7 +33,7 @@
       "policy": {
         "type": "Signature",
         "criteria": [
-          "Org1MSP","Org2MSP"
+          "Org1MSP"
         ]
       }
     },
@@ -42,7 +42,7 @@
       "policy": {
         "type": "Signature",
         "criteria": [
-          "Org1MSP","Org2MSP"
+          "Org1MSP"
         ]
       }
     }
