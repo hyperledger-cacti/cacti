@@ -27,7 +27,7 @@ CC_CHAIN_CODE=`echo "$CC_CHAIN_CODE" | tr [:upper:] [:lower:]`
 
 CC_END_POLICY=""
 if [ "$PROFILE" = "2-nodes" ]; then
-	CC_END_POLICY="--signature-policy AND('Org1MSP.member', 'Org2MSP.member')"
+	CC_END_POLICY="--signature-policy AND('Org1MSP.member','Org2MSP.member')"
 fi
 
 echo " - CHANNEL_NAME           :      ${CHANNEL_NAME}"
@@ -156,7 +156,7 @@ approveForMyOrg() {
     #echo "ORDERER_PORT = $ORDERER_PORT"
 	setGlobals $ORG $P_ADDR $NW_NAME
 	set -x
-	peer lifecycle chaincode approveformyorg -o localhost:${ORD_P} --ordererTLSHostnameOverride orderer.$NW_NAME.com --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA --channelID $CHANNEL_NAME --name $CC_CHAIN_CODE --version ${VERSION} --init-required --package-id ${PACKAGE_ID} --sequence ${VERSION} >&log.txt
+	peer lifecycle chaincode approveformyorg -o localhost:${ORD_P} --ordererTLSHostnameOverride orderer.$NW_NAME.com --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA --channelID $CHANNEL_NAME --name $CC_CHAIN_CODE --version ${VERSION} --init-required $CC_END_POLICY --package-id ${PACKAGE_ID} --sequence ${VERSION} >&log.txt
 	set +x
 	cat log.txt
 	verifyResult $res "Chaincode definition approved on peer0.org${ORG} on channel '$CHANNEL_NAME' failed"
