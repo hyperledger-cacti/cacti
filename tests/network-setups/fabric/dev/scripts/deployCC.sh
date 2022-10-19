@@ -379,9 +379,9 @@ fi
 
 ## now that we know for sure both orgs have approved, commit the definition
 if [ "$PROFILE" = "2-nodes" ]; then
-    commitChaincodeDefinition 1 2
-else
     commitChaincodeDefinition 1 $ORG1_P $NW_NAME 2 $ORG2_P $NW_NAME
+else
+    commitChaincodeDefinition 1 $ORG1_P $NW_NAME
 fi
 
 ## query on both orgs to see that the definition committed successfully
@@ -392,9 +392,9 @@ fi
 
 ## Invoke the chaincode
 if [ "$PROFILE" = "2-nodes" ]; then
-    chaincodeInvokeInit 1 $ORG1_P $NW_NAME
-else
     chaincodeInvokeInit 1 $ORG1_P $NW_NAME 2 $ORG2_P $NW_NAME
+else
+    chaincodeInvokeInit 1 $ORG1_P $NW_NAME
 fi
 
 # Query chaincode on peer0.org1
