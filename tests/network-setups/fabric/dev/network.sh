@@ -263,13 +263,13 @@ function createOrgs() {
     echo "############ Create Org1 Identities ######################"
     echo "##########################################################"
 
-    createOrg1 $NW_CFG_PATH $PEER_ORG1_PORT
+    createOrg1 $NW_CFG_PATH $CA_ORG1_PORT
 
     echo "##########################################################"
     echo "############ Create Org2 Identities ######################"
     echo "##########################################################"
 
-    createOrg2 $NW_CFG_PATH $PEER_ORG2_PORT
+    createOrg2 $NW_CFG_PATH $CA_ORG2_PORT
 
     echo "##########################################################"
     echo "############ Create Orderer Org Identities ###############"

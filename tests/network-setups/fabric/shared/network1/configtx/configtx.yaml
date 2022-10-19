@@ -315,8 +315,7 @@ Profiles:
             <<: *OrdererDefaults
             Organizations:
                 - *OrdererOrg
-            Capabilities:
-                <<: *OrdererCapabilities
+            Capabilities: *OrdererCapabilities
         Consortiums:
             SampleConsortium:
                 Organizations:
@@ -328,8 +327,7 @@ Profiles:
             <<: *ApplicationDefaults
             Organizations:
                 - *Org1
-            Capabilities:
-                <<: *ApplicationCapabilities
+            Capabilities: *ApplicationCapabilities
 
     TwoOrgsOrdererGenesis:
         <<: *ChannelDefaults
@@ -337,8 +335,7 @@ Profiles:
             <<: *OrdererDefaults
             Organizations:
                 - *OrdererOrg
-            Capabilities:
-                <<: *OrdererCapabilities
+            Capabilities: *OrdererCapabilities
         Consortiums:
             SampleConsortium:
                 Organizations:
@@ -352,5 +349,4 @@ Profiles:
             Organizations:
                 - *Org1
                 - *Org2
-            Capabilities:
-                <<: *ApplicationCapabilities
+            Capabilities: *ApplicationCapabilities

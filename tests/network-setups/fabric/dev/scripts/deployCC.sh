@@ -9,7 +9,7 @@ VERBOSE="$6"
 CC_CHAIN_CODE="$7"
 NW_PATH="$8"
 ORG1_P="$9"
-ORG2_P="$10"
+ORG2_P="${10}"
 ORD_P=${11}
 APP_R=${12}
 NW_NAME=${13}
@@ -189,7 +189,7 @@ checkCommitReadiness() {
 			grep "$var" log.txt &>/dev/null || let rc=1
 	    done
         COUNTER=$(expr $COUNTER + 1)
-    #done
+    done
 	cat log.txt
 	if test $res -eq 0; then
     	echo "===================== Checking the commit readiness of the chaincode definition successful on peer0.org${ORG} on channel '$CHANNEL_NAME' ===================== "
@@ -365,8 +365,8 @@ approveForMyOrg 2 $ORG2_P $ORD_PORT $NW_NAME
 
 ## check whether the chaincode definition is ready to be committed
 ## expect them both to have approved
-checkCommitReadiness 1 $ORG1_P "\"Org1MSP\": true" "\"Org2MSP\": true"
-checkCommitReadiness 2 $ORG2_P "\"Org1MSP\": true" "\"Org2MSP\": true"
+checkCommitReadiness 1 $ORG1_P $NW_NAME "\"Org1MSP\": true" "\"Org2MSP\": true"
+checkCommitReadiness 2 $ORG2_P $NW_NAME "\"Org1MSP\": true" "\"Org2MSP\": true"
 
 ## now that we know for sure both orgs have approved, commit the definition
 #commitChaincodeDefinition 1 2
