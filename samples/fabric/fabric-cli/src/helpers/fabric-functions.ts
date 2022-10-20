@@ -129,7 +129,7 @@ const walletSetup = async (
       logger.info(`Wallet Setup: Sucessful ${secret}`)
     } catch(error) {
       const registeredUser = `Identity '${userName}' is already `
-      if (!(error.message.includes("Identity ") && error.message.includes(userName) && error.message.includes(" is already registered"))) {
+      if (!userPwd || !(error.message.includes("Identity ") && error.message.includes(userName) && error.message.includes(" is already registered"))) {
         throw new Error(`user ${userName} registration with Fabric CA failed with error: ${error}`)
       } else {
         try {
@@ -139,7 +139,7 @@ const walletSetup = async (
           })
           enrollmentDone = true
         } catch (error) {
-          throw new Error(`user ${userName} registration with Fabric CA failed with error: ${error}`)
+          throw new Error(`user ${userName} registration/enrollment with Fabric CA failed with error: ${error}`)
         }
       }
     }

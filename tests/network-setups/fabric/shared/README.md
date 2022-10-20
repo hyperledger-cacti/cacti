@@ -13,7 +13,11 @@ All paths in following steps are relative to this folder (`tests/network-setups/
     ```
     make delete-artifacts
     ```
-2. Run `make start-interop`. This will re-generate all crypto materials and artifacts.
+2. Run:
+    ```
+    make start-interop PROFILE="2-nodes"
+    ```
+   This will re-generate all crypto materials and artifacts.
 3. To generate ccp file for docker, run:
     ```
     make docker-ccp

@@ -25,6 +25,23 @@ services:
     networks:
       - net
 
+  ca_org2:
+    profiles: ["2-nodes"]
+    image: hyperledger/fabric-ca:$IMAGE_TAG
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca.org2.${COMPOSE_PROJECT_NAME}.com
+      - FABRIC_CA_SERVER_TLS_ENABLED=true
+      - FABRIC_CA_SERVER_PORT=$CA_ORG2_PORT
+    ports:
+      - "${CA_ORG2_PORT}:${CA_ORG2_PORT}"
+    command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
+    volumes:
+      - ${NW_CFG_PATH}/fabric-ca/org2:/etc/hyperledger/fabric-ca-server
+    container_name: ca.org2.${COMPOSE_PROJECT_NAME}.com
+    networks:
+      - net
+
   ca_orderer:
     image: hyperledger/fabric-ca:$IMAGE_TAG
     environment:

@@ -1,5 +1,5 @@
 {
-    "name": "test-network-org1",
+    "name": "test-network2-org1",
     "version": "1.0.0",
     "client": {
         "organization": "Org1",
@@ -26,7 +26,7 @@
         "peer0.org1.network2.com": {
             "url": "grpcs://peer0.org1.network2.com:9051",
             "tlsCACerts": {
-                "pem": "-----BEGIN CERTIFICATE-----\nMIICFzCCAb2gAwIBAgIUajWU/EzwkVocqYksNXUdm04WvCswCgYIKoZIzj0EAwIw\naDELMAkGA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMRQwEgYDVQQK\nEwtIeXBlcmxlZGdlcjEPMA0GA1UECxMGRmFicmljMRkwFwYDVQQDExBmYWJyaWMt\nY2Etc2VydmVyMB4XDTIyMDgwNDE4MjQwMFoXDTM3MDczMTE4MjQwMFowaDELMAkG\nA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMRQwEgYDVQQKEwtIeXBl\ncmxlZGdlcjEPMA0GA1UECxMGRmFicmljMRkwFwYDVQQDExBmYWJyaWMtY2Etc2Vy\ndmVyMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE5is5AaAg+nbhzGDEQG+liqNH\nhl876WuMbeT8k6dRNAsBpIwpxRWlg9iNrnvlkkhCBjb9AUyczQ7+BY1+NfUYlKNF\nMEMwDgYDVR0PAQH/BAQDAgEGMBIGA1UdEwEB/wQIMAYBAf8CAQEwHQYDVR0OBBYE\nFOE41wEfBgHf+cfjQzayE/Q8pm2bMAoGCCqGSM49BAMCA0gAMEUCIQCDmJzZfO1n\nVX5eMdDkDDtDz+eAXhPsu7upJW0ukhxkTAIgJceBfxJYwM1Tof1ADInIY+M+U8y+\nTL2JfaeZkJJz42E=\n-----END CERTIFICATE-----\n"
+                "pem": "-----BEGIN CERTIFICATE-----\nMIICKzCCAdGgAwIBAgIUXg/fVunJl8SFe4GVGbiZZAxkNwQwCgYIKoZIzj0EAwIw\ncjELMAkGA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMRowGAYDVQQK\nExFvcmcxLm5ldHdvcmsyLmNvbTEPMA0GA1UECxMGRmFicmljMR0wGwYDVQQDExRj\nYS5vcmcxLm5ldHdvcmsyLmNvbTAeFw0yMjEwMTkwOTQ4MDBaFw0zNzEwMTUwOTQ4\nMDBaMHIxCzAJBgNVBAYTAlVTMRcwFQYDVQQIEw5Ob3J0aCBDYXJvbGluYTEaMBgG\nA1UEChMRb3JnMS5uZXR3b3JrMi5jb20xDzANBgNVBAsTBkZhYnJpYzEdMBsGA1UE\nAxMUY2Eub3JnMS5uZXR3b3JrMi5jb20wWTATBgcqhkjOPQIBBggqhkjOPQMBBwNC\nAAT2cU6d53SwJMEjOSgBQskzgZJzGbupswxpgQ0josScbFrwOymIMubaWYFBhy6F\nd5iZAh3Ougger9CY8lNs2sMio0UwQzAOBgNVHQ8BAf8EBAMCAQYwEgYDVR0TAQH/\nBAgwBgEB/wIBATAdBgNVHQ4EFgQU2tgfD9z/+OwPX7ACHLLe78JK2ZcwCgYIKoZI\nzj0EAwIDSAAwRQIhANOckgRPcmYBumf5SkPovMfV6ZRerEPJ5TZ3M6DRlDZoAiAO\neUv4Ri1zjWx+gn3Ylq3nzZDZh1gpohdmiMxbmNLJaA==\n-----END CERTIFICATE-----\n"
             },
             "grpcOptions": {
                 "ssl-target-name-override": "peer0.org1.network2.com",
@@ -39,7 +39,7 @@
             "url": "https://ca.org1.network2.com:5054",
             "caName": "ca-org1",
             "tlsCACerts": {
-                "pem": "-----BEGIN CERTIFICATE-----\nMIICFzCCAb2gAwIBAgIUajWU/EzwkVocqYksNXUdm04WvCswCgYIKoZIzj0EAwIw\naDELMAkGA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMRQwEgYDVQQK\nEwtIeXBlcmxlZGdlcjEPMA0GA1UECxMGRmFicmljMRkwFwYDVQQDExBmYWJyaWMt\nY2Etc2VydmVyMB4XDTIyMDgwNDE4MjQwMFoXDTM3MDczMTE4MjQwMFowaDELMAkG\nA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMRQwEgYDVQQKEwtIeXBl\ncmxlZGdlcjEPMA0GA1UECxMGRmFicmljMRkwFwYDVQQDExBmYWJyaWMtY2Etc2Vy\ndmVyMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE5is5AaAg+nbhzGDEQG+liqNH\nhl876WuMbeT8k6dRNAsBpIwpxRWlg9iNrnvlkkhCBjb9AUyczQ7+BY1+NfUYlKNF\nMEMwDgYDVR0PAQH/BAQDAgEGMBIGA1UdEwEB/wQIMAYBAf8CAQEwHQYDVR0OBBYE\nFOE41wEfBgHf+cfjQzayE/Q8pm2bMAoGCCqGSM49BAMCA0gAMEUCIQCDmJzZfO1n\nVX5eMdDkDDtDz+eAXhPsu7upJW0ukhxkTAIgJceBfxJYwM1Tof1ADInIY+M+U8y+\nTL2JfaeZkJJz42E=\n-----END CERTIFICATE-----\n"
+                "pem": "-----BEGIN CERTIFICATE-----\nMIICKzCCAdGgAwIBAgIUXg/fVunJl8SFe4GVGbiZZAxkNwQwCgYIKoZIzj0EAwIw\ncjELMAkGA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMRowGAYDVQQK\nExFvcmcxLm5ldHdvcmsyLmNvbTEPMA0GA1UECxMGRmFicmljMR0wGwYDVQQDExRj\nYS5vcmcxLm5ldHdvcmsyLmNvbTAeFw0yMjEwMTkwOTQ4MDBaFw0zNzEwMTUwOTQ4\nMDBaMHIxCzAJBgNVBAYTAlVTMRcwFQYDVQQIEw5Ob3J0aCBDYXJvbGluYTEaMBgG\nA1UEChMRb3JnMS5uZXR3b3JrMi5jb20xDzANBgNVBAsTBkZhYnJpYzEdMBsGA1UE\nAxMUY2Eub3JnMS5uZXR3b3JrMi5jb20wWTATBgcqhkjOPQIBBggqhkjOPQMBBwNC\nAAT2cU6d53SwJMEjOSgBQskzgZJzGbupswxpgQ0josScbFrwOymIMubaWYFBhy6F\nd5iZAh3Ougger9CY8lNs2sMio0UwQzAOBgNVHQ8BAf8EBAMCAQYwEgYDVR0TAQH/\nBAgwBgEB/wIBATAdBgNVHQ4EFgQU2tgfD9z/+OwPX7ACHLLe78JK2ZcwCgYIKoZI\nzj0EAwIDSAAwRQIhANOckgRPcmYBumf5SkPovMfV6ZRerEPJ5TZ3M6DRlDZoAiAO\neUv4Ri1zjWx+gn3Ylq3nzZDZh1gpohdmiMxbmNLJaA==\n-----END CERTIFICATE-----\n"
             },
             "httpOptions": {
                 "verify": false

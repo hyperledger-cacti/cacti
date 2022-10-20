@@ -8,6 +8,7 @@ version: "3"
 volumes:
   orderer.${COMPOSE_PROJECT_NAME}.com:
   peer0.org1.${COMPOSE_PROJECT_NAME}.com:
+  peer0.org2.${COMPOSE_PROJECT_NAME}.com:
 
 networks:
   net:
@@ -68,12 +69,12 @@ services:
       - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
       # Peer specific variabes
       - CORE_PEER_ID=peer0.org1.${COMPOSE_PROJECT_NAME}.com
-      - CORE_PEER_ADDRESS=peer0.org1.${COMPOSE_PROJECT_NAME}.com:$PEER_PORT
-      - CORE_PEER_LISTENADDRESS=0.0.0.0:$PEER_PORT
+      - CORE_PEER_ADDRESS=peer0.org1.${COMPOSE_PROJECT_NAME}.com:$PEER_ORG1_PORT
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:$PEER_ORG1_PORT
       - CORE_PEER_CHAINCODEADDRESS=peer0.org1.${COMPOSE_PROJECT_NAME}.com:$CHAINCODELISTENADDRESS
       - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:$CHAINCODELISTENADDRESS
-      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org1.${COMPOSE_PROJECT_NAME}.com:$PEER_PORT
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org1.${COMPOSE_PROJECT_NAME}.com:$PEER_PORT
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org1.${COMPOSE_PROJECT_NAME}.com:$PEER_ORG1_PORT
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org1.${COMPOSE_PROJECT_NAME}.com:$PEER_ORG1_PORT
       - CORE_PEER_LOCALMSPID=Org1MSP
       - FABRIC_CFG_PATH=/etc/hyperledger/fabric
     volumes:
@@ -84,6 +85,48 @@ services:
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
     command: peer node start
     ports:
-      - ${PEER_PORT}:${PEER_PORT}
+      - ${PEER_ORG1_PORT}:${PEER_ORG1_PORT}
+    networks:
+      - net
+
+  peer0.org2.${COMPOSE_PROJECT_NAME}.com:
+    profiles: ["2-nodes"]
+    container_name: peer0.org2.${COMPOSE_PROJECT_NAME}.com
+    image: hyperledger/fabric-peer:$IMAGE_TAG
+    environment:
+      #Generic peer variables
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      # the following setting starts chaincode containers on the same
+      # bridge network as the peers
+      # https://docs.docker.com/compose/networking/
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=${COMPOSE_PROJECT_NAME}_net
+      - FABRIC_LOGGING_SPEC=INFO
+      #- FABRIC_LOGGING_SPEC=DEBUG
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_GOSSIP_USELEADERELECTION=true
+      - CORE_PEER_GOSSIP_ORGLEADER=false
+      - CORE_PEER_PROFILE_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
+      # Peer specific variabes
+      - CORE_PEER_ID=peer0.org2.${COMPOSE_PROJECT_NAME}.com
+      - CORE_PEER_ADDRESS=peer0.org2.${COMPOSE_PROJECT_NAME}.com:$PEER_ORG2_PORT
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:$PEER_ORG2_PORT
+      - CORE_PEER_CHAINCODEADDRESS=peer0.org2.${COMPOSE_PROJECT_NAME}.com:$CHAINCODELISTENADDRESS
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:$CHAINCODELISTENADDRESS
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org2.${COMPOSE_PROJECT_NAME}.com:$PEER_ORG2_PORT
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org2.${COMPOSE_PROJECT_NAME}.com:$PEER_ORG2_PORT
+      - CORE_PEER_LOCALMSPID=Org2MSP
+      - FABRIC_CFG_PATH=/etc/hyperledger/fabric
+    volumes:
+      - /var/run/:/host/var/run/
+      - $NW_CFG_PATH/peerOrganizations/org2.${COMPOSE_PROJECT_NAME}.com/peers/peer0.org2.${COMPOSE_PROJECT_NAME}.com/msp:/etc/hyperledger/fabric/msp
+      - $NW_CFG_PATH/peerOrganizations/org2.${COMPOSE_PROJECT_NAME}.com/peers/peer0.org2.${COMPOSE_PROJECT_NAME}.com/tls:/etc/hyperledger/fabric/tls
+      - peer0.org2.${COMPOSE_PROJECT_NAME}.com:/var/hyperledger/production
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: peer node start
+    ports:
+      - ${PEER_ORG2_PORT}:${PEER_ORG2_PORT}
     networks:
       - net

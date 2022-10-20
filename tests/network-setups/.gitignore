@@ -22,3 +22,4 @@ fabric/shared/*/system-genesis-block/*
 fabric/shared/*/channel-artifacts
 fabric/shared/*/fabric-ca/ordererOrg/*
 fabric/shared/*/fabric-ca/org1/*
+fabric/shared/*/fabric-ca/org2/*

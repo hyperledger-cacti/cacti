@@ -5,7 +5,7 @@
 #
 
 ---
-name: test-network-org1
+name: test-network1-org1
 version: 1.0.0
 client:
   organization: Org1
@@ -31,26 +31,26 @@ channels:
         chaincodeQuery: true
         ledgerQuery: true
         eventSource: true
-
 orderers:
   orderer.network1.com:
     url: grpcs://localhost:7050
     tlsCACerts:
       pem: |
-          -----BEGIN CERTIFICATE-----
-          MIICFjCCAb2gAwIBAgIUM6cOj4I4iM/mzV1zDRWHdggGlW0wCgYIKoZIzj0EAwIw
-          aDELMAkGA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMRQwEgYDVQQK
-          EwtIeXBlcmxlZGdlcjEPMA0GA1UECxMGRmFicmljMRkwFwYDVQQDExBmYWJyaWMt
-          Y2Etc2VydmVyMB4XDTIyMDgwNDE4MjIwMFoXDTM3MDczMTE4MjIwMFowaDELMAkG
-          A1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMRQwEgYDVQQKEwtIeXBl
-          cmxlZGdlcjEPMA0GA1UECxMGRmFicmljMRkwFwYDVQQDExBmYWJyaWMtY2Etc2Vy
-          dmVyMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEdJBRx8CYboiYFTl5R0XQq14+
-          E4ekzCf6EHG2Srqh8u4oIFD+QeyR+4wwSJbJf9PWS3ngrnuoFYGwzOp0P4trUaNF
-          MEMwDgYDVR0PAQH/BAQDAgEGMBIGA1UdEwEB/wQIMAYBAf8CAQEwHQYDVR0OBBYE
-          FPwe+lWvofc06dG7IQQ32tIduAHkMAoGCCqGSM49BAMCA0cAMEQCIBykgEh65XUl
-          yNUvDx2rMKwiyPL1A6rr7hoiFJX7KRN4AiBQpctKYeXqe/qDWFB+KaiC1YHalCrb
-          FQNkBAC+kBjBjQ==
-          -----END CERTIFICATE-----
+        -----BEGIN CERTIFICATE-----
+        MIICFzCCAb2gAwIBAgIUIl0UGFzir8LsrZAVhR/iVtervl4wCgYIKoZIzj0EAwIw
+        aDELMAkGA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMRQwEgYDVQQK
+        EwtIeXBlcmxlZGdlcjEPMA0GA1UECxMGRmFicmljMRkwFwYDVQQDExBmYWJyaWMt
+        Y2Etc2VydmVyMB4XDTIyMTAxOTA5NDQwMFoXDTM3MTAxNTA5NDQwMFowaDELMAkG
+        A1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMRQwEgYDVQQKEwtIeXBl
+        cmxlZGdlcjEPMA0GA1UECxMGRmFicmljMRkwFwYDVQQDExBmYWJyaWMtY2Etc2Vy
+        dmVyMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE4pL6C4T3lP+CvPwoPkVXlpNM
+        SZQUvHOwyuSUhU8/n0gWeRnbS6PSxw2GjCDhHnD+vSUhX+W/LxEStq7b7nzHk6NF
+        MEMwDgYDVR0PAQH/BAQDAgEGMBIGA1UdEwEB/wQIMAYBAf8CAQEwHQYDVR0OBBYE
+        FOg8HelplUlw724Z9jqYIMgpUR55MAoGCCqGSM49BAMCA0gAMEUCIQCjIaNL7HXX
+        DtZr31O2IqEP7fRXmhXwBE1UOkO+Y6c61QIgcSRQ7OSNu71scXubmJctT0Iss0X2
+        gSFhhMLBhIVreQA=
+        -----END CERTIFICATE-----
+        
     grpcOptions:
       ssl-target-name-override: orderer.network1.com
       hostnameOverride: orderer.network1.com
@@ -60,18 +60,18 @@ peers:
     tlsCACerts:
       pem: |
         -----BEGIN CERTIFICATE-----
-        MIICFjCCAb2gAwIBAgIUYxHjCF1HdZexrgAM73ec4jdHy8owCgYIKoZIzj0EAwIw
-        aDELMAkGA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMRQwEgYDVQQK
-        EwtIeXBlcmxlZGdlcjEPMA0GA1UECxMGRmFicmljMRkwFwYDVQQDExBmYWJyaWMt
-        Y2Etc2VydmVyMB4XDTIyMDgwNDE4MjIwMFoXDTM3MDczMTE4MjIwMFowaDELMAkG
-        A1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMRQwEgYDVQQKEwtIeXBl
-        cmxlZGdlcjEPMA0GA1UECxMGRmFicmljMRkwFwYDVQQDExBmYWJyaWMtY2Etc2Vy
-        dmVyMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE76ubZH/VHJszsYLHVKaUwKBR
-        UZv8P+Jq6Op5PeBf02JUKPM15DSF9n56RJq+7mrM9zBzPvBsUySFd+rr/BrsW6NF
-        MEMwDgYDVR0PAQH/BAQDAgEGMBIGA1UdEwEB/wQIMAYBAf8CAQEwHQYDVR0OBBYE
-        FM7HDMehiHl8b92QSMN4Q1FB7JU/MAoGCCqGSM49BAMCA0cAMEQCIH4UJq+qY2OP
-        7DzBAwY7woYuy4zoT2kxyiexlix38aY4AiAo+8OKE1wFM+XKLUqI4zzgq2bpg1qb
-        U5aIsTpdz3N2tg==
+        MIICKzCCAdGgAwIBAgIUSZKrX3edWVSkQMVQ3X08lbCUAA8wCgYIKoZIzj0EAwIw
+        cjELMAkGA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMRowGAYDVQQK
+        ExFvcmcxLm5ldHdvcmsxLmNvbTEPMA0GA1UECxMGRmFicmljMR0wGwYDVQQDExRj
+        YS5vcmcxLm5ldHdvcmsxLmNvbTAeFw0yMjEwMTkwOTQ0MDBaFw0zNzEwMTUwOTQ0
+        MDBaMHIxCzAJBgNVBAYTAlVTMRcwFQYDVQQIEw5Ob3J0aCBDYXJvbGluYTEaMBgG
+        A1UEChMRb3JnMS5uZXR3b3JrMS5jb20xDzANBgNVBAsTBkZhYnJpYzEdMBsGA1UE
+        AxMUY2Eub3JnMS5uZXR3b3JrMS5jb20wWTATBgcqhkjOPQIBBggqhkjOPQMBBwNC
+        AATX2xOkAGM7WvbZPSlCha47oYTUNh4OvhfuEaJVILA6Z8qFBB+89s9ZrVdlHk3A
+        VvuvYW1k+ObRZIv6Uh3LBvT2o0UwQzAOBgNVHQ8BAf8EBAMCAQYwEgYDVR0TAQH/
+        BAgwBgEB/wIBATAdBgNVHQ4EFgQUY5y3+yIO0VlnxzEpIIMazzOYW68wCgYIKoZI
+        zj0EAwIDSAAwRQIhAPlezX/F6JYUFpdbCzenzqJXxioo4s8qfMns9YyofRsnAiA7
+        z6xJM1mo+JF0ZlwVBr7wFKVfzgtvlwkpVktgIQV5ug==
         -----END CERTIFICATE-----
         
     grpcOptions:
@@ -85,18 +85,18 @@ certificateAuthorities:
       pem:
         - |
           -----BEGIN CERTIFICATE-----
-          MIICFjCCAb2gAwIBAgIUYxHjCF1HdZexrgAM73ec4jdHy8owCgYIKoZIzj0EAwIw
-          aDELMAkGA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMRQwEgYDVQQK
-          EwtIeXBlcmxlZGdlcjEPMA0GA1UECxMGRmFicmljMRkwFwYDVQQDExBmYWJyaWMt
-          Y2Etc2VydmVyMB4XDTIyMDgwNDE4MjIwMFoXDTM3MDczMTE4MjIwMFowaDELMAkG
-          A1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMRQwEgYDVQQKEwtIeXBl
-          cmxlZGdlcjEPMA0GA1UECxMGRmFicmljMRkwFwYDVQQDExBmYWJyaWMtY2Etc2Vy
-          dmVyMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE76ubZH/VHJszsYLHVKaUwKBR
-          UZv8P+Jq6Op5PeBf02JUKPM15DSF9n56RJq+7mrM9zBzPvBsUySFd+rr/BrsW6NF
-          MEMwDgYDVR0PAQH/BAQDAgEGMBIGA1UdEwEB/wQIMAYBAf8CAQEwHQYDVR0OBBYE
-          FM7HDMehiHl8b92QSMN4Q1FB7JU/MAoGCCqGSM49BAMCA0cAMEQCIH4UJq+qY2OP
-          7DzBAwY7woYuy4zoT2kxyiexlix38aY4AiAo+8OKE1wFM+XKLUqI4zzgq2bpg1qb
-          U5aIsTpdz3N2tg==
+          MIICKzCCAdGgAwIBAgIUSZKrX3edWVSkQMVQ3X08lbCUAA8wCgYIKoZIzj0EAwIw
+          cjELMAkGA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMRowGAYDVQQK
+          ExFvcmcxLm5ldHdvcmsxLmNvbTEPMA0GA1UECxMGRmFicmljMR0wGwYDVQQDExRj
+          YS5vcmcxLm5ldHdvcmsxLmNvbTAeFw0yMjEwMTkwOTQ0MDBaFw0zNzEwMTUwOTQ0
+          MDBaMHIxCzAJBgNVBAYTAlVTMRcwFQYDVQQIEw5Ob3J0aCBDYXJvbGluYTEaMBgG
+          A1UEChMRb3JnMS5uZXR3b3JrMS5jb20xDzANBgNVBAsTBkZhYnJpYzEdMBsGA1UE
+          AxMUY2Eub3JnMS5uZXR3b3JrMS5jb20wWTATBgcqhkjOPQIBBggqhkjOPQMBBwNC
+          AATX2xOkAGM7WvbZPSlCha47oYTUNh4OvhfuEaJVILA6Z8qFBB+89s9ZrVdlHk3A
+          VvuvYW1k+ObRZIv6Uh3LBvT2o0UwQzAOBgNVHQ8BAf8EBAMCAQYwEgYDVR0TAQH/
+          BAgwBgEB/wIBATAdBgNVHQ4EFgQUY5y3+yIO0VlnxzEpIIMazzOYW68wCgYIKoZI
+          zj0EAwIDSAAwRQIhAPlezX/F6JYUFpdbCzenzqJXxioo4s8qfMns9YyofRsnAiA7
+          z6xJM1mo+JF0ZlwVBr7wFKVfzgtvlwkpVktgIQV5ug==
           -----END CERTIFICATE-----
         
     httpOptions:

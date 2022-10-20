@@ -12,7 +12,7 @@ export NW_NAME="$3"
 export CORE_PEER_TLS_ENABLED=true
 export ORDERER_CA=$NW_PATH/ordererOrganizations/${NW_NAME}.com/orderers/orderer.${NW_NAME}.com/msp/tlscacerts/tlsca.${NW_NAME}.com-cert.pem
 export PEER0_ORG1_CA=$NW_PATH/peerOrganizations/org1.${NW_NAME}.com/peers/peer0.org1.${NW_NAME}.com/tls/ca.crt
-#export PEER0_ORG2_CA=$NW_PATH/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt
+export PEER0_ORG2_CA=$NW_PATH/peerOrganizations/org2.${NW_NAME}.com/peers/peer0.org2.${NW_NAME}.com/tls/ca.crt
 #export PEER0_ORG3_CA=${PWD}/organizations/peerOrganizations/org3.example.com/peers/peer0.org3.example.com/tls/ca.crt
 
 # Set OrdererOrg.Admin globals
@@ -35,23 +35,15 @@ setGlobals() {
     export CORE_PEER_LOCALMSPID="Org1MSP"
     export CORE_PEER_TLS_ROOTCERT_FILE=$PEER0_ORG1_CA
     export CORE_PEER_MSPCONFIGPATH=$NW_PATH/peerOrganizations/org1."$3".com/users/Admin@org1."$3".com/msp
-    export CORE_PEER_ADDRESS="localhost:$2"
+    export CORE_PEER_ADDRESS="localhost:"${2}
   elif [ $USING_ORG -eq 2 ]; then
-    #export CORE_PEER_LOCALMSPID="Org2MSP"
-    #export CORE_PEER_TLS_ROOTCERT_FILE=$PEER0_ORG2_CA
-    #export CORE_PEER_MSPCONFIGPATH=${PWD}/organizations/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp
-    #export CORE_PEER_ADDRESS=localhost:9051
-    echo "${USING_ORG} is not expected here"
-    exit 1
-  elif [ $USING_ORG -eq 3 ]; then
-    #export CORE_PEER_LOCALMSPID="Org3MSP"
-    #export CORE_PEER_TLS_ROOTCERT_FILE=$PEER0_ORG3_CA
-    #export CORE_PEER_MSPCONFIGPATH=${PWD}/organizations/peerOrganizations/org3.example.com/users/Admin@org3.example.com/msp
-    #export CORE_PEER_ADDRESS=localhost:11051
-    echo "${USING_ORG} is not expected here"
-    exit 1
+    export CORE_PEER_LOCALMSPID="Org2MSP"
+    export CORE_PEER_TLS_ROOTCERT_FILE=$PEER0_ORG2_CA
+    export CORE_PEER_MSPCONFIGPATH=$NW_PATH/peerOrganizations/org2."$3".com/users/Admin@org2."$3".com/msp
+    export CORE_PEER_ADDRESS="localhost:"${2}
   else
     echo "================== ERROR !!! ORG Unknown =================="
+    exit 1
   fi
 
   if [ "$VERBOSE" == "true" ]; then
@@ -67,7 +59,7 @@ parsePeerConnectionParameters() {
   PEER_CONN_PARMS=""
   PEERS=""
   #echo "In parsePeerConnectionParameters : "$CORE_PEER_ADDRESS
-  #while [ "$#" -gt 0 ]; do
+  while [ "$#" -gt 0 ]; do
     setGlobals $1 $2 $3
     PEER="peer0.org$1"
     ## Set peer adresses
@@ -77,9 +69,9 @@ parsePeerConnectionParameters() {
     TLSINFO=$(eval echo "--tlsRootCertFiles \$PEER0_ORG$1_CA")
     PEER_CONN_PARMS="$PEER_CONN_PARMS $TLSINFO"
     echo "PEER_CONN_PARMS: $PEER_CONN_PARMS"
-    # shift by one to get to the next organization
-    #shift
-  #done
+    # shift by 3 to get to the next organization
+    shift 3
+  done
   # remove leading space for output
   PEERS="$(echo -e "$PEERS" | sed -e 's/^[[:space:]]*//')"
 }
