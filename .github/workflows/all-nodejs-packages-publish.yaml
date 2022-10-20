@@ -1,0 +1,30 @@
+name: all-nodejs-packages-publish
+
+on:
+  push:
+
+    # Publish `v1.2.3` tags as releases.
+    tags:
+      - v*
+
+jobs:
+
+  build-and-publish-packages:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2.3.4
+    - run: git fetch --unshallow --prune
+    - uses: actions/setup-node@v2.1.2
+      with:
+        always-auth: true
+        node-version: '16.14.2'
+        registry-url: 'https://registry.npmjs.org'
+    - name: lerna-publish
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      run: |
+        git config --global user.email "${GITHUB_ACTOR}"
+        git config --global user.name "${GITHUB_ACTOR}"
+        yarn run configure
+        yarn run build
+        yarn lerna publish from-git --yes --loglevel=debug
