@@ -118,18 +118,18 @@ jobs:
       # IIN AGENT
       - name: Setup Fabric IIN Env
         run: |
-          sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}#g" docker-testnet/envs/.env.n1
-          sed -i "s#^AUTO_SYNC=true#AUTO_SYNC=false#g" docker-testnet/envs/.env.n1
-          sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}#g" docker-testnet/envs/.env.n2
-          sed -i "s#^AUTO_SYNC=true#AUTO_SYNC=false#g" docker-testnet/envs/.env.n2
+          sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}#g" docker-testnet/envs/.env.n1.org1
+          sed -i "s#^AUTO_SYNC=true#AUTO_SYNC=false#g" docker-testnet/envs/.env.n1.org1
+          sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}#g" docker-testnet/envs/.env.n2.org1
+          sed -i "s#^AUTO_SYNC=true#AUTO_SYNC=false#g" docker-testnet/envs/.env.n2.org1
         working-directory: core/identity-management/iin-agent
        
       - name: Start Fabric IIN Agent for network1
-        run: make deploy COMPOSE_ARG='--env-file docker-testnet/envs/.env.n1'
+        run: make deploy COMPOSE_ARG='--env-file docker-testnet/envs/.env.n1.org1'
         working-directory: core/identity-management/iin-agent
 
       - name: Start Fabric IIN Agent for network2
-        run: make deploy COMPOSE_ARG='--env-file docker-testnet/envs/.env.n2'
+        run: make deploy COMPOSE_ARG='--env-file docker-testnet/envs/.env.n2.org1'
         working-directory: core/identity-management/iin-agent
   
       # CORDA DRIVER
