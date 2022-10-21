@@ -42,7 +42,7 @@ message AssetLockHTLC {
   TimeSpec timeSpec = 4;
 }
 ```
-- `hashMechanism` is the technique used for the generation of the hash value captured by `hashBase64`. It can be selected from an enumeration `HashMechanism` as follows:
+- `hashMechanism` is the algorithm used for the generation of the hash value captured by `hashBase64`. It can be selected from an enumeration `HashMechanism` as follows:
   - `SHA256` represents the cryptographic hash function (secure hash algorithm) that produces 256-bit hash value
   - `SHA512` represents the cryptographic hash function (secure hash algorithm) that produces 512-bit hash value
 ```protobuf

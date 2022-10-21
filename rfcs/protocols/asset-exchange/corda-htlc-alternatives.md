@@ -9,7 +9,7 @@
 - RFC: 02-006
 - Authors: Ermyas Abebe, Venkatraman Ramakrishna, Sandeep Nishad, Krishnasuri Narayanam, Dhinakaran Vinayagamurthy
 - Status: Proposed
-- Since: 25-Nov-2020
+- Since: 21-Oct-2022
 
 Here are few possible alternatives for implementing asset exchange using HTLC in a Weaver for a Corda network.
 

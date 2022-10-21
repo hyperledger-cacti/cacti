@@ -8,7 +8,7 @@
 - RFC: 02-010
 - Authors: Krishnasuri Narayanam, Sandeep Nishad, Venkatraman Ramakrishna, Dhinakaran Vinayagamurthy
 - Status: Proposed
-- Since: 19-Oct-2022
+- Since: 21-Oct-2022
 
 ## Weaver Asset Transfer implementation approach for Corda network
 Below we describe the approach for the implementation of asset transfer from one ledger to another that requires only non-validating notary.

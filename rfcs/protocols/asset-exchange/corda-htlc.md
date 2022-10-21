@@ -8,7 +8,7 @@
 - RFC: 02-006
 - Authors: Krishnasuri Narayanam, Sandeep Nishad, Venkatraman Ramakrishna, Dhinakaran Vinayagamurthy
 - Status: Proposed
-- Since: 25-Nov-2020
+- Since: 21-Oct-2022
 
 ## Generic Corda Network
 Below figure depicts the different components of a Corda network. Primarily it consists of the infrastructure used for the creation of the network and the distributed applications (CorDapps) deployed on the network. Any such CorDapp is a combination of contracts, flows and a client component to interact with the network.
@@ -19,7 +19,7 @@ Below figure depicts the different components of a Corda network with Weaver ada
 <img src="../../resources/images/weaver-enabled-corda-network.png" width=80%>
 
 ### Details of adaptations
-The ownus on the changes required to made lies both on the application developer (as Weaver is agnostic to the client application) and on Weaver as the platform provider.
+The onus on the changes required to made lies both on the application developer (as Weaver is agnostic to the client application) and on Weaver as the platform provider.
 
 #### Responsibilities of CorDapp developer
 
