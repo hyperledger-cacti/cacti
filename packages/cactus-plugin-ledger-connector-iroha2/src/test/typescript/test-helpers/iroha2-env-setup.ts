@@ -64,7 +64,9 @@ export async function waitForCommit(): Promise<void> {
  *
  * @returns Ed25519 keypair
  */
-export function generateTestIrohaCredentials(): Iroha2KeyPair {
+export function generateTestIrohaCredentials(): Iroha2KeyPair & {
+  publicKeyMultihash: string;
+} {
   const seedBytes = Buffer.from(addRandomSuffix("seed"));
   const config = crypto
     .createKeyGenConfiguration()
@@ -82,7 +84,8 @@ export function generateTestIrohaCredentials(): Iroha2KeyPair {
     freeableKeys.push(multiHashPubKey);
 
     return {
-      publicKey: bytesToHex(Array.from(multiHashPubKey.toBytes())),
+      publicKey: bytesToHex(Array.from(keyPair.publicKey().payload())),
+      publicKeyMultihash: bytesToHex(Array.from(multiHashPubKey.toBytes())),
       privateKey: {
         digestFunction: keyPair.privateKey().digestFunction(),
         payload: bytesToHex(Array.from(keyPair.privateKey().payload())),

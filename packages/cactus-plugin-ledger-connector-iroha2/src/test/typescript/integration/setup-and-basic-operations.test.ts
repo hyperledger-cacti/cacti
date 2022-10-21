@@ -60,6 +60,7 @@ describe("Helper functions test", () => {
     const credentials = generateTestIrohaCredentials();
     expect(credentials).toBeTruthy();
     expect(credentials.publicKey).toBeTruthy();
+    expect(credentials.publicKeyMultihash).toBeTruthy();
     expect(credentials.privateKey.payload).toBeTruthy();
     expect(credentials.privateKey.digestFunction).toBeTruthy();
   });

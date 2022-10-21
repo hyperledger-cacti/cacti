@@ -23,6 +23,7 @@ import {
   TransactionStatusV1,
 } from "../../../main/typescript/public-api";
 import {
+  generateTestIrohaCredentials,
   IrohaV2TestEnv,
   waitForCommit,
 } from "../test-helpers/iroha2-env-setup";
@@ -340,5 +341,266 @@ describe("Generate and send signed transaction tests", () => {
       expect(err.response.data.message).toEqual("Internal Server Error");
       expect(err.response.data.error).toBeTruthy();
     }
+  });
+
+  /**
+   * Complex test for account creation, asset definition and finally an asset transfer.
+   */
+  test("Complex asset transfer between accounts", async () => {
+    // 1. Register new account - bob
+    const bobDomain = "wonderland";
+    const bobName = addRandomSuffix("bob");
+    expect(bobName).toBeTruthy();
+
+    const bobCredentials = generateTestIrohaCredentials();
+    const registerAccountResponse = await env.apiClient.transactV1({
+      transaction: {
+        instruction: {
+          name: IrohaInstruction.RegisterAccount,
+          params: [
+            bobName,
+            bobDomain,
+            bobCredentials.publicKey,
+            bobCredentials.privateKey.digestFunction,
+          ],
+        },
+      },
+      waitForCommit: true,
+      baseConfig: env.defaultBaseConfig,
+    });
+    expect(registerAccountResponse).toBeTruthy();
+    expect(registerAccountResponse.status).toEqual(200);
+    expect(registerAccountResponse.data.rejectReason).toBeUndefined();
+    expect(registerAccountResponse.data.status).toEqual(
+      TransactionStatusV1.Committed,
+    );
+    log.info(`User '${bobName}' registered.`);
+
+    // 2. Confirm account bob was created
+    const accountQueryResponse = await env.apiClient.queryV1({
+      query: {
+        query: IrohaQuery.FindAccountById,
+        params: [bobName, bobDomain],
+      },
+      baseConfig: env.defaultBaseConfig,
+    });
+    expect(accountQueryResponse.data).toBeTruthy();
+    const responseData = accountQueryResponse.data.response;
+    expect(responseData).toBeTruthy();
+    expect(responseData.id.name).toEqual(bobName);
+    expect(responseData.id.domain_id.name).toEqual(bobDomain);
+
+    // 3. Create new asset
+    const assetOwnerName = env.defaultBaseConfig.accountId?.name;
+    expect(assetOwnerName).toBeTruthy();
+    const assetOwnerDomainName = env.defaultBaseConfig.accountId?.domainId;
+    expect(assetOwnerDomainName).toBeTruthy();
+    const assetName = addRandomSuffix("aliceGold");
+    expect(assetName).toBeTruthy();
+    const assetDomain = assetOwnerDomainName;
+    expect(assetDomain).toBeTruthy();
+    const valueType = "Quantity";
+    const initAssetValue = 100;
+    const mintable = "Infinitely";
+
+    const registerAssetDefResponse = await env.apiClient.transactV1({
+      transaction: {
+        instruction: {
+          name: IrohaInstruction.RegisterAssetDefinition,
+          params: [assetName, assetDomain, valueType, mintable],
+        },
+      },
+      waitForCommit: true,
+      baseConfig: env.defaultBaseConfig,
+    });
+    expect(registerAssetDefResponse).toBeTruthy();
+    expect(registerAssetDefResponse.status).toEqual(200);
+    expect(registerAssetDefResponse.data.rejectReason).toBeUndefined();
+    expect(registerAssetDefResponse.data.status).toEqual(
+      TransactionStatusV1.Committed,
+    );
+
+    const registerAssetResponse = await env.apiClient.transactV1({
+      transaction: {
+        instruction: {
+          name: IrohaInstruction.RegisterAsset,
+          params: [
+            assetName,
+            assetDomain,
+            assetOwnerName,
+            assetOwnerDomainName,
+            initAssetValue,
+          ],
+        },
+      },
+      waitForCommit: true,
+      baseConfig: env.defaultBaseConfig,
+    });
+    expect(registerAssetResponse).toBeTruthy();
+    expect(registerAssetResponse.status).toEqual(200);
+    expect(registerAssetResponse.data.rejectReason).toBeUndefined();
+    expect(registerAssetResponse.data.status).toEqual(
+      TransactionStatusV1.Committed,
+    );
+    log.info(
+      `Asset '${assetName}#${assetDomain}' registered. Initial value: ${initAssetValue}`,
+    );
+
+    // 4. Initial transfer of asset from alice to bob
+    const transferValue = 10;
+
+    const initTransferResponse = await env.apiClient.transactV1({
+      transaction: {
+        instruction: {
+          name: IrohaInstruction.TransferAsset,
+          params: [
+            assetName,
+            assetDomain,
+            assetOwnerName,
+            assetOwnerDomainName,
+            bobName,
+            bobDomain,
+            transferValue,
+          ],
+        },
+      },
+      waitForCommit: true,
+      baseConfig: env.defaultBaseConfig,
+    });
+    expect(initTransferResponse).toBeTruthy();
+    expect(initTransferResponse.status).toEqual(200);
+    expect(initTransferResponse.data.rejectReason).toBeUndefined();
+    expect(initTransferResponse.data.status).toEqual(
+      TransactionStatusV1.Committed,
+    );
+    log.info("Initial transfer of asset done.");
+
+    // 5. Confirm asset balance on both accounts
+    const initAliceBalanceQueryResponse = await env.apiClient.queryV1({
+      query: {
+        query: IrohaQuery.FindAssetById,
+        params: [assetName, assetDomain, assetOwnerName, assetOwnerDomainName],
+      },
+      baseConfig: env.defaultBaseConfig,
+    });
+    expect(initAliceBalanceQueryResponse).toBeTruthy();
+    expect(initAliceBalanceQueryResponse.data).toBeTruthy();
+    const initAliceBalance =
+      initAliceBalanceQueryResponse.data.response.value.value;
+    log.info(
+      "Alice (source) balance after initial transfer:",
+      initAliceBalance,
+    );
+    expect(initAliceBalance).toEqual(initAssetValue - transferValue);
+
+    const initBobBalanceQueryResponse = await env.apiClient.queryV1({
+      query: {
+        query: IrohaQuery.FindAssetById,
+        params: [assetName, assetDomain, bobName, bobDomain],
+      },
+      baseConfig: env.defaultBaseConfig,
+    });
+    expect(initBobBalanceQueryResponse).toBeTruthy();
+    expect(initBobBalanceQueryResponse.data).toBeTruthy();
+    const initBobBalance =
+      initBobBalanceQueryResponse.data.response.value.value;
+    log.info("Bob (target) balance after initial transfer:", initBobBalance);
+    expect(initBobBalance).toEqual(transferValue);
+
+    // 6. Generate and sign transaction to transfer half of bob assets back to alice
+    const transferBackValue = transferValue / 2;
+    log.info("Transfer back to alice asset amount:", transferBackValue);
+
+    const bobConfig = {
+      ...env.defaultBaseConfig,
+      accountId: {
+        name: bobName,
+        domainId: bobDomain,
+      },
+    };
+
+    const genTxResponse = await env.apiClient.generateTransactionV1({
+      request: {
+        instruction: {
+          name: IrohaInstruction.TransferAsset,
+          params: [
+            assetName,
+            assetDomain,
+            bobName,
+            bobDomain,
+            assetOwnerName,
+            assetOwnerDomainName,
+            transferBackValue,
+          ],
+        },
+      },
+      baseConfig: bobConfig,
+    });
+    expect(genTxResponse).toBeTruthy();
+    expect(genTxResponse.data).toBeTruthy();
+    expect(genTxResponse.status).toEqual(200);
+    const unsignedTransaction = Uint8Array.from(
+      Object.values(genTxResponse.data),
+    );
+    expect(unsignedTransaction).toBeTruthy();
+    log.info("Received unsigned transcation");
+    log.debug("unsignedTransaction:", unsignedTransaction);
+
+    const signedTransaction = signIrohaV2Transaction(
+      unsignedTransaction,
+      bobName,
+      bobDomain,
+      {
+        publicKey: bobCredentials.publicKeyMultihash,
+        privateKey: bobCredentials.privateKey,
+      },
+    );
+    expect(signedTransaction).toBeTruthy();
+    log.info("Transaction signed with bob private key");
+    log.debug("signedTransaction:", signedTransaction);
+
+    // 7. Send signed transfer transaction
+    const transactionResponse = await env.apiClient.transactV1({
+      signedTransaction,
+      waitForCommit: true,
+      baseConfig: bobConfig,
+    });
+    expect(transactionResponse).toBeTruthy();
+    expect(transactionResponse.status).toEqual(200);
+    expect(transactionResponse.data.rejectReason).toBeUndefined();
+    expect(transactionResponse.data.status).toEqual(
+      TransactionStatusV1.Committed,
+    );
+
+    // 8. Confirm final asset balance on both accounts
+    const finalAliceBalanceQueryResponse = await env.apiClient.queryV1({
+      query: {
+        query: IrohaQuery.FindAssetById,
+        params: [assetName, assetDomain, assetOwnerName, assetOwnerDomainName],
+      },
+      baseConfig: env.defaultBaseConfig,
+    });
+    expect(finalAliceBalanceQueryResponse).toBeTruthy();
+    expect(finalAliceBalanceQueryResponse.data).toBeTruthy();
+    const finalAliceBalance =
+      finalAliceBalanceQueryResponse.data.response.value.value;
+    log.info("Alice (target) balance after final transfer:", finalAliceBalance);
+    expect(finalAliceBalance).toEqual(
+      initAssetValue - transferValue + transferBackValue,
+    );
+
+    const finalBobBalanceQueryResponse = await env.apiClient.queryV1({
+      query: {
+        query: IrohaQuery.FindAssetById,
+        params: [assetName, assetDomain, bobName, bobDomain],
+      },
+      baseConfig: env.defaultBaseConfig,
+    });
+    expect(finalBobBalanceQueryResponse).toBeTruthy();
+    expect(finalBobBalanceQueryResponse.data).toBeTruthy();
+    const finalBobBalance =
+      finalBobBalanceQueryResponse.data.response.value.value;
+    log.info("Bob (source) balance after final transfer:", finalBobBalance);
+    expect(finalBobBalance).toEqual(transferValue - transferBackValue);
   });
 });
