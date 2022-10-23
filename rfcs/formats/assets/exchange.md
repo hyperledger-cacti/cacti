@@ -72,7 +72,7 @@ message AssetClaimHTLC {
   bytes hashPreimageBase64 = 2;
 }
 ```
-An HTLC claim simply needs to specify the secret preimage (`hashPreimageBase64`) of the hash in the corresponding HTLC lock. It is encoded in Base64 for communication safety and portability. The `hashMechanism` field assumes a value from the `HashMechanism` enumeration specified earlier, corresponding to the lock structure `AssetLockHTLC` defined earlier.
+An HTLC claim simply needs to specify the secret preimage (`hashPreimageBase64`) of the hash in the corresponding HTLC lock. It is encoded in Base64 for communication safety and portability. The `hashMechanism` field assumes a value from the `HashMechanism` enumeration specified earlier, and must match the `hashMechanism` value in the `AssetLockHTLC` object corresponding to this claim.
 
 ## Representing Two-Party Asset Exchange Agreements
 

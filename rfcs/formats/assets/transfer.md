@@ -12,7 +12,7 @@
 
 This document specifies the data formats used in [cross-network asset transfer protocol](../../protocols/asset-transfer/).
 
-## Representing Pledge on Asset
+## Representing an Asset Transfer Pledge
 
 To communicate pledge (burning of an asset in a ledger for minting that asset in the same or in a differet ledger at a later point in time) details between the application layer or a contract and the [interoperation module](models/infrastructure/interoperation-modules.md) or across networks, we need common DLT-neutral structures. Weaver supports atomic asset transfer between two parties, so a pledge agreement consists of the asset transfer commitment by a party in one ledger to an other party in a different ledger. The general structure to pledge assets (both fungible and non-fungible) is as follows (this structure can be extended in future when Weaver supports multi-party multi-asset transfers):
 ```protobuf
