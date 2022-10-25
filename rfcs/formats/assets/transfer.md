@@ -10,6 +10,7 @@
 - Status: Proposed
 - Since: 02-Apr-2022
 
+## Summary
 This document specifies the data formats used in [cross-network asset transfer protocol](../../protocols/asset-transfer/).
 
 ## Representing an Asset Transfer Pledge

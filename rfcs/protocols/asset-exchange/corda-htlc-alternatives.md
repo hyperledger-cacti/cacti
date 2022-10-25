@@ -16,13 +16,13 @@ Here are few possible alternatives for implementing asset exchange using HTLC in
 ## Approach Using Validating Notary
 
 Below we describe the approach for the implementation of asset exchange between Alice & Bob using HTLC that requires a validating notary.
-- Lock transaction: Consumes an input *Asset State* and produces *HTLC State* as the output. Since the claim/unlock later happens in the same ledger, a reference to the consumed *Asset State* is maintained as a Corda *StaticPointer* instead of copying the entire *Asset State* object.
+- **Lock transaction**: Consumes an input *Asset State* and produces *HTLC State* as the output. Since the claim/unlock later happens in the same ledger, a reference to the consumed *Asset State* is maintained as a Corda *StaticPointer* instead of copying the entire *Asset State* object.
   - requires consent (signature) from both parties (Alice & Bob) for locking to complete
 <img src="../../resources/images/asset-exchange-corda-lock.png" width=80%>
-- Cliam transaction: Consumes an input *HTLC State* and produces *Asset State* as the output. Checks the validity of the hash-preimage and timout as part of a Corda contract _command_. The Corda _flow_ that implements this transaction triggers a _subFlow_ to create asset object as per _StateAndRef_ with owner set to the party claiming (Bob).
-  - The _subFlow_ will be part of the client corDapp, but not part of the interoperation corDapp of the Corda network.  
+- **Claim transaction**: Consumes an input *HTLC State* and produces *Asset State* as the output. Checks the validity of the hash-preimage and timout as part of a Corda contract _command_. The Corda _flow_ that implements this transaction triggers a _subFlow_ to create asset object as per _StateAndRef_ with owner set to the party claiming (Bob).
+  - The _subFlow_ will be part of the client CorDapp, but not part of the [interoperation CorDapp](../../models/infrastructure/interoperation-modules.md) of the Corda network.
 <img src="../../resources/images/asset-exchange-corda-claim-unlock.png" width=100%>
-- Unlock transaction: Carried out by Alice after expiry of the timeout. It is similar to Claim transaction except that the _owner_ of the _Asset State_ is set to a party who performed locking (Alice).
+- **Unlock transaction**: Carried out by Alice after expiry of the timeout. It is similar to Claim transaction except that the _owner_ of the _Asset State_ is set to a party who performed locking (Alice).
 
 Claim/Unlock transactions are signed by the party that submits the transaction along with a validating notary service.
 -  Validation by notary compromises the privacy of the transaction data
@@ -66,3 +66,5 @@ Both claiming and refunding transactions can be performed unilaterally because d
 
 ### Generalisability
 The hash lock encumbrance state and associated contract can be offered as reusable pieces as part of Weaver. These pieces are largely agnostic of the specifics of the application. They can further be instrumented to *emit* custom Weaver events making automation of the orchestration of cross-chain HTLCs possible.
+
+**Note:** We've picked a third approach [using non-validating notary](corda-htlc.md) for our [current implementation in Weaver](../../../core/network/corda-interop-app) over the above described alternatives. The primary reasons behind choosing the non-validating notary approach are: [encumbrances are not fully functional](https://github.com/corda/corda/pull/4089#issuecomment-431571103) w.r.t. contract upgrades, etc. and validation by notary compromises the privacy of the transaction data.

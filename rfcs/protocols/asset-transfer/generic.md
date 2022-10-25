@@ -6,14 +6,14 @@
 # Asset Transfer Protocol
 
 - RFC: 02-008
-- Authors: Krishnasuri Narayanam, Sandeep Nishad, Venkatraman Ramakrishna, Dhinakaran Vinayagamurthy
+- Authors: Venkatraman Ramakrishna, Krishnasuri Narayanam, Sandeep Nishad, Dhinakaran Vinayagamurthy
 - Status: Proposed
 - Since: 21-Oct-2022
 
 ## Summary
 
-Asset transfer protocol in Weaver allows transferring an asset from one shared ledger to another by burning it in the source ledger and minting it in the destination ledger in an atomic manner.
-- Minting of the asset in the destination ledger should happen within an agreed-upon period. Otherwise, the asset is minted in the source ledger after the time period elapses.
+Asset transfer protocol in Weaver allows transferring an asset from one shared ledger to another by burning it in the source ledger and creating it in the destination ledger in an atomic manner.
+- Creating of the asset in the destination ledger should happen within an agreed-upon period. Otherwise, the asset is created in the source ledger after the time period elapses.
 
 ## Protocol Overview
 
@@ -42,7 +42,7 @@ The ledgers, participants, and sequence of states they go through to either effe
 
 ## Generic Asset Transfer Flow
 
-The following figure describes the asset transfer flow between two parties.
+The following figure describes the asset transfer flow between two parties on two different ledgers.
 
 <img src="../../resources/images/asset-transfer-flow.png" width=80%>
 
@@ -58,4 +58,4 @@ _TBD: list and discuss the library functions that support transfers, excluding s
 
 ## Safety and Liveness
 
-At no point in time, asset *M* is available in both the ledgers *A* and *B*. This is ensured by allowing minting of asset by Alice in ledger *A* only if the asset was not already minted by Bob in ledger *B*. Also note that Alice could mint the asset *M* in ledger *A* anytime after the period *t*.
+At no point in time is asset *M* available in both the ledgers *A* and *B*. This is ensured by allowing minting of asset by Alice in ledger *A* only if the asset was not already minted by Bob in ledger *B*. Also note that Alice could mint the asset *M* in ledger *A* anytime after the period *t*.
