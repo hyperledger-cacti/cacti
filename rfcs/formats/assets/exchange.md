@@ -12,7 +12,7 @@
 
 ## Locking Mechanisms for the Exchange Protocol
 
-This document specifies the data formats used in the [cross-network asset exchange protocols](../../protocols/asset-exchange/). We envision supporting several distinct kinds of asset locking mechanisms for asset exchanges in Weaver, which are listed in and can be selected from an enumeration as follows:
+This document specifies the data formats used in the [cross-network asset exchange protocol](../../protocols/asset-exchange/). We envision supporting several distinct kinds of asset locking mechanisms for asset exchanges in Weaver, which are listed in and can be selected from an enumeration as follows:
 ```protobuf
 enum LockMechanism {
   HTLC = 0;
@@ -32,13 +32,23 @@ message AssetLock {
 The `lockMechanism` field can assume any of the values in the `LockMechanism` enumeration specified earlier. The `lockInfo` field is a serialized lock structure containing specific information about the lock. For the `HTLC` locking mechanism, the lock structure is as follows:
 ```protobuf
 message AssetLockHTLC {
-  bytes hashBase64 = 1;
-  uint64 expiryTimeSecs = 2;
+  HashMechanism hashMechanism = 1;
+  bytes hashBase64 = 2;
+  uint64 expiryTimeSecs = 3;
   enum TimeSpec {
     EPOCH = 0;
     DURATION = 1;
   }
-  TimeSpec timeSpec = 3;
+  TimeSpec timeSpec = 4;
+}
+```
+- `hashMechanism` is the algorithm used for the generation of the hash value captured by `hashBase64`. It can be selected from an enumeration `HashMechanism` as follows:
+  - `SHA256` represents the cryptographic hash function (secure hash algorithm) that produces 256-bit hash value
+  - `SHA512` represents the cryptographic hash function (secure hash algorithm) that produces 512-bit hash value
+```protobuf
+enum HashMechanism {
+  SHA256 = 0;
+  SHA512 = 1;
 }
 ```
 - `hashBase64` is the _hash lock_, or the hash value with which an asset is locked, pending revelation of the secret preimage of this hash
@@ -58,10 +68,11 @@ message AssetClaim {
 Since every claim is associated with a lock, the above structure needs a `lockMechanism` field just like the `AssetLock` structure does, with identical semantics. The `claimInfo` field is a serialized claim structure containing specific information about the claim. For the `HTLC` locking mechanism, the claim structure is as follows:
 ```protobuf
 message AssetClaimHTLC {
-  bytes hashPreimageBase64 = 1;
+  HashMechanism hashMechanism = 1;
+  bytes hashPreimageBase64 = 2;
 }
 ```
-An HTLC claim simply needs to specify the secret preimage (`hashPreimageBase64`) of the hash in the corresponding HTLC lock. It is encoded in Base64 for communication safety and portability.
+An HTLC claim simply needs to specify the secret preimage (`hashPreimageBase64`) of the hash in the corresponding HTLC lock. It is encoded in Base64 for communication safety and portability. The `hashMechanism` field assumes a value from the `HashMechanism` enumeration specified earlier, and must match the `hashMechanism` value in the `AssetLockHTLC` object corresponding to this claim.
 
 ## Representing Two-Party Asset Exchange Agreements
 

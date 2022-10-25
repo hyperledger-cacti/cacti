@@ -67,7 +67,7 @@ The interoperation module takes the form of a Fabric Interopration Chaincode, wh
 - A chaincode that must be installed on all peers of a channel which maaintains ledger data that is involved in cross-network operations, and which can be invoked by the relay drivers and client applications.
 - A set of interfaces and utility functions that can be imported into application chaincode and exercised for asset exchanges and transfers as required.
 
-For details, see the [Fabric Interoperation Chaincode API](formats/network/fabric-interop-chaincode.md).
+For details, see the [Fabric Interoperation Chaincode API](../../formats/network/fabric-interop-chaincode.md).
 
 ### Corda
 
@@ -75,7 +75,7 @@ The interoperation module takes the form of an Interoperation CorDapp, consistin
 
 _TBD: Add more details here._
 
-For details, see the [Interoperation CorDapp API](formats/network/interop-cordapp.md).
+For details, see the [Interoperation CorDapp API](../../formats/network/interop-cordapp.md).
 
 ### Hyperledger Besu
 
@@ -83,4 +83,4 @@ The interoperation module takes the form of a Besu Interoperation Contract that 
 
 _TBD: Add more details here._
 
-For details, see the [Besu Interoperation Contract API](formats/network/besu-interop-contract.md).
+For details, see the [Besu Interoperation Contract API](../../formats/network/besu-interop-contract.md).
