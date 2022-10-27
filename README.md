@@ -2,7 +2,7 @@
 
 # Hyperledger Cactus
 
- [![Open in Visual Studio Code](https://open.vscode.dev/badges/open-in-vscode.svg)](https://open.vscode.dev/hyperledger/cactus)
+ [![Open in Visual Studio Code](https://badgen.net/badge/open%20in/Visual%20Studio%20Code?icon=visualstudio)](https://open.vscode.dev/hyperledger/cactus)
  ![license](https://img.shields.io/github/license/hyperledger/cactus) [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/4089/badge)](https://bestpractices.coreinfrastructure.org/projects/4089) [![codecov](https://codecov.io/gh/hyperledger/cactus/branch/main/graph/badge.svg?token=BJklIsqf1S)](https://codecov.io/gh/hyperledger/cactus)
  ![GitHub issues](https://img.shields.io/github/issues/hyperledger/cactus)
 
