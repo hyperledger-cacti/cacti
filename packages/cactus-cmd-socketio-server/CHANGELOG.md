@@ -3,8 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [1.0.0](https://github.com/hyperledger/cactus/compare/v1.0.0-rc.3...v1.0.0) (2022-03-16)
+# [1.1.0](https://github.com/hyperledger/cactus/compare/v1.0.0...v1.1.0) (2022-10-17)
 
+### Bug Fixes
+
+* **cactus-example-discounted-asset-trade:** enable ([12e972e](https://github.com/hyperledger/cactus/commit/12e972e9cac63fd03a0ba3c7c8a29dc9ca544b9d)), closes [#2145](https://github.com/hyperledger/cactus/issues/2145)
+* **cactus-example-electricity-trade:** enable tsconfig strict flag an… ([f7e726c](https://github.com/hyperledger/cactus/commit/f7e726c2720ed21bc4a582f6c4f345d0b2c65af7)), closes [#2144](https://github.com/hyperledger/cactus/issues/2144)
+* resolve some CodeQL warnings ([824f5c8](https://github.com/hyperledger/cactus/commit/824f5c80ce5efbd9765699fdd635ab1d7f29cea2))
+* **security:** mitigate Cross-Site Scripting attack (XSS) ([2cb68c3](https://github.com/hyperledger/cactus/commit/2cb68c3e9899691b1e0abeb6993c37c97a61dcdb))
+
+### Code Refactoring
+
+* **examples:** include sample apps in monorepo build ([51ac163](https://github.com/hyperledger/cactus/commit/51ac1630f53ca3ac881341c7f8847b6ae581b220))
+
+### Features
+
+* **socketio-server:** cross site scripting attack ([a5303ed](https://github.com/hyperledger/cactus/commit/a5303ed3a161477313646fc1f24220e53a20f7a4))
+
+### BREAKING CHANGES
+
+* **examples:** building discounted-asset-trade app (or any future app that use indy validator)
+                 requires Indy SDK to be installed on the build machine.
+
+Closes: 2029
+
+Signed-off-by: Michal Bajer <michal.bajer@fujitsu.com>
+
+# [1.0.0](https://github.com/hyperledger/cactus/compare/v1.0.0-rc.3...v1.0.0) (2022-03-16)
 
 ### Bug Fixes
 
@@ -13,47 +38,27 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * remove jade dependencies ([f4ce09e](https://github.com/hyperledger/cactus/commit/f4ce09e8c07949aa08e4bfd404e4468e6c3544a8)), closes [#1662](https://github.com/hyperledger/cactus/issues/1662)
 * **security:** address CVE-2019-5413 ([212b770](https://github.com/hyperledger/cactus/commit/212b770c705c279dcc766b7230d7519ed9a98748)), closes [#1777](https://github.com/hyperledger/cactus/issues/1777)
 
-
 ### Features
 
 * **cactus-api-client:** common verifier-factory ([2f70a64](https://github.com/hyperledger/cactus/commit/2f70a6473f30446859427335f2d3602bddca636d)), closes [#1878](https://github.com/hyperledger/cactus/issues/1878)
 
-
-
-
-
 # [1.0.0-rc.3](https://github.com/hyperledger/cactus/compare/v1.0.0-rc.2...v1.0.0-rc.3) (2021-12-07)
-
 
 ### Bug Fixes
 
 * **security:** upgrade fabric-common to 2.2.10 or later ([45c4a69](https://github.com/hyperledger/cactus/commit/45c4a69fb86964bc4e7018c31c5914a0063c7638)), closes [#1600](https://github.com/hyperledger/cactus/issues/1600)
 
-
-
-
-
 # [1.0.0-rc.2](https://github.com/hyperledger/cactus/compare/v1.0.0-rc.1...v1.0.0-rc.2) (2021-11-01)
 
 **Note:** Version bump only for package @hyperledger/cactus-cmd-socket-server
 
-
-
-
-
 # [1.0.0-rc.1](https://github.com/hyperledger/cactus/compare/v0.10.0...v1.0.0-rc.1) (2021-10-11)
-
 
 ### Bug Fixes
 
 * **cmd-socker-server:** delete unnecessary files on cmd-socker-server ([20e15cd](https://github.com/hyperledger/cactus/commit/20e15cd257628fe392818e14728851304a76c7cb))
 
-
-
-
-
 # [0.10.0](https://github.com/hyperledger/cactus/compare/v0.9.0...v0.10.0) (2021-09-28)
-
 
 ### Bug Fixes
 
