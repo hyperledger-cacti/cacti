@@ -147,7 +147,7 @@ impl<T, C> hyper::service::Service<(Request<Body>, C)> for Service<T, C> where
                 // Body parameters (note that non-required body parameters will ignore garbage
                 // values, rather than causing a 400 response). Produce warning header and logs for
                 // any unused fields.
-                let result = body.to_raw().await;
+                let result = hyper::body::to_bytes(body).await;
                 match result {
                             Ok(body) => {
                                 let mut unused_elements = Vec::new();
@@ -243,7 +243,7 @@ impl<T, C> hyper::service::Service<(Request<Body>, C)> for Service<T, C> where
                 // Body parameters (note that non-required body parameters will ignore garbage
                 // values, rather than causing a 400 response). Produce warning header and logs for
                 // any unused fields.
-                let result = body.to_raw().await;
+                let result = hyper::body::to_bytes(body).await;
                 match result {
                             Ok(body) => {
                                 let mut unused_elements = Vec::new();
@@ -342,14 +342,14 @@ impl<T, C> hyper::service::Service<(Request<Body>, C)> for Service<T, C> where
 /// Request parser for `Api`.
 pub struct ApiRequestParser;
 impl<T> RequestParser<T> for ApiRequestParser {
-    fn parse_operation_id(request: &Request<T>) -> Result<&'static str, ()> {
+    fn parse_operation_id(request: &Request<T>) -> Option<&'static str> {
         let path = paths::GLOBAL_REGEX_SET.matches(request.uri().path());
         match request.method() {
             // GetKeychainEntry - POST /api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/get-keychain-entry
-            &hyper::Method::POST if path.matched(paths::ID_API_V1_PLUGINS_HYPERLEDGER_CACTUS_PLUGIN_KEYCHAIN_VAULT_GET_KEYCHAIN_ENTRY) => Ok("GetKeychainEntry"),
+            &hyper::Method::POST if path.matched(paths::ID_API_V1_PLUGINS_HYPERLEDGER_CACTUS_PLUGIN_KEYCHAIN_VAULT_GET_KEYCHAIN_ENTRY) => Some("GetKeychainEntry"),
             // SetKeychainEntry - POST /api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/set-keychain-entry
-            &hyper::Method::POST if path.matched(paths::ID_API_V1_PLUGINS_HYPERLEDGER_CACTUS_PLUGIN_KEYCHAIN_VAULT_SET_KEYCHAIN_ENTRY) => Ok("SetKeychainEntry"),
-            _ => Err(()),
+            &hyper::Method::POST if path.matched(paths::ID_API_V1_PLUGINS_HYPERLEDGER_CACTUS_PLUGIN_KEYCHAIN_VAULT_SET_KEYCHAIN_ENTRY) => Some("SetKeychainEntry"),
+            _ => None,
         }
     }
 }
