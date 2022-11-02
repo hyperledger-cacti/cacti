@@ -68,7 +68,7 @@
     "dotenv": "16.0.0",
     "express": "4.17.1",
     "fabric-network": "2.2.10",
-    "jose": "4.1.0",
+    "jose": "4.9.2",
     "openapi-types": "9.1.0",
     "solc": "0.8.6",
     "typescript-optional": "2.0.1",
