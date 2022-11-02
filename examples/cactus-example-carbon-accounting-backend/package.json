@@ -80,7 +80,7 @@
     "@types/uuid": "8.3.1",
     "hardhat": "2.6.0",
     "http-status-codes": "2.1.4",
-    "jose": "4.1.0"
+    "jose": "4.9.2"
   },
   "engines": {
     "node": ">=10",
