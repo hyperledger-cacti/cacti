@@ -1,4 +1,4 @@
-# Hyperledger Cactus Roadmap
+# Hyperledger Cacti Roadmap
 
 A living document with the maintainers' plans regarding the general direction of the project:
 
@@ -16,19 +16,13 @@ For example:
 
 ## Release plan
 
-### Cactus V1
+### Cacti V1 (= Cactus)
 - Date: 
     - Start: March 2022
     - Expired: ****
 - Goal:
     - Ledger Connectors: Supply Ledger Connectors for all Hyperledger blockchains
-    - Integrating other projects: Integrate with Hyperledger-labs Weaver  
-- Achieved items
-    - [V1.0] Ledger Connectors – connectors to communicate with various blockchain platforms using multiple programming languages: (TypeScript and Python)
-        - Hyperledger Besu, Fabric, Indy, Iroha, Sawtooth
-        - Go-Ethereum, Quorum, Xdai
-        - Corda
-    - [V1.2] Integrate with Hyperledger-labs Weaver
+    - Integrating other projects: Integrate with Hyperledger-labs Weaver
 - Sub release
     - [V1.0] First release of Cactus V1
         - Date: March 2022
@@ -38,36 +32,33 @@ For example:
                 - Go-Ethereum, Quorum, Xdai
                 - Corda
     - [V1.1] Improved version reflecting security-audit advice
-        - Date: August 2022 (planned)
-    - [V1.2] Integrated version with Hyperledger-labs Weaver
-        - Date: September 2022 (planned)
-        - Goal:
-            - Integration with Hyperledger Weaver
-            - Ledger Connectors – connectors to communicate with various blockchain platforms using multiple programming languages: (TypeScript and Python)
-                - Hyperledger Iroha V2
+        - Date: October 2022
 
-### Cactus V2
+### Cacti V2
 - Date: 
     - Start: March 2023 (planned)
     - Expired: ****
 - Goal:
-    - To integrate Cactus different APIs to provide user-friendly APIs.  In detail, the goal is to combine the following strengths of existing APIs on Cactus V1 to provide better functionality
+    - To integrate Cactus different APIs to provide user-friendly APIs.  In detail, the goal is to combine the following strengths of existing APIs on Cactus V1 and Weaver to provide better functionality
         - c.f.: APIs on Cactus V1 
             - OpenAPI-api-client users need to use slightly different names, data types between different ledger types.
             - Verifier interface users only need to know four functions, but arguments passed to the function differs between different ledger types.
-            - Weaver interface ...
+            - Weaver interface.
         - Notes: The above goal will make some of Cactus V1 features incompatibilities on Cactus V2
-
-## Release diagram
-
-**draft (This diagram will be revised with some illustrated chart to be easy to understand)**
-
-```
-Cactus V1   ---------------------
-                        |
-                        |
-Cactus V2               -------------------
-```
+- Sub release
+    - [V2.0-alpha] First release of the merged version of Cactus and Weaver
+        - Date: November 2022 (planned)
+        - Goal:
+            - Raw integration with Cactus and Weaver features
+    - [V2.0-beta]
+        - Date: February 2023 (planned)
+        - Goal:
+            - Refactoring the architecture codes reflecting the diagram
+            - Add a GUI transaction viewer tool for Hyperledger Cacti 
+    - [V2.0]
+        - Date: March 2023 (planned)
+        - Goal:
+            - Enhance the code quality of V2.0-beta
 
 ## Notes
 
