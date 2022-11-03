@@ -34,7 +34,7 @@ jobs:
       - name: Verify jq
         run: jq --version
 
-      - uses: actions/checkout@v2.3.4
+      - uses: actions/checkout@v3.1.0
 
       - uses: actions/setup-go@v3.0.0
         with:
