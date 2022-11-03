@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.1](https://github.com/hyperledger/cactus/compare/v1.1.0...v1.1.1) (2022-11-03)
+
+### Bug Fixes
+
+* **plugin-keychain-vault:** hyper upgrade ([3062343](https://github.com/hyperledger/cactus/commit/3062343d47a492d6a15f7189a72e6ab3bb6a52f2)), closes [#2120](https://github.com/hyperledger/cactus/issues/2120)
+* **security:** vulnerabilities found in besu-all-in-one [#2055](https://github.com/hyperledger/cactus/issues/2055) ([2ce098f](https://github.com/hyperledger/cactus/commit/2ce098f490c0e20c7f5d00a81e8fced1ec81341c))
+* **tools:** ghcr-quorum-multi-party-all-in-one pip install ([5809fd8](https://github.com/hyperledger/cactus/commit/5809fd8fac06638220bbe12df4f3ff82d02ef0eb)), closes [#2183](https://github.com/hyperledger/cactus/issues/2183)
+
+### Features
+
+* **cbdc-bridging-app:** refactor ODAP plugin implementation ([6975fef](https://github.com/hyperledger/cactus/commit/6975fefd4994cc9c6dd7d649dc2d6400646a59ae))
+* **connector-iroha:** add dynamic request params ([a1f908f](https://github.com/hyperledger/cactus/commit/a1f908f4c27b652a15896c9847aee97cc6ea11fd))
+
 # [1.1.0](https://github.com/hyperledger/cactus/compare/v1.0.0...v1.1.0) (2022-10-17)
 
 ### Bug Fixes

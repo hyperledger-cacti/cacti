@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-plugin-ledger-connector-fabric-socketio",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "license": "Apache-2.0",
   "main": "dist/common/core/bin/www.js",
   "module": "dist/common/core/bin/www.js",
@@ -34,8 +34,8 @@
     "socket.io": "4.4.1"
   },
   "devDependencies": {
-    "@hyperledger/cactus-api-client": "1.1.0",
-    "@hyperledger/cactus-test-tooling": "1.1.0",
+    "@hyperledger/cactus-api-client": "1.1.1",
+    "@hyperledger/cactus-test-tooling": "1.1.1",
     "@types/config": "0.0.41",
     "ts-node": "9.1.1"
   }

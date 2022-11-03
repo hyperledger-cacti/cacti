@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.1](https://github.com/hyperledger/cactus/compare/v1.1.0...v1.1.1) (2022-11-03)
+
+### Bug Fixes
+
+* **plugin-keychain-vault:** hyper upgrade ([3062343](https://github.com/hyperledger/cactus/commit/3062343d47a492d6a15f7189a72e6ab3bb6a52f2)), closes [#2120](https://github.com/hyperledger/cactus/issues/2120)
+
 # [1.1.0](https://github.com/hyperledger/cactus/compare/v1.0.0...v1.1.0) (2022-10-17)
 
 **Note:** Version bump only for package @hyperledger/cactus-plugin-keychain-vault

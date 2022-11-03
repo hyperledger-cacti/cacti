@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.1](https://github.com/hyperledger/cactus/compare/v1.1.0...v1.1.1) (2022-11-03)
+
+### Features
+
+* **connector-iroha:** add dynamic request params ([a1f908f](https://github.com/hyperledger/cactus/commit/a1f908f4c27b652a15896c9847aee97cc6ea11fd))
+
 # [1.1.0](https://github.com/hyperledger/cactus/compare/v1.0.0...v1.1.0) (2022-10-17)
 
 ### Bug Fixes
