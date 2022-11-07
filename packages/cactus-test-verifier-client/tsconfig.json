@@ -1,0 +1,34 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "outDir": "./dist/",
+    "declarationDir": "dist/",
+    "resolveJsonModule": true,
+    "rootDir": "./src",
+    "tsBuildInfoFile": "../../.build-cache/cactus-test-verifier-client.tsbuildinfo"
+  },
+  "include": [
+    "./src"
+  ],
+  "references": [
+    {
+      "path": "../cactus-common/tsconfig.json"
+    },
+    {
+      "path": "../cactus-test-tooling/tsconfig.json"
+    },
+    {
+      "path": "../cactus-cmd-api-server/tsconfig.json"
+    },
+    {
+      "path": "../cactus-api-client/tsconfig.json"
+    },
+    {
+      "path": "../cactus-verifier-client/tsconfig.json"
+    },
+    {
+      "path": "../cactus-plugin-ledger-connector-go-ethereum-socketio/tsconfig.json"
+    }
+  ]
+}

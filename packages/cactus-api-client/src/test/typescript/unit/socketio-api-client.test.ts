@@ -379,12 +379,13 @@ describe("SocketIOApiClient Tests", function () {
       });
 
       const verifyMock = jest.fn();
-      verifyMock.mockRejectedValue({ message: "mock verify error" });
+      const verifyError = { message: "mock verify error" };
+      verifyMock.mockRejectedValue(verifyError);
       sut.checkValidator = verifyMock;
 
       return expect(
         sut.sendSyncRequest(reqContract, reqMethod, reqArgs),
-      ).resolves.toEqual({ status: 504 }); // timeout
+      ).rejects.toEqual({ status: 504, error: verifyError });
     });
 
     test("Process only requests with matching ID", () => {

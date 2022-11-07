@@ -27,6 +27,41 @@ import Web3 from "web3";
 import { AbiItem } from "web3-utils";
 import { safeStringifyException } from "@hyperledger/cactus-common";
 
+var WEB3_HTTP_PROVIDER_OPTIONS = {
+  keepAlive: true,
+};
+
+const WEB3_WS_PROVIDER_OPTIONS = {
+  // Enable auto reconnection
+  reconnect: {
+    auto: true,
+    delay: 3000, // ms
+    maxAttempts: 30,
+    onTimeout: false,
+  },
+};
+
+function getWeb3Provider(host: string) {
+  const hostUrl = new URL(host);
+
+  switch (hostUrl.protocol) {
+    case "http:":
+    case "https:":
+      return new Web3.providers.HttpProvider(host, WEB3_HTTP_PROVIDER_OPTIONS);
+    case "ws:":
+      return new Web3.providers.WebsocketProvider(
+        host,
+        WEB3_WS_PROVIDER_OPTIONS,
+      );
+    default:
+      throw new Error(
+        `Unknown host protocol ${hostUrl.protocol} in URL ${host}`,
+      );
+  }
+}
+
+const web3 = new Web3(getWeb3Provider(configRead("ledgerUrl")));
+
 /*
  * ServerPlugin
  * Class definition for server plugins
@@ -95,7 +130,6 @@ export class ServerPlugin {
 
     // Handling exceptions to absorb the difference of interest.
     try {
-      const web3 = new Web3(configRead("ledgerUrl"));
       const balance = await web3.eth.getBalance(ethargs);
       const amountVal = parseInt(balance, 10);
       const retObj = {
@@ -178,7 +212,6 @@ export class ServerPlugin {
 
       // Handle the exception once to absorb the difference of interest.
       try {
-        const web3 = new Web3(configRead("ledgerUrl"));
         const res = web3.eth[sendFunction](sendArgs);
 
         retObj = {
@@ -252,7 +285,6 @@ export class ServerPlugin {
 
     // Handling exceptions to absorb the difference of interest.
     try {
-      const web3 = new Web3(configRead("ledgerUrl"));
       const txnCount = await web3.eth.getTransactionCount(ethargs);
       logger.info(`getNonce(): txnCount: ${txnCount}`);
       const hexStr = web3.utils.toHex(txnCount);
@@ -324,7 +356,6 @@ export class ServerPlugin {
 
     // Handling exceptions to absorb the difference of interest.
     try {
-      const web3 = new Web3(configRead("ledgerUrl"));
       const hexStr = web3.utils.toHex(targetValue);
       logger.info(`toHex(): hexStr: ${hexStr}`);
       const result = {
@@ -396,7 +427,6 @@ export class ServerPlugin {
       const serializedTx = funcParam["serializedTx"];
       logger.info("serializedTx  :" + serializedTx);
 
-      const web3 = new Web3(configRead("ledgerUrl"));
       const res = await web3.eth.sendSignedTransaction(serializedTx);
       const result = {
         txid: res.transactionHash,
@@ -453,7 +483,6 @@ export class ServerPlugin {
 
     // Handle the exception once to absorb the difference of interest.
     try {
-      const web3 = new Web3(configRead("ledgerUrl"));
       const looseWeb3Eth = web3.eth as any;
 
       const isSafeToCall =
@@ -521,12 +550,11 @@ export class ServerPlugin {
 
     // Handle the exception once to absorb the difference of interest.
     try {
-      const web3 = new Web3(configRead("ledgerUrl"));
-
       const contract = new web3.eth.Contract(
         args.contract.abi as AbiItem[],
         args.contract.address,
       );
+      (contract as any).setProvider(web3.currentProvider);
 
       const isSafeToCall =
         Object.prototype.hasOwnProperty.call(contract.methods, sendCommand) &&
