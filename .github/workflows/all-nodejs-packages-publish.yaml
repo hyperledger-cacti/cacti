@@ -19,12 +19,17 @@ jobs:
         always-auth: true
         node-version: '16.14.2'
         registry-url: 'https://registry.npmjs.org'
+    - name: ./tools/ci.sh
+      run: ./tools/ci.sh
+      env:
+        DEV_BUILD_DISABLED: false
+        FULL_BUILD_DISABLED: false
+        JEST_TEST_RUNNER_DISABLED: true
+        TAPE_TEST_RUNNER_DISABLED: true
     - name: lerna-publish
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       run: |
         git config --global user.email "${GITHUB_ACTOR}"
         git config --global user.name "${GITHUB_ACTOR}"
-        yarn run configure
-        yarn run build
         yarn lerna publish from-git --yes --loglevel=debug
