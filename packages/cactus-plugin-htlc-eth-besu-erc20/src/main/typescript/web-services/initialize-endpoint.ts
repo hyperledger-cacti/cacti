@@ -86,7 +86,7 @@ export class InitializeEndpoint implements IWebServiceEndpoint {
     try {
       const request: InitializeRequest = req.body as InitializeRequest;
       const result = await this.options.plugin.initialize(request);
-      res.send(result);
+      res.render(result);
     } catch (ex) {
       this.log.error(`${fnTag} failed to serve request`, ex);
       res.status(400).json({

@@ -18,7 +18,7 @@ function isRifError(err: any, res: Response): boolean {
   if (err instanceof RIFError) {
     logger.error(`RIFError caught, ${err.statusCode}, ${err.message}`);
     res.status(err.statusCode);
-    res.send(escapeHtml(err.message));
+    res.render(escapeHtml(err.message));
     return true;
   }
   logger.error(`Error caught: ${err.statusCode}, ${err.message}`);
