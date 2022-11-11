@@ -95,7 +95,7 @@
     "crypto-browserify": "3.12.0",
     "cspell": "5.6.6",
     "del-cli": "4.0.1",
-    "electron": "15.5.5",
+    "electron": "18.3.7",
     "es-main": "1.0.2",
     "eslint": "7.32.0",
     "eslint-config-prettier": "8.3.0",
