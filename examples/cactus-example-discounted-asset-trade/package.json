@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-example-discounted-asset-trade",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "license": "Apache-2.0",
   "main": "dist/www.js",
   "module": "dist/www.js",
