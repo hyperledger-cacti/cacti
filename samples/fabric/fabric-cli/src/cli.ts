@@ -16,10 +16,12 @@ declare global {
   namespace NodeJS {
     interface Global {
       __DEFAULT_MSPID__: string
+      __DEFAULT_MSPID_ORG2__: string
     }
   }
 }
 global.__DEFAULT_MSPID__ = process.env.DEFAULT_MSPID || 'Org1MSP'
+global.__DEFAULT_MSPID_ORG2__ = process.env.DEFAULT_MSPID_ORG2 || 'Org2MSP'
 /**
  * Create the cli and kick it off
  */

@@ -109,7 +109,10 @@ iinAgentServer.addService(iin_agent_pb_grpc.IINAgentService, {
     requestAttestation: (call: { request: iin_agent_pb.CounterAttestedMembership }, callback: (_: any, object: ack_pb.Ack) => void) => {
         const ack_response = new ack_pb.Ack();
         try {
-            requestAttestation(call.request);
+            const securityDomain = process.env.SECURITY_DOMAIN ? process.env.SECURITY_DOMAIN : 'network1';
+            const memberId = process.env.MEMBER_ID ? process.env.MEMBER_ID : 'Org1MSP';
+            const attestationValidityTime = process.env.ATTESTATION_VALIDITY_TIME ? parseInt(process.env.ATTESTATION_VALIDITY_TIME) : 3600;
+            requestAttestation(call.request, securityDomain, memberId, attestationValidityTime);
             ack_response.setMessage('');
             ack_response.setStatus(ack_pb.Ack.STATUS.OK);
             ack_response.setRequestId('');
@@ -164,7 +167,7 @@ const configSetup = async () => {
     const ledgerBase = getLedgerBase(securityDomain, memberId);
     await ledgerBase.init();
     console.log("Setup compelete.");
-    
+
     // TODO
 };
 

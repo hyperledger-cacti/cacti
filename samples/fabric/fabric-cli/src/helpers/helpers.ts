@@ -415,12 +415,12 @@ const getLocalAssetPledgeDetails = async ({
     currentQuery.args = [...currentQuery.args, pledgeId]
     console.log(currentQuery)
     try {
-        const pledgeDetails = await query(currentQuery, 
-            netConfig.connProfilePath, 
-            sourceNetworkName, 
-            netConfig.mspId, 
-            logger, 
-            caller, 
+        const pledgeDetails = await query(currentQuery,
+            netConfig.connProfilePath,
+            sourceNetworkName,
+            netConfig.mspId,
+            logger,
+            caller,
             false
         )
         const pledgeDetailBytes = Buffer.from(pledgeDetails, 'base64')
@@ -747,7 +747,7 @@ const generateViewAddressFromRemoteConfig = (
       )
       throw new Error(`Error: ${networkId} does not exist in the remote-network-config.json file`)
     }
-    
+
     const remoteNetConfig = configJSON[networkId]
     let address = remoteNetConfig.relayEndpoint + '/' + networkId
     if (remoteNetConfig.type == "fabric") {
@@ -761,7 +761,7 @@ const generateViewAddressFromRemoteConfig = (
         throw new Error(`Error: remote network ${remoteNetConfig.type} not supported.`)
     }
     console.log(`Interop query, funcName: ${funcName} \n funcArgs: ${funcArgs} \n and address: ${address}`)
-    
+
     return address
   } catch (err) {
     logger.error(`Error: ${err}`)
@@ -785,7 +785,7 @@ const interopHelper = async (
   if (!netConfig.connProfilePath || !netConfig.channelName || !netConfig.chaincode) {
       throw new Error(`No valid config entry found for ${networkName}`)
   }
-  
+
   const { gateway, wallet, contract } = await fabricHelper({
       channel: netConfig.channelName,
       contractName: process.env.DEFAULT_CHAINCODE ? process.env.DEFAULT_CHAINCODE : 'interop',
@@ -796,7 +796,7 @@ const interopHelper = async (
       discoveryEnabled: true,
       userString: options['user']
   })
-  
+
   const [keyCert, keyCertError] = await handlePromise(
     getKeyAndCertForRemoteRequestbyUserName(wallet, options['user'])
   )
@@ -804,7 +804,7 @@ const interopHelper = async (
     throw new Error(`Error getting key and cert ${keyCertError}`)
   }
   const spinner = print.spin(`Starting Interop Query`)
-  
+
   let relayTlsCAFiles = []
   if (options['relay-tls-ca-files']) {
     relayTlsCAFiles = options['relay-tls-ca-files'].split(':')

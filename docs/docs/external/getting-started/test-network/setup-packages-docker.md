@@ -26,7 +26,7 @@ Before starting, make sure you have the following software installed on your hos
 - Curl: _install using package manager, like `apt` on Debian/Ubuntu Linux_
 - Git: [sample instructions](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - Docker: [sample instructions](https://docs.docker.com/engine/install/) (Latest version)
-- Docker-Compose: [sample instructions](https://docs.docker.com/compose/install/) (Version 1.28.2 or higher)
+- Docker-Compose: [sample instructions](https://docs.docker.com/compose/install/) (Version 1.28.2 or higher, but lower than version V2)
 - Golang: [sample instructions](https://golang.org/dl/) (Version 1.16 or higher)
 - Java (JDK and JRE): [sample instructions](https://openjdk.java.net/install/) (Version 8)
 - Node.js and NPM: [sample instructions](https://nodejs.org/en/download/package-manager/) (Version 11 to Version 14 Supported)
@@ -155,7 +155,7 @@ Use the following steps to run Fabric drivers in Docker containers:
   ```bash
   make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.n2.tls'
   ```
- 
+
 ### Fabric Client (Application)
 
 The CLI is used to interact with a Fabric network, configure it and run chaincode transactions to record data on the channel ledger or query data. It is also used to interact with remote networks through the relay in order to trigger an interoperation flow for data request and acceptance.
