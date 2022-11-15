@@ -52,7 +52,7 @@ Firstly let us identify the different entities involved in the protocol and what
 
 The sequence diagram of ODAP is pictured below.
 
-![odap-sequence-diagram](https://i.imgur.com/AFNvL9v.png)
+![odap-sequence-diagram](https://i.imgur.com/SOdXFEt.png)
 
 ### API Endpoints
 This plugin uses OpenAPI to generate the API paths.
@@ -117,34 +117,37 @@ Let us consider two gateways. The client gateway connected to Hyperledger Fabric
 Then the ODAP gateways should be created as follows:
 
 ```typescript
-const clientOdapPluginOptions: OdapGatewayConstructorOptions = {
-     name: "cactus-plugin#odapGateway",
-     dltIDs: ["DLT2"],
-     instanceId: uuidV4(),    
-     ipfsPath: "http://localhost:8047",
-     fabricPath: "http://localhost:8045",
-     fabricSigningCredential: fabricSigningCredential,
-     fabricChannelName: fabricChannelName,
-     fabricContractName: fabricContractName,
-     fabricAssetID: fabricAssetID,
-   };
+const clientGatewayOptions: IFabricOdapGatewayConstructorOptions = {
+  name: "cactus-plugin#clientOdapGateway",
+  dltIDs: ["DLT2"],
+  instanceId: uuidv4(),
+  ipfsPath: "http://localhost:8047",
+  fabricPath: "http://localhost:8045",
+  fabricSigningCredential: fabricSigningCredential,
+  fabricChannelName: fabricChannelName,
+  fabricContractName: fabricContractName,
+  clientHelper: new ClientGatewayHelper(),
+  serverHelper: new ServerGatewayHelper(),
+};
 
-const serverOdapPluginOptions: OdapGatewayConstructorOptions = {
-     name: "cactus-plugin#odapGateway",
-     dltIDs: ["DLT1"],
-     instanceId: uuidV4(),    
-     ipfsPath: "http://localhost:8047",
-     besuAssetID: "whatever",
-     besuPath: "http://localhost:8046",
-     besuWeb3SigningCredential:
-     besuWeb3SigningCredential,
-     besuContractName: besuContractName,
-     besuKeychainId: besuKeychainId,
-   };
+const serverGatewayOptions: IBesuOdapGatewayConstructorOptions = {
+  name: "cactus-plugin#serverOdapGateway",
+  dltIDs: ["DLT1"],
+  instanceId: uuidv4(),
+  ipfsPath: "http://localhost:8047",
+  besuPath: "http://localhost:8046",
+  besuWeb3SigningCredential: besuWeb3SigningCredential,
+  besuContractName: besuContractName,
+  besuKeychainId: besuKeychainId,
+  clientHelper: new ClientGatewayHelper(),
+  serverHelper: new ServerGatewayHelper(),
+};
    
-   const clientGateway = new OdapGateway(clientOdapPluginOptions);
-   const serverGateway = new OdapGateway(serverOdapPluginOptions);
+  const clientGateway = new FabricOdapGateway(clientGatewayOptions);
+  const serverGateway = new BesuOdapGateway(serverGatewayOptions);
 ```
+
+Note that these gateways are extensions of the [default ODAP Gateway class](https://github.com/hyperledger/cactus/blob/main/packages/cactus-plugin-odap-hermes/src/main/typescript/gateway/plugin-odap-gateway.ts), that implements the gateway functionality. Each of these extensions implements ledger-specific operations.
 
 ## Contributing
 We welcome contributions to Hyperledger Cactus in many forms, and there’s always plenty to do!
