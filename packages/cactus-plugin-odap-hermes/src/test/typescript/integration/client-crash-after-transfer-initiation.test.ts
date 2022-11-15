@@ -30,6 +30,8 @@ import { FabricOdapGateway } from "../../../main/typescript/gateway/fabric-odap-
 import { ServerGatewayHelper } from "../../../main/typescript/gateway/server/server-helper";
 import { ClientGatewayHelper } from "../../../main/typescript/gateway/client/client-helper";
 
+import { knexClientConnection, knexServerConnection } from "../knex.config";
+
 const MAX_RETRIES = 5;
 const MAX_TIMEOUT = 5000;
 
@@ -116,6 +118,7 @@ beforeAll(async () => {
       keyPair: Secp256k1Keys.generateKeyPairsBuffer(),
       clientHelper: new ClientGatewayHelper(),
       serverHelper: new ServerGatewayHelper(),
+      knexConfig: knexServerConnection,
     };
 
     serverExpressApp = express();
@@ -155,6 +158,7 @@ beforeAll(async () => {
       keyPair: Secp256k1Keys.generateKeyPairsBuffer(),
       clientHelper: new ClientGatewayHelper(),
       serverHelper: new ServerGatewayHelper(),
+      knexConfig: knexClientConnection,
     };
 
     clientExpressApp = express();

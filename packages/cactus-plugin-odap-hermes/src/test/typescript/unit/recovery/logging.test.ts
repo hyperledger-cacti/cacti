@@ -33,6 +33,8 @@ import {
 import { ClientGatewayHelper } from "../../../../main/typescript/gateway/client/client-helper";
 import { ServerGatewayHelper } from "../../../../main/typescript/gateway/server/server-helper";
 
+import { knexClientConnection, knexServerConnection } from "../../knex.config";
+
 const logLevel: LogLevelDesc = "TRACE";
 
 let sourceGatewayConstructor: IFabricOdapGatewayConstructorOptions;
@@ -107,6 +109,7 @@ beforeAll(async () => {
     keyPair: Secp256k1Keys.generateKeyPairsBuffer(),
     clientHelper: new ClientGatewayHelper(),
     serverHelper: new ServerGatewayHelper(),
+    knexConfig: knexClientConnection,
   };
   recipientGatewayConstructor = {
     name: "plugin-odap-gateway#recipientGateway",
@@ -115,6 +118,7 @@ beforeAll(async () => {
     ipfsPath: ipfsApiHost,
     clientHelper: new ClientGatewayHelper(),
     serverHelper: new ServerGatewayHelper(),
+    knexConfig: knexServerConnection,
   };
 });
 

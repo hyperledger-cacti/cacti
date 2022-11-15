@@ -45,6 +45,7 @@ export class BesuOdapGateway extends PluginOdapGateway {
       ipfsPath: options.ipfsPath,
       clientHelper: options.clientHelper,
       serverHelper: options.serverHelper,
+      knexConfig: options.knexConfig,
     });
 
     if (options.besuPath != undefined) this.defineBesuConnection(options);

@@ -35,6 +35,8 @@ import { FabricOdapGateway } from "../../../../main/typescript/gateway/fabric-od
 import { ClientGatewayHelper } from "../../../../main/typescript/gateway/client/client-helper";
 import { ServerGatewayHelper } from "../../../../main/typescript/gateway/server/server-helper";
 
+import { knexClientConnection, knexServerConnection } from "../../knex.config";
+
 const logLevel: LogLevelDesc = "TRACE";
 
 const MAX_RETRIES = 5;
@@ -104,6 +106,7 @@ beforeEach(async () => {
     keyPair: Secp256k1Keys.generateKeyPairsBuffer(),
     clientHelper: new ClientGatewayHelper(),
     serverHelper: new ServerGatewayHelper(),
+    knexConfig: knexClientConnection,
   };
   const recipientGatewayConstructor = {
     name: "plugin-odap-gateway#recipientGateway",
@@ -113,6 +116,7 @@ beforeEach(async () => {
     keyPair: Secp256k1Keys.generateKeyPairsBuffer(),
     clientHelper: new ClientGatewayHelper(),
     serverHelper: new ServerGatewayHelper(),
+    knexConfig: knexServerConnection,
   };
 
   pluginSourceGateway = new FabricOdapGateway(sourceGatewayConstructor);
@@ -201,9 +205,8 @@ test("check valid built of recover update message", async () => {
     data: JSON.stringify(sessionData),
   };
 
-  new Promise((resolve) => setTimeout(resolve, 1000));
   const firstTimestamp = Date.now().toString();
-  new Promise((resolve) => setTimeout(resolve, 1000));
+  await new Promise((resolve) => setTimeout(resolve, 5000));
 
   await pluginSourceGateway.storeOdapLog(odapLog1);
 
@@ -260,6 +263,7 @@ test("check valid built of recover update message", async () => {
     throw new Error("Test Failed");
   }
 
+  console.log(recoverUpdateMessage.recoveredLogs);
   expect(recoverUpdateMessage.recoveredLogs.length).toBe(3);
 
   await checkValidRecoverUpdateMessage(
