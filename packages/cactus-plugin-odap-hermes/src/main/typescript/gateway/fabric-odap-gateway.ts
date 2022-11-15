@@ -44,6 +44,7 @@ export class FabricOdapGateway extends PluginOdapGateway {
       ipfsPath: options.ipfsPath,
       clientHelper: options.clientHelper,
       serverHelper: options.serverHelper,
+      knexConfig: options.knexConfig,
     });
 
     if (options.fabricPath != undefined) this.defineFabricConnection(options);

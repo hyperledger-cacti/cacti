@@ -31,6 +31,8 @@ import {
 import { ClientGatewayHelper } from "../../../main/typescript/gateway/client/client-helper";
 import { ServerGatewayHelper } from "../../../main/typescript/gateway/server/server-helper";
 
+import { knexClientConnection } from "../knex.config";
+
 const MAX_RETRIES = 5;
 const MAX_TIMEOUT = 5000;
 
@@ -155,6 +157,7 @@ beforeAll(async () => {
       keyPair: Secp256k1Keys.generateKeyPairsBuffer(),
       clientHelper: new ClientGatewayHelper(),
       serverHelper: new ServerGatewayHelper(),
+      knexConfig: knexClientConnection,
     };
 
     clientExpressApp = express();

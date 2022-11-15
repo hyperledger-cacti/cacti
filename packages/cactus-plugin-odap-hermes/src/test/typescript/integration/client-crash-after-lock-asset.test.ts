@@ -65,6 +65,9 @@ import {
 } from "../../../main/typescript/gateway/fabric-odap-gateway";
 import { ClientGatewayHelper } from "../../../main/typescript/gateway/client/client-helper";
 import { ServerGatewayHelper } from "../../../main/typescript/gateway/server/server-helper";
+
+import { knexClientConnection, knexServerConnection } from "../knex.config";
+
 /**
  * Use this to debug issues with the fabric node SDK
  * ```sh
@@ -568,6 +571,7 @@ beforeAll(async () => {
       fabricContractName: fabricContractName,
       clientHelper: new ClientGatewayHelper(),
       serverHelper: new ServerGatewayHelper(),
+      knexConfig: knexServerConnection,
     };
 
     odapServerGatewayPluginOptions = {
@@ -582,6 +586,7 @@ beforeAll(async () => {
       besuKeychainId: besuKeychainId,
       clientHelper: new ClientGatewayHelper(),
       serverHelper: new ServerGatewayHelper(),
+      knexConfig: knexClientConnection,
     };
 
     pluginSourceGateway = new FabricOdapGateway(odapClientGatewayPluginOptions);

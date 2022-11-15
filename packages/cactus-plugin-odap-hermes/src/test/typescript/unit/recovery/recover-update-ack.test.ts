@@ -27,6 +27,8 @@ import { FabricOdapGateway } from "../../../../main/typescript/gateway/fabric-od
 import { ClientGatewayHelper } from "../../../../main/typescript/gateway/client/client-helper";
 import { ServerGatewayHelper } from "../../../../main/typescript/gateway/server/server-helper";
 
+import { knexClientConnection, knexServerConnection } from "../../knex.config";
+
 const logLevel: LogLevelDesc = "TRACE";
 
 let pluginSourceGateway: PluginOdapGateway;
@@ -92,6 +94,7 @@ beforeEach(async () => {
     ipfsPath: ipfsApiHost,
     clientHelper: new ClientGatewayHelper(),
     serverHelper: new ServerGatewayHelper(),
+    knexConfig: knexClientConnection,
   };
   const recipientGatewayConstructor = {
     name: "plugin-odap-gateway#recipientGateway",
@@ -99,6 +102,7 @@ beforeEach(async () => {
     instanceId: uuidV4(),
     clientHelper: new ClientGatewayHelper(),
     serverHelper: new ServerGatewayHelper(),
+    knexConfig: knexServerConnection,
   };
 
   pluginSourceGateway = new FabricOdapGateway(sourceGatewayConstructor);

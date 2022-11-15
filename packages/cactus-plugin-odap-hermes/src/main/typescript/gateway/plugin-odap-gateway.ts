@@ -114,6 +114,7 @@ export interface IPluginOdapGatewayConstructorOptions {
   ipfsPath?: string;
   clientHelper: ClientGatewayHelper;
   serverHelper: ServerGatewayHelper;
+  knexConfig?: Knex.Config;
 }
 export interface IOdapPluginKeyPair {
   publicKey: Uint8Array;
@@ -185,16 +186,16 @@ export abstract class PluginOdapGateway
 
     if (options.ipfsPath != undefined) this.defineIpfsConnection(options);
 
-    this.defineKnexConnection();
+    this.defineKnexConnection(options.knexConfig);
   }
 
-  public defineKnexConnection(): void {
+  public defineKnexConnection(config: Knex.Config | undefined): void {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const config = require("../../../../knex/knexfile.ts")[
+    const configFile = require("../../../../knex/knexfile.ts")[
       process.env.ENVIRONMENT || "development"
     ];
 
-    this.database = knex(config);
+    this.database = knex(config || configFile);
   }
 
   private defineIpfsConnection(

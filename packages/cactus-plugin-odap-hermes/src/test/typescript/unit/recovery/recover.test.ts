@@ -29,6 +29,8 @@ import { FabricOdapGateway } from "../../../../main/typescript/gateway/fabric-od
 import { ClientGatewayHelper } from "../../../../main/typescript/gateway/client/client-helper";
 import { ServerGatewayHelper } from "../../../../main/typescript/gateway/server/server-helper";
 
+import { knexClientConnection, knexServerConnection } from "../../knex.config";
+
 const logLevel: LogLevelDesc = "TRACE";
 
 let sourceGatewayConstructor: IPluginOdapGatewayConstructorOptions;
@@ -94,6 +96,7 @@ beforeAll(async () => {
     keyPair: Secp256k1Keys.generateKeyPairsBuffer(),
     clientHelper: new ClientGatewayHelper(),
     serverHelper: new ServerGatewayHelper(),
+    knexConfig: knexClientConnection,
   };
   recipientGatewayConstructor = {
     name: "plugin-odap-gateway#recipientGateway",
@@ -103,6 +106,7 @@ beforeAll(async () => {
     keyPair: Secp256k1Keys.generateKeyPairsBuffer(),
     clientHelper: new ClientGatewayHelper(),
     serverHelper: new ServerGatewayHelper(),
+    knexConfig: knexServerConnection,
   };
 });
 
