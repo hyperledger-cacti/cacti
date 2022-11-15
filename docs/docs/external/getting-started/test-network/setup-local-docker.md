@@ -26,7 +26,7 @@ Before starting, make sure you have the following software installed on your hos
 - Curl: _install using package manager, like `apt` on Debian/Ubuntu Linux_
 - Git: [sample instructions](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - Docker: [sample instructions](https://docs.docker.com/engine/install/) (Latest version)
-- Docker-Compose: [sample instructions](https://docs.docker.com/compose/install/) (Version 1.28.2 or higher)
+- Docker-Compose: [sample instructions](https://docs.docker.com/compose/install/) (Version 1.28.2 or higher, but lower than version V2)
 - Golang: [sample instructions](https://golang.org/dl/) (Version 1.16 or higher)
 - Java (JDK and JRE): [sample instructions](https://openjdk.java.net/install/) (Version 8)
 - Node.js and NPM: [sample instructions](https://nodejs.org/en/download/package-manager/) (Version 11 to Version 14 Supported)
@@ -35,8 +35,8 @@ Before starting, make sure you have the following software installed on your hos
   * Default method: Run the following with `sudo` if necessary. This will install both the protobuf compiler and the Go code generator plugins.
     ```
     apt-get install protobuf-compiler
-    go get -u google.golang.org/protobuf/cmd/protoc-gen-go
-    go get -u google.golang.org/grpc/cmd/protoc-gen-go-grpc
+    go install google.golang.org/protobuf/cmd/protoc-gen-go
+    go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
     ```
   * If the above method installs an older version of `protoc` (check using `protoc --version`), say below 3.12.x, you should download pre-compiled binaries instead. (With an older version, you may see errors while attempting to launch and setup the Fabric networks).
     ```
@@ -45,8 +45,8 @@ Before starting, make sure you have the following software installed on your hos
     sudo apt-get install unzip
     unzip protoc-3.15.6-linux-x86_64.zip -d <some-folder-path>
     export PATH="$PATH:<some-folder-path>/bin"
-    go get -u google.golang.org/protobuf/cmd/protoc-gen-go
-    go get -u google.golang.org/grpc/cmd/protoc-gen-go-grpc
+    go install google.golang.org/protobuf/cmd/protoc-gen-go
+    go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
     ```
     | Notes |
     |:------|
@@ -268,7 +268,7 @@ Build the interoperation CorDapp as follows:
   ```bash
   make build-local
   ```
-  
+
 ### Corda Interoperation SDK
 
 A client-layer library is defined in the `sdks/corda` folder. This contains functions for Corda based client applications to exercise interoperation capabilities via relays and also several utility/helper functions. The Corda Client tool, which we will use later, depends on this library.

@@ -42,7 +42,7 @@ const helperInvoke = async (userId, ccFunc, ccArg, ...args) => {
   }
 }
 
-const configureNetwork = async (mainNetwork: string, logger: any = console, iinAgent: boolean = false) => {
+const configureNetwork = async (mainNetwork: string, members: Array<string> = [global.__DEFAULT_MSPID__], logger: any = console, iinAgent: boolean = false) => {
   const networkEnv = getNetworkConfig(mainNetwork)
   logger.debug(`NetworkEnv: ${JSON.stringify(networkEnv)}`)
   if (!networkEnv.relayEndpoint || !networkEnv.connProfilePath) {
@@ -66,7 +66,6 @@ const configureNetwork = async (mainNetwork: string, logger: any = console, iinA
     const network = networkFolders[index]
     if (network === mainNetwork) {
       // A network needs to load/record only other networks' credentials
-      const members = [global.__DEFAULT_MSPID__]
       await loadLocalHelper(
         networkEnv.connProfilePath,
         mainNetwork,
@@ -144,6 +143,7 @@ const loadLocalHelper = async (
   })
   try {
     const response = await MembershipManager.createLocalMembership(gateway, members, networkName, channelName, contractName)
+    logger.info('CreateLocalMembership Successful.')
   } catch (e) {
     logger.error(e)
     logger.info('CreateLocalMembership attempting Update')

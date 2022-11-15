@@ -43,6 +43,11 @@ const command: GluegunCommand = {
             name: '--debug',
             description:
               'Shows debug logs when running. Disabled by default. To enable --debug=true'
+          },
+          {
+             name: '--num-orgs',
+             description:
+              'Optional flag to indicate the number of orgs. Default = 1'
           }
         ],
         command,
@@ -53,6 +58,10 @@ const command: GluegunCommand = {
     if (options.debug === 'true') {
       logger.level = 'debug'
       logger.debug('Debugging is enabled')
+    }
+    let members = [global.__DEFAULT_MSPID__]
+    if (options["num-orgs"] === 2){
+      members = [global.__DEFAULT_MSPID__, global.__DEFAULT_MSPID_ORG2__]
     }
 
     // Create wallet credentials
@@ -71,7 +80,7 @@ const command: GluegunCommand = {
       }
     }
 
-    await configureNetwork(options['local-network'], logger, options['iin-agent'])
+    await configureNetwork(options['local-network'], members, logger, options['iin-agent'])
     process.exit()
   }
 }

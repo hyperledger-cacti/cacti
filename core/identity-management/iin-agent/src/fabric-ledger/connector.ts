@@ -31,13 +31,13 @@ export class FabricConnector extends LedgerBase {
         }
         const config = JSON.parse(fs.readFileSync(configFilePath, 'utf8').toString());
         super(ledgerId, config.mspId, weaverCCId);
-        
+
         this.configFilePath = configFilePath;
         this.networkId = networkId ? networkId : 'network1';
         this.iinAgentUserName = config.agent.name;
         this.connectionProfilePath = (config.ccpPath && config.ccpPath.length>0) ? config.ccpPath : path.resolve(__dirname, './', 'connection_profile.json');
         if (!fs.existsSync(this.connectionProfilePath)) {
-            throw new Error('Connection profile does not exist at path: ' + configFilePath);
+            throw new Error('Connection profile does not exist at path: ' + this.connectionProfilePath);
         }
         this.walletPath = (config.walletPath && config.walletPath.length>0) ? config.walletPath : path.join(process.cwd(), `wallet-${this.networkId}-${this.memberId}`);
     }
@@ -52,45 +52,45 @@ export class FabricConnector extends LedgerBase {
         membership.setSecuritydomain(securityDomain);
         const membershipSerializedBase64 = Buffer.from(membership.serializeBinary()).toString('base64');
         const certAndSign = await this.agentSignMessage(membershipSerializedBase64 + nonce);
-        
+
         const unitId = new iin_agent_pb.SecurityDomainMemberIdentity();
         unitId.setSecurityDomain(securityDomain);
         unitId.setMemberId(this.memberId);
-        
+
         const attestation = new iin_agent_pb.Attestation();
         attestation.setUnitIdentity(unitId);
         attestation.setCertificate(certAndSign.certificate);
         attestation.setSignature(certAndSign.signature);
         attestation.setNonce(nonce);
         attestation.setTimestamp(Date.now());
-        
+
         const attestedMembership = new iin_agent_pb.AttestedMembership();
         attestedMembership.setMembership(membershipSerializedBase64);
         attestedMembership.setAttestation(attestation);
         return attestedMembership;
     }
-    
+
     // Collect security domain membership info
     async counterAttestMembership(attestedMembershipSetSerialized64: string, securityDomain: string, nonce: string): Promise<iin_agent_pb.CounterAttestedMembership> {
         const certAndSign = await this.agentSignMessage(attestedMembershipSetSerialized64 + nonce);
-        
+
         const unitId = new iin_agent_pb.SecurityDomainMemberIdentity();
         unitId.setSecurityDomain(securityDomain);
         unitId.setMemberId(this.memberId);
-        
+
         const attestation = new iin_agent_pb.Attestation();
         attestation.setUnitIdentity(unitId);
         attestation.setCertificate(certAndSign.certificate);
         attestation.setSignature(certAndSign.signature);
         attestation.setNonce(nonce);
         attestation.setTimestamp(Date.now());
-        
+
         const counterAttestedMembership = new iin_agent_pb.CounterAttestedMembership();
         counterAttestedMembership.setAttestedMembershipSet(attestedMembershipSetSerialized64);
         counterAttestedMembership.setAttestationsList([attestation]);
         return counterAttestedMembership;
     }
-    
+
     // record Membership
     async recordMembershipInLedger(counterAttestedMembership: iin_agent_pb.CounterAttestedMembership): Promise<any> {
         const counterAttestedMembershipSerialized64 = Buffer.from(counterAttestedMembership.serializeBinary()).toString('base64');
@@ -107,7 +107,7 @@ export class FabricConnector extends LedgerBase {
     async queryContract(): Promise<string> {
         return await queryFabricChaincode(this.walletPath, this.connectionProfilePath, this.configFilePath, this.ledgerId, this.contractId, "", []);
     }
-    
+
     private async agentSignMessage(message): Promise<{ certificate: string, signature: string }> {
         const wallet = await getWallet(this.walletPath);
         type KeyCert = { key: any, cert: any }
