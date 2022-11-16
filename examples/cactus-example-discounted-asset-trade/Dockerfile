@@ -1,6 +1,7 @@
 FROM cactus-cmd-socketio-server:latest
 
 ARG NPM_PKG_VERSION=latest
+ARG INDY_SDK_PKG_VERSION=1.16.0-dev-1649
 
 ENV APP_HOME=/root/cactus
 
@@ -9,8 +10,8 @@ WORKDIR ${APP_HOME}
 # Required by indy-sdk
 RUN apt-get update \
     && apt-get install -y libsodium23 \
-        libssl1.1 \
-        libzmq5 \
+    libssl1.1 \
+    libzmq5 \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy indy sdk lib from base ubuntu image
@@ -18,8 +19,8 @@ RUN apt-get update \
 COPY --from=indy-sdk-cli:latest /usr/lib/libindy.so /usr/lib/
 
 COPY ./package.json ./dist/yarn.lock ./
-RUN yarn add "${CACTUS_CMD_SOCKETIO_PATH}" "@hyperledger/cactus-verifier-client@${NPM_PKG_VERSION}" \
-        --production --ignore-engines --non-interactive --cache-folder ./.yarnCache && \
+RUN yarn add "${CACTUS_CMD_SOCKETIO_PATH}" "@hyperledger/cactus-verifier-client@${NPM_PKG_VERSION}" "indy-sdk@${INDY_SDK_PKG_VERSION}" \
+    --production --ignore-engines --non-interactive --cache-folder ./.yarnCache && \
     rm -rf ./.yarnCache
 
 COPY ./dist ./dist/

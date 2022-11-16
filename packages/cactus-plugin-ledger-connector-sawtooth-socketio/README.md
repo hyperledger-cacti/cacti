@@ -46,12 +46,16 @@ This plugin provides `Cactus` a way to interact with Hyperledger Sawtooth networ
     ```
 
 ### Docker
+- This image depends on `cactus-cmd-socketio-server:latest` to be present in local store. **Make sure to follow docker build instructions in [cactus-cmd-socketio-server README](../../packages/cactus-cmd-socketio-server/README.md)) before bulding this image!**
+- Docker build process will use artifacts from the latest build. Make sure `./dist` contains the version you want to dockerize.
+
 ```
 # Build
+pushd ../../packages/cactus-cmd-socketio-server/ && docker build . -t cactus-cmd-socketio-server && popd
 docker build . -t cactus-plugin-ledger-connector-sawtooth-socketio
 
 # Run
-docker run -v/etc/cactus/:/etc/cactus -p 5140:5140 --net=sawtooth_net cactus-plugin-ledger-connector-sawtooth-socketio
+docker run -v/etc/cactus/:/etc/cactus -p 5140:5140 cactus-plugin-ledger-connector-sawtooth-socketio
 ```
 
 ### Manual

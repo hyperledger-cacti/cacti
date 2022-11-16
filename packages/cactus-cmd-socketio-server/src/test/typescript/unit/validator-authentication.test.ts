@@ -29,29 +29,30 @@ const { publicKey, privateKey } = generateKeyPairSync("ec", {
   namedCurve: "P-256",
 });
 
-// Mock private key reading
-import { readFileSync } from "fs";
-jest.mock("fs");
-(readFileSync as jest.Mock).mockReturnValue(
-  privateKey.export({ type: "sec1", format: "pem" }),
-);
+const mockConfig = {
+  sslParam: {
+    port: 0,
+    keyValue: privateKey.export({ type: "sec1", format: "pem" }),
+    certValue: publicKey,
+    jwtAlgo: "ES256",
+  },
+  logLevel: "info",
+};
 
-import { config } from "../../../main/typescript/common/core/config/default";
-import { ValidatorAuthentication } from "../../../main/typescript/verifier/ValidatorAuthentication";
+jest.mock("config");
+import config from "config";
+(config.has as jest.Mock).mockImplementation(() => true);
+(config.get as jest.Mock).mockImplementation((keyPath: string) => {
+  let entry = mockConfig as any;
+  keyPath.split(".").forEach((key: string) => (entry = entry[key]));
+  return entry;
+});
+
+import { signMessageJwt } from "../../../main/typescript/verifier/validator-authentication";
 
 //////////////////////////
 // UNIT TESTS
 /////////////////////////
-
-test("Validator loads private key from it's config path", () => {
-  // Called once
-  expect((readFileSync as jest.Mock).mock.calls.length).toBe(1);
-
-  // 1'st argument of the 1'st call.
-  expect((readFileSync as jest.Mock).mock.calls[0][0]).toContain(
-    config.validatorKeyPath,
-  );
-});
 
 test("Static method sign encrypts payload using private key", () => {
   const message = {
@@ -60,7 +61,7 @@ test("Static method sign encrypts payload using private key", () => {
   };
 
   // Call sign
-  const signedMessage = ValidatorAuthentication.sign(message);
+  const signedMessage = signMessageJwt(message);
 
   // Assert signed message
   log.debug("signedMessage:", signedMessage);

@@ -4,6 +4,14 @@ version: "3.4"
 # ./etc/cactus should already exist and contain cactus node configs
 
 services:
+  cmd-socketio-base-image:
+    # Build base image and immediately exit
+    container_name: cmd-socketio-base-dummy
+    image: cactus-cmd-socketio-server
+    build:
+      context: ../../packages/cactus-cmd-socketio-server/
+    command: ["echo", "OK - Exit"]
+
   fabric-socketio-validator:
     container_name: cactus-example-discounted-asset-trade-fabric-socketio-validator
     image: cactus-plugin-ledger-connector-fabric-socketio
@@ -11,6 +19,8 @@ services:
       context: ../../packages/cactus-plugin-ledger-connector-fabric-socketio/
     ports:
       - "5040:5040"
+    depends_on:
+      - cmd-socketio-base-image
     volumes:
         - type: bind
           source: ./etc/cactus
@@ -26,6 +36,8 @@ services:
       context: ../../packages/cactus-plugin-ledger-connector-go-ethereum-socketio/
     ports:
       - "5050:5050"
+    depends_on:
+      - cmd-socketio-base-image
     volumes:
         - type: bind
           source: ./etc/cactus
@@ -75,14 +87,6 @@ services:
     networks:
       - indy-testnet_indy_net
       - cactus-example-discounted-asset-trade-net
-
-  cmd-socketio-base-image:
-    # Build base image and immediately exit
-    container_name: cmd-socketio-base-dummy
-    image: cactus-cmd-socketio-server
-    build:
-      context: ../../packages/cactus-cmd-socketio-server/
-    command: ["echo", "OK - Exit"]
 
   cactus-example-discounted-asset-trade-blp:
     container_name: cactus-example-discounted-asset-trade-blp

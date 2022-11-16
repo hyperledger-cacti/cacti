@@ -1,15 +1,13 @@
 /*
- * Copyright 2021 Hyperledger Cactus Contributors
+ * Copyright 2022 Hyperledger Cactus Contributors
  * SPDX-License-Identifier: Apache-2.0
+ *
+ * NOTE: Be sure that NODE_CONFIG_DIR env variable points to the location
+ * of current module config files before loading this.
  *
  * config.js
  */
 
-export const DEFAULT_NODE_CONFIG_DIR = "/etc/cactus/connector-fabric-socketio/";
-if (!process.env["NODE_CONFIG_DIR"]) {
-  // Must be set before import config
-  process.env["NODE_CONFIG_DIR"] = DEFAULT_NODE_CONFIG_DIR;
-}
 
 import config from "config";
 
@@ -20,7 +18,7 @@ import config from "config";
  * @param defaultValue : Value to return if key is not present in the config.
  * @returns : Configuration value
  */
-export function read<T>(key: string, defaultValue?: T): T {
+export function configRead<T>(key: string, defaultValue?: T): T {
   if (config.has(key)) {
     return config.get(key);
   }

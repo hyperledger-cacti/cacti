@@ -13,13 +13,21 @@
 
 import app from "../app";
 import https = require("https");
-import * as config from "../config";
+
+// Overwrite config read path
+export const DEFAULT_NODE_CONFIG_DIR = "/etc/cactus/connector-fabric-socketio/";
+if (!process.env["NODE_CONFIG_DIR"]) {
+  // Must be set before import config
+  process.env["NODE_CONFIG_DIR"] = DEFAULT_NODE_CONFIG_DIR;
+}
+import { configRead } from "@hyperledger/cactus-cmd-socketio-server";
+
 import fs = require("fs");
 import { Server } from "socket.io"
 // Log settings
 import { getLogger } from "log4js";
 const logger = getLogger("connector_main[" + process.pid + "]");
-logger.level = config.read('logLevel', 'info');
+logger.level = configRead('logLevel', 'info');
 
 // implementation class of a part dependent of end-chains (server plugin)
 import { ServerPlugin } from "../../../connector/ServerPlugin";
@@ -32,18 +40,18 @@ export async function startFabricSocketIOConnector() {
   const Smonitor = new ServerMonitorPlugin();
 
   // Get port from environment and store in Express.
-  const sslport = normalizePort(process.env.PORT || config.read('sslParam.port'));
+  const sslport = normalizePort(process.env.PORT || configRead('sslParam.port'));
   app.set("port", sslport);
 
   // Specify private key and certificate
   let keyString: string;
   let certString: string;
   try {
-    keyString = config.read<string>('sslParam.keyValue');
-    certString = config.read<string>('sslParam.certValue');
+    keyString = configRead<string>('sslParam.keyValue');
+    certString = configRead<string>('sslParam.certValue');
   } catch {
-    keyString = fs.readFileSync(config.read('sslParam.key'), "ascii");
-    certString = fs.readFileSync(config.read('sslParam.cert'), "ascii");
+    keyString = fs.readFileSync(configRead('sslParam.key'), "ascii");
+    certString = fs.readFileSync(configRead('sslParam.cert'), "ascii");
   }
 
   // Create HTTPS server.

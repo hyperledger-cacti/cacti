@@ -18,14 +18,23 @@
 import app from "../app";
 const debug = require("debug")("connector:server");
 import https = require("https");
-import * as config from "../config";
+
+// Overwrite config read path
+export const DEFAULT_NODE_CONFIG_DIR =
+  "/etc/cactus/connector-go-ethereum-socketio/";
+if (!process.env["NODE_CONFIG_DIR"]) {
+  // Must be set before import config
+  process.env["NODE_CONFIG_DIR"] = DEFAULT_NODE_CONFIG_DIR;
+}
+import { configRead } from "@hyperledger/cactus-cmd-socketio-server";
+
 import fs = require("fs");
 import { Server } from "socket.io"
 
 // Log settings
 import { getLogger } from "log4js";
 const logger = getLogger("connector_main[" + process.pid + "]");
-logger.level = config.read('logLevel', 'info');
+logger.level = configRead('logLevel', 'info');
 
 // implementation class of a part dependent of end-chains (server plugin)
 import { ServerPlugin } from "../../../connector/ServerPlugin";
@@ -39,13 +48,13 @@ const Smonitor = new ServerMonitorPlugin();
  * Get port from environment and store in Express.
  */
 
-const sslport = normalizePort(process.env.PORT || config.read('sslParam.port'));
+const sslport = normalizePort(process.env.PORT || configRead('sslParam.port'));
 app.set("port", sslport);
 
 // Specify private key and certificate
 const sslParam = {
-  key: fs.readFileSync(config.read('sslParam.key')),
-  cert: fs.readFileSync(config.read('sslParam.cert')),
+  key: fs.readFileSync(configRead('sslParam.key')),
+  cert: fs.readFileSync(configRead('sslParam.cert')),
 };
 
 /**

@@ -15,12 +15,10 @@ const fs = require("fs");
 const path = require("path");
 const yaml = require("js-yaml");
 const configDefault: any = ConfigUtil.getConfig();
-const configVerifier: ValidatorRegistry = new ValidatorRegistry(
-  path.resolve(__dirname, "/etc/cactus/validator-registry-config.yaml")
-);
-const configContract: any = yaml.safeLoad(
-  fs.readFileSync("/etc/cactus/contractInfo.yaml", "utf8")
-);
+
+import { getLogger } from "log4js";
+const logger = getLogger("DBAccess");
+logger.level = configDefault.logLevel;
 
 export class DBAccess {
   ledgerPluginInfo: LedgerPluginInfo[] = [];
@@ -32,16 +30,31 @@ export class DBAccess {
   }
 
   getLedgerPluginInfo(): LedgerPluginInfo[] {
-    // TODO: Future access to DB for connection information
+    try {
+      const configVerifier: ValidatorRegistry = new ValidatorRegistry(
+        path.resolve(__dirname, "/etc/cactus/validator-registry-config.yaml")
+      );
+      this.ledgerPluginInfo = configVerifier.ledgerPluginInfo;
+    } catch (error) {
+      logger.info("Could not get ledger plugin info");
+      logger.debug(error);
+    }
 
-    this.ledgerPluginInfo = configVerifier.ledgerPluginInfo;
     return this.ledgerPluginInfo;
   }
 
   getContractInfo(): [] {
-    // TODO: Future access to DB for contract information
+    try {
+      const configContract: any = yaml.safeLoad(
+        fs.readFileSync("/etc/cactus/contractInfo.yaml", "utf8")
+      );
 
-    this.contractInfo = configContract.contractInfo;
+      this.contractInfo = configContract.contractInfo;
+    } catch (error) {
+      logger.info("Could not get contract info");
+      logger.debug(error);
+    }
+
     return this.contractInfo;
   }
 

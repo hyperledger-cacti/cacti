@@ -15,13 +15,11 @@
 
 // configuration file
 const SplugUtil = require("./PluginUtil");
-import * as config from "../common/core/config";
+import { configRead, signMessageJwt } from "@hyperledger/cactus-cmd-socketio-server";
 // Log settings
 import { getLogger } from "log4js";
 const logger = getLogger("ServerMonitorPlugin[" + process.pid + "]");
-logger.level = config.read("logLevel", "info");
-// utility
-import { ValidatorAuthentication } from "./ValidatorAuthentication";
+logger.level = configRead("logLevel", "info");
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
 export type MonitorCallback = (callback: {
@@ -66,9 +64,9 @@ export class ServerMonitorPlugin {
       that.periodicMonitoring(clientId, filterKey, cb);
     };
     httpReq.open(
-      config.read<string>("blockMonitor.request.method"),
-      config.read<string>("blockMonitor.request.host") +
-        config.read<string>("blockMonitor.request.getLatestBlockNumberCommand"),
+      configRead<string>("blockMonitor.request.method"),
+      configRead<string>("blockMonitor.request.host") +
+        configRead<string>("blockMonitor.request.getLatestBlockNumberCommand"),
     );
     httpReq.send();
   }
@@ -127,7 +125,7 @@ export class ServerMonitorPlugin {
           logger.debug(
             `transactionDataArray = ${JSON.stringify(transactionDataArray)}`,
           );
-          const signedTransactionDataArray = ValidatorAuthentication.sign({
+          const signedTransactionDataArray = signMessageJwt({
             blockData: transactionDataArray,
           });
           logger.debug(
@@ -148,13 +146,13 @@ export class ServerMonitorPlugin {
     };
     const timerBlockMonitoring = setInterval(function () {
       const callURL =
-        config.read<string>("blockMonitor.request.host") +
-        config.read<string>("blockMonitor.request.periodicMonitoringCommand1") +
+        configRead<string>("blockMonitor.request.host") +
+        configRead<string>("blockMonitor.request.periodicMonitoringCommand1") +
         SplugUtil.convertBlockNumber(that.currentBlockNumber) +
-        config.read<string>("blockMonitor.request.periodicMonitoringCommand2");
+        configRead<string>("blockMonitor.request.periodicMonitoringCommand2");
       logger.debug(`call URL = ${callURL}`);
-      httpReq.open(config.read<string>("blockMonitor.request.method"), callURL);
+      httpReq.open(configRead<string>("blockMonitor.request.method"), callURL);
       httpReq.send();
-    }, config.read("blockMonitor.pollingInterval"));
+    }, configRead("blockMonitor.pollingInterval"));
   }
 }

@@ -12,12 +12,12 @@
  */
 
 // config file
-import * as config from "../common/core/config";
+import { configRead, signMessageJwt } from "@hyperledger/cactus-cmd-socketio-server";
+
 // Log settings
 import { getLogger } from "log4js";
 const logger = getLogger("ServerPlugin[" + process.pid + "]");
-logger.level = config.read<string>("logLevel", "info");
-import { ValidatorAuthentication } from "./ValidatorAuthentication";
+logger.level = configRead<string>("logLevel", "info");
 // Read the library, SDK, etc. according to EC specifications as needed
 
 import { getClientAndChannel, getSubmitterAndEnroll } from "./fabricaccess";
@@ -26,7 +26,7 @@ import safeStringify from "fast-safe-stringify";
 
 const path = require("path");
 const { FileSystemWallet, Gateway } = require("fabric-network");
-const connUserName = config.read<string>("fabric.connUserName");
+const connUserName = configRead<string>("fabric.connUserName");
 
 // Cryptographic for fabric
 const hash = require("fabric-client/lib/hash");
@@ -129,7 +129,7 @@ export class ServerPlugin {
               // logger.debug(`##evaluateTransaction(B6)`);
               objRetValue = JSON.parse(returnvalue);
             }
-            const signedResults = ValidatorAuthentication.sign({
+            const signedResults = signMessageJwt({
               result: objRetValue,
             });
             retObj = {
@@ -273,7 +273,7 @@ export class ServerPlugin {
       )
         .then((signedTx) => {
           if (signedTx != null) {
-            const signedResults = ValidatorAuthentication.sign({
+            const signedResults = signMessageJwt({
               result: signedTx,
             });
             retObj = {
@@ -387,7 +387,7 @@ export class ServerPlugin {
       throw errObj;
     }
 
-    const signedBlock = ValidatorAuthentication.sign({
+    const signedBlock = signMessageJwt({
       result: block,
     });
 
@@ -423,8 +423,8 @@ async function Invoke(reqBody: any) {
     const args = reqBody.args;
 
     // Create a new file system based wallet for managing identities.
-    const wallet = new FileSystemWallet(config.read<string>("fabric.keystore"));
-    console.log(`Wallet path: ${config.read<string>("fabric.keystore")}`);
+    const wallet = new FileSystemWallet(configRead<string>("fabric.keystore"));
+    console.log(`Wallet path: ${configRead<string>("fabric.keystore")}`);
 
     // Check to see if we've already enrolled the user.
     const userExists = await wallet.exists(connUserName);
@@ -489,9 +489,9 @@ async function InvokeSync(reqBody: any) {
       // Create a new file system based wallet for managing identities.
       // logger.debug(`##InvokeSync(B)`);
       const wallet = new FileSystemWallet(
-        config.read<string>("fabric.keystore"),
+        configRead<string>("fabric.keystore"),
       );
-      console.log(`Wallet path: ${config.read<string>("fabric.keystore")}`);
+      console.log(`Wallet path: ${configRead<string>("fabric.keystore")}`);
 
       // Check to see if we've already enrolled the user.
       // logger.debug(`##InvokeSync(C)`);
@@ -737,9 +737,9 @@ async function InvokeSendSignedProposal(
 
   // Low-level access to local-store cert and private key of submitter (in case request is missing those)
   if (!certPem || !privateKeyPem) {
-    const wallet = new FileSystemWallet(config.read<string>("fabric.keystore"));
+    const wallet = new FileSystemWallet(configRead<string>("fabric.keystore"));
     logger.debug(
-      `Wallet path: ${path.resolve(config.read<string>("fabric.keystore"))}`,
+      `Wallet path: ${path.resolve(configRead<string>("fabric.keystore"))}`,
     );
 
     const submitterName = user.getName();
@@ -761,7 +761,7 @@ async function InvokeSendSignedProposal(
 
   const { proposal, txId } = channel.generateUnsignedProposal(
     transactionProposalReq,
-    config.read<string>("fabric.mspid"),
+    configRead<string>("fabric.mspid"),
     certPem,
     false,
   ) as any;
@@ -769,7 +769,7 @@ async function InvokeSendSignedProposal(
   const signedProposal = signProposal(proposal.toBuffer(), privateKeyPem);
 
   const targets = [];
-  for (const peerInfo of config.read<any[]>("fabric.peers")) {
+  for (const peerInfo of configRead<any[]>("fabric.peers")) {
     const peer = channel.getPeer(peerInfo.requests.split("//")[1]);
     targets.push(peer);
   }

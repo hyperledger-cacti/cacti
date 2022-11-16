@@ -6,8 +6,17 @@
  */
 
 const fs = require("fs");
-const path = require("path");
 const yaml = require("js-yaml");
+
+function readConfig(path: string, encoding = "utf8"): object {
+  try {
+    return yaml.safeLoad(
+      fs.readFileSync(path, encoding)
+    );
+  } catch (err: unknown) {
+    return {}
+  }
+}
 
 export class ConfigUtil {
   /**
@@ -16,12 +25,8 @@ export class ConfigUtil {
    * @return {object} Configuration object
    */
   static getConfig(): object {
-    const configCommon: any = yaml.safeLoad(
-      fs.readFileSync("/etc/cactus/default.yaml", "utf8")
-    );
-    const configAppli: any = yaml.safeLoad(
-      fs.readFileSync("/etc/cactus/usersetting.yaml", "utf8")
-    );
+    const configCommon = readConfig("/etc/cactus/default.yaml", "utf8");
+    const configAppli = readConfig("/etc/cactus/usersetting.yaml", "utf8");
     return ConfigUtil.mergeObjects(configCommon, configAppli);
   }
 

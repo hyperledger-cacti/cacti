@@ -19,13 +19,12 @@ import FabricClient from "fabric-client";
 // IF declaration for fabric
 import { getClientAndChannel, getSubmitterAndEnroll } from "./fabricaccess";
 // config file
-import * as config from "../common/core/config";
+import { configRead, signMessageJwt } from "@hyperledger/cactus-cmd-socketio-server";
 // Log settings
 import { getLogger } from "log4js";
 const logger = getLogger("ServerMonitorPlugin[" + process.pid + "]");
-logger.level = config.read<string>("logLevel", "info");
+logger.level = configRead<string>("logLevel", "info");
 // utility
-import { ValidatorAuthentication } from "./ValidatorAuthentication";
 import safeStringify from "fast-safe-stringify";
 
 export type MonitorCallback = (callback: {
@@ -81,7 +80,7 @@ export class ServerMonitorPlugin {
 
               console.log("##[HL-BC] Notify new block data(D2)");
               logger.info(
-                "chain id :" + config.read<string>("fabric.channelName"),
+                "chain id :" + configRead<string>("fabric.channelName"),
               );
               logger.info("blocknumber : " + block.header.number);
               const len = block.data.data.length;
@@ -104,7 +103,7 @@ export class ServerMonitorPlugin {
                   const ccid = invocationSpec.chaincode_spec.chaincode_id.name;
                   logger.info("chaincode id :" + ccid);
                   // Only notify transactions from the chaincode used in ServerPlugin
-                  if (ccid == config.read<string>("fabric.chaincodeId")) {
+                  if (ccid == configRead<string>("fabric.chaincodeId")) {
                     const args = invocationSpec.chaincode_spec.input.args;
                     logger.info("args.length :" + args.length);
                     for (let j = 0; j < args.length; j++) {
@@ -133,7 +132,7 @@ export class ServerMonitorPlugin {
               }
               logger.info("*** SEND BLOCK DATA ***");
               logger.debug(`txlist = ${JSON.stringify(txlist)}`);
-              const signedTxlist = ValidatorAuthentication.sign({
+              const signedTxlist = signMessageJwt({
                 blockData: txlist,
               });
               logger.debug(`signedTxlist = ${signedTxlist}`);

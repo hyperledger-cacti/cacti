@@ -49,12 +49,16 @@ This plugin provides `Cactus` a way to interact with Hyperledger Fabric networks
     ```
 
 ### Docker
+- This image depends on `cactus-cmd-socketio-server:latest` to be present in local store. **Make sure to follow docker build instructions in [cactus-cmd-socketio-server README](../../packages/cactus-cmd-socketio-server/README.md)) before bulding this image!**
+- Docker build process will use artifacts from the latest build. Make sure `./dist` contains the version you want to dockerize.
+
 ```
 # Build
+pushd ../../packages/cactus-cmd-socketio-server/ && docker build . -t cactus-cmd-socketio-server && popd
 docker build . -t cactus-plugin-ledger-connector-fabric-socketio
 
 # Run
-docker run -v/etc/cactus/:/etc/cactus -p 5040:5040 --net=fabric-all-in-one_testnet-2x cactus-plugin-ledger-connector-fabric-socketio
+docker run -v/etc/cactus/:/etc/cactus -p 5040:5040 cactus-plugin-ledger-connector-fabric-socketio
 ```
 
 ### Manual

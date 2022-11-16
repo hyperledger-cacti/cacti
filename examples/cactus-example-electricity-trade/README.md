@@ -22,7 +22,7 @@ In this example, we use the Sawtooth intkey transaction processor as an applicat
   - `5140`: the port of `cactus-plugin-ledger-connector-sawtooth-socketio`
   - You can modify port exported to the host in `./docker-compose.yml`
 - Available directory (This directory must be empty):
-    - `./etc/cactus`: the directory for storing the config files of `cactus-cmd-socketio-server`, will be mounted by the containers.
+  - `./etc/cactus`: the directory for storing the config files of `cactus-cmd-socketio-server`, will be mounted by the containers.
 
 ## Setup
 
@@ -36,14 +36,16 @@ In this example, we use the Sawtooth intkey transaction processor as an applicat
    ```
 
 1. Start the ledgers:
-    ```
-    ./script-start-ledgers.sh
-    ```
-    - This script will start all ledger docker containers, networks, and will setup configuration needed to operate the sample app.
-    - (NOTICE: Before executing the above, your account needs to be added to the docker group (`usermod -a -G docker YourAccount` from root user))
-    - On success, this should start the following containers:
-        - `sawtooth_all_in_one_ledger_1x`
-        - `geth1`
+
+   ```
+   ./script-start-ledgers.sh
+   ```
+
+   - This script will start all ledger docker containers, networks, and will setup configuration needed to operate the sample app.
+   - (NOTICE: Before executing the above, your account needs to be added to the docker group (`usermod -a -G docker YourAccount` from root user))
+   - On success, this should start the following containers:
+     - `sawtooth_all_in_one_ledger_1x`
+     - `geth1`
 
 1. Launch electricity-trade and validators from local `docker-compose.yml` (use separate console for that, docker-compose will block your prompt):
 
@@ -74,6 +76,17 @@ In this example, we use the Sawtooth intkey transaction processor as an applicat
    cactus-example-electricity-trade-blp      | path: /api/v1/bl/balance/, routerJs: /root/cactus/dist/balance.js
    cactus-example-electricity-trade-blp      | [2022-02-14T15:47:47.399] [INFO] www - listening on *: 5034
    ```
+
+### Dockerless run
+
+For development purposes, it might be useful to run the sample application outside of docker-compose environment.
+
+1. Configure cactus and start the ledgers as described above.
+1. Run `./script-dockerless-config-patch.sh` from `cactus-example-electricity-trade/` directory. This will patch the configs and copy it to global location.
+1. Start validators (each in separate cmd window).
+   1. `cd packages/cactus-plugin-ledger-connector-go-ethereum-socketio/ && npm run start`
+   1. `cd packages/cactus-plugin-ledger-connector-sawtooth-socketio/ && npm run start`
+1. Start electricity-trade: `npm run start-dockerless`
 
 ## How to use this application
 
@@ -131,16 +144,16 @@ In this example, we use the Sawtooth intkey transaction processor as an applicat
 
    The result looks like the following:
 
-    ```
-    # Create intkey batch representing electricity usage
-    {
-    "link": "http://rest-api:8008/batch_statuses?id=4e85337e170917c138e4f7de44c85c9dea9c5e17916fded672b90adb85a07ca009002580f8629660e26e1117e9ac15f4c1164d9dc05fc77ac8e212672dc5e97a"
-    }
-    # Increase usage
-    {
-    "link": "http://rest-api:8008/batch_statuses?id=88b4dfa2128c7ad4b646b4fe6be878948f7c17651baf9c6384080a9eaae5036e219c432b46f74331a2d56b80bf2dcc94496ff261d1a941f23210d637badacf14"
-    }
-    ```
+   ```
+   # Create intkey batch representing electricity usage
+   {
+   "link": "http://rest-api:8008/batch_statuses?id=4e85337e170917c138e4f7de44c85c9dea9c5e17916fded672b90adb85a07ca009002580f8629660e26e1117e9ac15f4c1164d9dc05fc77ac8e212672dc5e97a"
+   }
+   # Increase usage
+   {
+   "link": "http://rest-api:8008/batch_statuses?id=88b4dfa2128c7ad4b646b4fe6be878948f7c17651baf9c6384080a9eaae5036e219c432b46f74331a2d56b80bf2dcc94496ff261d1a941f23210d637badacf14"
+   }
+   ```
 
 1. (Optional) Check the balance on Ethereum accounts using the following script
 

@@ -19,9 +19,24 @@ import { ISocketApiClient } from "@hyperledger/cactus-core-api";
 import { Socket, SocketOptions, ManagerOptions, io } from "socket.io-client";
 import { readFileSync } from "fs";
 import { resolve as resolvePath } from "path";
-import { verify, VerifyOptions, VerifyErrors, JwtPayload } from "jsonwebtoken";
+import {
+  verify,
+  VerifyOptions,
+  VerifyErrors,
+  JwtPayload,
+  Algorithm,
+} from "jsonwebtoken";
 import { Observable, ReplaySubject } from "rxjs";
 import { finalize } from "rxjs/operators";
+
+const supportedJwtAlgos: Algorithm[] = [
+  "ES256",
+  "ES384",
+  "ES512",
+  "RS256",
+  "RS384",
+  "RS512",
+];
 
 /**
  * Default logic for validating responses from socketio connector (validator).
@@ -36,7 +51,7 @@ export function verifyValidatorJwt(
 ): Promise<JwtPayload> {
   return new Promise((resolve, reject) => {
     const option: VerifyOptions = {
-      algorithms: ["ES256", "ES384", "ES512", "RS256", "RS384", "RS512"],
+      algorithms: supportedJwtAlgos,
     };
 
     verify(

@@ -105,7 +105,7 @@ The `npm run watch` script in action:
   * Docker Compose
   * OpenJDK (Corda support Java 8 JDK but do not currently support Java 9 or higher)
     * `sudo apt install openjdk-8-jdk-headless`
-  * Indy SDK
+  * Indy SDK (optional)
     * [Installing the SDK](https://github.com/hyperledger/indy-sdk#installing-the-sdk)
     * [Build the SDK from source](https://github.com/hyperledger/indy-sdk#how-to-build-indy-sdk-from-source)
 

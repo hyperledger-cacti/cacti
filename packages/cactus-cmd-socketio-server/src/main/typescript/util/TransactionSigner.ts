@@ -40,6 +40,11 @@ let fabricChannel: any = undefined;
 export class TransactionSigner {
   static signTxEthereum(rawTx: object, signPkey: string) {
     logger.debug(`####in signTxEthereum()`);
+
+    if (!configVerifier.signTxInfo) {
+      throw new Error("Missing configVerifier.signTxInfo");
+    }
+
     // ethereumjs-tx2.1.2_support
     const customCommon = ethJsCommon.forCustomChain(
       configVerifier.signTxInfo.ethereum.network,
@@ -79,6 +84,10 @@ export class TransactionSigner {
   ) {
     logger.debug(`######call signTxFabric()`);
     let invokeResponse; // Return value from chain code
+
+    if (!configVerifier.signTxInfo) {
+      throw new Error("Missing configVerifier.signTxInfo");
+    }
 
     // channel object generation
     if (fabricChannel === undefined) {
@@ -257,6 +266,11 @@ export class TransactionSigner {
       verify: false,
     };
     logger.debug("tlssetup start");
+
+    if (!configVerifier.signTxInfo) {
+      throw new Error("Missing configVerifier.signTxInfo");
+    }
+
     const caService = new classFabricCAService(
       configVerifier.signTxInfo.fabric.ca.URL,
       tlsOptions,
@@ -277,6 +291,11 @@ export class TransactionSigner {
   // Creating a channel object
   static async setupChannel(channelName: any) {
     logger.debug("setupChannel start");
+
+    if (!configVerifier.signTxInfo) {
+      throw new Error("Missing configVerifier.signTxInfo");
+    }
+
     const client = new classClient();
     await TransactionSigner.TLSSetup(
       client,

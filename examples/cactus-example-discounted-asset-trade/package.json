@@ -8,6 +8,7 @@
   "private": true,
   "scripts": {
     "start": "npm run build_pip_indy_package && docker-compose build && docker-compose up",
+    "start-dockerless": "node ./dist/www.js",
     "build": "npm run build-ts && npm run build:dev:backend:postbuild",
     "build-ts": "tsc",
     "build_pip_indy_package": "cd ../../packages-python/cactus_validator_socketio_indy && python3 setup.py bdist_wheel",
@@ -27,7 +28,6 @@
     "fabric-client": "1.4.19",
     "fabric-network": "1.4.19",
     "http-errors": "1.6.3",
-    "indy-sdk": "1.16.0-dev-1649",
     "jsonwebtoken": "8.5.1",
     "log4js": "6.4.0",
     "morgan": "1.9.1",
