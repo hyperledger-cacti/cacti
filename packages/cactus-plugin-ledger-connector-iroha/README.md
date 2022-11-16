@@ -126,7 +126,10 @@ docker run \
   --publish 3000:3000 \
   --publish 4000:4000 \
   --publish 5000:5000 \
-  --env PLUGINS='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-iroha", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "instanceId": "some-unique-iroha-connector-instance-id"}}]' \
+  --env AUTHORIZATION_PROTOCOL='NONE' \
+  --env AUTHORIZATION_CONFIG_JSON='{}' \
+  --env GRPC_TLS_ENABLED=false \
+  --env PLUGINS='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-iroha", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "rpcToriiPortHost": "http://localhost:8545", "instanceId": "some-unique-iroha-connector-instance-id"}}]' \
   cplcb
 ```
 
@@ -137,21 +140,27 @@ docker run \
   --publish 3000:3000 \
   --publish 4000:4000 \
   --publish 5000:5000 \
+  --env AUTHORIZATION_PROTOCOL='NONE' \
+  --env AUTHORIZATION_CONFIG_JSON='{}' \
+  --env GRPC_TLS_ENABLED=false \
   cplcb \
     ./node_modules/.bin/cactusapi \
-    --plugins='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-iroha", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "instanceId": "some-unique-iroha-connector-instance-id"}}]'
+    --plugins='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-iroha", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "rpcToriiPortHost": "http://localhost:8545", "instanceId": "some-unique-iroha-connector-instance-id"}}]'
 ```
 
 Launch container with **configuration file** mounted from host machine:
 ```sh
 
-echo '[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-iroha", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL", "options": {"rpcApiHttpHost": "http://localhost:8545", "instanceId": "some-unique-iroha-connector-instance-id"}}]' > cactus.json
+echo '[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-iroha", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL", "options": {"rpcApiHttpHost": "http://localhost:8545", "rpcToriiPortHost": "http://localhost:8545", "instanceId": "some-unique-iroha-connector-instance-id"}}]' > cactus.json
 
 docker run \
   --rm \
   --publish 3000:3000 \
   --publish 4000:4000 \
   --publish 5000:5000 \
+  --env AUTHORIZATION_PROTOCOL='NONE' \
+  --env AUTHORIZATION_CONFIG_JSON='{}' \
+  --env GRPC_TLS_ENABLED=false \
   --mount type=bind,source="$(pwd)"/cactus.json,target=/cactus.json \
   cplcb \
     ./node_modules/.bin/cactusapi \
@@ -175,7 +184,10 @@ docker run \
   --publish 3000:3000 \
   --publish 4000:4000 \
   --publish 5000:5000 \
-  --env PLUGINS='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-iroha", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL", "options": {"rpcApiHttpHost": "http://localhost:8545", "instanceId": "some-unique-iroha-connector-instance-id"}}]' \
+  --env AUTHORIZATION_PROTOCOL='NONE' \
+  --env AUTHORIZATION_CONFIG_JSON='{}' \
+  --env GRPC_TLS_ENABLED=false \
+  --env PLUGINS='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-iroha", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL", "options": {"rpcApiHttpHost": "http://localhost:8545", "rpcToriiPortHost": "http://localhost:8545", "instanceId": "some-unique-iroha-connector-instance-id"}}]' \
   cplcb
 ```
 

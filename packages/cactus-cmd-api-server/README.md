@@ -241,6 +241,9 @@ Once you've built the container, the following commands should work:
     --rm \
     --publish 3000:3000 \
     --publish 4000:4000 \
+    --env AUTHORIZATION_PROTOCOL='NONE' \
+    --env AUTHORIZATION_CONFIG_JSON='{}' \
+    --env GRPC_TLS_ENABLED=false \
     cas
   ```
 
@@ -251,6 +254,9 @@ Once you've built the container, the following commands should work:
     --rm \
     --publish 3000:3000 \
     --publish 4000:4000 \
+    --env AUTHORIZATION_PROTOCOL='NONE' \
+    --env AUTHORIZATION_CONFIG_JSON='{}' \
+    --env GRPC_TLS_ENABLED=false \
     cas \
       ./node_modules/.bin/cactusapi \
       --plugins='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-fabric", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": { "connectionProfile": {}, "instanceId": "some-unique-instance-id"}}]'
@@ -262,6 +268,9 @@ Once you've built the container, the following commands should work:
     --rm \
     --publish 3000:3000 \
     --publish 4000:4000 \
+    --env AUTHORIZATION_PROTOCOL='NONE' \
+    --env AUTHORIZATION_CONFIG_JSON='{}' \
+    --env GRPC_TLS_ENABLED=false \
     --env PLUGINS='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "instanceId": "some-unique-besu-connector-instance-id"}}]' \
     cas
   ```
@@ -272,6 +281,9 @@ Once you've built the container, the following commands should work:
     --rm \
     --publish 3000:3000 \
     --publish 4000:4000 \
+    --env AUTHORIZATION_PROTOCOL='NONE' \
+    --env AUTHORIZATION_CONFIG_JSON='{}' \
+    --env GRPC_TLS_ENABLED=false \
     cas \
       ./node_modules/.bin/cactusapi \
       --plugins='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "instanceId": "some-unique-besu-connector-instance-id"}}]'
@@ -286,6 +298,9 @@ Once you've built the container, the following commands should work:
     --rm \
     --publish 3000:3000 \
     --publish 4000:4000 \
+    --env AUTHORIZATION_PROTOCOL='NONE' \
+    --env AUTHORIZATION_CONFIG_JSON='{}' \
+    --env GRPC_TLS_ENABLED=false \
     --mount type=bind,source="$(pwd)"/cactus.json,target=/cactus.json \
     cas \
       ./node_modules/.bin/cactusapi \
@@ -308,6 +323,9 @@ Don't have a Besu network on hand to test with? Test or develop against our Besu
       --rm \
       --publish 3000:3000 \
       --publish 4000:4000 \
+      --env AUTHORIZATION_PROTOCOL='NONE' \
+      --env AUTHORIZATION_CONFIG_JSON='{}' \
+      --env GRPC_TLS_ENABLED=false \
       --env PLUGINS='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "instanceId": "some-unique-besu-connector-instance-id"}}]' \
       cas
     ```

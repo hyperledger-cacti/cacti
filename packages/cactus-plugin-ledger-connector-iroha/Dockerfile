@@ -1,5 +1,7 @@
-FROM ghcr.io/hyperledger/cactus-cmd-api-server:2021-08-15--refactor-1222
+FROM ghcr.io/hyperledger/cactus-cmd-api-server:2022-11-14-6ff6aac
+RUN npm install -g yarn@1.22.17
 
+ENV NODE_ENV=production
 ARG NPM_PKG_VERSION=latest
 
-RUN npm i @hyperledger/cactus-plugin-ledger-connector-iroha@${NPM_PKG_VERSION} --production
+RUN yarn add @hyperledger/cactus-plugin-ledger-connector-iroha@${NPM_PKG_VERSION} --production --ignore-engines
