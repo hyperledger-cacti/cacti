@@ -11,7 +11,7 @@
  */
 
 //Dependent library
-import * as config from "../common/core/config";
+import { configRead } from "@hyperledger/cactus-cmd-socketio-server";
 const path = require("path");
 import fs from "fs";
 
@@ -25,28 +25,28 @@ const clients = new Map<string, FabricClient>();
 // Log settings
 import { getLogger } from "log4js";
 const logger = getLogger("fabricaccess[" + process.pid + "]");
-logger.level = config.read<string>("logLevel", "info");
+logger.level = configRead<string>("logLevel", "info");
 
 // Get user object to send Proposal to EP
 export function getSubmitterAndEnroll(cli: FabricClient): Promise<User> {
   logger.info("##fabricaccess_getSubmitter");
-  const caUrl = config.read<string>("fabric.ca.url");
-  const caName = config.read<string>("fabric.ca.name");
+  const caUrl = configRead<string>("fabric.ca.url");
+  const caName = configRead<string>("fabric.ca.name");
   // Returns Promise<User> when checkPersistence is true (poor typing)
   return (cli.getUserContext(
-    config.read<string>("fabric.submitter.name"),
+    configRead<string>("fabric.submitter.name"),
     true,
   ) as Promise<User>).then((user) => {
     return new Promise((resolve, reject) => {
       if (user && user.isEnrolled()) {
         return resolve(user);
       }
-      const member = new User(config.read<string>("fabric.submitter.name"));
+      const member = new User(configRead<string>("fabric.submitter.name"));
       let cryptoSuite = cli.getCryptoSuite();
       if (!cryptoSuite) {
         const storePath = path.join(
-          config.read<string>("fabric.keystore"),
-          config.read<string>("fabric.submitter.name"),
+          configRead<string>("fabric.keystore"),
+          configRead<string>("fabric.submitter.name"),
         );
         cryptoSuite = FabricClient.newCryptoSuite();
         cryptoSuite.setCryptoKeyStore(
@@ -65,14 +65,14 @@ export function getSubmitterAndEnroll(cli: FabricClient): Promise<User> {
       const cop = new copService(caUrl, tlsOptions, caName, cryptoSuite);
       return cop
         .enroll({
-          enrollmentID: config.read<string>("fabric.submitter.name"),
-          enrollmentSecret: config.read<string>("fabric.submitter.secret"),
+          enrollmentID: configRead<string>("fabric.submitter.name"),
+          enrollmentSecret: configRead<string>("fabric.submitter.secret"),
         })
         .then((enrollment) => {
           return member.setEnrollment(
             enrollment.key,
             enrollment.certificate,
-            config.read<string>("fabric.mspid"),
+            configRead<string>("fabric.mspid"),
           );
         })
         .then(() => {
@@ -90,16 +90,16 @@ export function getSubmitterAndEnroll(cli: FabricClient): Promise<User> {
 
 // fabric-client and Channel object generation
 export async function getClientAndChannel(
-  channelName = config.read<string>("fabric.channelName"),
+  channelName = configRead<string>("fabric.channelName"),
 ) {
   logger.info("##fabricaccess_getClientAndChannel");
   // Since only one KVS can be set in the client, management in CA units as well as KVS path
   let isNewClient = false;
-  let client = clients.get(config.read<string>("fabric.ca.name"));
+  let client = clients.get(configRead<string>("fabric.ca.name"));
   if (!client) {
     logger.info("create new fabric-client");
     client = new FabricClient();
-    clients.set(config.read<string>("fabric.ca.name"), client);
+    clients.set(configRead<string>("fabric.ca.name"), client);
     isNewClient = true;
   }
 
@@ -116,23 +116,23 @@ export async function getClientAndChannel(
 
       let ordererCA: string;
       try {
-        ordererCA = config.read<string>('fabric.orderer.tlscaValue');
+        ordererCA = configRead<string>('fabric.orderer.tlscaValue');
       } catch {
-        ordererCA = fs.readFileSync(config.read('fabric.orderer.tlsca'), 'ascii');
+        ordererCA = fs.readFileSync(configRead('fabric.orderer.tlsca'), 'ascii');
       }
 
       const orderer = client.newOrderer(
-        config.read<string>("fabric.orderer.url"),
+        configRead<string>("fabric.orderer.url"),
         {
           pem: ordererCA,
-          "ssl-target-name-override": config.read<string>(
+          "ssl-target-name-override": configRead<string>(
             "fabric.orderer.name",
           ),
         },
       );
       channel.addOrderer(orderer);
       // EP settings
-      const peersConfig = config.read<any[]>("fabric.peers");
+      const peersConfig = configRead<any[]>("fabric.peers");
       for (let i = 0; i < peersConfig.length; i++) {
         let peerCA: string;
         if ("tlscaValue" in peersConfig[i]) {
@@ -146,12 +146,12 @@ export async function getClientAndChannel(
           "ssl-target-name-override": peersConfig[i].name,
         });
 
-        channel.addPeer(peer, config.read<string>("fabric.mspid"));
+        channel.addPeer(peer, configRead<string>("fabric.mspid"));
       }
 
       const storePath = path.join(
-        config.read<string>("fabric.keystore"),
-        config.read<string>("fabric.submitter.name"),
+        configRead<string>("fabric.keystore"),
+        configRead<string>("fabric.submitter.name"),
       );
       const cryptoSuite = FabricClient.newCryptoSuite();
       cryptoSuite.setCryptoKeyStore(

@@ -4,6 +4,14 @@ version: "3.4"
 # ./etc/cactus should already exist and contain cactus node configs
 
 services:
+  cmd-socketio-base-image:
+    # Build base image and immediately exit
+    container_name: cmd-socketio-base-dummy
+    image: cactus-cmd-socketio-server
+    build:
+      context: ../../packages/cactus-cmd-socketio-server/
+    command: ["echo", "OK - Exit"]
+
   ethereum-validator:
     container_name: cactus-example-electricity-trade-ethereum-validator
     image: cactus-plugin-ledger-connector-go-ethereum-socketio
@@ -14,6 +22,8 @@ services:
     networks:
      - geth1net
      - cactus-example-electricity-trade-net
+    depends_on:
+      - cmd-socketio-base-image
     volumes:
         - type: bind
           source: ./etc/cactus
@@ -29,18 +39,12 @@ services:
     networks:
       - sawtooth_aio_testnet_1x
       - cactus-example-electricity-trade-net
+    depends_on:
+      - cmd-socketio-base-image
     volumes:
         - type: bind
           source: ./etc/cactus
           target: /etc/cactus
-
-  cmd-socketio-base-image:
-    # Build base image and immediately exit
-    container_name: cmd-socketio-base-dummy
-    image: cactus-cmd-socketio-server
-    build:
-      context: ../../packages/cactus-cmd-socketio-server/
-    command: ["echo", "OK - Exit"]
 
   cactus-example-electricity-trade-blp:
     container_name: cactus-example-electricity-trade-blp

@@ -18,6 +18,12 @@
     },
     {
       "path": "../cactus-test-tooling/tsconfig.json"
+    },
+    {
+      "path": "../cactus-cmd-socketio-server/tsconfig.json"
+    },
+    {
+      "path": "../cactus-cmd-api-server/tsconfig.json"
     }
   ]
 }

@@ -12,14 +12,13 @@
  */
 
 // configuration file
-import * as config from "../common/core/config";
+import { configRead, signMessageJwt } from "@hyperledger/cactus-cmd-socketio-server";
 // Log settings
 import { getLogger } from "log4js";
 const logger = getLogger("ServerPlugin[" + process.pid + "]");
-logger.level = config.read("logLevel", "info");
+logger.level = configRead("logLevel", "info");
 // utility
 import * as SplugUtil from "./PluginUtil";
-import { ValidatorAuthentication } from "./ValidatorAuthentication";
 // Load libraries, SDKs, etc. according to specifications of endchains as needed
 const Web3 = require("web3");
 import safeStringify from "fast-safe-stringify";
@@ -92,7 +91,7 @@ export class ServerPlugin {
       try {
         const web3 = new Web3();
         web3.setProvider(
-          new web3.providers.HttpProvider(config.read("ledgerUrl")),
+          new web3.providers.HttpProvider(configRead("ledgerUrl")),
         );
         const balance = web3.eth.getBalance(ethargs);
         const amountVal = balance.toNumber();
@@ -182,7 +181,7 @@ export class ServerPlugin {
       try {
         const web3 = new Web3();
         web3.setProvider(
-          new web3.providers.HttpProvider(config.read("ledgerUrl")),
+          new web3.providers.HttpProvider(configRead("ledgerUrl")),
         );
         const res = web3.eth[sendFunction](sendArgs);
 
@@ -261,7 +260,7 @@ export class ServerPlugin {
       try {
         const web3 = new Web3();
         web3.setProvider(
-          new web3.providers.HttpProvider(config.read("ledgerUrl")),
+          new web3.providers.HttpProvider(configRead("ledgerUrl")),
         );
         const txnCount = web3.eth.getTransactionCount(ethargs);
         logger.info(`getNonce(): txnCount: ${txnCount}`);
@@ -273,7 +272,7 @@ export class ServerPlugin {
         };
         logger.debug(`getNonce(): result: ${result}`);
 
-        const signedResults = ValidatorAuthentication.sign({ result: result });
+        const signedResults = signMessageJwt({ result: result });
         logger.debug(`getNonce(): signedResults: ${signedResults}`);
         retObj = {
           resObj: {
@@ -342,7 +341,7 @@ export class ServerPlugin {
       try {
         const web3 = new Web3();
         web3.setProvider(
-          new web3.providers.HttpProvider(config.read("ledgerUrl")),
+          new web3.providers.HttpProvider(configRead("ledgerUrl")),
         );
         const hexStr = web3.toHex(targetValue);
         logger.info(`toHex(): hexStr: ${hexStr}`);
@@ -351,7 +350,7 @@ export class ServerPlugin {
         };
         logger.debug(`toHex(): result: ${result}`);
 
-        const signedResults = ValidatorAuthentication.sign({ result: result });
+        const signedResults = signMessageJwt({ result: result });
         logger.debug(`toHex(): signedResults: ${signedResults}`);
         retObj = {
           resObj: {
@@ -419,7 +418,7 @@ export class ServerPlugin {
       try {
         const web3 = new Web3();
         web3.setProvider(
-          new web3.providers.HttpProvider(config.read("ledgerUrl")),
+          new web3.providers.HttpProvider(configRead("ledgerUrl")),
         );
         const res = web3.eth.sendRawTransaction(serializedTx);
 
@@ -467,7 +466,7 @@ export class ServerPlugin {
       try {
         const web3 = new Web3();
         web3.setProvider(
-          new web3.providers.HttpProvider(config.read("ledgerUrl")),
+          new web3.providers.HttpProvider(configRead("ledgerUrl")),
         );
         let result: any = null;
         if (sendArgs !== undefined) {
@@ -475,7 +474,7 @@ export class ServerPlugin {
         } else {
           result = web3.eth[sendFunction]();
         }
-        const signedResults = ValidatorAuthentication.sign({ result: result });
+        const signedResults = signMessageJwt({ result: result });
         retObj = {
           resObj: {
             status: 200,
@@ -536,7 +535,7 @@ export class ServerPlugin {
       try {
         const web3 = new Web3();
         web3.setProvider(
-          new web3.providers.HttpProvider(config.read("ledgerUrl")),
+          new web3.providers.HttpProvider(configRead("ledgerUrl")),
         );
         const contract = web3.eth
           .contract(args.contract.abi)
@@ -570,7 +569,7 @@ export class ServerPlugin {
         }
         logger.debug(`##contract: result: ${result}`);
 
-        const signedResults = ValidatorAuthentication.sign({ result: result });
+        const signedResults = signMessageJwt({ result: result });
         retObj = {
           resObj: {
             status: 200,

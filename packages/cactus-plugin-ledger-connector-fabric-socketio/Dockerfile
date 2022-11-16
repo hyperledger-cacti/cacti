@@ -1,15 +1,15 @@
-# TODO
-# Install connector as yarn package like in @hyperledger/cactus-plugin-ledger-connector-besu
+FROM cactus-cmd-socketio-server:latest
 
-FROM node:14
+ENV CACTUS_CONNECTOR_FABRIC_PATH=/opt/cactus-plugin-ledger-connector-fabric-socketio
 
-WORKDIR /root/cactus/
-
-COPY ./dist/yarn.lock ./package.json ./
-RUN yarn install --production --ignore-engines --non-interactive --cache-folder ./.yarnCache; rm -rf ./.yarnCache
+WORKDIR ${CACTUS_CONNECTOR_FABRIC_PATH}
 
 COPY ./dist ./dist/
+COPY ./dist/yarn.lock ./package.json ./
+RUN yarn add "${CACTUS_CMD_SOCKETIO_PATH}" \
+        --production --frozen-lockfile --ignore-engines --non-interactive --cache-folder ./.yarnCache && \
+    rm -rf ./.yarnCache
 
 EXPOSE 5040
 VOLUME ["/etc/cactus/"]
-CMD ["npm", "run", "start"]
+CMD [ "npm", "run", "start" ]

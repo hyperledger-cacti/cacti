@@ -14,13 +14,11 @@
  */
 
 // configuration file
-import * as config from "../common/core/config";
+import { configRead, signMessageJwt } from "@hyperledger/cactus-cmd-socketio-server";
 // Log settings
 import { getLogger } from "log4js";
 const logger = getLogger("ServerMonitorPlugin[" + process.pid + "]");
-logger.level = config.read("logLevel", "info");
-// utility
-import { ValidatorAuthentication } from "./ValidatorAuthentication";
+logger.level = configRead("logLevel", "info");
 // Load libraries, SDKs, etc. according to specifications of endchains as needed
 const Web3 = require("web3");
 import safeStringify from "fast-safe-stringify";
@@ -54,7 +52,7 @@ export class ServerMonitorPlugin {
       try {
         const web3 = new Web3();
         const provider = new web3.providers.HttpProvider(
-          config.read("ledgerUrl"),
+          configRead("ledgerUrl"),
         );
         web3.setProvider(provider);
         filter = web3.eth.filter("latest");
@@ -75,7 +73,7 @@ export class ServerMonitorPlugin {
             if (trLength > 0) {
               logger.info("*** SEND BLOCK DATA ***");
               logger.debug(`blockData = ${JSON.stringify(blockData)}`);
-              const signedBlockData = ValidatorAuthentication.sign({
+              const signedBlockData = signMessageJwt({
                 blockData: blockData,
               });
               logger.debug(`signedBlockData = ${signedBlockData}`);

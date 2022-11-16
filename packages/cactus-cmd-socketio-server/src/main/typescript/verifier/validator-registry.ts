@@ -62,13 +62,17 @@ type SignTxInfo = {
 };
 
 export class ValidatorRegistry {
-  ledgerPluginInfo: Array<LedgerPluginInfo>;
-  signTxInfo: SignTxInfo;
+  ledgerPluginInfo: Array<LedgerPluginInfo> = [];
+  signTxInfo: SignTxInfo | undefined;
 
   constructor(path: string) {
-    const yamlText = fs.readFileSync(path, "utf8");
-    const yamlObj = yaml.safeLoad(yamlText);
-    this.ledgerPluginInfo = yamlObj.ledgerPluginInfo;
-    this.signTxInfo = yamlObj.signTxInfo;
+    try {
+      const yamlText = fs.readFileSync(path, "utf8");
+      const yamlObj = yaml.safeLoad(yamlText);
+      this.ledgerPluginInfo = yamlObj.ledgerPluginInfo;
+      this.signTxInfo = yamlObj.signTxInfo;
+    } catch (error) {
+      console.log("Could not read validator registry");
+    }
   }
 }

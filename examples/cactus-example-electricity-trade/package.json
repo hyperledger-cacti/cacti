@@ -8,6 +8,7 @@
   "private": true,
   "scripts": {
     "start": "docker-compose build && docker-compose up",
+    "start-dockerless": "node ./dist/www.js",
     "build": "npm run build-ts && npm run build:dev:backend:postbuild",
     "build-ts": "tsc",
     "build:dev:backend:postbuild": "cp -f ../../yarn.lock ./dist/"

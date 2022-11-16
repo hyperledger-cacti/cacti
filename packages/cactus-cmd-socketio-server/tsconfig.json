@@ -14,8 +14,7 @@
     "./src/main/typescript/routing-interface/**/*.ts"
   ],
   "exclude": [
-    "copyStaticAssets.ts",
-    "./src/main/typescript/verifier/ValidatorAuthentication.ts"
+    "copyStaticAssets.ts"
   ],
   "references": [
     {
