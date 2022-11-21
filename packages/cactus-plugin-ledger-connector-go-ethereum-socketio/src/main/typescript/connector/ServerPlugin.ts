@@ -125,7 +125,9 @@ export class ServerPlugin {
     });
   }
 
-  /*
+  /**
+   * @deprecated - Not usable, can't unlock account remotely at the moment.
+   *
    * transferNumericAsset
    * Transfer numerical asset
    *
@@ -397,42 +399,53 @@ export class ServerPlugin {
       logger.info("sendRawTransaction(start");
 
       let retObj: Record<string, any>;
-      const sendArgs = {};
-      const sendFunction = "sendTransaction";
       const funcParam = args.args.args[0];
-
-      if (funcParam["serializedTx"] == undefined) {
-        const emsg = "JSON parse error!";
-        logger.error(emsg);
-        retObj = {
-          status: 504,
-          errorDetail: emsg,
-        };
-        return reject(retObj);
-      }
-
-      const serializedTx = funcParam["serializedTx"];
-      logger.info("serializedTx  :" + serializedTx);
+      const reqID = args["reqID"];
 
       // Handle the exception once to absorb the difference of interest.
       try {
+        if (!funcParam || funcParam["serializedTx"] == undefined) {
+          throw "JSON parse error!";
+        }
+
+        const serializedTx = funcParam["serializedTx"];
+        logger.info("serializedTx  :" + serializedTx);
+
         const web3 = new Web3();
         web3.setProvider(
           new web3.providers.HttpProvider(configRead("ledgerUrl")),
         );
         const res = web3.eth.sendRawTransaction(serializedTx);
-
-        retObj = {
-          status: 200,
+        const result = {
           txid: res,
         };
+
+        const signedResults = signMessageJwt({ result });
+        logger.debug(`sendRawTransaction(): signedResults: ${signedResults}`);
+        retObj = {
+          resObj: {
+            status: 200,
+            data: signedResults,
+          },
+        };
+        if (reqID !== undefined) {
+          retObj["id"] = reqID;
+        }
+        logger.debug(`##sendRawTransaction: retObj: ${JSON.stringify(retObj)}`);
         return resolve(retObj);
       } catch (e) {
         retObj = {
-          status: 504,
-          errorDetail: safeStringify(e),
+          resObj: {
+            status: 504,
+            errorDetail: safeStringify(e),
+          },
         };
         logger.error(retObj);
+
+        if (reqID !== undefined) {
+          retObj["id"] = reqID;
+        }
+        logger.debug(`##sendRawTransaction: retObj: ${JSON.stringify(retObj)}`);
 
         return reject(retObj);
       }
