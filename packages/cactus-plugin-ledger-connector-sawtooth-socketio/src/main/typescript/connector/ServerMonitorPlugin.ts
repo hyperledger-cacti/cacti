@@ -32,15 +32,8 @@ export type MonitorCallback = (callback: {
  * Class definitions of server monitoring
  */
 export class ServerMonitorPlugin {
-  currentBlockNumber: number;
-
-  /*
-   * constructors
-   */
-  constructor() {
-    // Define dependent specific settings
-    this.currentBlockNumber = -1;
-  }
+  currentBlockNumber = -1;
+  runningMonitors = new Map<string, ReturnType<typeof setInterval>>();
 
   /*
    * startMonitor
@@ -62,12 +55,20 @@ export class ServerMonitorPlugin {
       logger.debug(`responseObj = ${JSON.stringify(responseObj)}`);
       logger.debug(`currentBlockNumber = ${that.currentBlockNumber}`);
       that.periodicMonitoring(clientId, filterKey, cb);
-    };
+    }
+
+    const method = configRead<string>("blockMonitor.request.method");
+    const latestBlockURL = new URL(
+      configRead<string>("blockMonitor.request.getLatestBlockNumberCommand"),
+      configRead<string>("blockMonitor.request.host"))
+      .toString();
+    logger.debug("latestBlockURL:", latestBlockURL);
+
     httpReq.open(
-      configRead<string>("blockMonitor.request.method"),
-      configRead<string>("blockMonitor.request.host") +
-        configRead<string>("blockMonitor.request.getLatestBlockNumberCommand"),
+      method,
+      latestBlockURL,
     );
+
     httpReq.send();
   }
 
@@ -135,7 +136,12 @@ export class ServerMonitorPlugin {
             status: 200,
             blockData: signedTransactionDataArray,
           };
-          cb(retObj);
+
+          if (that.runningMonitors.has(clientId)) {
+            cb(retObj);
+          } else {
+            logger.info("Monitoring seems to be stopped - don't send the response! ClientID:", clientId);
+          }
         }
       }
 
@@ -144,15 +150,36 @@ export class ServerMonitorPlugin {
       }
       logger.debug(`currentBlockNumber = ${that.currentBlockNumber}`);
     };
+
     const timerBlockMonitoring = setInterval(function () {
-      const callURL =
-        configRead<string>("blockMonitor.request.host") +
+      const newBlocksPath =
         configRead<string>("blockMonitor.request.periodicMonitoringCommand1") +
         SplugUtil.convertBlockNumber(that.currentBlockNumber) +
         configRead<string>("blockMonitor.request.periodicMonitoringCommand2");
-      logger.debug(`call URL = ${callURL}`);
-      httpReq.open(configRead<string>("blockMonitor.request.method"), callURL);
+      const newBlocksUrl = new URL(
+        newBlocksPath,
+        configRead<string>("blockMonitor.request.host"))
+        .toString();
+      logger.debug(`newBlocksUrl = ${newBlocksUrl}`);
+
+      httpReq.open(configRead<string>("blockMonitor.request.method"), newBlocksUrl);
       httpReq.send();
     }, configRead("blockMonitor.pollingInterval"));
+
+    this.runningMonitors.set(clientId, timerBlockMonitoring);
+  }
+
+  /**
+   * Stop monitor for given client.
+   *
+   * @param {string} clientId: Client ID from which monitoring stop request was made
+   */
+  stopMonitor(clientId: string) {
+    let monitorInterval = this.runningMonitors.get(clientId);
+    if (monitorInterval) {
+      logger.info("stop watching and remove interval.");
+      clearInterval(monitorInterval);
+      this.runningMonitors.delete(clientId);
+    }
   }
 }
