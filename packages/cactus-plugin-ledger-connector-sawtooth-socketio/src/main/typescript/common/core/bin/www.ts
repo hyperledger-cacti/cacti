@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /*
- * Copyright 2021 Hyperledger Cactus Contributors
+ * Copyright 2022 Hyperledger Cactus Contributors
  * SPDX-License-Identifier: Apache-2.0
  *
  * www.js
@@ -16,7 +16,6 @@
  */
 
 import app from "../app";
-const debug = require("debug")("connector:server");
 import https = require("https");
 
 // Overwrite config read path
@@ -37,42 +36,8 @@ logger.level = configRead('logLevel', 'info');
 
 // destination dependency (MONITOR) implementation class
 import { ServerMonitorPlugin } from "../../../connector/ServerMonitorPlugin";
-const Smonitor = new ServerMonitorPlugin();
 
-/**
- * Get port from environment and store in Express.
- */
-
-const sslport = normalizePort(process.env.PORT || configRead('sslParam.port'));
-app.set("port", sslport);
-
-// Specify private key and certificate
-const sslParam = {
-  key: fs.readFileSync(configRead('sslParam.key')),
-  cert: fs.readFileSync(configRead('sslParam.cert')),
-};
-
-/**
- * Create HTTPS server.
- */
-
-const server = https.createServer(sslParam, app); // Start as an https server.
-const io = new Server(server);
-
-/**
- * Listen on provided port, on all network interfaces.
- */
-
-server.listen(sslport, function () {
-  console.log("listening on *:" + sslport);
-});
-server.on("error", onError);
-server.on("listening", onListening);
-
-/**
- * Normalize a port into a number, string, or false.
- */
-
+// Normalize a port into a number, string, or false.
 function normalizePort(val: string) {
   const port = parseInt(val, 10);
 
@@ -89,65 +54,108 @@ function normalizePort(val: string) {
   return false;
 }
 
-/**
- * Event listener for HTTPS server "error" event.
- */
+export async function startSawtoothSocketIOConnector() {
+  const Smonitor = new ServerMonitorPlugin();
 
-function onError(error: any) {
-  if (error.syscall !== "listen") {
-    throw error;
+  // Get port from environment and store in Express.
+  const sslport = normalizePort(process.env.PORT || configRead('sslParam.port'));
+  app.set("port", sslport);
+
+  // Specify private key and certificate
+  let keyString: string;
+  let certString: string;
+  try {
+    keyString = configRead<string>('sslParam.keyValue');
+    certString = configRead<string>('sslParam.certValue');
+  } catch {
+    keyString = fs.readFileSync(configRead('sslParam.key'), "ascii");
+    certString = fs.readFileSync(configRead('sslParam.cert'), "ascii");
   }
 
-  const bind =
-    typeof sslport === "string" ? "Pipe " + sslport : "Port " + sslport;
+  // Create HTTPS server.
+  const server = https.createServer({
+    key: keyString,
+    cert: certString,
+  }, app); // Start as an https server.
+  const io = new Server(server);
 
-  // handle specific listen errors with friendly messages
-  switch (error.code) {
-    case "EACCES":
-      console.error(bind + " requires elevated privileges");
-      process.exit(1);
-      break;
-    case "EADDRINUSE":
-      console.error(bind + " is already in use");
-      process.exit(1);
-      break;
-    default:
+  // Event listener for HTTPS server "error" event.
+  server.on("error", (error: any) => {
+    if (error.syscall !== "listen") {
       throw error;
-  }
-}
+    }
 
-/**
- * Event listener for HTTPS server "listening" event.
- */
+    const bind =
+      typeof sslport === "string" ? "Pipe " + sslport : "Port " + sslport;
 
-function onListening() {
-  const addr = server.address();
+    // handle specific listen errors with friendly messages
+    switch (error.code) {
+      case "EACCES":
+        console.error(bind + " requires elevated privileges");
+        process.exit(1);
+      case "EADDRINUSE":
+        console.error(bind + " is already in use");
+        process.exit(1);
+      default:
+        throw error;
+    }
+  });
 
-  if (!addr) {
-    logger.error("Could not get running server address - exit.");
-    process.exit(1);
-  }
+  io.on("connection", function (client) {
+    logger.info("Client " + client.id + " connected.");
 
-  const bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
-  debug("Listening on " + bind);
-}
+    // startMonitor: starting block generation event monitoring
+    client.on("startMonitor", function (data) {
 
-io.on("connection", function (client) {
-  logger.info("Client " + client.id + " connected.");
-
-  /**
-   * startMonitor: starting block generation event monitoring
-   **/
-  client.on("startMonitor", function (data) {
-    Smonitor.startMonitor(client.id, data.filterKey, (callbackData) => {
-      let emitType = "";
-      if (callbackData.status == 200) {
-        emitType = "eventReceived";
-        logger.info("event data callbacked.");
-      } else {
-        emitType = "monitor_error";
+      if (!data || !data.filterKey) {
+        client.emit("error", {
+          status: 400,
+          errorDetail: "filterKey is required for startMonitor on sawtooth ledger",
+        });
       }
-      client.emit(emitType, callbackData);
+
+      Smonitor.startMonitor(client.id, data.filterKey, (callbackData) => {
+        let emitType = "";
+        if (callbackData.status == 200) {
+          emitType = "eventReceived";
+          logger.info("event data callbacked.");
+        } else {
+          emitType = "monitor_error";
+        }
+        client.emit(emitType, callbackData);
+      });
+    });
+
+
+    client.on("stopMonitor", function () {
+      Smonitor.stopMonitor(client.id);
+    });
+
+    client.on("disconnect", function (reason) {
+      logger.info("Client " + client.id + " disconnected.");
+      logger.info("Reason    :" + reason);
+      // Stop monitoring if disconnected client is for event monitoring
+      Smonitor.stopMonitor(client.id);
     });
   });
-});
+
+  // Listen on provided port, on all network interfaces.
+  return new Promise<https.Server>((resolve) => server.listen(sslport, () => resolve(server)));
+}
+
+if (require.main === module) {
+  // When this file executed as a script, not loaded as module - run the connector
+  startSawtoothSocketIOConnector().then((server) => {
+    const addr = server.address();
+
+    if (!addr) {
+      logger.error("Could not get running server address - exit.");
+      process.exit(1);
+    }
+
+    const bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
+    logger.debug("Listening on " + bind);
+  }).catch((err) => {
+    logger.error("Could not start sawtooth-socketio connector:", err);
+  });
+}
