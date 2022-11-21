@@ -2,6 +2,9 @@
   "name": "@hyperledger/cactus-plugin-ledger-connector-go-ethereum-socketio",
   "version": "1.1.2",
   "license": "Apache-2.0",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "start": "cd ./dist && node common/core/bin/www.js",
     "debug": "nodemon --inspect ./dist/common/core/bin/www.js",
@@ -28,6 +31,9 @@
     "web3": "0.20.7"
   },
   "devDependencies": {
+    "@hyperledger/cactus-test-tooling": "1.1.2",
+    "@hyperledger/cactus-common": "1.1.2",
+    "@hyperledger/cactus-api-client": "1.1.2",
     "@types/config": "0.0.41"
   }
 }
