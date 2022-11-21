@@ -12,6 +12,7 @@
       "42crunch.vscode-openapi",
       "esbenp.prettier-vscode",
       "eamodio.gitlens",
-      "streetsidesoftware.code-spell-checker"
+      "streetsidesoftware.code-spell-checker",
+      "github.vscode-pull-request-github"
     ]
   }
