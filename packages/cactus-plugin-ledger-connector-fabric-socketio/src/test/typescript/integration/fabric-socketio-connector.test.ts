@@ -2,6 +2,16 @@
  * Functional test of basic operations on connector-fabric-socketio (packages/cactus-plugin-ledger-connector-fabric-socketio)
  * Assumes sample CC was is deployed on the test ledger.
  * Tests include sending and evaluation transactions, and monitoring for events.
+ *
+ * You can speed up development or troubleshooting by using same ledger repeatadely.
+ *  1. Remove fabric wallets from previous runs - `rm -rf /tmp/fabric-test-wallet*`. Repeat this everytime you restart ledger.
+ *  2. Change variable `leaveLedgerRunning` to true.
+ *  3. Run this functional test. It will leave the ledger running, and will enroll the users to common wallet location.
+ *  4. Change `useRunningLedger` to true. The following test runs will not setup the ledger again.
+ * Note:
+ *  You may get a warning about open SIGNREQUEST handles after the test finishes.
+ *  These are false-positives, and should be fixed in jest v28.1.0
+ *  More details: https://github.com/facebook/jest/pull/12789
  */
 
 //////////////////////////////////
@@ -16,10 +26,12 @@ const fabricEnvCAVersion = "1.4.9";
 const ledgerUserName = "appUser";
 const ledgerChannelName = "mychannel";
 const ledgerContractName = "basic";
+const leaveLedgerRunning = false; // default: false
+const useRunningLedger = false; // default: false
 
 // Log settings
-const testLogLevel: LogLevelDesc = "info";
-const sutLogLevel: LogLevelDesc = "info";
+const testLogLevel: LogLevelDesc = "info"; // default: info
+const sutLogLevel: LogLevelDesc = "info"; // default: info
 
 import {
   FabricTestLedgerV1,
@@ -34,6 +46,8 @@ import {
 } from "@hyperledger/cactus-common";
 
 import { SocketIOApiClient } from "@hyperledger/cactus-api-client";
+
+import { signProposal } from "../../../main/typescript/connector/sign-utils";
 
 import {
   enrollAdmin,
@@ -61,6 +75,7 @@ describe("Fabric-SocketIO connector tests", () => {
   let connectorCertValue: string;
   let connectorPrivKeyValue: string;
   let tmpWalletDir: string;
+  let connectorModule: typeof import("../../../main/typescript/index");
   let connectorServer: HttpsServer;
   let apiClient: SocketIOApiClient;
 
@@ -111,7 +126,7 @@ describe("Fabric-SocketIO connector tests", () => {
         orderer: {
           name:
             connectionProfile.orderers[ordererId].grpcOptions[
-            "ssl-target-name-override"
+              "ssl-target-name-override"
             ],
           url: connectionProfile.orderers[ordererId].url,
           tlscaValue: connectionProfile.orderers[ordererId].tlsCACerts.pem,
@@ -149,6 +164,30 @@ describe("Fabric-SocketIO connector tests", () => {
     log.info("Prune Docker...");
     await pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
 
+    // Prepare local filesystem wallet path
+    if (leaveLedgerRunning || useRunningLedger) {
+      tmpWalletDir = path.join(os.tmpdir(), "fabric-test-wallet-common");
+      log.warn("Using common wallet path when re-using the same ledger.");
+      try {
+        fs.mkdirSync(tmpWalletDir);
+      } catch (err) {
+        if (!err.message.includes("EEXIST")) {
+          log.error(
+            "Unexpected exception when creating common wallet dir:",
+            err,
+          );
+          throw err;
+        }
+      }
+    } else {
+      log.info("Create temp dir for wallet - will be removed later...");
+      tmpWalletDir = fs.mkdtempSync(
+        path.join(os.tmpdir(), "fabric-test-wallet"),
+      );
+    }
+    log.info("Wallet path:", tmpWalletDir);
+    expect(tmpWalletDir).toBeTruthy();
+
     log.info("Start FabricTestLedgerV1...");
     log.debug("Version:", fabricEnvVersion, "CA Version:", fabricEnvCAVersion);
     ledger = new FabricTestLedgerV1({
@@ -161,6 +200,7 @@ describe("Fabric-SocketIO connector tests", () => {
         ["FABRIC_VERSION", fabricEnvVersion],
         ["CA_VERSION", fabricEnvCAVersion],
       ]),
+      useRunningLedger,
     });
     log.debug("Fabric image:", ledger.getContainerImageName());
     await ledger.start();
@@ -173,10 +213,7 @@ describe("Fabric-SocketIO connector tests", () => {
     // Get admin credentials
     const [adminName, adminSecret] = ledger.adminCredentials;
 
-    // Setup wallet
-    log.info("Create temp dir for wallet - will be removed later...");
-    tmpWalletDir = fs.mkdtempSync(path.join(os.tmpdir(), "fabric-test-wallet"));
-    expect(tmpWalletDir).toBeTruthy();
+    // Enroll admin and user
     await enrollAdmin(connectionProfile, tmpWalletDir, adminName, adminSecret);
     await enrollUser(
       connectionProfile,
@@ -205,7 +242,7 @@ describe("Fabric-SocketIO connector tests", () => {
     );
 
     // Load connector module
-    const connectorModule = await import("../../../main/typescript/index");
+    connectorModule = await import("../../../main/typescript/index");
 
     // Run the connector
     connectorServer = await connectorModule.startFabricSocketIOConnector();
@@ -240,7 +277,7 @@ describe("Fabric-SocketIO connector tests", () => {
   afterAll(async () => {
     log.info("FINISHING THE TESTS");
 
-    if (ledger) {
+    if (ledger && !leaveLedgerRunning && !useRunningLedger) {
       log.info("Stop the fabric ledger...");
       await ledger.stop();
       await ledger.destroy();
@@ -258,7 +295,7 @@ describe("Fabric-SocketIO connector tests", () => {
       );
     }
 
-    if (tmpWalletDir) {
+    if (tmpWalletDir && !leaveLedgerRunning && !useRunningLedger) {
       log.info("Remove tmp wallet dir", tmpWalletDir);
       fs.rmSync(tmpWalletDir, { recursive: true });
     }
@@ -370,9 +407,111 @@ describe("Fabric-SocketIO connector tests", () => {
     return { signedCommitProposal, commitReq };
   }
 
+  /**
+   * Calls connector function `generateUnsignedProposal`, assert correct response, and returns unsigned proposal.
+   * @param txProposal - Transaction data we want to send (CC function name, arguments, chancode ID, channel ID)
+   * @returns Unsigned proposal that can be signed locally and feed into `sendSignedProposalV2`
+   */
+  async function getUnsignedProposal(txProposal: unknown, certPem: string) {
+    const contract = { channelName: ledgerChannelName };
+    const method = { type: "function", command: "generateUnsignedProposal" };
+    const argsParam = {
+      args: {
+        transactionProposalReq: txProposal,
+        certPem,
+      },
+    };
+
+    log.info("Sending generateUnsignedProposal");
+
+    const response = await apiClient.sendSyncRequest(
+      contract,
+      method,
+      argsParam,
+    );
+    expect(response).toBeTruthy();
+    expect(response.status).toBe(200);
+    expect(response.data).toBeTruthy();
+    expect(response.data.proposal).toBeTruthy();
+    expect(response.data.proposalBuffer).toBeTruthy();
+    expect(response.data.proposalBuffer.type).toEqual("Buffer");
+    expect(response.data.proposalBuffer.data).toBeTruthy();
+    expect(response.data.txId).toBeTruthy();
+
+    const proposalBuffer = Buffer.from(response.data.proposalBuffer);
+    expect(proposalBuffer).toBeTruthy();
+
+    log.info("Received correct response from generateUnsignedProposal");
+
+    return {
+      proposal: response.data.proposal,
+      proposalBuffer,
+      txId: response.data.txId,
+    };
+  }
+
+  /**
+   * Calls connector function `generateUnsignedTransaction`, assert correct response, and returns unsigned transaction (commit) proposal.
+   * @param txProposal - Transaction data we want to send (CC function name, arguments, chancode ID, channel ID)
+   * @param proposalResponses - Proposal resonses of endorsment step from `sendSignedProposalV2` call.
+   * @returns Unsigned commit proposal that can be signed locally and feed into `sendSignedTransactionV2`
+   */
+  async function getUnsignedCommitProposal(
+    txProposal: unknown,
+    proposalResponses: unknown,
+  ) {
+    const contract = { channelName: ledgerChannelName };
+    const method = { type: "function", command: "generateUnsignedTransaction" };
+    const argsParam = {
+      args: {
+        proposal: txProposal,
+        proposalResponses: proposalResponses,
+      },
+    };
+
+    log.info("Sending generateUnsignedTransaction");
+
+    const response = await apiClient.sendSyncRequest(
+      contract,
+      method,
+      argsParam,
+    );
+
+    expect(response).toBeTruthy();
+    expect(response.status).toBe(200);
+    expect(response.data).toBeTruthy();
+    expect(response.data.txProposalBuffer).toBeTruthy();
+    expect(response.data.txProposalBuffer.type).toEqual("Buffer");
+    expect(response.data.txProposalBuffer.data).toBeTruthy();
+
+    const commitProposalBuffer = Buffer.from(response.data.txProposalBuffer);
+    expect(commitProposalBuffer).toBeTruthy();
+
+    log.info("Received correct response from generateUnsignedTransaction");
+
+    return commitProposalBuffer;
+  }
+
   //////////////////////////////////
   // Tests
   //////////////////////////////////
+
+  /**
+   * Test signProposal helper function from fabric-socketio connector module.
+   */
+  test("Signing proposal creates a signature", async () => {
+    const [, privateKeyPem] = await getUserCryptoFromWallet(
+      ledgerUserName,
+      tmpWalletDir,
+    );
+
+    const proposal = Buffer.from("test test test test");
+    const signedProposal = signProposal(proposal, privateKeyPem);
+
+    expect(signedProposal).toBeTruthy();
+    expect(signedProposal.proposal_bytes).toBeTruthy();
+    expect(signedProposal.signature).toBeTruthy();
+  });
 
   /**
    * Read all assets, get single asset, comapre that they return the same asset value without any errors.
@@ -426,6 +565,105 @@ describe("Fabric-SocketIO connector tests", () => {
     expect(responseEncoded.data).toBeTruthy();
     expect(responseEncoded.data.type).toEqual("Buffer");
     expect(responseEncoded.data.data).toBeTruthy();
+  });
+
+  /**
+   * Test entire process of sending transaction to the ledger without sharing the key with the connector.
+   * All proposals are signed on BLP (in this case, jest test) side.
+   * This test prepares proposal, signs it, sends for endorsment, prepares and sign commit proposal, sends commit transaction.
+   */
+  test("Sending transaction signed on BLP side (without sharing the private key) works", async () => {
+    const [certPem, privateKeyPem] = await getUserCryptoFromWallet(
+      ledgerUserName,
+      tmpWalletDir,
+    );
+
+    // Prepare raw transaction proposal
+    const allAssets = await getAllAssets();
+    const assetId = allAssets[1].ID;
+    const newOwnerName = "UnsignedSendTestXXX";
+    const txProposal = {
+      fcn: "TransferAsset",
+      args: [assetId, newOwnerName],
+      chaincodeId: ledgerContractName,
+      channelId: ledgerChannelName,
+    };
+    log.debug("Raw transaction proposal:", txProposal);
+
+    // Get unsigned proposal
+    const { proposal, proposalBuffer } = await getUnsignedProposal(
+      txProposal,
+      certPem,
+    );
+
+    // Prepare signed proposal
+    const signedProposal = signProposal(proposalBuffer, privateKeyPem);
+
+    // Call sendSignedProposalV2
+    const contractSignedProposal = { channelName: ledgerChannelName };
+    const methodSignedProposal = {
+      type: "function",
+      command: "sendSignedProposalV2",
+    };
+    const argsSignedProposal = {
+      args: {
+        signedProposal,
+      },
+    };
+
+    log.info("Sending sendSignedProposalV2");
+    const responseSignedProposal = await apiClient.sendSyncRequest(
+      contractSignedProposal,
+      methodSignedProposal,
+      argsSignedProposal,
+    );
+
+    expect(responseSignedProposal).toBeTruthy();
+    expect(responseSignedProposal.status).toBe(200);
+    expect(responseSignedProposal.data).toBeTruthy();
+    expect(responseSignedProposal.data.endorsmentStatus).toBeTrue();
+    expect(responseSignedProposal.data.proposalResponses).toBeTruthy();
+    log.info("Received correct response from sendSignedProposalV2");
+    const proposalResponses = responseSignedProposal.data.proposalResponses;
+
+    // Get unsigned commit (transaction) proposal
+    const commitProposalBuffer = await getUnsignedCommitProposal(
+      proposal,
+      proposalResponses,
+    );
+
+    // Prepare signed commit proposal
+    const signedCommitProposal = signProposal(
+      commitProposalBuffer,
+      privateKeyPem,
+    );
+
+    // Call sendSignedTransactionV2
+    const contractSignedTransaction = { channelName: ledgerChannelName };
+    const methodSignedTransaction = {
+      type: "function",
+      command: "sendSignedTransactionV2",
+    };
+    const argsSignedTransaction = {
+      args: {
+        signedCommitProposal: signedCommitProposal,
+        proposal: proposal,
+        proposalResponses: proposalResponses,
+      },
+    };
+
+    log.info("Sending sendSignedTransactionV2");
+    const responseSignedTransaction = await apiClient.sendSyncRequest(
+      contractSignedTransaction,
+      methodSignedTransaction,
+      argsSignedTransaction,
+    );
+
+    expect(responseSignedTransaction).toBeTruthy();
+    expect(responseSignedTransaction.status).toBe(200);
+    expect(responseSignedTransaction.data).toBeTruthy();
+    expect(responseSignedTransaction.data.status).toEqual("SUCCESS");
+    log.info("Received correct response from sendSignedTransactionV2");
   });
 
   /**

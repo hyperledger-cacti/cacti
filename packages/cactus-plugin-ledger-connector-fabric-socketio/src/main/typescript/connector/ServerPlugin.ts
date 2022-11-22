@@ -11,44 +11,125 @@
  * Define and implement the function independently according to the connection destination dependent part (adapter) on the core side.
  */
 
-// config file
-import { configRead, signMessageJwt } from "@hyperledger/cactus-cmd-socketio-server";
+import path from "path";
+import safeStringify from "fast-safe-stringify";
+import Client, {
+  Proposal,
+  ProposalRequest,
+  ProposalResponse,
+  Block,
+} from "fabric-client";
+import { FileSystemWallet, Gateway } from "fabric-network";
+
+import { getClientAndChannel, getSubmitterAndEnroll } from "./fabricaccess";
+import { signProposal } from "./sign-utils";
+import {
+  ProposalSerializer,
+  ProposalResponseSerializer,
+} from "./fabric-proto-serializers";
+
+// Config reading
+import {
+  configRead,
+  signMessageJwt,
+} from "@hyperledger/cactus-cmd-socketio-server";
+const connUserName = configRead<string>("fabric.connUserName");
 
 // Log settings
 import { getLogger } from "log4js";
 const logger = getLogger("ServerPlugin[" + process.pid + "]");
 logger.level = configRead<string>("logLevel", "info");
-// Read the library, SDK, etc. according to EC specifications as needed
 
-import { getClientAndChannel, getSubmitterAndEnroll } from "./fabricaccess";
-import Client, { ProposalRequest, Block } from "fabric-client";
-import safeStringify from "fast-safe-stringify";
+/////////////////////////////
+// API call signatures
+/////////////////////////////
 
-const path = require("path");
-const { FileSystemWallet, Gateway } = require("fabric-network");
-const connUserName = configRead<string>("fabric.connUserName");
-
-// Cryptographic for fabric
-const hash = require("fabric-client/lib/hash");
-const jsrsa = require("jsrsasign");
-const { KEYUTIL } = jsrsa;
-const elliptic = require("elliptic");
-const EC = elliptic.ec;
-
-//let xChannel = undefined; // Channel
-
-/*
- * ServerPlugin
- * ServerPlugin class definition
+/**
+ * `generateUnsignedProposal()` input argument type.
  */
-export class ServerPlugin {
-  /*
-   * constructor
-   */
-  constructor() {
-    // Define settings specific to the dependent part
-  }
+type GenerateUnsignedProposalArgs = {
+  contract: {
+    channelName: string;
+  };
+  args: {
+    args: {
+      transactionProposalReq: Client.ProposalRequest;
+      certPem: string;
+    };
+  };
+  reqID?: string;
+};
 
+/**
+ * `generateUnsignedTransaction()` input argument type.
+ */
+type GenerateUnsignedTransactionArgs = {
+  contract: {
+    channelName: string;
+  };
+  args: {
+    args: {
+      proposal: string;
+      proposalResponses: string[];
+    };
+  };
+  reqID?: string;
+};
+
+/**
+ * `sendSignedProposal()` input argument type.
+ */
+type SendSignedProposalArgs = {
+  contract: {
+    channelName: string;
+  };
+  args: {
+    args: {
+      transactionProposalReq: Client.ProposalRequest;
+      certPem?: string;
+      privateKeyPem?: string;
+    };
+  };
+  reqID?: string;
+};
+
+/**
+ * `sendSignedProposalV2()` input argument type.
+ */
+type SendSignedProposalV2Args = {
+  contract: {
+    channelName: string;
+  };
+  args: {
+    args: {
+      signedProposal: Buffer;
+    };
+  };
+  reqID?: string;
+};
+
+/**
+ * `sendSignedTransactionV2()` input argument type.
+ */
+type SendSignedTransactionV2Args = {
+  contract: {
+    channelName: string;
+  };
+  args: {
+    args: {
+      signedCommitProposal: Buffer;
+      proposal: string;
+      proposalResponses: string[];
+    };
+  };
+  reqID?: string;
+};
+
+/////////////////////////////
+// ServerPlugin Class
+/////////////////////////////
+
+export class ServerPlugin {
   /*
    * isExistFunction
    *
@@ -232,76 +313,168 @@ export class ServerPlugin {
   }
 
   /**
-   * sendSignedProposal with commit.
-   * @param {object} args :  JSON Object
-   * {
-   *     "args": {
-   *         "contract": {"channelName": channelName},
-   *         "args":[
-   *             {
-   *                 "transactionProposalReq":<transactionProposalReq>,
-   *                 "certPem"?:<certPem>,
-   *                 "privateKeyPem"?:<privateKeyPem>
-   *             }
-   *         ]
-   *     },
-   *     "reqID":<req ID> // option
-   * }
-   * @return {Object} JSON object
+   * API request to send commit transaction signed on the client side.
+   * No user cryptographic data is handled by this function.
+   * Uses Fabric-SDK `channel.sendSignedTransaction` call.
+   *
+   * @param args.signedCommitProposal Signed commit proposal buffer.
+   * @param args.proposal Encoded proposal from `generateUnsignedProposal` API call.
+   * @param args.proposalResponses Encoded endorsing responses from `sendSignedProposalV2` API call.
+   * @returns Send status.
    */
-  sendSignedProposal(args: any) {
-    return new Promise((resolve, reject) => {
-      logger.info("sendSignedProposal start");
-      let retObj: Record<string, any>;
+  async sendSignedTransactionV2(args: SendSignedTransactionV2Args) {
+    logger.info("sendSignedTransactionV2 start");
 
-      const channelName = args.contract.channelName;
-      const transactionProposalReq = args.args.args.transactionProposalReq;
-      const certPem = args.args.args.certPem;
-      const privateKeyPem = args.args.args.privateKeyPem;
-      let reqID = args["reqID"];
-      if (reqID === undefined) {
-        reqID = null;
+    // Parse arguments
+    const channelName = args.contract.channelName;
+    const signedCommitProposal = args.args.args.signedCommitProposal;
+    const proposal = ProposalSerializer.decode(args.args.args.proposal);
+    let proposalResponses: any[] = args.args.args.proposalResponses.map((val) =>
+      ProposalResponseSerializer.decode(val),
+    );
+    let reqID = args.reqID;
+    logger.info(`##sendSignedTransactionV2: reqID: ${reqID}`);
+
+    if (
+      !channelName ||
+      !signedCommitProposal ||
+      !proposal ||
+      proposalResponses.length === 0
+    ) {
+      throw {
+        resObj: {
+          status: 504,
+          errorDetail: "sendSignedTransactionV2: Invalid input parameters",
+        },
+      };
+    }
+
+    // Logic
+    try {
+      const invokeResponse = await InvokeSendSignedTransaction({
+        signedCommitProposal,
+        commitReq: {
+          proposal,
+          proposalResponses,
+        },
+        channelName: channelName,
+      });
+      logger.info("sendSignedTransactionV2: done.");
+
+      return {
+        id: reqID,
+        resObj: {
+          status: 200,
+          data: invokeResponse,
+        },
+      };
+    } catch (error) {
+      logger.error("sendSignedTransactionV2() error:", error);
+      throw {
+        resObj: {
+          status: 504,
+          errorDetail: safeStringify(error),
+        },
+      };
+    }
+  }
+
+  /**
+   * API request to send transaction endorsment.
+   * Uses cryptographic data either from input arguments, or from local (connectors) wallet.
+   *
+   * @param args.transactionProposalReq Raw transaction that will be turned into proposal.
+   * @param args.certPem Client public key in PEM format.
+   * @param args.privateKeyPem Client private key in PEM format.
+   * @returns signedCommitProposal Signed transaction proposal.
+   * @returns commitReq Unsigned commit request.
+   * @returns txId Transaction ID.
+   */
+  async sendSignedProposal(args: SendSignedProposalArgs) {
+    logger.info("sendSignedProposal start");
+
+    // Parse arguments
+    const channelName = args.contract.channelName;
+    const transactionProposalReq = args.args.args.transactionProposalReq;
+    let certPem = args.args.args.certPem;
+    let privateKeyPem = args.args.args.privateKeyPem;
+    let reqID = args.reqID;
+    logger.info(`##sendSignedProposal: reqID: ${reqID}`);
+
+    // Logic
+    try {
+      let { client, channel } = await getClientAndChannel(channelName);
+
+      if (!certPem || !privateKeyPem) {
+        // Get identity from connector wallet
+        const submiterId = await getSubmiterIdentityCrypto(client);
+        certPem = submiterId.certPem;
+        privateKeyPem = submiterId.privateKeyPem;
       }
-      logger.info(`##sendSignedProposal: reqID: ${reqID}`);
 
-      // call chainncode
-      InvokeSendSignedProposal(
-        channelName,
+      if (!certPem || !privateKeyPem) {
+        throw Error(
+          "Could not read certificate and private key of the submitter.",
+        );
+      }
+
+      // Generate endorsement proposal
+      const { proposal, txId } = InvokeGenerateUnsignedProposal(
+        channel,
         transactionProposalReq,
         certPem,
+      );
+      const signedProposal = signProposal(proposal.toBuffer(), privateKeyPem);
+
+      // Send proposal, get endorsment responses
+      const {
+        endorsmentStatus,
+        proposalResponses,
+      } = await InvokeSendSignedProposalV2(channel, signedProposal as any);
+      logger.info("sendSignedProposal: done.");
+
+      if (!endorsmentStatus) {
+        throw new Error(
+          "Failed to send Proposal or receive valid response. Response null or status is not 200. exiting...",
+        );
+      }
+
+      // Generate commit proposal
+      const commitProposal = await InvokeGenerateUnsignedTransaction(
+        channel,
+        proposalResponses as any,
+        proposal,
+      );
+      const signedCommitProposal = signProposal(
+        commitProposal.toBuffer(),
         privateKeyPem,
-      )
-        .then((signedTx) => {
-          if (signedTx != null) {
-            const signedResults = signMessageJwt({
-              result: signedTx,
-            });
-            retObj = {
-              resObj: {
-                status: 200,
-                // "data": signedTx
-                data: signedResults,
-              },
-            };
-            if (reqID !== null) {
-              retObj["id"] = reqID;
-            }
-            logger.info(`sendSignedProposal resolve`);
-            return resolve(retObj);
-          }
-        })
-        .catch((err) => {
-          retObj = {
-            resObj: {
-              status: 504,
-              errorDetail: safeStringify(err),
-            },
-          };
-          logger.error(err);
-          logger.info(`sendSignedProposal reject`);
-          return reject(retObj);
-        });
-    });
+      );
+
+      // Send the response
+      const signedResults = signMessageJwt({
+        result: {
+          signedCommitProposal,
+          commitReq: { proposalResponses, proposal },
+          txId: txId.getTransactionID(),
+        },
+      });
+
+      return {
+        id: reqID,
+        resObj: {
+          status: 200,
+          data: signedResults,
+        },
+      };
+    } catch (error) {
+      logger.error("sendSignedProposal() error:", error);
+      throw {
+        resObj: {
+          status: 504,
+          errorDetail: safeStringify(error),
+        },
+      };
+    }
   }
 
   /**
@@ -402,71 +575,219 @@ export class ServerPlugin {
 
     return retObj;
   }
+
+  /**
+   * API request to send endorsement proposal signed on the client side.
+   * No user cryptographic data is handled by this function.
+   * Uses Fabric-SDK `channel.sendSignedProposal` call.
+   *
+   * @param args.signedProposal Signed proposal buffer from `generateUnsignedProposal` API call.
+   * @returns endorsmentStatus Bool whether endorsment was OK or not.
+   * @returns proposalResponses Encoded responses to be used to generate commit proposal.
+   */
+  async sendSignedProposalV2(args: SendSignedProposalV2Args) {
+    logger.info("sendSignedProposalV2 start");
+
+    // Parse arguments
+    const channelName = args.contract.channelName;
+    const signedProposal = args.args.args.signedProposal;
+    let reqID = args.reqID;
+    logger.info(`##sendSignedProposalV2: reqID: ${reqID}`);
+
+    // Logic
+    try {
+      let { channel } = await getClientAndChannel(channelName);
+
+      const invokeResponse = await InvokeSendSignedProposalV2(
+        channel,
+        signedProposal,
+      );
+      logger.info("sendSignedProposalV2: done.");
+
+      let proposalResponses = invokeResponse.proposalResponses.map((val: any) =>
+        ProposalResponseSerializer.encode(val),
+      );
+      logger.debug(
+        `sendSignedProposalV2: encoded ${proposalResponses.length} proposalResponses.`,
+      );
+
+      const signedResults = signMessageJwt({
+        result: {
+          endorsmentStatus: invokeResponse.endorsmentStatus,
+          proposalResponses,
+        },
+      });
+
+      return {
+        id: reqID,
+        resObj: {
+          status: 200,
+          data: signedResults,
+        },
+      };
+    } catch (error) {
+      logger.error("sendSignedProposalV2() error:", error);
+      throw {
+        resObj: {
+          status: 504,
+          errorDetail: safeStringify(error),
+        },
+      };
+    }
+  }
+
+  /**
+   * API request to generate unsigned endorse proposal.
+   * Proposal must be signed on the client side.
+   * Uses Fabric-SDK `channel.generateUnsignedProposal` call.
+   *
+   * @param args.transactionProposalReq Raw transaction that will be turned into proposal.
+   * @param args.certPem Client public key in PEM format.
+   * @returns proposalBuffer Generated unsigned endorse proposal buffer.
+   * @returns proposal Encoded proposal to be used in follow-up calls to the connector.
+   * @returns txId Transaction ID.
+   */
+  async generateUnsignedProposal(args: GenerateUnsignedProposalArgs) {
+    logger.info("generateUnsignedProposal: start");
+
+    // Parse arguments
+    const channelName = args.contract.channelName;
+    const transactionProposalReq = args.args.args.transactionProposalReq;
+    const certPem = args.args.args.certPem;
+    let reqID = args.reqID;
+    logger.info(`##generateUnsignedProposal: reqID: ${reqID}`);
+
+    // Logic
+    try {
+      let { channel } = await getClientAndChannel(channelName);
+
+      let invokeResponse = InvokeGenerateUnsignedProposal(
+        channel,
+        transactionProposalReq,
+        certPem,
+      );
+      if (!invokeResponse.proposal || !invokeResponse.txId) {
+        throw new Error(
+          "generateUnsignedProposal: empty proposal or transaction id.",
+        );
+      }
+      logger.info(`generateUnsignedProposal: done.`);
+
+      const signedResults = signMessageJwt({
+        result: {
+          proposalBuffer: invokeResponse.proposal.toBuffer(),
+          proposal: ProposalSerializer.encode(invokeResponse.proposal),
+          txId: invokeResponse.txId.getTransactionID(),
+        },
+      });
+
+      return {
+        id: reqID,
+        resObj: {
+          status: 200,
+          data: signedResults,
+        },
+      };
+    } catch (error) {
+      logger.error("generateUnsignedProposal() error:", error);
+      throw {
+        resObj: {
+          status: 504,
+          errorDetail: safeStringify(error),
+        },
+      };
+    }
+  }
+
+  /**
+   * API request to generate unsigned commit (transaction) proposal.
+   * Proposal must be signed on the client side.
+   * Uses Fabric-SDK `channel.generateUnsignedTransaction` call.
+   *
+   * @param args.proposal Encoded proposal from `generateUnsignedProposal` API call.
+   * @param args.proposalResponses Encoded proposal responses from `sendSignedProposalV2` API call.
+   * @returns txProposalBuffer Unsigned proposal buffer.
+   */
+  async generateUnsignedTransaction(args: GenerateUnsignedTransactionArgs) {
+    logger.info("generateUnsignedTransaction: start");
+
+    // Parse arguments
+    const channelName = args.contract.channelName;
+    const proposal = ProposalSerializer.decode(args.args.args.proposal);
+    let proposalResponses: any[] = args.args.args.proposalResponses.map((val) =>
+      ProposalResponseSerializer.decode(val),
+    );
+    logger.debug(
+      `##generateUnsignedTransaction Received ${proposalResponses.length} proposal responses`,
+    );
+    let reqID = args.reqID;
+    logger.info(`##generateUnsignedTransaction: reqID: ${reqID}`);
+
+    // Logic
+    try {
+      let { channel } = await getClientAndChannel(channelName);
+
+      const txProposal = await InvokeGenerateUnsignedTransaction(
+        channel,
+        proposalResponses,
+        proposal,
+      );
+      logger.info(`generateUnsignedTransaction: done.`);
+
+      const signedResults = signMessageJwt({
+        result: {
+          txProposalBuffer: txProposal.toBuffer(),
+        },
+      });
+
+      return {
+        id: reqID,
+        resObj: {
+          status: 200,
+          data: signedResults,
+        },
+      };
+    } catch (error) {
+      logger.error("generateUnsignedTransaction() error:", error);
+      throw {
+        resObj: {
+          status: 504,
+          errorDetail: safeStringify(error),
+        },
+      };
+    }
+  }
 } /* class */
 
-/*
- * Invoke function
- * @param reqBody   [json object]  {fcn:<Chain code function name>, args:[arg1>,<arg2>,,,]}
- * @return [string] Success: Chain code execution result
- *                  Failure: Chain code error or internal error
+/////////////////////////////
+// Invoke (logic) functions
+/////////////////////////////
+
+/**
+ * Read public and private keys of the submitter from connector wallet.
+ * Throws `Error()` when submiters identity is missing.
+ *
+ * @param client Fabric-SDK channel client object.
+ * @returns `certPem`, `privateKeyPem`
  */
-async function Invoke(reqBody: any) {
-  let txId = null;
-  const theUser = null;
-  const eventhubs = [];
-  //var invokeResponse; //Return value from chain code
+async function getSubmiterIdentityCrypto(client: Client) {
+  const wallet = new FileSystemWallet(configRead<string>("fabric.keystore"));
+  logger.debug(
+    `Wallet path: ${path.resolve(configRead<string>("fabric.keystore"))}`,
+  );
 
-  try {
-    logger.info("##fablicaccess: Invoke start");
-
-    const fcn = reqBody.fcn;
-    const args = reqBody.args;
-
-    // Create a new file system based wallet for managing identities.
-    const wallet = new FileSystemWallet(configRead<string>("fabric.keystore"));
-    console.log(`Wallet path: ${configRead<string>("fabric.keystore")}`);
-
-    // Check to see if we've already enrolled the user.
-    const userExists = await wallet.exists(connUserName);
-    if (!userExists) {
-      //logger.error(`An identity for the user ${connUserName} does not exist in the wallet`);
-      const errMsg = `An identity for the user ${connUserName} does not exist in the wallet`;
-      logger.error(errMsg);
-      logger.error("Run the registerUser.js application before retrying");
-    }
-
-    // Create a new gateway for connecting to our peer node.
-    let { client } = await getClientAndChannel(reqBody.channelName);
-    await getSubmitterAndEnroll(client);
-
-    const gateway = new Gateway();
-    await gateway.connect(client, {
-      wallet,
-      identity: connUserName,
-      discovery: { enabled: false },
-    });
-
-    // Get the network (channel) our contract is deployed to.
-    const network = await gateway.getNetwork(reqBody.channelName);
-
-    // Get the contract from the network.
-    const contract = network.getContract(reqBody.contractName);
-
-    // Submit the specified transaction.
-    logger.info(
-      `##fablicaccess: Invoke Params: fcn=${fcn}, args0=${args[0]}, args1=${args[1]}`,
+  let user = await getSubmitterAndEnroll(client);
+  const submitterName = user.getName();
+  const submitterExists = await wallet.exists(submitterName);
+  if (submitterExists) {
+    const submitterIdentity = await wallet.export(submitterName);
+    const certPem = (submitterIdentity as any).certificate as string;
+    const privateKeyPem = (submitterIdentity as any).privateKey as string;
+    return { certPem, privateKeyPem };
+  } else {
+    throw new Error(
+      `No cert/key provided and submitter ${submitterName} is missing in validator wallet!`,
     );
-    const transaction = contract.createTransaction(fcn);
-
-    txId = transaction.getTransactionID().getTransactionID();
-    logger.info("##fablicaccess: txId = " + txId);
-
-    const respData = await transaction.submit(args[0], args[1]);
-
-    // const respData = await contract.submitTransaction(fcn, args[0], args[1]);
-    logger.info("Transaction has been submitted");
-  } catch (error) {
-    logger.error(`Failed to submit transaction: ${error}`);
   }
 }
 
@@ -597,80 +918,6 @@ async function InvokeSync(reqBody: any) {
   });
 }
 
-// BEGIN Signature process=====================================================================================
-// this ordersForCurve comes from CryptoSuite_ECDSA_AES.js and will be part of the
-// stand alone fabric-sig package in future.
-const ordersForCurve: Record<string, any> = {
-  secp256r1: {
-    halfOrder: elliptic.curves.p256.n.shrn(1),
-    order: elliptic.curves.p256.n,
-  },
-  secp384r1: {
-    halfOrder: elliptic.curves.p384.n.shrn(1),
-    order: elliptic.curves.p384.n,
-  },
-};
-
-// this function comes from CryptoSuite_ECDSA_AES.js and will be part of the
-// stand alone fabric-sig package in future.
-function preventMalleability(sig: any, curveParams: { name: string }) {
-  const halfOrder = ordersForCurve[curveParams.name].halfOrder;
-  if (!halfOrder) {
-    throw new Error(
-      'Can not find the half order needed to calculate "s" value for immalleable signatures. Unsupported curve name: ' +
-        curveParams.name,
-    );
-  }
-
-  // in order to guarantee 's' falls in the lower range of the order, as explained in the above link,
-  // first see if 's' is larger than half of the order, if so, it needs to be specially treated
-  if (sig.s.cmp(halfOrder) === 1) {
-    // module 'bn.js', file lib/bn.js, method cmp()
-    // convert from BigInteger used by jsrsasign Key objects and bn.js used by elliptic Signature objects
-    const bigNum = ordersForCurve[curveParams.name].order;
-    sig.s = bigNum.sub(sig.s);
-  }
-
-  return sig;
-}
-
-/**
- * this method is used for test at this moment. In future this
- * would be a stand alone package that running at the browser/cellphone/PAD
- *
- * @param {string} privateKey PEM encoded private key
- * @param {Buffer} proposalBytes proposal bytes
- */
-function sign(
-  privateKey: string,
-  proposalBytes: Buffer,
-  algorithm: string,
-  keySize: number,
-) {
-  const hashAlgorithm = algorithm.toUpperCase();
-  const hashFunction = hash[`${hashAlgorithm}_${keySize}`];
-  const ecdsaCurve = elliptic.curves[`p${keySize}`];
-  const ecdsa = new EC(ecdsaCurve);
-  const key = KEYUTIL.getKey(privateKey);
-
-  const signKey = ecdsa.keyFromPrivate(key.prvKeyHex, "hex");
-  const digest = hashFunction(proposalBytes);
-
-  let sig = ecdsa.sign(Buffer.from(digest, "hex"), signKey);
-  sig = preventMalleability(sig, key.ecparams);
-
-  return Buffer.from(sig.toDER());
-}
-
-function signProposal(proposalBytes: Buffer, paramPrivateKeyPem: string) {
-  logger.debug("signProposal start");
-
-  const signature = sign(paramPrivateKeyPem, proposalBytes, "sha2", 256);
-  const signedProposal = { signature, proposal_bytes: proposalBytes };
-  return signedProposal;
-}
-// END Signature process=========================================================================================
-
 /**
  * Function for InvokeSendSignedTransaction
  * @param reqBody   [json object]  {signedCommitProposal:<signedCommitProposal>, commitReq:<commitReq>, channelName:<channelName>}
@@ -717,56 +964,73 @@ async function InvokeSendSignedTransaction(reqBody: any) {
 }
 
 /**
- * Function for InvokeSendSignedProposal
- * @param transactionProposalReq   [json object]  {signedCommitProposal:<signedCommitProposal>, commitReq:<commitReq>, channelName:<channelName>}
- * @param certPem?   [json object]  {signedCommitProposal:<signedCommitProposal>, commitReq:<commitReq>, channelName:<channelName>}
- * @param privateKeyPem?   [json object]  {signedCommitProposal:<signedCommitProposal>, commitReq:<commitReq>, channelName:<channelName>}
- * @return [string] signed transaction.
+ * Call `channel.generateUnsignedProposal` to generate unsigned endorse proposal.
+ *
+ * @param channel Fabric-SDK channel object.
+ * @param txProposal Raw transaction.
+ * @param certPem Sender public key in PEM format.
+ * @returns `proposal` - Proposal, `txId` - Transaction object
  */
-async function InvokeSendSignedProposal(
-  channelName: string,
-  transactionProposalReq: ProposalRequest,
-  certPem?: string,
-  privateKeyPem?: string,
+function InvokeGenerateUnsignedProposal(
+  channel: Client.Channel,
+  txProposal: ProposalRequest,
+  certPem: string,
 ) {
-  logger.debug(`InvokeSendSignedProposal start`);
-
-  let invokeResponse2; // Return value from chain code
-  let { client, channel } = await getClientAndChannel(channelName);
-  let user = await getSubmitterAndEnroll(client);
-
-  // Low-level access to local-store cert and private key of submitter (in case request is missing those)
-  if (!certPem || !privateKeyPem) {
-    const wallet = new FileSystemWallet(configRead<string>("fabric.keystore"));
-    logger.debug(
-      `Wallet path: ${path.resolve(configRead<string>("fabric.keystore"))}`,
+  if (!txProposal || !certPem) {
+    throw new Error(
+      "InvokeGenerateUnsignedProposal: Invalid input parameters.",
     );
-
-    const submitterName = user.getName();
-    const submitterExists = await wallet.exists(submitterName);
-    if (submitterExists) {
-      const submitterIdentity = await wallet.export(submitterName);
-      certPem = (submitterIdentity as any).certificate;
-      privateKeyPem = (submitterIdentity as any).privateKey;
-    } else {
-      throw new Error(
-        `No cert/key provided and submitter ${submitterName} is missing in validator wallet!`,
-      );
-    }
   }
 
-  if (!certPem || !privateKeyPem) {
-    throw Error("Could not read certificate and private key of the submitter.");
-  }
+  logger.debug("Call channel.generateUnsignedProposal()");
 
-  const { proposal, txId } = channel.generateUnsignedProposal(
-    transactionProposalReq,
+  return (channel.generateUnsignedProposal(
+    txProposal,
     configRead<string>("fabric.mspid"),
     certPem,
     false,
-  ) as any;
-  logger.debug(`##InvokeSendSignedProposal; txId: ${txId.getTransactionID()}`);
-  const signedProposal = signProposal(proposal.toBuffer(), privateKeyPem);
+  ) as any) as { proposal: any; txId: any };
+}
+
+/**
+ * Call `channel.generateUnsignedTransaction` to generate unsigned commit proposal.
+ *
+ * @param channel Fabric-SDK channel object.
+ * @param proposalResponses Proposal responses from endorse step.
+ * @param proposal Unsigned proposal from `generateUnsignedProposal`
+ * @returns Unsigned commit proposal.
+ */
+async function InvokeGenerateUnsignedTransaction(
+  channel: Client.Channel,
+  proposalResponses: ProposalResponse[],
+  proposal: Proposal,
+) {
+  if (!proposal || !proposalResponses || proposalResponses.length === 0) {
+    throw new Error(
+      "InvokeGenerateUnsignedTransaction: Invalid input parameters.",
+    );
+  }
+
+  logger.debug("Call channel.generateUnsignedTransaction()");
+
+  return await channel.generateUnsignedTransaction({
+    proposalResponses,
+    proposal,
+  });
+}
+
+/**
+ * Call `channel.sendSignedProposal`, gather and check the responses.
+ *
+ * @param channel Fabric-SDK channel object.
+ * @param signedProposal Proposal from `generateUnsignedProposal` signed with sender private key.
+ * @returns `endorsmentStatus`, `proposalResponses`
+ */
+async function InvokeSendSignedProposalV2(
+  channel: Client.Channel,
+  signedProposal: Buffer,
+) {
+  logger.debug(`InvokeSendSignedProposalV2: start`);
 
   const targets = [];
   for (const peerInfo of configRead<any[]>("fabric.peers")) {
@@ -774,77 +1038,29 @@ async function InvokeSendSignedProposal(
     targets.push(peer);
   }
   const sendSignedProposalReq = { signedProposal, targets } as any;
+
   const proposalResponses = await channel.sendSignedProposal(
     sendSignedProposalReq,
   );
-  logger.debug("##InvokeSendSignedProposal: successfully send signedProposal");
+  logger.debug(
+    "##InvokeSendSignedProposalV2: successfully sent signedProposal",
+  );
 
-  let allGood = true;
+  // Determine endorsment status
+  let endorsmentStatus = true;
   for (const proposalResponse of proposalResponses) {
-    let oneGood = false;
     const propResponse = (proposalResponse as unknown) as Client.ProposalResponse;
     if (
-      propResponse &&
-      propResponse.response &&
-      propResponse.response.status === 200
+      !propResponse ||
+      !propResponse.response ||
+      propResponse.response.status !== 200
     ) {
-      if (propResponse.response.payload) {
-        invokeResponse2 = propResponse.response.payload;
-      }
-      oneGood = true;
-    } else {
-      logger.debug("##InvokeSendSignedProposal: transaction proposal was bad");
-      const resStr = proposalResponse.toString();
-      const errMsg = resStr.replace("Error: ", "");
-      throw new Error(errMsg);
+      endorsmentStatus = false;
     }
-    allGood = allGood && oneGood;
   }
 
-  // If the return value of invoke is an empty string, store txID
-  if (!invokeResponse2 || invokeResponse2.length == 0) {
-    invokeResponse2 = txId.getTransactionID();
-  }
-
-  // Error if all peers do not return status 200
-  if (!allGood) {
-    const errMsg =
-      "'Failed to send Proposal or receive valid response. Response null or status is not 200. exiting...";
-    logger.debug(`##InvokeSendSignedProposal: ${errMsg}`);
-    throw new Error(errMsg);
-  }
-
-  /**
-   * End the endorse step.
-   * Start to commit the tx.
-   */
-  const commitReq = {
+  return {
+    endorsmentStatus,
     proposalResponses,
-    proposal,
   };
-
-  const commitProposal = await channel.generateUnsignedTransaction(
-    commitReq as any,
-  );
-  logger.debug(
-    `##InvokeSendSignedProposal: Successfully build commit transaction proposal`,
-  );
-
-  // sign this commit proposal at local
-  const signedCommitProposal = signProposal(
-    commitProposal.toBuffer(),
-    privateKeyPem,
-  );
-
-  const signedTx = {
-    signedCommitProposal: signedCommitProposal,
-    commitReq: commitReq,
-    txId: txId.getTransactionID(),
-  };
-
-  // logger.debug(`##InvokeSendSignedProposal: signature: ${signedCommitProposal.signature}`);
-  // logger.debug(`##InvokeSendSignedProposal: proposal_bytes: ${signedCommitProposal.proposal_bytes}`);
-  // logger.debug(`##InvokeSendSignedProposal: signedTx: ${JSON.stringify(signedTx)}`);
-  logger.debug("##InvokeSendSignedProposal: signedTx:", signedTx);
-  return signedTx;
 }

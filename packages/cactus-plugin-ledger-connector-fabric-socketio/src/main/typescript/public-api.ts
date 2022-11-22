@@ -1,1 +1,1 @@
-export { startFabricSocketIOConnector } from "./common/core/bin/www"
+export { startFabricSocketIOConnector } from "./common/core/bin/www";
