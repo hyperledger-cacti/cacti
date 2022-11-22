@@ -18,6 +18,7 @@ function main()
     # Major version is 2 or newer (we'll deal with 3.x when it is released)
     cd /fabric-samples/test-network/
     peer chaincode query -C mychannel -n basic -c '{"Args": [], "Function": "GetAllAssets"}'
+    peer chaincode query -C mychannel -n basic -c '{"Args": ["asset1"], "Function": "ReadAsset"}'
   else
     # Major version is 1.x or earlier (assumption is 1.4.x only)
     docker exec cli peer chaincode query --channelID mychannel --name fabcar --ctor '{"Args": [], "Function": "queryAllCars"}'
