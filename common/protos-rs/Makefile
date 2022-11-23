@@ -1,16 +1,15 @@
 .PHONY: build
 build:
-	cp -r ../protos .
 	cargo build
 
 .PHONY: clean
 clean:
-	rm -rf src/generated/* target protos
+	rm -rf pkg/src/generated/* pkg/target
 
 .PHONY: publish
 publish:
-	cargo publish
+	cd pkg && cargo publish
 
 .PHONY: dry-run-publish
 dry-run-publish:
-	cargo publish --dry-run
+	cd pkg && cargo publish --dry-run --allow-dirty

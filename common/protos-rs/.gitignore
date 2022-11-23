@@ -1,2 +1,2 @@
 target
-protos
+pkg/src/generated/*.rs
