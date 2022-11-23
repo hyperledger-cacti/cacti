@@ -52,7 +52,7 @@ message EventSubscriptionState {
   STATUS status = 2;
   string message = 3;
   EventMatcher event_matcher = 4;
-  EventPublication event_publication_spec = 5;
+  repeated EventPublication event_publication_specs = 5;
 }
 
 message ContractTransaction {

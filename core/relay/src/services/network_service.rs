@@ -206,13 +206,16 @@ impl Network for NetworkService {
         let request_id = Uuid::new_v4();
         let network_event_subscription = request.into_inner().clone();
         
+        let mut event_publication_specs: Vec<EventPublication> = Vec::new();
+        event_publication_specs.push(network_event_subscription.event_publication_spec.clone().expect("Event publication spec not found in NetworkEventSubscription request"));
+        
         // Initial request state stored in DB.
         let target: EventSubscriptionState = EventSubscriptionState {
             status: event_subscription_state::Status::SubscribePendingAck as i32,
             request_id: request_id.to_string(),
             message: "".to_string(),
             event_matcher: network_event_subscription.event_matcher.clone(),
-            event_publication_spec: network_event_subscription.event_publication_spec.clone()
+            event_publication_specs: event_publication_specs
         };
         
         // Create EventSubscription
@@ -300,13 +303,16 @@ impl Network for NetworkService {
         let network_event_subscription = net_event_sub.request.clone().expect("No network event subscription passed");
         let request_id = net_event_sub.request_id.to_string();
         
+        let mut event_publication_specs: Vec<EventPublication> = Vec::new();
+        event_publication_specs.push(network_event_subscription.event_publication_spec.clone().expect("Event publication spec not found in NetworkEventSubscription request"));
+        
         // Initial request state stored in DB.
         let target: EventSubscriptionState = EventSubscriptionState {
             status: event_subscription_state::Status::UnsubscribePendingAck as i32,
             request_id: request_id.to_string(),
             message: "".to_string(),
             event_matcher: network_event_subscription.event_matcher.clone(),
-            event_publication_spec: network_event_subscription.event_publication_spec.clone()
+            event_publication_specs: event_publication_specs
         };
         
         // Create EventSubscription

@@ -40,7 +40,7 @@ pub fn update_event_subscription_status(
                                 request_id: curr_request_id.clone(),
                                 message: message.to_string(),
                                 event_matcher: fetched_event_sub_state.event_matcher,
-                                event_publication_spec: fetched_event_sub_state.event_publication_spec
+                                event_publication_specs: fetched_event_sub_state.event_publication_specs
                             };
                         },
                         event_subscription_state::Status::UnsubscribePending => {
@@ -49,7 +49,7 @@ pub fn update_event_subscription_status(
                                 request_id: curr_request_id.clone(),
                                 message: message.to_string(),
                                 event_matcher: fetched_event_sub_state.event_matcher,
-                                event_publication_spec: fetched_event_sub_state.event_publication_spec
+                                event_publication_specs: fetched_event_sub_state.event_publication_specs
                             };
                         },
                         event_subscription_state::Status::SubscribePendingAck  => {
@@ -58,7 +58,7 @@ pub fn update_event_subscription_status(
                                 request_id: curr_request_id.clone(),
                                 message: message.to_string(),
                                 event_matcher: fetched_event_sub_state.event_matcher.clone(),
-                                event_publication_spec: fetched_event_sub_state.event_publication_spec.clone(),
+                                event_publication_specs: fetched_event_sub_state.event_publication_specs.clone(),
                             };
                         },
                         event_subscription_state::Status::SubscribePending  => {
@@ -67,7 +67,7 @@ pub fn update_event_subscription_status(
                                 request_id: curr_request_id.clone(),
                                 message: message.to_string(),
                                 event_matcher: fetched_event_sub_state.event_matcher.clone(),
-                                event_publication_spec: fetched_event_sub_state.event_publication_spec.clone(),
+                                event_publication_specs: fetched_event_sub_state.event_publication_specs.clone(),
                             };
                         },
                         _ => {
@@ -76,7 +76,7 @@ pub fn update_event_subscription_status(
                                 request_id: curr_request_id.clone(),
                                 message: "Status is not supported or is invalid".to_string(),
                                 event_matcher: fetched_event_sub_state.event_matcher.clone(),
-                                event_publication_spec: fetched_event_sub_state.event_publication_spec.clone(),
+                                event_publication_specs: fetched_event_sub_state.event_publication_specs.clone(),
                             };
                         },
                     },
@@ -86,18 +86,60 @@ pub fn update_event_subscription_status(
                             request_id: curr_request_id.clone(),
                             message: "No event subscription status set in database".to_string(),
                             event_matcher: fetched_event_sub_state.event_matcher.clone(),
-                            event_publication_spec: fetched_event_sub_state.event_publication_spec.clone(),
+                            event_publication_specs: fetched_event_sub_state.event_publication_specs.clone(),
                         };
                     },
                 }
             } else {
-                target = EventSubscriptionState {
-                    status: event_subscription_state::Status::Error as i32,
-                    request_id: curr_request_id.clone(),
-                    message: message.to_string(),
-                    event_matcher: fetched_event_sub_state.event_matcher.clone(),
-                    event_publication_spec: fetched_event_sub_state.event_publication_spec.clone(),
-                };
+                match message.find("Event subscription already exists with requestId: ") {
+                    Some(_index) => {
+                        let mut new_message = message.to_string();
+                        let old_request_id = *(message.split("Event subscription already exists with requestId: ").collect::<Vec<&str>>().last().unwrap());
+                        println!("Adding event publication spec to existing EventSubscriptionState. Extracted request id from message: {}", old_request_id.to_string());
+
+                        let old_event_sub_key = get_event_subscription_key(old_request_id.to_string());
+                        let mut existing_event_sub_state = db.get::<EventSubscriptionState>(old_event_sub_key.to_string())
+                            .expect(&format!("No EventSubscriptionState found in DB for request_id provided {}", old_request_id.to_string()));
+                            
+                        let new_event_pub_spec = fetched_event_sub_state.event_publication_specs.first().unwrap();
+                        let mut unique_pub_spec_flag = true;
+                        for event_pub_spec in existing_event_sub_state.event_publication_specs.iter() {
+                            if *new_event_pub_spec == *event_pub_spec {
+                                unique_pub_spec_flag = false;
+                                break;
+                            }
+                        }
+                        if unique_pub_spec_flag {
+                            existing_event_sub_state.event_publication_specs.push((*new_event_pub_spec).clone());
+                            let updated_event_sub_state = EventSubscriptionState {
+                                status: event_subscription_state::Status::Subscribed as i32,
+                                request_id: old_request_id.to_string(),
+                                message: existing_event_sub_state.message.to_string(),
+                                event_matcher: existing_event_sub_state.event_matcher.clone(),
+                                event_publication_specs: existing_event_sub_state.event_publication_specs.clone(),
+                            };
+                            db.set(&old_event_sub_key.to_string(), &updated_event_sub_state)
+                                .expect("Failed to insert into DB");
+                            new_message = format!("New Event Publication added to eisting subscription with request id {}", old_request_id.to_string()).to_string();
+                        }
+                        target = EventSubscriptionState {
+                            status: event_subscription_state::Status::Error as i32,
+                            request_id: curr_request_id.clone(),
+                            message: new_message.to_string(),
+                            event_matcher: fetched_event_sub_state.event_matcher.clone(),
+                            event_publication_specs: fetched_event_sub_state.event_publication_specs.clone(),
+                        };
+                    },
+                    None => {
+                        target = EventSubscriptionState {
+                            status: event_subscription_state::Status::Error as i32,
+                            request_id: curr_request_id.clone(),
+                            message: message.to_string(),
+                            event_matcher: fetched_event_sub_state.event_matcher.clone(),
+                            event_publication_specs: fetched_event_sub_state.event_publication_specs.clone(),
+                        };
+                    }
+                }
             }
             
             // Panic if this fails, atm the panic is just logged by the tokio runtime

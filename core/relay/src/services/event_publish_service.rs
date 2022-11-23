@@ -264,13 +264,15 @@ fn send_state_helper(
     db.set(&event_publish_key, &event_states)
         .expect("Failed to insert into DB");
     
-    spawn_handle_event(
-        state,
-        event_sub_state.event_publication_spec.expect("No Publication Spec stored in event subscription state"),
-        request_id,
-        event_id.to_string(),
-        conf
-    );
+    for event_pub_spec in event_sub_state.event_publication_specs.iter() {
+        spawn_handle_event(
+            state.clone(),
+            (*event_pub_spec).clone(),
+            request_id.to_string(),
+            event_id.to_string(),
+            conf.clone()
+        );
+    }
     
     return Ok(());
 }
