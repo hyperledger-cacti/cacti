@@ -9,6 +9,7 @@ documentation = "https://github.com/hyperledger-labs/weaver-dlt-interoperability
 repository = "https://github.com/hyperledger-labs/weaver-dlt-interoperability/"
 readme = "README.md"
 keywords = ["weaver", "interoperability", "protobuf", "protos"]
+excludes = ["build.rs"]
 
 [lib]
 name = "pb"
