@@ -4,7 +4,7 @@ build:
 
 .PHONY: clean
 clean:
-	rm -rf pkg/src/generated/* pkg/target
+	rm -rf pkg/src/generated/* pkg/target target
 
 .PHONY: publish
 publish:
