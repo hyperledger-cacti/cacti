@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils/mocks"
 	"github.com/stretchr/testify/require"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
 	wtest "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils"
@@ -51,6 +52,13 @@ func TestCreateAccessControlPolicy(t *testing.T) {
 	// Happy case. No existing access control policy is found creates one.
 	accessControlBytes, err := json.Marshal(&accessControlAsset)
 	require.NoError(t, err)
+	// Case when caller is not an admin
+	err = interopcc.CreateAccessControlPolicy(ctx, string(accessControlBytes))
+	require.EqualError(t, err, "Caller not a network admin; access denied")
+	// Set caller to be admin now
+	clientIdentity := &mocks.ClientIdentity{}
+	clientIdentity.GetAttributeValueCalls(setClientAdmin)
+	ctx.GetClientIdentityReturns(clientIdentity)
 	err = interopcc.CreateAccessControlPolicy(ctx, string(accessControlBytes))
 	require.NoError(t, err)
 	// Invalid Input check
@@ -69,6 +77,13 @@ func TestUpdateAccessControlPolicy(t *testing.T) {
 	// Case when no access control policy is found
 	accessControlBytes, err := json.Marshal(&accessControlAsset)
 	require.NoError(t, err)
+	// Case when caller is not an admin
+	err = interopcc.UpdateAccessControlPolicy(ctx, string(accessControlBytes))
+	require.EqualError(t, err, "Caller not a network admin; access denied")
+	// Set caller to be admin now
+	clientIdentity := &mocks.ClientIdentity{}
+	clientIdentity.GetAttributeValueCalls(setClientAdmin)
+	ctx.GetClientIdentityReturns(clientIdentity)
 	err = interopcc.UpdateAccessControlPolicy(ctx, string(accessControlBytes))
 	require.EqualError(t, err, fmt.Sprintf("Access Control Policy with securityDomain: %s does not exist", accessControlAsset.SecurityDomain))
 	// Invalid Input check
@@ -87,7 +102,14 @@ func TestDeleteAccessControlPolicy(t *testing.T) {
 
 	// Case when a policy exists
 	chaincodeStub.GetStateReturns([]byte{}, nil)
+	// Case when caller is not an admin
 	err := interopcc.DeleteAccessControlPolicy(ctx, "2343")
+	require.EqualError(t, err, "Caller not a network admin; access denied")
+	// Set caller to be admin now
+	clientIdentity := &mocks.ClientIdentity{}
+	clientIdentity.GetAttributeValueCalls(setClientAdmin)
+	ctx.GetClientIdentityReturns(clientIdentity)
+	err = interopcc.DeleteAccessControlPolicy(ctx, "2343")
 	require.NoError(t, err)
 
 	// Case when no access control policy is found
