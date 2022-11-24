@@ -78,8 +78,7 @@ protos-local:
 .PHONY: build-local
 build-local:	protos-local
 	@echo -e "\033[1mBUILD\033[0m - Successfully updated protos, compiling Rust..."
-	cargo build || (./scripts/update-protos.sh && exit 1)
-	./scripts/update-protos.sh
+	cargo build
 
 # Builds the docker image of the relay. The target depends upon
 # the build fingerprint and the presence of the protos folder
@@ -88,28 +87,24 @@ build-local:	protos-local
 .PHONY:	build-server-local
 build-server-local: protos-local fingerprint.json
 	@echo -e "\033[1mBUILD\033[0m - Building Docker image (relay server)..."
-	docker build  --build-arg COMMIT=$(COMMIT) --build-arg BRANCH=$(BRANCH) --build-arg PROTOS_VERSION=$(PROTOS_TAG) --build-arg VERSION=$(DOCKER_TAG) --build-arg GIT_URL=$(GIT_URL) -t $(DOCKER_IMAGE_SERVER) -f Dockerfile.server . || (./scripts/update-protos.sh && exit 1)
-	./scripts/update-protos.sh
+	docker build  --build-arg COMMIT=$(COMMIT) --build-arg BRANCH=$(BRANCH) --build-arg PROTOS_VERSION=$(PROTOS_TAG) --build-arg VERSION=$(DOCKER_TAG) --build-arg GIT_URL=$(GIT_URL) -t $(DOCKER_IMAGE_SERVER) -f Dockerfile.server .
 	docker tag $(DOCKER_IMAGE_SERVER) $(DOCKER_IMAGE_SERVER_LATEST)
 
 .PHONY: build-client-local
 build-client-local: protos-local fingerprint.json
 	@echo -e "\033[1mBUILD\033[0m - Building Docker image (relay client)..."
 	docker build  --build-arg COMMIT=$(COMMIT) --build-arg BRANCH=$(BRANCH) --build-arg PROTOS_VERSION=$(PROTOS_TAG) --build-arg VERSION=$(DOCKER_TAG) -t $(DOCKER_IMAGE_CLIENT) -f Dockerfile.client .
-	-./scripts/update-protos.sh
 
 .PHONY: build-driver-local
 build-driver-local: protos-local fingerprint.json
 	@echo -e "\033[1mBUILD\033[0m - Building Docker image (relay driver)..."
 	docker build  --build-arg COMMIT=$(COMMIT) --build-arg BRANCH=$(BRANCH) --build-arg PROTOS_VERSION=$(PROTOS_TAG) --build-arg VERSION=$(DOCKER_TAG) -t $(DOCKER_IMAGE_DRIVER) -f Dockerfile.driver .
-	-./scripts/update-protos.sh
 
 
 .PHONY: build-allinone-local
 build-allinone-local: protos-local fingerprint.json
 	@echo -e "\033[1mBUILD\033[0m - Building Docker image (relay all-in-one)..."
 	docker build  --build-arg COMMIT=$(COMMIT) --build-arg BRANCH=$(BRANCH) --build-arg PROTOS_VERSION=$(PROTOS_TAG) --build-arg VERSION=$(DOCKER_TAG) -t $(DOCKER_IMAGE_ALL) -f Dockerfile .
-	-./scripts/update-protos.sh
 
 
 .PHONY: build-images-local
