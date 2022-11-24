@@ -1,12 +1,12 @@
 //Simple grpc with relay
 
 // Internal modules
-use common::ack::{ack, Ack};
-use common::query::Query;
-use common::events::EventSubscription;
-use common::state::{view_payload, Meta, meta, ViewPayload, View};
-use driver::driver::driver_communication_server::{DriverCommunication, DriverCommunicationServer};
-use driver::driver::WriteExternalStateMessage;
+use weaverpb::common::ack::{ack, Ack};
+use weaverpb::common::query::Query;
+use weaverpb::common::events::EventSubscription;
+use weaverpb::common::state::{view_payload, Meta, meta, ViewPayload, View};
+use weaverpb::driver::driver::driver_communication_server::{DriverCommunication, DriverCommunicationServer};
+use weaverpb::driver::driver::WriteExternalStateMessage;
 
 // External modules
 use config;
@@ -19,33 +19,6 @@ use tokio::sync::RwLock;
 use tonic::transport::Server;
 use tonic::{Request, Response, Status};
 
-pub mod driver {
-    pub mod driver {
-        include!(concat!("../proto-rs", "/driver.driver.rs"));
-    }
-}
-pub mod relay {
-    pub mod datatransfer {
-        include!(concat!("../proto-rs", "/relay.datatransfer.rs"));
-    }
-    pub mod events {
-        include!(concat!("../proto-rs", "/relay.events.rs"));
-    }
-}
-pub mod common {
-    pub mod ack {
-        include!(concat!("../proto-rs", "/common.ack.rs"));
-    }
-    pub mod state {
-        include!(concat!("../proto-rs", "/common.state.rs"));
-    }
-    pub mod query {
-        include!(concat!("../proto-rs", "/common.query.rs"));
-    }
-    pub mod events {
-        include!(concat!("../proto-rs", "/common.events.rs"));
-    }
-}
 pub struct DriverCommunicationService {
     pub config_lock: RwLock<config::Config>,
 }
@@ -78,7 +51,7 @@ impl DriverCommunication for DriverCommunicationService {
             .expect("Hostname table does not exist");
         let client_addr = format!("http://{}:{}", relay_hostname, relay_port);
         let client_result =
-            relay::datatransfer::data_transfer_client::DataTransferClient::connect(client_addr)
+            weaverpb::relay::datatransfer::data_transfer_client::DataTransferClient::connect(client_addr)
                 .await;
         match client_result {
             Ok(client) => {
@@ -138,7 +111,7 @@ impl DriverCommunication for DriverCommunicationService {
         let client_addr = format!("http://{}:{}", relay_hostname, relay_port);
         println!("Remote relay... {:?}", client_addr.clone());
         let client_result =
-            relay::events::event_subscribe_client::EventSubscribeClient::connect(client_addr)
+            weaverpb::relay::events::event_subscribe_client::EventSubscribeClient::connect(client_addr)
                 .await;
         match client_result {
             Ok(client) => {

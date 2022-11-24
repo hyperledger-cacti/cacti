@@ -1,6 +1,5 @@
-mod pb;
 mod relay_proto;
-use pb::networks::networks::{network_client::NetworkClient, NetworkQuery};
+use weaverpb::networks::networks::{network_client::NetworkClient, NetworkQuery};
 use relay_proto::get_url;
 use std::env;
 

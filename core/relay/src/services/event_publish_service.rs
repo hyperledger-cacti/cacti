@@ -1,11 +1,11 @@
 // Internal generated modules
-use crate::pb::common::ack::{ack, Ack};
-use crate::pb::common::query::Query;
-use crate::pb::common::state::{request_state, view_payload, RequestState, ViewPayload};
-use crate::pb::common::events::{EventSubscription, EventSubscriptionState, event_publication, EventPublication, EventState, EventStates};
-use crate::pb::relay::events::event_publish_client::EventPublishClient;
-use crate::pb::relay::events::event_publish_server::EventPublish;
-use crate::pb::driver::driver::WriteExternalStateMessage;
+use weaverpb::common::ack::{ack, Ack};
+use weaverpb::common::query::Query;
+use weaverpb::common::state::{request_state, view_payload, RequestState, ViewPayload};
+use weaverpb::common::events::{EventSubscription, EventSubscriptionState, event_publication, EventPublication, EventState, EventStates};
+use weaverpb::relay::events::event_publish_client::EventPublishClient;
+use weaverpb::relay::events::event_publish_server::EventPublish;
+use weaverpb::driver::driver::WriteExternalStateMessage;
 
 // Internal modules
 use crate::db::Database;

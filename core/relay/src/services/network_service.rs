@@ -1,12 +1,12 @@
 // Internal generated modules
-use crate::pb::common::ack::{ack, Ack};
-use crate::pb::common::query::Query;
-use crate::pb::common::state::{request_state, RequestState};
-use crate::pb::common::events::{EventSubscription, event_subscription_state, EventSubscriptionState, EventSubOperation, event_publication, EventPublication, EventStates};
-use crate::pb::networks::networks::network_server::Network;
-use crate::pb::networks::networks::{DbName, GetStateMessage, NetworkQuery, RelayDatabase, NetworkEventSubscription, NetworkEventUnsubscription};
-use crate::pb::relay::datatransfer::data_transfer_client::DataTransferClient;
-use crate::pb::relay::events::event_subscribe_client::EventSubscribeClient;
+use weaverpb::common::ack::{ack, Ack};
+use weaverpb::common::query::Query;
+use weaverpb::common::state::{request_state, RequestState};
+use weaverpb::common::events::{EventSubscription, event_subscription_state, EventSubscriptionState, EventSubOperation, event_publication, EventPublication, EventStates};
+use weaverpb::networks::networks::network_server::Network;
+use weaverpb::networks::networks::{DbName, GetStateMessage, NetworkQuery, RelayDatabase, NetworkEventSubscription, NetworkEventUnsubscription};
+use weaverpb::relay::datatransfer::data_transfer_client::DataTransferClient;
+use weaverpb::relay::events::event_subscribe_client::EventSubscribeClient;
 use crate::relay_proto::{parse_address, LocationSegment};
 // Internal modules
 use crate::db::Database;

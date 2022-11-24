@@ -1,9 +1,9 @@
 // Internal generated modules
-use crate::pb::common::ack::{ack, Ack};
-use crate::pb::common::query::Query;
-use crate::pb::common::events::{EventSubOperation, EventSubscription};
-use crate::pb::relay::events::event_subscribe_client::EventSubscribeClient;
-use crate::pb::relay::events::event_subscribe_server::EventSubscribe;
+use weaverpb::common::ack::{ack, Ack};
+use weaverpb::common::query::Query;
+use weaverpb::common::events::{EventSubOperation, EventSubscription};
+use weaverpb::relay::events::event_subscribe_client::EventSubscribeClient;
+use weaverpb::relay::events::event_subscribe_server::EventSubscribe;
 // Internal modules
 use crate::db::Database;
 use crate::error::Error;

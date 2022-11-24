@@ -1,9 +1,9 @@
-use crate::pb::common::ack::{ack};
-use crate::pb::common::query::Query;
-use crate::pb::common::state::{request_state, RequestState};
-use crate::pb::common::events::{event_subscription_state, EventSubscriptionState};
-use crate::pb::common::events::{EventSubscription, EventStates, EventState};
-use crate::pb::driver::driver::driver_communication_client::DriverCommunicationClient;
+use weaverpb::common::ack::{ack};
+use weaverpb::common::query::Query;
+use weaverpb::common::state::{request_state, RequestState};
+use weaverpb::common::events::{event_subscription_state, EventSubscriptionState};
+use weaverpb::common::events::{EventSubscription, EventStates, EventState};
+use weaverpb::driver::driver::driver_communication_client::DriverCommunicationClient;
 
 use crate::db::Database;
 use crate::services::types::{Driver, Network};
