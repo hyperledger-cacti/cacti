@@ -1,0 +1,93 @@
+# org.openapitools.client - Kotlin client library for Hyperledger Cactus Plugin - Connector Corda
+
+## Requires
+
+* Kotlin 1.4.30
+* Gradle 6.8.3
+
+## Build
+
+First, create the gradle wrapper script:
+
+```
+gradle wrapper
+```
+
+Then, run:
+
+```
+./gradlew check assemble
+```
+
+This runs all tests and packages the library.
+
+## Features/Implementation Notes
+
+* Supports JSON inputs/outputs, File inputs, and Form inputs.
+* Supports collection formats for query parameters: csv, tsv, ssv, pipes.
+* Some Kotlin and Java types are fully qualified to avoid conflicts with types defined in OpenAPI definitions.
+* Implementation of ApiClient is intended to reduce method counts, specifically to benefit Android targets.
+
+<a name="documentation-for-api-endpoints"></a>
+## Documentation for API Endpoints
+
+All URIs are relative to *http://localhost*
+
+Class | Method | HTTP request | Description
+------------ | ------------- | ------------- | -------------
+*DefaultApi* | [**clearMonitorTransactionsV1**](docs/DefaultApi.md#clearmonitortransactionsv1) | **DELETE** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/clear-monitor-transactions | Clear transactions from internal store so they'll not be available by GetMonitorTransactionsV1 anymore.
+*DefaultApi* | [**deployContractJarsV1**](docs/DefaultApi.md#deploycontractjarsv1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/deploy-contract-jars | Deploys a set of jar files (Cordapps, e.g. the contracts in Corda speak).
+*DefaultApi* | [**diagnoseNodeV1**](docs/DefaultApi.md#diagnosenodev1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/diagnose-node | 
+*DefaultApi* | [**getMonitorTransactionsV1**](docs/DefaultApi.md#getmonitortransactionsv1) | **GET** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-monitor-transactions | Get transactions for monitored state classes.
+*DefaultApi* | [**getPrometheusMetricsV1**](docs/DefaultApi.md#getprometheusmetricsv1) | **GET** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-prometheus-exporter-metrics | Get the Prometheus Metrics
+*DefaultApi* | [**invokeContractV1**](docs/DefaultApi.md#invokecontractv1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/invoke-contract | Invokes a contract on a Corda ledger (e.g. a flow)
+*DefaultApi* | [**listFlowsV1**](docs/DefaultApi.md#listflowsv1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-flows | 
+*DefaultApi* | [**networkMapV1**](docs/DefaultApi.md#networkmapv1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/network-map | 
+*DefaultApi* | [**startMonitorV1**](docs/DefaultApi.md#startmonitorv1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/start-monitor | Start monitoring corda changes (transactions) of given state class
+*DefaultApi* | [**stopMonitorV1**](docs/DefaultApi.md#stopmonitorv1) | **DELETE** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/stop-monitor | Stop monitoring corda changes (transactions) of given state class
+
+
+<a name="documentation-for-models"></a>
+## Documentation for Models
+
+ - [org.openapitools.client.models.ClearMonitorTransactionsV1Request](docs/ClearMonitorTransactionsV1Request.md)
+ - [org.openapitools.client.models.ClearMonitorTransactionsV1Response](docs/ClearMonitorTransactionsV1Response.md)
+ - [org.openapitools.client.models.CordaNodeSshCredentials](docs/CordaNodeSshCredentials.md)
+ - [org.openapitools.client.models.CordaRpcCredentials](docs/CordaRpcCredentials.md)
+ - [org.openapitools.client.models.CordaX500Name](docs/CordaX500Name.md)
+ - [org.openapitools.client.models.CordappDeploymentConfig](docs/CordappDeploymentConfig.md)
+ - [org.openapitools.client.models.CordappInfo](docs/CordappInfo.md)
+ - [org.openapitools.client.models.DeployContractJarsBadRequestV1Response](docs/DeployContractJarsBadRequestV1Response.md)
+ - [org.openapitools.client.models.DeployContractJarsSuccessV1Response](docs/DeployContractJarsSuccessV1Response.md)
+ - [org.openapitools.client.models.DeployContractJarsV1Request](docs/DeployContractJarsV1Request.md)
+ - [org.openapitools.client.models.DiagnoseNodeV1Request](docs/DiagnoseNodeV1Request.md)
+ - [org.openapitools.client.models.DiagnoseNodeV1Response](docs/DiagnoseNodeV1Response.md)
+ - [org.openapitools.client.models.FlowInvocationType](docs/FlowInvocationType.md)
+ - [org.openapitools.client.models.GetMonitorTransactionsV1Request](docs/GetMonitorTransactionsV1Request.md)
+ - [org.openapitools.client.models.GetMonitorTransactionsV1Response](docs/GetMonitorTransactionsV1Response.md)
+ - [org.openapitools.client.models.GetMonitorTransactionsV1ResponseTx](docs/GetMonitorTransactionsV1ResponseTx.md)
+ - [org.openapitools.client.models.InvokeContractV1Request](docs/InvokeContractV1Request.md)
+ - [org.openapitools.client.models.InvokeContractV1Response](docs/InvokeContractV1Response.md)
+ - [org.openapitools.client.models.JarFile](docs/JarFile.md)
+ - [org.openapitools.client.models.JvmObject](docs/JvmObject.md)
+ - [org.openapitools.client.models.JvmType](docs/JvmType.md)
+ - [org.openapitools.client.models.JvmTypeKind](docs/JvmTypeKind.md)
+ - [org.openapitools.client.models.ListFlowsV1Request](docs/ListFlowsV1Request.md)
+ - [org.openapitools.client.models.ListFlowsV1Response](docs/ListFlowsV1Response.md)
+ - [org.openapitools.client.models.NetworkHostAndPort](docs/NetworkHostAndPort.md)
+ - [org.openapitools.client.models.NodeDiagnosticInfo](docs/NodeDiagnosticInfo.md)
+ - [org.openapitools.client.models.NodeInfo](docs/NodeInfo.md)
+ - [org.openapitools.client.models.Party](docs/Party.md)
+ - [org.openapitools.client.models.PublicKey](docs/PublicKey.md)
+ - [org.openapitools.client.models.SHA256](docs/SHA256.md)
+ - [org.openapitools.client.models.StartMonitorV1Request](docs/StartMonitorV1Request.md)
+ - [org.openapitools.client.models.StartMonitorV1Response](docs/StartMonitorV1Response.md)
+ - [org.openapitools.client.models.StopMonitorV1Request](docs/StopMonitorV1Request.md)
+ - [org.openapitools.client.models.StopMonitorV1Response](docs/StopMonitorV1Response.md)
+ - [org.openapitools.client.models.X500Principal](docs/X500Principal.md)
+
+
+<a name="documentation-for-authorization"></a>
+## Documentation for Authorization
+
+All endpoints do not require authorization.

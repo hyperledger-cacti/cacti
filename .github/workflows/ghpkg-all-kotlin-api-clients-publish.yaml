@@ -1,0 +1,60 @@
+name: ghpkg-all-kotlin-api-clients-publish
+
+on:
+  push:
+    branches: [main, dev]
+
+  pull_request:
+    branches: [main, dev]
+
+jobs:
+  publish:
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Install Indy SDK
+      run: >
+        sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CE7709D068DB5E88 \
+          && sudo add-apt-repository "deb https://repo.sovrin.org/sdk/deb bionic stable" \
+          && sudo apt-get update \
+          && sudo apt-get install -y \
+              libindy \
+              libnullpay \
+              libvcx \
+              indy-cli \
+          && sudo rm -f /etc/apt/sources.list.d/sovrin.list*
+
+    - name: Checkout
+      uses: actions/checkout@v3.1.0
+      with:
+        fetch-depth: 0
+
+    - name: Get the latest release version
+      run: |
+        export GITVERSION=$(git describe --tags | awk -F'.' '{print $$1}')
+        echo "GITVERSION=$GITVERSION" >> $GITHUB_ENV
+
+    - uses: actions/setup-java@v2
+      with:
+        distribution: 'adopt'
+        java-version: '8'
+
+    - name: Set up NodeJS v16.9.1
+      uses: actions/setup-node@v2.1.2
+      with:
+        node-version: v16.9.1
+
+    - run: yarn configure
+
+    - name: build-cactus-plugin-ledger-connector-corda-kotlin-client
+      run: |
+        WDIR=`pwd`
+        cd ${WDIR}/packages/cactus-plugin-ledger-connector-corda/src/main/kotlin/generated/openapi/kotlin-client
+        chmod +x gradlew
+        ./gradlew clean
+        ./gradlew build
+
+    - name: publish-cactus-plugin-ledger-connector-corda-kotlin-client
+      uses: actions/upload-artifact@v3.0.0
+      with:
+        name: cactus-plugin-ledger-connector-corda-kotlin-client-${{ env.GITVERSION }}.jar
+        path: packages/cactus-plugin-ledger-connector-corda/src/main/kotlin/generated/openapi/kotlin-client/build/libs/kotlin-client-1.0.0.jar
