@@ -13,10 +13,10 @@
 ##   Handle line endings automatically for files detected as
 ##   text and leave all files detected as binary untouched.
 ##   This will handle all files NOT defined below.
-* text=auto
+* text=auto eol=lf
 
 ## SOURCE CODE
-*.bat      text eol=crlf
+# *.bat      text eol=crlf
 *.coffee   text
 *.css      text
 *.htm      text diff=html
