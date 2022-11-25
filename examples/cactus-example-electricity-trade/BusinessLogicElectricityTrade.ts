@@ -174,7 +174,7 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
         // Set Parameter
         logger.debug("remittanceTransaction data : " + json2str(result.data));
         const contract = {}; // NOTE: Since contract does not need to be specified, specify an empty object.
-        const method = { type: "web3Eth", command: "sendRawTransaction" };
+        const method = { type: "web3Eth", command: "sendSignedTransaction" };
         const args: RawTransationResultData = {
           args: [result.data["serializedTx"]],
         };

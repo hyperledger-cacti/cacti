@@ -1,4 +1,4 @@
-import { CodedError } from "../../../main/typescript/coded-error";
+import { CodedError } from "../../../main/typescript/error-utils";
 import "jest-extended";
 
 test("Error test", async () => {

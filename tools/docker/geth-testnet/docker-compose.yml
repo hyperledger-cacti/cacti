@@ -11,10 +11,11 @@ services:
       - "$PWD/data-geth1/genesis.json:/root/data/genesis.json" # mount genesis.js from host
     working_dir: /root
     ports:
-      - "8545:8545" #uncomment this line to enable JSON-RPC access from outside of network
-    #  - "30303:30303"
+      - 8545:8545/tcp # RPC - HTTP
+      - 8546:8546/tcp # RPC - WS
     expose:
-      - "8545" # enable JSON-RPC access fron only inside of network
+      - 8545/tcp # RPC - HTTP
+      - 8546/tcp # RPC - WS
     networks:
       - geth1net
     logging:
@@ -33,6 +34,11 @@ services:
       --rpccorsdomain "*"
       --rpcvhosts "*"
       --rpcapi "eth,web3"
+      --ws
+      --wsport "8546"
+      --wsaddr "0.0.0.0"
+      --wsorigins "*"
+      --wsapi "eth,web3"
       --unlock 0,1,2,3,4
       --password "/dev/null"
       --gasprice 0

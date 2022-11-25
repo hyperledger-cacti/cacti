@@ -38,11 +38,7 @@ import "jest-extended";
 import { Server as HttpsServer } from "https";
 import { Account } from "web3-core";
 
-/**
- * @todo Replace with TS import when validators web3 client is upgraded.
- * Current typing has very poor and wrong type definitions, better ignore them alltogether.
- */
-const Web3 = require("web3");
+import Web3 from "web3";
 
 // Logger setup
 const log: Logger = LoggerProvider.getOrCreate({
@@ -52,7 +48,7 @@ const log: Logger = LoggerProvider.getOrCreate({
 
 describe("Go-Ethereum-SocketIO connector tests", () => {
   let ledger: OpenEthereumTestLedger;
-  let web3: any;
+  let web3: Web3;
   let contractAddress: string;
   let connectorCertValue: string;
   let connectorPrivKeyValue: string;
@@ -87,17 +83,14 @@ describe("Go-Ethereum-SocketIO connector tests", () => {
       logLevel: sutLogLevel
     });
     await ledger.start();
-    const ledgerRpcUrl = await ledger.getRpcApiHttpHost();
+    const ledgerRpcUrl = await ledger.getRpcApiWebSocketHost();
     log.info(`Ledger started, RPC: ${ledgerRpcUrl}`);
 
     // Create Test Account
     constTestAcc = await ledger.createEthTestAccount(constTestAccBalance);
 
     // Create separate Web3 provider
-    web3 = new Web3();
-    web3.setProvider(
-      new web3.providers.HttpProvider(ledgerRpcUrl),
-    );
+    web3 = new Web3(ledgerRpcUrl);
 
     // Deploy test smart contract
     contractAddress = await deploySmartContract();
@@ -196,9 +189,9 @@ describe("Go-Ethereum-SocketIO connector tests", () => {
    * Doesn't use apiClient or validator.
    */
   test("Sanity check ledger connection", async () => {
-    const balance = web3.eth.getBalance(constTestAcc.address);
+    const balance = await web3.eth.getBalance(constTestAcc.address);
     expect(balance).toBeTruthy();
-    expect(balance.valueOf()).toEqual(constTestAccBalance.toString());
+    expect(balance).toEqual(constTestAccBalance.toString());
   });
 
   /**
@@ -347,6 +340,24 @@ describe("Go-Ethereum-SocketIO connector tests", () => {
   });
 
   /**
+   * Test ServerPlugin web3Eth method checking.
+   */
+  test("Function web3Eth returns error for non existant function", async () => {
+    const method = { type: "web3Eth", command: "foo" };
+    const args = {};
+
+    const response = await apiClient.sendSyncRequest(
+      {},
+      method,
+      args,
+    );
+
+    expect(response).toBeTruthy();
+    expect(response.status).toEqual(504);
+    expect(response.errorDetail).toBeTruthy();
+  });
+
+  /**
    * Test ServerPlugin contract function.
    */
   test("Calling pure smart contract method works", async () => {
@@ -364,6 +375,25 @@ describe("Go-Ethereum-SocketIO connector tests", () => {
     expect(response.status).toEqual(200);
     expect(response.data).toBeTruthy();
     expect(response.data).toEqual("Hello World!");
+  });
+
+  /**
+   * Test ServerPlugin contract method checking.
+   */
+   test("Calling contract returns error for non existant contract method", async () => {
+    const contract = { abi: HelloWorldContractJson.abi, address: contractAddress };
+    const method = { type: "contract", command: "foo", function: "call" };
+    const args = { args: [] };
+
+    const response = await apiClient.sendSyncRequest(
+      contract,
+      method,
+      args,
+    );
+
+    expect(response).toBeTruthy();
+    expect(response.status).toEqual(504);
+    expect(response.errorDetail).toBeTruthy();
   });
 
   /**
