@@ -262,7 +262,9 @@ export async function startGoEthereumSocketIOConnector() {
      **/
     // I think it is more common to stop from the disconnect described later, but I will prepare for it.
     client.on("stopMonitor", function (reason) {
-      Smonitor.stopMonitor(client.id);
+      Smonitor.stopMonitor(client.id).then(() => {
+        logger.info("stopMonitor completed.");
+      })
     });
 
     client.on("disconnect", function (reason) {

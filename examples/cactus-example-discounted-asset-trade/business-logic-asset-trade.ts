@@ -108,8 +108,6 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
     // Register transaction information in transaction information management
     const transactionInfo: TransactionInfo = new TransactionInfo();
     transactionInfo.setRequestInfo(0, requestInfo);
-    this.transactionInfoManagement.addTransactionInfo(transactionInfo);
-
     // pricing of trade by user's status which is employee or not employee
     this.Pricing(requestInfo)
       .then((result) => {
@@ -120,6 +118,10 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
           requestInfo.businessLogicID,
           requestInfo.tradeID,
         );
+
+        // Save transaction value
+        transactionInfo.setRequestInfo(1, requestInfo);
+        this.transactionInfoManagement.addTransactionInfo(transactionInfo);
 
         // trade status update
         this.transactionInfoManagement.setStatus(
@@ -352,7 +354,7 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
     // TODO: Get address of escrow and set parameter
     const escrowAddress = config.assetTradeInfo.ethereum.escrowAddress;
 
-    // Generate parameters for// sendRawTransaction
+    // Generate parameters for// sendSignedTransaction
     const txParam: {
       fromAddress: string;
       fromAddressPkey: string;
@@ -385,7 +387,7 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
         // Set Parameter
         logger.debug("firstTransaction data : " + JSON.stringify(result.data));
         const contract = {}; // NOTE: Since contract does not need to be specified, specify an empty object.
-        const method = { type: "web3Eth", command: "sendRawTransaction" };
+        const method = { type: "web3Eth", command: "sendSignedTransaction" };
 
         const args = { args: [result.data["serializedTx"]] };
         // Run Verifier (Ethereum)
@@ -500,7 +502,7 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
     // TODO: get escrow secret key
     const escrowAddressPkey = config.assetTradeInfo.ethereum.escrowAddressPkey;
 
-    // Generate parameters for sendRawTransaction
+    // Generate parameters for sendSignedTransaction
     const txParam: {
       fromAddress: string;
       fromAddressPkey: string;
@@ -538,7 +540,7 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
         // TODO: Neo!!
         // Set Parameter
         const contract = {}; // NOTE: Since contract does not need to be specified, specify an empty object.
-        const method = { type: "web3Eth", command: "sendRawTransaction" };
+        const method = { type: "web3Eth", command: "sendSignedTransaction" };
         const args = { args: [result.data["serializedTx"]] };
 
         // Run Verifier (Ethereum)

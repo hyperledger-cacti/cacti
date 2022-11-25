@@ -67,6 +67,10 @@ docker run -v/etc/cactus/:/etc/cactus -p 5050:5050 cactus-plugin-ledger-connecto
 npm run start
 ```
 
+## Configuration
+- Validator can be configured in `/etc/cactus/connector-go-ethereum-socketio/default.yaml` (see [sample-config](./sample-config/default.yaml) for details).
+- This configuration can be overwriten in `NODE_CONFIG` environment variable (JSON format).
+
 ## Usage samples
 - To confirm the operation of this package, please refer to the following business-logic sample applications:
     - [cactus-example-electricity-trade](../../examples/cactus-example-electricity-trade)

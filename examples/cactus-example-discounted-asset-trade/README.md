@@ -179,10 +179,14 @@ For development purposes, it might be useful to run the sample application outsi
 
    ```
    # Ethereum fromAccount:
-   { status: 200, amount: 100000 }
+   { status: 200, amount: 1e+26 }
+
+   # Ethereum escrowAccount:
+   { status: 200, amount: 0 }
 
    # Ethereum toAccount:
    { status: 200, amount: 0 }
+
 
    # Fabric:
    [
@@ -240,10 +244,14 @@ For development purposes, it might be useful to run the sample application outsi
 
    ```
    # Ethereum fromAccount:
-   { status: 200, amount: 99950 }
+   { status: 200, amount: 1.00000045e+26 }
+
+   # Ethereum escrowAccount:
+   { status: 200, amount: 0 }
 
    # Ethereum toAccount:
-   { status: 200, amount: 50 }
+   { status: 200, amount: 25 }
+
 
    # Fabric:
    [

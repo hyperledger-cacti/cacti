@@ -14,14 +14,20 @@
  */
 
 // configuration file
-import { configRead, signMessageJwt } from "@hyperledger/cactus-cmd-socketio-server";
+import {
+  configRead,
+  signMessageJwt,
+} from "@hyperledger/cactus-cmd-socketio-server";
 // Log settings
 import { getLogger } from "log4js";
 const logger = getLogger("ServerMonitorPlugin[" + process.pid + "]");
 logger.level = configRead("logLevel", "info");
 // Load libraries, SDKs, etc. according to specifications of endchains as needed
-const Web3 = require("web3");
-import safeStringify from "fast-safe-stringify";
+import Web3 from "web3";
+import { Subscription } from "web3-core-subscriptions";
+import { BlockHeader } from "web3-eth";
+
+import { safeStringifyException } from "@hyperledger/cactus-common";
 
 export type MonitorCallback = (callback: {
   status: number;
@@ -34,7 +40,7 @@ export type MonitorCallback = (callback: {
  * Class definitions of server monitoring
  */
 export class ServerMonitorPlugin {
-  _filterTable = new Map<string, any>();
+  _subscriptionTable = new Map<string, Subscription<BlockHeader>>();
 
   /*
    * startMonitor
@@ -46,23 +52,21 @@ export class ServerMonitorPlugin {
     logger.info("*** START MONITOR ***");
     logger.info("Client ID :" + clientId);
     // Implement handling to receive events from an end-chain and return them in a callback function
-    let filter = this._filterTable.get(clientId);
-    if (!filter) {
-      logger.info("create new web3 filter and start watching.");
+    let sub = this._subscriptionTable.get(clientId);
+    if (!sub) {
+      logger.info("create new web3 subscription and start watching.");
       try {
-        const web3 = new Web3();
-        const provider = new web3.providers.HttpProvider(
-          configRead("ledgerUrl"),
+        const web3 = new Web3(
+          new Web3.providers.WebsocketProvider(configRead("ledgerUrl")),
         );
-        web3.setProvider(provider);
-        filter = web3.eth.filter("latest");
-        // filter should be managed by client ID
+        sub = web3.eth.subscribe("newBlockHeaders");
+        // subscription should be managed by client ID
         // (You should never watch multiple urls from the same client)
-        this._filterTable.set(clientId, filter);
-        filter.watch(function (error: any, blockHash: string) {
+        this._subscriptionTable.set(clientId, sub);
+        sub.subscribe(async (error: any, block: BlockHeader) => {
           if (!error) {
             console.log("##[HL-BC] Notify new block data(D2)");
-            const blockData = web3.eth.getBlock(blockHash, true);
+            const blockData = await web3.eth.getBlock(block.hash, true);
             const trLength = blockData.transactions.length;
             logger.info(
               trLength + " transactions in block " + blockData.number,
@@ -87,7 +91,7 @@ export class ServerMonitorPlugin {
           } else {
             const errObj = {
               status: 504,
-              errorDetail: safeStringify(error),
+              errorDetail: safeStringifyException(error),
             };
             cb(errObj);
           }
@@ -95,13 +99,13 @@ export class ServerMonitorPlugin {
       } catch (e) {
         const errObj = {
           status: 504,
-          errorDetail: safeStringify(e),
+          errorDetail: safeStringifyException(e),
         };
         logger.error(errObj);
         cb(errObj);
       }
     } else {
-      logger.info("target filter has already start watching.");
+      logger.info("target subscription has already start watching.");
     }
   }
 
@@ -110,14 +114,14 @@ export class ServerMonitorPlugin {
    * monitoring stop
    * @param {string} clientId: Client ID from which monitoring stop request was made
    */
-  stopMonitor(clientId: string) {
+  async stopMonitor(clientId: string) {
     // Implement a process to end EC monitoring
-    let filter = this._filterTable.get(clientId);
-    if (filter) {
-      // Stop the filter & Remove it from table
-      logger.info("stop watching and remove filter.");
-      filter.stopWatching();
-      this._filterTable.delete(clientId);
+    let sub = this._subscriptionTable.get(clientId);
+    if (sub) {
+      // Stop the subscription & Remove it from table
+      logger.info("stop watching and remove subscription.");
+      await sub.unsubscribe();
+      this._subscriptionTable.delete(clientId);
     }
   }
 }

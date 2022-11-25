@@ -12,7 +12,6 @@
  */
 
 import path from "path";
-import safeStringify from "fast-safe-stringify";
 import Client, {
   Proposal,
   ProposalRequest,
@@ -37,6 +36,7 @@ const connUserName = configRead<string>("fabric.connUserName");
 
 // Log settings
 import { getLogger } from "log4js";
+import { safeStringifyException } from "@hyperledger/cactus-common";
 const logger = getLogger("ServerPlugin[" + process.pid + "]");
 logger.level = configRead<string>("logLevel", "info");
 
@@ -231,7 +231,7 @@ export class ServerPlugin {
           retObj = {
             resObj: {
               status: 504,
-              errorDetail: safeStringify(err),
+              errorDetail: safeStringifyException(err),
             },
           };
           logger.error(err);
@@ -304,7 +304,7 @@ export class ServerPlugin {
         .catch((err) => {
           retObj = {
             status: 504,
-            errorDetail: safeStringify(err),
+            errorDetail: safeStringifyException(err),
           };
           logger.error(err);
           return reject(retObj);
@@ -373,7 +373,7 @@ export class ServerPlugin {
       throw {
         resObj: {
           status: 504,
-          errorDetail: safeStringify(error),
+          errorDetail: safeStringifyException(error),
         },
       };
     }
@@ -471,7 +471,7 @@ export class ServerPlugin {
       throw {
         resObj: {
           status: 504,
-          errorDetail: safeStringify(error),
+          errorDetail: safeStringifyException(error),
         },
       };
     }
@@ -630,7 +630,7 @@ export class ServerPlugin {
       throw {
         resObj: {
           status: 504,
-          errorDetail: safeStringify(error),
+          errorDetail: safeStringifyException(error),
         },
       };
     }
@@ -693,7 +693,7 @@ export class ServerPlugin {
       throw {
         resObj: {
           status: 504,
-          errorDetail: safeStringify(error),
+          errorDetail: safeStringifyException(error),
         },
       };
     }
@@ -752,7 +752,7 @@ export class ServerPlugin {
       throw {
         resObj: {
           status: 504,
-          errorDetail: safeStringify(error),
+          errorDetail: safeStringifyException(error),
         },
       };
     }

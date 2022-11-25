@@ -50,15 +50,18 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
+    "fast-safe-stringify": "2.1.1",
     "json-stable-stringify": "1.0.1",
     "key-encoder": "2.0.3",
     "loglevel": "1.7.1",
     "loglevel-plugin-prefix": "0.8.4",
     "secp256k1": "4.0.2",
+    "sanitize-html": "2.7.0",
     "sha3": "2.1.4"
   },
   "devDependencies": {
     "@types/json-stable-stringify": "1.0.33",
+    "@types/sanitize-html": "2.6.2",
     "@types/secp256k1": "4.0.3",
     "@types/uuid": "8.3.1",
     "uuid": "8.3.2"

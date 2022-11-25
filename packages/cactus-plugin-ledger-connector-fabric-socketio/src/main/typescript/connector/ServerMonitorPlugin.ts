@@ -19,13 +19,16 @@ import FabricClient from "fabric-client";
 // IF declaration for fabric
 import { getClientAndChannel, getSubmitterAndEnroll } from "./fabricaccess";
 // config file
-import { configRead, signMessageJwt } from "@hyperledger/cactus-cmd-socketio-server";
+import {
+  configRead,
+  signMessageJwt,
+} from "@hyperledger/cactus-cmd-socketio-server";
 // Log settings
 import { getLogger } from "log4js";
 const logger = getLogger("ServerMonitorPlugin[" + process.pid + "]");
 logger.level = configRead<string>("logLevel", "info");
 // utility
-import safeStringify from "fast-safe-stringify";
+import { safeStringifyException } from "@hyperledger/cactus-common";
 
 export type MonitorCallback = (callback: {
   status: number;
@@ -152,7 +155,7 @@ export class ServerMonitorPlugin {
           logger.error(err);
           const errObj = {
             status: 504,
-            errorDetail: safeStringify(err),
+            errorDetail: safeStringifyException(err),
           };
           cb(errObj);
         });

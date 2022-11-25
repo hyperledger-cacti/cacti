@@ -3,4 +3,4 @@ sslParam:
   key: "/etc/cactus/connector-go-ethereum-socketio/CA/connector.priv"
   cert: "/etc/cactus/connector-go-ethereum-socketio/CA/connector.crt"
 logLevel: "debug"
-ledgerUrl: "http://geth1:8545"
+ledgerUrl: "ws://geth1:8546"

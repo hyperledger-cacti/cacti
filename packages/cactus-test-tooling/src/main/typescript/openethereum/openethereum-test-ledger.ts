@@ -26,11 +26,13 @@ export interface IOpenEthereumTestLedgerOptions {
   emitContainerLogs?: boolean;
   chain?: string;
   httpPort?: number;
+  wsPort?: number;
 }
 
 export const K_DEFAULT_OPEN_ETHEREUM_IMAGE_NAME = "openethereum/openethereum";
 export const K_DEFAULT_OPEN_ETHEREUM_IMAGE_VERSION = "v3.2.4";
 export const K_DEFAULT_OPEN_ETHEREUM_HTTP_PORT = 8545;
+export const K_DEFAULT_OPEN_ETHEREUM_WS_PORT = 8546;
 // @see https://openethereum.github.io/Chain-specification
 // @see https://github.com/openethereum/openethereum/tree/main/crates/ethcore/res/chainspec
 export const K_DEFAULT_OPEN_ETHEREUM_CHAIN = "dev";
@@ -55,6 +57,7 @@ export class OpenEthereumTestLedger {
   private readonly emitContainerLogs: boolean;
   private readonly chain: string;
   private readonly httpPort: number;
+  private readonly wsPort: number;
   private _container: Container | undefined;
   private _containerId: string | undefined;
   private _web3: Web3 | undefined;
@@ -99,6 +102,7 @@ export class OpenEthereumTestLedger {
 
     this.chain = this.options.chain || K_DEFAULT_OPEN_ETHEREUM_CHAIN;
     this.httpPort = this.options.httpPort || K_DEFAULT_OPEN_ETHEREUM_HTTP_PORT;
+    this.wsPort = this.options.wsPort || K_DEFAULT_OPEN_ETHEREUM_WS_PORT;
     this.imageName =
       this.options.imageName || K_DEFAULT_OPEN_ETHEREUM_IMAGE_NAME;
     this.imageVersion =
@@ -137,6 +141,7 @@ export class OpenEthereumTestLedger {
       "--jsonrpc-interface=all",
       "--jsonrpc-hosts=all",
       "--jsonrpc-apis=web3,eth,personal,net,parity",
+      "--ws-port=" + this.wsPort,
       "--ws-interface=all",
       "--ws-apis=web3,eth,net,parity,pubsub",
       "--ws-origins=all",
@@ -152,8 +157,14 @@ export class OpenEthereumTestLedger {
         [],
         {
           Env,
-          PublishAllPorts: true,
           Healthcheck,
+          ExposedPorts: {
+            [`${this.httpPort}/tcp`]: {},
+            [`${this.wsPort}/tcp`]: {},
+          },
+          HostConfig: {
+            PublishAllPorts: true,
+          },
         },
         {},
         (err?: Error) => {
@@ -317,6 +328,16 @@ export class OpenEthereumTestLedger {
     return `http://${lanAddress}:${thePort}`;
   }
 
+  public async getRpcApiWebSocketHost(
+    host?: string,
+    port?: number,
+  ): Promise<string> {
+    const thePort = port || (await this.getHostPortWs());
+    const lanIpV4OrUndefined = await internalIpV4();
+    const lanAddress = host || lanIpV4OrUndefined || "127.0.0.1"; // best effort...
+    return `ws://${lanAddress}:${thePort}`;
+  }
+
   public async stop(): Promise<void> {
     if (this._container) {
       await Containers.stop(this.container);
@@ -335,13 +356,21 @@ export class OpenEthereumTestLedger {
     }
   }
 
-  public async getHostPortHttp(): Promise<number> {
-    const fnTag = `${this.className}#getHostPortHttp()`;
+  private async getHostPort(port: number): Promise<number> {
+    const fnTag = `${this.className}#getHostPort()`;
     if (this._containerId) {
       const cInfo = await Containers.getById(this._containerId);
-      return Containers.getPublicPort(this.httpPort, cInfo);
+      return Containers.getPublicPort(port, cInfo);
     } else {
       throw new Error(`${fnTag} Container ID not set. Did you call start()?`);
     }
+  }
+
+  public async getHostPortHttp(): Promise<number> {
+    return this.getHostPort(this.httpPort);
+  }
+
+  public async getHostPortWs(): Promise<number> {
+    return this.getHostPort(this.wsPort);
   }
 }

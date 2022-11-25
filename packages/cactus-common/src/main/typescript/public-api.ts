@@ -5,7 +5,7 @@ export { Objects } from "./objects";
 export { Strings } from "./strings";
 export { Bools } from "./bools";
 export { Checks } from "./checks";
-export { CodedError } from "./coded-error";
+export { CodedError, safeStringifyException } from "./error-utils";
 
 export {
   JsObjectSigner,
