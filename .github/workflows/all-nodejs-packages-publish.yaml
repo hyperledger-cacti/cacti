@@ -30,6 +30,6 @@ jobs:
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       run: |
-        git config --global user.email "${GITHUB_ACTOR}"
-        git config --global user.name "${GITHUB_ACTOR}"
+        git config --global user.email "npm-ci@hyperledger.org"
+        git config --global user.name "hyperledger-ghci"
         yarn lerna publish from-git --yes --loglevel=debug
