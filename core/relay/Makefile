@@ -72,7 +72,7 @@ build-images: build-allinone build-driver build-server build-client
 # to build the scaffolds of the relay GRPC service.
 protos-local:
 	@echo -e "\033[1mFETCH\033[0m - Calling update-protos local script..."
-		./scripts/update-protos.sh local
+	./scripts/update-protos.sh local
 
 # Builds the relay binary.
 .PHONY: build-local
