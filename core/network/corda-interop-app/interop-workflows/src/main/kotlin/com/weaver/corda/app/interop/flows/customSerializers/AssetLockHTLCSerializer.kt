@@ -19,7 +19,7 @@ class AssetLockHTLCSerializer: SerializationCustomSerializer<AssetLocks.AssetLoc
         val hashMechanism: AssetLocks.HashMechanism,
         val hashBase64: ByteArray,
         val expiryTimeSecs: Long,
-        val timeSpec: AssetLocks.AssetLockHTLC.TimeSpec
+        val timeSpec: AssetLocks.TimeSpec
     )
 
     /**

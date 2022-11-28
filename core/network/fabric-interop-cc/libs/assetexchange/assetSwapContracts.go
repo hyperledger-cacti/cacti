@@ -96,7 +96,7 @@ func generateClaimContractIdMapKey(contractId string) string {
  * and contract-id (which is a hash on asset-lock key) for the non-fungible asset locking on the ledger
  */
 func GenerateAssetLockKeyAndContractId(ctx contractapi.TransactionContextInterface, chaincodeId string, assetAgreement *common.AssetExchangeAgreement) (string, string, error) {
-	assetLockKey, err := ctx.GetStub().CreateCompositeKey("AssetExchangeContract", []string{chaincodeId, assetAgreement.Type, assetAgreement.Id})
+	assetLockKey, err := ctx.GetStub().CreateCompositeKey("AssetExchangeContract", []string{chaincodeId, assetAgreement.AssetType, assetAgreement.Id})
 	if err != nil {
 		return "", "", logThenErrorf("error while creating composite key: %+v", err)
 	}
@@ -109,7 +109,7 @@ func GenerateAssetLockKeyAndContractId(ctx contractapi.TransactionContextInterfa
  * and contract-id (which is a hash on asset-lock key) for the non-fungible asset locking on the ledger
  */
 func GenerateClaimAssetLockKey(ctx contractapi.TransactionContextInterface, chaincodeId string, assetAgreement *common.AssetExchangeAgreement) (string, error) {
-	assetLockKey, err := ctx.GetStub().CreateCompositeKey("AssetExchangeContract", []string{chaincodeId, assetAgreement.Type, assetAgreement.Id})
+	assetLockKey, err := ctx.GetStub().CreateCompositeKey("AssetExchangeContract", []string{chaincodeId, assetAgreement.AssetType, assetAgreement.Id})
 	if err != nil {
 		return "", logThenErrorf("error while creating composite key: %+v", err)
 	}
@@ -121,7 +121,7 @@ func GenerateClaimAssetLockKey(ctx contractapi.TransactionContextInterface, chai
  * a hash on the attributes of the fungible asset exchange agreement)
  */
 func GenerateFungibleAssetLockContractId(ctx contractapi.TransactionContextInterface, chaincodeId string, assetAgreement *common.FungibleAssetExchangeAgreement) string {
-	preimage := chaincodeId + assetAgreement.Type + strconv.Itoa(int(assetAgreement.NumUnits)) +
+	preimage := chaincodeId + assetAgreement.AssetType + strconv.Itoa(int(assetAgreement.NumUnits)) +
 		assetAgreement.Locker + assetAgreement.Recipient + ctx.GetStub().GetTxID()
 	contractId := GenerateSHA256HashInBase64Form(preimage + ctx.GetStub().GetTxID())
 	return contractId
@@ -230,7 +230,7 @@ func getLockInfoAndExpiryTimeSecs(lockInfoBytesBase64 string) (interface{}, uint
 		log.Infof("lockInfoHTLC: %+v", lockInfoHTLC)
 		lockInfoVal = HashLock{HashMechanism: lockInfoHTLC.HashMechanism, HashBase64: string(lockInfoHTLC.HashBase64)}
 		// process time lock details here
-		if lockInfoHTLC.TimeSpec != common.AssetLockHTLC_EPOCH {
+		if lockInfoHTLC.TimeSpec != common.TimeSpec_EPOCH {
 			return lockInfoVal, 0, logThenErrorf("only EPOCH time is supported at present")
 		}
 		expiryTimeSecs = lockInfoHTLC.ExpiryTimeSecs
@@ -279,7 +279,7 @@ func LockAsset(ctx contractapi.TransactionContextInterface, callerChaincodeID, a
 	}
 
 	if assetLockValBytes != nil {
-		return "", logThenErrorf("asset of type %s and ID %s is already locked", assetAgreement.Type, assetAgreement.Id)
+		return "", logThenErrorf("asset of type %s and ID %s is already locked", assetAgreement.AssetType, assetAgreement.Id)
 	}
 
 	assetLockValBytes, err = json.Marshal(assetLockVal)
@@ -336,7 +336,7 @@ func UnlockAsset(ctx contractapi.TransactionContextInterface, callerChaincodeID,
 	}
 
 	if assetLockValBytes == nil {
-		return "", logThenErrorf("no asset of type %s and ID %s is locked", assetAgreement.Type, assetAgreement.Id)
+		return "", logThenErrorf("no asset of type %s and ID %s is locked", assetAgreement.AssetType, assetAgreement.Id)
 	}
 
 	assetLockVal := AssetLockValue{}
@@ -346,18 +346,18 @@ func UnlockAsset(ctx contractapi.TransactionContextInterface, callerChaincodeID,
 	}
 
 	if assetLockVal.Locker != assetAgreement.Locker || assetLockVal.Recipient != assetAgreement.Recipient {
-		return "", logThenErrorf("cannot unlock asset of type %s and ID %s as it is locked by %s for %s", assetAgreement.Type, assetAgreement.Id, assetLockVal.Locker, assetLockVal.Recipient)
+		return "", logThenErrorf("cannot unlock asset of type %s and ID %s as it is locked by %s for %s", assetAgreement.AssetType, assetAgreement.Id, assetLockVal.Locker, assetLockVal.Recipient)
 	}
 
 	// Check if expiry time is elapsed
 	currentTimeSecs := uint64(time.Now().Unix())
 	if currentTimeSecs < assetLockVal.ExpiryTimeSecs {
-		return "", logThenErrorf("cannot unlock asset of type %s and ID %s as the expiry time is not yet elapsed", assetAgreement.Type, assetAgreement.Id)
+		return "", logThenErrorf("cannot unlock asset of type %s and ID %s as the expiry time is not yet elapsed", assetAgreement.AssetType, assetAgreement.Id)
 	}
 
 	err = ctx.GetStub().DelState(assetLockKey)
 	if err != nil {
-		return "", logThenErrorf("failed to delete lock for asset of type %s and ID %s: %v", assetAgreement.Type, assetAgreement.Id, err)
+		return "", logThenErrorf("failed to delete lock for asset of type %s and ID %s: %v", assetAgreement.AssetType, assetAgreement.Id, err)
 	}
 	err = ctx.GetStub().DelState(generateContractIdMapKey(contractId))
 	if err != nil {
@@ -394,7 +394,7 @@ func IsAssetLocked(ctx contractapi.TransactionContextInterface, callerChaincodeI
 	}
 
 	if assetLockValBytes == nil {
-		return false, logThenErrorf("no asset of type %s and ID %s is locked", assetAgreement.Type, assetAgreement.Id)
+		return false, logThenErrorf("no asset of type %s and ID %s is locked", assetAgreement.AssetType, assetAgreement.Id)
 	}
 
 	assetLockVal := AssetLockValue{}
@@ -407,18 +407,18 @@ func IsAssetLocked(ctx contractapi.TransactionContextInterface, callerChaincodeI
 	// Check if expiry time is elapsed
 	currentTimeSecs := uint64(time.Now().Unix())
 	if currentTimeSecs >= assetLockVal.ExpiryTimeSecs {
-		return false, logThenErrorf("expiry time for asset of type %s and ID %s is already elapsed", assetAgreement.Type, assetAgreement.Id)
+		return false, logThenErrorf("expiry time for asset of type %s and ID %s is already elapsed", assetAgreement.AssetType, assetAgreement.Id)
 	}
 
 	// '*' for recipient or locker in the query implies that the query seeks status for an arbitrary recipient or locker respectively
 	if (assetAgreement.Locker == "*" || assetLockVal.Locker == assetAgreement.Locker) && (assetAgreement.Recipient == "*" || assetLockVal.Recipient == assetAgreement.Recipient) {
 		return true, nil
 	} else if assetAgreement.Locker == "*" && assetLockVal.Recipient != assetAgreement.Recipient {
-		return false, logThenErrorf("asset of type %s and ID %s is not locked for %s", assetAgreement.Type, assetAgreement.Id, assetAgreement.Recipient)
+		return false, logThenErrorf("asset of type %s and ID %s is not locked for %s", assetAgreement.AssetType, assetAgreement.Id, assetAgreement.Recipient)
 	} else if assetAgreement.Recipient == "*" && assetLockVal.Locker != assetAgreement.Locker {
-		return false, logThenErrorf("asset of type %s and ID %s is not locked by %s", assetAgreement.Type, assetAgreement.Id, assetAgreement.Locker)
+		return false, logThenErrorf("asset of type %s and ID %s is not locked by %s", assetAgreement.AssetType, assetAgreement.Id, assetAgreement.Locker)
 	} else if assetLockVal.Locker != assetAgreement.Locker || assetLockVal.Recipient != assetAgreement.Recipient {
-		return false, logThenErrorf("asset of type %s and ID %s is not locked by %s for %s", assetAgreement.Type, assetAgreement.Id, assetAgreement.Locker, assetAgreement.Recipient)
+		return false, logThenErrorf("asset of type %s and ID %s is not locked by %s for %s", assetAgreement.AssetType, assetAgreement.Id, assetAgreement.Locker, assetAgreement.Recipient)
 	}
 
 	return true, nil
@@ -538,7 +538,7 @@ func ClaimAsset(ctx contractapi.TransactionContextInterface, callerChaincodeID, 
 	}
 
 	if assetLockValBytes == nil {
-		return "", logThenErrorf("no asset of type %s and ID %s is locked", assetAgreement.Type, assetAgreement.Id)
+		return "", logThenErrorf("no asset of type %s and ID %s is locked", assetAgreement.AssetType, assetAgreement.Id)
 	}
 
 	assetLockVal := AssetLockValue{}
@@ -548,22 +548,22 @@ func ClaimAsset(ctx contractapi.TransactionContextInterface, callerChaincodeID, 
 	}
 
 	if assetLockVal.Locker != assetAgreement.Locker || assetLockVal.Recipient != assetAgreement.Recipient {
-		return "", logThenErrorf("cannot claim asset of type %s and ID %s as it is locked by %s for %s", assetAgreement.Type, assetAgreement.Id, assetLockVal.Locker, assetLockVal.Recipient)
+		return "", logThenErrorf("cannot claim asset of type %s and ID %s as it is locked by %s for %s", assetAgreement.AssetType, assetAgreement.Id, assetLockVal.Locker, assetLockVal.Recipient)
 	}
 
 	// Check if expiry time is elapsed
 	currentTimeSecs := uint64(time.Now().Unix())
 	if currentTimeSecs >= assetLockVal.ExpiryTimeSecs {
-		return "", logThenErrorf("cannot claim asset of type %s and ID %s as the expiry time is already elapsed", assetAgreement.Type, assetAgreement.Id)
+		return "", logThenErrorf("cannot claim asset of type %s and ID %s as the expiry time is already elapsed", assetAgreement.AssetType, assetAgreement.Id)
 	}
 
 	if claimInfo.LockMechanism == common.LockMechanism_HTLC {
 		isCorrectPreimage, err := validateHashPreimage(claimInfo, assetLockVal.LockInfo)
 		if err != nil {
-			return "", logThenErrorf("claim asset of type %s and ID %s error: %v", assetAgreement.Type, assetAgreement.Id, err)
+			return "", logThenErrorf("claim asset of type %s and ID %s error: %v", assetAgreement.AssetType, assetAgreement.Id, err)
 		}
 		if !isCorrectPreimage {
-			return "", logThenErrorf("cannot claim asset of type %s and ID %s as the hash preimage is not matching", assetAgreement.Type, assetAgreement.Id)
+			return "", logThenErrorf("cannot claim asset of type %s and ID %s as the hash preimage is not matching", assetAgreement.AssetType, assetAgreement.Id)
 		}
 
 		// Record Hash Preimage into ledger
@@ -584,7 +584,7 @@ func ClaimAsset(ctx contractapi.TransactionContextInterface, callerChaincodeID, 
 
 	err = ctx.GetStub().DelState(assetLockKey)
 	if err != nil {
-		return "", logThenErrorf("failed to delete lock for asset of type %s and ID %s: %v", assetAgreement.Type, assetAgreement.Id, err)
+		return "", logThenErrorf("failed to delete lock for asset of type %s and ID %s: %v", assetAgreement.AssetType, assetAgreement.Id, err)
 	}
 	err = ctx.GetStub().DelState(generateContractIdMapKey(contractId))
 	if err != nil {
@@ -775,7 +775,7 @@ func LockFungibleAsset(ctx contractapi.TransactionContextInterface, callerChainc
 	// generate the contractId for the fungible asset lock agreement
 	contractId := GenerateFungibleAssetLockContractId(ctx, callerChaincodeID, assetAgreement)
 
-	assetLockVal := FungibleAssetLockValue{Type: assetAgreement.Type, NumUnits: assetAgreement.NumUnits, Locker: assetAgreement.Locker,
+	assetLockVal := FungibleAssetLockValue{Type: assetAgreement.AssetType, NumUnits: assetAgreement.NumUnits, Locker: assetAgreement.Locker,
 		Recipient: assetAgreement.Recipient, LockInfo: lockInfo, ExpiryTimeSecs: expiryTimeSecs}
 
 	assetLockValBytes, err := ctx.GetStub().GetState(contractId)
@@ -955,7 +955,7 @@ func GetHTLCHash(ctx contractapi.TransactionContextInterface, callerChaincodeID,
 	}
 
 	if assetLockValBytes == nil {
-		return "", logThenErrorf("no asset of type %s and ID %s is locked", assetAgreement.Type, assetAgreement.Id)
+		return "", logThenErrorf("no asset of type %s and ID %s is locked", assetAgreement.AssetType, assetAgreement.Id)
 	}
 
 	assetLockVal := AssetLockValue{}

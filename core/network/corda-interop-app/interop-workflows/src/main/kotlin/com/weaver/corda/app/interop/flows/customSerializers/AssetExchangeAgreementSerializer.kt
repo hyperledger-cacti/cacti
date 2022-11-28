@@ -16,7 +16,7 @@ class AssetExchangeAgreementSerializer: SerializationCustomSerializer<AssetLocks
      * The Proxy class is a serializable counterpart of the AssetLocks.AssetExchangeAgreement class.
      */
     data class Proxy(
-        val type: String,
+        val assetType: String,
         val id: String,
         val locker: String,
         val recipient: String
@@ -27,7 +27,7 @@ class AssetExchangeAgreementSerializer: SerializationCustomSerializer<AssetLocks
      * class so that it can be serialized and transferred across the wire.
      */
     override fun toProxy(obj: AssetLocks.AssetExchangeAgreement) = Proxy(
-            type = obj.type,
+            assetType = obj.assetType,
             id = obj.id,
             locker = obj.locker,
             recipient = obj.recipient
@@ -38,7 +38,7 @@ class AssetExchangeAgreementSerializer: SerializationCustomSerializer<AssetLocks
      */
     override fun fromProxy(proxy: Proxy) : AssetLocks.AssetExchangeAgreement {
         return AssetLocks.AssetExchangeAgreement.newBuilder()
-                .setType(proxy.type)
+                .setAssetType(proxy.assetType)
                 .setId(proxy.id)
                 .setLocker(proxy.locker)
                 .setRecipient(proxy.recipient)
