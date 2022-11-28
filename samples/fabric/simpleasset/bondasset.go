@@ -148,7 +148,7 @@ func isCallerAssetOwner(ctx contractapi.TransactionContextInterface, asset *Bond
 // isBondAssetLocked returns true only if the asset is presently locked
 func isBondAssetLocked(s *SmartContract, ctx contractapi.TransactionContextInterface, asset *BondAsset) bool {
 	bondAssetAgreement := &common.AssetExchangeAgreement{
-		Type: asset.Type,
+		AssetType: asset.Type,
 		Id: asset.ID,
 		Recipient: "*",
 		Locker: asset.Owner,
@@ -170,7 +170,7 @@ func isBondAssetLocked(s *SmartContract, ctx contractapi.TransactionContextInter
 // isBondAssetLockedForMe returns true only if the asset is presently locked for me
 func isBondAssetLockedForMe(s *SmartContract, ctx contractapi.TransactionContextInterface, asset *BondAsset) bool {
 	bondAssetAgreement := &common.AssetExchangeAgreement{
-		Type: asset.Type,
+		AssetType: asset.Type,
 		Id: asset.ID,
 		Recipient: "",
 		Locker: asset.Owner,

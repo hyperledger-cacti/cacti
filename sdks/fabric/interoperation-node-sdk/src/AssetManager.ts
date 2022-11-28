@@ -23,7 +23,7 @@ const logger = log4js.getLogger("InteroperableHelper");
 function createAssetExchangeAgreementSerialized(assetType, assetID, recipientECert, lockerECert)
 {
     const assetExchangeAgreement = new assetLocksPb.AssetExchangeAgreement();
-    assetExchangeAgreement.setType(assetType);
+    assetExchangeAgreement.setAssettype(assetType);
     assetExchangeAgreement.setId(assetID);
     assetExchangeAgreement.setRecipient(recipientECert);
     assetExchangeAgreement.setLocker(lockerECert);
@@ -34,7 +34,7 @@ function createAssetExchangeAgreementSerialized(assetType, assetID, recipientECe
 function createFungibleAssetExchangeAgreementSerialized(assetType, numUnits, recipientECert, lockerECert)
 {
     const assetExchangeAgreement = new assetLocksPb.FungibleAssetExchangeAgreement();
-    assetExchangeAgreement.setType(assetType);
+    assetExchangeAgreement.setAssettype(assetType);
     assetExchangeAgreement.setNumunits(numUnits);
     assetExchangeAgreement.setRecipient(recipientECert);
     assetExchangeAgreement.setLocker(lockerECert);
@@ -48,7 +48,7 @@ function createAssetLockInfoSerialized(hash, expiryTimeSecs)
     lockInfoHTLC.setHashmechanism(hash.HASH_MECHANISM);
     lockInfoHTLC.setHashbase64(Buffer.from(hash.getSerializedHashBase64()));
     lockInfoHTLC.setExpirytimesecs(expiryTimeSecs);
-    lockInfoHTLC.setTimespec(assetLocksPb.AssetLockHTLC.TimeSpec.EPOCH)
+    lockInfoHTLC.setTimespec(assetLocksPb.TimeSpec.EPOCH)
     const lockInfoHTLCSerialized = lockInfoHTLC.serializeBinary();
     const lockInfo = new assetLocksPb.AssetLock();
     lockInfo.setLockmechanism(assetLocksPb.LockMechanism.HTLC);

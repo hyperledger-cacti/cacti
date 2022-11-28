@@ -251,7 +251,7 @@ class AssetManager {
             locker: String): AssetLocks.AssetExchangeAgreement {
 
                 val assetAgreement = AssetLocks.AssetExchangeAgreement.newBuilder()
-                    .setType(assetType)
+                    .setAssetType(assetType)
                     .setId(assetId)
                     .setLocker(locker)
                     .setRecipient(recipient)
@@ -267,7 +267,7 @@ class AssetManager {
             locker: String): AssetLocks.FungibleAssetExchangeAgreement {
             
                 val assetAgreement = AssetLocks.FungibleAssetExchangeAgreement.newBuilder()
-                    .setType(tokenType)
+                    .setAssetType(tokenType)
                     .setNumUnits(numUnits)
                     .setLocker(locker)
                     .setRecipient(recipient)

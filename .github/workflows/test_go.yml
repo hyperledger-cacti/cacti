@@ -135,7 +135,7 @@ jobs:
 
     - name: Vendor
       run: make run-vendor
-      working-directory: samples/fabric/simpleassetandinterop
+      working-directory: samples/fabric/simpleassettransfer
 
     - name: Build
       run: go build -v ./...

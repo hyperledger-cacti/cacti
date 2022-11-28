@@ -28,12 +28,13 @@ message AssetLockHTLC {
   HashMechanism hashMechanism = 1;
   bytes hashBase64 = 2;
   uint64 expiryTimeSecs = 3;
-  enum TimeSpec {
+  TimeSpec timeSpec = 4;
+}
+
+enum TimeSpec {
     EPOCH = 0;
     DURATION = 1;
   }
-  TimeSpec timeSpec = 4;
-}
 
 message AssetClaimHTLC {
   HashMechanism hashMechanism = 1;
@@ -41,14 +42,14 @@ message AssetClaimHTLC {
 }
 
 message AssetExchangeAgreement {
-  string type = 1;
+  string assetType = 1;
   string id = 2;
   string locker = 3;
   string recipient = 4;
 }
 
 message FungibleAssetExchangeAgreement {
-  string type = 1;
+  string assetType = 1;
   uint64 numUnits = 2;
   string locker = 3;
   string recipient = 4;
