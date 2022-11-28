@@ -11,6 +11,7 @@ use crate::error::Error;
 
 use config;
 use tonic::transport::{Certificate, Channel, ClientTlsConfig};
+use std::fs;
 
 // Locally scoped function to update request status in db. This function is
 // called for the first time after an Ack is received from the remote relay.
@@ -23,6 +24,12 @@ pub fn update_event_subscription_status(
     curr_db_path: String,
     message: String,
 ) {
+    let driver_error_constants = fs::read_to_string("./driver/driver-error-constants.json").expect("Unable to read file: ./driver/driver-error-constants.json");
+    let driver_error_constants_json: serde_json::Value =
+        serde_json::from_str(&driver_error_constants).expect("JSON was not well-formatted");
+    let driver_sub_exists_error = driver_error_constants_json.get("SUB_EXISTS").unwrap().as_str().unwrap();
+    let driver_sub_exists_error_without_args = *(driver_sub_exists_error.split("{0}").collect::<Vec<&str>>().first().unwrap());
+
     let db = Database {
         db_path: curr_db_path,
     };
@@ -91,10 +98,10 @@ pub fn update_event_subscription_status(
                     },
                 }
             } else {
-                match message.find("Event subscription already exists with requestId: ") {
+                match message.find(driver_sub_exists_error_without_args) {
                     Some(_index) => {
                         let mut new_message = message.to_string();
-                        let old_request_id = *(message.split("Event subscription already exists with requestId: ").collect::<Vec<&str>>().last().unwrap());
+                        let old_request_id = *(message.split(driver_sub_exists_error_without_args).collect::<Vec<&str>>().last().unwrap());
                         println!("Adding event publication spec to existing EventSubscriptionState. Extracted request id from message: {}", old_request_id.to_string());
 
                         let old_event_sub_key = get_event_subscription_key(old_request_id.to_string());

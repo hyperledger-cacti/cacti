@@ -11,6 +11,7 @@ ADD package.json .
 RUN npm install --unsafe-perm
 
 ADD server /fabric-driver/server
+ADD constants /fabric-driver/constants
 ADD config.json .
 ADD tsconfig.json .
 ADD .eslintrc .
@@ -39,6 +40,7 @@ ADD weaver-fabric-interop-sdk /fabric-driver/weaver-fabric-interop-sdk
 COPY --from=builder /fabric-driver/package-lock.json /fabric-driver/
 COPY --from=builder /fabric-driver/node_modules /fabric-driver/node_modules
 COPY --from=builder /fabric-driver/out /fabric-driver/out
+COPY --from=builder /fabric-driver/constants /fabric-driver/constants
 
 RUN chown -R relay:relay /fabric-driver
 

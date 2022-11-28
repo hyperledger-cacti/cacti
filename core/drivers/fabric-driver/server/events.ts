@@ -18,7 +18,15 @@ import { Gateway, Network, Contract } from "fabric-network";
 import state_pb from '@hyperledger-labs/weaver-protos-js/common/state_pb';
 import driverPb from '@hyperledger-labs/weaver-protos-js/driver/driver_pb';
 
+import fs from 'fs';
+import path from 'path';
+
 const DB_NAME: string = "driverdb";
+const DRIVER_ERROR_CONSTANTS = JSON.parse(
+    fs.readFileSync(
+        path.resolve(__dirname, '../constants/driver-error-constants.json'),
+    ).toString(),
+);
 
 async function subscribeEventHelper(
     call_request: eventsPb.EventSubscription,
@@ -40,6 +48,7 @@ async function subscribeEventHelper(
         client.sendDriverSubscriptionStatus(ack_send_error, relayCallback);
     } else {
         const ack_send = new ack_pb.Ack();
+        console.log(newRequestId, requestId);
         if (newRequestId == requestId) {    // event being subscribed for the first time
             // Start an appropriate type of event listener for this event subscription if one is not already active
             const [listenerHandle, error] = await handlePromise(registerListenerForEventSubscription(call_request.getEventMatcher()!, network_name));
@@ -61,7 +70,8 @@ async function subscribeEventHelper(
             }
         } else {
             // event being subscribed already exists
-            ack_send.setMessage(`Event subscription already exists with requestId: ${requestId}`);
+            const subExistsErrorMsg = DRIVER_ERROR_CONSTANTS.SUB_EXISTS.replace("{0}", requestId);
+            ack_send.setMessage(subExistsErrorMsg);
             ack_send.setStatus(ack_pb.Ack.STATUS.ERROR);
         }
         ack_send.setRequestId(newRequestId);

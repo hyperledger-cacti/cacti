@@ -1126,7 +1126,7 @@ checksum = "a3f87b73ce11b1619a3c6332f45341e0047173771e8b8b73f87bfeefb7b56244"
 
 [[package]]
 name = "relay"
-version = "1.4.5"
+version = "1.5.4"
 dependencies = [
  "base64 0.13.0",
  "bincode",
@@ -1955,7 +1955,7 @@ checksum = "6a89911bd99e5f3659ec4acf9c4d93b0a90fe4a2a11f15328472058edc5261be"
 
 [[package]]
 name = "weaver_protos_rs"
-version = "1.4.5"
+version = "1.5.4"
 dependencies = [
  "prost",
  "serde 1.0.139",
