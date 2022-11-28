@@ -220,12 +220,10 @@ github.com/hpcloud/tail v1.0.0/go.mod h1:ab1qPbhIpdTxEkNHXyeSf5vhxWSCs/tWer42PpO
 github.com/huin/goupnp v1.0.3-0.20220313090229-ca81a64b4204/go.mod h1:ZxNlw5WqJj6wSsRK5+YfflQGXYfccj5VgQsMNixHM7Y=
 github.com/huin/goutil v0.0.0-20170803182201-1ca381bf3150/go.mod h1:PpLOETDnJ0o3iZrZfqZzyLl6l7F3c6L1oWn7OICBi6o=
 github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go v1.3.0/go.mod h1:POCGO/RK9YDfgdhuyqjoD9tRNtWfK7Rh5AYYmsb1Chc=
-github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go v1.5.1 h1:IaZCvIAkkRgeyU5T+D1npd2L/7zQESOYNR09XZFS8u8=
-github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go v1.5.1/go.mod h1:POCGO/RK9YDfgdhuyqjoD9tRNtWfK7Rh5AYYmsb1Chc=
-github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go v1.5.2 h1:udlh7XSLYiDMegl7EMoJsCjzzPN36Ok6VNkvn8hoqhc=
-github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go v1.5.2/go.mod h1:POCGO/RK9YDfgdhuyqjoD9tRNtWfK7Rh5AYYmsb1Chc=
-github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange v1.5.1 h1:psneVt+MFOQY9K3a3Ur7tkZOSHCkNoTy9znU6qf5JXI=
-github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange v1.5.1/go.mod h1:u6CH8sOTS8ioB0ITKLIAvEvIK+UFzS/xDmQFYEmFVuw=
+github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go v1.5.3 h1:/DGEjKelDgw8DNC3k/1wLd3YucDFXAScF2O7H80e9ew=
+github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go v1.5.3/go.mod h1:POCGO/RK9YDfgdhuyqjoD9tRNtWfK7Rh5AYYmsb1Chc=
+github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange v1.5.3 h1:cqzZquVE+ViM30vZD4epsGJX2eVVOe9hns1CCyxpPP8=
+github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange v1.5.3/go.mod h1:QbVIZZ2dxI06A5qBUirS55qj5BJIS/C2VdMxnP00dtw=
 github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils v0.0.0-20220522111555-ae96e46bf4a1 h1:F4AWvGjRRWSCWtW0wMD1SkYGnW5yly9NqmHICxHIrUw=
 github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils v0.0.0-20220522111555-ae96e46bf4a1/go.mod h1:Nke1cGAeCHSgK8x/+tjzojTAT5L/V6e7ERxPUSbnA/8=
 github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/utils v1.5.1 h1:Ly857aoRE5TFL91dI6n5Ml9b71I2F4EY4vos6VIStbk=
