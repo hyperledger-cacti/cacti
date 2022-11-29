@@ -93,7 +93,7 @@ export class SubstrateTestLedger {
       (pairs) => `${pairs[0]}=${pairs[1]}`,
     );
 
-    const wsPort = this.envVars.get("WS_PORT") ?? 9944;
+    const wsPort: string = this.envVars.get("WS_PORT") ?? "9944";
     const portToExpose = `${wsPort}/tcp`;
 
     // TODO: dynamically expose ports for custom port mapping
