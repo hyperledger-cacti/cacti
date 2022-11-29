@@ -31,6 +31,11 @@ import {
 } from "@hyperledger/cactus-plugin-ledger-connector-iroha";
 
 import {
+  Iroha2ApiClient,
+  Iroha2ApiClientOptions,
+} from "@hyperledger/cactus-plugin-ledger-connector-iroha2";
+
+import {
   FabricApiClient,
   FabricApiClientOptions,
 } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
@@ -66,6 +71,10 @@ export type ClientApiConfig = {
     in: IrohaApiClientOptions;
     out: IrohaApiClient;
   };
+  IROHA_2X: {
+    in: Iroha2ApiClientOptions;
+    out: Iroha2ApiClient;
+  };
   FABRIC_2X: {
     in: FabricApiClientOptions;
     out: FabricApiClient;
@@ -97,6 +106,8 @@ export function getValidatorApiClient<K extends keyof ClientApiConfig>(
       return new CordaApiClient(options as CordaApiClientOptions);
     case "IROHA_1X":
       return new IrohaApiClient(options as IrohaApiClientOptions);
+    case "IROHA_2X":
+      return new Iroha2ApiClient(options as CordaApiClientOptions);
     case "FABRIC_2X":
       return new FabricApiClient(options as FabricApiClientOptions);
     default:

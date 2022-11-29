@@ -11,6 +11,7 @@ This package provides `Verifier` and `VerifierFactory` components that can be us
 | QUORUM_2X              | cactus-test-plugin-ledger-connector-quorum      |
 | CORDA_4X               | cactus-plugin-ledger-connector-corda            |
 | IROHA_1X               | cactus-plugin-ledger-connector-iroha            |
+| IROHA_2X               | cactus-plugin-ledger-connector-iroha2           |
 | FABRIC_2X              | cactus-plugin-ledger-connector-fabric           |
 | legacy-socketio        | cactus-plugin-ledger-connector-fabric-socketio<br />cactus-plugin-ledger-connector-go-ethereum-socketio<br />cactus-plugin-ledger-connector-sawtooth-socketio |
 

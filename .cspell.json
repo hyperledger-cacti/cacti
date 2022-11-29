@@ -133,7 +133,9 @@
         "vscc",
         "wasm",
         "Xdai",
-        "goquorum"
+        "goquorum",
+        "hada",
+        "undici"
     ],
     "dictionaries": [
         "typescript,node,npm,go,rust"

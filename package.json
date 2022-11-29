@@ -16,9 +16,9 @@
     "run-ci": "./tools/ci.sh",
     "reset:node-modules": "del-cli '**/node_modules'",
     "reset:git": "git clean -f -X",
-    "reset:yarn-lock": "yarn install --update-checksums --force",
+    "reset:yarn-lock": "yarn run init-registries && yarn install --update-checksums --force",
     "reset": "run-s reset:git reset:node-modules reset:yarn-lock configure",
-    "configure": "yarn install --frozen-lockfile --non-interactive && yarn run build:dev:backend",
+    "configure": "yarn run init-registries && yarn install --frozen-lockfile --non-interactive && yarn run build:dev:backend",
     "install-yarn": "npm install --global yarn@1.22.17",
     "custom-checks": "TS_NODE_PROJECT=./tools/tsconfig.json node --trace-deprecation --experimental-modules --abort-on-uncaught-exception --loader ts-node/esm --experimental-specifier-resolution=node ./tools/custom-checks/run-custom-checks.ts",
     "tools:validate-bundle-names": "TS_NODE_PROJECT=./tools/tsconfig.json node --trace-deprecation --experimental-modules --abort-on-uncaught-exception --loader ts-node/esm --experimental-specifier-resolution=node ./tools/validate-bundle-names.js",
@@ -68,7 +68,8 @@
     "version": "npm ci && npm run build:dev && npm run build:prod && npm run test:unit",
     "lerna-publish-canary": "npm run run-ci && lerna publish --canary --force-publish --dist-tag $(git branch --show-current) --preid $(git branch --show-current).$(git rev-parse --short HEAD)",
     "lerna-publish": "lerna publish --conventional-commits --sign-git-commit --sign-git-tag",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "init-registries": "npm config set @iroha2:registry=https://nexus.iroha.tech/repository/npm-group/"
   },
   "devDependencies": {
     "@commitlint/cli": "13.1.0",
