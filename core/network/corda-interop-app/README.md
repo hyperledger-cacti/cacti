@@ -57,6 +57,7 @@ structure.
 If updating Interop CorDapp version, update the dependency version for in:
 * `sdks/corda/build.gradle`
 * `samples/corda/corda-simple-application/constants.properties`
+* `samples/corda/fungible-house-token/constants.properties`
 * `tests/network-setups/corda/scripts/get-cordapps.sh`
 * `tests/network-setups/corda/scripts/start-nodes.sh`
 
