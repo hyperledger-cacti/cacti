@@ -1,11 +1,11 @@
-# Modified indy network docker image
+# Modified Indy network docker image
 
-Build iin docker image:
+Build IIN docker image:
 ```
-make iinimage
+make image
 ```
 
-Run iin docker container running 4 indy nodes:
+Run sample IIN docker container running 4 Indy nodes:
 ```
-make runiin
+make start
 ```
