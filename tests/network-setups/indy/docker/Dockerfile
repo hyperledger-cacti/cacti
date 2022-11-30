@@ -28,8 +28,8 @@ RUN python3 setup.py install
 
 
 WORKDIR /usr/src/indy_projects
-COPY create_dirs_modified.sh /usr/src/indy_projects/indy-node/scripts/
+COPY scripts/create_dirs_modified.sh /usr/src/indy_projects/indy-node/scripts/
 RUN /usr/src/indy_projects/indy-node/scripts/create_dirs_modified.sh
 
-COPY run_indy_nodes.sh run_indy_nodes.sh
+COPY scripts/run_indy_nodes.sh run_indy_nodes.sh
 CMD ./run_indy_nodes.sh

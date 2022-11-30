@@ -2,4 +2,7 @@ image:
 	docker build -t testiin .
 
 start:
-	docker run -p 9701-9708:9701-9708 -it testiin
+	./start_testiin.sh
+
+stop:
+	./stop_testiin.sh
