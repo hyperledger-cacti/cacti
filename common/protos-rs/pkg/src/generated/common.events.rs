@@ -26,13 +26,15 @@ pub struct EventSubscription {
 pub struct EventSubscriptionState {
     #[prost(string, tag = "1")]
     pub request_id: std::string::String,
-    #[prost(enumeration = "event_subscription_state::Status", tag = "2")]
+    #[prost(string, tag = "2")]
+    pub publishing_request_id: std::string::String,
+    #[prost(enumeration = "event_subscription_state::Status", tag = "3")]
     pub status: i32,
-    #[prost(string, tag = "3")]
+    #[prost(string, tag = "4")]
     pub message: std::string::String,
-    #[prost(message, optional, tag = "4")]
+    #[prost(message, optional, tag = "5")]
     pub event_matcher: ::std::option::Option<EventMatcher>,
-    #[prost(message, repeated, tag = "5")]
+    #[prost(message, repeated, tag = "6")]
     pub event_publication_specs: ::std::vec::Vec<EventPublication>,
 }
 pub mod event_subscription_state {
@@ -49,6 +51,7 @@ pub mod event_subscription_state {
         UnsubscribePending = 4,
         Unsubscribed = 5,
         Error = 6,
+        DuplicateQuerySubscribed = 7,
     }
 }
 #[derive(Clone, PartialEq, ::prost::Message, serde::Serialize, serde::Deserialize)]

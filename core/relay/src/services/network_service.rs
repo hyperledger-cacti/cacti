@@ -10,7 +10,7 @@ use weaverpb::relay::events::event_subscribe_client::EventSubscribeClient;
 use crate::relay_proto::{parse_address, LocationSegment};
 // Internal modules
 use crate::db::Database;
-use crate::services::helpers::{update_event_subscription_status, driver_sign_subscription_helper, try_mark_request_state_deleted, mark_event_states_deleted, get_event_publication_key, get_event_subscription_key};
+use crate::services::helpers::{update_event_subscription_status, driver_sign_subscription_helper, try_mark_request_state_deleted, mark_event_states_deleted, delete_event_pub_spec, get_event_publication_key, get_event_subscription_key};
 
 // External modules
 use config;
@@ -213,6 +213,7 @@ impl Network for NetworkService {
         let target: EventSubscriptionState = EventSubscriptionState {
             status: event_subscription_state::Status::SubscribePendingAck as i32,
             request_id: request_id.to_string(),
+            publishing_request_id: "".to_string(),
             message: "".to_string(),
             event_matcher: network_event_subscription.event_matcher.clone(),
             event_publication_specs: event_publication_specs
@@ -302,42 +303,64 @@ impl Network for NetworkService {
         let net_event_sub = request.into_inner().clone();
         let network_event_subscription = net_event_sub.request.clone().expect("No network event subscription passed");
         let request_id = net_event_sub.request_id.to_string();
+        let requested_unsub_pub_spec = network_event_subscription.event_publication_spec.clone().expect("No event publication spec provided for unsubscription request.");
         
-        let mut event_publication_specs: Vec<EventPublication> = Vec::new();
-        event_publication_specs.push(network_event_subscription.event_publication_spec.clone().expect("Event publication spec not found in NetworkEventSubscription request"));
+        let delete_pub_spec_status = delete_event_pub_spec(request_id.to_string(), requested_unsub_pub_spec, conf.get_str("db_path").unwrap().to_string());
         
-        // Initial request state stored in DB.
-        let target: EventSubscriptionState = EventSubscriptionState {
-            status: event_subscription_state::Status::UnsubscribePendingAck as i32,
-            request_id: request_id.to_string(),
-            message: "".to_string(),
-            event_matcher: network_event_subscription.event_matcher.clone(),
-            event_publication_specs: event_publication_specs
-        };
-        
-        // Create EventSubscription
-        let network_query = network_event_subscription.query.clone().expect("No query passed with NetworkEventSubscription request");
-        let relay_name = conf.get_str("name").unwrap();
-        let query: Query = Query {
-            policy: network_query.policy,
-            address: network_query.address,
-            requesting_relay: relay_name,
-            requesting_org: network_query.requesting_org,
-            requesting_network: network_query.requesting_network,
-            certificate: network_query.certificate,
-            requestor_signature: network_query.requestor_signature,
-            nonce: network_query.nonce,
-            request_id: request_id.to_string(),
-            confidential: network_query.confidential,
-        };
-        let event_subscription: EventSubscription = EventSubscription {
-            event_matcher: network_event_subscription.event_matcher,
-            query: Some(query),
-            operation: EventSubOperation::Unsubscribe as i32,
-        };
-        let event_publication_spec = network_event_subscription.event_publication_spec.clone().expect("No Event Publication Specification passed with NetworkEventSubscription request");
+        if delete_pub_spec_status == 0 {
+            let reply = Ack {
+                status: ack::Status::Ok as i32,
+                request_id: request_id.to_string(),
+                message: "Unsubscribed requested event publication specification.".to_string(),
+            };
+            println!("Sending Ack back to network: {:?}\n", reply);
+            Ok(Response::new(reply))
+        } else if delete_pub_spec_status == 2 {
+            let reply = Ack {
+                status: ack::Status::Error as i32,
+                request_id: request_id.to_string(),
+                message: "Unsubscription request does not match existing subscription: Check event publication specification.".to_string(),
+            };
+            println!("Sending Ack back to network: {:?}\n", reply);
+            Ok(Response::new(reply))
+        } else {
+            let mut event_publication_specs: Vec<EventPublication> = Vec::new();
+            event_publication_specs.push(network_event_subscription.event_publication_spec.clone().expect("Event publication spec not found in NetworkEventSubscription request"));
+            
+            // Initial request state stored in DB.
+            let target: EventSubscriptionState = EventSubscriptionState {
+                status: event_subscription_state::Status::UnsubscribePendingAck as i32,
+                request_id: request_id.to_string(),
+                publishing_request_id: request_id.to_string(),
+                message: "".to_string(),
+                event_matcher: network_event_subscription.event_matcher.clone(),
+                event_publication_specs: event_publication_specs
+            };
+            
+            // Create EventSubscription
+            let network_query = network_event_subscription.query.clone().expect("No query passed with NetworkEventSubscription request");
+            let relay_name = conf.get_str("name").unwrap();
+            let query: Query = Query {
+                policy: network_query.policy,
+                address: network_query.address,
+                requesting_relay: relay_name,
+                requesting_org: network_query.requesting_org,
+                requesting_network: network_query.requesting_network,
+                certificate: network_query.certificate,
+                requestor_signature: network_query.requestor_signature,
+                nonce: network_query.nonce,
+                request_id: request_id.to_string(),
+                confidential: network_query.confidential,
+            };
+            let event_subscription: EventSubscription = EventSubscription {
+                event_matcher: network_event_subscription.event_matcher,
+                query: Some(query),
+                operation: EventSubOperation::Unsubscribe as i32,
+            };
+            let event_publication_spec = network_event_subscription.event_publication_spec.clone().expect("No Event Publication Specification passed with NetworkEventSubscription request");
 
-        return event_subscription_helper(event_subscription, event_publication_spec, target, request_id.to_string(), db, conf).await;
+            return event_subscription_helper(event_subscription, event_publication_spec, target, request_id.to_string(), db, conf).await;
+        }
     }
     
     // Fetch EventStates for given subscription request identified by request_id.
