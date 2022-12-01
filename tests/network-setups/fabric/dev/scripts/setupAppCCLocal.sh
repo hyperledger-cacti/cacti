@@ -15,5 +15,6 @@ fi
 
 (cd ${APP_CC_PATH} && make run-vendor)
 cp -r ${APP_CC_PATH} ${CHAINCODE_PATH}/${CC_NAME}
+(cd ${APP_CC_PATH} && make undo-vendor)
 
 echo "Done."
