@@ -47,12 +47,14 @@ message EventSubscriptionState {
     UNSUBSCRIBE_PENDING = 4;
     UNSUBSCRIBED = 5;
     ERROR = 6;
+    DUPLICATE_QUERY_SUBSCRIBED=7;
   };
   string request_id = 1;
-  STATUS status = 2;
-  string message = 3;
-  EventMatcher event_matcher = 4;
-  EventPublication event_publication_spec = 5;
+  string publishing_request_id = 2;
+  STATUS status = 3;
+  string message = 4;
+  EventMatcher event_matcher = 5;
+  repeated EventPublication event_publication_specs = 6;
 }
 
 message ContractTransaction {

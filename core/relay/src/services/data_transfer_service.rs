@@ -1,9 +1,9 @@
 // Internal generated modules
-use crate::pb::common::ack::{ack, Ack};
-use crate::pb::common::query::Query;
-use crate::pb::common::state::{request_state, view_payload, RequestState, ViewPayload};
-use crate::pb::relay::datatransfer::data_transfer_client::DataTransferClient;
-use crate::pb::relay::datatransfer::data_transfer_server::DataTransfer;
+use weaverpb::common::ack::{ack, Ack};
+use weaverpb::common::query::Query;
+use weaverpb::common::state::{request_state, view_payload, RequestState, ViewPayload};
+use weaverpb::relay::datatransfer::data_transfer_client::DataTransferClient;
+use weaverpb::relay::datatransfer::data_transfer_server::DataTransfer;
 // Internal modules
 use crate::db::Database;
 use crate::error::Error;

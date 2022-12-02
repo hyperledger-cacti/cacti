@@ -1,19 +1,25 @@
-#!/bin/bash
+#!/bin/sh
 
-PROTOS_TAG=${PROTOS_TAG:-'v1.16'}
-
-
-# check if local proto dir exists
-if [ -d "./protos" ]
-then
-    # if yes, cd into dir, git fetch and checkout specified tag
-    echo "Updating local copy of protos directory"
-    cd protos
-    git fetch
-    git checkout tags/"$PROTOS_TAG"
-else
-    # if not, clone repo and checkout specified tag
-    echo "Local protos directory doesn't exist, cloning..."
-    git clone https://github.ibm.com:dlt-interoperability/interop-protos.git protos && cd protos && git checkout tags/"$PROTOS_TAG"
+directory=$(dirname $0)
+if [ -z $WEAVER_ROOT ]; then
+    WEAVER_ROOT=$directory/../../..
 fi
 
+comment () {
+    sed -i'.scriptbak' -e "$1"' s/^weaver_protos_rs/# weaver_protos_rs/' "$2"
+}
+uncomment() {
+    sed -i'.scriptbak' -e "$1"' s/^# weaver_protos_rs/weaver_protos_rs/' "$2"
+}
+
+if [ "$1" = "local" ]; then
+    rm -rf protos-rs
+    cp -r $WEAVER_ROOT/common/protos-rs/pkg protos-rs
+    comment 39 Cargo.toml
+    uncomment 38 Cargo.toml
+else
+    uncomment 39 Cargo.toml
+    comment 38 Cargo.toml
+fi
+
+rm -f Cargo.toml.scriptbak

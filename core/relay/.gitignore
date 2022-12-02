@@ -1,7 +1,5 @@
 fingerprint.json
 /target
-proto-rs/*
-/protos
-!proto-rs/.gitkeep
+protos-rs
 /db
 .env
