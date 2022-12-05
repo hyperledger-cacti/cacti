@@ -80,6 +80,15 @@ Instead, if you launched only one of the two Fabric networks, run the following 
 ./bin/fabric-cli configure all <network-id>
 ```
 
+Although IIN Agents can sync foreign network's membership automatically after every certain time period (by default 5 minutes), but **optionally**, fabric-cli can be used to trigger sync manually by running following command:
+```bash
+./bin/fabric-cli configure membership --local-network=network1 --target-network=network2 --iin-agent-endpoint=localhost:9500
+```
+This command syncs `network2`'s membership (target-network) in `network1` (local-network) using IIN Agent of `Org1MSP` as initiator. Similarly `network1`'s membership can be in `network2` by running:
+```bash
+./bin/fabric-cli configure membership --local-network=network2 --target-network=network1 --iin-agent-endpoint=localhost:9501
+```
+
 ### Initializing the Corda Networks
 
 Once the Corda networks are launched, the client applications (built earlier) needs to be exercised to generate network (ledger) state in preparation to test interoperation flows.

@@ -134,6 +134,10 @@ Follow the instructions below to build and launch the networks:
   ```bash
   make start-interop-local CHAINCODE_NAME=<chaincode-name>
   ```
+- _To launch the networks with 2 orgs, run_:
+  ```bash
+  make start-interop-local PROFILE="2-nodes"
+  ```
 
 | Notes |
 |:------|
@@ -340,6 +344,186 @@ Run a Fabric driver for `network2` as follows (_do this only if you wish to test
   ```bash
   CONNECTION_PROFILE=<PATH-TO-WEAVER>/tests/network-setups/fabric/shared/network2/peerOrganizations/org1.network2.com/connection-org1.json NETWORK_NAME=network2 RELAY_ENDPOINT=localhost:9083 DRIVER_ENDPOINT=localhost:9095 npm run dev
   ```
+
+| Notes |
+|:------|
+| The variables we specified earlier in the `.env` for `network1` are now passed in the command line. Alternatively, you can make a copy of the `fabric-driver` folder with a different  name and create a separate `.env` file within it that contains links to the connection profile, relay, and driver for `network2`. |
+
+
+### Fabric IIN Agent
+
+IIN Agent is a client of a member of a DLT network or security domain with special permissions to update security domain identities and configurations on the ledger via the network's interoperation module. The code for this lies in the `core/identity-management/iin-agent` folder. Navigate to the `core/identity-management/iin-agent` folder.
+
+#### Building
+
+To build the IIN Agent, run:
+```bash
+make build-local
+```
+
+#### Config
+
+Ledger config file specifies ledger specific IIN Agent details such as identity and which network and organization to connect to.
+
+1. To create config file for `Org1MSP`'s Fabric IIN Agent of `network1`, follow the steps:
+    * Create copy of template config file for Fabric IIN Agent: `src/fabric-ledger/config.json.template`, say to location `src/fabric-ledger/config-n1-org1.json`.
+    * Replace `<path-to-connection-profile>` with `<PATH-TO-WEAVER>/tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json`, where replace `<PATH-TO-WEAVER>` with the location of your clone of Weaver.
+    * Set `mspId` as `Org1MSP`.
+    * Set `agent.affiliation` as `org1.department1`.
+
+2. To create config file for `Org2MSP`'s Fabric IIN Agent of `network1`, repeat `Step 1` with different name for config file, say `src/fabric-ledger/config-n1-org2.json`, and replace `org1` with `org2` and `Org1MSP` with `Org2MSP`.
+3. To create config file for `Org1MSP`'s Fabric IIN Agent of `network2`, repeat `Step 1` with different name for config file, say `src/fabric-ledger/config-n2-org1.json`, and replace `network1` with `network2`.
+4. To create config file for `Org2MSP`'s Fabric IIN Agent of `network2`, repeat `Step 1` with different name for config file, say `src/fabric-ledger/config-n2-org2.json`, and replace `network1` with `network2`, `org1` with `org2` and `Org1MSP` with `Org2MSP`.
+
+#### Security Domain Config
+
+Security Domain config file specifies the scope of security domain, which can be a channel in Fabric networks or list of nodes. File `docker-testnet/configs/security-domain-config.json` can be used for Weaver testnets.
+
+#### DNS Config
+
+To allow an IIN Agent's to be able to discover other IIN Agents, a config file for DNS is required. Create one `dnsconfig.json` by creating a copy of template `dnsconfig.json.template`, and replace the values with:
+
+* If Fabric networks are started with 1 org, and IIN Agent are to be started without TLS, use following values:
+```json
+{
+    "network1": {
+        "Org1MSP": {
+            "endpoint": "localhost:9500",
+            "tls": false,
+            "tlsCACertPath": ""
+        }
+    },
+    "network2": {
+        "Org1MSP": {
+            "endpoint": "localhost:9501",
+            "tls": false,
+            "tlsCACertPath": ""
+        }
+    }
+}
+```
+
+* If Fabric networks are started with 1 org, and IIN Agent are to be started with TLS, use following values:
+```json
+{
+    "network1": {
+        "Org1MSP": {
+            "endpoint": "localhost:9500",
+            "tls": true,
+            "tlsCACertPath": "../../relay/credentials/fabric_ca_cert.pem"
+        }
+    },
+    "network2": {
+        "Org1MSP": {
+            "endpoint": "localhost:9501",
+            "tls": true,
+            "tlsCACertPath": "../../relay/credentials/fabric_ca_cert.pem"
+        }
+    }
+}
+```
+
+* If Fabric networks are started with 2 orgs, and IIN Agent are to be started without TLS, use following values:
+```json
+{
+    "network1": {
+        "Org1MSP": {
+            "endpoint": "localhost:9500",
+            "tls": false,
+            "tlsCACertPath": ""
+        },
+        "Org2MSP": {
+            "endpoint": "localhost:9510",
+            "tls": false,
+            "tlsCACertPath": ""
+        }
+    },
+    "network2": {
+        "Org1MSP": {
+            "endpoint": "localhost:9501",
+            "tls": false,
+            "tlsCACertPath": ""
+        },
+        "Org2MSP": {
+            "endpoint": "localhost:9511",
+            "tls": false,
+            "tlsCACertPath": ""
+        }
+    }
+}
+```
+
+* If Fabric networks are started with 2 orgs, and IIN Agent are to be started with TLS, use following values:
+```json
+{
+    "network1": {
+        "Org1MSP": {
+            "endpoint": "localhost:9500",
+            "tls": true,
+            "tlsCACertPath": "../../relay/credentials/fabric_ca_cert.pem"
+        },
+        "Org2MSP": {
+            "endpoint": "localhost:9510",
+            "tls": true,
+            "tlsCACertPath": "../../relay/credentials/fabric_ca_cert.pem"
+        }
+    },
+    "network2": {
+        "Org1MSP": {
+            "endpoint": "localhost:9501",
+            "tls": true,
+            "tlsCACertPath": "../../relay/credentials/fabric_ca_cert.pem"
+        },
+        "Org2MSP": {
+            "endpoint": "localhost:9511",
+            "tls": true,
+            "tlsCACertPath": "../../relay/credentials/fabric_ca_cert.pem"
+        }
+    }
+}
+```
+
+#### Environment Variables
+
+To configure environment variables for `Org1MSP`'s Fabric IIN Agent of `network1`, follow the steps:
+1. Create a copy of `.env.template` as `.env`, and update following values based on previous configuration file paths:
+```
+IIN_AGENT_ENDPOINT=localhost:9500
+MEMBER_ID=Org1MSP
+SECURITY_DOMAIN=network1
+DLT_TYPE=fabric
+CONFIG_PATH=./src/fabric-ledger/config-n1-org1.json
+DNS_CONFIG_PATH=./dnsconfig.json
+SECURITY_DOMAIN_CONFIG_PATH=./docker-testnet/configs/security-domain-config.json
+WEAVER_CONTRACT_ID=interop
+AUTO_SYNC=true
+```
+2. If IIN Agent has to be started with TLS enabled, also update following values:
+```
+IIN_AGENT_TLS=false
+IIN_AGENT_TLS_CERT_PATH=../../relay/credentials/fabric_cert.pem
+IIN_AGENT_TLS_KEY_PATH=../../relay/credentials/fabric_key
+```
+
+#### Deployment
+
+Use the following steps to run Fabric IIN Agents in host machine:
+* To start IIN Agent for `Org1MSP` of `network1`, run:
+```bash
+npm run dev
+```
+* To start IIN Agent for `Org2MSP` of `network1` (only required if Fabric network was started with 2 orgs), run:
+```bash
+IIN_AGENT_ENDPOINT=localhost:9510 MEMBER_ID=Org2MSP CONFIG_PATH=./src/fabric-ledger/config-n1-org2.json npm run dev
+```
+* To start IIN Agent for `Org1MSP` of `network2`, run:
+```bash
+IIN_AGENT_ENDPOINT=localhost:9501 SECURITY_DOMAIN=network2 CONFIG_PATH=./src/fabric-ledger/config-n2-org1.json npm run dev
+```
+* To start IIN Agent for `Org2MSP` of `network2` (only required if Fabric network was started with 2 orgs), run:
+```bash
+IIN_AGENT_ENDPOINT=localhost:9511 MEMBER_ID=Org2MSP SECURITY_DOMAIN=network2 CONFIG_PATH=./src/fabric-ledger/config-n2-org2.json npm run dev
+```
 
 | Notes |
 |:------|
