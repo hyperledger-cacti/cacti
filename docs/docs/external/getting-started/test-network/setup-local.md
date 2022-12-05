@@ -512,7 +512,7 @@ Use the following steps to run Fabric IIN Agents in host machine:
 ```bash
 npm run dev
 ```
-* To start IIN Agent for `Org2MSP` of `network1` (only required if Fabric network was started with 2 orgs), run:
+* To start IIN Agent for `Org2MSP` of `network1` (_only required if Fabric network was started with 2 orgs_), run:
 ```bash
 IIN_AGENT_ENDPOINT=localhost:9510 MEMBER_ID=Org2MSP CONFIG_PATH=./src/fabric-ledger/config-n1-org2.json npm run dev
 ```
@@ -520,7 +520,7 @@ IIN_AGENT_ENDPOINT=localhost:9510 MEMBER_ID=Org2MSP CONFIG_PATH=./src/fabric-led
 ```bash
 IIN_AGENT_ENDPOINT=localhost:9501 SECURITY_DOMAIN=network2 CONFIG_PATH=./src/fabric-ledger/config-n2-org1.json npm run dev
 ```
-* To start IIN Agent for `Org2MSP` of `network2` (only required if Fabric network was started with 2 orgs), run:
+* To start IIN Agent for `Org2MSP` of `network2` (_only required if Fabric network was started with 2 orgs_), run:
 ```bash
 IIN_AGENT_ENDPOINT=localhost:9511 MEMBER_ID=Org2MSP SECURITY_DOMAIN=network2 CONFIG_PATH=./src/fabric-ledger/config-n2-org2.json npm run dev
 ```

@@ -190,7 +190,7 @@ Use the following steps to run Fabric IIN Agents in Docker containers:
   ```bash
   make deploy COMPOSE_ARG='--env-file docker-testnet/envs/.env.n1.org1.tls'
   ```
-* To deploy the Fabric IIN Agent for `org2` of `network1` without TLS (only required if Fabric network was started with 2 orgs), run:
+* To deploy the Fabric IIN Agent for `org2` of `network1` without TLS (_only required if Fabric network was started with 2 orgs_), run:
   ```bash
   make deploy COMPOSE_ARG='--env-file docker-testnet/envs/.env.n1.org2'
   ```
@@ -206,7 +206,7 @@ Use the following steps to run Fabric IIN Agents in Docker containers:
   ```bash
   make deploy COMPOSE_ARG='--env-file docker-testnet/envs/.env.n2.org1.tls'
   ```
-* To deploy the Fabric IIN Agent for `org2` of `network2` without TLS (only required if Fabric network was started with 2 orgs), run:
+* To deploy the Fabric IIN Agent for `org2` of `network2` without TLS (_only required if Fabric network was started with 2 orgs_), run:
   ```bash
   make deploy COMPOSE_ARG='--env-file docker-testnet/envs/.env.n1.org2'
   ```
