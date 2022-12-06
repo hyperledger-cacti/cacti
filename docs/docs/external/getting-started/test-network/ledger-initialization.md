@@ -75,9 +75,15 @@ Finally, to prepare both `network1` and `network2` for interoperation, run:
 ```bash
 ./bin/fabric-cli configure all network1 network2
 ```
-Instead, if you launched only one of the two Fabric networks, run the following after replacing `<network-id>` with either `network1` or `network2`:
+
+If Fabric networks were launched with 2 organizations, run:
 ```bash
-./bin/fabric-cli configure all <network-id>
+./bin/fabric-cli configure all network1 network2 --num-orgs=2
+```
+
+Instead, if you launched only one of the two Fabric networks, run the following after replacing `<network-id>` with either `network1` or `network2`, and `<1/2>` with number of organizations in the network:
+```bash
+./bin/fabric-cli configure all <network-id> --num-orgs=<1/2>
 ```
 
 Although IIN Agents can sync foreign network's membership automatically after every certain time period (by default 5 minutes), but **optionally**, fabric-cli can be used to trigger sync manually by running following command:

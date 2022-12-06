@@ -94,7 +94,12 @@ export class FabricConnector extends LedgerBase {
     // record Membership
     async recordMembershipInLedger(counterAttestedMembership: iin_agent_pb.CounterAttestedMembership): Promise<any> {
         const counterAttestedMembershipSerialized64 = Buffer.from(counterAttestedMembership.serializeBinary()).toString('base64');
-        return await invokeFabricChaincode(this.walletPath, this.connectionProfilePath, this.configFilePath, this.ledgerId, this.contractId, "CreateMembership", [counterAttestedMembershipSerialized64]);
+        try {
+            const res = await invokeFabricChaincode(this.walletPath, this.connectionProfilePath, this.configFilePath, this.ledgerId, this.contractId, "CreateMembership", [counterAttestedMembershipSerialized64]);
+            return res;
+        } catch (e) {
+            return await invokeFabricChaincode(this.walletPath, this.connectionProfilePath, this.configFilePath, this.ledgerId, this.contractId, "UpdateMembership", [counterAttestedMembershipSerialized64]);
+        }
     }
 
     // Invoke a contract to drive a transaction
