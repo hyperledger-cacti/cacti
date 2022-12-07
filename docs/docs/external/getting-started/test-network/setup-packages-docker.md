@@ -29,7 +29,7 @@ Before starting, make sure you have the following software installed on your hos
 - Docker-Compose: [sample instructions](https://docs.docker.com/compose/install/) (Version 1.28.2 or higher, but lower than version V2)
 - Golang: [sample instructions](https://golang.org/dl/) (Version 1.16 or higher)
 - Java (JDK and JRE): [sample instructions](https://openjdk.java.net/install/) (Version 8)
-- Node.js and NPM: [sample instructions](https://nodejs.org/en/download/package-manager/) (Version 11 to Version 14 Supported)
+- Node.js and NPM: [sample instructions](https://nodejs.org/en/download/package-manager/) (Version 11 to Version 16 Supported)
 - Yarn: [sample instructions](https://classic.yarnpkg.com/en/docs/install/)
 
 ### Credentials
@@ -82,7 +82,7 @@ Follow the instructions below to build and launch the networks:
   ```bash
   make start-interop CHAINCODE_NAME=<chaincode-name>
   ```
-- _To launch the networks with 2 orgs, each with a peer (this will enable more variation and experimentation, which you can attempt after testing interoperation protocols across basic network configurations), run_:
+- _To launch the networks with 2 organizations, each with a peer (this will enable more variation and experimentation, which you can attempt after testing interoperation protocols across basic network configurations), run_:
   ```bash
   make start-interop-local PROFILE="2-nodes"
   ```

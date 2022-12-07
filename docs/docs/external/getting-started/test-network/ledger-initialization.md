@@ -92,7 +92,7 @@ Instead, if you launched only one of the two Fabric networks, run the following 
 ```bash
 ./bin/fabric-cli configure membership --local-network=network1 --target-network=network2 --iin-agent-endpoint=localhost:9500
 ```
-This command syncs `network2`'s membership (target-network) in `network1` (local-network) using IIN Agent of `Org1MSP` as initiator. Similarly `network1`'s membership can synced be to `network2`'s ledger by running:
+This command syncs `network2`'s membership (target-network) in `network1` (local-network) using IIN Agent of `Org1MSP` as initiator. Similarly `network1`'s membership can be synced to `network2`'s ledger by running:
 ```bash
 ./bin/fabric-cli configure membership --local-network=network2 --target-network=network1 --iin-agent-endpoint=localhost:9501
 ```
@@ -271,7 +271,7 @@ Load access control and verification policies onto the ledgers of `network1` and
 ```bash
 ./bin/fabric-cli configure membership --local-network=network1 --target-network=network2 --iin-agent-endpoint=localhost:9500
 ```
-This command syncs `network2`'s membership (target-network) in `network1` (local-network) using IIN Agent of `Org1MSP` as initiator. Similarly `network1`'s membership can synced be to `network2`'s ledger by running:
+This command syncs `network2`'s membership (target-network) in `network1` (local-network) using IIN Agent of `Org1MSP` as initiator. Similarly `network1`'s membership can be synced to `network2`'s ledger by running:
 ```bash
 ./bin/fabric-cli configure membership --local-network=network2 --target-network=network1 --iin-agent-endpoint=localhost:9501
 ```
