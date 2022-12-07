@@ -86,9 +86,7 @@ Instead, if you launched only one of the two Fabric networks, run the following 
 ./bin/fabric-cli configure all <network-id> --num-orgs=<1/2>
 ```
 
-| Notes |
-|:------|
-| Wait for at least 5 minutes before moving on to the next step (testing interoperability modes) to allow the networks' IIN Agents to sync their respective memberships (which occur after every 5 minutes by default) |
+**Wait for at least 5 minutes before moving on to the next step (testing interoperability modes) to allow the networks' IIN Agents to sync their respective memberships (which occur after every 5 minutes by default).**
 
 **Optionally**, fabric-cli can be used to trigger sync manually by running following command: 
 ```bash
@@ -260,12 +258,24 @@ Create appropriate access control and verification policies for `network1` and `
 ./bin/fabric-cli configure create all --local-network=network2
 ```
 
-Load access control and verification policies onto the ledgers of `network1` and `network2` by running:
+Load access control and verification policies onto the ledgers of `network1` and `network2` by running (replace `<1/2>` with number of organizations in the network):
 
 ```bash
-./bin/fabric-cli configure network --local-network=network1
-./bin/fabric-cli configure network --local-network=network2
+./bin/fabric-cli configure network --local-network=network1 --num-orgs=<1/2>
+./bin/fabric-cli configure network --local-network=network2 --num-orgs=<1/2>
 ```
+
+**Wait for at least 5 minutes before moving on to the next step (testing interoperability modes) to allow the networks' IIN Agents to sync their respective memberships (which occur after every 5 minutes by default).**
+
+**Optionally**, fabric-cli can be used to trigger sync manually by running following command: 
+```bash
+./bin/fabric-cli configure membership --local-network=network1 --target-network=network2 --iin-agent-endpoint=localhost:9500
+```
+This command syncs `network2`'s membership (target-network) in `network1` (local-network) using IIN Agent of `Org1MSP` as initiator. Similarly `network1`'s membership can synced be to `network2`'s ledger by running:
+```bash
+./bin/fabric-cli configure membership --local-network=network2 --target-network=network1 --iin-agent-endpoint=localhost:9501
+```
+Wait for 20-30 seconds after above commands to allow IIN Agents to finish the sync.
 
 Initialize bond and token asset states and ownerships on the `network1` ledger by running the following (this step will also create a user `alice` in `network1` and a user `bob` in `network2`):
 
