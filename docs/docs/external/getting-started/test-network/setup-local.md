@@ -134,7 +134,7 @@ Follow the instructions below to build and launch the networks:
   ```bash
   make start-interop-local CHAINCODE_NAME=<chaincode-name>
   ```
-- _To launch the networks with 2 orgs, run_:
+- _To launch the networks with 2 orgs, each with a peer (this will enable more variation and experimentation, which you can attempt after testing interoperation protocols across basic network configurations), run_:
   ```bash
   make start-interop-local PROFILE="2-nodes"
   ```
@@ -361,7 +361,7 @@ To build the IIN Agent, run:
 make build-local
 ```
 
-#### Config
+#### Configuration
 
 Ledger config file specifies ledger specific IIN Agent details such as identity and which network and organization to connect to.
 
@@ -375,11 +375,11 @@ Ledger config file specifies ledger specific IIN Agent details such as identity 
 3. To create config file for `Org1MSP`'s Fabric IIN Agent of `network2`, repeat `Step 1` with different name for config file, say `src/fabric-ledger/config-n2-org1.json`, and replace `network1` with `network2`.
 4. To create config file for `Org2MSP`'s Fabric IIN Agent of `network2`, repeat `Step 1` with different name for config file, say `src/fabric-ledger/config-n2-org2.json`, and replace `network1` with `network2`, `org1` with `org2` and `Org1MSP` with `Org2MSP`.
 
-#### Security Domain Config
+#### Security Domain Configuration
 
 Security Domain config file specifies the scope of security domain, which can be a channel in Fabric networks or list of nodes. File `docker-testnet/configs/security-domain-config.json` can be used for Weaver testnets.
 
-#### DNS Config
+#### DNS Configuration
 
 To allow an IIN Agent's to be able to discover other IIN Agents, a config file for DNS is required. Create one `dnsconfig.json` by creating a copy of template `dnsconfig.json.template`, and replace the values with:
 

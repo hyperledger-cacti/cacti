@@ -86,14 +86,19 @@ Instead, if you launched only one of the two Fabric networks, run the following 
 ./bin/fabric-cli configure all <network-id> --num-orgs=<1/2>
 ```
 
-Although IIN Agents can sync foreign network's membership automatically after every certain time period (by default 5 minutes), but **optionally**, fabric-cli can be used to trigger sync manually by running following command:
+| Notes |
+|:------|
+| Wait for at least 5 minutes before moving on to the next step (testing interoperability modes) to allow the networks' IIN Agents to sync their respective memberships (which occur after every 5 minutes by default) |
+
+**Optionally**, fabric-cli can be used to trigger sync manually by running following command: 
 ```bash
 ./bin/fabric-cli configure membership --local-network=network1 --target-network=network2 --iin-agent-endpoint=localhost:9500
 ```
-This command syncs `network2`'s membership (target-network) in `network1` (local-network) using IIN Agent of `Org1MSP` as initiator. Similarly `network1`'s membership can be in `network2` by running:
+This command syncs `network2`'s membership (target-network) in `network1` (local-network) using IIN Agent of `Org1MSP` as initiator. Similarly `network1`'s membership can synced be to `network2`'s ledger by running:
 ```bash
 ./bin/fabric-cli configure membership --local-network=network2 --target-network=network1 --iin-agent-endpoint=localhost:9501
 ```
+Wait for 20-30 seconds after above commands to allow IIN Agents to finish the sync.
 
 ### Initializing the Corda Networks
 

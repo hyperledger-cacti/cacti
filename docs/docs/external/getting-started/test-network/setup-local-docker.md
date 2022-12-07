@@ -133,7 +133,7 @@ Follow the instructions below to build and launch the networks:
   ```bash
   make start-interop-local CHAINCODE_NAME=<chaincode-name>
   ```
-- _To launch the networks with 2 orgs, run_:
+- _To launch the networks with 2 orgs, each with a peer (this will enable more variation and experimentation, which you can attempt after testing interoperation protocols across basic network configurations), run_:
   ```bash
   make start-interop-local PROFILE="2-nodes"
   ```
