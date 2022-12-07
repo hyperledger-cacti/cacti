@@ -6,3 +6,6 @@ start:
 
 stop:
 	./stop_testiin.sh
+
+clean:
+	rm -rf indy_sandbox

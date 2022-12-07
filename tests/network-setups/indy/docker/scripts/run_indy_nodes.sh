@@ -8,6 +8,7 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/src/indy_projects/ursa/target/relea
 generate_indy_pool_transactions --nodes $NODES --clients $CLIENTS --nodeNum $(seq 1 $NODES )
 
 
+
 i=1
 while [ $i -le $NODES ]
 do
@@ -20,6 +21,12 @@ do
 
         i=$(($i+1))
 done
+
+# Wait for all nodes to start
+sleep 30
+
+chmod -R 777 /var/lib/indy/sandbox
+
 
 
 wait -n

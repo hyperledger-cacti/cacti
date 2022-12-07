@@ -11,3 +11,4 @@ services:
     command: /etc/testnetscripts/run_indy_nodes.sh
     volumes:
       - ./scripts:/etc/testnetscripts
+      - ./indy_sandbox:/var/lib/indy/sandbox
