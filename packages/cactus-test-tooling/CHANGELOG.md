@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.3](https://github.com/hyperledger/cactus/compare/v1.1.2...v1.1.3) (2022-12-08)
+
+### Bug Fixes
+
+* **connector-iroha:** fix review comments and smaller issues ([b2742e8](https://github.com/hyperledger/cactus/commit/b2742e8f6512f9804c6b4a943947b5bbe90785f0)), closes [PR#2048](https://github.com/PR/issues/2048)
+* **test-tooling:** substrate test ledger fails if WS_PORT not specified ([c668c41](https://github.com/hyperledger/cactus/commit/c668c41dcb4294530978e98349cd9158026d37e7)), closes [#2213](https://github.com/hyperledger/cactus/issues/2213)
+
+### Features
+
+* **fabric-socketio-connector:** sending transactions signed on the client-side ([0b34ca3](https://github.com/hyperledger/cactus/commit/0b34ca3d35a39826c05cc047e480d377c1c52bef))
+* **iroha2-ledger:** add Iroha V2 test ledger image and setup class ([6ff6aac](https://github.com/hyperledger/cactus/commit/6ff6aac7fff4669fca873ef40ae6b0818e70b5ec)), closes [#2138](https://github.com/hyperledger/cactus/issues/2138)
+* monitoring, sync and async requests ([47da608](https://github.com/hyperledger/cactus/commit/47da608d378f5d48ca78b3d388b1c67da4c7aaf3)), closes [#1941](https://github.com/hyperledger/cactus/issues/1941)
+
 ## [1.1.2](https://github.com/hyperledger/cactus/compare/v1.1.1...v1.1.2) (2022-11-11)
 
 **Note:** Version bump only for package @hyperledger/cactus-test-tooling
