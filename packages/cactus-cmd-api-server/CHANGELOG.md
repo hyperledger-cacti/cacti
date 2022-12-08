@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.3](https://github.com/hyperledger/cactus/compare/v1.1.2...v1.1.3) (2022-12-08)
+
+### Bug Fixes
+
+* **plugin-ledger-connector-iroha:** running dockerfile locally ([f5faaab](https://github.com/hyperledger/cactus/commit/f5faaab75cecf22f588f0cdcb502952652fee058)), closes [#1874](https://github.com/hyperledger/cactus/issues/1874)
+
 ## [1.1.2](https://github.com/hyperledger/cactus/compare/v1.1.1...v1.1.2) (2022-11-11)
 
 **Note:** Version bump only for package @hyperledger/cactus-cmd-api-server
