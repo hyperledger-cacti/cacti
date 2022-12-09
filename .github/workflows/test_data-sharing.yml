@@ -692,6 +692,7 @@ jobs:
 
       - name: Get Latest Relay Dependencies
         run: |
+          make protos-local
           cargo update -p nom
           cargo update -p lexical-core
         working-directory: core/relay

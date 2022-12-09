@@ -11,5 +11,6 @@ if [ -d "${CHAINCODE_PATH}/interop" ]; then
 fi
 (cd $INTEROP_CC_PATH/contracts/interop && make run-vendor)
 cp -r $INTEROP_CC_PATH/contracts/interop $CHAINCODE_PATH/interop
+(cd $INTEROP_CC_PATH/contracts/interop && make undo-vendor)
 echo "Done."
 

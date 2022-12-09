@@ -72,8 +72,8 @@ constructor(
             )
             // 1. Create the LockInfo
             val expiryTime: Instant = when(lockInfoHTLC.timeSpec) {
-                AssetLocks.AssetLockHTLC.TimeSpec.EPOCH -> Instant.ofEpochSecond(lockInfoHTLC.expiryTimeSecs)
-                AssetLocks.AssetLockHTLC.TimeSpec.DURATION -> Instant.now().plusSeconds(lockInfoHTLC.expiryTimeSecs)
+                AssetLocks.TimeSpec.EPOCH -> Instant.ofEpochSecond(lockInfoHTLC.expiryTimeSecs)
+                AssetLocks.TimeSpec.DURATION -> Instant.now().plusSeconds(lockInfoHTLC.expiryTimeSecs)
                 else -> Instant.now().minusSeconds(10)
             }
             if (expiryTime.isBefore(Instant.now())) {
@@ -87,7 +87,7 @@ constructor(
             
             // Get AssetStateAndRef
             resolveStateAndRefFlow(getAssetFlowName,
-                listOf(agreement.type, agreement.id)
+                listOf(agreement.assetType, agreement.id)
             ).fold({
                 println("Error: Unable to resolve Get Asset StateAndRef Flow.")
                 Left(Error("Error: Unable to resolve Get Asset StateAndRef Flow"))
@@ -96,8 +96,8 @@ constructor(
                 val assetRef = subFlow(it)
                 
                 if (assetRef == null) {
-                    println("Error: Unable to Get Asset StateAndRef for type: ${agreement.type} and id: ${agreement.id}.")
-                    Left(Error("Error: Unable to Get Asset StateAndRef for type: ${agreement.type} and id: ${agreement.id}."))
+                    println("Error: Unable to Get Asset StateAndRef for type: ${agreement.assetType} and id: ${agreement.id}.")
+                    Left(Error("Error: Unable to Get Asset StateAndRef for type: ${agreement.assetType} and id: ${agreement.id}."))
                 }
                 
                 // Resolve recipient name to party
@@ -163,8 +163,8 @@ constructor(
             )
             // 1. Create the LockInfo
             val expiryTime: Instant = when(lockInfoHTLC.timeSpec) {
-                AssetLocks.AssetLockHTLC.TimeSpec.EPOCH -> Instant.ofEpochSecond(lockInfoHTLC.expiryTimeSecs)
-                AssetLocks.AssetLockHTLC.TimeSpec.DURATION -> Instant.now().plusSeconds(lockInfoHTLC.expiryTimeSecs)
+                AssetLocks.TimeSpec.EPOCH -> Instant.ofEpochSecond(lockInfoHTLC.expiryTimeSecs)
+                AssetLocks.TimeSpec.DURATION -> Instant.now().plusSeconds(lockInfoHTLC.expiryTimeSecs)
                 else -> Instant.now().minusSeconds(10)
             }
             if (expiryTime.isBefore(Instant.now())) {
@@ -178,7 +178,7 @@ constructor(
             
             // Get AssetStateAndRef
             resolveStateAndRefFlow(getAssetFlowName,
-                listOf(agreement.type, agreement.numUnits)
+                listOf(agreement.assetType, agreement.numUnits)
             ).fold({
                 println("Error: Unable to resolve Get Asset StateAndRef Flow.")
                 Left(Error("Error: Unable to resolve Get Asset StateAndRef Flow"))
@@ -187,8 +187,8 @@ constructor(
                 val assetRef = subFlow(it)
                 
                 if (assetRef == null) {
-                    println("Error: Unable to Get Asset StateAndRef for type: ${agreement.type} and id: ${agreement.numUnits}.")
-                    Left(Error("Error: Unable to Get Asset StateAndRef for type: ${agreement.type} and id: ${agreement.numUnits}."))
+                    println("Error: Unable to Get Asset StateAndRef for type: ${agreement.assetType} and id: ${agreement.numUnits}.")
+                    Left(Error("Error: Unable to Get Asset StateAndRef for type: ${agreement.assetType} and id: ${agreement.numUnits}."))
                 }
                 
                 // Resolve recipient name to party

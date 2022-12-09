@@ -52,6 +52,15 @@ The docs are then located in `build/dokka/corda-interop-app`. Opening
 `index.html` in your browser will allow you to navigate through the project
 structure.
 
+## Updating Version
+
+If updating Interop CorDapp version, update the dependency version for in:
+* `sdks/corda/build.gradle`
+* `samples/corda/corda-simple-application/constants.properties`
+* `samples/corda/fungible-house-token/constants.properties`
+* `tests/network-setups/corda/scripts/get-cordapps.sh`
+* `tests/network-setups/corda/scripts/start-nodes.sh`
+
 ## Steps to publish:
 
 1) Create a Personal Access Token from Github with write/read/delete access to packages. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.

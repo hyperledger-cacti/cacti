@@ -1,11 +1,20 @@
 run-vendor:
+	go mod edit -replace github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils=../../../core/network/fabric-interop-cc/libs/testutils/
 	go mod vendor
-	cp -r ../../../core/network/fabric-interop-cc/libs/testutils/* vendor/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils/
-	
-test-local: run-vendor
-	go test -v .
+
+undo-vendor:
+	rm -rf vendor
+	go mod edit -dropreplace github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils
+
+build-local: run-vendor build undo-vendor
+
+test-local: run-vendor test undo-vendor
+
+build:
+	go build -v .
+
 test:
-	go mod tidy
 	go test -v .
+
 clean:
-	rm -rf mocks simplestate vendor
+	rm -rf simplestate vendor

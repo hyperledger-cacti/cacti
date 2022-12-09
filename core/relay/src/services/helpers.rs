@@ -1,9 +1,9 @@
-use crate::pb::common::ack::{ack};
-use crate::pb::common::query::Query;
-use crate::pb::common::state::{request_state, RequestState};
-use crate::pb::common::events::{event_subscription_state, EventSubscriptionState};
-use crate::pb::common::events::{EventSubscription, EventStates, EventState};
-use crate::pb::driver::driver::driver_communication_client::DriverCommunicationClient;
+use weaverpb::common::ack::{ack};
+use weaverpb::common::query::Query;
+use weaverpb::common::state::{request_state, RequestState};
+use weaverpb::common::events::{event_subscription_state, EventSubscriptionState};
+use weaverpb::common::events::{EventSubscription, EventStates, EventState, EventPublication};
+use weaverpb::driver::driver::driver_communication_client::DriverCommunicationClient;
 
 use crate::db::Database;
 use crate::services::types::{Driver, Network};
@@ -11,6 +11,7 @@ use crate::error::Error;
 
 use config;
 use tonic::transport::{Certificate, Channel, ClientTlsConfig};
+use std::fs;
 
 // Locally scoped function to update request status in db. This function is
 // called for the first time after an Ack is received from the remote relay.
@@ -23,6 +24,12 @@ pub fn update_event_subscription_status(
     curr_db_path: String,
     message: String,
 ) {
+    let driver_error_constants = fs::read_to_string("./driver/driver-error-constants.json").expect("Unable to read file: ./driver/driver-error-constants.json");
+    let driver_error_constants_json: serde_json::Value =
+        serde_json::from_str(&driver_error_constants).expect("JSON was not well-formatted");
+    let driver_sub_exists_error = driver_error_constants_json.get("SUB_EXISTS").unwrap().as_str().unwrap();
+    let driver_sub_exists_error_without_args = *(driver_sub_exists_error.split("{0}").collect::<Vec<&str>>().first().unwrap());
+
     let db = Database {
         db_path: curr_db_path,
     };
@@ -38,45 +45,50 @@ pub fn update_event_subscription_status(
                             target = EventSubscriptionState {
                                 status: event_subscription_state::Status::UnsubscribePending as i32,
                                 request_id: curr_request_id.clone(),
+                                publishing_request_id: fetched_event_sub_state.publishing_request_id.to_string(),
                                 message: message.to_string(),
                                 event_matcher: fetched_event_sub_state.event_matcher,
-                                event_publication_spec: fetched_event_sub_state.event_publication_spec
+                                event_publication_specs: fetched_event_sub_state.event_publication_specs
                             };
                         },
                         event_subscription_state::Status::UnsubscribePending => {
                             target = EventSubscriptionState {
                                 status: event_subscription_state::Status::Unsubscribed as i32,
                                 request_id: curr_request_id.clone(),
+                                publishing_request_id: fetched_event_sub_state.publishing_request_id.to_string(),
                                 message: message.to_string(),
                                 event_matcher: fetched_event_sub_state.event_matcher,
-                                event_publication_spec: fetched_event_sub_state.event_publication_spec
+                                event_publication_specs: fetched_event_sub_state.event_publication_specs
                             };
                         },
                         event_subscription_state::Status::SubscribePendingAck  => {
                             target = EventSubscriptionState {
                                 status: event_subscription_state::Status::SubscribePending as i32,
                                 request_id: curr_request_id.clone(),
+                                publishing_request_id: "".to_string(),
                                 message: message.to_string(),
                                 event_matcher: fetched_event_sub_state.event_matcher.clone(),
-                                event_publication_spec: fetched_event_sub_state.event_publication_spec.clone(),
+                                event_publication_specs: fetched_event_sub_state.event_publication_specs.clone(),
                             };
                         },
                         event_subscription_state::Status::SubscribePending  => {
                             target = EventSubscriptionState {
                                 status: event_subscription_state::Status::Subscribed as i32,
                                 request_id: curr_request_id.clone(),
+                                publishing_request_id: curr_request_id.clone(),
                                 message: message.to_string(),
                                 event_matcher: fetched_event_sub_state.event_matcher.clone(),
-                                event_publication_spec: fetched_event_sub_state.event_publication_spec.clone(),
+                                event_publication_specs: fetched_event_sub_state.event_publication_specs.clone(),
                             };
                         },
                         _ => {
                             target = EventSubscriptionState {
                                 status: event_subscription_state::Status::Error as i32,
                                 request_id: curr_request_id.clone(),
+                                publishing_request_id: "".to_string(),
                                 message: "Status is not supported or is invalid".to_string(),
                                 event_matcher: fetched_event_sub_state.event_matcher.clone(),
-                                event_publication_spec: fetched_event_sub_state.event_publication_spec.clone(),
+                                event_publication_specs: fetched_event_sub_state.event_publication_specs.clone(),
                             };
                         },
                     },
@@ -84,20 +96,74 @@ pub fn update_event_subscription_status(
                         target = EventSubscriptionState {
                             status: event_subscription_state::Status::Error as i32,
                             request_id: curr_request_id.clone(),
+                            publishing_request_id: "".to_string(),
                             message: "No event subscription status set in database".to_string(),
                             event_matcher: fetched_event_sub_state.event_matcher.clone(),
-                            event_publication_spec: fetched_event_sub_state.event_publication_spec.clone(),
+                            event_publication_specs: fetched_event_sub_state.event_publication_specs.clone(),
                         };
                     },
                 }
             } else {
-                target = EventSubscriptionState {
-                    status: event_subscription_state::Status::Error as i32,
-                    request_id: curr_request_id.clone(),
-                    message: message.to_string(),
-                    event_matcher: fetched_event_sub_state.event_matcher.clone(),
-                    event_publication_spec: fetched_event_sub_state.event_publication_spec.clone(),
-                };
+                match message.find(driver_sub_exists_error_without_args) {
+                    Some(_index) => {
+                        let old_request_id = *(message.split(driver_sub_exists_error_without_args).collect::<Vec<&str>>().last().unwrap());
+                        println!("Adding event publication spec to existing EventSubscriptionState. Extracted request id from message: {}", old_request_id.to_string());
+
+                        let old_event_sub_key = get_event_subscription_key(old_request_id.to_string());
+                        let mut existing_event_sub_state = db.get::<EventSubscriptionState>(old_event_sub_key.to_string())
+                            .expect(&format!("No EventSubscriptionState found in DB for request_id provided {}", old_request_id.to_string()));
+                            
+                        let new_event_pub_spec = fetched_event_sub_state.event_publication_specs.first().unwrap();
+                        let mut unique_pub_spec_flag = true;
+                        for event_pub_spec in existing_event_sub_state.event_publication_specs.iter() {
+                            if *new_event_pub_spec == *event_pub_spec {
+                                unique_pub_spec_flag = false;
+                                break;
+                            }
+                        }
+                        if unique_pub_spec_flag {
+                            existing_event_sub_state.event_publication_specs.push((*new_event_pub_spec).clone());
+                            let updated_event_sub_state = EventSubscriptionState {
+                                status: event_subscription_state::Status::Subscribed as i32,
+                                request_id: old_request_id.to_string(),
+                                publishing_request_id: old_request_id.to_string(),
+                                message: existing_event_sub_state.message.to_string(),
+                                event_matcher: existing_event_sub_state.event_matcher.clone(),
+                                event_publication_specs: existing_event_sub_state.event_publication_specs.clone(),
+                            };
+                            db.set(&old_event_sub_key.to_string(), &updated_event_sub_state)
+                                .expect("Failed to insert into DB");
+                            
+                            target = EventSubscriptionState {
+                                status: event_subscription_state::Status::DuplicateQuerySubscribed as i32,
+                                request_id: curr_request_id.clone(),
+                                publishing_request_id: old_request_id.to_string(),
+                                message: format!("New Event Publication added to eisting subscription with request id {}", old_request_id.to_string()).to_string(),
+                                event_matcher: fetched_event_sub_state.event_matcher.clone(),
+                                event_publication_specs: fetched_event_sub_state.event_publication_specs.clone(),
+                            };
+                        } else {
+                            target = EventSubscriptionState {
+                                status: event_subscription_state::Status::Error as i32,
+                                request_id: curr_request_id.clone(),
+                                publishing_request_id: "".to_string(),
+                                message: message.to_string(),
+                                event_matcher: fetched_event_sub_state.event_matcher.clone(),
+                                event_publication_specs: fetched_event_sub_state.event_publication_specs.clone(),
+                            }
+                        };
+                    },
+                    None => {
+                        target = EventSubscriptionState {
+                            status: event_subscription_state::Status::Error as i32,
+                            request_id: curr_request_id.clone(),
+                            publishing_request_id: "".to_string(),
+                            message: message.to_string(),
+                            event_matcher: fetched_event_sub_state.event_matcher.clone(),
+                            event_publication_specs: fetched_event_sub_state.event_publication_specs.clone(),
+                        };
+                    }
+                }
             }
             
             // Panic if this fails, atm the panic is just logged by the tokio runtime
@@ -284,6 +350,68 @@ pub fn mark_event_states_deleted(fetched_event_states: EventStates, request_id: 
     db.set(&event_publish_key.to_string(), &updated_event_states)
         .expect("EventState Delete: Failed to insert into DB");
 }
+
+/* Gets the current subscription state.
+ * If status is "DuplicateQuerySubscribed", marks it unsubscribed,
+ *  and deletes the event pub spec from publishing_request_id state.
+ * Else deletes the event pub spec from the list if not the last element,
+ * Else if its last element, then unsubscription request is passed to source network.
+ */
+
+pub fn delete_event_pub_spec(
+    request_id: String,
+    event_pub_spec: EventPublication,
+    curr_db_path: String
+) -> u8 {
+    let db = Database {
+        db_path: curr_db_path,
+    };
+    let mut event_sub_key = get_event_subscription_key(request_id.to_string());
+    let mut event_sub_state = db.get::<EventSubscriptionState>(event_sub_key.to_string())
+        .expect(&format!("No EventSubscriptionState found in DB for request_id provided {}", request_id.to_string()));
+    
+    let mut del_event_pub_spec = event_pub_spec;
+    
+    if event_sub_state.status == event_subscription_state::Status::DuplicateQuerySubscribed as i32 {
+        let updated_state = EventSubscriptionState {
+            status: event_subscription_state::Status::Unsubscribed as i32,
+            request_id: request_id.to_string(),
+            publishing_request_id: event_sub_state.publishing_request_id.to_string(),
+            message: "Unsubscription successful".to_string(),
+            event_matcher: event_sub_state.event_matcher,
+            event_publication_specs: event_sub_state.event_publication_specs
+        };
+        db.set(&event_sub_key.to_string(), &updated_state)
+            .expect("Failed to insert into DB");
+
+        del_event_pub_spec = updated_state.clone().event_publication_specs.first().unwrap().clone();
+        println!("Removed EventSubscriptionState from database: {:?}", updated_state);
+        event_sub_key = get_event_subscription_key(updated_state.publishing_request_id.to_string());
+        event_sub_state = db.get::<EventSubscriptionState>(event_sub_key.to_string())
+            .expect(&format!("No EventSubscriptionState found in DB for request_id provided {}", updated_state.publishing_request_id.to_string()));
+    }
+    
+    let mut flag = true;
+    for (i, curr_event_pub_spec) in event_sub_state.event_publication_specs.iter().enumerate() {
+        if *curr_event_pub_spec == del_event_pub_spec {
+            if event_sub_state.event_publication_specs.len() == 1 {
+                return 1;
+            }
+            let _removed_pub_spec = event_sub_state.event_publication_specs.remove(i);
+            flag = false;
+            break;
+        }
+    }
+    if flag {
+        return 2;
+    }
+    db.set(&event_sub_key.to_string(), &event_sub_state)
+        .expect("Failed to insert into DB");
+    println!("Successfully deleted Event Publication from existing EventSubscriptionState from DB");
+    
+    return 0;
+}
+
 pub fn get_event_subscription_key(request_id: String) -> String {
     return format!("event_sub_{}", request_id);
 }

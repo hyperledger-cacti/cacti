@@ -71,8 +71,8 @@ build-images: build-allinone build-driver build-server build-client
 # This target is used to provision the protobuf definitions that are required
 # to build the scaffolds of the relay GRPC service.
 protos-local:
-	@echo -e "\033[1mFETCH\033[0m - Calling update-protos-local script..."
-	./scripts/update-protos-local.sh
+	@echo -e "\033[1mFETCH\033[0m - Calling update-protos local script..."
+	./scripts/update-protos.sh local
 
 # Builds the relay binary.
 .PHONY: build-local
@@ -180,7 +180,7 @@ convert-compose-method2:
 .PHONY: clean
 clean:
 	@echo -e "\033[1mCLEAN\033[0m - Removing all artifacts..."
-	-rm -rf protos
+	-rm -rf protos-rs
 	-rm fingerprint.json
 	-docker-compose down
 	-docker rmi $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_SERVER)

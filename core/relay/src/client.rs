@@ -1,11 +1,10 @@
-mod pb;
 mod relay_proto;
 use futures::future::{BoxFuture, FutureExt};
-use pb::common::ack::ack;
-use pb::common::state::{request_state, view_payload, ViewPayload, View, Meta, meta};
-use pb::common::events::{event_subscription_state, EventMatcher, EventPublication, event_publication, ContractTransaction};
-use pb::relay::events::{event_publish_client::EventPublishClient};
-use pb::networks::networks::{network_client::NetworkClient, GetStateMessage, NetworkQuery, NetworkEventSubscription, NetworkEventUnsubscription};
+use weaverpb::common::ack::ack;
+use weaverpb::common::state::{request_state, view_payload, ViewPayload, View, Meta, meta};
+use weaverpb::common::events::{event_subscription_state, EventMatcher, EventPublication, event_publication, ContractTransaction};
+use weaverpb::relay::events::{event_publish_client::EventPublishClient};
+use weaverpb::networks::networks::{network_client::NetworkClient, GetStateMessage, NetworkQuery, NetworkEventSubscription, NetworkEventUnsubscription};
 use relay_proto::get_url;
 use std::env;
 use std::thread::sleep;

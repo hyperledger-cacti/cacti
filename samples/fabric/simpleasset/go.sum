@@ -74,11 +74,10 @@ github.com/google/go-cmp v0.5.5/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/
 github.com/google/uuid v1.1.2/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/grpc-ecosystem/grpc-gateway v1.16.0/go.mod h1:BDjrQk3hbvj6Nolgz8mAMFbcEtjT1g+wF4CSlocrBnw=
 github.com/hashicorp/hcl v1.0.0/go.mod h1:E5yfLk+7swimpb2L/Alb/PJmXilQ/rhwaUYs4T20WEQ=
-github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go v1.3.0/go.mod h1:POCGO/RK9YDfgdhuyqjoD9tRNtWfK7Rh5AYYmsb1Chc=
-github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go v1.3.1 h1:83ZKi0fyaNfHjnc59Cqgr8Zma11hSqYSW46VIhBKaWo=
-github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go v1.3.1/go.mod h1:POCGO/RK9YDfgdhuyqjoD9tRNtWfK7Rh5AYYmsb1Chc=
-github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt v1.3.1 h1:g3hZCYi2wLxV+Ixxf4gLk+cQs2DYj7cAfeIEcVhrrmA=
-github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt v1.3.1/go.mod h1:9INJbcJ6SGbNB2v9w0FRwmgckR0kKYbscjSJd1pPFX0=
+github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go v1.5.3 h1:/DGEjKelDgw8DNC3k/1wLd3YucDFXAScF2O7H80e9ew=
+github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go v1.5.3/go.mod h1:POCGO/RK9YDfgdhuyqjoD9tRNtWfK7Rh5AYYmsb1Chc=
+github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt v1.5.3 h1:dBT8E4s+RV6OUr2Sm2JgRS+2/1qtDXfG5BEwoBqFXNY=
+github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt v1.5.3/go.mod h1:VlJPLLKwRKjic0utq66qd6fn9tb4ONC5a5IspKFED4M=
 github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils v0.0.0-20210920170720-5d5bf2a54081 h1:awla67KsROgWu07rPRpa0SGbhOnw5eNfG2mfd4wIDN4=
 github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils v0.0.0-20210920170720-5d5bf2a54081/go.mod h1:Nke1cGAeCHSgK8x/+tjzojTAT5L/V6e7ERxPUSbnA/8=
 github.com/hyperledger/fabric-chaincode-go v0.0.0-20200424173110-d7076418f212/go.mod h1:N7H3sA7Tx4k/YzFq7U0EPdqJtqvM4Kild0JoCc7C0Dc=

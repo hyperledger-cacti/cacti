@@ -18,7 +18,7 @@ buildscript {
         //TokenSDK
         tokens_release_group = 'com.r3.corda.lib.tokens'
         tokens_release_version = '1.2'
-        weaver_version = '1.2.9'
+        weaver_version = constants.getProperty("weaverCordaVersion")
     }
 
     repositories {

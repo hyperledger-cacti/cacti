@@ -4,8 +4,8 @@ go 1.16
 
 require (
 	github.com/cloudflare/cfssl v1.4.1
-	github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go v1.2.3-alpha.1
-	github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk v1.2.3-alpha.2
+	github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go v1.5.3
+	github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk v1.2.5
 	github.com/hyperledger/fabric-sdk-go v1.0.0
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.2.1

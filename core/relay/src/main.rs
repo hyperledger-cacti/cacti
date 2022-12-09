@@ -1,8 +1,8 @@
 // Internal generated modules
-use pb::networks::networks::network_server::NetworkServer;
-use pb::relay::datatransfer::data_transfer_server::DataTransferServer;
-use pb::relay::events::event_subscribe_server::EventSubscribeServer;
-use pb::relay::events::event_publish_server::EventPublishServer;
+use weaverpb::networks::networks::network_server::NetworkServer;
+use weaverpb::relay::datatransfer::data_transfer_server::DataTransferServer;
+use weaverpb::relay::events::event_subscribe_server::EventSubscribeServer;
+use weaverpb::relay::events::event_publish_server::EventPublishServer;
 
 // Internal modules
 use services::data_transfer_service::DataTransferService;
@@ -20,7 +20,6 @@ use tonic::transport::{Identity, Server, ServerTlsConfig};
 
 mod db;
 mod error;
-mod pb;
 mod relay_proto;
 mod services;
 

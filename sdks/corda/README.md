@@ -114,3 +114,9 @@ All Following functions (except CredentialsCreator), accepts an instance of `net
     - createAccessControlPolicy
     - createMembership
     - createVerificationPolicy
+
+## Updating Version
+
+If updating Corda SDK version, update the dependency version for Corda SDK in:
+* `core/drivers/corda-driver/build.gradle`
+* `samples/corda/corda-simple-application/constants.properties`

@@ -83,7 +83,7 @@ class AssetExchangeHTLCWrapperTests {
         .setHashMechanism(AssetLocks.HashMechanism.SHA256)
         .setHashBase64(ByteString.copyFrom(hash.toByteArray()))
         .setExpiryTimeSecs(10)
-        .setTimeSpec(AssetLocks.AssetLockHTLC.TimeSpec.DURATION)
+        .setTimeSpec(AssetLocks.TimeSpec.DURATION)
         .build()
         
     val lockInfo = AssetLocks.AssetLock.newBuilder()
@@ -102,7 +102,7 @@ class AssetExchangeHTLCWrapperTests {
         .build()
         
     val assetExchangeAgreement = AssetLocks.AssetExchangeAgreement.newBuilder()
-        .setType("Asset")
+        .setAssetType("Asset")
         .setId("a01")
         .setLocker("")
         .setRecipient(bob.nameOrNull().toString())
@@ -125,7 +125,7 @@ class AssetExchangeHTLCWrapperTests {
 
         // UnHappy case: Third party trying to lock asset of alice.
         val failAssetExchangeAgreement = AssetLocks.AssetExchangeAgreement.newBuilder()
-            .setType("Asset")
+            .setAssetType("Asset")
             .setId("lock01")
             .setLocker("")
             .setRecipient(charlie.nameOrNull().toString())
@@ -143,7 +143,7 @@ class AssetExchangeHTLCWrapperTests {
         
         // Happy case.
         val assetExchangeAgreementLock = AssetLocks.AssetExchangeAgreement.newBuilder()
-            .setType("Asset")
+            .setAssetType("Asset")
             .setId("lock01")
             .setLocker("")
             .setRecipient(bob.nameOrNull().toString())

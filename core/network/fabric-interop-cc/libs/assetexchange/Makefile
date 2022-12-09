@@ -1,6 +1,10 @@
 run-vendor:
+	go mod edit -replace github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go=../../../../../common/protos-go/
 	go mod vendor
-	cp -r ../../../../../common/protos-go/* vendor/github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/
+
+undo-vendor:
+	rm -rf vendor
+	go mod edit -dropreplace github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go
 
 clean:
 	rm -rf vendor

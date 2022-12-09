@@ -6,12 +6,19 @@ clean:
 	rm -rf vendor
 
 .PHONY: build
-build: clean
+build:
 	go build -o ./bin/fabric-cli fabric-cli.go
 
 run-vendor:
+	go mod edit -replace github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go=../../../common/protos-go/
+	go mod edit -replace github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk=../../../sdks/fabric/go-sdk/
 	go mod vendor
-	cp -r ../../../sdks/fabric/go-sdk/* vendor/github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/
+
+undo-vendor:
+	rm -rf vendor
+	go mod edit -dropreplace github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go
+	go mod edit -dropreplace github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk
+
 
 .PHONY: build-local
-build-local: clean run-vendor build
+build-local: clean run-vendor build undo-vendor

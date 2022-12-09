@@ -17,6 +17,7 @@ ADD package.json .
 RUN npm install --unsafe-perm
 
 ADD server /fabric-driver/server
+ADD constants /fabric-driver/constants
 ADD tsconfig.json .
 ADD .eslintrc .
 ADD .prettierrc .
@@ -42,6 +43,7 @@ ADD package.json .
 COPY --from=builder /fabric-driver/package-lock.json /fabric-driver/
 COPY --from=builder /fabric-driver/node_modules /fabric-driver/node_modules
 COPY --from=builder /fabric-driver/out /fabric-driver/out
+COPY --from=builder /fabric-driver/constants /fabric-driver/constants
 
 RUN chown -R relay:relay /fabric-driver
 
