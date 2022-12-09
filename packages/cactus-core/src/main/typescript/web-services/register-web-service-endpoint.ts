@@ -1,4 +1,4 @@
-import expressJwtAuthz from "express-jwt-authz";
+import expressJwtAuthz, { AuthzOptions } from "express-jwt-authz";
 import { Express } from "express";
 
 import { IWebServiceEndpoint } from "@hyperledger/cactus-core-api";
@@ -29,7 +29,13 @@ export async function registerWebServiceEndpoint(
   const registrationMethod = webAppCasted[httpVerb].bind(webApp);
   try {
     if (isProtected) {
-      const scopeCheckMiddleware = expressJwtAuthz(requiredRoles);
+      const opts: AuthzOptions = {
+        failWithError: true,
+        customScopeKey: "scope",
+        customUserKey: "auth",
+        checkAllScopes: true,
+      };
+      const scopeCheckMiddleware = expressJwtAuthz(requiredRoles, opts);
       registrationMethod(httpPath, scopeCheckMiddleware, requestHandler);
     } else {
       registrationMethod(httpPath, requestHandler);

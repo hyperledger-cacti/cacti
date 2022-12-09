@@ -27,7 +27,7 @@ test(testCase, async () => {
   try {
     const jwtKeyPair = await generateKeyPair("RS256", { modulusLength: 4096 });
     const jwtPublicKey = await exportSPKI(jwtKeyPair.publicKey);
-    const expressJwtOptions: expressJwt.Options = {
+    const expressJwtOptions: expressJwt.Params & { [key: string]: unknown } = {
       algorithms: ["RS256"],
       secret: jwtPublicKey,
       audience: uuidv4(),

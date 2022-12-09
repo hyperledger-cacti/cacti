@@ -11,7 +11,7 @@ import {
   GeneralSign,
   generalVerify,
 } from "jose";
-import type { Options as ExpressJwtOptions } from "express-jwt";
+import type { Params as ExpressJwtOptions } from "express-jwt";
 import jsonStableStringify from "json-stable-stringify";
 import {
   LoggerProvider,
@@ -592,7 +592,7 @@ export class ConfigService {
 
     const jwtSecret = uuidV4();
 
-    const expressJwtOptions: ExpressJwtOptions = {
+    const expressJwtOptions: ExpressJwtOptions & { [key: string]: unknown } = {
       secret: jwtSecret,
       algorithms: ["RS256"],
       audience: "org.hyperledger.cactus.jwt.audience",
@@ -664,7 +664,6 @@ export class ConfigService {
     const schema: Schema<ICactusApiServerOptions> = ConfigService.getConfigSchema();
     ConfigService.config = (convict as any)(schema, options);
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
     if (ConfigService.config.get("configFile")) {
       const configFilePath = ConfigService.config.get("configFile");
       ConfigService.config.loadFile(configFilePath);

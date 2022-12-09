@@ -9,6 +9,10 @@ import {
 import expressJwt from "express-jwt";
 import "jest-extended";
 
+import { LoggerProvider, LogLevelDesc } from "@hyperledger/cactus-common";
+import { IJoseFittingJwtParams } from "@hyperledger/cactus-common";
+import { Configuration } from "@hyperledger/cactus-core-api";
+
 import {
   ApiServer,
   ConfigService,
@@ -16,8 +20,6 @@ import {
   isHealthcheckResponse,
 } from "../../../main/typescript/public-api";
 import { DefaultApi as ApiServerApi } from "../../../main/typescript/public-api";
-import { LoggerProvider, LogLevelDesc } from "@hyperledger/cactus-common";
-import { Configuration } from "@hyperledger/cactus-core-api";
 import { AuthorizationProtocol } from "../../../main/typescript/config/authorization-protocol";
 import { IAuthorizationConfig } from "../../../main/typescript/authzn/i-authorization-config";
 
@@ -30,7 +32,7 @@ const log = LoggerProvider.getOrCreate({
 
 describe(testCase, () => {
   let apiServer: ApiServer,
-    expressJwtOptions: expressJwt.Options,
+    expressJwtOptions: expressJwt.Params & IJoseFittingJwtParams,
     jwtKeyPair: GenerateKeyPairResult,
     apiSrvOpts: ICactusApiServerOptions;
 

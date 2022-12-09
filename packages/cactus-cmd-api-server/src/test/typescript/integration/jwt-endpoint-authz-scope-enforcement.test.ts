@@ -5,6 +5,7 @@ import expressJwt from "express-jwt";
 import axios, { Method } from "axios";
 
 import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { IJoseFittingJwtParams } from "@hyperledger/cactus-common";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 
 import {
@@ -35,7 +36,7 @@ describe(testCase, () => {
       modulusLength: 4096,
     });
     const jwtPublicKey = await exportSPKI(jwtKeyPair.publicKey);
-    const expressJwtOptions: expressJwt.Options = {
+    const expressJwtOptions: expressJwt.Params & IJoseFittingJwtParams = {
       algorithms: ["RS256"],
       secret: jwtPublicKey,
       audience: uuidv4(),

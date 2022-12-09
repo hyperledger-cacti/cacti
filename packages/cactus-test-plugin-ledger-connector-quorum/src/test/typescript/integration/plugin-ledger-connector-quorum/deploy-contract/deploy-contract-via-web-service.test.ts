@@ -126,7 +126,6 @@ describe(testCase, () => {
     addressInfo = httpServer?.address() as AddressInfo;
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
     protocol = config.get("apiTlsEnabled") ? "https:" : "http:";
     basePath = `${protocol}//${addressInfo.address}:${addressInfo.port}`;
     configuration = new Configuration({ basePath });

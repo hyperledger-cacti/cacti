@@ -1,10 +1,13 @@
 import test, { Test } from "tape-promise/tape";
 import { v4 as uuidv4 } from "uuid";
 import { generateKeyPair, exportSPKI, SignJWT } from "jose";
-import type { Options as ExpressJwtOptions } from "express-jwt";
+import type { Params as ExpressJwtOptions } from "express-jwt";
 import type { AuthorizeOptions as SocketIoJwtOptions } from "@thream/socketio-jwt";
 
 import { Constants } from "@hyperledger/cactus-core-api";
+import { LoggerProvider, LogLevelDesc } from "@hyperledger/cactus-common";
+import { IJoseFittingJwtParams } from "@hyperledger/cactus-common";
+
 import {
   ApiServer,
   ConfigService,
@@ -13,7 +16,6 @@ import {
 } from "../../../main/typescript/public-api";
 import { ApiServerApiClient } from "../../../main/typescript/public-api";
 import { ApiServerApiClientConfiguration } from "../../../main/typescript/public-api";
-import { LoggerProvider, LogLevelDesc } from "@hyperledger/cactus-common";
 import { AuthorizationProtocol } from "../../../main/typescript/config/authorization-protocol";
 import { IAuthorizationConfig } from "../../../main/typescript/authzn/i-authorization-config";
 
@@ -28,7 +30,7 @@ test(testCase, async (t: Test) => {
   try {
     const jwtKeyPair = await generateKeyPair("RS256", { modulusLength: 4096 });
     const jwtPublicKey = await exportSPKI(jwtKeyPair.publicKey);
-    const expressJwtOptions: ExpressJwtOptions = {
+    const expressJwtOptions: ExpressJwtOptions & IJoseFittingJwtParams = {
       algorithms: ["RS256"],
       secret: jwtPublicKey,
       audience: uuidv4(),

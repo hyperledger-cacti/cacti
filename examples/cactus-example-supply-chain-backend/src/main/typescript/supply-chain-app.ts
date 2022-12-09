@@ -30,6 +30,7 @@ import {
   Logger,
   LoggerProvider,
   Servers,
+  IJoseFittingJwtParams,
 } from "@hyperledger/cactus-common";
 
 import {
@@ -162,7 +163,7 @@ export class SupplyChainApp {
   async createAuthorizationConfig(): Promise<void> {
     const jwtKeyPair = await generateKeyPair("RS256", { modulusLength: 4096 });
     const jwtPrivateKeyPem = await exportPKCS8(jwtKeyPair.privateKey);
-    const expressJwtOptions: expressJwt.Options = {
+    const expressJwtOptions: expressJwt.Params & IJoseFittingJwtParams = {
       algorithms: ["RS256"],
       secret: jwtPrivateKeyPem,
       audience: uuidv4(),

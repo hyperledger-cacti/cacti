@@ -1,5 +1,5 @@
 import { RequestHandler } from "express";
-import expressJwt from "express-jwt";
+import { expressjwt, Params as ExpressJwtOptions } from "express-jwt";
 import { Optional } from "typescript-optional";
 
 import {
@@ -83,13 +83,23 @@ export class AuthorizerFactory {
       throw new Error(`${fnTag}: ${E_BAD_EXPRESS_JWT_OPTIONS}`);
     }
 
-    const options: expressJwt.Options = {
+    const options: ExpressJwtOptions & { [key: string]: unknown } = {
       audience: "org.hyperledger.cactus", // default that can be overridden
       ...expressJwtOptions,
     };
     const unprotectedEndpoints = this.unprotectedEndpoints.map((e) => {
+      const verbLowerCase = e.getVerbLowerCase();
+
+      // including both cases of the HTTP verbs because upgrading the
+      // express-unless dependency (through the upgrade of express-jwt)
+      // broke the test cases that were verifying if the exemptions are
+      // enforced correctly.
+      // This test breakage was traced back to express-unless not realizing
+      // that there is a match of verbs if they are differently cased.
+      const methods = [verbLowerCase.toUpperCase(), verbLowerCase];
+
       // type pathFilter = string | RegExp | { url: string | RegExp, methods?: string[], method?: string | string[] };
-      return { url: e.getPath(), method: e.getVerbLowerCase() };
+      return { url: e.getPath(), methods };
     });
     if (socketIoPath) {
       log.info("SocketIO path configuration detected: %o", socketIoPath);
@@ -99,7 +109,7 @@ export class AuthorizerFactory {
         "Exempted SocketIO path from express-jwt authorization. Using @thream/socketio-jwt instead)",
       );
     }
-    return expressJwt(options).unless({ path: unprotectedEndpoints });
+    return expressjwt(options).unless({ path: unprotectedEndpoints });
   }
 
   /**
