@@ -199,7 +199,7 @@ func (s *SmartContract) CreateLocalMembership(ctx contractapi.TransactionContext
 		return err
 	}
 
-	fmt.Printf("Recording Foreign Membership with securityDomain: %s\n", membershipLocalSecurityDomain)
+	fmt.Printf("Recording Local Membership with securityDomain: %s\n", membershipLocalSecurityDomain)
 	membershipBytes, err := json.Marshal(membership)
 	if err != nil {
 		return fmt.Errorf("Marshal error: %s", err)
