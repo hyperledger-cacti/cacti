@@ -1,11 +1,12 @@
-name: all-nodejs-packages-publish
+name: publish-npm-manually
 
 on:
-  push:
-
-    # Publish `v1.2.3` tags as releases.
-    tags:
-      - v*
+  workflow_dispatch:
+    inputs:
+      tag-pub:
+        type: string
+        description: Tag to publish
+        required: true
 
 jobs:
 
@@ -13,6 +14,8 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3.1.0
+      with:
+        ref: ${{ inputs.tag-pub }}
     - run: git fetch --unshallow --prune
     - uses: actions/setup-node@v2.1.2
       with:
