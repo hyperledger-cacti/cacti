@@ -180,9 +180,12 @@ const configureNetworkHelper = async (
     networkName,
     logger
   ]
+
+  const adminUser = 'networkadmin'
+
   try {
     await helperInvoke(
-      '',
+      adminUser,
       'CreateAccessControlPolicy',
       accessControl,
       ...helperInvokeArgs
@@ -190,7 +193,7 @@ const configureNetworkHelper = async (
   } catch (e) {
     logger.info('CreateAccessControlPolicy attempting Update')
     await helperInvoke(
-      '',
+      adminUser,
       'UpdateAccessControlPolicy',
       accessControl,
       ...helperInvokeArgs
@@ -198,7 +201,7 @@ const configureNetworkHelper = async (
   }
   try {
     await helperInvoke(
-      '',
+      adminUser,
       'CreateVerificationPolicy',
       verificationPolicy,
       ...helperInvokeArgs
@@ -206,7 +209,7 @@ const configureNetworkHelper = async (
   } catch (e) {
     logger.info('CreateVerificationPolicy attempting Update')
     await helperInvoke(
-      '',
+      adminUser,
       'UpdateVerificationPolicy',
       verificationPolicy,
       ...helperInvokeArgs
@@ -214,7 +217,7 @@ const configureNetworkHelper = async (
   }
   if (iinAgent || !targetNetwork.startsWith('network')) {
     const membership = Buffer.from(fs.readFileSync(membershipPath)).toString()
-    const memberRecordingUser = iinAgent ? 'iinagent': 'networkadmin'    // HACK until we add IIN Agents for Corda networks
+    const memberRecordingUser = iinAgent ? 'iinagent': adminUser    // HACK until we add IIN Agents for Corda networks
     try {
       await helperInvoke(memberRecordingUser, 'CreateMembership', membership, ...helperInvokeArgs)
     } catch (e) {

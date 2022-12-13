@@ -27,11 +27,12 @@ import interopPayloadPb from "@hyperledger-labs/weaver-protos-js/common/interop_
 import proposalResponsePb from "@hyperledger-labs/weaver-protos-js/peer/proposal_response_pb";
 import identitiesPb from "@hyperledger-labs/weaver-protos-js/msp/identities_pb";
 import { Relay } from "./Relay";
-import { Contract } from "fabric-network";
+import { Gateway, Contract } from "fabric-network";
 import { v4 as uuidv4 } from "uuid";
 import { ICryptoKey } from "fabric-common";
-import { InteropJSON, Query, Flow, RemoteJSON } from "./types";
+import { InteropJSON, InvocationSpec, Flow, RemoteJSON } from "./types";
 const logger = log4js.getLogger("InteroperableHelper");
+const contractApi = require("fabric-network/lib/contract.js");
 
 // TODO: Lookup different key and cert pairs for different networks and chaincode functions
 /**
@@ -396,8 +397,8 @@ const parseAndValidateView = async (contract: Contract, address: string, base64V
 /**
  * Creates an address string based on a query object, networkid and remote url.
  **/
-const createAddress = (query: Query, networkID, remoteURL) => {
-    const { channel, contractName, ccFunc, ccArgs } = query;
+const createAddress = (invocationSpec: InvocationSpec, networkID, remoteURL) => {
+    const { channel, contractName, ccFunc, ccArgs } = invocationSpec;
     const addressString = `${remoteURL}/${networkID}/${channel}:${contractName}:${ccFunc}:${ccArgs.join(":")}`;
     return addressString;
 };
@@ -420,7 +421,7 @@ const createFlowAddress = (flow: Flow, networkID, remoteURL) => {
 const interopFlow = async (
     interopContract: Contract,
     networkID: string,
-    invokeObject: Query,
+    invokeObject: InvocationSpec,
     org: string,
     localRelayEndpoint: string,
     interopArgIndices: Array<number>,
@@ -431,6 +432,7 @@ const interopFlow = async (
     useTls: boolean = false,
     tlsRootCACertPaths?: Array<string>,
     confidential: boolean = false,
+    gateway: Gateway = null,
 ): Promise<{ views: Array<any>; result: any }> => {
     if (interopArgIndices.length !== interopJSONs.length) {
         throw new Error(`Number of argument indices ${interopArgIndices.length} does not match number of view addresses ${interopJSONs.length}`);
@@ -483,7 +485,8 @@ const interopFlow = async (
         computedAddresses,
         viewsSerializedBase64,
         viewContentsBase64,
-        endorsingOrgs
+        endorsingOrgs,
+        gateway
     );
     return { views, result };
 };
@@ -492,7 +495,7 @@ const interopFlow = async (
  * Prepare arguments for WriteExternalState chaincode transaction to verify a view and write data to ledger.
  **/
 const getCCArgsForProofVerification = (
-    invokeObject: Query,
+    invokeObject: InvocationSpec,
     interopArgIndices: Array<number>,
     viewAddresses: Array<string>,
     viewsSerializedBase64: Array<string>,
@@ -518,17 +521,38 @@ const getCCArgsForProofVerification = (
 };
 
 /**
+  * Add application chaincode's endorsement policy constraints to the interop chaincode
+  **/
+const addAppCCEndorsementPolicy = async (
+    interopContract: Contract,
+    invokeObject: InvocationSpec,
+    gateway: Gateway = null,
+): Promise<Contract> => {
+    if (!gateway) {
+        // Assume here that the caller doesn't intend to add the app cc's endorsement policy
+        // or that the app cc's endorsement policy is identical to the interop cc's policy
+        // NOTE: this is absolutely not recommended for production
+        return interopContract;
+    }
+    const appContract = new contractApi.ContractImpl((await gateway.getNetwork(invokeObject.channel)), invokeObject.contractName, '');
+    const appDiscInterests = appContract.getDiscoveryInterests();
+    appDiscInterests.forEach((interest) => { interopContract.addDiscoveryInterest(interest); });
+    return interopContract;
+};
+
+/**
  * Submit local chaincode transaction to verify a view and write data to ledger.
  * - Prepare arguments and call WriteExternalState.
  **/
 const submitTransactionWithRemoteViews = async (
     interopContract: Contract,
-    invokeObject: Query,
+    invokeObject: InvocationSpec,
     interopArgIndices: Array<number>,
     viewAddresses: Array<string>,
     viewsSerializedBase64: Array<string>,
     viewContentsBase64: Array<string>,
-    endorsingOrgs: Array<string>
+    endorsingOrgs: Array<string>,
+    gateway: Gateway = null,
 ): Promise<any> => {
     const ccArgs = getCCArgsForProofVerification(
         invokeObject,
@@ -537,7 +561,8 @@ const submitTransactionWithRemoteViews = async (
         viewsSerializedBase64,
         viewContentsBase64,
     );
-    
+
+    interopContract = await addAppCCEndorsementPolicy(interopContract, invokeObject, gateway);
     const tx = interopContract.createTransaction("WriteExternalState")
     if (endorsingOrgs.length > 0) {
         tx.setEndorsingOrganizations(...endorsingOrgs)
@@ -637,27 +662,27 @@ const invokeHandler = async (
     contract: Contract,
     networkID: string,
     org: string,
-    query: Query,
+    invocationSpec: InvocationSpec,
     remoteJSON: RemoteJSON,
     keyCert: { key: ICryptoKey; cert: any },
 ): Promise<any> => {
     // If the function exists in the remoteJSON it will start the interop flow
     // Otherwise it will treat it as a nomral invoke function
-    if (remoteJSON?.viewRequests?.[query.ccFunc]) {
+    if (remoteJSON?.viewRequests?.[invocationSpec.ccFunc]) {
         return interopFlow(
             contract,
             networkID,
-            query,
+            invocationSpec,
             org,
             remoteJSON.LocalRelayEndpoint,
-            remoteJSON.viewRequests[query.ccFunc].invokeArgIndices,
-            remoteJSON.viewRequests[query.ccFunc].interopJSONs,
+            remoteJSON.viewRequests[invocationSpec.ccFunc].invokeArgIndices,
+            remoteJSON.viewRequests[invocationSpec.ccFunc].interopJSONs,
             keyCert,
         );
     }
     // Normal invoke function
     const [result, submitError] = await helpers.handlePromise(
-        contract.submitTransaction(query.ccFunc, ...query.ccArgs),
+        contract.submitTransaction(invocationSpec.ccFunc, ...invocationSpec.ccArgs),
     );
     if (submitError) {
         throw new Error(`submitTransaction Error: ${submitError}`);

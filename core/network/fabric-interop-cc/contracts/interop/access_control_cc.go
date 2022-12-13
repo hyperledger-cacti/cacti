@@ -16,12 +16,20 @@ import (
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 	log "github.com/sirupsen/logrus"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
+	wutils "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/utils"
 )
 
 const accessControlObjectType = "accessControl"
 
 // CreateAccessControlPolicy cc is used to store a AccessControlPolicy in the ledger
 func (s *SmartContract) CreateAccessControlPolicy(ctx contractapi.TransactionContextInterface, accessControlPolicyJSON string) error {
+	// Check if the caller has network admin privileges
+	if isAdmin, err := wutils.IsClientNetworkAdmin(ctx); err != nil {
+		return fmt.Errorf("Admin client check error: %s", err)
+	} else if !isAdmin {
+		return fmt.Errorf("Caller not a network admin; access denied")
+	}
+
 	accessControlPolicy, err := decodeAccessControlPolicy([]byte(accessControlPolicyJSON))
 	if err != nil {
 		errorMessage := fmt.Sprintf("Unmarshal error: %s", err)
@@ -51,6 +59,13 @@ func (s *SmartContract) CreateAccessControlPolicy(ctx contractapi.TransactionCon
 
 // UpdateAccessControlPolicy cc is used to update an existing AccessControlPolicy in the ledger
 func (s *SmartContract) UpdateAccessControlPolicy(ctx contractapi.TransactionContextInterface, accessControlPolicyJSON string) error {
+	// Check if the caller has network admin privileges
+	if isAdmin, err := wutils.IsClientNetworkAdmin(ctx); err != nil {
+		return fmt.Errorf("Admin client check error: %s", err)
+	} else if !isAdmin {
+		return fmt.Errorf("Caller not a network admin; access denied")
+	}
+
 	accessControlPolicy, err := decodeAccessControlPolicy([]byte(accessControlPolicyJSON))
 	if err != nil {
 		errorMessage := fmt.Sprintf("Unmarshal error: %s", err)
@@ -95,6 +110,13 @@ func (s *SmartContract) GetAccessControlPolicyBySecurityDomain(ctx contractapi.T
 
 // DeleteAccessControlPolicy cc is used to delete an existing AccessControlPolicy in the ledger
 func (s *SmartContract) DeleteAccessControlPolicy(ctx contractapi.TransactionContextInterface, securityDomain string) error {
+	// Check if the caller has network admin privileges
+	if isAdmin, err := wutils.IsClientNetworkAdmin(ctx); err != nil {
+		return fmt.Errorf("Admin client check error: %s", err)
+	} else if !isAdmin {
+		return fmt.Errorf("Caller not a network admin; access denied")
+	}
+
 	accessControlKey, err := ctx.GetStub().CreateCompositeKey(accessControlObjectType, []string{securityDomain})
 	bytes, err := ctx.GetStub().GetState(accessControlKey)
 	if err != nil {
