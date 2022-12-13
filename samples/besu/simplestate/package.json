@@ -14,8 +14,8 @@
   "scripts": {
     "copy-interop-contracts": "cp -r ../../../core/network/besu/contracts/interop contracts/",
     "update-truffle-config": "node get-network-details.js",
-    "deploy-contract": "npm run copy-interop-contracts && npm install && npm run update-truffle-config && truffle compile && truffle migrate",
-    "compile": "npm run copy-interop-contracts && truffle compile",
+    "deploy-contract": "npm install && npm run update-truffle-config && truffle compile && truffle migrate",
+    "compile": "truffle compile",
     "deploy": "npm run update-truffle-config && truffle migrate",
     "clean-build": "rm -rf build",
     "clean": "rm -rf node_modules package-lock.json build"
@@ -34,7 +34,7 @@
     "chai": "^4.3.4",
     "dotenv": "latest",
     "ganache-cli": "^6.12.2",
-    "@openzeppelin/contracts": "^4.3.2",
+    "@openzeppelin/contracts": "^4.7.3",
     "solc": "^0.8.8"
   },
   "devDependencies": {
