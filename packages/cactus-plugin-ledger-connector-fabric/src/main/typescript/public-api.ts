@@ -1,6 +1,11 @@
 export * from "./generated/openapi/typescript-axios/index";
 
 export {
+  FabricApiClient,
+  FabricApiClientOptions,
+} from "./api-client/fabric-api-client";
+
+export {
   PluginLedgerConnectorFabric,
   IPluginLedgerConnectorFabricOptions,
 } from "./plugin-ledger-connector-fabric";

@@ -31,6 +31,9 @@
     },
     {
       "path": "../cactus-plugin-ledger-connector-iroha/tsconfig.json"
+    },
+    {
+      "path": "../cactus-plugin-ledger-connector-fabric/tsconfig.json"
     }
   ]
 }

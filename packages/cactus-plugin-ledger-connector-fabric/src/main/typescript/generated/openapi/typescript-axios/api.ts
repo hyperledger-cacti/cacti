@@ -1120,6 +1120,173 @@ export interface VaultTransitKey {
     token: string;
 }
 /**
+ * Error response from WatchBlocks operation.
+ * @export
+ * @interface WatchBlocksCactusErrorResponseV1
+ */
+export interface WatchBlocksCactusErrorResponseV1 {
+    /**
+     * Error code.
+     * @type {number}
+     * @memberof WatchBlocksCactusErrorResponseV1
+     */
+    code: number;
+    /**
+     * Description of the error.
+     * @type {string}
+     * @memberof WatchBlocksCactusErrorResponseV1
+     */
+    errorMessage: string;
+}
+/**
+ * Transaction summary from commited block.
+ * @export
+ * @interface WatchBlocksCactusTransactionsEventV1
+ */
+export interface WatchBlocksCactusTransactionsEventV1 {
+    /**
+     * ChainCode containing function that was executed.
+     * @type {string}
+     * @memberof WatchBlocksCactusTransactionsEventV1
+     */
+    chaincodeId: string;
+    /**
+     * Transaction identifier.
+     * @type {string}
+     * @memberof WatchBlocksCactusTransactionsEventV1
+     */
+    transactionId: string;
+    /**
+     * Function name that was executed.
+     * @type {string}
+     * @memberof WatchBlocksCactusTransactionsEventV1
+     */
+    functionName: string;
+    /**
+     * List of function arguments.
+     * @type {Array<string>}
+     * @memberof WatchBlocksCactusTransactionsEventV1
+     */
+    functionArgs: Array<string>;
+}
+/**
+ * Custom response containing block transactions summary. Compatible with legacy fabric-socketio connector monitoring.
+ * @export
+ * @interface WatchBlocksCactusTransactionsResponseV1
+ */
+export interface WatchBlocksCactusTransactionsResponseV1 {
+    /**
+     * List of transactions summary
+     * @type {Array<WatchBlocksCactusTransactionsEventV1>}
+     * @memberof WatchBlocksCactusTransactionsResponseV1
+     */
+    cactusTransactionsEvents: Array<WatchBlocksCactusTransactionsEventV1>;
+}
+/**
+ * Response that corresponds to Fabric SDK \'filtered\' EventType.
+ * @export
+ * @interface WatchBlocksFilteredResponseV1
+ */
+export interface WatchBlocksFilteredResponseV1 {
+    /**
+     * Filtered commited block.
+     * @type {any}
+     * @memberof WatchBlocksFilteredResponseV1
+     */
+    filteredBlock: any;
+}
+/**
+ * Response that corresponds to Fabric SDK \'full\' EventType.
+ * @export
+ * @interface WatchBlocksFullResponseV1
+ */
+export interface WatchBlocksFullResponseV1 {
+    /**
+     * Full commited block.
+     * @type {any}
+     * @memberof WatchBlocksFullResponseV1
+     */
+    fullBlock: any;
+}
+/**
+ * Response type from WatchBlocks. \'Cactus*\' are custom views, others correspond to fabric SDK call.
+ * @export
+ * @enum {string}
+ */
+
+export enum WatchBlocksListenerTypeV1 {
+    Filtered = 'filtered',
+    Full = 'full',
+    Private = 'private',
+    CactusTransactions = 'cactus:transactions'
+}
+
+/**
+ * Options passed when subscribing to block monitoring.
+ * @export
+ * @interface WatchBlocksOptionsV1
+ */
+export interface WatchBlocksOptionsV1 {
+    /**
+     * Hyperledger Fabric channel to connect to.
+     * @type {string}
+     * @memberof WatchBlocksOptionsV1
+     */
+    channelName: string;
+    /**
+     * 
+     * @type {GatewayOptions}
+     * @memberof WatchBlocksOptionsV1
+     */
+    gatewayOptions: GatewayOptions;
+    /**
+     * 
+     * @type {WatchBlocksListenerTypeV1}
+     * @memberof WatchBlocksOptionsV1
+     */
+    type: WatchBlocksListenerTypeV1;
+    /**
+     * From which block start monitoring. Defaults to latest.
+     * @type {string}
+     * @memberof WatchBlocksOptionsV1
+     */
+    startBlock?: string;
+}
+/**
+ * Response that corresponds to Fabric SDK \'private\' EventType.
+ * @export
+ * @interface WatchBlocksPrivateResponseV1
+ */
+export interface WatchBlocksPrivateResponseV1 {
+    /**
+     * Private commited block.
+     * @type {any}
+     * @memberof WatchBlocksPrivateResponseV1
+     */
+    privateBlock: any;
+}
+/**
+ * @type WatchBlocksResponseV1
+ * Response block from WatchBlocks endpoint. Depends on \'type\' passed in subscription options.
+ * @export
+ */
+export type WatchBlocksResponseV1 = WatchBlocksCactusErrorResponseV1 | WatchBlocksCactusTransactionsResponseV1 | WatchBlocksFilteredResponseV1 | WatchBlocksFullResponseV1 | WatchBlocksPrivateResponseV1;
+
+/**
+ * Websocket requests for monitoring new blocks.
+ * @export
+ * @enum {string}
+ */
+
+export enum WatchBlocksV1 {
+    Subscribe = 'org.hyperledger.cactus.api.async.hlfabric.WatchBlocksV1.Subscribe',
+    Next = 'org.hyperledger.cactus.api.async.hlfabric.WatchBlocksV1.Next',
+    Unsubscribe = 'org.hyperledger.cactus.api.async.hlfabric.WatchBlocksV1.Unsubscribe',
+    Error = 'org.hyperledger.cactus.api.async.hlfabric.WatchBlocksV1.Error',
+    Complete = 'org.hyperledger.cactus.api.async.hlfabric.WatchBlocksV1.Complete'
+}
+
+/**
  * web-socket key details for signing fabric message with private key stored with external client
  * @export
  * @interface WebSocketKey

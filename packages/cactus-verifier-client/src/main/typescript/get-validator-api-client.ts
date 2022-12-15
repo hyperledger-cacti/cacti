@@ -30,6 +30,11 @@ import {
   IrohaApiClientOptions,
 } from "@hyperledger/cactus-plugin-ledger-connector-iroha";
 
+import {
+  FabricApiClient,
+  FabricApiClientOptions,
+} from "@hyperledger/cactus-plugin-ledger-connector-fabric";
+
 /**
  * Configuration of ApiClients currently supported by Verifier and VerifierFactory
  * Each entry key defines the name of the connection type that has to be specified in VerifierFactory config.
@@ -61,6 +66,10 @@ export type ClientApiConfig = {
     in: IrohaApiClientOptions;
     out: IrohaApiClient;
   };
+  FABRIC_2X: {
+    in: FabricApiClientOptions;
+    out: FabricApiClient;
+  };
 };
 
 /**
@@ -88,6 +97,8 @@ export function getValidatorApiClient<K extends keyof ClientApiConfig>(
       return new CordaApiClient(options as CordaApiClientOptions);
     case "IROHA_1X":
       return new IrohaApiClient(options as IrohaApiClientOptions);
+    case "FABRIC_2X":
+      return new FabricApiClient(options as FabricApiClientOptions);
     default:
       // Will not compile if any ClientApiConfig key was not handled by this switch
       const _: never = validatorType;

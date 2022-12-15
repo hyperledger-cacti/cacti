@@ -22,6 +22,11 @@ import {
   Wallet,
 } from "fabric-network";
 
+import type {
+  Server as SocketIoServer,
+  Socket as SocketIoSocket,
+} from "socket.io";
+
 import OAS from "../json/openapi.json";
 
 import {
@@ -55,6 +60,8 @@ import {
   GetPrometheusExporterMetricsEndpointV1,
 } from "./get-prometheus-exporter-metrics/get-prometheus-exporter-metrics-endpoint-v1";
 
+import { WatchBlocksV1Endpoint } from "./watch-blocks/watch-blocks-v1-endpoint";
+
 import {
   ConnectionProfile,
   GatewayDiscoveryOptions,
@@ -75,6 +82,8 @@ import {
   GatewayOptions,
   GetBlockRequestV1,
   GetBlockResponseV1,
+  WatchBlocksV1,
+  WatchBlocksOptionsV1,
 } from "./generated/openapi/typescript-axios/index";
 
 import {
@@ -168,6 +177,7 @@ export class PluginLedgerConnectorFabric
   private endpoints: IWebServiceEndpoint[] | undefined;
   private readonly secureIdentity: SecureIdentityProviders;
   private readonly certStore: CertDatastore;
+  private runningWatchBlocksMonitors = new Set<WatchBlocksV1Endpoint>();
 
   public get className(): string {
     return PluginLedgerConnectorFabric.CLASS_NAME;
@@ -221,7 +231,8 @@ export class PluginLedgerConnectorFabric
   }
 
   public async shutdown(): Promise<void> {
-    return;
+    this.runningWatchBlocksMonitors.forEach((m) => m.close());
+    this.runningWatchBlocksMonitors.clear();
   }
 
   public getPrometheusExporter(): PrometheusExporter {
@@ -787,9 +798,70 @@ export class PluginLedgerConnectorFabric
     }
   }
 
-  async registerWebServices(app: Express): Promise<IWebServiceEndpoint[]> {
+  /**
+   * Register WatchBlocksV1 endpoint, will be triggered in response to
+   * dedicated socketio request.
+   *
+   * Adds and removes monitors from `this.runningWatchBlocksMonitors`.
+   *
+   * @param socket connected client socket.
+   * @returns socket from argument.
+   */
+  private registerWatchBlocksSocketIOEndpoint(
+    socket: SocketIoSocket,
+  ): SocketIoSocket {
+    this.log.debug("Register WatchBlocks.Subscribe handler.");
+
+    socket.on(
+      WatchBlocksV1.Subscribe,
+      async (options: WatchBlocksOptionsV1) => {
+        // Start monitoring
+        const monitor = new WatchBlocksV1Endpoint({
+          socket,
+          logLevel: this.opts.logLevel,
+          gateway: await this.createGatewayWithOptions(options.gatewayOptions),
+        });
+        this.runningWatchBlocksMonitors.add(monitor);
+        await monitor.subscribe(options);
+        this.log.debug(
+          "Running monitors count:",
+          this.runningWatchBlocksMonitors.size,
+        );
+
+        socket.on("disconnect", () => {
+          this.runningWatchBlocksMonitors.delete(monitor);
+          this.log.debug(
+            "Running monitors count:",
+            this.runningWatchBlocksMonitors.size,
+          );
+        });
+      },
+    );
+
+    return socket;
+  }
+
+  /**
+   * Register HTTP and SocketIO service endpoints.
+   *
+   * @param app express server.
+   * @param wsApi socketio server.
+   * @returns list of http endpoints.
+   */
+  async registerWebServices(
+    app: Express,
+    wsApi?: SocketIoServer,
+  ): Promise<IWebServiceEndpoint[]> {
     const webServices = await this.getOrCreateWebServices();
     await Promise.all(webServices.map((ws) => ws.registerExpress(app)));
+
+    if (wsApi) {
+      wsApi.on("connection", (socket: SocketIoSocket) => {
+        this.log.debug(`New Socket connected. ID=${socket.id}`);
+        this.registerWatchBlocksSocketIOEndpoint(socket);
+      });
+    }
+
     return webServices;
   }
 
@@ -830,6 +902,7 @@ export class PluginLedgerConnectorFabric
       const endpoint = new RunTransactionEndpointV1(opts);
       endpoints.push(endpoint);
     }
+
     {
       const opts: IRunTransactionEndpointV1Options = {
         connector: this,

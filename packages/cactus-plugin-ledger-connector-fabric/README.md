@@ -10,6 +10,9 @@
     - [1.4.1. Identity Providers](#141-identity-providers)
     - [1.4.2. Setting up a WS-X.509 provider](#142-setting-up-a-ws-x509-provider)
     - [1.4.3. Building the ws-identity docker image](#143-building-the-ws-identity-docker-image)
+  - [1.5 Monitoring new blocks (WatchBlocks)](#15-monitoring-new-blocks-watchblocks)
+    - [1.5.1 Example](#151-example)
+    - [1.5.2 Listener Type](#152-listener-type)
 - [2. Architecture](#2-architecture)
   - [2.1. run-transaction-endpoint](#21-run-transaction-endpoint)
 - [3. Containerization](#3-containerization)
@@ -27,9 +30,10 @@
 - [6. License](#6-license)
 - [7. Acknowledgments](#7-acknowledgments)
 
+
 ## 1. Usage
 
-This plugin provides a way to interact with Fabric networks. 
+This plugin provides a way to interact with Fabric networks.
 Using this one can perform:
 * Deploy smart contracts (chaincode).
 * Execute transactions on the ledger.
@@ -81,7 +85,7 @@ try {
 
 ### 1.3. Using Via The API Client
 
-**Prerequisites** 
+**Prerequisites**
 - A running Fabric ledger (network)
 - You have a running Cactus API server on `$HOST:$PORT` with the Fabric connector plugin installed on it (and the latter configured to have access to the Fabric ledger from point 1)
 
@@ -250,7 +254,7 @@ await connector.rotateKey(
 Identity providers allows client to manage their private more effectively and securely. Cactus Fabric Connector support multiple type of providers. Each provider differ based upon where the private are stored. On High level certificate credential are stored as
 
 ```typescript
-{  
+{
   type: FabricSigningCredentialType;
   credentials: {
     certificate: string;
@@ -277,6 +281,58 @@ The following packages are used to access private keys (via web-socket)  stored 
 
 TBD
 
+### 1.5 Monitoring new blocks (WatchBlocks)
+- Use `ApiClient` to receive new blocks from a fabric ledger.
+- Type of the response can be configured.
+- Credentials must be configured using `gatewayOptions` argument (you can either send them directly in request or use wallet stored in keychain).
+
+#### 1.5.1 Example
+For more detailed example check [fabric-watch-blocks-v1-endpoint.test.ts](./src/test/typescript/integration/fabric-v2-2-x/fabric-watch-blocks-v1-endpoint.test.ts)
+
+``` typescript
+// Setup
+const signingCredential = {
+  keychainId: uuidv4(),
+  keychainRef: "user2",
+};
+
+// Create RxJS Observable.
+// This will connect to the fabric connector and start the monitoring operation.
+const watchObservable = apiClient.watchBlocksV1({
+  channelName: "mychannel", // fabric channel name
+  gatewayOptions: { // use signing credential from keychain
+    identity: signingCredential.keychainRef,
+    wallet: {
+      keychain: signingCredential,
+    },
+  },
+  WatchBlocksListenerTypeV1.Full, // return full block data
+});
+
+// Subscribe to the observable to receive new blocks
+const subscription = watchObservable.subscribe({
+  next(event) {
+    // Handle new event
+  },
+  error(err) {
+    // Handle error from connector
+  },
+});
+```
+
+#### 1.5.2 Listener Type
+There are two types of listener type - original and cactus ones.
+
+##### Original
+Corresponds directly to `BlockType` from `fabric-common`:
+  - `WatchBlocksListenerTypeV1.Filtered`,
+  - `WatchBlocksListenerTypeV1.Full`,
+  - `WatchBlocksListenerTypeV1.Private`,
+
+##### Cactus (custom)
+Parses the data and returns custom formatted block.
+- `WatchBlocksListenerTypeV1.CactusTransactions`: Returns transactions summary. Compatible with legacy `fabric-socketio` monitoring operation.
+
 ## 2. Architecture
 The sequence diagrams for various endpoints are mentioned below
 
@@ -292,7 +348,7 @@ The above diagram shows the sequence diagram of transact() method of the PluginL
 
 ![run-transaction-endpoint-enroll](docs/architecture/images/run-transaction-endpoint-enroll.png)
 
-The above diagram shows the sequence diagram of enroll() method of the PluginLedgerConnectorFabric class. The caller to this function, which in reference to the above sequence diagram is API server, sends Signer object along with EnrollmentRequest as an argument to the enroll() method. Based on the singerType (FabricSigningCredentialType.X509, FabricSigningCredentialType.VaultX509, FabricSigningCredentialType.WsX509), corresponding identity is enrolled and stored inside keychain. 
+The above diagram shows the sequence diagram of enroll() method of the PluginLedgerConnectorFabric class. The caller to this function, which in reference to the above sequence diagram is API server, sends Signer object along with EnrollmentRequest as an argument to the enroll() method. Based on the singerType (FabricSigningCredentialType.X509, FabricSigningCredentialType.VaultX509, FabricSigningCredentialType.WsX509), corresponding identity is enrolled and stored inside keychain.
 
 
 

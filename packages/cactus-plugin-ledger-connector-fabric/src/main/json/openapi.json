@@ -1085,6 +1085,210 @@
             "PrometheusExporterMetricsResponse": {
                 "type": "string",
                 "nullable": false
+            },
+            "WatchBlocksV1": {
+                "type": "string",
+                "description": "Websocket requests for monitoring new blocks.",
+                "enum": [
+                    "org.hyperledger.cactus.api.async.hlfabric.WatchBlocksV1.Subscribe",
+                    "org.hyperledger.cactus.api.async.hlfabric.WatchBlocksV1.Next",
+                    "org.hyperledger.cactus.api.async.hlfabric.WatchBlocksV1.Unsubscribe",
+                    "org.hyperledger.cactus.api.async.hlfabric.WatchBlocksV1.Error",
+                    "org.hyperledger.cactus.api.async.hlfabric.WatchBlocksV1.Complete"
+                ],
+                "x-enum-varnames": [
+                    "Subscribe",
+                    "Next",
+                    "Unsubscribe",
+                    "Error",
+                    "Complete"
+                ]
+            },
+            "WatchBlocksListenerTypeV1": {
+                "type": "string",
+                "description": "Response type from WatchBlocks. 'Cactus*' are custom views, others correspond to fabric SDK call.",
+                "enum": [
+                    "filtered",
+                    "full",
+                    "private",
+                    "cactus:transactions"
+                ],
+                "x-enum-varnames": [
+                    "Filtered",
+                    "Full",
+                    "Private",
+                    "CactusTransactions"
+                ]
+            },
+            "WatchBlocksOptionsV1": {
+                "type": "object",
+                "description": "Options passed when subscribing to block monitoring.",
+                "required": [
+                    "channelName",
+                    "gatewayOptions",
+                    "type"
+                ],
+                "properties": {
+                    "channelName": {
+                        "type": "string",
+                        "description": "Hyperledger Fabric channel to connect to.",
+                        "minLength": 1,
+                        "maxLength": 100,
+                        "nullable": false
+                    },
+                    "gatewayOptions": {
+                        "$ref": "#/components/schemas/GatewayOptions",
+                        "description": "Options to Hyperledger Fabric Node SDK Gateway",
+                        "nullable": false
+                    },
+                    "type": {
+                        "$ref": "#/components/schemas/WatchBlocksListenerTypeV1",
+                        "description": "Type of response block to return.",
+                        "nullable": false
+                    },
+                    "startBlock": {
+                        "type": "string",
+                        "description": "From which block start monitoring. Defaults to latest.",
+                        "minLength": 1,
+                        "maxLength": 100,
+                        "nullable": false
+                    }
+                }
+            },
+            "WatchBlocksCactusTransactionsEventV1": {
+                "type": "object",
+                "description": "Transaction summary from commited block.",
+                "required": [
+                    "chaincodeId",
+                    "transactionId",
+                    "functionName",
+                    "functionArgs"
+                ],
+                "properties": {
+                    "chaincodeId": {
+                        "description": "ChainCode containing function that was executed.",
+                        "nullable": false,
+                        "type": "string"
+                    },
+                    "transactionId": {
+                        "description": "Transaction identifier.",
+                        "nullable": false,
+                        "type": "string"
+                    },
+                    "functionName": {
+                        "description": "Function name that was executed.",
+                        "nullable": false,
+                        "type": "string"
+                    },
+                    "functionArgs": {
+                        "description": "List of function arguments.",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "minLength": 0,
+                            "nullable": false
+                        }
+                    }
+                }
+            },
+            "WatchBlocksCactusTransactionsResponseV1": {
+                "type": "object",
+                "description": "Custom response containing block transactions summary. Compatible with legacy fabric-socketio connector monitoring.",
+                "required": [
+                    "cactusTransactionsEvents"
+                ],
+                "properties": {
+                    "cactusTransactionsEvents": {
+                        "description": "List of transactions summary",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/WatchBlocksCactusTransactionsEventV1",
+                            "nullable": false
+                        }
+                    }
+                }
+            },
+            "WatchBlocksFullResponseV1": {
+                "type": "object",
+                "description": "Response that corresponds to Fabric SDK 'full' EventType.",
+                "required": [
+                    "fullBlock"
+                ],
+                "properties": {
+                    "fullBlock": {
+                        "description": "Full commited block.",
+                        "nullable": false
+                    }
+                }
+            },
+            "WatchBlocksFilteredResponseV1": {
+                "type": "object",
+                "description": "Response that corresponds to Fabric SDK 'filtered' EventType.",
+                "required": [
+                    "filteredBlock"
+                ],
+                "properties": {
+                    "filteredBlock": {
+                        "description": "Filtered commited block.",
+                        "nullable": false
+                    }
+                }
+            },
+            "WatchBlocksPrivateResponseV1": {
+                "type": "object",
+                "description": "Response that corresponds to Fabric SDK 'private' EventType.",
+                "required": [
+                    "privateBlock"
+                ],
+                "properties": {
+                    "privateBlock": {
+                        "description": "Private commited block.",
+                        "nullable": false
+                    }
+                }
+            },
+            "WatchBlocksCactusErrorResponseV1": {
+                "type": "object",
+                "description": "Error response from WatchBlocks operation.",
+                "required": [
+                    "code",
+                    "errorMessage"
+                ],
+                "properties": {
+                    "code": {
+                        "description": "Error code.",
+                        "type": "number"
+                    },
+                    "errorMessage": {
+                        "description": "Description of the error.",
+                        "type": "string"
+                    }
+                }
+            },
+            "WatchBlocksResponseV1": {
+                "description": "Response block from WatchBlocks endpoint. Depends on 'type' passed in subscription options.",
+                "oneOf": [
+                    {
+                        "$ref": "#/components/schemas/WatchBlocksCactusTransactionsResponseV1",
+                        "nullable": false
+                    },
+                    {
+                        "$ref": "#/components/schemas/WatchBlocksFullResponseV1",
+                        "nullable": false
+                    },
+                    {
+                        "$ref": "#/components/schemas/WatchBlocksFilteredResponseV1",
+                        "nullable": false
+                    },
+                    {
+                        "$ref": "#/components/schemas/WatchBlocksPrivateResponseV1",
+                        "nullable": false
+                    },
+                    {
+                        "$ref": "#/components/schemas/WatchBlocksCactusErrorResponseV1",
+                        "nullable": false
+                    }
+                ]
             }
         }
     },
