@@ -368,7 +368,7 @@ A Fabric distributed application's business logic code spans two layers as illus
                 	return true, nil
                 }
                 ```
-                <!--
+<!--
                 3. *IsAssetLocked*
                 ```go
                 func (s *SmartContract) IsAssetLocked(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto64 string) (bool, error) {
@@ -473,7 +473,7 @@ A Fabric distributed application's business logic code spans two layers as illus
                 	return true, nil
                 }
                 ```
-                -->
+-->
                 Add following extra utility functions as well:
                 ```go
                 func (s *SmartContract) GetHTLCHash(ctx contractapi.TransactionContextInterface, callerChaincodeID, assetAgreementBytesBase64 string) (string, error) {
