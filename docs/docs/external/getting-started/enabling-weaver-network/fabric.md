@@ -130,7 +130,10 @@ A Fabric distributed application's business logic code spans two layers as illus
     ```
     An agent from a foreign network can query either `http://myorg1.mynetwork.com:9000/sec_group` or `http://myorg2.mynetwork.com:9000/sec_group` and obtain the security domain (or membership) configuration of the entire network.
   * **Interoperation Helpers**: Your Fabric network's Layer-2 applications have business logic embedded in them that, broadly speaking, accept data from users and other external agents and invoke smart contracts using library functions and APIs offered by the Fabric SDK. With the option of interoperability with other networks available through Weaver, other options can be added, namely requesting and accepting data from foreign networks, and triggering locks and claims for atomic exchanges spanning two networks. Weaver's Fabric Interoperation SDK (currently implemented both in Node.js and Golang) offers a library to exercise these options, supplementing the Fabric SDK. But this will involve modification to the application's business logic. The following examples will illustrate how you can adapt your applications.
-    - #### Data sharing: Consider a scenario inspired by the [global trade use case](../../user-stories/global-trade.md) where a letter of credit (L/C) management business logic (chaincode `letterofcreditcc`) installed in the `tradefinancechannel` channel in the `trade-finance-network` network supports a transaction `RecordBillOfLading`, which validates and records a bill of lading (B/L) supplied by a user via a UI. Weaver will enable such a B/L to be fetched from a different network `trade-logistics-network` by querying the function `GetBillOfLading` exposed by the chaincode `shipmentcc` installed in the `tradelogisticschannel` channel.
+  
+    #### Data sharing
+    
+    Consider a scenario inspired by the [global trade use case](../../user-stories/global-trade.md) where a letter of credit (L/C) management business logic (chaincode `letterofcreditcc`) installed in the `tradefinancechannel` channel in the `trade-finance-network` network supports a transaction `RecordBillOfLading`, which validates and records a bill of lading (B/L) supplied by a user via a UI. Weaver will enable such a B/L to be fetched from a different network `trade-logistics-network` by querying the function `GetBillOfLading` exposed by the chaincode `shipmentcc` installed in the `tradelogisticschannel` channel.
       
       (In preparation, a suitable access control policy must be recorded on `tradelogisticschannel` in `trade-logistics-network`, and a suitable verification policy must be recorded on `tradefinancechannel` in `trade-finance-network`. We will see how to do this in the "Startup and Boostrap" section later.)
       
@@ -193,396 +196,397 @@ A Fabric distributed application's business logic code spans two layers as illus
       ```
       Replace `<personal-access-token>` in this file with the token you created in Github.
 
-    - #### Asset exchange:
-        - _Client Application_:
-            You need to first add the following dependency to the `dependencies` section of your layer-2 application's `package.json` file:
-            ```json
-            "@hyperledger-labs/weaver-fabric-interop-sdk": "latest",
-            ```
-            (Or check out the [package website](https://github.com/hyperledger-labs/weaver-dlt-interoperability/packages/888424) and select a different version.)
+    #### Asset exchange
+    
+    - _Client Application_:
+        You need to first add the following dependency to the `dependencies` section of your layer-2 application's `package.json` file:
+        ```json
+        "@hyperledger-labs/weaver-fabric-interop-sdk": "latest",
+        ```
+        (Or check out the [package website](https://github.com/hyperledger-labs/weaver-dlt-interoperability/packages/888424) and select a different version.)
 
-            Before you run `npm install` to fetch the dependencies, make sure you create a [personal access token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) with `read:packages` access in Github. Create an `.npmrc` file in the same folder as the `package.json` with the following contents:
-            ```
-            registry=https://npm.pkg.github.com/hyperledger-labs
-            //npm.pkg.github.com/:_authToken=<personal-access-token>
-            ```
-            Replace `<personal-access-token>` in this file with the token you created in Github.
-            
-            Let's take an example of asset exchange between `Alice` and `Bob`, where Bob wants to purchase an asset of type `Gold` with id `A123` from `Alice` in `BondNetwork` in exchange for `200` tokens of type `CBDC01` in `TokenNetwork`.
-            
-            `Alice` needs to select a secret text (say `s`), and hash it (say `H`) using say `SHA512`, which will be used to lock her asset in `BondNetwork`. To lock the non-fungible asset using hash `H` and timeout duration of 10 minutes, you need to add following code snippet in your application:
-            ```typescript
-            import { AssetManager, HashFunctions } from '@hyperledger-labs/weaver-fabric-interop-sdk'
-            
-            const hash = HashFunctions.SHA512();    // Create Hash instance of one of the supported Hash Algorithm
-            hash.setSerializedHashBase64(H);        // Set the Hash
-            const timeout = Math.floor(Date.now()/1000) + 10 * 60;
-            
-            const bondContract = <handle-to-fabric-application-chaincode-in-bond-network>;
-            
-            const result = await AssetManager.createHTLC(
-                bondContract,
-                "Gold",             // Asset ID
-                "A123",             // Asset Type
-                bobCertificate,     // Certificate of Bob in Bond Network
-                hash,                  // Hash generated by Alice using her secret s
-                timeout,            // Timeout in epoch for 10 mins from current time
-                null                // Optional callback function to be called after the asset is locked
-            );
-            let bondContractId = result.result; // Unique ID for this asset exchange contract in BondNetwork
-            ```
-            
-            Now `Bob` will lock his tokens in `TokenNetwork`. To lock the fungible asset using same hash `H` and timeout of 5 minutes (half the timeout duration used by Alice in `BondNetwork`), add following code snippet in your application:
-            ```typescript
-            const hash = HashFunctions.SHA512();    // Create Hash instance of one of the supported Hash Algorithm
-            hash.setSerializedHashBase64(H);        // Set the Hash
-            const timeout = Math.floor(Date.now()/1000) + 5 * 60;
-            
-            const tokenContract = <handle-to-fabric-application-chaincode-in-token-network>;
-            const result = await AssetManager.createFungibleHTLC(
-                tokenContract,
-                "CBDC01",               // Token ID
-                200,                    // Token Quantity
-                aliceCertificate,       // Certificate of Alice in Token Network
-                hash,                      // Hash H used by Alice in Bond Network
-                timeout,                // Timeout in epoch for 5 mins from current time
-                null                    // Optional callback function to be called after the asset is locked
-            )
-            const tokenContractId = result.result // Unique ID for this asset exchange contract in TokenNetwork
-            ```
-            
-            To query whether the assets are locked or not in any network, use following query function:
-            ```typescript
-            const contract = <handle-to-fabric-application-chaincode>;
-            // Below contractId is the ID obtained during lock
-            const isLocked = AssetManager.isAssetLockedInHTLCqueryUsingContractId(contract, contractId)
-            ```
-            
-            Now to claim the asset using the secret text (pre-image of hash) `s`, add following code snippet:
-            ```typescript
-            const hash = HashFunctions.SHA512();    // Create Hash instance of one of the supported Hash Algorithm
-            hash.setPreimage(s)                     // Set Pre-Image s
-            const contract = <handle-to-fabric-application-chaincode>;
-            const claimSuccess = await AssetManager.claimAssetInHTLCusingContractId(
-                contract,
-                contractId,                         // contractId obtained during lock
-                hash
-            )
-            // return value claimSuccess is boolean indicating success or failure of claim
-            ```
-            
-            If the asset has to be unlocked, use following code snippet:
-            ```typescript
-            const contract = <handle-to-fabric-application-chaincode>;
-            const reclaimSuccess = await AssetManager.reclaimAssetInHTLCusingContractId(
-                contract,
-                contractId                          // contractId obtained during lock
-            )
-            // return value reclaimSuccess is boolean indicating success or failure of reclaim
-            ```
+        Before you run `npm install` to fetch the dependencies, make sure you create a [personal access token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) with `read:packages` access in Github. Create an `.npmrc` file in the same folder as the `package.json` with the following contents:
+        ```
+        registry=https://npm.pkg.github.com/hyperledger-labs
+        //npm.pkg.github.com/:_authToken=<personal-access-token>
+        ```
+        Replace `<personal-access-token>` in this file with the token you created in Github.
         
-        - _Application Chaincode_:
-            Application Chaincode can be developed in two ways, either use weaver `assetexchange` as library, or use interop chaincode to handle asset exchange by doing a chaincode to chaincode call.
-            - Use Library `AssetExchange`:
-                This method doesn't require `interop` chaincode to be installed. In you smart contract `go.mod`, add following in require (update the version according to the latest module version):
-                ```
-                require(
-                    ...
-                	github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go v1.5.3
-                	github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange v1.5.3
-                    ...
-                )
-                ```
-                Atleast following 5 functions needs to be added in chaincode (Note: the function signature, i.e. the name,  arguments and return values needs to be exactly same):
-                1. *LockAsset*
-                ```go
-                import (
-                	...
-                	"github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange"
-                )
-                func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, assetExchangeAgreementSerializedProto64 string, lockInfoSerializedProto64 string) (string, error) {
-                    // Add some safety checks before calling LockAsset from library
-                    // Caller of this chaincode is supposed to be the Locker and the owner of the asset being locked.
-                    contractId, err := assetexchange.LockAsset(ctx, "", assetExchangeAgreementSerializedProto64, lockInfoSerializedProto64)
-                	if err != nil {
-                		return "", logThenErrorf(err.Error())
-                	}
-                    // Post proccessing of asset after LockAsset called like change status of the asset so that it can't be spent.
-                    
-                    return contractId, nil
-                }
-                ```
-                Here `assetExchangeAgreementSerializedProto64` is serialized protobuf in base64 encoded string of `AssetExchangeAgreement` protobuf structure, and can be used to extract details like asset id, type of asset and recipient. Check the structure definition [https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/rfcs/formats/assets/exchange.md#representing-two-party-asset-exchange-agreements](here). 
-                Similarly `lockInfoSerializedProto64` is serialized protobuf in base64 encoded string of `AssetLock` protobuf structure. Check the structure definition [https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/rfcs/formats/assets/exchange.md#representing-locks-on-assets](here).
+        Let's take an example of asset exchange between `Alice` and `Bob`, where Bob wants to purchase an asset of type `Gold` with id `A123` from `Alice` in `BondNetwork` in exchange for `200` tokens of type `CBDC01` in `TokenNetwork`.
+        
+        `Alice` needs to select a secret text (say `s`), and hash it (say `H`) using say `SHA512`, which will be used to lock her asset in `BondNetwork`. To lock the non-fungible asset using hash `H` and timeout duration of 10 minutes, you need to add following code snippet in your application:
+        ```typescript
+        import { AssetManager, HashFunctions } from '@hyperledger-labs/weaver-fabric-interop-sdk'
+        
+        const hash = HashFunctions.SHA512();    // Create Hash instance of one of the supported Hash Algorithm
+        hash.setSerializedHashBase64(H);        // Set the Hash
+        const timeout = Math.floor(Date.now()/1000) + 10 * 60;
+        
+        const bondContract = <handle-to-fabric-application-chaincode-in-bond-network>;
+        
+        const result = await AssetManager.createHTLC(
+            bondContract,
+            "Gold",             // Asset ID
+            "A123",             // Asset Type
+            bobCertificate,     // Certificate of Bob in Bond Network
+            hash,                  // Hash generated by Alice using her secret s
+            timeout,            // Timeout in epoch for 10 mins from current time
+            null                // Optional callback function to be called after the asset is locked
+        );
+        let bondContractId = result.result; // Unique ID for this asset exchange contract in BondNetwork
+        ```
+        
+        Now `Bob` will lock his tokens in `TokenNetwork`. To lock the fungible asset using same hash `H` and timeout of 5 minutes (half the timeout duration used by Alice in `BondNetwork`), add following code snippet in your application:
+        ```typescript
+        const hash = HashFunctions.SHA512();    // Create Hash instance of one of the supported Hash Algorithm
+        hash.setSerializedHashBase64(H);        // Set the Hash
+        const timeout = Math.floor(Date.now()/1000) + 5 * 60;
+        
+        const tokenContract = <handle-to-fabric-application-chaincode-in-token-network>;
+        const result = await AssetManager.createFungibleHTLC(
+            tokenContract,
+            "CBDC01",               // Token ID
+            200,                    // Token Quantity
+            aliceCertificate,       // Certificate of Alice in Token Network
+            hash,                      // Hash H used by Alice in Bond Network
+            timeout,                // Timeout in epoch for 5 mins from current time
+            null                    // Optional callback function to be called after the asset is locked
+        )
+        const tokenContractId = result.result // Unique ID for this asset exchange contract in TokenNetwork
+        ```
+        
+        To query whether the assets are locked or not in any network, use following query function:
+        ```typescript
+        const contract = <handle-to-fabric-application-chaincode>;
+        // Below contractId is the ID obtained during lock
+        const isLocked = AssetManager.isAssetLockedInHTLCqueryUsingContractId(contract, contractId)
+        ```
+        
+        Now to claim the asset using the secret text (pre-image of hash) `s`, add following code snippet:
+        ```typescript
+        const hash = HashFunctions.SHA512();    // Create Hash instance of one of the supported Hash Algorithm
+        hash.setPreimage(s)                     // Set Pre-Image s
+        const contract = <handle-to-fabric-application-chaincode>;
+        const claimSuccess = await AssetManager.claimAssetInHTLCusingContractId(
+            contract,
+            contractId,                         // contractId obtained during lock
+            hash
+        )
+        // return value claimSuccess is boolean indicating success or failure of claim
+        ```
+        
+        If the asset has to be unlocked, use following code snippet:
+        ```typescript
+        const contract = <handle-to-fabric-application-chaincode>;
+        const reclaimSuccess = await AssetManager.reclaimAssetInHTLCusingContractId(
+            contract,
+            contractId                          // contractId obtained during lock
+        )
+        // return value reclaimSuccess is boolean indicating success or failure of reclaim
+        ```
+    
+    - _Application Chaincode_:
+        Application Chaincode can be developed in two ways, either use weaver `assetexchange` as library, or use interop chaincode to handle asset exchange by doing a chaincode to chaincode call.
+        - Use Library `AssetExchange`:
+            This method doesn't require `interop` chaincode to be installed. In you smart contract `go.mod`, add following in require (update the version according to the latest module version):
+            ```
+            require(
+                ...
+            	github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go v1.5.3
+            	github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange v1.5.3
+                ...
+            )
+            ```
+            Atleast following 5 functions needs to be added in chaincode (Note: the function signature, i.e. the name,  arguments and return values needs to be exactly same):
+            1. *LockAsset*
+            ```go
+            import (
+            	...
+            	"github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange"
+            )
+            func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, assetExchangeAgreementSerializedProto64 string, lockInfoSerializedProto64 string) (string, error) {
+                // Add some safety checks before calling LockAsset from library
+                // Caller of this chaincode is supposed to be the Locker and the owner of the asset being locked.
+                contractId, err := assetexchange.LockAsset(ctx, "", assetExchangeAgreementSerializedProto64, lockInfoSerializedProto64)
+            	if err != nil {
+            		return "", logThenErrorf(err.Error())
+            	}
+                // Post proccessing of asset after LockAsset called like change status of the asset so that it can't be spent.
                 
-                2. *LockFungibleAsset*
-                ```go
-                func (s *SmartContract) LockFungibleAsset(ctx contractapi.TransactionContextInterface, fungibleAssetExchangeAgreementSerializedProto64 string, lockInfoSerializedProto64 string) (string, error) {
-                    // Add some safety checks before calling LockFungibleAsset from library
-                    // Caller of this chaincode is supposed to be the Locker and the owner of the asset being locked.
-                    contractId, err := assetexchange.LockFungibleAsset(ctx, "", fungibleAssetExchangeAgreementSerializedProto64, lockInfoSerializedProto64)
-                	if err != nil {
-                		return "", logThenErrorf(err.Error())
-                	}
-                    // Post proccessing of asset after LockFungibleAsset called like reduce the amount of tokens owned by the locker, or mark it locked so that it can't be spent.
-                    
-                    return contractId, nil
-                }
-                ```
-                Here `fungibleAssetExchangeAgreementSerializedProto64` is serialized protobuf in base64 encoded string of `FungibleAssetExchangeAgreement` protobuf structure, and can be used to extract details like asset quantity, type of asset and recipient. Check the structure definition [https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/rfcs/formats/assets/exchange.md#representing-two-party-asset-exchange-agreements](here).
+                return contractId, nil
+            }
+            ```
+            Here `assetExchangeAgreementSerializedProto64` is serialized protobuf in base64 encoded string of `AssetExchangeAgreement` protobuf structure, and can be used to extract details like asset id, type of asset and recipient. Check the structure definition [https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/rfcs/formats/assets/exchange.md#representing-two-party-asset-exchange-agreements](here). 
+            Similarly `lockInfoSerializedProto64` is serialized protobuf in base64 encoded string of `AssetLock` protobuf structure. Check the structure definition [https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/rfcs/formats/assets/exchange.md#representing-locks-on-assets](here).
+            
+            2. *LockFungibleAsset*
+            ```go
+            func (s *SmartContract) LockFungibleAsset(ctx contractapi.TransactionContextInterface, fungibleAssetExchangeAgreementSerializedProto64 string, lockInfoSerializedProto64 string) (string, error) {
+                // Add some safety checks before calling LockFungibleAsset from library
+                // Caller of this chaincode is supposed to be the Locker and the owner of the asset being locked.
+                contractId, err := assetexchange.LockFungibleAsset(ctx, "", fungibleAssetExchangeAgreementSerializedProto64, lockInfoSerializedProto64)
+            	if err != nil {
+            		return "", logThenErrorf(err.Error())
+            	}
+                // Post proccessing of asset after LockFungibleAsset called like reduce the amount of tokens owned by the locker, or mark it locked so that it can't be spent.
                 
-                3. *IsAssetLockedQueryUsingContractId*
-                ```go
-                func (s *SmartContract) IsAssetLockedQueryUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
-                	return assetexchange.IsAssetLockedQueryUsingContractId(ctx, contractId)
-                }
-                ```
+                return contractId, nil
+            }
+            ```
+            Here `fungibleAssetExchangeAgreementSerializedProto64` is serialized protobuf in base64 encoded string of `FungibleAssetExchangeAgreement` protobuf structure, and can be used to extract details like asset quantity, type of asset and recipient. Check the structure definition [https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/rfcs/formats/assets/exchange.md#representing-two-party-asset-exchange-agreements](here).
+            
+            3. *IsAssetLockedQueryUsingContractId*
+            ```go
+            func (s *SmartContract) IsAssetLockedQueryUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
+            	return assetexchange.IsAssetLockedQueryUsingContractId(ctx, contractId)
+            }
+            ```
+            
+            4. *ClaimAssetUsingContractId*
+            ```go
+            func (s *SmartContract) ClaimAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId, claimInfoSerializedProto64 string) (bool, error) {
+                // Note recipient will be the caller for this function
+                claimed := false
+            	err := assetexchange.ClaimAssetUsingContractId(ctx, contractId, claimInfoSerializedProto64)
+            	if err != nil {
+            		return false, logThenErrorf(err.Error())
+            	}
+                claimed = true
+                // After the above function call, update the owner of the asset with recipeint/caller
                 
-                4. *ClaimAssetUsingContractId*
-                ```go
-                func (s *SmartContract) ClaimAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId, claimInfoSerializedProto64 string) (bool, error) {
-                    // Note recipient will be the caller for this function
-                    claimed := false
-                	err := assetexchange.ClaimAssetUsingContractId(ctx, contractId, claimInfoSerializedProto64)
-                	if err != nil {
-                		return false, logThenErrorf(err.Error())
-                	}
-                    claimed = true
-                    // After the above function call, update the owner of the asset with recipeint/caller
-                    
-                    return claimed, nil
-                }
-                ```
-                
-                5. *UnlockAssetUsingContractId*
-                ```go
-                func (s *SmartContract) UnlockAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
-                	unlocked := false
-                	err := assetexchange.UnlockAssetUsingContractId(ctx, contractId)
-                	if err != nil {
-                		return false, logThenErrorf(err.Error())
-                	}
-                    unlocked = true
-                    ...
-                    ...
-                	return true, nil
-                }
-                ```
+                return claimed, nil
+            }
+            ```
+            
+            5. *UnlockAssetUsingContractId*
+            ```go
+            func (s *SmartContract) UnlockAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
+            	unlocked := false
+            	err := assetexchange.UnlockAssetUsingContractId(ctx, contractId)
+            	if err != nil {
+            		return false, logThenErrorf(err.Error())
+            	}
+                unlocked = true
+                ...
+                ...
+            	return true, nil
+            }
+            ```
 <!--
-                3. *IsAssetLocked*
-                ```go
-                func (s *SmartContract) IsAssetLocked(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto64 string) (bool, error) {
-                	return assetexchange.IsAssetLocked(ctx, "", assetAgreementSerializedProto64)
-                }
-                ```
+            3. *IsAssetLocked*
+            ```go
+            func (s *SmartContract) IsAssetLocked(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto64 string) (bool, error) {
+            	return assetexchange.IsAssetLocked(ctx, "", assetAgreementSerializedProto64)
+            }
+            ```
+            
+            5. *IsFungibleAssetLocked*
+            ```go
+            func (s *SmartContract) IsFungibleAssetLocked(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
+            	return assetexchange.IsFungibleAssetLocked(ctx, contractId)
+            }
+            ```
+            
+            6. *ClaimAsset*
+            ```go
+            func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto64 string, claimInfoSerializedProto64 string) (bool, error) {
+                // Note recipient will be the caller for this function
+                claimed := false
+            	claimed, err = assetexchange.ClaimAsset(ctx, "", assetAgreementSerializedProto64, claimInfoSerializedProto64)
+            	if err != nil {
+            		return false, logThenErrorf(err.Error())
+            	}
+                // After the above function call, update the owner of the asset with recipeint/caller
                 
-                5. *IsFungibleAssetLocked*
-                ```go
-                func (s *SmartContract) IsFungibleAssetLocked(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
-                	return assetexchange.IsFungibleAssetLocked(ctx, contractId)
-                }
-                ```
+                return claimed, nil
+            }
+            ```
+            
+            7. *ClaimAssetUsingContractId*
+            ```go
+            func (s *SmartContract) ClaimAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId, claimInfoSerializedProto64 string) (bool, error) {
+                // Note recipient will be the caller for this function
+                claimed := false
+            	err := assetexchange.ClaimAssetUsingContractId(ctx, contractId, claimInfoSerializedProto64)
+            	if err != nil {
+            		return false, logThenErrorf(err.Error())
+            	}
+                claimed = true
+                // After the above function call, update the owner of the asset with recipeint/caller
                 
-                6. *ClaimAsset*
-                ```go
-                func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto64 string, claimInfoSerializedProto64 string) (bool, error) {
-                    // Note recipient will be the caller for this function
-                    claimed := false
-                	claimed, err = assetexchange.ClaimAsset(ctx, "", assetAgreementSerializedProto64, claimInfoSerializedProto64)
-                	if err != nil {
-                		return false, logThenErrorf(err.Error())
-                	}
-                    // After the above function call, update the owner of the asset with recipeint/caller
-                    
-                    return claimed, nil
-                }
-                ```
+                return claimed, nil
+            }
+            ```
+            
+            8. *ClaimFungibleAsset*
+            ```go
+            func (s *SmartContract) ClaimFungibleAsset(ctx contractapi.TransactionContextInterface, contractId, claimInfoSerializedProto64 string) (bool, error) {
+                // Note recipient will be the caller for this function
+                claimed := false
+            	err := assetexchange.ClaimAssetUsingContractId(ctx, contractId, claimInfoSerializedProto64)
+            	if err != nil {
+            		return false, logThenErrorf(err.Error())
+            	}
+                claimed = true
+                // After the above function call, update the owner of the asset with recipeint/caller
                 
-                7. *ClaimAssetUsingContractId*
-                ```go
-                func (s *SmartContract) ClaimAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId, claimInfoSerializedProto64 string) (bool, error) {
-                    // Note recipient will be the caller for this function
-                    claimed := false
-                	err := assetexchange.ClaimAssetUsingContractId(ctx, contractId, claimInfoSerializedProto64)
-                	if err != nil {
-                		return false, logThenErrorf(err.Error())
-                	}
-                    claimed = true
-                    // After the above function call, update the owner of the asset with recipeint/caller
-                    
-                    return claimed, nil
-                }
-                ```
-                
-                8. *ClaimFungibleAsset*
-                ```go
-                func (s *SmartContract) ClaimFungibleAsset(ctx contractapi.TransactionContextInterface, contractId, claimInfoSerializedProto64 string) (bool, error) {
-                    // Note recipient will be the caller for this function
-                    claimed := false
-                	err := assetexchange.ClaimAssetUsingContractId(ctx, contractId, claimInfoSerializedProto64)
-                	if err != nil {
-                		return false, logThenErrorf(err.Error())
-                	}
-                    claimed = true
-                    // After the above function call, update the owner of the asset with recipeint/caller
-                    
-                    return claimed, nil
-                }
-                ```
-                
-                9. *UnlockAsset*
-                ```go
-                func (s *SmartContract) UnlockAsset(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto64 string) (bool, error) {
-                	unlocked := false
-                	unlocked, err = assetexchange.UnlockAsset(ctx, "", assetAgreementSerializedProto64)
-                	if err != nil {
-                		return false, logThenErrorf(err.Error())
-                	}
-                    ...
-                    ...
-                	return true, nil
-                }
-                ```
-                
-                10. *UnlockAssetUsingContractId*
-                ```go
-                func (s *SmartContract) UnlockAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
-                	unlocked := false
-                	err := assetexchange.UnlockAssetUsingContractId(ctx, contractId)
-                	if err != nil {
-                		return false, logThenErrorf(err.Error())
-                	}
-                    unlocked = true
-                    ...
-                    ...
-                	return true, nil
-                }
-                ```
-                
-                11. *UnlockFungibleAsset*
-                ```go
-                func (s *SmartContract) UnlockFungibleAsset(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
-                	unlocked := false
-                	err := assetexchange.UnlockFungibleAsset(ctx, contractId)
-                	if err != nil {
-                		return false, logThenErrorf(err.Error())
-                	}
-                    unlocked = true
-                    ...
-                    ...
-                	return true, nil
-                }
-                ```
+                return claimed, nil
+            }
+            ```
+            
+            9. *UnlockAsset*
+            ```go
+            func (s *SmartContract) UnlockAsset(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto64 string) (bool, error) {
+            	unlocked := false
+            	unlocked, err = assetexchange.UnlockAsset(ctx, "", assetAgreementSerializedProto64)
+            	if err != nil {
+            		return false, logThenErrorf(err.Error())
+            	}
+                ...
+                ...
+            	return true, nil
+            }
+            ```
+            
+            10. *UnlockAssetUsingContractId*
+            ```go
+            func (s *SmartContract) UnlockAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
+            	unlocked := false
+            	err := assetexchange.UnlockAssetUsingContractId(ctx, contractId)
+            	if err != nil {
+            		return false, logThenErrorf(err.Error())
+            	}
+                unlocked = true
+                ...
+                ...
+            	return true, nil
+            }
+            ```
+            
+            11. *UnlockFungibleAsset*
+            ```go
+            func (s *SmartContract) UnlockFungibleAsset(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
+            	unlocked := false
+            	err := assetexchange.UnlockFungibleAsset(ctx, contractId)
+            	if err != nil {
+            		return false, logThenErrorf(err.Error())
+            	}
+                unlocked = true
+                ...
+                ...
+            	return true, nil
+            }
+            ```
 -->
-                Add following extra utility functions as well:
-                ```go
-                func (s *SmartContract) GetHTLCHash(ctx contractapi.TransactionContextInterface, callerChaincodeID, assetAgreementBytesBase64 string) (string, error) {
-                	return assetexchange.GetHTLCHash(ctx, callerChaincodeID, assetAgreementBytesBase64)
-                }
-                func (s *SmartContract) GetHTLCHashByContractId(ctx contractapi.TransactionContextInterface, contractId string) (string, error) {
-                	return assetexchange.GetHTLCHashByContractId(ctx, contractId)
-                }
-                func (s *SmartContract) GetHTLCHashPreImage(ctx contractapi.TransactionContextInterface, callerChaincodeID, assetAgreementBytesBase64 string) (string, error) {
-                	return assetexchange.GetHTLCHashPreImage(ctx, callerChaincodeID, assetAgreementBytesBase64)
-                }
-                func (s *SmartContract) GetHTLCHashPreImageByContractId(ctx contractapi.TransactionContextInterface, contractId string) (string, error) {
-                	return assetexchange.GetHTLCHashPreImageByContractId(ctx, contractId)
-                }
-                ```
+            Add following extra utility functions as well:
+            ```go
+            func (s *SmartContract) GetHTLCHash(ctx contractapi.TransactionContextInterface, callerChaincodeID, assetAgreementBytesBase64 string) (string, error) {
+            	return assetexchange.GetHTLCHash(ctx, callerChaincodeID, assetAgreementBytesBase64)
+            }
+            func (s *SmartContract) GetHTLCHashByContractId(ctx contractapi.TransactionContextInterface, contractId string) (string, error) {
+            	return assetexchange.GetHTLCHashByContractId(ctx, contractId)
+            }
+            func (s *SmartContract) GetHTLCHashPreImage(ctx contractapi.TransactionContextInterface, callerChaincodeID, assetAgreementBytesBase64 string) (string, error) {
+            	return assetexchange.GetHTLCHashPreImage(ctx, callerChaincodeID, assetAgreementBytesBase64)
+            }
+            func (s *SmartContract) GetHTLCHashPreImageByContractId(ctx contractapi.TransactionContextInterface, contractId string) (string, error) {
+            	return assetexchange.GetHTLCHashPreImageByContractId(ctx, contractId)
+            }
+            ```
+            
+        - Use Interop Chaincode:
+            This method requires `interop` chaincode to be installed on all peers of the channel. Application chaincode needs to implement the interface `github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt`. Atleast following 5 functions needs to be implemented in chaincode (Note: the function signature, i.e. the name,  arguments and return values needs to be exactly same):
+            In you smart contract `go.mod`, add following in require (update the version according to the latest module version):
+            ```
+            require(
+                ...
+            	github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go v1.5.3
+            	github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt v1.5.3
+                ...
+            )
+            ```
+            In the Smart Contract struct add following code:
+            ```go
+            import (
+            	...
+            	am "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt"
+            )
+            type SmartContract struct {
+            	contractapi.Contract
+            	amc am.AssetManagementContract
+            }
+            ```
+            1. *LockAsset*
+            ```go
+            func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, assetExchangeAgreementSerializedProto64 string, lockInfoSerializedProto64 string) (string, error) {
+                // Add some safety checks before calling LockAsset from library
+                // Caller of this chaincode is supposed to be the Locker and the owner of the asset being locked.
+                contractId, err := s.amc.LockAsset(ctx, "", assetExchangeAgreementSerializedProto64, lockInfoSerializedProto64)
+            	if err != nil {
+            		return "", logThenErrorf(err.Error())
+            	}
+                // Post proccessing of asset after LockAsset called like change status of the asset so that it can't be spent.
                 
-            - Use Interop Chaincode:
-                This method requires `interop` chaincode to be installed on all peers of the channel. Application chaincode needs to implement the interface `github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt`. Atleast following 5 functions needs to be implemented in chaincode (Note: the function signature, i.e. the name,  arguments and return values needs to be exactly same):
-                In you smart contract `go.mod`, add following in require (update the version according to the latest module version):
-                ```
-                require(
-                    ...
-                	github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go v1.5.3
-                	github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt v1.5.3
-                    ...
-                )
-                ```
-                In the Smart Contract struct add following code:
-                ```go
-                import (
-                	...
-                	am "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt"
-                )
-                type SmartContract struct {
-                	contractapi.Contract
-                	amc am.AssetManagementContract
-                }
-                ```
-                1. *LockAsset*
-                ```go
-                func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, assetExchangeAgreementSerializedProto64 string, lockInfoSerializedProto64 string) (string, error) {
-                    // Add some safety checks before calling LockAsset from library
-                    // Caller of this chaincode is supposed to be the Locker and the owner of the asset being locked.
-                    contractId, err := s.amc.LockAsset(ctx, "", assetExchangeAgreementSerializedProto64, lockInfoSerializedProto64)
-                	if err != nil {
-                		return "", logThenErrorf(err.Error())
-                	}
-                    // Post proccessing of asset after LockAsset called like change status of the asset so that it can't be spent.
-                    
-                    return contractId, nil
-                }
-                ```
-                Here `assetExchangeAgreementSerializedProto64` is serialized protobuf in base64 encoded string of `AssetExchangeAgreement` protobuf structure, and can be used to extract details like asset id, type of asset and recipient. Check the structure definition [https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/rfcs/formats/assets/exchange.md#representing-two-party-asset-exchange-agreements](here). 
-                Similarly `lockInfoSerializedProto64` is serialized protobuf in base64 encoded string of `AssetLock` protobuf structure. Check the structure definition [https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/rfcs/formats/assets/exchange.md#representing-locks-on-assets](here).
+                return contractId, nil
+            }
+            ```
+            Here `assetExchangeAgreementSerializedProto64` is serialized protobuf in base64 encoded string of `AssetExchangeAgreement` protobuf structure, and can be used to extract details like asset id, type of asset and recipient. Check the structure definition [https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/rfcs/formats/assets/exchange.md#representing-two-party-asset-exchange-agreements](here). 
+            Similarly `lockInfoSerializedProto64` is serialized protobuf in base64 encoded string of `AssetLock` protobuf structure. Check the structure definition [https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/rfcs/formats/assets/exchange.md#representing-locks-on-assets](here).
+            
+            2. *LockFungibleAsset*
+            ```go
+            func (s *SmartContract) LockFungibleAsset(ctx contractapi.TransactionContextInterface, fungibleAssetExchangeAgreementSerializedProto64 string, lockInfoSerializedProto64 string) (string, error) {
+                // Add some safety checks before calling LockFungibleAsset from library
+                // Caller of this chaincode is supposed to be the Locker and the owner of the asset being locked.
+                contractId, err := s.amc.LockFungibleAsset(ctx, "", fungibleAssetExchangeAgreementSerializedProto64, lockInfoSerializedProto64)
+            	if err != nil {
+            		return "", logThenErrorf(err.Error())
+            	}
+                // Post proccessing of asset after LockFungibleAsset called like reduce the amount of tokens owned by the locker, or mark it locked so that it can't be spent.
                 
-                2. *LockFungibleAsset*
-                ```go
-                func (s *SmartContract) LockFungibleAsset(ctx contractapi.TransactionContextInterface, fungibleAssetExchangeAgreementSerializedProto64 string, lockInfoSerializedProto64 string) (string, error) {
-                    // Add some safety checks before calling LockFungibleAsset from library
-                    // Caller of this chaincode is supposed to be the Locker and the owner of the asset being locked.
-                    contractId, err := s.amc.LockFungibleAsset(ctx, "", fungibleAssetExchangeAgreementSerializedProto64, lockInfoSerializedProto64)
-                	if err != nil {
-                		return "", logThenErrorf(err.Error())
-                	}
-                    // Post proccessing of asset after LockFungibleAsset called like reduce the amount of tokens owned by the locker, or mark it locked so that it can't be spent.
-                    
-                    return contractId, nil
-                }
-                ```
-                Here `fungibleAssetExchangeAgreementSerializedProto64` is serialized protobuf in base64 encoded string of `FungibleAssetExchangeAgreement` protobuf structure, and can be used to extract details like asset quantity, type of asset and recipient. Check the structure definition [https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/rfcs/formats/assets/exchange.md#representing-two-party-asset-exchange-agreements](here).
+                return contractId, nil
+            }
+            ```
+            Here `fungibleAssetExchangeAgreementSerializedProto64` is serialized protobuf in base64 encoded string of `FungibleAssetExchangeAgreement` protobuf structure, and can be used to extract details like asset quantity, type of asset and recipient. Check the structure definition [https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/rfcs/formats/assets/exchange.md#representing-two-party-asset-exchange-agreements](here).
+            
+            3. *IsAssetLockedQueryUsingContractId*
+            ```go
+            func (s *SmartContract) IsAssetLockedQueryUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
+            	return s.amc.IsAssetLockedQueryUsingContractId(ctx, contractId)
+            }
+            ```
+            
+            4. *ClaimAssetUsingContractId*
+            ```go
+            func (s *SmartContract) ClaimAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId, claimInfoSerializedProto64 string) (bool, error) {
+                // Note recipient will be the caller for this function
+                claimed := false
+            	err := s.amc.ClaimAssetUsingContractId(ctx, contractId, claimInfoSerializedProto64)
+            	if err != nil {
+            		return false, logThenErrorf(err.Error())
+            	}
+                claimed = true
+                // After the above function call, update the owner of the asset with recipeint/caller
                 
-                3. *IsAssetLockedQueryUsingContractId*
-                ```go
-                func (s *SmartContract) IsAssetLockedQueryUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
-                	return s.amc.IsAssetLockedQueryUsingContractId(ctx, contractId)
-                }
-                ```
-                
-                4. *ClaimAssetUsingContractId*
-                ```go
-                func (s *SmartContract) ClaimAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId, claimInfoSerializedProto64 string) (bool, error) {
-                    // Note recipient will be the caller for this function
-                    claimed := false
-                	err := s.amc.ClaimAssetUsingContractId(ctx, contractId, claimInfoSerializedProto64)
-                	if err != nil {
-                		return false, logThenErrorf(err.Error())
-                	}
-                    claimed = true
-                    // After the above function call, update the owner of the asset with recipeint/caller
-                    
-                    return claimed, nil
-                }
-                ```
-                
-                5. *UnlockAssetUsingContractId*
-                ```go
-                func (s *SmartContract) UnlockAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
-                	unlocked := false
-                	err := s.amc.UnlockAssetUsingContractId(ctx, contractId)
-                	if err != nil {
-                		return false, logThenErrorf(err.Error())
-                	}
-                    unlocked = true
-                    ...
-                    ...
-                	return true, nil
-                }
-                ```
-                
+                return claimed, nil
+            }
+            ```
+            
+            5. *UnlockAssetUsingContractId*
+            ```go
+            func (s *SmartContract) UnlockAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
+            	unlocked := false
+            	err := s.amc.UnlockAssetUsingContractId(ctx, contractId)
+            	if err != nil {
+            		return false, logThenErrorf(err.Error())
+            	}
+                unlocked = true
+                ...
+                ...
+            	return true, nil
+            }
+            ```
+            
 
 ### Pre-Configuration
 
