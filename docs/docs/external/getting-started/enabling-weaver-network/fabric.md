@@ -27,7 +27,7 @@ Existing chaincode deployed on the network's channels remain undisturbed. All th
 
 Layer-2 applications will need some additional code and configuration because the decisions to exercise interoperation mechanisms (relay queries for data sharing or atomic asset exchanges) are strictly part of business logic. But Weaver's Fabric Interoperation Node SDK offers various helper functions to ease this process and keep the adaptation to a minimum, as we wil see later in this document. Finally, an _identity service_ must be offered by the network to expose its CAs' certificate chains to foreign networks, thereby laying the basis for interoperation. This service simply needs to offer a REST endpoint, and can be implemented as a standalone application or (more conveniently) as an augmentation of one or more of the existing Layer-2 applications.
 
-## Data Sharing and Asset Transfer: Procedure
+## Procedure
 
 Let us walk through the changes that are required in different phases of your network's creation.
 
@@ -36,6 +36,200 @@ Let us walk through the changes that are required in different phases of your ne
 A Fabric distributed application's business logic code spans two layers as illustrated in the network model:
 - _Chaincode_: 
   - _Data Sharing_: No code changes are required for Weaver enablement, as mentioned above.
+  - _Asset Exchange_: Asset exchange can be enabled in two ways, either use weaver `assetexchange` as library, or use interop chaincode to handle asset exchange by doing a chaincode to chaincode call.
+    - _Use Library `assetexchange`_: This method doesn't require `interop` chaincode to be installed. In you smart contract `go.mod`, add following in require (update the version according to the latest module version):
+      ```
+      require(
+          ...
+          github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go v1.5.3
+          github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange v1.5.3
+          ...
+      )
+      ```
+      Atleast following 5 functions needs to be added in chaincode (Note: the function signature, i.e. the name,  arguments and return values needs to be exactly same):
+      1. **LockAsset**
+        ```go
+        import (
+            ...
+            "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange"
+        )
+        func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, assetExchangeAgreementSerializedProto64 string, lockInfoSerializedProto64 string) (string, error) {
+            // Add some safety checks before calling LockAsset from library
+            // Caller of this chaincode is supposed to be the Locker and the owner of the asset being locked.
+            contractId, err := assetexchange.LockAsset(ctx, "", assetExchangeAgreementSerializedProto64, lockInfoSerializedProto64)
+            if err != nil {
+                return "", logThenErrorf(err.Error())
+            }
+            // Post proccessing of asset after LockAsset called like change status of the asset so that it can't be spent.
+            
+            return contractId, nil
+        }
+        ```
+        Here `assetExchangeAgreementSerializedProto64` is serialized protobuf in base64 encoded string of `AssetExchangeAgreement` protobuf structure, and can be used to extract details like asset id, type of asset and recipient. Check the structure definition [here](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/rfcs/formats/assets/exchange.md#representing-two-party-asset-exchange-agreements). 
+        Similarly `lockInfoSerializedProto64` is serialized protobuf in base64 encoded string of `AssetLock` protobuf structure. Check the structure definition [here](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/rfcs/formats/assets/exchange.md#representing-locks-on-assets).
+        
+      2. **LockFungibleAsset**
+        ```go
+        func (s *SmartContract) LockFungibleAsset(ctx contractapi.TransactionContextInterface, fungibleAssetExchangeAgreementSerializedProto64 string, lockInfoSerializedProto64 string) (string, error) {
+            // Add some safety checks before calling LockFungibleAsset from library
+            // Caller of this chaincode is supposed to be the Locker and the owner of the asset being locked.
+            contractId, err := assetexchange.LockFungibleAsset(ctx, "", fungibleAssetExchangeAgreementSerializedProto64, lockInfoSerializedProto64)
+            if err != nil {
+                return "", logThenErrorf(err.Error())
+            }
+            // Post proccessing of asset after LockFungibleAsset called like reduce the amount of tokens owned by the locker, or mark it locked so that it can't be spent.
+            
+            return contractId, nil
+        }
+        ```
+        Here `fungibleAssetExchangeAgreementSerializedProto64` is serialized protobuf in base64 encoded string of `FungibleAssetExchangeAgreement` protobuf structure, and can be used to extract details like asset quantity, type of asset and recipient. Check the structure definition [here](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/rfcs/formats/assets/exchange.md#representing-two-party-asset-exchange-agreements).
+        
+      3. **IsAssetLockedQueryUsingContractId**
+        ```go
+        func (s *SmartContract) IsAssetLockedQueryUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
+            return assetexchange.IsAssetLockedQueryUsingContractId(ctx, contractId)
+        }
+        ```
+        
+      4. **ClaimAssetUsingContractId**
+        ```go
+        func (s *SmartContract) ClaimAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId, claimInfoSerializedProto64 string) (bool, error) {
+            // Note recipient will be the caller for this function
+            claimed := false
+            err := assetexchange.ClaimAssetUsingContractId(ctx, contractId, claimInfoSerializedProto64)
+            if err != nil {
+                return false, logThenErrorf(err.Error())
+            }
+            claimed = true
+            // After the above function call, update the owner of the asset with recipeint/caller
+            
+            return claimed, nil
+        }
+        ```
+        
+      5. **UnlockAssetUsingContractId**
+        ```go
+        func (s *SmartContract) UnlockAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
+            unlocked := false
+            err := assetexchange.UnlockAssetUsingContractId(ctx, contractId)
+            if err != nil {
+                return false, logThenErrorf(err.Error())
+            }
+            unlocked = true
+            ...
+            ...
+            return true, nil
+        }
+        ```
+
+      6. Add following extra utility functions as well:
+        ```go
+        func (s *SmartContract) GetHTLCHash(ctx contractapi.TransactionContextInterface, callerChaincodeID, assetAgreementBytesBase64 string) (string, error) {
+            return assetexchange.GetHTLCHash(ctx, callerChaincodeID, assetAgreementBytesBase64)
+        }
+        func (s *SmartContract) GetHTLCHashByContractId(ctx contractapi.TransactionContextInterface, contractId string) (string, error) {
+            return assetexchange.GetHTLCHashByContractId(ctx, contractId)
+        }
+        func (s *SmartContract) GetHTLCHashPreImage(ctx contractapi.TransactionContextInterface, callerChaincodeID, assetAgreementBytesBase64 string) (string, error) {
+            return assetexchange.GetHTLCHashPreImage(ctx, callerChaincodeID, assetAgreementBytesBase64)
+        }
+        func (s *SmartContract) GetHTLCHashPreImageByContractId(ctx contractapi.TransactionContextInterface, contractId string) (string, error) {
+            return assetexchange.GetHTLCHashPreImageByContractId(ctx, contractId)
+        }
+        ```
+        
+    - _Use Interop Chaincode_: This method requires `interop` chaincode to be installed on all peers of the channel. Application chaincode needs to implement the interface `github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt`.
+      In you smart contract `go.mod`, add following in require (update the version according to the latest module version):
+      ```
+      require(
+          ...
+          github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go v1.5.3
+          github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt v1.5.3
+          ...
+      )
+      ```
+      In the Smart Contract struct add following code:
+      ```go
+      import (
+          ...
+          am "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt"
+      )
+      type SmartContract struct {
+          contractapi.Contract
+          amc am.AssetManagementContract
+      }
+      ```
+      Following functions needs to be implemented in chaincode (Note: the function signature, i.e. the name,  arguments and return values needs to be exactly same):
+      1. **LockAsset**
+        ```go
+        func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, assetExchangeAgreementSerializedProto64 string, lockInfoSerializedProto64 string) (string, error) {
+            // Add some safety checks before calling LockAsset from library
+            // Caller of this chaincode is supposed to be the Locker and the owner of the asset being locked.
+            contractId, err := s.amc.LockAsset(ctx, "", assetExchangeAgreementSerializedProto64, lockInfoSerializedProto64)
+            if err != nil {
+                return "", logThenErrorf(err.Error())
+            }
+            // Post proccessing of asset after LockAsset called like change status of the asset so that it can't be spent.
+            
+            return contractId, nil
+        }
+        ```
+        Here `assetExchangeAgreementSerializedProto64` is serialized protobuf in base64 encoded string of `AssetExchangeAgreement` protobuf structure, and can be used to extract details like asset id, type of asset and recipient. Check the structure definition [here](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/rfcs/formats/assets/exchange.md#representing-two-party-asset-exchange-agreements). 
+        Similarly `lockInfoSerializedProto64` is serialized protobuf in base64 encoded string of `AssetLock` protobuf structure. Check the structure definition [here](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/rfcs/formats/assets/exchange.md#representing-locks-on-assets).
+    
+      2. **LockFungibleAsset**
+        ```go
+        func (s *SmartContract) LockFungibleAsset(ctx contractapi.TransactionContextInterface, fungibleAssetExchangeAgreementSerializedProto64 string, lockInfoSerializedProto64 string) (string, error) {
+            // Add some safety checks before calling LockFungibleAsset from library
+            // Caller of this chaincode is supposed to be the Locker and the owner of the asset being locked.
+            contractId, err := s.amc.LockFungibleAsset(ctx, "", fungibleAssetExchangeAgreementSerializedProto64, lockInfoSerializedProto64)
+            if err != nil {
+                return "", logThenErrorf(err.Error())
+            }
+            // Post proccessing of asset after LockFungibleAsset called like reduce the amount of tokens owned by the locker, or mark it locked so that it can't be spent.
+            
+            return contractId, nil
+        }
+        ```
+        Here `fungibleAssetExchangeAgreementSerializedProto64` is serialized protobuf in base64 encoded string of `FungibleAssetExchangeAgreement` protobuf structure, and can be used to extract details like asset quantity, type of asset and recipient. Check the structure definition [here](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/rfcs/formats/assets/exchange.md#representing-two-party-asset-exchange-agreements).
+      
+      3. **IsAssetLockedQueryUsingContractId**
+        ```go
+        func (s *SmartContract) IsAssetLockedQueryUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
+            return s.amc.IsAssetLockedQueryUsingContractId(ctx, contractId)
+        }
+        ```
+      
+      4. **ClaimAssetUsingContractId**
+        ```go
+        func (s *SmartContract) ClaimAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId, claimInfoSerializedProto64 string) (bool, error) {
+            // Note recipient will be the caller for this function
+            claimed := false
+            err := s.amc.ClaimAssetUsingContractId(ctx, contractId, claimInfoSerializedProto64)
+            if err != nil {
+                return false, logThenErrorf(err.Error())
+            }
+            claimed = true
+            // After the above function call, update the owner of the asset with recipeint/caller
+            
+            return claimed, nil
+        }
+        ```
+      
+      5. **UnlockAssetUsingContractId**
+        ```go
+        func (s *SmartContract) UnlockAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
+            unlocked := false
+            err := s.amc.UnlockAssetUsingContractId(ctx, contractId)
+            if err != nil {
+                return false, logThenErrorf(err.Error())
+            }
+            unlocked = true
+            ...
+            ...
+            return true, nil
+        }
+        ```
   - _Asset Transfer_: _TBD_
 
 - _Layer-2 applications_: Let us examine the adaptations required in detail:
@@ -71,7 +265,7 @@ A Fabric distributed application's business logic code spans two layers as illus
     }
     ```
 
-    * **Interoperation Helpers**: Your Fabric network's Layer-2 applications have business logic embedded in them that, broadly speaking, accept data from users and other external agents and invoke smart contracts using library functions and APIs offered by the Fabric SDK. With the option of interoperability with other networks available through Weaver, other options can be added, namely requesting and accepting data from foreign networks, and triggering locks and claims for atomic exchanges spanning two networks. Weaver's Fabric Interoperation SDK (currently implemented both in Node.js and Golang) offers a library to exercise these options, supplementing the Fabric SDK. But this will involve modification to the application's business logic. The following examples will illustrate how you can adapt your applications.
+  * **Interoperation Helpers**: Your Fabric network's Layer-2 applications have business logic embedded in them that, broadly speaking, accept data from users and other external agents and invoke smart contracts using library functions and APIs offered by the Fabric SDK. With the option of interoperability with other networks available through Weaver, other options can be added, namely requesting and accepting data from foreign networks, and triggering locks and claims for atomic exchanges spanning two networks. Weaver's Fabric Interoperation SDK (currently implemented both in Node.js and Golang) offers a library to exercise these options, supplementing the Fabric SDK. But this will involve modification to the application's business logic. The following examples will illustrate how you can adapt your applications.
   
     - _Data Sharing_: Consider a scenario inspired by the [global trade use case](../../user-stories/global-trade.md) where a letter of credit (L/C) management business logic (chaincode `letterofcreditcc`) installed in the `tradefinancechannel` channel in the `trade-finance-network` network supports a transaction `RecordBillOfLading`, which validates and records a bill of lading (B/L) supplied by a user via a UI. Weaver will enable such a B/L to be fetched from a different network `trade-logistics-network` by querying the function `GetBillOfLading` exposed by the chaincode `shipmentcc` installed in the `tradelogisticschannel` channel.
       
@@ -123,6 +317,78 @@ A Fabric distributed application's business logic code spans two layers as illus
 
       The rest of the code ought to be self-explanatory. Values are hardcoded for explanation purposes, but you can refactor the above code by reading view addresses corresponding to chaincode invocations from a configuration file.
     
+    - _Asset Exchange_: Let's take an example of asset exchange between `Alice` and `Bob`, where Bob wants to purchase an asset of type `Gold` with id `A123` from `Alice` in `BondNetwork` in exchange for `200` tokens of type `CBDC01` in `TokenNetwork`.
+      
+      `Alice` needs to select a secret text (say `s`), and hash it (say `H`) using say `SHA512`, which will be used to lock her asset in `BondNetwork`. To lock the non-fungible asset using hash `H` and timeout duration of 10 minutes, you need to add following code snippet in your application:
+      ```typescript
+      import { AssetManager, HashFunctions } from '@hyperledger-labs/weaver-fabric-interop-sdk'
+      
+      const hash = HashFunctions.SHA512();    // Create Hash instance of one of the supported Hash Algorithm
+      hash.setSerializedHashBase64(H);        // Set the Hash
+      const timeout = Math.floor(Date.now()/1000) + 10 * 60;
+      
+      const bondContract = <handle-to-fabric-application-chaincode-in-bond-network>;
+      
+      const result = await AssetManager.createHTLC(
+          bondContract,
+          "Gold",             // Asset ID
+          "A123",             // Asset Type
+          bobCertificate,     // Certificate of Bob in Bond Network
+          hash,                  // Hash generated by Alice using her secret s
+          timeout,            // Timeout in epoch for 10 mins from current time
+          null                // Optional callback function to be called after the asset is locked
+      );
+      let bondContractId = result.result; // Unique ID for this asset exchange contract in BondNetwork
+      ```
+      
+      Now `Bob` will lock his tokens in `TokenNetwork`. To lock the fungible asset using same hash `H` and timeout of 5 minutes (half the timeout duration used by Alice in `BondNetwork`), add following code snippet in your application:
+      ```typescript
+      const hash = HashFunctions.SHA512();    // Create Hash instance of one of the supported Hash Algorithm
+      hash.setSerializedHashBase64(H);        // Set the Hash
+      const timeout = Math.floor(Date.now()/1000) + 5 * 60;
+      
+      const tokenContract = <handle-to-fabric-application-chaincode-in-token-network>;
+      const result = await AssetManager.createFungibleHTLC(
+          tokenContract,
+          "CBDC01",               // Token ID
+          200,                    // Token Quantity
+          aliceCertificate,       // Certificate of Alice in Token Network
+          hash,                      // Hash H used by Alice in Bond Network
+          timeout,                // Timeout in epoch for 5 mins from current time
+          null                    // Optional callback function to be called after the asset is locked
+      )
+      const tokenContractId = result.result // Unique ID for this asset exchange contract in TokenNetwork
+      ```
+      
+      To query whether the assets are locked or not in any network, use following query function:
+      ```typescript
+      const contract = <handle-to-fabric-application-chaincode>;
+      // Below contractId is the ID obtained during lock
+      const isLocked = AssetManager.isAssetLockedInHTLCqueryUsingContractId(contract, contractId)
+      ```
+      
+      Now to claim the asset using the secret text (pre-image of hash) `s`, add following code snippet:
+      ```typescript
+      const hash = HashFunctions.SHA512();    // Create Hash instance of one of the supported Hash Algorithm
+      hash.setPreimage(s)                     // Set Pre-Image s
+      const contract = <handle-to-fabric-application-chaincode>;
+      const claimSuccess = await AssetManager.claimAssetInHTLCusingContractId(
+          contract,
+          contractId,                         // contractId obtained during lock
+          hash
+      )
+      // return value claimSuccess is boolean indicating success or failure of claim
+      ```
+      
+      If the asset has to be unlocked, use following code snippet:
+      ```typescript
+      const contract = <handle-to-fabric-application-chaincode>;
+      const reclaimSuccess = await AssetManager.reclaimAssetInHTLCusingContractId(
+          contract,
+          contractId                          // contractId obtained during lock
+      )
+      // return value reclaimSuccess is boolean indicating success or failure of reclaim
+      ```
     - _Asset Transfer_: _TBD_
 
 ### Pre-Configuration
@@ -136,11 +402,19 @@ Typically, pre-configuration involves generating:
 
 Only a connection profile will be used by Weaver, as we will see later.
 
-### Startup and Bootstrap
+### Startup and Bootstrap: Asset Exchange
 
 To launch a network using containerized components, you will typically use a Docker Compose or Kubernetes configuration file. No modifications are needed to the peers', orderers', and CAs' configurations. Sample instructions are given below for networks launched using Docker Compose; we leave it to the reader to adapt these to their custom launch processes.
 
-### Install the Fabric Interoperation Chaincode
+#### Install the Fabric Interoperation Chaincode
+
+Install the Fabric Interoperation Chaincode in the relevant channel(s), i.e., those that run smart contracts that will be involved in any interoperation mode. This is a Go module that can be fetched from `github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop`. Following that, you an install it using the appropriate Fabric process: in Fabric v2, you will need to package, install, approve, and commit this module on the selected channels in your network.
+
+### Startup and Bootstrap: Data Sharing & Asset Transfer
+
+To launch a network using containerized components, you will typically use a Docker Compose or Kubernetes configuration file. No modifications are needed to the peers', orderers', and CAs' configurations. Sample instructions are given below for networks launched using Docker Compose; we leave it to the reader to adapt these to their custom launch processes.
+
+#### Install the Fabric Interoperation Chaincode
 
 Install the Fabric Interoperation Chaincode in the relevant channel(s), i.e., those that run smart contracts that will be involved in any interoperation mode. This is a Go module that can be fetched from `github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop`. Following that, you an install it using the appropriate Fabric process: in Fabric v2, you will need to package, install, approve, and commit this module on the selected channels in your network.
 
@@ -445,311 +719,6 @@ To prepare your network for interoperation with a foreign network, you need to r
   Call the function or HTTP endpoint to record local membership that was created in development step.
 
 Your Fabric network is now up and running with the necessary Weaver components, and your network's channel's ledger is bootstrapped with the initial configuration necessary for cross-network interactions!
-
-## Asset Exchange: Procedure
-
-Let us walk through the changes that are required in different phases of your network's creation.
-
-### Development
-
-A Fabric distributed application's business logic code spans two layers as illustrated in the network model:
-- _Chaincode_: Asset exchange can be enabled in two ways, either use weaver `assetexchange` as library, or use interop chaincode to handle asset exchange by doing a chaincode to chaincode call.
-  - _Use Library `assetexchange`_: This method doesn't require `interop` chaincode to be installed. In you smart contract `go.mod`, add following in require (update the version according to the latest module version):
-    ```
-    require(
-        ...
-        github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go v1.5.3
-        github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange v1.5.3
-        ...
-    )
-    ```
-    Atleast following 5 functions needs to be added in chaincode (Note: the function signature, i.e. the name,  arguments and return values needs to be exactly same):
-    1. **LockAsset**
-      ```go
-      import (
-          ...
-          "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange"
-      )
-      func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, assetExchangeAgreementSerializedProto64 string, lockInfoSerializedProto64 string) (string, error) {
-          // Add some safety checks before calling LockAsset from library
-          // Caller of this chaincode is supposed to be the Locker and the owner of the asset being locked.
-          contractId, err := assetexchange.LockAsset(ctx, "", assetExchangeAgreementSerializedProto64, lockInfoSerializedProto64)
-          if err != nil {
-              return "", logThenErrorf(err.Error())
-          }
-          // Post proccessing of asset after LockAsset called like change status of the asset so that it can't be spent.
-          
-          return contractId, nil
-      }
-      ```
-      Here `assetExchangeAgreementSerializedProto64` is serialized protobuf in base64 encoded string of `AssetExchangeAgreement` protobuf structure, and can be used to extract details like asset id, type of asset and recipient. Check the structure definition [here](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/rfcs/formats/assets/exchange.md#representing-two-party-asset-exchange-agreements). 
-      Similarly `lockInfoSerializedProto64` is serialized protobuf in base64 encoded string of `AssetLock` protobuf structure. Check the structure definition [here](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/rfcs/formats/assets/exchange.md#representing-locks-on-assets).
-      
-    2. **LockFungibleAsset**
-      ```go
-      func (s *SmartContract) LockFungibleAsset(ctx contractapi.TransactionContextInterface, fungibleAssetExchangeAgreementSerializedProto64 string, lockInfoSerializedProto64 string) (string, error) {
-          // Add some safety checks before calling LockFungibleAsset from library
-          // Caller of this chaincode is supposed to be the Locker and the owner of the asset being locked.
-          contractId, err := assetexchange.LockFungibleAsset(ctx, "", fungibleAssetExchangeAgreementSerializedProto64, lockInfoSerializedProto64)
-          if err != nil {
-              return "", logThenErrorf(err.Error())
-          }
-          // Post proccessing of asset after LockFungibleAsset called like reduce the amount of tokens owned by the locker, or mark it locked so that it can't be spent.
-          
-          return contractId, nil
-      }
-      ```
-      Here `fungibleAssetExchangeAgreementSerializedProto64` is serialized protobuf in base64 encoded string of `FungibleAssetExchangeAgreement` protobuf structure, and can be used to extract details like asset quantity, type of asset and recipient. Check the structure definition [here](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/rfcs/formats/assets/exchange.md#representing-two-party-asset-exchange-agreements).
-      
-    3. **IsAssetLockedQueryUsingContractId**
-      ```go
-      func (s *SmartContract) IsAssetLockedQueryUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
-          return assetexchange.IsAssetLockedQueryUsingContractId(ctx, contractId)
-      }
-      ```
-      
-    4. **ClaimAssetUsingContractId**
-      ```go
-      func (s *SmartContract) ClaimAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId, claimInfoSerializedProto64 string) (bool, error) {
-          // Note recipient will be the caller for this function
-          claimed := false
-          err := assetexchange.ClaimAssetUsingContractId(ctx, contractId, claimInfoSerializedProto64)
-          if err != nil {
-              return false, logThenErrorf(err.Error())
-          }
-          claimed = true
-          // After the above function call, update the owner of the asset with recipeint/caller
-          
-          return claimed, nil
-      }
-      ```
-      
-    5. **UnlockAssetUsingContractId**
-      ```go
-      func (s *SmartContract) UnlockAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
-          unlocked := false
-          err := assetexchange.UnlockAssetUsingContractId(ctx, contractId)
-          if err != nil {
-              return false, logThenErrorf(err.Error())
-          }
-          unlocked = true
-          ...
-          ...
-          return true, nil
-      }
-      ```
-
-    6. Add following extra utility functions as well:
-      ```go
-      func (s *SmartContract) GetHTLCHash(ctx contractapi.TransactionContextInterface, callerChaincodeID, assetAgreementBytesBase64 string) (string, error) {
-          return assetexchange.GetHTLCHash(ctx, callerChaincodeID, assetAgreementBytesBase64)
-      }
-      func (s *SmartContract) GetHTLCHashByContractId(ctx contractapi.TransactionContextInterface, contractId string) (string, error) {
-          return assetexchange.GetHTLCHashByContractId(ctx, contractId)
-      }
-      func (s *SmartContract) GetHTLCHashPreImage(ctx contractapi.TransactionContextInterface, callerChaincodeID, assetAgreementBytesBase64 string) (string, error) {
-          return assetexchange.GetHTLCHashPreImage(ctx, callerChaincodeID, assetAgreementBytesBase64)
-      }
-      func (s *SmartContract) GetHTLCHashPreImageByContractId(ctx contractapi.TransactionContextInterface, contractId string) (string, error) {
-          return assetexchange.GetHTLCHashPreImageByContractId(ctx, contractId)
-      }
-      ```
-      
-  - _Use Interop Chaincode_: This method requires `interop` chaincode to be installed on all peers of the channel. Application chaincode needs to implement the interface `github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt`.
-    In you smart contract `go.mod`, add following in require (update the version according to the latest module version):
-    ```
-    require(
-        ...
-        github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go v1.5.3
-        github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt v1.5.3
-        ...
-    )
-    ```
-    In the Smart Contract struct add following code:
-    ```go
-    import (
-        ...
-        am "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt"
-    )
-    type SmartContract struct {
-        contractapi.Contract
-        amc am.AssetManagementContract
-    }
-    ```
-    Following functions needs to be implemented in chaincode (Note: the function signature, i.e. the name,  arguments and return values needs to be exactly same):
-    1. **LockAsset**
-      ```go
-      func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, assetExchangeAgreementSerializedProto64 string, lockInfoSerializedProto64 string) (string, error) {
-          // Add some safety checks before calling LockAsset from library
-          // Caller of this chaincode is supposed to be the Locker and the owner of the asset being locked.
-          contractId, err := s.amc.LockAsset(ctx, "", assetExchangeAgreementSerializedProto64, lockInfoSerializedProto64)
-          if err != nil {
-              return "", logThenErrorf(err.Error())
-          }
-          // Post proccessing of asset after LockAsset called like change status of the asset so that it can't be spent.
-          
-          return contractId, nil
-      }
-      ```
-      Here `assetExchangeAgreementSerializedProto64` is serialized protobuf in base64 encoded string of `AssetExchangeAgreement` protobuf structure, and can be used to extract details like asset id, type of asset and recipient. Check the structure definition [here](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/rfcs/formats/assets/exchange.md#representing-two-party-asset-exchange-agreements). 
-      Similarly `lockInfoSerializedProto64` is serialized protobuf in base64 encoded string of `AssetLock` protobuf structure. Check the structure definition [here](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/rfcs/formats/assets/exchange.md#representing-locks-on-assets).
-  
-    2. **LockFungibleAsset**
-      ```go
-      func (s *SmartContract) LockFungibleAsset(ctx contractapi.TransactionContextInterface, fungibleAssetExchangeAgreementSerializedProto64 string, lockInfoSerializedProto64 string) (string, error) {
-          // Add some safety checks before calling LockFungibleAsset from library
-          // Caller of this chaincode is supposed to be the Locker and the owner of the asset being locked.
-          contractId, err := s.amc.LockFungibleAsset(ctx, "", fungibleAssetExchangeAgreementSerializedProto64, lockInfoSerializedProto64)
-          if err != nil {
-              return "", logThenErrorf(err.Error())
-          }
-          // Post proccessing of asset after LockFungibleAsset called like reduce the amount of tokens owned by the locker, or mark it locked so that it can't be spent.
-          
-          return contractId, nil
-      }
-      ```
-      Here `fungibleAssetExchangeAgreementSerializedProto64` is serialized protobuf in base64 encoded string of `FungibleAssetExchangeAgreement` protobuf structure, and can be used to extract details like asset quantity, type of asset and recipient. Check the structure definition [here](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/rfcs/formats/assets/exchange.md#representing-two-party-asset-exchange-agreements).
-    
-    3. **IsAssetLockedQueryUsingContractId**
-      ```go
-      func (s *SmartContract) IsAssetLockedQueryUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
-          return s.amc.IsAssetLockedQueryUsingContractId(ctx, contractId)
-      }
-      ```
-    
-    4. **ClaimAssetUsingContractId**
-      ```go
-      func (s *SmartContract) ClaimAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId, claimInfoSerializedProto64 string) (bool, error) {
-          // Note recipient will be the caller for this function
-          claimed := false
-          err := s.amc.ClaimAssetUsingContractId(ctx, contractId, claimInfoSerializedProto64)
-          if err != nil {
-              return false, logThenErrorf(err.Error())
-          }
-          claimed = true
-          // After the above function call, update the owner of the asset with recipeint/caller
-          
-          return claimed, nil
-      }
-      ```
-    
-    5. **UnlockAssetUsingContractId**
-      ```go
-      func (s *SmartContract) UnlockAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
-          unlocked := false
-          err := s.amc.UnlockAssetUsingContractId(ctx, contractId)
-          if err != nil {
-              return false, logThenErrorf(err.Error())
-          }
-          unlocked = true
-          ...
-          ...
-          return true, nil
-      }
-      ```
-
-- _Layer-2 Applications_: Let us examine the adaptations required in detail:
-
-  All the application changes require weaver SDK, so first you need to add the following dependency to the `dependencies` section of your application's `package.json` file:
-  ```json
-  "@hyperledger-labs/weaver-fabric-interop-sdk": "latest",
-  ```
-  (Or check out the [package website](https://github.com/hyperledger-labs/weaver-dlt-interoperability/packages/888424) and select a different version.)
-
-  Before you run `npm install` to fetch the dependencies, make sure you create a [personal access token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) with `read:packages` access in Github. Create an `.npmrc` file in the same folder as the `package.json` with the following contents:
-
-  ```
-  registry=https://npm.pkg.github.com/hyperledger-labs
-  //npm.pkg.github.com/:_authToken=<personal-access-token>
-  ```
-  Replace `<personal-access-token>` in this file with the token you created in Github.
-
-  * **Interoperation Helpers**: Your Fabric network's Layer-2 applications have business logic embedded in them that, broadly speaking, accept data from users and other external agents and invoke smart contracts using library functions and APIs offered by the Fabric SDK. With the option of interoperability with other networks available through Weaver, other options can be added, namely requesting and accepting data from foreign networks, and triggering locks and claims for atomic exchanges spanning two networks. Weaver's Fabric Interoperation SDK (currently implemented both in Node.js and Golang) offers a library to exercise these options, supplementing the Fabric SDK. But this will involve modification to the application's business logic. The following examples will illustrate how you can adapt your applications.
-  
-    Let's take an example of asset exchange between `Alice` and `Bob`, where Bob wants to purchase an asset of type `Gold` with id `A123` from `Alice` in `BondNetwork` in exchange for `200` tokens of type `CBDC01` in `TokenNetwork`.
-      
-    `Alice` needs to select a secret text (say `s`), and hash it (say `H`) using say `SHA512`, which will be used to lock her asset in `BondNetwork`. To lock the non-fungible asset using hash `H` and timeout duration of 10 minutes, you need to add following code snippet in your application:
-    ```typescript
-    import { AssetManager, HashFunctions } from '@hyperledger-labs/weaver-fabric-interop-sdk'
-    
-    const hash = HashFunctions.SHA512();    // Create Hash instance of one of the supported Hash Algorithm
-    hash.setSerializedHashBase64(H);        // Set the Hash
-    const timeout = Math.floor(Date.now()/1000) + 10 * 60;
-    
-    const bondContract = <handle-to-fabric-application-chaincode-in-bond-network>;
-    
-    const result = await AssetManager.createHTLC(
-        bondContract,
-        "Gold",             // Asset ID
-        "A123",             // Asset Type
-        bobCertificate,     // Certificate of Bob in Bond Network
-        hash,                  // Hash generated by Alice using her secret s
-        timeout,            // Timeout in epoch for 10 mins from current time
-        null                // Optional callback function to be called after the asset is locked
-    );
-    let bondContractId = result.result; // Unique ID for this asset exchange contract in BondNetwork
-    ```
-    
-    Now `Bob` will lock his tokens in `TokenNetwork`. To lock the fungible asset using same hash `H` and timeout of 5 minutes (half the timeout duration used by Alice in `BondNetwork`), add following code snippet in your application:
-    ```typescript
-    const hash = HashFunctions.SHA512();    // Create Hash instance of one of the supported Hash Algorithm
-    hash.setSerializedHashBase64(H);        // Set the Hash
-    const timeout = Math.floor(Date.now()/1000) + 5 * 60;
-    
-    const tokenContract = <handle-to-fabric-application-chaincode-in-token-network>;
-    const result = await AssetManager.createFungibleHTLC(
-        tokenContract,
-        "CBDC01",               // Token ID
-        200,                    // Token Quantity
-        aliceCertificate,       // Certificate of Alice in Token Network
-        hash,                      // Hash H used by Alice in Bond Network
-        timeout,                // Timeout in epoch for 5 mins from current time
-        null                    // Optional callback function to be called after the asset is locked
-    )
-    const tokenContractId = result.result // Unique ID for this asset exchange contract in TokenNetwork
-    ```
-    
-    To query whether the assets are locked or not in any network, use following query function:
-    ```typescript
-    const contract = <handle-to-fabric-application-chaincode>;
-    // Below contractId is the ID obtained during lock
-    const isLocked = AssetManager.isAssetLockedInHTLCqueryUsingContractId(contract, contractId)
-    ```
-    
-    Now to claim the asset using the secret text (pre-image of hash) `s`, add following code snippet:
-    ```typescript
-    const hash = HashFunctions.SHA512();    // Create Hash instance of one of the supported Hash Algorithm
-    hash.setPreimage(s)                     // Set Pre-Image s
-    const contract = <handle-to-fabric-application-chaincode>;
-    const claimSuccess = await AssetManager.claimAssetInHTLCusingContractId(
-        contract,
-        contractId,                         // contractId obtained during lock
-        hash
-    )
-    // return value claimSuccess is boolean indicating success or failure of claim
-    ```
-    
-    If the asset has to be unlocked, use following code snippet:
-    ```typescript
-    const contract = <handle-to-fabric-application-chaincode>;
-    const reclaimSuccess = await AssetManager.reclaimAssetInHTLCusingContractId(
-        contract,
-        contractId                          // contractId obtained during lock
-    )
-    // return value reclaimSuccess is boolean indicating success or failure of reclaim
-    ```
-
-### Pre-Configuration
-
-No changes are required in your network's pre-configuration process for Weaver enablement.
-
-### Startup and Bootstrap
-
-To launch a network using containerized components, you will typically use a Docker Compose or Kubernetes configuration file. No modifications are needed to the peers', orderers', and CAs' configurations. Sample instructions are given below for networks launched using Docker Compose; we leave it to the reader to adapt these to their custom launch processes.
-
-### Install the Fabric Interoperation Chaincode
-
-If you are enabling asset exchange using interop chaincode, then install the Fabric Interoperation Chaincode in the relevant channel(s), i.e., those that run smart contracts that will be involved in any interoperation mode. This is a Go module that can be fetched from `github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop`. Following that, you an install it using the appropriate Fabric process: in Fabric v2, you will need to package, install, approve, and commit this module on the selected channels in your network.
 
 <!--
 3. *IsAssetLocked*
