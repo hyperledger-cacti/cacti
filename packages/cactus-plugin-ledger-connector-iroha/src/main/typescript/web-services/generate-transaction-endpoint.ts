@@ -90,7 +90,7 @@ export class GenerateTransactionEndpoint implements IWebServiceEndpoint {
     this.log.debug(reqTag);
 
     try {
-      res.send(this.options.connector.generateTransaction(req.body));
+      res.render(this.options.connector.generateTransaction(req.body));
     } catch (error) {
       this.log.error(`Crash while serving ${reqTag}:`, error);
 

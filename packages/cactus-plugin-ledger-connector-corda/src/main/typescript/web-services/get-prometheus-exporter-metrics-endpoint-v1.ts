@@ -90,7 +90,7 @@ export class GetPrometheusExporterMetricsEndpointV1
     try {
       const resBody = await this.opts.connector.getPrometheusExporterMetrics();
       res.status(200);
-      res.send(resBody);
+      res.render(resBody);
     } catch (ex) {
       this.log.error(`${fnTag} failed to serve request`, ex);
       res.status(500);

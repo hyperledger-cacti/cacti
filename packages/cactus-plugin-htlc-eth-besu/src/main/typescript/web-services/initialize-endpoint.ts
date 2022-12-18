@@ -90,7 +90,7 @@ export class InitializeEndpoint implements IWebServiceEndpoint {
         });
       } else {
         res.status(200);
-        res.send(result);
+        res.render(result);
       }
     } catch (ex) {
       this.log.error(`${fnTag} failed to serve request`, ex);

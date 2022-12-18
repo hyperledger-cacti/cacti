@@ -60,7 +60,7 @@ export class BusinessLogicCheckEthereumValidator extends BusinessLogicBase {
 
     const verifier = this.getVerifier(validator);
 
-    this.sendTestRequest(verifier);
+    this.renderTestRequest(verifier);
   }
 
   private getValidator(tradeInfo: TradeInfo) {
