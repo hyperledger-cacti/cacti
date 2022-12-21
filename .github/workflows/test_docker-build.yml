@@ -23,7 +23,7 @@ jobs:
         working-directory: core/relay
         
   fabric-driver-local:
-    if: ${{ false }}
+    # if: ${{ false }}
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
