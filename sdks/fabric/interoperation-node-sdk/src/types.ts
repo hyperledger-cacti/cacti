@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export type Query = {
+export type InvocationSpec = {
     ccArgs: string[];
     channel: string;
     ccFunc: string;

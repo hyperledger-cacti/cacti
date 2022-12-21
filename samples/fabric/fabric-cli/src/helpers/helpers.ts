@@ -7,7 +7,7 @@
 import { GluegunCommand } from 'gluegun'
 import { Toolbox } from 'gluegun/build/types/domain/toolbox'
 import { GluegunPrint } from 'gluegun/build/types/toolbox/print-types'
-import { getKeyAndCertForRemoteRequestbyUserName, fabricHelper, invoke, query, Query } from './fabric-functions'
+import { getKeyAndCertForRemoteRequestbyUserName, fabricHelper, invoke, query, InvocationSpec } from './fabric-functions'
 import { AssetPledge } from "@hyperledger-labs/weaver-protos-js/common/asset_transfer_pb"
 import { InteroperableHelper } from '@hyperledger-labs/weaver-fabric-interop-sdk'
 import * as crypto from 'crypto'
@@ -47,7 +47,7 @@ const addAssets = ({
   dataFilePath,
   networkName,
   connProfilePath,
-  query,
+  invocationSpec,
   mspId = global.__DEFAULT_MSPID__,
   channelName,
   contractName,
@@ -58,7 +58,7 @@ const addAssets = ({
   dataFilePath: string
   networkName: string
   connProfilePath: string
-  query?: Query
+  invocationSpec?: InvocationSpec
   mspId?: string
   channelName?: string
   contractName?: string
@@ -70,8 +70,8 @@ const addAssets = ({
   const data = JSON.parse(fs.readFileSync(filepath).toString())
   const valuesList = Object.entries(data)
   valuesList.forEach(async (item: [string, string]) => {
-    const currentQuery = query
-      ? query
+    const currentQuery = invocationSpec
+      ? invocationSpec
       : {
           channel: channelName,
           contractName: contractName
@@ -132,7 +132,7 @@ const pledgeAsset = async ({
   recipient,
   expirySecs,
   connProfilePath,
-  query,
+  invocationSpec,
   mspId = global.__DEFAULT_MSPID__,
   channelName,
   contractName,
@@ -149,7 +149,7 @@ const pledgeAsset = async ({
   recipient: string
   expirySecs: number
   connProfilePath: string
-  query?: Query
+  invocationSpec?: InvocationSpec
   mspId?: string
   channelName?: string
   contractName?: string
@@ -176,8 +176,8 @@ const pledgeAsset = async ({
   } else {
     throw new Error(`Neither asset owner nor reference is supplied`)
   }
-  const currentQuery = query
-    ? query
+  const currentQuery = invocationSpec
+    ? invocationSpec
     : {
         channel: channelName,
         contractName: contractName
@@ -307,7 +307,7 @@ const getAssetPledgeDetails = async ({
   destNetworkName,
   recipient,
   recipientCert,
-  query,
+  invocationSpec,
   mspId = global.__DEFAULT_MSPID__,
   ccFunc,
   pledgeId,
@@ -319,7 +319,7 @@ const getAssetPledgeDetails = async ({
   destNetworkName: string
   recipient: string
   recipientCert: string
-  query?: Query
+  invocationSpec?: InvocationSpec
   mspId?: string
   ccFunc?: string
   pledgeId: string
@@ -327,8 +327,8 @@ const getAssetPledgeDetails = async ({
 }): Promise<any> => {
   const netConfig = getNetworkConfig(sourceNetworkName)
 
-  const currentQuery = query
-    ? query
+  const currentQuery = invocationSpec
+    ? invocationSpec
     : {
         channel: netConfig.channelName,
         contractName: netConfig.chaincode
@@ -438,14 +438,14 @@ const addData = ({
   filename,
   networkName,
   connProfilePath,
-  query,
+  invocationSpec,
   mspId = global.__DEFAULT_MSPID__,
   logger
 }: {
   filename: string
   networkName: string
   connProfilePath: string
-  query?: Query
+  invocationSpec?: InvocationSpec
   mspId?: string
   logger?: any
 }): void => {
@@ -453,8 +453,8 @@ const addData = ({
   const data = JSON.parse(fs.readFileSync(filepath).toString())
   const valuesList = Object.entries(data)
   valuesList.forEach((item: [string, string]) => {
-    const currentQuery = query
-      ? query
+    const currentQuery = invocationSpec
+      ? invocationSpec
       : {
           channel: process.env.DEFAULT_CHANNEL
             ? process.env.DEFAULT_CHANNEL
@@ -834,7 +834,8 @@ const interopHelper = async (
       false,
       options['relay-tls'] === 'true',
       relayTlsCAFiles,
-      options['e2e-confidentiality'] === 'true'
+      options['e2e-confidentiality'] === 'true',
+      gateway
     )
     logger.info(
       `View from remote network: ${JSON.stringify(

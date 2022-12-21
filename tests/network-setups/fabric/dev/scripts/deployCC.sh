@@ -25,9 +25,13 @@ PROFILE="${14}"
 CC_SRC_LANGUAGE=`echo "$CC_SRC_LANGUAGE" | tr [:upper:] [:lower:]`
 CC_CHAIN_CODE=`echo "$CC_CHAIN_CODE" | tr [:upper:] [:lower:]`
 
-CC_END_POLICY=""
+CC_END_POLICY="--signature-policy AND('Org1MSP.member')"
 if [ "$PROFILE" = "2-nodes" ]; then
-	CC_END_POLICY="--signature-policy AND('Org1MSP.member','Org2MSP.member')"
+	if [ "$CC_CHAIN_CODE" = "interop" ]; then
+		CC_END_POLICY="--signature-policy OR('Org1MSP.member','Org2MSP.member')"
+	else
+		CC_END_POLICY="--signature-policy AND('Org1MSP.member','Org2MSP.member')"
+	fi
 fi
 
 echo " - CHANNEL_NAME           :      ${CHANNEL_NAME}"

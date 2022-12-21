@@ -249,7 +249,7 @@ func TestUpdateLocalMembership(t *testing.T) {
 		SecurityDomain: securityDomainId,
 		Members:		map[string]*common.Member{ "member1": &member1, "member2": &member2},
 	}
-	
+
 	membershipBytes, err := protoV2.Marshal(&membershipAsset)
 	require.NoError(t, err)
 	membershipSerialized64 := base64.StdEncoding.EncodeToString(membershipBytes)
@@ -872,7 +872,7 @@ func TestUpdateMembership(t *testing.T) {
 	chaincodeStub.GetStateReturnsOnCall(3, localMembershipJsonBytes, nil)
 	err = interopcc.UpdateMembership(ctx, counterAttestedMembershipBytes)
 	require.NoError(t, err)
-	
+
 	// One of the local signatures is invalid: should fail
 	hashedLocal2, err = computeSHA2Hash([]byte("invalid"), keyLocal2.PublicKey.Params().BitSize)
 	require.NoError(t, err)
@@ -886,7 +886,7 @@ func TestUpdateMembership(t *testing.T) {
 	chaincodeStub.GetStateReturnsOnCall(5, localMembershipJsonBytes, nil)
 	err = interopcc.UpdateMembership(ctx, counterAttestedMembershipBytes)
 	require.EqualError(t, err, "Unable to Validate Signature: Signature Verification failed. ECDSA VERIFY")
-	
+
 	// One of the foreign signatures is invalid: should fail
 	hashed2, err = computeSHA2Hash([]byte("invalid"), key2.PublicKey.Params().BitSize)
 	require.NoError(t, err)
@@ -915,7 +915,7 @@ func TestUpdateMembership(t *testing.T) {
 	chaincodeStub.GetStateReturnsOnCall(7, localMembershipJsonBytes, nil)
 	err = interopcc.UpdateMembership(ctx, counterAttestedMembershipBytes)
 	require.EqualError(t, err, "Unable to Validate Signature: Signature Verification failed. ECDSA VERIFY")
-	
+
 	// One of the foreign attestations has an invalid nonce: should fail
 	hashed2, err = computeSHA2Hash(membershipBytesWithNonce, key2.PublicKey.Params().BitSize)
 	require.NoError(t, err)
@@ -944,7 +944,7 @@ func TestUpdateMembership(t *testing.T) {
 	chaincodeStub.GetStateReturnsOnCall(8, []byte{}, nil)
 	err = interopcc.UpdateMembership(ctx, counterAttestedMembershipBytes)
 	require.EqualError(t, err, fmt.Sprintf("Mismatched nonces across two attestations: %s, %s", nonce, attestation1.Nonce))
-	
+
 	// Foreign membership has an invalid cert chain: should fail
 	attestation1.Nonce = nonce
 	tmpCert := member1.Chain[0]

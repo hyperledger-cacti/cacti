@@ -101,20 +101,20 @@ func validateAttestationsList(membership *common.Membership, attestations []*ide
 			return fmt.Errorf("IIN Agent security domain %s does not match with membership security domain %s",
 				attestation.UnitIdentity.SecurityDomain, membership.SecurityDomain)
 		}
-		
+
 		// Validate Attestation
 		attesterCert, err := parseAndValidateAttestation(attestation, messageBytes)
 		if err != nil {
 			return err
 		}
-		
+
 		// Verify membership of attester
 		err = verifyMemberInSecurityDomain2("", attesterCert, membership, attestation.UnitIdentity.MemberId)
 		if err != nil {
 			return fmt.Errorf("Attester with certificate %+v is not a designated IIN Agent of org %s in security domain %s: %+v",
 				attesterCert, attestation.UnitIdentity.MemberId, attestation.UnitIdentity.SecurityDomain, err)
 		}
-		
+
 		attestationsMap[attestation.UnitIdentity.MemberId] = true
 	}
 	for memberId := range membership.Members {
@@ -198,8 +198,8 @@ func (s *SmartContract) CreateLocalMembership(ctx contractapi.TransactionContext
 	if err != nil {
 		return err
 	}
-	
-	fmt.Printf("Recording Foreign Membership with securityDomain: %s\n", membershipLocalSecurityDomain)
+
+	fmt.Printf("Recording Local Membership with securityDomain: %s\n", membershipLocalSecurityDomain)
 	membershipBytes, err := json.Marshal(membership)
 	if err != nil {
 		return fmt.Errorf("Marshal error: %s", err)
@@ -278,7 +278,7 @@ func (s *SmartContract) CreateMembership(ctx contractapi.TransactionContextInter
 	if err != nil {
 		return err
 	}
-	
+
 	fmt.Printf("Recording Foreign Membership with securityDomain: %s\n", foreignMembership.SecurityDomain)
 	membershipBytes, err := json.Marshal(foreignMembership)
 	if err != nil {
