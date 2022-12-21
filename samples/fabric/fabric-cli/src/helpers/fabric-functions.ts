@@ -17,7 +17,7 @@ import * as dotenv from 'dotenv'
 dotenv.config({ path: path.resolve(__dirname, '../../.env') })
 import * as fs from 'fs'
 
-export type Query = {
+export type InvocationSpec = {
   contractName: string
   channel: string
   args: string[]
@@ -581,7 +581,7 @@ async function fabricHelper({
 }
 
 async function query(
-  query: Query,
+  invocationSpec: InvocationSpec,
   connProfilePath: string,
   networkName: string,
   mspId = global.__DEFAULT_MSPID__,
@@ -593,12 +593,12 @@ async function query(
   try {
     logger.debug(
       `QUERY: ${JSON.stringify(
-        query
+        invocationSpec
       )} connProfilePath: ${connProfilePath} networkName ${networkName} `
     )
     const { contract, gateway } = await fabricHelper({
-      channel: query.channel,
-      contractName: query.contractName,
+      channel: invocationSpec.channel,
+      contractName: invocationSpec.contractName,
       connProfilePath: connProfilePath,
       networkName: networkName,
       mspId: mspId,
@@ -606,7 +606,7 @@ async function query(
       userString: userString,
       registerUser: registerUser
     })
-    const read = await contract.evaluateTransaction(query.ccFunc, ...query.args)
+    const read = await contract.evaluateTransaction(invocationSpec.ccFunc, ...invocationSpec.args)
     const state = Buffer.from(read).toString()
     if (state) {
       logger.debug(`State From Network:`, state)
@@ -623,7 +623,7 @@ async function query(
 }
 
 async function invoke(
-  query: Query,
+  invocationSpec: InvocationSpec,
   connProfilePath: string,
   networkName: string,
   mspId = global.__DEFAULT_MSPID__,
@@ -634,8 +634,8 @@ async function invoke(
   logger.debug('Running invoke on fabric network')
   try {
     const { contract, gateway } = await fabricHelper({
-      channel: query.channel,
-      contractName: query.contractName,
+      channel: invocationSpec.channel,
+      contractName: invocationSpec.contractName,
       connProfilePath: connProfilePath,
       networkName: networkName,
       mspId: mspId,
@@ -644,9 +644,9 @@ async function invoke(
       registerUser: registerUser
     })
     logger.debug(
-      `CCFunc: ${query.ccFunc} 'CCArgs: ${JSON.stringify(query.args)}`
+      `CCFunc: ${invocationSpec.ccFunc} 'CCArgs: ${JSON.stringify(invocationSpec.args)}`
     )
-    const read = await contract.submitTransaction(query.ccFunc, ...query.args)
+    const read = await contract.submitTransaction(invocationSpec.ccFunc, ...invocationSpec.args)
     const state = Buffer.from(read).toString()
     if (state) {
       logger.debug(`Response From Network: ${state}`)

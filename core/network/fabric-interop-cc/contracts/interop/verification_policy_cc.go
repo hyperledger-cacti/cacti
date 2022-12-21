@@ -14,12 +14,20 @@ import (
 
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
+	wutils "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/utils"
 )
 
 const verificationPolicyObjectType = "verificationPolicy"
 
 // CreateVerificationPolicy cc is used to store a VerificationPolicy in the ledger
 func (s *SmartContract) CreateVerificationPolicy(ctx contractapi.TransactionContextInterface, verificationPolicyJSON string) error {
+	// Check if the caller has network admin privileges
+	if isAdmin, err := wutils.IsClientNetworkAdmin(ctx); err != nil {
+		return fmt.Errorf("Admin client check error: %s", err)
+	} else if !isAdmin {
+		return fmt.Errorf("Caller not a network admin; access denied")
+	}
+
 	verificationPolicy, err := decodeVerificationPolicy([]byte(verificationPolicyJSON))
 	if err != nil {
 		return fmt.Errorf("Unmarshal error: %s", err)
@@ -42,6 +50,13 @@ func (s *SmartContract) CreateVerificationPolicy(ctx contractapi.TransactionCont
 
 // UpdateVerificationPolicy cc is used to update an existing VerificationPolicy in the ledger
 func (s *SmartContract) UpdateVerificationPolicy(ctx contractapi.TransactionContextInterface, verificationPolicyJSON string) error {
+	// Check if the caller has network admin privileges
+	if isAdmin, err := wutils.IsClientNetworkAdmin(ctx); err != nil {
+		return fmt.Errorf("Admin client check error: %s", err)
+	} else if !isAdmin {
+		return fmt.Errorf("Caller not a network admin; access denied")
+	}
+
 	verificationPolicy, err := decodeVerificationPolicy([]byte(verificationPolicyJSON))
 	if err != nil {
 		return fmt.Errorf("Unmarshal error: %s", err)
@@ -61,6 +76,13 @@ func (s *SmartContract) UpdateVerificationPolicy(ctx contractapi.TransactionCont
 
 // DeleteVerificationPolicy cc is used to delete an existing VerificationPolicy in the ledger
 func (s *SmartContract) DeleteVerificationPolicy(ctx contractapi.TransactionContextInterface, verificationPolicyID string) error {
+	// Check if the caller has network admin privileges
+	if isAdmin, err := wutils.IsClientNetworkAdmin(ctx); err != nil {
+		return fmt.Errorf("Admin client check error: %s", err)
+	} else if !isAdmin {
+		return fmt.Errorf("Caller not a network admin; access denied")
+	}
+
 	verificationPolicyKey, err := ctx.GetStub().CreateCompositeKey(verificationPolicyObjectType, []string{verificationPolicyID})
 	bytes, err := ctx.GetStub().GetState(verificationPolicyKey)
 	if err != nil {
