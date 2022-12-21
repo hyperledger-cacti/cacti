@@ -193,18 +193,18 @@ fun verifyFabricNotarization(
             return Left(Error("Address in response does not match original address: Original: $addressString Response: ${interopPayload.address}"))
         }
 
-        // 3. Verify the response matches the response inside the ProposalResponsePayload chaincodeaction
-        val chaincodeAction = ProposalPackage.ChaincodeAction.parseFrom(fabricViewData.proposalResponsePayload.extension)
-        println("Chaincode Action: $chaincodeAction")
-        if (chaincodeAction.response.payload != fabricViewData.response.payload) {
-            println("Response in fabric view does not match response in proposal response")
-            return Left(Error("Response in fabric view does not match response in proposal response"))
-        }
-
         // For each of the peer responses in the viewData, parse the proposal response field to a ProposalResponse
-        return fabricViewData.endorsementsList.map { endorsement ->
+        return fabricViewData.endorsedProposalResponsesList.map { endorsedProposalResponse ->
+            // 3. Verify the response matches the response inside the ProposalResponsePayload chaincodeaction
+            val chaincodeAction = ProposalPackage.ChaincodeAction.parseFrom(endorsedProposalResponse.payload.extension)
+            println("Chaincode Action: $chaincodeAction")
+            if (chaincodeAction.response.payload != fabricViewData.response.payload) {
+                println("Response in fabric view does not match response in proposal response")
+                return Left(Error("Response in fabric view does not match response in proposal response"))
+            }
+            val endorsement = endorsedProposalResponse.endorsement
             // 4. Validate endorsement certificate and check [Membership]
-            verifyEndorsementAndMapToOrgName(endorsement, securityDomain, fabricViewData, serviceHub)
+            verifyEndorsementAndMapToOrgName(endorsement, securityDomain, endorsedProposalResponse.payload.toByteArray(), serviceHub)
             // Traverse the resulting List<Either<Error, String>> to get an Either<Error, List<String>>
         }.traverse(Either.applicative(), ::identity)
                 .fix().map { it.fix() }
@@ -236,7 +236,7 @@ fun verifyFabricNotarization(
  * @return Returns an Error if the endorsement verification failed, or the orgName of the org the
  * signed the certificate.
  */
-fun verifyEndorsementAndMapToOrgName(endorsement: ProposalResponsePackage.Endorsement, securityDomain: String, fabricViewData: ViewData.FabricView, serviceHub: ServiceHub): Either<Error, String> {
+fun verifyEndorsementAndMapToOrgName(endorsement: ProposalResponsePackage.Endorsement, securityDomain: String, proposalResponsePayloadBytes: ByteArray, serviceHub: ServiceHub): Either<Error, String> {
     // Get the endorser certificate from the Endorsement
     val serializedIdentity = Identities.SerializedIdentity.parseFrom(endorsement.endorser)
     val certString = Base64.getEncoder().encodeToString(serializedIdentity.idBytes.toByteArray())
@@ -250,7 +250,7 @@ fun verifyEndorsementAndMapToOrgName(endorsement: ProposalResponsePackage.Endors
             // Validate the signature on the response payload with the certificate
             isValidFabricSignature(
                     publicKey = certificate.publicKey,
-                    message = fabricViewData.proposalResponsePayload.toByteArray() + endorsement.endorser.toByteArray(),
+                    message = proposalResponsePayloadBytes + endorsement.endorser.toByteArray(),
                     signatureBytes = endorsement.signature.toByteArray())
         }.map { orgName }
     }
