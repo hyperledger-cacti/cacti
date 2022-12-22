@@ -198,12 +198,13 @@ const getEndorsementsAndSignatoriesFromFabricView = (view) => {
         throw new Error(`Not a Fabric view`);
     }
     const fabricView = fabricViewPb.FabricView.deserializeBinary(view.getData());
-    const endorsements = fabricView.getEndorsementsList();
+    const endorsedProposalResponses = fabricView.getEndorsedProposalResponsesList();
     let serializedEndorsementsWithSignatories = [];
-    for (let i = 0; i < endorsements.length; i++) {
-        const endorsement = Buffer.from(endorsements[i].serializeBinary()).toString('base64');
-        const sid = identitiesPb.SerializedIdentity.deserializeBinary(Uint8Array.from(Buffer.from(endorsements[i].getEndorser())));
-        serializedEndorsementsWithSignatories.push([sid.getMspid(), endorsement]);
+    for (let i = 0; i < endorsedProposalResponses.length; i++) {
+        const endorsement = endorsedProposalResponses[i].getEndorsement();
+        const endorsementSerializedBase64 = Buffer.from(endorsement.serializeBinary()).toString('base64');
+        const sid = identitiesPb.SerializedIdentity.deserializeBinary(Uint8Array.from(Buffer.from(endorsement.getEndorser())));
+        serializedEndorsementsWithSignatories.push([sid.getMspid(), endorsementSerializedBase64]);
     }
     return serializedEndorsementsWithSignatories;
 }

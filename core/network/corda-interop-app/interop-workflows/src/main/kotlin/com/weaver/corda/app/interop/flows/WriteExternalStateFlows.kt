@@ -11,22 +11,23 @@ import arrow.core.Left
 import arrow.core.Right
 import arrow.core.flatMap
 import co.paralleluniverse.fibers.Suspendable
-import com.weaver.corda.app.interop.contracts.ExternalStateContract
-import com.weaver.corda.app.interop.states.ExternalState
-import com.weaver.protos.common.state.State
 import net.corda.core.contracts.Command
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.flows.*
 import net.corda.core.transactions.TransactionBuilder
 import java.util.Base64
-
 import net.corda.core.node.services.queryBy
 import net.corda.core.node.services.vault.QueryCriteria
+import com.google.protobuf.ByteString
+
+import org.hyperledger.fabric.protos.msp.Identities
+
+import com.weaver.protos.common.state.State
 import com.weaver.protos.fabric.view_data.ViewData
 import com.weaver.protos.corda.ViewDataOuterClass
-import com.google.protobuf.ByteString
 import com.weaver.protos.common.interop_payload.InteropPayloadOuterClass
-import org.hyperledger.fabric.protos.msp.Identities
+import com.weaver.corda.app.interop.contracts.ExternalStateContract
+import com.weaver.corda.app.interop.states.ExternalState
 
 
 /**
@@ -149,7 +150,8 @@ class GetExternalStateByLinearId(
                     val proofStringPrefix = "Verified Proof: Endorsed by members: ["
                     val proofStringSuffix = "] of security domain: $securityDomain"
                     var mspIdList = ""
-                    fabricViewData.endorsementsList.map { endorsement ->
+                    fabricViewData.endorsedProposalResponsesList.map { endorsedProposalResponse ->
+                        val endorsement = endorsedProposalResponse.endorsement
                         val mspId = Identities.SerializedIdentity.parseFrom(endorsement.endorser).mspid
                         if (mspIdList.isNotEmpty()) {
                             mspIdList += ", "
@@ -161,7 +163,8 @@ class GetExternalStateByLinearId(
 
                     var notarizationList: List<ViewDataOuterClass.ViewData.Notarization> = listOf()
 
-                    fabricViewData.endorsementsList.map { endorsement ->
+                    fabricViewData.endorsedProposalResponsesList.map { endorsedProposalResponse ->
+                        val endorsement = endorsedProposalResponse.endorsement
                         val serializedIdentity = Identities.SerializedIdentity.parseFrom(endorsement.endorser)
                         val mspId = serializedIdentity.mspid
                         val certString = Base64.getEncoder().encodeToString(serializedIdentity.idBytes.toByteArray())
