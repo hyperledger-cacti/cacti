@@ -24,12 +24,12 @@ if (!process.env["NODE_CONFIG_DIR"]) {
 import { configRead } from "@hyperledger/cactus-cmd-socketio-server";
 
 import fs = require("fs");
-import { Server } from "socket.io"
+import { Server } from "socket.io";
 
 // Log settings
 import { getLogger } from "log4js";
 const logger = getLogger("connector_main[" + process.pid + "]");
-logger.level = configRead('logLevel', 'info');
+logger.level = configRead("logLevel", "info");
 
 // implementation class of a part dependent of end-chains (server plugin)
 import { ServerPlugin } from "../../../connector/ServerPlugin";
@@ -59,25 +59,30 @@ export async function startGoEthereumSocketIOConnector() {
   const Smonitor = new ServerMonitorPlugin();
 
   // Get port from environment and store in Express.
-  const sslport = normalizePort(process.env.PORT || configRead('sslParam.port'));
+  const sslport = normalizePort(
+    process.env.PORT || configRead("sslParam.port"),
+  );
   app.set("port", sslport);
 
   // Specify private key and certificate
   let keyString: string;
   let certString: string;
   try {
-    keyString = configRead<string>('sslParam.keyValue');
-    certString = configRead<string>('sslParam.certValue');
+    keyString = configRead<string>("sslParam.keyValue");
+    certString = configRead<string>("sslParam.certValue");
   } catch {
-    keyString = fs.readFileSync(configRead('sslParam.key'), "ascii");
-    certString = fs.readFileSync(configRead('sslParam.cert'), "ascii");
+    keyString = fs.readFileSync(configRead("sslParam.key"), "ascii");
+    certString = fs.readFileSync(configRead("sslParam.cert"), "ascii");
   }
 
   // Create HTTPS server.
-  const server = https.createServer({
-    key: keyString,
-    cert: certString,
-  }, app); // Start as an https server.
+  const server = https.createServer(
+    {
+      key: keyString,
+      cert: certString,
+    },
+    app,
+  ); // Start as an https server.
   const io = new Server(server);
 
   // Event listener for HTTPS server "error" event.
@@ -126,7 +131,8 @@ export async function startGoEthereumSocketIOConnector() {
       // Check for the existence of the specified function and call it if it exists.
       if (Splug.isExistFunction(func)) {
         // Can be called with Server plugin function name.
-        (Splug as any)[func](args)
+        (Splug as any)
+          [func](args)
           .then((respObj: unknown) => {
             logger.info("*** RESPONSE ***");
             logger.info("Client ID :" + client.id);
@@ -206,7 +212,8 @@ export async function startGoEthereumSocketIOConnector() {
         // Check for the existence of the specified function and call it if it exists.
         if (Splug.isExistFunction(func)) {
           // Can be called with Server plugin function name.
-          (Splug as any)[func](args)
+          (Splug as any)
+            [func](args)
             .then((respObj: unknown) => {
               logger.info("*** RESPONSE ***");
               logger.info("Client ID :" + client.id);
@@ -244,8 +251,11 @@ export async function startGoEthereumSocketIOConnector() {
     /**
      * startMonitor: starting block generation event monitoring
      **/
-    client.on("startMonitor", function () {
-      Smonitor.startMonitor(client.id, (event) => {
+    client.on("startMonitor", function (monitorOptions) {
+
+      monitorOptions = monitorOptions ?? {allBlocks: false};
+      logger.debug("monitorOptions", monitorOptions);
+      Smonitor.startMonitor(client.id, monitorOptions.allBlocks, (event) => {
         let emitType = "";
         if (event.status == 200) {
           emitType = "eventReceived";
@@ -264,7 +274,7 @@ export async function startGoEthereumSocketIOConnector() {
     client.on("stopMonitor", function (reason) {
       Smonitor.stopMonitor(client.id).then(() => {
         logger.info("stopMonitor completed.");
-      })
+      });
     });
 
     client.on("disconnect", function (reason) {
@@ -277,22 +287,27 @@ export async function startGoEthereumSocketIOConnector() {
   });
 
   // Listen on provided port, on all network interfaces.
-  return new Promise<https.Server>((resolve) => server.listen(sslport, () => resolve(server)));
+  return new Promise<https.Server>((resolve) =>
+    server.listen(sslport, () => resolve(server)),
+  );
 }
 
 if (require.main === module) {
   // When this file executed as a script, not loaded as module - run the connector
-  startGoEthereumSocketIOConnector().then((server) => {
-    const addr = server.address();
+  startGoEthereumSocketIOConnector()
+    .then((server) => {
+      const addr = server.address();
 
-    if (!addr) {
-      logger.error("Could not get running server address - exit.");
-      process.exit(1);
-    }
+      if (!addr) {
+        logger.error("Could not get running server address - exit.");
+        process.exit(1);
+      }
 
-    const bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
-    logger.debug("Listening on " + bind);
-  }).catch((err) => {
-    logger.error("Could not start go-ethereum-socketio connector:", err);
-  });
+      const bind =
+        typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
+      logger.debug("Listening on " + bind);
+    })
+    .catch((err) => {
+      logger.error("Could not start go-ethereum-socketio connector:", err);
+    });
 }

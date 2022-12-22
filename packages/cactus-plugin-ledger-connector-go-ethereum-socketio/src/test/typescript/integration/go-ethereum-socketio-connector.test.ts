@@ -62,12 +62,18 @@ describe("Go-Ethereum-SocketIO connector tests", () => {
   //////////////////////////////////
 
   async function deploySmartContract(): Promise<string> {
-    const txReceipt = await ledger.deployContract(HelloWorldContractJson.abi as any, "0x" + HelloWorldContractJson.bytecode);
+    const txReceipt = await ledger.deployContract(
+      HelloWorldContractJson.abi as any,
+      "0x" + HelloWorldContractJson.bytecode,
+    );
     expect(txReceipt.contractAddress).toBeTruthy();
     expect(txReceipt.status).toBeTrue();
     expect(txReceipt.blockHash).toBeTruthy();
     expect(txReceipt.blockNumber).toBeGreaterThan(1);
-    log.debug("Deployed test smart contract, TX on block number", txReceipt.blockNumber);
+    log.debug(
+      "Deployed test smart contract, TX on block number",
+      txReceipt.blockNumber,
+    );
     return txReceipt.contractAddress ?? "";
   }
 
@@ -80,7 +86,7 @@ describe("Go-Ethereum-SocketIO connector tests", () => {
       imageName,
       imageVersion,
       emitContainerLogs: true,
-      logLevel: sutLogLevel
+      logLevel: sutLogLevel,
     });
     await ledger.start();
     const ledgerRpcUrl = await ledger.getRpcApiWebSocketHost();
@@ -174,7 +180,7 @@ describe("Go-Ethereum-SocketIO connector tests", () => {
 
     // SocketIOApiClient has timeout running for each request which is not cancellable at the moment.
     // Wait timeout amount of seconds to make sure all handles are closed.
-    await new Promise((resolve) => setTimeout(resolve, syncReqTimeout))
+    await new Promise((resolve) => setTimeout(resolve, syncReqTimeout));
 
     log.info("Prune Docker...");
     await pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
@@ -200,14 +206,10 @@ describe("Go-Ethereum-SocketIO connector tests", () => {
   test("Function getNumericBalance returns const account balance", async () => {
     const method = { type: "function", command: "getNumericBalance" };
     const argsParam = {
-      args: [constTestAcc.address]
+      args: [constTestAcc.address],
     };
 
-    const response = await apiClient.sendSyncRequest(
-      {},
-      method,
-      argsParam,
-    );
+    const response = await apiClient.sendSyncRequest({}, method, argsParam);
 
     expect(response).toBeTruthy();
     expect(response.status).toEqual(200);
@@ -228,18 +230,16 @@ describe("Go-Ethereum-SocketIO connector tests", () => {
 
     const method = { type: "function", command: "transferNumericAsset" };
     const argsParam = {
-      args: [{
-        fromAddress: fromAcc.address,
-        toAddress: toAcc.address,
-        amount: transferAmount,
-      }]
+      args: [
+        {
+          fromAddress: fromAcc.address,
+          toAddress: toAcc.address,
+          amount: transferAmount,
+        },
+      ],
     };
 
-    const response = await apiClient.sendSyncRequest(
-      {},
-      method,
-      argsParam,
-    );
+    const response = await apiClient.sendSyncRequest({}, method, argsParam);
 
     expect(response).toBeTruthy();
   });
@@ -251,11 +251,7 @@ describe("Go-Ethereum-SocketIO connector tests", () => {
     const method = { type: "function", command: "getNonce" };
     const args = { args: { args: [constTestAcc.address] } };
 
-    const response = await apiClient.sendSyncRequest(
-      {},
-      method,
-      args,
-    );
+    const response = await apiClient.sendSyncRequest({}, method, args);
 
     expect(response).toBeTruthy();
     expect(response.status).toEqual(200);
@@ -272,11 +268,7 @@ describe("Go-Ethereum-SocketIO connector tests", () => {
     const method = { type: "function", command: "toHex" };
     const args = { args: { args: [value] } };
 
-    const response = await apiClient.sendSyncRequest(
-      {},
-      method,
-      args,
-    );
+    const response = await apiClient.sendSyncRequest({}, method, args);
 
     expect(response).toBeTruthy();
     expect(response.status).toEqual(200);
@@ -307,11 +299,7 @@ describe("Go-Ethereum-SocketIO connector tests", () => {
     const method = { type: "function", command: "sendRawTransaction" };
     const args = { args: [{ serializedTx: signedTx.rawTransaction }] };
 
-    const response = await apiClient.sendSyncRequest(
-      {},
-      method,
-      args,
-    );
+    const response = await apiClient.sendSyncRequest({}, method, args);
 
     expect(response).toBeTruthy();
     expect(response.status).toEqual(200);
@@ -327,11 +315,7 @@ describe("Go-Ethereum-SocketIO connector tests", () => {
     const method = { type: "web3Eth", command: "getBalance" };
     const args = { args: [constTestAcc.address] };
 
-    const response = await apiClient.sendSyncRequest(
-      {},
-      method,
-      args,
-    );
+    const response = await apiClient.sendSyncRequest({}, method, args);
 
     expect(response).toBeTruthy();
     expect(response.status).toEqual(200);
@@ -346,11 +330,7 @@ describe("Go-Ethereum-SocketIO connector tests", () => {
     const method = { type: "web3Eth", command: "foo" };
     const args = {};
 
-    const response = await apiClient.sendSyncRequest(
-      {},
-      method,
-      args,
-    );
+    const response = await apiClient.sendSyncRequest({}, method, args);
 
     expect(response).toBeTruthy();
     expect(response.status).toEqual(504);
@@ -361,15 +341,14 @@ describe("Go-Ethereum-SocketIO connector tests", () => {
    * Test ServerPlugin contract function.
    */
   test("Calling pure smart contract method works", async () => {
-    const contract = { abi: HelloWorldContractJson.abi, address: contractAddress };
+    const contract = {
+      abi: HelloWorldContractJson.abi,
+      address: contractAddress,
+    };
     const method = { type: "contract", command: "sayHello", function: "call" };
     const args = { args: [] };
 
-    const response = await apiClient.sendSyncRequest(
-      contract,
-      method,
-      args,
-    );
+    const response = await apiClient.sendSyncRequest(contract, method, args);
 
     expect(response).toBeTruthy();
     expect(response.status).toEqual(200);
@@ -380,16 +359,15 @@ describe("Go-Ethereum-SocketIO connector tests", () => {
   /**
    * Test ServerPlugin contract method checking.
    */
-   test("Calling contract returns error for non existant contract method", async () => {
-    const contract = { abi: HelloWorldContractJson.abi, address: contractAddress };
+  test("Calling contract returns error for non existant contract method", async () => {
+    const contract = {
+      abi: HelloWorldContractJson.abi,
+      address: contractAddress,
+    };
     const method = { type: "contract", command: "foo", function: "call" };
     const args = { args: [] };
 
-    const response = await apiClient.sendSyncRequest(
-      contract,
-      method,
-      args,
-    );
+    const response = await apiClient.sendSyncRequest(contract, method, args);
 
     expect(response).toBeTruthy();
     expect(response.status).toEqual(504);
@@ -399,41 +377,51 @@ describe("Go-Ethereum-SocketIO connector tests", () => {
   /**
    * Test ServerMonitorPlugin startMonitor/stopMonitor functions.
    */
-  test("Monitoring returns new block", async () => {
-    // Create monitoring promise and subscription
-    let monitorSub: any;
-    const newBlockPromise = new Promise<any>((resolve, reject) => {
-      monitorSub = apiClient.watchBlocksV1().subscribe({
-        next: block => resolve(block),
-        error: err => reject(err),
-        complete: () => reject("Unexpected watchBlocksV1 completion - reject."),
+  test.only(
+    "Monitoring returns new block",
+    async () => {
+      // Create monitoring promise and subscription
+      let monitorSub: any;
+      const newBlockPromise = new Promise<any>((resolve, reject) => {
+        monitorSub = apiClient.watchBlocksV1().subscribe({
+          next: (block) => resolve(block),
+          error: (err) => reject(err),
+          complete: () =>
+            reject("Unexpected watchBlocksV1 completion - reject."),
+        });
       });
-    });
 
-    try {
-      // Repeat deploySmartContract until block was received
-      while (true) {
-        const deployPromise = deploySmartContract();
-        const resolvedValue = await Promise.race([newBlockPromise, deployPromise]);
-        log.debug("Monitor: resolvedValue", resolvedValue);
-        if (resolvedValue && resolvedValue.blockData) {
-          log.info("Resolved watchBlock promise");
-          expect(resolvedValue.status).toEqual(200);
-          expect(resolvedValue.blockData.number).toBeGreaterThan(1);
-          expect(resolvedValue.blockData.transactions.length).toBeGreaterThan(0);
-          break;
+      try {
+        // Repeat deploySmartContract until block was received
+        while (true) {
+          const deployPromise = deploySmartContract();
+          const resolvedValue = await Promise.race([
+            newBlockPromise,
+            deployPromise,
+          ]);
+          log.debug("Monitor: resolvedValue", resolvedValue);
+          if (resolvedValue && resolvedValue.blockData) {
+            log.info("Resolved watchBlock promise");
+            expect(resolvedValue.status).toEqual(200);
+            expect(resolvedValue.blockData.number).toBeGreaterThan(1);
+            expect(resolvedValue.blockData.transactions.length).toBeGreaterThan(
+              0,
+            );
+            break;
+          }
+          // Sleep 1 second and try again
+          await new Promise((resolve) => setTimeout(resolve, 1000));
         }
-        // Sleep 1 second and try again
-        await new Promise((resolve) => setTimeout(resolve, 1000))
+      } catch (error) {
+        throw error;
+      } finally {
+        if (monitorSub) {
+          monitorSub.unsubscribe();
+        } else {
+          log.warn("monitorSub was not valid, could not unsubscribe");
+        }
       }
-    } catch (error) {
-      throw error;
-    } finally {
-      if (monitorSub) {
-        monitorSub.unsubscribe();
-      } else {
-        log.warn("monitorSub was not valid, could not unsubscribe");
-      }
-    }
-  }, testTimeout);
+    },
+    testTimeout,
+  );
 });
