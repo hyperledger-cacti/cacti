@@ -48,7 +48,19 @@ export class ServerMonitorPlugin {
    * @param {string} clientId: Client ID from which monitoring start request was made
    * @param {function} cb: A callback function that receives monitoring results at any time.
    */
-  startMonitor(clientId: string, cb: MonitorCallback) {
+
+  blockSigner = (blockData: any) => {
+    const signedBlockData = signMessageJwt({
+      blockData: blockData,
+    });
+    logger.debug(`signedBlockData = ${signedBlockData}`);
+    return {
+      status: 200,
+      blockData: signedBlockData,
+    };
+  };
+
+  startMonitor(clientId: string, allBlocks = false, cb: MonitorCallback) {
     logger.info("*** START MONITOR ***");
     logger.info("Client ID :" + clientId);
     // Implement handling to receive events from an end-chain and return them in a callback function
@@ -74,18 +86,21 @@ export class ServerMonitorPlugin {
             console.log("##[HL-BC] Validate transactions(D3)");
             console.log("##[HL-BC] digital sign on valid transaction(D4)");
 
-            if (trLength > 0) {
+            if (allBlocks == false) {
+              if (trLength > 0) {
+                logger.info("*** SEND BLOCK DATA ***");
+                logger.debug(
+                  "monitor is set to report blocks with at least one transaction",
+                );
+                logger.debug(`blockData = ${JSON.stringify(blockData)}`);
+                const retObj = this.blockSigner(blockData);
+                cb(retObj);
+              }
+            } else {
               logger.info("*** SEND BLOCK DATA ***");
+              logger.debug("monitor is set to report empty blocks");
               logger.debug(`blockData = ${JSON.stringify(blockData)}`);
-              const signedBlockData = signMessageJwt({
-                blockData: blockData,
-              });
-              logger.debug(`signedBlockData = ${signedBlockData}`);
-              // Notify only if transaction exists
-              const retObj = {
-                status: 200,
-                blockData: signedBlockData,
-              };
+              const retObj = this.blockSigner(blockData);
               cb(retObj);
             }
           } else {
