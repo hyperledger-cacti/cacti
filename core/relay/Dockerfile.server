@@ -2,7 +2,7 @@ FROM rust:1.62.1-slim-bullseye AS builder
 
 RUN apt-get update
 
-RUN apt-get install curl musl-tools perl build-essential -y
+RUN apt-get install curl musl-tools perl build-essential ca-certificates -y
 
 # adding the musl library target so that we can build
 # the components for busybox/alpine environments
@@ -53,6 +53,7 @@ RUN adduser -D -s /bin/sh -u 1000 -G relay relay
 RUN mkdir -p /opt/relay/config/relays
 
 COPY --from=builder /opt/relay/target/x86_64-unknown-linux-musl/release/server /opt/relay/
+COPY --from=builder /etc/ssl/certs /etc/ssl/certs
 
 COPY docker/server.template.toml /opt/relay/config/
 COPY docker/init.sh /opt/relay/
