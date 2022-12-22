@@ -36,8 +36,8 @@ Let us walk through the changes that are required in different phases of your ne
 A Fabric distributed application's business logic code spans two layers as illustrated in the network model:
 - _Chaincode_: 
   - _Data Sharing_: No code changes are required for Weaver enablement, as mentioned above.
-  - _Asset Exchange_: Asset exchange can be enabled in two ways, either use weaver `assetexchange` as library, or use interop chaincode to handle asset exchange by doing a chaincode to chaincode call.
-    - _Use Library `assetexchange`_: This method doesn't require `interop` chaincode to be installed. In you smart contract `go.mod`, add following in require (update the version according to the latest module version):
+  - _Asset Exchange_: Asset exchange can be enabled in two ways, either use weaver [`assetexchange`](https://pkg.go.dev/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange) as library, or use interop chaincode to handle asset exchange by doing a chaincode to chaincode call.
+    - _Use Library [`assetexchange`](https://pkg.go.dev/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange_: This method doesn't require [`interop`](https://pkg.go.dev/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop) chaincode to be installed. In you smart contract `go.mod`, add following in require (update the version according to the latest module version):
       ```
       require(
           ...
@@ -124,21 +124,17 @@ A Fabric distributed application's business logic code spans two layers as illus
 
       6. Add following extra utility functions as well:
         ```go
-        func (s *SmartContract) GetHTLCHash(ctx contractapi.TransactionContextInterface, callerChaincodeID, assetAgreementBytesBase64 string) (string, error) {
-            return assetexchange.GetHTLCHash(ctx, callerChaincodeID, assetAgreementBytesBase64)
-        }
         func (s *SmartContract) GetHTLCHashByContractId(ctx contractapi.TransactionContextInterface, contractId string) (string, error) {
             return assetexchange.GetHTLCHashByContractId(ctx, contractId)
-        }
-        func (s *SmartContract) GetHTLCHashPreImage(ctx contractapi.TransactionContextInterface, callerChaincodeID, assetAgreementBytesBase64 string) (string, error) {
-            return assetexchange.GetHTLCHashPreImage(ctx, callerChaincodeID, assetAgreementBytesBase64)
         }
         func (s *SmartContract) GetHTLCHashPreImageByContractId(ctx contractapi.TransactionContextInterface, contractId string) (string, error) {
             return assetexchange.GetHTLCHashPreImageByContractId(ctx, contractId)
         }
         ```
         
-    - _Use Interop Chaincode_: This method requires `interop` chaincode to be installed on all peers of the channel. Application chaincode needs to implement the interface `github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt`.
+      There is an alternative API to implement asset exchange using this library, which doesn't involve contractIds For details [read here](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/core/network/fabric-interop-cc/libs/assetexchange/README.md#without-contractid).
+        
+    - _Use [`Interop`](https://pkg.go.dev/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop) Chaincode_: This method requires `interop` chaincode to be installed on all peers of the channel. Application chaincode needs to implement the interface `github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt`.
       In you smart contract `go.mod`, add following in require (update the version according to the latest module version):
       ```
       require(
@@ -232,7 +228,7 @@ A Fabric distributed application's business logic code spans two layers as illus
         ```
   - _Asset Transfer_: _TBD_
 
-- _Layer-2 applications_: Let us examine the adaptations required in detail:
+- _Client (or Layer-2) applications_: Let us examine the adaptations required in detail:
 
   All the application changes require weaver SDK, so first you need to add the following dependency to the `dependencies` section of your application's `package.json` file:
   ```json
@@ -560,109 +556,116 @@ docker-compose up -d
 
 #### Launch IIN Agents
 
-You need to start one IIN agent for each organization. You can start an IIN agent within a Docker container using a [pre-built image](https://github.com/hyperledger-labs/weaver-dlt-interoperability/pkgs/container/weaver-iin-agent). You just need to customize the container configuration, which you can do by simply creating a folder (let's call it `iin_agent_config_<orgname>`) and configuring the following files in it:
-- `config.json`: This contains settings used to connect to a Fabric network organization and its CA. A sample is given below:
-  ```
-  {
-      "admin":{
-          "name":"admin",
-          "secret":"adminpw"
-      },
-      "agent": {
-          "name":"iin-agent",
-          "affiliation":"<affiliation>",
-          "role": "client",
-          "attrs": [{ "name": "iin-agent", "value": "true", "ecert": true }]
-      },
-      "mspId":"<msp-id>",
-      "ordererMspIds": [<list-of-orderer-msp-ids>],
-      "ccpPath": "<path-to-connection-profile>",
-      "walletPath": "",
-      "caUrl": "<ca-service-endpoint>",
-      "local": "false"
-  }
-  ```
-- `dnsconfig.json`: This defines list of known IIN agents for both local and foreign networks. A sample DNS configuration file is given below:
-  ```
-  {
-      "<securityDomainName1>": {
-          "<iin-agent1-name>": {
-              "endpoint": "<hostname:port>",
-              "tls": <true/false>,
-              "tlsCACertPath": "<cacert-path-or-empty-string>"
-          },
-          "<iin-agent2-name>": {
-              "endpoint": "<hostname:port>",
-              "tls": <true/false>,
-              "tlsCACertPath": "<cacert-path-or-empty-string>"
-          }
-      },
-      "<securityDomainName2>": {
-          "<iin-agent1-name>": {
-              "endpoint": "<hostname:port>",
-              "tls": <true/false>,
-              "tlsCACertPath": "<cacert-path-or-empty-string>"
-          },
-          "<iin-agent2-name>": {
-              "endpoint": "<hostname:port>",
-              "tls": <true/false>,
-              "tlsCACertPath": "<cacert-path-or-empty-string>"
-          }
-      }
-  }
-  ```
-  For each security domain, there's a JSON object which contains elements with key as iin-agent's name, which can be Org MSP Id for Fabric, and value as another JSON object. This value contains `endpoint` for the iin-agent, boolean `tls` which is true if TLS is enabled for that iin-agent, and `tlsCACertPath` which specifies the path to file containing TLS CA certs, keep it empty string if not known.
-- `security-domain-config.json`: This config file contains list of security domain defined for the network and its members, i.e. it can be list of organizations or channel name. Sample security domain configuration file:
-  ```
-  {
-      "<securityDomainName1>": "<channelName>",
-      "<securityDomainName2>": [
-          "<Org1MSPId>",
-          "<Org2MSPId>"
-      ]
-  }
-  ```
-- `.env`: This sets suitable environment variables within the driver container. Copy the `.env.template` file [from the repository](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/core/identity-management/iin-agent/.env.docker.template) and customize it for your purposes, as indicated in the below sample:
-  ```
-  IIN_AGENT_PORT=<iin-agent-server-port>
-  IIN_AGENT_TLS=<true/false>
-  IIN_AGENT_TLS_CERT_PATH=<path_to_tls_cert_pem_for_iin_agent>
-  IIN_AGENT_TLS_KEY_PATH=<path_to_tls_key_pem_for_iin_agent>
-  MEMBER_ID=<org-msp-id>
-  SECURITY_DOMAIN=network1
-  DLT_TYPE=fabric
-  CONFIG_PATH=./config.json
-  DNS_CONFIG_PATH=./dnsconfig.json
-  SECURITY_DOMAIN_CONFIG_PATH=./security-domain-config.json
-  WEAVER_CONTRACT_ID=<name-of-weaver-interop-chaincode-installed>
-  SYNC_PERIOD=<repeated_auto_sync_interval>
-  AUTO_SYNC=<true/false>
-  TLS_CREDENTIALS_DIR=<dir-with-tls-cert-and-key>
-  DOCKER_IMAGE_NAME=ghcr.io/hyperledger-labs/weaver-iin-agent
-  DOCKER_TAG=1.5.2
-  EXTERNAL_NETWORK=<docker-bridge-network>
-  ```
-  * `IIN_AGENT_ENDPOINT`: The endpoint at which IIN Agent server should listen. E.g.: `0.0.0.0:9500`
-  * `IIN_AGENT_TLS`: Set this to `true` to enable TLS on IIN Agent server
-  * `IIN_AGENT_TLS_CERT_PATH`: Path to TLS certificate if TLS is enabled
-  * `IIN_AGENT_TLS_KEY_PATH`: Path to TLS key if TLS is enabled
-  * `MEMBER_ID`: Member Id for this IIN Agent. For fabric network, it should be the Organization's MSP ID
-  * `SECURITY_DOMAIN`: Security domain to which this IIN Agent belongs
-  * `DLT_TYPE`: To indicate the type of DLT for which this IIN Agent is running. E.g. `fabric`
-  * `CONFIG_PATH`: Path to ledger specific config file (explained in next subsection)
-  * `DNS_CONFIG_PATH`: Path to DNS config file explained in previous sub sections
-  * `SECURITY_DOMAIN_CONFIG_PATH`: Path to security domain config file explained in previous sub sections
-  * `WEAVER_CONTRACT_ID`: Contract ID for DLT specific weaver interoperation module installed on network
-  * `SYNC_PERIOD`: Period at which auto synchronization of memberships from other security domains should happen
-  * `AUTO_SYNC`: Set this to `true` to enable auto synchronization of memberships from other security domains
-  * `EXTERNAL_NETWORK`: Set to the network [name](https://docs.docker.com/compose/networking/) of your Fabric network.
+You need to launch one IIN agent for each organization. To launch an IIN agent within a Docker container using a :
+1. You can use [weaver-iin-agent](https://github.com/hyperledger-labs/weaver-dlt-interoperability/pkgs/container/weaver-iin-agent) image.
+2. Before starting the IIN agent container, you need to customize the container configuration, which you can do by simply creating a folder (let's call it `iin_agent_config_<orgname>`) and configuring the following files in it:
+  - `config.json`: This contains settings used to connect to a Fabric network organization and its CA. A sample is given below:
+    ```
+    {
+        "admin":{
+            "name":"admin",
+            "secret":"adminpw"
+        },
+        "agent": {
+            "name":"iin-agent",
+            "affiliation":"<affiliation>",
+            "role": "client",
+            "attrs": [{ "name": "iin-agent", "value": "true", "ecert": true }]
+        },
+        "mspId":"<msp-id>",
+        "ordererMspIds": [<list-of-orderer-msp-ids>],
+        "ccpPath": "<path-to-connection-profile>",
+        "walletPath": "",
+        "caUrl": "<ca-service-endpoint>",
+        "local": "false"
+    }
+    ```
+  - `dnsconfig.json`: This defines list of known IIN agents for both local and foreign networks. A sample DNS configuration file is given below:
+    ```
+    {
+        "<securityDomainName1>": {
+            "<iin-agent1-name>": {
+                "endpoint": "<hostname:port>",
+                "tls": <true/false>,
+                "tlsCACertPath": "<cacert-path-or-empty-string>"
+            },
+            "<iin-agent2-name>": {
+                "endpoint": "<hostname:port>",
+                "tls": <true/false>,
+                "tlsCACertPath": "<cacert-path-or-empty-string>"
+            }
+        },
+        "<securityDomainName2>": {
+            "<iin-agent1-name>": {
+                "endpoint": "<hostname:port>",
+                "tls": <true/false>,
+                "tlsCACertPath": "<cacert-path-or-empty-string>"
+            },
+            "<iin-agent2-name>": {
+                "endpoint": "<hostname:port>",
+                "tls": <true/false>,
+                "tlsCACertPath": "<cacert-path-or-empty-string>"
+            }
+        }
+    }
+    ```
+    For each security domain, there's a JSON object which contains elements with key as iin-agent's name, which can be Org MSP Id for Fabric, and value as another JSON object. This value contains `endpoint` for the iin-agent, boolean `tls` which is true if TLS is enabled for that iin-agent, and `tlsCACertPath` which specifies the path to file containing TLS CA certs, keep it empty string if not known.
+  - `security-domain-config.json`: This config file contains list of security domain defined for the network and its members, i.e. it can be list of organizations or channel name. Sample security domain configuration file:
+    ```
+    {
+        "<securityDomainName1>": "<channelName>",
+        "<securityDomainName2>": [
+            "<Org1MSPId>",
+            "<Org2MSPId>"
+        ]
+    }
+    ```
+  - `.env`: This sets suitable environment variables within the driver container. Copy the `.env.template` file [from the repository](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/core/identity-management/iin-agent/.env.docker.template) and customize it for your purposes, as indicated in the below sample:
+    ```
+    IIN_AGENT_PORT=<iin-agent-server-port>
+    IIN_AGENT_TLS=<true/false>
+    IIN_AGENT_TLS_CERT_PATH=<path_to_tls_cert_pem_for_iin_agent>
+    IIN_AGENT_TLS_KEY_PATH=<path_to_tls_key_pem_for_iin_agent>
+    MEMBER_ID=<org-msp-id>
+    SECURITY_DOMAIN=network1
+    DLT_TYPE=fabric
+    CONFIG_PATH=./config.json
+    DNS_CONFIG_PATH=./dnsconfig.json
+    SECURITY_DOMAIN_CONFIG_PATH=./security-domain-config.json
+    WEAVER_CONTRACT_ID=<name-of-weaver-interop-chaincode-installed>
+    SYNC_PERIOD=<repeated_auto_sync_interval>
+    AUTO_SYNC=<true/false>
+    TLS_CREDENTIALS_DIR=<dir-with-tls-cert-and-key>
+    DOCKER_IMAGE_NAME=ghcr.io/hyperledger-labs/weaver-iin-agent
+    DOCKER_TAG=1.5.2
+    EXTERNAL_NETWORK=<docker-bridge-network>
+    ```
+    * `IIN_AGENT_ENDPOINT`: The endpoint at which IIN Agent server should listen. E.g.: `0.0.0.0:9500`
+    * `IIN_AGENT_TLS`: Set this to `true` to enable TLS on IIN Agent server
+    * `IIN_AGENT_TLS_CERT_PATH`: Path to TLS certificate if TLS is enabled
+    * `IIN_AGENT_TLS_KEY_PATH`: Path to TLS key if TLS is enabled
+    * `MEMBER_ID`: Member Id for this IIN Agent. For fabric network, it should be the Organization's MSP ID
+    * `SECURITY_DOMAIN`: Security domain to which this IIN Agent belongs
+    * `DLT_TYPE`: To indicate the type of DLT for which this IIN Agent is running. E.g. `fabric`
+    * `CONFIG_PATH`: Path to ledger specific config file (explained in next subsection)
+    * `DNS_CONFIG_PATH`: Path to DNS config file explained in previous sub sections
+    * `SECURITY_DOMAIN_CONFIG_PATH`: Path to security domain config file explained in previous sub sections
+    * `WEAVER_CONTRACT_ID`: Contract ID for DLT specific weaver interoperation module installed on network
+    * `SYNC_PERIOD`: Period at which auto synchronization of memberships from other security domains should happen
+    * `AUTO_SYNC`: Set this to `true` to enable auto synchronization of memberships from other security domains
+    * `EXTERNAL_NETWORK`: Set to the network [name](https://docs.docker.com/compose/networking/) of your Fabric network.
 
-- `docker-compose.yaml`: This specifies the properties of the driver container. You can use the [file in the repository](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/core/identity-management/iin-agent/docker-compose.yml) verbatim.
+  - `docker-compose.yaml`: This specifies the properties of the IIN agent container. You can use the [file in the repository](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/core/identity-management/iin-agent/docker-compose.yml) verbatim.
 
-To start the driver, navigate to the folder containing the above files and run the following:
+3. Now to start the IIN agent, navigate to the folder containing the above files and run the following:
 ```bash
 docker-compose up -d
 ```
+
+To launch an additional IIN agent corresponding to a different organization, repeat the Step 2 and 3 but use a different directory to keep the configuration files and change these specific things:
+- Update the organization names everywhere mentioned in `config.json`.
+- Update `IIN_AGENT_ENDPOINT` and `MEMBER_ID` in environment variables.
+  
 
 #### Ledger Initialization
 
@@ -719,110 +722,3 @@ To prepare your network for interoperation with a foreign network, you need to r
   Call the function or HTTP endpoint to record local membership that was created in development step.
 
 Your Fabric network is now up and running with the necessary Weaver components, and your network's channel's ledger is bootstrapped with the initial configuration necessary for cross-network interactions!
-
-<!--
-3. *IsAssetLocked*
-```go
-func (s *SmartContract) IsAssetLocked(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto64 string) (bool, error) {
-    return assetexchange.IsAssetLocked(ctx, "", assetAgreementSerializedProto64)
-}
-```
-
-5. *IsFungibleAssetLocked*
-```go
-func (s *SmartContract) IsFungibleAssetLocked(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
-    return assetexchange.IsFungibleAssetLocked(ctx, contractId)
-}
-```
-
-6. *ClaimAsset*
-```go
-func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto64 string, claimInfoSerializedProto64 string) (bool, error) {
-    // Note recipient will be the caller for this function
-    claimed := false
-    claimed, err = assetexchange.ClaimAsset(ctx, "", assetAgreementSerializedProto64, claimInfoSerializedProto64)
-    if err != nil {
-        return false, logThenErrorf(err.Error())
-    }
-    // After the above function call, update the owner of the asset with recipeint/caller
-    
-    return claimed, nil
-}
-```
-
-7. *ClaimAssetUsingContractId*
-```go
-func (s *SmartContract) ClaimAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId, claimInfoSerializedProto64 string) (bool, error) {
-    // Note recipient will be the caller for this function
-    claimed := false
-    err := assetexchange.ClaimAssetUsingContractId(ctx, contractId, claimInfoSerializedProto64)
-    if err != nil {
-        return false, logThenErrorf(err.Error())
-    }
-    claimed = true
-    // After the above function call, update the owner of the asset with recipeint/caller
-    
-    return claimed, nil
-}
-```
-
-8. *ClaimFungibleAsset*
-```go
-func (s *SmartContract) ClaimFungibleAsset(ctx contractapi.TransactionContextInterface, contractId, claimInfoSerializedProto64 string) (bool, error) {
-    // Note recipient will be the caller for this function
-    claimed := false
-    err := assetexchange.ClaimAssetUsingContractId(ctx, contractId, claimInfoSerializedProto64)
-    if err != nil {
-        return false, logThenErrorf(err.Error())
-    }
-    claimed = true
-    // After the above function call, update the owner of the asset with recipeint/caller
-    
-    return claimed, nil
-}
-```
-
-9. *UnlockAsset*
-```go
-func (s *SmartContract) UnlockAsset(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto64 string) (bool, error) {
-    unlocked := false
-    unlocked, err = assetexchange.UnlockAsset(ctx, "", assetAgreementSerializedProto64)
-    if err != nil {
-        return false, logThenErrorf(err.Error())
-    }
-    ...
-    ...
-    return true, nil
-}
-```
-
-10. *UnlockAssetUsingContractId*
-```go
-func (s *SmartContract) UnlockAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
-    unlocked := false
-    err := assetexchange.UnlockAssetUsingContractId(ctx, contractId)
-    if err != nil {
-        return false, logThenErrorf(err.Error())
-    }
-    unlocked = true
-    ...
-    ...
-    return true, nil
-}
-```
-
-11. *UnlockFungibleAsset*
-```go
-func (s *SmartContract) UnlockFungibleAsset(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
-    unlocked := false
-    err := assetexchange.UnlockFungibleAsset(ctx, contractId)
-    if err != nil {
-        return false, logThenErrorf(err.Error())
-    }
-    unlocked = true
-    ...
-    ...
-    return true, nil
-}
-```
--->

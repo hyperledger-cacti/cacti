@@ -162,7 +162,7 @@ async function invoke(
         const endorsedProposalResponses: view_data.FabricView.EndorsedProposalResponse[] = [];
         //TODO Fix ts error
         //@ts-ignore
-        let ii = 0;
+        let endorsementCounter = 0;
         proposalResponseResult.responses.forEach((response) => {
             // Set single (last) InteropPayload as response
             const currentResponse = new proposalResponse.Response();
@@ -185,9 +185,9 @@ async function invoke(
             // Add to list of endorsedProposalResponses
             endorsedProposalResponses.push(endorsedProposalResponse);
             
-            console.log('InteropPayload', ii, Buffer.from(response.response.payload).toString('base64'));
-            console.log('Endorsement', ii, Buffer.from(endorsement.serializeBinary()).toString('base64'));
-            ii++;
+            console.log('InteropPayload', endorsementCounter, Buffer.from(response.response.payload).toString('base64'));
+            console.log('Endorsement', endorsementCounter, Buffer.from(endorsement.serializeBinary()).toString('base64'));
+            endorsementCounter++;
         });
         viewPayload.setEndorsedProposalResponsesList(endorsedProposalResponses);
         // Disconnect from the gateway.
