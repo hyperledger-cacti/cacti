@@ -24,6 +24,7 @@ import statePb from "@hyperledger-labs/weaver-protos-js/common/state_pb";
 import fabricViewPb from "@hyperledger-labs/weaver-protos-js/fabric/view_data_pb";
 import cordaViewPb from "@hyperledger-labs/weaver-protos-js/corda/view_data_pb";
 import interopPayloadPb from "@hyperledger-labs/weaver-protos-js/common/interop_payload_pb";
+import proposalPb from "@hyperledger-labs/weaver-protos-js/peer/proposal_pb";
 import proposalResponsePb from "@hyperledger-labs/weaver-protos-js/peer/proposal_response_pb";
 import identitiesPb from "@hyperledger-labs/weaver-protos-js/msp/identities_pb";
 import { Relay } from "./Relay";
@@ -170,7 +171,10 @@ const verifyRemoteProposalResponse = async (proposalResponseBase64, isEncrypted,
 const getResponseDataFromView = (view, privKeyPEM = null) => {
     if (view.getMeta().getProtocol() == statePb.Meta.Protocol.FABRIC) {
         const fabricView = fabricViewPb.FabricView.deserializeBinary(view.getData());
-        const interopPayload = interopPayloadPb.InteropPayload.deserializeBinary(Uint8Array.from(Buffer.from(fabricView.getResponse().getPayload())));
+        // TODO: Match response from different members in array rather than taking the first element
+        const fabricViewChaincodeAction = proposalPb.ChaincodeAction.deserializeBinary(fabricView.getEndorsedProposalResponsesList()[0].getPayload().getExtension_asU8());
+        //const interopPayload = interopPayloadPb.InteropPayload.deserializeBinary(Uint8Array.from(Buffer.from(fabricView.getResponse().getPayload())));
+        const interopPayload = interopPayloadPb.InteropPayload.deserializeBinary(Uint8Array.from(Buffer.from(fabricViewChaincodeAction.getResponse().getPayload())));
         if (interopPayload.getConfidential()) {    // Currently this is only supported for Fabric because it uses ECDSA keys in wallets
             const confidentialPayload = interopPayloadPb.ConfidentialPayload.deserializeBinary(Uint8Array.from(Buffer.from(interopPayload.getPayload())));
             const decryptedPayload = decryptData(Buffer.from(confidentialPayload.getEncryptedPayload()), privKeyPEM);
@@ -240,7 +244,9 @@ const getResponsePayloadFromFabricView = (view) => {
         throw new Error(`Not a Fabric view`);
     }
     const fabricView = fabricViewPb.FabricView.deserializeBinary(view.getData())
-    return Buffer.from(fabricView.getResponse().serializeBinary()).toString('base64')
+    // TODO: Match response from different members in array rather than taking the first element
+    const fabricViewChaincodeAction = proposalPb.ChaincodeAction.deserializeBinary(fabricView.getEndorsedProposalResponsesList()[0].getPayload().getExtension_asU8());
+    return Buffer.from(fabricViewChaincodeAction.getResponse().serializeBinary()).toString('base64')
 }
 
 /**
@@ -459,10 +465,12 @@ const interopFlow = async (
         }
         views.push(requestResponse.view);
         viewsSerializedBase64.push(Buffer.from(requestResponse.view.serializeBinary()).toString("base64"));
+        console.log('VIEW SERIALIZED BASE64:', Buffer.from(requestResponse.view.serializeBinary()).toString("base64"));
         computedAddresses.push(requestResponse.address);
         if (confidential) {
             const respData = getResponseDataFromView(requestResponse.view, keyCert.key.toBytes());
             viewContentsBase64.push(respData.contents.toString("base64"));
+            console.log('VIEW CONTENTS BASE64:', respData.contents.toString("base64"));
         } else {
             viewContentsBase64.push("");
         }

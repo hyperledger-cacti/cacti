@@ -31,18 +31,30 @@ type interop interface {
 
 // Extract data (i.e., query response) from view
 func ExtractAndValidateDataFromView(view *common.View, b64ViewContent string) ([]byte, error) {
-	var interopPayload common.InteropPayload
+	var interopPayloadList []*common.InteropPayload
 	if view.Meta.Protocol == common.Meta_FABRIC {
 		var fabricViewData fabric.FabricView
 		err := protoV2.Unmarshal(view.Data, &fabricViewData)
 		if err != nil {
 			return nil, fmt.Errorf("FabricView Unmarshal error: %s", err)
 		}
-		err = protoV2.Unmarshal(fabricViewData.Response.Payload, &interopPayload)
-		if err != nil {
-			return nil, fmt.Errorf("Unable to Unmarshal interopPayload: %s", err.Error())
+		interopPayloadList = make([]*common.InteropPayload, len(fabricViewData.EndorsedProposalResponses))
+		for i, endorsedProposalResponse := range fabricViewData.EndorsedProposalResponses {
+			var chaincodeAction peer.ChaincodeAction
+			err = proto.Unmarshal(endorsedProposalResponse.Payload.Extension, &chaincodeAction)
+			if err != nil {
+				return nil, fmt.Errorf("Unable to Unmarshal ChaincodeAction: %s", err.Error())
+			}
+			var interopPayload common.InteropPayload
+			err = protoV2.Unmarshal(chaincodeAction.Response.Payload, &interopPayload)
+			if err != nil {
+				return nil, fmt.Errorf("Unable to Unmarshal interopPayload: %s", err.Error())
+			}
+			interopPayloadList[i] = &interopPayload
 		}
 	} else if view.Meta.Protocol == common.Meta_CORDA {
+		interopPayloadList = make([]*common.InteropPayload, 1)
+		var interopPayload common.InteropPayload
 		var cordaViewData corda.ViewData
 		err := protoV2.Unmarshal(view.Data, &cordaViewData)
 		if err != nil {
@@ -52,40 +64,68 @@ func ExtractAndValidateDataFromView(view *common.View, b64ViewContent string) ([
 		if err != nil {
 			return nil, fmt.Errorf("Unable to Unmarshal interopPayload: %s", err.Error())
 		}
+		interopPayloadList[0] = &interopPayload
 	} else {
 		return nil, fmt.Errorf("Cannot extract data from view; unsupported DLT type: %+v", view.Meta.Protocol)
 	}
 
-	// If view data is encrypted, match it to supplied decrypted data using the hash in the view payload
-	if interopPayload.Confidential {
-		var confidentialPayload common.ConfidentialPayload
-		err := protoV2.Unmarshal(interopPayload.Payload, &confidentialPayload)
-		if err != nil {
-			return nil, fmt.Errorf("ConfidentialPayload Unmarshal error: %s", err)
-		}
-		viewB64ContentBytes, err := base64.StdEncoding.DecodeString(b64ViewContent)
-		if err != nil {
-			return nil, fmt.Errorf("Unable to base64 decode view content: %s", err.Error())
-		}
-		var confidentialPayloadContents common.ConfidentialPayloadContents
-		err = protoV2.Unmarshal(viewB64ContentBytes, &confidentialPayloadContents)
-		if err != nil {
-			return nil, fmt.Errorf("ConfidentialPayloadContents Unmarshal error: %s", err)
-		}
-		if confidentialPayload.HashType == common.ConfidentialPayload_HMAC {
-			payloadHMAC := hmac.New(sha256.New, confidentialPayloadContents.Random)
-			payloadHMAC.Write(confidentialPayloadContents.Payload)
-			payloadHMACBytes := payloadHMAC.Sum(nil)
-			if !bytes.Equal(confidentialPayload.Hash, payloadHMACBytes) {
-				return nil, fmt.Errorf("View payload hash does not match hash of data submitted by client")
+	var payloadConfidential bool
+	var viewPayload, viewPayloadHash []byte
+	for i, interopPayload := range interopPayloadList {
+		// If view data is encrypted, match it to supplied decrypted data using the hash in the view payload
+		if interopPayload.Confidential {
+			if i == 0 {
+				payloadConfidential = true
+            } else if !payloadConfidential {
+				return nil, fmt.Errorf("Mismatching confidentiality flags among interop payloads")
+			}
+			var confidentialPayload common.ConfidentialPayload
+			err := protoV2.Unmarshal(interopPayload.Payload, &confidentialPayload)
+			if err != nil {
+				return nil, fmt.Errorf("ConfidentialPayload Unmarshal error: %s", err)
+			}
+			viewB64ContentBytes, err := base64.StdEncoding.DecodeString(b64ViewContent)
+			if err != nil {
+				return nil, fmt.Errorf("Unable to base64 decode view content: %s", err.Error())
+			}
+			var confidentialPayloadContents common.ConfidentialPayloadContents
+			err = protoV2.Unmarshal(viewB64ContentBytes, &confidentialPayloadContents)
+			if err != nil {
+				return nil, fmt.Errorf("ConfidentialPayloadContents Unmarshal error: %s", err)
+			}
+			if confidentialPayload.HashType == common.ConfidentialPayload_HMAC {
+				payloadHMAC := hmac.New(sha256.New, confidentialPayloadContents.Random)
+				payloadHMAC.Write(confidentialPayloadContents.Payload)
+				payloadHMACBytes := payloadHMAC.Sum(nil)
+				if !bytes.Equal(confidentialPayload.Hash, payloadHMACBytes) {
+					return nil, fmt.Errorf("View payload hash does not match hash of data submitted by client")
+				}
+			} else {
+				return nil, fmt.Errorf("Unsupported hash type in interop view payload: %+v", confidentialPayload.HashType)
+			}
+			if i == 0 {
+				viewPayloadHash = confidentialPayload.Hash
+				viewPayload = confidentialPayloadContents.Payload
+			} else {
+				// If the hashes match, we assume the plaintext payload matches too
+				if !bytes.Equal(viewPayloadHash, confidentialPayload.Hash) {
+					return nil, fmt.Errorf("Mismatching payload hashes in proposal responses: 0 - %+v, %d - %+v", viewPayloadHash, i, confidentialPayload.Hash)
+				}
 			}
 		} else {
-			return nil, fmt.Errorf("Unsupported hash type in interop view payload: %+v", confidentialPayload.HashType)
+			if i == 0 {
+				viewPayload = interopPayload.Payload
+				payloadConfidential = false
+            } else if payloadConfidential {
+				return nil, fmt.Errorf("Mismatching confidentiality flags among interop payloads")
+			} else {
+				if !bytes.Equal(viewPayload, interopPayload.Payload) {
+					return nil, fmt.Errorf("Mismatching payloads in proposal responses: 0 - %+v, %d - %+v", viewPayload, i, interopPayload.Payload)
+				}
+			}
 		}
-		return confidentialPayloadContents.Payload, nil
-	} else {
-		return interopPayload.Payload, nil
 	}
+	return viewPayload, nil
 }
 
 // Validate view against address, and extract data (i.e., query response) from view
@@ -271,11 +311,10 @@ func verifyCordaNotarization(s *SmartContract, ctx contractapi.TransactionContex
 // Verification requires the following checks to be performed:
 // 1. Ensure the response is in a valid format - view data should be parsed to [FabricViewData] and the
 // list of responses in the [FabricViewData] should be parsed to proposal reponses.
-// 2. Verify address in payload is the same as original address
+// 2. Verify address in each proposal response payload is the same as original address
 // 3. Verify each of the endorser signatures in the ProposalResponse according to the response payload and certificate.
 // 4. Check each of the endorser certificates matches the member's entry in the network's Membership.
-// 5. Verify the response matches the response inside the ProposalResponsePayload chaincodeaction
-// 6. Check the notarizations fulfill the verification policy of the request.
+// 5. Check that the notarizations fulfill the verification policy of the request.
 func verifyFabricNotarization(s *SmartContract, ctx contractapi.TransactionContextInterface, data []byte, verificationPolicy *common.Policy, securityDomain string, address string) error {
 	// 1. Ensure the response is in a valid format
 	var fabricViewData fabric.FabricView
@@ -283,57 +322,59 @@ func verifyFabricNotarization(s *SmartContract, ctx contractapi.TransactionConte
 	if err != nil {
 		return fmt.Errorf("Unable to decode fabric view data: %s", err.Error())
 	}
-	// 2. Verify address in payload is the same as original address
-	var interopPayload common.InteropPayload
-	err = protoV2.Unmarshal(fabricViewData.Response.Payload, &interopPayload)
-	if err != nil {
-		return fmt.Errorf("Unable to Unmarshal interopPayload: %s", err.Error())
-	}
-	if address != interopPayload.Address {
-		return fmt.Errorf("Address in response does not match original address: Original: %s Response: %s", address, interopPayload.Address)
-	}
 	signerList := []string{}
-	for _, endorsment := range fabricViewData.Endorsements {
+	var viewPayload []byte
+	for i, endorsedProposalResponse := range fabricViewData.EndorsedProposalResponses {
+		// 2. Verify address in each proposal response payload is the same as original address
+		var chaincodeAction peer.ChaincodeAction
+		err = proto.Unmarshal(endorsedProposalResponse.Payload.Extension, &chaincodeAction)
+		if err != nil {
+			return fmt.Errorf("Unable to Unmarshal ChaincodeAction: %s", err.Error())
+		}
+		if i == 0 {
+			viewPayload = chaincodeAction.Response.Payload
+		}
+		var interopPayload common.InteropPayload
+		err = protoV2.Unmarshal(chaincodeAction.Response.Payload, &interopPayload)
+		if err != nil {
+			return fmt.Errorf("Unable to Unmarshal interopPayload: %s", err.Error())
+		}
+		if address != interopPayload.Address {
+			return fmt.Errorf("Address in response does not match original address: Original: %s Response: %s", address, interopPayload.Address)
+		}
+
 		var serialisedIdentity msp.SerializedIdentity
-		err := proto.Unmarshal(endorsment.Endorser, &serialisedIdentity)
+		err := proto.Unmarshal(endorsedProposalResponse.Endorsement.Endorser, &serialisedIdentity)
 		x509Cert, err := parseCert(string(serialisedIdentity.IdBytes))
 		if err != nil {
 			return fmt.Errorf("Unable to parse certificate: %s", err.Error())
 		}
-		proposalResponsePayloadBytes, err := proto.Marshal(fabricViewData.ProposalResponsePayload)
+		proposalResponsePayloadBytes, err := proto.Marshal(endorsedProposalResponse.Payload)
 		if err != nil {
 			return fmt.Errorf("Unable to marshal proposal response payload: %s", err.Error())
 		}
 
 		// 3. Verify each of the endorser signatures in the ProposalResponse according to the response payload and certificate.
-		err = validateSignature(string(append(proposalResponsePayloadBytes, endorsment.Endorser...)), x509Cert, string(endorsment.Signature))
+		err = validateSignature(string(append(proposalResponsePayloadBytes, endorsedProposalResponse.Endorsement.Endorser...)), x509Cert, string(endorsedProposalResponse.Endorsement.Signature))
 		if err != nil {
 			return fmt.Errorf("Unable to Validate Signature: %s", err.Error())
 		}
-		org := serialisedIdentity.Mspid
+
 		// 4. Check each of the endorser certificates matches the member's entry in the network's Membership.
+		org := serialisedIdentity.Mspid
 		err = verifyMemberInSecurityDomain(s, ctx, string(serialisedIdentity.IdBytes), securityDomain, org)
 		if err != nil {
 			return fmt.Errorf("Verify membership failed. Certificate not valid: %s", err.Error())
 		}
 		signerList = append(signerList, org)
 	}
-	// 5. Verify the response matches the response inside the ProposalResponsePayload chaincodeaction
-	var chaincodeAction peer.ChaincodeAction
-	err = proto.Unmarshal(fabricViewData.ProposalResponsePayload.Extension, &chaincodeAction)
-	if err != nil {
-		return fmt.Errorf("Unable to Unmarshal ChaincodeAction: %s", err.Error())
-	}
-	if string(chaincodeAction.Response.Payload) != string(fabricViewData.Response.Payload) {
-		return fmt.Errorf("Response in fabric view does not match response in proposal response")
-	}
-	// 6. Check the notarizations fulfill the verification policy of the request.
+	// 5. Check the notarizations fulfill the verification policy of the request.
 	requiredSigners := verificationPolicy.Criteria
 	for _, signer := range requiredSigners {
 		if !Contains(signerList, signer) {
 			return fmt.Errorf("Notarizations missing signer: %s", signer)
 		}
 	}
-	log.Infof("Proof associated with response '%s' from Fabric network for query '%s' is VALID", string(fabricViewData.Response.Payload), address)
+	log.Infof("Proof associated with response '%s' from Fabric network for query '%s' is VALID", string(viewPayload), address)
 	return nil
 }
