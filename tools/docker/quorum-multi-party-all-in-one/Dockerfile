@@ -3,9 +3,9 @@
 # Setup quorum-dev-quickstart
 ################################
 
-FROM node:16 AS quorum-dev-quickstart-setup
+FROM node:16.17.0 AS quorum-dev-quickstart-setup
 
-ENV QUORUM_QUICKSTART_VERSION=0.0.53
+ENV QUORUM_QUICKSTART_VERSION=0.0.80
 ENV ROOT_DIR=/opt/quorum-dev-quickstart
 
 WORKDIR "${ROOT_DIR}"

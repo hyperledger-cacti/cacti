@@ -1,6 +1,6 @@
 general:
   vulnerabilities:
     #besu-all-in-one
+    - CVE-2022-37734
+    - CVE-2022-25857
 
-    -CVE-2022-37734
-    -CVE-2022-25857
