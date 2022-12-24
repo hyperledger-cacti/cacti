@@ -21,6 +21,7 @@ import net.corda.core.node.services.vault.QueryCriteria
 import com.google.protobuf.ByteString
 
 import org.hyperledger.fabric.protos.msp.Identities
+import org.hyperledger.fabric.protos.peer.ProposalPackage
 
 import com.weaver.protos.common.state.State
 import com.weaver.protos.fabric.view_data.ViewData
@@ -141,7 +142,9 @@ class GetExternalStateByLinearId(
                 State.Meta.Protocol.FABRIC -> {
                     val fabricViewData = ViewData.FabricView.parseFrom(viewDataByteArray)
                     println("fabricViewData: $fabricViewData")
-                    val interopPayload = InteropPayloadOuterClass.InteropPayload.parseFrom(fabricViewData.response.payload)
+                    // TODO: We assume here that the response payloads have been matched earlier, but perhaps we should match them here too
+                    val chaincodeAction = ProposalPackage.ChaincodeAction.parseFrom(fabricViewData.endorsedProposalResponsesList[0].payload.extension)
+                    val interopPayload = InteropPayloadOuterClass.InteropPayload.parseFrom(chaincodeAction.response.payload)
                     val payloadString = interopPayload.payload.toStringUtf8()
                     println("response from remote: ${payloadString}.\n")
                     println("query address: ${interopPayload.address}.\n")

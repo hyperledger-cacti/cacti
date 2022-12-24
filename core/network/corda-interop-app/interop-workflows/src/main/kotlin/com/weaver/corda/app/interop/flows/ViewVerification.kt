@@ -186,22 +186,42 @@ fun verifyFabricNotarization(
         println("Fabric view data: $fabricViewData\n")
 
         // 2. Verify address in payload is the same as original address
-        val interopPayload = InteropPayloadOuterClass.InteropPayload.parseFrom(fabricViewData.response.payload)
+        /*val interopPayload = InteropPayloadOuterClass.InteropPayload.parseFrom(fabricViewData.response.payload)
         println("Interop payload: $interopPayload")
         if (interopPayload.address != addressString) {
             println("Address in response does not match original address: Original: $addressString Response: ${interopPayload.address}")
             return Left(Error("Address in response does not match original address: Original: $addressString Response: ${interopPayload.address}"))
+        }*/
+
+        // TODO: Handle encrypted (confidential) payloads in Fabric views
+        var responsePayload = ""
+        var responseIndex = 0
+        for (endorsedProposalResponse in fabricViewData.endorsedProposalResponsesList) {
+            val chaincodeAction = ProposalPackage.ChaincodeAction.parseFrom(endorsedProposalResponse.payload.extension)
+            val interopPayload = InteropPayloadOuterClass.InteropPayload.parseFrom(chaincodeAction.response.payload)
+            println("Interop payload: $interopPayload")
+            if (responseIndex == 0) {
+                responsePayload = chaincodeAction.response.payload.toString()
+            } else if (responsePayload != chaincodeAction.response.payload.toString()) {
+                println("Mismatching payloads in proposal responses: 0 - $responsePayload,  $responseIndex: ${chaincodeAction.response.payload}")
+                return Left(Error("Address in response does not match original address: Original: $addressString Response: ${interopPayload.address}"))
+            }
+            if (interopPayload.address != addressString) {
+                println("Address in response does not match original address: Original: $addressString Response: ${interopPayload.address}")
+                return Left(Error("Address in response does not match original address: Original: $addressString Response: ${interopPayload.address}"))
+            }
+            responseIndex++
         }
 
         // For each of the peer responses in the viewData, parse the proposal response field to a ProposalResponse
         return fabricViewData.endorsedProposalResponsesList.map { endorsedProposalResponse ->
             // 3. Verify the response matches the response inside the ProposalResponsePayload chaincodeaction
-            val chaincodeAction = ProposalPackage.ChaincodeAction.parseFrom(endorsedProposalResponse.payload.extension)
+            /*val chaincodeAction = ProposalPackage.ChaincodeAction.parseFrom(endorsedProposalResponse.payload.extension)
             println("Chaincode Action: $chaincodeAction")
             if (chaincodeAction.response.payload != fabricViewData.response.payload) {
                 println("Response in fabric view does not match response in proposal response")
                 return Left(Error("Response in fabric view does not match response in proposal response"))
-            }
+            }*/
             val endorsement = endorsedProposalResponse.endorsement
             // 4. Validate endorsement certificate and check [Membership]
             verifyEndorsementAndMapToOrgName(endorsement, securityDomain, endorsedProposalResponse.payload.toByteArray(), serviceHub)
