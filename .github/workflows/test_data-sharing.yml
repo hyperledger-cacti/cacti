@@ -995,66 +995,90 @@ jobs:
           TOTAL=12
 
           # FABRIC2 - FABRIC1
+          echo "TEST 1 STARTING"
           cp chaincode.json.template chaincode.json
           ./bin/fabric-cli interop --local-network=network2 --requesting-org=Org1MSP localhost:9080/network1/mychannel:simplestate:Read:a &> tmp.out
           tail -n 1 tmp.out | grep "Args: a, Arcturus" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
+          echo "TEST 1 COMPLETE"
 
+          echo "TEST 2 STARTING"
           ./bin/fabric-cli chaincode query mychannel simplestate read '["a"]' --local-network=network2 &> tmp.out
           tail -n 1 tmp.out | grep "Result from network query: Arcturus" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
+          echo "TEST 2 COMPLETE"
 
           # FABRIC2 - FABRIC1 - CONFIDENTIAL
+          echo "TEST 3 STARTING"
           sed -i "s/\"args\"\: \[\"a\"/\"args\"\: \[\"b\"/g" chaincode.json
           ./bin/fabric-cli interop --local-network=network2 --requesting-org=Org1MSP --e2e-confidentiality=true localhost:9080/network1/mychannel:simplestate:Read:b &> tmp.out
           tail -n 1 tmp.out | grep "Args: b, Betelgeuse" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
+          echo "TEST 3 COMPLETE"
 
+          echo "TEST 4 STARTING"
           ./bin/fabric-cli chaincode query mychannel simplestate read '["b"]' --local-network=network2 &> tmp.out
           tail -n 1 tmp.out | grep "Result from network query: Betelgeuse" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
+          echo "TEST 4 COMPLETE"
 
           # FABRIC1 - FABRIC2
+          echo "TEST 5 STARTING"
           sed -i "s/\"args\"\: \[\"b\"/\"args\"\: \[\"Arcturus\"/g" chaincode.json
           ./bin/fabric-cli interop --local-network=network1 --requesting-org=Org1MSP localhost:9083/network2/mychannel:simplestate:Read:Arcturus &> tmp.out
           tail -n 1 tmp.out | grep "Args: Arcturus, 17.671" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
+          echo "TEST 5 COMPLETE"
 
+          echo "TEST 6 STARTING"
           ./bin/fabric-cli chaincode query mychannel simplestate read '["Arcturus"]' --local-network=network1 &> tmp.out
           tail -n 1 tmp.out | grep "Result from network query: 17.671" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
+          echo "TEST 6 COMPLETE"
 
           # FABRIC1 - FABRIC2 - CONFIDENTIAL
+          echo "TEST 7 STARTING"
           sed -i "s/\"args\"\: \[\"Arcturus\"/\"args\"\: \[\"Betelgeuse\"/g" chaincode.json
           ./bin/fabric-cli interop --local-network=network1 --requesting-org=Org1MSP --e2e-confidentiality=true localhost:9083/network2/mychannel:simplestate:Read:Betelgeuse &> tmp.out
           tail -n 1 tmp.out | grep "Args: Betelgeuse, 617.1" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
+          echo "TEST 7 COMPLETE"
 
+          echo "TEST 8 STARTING"
           ./bin/fabric-cli chaincode query mychannel simplestate read '["Betelgeuse"]' --local-network=network1 &> tmp.out
           tail -n 1 tmp.out | grep "Result from network query: 617.1" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
+          echo "TEST 8 COMPLETE"
 
           # FABRIC1 - CORDA
+          echo "TEST 9 STARTING"
           cp chaincode.json.template chaincode.json
           sed -i "s/\"args\"\: \[\"a\"/\"args\"\: \[\"H\"/g" chaincode.json
           ./bin/fabric-cli interop --local-network=network1 --sign=true --requesting-org=Org1MSP localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:H --debug=true &> tmp.out
           tail -n 1 tmp.out | grep "Args: H, \[SimpleState(key=H, value=1" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
+          echo "TEST 9 COMPLETE"
 
+          echo "TEST 10 STARTING"
           ./bin/fabric-cli chaincode query mychannel simplestate read '["H"]' --local-network=network1 &> tmp.out
           tail -n 1 tmp.out | grep "Result from network query: \[SimpleState(key=H, value=1" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
+          echo "TEST 10 COMPLETE"
 
           # FABRIC2 - CORDA
+          echo "TEST 11 STARTING"
           cp chaincode.json.template chaincode.json
           sed -i "s/\"args\"\: \[\"a\"/\"args\"\: \[\"C\"/g" chaincode.json
           ./bin/fabric-cli interop --local-network=network2 --sign=true --requesting-org=Org1MSP localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:C --debug=true --debug=true &> tmp.out
           tail -n 1 tmp.out | grep "Args: C, \[SimpleState(key=C, value=20" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
+          echo "TEST 11 COMPLETE"
 
+          echo "TEST 12 STARTING"
           ./bin/fabric-cli chaincode query mychannel simplestate read '["C"]' --local-network=network2 &> tmp.out
           tail -n 1 tmp.out | grep "Result from network query: \[SimpleState(key=C, value=20" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
+          echo "TEST 12 COMPLETE"
 
 
           # RESULT
