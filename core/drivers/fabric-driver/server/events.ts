@@ -406,14 +406,14 @@ async function writeExternalStateHelper(
         const view: state_pb.View = viewPayload.getView();
 
         const result = InteroperableHelper.getResponseDataFromView(view, keyCert.key.toBytes());
-        if (result.interopPayload.getConfidential()) {
+        if (result.contents) {
             viewContentsBase64.push(result.contents.toString("base64"));
         } else {
             viewContentsBase64.push("");
         }
 
         interopArgIndices.push(ctx.getReplaceArgIndex());
-        addresses.push(result.interopPayload.getAddress());
+        addresses.push(result.viewAddress);
         viewsSerializedBase64.push(Buffer.from(viewPayload.getView().serializeBinary()).toString("base64"));
 
         let ccArgsB64 = ctx.getArgsList();
