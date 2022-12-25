@@ -669,7 +669,7 @@ jobs:
 
           echo "TEST 7 STARTING"
           # FABRIC1 - FABRIC2 - CONFIDENTIAL
-          sed -i "s/\"args\"\: \[\"Arcturus\"/\"args\"\: \[\"Betelgeuse\"/g" chaincode.json
+          sed -i "s/\"args\"\: \[\"b\"/\"args\"\: \[\"Betelgeuse\"/g" chaincode.json
           ./bin/fabric-cli interop --local-network=network1 --requesting-org=Org1MSP --e2e-confidentiality=true relay-network2:9083/network2/mychannel:simplestate:Read:Betelgeuse &> tmp.out
           tail -n 1 tmp.out | grep "Args: Betelgeuse, 617.1" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
