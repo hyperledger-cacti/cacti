@@ -72,7 +72,7 @@
     "cors": "2.8.5",
     "express": "4.17.1",
     "express-http-proxy": "1.6.2",
-    "express-jwt": "6.0.0",
+    "express-jwt": "8.0.0",
     "express-openapi-validator": "4.12.12",
     "express-rate-limit": "6.3.0",
     "fs-extra": "10.0.0",
