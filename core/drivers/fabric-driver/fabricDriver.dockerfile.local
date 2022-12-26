@@ -7,6 +7,7 @@ WORKDIR /fabric-driver
 
 ADD protos-js /fabric-driver/protos-js
 ADD weaver-fabric-interop-sdk /fabric-driver/weaver-fabric-interop-sdk
+RUN rm -rf /fabric-driver/weaver-fabric-interop-sdk/protos-js
 ADD package.json .
 RUN npm install --unsafe-perm
 

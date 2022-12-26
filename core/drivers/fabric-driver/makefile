@@ -22,21 +22,22 @@ protos-js:
 		cp -r ../../../common/protos-js/relay ./protos-js/ && \
 		cp -r ../../../common/protos-js/package.json ./protos-js/
 
-weaver-fabric-interop-sdk:
+weaver-fabric-interop-sdk: protos-js
 	mkdir -p weaver-fabric-interop-sdk && \
 		cp -r ../../../sdks/fabric/interoperation-node-sdk/build ./weaver-fabric-interop-sdk/ && \
 		cp -r ../../../sdks/fabric/interoperation-node-sdk/index.js ./weaver-fabric-interop-sdk/ && \
+		cp -r ./protos-js ./weaver-fabric-interop-sdk/ && \
 		cp -r ../../../sdks/fabric/interoperation-node-sdk/package-local.json ./weaver-fabric-interop-sdk/package.json
 
-build-local: protos-js weaver-fabric-interop-sdk
-	(cp package.json package-remote.json && \
-		cp package-local.json package.json && \
-		npm install) || \
+build-local: weaver-fabric-interop-sdk
+	cp package.json package-remote.json
+	cp package-local.json package.json
+	(npm install --unsafe-perm) || \
 		(mv package-remote.json package.json && exit 1) # Only if fails	
 	mv package-remote.json package.json # Only if success
 	npm run build
 	
-build-image-local: protos-js weaver-fabric-interop-sdk
+build-image-local: weaver-fabric-interop-sdk
 	cp package.json package-remote.json
 	cp package-local.json package.json
 	(docker build --build-arg BUILD_TAG="local" --build-arg GIT_URL=$(GIT_URL) -t ${DOCKER_IMAGE_NAME}:$(DOCKER_TAG) -f fabricDriver.dockerfile.local . ) || \
