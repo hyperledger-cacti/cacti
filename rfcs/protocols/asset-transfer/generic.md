@@ -8,7 +8,7 @@
 - RFC: 02-008
 - Authors: Venkatraman Ramakrishna, Krishnasuri Narayanam, Sandeep Nishad, Dhinakaran Vinayagamurthy
 - Status: Proposed
-- Since: 21-Oct-2022
+- Since: 26-Dec-2022
 
 ## Summary
 
@@ -44,14 +44,14 @@ The asset transfer flow is illustrated in more detail in the following figure, a
 <img src="../../resources/images/asset-transfer-flow.png" width=80%>
 
 1. Alice pledges or locks asset *M*, which she owns, in Ledger *A*, in a commitment to burn it upon successful minting and assigning to Bob's ownership in Ledger *B* within time period *T*.
-2. Bob fetches the pledge status for *M* in Ledger *A* using a cross-ledger [data sharing query](../../data-sharing/generic.md).
+2. Bob fetches the pledge status for *M* in Ledger *A* using a cross-ledger [data sharing query](../data-sharing/generic.md).
     - If Ledger *A* reports the existence of no such pledge by Alice on asset *M*, the protocol terminates.
     - Otherwise, if Ledger *A* reports the expiration of the pledge (i.e., Bob send the query after time period *T*), the protocol terminates.
 3. Bob mints and acquires ownership of asset *M* in Ledger *B* by providing the fetched pledged details along with proof from Ledger *A*.
     - If the proof is invalid or indicates the absence of a pledge or indicates that the pledge has expired, minting of asset *M* fails.
     - Otherwise, if the current time exceeds *T*, minting of asset *M* fails.
     - Otherwise, asset *M* is minted and issued to Bob on Ledger *B*.
-4. Alice fetches the claim status of asset *M* in Ledger *B* using a cross-ledger [data sharing query](../../data-sharing/generic.md).
+4. Alice fetches the claim status of asset *M* in Ledger *B* using a cross-ledger [data sharing query](../data-sharing/generic.md).
     - If Ledger *B* reports a successful minting of asset *M* and issuance to Bob, the protocol terminates.
     - Otherwise, if ledger *B* doesn’t report a successful mint of asset *M* by Bob but the current time has not exceeded *T*, then Alice retries this step after some time.
     - If ledger *B* doesn’t report a successful mint of asset *M* by Bob and the current time has exceeded *T*, then Alice proceeds to the next step.
@@ -99,7 +99,7 @@ The Weaver SDK will provide the following API, corresponding to the operations p
 - `ClaimRemoteAsset(<pledging-network-id>, <pledging-contract-id>, <pledge-status-function-name>, <pledge-id>, <recipient-user-id>, <contract-id>, <function-name>)`: This is a convenience function to claim an asset based on a known `<pledge-id>`. It involves a cross-network data sharing query (`GetAssetPledgeStatus` or equivalent function) followed by a proof validation and claiming of the asset in the local network (using a `ClaimRemoteAsset` or equivalent function). This functional will internally infer and supply its network ID when making the data sharing query.
 - `ReclaimAsset(<contract-id>, <function-name>, <recipient-network-id>, <recipient-contract-id>, <claim-status-function-name>, <pledge-id>, <pledging-user-id>)`: This is a convenience function to reclaim an asset based on a known `<pledge-id>`. It involves a cross-network data sharing query (`GetAssetClaimStatus` or `GetFungibleAssetClaimStatus` or equivalent function) followed by a proof validation and reclaiming of the asset in the local network (using a `ReclaimAsset` or equivalent function). This functional will internally infer and supply its network ID when making the data sharing query.
 
-In the future, we will also engineer the protocol using [event pub/sub](events/event-bus.md) rather than manually triggered data sharing queries. In this protocol, the user will only need to exercise the `PledgeAsset` API function; the others will be triggered automatically by events.
+In the future, we will also engineer the protocol using [event pub/sub](../events/event-bus.md) rather than manually triggered data sharing queries. In this protocol, the user will only need to exercise the `PledgeAsset` API function; the others will be triggered automatically by events.
 
 ## Safety and Liveness
 

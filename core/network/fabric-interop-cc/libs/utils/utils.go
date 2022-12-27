@@ -358,8 +358,6 @@ func ClaimRemoteAsset(ctx contractapi.TransactionContextInterface, pledgeId, rem
 
 // ReclaimAsset gets back the ownership of an asset pledged for transfer to a different ledger/network.
 func ReclaimAsset(ctx contractapi.TransactionContextInterface, pledgeId, recipientCert, remoteNetworkId, claimStatusBytes64 string) ([]byte, []byte, error) {
-	// (Optional) Ensure that this function is being called by the Fabric Interop CC
-
 	pledgeKey := getAssetPledgeKey(pledgeId)
 	pledgeBytes, err := ctx.GetStub().GetState(pledgeKey)
 	if err != nil {
