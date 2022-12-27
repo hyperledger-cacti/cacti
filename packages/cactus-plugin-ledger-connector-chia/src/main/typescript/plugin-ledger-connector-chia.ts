@@ -92,7 +92,6 @@ import { GetTransactionEndpoint } from "./web-services/get-transaction-endpoint"
 import { GetPastLogsEndpoint } from "./web-services/get-past-logs-endpoint";
 import { RunTransactionEndpoint } from "./web-services/run-transaction-endpoint";
 import { GetBlockEndpoint } from "./web-services/get-block-v1-endpoint-";
-import { GetChiaRecordEndpointV1 } from "./web-services/get-Chia-record-endpoint-v1";
 import { AbiItem } from "web3-utils";
 
 export const E_KEYCHAIN_NOT_FOUND = "cactus.connector.Chia.keychain_not_found";
@@ -267,13 +266,6 @@ export class PluginLedgerConnectorChia
     }
     {
       const endpoint = new ChiaSignTransactionEndpointV1({
-        connector: this,
-        logLevel: this.options.logLevel,
-      });
-      endpoints.push(endpoint);
-    }
-    {
-      const endpoint = new GetChiaRecordEndpointV1({
         connector: this,
         logLevel: this.options.logLevel,
       });
