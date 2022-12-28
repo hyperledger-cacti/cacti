@@ -26,8 +26,7 @@ weaver-fabric-interop-sdk: protos-js
 	mkdir -p weaver-fabric-interop-sdk && \
 		cp -r ../../../sdks/fabric/interoperation-node-sdk/build ./weaver-fabric-interop-sdk/ && \
 		cp -r ../../../sdks/fabric/interoperation-node-sdk/index.js ./weaver-fabric-interop-sdk/ && \
-		cp -r ./protos-js ./weaver-fabric-interop-sdk/ && \
-		cp -r ../../../sdks/fabric/interoperation-node-sdk/package-local.json ./weaver-fabric-interop-sdk/package.json
+		cp -r ../../../sdks/fabric/interoperation-node-sdk/package.json ./weaver-fabric-interop-sdk/package.json
 
 build-local: weaver-fabric-interop-sdk
 	cp package.json package-remote.json
