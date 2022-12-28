@@ -390,7 +390,7 @@ func ReclaimAsset(ctx contractapi.TransactionContextInterface, pledgeId, recipie
 		return nil, nil, fmt.Errorf("cannot reclaim asset with pledgeId %s as the expiration timestamps in the pledge and the claim don't match", pledgeId)
 	}
 	if !claimStatus.ExpirationStatus {
-		return nil, nil, fmt.Errorf("cannot reclaim asset with pledgeId %s as the claim has not yet expired", pledgeId)
+		return nil, nil, fmt.Errorf("cannot reclaim asset with pledgeId %s as the pledge has not yet expired", pledgeId)
 	}
 	if claimStatus.ClaimStatus {
 		pledgeKey := getAssetPledgeKey(pledgeId)

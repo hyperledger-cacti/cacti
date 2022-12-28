@@ -175,7 +175,7 @@ const getResponseDataFromView = (view, privKeyPEM = null) => {
         let viewAddress = '';
         let responsePayload = '';
         let responsePayloadContents = null;
-        let paymentConfidential = false;
+        let payloadConfidential = false;
         for (let i = 0; i < fabricViewProposalResponses.length; i++) {
             const fabricViewChaincodeAction = proposalPb.ChaincodeAction.deserializeBinary(fabricViewProposalResponses[i].getPayload().getExtension_asU8());
             const interopPayload = interopPayloadPb.InteropPayload.deserializeBinary(Uint8Array.from(Buffer.from(fabricViewChaincodeAction.getResponse().getPayload())));
@@ -187,28 +187,27 @@ const getResponseDataFromView = (view, privKeyPEM = null) => {
                     viewAddress = interopPayload.getAddress();
                     responsePayload = Buffer.from(decryptedPayloadContents.getPayload()).toString();
                     responsePayloadContents = decryptedPayload;
-                    paymentConfidential = true;
-                } else if (!paymentConfidential) {
-                    throw new Error(`Mismatching payment confidentiality flags across proposal responses`);
+                    payloadConfidential = true;
+                } else if (!payloadConfidential) {
+                    throw new Error(`Mismatching payload confidentiality flags across proposal responses`);
                 } else {
+                    // Match view addresses in the different proposal responses
+                    if (viewAddress !== interopPayload.getAddress()) {
+                        throw new Error(`Proposal response view addresses mismatch: 0 - ${viewAddress}, ${i} - ${interopPayload.getAddress()}`);
+                    }
+                    // Match decrypted view payloads from the different proposal responses
                     const currentResponsePayload = Buffer.from(decryptedPayloadContents.getPayload()).toString();
                     if (responsePayload !== currentResponsePayload) {
                         throw new Error(`Decrypted proposal response payloads mismatch: 0 - ${responsePayload}, ${i} - ${currentResponsePayload}`);
-                    }
-                    if (!responsePayloadContents.equals(decryptedPayload)) {
-                        throw new Error(`Decrypted proposal response views mismatch: 0 - ${responsePayloadContents}, ${i} - ${decryptedPayload}`);
-                    }
-                    if (viewAddress !== interopPayload.getAddress()) {
-                        throw new Error(`Proposal response view addresses mismatch: 0 - ${viewAddress}, ${i} - ${interopPayload.getAddress()}`);
                     }
                 }
             } else {
                 if (i === 0) {
                     viewAddress = interopPayload.getAddress();
                     responsePayload = Buffer.from(interopPayload.getPayload()).toString();
-                    paymentConfidential = false;
-                } else if (paymentConfidential) {
-                    throw new Error(`Mismatching payment confidentiality flags across proposal responses`);
+                    payloadConfidential = false;
+                } else if (payloadConfidential) {
+                    throw new Error(`Mismatching payload confidentiality flags across proposal responses`);
                 } else {
                     const currentResponsePayload = Buffer.from(interopPayload.getPayload()).toString();
                     if (responsePayload !== currentResponsePayload) {
@@ -220,7 +219,7 @@ const getResponseDataFromView = (view, privKeyPEM = null) => {
                 }
             }
         }
-        if (paymentConfidential) {
+        if (payloadConfidential) {
             return { viewAddress: viewAddress, data: responsePayload, contents: responsePayloadContents };
         } else {
             return { viewAddress: viewAddress, data: responsePayload };

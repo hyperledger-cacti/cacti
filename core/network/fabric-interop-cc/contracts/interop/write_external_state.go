@@ -70,12 +70,23 @@ func ExtractAndValidateDataFromView(view *common.View, b64ViewContent string) ([
 	}
 
 	var payloadConfidential bool
-	var viewPayload, viewPayloadHash []byte
+	var viewPayload []byte
+	var confidentialPayloadContents common.ConfidentialPayloadContents
 	for i, interopPayload := range interopPayloadList {
 		// If view data is encrypted, match it to supplied decrypted data using the hash in the view payload
 		if interopPayload.Confidential {
 			if i == 0 {
 				payloadConfidential = true
+				// Unmarshal the (decrypted) confidential payload contents supplied by the caller; needs to be done only once
+				viewB64ContentBytes, err := base64.StdEncoding.DecodeString(b64ViewContent)
+				if err != nil {
+					return nil, fmt.Errorf("Unable to base64 decode view content: %s", err.Error())
+				}
+				err = protoV2.Unmarshal(viewB64ContentBytes, &confidentialPayloadContents)
+				if err != nil {
+					return nil, fmt.Errorf("ConfidentialPayloadContents Unmarshal error: %s", err)
+				}
+				viewPayload = confidentialPayloadContents.Payload
             } else if !payloadConfidential {
 				return nil, fmt.Errorf("Mismatching confidentiality flags among interop payloads")
 			}
@@ -83,15 +94,6 @@ func ExtractAndValidateDataFromView(view *common.View, b64ViewContent string) ([
 			err := protoV2.Unmarshal(interopPayload.Payload, &confidentialPayload)
 			if err != nil {
 				return nil, fmt.Errorf("ConfidentialPayload Unmarshal error: %s", err)
-			}
-			viewB64ContentBytes, err := base64.StdEncoding.DecodeString(b64ViewContent)
-			if err != nil {
-				return nil, fmt.Errorf("Unable to base64 decode view content: %s", err.Error())
-			}
-			var confidentialPayloadContents common.ConfidentialPayloadContents
-			err = protoV2.Unmarshal(viewB64ContentBytes, &confidentialPayloadContents)
-			if err != nil {
-				return nil, fmt.Errorf("ConfidentialPayloadContents Unmarshal error: %s", err)
 			}
 			if confidentialPayload.HashType == common.ConfidentialPayload_HMAC {
 				payloadHMAC := hmac.New(sha256.New, confidentialPayloadContents.Random)
@@ -102,15 +104,6 @@ func ExtractAndValidateDataFromView(view *common.View, b64ViewContent string) ([
 				}
 			} else {
 				return nil, fmt.Errorf("Unsupported hash type in interop view payload: %+v", confidentialPayload.HashType)
-			}
-			if i == 0 {
-				viewPayloadHash = confidentialPayload.Hash
-				viewPayload = confidentialPayloadContents.Payload
-			} else {
-				// If the hashes match, we assume the plaintext payload matches too
-				if !bytes.Equal(viewPayloadHash, confidentialPayload.Hash) {
-					return nil, fmt.Errorf("Mismatching payload hashes in proposal responses: 0 - %+v, %d - %+v", viewPayloadHash, i, confidentialPayload.Hash)
-				}
 			}
 		} else {
 			if i == 0 {
