@@ -30,7 +30,7 @@ type interop interface {
 }
 
 // Extract data (i.e., query response) from view
-func ExtractAndValidateDataFromView(view *common.View, b64ViewContent string) ([]byte, error) {
+func ExtractAndValidateDataFromView(view *common.View, b64ViewContentList []string) ([]byte, error) {
 	var interopPayloadList []*common.InteropPayload
 	if view.Meta.Protocol == common.Meta_FABRIC {
 		var fabricViewData fabric.FabricView
@@ -71,29 +71,34 @@ func ExtractAndValidateDataFromView(view *common.View, b64ViewContent string) ([
 
 	var payloadConfidential bool
 	var viewPayload []byte
-	var confidentialPayloadContents common.ConfidentialPayloadContents
 	for i, interopPayload := range interopPayloadList {
 		// If view data is encrypted, match it to supplied decrypted data using the hash in the view payload
 		if interopPayload.Confidential {
+			// Unmarshal the (decrypted) confidential payload contents supplied by the caller
+			viewB64ContentBytes, err := base64.StdEncoding.DecodeString(b64ViewContentList[i])
+			if err != nil {
+				return nil, fmt.Errorf("Unable to base64 decode decrypted view content: %s", err.Error())
+			}
+			var confidentialPayloadContents common.ConfidentialPayloadContents
+			err = protoV2.Unmarshal(viewB64ContentBytes, &confidentialPayloadContents)
+			if err != nil {
+				return nil, fmt.Errorf("ConfidentialPayloadContents Unmarshal error: %s", err)
+			}
+			var confidentialPayload common.ConfidentialPayload
+			err = protoV2.Unmarshal(interopPayload.Payload, &confidentialPayload)
+			if err != nil {
+				return nil, fmt.Errorf("ConfidentialPayload Unmarshal error: %s", err)
+			}
 			if i == 0 {
+				if len(b64ViewContentList) != len(interopPayloadList) {
+					return nil, fmt.Errorf("Number of decrypted payloads (%d) does not match number of view contents (%d)", len(b64ViewContentList), len(interopPayloadList))
+				}
 				payloadConfidential = true
-				// Unmarshal the (decrypted) confidential payload contents supplied by the caller; needs to be done only once
-				viewB64ContentBytes, err := base64.StdEncoding.DecodeString(b64ViewContent)
-				if err != nil {
-					return nil, fmt.Errorf("Unable to base64 decode view content: %s", err.Error())
-				}
-				err = protoV2.Unmarshal(viewB64ContentBytes, &confidentialPayloadContents)
-				if err != nil {
-					return nil, fmt.Errorf("ConfidentialPayloadContents Unmarshal error: %s", err)
-				}
 				viewPayload = confidentialPayloadContents.Payload
 			} else if !payloadConfidential {
 				return nil, fmt.Errorf("Mismatching confidentiality flags among interop payloads")
-			}
-			var confidentialPayload common.ConfidentialPayload
-			err := protoV2.Unmarshal(interopPayload.Payload, &confidentialPayload)
-			if err != nil {
-				return nil, fmt.Errorf("ConfidentialPayload Unmarshal error: %s", err)
+			} else if !bytes.Equal(viewPayload, confidentialPayloadContents.Payload) {
+				return nil, fmt.Errorf("Mismatching payloads in proposal responses: 0 - %+v, %d - %+v", viewPayload, i, confidentialPayloadContents.Payload)
 			}
 			if confidentialPayload.HashType == common.ConfidentialPayload_HMAC {
 				payloadHMAC := hmac.New(sha256.New, confidentialPayloadContents.Random)
@@ -111,10 +116,8 @@ func ExtractAndValidateDataFromView(view *common.View, b64ViewContent string) ([
 				payloadConfidential = false
 			} else if payloadConfidential {
 				return nil, fmt.Errorf("Mismatching confidentiality flags among interop payloads")
-			} else {
-				if !bytes.Equal(viewPayload, interopPayload.Payload) {
-					return nil, fmt.Errorf("Mismatching payloads in proposal responses: 0 - %+v, %d - %+v", viewPayload, i, interopPayload.Payload)
-				}
+			} else if !bytes.Equal(viewPayload, interopPayload.Payload) {
+				return nil, fmt.Errorf("Mismatching payloads in proposal responses: 0 - %+v, %d - %+v", viewPayload, i, interopPayload.Payload)
 			}
 		}
 	}
@@ -122,7 +125,7 @@ func ExtractAndValidateDataFromView(view *common.View, b64ViewContent string) ([
 }
 
 // Validate view against address, and extract data (i.e., query response) from view
-func (s *SmartContract) ParseAndValidateView(ctx contractapi.TransactionContextInterface, address, b64ViewProto, b64ViewContent string) (string, error) {
+func (s *SmartContract) ParseAndValidateView(ctx contractapi.TransactionContextInterface, address, b64ViewProto string, b64ViewContentList []string) (string, error) {
 	viewB64Bytes, err := base64.StdEncoding.DecodeString(b64ViewProto)
 	if err != nil {
 		return "", fmt.Errorf("Unable to base64 decode data: %s", err.Error())
@@ -141,7 +144,7 @@ func (s *SmartContract) ParseAndValidateView(ctx contractapi.TransactionContextI
 	}
 
 	// 2. Extract response data for consumption by application chaincode
-	viewData, err := ExtractAndValidateDataFromView(&view, b64ViewContent)
+	viewData, err := ExtractAndValidateDataFromView(&view, b64ViewContentList)
 	if err != nil {
 		return "", err
 	}
@@ -153,7 +156,7 @@ func (s *SmartContract) ParseAndValidateView(ctx contractapi.TransactionContextI
 // WriteExternalState flow is used to process a response from a foreign network for state.
 // 1. Verify Proofs that are returned
 // 2. Call application chaincode
-func (s *SmartContract) WriteExternalState(ctx contractapi.TransactionContextInterface, applicationID string, applicationChannel string, applicationFunction string, applicationArgs []string, argIndicesForSubstitution []int, addresses []string, b64ViewProtos []string, b64ViewContents []string) error {
+func (s *SmartContract) WriteExternalState(ctx contractapi.TransactionContextInterface, applicationID string, applicationChannel string, applicationFunction string, applicationArgs []string, argIndicesForSubstitution []int, addresses []string, b64ViewProtos []string, b64ViewContents [][]string) error {
 	if len(argIndicesForSubstitution) != len(addresses) {
 		return fmt.Errorf("Number of argument indices for substitution (%d) does not match number of addresses (%d)", len(argIndicesForSubstitution), len(addresses))
 	}

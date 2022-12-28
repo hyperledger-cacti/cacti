@@ -21,9 +21,9 @@ import (
 
 
 type TestData struct {
-	B64View             string	`json:"view64"`
-	B64ViewConfidential string	`json:"confidential_view64"`
-	B64ViewContents     string	`json:"confidential_view_content64"`
+	B64View             string      `json:"view64"`
+	B64ViewConfidential string      `json:"confidential_view64"`
+	B64ViewContents     []string    `json:"confidential_view_content64"`
 }
 
 func TestWriteExternalState(t *testing.T) {
@@ -133,26 +133,33 @@ func TestWriteExternalState(t *testing.T) {
 		Payload: []byte("I am a result"),
 	})
 
-	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{fabricViewAddress}, []string{fabricTestData_1_Org.B64View}, []string{""})
+	decContents := []string{""}
+	decContentsList := make([][]string, 1)
+	decContentsList[0] = decContents
+	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{fabricViewAddress}, []string{fabricTestData_1_Org.B64View}, decContentsList)
 	require.NoError(t, err)
 
 	// Test success with encrypted view payload
 	chaincodeStub.GetStateReturnsOnCall(2, network1VerificationPolicyBytes, nil)
 	chaincodeStub.GetStateReturnsOnCall(3, network1MembershipBytes, nil)
-	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{fabricViewAddress}, []string{fabricTestData_1_Org.B64ViewConfidential}, []string{fabricTestData_1_Org.B64ViewContents})
+	decContents = fabricTestData_1_Org.B64ViewContents
+	decContentsList[0] = decContents
+	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{fabricViewAddress}, []string{fabricTestData_1_Org.B64ViewConfidential}, decContentsList)
 	require.NoError(t, err)
 
 	// Test failures when invalid or insufficient arguments are supplied
-	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{2}, []string{fabricViewAddress}, []string{fabricTestData_1_Org.B64View}, []string{""})
+	decContents = []string{""}
+	decContentsList[0] = decContents
+	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{2}, []string{fabricViewAddress}, []string{fabricTestData_1_Org.B64View}, decContentsList)
 	require.EqualError(t, err, "Index 2 out of bounds of array (length 2)")
 
-	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{0, 1}, []string{fabricViewAddress}, []string{fabricTestData_1_Org.B64View}, []string{""})
+	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{0, 1}, []string{fabricViewAddress}, []string{fabricTestData_1_Org.B64View}, decContentsList)
 	require.EqualError(t, err, "Number of argument indices for substitution (2) does not match number of addresses (1)")
 
-	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{fabricViewAddress}, []string{}, []string{""})
+	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{fabricViewAddress}, []string{}, decContentsList)
 	require.EqualError(t, err, "Number of addresses (1) does not match number of views (0)")
 
-	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{fabricViewAddress}, []string{fabricTestData_1_Org.B64View}, []string{})
+	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{fabricViewAddress}, []string{fabricTestData_1_Org.B64View}, [][]string{})
 	require.EqualError(t, err, "Number of addresses (1) does not match number of view contents (0)")
 
 	// Happy case: Fabric: 2 Orgs
@@ -172,27 +179,33 @@ func TestWriteExternalState(t *testing.T) {
 		Payload: []byte("I am a result"),
 	})
 
-	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{fabricViewAddress}, []string{fabricTestData_2_Orgs.B64View}, []string{""})
+	decContents = []string{"", ""}
+	decContentsList[0] = decContents
+	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{fabricViewAddress}, []string{fabricTestData_2_Orgs.B64View}, decContentsList)
 	require.NoError(t, err)
 
 	// Test success with encrypted view payload
 	chaincodeStub.GetStateReturnsOnCall(3, network1VerificationPolicyBytes, nil)
 	chaincodeStub.GetStateReturnsOnCall(4, network1MembershipBytes, nil)
 	chaincodeStub.GetStateReturnsOnCall(5, network1MembershipBytes, nil)
-	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{fabricViewAddress}, []string{fabricTestData_2_Orgs.B64ViewConfidential}, []string{fabricTestData_2_Orgs.B64ViewContents})
+	decContents = fabricTestData_2_Orgs.B64ViewContents
+	decContentsList[0] = decContents
+	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{fabricViewAddress}, []string{fabricTestData_2_Orgs.B64ViewConfidential}, decContentsList)
 	require.NoError(t, err)
 
 	// Test failures when invalid or insufficient arguments are supplied
-	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{2}, []string{fabricViewAddress}, []string{fabricTestData_2_Orgs.B64View}, []string{""})
+	decContents = []string{"", ""}
+	decContentsList[0] = decContents
+	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{2}, []string{fabricViewAddress}, []string{fabricTestData_2_Orgs.B64View}, decContentsList)
 	require.EqualError(t, err, "Index 2 out of bounds of array (length 2)")
 
-	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{0, 1}, []string{fabricViewAddress}, []string{fabricTestData_2_Orgs.B64View}, []string{""})
+	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{0, 1}, []string{fabricViewAddress}, []string{fabricTestData_2_Orgs.B64View}, decContentsList)
 	require.EqualError(t, err, "Number of argument indices for substitution (2) does not match number of addresses (1)")
 
-	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{fabricViewAddress}, []string{}, []string{""})
+	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{fabricViewAddress}, []string{}, decContentsList)
 	require.EqualError(t, err, "Number of addresses (1) does not match number of views (0)")
 
-	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{fabricViewAddress}, []string{fabricTestData_2_Orgs.B64View}, []string{})
+	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{fabricViewAddress}, []string{fabricTestData_2_Orgs.B64View}, [][]string{})
 	require.EqualError(t, err, "Number of addresses (1) does not match number of view contents (0)")
 
 	// Happy case: Corda
@@ -211,7 +224,7 @@ func TestWriteExternalState(t *testing.T) {
 		Message: "",
 		Payload: []byte("I am a result"),
 	})
-	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{"localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:H"}, []string{cordaTestData.B64View}, []string{""})
+	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{"localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:H"}, []string{cordaTestData.B64View}, decContentsList)
 	require.NoError(t, err)
 
 	// Test case: Invalid cert in Membership
@@ -223,7 +236,7 @@ func TestWriteExternalState(t *testing.T) {
 	chaincodeStub.GetStateReturnsOnCall(0, network1VerificationPolicyBytes, nil)
 	chaincodeStub.GetStateReturnsOnCall(1, invalidMembershipBytes, nil)
 	chaincodeStub.GetStateReturnsOnCall(2, invalidMembershipBytes, nil)
-	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{fabricViewAddress}, []string{fabricTestData_2_Orgs.B64View}, []string{""})
+	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{fabricViewAddress}, []string{fabricTestData_2_Orgs.B64View}, decContentsList)
 	require.EqualError(t, err, "VerifyView error: Verify membership failed. Certificate not valid: Client cert not in a known PEM format")
 
 	// Test case: Invalid policy in verification policy
@@ -233,6 +246,6 @@ func TestWriteExternalState(t *testing.T) {
 	invalidVerificationPolicyBytes, err := json.Marshal(&network1VerificationPolicy_2_Orgs)
 	require.NoError(t, err)
 	chaincodeStub.GetStateReturnsOnCall(0, invalidVerificationPolicyBytes, nil)
-	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{fabricViewAddress}, []string{fabricTestData_2_Orgs.B64View}, []string{""})
+	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{fabricViewAddress}, []string{fabricTestData_2_Orgs.B64View}, decContentsList)
 	require.EqualError(t, err, "VerifyView error: Unable to resolve verification policy: Verification Policy Error: Failed to find verification policy matching view address: " + fabricPattern)
 }

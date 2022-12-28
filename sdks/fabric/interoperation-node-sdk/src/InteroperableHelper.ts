@@ -174,7 +174,7 @@ const getResponseDataFromView = (view, privKeyPEM = null) => {
         const fabricViewProposalResponses = fabricView.getEndorsedProposalResponsesList();
         let viewAddress = '';
         let responsePayload = '';
-        let responsePayloadContents = null;
+        let responsePayloadContents = [];
         let payloadConfidential = false;
         for (let i = 0; i < fabricViewProposalResponses.length; i++) {
             const fabricViewChaincodeAction = proposalPb.ChaincodeAction.deserializeBinary(fabricViewProposalResponses[i].getPayload().getExtension_asU8());
@@ -186,7 +186,6 @@ const getResponseDataFromView = (view, privKeyPEM = null) => {
                 if (i === 0) {
                     viewAddress = interopPayload.getAddress();
                     responsePayload = Buffer.from(decryptedPayloadContents.getPayload()).toString();
-                    responsePayloadContents = decryptedPayload;
                     payloadConfidential = true;
                 } else if (!payloadConfidential) {
                     throw new Error(`Mismatching payload confidentiality flags across proposal responses`);
@@ -201,6 +200,7 @@ const getResponseDataFromView = (view, privKeyPEM = null) => {
                         throw new Error(`Decrypted proposal response payloads mismatch: 0 - ${responsePayload}, ${i} - ${currentResponsePayload}`);
                     }
                 }
+                responsePayloadContents.push(decryptedPayload.toString("base64"));
             } else {
                 if (i === 0) {
                     viewAddress = interopPayload.getAddress();
@@ -495,9 +495,9 @@ const interopFlow = async (
         computedAddresses.push(requestResponse.address);
         if (confidential) {
             const respData = getResponseDataFromView(requestResponse.view, keyCert.key.toBytes());
-            viewContentsBase64.push(respData.contents.toString("base64"));
+            viewContentsBase64.push(respData.contents);
         } else {
-            viewContentsBase64.push("");
+            viewContentsBase64.push([]);
         }
     }
     // Return here if caller just wants the views and doesn't want to invoke a local chaincode
