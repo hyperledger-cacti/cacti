@@ -87,7 +87,7 @@ func ExtractAndValidateDataFromView(view *common.View, b64ViewContent string) ([
 					return nil, fmt.Errorf("ConfidentialPayloadContents Unmarshal error: %s", err)
 				}
 				viewPayload = confidentialPayloadContents.Payload
-            } else if !payloadConfidential {
+			} else if !payloadConfidential {
 				return nil, fmt.Errorf("Mismatching confidentiality flags among interop payloads")
 			}
 			var confidentialPayload common.ConfidentialPayload
@@ -109,7 +109,7 @@ func ExtractAndValidateDataFromView(view *common.View, b64ViewContent string) ([
 			if i == 0 {
 				viewPayload = interopPayload.Payload
 				payloadConfidential = false
-            } else if payloadConfidential {
+			} else if payloadConfidential {
 				return nil, fmt.Errorf("Mismatching confidentiality flags among interop payloads")
 			} else {
 				if !bytes.Equal(viewPayload, interopPayload.Payload) {

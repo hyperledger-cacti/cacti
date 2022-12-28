@@ -187,6 +187,7 @@ fun verifyFabricNotarization(
 
         // TODO: Handle encrypted (confidential) payloads in Fabric views
         var responsePayload = ""
+        var responsePayloadEncoded = ""
         var responseIndex = 0
         for (endorsedProposalResponse in fabricViewData.endorsedProposalResponsesList) {
             val chaincodeAction = ProposalPackage.ChaincodeAction.parseFrom(endorsedProposalResponse.payload.extension)
@@ -200,10 +201,11 @@ fun verifyFabricNotarization(
             // 3. Verify that the responses in the different ProposalResponsePayload blobs match each other
             if (responseIndex == 0) {
                 responsePayload = chaincodeAction.response.payload.toString()
+                responsePayloadEncoded = Base64.getEncoder().encodeToString(chaincodeAction.response.payload.toByteArray())
             } else if (responsePayload != chaincodeAction.response.payload.toString()) {
                 println("Mismatching payloads in proposal responses: 0 - $responsePayload,  $responseIndex: ${chaincodeAction.response.payload}")
                 val encodedPayload = Base64.getEncoder().encodeToString(chaincodeAction.response.payload.toByteArray())
-                return Left(Error("Mismatching payloads in proposal responses: 0 - $responsePayload,  $responseIndex: ${encodedPayload}"))
+                return Left(Error("Mismatching payloads in proposal responses: 0 - $responsePayloadEncoded,  $responseIndex: $encodedPayload"))
             }
             responseIndex++
         }
