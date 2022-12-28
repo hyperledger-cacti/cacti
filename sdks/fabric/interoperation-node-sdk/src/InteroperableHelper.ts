@@ -533,7 +533,7 @@ const getCCArgsForProofVerification = (
     interopArgIndices: Array<number>,
     viewAddresses: Array<string>,
     viewsSerializedBase64: Array<string>,
-    viewContentsBase64: Array<string>,
+    viewContentsBase64: Array<Array<string>>,
 ): Array<any> => {
     const {
         ccArgs: localCCArgs,
@@ -584,7 +584,7 @@ const submitTransactionWithRemoteViews = async (
     interopArgIndices: Array<number>,
     viewAddresses: Array<string>,
     viewsSerializedBase64: Array<string>,
-    viewContentsBase64: Array<string>,
+    viewContentsBase64: Array<Array<string>>,
     endorsingOrgs: Array<string>,
     gateway: Gateway = null,
 ): Promise<any> => {
