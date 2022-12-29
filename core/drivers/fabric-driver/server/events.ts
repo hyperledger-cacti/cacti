@@ -407,9 +407,9 @@ async function writeExternalStateHelper(
 
         const result = InteroperableHelper.getResponseDataFromView(view, keyCert.key.toBytes());
         if (result.contents) {
-            viewContentsBase64.push(result.contents.toString("base64"));
+            viewContentsBase64.push(result.contents);
         } else {
-            viewContentsBase64.push("");
+            viewContentsBase64.push([]);
         }
 
         interopArgIndices.push(ctx.getReplaceArgIndex());
