@@ -21,6 +21,7 @@ import (
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
 	"github.com/hyperledger/fabric-chaincode-go/shim"
 	"github.com/hyperledger/fabric-chaincode-go/pkg/cid"
+	mspProtobuf "github.com/hyperledger/fabric-protos-go/msp"
 	pb "github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 )
@@ -124,6 +125,24 @@ func CheckAccessIfRelayClient(stub shim.ChaincodeStubInterface) (bool, error) {
 	return IsCallerInteropChaincode(stub)
 }
 
+func GetECertOfTxCreatorBase64(ctx contractapi.TransactionContextInterface) (string, error) {
+
+	txCreatorBytes, err := ctx.GetStub().GetCreator()
+	if err != nil {
+	return "", fmt.Errorf("unable to get the transaction creator information: %+v", err)
+	}
+
+	serializedIdentity := &mspProtobuf.SerializedIdentity{}
+	err = proto.Unmarshal(txCreatorBytes, serializedIdentity)
+	if err != nil {
+		return "", fmt.Errorf("GetECertOfTxCreatorBase64: unmarshal error: %+v", err)
+	}
+
+	eCertBytesBase64 := base64.StdEncoding.EncodeToString(serializedIdentity.IdBytes)
+
+	return eCertBytesBase64, nil
+}
+
 
 ///////////////////////////////////////////////////////
 //////        ASSET TRANSFER FUNCTIONS         ////////
@@ -209,9 +228,15 @@ func unmarshalAssetClaimStatus(claimStatusBase64 string) (*common.AssetClaimStat
 }
 
 // PledgeAsset locks an asset for transfer to a different ledger/network.
-func PledgeAsset(ctx contractapi.TransactionContextInterface, assetJSON []byte, assetType, assetIdOrQuantity, owner, remoteNetworkId, recipientCert string, expiryTimeSecs uint64) (string, error) {
+func PledgeAsset(ctx contractapi.TransactionContextInterface, assetJSON []byte, assetType, assetIdOrQuantity, remoteNetworkId, recipientCert string, expiryTimeSecs uint64) (string, error) {
 	if assetIdOrQuantity == "" {
 		return "", fmt.Errorf("no asset ID or unit count provided")
+	}
+
+	// Get the caller's certificate for assigning pledge ownership
+	owner, err := GetECertOfTxCreatorBase64(ctx)
+	if err != nil {
+		return "", err
 	}
 
 	pledgeId := generatePledgeId(ctx, assetType, assetIdOrQuantity, owner, remoteNetworkId, recipientCert, expiryTimeSecs)
@@ -264,12 +289,18 @@ func PledgeAsset(ctx contractapi.TransactionContextInterface, assetJSON []byte, 
 }
 
 // ClaimRemoteAsset gets ownership of an asset transferred from a different ledger/network.
-func ClaimRemoteAsset(ctx contractapi.TransactionContextInterface, pledgeId, claimer, remoteNetworkId, pledgeBytes64 string) ([]byte, error) {
+func ClaimRemoteAsset(ctx contractapi.TransactionContextInterface, pledgeId, remoteNetworkId, pledgeBytes64 string) ([]byte, error) {
 	if pledgeId == "" {
 		return nil, fmt.Errorf("pledgeId can not be empty")
 	}
 
 	pledge, err := unmarshalAssetPledge(pledgeBytes64)
+	if err != nil {
+		return nil, err
+	}
+
+	// Caller of this function is assumed to be the asset claimant
+	claimer, err := GetECertOfTxCreatorBase64(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -327,8 +358,6 @@ func ClaimRemoteAsset(ctx contractapi.TransactionContextInterface, pledgeId, cla
 
 // ReclaimAsset gets back the ownership of an asset pledged for transfer to a different ledger/network.
 func ReclaimAsset(ctx contractapi.TransactionContextInterface, pledgeId, recipientCert, remoteNetworkId, claimStatusBytes64 string) ([]byte, []byte, error) {
-	// (Optional) Ensure that this function is being called by the Fabric Interop CC
-
 	pledgeKey := getAssetPledgeKey(pledgeId)
 	pledgeBytes, err := ctx.GetStub().GetState(pledgeKey)
 	if err != nil {

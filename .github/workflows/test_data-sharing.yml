@@ -334,7 +334,7 @@ jobs:
         working-directory: samples/fabric/fabric-cli
 
   data-sharing-docker-local:
-    if: ${{ false }}
+    # if: ${{ false }}
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
@@ -646,7 +646,7 @@ jobs:
           cat tmp.out
 
           # FABRIC2 - FABRIC1 - CONFIDENTIAL
-          sed -i "s/\"args\"\: \[\"a\"/\"args\"\: \[\"b\"/g" chaincode.json
+          sed -i "s/\"args\"\: \[\"Arcturus\"/\"args\"\: \[\"b\"/g" chaincode.json
           ./bin/fabric-cli interop --local-network=network2 --requesting-org=Org1MSP --e2e-confidentiality=true relay-network1:9080/network1/mychannel:simplestate:Read:b &> tmp.out
           tail -n 1 tmp.out | grep "Args: b, Betelgeuse" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
@@ -656,7 +656,7 @@ jobs:
           cat tmp.out
 
           # FABRIC1 - FABRIC2 - CONFIDENTIAL
-          sed -i "s/\"args\"\: \[\"Arcturus\"/\"args\"\: \[\"Betelgeuse\"/g" chaincode.json
+          sed -i "s/\"args\"\: \[\"b\"/\"args\"\: \[\"Betelgeuse\"/g" chaincode.json
           ./bin/fabric-cli interop --local-network=network1 --requesting-org=Org1MSP --e2e-confidentiality=true relay-network2:9083/network2/mychannel:simplestate:Read:Betelgeuse &> tmp.out
           tail -n 1 tmp.out | grep "Args: Betelgeuse, 617.1" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
@@ -699,7 +699,7 @@ jobs:
         working-directory: samples/fabric/fabric-cli
 
   data-sharing-local:
-    if: ${{ false }}
+    # if: ${{ false }}
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 

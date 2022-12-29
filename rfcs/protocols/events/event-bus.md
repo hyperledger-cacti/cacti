@@ -48,7 +48,7 @@ See specification on [events](../models/events.md) for event types.
   * State for ensuring delivery guarantees, sequencing etc can be tracked on the ledger.
 * The data model for Weaver events are easier to enforce, which applications must comply with.
 
-<img src="../../resources/images/event-capture-graphene.png" width=60%>
+<img src="../../resources/images/event-capture-weaver.png" width=60%>
 
 ## Event Proofs
 

@@ -48,7 +48,7 @@ There are different units in the identity plane with different roles as follows:
 
 The organizational unit corresponding to each network member must have its DID record registered in some IIN. The following steps must be performed to create a DID record in an IIN registry.
 
-<img src="../../resources/images/participant_identity_configuration.jpg">
+<img src="../../resources/images/participant-identity-configuration.png">
 
 **Step 1. member chooses a unique DID**
 
@@ -114,7 +114,7 @@ A DID document does not contain any personal information about its holder, like 
 
 ## Security Domain Identity Creation as Security Domain DID
 
-<img src="../../resources/images/network_did_creation.jpg">
+<img src="../../resources/images/network-did-creation.png">
 
 A security domain creates its own DID record in an IIN registry. The Security Domain DID is controlled jointly by its members according to the [group controller specification](https://w3c.github.io/did-core/#group-control). This DID can then be used as a way of addressing the network/domain, to discover and configure its identity and membership for interoperation. 
 
@@ -307,7 +307,7 @@ The IIN registry authenticates a Security Domain DID update request the same way
 
 The security domain validation and membership syncing protocols must be re-run every time there is a change in a security domain's identity (DID document) or in its membership configuration. The flow diagram below illustrates the complete process from the time a change occurs in one network up to the point where its updated identity and membership info is reflected in another network's ledger as a prerequisite for data plane interoperation. Each step in this diagram represents a separate protocol: (1) is described in this document above, (2) is described in the [security domain identity validation specification](./security-domain-identity-validation.md), and (3) in the [membership syncing specification](./membership-syncing.md).
 
-<img src="../../resources/images/protocol-identity-overview.jpg" width=70%>
+<img src="../../resources/images/protocol-identity-overview.png" width=70%>
 
 The trigger for Step 2 can be any of the following:
 * Manual trigger applied by a network administrator

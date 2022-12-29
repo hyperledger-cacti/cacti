@@ -570,7 +570,7 @@ func TestReclaimTokenAsset(t *testing.T) {
 	tokenClaimStatusBytes, _ = marshalAssetClaimStatus(tokenClaimStatus)
 	err = simpleAsset.ReclaimTokenAsset(transactionContext, pledgeId, getRecipientECertBase64(), destNetworkID, tokenClaimStatusBytes)
 	require.EqualError(t, err, fmt.Sprintf("cannot reclaim asset with pledgeId %s as the pledge has not yet expired", pledgeId))       // claim probe time was before expiration time
-	
+
 	tokenClaimStatus.ExpirationStatus = true
 	tokenClaimStatus.ClaimStatus = true
 	tokenClaimStatusBytes, _ = marshalAssetClaimStatus(tokenClaimStatus)
