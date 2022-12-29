@@ -2,7 +2,7 @@ DOCKER_IMAGE_NAME ?= weaver-fabric-driver
 DOCKER_TAG ?= `cat ./VERSION`
 DOCKER_REGISTRY ?= ghcr.io/hyperledger-labs
 GIT_URL = https://github.com/hyperledger-labs/weaver-dlt-interoperability/core/drivers/fabric-driver
-
+NETWORK_NAME ?= network1
 COMPOSE_ARG ?=
 
 build: .npmrc
@@ -60,6 +60,7 @@ push-image-latest:
 	docker push $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_NAME):latest
 
 deploy:
+	mkdir -p wallet-$(NETWORK_NAME) && chmod 777 wallet-$(NETWORK_NAME)
 	docker-compose $(COMPOSE_ARG) up -d
 
 stop:
