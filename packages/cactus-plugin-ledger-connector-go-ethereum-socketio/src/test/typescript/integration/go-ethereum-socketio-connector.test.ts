@@ -377,7 +377,7 @@ describe("Go-Ethereum-SocketIO connector tests", () => {
   /**
    * Test ServerMonitorPlugin startMonitor/stopMonitor functions.
    */
-  test.only(
+  test(
     "Monitoring returns new block",
     async () => {
       // Create monitoring promise and subscription

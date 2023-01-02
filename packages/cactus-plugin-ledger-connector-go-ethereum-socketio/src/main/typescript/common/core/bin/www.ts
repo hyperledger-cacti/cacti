@@ -251,11 +251,8 @@ export async function startGoEthereumSocketIOConnector() {
     /**
      * startMonitor: starting block generation event monitoring
      **/
-    client.on("startMonitor", function (monitorOptions) {
-
-      monitorOptions = monitorOptions ?? {allBlocks: false};
-      logger.debug("monitorOptions", monitorOptions);
-      Smonitor.startMonitor(client.id, monitorOptions.allBlocks, (event) => {
+    client.on("startMonitor", function (monitorOptions?: any) {
+      Smonitor.startMonitor(client.id,  monitorOptions?.allBlocks ?? false, (event) => {
         let emitType = "";
         if (event.status == 200) {
           emitType = "eventReceived";
