@@ -12,11 +12,11 @@
 
 ## Summary
 
-This document specifies the Hyperledger Fabric implementation of modules, and application adaptation guidelines, for the asset transfer protocol.
-Within Weaver, the protocol units to operate on the asset being transferred will be implemented in the Fabric Interoperation Chaincode, which is the [interoperation module](../../models/infrastructure/interoperation-modules.md) for a Fabric-based network.
-- The functions are implemented in a library package that can be imported in any chaincode. The Fabric Interoperation Chaincode will import them by default.
-Any application chaincode that is either pledging/burning or claiming/minting an asset at either end of the protocol will import this library too and incorporate suitable function calls in its adapted workflow.
-Within Weaver, the SDK will provide user agents (clients) the capability to trigger transfer operations on particular chaincodes maintaining particular digital assets.
+- This document specifies the Hyperledger Fabric implementation of modules, and application adaptation guidelines, for the asset transfer protocol.
+- Within Weaver, the protocol units to operate on the asset being transferred will be implemented in the Fabric Interoperation Chaincode, which is the [interoperation module](../../models/infrastructure/interoperation-modules.md) for a Fabric-based network.
+- The protocol unit functions are implemented in a library package that can be imported in any chaincode. The Fabric Interoperation Chaincode will import them by default.
+- Any application chaincode that is either pledging/burning or claiming/minting an asset at either end of the protocol will import this library too and incorporate suitable function calls in its adapted workflow.
+- Within Weaver, the SDK will provide user agents (clients) the capability to trigger transfer operations on particular chaincodes maintaining particular digital assets.
 
 ## Fabric Interoperation Chaincode
 
@@ -27,7 +27,7 @@ The following functions should be implemented in a separate package within the F
 - `func GetAssetPledgeStatus(ctx contractapi.TransactionContextInterface, pledgeId, recipientNetworkId, recipientCert string, blankAssetJSON []byte) (string, error)`: return value contains the pledge details associuated with the asset being transferred
 - `func GetAssetClaimStatus(ctx contractapi.TransactionContextInterface, pledgeId, recipientCert, pledger, pledgerNetworkId string, pledgeExpiryTimeSecs uint64, blankAssetJSON []byte) (string, error)`: return value contains the claim details associated with the asset being transferred
 
-The following function can also be implemented for app developer convenience, though it is not a cor building block in the asset transfer protocol:
+The following function can also be implemented for app developer convenience, though it is not a core building block in the asset transfer protocol:
 - `func GetAssetPledgeDetails(ctx contractapi.TransactionContextInterface, pledgeId string) (string, error)`: it returns the [AssetPledge structure](../../formats/assets/transfer.md#representing-an-asset-transfer-pledge) on the ledger (or a serialized form of it) corresponding to the `<pledge-id>`. Its purpose is similar to `GetAssetPledgeStatus` except that it doesn't perform validations. It is meant to be used as a lookup function within the network in which the asset has been pledged.
 
 Optionally, these functions may contain additional parameters and return values for developer convenience and to optimize the processing across application chaincode and the Interoperation Chaincode. (The [current implementation](../../../core/network/fabric-interop-cc/libs/utils/) has some such variations.)
