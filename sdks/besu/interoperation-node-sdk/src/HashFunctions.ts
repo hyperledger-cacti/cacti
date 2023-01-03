@@ -7,6 +7,8 @@
 import * as crypto from 'crypto';
 import { HashMechanism } from "@hyperledger-labs/weaver-protos-js/common/asset_locks_pb";
 
+//TODO: move all common node SDK functions to one place, instead of replicating in each SDK
+ 
 /*
  * Interface for all hash functions to be used for HTLC
  * To extend supported hash functions in weaver for HTLC,
