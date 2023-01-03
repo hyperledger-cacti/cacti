@@ -12,10 +12,10 @@
 
 ## Summary
 
-This document specifies the Hyperledger Fabric implementation of modules, and application adaptation guidelines, for the asset transfer protocol.
-Within Weaver, the protocol units to operate on the asset being transferred will be implemented in the Fabric Interoperation Chaincode, which is the [interoperation module](../../models/infrastructure/interoperation-modules.md) for a Fabric-based network.
-- The functions are meant to be called only by relay drivers with special wallet identities that are recognized by the Fabric Interoperation Chaincode at bootstrap.
-Within Weaver, the SDK will provide user agents (clients) the capability to trigger cross-ledger data sharing operations, fetching remote state using [view addresses](../../formats/views/addressing.md) and using the [proof-accompanied view data](../../formats/views/definition.md) in a local business workflow by invoking a chaincode in the local network.
+- This document specifies the Hyperledger Fabric implementation of modules, and application adaptation guidelines, for the data sharing protocol.
+- Within Weaver, the protocol units to request, share, and validte data will be implemented in the Fabric Interoperation Chaincode, which is the [interoperation module](../../models/infrastructure/interoperation-modules.md) for a Fabric-based network.
+- The protocol unit functions are meant to be called only by relay drivers with special wallet identities that are recognized by the Fabric Interoperation Chaincode at bootstrap.
+- Within Weaver, the SDK will provide user agents (clients) the capability to trigger cross-ledger data sharing operations, fetching remote state using [view addresses](../../formats/views/addressing.md) and using the [proof-accompanied view data](../../formats/views/definition.md) in a local business workflow by invoking a chaincode in the local network.
 
 ## Fabric Interoperation Chaincode
 

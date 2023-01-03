@@ -12,11 +12,11 @@
 
 ## Summary
 
-This document specifies the Hyperledger Fabric implementation of modules, and application adaptation guidelines, for the asset transfer protocol.
-Within Weaver, the protocol units to operate on the asset being transferred will be implemented in the Fabric Interoperation Chaincode, which is the [interoperation module](../../models/infrastructure/interoperation-modules.md) for a Fabric-based network.
-- The functions are implemented in a library package that can be imported in any chaincode. The Fabric Interoperation Chaincode will import them by default.
-Any application chaincode that is either pledging/burning or claiming/minting an asset at either end of the protocol will import this library too and incorporate suitable function calls in its adapted workflow.
-Within Weaver, the SDK will provide user agents (clients) the capability to trigger transfer operations on particular chaincodes maintaining particular digital assets.
+- This document specifies the Hyperledger Fabric implementation of modules, and application adaptation guidelines, for the asset transfer protocol.
+- Within Weaver, the protocol units to operate on the asset being transferred will be implemented in the Fabric Interoperation Chaincode, which is the [interoperation module](../../models/infrastructure/interoperation-modules.md) for a Fabric-based network.
+- The protocol unit functions are implemented in a library package that can be imported in any chaincode. The Fabric Interoperation Chaincode will import them by default.
+- Any application chaincode that is either pledging/burning or claiming/minting an asset at either end of the protocol will import this library too and incorporate suitable function calls in its adapted workflow.
+- Within Weaver, the SDK will provide user agents (clients) the capability to trigger transfer operations on particular chaincodes maintaining particular digital assets.
 
 ## Fabric Interoperation Chaincode
 

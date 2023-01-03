@@ -84,7 +84,7 @@ data: "eyJub3Rhcml6YXRpb25zIjpbeyJzaWduYXR1cmUiOiJRYkt4UXFLbHNMSkg4TUM2ZU9GaFEvR
 message Commitment {
     // How is the commitment exchanged/located?
     string address = 3;
-	// Cryptographic commitment scheme
+    // Cryptographic commitment scheme
     string scheme = 1;
 }
 ```
