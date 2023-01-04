@@ -48,6 +48,15 @@ message AssetExchangeAgreement {
   string recipient = 4;
 }
 
+message HybridAssetExchangeAgreement {
+  string assetType = 1;
+  string id = 2;
+  bytes assetData = 3;
+  uint64 numUnits = 4;
+  string locker = 5;
+  string recipient = 6;
+}
+
 message FungibleAssetExchangeAgreement {
   string assetType = 1;
   uint64 numUnits = 2;
