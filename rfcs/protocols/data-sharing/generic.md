@@ -15,7 +15,7 @@
 This document specifies a request-response-validate protocol whereby a client application in one network requests data from another network's peers and submits the received data to its network's peers for validation.
 Each network has a [relay](../../models/infrastructure/relays.md) that acts as an ingress and egress point for cross-network communication (i.e., messages and notifications).
 This pair of network relays communicate messages using a DLT-agnostic protocol.
-The [request](../../formats/views/request.md) is communicated in the form of a [view address](../../formats/views/addressing.md) plus a [verification policy](../../formats/policies/proof-verification.md).
+The [request](../../formats/views/request-response.md) is communicated in the form of a [view address](../../formats/views/addressing.md) plus a [verification policy](../../formats/policies/proof-verification.md).
 The response is communicated in the form of a [view](../../formats/views/definition.md), which contains a [proof](../../models/ledger/cryptographic-proofs.md).
 The responding network's peers run [access control policy](../../formats/policies/access-control.md) checks agianst the received view address.
 The responding network's peers can optionally [encrypt the requested data using the requesting client's public key](../../models/security/confidentiality.md) before sending a response.
@@ -31,7 +31,7 @@ Data sharing (i.e. querying data) across networks/ledgers is a fundamental inter
 - [Addressing](../../formats/views/addressing.md): Addressing is how a network can specify the data it wants from another network. This is akin to URLs in the World Wide Web.
 - [Views](../../models/ledger/views.md): The self-authenticating data that can be shared by a network and identified by an address from outside the network. Its [format](../../formats/views/definition.md) has DLT-agnostic and DLT-specific parts, and it consists of [DLT-specific proofs](../../models/ledger/cryptographic-proofs.md) indicating an authentic association with the source ledger.
 - [Verification Policy](../../formats/policies/proof-verification.md): Standard for authenticity proof as supplied by the data requestor, usually accompanying a view address.
-- [View request](../../formats/views/request.md): A message consisting of a view address and an associated verification policy.
+- [View request](../../formats/views/request-response.md): A message consisting of a view address and an associated verification policy.
 - [Access control policy](../../formats/policies/access-control.md): Standard for supplying addressable data to a requestor. Typically maintained as a collection of rules specifying which entities may access which categories of data (i.e., which comprise views).
 - [Confidentiality](../../models/security/confidentiality.md): Data embedded in views can be encrypted using the requestor's public key.
 
@@ -70,13 +70,13 @@ Messages and API functions in relevant steps in the above workflow are given bel
 - *Client Application `-->` Destination Interoperation Module*: Query verification policy for view address: this is done using the `GetVerificationPolicy` or `GetVerificationPolicyBySecurityDomain` function exposed by the interoperation module.
 - *Destination Interoperation Module `-->` Client Application*: Response: `verification policy`: this is a serialized form of a [VerificationPolicy protobuf message](../../formats/policies/proof-verification.md#defining-verification-policies).
 - *Client Application `-->` Destination Relay*: Request: `<view address, verification policy>`: the client application sends a [NetworkQuery](../../formats/communication/relay.md#networkquery) message to the relay.
-- *Destination Relay `-->` Source Relay*: Request: `<request id, view address, verification policy>`: the destination relay sends a [Query](../../formats/views/request.md#query) message to the source relay.
-- *Source Relay `-->` Source Driver*: Request: `<request id, view address, verification policy>`: the source relay sends a [Query](../../formats/views/request.md#query) message to the source driver.
+- *Destination Relay `-->` Source Relay*: Request: `<request id, view address, verification policy>`: the destination relay sends a [Query](../../formats/views/request-response.md#query) message to the source relay.
+- *Source Relay `-->` Source Driver*: Request: `<request id, view address, verification policy>`: the source relay sends a [Query](../../formats/views/request-response.md#query) message to the source driver.
 - *Source Driver `-->` Source Interoperation Module*: Query state: this is done using the `HandleExternalRequest` function exposed by the interoperation module.
 - *Source Interoperation Module `-->` Source Driver*: Response: `<state, proof>`: this is a serialized form of a DLT-specific view, e.g., [FabricView protobuf message](../../formats/views/fabric.md#view-data-definition)in Fabric networks, [ViewData protobuf message](../../formats/views/corda.md#view-data-definition) in Corda networks.
-- *Source Driver `-->` Source Relay*: Response/poll: `<view, proof>`: this is a serialized form of a [ViewPayload protobuf message](../../formats/views/request.md#viewpayload).
-- *Source Relay `-->` Destination Relay*: Response/poll: `<view, proof>`: this is a serialized form of a [ViewPayload protobuf message](../../formats/views/request.md#viewpayload).
-- *Destination Relay `-->` Client Application*: Response/poll: `<view, proof>`: this is a serialized form of a [ViewPayload protobuf message](../../formats/views/request.md#viewpayload).
+- *Source Driver `-->` Source Relay*: Response/poll: `<view, proof>`: this is a serialized form of a [ViewPayload protobuf message](../../formats/views/request-response.md#viewpayload).
+- *Source Relay `-->` Destination Relay*: Response/poll: `<view, proof>`: this is a serialized form of a [ViewPayload protobuf message](../../formats/views/request-response.md#viewpayload).
+- *Destination Relay `-->` Client Application*: Response/poll: `<view, proof>`: this is a serialized form of a [ViewPayload protobuf message](../../formats/views/request-response.md#viewpayload).
 - *Client Application `-->` Destination Interoperation Module*: Submit state validation Tx: `<contract/dapp Tx, view, proof>`: this is done using the `WriteExternalState`function exposed by the interoperation module.
 - *Destination Interoperation Module `-->` Client Application*: Response: `Tx success/failure`: this is either a blank (success) or an error message (failure).
 
