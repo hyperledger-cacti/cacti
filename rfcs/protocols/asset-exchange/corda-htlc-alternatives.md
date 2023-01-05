@@ -6,7 +6,7 @@
  
 # Design Choices for Asset Exchange - HTLC Protocol Units in Corda Networks
 
-- RFC: 02-006
+- RFC: 02-006-appendix
 - Authors: Ermyas Abebe, Venkatraman Ramakrishna, Sandeep Nishad, Krishnasuri Narayanam, Dhinakaran Vinayagamurthy
 - Status: Proposed
 - Since: 21-Oct-2022

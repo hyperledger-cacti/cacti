@@ -30,7 +30,7 @@ The following functions should be implemented in the Fabric Interoperation Chain
 
 The Weaver SDK should implement and offer the following function to serve the end-to-end purpose described in the [protocol's client API requirements](./generic.md#client-api-and-sdk). The given function signature is suggestive and in TypeScript syntax, but it can be modified or adapted as per need.
 
-```protobuf
+```TypeScript
 const interopFlow = async (
     interopContract: Contract,
     networkID: string,
