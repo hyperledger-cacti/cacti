@@ -21,7 +21,7 @@ This is an identity plane protocol to exchange identity information between two 
 
 As mentioned in the background document (linked to above), there are three phases in the process between a new network unit making itself known via an IIN and a Steward up to the point when its identity and certificates are accepted and recorded by a foreign network with which an interoperation (in the data plane) may occur in the future. These phases are separate protocol instances in themselves, though they must follow a particular chronological order. The full process is illustrated in the figure below:
 
-<img src="../../resources/images/protocol-identity-overview.jpg" width=60%>
+<img src="../../resources/images/protocol-identity-overview.png" width=60%>
 
 First, each network unit of a network (above, without loss of generality, `NETWORK 1`) must register itself with an IIN and a Steward in that IIN. So Step 1 in the above figure must be carried out by each unit independently before a network is ready to interoperate with another.
 
@@ -49,7 +49,7 @@ The protocol in each phase is described below. As above, without loss of general
 
 ## Protocol: Registration
 
-<img src="../../resources/images/protocol-registration-phase.jpg">
+<img src="../../resources/images/protocol-registration-phase.png">
 
 An IIN Agent represents each network unit: two for `NETWORK 2` and one for `NETWORK 1`.
 
@@ -64,7 +64,7 @@ The steps of this registration procedure are as follows:
 
 ## Protocol: Get Foreign Network Membership Information
 
-<img src="../../resources/images/protocol-get-info-phase.jpg">
+<img src="../../resources/images/protocol-get-info-phase.png">
 
 This stage of the protocol involves three entities (and the IIN):
 * IIN Agent of a recently registered network unit: `IIN Agent Org3` (`NETWORK 1`)
@@ -86,7 +86,7 @@ It is possible for the membership credential schema or verification key to be re
 
 ## Protocol: Update Foreign Network Information
 
-<img src="../../resources/images/protocol-update-info-phase.jpg">
+<img src="../../resources/images/protocol-update-info-phase.png">
 
 This stage of the protocol involves all the entities that participate in this scenario (and the IIN):
 * IIN Agent of a recently registered network unit: `IIN Agent Org3` (`NETWORK 1`)

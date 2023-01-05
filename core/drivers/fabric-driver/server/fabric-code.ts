@@ -164,13 +164,6 @@ async function invoke(
         //@ts-ignore
         let endorsementCounter = 0;
         proposalResponseResult.responses.forEach((response) => {
-            // Set single (last) InteropPayload as response
-            const currentResponse = new proposalResponse.Response();
-            currentResponse.setStatus(response.response.status);
-            currentResponse.setMessage(response.response.message);
-            currentResponse.setPayload(response.response.payload);
-            viewPayload.setResponse(currentResponse);
-            
             const endorsement = new proposalResponse.Endorsement();
             endorsement.setSignature(response.endorsement.signature);
             endorsement.setEndorser(response.endorsement.endorser);

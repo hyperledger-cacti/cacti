@@ -63,7 +63,7 @@ The below figure (Fig. 3) illustrates our identity plane architecture:
 * A set of agents, called *IIN Agents* that act on behalf of members (participant units) within a network that collectively supply and fetch membership, identity, and any other configuration information, of the counterparty network.
 
 <div align="center">
-<img src="../../resources/images/identity-plane.jpg" width=70%>
+<img src="../../resources/images/identity-plane.png" width=70%>
 <br/>
 <figcaption>Fig.3 - Identity plane architecture overview</figcaption><br/>
 </div>

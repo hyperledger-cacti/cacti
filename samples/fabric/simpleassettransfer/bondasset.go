@@ -184,7 +184,7 @@ func (s *SmartContract) PledgeAsset(ctx contractapi.TransactionContextInterface,
 	}
 
 	// Pledge the asset using common (library) logic
-	if pledgeId, err := wutils.PledgeAsset(ctx, assetJSON, assetType, id, asset.Owner, remoteNetworkId, recipientCert, expiryTimeSecs); err == nil {
+	if pledgeId, err := wutils.PledgeAsset(ctx, assetJSON, assetType, id, remoteNetworkId, recipientCert, expiryTimeSecs); err == nil {
 		// Delete asset state using app-specific logic
 		return pledgeId, s.DeleteAsset(ctx, assetType, id)
 		if err != nil {
@@ -202,11 +202,11 @@ func (s *SmartContract) ClaimRemoteAsset(ctx contractapi.TransactionContextInter
 	// (Optional) Ensure that this function is being called by the Fabric Interop CC
 
 	// Claim the asset using common (library) logic
-	claimer, err := getECertOfTxCreatorBase64(ctx)
+	claimer, err := wutils.GetECertOfTxCreatorBase64(ctx)
 	if err != nil {
 		return err
 	}
-	pledgeAssetDetails, err := wutils.ClaimRemoteAsset(ctx, pledgeId, claimer, remoteNetworkId, pledgeBytes64)
+	pledgeAssetDetails, err := wutils.ClaimRemoteAsset(ctx, pledgeId, remoteNetworkId, pledgeBytes64)
 	if err != nil {
 		return err
 	}
@@ -390,7 +390,7 @@ func (s *SmartContract) GetAssetClaimStatus(ctx contractapi.TransactionContextIn
 
 // isCallerAssetOwner returns true only if the invoker of the transaction is also the asset owner
 func isCallerAssetOwner(ctx contractapi.TransactionContextInterface, asset *BondAsset) bool {
-	caller, err := getECertOfTxCreatorBase64(ctx)
+	caller, err := wutils.GetECertOfTxCreatorBase64(ctx)
 	if err != nil {
 		fmt.Println(err.Error())
 		return false

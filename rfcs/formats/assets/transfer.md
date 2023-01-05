@@ -8,10 +8,10 @@
 - RFC: 03-014
 - Authors: Venkatraman Ramakrishna, Krishnasuri Narayanam, Sandeep Nishad, Dhinakaran Vinayagamurthy
 - Status: Proposed
-- Since: 02-Apr-2022
+- Since: 21-Dec-2022
 
 ## Summary
-This document specifies the data formats used in [cross-network asset transfer protocol](../../protocols/asset-transfer/).
+This document specifies the data formats used in the [cross-network asset transfer protocol](../../protocols/asset-transfer/). The structures defined in this document are generic and the operations on them are generic (see the protocol specification for details.) These structures are oblivious to the specifications and semantics of any digital asset maintained by any DLT application (e.g., any application chaincode in Fabric or any CorDapp in Corda).
 
 ## Representing an Asset Transfer Pledge
 
@@ -25,7 +25,7 @@ message AssetPledge {
 	uint64 expiryTimeSecs = 5;
 }
 ```
-- `assetDetails` field is a serialized asset details structure containing specific information about the asset being pledged. Note that only the party owning the asset (captured as part of asset details structure) should be able to perform the pledge on the asset
+- `assetDetails` field is a serialized asset details structure containing specific information about the asset being pledged. The details are opaque to the [interoperation module](models/infrastructure/interoperation-modules.md), which simply treats this asset as a digital blob that is ready to be pledged. Only the relevant application (e.g., chaincode, CorDapp) can parse and interpret the asset details, and must contain logic to perform additional checks and operations on the asset's state. Note that only the party owning the asset (captured as part of asset details structure) should be able to perform a pledge on the asset
 - `localNetworkID` field is the identifier of the ledger in which the asset resides before the transfer (this is the network that exports the asset)
 - `remoteNetworkID` field is the identifier of the ledger in which the asset resides after the transfer (this is the network that imports the asset)
 - `recipient` field is the party in the importing network who owns the asset post the asset transfer
@@ -45,7 +45,7 @@ message AssetClaimStatus {
 	bool expirationStatus = 7;
 }
 ```
-- `assetDetails` field is a serialized asset details structure containing specific information about the asset being claimed. Note that the party owning the asset (captured as part of asset details structure) is set to the party specified as the `recipient`
+- `assetDetails` field is a serialized asset details structure containing specific information about the asset being claimed. The details are opaque to the [interoperation module](models/infrastructure/interoperation-modules.md), which simply treats this asset as a digital blob that is ready to be claimed. Only the relevant application (e.g., chaincode, CorDapp) can parse and interpret the asset details, and must contain logic to perform additional checks and operations on the asset's state. Note that the party owning the asset (captured as part of asset details structure) is set to the party specified as the `recipient`
 - `localNetworkID` field is the identifier of the ledger in which the asset resides after the transfer (this is the network that imports the asset)
 - `remoteNetworkID` field is the identifier of the ledger in which the asset resides before the transfer (this is the network that exports the asset)
 - `recipient` field is the party in the importing network who owns the asset post the asset transfer; only this party can perform the claim on the asset that was pledged earlier

@@ -24,6 +24,7 @@ import statePb from "@hyperledger-labs/weaver-protos-js/common/state_pb";
 import fabricViewPb from "@hyperledger-labs/weaver-protos-js/fabric/view_data_pb";
 import cordaViewPb from "@hyperledger-labs/weaver-protos-js/corda/view_data_pb";
 import interopPayloadPb from "@hyperledger-labs/weaver-protos-js/common/interop_payload_pb";
+import proposalPb from "@hyperledger-labs/weaver-protos-js/peer/proposal_pb";
 import proposalResponsePb from "@hyperledger-labs/weaver-protos-js/peer/proposal_response_pb";
 import identitiesPb from "@hyperledger-labs/weaver-protos-js/msp/identities_pb";
 import { Relay } from "./Relay";
@@ -170,19 +171,63 @@ const verifyRemoteProposalResponse = async (proposalResponseBase64, isEncrypted,
 const getResponseDataFromView = (view, privKeyPEM = null) => {
     if (view.getMeta().getProtocol() == statePb.Meta.Protocol.FABRIC) {
         const fabricView = fabricViewPb.FabricView.deserializeBinary(view.getData());
-        const interopPayload = interopPayloadPb.InteropPayload.deserializeBinary(Uint8Array.from(Buffer.from(fabricView.getResponse().getPayload())));
-        if (interopPayload.getConfidential()) {    // Currently this is only supported for Fabric because it uses ECDSA keys in wallets
-            const confidentialPayload = interopPayloadPb.ConfidentialPayload.deserializeBinary(Uint8Array.from(Buffer.from(interopPayload.getPayload())));
-            const decryptedPayload = decryptData(Buffer.from(confidentialPayload.getEncryptedPayload()), privKeyPEM);
-            const decryptedPayloadContents = interopPayloadPb.ConfidentialPayloadContents.deserializeBinary(Uint8Array.from(Buffer.from(decryptedPayload)));
-            return { interopPayload: interopPayload, data: Buffer.from(decryptedPayloadContents.getPayload()).toString(), contents: decryptedPayload };
+        const fabricViewProposalResponses = fabricView.getEndorsedProposalResponsesList();
+        let viewAddress = '';
+        let responsePayload = '';
+        let responsePayloadContents = [];
+        let payloadConfidential = false;
+        for (let i = 0; i < fabricViewProposalResponses.length; i++) {
+            const fabricViewChaincodeAction = proposalPb.ChaincodeAction.deserializeBinary(fabricViewProposalResponses[i].getPayload().getExtension_asU8());
+            const interopPayload = interopPayloadPb.InteropPayload.deserializeBinary(Uint8Array.from(Buffer.from(fabricViewChaincodeAction.getResponse().getPayload())));
+            if (interopPayload.getConfidential()) {    // Currently this is only supported for Fabric because it uses ECDSA keys in wallets
+                const confidentialPayload = interopPayloadPb.ConfidentialPayload.deserializeBinary(Uint8Array.from(Buffer.from(interopPayload.getPayload())));
+                const decryptedPayload = decryptData(Buffer.from(confidentialPayload.getEncryptedPayload()), privKeyPEM);
+                const decryptedPayloadContents = interopPayloadPb.ConfidentialPayloadContents.deserializeBinary(Uint8Array.from(Buffer.from(decryptedPayload)));
+                if (i === 0) {
+                    viewAddress = interopPayload.getAddress();
+                    responsePayload = Buffer.from(decryptedPayloadContents.getPayload()).toString();
+                    payloadConfidential = true;
+                } else if (!payloadConfidential) {
+                    throw new Error(`Mismatching payload confidentiality flags across proposal responses`);
+                } else {
+                    // Match view addresses in the different proposal responses
+                    if (viewAddress !== interopPayload.getAddress()) {
+                        throw new Error(`Proposal response view addresses mismatch: 0 - ${viewAddress}, ${i} - ${interopPayload.getAddress()}`);
+                    }
+                    // Match decrypted view payloads from the different proposal responses
+                    const currentResponsePayload = Buffer.from(decryptedPayloadContents.getPayload()).toString();
+                    if (responsePayload !== currentResponsePayload) {
+                        throw new Error(`Decrypted proposal response payloads mismatch: 0 - ${responsePayload}, ${i} - ${currentResponsePayload}`);
+                    }
+                }
+                responsePayloadContents.push(decryptedPayload.toString("base64"));
+            } else {
+                if (i === 0) {
+                    viewAddress = interopPayload.getAddress();
+                    responsePayload = Buffer.from(interopPayload.getPayload()).toString();
+                    payloadConfidential = false;
+                } else if (payloadConfidential) {
+                    throw new Error(`Mismatching payload confidentiality flags across proposal responses`);
+                } else {
+                    const currentResponsePayload = Buffer.from(interopPayload.getPayload()).toString();
+                    if (responsePayload !== currentResponsePayload) {
+                        throw new Error(`Proposal response payloads mismatch: 0 - ${responsePayload}, ${i} - ${currentResponsePayload}`);
+                    }
+                    if (viewAddress !== interopPayload.getAddress()) {
+                        throw new Error(`Proposal response view addresses mismatch: 0 - ${viewAddress}, ${i} - ${interopPayload.getAddress()}`);
+                    }
+                }
+            }
+        }
+        if (payloadConfidential) {
+            return { viewAddress: viewAddress, data: responsePayload, contents: responsePayloadContents };
         } else {
-            return { interopPayload: interopPayload, data: Buffer.from(interopPayload.getPayload()).toString() };
+            return { viewAddress: viewAddress, data: responsePayload };
         }
     } else if (view.getMeta().getProtocol() == statePb.Meta.Protocol.CORDA) {
         const cordaView = cordaViewPb.ViewData.deserializeBinary(view.getData());
         const interopPayload = interopPayloadPb.InteropPayload.deserializeBinary(Uint8Array.from(Buffer.from(cordaView.getPayload())));
-        return { interopPayload: interopPayload, data: Buffer.from(interopPayload.getPayload()).toString() };
+        return { viewAddress: interopPayload.getAddress(), data: Buffer.from(interopPayload.getPayload()).toString() };
     } else {
         const protocolType = view.getMeta().getProtocol();
         throw new Error(`Unsupported DLT type: ${protocolType}`);
@@ -229,18 +274,6 @@ const getEndorsementsAndSignatoriesFromCordaView = (view) => {
         ids.push(notarizations[i].getId());
     }
     return { signatures, certs, ids };
-}
-
-/**
- * Extracts response payload from a Fabric view.
- * Argument is a View protobuf ('statePb.View')
- **/
-const getResponsePayloadFromFabricView = (view) => {
-    if (view.getMeta().getProtocol() != statePb.Meta.Protocol.FABRIC) {
-        throw new Error(`Not a Fabric view`);
-    }
-    const fabricView = fabricViewPb.FabricView.deserializeBinary(view.getData())
-    return Buffer.from(fabricView.getResponse().serializeBinary()).toString('base64')
 }
 
 /**
@@ -462,9 +495,9 @@ const interopFlow = async (
         computedAddresses.push(requestResponse.address);
         if (confidential) {
             const respData = getResponseDataFromView(requestResponse.view, keyCert.key.toBytes());
-            viewContentsBase64.push(respData.contents.toString("base64"));
+            viewContentsBase64.push(respData.contents);
         } else {
-            viewContentsBase64.push("");
+            viewContentsBase64.push([]);
         }
     }
     // Return here if caller just wants the views and doesn't want to invoke a local chaincode
@@ -500,7 +533,7 @@ const getCCArgsForProofVerification = (
     interopArgIndices: Array<number>,
     viewAddresses: Array<string>,
     viewsSerializedBase64: Array<string>,
-    viewContentsBase64: Array<string>,
+    viewContentsBase64: Array<Array<string>>,
 ): Array<any> => {
     const {
         ccArgs: localCCArgs,
@@ -551,7 +584,7 @@ const submitTransactionWithRemoteViews = async (
     interopArgIndices: Array<number>,
     viewAddresses: Array<string>,
     viewsSerializedBase64: Array<string>,
-    viewContentsBase64: Array<string>,
+    viewContentsBase64: Array<Array<string>>,
     endorsingOrgs: Array<string>,
     gateway: Gateway = null,
 ): Promise<any> => {
@@ -723,7 +756,6 @@ export {
     getResponseDataFromView,
     getEndorsementsAndSignatoriesFromFabricView,
     getEndorsementsAndSignatoriesFromCordaView,
-    getResponsePayloadFromFabricView,
     getSignatoryOrgMSPFromFabricEndorsementBase64,
     decodeView,
     signMessage,

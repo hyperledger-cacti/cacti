@@ -8,11 +8,6 @@ option go_package = "github.com/hyperledger-labs/weaver-dlt-interoperability/com
 import "peer/proposal_response.proto";
 
 message FabricView {
-  // `Response` from the peers
-  // https://github.com/hyperledger/fabric-protos-go/blob/master/peer/proposal_response.pb.go#L113
-  // We only need the `Payload` field though.
-  protos.Response response = 1;
-  
   message EndorsedProposalResponse {
     // `ProposalResponsePayload` is the output produced by each peer and signed as a serialized blob
     // https://github.com/hyperledger/fabric-protos-go/blob/master/peer/proposal_response.pb.go#L176
@@ -24,5 +19,5 @@ message FabricView {
     // https://github.com/hyperledger/fabric-protos-go/blob/master/peer/proposal_response.pb.go#L242
     protos.Endorsement endorsement = 2;
   }
-  repeated EndorsedProposalResponse endorsed_proposal_responses = 2;
+  repeated EndorsedProposalResponse endorsed_proposal_responses = 1;
 }

@@ -21,7 +21,7 @@ on:
 jobs:
 
   asset-exchange-fabric:
-    if: ${{ false }}
+    # if: ${{ false }}
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
@@ -95,7 +95,7 @@ jobs:
         working-directory: samples/fabric/fabric-cli
 
   asset-exchange-fabric-local:
-    if: ${{ false }}
+    # if: ${{ false }}
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 

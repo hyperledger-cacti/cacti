@@ -20,7 +20,7 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   fabric-asset-transfer:
-    if: ${{ false }}
+    # if: ${{ false }}
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
@@ -108,11 +108,11 @@ jobs:
         working-directory: core/drivers/fabric-driver
 
       - name: Start Fabric Driver for network1
-        run: make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.n1'
+        run: make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.n1' NETWORK_NAME=$(grep NETWORK_NAME docker-testnet-envs/.env.n1 | cut -d '=' -f 2)
         working-directory: core/drivers/fabric-driver
 
       - name: Start Fabric Driver for network2
-        run: make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.n2'
+        run: make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.n2' NETWORK_NAME=$(grep NETWORK_NAME docker-testnet-envs/.env.n2 | cut -d '=' -f 2)
         working-directory: core/drivers/fabric-driver
 
       # IIN AGENT
@@ -134,14 +134,14 @@ jobs:
 
       - name: Start Fabric IIN Agent for network1
         run: |
-          make deploy COMPOSE_ARG='--env-file docker-testnet/envs/.env.n1.org1'
-          make deploy COMPOSE_ARG='--env-file docker-testnet/envs/.env.n1.org2'
+          make deploy COMPOSE_ARG='--env-file docker-testnet/envs/.env.n1.org1' DLT_SPECIFIC_DIR=$(grep DLT_SPECIFIC_DIR docker-testnet/envs/.env.n1.org1 | cut -d '=' -f 2)
+          make deploy COMPOSE_ARG='--env-file docker-testnet/envs/.env.n1.org2' DLT_SPECIFIC_DIR=$(grep DLT_SPECIFIC_DIR docker-testnet/envs/.env.n1.org2 | cut -d '=' -f 2)
         working-directory: core/identity-management/iin-agent
 
       - name: Start Fabric IIN Agent for network2
         run: |
-          make deploy COMPOSE_ARG='--env-file docker-testnet/envs/.env.n2.org1'
-          make deploy COMPOSE_ARG='--env-file docker-testnet/envs/.env.n2.org2'
+          make deploy COMPOSE_ARG='--env-file docker-testnet/envs/.env.n2.org1' DLT_SPECIFIC_DIR=$(grep DLT_SPECIFIC_DIR docker-testnet/envs/.env.n2.org1 | cut -d '=' -f 2)
+          make deploy COMPOSE_ARG='--env-file docker-testnet/envs/.env.n2.org2' DLT_SPECIFIC_DIR=$(grep DLT_SPECIFIC_DIR docker-testnet/envs/.env.n2.org2 | cut -d '=' -f 2)
         working-directory: core/identity-management/iin-agent
 
       # CORDA DRIVER
@@ -406,7 +406,7 @@ jobs:
         working-directory: samples/fabric/fabric-cli
 
   fabric-asset-transfer-local:
-    if: ${{ false }}
+    # if: ${{ false }}
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
