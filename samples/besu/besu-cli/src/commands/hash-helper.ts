@@ -7,7 +7,7 @@
 import { GluegunCommand } from 'gluegun'
 import logger from '../helpers/logger'
 import { commandHelp } from '../helpers/helpers'
-import { HashFunctions } from '@hyperledger-labs/weaver-fabric-interop-sdk'
+import { HashFunctions } from '@hyperledger-labs/weaver-besu-interop-sdk'
 
 const command: GluegunCommand = {
   name: 'hash',
@@ -21,8 +21,8 @@ const command: GluegunCommand = {
       commandHelp(
         print,
         toolbox,
-        `fabric-cli hash --hash_fn=SHA256 abc`,
-        'fabric-cli hash --hash_fn=<hash-function-name> --random <preimage-string>',
+        `besu-cli hash --hash_fn=SHA256 abc`,
+        'besu-cli hash --hash_fn=<hash-function-name> --random <preimage-string>',
         [
           {
             name: '--hash_fn',

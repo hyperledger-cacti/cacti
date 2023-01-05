@@ -2,7 +2,7 @@
 	"network1": {
 		"networkHost": "localhost",
 		"networkPort": 8545,
-		"tokenContract": "../simpleasset/build/contracts/AliceERC20.json",
+		"tokenContract": "../simpleasset/build/contracts/AliceERC721.json",
 		"interopContract": "../simpleasset/build/contracts/AssetExchangeContract.json",
 		"senderAccountIndex": 1,
 		"recipientAccountIndex": 2

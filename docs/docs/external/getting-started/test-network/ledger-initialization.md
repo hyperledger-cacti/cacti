@@ -181,10 +181,34 @@ Bootstrap the Corda network and application states as follows:
     ./scripts/initAsset.sh
     ```
 
+### Initializing the Besu Networks
+
+Let's assume that `network1` can either manage NFT `AliceERC721` or Hybrid `AliceERC1155` tokens, while `network2` manages fungible `BobERC20` tokens. Here we use account `1` for Alice and account `2` for Bob in both neworks. To prepare Besu networks for asset exchange, navigate to the `samples/besu/besu-cli` and then follow the steps in next subsections.
+
+#### Configuring the Besu-CLI
+
+Create a `config.json` file by copying the `config.template.json`, keep the default values for managing `AliceERC721` tokens in `network1` and `BobERC20` tokens in `network2`.
+If you want to change the token type used in the `network1` to Hybrid `AliceERC1155` tokens, in `config.json` update `tokenContract` field with value `"../simpleasset/build/contracts/AliceERC1155.json".`
+  
+#### Bootstrapping Network and Application State
+
+Finally, to prepare both `network1` and `network2` for interoperation, run:
+
+* for default configuration, run:
+  ```bash
+  ./scripts/initAsset.sh
+  ```
+  This will issue `100 BobERC20` tokens to each account in `network2` and `AliceERC721` token with id `0` to `Alice` and id `1` to `Bob` in `network1`.
+* if using Hybrid `AliceERC1155` token in `network1`, run:
+  ```bash
+  ./scripts/initAsset.sh hybrid
+  ```
+  This will issue `100 BobERC20` tokens to each account in `network2` and `100 AliceERC1155` tokens with id `0` to `Alice` and id `1` to `Bob` in `network1`.
+  
+
 ### Next Steps
 
-The test networks are now configured and their ledgers are initialized. You can now run the [asset exchange flows](../interop/asset-exchange.md).
-
+The test networks are now configured and their ledgers are initialized. You can now run the [asset exchange flows](../interop/asset-exchange/overview.md).
 
 ## Preparation for Asset Transfer
 
