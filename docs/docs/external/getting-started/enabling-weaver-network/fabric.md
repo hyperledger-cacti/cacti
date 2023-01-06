@@ -44,7 +44,7 @@ A Fabric distributed application's business logic code spans two layers as illus
 
 These are smart contracts embodied in code, managing business workflow state and digital assets.
 
-#### Data Sharing
+#### For Data Sharing
 
 No code changes are required for Weaver enablement, because data sharing involves:
 - View packaging (and optionally, encryption) logic and access control logic in a source network, and
@@ -52,15 +52,30 @@ No code changes are required for Weaver enablement, because data sharing involve
 
 This logic is standard and independent of smart contract, asset, and state, particulars. It is already implemented in the Fabric Interoperation Chaincode offered by Weaver. Hence. you just need to deploy that chaincode to exercise data sharing from, or to, your application chaincode. Your application chaincode can be oblivious of the Fabric Interoperation Chaincode's workings and of the view request-response protocol.
 
-#### Asset Exchange
+#### For Asset Exchange
 
-Asset exchange can be enabled in two ways, either use Weaver [`assetexchange`](https://pkg.go.dev/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange) as library, or use interop chaincode to handle asset exchange by doing a chaincode-to-chaincode call (invocation).
+To exchange an asset using Weaver, the asset's state on the ledger must be controlled in the following ways:
+- Locked in favor of a party
+- Claimed by the party to whom the asset is pledged
+- Returned to the original owner if it is not claimed within a given timeframe
+
+In addition, the state of the asset (i.e., whether it is locked), and its current and targeted owners, must be determinable by looking at the ledger records.
+
+The bookkeeping logic required to maintain records of locks can be anstracted away from the particulars of a digital asset and its workflow. But as such assets and their properties (including ownership) can be, and are, encoded in an arbitrary number of ways, we cannot provide a one-size-fits all set of functions (like in the data sharing protocol) to exchange any kind of asset. Instead, we must rely on the application contract (chaincode) managing an asset, as it knows precisely what the asset's properties are and how they can be updated and queried on the ledger (channel).
+
+What Weaver offers, therefore, is the following:
+- Lock management (bookkeeping) logic implemented in the Fabric Interoperation Chaincode that treats each asset as an abstract object and is agnostic of the assets' internals. This logic can be exercised in one of two ways:
+  - Imporing the [`assetexchange`](https://pkg.go.dev/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange) library from the Fabric Interoperation Chaincode into your application chaincode, or
+  - Invoking them within the Fabric Interoperation Chaincode using a [chaincode-to-chaincode call](https://pkg.go.dev/github.com/hyperledger/fabric-chaincode-go/shim#ChaincodeStub.InvokeChaincode).
+- A set of template functions with sample (and extensible) code that must be added to the application chaincode to exercise the above lock management functions.
+
+Below, we list the template functions with sample code that you, as a developer, must use and adapt within your chaincode, in either mode (library import or chaincode invocations).
 
 | Notes |
 |:------|
 | The instructions here apply only to chaincode implemented in Go, because Weaver presently offers only a Go version of the Fabric Interoperation Chaincode. |
 
-- _Use Library [`assetexchange`](https://pkg.go.dev/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange)_: This method doesn't require the [`Fabric Interoperation Chaincode`](https://pkg.go.dev/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop) to be installed. In your smart contract's `go.mod`, add the following in the `require` section (the sample below uses the current versions for dependency packages; update them to the latest versions offered by Weaver):
+- _Using the [`assetexchange`](https://pkg.go.dev/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange) Library_: This method doesn't require the [`Fabric Interoperation Chaincode`](https://pkg.go.dev/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop) to be installed. In your smart contract's `go.mod`, add the following in the `require` section (the sample below uses the current versions for dependency packages; update them to the latest versions offered by Weaver):
   ```go
   require(
       ...
@@ -69,7 +84,7 @@ Asset exchange can be enabled in two ways, either use Weaver [`assetexchange`](h
       ...
   )
   ```
-  The following functions need to be added to your chaincode (_Note_: the function signature, i.e. the name, arguments, and return values, need to be exactly what is given in the below samples; you can have additional code to manage asset state as per need):
+  The following functions need to be added to your chaincode, and the smart contract class/type used below is called `SmartContract` (_Note_: the function signature, i.e. the name, arguments, and return values, need to be exactly what is given in the below samples; you can have additional code to manage asset state as per need):
   1. **LockAsset**
      ```go
      import (
@@ -152,8 +167,8 @@ Asset exchange can be enabled in two ways, either use Weaver [`assetexchange`](h
 
   There is an alternative API to implement asset exchange using this library, which doesn't involve contract IDs. For details, see the [Asset Exchange Library README](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/core/network/fabric-interop-cc/libs/assetexchange/README.md#without-contractid).
         
-- _Use [`Fabric Interoperation Chaincode`](https://pkg.go.dev/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop)_: This method requires `interop` chaincode to be installed on all peers of the channel. Application chaincode needs to implement the interface `github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt`.
-  In your smart contract's `go.mod`, add following in require (update the version according to the latest module version):
+- _Using the [`Fabric Interoperation Chaincode`](https://pkg.go.dev/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop)_: This method requires the Fabric Interoperation Chaincode to be installed on all peers of the channel, using a special chaincode ID (e.g., `interop`, which is what we will use later in this document). Your application chaincode needs to implement the interface `github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt`.
+  In your smart contract's `go.mod`, add the following in require (update the version according to the latest module version):
   ```go
   require(
       ...
@@ -162,7 +177,7 @@ Asset exchange can be enabled in two ways, either use Weaver [`assetexchange`](h
       ...
   )
   ```
-  In the Smart Contract struct add following code:
+  In the SmartContract class definition file, add the following code:
   ```go
   import (
       ...
@@ -240,23 +255,23 @@ Asset exchange can be enabled in two ways, either use Weaver [`assetexchange`](h
      }
      ```
 
-#### Asset Transfer
+#### For Asset Transfer
 
 _TBD_
 
-### Client (or Layer-2) applications
+### Client (or Layer-2) Applications
 
-All interoperability modes require some application changes using the Weaver SDK.
+Weaver provides an SDK to help you adapt your applications to exercise the various interoperability modes. These are called out as **Interoperation Helpers** in the network model illustrated earlier. Your Fabric network's Layer-2 applications have business logic embedded in them that, broadly speaking, accept data from users and other external agents and invoke smart contracts using library functions and APIs offered by the Fabric SDK. When you use Weaver for network interoperability, other options can be added, namely requesting and accepting data from foreign networks, and triggering locks and claims for atomic exchanges spanning two networks. Weaver's Fabric Interoperation SDK (currently implemented both in Node.js and Golang) offers a library to exercise these options, supplementing the Fabric SDK. But this will involve modification to the application's business logic.
 
 | Notes |
 |:------|
 | The instructions here apply to applications implemented in Node.js (JavaScript and TypeScript), using the Weaver Node SDK for Fabric. We will add instructions later for Go applications using the Weaver Go SDK for Fabric. |
 
-Therefore, you first you need to add the following dependency to the `dependencies` section of your application's `package.json` file:
+To import and use the Weaver SDK, you need to add the following dependency to the `dependencies` section of your Node.js application's `package.json` file:
 ```json
 "@hyperledger-labs/weaver-fabric-interop-sdk": "latest",
 ```
-(Or check out the [package website](https://github.com/hyperledger-labs/weaver-dlt-interoperability/packages/888424) and select a different version.)
+(Instead of `latest`, you can select a particular version from the [package website](https://github.com/hyperledger-labs/weaver-dlt-interoperability/packages/888424).)
 
 Before you run `npm install` to fetch the dependencies, make sure you create a [personal access token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) with `read:packages` access in Github. Create an `.npmrc` file in the same folder as the `package.json` with the following contents:
 
@@ -266,26 +281,33 @@ registry=https://npm.pkg.github.com/hyperledger-labs
 ```
 Replace `<personal-access-token>` in this file with the token you created in Github.
 
-- **Identity Service**: A Fabric network needs to share its security domain (or membership) configuration, i.e., its organizations' CA certificate chains, with a foreign network with which it seeks to interoperate. (You will need one service per channel.). IIN Agents does automatic sync of membership. But before setting up IIN Agents, _local membership_ needs to be recorded in the ledger. Following code snipper needs to be added in application to enable this:
+First, you must incorporate some code for Weaver's network administration, specifically identity management. Then, using the given sample code and examples, you can adapt your applications for each interoperability mode.
+
+#### For Identity Administration
+
+A Fabric network channel must share its security domain (or membership) configuration, i.e., its organizations' CA certificate chains, with a foreign network with which it seeks to interoperate. Each organization must run an IIN Agent for this purpose. The set of IIN Agents, a.k.a. the _local membership_ must be recorded in the ledger before those agents can be operational. In your Fabric network application suite, one or more applications will exist for network administration; the following code snippet should be added in at least one of those applications to record local membership as a prerequisite for interoperability:
   ```typescript
+  import { MembershipManager } from '@hyperledger-labs/weaver-fabric-interop-sdk'
+
   const gateway = <get-fabric-network-gateway-instance>
+
   try {
       const response = await MembershipManager.createLocalMembership(
           gateway,
           members,        // list of all organization MSPIDs that are part of the channel
           securityDomain, // name of the local network's security domain
           channelName,    // Channel Name
-          contractName    // Interop chaincode name set during installation
+          contractName    // Fabric Interoperation Chaincode installation ID on the channel
       )
   } catch (e) {
       // On error try updating local membership
       const response = await MembershipManager.updateLocalMembership(gateway, members, securityDomain, channelName, contractName)
   }
   ```
-
-- **Interoperation Helpers**: Your Fabric network's Layer-2 applications have business logic embedded in them that, broadly speaking, accept data from users and other external agents and invoke smart contracts using library functions and APIs offered by the Fabric SDK. With the option of interoperability with other networks available through Weaver, other options can be added, namely requesting and accepting data from foreign networks, and triggering locks and claims for atomic exchanges spanning two networks. Weaver's Fabric Interoperation SDK (currently implemented both in Node.js and Golang) offers a library to exercise these options, supplementing the Fabric SDK. But this will involve modification to the application's business logic. The following examples will illustrate how you can adapt your applications.
+  - `<get-fabric-network-gateway-instance>` should be replaced with standard (boilerplate) code to get a handle to your network's gateway. This requires a special wallet identity, namely one with a `network-admin` attribute indicating that the caller is a trusted network administrator who is authorized to record local memberships on the `channelName` channel.
+  - `members` must consist of the list of organizational MSP IDs for the `channelName` channel.
   
-#### Data Sharing
+#### For Data Sharing
 
 Consider a scenario inspired by the [global trade use case](../../user-stories/global-trade.md) where a letter of credit (L/C) management business logic (chaincode `letterofcreditcc`) installed in the `tradefinancechannel` channel in the `trade-finance-network` network supports a transaction `RecordBillOfLading`, which validates and records a bill of lading (B/L) supplied by a user via a UI. Weaver will enable such a B/L to be fetched from a different network `trade-logistics-network` by querying the function `GetBillOfLading` exposed by the chaincode `shipmentcc` installed in the `tradelogisticschannel` channel.
       
@@ -329,7 +351,7 @@ if (!flowResponse.views || flowResponse.views.length === 0 || !flowResponse.resu
     throw <error>;
 }
 ```
-Let us understand this code snippet better. The structure in lines 156-161 specifies the local chaincode transaction that is to be triggered after remote data (view) has been requested and obtained via relays. The function `RecordBillOfLading` expects two arguments as specified in line 160: the first is the common shipment reference that is used by the letter of credit in `trade-finance-network` and the bill of lading in `trade-logistics-network`, and the second is the bill of lading contents. When the `interopFlow` function is called, this argument is left blank because it is supposed to be filled with contents obtained from a view request. The array list `indices`, which is passed as an argument to `interopFlow` therefore contains the index value `1` (line 150), indicating which argument ought to be substituted  with view data. The `interopJSONs` array correspondingly contains a list of view addresses that are to be supplied to the relay.
+Let us understand this code snippet better. The structure in lines 337-342 specifies the local chaincode transaction that is to be triggered after remote data (view) has been requested and obtained via relays. The function `RecordBillOfLading` expects two arguments as specified in line 341: the first is the common shipment reference that is used by the letter of credit in `trade-finance-network` and the bill of lading in `trade-logistics-network`, and the second is the bill of lading contents. When the `interopFlow` function is called, this argument is left blank because it is supposed to be filled with contents obtained from a view request. The array list `indices`, which is passed as an argument to `interopFlow` therefore contains the index value `1` (line 331), indicating which argument ought to be substituted  with view data. The `interopJSONs` array correspondingly contains a list of view addresses that are to be supplied to the relay.
 
 | Notes |
 |:------|
@@ -337,11 +359,11 @@ Let us understand this code snippet better. The structure in lines 156-161 speci
 
 The rest of the code ought to be self-explanatory. Values are hardcoded for explanation purposes, but you can refactor the above code by reading view addresses corresponding to chaincode invocations from a configuration file.
     
-#### Asset Exchange
+#### For Asset Exchange
 
 Let's take an example of asset exchange between `Alice` and `Bob`, where Bob wants to purchase an asset of type `Gold` with id `A123` from `Alice` in `BondNetwork` in exchange for `200` tokens of type `CBDC01` in `TokenNetwork`.
       
-`Alice` needs to select a secret text (say `s`), and hash it (say `H`) using say `SHA512`, which will be used to lock her asset in `BondNetwork`. To lock the non-fungible asset using hash `H` and timeout duration of 10 minutes, you need to add following code snippet in your application:
+`Alice` needs to select a secret text (say `s`), and hash it (say `H`) using say `SHA512`, which will be used to lock her asset in `BondNetwork`. At the place in your application where an asset exchange is to be initiated, you need to add code to enable Alice to lock the non-fungible asset using hash `H` and timeout duration of 10 minutes:
 ```typescript
 import { AssetManager, HashFunctions } from '@hyperledger-labs/weaver-fabric-interop-sdk'
 
@@ -362,8 +384,12 @@ const result = await AssetManager.createHTLC(
 );
 let bondContractId = result.result; // Unique ID for this asset exchange contract in BondNetwork
 ```
-      
-Now `Bob` will lock his tokens in `TokenNetwork`. To lock the fungible asset using same hash `H` and timeout of 5 minutes (half the timeout duration used by Alice in `BondNetwork`), add following code snippet in your application:
+
+| Notes |
+|:------|
+| Note that 'Alice' and 'Bob' and the asset specifics can be parameterized in the above code, which can be reused for arbitrary asset exchange scenarios in your business workflow. The above code is only meant to be a sample. |
+
+Now `Bob` will lock his tokens in `TokenNetwork`. To lock the fungible asset using same hash `H` and timeout of 5 minutes (half the timeout duration used by Alice in `BondNetwork`), add the following code snippet in your application:
 ```typescript
 const hash = HashFunctions.SHA512();    // Create Hash instance of one of the supported Hash Algorithm
 hash.setSerializedHashBase64(H);        // Set the Hash
@@ -382,14 +408,14 @@ const result = await AssetManager.createFungibleHTLC(
 const tokenContractId = result.result // Unique ID for this asset exchange contract in TokenNetwork
 ```
 
-To query whether the assets are locked or not in any network, use following query function:
+Wherever the lock status of the asset is required in your application, you should insert a query function call as follows:
 ```typescript
 const contract = <handle-to-fabric-application-chaincode>;
 // Below contractId is the ID obtained during lock
 const isLocked = AssetManager.isAssetLockedInHTLCqueryUsingContractId(contract, contractId)
 ```
 
-Now to claim the asset using the secret text (pre-image of hash) `s`, add following code snippet:
+Wherever a participant (either 'Alice' or 'Bob' in this example) needs to claim a locked asset using the secret text (pre-image of hash) `s` in your application, insert the following code snippet (*Note*: typically one would insert this in event callback functions or in functions that are polling the ledger to monitor whether the asset is locked in favor of a given recipient):
 ```typescript
 const hash = HashFunctions.SHA512();    // Create Hash instance of one of the supported Hash Algorithm
 hash.setPreimage(s)                     // Set Pre-Image s
@@ -402,48 +428,55 @@ const claimSuccess = await AssetManager.claimAssetInHTLCusingContractId(
 // return value claimSuccess is boolean indicating success or failure of claim
 ```
 
-If the asset has to be unlocked, use following code snippet:
+Wherever the asset must be unlocked in your application (typically, an event callback function triggered upon the expiration of the time lock), insert the following code snippet:
 ```typescript
 const contract = <handle-to-fabric-application-chaincode>;
 const reclaimSuccess = await AssetManager.reclaimAssetInHTLCusingContractId(
     contract,
     contractId                          // contractId obtained during lock
 )
-// return value reclaimSuccess is boolean indicating success or failure of reclaim
+// return value 'reclaimSuccess' is a boolean indicating success or failure of reclaim
 ```
 
-#### Asset Transfer
+#### For Asset Transfer
 
 _TBD_
 
 ## Pre-Configuration Phase
 
-No changes are required in your network's pre-configuration process for Weaver enablement.
-
-Typically, pre-configuration involves generating:
+Typically, pre-configuration in a Fabric network involves generating (after creating the channel specifications and policies):
 - _Channel artifacts_: orderer genesis block, channel transaction, and anchor peer configurations from a `configtx.yaml` file (using Fabric's `configtxgen` tool)
 - _Crypto artifacts_: keys and certificates for CAs, peers, orderers, and clients from a `crypto-config.yaml` file (using Fabric's `cryptogen` tool)
 - _Connection profiles_: one for every network organization, which will be used by the organization's Layer-2 applications to connect to the network's peers and CAs
 
-Only a connection profile will be used by Weaver, as we will see later.
+No changes are required in this process to support any of the three interoperation modes using Weaver. The connection profiles generated above will be used by certain Weaver modules, as we will see later. The only additional step required is to generate special wallet identities for the following:
+- Network administrator: one or more identities containing the `network-admin` attribute; only a user/application possessing this identity may record special (privileged) information regarding memberships and policies on the channel.
+- Fabric Driver: one or more identities (for each deployed driver) containing the `relay` attribute; only a relay-driver combination possessing this identity may run data sharing-related operations on the deployed Fabric Interoperation Chaincode.
+- IIN Agent: one or more identities (for each deployed agent) containing the `iin-agent` attribute: only an agent may submit foreign network membership records to the Fabric Interoperation Chaincode.
+
+Later we will see how the components possessing these identities are deployed.
 
 ## Startup and Bootstrap Phase
 
-### Asset Exchange
+After writing application code and creating the network configuration files, the components of a Fabric network (peers, CAs, and ordering service) are launched. In this section, we will list the additional tasks you, as a Fabric network administrator, must perform to make your network ready to interoperate.
 
 To launch a network using containerized components, you will typically use a Docker Compose or Kubernetes configuration file. No modifications are needed to the peers', orderers', and CAs' configurations. Sample instructions are given below for networks launched using Docker Compose; we leave it to the reader to adapt these to their custom launch processes.
 
-#### Install the Fabric Interoperation Chaincode
+### For Asset Exchange
 
-Install the Fabric Interoperation Chaincode in the relevant channel(s), i.e., those that run smart contracts that will be involved in any interoperation mode. This is a Go module that can be fetched from `github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop`. Following that, you an install it using the appropriate Fabric process: in Fabric v2, you will need to package, install, approve, and commit this module on the selected channels in your network.
-
-### Data Sharing & Asset Transfer
-
-To launch a network using containerized components, you will typically use a Docker Compose or Kubernetes configuration file. No modifications are needed to the peers', orderers', and CAs' configurations. Sample instructions are given below for networks launched using Docker Compose; we leave it to the reader to adapt these to their custom launch processes.
+The asset exchange mode currently requires only the Fabric Interoperation Chaincode module from Weaver. Relays, drivers, and IIN agents, are not necessary. In the future, we expect to make the asset exchange protocol moe automated using these components; the instructions here will be updated appropriately.
 
 #### Install the Fabric Interoperation Chaincode
 
-Install the Fabric Interoperation Chaincode in the relevant channel(s), i.e., those that run smart contracts that will be involved in any interoperation mode. This is a Go module that can be fetched from `github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop`. Following that, you an install it using the appropriate Fabric process: in Fabric v2, you will need to package, install, approve, and commit this module on the selected channels in your network.
+Install the Fabric Interoperation Chaincode in the relevant channel(s), i.e., those that run chaincodes that will be involved in asset exchanges. This is a Go module that can be fetched from `github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop`. Following that, you an install it using the appropriate Fabric process: in Fabric v2, you will need to package, install, approve, and commit this module on the selected channels in your network.
+
+### For Data Sharing or Asset Transfer
+
+Both the data sharing and asset transfer modes require the Fabric Interoperation Chaincode, relays, drivers, and IIN agents, to be deployed.
+
+#### Install the Fabric Interoperation Chaincode
+
+Install the Fabric Interoperation Chaincode in the relevant channel(s), i.e., those that run chaincodess that will be involved in data sharing (and asset transfers, which require multiple data shares). This is a Go module that can be fetched from `github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop`. Following that, you an install it using the appropriate Fabric process: in Fabric v2, you will need to package, install, approve, and commit this module on the selected channels in your network.
 
 #### Launch Relay
 
@@ -465,6 +498,7 @@ You can start a relay within a Docker container using a [pre-built image](https:
   - The `DOCKER_*` variables are used to specify the image on which the container will be built. Make sure you set `DOCKER_TAG` to the latest version you see on [Github](https://github.com/hyperledger-labs/weaver-dlt-interoperability/pkgs/container/weaver-relay-server).
 
   For more details, see the [Relay Docker README](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/core/relay/relay-docker.md) ("Relay Server Image" and "Running With Docker Compose" sections).
+
 - `config.toml`: This specifies properties of the relay and the driver(s) is associates with. A sample is given below:
   ```
   name=<relay-name>
@@ -492,24 +526,19 @@ You can start a relay within a Docker container using a [pre-built image](https:
   hostname="<driver-hostname-or-ip-address>"
   port="<driver-port>"
   ```
-  `<relay-name>` should be a unique ID representing this relay; e.g., `my_network_relay`. It should match the `RELAY_NAME` value in `.env`.
-
-  `<relay-port>` is the port number the relay server will listen on. It should match the `RELAY_PORT` value in `.env`.
-
-  `db_path` and `remote_db_path` are used internally by the relay to store data. Replace `<relay-name>` with the same value set for the `name` parameter. (These can point to any filesystem paths in the relay's container.)
-
-  If you set `tls` to `true`, the relay will enforce TLS communication. The `cert_path` and `key_path` should point to a Fabric TLS certificate and key respectively, such as those created using the `cryptogen` tool.
-
-  `<network-name>` is a unique identifier for your local network. You can set it to whatever value you wish.
-
-  `<driver-name>` refers to the driver used by this relay to respond to requests. This also refers to one of the drivers's specifications in the `drivers` section further below. In this code snippet, we have defined one driver. (The names in lines 234 and 242 must match.) In lines 243 and 244, you should specify the hostname and port for the driver (whose configuration we will handle later).
-
-  The `relays` section specifies all foreign relays this relay can connect to. The `<foreign-relay-name>` value should be a unique ID for a given foreign relay, and this value will be used by your Layer-2 applications when constructing view addresses for data sharing requests. In lines 238 and 239, you should specify the hostname and port for the foreign relay.
+  - `<relay-name>` should be a unique ID representing this relay; e.g., `my_network_relay`. It should match the `RELAY_NAME` value in `.env`.
+  - `<relay-port>` is the port number the relay server will listen on. It should match the `RELAY_PORT` value in `.env`.
+  - `db_path` and `remote_db_path` are used internally by the relay to store data. Replace `<relay-name>` with the same value set for the `name` parameter. (These can point to any filesystem paths in the relay's container.)
+  - If you set `tls` to `true`, the relay will enforce TLS communication. The `cert_path` and `key_path` should point to a Fabric TLS certificate and key respectively, such as those created using the `cryptogen` tool.
+  - `<network-name>` is a unique identifier for your local network. You can set it to whatever value you wish.
+  - `<driver-name>` refers to the driver used by this relay to respond to requests. This also refers to one of the drivers's specifications in the `drivers` section further below. In this code snippet, we have defined one driver. (The names in lines 234 and 242 must match.) In lines 243 and 244, you should specify the hostname and port for the driver (whose configuration we will handle later).
+  - The `relays` section specifies all foreign relays this relay can connect to. The `<foreign-relay-name>` value should be a unique ID for a given foreign relay, and this value will be used by your Layer-2 applications when constructing view addresses for data sharing requests. In lines 238 and 239, you should specify the hostname and port for the foreign relay.
 
   | Notes |
   |:------|
   | You can specify more than one driver instance in the `drivers` section. |
   | You can specify more than one foreign relay instance in the `relays` section. |
+
 - `docker-compose.yaml`: This specifies the properties of the relay container. You can use the [file in the repository](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/core/relay/docker-compose.yaml) verbatim.
 
 To start the relay server, navigate to the folder containing the above files and run the following:
@@ -533,19 +562,14 @@ You can start a driver within a Docker container using a [pre-built image](https
   DOCKER_TAG=1.2.4
   DOCKER_REGISTRY=ghcr.io/hyperledger-labs
   ```
-  `<path_to_connection_profile>` should point to the path of a connection profile you generated in the "Pre-Configuration" section. A Fabric driver obtains client credentials from one of the organizations in your network, so pick an organization and point to the right connection profile.
+  - `<path_to_connection_profile>` should point to the path of a connection profile you generated in the "Pre-Configuration" section. A Fabric driver obtains client credentials from one of the organizations in your network, so pick an organization and point to the right connection profile.
+  - The `DRIVER_CONFIG` variable should point to the `config.json` (you can name this whatever you wish) specified below.
+  - `<relay-hostname>` should be set to the hostname of the relay server machine and `<relay-port>` should match the `port` value in the relay's `config.toml` (see above).
+  - The `NETWORK_NAME` variable should be a unique ID referring to the Fabric network. It will be used to distinguish container names and wallet paths. (This setting is relevant in situations where a driver is used to query multiple network channels.)
+  - The `DRIVER_PORT` variable should be set to the port this driver will listen on.
+  - The `INTEROP_CHAINCODE` variable should be set to the ID of the Fabric Interop Chaincode installed on your Fabric network channel.
+  - The `EXTERNAL_NETWORK` variable should be set to the [name](https://docs.docker.com/compose/networking/) of your Fabric network.
 
-  The `DRIVER_CONFIG` variable should point to the `config.json` (you can name this whatever you wish) specified below.
-
-  `<relay-hostname>` should be set to the hostname of the relay server machine and `<relay-port>` should match the `port` value in the relay's `config.toml` (see above).
-
-  The `NETWORK_NAME` variable should be a unique ID referring to the Fabric network. It will be used to distinguish container names and wallet paths. (This setting is relevant in situations where a driver is used to query multiple network channels.)
-
-  The `DRIVER_PORT` variable should be set to the port this driver will listen on.
-
-  The `INTEROP_CHAINCODE` variable should be set to the ID of the Fabric Interop Chaincode installed on your Fabric network channel.
-
-  The `EXTERNAL_NETWORK` variable should be set to the [name](https://docs.docker.com/compose/networking/) of your Fabric network.
 - `config.json`: This contains settings used to connect to a CA of a Fabric network organization and enroll a client. A sample is given below:
   ```json
   {
@@ -563,17 +587,15 @@ You can start a driver within a Docker container using a [pre-built image](https
       "caUrl":"<ca-service-endpoint>"
   }
   ```
-  As in the `.env` configuration, you should pick an organization for the driver to associate with. The `admin` section specifies the registrar name and password (this should be familiar to any Fabric network administrator) used to enroll clients. Default values of `admin` and `adminpw` are specified above as examples, which you should replace with the right values configured in your network organization's CA.
-
-  `<affiliation>` should be what's specified in your organization's Fabric CA server configuration. The default is `org1.department1`, but you should look up the appropriate value from the CA server's configuration file.
-
-  `<msp-id>` should be set to the (or an) MSP ID of the selected organization.
-
-  `<ca-service-endpoint>` should be set to the CA server's endpoint. If you launched your CA server as a container from a docker-compose file, this should be set to the container's service name.
+  - As in the `.env` configuration, you should pick an organization for the driver to associate with. The `admin` section specifies the registrar name and password (this should be familiar to any Fabric network administrator) used to enroll clients. Default values of `admin` and `adminpw` are specified above as examples, which you should replace with the right values configured in your network organization's CA.
+  - `<affiliation>` should be what's specified in your organization's Fabric CA server configuration. The default is `org1.department1`, but you should look up the appropriate value from the CA server's configuration file.
+  - `<msp-id>` should be set to the (or an) MSP ID of the selected organization.
+  - `<ca-service-endpoint>` should be set to the CA server's endpoint. If you launched your CA server as a container from a docker-compose file, this should be set to the container's service name.
 
   | Notes |
   |:------|
   | If your connection profile already contains specifications for a CA server, you can leave the `<ca-service-endpoint>` value as a blank. |
+
 - `docker-compose.yaml`: This specifies the properties of the driver container. You can use the [file in the repository](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/core/drivers/fabric-driver/docker-compose.yml) verbatim.
 
 To start the driver, navigate to the folder containing the above files and run the following:
@@ -583,7 +605,7 @@ docker-compose up -d
 
 #### Launch IIN Agents
 
-You need to launch one IIN agent for each organization. To launch an IIN agent within a Docker container using a :
+You need to launch one IIN agent for each organization. To launch an IIN agent within a Docker container using a:
 1. You can use [weaver-iin-agent](https://github.com/hyperledger-labs/weaver-dlt-interoperability/pkgs/container/weaver-iin-agent) image.
 2. Before starting the IIN agent container, you need to customize the container configuration, which you can do by simply creating a folder (let's call it `iin_agent_config_<orgname>`) and configuring the following files in it:
   - `config.json`: This contains settings used to connect to a Fabric network organization and its CA. A sample is given below:
@@ -746,6 +768,6 @@ To prepare your network for interoperation with a foreign network, you need to r
   |:------|
   | For any cross-network data request, make sure an access control policy is recorded in the _source network_ (`trade-logistics-network` in the above example) and a corresponding verification policy is recorded in the _destination network_ (`trade-finance-network` in the above example) before any relay request is triggered. |
 - **Local network security domain (membership) configuration**:
-  Call the function or HTTP endpoint to record local membership that was created in development step.
+  Recall the code snippet added to your application in the "Identity Administration" section. Exercise that code snippet, exposed either through a function API or an HTTP endpoint, to record the initial local membership for the relevant network channels.
 
 Your Fabric network is now up and running with the necessary Weaver components, and your network's channel's ledger is bootstrapped with the initial configuration necessary for cross-network interactions!
