@@ -1,5 +1,5 @@
-ARG QUORUM_VERSION=21.4.1
-ARG TESSERA_VERSION=21.1.1
+ARG QUORUM_VERSION=22.7.4
+ARG TESSERA_VERSION=22.1.7
 
 FROM quorumengineering/quorum:$QUORUM_VERSION AS quorum
 FROM quorumengineering/tessera:$TESSERA_VERSION AS tessera
@@ -8,10 +8,10 @@ COPY --from=quorum /usr/local/bin/geth /usr/local/bin/
 COPY --from=quorum /usr/local/bin/bootnode /usr/local/bin/
 
 # BASH
-RUN apk update && apk add --no-cache bash
+RUN apt update && apt-get -y install bash
 
 # SUPERVISORD
-RUN apk update && apk add --no-cache supervisor
+RUN apt update && apt-get -y install supervisor
 RUN mkdir -p /var/log/supervisor
 COPY supervisord.conf /etc/supervisord.conf
 
