@@ -34,9 +34,54 @@ Let us walk through the changes that are required in different phases of your ne
 ### Development
 
 A Corda distributed application's business logic code spans three layers as illustrated in the network model:
-- _Flows CorDapp_: no code changes are required for Weaver enablement, as mentioned above
+- _Flows CorDapp_:
+  - _Data Sharing_: no code changes are required for Weaver enablement, as mentioned above
+  - _Asset Exchange_: Following helper functions needs to be added in workflows of a CorDapp:
+    - **Flow to get Asset State**: For non-fungible assets, create a flow like:
+      ```kotlin
+      class RetrieveStateAndRef(
+          val type: String, 
+          val id: String
+      ): FlowLogic<StateAndRef<AssetState>>
+      ```
+      And for fungible assets, create a flow like:
+      ```kotlin
+      class RetrieveStateAndRef(
+          val type: String, 
+          val quantity: Long
+      ): FlowLogic<StateAndRef<AssetState>>
+      ```
+      The name of these flows can be anything, but the parameters should be same, and return type should `StateAndRef`. These flows are supposed to get the `StateAndRef` object to the asset state that has to be locked, which can be identified by `type` and `id` for non-fungible assets, and `type` and `quantity` for fungible assets.
+    - **Flow to update owner in asset state**: Create a flow like:
+      ```kotlin
+      class UpdateOwnerFromPointer(
+        val statePointer: StaticPointer<AssetState>
+      ) : FlowLogic<AssetState>()
+      ```
+      Again the name can be anything but the function parameter should be same, i.e. take a `StaticPointer` and return the `ContractState` of the asset involved in asset exchange. This flow is supposed to resolve the `StaticPointer` to actual asset, and update the owner of this asset to the caller of this flow.
+  - _Asset Transfer_: _TBD_
 - _Contracts CorDapp_: no code changes are required for Weaver enablement, as mentioned above
-- _Client Layer applications_: let us examine the adaptations required in detail:
+- _Client Layer applications_: Let us examine the adaptations required in detail:
+  All the application changes require Weaver's Corda SDK. To use Weaver's Corda SDK, you need to create a [personal access token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) with `read:packages` access in Github, to access weaver packages.
+  You also need to add the following to your application's `build.gradle` file:
+  ```groovy
+  repositories {
+      maven {
+          url https://maven.pkg.github.com/hyperledger-labs/weaver-dlt-interoperability
+          credentials {
+              username <github-email>
+              password <github-personal-access-token>
+          }
+      }
+  }
+  dependencies {
+      implementation(group: 'com.weaver.corda.sdk', name: 'weaver-corda-sdk', version: "1.2.3")
+      implementation(group: 'com.weaver.corda.app.interop', name: 'interop-contracts', version: "1.2.3")
+      implementation(group: 'com.weaver.corda.app.interop', name: 'interop-workflows', version: "1.2.3")
+      implementation(group: 'com.weaver', name: 'protos-java-kt', version: "1.2.3")
+  }
+  ```
+  (Or check out the [package website](https://github.com/hyperledger-labs/weaver-dlt-interoperability/packages/952245) and select a different version.)
   * **Identity Service**: A Corda network needs to share its security domain (or membership) configuration, i.e., its nodes' CA certificate chains, with a foreign network with which it seeks to interoperate. Though such sharing can be implemented using several different mechanisms, ranging from manual to automated, the simplest and most modular way is to expose a REST endpoint that agents in foreign networks can reach. Further, this REST endpoint can be implemented as a standalone web application or it can be an extension of one or more of the existing client layer applications. (Multiple apps can expose the same endpoint serving the same information for redundancy.) We will demonstrate an example of this while leaving other implementation modes to the user.
     Let's say a Corda network consists of two nodes called `PartyA` and `PartyB`, each running a client layer application with a web server whose URL prefixes are `http://partya.mynetwork.com:9000` and `http://partyb.mynetwork.com:9000` respectively. Each app then can expose a REST endpoint (again, as an example) `http://partya.mynetwork.com:9000/node_sec_grp` and `http://partyb.mynetwork.com:9000/node_sec_grp` respectively.
     At each web server's backend, you need to implement logic to retrieve the node's ID and it's associated certificated chains. Sample code is given below for a Kotlin implementation built on `weaver-corda-sdk`. You can use this code verbatim, except for some minor changes like `<path-to-root-corda-net-folder>`, other parameters like security domain, and list of names of nodes as appropriate for your environment:
@@ -70,71 +115,146 @@ A Corda distributed application's business logic code spans three layers as illu
     }
     ```
     An agent from a foreign network can query either `http://partya.mynetwork.com:9000/sec_group` or `http://partyb.mynetwork.com:9000/sec_group` and obtain the security domain (or membership) configuration of the entire network.
-  * **Interoperation Helpers**: Your Corda network's client layer applications have business logic embedded in them that, broadly speaking, accept data from users and other external agents and invoke workflows. With the option of interoperability with other networks available through Weaver, other options can be added, namely requesting and accepting data from foreign networks, and triggering locks and claims for atomic exchanges spanning two networks. Weaver's Corda SDK (currently implemented both in Java and Kotlin) offers a library to exercise these options. But this will involve modification to the application's logic. The following examples will illustrate how you can adapt your applications.
+  * **Interoperation Helpers**: Your Corda network's client layer applications have business logic embedded in them that, broadly speaking, accept data from users and other external agents and invoke workflows. With the option of interoperability with other networks available through Weaver, other options can be added, namely requesting and accepting data from foreign networks, and triggering locks and claims for atomic exchanges spanning two networks. Weaver's Corda SDK (currently supported for both Java and Kotlin) offers a library to exercise these options. But this will involve modification to the application's logic. The following examples will illustrate how you can adapt your applications.
     - _Data sharing_: Consider a scenario inspired by the [global trade use case](../../user-stories/global-trade.md) where a letter of credit (L/C) management business logic is installed in the `trade-finance-network` network, supports a flow named `UploadBillOfLading`, which validates and records a bill of lading (B/L) supplied by a user via a UI. Weaver will enable such a B/L to be fetched from a different network `trade-logistics-network` by querying the function `GetBillOfLading` exposed by the chaincode `shipmentcc` installed in the `tradelogisticschannel` channel (_The trade logistics network can be built on Corda as well. The steps for Weaver-enablement will mostly be the same, with the exception of view address creation logic. Here, for demonstration purposes, we assume that that counter-party network is built on Fabric_).
-      
-        (In preparation, a suitable access control policy must be recorded on `tradelogisticschannel` in `trade-logistics-network`, and a suitable verification policy must be recorded in the vault of `trade-finance-network`. We will see how to do this in the [Startup and Bootstrap Weaver Components](#startup-and-bootstrap-weaver-components) section later.)
 
-        You will need to insert some code in the client layer application that accepts a B/L and submits a `UploadBillOfLading` request in `trade-finance-network`. (No code changes need to be made in any application in the other network.) The logic to accept a B/L should be replaced (or you can simply add an alternative) by a call to the `InteroperableHelper.interopFlow` function offered by the [weaver-corda-sdk](https://github.com/hyperledger-labs/weaver-dlt-interoperability/packages/952245) library. The following code sample illustrates this:
-      
-        ```kt
-        import com.weaver.corda.sdk.InteroperableHelper
-        import com.mynetwork.flow.UploadBillOfLading
+      (In preparation, a suitable access control policy must be recorded on `tradelogisticschannel` in `trade-logistics-network`, and a suitable verification policy must be recorded in the vault of `trade-finance-network`. We will see how to do this in the [Startup and Bootstrap Weaver Components](#startup-and-bootstrap-weaver-components) section later.)
 
-        val viewAddress = InteroperableHelper.createFabricViewAddress(
-            'trade-logistics-network',               // Security Domain/Group
-            <trade-logistics-relay-url[:<port>],     // Replace with remote network's relay
-            'tradelogisticschannel',                 // Remote network's channel
-            'shipmentcc',                            // Remote network's cc
-            'GetBillOfLading',                       // Remote network's cc Fun
-            [ <shipment-reference> ]                 // Replace <shipment-reference> with a value that can be used to look up the right B/L
-        )
-        try {
-            val response = InteroperableHelper.interopFlow(
-                proxy,                                // CordaRPCOps instance to start flows
-                viewAddress,
-                <trade-finance-relay-url>[:<port>]   // Replace with local network's relay address and port
-            ).fold({
-                println("Error in Interop Flow: ${it.message}")
-            }, {
-                val linearId = it.toString()
-                val BoLString = InteroperableHelper.getExternalStatePayloadString(
-                    proxy,
-                    linearId
-                )
-                val result = proxy.startFlow(::UploadBillOfLading, BoLString)
-                println("$result")
-            }
-        } catch (e: Exception) {
-            println("Error: ${e.toString()}")
-        }
-        ```
+      You will need to insert some code in the client layer application that accepts a B/L and submits a `UploadBillOfLading` request in `trade-finance-network`. (No code changes need to be made in any application in the other network.) The logic to accept a B/L should be replaced (or you can simply add an alternative) by a call to the `InteroperableHelper.interopFlow` function offered by the [weaver-corda-sdk](https://github.com/hyperledger-labs/weaver-dlt-interoperability/packages/952245) library. The following code sample illustrates this:
+    
+      ```kt
+      import com.weaver.corda.sdk.InteroperableHelper
+      import com.mynetwork.flow.UploadBillOfLading
+
+      val viewAddress = InteroperableHelper.createFabricViewAddress(
+          'trade-logistics-network',               // Security Domain/Group
+          <trade-logistics-relay-url[:<port>],     // Replace with remote network's relay
+          'tradelogisticschannel',                 // Remote network's channel
+          'shipmentcc',                            // Remote network's cc
+          'GetBillOfLading',                       // Remote network's cc Fun
+          [ <shipment-reference> ]                 // Replace <shipment-reference> with a value that can be used to look up the right B/L
+      )
+      try {
+          val response = InteroperableHelper.interopFlow(
+              proxy,                                // CordaRPCOps instance to start flows
+              viewAddress,
+              <trade-finance-relay-url>[:<port>]   // Replace with local network's relay address and port
+          ).fold({
+              println("Error in Interop Flow: ${it.message}")
+          }, {
+              val linearId = it.toString()
+              val BoLString = InteroperableHelper.getExternalStatePayloadString(
+                  proxy,
+                  linearId
+              )
+              val result = proxy.startFlow(::UploadBillOfLading, BoLString)
+              println("$result")
+          }
+      } catch (e: Exception) {
+          println("Error: ${e.toString()}")
+      }
+      ```
+      
+      Let us understand this code snippet better. The function `UploadBillOfLading` expects one argument, the bill of lading contents. The `InteroperableHelper.createFabricViewAddress` is used to create view address that is to passed to `InteroperableHelper.interopFlow` function. The equivalent function to create a view address for a remote Corda network is `InteroperableHelper.createCordaViewAddress`. 
+      
+      The rest of the code ought to be self-explanatory. Values are hardcoded for explanation purposes.
         
-        Let us understand this code snippet better. The function `UploadBillOfLading` expects one argument, the bill of lading contents. The `InteroperableHelper.createFabricViewAddress` is used to create view address that is to passed to `InteroperableHelper.interopFlow` function. The equivalent function to create a view address for a remote Corda network is `InteroperableHelper.createCordaViewAddress`. 
-        
-        The rest of the code ought to be self-explanatory. Values are hardcoded for explanation purposes.
-        
-        You need to create a [personal access token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) with `read:packages` access in Github, to access weaver packages.
-        You also need to add the following to your application's `build.gradle` file:
-        ```groovy
-        repositories {
-            maven {
-                url https://maven.pkg.github.com/hyperledger-labs/weaver-dlt-interoperability
-                credentials {
-                    username <github-email>
-                    password <github-personal-access-token>
-                }
-            }
-        }
-        dependencies {
-            implementation(group: 'com.weaver.corda.sdk', name: 'weaver-corda-sdk', version: "1.2.3")
-            implementation(group: 'com.weaver.corda.app.interop', name: 'interop-contracts', version: "1.2.3")
-            implementation(group: 'com.weaver.corda.app.interop', name: 'interop-workflows', version: "1.2.3")
-            implementation(group: 'com.weaver', name: 'protos-java-kt', version: "1.2.3")
-        }
-        ```
-      (Or check out the [package website](https://github.com/hyperledger-labs/weaver-dlt-interoperability/packages/952245) and select a different version.)
-    - _Asset exchange_: _TBD_
+    - _Asset exchange_: Let's take an example of asset exchange between `Alice` and `Bob`, where Bob wants to purchase an asset of type `Gold` with id `A123` from `Alice` in `BondNetwork` in exchange for `200` tokens of type `CBDC01` in `TokenNetwork`.
+
+      `Alice` needs to select a secret text (say `s`), and hash it (say `H`) using say `SHA512`, which will be used to lock her asset in `BondNetwork`. To lock the non-fungible asset using hash `H` and timeout duration of 10 minutes, you need to add following code snippet in your application:
+      ```kotlin
+      import com.weaver.corda.sdk.AssetManager
+      import com.weaver.corda.sdk.HashFunctions
+      
+      var hash: HashFunctions.Hash = HashFunctions.SHA512
+      hash.setSerializedHashBase64(H)
+      val proxy = <CordaRPCOps-instance-created-using-credentials-of-Alice-in-BondNetwork>
+      val issuer = <Issuer-party-in-BondNetwork>
+      val recipient = <Bob-party-in-BondNetwork>
+      val contractId = AssetManager.createHTLC(
+          proxy,          
+          "Gold",         // Type
+          "A123",         // ID
+          recipient, 
+          hash,           
+          10L,            // Duration tmeout in secs, L denotes Long
+          1,              // 1 if timeout is Duration, 0 if timeout is in absolute epochs
+          "com.cordaSimpleApplication.flow.RetrieveStateAndRef", // full name of "Flow to get Asset State"
+          AssetContract.Commands.Delete(),  // Contract command for Asset to Burn/Delete the state
+          issuer,
+          observers       // Optional parameter for list of observers for this transaction
+      )
+      ```
+      
+      Now `Bob` will lock his tokens in `TokenNetwork`. To lock the fungible asset using same hash `H` and timeout of 5 minutes (half the timeout duration used by Alice in `BondNetwork`), add following code snippet in your application:
+      ```kotlin
+      import com.weaver.corda.sdk.AssetManager
+      import com.weaver.corda.sdk.HashFunctions
+      
+      var hash: HashFunctions.Hash = HashFunctions.SHA512
+      hash.setSerializedHashBase64(H)
+      val proxy = <CordaRPCOps-instance-created-using-credentials-of-Bob-in-TokenNetwork>
+      val issuer = <Issuer-party-in-TokenNetwork>
+      val recipient = <Alice-party-in-TokenNetwork>
+      val contractId = AssetManager.createFungibleHTLC(
+          proxy,          
+          "CBDC01",       // Type
+          "200",          // Quantity
+          recipient, 
+          hash,           
+          5L,             // Duration timeout in secs, L denotes Long
+          1,              // 1 if timeout is Duration, 0 if timeout is in absolute epochs
+          "com.cordaSimpleApplication.flow.RetrieveStateAndRef", // full name of "Flow to get Asset State"
+          AssetContract.Commands.Delete(),  // Contract command for Asset to Burn/Delete the state
+          issuer,
+          observers       // Optional parameter for list of observers for this transaction
+      )
+      ```
+      
+      The above locks will return `contractId`, that has to be stored and will be used in other HTLC functions.
+      
+      To query whether the assets are locked or not in any network, use following query function:
+      ```kotlin
+      val isLockedBoolean = AssetManager.isAssetLockedInHTLC(
+          rpc.proxy, 
+          contractId
+      )
+      ```
+      
+      Now to claim the asset using the secret text (pre-image of hash) `s`, add following code snippet:
+      ```kotlin
+      var hash: HashFunctions.Hash = HashFunctions.SHA512()
+      hash.setPreimage(s)
+      val issuer = <Issuer-party>
+      val proxu = <CordaRPCOps-instance-created-using-credentials-of-claiming-party>
+      val res = AssetManager.claimAssetInHTLC(
+          proxy, 
+          contractId,                       // ContractId obtained during lock
+          hash,
+          AssetContract.Commands.Issue(),   // Contract command for issuing/minting asset
+          "com.cordaSimpleApplication.flow.UpdateAssetOwnerFromPointer", // full name of flow to update owner in asset state
+          issuer,
+          observers                         // Optional parameter for list of observers for this transaction
+      )   
+      // return value is boolean indicating success or failure of claim 
+      ```
+      The above function can be adapted to both `BondNetwork` and `TokenNetwork`.
+      
+      If the asset has to be unlocked, use following code snippet:
+      ```kotlin
+      val issuer = <Issuer-party>
+      val proxu = <CordaRPCOps-instance-created-using-credentials-of-locking-party>
+      val res = AssetManager.reclaimAssetInHTLC(
+          rpc.proxy, 
+          contractId,                       // ContractId obtained during lock
+          AssetContract.Commands.Issue(),   // Contract command for issuing/minting asset
+          issuer,
+          observers                         // Optional parameter for list of observers for this transaction
+      ) 
+      // return value is boolean indicating success or failure of claim 
+      ```
+      
+    - _Asset Transfer_: _TBD_
 
 ### Pre-Configuration
 
