@@ -480,7 +480,9 @@ Install the Fabric Interoperation Chaincode in the relevant channel(s), i.e., th
 
 #### Launch Relay
 
-You can start a relay within a Docker container using a [pre-built image](https://github.com/hyperledger-labs/weaver-dlt-interoperability/pkgs/container/weaver-relay-server). You just need to customize the container configuration for your Fabric network, which you can do by simply creating a folder (let's call it `relay_config`) and configuring the following files in it:
+You need to run one or more relays for network-to-network communication. Here we provide instructions to run one relay running in a Docker container, which is sufficient for data sharing. (Later, we will provide instructions to run multiple relays, which will be useful from a failover perspective.)
+
+Weaver provides a [pre-built image](https://github.com/hyperledger-labs/weaver-dlt-interoperability/pkgs/container/weaver-relay-server) for the relay. Before launching a container, you just need to customize its configuration for your Fabric network, which you can do by simply creating a folder (let's call it `relay_config`) and configuring the following files in it:
 - `.env`: This sets suitable environment variables within the relay container. Copy the `.env.template` file [from the repository](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/core/relay/.env.template) and customize it for your purposes, as indicated in the below sample:
   ```
   PATH_TO_CONFIG=./config.toml
@@ -491,7 +493,7 @@ You can start a relay within a Docker container using a [pre-built image](https:
   DOCKER_IMAGE_NAME=weaver-relay
   DOCKER_TAG=1.2.4
   ```
-  - The `PATH_TO_CONFIG` variable should point to the `config.toml` (you can name this whatever you wish) specified below.
+  - The `PATH_TO_CONFIG` variable should point to the properties file typically named `config.toml` (you can name this whatever you wish). See further below for instructions to write this file.
   - The `RELAY_NAME` variable specifies a unique name for this relay. It should match what's specified in the `config.toml` (more on that below).
   - The `RELAY_PORT` variable specifies the port this relay server will listen on. It should match what's specified in the `config.toml` (more on that below).
   - The `EXTERNAL_NETWORK` variable should be set to the [name](https://docs.docker.com/compose/networking/) of your Fabric network.
@@ -499,7 +501,7 @@ You can start a relay within a Docker container using a [pre-built image](https:
 
   For more details, see the [Relay Docker README](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/core/relay/relay-docker.md) ("Relay Server Image" and "Running With Docker Compose" sections).
 
-- `config.toml`: This specifies properties of the relay and the driver(s) is associates with. A sample is given below:
+- `config.toml`: This is the file specified in the `PATH_TO_CONFIG` variable in the `.env`. It specifies properties of this relay and the driver(s) it supports. A sample is given below:
   ```
   name=<relay-name>
   port=<relay-port>
@@ -531,13 +533,33 @@ You can start a relay within a Docker container using a [pre-built image](https:
   - `db_path` and `remote_db_path` are used internally by the relay to store data. Replace `<relay-name>` with the same value set for the `name` parameter. (These can point to any filesystem paths in the relay's container.)
   - If you set `tls` to `true`, the relay will enforce TLS communication. The `cert_path` and `key_path` should point to a Fabric TLS certificate and key respectively, such as those created using the `cryptogen` tool.
   - `<network-name>` is a unique identifier for your local network. You can set it to whatever value you wish.
-  - `<driver-name>` refers to the driver used by this relay to respond to requests. This also refers to one of the drivers's specifications in the `drivers` section further below. In this code snippet, we have defined one driver. (The names in lines 234 and 242 must match.) In lines 243 and 244, you should specify the hostname and port for the driver (whose configuration we will handle later).
-  - The `relays` section specifies all foreign relays this relay can connect to. The `<foreign-relay-name>` value should be a unique ID for a given foreign relay, and this value will be used by your Layer-2 applications when constructing view addresses for data sharing requests. In lines 238 and 239, you should specify the hostname and port for the foreign relay.
+  - `<driver-name>` refers to the driver used by this relay to respond to requests. This also refers to one of the drivers's specifications in the `drivers` section further below. In this code snippet, we have defined one driver. (The names in lines 519 and 527 must match.) In lines 528 and 529 respectively, you should specify the hostname and port for the driver (whose configuration we will handle later).
+  - The `relays` section specifies all foreign relays this relay can connect to. The `<foreign-relay-name>` value should be a unique ID for a given foreign relay, and this value will be used by your Layer-2 applications when constructing view addresses for data sharing requests. In lines 523 and 524, you should specify the hostname and port for the foreign relay.
+  - **Enabling TLS**:
+    - You can make your relay accept TLS connections by specifying a TLS certificate file path and private key file path in `cert_path` and `key_path` respectively, and set `tls` to `true`.
+    - To communicate with a foreign relay using TLS, specify that relay's TLS CA certificate path in `tlsca_cert_path` (currently only one certificate can be configured) and set `tls` to `true` by extending that relay's section as follows (*Note*: this CA certificate should match the one specified in the `cert_path` property in the foreign relay's `config.toml` file):
+      ```
+      [relays]
+      [relays.<foreign-relay-name>]
+      hostname="<foreign-relay-hostname-or-ip-address>"
+      port="<foreign-relay-port>"
+      tls=<true|false>
+      tlsca_cert_path="<relay-tls-ca-certificate-path>"
+      ```
+    - To communicate with a driver using TLS, specify the driver's TLS CA certificate in `tlsca_cert_path` (currently only one certificate can be configured) and set `tls` to `true` by extending that driver's section as follows (*Note*: this CA certificate must match the certificate used by the driver in its configuration file, which we will examine later):
+      ```
+      [drivers]
+      [drivers.<driver-name>]
+      hostname="<driver-hostname-or-ip-address>"
+      port="<driver-port>"
+      tls=<true|false>
+      tlsca_cert_path="<driver-tls-ca-certificate-path>"
+      ```
 
   | Notes |
   |:------|
-  | You can specify more than one driver instance in the `drivers` section. |
   | You can specify more than one foreign relay instance in the `relays` section. |
+  | You can specify more than one driver instance in the `drivers` section. |
 
 - `docker-compose.yaml`: This specifies the properties of the relay container. You can use the [file in the repository](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/core/relay/docker-compose.yaml) verbatim.
 
@@ -548,7 +570,9 @@ docker-compose up -d relay-server
 
 #### Launch Driver
 
-You can start a driver within a Docker container using a [pre-built image](https://github.com/hyperledger-labs/weaver-dlt-interoperability/pkgs/container/weaver-fabric-driver). You just need to customize the container configuration for your Fabric network, which you can do by simply creating a folder (let's call it `driver_config`) and configuring the following files in it:
+You need to run one or more drivers through which your relay can interact with your Fabric network. Here we provide instructions to run one Fabric driver running in a Docker container, which is sufficient for data sharing. (Later, we will provide instructions to run multiple drivers, which will be useful both from a failover perspective and to interact with different subsets of your Fabric network, like private data collections.)
+
+Weaver provides a [pre-built image](https://github.com/hyperledger-labs/weaver-dlt-interoperability/pkgs/container/weaver-fabric-driver) for the Fabric driver. Before launching a container, you just need to customize its configuration for your Fabric network, which you can do by simply creating a folder (let's call it `driver_config`) and configuring the following files in it:
 - `.env`: This sets suitable environment variables within the driver container. Copy the `.env.template` file [from the repository](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/core/drivers/fabric-driver/.env.docker.template) and customize it for your purposes, as indicated in the below sample:
   ```
   CONNECTION_PROFILE=<path_to_connection_profile>
@@ -561,6 +585,11 @@ You can start a driver within a Docker container using a [pre-built image](https
   DOCKER_IMAGE_NAME=weaver-fabric-driver
   DOCKER_TAG=1.2.4
   DOCKER_REGISTRY=ghcr.io/hyperledger-labs
+  DRIVER_TLS=<true|false>
+  DRIVER_TLS_CERT_PATH=path_to_tls_cert_pem_for_driver
+  DRIVER_TLS_KEY_PATH=path_to_tls_key_pem_for_driver
+  RELAY_TLS=<true|false>
+  RELAY_TLSCA_CERT_PATH=path_to_tls_ca_cert_pem_for_relay
   ```
   - `<path_to_connection_profile>` should point to the path of a connection profile you generated in the "Pre-Configuration" section. A Fabric driver obtains client credentials from one of the organizations in your network, so pick an organization and point to the right connection profile.
   - The `DRIVER_CONFIG` variable should point to the `config.json` (you can name this whatever you wish) specified below.
@@ -569,6 +598,9 @@ You can start a driver within a Docker container using a [pre-built image](https
   - The `DRIVER_PORT` variable should be set to the port this driver will listen on.
   - The `INTEROP_CHAINCODE` variable should be set to the ID of the Fabric Interop Chaincode installed on your Fabric network channel.
   - The `EXTERNAL_NETWORK` variable should be set to the [name](https://docs.docker.com/compose/networking/) of your Fabric network.
+  - **Enabling TLS**:
+    - You can make your driver accept TLS connections by specifying `DRIVER_TLS` as `true` and specifying a TLS certificate file path and private key file path in `DRIVER_TLS_CERT_PATH` and `DRIVER_TLS_KEY_PATH` respectively. The same certificate should be specified in this driver's definition in the `drivers` section in the `config.toml` file of your relay in the `tlsca_cert_path` property (see the earlier section on relay configuration).
+    - To communicate with your network' relay using TLS (i.e., if the relay is TLS-enabled), specify that relay's TLS CA certificate path in `RELAY_TLSCA_CERT_PATH` (currently only one certificate can be configured) and set `RELAY_TLS` to `true`. This CA certificate should match the one specified in the `cert_path` property in the relay's `config.toml` file (see the earlier section on relay configuration):
 
 - `config.json`: This contains settings used to connect to a CA of a Fabric network organization and enroll a client. A sample is given below:
   ```json
