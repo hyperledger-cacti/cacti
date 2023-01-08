@@ -4,7 +4,7 @@ import Joi from "joi";
 import tar from "tar-stream";
 import { EventEmitter } from "events";
 import Web3 from "web3";
-import { Account } from "web3-core";
+import { Account, TransactionReceipt } from "web3-core";
 import {
   LogLevelDesc,
   Logger,
@@ -181,7 +181,7 @@ export class BesuTestLedger implements ITestLedger {
   public async sendEthToAccount(
     address: string,
     seedMoney = 10e8,
-  ): Promise<void> {
+  ): Promise<TransactionReceipt> {
     const fnTag = `BesuTestLedger#sendEthToAccount()`;
 
     const rpcApiHttpHost = await this.getRpcApiHttpHost();
@@ -206,6 +206,7 @@ export class BesuTestLedger implements ITestLedger {
     if (receipt instanceof Error) {
       throw receipt;
     }
+    return receipt;
   }
 
   public async getBesuKeyPair(): Promise<IKeyPair> {
