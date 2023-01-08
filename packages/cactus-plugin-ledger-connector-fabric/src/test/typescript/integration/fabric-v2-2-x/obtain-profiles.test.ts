@@ -15,13 +15,13 @@ import { LogLevelDesc } from "@hyperledger/cactus-common";
 const testCase = "obtains configuration profiles from Fabric 2.x ledger";
 const logLevel: LogLevelDesc = "TRACE";
 
-test.skip("BEFORE " + testCase, async (t: Test) => {
+test("BEFORE " + testCase, async (t: Test) => {
   const pruning = pruneDockerAllIfGithubAction({ logLevel });
   await t.doesNotReject(pruning, "Pruning did not throw OK");
   t.end();
 });
 
-test.skip(testCase, async (t: Test) => {
+test(testCase, async (t: Test) => {
   const ledger = new FabricTestLedgerV1({
     emitContainerLogs: true,
     publishAllPorts: true,
@@ -42,10 +42,10 @@ test.skip(testCase, async (t: Test) => {
 
   t.ok(connectionProfile, "getConnectionProfileOrg1() out truthy OK");
 
-  const connectionProfileOrg1 = await ledger.getConnectionProfileOrgX("1");
+  const connectionProfileOrg1 = await ledger.getConnectionProfileOrgX("org1");
   t.isEquivalent(connectionProfile, connectionProfileOrg1);
 
-  const connectionProfileOrg2 = await ledger.getConnectionProfileOrgX("2");
+  const connectionProfileOrg2 = await ledger.getConnectionProfileOrgX("org2");
   t.ok(connectionProfileOrg2, "getConnectionProfileOrg2() out truthy OK");
 
   t.notDeepEqual(
@@ -55,13 +55,13 @@ test.skip(testCase, async (t: Test) => {
   );
 
   //Should return error, as there is no Org3 in the default deployment of Fabric AIO image
-  const error = "/Error.*/";
-  await t.rejects(ledger.getConnectionProfileOrgX("3"), error);
+  const error = "/no such container - Could not find the file.*/";
+  await t.rejects(ledger.getConnectionProfileOrgX("org3"), error);
 
   t.end();
 });
 
-test.skip("AFTER " + testCase, async (t: Test) => {
+test("AFTER " + testCase, async (t: Test) => {
   const pruning = pruneDockerAllIfGithubAction({ logLevel });
   await t.doesNotReject(pruning, "Pruning did not throw OK");
   t.end();

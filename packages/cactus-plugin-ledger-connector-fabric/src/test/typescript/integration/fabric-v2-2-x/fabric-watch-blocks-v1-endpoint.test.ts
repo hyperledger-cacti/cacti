@@ -60,8 +60,8 @@ const ledgerChannelName = "mychannel";
 const ledgerContractName = "basic";
 
 // Log settings
-const testLogLevel: LogLevelDesc = "info"; // default: info
-const sutLogLevel: LogLevelDesc = "info"; // default: info
+const testLogLevel: LogLevelDesc = "TRACE"; // default: info
+const sutLogLevel: LogLevelDesc = "TRACE"; // default: info
 
 // Logger setup
 const log: Logger = LoggerProvider.getOrCreate({
@@ -108,12 +108,15 @@ describe("watchBlocksV1 of fabric connector tests", () => {
     // Get connection profile
     log.info("Get fabric connection profile for Org1...");
     const connectionProfile = await ledger.getConnectionProfileOrg1();
+    log.debug("Fabric connection profile for Org1 OK: %o", connectionProfile);
     expect(connectionProfile).toBeTruthy();
 
     // Enroll admin and user
     const enrollAdminOut = await ledger.enrollAdmin();
+    log.debug("Enrolled admin OK.");
     const adminWallet = enrollAdminOut[1];
     const [userIdentity] = await ledger.enrollUser(adminWallet);
+    log.debug("Enrolled user OK.");
 
     // Create Keychain Plugin
     const keychainId = uuidv4();

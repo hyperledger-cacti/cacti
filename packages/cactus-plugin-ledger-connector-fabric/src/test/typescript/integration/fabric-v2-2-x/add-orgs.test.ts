@@ -3,6 +3,9 @@
 import test, { Test } from "tape-promise/tape";
 
 import {
+  DEFAULT_FABRIC_2_AIO_FABRIC_VERSION,
+  DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
+  DEFAULT_FABRIC_2_AIO_IMAGE_VERSION,
   FabricTestLedgerV1,
   pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
@@ -18,7 +21,6 @@ const testCase = "adds org4 to the network";
 const logLevel: LogLevelDesc = "TRACE";
 
 test.skip("BEFORE " + testCase, async (t: Test) => {
-  t.skip();
   const pruning = pruneDockerAllIfGithubAction({ logLevel });
   await t.doesNotReject(pruning, "Pruning did not throw OK");
   t.end();
@@ -38,9 +40,10 @@ test.skip(testCase, async (t: Test) => {
   const ledger = new FabricTestLedgerV1({
     emitContainerLogs: true,
     publishAllPorts: true,
-    logLevel: "debug",
-    imageName: "ghcr.io/hyperledger/cactus-fabric2-all-in-one",
-    envVars: new Map([["FABRIC_VERSION", "2.2.0"]]),
+    logLevel,
+    imageName: DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
+    imageVersion: DEFAULT_FABRIC_2_AIO_IMAGE_VERSION,
+    envVars: new Map([["FABRIC_VERSION", DEFAULT_FABRIC_2_AIO_FABRIC_VERSION]]),
     extraOrgs: [extraOrg],
   });
 
@@ -88,11 +91,8 @@ test.skip(testCase, async (t: Test) => {
   );
 
   //Should return error, as there is no org101 in the default deployment of Fabric AIO image nor it was added
-  const error = "/Error.*/";
-
+  const error = "/no such container - Could not find the file.*/";
   await t.rejects(ledger.getConnectionProfileOrgX("org101"), error);
-
-  //Let us add org 3 and retrieve the connection profile
 
   t.end();
 });
