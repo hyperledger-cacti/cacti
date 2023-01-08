@@ -546,7 +546,7 @@ Weaver provides a [pre-built image](https://github.com/hyperledger-labs/weaver-d
       tls=<true|false>
       tlsca_cert_path="<relay-tls-ca-certificate-path>"
       ```
-    - To communicate with a driver using TLS, specify the driver's TLS CA certificate in `tlsca_cert_path` (currently only one certificate can be configured) and set `tls` to `true` by extending that driver's section as follows (*Note*: this CA certificate must match the certificate used by the driver in its configuration file, which we will examine later):
+    - To communicate with a driver using TLS, specify the driver's TLS CA certificate in `tlsca_cert_path` (currently only one certificate can be configured) and set `tls` to `true` by extending that driver's section as follows (*Note*: this CA certificate must match the certificate used by the driver using the `DRIVER_TLS_CERT_PATH` property in its `.env` configuration file, which we will examine later):
       ```
       [drivers]
       [drivers.<driver-name>]
@@ -582,6 +582,7 @@ Weaver provides a [pre-built image](https://github.com/hyperledger-labs/weaver-d
   DRIVER_PORT=<driver-server-port>
   INTEROP_CHAINCODE=<interop-chaincode-name>
   EXTERNAL_NETWORK=<docker-bridge-network>
+  TLS_CREDENTIALS_DIR=<dir-with-tls-cert-and-key>
   DOCKER_IMAGE_NAME=weaver-fabric-driver
   DOCKER_TAG=1.2.4
   DOCKER_REGISTRY=ghcr.io/hyperledger-labs
@@ -601,6 +602,7 @@ Weaver provides a [pre-built image](https://github.com/hyperledger-labs/weaver-d
   - **Enabling TLS**:
     - You can make your driver accept TLS connections by specifying `DRIVER_TLS` as `true` and specifying a TLS certificate file path and private key file path in `DRIVER_TLS_CERT_PATH` and `DRIVER_TLS_KEY_PATH` respectively. The same certificate should be specified in this driver's definition in the `drivers` section in the `config.toml` file of your relay in the `tlsca_cert_path` property (see the earlier section on relay configuration).
     - To communicate with your network' relay using TLS (i.e., if the relay is TLS-enabled), specify that relay's TLS CA certificate path in `RELAY_TLSCA_CERT_PATH` (currently only one certificate can be configured) and set `RELAY_TLS` to `true`. This CA certificate should match the one specified in the `cert_path` property in the relay's `config.toml` file (see the earlier section on relay configuration):
+    - You can point to the folder in your host system containing the certificate and key using the `TLS_CREDENTIALS_DIR` variable. (This folder will be synced to the `/fabric-driver/credentials` folder in the Fabric Driver container as specified in the [docker-compose file](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/core/drivers/fabric-driver/docker-compose.yml).) Make sure you point to the right certificate and key file paths within the container using the `DRIVER_TLS_CERT_PATH`, `DRIVER_TLS_KEY_PATH`, and ``RELAY_TLSCA_CERT_PATH` variables.
 
 - `config.json`: This contains settings used to connect to a CA of a Fabric network organization and enroll a client. A sample is given below:
   ```json
@@ -637,115 +639,120 @@ docker-compose up -d
 
 #### Launch IIN Agents
 
-You need to launch one IIN agent for each organization. To launch an IIN agent within a Docker container using a:
-1. You can use [weaver-iin-agent](https://github.com/hyperledger-labs/weaver-dlt-interoperability/pkgs/container/weaver-iin-agent) image.
-2. Before starting the IIN agent container, you need to customize the container configuration, which you can do by simply creating a folder (let's call it `iin_agent_config_<orgname>`) and configuring the following files in it:
-  - `config.json`: This contains settings used to connect to a Fabric network organization and its CA. A sample is given below:
-    ```
-    {
-        "admin":{
-            "name":"admin",
-            "secret":"adminpw"
-        },
-        "agent": {
-            "name":"iin-agent",
-            "affiliation":"<affiliation>",
-            "role": "client",
-            "attrs": [{ "name": "iin-agent", "value": "true", "ecert": true }]
-        },
-        "mspId":"<msp-id>",
-        "ordererMspIds": [<list-of-orderer-msp-ids>],
-        "ccpPath": "<path-to-connection-profile>",
-        "walletPath": "",
-        "caUrl": "<ca-service-endpoint>",
-        "local": "false"
-    }
-    ```
-  - `dnsconfig.json`: This defines list of known IIN agents for both local and foreign networks. A sample DNS configuration file is given below:
-    ```
-    {
-        "<securityDomainName1>": {
-            "<iin-agent1-name>": {
-                "endpoint": "<hostname:port>",
-                "tls": <true/false>,
-                "tlsCACertPath": "<cacert-path-or-empty-string>"
-            },
-            "<iin-agent2-name>": {
-                "endpoint": "<hostname:port>",
-                "tls": <true/false>,
-                "tlsCACertPath": "<cacert-path-or-empty-string>"
-            }
-        },
-        "<securityDomainName2>": {
-            "<iin-agent1-name>": {
-                "endpoint": "<hostname:port>",
-                "tls": <true/false>,
-                "tlsCACertPath": "<cacert-path-or-empty-string>"
-            },
-            "<iin-agent2-name>": {
-                "endpoint": "<hostname:port>",
-                "tls": <true/false>,
-                "tlsCACertPath": "<cacert-path-or-empty-string>"
-            }
-        }
-    }
-    ```
-    For each security domain, there's a JSON object which contains elements with key as iin-agent's name, which can be Org MSP Id for Fabric, and value as another JSON object. This value contains `endpoint` for the iin-agent, boolean `tls` which is true if TLS is enabled for that iin-agent, and `tlsCACertPath` which specifies the path to file containing TLS CA certs, keep it empty string if not known.
-  - `security-domain-config.json`: This config file contains list of security domain defined for the network and its members, i.e. it can be list of organizations or channel name. Sample security domain configuration file:
-    ```
-    {
-        "<securityDomainName1>": "<channelName>",
-        "<securityDomainName2>": [
-            "<Org1MSPId>",
-            "<Org2MSPId>"
-        ]
-    }
-    ```
-  - `.env`: This sets suitable environment variables within the driver container. Copy the `.env.template` file [from the repository](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/core/identity-management/iin-agent/.env.docker.template) and customize it for your purposes, as indicated in the below sample:
-    ```
-    IIN_AGENT_PORT=<iin-agent-server-port>
-    IIN_AGENT_TLS=<true/false>
-    IIN_AGENT_TLS_CERT_PATH=<path_to_tls_cert_pem_for_iin_agent>
-    IIN_AGENT_TLS_KEY_PATH=<path_to_tls_key_pem_for_iin_agent>
-    MEMBER_ID=<org-msp-id>
-    SECURITY_DOMAIN=network1
-    DLT_TYPE=fabric
-    CONFIG_PATH=./config.json
-    DNS_CONFIG_PATH=./dnsconfig.json
-    SECURITY_DOMAIN_CONFIG_PATH=./security-domain-config.json
-    WEAVER_CONTRACT_ID=<name-of-weaver-interop-chaincode-installed>
-    SYNC_PERIOD=<repeated_auto_sync_interval>
-    AUTO_SYNC=<true/false>
-    TLS_CREDENTIALS_DIR=<dir-with-tls-cert-and-key>
-    DOCKER_IMAGE_NAME=ghcr.io/hyperledger-labs/weaver-iin-agent
-    DOCKER_TAG=1.5.2
-    EXTERNAL_NETWORK=<docker-bridge-network>
-    ```
-    * `IIN_AGENT_ENDPOINT`: The endpoint at which IIN Agent server should listen. E.g.: `0.0.0.0:9500`
-    * `IIN_AGENT_TLS`: Set this to `true` to enable TLS on IIN Agent server
-    * `IIN_AGENT_TLS_CERT_PATH`: Path to TLS certificate if TLS is enabled
-    * `IIN_AGENT_TLS_KEY_PATH`: Path to TLS key if TLS is enabled
-    * `MEMBER_ID`: Member Id for this IIN Agent. For fabric network, it should be the Organization's MSP ID
-    * `SECURITY_DOMAIN`: Security domain to which this IIN Agent belongs
-    * `DLT_TYPE`: To indicate the type of DLT for which this IIN Agent is running. E.g. `fabric`
-    * `CONFIG_PATH`: Path to ledger specific config file (explained in next subsection)
-    * `DNS_CONFIG_PATH`: Path to DNS config file explained in previous sub sections
-    * `SECURITY_DOMAIN_CONFIG_PATH`: Path to security domain config file explained in previous sub sections
-    * `WEAVER_CONTRACT_ID`: Contract ID for DLT specific Weaver interoperation module installed on network
-    * `SYNC_PERIOD`: Period at which auto synchronization of memberships from other security domains should happen
-    * `AUTO_SYNC`: Set this to `true` to enable auto synchronization of memberships from other security domains
-    * `EXTERNAL_NETWORK`: Set to the network [name](https://docs.docker.com/compose/networking/) of your Fabric network.
+You need to run one IIN Agent for each organization in the Fabric network channel you are enabling Weaver in. This agent runs a protocol with other organizations' agents and with targeted foreign networks' agents to sync and record foreign networks' memberships to the channel ledger.
 
-  - `docker-compose.yaml`: This specifies the properties of the IIN agent container. You can use the [file in the repository](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/core/identity-management/iin-agent/docker-compose.yml) verbatim.
+Weaver provides a [pre-built image](https://github.com/hyperledger-labs/weaver-dlt-interoperability/pkgs/container/weaver-iin-agent) for the IIN Agent. Before launching a container, you just need to customize its configuration for your Fabric network organization, which you can do by simply creating a folder (let's call it `iin_agent_config_<orgname>`) and configuring the following files in it:
+- `config.json`: This contains settings used to connect to a Fabric network organization and its CA (part of the organization's MSP). A sample is given below:
+  ```
+  {
+      "admin":{
+          "name":"admin",
+          "secret":"adminpw"
+      },
+      "agent": {
+          "name":"iin-agent",
+          "affiliation":"<affiliation>",
+          "role": "client",
+          "attrs": [{ "name": "iin-agent", "value": "true", "ecert": true }]
+      },
+      "mspId":"<msp-id>",
+      "ordererMspIds": [<list-of-orderer-msp-ids>],
+      "ccpPath": "<path-to-connection-profile>",
+      "walletPath": "",
+      "caUrl": "<ca-service-endpoint>",
+      "local": "false"
+  }
+  ```
+- `dnsconfig.json`: This specifies the list of known IIN agents of your network (i.e., belonging to other organizations) and of foreign networks. A sample DNS configuration file is given below:
+  ```
+  {
+      "<securityDomainName1>": {
+          "<iin-agent1-name>": {
+              "endpoint": "<hostname:port>",
+              "tls": <true/false>,
+              "tlsCACertPath": "<cacert-path-or-empty-string>"
+          },
+          "<iin-agent2-name>": {
+              "endpoint": "<hostname:port>",
+              "tls": <true/false>,
+              "tlsCACertPath": "<cacert-path-or-empty-string>"
+          }
+      },
+      "<securityDomainName2>": {
+          "<iin-agent1-name>": {
+              "endpoint": "<hostname:port>",
+              "tls": <true/false>,
+              "tlsCACertPath": "<cacert-path-or-empty-string>"
+          },
+          "<iin-agent2-name>": {
+              "endpoint": "<hostname:port>",
+              "tls": <true/false>,
+              "tlsCACertPath": "<cacert-path-or-empty-string>"
+          }
+      }
+  }
+  ```
+  - Each security domain (i.e., unique ledger, like a Fabric channel) scopes a set of JSON objects, each containing specifications of an IIN Agent. The key (`<iin-agent1-name>` for example) in each is the IIN Agent's name, which can be the organization's MSP ID (for a Fabric network). The value is another JSON object, containing an `endpoint` with a hostname and port for the agent.
+  - **Enabling TLS**: To communicate with a given IIN Agent using TLS (i.e., if that agent is TLS-enabled), specify `tls` as `true` and that agent's TLS CA certificate path in `tlsCACertPath` (currently only one certificate can be configured) within the JSON object corresponding to that agent. This CA certificate should match the one specified in that IIN Agent's `.env` file, whose configuration we will specify later.
+- `security-domain-config.json`: This config file contains list of security domain defined for the network and its members, i.e. it can be list of organizations or channel name. Sample security domain configuration file:
+  ```
+  {
+      "<securityDomainName1>": "<channelName>",
+      "<securityDomainName2>": [
+          "<Org1MSPId>",
+          "<Org2MSPId>"
+      ]
+  }
+  ```
+- `.env`: This sets suitable environment variables within the driver container. Copy the `.env.template` file [from the repository](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/core/identity-management/iin-agent/.env.docker.template) and customize it for your purposes, as indicated in the below sample:
+  ```
+  IIN_AGENT_PORT=<iin-agent-server-port>
+  IIN_AGENT_TLS=<true/false>
+  IIN_AGENT_TLS_CERT_PATH=<path_to_tls_cert_pem_for_iin_agent>
+  IIN_AGENT_TLS_KEY_PATH=<path_to_tls_key_pem_for_iin_agent>
+  MEMBER_ID=<org-msp-id>
+  SECURITY_DOMAIN=network1
+  DLT_TYPE=fabric
+  CONFIG_PATH=./config.json
+  DNS_CONFIG_PATH=./dnsconfig.json
+  SECURITY_DOMAIN_CONFIG_PATH=./security-domain-config.json
+  WEAVER_CONTRACT_ID=<name-of-weaver-interop-chaincode-installed>
+  SYNC_PERIOD=<repeated_auto_sync_interval>
+  AUTO_SYNC=<true/false>
+  TLS_CREDENTIALS_DIR=<dir-with-tls-cert-and-key>
+  DOCKER_IMAGE_NAME=ghcr.io/hyperledger-labs/weaver-iin-agent
+  DOCKER_TAG=<iin-agent-docker-image-version>
+  EXTERNAL_NETWORK=<docker-bridge-network>
+  ```
+  - `IIN_AGENT_ENDPOINT`: The endpoint at which IIN Agent server should listen. E.g.: `0.0.0.0:9500`
+  - `IIN_AGENT_TLS`: Set this to `true` to enable TLS on IIN Agent server
+  - `IIN_AGENT_TLS_CERT_PATH`: Path to TLS certificate if TLS is enabled
+  - `IIN_AGENT_TLS_KEY_PATH`: Path to TLS key if TLS is enabled
+  - `MEMBER_ID`: Member Id for this IIN Agent. For fabric network, it should be the Organization's MSP ID
+  - `SECURITY_DOMAIN`: Security domain to which this IIN Agent belongs
+  - `DLT_TYPE`: To indicate the type of DLT for which this IIN Agent is running. E.g. `fabric`
+  - `CONFIG_PATH`: Path to ledger specific config file (explained in next subsection)
+  - `DNS_CONFIG_PATH`: Path to DNS config file explained in previous sub sections
+  - `SECURITY_DOMAIN_CONFIG_PATH`: Path to security domain config file explained in previous sub sections
+  - `WEAVER_CONTRACT_ID`: Contract ID for DLT specific Weaver interoperation module installed on network
+  - `SYNC_PERIOD`: Period at which auto synchronization of memberships from other security domains should happen
+  - `AUTO_SYNC`: Set this to `true` to enable auto synchronization of memberships from other security domains
+  - `DOCKER_TAG`: Set this to the desired version of the Weaver IIN Agent [docker image](https://github.com/hyperledger-labs/weaver-dlt-interoperability/pkgs/container/weaver-iin-agent)
+  - `EXTERNAL_NETWORK`: Set to the network [name](https://docs.docker.com/compose/networking/) of your Fabric network.
+  - **Enabling TLS**:
+    - Make your IIN Agent accept TLS connections by specifying `IIN_AGENT_TLS` as `true` and specifying a TLS certificate file path and private key file path in `IIN_AGENT_TLS_CERT_PATH` and `IIN_AGENT_TLS_KEY_PATH` respectively. The same certificate should be specified in this agent's JSON object in another agent's `dnsconfig.json` file under the appropriate security domain and IIN Agent ID scope.
+    - You can point to the folder in your host system containing the certificate and key using the `TLS_CREDENTIALS_DIR` variable. (This folder will be synced to the `/opt/iinagent/credentials` folder in the IIN Agent container as specified in the [docker-compose file](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/core/identity-management/iin-agent/docker-compose.yml).) Make sure you point to the right certificate and key file paths within the container using the `IIN_AGENT_TLS_CERT_PATH` and ``IIN_AGENT_TLS_KEY_PATH` variables respectively.
 
-3. Now to start the IIN agent, navigate to the folder containing the above files and run the following:
+- `docker-compose.yaml`: This specifies the properties of the IIN agent container. You can use the [file in the repository](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/core/identity-management/iin-agent/docker-compose.yml) verbatim.
+
+Now to start the IIN agent, navigate to the folder containing the above files and run the following:
 ```bash
 docker-compose up -d
 ```
 
-To launch an additional IIN agent corresponding to a different organization, repeat the Step 2 and 3 but use a different directory to keep the configuration files and change these specific things:
-- Update the organization names everywhere mentioned in `config.json`.
-- Update `IIN_AGENT_ENDPOINT` and `MEMBER_ID` in environment variables.
+Repeat the above steps to launch an IIN Agent for every other organization on your channnel, i.e., create similar configuration files in an organization-specific folder. Make sure you:
+- Update the organization names in every relevant location in the `config.json`.
+- Update `IIN_AGENT_ENDPOINT` and `MEMBER_ID` in the `.env`.
   
 
 #### Ledger Initialization
