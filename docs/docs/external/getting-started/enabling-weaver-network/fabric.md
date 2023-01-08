@@ -36,8 +36,8 @@ Let us walk through the changes that are required in different phases of your ne
 A Fabric distributed application's business logic code spans two layers as illustrated in the network model:
 - _Chaincode_: 
   - _Data Sharing_: No code changes are required for Weaver enablement, as mentioned above.
-  - _Asset Exchange_: Asset exchange can be enabled in two ways, either use weaver [assetexchange](https://pkg.go.dev/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange) as library, or use interop chaincode to handle asset exchange by doing a chaincode to chaincode call.
-    - _Use Library [assetexchange](https://pkg.go.dev/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange)_: This method doesn't require [interop](https://pkg.go.dev/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop) chaincode to be installed. In you smart contract `go.mod`, add following in require (update the version according to the latest module version):
+  - _Asset Exchange_: Asset exchange can be enabled in two ways, either use weaver [`assetexchange`](https://pkg.go.dev/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange) as library, or use interop chaincode to handle asset exchange by doing a chaincode to chaincode call.
+    - _Use Library [`assetexchange`](https://pkg.go.dev/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange_: This method doesn't require [`interop`](https://pkg.go.dev/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop) chaincode to be installed. In you smart contract `go.mod`, add following in require (update the version according to the latest module version):
       ```
       require(
           ...
@@ -134,7 +134,7 @@ A Fabric distributed application's business logic code spans two layers as illus
         
       There is an alternative API to implement asset exchange using this library, which doesn't involve contractIds For details [read here](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/core/network/fabric-interop-cc/libs/assetexchange/README.md#without-contractid).
         
-    - _Use [Interop](https://pkg.go.dev/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop) Chaincode_: This method requires `interop` chaincode to be installed on all peers of the channel. Application chaincode needs to implement the interface `github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt`.
+    - _Use [`Interop`](https://pkg.go.dev/github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/contracts/interop) Chaincode_: This method requires `interop` chaincode to be installed on all peers of the channel. Application chaincode needs to implement the interface `github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt`.
       In you smart contract `go.mod`, add following in require (update the version according to the latest module version):
       ```
       require(
