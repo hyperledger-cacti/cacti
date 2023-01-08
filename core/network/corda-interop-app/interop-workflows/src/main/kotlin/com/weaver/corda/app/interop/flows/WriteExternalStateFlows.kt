@@ -128,13 +128,12 @@ class GetExternalStateByLinearId(
                 State.Meta.Protocol.CORDA -> {
                     val cordaViewData = ViewDataOuterClass.ViewData.parseFrom(viewDataByteArray)
                     println("cordaViewData: $cordaViewData")
-                    val interopPayload = InteropPayloadOuterClass.InteropPayload.parseFrom(cordaViewData.payload)
+                    val interopPayload = InteropPayloadOuterClass.InteropPayload.parseFrom(cordaViewData.notarizedPayloadsList[0].payload)
                     val payloadString = interopPayload.payload.toStringUtf8()
                     println("response from remote: ${payloadString}.\n")
                     println("query address: ${interopPayload.address}.\n")
                     val viewData = ViewDataOuterClass.ViewData.newBuilder()
-                            .addAllNotarizations(cordaViewData.notarizationsList)
-                            .setPayload(interopPayload.payload)
+                            .addAllNotarizedPayloads(cordaViewData.notarizedPayloadsList)
                             .build()
                             
                     return viewData.toByteArray()
@@ -164,7 +163,7 @@ class GetExternalStateByLinearId(
                     val proofMessage = proofStringPrefix + mspIdList + proofStringSuffix
                     println("Proof Message: ${proofMessage}.\n")
 
-                    var notarizationList: List<ViewDataOuterClass.ViewData.Notarization> = listOf()
+                    var notarizationList: List<ViewDataOuterClass.ViewData.NotarizedPayload> = listOf()
 
                     fabricViewData.endorsedProposalResponsesList.map { endorsedProposalResponse ->
                         val endorsement = endorsedProposalResponse.endorsement
@@ -173,17 +172,17 @@ class GetExternalStateByLinearId(
                         val certString = Base64.getEncoder().encodeToString(serializedIdentity.idBytes.toByteArray())
                         val signature = Base64.getEncoder().encodeToString(endorsement.signature.toByteArray())
                         
-                        val notarization = ViewDataOuterClass.ViewData.Notarization.newBuilder()
+                        val notarization = ViewDataOuterClass.ViewData.NotarizedPayload.newBuilder()
                                 .setCertificate(certString)
                                 .setSignature(signature)
                                 .setId(mspId)
+                                .setPayload(chaincodeAction.response.payload)
                                 .build()
                         notarizationList = notarizationList + notarization
                     }
 
                     val viewData = ViewDataOuterClass.ViewData.newBuilder()
-                            .addAllNotarizations(notarizationList)
-                            .setPayload(interopPayload.payload)
+                            .addAllNotarizedPayloads(notarizationList)
                             .build()
                             
                     return viewData.toByteArray()

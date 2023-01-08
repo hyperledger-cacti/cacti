@@ -31,8 +31,9 @@ import net.corda.core.messaging.CordaRPCOps
 import com.weaver.corda.app.interop.flows.CreateExternalRequest
 import com.weaver.corda.app.interop.flows.WriteExternalStateInitiator
 import com.weaver.corda.app.interop.flows.GetExternalStateByLinearId
-import com.weaver.protos.corda.ViewDataOuterClass
+import com.weaver.protos.common.interop_payload.InteropPayloadOuterClass
 import com.weaver.protos.common.state.State
+import com.weaver.protos.corda.ViewDataOuterClass
 import com.weaver.protos.networks.networks.Networks
 
 class InteroperableHelper {
@@ -214,7 +215,8 @@ class InteroperableHelper {
             externalStateLinearId: String
         ): String {
             val responseView = getExternalStateView(proxy, externalStateLinearId)
-            return responseView.payload.toStringUtf8()
+            val interopPayload = InteropPayloadOuterClass.InteropPayload.parseFrom(responseView.notarizedPayloadsList[0].payload)
+            return interopPayload.payload.toStringUtf8()
         }
         
         /**
@@ -227,7 +229,7 @@ class InteroperableHelper {
         ): List<String> {
             val responseView = getExternalStateView(proxy, externalStateLinearId)
             var result: List<String> = listOf()
-            for (notarization in responseView.notarizationsList) {
+            for (notarization in responseView.notarizedPayloadsList) {
                 val id = notarization.id
                 result += id
             }
@@ -245,7 +247,7 @@ class InteroperableHelper {
             signerId: String
         ): String {
             val responseView = getExternalStateView(proxy, externalStateLinearId)
-            for (notarization in responseView.notarizationsList) {
+            for (notarization in responseView.notarizedPayloadsList) {
                 val id = notarization.id
                 if (id == signerId) {
                     return notarization.signature
@@ -265,7 +267,7 @@ class InteroperableHelper {
             signerId: String
         ): String {
             val responseView = getExternalStateView(proxy, externalStateLinearId)
-            for (notarization in responseView.notarizationsList) {
+            for (notarization in responseView.notarizedPayloadsList) {
                 val id = notarization.id
                 if (id == signerId) {
                     return notarization.certificate

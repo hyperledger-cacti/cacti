@@ -53,18 +53,20 @@ func ExtractAndValidateDataFromView(view *common.View, b64ViewContentList []stri
 			interopPayloadList[i] = &interopPayload
 		}
 	} else if view.Meta.Protocol == common.Meta_CORDA {
-		interopPayloadList = make([]*common.InteropPayload, 1)
-		var interopPayload common.InteropPayload
 		var cordaViewData corda.ViewData
 		err := protoV2.Unmarshal(view.Data, &cordaViewData)
 		if err != nil {
 			return nil, fmt.Errorf("CordaView Unmarshal error: %s", err)
 		}
-		err = protoV2.Unmarshal(cordaViewData.Payload, &interopPayload)
-		if err != nil {
-			return nil, fmt.Errorf("Unable to Unmarshal interopPayload: %s", err.Error())
+		interopPayloadList = make([]*common.InteropPayload, len(cordaViewData.NotarizedPayloads))
+		for i, notarizedPayload := range cordaViewData.NotarizedPayloads {
+			var interopPayload common.InteropPayload
+			err = protoV2.Unmarshal(notarizedPayload.Payload, &interopPayload)
+			if err != nil {
+				return nil, fmt.Errorf("Unable to Unmarshal interopPayload: %s", err.Error())
+			}
+			interopPayloadList[i] = &interopPayload
 		}
-		interopPayloadList[0] = &interopPayload
 	} else {
 		return nil, fmt.Errorf("Cannot extract data from view; unsupported DLT type: %+v", view.Meta.Protocol)
 	}
@@ -263,14 +265,18 @@ func verifyCordaNotarization(s *SmartContract, ctx contractapi.TransactionContex
 	}
 
 	signerList := []string{}
+	var viewPayload []byte
 	// 3. Verify each of the signatures in the Notarization array according to the data bytes and certificate.
-	for _, value := range cordaViewData.Notarizations {
+	for i, value := range cordaViewData.NotarizedPayloads {
 		x509Cert, err := parseCert(value.Certificate)
 		if err != nil {
 			return fmt.Errorf("Unable to parse certificate: %s", err.Error())
 		}
+		if i == 0 {
+			viewPayload = value.Payload
+		}
 		var interopPayload common.InteropPayload
-		err = protoV2.Unmarshal(cordaViewData.Payload, &interopPayload)
+		err = protoV2.Unmarshal(value.Payload, &interopPayload)
 		if err != nil {
 			return fmt.Errorf("Unable to decode corda view data: %s", err.Error())
 		}
@@ -278,7 +284,7 @@ func verifyCordaNotarization(s *SmartContract, ctx contractapi.TransactionContex
 		if err != nil {
 			return fmt.Errorf("Corda signature could not be decoded from base64: %s", err.Error())
 		}
-		err = validateSignature(string(cordaViewData.Payload), x509Cert, string(decodedSignature))
+		err = validateSignature(string(value.Payload), x509Cert, string(decodedSignature))
 		if err != nil {
 			return fmt.Errorf("Unable to Validate Signature: %s", err.Error())
 		}
@@ -297,7 +303,7 @@ func verifyCordaNotarization(s *SmartContract, ctx contractapi.TransactionContex
 			return fmt.Errorf("Notarizations missing signer: %s", signer)
 		}
 	}
-	log.Infof("Proof associated with response '%s' from Corda network for query '%s' is VALID", string(cordaViewData.Payload), address)
+	log.Infof("Proof associated with response '%s' from Corda network for query '%s' is VALID", string(viewPayload), address)
 	return nil
 }
 

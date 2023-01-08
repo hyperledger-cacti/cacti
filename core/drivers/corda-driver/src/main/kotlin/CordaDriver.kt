@@ -66,7 +66,7 @@ fun fetchState(query: QueryOuterClass.Query) {
             }.traverse(Either.applicative(), ::identity).fix().map { it.fix() }
         }
 
-        // Aggregate the notarizations from each node and into a single view.
+        // Aggregate the notarizedPayloads from each node and into a single view.
         val viewPayload = eitherErrorViews.flatMap { views ->
             createAggregatedCordaView(views)
         }.fold({
@@ -92,12 +92,12 @@ fun fetchState(query: QueryOuterClass.Query) {
 }
 
 /**
- * The createAggregateCordaView function aggregates the notarizations returned from each queried
+ * The createAggregateCordaView function aggregates the notarizedPayloads returned from each queried
  * Corda node into a single View.
  *
  * Each View returned from the Corda node contains in its "data" field a ByteString of a Base64 encoded
- * JSON string of the CordaViewData. The CordaViewData contains the notarization from the Corda node
- * and the state data returned from the application CorDapp. The notarizations need to be aggregated
+ * JSON string of the CordaViewData. The CordaViewData contains the notarizedPayload from the Corda node
+ * and the state data returned from the application CorDapp. The notarizedPayloads need to be aggregated
  * into a single list and then a new CordaViewData instance with this list and one copy of the data from
  * any of the returned views is created.
  *
@@ -107,21 +107,20 @@ fun fetchState(query: QueryOuterClass.Query) {
  */
 fun createAggregatedCordaView(views: List<State.View>) : Either<Error, State.View> = try {
 
-    println("Aggregating the notarizations returned from all Corda nodes.\n")
+    println("Aggregating the notarizedPayloads returned from all Corda nodes.\n")
     // For each View, parse the data ByteString field into a CordaViewData type
     val cordaViewDataList = views.map { view ->
         ViewDataOuterClass.ViewData.parseFrom(view.data)
     }
 
-    // Flatten the lists of notarizations returned from each node to a single list
-    val notarizations = cordaViewDataList.map { cordaViewData  ->
-        cordaViewData.notarizationsList
+    // Flatten the lists of notarizedPayloads returned from each node to a single list
+    val notarizedPayloads = cordaViewDataList.map { cordaViewData  ->
+        cordaViewData.notarizedPayloadsList
     }.flatten()
 
     // Create a new CordaViewData with the flattened list
     val aggregatedCordaViewData = ViewDataOuterClass.ViewData.newBuilder()
-      .addAllNotarizations(notarizations)
-      .setPayload(cordaViewDataList[0].payload)
+      .addAllNotarizedPayloads(notarizedPayloads)
       .build()
 
     // Return the new State.View from the new CordaViewData

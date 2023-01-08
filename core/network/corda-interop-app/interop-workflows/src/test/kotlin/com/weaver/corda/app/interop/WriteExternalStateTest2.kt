@@ -21,7 +21,7 @@ import kotlin.test.assertTrue
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 
-class WriteExternalStateTest {
+class WriteExternalStateTest2 {
     companion object {
         lateinit var network: MockNetwork
         lateinit var partyA: StartedMockNode
@@ -54,23 +54,28 @@ class WriteExternalStateTest {
         @SerializedName("confidential_view64") val B64ViewConfidential: String,
         @SerializedName("confidential_view_content64") val B64ViewContents: List<String>
     )
-    val fabricTestDataJSON = javaClass.getResource("/test_data/fabric_viewdata_1_org.json").readText(Charsets.UTF_8)
+    val fabricTestDataJSON = javaClass.getResource("/test_data/fabric_viewdata_2_orgs.json").readText(Charsets.UTF_8)
     val fabricTestData = Gson().fromJson(fabricTestDataJSON, TestData::class.java)
     
-    val fabricCert = javaClass.getResource("/test_data/fabric_cacert_org1.pem").readText(Charsets.UTF_8)
+    val fabricCertOrg1 = javaClass.getResource("/test_data/fabric_cacert_org1.pem").readText(Charsets.UTF_8)
+    val fabricCertOrg2 = javaClass.getResource("/test_data/fabric_cacert_org2.pem").readText(Charsets.UTF_8)
 
     val fabricVerificationPolicy = VerificationPolicyState(
             securityDomain = fabricNetwork,
             identifiers = listOf(Identifier(
                     fabricViewAddress,
-                    Policy("signature", listOf("Org1MSP"))
+                    Policy("signature", listOf("Org1MSP", "Org2MSP"))
             ))
     )
 
     val fabricMembership = MembershipState(
             securityDomain = fabricNetwork,
             members = mapOf("Org1MSP" to Member(
-                    value = fabricCert,
+                    value = fabricCertOrg1,
+                    type = "ca",
+                    chain = listOf("")
+            ), "Org2MSP" to Member(
+                    value = fabricCertOrg2,
                     type = "ca",
                     chain = listOf("")
             ))
@@ -107,10 +112,10 @@ class WriteExternalStateTest {
     )
 
     @Test
-    fun `WriteExternalState tests`() {
+    fun `WriteExternalState 2 Node tests`() {
         // Corda happy case
         // Create corda membership and verificationPolicy in vault
-        println(fabricCert)
+        println(fabricCertOrg1)
         val future = partyA.startFlow(CreateVerificationPolicyState(cordaVerificationPolicy))
         network.runNetwork()
         val linearId = future.getOrThrow()

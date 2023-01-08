@@ -208,16 +208,16 @@ fun createViewData(
         certificate: String,
         identity: String
 ) : Either<Error, ByteArray> = try {
-    val notarization = ViewDataOuterClass.ViewData.Notarization.newBuilder()
+    val notarizedPayload = ViewDataOuterClass.ViewData.NotarizedPayload.newBuilder()
             .setCertificate(certificate)
             .setSignature(signature)
             .setId(identity)
+            .setPayload(ByteString.copyFrom(interopPayload))
             .build()
 
     // Create the viewData object and convert to a JSON string
     val viewData = ViewDataOuterClass.ViewData.newBuilder()
-            .addAllNotarizations(listOf(notarization))
-            .setPayload(ByteString.copyFrom(interopPayload))
+            .addAllNotarizedPayloads(listOf(notarizedPayload))
             .build()
     println("View data created: $viewData \n")
 

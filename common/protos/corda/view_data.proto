@@ -6,12 +6,12 @@ option java_package = "com.weaver.protos.corda";
 option go_package = "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/corda";
 
 message ViewData {
-    message Notarization {
+    message NotarizedPayload {
         string signature = 1;
         string certificate = 2;
         string id = 3;
+        // Bytes of InteropPayload
+        bytes payload = 4;
     }
-    repeated Notarization notarizations = 1;
-    // Bytes of InteropPayload
-    bytes payload = 2;
+    repeated NotarizedPayload notarized_payloads = 1;
 }

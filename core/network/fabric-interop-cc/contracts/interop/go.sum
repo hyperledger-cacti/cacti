@@ -220,8 +220,8 @@ github.com/hpcloud/tail v1.0.0/go.mod h1:ab1qPbhIpdTxEkNHXyeSf5vhxWSCs/tWer42PpO
 github.com/huin/goupnp v1.0.3-0.20220313090229-ca81a64b4204/go.mod h1:ZxNlw5WqJj6wSsRK5+YfflQGXYfccj5VgQsMNixHM7Y=
 github.com/huin/goutil v0.0.0-20170803182201-1ca381bf3150/go.mod h1:PpLOETDnJ0o3iZrZfqZzyLl6l7F3c6L1oWn7OICBi6o=
 github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go v1.5.3/go.mod h1:POCGO/RK9YDfgdhuyqjoD9tRNtWfK7Rh5AYYmsb1Chc=
-github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go v1.5.6 h1:OiaGROFcyfoz02xD87zcSwWyD3WBgyzt2Om9A8jx0t8=
-github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go v1.5.6/go.mod h1:POCGO/RK9YDfgdhuyqjoD9tRNtWfK7Rh5AYYmsb1Chc=
+github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go v1.5.7 h1:KqQOPOHKRuNivHF/U9dzs+3EEBuC44paenhEWCPQAA8=
+github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go v1.5.7/go.mod h1:POCGO/RK9YDfgdhuyqjoD9tRNtWfK7Rh5AYYmsb1Chc=
 github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange v1.5.3 h1:H9VAuhoxxn2VJlCOtXNVxEBVoN6lTFVuvA0/lS7jaD8=
 github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/assetexchange v1.5.3/go.mod h1:QbVIZZ2dxI06A5qBUirS55qj5BJIS/C2VdMxnP00dtw=
 github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils v0.0.0-20220522111555-ae96e46bf4a1 h1:F4AWvGjRRWSCWtW0wMD1SkYGnW5yly9NqmHICxHIrUw=
