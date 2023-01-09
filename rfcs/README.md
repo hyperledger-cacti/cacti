@@ -67,7 +67,7 @@ The RFC numbering convention is: `<type>:<id>`. The list of types (`<type>`) is 
 | 03-004 | Corda View                          | Format   | [Proposed](./formats/views/corda.md)                                    |
 | 03-005 | Besu View                           | Format   | [Draft](./formats/views/besu.md)                                        |
 | 03-006 | Ethereum View                       | Format   | [Draft](./formats/views/ethereum.md)                                    |
-| 03-007 | View Request                        | Format   | [Proposed](./formats/views/request.md)                                  |
+| 03-007 | View Request                        | Format   | [Proposed](./formats/views/request-response.md)                         |
 | 03-008 | Access Control Policy               | Format   | [Proposed](./formats/policies/access-control.md)                        |
 | 03-009 | Proof Verification Policy           | Format   | [Proposed](./formats/policies/proof-verification.md)                    |
 | 03-010 | Verification Policy DSL             | Format   | [Draft](./formats/policies/dsl.md)                                      |
