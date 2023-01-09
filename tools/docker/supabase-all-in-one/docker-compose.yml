@@ -1,0 +1,15 @@
+version: "3.5"
+
+services:
+  supabase-all-in-one-db:
+    container_name: cactus-supabase-all-in-one-db
+    image: cactus-supabase-all-in-one
+    privileged: true
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000" # Supabase Studio
+      - "8000:8000" # Supabase API
+      - "5432:5432" # Postgres
+    network_mode: host
