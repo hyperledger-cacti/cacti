@@ -167,6 +167,7 @@ const verifyRemoteProposalResponse = async (proposalResponseBase64, isEncrypted,
 /**
  * Extracts actual remote query response (along with full decrypted contents, if the response is encrypted) embedded in view structure.
  * Arguments are a View protobuf ('statePb.View') and a certificate in the form of a PEM string
+ * TODO - Also take verification policy as parameter and determine if enough matching responses exist (current logic mandates unanimity among payloads)
  **/
 const getResponseDataFromView = (view, privKeyPEM = null) => {
     if (view.getMeta().getProtocol() == statePb.Meta.Protocol.FABRIC) {

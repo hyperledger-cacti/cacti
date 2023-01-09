@@ -29,7 +29,7 @@ For an interoperation module to provide a trusted base of this kind, it must be 
 ## Core Basic Interoperation Module Functions
 
 The basic capabilities an interoperation module offers are listed below (in the future, other capabilities may be added to support new interoperation modes):
-- Access control for [view requests](../../formats/views/request.md) originating outside the network
+- Access control for [view requests](../../formats/views/request-response.md) originating outside the network
 - [Proof generation](../ledger/cryptographic-proofs.md) for ledger [views](../ledger/views.md)
 - [Proof verification](../../formats/policies/proof-verification.md) for ledger views
 - Locks, claims, and unlocks for [asset exchanges](../../protocols/asset-exchange/generic-htlc.md)
