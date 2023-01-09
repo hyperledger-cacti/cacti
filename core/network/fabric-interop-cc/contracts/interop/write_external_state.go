@@ -30,6 +30,7 @@ type interop interface {
 }
 
 // Extract data (i.e., query response) from view
+// TODO - Also take verification policy as parameter and determine if enough matching responses exist (current logic mandates unanimity among payloads)
 func ExtractAndValidateDataFromView(view *common.View, b64ViewContentList []string) ([]byte, error) {
 	var interopPayloadList []*common.InteropPayload
 	if view.Meta.Protocol == common.Meta_FABRIC {
