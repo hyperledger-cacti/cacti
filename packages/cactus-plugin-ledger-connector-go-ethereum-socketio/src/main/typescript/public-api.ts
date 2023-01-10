@@ -1,1 +1,2 @@
-export { startGoEthereumSocketIOConnector } from "./common/core/bin/www"
+export { startGoEthereumSocketIOConnector } from "./common/core/bin/www";
+export { shutdown } from "./connector/ServerPlugin";

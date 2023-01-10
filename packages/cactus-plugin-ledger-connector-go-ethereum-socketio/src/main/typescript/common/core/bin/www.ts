@@ -252,19 +252,20 @@ export async function startGoEthereumSocketIOConnector() {
      * startMonitor: starting block generation event monitoring
      **/
     client.on("startMonitor", function (monitorOptions) {
-
-      monitorOptions = monitorOptions ?? {allBlocks: false};
-      logger.debug("monitorOptions", monitorOptions);
-      Smonitor.startMonitor(client.id, monitorOptions.allBlocks, (event) => {
-        let emitType = "";
-        if (event.status == 200) {
-          emitType = "eventReceived";
-          logger.info("event data callbacked.");
-        } else {
-          emitType = "monitor_error";
-        }
-        client.emit(emitType, event);
-      });
+      Smonitor.startMonitor(
+        client.id,
+        monitorOptions?.allBlocks ?? false,
+        (event) => {
+          let emitType = "";
+          if (event.status == 200) {
+            emitType = "eventReceived";
+            logger.info("event data callbacked.");
+          } else {
+            emitType = "monitor_error";
+          }
+          client.emit(emitType, event);
+        },
+      );
     });
 
     /**

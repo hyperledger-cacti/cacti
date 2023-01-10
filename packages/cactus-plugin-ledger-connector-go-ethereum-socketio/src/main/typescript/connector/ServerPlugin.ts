@@ -25,9 +25,10 @@ import * as SplugUtil from "./PluginUtil";
 // Load libraries, SDKs, etc. according to specifications of endchains as needed
 import Web3 from "web3";
 import { AbiItem } from "web3-utils";
+import { BlockNumber } from "web3-core";
 import { safeStringifyException } from "@hyperledger/cactus-common";
 
-var WEB3_HTTP_PROVIDER_OPTIONS = {
+const WEB3_HTTP_PROVIDER_OPTIONS = {
   keepAlive: true,
 };
 
@@ -60,7 +61,12 @@ function getWeb3Provider(host: string) {
   }
 }
 
-const web3 = new Web3(getWeb3Provider(configRead("ledgerUrl")));
+const web3Provider = getWeb3Provider(configRead("ledgerUrl"));
+const web3 = new Web3(web3Provider);
+
+export function shutdown() {
+  web3Provider.disconnect();
+}
 
 /*
  * ServerPlugin
@@ -90,6 +96,135 @@ export class ServerPlugin {
       return true;
     } else {
       return false;
+    }
+  }
+
+  /*
+   * getBlock
+   *
+   * @param {String|Number} block hash, block number or string:"earliest", "latest" or "pending"
+   *
+   * @return {Object} JSON object
+   */
+
+  async getBlock(args: any) {
+    logger.debug("getBlock start");
+
+    const blockID: BlockNumber = args.args.args[0];
+    const returnTransactionObjects = args.args.args[1] ?? false;
+    const reqID = args["reqID"];
+
+    if (!blockID) {
+      const emsg = "JSON parse error!";
+      logger.warn(emsg);
+      throw {
+        resObj: {
+          status: 504,
+          errorDetail: emsg,
+        },
+        id: reqID,
+      };
+    }
+
+    try {
+      const blockData = await web3.eth.getBlock(
+        blockID,
+        returnTransactionObjects,
+      );
+      const result = {
+        blockData: blockData,
+      };
+      logger.debug(`getBlock(): result: ${result}`);
+
+      const signedResults = signMessageJwt({ result });
+      logger.debug(`getBlock(): signedResults: ${signedResults}`);
+
+      return {
+        resObj: {
+          status: 200,
+          data: signedResults,
+        },
+        id: reqID,
+      };
+    } catch (e) {
+      const retObj = {
+        resObj: {
+          status: 504,
+          errorDetail: safeStringifyException(e),
+        },
+        id: reqID,
+      };
+
+      logger.error(`##getBlock: retObj: ${JSON.stringify(retObj)}`);
+
+      throw retObj;
+    }
+  }
+
+  /*
+   * getTransactionReceipt
+   *
+   * @param {String} transaction hash
+   *
+   * @return {Object} JSON object
+   */
+
+  async getTransactionReceipt(args: any) {
+    logger.debug("getTransactionReceipt start");
+
+    const txHash: string = args.args.args[0];
+    const reqID = args["reqID"];
+
+    if (txHash === undefined) {
+      const emsg = "JSON parse error!";
+      logger.warn(emsg);
+      throw {
+        resObj: {
+          status: 504,
+          errorDetail: emsg,
+        },
+        id: reqID,
+      };
+    }
+
+    try {
+      const txReceipt = await web3.eth.getTransactionReceipt(txHash);
+      logger.info(`getTransactionReceipt(): txReceipt: ${txReceipt}`);
+
+      const result = {
+        txReceipt: txReceipt,
+      };
+      logger.debug(`getTransactionReceipt(): result: ${result}`);
+
+      const signedResults = signMessageJwt({ result: result });
+      logger.debug(`getTransactionReceipt(): signedResults: ${signedResults}`);
+
+      const retObj = {
+        resObj: {
+          status: 200,
+          data: signedResults,
+        },
+        id: reqID,
+      };
+
+      logger.debug(
+        `##getTransactionReceipt: retObj: ${JSON.stringify(retObj)}`,
+      );
+      return retObj;
+    } catch (e) {
+      const retObj = {
+        resObj: {
+          status: 504,
+          errorDetail: safeStringifyException(e),
+        },
+        id: reqID,
+      };
+
+      logger.error(
+        `##getTransactionReceipt: retObj: ${JSON.stringify(retObj)}`,
+      );
+
+      throw retObj;
     }
   }
 

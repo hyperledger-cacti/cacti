@@ -55,13 +55,17 @@ describe("Go-Ethereum-SocketIO connector tests", () => {
   let connectorServer: HttpsServer;
   let apiClient: SocketIOApiClient;
   let constTestAcc: Account;
+  let connectorModule: any;
   const constTestAccBalance = 5 * 1000000;
 
   //////////////////////////////////
   // Environment Setup
   //////////////////////////////////
 
-  async function deploySmartContract(): Promise<string> {
+  async function deploySmartContract(): Promise<{
+    contractAddress: string;
+    blockNumber: number;
+  }> {
     const txReceipt = await ledger.deployContract(
       HelloWorldContractJson.abi as any,
       "0x" + HelloWorldContractJson.bytecode,
@@ -74,7 +78,11 @@ describe("Go-Ethereum-SocketIO connector tests", () => {
       "Deployed test smart contract, TX on block number",
       txReceipt.blockNumber,
     );
-    return txReceipt.contractAddress ?? "";
+
+    return {
+      contractAddress: txReceipt.contractAddress ?? "",
+      blockNumber: txReceipt.blockNumber,
+    };
   }
 
   beforeAll(async () => {
@@ -99,7 +107,8 @@ describe("Go-Ethereum-SocketIO connector tests", () => {
     web3 = new Web3(ledgerRpcUrl);
 
     // Deploy test smart contract
-    contractAddress = await deploySmartContract();
+    const deployOutput = await deploySmartContract();
+    contractAddress = deployOutput.contractAddress;
 
     // Generate connector private key and certificate
     const pkiGenerator = new SelfSignedPkiGenerator();
@@ -125,7 +134,7 @@ describe("Go-Ethereum-SocketIO connector tests", () => {
     process.env["NODE_CONFIG"] = configJson;
 
     // Load connector module
-    const connectorModule = await import("../../../main/typescript/index");
+    connectorModule = await import("../../../main/typescript/index");
 
     // Run the connector
     connectorServer = await connectorModule.startGoEthereumSocketIOConnector();
@@ -159,6 +168,10 @@ describe("Go-Ethereum-SocketIO connector tests", () => {
 
   afterAll(async () => {
     log.info("FINISHING THE TESTS");
+
+    if (connectorModule) {
+      connectorModule.shutdown();
+    }
 
     if (apiClient) {
       log.info("Close ApiClient connection...");
@@ -198,6 +211,97 @@ describe("Go-Ethereum-SocketIO connector tests", () => {
     const balance = await web3.eth.getBalance(constTestAcc.address);
     expect(balance).toBeTruthy();
     expect(balance).toEqual(constTestAccBalance.toString());
+  });
+
+  test("getBlock returns valid block data for different methods", async () => {
+    const getBlock = async (param: string | number) => {
+      const method = { type: "function", command: "getBlock" };
+      const args = { args: [param] };
+      const response = await apiClient.sendSyncRequest({}, method, args);
+      expect(response).toBeTruthy();
+      return response;
+    };
+
+    const latestBlock = await getBlock("latest");
+    expect(latestBlock.status).toEqual(200);
+    const { data: blockDataByHash } = await getBlock(
+      latestBlock.data.blockData.hash,
+    );
+    expect(blockDataByHash.blockData.hash).toEqual(
+      latestBlock.data.blockData.hash,
+    );
+    const { data: blockDataByNumber } = await getBlock(
+      latestBlock.data.blockData.number,
+    );
+    expect(blockDataByNumber.blockData.hash).toEqual(
+      blockDataByHash.blockData.hash,
+    );
+
+    // Assert transaction data is not returned
+    const { blockNumber } = await deploySmartContract();
+    const blockWithTx = await getBlock(blockNumber);
+    const firstTx = blockWithTx.data.blockData.transactions[0];
+    expect(firstTx).toBeTruthy();
+    // Only string hashes are returned when flag is false
+    expect(typeof firstTx).toEqual("string");
+  });
+
+  test("getBlock returns transaction data when requested", async () => {
+    const method = { type: "function", command: "getBlock" };
+    const { blockNumber } = await deploySmartContract();
+    const args = { args: [blockNumber, true] };
+
+    const response = await apiClient.sendSyncRequest({}, method, args);
+
+    // Assert correct response
+    expect(response).toBeTruthy();
+    expect(response.status).toEqual(200);
+
+    // Assert valid block data
+    const block = response.data.blockData;
+    expect(block).toBeTruthy();
+    expect(block.hash).toBeTruthy();
+
+    // Assert transaction data was returned as requested
+    expect(block.transactions.length).toBeGreaterThan(0);
+    const firstTx = block.transactions[0];
+    expect(firstTx).toBeTruthy();
+    expect(firstTx.hash).toBeTruthy();
+  });
+
+  test("Function getTransactionReceipt returns transaction receipt of given transaction", async () => {
+    async function getTransactionHash() {
+      const fromAccInitBalance = 1500;
+      const toAccInitBalance = 1500;
+      const transferAmount = 500;
+      //creating two accounts to perform transaction on them
+      const fromAddress = await ledger.createEthTestAccount(fromAccInitBalance);
+      const toAcc = await ledger.createEthTestAccount(toAccInitBalance);
+      // adding account using a private key to the wallet
+      web3.eth.accounts.wallet.add(fromAddress.privateKey);
+
+      const signedTx = await fromAddress.signTransaction({
+        from: fromAddress.address,
+        to: toAcc.address,
+        value: transferAmount,
+        gas: 1000000,
+      });
+      const method = { type: "function", command: "sendRawTransaction" };
+      const args = { args: [{ serializedTx: signedTx.rawTransaction }] };
+      // transfering funds to trigger transaction
+      const response = await apiClient.sendSyncRequest({}, method, args);
+      // returning only transaction hash
+      return response.data.txid;
+    }
+
+    const transactionHash = await getTransactionHash();
+    const method = { type: "function", command: "getTransactionReceipt" };
+    const args = { args: [transactionHash] };
+
+    const response = await apiClient.sendSyncRequest({}, method, args);
+    expect(response).toBeTruthy();
+    expect(response.status).toEqual(200);
+    expect(response.data.txReceipt.transactionHash).toEqual(transactionHash);
   });
 
   /**
@@ -294,7 +398,6 @@ describe("Go-Ethereum-SocketIO connector tests", () => {
       gas: 1000000,
     });
     expect(signedTx).toBeTruthy();
-    log.warn(signedTx);
 
     const method = { type: "function", command: "sendRawTransaction" };
     const args = { args: [{ serializedTx: signedTx.rawTransaction }] };
@@ -377,7 +480,7 @@ describe("Go-Ethereum-SocketIO connector tests", () => {
   /**
    * Test ServerMonitorPlugin startMonitor/stopMonitor functions.
    */
-  test.only(
+  test(
     "Monitoring returns new block",
     async () => {
       // Create monitoring promise and subscription
