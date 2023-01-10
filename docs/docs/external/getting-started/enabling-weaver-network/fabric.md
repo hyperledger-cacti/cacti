@@ -50,7 +50,7 @@ No code changes are required for Weaver enablement, because data sharing involve
 - View packaging (and optionally, encryption) logic and access control logic in a source network, and
 - View validation logic in a destination network
 
-This logic is standard and independent of smart contract, asset, and state, particulars. It is already implemented in the Fabric Interoperation Chaincode offered by Weaver. Hence. you just need to deploy that chaincode to exercise data sharing from, or to, your application chaincode. Your application chaincode can be oblivious of the Fabric Interoperation Chaincode's workings and of the view request-response protocol.
+This logic is standard and independent of smart contract, asset, and state, particulars. It is already implemented in the Fabric Interoperation Chaincode offered by Weaver. Hence you just need to deploy that chaincode to exercise data sharing from, or to, your application chaincode. Your application chaincode can be oblivious of the Fabric Interoperation Chaincode's workings and of the view request-response protocol.
 
 #### For Asset Exchange
 
@@ -344,20 +344,49 @@ const flowResponse = await ihelper.interopFlow(
     <trade-finance-relay-url>[:<port>],   // Replace with local network's relay address and port
     indices,
     interopJSONs,
-    keyCert
+    keyCert,
+    <endorsingOrgs>,        // List of orgs to submit transaction to local i.e. trade logistics network
+    false,                  // Boolean flag to indicate whether return without submit transaction to local i.e. trade logistics network
+    false,                  // Boolean flag indicating no TLS communication with relay
+    [],                     // Keep it empty when TLS is disabled
+    <confidential-flag>,    // Boolean flag to indicate whether to use to end-to-end encryption
 );
 // List of errors to check for
 if (!flowResponse.views || flowResponse.views.length === 0 || !flowResponse.result || flowResponse.views.length !== argIndices.length) {
     throw <error>;
 }
 ```
-Let us understand this code snippet better. The structure in lines 337-342 specifies the local chaincode transaction that is to be triggered after remote data (view) has been requested and obtained via relays. The function `RecordBillOfLading` expects two arguments as specified in line 341: the first is the common shipment reference that is used by the letter of credit in `trade-finance-network` and the bill of lading in `trade-logistics-network`, and the second is the bill of lading contents. When the `interopFlow` function is called, this argument is left blank because it is supposed to be filled with contents obtained from a view request. The array list `indices`, which is passed as an argument to `interopFlow` therefore contains the index value `1` (line 331), indicating which argument ought to be substituted  with view data. The `interopJSONs` array correspondingly contains a list of view addresses that are to be supplied to the relay.
+Let us understand this code snippet better. The structure in lines 337-342 specifies the local chaincode transaction that is to be triggered after remote data (view) has been requested and obtained via relays. The function `RecordBillOfLading` expects two arguments as specified in line 341: the first is the common shipment reference that is used by the letter of credit in `trade-finance-network` and the bill of lading in `trade-logistics-network`, and the second is the bill of lading contents. When the `interopFlow` function is called, this argument is left blank because it is supposed to be filled with contents obtained from a view request. The array list `indices`, which is passed as an argument to `interopFlow` therefore contains the index value `1` (line 331), indicating which argument ought to be substituted  with view data. The `interopJSONs` array correspondingly contains a list of view addresses that are to be supplied to the relay. The `<confidential-flag>` if set to `true` will enable end-to-end confidentiality, i.e. payload will be encrypted from `trade-finance-network`'s weaver chaincode, and will be decrypted in SDK (i.e. Layer-2 client application) at `trade-logistics-network`, but relays and drivers in between will not be able to see the payload. By default this flag is set to `false`.
 
 | Notes |
 |:------|
 | A local chaincode invocation may require multiple view requests to different networks, which is why `indices` and `interopJSONs` are arrays; they therefore must have the same lengths. |
 
 The rest of the code ought to be self-explanatory. Values are hardcoded for explanation purposes, but you can refactor the above code by reading view addresses corresponding to chaincode invocations from a configuration file.
+
+**Enabling TLS**:
+By default, the TLS is set to false in `interopFlow`, i.e. disabled. But if you want to enable TLS, can pass additional parameters to the `interopFlow` function as follows:
+```TypeScript
+const flowResponse = await ihelper.interopFlow(
+    interopcc,
+    'trade-finance-network',
+    {
+        channel: 'tradefinancechannel',
+        contractName: 'letterofcreditcc',
+        ccFunc: 'RecordBillOfLading',
+        ccArgs: [ <shipment-reference> , '' ]
+    },
+    <org-msp-id>,                         // Replace with this Layer-2 application's organization's MSP ID
+    <trade-finance-relay-url>[:<port>],   // Replace with local network's relay address and port
+    indices,
+    interopJSONs,
+    keyCert,
+    <endorsingOrgs>,            // List of orgs to submit transaction to in trade logistics network
+    false,                  // Boolean flag to indicate whether return without submit transaction to local i.e. trade logistics network
+    true,                       // Boolean indication TLS is enabled.
+    <tlsCACertPathsForRelay>,   // list of CA certificate file paths
+);
+```
     
 #### For Asset Exchange
 
@@ -491,7 +520,7 @@ Weaver provides a [pre-built image](https://github.com/hyperledger-labs/weaver-d
   EXTERNAL_NETWORK=<docker-bridge-network>
   DOCKER_REGISTRY=ghcr.io/hyperledger-labs
   DOCKER_IMAGE_NAME=weaver-relay
-  DOCKER_TAG=1.2.4
+  DOCKER_TAG=1.5.4
   ```
   - The `PATH_TO_CONFIG` variable should point to the properties file typically named `config.toml` (you can name this whatever you wish). See further below for instructions to write this file.
   - The `RELAY_NAME` variable specifies a unique name for this relay. It should match what's specified in the `config.toml` (more on that below).
@@ -583,9 +612,8 @@ Weaver provides a [pre-built image](https://github.com/hyperledger-labs/weaver-d
   INTEROP_CHAINCODE=<interop-chaincode-name>
   EXTERNAL_NETWORK=<docker-bridge-network>
   TLS_CREDENTIALS_DIR=<dir-with-tls-cert-and-key>
-  DOCKER_IMAGE_NAME=weaver-fabric-driver
-  DOCKER_TAG=1.2.4
-  DOCKER_REGISTRY=ghcr.io/hyperledger-labs
+  DOCKER_IMAGE_NAME=ghcr.io/hyperledger-labs/weaver-fabric-driver
+  DOCKER_TAG=1.5.6
   DRIVER_TLS=<true|false>
   DRIVER_TLS_CERT_PATH=path_to_tls_cert_pem_for_driver
   DRIVER_TLS_KEY_PATH=path_to_tls_key_pem_for_driver
@@ -602,7 +630,7 @@ Weaver provides a [pre-built image](https://github.com/hyperledger-labs/weaver-d
   - **Enabling TLS**:
     - You can make your driver accept TLS connections by specifying `DRIVER_TLS` as `true` and specifying a TLS certificate file path and private key file path in `DRIVER_TLS_CERT_PATH` and `DRIVER_TLS_KEY_PATH` respectively. The same certificate should be specified in this driver's definition in the `drivers` section in the `config.toml` file of your relay in the `tlsca_cert_path` property (see the earlier section on relay configuration).
     - To communicate with your network' relay using TLS (i.e., if the relay is TLS-enabled), specify that relay's TLS CA certificate path in `RELAY_TLSCA_CERT_PATH` (currently only one certificate can be configured) and set `RELAY_TLS` to `true`. This CA certificate should match the one specified in the `cert_path` property in the relay's `config.toml` file (see the earlier section on relay configuration):
-    - You can point to the folder in your host system containing the certificate and key using the `TLS_CREDENTIALS_DIR` variable. (This folder will be synced to the `/fabric-driver/credentials` folder in the Fabric Driver container as specified in the [docker-compose file](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/core/drivers/fabric-driver/docker-compose.yml).) Make sure you point to the right certificate and key file paths within the container using the `DRIVER_TLS_CERT_PATH`, `DRIVER_TLS_KEY_PATH`, and ``RELAY_TLSCA_CERT_PATH` variables.
+    - You can point to the folder in your host system containing the certificate and key using the `TLS_CREDENTIALS_DIR` variable. (This folder will be synced to the `/fabric-driver/credentials` folder in the Fabric Driver container as specified in the [docker-compose file](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/core/drivers/fabric-driver/docker-compose.yml).) Make sure you point to the right certificate and key file paths within the container using the `DRIVER_TLS_CERT_PATH`, `DRIVER_TLS_KEY_PATH`, and `RELAY_TLSCA_CERT_PATH` variables.
 
 - `config.json`: This contains settings used to connect to a CA of a Fabric network organization and enroll a client. A sample is given below:
   ```json
