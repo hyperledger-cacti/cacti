@@ -933,6 +933,33 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
       - run: ./tools/ci.sh
+  cactus-plugin-persistence-ethereum:
+    continue-on-error: false
+    env:
+      FULL_BUILD_DISABLED: true
+      JEST_TEST_PATTERN: packages/cactus-plugin-persistence-ethereum/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_RUNNER_DISABLED: false
+      TAPE_TEST_RUNNER_DISABLED: true
+    needs: build-dev
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Use Node.js v16.14.2
+        uses: actions/setup-node@v2.1.2
+        with:
+          node-version: v16.14.2
+      - uses: actions/checkout@v2.3.4
+      - id: yarn-cache-dir-path
+        name: Get yarn cache directory path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - id: yarn-cache
+        name: Restore Yarn Cache
+        uses: actions/cache@v3.0.4
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - run: ./tools/ci.sh
   cactus-plugin-object-store-ipfs:
     continue-on-error: false
     env:

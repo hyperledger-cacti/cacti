@@ -1,0 +1,91 @@
+{
+  "name": "@hyperledger/cactus-plugin-persistence-ethereum",
+  "version": "1.2.0",
+  "description": "Persistence plugin for Ethereum ledgers to store data into a database.",
+  "keywords": [
+    "Hyperledger",
+    "Cactus",
+    "Integration",
+    "Blockchain",
+    "Distributed Ledger Technology"
+  ],
+  "homepage": "https://github.com/hyperledger/cactus#readme",
+  "bugs": {
+    "url": "https://github.com/hyperledger/cactus/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger/cactus.git"
+  },
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Hyperledger Cactus Contributors",
+    "email": "cactus@lists.hyperledger.org",
+    "url": "https://www.hyperledger.org/use/cactus"
+  },
+  "contributors": [
+    {
+      "name": "Please add yourself to the list of contributors",
+      "email": "your.name@example.com",
+      "url": "https://example.com"
+    },
+    {
+      "name": "Michal Bajer",
+      "email": "michal.bajer@fujitsu.com",
+      "url": "https://www.fujitsu.com/global/"
+    },
+    {
+      "name": "Tomasz Awramski",
+      "email": "tomasz.awramski@fujitsu.com",
+      "url": "https://www.fujitsu.com/global/"
+    }
+  ],
+  "main": "dist/lib/main/typescript/index.js",
+  "module": "dist/lib/main/typescript/index.js",
+  "types": "dist/lib/main/typescript/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "scripts": {
+    "codegen": "run-p 'codegen:*'",
+    "codegen:openapi": "npm run generate-sdk",
+    "generate-sdk": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
+    "build": "npm run build-ts && npm run build:dev:backend:postbuild",
+    "build-ts": "tsc",
+    "build:dev:backend:postbuild": "npm run copy-sql && npm run copy-yarn-lock",
+    "copy-sql": "cp -raf ./src/main/sql ./dist/lib/main/",
+    "copy-yarn-lock": "cp -af ../../yarn.lock ./dist/yarn.lock"
+  },
+  "dependencies": {
+    "@ethersproject/abi": "5.7.0",
+    "@hyperledger/cactus-core": "1.2.0",
+    "@hyperledger/cactus-common": "1.2.0",
+    "pg": "8.8.0",
+    "run-time-error": "1.4.0",
+    "fast-safe-stringify": "2.1.1",
+    "sanitize-html": "2.7.0",
+    "web3-utils": "1.5.2",
+    "async-mutex": "0.4.0",
+    "uuid": "8.3.2"
+  },
+  "devDependencies": {
+    "@hyperledger/cactus-core-api": "1.2.0",
+    "@hyperledger/cactus-api-client": "1.2.0",
+    "@hyperledger/cactus-test-tooling": "1.2.0",
+    "@types/express": "4.17.13",
+    "@types/pg": "8.6.5",
+    "rxjs": "7.3.0",
+    "web3": "1.5.2",
+    "web3-eth": "1.5.2",
+    "web3-core": "1.5.2",
+    "jest-extended": "2.0.0"
+  },
+  "engines": {
+    "node": ">=10",
+    "npm": ">=6"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "watch": {}
+}

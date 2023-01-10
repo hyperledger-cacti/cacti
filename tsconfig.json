@@ -74,6 +74,9 @@
       "path": "./packages/cactus-verifier-client/tsconfig.json"
     },
     {
+      "path": "./packages/cactus-plugin-persistence-ethereum/tsconfig.json"
+    },
+    {
       "path": "./packages/cactus-test-api-client/tsconfig.json"
     },
     {
