@@ -361,7 +361,7 @@ const claimFungibleAssetInHTLC = async (
  * Rollback step of a Hashed Time Lock Contract
  * - Reclaim a unique asset instance
  **/
- const reclaimAssetInHTLC = async (
+const reclaimAssetInHTLC = async (
     contract: Contract,
     assetType: string,
     assetID: string,
