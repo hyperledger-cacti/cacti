@@ -1,4 +1,4 @@
-FROM rust:1.63.0 as builder
+FROM rust:1.67-bullseye as builder
 
 WORKDIR /
 RUN USER=root cargo new --bin cactus-keychain-vault-server
@@ -6,10 +6,11 @@ WORKDIR /cactus-keychain-vault-server
 ADD ./rust/gen/ ./
 RUN cargo build --release --example server
 
-FROM debian:buster-slim
+FROM debian:bullseye-slim
 ARG APP=/usr/src/app
 
 RUN apt-get update
+RUN apt-get -y upgrade
 RUN apt-get install -y ca-certificates tzdata curl tini
 RUN rm -rf /var/lib/apt/lists/*
 
