@@ -197,9 +197,9 @@ func unmarshalAssetPledge(assetPledgeBase64 string) (*common.AssetPledge, error)
 		return pledge, fmt.Errorf("empty asset pledge")
 	}
 	err = proto.Unmarshal([]byte(assetPledgeSerialized), pledge)
-  if err != nil {
-    return pledge, err
-  }
+	if err != nil {
+		return pledge, err
+	}
 	return pledge, nil
 }
 
