@@ -227,7 +227,7 @@ func (s *SmartContract) ClaimRemoteAsset(ctx contractapi.TransactionContextInter
 	}
 	
 	// Question in PR: Is following return `pledgeAssetDetails` required from utils?
-	pledgeAssetDetails, err := wutils.ClaimRemoteAsset(ctx, pledgeId, remoteNetworkId, pledgeBytes64)
+	_, err = wutils.ClaimRemoteAsset(ctx, pledgeId, remoteNetworkId, pledgeBytes64)
 	if err != nil {
 		return err
 	}
@@ -250,14 +250,14 @@ func (s *SmartContract) ReclaimAsset(ctx contractapi.TransactionContextInterface
 		claimAsset.Owner != "" {
 		// Check if there was a pledge made for the claimed asset
 		bondAssetPledgeMap, err := getAssetPledgeIdMap(ctx, claimAsset.Type, claimAsset.ID)
-		if (err != nil) || (bondAssetPledgeMap.PledgeID != pledgeId) || (bondAssetPledgeMap.RemoteNetworkID != remoteNetworkId) || (bondAssetPledgeMap.Recipient != recipientCert) {
-			return fmt.Errorf("asset %s was not pledged with pledgeId %s, for %s in network %s", claimAsset, pledgeId, recipientCert, remoteNetworkId)
+		if (err != nil) || (bondAssetPledgeMap.PledgeID != pledgeId) {
+			return fmt.Errorf("asset %s:%s was not pledged with pledgeId %s", claimAsset.Type, claimAsset.ID, pledgeId)
 		}
 	}
 
 	// Reclaim the asset using common (library) logic
 	// Question in PR: is claimAssetDetails required from utils to be returned?
-	claimAssetDetails, pledgeAssetDetails, err := wutils.ReclaimAsset(ctx, pledgeId, recipientCert, remoteNetworkId, claimStatusBytes64)
+	_, pledgeAssetDetails, err := wutils.ReclaimAsset(ctx, pledgeId, recipientCert, remoteNetworkId, claimStatusBytes64)
 	if err != nil {
 		return err
 	}

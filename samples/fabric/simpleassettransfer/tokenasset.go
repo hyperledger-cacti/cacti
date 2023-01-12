@@ -257,7 +257,7 @@ func (s *SmartContract) ClaimRemoteTokenAsset(ctx contractapi.TransactionContext
 		return fmt.Errorf("cannot claim %d %s tokens as it has not been pledged by the given owner", numUnits, assetType)
 	}
 	
-	pledgeAssetDetails, err := wutils.ClaimRemoteAsset(ctx, pledgeId, remoteNetworkId, pledgeBytes64)
+	_, err = wutils.ClaimRemoteAsset(ctx, pledgeId, remoteNetworkId, pledgeBytes64)
 	if err != nil {
 		return err
 	}
@@ -271,12 +271,13 @@ func (s *SmartContract) ReclaimTokenAsset(ctx contractapi.TransactionContextInte
 	// (Optional) Ensure that this function is being called by the Fabric Interop CC
 	
 	// Reclaim the asset using common (library) logic
-	claimAssetDetails, pledgeAssetDetails, err := wutils.ReclaimAsset(ctx, pledgeId, recipientCert, remoteNetworkId, claimStatusBytes64)
+	_, pledgeAssetDetails, err := wutils.ReclaimAsset(ctx, pledgeId, recipientCert, remoteNetworkId, claimStatusBytes64)
 	if err != nil {
 		return err
 	}
 
 	// Recreate the asset in this network and chaincode using app-specific logic
+	var pledgeAsset TokenAsset
 	err = json.Unmarshal(pledgeAssetDetails, &pledgeAsset)
 	if err != nil {
 		return err
