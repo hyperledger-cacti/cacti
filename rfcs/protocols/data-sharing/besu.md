@@ -13,17 +13,18 @@
 ## Summary
 
 - This document specifies the Hyperledger Besu implementation of modules, and application adaptation guidelines, for the data sharing protocol.
-- The design is tentative.
 
 ### Configuration:
 - Source Driver:
-    - Source Driver can maintain a map of contract name to the contract address
+    - Source Driver can maintain a map of contract names to contract addresses
     - Interop contract JSON
 
 ### Bootstrapping
 
+Certain artifacts are required for data sharing, typically to be recorded on the ledger before operations commence. They are:
+
 - `Membership`: An array of public keys of all the validator nodes in the network.
-- `Access Control Policy`: No change required.
+- `Access Control Policy`: Defined [here](../../formats/policies/access-control.md), same can be used as it is, with `principalType` to be set as `public-key`.
 - `Verification Policy`: Number of validator nodes whose signature/seal is required.
 
 ### End to End steps:

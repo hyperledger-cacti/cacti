@@ -15,18 +15,18 @@
 - This document specifies the Hyperledger Fabric implementation of modules, and application adaptation guidelines, for the asset exchange protocol.
 - There are two types of implementation for asset exchange in Fabric:
   - The protocol unit functions are implemented in a library package that can be imported in any application chaincode.
-  - The Fabric Interoperation Chaincode will already import the above library, and can be used as it is, along with an interface that needs to be extended by the application chaincode.
+  - The Fabric Interoperation Chaincode will already import the above library, and its functions can be invoked from an application chaincode, using an interface that needs to be extended by the application chaincode.
 - Within Weaver, the SDK will provide user agents (clients) the capability to trigger HTLC operations on particular chaincodes maintaining particular digital assets.
 
 ## HTLC Asset Exchange Capabilities in Weaver
 
-Weaver asset exchange capabilities are asset and application agnostic. It verifies the HTLC parameters and maintains asset and claim state in the ledger for the corresponding asset exchange. Other verifications and operations must be done in the application contract. Following are the core capabilities of Weaver for HTLC asset exchange:
+Weaver asset exchange capabilities are asset and application-agnostic. Weaver interoperation module verifies the HTLC parameters and maintains asset and claim state in the ledger for the corresponding asset exchange. Other verifications and operations must be done in the application contract. Following are the core capabilities of Weaver for HTLC asset exchange:
 
 * Lock Functions:
   * `LockAsset`: Function to lock a non-fungible asset. It takes two parameters: base64 encoded serialized protobuf message of type [AssetLock](../../formats/assets/exchange.md#representing-locks-on-assets) defining hash lock and time lock parameters of HTLC and [AssetExchangeAgreement](../../formats/assets/exchange.md#representing-two-party-asset-exchange-agreements).
   * `LockFungibleAsset`: Function to lock fungible assets. Similar to `LockAsset`, it also takes two parameters: base64 encoded serialized protobuf message of type [AssetLock](../../formats/assets/exchange.md#representing-locks-on-assets) defining hash lock and time lock parameters of HTLC and [FungibleAssetExchangeAgreement](../../formats/assets/exchange.md#representing-two-party-asset-exchange-agreements).
   
-  Both functions generate a unique ID called `contractId` for this asset exchange, and returns it, which can be used in other functions to refer to this asset exchange. These lock functions only creates a state in the ledger signifying that the corresponding asset is locked and the HTLC parameters. The application contract must make sure to not allow any spenditure of the locked asset.
+  Both functions generate a unique ID called `contractId` for this asset exchange, and returns it, which can be used in other functions to refer to this asset exchange. These lock functions only creates a state in the ledger signifying that the corresponding asset is locked and the HTLC parameters. The application contract must make sure to not allow any changes to the state or ownership of the asset while it is locked.
 * `IsAssetLocked`: Function to query if the asset is locked. There can be two interfaces for this function, one that takes only `contractId` as input, and other interface only for non-fungible assets, where `AssetExchangeAgreement` protobuf or its fields can be provided as input.
 * `ClaimAsset`: Function to claim asset by providing preimage of the lock. This function can also be implemented in two ways, one taking contractId and serialized protobuf [AssetClaim](../../formats/assets/exchange.md#representing-claims-on-assets) as input, and another way for non-fungible assets taking serialized protobufs of type [AssetExchangeAgreement](../../formats/assets/exchange.md#representing-two-party-asset-exchange-agreements) and  [AssetClaim](../../formats/assets/exchange.md#representing-claims-on-assets). The claim function creates a claim state in ledger, and deletes lock state. The actual transfer of asset must be done in the application contract.
 * `UnlockAsset`: Function to unlock asset after timeout has expired. This function can also be implemented in two ways, one taking contractId as input, and another way for non-fungible assets taking serialized protobuf [AssetExchangeAgreement](../../formats/assets/exchange.md#representing-two-party-asset-exchange-agreements) as input. The claim function only deletes lock state in ledger.
@@ -40,14 +40,14 @@ Utility functions:
 
 Weaver SDK provides an interface `Hash`, which is designed to allow different hashing algorithms to be used for HTLC. Currently there are two implementations: `SHA256` and `SHA512`. The interface `Hash` in `HashFunctions` has following API:
 
-* `generateRandomPreimage(length): void`: generates a random preimage of size `length`, and sets it to internal variable
+* `generateRandomPreimage(length: number): void`: generates a random preimage of size `length`, and sets it to internal variable
 * `setPreimage(preimage: any): void`: sets a user-provided preimage
 * `getPreimage(): any`: returns the preimage
 * `getSerializedPreimageBase64(): string`: returns serialized preimage in base64 encoded string
 * `setSerializedHashBase64(hash64: string)`: sets serialized hash value in base64 encoded string
 * `getSerializedHashBase64(): string`: returns serialized hash value in base64 encoded string
 
-The Weaver SDK API functions,  in `AssetManager`, are listed below, to help client application developers add HTLC functionalities in their app. Before going to API functions, the parameters used in those functions are explained below:
+The Weaver SDK's `AssetManager` API functions are listed below to help client application developers add HTLC functionalities in their app. Before going to API functions, the parameters used in those functions are explained below:
 
 * `contract: Contract`: application chaincode handle obtained via Fabric SDK using the caller's credentials
 * `assetType: string`: type of asset
@@ -138,7 +138,7 @@ The onus on the changes required to be made lies both on the application develop
 
 ### Smart Contract
 
-HTLC can be implemented in a network using Weaver in two ways:
+HTLC can be implemented in a network using Weaver in one of two ways:
 
 * **Using AssetExchange library:** All HTLC capabilities are encapsulated in `assetexchange` library, which any Fabric chaincode can import and extend to implement asset exchange.
 

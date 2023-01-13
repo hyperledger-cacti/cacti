@@ -449,7 +449,7 @@ Weaver provides a [pre-built image](https://github.com/hyperledger-labs/weaver-d
   For more details, see the [Relay Docker README](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/core/relay/relay-docker.md) ("Relay Server Image" and "Running With Docker Compose" sections).
 
 - `config.toml`: This is the file specified in the `PATH_TO_CONFIG` variable in the `.env`. It specifies properties of this relay and the driver(s) it supports. A sample is given below:
-  ```
+  ```toml showLineNumbers
   name=<relay-name>
   port=<relay-port>
   host="0.0.0.0"
@@ -480,12 +480,12 @@ Weaver provides a [pre-built image](https://github.com/hyperledger-labs/weaver-d
   - `db_path` and `remote_db_path` are used internally by the relay to store data. Replace `<relay-name>` with the same value set for the `name` parameter. (These can point to any filesystem paths in the relay's container.)
   - If you set `tls` to `true`, the relay will enforce TLS communication. The `cert_path` and `key_path` should point to a Fabric TLS certificate and key respectively, such as those created using the `cryptogen` tool.
   - `<network-name>` is a unique identifier for your local network. You can set it to whatever value you wish.
-  - `<driver-name>` refers to the driver used by this relay to respond to requests. This also refers to one of the drivers's specifications in the `drivers` section further below. In this code snippet, we have defined one driver. (The names in lines 519 and 527 must match.) In lines 528 and 529 respectively, you should specify the hostname and port for the driver (whose configuration we will handle later).
-  - The `relays` section specifies all foreign relays this relay can connect to. The `<foreign-relay-name>` value should be a unique ID for a given foreign relay, and this value will be used by your Layer-2 applications when constructing view addresses for data sharing requests. In lines 523 and 524, you should specify the hostname and port for the foreign relay.
+  - `<driver-name>` refers to the driver used by this relay to respond to requests. This also refers to one of the drivers's specifications in the `drivers` section further below. In this code snippet, we have defined one driver. (The names in lines 14 and 22 must match.) In lines 23 and 24 respectively, you should specify the hostname and port for the driver (whose configuration we will handle later).
+  - The `relays` section specifies all foreign relays this relay can connect to. The `<foreign-relay-name>` value should be a unique ID for a given foreign relay, and this value will be used by your Layer-2 applications when constructing view addresses for data sharing requests. In lines 18 and 19, you should specify the hostname and port for the foreign relay.
   - **Enabling TLS**:
     - You can make your relay accept TLS connections by specifying a TLS certificate file path and private key file path in `cert_path` and `key_path` respectively, and set `tls` to `true`.
     - To communicate with a foreign relay using TLS, specify that relay's TLS CA certificate path in `tlsca_cert_path` (currently only one certificate can be configured) and set `tls` to `true` by extending that relay's section as follows (*Note*: this CA certificate should match the one specified in the `cert_path` property in the foreign relay's `config.toml` file):
-      ```
+      ```toml
       [relays]
       [relays.<foreign-relay-name>]
       hostname="<foreign-relay-hostname-or-ip-address>"
@@ -494,7 +494,7 @@ Weaver provides a [pre-built image](https://github.com/hyperledger-labs/weaver-d
       tlsca_cert_path="<relay-tls-ca-certificate-path>"
       ```
     - To communicate with a driver using TLS, specify the driver's TLS CA certificate in `tlsca_cert_path` (currently only one certificate can be configured) and set `tls` to `true` by extending that driver's section as follows (*Note*: this CA certificate must match the certificate used by the driver using the `DRIVER_TLS_CERT_PATH` property in its `.env` configuration file, which we will examine later):
-      ```
+      ```toml
       [drivers]
       [drivers.<driver-name>]
       hostname="<driver-hostname-or-ip-address>"

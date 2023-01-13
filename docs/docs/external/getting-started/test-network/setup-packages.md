@@ -152,7 +152,7 @@ An instance or a relay can be run using a suitable configuration file. Samples a
 Run a relay for `network1` as follows:
 - Navigate to the `core/relay` folder.
 - To launch the server without TLS, leave the configuration file `config/Fabric_Relay.toml` in its default state. Otherwise, edit it to set TLS flags for this relay and the other relays and drivers it will connect to in this demonstration as follows:
-  ```
+  ```toml
   .
   .
   cert_path="credentials/fabric_cert.pem"
@@ -195,7 +195,7 @@ Run a relay for `network1` as follows:
 Run a relay for `network2` as follows (_do this only if you have launched both Fabric networks `network1` and `network2` and wish to test interoperation between them_)
 - Navigate to the `core/relay` folder.
 - To launch the server without TLS, leave the configuration file `config/Fabric_Relay2.toml` in its default state. Otherwise, edit it to set TLS flags for this relay and the other relays and drivers it will connect to in this demonstration as follows:
-  ```
+  ```toml
   .
   .
   cert_path="credentials/fabric_cert.pem"
@@ -532,7 +532,7 @@ Run a relay for `Corda_Network` as follows:
 - Navigate to the `core/relay` folder.
 - (Make sure you've already built the relay by running `make`.)
 - To launch the server without TLS, leave the configuration file `config/Corda_Relay.toml` in its default state. Otherwise, edit it to set TLS flags for this relay and the other relays and drivers it will connect to in this demonstration as follows:
-  ```
+  ```toml
   .
   .
   cert_path="credentials/fabric_cert.pem"
@@ -582,7 +582,7 @@ Run a relay for `Corda_Network` as follows:
 Run a relay for `Corda_Network2` as follows (_do this only if you have launched both Corda networks `Corda_Network` and `Corda_Network2` and wish to test interoperation between them_)
 - Navigate to the `core/relay` folder.
 - To launch the server without TLS, leave the configuration file `config/Corda_Relay2.toml` in its default state. Otherwise, edit it to set TLS flags for this relay and the other relays and drivers it will connect to in this demonstration as follows:
-  ```
+  ```toml
   .
   .
   cert_path="credentials/fabric_cert.pem"

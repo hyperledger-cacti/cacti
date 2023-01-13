@@ -314,7 +314,7 @@ Consider a scenario inspired by the [global trade use case](../../user-stories/g
 (In preparation, a suitable access control policy must be recorded on `tradelogisticschannel` in `trade-logistics-network`, and a suitable verification policy must be recorded on `tradefinancechannel` in `trade-finance-network`. We will see how to do this in the "Startup and Boostrap" section later.)
 
 You will need to insert some code in the Layer-2 application that accepts a B/L and submits a `RecordBillOfLading` transaction in `trade-finance-network`. (No code changes need to be made in any application in the other network.) The logic to accept a B/L should be replaced (or you can simply add an alternative) by a call to the `interopFlow` function offered by the [weaver-fabric-interop-sdk](https://github.com/hyperledger-labs/weaver-dlt-interoperability/packages/888424) library (there's an [equivalent library in Golang](https://github.com/hyperledger-labs/weaver-dlt-interoperability/releases/tag/sdks%2Ffabric%2Fgo-sdk%2Fv1.2.3-alpha.1) too). The following code sample illustrates this (the Golang equivalent is left to the reader):
-```javascript
+```js showLineNumbers
 const ihelper = require('@hyperledger-labs/weaver-fabric-interop-sdk').InteroperableHelper;
 const interopcc = <handle-to-fabric-interop-chaincode>;   // Use Fabric SDK functions: (new Gateway()).getNetwork(...).getContract(<fabric-interop-chaincode-id>)
 const keyCert = await ihelper.getKeyAndCertForRemoteRequestbyUserName(<wallet>, <user-id>);      // Read key and certificate for <user-id> from wallet (get handle using Fabric SDK Wallets API)
@@ -356,7 +356,7 @@ if (!flowResponse.views || flowResponse.views.length === 0 || !flowResponse.resu
     throw <error>;
 }
 ```
-Let us understand this code snippet better. The structure in lines 337-342 specifies the local chaincode transaction that is to be triggered after remote data (view) has been requested and obtained via relays. The function `RecordBillOfLading` expects two arguments as specified in line 341: the first is the common shipment reference that is used by the letter of credit in `trade-finance-network` and the bill of lading in `trade-logistics-network`, and the second is the bill of lading contents. When the `interopFlow` function is called, this argument is left blank because it is supposed to be filled with contents obtained from a view request. The array list `indices`, which is passed as an argument to `interopFlow` therefore contains the index value `1` (line 331), indicating which argument ought to be substituted  with view data. The `interopJSONs` array correspondingly contains a list of view addresses that are to be supplied to the relay. The `<confidential-flag>` if set to `true` will enable end-to-end confidentiality, i.e. payload will be encrypted from `trade-finance-network`'s weaver chaincode, and will be decrypted in SDK (i.e. Layer-2 client application) at `trade-logistics-network`, but relays and drivers in between will not be able to see the payload. By default this flag is set to `false`.
+Let us understand this code snippet better. The structure in lines 20-25 specifies the local chaincode transaction that is to be triggered after remote data (view) has been requested and obtained via relays. The function `RecordBillOfLading` expects two arguments as specified in line 24: the first is the common shipment reference that is used by the letter of credit in `trade-finance-network` and the bill of lading in `trade-logistics-network`, and the second is the bill of lading contents. When the `interopFlow` function is called, this argument is left blank because it is supposed to be filled with contents obtained from a view request. The array list `indices`, which is passed as an argument to `interopFlow` therefore contains the index value `1` (line 14), indicating which argument ought to be substituted  with view data. The `interopJSONs` array correspondingly contains a list of view addresses that are to be supplied to the relay. The `<confidential-flag>` if set to `true` will enable end-to-end confidentiality, i.e. payload will be encrypted from `trade-finance-network`'s weaver chaincode, and will be decrypted in SDK (i.e. Layer-2 client application) at `trade-logistics-network`, but relays and drivers in between will not be able to see the payload. By default this flag is set to `false`.
 
 | Notes |
 |:------|
@@ -531,7 +531,7 @@ Weaver provides a [pre-built image](https://github.com/hyperledger-labs/weaver-d
   For more details, see the [Relay Docker README](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/core/relay/relay-docker.md) ("Relay Server Image" and "Running With Docker Compose" sections).
 
 - `config.toml`: This is the file specified in the `PATH_TO_CONFIG` variable in the `.env`. It specifies properties of this relay and the driver(s) it supports. A sample is given below:
-  ```
+  ```toml showLineNumbers
   name=<relay-name>
   port=<relay-port>
   host="0.0.0.0"
@@ -562,12 +562,12 @@ Weaver provides a [pre-built image](https://github.com/hyperledger-labs/weaver-d
   - `db_path` and `remote_db_path` are used internally by the relay to store data. Replace `<relay-name>` with the same value set for the `name` parameter. (These can point to any filesystem paths in the relay's container.)
   - If you set `tls` to `true`, the relay will enforce TLS communication. The `cert_path` and `key_path` should point to a Fabric TLS certificate and key respectively, such as those created using the `cryptogen` tool.
   - `<network-name>` is a unique identifier for your local network. You can set it to whatever value you wish.
-  - `<driver-name>` refers to the driver used by this relay to respond to requests. This also refers to one of the drivers's specifications in the `drivers` section further below. In this code snippet, we have defined one driver. (The names in lines 519 and 527 must match.) In lines 528 and 529 respectively, you should specify the hostname and port for the driver (whose configuration we will handle later).
-  - The `relays` section specifies all foreign relays this relay can connect to. The `<foreign-relay-name>` value should be a unique ID for a given foreign relay, and this value will be used by your Layer-2 applications when constructing view addresses for data sharing requests. In lines 523 and 524, you should specify the hostname and port for the foreign relay.
+  - `<driver-name>` refers to the driver used by this relay to respond to requests. This also refers to one of the drivers's specifications in the `drivers` section further below. In this code snippet, we have defined one driver. (The names in lines 14 and 22 must match.) In lines 23 and 24 respectively, you should specify the hostname and port for the driver (whose configuration we will handle later).
+  - The `relays` section specifies all foreign relays this relay can connect to. The `<foreign-relay-name>` value should be a unique ID for a given foreign relay, and this value will be used by your Layer-2 applications when constructing view addresses for data sharing requests. In lines 18 and 19, you should specify the hostname and port for the foreign relay.
   - **Enabling TLS**:
     - You can make your relay accept TLS connections by specifying a TLS certificate file path and private key file path in `cert_path` and `key_path` respectively, and set `tls` to `true`.
     - To communicate with a foreign relay using TLS, specify that relay's TLS CA certificate path in `tlsca_cert_path` (currently only one certificate can be configured) and set `tls` to `true` by extending that relay's section as follows (*Note*: this CA certificate should match the one specified in the `cert_path` property in the foreign relay's `config.toml` file):
-      ```
+      ```toml
       [relays]
       [relays.<foreign-relay-name>]
       hostname="<foreign-relay-hostname-or-ip-address>"
@@ -576,7 +576,7 @@ Weaver provides a [pre-built image](https://github.com/hyperledger-labs/weaver-d
       tlsca_cert_path="<relay-tls-ca-certificate-path>"
       ```
     - To communicate with a driver using TLS, specify the driver's TLS CA certificate in `tlsca_cert_path` (currently only one certificate can be configured) and set `tls` to `true` by extending that driver's section as follows (*Note*: this CA certificate must match the certificate used by the driver using the `DRIVER_TLS_CERT_PATH` property in its `.env` configuration file, which we will examine later):
-      ```
+      ```toml
       [drivers]
       [drivers.<driver-name>]
       hostname="<driver-hostname-or-ip-address>"

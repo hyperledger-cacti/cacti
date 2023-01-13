@@ -37,7 +37,7 @@ operator = _:SimpleState:get(string):key
 
 1. Interop payload in bytes (_check_ if the requestor can directly obtain this from the output merkle-patricia-trie proof verification)
 2. Header fields of block object (this also contains `receiptsRoot`).
-3. Merkle-Patricia Proof
+3. [Merkle-Patricia Proof](https://ethereum.org/en/developers/docs/data-structures-and-encoding/patricia-merkle-trie/)
 4. Index of receipt object of interest -> txRIndex.
 5. LogIndex
 6. Signatures of validators from extraData (we can obtain a validator's public key from its signature using `recover`)

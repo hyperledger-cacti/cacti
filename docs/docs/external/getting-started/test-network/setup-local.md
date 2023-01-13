@@ -208,7 +208,7 @@ An instance or a relay can be run using a suitable configuration file. Samples a
 Run a relay for `network1` as follows:
 - Navigate to the `core/relay` folder.
 - To launch the server without TLS, leave the configuration file `config/Fabric_Relay.toml` in its default state. Otherwise, edit it to set TLS flags for this relay and the other relays and drivers it will connect to in this demonstration as follows:
-  ```
+  ```toml
   .
   .
   cert_path="credentials/fabric_cert.pem"
@@ -251,7 +251,7 @@ Run a relay for `network1` as follows:
 Run a relay for `network2` as follows (_do this only if you have launched both Fabric networks `network1` and `network2` and wish to test interoperation between them_)
 - Navigate to the `core/relay` folder.
 - To launch the server without TLS, leave the configuration file `config/Fabric_Relay2.toml` in its default state. Otherwise, edit it to set TLS flags for this relay and the other relays and drivers it will connect to in this demonstration as follows:
-  ```
+  ```toml
   .
   .
   cert_path="credentials/fabric_cert.pem"
@@ -618,7 +618,7 @@ Run a relay for `Corda_Network` as follows:
 - Navigate to the `core/relay` folder.
 - (Make sure you've already built the relay by running `make`.)
 - To launch the server without TLS, leave the configuration file `config/Corda_Relay.toml` in its default state. Otherwise, edit it to set TLS flags for this relay and the other relays and drivers it will connect to in this demonstration as follows:
-  ```
+  ```toml
   .
   .
   cert_path="credentials/fabric_cert.pem"
@@ -668,7 +668,7 @@ Run a relay for `Corda_Network` as follows:
 Run a relay for `Corda_Network2` as follows (_do this only if you have launched both Corda networks `Corda_Network` and `Corda_Network2` and wish to test interoperation between them_)
 - Navigate to the `core/relay` folder.
 - To launch the server without TLS, leave the configuration file `config/Corda_Relay2.toml` in its default state. Otherwise, edit it to set TLS flags for this relay and the other relays and drivers it will connect to in this demonstration as follows:
-  ```
+  ```toml
   .
   .
   cert_path="credentials/fabric_cert.pem"
@@ -770,9 +770,22 @@ Run a Corda driver as follows:
 
 ## Hyperledger Besu Components
 
-**Prerequisites**: Java (JDK and JRE): [sample instructions](https://openjdk.java.net/install/) (Version 11)
+Using the sequence of instructions below, you can start two separate Besu networks, each with 4 validator nodes, and EthSigner and application contract. You can also install an interoperation contract in the network. You can build a Besu CLI tool with which you can initialize both networks' ledgers.
 
-Using the sequence of instructions below, you can start two separate Besu networks, each with 4 validator nodes, ann EthSigner and application contract. You can also install an interoperation contract in the network. You can build a Besu CLI tool with which you can initialize both networks' ledgers.
+### Prerequisites
+
+- Java (JDK and JRE): [sample instructions](https://openjdk.java.net/install/) (Version 11)
+  You need to run Besu instructions in a separate environment (separate terminal or machine) than Corda, as Corda requires Java 8. You can also use `update-alternatives` to switch between java versions.
+- tmux: `sudo apt install tmux`
+- Besu: 
+	* Download and unpack the latest https://github.com/hyperledger/besu/releases/latest. You will find it in the link of the form: https://hyperledger.jfrog.io/artifactory/besu-binaries/besu/x.y.z/besu-x.y.z.zip with x.y.z replaced with the version number. For instance, run the following command after updating version number accordingly.
+    ```
+    wget https://hyperledger.jfrog.io/artifactory/besu-binaries/besu/21.7.0/besu-21.7.0.zip
+    ```
+	* Add the path to besu-x.y.z/bin to PATH
+- EthSigner: 
+	* Download and unpack the latest from https://cloudsmith.io/~consensys/repos/ethsigner/packages/?q=tag%3Alatest (Requires Java 11 or later)
+	* Add the path to ethsigner-x.y.z/bin to PATH
 
 ### Besu Interoperation Node SDK
 
@@ -787,7 +800,7 @@ To build the library, do the following:
 
 ### Besu Network
 
-The code for this lies in the `tests/network-setups` folder.
+The code for this lies in the `tests/network-setups/besu` folder.
 
 This folder contains code to create and launch networks `Network1` and `Network2` of identical specifications:
 - Network: 4 validator nodes, 1 EthSigner node.
@@ -822,7 +835,7 @@ make deploy-contracts
 
 ### Besu Client (besu-cli)
 
-The CLI is used to interact with a Besu network, configure it and run chaincode transactions to record data on the channel ledger or query data.
+The CLI is used to interact with a Besu network, configure it and run contract transactions to record data on the ledger or query data.
 
 The `besu-cli` Node.js source code is located in the `samples/besu/besu-cli` folder.
 
