@@ -11,7 +11,7 @@ To get started with capturing and publishing documentation see instructions belo
 
 This documentation site is built using [Docusaurus v2](https://v2.docusaurus.io/docs/).
 
-**NOTE:** Required Node.js version >= 12.13.0 or above.
+**NOTE:** Required Node.js version >= 16.14.0 or above.
 
 ## Preview Locally
 
