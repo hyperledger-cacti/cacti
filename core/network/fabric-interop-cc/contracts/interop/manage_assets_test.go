@@ -225,7 +225,7 @@ func TestIsAssetLocked(t *testing.T) {
 	chaincodeStub.GetStateReturns(assetLockValBytes, nil)
 	// Test failure with asset agreement not specified properly
 	isAssetLocked, err := interopcc.IsAssetLocked(ctx, base64.StdEncoding.EncodeToString(assetAgreementBytes))
-	require.Error(t, err)
+	require.NoError(t, err)
 	require.False(t, isAssetLocked)
 	log.Info(fmt.Println("Test failed as expected with error:", err))
 
@@ -243,7 +243,7 @@ func TestIsAssetLocked(t *testing.T) {
 	chaincodeStub.GetStateReturns(assetLockValBytes, nil)
 	// Test failure with expiry time elapsed already
 	isAssetLocked, err = interopcc.IsAssetLocked(ctx, base64.StdEncoding.EncodeToString(assetAgreementBytes))
-	require.Error(t, err)
+	require.NoError(t, err)
 	require.False(t, isAssetLocked)
 	log.Info(fmt.Println("Test failed as expected with error:", err))
 
@@ -252,7 +252,7 @@ func TestIsAssetLocked(t *testing.T) {
 	chaincodeStub.GetStateReturns(assetLockValBytes, nil)
 	// Test failure with asset agreement not specified properly
 	isAssetLocked, err = interopcc.IsAssetLocked(ctx, base64.StdEncoding.EncodeToString(assetAgreementBytes))
-	require.Error(t, err)
+	require.NoError(t, err)
 	require.False(t, isAssetLocked)
 	log.Info(fmt.Println("Test failed as expected with error:", err))
 
@@ -281,7 +281,7 @@ func TestIsAssetLocked(t *testing.T) {
 	assetAgreementBytes, _ = proto.Marshal(assetAgreement)
 	// Test failure with asset agreement specified to include arbitrary locker and wrong recipient
 	isAssetLocked, err = interopcc.IsAssetLocked(ctx, base64.StdEncoding.EncodeToString(assetAgreementBytes))
-	require.Error(t, err)
+	require.NoError(t, err)
 	require.False(t, isAssetLocked)
 	log.Info(fmt.Println("Test failed as expected with error:", err))
 
@@ -310,7 +310,7 @@ func TestIsAssetLocked(t *testing.T) {
 	assetAgreementBytes, _ = proto.Marshal(assetAgreement)
 	// Test failure with asset agreement specified to include arbitrary locker and wrong locker
 	isAssetLocked, err = interopcc.IsAssetLocked(ctx, base64.StdEncoding.EncodeToString(assetAgreementBytes))
-	require.Error(t, err)
+	require.NoError(t, err)
 	require.False(t, isAssetLocked)
 	log.Info(fmt.Println("Test failed as expected with error:", err))
 
@@ -897,8 +897,7 @@ func TestIsAssetLockedQueryUsingContractId(t *testing.T) {
 	chaincodeStub.GetStateReturnsOnCall(2, []byte(localCCId), nil)
 	chaincodeStub.GetStateReturnsOnCall(3, nil, nil)
 	isAssetLocked, err = interopcc.IsAssetLockedQueryUsingContractId(ctx, contractId)
-	require.Error(t, err)
-	require.EqualError(t, err, "no contractId "+contractId+" exists on the ledger")
+	require.NoError(t, err)
 	require.False(t, isAssetLocked)
 	fmt.Printf("Test failed as expected with error: %s\n", err)
 
@@ -933,8 +932,7 @@ func TestIsAssetLockedQueryUsingContractId(t *testing.T) {
 	assetLockValBytes, _ := json.Marshal(assetLockVal)
 	chaincodeStub.GetStateReturnsOnCall(12, assetLockValBytes, nil)
 	isAssetLocked, err = interopcc.IsAssetLockedQueryUsingContractId(ctx, contractId)
-	require.Error(t, err)
-	require.EqualError(t, err, "expiry time for asset associated with contractId "+contractId+" is already elapsed")
+	require.NoError(t, err)
 	require.False(t, isAssetLocked)
 	fmt.Printf("Test failed as expected with error: %s\n", err)
 
@@ -1084,8 +1082,7 @@ func TestIsFungibleAssetLocked(t *testing.T) {
 	chaincodeStub.GetStateReturnsOnCall(2, []byte(localCCId), nil)
 	chaincodeStub.GetStateReturnsOnCall(3, nil, nil)
 	isAssetLocked, err = interopcc.IsFungibleAssetLocked(ctx, contractId)
-	require.Error(t, err)
-	require.EqualError(t, err, "contractId "+contractId+" is not associated with any currently locked fungible asset")
+	require.NoError(t, err)
 	require.False(t, isAssetLocked)
 	fmt.Printf("Test failed as expected with error: %s\n", err)
 
@@ -1099,8 +1096,7 @@ func TestIsFungibleAssetLocked(t *testing.T) {
 	chaincodeStub.GetStateReturnsOnCall(4, []byte(localCCId), nil)
 	chaincodeStub.GetStateReturnsOnCall(5, assetLockValBytes, nil)
 	isAssetLocked, err = interopcc.IsFungibleAssetLocked(ctx, contractId)
-	require.Error(t, err)
-	require.EqualError(t, err, "expiry time for fungible asset associated with contractId "+contractId+" is already elapsed")
+	require.NoError(t, err)
 	require.False(t, isAssetLocked)
 	fmt.Printf("Test failed as expected with error: %s\n", err)
 

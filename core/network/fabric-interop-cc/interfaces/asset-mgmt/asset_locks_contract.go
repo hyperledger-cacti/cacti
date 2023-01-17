@@ -602,3 +602,25 @@ func (amc *AssetManagementContract) GetFungibleAssetTimeToRelease(ctx contractap
 func (amc *AssetManagementContract) GetAllAssetsLockedUntil(ctx contractapi.TransactionContextInterface, lockExpiryTimeSecs uint64) ([]string, error) {
     return amc.assetManagement.GetAllAssetsLockedUntil(ctx.GetStub(), lockExpiryTimeSecs)
 }
+
+func (amc *AssetManagementContract) GetHTLCHash(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto64 string) (string, error) {
+    assetAgreement, err := amc.ValidateAndExtractAssetAgreement(assetAgreementSerializedProto64)
+    if err != nil {
+        return "", err
+    }
+    return amc.assetManagement.GetHTLCHash(ctx.GetStub(), assetAgreement)
+}
+func (amc *AssetManagementContract) GetHTLCHashByContractId(ctx contractapi.TransactionContextInterface, contractId string) (string, error) {
+	return amc.assetManagement.GetHTLCHashByContractId(ctx.GetStub(), contractId)
+}
+func (amc *AssetManagementContract) GetHTLCHashPreImage(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto64 string) (string, error) {
+    assetAgreement, err := amc.ValidateAndExtractAssetAgreement(assetAgreementSerializedProto64)
+    if err != nil {
+        return "", err
+    }
+    return amc.assetManagement.GetHTLCHashPreImage(ctx.GetStub(), assetAgreement)
+}
+func (amc *AssetManagementContract) GetHTLCHashPreImageByContractId(ctx contractapi.TransactionContextInterface, contractId string) (string, error) {
+	return amc.assetManagement.GetHTLCHashPreImageByContractId(ctx.GetStub(), contractId)
+}
+
