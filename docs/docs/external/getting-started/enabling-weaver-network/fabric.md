@@ -254,6 +254,15 @@ Below, we list the template functions with sample code that you, as a developer,
          return true, nil
      }
      ```
+  In addition, you should add the following extra utility functions to enable client applications to query and discover asset state:
+  ```go
+  func (s *SmartContract) GetHTLCHashByContractId(ctx contractapi.TransactionContextInterface, contractId string) (string, error) {
+  	return s.amc.GetHTLCHashByContractId(ctx, contractId)
+  }
+  func (s *SmartContract) GetHTLCHashPreImageByContractId(ctx contractapi.TransactionContextInterface, contractId string) (string, error) {
+  	return s.amc.GetHTLCHashPreImageByContractId(ctx, contractId)
+  }
+  ```
 
 #### For Asset Transfer
 
