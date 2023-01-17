@@ -307,7 +307,7 @@ func (s *SmartContract) UnlockFungibleAsset(ctx contractapi.TransactionContextIn
 func (s *SmartContract) GetHTLCHash(ctx contractapi.TransactionContextInterface, assetAgreementBytesBase64 string) (string, error) {
 	callerChaincodeID, err := wutils.GetLocalChaincodeID(ctx.GetStub())
 	if err != nil {
-		return false, logThenErrorf(err.Error())
+		return "", logThenErrorf(err.Error())
 	}
 	return assetexchange.GetHTLCHash(ctx, callerChaincodeID, assetAgreementBytesBase64)
 }
@@ -317,7 +317,7 @@ func (s *SmartContract) GetHTLCHashByContractId(ctx contractapi.TransactionConte
 func (s *SmartContract) GetHTLCHashPreImage(ctx contractapi.TransactionContextInterface, assetAgreementBytesBase64 string) (string, error) {
 	callerChaincodeID, err := wutils.GetLocalChaincodeID(ctx.GetStub())
 	if err != nil {
-		return false, logThenErrorf(err.Error())
+		return "", logThenErrorf(err.Error())
 	}
 	return assetexchange.GetHTLCHashPreImage(ctx, callerChaincodeID, assetAgreementBytesBase64)
 }
