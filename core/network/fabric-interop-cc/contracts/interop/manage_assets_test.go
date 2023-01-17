@@ -532,7 +532,7 @@ func TestGetHTLCHash(t *testing.T) {
 	// Test failure with no associated asset that is already locked
 	chaincodeStub.GetStateReturnsOnCall(0, nil, nil)
 
-	retVal, err := interopcc.GetHTLCHash(ctx, localCCId, base64.StdEncoding.EncodeToString(assetAgreementBytes))
+	retVal, err := interopcc.GetHTLCHash(ctx, base64.StdEncoding.EncodeToString(assetAgreementBytes))
 	require.Error(t, err)
 	require.EqualError(t, err, "no asset of type " + assetType + " and ID " + assetId + " is locked")
 	log.Info(fmt.Println("Test failed as expected with error:", err))
@@ -540,7 +540,7 @@ func TestGetHTLCHash(t *testing.T) {
 	// Test success querying an asset that is already locked
 	chaincodeStub.GetStateReturnsOnCall(1, assetLockValBytes, nil)
 
-	retVal, err = interopcc.GetHTLCHash(ctx, localCCId, base64.StdEncoding.EncodeToString(assetAgreementBytes))
+	retVal, err = interopcc.GetHTLCHash(ctx, base64.StdEncoding.EncodeToString(assetAgreementBytes))
 	require.NoError(t, err)
 	log.Info(fmt.Println("retVal: ", retVal))
 	lockInfoVal := assetexchange.HashLock{}
