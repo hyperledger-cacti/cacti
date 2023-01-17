@@ -194,12 +194,12 @@ If you want to change the token type used in the `network1` to Hybrid `AliceERC1
 
 Finally, to prepare both `network1` and `network2` for interoperation, run:
 
-* for default configuration, run:
+* If you wish to test the default exchange (ERC-20 tokens for ERC-721 tokens), run::
   ```bash
   ./scripts/initAsset.sh
   ```
   This will issue `100 BobERC20` tokens to each account in `network2` and `AliceERC721` token with id `0` to `Alice` and id `1` to `Bob` in `network1`.
-* if using Hybrid `AliceERC1155` token in `network1`, run:
+* Instead, if you wish to test Alice's exchange of ERC-1155 tokens for Bob's ERC-20 tokens, run:
   ```bash
   ./scripts/initAsset.sh hybrid
   ```

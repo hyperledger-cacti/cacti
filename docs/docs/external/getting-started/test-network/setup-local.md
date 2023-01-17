@@ -782,10 +782,10 @@ Using the sequence of instructions below, you can start two separate Besu networ
     ```
     wget https://hyperledger.jfrog.io/artifactory/besu-binaries/besu/21.7.0/besu-21.7.0.zip
     ```
-	* Add the path to besu-x.y.z/bin to PATH
+	* Add the path to `besu-x.y.z/bin` to your system PATH
 - EthSigner: 
 	* Download and unpack the latest from https://cloudsmith.io/~consensys/repos/ethsigner/packages/?q=tag%3Alatest (Requires Java 11 or later)
-	* Add the path to ethsigner-x.y.z/bin to PATH
+	* Add the path to `ethsigner-x.y.z/bin` to your system PATH
 
 ### Besu Interoperation Node SDK
 

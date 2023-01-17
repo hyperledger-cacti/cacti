@@ -22,7 +22,7 @@ For Besu commands, run from `samples/besu/besu-cli` folder, and for Corda comman
   ./bin/besu-cli asset get-balance --network=network1 --account=1
   ./bin/besu-cli asset get-balance --network=network1 --account=2
   ```
-4. Complete the asset exchange in either of the two different ways:
+4. Complete the asset exchange using following steps:
   - Run the following to trigger `alice` locking `AliceERC721` token with id `0` for `bob` in `network1` for 1 hour
     ```bash
     ./bin/besu-cli asset lock --network=network1 --sender_account=1 --recipient_account=2 --token_id=0 --asset_type=ERC721 --timeout=3600 --hash_base64=ivHErp1x4bJDKuRo6L5bApO/DdoyD/dG0mAZrzLZEIs=
