@@ -44,7 +44,7 @@ Run the following steps:
  ```
 6. Run the following to trigger `bob` locking `10` units of `BobERC20` tokens for `alice` in `network2` for 30 mins:
  ```bash
- ./bin/besu-cli asset lock --network=network2 --sender_account=1 --recipient_account=2 --amount=10 --timeout=1800 --hash_base64=ivHErp1x4bJDKuRo6L5bApO/DdoyD/dG0mAZrzLZEIs=
+ ./bin/besu-cli asset lock --network=network2 --sender_account=2 --recipient_account=1 --amount=10 --timeout=1800 --hash_base64=ivHErp1x4bJDKuRo6L5bApO/DdoyD/dG0mAZrzLZEIs=
  ```
  Note the `contract-id` again for this lock printed as output in above command. Let's refer it `<contract-id-2>` for this demonstration.
 7. Run the following to verify `bob`'s lock:
@@ -53,7 +53,7 @@ Run the following steps:
  ```
 8. Run the following to trigger `alice`'s claim for `10` units of `BobERC20` tokens locked by `bob` in `network2`:
  ```bash
- ./bin/besu-cli asset claim --network=network2 --recipient_account=2 --preimage=secrettext --lock_contract_id=<contract-id-2>
+ ./bin/besu-cli asset claim --network=network2 --recipient_account=1 --preimage=secrettext --lock_contract_id=<contract-id-2>
  ```
 9. Run the following to trigger `bob`'s claim for `AliceERC721` NFT with id `0` locked by `alice` in `network1`:
  ```bash
@@ -68,7 +68,7 @@ In addition to the above commands, following commands can be run if specified ti
  ```
 - If `bob` wants to unlock the token asset, run the following to trigger `bob`'s re-claim for `10 BobERC20` tokens locked in `network2`:
  ```bash
- ./bin/besu-cli asset unlock --network=network2 --lock_contract_id=<contract-id-2> --sender_account=1
+ ./bin/besu-cli asset unlock --network=network2 --lock_contract_id=<contract-id-2> --sender_account=2
  ```
    
 ## AliceERC1155 with BobERC20
@@ -103,7 +103,7 @@ Run the following steps:
  ```
 6. Run the following to trigger `bob` locking `50` units of `BobERC20` tokens for `alice` in `network2`:
  ```bash
- ./bin/besu-cli asset lock --network=network2 --sender_account=1 --recipient_account=2 --amount=50 --timeout=3600 --hash_base64=ivHErp1x4bJDKuRo6L5bApO/DdoyD/dG0mAZrzLZEIs=
+ ./bin/besu-cli asset lock --network=network2 --sender_account=2 --recipient_account=1 --amount=50 --timeout=3600 --hash_base64=ivHErp1x4bJDKuRo6L5bApO/DdoyD/dG0mAZrzLZEIs=
  ```
  Note the `contract-id` again for this lock printed as output in above command. Let's refer it `<contract-id-2>` for this demonstration.
 7. Run the following to verify `bob`'s lock:
@@ -112,7 +112,7 @@ Run the following steps:
  ```
 8. Run the following to trigger `alice`'s claim for `50` units of `BobERC20` tokens locked by `bob` in `network2`:
  ```bash
- ./bin/besu-cli asset claim --network=network2 --recipient_account=2 --preimage=secrettext --lock_contract_id=<contract-id-2>
+ ./bin/besu-cli asset claim --network=network2 --recipient_account=1 --preimage=secrettext --lock_contract_id=<contract-id-2>
  ```
 9. Run the following to trigger `bob`'s claim for `5 AliceERC1155` tokens with id `0` locked by `alice` in `network1`:
  ```bash
@@ -127,7 +127,7 @@ In addition to the above commands, following commands can be run if specified ti
  ```
 - If `bob` wants to unlock the token asset, run the following to trigger `bob`'s re-claim for `50 BobERC20` tokens locked in `network2`:
  ```bash
- ./bin/besu-cli asset unlock --network=network2 --lock_contract_id=<contract-id-2> --sender_account=1
+ ./bin/besu-cli asset unlock --network=network2 --lock_contract_id=<contract-id-2> --sender_account=2
  ```
 
 Run the following to verify the status of the assets owned by `alice` and `bob` in the two networks:

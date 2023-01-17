@@ -36,7 +36,7 @@ For Fabric commands, run from `samples/fabric/fabric-cli` folder, and for Besu c
   ```
 - Run the following to trigger `bob` locking `10` units of `BobERC20` tokens for `alice` in `network2` for 30 mins:
   ```bash
-  ./bin/besu-cli asset lock --network=network2 --sender_account=1 --recipient_account=2 --amount=10 --timeout=1800 --hash_base64=ivHErp1x4bJDKuRo6L5bApO/DdoyD/dG0mAZrzLZEIs=
+  ./bin/besu-cli asset lock --network=network2 --sender_account=2 --recipient_account=1 --amount=10 --timeout=1800 --hash_base64=ivHErp1x4bJDKuRo6L5bApO/DdoyD/dG0mAZrzLZEIs=
   ```
   Note the `contract-id` printed as output in above command. The output line containing `contract-id` (text in base64 after `Lock contract ID:`) would like this:
   ```bash
@@ -49,7 +49,7 @@ For Fabric commands, run from `samples/fabric/fabric-cli` folder, and for Besu c
   ```
 - Run the following to trigger `alice`'s claim for `10` units of `BobERC20` tokens locked by `bob` in `network2`:
   ```bash
-  ./bin/besu-cli asset claim --network=network2 --recipient_account=2 --preimage=secrettext --lock_contract_id=<contract-id-2>
+  ./bin/besu-cli asset claim --network=network2 --recipient_account=1 --preimage=secrettext --lock_contract_id=<contract-id-2>
   ```
 - Run the following to trigger `bob`'s claim for `bond01:a03` locked by `alice` in `network1`:
   ```bash
@@ -73,5 +73,5 @@ In addition to the above commands, following commands can be run if specified ti
   ```
 - If `bob` wants to unlock the token asset, run the following to trigger `bob`'s re-claim for `50 BobERC20` tokens locked in `network2`:
   ```bash
-  ./bin/besu-cli asset unlock --network=network2 --lock_contract_id=<contract-id-2> --sender_account=1
+  ./bin/besu-cli asset unlock --network=network2 --lock_contract_id=<contract-id-2> --sender_account=2
   ```
