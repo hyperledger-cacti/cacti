@@ -150,7 +150,7 @@ jobs:
     
   publish-driver-image:
     if: ${{ always() && github.repository_owner == 'hyperledger-labs' }}
-    needs: [publish-protos, publish-sdk]
+    needs: [publish-protos, publish-fabric-sdk]
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -186,7 +186,7 @@ jobs:
         
   publish-iin-agent-image:
     if: ${{ always() && github.repository_owner == 'hyperledger-labs' }}
-    needs: [publish-protos, publish-sdk]
+    needs: [publish-protos, publish-fabric-sdk]
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
