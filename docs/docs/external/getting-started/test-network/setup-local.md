@@ -84,6 +84,13 @@ To compile the protobufs for Java, do the following:
   ```bash
   make build
   ```
+  
+To compile the protobufs for Solidity, do the following:
+- Navigate to the `common/protos-sol` folder.
+- Run the following command:
+  ```bash
+  make build
+  ```
 
 ## Securing Components
 
@@ -116,9 +123,9 @@ This folder contains code to create and launch networks `network1` and `network2
 - One of the following contracts deployed on `mychannel`, the choice depending on the [interoperability mode](../../interoperability-modes.md) you wish to test:
   * `simplestate` ([Data Sharing](../interop/data-sharing.md)): supports simple transactions (`Create`, `Read`, `Update`, `Delete`) involving storage and lookup of <key, value> pairs.
   * `simplestatewithacl` ([Data Sharing](../interop/data-sharing.md)): identical to `simplestate` but with extra security features to ensure that the Weaver infrastructure cannot be bypassed by a malicious client of the network.
-  * `simpleasset` ([Asset Exchange](../interop/asset-exchange.md)): supports creation, modification, transfer, and deletion, as well as locking, unlocking, and claiming, of simple bonds and tokens (examples of non-fungible and fungible assets respectively).
-  * `simpleassetandinterop` ([Asset Exchange](../interop/asset-exchange.md)): identical to `simpleasset` but where the locking, unlocking, and claiming logic is imported as a library in the chaincode rather than available in the common Fabric Interoperation Chaincode (a Weaver component).
-  * `simpleassettransfer` ([Asset Exchange](../interop/asset-exchange.md) or [Asset Transfer](../interop/asset-transfer.md)): augmentation of `simpleasset` with asset pledging, claiming, and reclaiming features for cross-network transfers.
+  * `simpleasset` ([Asset Exchange](../interop/asset-exchange/overview.md)): supports creation, modification, transfer, and deletion, as well as locking, unlocking, and claiming, of simple bonds and tokens (examples of non-fungible and fungible assets respectively).
+  * `simpleassetandinterop` ([Asset Exchange](../interop/asset-exchange/overview.md)): identical to `simpleasset` but where the locking, unlocking, and claiming logic is imported as a library in the chaincode rather than available in the common Fabric Interoperation Chaincode (a Weaver component).
+  * `simpleassettransfer` ([Asset Exchange](../interop/asset-exchange/overview.md) or [Asset Transfer](../interop/asset-transfer.md)): augmentation of `simpleasset` with asset pledging, claiming, and reclaiming features for cross-network transfers.
 
 | Notes |
 |:------|
@@ -201,7 +208,7 @@ An instance or a relay can be run using a suitable configuration file. Samples a
 Run a relay for `network1` as follows:
 - Navigate to the `core/relay` folder.
 - To launch the server without TLS, leave the configuration file `config/Fabric_Relay.toml` in its default state. Otherwise, edit it to set TLS flags for this relay and the other relays and drivers it will connect to in this demonstration as follows:
-  ```
+  ```toml
   .
   .
   cert_path="credentials/fabric_cert.pem"
@@ -244,7 +251,7 @@ Run a relay for `network1` as follows:
 Run a relay for `network2` as follows (_do this only if you have launched both Fabric networks `network1` and `network2` and wish to test interoperation between them_)
 - Navigate to the `core/relay` folder.
 - To launch the server without TLS, leave the configuration file `config/Fabric_Relay2.toml` in its default state. Otherwise, edit it to set TLS flags for this relay and the other relays and drivers it will connect to in this demonstration as follows:
-  ```
+  ```toml
   .
   .
   cert_path="credentials/fabric_cert.pem"
@@ -611,7 +618,7 @@ Run a relay for `Corda_Network` as follows:
 - Navigate to the `core/relay` folder.
 - (Make sure you've already built the relay by running `make`.)
 - To launch the server without TLS, leave the configuration file `config/Corda_Relay.toml` in its default state. Otherwise, edit it to set TLS flags for this relay and the other relays and drivers it will connect to in this demonstration as follows:
-  ```
+  ```toml
   .
   .
   cert_path="credentials/fabric_cert.pem"
@@ -661,7 +668,7 @@ Run a relay for `Corda_Network` as follows:
 Run a relay for `Corda_Network2` as follows (_do this only if you have launched both Corda networks `Corda_Network` and `Corda_Network2` and wish to test interoperation between them_)
 - Navigate to the `core/relay` folder.
 - To launch the server without TLS, leave the configuration file `config/Corda_Relay2.toml` in its default state. Otherwise, edit it to set TLS flags for this relay and the other relays and drivers it will connect to in this demonstration as follows:
-  ```
+  ```toml
   .
   .
   cert_path="credentials/fabric_cert.pem"
@@ -761,6 +768,95 @@ Run a Corda driver as follows:
   Corda driver gRPC server started. Listening on port 9098
   ```
 
+## Hyperledger Besu Components
+
+Using the sequence of instructions below, you can start two separate Besu networks, each with 4 validator nodes, and EthSigner and application contract. You can also install an interoperation contract in the network. You can build a Besu CLI tool with which you can initialize both networks' ledgers.
+
+### Prerequisites
+
+- Java (JDK and JRE): [sample instructions](https://openjdk.java.net/install/) (Version 11)
+  You need to run Besu instructions in a separate environment (separate terminal or machine) than Corda, as Corda requires Java 8. You can also use `update-alternatives` to switch between java versions.
+- tmux: `sudo apt install tmux`
+- Besu: 
+	* Download and unpack the latest https://github.com/hyperledger/besu/releases/latest. You will find it in the link of the form: https://hyperledger.jfrog.io/artifactory/besu-binaries/besu/x.y.z/besu-x.y.z.zip with x.y.z replaced with the version number. For instance, run the following command after updating version number accordingly.
+    ```
+    wget https://hyperledger.jfrog.io/artifactory/besu-binaries/besu/21.7.0/besu-21.7.0.zip
+    ```
+	* Add the path to `besu-x.y.z/bin` to your system PATH
+- EthSigner: 
+	* Download and unpack the latest from https://cloudsmith.io/~consensys/repos/ethsigner/packages/?q=tag%3Alatest (Requires Java 11 or later)
+	* Add the path to `ethsigner-x.y.z/bin` to your system PATH
+
+### Besu Interoperation Node SDK
+
+A client-layer library is defined in the `sdks/besu/interoperation-node-sdk` folder. This contains functions for Besu web3JS based applications to exercise interoperation capabilities via several utility/helper functions. The Besu-CLI tool, which we will use later, depends on this library.
+
+To build the library, do the following:
+- Navigate to the `sdks/besu/interoperation-node-sdk` folder.
+- Run the following command:
+  ```bash
+  make build-local
+  ```
+
+### Besu Network
+
+The code for this lies in the `tests/network-setups/besu` folder.
+
+This folder contains code to create and launch networks `Network1` and `Network2` of identical specifications:
+- Network: 4 validator nodes, 1 EthSigner node.
+- `Network1` uses `8545` port for EthSigner while `Network2` uses `9544` port for EthSigner.
+
+Follow the instructions below to build and launch the networks:
+- Navigate to the `tests/network-setups/besu` folder.
+- To spin up both Network1 and Network2, run:
+  ```bash
+  make start
+  ```
+
+| Notes |
+|:------|
+| If you do not wish to test Besu-Besu interoperation, you can choose to launch only one of the two networks. For `Network1`, run `make start-network1`, and for `Network2`, run `make start-network2` |
+
+For more information, refer to the associated [README](https://github.com/hyperledger-labs/weaver-dlt-interoperability/tree/master/tests/network-setups/besu).
+
+### Contracts
+
+- `AssetExchangeContract` must be deployed which is present in `core/network/besu/contracts/interop/manageAssetAny.sol`. This contract is deployed along with application contract.
+- Application contract `simpleasset`, located in `samples/besu/simpleasset` directory (for [Asset Exchange](../interop/asset-exchange/overview.md)), which supports creation, modification, transfer, and deletion, as well as locking, unlocking, and claiming, of simple `AliceERC20` and `BobERC20` tokens (examples of fungible assets), or `AliceERC721` and `BobERC721` tokens (example of non-fungible assets), or `AliceERC1155` and `BobERC1155` tokens (example of hybrid assets).
+
+To deploy `simpleasset` with `AssetExchangeContract` on both Besu networks, navigate to `samples/besu/simpleasset` folder, and run:
+```bash
+make deploy-contracts
+```
+
+| Notes |
+|:------|
+| If you chose to launch only one of the two networks, then for `Network1`, run `make deploy-contract-network1`, and for `Network2`, run `deploy-contract-network2` |
+
+### Besu Client (besu-cli)
+
+The CLI is used to interact with a Besu network, configure it and run contract transactions to record data on the ledger or query data.
+
+The `besu-cli` Node.js source code is located in the `samples/besu/besu-cli` folder.
+
+#### Prerequisites
+
+If you are using a Linux system, make sure that lib64 is installed.
+
+| Notes |
+|:------|
+| For the Node.js version of the `besu-cli`, the setup and running instructions below were tested with all Node.js versions from v11.14.0 to v14.17.3. |
+
+#### Installation
+
+You can install `besu-cli` as follows:
+- Navigate to the `samples/besu/besu-cli` folder.
+- Run the following to install dependencies:
+  ```bash
+  make build-local
+  ```
+- Use the `besu-cli` executable in the `bin` folder for [subsequent actions](./ledger-initialization.md).
+
 ## Tear Down the Setup
 
 Bring down the test network's components as follows:
@@ -773,6 +869,12 @@ Bring down the test network's components as follows:
     ```
 - To bring down all the running Fabric networks:
   * Navigate to the `tests/network-setups/fabric/dev` folder.
+  * Run the following:
+    ```bash
+    make clean
+    ```
+- To bring down all the running Besu networks:
+  * Navigate to the `tests/network-setups/besu` folder.
   * Run the following:
     ```bash
     make clean

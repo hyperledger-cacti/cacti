@@ -31,21 +31,23 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "gluegun": "latest",
+    "@hyperledger-labs/weaver-besu-interop-sdk": "~1.5.0",
+    "@hyperledger-labs/weaver-protos-js": "~1.5.0",
     "@truffle/contract": "^4.2.14",
+    "gluegun": "latest",
     "winston": "^3.3.3"
   },
   "devDependencies": {
-    "@types/node": "^12.7.11",
     "@types/jest": "^24.0.18",
-    "ts-node": "^8.4.1",
+    "@types/node": "^12.7.11",
+    "jest": "^24.1.0",
+    "prettier": "^1.12.1",
     "ts-jest": "^24.1.0",
+    "ts-node": "^8.4.1",
     "tslint": "^5.12.0",
     "tslint-config-prettier": "^1.17.0",
     "tslint-config-standard": "^8.0.1",
-    "typescript": "^3.6.3",
-    "prettier": "^1.12.1",
-    "jest": "^24.1.0"
+    "typescript": "^3.6.3"
   },
   "jest": {
     "preset": "ts-jest",

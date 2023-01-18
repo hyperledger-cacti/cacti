@@ -382,7 +382,7 @@ describe("InteroperableHelper", () => {
                     JSON.stringify(argsIndices),
                     JSON.stringify(viewAddresses),
                     JSON.stringify(views64),
-                    JSON.stringify(["", ""])
+                    JSON.stringify([[], []])
                 ).resolves(true);
             
             const vpResult = JSON.stringify(vpJSON);

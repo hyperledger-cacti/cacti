@@ -184,9 +184,9 @@ func (s *SmartContract) PledgeAsset(ctx contractapi.TransactionContextInterface,
 	}
 
 	// Pledge the asset using common (library) logic
-	if pledgeId, err := wutils.PledgeAsset(ctx, assetJSON, assetType, id, asset.Owner, remoteNetworkId, recipientCert, expiryTimeSecs); err == nil {
+	if pledgeId, err := wutils.PledgeAsset(ctx, assetJSON, assetType, id, remoteNetworkId, recipientCert, expiryTimeSecs); err == nil {
 		// Delete asset state using app-specific logic
-		return pledgeId, s.DeleteAsset(ctx, assetType, id)
+		err = s.DeleteAsset(ctx, assetType, id)
 		if err != nil {
 			return pledgeId, err
 		}
@@ -202,21 +202,17 @@ func (s *SmartContract) ClaimRemoteAsset(ctx contractapi.TransactionContextInter
 	// (Optional) Ensure that this function is being called by the Fabric Interop CC
 
 	// Claim the asset using common (library) logic
-	claimer, err := getECertOfTxCreatorBase64(ctx)
+	claimer, err := wutils.GetECertOfTxCreatorBase64(ctx)
 	if err != nil {
 		return err
 	}
-	pledgeAssetDetails, err := wutils.ClaimRemoteAsset(ctx, pledgeId, claimer, remoteNetworkId, pledgeBytes64)
+	
+	asset, err := getBondAssetFromPledge(pledgeBytes64)
 	if err != nil {
 		return err
 	}
-
+	
 	// Validate pledged asset details using app-specific-logic
-	var asset BondAsset
-	err = json.Unmarshal(pledgeAssetDetails, &asset)
-	if err != nil {
-		return err
-	}
 	if asset.ID == "" {
 		return fmt.Errorf("cannot claim asset %s as it has not been pledged in %s", id, remoteNetworkId)
 	}
@@ -229,6 +225,12 @@ func (s *SmartContract) ClaimRemoteAsset(ctx contractapi.TransactionContextInter
 	if asset.Owner != owner {
 		return fmt.Errorf("cannot claim asset %s as it has not been pledged by the given owner", id)
 	}
+	
+	// Question in PR: Is following return `pledgeAssetDetails` required from utils?
+	_, err = wutils.ClaimRemoteAsset(ctx, pledgeId, remoteNetworkId, pledgeBytes64)
+	if err != nil {
+		return err
+	}
 
 	// Recreate the asset in this network and chaincode using app-specific logic: make the recipient the owner of the asset
 	return s.CreateAsset(ctx, assetType, id, claimer, asset.Owner, asset.FaceValue, asset.MaturityDate.Format(time.RFC822))
@@ -238,28 +240,30 @@ func (s *SmartContract) ClaimRemoteAsset(ctx contractapi.TransactionContextInter
 func (s *SmartContract) ReclaimAsset(ctx contractapi.TransactionContextInterface, pledgeId, recipientCert, remoteNetworkId, claimStatusBytes64 string) error {
 	// (Optional) Ensure that this function is being called by the Fabric Interop CC
 
-	// Reclaim the asset using common (library) logic
-	claimAssetDetails, pledgeAssetDetails, err := wutils.ReclaimAsset(ctx, pledgeId, recipientCert, remoteNetworkId, claimStatusBytes64)
+	claimAsset, err := getBondAssetFromClaimStatus(claimStatusBytes64)
 	if err != nil {
 		return err
 	}
-
-	// Validate reclaimed asset details using app-specific-logic
-	var claimAsset, pledgeAsset BondAsset
-	err = json.Unmarshal(claimAssetDetails, &claimAsset)
-	if err != nil {
-		return err
-	}
+	
 	if claimAsset.Type != "" &&
 		claimAsset.ID != "" &&
 		claimAsset.Owner != "" {
-		// Run checks on the claim parameter to see if it is what we expect and to ensure it has not already been made in the other network
-		if !matchClaimWithAssetPledge(pledgeAssetDetails, claimAssetDetails) {
-			return fmt.Errorf("claim info for asset with pledge id %s does not match pledged asset details on ledger: %s", pledgeId, pledgeAssetDetails)
+		// Check if there was a pledge made for the claimed asset
+		bondAssetPledgeMap, err := getAssetPledgeIdMap(ctx, claimAsset.Type, claimAsset.ID)
+		if (err != nil) || (bondAssetPledgeMap.PledgeID != pledgeId) {
+			return fmt.Errorf("asset %s:%s was not pledged with pledgeId %s", claimAsset.Type, claimAsset.ID, pledgeId)
 		}
 	}
 
+	// Reclaim the asset using common (library) logic
+	// Question in PR: is claimAssetDetails required from utils to be returned?
+	_, pledgeAssetDetails, err := wutils.ReclaimAsset(ctx, pledgeId, recipientCert, remoteNetworkId, claimStatusBytes64)
+	if err != nil {
+		return err
+	}
+	
 	// Recreate the asset in this network and chaincode using app-specific logic
+	var pledgeAsset BondAsset
 	err = json.Unmarshal(pledgeAssetDetails, &pledgeAsset)
 	if err != nil {
 		return err
@@ -390,7 +394,7 @@ func (s *SmartContract) GetAssetClaimStatus(ctx contractapi.TransactionContextIn
 
 // isCallerAssetOwner returns true only if the invoker of the transaction is also the asset owner
 func isCallerAssetOwner(ctx contractapi.TransactionContextInterface, asset *BondAsset) bool {
-	caller, err := getECertOfTxCreatorBase64(ctx)
+	caller, err := wutils.GetECertOfTxCreatorBase64(ctx)
 	if err != nil {
 		fmt.Println(err.Error())
 		return false

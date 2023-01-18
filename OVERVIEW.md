@@ -30,13 +30,15 @@ You can find details on these use cases (or _modes_ of interoperation) in [Inter
 
 _Relay_ modules owned and managed by networks enable cross-network communications or even communications between networks and enterprises systems of record. Cross-network identity management occurs on a separate plane from the information exchanges, and our vision for this is described in [Decentralized Identity](https://hyperledger-labs.github.io/weaver-dlt-interoperability/docs/external/architecture-and-design/decentralized-identity) and [Distributed Identity Management for Interoperation](./rfcs/models/identity/decentralized-network-identity-discovery-management.md).
 
-## Architecture and Deployment
+## System Design and Deployment
 
-Because DLTs can be highly divergent, it is difficult to create components that are not in some way architected to fit a particular technology. But the templates these components are based on can be standardized, as is illustrated in the architecture diagram below which shows a Hyperledger Fabric network at the left and a Corda network at the right, both augmented for interoperability with each other.
+The Weaver system consists of standardized components as well as DLT-specific components, both of which must be incorporated into a given network to make it interoperable with others. Because DLTs can be highly divergent, some of these components may look very different in different DLTs, as is illustrated in the architecture diagram below which shows a typical Hyperledger Fabric network at the left and a typical Corda network at the right, both augmented for interoperability with each other. (The components that look different still follow a standardized template and offer a similar set of capabilities, as we will show further below.)
 
 <img src="./resources/images/arch-protocol.png">
 
 In the middle, for cross-network communications, lie DLT-agnostic relays, which can have one or more DLT-specific _drivers_ to interpret requests and orchestrate response collection from the network. _Interoperation modules_ lie within the network and operate the way smart contracts for that platform natively do. Hence, in a Fabric network, these are implemented and deployed as _chaincode_ on all peers, whereas in a Corda network, they are implemented and deployed within a special _Interop Cordapp_ that can trigger flows across the network. Lastly, for applications that are already deployed on these networks to exercise interoperation capabilities, Weaver provides SDK extensions and libraries.
+
+### Example: Data Sharing Protocol Overview
 
 For a data sharing use case, the following are the functions that are performed network-wide using the interoperation modules (i.e., through consensus):
 - Access control of requests for data from another network
@@ -46,7 +48,111 @@ For a data sharing use case, the following are the functions that are performed 
 
 The basis for this protocol is a priori knowledge of counterparty networks' membership providers' certificate chains.
 
-For more details, see the [RFCs](./rfcs).
+### Architecture
+
+The Weaver components and tools are illustrated in the below architecture diagram, independent of the networks into which they are incorporated.
+
+<p align="center" width="100%">
+  <img src="./resources/images/weaver-architecture.png" width="75%">
+</p>
+
+#### Relays
+
+| Summary |
+|:------|
+| These are modules that acts as gateways to a network, both as an ingress and an egress point. A relay discovers other networks’ relays and routes messages for cross-network transactions. A relay offers an API to applications and to other relays that is not tied to a specific DLT or application implementation. |
+
+These modules act as fulcra of inter-network (or inter-ledger) discovery and communication. A relay acts as a gateway for a network, serving as both an ingress and an egress point.
+
+Relays connect clients, or applications, in one network, with the peers of another using a DLT-neutral, asynchronous, event-based, message passing protocol.
+(Presently, the protocol is stateless but we will enhance the relay in the future to support stateful fault-tolerant communication with message queueing, prioritization, and load balancing. Discovery will also be a future addition, with relays currently channelling requests and responses using other networks’ relay addresses.)
+
+A Weaver relay consists of a gRPC service and uses gRPC for communication. It offers 2 APIs:
+- To a network app/client: trigger cross-network operations
+- To other relays: cross-network requests/responses
+
+For interoperability, a network must own or access at least one relay, though multiple would be useful for redundancy and failover. A relay is trustless, as it cannot impact integrity and confidentiality for end-to-end protocols. Therefore, a relay can be supplied and maintained by the network’s consortium as a whole or just any of the constituent organizations without impacting network security. It can also be an external service.
+
+A Weaver relay can be used by any network built on any present or future DLT with the only extra effort required in customizing its configuration for communication with other network components.
+
+Currently, Weaver relays support cross-network data queries (returning a ledger state view in response to a view request). Cross-network transaction invocations and event publish/subscribe will be supported in the future.
+
+#### Drivers
+
+| Summary |
+|:------|
+| These are modules that can be “plugged into” relays that can talk specific  DLT protocols and have access to specific portions of a distributed ledger. They translate relayed messages into instructions for collecting ledger state proofs and (in the future) issuing instructions to update ledger state. |
+
+These are ledger-specific relay plug-ins, which can be activated by relays for the following purposes in a protocol:
+Translation of a DLT-neutral relay request coming from outside the network to a DLT- and ledger-specific instruction or query that can be executed within the network
+- Generating a ledger state view to return in a response.
+- In the data sharing protocol, a driver orchestrates the generation of a response and the collection of authenticity proof to satisfy the verification policy within the external request. (Presently, Weaver drivers only serve a data query purpose, but in the future, we will add capabilities for transaction invocation (block creation) and event transmission.)
+
+A driver is implemented as a typical Layer-2 app with a wallet identity for a given DLT platform (using its SDK). It must possess a network-issued client credential so it can invoke contracts, but like the relay it is coupled with, it is untrusted for integrity and confidentiality purposes. The credential can therefore be issued by the network’s consortium as a whole or by an individual constituent organization; this decision does not impact security.
+
+Drivers are implemented in Weaver for Fabric and Corda, and a Besu implementation is underway. Once implemented for a given DLT, the driver module can be reused in any network built on that DLT with minimal network-specific customizations.
+
+In our current model, a driver is deployed as a service loosely coupled with a relay, but other deployment models can be considered in the future where they are offered as extensions of relays. Depending on the nature of the wallet credential possessed by a driver, it can be used for a single ledger within the network or all the ledgers within the network or a private data collection (if the DLT platform supports these).
+
+#### Interoperation Module
+
+| Summary |
+|:------|
+| This is a set of procedures for ledger state exposure and validation and asset management in the context of cross-network operations. They are implemented and deployed as smart contracts and distributed application flows in DLT-specific ways. |
+
+This module implements the core basic network functions that any cross-network transaction is comprised of: access control, proof generation and verification, asset locks, claims, pledges, and reclaims.
+
+This module is deployed on, and its functions executed by, every network peer that is involved in a cross-network transaction. The implementation and deployment is DLT-specific and is based on the template outlined for the implementation and deployment of smart contracts and distributed applications on a particular DLT.
+- For Hyperledger Fabric networks, this module is implemented as chaincode, which is the embodiment of a smart contract in that platform.
+- For Corda networks, this module is implemented as a CorDapp, which is the embodiment of a distributed application (including contracts) on that platform.
+- For Hyperledger Besu networks (and Ethereum-based networks in general), this module is implemented as a set of Solidity contracts.
+
+The logic behind this is that the core functions for interoperation must be executed by the network as a collective (group) rather than by a trusted proxy module. And because the network’s trustworthiness is given by how it executes contracts and finalizes transactions, Weaver can guarantee that the proof and asset management functions are as trustworthy and as secure as the networks running them.
+
+Weaver defines a template function API to be implemented by every interoperation module. For a given DLT, an interoperation module must be built from scratch using this template. But once built for a particular DLT, it can be reused for any network built on that DLT’s stack.
+
+Access control and proof verification policies as well as foreign networks’ memberships and authority certificates are maintained on a networks’ ledger through consensus via these interoperation modules.
+
+#### Application Helpers
+
+| Summary |
+|:------|
+| This is a package of library functions and API for applications to use as an SDK. Offered functions can be called from suitable locations within applications’ workflows. |
+
+This is an SDK consisting of a package of library functions and an API for applications to exercise, i.e., trigger operations involved in cross-network transactions.
+
+These library functions enable distributed applications on DLT networks to be interoperation-ready with minimal adaptation. An application developer just needs to determine where in the business workflow a cross-network transaction (data sharing, asset exchange, or asset transfer) is required, and insert a suitable Weaver API function call to trigger it. The API hides the complexity of the underlying communication and commitment mechanisms.
+
+Core functions currently offered by the Weaver SDK are standardized across DLTs, though implemented in both DLT- and language-specific ways:
+Data sharing function that underneath runs a cross-network request-response protocol and commits to local ledger after proof validation.
+Asset locks, claims, and unlocks for exchanges.
+Asset pledges and redemptions for transfers.
+
+Weaver currently offers SDKs for the following DLTs:
+- In Fabric for JS/TS-based apps, built on Fabric Node SDK
+- In Fabric for Go-based apps, built on Fabric Go SDK
+- In Corda for Java/Kotlin-based apps, built on Corda SDK
+- In Besu (partial support, only for asset exchanges) for JS-based apps, built on Web3.js
+
+#### Identity Service
+
+| Summary |
+|:------|
+| This is a module that consists of both a service and an agent. The service exposes the network’s identity providers’ or certification authorities’ certificate chains for external parties. The agent syncs such certificates from external networks. |
+
+This is a service coupled with an agent that syncs membership and certificates with other networks to establish a trust basis for interoperation.
+
+The service exposes the local network’s membership, i.e., the different stakeholders (corresponding to network subdivisions or even individual peer nodes) who collectively maintain shared ledgers through consensus, and the certificate chains of the respective stakeholders identity providers’ (root and intermediate certificates), to other networks’ identity agents.
+- In a Fabric network, these consist of certificate chains of the organizations’ MSP CAs
+- In a Corda network, these consist of network and doormen CA certificates as well as individual nodes’ CA certificates.
+
+The agent syncs other networks’ memberships and certificates and records (or updates) them on its network’s ledgers (using consensus) via the deployed Weaver Interoperation Module.
+
+An identity service is necessary for a permissioned network and an identity agent is necessary whenever the counterparty network is permissioned. Without this, access control and proof verification (two core Weaver functions) cannot be performed independently and in a foolproof manner.
+
+Currently, Weaver offers reference code and instructions to launch an identity service. (Some of that code is specific  for Fabric and Corda networks.) Design specifications exist in Weaver for building a scalable solution using DIDs, public registries, and verifiable credentials, and an implementation is underway. (A PoC was built in the past for Fabric, using Indy as a candidate DID registry.)
+
+### Relays and Drivers
 
 The architecture of the relay, which we envision can be the basis of a universal DLT interoperability standard, is illustrated in the figure below. As mentioned above, there are both DLT-agnostic components as well as DLT-specific components called drivers. Relays can manage requests and responses for different interoperability modes as well as targets (other DLT networks or ERP systems).
 
@@ -55,6 +161,20 @@ The architecture of the relay, which we envision can be the basis of a universal
 Because relays are additional components introduced by Weaver into a DLT network, the nature of their deployment is a matter of concern (and debate). Below, you can see three ways in which a relay can be deployed within a typical Hyperledger Fabric network, each with different trust assumptions and governance requirements.
 
 <img src="./resources/images/relay-deployment-models.png">
+
+### Protocol Building Blocks
+
+The capabilities that need to be supported within the network and in the cross-network communication modules for the three interoperability modes (data sharing, asset exchange, and asset transfer) are illustrated in the figure below.
+
+<p align="center" width="100%">
+  <img src="./resources/images/weaver-building-blocks.png" width="75%">
+</p>
+
+To support any of the Weaver protocols, the *Core Network Capabilities* must be implemented in the interoperation module for a given network and the *Relay Capabilities* must be implemented in the relay/driver combination for that network.
+
+### Design Specifications
+
+For more details on the various architectural components, building blocks, and cross-network protocols, see the [Weaver RFCs](./rfcs).
 
 ## Articles
 

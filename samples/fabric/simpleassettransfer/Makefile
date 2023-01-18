@@ -27,8 +27,3 @@ clean-vendor:
 
 clean: clean-vendor
 	rm simpleassettransfer
-
-test-local: run-vendor
-	go test -v .
-
-

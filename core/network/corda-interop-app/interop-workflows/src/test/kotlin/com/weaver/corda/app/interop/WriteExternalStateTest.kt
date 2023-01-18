@@ -52,12 +52,12 @@ class WriteExternalStateTest {
     data class TestData(
         @SerializedName("view64") val B64View: String,
         @SerializedName("confidential_view64") val B64ViewConfidential: String,
-        @SerializedName("confidential_view_content64") val B64ViewContents: String
+        @SerializedName("confidential_view_content64") val B64ViewContents: List<String>
     )
-    val fabricTestDataJSON = javaClass.getResource("/test_data/fabric_viewdata.json").readText(Charsets.UTF_8)
+    val fabricTestDataJSON = javaClass.getResource("/test_data/fabric_viewdata_1_org.json").readText(Charsets.UTF_8)
     val fabricTestData = Gson().fromJson(fabricTestDataJSON, TestData::class.java)
     
-    val fabricCert = javaClass.getResource("/test_data/fabric_cacert.pem").readText(Charsets.UTF_8)
+    val fabricCert = javaClass.getResource("/test_data/fabric_cacert_org1.pem").readText(Charsets.UTF_8)
 
     val fabricVerificationPolicy = VerificationPolicyState(
             securityDomain = fabricNetwork,

@@ -19,6 +19,11 @@ jobs:
   asset-exchange-besu:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
+      
+    strategy:
+      fail-fast: false
+      matrix:
+        app_contract: ["AliceERC1155", "AliceERC20", "AliceERC721"]
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -30,7 +35,33 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
+
+      - name: Use Protoc 3.15
+        run: |
+          curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.15.6/protoc-3.15.6-linux-x86_64.zip
+          unzip protoc-3.15.6-linux-x86_64.zip -d protoc
           
+      # PROTOS
+      - name: Build JS Protos
+        run: |
+          export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
+          make build
+        working-directory: common/protos-js
+        
+      # PROTOS
+      - name: Build Solidity Protos
+        run: |
+          export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
+          make build
+        working-directory: common/protos-sol
+
+      # BESU SDK
+      - name: Setup BESU SDK
+        run: |
+         npm link
+         make build-local
+        working-directory: sdks/besu/interoperation-node-sdk 
+        
       # BESU NETWORK
       - name: Start Besu Network
         run: |
@@ -54,10 +85,10 @@ jobs:
        # BESU CLI
       - name: Setup BESU CLI init
         run: |
-         npm install .
+         make build-local
          cp config.template.json tmp.json
          cp config.template.json tmp.json
-         jq -r '.network1.tokenContract |= "../simpleasset/build/contracts/AliceERC20.json"' tmp.json > config.json
+         jq -r '.network1.tokenContract |= "../simpleasset/build/contracts/${{ matrix.app_contract }}.json"' tmp.json > config.json
          cp config.json tmp.json
          jq -r '.network2.tokenContract |= "../simpleasset/build/contracts/BobERC20.json"' tmp.json > config.json
          rm tmp.json
@@ -67,77 +98,95 @@ jobs:
         run: |
           export PATH="${PWD}/bin:$PATH"
           COUNT=0
-          TOTAL=15
-          tokencontract=( "AliceERC1155" "AliceERC20" "AliceERC721") 
-          for (( count=0; count<3; count++ ))
-          do 
-          cp config.template.json tmp.json
-          cp config.template.json tmp.json
-          jq  -r ".network1.tokenContract |= \"../simpleasset/build/contracts/${tokencontract[$count]}.json\"" tmp.json > config.json
-          cp config.json tmp.json
-          jq -r '.network2.tokenContract |= "../simpleasset/build/contracts/BobERC20.json"' tmp.json > config.json
-          rm tmp.json
-
-          # issue 1 tokens to account 1
-          # & lock 1 token for account 2 in network 2
-          if [ ${tokencontract[$count]} == "AliceERC20" ]; then
-              besu-cli asset issue --network=network1 --account=1 --amount=1 --asset_type=ERC20
-              besu-cli asset lock --network=network1 --sender_account=1 --recipient_account=2 --amount=1 --timeout=1000 1> tmp.out
-          elif [ ${tokencontract[$count]} == "AliceERC1155" ]; then
-              besu-cli asset issue --network=network1 --account=1 --amount=1 --token_id=0 --token_data="" --asset_type=ERC1155 
-              besu-cli asset lock --network=network1 --sender_account=1 --recipient_account=2 --amount=1 --token_id=0 --timeout=1000 --asset_type=ERC1155 1> tmp.out
+          TOTAL=10
+          
+          # HTLC Params
+          timeout=1000
+          hashBase64="ivHErp1x4bJDKuRo6L5bApO/DdoyD/dG0mAZrzLZEIs="
+          preimage="secrettext"
+          
+          # issue tokens to account 1
+          initAmount=10
+          transferAmount=5
+          tokenId=0
+          # & lock 5 token for account 2 in network 1
+          if [ ${{ matrix.app_contract }} == "AliceERC20" ]; then
+              besu-cli asset issue --network=network1 --account=1 --amount=${initAmount} --asset_type=ERC20
+              besu-cli asset lock --network=network1 --sender_account=1 --recipient_account=2 --amount=${transferAmount} --timeout=${timeout} --hash_base64=${hashBase64} 1> tmp.out
+          elif [ ${{ matrix.app_contract }} == "AliceERC1155" ]; then
+              besu-cli asset issue --network=network1 --account=1 --amount=${initAmount} --token_id=${tokenId} --token_data="" --asset_type=ERC1155 
+              besu-cli asset lock --network=network1 --sender_account=1 --recipient_account=2 --amount=${transferAmount} --token_id=${tokenId} --timeout=${timeout} --asset_type=ERC1155 --hash_base64=${hashBase64} 1> tmp.out
           else
-              besu-cli asset issue --network=network1 --account=1 --amount=1 --token_id=0 --asset_type=ERC721 
-              besu-cli asset lock --network=network1 --sender_account=1 --recipient_account=2 --amount=1 --token_id=0 --asset_type=ERC721 --timeout=1000 1> tmp.out
+              initAmount=1
+              transferAmount=1
+              besu-cli asset issue --network=network1 --account=1 --token_id=${tokenId} --asset_type=ERC721 1> tmp.out
+              tokenId=$(cat tmp.out | grep "New ERC721 token minted with id " | sed -e 's/New ERC721 token minted with id //')
+              cat tmp.out
+              echo $tokenId
+              besu-cli asset lock --network=network1 --sender_account=1 --recipient_account=2 --token_id=${tokenId} --asset_type=ERC721 --timeout=${timeout} --hash_base64=${hashBase64} 1> tmp.out
           fi
           
-          cat tmp.out | grep "Account balance of the sender in Network network1: 1" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          balanceRem=$((initAmount-transferAmount))
+          cat tmp.out | grep "Account balance of the sender in Network network1: ${initAmount} " && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out | grep "Account balance of the sender in Network network1: ${balanceRem}" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out | grep "Account balance of the recipient in Network network1: 0" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
 
           tmp_string=$(cat tmp.out | grep "Lock contract ID:")
           arrIN=(${tmp_string//:/ })
           LOCK_ID=${arrIN[3]}
-          tmp_string=$(cat tmp.out | grep "Preimage:")
-          arrIN=(${tmp_string//:/ })
-          PREIMAGE=${arrIN[1]}
 
           # Is Asset locked
           besu-cli asset is-locked --network=network1 --lock_contract_id=$LOCK_ID 1> tmp.out
           cat tmp.out | grep "in Network network1: true" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
-
-          sleep 30
           
           # Claim asset
-          besu-cli asset claim --network=network1 --lock_contract_id=$LOCK_ID --recipient_account=2 --preimage=$PREIMAGE 1> tmp.out
-          cat tmp.out | grep "Account balance of the recipient in Network network1 after claiming: 1" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          besu-cli asset claim --network=network1 --recipient_account=2 --preimage=${preimage} --token_id=${tokenId} --lock_contract_id=$LOCK_ID 1> tmp.out
+          cat tmp.out | grep "Account balance of the recipient in Network network1 before claiming: 0" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out | grep "Account balance of the recipient in Network network1 after claiming: ${transferAmount}" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
 
-          # test unlock
-          if [ ${tokencontract[$count]} == "AliceERC20" ]; then
-              besu-cli asset issue --network=network1 --account=1 --amount=1 --asset_type=ERC20
-              besu-cli asset lock --network=network1 --sender_account=1 --recipient_account=2 --amount=1 --timeout=5 1> tmp.out
-          elif [ ${tokencontract[$count]} == "AliceERC1155" ]; then
-              besu-cli asset issue --network=network1 --account=1 --amount=1 --token_id=1 --token_data="" --asset_type=ERC1155 
-              besu-cli asset lock --network=network1 --sender_account=1 --recipient_account=2 --amount=1 --token_id=1 --timeout=5 --asset_type=ERC1155 1> tmp.out
+          ###### test unlock #######
+          timeout=20
+          initAmount=5
+          recipientAmt=0
+          transferAmount=2
+          tokenId=1
+          if [ ${{ matrix.app_contract }} == "AliceERC20" ]; then
+              recipientAmt=5
+              besu-cli asset lock --network=network1 --sender_account=1 --recipient_account=2 --amount=${transferAmount} --timeout=${timeout} --hash_base64=${hashBase64} 1> tmp.out
+          elif [ ${{ matrix.app_contract }} == "AliceERC1155" ]; then
+              besu-cli asset issue --network=network1 --account=1 --amount=${initAmount} --token_id=${tokenId} --token_data="" --asset_type=ERC1155
+              besu-cli asset lock --network=network1 --sender_account=1 --recipient_account=2 --amount=${transferAmount} --token_id=${tokenId} --timeout=${timeout} --asset_type=ERC1155 --hash_base64=${hashBase64} 1> tmp.out
           else
-              besu-cli asset issue --network=network1 --account=1 --amount=1 --token_id=1 --asset_type=ERC721 
-              besu-cli asset lock --network=network1 --sender_account=1 --recipient_account=2 --amount=1 --token_id=1 --asset_type=ERC721 --timeout=5 1> tmp.out
+              initAmount=1
+              transferAmount=1
+              recipientAmt=1
+              besu-cli asset issue --network=network1 --account=1 --token_id=${tokenId} --asset_type=ERC721 1> tmp.out
+              tokenId=$(cat tmp.out | grep "New ERC721 token minted with id " | sed -e 's/New ERC721 token minted with id //')
+              cat tmp.out
+              echo $tokenId
+              besu-cli asset lock --network=network1 --sender_account=1 --recipient_account=2 --token_id=${tokenId} --asset_type=ERC721 --timeout=${timeout} --hash_base64=${hashBase64} 1> tmp.out
           fi
-          cat tmp.out | grep "Account balance of the sender in Network network1: 0" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          
+          balanceRem=$((initAmount-transferAmount))
+          cat tmp.out | grep "Account balance of the sender in Network network1: ${initAmount}" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out | grep "Account balance of the sender in Network network1: ${balanceRem}" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out | grep "Account balance of the recipient in Network network1: ${recipientAmt}" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
 
           tmp_string=$(cat tmp.out | grep "Lock contract ID:")
           arrIN=(${tmp_string//:/ })
           LOCK_ID=${arrIN[3]}
-          tmp_string=$(cat tmp.out | grep "Preimage:")
-          arrIN=(${tmp_string//:/ })
-          PREIMAGE=${arrIN[1]}
+          
+          sleep $timeout
 
-          besu-cli asset unlock --network=network1 --lock_contract_id=$LOCK_ID --sender_account=1 --token_id=1 1> tmp.out
-          cat tmp.out | grep "after unlocking: 1" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          besu-cli asset unlock --network=network1 --lock_contract_id=$LOCK_ID --sender_account=1 --token_id=${tokenId} 1> tmp.out
+          cat tmp.out | grep "before unlocking: ${balanceRem}" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out | grep "after unlocking: ${initAmount}" && COUNT=$(( COUNT + 1 )) && echo "PASS"
           cat tmp.out
-          done
+          
           # RESULT
           echo "Passed $COUNT/$TOTAL Tests."
 

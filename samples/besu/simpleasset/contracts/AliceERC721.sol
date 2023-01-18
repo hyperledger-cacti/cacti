@@ -15,12 +15,8 @@ contract AliceERC721 is ERC721, transferInterface {
     address owner;
 
     constructor() ERC721("Alice NFT", "AliceNFT") {
-        // for (uint256 i = 0; i < 5; i++) {
-        //     _tokenIds.increment();
-        //     uint256 newItemId = _tokenIds.current();
-        //     _safeMint(msg.sender, newItemId);
-        // }
         owner = msg.sender;
+        _tokenIds.reset();
     }
 
     function mint(address to) public {

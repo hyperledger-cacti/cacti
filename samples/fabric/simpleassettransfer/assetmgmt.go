@@ -13,6 +13,7 @@ import (
 	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 	log "github.com/sirupsen/logrus"
+	wutils "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/utils"
 )
 
 // asset specific checks (ideally an asset in a different application might implement checks specific to that asset)
@@ -140,7 +141,7 @@ func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, 
 	}
 	if claimed {
 		// Change asset ownership to claimant
-		recipientECertBase64, err := getECertOfTxCreatorBase64(ctx)
+		recipientECertBase64, err := wutils.GetECertOfTxCreatorBase64(ctx)
 		if err != nil {
 			return false, logThenErrorf(err.Error())
 		}
@@ -176,7 +177,7 @@ func (s *SmartContract) ClaimAssetUsingContractId(ctx contractapi.TransactionCon
 	}
 	if claimed {
 		// Change asset ownership to claimant
-		recipientECertBase64, err := getECertOfTxCreatorBase64(ctx)
+		recipientECertBase64, err := wutils.GetECertOfTxCreatorBase64(ctx)
 		if err != nil {
 			return false, logThenErrorf(err.Error())
 		}
@@ -219,7 +220,7 @@ func (s *SmartContract) ClaimFungibleAsset(ctx contractapi.TransactionContextInt
 	}
 	if claimed {
 		// Add the claimed tokens into the wallet of the claimant
-		recipientECertBase64, err := getECertOfTxCreatorBase64(ctx)
+		recipientECertBase64, err := wutils.GetECertOfTxCreatorBase64(ctx)
 		if err != nil {
 			return false, logThenErrorf(err.Error())
 		}
@@ -290,7 +291,7 @@ func (s *SmartContract) UnlockFungibleAsset(ctx contractapi.TransactionContextIn
 	}
 	if unlocked {
 		// Add the unlocked tokens into the wallet of the locker
-		lockerECertBase64, err := getECertOfTxCreatorBase64(ctx)
+		lockerECertBase64, err := wutils.GetECertOfTxCreatorBase64(ctx)
 		if err != nil {
 			return false, logThenErrorf(err.Error())
 		}
@@ -313,4 +314,21 @@ func (s *SmartContract) UnlockFungibleAsset(ctx contractapi.TransactionContextIn
 	} else {
 		return false, logThenErrorf("unlock on token asset using contractId %s failed", contractId)
 	}
+}
+
+
+func (s *SmartContract) GetHTLCHash(ctx contractapi.TransactionContextInterface, assetAgreementBytesBase64 string) (string, error) {
+	return s.amc.GetHTLCHash(ctx, assetAgreementBytesBase64)
+}
+
+func (s *SmartContract) GetHTLCHashByContractId(ctx contractapi.TransactionContextInterface, contractId string) (string, error) {
+	return s.amc.GetHTLCHashByContractId(ctx, contractId)
+}
+
+func (s *SmartContract) GetHTLCHashPreImage(ctx contractapi.TransactionContextInterface, assetAgreementBytesBase64 string) (string, error) {
+	return s.amc.GetHTLCHashPreImage(ctx, assetAgreementBytesBase64)
+}
+
+func (s *SmartContract) GetHTLCHashPreImageByContractId(ctx contractapi.TransactionContextInterface, contractId string) (string, error) {
+	return s.amc.GetHTLCHashPreImageByContractId(ctx, contractId)
 }

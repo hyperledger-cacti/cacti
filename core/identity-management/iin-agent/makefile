@@ -2,7 +2,7 @@ DOCKER_IMAGE_NAME ?= weaver-iin-agent
 DOCKER_TAG ?= `cat ./VERSION`
 DOCKER_REGISTRY ?= ghcr.io/hyperledger-labs
 GIT_URL = https://github.com/hyperledger-labs/weaver-dlt-interoperability/core/identity-management/iin-agent
-
+DLT_SPECIFIC_DIR ?= .
 COMPOSE_ARG ?=
 
 build: .npmrc
@@ -61,6 +61,7 @@ push-image-latest:
 	docker push $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_NAME):latest
 
 deploy:
+	chmod 777 $(DLT_SPECIFIC_DIR)
 	docker network create iin || true
 	docker-compose $(COMPOSE_ARG) up -d
 

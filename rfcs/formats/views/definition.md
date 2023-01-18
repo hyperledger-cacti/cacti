@@ -8,16 +8,31 @@
 - RFC: 03-002
 - Authors: Allison Irvin, Antony Targett, Christian Vecchiola, Dileban Karunamoorthy, Ermyas Abebe, Nick Waywood, Venkatraman Ramakrishna, Sandeep Nishad
 - Status: Proposed
-- Since: 30-May-2022
+- Since: 02-Jan-2023
 
 ## Summary
 
+This document specifies the data structure formats for distributed ledger [views](../../models/ledger/views.md).
 
-## Definition 
+## Definition
 
-- View data must be encoded (see `data` field in view definition below.)
-- What encoding do we use?
-- Encodings can be specified by the creator (driver) and specified in `meta`.
+- View data must be encoded or serialized (see `data` field in view definition below).
+- The default encoding will be just a serialization of DLT-specific view data using standard mechanisms (e.g., for protobuf or JSON).
+- Encodings can be specified by the creator (driver) and specified in the `meta` field in a `View` message.
+
+```protobuf
+message View {
+  Meta meta = 1;
+
+  // Represents the data playload of this view.
+  // The representation of Fabric, Corda etc will be captured elsewhere.
+  // For some protocols, like Bitcoin, the structure of an SPV proof is well known.
+  bytes data = 2;
+}
+```
+The attributes are defined below:
+- `meta` contains metadata of the view.
+- `data` contains the requested data, including ledger data and associated proof.
 
 ```protobuf
 message Meta {
@@ -42,16 +57,12 @@ message Meta {
   // The data field's serialization format (e.g. JSON, XML, Protobuf)
   string serialization_format = 4;
 }
-
-message View {
-  Meta meta = 1;
-
-  // Represents the data playload of this view.
-  // The representation of Fabric, Corda etc will be captured elsewhere.
-  // For some protocols, like Bitcoin, the structure of an SPV proof is well known.
-  bytes data = 2;
-}
 ```
+The attributes are defined below:
+- `protocol` specifies the network protocol of the source (responding) network.
+- `timestamp` the timestamp of the response.
+- `proof_type` describes the type of proof, e.g. Notarization, SPV, ZKP, etc. (*This field may be changed to an enum in the future*). See [proof representation](../../models/ledger/cryptographic-proofs.md) for more details.
+- `serialization_format` specifies the data field's serialization format (e.g. JSON, XML, Protobuf).
 
 ## Examples
 
@@ -73,10 +84,10 @@ data: "eyJub3Rhcml6YXRpb25zIjpbeyJzaWduYXR1cmUiOiJRYkt4UXFLbHNMSkg4TUM2ZU9GaFEvR
 message Commitment {
     // How is the commitment exchanged/located?
     string address = 3;
-	// Cryptographic commitment scheme
+    // Cryptographic commitment scheme
     string scheme = 1;
 }
 ```
 
-We intend to add a commitment field to Meta in the future as a mechanism to make public commitments of state with freshness guarantees.
+We intend to add a commitment field to the `Meta` structure in the future as a mechanism to make public commitments of state with freshness guarantees.
 

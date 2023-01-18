@@ -22,7 +22,7 @@ const command: GluegunCommand = {
         print,
         toolbox,
         `fabric-cli hash --hash_fn=SHA256 abc`,
-        'fabric-cli hash --hash_fn=<hash-function-name> --random <preimage-array-of-strings-seprated-by-space>',
+        'fabric-cli hash --hash_fn=<hash-function-name> --random <preimage-string>',
         [
           {
             name: '--hash_fn',

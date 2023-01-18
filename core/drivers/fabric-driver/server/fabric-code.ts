@@ -91,8 +91,6 @@ async function invoke(
         const network = await gateway.getNetwork(parsedAddress.channel);
         const currentChannel = network.getChannel();
         const endorsers = currentChannel.getEndorsers();
-        console.log(endorsers);
-        // Get the contract from the network.
         console.log('policy', query.getPolicyList());
         const chaincodeId = process.env.INTEROP_CHAINCODE ? process.env.INTEROP_CHAINCODE : 'interop';
 
@@ -161,28 +159,30 @@ async function invoke(
 
         // 4. Prepare the view and return.
         const viewPayload = new view_data.FabricView();
-        const endorsements: proposalResponse.Endorsement[] = [];
+        const endorsedProposalResponses: view_data.FabricView.EndorsedProposalResponse[] = [];
         //TODO Fix ts error
         //@ts-ignore
+        let endorsementCounter = 0;
         proposalResponseResult.responses.forEach((response) => {
-            console.log('Response', response);
-            viewPayload.setProposalResponsePayload(
-                proposalResponse.ProposalResponsePayload.deserializeBinary(response.payload),
-            );
-            const currentResponse = new proposalResponse.Response();
-            currentResponse.setStatus(response.response.status);
-            currentResponse.setMessage(response.response.message);
-            currentResponse.setPayload(
-                interopPayload.InteropPayload.deserializeBinary(response.response.payload).serializeBinary(),
-            );
-            viewPayload.setResponse(currentResponse);
             const endorsement = new proposalResponse.Endorsement();
             endorsement.setSignature(response.endorsement.signature);
             endorsement.setEndorser(response.endorsement.endorser);
-
-            endorsements.push(endorsement);
+            
+            // Create EndorsedProposalResponse
+            const endorsedProposalResponse = new view_data.FabricView.EndorsedProposalResponse();
+            endorsedProposalResponse.setPayload(
+                proposalResponse.ProposalResponsePayload.deserializeBinary(response.payload)
+            );
+            endorsedProposalResponse.setEndorsement(endorsement);
+            
+            // Add to list of endorsedProposalResponses
+            endorsedProposalResponses.push(endorsedProposalResponse);
+            
+            console.log('InteropPayload', endorsementCounter, Buffer.from(response.response.payload).toString('base64'));
+            console.log('Endorsement', endorsementCounter, Buffer.from(endorsement.serializeBinary()).toString('base64'));
+            endorsementCounter++;
         });
-        viewPayload.setEndorsementsList(endorsements);
+        viewPayload.setEndorsedProposalResponsesList(endorsedProposalResponses);
         // Disconnect from the gateway.
         gateway.disconnect();
         return viewPayload;

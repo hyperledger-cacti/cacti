@@ -23,7 +23,7 @@ This view is illustrated in the figure below (Fig.1), which maps quite naturally
 
 
 <div align="center">
-<img src="../../resources/images/iin-augmented-network.jpg" width=60%>
+<img src="../../resources/images/iin-augmented-network.png" width=60%>
 <br/>
 <figcaption>Fig.1 - IIN Agents as Components of DLT Networks.</figcaption>
 </div>

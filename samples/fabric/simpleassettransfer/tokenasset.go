@@ -147,7 +147,7 @@ func (s *SmartContract) IssueTokenAssets(ctx contractapi.TransactionContextInter
 
 // DeleteTokenAssets burns the token assets from an owner.
 func (s *SmartContract) DeleteTokenAssets(ctx contractapi.TransactionContextInterface, tokenAssetType string, numUnits uint64) error {
-	owner, err := getECertOfTxCreatorBase64(ctx)
+	owner, err := wutils.GetECertOfTxCreatorBase64(ctx)
 	if err != nil {
 		return err
 	}
@@ -177,7 +177,7 @@ func (s *SmartContract) TransferTokenAssets(ctx contractapi.TransactionContextIn
 		return fmt.Errorf("New owner cannot be blank")
 	}
 
-	owner, err := getECertOfTxCreatorBase64(ctx)
+	owner, err := wutils.GetECertOfTxCreatorBase64(ctx)
 	if err != nil {
 		return err
 	}
@@ -204,7 +204,7 @@ func (s *SmartContract) PledgeTokenAsset(ctx contractapi.TransactionContextInter
 	}
 
 	// Get asset owner (this transaction's client) using app-specific-logic
-	owner, err := getECertOfTxCreatorBase64(ctx)
+	owner, err := wutils.GetECertOfTxCreatorBase64(ctx)
 	if err != nil {
 		return "", err
 	}
@@ -220,7 +220,7 @@ func (s *SmartContract) PledgeTokenAsset(ctx contractapi.TransactionContextInter
 	}
 
 	// Pledge the asset using common (library) logic
-	if pledgeId, err := wutils.PledgeAsset(ctx, assetJSON, assetType, strconv.Itoa(int(numUnits)), owner, remoteNetworkId, recipientCert, expiryTimeSecs); err == nil {
+	if pledgeId, err := wutils.PledgeAsset(ctx, assetJSON, assetType, strconv.Itoa(int(numUnits)), remoteNetworkId, recipientCert, expiryTimeSecs); err == nil {
 		// Deduce asset balance using app-specific logic
 		return pledgeId, s.DeleteTokenAssets(ctx, assetType, numUnits)
 	} else {
@@ -233,21 +233,17 @@ func (s *SmartContract) ClaimRemoteTokenAsset(ctx contractapi.TransactionContext
 	// (Optional) Ensure that this function is being called by the Fabric Interop CC
 
 	// Claim the asset using common (library) logic
-	claimer, err := getECertOfTxCreatorBase64(ctx)
+	claimer, err := wutils.GetECertOfTxCreatorBase64(ctx)
 	if err != nil {
 		return err
 	}
-	pledgeAssetDetails, err := wutils.ClaimRemoteAsset(ctx, pledgeId, claimer, remoteNetworkId, pledgeBytes64)
+	
+	asset, err := getTokenAssetFromPledge(pledgeBytes64)
 	if err != nil {
 		return err
 	}
 
 	// Validate pledged asset details using app-specific-logic
-	var asset TokenAsset
-	err = json.Unmarshal(pledgeAssetDetails, &asset)
-	if err != nil {
-		return err
-	}
 	if asset.NumUnits == 0 {
 		return fmt.Errorf("cannot claim %d %s tokens as it has not been pledged in %s", numUnits, assetType, remoteNetworkId)
 	}
@@ -260,6 +256,11 @@ func (s *SmartContract) ClaimRemoteTokenAsset(ctx contractapi.TransactionContext
 	if asset.Owner != owner {
 		return fmt.Errorf("cannot claim %d %s tokens as it has not been pledged by the given owner", numUnits, assetType)
 	}
+	
+	_, err = wutils.ClaimRemoteAsset(ctx, pledgeId, remoteNetworkId, pledgeBytes64)
+	if err != nil {
+		return err
+	}
 
 	// Recreate the asset in this network and chaincode using app-specific logic: make the recipient the owner of the asset
 	return s.IssueTokenAssets(ctx, assetType, asset.NumUnits, claimer)
@@ -268,29 +269,15 @@ func (s *SmartContract) ClaimRemoteTokenAsset(ctx contractapi.TransactionContext
 // ReclaimTokenAsset gets back the ownership of an asset pledged for transfer to a different ledger/network.
 func (s *SmartContract) ReclaimTokenAsset(ctx contractapi.TransactionContextInterface, pledgeId, recipientCert, remoteNetworkId, claimStatusBytes64 string) error {
 	// (Optional) Ensure that this function is being called by the Fabric Interop CC
-
+	
 	// Reclaim the asset using common (library) logic
-	claimAssetDetails, pledgeAssetDetails, err := wutils.ReclaimAsset(ctx, pledgeId, recipientCert, remoteNetworkId, claimStatusBytes64)
+	_, pledgeAssetDetails, err := wutils.ReclaimAsset(ctx, pledgeId, recipientCert, remoteNetworkId, claimStatusBytes64)
 	if err != nil {
 		return err
-	}
-
-	// Validate reclaimed asset details using app-specific-logic
-	var claimAsset, pledgeAsset TokenAsset
-	err = json.Unmarshal(claimAssetDetails, &claimAsset)
-	if err != nil {
-		return err
-	}
-	if claimAsset.Type != "" &&
-		claimAsset.NumUnits != 0 &&
-		claimAsset.Owner != "" {
-		// Run checks on the claim parameter to see if it is what we expect and to ensure it has not already been made in the other network
-		if !matchClaimWithTokenAssetPledge(pledgeAssetDetails, claimAssetDetails) {
-			return fmt.Errorf("claim info for asset with pledge id %s does not match pledged asset details on ledger: %s", pledgeId, pledgeAssetDetails)
-		}
 	}
 
 	// Recreate the asset in this network and chaincode using app-specific logic
+	var pledgeAsset TokenAsset
 	err = json.Unmarshal(pledgeAssetDetails, &pledgeAsset)
 	if err != nil {
 		return err
@@ -354,7 +341,7 @@ func (s *SmartContract) GetTokenAssetPledgeDetails(ctx contractapi.TransactionCo
 	if err != nil {
 		return "", err
 	}
-	caller, err := getECertOfTxCreatorBase64(ctx)
+	caller, err := wutils.GetECertOfTxCreatorBase64(ctx)
 	if err != nil {
 		return "", err
 	}
@@ -441,7 +428,7 @@ func (s *SmartContract) GetBalance(ctx contractapi.TransactionContextInterface, 
 
 // GetMyWallet returns the available amount for each token asset type owned by an owner.
 func (s *SmartContract) GetMyWallet(ctx contractapi.TransactionContextInterface) (string, error) {
-	owner, err := getECertOfTxCreatorBase64(ctx)
+	owner, err := wutils.GetECertOfTxCreatorBase64(ctx)
 	if err != nil {
 		return "", err
 	}
@@ -465,7 +452,7 @@ func (s *SmartContract) GetMyWallet(ctx contractapi.TransactionContextInterface)
 
 // Checks if owner has some given amount of token asset
 func (s *SmartContract) TokenAssetsExist(ctx contractapi.TransactionContextInterface, tokenAssetType string, numUnits uint64) (bool, error) {
-	owner, err := getECertOfTxCreatorBase64(ctx)
+	owner, err := wutils.GetECertOfTxCreatorBase64(ctx)
 	if err != nil {
 		return false, err
 	}

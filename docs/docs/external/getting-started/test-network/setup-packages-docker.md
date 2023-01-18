@@ -64,9 +64,9 @@ This folder contains code to create and launch networks `network1` and `network2
 - One of the following contracts deployed on `mychannel`, the choice depending on the [interoperability mode](../../interoperability-modes.md) you wish to test:
   * `simplestate` ([Data Sharing](../interop/data-sharing.md)): supports simple transactions (`Create`, `Read`, `Update`, `Delete`) involving storage and lookup of <key, value> pairs.
   * `simplestatewithacl` ([Data Sharing](../interop/data-sharing.md)): identical to `simplestate` but with extra security features to ensure that the Weaver infrastructure cannot be bypassed by a malicious client of the network.
-  * `simpleasset` ([Asset Exchange](../interop/asset-exchange.md)): supports creation, modification, transfer, and deletion, as well as locking, unlocking, and claiming, of simple bonds and tokens (examples of non-fungible and fungible assets respectively).
-  * `simpleassetandinterop` ([Asset Exchange](../interop/asset-exchange.md)): identical to `simpleasset` but where the locking, unlocking, and claiming logic is imported as a library in the chaincode rather than available in the common Fabric Interoperation Chaincode (a Weaver component).
-  * `simpleassettransfer` ([Asset Exchange](../interop/asset-exchange.md) or [Asset Transfer](../interop/asset-transfer.md)): augmentation of `simpleasset` with asset pledging, claiming, and reclaiming features for cross-network transfers.
+  * `simpleasset` ([Asset Exchange](../interop/asset-exchange/overview.md)): supports creation, modification, transfer, and deletion, as well as locking, unlocking, and claiming, of simple bonds and tokens (examples of non-fungible and fungible assets respectively).
+  * `simpleassetandinterop` ([Asset Exchange](../interop/asset-exchange/overview.md)): identical to `simpleasset` but where the locking, unlocking, and claiming logic is imported as a library in the chaincode rather than available in the common Fabric Interoperation Chaincode (a Weaver component).
+  * `simpleassettransfer` ([Asset Exchange](../interop/asset-exchange/overview.md) or [Asset Transfer](../interop/asset-transfer.md)): augmentation of `simpleasset` with asset pledging, claiming, and reclaiming features for cross-network transfers.
 
 | Notes |
 |:------|
@@ -145,19 +145,19 @@ Use the following steps to run Fabric drivers in Docker containers:
 * Repeat the above step for `.env.n2` or `.env.n2.tls` in `docker-testnet-envs` directory, which contain environment variables for the `network2` driver.
 * To deploy the Fabric driver for `network1` without TLS, run:
   ```bash
-  make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.n1'
+  make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.n1' NETWORK_NAME=$(grep NETWORK_NAME docker-testnet-envs/.env.n1 | cut -d '=' -f 2)
   ```
   Instead, to deploy the driver with TLS, run:
   ```bash
-  make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.n1.tls'
+  make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.n1.tls' NETWORK_NAME=$(grep NETWORK_NAME docker-testnet-envs/.env.n1.tls | cut -d '=' -f 2)
   ```
 * To deploy the Fabric driver for `network2` without TLS, run:
   ```bash
-  make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.n2'
+  make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.n2' NETWORK_NAME=$(grep NETWORK_NAME docker-testnet-envs/.env.n2 | cut -d '=' -f 2)
   ```
   Instead, to deploy the driver with TLS, run:
   ```bash
-  make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.n2.tls'
+  make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.n2.tls' NETWORK_NAME=$(grep NETWORK_NAME docker-testnet-envs/.env.n2.tls | cut -d '=' -f 2)
   ```
 
 ### Fabric IIN Agent
@@ -184,35 +184,35 @@ Use the following steps to run Fabric IIN Agents in Docker containers:
 * Repeat the above steps for all other environment variable files (depending upon whether tls is enabled) in `docker-testnet/envs` directory.
 * To deploy the Fabric IIN Agent for `org1` of `network1` without TLS, run:
   ```bash
-  make deploy COMPOSE_ARG='--env-file docker-testnet/envs/.env.n1.org1'
+  make deploy COMPOSE_ARG='--env-file docker-testnet/envs/.env.n1.org1' DLT_SPECIFIC_DIR=$(grep DLT_SPECIFIC_DIR docker-testnet/envs/.env.n1.org1 | cut -d '=' -f 2)
   ```
   Instead, to deploy the IIN Agent with TLS, run:
   ```bash
-  make deploy COMPOSE_ARG='--env-file docker-testnet/envs/.env.n1.org1.tls'
+  make deploy COMPOSE_ARG='--env-file docker-testnet/envs/.env.n1.org1.tls' DLT_SPECIFIC_DIR=$(grep DLT_SPECIFIC_DIR docker-testnet/envs/.env.n1.org1.tls | cut -d '=' -f 2)
   ```
 * To deploy the Fabric IIN Agent for `org2` of `network1` without TLS (_only required if Fabric network was started with 2 orgs_), run:
   ```bash
-  make deploy COMPOSE_ARG='--env-file docker-testnet/envs/.env.n1.org2'
+  make deploy COMPOSE_ARG='--env-file docker-testnet/envs/.env.n1.org2' DLT_SPECIFIC_DIR=$(grep DLT_SPECIFIC_DIR docker-testnet/envs/.env.n1.org2 | cut -d '=' -f 2)
   ```
   Instead, to deploy the IIN Agent with TLS, run:
   ```bash
-  make deploy COMPOSE_ARG='--env-file docker-testnet/envs/.env.n1.org2.tls'
+  make deploy COMPOSE_ARG='--env-file docker-testnet/envs/.env.n1.org2.tls' DLT_SPECIFIC_DIR=$(grep DLT_SPECIFIC_DIR docker-testnet/envs/.env.n1.org2.tls | cut -d '=' -f 2)
   ```
 * To deploy the Fabric IIN Agent for `org1` of `network2` without TLS, run:
   ```bash
-  make deploy COMPOSE_ARG='--env-file docker-testnet/envs/.env.n2.org1'
+  make deploy COMPOSE_ARG='--env-file docker-testnet/envs/.env.n2.org1' DLT_SPECIFIC_DIR=$(grep DLT_SPECIFIC_DIR docker-testnet/envs/.env.n2.org1 | cut -d '=' -f 2)
   ```
   Instead, to deploy the IIN Agent with TLS, run:
   ```bash
-  make deploy COMPOSE_ARG='--env-file docker-testnet/envs/.env.n2.org1.tls'
+  make deploy COMPOSE_ARG='--env-file docker-testnet/envs/.env.n2.org1.tls' DLT_SPECIFIC_DIR=$(grep DLT_SPECIFIC_DIR docker-testnet/envs/.env.n2.org1.tls | cut -d '=' -f 2)
   ```
 * To deploy the Fabric IIN Agent for `org2` of `network2` without TLS (_only required if Fabric network was started with 2 orgs_), run:
   ```bash
-  make deploy COMPOSE_ARG='--env-file docker-testnet/envs/.env.n2.org2'
+  make deploy COMPOSE_ARG='--env-file docker-testnet/envs/.env.n2.org2' DLT_SPECIFIC_DIR=$(grep DLT_SPECIFIC_DIR docker-testnet/envs/.env.n2.org2 | cut -d '=' -f 2)
   ```
   Instead, to deploy the IIN Agent with TLS, run:
   ```bash
-  make deploy COMPOSE_ARG='--env-file docker-testnet/envs/.env.n2.org2.tls'
+  make deploy COMPOSE_ARG='--env-file docker-testnet/envs/.env.n2.org2.tls' DLT_SPECIFIC_DIR=$(grep DLT_SPECIFIC_DIR docker-testnet/envs/.env.n2.org2.tls | cut -d '=' -f 2)
   ```
 
 

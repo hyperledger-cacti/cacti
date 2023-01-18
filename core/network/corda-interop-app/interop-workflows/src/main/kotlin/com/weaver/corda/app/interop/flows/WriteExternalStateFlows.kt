@@ -11,22 +11,24 @@ import arrow.core.Left
 import arrow.core.Right
 import arrow.core.flatMap
 import co.paralleluniverse.fibers.Suspendable
-import com.weaver.corda.app.interop.contracts.ExternalStateContract
-import com.weaver.corda.app.interop.states.ExternalState
-import com.weaver.protos.common.state.State
 import net.corda.core.contracts.Command
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.flows.*
 import net.corda.core.transactions.TransactionBuilder
 import java.util.Base64
-
 import net.corda.core.node.services.queryBy
 import net.corda.core.node.services.vault.QueryCriteria
+import com.google.protobuf.ByteString
+
+import org.hyperledger.fabric.protos.msp.Identities
+import org.hyperledger.fabric.protos.peer.ProposalPackage
+
+import com.weaver.protos.common.state.State
 import com.weaver.protos.fabric.view_data.ViewData
 import com.weaver.protos.corda.ViewDataOuterClass
-import com.google.protobuf.ByteString
 import com.weaver.protos.common.interop_payload.InteropPayloadOuterClass
-import org.hyperledger.fabric.protos.msp.Identities
+import com.weaver.corda.app.interop.contracts.ExternalStateContract
+import com.weaver.corda.app.interop.states.ExternalState
 
 
 /**
@@ -126,13 +128,12 @@ class GetExternalStateByLinearId(
                 State.Meta.Protocol.CORDA -> {
                     val cordaViewData = ViewDataOuterClass.ViewData.parseFrom(viewDataByteArray)
                     println("cordaViewData: $cordaViewData")
-                    val interopPayload = InteropPayloadOuterClass.InteropPayload.parseFrom(cordaViewData.payload)
+                    val interopPayload = InteropPayloadOuterClass.InteropPayload.parseFrom(cordaViewData.notarizedPayloadsList[0].payload)
                     val payloadString = interopPayload.payload.toStringUtf8()
                     println("response from remote: ${payloadString}.\n")
                     println("query address: ${interopPayload.address}.\n")
                     val viewData = ViewDataOuterClass.ViewData.newBuilder()
-                            .addAllNotarizations(cordaViewData.notarizationsList)
-                            .setPayload(interopPayload.payload)
+                            .addAllNotarizedPayloads(cordaViewData.notarizedPayloadsList)
                             .build()
                             
                     return viewData.toByteArray()
@@ -140,7 +141,9 @@ class GetExternalStateByLinearId(
                 State.Meta.Protocol.FABRIC -> {
                     val fabricViewData = ViewData.FabricView.parseFrom(viewDataByteArray)
                     println("fabricViewData: $fabricViewData")
-                    val interopPayload = InteropPayloadOuterClass.InteropPayload.parseFrom(fabricViewData.response.payload)
+                    // TODO: We assume here that the response payloads have been matched earlier, but perhaps we should match them here too
+                    val chaincodeAction = ProposalPackage.ChaincodeAction.parseFrom(fabricViewData.endorsedProposalResponsesList[0].payload.extension)
+                    val interopPayload = InteropPayloadOuterClass.InteropPayload.parseFrom(chaincodeAction.response.payload)
                     val payloadString = interopPayload.payload.toStringUtf8()
                     println("response from remote: ${payloadString}.\n")
                     println("query address: ${interopPayload.address}.\n")
@@ -149,7 +152,8 @@ class GetExternalStateByLinearId(
                     val proofStringPrefix = "Verified Proof: Endorsed by members: ["
                     val proofStringSuffix = "] of security domain: $securityDomain"
                     var mspIdList = ""
-                    fabricViewData.endorsementsList.map { endorsement ->
+                    fabricViewData.endorsedProposalResponsesList.map { endorsedProposalResponse ->
+                        val endorsement = endorsedProposalResponse.endorsement
                         val mspId = Identities.SerializedIdentity.parseFrom(endorsement.endorser).mspid
                         if (mspIdList.isNotEmpty()) {
                             mspIdList += ", "
@@ -159,25 +163,26 @@ class GetExternalStateByLinearId(
                     val proofMessage = proofStringPrefix + mspIdList + proofStringSuffix
                     println("Proof Message: ${proofMessage}.\n")
 
-                    var notarizationList: List<ViewDataOuterClass.ViewData.Notarization> = listOf()
+                    var notarizationList: List<ViewDataOuterClass.ViewData.NotarizedPayload> = listOf()
 
-                    fabricViewData.endorsementsList.map { endorsement ->
+                    fabricViewData.endorsedProposalResponsesList.map { endorsedProposalResponse ->
+                        val endorsement = endorsedProposalResponse.endorsement
                         val serializedIdentity = Identities.SerializedIdentity.parseFrom(endorsement.endorser)
                         val mspId = serializedIdentity.mspid
                         val certString = Base64.getEncoder().encodeToString(serializedIdentity.idBytes.toByteArray())
                         val signature = Base64.getEncoder().encodeToString(endorsement.signature.toByteArray())
                         
-                        val notarization = ViewDataOuterClass.ViewData.Notarization.newBuilder()
+                        val notarization = ViewDataOuterClass.ViewData.NotarizedPayload.newBuilder()
                                 .setCertificate(certString)
                                 .setSignature(signature)
                                 .setId(mspId)
+                                .setPayload(chaincodeAction.response.payload)
                                 .build()
                         notarizationList = notarizationList + notarization
                     }
 
                     val viewData = ViewDataOuterClass.ViewData.newBuilder()
-                            .addAllNotarizations(notarizationList)
-                            .setPayload(interopPayload.payload)
+                            .addAllNotarizedPayloads(notarizationList)
                             .build()
                             
                     return viewData.toByteArray()

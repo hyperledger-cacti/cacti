@@ -36,4 +36,4 @@ You can launch these components in one of several different ways:
 After setting up and launching the components, you must initialize the network by following steps in [Ledger Initialization](ledger-initialization.md). 
 Then you can test the following interoperation modes:
 - [Data Sharing](../interop/data-sharing.md) among Fabric and Corda networks
-- [Asset Exchange](../interop/asset-exchange.md) between Fabric networks
+- [Asset Exchange](../interop/asset-exchange/overview.md) between Fabric networks

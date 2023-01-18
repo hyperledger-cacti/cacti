@@ -10,15 +10,15 @@ package main
 import (
 	"fmt"
 	"errors"
-	"encoding/base64"
 	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/base64"
+	"encoding/json"
 
-	"github.com/golang/protobuf/proto"
-	"github.com/hyperledger/fabric-contract-api-go/contractapi"
-	mspProtobuf "github.com/hyperledger/fabric-protos-go/msp"
 	log "github.com/sirupsen/logrus"
+	"github.com/golang/protobuf/proto"
+	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
 )
 
 // functions to log and return errors
@@ -26,24 +26,6 @@ func logThenErrorf(format string, args ...interface{}) error {
 	errorMsg := fmt.Sprintf(format, args...)
 	log.Error(errorMsg)
 	return errors.New(errorMsg)
-}
-
-func getECertOfTxCreatorBase64(ctx contractapi.TransactionContextInterface) (string, error) {
-
-	txCreatorBytes, err := ctx.GetStub().GetCreator()
-	if err != nil {
-	return "", fmt.Errorf("unable to get the transaction creator information: %+v", err)
-	}
-
-	serializedIdentity := &mspProtobuf.SerializedIdentity{}
-	err = proto.Unmarshal(txCreatorBytes, serializedIdentity)
-	if err != nil {
-		return "", fmt.Errorf("getECertOfTxCreatorBase64: unmarshal error: %+v", err)
-	}
-
-	eCertBytesBase64 := base64.StdEncoding.EncodeToString(serializedIdentity.IdBytes)
-
-	return eCertBytesBase64, nil
 }
 
 func createKeyValuePairs(m map[string]uint64) string {
@@ -60,4 +42,76 @@ func generateSHA256HashInHexForm(preimage string) string {
 	shaHash := hasher.Sum(nil)
 	shaHashHex := hex.EncodeToString(shaHash)
 	return shaHashHex
+}
+
+func getBondAssetFromPledge(pledgeBytes64 string) (BondAsset, error) {
+	var asset BondAsset
+	pledge := &common.AssetPledge{}
+	assetPledgeSerialized, err := base64.StdEncoding.DecodeString(pledgeBytes64)
+	if err != nil {
+		return asset, err
+	}
+	if len(assetPledgeSerialized) == 0 {
+		return asset, fmt.Errorf("empty asset pledge")
+	}
+	err = proto.Unmarshal([]byte(assetPledgeSerialized), pledge)
+	if err != nil {
+		return asset, err
+	}
+	err = json.Unmarshal(pledge.AssetDetails, &asset)
+	return asset, err
+}
+
+func getTokenAssetFromPledge(pledgeBytes64 string) (TokenAsset, error) {
+	var asset TokenAsset
+	pledge := &common.AssetPledge{}
+	assetPledgeSerialized, err := base64.StdEncoding.DecodeString(pledgeBytes64)
+	if err != nil {
+		return asset, err
+	}
+	if len(assetPledgeSerialized) == 0 {
+		return asset, fmt.Errorf("empty asset pledge")
+	}
+	err = proto.Unmarshal([]byte(assetPledgeSerialized), pledge)
+	if err != nil {
+		return asset, err
+	}
+	err = json.Unmarshal(pledge.AssetDetails, &asset)
+	return asset, err
+}
+
+func getBondAssetFromClaimStatus(claimStatusBase64 string) (BondAsset, error) {
+	var asset BondAsset
+	claimStatus := &common.AssetClaimStatus{}
+	claimStatusSerialized, err := base64.StdEncoding.DecodeString(claimStatusBase64)
+	if err != nil {
+		return asset, err
+	}
+	if len(claimStatusSerialized) == 0 {
+		return asset, fmt.Errorf("empty asset claim status")
+	}
+	err = proto.Unmarshal([]byte(claimStatusSerialized), claimStatus)
+	if err != nil {
+		return asset, err
+	}
+	err = json.Unmarshal(claimStatus.AssetDetails, &asset)
+	return asset, err
+}
+
+func getTokenAssetFromClaimStatus(claimStatusBase64 string) (TokenAsset, error) {
+	var asset TokenAsset
+	claimStatus := &common.AssetClaimStatus{}
+	claimStatusSerialized, err := base64.StdEncoding.DecodeString(claimStatusBase64)
+	if err != nil {
+		return asset, err
+	}
+	if len(claimStatusSerialized) == 0 {
+		return asset, fmt.Errorf("empty asset claim status")
+	}
+	err = proto.Unmarshal([]byte(claimStatusSerialized), claimStatus)
+	if err != nil {
+		return asset, err
+	}
+	err = json.Unmarshal(claimStatus.AssetDetails, &asset)
+	return asset, err
 }

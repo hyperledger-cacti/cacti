@@ -115,13 +115,20 @@ fun verifyCordaNotarization(viewData: ByteString, verificationPolicyCriteria: Li
     // 1. Make the CordaViewData object from the view data
     val cordaViewData = ViewDataOuterClass.ViewData.parseFrom(viewData)
     println("Corda view data: $cordaViewData")
+    
+    var interopPayload = cordaViewData.notarizedPayloadsList[0].payload
 
     // 2. Map over the list of notarizations and verify the signature, creating a list of Either Error Boolean
-    val eitherErrorCordaViewData = cordaViewData.notarizationsList.map { notarization ->
-        getCertificateFromString(notarization.certificate).flatMap { x509Cert ->
+    val eitherErrorCordaViewData = cordaViewData.notarizedPayloadsList.map { notarizedPayload ->
+        getCertificateFromString(notarizedPayload.certificate).flatMap { x509Cert ->
             // 3. Check the certificates are valid according to the [Membership].
-            verifyMemberInSecurityDomain(x509Cert, securityDomain, notarization.id, serviceHub).flatMap {
-                verifyNodeSignature(notarization.certificate, notarization.signature, cordaViewData.payload.toByteArray())
+            verifyMemberInSecurityDomain(x509Cert, securityDomain, notarizedPayload.id, serviceHub).flatMap {
+                verifyNodeSignature(notarizedPayload.certificate, notarizedPayload.signature, notarizedPayload.payload.toByteArray()).flatMap {
+                    if (interopPayload != notarizedPayload.payload) {
+                        Left(Error("InteropPayload doesn't match across responses from different nodes"))
+                    }
+                    Right(true)
+                }
             }
         }
     }
@@ -131,8 +138,8 @@ fun verifyCordaNotarization(viewData: ByteString, verificationPolicyCriteria: Li
             // Map the Right to the view data
             .map { viewData }
 
-    // Get the signers from the list of notarizations
-    val signers = cordaViewData.notarizationsList.map { it.id }
+    // Get the signers from the list of notarizedPayloads
+    val signers = cordaViewData.notarizedPayloadsList.map { it.id }
 
     // 4. Check that every party listed in the verification policy is a signatory
     eitherErrorCordaViewData.flatMap { _ ->
@@ -156,7 +163,7 @@ fun verifyCordaNotarization(viewData: ByteString, verificationPolicyCriteria: Li
  * Verification requires the following checks to be performed:
  * 1. Ensure the response is in a valid format - view data should be parsed to [ViewData.FabricView]
  * 2. Verify address in payload is the same as original address
- * 3. Verify the response matches the response inside the ProposalResponsePayload chaincodeaction
+ * 3. Verify that the responses in the different ProposalResponsePayload blobs match each other
  * 4. Validate endorsement certificate and check [Membership]
  * 5. Check the notarizations fulfill the verification policy of the request.
  *
@@ -185,26 +192,34 @@ fun verifyFabricNotarization(
         val fabricViewData = ViewData.FabricView.parseFrom(viewData)
         println("Fabric view data: $fabricViewData\n")
 
-        // 2. Verify address in payload is the same as original address
-        val interopPayload = InteropPayloadOuterClass.InteropPayload.parseFrom(fabricViewData.response.payload)
-        println("Interop payload: $interopPayload")
-        if (interopPayload.address != addressString) {
-            println("Address in response does not match original address: Original: $addressString Response: ${interopPayload.address}")
-            return Left(Error("Address in response does not match original address: Original: $addressString Response: ${interopPayload.address}"))
-        }
-
-        // 3. Verify the response matches the response inside the ProposalResponsePayload chaincodeaction
-        val chaincodeAction = ProposalPackage.ChaincodeAction.parseFrom(fabricViewData.proposalResponsePayload.extension)
-        println("Chaincode Action: $chaincodeAction")
-        if (chaincodeAction.response.payload != fabricViewData.response.payload) {
-            println("Response in fabric view does not match response in proposal response")
-            return Left(Error("Response in fabric view does not match response in proposal response"))
+        // TODO: Handle encrypted (confidential) payloads in Fabric views
+        var responsePayload = ""
+        var responseIndex = 0
+        for (endorsedProposalResponse in fabricViewData.endorsedProposalResponsesList) {
+            val chaincodeAction = ProposalPackage.ChaincodeAction.parseFrom(endorsedProposalResponse.payload.extension)
+            val interopPayload = InteropPayloadOuterClass.InteropPayload.parseFrom(chaincodeAction.response.payload)
+            val encodedPayload = Base64.getEncoder().encodeToString(chaincodeAction.response.payload.toByteArray())
+            println("Interop payload: $interopPayload")
+            // 2. Verify address in payload is the same as original address
+            if (interopPayload.address != addressString) {
+                println("Address in response does not match original address: Original: $addressString Response: ${interopPayload.address}")
+                return Left(Error("Address in response does not match original address: Original: $addressString Response: ${interopPayload.address}"))
+            }
+            // 3. Verify that the responses in the different ProposalResponsePayload blobs match each other
+            if (responseIndex == 0) {
+                responsePayload = encodedPayload
+            } else if (responsePayload != encodedPayload) {
+                println("Mismatching payloads in proposal responses: 0 - $responsePayload,  $responseIndex: $encodedPayload")
+                return Left(Error("Mismatching payloads in proposal responses: 0 - $responsePayload,  $responseIndex: $encodedPayload"))
+            }
+            responseIndex++
         }
 
         // For each of the peer responses in the viewData, parse the proposal response field to a ProposalResponse
-        return fabricViewData.endorsementsList.map { endorsement ->
+        return fabricViewData.endorsedProposalResponsesList.map { endorsedProposalResponse ->
+            val endorsement = endorsedProposalResponse.endorsement
             // 4. Validate endorsement certificate and check [Membership]
-            verifyEndorsementAndMapToOrgName(endorsement, securityDomain, fabricViewData, serviceHub)
+            verifyEndorsementAndMapToOrgName(endorsement, securityDomain, endorsedProposalResponse.payload.toByteArray(), serviceHub)
             // Traverse the resulting List<Either<Error, String>> to get an Either<Error, List<String>>
         }.traverse(Either.applicative(), ::identity)
                 .fix().map { it.fix() }
@@ -236,7 +251,7 @@ fun verifyFabricNotarization(
  * @return Returns an Error if the endorsement verification failed, or the orgName of the org the
  * signed the certificate.
  */
-fun verifyEndorsementAndMapToOrgName(endorsement: ProposalResponsePackage.Endorsement, securityDomain: String, fabricViewData: ViewData.FabricView, serviceHub: ServiceHub): Either<Error, String> {
+fun verifyEndorsementAndMapToOrgName(endorsement: ProposalResponsePackage.Endorsement, securityDomain: String, proposalResponsePayloadBytes: ByteArray, serviceHub: ServiceHub): Either<Error, String> {
     // Get the endorser certificate from the Endorsement
     val serializedIdentity = Identities.SerializedIdentity.parseFrom(endorsement.endorser)
     val certString = Base64.getEncoder().encodeToString(serializedIdentity.idBytes.toByteArray())
@@ -250,7 +265,7 @@ fun verifyEndorsementAndMapToOrgName(endorsement: ProposalResponsePackage.Endors
             // Validate the signature on the response payload with the certificate
             isValidFabricSignature(
                     publicKey = certificate.publicKey,
-                    message = fabricViewData.proposalResponsePayload.toByteArray() + endorsement.endorser.toByteArray(),
+                    message = proposalResponsePayloadBytes + endorsement.endorser.toByteArray(),
                     signatureBytes = endorsement.signature.toByteArray())
         }.map { orgName }
     }

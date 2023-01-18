@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-    
+
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 )
 
@@ -12,6 +12,7 @@ type AssetPledgeMap struct {
 	RemoteNetworkID   string      `json:"remotenetworkid"`
 	Recipient         string      `json:"recipient"`
 }
+
 func createAssetPledgeIdMap(ctx contractapi.TransactionContextInterface, pledgeId, assetType, id, remoteNetworkId, recipientCert string) error {
 	key := "asset_pledge_map_" + generateSHA256HashInHexForm(assetType + id)
 	assetPledgeMap := &AssetPledgeMap{
@@ -29,8 +30,10 @@ func createAssetPledgeIdMap(ctx contractapi.TransactionContextInterface, pledgeI
 	}
 	return nil
 }
+
 func getAssetPledgeIdMap(ctx contractapi.TransactionContextInterface, assetType, id string) (*AssetPledgeMap, error) {
 	key := "asset_pledge_map_" + generateSHA256HashInHexForm(assetType + id)
+	fmt.Printf("key: %s\n", key)
 	assetPledgeMap := &AssetPledgeMap{}
 	assetPledgeMapJSON, err := ctx.GetStub().GetState(key)
 	if err != nil {
@@ -39,6 +42,7 @@ func getAssetPledgeIdMap(ctx contractapi.TransactionContextInterface, assetType,
 	err = json.Unmarshal(assetPledgeMapJSON, assetPledgeMap)
 	return assetPledgeMap, err
 }
+
 func delAssetPledgeIdMap(ctx contractapi.TransactionContextInterface, assetType, id string) error {
 	key := "asset_pledge_map_" + generateSHA256HashInHexForm(assetType + id)
 	err := ctx.GetStub().DelState(key)
