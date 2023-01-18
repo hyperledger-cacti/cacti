@@ -135,7 +135,7 @@ func handleRequest(s *SmartContract, ctx contractapi.TransactionContextInterface
 		resp := ""
 		if viewAddress.CCFunc == "GetHTLCHash" {
 			if len(viewAddress.Args) > 1 {
-				return "", logThenErrorf("Recieved more arguments than required 2 argument.")
+				return "", logThenErrorf("Recieved more arguments than required 1 argument.")
 			}
 			resp, err = s.GetHTLCHash(ctx, viewAddress.Args[0])
 		} else if viewAddress.CCFunc == "GetHTLCHashByContractId" {
@@ -145,7 +145,7 @@ func handleRequest(s *SmartContract, ctx contractapi.TransactionContextInterface
 			resp, err = s.GetHTLCHashByContractId(ctx, viewAddress.Args[0])
 		} else if viewAddress.CCFunc == "GetHTLCHashPreImage" {
 			if len(viewAddress.Args) > 1 {
-				return "", logThenErrorf("Recieved more arguments than required 2 argument.")
+				return "", logThenErrorf("Recieved more arguments than required 1 argument.")
 			}
 			resp, err = s.GetHTLCHashPreImage(ctx, viewAddress.Args[0])
 		} else if viewAddress.CCFunc == "GetHTLCHashPreImageByContractId" {

@@ -320,12 +320,15 @@ func (s *SmartContract) UnlockFungibleAsset(ctx contractapi.TransactionContextIn
 func (s *SmartContract) GetHTLCHash(ctx contractapi.TransactionContextInterface, assetAgreementBytesBase64 string) (string, error) {
 	return s.amc.GetHTLCHash(ctx, assetAgreementBytesBase64)
 }
+
 func (s *SmartContract) GetHTLCHashByContractId(ctx contractapi.TransactionContextInterface, contractId string) (string, error) {
 	return s.amc.GetHTLCHashByContractId(ctx, contractId)
 }
+
 func (s *SmartContract) GetHTLCHashPreImage(ctx contractapi.TransactionContextInterface, assetAgreementBytesBase64 string) (string, error) {
 	return s.amc.GetHTLCHashPreImage(ctx, assetAgreementBytesBase64)
 }
+
 func (s *SmartContract) GetHTLCHashPreImageByContractId(ctx contractapi.TransactionContextInterface, contractId string) (string, error) {
 	return s.amc.GetHTLCHashPreImageByContractId(ctx, contractId)
 }
