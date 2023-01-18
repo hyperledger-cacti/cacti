@@ -56,9 +56,9 @@ The Weaver components and tools are illustrated in the below architecture diagra
 
 #### Relays
 
-**Summary**: These are modules that acts as gateways to a network, both as an ingress and an egress point. A relay discovers other networks’ relays and routes messages for cross-network transactions. A relay offers an API to applications and to other relays that is not tied to a specific DLT or application implementation.
-
-**Description**
+| Summary |
+|:------|
+| These are modules that acts as gateways to a network, both as an ingress and an egress point. A relay discovers other networks’ relays and routes messages for cross-network transactions. A relay offers an API to applications and to other relays that is not tied to a specific DLT or application implementation. |
 
 These modules act as fulcra of inter-network (or inter-ledger) discovery and communication. A relay acts as a gateway for a network, serving as both an ingress and an egress point.
 
@@ -77,9 +77,9 @@ Currently, Weaver relays support cross-network data queries (returning a ledger 
 
 #### Drivers
 
-**Summary**: These are modules that can be “plugged into” relays that can talk specific  DLT protocols and have access to specific portions of a distributed ledger. They translate relayed messages into instructions for collecting ledger state proofs and (in the future) issuing instructions to update ledger state.
-
-**Description**
+| Summary |
+|:------|
+| These are modules that can be “plugged into” relays that can talk specific  DLT protocols and have access to specific portions of a distributed ledger. They translate relayed messages into instructions for collecting ledger state proofs and (in the future) issuing instructions to update ledger state. |
 
 These are ledger-specific relay plug-ins, which can be activated by relays for the following purposes in a protocol:
 Translation of a DLT-neutral relay request coming from outside the network to a DLT- and ledger-specific instruction or query that can be executed within the network
@@ -94,9 +94,9 @@ In our current model, a driver is deployed as a service loosely coupled with a r
 
 #### Interoperation Module
 
-**Summary**: This is a set of procedures for ledger state exposure and validation and asset management in the context of cross-network operations. They are implemented and deployed as smart contracts and distributed application flows in DLT-specific ways.
-
-**Description**
+| Summary |
+|:------|
+| This is a set of procedures for ledger state exposure and validation and asset management in the context of cross-network operations. They are implemented and deployed as smart contracts and distributed application flows in DLT-specific ways. |
 
 This module implements the core basic network functions that any cross-network transaction is comprised of: access control, proof generation and verification, asset locks, claims, pledges, and reclaims.
 
@@ -113,9 +113,9 @@ Access control and proof verification policies as well as foreign networks’ me
 
 #### Application Helpers
 
-**Summary**: This is a package of library functions and API for applications to use as an SDK. Offered functions can be called from suitable locations within applications’ workflows.
-
-**Description**
+| Summary |
+|:------|
+| This is a package of library functions and API for applications to use as an SDK. Offered functions can be called from suitable locations within applications’ workflows. |
 
 This is an SDK consisting of a package of library functions and an API for applications to exercise, i.e., trigger operations involved in cross-network transactions.
 
@@ -134,9 +134,9 @@ Weaver currently offers SDKs for the following DLTs:
 
 #### Identity Service
 
-**Summary**: This is a module that consists of both a service and an agent. The service exposes the network’s identity providers’ or certification authorities’ certificate chains for external parties. The agent syncs such certificates from external networks.
-
-**Description**
+| Summary |
+|:------|
+| This is a module that consists of both a service and an agent. The service exposes the network’s identity providers’ or certification authorities’ certificate chains for external parties. The agent syncs such certificates from external networks. |
 
 This is a service coupled with an agent that syncs membership and certificates with other networks to establish a trust basis for interoperation.
 
