@@ -595,3 +595,100 @@ func (am *AssetManagement) GetAllAssetsLockedUntil(stub shim.ChaincodeStubInterf
     fmt.Printf("Obtained info for %d assets locked until %+v\n", len(assets), time.Unix(int64(lockExpiryTimeSecs), 0))
     return assets, nil
 }
+
+func (am *AssetManagement) GetHTLCHash(stub shim.ChaincodeStubInterface, assetAgreement *common.AssetExchangeAgreement) (string, error) {
+    _, err := am.validateInteropccAssetTypeAssetId(assetAgreement)
+    if err != nil {
+        return "", err
+    }
+
+    myselfBytes, err := stub.GetCreator()
+    if err != nil {
+        log.Error(err.Error())
+        return "", err
+    }
+    myself := string(myselfBytes)
+    if len(assetAgreement.Recipient) == 0 {
+        log.Info("empty lock recipient; assuming caller")
+        assetAgreement.Recipient = myself
+    }
+    if len(assetAgreement.Locker) == 0 {
+        log.Info("empty locker; assuming caller")
+        assetAgreement.Locker = myself
+    }
+    if assetAgreement.Recipient == assetAgreement.Locker {
+        return "", logThenErrorf("invalid query: locker identical to recipient")
+    }
+    assetAgreementBytes, err := proto.Marshal(assetAgreement)
+    if err != nil {
+        return "", logThenErrorf(err.Error())
+    }
+    assetAgreementBytes64 := base64.StdEncoding.EncodeToString(assetAgreementBytes)
+    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("GetHTLCHash"), []byte(assetAgreementBytes64)}, "")
+    fmt.Printf("Response from Interop CC: %+v\n", iccResp)
+    if iccResp.GetStatus() != shim.OK {
+        return "", errors.New(string(iccResp.GetMessage()))
+    }
+    return string(iccResp.GetPayload()), nil
+}
+func (am *AssetManagement) GetHTLCHashByContractId(stub shim.ChaincodeStubInterface, contractId string) (string, error) {
+    _, err := am.validateInteropccContractId(contractId)
+    if err != nil {
+	       return "", err
+    }
+
+    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("GetHTLCHashByContractId"), []byte(contractId)}, "")
+    fmt.Printf("Response from Interop CC: %+v\n", iccResp)
+    if iccResp.GetStatus() != shim.OK {
+        return "", logThenErrorf(string(iccResp.GetMessage()))
+    }
+    return string(iccResp.GetPayload()), nil
+}
+func (am *AssetManagement) GetHTLCHashPreImage(stub shim.ChaincodeStubInterface, assetAgreement *common.AssetExchangeAgreement) (string, error) {
+	    _, err := am.validateInteropccAssetTypeAssetId(assetAgreement)
+        if err != nil {
+            return "", err
+        }
+
+        myselfBytes, err := stub.GetCreator()
+        if err != nil {
+            log.Error(err.Error())
+            return "", err
+        }
+        myself := string(myselfBytes)
+        if len(assetAgreement.Recipient) == 0 {
+            log.Info("empty lock recipient; assuming caller")
+            assetAgreement.Recipient = myself
+        }
+        if len(assetAgreement.Locker) == 0 {
+            log.Info("empty locker; assuming caller")
+            assetAgreement.Locker = myself
+        }
+        if assetAgreement.Recipient == assetAgreement.Locker {
+            return "", logThenErrorf("invalid query: locker identical to recipient")
+        }
+        assetAgreementBytes, err := proto.Marshal(assetAgreement)
+        if err != nil {
+            return "", logThenErrorf(err.Error())
+        }
+        assetAgreementBytes64 := base64.StdEncoding.EncodeToString(assetAgreementBytes)
+        iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("GetHTLCHashPreImage"), []byte(assetAgreementBytes64)}, "")
+        fmt.Printf("Response from Interop CC: %+v\n", iccResp)
+        if iccResp.GetStatus() != shim.OK {
+            return "", errors.New(string(iccResp.GetMessage()))
+        }
+        return string(iccResp.GetPayload()), nil
+}
+func (am *AssetManagement) GetHTLCHashPreImageByContractId(stub shim.ChaincodeStubInterface, contractId string) (string, error) {
+    _, err := am.validateInteropccContractId(contractId)
+    if err != nil {
+	       return "", err
+    }
+
+    iccResp := stub.InvokeChaincode(am.interopChaincodeId, [][]byte{[]byte("GetHTLCHashPreImageByContractId"), []byte(contractId)}, "")
+    fmt.Printf("Response from Interop CC: %+v\n", iccResp)
+    if iccResp.GetStatus() != shim.OK {
+        return "", logThenErrorf(string(iccResp.GetMessage()))
+    }
+    return string(iccResp.GetPayload()), nil
+}
