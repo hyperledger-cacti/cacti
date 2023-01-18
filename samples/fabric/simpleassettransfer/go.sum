@@ -77,7 +77,7 @@ github.com/hashicorp/hcl v1.0.0/go.mod h1:E5yfLk+7swimpb2L/Alb/PJmXilQ/rhwaUYs4T
 github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go v1.5.3/go.mod h1:POCGO/RK9YDfgdhuyqjoD9tRNtWfK7Rh5AYYmsb1Chc=
 github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go v1.5.6 h1:OiaGROFcyfoz02xD87zcSwWyD3WBgyzt2Om9A8jx0t8=
 github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go v1.5.6/go.mod h1:POCGO/RK9YDfgdhuyqjoD9tRNtWfK7Rh5AYYmsb1Chc=
-github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt v1.5.7 h1:UMm7v5UzcCjYygoMPBdECGZN/wGZLtqbM6/7yRaYWo0=
+github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt v1.5.7 h1:GdknSXUlsl6+LF8+4NEkNPxFD/vOkzv9HW/tZxshOBc=
 github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/interfaces/asset-mgmt v1.5.7/go.mod h1:lKuvnpX+Hg7RWd3ZLZ5SYQMPjZI+OQjJtRR5hLt2oiE=
 github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils v0.0.0-20210920170720-5d5bf2a54081/go.mod h1:Nke1cGAeCHSgK8x/+tjzojTAT5L/V6e7ERxPUSbnA/8=
 github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils v0.0.0-20211117075003-d4cef34c8832 h1:9nENncgnW8sKG2b+H+oEdtLhGzF4mVDgh8Jlm+QQCcw=

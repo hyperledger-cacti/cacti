@@ -631,6 +631,7 @@ func (am *AssetManagement) GetHTLCHash(stub shim.ChaincodeStubInterface, assetAg
     }
     return string(iccResp.GetPayload()), nil
 }
+
 func (am *AssetManagement) GetHTLCHashByContractId(stub shim.ChaincodeStubInterface, contractId string) (string, error) {
     _, err := am.validateInteropccContractId(contractId)
     if err != nil {
@@ -644,6 +645,7 @@ func (am *AssetManagement) GetHTLCHashByContractId(stub shim.ChaincodeStubInterf
     }
     return string(iccResp.GetPayload()), nil
 }
+
 func (am *AssetManagement) GetHTLCHashPreImage(stub shim.ChaincodeStubInterface, assetAgreement *common.AssetExchangeAgreement) (string, error) {
 	    _, err := am.validateInteropccAssetTypeAssetId(assetAgreement)
         if err != nil {
@@ -679,6 +681,7 @@ func (am *AssetManagement) GetHTLCHashPreImage(stub shim.ChaincodeStubInterface,
         }
         return string(iccResp.GetPayload()), nil
 }
+
 func (am *AssetManagement) GetHTLCHashPreImageByContractId(stub shim.ChaincodeStubInterface, contractId string) (string, error) {
     _, err := am.validateInteropccContractId(contractId)
     if err != nil {

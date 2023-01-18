@@ -311,9 +311,11 @@ func (s *SmartContract) GetHTLCHash(ctx contractapi.TransactionContextInterface,
 	}
 	return assetexchange.GetHTLCHash(ctx, callerChaincodeID, assetAgreementBytesBase64)
 }
+
 func (s *SmartContract) GetHTLCHashByContractId(ctx contractapi.TransactionContextInterface, contractId string) (string, error) {
 	return assetexchange.GetHTLCHashByContractId(ctx, contractId)
 }
+
 func (s *SmartContract) GetHTLCHashPreImage(ctx contractapi.TransactionContextInterface, assetAgreementBytesBase64 string) (string, error) {
 	callerChaincodeID, err := wutils.GetLocalChaincodeID(ctx.GetStub())
 	if err != nil {
@@ -321,6 +323,7 @@ func (s *SmartContract) GetHTLCHashPreImage(ctx contractapi.TransactionContextIn
 	}
 	return assetexchange.GetHTLCHashPreImage(ctx, callerChaincodeID, assetAgreementBytesBase64)
 }
+
 func (s *SmartContract) GetHTLCHashPreImageByContractId(ctx contractapi.TransactionContextInterface, contractId string) (string, error) {
 	return assetexchange.GetHTLCHashPreImageByContractId(ctx, contractId)
 }

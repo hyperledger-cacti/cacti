@@ -610,9 +610,11 @@ func (amc *AssetManagementContract) GetHTLCHash(ctx contractapi.TransactionConte
     }
     return amc.assetManagement.GetHTLCHash(ctx.GetStub(), assetAgreement)
 }
+
 func (amc *AssetManagementContract) GetHTLCHashByContractId(ctx contractapi.TransactionContextInterface, contractId string) (string, error) {
 	return amc.assetManagement.GetHTLCHashByContractId(ctx.GetStub(), contractId)
 }
+
 func (amc *AssetManagementContract) GetHTLCHashPreImage(ctx contractapi.TransactionContextInterface, assetAgreementSerializedProto64 string) (string, error) {
     assetAgreement, err := amc.ValidateAndExtractAssetAgreement(assetAgreementSerializedProto64)
     if err != nil {
@@ -620,6 +622,7 @@ func (amc *AssetManagementContract) GetHTLCHashPreImage(ctx contractapi.Transact
     }
     return amc.assetManagement.GetHTLCHashPreImage(ctx.GetStub(), assetAgreement)
 }
+
 func (amc *AssetManagementContract) GetHTLCHashPreImageByContractId(ctx contractapi.TransactionContextInterface, contractId string) (string, error) {
 	return amc.assetManagement.GetHTLCHashPreImageByContractId(ctx.GetStub(), contractId)
 }
