@@ -38,7 +38,8 @@ class QuerySerializer: SerializationCustomSerializer<Query, QuerySerializer.Prox
             val requestorSignature: String,
             val nonce: String,
             val requestId: String,
-            val requestingOrg: String)
+            val requestingOrg: String,
+            val confidential: Boolean)
 
     /**
      * The function toProxy describes how the Query class should be converted to a Proxy
@@ -53,7 +54,8 @@ class QuerySerializer: SerializationCustomSerializer<Query, QuerySerializer.Prox
             requestorSignature = obj.requestorSignature,
             nonce = obj.nonce,
             requestId = obj.requestId,
-            requestingOrg = obj.requestingOrg)
+            requestingOrg = obj.requestingOrg,
+            confidential = obj.confidential)
 
     /** The function fromProxy describes how the Proxy class should be converted back to a
      * Query class when it is received from across the wire.
@@ -69,6 +71,7 @@ class QuerySerializer: SerializationCustomSerializer<Query, QuerySerializer.Prox
                 .setNonce(proxy.nonce)
                 .setRequestId(proxy.requestId)
                 .setRequestingOrg(proxy.requestingOrg)
+                .setConfidential(proxy.confidential)
                 .build()
     }
 }

@@ -237,17 +237,13 @@ func (s *SmartContract) ClaimRemoteTokenAsset(ctx contractapi.TransactionContext
 	if err != nil {
 		return err
 	}
-	pledgeAssetDetails, err := wutils.ClaimRemoteAsset(ctx, pledgeId, remoteNetworkId, pledgeBytes64)
+	
+	asset, err := getTokenAssetFromPledge(pledgeBytes64)
 	if err != nil {
 		return err
 	}
 
 	// Validate pledged asset details using app-specific-logic
-	var asset TokenAsset
-	err = json.Unmarshal(pledgeAssetDetails, &asset)
-	if err != nil {
-		return err
-	}
 	if asset.NumUnits == 0 {
 		return fmt.Errorf("cannot claim %d %s tokens as it has not been pledged in %s", numUnits, assetType, remoteNetworkId)
 	}
@@ -260,6 +256,11 @@ func (s *SmartContract) ClaimRemoteTokenAsset(ctx contractapi.TransactionContext
 	if asset.Owner != owner {
 		return fmt.Errorf("cannot claim %d %s tokens as it has not been pledged by the given owner", numUnits, assetType)
 	}
+	
+	_, err = wutils.ClaimRemoteAsset(ctx, pledgeId, remoteNetworkId, pledgeBytes64)
+	if err != nil {
+		return err
+	}
 
 	// Recreate the asset in this network and chaincode using app-specific logic: make the recipient the owner of the asset
 	return s.IssueTokenAssets(ctx, assetType, asset.NumUnits, claimer)
@@ -268,29 +269,15 @@ func (s *SmartContract) ClaimRemoteTokenAsset(ctx contractapi.TransactionContext
 // ReclaimTokenAsset gets back the ownership of an asset pledged for transfer to a different ledger/network.
 func (s *SmartContract) ReclaimTokenAsset(ctx contractapi.TransactionContextInterface, pledgeId, recipientCert, remoteNetworkId, claimStatusBytes64 string) error {
 	// (Optional) Ensure that this function is being called by the Fabric Interop CC
-
+	
 	// Reclaim the asset using common (library) logic
-	claimAssetDetails, pledgeAssetDetails, err := wutils.ReclaimAsset(ctx, pledgeId, recipientCert, remoteNetworkId, claimStatusBytes64)
+	_, pledgeAssetDetails, err := wutils.ReclaimAsset(ctx, pledgeId, recipientCert, remoteNetworkId, claimStatusBytes64)
 	if err != nil {
 		return err
-	}
-
-	// Validate reclaimed asset details using app-specific-logic
-	var claimAsset, pledgeAsset TokenAsset
-	err = json.Unmarshal(claimAssetDetails, &claimAsset)
-	if err != nil {
-		return err
-	}
-	if claimAsset.Type != "" &&
-		claimAsset.NumUnits != 0 &&
-		claimAsset.Owner != "" {
-		// Run checks on the claim parameter to see if it is what we expect and to ensure it has not already been made in the other network
-		if !matchClaimWithTokenAssetPledge(pledgeAssetDetails, claimAssetDetails) {
-			return fmt.Errorf("claim info for asset with pledge id %s does not match pledged asset details on ledger: %s", pledgeId, pledgeAssetDetails)
-		}
 	}
 
 	// Recreate the asset in this network and chaincode using app-specific logic
+	var pledgeAsset TokenAsset
 	err = json.Unmarshal(pledgeAssetDetails, &pledgeAsset)
 	if err != nil {
 		return err

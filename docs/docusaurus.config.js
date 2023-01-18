@@ -16,7 +16,7 @@ module.exports = {
   projectName: 'hyperledger-labs.github.io',
   themeConfig: {
     prism: {
-        additionalLanguages: ['java', 'kotlin', 'groovy'],
+        additionalLanguages: ['java', 'kotlin', 'groovy', 'toml'],
     },
     navbar: {
       title: 'Weaver',

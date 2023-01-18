@@ -394,7 +394,7 @@ func IsAssetLocked(ctx contractapi.TransactionContextInterface, callerChaincodeI
 	}
 
 	if assetLockValBytes == nil {
-		return false, logThenErrorf("no asset of type %s and ID %s is locked", assetAgreement.AssetType, assetAgreement.Id)
+		return false, nil
 	}
 
 	assetLockVal := AssetLockValue{}
@@ -407,18 +407,18 @@ func IsAssetLocked(ctx contractapi.TransactionContextInterface, callerChaincodeI
 	// Check if expiry time is elapsed
 	currentTimeSecs := uint64(time.Now().Unix())
 	if currentTimeSecs >= assetLockVal.ExpiryTimeSecs {
-		return false, logThenErrorf("expiry time for asset of type %s and ID %s is already elapsed", assetAgreement.AssetType, assetAgreement.Id)
+		return false, nil
 	}
 
 	// '*' for recipient or locker in the query implies that the query seeks status for an arbitrary recipient or locker respectively
 	if (assetAgreement.Locker == "*" || assetLockVal.Locker == assetAgreement.Locker) && (assetAgreement.Recipient == "*" || assetLockVal.Recipient == assetAgreement.Recipient) {
 		return true, nil
 	} else if assetAgreement.Locker == "*" && assetLockVal.Recipient != assetAgreement.Recipient {
-		return false, logThenErrorf("asset of type %s and ID %s is not locked for %s", assetAgreement.AssetType, assetAgreement.Id, assetAgreement.Recipient)
+		return false, nil
 	} else if assetAgreement.Recipient == "*" && assetLockVal.Locker != assetAgreement.Locker {
-		return false, logThenErrorf("asset of type %s and ID %s is not locked by %s", assetAgreement.AssetType, assetAgreement.Id, assetAgreement.Locker)
+		return false, nil
 	} else if assetLockVal.Locker != assetAgreement.Locker || assetLockVal.Recipient != assetAgreement.Recipient {
-		return false, logThenErrorf("asset of type %s and ID %s is not locked by %s for %s", assetAgreement.AssetType, assetAgreement.Id, assetAgreement.Locker, assetAgreement.Recipient)
+		return false, nil
 	}
 
 	return true, nil
@@ -733,13 +733,18 @@ func IsAssetLockedQueryUsingContractId(ctx contractapi.TransactionContextInterfa
 
 	_, assetLockVal, err := fetchAssetLockedUsingContractId(ctx, contractId)
 	if err != nil {
+		errStr := fmt.Sprintf("no contractId %s exists on the ledger", contractId)
+		// Reporting no error only if the lock contract doesn't exist at all
+		if err.Error() == errStr {
+			return false, nil
+		}
 		return false, logThenErrorf(err.Error())
 	}
 
 	// Check if expiry time is elapsed
 	currentTimeSecs := uint64(time.Now().Unix())
 	if currentTimeSecs >= assetLockVal.ExpiryTimeSecs {
-		return false, logThenErrorf("expiry time for asset associated with contractId %s is already elapsed", contractId)
+		return false, nil
 	}
 
 	return true, nil
@@ -827,13 +832,18 @@ func IsFungibleAssetLocked(ctx contractapi.TransactionContextInterface, contract
 
 	assetLockVal, err := fetchFungibleAssetLocked(ctx, contractId)
 	if err != nil {
+		errStr := fmt.Sprintf("contractId %s is not associated with any currently locked fungible asset", contractId)
+		// Reporting no error only if the lock contract doesn't exist at all
+		if err.Error() == errStr {
+			return false, nil
+		}
 		return false, logThenErrorf(err.Error())
 	}
 
 	// Check if expiry time is elapsed
 	currentTimeSecs := uint64(time.Now().Unix())
 	if currentTimeSecs >= assetLockVal.ExpiryTimeSecs {
-		return false, logThenErrorf("expiry time for fungible asset associated with contractId %s is already elapsed", contractId)
+		return false, nil
 	}
 
 	return true, nil

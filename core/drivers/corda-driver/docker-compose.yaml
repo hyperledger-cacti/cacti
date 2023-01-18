@@ -23,7 +23,7 @@ services:
     ports:
       - "${DRIVER_PORT}:${DRIVER_PORT}"
     volumes:
-      - ../../relay/credentials:/corda-driver/credentials
+      - ${TLS_CREDENTIALS_DIR}:/corda-driver/credentials
     command: sh -c "./bin/corda-driver"
 
 networks:

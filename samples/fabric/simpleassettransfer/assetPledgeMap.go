@@ -33,6 +33,7 @@ func createAssetPledgeIdMap(ctx contractapi.TransactionContextInterface, pledgeI
 
 func getAssetPledgeIdMap(ctx contractapi.TransactionContextInterface, assetType, id string) (*AssetPledgeMap, error) {
 	key := "asset_pledge_map_" + generateSHA256HashInHexForm(assetType + id)
+	fmt.Printf("key: %s\n", key)
 	assetPledgeMap := &AssetPledgeMap{}
 	assetPledgeMapJSON, err := ctx.GetStub().GetState(key)
 	if err != nil {

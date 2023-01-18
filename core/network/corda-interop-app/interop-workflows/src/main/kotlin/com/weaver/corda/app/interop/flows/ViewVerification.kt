@@ -115,13 +115,20 @@ fun verifyCordaNotarization(viewData: ByteString, verificationPolicyCriteria: Li
     // 1. Make the CordaViewData object from the view data
     val cordaViewData = ViewDataOuterClass.ViewData.parseFrom(viewData)
     println("Corda view data: $cordaViewData")
+    
+    var interopPayload = cordaViewData.notarizedPayloadsList[0].payload
 
     // 2. Map over the list of notarizations and verify the signature, creating a list of Either Error Boolean
-    val eitherErrorCordaViewData = cordaViewData.notarizationsList.map { notarization ->
-        getCertificateFromString(notarization.certificate).flatMap { x509Cert ->
+    val eitherErrorCordaViewData = cordaViewData.notarizedPayloadsList.map { notarizedPayload ->
+        getCertificateFromString(notarizedPayload.certificate).flatMap { x509Cert ->
             // 3. Check the certificates are valid according to the [Membership].
-            verifyMemberInSecurityDomain(x509Cert, securityDomain, notarization.id, serviceHub).flatMap {
-                verifyNodeSignature(notarization.certificate, notarization.signature, cordaViewData.payload.toByteArray())
+            verifyMemberInSecurityDomain(x509Cert, securityDomain, notarizedPayload.id, serviceHub).flatMap {
+                verifyNodeSignature(notarizedPayload.certificate, notarizedPayload.signature, notarizedPayload.payload.toByteArray()).flatMap {
+                    if (interopPayload != notarizedPayload.payload) {
+                        Left(Error("InteropPayload doesn't match across responses from different nodes"))
+                    }
+                    Right(true)
+                }
             }
         }
     }
@@ -131,8 +138,8 @@ fun verifyCordaNotarization(viewData: ByteString, verificationPolicyCriteria: Li
             // Map the Right to the view data
             .map { viewData }
 
-    // Get the signers from the list of notarizations
-    val signers = cordaViewData.notarizationsList.map { it.id }
+    // Get the signers from the list of notarizedPayloads
+    val signers = cordaViewData.notarizedPayloadsList.map { it.id }
 
     // 4. Check that every party listed in the verification policy is a signatory
     eitherErrorCordaViewData.flatMap { _ ->
@@ -187,11 +194,11 @@ fun verifyFabricNotarization(
 
         // TODO: Handle encrypted (confidential) payloads in Fabric views
         var responsePayload = ""
-        var responsePayloadEncoded = ""
         var responseIndex = 0
         for (endorsedProposalResponse in fabricViewData.endorsedProposalResponsesList) {
             val chaincodeAction = ProposalPackage.ChaincodeAction.parseFrom(endorsedProposalResponse.payload.extension)
             val interopPayload = InteropPayloadOuterClass.InteropPayload.parseFrom(chaincodeAction.response.payload)
+            val encodedPayload = Base64.getEncoder().encodeToString(chaincodeAction.response.payload.toByteArray())
             println("Interop payload: $interopPayload")
             // 2. Verify address in payload is the same as original address
             if (interopPayload.address != addressString) {
@@ -200,12 +207,10 @@ fun verifyFabricNotarization(
             }
             // 3. Verify that the responses in the different ProposalResponsePayload blobs match each other
             if (responseIndex == 0) {
-                responsePayload = chaincodeAction.response.payload.toString()
-                responsePayloadEncoded = Base64.getEncoder().encodeToString(chaincodeAction.response.payload.toByteArray())
-            } else if (responsePayload != chaincodeAction.response.payload.toString()) {
-                println("Mismatching payloads in proposal responses: 0 - $responsePayload,  $responseIndex: ${chaincodeAction.response.payload}")
-                val encodedPayload = Base64.getEncoder().encodeToString(chaincodeAction.response.payload.toByteArray())
-                return Left(Error("Mismatching payloads in proposal responses: 0 - $responsePayloadEncoded,  $responseIndex: $encodedPayload"))
+                responsePayload = encodedPayload
+            } else if (responsePayload != encodedPayload) {
+                println("Mismatching payloads in proposal responses: 0 - $responsePayload,  $responseIndex: $encodedPayload")
+                return Left(Error("Mismatching payloads in proposal responses: 0 - $responsePayload,  $responseIndex: $encodedPayload"))
             }
             responseIndex++
         }

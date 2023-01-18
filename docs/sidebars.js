@@ -31,7 +31,19 @@ module.exports = {
                     items: [
                         "external/getting-started/interop/overview",
                         "external/getting-started/interop/data-sharing",
-                        "external/getting-started/interop/asset-exchange",
+                        {
+                            type: "category",
+                            label: "Asset Exchange",
+                            items: [
+                                "external/getting-started/interop/asset-exchange/overview",
+                                "external/getting-started/interop/asset-exchange/fabric-fabric",
+                                "external/getting-started/interop/asset-exchange/fabric-corda",
+                                "external/getting-started/interop/asset-exchange/fabric-besu",
+                                "external/getting-started/interop/asset-exchange/corda-corda",
+                                "external/getting-started/interop/asset-exchange/corda-besu",
+                                "external/getting-started/interop/asset-exchange/besu-besu",
+                            ],
+                        },
                         "external/getting-started/interop/asset-transfer",
                     ],
                 },

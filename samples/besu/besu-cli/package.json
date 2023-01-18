@@ -31,8 +31,8 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@hyperledger-labs/weaver-besu-interop-sdk": "file:../../../sdks/besu/interoperation-node-sdk",
-    "@hyperledger-labs/weaver-protos-js": "file:../../../common/protos-js",
+    "@hyperledger-labs/weaver-besu-interop-sdk": "~1.5.0",
+    "@hyperledger-labs/weaver-protos-js": "~1.5.0",
     "@truffle/contract": "^4.2.14",
     "gluegun": "latest",
     "winston": "^3.3.3"

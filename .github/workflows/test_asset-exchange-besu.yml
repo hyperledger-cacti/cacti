@@ -85,7 +85,7 @@ jobs:
        # BESU CLI
       - name: Setup BESU CLI init
         run: |
-         npm install .
+         make build-local
          cp config.template.json tmp.json
          cp config.template.json tmp.json
          jq -r '.network1.tokenContract |= "../simpleasset/build/contracts/${{ matrix.app_contract }}.json"' tmp.json > config.json

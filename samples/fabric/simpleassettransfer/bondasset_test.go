@@ -473,12 +473,21 @@ func TestReclaimAsset(t *testing.T) {
 		ExpirationStatus: false,
 	}
 	claimStatusBytes, _ := marshalAssetClaimStatus(claimStatus)
+	
+	assetPledgeMap := &sa.AssetPledgeMap{
+		PledgeID: defaultPledgeId,
+		RemoteNetworkID: destNetworkID,
+		Recipient: getRecipientECertBase64(),
+	}
+	assetPledgeMapJSON, _ := json.Marshal(assetPledgeMap)
+	bondAssetPledgeMapKey := "asset_pledge_map_" + generateSHA256HashInHexForm(defaultAssetType + defaultAssetId)
 
 	chaincodeStub.GetCreatorReturns([]byte(getCreatorInContext("locker")), nil)
 	err = simpleAsset.ReclaimAsset(transactionContext, defaultPledgeId, getRecipientECertBase64(), destNetworkID, claimStatusBytes)
-	require.EqualError(t, err, "the asset with pledgeId abc123 has not been pledged")       // no pledge recorded
+	require.EqualError(t, err, "asset BearerBonds:asset1 was not pledged with pledgeId abc123")       // no pledge recorded
 
 	bondAssetPledgeKey := "Pledged_" + defaultPledgeId
+	chaincodeStub.GetStateReturnsForKey(bondAssetPledgeMapKey, assetPledgeMapJSON, nil)
 	chaincodeStub.GetStateReturnsForKey(bondAssetPledgeKey, bondAssetPledgeBytes, nil)
 	err = simpleAsset.ReclaimAsset(transactionContext, defaultPledgeId, getRecipientECertBase64(), destNetworkID, claimStatusBytes)
 	require.EqualError(t, err, "cannot reclaim asset with pledgeId abc123 as the expiry time is not yet elapsed")       // pledge has not expired yet
@@ -504,7 +513,7 @@ func TestReclaimAsset(t *testing.T) {
 	claimStatus.ClaimStatus = false
 	claimStatusBytes, _ = marshalAssetClaimStatus(claimStatus)
 	err = simpleAsset.ReclaimAsset(transactionContext, defaultPledgeId, getRecipientECertBase64(), destNetworkID, claimStatusBytes)
-	require.EqualError(t, err, "cannot reclaim asset with pledgeId abc123 as it has not been pledged by a claimer in this network")       // claim was for a different asset
+	require.EqualError(t, err, "asset BearerBonds:someid was not pledged with pledgeId abc123")       // claim was for a different asset
 
 	bondAsset.ID = defaultAssetId
 	bondAssetJSON, _ = json.Marshal(bondAsset)

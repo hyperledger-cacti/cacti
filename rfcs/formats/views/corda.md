@@ -174,17 +174,20 @@ serialization format will be protobuf. The `data` field of the view will be a by
 
 ```protobuf
 message ViewData {
-  message Notarization {
-    string signature = 1;
-    string certificate = 2;
-    string id = 3;
-  }
-  repeated Notarization notarizations = 1;
-  bytes payload = 2;
+    message NotarizedPayload {
+        string signature = 1;
+        string certificate = 2;
+        string id = 3;
+        // Bytes of InteropPayload
+        bytes payload = 4;
+    }
+    repeated NotarizedPayload notarized_payloads = 1;
 }
 ```
 
-The `payload` field will have the following structure:
+It consists of an array of `NotarizedPayload`, a response from each Corda node. The reason why we need to retain the payload field in each array element instead of keeping just one copy is because the data blobs within those different payloads may be different while being semantically identical (they may be different because of non-deterministic serialization and encryption operations carried out by the [interoperation module](../../models/infrastructure/interoperation-modules.md).
+
+The `NotarizedPayload.payload` field will have the serialized bytes of following structure:
 
 ```protobuf
 message InteropPayload {
@@ -201,15 +204,15 @@ message InteropPayload {
     calculated from computing derived state. The external network application that
     receives the view will need to know how to parse this field and agreement on
     format of the field needs to be agreed out-of-band.
--   `Notarization.signature` is the signature of the node providing the view and proof. The
+-   `NotarizedPayload.signature` is the signature of the node providing the view and proof. The
     signature is signed on the result encoded as a Base64 bytearray of the JSON
     stringified `data`. The signature is provided as a Base64 encoded string.
--   `Notarization.certificate` is the X509 certificate of the node that contains the public key
+-   `NotarizedPayload.certificate` is the X509 certificate of the node that contains the public key
     corresponding to the private key that was used to sign the response. This is
     used by the requesting network to verify the signature and authenticate the
     identity of the signer based on the network's topology map. The certificate is
     provided in PEM format as a Base64 encoded string.
--   `Notarization.id` is the identity of the organisation that owns the node that did the signing
+-   `NotarizedPayload.id` is the identity of the organisation that owns the node that did the signing
 -   `notarizations` is the list of all of the signatures and certificates from all
     nodes that were required to endorse the request, as well as the id of the node that did the signing.
 
@@ -220,7 +223,8 @@ message InteropPayload {
 ```
 notarizations: [{
     signature: QbKxQqKlsLJH8MC6eOFhQ/ELful7lbkVrQTwm4Xmfg5xJXeNz8xtqv8any6H4jyXXskyFxYWLISosAfcUdd0BA==,
-    certificate: MIIBwjCCAVgAwIBAgIIUJkQvmKm35YwFAYIKoZIzj0EAwIGCCqGSM49AwEHMC8xCzAJBgNVBAYTAkdCMQ8wDQYDVQQHDAZMb25kb24xDzANBgNVBAoMBlBhcnR5QTAeFw0yMDA3MjQwMDAwMDBaFw0yNzA1MjAwMDAwMDBaMC8xCzAJBgNVBAYTAkdCMQ8wDQYDVQQHDAZMb25kb24xDzANBgNVBAoMBlBhcnR5QTAqMAUGAytlcAMhAMMKaREKhcTgSBMMzK81oPUSPoVmG/fJMLXq/ujSmse9o4GJMIGGMB0GA1UdDgQWBBRMXtDsKFZzULdQ3c2DCUEx3T1CUDAPBgNVHRMBAf8EBTADAQH/MAsGA1UdDwQEAwIChDATBgNVHSUEDDAKBggrBgEFBQcDAjAfBgNVHSMEGDAWgBR4hwLuLgfIZMEWzG4n3AxwfgPbezARBgorBgEEAYOKYgEBBAMCAQYwFAYIKoZIzj0EAwIGCCqGSM49AwEHA0cAMEQCIC7J46SxDDz3LjDNrEPjjwP2prgMEMh7r/gJpouQHBk+AiA+KzXD0d5miI86D2mYK4C3tRli3X3VgnCe8COqfYyuQg==
+    certificate: MIIBwjCCAVgAwIBAgIIUJkQvmKm35YwFAYIKoZIzj0EAwIGCCqGSM49AwEHMC8xCzAJBgNVBAYTAkdCMQ8wDQYDVQQHDAZMb25kb24xDzANBgNVBAoMBlBhcnR5QTAeFw0yMDA3MjQwMDAwMDBaFw0yNzA1MjAwMDAwMDBaMC8xCzAJBgNVBAYTAkdCMQ8wDQYDVQQHDAZMb25kb24xDzANBgNVBAoMBlBhcnR5QTAqMAUGAytlcAMhAMMKaREKhcTgSBMMzK81oPUSPoVmG/fJMLXq/ujSmse9o4GJMIGGMB0GA1UdDgQWBBRMXtDsKFZzULdQ3c2DCUEx3T1CUDAPBgNVHRMBAf8EBTADAQH/MAsGA1UdDwQEAwIChDATBgNVHSUEDDAKBggrBgEFBQcDAjAfBgNVHSMEGDAWgBR4hwLuLgfIZMEWzG4n3AxwfgPbezARBgorBgEEAYOKYgEBBAMCAQYwFAYIKoZIzj0EAwIGCCqGSM49AwEHA0cAMEQCIC7J46SxDDz3LjDNrEPjjwP2prgMEMh7r/gJpouQHBk+AiA+KzXD0d5miI86D2mYK4C3tRli3X3VgnCe8COqfYyuQg==,
+    payload: <binary of interop payload>
   }]
-payload: <binary of interop payload>
+
 ```

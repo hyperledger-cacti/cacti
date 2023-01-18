@@ -29,6 +29,8 @@ import (
 const (
     interopCCId = "interopcc"
     clientId = "Alice"
+    defaultHash = "MBQGA1UEBxMNU2FuIEZyYW5jaXNjbzEPMA0GA1UECxMGY2xpZW50MSQwIgYDVQQD"
+    defaultPreimage = "YW5jaXNjbzEeMBwGA1UE"
 )
 
 // Mock function to simulate the Fabric Interop CC
@@ -247,6 +249,18 @@ func (cc *InteropCC) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
     if function == "GetFungibleAssetTimeToRelease" {
         return shim.Success([]byte(strconv.Itoa(len(cc.fungibleAssetLockMap))))
     }
+    if function == "GetHTLCHash" {
+        return shim.Success([]byte(defaultHash))
+    }
+    if function == "GetHTLCHashByContractId" {
+        return shim.Success([]byte(defaultHash))
+    }
+    if function == "GetHTLCHashPreImage" {
+        return shim.Success([]byte(defaultPreimage))
+    }
+    if function == "GetHTLCHashPreImageByContractId" {
+        return shim.Success([]byte(defaultPreimage))
+    }
     return shim.Error(fmt.Sprintf("Invalid invoke function name: %s", function))
 }
 
@@ -371,6 +385,16 @@ func TestAssetLock(t *testing.T) {
     lockSuccess, err = amcc.IsAssetLockedQueryUsingContractId(amstub, contractId)
     require.NoError(t, err)
     require.True(t, lockSuccess)
+    
+    // Query the Hash
+    retrievedHash, err := amcc.GetHTLCHash(amstub, assetAgreement)
+    require.NoError(t, err)
+    require.Equal(t, retrievedHash, string(hash))
+    
+    // Query the Hash using contractId
+    retrievedHash, err = amcc.GetHTLCHashByContractId(amstub, contractId)
+    require.NoError(t, err)
+    require.Equal(t, retrievedHash, string(hash))
 
     // Test failure when we try to lock an already locked asset
     currTime := time.Now()
@@ -488,6 +512,11 @@ func TestFungibleAssetLock(t *testing.T) {
     lockSuccess, err = amcc.IsFungibleAssetLocked(amstub, contractId)
     require.NoError(t, err)
     require.True(t, lockSuccess)
+    
+    // Query the Hash using contractId
+    retrievedHash, err := amcc.GetHTLCHashByContractId(amstub, contractId)
+    require.NoError(t, err)
+    require.Equal(t, retrievedHash, string(hash))
 }
 
 func TestIsAssetLocked(t *testing.T) {
@@ -1077,6 +1106,11 @@ func TestAssetClaim(t *testing.T) {
     lockSuccess, err = amcc.IsAssetLocked(amstub, assetAgreement)
     require.NoError(t, err)
     require.False(t, lockSuccess)
+    
+    // Query the HashPreimage
+    retrievedPreimage, err := amcc.GetHTLCHashPreImage(amstub, assetAgreement)
+    require.NoError(t, err)
+    require.Equal(t, retrievedPreimage, string(hashPreimage))
 }
 
 func TestAssetClaimUsingContractId(t *testing.T) {
@@ -1184,6 +1218,11 @@ func TestAssetClaimUsingContractId(t *testing.T) {
     lockSuccess, err = amcc.IsAssetLockedQueryUsingContractId(amstub, contractId)
     require.NoError(t, err)
     require.False(t, lockSuccess)
+    
+    // Query the HashPreimage
+    retrievedPreimage, err := amcc.GetHTLCHashPreImageByContractId(amstub, contractId)
+    require.NoError(t, err)
+    require.Equal(t, retrievedPreimage, string(hashPreimage))
 }
 
 func TestFungibleAssetClaim(t *testing.T) {
@@ -1257,6 +1296,11 @@ func TestFungibleAssetClaim(t *testing.T) {
     lockSuccess, err = amcc.IsFungibleAssetLocked(amstub, contractId)
     require.NoError(t, err)
     require.False(t, lockSuccess)
+    
+    // Query the HashPreimage
+    retrievedPreimage, err := amcc.GetHTLCHashPreImageByContractId(amstub, contractId)
+    require.NoError(t, err)
+    require.Equal(t, retrievedPreimage, string(hashPreimage))
 }
 
 func TestFungibleAssetCountFunctions(t *testing.T) {

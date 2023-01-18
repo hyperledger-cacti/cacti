@@ -15,12 +15,12 @@
 - Interaction between networks is asymmetrical, with either end assuming a designated role that complements the other to fulfill a cross-ledger requirement.
 - We can draw inspiration from both database operations and the HTTP client server protocols with its limited number of methods (GET, PUT, POST, and DELETE)
 - Broadly, the cross-network operations can be classified into unidirectional (write following a read) and bidirectional (simultaneous writes)
-- Ledger resources can be classified into data, which can be copied, and assets, which have designated ownership and a limited number of instances
+- Ledger resources can be classified into data (referring to asset or workflow state), which can be copied, and assets, which have designated ownership and a limited number of instances (assets can be transferred from one owner to another, within a single ledger or across multiple ledgers)
 - Broadly, the building blocks of use cases can be classified into those that sync data and those that move assets
 
 ## Cross-Network Dependencies
 
-We can reason about the range and exhaustiveness of operations that two distinct shared ledgers, and the networks that maintain them, would like to perform in concert by considering what kinds of resources are present on a ledger and the nature of dependencies between ledgers and the smart contracts deployed on them. This will them help us define the most common and useful cross-network protocols that a platform like Weaver ought to support.
+We can reason about the range and exhaustiveness of operations that two distinct shared ledgers, and the networks that maintain them, would like to perform in concert by considering what kinds of resources are present on a ledger and the nature of dependencies between ledgers and the smart contracts deployed on them. This will then help us define the most common and useful cross-network protocols that a platform like Weaver ought to support.
 
 At the most basic level, we can classify the dependencies into the following:
 - _Bidirectional_: an action in one network triggers an action in another network and simultaneously is triggered by the latter. In other words, actions in two networks must occur atomically; i.e., both happen or neither happens.
@@ -44,7 +44,7 @@ Examples:
 
 ## Building Blocks of Cross-Network Use Cases
 
-Extrapolating from the above figure, we can now think about a taxonomy of the kinds of records are typically maintained on shared ledger using smart contracts, producing two types:
+Extrapolating from the above figure, we can now think about a taxonomy of the kinds of records that are typically maintained on shared ledger using smart contracts, producing two types:
 - _Assets_: these are digital embodiments of some tangible real-world physical goods that have designated owners and a limited and immutable number of instances; i.e., they cannot be just copied digitally without losing their integrity.
 - _Data_: these are all digital records that are not assets. They can describe properties about entities, things, or the environment, and can be copied arbitrarily while retaining their value.
 

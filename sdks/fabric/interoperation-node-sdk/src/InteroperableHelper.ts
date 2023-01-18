@@ -179,9 +179,9 @@ const getResponseDataFromView = (view, privKeyPEM = null) => {
         let payloadConfidential = false;
         for (let i = 0; i < fabricViewProposalResponses.length; i++) {
             const fabricViewChaincodeAction = proposalPb.ChaincodeAction.deserializeBinary(fabricViewProposalResponses[i].getPayload().getExtension_asU8());
-            const interopPayload = interopPayloadPb.InteropPayload.deserializeBinary(Uint8Array.from(Buffer.from(fabricViewChaincodeAction.getResponse().getPayload())));
+            const interopPayload = interopPayloadPb.InteropPayload.deserializeBinary(fabricViewChaincodeAction.getResponse().getPayload_asU8());
             if (interopPayload.getConfidential()) {    // Currently this is only supported for Fabric because it uses ECDSA keys in wallets
-                const confidentialPayload = interopPayloadPb.ConfidentialPayload.deserializeBinary(Uint8Array.from(Buffer.from(interopPayload.getPayload())));
+                const confidentialPayload = interopPayloadPb.ConfidentialPayload.deserializeBinary(interopPayload.getPayload_asU8());
                 const decryptedPayload = decryptData(Buffer.from(confidentialPayload.getEncryptedPayload()), privKeyPEM);
                 const decryptedPayloadContents = interopPayloadPb.ConfidentialPayloadContents.deserializeBinary(Uint8Array.from(Buffer.from(decryptedPayload)));
                 if (i === 0) {
@@ -227,8 +227,39 @@ const getResponseDataFromView = (view, privKeyPEM = null) => {
         }
     } else if (view.getMeta().getProtocol() == statePb.Meta.Protocol.CORDA) {
         const cordaView = cordaViewPb.ViewData.deserializeBinary(view.getData());
-        const interopPayload = interopPayloadPb.InteropPayload.deserializeBinary(Uint8Array.from(Buffer.from(cordaView.getPayload())));
-        return { viewAddress: interopPayload.getAddress(), data: Buffer.from(interopPayload.getPayload()).toString() };
+        const cordaNotarizedPayloads = cordaView.getNotarizedPayloadsList();
+        let viewAddress = '';
+        let responsePayload = '';
+        let responsePayloadContents = [];
+        let payloadConfidential = false;
+        cordaNotarizedPayloads.forEach((notarizedPayload, i) => {
+            const interopPayload = interopPayloadPb.InteropPayload.deserializeBinary(notarizedPayload.getPayload_asU8());
+            if (interopPayload.getConfidential()) {
+                const confidentialPayload = interopPayloadPb.ConfidentialPayload.deserializeBinary(interopPayload.getPayload_asU8());
+                //TODO: Confidentiality in Corda
+            } else {
+                if (i === 0) {
+                    viewAddress = interopPayload.getAddress();
+                    responsePayload = Buffer.from(interopPayload.getPayload()).toString();
+                    payloadConfidential = false;
+                } else if (payloadConfidential) {
+                    throw new Error(`Mismatching payload confidentiality flags across notarized payloads`);
+                } else {
+                    const currentResponsePayload = Buffer.from(interopPayload.getPayload()).toString();
+                    if (responsePayload !== currentResponsePayload) {
+                        throw new Error(`Proposal response payloads mismatch: 0 - ${responsePayload}, ${i} - ${currentResponsePayload}`);
+                    }
+                    if (viewAddress !== interopPayload.getAddress()) {
+                        throw new Error(`Proposal response view addresses mismatch: 0 - ${viewAddress}, ${i} - ${interopPayload.getAddress()}`);
+                    }
+                }
+            }
+        })
+        if (payloadConfidential) {
+            return { viewAddress: viewAddress, data: responsePayload, contents: responsePayloadContents };
+        } else {
+            return { viewAddress: viewAddress, data: responsePayload };
+        }
     } else {
         const protocolType = view.getMeta().getProtocol();
         throw new Error(`Unsupported DLT type: ${protocolType}`);
@@ -264,7 +295,7 @@ const getEndorsementsAndSignatoriesFromCordaView = (view) => {
         throw new Error(`Not a Corda view`);
     }
     const cordaView = cordaViewPb.ViewData.deserializeBinary(view.getData());
-    const notarizations = cordaView.getNotarizationsList();
+    const notarizations = cordaView.getNotarizedPayloadsList();
     const signatures = [];
     const certs = [];
     const ids = [];
