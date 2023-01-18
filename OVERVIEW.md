@@ -52,7 +52,9 @@ The basis for this protocol is a priori knowledge of counterparty networks' memb
 
 The Weaver components and tools are illustrated in the below architecture diagram, independent of the networks into which they are incorporated.
 
-<img src="./resources/images/weaver-architecture.png">
+<p align="center" width="100%">
+  <img src="./resources/images/weaver-architecture.png" width="75%">
+</p>
 
 #### Relays
 
@@ -164,7 +166,9 @@ Because relays are additional components introduced by Weaver into a DLT network
 
 The capabilities that need to be supported within the network and in the cross-network communication modules for the three interoperability modes (data sharing, asset exchange, and asset transfer) are illustrated in the figure below.
 
-<img src="./resources/images/weaver-building-blocks.png">
+<p align="center" width="100%">
+  <img src="./resources/images/weaver-building-blocks.png" width="75%">
+</p>
 
 To support any of the Weaver protocols, the *Core Network Capabilities* must be implemented in the interoperation module for a given network and the *Relay Capabilities* must be implemented in the relay/driver combination for that network.
 
