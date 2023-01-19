@@ -200,7 +200,7 @@ const createFungibleHTLC = async (
     //If timeoutCallback is not defined, start automated listener
     if (!timeoutCallback) 
     {
-        StartHTLCFungibleAssetLockListener(contract, "", assetType, numUnits, recipientECert, "", assetLockExpirationCallback);
+        StartHTLCFungibleAssetLockListener(contract, "", assetType, numUnits, recipientECert, "", fungibleAssetLockExpirationCallback);
     }
 
     // Normal invoke function
@@ -514,7 +514,7 @@ const isAssetLockedInHTLC = async (
     if (evaluateError) {
         throw new Error(`IsAssetLocked evaluateTransaction Error: ${evaluateError}`);
     }
-    return result;
+    return result.toString() === "true";
 };
 
 /**
@@ -544,7 +544,6 @@ const isAssetLockedInHTLCqueryUsingContractId = async (
     if (evaluateError) {
         throw new Error(`IsAssetLockedQueryUsingContractId evaluateTransaction Error: ${evaluateError}`);
     }
-    console.log("result.toString: ", result.toString());
     return result.toString() === "true";
 };
 
@@ -575,7 +574,7 @@ const isFungibleAssetLockedInHTLC = async (
     if (evaluateError) {
         throw new Error(`IsFungibleAssetLocked evaluateTransaction Error: ${evaluateError}`);
     }
-    return result;
+    return result.toString() === "true";
 };
 
 
@@ -627,7 +626,7 @@ const StartHTLCEventListener = (
             let infoNumUnits: number, infoAssetId: string;
             if (eventName.includes('Fungible')) {
                 infoNumUnits = assetLockContractInfo.getAgreement().getNumunits();
-                if (infoNumUnits !== numUnits) {
+                if (infoNumUnits != numUnits) {
                     return;
                 }
             } 
@@ -650,8 +649,7 @@ const StartHTLCEventListener = (
                 if (infoLocker.length > 0 && infoLocker !== lockerECert) {
                     return;
                 }
-            }
-            
+            }            
             // All filters passed
             if (eventName === 'LockAsset' || eventName === 'LockFungibleAsset') {
                 const timeout = assetLockContractInfo.getLock().getExpirytimesecs();
@@ -709,12 +707,13 @@ const StartHTLCAssetLockListener = (
     StartHTLCEventListener(contract, 'LockAsset', contractId, assetType, assetId, -1, recipientECert, lockerECert, lockCallback);
 }
 
+// NOTE: For Nonfungible Assets
 // Byzantine Swaps: Timed counterpart for timed AssetLockListener for reversion
 const assetLockExpirationCallback = (
     contract: Contract, 
     contractID: string, 
     assetType: string, 
-    assetIDOrQuantity: any, 
+    assetID: string, 
     recipientECert: string, 
     lockerECert: string, 
     hash: Hash,
@@ -722,30 +721,24 @@ const assetLockExpirationCallback = (
 ): void => {
     // Compare expiryTimeSec with currentTimeSec, which is number of milliseconds since epoch (L174)
     const currTimeSecs = Math.floor(Date.now()/1000);
-    console.log("Check #1");
-
     const reclaimCallback = async (contract: Contract, contractID: string) => {
         // Check if asset hasn't been claimed yet. If true, do nothing. If false, either do the following cases:
         const [islocked, isLockedQueryError] = await helpers.handlePromise(isAssetLockedInHTLCqueryUsingContractId(contract, contractID));
-        console.log("Check #2. isLocked: ", islocked);
-        
         if (islocked == false) {
             // CASE #1: Check GetHTLCHashPreImageByContractId(contractId)
             const [result, evaluateError] = await helpers.handlePromise(
                 contract.evaluateTransaction("GetHTLCHashPreImageByContractId", contractID),
             );
-
-            console.log("Check #3. result: ", result);
             
             // CASE #2: If the function above returns ANY error, call reclaimAssetInHTLC
             if (evaluateError) {
                 // Put retry logic in event of failure. Retry 3x and then give up if unsuccessful (temp solution for now; requires CORE changes)
                 // If it fails, retry for i (arbitrarily defined) more attempts until you quit
                 let i = 0;
-                console.log("Check #4. evaluateError: ", evaluateError);
                 do {
                     let [retryReclaimResult, retryReclaimableQueryError] = await helpers.handlePromise(reclaimAssetInHTLCusingContractId(contract, contractID));
                     if (!retryReclaimableQueryError) {
+                        console.log("Nonfungible Asset unlocked successfully");
                         break;
                     }
 
@@ -753,8 +746,59 @@ const assetLockExpirationCallback = (
                 } while (i < 3);
             }
         }
+    }
 
-        console.log("Check #5");
+    // If you have time remaining, call setTimeout with reclaimCallback
+    if (expiryTime - currTimeSecs > 0) {
+        setTimeout(reclaimCallback, 1000 * (expiryTime - currTimeSecs), contract, contractID);
+    }
+
+    // If no time remaining, call the reclaim callback immediately
+    else if (expiryTime - currTimeSecs <= 0) {
+        reclaimCallback(contract, contractID);
+    }
+}
+//----------------------------------------------------------------------------------------------------------------------------------
+//NOTE: FUNGIBLE counterpart
+// Byzantine Swaps: Timed counterpart for timed AssetLockListener for reversion
+const fungibleAssetLockExpirationCallback = (
+    contract: Contract, 
+    contractID: string, 
+    assetType: string, 
+    numUnits: number, 
+    recipientECert: string, 
+    lockerECert: string, 
+    hash: Hash,
+    expiryTime: number
+): void => {
+    // Compare expiryTimeSec with currentTimeSec, which is number of milliseconds since epoch (L174)
+    const currTimeSecs = Math.floor(Date.now()/1000);
+    const reclaimCallback = async (contract: Contract, contractID: string) => {
+        // Check if asset hasn't been claimed yet. If true, do nothing. If false, either do the following cases:
+        const [islocked, isLockedQueryError] = await helpers.handlePromise(isFungibleAssetLockedInHTLC(contract, contractID));
+        
+        if (islocked == false) {
+            // CASE #1: Check GetHTLCHashPreImageByContractId(contractId)
+            const [result, evaluateError] = await helpers.handlePromise(
+                contract.evaluateTransaction("GetHTLCHashPreImageByContractId", contractID),
+            );
+            
+            // CASE #2: If the function above returns ANY error, call reclaimAssetInHTLC
+            if (evaluateError) {
+                // Put retry logic in event of failure. Retry 3x and then give up if unsuccessful (temp solution for now; requires CORE changes)
+                // If it fails, retry for i (arbitrarily defined) more attempts until you quit
+                let i = 0;
+                do {
+                    let [retryReclaimResult, retryReclaimableQueryError] = await helpers.handlePromise(reclaimFungibleAssetInHTLC(contract, contractID));
+                    if (!retryReclaimableQueryError) {
+                        console.log("Fungible Asset unlocked successfully");
+                        break;
+                    }
+
+                    i++;
+                } while (i < 3);
+            }
+        }
     }
 
     // If you have time remaining, call setTimeout with reclaimCallback
@@ -801,7 +845,6 @@ const StartHTLCFungibleAssetLockListener = (
     lockerECert: string,
     lockCallback: (c: Contract, d: string, t: string, n: number, r: string, l: string, v: Hash, timeout: number) => any,
 ): void => {
-    console.log("StartHTLCEventListener is called from StartHTLCFungibleAssetLockListener")
     StartHTLCEventListener(contract, 'LockFungibleAsset', contractId, assetType, "", numUnits, recipientECert, lockerECert, lockCallback);
 }
 
