@@ -9,5 +9,3 @@ require (
 	github.com/hyperledger/fabric-protos-go v0.0.0-20210720123151-f0dc3e2a0871
 	github.com/sirupsen/logrus v1.8.1
 )
-
-replace github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go => ../../../../../common/protos-go/
