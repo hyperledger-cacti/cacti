@@ -12,6 +12,7 @@
       "**/iroha-helpers"
     ]
   },
+  "packageManager": "yarn@1.22.17",
   "scripts": {
     "run-ci": "./tools/ci.sh",
     "reset:node-modules": "del-cli '**/node_modules'",
