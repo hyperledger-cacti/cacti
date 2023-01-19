@@ -182,7 +182,7 @@ const command: GluegunCommand = {
                     params[1],
                     recipientCert,
                     hash,
-                    timeout2,
+                    timeout,
                     null)
         if (!res.result) {
             throw new Error()
@@ -194,8 +194,9 @@ const command: GluegunCommand = {
         spinner.fail(`Error`)
     }
 
-    await network.gateway.disconnect()
+    // await new Promise(f => setTimeout(f, options['timeout-duration'] * 1000 + 3000));
 
+    await network.gateway.disconnect()
     console.log('Gateways disconnected.')
 
     process.exit()

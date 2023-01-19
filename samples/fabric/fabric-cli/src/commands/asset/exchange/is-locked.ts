@@ -156,13 +156,10 @@ const command: GluegunCommand = {
                           params[1],
                           recipientCert,
                           lockerCert)
-            if (!res) {
-                throw new Error()
-            }
             spinner.info(`${asset} Is Locked Response: ${res}`)
             spinner.succeed('Asset Exchange: Query Complete.')
         } catch(error) {
-            print.error(`Could not query ${asset} is-locked in ${options['target-network']}`)
+            print.error(`Could not query ${asset} is-locked in ${options['target-network']}, error: ${error}`)
             spinner.fail(`Error`)
         }
     }
