@@ -178,19 +178,30 @@ For more details on the various architectural components, building blocks, and c
 
 ## Articles
 
+1. Venkatraman Ramakrishna and Vinayaka Pandit, DLT Interoperability: Why, How, and Weaver LinkedIn blog. [Part 1](https://www.linkedin.com/pulse/dlt-interoperability-why-how-weaver-part-1-vinayaka-pandit/), [Part 2](https://www.linkedin.com/pulse/dlt-interoperability-why-how-weaver-part-2-vinayaka-pandit/) _LinkedIn_
 1. Venkatraman Ramakrishna and Vinayaka Pandit, [Making permissioned blockchains interoperable with Weaver](https://www.ibm.com/blogs/blockchain/2021/07/making-permissioned-blockchains-interoperable-with-weaver/), _Blockchain Pulse: IBM Blockchain Blog_
-2. Venkatraman Ramakrishna, [Meet Weaver, one of the new Hyperledger Labs taking on cross-chain and off-chain operations](https://www.hyperledger.org/blog/2021/06/09/meet-weaver-one-the-new-hyperledger-labs-projects-taking-on-cross-chain-and-off-chain-operations), _Hyperledger Global Forum 2021 Blog_
-3. Dileban Karunamoorthy and Ermyas Abebe, [On the Interoperability of Distributed Ledgers](https://medium.com/thinkdecentralized/on-the-interoperability-of-distributed-ledgers-15f584b79808), _Medium.com_
+1. Venkatraman Ramakrishna, [Meet Weaver, one of the new Hyperledger Labs taking on cross-chain and off-chain operations](https://www.hyperledger.org/blog/2021/06/09/meet-weaver-one-the-new-hyperledger-labs-projects-taking-on-cross-chain-and-off-chain-operations), _Hyperledger Global Forum 2021 Blog_
+1. Dileban Karunamoorthy and Ermyas Abebe, [On the Interoperability of Distributed Ledgers](https://medium.com/thinkdecentralized/on-the-interoperability-of-distributed-ledgers-15f584b79808), _Medium.com_
 
 ## Presentations
 
+1. [Secure Asset Transfer Protocol](https://www.youtube.com/watch?v=st9tP1n0fg0), Thomas Hardjono, Venkatraman Ramakrishna, Martin Hargreaves, _Birds-of-a-Feather (BoF) Session, IETF 115 Meeting_, London, UK, November 10, 2022
+1. [Panel Discussion on Blockchain Interoperability with Hyperledger Cactus, Weaver, and YUI](https://www.youtube.com/watch?v=FdYCrgO9g6A), Moderator: Tracy Kuhrt, Panelists: Takuma Takeuchi, Venkatraman Ramakrishna, Susumu Toriumi, _Hyperledger Global Forum 2022_, September 13, 2022
+1. [Formalizing and Standardizing Blockchain Interoperability](https://www.youtube.com/watch?v=PMoEGHOr9-U),  Dhinakaran Vinayagamurthy and Rafael Belchior, _Hyperledger Global Forum 2022_, September 13, 2022
+1. [Making Distributed Ledgers Interoperable Using Weaver (Hyperledger Labs)](https://www.youtube.com/watch?v=Tz4ttPFgsA0), Venkatraman Ramakrishna, _Hyperledger Global Forum 2022_, September 13, 2022
+1. [Panel Discussion - All Things Cross-Chain](https://www.youtube.com/watch?v=_NmUiVsmss8), Moderator: Sophia Lopez, Panelists: Jim Zhang, Venkatraman Ramakrishna, Takeuchi Takuma, _Hyperledger Global Forum 2022_, September 12, 2022
+1. [Secure Asset Transfer Protocol](https://www.youtube.com/watch?v=lgPvjhUsERo), Thomas Hardjono, Venkatraman Ramakrishna, Martin Hargreaves, Birds-of-a-Feather (BoF) Session, IETF 114 Meeting, Philadelphia, PA, USA, July 26, 2022
+1. Working Draft: Views and View Addresses for Blockchain/DLT Interoperability, Venkatraman Ramakrishna, IETF 112 Side Meeting, November 12, 2021
 1. [Blockchain Interoperability with Hyperledger Cactus & Weaver](https://www.youtube.com/watch?v=l-nZlLK8IMM), Peter Somogyvari and Venkatraman Ramakrishna, _Hyperledger NYC Meetup_, October 14, 2021
-2. Panel discussion on Blockchain Interoperability: Moderator: Vinayaka Pandit; Panelists: Rafael Belchior, Hart Montgomery, and Venkatraman Ramakrishna, _IEEE Services 2021: Blockchain Interoperability_, September 8, 2021
-3. Blockchain Interoperability: Challenges, Ongoing Efforts, and Potential Solutions: Vinayaka Pandit, _Hyperledger Global Forum 2021_, June 9, 2021
-4. Hosted Discussion: The Future of Blockchain Interoperability: Hart Montgomery, Tracy Kuhrt, Susumu Toriumi, and Venkatraman Ramakrishna, _Hyperledger Global Forum 2021_, June 8, 2021
+1. Panel discussion on Blockchain Interoperability: Moderator: Vinayaka Pandit; Panelists: Rafael Belchior, Hart Montgomery, and Venkatraman Ramakrishna, _IEEE Services 2021: Blockchain Interoperability_, September 8, 2021
+1. Blockchain Interoperability: Challenges, Ongoing Efforts, and Potential Solutions: Vinayaka Pandit, _Hyperledger Global Forum 2021_, June 9, 2021
+1. Hosted Discussion: The Future of Blockchain Interoperability: Hart Montgomery, Tracy Kuhrt, Susumu Toriumi, and Venkatraman Ramakrishna, _Hyperledger Global Forum 2021_, June 8, 2021
 
 ## Peer-Reviewed Research Publications
 
+1. Bishakh Chandra Ghosh, Sikhar Patranabis, Dhinakaran Vinayagamurthy, Venkatraman Ramakrishna, Krishnasuri Narayanam, Sandip Chakraborty, [Private Certifier Intersection](https://eprint.iacr.org/2022/1302.pdf) _NDSS 2023_
+1. Krishnasuri Narayanam, Venkatraman Ramakrishna, Dhinakaran Vinayagamurthy, Sandeep Nishad, [Generalized HTLC for Cross-Chain Swapping of Multiple Assets with Co-Ownerships](https://arxiv.org/pdf/2202.12855.pdf) _AFT 2022_ 
+1. Bishakh Chandra Ghosh, Dhinakaran Vinayagamurthy, Venkatraman Ramakrishna, Krishnasuri Narayanam, Sandip Chakraborty, [Privacy-Preserving Negotiation of Common Trust Anchors Across Blockchain Networks](https://ieeexplore.ieee.org/document/9805532) _ICBC 2022_
+1. Bishakh Chandra Ghosh, Venkatraman Ramakrishna, Chander Govindarajan, Dushyant Behl, Dileban Karunamoorthy, Ermyas Abebe, Sandip Chakraborty, [Decentralized Cross-Network Identity Management for Blockchain Interoperation](https://arxiv.org/abs/2104.03277), _ICBC 2021_
+1. Ermyas Abebe, Yining Hu, Allison Irvin, Dileban Karunamoorthy, Vinayaka Pandit, Venkatraman Ramakrishna, Jiangshan Yu, [Verifiable Observation of Permissioned Ledgers](https://arxiv.org/abs/2012.07339), _ICBC 2021_
 1. Ermyas Abebe, Dushyant Behl, Chander Govindarajan, Yining Hu, Dileban Karunamoorthy, Petr Novotny, Vinayaka Pandit, Venkatraman Ramakrishna, Christian Vecchiola, [Enabling Enterprise Blockchain Interoperability with Trusted Data Transfer](https://arxiv.org/abs/1911.01064), _Middleware 2019 - Industry Track_
-2. Ermyas Abebe, Yining Hu, Allison Irvin, Dileban Karunamoorthy, Vinayaka Pandit, Venkatraman Ramakrishna, Jiangshan Yu, [Verifiable Observation of Permissioned Ledgers](https://arxiv.org/abs/2012.07339), _ICBC 2021_
-3. Bishakh Chandra Ghosh, Venkatraman Ramakrishna, Chander Govindarajan, Dushyant Behl, Dileban Karunamoorthy, Ermyas Abebe, Sandip Chakraborty, [Decentralized Cross-Network Identity Management for Blockchain Interoperation](https://arxiv.org/abs/2104.03277), _ICBC 2021_
