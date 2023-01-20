@@ -5,10 +5,12 @@
  -->
 # Weaver: DLT Interoperability
 
-![Data Sharing Status](https://github.com/hyperledger-labs/weaver-dlt-interoperability/actions/workflows/test_data-sharing.yml/badge.svg?event=push)
-![Fabric Asset Exchange Status](https://github.com/hyperledger-labs/weaver-dlt-interoperability/actions/workflows/test_asset-exchange-fabric.yml/badge.svg?event=push)
-![Corda Asset Exchange Status](https://github.com/hyperledger-labs/weaver-dlt-interoperability/actions/workflows/test_asset-exchange-corda.yml/badge.svg?event=push)
-![Asset Transfer Status](https://github.com/hyperledger-labs/weaver-dlt-interoperability/actions/workflows/test_asset-transfer.yml/badge.svg?event=push)
+<div align="center">
+
+[![Data Sharing Status](https://github.com/hyperledger-labs/weaver-dlt-interoperability/actions/workflows/test_data-sharing.yml/badge.svg?event=push)](https://github.com/hyperledger-labs/weaver-dlt-interoperability/actions/workflows/test_data-sharing.yml) [![Asset Transfer Status](https://github.com/hyperledger-labs/weaver-dlt-interoperability/actions/workflows/test_asset-transfer.yml/badge.svg?event=push)](https://github.com/hyperledger-labs/weaver-dlt-interoperability/actions/workflows/test_asset-transfer.yml)  
+[![Fabric Asset Exchange Status](https://github.com/hyperledger-labs/weaver-dlt-interoperability/actions/workflows/test_asset-exchange-fabric.yml/badge.svg?event=push)](https://github.com/hyperledger-labs/weaver-dlt-interoperability/actions/workflows/test_asset-exchange-fabric.yml) [![Corda Asset Exchange Status](https://github.com/hyperledger-labs/weaver-dlt-interoperability/actions/workflows/test_asset-exchange-corda.yml/badge.svg?event=push)](https://github.com/hyperledger-labs/weaver-dlt-interoperability/actions/workflows/test_asset-exchange-corda.yml) [![Besu Asset Exchange Status](https://github.com/hyperledger-labs/weaver-dlt-interoperability/actions/workflows/test_asset-exchange-besu.yml/badge.svg?event=push)](https://github.com/hyperledger-labs/weaver-dlt-interoperability/actions/workflows/test_asset-exchange-besu.yml)
+
+</div>
 
 Weaver is a framework, with a family of protocols, to enable interoperation for data sharing and asset movements among independent networks built on similar or different distributed ledger technologies (DLTs) in a manner that preserves the core blockchain tenets of decentralization and security. To this end, it is built on a particular design philosophy that differentiates it from other DLT interoperability solutions in the market. This philosophy can be summarized through the following design principles or guidelines:
 - A network is self-sovereign in matters of governance and should be able to choose who, how, and when, to interoperate with.
@@ -83,6 +85,8 @@ Prominent features in our future roadmap are:
 
 ## Other Contributors
 - https://github.com/ghoshbishakh
+- https://github.com/michiboo
+- https://github.com/officialfrancismendoza
 
 ## Initial Committers
 - https://github.com/ermyas

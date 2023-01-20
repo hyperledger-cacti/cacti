@@ -724,7 +724,7 @@ const assetLockExpirationCallback = (
     const reclaimCallback = async (contract: Contract, contractID: string) => {
         // Check if asset hasn't been claimed yet. If true, do nothing. If false, either do the following cases:
         const [islocked, isLockedQueryError] = await helpers.handlePromise(isAssetLockedInHTLCqueryUsingContractId(contract, contractID));
-        if (islocked == false) {
+        if (islocked === false) {
             // CASE #1: Check GetHTLCHashPreImageByContractId(contractId)
             const [result, evaluateError] = await helpers.handlePromise(
                 contract.evaluateTransaction("GetHTLCHashPreImageByContractId", contractID),
@@ -751,14 +751,12 @@ const assetLockExpirationCallback = (
     // If you have time remaining, call setTimeout with reclaimCallback
     if (expiryTime - currTimeSecs > 0) {
         setTimeout(reclaimCallback, 1000 * (expiryTime - currTimeSecs), contract, contractID);
-    }
-
-    // If no time remaining, call the reclaim callback immediately
-    else if (expiryTime - currTimeSecs <= 0) {
+    } else {
+        // If no time remaining, call the reclaim callback immediately
         reclaimCallback(contract, contractID);
     }
 }
-//----------------------------------------------------------------------------------------------------------------------------------
+
 //NOTE: FUNGIBLE counterpart
 // Byzantine Swaps: Timed counterpart for timed AssetLockListener for reversion
 const fungibleAssetLockExpirationCallback = (
@@ -777,7 +775,7 @@ const fungibleAssetLockExpirationCallback = (
         // Check if asset hasn't been claimed yet. If true, do nothing. If false, either do the following cases:
         const [islocked, isLockedQueryError] = await helpers.handlePromise(isFungibleAssetLockedInHTLC(contract, contractID));
         
-        if (islocked == false) {
+        if (islocked === false) {
             // CASE #1: Check GetHTLCHashPreImageByContractId(contractId)
             const [result, evaluateError] = await helpers.handlePromise(
                 contract.evaluateTransaction("GetHTLCHashPreImageByContractId", contractID),
@@ -804,10 +802,8 @@ const fungibleAssetLockExpirationCallback = (
     // If you have time remaining, call setTimeout with reclaimCallback
     if (expiryTime - currTimeSecs > 0) {
         setTimeout(reclaimCallback, 1000 * (expiryTime - currTimeSecs), contract, contractID);
-    }
-
-    // If no time remaining, call the reclaim callback immediately
-    else if (expiryTime - currTimeSecs <= 0) {
+    } else {
+        // If no time remaining, call the reclaim callback immediately
         reclaimCallback(contract, contractID);
     }
 }
