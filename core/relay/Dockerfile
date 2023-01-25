@@ -53,11 +53,13 @@ RUN addgroup -g 1000 relay
 RUN adduser -D -s /bin/sh -u 1000 -G relay relay
 
 RUN mkdir -p /opt/relay/config
+RUN mkdir -p /opt/relay/driver
 
 COPY --from=builder /opt/relay/target/x86_64-unknown-linux-musl/release/client /opt/relay/
 COPY --from=builder /opt/relay/target/x86_64-unknown-linux-musl/release/client-tls /opt/relay/
 COPY --from=builder /opt/relay/target/x86_64-unknown-linux-musl/release/dummy-driver /opt/relay/
 COPY --from=builder /opt/relay/target/x86_64-unknown-linux-musl/release/server /opt/relay/
+COPY --from=builder /etc/ssl/certs /etc/ssl/certs
 
 COPY docker/server.template.toml /opt/relay/config/
 COPY docker/driver.template.toml /opt/relay/config/
@@ -66,6 +68,7 @@ COPY docker/entrypoint-server.sh /opt/relay/
 COPY docker/entrypoint-client.sh /opt/relay/
 COPY docker/entrypoint-driver.sh /opt/relay/
 COPY docker/entrypoint.sh /opt/relay/
+COPY driver/driver-error-constants.json /opt/relay/driver
 
 COPY fingerprint.json /opt/relay/ 
 

@@ -53,9 +53,11 @@ RUN addgroup -g 1000 relay
 RUN adduser -D -s /bin/sh -u 1000 -G relay relay
 
 RUN mkdir -p /opt/relay/config
+RUN mkdir -p /opt/relay/driver
 
 COPY --from=builder /opt/relay/target/x86_64-unknown-linux-musl/release/dummy-driver /opt/relay/
 
+COPY driver/driver-error-constants.json /opt/relay/driver
 COPY docker/init.sh /opt/relay/
 COPY docker/entrypoint-driver.sh /opt/relay/
 COPY docker/driver.template.toml /opt/relay/config/
