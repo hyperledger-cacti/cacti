@@ -451,9 +451,9 @@ const verifyView = async (contract: Contract, base64ViewProto: string, address: 
 /**
  * Verifies a view's contents and extracts confidential payload by using chaincode function in interop chaincode. Verification is based on verification policy of the network, proof type and protocol type.
  **/
-const parseAndValidateView = async (contract: Contract, address: string, base64ViewProto: string, b64ViewContent: string): Promise<Buffer> => {
+const parseAndValidateView = async (contract: Contract, address: string, base64ViewProto: string, b64ViewContents: Array<string>): Promise<Buffer> => {
     try {
-        const viewPayload = await contract.evaluateTransaction("ParseAndValidateView", address, base64ViewProto, b64ViewContent);
+        const viewPayload = await contract.evaluateTransaction("ParseAndValidateView", address, base64ViewProto, JSON.stringify(b64ViewContents));
         return viewPayload;
     } catch (e) {
         throw new Error(`Unable to parse and validate view: ${e}`);
