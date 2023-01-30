@@ -82,6 +82,7 @@ Prominent features in our future roadmap are:
 - https://github.com/sanvenDev
 - https://github.com/knarayan
 - https://github.com/dhinakaran2705
+- https://github.com/SIKHAR405
 
 ## Other Contributors
 - https://github.com/ghoshbishakh
