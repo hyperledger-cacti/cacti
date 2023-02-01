@@ -20,13 +20,13 @@ spec:
   selector:
     matchLabels:
       app: postgresql-network1
-      role: master
+      role: main
   template:
     metadata:
       name: postgresql-network1
       labels:
         app: postgresql-network1
-        role: master
+        role: main
     spec:
       containers:
         - name: postgresql-network1

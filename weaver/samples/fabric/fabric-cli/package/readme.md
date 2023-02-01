@@ -23,9 +23,11 @@ More documentation can be found [here](docs/commands.md)
 
 ## Installing with npm
 
-Set up `.npmrc` by copying across the `.npmrc.template` and updating the values. View [Setup Artifactory token for fabric-interop-sdk for the detailed process](https://github.ibm.com/dlt-interoperability/network-setups/tree/master/fabric/dev/scripts/fabric-cli#setup-artifactory-token-for-fabric-interop-sdk)
-
-Add contents of the `.npmrc` to the `.npmrc` located at `~/.npmrc`, be careful not to replace anything
+Set up `.npmrc` by following steps:
+1) Create a Personal Access Token from Github with read access to packages. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
+2) Create a copy of `.npmrc.template` as `.npmrc`.
+3) Replace <personal-access-token> in copied `.npmrc` file with your personal access token.
+4) Now put this `.npmrc` file in your application in same level as package.json. Be careful not to replace anything
 
 then run `npm install -g @res-dlt-interop/fabric-cli`
 
@@ -41,9 +43,13 @@ Tested on Node v10.16.3 requires Node >= 10.15.3 < 13.0
 
 Set up `.env` by copying across the `.env.template` and updating the values
 
-Set up `.npmrc` by copying across the `.npmrc.template` and updating the values. View [Setup Artifactory token for fabric-interop-sdk for the detailed process](https://github.ibm.com/dlt-interoperability/network-setups/tree/master/fabric/dev/scripts/fabric-cli#setup-artifactory-token-for-fabric-interop-sdk)
+Set up `.npmrc` by following steps:
+1) Create a Personal Access Token from Github with read access to packages. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
+2) Create a copy of `.npmrc.template` as `.npmrc`.
+3) Replace <personal-access-token> in copied `.npmrc` file with your personal access token.
+4) Now put this `.npmrc` file in your application in same level as package.json. Be careful not to replace anything
 
-Have `yarn` installed and have Node >= 10.15.3 < 13.0
+Have `yarn` installed and have Node >= 10.15.3 < 16.0
 
 Run `yarn` to install dependencies. 
 
@@ -65,28 +71,6 @@ Then run
 `$ fabric-cli chaincode invoke mychannel simplestate invoke create '["test", "teststate"]'`
 
 NOTE: --help flag can be provided to most commands to show examples and usage. 
-
-
-## Setup Artifactory token for fabric-interop-sdk
-
-1) Go to IBM artifactory (https://na.artifactory.swg-devops.com/artifactory/)
-2) Click on your email id on top right
-3) Generate/Copy the API key from profile, let's say it is - "ThisIsMyAPIKey"
-4) Run this command on your system - 
-	 curl --header 'X-JFrog-Art-Api: ThisIsMyAPIKey' https://na.artifactory.swg-devops.com/artifactory/api/npm/auth
-5) The above command will return you auth token along with auth settings and your email id from artifactory.
-6) Create a .npmrc file in the backend folder (from where you want to run npm install)
-7) Add this line to your .npmrc file,
-	 @res-dlt-interop:registry=https://na.artifactory.swg-devops.com/artifactory/api/npm/res-dlt-interop-npm-local/
-8) Add the output of curl to that file.
-9) Final .npmrc should look like this - 
-   "@res-dlt-interop:registry=https://na.artifactory.swg-devops.com/artifactory/api/npm/res-dlt-interop-npm-local/
-    _auth = <Auth-token>
-    always-auth = true
-    email = user@email.com"
-10) Run npm install to check if artifactory connection is working before testing/deployment.
-
-
 
 
 # License
