@@ -1,0 +1,13 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+---
+
+openshift_cli:
+  bin_directory: "~/bin/oc"
+
+
+

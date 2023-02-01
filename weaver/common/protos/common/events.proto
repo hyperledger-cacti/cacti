@@ -1,0 +1,87 @@
+syntax = "proto3";
+
+package common.events;
+
+import "common/query.proto";
+import "common/state.proto";
+
+option java_package = "com.weaver.protos.common.events";
+option go_package = "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common";
+
+enum EventType {
+  LEDGER_STATE = 0;
+  ASSET_LOCK = 1;
+  ASSET_CLAIM = 2;
+}
+
+message EventMatcher {
+    EventType event_type = 1;
+    string event_class_id = 2;
+    string transaction_ledger_id = 3;
+    string transaction_contract_id = 4;
+    string transaction_func = 5;
+}
+
+enum EventSubOperation {
+    SUBSCRIBE = 0;
+    UNSUBSCRIBE = 1;
+    UPDATE = 2;
+}
+
+// Below message is used to communicate between dest-relay and src-relay;
+// and src-relay and src-driver.
+message EventSubscription {
+    EventMatcher event_matcher = 1;
+    common.query.Query query = 2;
+    EventSubOperation operation = 3;
+}
+
+message EventSubscriptionState {
+  enum STATUS {
+    // pending ACK from remote relay
+    SUBSCRIBE_PENDING_ACK = 0;
+    // Received ACK, waiting for event subscription confirmation from remote relay
+    SUBSCRIBE_PENDING = 1;
+    SUBSCRIBED = 2;
+    UNSUBSCRIBE_PENDING_ACK = 3;
+    UNSUBSCRIBE_PENDING = 4;
+    UNSUBSCRIBED = 5;
+    ERROR = 6;
+    DUPLICATE_QUERY_SUBSCRIBED=7;
+  };
+  string request_id = 1;
+  string publishing_request_id = 2;
+  STATUS status = 3;
+  string message = 4;
+  EventMatcher event_matcher = 5;
+  repeated EventPublication event_publication_specs = 6;
+}
+
+message ContractTransaction {
+  string driver_id = 1;
+  string ledger_id = 2;
+  string contract_id = 3;
+  string func = 4;
+  repeated bytes args = 5;
+  uint64 replace_arg_index = 6;
+  repeated string members = 7; 
+}
+
+message EventPublication {
+  oneof publication_target {
+    ContractTransaction ctx = 1;
+    string app_url = 2;
+  }
+}
+
+message EventStates {
+    repeated EventState states = 1;
+}
+
+// the payload that is used for the communication between the requesting relay
+// and its network
+message EventState {
+  common.state.RequestState state = 1;
+  string event_id = 2;
+  string message = 3;
+}

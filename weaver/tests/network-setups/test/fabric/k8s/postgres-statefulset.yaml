@@ -1,0 +1,106 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgresql-network1
+  annotations:
+    app.kubernetes.io/component: "CA DB"
+  labels:
+    app: postgresql-network1
+spec:
+  serviceName: postgresql-network1-headless
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: postgresql-network1
+      role: master
+  template:
+    metadata:
+      name: postgresql-network1
+      labels:
+        app: postgresql-network1
+        role: master
+    spec:
+      containers:
+        - name: postgresql-network1
+          image: docker.io/bitnami/postgresql:11.7.0-debian-10-r26
+          imagePullPolicy: "IfNotPresent"
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+          env:
+            - name: BITNAMI_DEBUG
+              value: "false"
+            - name: POSTGRESQL_PORT_NUMBER
+              value: "5432"
+            - name: POSTGRESQL_VOLUME_DIR
+              value: "/bitnami/postgresql"
+            - name: PGDATA
+              value: "/bitnami/postgresql/data"
+            - name: POSTGRES_USER
+              value: pgadmin
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgresql-network1
+                  key: postgresql-password
+            - name: POSTGRES_DB
+              value: "fabric_ca"
+            - name: POSTGRESQL_ENABLE_LDAP
+              value: "no"
+          ports:
+            - name: tcp-postgresql
+              containerPort: 5432
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - exec pg_isready -U "pgadmin" -d fabric_ca -h 127.0.0.1 -p 5432
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 6
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - -e
+                - |
+                  exec pg_isready -U "pgadmin" -d fabric_ca -h 127.0.0.1 -p 5432
+                  [ -f /opt/bitnami/postgresql/tmp/.initialized ] || [ -f /bitnami/postgresql/.initialized ]
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 6
+          volumeMounts:
+            - name: dshm
+              mountPath: /dev/shm
+            - name: postgresql-network1-data
+              mountPath: /bitnami/postgresql
+              subPath:
+      volumes:
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 1Gi
+  volumeClaimTemplates:
+    - metadata:
+        name: postgresql-network1-data
+      spec:
+        accessModes:
+          - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: "500Mi"

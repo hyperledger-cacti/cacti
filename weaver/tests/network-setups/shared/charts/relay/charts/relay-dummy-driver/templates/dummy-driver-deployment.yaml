@@ -1,0 +1,60 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+apiVersion: v1
+kind: Deployment
+metadata:
+  name: {{ $.Values.driver.name | default "Relay Dummy Driver" }}
+  namespace: {{ $.Values.deployment.namespace | default "default" }}
+  labels: 
+{{ include "relay-dummy-driver.labels" | indent 4 }}
+spec:
+  replicas: {{ $.Values.deployment.replicas | default 1 }}
+  selector:
+    matchLabels:
+      name: {{ $.Values.driver.name }}
+  template:
+    metadata:
+      labels:
+        name: {{ $.Values.driver.name }}
+        app: {{ $.Values.driver.name }}
+{{ include "relay-dummy-driver.labels" $ | indent 8 }}
+    spec:
+      containers:
+        - name: {{ $.Values.driver.name }}
+          image: {{ $.Values.deployment.image }}
+          {{- if $.Values.deployment.imagePullPolicy -}}
+          imagePullPolicy: {{ $.Values.deployment.imagePullPolicy }}
+          {{- end -}}
+          ports:
+          - containerPort: {{ $.Values.driver.port }}
+          env: 
+          {{- if $.Values.network.name -}}
+          - name: NETWORK_NAME
+            value: {{ $.Value.network.name -}}
+          {{- end -}}
+          {{- if $.Values.configuration -}}         
+          {{- if $.Values.configuration.templatePath -}}
+          - name: DRIVER_CONFIG_TEMPLATE
+            value: {{ $.Values.configuration.templatePath }}
+          {{- end -}}
+          {{- if $.Values.configuration.path -}}
+          - name: DRIVER_CONFIG
+            value: {{ $.Values.configuration.templatePath }}
+          {{- end -}}
+          {{- end -}}
+          {{- if $.Values.discovery.driver -}}
+          - name: RELAY_NAME
+            value: {{ #.Values.discovery.driver.name }}
+          - name: RELAY_HOST
+            value: {{ #.Values.discovery.driver.host }}
+          - name: RELAY_PORT
+            value: {{ #.Values.discovery.driver.port }}
+          {{- end -}}
+          {{- range $.Values.environment }}
+          - name: {{ .name }}
+            value: {{ .value }}
+          {{- end }}

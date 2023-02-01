@@ -1,0 +1,41 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgresql-network1
+  annotations:
+    app.kubernetes.io/component: "CA DB"
+  labels:
+    app: postgresql-network1
+spec:
+  type: ClusterIP
+  ports:
+    - name: tcp-postgresql
+      port: 5432
+      targetPort: tcp-postgresql
+  selector:
+    app: postgresql-network1
+    role: master
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgresql-network1-headless
+  annotations:
+    app.kubernetes.io/component: "CA DB"
+  labels:
+    app: postgresql-network1
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - name: tcp-postgresql
+      port: 5432
+      targetPort: tcp-postgresql
+  selector:
+    app: postgresql-network1

@@ -1,0 +1,24 @@
+run-vendor:
+	go mod edit -replace github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/utils=../../../core/network/fabric-interop-cc/libs/utils/
+	go mod edit -replace github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils=../../../core/network/fabric-interop-cc/libs/testutils/
+	go mod vendor
+
+undo-vendor:
+	rm -rf vendor
+	go mod edit -dropreplace github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/utils
+	go mod edit -dropreplace github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils
+
+build-local: run-vendor build undo-vendor
+
+test-local: run-vendor test undo-vendor
+
+build:
+	go build -v .
+
+test:
+	go test -v .
+
+clean-vendor:
+	rm -rf vendor
+clean: clean-vendor
+	rm -rf simplestate

@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package common.interop_payload;
+
+option java_package = "com.weaver.protos.common.interop_payload";
+option go_package = "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common";
+
+message InteropPayload {
+  bytes payload = 1;
+  string address = 2;
+  bool confidential = 3;
+  string requestor_certificate = 4;
+  string nonce = 5;
+}
+
+message ConfidentialPayload {
+  bytes encrypted_payload = 1;
+  enum HashType {
+    HMAC = 0;
+  }
+  HashType hash_type = 2;
+  bytes hash = 3;
+}
+
+message ConfidentialPayloadContents {
+  bytes payload = 1;
+  bytes random  = 2;
+}

@@ -1,0 +1,15 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+# This file contains the default settings for the role.
+# The variables defined here are applied to all executions of
+# the tasks and are not meant to be changed, as they are more
+# of system wide settings for the role.
+#
+simple_package_cache_path: ~/.simple-package/cache/
+simple_package_metadata_file: package.yaml
+simple_package_unpack_directory: unpack/
+simple_package_download_directory: download/

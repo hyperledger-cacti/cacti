@@ -1,0 +1,47 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+{{- if $.Values.global.network.postgres -}}
+{{- $name := printf "postgresql-%s" $.Values.global.network.name}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $name }}
+  annotations:
+    app.kubernetes.io/component: "CA_DB"
+{{ include "fabric-network.labels" $ | indent 4 }}
+  labels:
+    app: {{ $name }}
+spec:
+  type: ClusterIP
+  ports:
+    - name: tcp-postgresql
+      port: 5432
+      targetPort: tcp-postgresql
+  selector:
+    app: {{ $name }}
+    role: master
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $name }}-headless
+  annotations:
+    app.kubernetes.io/component: "CA DB"
+{{ include "fabric-network.labels" $ | indent 4 }}
+  labels:
+    app: {{ $name }}
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - name: tcp-postgresql
+      port: 5432
+      targetPort: tcp-postgresql
+  selector:
+    app: {{ $name }}
+---
+{{- end -}}

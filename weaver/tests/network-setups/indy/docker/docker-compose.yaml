@@ -1,0 +1,14 @@
+version: "3"
+
+services:
+  testiin:
+    image: testiin:latest
+    environment:
+      - INDYNODES=$INDYNODES
+      - INDYCLIENTS=$INDYCLIENTS
+    ports:
+      - "${INDY_NODE_PORT_RANGE}:${INDY_NODE_PORT_RANGE}"
+    command: /etc/testnetscripts/run_indy_nodes.sh
+    volumes:
+      - ./scripts:/etc/testnetscripts
+      - ./indy_sandbox:/var/lib/indy/sandbox

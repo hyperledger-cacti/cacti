@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package fabric.view_data;
+
+option java_package = "com.weaver.protos.fabric.view_data";
+option go_package = "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/fabric";
+
+import "peer/proposal_response.proto";
+
+message FabricView {
+  message EndorsedProposalResponse {
+    // `ProposalResponsePayload` is the output produced by each peer and signed as a serialized blob
+    // https://github.com/hyperledger/fabric-protos-go/blob/master/peer/proposal_response.pb.go#L176
+    // `ProposalResponsePayload` contains an `Extension` field which is of type `ChaincodeAction`
+    // https://github.com/hyperledger/fabric-protos-go/blob/master/peer/proposal.pb.go#L280
+    // We only need the `ProposalHash`, `ChaincodeId` and `Response` fields.
+    protos.ProposalResponsePayload payload = 1;
+    // Each `Endorsement` is an identity coupled with a signature
+    // https://github.com/hyperledger/fabric-protos-go/blob/master/peer/proposal_response.pb.go#L242
+    protos.Endorsement endorsement = 2;
+  }
+  repeated EndorsedProposalResponse endorsed_proposal_responses = 1;
+}

@@ -1,0 +1,103 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+---
+name: test-network2-org2
+version: 1.0.0
+client:
+  organization: Org2
+  connection:
+    timeout:
+      peer:
+        endorser: '300'
+organizations:
+  Org2:
+    mspid: Org2MSP
+    cryptoPath: users/{username}@org2.network2.com/msp
+    peers:
+    - peer0.org2.network2.com
+    certificateAuthorities:
+    - ca.org2.network2.com
+channels:
+  mychannel:
+    orderers:
+      - orderer.network2.com
+    peers:
+      peer0.org2.network2.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+orderers:
+  orderer.network2.com:
+    url: grpcs://localhost:9050
+    tlsCACerts:
+      pem: |
+        -----BEGIN CERTIFICATE-----
+        MIICFzCCAb2gAwIBAgIUNq6Y2Qt5PcSWSREFkdVWI2AfohYwCgYIKoZIzj0EAwIw
+        aDELMAkGA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMRQwEgYDVQQK
+        EwtIeXBlcmxlZGdlcjEPMA0GA1UECxMGRmFicmljMRkwFwYDVQQDExBmYWJyaWMt
+        Y2Etc2VydmVyMB4XDTIyMTAxOTA5NDgwMFoXDTM3MTAxNTA5NDgwMFowaDELMAkG
+        A1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMRQwEgYDVQQKEwtIeXBl
+        cmxlZGdlcjEPMA0GA1UECxMGRmFicmljMRkwFwYDVQQDExBmYWJyaWMtY2Etc2Vy
+        dmVyMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEAb5P6gm/T35j7/AS8MXEsqBa
+        cQW+Y9rG+vxbo/a7Ymgh1Eh4sDhKvyMU9q0jxb6yxBDkSjTPPPzbqt0NxLBT1KNF
+        MEMwDgYDVR0PAQH/BAQDAgEGMBIGA1UdEwEB/wQIMAYBAf8CAQEwHQYDVR0OBBYE
+        FLnewq2ZfY8r3stpWSS6Ib+IjZhrMAoGCCqGSM49BAMCA0gAMEUCIQDzzLH/Ay+v
+        2AGZjZavs0HwKnunjBteCzPsAot54F5vwwIgcK48WJxABE/7wp+3qid5vH72hNOZ
+        Qt5kkjVO2HpTSRc=
+        -----END CERTIFICATE-----
+        
+    grpcOptions:
+      ssl-target-name-override: orderer.network2.com
+      hostnameOverride: orderer.network2.com
+peers:
+  peer0.org2.network2.com:
+    url: grpcs://localhost:9061
+    tlsCACerts:
+      pem: |
+        -----BEGIN CERTIFICATE-----
+        MIICKjCCAdGgAwIBAgIUR084M6T8l6TdOfC4zjNvSyK9z8YwCgYIKoZIzj0EAwIw
+        cjELMAkGA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMRowGAYDVQQK
+        ExFvcmcyLm5ldHdvcmsyLmNvbTEPMA0GA1UECxMGRmFicmljMR0wGwYDVQQDExRj
+        YS5vcmcyLm5ldHdvcmsyLmNvbTAeFw0yMjEwMTkwOTQ4MDBaFw0zNzEwMTUwOTQ4
+        MDBaMHIxCzAJBgNVBAYTAlVTMRcwFQYDVQQIEw5Ob3J0aCBDYXJvbGluYTEaMBgG
+        A1UEChMRb3JnMi5uZXR3b3JrMi5jb20xDzANBgNVBAsTBkZhYnJpYzEdMBsGA1UE
+        AxMUY2Eub3JnMi5uZXR3b3JrMi5jb20wWTATBgcqhkjOPQIBBggqhkjOPQMBBwNC
+        AATE/oznpJXEWCQrnAayXd1bzfzq/n+wYm7xoaxIvxLOEOdkPixOaS1fxdb3uUaN
+        2We9G2oXZrkHHq9HceZFgvEUo0UwQzAOBgNVHQ8BAf8EBAMCAQYwEgYDVR0TAQH/
+        BAgwBgEB/wIBATAdBgNVHQ4EFgQU6e9Jc8pbYs0WUTNvoRMmRB7ZeDMwCgYIKoZI
+        zj0EAwIDRwAwRAIgWZi0U1TOqfSVf0YbnAmCX7fRex8FSsmMAZpRperIm2YCIHvM
+        uLv93Ni9hjHJ7c7J5tAPR1Cy8KT+F4+664KoDiFE
+        -----END CERTIFICATE-----
+        
+    grpcOptions:
+      ssl-target-name-override: peer0.org2.network2.com
+      hostnameOverride: peer0.org2.network2.com
+certificateAuthorities:
+  ca.org2.network2.com:
+    url: https://localhost:5064
+    caName: ca-org2
+    tlsCACerts:
+      pem:
+        - |
+          -----BEGIN CERTIFICATE-----
+          MIICKjCCAdGgAwIBAgIUR084M6T8l6TdOfC4zjNvSyK9z8YwCgYIKoZIzj0EAwIw
+          cjELMAkGA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMRowGAYDVQQK
+          ExFvcmcyLm5ldHdvcmsyLmNvbTEPMA0GA1UECxMGRmFicmljMR0wGwYDVQQDExRj
+          YS5vcmcyLm5ldHdvcmsyLmNvbTAeFw0yMjEwMTkwOTQ4MDBaFw0zNzEwMTUwOTQ4
+          MDBaMHIxCzAJBgNVBAYTAlVTMRcwFQYDVQQIEw5Ob3J0aCBDYXJvbGluYTEaMBgG
+          A1UEChMRb3JnMi5uZXR3b3JrMi5jb20xDzANBgNVBAsTBkZhYnJpYzEdMBsGA1UE
+          AxMUY2Eub3JnMi5uZXR3b3JrMi5jb20wWTATBgcqhkjOPQIBBggqhkjOPQMBBwNC
+          AATE/oznpJXEWCQrnAayXd1bzfzq/n+wYm7xoaxIvxLOEOdkPixOaS1fxdb3uUaN
+          2We9G2oXZrkHHq9HceZFgvEUo0UwQzAOBgNVHQ8BAf8EBAMCAQYwEgYDVR0TAQH/
+          BAgwBgEB/wIBATAdBgNVHQ4EFgQU6e9Jc8pbYs0WUTNvoRMmRB7ZeDMwCgYIKoZI
+          zj0EAwIDRwAwRAIgWZi0U1TOqfSVf0YbnAmCX7fRex8FSsmMAZpRperIm2YCIHvM
+          uLv93Ni9hjHJ7c7J5tAPR1Cy8KT+F4+664KoDiFE
+          -----END CERTIFICATE-----
+        
+    httpOptions:
+      verify: false

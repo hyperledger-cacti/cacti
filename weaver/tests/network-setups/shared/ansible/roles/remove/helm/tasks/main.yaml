@@ -1,0 +1,13 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+---
+  - name: Remove Helm installation
+    file: 
+      path: "{{ helm.bin_directory }}"
+      state: absent
+    tags:
+      - helm

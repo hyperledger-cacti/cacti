@@ -1,0 +1,22 @@
+#!/bin/bash
+
+CHAINCODE_SOURCE_DIR="$1"
+CHAINCODE_METADATA_DIR="$2"
+BUILD_OUTPUT_DIR="$3"
+
+# extract package path from metadata.json
+GO_PACKAGE_PATH="$(jq -r .path "$CHAINCODE_METADATA_DIR/metadata.json")"
+CC_NAME="$(jq -r .label "$CHAINCODE_METADATA_DIR/metadata.json")"
+if [ -f "$CHAINCODE_SOURCE_DIR/src/go.mod" ]; then
+    cd "$CHAINCODE_SOURCE_DIR/src"
+    go build -v -mod=readonly -o "$BUILD_OUTPUT_DIR/${CC_NAME}" "$GO_PACKAGE_PATH"
+else
+    GO111MODULE=off go build -v  -o "$BUILD_OUTPUT_DIR/${CC_NAME}" "$GO_PACKAGE_PATH"
+fi
+
+# save statedb index metadata to provide at release
+if [ -d "$CHAINCODE_SOURCE_DIR/META-INF" ]; then
+    cp -a "$CHAINCODE_SOURCE_DIR/META-INF" "$BUILD_OUTPUT_DIR/"
+fi
+
+go build -v -mod=readonly -o "/go/bin/fnimcc" "github.com/hyperledger/proof-verification/fnimcc"

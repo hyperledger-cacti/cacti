@@ -1,0 +1,34 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+---
+# This playbook sets up the environment to enable
+# the deployment of the networks.
+
+- hosts: ansible_provisioners
+  gather_facts: yes
+  tasks:
+
+  - include_role:
+      name: remove/openshift-cli
+    vars:
+      openshift_cli:
+        bin_directory: "{{ bin_install_dir }}/oc"
+    when: cloud_provider is defined and cloud_provider == "openshift"
+
+  - include_role:
+      name: remove/helm
+    vars:
+      helm:
+        bin_directory: "{{ bin_install_dir }}/helm"
+
+  vars: # These variables can be overriden from the command line
+    privilege_escalate: false           # Default to NOT escalate to root privledges
+
+    # cloud_provider:                   # to be provided via environment    
+    # bin_install_dir:                  # to be provided via environment
+  
+

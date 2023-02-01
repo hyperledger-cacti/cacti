@@ -1,0 +1,73 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+{{- $volumeClaimName := printf "%s-crypto" $.Values.global.network.name -}}
+{{- $caName := printf "ca-orderers-%s" $.Values.global.network.name -}}
+{{- $dbName := printf "ca_orderers_%s" $.Values.global.network.name -}}
+{{- $dbHost := printf "postgresql-%s" $.Values.global.network.name }}
+{{- $dbSource := printf "host=postgresql-%s port=5432 user=%s password=%s dbname=%s sslmode=disable" $.Values.global.network.name $.Values.global.network.postgres.admin.user $.Values.global.network.postgres.admin.password $dbName -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $caName }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: {{ $caName }}
+  template:
+    metadata:
+      labels:
+        name: {{ $caName }}
+        app: {{ $caName }}
+        app.kubernetes.io/component: "Orderer_CA"
+{{ include "fabric-network.labels" $ | indent 8 }}
+    spec:
+      containers:
+      - name: {{ $caName }}
+        image: {{ printf "%s:%s" $.Values.global.images.ca.name $.Values.global.images.ca.version }}
+        command: ["sh", "-c"]
+        args: ['echo;
+                res=1;
+                while [ $res -ne 0 ]; do
+                  set -x;
+                  nc -zv -w60 {{ $dbHost }} 5432;
+                	res=$?;
+                  set +x;
+                  echo "Waiting for Postgres server to be up...";
+                  sleep 30;
+                done;
+                echo "Postgres Server: {{ $dbHost }}:5432 Up.";
+                sleep 5;
+                fabric-ca-server start -b admin:adminpw -d;']
+        ports:
+        - containerPort: 7054
+        env:
+        - name: FABRIC_CA_HOME
+          value: /etc/hyperledger/fabric-ca-server
+        - name: FABRIC_CA_SERVER_CA_NAME
+          value: {{ $caName }}
+        - name: FABRIC_CA_SERVER_TLS_ENABLED
+          value: "true"
+        - name: FABRIC_CA_SERVER_PORT
+          value: "7054"
+        - name: FABRIC_CA_SERVER_CSR_CN
+          value: {{ $caName }}
+        - name: FABRIC_CA_SERVER_CSR_HOSTS
+          value: {{ $caName }}
+        - name: FABRIC_CA_SERVER_DB_TYPE
+          value: postgres
+        - name: FABRIC_CA_SERVER_DB_DATASOURCE
+          value: '{{ $dbSource }}'
+        volumeMounts:
+        - name: fabric-ca-volume
+          subPath: fabric-ca/orderer
+          mountPath: /etc/hyperledger/fabric-ca-server
+      volumes:
+      - name: fabric-ca-volume
+        persistentVolumeClaim:
+          claimName: {{ $volumeClaimName }}
+---

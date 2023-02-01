@@ -1,0 +1,29 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  generation: 1
+  labels:
+    tekton.dev/pipeline: chaincode-builder
+  name: {{ printf "chaincode-builder-%s" $.Values.network.chaincode.name }}
+spec:
+  params:
+    - name: ccroot
+      value: {{ $.Values.network.chaincode.subPath }}
+  pipelineRef:
+    name: chaincode-builder
+  resources:
+    - name: git-repo-resource
+      resourceRef:
+        name: {{ printf "%s-git" $.Values.network.chaincode.name }}
+    - name: image-resource
+      resourceRef:
+        name: {{ printf "%s-image" $.Values.network.chaincode.name }}
+  serviceAccountName: pipeline
+
+---

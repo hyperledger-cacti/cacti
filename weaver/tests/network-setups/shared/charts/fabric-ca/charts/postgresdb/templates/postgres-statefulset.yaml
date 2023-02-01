@@ -1,0 +1,123 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+{{- if $.Values.global.network.postgres -}}
+{{- $name := printf "postgresql-%s" $.Values.global.network.name}}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ $name }}
+  annotations:
+    app.kubernetes.io/component: "CA_DB"
+{{ include "fabric-network.labels" $ | indent 4 }}
+  labels:
+    app: {{ $name }}
+spec:
+  serviceName: {{ $name }}-headless
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: {{ $name }}
+      role: master
+  template:
+    metadata:
+      name: {{ $name }}
+      labels:
+        app: {{ $name }}
+        role: master
+    spec:
+      {{- if $.Values.global.postgresdb.securityContext.enabled }}
+      securityContext:
+        runAsUser: {{ $.Values.global.postgresdb.securityContext.runAsUser }}
+      {{- end }}
+      containers:
+        - name: {{ $name }}
+          image: {{ printf "%s:%s" $.Values.global.images.postgres.name $.Values.global.images.postgres.version }}
+          imagePullPolicy: "IfNotPresent"
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+          env:
+            - name: BITNAMI_DEBUG
+              value: "false"
+            - name: POSTGRESQL_PORT_NUMBER
+              value: "5432"
+            - name: POSTGRESQL_VOLUME_DIR
+              value: "/bitnami/postgresql"
+            - name: PGDATA
+              value: "/bitnami/postgresql/data"
+            - name: POSTGRES_USER
+              value: {{ $.Values.global.network.postgres.admin.user }}
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $name }}
+                  key: postgresql-password
+            - name: POSTGRES_DB
+              value: {{ $.Values.global.network.postgres.admin.db }}
+            - name: POSTGRESQL_ENABLE_LDAP
+              value: "no"
+          ports:
+            - name: tcp-postgresql
+              containerPort: 5432
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - exec pg_isready -U {{ $.Values.global.network.postgres.admin.user | quote }} -d {{ $.Values.global.network.postgres.admin.db }} -h 127.0.0.1 -p 5432
+            initialDelaySeconds: 30
+            periodSeconds: 60
+            timeoutSeconds: 10
+            successThreshold: 1
+            failureThreshold: 30
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - -e
+                - |
+                  exec pg_isready -U {{ $.Values.global.network.postgres.admin.user | quote }} -d {{ $.Values.global.network.postgres.admin.db }} -h 127.0.0.1 -p 5432
+                  [ -f /opt/bitnami/postgresql/tmp/.initialized ] || [ -f /bitnami/postgresql/.initialized ]
+            initialDelaySeconds: 30
+            periodSeconds: 60
+            timeoutSeconds: 10
+            successThreshold: 1
+            failureThreshold: 30
+          volumeMounts:
+            - name: dshm
+              mountPath: /dev/shm
+            {{- if $.Values.global.network.postgres.pvc }}
+            - name: {{ $name }}-data
+              mountPath: /bitnami/postgresql
+              subPath:
+            {{- end }}
+      volumes:
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 1Gi
+        {{- if $.Values.global.network.postgres.pvc }}
+        - name: {{ $name }}-data
+          persistentVolumeClaim:
+            claimName: {{ $name }}-data
+        {{- end }}
+
+  # volumeClaimTemplates:
+  #   - metadata:
+  #       name: {{ $name }}-data
+  #     spec:
+  #       accessModes:
+  #         - "ReadWriteOnce"
+  #       resources:
+  #         requests:
+  #           storage: {{ $.Values.global.network.postgres.storage | quote }}
+---
+{{- end -}}

@@ -1,0 +1,92 @@
+[
+    {
+        "event_matcher": {
+            "eventType": 1,
+            "eventClassId": "",
+            "transactionLedgerId": "mychannel",
+            "transactionContractId": "simplestate",
+            "transactionFunc": "create"
+        },
+        "event_publication_spec": {
+            "ccArgs": ["keyType", ""],
+            "chaincodeId": "simplestate",
+            "driverId": "network1",
+            "ccFunc": "Create",
+            "channelId": "mychannel",
+            "replaceArgIndex": 1
+        },
+        "view_address": "localhost:9083/network2/mychannel:simplestate:Read:a",
+        "confidential": false
+    },
+    {
+        "event_matcher": {
+            "eventType": 1,
+            "eventClassId": "",
+            "transactionLedgerId": "mychannel",
+            "transactionContractId": "simplestate",
+            "transactionFunc": "createandreturnkey"
+        },
+        "event_publication_spec": {
+            "ccArgs": ["keyTypeDynamic", ""],
+            "chaincodeId": "simplestate",
+            "driverId": "network1",
+            "ccFunc": "Create",
+            "channelId": "mychannel",
+            "replaceArgIndex": 1
+        },
+        "view_address": "localhost:9083/network2/mychannel:simplestate:Read:?",
+        "confidential": false
+    },
+    {
+        "event_matcher": {
+            "eventType": 1,
+            "eventClassId": "CreateSimpleState",
+            "transactionLedgerId": "mychannel",
+            "transactionContractId": "simplestate",
+            "transactionFunc": "create"
+        },
+        "event_publication_spec": {
+            "ccArgs": ["keyClass", ""],
+            "chaincodeId": "simplestate",
+            "driverId": "network1",
+            "ccFunc": "Create",
+            "channelId": "mychannel",
+            "replaceArgIndex": 1
+        },
+        "view_address": "localhost:9083/network2/mychannel:simplestate:Read:a",
+        "confidential": false
+    },
+    {
+        "event_matcher": {
+            "eventType": 1,
+            "eventClassId": "CreateSimpleState",
+            "transactionLedgerId": "mychannel",
+            "transactionContractId": "simplestate",
+            "transactionFunc": "create"
+        },
+        "event_publication_spec": {
+            "ccArgs": ["keyClassDynamic", ""],
+            "chaincodeId": "simplestate",
+            "driverId": "network1",
+            "ccFunc": "Create",
+            "channelId": "mychannel",
+            "replaceArgIndex": 1
+        },
+        "view_address": "localhost:9083/network2/mychannel:simplestate:Read:?",
+        "confidential": false
+    },
+    {
+        "event_matcher": {
+            "eventType": 1,
+            "eventClassId": "CreateSimpleState",
+            "transactionLedgerId": "mychannel",
+            "transactionContractId": "simplestate",
+            "transactionFunc": "create"
+        },
+        "event_publication_spec": {
+            "appUrl": "http://localhost:8080/simple-event-callback"
+        },
+        "view_address": "localhost:9083/network2/mychannel:simplestate:Read:a",
+        "confidential": false
+    }
+]

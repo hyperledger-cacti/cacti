@@ -1,0 +1,28 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  generation: 1
+  labels:
+    tekton.dev/pipeline: chaincode-builder
+  name: chaincode-builder-sacc
+  namespace: dlt-interop
+spec:
+  params:
+    - name: ccroot
+      value: ./test/fabric/chaincode/sacc/
+  pipelineRef:
+    name: chaincode-builder
+  resources:
+    - name: git-repo-resource
+      resourceRef:
+        name: sacc-git
+    - name: image-resource
+      resourceRef:
+        name: sacc-image2
+  serviceAccountName: pipeline

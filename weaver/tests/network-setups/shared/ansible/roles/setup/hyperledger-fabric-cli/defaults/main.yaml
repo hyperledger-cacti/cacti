@@ -1,0 +1,9 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+hlf_github:  "https://github.com/hyperledger"
+hlf_github_releases_url: "{{ hlf_github }}/fabric/releases/download"
+hlf_ca_github_releases_url: "{{ hlf_github }}/fabric-ca/releases/download"

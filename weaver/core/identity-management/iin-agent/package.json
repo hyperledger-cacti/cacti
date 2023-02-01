@@ -1,0 +1,51 @@
+{
+    "name": "iin-agent",
+    "version": "1.5.4",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "nyc mocha -r ts-node/register --exclude 'test/data/**/*.js' --recursive  -t 10000",
+        "build": "npm run tsc",
+        "tsc": "tsc",
+        "start": "node out/server.js",
+        "watch": "tsc --watch",
+        "dev": "nodemon out/server.js",
+        "lint": "eslint '*/**/*.{js,ts,tsx}' --quiet --fix"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/hyperledger-labs/weaver-dlt-interoperability.git"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@hyperledger-labs/weaver-protos-js": "~1.5.0",
+        "@hyperledger-labs/weaver-fabric-interop-sdk": "~1.5.0",
+        "@fidm/x509": "^1.2.1",
+        "@grpc/grpc-js": "^1.1.1",
+        "@typescript-eslint/eslint-plugin": "^3.5.0",
+        "@typescript-eslint/parser": "^3.5.0",
+        "dotenv": "^8.2.0",
+        "eslint-config-prettier": "^6.11.0",
+        "eslint-plugin-prettier": "^3.1.4",
+        "fabric-ca-client": "^2.2.8",
+        "fabric-network": "^2.2.8",
+        "fabric-common": "^2.2.8"
+    },
+    "devDependencies": {
+        "patch-package": "^6.2.2",
+        "@types/node": "^14.0.14",
+        "ts-node": "^10.9.0",
+        "typedoc": "^0.23.15",
+        "typescript": "^4.8.4",
+        "nodemon": "^2.0.4",
+        "chai": "^4.1.2",
+        "chai-as-promised": "^7.1.1",
+        "mocha": "^5.2.0",
+        "nyc": "^12.0.2",
+        "rewire": "^4.0.1",
+        "sinon": "^6.1.3",
+        "sinon-chai": "^3.3.0",
+        "proto3-json-serializer": "^1.1.0"
+    }
+}

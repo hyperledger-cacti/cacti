@@ -1,0 +1,165 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+#---------------- Chaincode Deployment ---------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sacc-org1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: sacc-org1
+  template:
+    metadata:
+      labels:
+        name: sacc-org1
+        app: sacc-org1
+    spec:
+      volumes:
+        - name: network1-secrets
+          persistentVolumeClaim:
+            claimName: network1-secrets
+      containers:
+        - image: image-registry.openshift-image-registry.svc:5000/dlt-interop/sacc:latest
+          name: sacc-org1
+          imagePullPolicy: IfNotPresent
+          command: ["sh", "-c"]
+          args: ['set -a;
+                  . /var/env/pkgid;
+                  set +a;
+                  echo $CHAINCODE_CCID;
+                  ./sacc']
+          env:
+            # - name: CHAINCODE_CCID
+            #   value: "sacc:e5d873ce95b806bfe5bbfa60fe7cb33d77009c05f147bcf223795a2fbfd03c90"
+            - name: EXTERNAL_SERVICE
+              value: "true"
+            - name: CHAINCODE_ADDRESS
+              value: "0.0.0.0:7052"
+          ports:
+            - containerPort: 7052
+          volumeMounts:
+            - name: network1-secrets
+              subPath: chaincodes/sacc-org1
+              mountPath: /var/env
+      initContainers:
+      - name: cc-install
+        image: hyperledger/fabric-tools:2.1
+        env:
+          - name: ARTIFACTORY_URL
+            value: https://na.artifactory.swg-devops.com/artifactory
+          - name: ARTIFACTORY_APIKEY
+            valueFrom:
+              secretKeyRef:
+                name: artifactory-apikey
+                key: apikey
+          - name: CC_PATH
+            value: res-dlt-interop-generic-local/fabric-test-environment/sacc.zip
+          - name: CC_NAME
+            value: sacc
+          - name: CC_VERSION
+            value: v1.0
+          - name: CC_LANGUAGE
+            value: golang
+          - name: CC_INIT_FCN
+            value: "init"
+          - name: CC_INIT_ARGS
+            value: "\"a\",\"10\""
+          - name: CC_END_POLICY
+            value: NA
+          - name: CC_COLL_CONFIG
+            value: NA
+          - name: CC_SEQUENCE
+            value: "1"
+          - name: MAX_RETRY
+            value: "5"
+          - name: DELAY
+            value: "3"
+          - name: ORG
+            value: org1
+          - name: CORE_PEER_LOCALMSPID
+            value: Org1MSP
+          - name: CORE_PEER_TLS_ROOTCERT_FILE
+            value: /var/pvc1/peerOrganizations/org1/peers/peer0-org1-network1/tls/ca.crt
+          - name: CORE_PEER_MSPCONFIGPATH
+            value: /var/pvc1/peerOrganizations/org1/users/Admin@org1/msp
+          - name: CORE_PEER_ADDRESS
+            value: peer0-org1-network1:7051
+          - name: CORE_PEER_TLS_ENABLED
+            value: "true"
+          - name: ORDERER_NAME
+            value: ord0-orderers-network1
+          - name: ORDERER_URL
+            value: ord0-orderers-network1:7050
+          - name: ORDERER_CA
+            value: /var/pvc1/ordererOrganizations/orderer/orderers/ord0-orderers-network1/tls/ca.crt
+          - name: CHANNEL_NAME
+            value: mychannel
+          - name: NW_NAME
+            value: network1
+          - name: PORT
+            value: "7051"
+        volumeMounts:
+          - name: network1-secrets
+            mountPath: /var/pvc1
+        command: ["/bin/sh",  "-c"]
+        args: ['echo;
+                cd $GOPATH/src;
+                wget --header X-JFrog-Art-Api:$ARTIFACTORY_APIKEY $ARTIFACTORY_URL/$CC_PATH;
+                unzip $(basename $CC_PATH);
+                CC_PKG_FILE=${CC_NAME}.tar.gz;
+                CC_SRC_PATH=$GOPATH/src/$CC_NAME;
+                cp $CC_SRC_PATH/connection.json .;
+                cp $CC_SRC_PATH/metadata.json .;
+                tar cfz code.tar.gz connection.json;
+                tar cfz ${CC_PKG_FILE} code.tar.gz metadata.json;
+                rm code.tar.gz metadata.json connection.json;
+                echo "===================== Chaincode is packaged on peer0.org${ORG} ===================== ";
+                echo;
+                set -x;
+                peer lifecycle chaincode install ${CC_PKG_FILE};
+                res=$?;
+                set +x;
+                if [ $res -ne 0 ]; then
+                  echo "############# Chaincode installation on ${CORE_PEER_ADDRESS} has failed ##########";
+                  exit 1;
+                fi;
+                echo "===================== Chaincode is installed on ${CORE_PEER_ADDRESS} ===================== ";
+                set -x;
+                peer lifecycle chaincode queryinstalled >&~/log.txt;
+                res=$?;
+                set +x;
+                grep ${CC_NAME} ~/log.txt > logtemp.txt;
+                cat logtemp.txt;
+                PACKAGE_ID=$(sed -n "/${CC_NAME}/{s/^Package ID: //; s/, Label:.*$//; p;}" logtemp.txt);
+                if [ $res -ne 0 ]; then
+                  echo "############# Query installed on ${CORE_PEER_ADDRESS} has failed ##########";
+                  exit 1;
+                fi;
+                echo PackageID is ${PACKAGE_ID};
+                echo "===================== Query installed successful on ${CORE_PEER_ADDRESS} on channel ===================== ";
+                rm logtemp.txt;
+
+                mkdir -p /var/pvc1/chaincodes/$CC_NAME-$ORG;
+                echo "CHAINCODE_CCID="$PACKAGE_ID > /var/pvc1/chaincodes/$CC_NAME-$ORG/pkgid;
+                exit 0;']
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sacc-org1
+  labels:
+    app: sacc-org1
+spec:
+  ports:
+    - name: grpc
+      port: 7052
+      targetPort: 7052
+  selector:
+    app: sacc-org1

@@ -1,0 +1,119 @@
+buildscript {
+    ext.protobuf_version = "3.11.1"
+    
+    repositories {
+        mavenCentral()
+    }
+}
+
+plugins {
+    id "java"
+    id "idea"
+    id "maven-publish"
+}
+
+apply plugin: 'net.corda.plugins.cordapp'
+apply plugin: 'net.corda.plugins.quasar-utils'
+
+repositories {
+    if (github_url == "") {
+        println("Fetching Locally built Weaver packages.")
+        flatDir {
+            dirs '../../../../common/protos-java-kt/build/libs'
+        }
+    }
+}
+
+cordapp {
+    targetPlatformVersion corda_platform_version
+    minimumPlatformVersion corda_platform_version
+    workflow {
+        name "Interoperability Flows"
+        vendor "Corda Open Source"
+        licence "Apache License, Version 2.0"
+        versionId 1
+    }
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDir rootProject.file("config/dev")
+        }
+    }
+    test {
+        resources {
+            srcDir rootProject.file("config/test")
+        }
+    }
+    integrationTest {
+        kotlin {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+            srcDir file('src/integrationTest/kotlin')
+        }
+    }
+}
+
+configurations {
+    integrationTestCompile.extendsFrom testCompile
+    integrationTestRuntime.extendsFrom testRuntime
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    implementation 'com.google.code.gson:gson:2.9.1'
+
+    testCompile "org.jetbrains.kotlin:kotlin-test:$kotlin_version"
+    testCompile "junit:junit:$junit_version"
+    testCompile project(":test-cordapp")
+
+    compile "io.arrow-kt:arrow-core:$arrow_version"
+    compile "io.arrow-kt:arrow-fx:$arrow_version"
+    compile "io.arrow-kt:arrow-syntax:$arrow_version"
+    
+    // weaver-protos
+    compile "com.weaver:protos-java-kt:$weaver_version"
+    
+    compile "com.google.protobuf:protobuf-java:$protobuf_version"
+    compile "com.google.protobuf:protobuf-java-util:$protobuf_version"
+
+    // Corda dependencies.
+    cordaCompile "$corda_core_release_group:corda-core:$corda_core_release_version"
+    cordaRuntime "$corda_release_group:corda:$corda_release_version"
+
+    testCompile "$corda_release_group:corda-node-driver:$corda_release_version"
+
+    // CorDapp dependencies.
+    cordapp project(":interop-contracts")
+}
+
+task integrationTest(type: Test, dependsOn: []) {
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+}
+
+publishing {
+    publications {
+        workflows(MavenPublication) {
+            groupId = project.properties['group']
+            artifactId = 'interop-workflows'
+            version = project.properties['version']
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            url github_url
+            credentials {
+                username github_username
+                password github_password
+            }
+        }
+    }
+}
+
+test {
+    maxHeapSize = "4096m"
+}

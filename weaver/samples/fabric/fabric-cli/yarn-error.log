@@ -1,0 +1,101 @@
+Arguments: 
+  /Users/antonytargett/.nvm/versions/node/v10.16.3/bin/node /usr/local/Cellar/yarn/1.22.4/libexec/bin/yarn.js
+
+PATH: 
+  /Users/antonytargett/.nvm/versions/node/v10.16.3/bin:/Users/antonytargett/go/src/github.ibm.com/dlt-interoperability/network-setups/fabric/dev/scripts/fabric-cli/depot_tools:/usr/local/bin:/Users/antonytargett/.cargo/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/TeX/texbin://depot_tools:/Users/antonytargett/.cargo/bin:/Users/antonytargett/go/bin:/Users/antonytargett/go/bin
+
+Yarn version: 
+  1.22.4
+
+Node version: 
+  10.16.3
+
+Platform: 
+  darwin x64
+
+Trace: 
+  Error: https://registry.yarnpkg.com/@res-dlt-interop%2ffabric-interop-sdk: Not found
+      at Request.params.callback [as _callback] (/usr/local/Cellar/yarn/1.22.4/libexec/lib/cli.js:66987:18)
+      at Request.self.callback (/usr/local/Cellar/yarn/1.22.4/libexec/lib/cli.js:140748:22)
+      at Request.emit (events.js:198:13)
+      at Request.<anonymous> (/usr/local/Cellar/yarn/1.22.4/libexec/lib/cli.js:141720:10)
+      at Request.emit (events.js:198:13)
+      at IncomingMessage.<anonymous> (/usr/local/Cellar/yarn/1.22.4/libexec/lib/cli.js:141642:12)
+      at Object.onceWrapper (events.js:286:20)
+      at IncomingMessage.emit (events.js:203:15)
+      at endReadableNT (_stream_readable.js:1145:12)
+      at process._tickCallback (internal/process/next_tick.js:63:19)
+
+npm manifest: 
+  {
+    "name": "fabric-cli",
+    "version": "0.0.1",
+    "description": "fabric-cli CLI",
+    "private": true,
+    "types": "build/types/types.d.ts",
+    "bin": {
+      "fabric-cli": "bin/fabric-cli"
+    },
+    "scripts": {
+      "lint": "eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
+      "clean-build": "rm -rf ./build",
+      "compile": "tsc -p .",
+      "copy-templates": "if [ -e ./src/templates ]; then cp -a ./src/templates ./build/; fi",
+      "build": "yarn format && yarn lint && yarn clean-build && yarn compile && yarn copy-templates",
+      "prepublishOnly": "yarn build",
+      "test": "jest",
+      "watch": "jest --watch",
+      "snapupdate": "jest --updateSnapshot",
+      "coverage": "jest --coverage",
+      "protos": "grpc_tools_node_protoc --proto_path=protos --js_out=import_style=commonjs,binary:protos-js/ --grpc_out=grpc_js:protos-js/ --plugin=protoc-gen-grpc=`which grpc_tools_node_protoc_plugin` protos/relay/datatransfer.proto protos/networks/networks.proto protos/driver/driver.proto protos/common/ack.proto protos/common/query.proto protos/common/state.proto protos/common/proofs.proto  "
+    },
+    "files": [
+      "tsconfig.json",
+      "build",
+      "LICENSE",
+      "readme.md",
+      "docs",
+      "bin"
+    ],
+    "license": "MIT",
+    "dependencies": {
+      "@res-dlt-interop/fabric-interop-sdk": "^2.2.0",
+      "dotenv": "^8.2.0",
+      "gluegun": "latest"
+    },
+    "devDependencies": {
+      "@grpc/grpc-js": "^1.1.1",
+      "@grpc/proto-loader": "^0.5.4",
+      "@types/node": "^12.7.11",
+      "@types/jest": "^24.0.18",
+      "@typescript-eslint/eslint-plugin": "^3.5.0",
+      "@typescript-eslint/parser": "^3.5.0",
+      "eslint": "^7.3.1",
+      "eslint-config-prettier": "^6.11.0",
+      "eslint-plugin-prettier": "^3.1.4",
+      "fabric-ca-client": "^2.1.0",
+      "fabric-network": "^2.1.0",
+      "google-protobuf": "^3.12.2",
+      "grpc-tools": "^1.9.0",
+      "protobufjs": "^6.9.0",
+      "ts-node": "^8.4.1",
+      "ts-jest": "^24.1.0",
+      "typescript": "^3.6.3",
+      "prettier": "^1.12.1",
+      "jest": "^24.1.0"
+    },
+    "jest": {
+      "preset": "ts-jest",
+      "testEnvironment": "node"
+    },
+    "prettier": {
+      "semi": false,
+      "singleQuote": true
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

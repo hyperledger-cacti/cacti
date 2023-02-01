@@ -1,0 +1,36 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+---
+  - name: Ensure Hyperledger Fabric {{ fabric_cli.version }} Tooling Installation
+    include_role:
+      name: setup/simple-package
+    vars:
+      package:
+        name: "Hyperledger Fabric Tooling"
+        install_path: "{{ fabric_cli.bin_directory }}"
+        url: "{{ hlf_package_url }}"
+        unpack: True
+        command: "{{ fabric_cli.bin_directory }}/bin/configtxgen -version"
+        cache_remove: False
+        cache_refresh: False
+    tags:
+      - fabric_cli
+
+  - name: Ensure Hyperledger Fabric CA {{ fabric_cli.ca.version }} Installation
+    include_role:
+      name: setup/simple-package
+    vars:
+      package:
+        name: "Hyperledger Fabric CA Tooling"
+        install_path: "{{ fabric_cli.ca.bin_directory }}"
+        url: "{{ hlf_ca_package_url }}"
+        unpack: True
+        command: "{{ fabric_cli.ca.bin_directory }}/bin/fabric-ca-client version"
+        cache_refresh: False
+        cache_remove: False
+    tags:
+      - fabric_cli

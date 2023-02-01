@@ -1,0 +1,14 @@
+{
+  "securityDomain": "network2",
+  "identifiers": [
+    {
+      "pattern": "mychannel:simplestate:Read:*",
+      "policy": {
+        "type": "Signature",
+        "criteria": [
+          "Org1MSP"
+        ]
+      }
+    }
+  ]
+}

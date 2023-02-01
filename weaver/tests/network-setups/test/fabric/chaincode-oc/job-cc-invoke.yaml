@@ -1,0 +1,76 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: cc-invoke
+spec:
+  template:
+    spec:
+      volumes:
+        - name: network1-secrets
+          persistentVolumeClaim:
+            claimName: network1-secrets
+      containers:
+      - name: cc-invoke
+        image: hyperledger/fabric-tools:2.1
+        env:
+          - name: CC_NAME
+            value: sacc
+          - name: CC_FCN
+            value: "set"
+          - name: CC_ARGS
+            value: "\"b\",\"20\""
+          # - name: CC_ARGS
+          #   value: "\"b\""
+          - name: CHANNEL_NAME
+            value: mychannel
+          - name: ORG_LIST
+            value: "org1"
+          - name: CORE_PEER_LOCALMSPID
+            value: Org1MSP
+          - name: CORE_PEER_TLS_ROOTCERT_FILE
+            value: /var/pvc1/peerOrganizations/org1/peers/peer0-org1-network1/tls/ca.crt
+          - name: CORE_PEER_MSPCONFIGPATH
+            value: /var/pvc1/peerOrganizations/org1/users/Admin@org1/msp
+          - name: CORE_PEER_ADDRESS
+            value: peer0-org1-network1:7051
+          - name: ORDERER_NAME
+            value: ord0-orderers-network1
+          - name: ORDERER_URL
+            value: ord0-orderers-network1:7050
+          - name: ORDERER_CA
+            value: /var/pvc1/ordererOrganizations/orderer/orderers/ord0-orderers-network1/tls/ca.crt
+          - name: NW_NAME
+            value: network1
+          - name: PORT
+            value: "7051"
+          - name: MAX_RETRY
+            value: "5"
+          - name: DELAY
+            value: "3"
+          - name: CORE_PEER_TLS_ENABLED
+            value: "true"
+        volumeMounts:
+          - name: network1-secrets
+            mountPath: /var/pvc1
+        command: ["/bin/sh",  "-c"]
+        args: ['echo;
+                echo "===================== Invoking chaincode ${CC_NAME} on channel $CHANNEL_NAME... ===================== ";
+                PEER_CONN_PARAMS="";
+              	for org in $ORG_LIST; do
+              		PEER_CONN_PARAMS=$PEER_CONN_PARAMS" --peerAddresses peer0-${org}-${NW_NAME}:${PORT} --tlsRootCertFiles /var/pvc1/peerOrganizations/${org}/peers/peer0-${org}-${NW_NAME}/tls/ca.crt";
+              	done;
+                set -x;
+                fcn_call="{\"function\":\""${CC_FCN}"\",\"Args\":["${CC_ARGS}"]}";
+                echo invoke fcn call:${fcn_call};
+                peer chaincode invoke -o ${ORDERER_URL} --ordererTLSHostnameOverride ${ORDERER_NAME} --tls --cafile ${ORDERER_CA} -C ${CHANNEL_NAME} -n $CC_NAME ${PEER_CONN_PARAMS} -c ${fcn_call};
+                set +x;
+                echo;
+                exit 0;']
+      restartPolicy: Never
+  backoffLimit: 4

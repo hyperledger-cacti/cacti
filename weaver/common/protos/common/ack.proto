@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package common.ack;
+
+option java_package = "com.weaver.protos.common.ack";
+option go_package = "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common";
+
+// This message respresents "ACKs" sent between relay-relay,
+// relay-driver and relay-network
+message Ack {
+    enum STATUS {
+      OK = 0;
+      ERROR = 1;
+    };
+    STATUS status = 2;
+    string request_id = 3;
+    // an error can have an associated string
+    // this is the best way to represent this in protobuf
+    string message = 4;
+  }
+  

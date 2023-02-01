@@ -1,0 +1,17 @@
+# Local build
+FROM gradle:4.10.3-jdk8 AS builder-local
+
+WORKDIR /corda-driver
+ADD build /corda-driver/build
+
+FROM builder-local as builder
+
+# Deployment Image 
+FROM openjdk:8-jre
+
+COPY --from=builder /corda-driver/build/install/corda-driver /corda-driver/
+
+WORKDIR /corda-driver
+
+ARG GIT_URL
+LABEL org.opencontainers.image.source ${GIT_URL}

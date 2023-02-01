@@ -1,0 +1,110 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: gen-crypto-ord
+spec:
+  template:
+    spec:
+      volumes:
+        - name: network1-secrets
+          persistentVolumeClaim:
+            claimName: network1-secrets
+      containers:
+      - name: gen-crypto-ord
+        image: hyperledger/fabric-ca:1.4
+        env:
+          - name: DOMAIN
+            value: orderer
+          - name: NODE_HOSTNAME
+            value: ord0-orderers-network1
+          - name: CA_NAME
+            value: ca-orderer-network1
+          - name: CA_URL
+            value: ca-orderer-network1:7054
+          - name: CA_CERT_FILE
+            value: ca-orderer-network1-7054-ca-orderer-network1.pem
+          - name: FABRIC_CA_CLIENT_HOME
+            value: /var/pvc1/ordererOrganizations/orderer
+          - name: TLS_CACERT_PATH
+            value: /var/pvc1/fabric-ca/orderer/tls-cert.pem
+        volumeMounts:
+          - name: network1-secrets
+            mountPath: /var/pvc1
+        command: ["/bin/sh",  "-c"]
+        args: ['echo;
+                echo "Enroll the CA admin";
+                echo;
+                mkdir -p ${FABRIC_CA_CLIENT_HOME};
+
+                export FABRIC_CA_CLIENT_HOME=${FABRIC_CA_CLIENT_HOME};
+                set -x;
+                fabric-ca-client enroll -u https://admin:adminpw@${CA_URL} --caname ${CA_NAME} --tls.certfiles ${TLS_CACERT_PATH};
+                set +x;
+
+                echo "NodeOUs:\n  Enable: true\n  ClientOUIdentifier:\n    Certificate: cacerts/${CA_CERT_FILE}\n    OrganizationalUnitIdentifier: client\n  PeerOUIdentifier:\n    Certificate: cacerts/${CA_CERT_FILE}\n    OrganizationalUnitIdentifier: peer\n  AdminOUIdentifier:\n    Certificate: cacerts/${CA_CERT_FILE}\n    OrganizationalUnitIdentifier: admin\n  OrdererOUIdentifier:\n    Certificate: cacerts/${CA_CERT_FILE}\n    OrganizationalUnitIdentifier: orderer" > ${FABRIC_CA_CLIENT_HOME}/msp/config.yaml;
+
+
+                echo;
+                echo "Register orderer";
+                echo;
+                set -x;
+                fabric-ca-client register --caname ${CA_NAME} --id.name orderer --id.secret ordererpw --id.type orderer --tls.certfiles ${TLS_CACERT_PATH};
+                  set +x;
+
+                echo;
+                echo "Register the orderer admin";
+                echo;
+                set -x;
+                fabric-ca-client register --caname ${CA_NAME} --id.name ordererAdmin --id.secret ordererAdminpw --id.type admin --tls.certfiles ${TLS_CACERT_PATH};
+                set +x;
+
+                mkdir -p ${FABRIC_CA_CLIENT_HOME}/orderers;
+                mkdir -p ${FABRIC_CA_CLIENT_HOME}/orderers/${DOMAIN};
+
+                mkdir -p ${FABRIC_CA_CLIENT_HOME}/orderers/${NODE_HOSTNAME};
+
+                echo;
+                echo "## Generate the orderer msp";
+                echo;
+                set -x;
+                fabric-ca-client enroll -u https://orderer:ordererpw@${CA_URL} --caname ${CA_NAME} -M ${FABRIC_CA_CLIENT_HOME}/orderers/${NODE_HOSTNAME}/msp --csr.hosts ${NODE_HOSTNAME} --csr.hosts localhost --tls.certfiles ${TLS_CACERT_PATH};
+                set +x;
+
+                cp ${FABRIC_CA_CLIENT_HOME}/msp/config.yaml ${FABRIC_CA_CLIENT_HOME}/orderers/${NODE_HOSTNAME}/msp/config.yaml;
+
+                echo;
+                echo "## Generate the orderer-tls certificates";
+                echo;
+                set -x;
+                fabric-ca-client enroll -u https://orderer:ordererpw@${CA_URL} --caname ${CA_NAME} -M ${FABRIC_CA_CLIENT_HOME}/orderers/${NODE_HOSTNAME}/tls --enrollment.profile tls --csr.hosts ${NODE_HOSTNAME} --csr.hosts localhost --tls.certfiles ${TLS_CACERT_PATH};
+                set +x;
+
+                cp ${FABRIC_CA_CLIENT_HOME}/orderers/${NODE_HOSTNAME}/tls/tlscacerts/* ${FABRIC_CA_CLIENT_HOME}/orderers/${NODE_HOSTNAME}/tls/ca.crt;
+                cp ${FABRIC_CA_CLIENT_HOME}/orderers/${NODE_HOSTNAME}/tls/signcerts/* ${FABRIC_CA_CLIENT_HOME}/orderers/${NODE_HOSTNAME}/tls/server.crt;
+                cp ${FABRIC_CA_CLIENT_HOME}/orderers/${NODE_HOSTNAME}/tls/keystore/* ${FABRIC_CA_CLIENT_HOME}/orderers/${NODE_HOSTNAME}/tls/server.key;
+
+                mkdir -p ${FABRIC_CA_CLIENT_HOME}/orderers/${NODE_HOSTNAME}/msp/tlscacerts;
+                cp ${FABRIC_CA_CLIENT_HOME}/orderers/${NODE_HOSTNAME}/tls/tlscacerts/* ${FABRIC_CA_CLIENT_HOME}/orderers/${NODE_HOSTNAME}/msp/tlscacerts/tlsca.${DOMAIN}-cert.pem;
+
+                mkdir -p ${FABRIC_CA_CLIENT_HOME}/msp/tlscacerts;
+                cp ${FABRIC_CA_CLIENT_HOME}/orderers/${NODE_HOSTNAME}/tls/tlscacerts/* ${FABRIC_CA_CLIENT_HOME}/msp/tlscacerts/tlsca.${DOMAIN}-cert.pem;
+
+                mkdir -p ${FABRIC_CA_CLIENT_HOME}/users;
+                mkdir -p ${FABRIC_CA_CLIENT_HOME}/users/Admin@${DOMAIN};
+
+                echo;
+                echo "## Generate the admin msp";
+                echo;
+                set -x;
+                fabric-ca-client enroll -u https://ordererAdmin:ordererAdminpw@${CA_URL} --caname ${CA_NAME} -M ${FABRIC_CA_CLIENT_HOME}/users/Admin@${DOMAIN}/msp --tls.certfiles ${TLS_CACERT_PATH};
+                set +x;
+
+                cp ${FABRIC_CA_CLIENT_HOME}/msp/config.yaml ${FABRIC_CA_CLIENT_HOME}/users/Admin@${DOMAIN}/msp/config.yaml;']
+      restartPolicy: Never
+  backoffLimit: 4

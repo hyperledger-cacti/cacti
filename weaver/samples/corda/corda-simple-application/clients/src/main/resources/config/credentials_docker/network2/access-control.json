@@ -1,0 +1,17 @@
+{
+  "securityDomain": "network2",
+  "rules": [
+    {
+      "principal": "-----BEGIN CERTIFICATE-----\nMIICUDCCAfegAwIBAgIUeeOR/dieeIlKyt2GV098/C8TAfMwCgYIKoZIzj0EAwIw\ncjELMAkGA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMRowGAYDVQQK\nExFvcmcxLm5ldHdvcmsyLmNvbTEPMA0GA1UECxMGRmFicmljMR0wGwYDVQQDExRj\nYS5vcmcxLm5ldHdvcmsyLmNvbTAeFw0yMjEwMTkxMjA3MDBaFw0zMjEwMTkwMDEy\nMDBaMCExDzANBgNVBAsTBmNsaWVudDEOMAwGA1UEAxMFdXNlcjEwWTATBgcqhkjO\nPQIBBggqhkjOPQMBBwNCAAT9eQoprN/YqJiRC5okvLOqqokAcNMy1WfuAZKazuj7\n6KKG7fnCwz710gvvNhxwiQTjQWRHG1uE6wVCB1apqZ5co4G7MIG4MA4GA1UdDwEB\n/wQEAwIHgDAMBgNVHRMBAf8EAjAAMB0GA1UdDgQWBBSaIQrE1wG9KOYEQYQPBnKq\nXTOh/jAfBgNVHSMEGDAWgBTa2B8P3P/47A9fsAIcst7vwkrZlzBYBggqAwQFBgcI\nAQRMeyJhdHRycyI6eyJoZi5BZmZpbGlhdGlvbiI6IiIsImhmLkVucm9sbG1lbnRJ\nRCI6InVzZXIxIiwiaGYuVHlwZSI6ImNsaWVudCJ9fTAKBggqhkjOPQQDAgNHADBE\nAiAGkpX+ZFTjzpbw8wUlhstlvcZagxK52NIyNSMu9PyNSgIgDX+7I/vSAq70oe2l\nMI5vqvtgL1owFrb7BfVKLwIgSJ8=\n-----END CERTIFICATE-----\n",
+      "principalType": "ca",
+      "resource": "corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:*",
+      "read": true
+    },
+    {
+      "principal": "-----BEGIN CERTIFICATE-----\nMIICUDCCAfegAwIBAgIUeeOR/dieeIlKyt2GV098/C8TAfMwCgYIKoZIzj0EAwIw\ncjELMAkGA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMRowGAYDVQQK\nExFvcmcxLm5ldHdvcmsyLmNvbTEPMA0GA1UECxMGRmFicmljMR0wGwYDVQQDExRj\nYS5vcmcxLm5ldHdvcmsyLmNvbTAeFw0yMjEwMTkxMjA3MDBaFw0zMjEwMTkwMDEy\nMDBaMCExDzANBgNVBAsTBmNsaWVudDEOMAwGA1UEAxMFdXNlcjEwWTATBgcqhkjO\nPQIBBggqhkjOPQMBBwNCAAT9eQoprN/YqJiRC5okvLOqqokAcNMy1WfuAZKazuj7\n6KKG7fnCwz710gvvNhxwiQTjQWRHG1uE6wVCB1apqZ5co4G7MIG4MA4GA1UdDwEB\n/wQEAwIHgDAMBgNVHRMBAf8EAjAAMB0GA1UdDgQWBBSaIQrE1wG9KOYEQYQPBnKq\nXTOh/jAfBgNVHSMEGDAWgBTa2B8P3P/47A9fsAIcst7vwkrZlzBYBggqAwQFBgcI\nAQRMeyJhdHRycyI6eyJoZi5BZmZpbGlhdGlvbiI6IiIsImhmLkVucm9sbG1lbnRJ\nRCI6InVzZXIxIiwiaGYuVHlwZSI6ImNsaWVudCJ9fTAKBggqhkjOPQQDAgNHADBE\nAiAGkpX+ZFTjzpbw8wUlhstlvcZagxK52NIyNSMu9PyNSgIgDX+7I/vSAq70oe2l\nMI5vqvtgL1owFrb7BfVKLwIgSJ8=\n-----END CERTIFICATE-----\n",
+      "principalType": "ca",
+      "resource": "corda_network2_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:*",
+      "read": true
+    }
+  ]
+}

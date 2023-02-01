@@ -1,0 +1,54 @@
+# This is the main section of the configuration
+# of the relay server. We keep information about
+# the port the server is listening to and the
+# name, as well as details about the databases 
+# that are used to persiste messages.
+#
+name = "${RELAY_NAME}"
+port="${RELAY_PORT}"
+hostname="0.0.0.0"
+db_path="db/${RELAY_NAME}/requests"
+remote_db_path="db/${RELAY_NAME}/remote_request"
+cert_path="${RELAY_TLS_CERT_PATH}"
+key_path="${RELAY_TLS_KEY_PATH}"
+tls="${RELAY_TLS}"
+
+# This section contains information about the
+# network that is being exposed by the relay.
+# The information is essentially metadata.
+#
+[networks]
+[networks.${NETWORK_NAME}]
+network="${NETWORK_TYPE}"
+
+# This section provides information associated
+# to the driver that is currently configured
+# with the relay. This provide connectivity
+# to the network that is exposed by the relay.
+# We only need hostname and port at present
+# time.
+#
+[drivers]
+[drivers.${NETWORK_TYPE}]
+hostname="${DRIVER_HOST}"
+port="${DRIVER_PORT}"
+tls="${DRIVER_TLS}"
+tlsca_cert_path="${DRIVER_TLSCA_CERT_PATH}"
+
+# Here additional configuration about
+# the relay services that the current
+# relay is aware of.
+#
+[relays]
+
+# Here is an example of the content of the
+# files that are added as relay entries.
+#
+# [relays.Fabric_Relay]
+# hostname="fabric-relay.dlt-interop.net"
+# port="9090"
+# [relays.Corda_Relay]
+# hostname="corda-relay.dlt-interop.net"
+# port="9091"
+# ....
+

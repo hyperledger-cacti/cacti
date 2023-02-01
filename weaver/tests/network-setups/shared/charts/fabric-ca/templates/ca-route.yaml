@@ -1,0 +1,32 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+{{- if (eq $.Values.global.cluster "OpenShift") -}}
+{{- range $.Values.global.network.orgs }}
+{{- $orgName := .name -}}
+{{- if (and .ca.deploy .ca.expose) -}}
+{{- $caName := printf "ca-%s-%s" $orgName $.Values.global.network.name -}}
+apiVersion: v1
+kind: Route
+metadata:
+  name: {{ printf "%s-route" $caName }}
+  labels:
+    app.kubernetes.io/component: "CA"
+{{ include "fabric-network.labels" $ | indent 4 }}
+spec:
+  host: {{ printf "%s.%s" $caName $.Values.global.network.domain.cluster }}
+  port:
+    targetPort: grpc
+  to:
+    kind: Service
+    name: {{ $caName }}
+  tls:
+    termination: passthrough
+  wildcardPolicy: None
+---
+{{- end -}}
+{{- end }}
+{{- end -}}

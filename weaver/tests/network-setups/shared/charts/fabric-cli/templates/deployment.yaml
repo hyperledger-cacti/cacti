@@ -1,0 +1,102 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+{{- $appName := printf "fabric-cli-%s" $.Values.cli.network -}}
+{{- $volumeClaimName := printf "%s-crypto" $.Values.cli.network -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $appName }}
+  labels:
+{{- include "fabric-cli.labels" $ | indent 4 }}
+    app.kubernetes.io/component: "fabric-cli"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: {{ $appName }}
+  template:
+    metadata:
+      labels:
+        name: {{ $appName }}
+        app: {{ $appName }}
+    spec:
+      volumes:
+        - name: network-volume
+          persistentVolumeClaim:
+            claimName: {{ $volumeClaimName }}
+        - name: config-map
+          configMap:
+            name: {{ $appName }}-configmap
+      initContainers:
+        - name: init-container
+          image: {{ printf "%s/%s:%s" $.Values.image.repository $.Values.image.name $.Values.image.tag }}
+          imagePullPolicy:  {{ $.Values.image.pullPolicy }}
+          env:
+            - name: NW_NAME
+              value: {{ $.Values.cli.network }}
+            - name: REMOTE_NW_ID
+              value: {{ $.Values.cli.remoteNetwork }}
+            - name: LOCAL
+              value: "false"
+            - name: DEFAULT_CHANNEL
+              value: {{ $.Values.cli.defaultChannel }}
+            - name: DEFAULT_CHAINCODE
+              value: {{ $.Values.cli.defaultChaincode }}
+            - name: MEMBER_CREDENTIAL_FOLDER
+              value: /var/pvc1/fabric-cli
+            - name: WALLET_PATH
+              value: /var/pvc1/wallets/fabric-cli
+            - name: CONFIG_PATH
+              value: /var/config/config.json
+          volumeMounts:
+          - name: network-volume
+            mountPath: /var/pvc1
+          - name: config-map
+            mountPath: /var/config
+          command: ["bash", "-c"]
+          args: ['echo "Initialising Interop...";
+                mkdir -p ${WALLET_PATH};
+                mkdir -p ${MEMBER_CREDENTIAL_FOLDER};
+                fabric-cli config set-file $CONFIG_PATH;
+                fabric-cli configure network-config --local-network=${NW_NAME};
+                while [ ! -d "${MEMBER_CREDENTIAL_FOLDER}/${REMOTE_NW_ID}" ]; do
+                  echo "Waiting for ${REMOTE_NW_ID} configuration to be loaded manually...";
+                  sleep 30;
+                done;
+                sleep 5;
+                fabric-cli configure all ${NW_NAME};
+                echo "Done..";']
+      containers:
+        - name: {{ $appName }}
+          image: {{ printf "%s/%s:%s" $.Values.image.repository $.Values.image.name $.Values.image.tag }}
+          imagePullPolicy:  {{ $.Values.image.pullPolicy }}
+          env:
+            - name: NW_NAME
+              value: {{ $.Values.cli.network }}
+            - name: REMOTE_NW_ID
+              value: {{ $.Values.cli.remoteNetwork }}
+            - name: LOCAL
+              value: "false"
+            - name: DEFAULT_CHANNEL
+              value: {{ $.Values.cli.defaultChannel }}
+            - name: DEFAULT_CHAINCODE
+              value: {{ $.Values.cli.defaultChaincode }}
+            - name: MEMBER_CREDENTIAL_FOLDER
+              value: /var/pvc1/fabric-cli
+            - name: WALLET_PATH
+              value: /var/pvc1/wallets/fabric-cli
+            - name: CONFIG_PATH
+              value: /var/config/config.json
+          volumeMounts:
+          - name: network-volume
+            mountPath: /var/pvc1
+          - name: config-map
+            mountPath: /var/config
+          command: ["sh"]
+          args: ["-c", "sleep 6000"]
+      imagePullSecrets:
+        - name: {{ $.Values.image.pullSecrets }}

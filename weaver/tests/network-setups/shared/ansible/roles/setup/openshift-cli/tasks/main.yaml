@@ -1,0 +1,47 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+---
+  - name: Ensure OpenShift Container Platform CLI Installation
+    include_role:
+      name: setup/simple-package
+    vars:
+      package:
+        name: "OpenShift Container Platform CLI"
+        install_path: "{{ openshift_cli.bin_directory }}"
+        url: "{{ openshift_cli.repository.url }}/openshift/cli/{{ openshift_cli.os }}/oc.tar.gz"
+        headers:
+          "X-JFrog-Art-Api": "{{ openshift_cli.repository.api_key }}"
+        unpack: True
+        command: "{{ openshift_cli.bin_directory }}/oc -h"
+        cache_refresh: False
+        cache_remove: False
+    tags:
+      - openshift_cli
+
+
+  - name: "Login into OpenShift Cluster (login_mode: OC)"
+    shell:
+      chdir: "{{ openshift_cli.bin_directory }}"
+      cmd: "./oc --token={{ openshift_cli.api.token }} --server={{ openshift_cli.api.cluster_endpoint }}"
+    when: openshift_cli.login_mode == "oc"
+    tags:
+      - openshift_cli
+
+  - name: "Login into OpenShift Cluster (login_mode: OCL)"
+    shell:
+      chdir: "{{ openshift_cli.bin_directory }}"
+      cmd: "OPENSHIFT_CLUSTER_API={{ openshift_cli.api.cluster_hostname }} OPENSHIFT_TOKEN={{ openshift_cli.api.token }} ./ocl.sh"
+    when: openshift_cli.login_mode == "ocl"
+    tags:
+      - openshift_cli
+
+  - name: Selecting Default Project
+    command: "{{ openshift_cli.bin_directory }}/oc project {{ openshift_cli.project }}"
+    when: >
+      openshift_cli.project is defined and
+      (openshift_cli.project | length > 0) and
+      openshift_cli.login_mode != "none"
