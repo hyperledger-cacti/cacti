@@ -1,6 +1,6 @@
 {
     "name": "fabric-driver",
-    "version": "1.5.6",
+    "version": "1.5.9",
     "description": "",
     "main": "out/server.js",
     "scripts": {

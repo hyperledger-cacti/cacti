@@ -84,6 +84,7 @@ const createHTLC = async (
     hash: Hash,
     expiryTimeSecs: number,
     timeoutCallback: (c: Contract, t: string, i: string, r: string, h: Hash) => any,
+    endorsingOrgs: Array<string> = [],
 ): Promise<{ hash: Hash; result: any }> => {
 
     if (!contract)
@@ -126,12 +127,17 @@ const createHTLC = async (
     //If timeoutCallback is not defined, start automated listener
     if (!timeoutCallback) 
     {
-        StartHTLCAssetLockListener(contract, "", assetType, assetID, recipientECert, "", assetLockExpirationCallback);
+        StartHTLCAssetLockListener(contract, "", assetType, assetID, recipientECert, "", assetLockExpirationCallback, endorsingOrgs);
     }
 
+    const tx = contract.createTransaction("LockAsset")
+    const ccArgs = [assetExchangeAgreementStr, lockInfoStr]
+    if (endorsingOrgs && endorsingOrgs.length > 0) {
+        tx.setEndorsingOrganizations(...endorsingOrgs)
+    }
     // Normal invoke function
     const [result, submitError] = await helpers.handlePromise(
-        contract.submitTransaction("LockAsset", assetExchangeAgreementStr, lockInfoStr),
+        tx.submit(...ccArgs)
     );
     if (submitError) {
         throw new Error(`LockAsset submitTransaction Error: ${submitError}`);
@@ -158,6 +164,7 @@ const createFungibleHTLC = async (
     hash: Hash,
     expiryTimeSecs: number,
     timeoutCallback: (c: Contract, i: string, t: string, n: number, r: string, h: Hash) => any,
+    endorsingOrgs: Array<string> = [],
 ): Promise<{ hash: Hash; result: any }> => {
 
     if (!contract)
@@ -200,12 +207,17 @@ const createFungibleHTLC = async (
     //If timeoutCallback is not defined, start automated listener
     if (!timeoutCallback) 
     {
-        StartHTLCFungibleAssetLockListener(contract, "", assetType, numUnits, recipientECert, "", fungibleAssetLockExpirationCallback);
+        StartHTLCFungibleAssetLockListener(contract, "", assetType, numUnits, recipientECert, "", fungibleAssetLockExpirationCallback, endorsingOrgs);
     }
 
+    const tx = contract.createTransaction("LockFungibleAsset")
+    const ccArgs = [assetExchangeAgreementStr, lockInfoStr]
+    if (endorsingOrgs && endorsingOrgs.length > 0) {
+        tx.setEndorsingOrganizations(...endorsingOrgs)
+    }
     // Normal invoke function
     const [contractId, submitError] = await helpers.handlePromise(
-        contract.submitTransaction("LockFungibleAsset", assetExchangeAgreementStr, lockInfoStr),
+        tx.submit(...ccArgs)
     );
     if (submitError) {
         throw new Error(`LockFungibleAsset submitTransaction Error: ${submitError}`);
@@ -230,6 +242,7 @@ const claimAssetInHTLC = async (
     assetID: string,
     lockerECert: string,
     hash: Hash,
+    endorsingOrgs: Array<string> = []
 ): Promise<any> => {
 
     if (!contract)
@@ -267,8 +280,13 @@ const claimAssetInHTLC = async (
     const claimInfoStr = createAssetClaimInfoSerialized(hash);
 
     // Normal invoke function
+    const tx = contract.createTransaction("ClaimAsset")
+    const ccArgs = [assetExchangeAgreementStr, claimInfoStr]
+    if (endorsingOrgs && endorsingOrgs.length > 0) {
+        tx.setEndorsingOrganizations(...endorsingOrgs)
+    }
     const [result, submitError] = await helpers.handlePromise(
-        contract.submitTransaction("ClaimAsset", assetExchangeAgreementStr, claimInfoStr),
+        tx.submit(...ccArgs)
     );
     if (submitError) {
         throw new Error(`ClaimAsset submitTransaction Error: ${submitError}`);
@@ -284,6 +302,7 @@ const claimAssetInHTLCusingContractId = async (
     contract: Contract,
     contractId: string,
     hash: Hash,
+    endorsingOrgs: Array<string> = []
 ): Promise<any> => {
 
     if (!contract)
@@ -310,8 +329,13 @@ const claimAssetInHTLCusingContractId = async (
     const claimInfoStr = createAssetClaimInfoSerialized(hash);
 
     // Normal invoke function
+    const tx = contract.createTransaction("ClaimAssetUsingContractId")
+    const ccArgs = [contractId, claimInfoStr]
+    if (endorsingOrgs && endorsingOrgs.length > 0) {
+        tx.setEndorsingOrganizations(...endorsingOrgs)
+    }
     const [result, submitError] = await helpers.handlePromise(
-        contract.submitTransaction("ClaimAssetUsingContractId", contractId, claimInfoStr),
+        tx.submit(...ccArgs)
     );
     if (submitError) {
         throw new Error(`ClaimAssetUsingContractId submitTransaction Error: ${submitError}`);
@@ -328,6 +352,7 @@ const claimFungibleAssetInHTLC = async (
     contract: Contract,
     contractId: string,
     hash: Hash,
+    endorsingOrgs: Array<string> = []
 ): Promise<any> => {
 
     if (!contract)
@@ -354,8 +379,13 @@ const claimFungibleAssetInHTLC = async (
     const claimInfoStr = createAssetClaimInfoSerialized(hash);
 
     // Normal invoke function
+    const tx = contract.createTransaction("ClaimFungibleAsset")
+    const ccArgs = [contractId, claimInfoStr]
+    if (endorsingOrgs && endorsingOrgs.length > 0) {
+        tx.setEndorsingOrganizations(...endorsingOrgs)
+    }
     const [result, submitError] = await helpers.handlePromise(
-        contract.submitTransaction("ClaimFungibleAsset", contractId, claimInfoStr),
+        tx.submit(...ccArgs)
     );
     if (submitError) {
         throw new Error(`ClaimFungibleAsset submitTransaction Error: ${submitError}`);
@@ -372,6 +402,7 @@ const reclaimAssetInHTLC = async (
     assetType: string,
     assetID: string,
     recipientECert: string,
+    endorsingOrgs: Array<string> = []
 ): Promise<any> => {
 
     if (!contract)
@@ -398,8 +429,13 @@ const reclaimAssetInHTLC = async (
     const assetExchangeAgreementStr = createAssetExchangeAgreementSerialized(assetType, assetID, recipientECert, "");
 
     // Normal invoke function
+    const tx = contract.createTransaction("UnlockAsset")
+    const ccArgs = [assetExchangeAgreementStr]
+    if (endorsingOrgs && endorsingOrgs.length > 0) {
+        tx.setEndorsingOrganizations(...endorsingOrgs)
+    }
     const [result, submitError] = await helpers.handlePromise(
-        contract.submitTransaction("UnlockAsset", assetExchangeAgreementStr),
+        tx.submit(...ccArgs)
     );
     if (submitError) {
         throw new Error(`UnlockAsset submitTransaction Error: ${submitError}`);
@@ -414,6 +450,7 @@ const reclaimAssetInHTLC = async (
 const reclaimAssetInHTLCusingContractId = async (
     contract: Contract,
     contractId: string,
+    endorsingOrgs: Array<string> = []
 ): Promise<any> => {
 
     if (!contract)
@@ -428,8 +465,13 @@ const reclaimAssetInHTLCusingContractId = async (
     }
 
     // Normal invoke function
+    const tx = contract.createTransaction("UnlockAssetUsingContractId")
+    const ccArgs = [contractId]
+    if (endorsingOrgs && endorsingOrgs.length > 0) {
+        tx.setEndorsingOrganizations(...endorsingOrgs)
+    }
     const [result, submitError] = await helpers.handlePromise(
-        contract.submitTransaction("UnlockAssetUsingContractId", contractId),
+        tx.submit(...ccArgs)
     );
     if (submitError) {
         throw new Error(`UnlockAssetUsingContractId submitTransaction Error: ${submitError}`);
@@ -444,6 +486,7 @@ const reclaimAssetInHTLCusingContractId = async (
 const reclaimFungibleAssetInHTLC = async (
     contract: Contract,
     contractId: string,
+    endorsingOrgs: Array<string> = []
 ): Promise<any> => {
 
     if (!contract)
@@ -458,8 +501,13 @@ const reclaimFungibleAssetInHTLC = async (
     }
 
     // Normal invoke function
+    const tx = contract.createTransaction("UnlockFungibleAsset")
+    const ccArgs = [contractId]
+    if (endorsingOrgs && endorsingOrgs.length > 0) {
+        tx.setEndorsingOrganizations(...endorsingOrgs)
+    }
     const [result, submitError] = await helpers.handlePromise(
-        contract.submitTransaction("UnlockFungibleAsset", contractId),
+        tx.submit(...ccArgs)
     );
     if (submitError) {
         throw new Error(`UnlockFungibleAsset submitTransaction Error: ${submitError}`);
@@ -598,6 +646,7 @@ const StartHTLCEventListener = (
     recipientECert: string,
     lockerECert: string,
     eventCallback: Function,
+    endorsingOrgs: Array<string> = [],
 ): void => {
     const listener: ContractListener = async (event) => {
         if (event.eventName === eventName) {
@@ -669,10 +718,10 @@ const StartHTLCEventListener = (
                 hash.setSerializedHashBase64(hashBase64);
                 // We only care about timeouts for locking the asset, not for the unlock itself
                 if (eventName === 'LockAsset') {
-                    eventCallback(contract, infoContractId, infoAssetType, infoAssetId, infoRecipient, infoLocker, hash, timeout);
+                    eventCallback(contract, infoContractId, infoAssetType, infoAssetId, infoRecipient, infoLocker, hash, timeout, endorsingOrgs);
                 } 
                 else {
-                    eventCallback(contract, infoContractId, infoAssetType, infoNumUnits, infoRecipient, infoLocker, hash, timeout);
+                    eventCallback(contract, infoContractId, infoAssetType, infoNumUnits, infoRecipient, infoLocker, hash, timeout, endorsingOrgs);
                 }
             } else if (eventName === 'ClaimAsset' || eventName === 'ClaimFungibleAsset') {
                 const hashPreimageBase64 = assetLockContractInfo.getClaim().getHashpreimagebase64();
@@ -702,9 +751,10 @@ const StartHTLCAssetLockListener = (
     assetId: string,
     recipientECert: string,
     lockerECert: string,
-    lockCallback: (c: Contract, d: string, t: string, i: string, r: string, l: string, v: Hash, timeout: number) => any,
+    lockCallback: (c: Contract, d: string, t: string, i: string, r: string, l: string, v: Hash, timeout: number, eOrgs: Array<string>) => any,
+    endorsingOrgs: Array<string> = [],
 ): void => {
-    StartHTLCEventListener(contract, 'LockAsset', contractId, assetType, assetId, -1, recipientECert, lockerECert, lockCallback);
+    StartHTLCEventListener(contract, 'LockAsset', contractId, assetType, assetId, -1, recipientECert, lockerECert, lockCallback, endorsingOrgs);
 }
 
 // NOTE: For Nonfungible Assets
@@ -717,7 +767,8 @@ const assetLockExpirationCallback = (
     recipientECert: string, 
     lockerECert: string, 
     hash: Hash,
-    expiryTime: number
+    expiryTime: number,
+    endorsingOrgs: Array<string> = []
 ): void => {
     // Compare expiryTimeSec with currentTimeSec, which is number of milliseconds since epoch (L174)
     const currTimeSecs = Math.floor(Date.now()/1000);
@@ -736,7 +787,7 @@ const assetLockExpirationCallback = (
                 // If it fails, retry for i (arbitrarily defined) more attempts until you quit
                 let i = 0;
                 do {
-                    let [retryReclaimResult, retryReclaimableQueryError] = await helpers.handlePromise(reclaimAssetInHTLCusingContractId(contract, contractID));
+                    let [retryReclaimResult, retryReclaimableQueryError] = await helpers.handlePromise(reclaimAssetInHTLCusingContractId(contract, contractID, endorsingOrgs));
                     if (!retryReclaimableQueryError) {
                         console.log("Nonfungible Asset unlocked successfully");
                         break;
@@ -767,7 +818,8 @@ const fungibleAssetLockExpirationCallback = (
     recipientECert: string, 
     lockerECert: string, 
     hash: Hash,
-    expiryTime: number
+    expiryTime: number,
+    endorsingOrgs: Array<string> = []
 ): void => {
     // Compare expiryTimeSec with currentTimeSec, which is number of milliseconds since epoch (L174)
     const currTimeSecs = Math.floor(Date.now()/1000);
@@ -787,7 +839,7 @@ const fungibleAssetLockExpirationCallback = (
                 // If it fails, retry for i (arbitrarily defined) more attempts until you quit
                 let i = 0;
                 do {
-                    let [retryReclaimResult, retryReclaimableQueryError] = await helpers.handlePromise(reclaimFungibleAssetInHTLC(contract, contractID));
+                    let [retryReclaimResult, retryReclaimableQueryError] = await helpers.handlePromise(reclaimFungibleAssetInHTLC(contract, contractID, endorsingOrgs));
                     if (!retryReclaimableQueryError) {
                         console.log("Fungible Asset unlocked successfully");
                         break;
@@ -839,9 +891,10 @@ const StartHTLCFungibleAssetLockListener = (
     numUnits: number,
     recipientECert: string,
     lockerECert: string,
-    lockCallback: (c: Contract, d: string, t: string, n: number, r: string, l: string, v: Hash, timeout: number) => any,
+    lockCallback: (c: Contract, d: string, t: string, n: number, r: string, l: string, v: Hash, timeout: number, eOrgs: Array<string>) => any,
+    endorsingOrgs: Array<string> = [],
 ): void => {
-    StartHTLCEventListener(contract, 'LockFungibleAsset', contractId, assetType, "", numUnits, recipientECert, lockerECert, lockCallback);
+    StartHTLCEventListener(contract, 'LockFungibleAsset', contractId, assetType, "", numUnits, recipientECert, lockerECert, lockCallback, endorsingOrgs);
 }
 
 const StartHTLCFungibleAssetClaimListener = (
