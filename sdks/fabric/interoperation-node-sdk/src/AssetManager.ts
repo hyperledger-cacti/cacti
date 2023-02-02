@@ -132,7 +132,7 @@ const createHTLC = async (
 
     const tx = contract.createTransaction("LockAsset")
     const ccArgs = [assetExchangeAgreementStr, lockInfoStr]
-    if (endorsingOrgs.length > 0) {
+    if (endorsingOrgs && endorsingOrgs.length > 0) {
         tx.setEndorsingOrganizations(...endorsingOrgs)
     }
     // Normal invoke function
@@ -212,7 +212,7 @@ const createFungibleHTLC = async (
 
     const tx = contract.createTransaction("LockFungibleAsset")
     const ccArgs = [assetExchangeAgreementStr, lockInfoStr]
-    if (endorsingOrgs.length > 0) {
+    if (endorsingOrgs && endorsingOrgs.length > 0) {
         tx.setEndorsingOrganizations(...endorsingOrgs)
     }
     // Normal invoke function
@@ -282,7 +282,7 @@ const claimAssetInHTLC = async (
     // Normal invoke function
     const tx = contract.createTransaction("ClaimAsset")
     const ccArgs = [assetExchangeAgreementStr, claimInfoStr]
-    if (endorsingOrgs.length > 0) {
+    if (endorsingOrgs && endorsingOrgs.length > 0) {
         tx.setEndorsingOrganizations(...endorsingOrgs)
     }
     const [result, submitError] = await helpers.handlePromise(
@@ -331,7 +331,7 @@ const claimAssetInHTLCusingContractId = async (
     // Normal invoke function
     const tx = contract.createTransaction("ClaimAssetUsingContractId")
     const ccArgs = [contractId, claimInfoStr]
-    if (endorsingOrgs.length > 0) {
+    if (endorsingOrgs && endorsingOrgs.length > 0) {
         tx.setEndorsingOrganizations(...endorsingOrgs)
     }
     const [result, submitError] = await helpers.handlePromise(
@@ -381,7 +381,7 @@ const claimFungibleAssetInHTLC = async (
     // Normal invoke function
     const tx = contract.createTransaction("ClaimFungibleAsset")
     const ccArgs = [contractId, claimInfoStr]
-    if (endorsingOrgs.length > 0) {
+    if (endorsingOrgs && endorsingOrgs.length > 0) {
         tx.setEndorsingOrganizations(...endorsingOrgs)
     }
     const [result, submitError] = await helpers.handlePromise(
@@ -431,7 +431,7 @@ const reclaimAssetInHTLC = async (
     // Normal invoke function
     const tx = contract.createTransaction("UnlockAsset")
     const ccArgs = [assetExchangeAgreementStr]
-    if (endorsingOrgs.length > 0) {
+    if (endorsingOrgs && endorsingOrgs.length > 0) {
         tx.setEndorsingOrganizations(...endorsingOrgs)
     }
     const [result, submitError] = await helpers.handlePromise(
@@ -467,7 +467,7 @@ const reclaimAssetInHTLCusingContractId = async (
     // Normal invoke function
     const tx = contract.createTransaction("UnlockAssetUsingContractId")
     const ccArgs = [contractId]
-    if (endorsingOrgs.length > 0) {
+    if (endorsingOrgs && endorsingOrgs.length > 0) {
         tx.setEndorsingOrganizations(...endorsingOrgs)
     }
     const [result, submitError] = await helpers.handlePromise(
@@ -503,7 +503,7 @@ const reclaimFungibleAssetInHTLC = async (
     // Normal invoke function
     const tx = contract.createTransaction("UnlockFungibleAsset")
     const ccArgs = [contractId]
-    if (endorsingOrgs.length > 0) {
+    if (endorsingOrgs && endorsingOrgs.length > 0) {
         tx.setEndorsingOrganizations(...endorsingOrgs)
     }
     const [result, submitError] = await helpers.handlePromise(
