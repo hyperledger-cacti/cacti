@@ -164,16 +164,33 @@ export class BesuTestLedger implements ITestLedger {
    * @param [seedMoney=10e8] The amount of money to seed the new test account with.
    */
   public async createEthTestAccount(seedMoney = 10e8): Promise<Account> {
-    const fnTag = `BesuTestLedger#getEthTestAccount()`;
-
     const rpcApiHttpHost = await this.getRpcApiHttpHost();
     const web3 = new Web3(rpcApiHttpHost);
     const ethTestAccount = web3.eth.accounts.create(uuidv4());
 
+    await this.sendEthToAccount(ethTestAccount.address, seedMoney);
+
+    return ethTestAccount;
+  }
+
+  /**
+   * Sends seed money to a provided address to get things started.
+   *
+   * @param [seedMoney=10e8] The amount of money to seed the new test account with.
+   */
+  public async sendEthToAccount(
+    address: string,
+    seedMoney = 10e8,
+  ): Promise<void> {
+    const fnTag = `BesuTestLedger#sendEthToAccount()`;
+
+    const rpcApiHttpHost = await this.getRpcApiHttpHost();
+    const web3 = new Web3(rpcApiHttpHost);
+
     const tx = await web3.eth.accounts.signTransaction(
       {
         from: this.getGenesisAccountPubKey(),
-        to: ethTestAccount.address,
+        to: address,
         value: seedMoney,
         gas: 1000000,
       },
@@ -188,8 +205,6 @@ export class BesuTestLedger implements ITestLedger {
 
     if (receipt instanceof Error) {
       throw receipt;
-    } else {
-      return ethTestAccount;
     }
   }
 
