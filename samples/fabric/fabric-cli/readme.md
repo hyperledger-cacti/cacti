@@ -34,7 +34,7 @@ The tool can be installed via npm or manually. If no development is required it 
 
 ## Installing with npm
 
-Set up `.npmrc` by copying across the `.npmrc.template` and updating the values. View [Setup access token for weaver-fabric-interop-sdk for the detailed process](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/samples/fabric/fabric-cli/readme.md#setup-access-token-for-fabric-interop-sdk)
+Set up `.npmrc` by copying across the `.npmrc.template` and updating the values. View [Setup access token for weaver-fabric-interop-sdk for the detailed process](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/samples/fabric/fabric-cli/readme.md#setup-access-token-for-weaver-fabric-interop-sdk)
 
 Add contents of the `.npmrc` to the `.npmrc` located at `~/.npmrc`, be careful not to replace anything
 
@@ -57,7 +57,7 @@ Set up `config.json` by adding the connection profile and relay port for each ne
 
 (Editing of the env and config can be done via the CLI with the `fabric-cli env set` and `fabric-cli config set` commands)
 
-Set up `.npmrc` by copying across the `.npmrc.template` and updating the values. View [Setup access token for weaver-fabric-interop-sdk for the detailed process](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/samples/fabric/fabric-cli/readme.md#setup-access-token-for-fabric-interop-sdk)
+Set up `.npmrc` by copying across the `.npmrc.template` and updating the values. View [Setup access token for weaver-fabric-interop-sdk for the detailed process](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/samples/fabric/fabric-cli/readme.md#setup-access-token-for-weaver-fabric-interop-sdk)
 
 Have `yarn` installed and have Node >= 11.14.0 <= 16.0.0
 
@@ -77,7 +77,7 @@ Then run
 
 ## Docker
 
-Set up `.npmrc` by copying across the `.npmrc.template` and updating the values. View [Setup access token for weaver-fabric-interop-sdk for the detailed process](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/samples/fabric/fabric-cli/readme.md#setup-access-token-for-fabric-interop-sdk)
+Set up `.npmrc` by copying across the `.npmrc.template` and updating the values. View [Setup access token for weaver-fabric-interop-sdk for the detailed process](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/samples/fabric/fabric-cli/readme.md#setup-access-token-for-weaver-fabric-interop-sdk)
 
 Run `make build-image` to build fabric-cli docker image.
 
