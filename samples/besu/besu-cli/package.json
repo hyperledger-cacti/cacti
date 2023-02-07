@@ -31,11 +31,12 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@hyperledger-labs/weaver-besu-interop-sdk": "~1.5.0",
+    "@hyperledger-labs/weaver-besu-interop-sdk": "~1.0.0",
     "@hyperledger-labs/weaver-protos-js": "~1.5.0",
     "@truffle/contract": "^4.2.14",
     "gluegun": "latest",
-    "winston": "^3.3.3"
+    "winston": "^3.3.3",
+    "logform": "~2.4.2"
   },
   "devDependencies": {
     "@types/jest": "^24.0.18",
