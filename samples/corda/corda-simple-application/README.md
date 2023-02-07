@@ -15,17 +15,6 @@ the interoperation CorDapp. The Corda network itself is defined in the
 [network-setups](../../../tests/network-setups)
 repository.
 
-## Initial setup
-
-Copy the `github.properties.template` file to `github.properties` with
-your IBM email and Artifactory API key. This is needed because the client CLI
-triggers flows from the interoperation CorDapp to store external state in the
-Corda vault and therefore the interoperation CorDapp needs to be retrieved as a
-dependency from Artifactory. To access the interoperation CorDapp, Artifactory
-credentials are required and you will need to have permission to access the
-[res-dlt-interop-maven-local](https://na.artifactory.swg-devops.com/artifactory/webapp/#/artifacts/browse/tree/General/res-dlt-interop-maven-local)
-repository.
-
 ## Building the CLI client and CorDapp locally
 
 _Prerequisites_: Build local dependencies as follows:
