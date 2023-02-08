@@ -1,8 +1,8 @@
 import { GluegunCommand } from 'gluegun'
 import { getNetworkConfig, commandHelp } from '../../helper/helper'
 import { getContractInstance } from '../../helper/besu-functions'
-import * as assetManager from '@hyperledger-labs/weaver-besu-interop-sdk/src/AssetManager'
-import { SHA256 } from '@hyperledger-labs/weaver-besu-interop-sdk/src/HashFunctions'
+import { AssetManager } from '@hyperledger-labs/weaver-besu-interop-sdk'
+import { HashFunctions } from "@hyperledger-labs/weaver-besu-interop-sdk";
 
 const Web3 = require('web3')
 const crypto = require('crypto')
@@ -210,7 +210,7 @@ const command: GluegunCommand = {
     console.log('Hash (base64): ', hash_base64)
     console.log('Preimage: ', preimage)
     
-    const hash = new SHA256();
+    const hash = new HashFunctions.SHA256();
     hash.setSerializedHashBase64(hash_base64)
 
     // Balances of sender and receiver before locking
@@ -242,7 +242,7 @@ const command: GluegunCommand = {
         await tokenContract
             .approve(tokenContract.address, options.token_id, { from: sender })
         try {
-            lockTx = await assetManager.createHTLC(
+            lockTx = await AssetManager.createHTLC(
                 interopContract,
                 tokenContract,
                 options.asset_type,
@@ -261,7 +261,7 @@ const command: GluegunCommand = {
         await tokenContract
             .setApprovalForAll(tokenContract.address, true, { from: sender })
         try {
-            lockTx = await assetManager.createHybridHTLC(
+            lockTx = await AssetManager.createHybridHTLC(
                 interopContract,
                 tokenContract,
                 options.asset_type,
@@ -282,7 +282,7 @@ const command: GluegunCommand = {
         await tokenContract
             .approve(tokenContract.address, amount, { from: sender })
         try {
-            lockTx = await assetManager.createFungibleHTLC(
+            lockTx = await AssetManager.createFungibleHTLC(
                 interopContract,
                 tokenContract,
                 options.asset_type,

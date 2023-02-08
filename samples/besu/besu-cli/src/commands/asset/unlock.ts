@@ -1,7 +1,8 @@
 import { GluegunCommand } from 'gluegun'
 import { getNetworkConfig, commandHelp } from '../../helper/helper'
 import { getContractInstance } from '../../helper/besu-functions'
-import * as assetManager from '@hyperledger-labs/weaver-besu-interop-sdk/src/AssetManager'
+import { AssetManager } from '@hyperledger-labs/weaver-besu-interop-sdk'
+
 // import { send } from 'process'
 const Web3 = require('web3')
 async function getBalances(
@@ -152,7 +153,7 @@ const command: GluegunCommand = {
       } before unlocking: ${senderBalance.toString()}`
     )
 
-    await assetManager
+    await AssetManager
       .reclaimAssetInHTLC(interopContract, lockContractId, sender)
       .catch(function(e) {
         console.log(e)

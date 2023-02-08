@@ -35,20 +35,19 @@
     "@hyperledger-labs/weaver-protos-js": "file:../../../common/protos-js",
     "@truffle/contract": "^4.2.14",
     "gluegun": "latest",
-    "winston": "^3.3.3",
-    "logform": "~2.4.2"
+    "winston": "^3.3.3"
   },
   "devDependencies": {
     "@types/jest": "^24.0.18",
     "@types/node": "^12.7.11",
-    "jest": "^24.1.0",
+    "jest": "^29.4.2",
     "prettier": "^1.12.1",
-    "ts-jest": "^24.1.0",
-    "ts-node": "^8.4.1",
+    "ts-jest": "^29.0.5",
+    "ts-node": "^10.9.1",
     "tslint": "^5.12.0",
     "tslint-config-prettier": "^1.17.0",
     "tslint-config-standard": "^8.0.1",
-    "typescript": "^3.6.3"
+    "typescript": "^4.9.5"
   },
   "jest": {
     "preset": "ts-jest",
