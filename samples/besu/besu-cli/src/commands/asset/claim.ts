@@ -1,8 +1,8 @@
 import { GluegunCommand } from 'gluegun'
 import { getNetworkConfig, commandHelp } from '../../helper/helper'
 import { getContractInstance } from '../../helper/besu-functions'
-import * as assetManager from '@hyperledger-labs/weaver-besu-interop-sdk/src/AssetManager'
-import { SHA256 } from "@hyperledger-labs/weaver-besu-interop-sdk/src/HashFunctions";
+import { AssetManager } from '@hyperledger-labs/weaver-besu-interop-sdk'
+import { HashFunctions } from "@hyperledger-labs/weaver-besu-interop-sdk";
 
 const Web3 = require('web3')
 
@@ -157,9 +157,9 @@ const command: GluegunCommand = {
       } before claiming: ${recipientBalance.toString()}`
     )
 
-    const hash = new SHA256()
+    const hash = new HashFunctions.SHA256()
     hash.setPreimage(options.preimage)
-    await assetManager
+    await AssetManager
       .claimAssetInHTLC(
         interopContract,
         lockContractId,

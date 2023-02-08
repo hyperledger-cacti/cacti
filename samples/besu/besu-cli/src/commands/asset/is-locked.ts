@@ -1,7 +1,7 @@
 import { GluegunCommand } from 'gluegun'
 import { getNetworkConfig, commandHelp } from '../../helper/helper'
 import { getContractInstance } from '../../helper/besu-functions'
-import * as assetManager from '@hyperledger-labs/weaver-besu-interop-sdk/src/AssetManager'
+import { AssetManager } from '@hyperledger-labs/weaver-besu-interop-sdk'
 const Web3 = require('web3')
 
 const command: GluegunCommand = {
@@ -81,7 +81,7 @@ const command: GluegunCommand = {
     // const accounts = await web3N.eth.getAccounts()
     // var sender = accounts[networkConfig.senderAccountIndex]
 
-    var isLocked = await assetManager
+    var isLocked = await AssetManager
       .isAssetLockedInHTLC(interopContract, lockContractId)
       .catch(function() {
         console.log('isAssetLocked threw an error')

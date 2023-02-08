@@ -3,7 +3,7 @@
 
  SPDX-License-Identifier: CC-BY-4.0
  -->
-# fabric-cli
+# Fabric CLI
 
 A CLI for interacting with the Fabric test-net and relays. Made using [gluegun.js](https://infinitered.github.io/gluegun/#/)
 
@@ -15,10 +15,11 @@ fabric-cli options:
 
 More documentation can be found [here](docs/commands.md)
 
-# Folder Structure
+## Folder Structure
     .
     ├── build                      # Compiled files
     ├── docs                       # Documentation files
+    ├── scripts                    # Utility scripts
     ├── src                        # Source files
     │   ├── commands               # Commands for the cli. Subcommands are in named folders
     │   ├── data                   # Data used across the commands, includes credentials for other networks and basic data to initialise the network with
@@ -28,28 +29,38 @@ More documentation can be found [here](docs/commands.md)
 
 Another naming convention made is inside the commands folder files suffixed with "`-helper`" are used to for the `--help` options for each command.
 
-# Installation
+## Setup
 
-The tool can be installed via npm or manually. If no development is required it is recommended to install via npm.
+| Notes |
+|:------|
+| If you are using a linux system make sure that `lib64` is installed |
+| Tested on Node v11.14.0 to v16.0.0; requires Node >= 11.14.0 <= 16.0.0 |
 
-## Installing with npm
+The Fabric CLI can be configured either to depend on the published Weaver SDK or the locally built version.
 
-Set up `.npmrc` by copying across the `.npmrc.template` and updating the values. View [Setup access token for weaver-fabric-interop-sdk for the detailed process](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/samples/fabric/fabric-cli/readme.md#setup-access-token-for-fabric-interop-sdk)
+### Using Published Weaver SDK
 
-Add contents of the `.npmrc` to the `.npmrc` located at `~/.npmrc`, be careful not to replace anything
+The `fabric-cli` depends on the npm package `@hyperledger-labs/weaver-fabric-interop-sdk`. To pull this package from Github, run the following steps:
+1) Create a Personal Access Token from Github with read access to packages. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help. \
+2) Create a copy of `.npmrc.template` as `.npmrc`. \
+3) Replace <personal-access-token> in copied `.npmrc` file with your personal access token. \
+4) Run `npm install` to check if it is working before testing/deployment.
 
-then run `npm install -g @hyperledger-labs/weaver-fabric-cli`
+To install package dependencies, run:
+```
+make build
+```
 
-NOTE: If installing this way it is required to set up the env and config through the cli using either `fabric-cli env set <key> <value>` or `fabric-cli env set-file <file-path>`. Refer to the `.env.template` and `config.json `to determine what values are needed.
+### Using Locally Built Weaver SDK
 
-## Installing manually
+Make sure that the [protos-js](../../../common/protos-js) and [weaver-fabric-interop-sdk](../../../sdks/fabric/interoperation-node-sdk) have been built already according to the given instructions.
 
-### Pre-req
+To install package dependencies, run:
+```
+make build-local
+```
 
-
-NOTE: If you are using a linux system make sure that `lib64` is installed
-
-Tested on Node v11.14.0 to v16.0.0; requires Node >= 11.14.0 <= 16.0.0
+## Configuration
 
 Set up `.env` by copying across the `.env.template` and updating the values
 
@@ -57,27 +68,21 @@ Set up `config.json` by adding the connection profile and relay port for each ne
 
 (Editing of the env and config can be done via the CLI with the `fabric-cli env set` and `fabric-cli config set` commands)
 
-Set up `.npmrc` by copying across the `.npmrc.template` and updating the values. View [Setup access token for weaver-fabric-interop-sdk for the detailed process](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/samples/fabric/fabric-cli/readme.md#setup-access-token-for-fabric-interop-sdk)
+## Running the Fabric-CLI
 
-Have `yarn` installed and have Node >= 11.14.0 <= 16.0.0
+Run:
+```
+./bin/fabric-cli [commands-and-parameters]
+```
 
-Run `yarn` to install dependencies.
+To view list of commands and associated parameters, run:
+```
+./bin/fabric-cli -h
+```
 
-### Development
+## Running fabric-cli in a Docker container
 
-`cd fabric-cli`
-
-and
-
-`yarn link`
-
-Then run
-
-`$ fabric-cli`
-
-## Docker
-
-Set up `.npmrc` by copying across the `.npmrc.template` and updating the values. View [Setup access token for weaver-fabric-interop-sdk for the detailed process](https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/samples/fabric/fabric-cli/readme.md#setup-access-token-for-fabric-interop-sdk)
+Set up `.npmrc` by copying across the `.npmrc.template` and updating the values as specified [earlier](#using-published-weaver-sdk).
 
 Run `make build-image` to build fabric-cli docker image.
 
@@ -102,17 +107,6 @@ $ ./bin/fabric-cli chaincode query mychannel simplestate read '["test"]' --local
 ```
 
 NOTE: Use the `--help` flag with any command to view examples and usage.
-
-## Publishing CLI
-
-Run `npm publish`. Will need the github personal access token with write access, will error if same version is already published.
-
-## Setup access token for weaver-fabric-interop-sdk
-
-1) Create a Personal Access Token from Github with read access to packages. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help. \
-2) Create a copy of `.npmrc.template` as `.npmrc`. \
-3) Replace <personal-access-token> in copied `.npmrc` file with your personal access token. \
-4) Run npm install to check if it is working before testing/deployment.
 
 ## Environment Variables
 - `DEFAULT_CHANNEL` (OPTIONAL) The default channel used by the CLI when invoking chaincode on a network.
@@ -144,7 +138,7 @@ Example config:
 }
 ```
 
-## Data Transfer
+## Data Sharing
 
 Examples of cross-network queries (via relays) are as follows (the last part of the command is a view address, and you will see the remote view being logged to the console):
 - Fabric network `network1` requesting a view from Fabric network `network2`
