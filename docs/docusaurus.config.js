@@ -58,7 +58,7 @@ module.exports = {
           sidebarPath: require.resolve('./sidebars.js'),
           // Please change this to your repo.
           editUrl:
-            'https://github.com/hyperledger-labs/weaver-dlt-interoperability/edit/master/',
+            'https://github.com/hyperledger-labs/weaver-dlt-interoperability/edit/main/',
         },        
         theme: {
           customCss: require.resolve('./src/css/custom.css'),

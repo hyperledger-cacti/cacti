@@ -23,13 +23,13 @@ spec:
   selector:
     matchLabels:
       app: {{ $name }}
-      role: master
+      role: main
   template:
     metadata:
       name: {{ $name }}
       labels:
         app: {{ $name }}
-        role: master
+        role: main
     spec:
       {{- if $.Values.global.postgresdb.securityContext.enabled }}
       securityContext:

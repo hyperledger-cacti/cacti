@@ -12,7 +12,7 @@ Here are the steps to exercise asset exchange using the besu-cli tool.
 
 ## Customizing your CLI
 
-Check out the documentation at https://github.com/infinitered/gluegun/tree/master/docs.
+Check out the documentation at https://github.com/infinitered/gluegun.
 
 ## Publishing to NPM
 

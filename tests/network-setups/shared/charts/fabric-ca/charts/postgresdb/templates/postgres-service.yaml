@@ -23,7 +23,7 @@ spec:
       targetPort: tcp-postgresql
   selector:
     app: {{ $name }}
-    role: master
+    role: main
 ---
 apiVersion: v1
 kind: Service

@@ -1,6 +1,6 @@
 # Fungible House Token
 
-The source is obtained from corda samples-kotlin repo: [FungibleHouseTokens](https://github.com/corda/samples-kotlin/tree/master/Tokens/fungiblehousetoken).
+The source is obtained from corda samples-kotlin repo: [Samples-Kotlin](https://github.com/corda/samples-kotlin), in directory `Tokens/fungiblehousetoken`.
 
 Added few Workflows as an extension to that to support Asset exchange using HTLC from Weaver:
 

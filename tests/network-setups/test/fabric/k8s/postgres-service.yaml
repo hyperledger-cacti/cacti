@@ -20,7 +20,7 @@ spec:
       targetPort: tcp-postgresql
   selector:
     app: postgresql-network1
-    role: master
+    role: main
 ---
 apiVersion: v1
 kind: Service
