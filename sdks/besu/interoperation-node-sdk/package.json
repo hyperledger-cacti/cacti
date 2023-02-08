@@ -1,7 +1,7 @@
 {
   "name": "@hyperledger-labs/weaver-besu-interop-sdk",
   "description": "Supplemental library for Web3JS based Besu client applications to enable interoperability using Weaver",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "build/index.js",
   "scripts": {
