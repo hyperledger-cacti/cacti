@@ -95,7 +95,7 @@ Follow the instructions below to build and launch the networks:
 | If you do not wish to test Fabric-Fabric interoperation, you can choose to launch only one of the two networks along with its interoperation chaincode. For `network1`, run `make start-interop-network1`, and for `network2`, run `make start-interop-network2` |
 | If you wish to enable end-to-end confidentiality by default in the interoperation modules that are deployed during network launch, set the environment variable `E2E_CONFIDENTIALITY` to `true` in the command line as follows: `E2E_CONFIDENTIALITY=true make start-interop` |
 
-For more information, refer to the associated [README](https://github.com/hyperledger-labs/weaver-dlt-interoperability/tree/master/tests/network-setups/fabric/dev).
+For more information, refer to the associated [README](https://github.com/hyperledger-labs/weaver-dlt-interoperability/tree/main/tests/network-setups/fabric/dev).
 
 **Troubleshooting Tips**:
 - If you see any errors during the launches, re-check the prerequisites (software installations and credentials). Ensure your network connection is working. As a safe bet, you can retry after cleanup: kill and remove all Docker containers and associated volumes.
@@ -235,7 +235,7 @@ Run a relay for `network2` as follows (_do this only if you have launched both F
   RELAY_CONFIG=config/Fabric_Relay2.toml cargo run --bin server
   ```
 
-For more information, see the [relay README](https://github.com/hyperledger-labs/weaver-dlt-interoperability/tree/master/core/relay).
+For more information, see the [relay README](https://github.com/hyperledger-labs/weaver-dlt-interoperability/tree/main/core/relay).
 
 
 ### Fabric Driver

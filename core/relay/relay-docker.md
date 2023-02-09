@@ -42,7 +42,7 @@ The last four labels together with the timestamp of the build can also be found 
   {
     "version"         :   "1.0",
     "protos_version"  :   "0.5",
-    "branch"          :   "master", 
+    "branch"          :   "main", 
     "commit"          :   "456372c",
     "timestap"        :   "2020-07-23 14:32:01+1000"
   }

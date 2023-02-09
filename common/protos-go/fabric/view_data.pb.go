@@ -74,13 +74,13 @@ type FabricView_EndorsedProposalResponse struct {
 	unknownFields protoimpl.UnknownFields
 
 	// `ProposalResponsePayload` is the output produced by each peer and signed as a serialized blob
-	// https://github.com/hyperledger/fabric-protos-go/blob/master/peer/proposal_response.pb.go#L176
+	// https://github.com/hyperledger/fabric-protos-go/blob/main/peer/proposal_response.pb.go#L176
 	// `ProposalResponsePayload` contains an `Extension` field which is of type `ChaincodeAction`
-	// https://github.com/hyperledger/fabric-protos-go/blob/master/peer/proposal.pb.go#L280
+	// https://github.com/hyperledger/fabric-protos-go/blob/main/peer/proposal.pb.go#L280
 	// We only need the `ProposalHash`, `ChaincodeId` and `Response` fields.
 	Payload *peer.ProposalResponsePayload `protobuf:"bytes,1,opt,name=payload,proto3" json:"payload,omitempty"`
 	// Each `Endorsement` is an identity coupled with a signature
-	// https://github.com/hyperledger/fabric-protos-go/blob/master/peer/proposal_response.pb.go#L242
+	// https://github.com/hyperledger/fabric-protos-go/blob/main/peer/proposal_response.pb.go#L242
 	Endorsement *peer.Endorsement `protobuf:"bytes,2,opt,name=endorsement,proto3" json:"endorsement,omitempty"`
 }
 
