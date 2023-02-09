@@ -1,0 +1,22 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ printf "%s-volume" $.Values.network.name }}
+  labels:
+    app.kubernetes.io/component: "Storage"
+{{- include "corda-net.labels" $ | indent 4 }}
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: {{ $.Values.network.storageClass }}
+  volumeMode: Filesystem
+---

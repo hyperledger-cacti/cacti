@@ -1,0 +1,79 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+{{- $volumeClaimName := printf "%s-crypto" $.Values.global.network.name -}}
+{{- range $.Values.chaincodes }}
+{{- $chaincode := . }}
+{{- $jobName := printf "instantiate-%s-%s-%s" $chaincode.name $chaincode.channelName $.Values.global.network.name -}}
+{{- $ordererName := printf "%s-orderers-%s" $chaincode.ordererName $.Values.global.network.name -}}
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ $jobName }}
+spec:
+  template:
+    spec:
+      volumes:
+        - name: pvc1
+          persistentVolumeClaim:
+            claimName: {{ $volumeClaimName }}
+        - name: cc-scripts
+          configMap:
+            name: cc-scripts
+      containers:
+      - name: cc-instantiate
+        image: hyperledger/fabric-tools:2.1
+        env:
+          - name: CC_NAME
+            value: {{ $chaincode.name }}
+          - name: CC_VERSION
+            value: "{{ $chaincode.version }}"
+          - name: CC_LANGUAGE
+            value: {{ $chaincode.lang }}
+          - name: CC_INIT_FCN
+            value: {{ $chaincode.initFn }}
+          - name: CC_INIT_ARGS
+            value: '{{ $chaincode.initArgs }}'
+          - name: CC_END_POLICY
+            value: "{{ $chaincode.endorsementPolicy }}"
+          - name: CC_COLL_CONFIG
+            value: {{ $chaincode.collConfig }}
+          - name: CC_SEQUENCE
+            value: "{{ $chaincode.sequence }}"
+          - name: MAX_RETRY
+            value: "5"
+          - name: DELAY
+            value: "3"
+          - name: CORE_PEER_TLS_ENABLED
+            value: "true"
+          - name: ORDERER_NAME
+            value: {{ $ordererName }}
+          - name: ORDERER_URL
+            value: {{ printf "%s:7050" $ordererName }}
+          - name: ORDERER_CA
+            value: {{ printf "/var/pvc1/ordererOrganizations/orderer/orderers/%s/tls/ca.crt" $ordererName }}
+          - name: CHANNEL_NAME
+            value: {{ $chaincode.channelName }}
+          - name: ORG_LIST
+            value: "{{ $.Values.global.network.orgList }}"
+          - name: ORGMSPS
+            value: "{{ $.Values.global.network.orgMSPList }}"
+          - name: NW_NAME
+            value: {{ $.Values.global.network.name }}
+          - name: PORT
+            value: "7051"
+        volumeMounts:
+          - name: pvc1
+            mountPath: /var/pvc1
+          - name: cc-scripts
+            mountPath: /var/cc-scripts
+        command: ["/bin/sh",  "-c"]
+        args: ['bash /var/cc-scripts/initCC.sh']
+      restartPolicy: Never
+  backoffLimit: 1
+---
+{{ end -}}

@@ -1,0 +1,33 @@
+{
+    "securityDomain": "<network-id>",
+    "identifiers": [
+      {
+        "pattern": "mychannel:simpleasset:GetHTLCHash:*",
+        "policy": {
+          "type": "Signature",
+          "criteria": []
+        }
+      },
+      {
+        "pattern": "mychannel:simpleasset:GetHTLCHashByContractId:*",
+        "policy": {
+          "type": "Signature",
+          "criteria": []
+        }
+      },
+      {
+        "pattern": "mychannel:simpleasset:GetHTLCHashPreImage:*",
+        "policy": {
+          "type": "Signature",
+          "criteria": []
+        }
+      },
+      {
+        "pattern": "mychannel:simpleasset:GetHTLCHashPreImageByContractId:*",
+        "policy": {
+          "type": "Signature",
+          "criteria": []
+        }
+      }
+    ]
+}

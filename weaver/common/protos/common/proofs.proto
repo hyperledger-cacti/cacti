@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package common.proofs;
+option java_package = "com.weaver.protos.common.proofs";
+option go_package = "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common";
+
+message Proof {
+  string signature = 1;
+  string certificate = 2;
+}
+
+message Proofs { repeated Proof proofs = 1; }

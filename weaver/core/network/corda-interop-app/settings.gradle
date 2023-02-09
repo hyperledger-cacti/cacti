@@ -1,0 +1,3 @@
+include 'interop-workflows'
+include 'interop-contracts'
+include 'test-cordapp'

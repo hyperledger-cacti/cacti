@@ -1,0 +1,17 @@
+node_modules/
+.docusaurus
+packages/docusaurus-utils/lib/
+packages/docusaurus/lib/
+packages/docusaurus-init/lib/
+packages/docusaurus-plugin-content-blog/lib/
+packages/docusaurus-plugin-content-docs/lib/
+packages/docusaurus-plugin-content-pages/lib/
+packages/docusaurus-plugin-sitemap/lib/
+packages/docusaurus-plugin-ideal-image/lib/<Paste>
+build/
+.DS_Store
+.vscode
+.idea
+.cache-loader
+types
+package-lock.json

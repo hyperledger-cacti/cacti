@@ -1,0 +1,24 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+---
+tmp_directory: "{{ lookup('env', 'TMPDIR') | default('/tmp', true) }}"
+
+openshift_cli:
+  os: "darwin"  # Use 'darwin' for MacOS X, 'linux' for Linux
+  bin_directory: "~/bin/oc"
+  project: ""
+  login_mode: "oc"
+  repository:
+    url: "https://na.artifactory.swg-devops.com/artifactory/aur-generic-local"
+    api_key: "{{ lookup('env', 'OPENSHIFT_BINARY_REPOSITORY_API_KEY') }}"
+  api:
+    token: "{{ lookup('env', 'OPENSHIFT_TOKEN') }}"
+    cluster_hostname: "" 
+    cluster_endpoint: ""
+ 
+
+

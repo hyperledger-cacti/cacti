@@ -1,0 +1,50 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: join-channel
+spec:
+  template:
+    spec:
+      volumes:
+        - name: network1-secrets
+          persistentVolumeClaim:
+            claimName: network1-secrets
+      containers:
+      - name: join-channel
+        image: hyperledger/fabric-tools:2.1
+        env:
+          - name: CHANNEL_NAME
+            value: mychannel
+          - name: CORE_PEER_LOCALMSPID
+            value: Org1MSP
+          - name: CORE_PEER_TLS_ROOTCERT_FILE
+            value: /var/pvc1/peerOrganizations/org1/peers/peer0-org1-network1/tls/ca.crt
+          - name: CORE_PEER_MSPCONFIGPATH
+            value: /var/pvc1/peerOrganizations/org1/users/Admin@org1/msp
+          - name: CORE_PEER_ADDRESS
+            value: peer0-org1-network1:7051
+          - name: CHANNELTX
+            value: /var/pvc1/channel-artifacts
+          - name: ORDERER_NAME
+            value: ord0-orderers-network1
+          - name: ORDERER_URL
+            value: ord0-orderers-network1:7050
+          - name: ORDERER_CA
+            value: /var/pvc1/ordererOrganizations/orderer/orderers/ord0-orderers-network1/tls/ca.crt
+          - name: CORE_PEER_TLS_ENABLED
+            value: "true"
+        volumeMounts:
+          - name: network1-secrets
+            mountPath: /var/pvc1
+        command: ["/bin/sh",  "-c"]
+        args: ['cd /var/pvc1;
+                peer channel join -b /var/pvc1/${CHANNEL_NAME}.block;
+                peer channel update -o ${ORDERER_URL} --ordererTLSHostnameOverride ${ORDERER_NAME} -c $CHANNEL_NAME -f ${CHANNELTX}/${CORE_PEER_LOCALMSPID}anchors.tx --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA;']
+      restartPolicy: Never
+  backoffLimit: 4

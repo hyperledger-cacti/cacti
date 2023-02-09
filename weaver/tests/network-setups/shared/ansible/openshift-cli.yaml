@@ -1,0 +1,46 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+---
+# This playbook sets up the environment to enable
+# the deployment of the networks.
+
+- hosts: ansible_provisioners
+  gather_facts: yes
+  tasks:
+
+  - include_role:
+      name: setup/openshift-cli
+    vars:
+      openshift_cli:
+        os: "{{ install_os }}"
+        bin_directory: "{{ bin_install_dir }}/oc"
+        repository: 
+          url: "https://na.artifactory.swg-devops.com/artifactory/res-dlt-interop-generic-local"
+          api_key: "{{ artifactory_api_key }}"
+        api:
+          token: "{{ openshift_api_token }}"
+          cluster_hostname: "{{ openshift_api_cluster_hostname }}"
+          cluster_endpoint: "{{ openshift_api_cluster_endpoint }}"
+        login_mode: "{{ openshift_login_mode }}" # Use 'oc' to directly use the oc command line tool, 'ocl' to use the shell script, 'none' to avoid login.
+        project: "{{ openshift_project }}"
+        checksum: ""
+    when: cloud_provider is defined and cloud_provider == "openshift"
+
+
+  vars: # These variables can be overriden from the command line
+    privilege_escalate: false           # Default to NOT escalate to root privledges
+    
+    # install_os:                       # to be provided via environment
+    # bin_install_dir:                  # to be provided via environment
+    # cloud_provider:                   # to be provided via environment
+    # artifactory_api_key:              # to be provided via environment
+    # openshift_api_token:              # to be provided via environment
+    # openshift_api_cluster_hostname    # to be provided via environment
+    # openshift_api_cluster_endpoint    # to be provided via environment
+    # openshift_login_mode              # to be provided via environment
+    # openshift_project                 # to be provided via environment     
+

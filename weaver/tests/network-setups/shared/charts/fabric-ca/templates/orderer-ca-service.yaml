@@ -1,0 +1,24 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+{{- $caName := printf "ca-orderers-%s" $.Values.global.network.name -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $caName }}
+  labels:
+    run: {{ $caName }}
+    app.kubernetes.io/component: "Orderer_CA"
+{{ include "fabric-network.labels" $ | indent 4 }}
+spec:
+  type: ClusterIP
+  selector:
+    name: {{ $caName }}
+  ports:
+  - protocol: TCP
+    port: 7054
+    name: https
+---

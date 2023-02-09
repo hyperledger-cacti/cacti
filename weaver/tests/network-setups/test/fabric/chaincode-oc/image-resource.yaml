@@ -1,0 +1,16 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: sacc-image2
+  namespace: dlt-interop
+spec:
+  type: image
+  params:
+    - name: url
+      value: 'image-registry.openshift-image-registry.svc:5000/dlt-interop/sacc2:latest'

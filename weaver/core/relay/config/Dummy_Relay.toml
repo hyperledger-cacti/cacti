@@ -1,0 +1,53 @@
+name = "Dummy_Relay"
+port="9085"
+hostname="localhost"
+db_path="db/Dummy_Relay/requests"
+# This will be replaced by the task queue.
+remote_db_path="db/Dummy_Relay/remote_request"
+
+# FOR TLS
+cert_path="credentials/fabric_cert.pem"
+key_path="credentials/fabric_key"
+tls=false
+
+# Networks map is used to identity the network behind the relay
+# by its network name so the request can be routed to the right driver
+[networks]
+[networks.Dummy_Network]
+network="Dummy"
+
+# Location of the remote relays
+[relays]
+[relays.Corda_Relay]
+hostname="localhost"
+port="9081"
+tls=false
+tlsca_cert_path="credentials/fabric_ca_cert.pem"
+[relays.Dummy_Relay]
+hostname="localhost"
+port="9085"
+tls=false
+tlsca_cert_path="credentials/fabric_ca_cert.pem"
+[relays.Fabric_Relay2]
+hostname="localhost"
+port="9083"
+tls=false
+tlsca_cert_path="credentials/fabric_ca_cert.pem"
+
+# host and port of the driver identified by networks map
+[drivers]
+[drivers.Fabric]
+hostname="localhost"
+port="9090"
+tls=false
+tlsca_cert_path="credentials/fabric_ca_cert.pem"
+[drivers.Corda]
+hostname="localhost"
+port="9099"
+tls=false
+tlsca_cert_path="credentials/fabric_ca_cert.pem"
+[drivers.Dummy]
+hostname="localhost"
+port="9092"
+tls=false
+tlsca_cert_path="credentials/fabric_ca_cert.pem"

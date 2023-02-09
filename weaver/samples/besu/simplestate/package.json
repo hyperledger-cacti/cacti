@@ -1,0 +1,43 @@
+{
+  "name": "simple-state-besu-app",
+  "version": "0.1.0",
+  "description": "Sample Besu Application for Storing Key Value Pairs",
+  "license": "Apache-2.0",
+  "repository": "hyperledger-labs/weaver-dlt-interoperability/samples/besu/simplestate",
+  "bugs": {
+    "url": "https://github.com/hyperledger-labs/weaver-dlt-interoperability/issues"
+  },
+  "directories": {
+    "doc": "docs",
+    "test": "test"
+  },
+  "scripts": {
+    "copy-interop-contracts": "cp -r ../../../core/network/besu/contracts/interop contracts/",
+    "update-truffle-config": "node get-network-details.js",
+    "deploy-contract": "npm install && npm run update-truffle-config && truffle compile && truffle migrate",
+    "compile": "truffle compile",
+    "deploy": "npm run update-truffle-config && truffle migrate",
+    "clean-build": "rm -rf build",
+    "clean": "rm -rf node_modules package-lock.json build"
+  },
+  "keywords": [
+    "ethereum",
+    "besu",
+    "interoperability",
+    "hashed-timelock-contract",
+    "solidity",
+    "smart-contract"
+  ],
+  "homepage": "https://github.com/hyperledger-labs/weaver-dlt-interoperability/samples/besu/simplestate",
+  "dependencies": {
+    "@truffle/contract": "^4.2.14",
+    "chai": "^4.3.4",
+    "dotenv": "latest",
+    "ganache-cli": "^6.12.2",
+    "@openzeppelin/contracts": "^4.7.3",
+    "solc": "^0.8.8"
+  },
+  "devDependencies": {
+    "truffle": "^5.4.15"
+  }
+}

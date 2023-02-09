@@ -1,0 +1,38 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+version: '2'
+services:
+  fabric-driver:
+    image: ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}
+    container_name: fabric-driver-${NETWORK_NAME}
+    environment:
+      - NETWORK_NAME=${NETWORK_NAME}
+      - RELAY_ENDPOINT=${RELAY_ENDPOINT}
+      - DRIVER_ENDPOINT=0.0.0.0:${DRIVER_PORT}
+      - CONNECTION_PROFILE=/fabric-driver/ccp.json
+      - DRIVER_CONFIG=/fabric-driver/config.json
+      - INTEROP_CHAINCODE=${INTEROP_CHAINCODE}
+      - local=false
+      - RELAY_TLS=${RELAY_TLS}
+      - RELAY_TLSCA_CERT_PATH=${RELAY_TLSCA_CERT_PATH}
+      - DRIVER_TLS=${DRIVER_TLS}
+      - DRIVER_TLS_CERT_PATH=${DRIVER_TLS_CERT_PATH}
+      - DRIVER_TLS_KEY_PATH=${DRIVER_TLS_KEY_PATH}
+      - WALLET_PATH=${WALLET_PATH}
+    volumes:
+      - ${CONNECTION_PROFILE}:/fabric-driver/ccp.json
+      - ${DRIVER_CONFIG}:/fabric-driver/config.json
+      - ./wallet-${NETWORK_NAME}:/fabric-driver/wallet-${NETWORK_NAME}
+      - ${TLS_CREDENTIALS_DIR}:/fabric-driver/credentials
+    ports:
+      - "${DRIVER_PORT}:${DRIVER_PORT}"
+    command: sh -c "npm run start"
+# This networks section is required for when the peers have networks specified
+networks:
+  default:
+    external:
+      name: ${EXTERNAL_NETWORK}

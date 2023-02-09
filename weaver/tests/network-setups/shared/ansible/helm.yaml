@@ -1,0 +1,29 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+---
+# This playbook sets up the environment to enable
+# the deployment of the networks.
+
+- hosts: ansible_provisioners
+  gather_facts: yes
+  tasks:
+
+  - include_role:
+      name: setup/helm
+    vars:
+      helm:
+        version: "v3.3.0-rc.2"
+        os: "{{ install_os }}"
+        arch: "{{ install_arch }}"
+        bin_directory: "{{ bin_install_dir }}/helm"
+        checksum: ""
+
+  vars: # These variables can be overriden from the command line
+    privilege_escalate: false           # Default to NOT escalate to root privledges
+
+    # cloud_provider:                   # to be provided via environment    
+    # bin_install_dir:                  # to be provided via environment

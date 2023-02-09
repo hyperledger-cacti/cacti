@@ -1,0 +1,19 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: {{ printf "%s-git" $.Values.network.chaincode.name }}
+spec:
+  type: git
+  params:
+    - name: url
+      value: {{ $.Values.network.chaincode.git }}
+    - name: revision
+      value: {{ $.Values.network.chaincode.branch }}
+
+---

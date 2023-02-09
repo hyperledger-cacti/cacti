@@ -1,0 +1,9 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+global:
+  network:
+    storageClass: ibmc-file-bronze-gid

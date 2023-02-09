@@ -1,0 +1,52 @@
+{
+  "securityDomain": "Corda_Network",
+  "identifiers": [{
+    "pattern": "corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:*",
+    "policy": {
+      "type": "Signature",
+      "criteria": ["PartyA"]
+    }
+  },
+  {
+    "pattern": "corda_partya_1:10003#com.cordaSimpleApplication.flow.GetAssetPledgeStatusByPledgeId:*",
+    "policy": {
+      "type": "Signature",
+      "criteria": ["PartyA"]
+    }
+  },
+  {
+    "pattern": "corda_partya_1:10003#com.cordaSimpleApplication.flow.GetAssetClaimStatusByPledgeId:*",
+    "policy": {
+      "type": "Signature",
+      "criteria": ["PartyA"]
+    }
+  },
+  {
+    "pattern": "corda_partya_1:10003#com.cordaSimpleApplication.flow.GetBondAssetPledgeStatusByPledgeId:*",
+    "policy": {
+      "type": "Signature",
+      "criteria": ["PartyA"]
+    }
+  },
+  {
+    "pattern": "corda_partya_1:10003#com.cordaSimpleApplication.flow.GetBondAssetClaimStatusByPledgeId:*",
+    "policy": {
+      "type": "Signature",
+      "criteria": ["PartyA"]
+    }
+  },
+  {
+    "pattern": "corda_partya_1:10003#net.corda.samples.tokenizedhouse.flows.GetAssetPledgeStatusByPledgeId:*",
+    "policy": {
+      "type": "Signature",
+      "criteria": ["PartyA"]
+    }
+  },
+  {
+    "pattern": "corda_partya_1:10003#net.corda.samples.tokenizedhouse.flows.GetAssetClaimStatusByPledgeId:*",
+    "policy": {
+      "type": "Signature",
+      "criteria": ["PartyA"]
+    }
+  }]
+}

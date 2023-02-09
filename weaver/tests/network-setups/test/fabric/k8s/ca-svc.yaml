@@ -1,0 +1,50 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: ca-orderer-network1
+  labels:
+    run: ca-orderer-network1
+spec:
+  type: ClusterIP
+  selector:
+    name: ca-orderer-network1
+  ports:
+  - protocol: TCP
+    port: 7054
+    name: grpc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ca-org1-network1
+  labels:
+    run: ca-org1-network1
+spec:
+  type: ClusterIP
+  selector:
+    name: ca-org1-network1
+  ports:
+  - protocol: TCP
+    port: 7054
+    name: grpc
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: ca-org2-network1
+#   labels:
+#     run: ca-org2-network1
+# spec:
+#   type: ClusterIP
+#   selector:
+#     name: ca-org2-network1
+#   ports:
+#   - protocol: TCP
+#     port: 7054
+#     name: grpc

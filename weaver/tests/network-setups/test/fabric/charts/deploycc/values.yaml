@@ -1,0 +1,47 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+network:
+  domain:
+    local: "dlt-interop.svc.cluster.local"
+    cluster: "dlt-interop.apps.ros2.sl.cloud9.ibm.com"
+  name: network1
+  channelName: mychannel
+  orgList: "org1"
+  orgMSPList: "Org1MSP"
+  peerPort: "7051"
+  chaincode:
+    name: sacc
+    version: v1.0
+    lang: golang
+    git: 'https://github.ibm.com/dlt-interoperability/network-setups.git'
+    branch: feature/test-environment
+    subPath:
+    imageRegistry: image-registry.openshift-image-registry.svc:5000/dlt-interop
+    imageName: sacc
+    imageTag: "2.0"
+    initFn: ""
+    initArgs: '"a","10"'
+    endorsementPolicy: NA
+    collConfig: NA
+    sequence: 1
+  orderer:
+    name: ord0-orderers-network1
+    url: ord0-orderers-network1:7050
+    cacert: ordererOrganizations/orderer/orderers/ord0-orderers-network1/tls/ca.crt
+  orgs:
+    - name: org1
+      msp: Org1MSP
+      peers:
+        - name: peer0
+          port: "7051"
+          mspConfigPath: peerOrganizations/org1/users/Admin@org1/msp
+          tlsRootCertPath: peerOrganizations/org1/peers/peer0-org1-network1/tls/ca.crt
+  artifactory:
+    url: https://na.artifactory.swg-devops.com/artifactory
+    path: res-dlt-interop-generic-local/fabric-test-environment/sacc.zip
+    secret: artifactory-apikey
+    secretKey: apikey

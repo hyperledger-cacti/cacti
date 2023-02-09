@@ -1,0 +1,63 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+global:
+  network:
+    domain:
+      local: "dlt-interop.svc.cluster.local"
+      cluster: "dlt-interop.apps.ros2.cloud9.ibm.com"
+    name: network1
+    storageClass: nfs-storage
+    orderers:
+    - name: ord0
+      profile: OneOrgOrdererGenesis
+      expose: true
+    orgList: "org1"
+    orgMSPList: "Org1MSP"
+    orgs:
+    - name: org1
+      mspId: Org1MSP
+      ca:
+        deploy: true
+        expose: false
+      peers:
+      - name: peer0
+        expose: true
+        orderer: orderer
+    channels:
+    - name: mychannel
+      profile: OneOrgChannel
+      orderer: orderer
+      orgs:
+        org1:
+        - peer0
+    postgres:
+      expose: false
+      pvc: true
+      admin:
+        user: "pgadmin"
+        password: "pgadminpw"
+        db: "default"
+      storage: "500Mi"
+
+  cluster: Kubernetes
+
+  images:
+    postgres:
+      name: docker.io/bitnami/postgresql
+      version: 11.7.0-debian-10-r26
+    ca:
+      name: hyperledger/fabric-ca
+      version: "1.4"
+    peer:
+      name: hyperledger/fabric-peer
+      version: "2.1"
+    orderer:
+      name: hyperledger/fabric-orderer
+      version: "2.1"
+    fabricTools:
+      name: hyperledger/fabric-tools
+      version: "2.1"

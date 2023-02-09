@@ -1,0 +1,15 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+---
+# This playbook sets up the environment to enable
+# the deployment of the networks.
+
+- import_playbook: openshift-cli.yaml
+- import_playbook: helm.yaml
+- import_playbook: fabric-cli.yaml
+  
+

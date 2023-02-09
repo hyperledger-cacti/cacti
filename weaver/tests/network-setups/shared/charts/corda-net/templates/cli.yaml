@@ -1,0 +1,47 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+{{- $volumeClaimName := printf "%s-volume" $.Values.network.name -}}
+{{- $deployName := printf "%s-cli" $.Values.network.name -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $deployName }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: {{ $deployName }}
+  template:
+    metadata:
+      labels:
+        name: {{ $deployName }}
+        app: {{ $deployName }}
+        app.kubernetes.io/component: "{{ $deployName }}"
+{{- include "corda-net.labels" $ | indent 8 }}
+    spec:
+      containers:
+        - name: corda-cli
+          image: {{ printf "%s/%s:%s" $.Values.cli.image.repository $.Values.cli.image.name $.Values.cli.image.tag }}
+          imagePullPolicy:  {{ $.Values.cli.image.pullPolicy }}
+          securityContext:
+            runAsUser: 0
+          env:
+            - name: CORDA_HOST
+              value: {{ printf "%s-partya" $.Values.network.name }}
+            - name: CORDA_PORT
+              value: "10003"
+          volumeMounts:
+            - name: network-volume
+              mountPath: /var/pvc1
+          command: ["/bin/sh",  "-c", "sleep 6000"]
+      volumes:
+        - name: network-volume
+          persistentVolumeClaim:
+            claimName: {{ $volumeClaimName }}
+      imagePullSecrets:
+        - name: {{ $.Values.cli.image.pullSecrets }}
+---

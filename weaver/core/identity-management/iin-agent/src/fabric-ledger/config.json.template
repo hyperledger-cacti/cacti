@@ -1,0 +1,18 @@
+{
+    "admin":{
+        "name":"admin",
+        "secret":"adminpw"
+    },
+    "agent": {
+        "name":"iin-agent",
+        "affiliation":"org1.department1",
+        "role": "client",
+        "attrs": [{ "name": "iin-agent", "value": "true", "ecert": true }]
+    },
+    "mspId":"Org1MSP",
+    "ordererMspIds": ["OrdererMSP"],
+    "ccpPath": "<path-to-connection-profile>",
+    "walletPath": "",
+    "caUrl": "",
+    "local": "true"
+}

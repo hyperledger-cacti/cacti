@@ -1,0 +1,29 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+{{- if $.Values.relay.expose }}
+{{- $relayName := printf "%s-%s" $.Values.relay.name $.Values.network.name -}}
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: {{ printf "%s-ingress" $relayName }}
+  namespace: {{ $.Values.deployment.namespace | default "default" }}
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    ingress.kubernetes.io/ssl-passthrough: "true"
+  labels:
+{{ include "relay-server.labels" $ | indent 4}}
+spec:
+  rules:
+  - host: {{ printf "%s-%s.%s" $relayName $.Values.deployment.namespace $.Values.network.domain.cluster }}
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: {{ $relayName }}
+          servicePort: grpc
+---
+{{- end }}

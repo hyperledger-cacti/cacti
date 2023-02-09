@@ -1,0 +1,193 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+version: "3.0"
+services:
+  # This service definition deploys an instance of the relay server
+  # image configured to work with the dummy driver.
+  #
+  relay-server:
+    image: ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}
+    container_name: ${RELAY_NAME}
+    environment:
+    # General Configuration
+    # --------------------
+    #
+    # Script debugging: by default the debugging feature is turned
+    # off. You may want to uncomment this variable definition to
+    # turn the debugging capability of the startup script on. This
+    # will allow you to log the generation of the configuration
+    # and the final content of the relay configuration.
+    #
+    - DEBUG=true
+    # Default Relay Server Configuration
+    # -----------------------------------------------------------
+    # These settings support the default setup of the relay which
+    # uses the default configuration template:
+    #
+    # ./docker/server.template.toml
+    #
+    # This template externalises most of the common information
+    # that is of use in a standard configurartion with references
+    # to environment variable in the form ${VAR_NAME}. This allows
+    # for quickly deploying a relay server with the minimum amount
+    # of information required.
+    #
+    # NOTE: the template is only used if an actual configuration
+    #       specified through the RELAY_CONFIG file is not provided.
+    #       By default this variable points to the configuration:
+    #
+    #       /opt/relay/config/server.toml
+    #
+    #       The standard image does not have this file and users
+    #       of the relay image may decide to supply their own
+    #       configuration, which will then override the default
+    #       behaviour of using the template.
+    #
+    # Server configuration: this section provides the details for
+    # specialising the server configuration. These variables are
+    # only in effect if we do use the standard template for the
+    # server configuration, since the corresponding values will
+    # be injected in the configuration template to specialise it
+    # and generate the actual configuration.
+    #
+    - RELAY_PORT=${RELAY_PORT}
+    - RELAY_NAME=${RELAY_NAME}
+    # - RELAY_TLS=${RELAY_TLS}
+    # - RELAY_TLS_CERT_PATH=${RELAY_TLS_CERT_PATH}
+    # - RELAY_TLS_KEY_PATH=${RELAY_TLS_KEY_PATH}
+    # Driver configuration: this section provides the details of the
+    # driver the relay is connected to. We need to supply the port,
+    # hostname, and name of the driver. The current configuration
+    # shows the details for a Dummy Driver setup and is only relevant
+    # if we are using the default configuration template, which is
+    # referencing these variables.
+    #
+    # - DRIVER_NAME=${DRIVER_NAME}
+    # - DRIVER_PORT=${DRIVER_PORT}
+    # - DRIVER_HOST=${DRIVER_HOST}
+    # - DRIVER_TLS=${DRIVER_TLS}
+    # - DRIVER_TLSCA_CERT_PATH=${DRIVER_TLSCA_CERT_PATH}
+    # Network configuration: this section provides the information
+    # associated to the network. This value is only relevant if we
+    # use the default configuration template which references this
+    # variable.
+    #
+    # - NETWORK_NAME=${NETWORK_NAME}
+    # - NETWORK_TYPE=${NETWORK_TYPE}
+    # Uncomment these variables to specify the setup of the relay.
+    # The values that are assigned to the variables represent the
+    # default values that are used in the absence of their
+    # declaration
+    #
+    - RELAY_CONFIG=/opt/relay/config/server.toml
+    # - RELAY_CONFIG=${RELAY_CONFIG}
+    # - RELAY_CONFIG_TEMPLATE=/opt/relay/config/server.template.toml
+    # - RELAY_DNS_CONFIG=/opt/relay/config/relays
+    # You don't need any volumes, these can be uncommented in case
+    # you are doing debugging of the scripts that initialise the
+    # the container and you want to check that the everything is
+    # working ok, or if you want to add additional assets such as
+    # custom configurations and additional remote relay definitions
+    #
+    volumes:
+    #
+    # Uncomment these two files if you want to mount your specialised
+    # scripts for initialisation. Init for the functions and the other
+    # one for the startup procedure.
+    #
+    # - ./docker/init.sh:/opt/relay/init.sh
+    # - ./docker/entrypoint-server.sh:/opt/relay/entrypoint-server.sh
+    #
+    # Uncomment the following volume mounts if you want to customise
+    # any of the default configurations.
+    #
+    # - ./config/Network1.toml:/opt/relay/config/Network1.toml
+    - ${PATH_TO_CONFIG}:/opt/relay/config/server.toml
+    # - ${PATH_TO_REMOTE_RELAYS_DEFINITIONS}:/opt/relay/config/relays
+    # - <path/to/custom-configuration-template>:/opt/relay/config/server.template.toml
+    - ./credentials/docker:/opt/relay/credentials/docker
+    # Uncomment this to expose ports internally and externally from the container
+    ports:
+    - "${RELAY_PORT}:${RELAY_PORT}"
+    networks:
+        - base-network
+        - relay
+  relay-driver:
+    image: dlt-interop/relay-driver:latest
+    environment:
+    # General Configuration
+    # --------------------
+    #
+    # Script debugging: by default the debugging feature is turned
+    # off. You may want to uncomment this variable definition to
+    # turn the debugging capability of the startup script on. This
+    # will allow you to log the generation of the configuration
+    # and the final content of the relay configuration.
+    #
+    - DEBUG=true
+    # Default Dummy Driver Configuration
+    # ----------------------------------
+    # These settings contain the information about the configuration
+    # of the driver. These settings have only effect if there is no
+    # actual configuration supplied in the path pointed by:
+    #
+    # DRIVER_CONFIG=/opt/relay/config/driver.toml
+    #
+    # In its absence, the default configuration template that is specified
+    # via the default configuration template, which references those
+    # variables, specified by:
+    #
+    # DRIVER_CONFIG_TEMPLATE=/opt/relay/config/driver.template.toml
+    #
+    # This template references the following variables.
+    # Driver configuration: these are basic details about the driver such
+    # as hostname, port, and name.
+    #
+    - DRIVER_NAME=Dummy  # this is currently not in used at is hard-coded
+    - DRIVER_PORT=9081
+    - DRIVER_HOST=relay-driver
+    # Relay configuration: these are the basic settings about the relay that
+    # the driver needs to connect to. In particular, we need the hostname,
+    # the port, and the name.
+    - RELAY_HOST=relay-server
+    - RELAY_PORT=9080
+    - RELAY_NAME=Relay
+    # Network configuration: these are the basic settings representing the
+    # the network that is proxied by the driver.
+    - NETWORK_NAME=dummy
+    # You don't need to mount any volumes as the environment variables by
+    # default can automatically generate a configuration that is sufficient
+    # for the relay driver to. You can mount volume if you want to provide
+    # customised configuration, a customised template, or customise the
+    # startup procedure of the dummy driver.
+    #
+    # volumes:
+    #
+    # Uncomment these two files if you want to mount your specialised
+    # scripts for initialisation. Init for the functions and the other
+    # one for the startup procedure.
+    #
+    # - ./docker/init.sh:/opt/relay/init.sh
+    # - ./docker/entrypoint-driver.sh:/opt/relay/entrypoint-driver.sh
+    #
+    # Uncomment the following volume mounts if you want to customise
+    # any of the default configurations.
+    #
+    # - <path/to/configuration>:/opt/relay/config/driver.toml
+    # - <path/to/custom-configuration-template>:/opt/relay/config/driver.template.toml
+    # Uncomment this to expose ports internally and externally from the container
+    # ports:
+    # - "9083:9083"
+    networks:
+        - relay
+# This networks section is required for when the peers have networks specified
+networks:
+  base-network:
+    external:
+      name: ${EXTERNAL_NETWORK}
+  relay:
+    external: true

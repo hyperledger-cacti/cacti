@@ -1,0 +1,86 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+{{- $volumeClaimName := printf "%s-crypto" $.Values.global.network.name -}}
+{{- $orderer := index .Values.global.network.orderers 0 -}}
+{{- $ordName := printf "%s-orderers-%s" $orderer.name $.Values.global.network.name -}}
+{{- range $.Values.global.network.orgs }}
+{{- $orgName := .name -}}
+{{- $orgMSP := .mspId -}}
+{{- range .peers }}
+{{- $peerName := printf "%s-%s-%s" .name  $orgName  $.Values.global.network.name -}}
+{{- range $.Values.global.network.channels }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ printf "%s-join-channel-%s" $peerName .name }}
+spec:
+  template:
+    spec:
+      volumes:
+        - name: network1-secrets
+          persistentVolumeClaim:
+            claimName: {{ $volumeClaimName }}
+      containers:
+      - name: join-channel
+        image: {{ printf "%s:%s" $.Values.global.images.fabricTools.name $.Values.global.images.fabricTools.version }}
+        env:
+          - name: CHANNEL_NAME
+            value: {{ .name }}
+          - name: CORE_PEER_LOCALMSPID
+            value: {{ $orgMSP }}
+          - name: CORE_PEER_TLS_ROOTCERT_FILE
+            value: {{ printf "/var/pvc1/peerOrganizations/%s/peers/%s/tls/ca.crt" $orgName $peerName }}
+          - name: CORE_PEER_MSPCONFIGPATH
+            value: {{ printf "/var/pvc1/peerOrganizations/%s/users/Admin@%s/msp" $orgName $orgName }}
+          - name: CORE_PEER_ADDRESS
+            value: {{ printf "%s:7051" $peerName }}
+          - name: PEER_NAME
+            value: {{ $peerName }}
+          - name: CHANNELTX
+            value: /var/pvc1/channel-artifacts
+          - name: ORDERER_NAME
+            value: {{ $ordName }}
+          - name: ORDERER_URL
+            value: {{ printf "%s:7050" $ordName }}
+          - name: ORDERER_CA
+            value: {{ printf "/var/pvc1/ordererOrganizations/orderer/orderers/%s/tls/ca.crt" $ordName }}
+          - name: CORE_PEER_TLS_ENABLED
+            value: "true"
+        volumeMounts:
+          - name: network1-secrets
+            mountPath: /var/pvc1
+        command: ["/bin/sh",  "-c"]
+        args: ['cd /var/pvc1;
+                while [ ! -f "/var/pvc1/${CHANNEL_NAME}.block" ]; do
+                  echo "Could not find ${CHANNEL_NAME}.block. Waiting for it to be created...";
+                  sleep 5;
+                done;
+                echo "${CHANNEL_NAME}.block Found.";
+                set -x;
+                peer channel join -b /var/pvc1/${CHANNEL_NAME}.block;
+                res=$?;
+                set +x;
+                if [ $res -ne 0 ]; then
+                  echo "Failed to join channel";
+                  exit 1;
+                fi;
+                set -x;
+                peer channel update -o ${ORDERER_URL} --ordererTLSHostnameOverride ${ORDERER_NAME} -c $CHANNEL_NAME -f ${CHANNELTX}/${CORE_PEER_LOCALMSPID}anchors.tx --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA;
+                res=$?;
+                set +x;
+                if [ $res -ne 0 ]; then
+                  echo "Failed to update anchor peers for the channel";
+                  exit 1;
+                fi;
+                mkdir -p /var/pvc1/channel_ready/${PEER_NAME}-${CHANNEL_NAME}
+                echo "Channel succesfully joined."']
+      restartPolicy: Never
+  backoffLimit: 4
+---
+{{ end -}}
+{{ end -}}
+{{ end -}}

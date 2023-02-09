@@ -1,0 +1,12 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+# These variable resolve the full URLs to the two packages to download based on
+# the default settings and the specification of architecture, version, and operating
+# system supplied.
+#
+hlf_package_url: "{{ hlf_github_releases_url }}/v{{ fabric_cli.version }}/hyperledger-fabric-{{ fabric_cli.os }}-{{ fabric_cli.arch }}-{{ fabric_cli.version }}.tar.gz"
+hlf_ca_package_url: "{{ hlf_github_releases_url }}/v{{ fabric_cli.ca.version }}/hyperledger-fabric-ca-{{ fabric_cli.os }}-{{ fabric_cli.arch }}-{{ fabric_cli.ca.version }}.tar.gz"
