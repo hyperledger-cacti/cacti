@@ -1,0 +1,44 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: CC-BY-4.0
+
+name: Deploy Relay Docker Image
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'core/relay/VERSION'
+      
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  relay-image:
+    if: github.repository_owner == 'hyperledger-labs'
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Check if package already exists
+        run: (make check-if-tag-exists && echo "RELAY_PUSH=true" >> $GITHUB_ENV) || echo "RELAY_PUSH=false" >> $GITHUB_ENV
+        working-directory: core/relay
+          
+      - name: Build and Push
+        if: ${{ env.RELAY_PUSH == 'true' }}
+        run: make push-server
+        working-directory: core/relay
+        
+      - name: Push latest tag
+        if: ${{ env.RELAY_PUSH == 'true' }}
+        run: (cat out | grep "exists") || make push-server-latest
+        working-directory: core/relay

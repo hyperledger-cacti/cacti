@@ -1,0 +1,180 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+{{- $volumeClaimName := printf "%s-volume" $.Values.network.name -}}
+{{- $deployName := printf "%s-notary" $.Values.network.name -}}
+{{- $cmName := printf "%s-gradle-build" $.Values.network.name -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $deployName }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: {{ $deployName }}
+  template:
+    metadata:
+      labels:
+        name: {{ $deployName }}
+        app: {{ $deployName }}
+        app.kubernetes.io/component: "{{ $deployName }}"
+{{- include "corda-net.labels" $ | indent 8 }}
+    spec:
+      containers:
+        - name: notary
+          image: {{ $.Values.network.image.name }}
+          securityContext:
+            runAsUser: 0
+          resources:
+            limits:
+              cpu: 900m
+              memory: "1Gi"
+          ports:
+            - containerPort: 10003
+            - containerPort: 22022
+          volumeMounts:
+            - name: network-volume
+              subPath: build/nodes/Notary/node.conf
+              mountPath: /etc/corda/node.conf
+            - name: network-volume
+              subPath: build/nodes/Notary/certificates
+              mountPath: /opt/corda/certificates
+            - name: network-volume
+              subPath: build/nodes/Notary/logs
+              mountPath: /opt/corda/logs
+            - name: network-volume
+              subPath: build/nodes/Notary/persistence
+              mountPath: /opt/corda/persistence
+            - name: network-volume
+              subPath: build/nodes/Notary/cordapps
+              mountPath: /opt/corda/cordapps
+            - name: network-volume
+              subPath: build/nodes/Notary/network-parameters
+              mountPath: /opt/corda/network-parameters
+            - name: network-volume
+              subPath: build/nodes/Notary/additional-node-infos
+              mountPath: /opt/corda/additional-node-infos
+            - name: network-volume
+              subPath: build/nodes/Notary/drivers
+              mountPath: /opt/corda/drivers
+        # - name: partya
+        #   image: {{ $.Values.network.image.name }}
+        #   ports:
+        #     - containerPort: 10003
+        #     - containerPort: 22022
+        #   volumeMounts:
+        #     - name: network-volume
+        #       subPath: build/nodes/PartyA/node.conf
+        #       mountPath: /etc/corda/node.conf
+        #     - name: network-volume
+        #       subPath: build/nodes/PartyA/certificates
+        #       mountPath: /opt/corda/certificates
+        #     - name: network-volume
+        #       subPath: build/nodes/PartyA/logs
+        #       mountPath: /opt/corda/logs
+        #     - name: network-volume
+        #       subPath: build/nodes/PartyA/persistence
+        #       mountPath: /opt/corda/persistence
+        #     - name: network-volume
+        #       subPath: build/nodes/PartyA/cordapps
+        #       mountPath: /opt/corda/cordapps
+        #     - name: network-volume
+        #       subPath: build/nodes/PartyA/network-parameters
+        #       mountPath: /opt/corda/network-parameters
+        #     - name: network-volume
+        #       subPath: build/nodes/PartyA/additional-node-infos
+        #       mountPath: /opt/corda/additional-node-infos
+        #     - name: network-volume
+        #       subPath: build/nodes/PartyA/drivers
+        #       mountPath: /opt/corda/drivers
+      initContainers:
+        - name: init-container
+          image: {{ printf "%s:%s" $.Values.build.image.name $.Values.build.image.tag }}
+          resources:
+            limits:
+              cpu: 900m
+              memory: "2Gi"
+          env:
+            - name: ARTIFACTORY_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: artifactory-apikey
+                  key: username
+            - name: ARTIFACTORY_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: artifactory-apikey
+                  key: apikey
+            - name: simpleAppVersion
+              value: "{{ $.Values.network.simpleAppVersion }}"
+            - name: interopAppVersion
+              value: "{{ $.Values.network.interopAppVersion }}"
+            - name: NW_NAME
+              value: {{ $.Values.network.name }}
+          volumeMounts:
+            - name: network-volume
+              mountPath: /var/pvc1
+            - name: gradle-build-map
+              mountPath: /var/gradle-build
+          securityContext:
+            runAsUser: 0
+          command: ["/bin/sh",  "-c"]
+          args: ['echo;
+                  apt-get update;
+                  apt-get install -y curl;
+                  echo "Running gradle task..";
+                  cp /var/gradle-build/* /var/pvc1/;
+                  cd /var/pvc1;
+                  mkdir -p /var/pvc1/build;
+                  pwd;
+                  ls -la;
+                  if [ ! -f build.gradle ]; then
+                    echo "gradle build file not found, Exiting...";
+                    exit 1;
+                  fi;
+                  gradle clean deployNodes prepareDockerNodes;
+                  cat build/nodes/docker-compose.yml;
+                  if [ ! -d build/nodes/PartyA ]; then
+                    echo "Build unsuccesful, Exiting...";
+                    exit 1;
+                  fi;
+                  echo "Downloading CorDapps from Artifactory...";
+                  username=$ARTIFACTORY_USERNAME;
+                  password=$ARTIFACTORY_PASSWORD;
+                  mkdir -p /var/pvc1/artifacts;
+                  set -x;
+                  (cd /var/pvc1/artifacts && curl -u $username:$password -O https://na.artifactory.swg-devops.com:443/artifactory/res-dlt-interop-maven-local/com/cordaInteropApp/interop-contracts/$interopAppVersion/interop-contracts-$interopAppVersion.jar);
+                  (cd /var/pvc1/artifacts && curl -u $username:$password -O https://na.artifactory.swg-devops.com:443/artifactory/res-dlt-interop-maven-local/com/cordaInteropApp/interop-workflows/$interopAppVersion/interop-workflows-$interopAppVersion.jar);
+                  (cd /var/pvc1/artifacts && curl -u $username:$password -O https://na.artifactory.swg-devops.com:443/artifactory/res-dlt-interop-maven-local/com/cordaSimpleApplication/contracts-kotlin/$simpleAppVersion/contracts-kotlin-$simpleAppVersion.jar);
+                  (cd /var/pvc1/artifacts && curl -u $username:$password -O https://na.artifactory.swg-devops.com:443/artifactory/res-dlt-interop-maven-local/com/cordaSimpleApplication/workflows-kotlin/$simpleAppVersion/workflows-kotlin-$simpleAppVersion.jar);
+                  set +x;
+                  cd /var/pvc1/;
+                  cp /var/pvc1/artifacts/contracts-kotlin-$simpleAppVersion.jar build/nodes/Notary/cordapps;
+                  cp /var/pvc1/artifacts/contracts-kotlin-$simpleAppVersion.jar build/nodes/PartyA/cordapps;
+                  cp /var/pvc1/artifacts/workflows-kotlin-$simpleAppVersion.jar build/nodes/Notary/cordapps;
+                  cp /var/pvc1/artifacts/workflows-kotlin-$simpleAppVersion.jar build/nodes/PartyA/cordapps;
+
+                  cp /var/pvc1/artifacts/interop-contracts-$interopAppVersion.jar build/nodes/Notary/cordapps;
+                  cp /var/pvc1/artifacts/interop-contracts-$interopAppVersion.jar build/nodes/PartyA/cordapps;
+                  cp /var/pvc1/artifacts/interop-workflows-$interopAppVersion.jar build/nodes/Notary/cordapps;
+                  cp /var/pvc1/artifacts/interop-workflows-$interopAppVersion.jar build/nodes/PartyA/cordapps;
+
+                  sed -i "s/notary:10003/0.0.0.0:10003/g" build/nodes/Notary/node.conf;
+                  sed -i "s/notary:10005/0.0.0.0:10005/g" build/nodes/Notary/node.conf;
+                  sed -i "s/partya:10003/0.0.0.0:10003/g" build/nodes/PartyA/node.conf;
+                  sed -i "s/partya:10005/0.0.0.0:10005/g" build/nodes/PartyA/node.conf;
+                  sed -i "s/p2pAddress=\"notary:10002\"/p2pAddress=\"${NW_NAME}-notary:10002\"/g" build/nodes/PartyA/node.conf;
+                  sed -i "s/p2pAddress=\"partya:10004\"/p2pAddress=\"${NW_NAME}-partya:10004\"/g" build/nodes/PartyA/node.conf;
+                  echo;']
+      volumes:
+        - name: network-volume
+          persistentVolumeClaim:
+            claimName: {{ $volumeClaimName }}
+        - name: gradle-build-map
+          configMap:
+            name: {{ $cmName }}
+---

@@ -1,0 +1,221 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: CC-BY-4.0
+
+name: Deploy Node JS Packages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'common/protos-js/package.json'
+      - 'sdks/fabric/interoperation-node-sdk/package.json'
+      - 'sdks/besu/interoperation-node-sdk/package.json'
+      - 'core/drivers/fabric-driver/VERSION'
+      - 'core/identity-management/iin-agent/VERSION'
+      
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  publish-protos:
+    if: github.repository_owner == 'hyperledger-labs'
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      
+      - name: Use Node.js 14.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14.x
+          
+      - name: Use Protoc 3.15
+        run: |
+          curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.15.6/protoc-3.15.6-linux-x86_64.zip
+          unzip protoc-3.15.6-linux-x86_64.zip -d protoc
+          
+      - name: Generate .npmrc
+        run: |
+          cp .npmrc.template .npmrc
+          sed -i "s/<personal-access-token>/${{ secrets.GITHUB_TOKEN }}/g" .npmrc
+          cat .npmrc
+        working-directory: common/protos-js
+        
+      - name: Build
+        run: |
+          export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
+          make build
+        working-directory: common/protos-js
+        
+      - name: Check if package already exists
+        run : |
+          PKG_NAME=$(node -p "require('./package.json').name")
+          PUBLISHED_VERSION=$(npm view $PKG_NAME version)
+          LOCAL_VERSION=$(node -p "require('./package.json').version")
+          if [[ "$PUBLISHED_VERSION" == "$LOCAL_VERSION" ]]; then
+            echo "PROTOS_JS_PUBLISH=false" >> $GITHUB_ENV
+          else
+            echo "PROTOS_JS_PUBLISH=true" >> $GITHUB_ENV
+          fi
+        working-directory: common/protos-js
+        
+      - name: Publish
+        if: ${{ env.PROTOS_JS_PUBLISH == 'true' }}
+        run: make publish
+        working-directory: common/protos-js
+        
+  publish-fabric-sdk:
+    if: ${{ always() && github.repository_owner == 'hyperledger-labs' }}
+    needs: [publish-protos]
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      
+      - name: Use Node.js 14.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14.x
+          
+      - name: Generate .npmrc
+        run: |
+          cp .npmrc.template .npmrc
+          sed -i "s/<personal-access-token>/${{ secrets.GITHUB_TOKEN }}/g" .npmrc
+          cat .npmrc
+        working-directory: sdks/fabric/interoperation-node-sdk
+        
+      - name: Build
+        run: make build
+        working-directory: sdks/fabric/interoperation-node-sdk
+        
+      - name: Check if package already exists
+        run : |
+          PKG_NAME=$(node -p "require('./package.json').name")
+          PUBLISHED_VERSION=$(npm view $PKG_NAME version)
+          LOCAL_VERSION=$(node -p "require('./package.json').version")
+          if [[ "$PUBLISHED_VERSION" == "$LOCAL_VERSION" ]]; then
+            echo "WEAVER_FABRIC_SDK_PUBLISH=false" >> $GITHUB_ENV
+          else
+            echo "WEAVER_FABRIC_SDK_PUBLISH=true" >> $GITHUB_ENV
+          fi
+        working-directory: sdks/fabric/interoperation-node-sdk
+        
+      - name: Publish
+        if: ${{ env.WEAVER_FABRIC_SDK_PUBLISH == 'true' }}
+        run: make publish
+        working-directory: sdks/fabric/interoperation-node-sdk
+        
+  publish-besu-sdk:
+    if: ${{ always() && github.repository_owner == 'hyperledger-labs' }}
+    needs: [publish-protos]
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      
+      - name: Use Node.js 14.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14.x
+          
+      - name: Generate .npmrc
+        run: |
+          cp .npmrc.template .npmrc
+          sed -i "s/<personal-access-token>/${{ secrets.GITHUB_TOKEN }}/g" .npmrc
+          cat .npmrc
+        working-directory: sdks/besu/interoperation-node-sdk
+        
+      - name: Build
+        run: make build
+        working-directory: sdks/besu/interoperation-node-sdk
+        
+      - name: Check if package already exists
+        run : |
+          PKG_NAME=$(node -p "require('./package.json').name")
+          PUBLISHED_VERSION=$(npm view $PKG_NAME version)
+          LOCAL_VERSION=$(node -p "require('./package.json').version")
+          if [[ "$PUBLISHED_VERSION" == "$LOCAL_VERSION" ]]; then
+            echo "WEAVER_BESU_SDK_PUBLISH=false" >> $GITHUB_ENV
+          else
+            echo "WEAVER_BESU_SDK_PUBLISH=true" >> $GITHUB_ENV
+          fi
+        working-directory: sdks/besu/interoperation-node-sdk
+        
+      - name: Publish
+        if: ${{ env.WEAVER_BESU_SDK_PUBLISH == 'true' }}
+        run: make publish
+        working-directory: sdks/besu/interoperation-node-sdk
+    
+  publish-driver-image:
+    if: ${{ always() && github.repository_owner == 'hyperledger-labs' }}
+    needs: [publish-protos, publish-fabric-sdk]
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Generate .npmrc
+        run: |
+          cp .npmrc.template .npmrc
+          sed -i "s/<personal-access-token>/${{ secrets.GITHUB_TOKEN }}/g" .npmrc
+          cat .npmrc
+        working-directory: core/drivers/fabric-driver
+
+      - name: Check if package already exists
+        run: (make check-if-tag-exists && echo "FABRIC_DRIVER_PUSH=true" >> $GITHUB_ENV) || echo "FABRIC_DRIVER_PUSH=false" >> $GITHUB_ENV
+        working-directory: core/drivers/fabric-driver
+
+      - name: Build and Push
+        if: ${{ env.FABRIC_DRIVER_PUSH == 'true' }}
+        run: make push-image
+        working-directory: core/drivers/fabric-driver
+        
+      - name: Push latest tag
+        if: ${{ env.FABRIC_DRIVER_PUSH == 'true' }}
+        run: make push-image-latest
+        working-directory: core/drivers/fabric-driver
+        
+  publish-iin-agent-image:
+    if: ${{ always() && github.repository_owner == 'hyperledger-labs' }}
+    needs: [publish-protos, publish-fabric-sdk]
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+                    
+      - name: Generate .npmrc
+        run: |
+          cp .npmrc.template .npmrc
+          sed -i "s/<personal-access-token>/${{ secrets.GITHUB_TOKEN }}/g" .npmrc
+          cat .npmrc
+        working-directory: core/identity-management/iin-agent
+
+      - name: Check if package already exists
+        run: (make check-if-tag-exists && echo "IINAGENT_PUSH=true" >> $GITHUB_ENV) || echo "IINAGENT_PUSH=false" >> $GITHUB_ENV
+        working-directory: core/identity-management/iin-agent
+
+      - name: Build and Push
+        if: ${{ env.IINAGENT_PUSH == 'true' }}
+        run: make push-image
+        working-directory: core/identity-management/iin-agent
+        
+      - name: Push latest tag
+        if: ${{ env.IINAGENT_PUSH == 'true' }}
+        run: make push-image-latest
+        working-directory: core/identity-management/iin-agent

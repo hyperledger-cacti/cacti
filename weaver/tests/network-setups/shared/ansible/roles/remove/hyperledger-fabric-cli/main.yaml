@@ -1,0 +1,20 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+---
+  - name: Remove Hyperleder Fabric CLI Installation
+    file: 
+      path: "{{ fabric-cli.bin_directory }}"
+      state: absent
+    tags:
+      - fabric_cli
+      
+  - name: Remove Hyperleder Fabric CA CLI Installation
+    file: 
+      path: "{{ fabric-cli.ca.bin_directory }}"
+      state: absent
+    tags:
+      - fabric_cli

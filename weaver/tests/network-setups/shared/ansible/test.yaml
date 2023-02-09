@@ -1,0 +1,32 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+---
+# This playbook sets up the environment to enable
+# the deployment of the networks.
+
+- hosts: ansible_provisioners
+  gather_facts: yes
+  tasks:
+
+  - name: "Retrieve file"
+    get_url:
+      url: https://get.helm.sh/helm-{{ helm.version }}-{{ helm.os }}-{{ helm.arch }}.tar.gz
+      dest: /tmp/helm.tar.gz
+      headers: "{{ helm.headers | default({})  }}"
+    vars:
+      helm:
+        version: "v3.3.0-rc.2"
+        os: "darwin"
+        arch: "amd64"
+        headers:
+          "X-API-Key" : "Awjhppp"
+
+  vars: # These variables can be overriden from the command line
+    privilege_escalate: false           # Default to NOT escalate to root privledges
+
+    # cloud_provider:                   # to be provided via environment    
+    # bin_install_dir:                  # to be provided via environment

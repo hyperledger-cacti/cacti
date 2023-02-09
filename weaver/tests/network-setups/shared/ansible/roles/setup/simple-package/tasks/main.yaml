@@ -1,0 +1,200 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+---
+  # This task provides an overview of the information that will be
+  # used to download and install the package specified in the
+  # variables passed to it.
+  #
+  - name: Initialize Package 
+    vars: 
+      msg: |
+       Package Name:            {{ package.name }}
+       Package Key:             {{ package_cache_key }}
+       Package Cache Root:      {{ package_cache_directory }}
+       Package Download Root:   {{ package_cache_download_directory }}
+       Package Download File:   {{ package_cache_download_file }}
+       Package Unpack Root:     {{ package_cache_unpack_directory }}
+       Package Unpack Path:     {{ package_cache_unpack_path }}
+    debug:
+      msg: "{{ msg.split('\n') }}"
+    tags:
+      - simple_package
+
+  # This tasks determine whether the package is already installed.
+  # If that is the case, then we do not do any other task, except
+  # for verifying the installation.
+  #
+  - name: "Check Package Installation"
+    stat:
+      path: "{{ package.install_path }}"
+    register: package_path
+    tags:
+      - simple_package
+
+  # This task determines the location of the package download
+  # folder in the cache. It is used as a temporary folder were
+  # the binary is stored and unpacked if needed. The task register
+  # an array of stat results: 
+  # - the first is the download directory
+  # - the second is the __unpack__ directory
+  #
+  - name: "Configure Package Cache Locations"
+    file:
+      path: "{{ item }}"
+      state: directory
+    with_items:
+      - "{{ package_cache_download_directory }}"
+      - "{{ package_cache_unpack_directory }}"
+    when: not package_path.stat.exists
+    tags:
+      - simple_package
+
+  
+  # This task ensures that the cache is refreshed, forcing the 
+  # download of the package again from the remote url.
+  #
+  - name: "Clearing Cache (cache_refresh=True)"
+    file:
+      path: "{{ package_cache_directory }}"
+      state: absent
+    when: > 
+      not package_path.stat.exists
+      and (package.cache_refresh is defined and package.cache_refresh)
+
+
+  # This task execute the file system stat operation to gather
+  # information about the locations that are required for the
+  # download and installation of the package. Essentially it
+  # exposes the paths as file system entities that can be queried
+  # to obtain information about their existence.
+  #
+  - name: "Register Package Cache Locations"
+    stat:
+      path: "{{ item }}"
+    register: package_cache_locations
+    with_items:
+      - "{{ package_cache_metadata_path }}"
+      - "{{ package_cache_download_directory }}"
+      - "{{ package_cache_download_file }}"
+      - "{{ package_cache_unpack_directory }}"
+    when: not package_path.stat.exists
+    tags:
+      - simple_package
+
+  # This task downloads the package that is available at package URL and
+  # it is only executed when the file is not already present in the download
+  # cache.
+  #
+  - name: "Download Package"
+    get_url:
+      url: "{{ package.url }}"
+      dest: "{{ package_cache_download_file }}"
+      headers: "{{ package.headers | default({}) }}"
+    register: package_download
+    when: >
+      not package_path.stat.exists
+      and not package_cache_locations.results[3].stat.exists
+    tags:
+      - simple_package
+  
+  # This task determines whether the package has alread been downloaded
+  # and present in the download cache. This is operation is implemented
+  # by performing a stat on the path where it is expected to be found 
+  # in the download cache.
+  #
+  - name: "Checking Downloaded Package"
+    stat:
+      path: "{{ package_cache_download_file }}"
+    register: package_download_file
+    when: not package_path.stat.exists
+    tags:
+      - simple_package
+  
+  # This tasks updates the package metadata in the cache. The tasks
+  # writes a simple file that contains information about the package
+  # downloaded and installed.
+  #
+  - name: "Update Package Metadata"
+    blockinfile:
+      path: "{{ package_cache_metadata_path }}"
+      create: yes
+      block: |
+        name: "{{ package.name }}"
+        key: "{{ package_cache_key }}"
+        url: "{{ package.url }}"
+        install_path: "{{ package.install_path }}"
+        unpack: "{{ package.unpack }}"
+        command: "{{ package.command | default('') }}"
+        archive_path: "{{ package.archive_path | default('') }}"
+        size: "{{ package_download_file.stat.size }} ({{ package_download_file.stat.size | human_readable }})"
+        update: "{{ package_download_file.stat.ctime }}"
+    when: >
+      not package_path.stat.exists
+      and package_download.changed
+    tags:
+      - simple_package
+  
+  # This task explodes the downloaded package if needed. It is triggered if
+  # the package.unpack flag is set to true, and it will be exploding the
+  # archive in the preconfigured path in the download cache.
+  #
+  - name: Explode the Archive
+    unarchive:
+      src: "{{ package_cache_download_file }}"
+      dest: "{{ package_cache_unpack_directory }}"
+      remote_src: yes
+    register: package_unpack
+    when: >
+      package.unpack
+      and (not package_path.stat.exists or package_download.changed)
+    tags:
+      - simple_package
+
+  # This task copies the binaries into the designated installation folder.
+  # The tasks selects the source of files to copy based on whether the 
+  # package.unpack is set to true or false:
+  # - package.unpack=True then the source folder is the unpack folder.
+  # - package.unpack=False then the source folder is the download folder.
+  #
+  - name: Copy Binaries into Installation Location
+    copy:
+      src: "{{ package_cache_unpack_path if package.unpack else package_cache_download_file }}"
+      dest: "{{ package.install_path }}"
+      mode: "0755"
+    when: >
+      not package_path.stat.exists
+      or package_unpack.changed
+    tags:
+      - simple_package
+
+  # This task verifies the installation of the package by executing the
+  # command that has been specified in the package.command parameter if
+  # any, otherwise it skips the execution.
+  #
+  - name: Verify Installation Location
+    command: "{{ package.command }}"
+    changed_when: false
+    when: >
+      package.command is defined and
+      package.command | length > 0
+    tags:
+      - simple_package
+      - molecule-idempotence-notest
+
+  # This tasks removes any information associated to the package from the
+  # download cache. It is only executed if the value of package.cache is
+  # set to False.
+  #
+  - name: Remove Package Cache Location
+    file:
+      path: "{{ package_cache_directory }}"
+      state: absent
+    when: package.cache_remove is defined and package.cache_remove
+    tags:
+      - simple_package
+
+

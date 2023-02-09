@@ -1,0 +1,18 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+---
+cloud_provider: "openshift"
+install_os: "linux"
+install_arch: "amd64"
+bin_install_dir: "~/bin"
+artifactory_api_key: "{{ lookup('env', 'ARTIFACTORY_API_KEY') }}"
+openshift_api_token: "{{ lookup('env', 'OPENSHIFT_API_TOKEN') }}"
+openshift_login_mode: "ocl" 
+openshift_project: "dlt-interop"
+openshift_api_cluster_hostname: "ros.api.sl.cloud9.ibm.com"
+openshift_api_cluster_port: 6443
+openshift_api_cluster_endpoint: "https://{{ openshift_api_cluster_hostname }}:{{ openshift_api_cluster_port }}"

@@ -1,0 +1,82 @@
+{
+  "a03": {
+    "assetType": "bond01",
+    "id": "a03",
+    "owner": "alice",
+    "issuer": "treasury",
+    "facevalue": "500",
+    "maturitydate": "01 Jan 45 00:00 MST"
+  },
+  "a04": {
+    "assetType": "bond01",
+    "id": "a04",
+    "owner": "bob",
+    "issuer": "treasury",
+    "facevalue": "700",
+    "maturitydate": "01 Jul 45 00:00 MST"
+  },
+  "a05": {
+    "assetType": "bond01",
+    "id": "a05",
+    "owner": "alice",
+    "issuer": "treasury",
+    "facevalue": "300",
+    "maturitydate": "05 May 47 00:00 MST"
+  },
+  "a06": {
+    "assetType": "bond01",
+    "id": "a06",
+    "owner": "bob",
+    "issuer": "treasury",
+    "facevalue": "300",
+    "maturitydate": "05 Mar 47 00:00 MST"
+  },
+  "a07": {
+    "assetType": "bond02",
+    "id": "a07",
+    "owner": "alice",
+    "issuer": "treasury",
+    "facevalue": "900",
+    "maturitydate": "24 Nov 42 00:00 MST"
+  },
+  "a08": {
+    "assetType": "bond02",
+    "id": "a08",
+    "owner": "bob",
+    "issuer": "treasury",
+    "facevalue": "100",
+    "maturitydate": "24 Dec 42 00:00 MST"
+  },
+  "a09": {
+    "assetType": "bond02",
+    "id": "a09",
+    "owner": "alice",
+    "issuer": "treasury",
+    "facevalue": "500",
+    "maturitydate": "06 Apr 44 00:00 MST"
+  },
+  "a10": {
+    "assetType": "bond02",
+    "id": "a10",
+    "owner": "bob",
+    "issuer": "treasury",
+    "facevalue": "800",
+    "maturitydate": "06 Aug 44 00:00 MST"
+  },
+  "a11": {
+    "assetType": "bond03",
+    "id": "a11",
+    "owner": "alice",
+    "issuer": "treasury",
+    "facevalue": "200",
+    "maturitydate": "15 Jul 50 00:00 MST"
+  },
+  "a12": {
+    "assetType": "bond03",
+    "id": "a12",
+    "owner": "bob",
+    "issuer": "treasury",
+    "facevalue": "700",
+    "maturitydate": "15 Jun 50 00:00 MST"
+  }
+}

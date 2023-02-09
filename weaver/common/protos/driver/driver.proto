@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package driver.driver;
+
+import "common/ack.proto";
+import "common/query.proto";
+import "common/events.proto";
+import "common/state.proto";
+
+option java_package = "com.weaver.protos.driver.driver";
+option go_package = "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/driver";
+
+// Data for a View processing by dest-driver
+message WriteExternalStateMessage {
+  common.state.ViewPayload view_payload = 1;
+  common.events.ContractTransaction ctx = 2;
+}
+
+service DriverCommunication {
+  // Data Sharing 
+  // the remote relay sends a RequestDriverState request to its driver with a
+  // query defining the data it wants to receive
+  rpc RequestDriverState(common.query.Query) returns (common.ack.Ack) {}
+  
+  // Events Subscription
+  // the src-relay uses this endpoint to forward the event subscription request from dest-relay to driver
+  rpc SubscribeEvent(common.events.EventSubscription) returns (common.ack.Ack) {}
+  
+  // Recommended to have TLS mode on for this unsafe endpoint
+  // Relay uses this to get Query.requestor_signature and 
+  // Query.certificate required for event subscription
+  rpc RequestSignedEventSubscriptionQuery(common.events.EventSubscription) returns (common.query.Query) {}
+
+  // Events Publication
+  // the dest-relay calls the dest-driver on this end point to write the remote network state to the local ledger
+  rpc WriteExternalState(WriteExternalStateMessage) returns (common.ack.Ack) {}
+}

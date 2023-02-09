@@ -1,0 +1,59 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+version: "3"
+
+networks:
+  net:
+
+services:
+  ca_org1:
+    image: hyperledger/fabric-ca:$IMAGE_TAG
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca.org1.${COMPOSE_PROJECT_NAME}.com
+      - FABRIC_CA_SERVER_TLS_ENABLED=true
+      - FABRIC_CA_SERVER_PORT=$CA_ORG1_PORT
+    ports:
+      - "${CA_ORG1_PORT}:${CA_ORG1_PORT}"
+    command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
+    volumes:
+      - ${NW_CFG_PATH}/fabric-ca/org1:/etc/hyperledger/fabric-ca-server
+    container_name: ca.org1.${COMPOSE_PROJECT_NAME}.com
+    networks:
+      - net
+
+  ca_org2:
+    profiles: ["2-nodes"]
+    image: hyperledger/fabric-ca:$IMAGE_TAG
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca.org2.${COMPOSE_PROJECT_NAME}.com
+      - FABRIC_CA_SERVER_TLS_ENABLED=true
+      - FABRIC_CA_SERVER_PORT=$CA_ORG2_PORT
+    ports:
+      - "${CA_ORG2_PORT}:${CA_ORG2_PORT}"
+    command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
+    volumes:
+      - ${NW_CFG_PATH}/fabric-ca/org2:/etc/hyperledger/fabric-ca-server
+    container_name: ca.org2.${COMPOSE_PROJECT_NAME}.com
+    networks:
+      - net
+
+  ca_orderer:
+    image: hyperledger/fabric-ca:$IMAGE_TAG
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca.orderer.${COMPOSE_PROJECT_NAME}.com
+      - FABRIC_CA_SERVER_TLS_ENABLED=true
+      - FABRIC_CA_SERVER_PORT=$CA_ORDERER_PORT
+    ports:
+      - "${CA_ORDERER_PORT}:${CA_ORDERER_PORT}"
+    command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
+    volumes:
+      - ${NW_CFG_PATH}/fabric-ca/ordererOrg:/etc/hyperledger/fabric-ca-server
+    container_name: ca.orderer.${COMPOSE_PROJECT_NAME}.com
+    networks:
+      - net

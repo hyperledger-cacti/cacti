@@ -1,0 +1,8 @@
+.npmrc
+.npmrc.template
+node_modules/
+package-lock.json
+Makefile
+.gitignore
+.npmignore
+build-protos.sh

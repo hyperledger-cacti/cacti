@@ -1,0 +1,80 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: CC-BY-4.0
+
+name: Deploy General Go Module
+
+on:
+  # Allows this to be a reusable workflow
+  workflow_call:
+    inputs:
+      module:
+        description: 'Go Module name'
+        required: true
+        type: string
+      version:
+        description: 'Version for Go Release'
+        required: true
+        type: string
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+    inputs:
+      module:
+        description: 'Go Module name'
+        default: 'protos-go'
+        required: true
+      version:
+        description: 'Version for Go Release'
+        default: 'v0.0.0'
+        required: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+          
+      - name: Set current date as env
+        run: echo "RELEASE_DATE=$(date +%b\ %d,\ %Y)" >> $GITHUB_ENV
+        
+      - name: Get Full path
+        run: |
+          if [ "${{ inputs.module }}" = "protos-go" ]; then
+            echo "MODULE_TAG=common/protos-go" >> $GITHUB_ENV
+            echo "MODULE_DESC=GO Weaver Protos" >> $GITHUB_ENV
+          elif [ "${{ inputs.module }}" = "interop" ]; then
+            echo "MODULE_TAG=core/network/fabric-interop-cc/contracts/interop" >> $GITHUB_ENV
+            echo "MODULE_DESC=GO Fabric Interop Chaincode" >> $GITHUB_ENV
+          elif [ "${{ inputs.module }}" = "utils" ]; then
+            echo "MODULE_TAG=core/network/fabric-interop-cc/libs/utils" >> $GITHUB_ENV
+            echo "MODULE_DESC=GO Fabric Utils Library for Interoperation" >> $GITHUB_ENV
+          elif [ "${{ inputs.module }}" = "assetexchange" ]; then
+            echo "MODULE_TAG=core/network/fabric-interop-cc/libs/assetexchange" >> $GITHUB_ENV
+            echo "MODULE_DESC=GO Fabric Library for Asset Exchange" >> $GITHUB_ENV
+          elif [ "${{ inputs.module }}" = "asset-mgmt" ]; then
+            echo "MODULE_TAG=core/network/fabric-interop-cc/interfaces/asset-mgmt" >> $GITHUB_ENV
+            echo "MODULE_DESC=GO Fabric Asset Management Interface" >> $GITHUB_ENV
+          elif [ "${{ inputs.module }}" = "go-sdk" ]; then
+            echo "MODULE_TAG=sdks/fabric/go-sdk" >> $GITHUB_ENV
+            echo "MODULE_DESC=GO Fabric Weaver SDK" >> $GITHUB_ENV
+          else
+            echo "Module not known to the workflow. Exiting."
+            exit 1
+          fi
+        
+      - name: Create GO Release
+        id: go-release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ env.MODULE_TAG }}/${{ inputs.version }}
+          release_name: ${{ inputs.version }} - ${{ env.MODULE_DESC }} - ${{ env.RELEASE_DATE }}
+          body: |
+            - Go Module: `github.com/${{ github.repository_owner }}/weaver-dlt-interoperability/${{ env.MODULE_TAG }}`
+            - Release: ${{ inputs.version }}
+            - Readme: [Here](https://github.com/${{ github.repository_owner }}/weaver-dlt-interoperability/blob/${{ env.MODULE_TAG }}/${{ inputs.version }}/${{ env.MODULE_TAG }}/README.md).
+            - Source: [Here](https://github.com/${{ github.repository_owner }}/weaver-dlt-interoperability/blob/${{ env.MODULE_TAG }}/${{ inputs.version }}/${{ env.MODULE_TAG }})
+          draft: false
+          prerelease: false

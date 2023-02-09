@@ -1,0 +1,72 @@
+buildscript {
+    ext.protobuf_version = "3.11.1"
+}
+
+plugins {
+    id "maven-publish"
+    id "java"
+    id "idea"
+}
+
+apply plugin: 'net.corda.plugins.cordapp'
+
+repositories {
+    if (github_url == "") {
+        println("Fetching Locally built Weaver packages.")
+        flatDir {
+            dirs '../../../../common/protos-java-kt/build/libs'
+        }
+    }
+}
+
+cordapp {
+    targetPlatformVersion corda_platform_version
+    minimumPlatformVersion corda_platform_version
+    contract {
+        name "Interoperability CorDapp"
+        vendor "Corda Open Source"
+        licence "Apache License, Version 2.0"
+        versionId 1
+    }
+}
+
+sourceSets {
+    main {
+    }
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+
+    // Corda dependencies.
+    cordaCompile "$corda_core_release_group:corda-core:$corda_core_release_version"
+
+    testCompile "$corda_release_group:corda-node-driver:$corda_release_version"
+    
+    // weaver-protos
+    compile "com.weaver:protos-java-kt:$weaver_version"
+    
+    compile "com.google.protobuf:protobuf-java:$protobuf_version"
+    compile "com.google.protobuf:protobuf-java-util:$protobuf_version"
+}
+
+publishing {
+    publications {
+        contracts(MavenPublication) {
+            groupId = project.properties['group']
+            artifactId = 'interop-contracts'
+            version = project.properties['version']
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            url github_url
+            credentials {
+                username github_username
+                password github_password
+            }
+        }
+    }
+}

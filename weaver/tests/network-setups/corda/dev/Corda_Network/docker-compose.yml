@@ -1,0 +1,83 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+version: "3"
+services:
+  notary:
+    volumes:
+      - ./build/nodes/Notary/node.conf:/etc/corda/node.conf
+      - ./build/nodes/Notary/certificates:/opt/corda/certificates
+      - ./build/nodes/Notary/logs:/opt/corda/logs
+      - ./build/nodes/Notary/persistence:/opt/corda/persistence
+      - ./build/nodes/Notary/cordapps:/opt/corda/cordapps
+      - ./build/nodes/Notary/network-parameters:/opt/corda/network-parameters
+      - ./build/nodes/Notary/additional-node-infos:/opt/corda/additional-node-infos
+      - ./build/nodes/Notary/drivers:/opt/corda/drivers
+    environment:
+    - ACCEPT_LICENSE=${ACCEPT_LICENSE}
+    user: root
+    ports:
+      - 10003:10003
+      - 22022
+    image: corda/corda-zulu-java1.8-4.8
+    container_name: corda_notary_1
+  partya:
+    profiles: ["1-node", "2-nodes", "3-nodes"]
+    volumes:
+      - ./build/nodes/PartyA/node.conf:/etc/corda/node.conf
+      - ./build/nodes/PartyA/certificates:/opt/corda/certificates
+      - ./build/nodes/PartyA/logs:/opt/corda/logs
+      - ./build/nodes/PartyA/persistence:/opt/corda/persistence
+      - ./build/nodes/PartyA/cordapps:/opt/corda/cordapps
+      - ./build/nodes/PartyA/network-parameters:/opt/corda/network-parameters
+      - ./build/nodes/PartyA/additional-node-infos:/opt/corda/additional-node-infos
+      - ./build/nodes/PartyA/drivers:/opt/corda/drivers
+    environment:
+    - ACCEPT_LICENSE=${ACCEPT_LICENSE}
+    user: root
+    ports:
+      - 10006:10003
+      - 22022
+    image: corda/corda-zulu-java1.8-4.8
+    container_name: corda_partya_1
+  partyb:
+    profiles: ["2-nodes", "3-nodes"]
+    volumes:
+    - ./build/nodes/PartyB/node.conf:/etc/corda/node.conf
+    - ./build/nodes/PartyB/certificates:/opt/corda/certificates
+    - ./build/nodes/PartyB/logs:/opt/corda/logs
+    - ./build/nodes/PartyB/persistence:/opt/corda/persistence
+    - ./build/nodes/PartyB/cordapps:/opt/corda/cordapps
+    - ./build/nodes/PartyB/network-parameters:/opt/corda/network-parameters
+    - ./build/nodes/PartyB/additional-node-infos:/opt/corda/additional-node-infos
+    - ./build/nodes/PartyB/drivers:/opt/corda/drivers
+    environment:
+    - ACCEPT_LICENSE=${ACCEPT_LICENSE}
+    user: root
+    ports:
+      - 10009:10003
+      - 22022
+    image: corda/corda-zulu-java1.8-4.8
+    container_name: corda_partyb_1
+  partyc:
+    profiles: ["3-nodes"]
+    volumes:
+    - ./build/nodes/PartyC/node.conf:/etc/corda/node.conf
+    - ./build/nodes/PartyC/certificates:/opt/corda/certificates
+    - ./build/nodes/PartyC/logs:/opt/corda/logs
+    - ./build/nodes/PartyC/persistence:/opt/corda/persistence
+    - ./build/nodes/PartyC/cordapps:/opt/corda/cordapps
+    - ./build/nodes/PartyC/network-parameters:/opt/corda/network-parameters
+    - ./build/nodes/PartyC/additional-node-infos:/opt/corda/additional-node-infos
+    - ./build/nodes/PartyC/drivers:/opt/corda/drivers
+    environment:
+    - ACCEPT_LICENSE=${ACCEPT_LICENSE}
+    user: root
+    ports:
+      - 10012:10003
+      - 22022
+    image: corda/corda-zulu-java1.8-4.8
+    container_name: corda_partyc_1

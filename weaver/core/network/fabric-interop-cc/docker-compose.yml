@@ -1,0 +1,23 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+version: '2'
+services:
+  fabric-driver:
+    image: ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}
+    container_name: weaver-faric-${CHANNEL}-${PEER}-${ORG}-${NETWORK}
+    environment:
+        - CC_NAME=interop
+        - EXTERNAL_SERVICE=true
+        - CHAINCODE_ADDRESS=0.0.0.0:7052
+        - CHAINCODE_CCID=${CCID}
+    ports:
+      - 7052:7052
+# This networks section is required for when the peers have networks specified
+networks:
+  default:
+    external:
+      name: ${EXTERNAL_NETWORK}

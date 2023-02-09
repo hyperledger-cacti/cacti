@@ -1,0 +1,20 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+version: "3"
+networks:
+  default:
+    external:
+      name: network1
+services:
+  sacc-org1:
+    container_name: sacc-org1
+    image: chaincode/sacc:latest
+    environment:
+      - CHAINCODE_CCID=sacc:3e02d2ce1e03160849fc3d693c9488c69d58981959bcf0637ebf1c8d5c6f0ef2
+      - CHAINCODE_ADDRESS=0.0.0.0:7052
+    ports:
+      - 7052:7052

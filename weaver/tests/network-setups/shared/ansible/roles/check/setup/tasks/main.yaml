@@ -1,0 +1,24 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+
+---
+# This tasks ensures the directory existance and registers the result essential for idempotence test
+- name: Check if directory exists
+  stat:
+    path: "{{ path }}"
+  register: dir_check
+  when: check == "ensure_dir"
+
+# Check if directory is created
+# This task creates the directory
+- name: Ensures directory exists
+  file:
+    path: "{{ path }}"
+    recurse: yes
+    mode: '0755'
+    state: directory
+  when: check == "ensure_dir" and (not dir_check.stat.exists)

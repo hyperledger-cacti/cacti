@@ -1,0 +1,32 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+global:
+  network:
+    domain:
+      local: "dlt-interop.svc.cluster.local"
+      cluster: "dlt-interop.apps.ros2.cloud9.ibm.com"
+    name: network1
+    storageClass: nfs-storage
+    postgres:
+      expose: true
+      pvc: true
+      admin:
+        user: "pgadmin"
+        password: "pgadminpw"
+        db: "default"
+      storage: "500Mi"
+
+  cluster: Kubernetes
+  postgresdb:
+    securityContext:
+      enabled: true
+      runAsUser: 1001
+
+  images:
+    postgres:
+      name: docker.io/bitnami/postgresql
+      version: 11.7.0-debian-10-r26

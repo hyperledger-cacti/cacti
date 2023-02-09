@@ -1,0 +1,13 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+---
+helm:
+  version: "v2.14.1"
+  os: "darwin"   # use "darwin" for MacOS X, "windows" for Windows, "linux" for Linux
+  arch: "amd64" # other possible values: "386","arm64","arm","ppc64le","s390x"
+  bin_directory: "~/bin/helm"
+  checksum: ""

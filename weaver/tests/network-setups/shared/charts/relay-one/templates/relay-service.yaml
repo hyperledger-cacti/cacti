@@ -1,0 +1,25 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+{{- $relayName := printf "%s-%s" $.Values.relay.name $.Values.network.name -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $relayName }}
+  namespace: {{ $.Values.deployment.namespace | default "default" }}
+  labels:
+    app.kubernetes.io/component: "Relay"
+{{ include "relay-server.labels" $ | indent 4 }}
+spec:
+  type: NodePort
+  selector:
+    name: {{ $relayName }}
+  ports:
+  - protocol: TCP
+    port: {{ $.Values.relay.port }}
+    targetPort: {{ $.Values.relay.port }}
+    nodePort: {{ $.Values.relay.nodeport }}
+    name: grpc

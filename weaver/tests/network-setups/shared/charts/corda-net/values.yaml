@@ -1,0 +1,31 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+network:
+  domain:
+    local: "dlt-interop.svc.cluster.local"
+    cluster: "dlt-interop.apps.ros2.cloud9.ibm.com"
+  name: corda-net1
+  simpleAppVersion: 0.4
+  interopAppVersion: 0.6
+  storageClass: nfs-storage
+  image:
+    name: corda/corda-zulu-java1.8-4.4
+
+cli:
+  image:
+    repository: res-dlt-interop-docker-local.artifactory.swg-devops.com
+    pullPolicy: Always
+    pullSecrets: interop-artifactory
+    name: dlt-interop/corda-cli
+    tag: latest
+
+build:
+  image:
+    name: gradle
+    tag: 5.6.0-jdk8
+    # name: openjdk
+    # tag: 8-jdk-alpine

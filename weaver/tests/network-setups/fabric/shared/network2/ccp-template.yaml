@@ -1,0 +1,61 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+---
+name: test-network2-org${ORG}
+version: 1.0.0
+client:
+  organization: Org${ORG}
+  connection:
+    timeout:
+      peer:
+        endorser: '300'
+organizations:
+  Org${ORG}:
+    mspid: Org${ORG}MSP
+    cryptoPath: users/{username}@org${ORG}.network2.com/msp
+    peers:
+    - peer0.org${ORG}.network2.com
+    certificateAuthorities:
+    - ca.org${ORG}.network2.com
+channels:
+  mychannel:
+    orderers:
+      - orderer.network2.com
+    peers:
+      peer0.org${ORG}.network2.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+orderers:
+  orderer.network2.com:
+    url: grpcs://localhost:${ORDERER_PORT}
+    tlsCACerts:
+      pem: |
+        ${ORDERER_PEM}
+    grpcOptions:
+      ssl-target-name-override: orderer.network2.com
+      hostnameOverride: orderer.network2.com
+peers:
+  peer0.org${ORG}.network2.com:
+    url: grpcs://localhost:${P0PORT}
+    tlsCACerts:
+      pem: |
+        ${PEERPEM}
+    grpcOptions:
+      ssl-target-name-override: peer0.org${ORG}.network2.com
+      hostnameOverride: peer0.org${ORG}.network2.com
+certificateAuthorities:
+  ca.org${ORG}.network2.com:
+    url: https://localhost:${CAPORT}
+    caName: ca-org${ORG}
+    tlsCACerts:
+      pem:
+        - |
+          ${CAPEM}
+    httpOptions:
+      verify: false

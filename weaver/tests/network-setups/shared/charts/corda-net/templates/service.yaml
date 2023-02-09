@@ -1,0 +1,49 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+{{- $notaryHost := printf "%s-notary" $.Values.network.name -}}
+{{- $partyaHost := printf "%s-partya" $.Values.network.name -}}
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $notaryHost }}
+  labels:
+    {{- include "corda-net.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: 10003
+      targetPort: 10003
+      protocol: TCP
+      name: port1
+    - port: 22022
+      targetPort: 22022
+      protocol: TCP
+      name: port2
+  selector:
+    name: {{ $notaryHost }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $partyaHost }}
+  labels:
+    {{- include "corda-net.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: 10003
+      targetPort: 10003
+      protocol: TCP
+      name: port1
+    - port: 22022
+      targetPort: 22022
+      protocol: TCP
+      name: port2
+  selector:
+    name: {{ $partyaHost }}
+---

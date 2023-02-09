@@ -1,0 +1,28 @@
+# Git databases, we don't need these because we
+# are only interested into the version that is
+# currently checked out.
+#
+.git
+.gitignore
+protos/.git
+
+# Build folders and build files, these are not
+# needed either.
+#
+target
+Dockerfile
+Dockerfile.server
+Dockerfile.client
+Dockerfile.driver
+Makefile
+
+# Documentation we don't need to have this stuff
+# in an docker image.
+assets
+*.md
+
+# Configuration that is going to be externalised
+# to the image, we don't need to add it there.
+config
+credentials
+

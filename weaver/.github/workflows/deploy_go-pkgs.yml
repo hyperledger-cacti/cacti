@@ -1,0 +1,364 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: CC-BY-4.0
+
+name: Deploy Go Modules
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'common/protos-go/VERSION'
+      - 'core/network/fabric-interop-cc/libs/utils/VERSION'
+      - 'core/network/fabric-interop-cc/libs/assetexchange/VERSION'
+      - 'core/network/fabric-interop-cc/interfaces/asset-mgmt/VERSION'
+      - 'core/network/fabric-interop-cc/contracts/interop/VERSION'
+      - 'sdks/fabric/go-sdk/VERSION'
+      
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  publish-protos:
+    if: github.repository_owner == 'hyperledger-labs'
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+          
+      - name: Set current date as env
+        run: echo "RELEASE_DATE=$(date +%b\ %d,\ %Y)" >> $GITHUB_ENV
+                
+      - name: Set module tag and description
+        run: |
+          echo "MODULE_TAG=common/protos-go" >> $GITHUB_ENV
+          echo "MODULE_DESC=GO Weaver Protos" >> $GITHUB_ENV
+        
+      - name: Set module version
+        run: echo "VERSION=v$(cat VERSION)" >> $GITHUB_ENV
+        working-directory: common/protos-go
+        
+      - name: Check if release already exists
+        run: (git ls-remote origin | grep "$MODULE_TAG/$VERSION" && echo "PROTOS_GO_RELEASE=false" >> $GITHUB_ENV) || echo "PROTOS_GO_RELEASE=true" >> $GITHUB_ENV
+        working-directory: common/protos-go
+            
+      - name: Create Release
+        if: ${{ env.PROTOS_GO_RELEASE == 'true' }}
+        id: protos-go-release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ env.MODULE_TAG }}/${{ env.VERSION }}
+          release_name: ${{ env.VERSION }} - ${{ env.MODULE_DESC }} - ${{ env.RELEASE_DATE }}
+          body: |
+            - Go Module: `github.com/${{ github.repository_owner }}/weaver-dlt-interoperability/${{ env.MODULE_TAG }}`
+            - Release: ${{ env.VERSION }}
+            - Readme: [Here](https://github.com/${{ github.repository_owner }}/weaver-dlt-interoperability/blob/${{ env.MODULE_TAG }}/${{ env.VERSION }}/${{ env.MODULE_TAG }}/README.md).
+            - Source: [Here](https://github.com/${{ github.repository_owner }}/weaver-dlt-interoperability/blob/${{ env.MODULE_TAG }}/${{ env.VERSION }}/${{ env.MODULE_TAG }})
+          draft: false
+          prerelease: false
+          
+      - name: Wait for release to be reflected
+        if: ${{ env.PROTOS_GO_RELEASE == 'true' }}
+        run: sleep 300
+          
+  publish-lib-utils:
+    if: ${{ always() && github.repository_owner == 'hyperledger-labs' }}
+    needs: publish-protos
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
+          
+      - name: Set current date as env
+        run: echo "RELEASE_DATE=$(date +%b\ %d,\ %Y)" >> $GITHUB_ENV
+                
+      - name: Set module tag and description
+        run: |
+          echo "MODULE_TAG=core/network/fabric-interop-cc/libs/utils" >> $GITHUB_ENV
+          echo "MODULE_DESC=GO Fabric Utils Library for Interoperation" >> $GITHUB_ENV
+        
+      - name: Set module version
+        run: echo "VERSION=v$(cat VERSION)" >> $GITHUB_ENV
+        working-directory: core/network/fabric-interop-cc/libs/utils
+        
+      - name: Build test
+        run: go build -v ./...
+        working-directory: core/network/fabric-interop-cc/libs/utils
+        
+      - name: Check if release already exists
+        run: (git ls-remote origin | grep "$MODULE_TAG/$VERSION" && echo "LIB_UTILS_RELEASE=false" >> $GITHUB_ENV) || echo "LIB_UTILS_RELEASE=true" >> $GITHUB_ENV
+        working-directory: core/network/fabric-interop-cc/libs/utils
+            
+      - name: Create Release
+        if: ${{ env.LIB_UTILS_RELEASE == 'true' }}
+        id: lib-utils-release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ env.MODULE_TAG }}/${{ env.VERSION }}
+          release_name: ${{ env.VERSION }} - ${{ env.MODULE_DESC }} - ${{ env.RELEASE_DATE }}
+          body: |
+            - Go Module: `github.com/${{ github.repository_owner }}/weaver-dlt-interoperability/${{ env.MODULE_TAG }}`
+            - Release: ${{ env.VERSION }}
+            - Readme: [Here](https://github.com/${{ github.repository_owner }}/weaver-dlt-interoperability/blob/${{ env.MODULE_TAG }}/${{ env.VERSION }}/${{ env.MODULE_TAG }}/README.md).
+            - Source: [Here](https://github.com/${{ github.repository_owner }}/weaver-dlt-interoperability/blob/${{ env.MODULE_TAG }}/${{ env.VERSION }}/${{ env.MODULE_TAG }})
+          draft: false
+          prerelease: false    
+      
+      - name: Wait for release to be reflected
+        if: ${{ env.LIB_UTILS_RELEASE == 'true' }}
+        run: sleep 300
+
+  publish-lib-asset-exchange:
+    if: ${{ always() && github.repository_owner == 'hyperledger-labs' }}
+    needs: publish-protos
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
+          
+      - name: Set current date as env
+        run: echo "RELEASE_DATE=$(date +%b\ %d,\ %Y)" >> $GITHUB_ENV
+                
+      - name: Set module tag and description
+        run: |
+          echo "MODULE_TAG=core/network/fabric-interop-cc/libs/assetexchange" >> $GITHUB_ENV
+          echo "MODULE_DESC=GO Fabric Library for Asset Exchange" >> $GITHUB_ENV
+        
+      - name: Set module version
+        run: echo "VERSION=v$(cat VERSION)" >> $GITHUB_ENV
+        working-directory: core/network/fabric-interop-cc/libs/assetexchange
+
+      - name: Build test
+        run: go build -v ./...
+        working-directory: core/network/fabric-interop-cc/libs/assetexchange
+        
+      - name: Check if release already exists
+        run: (git ls-remote origin | grep "$MODULE_TAG/$VERSION" && echo "LIB_ASSET_EXCHANGE_RELEASE=false" >> $GITHUB_ENV) || echo "LIB_ASSET_EXCHANGE_RELEASE=true" >> $GITHUB_ENV
+        working-directory: core/network/fabric-interop-cc/libs/assetexchange
+            
+      - name: Create Release
+        if: ${{ env.LIB_ASSET_EXCHANGE_RELEASE == 'true' }}
+        id: lib-asset-exchange-release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ env.MODULE_TAG }}/${{ env.VERSION }}
+          release_name: ${{ env.VERSION }} - ${{ env.MODULE_DESC }} - ${{ env.RELEASE_DATE }}
+          body: |
+            - Go Module: `github.com/${{ github.repository_owner }}/weaver-dlt-interoperability/${{ env.MODULE_TAG }}`
+            - Release: ${{ env.VERSION }}
+            - Readme: [Here](https://github.com/${{ github.repository_owner }}/weaver-dlt-interoperability/blob/${{ env.MODULE_TAG }}/${{ env.VERSION }}/${{ env.MODULE_TAG }}/README.md).
+            - Source: [Here](https://github.com/${{ github.repository_owner }}/weaver-dlt-interoperability/blob/${{ env.MODULE_TAG }}/${{ env.VERSION }}/${{ env.MODULE_TAG }})
+          draft: false
+          prerelease: false
+                
+      - name: Wait for release to be reflected
+        if: ${{ env.LIB_ASSET_EXCHANGE_RELEASE == 'true' }}
+        run: sleep 300
+      
+  publish-interface-asset-mgmt:
+    if: ${{ always() && github.repository_owner == 'hyperledger-labs' }}
+    needs: [publish-protos]
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
+          
+      - name: Set current date as env
+        run: echo "RELEASE_DATE=$(date +%b\ %d,\ %Y)" >> $GITHUB_ENV
+                
+      - name: Set module tag and description
+        run: |
+          echo "MODULE_TAG=core/network/fabric-interop-cc/interfaces/asset-mgmt" >> $GITHUB_ENV
+          echo "MODULE_DESC=GO Fabric Asset Management Interface" >> $GITHUB_ENV
+        
+      - name: Set module version
+        run: echo "VERSION=v$(cat VERSION)" >> $GITHUB_ENV
+        working-directory: core/network/fabric-interop-cc/interfaces/asset-mgmt
+      
+      - name: Build test
+        run: go build -v ./...
+        working-directory: core/network/fabric-interop-cc/interfaces/asset-mgmt
+        
+      - name: Check if release already exists
+        run: (git ls-remote origin | grep "$MODULE_TAG/$VERSION" && echo "INTERFACE_ASSET_MGMT_RELEASE=false" >> $GITHUB_ENV) || echo "INTERFACE_ASSET_MGMT_RELEASE=true" >> $GITHUB_ENV
+        working-directory: core/network/fabric-interop-cc/interfaces/asset-mgmt
+            
+      - name: Create Release
+        if: ${{ env.INTERFACE_ASSET_MGMT_RELEASE == 'true' }}
+        id: asset-mgmt-release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ env.MODULE_TAG }}/${{ env.VERSION }}
+          release_name: ${{ env.VERSION }} - ${{ env.MODULE_DESC }} - ${{ env.RELEASE_DATE }}
+          body: |
+            - Go Module: `github.com/${{ github.repository_owner }}/weaver-dlt-interoperability/${{ env.MODULE_TAG }}`
+            - Release: ${{ env.VERSION }}
+            - Readme: [Here](https://github.com/${{ github.repository_owner }}/weaver-dlt-interoperability/blob/${{ env.MODULE_TAG }}/${{ env.VERSION }}/${{ env.MODULE_TAG }}/README.md).
+            - Source: [Here](https://github.com/${{ github.repository_owner }}/weaver-dlt-interoperability/blob/${{ env.MODULE_TAG }}/${{ env.VERSION }}/${{ env.MODULE_TAG }})
+          draft: false
+          prerelease: false
+                
+      - name: Wait for release to be reflected
+        if: ${{ env.INTERFACE_ASSET_MGMT_RELEASE == 'true' }}
+        run: sleep 300
+
+  publish-interop-cc:
+    if: ${{ always() && github.repository_owner == 'hyperledger-labs' }}
+    needs: [publish-protos, publish-lib-utils, publish-lib-asset-exchange]
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
+          
+      - name: Set current date as env
+        run: echo "RELEASE_DATE=$(date +%b\ %d,\ %Y)" >> $GITHUB_ENV
+                
+      - name: Set module tag and description
+        run: |
+          echo "MODULE_TAG=core/network/fabric-interop-cc/contracts/interop" >> $GITHUB_ENV
+          echo "MODULE_DESC=GO Fabric Interop Chaincode" >> $GITHUB_ENV
+        
+      - name: Set module version
+        run: echo "VERSION=v$(cat VERSION)" >> $GITHUB_ENV
+        working-directory: core/network/fabric-interop-cc/contracts/interop
+        
+      - name: Build test
+        run: make build
+        working-directory: core/network/fabric-interop-cc/contracts/interop
+        
+      - name: Check if release already exists
+        run: (git ls-remote origin | grep "$MODULE_TAG/$VERSION" && echo "INTEROPCC_RELEASE=false" >> $GITHUB_ENV) || echo "INTEROPCC_RELEASE=true" >> $GITHUB_ENV
+        working-directory: core/network/fabric-interop-cc/contracts/interop
+            
+      - name: Create Release
+        if: ${{ env.INTEROPCC_RELEASE == 'true' }}
+        id: interop-cc-release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ env.MODULE_TAG }}/${{ env.VERSION }}
+          release_name: ${{ env.VERSION }} - ${{ env.MODULE_DESC }} - ${{ env.RELEASE_DATE }}
+          body: |
+            - Go Module: `github.com/${{ github.repository_owner }}/weaver-dlt-interoperability/${{ env.MODULE_TAG }}`
+            - Release: ${{ env.VERSION }}
+            - Readme: [Here](https://github.com/${{ github.repository_owner }}/weaver-dlt-interoperability/blob/${{ env.MODULE_TAG }}/${{ env.VERSION }}/${{ env.MODULE_TAG }}/README.md).
+            - Source: [Here](https://github.com/${{ github.repository_owner }}/weaver-dlt-interoperability/blob/${{ env.MODULE_TAG }}/${{ env.VERSION }}/${{ env.MODULE_TAG }})
+          draft: false
+          prerelease: false
+                
+      - name: Wait for release to be reflected
+        if: ${{ env.INTEROPCC_RELEASE == 'true' }}
+        run: sleep 300
+
+  publish-go-sdk:
+    if: ${{ always() && github.repository_owner == 'hyperledger-labs' }}
+    needs: [publish-protos]
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
+          
+      - name: Set current date as env
+        run: echo "RELEASE_DATE=$(date +%b\ %d,\ %Y)" >> $GITHUB_ENV
+                
+      - name: Set module tag and description
+        run: |
+            echo "MODULE_TAG=sdks/fabric/go-sdk" >> $GITHUB_ENV
+            echo "MODULE_DESC=GO Fabric Weaver SDK" >> $GITHUB_ENV
+        
+      - name: Set module version
+        run: echo "VERSION=v$(cat VERSION)" >> $GITHUB_ENV
+        working-directory: sdks/fabric/go-sdk
+        
+      - name: Build test
+        run: go build -v ./...
+        working-directory: sdks/fabric/go-sdk
+        
+      - name: Check if release already exists
+        run: (git ls-remote origin | grep "$MODULE_TAG/$VERSION" && echo "WEAVER_FABRIC_GO_SDK=false" >> $GITHUB_ENV) || echo "WEAVER_FABRIC_GO_SDK=true" >> $GITHUB_ENV
+        working-directory: sdks/fabric/go-sdk
+            
+      - name: Create Release
+        if: ${{ env.WEAVER_FABRIC_GO_SDK == 'true' }}
+        id: go-sdk-release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ env.MODULE_TAG }}/${{ env.VERSION }}
+          release_name: ${{ env.VERSION }} - ${{ env.MODULE_DESC }} - ${{ env.RELEASE_DATE }}
+          body: |
+            - Go Module: `github.com/${{ github.repository_owner }}/weaver-dlt-interoperability/${{ env.MODULE_TAG }}`
+            - Release: ${{ env.VERSION }}
+            - Readme: [Here](https://github.com/${{ github.repository_owner }}/weaver-dlt-interoperability/blob/${{ env.MODULE_TAG }}/${{ env.VERSION }}/${{ env.MODULE_TAG }}/README.md).
+            - Source: [Here](https://github.com/${{ github.repository_owner }}/weaver-dlt-interoperability/blob/${{ env.MODULE_TAG }}/${{ env.VERSION }}/${{ env.MODULE_TAG }})
+          draft: false
+          prerelease: false
+                
+      - name: Wait for release to be reflected
+        if: ${{ env.WEAVER_FABRIC_GO_SDK == 'true' }}
+        run: sleep 300
+        
+  publish-weaver-fabric-cc-image:
+    if: ${{ always() && github.repository_owner == 'hyperledger-labs' }}
+    needs: [publish-protos, publish-lib-utils, publish-lib-asset-exchange]
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check if package already exists
+        run: (make check-if-tag-exists && echo "WEAVER_FABRIC_CC_PUSH=true" >> $GITHUB_ENV) || echo "WEAVER_FABRIC_CC_PUSH=false" >> $GITHUB_ENV
+        working-directory: core/network/fabric-interop-cc
+
+      - name: Build and Push
+        if: ${{ env.WEAVER_FABRIC_CC_PUSH == 'true' }}
+        run: make push-image
+        working-directory: core/network/fabric-interop-cc
+        
+      - name: Push latest tag
+        if: ${{ env.WEAVER_FABRIC_CC_PUSH == 'true' }}
+        run: make push-image-latest
+        working-directory: core/network/fabric-interop-cc

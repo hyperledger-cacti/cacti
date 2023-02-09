@@ -1,0 +1,16 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+{{- $fileName := printf "%s/configtx.yaml" $.Values.global.network.name -}}
+{{- $cmname := printf "%s-configtx" $.Values.global.network.name -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $cmname }}
+data:
+  configtx.yaml: |-
+{{ $.Files.Get $fileName | indent 4}}
+---

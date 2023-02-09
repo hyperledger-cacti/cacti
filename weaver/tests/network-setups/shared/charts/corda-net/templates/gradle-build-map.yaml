@@ -1,0 +1,19 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+{{- $cmName := printf "%s-gradle-build" $.Values.network.name -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $cmName }}
+data:
+  build.gradle: |-
+{{ .Files.Get "corda-gradle/build.gradle" | indent 4}}
+  gradle.properties: |-
+{{ .Files.Get "corda-gradle/gradle.properties" | indent 4}}
+  constants.properties: |-
+{{ .Files.Get "corda-gradle/constants.properties" | indent 4}}
+---

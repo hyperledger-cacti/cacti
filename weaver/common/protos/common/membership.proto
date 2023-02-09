@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package common.membership;
+
+option java_package = "com.weaver.protos.common.membership";
+option go_package = "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common";
+
+// Membership captures the members of an external entity such as a thing,
+// person, organization or groups of entities such as networks
+message Membership {
+  string securityDomain = 1;
+  map<string, Member> members = 2;
+}
+
+// Member of a security group is represented by a set of public keys,
+// certificates or certificate authorities
+message Member {
+  string value = 1;
+  string type = 2;
+  repeated string chain = 3;
+}

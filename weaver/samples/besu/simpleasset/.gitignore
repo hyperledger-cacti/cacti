@@ -1,0 +1,6 @@
+build
+node_modules
+contracts/manageAssetAny.sol
+contracts/transferInterface.sol
+contracts/asset_locks.proto.sol
+package-lock.json

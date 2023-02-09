@@ -1,0 +1,20 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: ord0-orderers-network1
+  labels:
+    run: ord0-orderers-network1
+spec:
+  type: ClusterIP
+  selector:
+    name: ord0-orderers-network1
+  ports:
+  - protocol: TCP
+    port: 7050
+    name: grpc
