@@ -1,0 +1,193 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+{{- $volumeClaimName := printf "%s-crypto" $.Values.global.network.name -}}
+{{- range $.Values.global.network.orgs }}
+{{- $orgName := .name -}}
+{{- $jobName := printf "gen-crypto-%s-%s" $orgName $.Values.global.network.name -}}
+{{- $caName := printf "ca-%s-%s" $orgName $.Values.global.network.name -}}
+{{- range .peers }}
+{{- $peerName := printf "%s-%s-%s" .name $orgName $.Values.global.network.name -}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ $jobName }}
+spec:
+  template:
+    spec:
+      volumes:
+        - name: volume1
+          persistentVolumeClaim:
+            claimName: {{ $volumeClaimName }}
+      containers:
+      - name: gen-crypto-org
+        image: {{ printf "%s:%s" $.Values.global.images.ca.name $.Values.global.images.ca.version}}
+        env:
+          - name: DOMAIN
+            value: {{ $orgName }}
+          - name: NODE_NAME
+            value: {{ .name }}
+          - name: NODE_HOSTNAME
+            value: {{ $peerName }}
+          - name: CA_NAME
+            value: {{ $caName }}
+          - name: CA_URL
+            value: {{ printf "%s:7054" $caName }}
+          - name: CA_CERT_FILE
+            value: {{ printf "%s-7054-%s.pem" $caName $caName }}
+          - name: FABRIC_CA_CLIENT_HOME
+            value: {{ printf "/var/pvc1/peerOrganizations/%s" $orgName }}
+          - name: TLS_CACERT_PATH
+            value: {{ printf "/var/pvc1/fabric-ca/%s/tls-cert.pem" $orgName }}
+        volumeMounts:
+          - name: volume1
+            mountPath: /var/pvc1
+        command: ["/bin/sh",  "-c"]
+        args: ['echo;
+                res=1;
+                while [ $res -ne 0 ]; do
+                  set -x;
+                  nc -zv -w60 $CA_NAME 7054;
+                	res=$?;
+                  set +x;
+                  sleep 5;
+                done;
+                echo "CA Server: $CA_NAME:7054 Up.";
+                sleep 5;
+
+                echo "Enroll the CA admin";
+                echo;
+                mkdir -p ${FABRIC_CA_CLIENT_HOME};
+
+                export FABRIC_CA_CLIENT_HOME=${FABRIC_CA_CLIENT_HOME}/;
+
+                set -x;
+                fabric-ca-client enroll -u https://admin:adminpw@${CA_URL} --caname ${CA_NAME} --tls.certfiles ${TLS_CACERT_PATH};
+                res=$?;
+                set +x;
+                if [ $res -ne 0 ]; then
+                  echo "Failed to enroll admin...";
+                  exit 1;
+                fi;
+
+                echo "NodeOUs:\n  Enable: true\n  ClientOUIdentifier:\n    Certificate: cacerts/${CA_CERT_FILE}\n    OrganizationalUnitIdentifier: client\n  PeerOUIdentifier:\n    Certificate: cacerts/${CA_CERT_FILE}\n    OrganizationalUnitIdentifier: peer\n  AdminOUIdentifier:\n    Certificate: cacerts/${CA_CERT_FILE}\n    OrganizationalUnitIdentifier: admin\n  OrdererOUIdentifier:\n    Certificate: cacerts/${CA_CERT_FILE}\n    OrganizationalUnitIdentifier: orderer" > ${FABRIC_CA_CLIENT_HOME}/msp/config.yaml;
+
+                echo;
+                echo "Register ${NODE_NAME}";
+                echo;
+                set -x;
+                fabric-ca-client register --caname ${CA_NAME} --id.name ${NODE_NAME} --id.secret ${NODE_NAME}pw --id.type peer --tls.certfiles ${TLS_CACERT_PATH};
+                res=$?;
+                set +x;
+                if [ $res -ne 0 ]; then
+                  echo "Failed to register ${NODE_NAME}...";
+                  exit 1;
+                fi;
+
+                echo;
+                echo "Register user";
+                echo;
+                set -x;
+                fabric-ca-client register --caname ${CA_NAME} --id.name user1 --id.secret user1pw --id.type client --tls.certfiles ${TLS_CACERT_PATH};
+                res=$?;
+                set +x;
+                if [ $res -ne 0 ]; then
+                  echo "Failed to register user1...";
+                  exit 1;
+                fi;
+
+                echo;
+                echo "Register the org admin";
+                echo;
+                set -x;
+                fabric-ca-client register --caname ${CA_NAME} --id.name ${DOMAIN}admin --id.secret ${DOMAIN}adminpw --id.type admin --tls.certfiles ${TLS_CACERT_PATH};
+                res=$?;
+                set +x;
+                if [ $res -ne 0 ]; then
+                  echo "Failed to register ${DOMAIN}admin...";
+                  exit 1;
+                fi;
+
+                mkdir -p ${FABRIC_CA_CLIENT_HOME}/peers;
+                mkdir -p ${FABRIC_CA_CLIENT_HOME}/peers/${NODE_HOSTNAME};
+
+                echo;
+                echo "## Generate the ${NODE_NAME} msp";
+                echo;
+                set -x;
+                fabric-ca-client enroll -u https://${NODE_NAME}:${NODE_NAME}pw@${CA_URL} --caname ${CA_NAME} -M ${FABRIC_CA_CLIENT_HOME}/peers/${NODE_HOSTNAME}/msp --csr.hosts ${NODE_HOSTNAME} --tls.certfiles ${TLS_CACERT_PATH};
+                res=$?;
+                set +x;
+                if [ $res -ne 0 ]; then
+                  echo "Failed to enroll ${NODE_NAME}...";
+                  exit 1;
+                fi;
+
+                cp ${FABRIC_CA_CLIENT_HOME}/msp/config.yaml ${FABRIC_CA_CLIENT_HOME}/peers/${NODE_HOSTNAME}/msp/config.yaml;
+
+                echo;
+                echo "## Generate the ${NODE_NAME}-tls certificates";
+                echo;
+                set -x;
+                fabric-ca-client enroll -u https://${NODE_NAME}:${NODE_NAME}pw@${CA_URL} --caname ${CA_NAME} -M ${FABRIC_CA_CLIENT_HOME}/peers/${NODE_HOSTNAME}/tls --enrollment.profile tls --csr.hosts ${NODE_HOSTNAME} --csr.hosts localhost --tls.certfiles ${TLS_CACERT_PATH};
+                res=$?;
+                set +x;
+                if [ $res -ne 0 ]; then
+                  echo "Failed to enroll ${NODE_NAME}...";
+                  exit 1;
+                fi;
+
+
+                cp ${FABRIC_CA_CLIENT_HOME}/peers/${NODE_HOSTNAME}/tls/tlscacerts/* ${FABRIC_CA_CLIENT_HOME}/peers/${NODE_HOSTNAME}/tls/ca.crt;
+                cp ${FABRIC_CA_CLIENT_HOME}/peers/${NODE_HOSTNAME}/tls/signcerts/* ${FABRIC_CA_CLIENT_HOME}/peers/${NODE_HOSTNAME}/tls/server.crt;
+                cp ${FABRIC_CA_CLIENT_HOME}/peers/${NODE_HOSTNAME}/tls/keystore/* ${FABRIC_CA_CLIENT_HOME}/peers/${NODE_HOSTNAME}/tls/server.key;
+
+                mkdir -p ${FABRIC_CA_CLIENT_HOME}/msp/tlscacerts;
+                cp ${FABRIC_CA_CLIENT_HOME}/peers/${NODE_HOSTNAME}/tls/tlscacerts/* ${FABRIC_CA_CLIENT_HOME}/msp/tlscacerts/ca.crt;
+
+                mkdir -p ${FABRIC_CA_CLIENT_HOME}/tlsca;
+                cp ${FABRIC_CA_CLIENT_HOME}/peers/${NODE_HOSTNAME}/tls/tlscacerts/* ${FABRIC_CA_CLIENT_HOME}/tlsca/tlsca.${DOMAIN}-cert.pem;
+
+                mkdir -p ${FABRIC_CA_CLIENT_HOME}/ca;
+                cp ${FABRIC_CA_CLIENT_HOME}/peers/${NODE_HOSTNAME}/msp/cacerts/* ${FABRIC_CA_CLIENT_HOME}/ca/ca.${DOMAIN}-cert.pem;
+
+                mkdir -p ${FABRIC_CA_CLIENT_HOME}/users;
+                mkdir -p ${FABRIC_CA_CLIENT_HOME}/users/User1@${DOMAIN};
+
+                echo;
+                echo "## Generate the user msp";
+                echo;
+                set -x;
+                fabric-ca-client enroll -u https://user1:user1pw@${CA_URL} --caname ${CA_NAME} -M ${FABRIC_CA_CLIENT_HOME}/users/User1@${DOMAIN}/msp --tls.certfiles ${TLS_CACERT_PATH};
+                res=$?;
+                set +x;
+                if [ $res -ne 0 ]; then
+                  echo "Failed to enroll user1...";
+                  exit 1;
+                fi;
+
+                cp ${FABRIC_CA_CLIENT_HOME}/msp/config.yaml ${FABRIC_CA_CLIENT_HOME}/users/User1@${DOMAIN}/msp/config.yaml;
+
+                mkdir -p ${FABRIC_CA_CLIENT_HOME}/users/Admin@${DOMAIN};
+
+                echo;
+                echo "## Generate the org admin msp";
+                echo;
+                set -x;
+                fabric-ca-client enroll -u https://${DOMAIN}admin:${DOMAIN}adminpw@${CA_URL} --caname ${CA_NAME} -M ${FABRIC_CA_CLIENT_HOME}/users/Admin@${DOMAIN}/msp --tls.certfiles ${TLS_CACERT_PATH};
+                res=$?;
+                set +x;
+                if [ $res -ne 0 ]; then
+                  echo "Failed to enroll ${DOMAIN}Admin...";
+                  exit 1;
+                fi;
+
+                cp ${FABRIC_CA_CLIENT_HOME}/msp/config.yaml ${FABRIC_CA_CLIENT_HOME}/users/Admin@${DOMAIN}/msp/config.yaml;']
+      restartPolicy: Never
+  backoffLimit: 0
+---
+{{ end -}}
+{{ end -}}

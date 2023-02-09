@@ -1,0 +1,116 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+{{- $volumeClaimName := printf "%s-secrets" $.Values.network.name -}}
+{{- $ccImage := printf "%s/%s:%s" $.Values.network.chaincode.imageRegistry $.Values.network.chaincode.imageName $.Values.network.chaincode.imageTag -}}
+{{- range $.Values.network.orgs }}
+{{- $orgName := .name -}}
+{{- $orgMSP := .msp -}}
+{{- range .peers }}
+{{- $peerName := printf "%s-%s-%s" .name  $orgName  $.Values.network.name -}}
+{{- $peerAddress := printf "%s:%s" $peerName .port -}}
+{{- $deployccName := printf "%s-%s" $.Values.network.chaincode.name $peerName -}}
+
+#---------------- Chaincode Deployment ---------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $deployccName }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: {{ $deployccName }}
+  template:
+    metadata:
+      labels:
+        name: {{ $deployccName }}
+        app: {{ $deployccName }}
+    spec:
+      volumes:
+        - name: pvc1
+          persistentVolumeClaim:
+            claimName: {{ $volumeClaimName }}
+        - name: cc-scripts
+          configMap:
+            name: cc-scripts
+      containers:
+        - image: {{ $ccImage }}
+          name: chaincode
+          imagePullPolicy: IfNotPresent
+          command: ["sh", "-c"]
+          args: ['set -a;
+                  . /var/env/pkgid;
+                  set +a;
+                  echo $CHAINCODE_CCID;
+                  ./$CC_NAME']
+          env:
+            - name: CC_NAME
+              value: {{ $.Values.network.chaincode.name }}
+            - name: EXTERNAL_SERVICE
+              value: "true"
+            - name: CHAINCODE_ADDRESS
+              value: "0.0.0.0:7052"
+          ports:
+            - containerPort: 7052
+          volumeMounts:
+            - name: pvc1
+              subPath: {{ printf "chaincodes/%s" $deployccName }}
+              mountPath: /var/env
+      initContainers:
+      - name: cc-install
+        image: hyperledger/fabric-tools:2.1
+        env:
+          - name: ARTIFACTORY_URL
+            value: {{ $.Values.network.artifactory.url }}
+          - name: ARTIFACTORY_APIKEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ $.Values.network.artifactory.secret }}
+                key: {{ $.Values.network.artifactory.secretKey }}
+          - name: CC_PATH
+            value: {{ $.Values.network.artifactory.path }}
+          - name: CC_NAME
+            value: {{ $.Values.network.chaincode.name }}
+          - name: CC_VERSION
+            value: "{{ $.Values.network.chaincode.version }}"
+          - name: CC_LANGUAGE
+            value: {{ $.Values.network.chaincode.lang }}
+          - name: ORG
+            value: {{ $orgName }}
+          - name: CORE_PEER_LOCALMSPID
+            value: {{ $orgMSP }}
+          - name: CORE_PEER_TLS_ROOTCERT_FILE
+            value: {{ printf "/var/pvc1/%s" .tlsRootCertPath }}
+          - name: CORE_PEER_MSPCONFIGPATH
+            value: {{ printf "/var/pvc1/%s" .mspConfigPath }}
+          - name: CORE_PEER_ADDRESS
+            value: {{ $peerAddress }}
+          - name: CORE_PEER_TLS_ENABLED
+            value: "true"
+          - name: ORDERER_NAME
+            value: {{ $.Values.network.orderer.name }}
+          - name: ORDERER_URL
+            value: {{ $.Values.network.orderer.url }}
+          - name: ORDERER_CA
+            value: {{ printf "/var/pvc1/%s" $.Values.network.orderer.cacert }}
+          - name: CHANNEL_NAME
+            value: {{ $.Values.network.channelName }}
+          - name: NW_NAME
+            value: {{ $.Values.network.name }}
+          - name: DEPLOYCC_NAME
+            value: {{ $deployccName }}
+        volumeMounts:
+          - name: pvc1
+            mountPath: /var/pvc1
+          - name: cc-scripts
+            mountPath: /var/cc-scripts
+        command: ["/bin/sh",  "-c"]
+        args: ["bash /var/cc-scripts/installCC.sh"]
+
+---
+{{- end }}
+{{- end }}

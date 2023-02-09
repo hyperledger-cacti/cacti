@@ -1,0 +1,2 @@
+@hyperledger-labs:registry=https://npm.pkg.github.com/hyperledger-labs
+//npm.pkg.github.com/:_authToken=<personal-access-token>

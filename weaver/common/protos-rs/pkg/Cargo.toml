@@ -1,0 +1,24 @@
+[package]
+name = "weaver_protos_rs"
+version = "1.5.4"
+authors = ["Peter Somogyvari  <peter.somogyvari@accenture.com>", "Sandeep Nishad <sandeep.nishad1@ibm.com"]
+edition = "2018"
+license = "Apache-2.0"
+description = "Rust compiled Weaver protobuf package"
+documentation = "https://github.com/hyperledger-labs/weaver-dlt-interoperability/tree/main/rfcs/formats"
+repository = "https://github.com/hyperledger-labs/weaver-dlt-interoperability/"
+readme = "README.md"
+keywords = ["weaver", "interoperability", "protobuf", "protos"]
+
+[lib]
+name = "weaverpb"
+path = "src/lib.rs"
+
+[dependencies]
+tonic = {version="0.2",  features = ["tls"]}
+prost = "0.6"
+tokio = { version = "0.2", features = ["macros", "fs"] }
+serde = {version="1.0.110", features = ["derive"]}
+
+[build-dependencies]
+tonic-build = "0.2"

@@ -1,0 +1,140 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+# This section provides information about the network that is being
+# proxied by the relay. At present time we only require to know the
+# network name.
+#
+# NOTE: this setting WILL ONLY take effect if a server configuration
+#       is not supplied to the relay. Otherwise, they will be overridden
+#       by the values in the actual configuration file.
+#
+network:
+  name: network1
+  type: Fabric
+  domain:
+    local: "dlt-interop.svc.cluster.local"
+    cluster: "apps.ros2.cloud9.ibm.com"
+
+driver:
+  name: fabric-driver
+  port: "9090"
+  org: org1
+  affiliation: org1.department1
+  mspId: Org1MSP
+  configmap: true
+
+# This section provides information about the server. More specifically
+# the name of the relay, its hostname, which is of use to create the
+# service name and the port the relay is going to listen to.
+#
+# NOTE: this setting WILL ONLY take effect if there is no server configuration
+#       supplied to the container. In that case corresponding values stored
+#       in the configuration file will override these settings.
+#
+#       In the specific case where a concrete configuration is supplied the
+#       the values for the host and the port MUST match the values entered
+#       here, because these values are used to create the service instance
+#       that exposes the relay deployment.
+#
+
+relay:
+  name: relay
+  port: "9080"
+  nodeport: "30080"
+  expose: false
+
+  # This section provides a way to customise the relay server with
+  # additional environment variables that can be used to specialise
+  # the server configuration file if a specific file is used.
+  environment: {}
+  # Uncomment this entry if you want to enable the debug mode of the
+  # relay. This is also an example of how to add additional parameters
+  # that you would like to use to configure the relay.
+  #
+  # NOTE: If these are variable referenced in the server configuration
+  #       template file they will only take effect if a server configuration
+  #       is not supplied.
+  #
+  # - name: DEBUG
+  #   value: "true"
+
+  # This section determines how the relay get to discover all the
+  # other components required for its operation. At present time
+  # these are the associated driver and the remote relays.
+  #
+  discovery:
+    # This section specifies the details of the associated driver the server
+    # is going to work with. We need the information about the name, host,
+    # and port of the driver. These details are exposed through environment
+    # variables and then injected in the relay configuration, via specialisation
+    # of the server configuration template.
+    #
+    # NOTE: these settings WILL NOT TAKE EFFECT if a specific configuration file
+    #       is being supplied.
+    driver:
+      name: fabric-driver
+      host: localhost
+      port: "9090"
+    # This section specifies the relay entries that are known to the relay server.
+    # These are currently added to the configuration file of the server, by creating
+    # a file that is named dns[..].group under the path specified by configuration.relaysPath.
+    relays:
+      # This property specifies a local set of DNS entries that are added to the
+      # relay server configuration file. In ther future other modes may be used.
+      # The system allows for allowing multiple DNS sets to be added to the
+      # configuration server which can be added as distinct files. The name of the
+      # name of the group determines the name of the file that is being created.
+      dns:
+        # This is the default group, which will generate a default.toml file, with
+        # a relay entry for each item in the entries array.
+        - group: default
+          entries:
+            - name: relay-network1
+              host: relay-network1.dlt-interop.apps.ros2.sl.cloud9.ibm.com
+              port: "30080"
+            - name: relay-network2
+              host: relay-network2.ris3-int-dal12-ocp-9ca4d14d48413d18ce61b80811ba4308-0000.us-south.containers.appdomain.cloud
+              port: "30080"
+
+  # This section provides information about the configuration settings
+  # that are used to control the overall behaviour of the relay. We
+  # configure here the location of server configuration file and the
+  # configuration template file.
+  #
+  configuration:
+    # This is the path to the file that represents the server configuration.
+    # The assigned value is the default value and does not need to be specified.
+    # If this file exists it will be used as it is in combination with the
+    # various remote relays that are provided in the discovery section.
+    path: /opt/relay/config/server.toml
+    # This is the path to the server configuration file template. The default
+    # value for the environment variable is shown. This file is used to generate
+    # the configuration at runtime based on the environment variables supplied
+    # to the relay server and it is only used if a specific configuration file
+    # is not used.
+    #
+    templatePath: /opt/relay/config/server.template.toml
+    # This is the path to the directory that stores all the configuration about
+    # the various relays that are known to the relay server. By default all the
+    # file with .toml extensions will be loaded in and added to the server
+    # configuration file.
+    #
+    relaysPath: /opt/relay/config/relays
+
+
+# Additional information about the deployment of the server
+# such as the image being used, the number of replicas and
+# the target namespace.
+deployment:
+  relayImage: dlt-interop/relay-server:latest
+  fabricDriverImage: dlt-interop/fabric-driver:latest
+  cordaDriverImage: dlt-interop/corda-driver:latest
+  imagePullPolicy: Always
+  namespace: dlt-interop
+  replicas: 1
+  imageRegistry: res-dlt-interop-docker-local.artifactory.swg-devops.com
+  imagePullSecrets: interop-artifactory

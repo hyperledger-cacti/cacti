@@ -1,0 +1,5 @@
+fingerprint.json
+/target
+protos-rs
+/db
+.env

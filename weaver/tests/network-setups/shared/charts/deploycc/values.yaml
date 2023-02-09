@@ -1,0 +1,43 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+global:
+  network:
+    domain:
+      local: "dlt-interop.svc.cluster.local"
+      cluster: "dlt-interop.apps.ros2.cloud9.ibm.com"
+    name: network1
+    orgList: "org1"
+    orgMSPList: "Org1MSP"
+    orgs:
+    - name: org1
+      mspId: Org1MSP
+      peers:
+      - name: peer0
+
+docker:
+  imageRegistry: res-dlt-interop-docker-local.artifactory.swg-devops.com
+  imagePullSecrets: interop-artifactory
+
+artifactory:
+  url: https://na.artifactory.swg-devops.com/artifactory
+  secret: artifactory-apikey
+  secretKey: apikey
+
+chaincodes:
+  - name: sacc
+    channelName: mychannel
+    ordererName: ord0
+    version: v1.0
+    lang: golang
+    imageName: dlt-interop/chaincodes/sacc
+    imageTag: "2.0"
+    artifactoryPath: res-dlt-interop-generic-local/fabric-test-environment/sacc.zip
+    initFn: ""
+    initArgs: '"a","10"'
+    endorsementPolicy: NA
+    collConfig: NA
+    sequence: 1

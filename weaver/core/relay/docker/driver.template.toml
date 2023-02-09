@@ -1,0 +1,29 @@
+# This section provides information about the
+# the relay server that the dummy driver should
+# connect to.
+#
+name="${RELAY_NAME}"
+hostname="${RELAY_HOST}"
+port="${RELAY_PORT}"
+cert_path="${RELAY_TLS_CERT_PATH}"
+key_path="${RELAY_TLS_KEY_PATH}"
+tls="${RELAY_TLS}"
+
+
+# This section contains information about the
+# network that is being exposed by the relay.
+# The information is essentially metadata.
+#
+[networks]
+[networks.${NETWORK_NAME}]
+network="${NETWORK_NAME}"
+
+# This section provides information associated
+# to the dummy driver.
+#
+[drivers]
+[drivers.Dummy]
+hostname="${DRIVER_HOST}"
+port="${DRIVER_PORT}"
+tls="${DRIVER_TLS}"
+tlsca_cert_path="${DRIVER_TLSCA_CERT_PATH}"

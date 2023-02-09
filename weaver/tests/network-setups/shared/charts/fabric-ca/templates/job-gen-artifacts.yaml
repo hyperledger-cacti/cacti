@@ -1,0 +1,75 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+{{- $volumeClaimName := printf "%s-crypto" $.Values.global.network.name -}}
+{{- $configMapName := printf "%s-configtx" $.Values.global.network.name -}}
+{{- range $.Values.global.network.channels }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: gen-artifacts-{{ $.Values.global.network.name }}
+spec:
+  template:
+    spec:
+      volumes:
+        - name: volume1
+          persistentVolumeClaim:
+            claimName: {{ $volumeClaimName }}
+        - name: configtx
+          configMap:
+            name: {{ $configMapName }}
+      containers:
+      - name: gen-artifacts
+        image: {{ printf "%s:%s" $.Values.global.images.fabricTools.name $.Values.global.images.fabricTools.version }}
+        env:
+          - name: CHANNEL_NAME
+            value: {{ .name }}
+          - name: ORGMSPS
+            value: "{{ $.Values.global.network.orgMSPList }}"
+          - name: CHANNEL_PROFILE
+            value: {{ .profile }}
+          - name: FABRIC_CFG_PATH
+            value: /var/pvc1
+        volumeMounts:
+          - name: volume1
+            mountPath: /var/pvc1
+          - name: configtx
+            mountPath: /var/fabric_cfg
+        command: ["/bin/sh",  "-c"]
+        args: ['mkdir -p /var/pvc1/channel-artifacts;
+                cp /var/fabric_cfg/configtx.yaml /var/pvc1/;
+
+                while [ ! -d "/var/pvc1/peerOrganizations/org1/msp/cacerts" ]; do
+                  sleep 5;
+                done;
+                sleep 5;
+
+                echo "Generating channel-artifacts";
+                set -x;
+                configtxgen -profile ${CHANNEL_PROFILE} -outputCreateChannelTx /var/pvc1/channel-artifacts/${CHANNEL_NAME}.tx -channelID $CHANNEL_NAME;
+                res=$?;
+                set +x;
+                if [ $res -ne 0 ]; then
+                  echo "Failed to generate channel configuration transaction...";
+                  exit 1;
+                fi;
+
+                for orgmsp in $ORGMSPS; do
+                  echo "#######    Generating anchor peer update for ${orgmsp}  ##########";
+                  set -x;
+                  configtxgen -profile ${CHANNEL_PROFILE} -outputAnchorPeersUpdate /var/pvc1/channel-artifacts/${orgmsp}anchors.tx -channelID $CHANNEL_NAME -asOrg ${orgmsp};
+                  res=$?;
+                  set +x;
+                  if [ $res -ne 0 ]; then
+                    echo "Failed to generate anchor peer update for ${orgmsp}...";
+                    exit 1;
+                  fi;
+                  echo;
+                done;']
+      restartPolicy: Never
+  backoffLimit: 4
+---
+{{ end -}}

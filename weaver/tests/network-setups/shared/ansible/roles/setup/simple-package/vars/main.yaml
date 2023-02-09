@@ -1,0 +1,18 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+# This file contains the variables that are derived from the current configuration
+# parameters of the task and the defaults set in ../defaults/main.yaml. These are
+# essentially short-hands for file system locations that are internally managed by
+# the package to perform downloads, archive decompression, and installation.
+#
+package_cache_key: "{{ package.url | hash('md5') }}"
+package_cache_directory: "{{ simple_package_cache_path }}{{ package_cache_key }}/"
+package_cache_metadata_path: "{{ package_cache_directory }}{{ simple_package_metadata_file }}"
+package_cache_unpack_directory: "{{ package_cache_directory }}{{ simple_package_unpack_directory }}"
+package_cache_unpack_path: "{{ package_cache_unpack_directory }}{{ package.archive_path | default('') }}"
+package_cache_download_directory: "{{ package_cache_directory }}{{ simple_package_download_directory }}"
+package_cache_download_file: "{{ package_cache_download_directory }}{{ package.url | basename }}"

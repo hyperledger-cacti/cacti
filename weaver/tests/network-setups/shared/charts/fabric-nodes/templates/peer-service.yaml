@@ -1,0 +1,35 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+{{- range $.Values.global.network.orgs }}
+{{- $orgName := .name -}}
+{{- range .peers }}
+{{- $peerName := printf "%s-%s-%s" .name  $orgName  $.Values.global.network.name -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $peerName }}
+  labels:
+    run: {{ $peerName }}
+    app.kubernetes.io/component: "Peer"
+{{ include "fabric-network.labels" $ | indent 4 }}
+spec:
+  type: ClusterIP
+  selector:
+    name: {{ $peerName }}
+  ports:
+  - protocol: TCP
+    port: 7051
+    name: grpc
+  - protocol: TCP
+    port: 7053
+    name: events
+  - protocol: TCP
+    port: 5984
+    name: couchdb
+---
+{{- end }}
+{{- end }}

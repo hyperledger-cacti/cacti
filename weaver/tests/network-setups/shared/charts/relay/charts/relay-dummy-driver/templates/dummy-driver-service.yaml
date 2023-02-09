@@ -1,0 +1,23 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $.Values.driver.host }}
+  namespace: {{ $.Values.deployment.namespace | default "default" }}
+  labels:
+    relay/dlt-interop.org/name: {{ $.Values.driver.name }}
+    app.kubernetes.io/component: "Relay Dummy Driver"
+{{ include "relay-dummy-driver.labels" $ | indent 4 }}
+spec:
+  type: ClusterIP
+  selector:
+    name: {{ $.Values.driver.name }}
+  ports:
+  - protocol: TCP
+    port: {{ $.Values.driver.port }}
+    name: grpc

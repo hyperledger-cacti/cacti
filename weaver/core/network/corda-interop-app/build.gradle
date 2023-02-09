@@ -1,0 +1,151 @@
+buildscript {
+    Properties constants = new Properties()
+    file("$projectDir/./constants.properties").withInputStream { constants.load(it) }
+
+    ext {
+        corda_release_group = constants.getProperty("cordaReleaseGroup")
+        corda_core_release_group =  constants.getProperty("cordaCoreReleaseGroup")
+        corda_release_version = constants.getProperty("cordaVersion")
+        corda_core_release_version = constants.getProperty("cordaCoreVersion")
+        corda_gradle_plugins_version = constants.getProperty("gradlePluginsVersion")
+        kotlin_version = constants.getProperty("kotlinVersion")
+        junit_version = constants.getProperty("junitVersion")
+        log4j_version = constants.getProperty("log4jVersion")
+        slf4j_version = constants.getProperty("slf4jVersion")
+        corda_platform_version = constants.getProperty("platformVersion").toInteger()
+        arrow_version = constants.getProperty("arrowVersion")
+        weaver_version = constants.getProperty("weaverVersion")
+        github_username = ""
+        github_password = ""
+        github_url = ""
+    }
+    if (file("$projectDir/./github.properties").exists()) {
+        Properties githubConsts = new Properties()
+        file("$projectDir/./github.properties").withInputStream { githubConsts.load(it) }
+        ext {
+            github_username = githubConsts.getProperty("username")
+            github_password = githubConsts.getProperty("password")
+            github_url = githubConsts.getProperty("url")
+        }
+    }
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven { url 'https://repo1.maven.org/maven2' }
+        maven { url 'https://ci-artifactory.corda.r3cev.com/artifactory/corda-releases' }
+    }
+
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+        classpath "net.corda.plugins:cordapp:$corda_gradle_plugins_version"
+        classpath "net.corda.plugins:cordformation:$corda_gradle_plugins_version"
+        classpath "net.corda.plugins:quasar-utils:$corda_gradle_plugins_version"
+    }
+}
+
+plugins {
+    id 'java'
+    id 'org.jetbrains.dokka' version '0.10.1'
+    id "com.jfrog.artifactory" version "4.16.1"
+    id "maven-publish"
+}
+
+
+allprojects {
+    apply from: "${rootProject.projectDir}/repositories.gradle"
+    apply plugin: 'kotlin'
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven { url 'https://repo1.maven.org/maven2' }
+        maven { url 'https://software.r3.com/artifactory/corda' }
+        maven { url 'https://jitpack.io' }
+        if (github_url != "") {
+            println("Fetching Weaver packages from: $github_url")
+            maven {
+                url github_url
+                credentials {
+                    username github_username
+                    password github_password
+                }
+            }
+        }
+        else {
+            println("Fetching Locally built Weaver packages.")
+            flatDir {
+                dirs '../../../common/protos-java-kt/build/libs'
+            }
+        }
+    }
+
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
+        kotlinOptions {
+            languageVersion = "1.3"
+            apiVersion = "1.3"
+            jvmTarget = "1.8"
+            javaParameters = true   // Useful for reflection.
+        }
+    }
+
+    jar {
+        // This makes the JAR's SHA-256 hash repeatable.
+        preserveFileTimestamps = false
+        reproducibleFileOrder = true
+    }
+}
+
+apply plugin: 'net.corda.plugins.cordapp'
+apply plugin: 'net.corda.plugins.cordformation'
+apply plugin: 'net.corda.plugins.quasar-utils'
+
+sourceSets {
+    main {
+        resources {
+            srcDir rootProject.file("config/dev")
+        }
+    }
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+
+    // Corda dependencies.
+    cordaCompile "$corda_core_release_group:corda-core:$corda_core_release_version"
+    cordaRuntime "$corda_release_group:corda-node-api:$corda_release_version"
+    cordaRuntime "$corda_release_group:corda:$corda_release_version"
+    
+    // CorDapp dependencies.
+    cordapp project(":interop-workflows")
+    cordapp project(":interop-contracts")
+
+    // Logging dependencies.
+    cordaCompile "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_version}"
+    cordaCompile "org.apache.logging.log4j:log4j-web:${log4j_version}"
+    cordaCompile "org.slf4j:jul-to-slf4j:$slf4j_version"
+}
+
+cordapp {
+    info {
+        name "CorDapp Template"
+        vendor "Corda Open Source"
+        targetPlatformVersion corda_platform_version
+        minimumPlatformVersion corda_platform_version
+    }
+}
+
+task installQuasar(type: Copy) {
+    destinationDir rootProject.file("lib")
+    from(configurations.quasar) {
+        rename 'quasar-core(.*).jar', 'quasar.jar'
+    }
+}
+
+dokka {
+    outputFormat = 'html'
+    outputDirectory = "$buildDir/dokka"
+    subProjects = ["interop-workflows", "interop-contracts"]
+}

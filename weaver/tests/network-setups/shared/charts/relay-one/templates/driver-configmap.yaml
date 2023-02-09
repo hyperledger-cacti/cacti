@@ -1,0 +1,32 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+{{- if $.Values.driver.configmap -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $.Values.driver.name }}-{{ $.Values.network.name }}-configmap
+  namespace: {{ $.Values.deployment.namespace | default "default" }}
+  labels:
+{{ include "relay-server.labels" $ | indent 4 }}
+data:
+  config.json: |-
+    {
+      "admin":{
+          "name":"admin",
+          "secret":"adminpw"
+      },
+      "relay": {
+          "name":"relay",
+          "affiliation":"{{ $.Values.driver.affiliation }}",
+          "role": "client",
+          "attrs": [{ "name": "relay", "value": "true", "ecert": true }]
+      },
+      "mspId": "{{ $.Values.driver.mspId }}",
+      "caUrl": ""
+    }
+
+{{- end -}}

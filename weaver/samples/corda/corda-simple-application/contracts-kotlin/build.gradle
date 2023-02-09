@@ -1,0 +1,56 @@
+apply plugin: 'net.corda.plugins.cordapp'
+
+Properties constants = new Properties()
+
+cordapp {
+    targetPlatformVersion corda_platform_version
+    minimumPlatformVersion corda_platform_version
+    contract {
+        name "Template CorDapp"
+        vendor "Corda Open Source"
+        licence "Apache License, Version 2.0"
+        versionId 1
+    }
+}
+
+dependencies {
+    compile 'com.google.code.gson:gson:2.8.6'
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+
+    // Corda dependencies.
+    cordaCompile "$corda_core_release_group:corda-core:$corda_core_release_version"
+
+    testCompile "$corda_release_group:corda-node-driver:$corda_release_version"
+}
+
+publishing {
+    // Handling if github.properties is not specified
+    def styler = 'black red green yellow blue magenta cyan white'
+            .split().toList().withIndex(30)
+            .collectEntries { key, val -> [(key) : { "\033[${val}m${it}\033[0m" }] }
+    if (file("$projectDir/../github.properties").exists()) {
+        file("$projectDir/../github.properties").withInputStream { constants.load(it) }
+    }
+    else {
+        println "${styler['red']('Warning')}: Publish won't work. Please use github.properties.template to create github.properties"
+    }
+    
+    publications {
+        contracts(MavenPublication) {
+            groupId = 'com.cordaSimpleApplication'
+            artifactId = 'contracts-kotlin'
+            version = '0.4'
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            url constants.url
+            credentials {
+                username constants.username
+                password constants.password
+            }
+        }
+    }
+}

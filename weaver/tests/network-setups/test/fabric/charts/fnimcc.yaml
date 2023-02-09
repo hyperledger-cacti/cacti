@@ -1,0 +1,22 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+network:
+  chaincode:
+    name: fnimcc
+    version: v1.0
+    lang: golang
+    git: 'https://github.ibm.com/dlt-interoperability/proof-verification.git'
+    branch: 'external-interop-1.0'
+    subPath: ./fnimcc/
+    imageRegistry: image-registry.openshift-image-registry.svc:5000/dlt-interop
+    imageName: fnimcc
+    imageTag: latest
+    initFn: "init"
+    initArgs: ""
+    endorsementPolicy: "AND('Org1MSP')"
+  artifactory:
+    path: res-dlt-interop-generic-local/proof-verification/fnimcc_fabric_external-interop-1.0.zip

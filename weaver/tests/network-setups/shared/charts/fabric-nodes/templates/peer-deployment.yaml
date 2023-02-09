@@ -1,0 +1,113 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+{{- $volumeClaimName := printf "%s-crypto" $.Values.global.network.name -}}
+{{- range $.Values.global.network.orgs }}
+{{- $orgName := .name -}}
+{{- $orgMSP := .mspId -}}
+{{- range .peers }}
+{{- $peerName := printf "%s-%s-%s" .name  $orgName  $.Values.global.network.name -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $peerName }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: {{ $peerName }}
+  template:
+    metadata:
+      labels:
+        name: {{ $peerName }}
+        app: {{ $peerName }}
+        app.kubernetes.io/component: "Peer"
+{{ include "fabric-network.labels" $ | indent 8 }}
+    spec:
+      containers:
+        - name: peers
+          image: {{ printf "%s:%s" $.Values.global.images.peer.name $.Values.global.images.peer.version }}
+          command: ["sh", "-c", "apk add --no-cache bash jq;
+                        peer node start"]
+          ports:
+            - containerPort: 7051
+            - containerPort: 7052
+            - containerPort: 7053
+          env:
+            - name: FABRIC_LOGGING_SPEC
+              value: INFO
+            - name: FABRIC_CFG_PATH
+              value: /etc/hyperledger/fabric
+            - name: CORE_PEER_ID
+              value: {{ $peerName }}
+            - name: CORE_PEER_ADDRESS
+              value: {{ printf "%s:7051" $peerName }}
+            - name: CORE_PEER_LISTENADDRESS
+              value: 0.0.0.0:7051
+            - name: CORE_PEER_CHAINCODEADDRESS
+              value: {{ printf "%s:7052" $peerName }}
+            - name: CORE_PEER_CHAINCODELISTENADDRESS
+              value: 0.0.0.0:7052
+            - name: CORE_PEER_GOSSIP_BOOTSTRAP
+              value: {{ printf "%s:7051" $peerName }}
+            - name: CORE_PEER_GOSSIP_ENDPOINT
+              value: {{ printf "%s:7051" $peerName }}
+            - name: CORE_PEER_GOSSIP_EXTERNALENDPOINT
+              value: {{ printf "%s:7051" $peerName }}
+            - name: CORE_PEER_GOSSIP_ORGLEADER
+              value: "false"
+            - name: CORE_PEER_GOSSIP_USELEADERELECTION
+              value: "true"
+            - name: CORE_PEER_PROFILE_ENABLED
+              value: "true"
+            - name: CORE_PEER_LOCALMSPID
+              value: {{ $orgMSP }}
+            - name: CORE_PEER_MSPCONFIGPATH
+              value: /fabric/peer/msp
+            - name: CORE_PEER_TLS_ENABLED
+              value: "true"
+            - name: CORE_PEER_PROFILE_ENABLED
+              value: "true"
+            - name: CORE_PEER_TLS_KEY_FILE
+              value: /fabric/peer/tls/server.key
+            - name: CORE_PEER_TLS_CERT_FILE
+              value: /fabric/peer/tls/server.crt
+            - name: CORE_PEER_TLS_ROOTCERT_FILE
+              value: /fabric/peer/tls/ca.crt
+            - name: CORE_LEDGER_STATE_DATABASE
+              value: "CouchDB"
+            - name: CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS
+              value: "localhost:5984"
+            - name: ORDERER_URL
+              value: {{ printf "%s-orderers-%s:7050" .orderer $.Values.global.network.name }}
+          volumeMounts:
+            - name: peer-volume
+              subPath: {{ printf "peerOrganizations/%s/peers/%s" $orgName $peerName }}
+              mountPath: /fabric/peer
+            - name: peer-volume
+              mountPath: /fabric/network1-secrets
+            - name: peer-config
+              mountPath: /etc/hyperledger/fabric
+            - name: external-builder
+              mountPath: /fabric/external-service-builder/bin
+        - name: couchdb
+          image: hyperledger/fabric-couchdb
+          ports:
+            - containerPort: 5984
+      volumes:
+        - name: peer-volume
+          persistentVolumeClaim:
+            claimName: {{ $volumeClaimName }}
+        - name: peer-config
+          configMap:
+            name: peer-config
+        - name: external-builder
+          configMap:
+            name: external-builder
+            defaultMode: 0777
+---
+{{- end }}
+{{- end }}

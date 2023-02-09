@@ -1,0 +1,27 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+{{- if $.Values.relay.discovery.relays.dns -}}
+{{- $relayName := printf "%s-%s" $.Values.relay.name $.Values.network.name -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $relayName }}-configmap
+  namespace: {{ $.Values.deployment.namespace | default "default" }}
+  labels:
+{{ include "relay-server.labels" $ | indent 4 }}
+data:
+{{- range $.Values.relay.discovery.relays.dns }}
+  {{ .group }}.toml: |-
+  {{- range .entries }}
+    [relays.{{.name}}]
+    hostname={{ quote .host }}
+    port={{ quote .port }}
+
+
+  {{- end }}
+{{- end }}
+{{- end -}}

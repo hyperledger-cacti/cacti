@@ -1,0 +1,13 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+network:
+  domain:
+    local: "dlt-interop-fabric2.svc.cluster.local"
+    cluster: "dlt-interop-fabric2.bx.cloud9.ibm.com"
+
+deployment:
+  namespace: dlt-interop-fabric2

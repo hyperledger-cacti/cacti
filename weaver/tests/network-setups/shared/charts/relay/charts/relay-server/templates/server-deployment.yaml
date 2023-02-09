@@ -1,0 +1,73 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+apiVersion: v1
+kind: Deployment
+metadata:
+  name: {{ $.Values.server.name | default "Relay Server" }}
+  namespace: {{ $.Values.deployment.namespace | default "default" }}
+  labels: 
+{{ include "relay-server.labels" | indent 4}}
+spec:
+  replicas: {{ $.Values.deployment.replicas | default 1 }}
+  selector:
+    matchLabels:
+      name: {{ $.Values.server.name }}
+  template:
+    metadata:
+      labels:
+        name: {{ $.Values.server.name }}
+        app: {{ $.Values.server.name }}
+{{ include "relay-server.labels" $ | indent 8 }}
+    spec:
+      containers:
+        - name: {{ $.Values.server.name }}
+          image: {{ $.Values.deployment.image }}
+          {{- if $.Values.deployment.imagePullPolicy -}}
+          imagePullPolicy: {{ $.Values.deployment.imagePullPolicy }}
+          {{- end -}}
+          ports:
+            - containerPort: {{ $.Values.server.port }}
+          env: 
+          {{- if $.Values.network.name -}}
+          - name: NETWORK_NAME
+            value: {{ $.Value.network.name -}}
+          {{- end -}}
+          {{- if $.Values.configuration -}}         
+          {{- if $.Values.configuration.templatePath -}}
+          - name: RELAY_CONFIG_TEMPLATE
+            value: {{ $.Values.configuration.templatePath }}
+          {{- end -}}
+          {{- if $.Values.configuration.path -}}
+          - name: RELAY_CONFIG
+            value: {{ $.Values.configuration.templatePath }}
+          {{- end -}}
+          {{- if $.Values.configuration.relaysPath -}}
+          - name: RELAY_DNS_CONFIG
+            value: {{ $.Values.configuration.relaysPath }}
+          {{- end -}}
+          {{- end -}}
+          {{- if $.Values.discovery.driver -}}
+          - name: DRIVER_NAME
+            value: {{ #.Values.discovery.driver.name }}
+          - name: DRIVER_HOST
+            value: {{ #.Values.discovery.driver.host }}
+          - name: RDRIVER_PORT
+            value: {{ #.Values.discovery.driver.port }}
+          {{- end -}}
+          {{- range $.Values.environment }}
+          - name: {{ .name }}
+          - value: {{ .value }}
+         {{- end }}
+{{- if $.Values.discovery.relays.dns -}}
+        volumeMounts:
+        - name: {{ $.Values.server.name }}-dns
+          mountPath: {{ $.Values.configuration.relaysPath  | default "/opt/relay/config/relays" }}
+      volumes:
+      - name: {{ $.Values.server.name }}-dns
+        configMap: 
+          name: {{ $.Values.server.name }}-configmap
+{{- end -}}

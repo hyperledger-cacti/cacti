@@ -1,0 +1,24 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+{{- $appName := printf "fabric-cli-%s" $.Values.cli.network -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $appName }}-configmap
+  labels:
+data:
+  config.json: |-
+    {
+      {{- range $.Values.cli.relays }}
+      "{{ .network }}": {
+        "connProfilePath": "{{ printf "/var/pvc1/connection-profiles/ccp-%s.json" $.Values.cli.ccpOrg }}",
+        "relayEndpoint": "{{ .endpoint }}"
+      },
+      {{- end }}
+      "_empty_": {}
+    }
+---

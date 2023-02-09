@@ -1,0 +1,18 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+relay:
+  discovery:
+    relays:
+      dns:
+        - group: default
+          entries:
+            - name: relay-network1
+              host: relay-network1.testnet-interop-fabric-24e79b958bc67364a17abc9eccbb097f-0000.che01.containers.appdomain.cloud
+              port: "9080"
+            - name: relay-network2
+              host: relay-network2.network2-tnet-iop-fabri-24e79b958bc67364a17abc9eccbb097f-0000.che01.containers.appdomain.cloud
+              port: "9080"

@@ -1,0 +1,5 @@
+# Ethsigner Config
+
+chain-id="1337"
+downstream-http-port="8590"
+http-listen-port="8545"

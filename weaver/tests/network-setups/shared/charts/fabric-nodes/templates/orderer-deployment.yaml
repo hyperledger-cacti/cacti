@@ -1,0 +1,111 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+{{- $volumeClaimName := printf "%s-crypto" $.Values.global.network.name -}}
+{{- $configMapName := printf "%s-configtx" $.Values.global.network.name -}}
+{{- range $.Values.global.network.orderers }}
+{{- $ordName := printf "%s-orderers-%s" .name $.Values.global.network.name -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $ordName }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: {{ $ordName }}
+  template:
+    metadata:
+      labels:
+        name: {{ $ordName }}
+        app: {{ $ordName }}
+        app.kubernetes.io/component: "Orderer"
+{{ include "fabric-network.labels" $ | indent 8 }}
+    spec:
+      containers:
+        - name: {{ $ordName }}
+          image: {{ printf "%s:%s" $.Values.global.images.orderer.name $.Values.global.images.orderer.version }}
+          command: ["sh", "-c", "orderer"]
+          ports:
+            - containerPort: 7050
+          env:
+            - name: FABRIC_LOGGING_SPEC
+              value: INFO
+            - name: FABRIC_CFG_PATH
+              value: /etc/hyperledger/fabric
+            - name: ORDERER_GENERAL_LISTENADDRESS
+              value: 0.0.0.0
+            - name: ORDERER_GENERAL_LISTENPORT
+              value: "7050"
+            - name: ORDERER_GENERAL_GENESISMETHOD
+              value: file
+            - name: ORDERER_GENERAL_GENESISFILE
+              value: /fabric/system-genesis-block/genesis.block
+            - name: ORDERER_GENERAL_LOCALMSPID
+              value: OrdererMSP
+            - name: ORDERER_GENERAL_LOCALMSPDIR
+              value: /fabric/orderer/msp
+            - name: ORDERER_GENERAL_TLS_ENABLED
+              value: "true"
+            - name: ORDERER_GENERAL_TLS_PRIVATEKEY
+              value: /fabric/orderer/tls/server.key
+            - name: ORDERER_GENERAL_TLS_CERTIFICATE
+              value: /fabric/orderer/tls/server.crt
+            - name: ORDERER_GENERAL_TLS_ROOTCAS
+              value: /fabric/orderer/tls/ca.crt
+            - name: ORDERER_KAFKA_TOPIC_REPLICATIONFACTOR
+              value: "1"
+            - name: ORDERER_KAFKA_VERBOSE
+              value: "true"
+            - name: ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE
+              value: /fabric/orderer/tls/server.crt
+            - name: ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY
+              value: /fabric/orderer/tls/server.key
+            - name: ORDERER_GENERAL_CLUSTER_ROOTCAS
+              value: /fabric/orderer/tls/ca.crt
+          volumeMounts:
+            - name: orderer-volume
+              subPath: {{ printf "ordererOrganizations/orderer/orderers/%s" $ordName }}
+              mountPath: /fabric/orderer
+            - name: orderer-volume
+              subPath: system-genesis-block
+              mountPath: /fabric/system-genesis-block
+      initContainers:
+      - name: gen-genesis-block
+        image: {{ printf "%s:%s" $.Values.global.images.fabricTools.name $.Values.global.images.fabricTools.version }}
+        env:
+          - name: ORDERER_PROFILE
+            value: {{ .profile }}
+          - name: FABRIC_CFG_PATH
+            value: /var/pvc1
+        volumeMounts:
+          - name: orderer-volume
+            mountPath: /var/pvc1
+          - name: configtx
+            mountPath: /var/fabric_cfg
+        command: ["/bin/sh",  "-c"]
+        args: ['if [ ! -f /var/pvc1/system-genesis-block/genesis.block ]; then
+                  mkdir -p /var/pvc1/system-genesis-block;
+                  cp /var/fabric_cfg/configtx.yaml /var/pvc1/;
+
+                  set -x;
+                  configtxgen -profile ${ORDERER_PROFILE} -channelID system-channel -outputBlock /var/pvc1/system-genesis-block/genesis.block;
+                  res=$?;
+                  set +x;
+                  if [ $res -ne 0 ]; then
+                    echo "Failed to generate orderer genesis block...";
+                    exit 1;
+                  fi;
+                fi;']
+      volumes:
+        - name: orderer-volume
+          persistentVolumeClaim:
+            claimName: {{ $volumeClaimName }}
+        - name: configtx
+          configMap:
+            name: {{ $configMapName }}
+---
+{{- end }}

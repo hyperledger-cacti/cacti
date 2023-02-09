@@ -1,0 +1,11 @@
+{
+  "securityDomain": "",
+  "rules": [
+    {
+      "principal": "<mspid>",
+      "principalType": "ca",
+      "resource": "mychannel:simplestate:Read:*",
+      "read": true
+    }
+  ]
+}

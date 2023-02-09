@@ -1,0 +1,20 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+chaincodes:
+  - name: interop
+    channelName: mychannel
+    ordererName: ord0
+    version: v1.0
+    lang: golang
+    imageName: dlt-interop/chaincodes/interop
+    imageTag: latest
+    initFn: "init"
+    initArgs: "\"fnimcc\",\"snamcc\""
+    endorsementPolicy: NA
+    collConfig: NA
+    sequence: 1
+    artifactoryPath: res-dlt-interop-generic-local/fabric-test-environment/interop.zip

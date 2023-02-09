@@ -1,0 +1,73 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: cc-instantiate
+spec:
+  template:
+    spec:
+      volumes:
+        - name: network1-secrets
+          persistentVolumeClaim:
+            claimName: network1-secrets
+        - name: cc-scripts
+          configMap:
+            name: cc-scripts
+      containers:
+      - name: cc-instantiate
+        image: hyperledger/fabric-tools:2.1
+        env:
+          - name: CC_NAME
+            value: sacc
+          - name: CC_VERSION
+            value: v1.0
+          - name: CC_LANGUAGE
+            value: golang
+          - name: CC_INIT_FCN
+            value: ""
+          - name: CC_INIT_ARGS
+            value: '"a","10"'
+          - name: CC_END_POLICY
+            value: NA
+          - name: CC_COLL_CONFIG
+            value: NA
+          - name: CC_SEQUENCE
+            value: "1"
+          - name: MAX_RETRY
+            value: "5"
+          - name: DELAY
+            value: "3"
+          - name: CORE_PEER_TLS_ENABLED
+            value: "true"
+          - name: ORDERER_NAME
+            value: ord0-orderers-network1
+          - name: ORDERER_URL
+            value: ord0-orderers-network1:7050
+          - name: ORDERER_CA
+            value: /var/pvc1/ordererOrganizations/orderer/orderers/ord0-orderers-network1/tls/ca.crt
+          - name: CHANNEL_NAME
+            value: mychannel
+          - name: ORG
+            value: org1
+          - name: ORG_LIST
+            value: "org1"
+          - name: ORGMSPS
+            value: "Org1MSP"
+          - name: NW_NAME
+            value: network1
+          - name: PORT
+            value: "7051"
+        volumeMounts:
+          - name: network1-secrets
+            mountPath: /var/pvc1
+          - name: cc-scripts
+            mountPath: /var/cc-scripts
+        command: ["/bin/sh",  "-c"]
+        args: ['bash /var/cc-scripts/initCC.sh']
+      restartPolicy: Never
+  backoffLimit: 4

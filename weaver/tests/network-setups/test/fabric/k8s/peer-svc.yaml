@@ -1,0 +1,48 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: peer0-org1-network1
+  labels:
+    run: peer0-org1-network1
+spec:
+  type: ClusterIP
+  selector:
+    name: peer0-org1-network1
+  ports:
+  - protocol: TCP
+    port: 7051
+    name: grpc
+  - protocol: TCP
+    port: 7053
+    name: events
+  - protocol: TCP
+    port: 5984
+    name: couchdb
+
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: peer0-org2-network1
+#   labels:
+#     run: peer0-org2-network1
+# spec:
+#   type: ClusterIP
+#   selector:
+#     name: peer0-org2-network1
+#   ports:
+#   - protocol: TCP
+#     port: 7051
+#     name: grpc
+#   - protocol: TCP
+#     port: 7061
+#     name: events
+#   - protocol: TCP
+#     port: 5984
+#     name: couchdb

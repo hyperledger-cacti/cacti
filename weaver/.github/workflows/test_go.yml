@@ -1,0 +1,145 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: CC-BY-4.0
+
+name: Unit Test Fabric Interop CC and Sample Chaincode
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test_interopcc:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.16
+        
+    - name: Vendor
+      run: make run-vendor
+      working-directory: core/network/fabric-interop-cc/contracts/interop
+      
+    - name: Build
+      run: go build -v ./...
+      working-directory: core/network/fabric-interop-cc/contracts/interop
+
+    - name: Test
+      run: go test -v ./...
+      working-directory: core/network/fabric-interop-cc/contracts/interop
+
+  test_assetmgmt:
+    # if: ${{ false }}  # disable
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.16
+        
+    - name: Vendor
+      run: make run-vendor
+      working-directory: core/network/fabric-interop-cc/interfaces/asset-mgmt
+
+    - name: Build
+      run: go build -v ./...
+      working-directory: core/network/fabric-interop-cc/interfaces/asset-mgmt
+
+    - name: Test
+      run: go test -v ./...
+      working-directory: core/network/fabric-interop-cc/interfaces/asset-mgmt
+
+  test_simplestate:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.16
+
+    - name: Vendor
+      run: make run-vendor
+      working-directory: samples/fabric/simplestate
+
+    - name: Build
+      run: go build -v ./...
+      working-directory: samples/fabric/simplestate
+
+    - name: Test
+      run: go test -v ./...
+      working-directory: samples/fabric/simplestate
+ 
+  test_simpleasset:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.16
+
+    - name: Vendor
+      run: make run-vendor
+      working-directory: samples/fabric/simpleasset
+
+    - name: Build
+      run: go build -v ./...
+      working-directory: samples/fabric/simpleasset
+
+    - name: Test
+      run: go test -v ./...
+      working-directory: samples/fabric/simpleasset
+
+  test_simpleassetandinterop:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.16
+
+    - name: Vendor
+      run: make run-vendor
+      working-directory: samples/fabric/simpleassetandinterop
+
+    - name: Build
+      run: go build -v ./...
+      working-directory: samples/fabric/simpleassetandinterop
+
+    - name: Test
+      run: go test -v ./...
+      working-directory: samples/fabric/simpleassetandinterop
+
+  test_simpleassettransfer:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.16
+
+    - name: Vendor
+      run: make run-vendor
+      working-directory: samples/fabric/simpleassettransfer
+
+    - name: Build
+      run: go build -v ./...
+      working-directory: samples/fabric/simpleassettransfer
+
+    - name: Test
+      run: go test -v ./...
+      working-directory: samples/fabric/simpleassettransfer

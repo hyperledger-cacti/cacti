@@ -1,0 +1,25 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+network:
+  domain:
+    local: "dlt-interop.svc.cluster.local"
+    cluster: "dlt-interop.apps.ros2.sl.cloud9.ibm.com"
+  chaincode:
+    name: sacc
+    version: v1.0
+    lang: golang
+    git: 'https://github.ibm.com/dlt-interoperability/network-setups.git'
+    branch: feature/test-environment
+    subPath: ./test/fabric/chaincode/sacc/
+    imageRegistry: image-registry.openshift-image-registry.svc:5000/dlt-interop
+    imageName: sacc
+    imageTag: latest
+    initFn: "init"
+    initArgs: '"a","10"'
+    endorsementPolicy: NA
+    collConfig: NA
+    sequence: 1

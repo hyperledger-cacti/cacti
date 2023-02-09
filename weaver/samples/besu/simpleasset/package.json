@@ -1,0 +1,46 @@
+{
+  "name": "sample-besu-app",
+  "version": "0.1.0",
+  "description": "Sample Besu Application for Demonstrating Interoperation With Other Networks",
+  "license": "Apache-2.0",
+  "repository": "hyperledger-labs/weaver-dlt-interoperability/samples/besu/simpleasset",
+  "bugs": {
+    "url": "https://github.com/hyperledger-labs/weaver-dlt-interoperability/issues"
+  },
+  "directories": {
+    "doc": "docs",
+    "test": "test"
+  },
+  "scripts": {
+    "copy-interop-contracts": "cp ../../../core/network/besu/contracts/interop/manageAssetAny.sol contracts/ && cp ../../../core/network/besu/interface/asset-exchange/transferInterface.sol contracts/ && cp ../../../common/protos-sol/asset_locks.proto.sol contracts/",
+    "update-truffle-config": "node get-network-details.js",
+    "deploy-contract": "npm run copy-interop-contracts && npm install && npm run update-truffle-config && truffle compile && truffle migrate",
+    "clean-run": "rm -rf package-lock.json build",
+    "clean": "rm -rf node_modules package-lock.json build",
+    "redeploy": "npm run copy-interop-contracts && truffle migrate --reset"
+  },
+  "keywords": [
+    "ethereum",
+    "besu",
+    "interoperability",
+    "hashed-timelock-contract",
+    "solidity",
+    "smart-contract"
+  ],
+  "homepage": "https://github.com/hyperledger-labs/weaver-dlt-interoperability/samples/besu/simpleasset",
+  "dependencies": {
+    "@hyperledger-labs/weaver-besu-interop-sdk": "file:../../../sdks/besu/interoperation-node-sdk",
+    "@hyperledger-labs/weaver-protos-js": "file:../../../common/protos-js",
+    "@lazyledger/protobuf3-solidity-lib": "^0.6.0",
+    "@openzeppelin/contracts": "^4.3.2",
+    "@truffle/contract": "^4.2.14",
+    "chai": "^4.3.4",
+    "dotenv": "latest",
+    "ganache-cli": "^6.12.2",
+    "solc": "^0.8.8"
+  },
+  "devDependencies": {
+    "truffle": "^5.4.15",
+    "typescript": "^4.9.3"
+  }
+}

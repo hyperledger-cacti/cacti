@@ -1,0 +1,141 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ca-orderer-network1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: ca-orderer-network1
+  template:
+    metadata:
+      labels:
+        name: ca-orderer-network1
+        app: ca-orderer-network1
+    spec:
+      volumes:
+        - name: network1-secrets
+          persistentVolumeClaim:
+            claimName: network1-secrets
+      containers:
+        - name: ca-orderer-network1
+          image: hyperledger/fabric-ca:1.4
+          command: ["sh", "-c", "fabric-ca-server start -b admin:adminpw -d"]
+          ports:
+            - containerPort: 7054
+          env:
+            - name: FABRIC_CA_HOME
+              value: /etc/hyperledger/fabric-ca-server
+            - name: FABRIC_CA_SERVER_CA_NAME
+              value: ca-orderer-network1
+            - name: FABRIC_CA_SERVER_TLS_ENABLED
+              value: "true"
+            - name: FABRIC_CA_SERVER_PORT
+              value: "7054"
+            - name: FABRIC_CA_SERVER_CSR_CN
+              value: ca-orderer-network1
+            - name: FABRIC_CA_SERVER_CSR_HOSTS
+              value: ca-orderer-network1
+            - name: FABRIC_CA_SERVER_DB_TYPE
+              value: postgres
+            - name: FABRIC_CA_SERVER_DB_DATASOURCE
+              value: 'host=postgresql-network1 port=5432 user=pgadmin password=pgadminpw dbname=fabric_ca_network1 sslmode=disable'
+          volumeMounts:
+            - name: network1-secrets
+              subPath: fabric-ca/orderer
+              mountPath: /etc/hyperledger/fabric-ca-server
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ca-org1-network1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: ca-org1-network1
+  template:
+    metadata:
+      labels:
+        name: ca-org1-network1
+        app: ca-org1-network1
+    spec:
+      volumes:
+        - name: network1-secrets
+          persistentVolumeClaim:
+            claimName: network1-secrets
+      containers:
+        - name: ca-org1-network1
+          image: hyperledger/fabric-ca:1.4
+          command: ["sh", "-c", "fabric-ca-server start -b admin:adminpw -d"]
+          ports:
+            - containerPort: 7054
+          env:
+            - name: FABRIC_CA_HOME
+              value: /etc/hyperledger/fabric-ca-server
+            - name: FABRIC_CA_SERVER_CA_NAME
+              value: ca-org1-network1
+            - name: FABRIC_CA_SERVER_TLS_ENABLED
+              value: "true"
+            - name: FABRIC_CA_SERVER_PORT
+              value: "7054"
+            - name: FABRIC_CA_SERVER_CSR_CN
+              value: ca-org1-network1
+            - name: FABRIC_CA_SERVER_CSR_HOSTS
+              value: ca-org1-network1
+            - name: FABRIC_CA_SERVER_DB_TYPE
+              value: postgres
+            - name: FABRIC_CA_SERVER_DB_DATASOURCE
+              value: 'host=postgresql-network1-headless port=5432 user=pgadmin password=pgadminpw dbname=fabric_ca_network1 sslmode=disable'
+          volumeMounts:
+            - name: network1-secrets
+              subPath: fabric-ca/org1
+              mountPath: /etc/hyperledger/fabric-ca-server
+
+# ---
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: ca-org2-network1
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       name: ca-org2-network1
+#   template:
+#     metadata:
+#       labels:
+#         name: ca-org2-network1
+#         app: ca-org2-network1
+#     spec:
+#       # volumes:
+#       #   - name: network1-secrets
+#       #     persistentVolumeClaim:
+#       #       claimName: network1-secrets
+#       containers:
+#         - name: ca-org2-network1
+#           image: hyperledger/fabric-ca:1.4
+#           command: ["sh", "-c", "fabric-ca-server start -b admin:adminpw -d"]
+#           ports:
+#             - containerPort: 7054
+#           env:
+#             - name: FABRIC_CA_HOME
+#               value: /etc/hyperledger/fabric-ca-server
+#             - name: FABRIC_CA_SERVER_CA_NAME
+#               value: ca-org2-network1
+#             - name: FABRIC_CA_SERVER_TLS_ENABLED
+#               value: "true"
+#             - name: FABRIC_CA_SERVER_PORT
+#               value: "7054"
+#             - name: FABRIC_CA_SERVER_CSR_CN
+#               value: ca-org2-network1
+#             - name: FABRIC_CA_SERVER_CSR_HOSTS
+#               value: ca-org2-network1

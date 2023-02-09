@@ -1,0 +1,38 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fabric-cli
+  labels:
+    app.kubernetes.io/component: "fabric-cli"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: fabric-cli
+  template:
+    metadata:
+      labels:
+        name: fabric-cli
+        app: fabric-cli
+    spec:
+      volumes:
+        - name: network-volume
+          persistentVolumeClaim:
+            claimName: network1-crypto
+      containers:
+        - name: fabric-cli
+          image: res-dlt-interop-docker-local.artifactory.swg-devops.com/dlt-interop/interop-fabric-cli:latest
+          imagePullPolicy: Always
+          volumeMounts:
+          - name: network-volume
+            mountPath: /var/pvc1
+          command: ["sh"]
+          args: ["-c", "sleep 6000"]
+      imagePullSecrets:
+        - name: interop-artifactory

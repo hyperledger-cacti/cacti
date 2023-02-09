@@ -1,0 +1,125 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+{{- $volumeClaimName := printf "%s-crypto" $.Values.global.network.name -}}
+
+{{- range $.Values.chaincodes }}
+{{- $chaincode := . }}
+{{- $ccImage := printf "%s/%s:%s" $.Values.docker.imageRegistry $chaincode.imageName $chaincode.imageTag -}}
+{{- $ordererName := printf "%s-orderers-%s" $chaincode.ordererName $.Values.global.network.name -}}
+{{- range $.Values.global.network.orgs }}
+{{- $orgName := .name -}}
+{{- $orgMSP := .mspId -}}
+{{- range .peers }}
+{{- $peerName := printf "%s-%s-%s" .name  $orgName  $.Values.global.network.name -}}
+{{- $peerAddress := printf "%s:7051" $peerName -}}
+{{- $deployccName := printf "%s-%s-%s" $chaincode.name $chaincode.channelName $peerName -}}
+
+#---------------- Chaincode Deployment ---------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $deployccName }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: {{ $deployccName }}
+  template:
+    metadata:
+      labels:
+        name: {{ $deployccName }}
+        app: {{ $deployccName }}
+    spec:
+      volumes:
+        - name: pvc1
+          persistentVolumeClaim:
+            claimName: {{ $volumeClaimName }}
+        - name: cc-scripts
+          configMap:
+            name: cc-scripts
+      imagePullSecrets:
+      - name: {{ $.Values.docker.imagePullSecrets }}
+      containers:
+        - image: {{ $ccImage }}
+          name: chaincode
+          imagePullPolicy: IfNotPresent
+          command: ["sh", "-c"]
+          args: ['set -a;
+                  . /var/env/pkgid;
+                  set +a;
+                  echo $CHAINCODE_CCID;
+                  ./$CC_NAME']
+          env:
+            - name: CC_NAME
+              value: {{ $chaincode.name }}
+            - name: EXTERNAL_SERVICE
+              value: "true"
+            - name: CHAINCODE_ADDRESS
+              value: "0.0.0.0:7052"
+          ports:
+            - containerPort: 7052
+          volumeMounts:
+            - name: pvc1
+              subPath: {{ printf "chaincodes/%s" $deployccName }}
+              mountPath: /var/env
+      initContainers:
+      - name: cc-install
+        image: hyperledger/fabric-tools:2.1
+        env:
+          - name: ARTIFACTORY_URL
+            value: {{ $.Values.artifactory.url }}
+          - name: ARTIFACTORY_APIKEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ $.Values.artifactory.secret }}
+                key: {{ $.Values.artifactory.secretKey }}
+          - name: CC_PATH
+            value: {{ $chaincode.artifactoryPath }}
+          - name: CC_NAME
+            value: {{ $chaincode.name }}
+          - name: CC_VERSION
+            value: "{{ $chaincode.version }}"
+          - name: CC_LANGUAGE
+            value: {{ $chaincode.lang }}
+          - name: ORG
+            value: {{ $orgName }}
+          - name: CORE_PEER_LOCALMSPID
+            value: {{ $orgMSP }}
+          - name: CORE_PEER_TLS_ROOTCERT_FILE
+            value: {{ printf "/var/pvc1/peerOrganizations/%s/peers/%s/tls/ca.crt" $orgName $peerName }}
+          - name: CORE_PEER_MSPCONFIGPATH
+            value: {{ printf "/var/pvc1/peerOrganizations/%s/users/Admin@%s/msp" $orgName $orgName }}
+          - name: CORE_PEER_ADDRESS
+            value: {{ $peerAddress }}
+          - name: PEER_NAME
+            value: {{ $peerName }}
+          - name: CORE_PEER_TLS_ENABLED
+            value: "true"
+          - name: ORDERER_NAME
+            value: {{ $ordererName }}
+          - name: ORDERER_URL
+            value: {{ printf "%s:7050" $ordererName }}
+          - name: ORDERER_CA
+            value: {{ printf "/var/pvc1/ordererOrganizations/orderer/orderers/%s/tls/ca.crt" $ordererName }}
+          - name: CHANNEL_NAME
+            value: {{ $chaincode.channelName }}
+          - name: NW_NAME
+            value: {{ $.Values.global.network.name }}
+          - name: DEPLOYCC_NAME
+            value: {{ $deployccName }}
+        volumeMounts:
+          - name: pvc1
+            mountPath: /var/pvc1
+          - name: cc-scripts
+            mountPath: /var/cc-scripts
+        command: ["/bin/sh",  "-c"]
+        args: ["bash /var/cc-scripts/installCC.sh"]
+
+---
+{{- end }}
+{{- end }}
+{{- end }}

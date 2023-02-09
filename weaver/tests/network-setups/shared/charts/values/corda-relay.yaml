@@ -1,0 +1,44 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+network:
+  name: corda-net1
+  type: Corda
+  domain:
+    local: "dlt-interop.svc.cluster.local"
+    cluster: "apps.ros2.cloud9.ibm.com"
+
+driver:
+  name: corda-driver
+  port: "9090"
+  configmap: false
+
+relay:
+  name: relay
+  port: "9080"
+  nodeport: "30050"
+  expose: false
+  discovery:
+    driver:
+      name: corda-driver
+      host: localhost
+      port: "9090"
+    relays:
+      dns:
+        - group: default
+          entries:
+            - name: relay-network1
+              host: relay-network1
+              port: "9080"
+            - name: relay-network2
+              host: relay-network2
+              port: "9080"
+            - name: relay-corda-net1
+              host: relay-corda-net1
+              port: "9080"
+
+deployment:
+  namespace: default

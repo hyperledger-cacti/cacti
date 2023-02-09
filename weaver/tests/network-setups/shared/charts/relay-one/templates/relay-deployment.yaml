@@ -1,0 +1,188 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+{{- $volumeClaimName := printf "%s-crypto" $.Values.network.name -}}
+{{- $relayName := printf "%s-%s" $.Values.relay.name $.Values.network.name -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $relayName }}
+  namespace: {{ $.Values.deployment.namespace | default "default" }}
+  labels:
+{{ include "relay-server.labels" $ | indent 4}}
+spec:
+  replicas: {{ $.Values.deployment.replicas | default 1 }}
+  selector:
+    matchLabels:
+      name: {{ $relayName }}
+  template:
+    metadata:
+      labels:
+        name: {{ $relayName }}
+        app: {{ $relayName }}
+{{ include "relay-server.labels" $ | indent 8 }}
+    spec:
+      volumes:
+        {{- if eq $.Values.network.type "Fabric" }}
+        - name: network-volume
+          persistentVolumeClaim:
+            claimName: {{ $volumeClaimName }}
+        - name: generate-ccp
+          configMap:
+            name: generate-ccp
+        {{- end }}
+        {{- if $.Values.driver.configmap }}
+        - name: driver-config
+          configMap:
+            name: {{ $.Values.driver.name }}-{{ $.Values.network.name }}-configmap
+        {{- end }}
+        {{- if $.Values.relay.discovery.relays.dns }}
+        - name: remote-dns
+          configMap:
+            name: {{ $relayName }}-configmap
+        {{- end }}
+      {{- if eq $.Values.network.type "Fabric" }}
+      initContainers:
+      - name: generate-ccp
+        image: alpine:3.7
+        env:
+          - name: ORG
+            value: {{ $.Values.driver.org }}
+          - name: ORGMSP
+            value: {{ $.Values.driver.mspId }}
+          - name: P0PORT
+            value: "7051"
+          - name: CAPORT
+            value: "7054"
+          - name: NW
+            value: {{ $.Values.network.name }}
+          - name: PEERPEM
+            value: {{ printf "/var/pvc1/peerOrganizations/%s/tlsca/tlsca.%s-cert.pem" $.Values.driver.org $.Values.driver.org }}
+          - name: CAPEM
+            value: {{ printf "/var/pvc1/fabric-ca/%s/tls-cert.pem" $.Values.driver.org }}
+          - name: CCP_TEMPLATE
+            value: /var/ccp/ccp-template.json
+          - name: CCPPATH
+            value: {{ printf "/var/pvc1/connection-profiles/ccp-%s.json" $.Values.driver.org }}
+        volumeMounts:
+          - name: network-volume
+            mountPath: /var/pvc1
+          - name: generate-ccp
+            mountPath: /var/ccp
+        command: ["/bin/sh",  "-c"]
+        args: ['mkdir -p /var/pvc1/connection-profiles;
+                mkdir -p /var/pvc1/wallets/relay;
+                apk update;
+                apk add bash;
+                bash /var/ccp/ccp-generate.sh']
+      {{- end }}
+      containers:
+        - name: {{ $relayName }}
+          image: {{ printf "%s/%s" $.Values.deployment.imageRegistry $.Values.deployment.relayImage }}
+          {{- if $.Values.deployment.imagePullPolicy }}
+          imagePullPolicy: {{ $.Values.deployment.imagePullPolicy }}
+          {{- end }}
+          ports:
+            - containerPort: {{ $.Values.relay.port }}
+          env:
+          - name: RELAY_NAME
+            value: {{ $relayName }}
+          - name: RELAY_PORT
+            value: "{{ $.Values.relay.port }}"
+          - name: NETWORK_TYPE
+            value: {{ $.Values.network.type }}
+          {{- if $.Values.network.name }}
+          - name: NETWORK_NAME
+            value: {{ $.Values.network.name }}
+          {{- end }}
+          {{- if $.Values.relay.configuration }}
+          {{- if $.Values.relay.configuration.templatePath }}
+          - name: RELAY_CONFIG_TEMPLATE
+            value: {{ $.Values.relay.configuration.templatePath }}
+          {{- end }}
+          {{- if $.Values.relay.configuration.path }}
+          - name: RELAY_CONFIG
+            value: {{ $.Values.relay.configuration.path }}
+          {{- end }}
+          - name: RELAY_DNS_CONFIG
+            value: /opt/relay/config/relays
+          {{- end }}
+          {{- if $.Values.relay.discovery.driver }}
+          - name: DRIVER_NAME
+            value: {{ $.Values.relay.discovery.driver.name }}
+          - name: DRIVER_HOST
+            value: {{ $.Values.relay.discovery.driver.host }}
+          - name: DRIVER_PORT
+            value: "{{ $.Values.relay.discovery.driver.port }}"
+          {{- end }}
+          {{- range $.Values.relay.environment }}
+          - name: {{ .name }}
+          - value: {{ .value }}
+          {{- end }}
+          {{- if $.Values.relay.discovery.relays.dns }}
+          volumeMounts:
+          - name: remote-dns
+            mountPath: /opt/relay/config/relays
+          {{- end }}
+        {{- if eq $.Values.network.type "Fabric" }}
+        - name: {{ $.Values.driver.name }}
+          image: {{ printf "%s/%s" $.Values.deployment.imageRegistry $.Values.deployment.fabricDriverImage }}
+          {{- if $.Values.deployment.imagePullPolicy }}
+          imagePullPolicy: {{ $.Values.deployment.imagePullPolicy }}
+          {{- end }}
+          ports:
+          - containerPort: {{ $.Values.driver.port }}
+          command: ["sh"]
+          args: ["-c", "npm run dev"]
+          env:
+          - name: CRYPTO_ROOT
+            value: /fabric-driver/crypto-config
+          - name: NETWORK_NAME
+            value: {{ $.Values.network.name }}
+          - name: RELAY_ENDPOINT
+            value: {{ printf "localhost:%s" $.Values.relay.port }}
+          - name: DRIVER_ENDPOINT
+            value: {{ printf "0.0.0.0:%s" $.Values.driver.port }}
+          - name: CONNECTION_PROFILE
+            value: {{ printf "/fabric-driver/connection-profiles/ccp-%s.json" $.Values.driver.org }}
+          - name: CONFIG_FILE
+            value: /fabric-driver/config/config.json
+          - name: local
+            value: "false"
+          imagePullPolicy: Always
+          volumeMounts:
+          - name: network-volume
+            subPath: connection-profiles
+            mountPath: /fabric-driver/connection-profiles/
+          - name: network-volume
+            subPath: wallets/relay
+            mountPath: {{ printf "/fabric-driver/wallet-%s" $.Values.network.name }}
+          {{- if $.Values.driver.configmap }}
+          - name: driver-config
+            mountPath: /fabric-driver/config/
+          {{- end }}
+        {{- else if eq $.Values.network.type "Corda" }}
+        - name: {{ $.Values.driver.name }}
+          image: {{ printf "%s/%s" $.Values.deployment.imageRegistry $.Values.deployment.cordaDriverImage }}
+          {{- if $.Values.deployment.imagePullPolicy }}
+          imagePullPolicy: {{ $.Values.deployment.imagePullPolicy }}
+          {{- end }}
+          env:
+            - name: DRIVER_PORT
+              value: "{{ $.Values.driver.port }}"
+          command: ["sh"]
+          args: ["-c", "./bin/corda-driver"]
+          ports:
+            - containerPort: {{ $.Values.driver.port }}
+          {{- if $.Values.driver.configmap }}
+          volumeMounts:
+            - name: driver-config
+              mountPath: /corda-driver/config/
+          {{- end }}
+        {{- end }}
+      imagePullSecrets:
+        - name: {{ $.Values.deployment.imagePullSecrets }}
+---

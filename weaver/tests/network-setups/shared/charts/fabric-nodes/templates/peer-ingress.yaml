@@ -1,0 +1,34 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+{{- if (ne $.Values.global.cluster "OpenShift") -}}
+{{- range $.Values.global.network.orgs }}
+{{- $orgName := .name -}}
+{{- range .peers }}
+{{- $peerName := printf "%s-%s-%s" .name  $orgName  $.Values.global.network.name -}}
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: {{ printf "%s-ingress" $peerName }}
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+    kubernetes.io/ingress-class: "nginx"
+  labels:
+    app.kubernetes.io/component: "Orderer"
+{{ include "fabric-network.labels" $ | indent 4 }}
+spec:
+  rules:
+  - host: {{ printf "%s.%s" $peerName $.Values.global.network.domain.cluster }}
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: {{ $peerName }}
+          servicePort: grpc
+---
+{{- end }}
+{{- end }}
+{{- end -}}

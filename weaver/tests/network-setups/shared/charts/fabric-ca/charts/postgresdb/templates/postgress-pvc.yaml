@@ -1,0 +1,25 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+{{- if $.Values.global.network.postgres.pvc -}}
+{{- $name := printf "postgresql-%s" $.Values.global.network.name}}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ $name }}-data
+  labels:
+    app.kubernetes.io/component: "Storage"
+{{ include "fabric-network.labels" $ | indent 4 }}
+spec:
+  accessModes:
+    - "ReadWriteOnce"
+  resources:
+    requests:
+      storage: {{ $.Values.global.network.postgres.storage | quote }}
+  storageClassName:  {{ $.Values.global.network.storageClass }}
+  volumeMode: Filesystem
+---
+{{- end -}}

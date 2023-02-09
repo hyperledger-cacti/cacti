@@ -1,0 +1,24 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+relay:
+  name: Network Relay
+  host: relay-server
+  port: 9080
+  config:
+    path: /opt/relay/server/config/server.toml
+    templatePath: /opt/relay/config/server.template.toml
+  discovery:
+    mode: config
+    relaysConfigPath: /opt/relay/config/relays.toml
+    remoteRelays:
+    - relay1.svc.cluster.local
+    - relay2.svc.cluster.local
+    - relay3.svc.cluster.local
+driver:
+- name:
+  type:
+  

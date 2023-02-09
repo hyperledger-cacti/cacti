@@ -1,0 +1,35 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+apiVersion: v1
+kind: Route
+metadata:
+  name: ca-orderer-network1-route
+spec:
+  host: ca-orderer-network1.dlt-interop.apps.ros2.sl.cloud9.ibm.com
+  port:
+    targetPort: grpc
+  to:
+    kind: Service
+    name: ca-orderer-network1
+  tls:
+    termination: passthrough
+  wildcardPolicy: None
+---
+apiVersion: v1
+kind: Route
+metadata:
+  name: ca-org1-network1-route
+spec:
+  host: ca-org1-network1.dlt-interop.apps.ros2.sl.cloud9.ibm.com
+  port:
+    targetPort: grpc
+  to:
+    kind: Service
+    name: ca-org1-network1
+  tls:
+    termination: passthrough
+  wildcardPolicy: None

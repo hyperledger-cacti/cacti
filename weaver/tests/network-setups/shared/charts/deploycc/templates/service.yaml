@@ -1,0 +1,32 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+{{- range $.Values.chaincodes }}
+{{- $chaincode := . }}
+{{- range $.Values.global.network.orgs }}
+{{- $orgName := .name -}}
+{{- range .peers }}
+{{- $peerName := printf "%s-%s-%s" .name  $orgName  $.Values.global.network.name -}}
+{{- $deployccName := printf "%s-%s-%s" $chaincode.name $chaincode.channelName $peerName -}}
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $deployccName }}
+  labels:
+    app: {{ $deployccName }}
+spec:
+  ports:
+    - name: grpc
+      port: 7052
+      targetPort: 7052
+  selector:
+    app: {{ $deployccName }}
+---
+
+{{- end }}
+{{- end }}
+{{- end }}

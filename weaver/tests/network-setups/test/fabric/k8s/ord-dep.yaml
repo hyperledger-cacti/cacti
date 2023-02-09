@@ -1,0 +1,73 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ord0-orderers-network1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: ord0-orderers-network1
+  template:
+    metadata:
+      labels:
+        name: ord0-orderers-network1
+        app: ord0-orderers-network1
+    spec:
+      volumes:
+        - name: network1-secrets
+          persistentVolumeClaim:
+            claimName: network1-secrets
+      containers:
+        - name: orderers
+          image: hyperledger/fabric-orderer:2.1
+          command: ["sh", "-c", "orderer"]
+          ports:
+            - containerPort: 7050
+          env:
+            - name: FABRIC_LOGGING_SPEC
+              value: INFO
+            - name: FABRIC_CFG_PATH
+              value: /etc/hyperledger/fabric
+            - name: ORDERER_GENERAL_LISTENADDRESS
+              value: 0.0.0.0
+            - name: ORDERER_GENERAL_LISTENPORT
+              value: "7050"
+            - name: ORDERER_GENERAL_GENESISMETHOD
+              value: file
+            - name: ORDERER_GENERAL_GENESISFILE
+              value: /fabric/system-genesis-block/genesis.block
+            - name: ORDERER_GENERAL_LOCALMSPID
+              value: OrdererMSP
+            - name: ORDERER_GENERAL_LOCALMSPDIR
+              value: /fabric/orderer/msp
+            - name: ORDERER_GENERAL_TLS_ENABLED
+              value: "true"
+            - name: ORDERER_GENERAL_TLS_PRIVATEKEY
+              value: /fabric/orderer/tls/server.key
+            - name: ORDERER_GENERAL_TLS_CERTIFICATE
+              value: /fabric/orderer/tls/server.crt
+            - name: ORDERER_GENERAL_TLS_ROOTCAS
+              value: /fabric/orderer/tls/ca.crt
+            - name: ORDERER_KAFKA_TOPIC_REPLICATIONFACTOR
+              value: "1"
+            - name: ORDERER_KAFKA_VERBOSE
+              value: "true"
+            - name: ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE
+              value: /fabric/orderer/tls/server.crt
+            - name: ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY
+              value: /fabric/orderer/tls/server.key
+            - name: ORDERER_GENERAL_CLUSTER_ROOTCAS
+              value: /fabric/orderer/tls/ca.crt
+          volumeMounts:
+            - name: network1-secrets
+              subPath: ordererOrganizations/orderer/orderers/ord0-orderers-network1
+              mountPath: /fabric/orderer
+            - name: network1-secrets
+              subPath: system-genesis-block
+              mountPath: /fabric/system-genesis-block
