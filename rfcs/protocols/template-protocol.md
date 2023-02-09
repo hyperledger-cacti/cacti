@@ -42,9 +42,9 @@ Protocol names are conventionally lower_snake_case (especially in URIs), but are
 
 URI: https://didcomm.org/lets_do_lunch/<version>/<messageType>
 
-Message types and protocols are identified with special URIs that match certain conventions. See [Message Type and Protocol Identifier URIs](https://github.com/hyperledger/aries-rfcs/tree/main/concepts/0003-protocols/uris.md) for more details.
+Message types and protocols are identified with special URIs that match certain conventions. See [Message Type and Protocol Identifier URIs](https://github.com/hyperledger/aries-rfcs/tree/main/concepts/0003-protocols/#message-type-and-protocol-identifier-uris) for more details.
 
-The version of a protocol is declared carefully. See [Semver Rules for Protocols](https://github.com/hyperledger/aries-rfcs/tree/main/concepts/0003-protocols/semver.md) for details.
+The version of a protocol is declared carefully. See [Semver Rules for Protocols](https://github.com/hyperledger/aries-rfcs/tree/main/concepts/0003-protocols/#semver-rules-for-protocols) for details.
 
 ## Key Concepts
 
@@ -59,7 +59,7 @@ variants.
 
 ## Roles
 
-> See [this note](https://github.com/hyperledger/aries-rfcs/tree/main/concepts/0003-protocols/roles-participants-etc.md) for definitions of the terms
+> See [this note](https://github.com/hyperledger/aries-rfcs/tree/main/concepts/0003-protocols/#roles-participants-parties-and-controllers) for definitions of the terms
 "role", "participant", and "party".
 
 Provides a formal name to each role in the protocol, says who and how many can
@@ -113,7 +113,7 @@ By convention, state names use lower-kebab-case but are compared
 case-insensitively and ignoring punctuation.
 
 State management in protocols is a deep topic. For more information, please
-see [State Details and State Machines](https://github.com/hyperledger/aries-rfcs/blob/main/concepts/0003-protocols/state-details.md).
+see [State Details and State Machines](https://github.com/hyperledger/aries-rfcs/tree/main/concepts/0003-protocols#state-details-and-state-machines).
 
 ## Messages
 
