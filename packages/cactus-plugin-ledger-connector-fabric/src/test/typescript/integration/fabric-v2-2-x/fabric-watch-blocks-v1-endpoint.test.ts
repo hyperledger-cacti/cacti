@@ -366,12 +366,12 @@ describe("watchBlocksV1 of fabric connector tests", () => {
           );
         }
 
-        const fullBlock = event.privateBlock;
-        expect(fullBlock.blockNumber).toBeTruthy();
-        expect(fullBlock.blockData).toBeTruthy();
-        expect(fullBlock.blockData.header).toBeTruthy();
-        expect(fullBlock.blockData.data).toBeTruthy();
-        expect(fullBlock.blockData.metadata).toBeTruthy();
+        const privateBlock = event.privateBlock;
+        expect(privateBlock.blockNumber).toBeTruthy();
+        expect(privateBlock.blockData).toBeTruthy();
+        expect(privateBlock.blockData.header).toBeTruthy();
+        expect(privateBlock.blockData.data).toBeTruthy();
+        expect(privateBlock.blockData.metadata).toBeTruthy();
       },
     );
 
