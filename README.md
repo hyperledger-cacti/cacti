@@ -1,64 +1,29 @@
-![Cactus Logo Color](./images/HL_Cactus_Logo_Color.png)
+![Cacti Logo Color](./images/HL_Cacti_Logo_Color.png)
 
-# Hyperledger Cactus
+# Hyperledger Cacti
 
- [![Open in Visual Studio Code](https://open.vscode.dev/badges/open-in-vscode.svg)](https://open.vscode.dev/hyperledger/cactus)
- ![license](https://img.shields.io/github/license/hyperledger/cactus) [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/4089/badge)](https://bestpractices.coreinfrastructure.org/projects/4089) [![codecov](https://codecov.io/gh/hyperledger/cactus/branch/main/graph/badge.svg?token=BJklIsqf1S)](https://codecov.io/gh/hyperledger/cactus)
- ![GitHub issues](https://img.shields.io/github/issues/hyperledger/cactus)
+Hyperledger Cacti is a multi-faceted pluggable interoperability framework to link networks built on heterogeneous distributed ledger and blockchain technologies and to run transactions spanning multiple networks. This project is the result of a merger of the [Weaver Lab](https://github.com/hyperledger-labs/weaver-dlt-interoperability) project with **Hyperledger Cactus**, which was subsequently renamed to **Cacti**. It draws on the cutting-edge technological features of both constituent projects to provide a common general purpose platform and toolkit for DLT interoperability. This was the first-of-a-kind merger of two systems, architecture and code bases, to create a new project, under the Hyperledger Foundation. See this [Hyperledger Foundation blog article](https://www.hyperledger.org/blog/2022/11/07/introducing-hyperledger-cacti-a-multi-faceted-pluggable-interoperability-framework) for more information about the merger.
 
-This project is an _Incubation_ Hyperledger project. For more information on the history of this project see the [Cactus wiki page](https://wiki.hyperledger.org/display/cactus). Information on what _Active_ entails can be found in
-the [Hyperledger Project Lifecycle document](https://wiki.hyperledger.org/display/TSC/Project+Lifecycle).
-
-Hyperledger Cactus aims to provide Decentralized, Secure and Adaptable Integration between Blockchain Networks.
-Hyperledger Cactus is currently undergoing a major refactoring effort to enable the desired to-be architecture which will enable plug-in based collaborative development to increase the breadth of use cases & Ledgers supported.
+Cacti is an _Incubation_ Hyperledger project, inheriting that status from Hyperledger Cactus. Information on the different stages of a Hyperledger project and graduation criteria can be found in
+the [Hyperledger Project Incubation Exit Criteria document](https://wiki.hyperledger.org/display/TSC/Project+Incubation+Exit+Criteria).
 
 ## Scope of Project
 
-As blockchain technology proliferates, blockchain integration will become an increasingly important topic in the broader blockchain ecosystem.  For instance, people might want to trade between multiple different blockchains that are run on different platforms. Hyperledger Cactus is a web application system designed to allow users to securely integrate different blockchains. It includes a set of libraries, data models, and SDK to accelerate development of an integrated services application. Our goal is to deliver a system that allows users of our code to securely conduct transactions between all of the most commonly used blockchains.
+The existence of several blockchain and distributed ledger technologies of different flavors in the market as well as networks of varying scopes and sizes built on them necessitates the need for interoperability and integration, lest we end up with a fragmented ecosystem where digital assets and the workfows (often contracts) governing them remain isolated in silos. The solution to this is not to force all chains to coalesce (i.e., "*a single chain to rule them all*") but rather enable the networks to orchestrate transactions spanning their boundaries without sacrificing security, privacy, or governance autonomy (i.e., self-sovereignty). Hyperledger Cacti offers a family of protocols, modules, libraries, and SDKs, that can enable one network to be interoperable with, and carry out transactions directly with, another while eschewing the need for a central or common settlement chain. Cacti will allow networks to share ledger data, and exchange and transfer assets atomically, and manage identities, across their boundaries, as illustrated in the figure below.
 
-## Run the Examples
+<img src="./images/cacti-vision.png">
 
-### Supply Chain Example
+As a fusion of two earlier systems (Cactus and Weaver) that have similar philosophies and goals, yet offer distinct mechanisms backed by differemt design and trust assumptions, Cacti offers a spectrum of selectable and configurable features for cross-network transaction orchestrations. An example illustrated below shows how distributed applications running on Fabric and Besu ledgers respectively can carry out the same set of cross-network transactions using the **Node Server** (Cactus legacy) or through **Relays** (Weaver legacy).
 
-1. Ensure a working installation of [Docker](https://docs.docker.com/desktop/) is present on your machine.
-2. Run the following command to pull up the container that will run the example application and the test ledgers as well:
-    ```sh
-    docker run \
-      --rm \
-      --privileged \
-      -p 3000:3000 \
-      -p 3100:3100 \
-      -p 3200:3200 \
-      -p 4000:4000 \
-      -p 4100:4100 \
-      -p 4200:4200 \
-      ghcr.io/hyperledger/cactus-example-supply-chain-app:2022-04-05--feat-1579
-    ```
-3. Wait for the output to show the message `INFO (api-server): Cactus Cockpit reachable http://0.0.0.0:3200`
-4. Token generated by the application is displayed below
-5. Visit http://localhost:3200 in a web browser with Javascript enabled and insert the token when prompted
-6. Use the graphical user interface to create data on both ledgers and observe that a consistent view of the data from different ledgers is provided.
+<img src="./images/tx-orchestration-modes.png">
 
-Once the last command has finished executing, open link printed on the console with a web browser of your choice
+The present (initial) version of the Cacti code base is simply an aggregation of the legacy Cactus and Weaver code bases with their original folder structures. Until merge and integration (see further below), users should examine, test, and use them separately as follows:
+- Cactus code and documentation lies within this (root) folder, excluding the `weaver` folder. See [Cactus documentation](./README-cactus.md) to test and use Cactus.
+- Weaver code and documentation lies within the [weaver](./weaver/) folder. See [Weaver documentation](./weaver/README.md) to test and use Weaver.
 
-### Discounted Asset Trade Example
+## Roadmap
 
-- The guidance is [here](./examples/cactus-example-discounted-asset-trade/README.md).
-
-### Electricity Trade Example
-
-- The guidance is [here](./examples/cactus-example-electricity-trade/README.md).
-
-
-## Documentation
-
-* [Project Wiki](https://wiki.hyperledger.org/display/cactus): Schedule and logs of the maintainer meetings
-* [Whitepaper](./whitepaper/whitepaper.md): The official document on Cactus design specifications
-* [Contributing](./CONTRIBUTING.md): How to get from an idea to an approved pull request
-* [Build](./BUILD.md): Instructions on how to set up the project for development
-
-  ![Build Script Decision Tree](./docs/images/build-script-decision-tree-2021-03-06.png)
-* [FAQ](./FAQ.md): A collection of frequently asked questions
+See [ROADMAP.md](./ROADMAP.md) for details on the envisioned integration.
 
 ## Inclusive Language Statement
 
@@ -78,20 +43,12 @@ and
 [Google inclusive doc writing guide](https://developers.google.com/style/inclusive-documentation)
 as starting points.
 
-## Roadmap
-
-Can be found here: [ROADMAP.md](./ROADMAP.md)
-
 ## Contact
-* mailing list: [cactus@lists.hyperledger.org](mailto:cactus@lists.hyperledger.org)
+* mailing list: [cacti@lists.hyperledger.org](mailto:cacti@lists.hyperledger.org)
 * discord channel: [https://discord.com/invite/hyperledger](https://discord.com/invite/hyperledger)
 
-## Build/Development Flow
-
-To go from zero to hero with project setup and working on your contributions: [BUILD.md](./BUILD.md)
-
 ## Contributing
-We welcome contributions to Hyperledger Cactus in many forms, and there’s always plenty to do!
+We welcome contributions to Hyperledger Cacti in many forms, and there’s always plenty to do!
 
 Please review [contributing](/CONTRIBUTING.md) guidelines to get started.
 

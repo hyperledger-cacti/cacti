@@ -18,3 +18,25 @@ packages/cactus-test-tooling/src/main/typescript/keycloak/keycloak-container.ts
 
 # Generated code that cannot be modified
 examples/cactus-example-carbon-accounting-backend/src/main/json/generated/build-info/**
+
+# Corda test network files that are generated and therefore cannot be altered to comply with DCI-Lint
+weaver/core/drivers/corda-driver/src/main/kotlin/CustomSerializationWhitelist.kt
+weaver/tests/network-setups/corda/shared/Corda_Network/nodes/Notary/network-parameters
+weaver/tests/network-setups/corda/shared/Corda_Network/nodes/PartyA/network-parameters
+weaver/tests/network-setups/corda/shared/Corda_Network/nodes/PartyB/network-parameters
+weaver/tests/network-setups/corda/shared/Corda_Network/nodes/PartyC/network-parameters
+weaver/tests/network-setups/corda/shared/Corda_Network2/nodes/Notary/network-parameters
+weaver/tests/network-setups/corda/shared/Corda_Network2/nodes/PartyA/network-parameters
+weaver/tests/network-setups/corda/shared/Corda_Network2/nodes/PartyB/network-parameters
+weaver/tests/network-setups/corda/shared/Corda_Network2/nodes/PartyC/network-parameters
+weaver/tests/network-setups/corda/shared/Corda_Network/nodes/Notary/persistence/persistence.mv.db
+weaver/tests/network-setups/corda/shared/Corda_Network/nodes/PartyA/persistence/persistence.mv.db
+weaver/tests/network-setups/corda/shared/Corda_Network/nodes/PartyB/persistence/persistence.mv.db
+weaver/tests/network-setups/corda/shared/Corda_Network/nodes/PartyC/persistence/persistence.mv.db
+weaver/tests/network-setups/corda/shared/Corda_Network2/nodes/Notary/persistence/persistence.mv.db
+weaver/tests/network-setups/corda/shared/Corda_Network2/nodes/PartyA/persistence/persistence.mv.db
+weaver/tests/network-setups/corda/shared/Corda_Network2/nodes/PartyB/persistence/persistence.mv.db
+weaver/tests/network-setups/corda/shared/Corda_Network2/nodes/PartyC/persistence/persistence.mv.db
+weaver/samples/corda/corda-simple-application/clients/src/main/kotlin/com/cordaSimpleApplication/client/CustomSerializationWhitelist.kt
+weaver/core/network/corda-interop-app/interop-workflows/src/main/kotlin/com/weaver/corda/app/interop/flows/AccessControlFlows.kt
+weaver/core/network/corda-interop-app/interop-workflows/src/main/kotlin/com/weaver/corda/app/interop/flows/customSerializers/CustomSerializationWhitelist.kt
