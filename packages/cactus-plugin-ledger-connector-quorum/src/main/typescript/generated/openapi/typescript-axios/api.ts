@@ -164,11 +164,23 @@ export interface DeployContractSolidityBytecodeV1Request {
      */
     contractName: string;
     /**
+     * The application binary interface of the solidity contract
+     * @type {Array<any>}
+     * @memberof DeployContractSolidityBytecodeV1Request
+     */
+    contractAbi?: Array<any>;
+    /**
      * 
      * @type {Web3SigningCredential}
      * @memberof DeployContractSolidityBytecodeV1Request
      */
     web3SigningCredential: Web3SigningCredential;
+    /**
+     * See https://ethereum.stackexchange.com/a/47556 regarding the maximum length of the bytecode
+     * @type {string}
+     * @memberof DeployContractSolidityBytecodeV1Request
+     */
+    bytecode?: string;
     /**
      * The keychainId for retrieve the contracts json.
      * @type {string}
@@ -183,10 +195,22 @@ export interface DeployContractSolidityBytecodeV1Request {
     gas?: number;
     /**
      * 
-     * @type {string}
+     * @type {number}
      * @memberof DeployContractSolidityBytecodeV1Request
      */
-    gasPrice?: string;
+    gasPrice?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof DeployContractSolidityBytecodeV1Request
+     */
+    nonce?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof DeployContractSolidityBytecodeV1Request
+     */
+    value?: number;
     /**
      * The amount of milliseconds to wait for a transaction receipt with theaddress of the contract(which indicates successful deployment) beforegiving up and crashing.
      * @type {number}
@@ -205,6 +229,12 @@ export interface DeployContractSolidityBytecodeV1Request {
      * @memberof DeployContractSolidityBytecodeV1Request
      */
     constructorArgs?: Array<any>;
+    /**
+     * 
+     * @type {QuorumPrivateTransactionConfig}
+     * @memberof DeployContractSolidityBytecodeV1Request
+     */
+    privateTransactionConfig?: QuorumPrivateTransactionConfig;
 }
 /**
  * 
@@ -315,6 +345,12 @@ export interface InvokeContractJsonObjectV1Request {
      * @memberof InvokeContractJsonObjectV1Request
      */
     contractJSON: ContractJSON;
+    /**
+     * 
+     * @type {QuorumPrivateTransactionConfig}
+     * @memberof InvokeContractJsonObjectV1Request
+     */
+    privateTransactionConfig?: QuorumPrivateTransactionConfig;
 }
 /**
  * 
@@ -529,6 +565,55 @@ export interface InvokeRawWeb3EthMethodV1Response {
 /**
  * 
  * @export
+ * @interface QuorumPrivateTransactionConfig
+ */
+export interface QuorumPrivateTransactionConfig {
+    /**
+     * 
+     * @type {string}
+     * @memberof QuorumPrivateTransactionConfig
+     */
+    privateFrom?: string;
+    /**
+     * 
+     * @type {Array<any>}
+     * @memberof QuorumPrivateTransactionConfig
+     */
+    privateFor: Array<any>;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof QuorumPrivateTransactionConfig
+     */
+    isPrivate?: boolean;
+    /**
+     * 
+     * @type {number}
+     * @memberof QuorumPrivateTransactionConfig
+     */
+    gasPrice?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof QuorumPrivateTransactionConfig
+     */
+    gasLimit?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof QuorumPrivateTransactionConfig
+     */
+    privateKey?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof QuorumPrivateTransactionConfig
+     */
+    privacyGroupId?: string;
+}
+/**
+ * 
+ * @export
  * @interface QuorumTransactionConfig
  */
 export interface QuorumTransactionConfig {
@@ -607,6 +692,12 @@ export interface RunTransactionRequest {
      * @memberof RunTransactionRequest
      */
     timeoutMs?: number;
+    /**
+     * 
+     * @type {QuorumPrivateTransactionConfig}
+     * @memberof RunTransactionRequest
+     */
+    privateTransactionConfig?: QuorumPrivateTransactionConfig;
 }
 /**
  * 
@@ -1230,6 +1321,42 @@ export interface Web3TransactionReceipt {
      * @memberof Web3TransactionReceipt
      */
     to: string;
+    /**
+     * 
+     * @type {Array<any>}
+     * @memberof Web3TransactionReceipt
+     */
+    logs?: Array<any>;
+    /**
+     * 
+     * @type {string}
+     * @memberof Web3TransactionReceipt
+     */
+    logsBloom?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Web3TransactionReceipt
+     */
+    revertReason?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Web3TransactionReceipt
+     */
+    output?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Web3TransactionReceipt
+     */
+    commitmentHash?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof Web3TransactionReceipt
+     */
+    cumulativeGasUSed?: number;
 }
 
 /**

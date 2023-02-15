@@ -224,6 +224,7 @@ describe(testCase, () => {
       const pluginRegistry = new PluginRegistry({ plugins: [] });
 
       const pluginQuorumConnector = new PluginLedgerConnectorQuorum({
+        privateUrl: rpcApiHttpHost2,
         instanceId: uuidV4(),
         rpcApiHttpHost: rpcApiHttpHost2,
         logLevel,

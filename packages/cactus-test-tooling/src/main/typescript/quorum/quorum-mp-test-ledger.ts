@@ -158,6 +158,13 @@ export class QuorumMultiPartyTestLedger implements ITestLedger {
     });
   }
 
+  public async pullFile(filePath: string): Promise<string> {
+    const docker = new Docker();
+    this.container = docker.getContainer(this.containerId as string);
+
+    return await Containers.pullFile(this.container, filePath);
+  }
+
   public stop(): Promise<unknown> {
     if (this.useRunningLedger) {
       this.log.info("Ignore stop request because useRunningLedger is enabled.");
