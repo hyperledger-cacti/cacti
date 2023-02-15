@@ -301,6 +301,46 @@
                     }
                 }
             },
+            "QuorumPrivateTransactionConfig" : {
+                "type": "object",
+                "required" : [
+                    "privateFor"
+                ],
+                "properties" : {
+                    "privateFrom": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "privateFor": {
+                        "type": "array",
+                        "default": [],
+                        "items": {},
+                        "nullable": false
+                    },
+                    "isPrivate": {
+                        "type": "boolean",
+                        "default": false,
+                        "nullable": false
+                    },
+                    "gasPrice": {
+                        "type": "number",
+                        "nullable": false
+                    },
+                    "gasLimit": {
+                        "type": "number",
+                        "nullable": false
+                    },
+                    "privateKey": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "privacyGroupId": {
+                        "type": "string",
+                        "nullable": false
+                    }
+
+                }
+            },
             "Web3TransactionReceipt": {
                 "type": "object",
                 "required": [
@@ -354,7 +394,33 @@
                     "to": {
                         "type": "string",
                         "nullable": false
-                    }
+                    },
+                    "logs": {
+                        "type": "array",
+                        "default": [],
+                        "items": {},
+                        "nullable": false
+                    },
+                    "logsBloom": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "revertReason": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "output": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "commitmentHash": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "cumulativeGasUSed": {
+                        "type": "number",
+                        "nullable": false
+                    } 
                 }
             },
             "ContractJSON": {
@@ -436,6 +502,9 @@
                         "minimum": 0,
                         "default": 60000,
                         "nullable": false
+                    },
+                    "privateTransactionConfig": {
+                        "$ref": "#/components/schemas/QuorumPrivateTransactionConfig"
                     }
                 }
             },
@@ -448,7 +517,7 @@
                     "transactionReceipt": {
                         "$ref": "#/components/schemas/Web3TransactionReceipt"
                     }
-                }
+                } 
             },
             "DeployContractSolidityBytecodeV1Request": {
                 "type": "object",
@@ -466,9 +535,22 @@
                         "maxLength": 100,
                         "nullable": false
                     },
+                    "contractAbi": {
+                        "description": "The application binary interface of the solidity contract",
+                        "type": "array",
+                        "items": {},
+                        "nullable": false
+                    },
                     "web3SigningCredential": {
                         "$ref": "#/components/schemas/Web3SigningCredential",
                         "nullable": false
+                    },
+                    "bytecode": {
+                        "type": "string",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 24576,
+                        "description": "See https://ethereum.stackexchange.com/a/47556 regarding the maximum length of the bytecode"
                     },
                     "keychainId": {
                         "type": "string",
@@ -482,7 +564,15 @@
                         "nullable": false
                     },
                     "gasPrice": {
-                        "type": "string",
+                        "type": "number",
+                        "nullable": false
+                    },
+                    "nonce": {
+                        "type": "number",
+                        "nullable": false
+                    },
+                    "value": {
+                        "type": "number",
                         "nullable": false
                     },
                     "timeoutMs": {
@@ -502,6 +592,9 @@
                         "type": "array",
                         "default": [],
                         "items": {}
+                    },
+                    "privateTransactionConfig": {
+                        "$ref": "#/components/schemas/QuorumPrivateTransactionConfig"
                     }
                 }
             },
@@ -726,6 +819,9 @@
                         "$ref": "#/components/schemas/ContractJSON",
                         "description": "For use when not using keychain, pass the contract in as this variable",
                         "nullable": false
+                    },
+                    "privateTransactionConfig": {
+                        "$ref": "#/components/schemas/QuorumPrivateTransactionConfig"
                     }
                 }
             },

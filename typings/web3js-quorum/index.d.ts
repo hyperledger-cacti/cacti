@@ -311,7 +311,7 @@ declare module "web3js-quorum" {
     readonly privateFrom: string;
     readonly privateFor: string[];
     readonly privacyGroupId?: string;
-    readonly nonce?: string;
+    readonly nonce?: number;
     readonly to?: string;
     readonly data: string;
   }
