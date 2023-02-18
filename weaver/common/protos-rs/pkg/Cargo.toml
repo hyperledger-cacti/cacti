@@ -6,7 +6,7 @@ edition = "2018"
 license = "Apache-2.0"
 description = "Rust compiled Weaver protobuf package"
 documentation = "https://github.com/hyperledger/cacti/tree/main/weaver/rfcs/formats"
-repository = "https://github.com/hyperledger-labs/weaver-dlt-interoperability/"
+repository = "https://github.com/hyperledger/cacti/"
 readme = "README.md"
 keywords = ["weaver", "interoperability", "protobuf", "protos"]
 
