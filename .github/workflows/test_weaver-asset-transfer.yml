@@ -61,18 +61,18 @@ jobs:
       #     ./scripts/get-cordapps.sh || mv github.main.properties github.properties
       #
       #     cat github.properties
-      #   working-directory: tests/network-setups/corda
+      #   working-directory: weaver/tests/network-setups/corda
       #
       # - name: Start Corda Network
       #   run: |
       #     sed -i "/docker logs corda_partya_1 -f/"' s/^/#/' "scripts/start-nodes.sh"
       #     make start &> corda-net.out &
-      #   working-directory: tests/network-setups/corda
+      #   working-directory: weaver/tests/network-setups/corda
 
       # FABRIC NETWORK
       - name: Start Fabric Network
         run: make start-interop CHAINCODE_NAME=simpleassettransfer PROFILE='2-nodes'
-        working-directory: tests/network-setups/fabric/dev
+        working-directory: weaver/tests/network-setups/fabric/dev
 
       # - name: Corda Network logs
       #   run: |
@@ -82,38 +82,38 @@ jobs:
       # RELAY
       - name: Edit Relay docker compose
         run: make convert-compose-method2
-        working-directory: core/relay
+        working-directory: weaver/core/relay
 
       - name: Start Relay for network1
         run: make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.n1'
-        working-directory: core/relay
+        working-directory: weaver/core/relay
 
       - name: Start Relay for network2
         run: make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.n2'
-        working-directory: core/relay
+        working-directory: weaver/core/relay
 
       # - name: Start Relay for Corda_Network
       #   run: make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.corda'
-      #   working-directory: core/relay
+      #   working-directory: weaver/core/relay
       #
       # - name: Start Relay for Corda_Network2
       #   run: make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.corda2'
-      #   working-directory: core/relay
+      #   working-directory: weaver/core/relay
 
       # FABRIC DRIVER
       - name: Setup Fabric Driver .env
         run: |
           sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}#g" docker-testnet-envs/.env.n1
           sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}#g" docker-testnet-envs/.env.n2
-        working-directory: core/drivers/fabric-driver
+        working-directory: weaver/core/drivers/fabric-driver
 
       - name: Start Fabric Driver for network1
         run: make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.n1' NETWORK_NAME=$(grep NETWORK_NAME docker-testnet-envs/.env.n1 | cut -d '=' -f 2)
-        working-directory: core/drivers/fabric-driver
+        working-directory: weaver/core/drivers/fabric-driver
 
       - name: Start Fabric Driver for network2
         run: make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.n2' NETWORK_NAME=$(grep NETWORK_NAME docker-testnet-envs/.env.n2 | cut -d '=' -f 2)
-        working-directory: core/drivers/fabric-driver
+        working-directory: weaver/core/drivers/fabric-driver
 
       # IIN AGENT
       - name: Setup Fabric IIN Env
@@ -130,28 +130,28 @@ jobs:
           sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}#g" docker-testnet/envs/.env.n2.org2
           sed -i "s#^AUTO_SYNC=true#AUTO_SYNC=false#g" docker-testnet/envs/.env.n2.org2
           sed -i "s#^DNS_CONFIG_PATH=.*#DNS_CONFIG_PATH=./docker-testnet/configs/dnsconfig-2-nodes.json#g" docker-testnet/envs/.env.n2.org2
-        working-directory: core/identity-management/iin-agent
+        working-directory: weaver/core/identity-management/iin-agent
 
       - name: Start Fabric IIN Agent for network1
         run: |
           make deploy COMPOSE_ARG='--env-file docker-testnet/envs/.env.n1.org1' DLT_SPECIFIC_DIR=$(grep DLT_SPECIFIC_DIR docker-testnet/envs/.env.n1.org1 | cut -d '=' -f 2)
           make deploy COMPOSE_ARG='--env-file docker-testnet/envs/.env.n1.org2' DLT_SPECIFIC_DIR=$(grep DLT_SPECIFIC_DIR docker-testnet/envs/.env.n1.org2 | cut -d '=' -f 2)
-        working-directory: core/identity-management/iin-agent
+        working-directory: weaver/core/identity-management/iin-agent
 
       - name: Start Fabric IIN Agent for network2
         run: |
           make deploy COMPOSE_ARG='--env-file docker-testnet/envs/.env.n2.org1' DLT_SPECIFIC_DIR=$(grep DLT_SPECIFIC_DIR docker-testnet/envs/.env.n2.org1 | cut -d '=' -f 2)
           make deploy COMPOSE_ARG='--env-file docker-testnet/envs/.env.n2.org2' DLT_SPECIFIC_DIR=$(grep DLT_SPECIFIC_DIR docker-testnet/envs/.env.n2.org2 | cut -d '=' -f 2)
-        working-directory: core/identity-management/iin-agent
+        working-directory: weaver/core/identity-management/iin-agent
 
       # CORDA DRIVER
       # - name: Start Corda Driver
       #   run: make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.corda'
-      #   working-directory: core/drivers/corda-driver
+      #   working-directory: weaver/core/drivers/corda-driver
       #
       # - name: Start Corda_Network2 Driver
       #   run: make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.corda2'
-      #   working-directory: core/drivers/corda-driver
+      #   working-directory: weaver/core/drivers/corda-driver
 
       # FABRIC CLI
       - name: Setup Fabric CLI .npmrc
@@ -159,12 +159,12 @@ jobs:
           cp .npmrc.template .npmrc
           sed -i "s/<personal-access-token>/${{ secrets.GITHUB_TOKEN }}/g" .npmrc
           cat .npmrc
-        working-directory: samples/fabric/fabric-cli
+        working-directory: weaver/samples/fabric/fabric-cli
       - name: Build Fabric CLI
         run: |
           npm install --global yarn
           make build
-        working-directory: samples/fabric/fabric-cli
+        working-directory: weaver/samples/fabric/fabric-cli
 
       # FABRIC CLI
       - name: Setup Fabric CLI ENV
@@ -178,7 +178,7 @@ jobs:
           ./bin/fabric-cli env set REMOTE_CONFIG_PATH ${GITHUB_WORKSPACE}/samples/fabric/fabric-cli/remote-network-config.json
           ./bin/fabric-cli env set CHAINCODE_PATH ${GITHUB_WORKSPACE}/samples/fabric/fabric-cli/chaincode.json
           cat .env
-        working-directory: samples/fabric/fabric-cli
+        working-directory: weaver/samples/fabric/fabric-cli
 
       - name: Setup Fabric CLI Config
         run: |
@@ -196,7 +196,7 @@ jobs:
           sed -i "s#localhost:9083#relay-network2:9083#g" remote-network-config.json
           sed -i "s#localhost:10006#corda_partya_1:10003#g" remote-network-config.json
           sed -i "s#localhost:30006#corda_network2_partya_1:10003#g" remote-network-config.json
-        working-directory: samples/fabric/fabric-cli
+        working-directory: weaver/samples/fabric/fabric-cli
 
       - name: Fabric CLI Init
         run: |
@@ -205,7 +205,7 @@ jobs:
           ./bin/fabric-cli configure network --local-network=network1 --num-orgs=2
           ./bin/fabric-cli configure network --local-network=network2 --num-orgs=2
           ./scripts/initAssetsForTransfer.sh
-        working-directory: samples/fabric/fabric-cli
+        working-directory: weaver/samples/fabric/fabric-cli
 
       - name: Fabric Sync Membership using IIN Agent
         run: |
@@ -217,7 +217,7 @@ jobs:
           sleep 30
           docker logs iin-agent-Org1MSP-network1
           docker logs iin-agent-Org1MSP-network2
-        working-directory: samples/fabric/fabric-cli
+        working-directory: weaver/samples/fabric/fabric-cli
 
       # CORDA CLIENT
       # - name: Corda CLI Setup
@@ -229,11 +229,11 @@ jobs:
       #     sed -i "s#localhost:9083#relay-network2:9083#g" remote-network-config.json
       #     sed -i "s#localhost:10006#corda_partya_1:10003#g" remote-network-config.json
       #     sed -i "s#localhost:30006#corda_network2_partya_1:10003#g" remote-network-config.json
-      #   working-directory: samples/corda/corda-simple-application/clients/src/main/resources/config
+      #   working-directory: weaver/samples/corda/corda-simple-application/clients/src/main/resources/config
       #
       # - name: Corda CLI Initialize Vault
       #   run: make initialise-vault-asset-transfer-docker
-      #   working-directory: samples/corda/corda-simple-application
+      #   working-directory: weaver/samples/corda/corda-simple-application
 
       # - name: Data Transfer Corda Client Tests
       #   run: |
@@ -285,7 +285,7 @@ jobs:
       #     else
       #         exit 1
       #     fi
-      #   working-directory: samples/corda/corda-simple-application
+      #   working-directory: weaver/samples/corda/corda-simple-application
 
       # FABRIC CLI
       - name: Asset Transfer Fabric CLI Non-Fungible Tests
@@ -345,7 +345,7 @@ jobs:
           else
               exit 1
           fi
-        working-directory: samples/fabric/fabric-cli
+        working-directory: weaver/samples/fabric/fabric-cli
 
       # FABRIC CLI
       - name: Asset Transfer Fabric CLI Fungible Tests
@@ -403,7 +403,7 @@ jobs:
           else
               exit 1
           fi
-        working-directory: samples/fabric/fabric-cli
+        working-directory: weaver/samples/fabric/fabric-cli
 
   fabric-asset-transfer-local:
     # if: ${{ false }}
@@ -443,7 +443,7 @@ jobs:
           make protos-local
           cargo update -p nom
           cargo update -p lexical-core
-        working-directory: core/relay
+        working-directory: weaver/core/relay
 
       - name: Use Protoc 3.15
         run: |
@@ -457,68 +457,68 @@ jobs:
         run: |
           export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
           make build
-        working-directory: common/protos-go
+        working-directory: weaver/common/protos-go
 
       # PROTOS
       - name: Build JS Protos
         run: |
           export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
           make build
-        working-directory: common/protos-js
+        working-directory: weaver/common/protos-js
 
       # - name: Build Java Protos
       #   run: make build
-      #   working-directory: common/protos-java-kt
+      #   working-directory: weaver/common/protos-java-kt
 
       # Build Dependencies
       # - name: Build Corda Interop App
       #   run: make build-local
-      #   working-directory: core/network/corda-interop-app
+      #   working-directory: weaver/core/network/corda-interop-app
       #
       # - name: Build Corda Interop SDK
       #   run: make build
-      #   working-directory: sdks/corda
+      #   working-directory: weaver/sdks/corda
       #
       # - name: Build Corda SimpleApplication
       #   run: make build-local
-      #   working-directory: samples/corda/corda-simple-application
+      #   working-directory: weaver/samples/corda/corda-simple-application
 
       - name: Build Fabric Interop SDK
         run: make build-local
-        working-directory: sdks/fabric/interoperation-node-sdk
+        working-directory: weaver/sdks/fabric/interoperation-node-sdk
 
       - name: Build Fabric CLI
         run: make build-local
-        working-directory: samples/fabric/fabric-cli
+        working-directory: weaver/samples/fabric/fabric-cli
 
       - name: Build Relay
         run: make
-        working-directory: core/relay
+        working-directory: weaver/core/relay
 
       - name: Build Fabric Driver
         run: make build-local
-        working-directory: core/drivers/fabric-driver
+        working-directory: weaver/core/drivers/fabric-driver
 
       - name: Build IIN Agent
         run: make build-local
-        working-directory: core/identity-management/iin-agent
+        working-directory: weaver/core/identity-management/iin-agent
 
       # - name: Build Corda Driver
       #   run: make build-local
-      #   working-directory: core/drivers/corda-driver
+      #   working-directory: weaver/core/drivers/corda-driver
       #
       # # CORDA NETWORK
       # - name: Start Corda Network
       #   run: |
       #     sed -i "/docker logs corda_partya_1 -f/"' s/^/#/' "scripts/start-nodes.sh"
       #     make start-local &> corda-net.out &
-      #   working-directory: tests/network-setups/corda
+      #   working-directory: weaver/tests/network-setups/corda
 
       # FABRIC NETWORK
 
       - name: Start Fabric Network
         run: make start-interop-local CHAINCODE_NAME=simpleassettransfer
-        working-directory: tests/network-setups/fabric/dev
+        working-directory: weaver/tests/network-setups/fabric/dev
 
       # - name: Corda Network logs
       #   run: |
@@ -528,19 +528,19 @@ jobs:
       # RELAY
       - name: Start Relay for network1
         run: RELAY_CONFIG=config/Fabric_Relay.toml cargo run --bin server &> relay-n1.out &
-        working-directory: core/relay
+        working-directory: weaver/core/relay
 
       - name: Start Relay for network2
         run: RELAY_CONFIG=config/Fabric_Relay2.toml cargo run --bin server &> relay-n2.out &
-        working-directory: core/relay
+        working-directory: weaver/core/relay
 
       # - name: Start Relay for Corda_Network
       #   run: RELAY_CONFIG=config/Corda_Relay.toml cargo run --bin server &> relay-corda.out &
-      #   working-directory: core/relay
+      #   working-directory: weaver/core/relay
       #
       # - name: Start Relay for Corda_Network2
       #   run: RELAY_CONFIG=config/Corda_Relay2.toml cargo run --bin server &> relay-corda2.out &
-      #   working-directory: core/relay
+      #   working-directory: weaver/core/relay
 
       # FABRIC DRIVER
       - name: Setup Fabric Driver .env
@@ -548,15 +548,15 @@ jobs:
           cp .env.template .env
           CCP_PATH=${GITHUB_WORKSPACE}/tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json
           sed -i "s#path_to_connection_profile#${CCP_PATH}#g" .env
-        working-directory: core/drivers/fabric-driver
+        working-directory: weaver/core/drivers/fabric-driver
 
       - name: Start Fabric Driver for network1
         run: npm run dev &> fdriver-n1.out &
-        working-directory: core/drivers/fabric-driver
+        working-directory: weaver/core/drivers/fabric-driver
 
       - name: Start Fabric Driver for network2
         run: CONNECTION_PROFILE=${GITHUB_WORKSPACE}/tests/network-setups/fabric/shared/network2/peerOrganizations/org1.network2.com/connection-org1.json NETWORK_NAME=network2 RELAY_ENDPOINT=localhost:9083 DRIVER_ENDPOINT=localhost:9095 npm run dev &> fdriver-n2.out &
-        working-directory: core/drivers/fabric-driver
+        working-directory: weaver/core/drivers/fabric-driver
 
       # IIN AGENT
       - name: Setup Fabric IIN Config
@@ -574,7 +574,7 @@ jobs:
           sed -i "s#iin-agent-Org1MSP-network1#localhost#g" docker-testnet/configs/dnsconfig.json
           sed -i "s#iin-agent-Org1MSP-network2#localhost#g" docker-testnet/configs/dnsconfig.json
           cat docker-testnet/configs/dnsconfig.json
-        working-directory: core/identity-management/iin-agent
+        working-directory: weaver/core/identity-management/iin-agent
 
       - name: Setup Fabric IIN Env
         run: |
@@ -587,24 +587,24 @@ jobs:
           sed -i "s#^CONFIG_PATH=#CONFIG_PATH=./src/fabric-ledger/config-n1.json#g" .env
           sed -i "s#^AUTO_SYNC=#AUTO_SYNC=false#g" .env
           cat .env
-        working-directory: core/identity-management/iin-agent
+        working-directory: weaver/core/identity-management/iin-agent
 
       - name: Start Fabric IIN Agent for network1
         run: npm run dev &> iinagent-n1.out &
-        working-directory: core/identity-management/iin-agent
+        working-directory: weaver/core/identity-management/iin-agent
 
       - name: Start Fabric IIN Agent for network2
         run: IIN_AGENT_ENDPOINT=localhost:9501 SECURITY_DOMAIN=network2 CONFIG_PATH=./src/fabric-ledger/config-n2.json npm run dev &> iinagent-n2.out &
-        working-directory: core/identity-management/iin-agent
+        working-directory: weaver/core/identity-management/iin-agent
 
       # # CORDA DRIVER
       # - name: Start Corda_Network Driver
       #   run: ./build/install/corda-driver/bin/corda-driver &> corda-driver.out &
-      #   working-directory: core/drivers/corda-driver
+      #   working-directory: weaver/core/drivers/corda-driver
       #
       # - name: Start Corda_Network2 Driver
       #   run: DRIVER_PORT=9098 ./build/install/corda-driver/bin/corda-driver &> corda2-driver.out &
-      #   working-directory: core/drivers/corda-driver
+      #   working-directory: weaver/core/drivers/corda-driver
 
       # FABRIC CLI
       - name: Setup Fabric CLI ENV
@@ -618,7 +618,7 @@ jobs:
           ./bin/fabric-cli env set REMOTE_CONFIG_PATH ${GITHUB_WORKSPACE}/samples/fabric/fabric-cli/remote-network-config.json
           ./bin/fabric-cli env set CHAINCODE_PATH ${GITHUB_WORKSPACE}/samples/fabric/fabric-cli/chaincode.json
           cat .env
-        working-directory: samples/fabric/fabric-cli
+        working-directory: weaver/samples/fabric/fabric-cli
 
       - name: Setup Fabric CLI Config
         run: |
@@ -631,7 +631,7 @@ jobs:
           ./bin/fabric-cli config set network2 chaincode simpleassettransfer
           cp chaincode.json.template chaincode.json
           cp remote-network-config.json.template remote-network-config.json
-        working-directory: samples/fabric/fabric-cli
+        working-directory: weaver/samples/fabric/fabric-cli
 
 
       - name: Fabric CLI Init
@@ -641,7 +641,7 @@ jobs:
           ./bin/fabric-cli configure network --local-network=network1
           ./bin/fabric-cli configure network --local-network=network2
           ./scripts/initAssetsForTransfer.sh
-        working-directory: samples/fabric/fabric-cli
+        working-directory: weaver/samples/fabric/fabric-cli
 
       - name: Fabric Sync Membership using IIN Agent
         run: |
@@ -651,12 +651,12 @@ jobs:
           ./bin/fabric-cli configure membership --local-network=network2 --target-network=network1 --iin-agent-endpoint=localhost:9501
           sleep 10
           tail -10 ../../../core/identity-management/iin-agent/iinagent-n2.out
-        working-directory: samples/fabric/fabric-cli
+        working-directory: weaver/samples/fabric/fabric-cli
 
       # # CORDA CLIENT
       # - name: Corda CLI Initialize Vault
       #   run: make initialise-vault
-      #   working-directory: samples/corda/corda-simple-application
+      #   working-directory: weaver/samples/corda/corda-simple-application
       #
       # - name: Data Transfer Corda Client Tests
       #   run: |
@@ -708,7 +708,7 @@ jobs:
       #     else
       #         exit 1
       #     fi
-      #   working-directory: samples/corda/corda-simple-application
+      #   working-directory: weaver/samples/corda/corda-simple-application
 
       # FABRIC CLI
       - name: Asset Transfer Fabric CLI Non-Fungible Tests
@@ -768,7 +768,7 @@ jobs:
           else
               exit 1
           fi
-        working-directory: samples/fabric/fabric-cli
+        working-directory: weaver/samples/fabric/fabric-cli
 
       # FABRIC CLI
       - name: Asset Transfer Fabric CLI Fungible Tests
@@ -826,4 +826,4 @@ jobs:
           else
               exit 1
           fi
-        working-directory: samples/fabric/fabric-cli
+        working-directory: weaver/samples/fabric/fabric-cli

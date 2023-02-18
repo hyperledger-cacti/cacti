@@ -27,12 +27,12 @@ jobs:
         
     - name: Build Protos (Local)
       run: make build
-      working-directory: common/protos-java-kt
+      working-directory: weaver/common/protos-java-kt
       
     - name: Build Corda Interop App (Local)
       run: make build-local
-      working-directory: core/network/corda-interop-app
+      working-directory: weaver/core/network/corda-interop-app
       
     - name: Run Tests (Local)
       run: make test
-      working-directory: core/network/corda-interop-app
+      working-directory: weaver/core/network/corda-interop-app

@@ -32,33 +32,33 @@ jobs:
             
       - name: Build Protos RS
         run: make build
-        working-directory: common/protos-rs
+        working-directory: weaver/common/protos-rs
           
       - name: Get Latest Relay Dependencies
         run: |
           make protos-local
           cargo update -p nom
           cargo update -p lexical-core
-        working-directory: core/relay
+        working-directory: weaver/core/relay
           
       - name: Build Image
         run: make
-        working-directory: core/relay
+        working-directory: weaver/core/relay
     
       - name: Run Dummy Relay
         run: RELAY_CONFIG=config/Dummy_Relay.toml  cargo run --bin server &> relay-dummy.out &
-        working-directory: core/relay
+        working-directory: weaver/core/relay
     
       - name: Run Dummy Driver
         run: RELAY_CONFIG=config/Dummy_Relay.toml  cargo run --bin dummy-driver &> driver-dummy.out &
-        working-directory: core/relay
+        working-directory: weaver/core/relay
     
       - name: Mock Client Test
         run: |
             echo "Waiting for Dummy Relay and Driver to come up"
             sleep 30
             cargo run --bin client 9085 localhost:9085/Dummy_Network/abc:abc:abc:abc
-        working-directory: core/relay
+        working-directory: weaver/core/relay
         
   relay:
     # if: ${{ false }}
@@ -78,23 +78,23 @@ jobs:
         run: |
           cargo update -p nom
           cargo update -p lexical-core
-        working-directory: core/relay
+        working-directory: weaver/core/relay
           
       - name: Build Image
         run: make build
-        working-directory: core/relay
+        working-directory: weaver/core/relay
     
       - name: Run Dummy Relay
         run: RELAY_CONFIG=config/Dummy_Relay.toml  cargo run --bin server &> relay-dummy.out &
-        working-directory: core/relay
+        working-directory: weaver/core/relay
     
       - name: Run Dummy Driver
         run: RELAY_CONFIG=config/Dummy_Relay.toml  cargo run --bin dummy-driver &> driver-dummy.out &
-        working-directory: core/relay
+        working-directory: weaver/core/relay
     
       - name: Mock Client Test
         run: |
             echo "Waiting for Dummy Relay and Driver to come up"
             sleep 30
             cargo run --bin client 9085 localhost:9085/Dummy_Network/abc:abc:abc:abc
-        working-directory: core/relay
+        working-directory: weaver/core/relay
