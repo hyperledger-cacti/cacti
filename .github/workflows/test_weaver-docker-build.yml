@@ -1,4 +1,4 @@
-# Copyright IBM Corp. All Rights Reserved.
+Copyright IBM Corp. All Rights Reserved.
 #
 # SPDX-License-Identifier: CC-BY-4.0
 
@@ -53,7 +53,7 @@ jobs:
         working-directory: core/drivers/fabric-driver
         
   fabric-driver-packages:
-    # if: ${{ false }}
+    if: ${{ false }}
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -99,6 +99,7 @@ jobs:
         working-directory: core/drivers/corda-driver
           
   corda-driver-packages:
+    if: ${{ false }}
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
