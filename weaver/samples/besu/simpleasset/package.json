@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Sample Besu Application for Demonstrating Interoperation With Other Networks",
   "license": "Apache-2.0",
-  "repository": "hyperledger-labs/weaver-dlt-interoperability/samples/besu/simpleasset",
+  "repository": "https://github.com/hyperledger/cacti/samples/besu/simpleasset",
   "bugs": {
     "url": "https://github.com/hyperledger/cacti/issues"
   },
