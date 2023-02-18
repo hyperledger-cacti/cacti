@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package common.proofs;
 option java_package = "com.weaver.protos.common.proofs";
-option go_package = "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common";
+option go_package = "github.com/hyperledger/cacti/weaver/common/protos-go/common";
 
 message Proof {
   string signature = 1;

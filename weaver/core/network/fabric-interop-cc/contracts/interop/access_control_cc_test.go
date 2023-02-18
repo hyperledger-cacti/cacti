@@ -11,10 +11,10 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils/mocks"
+	"github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/testutils/mocks"
 	"github.com/stretchr/testify/require"
-	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
-	wtest "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils"
+	"github.com/hyperledger/cacti/weaver/common/protos-go/common"
+	wtest "github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/testutils"
 )
 
 var accessControlAsset = common.AccessControlPolicy{

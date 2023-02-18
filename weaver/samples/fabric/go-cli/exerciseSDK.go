@@ -21,12 +21,12 @@ import (
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
-	"github.com/hyperledger-labs/weaver-dlt-interoperability/samples/fabric/go-cli/helpers"
-	"github.com/hyperledger-labs/weaver-dlt-interoperability/samples/fabric/go-cli/helpers/interopsetup"
-	am "github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/asset-manager"
-	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/interoperablehelper"
-	"github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/types"
+	"github.com/hyperledger/cacti/weaver/common/protos-go/common"
+	"github.com/hyperledger/cacti/weaver/samples/fabric/go-cli/helpers"
+	"github.com/hyperledger/cacti/weaver/samples/fabric/go-cli/helpers/interopsetup"
+	am "github.com/hyperledger/cacti/weaver/sdks/fabric/go-sdk/asset-manager"
+	"github.com/hyperledger/cacti/weaver/sdks/fabric/go-sdk/interoperablehelper"
+	"github.com/hyperledger/cacti/weaver/sdks/fabric/go-sdk/types"
 )
 
 func connectSimpleStateWithSDK() {
