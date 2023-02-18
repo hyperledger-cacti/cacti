@@ -8,3 +8,7 @@ package-lock.json
 .npmrc
 driverdbs
 weaver-fabric-interop-sdk
+wallet-network1/*.id
+!wallet-network1/relay.id
+wallet-network2/*.id
+!wallet-network2/relay.id

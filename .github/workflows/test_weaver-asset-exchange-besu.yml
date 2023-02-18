@@ -37,6 +37,11 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
 
+      - name: Use Node.js 14.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14.x
+
       - name: Use Protoc 3.15
         run: |
           curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.15.6/protoc-3.15.6-linux-x86_64.zip
@@ -210,6 +215,11 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
+
+      - name: Use Node.js 14.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14.x
 
       - name: Use Protoc 3.15
         run: |
