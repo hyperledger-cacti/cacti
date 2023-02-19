@@ -242,9 +242,7 @@ jobs:
 
       # BESU SDK
       - name: Setup BESU SDK
-        run: |
-         npm link
-         make build-local
+        run: make build-local
         working-directory: weaver/sdks/besu/interoperation-node-sdk 
         
       # BESU NETWORK

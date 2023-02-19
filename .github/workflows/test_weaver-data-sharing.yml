@@ -176,8 +176,8 @@ jobs:
           echo ${GITHUB_WORKSPACE}
           cp .env.template .env
           sed -i "s/CHAINCODE_PATH=.*/CHAINCODE_PATH=\.\/chaincode\.json/g" .env
-          ./bin/fabric-cli env set MEMBER_CREDENTIAL_FOLDER ${GITHUB_WORKSPACE}/samples/fabric/fabric-cli/src/data/credentials_docker
-          ./bin/fabric-cli env set CONFIG_PATH ${GITHUB_WORKSPACE}/samples/fabric/fabric-cli/config.json
+          ./bin/fabric-cli env set MEMBER_CREDENTIAL_FOLDER ${GITHUB_WORKSPACE}/weaver/samples/fabric/fabric-cli/src/data/credentials_docker
+          ./bin/fabric-cli env set CONFIG_PATH ${GITHUB_WORKSPACE}/weaver/samples/fabric/fabric-cli/config.json
           cat .env
         working-directory: weaver/samples/fabric/fabric-cli
 
@@ -541,8 +541,8 @@ jobs:
           echo ${GITHUB_WORKSPACE}
           cp .env.template .env
           sed -i "s/CHAINCODE_PATH=.*/CHAINCODE_PATH=\.\/chaincode\.json/g" .env
-          ./bin/fabric-cli env set MEMBER_CREDENTIAL_FOLDER ${GITHUB_WORKSPACE}/samples/fabric/fabric-cli/src/data/credentials_docker
-          ./bin/fabric-cli env set CONFIG_PATH ${GITHUB_WORKSPACE}/samples/fabric/fabric-cli/config.json
+          ./bin/fabric-cli env set MEMBER_CREDENTIAL_FOLDER ${GITHUB_WORKSPACE}/weaver/samples/fabric/fabric-cli/src/data/credentials_docker
+          ./bin/fabric-cli env set CONFIG_PATH ${GITHUB_WORKSPACE}/weaver/samples/fabric/fabric-cli/config.json
           cat .env
         working-directory: weaver/samples/fabric/fabric-cli
 
@@ -839,7 +839,7 @@ jobs:
       - name: Setup Fabric Driver .env
         run: |
           cp .env.template .env
-          CCP_PATH=${GITHUB_WORKSPACE}/tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json
+          CCP_PATH=${GITHUB_WORKSPACE}/weaver/tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json
           sed -i "s#path_to_connection_profile#${CCP_PATH}#g" .env
         working-directory: weaver/core/drivers/fabric-driver
 
@@ -848,7 +848,7 @@ jobs:
         working-directory: weaver/core/drivers/fabric-driver
 
       - name: Start Fabric Driver for network2
-        run: CONNECTION_PROFILE=${GITHUB_WORKSPACE}/tests/network-setups/fabric/shared/network2/peerOrganizations/org1.network2.com/connection-org1.json NETWORK_NAME=network2 RELAY_ENDPOINT=localhost:9083 DRIVER_ENDPOINT=localhost:9095 npm run dev &> fdriver-n2.out &
+        run: CONNECTION_PROFILE=${GITHUB_WORKSPACE}/weaver/tests/network-setups/fabric/shared/network2/peerOrganizations/org1.network2.com/connection-org1.json NETWORK_NAME=network2 RELAY_ENDPOINT=localhost:9083 DRIVER_ENDPOINT=localhost:9095 npm run dev &> fdriver-n2.out &
         working-directory: weaver/core/drivers/fabric-driver
 
       # IIN AGENT
@@ -856,11 +856,11 @@ jobs:
         run: |
           # FABRIC CONFIG
           cp src/fabric-ledger/config.json.template src/fabric-ledger/config-n1.json
-          CCP_PATH=${GITHUB_WORKSPACE}/tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json
+          CCP_PATH=${GITHUB_WORKSPACE}/weaver/tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json
           sed -i "s#<path-to-connection-profile>#${CCP_PATH}#g" src/fabric-ledger/config-n1.json
           cat src/fabric-ledger/config-n1.json
           cp src/fabric-ledger/config.json.template src/fabric-ledger/config-n2.json
-          CCP_PATH=${GITHUB_WORKSPACE}/tests/network-setups/fabric/shared/network2/peerOrganizations/org1.network2.com/connection-org1.json
+          CCP_PATH=${GITHUB_WORKSPACE}/weaver/tests/network-setups/fabric/shared/network2/peerOrganizations/org1.network2.com/connection-org1.json
           sed -i "s#<path-to-connection-profile>#${CCP_PATH}#g" src/fabric-ledger/config-n2.json
           cat src/fabric-ledger/config-n2.json
           # DNS CONFIG
@@ -911,8 +911,8 @@ jobs:
           echo ${GITHUB_WORKSPACE}
           cp .env.template .env
           sed -i "s/CHAINCODE_PATH=.*/CHAINCODE_PATH=\.\/chaincode\.json/g" .env
-          ./bin/fabric-cli env set MEMBER_CREDENTIAL_FOLDER ${GITHUB_WORKSPACE}/samples/fabric/fabric-cli/src/data/credentials
-          ./bin/fabric-cli env set CONFIG_PATH ${GITHUB_WORKSPACE}/samples/fabric/fabric-cli/config.json
+          ./bin/fabric-cli env set MEMBER_CREDENTIAL_FOLDER ${GITHUB_WORKSPACE}/weaver/samples/fabric/fabric-cli/src/data/credentials
+          ./bin/fabric-cli env set CONFIG_PATH ${GITHUB_WORKSPACE}/weaver/samples/fabric/fabric-cli/config.json
           cat .env
           cp chaincode.json.template chaincode.json
         working-directory: weaver/samples/fabric/fabric-cli
