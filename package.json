@@ -73,11 +73,11 @@
   "devDependencies": {
     "@commitlint/cli": "13.1.0",
     "@commitlint/config-conventional": "13.1.0",
-    "@openapitools/openapi-generator-cli": "2.4.14",
     "@lerna-lite/cli": "1.4.0",
     "@lerna-lite/exec": "1.4.0",
     "@lerna-lite/list": "1.4.0",
     "@lerna-lite/run": "1.4.0",
+    "@openapitools/openapi-generator-cli": "2.4.14",
     "@types/fs-extra": "9.0.12",
     "@types/jasminewd2": "2.0.10",
     "@types/jest": "27.5.0",
@@ -152,5 +152,8 @@
     "minimist": ">=1.2.6",
     "node-forge": ">=1.3.0",
     "underscore": "1.13.2"
+  },
+  "dependencies": {
+    "chia-js": "^0.1.7"
   }
 }

@@ -9,6 +9,9 @@ import { Optional } from "typescript-optional";
 import OAS from "../json/openapi.json";
 
 import Web3 from "web3";
+import { Wallet } from "chia-js";
+import { WalletBalance } from "./moreModel";
+import { WalletBalanceResponse } from "./model-type-guards";
 
 import type { WebsocketProvider } from "web3-core";
 //import EEAClient, { ICallOptions, IWeb3InstanceExtended } from "web3-eea";
@@ -120,6 +123,7 @@ export class PluginLedgerConnectorChia
   private readonly log: Logger;
   private readonly web3Provider: WebsocketProvider;
   private readonly web3: Web3;
+  private readonly wallet: Wallet;
   private web3Quorum: IWeb3Quorum | undefined;
   private readonly pluginRegistry: PluginRegistry;
   private contracts: {
@@ -931,6 +935,15 @@ export class PluginLedgerConnectorChia
       request.defaultBlock,
     );
     return { balance };
+  }
+
+  public async getWalletBalance(walletId: number): Promise<WalletBalance> {
+    const { wallet_balance } = await this.request<WalletBalanceResponse>(
+      "get_wallet_balance",
+      { wallet_id: walletId },
+    );
+
+    return wallet_balance;
   }
 
   public async getTransaction(
