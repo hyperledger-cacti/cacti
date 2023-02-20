@@ -79,7 +79,7 @@ Prominent features in our future roadmap are:
 
 ## Active Maintainers
 - https://github.com/VRamakrishna
-- https://github.com/sanvenDev
+- https://github.com/sandeepnRES
 - https://github.com/knarayan
 - https://github.com/dhinakaran2705
 - https://github.com/SIKHAR405

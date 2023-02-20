@@ -11,7 +11,7 @@ Maintainers
 | Takuma TAKEUCHI | [takeutak][takeutak] | takeutak#7220 |
 | Jagpreet Singh Sasan | [jagpreetsinghsasan][jagpreetsinghsasan] | jagpreetsinghsasan |
 | Venkatraman Ramakrishna | [VRamakrishna][VRamakrishna] | Ramakrishna#6645 |
-| Sandeep Nishad | [sanvenDev][sanvenDev] | sanven#1092 |
+| Sandeep Nishad | [sandeepnRES][sandeepnRES] | sandeepn#1092 |
 
 [jonathan-m-hamilton]: https://github.com/jonathan-m-hamilton
 [izuru0]: https://github.com/izuru0
@@ -19,4 +19,4 @@ Maintainers
 [takeutak]: https://github.com/takeutak
 [jagpreetsinghsasan]: https://github.com/jagpreetsinghsasan
 [VRamakrishna]: https://github.com/VRamakrishna/
-[sanvenDev]: https://github.com/sanvenDev
+[sandeepnRES]: https://github.com/sandeepnRES
