@@ -59,7 +59,7 @@ jobs:
         run: |
           echo ${GITHUB_WORKSPACE}
           cp config.template.json config.json
-          sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}#g" config.json
+          sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}/weaver#g" config.json
         working-directory: weaver/samples/fabric/fabric-cli
       - name: Setup Fabric CLI ENV
         run: |
@@ -147,7 +147,7 @@ jobs:
         run: |
           echo ${GITHUB_WORKSPACE}
           cp config.template.json config.json
-          sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}#g" config.json
+          sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}/weaver#g" config.json
         working-directory: weaver/samples/fabric/fabric-cli
       - name: Setup Fabric CLI ENV
         run: |

@@ -78,6 +78,7 @@ jobs:
       #   run: |
       #     cat tests/network-setups/corda/corda-net.out
       #     docker logs corda_partya_1
+      # working-directory: weaver
 
       # RELAY
       - name: Edit Relay docker compose
@@ -103,8 +104,8 @@ jobs:
       # FABRIC DRIVER
       - name: Setup Fabric Driver .env
         run: |
-          sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}#g" docker-testnet-envs/.env.n1
-          sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}#g" docker-testnet-envs/.env.n2
+          sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}/weaver#g" docker-testnet-envs/.env.n1
+          sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}/weaver#g" docker-testnet-envs/.env.n2
         working-directory: weaver/core/drivers/fabric-driver
 
       - name: Start Fabric Driver for network1
@@ -118,16 +119,16 @@ jobs:
       # IIN AGENT
       - name: Setup Fabric IIN Env
         run: |
-          sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}#g" docker-testnet/envs/.env.n1.org1
+          sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}/weaver#g" docker-testnet/envs/.env.n1.org1
           sed -i "s#^AUTO_SYNC=true#AUTO_SYNC=false#g" docker-testnet/envs/.env.n1.org1
           sed -i "s#^DNS_CONFIG_PATH=.*#DNS_CONFIG_PATH=./docker-testnet/configs/dnsconfig-2-nodes.json#g" docker-testnet/envs/.env.n1.org1
-          sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}#g" docker-testnet/envs/.env.n1.org2
+          sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}/weaver#g" docker-testnet/envs/.env.n1.org2
           sed -i "s#^AUTO_SYNC=true#AUTO_SYNC=false#g" docker-testnet/envs/.env.n1.org2
           sed -i "s#^DNS_CONFIG_PATH=.*#DNS_CONFIG_PATH=./docker-testnet/configs/dnsconfig-2-nodes.json#g" docker-testnet/envs/.env.n1.org2
-          sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}#g" docker-testnet/envs/.env.n2.org1
+          sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}/weaver#g" docker-testnet/envs/.env.n2.org1
           sed -i "s#^AUTO_SYNC=true#AUTO_SYNC=false#g" docker-testnet/envs/.env.n2.org1
           sed -i "s#^DNS_CONFIG_PATH=.*#DNS_CONFIG_PATH=./docker-testnet/configs/dnsconfig-2-nodes.json#g" docker-testnet/envs/.env.n2.org1
-          sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}#g" docker-testnet/envs/.env.n2.org2
+          sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}/weaver#g" docker-testnet/envs/.env.n2.org2
           sed -i "s#^AUTO_SYNC=true#AUTO_SYNC=false#g" docker-testnet/envs/.env.n2.org2
           sed -i "s#^DNS_CONFIG_PATH=.*#DNS_CONFIG_PATH=./docker-testnet/configs/dnsconfig-2-nodes.json#g" docker-testnet/envs/.env.n2.org2
         working-directory: weaver/core/identity-management/iin-agent
@@ -184,7 +185,7 @@ jobs:
         run: |
           echo ${GITHUB_WORKSPACE}
           cp config.template.json config.json
-          sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}#g" config.json
+          sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}/weaver#g" config.json
           ./bin/fabric-cli config set network2 aclPolicyPrincipalType ca
           ./bin/fabric-cli config set network1 chaincode simpleassettransfer
           ./bin/fabric-cli config set network2 chaincode simpleassettransfer
@@ -524,6 +525,7 @@ jobs:
       #   run: |
       #     cat tests/network-setups/corda/corda-net.out
       #     docker logs corda_partya_1
+      # working-directory: weaver
 
       # RELAY
       - name: Start Relay for network1
@@ -624,7 +626,7 @@ jobs:
         run: |
           echo ${GITHUB_WORKSPACE}
           cp config.template.json config.json
-          sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}#g" config.json
+          sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}/weaver#g" config.json
           ###### Change line number in following commands if config is modified #####
           ./bin/fabric-cli config set network2 aclPolicyPrincipalType ca
           ./bin/fabric-cli config set network1 chaincode simpleassettransfer
