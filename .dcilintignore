@@ -18,3 +18,11 @@ packages/cactus-test-tooling/src/main/typescript/keycloak/keycloak-container.ts
 
 # Generated code that cannot be modified
 examples/cactus-example-carbon-accounting-backend/src/main/json/generated/build-info/**
+
+# Cannot be edited as its a name of a imported Corda library, and Corda syntax
+weaver/core/drivers/corda-driver/src/main/kotlin/CustomSerializationWhitelist.kt
+weaver/samples/corda/corda-simple-application/clients/src/main/kotlin/com/cordaSimpleApplication/client/CustomSerializationWhitelist.kt
+weaver/core/network/corda-interop-app/interop-workflows/src/main/kotlin/com/weaver/corda/app/interop/flows/customSerializers/CustomSerializationWhitelist.kt
+
+# Corda Generated files that we have no control over, used for testing
+weaver/tests/network-setups/corda/shared

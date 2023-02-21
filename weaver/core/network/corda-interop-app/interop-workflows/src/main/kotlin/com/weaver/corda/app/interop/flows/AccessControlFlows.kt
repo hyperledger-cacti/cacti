@@ -152,7 +152,7 @@ class UpdateAccessControlPolicyState(val accessControlPolicyState: AccessControl
             println("Current version of access control policy is $inputState")
 
             // 2. Create the output state from a copy of the input state with the provided
-            // externalNetworkParticipants and flowsWhitelist. Note that the null status of
+            // externalNetworkParticipants and flowsallowlist. Note that the null status of
             // the inputState has been checked above.
             val outputState = inputState.state.data.copy(
                     rules = accessControlPolicyState.rules
@@ -341,7 +341,7 @@ class GetAccessControlPolicies() : FlowLogic<List<StateAndRef<AccessControlPolic
  *
  * This requires the following checks:
  * - That an access control policy for the external network exists
- * - That the requested view address is on the whitelist of the access control policy
+ * - That the requested view address is on the allowlist of the access control policy
  * - That the specific party from the external network that made the request is on the list of
  * participants for the access control policy
  * - That the provided certificate for the requester matches the stored certificate in the access control policy
