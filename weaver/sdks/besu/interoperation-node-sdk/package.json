@@ -12,7 +12,7 @@
   "tag": "latest",
   "repository": {
     "type": "git",
-    "url": "https://github.com/hyperledger-labs/weaver-dlt-interoperability.git"
+    "url": "https://github.com/hyperledger/cacti.git"
   },
   "license": "ISC",
   "dependencies": {

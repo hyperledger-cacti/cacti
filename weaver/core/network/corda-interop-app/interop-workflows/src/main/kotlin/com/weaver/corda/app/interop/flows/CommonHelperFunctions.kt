@@ -15,6 +15,8 @@ import java.io.ByteArrayInputStream
 import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
 import java.util.Base64
+import com.weaver.protos.common.asset_locks.AssetLocks
+import com.weaver.corda.app.interop.states.HashMechanism
 
 /**
  * The parseAddress function takes the address field of a Query sent from an external network at parses it into its
@@ -186,4 +188,12 @@ fun isPatternAndAddressMatch(pattern: String, address: String) : Boolean {
         true
         // if 1 star and pattern is a substring of address, return true
     } else numStars == 1 && address.contains(pattern.removeSuffix("*"))
+}
+
+fun getHashMechanism(obj: AssetLocks.HashMechanism): HashMechanism {
+    return when(obj) {
+        AssetLocks.HashMechanism.SHA256 -> HashMechanism.SHA256
+        AssetLocks.HashMechanism.SHA512 -> HashMechanism.SHA512
+        else -> HashMechanism.UNRECOGNIZED
+    }
 }

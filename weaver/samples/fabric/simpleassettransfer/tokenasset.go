@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	wutils "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/utils"
+	wutils "github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/utils"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 )
 

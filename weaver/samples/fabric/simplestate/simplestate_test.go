@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/stretchr/testify/require"
-	wtest "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils"
+	wtest "github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/testutils"
 )
 
 func TestCreate(t *testing.T) {

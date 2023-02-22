@@ -1,7 +1,7 @@
 DOCKER_IMAGE_NAME ?= weaver-iin-agent
 DOCKER_TAG ?= `cat ./VERSION`
 DOCKER_REGISTRY ?= ghcr.io/hyperledger-labs
-GIT_URL = https://github.com/hyperledger-labs/weaver-dlt-interoperability/core/identity-management/iin-agent
+GIT_URL = https://github.com/hyperledger/cacti/weaver/core/identity-management/iin-agent
 DLT_SPECIFIC_DIR ?= .
 COMPOSE_ARG ?=
 
@@ -27,7 +27,7 @@ weaver-fabric-interop-sdk:
 	mkdir -p weaver-fabric-interop-sdk && \
 		cp -r ../../../sdks/fabric/interoperation-node-sdk/build ./weaver-fabric-interop-sdk/ && \
 		cp -r ../../../sdks/fabric/interoperation-node-sdk/index.js ./weaver-fabric-interop-sdk/ && \
-		cp -r ../../../sdks/fabric/interoperation-node-sdk/package-local.json ./weaver-fabric-interop-sdk/package.json
+		cp -r ../../../sdks/fabric/interoperation-node-sdk/package.json ./weaver-fabric-interop-sdk/package.json
 
 build-local: protos-js weaver-fabric-interop-sdk
 	(cp package.json package-remote.json && \

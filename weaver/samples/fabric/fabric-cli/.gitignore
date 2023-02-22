@@ -14,11 +14,16 @@ protos-js/*
 temp/
 config.json
 package-lock.json
-src/wallet-network1
-src/wallet-network2
 chaincode.json
 remote-network-config.json
 admin.id
-networkadmin.id
 iinagent.id
 *.proto.serialized
+
+# Wallet
+src/wallet-network1/*.id
+!src/wallet-network1/networkadmin.id
+!src/wallet-network1/user1.id
+src/wallet-network2/*.id
+!src/wallet-network2/networkadmin.id
+!src/wallet-network2/user1.id

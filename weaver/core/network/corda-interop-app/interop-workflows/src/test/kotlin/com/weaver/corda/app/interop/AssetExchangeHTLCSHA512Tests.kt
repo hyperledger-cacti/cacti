@@ -11,7 +11,7 @@ import com.weaver.corda.app.interop.flows.*
 import com.weaver.corda.app.interop.states.AssetExchangeHTLCState
 import com.weaver.corda.app.interop.states.AssetLockHTLCData
 import com.weaver.corda.app.interop.states.AssetClaimHTLCData
-import com.weaver.protos.common.asset_locks.AssetLocks.HashMechanism
+import com.weaver.corda.app.interop.states.HashMechanism
 
 import com.weaver.corda.app.interop.test.*
 

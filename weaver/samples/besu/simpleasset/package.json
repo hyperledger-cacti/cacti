@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "description": "Sample Besu Application for Demonstrating Interoperation With Other Networks",
   "license": "Apache-2.0",
-  "repository": "hyperledger-labs/weaver-dlt-interoperability/samples/besu/simpleasset",
+  "repository": "https://github.com/hyperledger/cacti/samples/besu/simpleasset",
   "bugs": {
-    "url": "https://github.com/hyperledger-labs/weaver-dlt-interoperability/issues"
+    "url": "https://github.com/hyperledger/cacti/issues"
   },
   "directories": {
     "doc": "docs",
@@ -27,7 +27,7 @@
     "solidity",
     "smart-contract"
   ],
-  "homepage": "https://github.com/hyperledger-labs/weaver-dlt-interoperability/samples/besu/simpleasset",
+  "homepage": "https://github.com/hyperledger/cacti/weaver/samples/besu/simpleasset",
   "dependencies": {
     "@hyperledger-labs/weaver-besu-interop-sdk": "file:../../../sdks/besu/interoperation-node-sdk",
     "@hyperledger-labs/weaver-protos-js": "file:../../../common/protos-js",

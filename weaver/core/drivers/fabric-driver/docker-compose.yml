@@ -23,6 +23,7 @@ services:
       - DRIVER_TLS_CERT_PATH=${DRIVER_TLS_CERT_PATH}
       - DRIVER_TLS_KEY_PATH=${DRIVER_TLS_KEY_PATH}
       - WALLET_PATH=${WALLET_PATH}
+      - DEBUG=false
     volumes:
       - ${CONNECTION_PROFILE}:/fabric-driver/ccp.json
       - ${DRIVER_CONFIG}:/fabric-driver/config.json

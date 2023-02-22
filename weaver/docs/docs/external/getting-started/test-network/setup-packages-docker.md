@@ -42,7 +42,7 @@ Run `docker login ghcr.io`,  and provide github email id as username and persona
 
 ## Getting the Code and Documentation
 
-Clone the [weaver-dlt-interoperability](https://github.com/hyperledger-labs/weaver-dlt-interoperability) repository. The code to get a basic test network up and running and test data-sharing interoperation flows lies in the subfolder `tests/network-setups`, which should be your starting point, though the setups will rely on other parts of the repository, as you will find out in the instructions given on this page.
+Clone the [weaver-dlt-interoperability](https://github.com/hyperledger/cacti/weaver) repository. The code to get a basic test network up and running and test data-sharing interoperation flows lies in the subfolder `tests/network-setups`, which should be your starting point, though the setups will rely on other parts of the repository, as you will find out in the instructions given on this page.
 
 ## Securing Components
 
@@ -92,7 +92,7 @@ Follow the instructions below to build and launch the networks:
 | If you do not wish to test Fabric-Fabric interoperation, you can choose to launch only one of the two networks along with its interoperation chaincode. For `network1`, run `make start-interop-network1`, and for `network2`, run `make start-interop-network2` |
 | If you wish to enable end-to-end confidentiality by default in the interoperation modules that are deployed during network launch, set the environment variable `E2E_CONFIDENTIALITY` to `true` in the command line as follows: `E2E_CONFIDENTIALITY=true make start-interop` |
 
-For more information, refer to the associated [README](https://github.com/hyperledger-labs/weaver-dlt-interoperability/tree/main/tests/network-setups/fabric/dev).
+For more information, refer to the associated [README](https://github.com/hyperledger/cacti/tree/main/weaver/tests/network-setups/fabric/dev).
 
 **Troubleshooting Tips**:
 - If you see any errors during the launches, re-check the prerequisites (software installations and credentials). Ensure your network connection is working. As a safe bet, you can retry after cleanup: kill and remove all Docker containers and associated volumes.
@@ -131,7 +131,7 @@ Navigate to the `core/relay` folder and run a relay as follows:
   make convert-compose-method1
   ```
 
-For more information, see the [relay-docker README](https://github.com/hyperledger-labs/weaver-dlt-interoperability/tree/main/core/relay/relay-docker.md).
+For more information, see the [relay-docker README](https://github.com/hyperledger/cacti/tree/main/weaver/core/relay/relay-docker.md).
 
 ### Fabric Driver
 

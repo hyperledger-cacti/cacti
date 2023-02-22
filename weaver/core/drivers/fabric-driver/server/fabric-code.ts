@@ -15,6 +15,7 @@ import interopPayload from '@hyperledger-labs/weaver-protos-js/common/interop_pa
 import state_pb from '@hyperledger-labs/weaver-protos-js/common/state_pb';
 import { Certificate } from '@fidm/x509';
 import { getConfig } from './walletSetup';
+import logger from './logger';
 
 const parseAddress = (address: string) => {
     const addressList = address.split('/');
@@ -34,8 +35,8 @@ const getNetworkGateway = async (networkName: string): Promise<Gateway> => {
             ? path.resolve(__dirname, process.env.CONNECTION_PROFILE)
             : path.resolve(__dirname, '../connection_profile.json');
         if (!fs.existsSync(ccpPath)) {
-            console.error('File does not exist at path: ', ccpPath);
-            console.error(
+            logger.error(`File does not exist at path: ${ccpPath}`);
+            logger.error(
                 'Please check the CONNECTION_PROFILE environemnt variable in your .env. The path will default to the root of the fabric-driver folder if not supplied',
             );
             throw new Error('No CONNECTION_PROFILE provided in .env');
@@ -47,12 +48,12 @@ const getNetworkGateway = async (networkName: string): Promise<Gateway> => {
         const walletPath = process.env.WALLET_PATH ? process.env.WALLET_PATH : path.join(process.cwd(), `wallet-${networkName}`);
         const userName = config.relay.name;
         const wallet = await getWallet(walletPath);
-        console.log(`Wallet path: ${walletPath}`);
+        logger.debug(`Wallet path: ${walletPath}`);
         // Check to see if we've already enrolled the user.
         const identity = await wallet.get(userName);
         if (!identity) {
-            console.log(`An identity for the user "${userName}.com" does not exist in the wallet`);
-            console.log('Run the registerUser.ts application before retrying');
+            logger.info(`An identity for the user "${userName}" does not exist in the wallet`);
+            logger.info('Run the registerUser.ts application before retrying');
         }
         // Create a new gateway for connecting to our peer node.
         const gateway = new Gateway();
@@ -63,7 +64,7 @@ const getNetworkGateway = async (networkName: string): Promise<Gateway> => {
         });
         return gateway;
     } catch (error) {
-        console.error(`Failed to instantiate network (channel): ${error}`);
+        logger.error(`Failed to instantiate network (channel): ${error}`);
         throw error;
     }
 }
@@ -79,7 +80,7 @@ async function invoke(
     funcName: string,
     dynamicArg?: Buffer
 ): Promise<view_data.FabricView> {
-    console.log('Running query on fabric network');
+    logger.info('Running query on fabric network');
     try {
         // 1. Prepare credentials/gateway for communicating with fabric network
         const gateway = await getNetworkGateway(networkName);
@@ -87,28 +88,28 @@ async function invoke(
         // 2. Prepare info required for query (address/policy)
         const parsedAddress = parseAddress(query.getAddress());
         // Get the network (channel) our contract is deployed to.
-        console.log(parsedAddress.channel);
+        logger.debug(`Channel: ${parsedAddress.channel}`);
         const network = await gateway.getNetwork(parsedAddress.channel);
         const currentChannel = network.getChannel();
         const endorsers = currentChannel.getEndorsers();
-        console.log('policy', query.getPolicyList());
+        logger.info(`policy: ${query.getPolicyList()}`);
         const chaincodeId = process.env.INTEROP_CHAINCODE ? process.env.INTEROP_CHAINCODE : 'interop';
 
         // LOGIC for getting identities from the provided policy. If none can be found it will default to all.
         const identities = query.getPolicyList();
 
-        console.log('Message: ', query.getAddress() + query.getNonce(), identities);
+        logger.debug(`Message: ${query.getAddress() + query.getNonce()} ${identities}`);
         const cert = Certificate.fromPEM(Buffer.from(query.getCertificate()));
         const orgName = cert.issuer.organizationName;
-        console.log(
-            'CC ARGS',
-            parsedAddress.ccFunc,
-            ...parsedAddress.args,
-            query.getRequestingNetwork(),
-            query.getRequestingOrg() ? query.getRequestingOrg() : orgName,
-            query.getCertificate(),
-            query.getRequestorSignature(),
-            query.getAddress() + query.getNonce(),
+        logger.info(
+            `CC ARGS:
+            ${parsedAddress.ccFunc},
+            ${parsedAddress.args},
+            ${query.getRequestingNetwork()},
+            ${query.getRequestingOrg() ? query.getRequestingOrg() : orgName},
+            ${query.getCertificate()},
+            ${query.getRequestorSignature()},
+            ${query.getAddress() + query.getNonce()}`
         );
         const b64QueryBytes = Buffer.from(query.serializeBinary()).toString('base64');
 
@@ -139,14 +140,14 @@ async function invoke(
                 const orgName = cert.issuer.organizationName;
                 return identities.includes(endorser.mspid) || identities.includes(orgName);
             });
-            console.log('Set endorserList', endorserList);
+            logger.debug(`Set endorserList: ${endorserList}`);
             proposalRequest = {
                     targets: endorserList,
                     requestTimeout: 30000
             };
         } else {
             // When no identities provided it will default to all peers
-            console.log('Set endorsers', endorsers);
+            logger.debug(`Set endorsers: ${endorsers}`);
             proposalRequest = {
                     targets: endorsers,
                     requestTimeout: 30000
@@ -155,7 +156,7 @@ async function invoke(
 
         // submit query transaction and get result from chaincode
         const proposalResponseResult = await queryProposal.send(proposalRequest);
-        //console.debug(JSON.stringify(proposalResponseResult, null, 2))
+        //logger.debug(`${JSON.stringify(proposalResponseResult, null, 2)}`)
 
         // 4. Prepare the view and return.
         const viewPayload = new view_data.FabricView();
@@ -178,8 +179,8 @@ async function invoke(
             // Add to list of endorsedProposalResponses
             endorsedProposalResponses.push(endorsedProposalResponse);
             
-            console.log('InteropPayload', endorsementCounter, Buffer.from(response.response.payload).toString('base64'));
-            console.log('Endorsement', endorsementCounter, Buffer.from(endorsement.serializeBinary()).toString('base64'));
+            logger.info(`InteropPayload: ${endorsementCounter}, ${Buffer.from(response.response.payload).toString('base64')}`);
+            logger.info(`Endorsement: ${endorsementCounter}, ${Buffer.from(endorsement.serializeBinary()).toString('base64')}`);
             endorsementCounter++;
         });
         viewPayload.setEndorsedProposalResponsesList(endorsedProposalResponses);
@@ -187,7 +188,7 @@ async function invoke(
         gateway.disconnect();
         return viewPayload;
     } catch (error) {
-        console.error(`Failed to submit transaction: ${error}`);
+        logger.error(`Failed to submit transaction: ${error}`);
         throw error;
     }
 }

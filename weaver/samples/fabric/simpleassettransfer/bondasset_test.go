@@ -10,13 +10,13 @@ import (
 	"encoding/hex"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
+	"github.com/hyperledger/cacti/weaver/common/protos-go/common"
 	"github.com/hyperledger/fabric-protos-go/ledger/queryresult"
-	sa "github.com/hyperledger-labs/weaver-dlt-interoperability/samples/fabric/simpleassettransfer"
+	sa "github.com/hyperledger/cacti/weaver/samples/fabric/simpleassettransfer"
 	"github.com/stretchr/testify/require"
 	"github.com/hyperledger/fabric-chaincode-go/shim"
-	wtest "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils"
-	wtestmocks "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils/mocks"
+	wtest "github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/testutils"
+	wtestmocks "github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/testutils/mocks"
 )
 
 const (

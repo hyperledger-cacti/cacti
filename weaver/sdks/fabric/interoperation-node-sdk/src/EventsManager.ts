@@ -255,13 +255,14 @@ const getSubscriptionStatus = async (
 
     let eventSubscriptionState: eventsPb.EventSubscriptionState = relayResponse;
     for (const eventPubSpec of eventSubscriptionState.getEventPublicationSpecsList()) {
-        let ccArgsBytes = eventPubSpec.getCtx().getArgsList();
-        let ccArgsStr = [];
-        for (const ccArgBytes of ccArgsBytes) {
-            ccArgsStr.push(Buffer.from(ccArgBytes).toString('utf8'));
+        if (eventPubSpec.hasCtx()) {
+            let ccArgsBytes = eventPubSpec.getCtx().getArgsList();
+            let ccArgsStr = [];
+            for (const ccArgBytes of ccArgsBytes) {
+                ccArgsStr.push(Buffer.from(ccArgBytes).toString('utf8'));
+            }
+            eventPubSpec.getCtx().setArgsList(ccArgsStr);
         }
-
-        eventPubSpec.getCtx().setArgsList(ccArgsStr);
     }
 
     logger.debug(`Get event subscription status response: ${JSON.stringify(relayResponse)}`)

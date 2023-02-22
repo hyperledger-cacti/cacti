@@ -17,6 +17,7 @@ import { getNetworkGateway } from "./fabric-code";
 import { Gateway, Network, Contract } from "fabric-network";
 import state_pb from '@hyperledger-labs/weaver-protos-js/common/state_pb';
 import driverPb from '@hyperledger-labs/weaver-protos-js/driver/driver_pb';
+import logger from './logger';
 
 import fs from 'fs';
 import path from 'path';
@@ -37,18 +38,18 @@ async function subscribeEventHelper(
     const [requestId, error] = await handlePromise(addEventSubscription(call_request));
     if (error) {
         const errorString: string = `error (thrown as part of async processing while storing to DB during subscribeEvent): ${error.toString()}`;
-        console.error(errorString);
+        logger.error(errorString);
         const ack_send_error = new ack_pb.Ack();
         ack_send_error.setRequestId(newRequestId);
         ack_send_error.setMessage(errorString);
         ack_send_error.setStatus(ack_pb.Ack.STATUS.ERROR);
         // gRPC response.
-        console.log(`Sending to the relay the eventSubscription error Ack: ${JSON.stringify(ack_send_error.toObject())}`);
+        logger.info(`Sending to the relay the eventSubscription error Ack: ${JSON.stringify(ack_send_error.toObject())}`);
         // Sending the fabric state to the relay.
         client.sendDriverSubscriptionStatus(ack_send_error, relayCallback);
     } else {
         const ack_send = new ack_pb.Ack();
-        console.log(newRequestId, requestId);
+        logger.debug(`${newRequestId}, ${requestId}`);
         if (newRequestId == requestId) {    // event being subscribed for the first time
             // Start an appropriate type of event listener for this event subscription if one is not already active
             const [listenerHandle, error] = await handlePromise(registerListenerForEventSubscription(call_request.getEventMatcher()!, network_name));
@@ -58,10 +59,10 @@ async function subscribeEventHelper(
                     await handlePromise(deleteEventSubscription(call_request.getEventMatcher()!, newRequestId));
                 if (err) {
                     const errorString: string = err.toString();
-                    console.error(errorString);
+                    logger.error(errorString);
                 }
                 const errorString2 = error.toString();
-                console.error(errorString2);
+                logger.error(errorString2);
                 ack_send.setMessage(`Event subscription error: listener registration failed with error: ${errorString2}`);
                 ack_send.setStatus(ack_pb.Ack.STATUS.ERROR);
             } else {
@@ -77,7 +78,7 @@ async function subscribeEventHelper(
         ack_send.setRequestId(newRequestId);
     
         // gRPC response.
-        console.log(`Sending to the relay the eventSubscription Ack: ${JSON.stringify(ack_send.toObject())}`);
+        logger.info(`Sending to the relay the eventSubscription Ack: ${JSON.stringify(ack_send.toObject())}`);
     
         if (!process.env.RELAY_ENDPOINT) {
             throw new Error('RELAY_ENDPOINT is not set.');
@@ -96,24 +97,24 @@ async function unsubscribeEventHelper(
     const [unregister, err] =
         await handlePromise(unregisterListenerForEventSubscription(call_request.getEventMatcher()!, network_name));
     if (!unregister) {      // Just log a warning. This is not critical.
-        console.warn('No listener running for the given subscription or unable to stop listener');
+        logger.warn('No listener running for the given subscription or unable to stop listener');
     }
     if (err) {    // Just log the error. This is not critical.
         const errorString: string = err.toString();
-        console.error(errorString);
+        logger.error(errorString);
     }
     const newRequestId = call_request.getQuery()!.getRequestId();
     const [deletedSubscription, error] =
         await handlePromise(deleteEventSubscription(call_request.getEventMatcher()!, newRequestId));
     if (error) {
         const errorString: string = `error (thrown as part of async processing while deleting from DB during unsubscribeEvent): ${error.toString()}`;
-        console.error(errorString);
+        logger.error(errorString);
         const ack_send_error = new ack_pb.Ack();
         ack_send_error.setRequestId(newRequestId);
         ack_send_error.setMessage(errorString);
         ack_send_error.setStatus(ack_pb.Ack.STATUS.ERROR);
         // gRPC response.
-        console.log(`Sending to the relay the eventSubscription error Ack: ${JSON.stringify(ack_send_error.toObject())}`);
+        logger.info(`Sending to the relay the eventSubscription error Ack: ${JSON.stringify(ack_send_error.toObject())}`);
         // Sending the fabric state to the relay.
         client.sendDriverSubscriptionStatus(ack_send_error, relayCallback);
     } else {
@@ -125,7 +126,7 @@ async function unsubscribeEventHelper(
         ack_send.setRequestId(newRequestId);
     
         // gRPC response.
-        console.log(`Sending to the relay the eventSubscription Ack: ${JSON.stringify(ack_send.toObject())}`);
+        logger.info(`Sending to the relay the eventSubscription Ack: ${JSON.stringify(ack_send.toObject())}`);
     
         if (!process.env.RELAY_ENDPOINT) {
             throw new Error('RELAY_ENDPOINT is not set.');
@@ -139,7 +140,7 @@ async function unsubscribeEventHelper(
 async function addEventSubscription(
     eventSub: eventsPb.EventSubscription
 ): Promise<string> {
-    console.log(`adding to driver, subscription of the eventSub: ${JSON.stringify(eventSub.toObject())}`);
+    logger.info(`adding to driver, subscription of the eventSub: ${JSON.stringify(eventSub.toObject())}`);
     let db: DBConnector;
     try {
         // Create connection to a database
@@ -163,7 +164,7 @@ async function addEventSubscription(
             var subscriptionsSerialized: string = await db.read(key) as string;
             subscriptions = JSON.parse(subscriptionsSerialized);
 
-            console.debug(`subscriptions.length: ${subscriptions.length}`);
+            logger.debug(`subscriptions.length: ${subscriptions.length}`);
             // check if the event to be subscribed is already present in the DB
             for (const subscriptionSerialized of subscriptions) {
                 var subscription: queryPb.Query =  queryPb.Query.deserializeBinary(Buffer.from(subscriptionSerialized, 'base64'));
@@ -175,42 +176,42 @@ async function addEventSubscription(
                     subscription.getRequestingOrg() == query.getRequestingOrg() &&
                     subscription.getConfidential() == query.getConfidential()) {
 
-                    console.log(`found subscription for query with requestId: ${subscription.getRequestId()}`);
+                    logger.info(`found subscription for query with requestId: ${subscription.getRequestId()}`);
                     await db.close();
                     return subscription.getRequestId();
                 }
             }
 
             // case of key being present in the list
-            console.debug(`eventMatcher: ${JSON.stringify(eventMatcher.toObject())} is already present in the database`);
+            logger.debug(`eventMatcher: ${JSON.stringify(eventMatcher.toObject())} is already present in the database`);
             subscriptions.push(querySerialized);
         } catch (error: any) {
             let errorString = error.toString();
             if (error instanceof DBKeyNotFoundError) {
                 // case of read failing due to key not found
-                console.debug(`eventMatcher: ${JSON.stringify(eventMatcher.toObject())} is not present before in the database`);
+                logger.debug(`eventMatcher: ${JSON.stringify(eventMatcher.toObject())} is not present before in the database`);
                 subscriptions = new Array<string>();
                 subscriptions.push(querySerialized);
             } else {
                 // case of read failing due to some other issue
-                console.error(`re-throwing error: ${errorString}`);
+                logger.error(`re-throwing error: ${errorString}`);
                 await db.close();
                 throw new Error(error);
             }
         }
 
-        console.debug(`subscriptions.length: ${subscriptions.length}`);
+        logger.debug(`subscriptions.length: ${subscriptions.length}`);
         subscriptionsSerialized = JSON.stringify(subscriptions);
         // insert the value against key in the DB (it can be the scenario of a new key addition, or update to the value of an existing key)
         await db.insert(key, subscriptionsSerialized);
         await db.close();
 
         // TODO: register the event with fabric sdk
-        console.log(`end addEventSubscription() .. requestId: ${query.getRequestId()}`);
+        logger.info(`end addEventSubscription() .. requestId: ${query.getRequestId()}`);
         return query.getRequestId();
 
     } catch(error: any) {
-        console.error(`Error during addEventSubscription(): ${error.toString()}`);
+        logger.error(`Error during addEventSubscription(): ${error.toString()}`);
         await db?.close();
         throw new Error(error);
     }
@@ -220,7 +221,7 @@ const deleteEventSubscription = async (
     eventMatcher: eventsPb.EventMatcher,
     requestId: string
 ): Promise<eventsPb.EventSubscription> => {
-    console.log(`deleting from driver subscription of the eventMatcher: ${JSON.stringify(eventMatcher.toObject())} with requestId: ${requestId}`);
+    logger.info(`deleting from driver subscription of the eventMatcher: ${JSON.stringify(eventMatcher.toObject())} with requestId: ${requestId}`);
     var subscriptions: Array<string>;
     var retVal: eventsPb.EventSubscription = new eventsPb.EventSubscription();
     retVal.setEventMatcher(eventMatcher);
@@ -236,12 +237,12 @@ const deleteEventSubscription = async (
             var subscriptionsSerialized: string = await db.read(key) as string;
             subscriptions = JSON.parse(subscriptionsSerialized);
 
-            console.debug(`subscriptions.length: ${subscriptions.length}`);
+            logger.debug(`subscriptions.length: ${subscriptions.length}`);
             var foundEntry: boolean = false;
             for (var subscriptionSerialized of subscriptions) {
                 var subscription: queryPb.Query =  queryPb.Query.deserializeBinary(Buffer.from(subscriptionSerialized, 'base64'));
                 if (subscription.getRequestId() == requestId) {
-                    console.debug(`deleting the subscription (with input requestId): ${JSON.stringify(subscription.toObject())}`);
+                    logger.debug(`deleting the subscription (with input requestId): ${JSON.stringify(subscription.toObject())}`);
                     subscriptions.splice(subscriptions.indexOf(subscriptionSerialized), 1);
                     retVal.setQuery(subscription);
                     foundEntry = true;
@@ -254,12 +255,12 @@ const deleteEventSubscription = async (
             }
         } catch (error: any) {
             // error could be either due to key not being present in the database or some other issue with database access
-            console.error(`re-throwing error: ${error.toString()}`);
+            logger.error(`re-throwing error: ${error.toString()}`);
             await db.close();
             throw new Error(error);
         }
 
-        console.debug(`subscriptions.length: ${subscriptions.length}`);
+        logger.debug(`subscriptions.length: ${subscriptions.length}`);
         if (subscriptions.length == 0) {
             await db.delete(key);
         } else {
@@ -268,10 +269,10 @@ const deleteEventSubscription = async (
         }
 
         await db.close();
-        console.log(`end deleteEventSubscription() .. retVal: ${JSON.stringify(retVal.toObject())}`);
+        logger.info(`end deleteEventSubscription() .. retVal: ${JSON.stringify(retVal.toObject())}`);
         return retVal;
     } catch(error: any) {
-        console.error(`Error during delete: ${error.toString()}`);
+        logger.error(`Error during delete: ${error.toString()}`);
         await db?.close();
         throw new Error(error);
     }
@@ -293,7 +294,7 @@ function filterEventMatcher(keySerialized: string, eventMatcher: eventsPb.EventM
 async function lookupEventSubscriptions(
     eventMatcher: eventsPb.EventMatcher
 ): Promise<Array<queryPb.Query>> {
-    console.info(`finding the subscriptions with eventMatcher: ${JSON.stringify(eventMatcher.toObject())}`);
+    logger.info(`finding the subscriptions with eventMatcher: ${JSON.stringify(eventMatcher.toObject())}`);
     var subscriptions: Array<string>;
     var returnSubscriptions: Array<queryPb.Query> = new Array<queryPb.Query>();
     let db: DBConnector;
@@ -307,13 +308,13 @@ async function lookupEventSubscriptions(
             subscriptions = JSON.parse(subscriptionsSerialized)
             for (const subscriptionSerialized of subscriptions) {
                 var subscription: queryPb.Query =  queryPb.Query.deserializeBinary(Buffer.from(subscriptionSerialized, 'base64'));
-                console.debug(`subscription: ${JSON.stringify(subscription.toObject())}`)
+                logger.debug(`subscription: ${JSON.stringify(subscription.toObject())}`)
                 returnSubscriptions.push(subscription);
             }
         }
 
-        console.debug(`returnSubscriptions.length: ${returnSubscriptions.length}`);
-        console.log(`end lookupEventSubscriptions()`);
+        logger.debug(`returnSubscriptions.length: ${returnSubscriptions.length}`);
+        logger.info(`end lookupEventSubscriptions()`);
         await db.close();
         return returnSubscriptions;
 
@@ -323,11 +324,11 @@ async function lookupEventSubscriptions(
         if (error instanceof DBKeyNotFoundError) {
             // case of read failing due to key not found
             returnSubscriptions = new Array<queryPb.Query>();
-            console.debug(`returnSubscriptions.length: ${returnSubscriptions.length}`);
+            logger.debug(`returnSubscriptions.length: ${returnSubscriptions.length}`);
             return returnSubscriptions;
         } else {
             // case of read failing due to some other issue
-            console.error(`Error during lookup: ${errorString}`);
+            logger.error(`Error during lookup: ${errorString}`);
             throw new Error(error);
         }
     }
@@ -336,7 +337,7 @@ async function lookupEventSubscriptions(
 async function readAllEventMatchers(): Promise<Array<eventsPb.EventMatcher>> {
     var returnMatchers = []
     let db: DBConnector;
-    console.debug(`start readAllEventMatchers()`);
+    logger.debug(`start readAllEventMatchers()`);
     try {
         // Create connection to a database
         db = new LevelDBConnector(DB_NAME!);
@@ -346,7 +347,7 @@ async function readAllEventMatchers(): Promise<Array<eventsPb.EventMatcher>> {
             const eventMatcher = eventsPb.EventMatcher.deserializeBinary(Uint8Array.from(Buffer.from(key, 'base64')))
             returnMatchers.push(eventMatcher)
         }
-        console.debug(`end readAllEventMatchers()`);
+        logger.debug(`end readAllEventMatchers()`);
         await db.close();
         return returnMatchers;
 
@@ -354,7 +355,7 @@ async function readAllEventMatchers(): Promise<Array<eventsPb.EventMatcher>> {
         let errorString: string = error.toString();
         await db?.close();
         // case of read failing due to some other issue
-        console.error(`Error during read: ${errorString}`);
+        logger.error(`Error during read: ${errorString}`);
         throw new Error(error);
     }
 }
@@ -362,7 +363,7 @@ async function readAllEventMatchers(): Promise<Array<eventsPb.EventMatcher>> {
 async function signEventSubscriptionQuery(
     inputQuery: queryPb.Query
 ): Promise<queryPb.Query> {
-    console.log(`driver ready to provide sign on query: ${JSON.stringify(inputQuery.toObject())}`);
+    logger.info(`driver ready to provide sign on query: ${JSON.stringify(inputQuery.toObject())}`);
     let signedQuery = new queryPb.Query();
 
     try {
@@ -386,7 +387,7 @@ async function signEventSubscriptionQuery(
         return signedQuery;
     } catch (error: any) {
         const errorString: string = `${error.toString()}`;
-        console.error(`signing query failed with error: ${errorString}`);
+        logger.error(`signing query failed with error: ${errorString}`);
         throw new Error(error);
     }
 }
@@ -433,7 +434,7 @@ async function writeExternalStateHelper(
             ccArgs: ccArgsStr,
             contractName: ctx.getContractId()
         }
-        console.debug(`invokeObject.ccArgs: ${invokeObject.ccArgs}`)
+        logger.info(`invokeObject.ccArgs: ${invokeObject.ccArgs}`)
                 
         const [ response, responseError ] = await handlePromise(InteroperableHelper.submitTransactionWithRemoteViews(
             interopContract,
@@ -445,14 +446,14 @@ async function writeExternalStateHelper(
             endorsingOrgs
         ));
         if (responseError) {
-            console.log(`Failed writing to the ledger with error: ${responseError}`);
+            logger.error(`Failed writing to the ledger with error: ${responseError}`);
             gateway.disconnect();
             throw responseError;
         }
 	    gateway.disconnect();
     } else {
         const errorString: string = `erroneous viewPayload identified in WriteExternalState processing`;
-        console.log(`error viewPayload.getError(): ${JSON.stringify(viewPayload.getError())}`);
+        logger.error(`error viewPayload.getError(): ${JSON.stringify(viewPayload.getError())}`);
         throw new Error(errorString);
     }
 }

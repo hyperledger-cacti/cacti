@@ -6,7 +6,6 @@
 
 package com.weaver.corda.app.interop.states
 
-import com.weaver.protos.common.asset_locks.AssetLocks.HashMechanism
 import com.weaver.corda.app.interop.contracts.AssetExchangeHTLCStateContract
 import com.weaver.corda.app.interop.contracts.AssetExchangeTxStateContract
 import net.corda.core.contracts.BelongsToContract
@@ -56,6 +55,11 @@ data class AssetClaimHTLCData(
     val hashMechanism: HashMechanism,
     val hashPreimage: OpaqueBytes
 )
+
+@CordaSerializable
+enum class HashMechanism {
+    SHA256, SHA512, UNRECOGNIZED
+}
 
 /**
  * The AssetExchangeTxState stores the mapping of linearId of
