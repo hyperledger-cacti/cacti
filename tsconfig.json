@@ -138,6 +138,12 @@
     },
     {
       "path": "./packages/cactus-plugin-ledger-connector-ubiquity/tsconfig.json"
+    },   
+    {
+      "path": "./packages/cactus-cmd-gui-app/tsconfig.json"
+    },
+    {
+      "path": "./packages/cactus-plugin-persistence-fabric-block/tsconfig.json"
     }
   ],
   "compilerOptions": {
