@@ -72,6 +72,8 @@ export class PluginPersistenceFabricBlock
   public ledgerContractName = "basic";
   // gateway options
   public gatewayOptions: GatewayOptions;
+  // synchronization ongoing
+  public synchronizationGo:boolean = true;
 
   constructor(public readonly options: IPluginPersistenceFabricBlockOptions) {
     const level = this.options.logLevel || "INFO";
@@ -188,15 +190,6 @@ export class PluginPersistenceFabricBlock
   public getOpenApiSpec(): unknown {
     return OAS;
   }
-
-  /*/  public async onPluginInit(): Promise<void> {
-   // await this.dbClient.connect();
-   // await this.dbClient.initializePlugin(
-    //  PluginPersistenceFabricBlock.CLASS_NAME,
-    //////////////////////  this.instanceId,
-    );
-    this.isConnected = true;
-  }*/
 
   public async registerWebServices(
     app: Express,
@@ -339,6 +332,7 @@ export class PluginPersistenceFabricBlock
   }
 
   async continueBlocksSynchronization(): Promise<string> {
+    this.synchronizationGo = true;
     let tempBlockNumber = this.lastSeenBlock;
     let blockNumber = tempBlockNumber.toString();
     this.lastBlock = await this.lastBlockInLedger();
@@ -383,6 +377,9 @@ export class PluginPersistenceFabricBlock
             moreBlocks = false;
           }
         }
+        if(this.synchronizationGo == false){
+          moreBlocks = false;
+        }
       } else {
         moreBlocks = false;
       }
@@ -392,6 +389,7 @@ export class PluginPersistenceFabricBlock
   // NOTE: this function can loop into very long almost infinite loop or even
   // infinite loop depends on time of generating block < time writing to database
   async constinousBlocksSynchronization(): Promise<string> {
+    this.synchronizationGo = true;
     let tempBlockNumber = this.lastSeenBlock;
     let blockNumber = tempBlockNumber.toString();
     this.lastBlock = await this.lastBlockInLedger();
@@ -436,11 +434,19 @@ export class PluginPersistenceFabricBlock
           tempBlockNumber = tempBlockNumber + 1;
           blockNumber = tempBlockNumber.toString();
         }
+        if(this.synchronizationGo == false){
+          moreBlocks = false;
+        }
       } else {
         moreBlocks = false;
       }
     } while (moreBlocks);
     return "done";
+  }
+
+  async changeSynchronization(): Promise<boolean> {
+    this.synchronizationGo = false;
+    return this.synchronizationGo;
   }
 
   async getBlockFromLedger(blockNumber: string): Promise<any> {
@@ -711,23 +717,7 @@ export class PluginPersistenceFabricBlock
     return this.howManyBlocksMissing;
   }
 
-  public async whichBlocksAreMissingInDd(): Promise<void> {
-    this.howManyBlocksMissing = 0;
-    for (let i: number = 0; i > this.lastBlock - 1; i--) {
-      const isThisBlockPresent = await this.dbClient.isThisBlockInDB(i);
-      this.log.warn("Answer for query about block in DB ", isThisBlockPresent);
-      this.log.warn(
-        "Answer for query about block in DB stringify",
-        JSON.stringify(isThisBlockPresent),
-      );
-      if (isThisBlockPresent[0]) {
-        this.missedBlocks.push(i.toString());
-        this.howManyBlocksMissing += 1;
-      }
-    }
 
-    this.log.info("missedBlocks", JSON.stringify(this.missedBlocks));
-  }
   public async whichBlocksAreMissingInDdSimple(): Promise<void> {
     this.howManyBlocksMissing = 0;
     this.log.warn(
