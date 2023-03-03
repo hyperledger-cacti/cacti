@@ -25,10 +25,26 @@
   },
   "contributors": [
     {
-      "name": "Please add yourself to the list of contributors",
-      "email": "your.name@example.com",
-      "url": "https://example.com"
+      "name": "Barnaba Pawelczak",
+      "email": "barnaba.pawelczak@fujitsu.com",
+      "url": "https://fujitsu.com"
+    },
+    {
+      "name": "Michal Bajer",
+      "email": "michal.bajer@fujitsu.com",
+      "url": "https://fujitsu.com"
+    },
+    {
+      "name": "Eryk Baranowski",
+      "email": "Eryk.Baranowski@fujitsu.com",
+      "url": "https://fujitsu.com"
+    },
+    {
+      "name": "Tomasz Awramski",
+      "email": "tomasz.awramski@fujitsu.com",
+      "url": "https://fujitsu.com"
     }
+
   ],
   "main": "dist/lib/main/typescript/index.js",
   "module": "dist/lib/main/typescript/index.js",
