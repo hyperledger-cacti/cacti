@@ -585,7 +585,7 @@ export class PluginPersistenceFabricBlock
         status =
           transactionDataObject.payload.data.actions[0].payload.action.proposal_response_payload
             .extension.response.status;
-        this.log.info("rwser  :", JSON.stringify(rwset));
+        this.log.info("rwset  :", JSON.stringify(rwset));
         rwset =
           transactionDataObject.payload.data.actions[0].payload.action.proposal_response_payload
             .extension.results.ns_rwset;
@@ -718,7 +718,7 @@ export class PluginPersistenceFabricBlock
       fabric_block_id: hash,
       fabric_blocknum: blockNumber,
       fabric_datahash: hash,
-      fabric_txcount: txLen,
+      fabric_tx_count: txLen,
       fabric_createdat:
         tempBlockParse.decodedBlock.data.data[0].payload.header.channel_header
           .timestamp,

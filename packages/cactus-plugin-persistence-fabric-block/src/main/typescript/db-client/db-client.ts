@@ -163,7 +163,7 @@ export default class PostgresDatabaseClient {
         block.fabric_block_id,
         block.fabric_blocknum,
         block.fabric_datahash,
-        block.fabric_txcount,
+        block.fabric_tx_count,
         block.fabric_createdat,
         block.fabric_prev_blockhash,
         block.fabric_channel_id,
