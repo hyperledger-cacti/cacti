@@ -172,7 +172,7 @@ export class PluginPersistenceFabricBlock
   public getInstanceId(): string {
     return this.instanceId;
   }
-
+ // this is just test function to check if you correctly created instance of plugin
   public async helloWorldTest(): Promise<string> {
     return new Promise<string>((resolve) => {
       resolve("hello World test");
@@ -223,16 +223,16 @@ export class PluginPersistenceFabricBlock
     return endpoints;
   }
 
-  // Last block seen
-  // change to public during migration
+  
+  // current last block from ledger ( not in database ) 
   public currentLastBlock(): number {
     return this.lastBlock;
   }
-  // this is greatest  in number block migrated successfully to  database
+  // this is greatest block number successfully migrated to database
   public currentLastSeenBlock(): number {
     return this.lastSeenBlock;
   }
-
+  // Additional check if ledger is in synchronization
   public isLastBlockGreatherThenLastSeen(): boolean {
     if (this.lastSeenBlock >= this.lastBlock) {
       return false;
@@ -241,7 +241,11 @@ export class PluginPersistenceFabricBlock
     }
   }
 
-  async lastBlockInLedger(): Promise<number> {
+  /**
+   * lastBlockInLedger
+   * @returns this.lastBlock which is last block in ledger assuming using getBlock and node js SDK
+   */
+  public async lastBlockInLedger(): Promise<number> {
     let tempBlockNumber = this.lastBlock;
     let blockNumber = tempBlockNumber.toString();
     let block: any;
@@ -279,9 +283,13 @@ export class PluginPersistenceFabricBlock
     } while (moreBlocks);
     return this.lastBlock;
   }
-
-  // Synchronization of blocks
-
+/**  Synchronization of blocks
+ * - Synchronize entire first 30 blocks of ledger state 
+ * with the database as a good start and to check if everything is correctly set.
+ * @returns string promise done after finishing the process
+ * // future changes - parameter to set which part of blokchain to move to database
+ */
+ 
   async initialBlocksSynchronization(): Promise<string> {
     let tempBlockNumber = 0;
     let blockNumber = tempBlockNumber.toString();
@@ -330,6 +338,14 @@ export class PluginPersistenceFabricBlock
     } while (moreBlocks);
     return "done";
   }
+
+/**  Synchronization of blocks
+ * - Synchronize entire ledger state 
+ * with the database as far as the lastBlockInLedger shows ( triggered once )
+ * @returns string promise lastBlock number after finishing the process
+ * 
+ */
+
 
   async continueBlocksSynchronization(): Promise<string> {
     this.synchronizationGo = true;
@@ -386,9 +402,17 @@ export class PluginPersistenceFabricBlock
     } while (moreBlocks);
     return "done";
   }
+
+
+  /**  Synchronization of blocks
+ * - Synchronize entire ledger state 
+ * with the database as far as the lastBlockInLedger shows ( triggered more than once )
+ * @returns string promise lastBlock number after finishing the process
+ * 
+ */
   // NOTE: this function can loop into very long almost infinite loop or even
   // infinite loop depends on time of generating block < time writing to database
-  async constinousBlocksSynchronization(): Promise<string> {
+  async continuousBlocksSynchronization(): Promise<string> {
     this.synchronizationGo = true;
     let tempBlockNumber = this.lastSeenBlock;
     let blockNumber = tempBlockNumber.toString();
@@ -471,6 +495,12 @@ export class PluginPersistenceFabricBlock
 
   // Migration of block nr with transaction inside
   // NOTE that each block have at least 1 transaction endorsement
+  /**
+   * 
+   * @param blockNumber this is parameter of function which set 
+   * block number to be moved from ledger to database
+   * @returns true a boolean which indicates successfull migration
+   */
   public async migrateBlockNrWithTransactions(
     blockNumber: string,
   ): Promise<boolean> {
@@ -511,8 +541,8 @@ export class PluginPersistenceFabricBlock
       return false;
     }
     for (let txIndex = 0; txIndex < txLen; txIndex++) {
-      const txObj = tempBlockParse.decodedBlock.data.data[txIndex];
-      const txStr = JSON.stringify(txObj);
+      const transactionDataObject = tempBlockParse.decodedBlock.data.data[txIndex];
+      const transactionDataStringifies = JSON.stringify(transactionDataObject);
 
       let txid = "";
 
@@ -531,33 +561,33 @@ export class PluginPersistenceFabricBlock
       let creator_nonce = "";
       // add txIndex in block
 
-      let envelope_signature = txObj.signature;
+      let envelope_signature = transactionDataObject.signature;
       if (envelope_signature !== undefined) {
         envelope_signature = Buffer.from(envelope_signature).toString("hex");
       }
-      let payload_extension = txObj.payload.header.channel_header.extension;
+      let payload_extension = transactionDataObject.payload.header.channel_header.extension;
       if (payload_extension !== undefined) {
         payload_extension = Buffer.from(payload_extension).toString("hex");
       }
-      creator_nonce = txObj.payload.header.signature_header.nonce;
+      creator_nonce = transactionDataObject.payload.header.signature_header.nonce;
       if (creator_nonce !== undefined) {
         creator_nonce = Buffer.from(creator_nonce).toString("hex");
       }
       /* eslint-disable */
-      const creator_id_bytes = txObj.payload.header.signature_header.creator.id_bytes.data.toString();
-      if (txObj.payload.data.actions !== undefined) {
+      const creator_id_bytes = transactionDataObject.payload.header.signature_header.creator.id_bytes.data.toString();
+      if (transactionDataObject.payload.data.actions !== undefined) {
         chaincode =
-          txObj.payload.data.actions[0].payload.action.proposal_response_payload
+          transactionDataObject.payload.data.actions[0].payload.action.proposal_response_payload
             .extension.chaincode_id.name;
         chaincodeID =
-          txObj.payload.data.actions[0].payload.action.proposal_response_payload
+          transactionDataObject.payload.data.actions[0].payload.action.proposal_response_payload
             .extension;
         status =
-          txObj.payload.data.actions[0].payload.action.proposal_response_payload
+          transactionDataObject.payload.data.actions[0].payload.action.proposal_response_payload
             .extension.response.status;
         this.log.info("rwser  :", JSON.stringify(rwset));
         rwset =
-          txObj.payload.data.actions[0].payload.action.proposal_response_payload
+          transactionDataObject.payload.data.actions[0].payload.action.proposal_response_payload
             .extension.results.ns_rwset;
 
         if (rwset !== undefined) {
@@ -569,7 +599,7 @@ export class PluginPersistenceFabricBlock
         }
 
         chaincode_proposal_input =
-          txObj.payload.data.actions[0].payload.chaincode_proposal_payload.input
+          transactionDataObject.payload.data.actions[0].payload.chaincode_proposal_payload.input
             .chaincode_spec.input.args;
         if (chaincode_proposal_input !== undefined) {
           let inputs = "";
@@ -581,15 +611,15 @@ export class PluginPersistenceFabricBlock
           chaincode_proposal_input = inputs;
         }
         endorser_signature =
-          txObj.payload.data.actions[0].payload.action.endorsements[0]
+          transactionDataObject.payload.data.actions[0].payload.action.endorsements[0]
             .signature;
         if (endorser_signature !== undefined) {
           endorser_signature = Buffer.from(endorser_signature).toString("hex");
         }
-        payload_proposal_hash = txObj.payload.data.actions[0].payload.action.proposal_response_payload.proposal_hash.data.toString(
+        payload_proposal_hash = transactionDataObject.payload.data.actions[0].payload.action.proposal_response_payload.proposal_hash.data.toString(
           "hex",
         );
-        endorser_id_bytes = txObj.payload.data.actions[0].payload.action.endorsements[0].endorser.id_bytes.data.toString(
+        endorser_id_bytes = transactionDataObject.payload.data.actions[0].payload.action.endorsements[0].endorser.id_bytes.data.toString(
           "hex",
         );
 
@@ -601,12 +631,12 @@ export class PluginPersistenceFabricBlock
             .payload.action.proposal_response_payload.extension;
       }
 
-      if (txObj.payload.header.channel_header.typeString === "CONFIG") {
-        txid = sha256(txStr);
+      if (transactionDataObject.payload.header.channel_header.typeString === "CONFIG") {
+        txid = sha256(transactionDataStringifies);
         readSet =
-          txObj.payload.data.last_update.payload?.data.config_update.read_set;
+          transactionDataObject.payload.data.last_update.payload?.data.config_update.read_set;
         writeSet =
-          txObj.payload.data.last_update.payload?.data.config_update.write_set;
+          transactionDataObject.payload.data.last_update.payload?.data.config_update.write_set;
       } else {
         txid =
           tempBlockParse.decodedBlock.data.data[txIndex].payload.header
@@ -619,6 +649,7 @@ export class PluginPersistenceFabricBlock
       const chaincode_id = chaincodeID;
 
       let chaincodename: string = "";
+      // checking if proposal_response_payload is present and operational
       let checker = "";
       const BlockNumberIn: string = blockNumber;
       try {
@@ -706,18 +737,31 @@ export class PluginPersistenceFabricBlock
 
     return true;
   }
-
+/**
+ * 
+ * @param limitLastBlockConsidered  this parameter - set the last block in ledger which we consider valid by our party and synchronize only to this point in ledger
+If some blocks above this number are already in database they will not be removed.
+ * @returns number which is this.lastBlock , artificially set lastBlock in ledger
+ */
   public setLastBlockConsidered(limitLastBlockConsidered: number): number {
     this.lastBlock = limitLastBlockConsidered;
     return this.lastBlock;
   }
 
-  /////////////////// explore end
+  /**
+   * 
+   * @returns number blocks missing according to last run of function which checks missing blocks
+   * whichBlocksAreMissingInDdSimple
+   */
   public showHowManyBlocksMissing(): number {
     return this.howManyBlocksMissing;
   }
 
-
+/**
+ * - Walk through all the blocks 
+ * that could not be synchronized with the DB for some reasons and list them
+ * @returns number of missing blocks
+ */
   public async whichBlocksAreMissingInDdSimple(): Promise<void> {
     this.howManyBlocksMissing = 0;
     this.log.warn(
@@ -748,7 +792,11 @@ export class PluginPersistenceFabricBlock
 
     this.log.info("missedBlocks", JSON.stringify(this.missedBlocks));
   }
-  // synchronization of missing Blocks
+  /**
+   * synchronization of missing Blocks 
+   * run function whichBlocksAreMissingInDdSimple before using this one 
+   * @returns number of missing blocks if any , should return 0
+   */
   async synchronizeOnlyMissedBlocks(): Promise<number> {
     if (this.howManyBlocksMissing > 0) {
       let missedIndex = 0;
@@ -796,8 +844,11 @@ export class PluginPersistenceFabricBlock
     this.log.info("database Is in Synchronization");
     return this.howManyBlocksMissing;
   }
-
-  async migrateNextBlock(): Promise<void> {
+  
+ /** migrateNextBlock
+  * tries to migrate next block according to lastBlock information stored in plugin
+  */
+ public async migrateNextBlock(): Promise<void> {
     await this.lastBlockInLedger();
     try {
       const block = await this.migrateBlockNrWithTransactions(
