@@ -9,8 +9,6 @@ import {
   // LogLevelDesc,
 } from "@hyperledger/cactus-common";
 
-//   import { Database as DatabaseSchemaType } from "./database.types";
-//   import { getRuntimeErrorCause } from "../utils";
 
 import fs from "fs";
 import path from "path";
@@ -18,7 +16,7 @@ import { Client as PostgresClient } from "pg";
 // import { RuntimeError } from "run-time-error";
 
 //////////////////////////////////
-// PostgresDatabaseClient
+//          PostgresDatabaseClient
 //////////////////////////////////
 
 /**
@@ -131,7 +129,7 @@ export default class PostgresDatabaseClient {
       this.log.debug("Schema file length:", schemaSql.length);
 
       await this.client.query(schemaSql);
-      // isSchemaInitialized = true;
+      isSchemaInitialized = true;
 
       this.log.info("Schema DB initialized.");
     }
@@ -182,7 +180,7 @@ export default class PostgresDatabaseClient {
     const insertResponse: any = await this.client.query(
       `INSERT INTO public.fabric_transactions_entry("id", "block_id", "transaction_data") VALUES ($1, $2, $3)`,
       [
-        transactions.fabric_transaction_id,
+        transactions.transaction_id,
         transactions.fabric_block_id,
         transactions.fabric_transaction_data,
       ],
@@ -199,12 +197,12 @@ export default class PostgresDatabaseClient {
     this.assertConnected();
 
     const insertResponse = await this.client.query(
-      `INSERT INTO public.fabric_transactions( "block_number","block_id", "fabric_transaction_id", "created_at", "chaincode_name", "status", "creator_msp_id", "endorser_msp_id", "chaincode_id", "type", "read_set", "write_set", "channel_id", "payload_extension", "creator_id_bytes", "creator_nonce", "chaincode_proposal_input", "tx_response", "payload_proposal_hash", "endorser_id_bytes", "endorser_signature") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)`,
+      `INSERT INTO public.fabric_transactions( "block_number","block_id", "transaction_id", "created_at", "chaincode_name", "status", "creator_msp_id", "endorser_msp_id", "chaincode_id", "type", "read_set", "write_set", "channel_id", "payload_extension", "creator_id_bytes", "creator_nonce", "chaincode_proposal_input", "tx_response", "payload_proposal_hash", "endorser_id_bytes", "endorser_signature") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)`,
       [
         // id integer BIGSERIAL, this should auto increment , total number of transactions counter
         transactions.block_number,
         transactions.block_id,
-        transactions.fabric_transaction_id,
+        transactions.transaction_id,
         transactions.createdat,
         transactions.chaincodename,
         transactions.status,

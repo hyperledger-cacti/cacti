@@ -112,7 +112,7 @@ CREATE TABLE IF NOT EXISTS public.fabric_transactions
     id BIGSERIAL,
     block_number text,
     block_id text,
-    fabric_transaction_id text DEFAULT NULL::character varying,
+    transaction_id text DEFAULT NULL::character varying,
     created_at timestamp without time zone,
     chaincode_name character varying(255) DEFAULT NULL::character varying,
     status integer,
@@ -131,8 +131,8 @@ CREATE TABLE IF NOT EXISTS public.fabric_transactions
     payload_proposal_hash character varying,
     endorser_id_bytes character varying,
     endorser_signature character varying,
-    CONSTRAINT transaction_details_pkey PRIMARY KEY (fabric_transaction_id),
-    CONSTRAINT transaction_details_name_key UNIQUE (fabric_transaction_id)
+    CONSTRAINT transaction_details_pkey PRIMARY KEY (transaction_id),
+    CONSTRAINT transaction_details_name_key UNIQUE (transaction_id)
 );
 
 

@@ -670,7 +670,7 @@ export class PluginPersistenceFabricBlock
       await this.dbClient.insertDetailedTransactionEntry({
         block_number: BlockNumberIn,
         block_id: hash,
-        fabric_transaction_id: txid,
+        transaction_id: txid,
         createdat:
           tempBlockParse.decodedBlock.data.data[txIndex].payload.header
             .channel_header.timestamp,
@@ -700,7 +700,7 @@ export class PluginPersistenceFabricBlock
       });
 
       await this.dbClient.insertBlockTransactionEntry({
-        fabric_transaction_id: txid,
+        transaction_id: txid,
         fabric_block_id: hash,
         fabric_transaction_data:
           tempBlockParse.decodedBlock.data.data[txIndex].payload.data.actions,
