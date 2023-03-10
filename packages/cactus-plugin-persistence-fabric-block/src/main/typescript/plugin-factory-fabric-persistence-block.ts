@@ -8,7 +8,7 @@ import {
 } from "./plugin-fabric-persistence-block";
 
 export class PluginFactoryPersistanceFabricBlocks extends PluginFactory<
-PluginPersistenceFabricBlock,
+  PluginPersistenceFabricBlock,
   IPluginPersistenceFabricBlockOptions,
   IPluginFactoryOptions
 > {
