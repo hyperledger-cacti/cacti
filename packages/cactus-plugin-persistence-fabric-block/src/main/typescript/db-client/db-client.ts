@@ -9,6 +9,8 @@ import {
   // LogLevelDesc,
 } from "@hyperledger/cactus-common";
 
+//   import { Database as DatabaseSchemaType } from "./database.types";
+//   import { getRuntimeErrorCause } from "../utils";
 
 import fs from "fs";
 import path from "path";
@@ -16,7 +18,7 @@ import { Client as PostgresClient } from "pg";
 // import { RuntimeError } from "run-time-error";
 
 //////////////////////////////////
-//          PostgresDatabaseClient
+// PostgresDatabaseClient
 //////////////////////////////////
 
 /**

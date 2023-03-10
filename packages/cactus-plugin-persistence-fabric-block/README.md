@@ -3,6 +3,7 @@
 This plugin allows `Cactus` to persist Fabric Block general data and basic information about transactions into some storage (currently to a `PostgreSQL` database, but this concept can be extended further).
 Data in the database can later be analyzed and viewed in a GUI tool.
 GUI tool is in project root directory of Cacti project in GUI folder.
+
 ## Summary
 
 - [Remarks](#remarks)
@@ -36,36 +37,33 @@ yarn run configure
 Instantiate a new `PluginPersistenceFabrickBlock` instance:
 
 There is few ways to use this plugins:
-1)  Using Watch block might cause infinite loop
-and function migrateBlockNrWithTransactions
-2)  Individually using migrateBlockNrWithTransactions
-if you know which exactly which blocks you want to analyze
-3)  Using plugin function continueBlocksSynchronization in some periodical calls
-4)  Using plugin function constinousBlocksSynchronization in some reasonable time with changeSynchronization - which should break flow
-this function might continue work for long period
+
+1.  Using Watch block might cause infinite loop
+    and function migrateBlockNrWithTransactions
+2.  Individually using migrateBlockNrWithTransactions
+    if you know which exactly which blocks you want to analyze
+3.  Using plugin function continueBlocksSynchronization in some periodical calls
+4.  Using plugin function continuousBlocksSynchronization in some reasonable time with changeSynchronization - which should break flow
+    this function might continue work for long period
 
 5) Best to start synchronization with initialBlocksSynchronization , which will transfer and parse into database 30 blocks that will show if
 
-6) If there were some issues in network conection or you think that your database might be corrupted and lost some data you might use whichBlocksAreMissingInDdSimple
-and then showHowManyBlocksMissing if more than 0
-then use synchronizeOnlyMissedBlocks
-
-
+6) If there were some issues in network connection or you think that your database might be corrupted and lost some data you might use whichBlocksAreMissingInDdSimple
+   and then showHowManyBlocksMissing if more than 0
+   then use synchronizeOnlyMissedBlocks
 
 ```typescript
-
 import { PluginPersistenceFabricBlock } from "../../../main/typescript/plugin-fabric-persistence-block";
 import { v4 as uuidv4 } from "uuid";
 
-
-    PluginInstance = new PluginPersistenceFabricBlock({
-      gatewayOptions,
-      apiClient,
-      logLevel: testLogLevel,
-      instanceId: uuidv4(),
-      connectionString:
-        "postgresql://postgres:your-super-secret-and-long-postgres-password@localhost:5432/postgres",
-    });
+PluginInstance = new PluginPersistenceFabricBlock({
+  gatewayOptions,
+  apiClient,
+  logLevel: testLogLevel,
+  instanceId: uuidv4(),
+  connectionString:
+    "postgresql://postgres:your-super-secret-and-long-postgres-password@localhost:5432/postgres",
+});
 
 // Initialize the connection to the DB
 PluginInstance.onPluginInit();
@@ -90,31 +88,26 @@ const persistencePlugin = await factory.create({
     "postgresql://postgres:your-super-secret-and-long-postgres-password@localhost:5432/postgres",
 });
 
-
-
-
 // Initialize the connection to the DB
 persistencePlugin.onPluginInit();
 ```
-onPluginInit it also creates database structure if this is first time run
 
+onPluginInit it also creates database structure if this is first time run
 
 // Start synchronization with ledger.
 // To synchronize ledger
 
-you individually 
-
+you individually
 
 // Show current status of the plugin
 PluginInstance.getStatus();
+
 ```
 
 
 ```
 
 ## Endpoints
-
-
 
 ### Plugin Methods
 
@@ -132,9 +125,6 @@ PluginInstance.getStatus();
 
 - Get status report of this instance of persistence plugin.
 
-
-
-
 #### `constinousBlocksSynchronization`
 
 - Start the block synchronization process. New blocks from the ledger will be parsed and pushed to the database.
@@ -150,16 +140,16 @@ PluginInstance.getStatus();
 #### `whichBlocksAreMissingInDdSimple`
 
 - Walk through all the blocks that could not be synchronized with the DB for some reasons and list them
+
 #### `synchronizeOnlyMissedBlocks`
 
-- Walk through all the blocks that are listed as not be synchronized with the DB for some reasons and try push them into DB from ledger. 
+- Walk through all the blocks that are listed as not be synchronized with the DB for some reasons and try push them into DB from ledger.
 - can try many times to use this
-
 
 ### `setLastBlockConsidered`
 
 - set the last block in ledger which we consider valid by our party and synchronize only to this point in ledger
-If some blocks above this number are already in database they will not be removed.
+  If some blocks above this number are already in database they will not be removed.
 
 #### `initialBlocksSynchronization`
 
@@ -192,7 +182,6 @@ Please review [CONTIRBUTING.md](../../CONTRIBUTING.md) to get started.
 #### `./src/main/sql/schema.sql`
 
 - Database schema for Ethereum data.
-
 
 #### `./src/main/typescript/web-services`
 
