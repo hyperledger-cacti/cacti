@@ -8,7 +8,7 @@ on:
       - opened
       - synchronize
       - reopened
-      - converted_to_draft
+      - unlabeled
       - closed
 
     # Publish `main` as Docker `latest` image.
