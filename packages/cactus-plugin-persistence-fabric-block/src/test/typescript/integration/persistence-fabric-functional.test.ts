@@ -32,7 +32,7 @@ import bodyParser from "body-parser";
 import express from "express";
 import { Server as SocketIoServer } from "socket.io";
 import { DiscoveryOptions } from "fabric-network";
-import { PluginPersistenceFabric } from "../../../main/typescript";
+import { PluginPersistenceFabricBlock } from "../../../main/typescript";
 import {
   FabricTestLedgerV1,
   pruneDockerAllIfGithubAction,
