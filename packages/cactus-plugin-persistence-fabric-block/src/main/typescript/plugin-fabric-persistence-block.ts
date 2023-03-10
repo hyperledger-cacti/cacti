@@ -83,6 +83,7 @@ export class PluginPersistenceFabricBlock
     this.gatewayOptions = options.gatewayOptions;
     // this.fabricConnectorPlugin = new PluginLedgerConnectorFabric(options);
 
+    this.synchronizationGo = true;
     // database
     this.instanceId = options.instanceId;
     this.apiClient = options.apiClient;
@@ -348,7 +349,7 @@ export class PluginPersistenceFabricBlock
 
 
   async continueBlocksSynchronization(): Promise<string> {
-    this.synchronizationGo = true;
+    
     let tempBlockNumber = this.lastSeenBlock;
     let blockNumber = tempBlockNumber.toString();
     this.lastBlock = await this.lastBlockInLedger();
@@ -458,7 +459,7 @@ export class PluginPersistenceFabricBlock
           tempBlockNumber = tempBlockNumber + 1;
           blockNumber = tempBlockNumber.toString();
         }
-        if(this.synchronizationGo == false){
+        if(!this.synchronizationGo){
           moreBlocks = false;
         }
       } else {
@@ -469,7 +470,12 @@ export class PluginPersistenceFabricBlock
   }
 
   async changeSynchronization(): Promise<boolean> {
+    if(this.synchronizationGo){
     this.synchronizationGo = false;
+    } else
+    {
+    this.synchronizationGo = true;  
+    }
     return this.synchronizationGo;
   }
 
