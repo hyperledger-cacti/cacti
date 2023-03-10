@@ -3,7 +3,12 @@ name: GitGuardian scan
 on: 
   push:
   pull_request_target:
-    types: [assigned, opened, synchronize, reopened, closed]
+    types:
+      - assigned
+      - opened
+      - synchronize
+      - reopened
+      - closed
 
     # Publish `main` as Docker `latest` image.
     branches:
