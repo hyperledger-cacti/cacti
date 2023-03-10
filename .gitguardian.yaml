@@ -2,7 +2,7 @@ version: 2
 
 # Set to true if the desired exit code for the CLI is always 0,
 # otherwise the exit code will be 1 if incidents are found
-# the environment variable GITGUARDIAN_EXIT_ZERO=true can also be used toggle this behaviour.
+# the environment variable GITGUARDIAN_EXIT_ZERO=true can also be used toggle this behavior.
 exit-zero: false # default: false
 
 verbose: false # default: false
@@ -24,13 +24,6 @@ secret:
     - 'doc/*'
     - 'LICENSE'
     - '**/examples/cactus-example-carbon-accounting-backend/example-config.json'
-
-  # Ignore security incidents with the SHA256 of the occurrence obtained at output or the secret itself
-  # ignored-matches:
-  #   - name:
-  #     match: 530e5a4a7ea00814db8845dd0cae5efaa4b974a3ce1c76d0384ba715248a5dc1
-  #   - name: credentials
-  #     match: MY_TEST_CREDENTIAL
 
   # Detectors to ignore.
   ignored-detectors: # default: []
