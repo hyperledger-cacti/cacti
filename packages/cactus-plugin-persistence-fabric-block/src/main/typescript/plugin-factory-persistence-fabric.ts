@@ -5,7 +5,7 @@ import {
 import {
   IPluginPersistenceFabricOptions,
   PluginPersistenceFabric,
-} from "./plugin-fabric-persistence-block";
+} from "./plugin-persistence-fabric";
 
 export class PluginFactoryPersistanceFabricBlocks extends PluginFactory<
   PluginPersistenceFabric,

@@ -43,7 +43,7 @@ npm install
 - Run Supabase instance (see documentation for detailed instructions). For development purposes, you can use our image located in `tools/docker/supabase-all-in-one`.
 - Run one or more persistence plugins:
     - [Ethereum](../cactus-plugin-persistence-ethereum)
-    - [Fabric] (../cactus-plugin-persistence-fabric-block)
+    - [Fabric] (../cactus-plugin-persistence-fabric)
 - Edit [Supabase configuration file](./src/supabase-client.tsx), set correct supabase API URL and service_role key.
 - Execute `yarn run start` or `npm start` in this package directory.
 - The running application address: http://localhost:3001/ (can be changed in [Vite configuration](./vite.config.ts))

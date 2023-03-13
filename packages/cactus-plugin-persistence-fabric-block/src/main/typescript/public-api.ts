@@ -7,7 +7,7 @@ export { PluginFactoryPersistanceFabricBlocks } from "./plugin-factory-fabric-pe
 export {
   PluginPersistenceFabric,
   IPluginPersistenceFabricOptions,
-} from "./plugin-fabric-persistence-block";
+} from "./plugin-persistence-fabric";
 
 export async function createPluginFactory(
   pluginFactoryOptions: IPluginFactoryOptions,

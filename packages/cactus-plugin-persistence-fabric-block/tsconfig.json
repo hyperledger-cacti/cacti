@@ -5,7 +5,7 @@
     "outDir": "./dist/lib/",
     "declarationDir": "dist/lib",
     "rootDir": "./src",
-    "tsBuildInfoFile": "../../.build-cache/cactus-plugin-persistence-fabric-blocke.tsbuildinfo"
+    "tsBuildInfoFile": "../../.build-cache/cactus-plugin-persistence-fabrice.tsbuildinfo"
   },
   "include": ["./src", "**/openapi.json"],
   "references": [
