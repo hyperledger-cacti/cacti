@@ -33,7 +33,7 @@ import OAS from "../json/openapi.json";
 
 //import { BlockTransactionObject } from "web3-eth"; //
 
-export interface IPluginPersistenceFabricBlockOptions
+export interface IPluginPersistenceFabricOptions
   extends ICactusPluginOptions {
   gatewayOptions: GatewayOptions;
   apiClient: FabricApiClient;
@@ -42,10 +42,10 @@ export interface IPluginPersistenceFabricBlockOptions
   instanceId: string;
 }
 
-export class PluginPersistenceFabricBlock
+export class PluginPersistenceFabric
   implements ICactusPlugin, IPluginWebService {
   private log: Logger;
-  public static readonly CLASS_NAME = "PluginPersistenceFabricBlock";
+  public static readonly CLASS_NAME = "PluginPersistenceFabric";
   private dbClient: PostgresDatabaseClient;
   private readonly instanceId: string;
   private apiClient: FabricApiClient;
@@ -76,9 +76,9 @@ export class PluginPersistenceFabricBlock
   // synchronization ongoing
   public synchronizationGo = true;
 
-  constructor(public readonly options: IPluginPersistenceFabricBlockOptions) {
+  constructor(public readonly options: IPluginPersistenceFabricOptions) {
     const level = this.options.logLevel || "INFO";
-    const label = PluginPersistenceFabricBlock.CLASS_NAME;
+    const label = PluginPersistenceFabric.CLASS_NAME;
     this.log = LoggerProvider.getOrCreate({ level, label });
     this.instanceId = options.instanceId;
     this.gatewayOptions = options.gatewayOptions;
@@ -163,7 +163,7 @@ export class PluginPersistenceFabricBlock
     await this.dbClient.connect();
     this.log.info("Connect the PostgreSQL PostgresDatabaseClient");
     await this.dbClient.initializePlugin(
-      PluginPersistenceFabricBlock.CLASS_NAME,
+      PluginPersistenceFabric.CLASS_NAME,
       this.instanceId,
     );
     this.log.info("Plugin initialized");

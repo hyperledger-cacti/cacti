@@ -3,18 +3,18 @@ import {
   PluginFactory,
 } from "@hyperledger/cactus-core-api";
 import {
-  IPluginPersistenceFabricBlockOptions,
-  PluginPersistenceFabricBlock,
+  IPluginPersistenceFabricOptions,
+  PluginPersistenceFabric,
 } from "./plugin-fabric-persistence-block";
 
 export class PluginFactoryPersistanceFabricBlocks extends PluginFactory<
-  PluginPersistenceFabricBlock,
-  IPluginPersistenceFabricBlockOptions,
+  PluginPersistenceFabric,
+  IPluginPersistenceFabricOptions,
   IPluginFactoryOptions
 > {
   async create(
-    pluginOptions: IPluginPersistenceFabricBlockOptions,
-  ): Promise<PluginPersistenceFabricBlock> {
-    return new PluginPersistenceFabricBlock(pluginOptions);
+    pluginOptions: IPluginPersistenceFabricOptions,
+  ): Promise<PluginPersistenceFabric> {
+    return new PluginPersistenceFabric(pluginOptions);
   }
 }

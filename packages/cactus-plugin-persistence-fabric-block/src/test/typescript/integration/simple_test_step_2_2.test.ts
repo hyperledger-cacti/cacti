@@ -10,7 +10,7 @@
 // // Constants
 // //////////////////////////////////
 
-// import { PluginPersistenceFabricBlock } from "../../../main/typescript/plugin-fabric-persistence-block";
+// import { PluginPersistenceFabric } from "../../../main/typescript/plugin-fabric-persistence-block";
 
 // /**
 //  * Functional tests of Fabric Persistance Plugin for blocks
@@ -86,7 +86,7 @@
 //   let socketioServer: SocketIoServer;
 //   let apiClient: FabricApiClient;
 
-//   let PluginInstance: PluginPersistenceFabricBlock;
+//   let PluginInstance: PluginPersistenceFabric;
 //   let gatewayOptions: GatewayOptions;
 
 //   let ledger: FabricTestLedgerV1;
@@ -210,7 +210,7 @@
 //     apiClient = new FabricApiClient(apiConfig);
 //     log.debug("apiClient", apiClient);
 
-//     PluginInstance = new PluginPersistenceFabricBlock({
+//     PluginInstance = new PluginPersistenceFabric({
 //       gatewayOptions,
 //       apiClient,
 //       logLevel: testLogLevel,

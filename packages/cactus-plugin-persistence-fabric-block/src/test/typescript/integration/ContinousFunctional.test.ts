@@ -50,7 +50,7 @@ import bodyParser from "body-parser";
 import express from "express";
 import { Server as SocketIoServer } from "socket.io";
 import { DiscoveryOptions } from "fabric-network";
-import { PluginPersistenceFabricBlock } from "../../../main/typescript";
+import { PluginPersistenceFabric } from "../../../main/typescript";
 import {
   FabricTestLedgerV1,
   pruneDockerAllIfGithubAction,
@@ -109,7 +109,7 @@ describe("Persistence Fabric", () => {
   let connectorServer: http.Server;
   let socketioServer: SocketIoServer;
   let apiClient: FabricApiClient;
-  let persistence: PluginPersistenceFabricBlock;
+  let persistence: PluginPersistenceFabric;
   let gatewayOptions: GatewayOptions;
   let dbClient: DatabaseClient;
   let tmpWalletDir: string;
@@ -389,7 +389,7 @@ describe("Persistence Fabric", () => {
     apiClient = new FabricApiClient(apiConfig);
     log.debug("apiClient", apiClient);
     // DatabaseClientMock.mockClear();
-    persistence = new PluginPersistenceFabricBlock({
+    persistence = new PluginPersistenceFabric({
       gatewayOptions,
       apiClient,
       logLevel: testLogLevel,

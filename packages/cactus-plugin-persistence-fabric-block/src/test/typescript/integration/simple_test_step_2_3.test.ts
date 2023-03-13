@@ -59,7 +59,7 @@ import {
   //WatchBlocksListenerTypeV1,
   //WatchBlocksResponseV1,
 } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
-import { PluginPersistenceFabricBlock } from "../../../main/typescript";
+import { PluginPersistenceFabric } from "../../../main/typescript";
 
 //////////////////////////////////
 // Constants
@@ -86,7 +86,7 @@ describe("Persistence Fabric", () => {
   let connectorServer: http.Server;
   let socketioServer: SocketIoServer;
   let apiClient: FabricApiClient;
-  let persistence: PluginPersistenceFabricBlock;
+  let persistence: PluginPersistenceFabric;
   let gatewayOptions: GatewayOptions;
   // let dbClient: PostgresDatabaseClient;
 
@@ -205,7 +205,7 @@ describe("Persistence Fabric", () => {
     apiClient = new FabricApiClient(apiConfig);
     log.debug("apiClient", apiClient);
 
-    persistence = new PluginPersistenceFabricBlock({
+    persistence = new PluginPersistenceFabric({
       gatewayOptions,
       apiClient,
       logLevel: testLogLevel,

@@ -53,10 +53,10 @@ There is few ways to use this plugins:
    then use synchronizeOnlyMissedBlocks
 
 ```typescript
-import { PluginPersistenceFabricBlock } from "../../../main/typescript/plugin-fabric-persistence-block";
+import { PluginPersistenceFabric } from "../../../main/typescript/plugin-fabric-persistence-block";
 import { v4 as uuidv4 } from "uuid";
 
-PluginInstance = new PluginPersistenceFabricBlock({
+PluginInstance = new PluginPersistenceFabric({
   gatewayOptions,
   apiClient,
   logLevel: testLogLevel,
@@ -69,10 +69,10 @@ PluginInstance = new PluginPersistenceFabricBlock({
 PluginInstance.onPluginInit();
 ```
 
-Alternatively, import `PluginPersistenceFabricBlock` from the plugin package and use it to create a plugin.
+Alternatively, import `PluginPersistenceFabric` from the plugin package and use it to create a plugin.
 
 ```typescript
-import { PluginPersistenceFabricBlock } from "@hyperledger/plugin-fabric-persistence-block";
+import { PluginPersistenceFabric } from "@hyperledger/plugin-fabric-persistence-block";
 import { PluginImportType } from "@hyperledger/cactus-core-api";
 import { v4 as uuidv4 } from "uuid";
 

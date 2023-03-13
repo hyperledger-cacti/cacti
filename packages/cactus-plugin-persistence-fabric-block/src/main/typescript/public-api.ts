@@ -5,8 +5,8 @@ import { PluginFactoryPersistanceFabricBlocks } from "./plugin-factory-fabric-pe
 export { PluginFactoryPersistanceFabricBlocks } from "./plugin-factory-fabric-persistence-block";
 
 export {
-  PluginPersistenceFabricBlock,
-  IPluginPersistenceFabricBlockOptions,
+  PluginPersistenceFabric,
+  IPluginPersistenceFabricOptions,
 } from "./plugin-fabric-persistence-block";
 
 export async function createPluginFactory(

@@ -16,7 +16,7 @@ import type {
 } from "@hyperledger/cactus-core-api";
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
-import { PluginPersistenceFabricBlock } from "../plugin-fabric-persistence-block";
+import { PluginPersistenceFabric } from "../plugin-fabric-persistence-block";
 import OAS from "../../json/openapi.json";
 
 import type { Express, Request, Response } from "express";
@@ -25,7 +25,7 @@ import sanitizeHtml from "sanitize-html";
 
 export interface IStatusEndpointV1Options {
   logLevel?: LogLevelDesc;
-  connector: PluginPersistenceFabricBlock;
+  connector: PluginPersistenceFabric;
 }
 
 /**
