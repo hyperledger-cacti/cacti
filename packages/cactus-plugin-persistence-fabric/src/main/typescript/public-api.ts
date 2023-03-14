@@ -1,8 +1,8 @@
 import { IPluginFactoryOptions } from "@hyperledger/cactus-core-api";
 import * as OpenApiJson from "../json/openapi.json";
 export { OpenApiJson };
-import { PluginFactoryPersistanceFabricBlocks } from "./plugin-factory-persistence-fabric";
-export { PluginFactoryPersistanceFabricBlocks } from "./plugin-factory-persistence-fabric";
+import { PluginFactoryPersistanceFabric } from "./plugin-factory-persistence-fabric";
+export { PluginFactoryPersistanceFabric } from "./plugin-factory-persistence-fabric";
 
 export {
   PluginPersistenceFabric,
@@ -11,6 +11,6 @@ export {
 
 export async function createPluginFactory(
   pluginFactoryOptions: IPluginFactoryOptions,
-): Promise<PluginFactoryPersistanceFabricBlocks> {
-  return new PluginFactoryPersistanceFabricBlocks(pluginFactoryOptions);
+): Promise<PluginFactoryPersistanceFabric> {
+  return new PluginFactoryPersistanceFabric(pluginFactoryOptions);
 }
