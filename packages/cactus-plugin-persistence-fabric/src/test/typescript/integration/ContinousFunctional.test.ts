@@ -515,13 +515,14 @@ describe("Persistence Fabric", () => {
 
     for (let i = getMaxBlockNumber; i >= 0; i--) {
       try {
-        await apiClient.getBlockV1({
-          channelName: ledgerChannelName,
-          gatewayOptions,
-          query: {
-            blockNumber: `${i}`,
-          },
-        });
+        persistence.getBlockFromLedger(`${i}`);
+        // await apiClient.getBlockV1({
+        //   channelName: ledgerChannelName,
+        //   gatewayOptions,
+        //   query: {
+        //     blockNumber: `${i}`,
+        //   },
+        // });
         const isThisBlockInDB = await dbClient.isThisBlockInDB(i);
         if (isThisBlockInDB.rowCount === 0) {
           howManyBlocksMissing += 1;
@@ -537,6 +538,60 @@ describe("Persistence Fabric", () => {
     }
     log.info(`missedBlocks: ${howManyBlocksMissing}`, missedBlocks);
     expect(getMaxBlockNumber).toBeTruthy();
+  });
+
+  test(" last block setting to 6", async () => {
+    const LastBlockChanged = await persistence.setLastBlockConsidered(6);
+    log.warn("setting Lastblock from plugin for analyze");
+    log.warn(LastBlockChanged);
+  });
+  test("check last block setting to 6", async () => {
+    const LastBlockChanged = await persistence.currentLastBlock();
+    log.warn("Getting Lastblock from plugin for analyze");
+    log.warn(LastBlockChanged);
+  });
+
+  test("Migration of 5 block Test", async () => {
+    const blockTotest = await persistence.migrateBlockNrWithTransactions("5");
+    log.warn("Getting block from ledger for analyze");
+    log.warn(blockTotest);
+    log.warn(blockTotest);
+  });
+  test("Migration of 6 block Test", async () => {
+    const blockTotest = await persistence.migrateBlockNrWithTransactions("6");
+    log.warn("Getting block from ledger for analyze");
+    log.warn(blockTotest);
+    log.warn(blockTotest);
+  });
+  test("Migration of check Last block Test", async () => {
+    const LastBlockChanged = await persistence.currentLastBlock();
+    log.warn("Getting Lastblock from plugin for analyze");
+    log.warn(LastBlockChanged);
+  });
+  test("check missing blocks", async () => {
+    const missingBlocksCheck = await persistence.whichBlocksAreMissingInDdSimple();
+    log.warn("Getting missing blocks from plugin for analyze");
+    log.warn(JSON.stringify(missingBlocksCheck));
+  });
+
+  test("check missing blocks count", async () => {
+    const missingBlocksCount = await persistence.showHowManyBlocksMissing();
+    log.warn("Getting missingBlocksCount from plugin for analyze");
+    log.warn(missingBlocksCount);
+  });
+
+  test("fill missing blocks", async () => {
+    const missingBlocksCheck = await persistence.synchronizeOnlyMissedBlocks();
+    log.warn("Getting missing blocks from plugin for analyze");
+    log.warn(JSON.stringify(missingBlocksCheck));
+  });
+
+  test("check missing blocks count after fill", async () => {
+    const missingBlocksCount = await persistence.showHowManyBlocksMissing();
+    log.warn(
+      "After migration missing blocks getting missingBlocksCount from plugin for analyze",
+    );
+    log.warn(missingBlocksCount);
   });
 
   //creating test transaction on ledger.

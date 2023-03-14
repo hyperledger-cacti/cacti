@@ -33,8 +33,7 @@ import OAS from "../json/openapi.json";
 
 //import { BlockTransactionObject } from "web3-eth"; //
 
-export interface IPluginPersistenceFabricOptions
-  extends ICactusPluginOptions {
+export interface IPluginPersistenceFabricOptions extends ICactusPluginOptions {
   gatewayOptions: GatewayOptions;
   apiClient: FabricApiClient;
   connectionString: string;
@@ -347,7 +346,6 @@ export class PluginPersistenceFabric
    */
 
   async continueBlocksSynchronization(): Promise<string> {
-    
     let tempBlockNumber = this.lastSeenBlock;
     let blockNumber = tempBlockNumber.toString();
     this.lastBlock = await this.lastBlockInLedger();
@@ -392,7 +390,7 @@ export class PluginPersistenceFabric
             moreBlocks = false;
           }
         }
-        if(!this.synchronizationGo){
+        if (!this.synchronizationGo) {
           moreBlocks = false;
         }
       } else {
@@ -456,7 +454,7 @@ export class PluginPersistenceFabric
           tempBlockNumber = tempBlockNumber + 1;
           blockNumber = tempBlockNumber.toString();
         }
-        if(!this.synchronizationGo){
+        if (!this.synchronizationGo) {
           moreBlocks = false;
         }
       } else {
@@ -467,11 +465,10 @@ export class PluginPersistenceFabric
   }
 
   async changeSynchronization(): Promise<boolean> {
-    if(this.synchronizationGo){
-    this.synchronizationGo = false;
-    } else
-    {
-    this.synchronizationGo = true;  
+    if (this.synchronizationGo) {
+      this.synchronizationGo = false;
+    } else {
+      this.synchronizationGo = true;
     }
     return this.synchronizationGo;
   }

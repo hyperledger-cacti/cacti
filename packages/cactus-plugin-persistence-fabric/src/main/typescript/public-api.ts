@@ -1,8 +1,8 @@
 import { IPluginFactoryOptions } from "@hyperledger/cactus-core-api";
 import * as OpenApiJson from "../json/openapi.json";
 export { OpenApiJson };
-import { PluginFactoryPersistanceFabricBlocks } from "./plugin-factory-fabric-persistence-block";
-export { PluginFactoryPersistanceFabricBlocks } from "./plugin-factory-fabric-persistence-block";
+import { PluginFactoryPersistanceFabricBlocks } from "./plugin-factory-persistence-fabric";
+export { PluginFactoryPersistanceFabricBlocks } from "./plugin-factory-persistence-fabric";
 
 export {
   PluginPersistenceFabric,
