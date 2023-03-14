@@ -95,8 +95,8 @@
   "publishConfig": {
     "access": "public"
   },
-  "browserMinified": "dist/plugin-persistance-fabric.web.umd.min.js",
-  "mainMinified": "dist/cactus-plugin-persistance-fabric.node.umd.min.js",
+  "browserMinified": "dist/plugin-persistence-fabric.web.umd.min.js",
+  "mainMinified": "dist/cactus-plugin-persistence-fabric.node.umd.min.js",
   "watch": {
     "codegen:openapi": {
       "patterns": [
