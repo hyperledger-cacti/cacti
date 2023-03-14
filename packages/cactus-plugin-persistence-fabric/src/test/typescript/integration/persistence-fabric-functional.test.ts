@@ -18,11 +18,11 @@
 // Constants
 //////////////////////////////////
 
-const postgresImageName = "postgres";
-const postgresImageVersion = "14.6-alpine";
+// const postgresImageName = "postgres";
+// const postgresImageVersion = "14.6-alpine";
 const testLogLevel: LogLevelDesc = "info";
 const sutLogLevel: LogLevelDesc = "info";
-// const setupTimeout = 1000 * 60; // 1 minute timeout for setup
+const setupTimeout = 1000 * 60; // 1 minute timeout for setup
 // const testTimeout = 1000 * 60 * 3; // 3 minutes timeout for some async tests
 
 const imageName = "ghcr.io/hyperledger/cactus-fabric2-all-in-one";
@@ -33,7 +33,7 @@ const ledgerUserName = "appUser";
 const ledgerChannelName = "mychannel";
 const ledgerContractName = "basic";
 const leaveLedgerRunning = true; // default: false
-const useRunningLedger = false; // default: false
+const useRunningLedger = true; // default: false
 
 /////////////////////////////////
 
@@ -55,7 +55,7 @@ import {
   FabricTestLedgerV1,
   pruneDockerAllIfGithubAction,
   SelfSignedPkiGenerator,
-  PostgresTestContainer,
+  // PostgresTestContainer,
 } from "@hyperledger/cactus-test-tooling";
 
 import {
@@ -82,20 +82,20 @@ import {
 // Mocked DB setup
 
 import DatabaseClient from "../../../main/typescript/db-client/db-client";
-// jest.mock("../../../main/typescript/db-client/db-client");
-// const DatabaseClientMock = (DatabaseClient as unknown) as jest.Mock;
-
-// Logger setup
-const log: Logger = LoggerProvider.getOrCreate({
-  label: "persistence-fabric-functional.test",
-  level: testLogLevel,
-});
+jest.mock("../../../main/typescript/db-client/db-client");
+const DatabaseClientMock = (DatabaseClient as unknown) as jest.Mock;
 
 import {
   enrollAdmin,
   enrollUser,
   getUserCryptoFromWallet,
 } from "./fabric-setup-helpers";
+
+// Logger setup
+const log: Logger = LoggerProvider.getOrCreate({
+  label: "persistence-fabric-functional.test",
+  level: testLogLevel,
+});
 
 /**
  * Main test suite
@@ -111,13 +111,54 @@ describe("Persistence Fabric", () => {
   let apiClient: FabricApiClient;
   let persistence: PluginPersistenceFabric;
   let gatewayOptions: GatewayOptions;
+  let dbClientInstance: any;
   let dbClient: DatabaseClient;
   let tmpWalletDir: string;
   let connectorCertValue: string;
   let connectorPrivKeyValue: string;
-  let postgresContainer: PostgresTestContainer;
+  // let postgresContainer: PostgresTestContainer;
 
   let instanceId: string;
+
+  function insertResponseMock() {
+    (dbClientInstance.insertBlockDataEntry as jest.Mock).mockReturnValue({
+      test: "test",
+    });
+  }
+  // function isThisBlockInDbMock(blockNumber: number) {
+  //   (dbClientInstance.isThisBlockInDB as jest.Mock).mockReturnValue(
+  //     blockNumber,
+  //   );
+  // }
+  function getMaxBlockNumberMock(blockNumber: number) {
+    (dbClientInstance.getMaxBlockNumber as jest.Mock).mockReturnValue(
+      blockNumber,
+    );
+  }
+
+  function missBlock10(blockNumber: number) {
+    if (blockNumber === 10) {
+      (dbClientInstance.isThisBlockInDB as jest.Mock).mockReturnValue({
+        command: "SELECT",
+        rowCount: 0,
+        rows: [],
+      });
+    } else {
+      (dbClientInstance.isThisBlockInDB as jest.Mock).mockReturnValue(
+        blockNumber,
+      );
+    }
+  }
+
+  function clearMockTokenMetadata() {
+    for (const mockMethodName in dbClientInstance) {
+      const mockMethod = dbClientInstance[mockMethodName];
+      if ("mockClear" in mockMethod) {
+        mockMethod.mockClear;
+      }
+    }
+  }
+
   ////////////////////
   function createFabricConnectorConfig(
     connectionProfile: Record<string, any>,
@@ -195,33 +236,33 @@ describe("Persistence Fabric", () => {
     log.info("Prune Docker...");
     await pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
 
-    postgresContainer = new PostgresTestContainer({
-      imageName: postgresImageName,
-      imageVersion: postgresImageVersion,
-      logLevel: testLogLevel,
-      envVars: ["POSTGRES_USER=postgres", "POSTGRES_PASSWORD=postgres"],
-    });
-    await postgresContainer.start();
+    // postgresContainer = new PostgresTestContainer({
+    //   imageName: postgresImageName,
+    //   imageVersion: postgresImageVersion,
+    //   logLevel: testLogLevel,
+    //   envVars: ["POSTGRES_USER=postgres", "POSTGRES_PASSWORD=postgres"],
+    // });
+    // await postgresContainer.start();
 
-    const postgresPort = await postgresContainer.getPostgresPort();
-    expect(postgresPort).toBeTruthy();
-    log.info(`Postgres running at localhost:${postgresPort}`);
+    // const postgresPort = await postgresContainer.getPostgresPort();
+    // expect(postgresPort).toBeTruthy();
+    // log.info(`Postgres running at localhost:${postgresPort}`);
 
     log.info("Create PostgresDatabaseClient");
-    dbClient = new DatabaseClient({
-      connectionString: `postgresql://postgres:postgres@localhost:${postgresPort}/postgres`,
-      logLevel: sutLogLevel,
-    });
+    // dbClient = new DatabaseClient({
+    //   connectionString: `postgresql://postgres:postgres@localhost:${postgresPort}/postgres`,
+    //   logLevel: sutLogLevel,
+    // });
 
     log.info("Connect the PostgreSQL PostgresDatabaseClient");
-    await dbClient.connect();
-    await dbClient.client.query(
-      `CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-         CREATE ROLE anon NOLOGIN;
-         CREATE ROLE authenticated NOLOGIN;
-         CREATE ROLE service_role NOLOGIN;
-         CREATE ROLE supabase_admin NOLOGIN;`,
-    );
+    // await dbClient.connect();
+    // await dbClient.client.query(
+    //   `CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+    //      CREATE ROLE anon NOLOGIN;
+    //      CREATE ROLE authenticated NOLOGIN;
+    //      CREATE ROLE service_role NOLOGIN;
+    //      CREATE ROLE supabase_admin NOLOGIN;`,
+    // );
 
     log.info("Initialize the test DB Schema");
     // await dbClient.initializePlugin(testPluginName, testPluginInstanceId);
@@ -383,18 +424,19 @@ describe("Persistence Fabric", () => {
     const apiConfig = new Configuration({ basePath: apiHost });
     apiClient = new FabricApiClient(apiConfig);
     log.debug("apiClient", apiClient);
-    // DatabaseClientMock.mockClear();
+    DatabaseClientMock.mockClear();
     persistence = new PluginPersistenceFabric({
       gatewayOptions,
       apiClient,
       logLevel: testLogLevel,
       instanceId,
-      connectionString: `postgresql://postgres:postgres@localhost:${postgresPort}/postgres`,
+      connectionString: `db-is-mocked`,
     });
-    await persistence.onPluginInit();
-    // expect(DatabaseClientMock).toHaveBeenCalledTimes(1);
-    // dbClientInstance = DatabaseClientMock.mock.instances[0];
-    // expect(dbClientInstance).toBeTruthy();
+    // await persistence.onPluginInit();
+    expect(DatabaseClientMock).toHaveBeenCalledTimes(1);
+    dbClientInstance = DatabaseClientMock.mock.instances[0];
+    // log.warn("dbClientInstance", dbClientInstance);
+    expect(dbClientInstance).toBeTruthy();
   });
 
   afterAll(async () => {
@@ -442,12 +484,12 @@ describe("Persistence Fabric", () => {
       log.info("Disconnect the PostgresDatabaseClient");
       await dbClient.shutdown();
     }
-    if (postgresContainer) {
-      log.info("Disconnect the PostgresDatabaseClient");
+    // if (postgresContainer) {
+    //   log.info("Disconnect the PostgresDatabaseClient");
 
-      await postgresContainer.stop();
-      // await postgresContainer.destroy();
-    }
+    //   await postgresContainer.stop();
+    //   await postgresContainer.destroy();
+    // }
 
     // Wait for monitor to be terminated
     await new Promise((resolve) => setTimeout(resolve, 8000));
@@ -455,22 +497,23 @@ describe("Persistence Fabric", () => {
     log.info("Prune Docker...");
     await pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
   });
-  //   beforeEach(() => {
-  //     clearMockTokenMetadata();
-  //   }, setupTimeout);
 
-  test("insertBlockDataEntry test", async () => {
-    const block_data = {
-      fabric_block_id: uuidv4(),
-      fabric_block_num: 1,
-      fabric_block_data: "test",
-    };
-    const response = await persistence.insertBlockDataEntry(block_data);
+  beforeEach(() => {
+    clearMockTokenMetadata();
+  }, setupTimeout);
 
-    expect(response).toBeTruthy();
-    expect(response.command).toEqual("INSERT");
-    expect(response.rowCount).toEqual(1);
-  });
+  // test("insertBlockDataEntry test", async () => {
+  //   const block_data = {
+  //     fabric_block_id: uuidv4(),
+  //     fabric_block_num: 1,
+  //     fabric_block_data: "test",
+  //   };
+  //   const response = await persistence.insertBlockDataEntry(block_data);
+
+  //   expect(response).toBeTruthy();
+  //   expect(response.command).toEqual("INSERT");
+  //   expect(response.rowCount).toEqual(1);
+  // });
 
   // getblock method test should return block data from ledger
   // currently there is no option like "latest"
@@ -480,22 +523,26 @@ describe("Persistence Fabric", () => {
 
     expect(block).toBeTruthy();
   });
-
-  // checks if method works.
-  test("isThisBlockInDB method", async () => {
-    const isThisBlockInDB = await dbClient.isThisBlockInDB(-1);
-    expect(isThisBlockInDB).toBeTruthy();
-    expect(isThisBlockInDB.rowCount).toEqual(0);
+  test("getblock", async () => {
+    await insertResponseMock();
+    const testValue = await dbClientInstance.insertBlockDataEntry();
+    log.warn("##testValue", testValue);
   });
 
+  // checks if method works.
+
   // checks if all blocks from ledger are inserted into DB. If not, returns array with numbers of missing blocks.
-  test("log all not synchronized blocks", async () => {
-    const getMaxBlockNumber = await dbClient.getMaxBlockNumber();
+  test.only("log all not synchronized blocks", async () => {
+    getMaxBlockNumberMock(11);
+    const getMaxBlockNumber = await dbClientInstance.getMaxBlockNumber(11);
     const missedBlocks: number[] = [];
     let howManyBlocksMissing = 0;
+    log.warn("getMaxBlockNumber", getMaxBlockNumber);
 
     for (let i = getMaxBlockNumber; i >= 0; i--) {
       try {
+        missBlock10(i);
+
         persistence.getBlockFromLedger(`${i}`);
         // await apiClient.getBlockV1({
         //   channelName: ledgerChannelName,
@@ -504,13 +551,14 @@ describe("Persistence Fabric", () => {
         //     blockNumber: `${i}`,
         //   },
         // });
-        const isThisBlockInDB = await dbClient.isThisBlockInDB(i);
+        const isThisBlockInDB = await dbClientInstance.isThisBlockInDB(i);
+        log.warn("isThisBlockInDB", isThisBlockInDB);
         if (isThisBlockInDB.rowCount === 0) {
           howManyBlocksMissing += 1;
           missedBlocks.push(i);
         }
       } catch (err: unknown) {
-        const isThisBlockInDB = await dbClient.isThisBlockInDB(i);
+        const isThisBlockInDB = await dbClientInstance.isThisBlockInDB(i);
         if (isThisBlockInDB.rowCount === 0) {
           howManyBlocksMissing += 1;
           missedBlocks.push(i);

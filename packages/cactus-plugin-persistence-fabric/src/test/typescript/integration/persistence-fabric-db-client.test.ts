@@ -119,4 +119,11 @@ describe("Fabric persistence PostgreSQL PostgresDatabaseClient tests", () => {
     expect(getMaxBlockNumber).toBeTruthy();
     expect(getMaxBlockNumber).toBeGreaterThanOrEqual(1);
   });
+
+  test("isThisBlockInDB method", async () => {
+    const isThisBlockInDB = await dbClient.isThisBlockInDB(-1);
+    log.warn("isThisBlockInDB", isThisBlockInDB);
+    expect(isThisBlockInDB).toBeTruthy();
+    expect(isThisBlockInDB.rowCount).toEqual(0);
+  });
 });
