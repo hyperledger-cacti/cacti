@@ -33,7 +33,7 @@ const ledgerUserName = "appUser";
 const ledgerChannelName = "mychannel";
 const ledgerContractName = "basic";
 const leaveLedgerRunning = true; // default: false
-const useRunningLedger = true; // default: false
+const useRunningLedger = false; // default: false
 
 /////////////////////////////////
 
@@ -293,9 +293,6 @@ describe("Persistence Fabric", () => {
       mspId: userIdent[2],
       type: userIdent[3],
     };
-    // log.warn("###userIdentity", userIdentity);
-    log.warn("###identityTest", identityTest);
-
     const pkiGenerator = new SelfSignedPkiGenerator();
     const pki = pkiGenerator.create("localhost");
     connectorCertValue = pki.certificatePem;
@@ -312,8 +309,6 @@ describe("Persistence Fabric", () => {
       adminName,
       adminSecret,
     );
-
-    // log.warn("ident", ident);
 
     // Create Keychain Plugin
     const keychainId = uuidv4();
@@ -464,11 +459,6 @@ describe("Persistence Fabric", () => {
   //     clearMockTokenMetadata();
   //   }, setupTimeout);
 
-  test("plugins checks", async () => {
-    log.warn("###ApiClient", apiClient);
-    log.warn("###Persistence", persistence);
-  });
-
   test("insertBlockDataEntry test", async () => {
     const block_data = {
       fabric_block_id: uuidv4(),
@@ -477,15 +467,9 @@ describe("Persistence Fabric", () => {
     };
     const response = await persistence.insertBlockDataEntry(block_data);
 
-    log.warn("insert block", response);
     expect(response).toBeTruthy();
     expect(response.command).toEqual("INSERT");
     expect(response.rowCount).toEqual(1);
-  });
-  test.skip("Logger test", async () => {
-    log.warn("ledgerChannelName", ledgerChannelName);
-    log.warn("gatewayOptions", gatewayOptions);
-    log.warn("ledgerChannelName", ledgerChannelName);
   });
 
   // getblock method test should return block data from ledger
@@ -494,15 +478,12 @@ describe("Persistence Fabric", () => {
     const blockNumber = "1";
     const block = await persistence.getBlockFromLedger(blockNumber);
 
-    log.warn("getBlockV1 response:", JSON.stringify(block));
-
     expect(block).toBeTruthy();
   });
 
   // checks if method works.
   test("isThisBlockInDB method", async () => {
     const isThisBlockInDB = await dbClient.isThisBlockInDB(-1);
-    log.debug("isThisBlockInDB", isThisBlockInDB);
     expect(isThisBlockInDB).toBeTruthy();
     expect(isThisBlockInDB.rowCount).toEqual(0);
   });
@@ -542,56 +523,55 @@ describe("Persistence Fabric", () => {
 
   test(" last block setting to 6", async () => {
     const LastBlockChanged = await persistence.setLastBlockConsidered(6);
-    log.warn("setting Lastblock from plugin for analyze");
-    log.warn(LastBlockChanged);
+    log.info("setting Lastblock from plugin for analyze");
+    expect(LastBlockChanged).toBeTruthy();
   });
   test("check last block setting to 6", async () => {
     const LastBlockChanged = await persistence.currentLastBlock();
-    log.warn("Getting Lastblock from plugin for analyze");
-    log.warn(LastBlockChanged);
+    log.info("Getting Lastblock from plugin for analyze");
+
+    expect(LastBlockChanged).toBeTruthy();
   });
 
   test("Migration of 5 block Test", async () => {
     const blockTotest = await persistence.migrateBlockNrWithTransactions("5");
-    log.warn("Getting block from ledger for analyze");
-    log.warn(blockTotest);
-    log.warn(blockTotest);
+    log.info("Getting block from ledger for analyze");
+    expect(blockTotest).toBeTruthy();
   });
   test("Migration of 6 block Test", async () => {
     const blockTotest = await persistence.migrateBlockNrWithTransactions("6");
-    log.warn("Getting block from ledger for analyze");
-    log.warn(blockTotest);
-    log.warn(blockTotest);
+    log.info("Getting block from ledger for analyze");
+    expect(blockTotest).toBeTruthy();
   });
   test("Migration of check Last block Test", async () => {
     const LastBlockChanged = await persistence.currentLastBlock();
-    log.warn("Getting Lastblock from plugin for analyze");
-    log.warn(LastBlockChanged);
+    log.info("Getting Lastblock from plugin for analyze");
+    expect(LastBlockChanged).toBeTruthy();
   });
   test("check missing blocks", async () => {
     const missingBlocksCheck = await persistence.whichBlocksAreMissingInDdSimple();
-    log.warn("Getting missing blocks from plugin for analyze");
-    log.warn(JSON.stringify(missingBlocksCheck));
+    log.info("Getting missing blocks from plugin for analyze");
+    expect(missingBlocksCheck).toBeTruthy();
   });
 
   test("check missing blocks count", async () => {
     const missingBlocksCount = await persistence.showHowManyBlocksMissing();
-    log.warn("Getting missingBlocksCount from plugin for analyze");
-    log.warn(missingBlocksCount);
+    log.info("Getting missingBlocksCount from plugin for analyze");
+    expect(missingBlocksCount).toBeTruthy();
   });
 
   test("fill missing blocks", async () => {
     const missingBlocksCheck = await persistence.synchronizeOnlyMissedBlocks();
-    log.warn("Getting missing blocks from plugin for analyze");
-    log.warn(JSON.stringify(missingBlocksCheck));
+    log.info("Getting missing blocks from plugin for analyze");
+    expect(missingBlocksCheck).toBeTruthy();
   });
 
   test("check missing blocks count after fill", async () => {
     const missingBlocksCount = await persistence.showHowManyBlocksMissing();
-    log.warn(
+    log.info(
       "After migration missing blocks getting missingBlocksCount from plugin for analyze",
     );
-    log.warn(missingBlocksCount);
+    expect(missingBlocksCount).toBeTruthy();
   });
 
   //creating test transaction on ledger.
