@@ -487,7 +487,7 @@ export class PluginPersistenceFabric
       },
     });
 
-    let tempBlockParse:Object = JSON.parse(JSON.stringify(block.data));
+    const tempBlockParse: any = JSON.parse(JSON.stringify(block.data));
 
 
     const hash = Buffer.from(
