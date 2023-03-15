@@ -487,7 +487,8 @@ export class PluginPersistenceFabric
       },
     });
 
-    let tempBlockParse: any;
+    let tempBlockParse:Object = JSON.parse(JSON.stringify(block.data));
+
 
     const hash = Buffer.from(
       tempBlockParse.decodedBlock.header.data_hash.data,
@@ -577,7 +578,7 @@ export class PluginPersistenceFabric
           for (const input of chaincode_proposal_input) {
             inputs =
               (inputs === "" ? inputs : `${inputs},`) +
-              Buffer.from(input).toString("hex");
+              Buffer.from(input).toString("utf8");
           }
           chaincode_proposal_input = inputs;
         }
@@ -619,10 +620,10 @@ export class PluginPersistenceFabric
             .channel_header.tx_id;
       }
 
-      const read_set = JSON.stringify(readSet, null, 2);
-      const write_set = JSON.stringify(writeSet, null, 2);
+      const read_set:string = JSON.stringify(readSet, null, 2);
+      const write_set:string = JSON.stringify(writeSet, null, 2);
 
-      const chaincode_id = chaincodeID;
+      const chaincode_id:string = JSON.stringify(chaincodeID);
 
       let chaincodename: string = "";
       // checking if proposal_response_payload is present and operational
