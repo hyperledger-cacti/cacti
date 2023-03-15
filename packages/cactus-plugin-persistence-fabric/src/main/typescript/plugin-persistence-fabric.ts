@@ -244,6 +244,7 @@ export class PluginPersistenceFabric
    * lastBlockInLedger
    * @returns this.lastBlock which is last block in ledger assuming using getBlock and node js SDK
    */
+
   public async lastBlockInLedger(): Promise<number> {
     let tempBlockNumber = this.lastBlock;
     let blockNumber = tempBlockNumber.toString();

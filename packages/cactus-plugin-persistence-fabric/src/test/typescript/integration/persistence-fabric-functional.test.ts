@@ -33,7 +33,7 @@ const ledgerUserName = "appUser";
 const ledgerChannelName = "mychannel";
 const ledgerContractName = "basic";
 const leaveLedgerRunning = true; // default: false
-const useRunningLedger = true; // default: false
+const useRunningLedger = false; // default: false
 
 /////////////////////////////////
 
@@ -120,11 +120,11 @@ describe("Persistence Fabric", () => {
 
   let instanceId: string;
 
-  function insertResponseMock() {
-    (dbClientInstance.insertBlockDataEntry as jest.Mock).mockReturnValue({
-      test: "test",
-    });
-  }
+  // function insertResponseMock() {
+  //   (dbClientInstance.insertBlockDataEntry as jest.Mock).mockReturnValue({
+  //     test: "test",
+  //   });
+  // }
   // function isThisBlockInDbMock(blockNumber: number) {
   //   (dbClientInstance.isThisBlockInDB as jest.Mock).mockReturnValue(
   //     blockNumber,
@@ -520,19 +520,15 @@ describe("Persistence Fabric", () => {
   test("getblock", async () => {
     const blockNumber = "1";
     const block = await persistence.getBlockFromLedger(blockNumber);
-
+    log.warn(block);
+    log.error(JSON.stringify(block));
     expect(block).toBeTruthy();
-  });
-  test("getblock", async () => {
-    await insertResponseMock();
-    const testValue = await dbClientInstance.insertBlockDataEntry();
-    log.warn("##testValue", testValue);
   });
 
   // checks if method works.
 
   // checks if all blocks from ledger are inserted into DB. If not, returns array with numbers of missing blocks.
-  test.only("log all not synchronized blocks", async () => {
+  test("log all not synchronized blocks", async () => {
     getMaxBlockNumberMock(11);
     const getMaxBlockNumber = await dbClientInstance.getMaxBlockNumber(11);
     const missedBlocks: number[] = [];
@@ -569,17 +565,45 @@ describe("Persistence Fabric", () => {
     expect(getMaxBlockNumber).toBeTruthy();
   });
 
+  // test("initialBlocksSynchronization", async () => {
+  //   const initialBlocksSynchronization = await persistence.initialBlocksSynchronization();
+  //   expect(initialBlocksSynchronization).toBeTruthy();
+  //   expect(initialBlocksSynchronization).toEqual("done");
+  // });
+  // test("continueBlocksSynchronization", async () => {
+  //   const continueBlocksSynchronization = await persistence.continueBlocksSynchronization();
+  //   expect(continueBlocksSynchronization).toBeTruthy();
+  //   expect(continueBlocksSynchronization).toEqual("done");
+  // });
+  // test("continuousBlocksSynchronization", async () => {
+  //   const continuousBlocksSynchronization = await persistence.continuousBlocksSynchronization();
+  //   expect(continuousBlocksSynchronization).toBeTruthy();
+  //   expect(continuousBlocksSynchronization).toEqual("done");
+  // });
+  // test("changeSynchronization", async () => {
+  //   const changeSynchronization = await persistence.changeSynchronization();
+  //   expect(changeSynchronization).toBeTruthy();
+  //   expect(changeSynchronization).toEqual(true || false);
+  // });
+
+  // test("LastBlockChanged", async () => {
+  //   const LastBlockChanged = await persistence.currentLastSeenBlock();
+  //   log.info("Getting Lastblock from plugin for analyze");
+
+  //   expect(LastBlockChanged).toBeTruthy();
+  // });
+
   test(" last block setting to 6", async () => {
     const LastBlockChanged = await persistence.setLastBlockConsidered(6);
     log.info("setting Lastblock from plugin for analyze");
     expect(LastBlockChanged).toBeTruthy();
   });
-  test("check last block setting to 6", async () => {
-    const LastBlockChanged = await persistence.currentLastBlock();
-    log.info("Getting Lastblock from plugin for analyze");
+  // test("currentLastBlock", async () => {
+  //   const currentLastBlock = await persistence.currentLastBlock();
+  //   log.info("Getting Lastblock from plugin for analyze");
 
-    expect(LastBlockChanged).toBeTruthy();
-  });
+  //   expect(currentLastBlock).toBeTruthy();
+  // });
 
   test("Migration of 5 block Test", async () => {
     const blockTotest = await persistence.migrateBlockNrWithTransactions("5");
@@ -621,6 +645,11 @@ describe("Persistence Fabric", () => {
     );
     expect(missingBlocksCount).toBeTruthy();
   });
+  // test("migrateNextBlock", async () => {
+  //   const missingBlocksCount = await persistence.migrateNextBlock();
+
+  //   expect(missingBlocksCount).toBeTruthy();
+  // });
 
   //creating test transaction on ledger.
   // test.skip("create test transaction", async () => {
