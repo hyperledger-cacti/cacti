@@ -1,0 +1,42 @@
+name: azure-container-image-scan
+
+on:
+  push:
+  pull_request:
+    # Publish `main` as Docker `latest` image.
+    branches:
+      - main
+
+    # Publish `v1.2.3` tags as releases.
+    tags:
+      - v*
+
+jobs:
+ build-secure-and-push-2:
+    name: Scan cactus-cmd-api-server image
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2.4.0
+      env:
+          # (Required) The token to use to make API calls to GitHub.
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
+    - uses: actions/checkout@v1
+    - name: Login to DockerHub Registry
+      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+
+    - name: Build Images from Dockerfile
+      run: DOCKER_BUILDKIT=1 docker build ./ -f ./packages/cactus-cmd-api-server/Dockerfile -t cactus-cmd-api-server
+
+    - uses: Azure/container-scan@v0.1
+      name: Scan image for vulnerabilities
+      id: container-scan
+      continue-on-error: true
+      with:
+        image-name: cactus-cmd-api-server 
+
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: cactus-cmd-api-server
