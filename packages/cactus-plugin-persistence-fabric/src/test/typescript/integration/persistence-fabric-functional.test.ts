@@ -595,7 +595,7 @@ describe("Persistence Fabric", () => {
 
   test(" last block setting to 6", async () => {
     // const LastBlockChanged = await persistence.setLastBlockConsidered(6);
-    await persistence.setLastBlockConsidered(6);
+    persistence.setLastBlockConsidered(6);
     log.info("setting Lastblock from plugin for analyze");
     // expect(LastBlockChanged).toBeTruthy();
   });
