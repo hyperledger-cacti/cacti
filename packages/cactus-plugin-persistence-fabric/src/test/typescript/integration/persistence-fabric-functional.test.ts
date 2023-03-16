@@ -33,7 +33,7 @@ const ledgerUserName = "appUser";
 const ledgerChannelName = "mychannel";
 const ledgerContractName = "basic";
 const leaveLedgerRunning = true; // default: false
-const useRunningLedger = true; // default: false
+const useRunningLedger = false; // default: false
 
 /////////////////////////////////
 
@@ -517,7 +517,7 @@ describe("Persistence Fabric", () => {
 
   // getblock method test should return block data from ledger
   // currently there is no option like "latest"
-  test.only("getblock", async () => {
+  test("getblock", async () => {
     const blockNumber = "1";
     const block = await persistence.getBlockFromLedger(blockNumber);
     log.warn(block);
@@ -594,10 +594,9 @@ describe("Persistence Fabric", () => {
   // });
 
   test(" last block setting to 6", async () => {
-    // const LastBlockChanged = await persistence.setLastBlockConsidered(6);
-    persistence.setLastBlockConsidered(6);
+    const LastBlockChanged = await persistence.setLastBlockConsidered(6);
     log.info("setting Lastblock from plugin for analyze");
-    // expect(LastBlockChanged).toBeTruthy();
+    expect(LastBlockChanged).toBeTruthy();
   });
   // test("currentLastBlock", async () => {
   //   const currentLastBlock = await persistence.currentLastBlock();
@@ -607,51 +606,54 @@ describe("Persistence Fabric", () => {
   // });
 
   test("Migration of 5 block Test", async () => {
-    // const blockTotest = await persistence.migrateBlockNrWithTransactions("5");
-    await persistence.migrateBlockNrWithTransactions("5");
+    const blockTotest = await persistence.migrateBlockNrWithTransactions("5");
     log.info("Getting block from ledger for analyze");
-    // expect(blockTotest).toBeTruthy();
+    expect(blockTotest).toBeTruthy();
   });
   test("Migration of 6 block Test", async () => {
-    await persistence.migrateBlockNrWithTransactions("6");
-    // const blockTotest = await persistence.migrateBlockNrWithTransactions("6");
+    const blockTotest = await persistence.migrateBlockNrWithTransactions("6");
     log.info("Getting block from ledger for analyze");
-    // expect(blockTotest).toBeTruthy();
+    expect(blockTotest).toBeTruthy();
   });
   test("Migration of check Last block Test", async () => {
-    await persistence.currentLastBlock();
-    // const LastBlockChanged = await persistence.currentLastBlock();
+    const LastBlockChanged = await persistence.currentLastBlock();
     log.info("Getting Lastblock from plugin for analyze");
-    // expect(LastBlockChanged).toBeTruthy();
+    expect(LastBlockChanged).toBeTruthy();
   });
   test("check missing blocks", async () => {
-    await persistence.whichBlocksAreMissingInDdSimple();
-    // const missingBlocksCheck = await persistence.whichBlocksAreMissingInDdSimple();
-    log.info("Getting missing blocks from plugin for analyze");
+    const missingBlocksCheck = await persistence.whichBlocksAreMissingInDdSimple();
+    log.info(
+      "Getting missing blocks from plugin for analyze",
+      missingBlocksCheck,
+    );
     // expect(missingBlocksCheck).toBeTruthy();
   });
 
   test("check missing blocks count", async () => {
-    await persistence.showHowManyBlocksMissing();
-    // const missingBlocksCount = await persistence.showHowManyBlocksMissing();
-    log.info("Getting missingBlocksCount from plugin for analyze");
-    // expect(missingBlocksCount).toBeTruthy();
+    const missingBlocksCount = await persistence.showHowManyBlocksMissing();
+    log.info(
+      "Getting missingBlocksCount from plugin for analyze",
+      missingBlocksCount,
+    );
+    expect(missingBlocksCount).not.toBe(undefined);
   });
 
   test("fill missing blocks", async () => {
-    await persistence.synchronizeOnlyMissedBlocks();
-    // const missingBlocksCheck = await persistence.synchronizeOnlyMissedBlocks();
-    log.info("Getting missing blocks from plugin for analyze");
-    // expect(missingBlocksCheck).toBeTruthy();
+    const missingBlocksCheck = await persistence.synchronizeOnlyMissedBlocks();
+    log.info(
+      "Getting missing blocks from plugin for analyze",
+      missingBlocksCheck,
+    );
+    expect(missingBlocksCheck).toBe(0);
   });
 
   test("check missing blocks count after fill", async () => {
-    await persistence.showHowManyBlocksMissing();
-    // const missingBlocksCount = await persistence.showHowManyBlocksMissing();
+    const missingBlocksCount = await persistence.showHowManyBlocksMissing();
     log.info(
       "After migration missing blocks getting missingBlocksCount from plugin for analyze",
+      missingBlocksCount,
     );
-    // expect(missingBlocksCount).toBeTruthy();
+    expect(missingBlocksCount).toBe(0);
   });
   // test("migrateNextBlock", async () => {
   //   const missingBlocksCount = await persistence.migrateNextBlock();
