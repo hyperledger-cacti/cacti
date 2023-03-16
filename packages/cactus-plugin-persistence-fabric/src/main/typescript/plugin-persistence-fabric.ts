@@ -802,18 +802,20 @@ If some blocks above this number are already in database they will not be remove
   /** migrateNextBlock
    * tries to migrate next block according to lastBlock information stored in plugin
    */
-  public async migrateNextBlock(): Promise<void> {
+  public async migrateNextBlock(): Promise<number> {
     await this.lastBlockInLedger();
+    const toMigrate: number = this.lastBlock + 1;
     try {
       const block = await this.migrateBlockNrWithTransactions(
-        (this.lastBlock + 1).toString(),
+        (toMigrate).toString(),
       );
-      this.lastSeenBlock = this.lastBlock + 1;
+      this.lastSeenBlock = toMigrate;
+      return toMigrate;
     } catch (error: unknown) {
-      const message = `Parsing block #${this.lastBlock + 1} failed: ${error}`;
-      this.log.error(message);
-      throw new RuntimeError(message, this.getRuntimeErrorCause(error));
+      const message = `Parsing block #${toMigrate} failed: ${error}`;
+      this.log.info(message);
     }
+    return 0;
   }
 
   public async insertBlockDataEntry(

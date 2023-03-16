@@ -758,7 +758,7 @@ describe("Persistence Fabric", () => {
 
   test("try migrate Next Block", async () => {
     const nextBlockArrival = await persistence.migrateNextBlock();
-    expect(nextBlockArrival).toBe(undefined); // as this block should be outside range
+    expect(nextBlockArrival).toBe(0); // as this block should be outside range
   });
 
   test("check missing blocks", async () => {
