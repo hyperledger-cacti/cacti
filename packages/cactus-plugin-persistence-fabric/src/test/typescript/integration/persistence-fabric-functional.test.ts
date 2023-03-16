@@ -32,7 +32,7 @@ const fabricEnvCAVersion = "1.4.9";
 const ledgerUserName = "appUser";
 const ledgerChannelName = "mychannel";
 const ledgerContractName = "basic";
-const leaveLedgerRunning = true; // default: false
+const leaveLedgerRunning = false; // default: false
 const useRunningLedger = false; // default: false
 
 /////////////////////////////////
@@ -520,8 +520,6 @@ describe("Persistence Fabric", () => {
   test("getblock", async () => {
     const blockNumber = "1";
     const block = await persistence.getBlockFromLedger(blockNumber);
-    log.warn(block);
-    log.error(JSON.stringify(block));
     expect(block).toBeTruthy();
   });
 
@@ -533,7 +531,7 @@ describe("Persistence Fabric", () => {
     const getMaxBlockNumber = await dbClientInstance.getMaxBlockNumber(11);
     const missedBlocks: number[] = [];
     let howManyBlocksMissing = 0;
-    log.warn("getMaxBlockNumber", getMaxBlockNumber);
+    log.info("getMaxBlockNumber", getMaxBlockNumber);
 
     for (let i = getMaxBlockNumber; i >= 0; i--) {
       try {
@@ -548,7 +546,7 @@ describe("Persistence Fabric", () => {
         //   },
         // });
         const isThisBlockInDB = await dbClientInstance.isThisBlockInDB(i);
-        log.warn("isThisBlockInDB", isThisBlockInDB);
+        log.info("isThisBlockInDB", isThisBlockInDB);
         if (isThisBlockInDB.rowCount === 0) {
           howManyBlocksMissing += 1;
           missedBlocks.push(i);
@@ -598,12 +596,12 @@ describe("Persistence Fabric", () => {
     log.info("setting Lastblock from plugin for analyze");
     expect(LastBlockChanged).toBeTruthy();
   });
-  // test("currentLastBlock", async () => {
-  //   const currentLastBlock = await persistence.currentLastBlock();
-  //   log.info("Getting Lastblock from plugin for analyze");
+  test("currentLastBlock", async () => {
+    const currentLastBlock = await persistence.currentLastBlock();
+    log.info("Getting Lastblock from plugin for analyze");
 
-  //   expect(currentLastBlock).toBeTruthy();
-  // });
+    expect(currentLastBlock).toBeTruthy();
+  });
 
   test("Migration of 5 block Test", async () => {
     const blockTotest = await persistence.migrateBlockNrWithTransactions("5");
@@ -656,9 +654,9 @@ describe("Persistence Fabric", () => {
     expect(missingBlocksCount).toBe(0);
   });
   // test("migrateNextBlock", async () => {
-  //   const missingBlocksCount = await persistence.migrateNextBlock();
+  //   const nextBlockArrival = await persistence.migrateNextBlock();
 
-  //   expect(missingBlocksCount).toBeTruthy();
+  //   expect(nextBlockArrival).toBeTruthy();
   // });
 
   //creating test transaction on ledger.
