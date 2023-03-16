@@ -31,7 +31,6 @@ import PostgresDatabaseClient from "./db-client/db-client";
 
 import OAS from "../json/openapi.json";
 
-//import { BlockTransactionObject } from "web3-eth"; //
 
 export interface IPluginPersistenceFabricOptions extends ICactusPluginOptions {
   gatewayOptions: GatewayOptions;
@@ -57,7 +56,7 @@ export class PluginPersistenceFabric
 
   private failedBlocks = new Set<number>();
 
-  // = > private lastSeenBlock = 0;
+  // = > private lastSeenBlock migrated from ledger to database , the greatest block index
   private lastSeenBlock = 0;
   // Last Block in Ledger
   private lastBlock = 0;
@@ -66,7 +65,7 @@ export class PluginPersistenceFabric
   private missedBlocks: string[] = [];
   private howManyBlocksMissing = 0;
   // connection
-  //public fabricConnectorPlugin: PluginLedgerConnectorFabric;
+  
 
   public ledgerChannelName = "mychannel";
   public ledgerContractName = "basic";
@@ -81,8 +80,7 @@ export class PluginPersistenceFabric
     this.log = LoggerProvider.getOrCreate({ level, label });
     this.instanceId = options.instanceId;
     this.gatewayOptions = options.gatewayOptions;
-    // this.fabricConnectorPlugin = new PluginLedgerConnectorFabric(options);
-
+  
     // database
     this.instanceId = options.instanceId;
     this.apiClient = options.apiClient;
@@ -99,38 +97,6 @@ export class PluginPersistenceFabric
     this.isConnected = false;
   }
 
-  // public async getOrCreateWebServices(): Promise<IWebServiceEndpoint[]> {
-  // const { log } = this;
-  // const pkgName = this.getPackageName();
-  // if (this.endpoints) {
-  //   return this.endpoints;
-  // }
-  // this.log.info(`Creating web services for plugin ${pkgName}...`);
-  // const endpoints: IWebServiceEndpoint[] = [];
-  // {
-  //   const endpoint = new StatusEndpointV1({
-  //     connector: this,
-  //     logLevel: this.options.logLevel,
-  //   });
-  //   endpoints.push(endpoint);
-  // }
-  // this.endpoints = endpoints;
-  // this.log.info(`Instantiated web services for plugin ${pkgName} OK`, {
-  //   endpoints,
-  // });
-  // return endpoints;
-  // }
-
-  // public async registerWebServices(
-  //   app: Express,
-  // ): Promise<IWebServiceEndpoint[]> {
-  //   const webServices = await this.getOrCreateWebServices();
-  //   webServices.forEach((ws) => ws.registerExpress(app));
-  //   this.isWebServicesRegistered = true;
-  //   return webServices;
-  // }
-  //
-  //
   public getStatus(): any {
     return {
       instanceId: this.instanceId,
@@ -208,13 +174,6 @@ export class PluginPersistenceFabric
     this.log.info(`Creating web services for plugin ${pkgName}...`);
 
     const endpoints: IWebServiceEndpoint[] = [];
-    // {
-    //   const options = { keyPairPem, consortiumRepo, plugin: this };
-    //   const endpoint = new GetConsortiumEndpointV1(options);
-    //   endpoints.push(endpoint);
-    //   const path = endpoint.getPath();
-    //   this.log.info(`Instantiated GetConsortiumEndpointV1 at ${path}`);
-    // }
     this.endpoints = endpoints;
 
     this.log.info(`Instantiated web svcs for plugin ${pkgName} OK`, {
@@ -544,7 +503,7 @@ export class PluginPersistenceFabric
       if (creator_nonce !== undefined) {
         creator_nonce = Buffer.from(creator_nonce).toString("hex");
       }
-      /* eslint-disable */
+      
       const creator_id_bytes = transactionDataObject.payload.header.signature_header.creator.id_bytes.data.toString();
       if (transactionDataObject.payload.data.actions !== undefined) {
         chaincode =
