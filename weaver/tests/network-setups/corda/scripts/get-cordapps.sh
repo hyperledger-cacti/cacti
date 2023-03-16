@@ -3,7 +3,7 @@
 directory=$(dirname $0)
 app=${1:-simple}
 local=$2
-weaverCordaVersion="1.2.13"
+weaverCordaVersion="1.2.14"
 weaverProtosVersion="1.5.7"
 
 if [ "simple" = "$app" ]; then

@@ -7,8 +7,8 @@
 
 <div align="center">
 
-[![Data Sharing Status](https://github.com/hyperledger-labs/weaver-dlt-interoperability/actions/workflows/test_data-sharing.yml/badge.svg?event=push)](https://github.com/hyperledger-labs/weaver-dlt-interoperability/actions/workflows/test_data-sharing.yml) [![Asset Transfer Status](https://github.com/hyperledger-labs/weaver-dlt-interoperability/actions/workflows/test_asset-transfer.yml/badge.svg?event=push)](https://github.com/hyperledger-labs/weaver-dlt-interoperability/actions/workflows/test_asset-transfer.yml)  
-[![Fabric Asset Exchange Status](https://github.com/hyperledger-labs/weaver-dlt-interoperability/actions/workflows/test_asset-exchange-fabric.yml/badge.svg?event=push)](https://github.com/hyperledger-labs/weaver-dlt-interoperability/actions/workflows/test_asset-exchange-fabric.yml) [![Corda Asset Exchange Status](https://github.com/hyperledger-labs/weaver-dlt-interoperability/actions/workflows/test_asset-exchange-corda.yml/badge.svg?event=push)](https://github.com/hyperledger-labs/weaver-dlt-interoperability/actions/workflows/test_asset-exchange-corda.yml) [![Besu Asset Exchange Status](https://github.com/hyperledger-labs/weaver-dlt-interoperability/actions/workflows/test_asset-exchange-besu.yml/badge.svg?event=push)](https://github.com/hyperledger-labs/weaver-dlt-interoperability/actions/workflows/test_asset-exchange-besu.yml)
+[![Data Sharing Status](https://github.com/hyperledger/cacti/actions/workflows/test_data-sharing.yml/badge.svg?event=push)](https://github.com/hyperledger/cacti/actions/workflows/test_data-sharing.yml) [![Asset Transfer Status](https://github.com/hyperledger/cacti/actions/workflows/test_asset-transfer.yml/badge.svg?event=push)](https://github.com/hyperledger/cacti/actions/workflows/test_asset-transfer.yml)  
+[![Fabric Asset Exchange Status](https://github.com/hyperledger/cacti/actions/workflows/test_asset-exchange-fabric.yml/badge.svg?event=push)](https://github.com/hyperledger/cacti/actions/workflows/test_asset-exchange-fabric.yml) [![Corda Asset Exchange Status](https://github.com/hyperledger/cacti/actions/workflows/test_asset-exchange-corda.yml/badge.svg?event=push)](https://github.com/hyperledger/cacti/actions/workflows/test_asset-exchange-corda.yml) [![Besu Asset Exchange Status](https://github.com/hyperledger/cacti/actions/workflows/test_asset-exchange-besu.yml/badge.svg?event=push)](https://github.com/hyperledger/cacti/actions/workflows/test_asset-exchange-besu.yml)
 
 </div>
 
@@ -79,7 +79,7 @@ Prominent features in our future roadmap are:
 
 ## Active Maintainers
 - https://github.com/VRamakrishna
-- https://github.com/sanvenDev
+- https://github.com/sandeepnRES
 - https://github.com/knarayan
 - https://github.com/dhinakaran2705
 - https://github.com/SIKHAR405

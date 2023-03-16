@@ -20,7 +20,7 @@ jobs:
           
       - name: Build Image
         run: make build-server-local
-        working-directory: core/relay
+        working-directory: weaver/core/relay
         
   fabric-driver-local:
     # if: ${{ false }}
@@ -42,18 +42,18 @@ jobs:
         run: |
           export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
           make build
-        working-directory: common/protos-js
+        working-directory: weaver/common/protos-js
         
       - name: Build Fabric Interop Node SDK (Local)
         run: make build-local
-        working-directory: sdks/fabric/interoperation-node-sdk
+        working-directory: weaver/sdks/fabric/interoperation-node-sdk
         
       - name: Build Image (Local)
         run: make build-image-local
-        working-directory: core/drivers/fabric-driver
+        working-directory: weaver/core/drivers/fabric-driver
         
   fabric-driver-packages:
-    # if: ${{ false }}
+    if: ${{ false }}
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -64,11 +64,11 @@ jobs:
           cp .npmrc.template .npmrc
           sed -i "s/<personal-access-token>/${{ secrets.GITHUB_TOKEN }}/g" .npmrc
           cat .npmrc
-        working-directory: core/drivers/fabric-driver
+        working-directory: weaver/core/drivers/fabric-driver
         
       - name: Build Image
         run: make build-image
-        working-directory: core/drivers/fabric-driver
+        working-directory: weaver/core/drivers/fabric-driver
         
   corda-driver-local:
     runs-on: ubuntu-latest
@@ -84,21 +84,22 @@ jobs:
           
       - name: Build Protos (Local)
         run: make build
-        working-directory: common/protos-java-kt
+        working-directory: weaver/common/protos-java-kt
         
       - name: Build Corda Interop App (Local)
         run: make build-local
-        working-directory: core/network/corda-interop-app
+        working-directory: weaver/core/network/corda-interop-app
         
       - name: Build Corda Interop SDK (Local)
         run: make build
-        working-directory: sdks/corda
+        working-directory: weaver/sdks/corda
         
       - name: Build Image (Local)
         run: make image-local
-        working-directory: core/drivers/corda-driver
+        working-directory: weaver/core/drivers/corda-driver
           
   corda-driver-packages:
+    if: ${{ false }}
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -120,11 +121,11 @@ jobs:
           make clean
           
           cat github.properties
-        working-directory: core/drivers/corda-driver
+        working-directory: weaver/core/drivers/corda-driver
         
       - name: Build Image
         run: make image
-        working-directory: core/drivers/corda-driver
+        working-directory: weaver/core/drivers/corda-driver
 
   iin-agent-local:
     runs-on: ubuntu-latest
@@ -145,12 +146,12 @@ jobs:
         run: |
           export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
           make build
-        working-directory: common/protos-js
+        working-directory: weaver/common/protos-js
         
       - name: Build Fabric Interop Node SDK (Local)
         run: make build-local
-        working-directory: sdks/fabric/interoperation-node-sdk
+        working-directory: weaver/sdks/fabric/interoperation-node-sdk
         
       - name: Build Image
         run: make build-image-local
-        working-directory: core/identity-management/iin-agent
+        working-directory: weaver/core/identity-management/iin-agent

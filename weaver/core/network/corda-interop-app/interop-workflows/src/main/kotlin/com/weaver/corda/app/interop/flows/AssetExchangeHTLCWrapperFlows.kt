@@ -80,7 +80,7 @@ constructor(
                 Left(Error("Invalid Expiry Time or TimeSpec in lockInfo."))
             }
             val lockInfoData = AssetLockHTLCData(
-                hashMechanism = lockInfoHTLC.hashMechanism,
+                hashMechanism = getHashMechanism(lockInfoHTLC.hashMechanism),
                 hash = OpaqueBytes(Base64.getDecoder().decode(lockInfoHTLC.hashBase64.toByteArray())),
                 expiryTime = expiryTime
             )
@@ -171,7 +171,7 @@ constructor(
                 Left(Error("Invalid Expiry Time or TimeSpec in lockInfo."))
             }
             val lockInfoData = AssetLockHTLCData(
-                hashMechanism = lockInfoHTLC.hashMechanism,
+                hashMechanism = getHashMechanism(lockInfoHTLC.hashMechanism),
                 hash = OpaqueBytes(Base64.getDecoder().decode(lockInfoHTLC.hashBase64.toByteArray())),
                 expiryTime = expiryTime
             )
@@ -251,7 +251,7 @@ constructor(
                 Base64.getDecoder().decode(assetClaim.claimInfo.toByteArray())
             )
             val claimInfoData = AssetClaimHTLCData(
-                hashMechanism = claimInfoHTLC.hashMechanism,
+                hashMechanism = getHashMechanism(claimInfoHTLC.hashMechanism),
                 hashPreimage = OpaqueBytes(Base64.getDecoder().decode(claimInfoHTLC.hashPreimageBase64.toByteArray()))
             )
             subFlow(ClaimAssetHTLC.Initiator(

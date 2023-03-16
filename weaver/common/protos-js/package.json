@@ -20,7 +20,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hyperledger-labs/weaver-dlt-interoperability.git"
+    "url": "git+https://github.com/hyperledger/cacti.git"
   },
   "keywords": [
     "hyperledger",
@@ -46,13 +46,13 @@
   "licenses": [
     {
       "type": "Apache-2.0",
-      "url": "https://github.com/hyperledger-labs/weaver-dlt-interoperability/blob/main/LICENSE"
+      "url": "https://github.com/hyperledger/cacti/blob/main/weaver/LICENSE"
     }
   ],
   "bugs": {
-    "url": "https://github.com/hyperledger-labs/weaver-dlt-interoperability/issues"
+    "url": "https://github.com/hyperledger/cacti/issues"
   },
-  "homepage": "https://github.com/hyperledger-labs/weaver-dlt-interoperability#readme",
+  "homepage": "https://github.com/hyperledger/cacti/weaver#readme",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/hyperledger-labs"
   }

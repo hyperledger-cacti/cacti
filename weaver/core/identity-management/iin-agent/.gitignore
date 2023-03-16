@@ -11,3 +11,4 @@ config*.json
 dnsconfig*.json
 security-domain-config*.json
 /wallet-*
+!/docker-testnet/configs/*.json

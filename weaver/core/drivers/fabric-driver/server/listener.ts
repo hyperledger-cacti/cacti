@@ -12,6 +12,7 @@ import { lookupEventSubscriptions, readAllEventMatchers } from './events';
 import { invoke, getNetworkGateway, packageFabricView } from './fabric-code';
 import { handlePromise, relayCallback, getRelayClientForEventPublish } from './utils';
 import { DBLockedError } from './dbConnector';
+import logger from './logger';
 
 let networkGatewayMap = new Map<string, Gateway>();
 let networkChannelMap = new Map<string, Network>();
@@ -51,7 +52,7 @@ const initBlockEventListenerForChannel = async (
                     // const responsePayload = transaction.payload.action.proposal_response_payload.extension.events.payload;
                     // Get transaction function name: first argument according to convention
                     const chaincodeFunc = transaction.payload.chaincode_proposal_payload.input.chaincode_spec.input.args[0].toString();
-                    console.log('Trying to find match for channel', channelId, 'chaincode', chaincodeId, 'function', chaincodeFunc);
+                    logger.info(`Trying to find match for channel: ${channelId}, chaincode: ${chaincodeId}, function: ${chaincodeFunc}`);
                     // Find all matching event subscriptions stored in the database
                     let eventMatcher = new events_pb.EventMatcher();
                     eventMatcher.setEventType(events_pb.EventType.LEDGER_STATE);
@@ -74,7 +75,7 @@ const initBlockEventListenerForChannel = async (
                     }
                     // Iterate through the view requests in the matching event subscriptions
                     eventSubscriptionQueries.forEach(async (eventSubscriptionQuery: query_pb.Query) => {
-                        console.log('Generating view and collecting proof for channel', channelId, 'chaincode', chaincodeId, 'function', chaincodeFunc, 'responsePayload', responsePayload.toString());
+                        logger.info(`Generating view and collecting proof for channel: ${channelId}, chaincode: ${chaincodeId}, function: ${chaincodeFunc}, responsePayload: ${responsePayload.toString()}`);
                         // Trigger proof collection
                         const [result, invokeError] = await handlePromise(
                             invoke(
@@ -89,7 +90,7 @@ const initBlockEventListenerForChannel = async (
                             const client = getRelayClientForEventPublish();
                             const viewPayload = packageFabricView(eventSubscriptionQuery, result);
 
-                            console.log('Sending block event');
+                            logger.info('Sending block event');
                             // Sending the Fabric event to the relay.
                             client.sendDriverState(viewPayload, relayCallback);
                         }
@@ -100,7 +101,7 @@ const initBlockEventListenerForChannel = async (
     };
     await network.addBlockListener(listener);
     channelBlockListenerMap.set(channelId, listener);
-    console.log('Added block listener for channel', channelId);
+    logger.info(`Added block listener for channel ${channelId}`);
     return listener;
 }
 
@@ -114,7 +115,7 @@ const initContractEventListener = (
     chaincodeId: string,
 ): any => {
     const listener: ContractListener = async (event: ContractEvent) => {
-        console.log('Trying to find match for channel', channelId, 'chaincode', chaincodeId, 'event class', event.eventName);
+        logger.info(`Trying to find match for channel: ${channelId}, chaincode: ${chaincodeId}, event class: ${event.eventName}`);
         // Find all matching event subscriptions stored in the database
         let eventMatcher = new events_pb.EventMatcher();
         eventMatcher.setEventType(events_pb.EventType.LEDGER_STATE);
@@ -137,7 +138,7 @@ const initContractEventListener = (
         }
         // Iterate through the view requests in the matching event subscriptions
         eventSubscriptionQueries.forEach(async (eventSubscriptionQuery: query_pb.Query) => {
-            console.log('Generating view and collecting proof for event class', event.eventName, 'channel', channelId, 'chaincode', chaincodeId, 'event.payload', event.payload.toString());
+            logger.info(`Generating view and collecting proof for event class: ${event.eventName}, channel: ${channelId}, chaincode: ${chaincodeId}, event.payload: ${event.payload.toString()}`);
             // Trigger proof collection
             const [result, invokeError] = await handlePromise(
                 invoke(
@@ -152,7 +153,7 @@ const initContractEventListener = (
                 const client = getRelayClientForEventPublish();
                 const viewPayload = packageFabricView(eventSubscriptionQuery, result);
 
-                console.log('Sending contract event');
+                logger.info('Sending contract event');
                 // Sending the Fabric event to the relay.
                 client.sendDriverState(viewPayload, relayCallback);
             }
@@ -160,7 +161,7 @@ const initContractEventListener = (
     };
     contract.addContractListener(listener);
     channelContractListenerMap.set(getChannelContractKey(channelId, chaincodeId), listener);
-    console.log('Added contract listener for channel', channelId, 'and contract', chaincodeId);
+    logger.info(`Added contract listener for channel: ${channelId}, and contract: ${chaincodeId}`);
     return listener;
 }
 
@@ -282,7 +283,7 @@ const unregisterListenerForEventSubscription = async (
  * Start a listener for each channel from which one of the subscribed events originate.
  **/
 const loadEventSubscriptionsFromStorage = async (networkName: string): Promise<boolean> => {
-    console.log('Starting event listeners for subscribed events in database...')
+    logger.info('Starting event listeners for subscribed events in database...')
     try {
         const eventMatchers = await readAllEventMatchers();
         for (const eventMatcher of eventMatchers) {
@@ -292,12 +293,12 @@ const loadEventSubscriptionsFromStorage = async (networkName: string): Promise<b
                     networkName
                 )
             } catch(error) {
-                console.error(`Error: Could not start event listener for ${JSON.stringify(eventMatcher.toObject())} with error: ${error}`)
+                logger.error(`Error: Could not start event listener for ${JSON.stringify(eventMatcher.toObject())} with error: ${error}`)
                 return false
             }
         }
     } catch(error) {
-        console.error(`Error: event matcher read error: ${error}`)
+        logger.error(`Error: event matcher read error: ${error}`)
         return false
     }
     return true

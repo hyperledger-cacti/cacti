@@ -10,7 +10,7 @@ import com.weaver.corda.app.interop.states.AssetExchangeHTLCState
 import com.weaver.corda.app.interop.states.AssetClaimHTLCData
 import com.weaver.corda.app.interop.states.AssetExchangeTxState
 import com.weaver.corda.app.interop.states.sha512
-import com.weaver.protos.common.asset_locks.AssetLocks.HashMechanism
+import com.weaver.corda.app.interop.states.HashMechanism
 import net.corda.core.contracts.CommandData
 import net.corda.core.contracts.Contract
 import net.corda.core.contracts.requireSingleCommand

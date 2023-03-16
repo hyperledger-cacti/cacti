@@ -37,13 +37,13 @@ jobs:
       run: |
         export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
         make build
-      working-directory: common/protos-js
+      working-directory: weaver/common/protos-js
     - name: Build
       run: make build-local
-      working-directory: sdks/fabric/interoperation-node-sdk
+      working-directory: weaver/sdks/fabric/interoperation-node-sdk
     - name: Tests
       run: npm run test
-      working-directory: sdks/fabric/interoperation-node-sdk
+      working-directory: weaver/sdks/fabric/interoperation-node-sdk
 
   iin_agent_local:
 
@@ -68,16 +68,16 @@ jobs:
       run: |
         export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
         make build
-      working-directory: common/protos-js
+      working-directory: weaver/common/protos-js
     - name: Build
       run: make build-local
-      working-directory: sdks/fabric/interoperation-node-sdk
+      working-directory: weaver/sdks/fabric/interoperation-node-sdk
     - name: Build IIN Agent
       run: make build-local
-      working-directory: core/identity-management/iin-agent
+      working-directory: weaver/core/identity-management/iin-agent
     - name: Tests
       run: npm run test
-      working-directory: core/identity-management/iin-agent
+      working-directory: weaver/core/identity-management/iin-agent
 
   build-docs:
     runs-on: ubuntu-latest
@@ -92,8 +92,8 @@ jobs:
 
       - name: NPM INSTALL
         run: npm install
-        working-directory: docs
+        working-directory: weaver/docs
         
       - name: Build
         run: npm run build
-        working-directory: docs
+        working-directory: weaver/docs

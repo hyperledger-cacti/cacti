@@ -9,9 +9,9 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	mspProtobuf "github.com/hyperledger/fabric-protos-go/msp"
-	sa "github.com/hyperledger-labs/weaver-dlt-interoperability/samples/fabric/simpleasset"
+	sa "github.com/hyperledger/cacti/weaver/samples/fabric/simpleasset"
 	"github.com/stretchr/testify/require"
-	wtest "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils"
+	wtest "github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/testutils"
 )
 
 func TestInitTokenAssetLedger(t *testing.T) {

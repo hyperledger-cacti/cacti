@@ -9,7 +9,7 @@
 package assetexchange
 
 import (
-    "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
+    "github.com/hyperledger/cacti/weaver/common/protos-go/common"
 )
 
 type AssetLockInterface interface {
