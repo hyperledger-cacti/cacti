@@ -702,7 +702,7 @@ describe("Persistence Fabric", () => {
     expect(initialBlocksSynchronization).toBeTruthy();
     expect(initialBlocksSynchronization).toEqual("done");
   });
-  
+
   // Those are other test scenarios when we check not missing block but normal synchronziation
   // test("continueBlocksSynchronization", async () => {
   //   const continueBlocksSynchronization = await persistence.continueBlocksSynchronization();
@@ -756,9 +756,9 @@ describe("Persistence Fabric", () => {
     expect(LastBlockChanged).toBeTruthy();
   });
 
-  test("migrateNextBlock", async () => {
+  test("try migrate Next Block", async () => {
     const nextBlockArrival = await persistence.migrateNextBlock();
-    expect(nextBlockArrival).toBe(undefined);
+    expect(nextBlockArrival).toBe(undefined); // as this block should be outside range
   });
 
   test("check missing blocks", async () => {
@@ -779,7 +779,7 @@ describe("Persistence Fabric", () => {
     expect(missingBlocksCount).not.toBe(undefined);
   });
 
-  test("fill missing blocks", async () => {
+  test("fill missing blocks from ledger into database", async () => {
     const missingBlocksCheck = await persistence.synchronizeOnlyMissedBlocks();
     log.info(
       "Getting missing blocks from plugin for analyze",
@@ -788,7 +788,7 @@ describe("Persistence Fabric", () => {
     expect(missingBlocksCheck).toBe(0);
   });
 
-  test("check missing blocks count after fill", async () => {
+  test("check missing blocks count after fill inside database", async () => {
     const missingBlocksCount = await persistence.showHowManyBlocksMissing();
     log.info(
       "After migration missing blocks getting missingBlocksCount from plugin for analyze",
