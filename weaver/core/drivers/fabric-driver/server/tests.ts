@@ -8,11 +8,12 @@ import eventsPb from "@hyperledger-labs/weaver-protos-js/common/events_pb";
 import queryPb from '@hyperledger-labs/weaver-protos-js/common/query_pb';
 import { addEventSubscription, deleteEventSubscription, lookupEventSubscriptions } from "./events"
 import { LevelDBConnector, DBConnector, DBNotOpenError, DBKeyNotFoundError, DBLockedError } from "./dbConnector"
+import logger from './logger';
 
 // test the LevelDB basic operations
 async function dbConnectionTest(
 ): Promise<boolean> {
-    console.log(`Start testing LevelDBConnector()`)
+    logger.info(`Start testing LevelDBConnector()`)
     let db: DBConnector;
     try {
         // Create connection to a database
@@ -26,7 +27,7 @@ async function dbConnectionTest(
 
         // Fetch the value of the key
         value = await db.read(key);
-        console.log(`obtained <key, value>: <${key}, ${value}>`);
+        logger.info(`obtained <key, value>: <${key}, ${value}>`);
 
         // Close the database connection
         await db.close();
@@ -38,13 +39,13 @@ async function dbConnectionTest(
         } catch (error: any) {
             const errorString: string = `${error.toString()}`;
             if (error instanceof DBNotOpenError) {
-                console.log(`test success for DBNotOpenError`);
+                logger.info(`test success for DBNotOpenError`);
                 // open the database connection
                 await db.open();
                 // try to update again the key
                 await db.update(key, value);
             } else {
-                console.error(`re-throwing the error: ${errorString}`);
+                logger.error(`re-throwing the error: ${errorString}`);
                 db.close();
                 throw new Error(error);
             }
@@ -59,9 +60,9 @@ async function dbConnectionTest(
         } catch (error: any) {
             const errorString: string = `${error.toString()}`;
             if (error instanceof DBKeyNotFoundError) {
-                console.log(`test success for DBKeyNotFoundError`);
+                logger.info(`test success for DBKeyNotFoundError`);
             } else {
-                console.error(`re-throwing the error: ${errorString}`);
+                logger.error(`re-throwing the error: ${errorString}`);
                 db.close();
                 throw new Error(error);
             }
@@ -74,21 +75,21 @@ async function dbConnectionTest(
         } catch (error: any) {
             const errorString: string = `${error.toString()}`;
             if (error instanceof DBLockedError) {
-                console.log(`test success for DBLockedError`);
+                logger.info(`test success for DBLockedError`);
             } else {
-                console.error(`re-throwing the error: ${errorString}`);
+                logger.error(`re-throwing the error: ${errorString}`);
                 throw new Error(error);
             }
         }
 
         await db.close();
     } catch (error) {
-        console.error(`Failed testing LevelDBConnector, with error: ${error.toString()}`);
+        logger.error(`Failed testing LevelDBConnector, with error: ${error.toString()}`);
         db.close();
         return false;
     }
 
-    console.log(`End testing LevelDBConnector()`);
+    logger.info(`End testing LevelDBConnector()`);
     return true;
 }
 
@@ -96,7 +97,7 @@ async function dbConnectionTest(
 async function eventSubscriptionTest(
     eventSub: eventsPb.EventSubscription
 ): Promise<boolean> {
-    console.debug(`Start eventSubscriptionTest()`);
+    logger.info(`Start eventSubscriptionTest()`);
 
     try {
         var eventMatcher: eventsPb.EventMatcher = eventSub.getEventMatcher()!;
@@ -110,11 +111,11 @@ async function eventSubscriptionTest(
             }
         }
     } catch (error) {
-        console.error(`Failed testing event subscription operations, with error: ${error.toString()}`);
+        logger.error(`Failed testing event subscription operations, with error: ${error.toString()}`);
         return false;
     }
 
-    console.debug(`End eventSubscriptionTest()`);
+    logger.info(`End eventSubscriptionTest()`);
     return true;
 }
 

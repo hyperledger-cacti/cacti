@@ -19,7 +19,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/hyperledger-labs/weaver-dlt-interoperability/samples/fabric/go-cli/helpers"
+	"github.com/hyperledger/cacti/weaver/samples/fabric/go-cli/helpers"
 	"github.com/spf13/cobra"
 
 	log "github.com/sirupsen/logrus"

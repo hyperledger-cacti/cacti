@@ -7,12 +7,14 @@ fabric/dev/.fabric-setup
 .lock
 *.lock
 fabric/dev/scripts/config.json
-fabric/shared/chaincode/*
 shared/charts/apikey
 shared/charts/username
 *.real.*
 *.tar.gz
 *.env
+!base.env
+!network1.env
+!network2.env
 fabric/dev/log.txt
 
 fabric/shared/*/ordererOrganizations
@@ -23,3 +25,5 @@ fabric/shared/*/channel-artifacts
 fabric/shared/*/fabric-ca/ordererOrg/*
 fabric/shared/*/fabric-ca/org1/*
 fabric/shared/*/fabric-ca/org2/*
+fabric/shared/chaincode/*
+!fabric/shared/chaincode/.gitkeep

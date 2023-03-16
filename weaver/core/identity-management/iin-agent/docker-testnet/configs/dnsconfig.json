@@ -1,0 +1,16 @@
+{
+    "network1": {
+        "Org1MSP": {
+            "endpoint": "iin-agent-Org1MSP-network1:9500",
+            "tls": false,
+            "tlsCACertPath": ""
+        }
+    },
+    "network2": {
+        "Org1MSP": {
+            "endpoint": "iin-agent-Org1MSP-network2:9501",
+            "tls": false,
+            "tlsCACertPath": ""
+        }
+    }
+}

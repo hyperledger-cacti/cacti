@@ -7,13 +7,13 @@
 module.exports = {
   title: 'Weaver: DLT Interoperability Framework',
   tagline: 'Documentation',
-  url: 'https://hyperledger-labs.github.io',
-  baseUrl: '/weaver-dlt-interoperability/',
+  url: 'https://hyperledger.github.io',
+  baseUrl: '/cacti/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'shared/favicon.ico',
-  organizationName: 'hyperledger-labs',
-  projectName: 'hyperledger-labs.github.io',
+  organizationName: 'hyperledger',
+  projectName: 'hyperledger.github.io',
   themeConfig: {
     prism: {
         additionalLanguages: ['java', 'kotlin', 'groovy', 'toml'],
@@ -37,7 +37,7 @@ module.exports = {
           position: 'left'
         },
         {
-          href: 'https://github.com/hyperledger-labs/weaver-dlt-interoperability',
+          href: 'https://github.com/hyperledger/cacti',
           label: 'GitHub',
           position: 'right',
         },
@@ -58,7 +58,7 @@ module.exports = {
           sidebarPath: require.resolve('./sidebars.js'),
           // Please change this to your repo.
           editUrl:
-            'https://github.com/hyperledger-labs/weaver-dlt-interoperability/edit/main/',
+            'https://github.com/hyperledger/cacti/edit/main/',
         },        
         theme: {
           customCss: require.resolve('./src/css/custom.css'),

@@ -1,7 +1,7 @@
 DOCKER_IMAGE_NAME ?= weaver-relay
 DOCKER_TAG ?= `cat ./VERSION`
 DOCKER_REGISTRY ?= ghcr.io/hyperledger-labs
-GIT_URL = https://github.com/hyperledger-labs/weaver-dlt-interoperability
+GIT_URL = https://github.com/hyperledger/cacti/weaver
 
 PROTOS_TAG ?= v1.4.2
 

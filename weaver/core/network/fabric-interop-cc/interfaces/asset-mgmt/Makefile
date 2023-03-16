@@ -1,12 +1,12 @@
 run-vendor:
-	go mod edit -replace github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go=../../../../../common/protos-go/
-	go mod edit -replace github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils=../../libs/testutils/
+	go mod edit -replace github.com/hyperledger/cacti/weaver/common/protos-go=../../../../../common/protos-go/
+	go mod edit -replace github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/testutils=../../libs/testutils/
 	go mod vendor
 
 undo-vendor:
 	rm -rf vendor
-	go mod edit -dropreplace github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go
-	go mod edit -dropreplace github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils
+	go mod edit -dropreplace github.com/hyperledger/cacti/weaver/common/protos-go
+	go mod edit -dropreplace github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/testutils
 
 test:
 	go test asset_locks_contract.go asset_locks_contract_test.go asset_locks.go -v

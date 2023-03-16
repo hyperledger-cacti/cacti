@@ -22,12 +22,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils/mocks"
+	"github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/testutils/mocks"
 	"github.com/stretchr/testify/require"
-	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
-	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/identity"
+	"github.com/hyperledger/cacti/weaver/common/protos-go/common"
+	"github.com/hyperledger/cacti/weaver/common/protos-go/identity"
 	protoV2 "google.golang.org/protobuf/proto"
-	wtest "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils"
+	wtest "github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/testutils"
 )
 
 var securityDomainId = "2345"
@@ -1065,7 +1065,7 @@ func TestDeleteMembership(t *testing.T) {
 
 	// Case when caller is not an IIN Agent
 	err := interopcc.DeleteMembership(ctx, securityDomainId)
-	require.EqualError(t, err, "Caller not an IIN Agent; access denied")
+	require.EqualError(t, err, "Caller neither a network admin nor an IIN Agent; access denied")
 
 	// Case when a Membership exists
 	clientIdentity := &mocks.ClientIdentity{}

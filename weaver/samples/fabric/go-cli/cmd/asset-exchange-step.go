@@ -22,8 +22,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hyperledger-labs/weaver-dlt-interoperability/samples/fabric/go-cli/helpers"
-	am "github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk/asset-manager"
+	"github.com/hyperledger/cacti/weaver/samples/fabric/go-cli/helpers"
+	am "github.com/hyperledger/cacti/weaver/sdks/fabric/go-sdk/asset-manager"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )

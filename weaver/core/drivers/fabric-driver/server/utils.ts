@@ -8,6 +8,7 @@ import fs from 'fs';
 import { credentials } from '@grpc/grpc-js';
 import datatransfer_grpc_pb from '@hyperledger-labs/weaver-protos-js/relay/datatransfer_grpc_pb';
 import events_grpc_pb from '@hyperledger-labs/weaver-protos-js/relay/events_grpc_pb';
+import logger from './logger';
 
 function checkIfArraysAreEqual(x: Array<any>, y: Array<any>): boolean {
     if (x == y) {
@@ -37,9 +38,9 @@ function checkIfArraysAreEqual(x: Array<any>, y: Array<any>): boolean {
 // handle callback
 function relayCallback(err: any, response: any) {
     if (response) {
-        console.log(`Relay Callback Response: ${JSON.stringify(response.toObject())}`);
+        logger.info(`Relay Callback Response: ${JSON.stringify(response.toObject())}`);
     } else if (err) {
-        console.error(`Relay Callback Error: ${err}`);
+        logger.error(`Relay Callback Error: ${err}`);
     }
 }
 

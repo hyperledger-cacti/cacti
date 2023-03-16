@@ -15,10 +15,10 @@ import (
 	"fmt"
 
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
-	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
-	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/identity"
+	"github.com/hyperledger/cacti/weaver/common/protos-go/common"
+	"github.com/hyperledger/cacti/weaver/common/protos-go/identity"
 	protoV2 "google.golang.org/protobuf/proto"
-	wutils "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/utils"
+	wutils "github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/utils"
 )
 
 const membershipObjectType = "membership"
@@ -417,7 +417,12 @@ func (s *SmartContract) DeleteMembership(ctx contractapi.TransactionContextInter
 	if isIINAgent, err := wutils.IsClientIINAgent(ctx); err != nil {
 		return fmt.Errorf("IIN Agent client check error: %s", err)
 	} else if !isIINAgent {
-		return fmt.Errorf("Caller not an IIN Agent; access denied")
+		// Check if the caller has network admin privileges
+		if isAdmin, err := wutils.IsClientNetworkAdmin(ctx); err != nil {
+			return fmt.Errorf("Admin client check error: %s", err)
+		} else if !isAdmin {
+			return fmt.Errorf("Caller neither a network admin nor an IIN Agent; access denied")
+		}
 	}
 
 	membershipKey, err := ctx.GetStub().CreateCompositeKey(membershipObjectType, []string{membershipID})

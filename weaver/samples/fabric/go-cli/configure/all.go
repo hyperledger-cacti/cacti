@@ -11,8 +11,8 @@ import (
 	"fmt"
 
 	"github.com/cloudflare/cfssl/log"
-	"github.com/hyperledger-labs/weaver-dlt-interoperability/samples/fabric/go-cli/helpers"
-	"github.com/hyperledger-labs/weaver-dlt-interoperability/samples/fabric/go-cli/helpers/interopsetup"
+	"github.com/hyperledger/cacti/weaver/samples/fabric/go-cli/helpers"
+	"github.com/hyperledger/cacti/weaver/samples/fabric/go-cli/helpers/interopsetup"
 )
 
 // helper functions to log and return errors

@@ -17,7 +17,7 @@ import (
     "github.com/golang/protobuf/proto"
     "github.com/hyperledger/fabric-chaincode-go/shim"
     log "github.com/sirupsen/logrus"
-    "github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
+    "github.com/hyperledger/cacti/weaver/common/protos-go/common"
 )
 
 

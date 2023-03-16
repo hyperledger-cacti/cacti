@@ -8,7 +8,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/require"
 	mspProtobuf "github.com/hyperledger/fabric-protos-go/msp"
-	wtest "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/testutils"
+	wtest "github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/testutils"
 )
 
 // function that supplies value that is to be returned by ctx.GetStub().GetCreator()

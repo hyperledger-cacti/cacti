@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "description": "Sample Besu Application for Storing Key Value Pairs",
   "license": "Apache-2.0",
-  "repository": "hyperledger-labs/weaver-dlt-interoperability/samples/besu/simplestate",
+  "repository": "https://github.com/hyperledger/cacti/samples/besu/simplestate",
   "bugs": {
-    "url": "https://github.com/hyperledger-labs/weaver-dlt-interoperability/issues"
+    "url": "https://github.com/hyperledger/cacti/issues"
   },
   "directories": {
     "doc": "docs",
@@ -28,7 +28,7 @@
     "solidity",
     "smart-contract"
   ],
-  "homepage": "https://github.com/hyperledger-labs/weaver-dlt-interoperability/samples/besu/simplestate",
+  "homepage": "https://github.com/hyperledger/cacti/weaver/samples/besu/simplestate",
   "dependencies": {
     "@truffle/contract": "^4.2.14",
     "chai": "^4.3.4",

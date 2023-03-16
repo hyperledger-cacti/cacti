@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package com.weaver.corda.app.interop.states.customSerializers
+package com.weaver.corda.app.interop.flows.customSerializers
 
 import com.google.protobuf.ByteString
 import com.weaver.protos.common.asset_locks.AssetLocks

@@ -10,14 +10,14 @@ build:
 	go build -o ./bin/fabric-cli fabric-cli.go
 
 run-vendor:
-	go mod edit -replace github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go=../../../common/protos-go/
-	go mod edit -replace github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk=../../../sdks/fabric/go-sdk/
+	go mod edit -replace github.com/hyperledger/cacti/weaver/common/protos-go=../../../common/protos-go/
+	go mod edit -replace github.com/hyperledger/cacti/weaver/sdks/fabric/go-sdk=../../../sdks/fabric/go-sdk/
 	go mod vendor
 
 undo-vendor:
 	rm -rf vendor
-	go mod edit -dropreplace github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go
-	go mod edit -dropreplace github.com/hyperledger-labs/weaver-dlt-interoperability/sdks/fabric/go-sdk
+	go mod edit -dropreplace github.com/hyperledger/cacti/weaver/common/protos-go
+	go mod edit -dropreplace github.com/hyperledger/cacti/weaver/sdks/fabric/go-sdk
 
 
 .PHONY: build-local

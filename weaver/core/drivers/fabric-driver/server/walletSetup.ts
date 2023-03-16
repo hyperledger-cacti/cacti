@@ -10,6 +10,7 @@ import { handlePromise } from './utils';
 import { InteroperableHelper } from '@hyperledger-labs/weaver-fabric-interop-sdk'
 import * as path from 'path';
 import * as fs from 'fs';
+import logger from './logger';
 
 const getConfig = () => {
     const config = JSON.parse(
@@ -27,8 +28,8 @@ const walletSetup = async (walletPath: string, conn_profile_path: string, networ
         ? path.resolve(__dirname, conn_profile_path)
         : path.resolve(__dirname, '../', 'connection_profile.json');
     if (!fs.existsSync(ccpPath)) {
-        console.error('File does not exist at path: ', ccpPath);
-        console.error(
+        logger.error(`File does not exist at path: ${ccpPath}`);
+        logger.error(
             'Please check the CONNECTION_PROFILE environemnt variable in your .env. The path will default to the root of the fabric-driver folder if not supplied',
         );
         return;
@@ -37,11 +38,11 @@ const walletSetup = async (walletPath: string, conn_profile_path: string, networ
     const config = getConfig();
     // Create a new CA client for interacting with the CA.
     const org = ccp.client["organization"];
-    console.log('Org', org);
+    logger.debug(`Org ${org}`);
     const caName =  ccp.organizations[org]["certificateAuthorities"][0];
-    console.log('CA Name', caName);
+    logger.debug(`CA Name ${caName}`);
     const caURL = config.caUrl ? config.caUrl : ccp.certificateAuthorities[caName].url;
-    console.log('CA URL', caURL);
+    logger.debug(`CA URL ${caURL}`);
     const ca = new FabricCAServices(caURL);
     const ident = ca.newIdentityService();
 
@@ -52,10 +53,10 @@ const walletSetup = async (walletPath: string, conn_profile_path: string, networ
     let adminIdentity = await wallet.get(adminName);
 
     if (adminIdentity) {
-        console.log('An identity for the admin user "admin" already exists in the wallet');
+        logger.info('An identity for the admin user "admin" already exists in the wallet');
     } else {
         // Enroll the admin user, and import the new identity into the wallet.
-        console.log('Enrolling Admin...', adminName, adminSecret);
+        logger.debug(`Enrolling Admin... ${adminName}, ${adminSecret}`);
         const enrollment = await ca.enroll({
             enrollmentID: adminName,
             enrollmentSecret: adminSecret,
@@ -72,7 +73,7 @@ const walletSetup = async (walletPath: string, conn_profile_path: string, networ
         adminIdentity = await wallet.get(adminName);
     }
     if (adminIdentity) {
-        console.log(`Creating ${config.relay.name} Identity`);
+        logger.info(`Creating ${config.relay.name} Identity`);
         const provider = wallet.getProviderRegistry().getProvider(adminIdentity.type);
         const adminUser = await provider.getUserContext(adminIdentity, adminName);
         const identity = await wallet.get(config.relay.name);
@@ -99,14 +100,14 @@ const walletSetup = async (walletPath: string, conn_profile_path: string, networ
                 type: 'X.509',
             };
             await wallet.put(config.relay.name, x509Identity);
-            console.log(`${config.relay.name} Identity Created`);
+            logger.info(`${config.relay.name} Identity Created`);
         } else {
-            console.log(`${config.relay.name} Identity Already exists`);
+            logger.info(`${config.relay.name} Identity Already exists`);
         }
 
         return wallet;
     } else {
-        console.error('Admin was not registered');
+        logger.error('Admin was not registered');
         throw new Error('Admin was not registered');
     }
 };
@@ -116,7 +117,7 @@ const getDriverKeyCert = async (): Promise<any> => {
     const walletPath = process.env.WALLET_PATH ? process.env.WALLET_PATH : path.join(process.cwd(), `wallet-${process.env.NETWORK_NAME ? process.env.NETWORK_NAME : 'network1'}`);
     const config = getConfig();
     const wallet = await Wallets.newFileSystemWallet(walletPath);
-    console.log(`Wallet path: ${walletPath}`);
+    logger.debug(`Wallet path: ${walletPath}`);
 
     const [keyCert, keyCertError] = await handlePromise(
         InteroperableHelper.getKeyAndCertForRemoteRequestbyUserName(wallet, config.relay.name)

@@ -1,7 +1,7 @@
 DOCKER_IMAGE_NAME ?= weaver-fabric-cc
 DOCKER_TAG ?= `cat contracts/interop/VERSION`
 DOCKER_REGISTRY ?= ghcr.io/hyperledger-labs
-GIT_URL = https://github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc
+GIT_URL = https://github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc
 
 .PHONY: build protos all clean image push-image check-if-tag-exists
 

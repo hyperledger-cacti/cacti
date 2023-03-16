@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/hyperledger-labs/weaver-dlt-interoperability/common/protos-go/common"
-	wutils "github.com/hyperledger-labs/weaver-dlt-interoperability/core/network/fabric-interop-cc/libs/utils"
+	"github.com/hyperledger/cacti/weaver/common/protos-go/common"
+	wutils "github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/utils"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 )
 

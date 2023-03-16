@@ -1,4 +1,5 @@
-![Cacti Logo Color](./images/HL_Cacti_Logo_Color.png)
+![Cacti Logo Color](./images/HL_Cacti_Logo_Color.png#gh-light-mode-only)
+![Cacti Logo Color](./images/HL_Cacti_Logo_Colorreverse.svg#gh-dark-mode-only)
 
 # Hyperledger Cacti
 
