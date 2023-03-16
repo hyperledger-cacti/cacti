@@ -73,7 +73,7 @@ import { PluginRegistry } from "@hyperledger/cactus-core";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import {
   PluginLedgerConnectorFabric,
-  // FabricContractInvocationType,
+  FabricContractInvocationType,
   DefaultEventHandlerStrategy,
   FabricSigningCredential,
   FabricApiClient,
@@ -235,7 +235,7 @@ describe("Persistence Fabric", () => {
   beforeAll(async () => {
     log.info("Prune Docker...");
     await pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
-
+    // this is to use only if you want to start integration with real container and database
     // postgresContainer = new PostgresTestContainer({
     //   imageName: postgresImageName,
     //   imageVersion: postgresImageVersion,
@@ -248,13 +248,13 @@ describe("Persistence Fabric", () => {
     // expect(postgresPort).toBeTruthy();
     // log.info(`Postgres running at localhost:${postgresPort}`);
 
-    log.info("Create PostgresDatabaseClient");
+    //log.info("Create PostgresDatabaseClient");
     // dbClient = new DatabaseClient({
     //   connectionString: `postgresql://postgres:postgres@localhost:${postgresPort}/postgres`,
     //   logLevel: sutLogLevel,
     // });
 
-    log.info("Connect the PostgreSQL PostgresDatabaseClient");
+    //log.info("Connect the PostgreSQL PostgresDatabaseClient");
     // await dbClient.connect();
     // await dbClient.client.query(
     //   `CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -264,7 +264,7 @@ describe("Persistence Fabric", () => {
     //      CREATE ROLE supabase_admin NOLOGIN;`,
     // );
 
-    log.info("Initialize the test DB Schema");
+    //log.info("Initialize the test DB Schema");
     // await dbClient.initializePlugin(testPluginName, testPluginInstanceId);
 
     // Prepare local filesystem wallet path
@@ -502,19 +502,6 @@ describe("Persistence Fabric", () => {
     clearMockTokenMetadata();
   }, setupTimeout);
 
-  // test("insertBlockDataEntry test", async () => {
-  //   const block_data = {
-  //     fabric_block_id: uuidv4(),
-  //     fabric_block_num: 1,
-  //     fabric_block_data: "test",
-  //   };
-  //   const response = await persistence.insertBlockDataEntry(block_data);
-
-  //   expect(response).toBeTruthy();
-  //   expect(response.command).toEqual("INSERT");
-  //   expect(response.rowCount).toEqual(1);
-  // });
-
   // getblock method test should return block data from ledger
   // currently there is no option like "latest"
   test("getblock", async () => {
@@ -523,6 +510,157 @@ describe("Persistence Fabric", () => {
     expect(block).toBeTruthy();
   });
 
+  //creating test transaction on ledger.
+  test("create test transaction 1", async () => {
+    const createAssetResponse = await apiClient.runTransactionV1({
+      signingCredential,
+      channelName: ledgerChannelName,
+      invocationType: FabricContractInvocationType.Send,
+      contractName: ledgerContractName,
+      methodName: "CreateAsset",
+      params: ["CactusTransactionsTest1", "green", "111", "someOwner", "299"],
+    });
+
+
+    expect(createAssetResponse).toBeTruthy();
+    expect(createAssetResponse.status).toEqual(200);
+    expect(createAssetResponse.data).toBeTruthy();
+    expect(createAssetResponse.data.success).toBeTrue();
+    expect(createAssetResponse.data.transactionId).toBeTruthy();
+  });
+
+  //creating test transaction on ledger.
+  test("create test transaction 2", async () => {
+    const createAssetResponse = await apiClient.runTransactionV1({
+      signingCredential,
+      channelName: ledgerChannelName,
+      invocationType: FabricContractInvocationType.Send,
+      contractName: ledgerContractName,
+      methodName: "CreateAsset",
+      params: ["CactusTransactionsTest2", "blue", "111", "someOwner1", "299"],
+    });
+
+
+    expect(createAssetResponse).toBeTruthy();
+    expect(createAssetResponse.status).toEqual(200);
+    expect(createAssetResponse.data).toBeTruthy();
+    expect(createAssetResponse.data.success).toBeTrue();
+    expect(createAssetResponse.data.transactionId).toBeTruthy();
+  });
+
+  //creating test transaction on ledger.
+  test("create test transaction 3", async () => {
+    const createAssetResponse = await apiClient.runTransactionV1({
+      signingCredential,
+      channelName: ledgerChannelName,
+      invocationType: FabricContractInvocationType.Send,
+      contractName: ledgerContractName,
+      methodName: "CreateAsset",
+      params: ["CactusTransactionsTest3", "blue", "13331", "someOwner3", "299"],
+    });
+
+
+    expect(createAssetResponse).toBeTruthy();
+    expect(createAssetResponse.status).toEqual(200);
+    expect(createAssetResponse.data).toBeTruthy();
+    expect(createAssetResponse.data.success).toBeTrue();
+    expect(createAssetResponse.data.transactionId).toBeTruthy();
+  });
+
+  //creating test transaction on ledger.
+  test("create test transaction 4", async () => {
+    const createAssetResponse = await apiClient.runTransactionV1({
+      signingCredential,
+      channelName: ledgerChannelName,
+      invocationType: FabricContractInvocationType.Send,
+      contractName: ledgerContractName,
+      methodName: "CreateAsset",
+      params: ["CactusTransactionsTest4", "yellow", "111", "someOwner1", "299"],
+    });
+
+
+    expect(createAssetResponse).toBeTruthy();
+    expect(createAssetResponse.status).toEqual(200);
+    expect(createAssetResponse.data).toBeTruthy();
+    expect(createAssetResponse.data.success).toBeTrue();
+    expect(createAssetResponse.data.transactionId).toBeTruthy();
+  });
+
+  //creating test transaction on ledger.
+  test("create test transaction 5", async () => {
+    const createAssetResponse = await apiClient.runTransactionV1({
+      signingCredential,
+      channelName: ledgerChannelName,
+      invocationType: FabricContractInvocationType.Send,
+      contractName: ledgerContractName,
+      methodName: "CreateAsset",
+      params: ["CactusTransactionsTest5", "black", "121", "someOwner3", "199"],
+    });
+
+
+    expect(createAssetResponse).toBeTruthy();
+    expect(createAssetResponse.status).toEqual(200);
+    expect(createAssetResponse.data).toBeTruthy();
+    expect(createAssetResponse.data.success).toBeTrue();
+    expect(createAssetResponse.data.transactionId).toBeTruthy();
+  });
+
+  //creating test transaction on ledger.
+  test("create test transaction 6", async () => {
+    const createAssetResponse = await apiClient.runTransactionV1({
+      signingCredential,
+      channelName: ledgerChannelName,
+      invocationType: FabricContractInvocationType.Send,
+      contractName: ledgerContractName,
+      methodName: "CreateAsset",
+      params: ["CactusTransactionsTest6", "blue", "112", "someOwner1", "219"],
+    });
+
+
+    expect(createAssetResponse).toBeTruthy();
+    expect(createAssetResponse.status).toEqual(200);
+    expect(createAssetResponse.data).toBeTruthy();
+    expect(createAssetResponse.data.success).toBeTrue();
+    expect(createAssetResponse.data.transactionId).toBeTruthy();
+  });
+
+  //creating test transaction on ledger.
+  test("create test transaction 7", async () => {
+    const createAssetResponse = await apiClient.runTransactionV1({
+      signingCredential,
+      channelName: ledgerChannelName,
+      invocationType: FabricContractInvocationType.Send,
+      contractName: ledgerContractName,
+      methodName: "CreateAsset",
+      params: ["CactusTransactionsTest7", "yellow", "111", "someOwner3", "229"],
+    });
+
+
+    expect(createAssetResponse).toBeTruthy();
+    expect(createAssetResponse.status).toEqual(200);
+    expect(createAssetResponse.data).toBeTruthy();
+    expect(createAssetResponse.data.success).toBeTrue();
+    expect(createAssetResponse.data.transactionId).toBeTruthy();
+  });
+
+  //creating test transaction on ledger.
+  test("create test transaction 8", async () => {
+    const createAssetResponse = await apiClient.runTransactionV1({
+      signingCredential,
+      channelName: ledgerChannelName,
+      invocationType: FabricContractInvocationType.Send,
+      contractName: ledgerContractName,
+      methodName: "CreateAsset",
+      params: ["CactusTransactionsTest8", "blue", "2111", "someOwner3", "2119"],
+    });
+
+
+    expect(createAssetResponse).toBeTruthy();
+    expect(createAssetResponse.status).toEqual(200);
+    expect(createAssetResponse.data).toBeTruthy();
+    expect(createAssetResponse.data.success).toBeTrue();
+    expect(createAssetResponse.data.transactionId).toBeTruthy();
+  });
   // checks if method works.
 
   // checks if all blocks from ledger are inserted into DB. If not, returns array with numbers of missing blocks.
@@ -538,13 +676,7 @@ describe("Persistence Fabric", () => {
         missBlock10(i);
 
         persistence.getBlockFromLedger(`${i}`);
-        // await apiClient.getBlockV1({
-        //   channelName: ledgerChannelName,
-        //   gatewayOptions,
-        //   query: {
-        //     blockNumber: `${i}`,
-        //   },
-        // });
+
         const isThisBlockInDB = await dbClientInstance.isThisBlockInDB(i);
         log.info("isThisBlockInDB", isThisBlockInDB);
         if (isThisBlockInDB.rowCount === 0) {
@@ -563,11 +695,15 @@ describe("Persistence Fabric", () => {
     expect(getMaxBlockNumber).toBeTruthy();
   });
 
-  // test("initialBlocksSynchronization", async () => {
-  //   const initialBlocksSynchronization = await persistence.initialBlocksSynchronization();
-  //   expect(initialBlocksSynchronization).toBeTruthy();
-  //   expect(initialBlocksSynchronization).toEqual("done");
-  // });
+  test("initialBlocksSynchronization", async () => {
+    const initialBlocksSynchronization = await persistence.initialBlocksSynchronization(
+      10,
+    );
+    expect(initialBlocksSynchronization).toBeTruthy();
+    expect(initialBlocksSynchronization).toEqual("done");
+  });
+  
+  // Those are other test scenarios when we check not missing block but normal synchronziation
   // test("continueBlocksSynchronization", async () => {
   //   const continueBlocksSynchronization = await persistence.continueBlocksSynchronization();
   //   expect(continueBlocksSynchronization).toBeTruthy();
@@ -584,15 +720,15 @@ describe("Persistence Fabric", () => {
   //   expect(changeSynchronization).toEqual(true || false);
   // });
 
-  // test("LastBlockChanged", async () => {
-  //   const LastBlockChanged = await persistence.currentLastSeenBlock();
-  //   log.info("Getting Lastblock from plugin for analyze");
+  test("LastBlockChanged", async () => {
+    const LastBlockChanged = await persistence.currentLastSeenBlock();
+    log.info("Getting Lastblock from plugin for analyze");
 
-  //   expect(LastBlockChanged).toBeTruthy();
-  // });
+    expect(LastBlockChanged).toBeTruthy();
+  });
 
-  test(" last block setting to 6", async () => {
-    const LastBlockChanged = await persistence.setLastBlockConsidered(6);
+  test(" last block setting to 14", async () => {
+    const LastBlockChanged = await persistence.setLastBlockConsidered(14);
     log.info("setting Lastblock from plugin for analyze");
     expect(LastBlockChanged).toBeTruthy();
   });
@@ -603,21 +739,28 @@ describe("Persistence Fabric", () => {
     expect(currentLastBlock).toBeTruthy();
   });
 
-  test("Migration of 5 block Test", async () => {
-    const blockTotest = await persistence.migrateBlockNrWithTransactions("5");
+  test("Migration of 12 block Test", async () => {
+    const blockTotest = await persistence.migrateBlockNrWithTransactions("12");
     log.info("Getting block from ledger for analyze");
     expect(blockTotest).toBeTruthy();
   });
-  test("Migration of 6 block Test", async () => {
-    const blockTotest = await persistence.migrateBlockNrWithTransactions("6");
+  test("Migration of 13 block Test", async () => {
+    const blockTotest = await persistence.migrateBlockNrWithTransactions("13");
     log.info("Getting block from ledger for analyze");
     expect(blockTotest).toBeTruthy();
   });
-  test("Migration of check Last block Test", async () => {
+
+  test("Check Last block set", async () => {
     const LastBlockChanged = await persistence.currentLastBlock();
     log.info("Getting Lastblock from plugin for analyze");
     expect(LastBlockChanged).toBeTruthy();
   });
+
+  test("migrateNextBlock", async () => {
+    const nextBlockArrival = await persistence.migrateNextBlock();
+    expect(nextBlockArrival).toBe(undefined);
+  });
+
   test("check missing blocks", async () => {
     const missingBlocksCheck = await persistence.whichBlocksAreMissingInDdSimple();
     log.info(
@@ -653,32 +796,5 @@ describe("Persistence Fabric", () => {
     );
     expect(missingBlocksCount).toBe(0);
   });
-  // test("migrateNextBlock", async () => {
-  //   const nextBlockArrival = await persistence.migrateNextBlock();
 
-  //   expect(nextBlockArrival).toBeTruthy();
-  // });
-
-  //creating test transaction on ledger.
-  // test.skip("create test transaction", async () => {
-  //   const createAssetResponse = await persistence.runTransactionV1({
-  //     signingCredential,
-  //     channelName: ledgerChannelName,
-  //     invocationType: FabricContractInvocationType.Send,
-  //     contractName: ledgerContractName,
-  //     methodName: "CreateAsset",
-  //     params: ["CactusTransactionsTest", "green", "111", "someOwner", "299"],
-  //   });
-
-  //   log.warn(
-  //     "runTransactionV1 response:",
-  //     JSON.stringify(createAssetResponse.data),
-  //   );
-
-  //   expect(createAssetResponse).toBeTruthy();
-  //   expect(createAssetResponse.status).toEqual(200);
-  //   expect(createAssetResponse.data).toBeTruthy();
-  //   expect(createAssetResponse.data.success).toBeTrue();
-  //   expect(createAssetResponse.data.transactionId).toBeTruthy();
-  // });
 });
