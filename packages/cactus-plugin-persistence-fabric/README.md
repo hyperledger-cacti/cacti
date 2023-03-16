@@ -46,7 +46,7 @@ There is few ways to use this plugins:
 4.  Using plugin function continuousBlocksSynchronization in some reasonable time with changeSynchronization - which should break flow
     this function might continue work for long period
 
-5) Best to start synchronization with initialBlocksSynchronization , which will transfer and parse into database 30 blocks that will show if
+5) Best to start synchronization with initialBlocksSynchronization , which will transfer and parse into database number of blocks equal to edgeOfLedger
 
 6) If there were some issues in network connection or you think that your database might be corrupted and lost some data you might use whichBlocksAreMissingInDdSimple
    and then showHowManyBlocksMissing if more than 0
@@ -153,7 +153,7 @@ PluginInstance.getStatus();
 
 #### `initialBlocksSynchronization`
 
-- Synchronize entire first 30 blocks of ledger state with the database as a good start and to check if everything is correctly set.
+- Synchronize entire first N number of blocks of ledger state with the database. It is a good start and easy to check if everything is correctly set.
 
 ## Running the tests
 
