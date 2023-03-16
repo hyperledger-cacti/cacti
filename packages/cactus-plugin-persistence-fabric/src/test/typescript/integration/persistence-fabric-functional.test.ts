@@ -626,7 +626,7 @@ describe("Persistence Fabric", () => {
       "Getting missing blocks from plugin for analyze",
       missingBlocksCheck,
     );
-    // expect(missingBlocksCheck).toBeTruthy();
+    expect(missingBlocksCheck).not.toBe(undefined);
   });
 
   test("check missing blocks count", async () => {

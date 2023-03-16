@@ -736,7 +736,7 @@ If some blocks above this number are already in database they will not be remove
    * that could not be synchronized with the DB for some reasons and list them
    * @returns number of missing blocks
    */
-  public async whichBlocksAreMissingInDdSimple(): Promise<void> {
+  public async whichBlocksAreMissingInDdSimple(): Promise<number> {
     this.howManyBlocksMissing = 0;
 
     for (let iterator: number = this.lastBlock; iterator >= 0; iterator--) {
@@ -749,6 +749,7 @@ If some blocks above this number are already in database they will not be remove
     }
 
     this.log.info("missedBlocks", JSON.stringify(this.missedBlocks));
+    return this.howManyBlocksMissing;
   }
   /**
    * synchronization of missing Blocks
