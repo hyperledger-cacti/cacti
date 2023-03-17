@@ -65,9 +65,6 @@
       "path": "./packages/cactus-plugin-ledger-connector-go-ethereum-socketio/tsconfig.json"
     },
     {
-      "path": "./packages/cactus-plugin-persistence-ethereum/tsconfig.json"
-    },
-    {
       "path": "./packages/cactus-plugin-ledger-connector-iroha/tsconfig.json"
     },
     {
