@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package com.weaver.corda.driver
+package org.hyperledger.cacti.weaver.corda.driver
 
 import arrow.core.*
 import arrow.core.extensions.either.applicative.applicative
@@ -16,11 +16,11 @@ import com.google.protobuf.ByteString
 import net.corda.core.messaging.CordaRPCOps
 import java.util.*
 
-import com.weaver.corda.app.interop.flows.HandleExternalRequest
-import com.weaver.corda.sdk.InteroperableHelper
-import com.weaver.protos.common.query.QueryOuterClass
-import com.weaver.protos.common.state.State
-import com.weaver.protos.corda.ViewDataOuterClass
+import org.hyperledger.cacti.weaver.corda.app.interop.flows.HandleExternalRequest
+import org.hyperledger.cacti.weaver.corda.sdk.InteroperableHelper
+import org.hyperledger.cacti.weaver.protos.common.query.QueryOuterClass
+import org.hyperledger.cacti.weaver.protos.common.state.State
+import org.hyperledger.cacti.weaver.protos.corda.ViewDataOuterClass
 
 fun main(args: Array<String>) {
     val port = System.getenv("DRIVER_PORT")?.toInt() ?: 9099

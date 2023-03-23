@@ -22,8 +22,8 @@ import kotlin.system.exitProcess
 import java.util.Base64
 import net.corda.core.identity.CordaX500Name
 import net.corda.core.identity.Party
-import com.weaver.corda.app.interop.flows.x509CertToPem
-import com.weaver.corda.sdk.HashFunctions
+import org.hyperledger.cacti.weaver.corda.app.interop.flows.x509CertToPem
+import org.hyperledger.cacti.weaver.corda.sdk.HashFunctions
 
 class UtilsCommand : CliktCommand(name = "utils", help ="Manages utilities") {
     override fun run() {

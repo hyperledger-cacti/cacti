@@ -1,1 +1,1 @@
-com.weaver.corda.app.interop.flows.customSerializers.CustomSerializationWhitelist
+org.hyperledger.cacti.weaver.corda.app.interop.flows.customSerializers.CustomSerializationWhitelist

@@ -92,10 +92,10 @@ dependencies {
     implementation "net.corda:corda:$corda_version"
     implementation "net.corda:corda-rpc:$corda_version"
 
-    implementation(group: 'com.weaver.corda.app.interop', name: 'interop-contracts', version: "$weaver_corda_version")
-    implementation(group: 'com.weaver.corda.app.interop', name: 'interop-workflows', version: "$weaver_corda_version")
-    implementation(group: 'com.weaver.corda.sdk', name: 'weaver-corda-sdk', version: "$weaver_corda_version")
-    implementation(group: 'com.weaver', name: 'protos-java-kt', version: "$weaver_protos_version")
+    implementation(group: 'org.hyperledger.cacti.weaver.corda.app.interop', name: 'interop-contracts', version: "$weaver_corda_version")
+    implementation(group: 'org.hyperledger.cacti.weaver.corda.app.interop', name: 'interop-workflows', version: "$weaver_corda_version")
+    implementation(group: 'org.hyperledger.cacti.weaver.corda.sdk', name: 'weaver-corda-sdk', version: "$weaver_corda_version")
+    implementation(group: 'org.hyperledger.cacti.weaver', name: 'protos-java-kt', version: "$weaver_protos_version")
     
     // gRPC and protobuf dependencies
     implementation "io.grpc:grpc-kotlin-stub:$grpc_kotlin_version"
@@ -123,7 +123,7 @@ dokka {
 }
 
 
-mainClassName = "com.weaver.corda.driver.CordaDriverKt"
+mainClassName = "org.hyperledger.cacti.weaver.corda.driver.CordaDriverKt"
 
 tasks.test {
     useJUnitPlatform()

@@ -21,8 +21,8 @@ import com.google.protobuf.util.JsonFormat
 import net.corda.core.identity.CordaX500Name
 import net.corda.core.identity.Party
 
-import com.weaver.corda.sdk.MembershipManager
-import com.weaver.protos.common.membership.MembershipOuterClass
+import org.hyperledger.cacti.weaver.corda.sdk.MembershipManager
+import org.hyperledger.cacti.weaver.protos.common.membership.MembershipOuterClass
 
 /**
  * TODO: Documentation

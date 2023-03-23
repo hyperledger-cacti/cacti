@@ -24,10 +24,10 @@ import net.corda.core.messaging.startFlow
 import org.json.JSONObject
 import java.util.Base64
 import java.util.Calendar
-import com.weaver.corda.app.interop.states.AssetClaimStatusState
-import com.weaver.corda.app.interop.states.AssetPledgeState
-import com.weaver.corda.app.interop.flows.GetAssetPledgeStatus
-import com.weaver.corda.sdk.AssetTransferSDK
+import org.hyperledger.cacti.weaver.corda.app.interop.states.AssetClaimStatusState
+import org.hyperledger.cacti.weaver.corda.app.interop.states.AssetPledgeState
+import org.hyperledger.cacti.weaver.corda.app.interop.flows.GetAssetPledgeStatus
+import org.hyperledger.cacti.weaver.corda.sdk.AssetTransferSDK
 import com.cordaSimpleApplication.contract.AssetContract
 
 import net.corda.samples.tokenizedhouse.flows.GetAssetClaimStatusByPledgeId
@@ -41,7 +41,7 @@ import com.google.gson.GsonBuilder
 import com.r3.corda.lib.tokens.contracts.commands.RedeemTokenCommand
 import com.r3.corda.lib.tokens.contracts.commands.IssueTokenCommand
 import com.r3.corda.lib.tokens.contracts.FungibleTokenContract
-import com.weaver.corda.app.interop.flows.RetrieveNetworkId
+import org.hyperledger.cacti.weaver.corda.app.interop.flows.RetrieveNetworkId
 import net.corda.core.identity.CordaX500Name
 import net.corda.core.identity.Party
 

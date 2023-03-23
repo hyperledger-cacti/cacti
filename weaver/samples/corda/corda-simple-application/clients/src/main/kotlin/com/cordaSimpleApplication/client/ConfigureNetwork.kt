@@ -20,7 +20,7 @@ import java.nio.file.Paths
 import java.util.stream.Collectors
 import net.corda.core.identity.Party
 
-import com.weaver.corda.sdk.CredentialsCreator
+import org.hyperledger.cacti.weaver.corda.sdk.CredentialsCreator
 
 class ConfigureCommand : CliktCommand(help ="Configure Command") {
     override fun run() {

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package com.weaver.corda.driver
+package org.hyperledger.cacti.weaver.corda.driver
 
 import arrow.core.Either
 import net.corda.core.serialization.SerializationWhitelist

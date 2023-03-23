@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package common.interop_payload;
 
-option java_package = "com.weaver.protos.common.interop_payload";
+option java_package = "org.hyperledger.cacti.weaver.protos.common.interop_payload";
 option go_package = "github.com/hyperledger/cacti/weaver/common/protos-go/common";
 
 message InteropPayload {

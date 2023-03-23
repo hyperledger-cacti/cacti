@@ -25,8 +25,8 @@ import net.corda.core.utilities.OpaqueBytes
 import net.corda.core.crypto.sha256
 import java.time.Instant
 
-import com.weaver.corda.sdk.AssetManager
-import com.weaver.corda.sdk.HashFunctions
+import org.hyperledger.cacti.weaver.corda.sdk.AssetManager
+import org.hyperledger.cacti.weaver.corda.sdk.HashFunctions
 import com.cordaSimpleApplication.state.AssetState
 import com.cordaSimpleApplication.contract.AssetContract
 

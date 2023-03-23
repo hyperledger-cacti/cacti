@@ -4,16 +4,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package com.weaver.corda.driver
+package org.hyperledger.cacti.weaver.corda.driver
 
 import java.io.File
 import io.grpc.Server
 import io.grpc.ServerBuilder
 import kotlinx.coroutines.*
 
-import com.weaver.protos.common.ack.AckOuterClass
-import com.weaver.protos.common.query.QueryOuterClass
-import com.weaver.protos.driver.driver.DriverCommunicationGrpcKt
+import org.hyperledger.cacti.weaver.protos.common.ack.AckOuterClass
+import org.hyperledger.cacti.weaver.protos.common.query.QueryOuterClass
+import org.hyperledger.cacti.weaver.protos.driver.driver.DriverCommunicationGrpcKt
 
 /**
  * The GrpcServer is used by the Corda driver to listen for requests for statefrom the relay.
