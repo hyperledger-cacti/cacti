@@ -12,7 +12,7 @@ path = "src/main/rust/pb.rs"
 [dependencies]
 tonic = {version="0.2",  features = ["tls"]}
 prost = "0.6"
-tokio = { version = "0.2", features = ["macros", "fs"] }
+tokio = { version = "1.18", features = ["macros", "fs"] }
 serde = {version="1.0.110", features = ["derive"]}
 
 # These upgraded versions compile fine as well, so we should upgrade them
