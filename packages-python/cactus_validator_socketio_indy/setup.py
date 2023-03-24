@@ -88,7 +88,7 @@ setup(
         'six==1.16.0',
         'urllib3==1.26.6',
         'websocket==0.2.1',
-        'Werkzeug==2.0.1',
+        'Werkzeug==2.2.3',
         'zope.event==4.5.0',
         'zope.interface==5.4.0'
     ],
