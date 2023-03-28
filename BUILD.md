@@ -129,6 +129,12 @@ git config --system core.longpaths true
 cd cactus
 ```
 
+* Run this command to enable corepack (Corepack is included by default with all Node.js installs, but is currently opt-in.)
+
+```sh
+npm run enable-corepack
+```
+
 * Run the initial configuration script (can take a long time, 10+ minutes on a low-spec laptop)
 
 ```sh
