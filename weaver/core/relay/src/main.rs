@@ -71,7 +71,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         let identity = Identity::from_pem(cert, key);
         // Spins up two gRPC services in a tonic server. One for relay to relay and one for network to relay communication.
         let server = Server::builder()
-            .tls_config(ServerTlsConfig::new().identity(identity))
+            .tls_config(ServerTlsConfig::new().identity(identity))?
             .add_service(DataTransferServer::new(relay))
             .add_service(EventSubscribeServer::new(event_subscribe))
             .add_service(EventPublishServer::new(event_publish))

@@ -7,6 +7,7 @@
 import { Level } from 'level';
 import * as path from 'path';
 import logger from './logger';
+import { delay } from './utils';
 
 /*
  * Interfaces for all database connectors to be used for event subscriptions 
@@ -55,15 +56,22 @@ class LevelDBConnector implements DBConnector {
     }
 
     async open(
+        i: number = 0
     ): Promise<boolean> {
         try {
             await this.dbHandle.open();
         } catch (error: any) {
-            logger.error(`failed to open database connection with error: ${error.toString()}`);
-            if (error.code == 'LEVEL_DATABASE_NOT_OPEN' && error.cause && error.cause.code == 'LEVEL_LOCKED') {
-                throw new DBLockedError(error.toString());
-            } else {
-                throw new DBNotOpenError(error.toString());
+            if (i>=10) {
+                logger.error(`failed to open database connection with error: ${error.toString()}`);
+                if (error.code == 'LEVEL_DATABASE_NOT_OPEN' && error.cause && error.cause.code == 'LEVEL_LOCKED') {
+                    throw new DBLockedError(error.toString());
+                } else {
+                    throw new DBNotOpenError(error.toString());
+                }
+            }
+            else {
+                await delay(1000);
+                await this.open(i+1);
             }
         }
 

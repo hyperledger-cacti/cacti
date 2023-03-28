@@ -325,7 +325,7 @@ class InteroperableHelper {
          * @return Returns the request state when it has status "COMPLETED" or "ERROR".
          */
         suspend fun pollForState(requestId: String, client: RelayClient, retryCount: Int = 0): Either<Error, State.RequestState> = coroutineScope {
-            val num = 10
+            val num = 30
             if (retryCount > num) {
                 Left(Error("Error: Timeout, remote network took longer than $num seconds to respond"))
             } else {

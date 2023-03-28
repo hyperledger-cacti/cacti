@@ -635,7 +635,7 @@ async fn data_transfer_call(
             .domain_name(relay_host);
 
         let channel = Channel::from_shared(client_addr)?
-            .tls_config(tls)
+            .tls_config(tls)?
             .connect()
             .await?;
 
@@ -745,7 +745,7 @@ async fn suscribe_event_call(
             .domain_name(relay_host);
     
         let channel = Channel::from_shared(client_addr)?
-            .tls_config(tls)
+            .tls_config(tls)?
             .connect()
             .await?;
     

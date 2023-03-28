@@ -140,11 +140,16 @@ function getRelayClientForEventPublish() {
     return client;
 }
 
+async function delay(ms: number) {
+    await new Promise(f => setTimeout(f, ms));
+}
+
 export {
     checkIfArraysAreEqual,
     handlePromise,
     relayCallback,
     getRelayClientForQueryResponse,
     getRelayClientForEventSubscription,
-    getRelayClientForEventPublish
+    getRelayClientForEventPublish,
+    delay
 }

@@ -47,4 +47,8 @@ function parseAddress(address: string): { locationSegment: string; viewSegment: 
     };
 }
 
-export { handlePromise, promisifyAll, parseAddress };
+async function delay(ms: number) {
+    await new Promise(f => setTimeout(f, ms));
+}
+
+export { handlePromise, promisifyAll, parseAddress, delay };
