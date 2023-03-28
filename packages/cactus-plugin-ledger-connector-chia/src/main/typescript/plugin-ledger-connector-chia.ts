@@ -343,4 +343,10 @@ export class PluginLedgerConnectorChia
       type,
     });
   }
+
+  public async deleteKey(
+    fingerprint: number,
+  ): Promise<Record<string, unknown>> {
+    return this.request<Record<string, unknown>>("delete_key", { fingerprint });
+  }
 }
