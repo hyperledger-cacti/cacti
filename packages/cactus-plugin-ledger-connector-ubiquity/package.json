@@ -1,6 +1,6 @@
 {
     "name": "@hyperledger/cactus-plugin-ledger-connector-ubiquity",
-    "version": "1.1.2",
+    "version": "1.2.0",
     "description": "Allows Cacti nodes to connect to a set of public blockchains.",
     "keywords": [
         "Hyperledger",
@@ -58,14 +58,13 @@
         "@hyperledger/cactus-core": "1.1.2",
         "@hyperledger/cactus-core-api": "1.1.2",
         "@ubiquity/ubiquity-ts-client-modified": "https://github.com/RafaelAPB/ubiquity-ts-client-mirror.git",
-        "typescript-optional": "2.0.1",
-        "dotenv": "16.0.1"
+        "dotenv": "16.0.1",
+        "typescript-optional": "2.0.1"
     },
     "devDependencies": {
-        "@types/express": "4.17.8",
+        "@hyperledger/cactus-common": "1.1.2",
         "@hyperledger/cactus-test-tooling": "1.1.2",
-        "@hyperledger/cactus-common": "1.1.2"
-
+        "@types/express": "4.17.8"
     },
     "engines": {
         "node": ">=10",
@@ -79,9 +78,9 @@
     "watch": {
         "codegen:openapi": {
             "patterns": [
-              "./src/main/json/openapi.json"
+                "./src/main/json/openapi.json"
             ]
-          },
+        },
         "tsc": {
             "patterns": [
                 "src/",

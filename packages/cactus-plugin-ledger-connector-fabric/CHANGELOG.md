@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.2.0](https://github.com/hyperledger/cactus/compare/v1.1.3...v1.2.0) (2023-03-28)
+
+### Features
+
+* **connector-fabric:** add WatchBlocks endpoint ([6c62de4](https://github.com/hyperledger/cactus/commit/6c62de4dfb360536fc67a03cf10602e311c08a9d)), closes [#2118](https://github.com/hyperledger/cactus/issues/2118)
+
 ## [1.1.3](https://github.com/hyperledger/cactus/compare/v1.1.2...v1.1.3) (2022-12-08)
 
 **Note:** Version bump only for package @hyperledger/cactus-plugin-ledger-connector-fabric

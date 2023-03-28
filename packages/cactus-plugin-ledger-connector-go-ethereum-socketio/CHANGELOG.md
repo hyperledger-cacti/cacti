@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.2.0](https://github.com/hyperledger/cacti/compare/v1.1.3...v1.2.0) (2023-03-28)
+
+### Features
+
+* connector-go-ethereum now can report empty blocks ([6dbe6b5](https://github.com/hyperledger/cacti/commit/6dbe6b54eaee156cd236ebbde4337b8599b05c08))
+
 ## [1.1.3](https://github.com/hyperledger/cactus/compare/v1.1.2...v1.1.3) (2022-12-08)
 
 ### Features
