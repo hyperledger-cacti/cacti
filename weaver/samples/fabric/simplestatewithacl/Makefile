@@ -1,4 +1,5 @@
 run-vendor:
+	go mod edit -replace github.com/hyperledger/cacti/weaver/common/protos-go=../../../common/protos-go/
 	go mod edit -replace github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/utils=../../../core/network/fabric-interop-cc/libs/utils/
 	go mod edit -replace github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/testutils=../../../core/network/fabric-interop-cc/libs/testutils/
 	go mod vendor
@@ -6,7 +7,8 @@ run-vendor:
 undo-vendor:
 	rm -rf vendor
 	go mod edit -dropreplace github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/utils
-	go mod edit -dropreplace github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/testutils
+	go mod edit -dropreplace github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/testutils 
+	go mod edit -dropreplace github.com/hyperledger/cacti/weaver/common/protos-go 
 
 build-local: run-vendor build undo-vendor
 
