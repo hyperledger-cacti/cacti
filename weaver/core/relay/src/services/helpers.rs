@@ -233,7 +233,7 @@ pub async fn get_driver_client(
             .domain_name(hostname);
 
         let channel = Channel::from_shared(driver_address).unwrap()
-            .tls_config(tls)
+            .tls_config(tls)?
             .connect()
             .await
             .unwrap();

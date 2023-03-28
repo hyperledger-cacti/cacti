@@ -9,10 +9,10 @@ name = "weaverpb"
 path = "pkg/src/lib.rs"
 
 [dependencies]
-tonic = {version="0.2",  features = ["tls"]}
-prost = "0.6"
-tokio = { version = "1.8", features = ["macros", "fs"] }
-serde = {version="1.0.110", features = ["derive"]}
+tonic = {version="0.8.3",  features = ["tls"]}
+prost = "0.11.8"
+tokio = { version = "1.27", features = ["macros", "fs"] }
+serde = {version="1.0.159", features = ["derive"]}
 
 [build-dependencies]
-tonic-build = "0.2"
+tonic-build = "0.8.3"

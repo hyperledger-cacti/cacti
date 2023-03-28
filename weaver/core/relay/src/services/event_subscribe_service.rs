@@ -290,7 +290,7 @@ fn spawn_send_subscription_status(
                 .domain_name(requestor_host);
 
             let channel = Channel::from_shared(client_addr.clone()).unwrap()
-                .tls_config(tls)
+                .tls_config(tls).expect(&format!("Error in TLS configuration for client: {}", client_addr.to_string()))
                 .connect()
                 .await
                 .unwrap();

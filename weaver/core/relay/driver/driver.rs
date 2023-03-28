@@ -7,6 +7,8 @@ use weaverpb::common::events::EventSubscription;
 use weaverpb::common::state::{view_payload, Meta, meta, ViewPayload, View};
 use weaverpb::driver::driver::driver_communication_server::{DriverCommunication, DriverCommunicationServer};
 use weaverpb::driver::driver::WriteExternalStateMessage;
+use weaverpb::relay::datatransfer::data_transfer_client::DataTransferClient;
+use weaverpb::relay::events::event_subscribe_client::EventSubscribeClient;
 
 // External modules
 use config;
@@ -16,7 +18,7 @@ use std::net::ToSocketAddrs;
 use std::thread::sleep;
 use std::time;
 use tokio::sync::RwLock;
-use tonic::transport::Server;
+use tonic::transport::{Identity, Server, ServerTlsConfig, Certificate, Channel, ClientTlsConfig};
 use tonic::{Request, Response, Status};
 
 pub struct DriverCommunicationService {
@@ -34,51 +36,54 @@ pub struct URI {
 impl DriverCommunication for DriverCommunicationService {
     async fn request_driver_state(&self, request: Request<Query>) -> Result<Response<Ack>, Status> {
         println!("Got a request from {:?}", request.remote_addr());
-        let into_inner = request.into_inner().clone();
-        let request_id = into_inner.request_id.to_string();
+        let query = request.into_inner().clone();
+        let request_id = query.request_id.to_string();
+        
+        let relays_table = self
+            .config_lock
+            .read()
+            .await
+            .get_table("relays")
+            .expect("No relays table in config file");
+        let relay_uri = relays_table
+            .get(&query.requesting_relay.to_string())
+            .expect("Requesting relay not found in config file relays table");
+        let uri = relay_uri.clone().try_into::<URI>()
+            .expect("Syntax for relays table in config file not correct");
 
-        let relay_port = self
-            .config_lock
-            .read()
-            .await
-            .get_str("port")
-            .expect("Port table does not exist");
-        let relay_hostname = self
-            .config_lock
-            .read()
-            .await
-            .get_str("hostname")
-            .expect("Hostname table does not exist");
+        let relay_port = uri.port.to_string();
+        let relay_hostname = uri.hostname.to_string();
+        let use_tls = uri.tls;
+        let tlsca_cert_path = uri.tlsca_cert_path.to_string();
         let client_addr = format!("http://{}:{}", relay_hostname, relay_port);
-        let client_result =
-            weaverpb::relay::datatransfer::data_transfer_client::DataTransferClient::connect(client_addr)
-                .await;
-        match client_result {
-            Ok(client) => {
-                // Sends Mocked payload back.
-                tokio::spawn(async move {
-                    let my_time = time::Duration::from_millis(3000);
-                    sleep(my_time);
-                    let state = ViewPayload {
-                        state: Some(view_payload::State::View(View {
-                            meta: Some(Meta {
-                                timestamp: "I am time".to_string(),
-                                proof_type: "I am proof".to_string(),
-                                serialization_format: "Proto".to_string(),
-                                protocol: meta::Protocol::Fabric as i32
-                            }),
-                            data: "This is a mocked payload".as_bytes().to_vec(),
-                        })),
-                        request_id: into_inner.request_id.to_string(),
-                    };
-                    println!("Sending state to remote relay...");
-                    let response = client.clone().send_driver_state(state).await;
-                    println!("Ack from remote relay={:?}", response);
-                });
-            }
-            Err(e) => {
-                // TODO: Add better error handling (Attempt a few times?)
-                panic!("Failed to connect to client. Error: {}", e.to_string());
+        
+        if use_tls {
+            let pem = tokio::fs::read(tlsca_cert_path).await.unwrap();
+            let ca = Certificate::from_pem(pem);
+
+            let tls = ClientTlsConfig::new()
+                .ca_certificate(ca)
+                .domain_name(relay_hostname);
+
+            let channel = Channel::from_shared(client_addr.to_string()).unwrap()
+                .tls_config(tls).expect(&format!("Error in TLS configuration for client: {}", client_addr.to_string()))
+                .connect()
+                .await
+                .unwrap();
+
+            let client = DataTransferClient::new(channel);
+            send_driver_mock_state_helper(client, request_id.to_string());
+        } else {
+            let client_result = DataTransferClient::connect(client_addr).await;
+            match client_result {
+                Ok(client) => {
+                    // Sends Mocked payload back.
+                    send_driver_mock_state_helper(client, request_id.to_string());
+                }
+                Err(e) => {
+                    // TODO: Add better error handling (Attempt a few times?)
+                    panic!("Failed to connect to client. Error: {}", e.to_string());
+                }
             }
         }
 
@@ -96,42 +101,51 @@ impl DriverCommunication for DriverCommunicationService {
         let query = into_inner.query.clone().expect("");
         let request_id = query.clone().request_id.to_string();
 
-        let relay_port = self
+        let relays_table = self
             .config_lock
             .read()
             .await
-            .get_str("port")
-            .expect("Port table does not exist");
-        let relay_hostname = self
-            .config_lock
-            .read()
-            .await
-            .get_str("hostname")
-            .expect("Hostname table does not exist");
+            .get_table("relays")
+            .expect("No relays table in config file");
+        let relay_uri = relays_table
+            .get(&query.requesting_relay.to_string())
+            .expect("Requesting relay not found in config file relays table");
+        let uri = relay_uri.clone().try_into::<URI>()
+            .expect("Syntax for relays table in config file not correct");
+        
+        let relay_port = uri.port.to_string();
+        let relay_hostname = uri.hostname.to_string();
+        let use_tls = uri.tls;
+        let tlsca_cert_path = uri.tlsca_cert_path.to_string();
         let client_addr = format!("http://{}:{}", relay_hostname, relay_port);
         println!("Remote relay... {:?}", client_addr.clone());
-        let client_result =
-            weaverpb::relay::events::event_subscribe_client::EventSubscribeClient::connect(client_addr)
-                .await;
-        match client_result {
-            Ok(client) => {
-                // Sends Mocked payload back.
-                tokio::spawn(async move {
-                    let my_time = time::Duration::from_millis(3000);
-                    sleep(my_time);
-                    let ack = Ack {
-                        status: ack::Status::Ok as i32,
-                        request_id: request_id,
-                        message: "".to_string(),
-                    };
-                    println!("Sending ack to remote relay... {:?}", ack.clone());
-                    let response = client.clone().send_driver_subscription_status(ack).await;
-                    println!("Ack from remote relay={:?}", response);
-                });
-            }
-            Err(e) => {
-                // TODO: Add better error handling (Attempt a few times?)
-                panic!("Failed to connect to client. Error: {}", e.to_string());
+        if use_tls {
+            let pem = tokio::fs::read(tlsca_cert_path).await.unwrap();
+            let ca = Certificate::from_pem(pem);
+
+            let tls = ClientTlsConfig::new()
+                .ca_certificate(ca)
+                .domain_name(relay_hostname);
+
+            let channel = Channel::from_shared(client_addr.to_string()).unwrap()
+                .tls_config(tls).expect(&format!("Error in TLS configuration for client: {}", client_addr.to_string()))
+                .connect()
+                .await
+                .unwrap();
+
+            let client = EventSubscribeClient::new(channel);
+            send_driver_mock_subscription_state_helper(client, request_id.to_string());
+        } else {
+            let client_result = EventSubscribeClient::connect(client_addr).await;
+            match client_result {
+                Ok(client) => {
+                    // Sends Mocked payload back.
+                    send_driver_mock_subscription_state_helper(client, request_id.to_string());
+                }
+                Err(e) => {
+                    // TODO: Add better error handling (Attempt a few times?)
+                    panic!("Failed to connect to client. Error: {}", e.to_string());
+                }
             }
         }
 
@@ -192,6 +206,42 @@ impl DriverCommunication for DriverCommunicationService {
     }
 }
 
+fn send_driver_mock_state_helper(client: DataTransferClient<Channel>, request_id: String) {
+    tokio::spawn(async move {
+        let my_time = time::Duration::from_millis(3000);
+        sleep(my_time);
+        let state = ViewPayload {
+            state: Some(view_payload::State::View(View {
+                meta: Some(Meta {
+                    timestamp: "I am time".to_string(),
+                    proof_type: "I am proof".to_string(),
+                    serialization_format: "Proto".to_string(),
+                    protocol: meta::Protocol::Fabric as i32
+                }),
+                data: "This is a mocked payload".as_bytes().to_vec(),
+            })),
+            request_id: request_id.to_string(),
+        };
+        println!("Sending state to remote relay...");
+        let response = client.clone().send_driver_state(state).await;
+        println!("Ack from remote relay={:?}", response);
+    });
+}
+fn send_driver_mock_subscription_state_helper(client: EventSubscribeClient<Channel>, request_id: String) {
+    tokio::spawn(async move {
+        let my_time = time::Duration::from_millis(3000);
+        sleep(my_time);
+        let ack = Ack {
+            status: ack::Status::Ok as i32,
+            request_id: request_id,
+            message: "".to_string(),
+        };
+        println!("Sending ack to remote relay... {:?}", ack.clone());
+        let response = client.clone().send_driver_subscription_status(ack).await;
+        println!("Ack from remote relay={:?}", response);
+    });
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // NOTE: This will need cleaning up
@@ -228,14 +278,28 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .to_socket_addrs()?
                 .next()
                 .expect("Port number is potentially invalid. Unable to create SocketAddr");
-
-                println!("DriverServer listening on {}", addr);
+                
                 let driver = DriverCommunicationService {
                     config_lock: RwLock::new(settings.clone()),
                 };
-                // Spins up two gRPC services in a tonic server. One for relay to relay and one for network to relay communication.
-                let server = Server::builder().add_service(DriverCommunicationServer::new(driver));
-                server.serve(addr).await?;
+                let with_tls = settings.get_bool("tls").unwrap_or(false);
+                if with_tls == true {
+                    println!("DriverServer with TLS enabled, listening on {}", addr);
+                    let cert = tokio::fs::read(settings.get_str("cert_path").unwrap()).await?;
+                    let key = tokio::fs::read(settings.get_str("key_path").unwrap()).await?;
+                    let identity = Identity::from_pem(cert, key);
+                    // Spins up two gRPC services in a tonic server. One for relay to relay and one for network to relay communication.
+                    let server = Server::builder()
+                        .tls_config(ServerTlsConfig::new().identity(identity))?
+                        .add_service(DriverCommunicationServer::new(driver));
+                    server.serve(addr).await?;
+                    
+                } else {
+                    println!("DriverServer listening on {}", addr);
+                    // Spins up two gRPC services in a tonic server. One for relay to relay and one for network to relay communication.
+                    let server = Server::builder().add_service(DriverCommunicationServer::new(driver));
+                    server.serve(addr).await?;
+                }
             }
             None => panic!("No Driver port specified for 'Dummy'"),
         },

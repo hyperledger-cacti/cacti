@@ -164,8 +164,8 @@ fn spawn_send_state(state: ViewPayload, requestor_host: String, requester_port: 
                 .ca_certificate(ca)
                 .domain_name(requestor_host);
 
-            let channel = Channel::from_shared(client_addr).unwrap()
-                .tls_config(tls)
+            let channel = Channel::from_shared(client_addr.to_string()).unwrap()
+                .tls_config(tls).expect(&format!("Error in TLS configuration for client: {}", client_addr.to_string()))
                 .connect()
                 .await
                 .unwrap();
