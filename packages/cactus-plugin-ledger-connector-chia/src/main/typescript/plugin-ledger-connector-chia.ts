@@ -306,4 +306,41 @@ export class PluginLedgerConnectorChia
 
     return wallet_balance;
   }
+
+  public async getPublicKeys(): Promise<string[]> {
+    const { public_key_fingerprints } = await this.request<PublicKeysResponse>(
+      "get_public_keys",
+      {},
+    );
+
+    return public_key_fingerprints;
+  }
+
+  public async getPrivateKey(fingerprint: number): Promise<string[]> {
+    const { private_key } = await this.request<PrivateKeyResponse>(
+      "get_private_key",
+      { fingerprint },
+    );
+
+    return private_key;
+  }
+
+  public async generateMnemonic(): Promise<string[]> {
+    const { mnemonic } = await this.request<GenerateMnemonicResponse>(
+      "generate_mnemonic",
+      {},
+    );
+
+    return mnemonic;
+  }
+
+  public async addKey(
+    mnemonic: string[],
+    type = "new_wallet",
+  ): Promise<AddKeyResponse> {
+    return this.request<AddKeyResponse>("add_key", {
+      mnemonic,
+      type,
+    });
+  }
 }
