@@ -16,7 +16,7 @@ concurrency:
 jobs:
   analyze:
     name: Analyze
-    runs-on: ubuntu-20.04
+    runs-on: buildjet-2vcpu-ubuntu-2004
 
     strategy:
       fail-fast: false

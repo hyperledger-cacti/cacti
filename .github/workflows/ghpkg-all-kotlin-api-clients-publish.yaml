@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   publish:
-    runs-on: ubuntu-20.04
+    runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
     - name: Install Indy SDK
       run: >
