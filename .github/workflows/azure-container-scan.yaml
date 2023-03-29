@@ -1,0 +1,38 @@
+name: azure-container-image-scan
+
+on:
+  push:
+  pull_request:
+    # Publish `main` as Docker `latest` image.
+    branches:
+      - main
+
+    # Publish `v1.2.3` tags as releases.
+    tags:
+      - v*
+
+
+jobs:
+ build-secure-and-push-8:
+    name: Scan cactus-corda-4-8-all-in-one-obligation image
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2.4.0
+      env:
+          # (Required) The token to use to make API calls to GitHub.
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
+    - uses: actions/checkout@v1
+    - name: Login to DockerHub Registry
+      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+
+    - name: Build Images from Dockerfile
+      run: DOCKER_BUILDKIT=1 docker build ./tools/docker/corda-all-in-one/ -f ./tools/docker/corda-all-in-one/corda-v4_8/Dockerfile -t cactus-corda-4-8-all-in-one-obligation
+
+    - uses: Azure/container-scan@v0.1
+      name: Scan image for vulnerabilities
+      id: container-scan
+      continue-on-error: true
+      with:
+       image-name: cactus-corda-4-8-all-in-one-obligation
