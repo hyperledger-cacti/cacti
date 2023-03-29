@@ -349,4 +349,323 @@ export class PluginLedgerConnectorChia
   ): Promise<Record<string, unknown>> {
     return this.request<Record<string, unknown>>("delete_key", { fingerprint });
   }
+
+  public async deleteAllKeys(): Promise<Record<string, unknown>> {
+    return this.request<Record<string, unknown>>("delete_all_keys", {});
+  }
+
+  public async getSyncStatus(): Promise<SyncStatusResponse> {
+    const status = await this.request<SyncStatusResponse>(
+      "get_sync_status",
+      {},
+    );
+    return status;
+  }
+
+  public async getHeightInfo(): Promise<number> {
+    const { height } = await this.request<HeightResponse>(
+      "get_height_info",
+      {},
+    );
+
+    return height;
+  }
+
+  public async farmBlock(address: string): Promise<Record<string, unknown>> {
+    return this.request<Record<string, unknown>>("farm_block", { address });
+  }
+
+  public async getWallets(): Promise<WalletInfo[]> {
+    const { wallets } = await this.request<WalletsResponse>("get_wallets", {});
+
+    return wallets;
+  }
+
+  public async getTransaction(
+    walletId: number,
+    transactionId: string,
+  ): Promise<Transaction> {
+    const { transaction } = await this.request<TransactionResponse>(
+      "get_transaction",
+      {
+        wallet_id: walletId,
+        transaction_id: transactionId,
+      },
+    );
+
+    return transaction;
+  }
+
+  public async getTransactions(
+    walletId: number,
+    limit: number,
+  ): Promise<Transaction[]> {
+    const { transactions } = await this.request<TransactionsResponse>(
+      "get_transactions",
+      { wallet_id: walletId, end: limit },
+    );
+
+    return transactions;
+  }
+
+  public async getNextAddress(walletId: number): Promise<string> {
+    const { address } = await this.request<NextAddressResponse>(
+      "get_next_address",
+      {
+        wallet_id: walletId,
+        new_address: true,
+      },
+    );
+    return address;
+  }
+
+  public async getCurrentAddress(walletId: number): Promise<string> {
+    const { address } = await this.request<NextAddressResponse>(
+      "get_next_address",
+      {
+        wallet_id: walletId,
+        new_address: false,
+      },
+    );
+    return address;
+  }
+
+  public async sendTransaction(
+    walletId: number,
+    amount: number,
+    address: string,
+    fee: number,
+  ): Promise<TransactionResponse> {
+    const transaction = await this.request<TransactionResponse>(
+      "send_transaction",
+      {
+        wallet_id: walletId,
+        amount,
+        address,
+        fee,
+      },
+    );
+
+    return transaction;
+  }
+
+  public async createNewCCWallet(
+    host: string,
+    amount: number,
+  ): Promise<CreateNewCCWalletResponse> {
+    return await this.request<CreateNewCCWalletResponse>("create_new_wallet", {
+      host,
+      wallet_type: "cc_wallet",
+      mode: "new",
+      amount,
+    });
+  }
+
+  public async createExistingCCWallet(
+    host: string,
+    colour: string,
+  ): Promise<CreateExistingCCWalletResponse> {
+    return await this.request<CreateExistingCCWalletResponse>(
+      "create_new_wallet",
+      {
+        host,
+        wallet_type: "cc_wallet",
+        mode: "existing",
+        colour,
+      },
+    );
+  }
+
+  public async createNewAdminRLWallet(
+    host: string,
+    interval: number,
+    limit: number,
+    pubkey: string,
+    amount: number,
+    fee?: number,
+  ): Promise<CreateNewAdminRlWalletResponse> {
+    return await this.request<CreateNewAdminRlWalletResponse>(
+      "create_new_wallet",
+      {
+        host,
+        wallet_type: "rl_wallet",
+        rl_type: "admin",
+        interval,
+        limit,
+        pubkey,
+        amount,
+        fee: fee || 0,
+      },
+    );
+  }
+
+  public async createNewUserRLWallet(
+    host: string,
+  ): Promise<CreateNewUserRlWalletResponse> {
+    return await this.request<CreateNewUserRlWalletResponse>(
+      "create_new_wallet",
+      {
+        host,
+        wallet_type: "rl_wallet",
+        rl_type: "user",
+      },
+    );
+  }
+
+  public async createSignedTransaction(
+    additions: Array<Addition>,
+    coins?: string,
+    fee?: number,
+  ): Promise<CreateSignedTransactionResponse> {
+    const additionArray = [];
+    for (let i = 0; i < additions.length; i++) {
+      additionArray.push(JSON.parse(JSON.stringify(additions[i])));
+    }
+    return this.request<CreateSignedTransactionResponse>(
+      "create_signed_transaction",
+      {
+        additions: additionArray,
+        coins,
+        fee,
+      },
+    );
+  }
+
+  public async createBackup(
+    filePath: string,
+  ): Promise<Record<string, unknown>> {
+    return this.request<Record<string, unknown>>("create_backup", {
+      file_path: filePath,
+    });
+  }
+
+  public async getTransactionCount(
+    walletId: number,
+  ): Promise<TransactionCountResponse> {
+    return this.request<TransactionCountResponse>("get_transaction_count", {
+      wallet_id: walletId,
+    });
+  }
+
+  public async ccSetName(walletId: number, name: string): Promise<number> {
+    return this.request<number>("cc_set_name", {
+      wallet_id: walletId,
+      name,
+    });
+  }
+
+  public async ccGetName(walletId: number): Promise<CCGetNameResponse> {
+    return this.request<CCGetNameResponse>("cc_get_name", {
+      wallet_id: walletId,
+    });
+  }
+
+  public async ccSpend(
+    walletId: number,
+    inner_address: string,
+    amount: number,
+    fee?: number,
+  ): Promise<CCSpendResponse> {
+    return this.request<CCSpendResponse>("cc_spend", {
+      wallet_id: walletId,
+      inner_address,
+      amount,
+      fee: fee !== undefined ? fee : 0,
+    });
+  }
+
+  public async ccGetColour(walletId: number): Promise<CCGetColourResponse> {
+    return this.request<CCGetColourResponse>("cc_get_colour", {
+      wallet_id: walletId,
+    });
+  }
+
+  public async ccCreateOfferForIds(
+    ids: Array<CCTradeIds>,
+    filename: string,
+  ): Promise<boolean> {
+    const idsObj: any = {};
+    for (let i = 0; i < ids.length; i++) {
+      idsObj[ids[i].wallet_id] = ids[i].amount;
+    }
+    return this.request<boolean>("create_offer_for_ids", {
+      ids: JSON.parse(JSON.stringify(idsObj)),
+      filename,
+    });
+  }
+
+  public async ccGetDiscrepanciesForOffer(
+    filename: string,
+  ): Promise<CCDiscrepancyResponse> {
+    return this.request<CCDiscrepancyResponse>("get_discrepancies_for_offer", {
+      filename,
+    });
+  }
+
+  public async ccRespondToOffer(filename: string): Promise<boolean> {
+    return this.request<boolean>("respond_to_offer", {
+      filename,
+    });
+  }
+
+  public async ccGetTrade(tradeId: string): Promise<Record<string, unknown>> {
+    return this.request<Record<string, unknown>>("get_trade", {
+      trade_id: tradeId,
+    });
+  }
+
+  public async ccGetAllTrades(): Promise<Array<Record<string, unknown>>> {
+    return this.request<Array<Record<string, unknown>>>("get_all_trades", {});
+  }
+
+  public async ccCancelTrade(
+    tradeId: string,
+    secure?: boolean,
+  ): Promise<boolean> {
+    return this.request<boolean>("cancel_trade", {
+      trade_id: tradeId,
+      secure,
+    });
+  }
+
+  // For rate limited wallet
+  public async rlSetUserInfo(
+    walletId: string,
+    origin: RLOrigin,
+    interval: number,
+    limit: number,
+    admin_pubkey: string,
+  ): Promise<void> {
+    return this.request<void>("rl_set_user_info", {
+      wallet_id: walletId,
+      origin: JSON.stringify(origin),
+      interval,
+      limit,
+      admin_pubkey,
+    });
+  }
+
+  public async rlSendClawbackTransaction(
+    walletId: string,
+    fee?: number,
+  ): Promise<CCSpendResponse> {
+    return this.request<CCSpendResponse>("send_clawback_transaction", {
+      wallet_id: walletId,
+      fee,
+    });
+  }
+
+  public async rlAddRateLimitedFund(
+    walletId: string,
+    puzzleHash: string,
+    amount: number,
+    fee?: number,
+  ): Promise<string> {
+    return this.request<string>("add_rate_limited_fund", {
+      wallet_id: walletId,
+      puzzle_hash: puzzleHash,
+      amount,
+      fee,
+    });
+  }
 }
