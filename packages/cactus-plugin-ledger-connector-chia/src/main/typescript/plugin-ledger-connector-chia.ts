@@ -299,30 +299,30 @@ export class PluginLedgerConnectorChia
   }
 
   public async getWalletBalance(walletId: number): Promise<WalletBalance> {
-    const { wallet_balance } = await this.request<WalletBalanceResponse>(
+    const { walletBalance } = await this.request<WalletBalanceResponse>(
       "get_wallet_balance",
       { wallet_id: walletId },
     );
 
-    return wallet_balance;
+    return walletBalance;
   }
 
   public async getPublicKeys(): Promise<string[]> {
-    const { public_key_fingerprints } = await this.request<PublicKeysResponse>(
+    const { publicKeyFingerprints } = await this.request<PublicKeysResponse>(
       "get_public_keys",
       {},
     );
 
-    return public_key_fingerprints;
+    return publicKeyFingerprints;
   }
 
   public async getPrivateKey(fingerprint: number): Promise<string[]> {
-    const { private_key } = await this.request<PrivateKeyResponse>(
+    const { privateKey } = await this.request<PrivateKeyResponse>(
       "get_private_key",
       { fingerprint },
     );
 
-    return private_key;
+    return privateKey;
   }
 
   public async generateMnemonic(): Promise<string[]> {
