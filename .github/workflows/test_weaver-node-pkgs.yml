@@ -20,7 +20,7 @@ concurrency:
 jobs:
   node_sdk_local:
 
-    runs-on: ubuntu-latest
+    runs-on: buildjet-2vcpu-ubuntu-2204
 
     strategy:
       matrix:
@@ -51,7 +51,7 @@ jobs:
 
   iin_agent_local:
 
-    runs-on: ubuntu-latest
+    runs-on: buildjet-2vcpu-ubuntu-2204
 
     strategy:
       matrix:
@@ -84,7 +84,7 @@ jobs:
       working-directory: weaver/core/identity-management/iin-agent
 
   build-docs:
-    runs-on: ubuntu-latest
+    runs-on: buildjet-2vcpu-ubuntu-2204
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2

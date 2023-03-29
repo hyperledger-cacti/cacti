@@ -21,7 +21,7 @@ jobs:
   # Push image to GitHub Packages.
   # See also https://docs.docker.com/docker-hub/builds/
   build-tag-push-container:
-    runs-on: ubuntu-20.04
+    runs-on: buildjet-2vcpu-ubuntu-2004
     env:
       DOCKER_BUILDKIT: 1
       DOCKERFILE_PATH: ./packages/cactus-plugin-keychain-vault/src/cactus-keychain-vault-server/Dockerfile

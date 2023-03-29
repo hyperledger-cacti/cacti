@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   test_local:
-    runs-on: ubuntu-latest
+    runs-on: buildjet-2vcpu-ubuntu-2204
     steps:
     - uses: actions/checkout@v2
     

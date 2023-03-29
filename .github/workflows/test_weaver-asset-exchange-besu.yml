@@ -23,7 +23,7 @@ jobs:
   asset-exchange-besu:
     if: ${{ false }}
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on: buildjet-2vcpu-ubuntu-2204
       
     strategy:
       fail-fast: false
@@ -202,7 +202,7 @@ jobs:
         
   asset-exchange-besu-local:
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on: buildjet-2vcpu-ubuntu-2204
       
     strategy:
       fail-fast: false
