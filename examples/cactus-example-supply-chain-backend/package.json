@@ -66,7 +66,7 @@
     "async-exit-hook": "2.0.1",
     "axios": "0.21.4",
     "dotenv": "16.0.0",
-    "express": "4.17.1",
+    "express": "4.17.3",
     "fabric-network": "2.2.10",
     "jose": "4.9.2",
     "openapi-types": "9.1.0",

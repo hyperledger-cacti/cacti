@@ -57,7 +57,7 @@
     "@hyperledger/cactus-core": "1.2.0",
     "@hyperledger/cactus-core-api": "1.2.0",
     "axios": "0.21.4",
-    "express": "4.17.1",
+    "express": "4.17.3",
     "prom-client": "13.2.0",
     "uuid": "8.3.2"
   },
