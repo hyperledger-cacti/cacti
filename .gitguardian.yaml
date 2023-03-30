@@ -1,0 +1,30 @@
+version: 2
+
+# Set to true if the desired exit code for the CLI is always 0,
+# otherwise the exit code will be 1 if incidents are found
+# the environment variable GITGUARDIAN_EXIT_ZERO=true can also be used toggle this behavior.
+exit-zero: false # default: false
+
+verbose: false # default: false
+
+instance: https://api.gitguardian.com/
+
+# Maximum commits to scan in a hook.
+max-commits-for-hook: 50 # default: 50
+
+# Accept self-signed certificates for the API.
+allow-self-signed: false # default: False
+
+secret:
+  show-secrets: false # default: false
+
+  # Exclude files and paths by globbing
+  ignored-paths:
+    - '**/README.md'
+    - 'doc/*'
+    - 'LICENSE'
+    - '**/examples/cactus-example-carbon-accounting-backend/example-config.json'
+
+  # Detectors to ignore.
+  ignored-detectors: # default: []
+    - Generic Password
