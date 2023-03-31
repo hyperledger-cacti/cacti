@@ -155,6 +155,117 @@
           }
         }
       },
+      "RunTransactionRequestV1Params": {
+        "oneOf": [
+          {
+            "type": "array",
+            "items": {}
+          },
+          {
+            "$ref": "#/components/schemas/AddAssetQuantityRequestParameters"
+          },
+          {
+            "$ref": "#/components/schemas/AddPeerRequestParameters"
+          },
+          {
+            "$ref": "#/components/schemas/AddSignatoryRequestParameters"
+          },
+          {
+            "$ref": "#/components/schemas/AppendRoleRequestParameters"
+          },
+          {
+            "$ref": "#/components/schemas/CallEngineRequestParameters"
+          },
+          {
+            "$ref": "#/components/schemas/CreateAccountRequestParameters"
+          },
+          {
+            "$ref": "#/components/schemas/CreateAssetRequestParameters"
+          },
+          {
+            "$ref": "#/components/schemas/CreateDomainRequestParameters"
+          },
+          {
+            "$ref": "#/components/schemas/CreateRoleRequestParameters"
+          },
+          {
+            "$ref": "#/components/schemas/DetachRoleRequestParameters"
+          },
+          {
+            "$ref": "#/components/schemas/GrantPermissionRequestParameters"
+          },
+          {
+            "$ref": "#/components/schemas/RemovePeerRequestParameters"
+          },
+          {
+            "$ref": "#/components/schemas/RemoveSignatoryRequestParameters"
+          },
+          {
+            "$ref": "#/components/schemas/RevokePermissionRequestParameters"
+          },
+          {
+            "$ref": "#/components/schemas/SetAccountDetailRequestParameters"
+          },
+          {
+            "$ref": "#/components/schemas/SetAccountQuorumRequestParameters"
+          },
+          {
+            "$ref": "#/components/schemas/SubtractAssetQuantityRequestParameters"
+          },
+          {
+            "$ref": "#/components/schemas/TransferAssetRequestParameters"
+          },
+          {
+            "$ref": "#/components/schemas/CompareAndSetAccountDetailRequestParameters"
+          },
+          {
+            "$ref": "#/components/schemas/GetAccountRequestParameters"
+          },
+          {
+            "$ref": "#/components/schemas/GetBlockRequestParameters"
+          },
+          {
+            "$ref": "#/components/schemas/GetSignatoriesRequestParameters"
+          },
+          {
+            "$ref": "#/components/schemas/GetTransactionsRequestParameters"
+          },
+          {
+            "$ref": "#/components/schemas/GetPendingTransactionsRequestParameters"
+          },
+          {
+            "$ref": "#/components/schemas/GetAccountTransactionsRequestParameters"
+          },
+          {
+            "$ref": "#/components/schemas/GetAccountAssetTransactionsRequestParameters"
+          },
+          {
+            "$ref": "#/components/schemas/GetAccountAssetsRequestParameters"
+          },
+          {
+            "$ref": "#/components/schemas/GetAccountDetailRequestParameters"
+          },
+          {
+            "$ref": "#/components/schemas/GetAssetInfoRequestParameters"
+          },
+          {
+            "$ref": "#/components/schemas/GetRolePermissionsRequestParameters"
+          },
+          {
+            "$ref": "#/components/schemas/GetEngineReceiptsRequestParameters"
+          }
+        ]
+      },
+      "RunTransactionRequestV1Body": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/RunTransactionRequestV1"
+          },
+          {
+            "$ref": "#/components/schemas/RunTransactionSignedRequestV1"
+          }
+        ]
+      },
       "RunTransactionRequestV1": {
         "type": "object",
         "required": [
@@ -173,105 +284,8 @@
             "nullable": false
           },
           "params": {
-            "oneOf": [
-              {
-                "type": "array",
-                "items": {}
-              },
-              {
-                "$ref": "#/components/schemas/AddAssetQuantityRequestParameters"
-              },
-              {
-                "$ref": "#/components/schemas/AddPeerRequestParameters"
-              },
-              {
-                "$ref": "#/components/schemas/AddSignatoryRequestParameters"
-              },
-              {
-                "$ref": "#/components/schemas/AppendRoleRequestParameters"
-              },
-              {
-                "$ref": "#/components/schemas/CallEngineRequestParameters"
-              },
-              {
-                "$ref": "#/components/schemas/CreateAccountRequestParameters"
-              },
-              {
-                "$ref": "#/components/schemas/CreateAssetRequestParameters"
-              },
-              {
-                "$ref": "#/components/schemas/CreateDomainRequestParameters"
-              },
-              {
-                "$ref": "#/components/schemas/CreateRoleRequestParameters"
-              },
-              {
-                "$ref": "#/components/schemas/DetachRoleRequestParameters"
-              },
-              {
-                "$ref": "#/components/schemas/GrantPermissionRequestParameters"
-              },
-              {
-                "$ref": "#/components/schemas/RemovePeerRequestParameters"
-              },
-              {
-                "$ref": "#/components/schemas/RemoveSignatoryRequestParameters"
-              },
-              {
-                "$ref": "#/components/schemas/RevokePermissionRequestParameters"
-              },
-              {
-                "$ref": "#/components/schemas/SetAccountDetailRequestParameters"
-              },
-              {
-                "$ref": "#/components/schemas/SetAccountQuorumRequestParameters"
-              },
-              {
-                "$ref": "#/components/schemas/SubtractAssetQuantityRequestParameters"
-              },
-              {
-                "$ref": "#/components/schemas/TransferAssetRequestParameters"
-              },
-              {
-                "$ref": "#/components/schemas/CompareAndSetAccountDetailRequestParameters"
-              },
-              {
-                "$ref": "#/components/schemas/GetAccountRequestParameters"
-              },
-              {
-                "$ref": "#/components/schemas/GetBlockRequestParameters"
-              },
-              {
-                "$ref": "#/components/schemas/GetSignatoriesRequestParameters"
-              },
-              {
-                "$ref": "#/components/schemas/GetTransactionsRequestParameters"
-              },
-              {
-                "$ref": "#/components/schemas/GetPendingTransactionsRequestParameters"
-              },
-              {
-                "$ref": "#/components/schemas/GetAccountTransactionsRequestParameters"
-              },
-              {
-                "$ref": "#/components/schemas/GetAccountAssetTransactionsRequestParameters"
-              },
-              {
-                "$ref": "#/components/schemas/GetAccountAssetsRequestParameters"
-              },
-              {
-                "$ref": "#/components/schemas/GetAccountDetailRequestParameters"
-              },
-              {
-                "$ref": "#/components/schemas/GetAssetInfoRequestParameters"
-              },
-              {
-                "$ref": "#/components/schemas/GetRolePermissionsRequestParameters"
-              },
-              {
-                "$ref": "#/components/schemas/GetEngineReceiptsRequestParameters"
-              }
-            ]
+            "$ref": "#/components/schemas/RunTransactionRequestV1Params",
+            "nullable": false
           }
         }
       },
@@ -1086,14 +1100,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/RunTransactionRequestV1"
-                  },
-                  {
-                    "$ref": "#/components/schemas/RunTransactionSignedRequestV1"
-                  }
-                ]
+                "$ref": "#/components/schemas/RunTransactionRequestV1Body"
               }
             }
           }

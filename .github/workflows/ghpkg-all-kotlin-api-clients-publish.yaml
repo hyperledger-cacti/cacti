@@ -62,3 +62,199 @@ jobs:
       with:
         name: cactus-plugin-ledger-connector-corda-kotlin-client-${{ env.GITVERSION }}.jar
         path: packages/cactus-plugin-ledger-connector-corda/src/main/kotlin/generated/openapi/kotlin-client/build/libs/kotlin-client-1.0.0.jar
+
+    - name: build-cactus-cmd-api-server-kotlin-client
+      run: |
+        WDIR=`pwd`
+        cd ${WDIR}/packages/cactus-cmd-api-server/src/main/kotlin/generated/openapi/kotlin-client
+        chmod +x gradlew
+        ./gradlew clean
+        ./gradlew build
+
+    - name: publish-cactus-cmd-api-server-kotlin-client
+      uses: actions/upload-artifact@v3.0.0
+      with:
+        name: cactus-cmd-api-server-kotlin-client-${{ env.GITVERSION }}.jar
+        path: packages/cactus-cmd-api-server/src/main/kotlin/generated/openapi/kotlin-client/build/libs/kotlin-client-1.0.0.jar
+
+    - name: build-cactus-core-api-kotlin-client
+      run: |
+        WDIR=`pwd`
+        cd ${WDIR}/packages/cactus-core-api/src/main/kotlin/generated/openapi/kotlin-client
+        chmod +x gradlew
+        ./gradlew clean
+        ./gradlew build
+
+    - name: publish-cactus-core-api-kotlin-client
+      uses: actions/upload-artifact@v3.0.0
+      with:
+        name: cactus-core-api-kotlin-client-${{ env.GITVERSION }}.jar
+        path: packages/cactus-core-api/src/main/kotlin/generated/openapi/kotlin-client/build/libs/kotlin-client-1.0.0.jar
+
+    - name: build-cactus-plugin-consortium-manual-kotlin-client
+      run: |
+        WDIR=`pwd`
+        cd ${WDIR}/packages/cactus-plugin-consortium-manual/src/main/kotlin/generated/openapi/kotlin-client
+        chmod +x gradlew
+        ./gradlew clean
+        ./gradlew build
+
+    - name: publish-cactus-plugin-consortium-manual-kotlin-client
+      uses: actions/upload-artifact@v3.0.0
+      with:
+        name: cactus-plugin-consortium-manual-kotlin-client-${{ env.GITVERSION }}.jar
+        path: packages/cactus-plugin-consortium-manual/src/main/kotlin/generated/openapi/kotlin-client/build/libs/kotlin-client-1.0.0.jar
+
+    - name: build-cactus-plugin-keychain-google-sm-kotlin-client
+      run: |
+        WDIR=`pwd`
+        cd ${WDIR}/packages/cactus-plugin-keychain-google-sm/src/main/kotlin/generated/openapi/kotlin-client
+        chmod +x gradlew
+        ./gradlew clean
+        ./gradlew build
+
+    - name: publish-cactus-plugin-keychain-google-sm-kotlin-client
+      uses: actions/upload-artifact@v3.0.0
+      with:
+        name: cactus-plugin-keychain-google-sm-kotlin-client-${{ env.GITVERSION }}.jar
+        path: packages/cactus-plugin-keychain-google-sm/src/main/kotlin/generated/openapi/kotlin-client/build/libs/kotlin-client-1.0.0.jar
+
+    - name: build-cactus-plugin-keychain-aws-sm-kotlin-client
+      run: |
+        WDIR=`pwd`
+        cd ${WDIR}/packages/cactus-plugin-keychain-aws-sm/src/main/kotlin/generated/openapi/kotlin-client
+        chmod +x gradlew
+        ./gradlew clean
+        ./gradlew build
+
+    - name: publish-cactus-plugin-keychain-aws-sm-kotlin-client
+      uses: actions/upload-artifact@v3.0.0
+      with:
+        name: cactus-plugin-keychain-aws-sm-kotlin-client-${{ env.GITVERSION }}.jar
+        path: packages/cactus-plugin-keychain-aws-sm/src/main/kotlin/generated/openapi/kotlin-client/build/libs/kotlin-client-1.0.0.jar
+
+    - name: build-cactus-plugin-keychain-azure-kv-kotlin-client
+      run: |
+        WDIR=`pwd`
+        cd ${WDIR}/packages/cactus-plugin-keychain-azure-kv/src/main/kotlin/generated/openapi/kotlin-client
+        chmod +x gradlew
+        ./gradlew clean
+        ./gradlew build
+
+    - name: publish-cactus-plugin-keychain-azure-kv-kotlin-client
+      uses: actions/upload-artifact@v3.0.0
+      with:
+        name: cactus-plugin-keychain-azure-kv-kotlin-client-${{ env.GITVERSION }}.jar
+        path: packages/cactus-plugin-keychain-azure-kv/src/main/kotlin/generated/openapi/kotlin-client/build/libs/kotlin-client-1.0.0.jar
+
+    - name: build-cactus-plugin-keychain-memory-kotlin-client
+      run: |
+        WDIR=`pwd`
+        cd ${WDIR}/packages/cactus-plugin-keychain-memory/src/main/kotlin/generated/openapi/kotlin-client
+        chmod +x gradlew
+        ./gradlew clean
+        ./gradlew build
+
+    - name: publish-cactus-plugin-keychain-memory-kotlin-client
+      uses: actions/upload-artifact@v3.0.0
+      with:
+        name: cactus-plugin-keychain-memory-kotlin-client-${{ env.GITVERSION }}.jar
+        path: packages/cactus-plugin-keychain-memory/src/main/kotlin/generated/openapi/kotlin-client/build/libs/kotlin-client-1.0.0.jar
+
+    - name: build-cactus-plugin-keychain-vault-kotlin-client
+      run: |
+        WDIR=`pwd`
+        cd ${WDIR}/packages/cactus-plugin-keychain-vault/src/main/kotlin/generated/openapi/kotlin-client
+        chmod +x gradlew
+        ./gradlew clean
+        ./gradlew build
+
+    - name: publish-cactus-plugin-keychain-vault-kotlin-client
+      uses: actions/upload-artifact@v3.0.0
+      with:
+        name: cactus-plugin-keychain-vault-kotlin-client-${{ env.GITVERSION }}.jar
+        path: packages/cactus-plugin-keychain-vault/src/main/kotlin/generated/openapi/kotlin-client/build/libs/kotlin-client-1.0.0.jar
+
+    - name: build-cactus-plugin-ledger-connector-fabric-kotlin-client
+      run: |
+        WDIR=`pwd`
+        cd ${WDIR}/packages/cactus-plugin-ledger-connector-fabric/src/main/kotlin/generated/openapi/kotlin-client
+        chmod +x gradlew
+        ./gradlew clean
+        ./gradlew build
+
+    - name: publish-cactus-plugin-ledger-connector-fabric-kotlin-client
+      uses: actions/upload-artifact@v3.0.0
+      with:
+        name: cactus-plugin-ledger-connector-fabric-kotlin-client-${{ env.GITVERSION }}.jar
+        path: packages/cactus-plugin-ledger-connector-fabric/src/main/kotlin/generated/openapi/kotlin-client/build/libs/kotlin-client-1.0.0.jar
+
+    - name: build-cactus-plugin-keychain-memory-wasm-kotlin-client
+      run: |
+        WDIR=`pwd`
+        cd ${WDIR}/packages/cactus-plugin-keychain-memory-wasm/src/main/kotlin/generated/openapi/kotlin-client
+        chmod +x gradlew
+        ./gradlew clean
+        ./gradlew build
+
+    - name: publish-cactus-plugin-keychain-memory-wasm-kotlin-client
+      uses: actions/upload-artifact@v3.0.0
+      with:
+        name: cactus-plugin-keychain-memory-wasm-kotlin-client-${{ env.GITVERSION }}.jar
+        path: packages/cactus-plugin-keychain-memory-wasm/src/main/kotlin/generated/openapi/kotlin-client/build/libs/kotlin-client-1.0.0.jar
+
+    - name: build-cactus-plugin-odap-hermes-kotlin-client
+      run: |
+        WDIR=`pwd`
+        cd ${WDIR}/packages/cactus-plugin-odap-hermes/src/main/kotlin/generated/openapi/kotlin-client
+        chmod +x gradlew
+        ./gradlew clean
+        ./gradlew build
+
+    - name: publish-cactus-plugin-odap-hermes-kotlin-client
+      uses: actions/upload-artifact@v3.0.0
+      with:
+        name: cactus-plugin-odap-hermes-kotlin-client-${{ env.GITVERSION }}.jar
+        path: packages/cactus-plugin-odap-hermes/src/main/kotlin/generated/openapi/kotlin-client/build/libs/kotlin-client-1.0.0.jar
+
+    - name: build-cactus-example-supply-chain-business-logic-plugin-kotlin-client
+      run: |
+        WDIR=`pwd`
+        cd ${WDIR}/examples/cactus-example-supply-chain-business-logic-plugin/src/main/kotlin/generated/openapi/kotlin-client
+        chmod +x gradlew
+        ./gradlew clean
+        ./gradlew build
+
+    - name: publish-cactus-example-supply-chain-business-logic-plugin-kotlin-client
+      uses: actions/upload-artifact@v3.0.0
+      with:
+        name: cactus-example-supply-chain-business-logic-plugin-kotlin-client-${{ env.GITVERSION }}.jar
+        path: examples/cactus-example-supply-chain-business-logic-plugin/src/main/kotlin/generated/openapi/kotlin-client/build/libs/kotlin-client-1.0.0.jar
+
+    - name: build-cactus-example-carbon-accounting-business-logic-plugin-kotlin-client
+      run: |
+        WDIR=`pwd`
+        cd ${WDIR}/examples/cactus-example-carbon-accounting-business-logic-plugin/src/main/kotlin/generated/openapi/kotlin-client
+        chmod +x gradlew
+        ./gradlew clean
+        ./gradlew build
+
+    - name: publish-cactus-example-carbon-accounting-business-logic-plugin-kotlin-client
+      uses: actions/upload-artifact@v3.0.0
+      with:
+        name: cactus-example-carbon-accounting-business-logic-plugin-kotlin-client-${{ env.GITVERSION }}.jar
+        path: examples/cactus-example-carbon-accounting-business-logic-plugin/src/main/kotlin/generated/openapi/kotlin-client/build/libs/kotlin-client-1.0.0.jar
+
+    - name: build-cactus-plugin-object-store-ipfs-kotlin-client
+      run: |
+        WDIR=`pwd`
+        cd ${WDIR}/extensions/cactus-plugin-object-store-ipfs/src/main/kotlin/generated/openapi/kotlin-client
+        chmod +x gradlew
+        ./gradlew clean
+        ./gradlew build
+
+    - name: publish-cactus-plugin-object-store-ipfs-kotlin-client
+      uses: actions/upload-artifact@v3.0.0
+      with:
+        name: cactus-plugin-object-store-ipfs-kotlin-client-${{ env.GITVERSION }}.jar
+        path: extensions/cactus-plugin-object-store-ipfs/src/main/kotlin/generated/openapi/kotlin-client/build/libs/kotlin-client-1.0.0.jar
