@@ -1045,11 +1045,23 @@ export interface RunTransactionRequestV1 {
     baseConfig: IrohaBaseConfig;
     /**
      * 
-     * @type {Array<any> | AddAssetQuantityRequestParameters | AddPeerRequestParameters | AddSignatoryRequestParameters | AppendRoleRequestParameters | CallEngineRequestParameters | CreateAccountRequestParameters | CreateAssetRequestParameters | CreateDomainRequestParameters | CreateRoleRequestParameters | DetachRoleRequestParameters | GrantPermissionRequestParameters | RemovePeerRequestParameters | RemoveSignatoryRequestParameters | RevokePermissionRequestParameters | SetAccountDetailRequestParameters | SetAccountQuorumRequestParameters | SubtractAssetQuantityRequestParameters | TransferAssetRequestParameters | CompareAndSetAccountDetailRequestParameters | GetAccountRequestParameters | GetBlockRequestParameters | GetSignatoriesRequestParameters | GetTransactionsRequestParameters | GetPendingTransactionsRequestParameters | GetAccountTransactionsRequestParameters | GetAccountAssetTransactionsRequestParameters | GetAccountAssetsRequestParameters | GetAccountDetailRequestParameters | GetAssetInfoRequestParameters | GetRolePermissionsRequestParameters | GetEngineReceiptsRequestParameters}
+     * @type {RunTransactionRequestV1Params}
      * @memberof RunTransactionRequestV1
      */
-    params: Array<any> | AddAssetQuantityRequestParameters | AddPeerRequestParameters | AddSignatoryRequestParameters | AppendRoleRequestParameters | CallEngineRequestParameters | CreateAccountRequestParameters | CreateAssetRequestParameters | CreateDomainRequestParameters | CreateRoleRequestParameters | DetachRoleRequestParameters | GrantPermissionRequestParameters | RemovePeerRequestParameters | RemoveSignatoryRequestParameters | RevokePermissionRequestParameters | SetAccountDetailRequestParameters | SetAccountQuorumRequestParameters | SubtractAssetQuantityRequestParameters | TransferAssetRequestParameters | CompareAndSetAccountDetailRequestParameters | GetAccountRequestParameters | GetBlockRequestParameters | GetSignatoriesRequestParameters | GetTransactionsRequestParameters | GetPendingTransactionsRequestParameters | GetAccountTransactionsRequestParameters | GetAccountAssetTransactionsRequestParameters | GetAccountAssetsRequestParameters | GetAccountDetailRequestParameters | GetAssetInfoRequestParameters | GetRolePermissionsRequestParameters | GetEngineReceiptsRequestParameters;
+    params: RunTransactionRequestV1Params;
 }
+/**
+ * @type RunTransactionRequestV1Body
+ * @export
+ */
+export type RunTransactionRequestV1Body = RunTransactionRequestV1 | RunTransactionSignedRequestV1;
+
+/**
+ * @type RunTransactionRequestV1Params
+ * @export
+ */
+export type RunTransactionRequestV1Params = AddAssetQuantityRequestParameters | AddPeerRequestParameters | AddSignatoryRequestParameters | AppendRoleRequestParameters | Array<any> | CallEngineRequestParameters | CompareAndSetAccountDetailRequestParameters | CreateAccountRequestParameters | CreateAssetRequestParameters | CreateDomainRequestParameters | CreateRoleRequestParameters | DetachRoleRequestParameters | GetAccountAssetTransactionsRequestParameters | GetAccountAssetsRequestParameters | GetAccountDetailRequestParameters | GetAccountRequestParameters | GetAccountTransactionsRequestParameters | GetAssetInfoRequestParameters | GetBlockRequestParameters | GetEngineReceiptsRequestParameters | GetPendingTransactionsRequestParameters | GetRolePermissionsRequestParameters | GetSignatoriesRequestParameters | GetTransactionsRequestParameters | GrantPermissionRequestParameters | RemovePeerRequestParameters | RemoveSignatoryRequestParameters | RevokePermissionRequestParameters | SetAccountDetailRequestParameters | SetAccountQuorumRequestParameters | SubtractAssetQuantityRequestParameters | TransferAssetRequestParameters;
+
 /**
  * 
  * @export
@@ -1270,11 +1282,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * 
          * @summary Executes a transaction on a Iroha ledger
-         * @param {RunTransactionRequestV1 | RunTransactionSignedRequestV1} [runTransactionRequestV1RunTransactionSignedRequestV1] 
+         * @param {RunTransactionRequestV1Body} [runTransactionRequestV1Body] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        runTransactionV1: async (runTransactionRequestV1RunTransactionSignedRequestV1?: RunTransactionRequestV1 | RunTransactionSignedRequestV1, options: any = {}): Promise<RequestArgs> => {
+        runTransactionV1: async (runTransactionRequestV1Body?: RunTransactionRequestV1Body, options: any = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha/run-transaction`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1294,7 +1306,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(runTransactionRequestV1RunTransactionSignedRequestV1, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(runTransactionRequestV1Body, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -1335,12 +1347,12 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Executes a transaction on a Iroha ledger
-         * @param {RunTransactionRequestV1 | RunTransactionSignedRequestV1} [runTransactionRequestV1RunTransactionSignedRequestV1] 
+         * @param {RunTransactionRequestV1Body} [runTransactionRequestV1Body] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async runTransactionV1(runTransactionRequestV1RunTransactionSignedRequestV1?: RunTransactionRequestV1 | RunTransactionSignedRequestV1, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RunTransactionResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.runTransactionV1(runTransactionRequestV1RunTransactionSignedRequestV1, options);
+        async runTransactionV1(runTransactionRequestV1Body?: RunTransactionRequestV1Body, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RunTransactionResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.runTransactionV1(runTransactionRequestV1Body, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -1375,12 +1387,12 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         /**
          * 
          * @summary Executes a transaction on a Iroha ledger
-         * @param {RunTransactionRequestV1 | RunTransactionSignedRequestV1} [runTransactionRequestV1RunTransactionSignedRequestV1] 
+         * @param {RunTransactionRequestV1Body} [runTransactionRequestV1Body] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        runTransactionV1(runTransactionRequestV1RunTransactionSignedRequestV1?: RunTransactionRequestV1 | RunTransactionSignedRequestV1, options?: any): AxiosPromise<RunTransactionResponse> {
-            return localVarFp.runTransactionV1(runTransactionRequestV1RunTransactionSignedRequestV1, options).then((request) => request(axios, basePath));
+        runTransactionV1(runTransactionRequestV1Body?: RunTransactionRequestV1Body, options?: any): AxiosPromise<RunTransactionResponse> {
+            return localVarFp.runTransactionV1(runTransactionRequestV1Body, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -1418,13 +1430,13 @@ export class DefaultApi extends BaseAPI {
     /**
      * 
      * @summary Executes a transaction on a Iroha ledger
-     * @param {RunTransactionRequestV1 | RunTransactionSignedRequestV1} [runTransactionRequestV1RunTransactionSignedRequestV1] 
+     * @param {RunTransactionRequestV1Body} [runTransactionRequestV1Body] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public runTransactionV1(runTransactionRequestV1RunTransactionSignedRequestV1?: RunTransactionRequestV1 | RunTransactionSignedRequestV1, options?: any) {
-        return DefaultApiFp(this.configuration).runTransactionV1(runTransactionRequestV1RunTransactionSignedRequestV1, options).then((request) => request(this.axios, this.basePath));
+    public runTransactionV1(runTransactionRequestV1Body?: RunTransactionRequestV1Body, options?: any) {
+        return DefaultApiFp(this.configuration).runTransactionV1(runTransactionRequestV1Body, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
