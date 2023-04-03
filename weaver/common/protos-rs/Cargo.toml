@@ -15,4 +15,4 @@ tokio = { version = "1.27", features = ["macros", "fs"] }
 serde = {version="1.0.159", features = ["derive"]}
 
 [build-dependencies]
-tonic-build = "0.8.3"
+tonic-build = "0.8.4"
