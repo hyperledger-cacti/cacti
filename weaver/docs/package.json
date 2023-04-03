@@ -21,7 +21,7 @@
     "react-dom": "^16.8.4",
     "gh-pages": "^2.2.0",
     "elliptic": "^6.5.4",
-    "immer": "^8.0.1",
+    "immer": "^9.0.21",
     "react-dev-utils": "^11.0.4",
     "is-svg": "^4.2.2"
   },

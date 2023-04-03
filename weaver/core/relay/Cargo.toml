@@ -38,7 +38,7 @@ weaver_protos_rs = { path = "./protos-rs" }
 # weaver_protos_rs = "1.5.4"
 
 [build-dependencies]
-tonic-build = "0.2"
+tonic-build = "0.8.4"
 
 
 
