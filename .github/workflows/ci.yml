@@ -21,7 +21,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.1.0
@@ -50,7 +50,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.1.0
@@ -80,7 +80,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.1.0
@@ -107,7 +107,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.1.0
@@ -136,7 +136,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.1.0
@@ -163,7 +163,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.1.0
@@ -190,7 +190,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.1.0
@@ -218,7 +218,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.1.0
@@ -245,7 +245,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.1.0
@@ -273,7 +273,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.1.0
@@ -301,7 +301,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.1.0
@@ -328,7 +328,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.1.0
@@ -356,7 +356,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.1.0
@@ -383,7 +383,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.1.0
@@ -412,7 +412,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.1.0
@@ -439,7 +439,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.1.0
@@ -466,7 +466,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.1.0
@@ -494,7 +494,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.1.0
@@ -522,7 +522,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.1.0
@@ -550,7 +550,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.1.0
@@ -577,7 +577,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.1.0
@@ -605,7 +605,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.1.0
@@ -633,7 +633,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.1.0
@@ -662,7 +662,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.1.0
@@ -691,7 +691,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.1.0
@@ -720,7 +720,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.1.0
@@ -747,7 +747,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.1.0
@@ -775,7 +775,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.1.0
@@ -804,7 +804,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.1.0
@@ -831,7 +831,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v2.3.4
@@ -860,7 +860,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.1.0
@@ -888,7 +888,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.1.0
@@ -917,7 +917,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.1.0
@@ -944,7 +944,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v2.3.4
@@ -972,7 +972,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.1.0
@@ -999,7 +999,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.1.0
@@ -1027,7 +1027,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v2.3.4
@@ -1056,7 +1056,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.1.0
@@ -1084,7 +1084,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.1.0
@@ -1112,7 +1112,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.1.0
@@ -1140,7 +1140,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.1.0
@@ -1169,7 +1169,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.1.0
@@ -1198,7 +1198,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.1.0
@@ -1225,7 +1225,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.1.0
@@ -1254,7 +1254,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.1.0
@@ -1281,7 +1281,7 @@ jobs:
     runs-on: buildjet-2vcpu-ubuntu-2004
     steps:
       - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.1.0
