@@ -26,7 +26,7 @@ jobs:
   data-sharing:
     if: ${{ false }}
     # The type of runner that the job will run on
-    runs-on: buildjet-2vcpu-ubuntu-2204
+    runs-on: buildjet-4vcpu-ubuntu-2204
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -341,7 +341,7 @@ jobs:
   data-sharing-docker-local:
     # if: ${{ false }}
     # The type of runner that the job will run on
-    runs-on: buildjet-2vcpu-ubuntu-2204
+    runs-on: buildjet-4vcpu-ubuntu-2204
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -707,7 +707,7 @@ jobs:
   data-sharing-local:
     # if: ${{ false }}
     # The type of runner that the job will run on
-    runs-on: buildjet-2vcpu-ubuntu-2204
+    runs-on: buildjet-4vcpu-ubuntu-2204
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
