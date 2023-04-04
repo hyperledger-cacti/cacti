@@ -43,7 +43,7 @@ jobs:
         java-version: '8'
 
     - name: Set up NodeJS v16.9.1
-      uses: actions/setup-node@v2.1.2
+      uses: actions/setup-node@v3.6.0
       with:
         node-version: v16.9.1
 

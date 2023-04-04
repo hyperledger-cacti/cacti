@@ -42,7 +42,7 @@ jobs:
           distribution: 'adopt'
 
       - name: Use Node.js 14.x
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: 14.x
 
@@ -221,7 +221,7 @@ jobs:
           distribution: 'adopt'
 
       - name: Use Node.js 14.x
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: 14.x
 
