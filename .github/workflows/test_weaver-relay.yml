@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  relay-local:
+  unit_test_relay_local:
     # if: ${{ false }}
     runs-on: buildjet-2vcpu-ubuntu-2204
     steps:
@@ -66,7 +66,7 @@ jobs:
             cargo run --bin client 9085 localhost:9085/Dummy_Network/abc:abc:abc:abc
         working-directory: weaver/core/relay
 
-  relay-tls-local:
+  unit_test_relay_tls_local:
     # if: ${{ false }}
     runs-on: buildjet-2vcpu-ubuntu-2204
     steps:
@@ -117,7 +117,7 @@ jobs:
             cargo run --bin client-tls 9085 localhost:9085/Dummy_Network/abc:abc:abc:abc
         working-directory: weaver/core/relay
 
-  relay:
+  unit_test_relay:
     if: ${{ false }}
     runs-on: buildjet-2vcpu-ubuntu-2204
     steps:
@@ -156,7 +156,7 @@ jobs:
             cargo run --bin client 9085 localhost:9085/Dummy_Network/abc:abc:abc:abc
         working-directory: weaver/core/relay
 
-  relay-tls:
+  unit_test_relay_tls:
     if: ${{ false }}
     runs-on: buildjet-2vcpu-ubuntu-2204
     steps:

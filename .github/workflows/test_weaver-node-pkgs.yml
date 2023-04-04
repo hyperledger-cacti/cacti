@@ -18,7 +18,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  node_sdk_local:
+  unit_test_weaver_node_sdk_local:
 
     runs-on: buildjet-2vcpu-ubuntu-2204
 
@@ -49,7 +49,7 @@ jobs:
       run: npm run test
       working-directory: weaver/sdks/fabric/interoperation-node-sdk
 
-  iin_agent_local:
+  unit_test_iin_agent_local:
 
     runs-on: buildjet-2vcpu-ubuntu-2204
 
@@ -83,7 +83,7 @@ jobs:
       run: npm run test
       working-directory: weaver/core/identity-management/iin-agent
 
-  build-docs:
+  build_docs:
     runs-on: buildjet-2vcpu-ubuntu-2204
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it

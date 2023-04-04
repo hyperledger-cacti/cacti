@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  relay:
+  build_docker_relay:
     # if: ${{ false }}
     runs-on: buildjet-2vcpu-ubuntu-2204
     steps:
@@ -26,7 +26,7 @@ jobs:
         run: make build-server-local
         working-directory: weaver/core/relay
         
-  fabric-driver-local:
+  build_docker_fabric_driver_local:
     # if: ${{ false }}
     runs-on: buildjet-2vcpu-ubuntu-2204
     steps:
@@ -56,7 +56,7 @@ jobs:
         run: make build-image-local
         working-directory: weaver/core/drivers/fabric-driver
         
-  fabric-driver-packages:
+  build_docker_fabric_driver_packages:
     if: ${{ false }}
     runs-on: buildjet-2vcpu-ubuntu-2204
     steps:
@@ -74,7 +74,7 @@ jobs:
         run: make build-image
         working-directory: weaver/core/drivers/fabric-driver
         
-  corda-driver-local:
+  build_docker_corda_driver_local:
     runs-on: buildjet-2vcpu-ubuntu-2204
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -102,7 +102,7 @@ jobs:
         run: make image-local
         working-directory: weaver/core/drivers/corda-driver
           
-  corda-driver-packages:
+  build_docker_corda_driver_packages:
     if: ${{ false }}
     runs-on: buildjet-2vcpu-ubuntu-2204
     steps:
@@ -131,7 +131,7 @@ jobs:
         run: make image
         working-directory: weaver/core/drivers/corda-driver
 
-  iin-agent-local:
+  build_docker_iin_agent_local:
     runs-on: buildjet-2vcpu-ubuntu-2204
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it

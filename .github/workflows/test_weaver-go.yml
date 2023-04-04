@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test_interopcc:
+  unit_test_interopcc:
     runs-on: buildjet-2vcpu-ubuntu-2204
     steps:
     - uses: actions/checkout@v2
@@ -37,7 +37,7 @@ jobs:
       run: go test -v ./...
       working-directory: weaver/core/network/fabric-interop-cc/contracts/interop
 
-  test_assetmgmt:
+  unit_test_assetmgmt:
     # if: ${{ false }}  # disable
     runs-on: buildjet-2vcpu-ubuntu-2204
     steps:
@@ -60,7 +60,7 @@ jobs:
       run: go test -v ./...
       working-directory: weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt
 
-  test_simplestate:
+  unit_test_simplestate:
     runs-on: buildjet-2vcpu-ubuntu-2204
     steps:
     - uses: actions/checkout@v2
@@ -82,7 +82,7 @@ jobs:
       run: go test -v ./...
       working-directory: weaver/samples/fabric/simplestate
  
-  test_simpleasset:
+  unit_test_simpleasset:
     runs-on: buildjet-2vcpu-ubuntu-2204
     steps:
     - uses: actions/checkout@v2
@@ -104,7 +104,7 @@ jobs:
       run: go test -v ./...
       working-directory: weaver/samples/fabric/simpleasset
 
-  test_simpleassetandinterop:
+  unit_test_simpleassetandinterop:
     runs-on: buildjet-2vcpu-ubuntu-2204
     steps:
     - uses: actions/checkout@v2
@@ -126,7 +126,7 @@ jobs:
       run: go test -v ./...
       working-directory: weaver/samples/fabric/simpleassetandinterop
 
-  test_simpleassettransfer:
+  unit_test_simpleassettransfer:
     runs-on: buildjet-2vcpu-ubuntu-2204
     steps:
     - uses: actions/checkout@v2

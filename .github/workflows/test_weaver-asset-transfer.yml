@@ -23,7 +23,7 @@ concurrency:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  fabric-asset-transfer:
+  asset-transfer-fabric:
     if: ${{ false }}
     # The type of runner that the job will run on
     runs-on: buildjet-2vcpu-ubuntu-2204
@@ -410,7 +410,7 @@ jobs:
           fi
         working-directory: weaver/samples/fabric/fabric-cli
 
-  fabric-asset-transfer-local:
+  asset-transfer-fabric-local:
     # if: ${{ false }}
     # The type of runner that the job will run on
     runs-on: buildjet-2vcpu-ubuntu-2204
