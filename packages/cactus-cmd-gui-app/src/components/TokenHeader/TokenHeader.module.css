@@ -1,0 +1,58 @@
+.token-header {
+    display: flex;
+    height: 5rem;
+    width: 100%;
+    gap: 1rem;
+}
+
+.token-details {
+    width: 70%;
+    height: 100%;
+    border: 1px solid rgb(240, 236, 236);
+    border-radius: 10px;
+    gap: 3rem;
+    padding: .25rem 2rem;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    background-color: rgb(247, 245, 245);
+}
+
+.token-details div {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.token-icon {
+    font-size: 2.5rem;
+    height: 100%;
+    transform: translateY(10%);
+    color: rgb(34, 70, 70);
+}
+
+.token-account {
+    font-size: 18px;
+    width: min-content;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(247, 245, 245);
+    border-radius: 10px;
+    padding: 1rem;
+    padding-left: 2rem;
+}
+
+.token-account span {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+
+.token-account-icon {
+    color: rgb(22, 92, 65);
+    font-size: 28px;
+    height: 30px;
+    width: 30px;
+}

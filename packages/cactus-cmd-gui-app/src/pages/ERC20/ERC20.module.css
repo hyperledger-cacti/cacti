@@ -1,0 +1,11 @@
+.erc-content {
+    display: flex;
+    gap:2rem;
+}
+
+.erc-wrap{
+    display: flex;
+    gap:1rem;
+    flex-direction: column;
+    align-items: flex-end;
+}

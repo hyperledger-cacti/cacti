@@ -1,0 +1,21 @@
+.navigation {
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+    justify-content: flex-start;
+    padding-left: 8rem;
+    height: 4rem;
+    background-color: rgb(245, 243, 243);
+}
+
+.logo-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right:3rem;
+}
+
+.logo {
+    height: 70%;
+    filter: invert(28%) sepia(14%) saturate(2925%) hue-rotate(69deg) brightness(97%) contrast(89%);
+}

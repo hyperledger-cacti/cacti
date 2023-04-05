@@ -1,0 +1,20 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js",
+    "plugins": [
+        {
+            "name": "typescript-plugin-css-modules"
+        }
+    ],
+    "composite": true,
+    "outDir": "./dist/out-tsc",
+    "rootDir": "./src",
+    "skipLibCheck": true,
+    "tsBuildInfoFile": "../../.build-cache/cactus-cmd-gui-app.tsbuildinfo"
+  },
+  "include": [
+    "./src"
+  ]
+}
