@@ -63,3 +63,5 @@ site/
 !packages/cactus-plugin-ledger-connector-*-socketio/src/main/typescript/common/core/bin
 
 tools/docker/geth-testnet/data-geth1/
+
+.history/
