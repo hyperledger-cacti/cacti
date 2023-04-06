@@ -17,9 +17,6 @@ services:
   cactus-api-server:
     image: ghcr.io/hyperledger/cactus-cmd-api-server:2021-08-15--refactor-1222
     environment:
-      CACTUS_NODE_ID: "-"
-      CONSORTIUM_ID: "-"
-      KEY_PAIR_PEM: "-"
       COCKPIT_WWW_ROOT: ${APP}node_modules/@hyperledger/cactus-cockpit/www/
       COCKPIT_TLS_ENABLED: "false"
       COCKPIT_CORS_DOMAIN_CSV: \*
