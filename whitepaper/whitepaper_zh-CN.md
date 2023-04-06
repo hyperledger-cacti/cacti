@@ -46,8 +46,8 @@ Photo by Pontus Wellgraf on Unsplash
   - [2.2 数据托管出售](#22-数据托管出售)
   - [2.3 货币兑换](#23-货币兑换)
   - [2.4 稳定币和其他货币的铆定](#24-稳定币和其他货币的铆定)
-    - [2.4.1 和非授权区块链（BTC）](#241-和非授权区块链btc)
-    - [2.4.2 和法定货币](#242-和法定货币)
+    - [2.4.1 和非授权区块链兑换](#241-和非授权区块链兑换)
+    - [2.4.2 和法定货币兑换](#242-和法定货币兑换)
   - [2.5 带有访问控制列表的医疗保健数据共享](#25-带有访问控制列表的医疗保健数据共享)
   - [2.6 集成现有的食品溯源解决方案](#26-集成现有的食品溯源解决方案)
   - [2.7 终端用户钱包身份验证/授权](#27-终端用户钱包身份验证授权)
@@ -81,7 +81,7 @@ Photo by Pontus Wellgraf on Unsplash
   - [4.3 技术架构](#43-技术架构)
     - [4.3.1 Monorepo包](#431-monorepo包)
       - [4.3.1.1 cmd-api-server](#4311-cmd-api-server)
-        - [4.3.1.1.1  运行时配置解析和验证](#43111-运行时配置解析和验证)
+        - [4.3.1.1.1  运行时配置解析和验证](#43111--运行时配置解析和验证)
         - [4.3.1.1.2 配置模式 - API 服务器](#43112-配置模式---api-服务器)
         - [4.3.1.1.4 插件加载/验证](#43114-插件加载验证)
       - [4.3.1.2 core-api](#4312-core-api)
@@ -511,11 +511,6 @@ $ npx ts-node -e "import {ConfigService} from './packages/cactus-cmd-api-server/
                 Default: Mandatory parameter without a default value.
                 Env: CONFIG_FILE
                 CLI: --config-file
-  cactusNodeId:
-                Description: Identifier of this particular Cactus node. Must be unique among the total set of Cactus nodes running in any given Cactus deployment. Can be any string of characters such as a UUID or an Int64
-                Default: Mandatory parameter without a default value.
-                Env: CACTUS_NODE_ID
-                CLI: --cactus-node-id
   logLevel:
                 Description: The level at which loggers should be configured. Supported values include the following: error, warn, info, debug, trace
                 Default: warn
@@ -562,12 +557,12 @@ $ npx ts-node -e "import {ConfigService} from './packages/cactus-cmd-api-server/
                 Env: PRIVATE_KEY
                 CLI: --private-key
   keychainSuffixPrivateKey:
-                Description: The key under which to store/retrieve the private key from the keychain of this Cactus node (API server)The complete lookup key is constructed from the ${CACTUS_NODE_ID}${KEYCHAIN_SUFFIX_PRIVATE_KEY} template.
+                Description: The key under which to store/retrieve the private key from the keychain of this Cactus node (API server)The complete lookup key is constructed from the ${KEYCHAIN_SUFFIX_PRIVATE_KEY} template.
                 Default: CACTUS_NODE_PRIVATE_KEY
                 Env: KEYCHAIN_SUFFIX_PRIVATE_KEY
                 CLI: --keychain-suffix-private-key
   keychainSuffixPublicKey:
-                Description: The key under which to store/retrieve the public key from the keychain of this Cactus node (API server)The complete lookup key is constructed from the ${CACTUS_NODE_ID}${KEYCHAIN_SUFFIX_PRIVATE_KEY} template.
+                Description: The key under which to store/retrieve the public key from the keychain of this Cactus node (API server)The complete lookup key is constructed from the ${KEYCHAIN_SUFFIX_PRIVATE_KEY} template.
                 Default: CACTUS_NODE_PUBLIC_KEY
                 Env: KEYCHAIN_SUFFIX_PUBLIC_KEY
                 CLI: --keychain-suffix-public-key

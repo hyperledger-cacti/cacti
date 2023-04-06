@@ -59,9 +59,7 @@ describe(testCase, () => {
       consortiumDatabase: db,
     };
 
-    const pluginConsortiumManual: PluginConsortiumManual = new PluginConsortiumManual(
-      options,
-    );
+    const pluginConsortiumManual = new PluginConsortiumManual(options);
 
     // Setting up of the api-server for hosting the endpoints defined in the openapi specs
     // of the plugin
