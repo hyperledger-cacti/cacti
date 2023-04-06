@@ -974,6 +974,12 @@ export interface RunTransactionRequest {
      * @memberof RunTransactionRequest
      */
     endorsingParties?: Array<string>;
+    /**
+     * 
+     * @type {string}
+     * @memberof RunTransactionRequest
+     */
+    responseType?: string;
 }
 /**
  * 

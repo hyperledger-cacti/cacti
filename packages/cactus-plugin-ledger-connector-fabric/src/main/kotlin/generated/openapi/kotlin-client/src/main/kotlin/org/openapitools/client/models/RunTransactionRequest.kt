@@ -39,6 +39,7 @@ import com.squareup.moshi.Json
  * @param transientData 
  * @param gatewayOptions 
  * @param endorsingParties 
+ * @param responseType 
  */
 
 data class RunTransactionRequest (
@@ -72,7 +73,10 @@ data class RunTransactionRequest (
     val gatewayOptions: GatewayOptions? = null,
 
     @Json(name = "endorsingParties")
-    val endorsingParties: kotlin.collections.List<kotlin.String>? = null
+    val endorsingParties: kotlin.collections.List<kotlin.String>? = null,
+
+    @Json(name = "responseType")
+    val responseType: kotlin.String? = null
 
 )
 
