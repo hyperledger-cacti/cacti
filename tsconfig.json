@@ -141,6 +141,9 @@
     },
     {
       "path": "./packages/cactus-plugin-ledger-connector-ubiquity/tsconfig.json"
+    },
+    {
+      "path": "./packages/cactus-plugin-persistence-fabric/tsconfig.json"
     }
   ],
   "compilerOptions": {
