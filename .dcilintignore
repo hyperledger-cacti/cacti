@@ -26,3 +26,6 @@ weaver/core/network/corda-interop-app/interop-workflows/src/main/kotlin/org/hype
 
 # Corda test network files that are generated and therefore cannot be altered to comply with DCI-Lint
 weaver/tests/network-setups/corda/shared
+
+# Commit messages snuck disallowed terminology into the changelog files.
+CHANGELOG.md
