@@ -7,6 +7,8 @@ use crate::error::Error;
 /// Struct for managing all db interactions
 pub struct Database {
     pub db_path: String,
+    pub db_open_max_retries: u32,
+    pub db_open_retry_backoff_msec: u32,
 }
 
 impl Database {
@@ -15,16 +17,16 @@ impl Database {
         match req_db_result {
             Ok(db) => Ok(db),
             Err(error) => {
-                println!("Db open error: {:?}", error.to_string());
-                if retry.clone() >= 10 {
+                if retry.clone() >= self.db_open_max_retries.clone() {
                     println!("Db open error: {:?}", error);
                     return Err(Error::SledError(error));
                 }
                 let retry_error = "Resource temporarily unavailable";
                 return match error.to_string().find(retry_error) {
                     Some(_index) => {
-                        sleep(time::Duration::from_millis(1000));
-                        println!("Retrying DB open...");
+                        println!("Db locked temporarily with error: {:?}", error.to_string());
+                        sleep(time::Duration::from_millis(self.db_open_retry_backoff_msec.clone() as u64));
+                        println!("Retrying DB open attempt #{:?}...", retry.clone()+1);
                         let db_result = self.open_db(retry+1);
                         db_result
                     },

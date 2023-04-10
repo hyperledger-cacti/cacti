@@ -22,6 +22,8 @@ pub fn update_event_subscription_status(
     curr_request_id: String,
     new_status: ack::Status,
     curr_db_path: String,
+    db_open_max_retries: u32,
+    db_open_retry_backoff_msec: u32,
     message: String,
 ) {
     let driver_error_constants = fs::read_to_string("./driver/driver-error-constants.json").expect("Unable to read file: ./driver/driver-error-constants.json");
@@ -32,6 +34,8 @@ pub fn update_event_subscription_status(
 
     let db = Database {
         db_path: curr_db_path,
+        db_open_max_retries: db_open_max_retries,
+        db_open_retry_backoff_msec: db_open_retry_backoff_msec,
     };
     let event_sub_key = get_event_subscription_key(curr_request_id.clone());
     let result = db.get::<EventSubscriptionState>(event_sub_key.to_string());
@@ -171,7 +175,6 @@ pub fn update_event_subscription_status(
                 .expect("Failed to insert into DB");
             println!("Successfully written EventSubscriptionState to database");
             println!("{:?}\n", db.get::<EventSubscriptionState>(event_sub_key.to_string()).unwrap())
-
         },
         Err(e) => {
             println!("EventSubscription Request not found. Error: {:?}", e);
@@ -277,10 +280,14 @@ pub fn update_event_state(
     event_id: String,
     new_status: request_state::Status,
     curr_db_path: String,
+    db_open_max_retries: u32,
+    db_open_retry_backoff_msec: u32,
     message: String,
 ) {
     let db = Database {
         db_path: curr_db_path,
+        db_open_max_retries: db_open_max_retries,
+        db_open_retry_backoff_msec: db_open_retry_backoff_msec,
     };
     let event_publish_key = get_event_publication_key(request_id.to_string());
     let result = db.get::<EventStates>(event_publish_key.to_string());
@@ -309,7 +316,6 @@ pub fn update_event_state(
             db.set(&event_publish_key.to_string(), &updated_event_states)
                 .expect("Failed to insert into DB");
             println!("Successfully updated EventStates in database");
-            println!("{:?}\n", updated_event_states);
         },
         Err(e) => {
             println!("EventStates not found. Error: {:?}", e);
@@ -361,10 +367,14 @@ pub fn mark_event_states_deleted(fetched_event_states: EventStates, request_id: 
 pub fn delete_event_pub_spec(
     request_id: String,
     event_pub_spec: EventPublication,
-    curr_db_path: String
+    curr_db_path: String,
+    db_open_max_retries: u32,
+    db_open_retry_backoff_msec: u32,
 ) -> u8 {
     let db = Database {
         db_path: curr_db_path,
+        db_open_max_retries: db_open_max_retries,
+        db_open_retry_backoff_msec: db_open_retry_backoff_msec,
     };
     let mut event_sub_key = get_event_subscription_key(request_id.to_string());
     let mut event_sub_state = db.get::<EventSubscriptionState>(event_sub_key.to_string())
