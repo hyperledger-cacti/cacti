@@ -1,7 +1,7 @@
 import { GluegunCommand } from 'gluegun'
 import { getNetworkConfig, commandHelp } from '../../helper/helper'
 import { getContractInstance } from '../../helper/besu-functions'
-import { AssetManager } from '@hyperledger-labs/weaver-besu-interop-sdk'
+import { AssetManager } from '@hyperledger/cacti-weaver-sdk-besu'
 const Web3 = require('web3')
 
 const command: GluegunCommand = {

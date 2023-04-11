@@ -1,6 +1,6 @@
 [package]
-name = "weaver_protos_rs"
-version = "1.5.4"
+name = "cacti_weaver_protos_rs"
+version = "2.0.0-alpha-prerelease"
 authors = ["Peter Somogyvari  <peter.somogyvari@accenture.com>", "Sandeep Nishad <sandeep.nishad1@ibm.com"]
 edition = "2018"
 license = "Apache-2.0"
@@ -8,7 +8,7 @@ description = "Rust compiled Weaver protobuf package"
 documentation = "https://github.com/hyperledger/cacti/tree/main/weaver/rfcs/formats"
 repository = "https://github.com/hyperledger/cacti/"
 readme = "README.md"
-keywords = ["weaver", "interoperability", "protobuf", "protos"]
+keywords = ["cacti", "weaver", "interoperability", "protobuf", "protos"]
 
 [lib]
 name = "weaverpb"

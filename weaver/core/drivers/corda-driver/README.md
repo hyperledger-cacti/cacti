@@ -1,9 +1,9 @@
-<!--
+driver-corda<!--
  Copyright IBM Corp. All Rights Reserved.
 
  SPDX-License-Identifier: CC-BY-4.0
  -->
-# corda-driver
+# Corda Driver
 
 The Corda driver is used by the relays to interface with the Corda nodes. It
 triggers flows from the interoperation CorDapp to retrieve state given the query
@@ -52,14 +52,14 @@ make build-refresh-dependencies[-local]
 To run the driver, use the following:
 
 ```
-./build/install/corda-driver/bin/corda-driver
+./build/install/driver-corda/bin/driver-corda
 ```
 
 The driver gRPC server will be listening on port `9099`.
 
 ### With TLS
 
-If the relay expects a TLS connection over gRPC, you need to specify the following environment variables in the `corda-driver` command:
+If the relay expects a TLS connection over gRPC, you need to specify the following environment variables in the `driver-corda` command:
 - `RELAY_TLS`: should be set to `true`
 - One of the following:
   * If the relay server TLS CA certificates are in a password-protected Java Key Store (JKS file):
@@ -67,17 +67,17 @@ If the relay expects a TLS connection over gRPC, you need to specify the followi
     - `RELAY_TLSCA_TRUST_STORE_PASSWORD`: password used to create the JKS file
   * If the relay server TLS CA certificates are in separate PEM files in the filesystem:
     - `RELAY_TLSCA_CERT_PATHS`: colon-separated list of CA certificate file paths
-If you wish to run the driver service with TLS enabled, you need to specify the following environment variables in the `corda-driver` command:
+If you wish to run the driver service with TLS enabled, you need to specify the following environment variables in the `driver-corda` command:
 - `DRIVER_TLS`: should be set to `true`
 - `DRIVER_TLS_CERT_PATH`: driver's TLS certificate file path
 - `DRIVER_TLS_KEY_PATH`: driver's TLS private key file path
 - Example: both relay and driver are TLS-enabled, and a trust store is used as a certificate repository:
   ```bash
-  RELAY_TLS=true RELAY_TLSCA_TRUST_STORE_PASSWORD=password RELAY_TLSCA_TRUST_STORE=trust_store.jks DRIVER_TLS=true DRIVER_TLS_CERT_PATH=cert.pem DRIVER_TLS_KEY_PATH=key.pem ./build/install/corda-driver/bin/corda-driver
+  RELAY_TLS=true RELAY_TLSCA_TRUST_STORE_PASSWORD=password RELAY_TLSCA_TRUST_STORE=trust_store.jks DRIVER_TLS=true DRIVER_TLS_CERT_PATH=cert.pem DRIVER_TLS_KEY_PATH=key.pem ./build/install/driver-corda/bin/driver-corda
   ```
 - Example: only relay is TLS-enabled, and the driver's trusted certificates are in separate files in the filesystem:
   ```bash
-  RELAY_TLS=true RELAY_TLSCA_CERT_PATHS=ca_cert1.pem:ca_cert2.pem ./build/install/corda-driver/bin/corda-driver
+  RELAY_TLS=true RELAY_TLSCA_CERT_PATHS=ca_cert1.pem:ca_cert2.pem ./build/install/driver-corda/bin/driver-corda
   ```
 
 If the driver is deployed within a Docker container, set the same variables as above in the appropriate `.env` file. The following sample files in [./docker-testnet-envs/](./docker-testnet-envs) can be used and tweaked for Fabric drivers associated with particular testnets:
@@ -114,13 +114,13 @@ To push image to github container registry:
 ### Docker-Compose Deployment
 
 * Copy `.env.docker.template` to `.env`
-    - `NETWORK_NAME`: Used as suffix to corda-driver container name, i.e. `corda-driver-<network-name>` will be the name of the container.
+    - `NETWORK_NAME`: Used as suffix to driver-corda container name, i.e. `driver-corda-<network-name>` will be the name of the container.
     - `DRIVER_PORT`: Driver server port.
     - `DRIVER_RPC_USERNAME`: RPC user registered for Driver.
     - `DRIVER_RPC_PASSWORD`: Password for the above RPC user.
     - `EXTERNAL_NETWORK`: Name of the docker network in which the Corda containers are deployed.
     - `DOCKER_IMAGE_NAME`: _Keep this unchanged_.
-    - `DOCKER_TAG`: Refer here for the image tags available: [weaver-corda-driver](https://github.com/hyperledger-labs/weaver-dlt-interoperability/pkgs/container/weaver-corda-driver)
+    - `DOCKER_TAG`: Refer here for the image tags available: [cacti-weaver-driver-corda](https://github.com/hyperledger/cacti/pkgs/container/cacti-weaver-driver-corda)
     - `COMPOSE_PROJECT_NAME`: Docker project name for the Corda network to which this driver is supposed to attach. By default, the folder name of the Corda network's `docker-compose.yml`, is the project name.
     - `COMPOSE_PROJECT_NETWORK`: Docker project network name for the Corda network to which this driver is supposed to attach. By default, `default` is the project network name.
     - `RELAY_TLS`: Boolean flag indicating whether or not the local relay requires TLS connections
@@ -144,37 +144,10 @@ generate the code docs, run the following:
 ./gradlew dokka
 ```
 
-The docs are then located in `build/dokka/corda-driver`. Opening
+The docs are then located in `build/dokka/driver-corda`. Opening
 `index.html` in your browser will allow you to navigate through the project
 structure.
-
-## Notes on the proto dependencies
-
-This repo relies on data structures defined in
-[protos](../../../common/protos). It
-also has a dependency on the [interop
-CorDapp](../../../core/network/corda-interop-app), which
-itself has a dependency on the same proto files. Generating the java and Kotlin
-files from the proto files locally in this repository therefore creates some
-problems. Firstly, because the generated java and kotlin files are created under
-the namespace provided in the proto files (e.g. `common.state`), this creates
-two sets of the same source files in the classpath under the same namespace.
-Compiling the project then fails with conflicting dependencies. The other
-problem is that if the proto files do change, they need to be updated in two
-separate repositories.
-
-A workaround (or arguably, a cleaner solution) is for the corda-testnet project
-to use the generated java and kotlin source files that comes from the interop
-CorDapp. This means that there is guaranteed to be one consistent version of the
-files and we don't need to worry about conflicting dependencies. When the proto
-files are updated, they need to be updated in a single repo, instead of across
-multiple.
-
-To update the version number of the interop CorDapps that should be pulled from
-Github Maven Repository, change the version number of the `interop_cordapps_version` at the
-top of the `build.gradle` file. 
 
 ## TODO
 
 1. Create an Error class
-2. Make a script for pulling the latest interop cordapp (add to make)

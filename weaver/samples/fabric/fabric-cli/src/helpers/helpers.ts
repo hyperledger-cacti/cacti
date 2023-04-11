@@ -8,8 +8,8 @@ import { GluegunCommand } from 'gluegun'
 import { Toolbox } from 'gluegun/build/types/domain/toolbox'
 import { GluegunPrint } from 'gluegun/build/types/toolbox/print-types'
 import { getKeyAndCertForRemoteRequestbyUserName, fabricHelper, invoke, query, InvocationSpec } from './fabric-functions'
-import { AssetPledge } from "@hyperledger-labs/weaver-protos-js/common/asset_transfer_pb"
-import { InteroperableHelper } from '@hyperledger-labs/weaver-fabric-interop-sdk'
+import { AssetPledge } from "@hyperledger/cacti-weaver-protos-js/common/asset_transfer_pb"
+import { InteroperableHelper } from '@hyperledger/cacti-weaver-sdk-fabric'
 import * as crypto from 'crypto'
 import { promisify } from 'util'
 import * as fs from 'fs'

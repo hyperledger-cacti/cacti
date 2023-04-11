@@ -23,7 +23,7 @@ after PR approval, publish it to `hyperledger/cacti`.
 To publish to your fork, replace `<your-git-name>` with your github username in `github.properties`:
 ```
 ...
-url=https://maven.pkg.github.com/<your-git-name>/weaver-dlt-interoperability
+url=https://maven.pkg.github.com/<your-git-name>/cacti
 ```
 and then follow above 4 steps.
 
@@ -38,6 +38,6 @@ and then follow above 4 steps.
 5) Add this to your build.gradle (change the version accordingly):
 ```
 dependencies {
-	compile(group: 'com.weaver', name: 'protos-java-kt', version: "1.2.1")
+	compile(group: 'org.hyperledger.cacti.weaver', name: 'protos-java-kt', version: "1.2.1")
 }
 ```

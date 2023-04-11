@@ -1,9 +1,9 @@
 package net.corda.samples.tokenizedhouse.flows
 
-import org.hyperledger.cacti.weaver.corda.app.interop.states.AssetPledgeState
-import org.hyperledger.cacti.weaver.corda.app.interop.flows.GetAssetClaimStatusState
-import org.hyperledger.cacti.weaver.corda.app.interop.flows.GetAssetPledgeStatus
-import org.hyperledger.cacti.weaver.corda.app.interop.flows.AssetPledgeStateToProtoBytes
+import org.hyperledger.cacti.weaver.imodule.corda.states.AssetPledgeState
+import org.hyperledger.cacti.weaver.imodule.corda.flows.GetAssetClaimStatusState
+import org.hyperledger.cacti.weaver.imodule.corda.flows.GetAssetPledgeStatus
+import org.hyperledger.cacti.weaver.imodule.corda.flows.AssetPledgeStateToProtoBytes
 import net.corda.samples.tokenizedhouse.states.FungibleHouseTokenJson
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder

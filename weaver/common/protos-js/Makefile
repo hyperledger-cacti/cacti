@@ -5,7 +5,7 @@ build:
 	npm run build
 
 .PHONY: publish
-publish:
+publish: build
 	npm publish
 
 .PHONY: clean-build

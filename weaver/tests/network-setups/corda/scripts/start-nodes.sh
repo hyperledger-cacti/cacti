@@ -9,8 +9,7 @@ simpleAppVersion="0.4"
 houseTokenAppVersion="1.0"
 tokenVersion="1.2"
 
-weaverCordaVersion="1.2.14"
-weaverProtosVersion="1.5.7"
+cactiVersion="2.0.0-alpha-prerelease"
 
 parties="Notary PartyA PartyB PartyC"
 
@@ -31,10 +30,10 @@ for party in ${parties}; do
     echo "Cordapp not found" && exit 1
   fi
   
-  cp $directory/../shared/artifacts/interop-contracts-$weaverCordaVersion.jar dev/${nw}/build/nodes/${party}/cordapps
-  cp $directory/../shared/artifacts/interop-workflows-$weaverCordaVersion.jar dev/${nw}/build/nodes/${party}/cordapps
+  cp $directory/../shared/artifacts/interop-contracts-$cactiVersion.jar dev/${nw}/build/nodes/${party}/cordapps
+  cp $directory/../shared/artifacts/interop-workflows-$cactiVersion.jar dev/${nw}/build/nodes/${party}/cordapps
   
-  cp $directory/../shared/artifacts/protos-java-kt-$weaverProtosVersion.jar dev/${nw}/build/nodes/${party}/cordapps
+  cp $directory/../shared/artifacts/protos-java-kt-$cactiVersion.jar dev/${nw}/build/nodes/${party}/cordapps
 done;
 
 dockerProject="corda"

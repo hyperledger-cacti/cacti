@@ -3,8 +3,7 @@
 directory=$(dirname $0)
 app=${1:-simple}
 local=$2
-weaverCordaVersion="1.2.14"
-weaverProtosVersion="1.5.7"
+cactiVersion="2.0.0-alpha-prerelease"
 
 if [ "simple" = "$app" ]; then
   cordappPath=$directory/../../../../samples/corda/corda-simple-application
@@ -80,19 +79,19 @@ fi
 ######### Corda Interop App ###########
 
 if [[ $local == "local" ]]; then
-  if [[ ! -f $directory/../../../../common/protos-java-kt/build/libs/protos-java-kt-$weaverProtosVersion.jar ]]; then
-      echo "Please Build the weaver-protos-java-kt version $weaverVersion to use local components."
+  if [[ ! -f $directory/../../../../common/protos-java-kt/build/libs/protos-java-kt-$cactiVersion.jar ]]; then
+      echo "Please Build the weaver-protos-java-kt version $cactiVersion to use local components."
   fi  
-  if [[ ! -f $directory/../../../../core/network/corda-interop-app/interop-contracts/build/libs/interop-contracts-$weaverCordaVersion.jar ]]; then
-      echo "Please Build the corda-interop-app version $weaverVersion to use local components."
+  if [[ ! -f $directory/../../../../core/network/corda-interop-app/interop-contracts/build/libs/interop-contracts-$cactiVersion.jar ]]; then
+      echo "Please Build the corda-interop-app version $cactiVersion to use local components."
   fi 
-  if [[ ! -f $directory/../../../../core/network/corda-interop-app/interop-workflows/build/libs/interop-workflows-$weaverCordaVersion.jar ]]; then
-      echo "Please Build the corda-interop-app version $weaverVersion to use local components."
+  if [[ ! -f $directory/../../../../core/network/corda-interop-app/interop-workflows/build/libs/interop-workflows-$cactiVersion.jar ]]; then
+      echo "Please Build the corda-interop-app version $cactiVersion to use local components."
   fi 
   echo "Copying Corda Interop App..."
-  cp $directory/../../../../core/network/corda-interop-app/interop-contracts/build/libs/interop-contracts-$weaverCordaVersion.jar $directory/../shared/artifacts
-  cp $directory/../../../../core/network/corda-interop-app/interop-workflows/build/libs/interop-workflows-$weaverCordaVersion.jar $directory/../shared/artifacts
-  cp $directory/../../../../common/protos-java-kt/build/libs/protos-java-kt-$weaverProtosVersion.jar $directory/../shared/artifacts
+  cp $directory/../../../../core/network/corda-interop-app/interop-contracts/build/libs/interop-contracts-$cactiVersion.jar $directory/../shared/artifacts
+  cp $directory/../../../../core/network/corda-interop-app/interop-workflows/build/libs/interop-workflows-$cactiVersion.jar $directory/../shared/artifacts
+  cp $directory/../../../../common/protos-java-kt/build/libs/protos-java-kt-$cactiVersion.jar $directory/../shared/artifacts
 else
   file="$directory/../github.properties"
   if [ -f $file ]; then
@@ -101,9 +100,9 @@ else
     pkgurl=`sed '/^\#/d' $file | grep 'url=' | cut -d "=" -f2-`
     baseUrl="$pkgurl/org/hyperledger/cacti/weaver"
     echo "Downloading Corda Interop App from $baseUrl ..."
-    (cd $directory/../shared/artifacts && curl --location -u $username:$password -O $baseUrl/corda/app/interop/interop-contracts/$weaverCordaVersion/interop-contracts-$weaverCordaVersion.jar) || exit 1
-    (cd $directory/../shared/artifacts && curl --location -u $username:$password -O $baseUrl/corda/app/interop/interop-workflows/$weaverCordaVersion/interop-workflows-$weaverCordaVersion.jar) || exit 1
-    (cd $directory/../shared/artifacts && curl --location -u $username:$password -O $baseUrl/protos-java-kt/$weaverProtosVersion/protos-java-kt-$weaverProtosVersion.jar) || exit 1
+    (cd $directory/../shared/artifacts && curl --location -u $username:$password -O $baseUrl/imodule/corda/interop-contracts/$cactiVersion/interop-contracts-$cactiVersion.jar) || exit 1
+    (cd $directory/../shared/artifacts && curl --location -u $username:$password -O $baseUrl/imodule/corda//interop-workflows/$cactiVersion/interop-workflows-$cactiVersion.jar) || exit 1
+    (cd $directory/../shared/artifacts && curl --location -u $username:$password -O $baseUrl/protos/protos-java-kt/$cactiVersion/protos-java-kt-$cactiVersion.jar) || exit 1
   else
     echo Please copy the github.properties.template file as github.properties and replace placeholders with Github credentials.
   fi

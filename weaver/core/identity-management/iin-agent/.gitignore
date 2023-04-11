@@ -2,7 +2,7 @@
 /out
 /protos
 /protos-js
-/weaver-fabric-interop-sdk
+/cacti-weaver-sdk-fabric
 .env
 package-lock.json
 .npmrc

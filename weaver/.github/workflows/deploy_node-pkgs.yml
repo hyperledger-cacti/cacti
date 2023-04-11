@@ -11,7 +11,7 @@ on:
     paths:
       - 'common/protos-js/package.json'
       - 'sdks/fabric/interoperation-node-sdk/package.json'
-      - 'sdks/besu/interoperation-node-sdk/package.json'
+      - 'sdks/besu/node/package.json'
       - 'core/drivers/fabric-driver/VERSION'
       - 'core/identity-management/iin-agent/VERSION'
       
@@ -125,11 +125,11 @@ jobs:
           cp .npmrc.template .npmrc
           sed -i "s/<personal-access-token>/${{ secrets.GITHUB_TOKEN }}/g" .npmrc
           cat .npmrc
-        working-directory: sdks/besu/interoperation-node-sdk
+        working-directory: weaver/sdks/besu/node
         
       - name: Build
         run: make build
-        working-directory: sdks/besu/interoperation-node-sdk
+        working-directory: weaver/sdks/besu/node
         
       - name: Check if package already exists
         run : |
@@ -141,12 +141,12 @@ jobs:
           else
             echo "WEAVER_BESU_SDK_PUBLISH=true" >> $GITHUB_ENV
           fi
-        working-directory: sdks/besu/interoperation-node-sdk
+        working-directory: weaver/sdks/besu/node
         
       - name: Publish
         if: ${{ env.WEAVER_BESU_SDK_PUBLISH == 'true' }}
         run: make publish
-        working-directory: sdks/besu/interoperation-node-sdk
+        working-directory: weaver/sdks/besu/node
     
   publish-driver-image:
     if: ${{ always() && github.repository_owner == 'hyperledger-labs' }}

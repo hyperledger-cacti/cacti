@@ -16,10 +16,10 @@ const chai = require("chai");
 const sinon = require("sinon");
 const sinonChai = require("sinon-chai");
 
-import statePb from "@hyperledger-labs/weaver-protos-js/common/state_pb";
-import ackPb from "@hyperledger-labs/weaver-protos-js/common/ack_pb";
-import networksGrpcPb from "@hyperledger-labs/weaver-protos-js/networks/networks_grpc_pb";
-import networksPb from "@hyperledger-labs/weaver-protos-js/networks/networks_pb";
+import statePb from "@hyperledger/cacti-weaver-protos-js/common/state_pb";
+import ackPb from "@hyperledger/cacti-weaver-protos-js/common/ack_pb";
+import networksGrpcPb from "@hyperledger/cacti-weaver-protos-js/networks/networks_grpc_pb";
+import networksPb from "@hyperledger/cacti-weaver-protos-js/networks/networks_pb";
 
 const { expect } = chai;
 chai.use(sinonChai);

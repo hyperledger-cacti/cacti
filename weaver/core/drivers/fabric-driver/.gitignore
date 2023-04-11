@@ -7,7 +7,7 @@
 package-lock.json
 .npmrc
 driverdbs
-weaver-fabric-interop-sdk
+cacti-weaver-sdk-fabric
 wallet-network1/*.id
 !wallet-network1/relay.id
 wallet-network2/*.id

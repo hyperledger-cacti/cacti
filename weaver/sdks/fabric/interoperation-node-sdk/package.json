@@ -1,12 +1,12 @@
 {
-  "name": "@hyperledger-labs/weaver-fabric-interop-sdk",
+  "name": "@hyperledger/cacti-weaver-sdk-fabric",
   "description": "Supplemental library to 'fabric-client' with functions for relay-based cross-network interactions",
   "keywords": [
     "hyperledger",
     "blockchain",
     "interoperability"
   ],
-  "version": "1.5.9",
+  "version": "2.0.0-alpha-prerelease",
   "author": "V. Ramakrishna",
   "tag": "latest",
   "main": "build/index.js",
@@ -29,7 +29,7 @@
   "dependencies": {
     "@grpc/grpc-js": "^1.1.3",
     "@grpc/proto-loader": "^0.6.13",
-    "@hyperledger-labs/weaver-protos-js": "~1.5.7",
+    "@hyperledger/cacti-weaver-protos-js": "2.0.0-alpha-prerelease",
     "elliptic": "^6.2.3",
     "fabric-common": "^2.2.8",
     "fabric-network": "^2.2.8",
@@ -87,6 +87,6 @@
     "all": true
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com/hyperledger-labs"
+    "registry": "https://npm.pkg.github.com/hyperledger"
   }
 }

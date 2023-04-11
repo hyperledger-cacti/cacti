@@ -21,7 +21,7 @@ import java.util.*
 import com.cordaSimpleApplication.flow.CreateState
 import com.cordaSimpleApplication.state.SimpleState
 
-import org.hyperledger.cacti.weaver.corda.sdk.InteroperableHelper
+import org.hyperledger.cacti.weaver.sdk.corda.InteroperableHelper
 
 /**
  * The CLI command used to trigger a request for state from an external network.

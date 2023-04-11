@@ -6,14 +6,14 @@
 
 import fs from 'fs';
 import { Server, ServerCredentials, credentials } from '@grpc/grpc-js';
-import ack_pb from '@hyperledger-labs/weaver-protos-js/common/ack_pb';
-import query_pb from '@hyperledger-labs/weaver-protos-js/common/query_pb';
-import fabricViewPb from '@hyperledger-labs/weaver-protos-js/fabric/view_data_pb';
-import eventsPb from '@hyperledger-labs/weaver-protos-js/common/events_pb';
-import driver_pb_grpc from '@hyperledger-labs/weaver-protos-js/driver/driver_grpc_pb';
-import datatransfer_grpc_pb from '@hyperledger-labs/weaver-protos-js/relay/datatransfer_grpc_pb';
-import events_grpc_pb from '@hyperledger-labs/weaver-protos-js/relay/events_grpc_pb';
-import state_pb from '@hyperledger-labs/weaver-protos-js/common/state_pb';
+import ack_pb from '@hyperledger/cacti-weaver-protos-js/common/ack_pb';
+import query_pb from '@hyperledger/cacti-weaver-protos-js/common/query_pb';
+import fabricViewPb from '@hyperledger/cacti-weaver-protos-js/fabric/view_data_pb';
+import eventsPb from '@hyperledger/cacti-weaver-protos-js/common/events_pb';
+import driver_pb_grpc from '@hyperledger/cacti-weaver-protos-js/driver/driver_grpc_pb';
+import datatransfer_grpc_pb from '@hyperledger/cacti-weaver-protos-js/relay/datatransfer_grpc_pb';
+import events_grpc_pb from '@hyperledger/cacti-weaver-protos-js/relay/events_grpc_pb';
+import state_pb from '@hyperledger/cacti-weaver-protos-js/common/state_pb';
 import { invoke, packageFabricView } from './fabric-code';
 import 'dotenv/config';
 import { loadEventSubscriptionsFromStorage, monitorBlockForMissedEvents } from './listener'
@@ -22,7 +22,7 @@ import { subscribeEventHelper, unsubscribeEventHelper, signEventSubscriptionQuer
 import * as path from 'path';
 import { handlePromise, relayCallback, getRelayClientForQueryResponse, getRelayClientForEventSubscription, delay } from './utils';
 import { dbConnectionTest, eventSubscriptionTest } from "./tests"
-import driverPb from '@hyperledger-labs/weaver-protos-js/driver/driver_pb';
+import driverPb from '@hyperledger/cacti-weaver-protos-js/driver/driver_pb';
 import logger from './logger';
 
 if (process.env.DEBUG === 'true') {

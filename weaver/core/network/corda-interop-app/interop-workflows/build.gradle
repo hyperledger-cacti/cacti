@@ -74,7 +74,7 @@ dependencies {
     compile "io.arrow-kt:arrow-syntax:$arrow_version"
     
     // weaver-protos
-    implementation "org.hyperledger.cacti.weaver:protos-java-kt:$weaver_version"
+    implementation "org.hyperledger.cacti.weaver.protos:protos-java-kt:$cacti_version"
     
     compile "com.google.protobuf:protobuf-java:$protobuf_version"
     compile "com.google.protobuf:protobuf-java-util:$protobuf_version"

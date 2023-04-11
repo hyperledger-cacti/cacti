@@ -1,2 +1,2 @@
-rootProject.name = "corda-driver"
+rootProject.name = "driver-corda"
 
