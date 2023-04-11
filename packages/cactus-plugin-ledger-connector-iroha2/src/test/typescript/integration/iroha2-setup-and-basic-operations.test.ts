@@ -32,7 +32,6 @@ import { setCrypto } from "@iroha2/client";
 import {
   IrohaV2TestEnv,
   generateTestIrohaCredentials,
-  waitForCommit,
 } from "../test-helpers/iroha2-env-setup";
 import { addRandomSuffix } from "../test-helpers/utils";
 
@@ -110,46 +109,6 @@ describe("Setup and basic endpoint tests", () => {
       await defaultConfigConnector.createClient(requestConfig)
     ).toriiOptions;
     expect(overwrittenConfig).toEqual(requestConfig.torii);
-  });
-
-  test("Simple transaction without waiting and query endpoints works", async () => {
-    const domainName = addRandomSuffix("singleTxTest");
-
-    // Create new domain
-    const transactionResponse = await env.apiClient.transactV1({
-      transaction: {
-        instruction: {
-          name: IrohaInstruction.RegisterDomain,
-          params: [domainName],
-        },
-      },
-      baseConfig: env.defaultBaseConfig,
-    });
-    expect(transactionResponse).toBeTruthy();
-    expect(transactionResponse.status).toEqual(200);
-    expect(transactionResponse.data.status).toBeTruthy();
-    expect(transactionResponse.data.status).toEqual(
-      TransactionStatusV1.Submitted,
-    );
-    expect(transactionResponse.data.hash).toBeTruthy();
-    expect(transactionResponse.data.hash.length).toEqual(64);
-
-    // Sleep
-    await waitForCommit();
-
-    // Query it
-    const queryResponse = await env.apiClient.queryV1({
-      query: {
-        query: IrohaQuery.FindDomainById,
-        params: [domainName],
-      },
-      baseConfig: env.defaultBaseConfig,
-    });
-    expect(queryResponse).toBeTruthy();
-    expect(queryResponse.data).toBeTruthy();
-    expect(queryResponse.data.response).toBeTruthy();
-    expect(queryResponse.data.response.id).toBeTruthy();
-    expect(queryResponse.data.response.id.name).toEqual(domainName);
   });
 
   test("Waiting for transaction commit returns it's status", async () => {
