@@ -25,7 +25,6 @@ import {
 import {
   generateTestIrohaCredentials,
   IrohaV2TestEnv,
-  waitForCommit,
 } from "../test-helpers/iroha2-env-setup";
 import { addRandomSuffix } from "../test-helpers/utils";
 
@@ -160,17 +159,15 @@ describe("Generate and send signed transaction tests", () => {
     // 3. Send
     const transactionResponse = await env.apiClient.transactV1({
       signedTransaction,
+      waitForCommit: true,
       baseConfig: env.defaultBaseConfig,
     });
     expect(transactionResponse).toBeTruthy();
     expect(transactionResponse.status).toEqual(200);
     expect(transactionResponse.data.rejectReason).toBeUndefined();
     expect(transactionResponse.data.status).toEqual(
-      TransactionStatusV1.Submitted,
+      TransactionStatusV1.Committed,
     );
-
-    // Sleep
-    await waitForCommit();
 
     // Check if domain was created
     await assertDomainExistence(domainName);
