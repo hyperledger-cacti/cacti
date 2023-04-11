@@ -1,0 +1,28 @@
+{
+    "defaultSeverity": "error",
+    "extends": [
+        "tslint:recommended"
+    ],
+    "jsRules": {},
+    "rules": {
+        "variable-name": {
+            "options": [
+                "allow-leading-underscore",
+                "ban-keywords",
+                "check-format"
+            ]
+        },
+        "no-string-literal": false,
+        "no-var-requires": false,
+        "object-literal-shorthand": false,
+        "max-classes-per-file": false,
+        "no-console": false
+    },
+    "rulesDirectory": [],
+    "linterOptions": {
+        "exclude": [
+            "packages/cactus-sdk/src/main/typescript/generated/**/*.ts",
+            "packages/cactus-sdk/src/main/typescript/public-api.ts"
+        ]
+    }
+}
