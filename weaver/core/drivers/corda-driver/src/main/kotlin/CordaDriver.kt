@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.hyperledger.cacti.weaver.corda.driver
+package org.hyperledger.cacti.weaver.driver.corda
 
 import arrow.core.*
 import arrow.core.extensions.either.applicative.applicative
@@ -16,8 +16,8 @@ import com.google.protobuf.ByteString
 import net.corda.core.messaging.CordaRPCOps
 import java.util.*
 
-import org.hyperledger.cacti.weaver.corda.app.interop.flows.HandleExternalRequest
-import org.hyperledger.cacti.weaver.corda.sdk.InteroperableHelper
+import org.hyperledger.cacti.weaver.imodule.corda.flows.HandleExternalRequest
+import org.hyperledger.cacti.weaver.sdk.corda.InteroperableHelper
 import org.hyperledger.cacti.weaver.protos.common.query.QueryOuterClass
 import org.hyperledger.cacti.weaver.protos.common.state.State
 import org.hyperledger.cacti.weaver.protos.corda.ViewDataOuterClass
@@ -181,8 +181,6 @@ fun createCordaNodeConnection(rpcAddress: RpcAddress) = try {
 /**
  * useHandleExternalRequest function uses the interoperation CorDapp flow HandleExternalRequest to process the
  * external network query and returns a View.
- *
- * This function is currently breaking the corda-driver code because of conflicting dependencies with the proto libraries.
  *
  * @property proxy The Corda RPC connection proxy.
  * @property query The Query supplied by the requesting network.

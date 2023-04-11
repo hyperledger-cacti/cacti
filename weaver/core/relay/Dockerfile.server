@@ -1,8 +1,6 @@
 FROM rust:1.62.1-slim-bullseye AS builder
 
-RUN apt-get update
-
-RUN apt-get install curl musl-tools perl build-essential ca-certificates -y
+RUN apt-get update && apt-get install curl musl-tools perl build-essential ca-certificates -y
 
 # adding the musl library target so that we can build
 # the components for busybox/alpine environments

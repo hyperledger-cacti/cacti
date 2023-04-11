@@ -6,9 +6,9 @@
 
 version: '2'
 services:
-  corda-driver:
+  driver-corda:
     image: ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}
-    container_name: corda-driver-${NETWORK_NAME}
+    container_name: driver-corda-${NETWORK_NAME}
     environment:
       - DRIVER_PORT=${DRIVER_PORT}
       - DRIVER_RPC_USERNAME=${DRIVER_RPC_USERNAME}
@@ -23,8 +23,8 @@ services:
     ports:
       - "${DRIVER_PORT}:${DRIVER_PORT}"
     volumes:
-      - ${TLS_CREDENTIALS_DIR}:/corda-driver/credentials
-    command: sh -c "./bin/corda-driver"
+      - ${TLS_CREDENTIALS_DIR}:/corda/driver/credentials
+    command: sh -c "./bin/driver-corda"
 
 networks:
   default:

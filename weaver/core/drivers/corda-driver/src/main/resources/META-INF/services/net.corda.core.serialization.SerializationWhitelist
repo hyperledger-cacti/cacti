@@ -1,1 +1,1 @@
-org.hyperledger.cacti.weaver.corda.driver.CustomSerializationWhitelist
+org.hyperledger.cacti.weaver.driver.corda.CustomSerializationWhitelist

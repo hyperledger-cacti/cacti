@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.hyperledger.cacti.weaver.corda.app.interop
+package org.hyperledger.cacti.weaver.imodule.corda
 
 import net.corda.core.identity.CordaX500Name
 import net.corda.core.utilities.getOrThrow

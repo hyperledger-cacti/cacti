@@ -1,6 +1,6 @@
-DOCKER_IMAGE_NAME ?= weaver-iin-agent
+DOCKER_IMAGE_NAME ?= cacti-weaver-iin-agent
 DOCKER_TAG ?= `cat ./VERSION`
-DOCKER_REGISTRY ?= ghcr.io/hyperledger-labs
+DOCKER_REGISTRY ?= ghcr.io/hyperledger
 GIT_URL = https://github.com/hyperledger/cacti/weaver/core/identity-management/iin-agent
 DLT_SPECIFIC_DIR ?= .
 COMPOSE_ARG ?=
@@ -23,13 +23,13 @@ protos-js:
 		cp -r ../../../common/protos-js/relay ./protos-js/ && \
 		cp -r ../../../common/protos-js/package.json ./protos-js/
 
-weaver-fabric-interop-sdk:
-	mkdir -p weaver-fabric-interop-sdk && \
-		cp -r ../../../sdks/fabric/interoperation-node-sdk/build ./weaver-fabric-interop-sdk/ && \
-		cp -r ../../../sdks/fabric/interoperation-node-sdk/index.js ./weaver-fabric-interop-sdk/ && \
-		cp -r ../../../sdks/fabric/interoperation-node-sdk/package.json ./weaver-fabric-interop-sdk/package.json
+cacti-weaver-sdk-fabric:
+	mkdir -p cacti-weaver-sdk-fabric && \
+		cp -r ../../../sdks/fabric/interoperation-node-sdk/build ./cacti-weaver-sdk-fabric/ && \
+		cp -r ../../../sdks/fabric/interoperation-node-sdk/index.js ./cacti-weaver-sdk-fabric/ && \
+		cp -r ../../../sdks/fabric/interoperation-node-sdk/package.json ./cacti-weaver-sdk-fabric/package.json
 
-build-local: protos-js weaver-fabric-interop-sdk
+build-local: protos-js cacti-weaver-sdk-fabric
 	(cp package.json package-remote.json && \
 		cp package-local.json package.json && \
 		npm install) || \
@@ -37,13 +37,13 @@ build-local: protos-js weaver-fabric-interop-sdk
 	mv package-remote.json package.json # Only if success
 	npm run build
 
-build-image-local: protos-js weaver-fabric-interop-sdk
+build-image-local: protos-js cacti-weaver-sdk-fabric
 	cp package.json package-remote.json
 	cp package-local.json package.json
 	(docker build --build-arg BUILD_TAG="local" --build-arg GIT_URL=$(GIT_URL) -t ${DOCKER_IMAGE_NAME}:$(DOCKER_TAG) -f iinagent.local.Dockerfile . ) || \
 		(mv package-remote.json package.json && exit 1) # Only if fails
 	mv package-remote.json package.json # Only if success
-	rm -rf protos-js weaver-fabric-interop-sdk
+	rm -rf protos-js cacti-weaver-sdk-fabric
 	docker tag ${DOCKER_IMAGE_NAME}:$(DOCKER_TAG) $(DOCKER_IMAGE_NAME):latest
 
 build-image: .npmrc
@@ -77,4 +77,4 @@ clean:
 	rm -rf node_modules package-lock.json out
 	
 clean-local:
-	rm -rf node_modules package-lock.json out protos-js weaver-fabric-interop-sdk
+	rm -rf node_modules package-lock.json out protos-js cacti-weaver-sdk-fabric

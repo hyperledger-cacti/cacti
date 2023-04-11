@@ -22,7 +22,7 @@ examples/cactus-example-carbon-accounting-backend/src/main/json/generated/build-
 # Cannot be edited as its a name of a imported Corda library, and Corda syntax
 weaver/core/drivers/corda-driver/src/main/kotlin/CustomSerializationWhitelist.kt
 weaver/samples/corda/corda-simple-application/clients/src/main/kotlin/com/cordaSimpleApplication/client/CustomSerializationWhitelist.kt
-weaver/core/network/corda-interop-app/interop-workflows/src/main/kotlin/org/hyperledger/cacti/weaver/corda/app/interop/flows/customSerializers/CustomSerializationWhitelist.kt
+weaver/core/network/corda-interop-app/interop-workflows/src/main/kotlin/org/hyperledger/cacti/weaver/imodule/corda/flows/customSerializers/CustomSerializationWhitelist.kt
 
 # Corda test network files that are generated and therefore cannot be altered to comply with DCI-Lint
 weaver/tests/network-setups/corda/shared

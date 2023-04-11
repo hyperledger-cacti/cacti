@@ -1,6 +1,6 @@
-DOCKER_IMAGE_NAME ?= weaver-corda-driver
+DOCKER_IMAGE_NAME ?= cacti-weaver-driver-corda
 DOCKER_TAG ?= `cat ./VERSION`
-DOCKER_REGISTRY ?= ghcr.io/hyperledger-labs
+DOCKER_REGISTRY ?= ghcr.io/hyperledger
 GIT_URL = https://github.com/hyperledger/cacti/weaver/core/drivers/corda-driver
 
 COMPOSE_ARG ?=
@@ -48,7 +48,7 @@ push-image-latest:
 
 .PHONY: run
 run:
-	./build/install/corda-driver/bin/corda-driver
+	./build/install/driver-corda/bin/driver-corda
 	
 .PHONY: deploy
 deploy:

@@ -6,7 +6,7 @@ FROM node:16 AS builder-local
 WORKDIR /opt/iinagent
 
 ADD protos-js /opt/iinagent/protos-js
-ADD weaver-fabric-interop-sdk /opt/iinagent/weaver-fabric-interop-sdk
+ADD cacti-weaver-sdk-fabric /opt/iinagent/cacti-weaver-sdk-fabric
 ADD package.json .
 RUN npm install --unsafe-perm
 
@@ -31,7 +31,7 @@ WORKDIR /opt/iinagent
 
 ADD package.json .
 ADD protos-js /opt/iinagent/protos-js
-ADD weaver-fabric-interop-sdk /opt/iinagent/weaver-fabric-interop-sdk
+ADD cacti-weaver-sdk-fabric /opt/iinagent/cacti-weaver-sdk-fabric
 
 COPY --from=builder /opt/iinagent/package-lock.json /opt/iinagent/
 COPY --from=builder /opt/iinagent/node_modules /opt/iinagent/node_modules

@@ -3,21 +3,21 @@ ARG BUILD_TAG
 # Local Build
 # FROM node:16 AS builder-local
 # 
-# WORKDIR /fabric-driver
+# WORKDIR /driver/fabric
 
-# ADD protos-js /fabric-driver/protos-js
+# ADD protos-js /driver/fabric/protos-js
 
 # Remote build
 FROM node:16 AS builder-remote
 
-WORKDIR /fabric-driver
+WORKDIR /driver/fabric
 
 ADD .npmrc .
 ADD package.json .
 RUN npm install --unsafe-perm
 
-ADD server /fabric-driver/server
-ADD constants /fabric-driver/constants
+ADD server /driver/fabric/server
+ADD constants /driver/fabric/constants
 ADD tsconfig.json .
 ADD .eslintrc .
 ADD .prettierrc .
@@ -36,16 +36,16 @@ RUN adduser -D -s /bin/sh -u 1001 -G relay relay
 
 ENV NODE_ENV production
 
-WORKDIR /fabric-driver
+WORKDIR /driver/fabric
 
 ADD package.json .
 
-COPY --from=builder /fabric-driver/package-lock.json /fabric-driver/
-COPY --from=builder /fabric-driver/node_modules /fabric-driver/node_modules
-COPY --from=builder /fabric-driver/out /fabric-driver/out
-COPY --from=builder /fabric-driver/constants /fabric-driver/constants
+COPY --from=builder /driver/fabric/package-lock.json /driver/fabric/
+COPY --from=builder /driver/fabric/node_modules /driver/fabric/node_modules
+COPY --from=builder /driver/fabric/out /driver/fabric/out
+COPY --from=builder /driver/fabric/constants /driver/fabric/constants
 
-RUN chown -R relay:relay /fabric-driver
+RUN chown -R relay:relay /driver/fabric
 
 USER relay
 

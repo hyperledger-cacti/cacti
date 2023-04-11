@@ -56,7 +56,7 @@ To use the SDK, add following in your `build.gradle`:
 ```
 repositories {
     maven {
-        url https://maven.pkg.github.com/hyperledger-labs/weaver-dlt-interoperability
+        url https://maven.pkg.github.com/hyperledger/cacti
         credentials {
             username <github-email>
             password <github-personal-access-token>
@@ -64,9 +64,9 @@ repositories {
     }
 }
 dependencies {
-    implementation(group: 'org.hyperledger.cacti.weaver.corda.sdk', name: 'weaver-corda-sdk', version: "1.2.3")
-    implementation(group: 'org.hyperledger.cacti.weaver.corda.app.interop', name: 'interop-contracts', version: "1.2.3")
-    implementation(group: 'org.hyperledger.cacti.weaver.corda.app.interop', name: 'interop-workflows', version: "1.2.3")
+    implementation(group: 'org.hyperledger.cacti.weaver.sdk.corda', name: 'weaver-sdk-corda', version: "1.2.3")
+    implementation(group: 'org.hyperledger.cacti.weaver.imodule.corda', name: 'interop-contracts', version: "1.2.3")
+    implementation(group: 'org.hyperledger.cacti.weaver.imodule.corda', name: 'interop-workflows', version: "1.2.3")
     implementation(group: 'org.hyperledger.cacti.weaver', name: 'protos-java-kt', version: "1.2.3")
 }
 ```

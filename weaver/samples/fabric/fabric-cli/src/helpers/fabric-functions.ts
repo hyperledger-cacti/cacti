@@ -9,9 +9,9 @@ import { commandHelp, getNetworkConfig, saveUserCertToFile, handlePromise } from
 import * as FabricCAServices from 'fabric-ca-client'
 import { Certificate } from '@fidm/x509'
 import { Utils, ICryptoKey } from 'fabric-common'
-import * as membership_pb from "@hyperledger-labs/weaver-protos-js/common/membership_pb"
-import * as iin_agent_pb from "@hyperledger-labs/weaver-protos-js/identity/agent_pb"
-import { InteroperableHelper } from '@hyperledger-labs/weaver-fabric-interop-sdk'
+import * as membership_pb from "@hyperledger/cacti-weaver-protos-js/common/membership_pb"
+import * as iin_agent_pb from "@hyperledger/cacti-weaver-protos-js/identity/agent_pb"
+import { InteroperableHelper } from '@hyperledger/cacti-weaver-sdk-fabric'
 import * as path from 'path'
 import * as dotenv from 'dotenv'
 dotenv.config({ path: path.resolve(__dirname, '../../.env') })

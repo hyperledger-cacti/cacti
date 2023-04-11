@@ -22,7 +22,7 @@ const { NetworkImpl } = require("fabric-network/lib/network");
 const { Transaction } = require("fabric-network/lib/transaction");
 const assetManager = require("../src/AssetManager");
 const hashFunctions = require("../src/HashFunctions");
-import assetLocksPb from "@hyperledger-labs/weaver-protos-js/common/asset_locks_pb";
+import assetLocksPb from "@hyperledger/cacti-weaver-protos-js/common/asset_locks_pb";
 
 describe("AssetManager", () => {
     const mspId = "mspId";

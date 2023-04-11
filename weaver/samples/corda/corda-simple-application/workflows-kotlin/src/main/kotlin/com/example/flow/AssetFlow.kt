@@ -31,10 +31,10 @@ import sun.security.x509.UniqueIdentity
 import java.util.*
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import org.hyperledger.cacti.weaver.corda.app.interop.flows.GetAssetClaimStatusState
-import org.hyperledger.cacti.weaver.corda.app.interop.states.AssetPledgeState
-import org.hyperledger.cacti.weaver.corda.app.interop.flows.GetAssetPledgeStatus
-import org.hyperledger.cacti.weaver.corda.app.interop.flows.AssetPledgeStateToProtoBytes
+import org.hyperledger.cacti.weaver.imodule.corda.flows.GetAssetClaimStatusState
+import org.hyperledger.cacti.weaver.imodule.corda.states.AssetPledgeState
+import org.hyperledger.cacti.weaver.imodule.corda.flows.GetAssetPledgeStatus
+import org.hyperledger.cacti.weaver.imodule.corda.flows.AssetPledgeStateToProtoBytes
 
 
 /**

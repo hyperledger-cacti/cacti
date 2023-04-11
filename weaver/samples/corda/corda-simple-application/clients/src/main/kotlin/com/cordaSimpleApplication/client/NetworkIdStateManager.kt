@@ -6,8 +6,8 @@
 
 package com.cordaSimpleApplication.client
 
-import org.hyperledger.cacti.weaver.corda.app.interop.flows.CreateNetworkIdState
-import org.hyperledger.cacti.weaver.corda.app.interop.flows.RetrieveNetworkIdStateAndRef
+import org.hyperledger.cacti.weaver.imodule.corda.flows.CreateNetworkIdState
+import org.hyperledger.cacti.weaver.imodule.corda.flows.RetrieveNetworkIdStateAndRef
 import com.cordaSimpleApplication.flow.TransferAssetStateInitiator
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.requireObject
@@ -17,7 +17,7 @@ import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.default
 import net.corda.core.identity.CordaX500Name
 import net.corda.core.identity.Party
-import org.hyperledger.cacti.weaver.corda.app.interop.states.NetworkIdState
+import org.hyperledger.cacti.weaver.imodule.corda.states.NetworkIdState
 import java.lang.Exception
 import net.corda.core.messaging.startFlow
 

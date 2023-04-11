@@ -29,8 +29,8 @@
   ],
   "homepage": "https://github.com/hyperledger/cacti/weaver/samples/besu/simpleasset",
   "dependencies": {
-    "@hyperledger-labs/weaver-besu-interop-sdk": "file:../../../sdks/besu/interoperation-node-sdk",
-    "@hyperledger-labs/weaver-protos-js": "file:../../../common/protos-js",
+    "@hyperledger/cacti-weaver-sdk-besu": "file:../../../sdks/besu/node",
+    "@hyperledger/cacti-weaver-protos-js": "file:../../../common/protos-js",
     "@lazyledger/protobuf3-solidity-lib": "^0.6.0",
     "@openzeppelin/contracts": "^4.3.2",
     "@truffle/contract": "^4.2.14",
