@@ -4,12 +4,6 @@ use std::collections::HashMap;
 use serde::{Serialize, Deserialize};
 use wasm_bindgen::prelude::*;
 
-// When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
-// allocator.
-#[cfg(feature = "wee_alloc")]
-#[global_allocator]
-static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
-
 // We have to allow snake case because the JS side expects it.
 #[allow(non_snake_case)]
 #[wasm_bindgen]
