@@ -1,4 +1,4 @@
-FROM pandoc/latex:2.12
+FROM pandoc/latex:2.19
 
 RUN tlmgr list
 
