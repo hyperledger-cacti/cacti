@@ -58,7 +58,7 @@
     "@hyperledger/cactus-core-api": "1.2.0",
     "axios": "0.21.4",
     "express": "4.17.3",
-    "joi": "17.4.2",
+    "joi": "17.9.1",
     "openapi-types": "9.1.0",
     "prom-client": "13.2.0",
     "run-time-error": "1.4.0",
