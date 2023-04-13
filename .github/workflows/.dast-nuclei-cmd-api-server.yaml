@@ -24,7 +24,7 @@ jobs:
             && sudo rm -f /etc/apt/sources.list.d/sovrin.list*
 
       - name: Set up NodeJS v16.9.1
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.9.1
 
@@ -109,7 +109,7 @@ jobs:
       # - run: ls -alt
 
       - name: Start API Server & Run DAST
-        uses: BerniWittmann/background-server-action@v1.0.4
+        uses: BerniWittmann/background-server-action@v1.1.0
         env:
             # Needed because the wait-on syntax otherwise keeps thinking that
             # there is a problem due to our self signed certificates on the

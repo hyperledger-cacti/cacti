@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   publish:
-    runs-on: buildjet-2vcpu-ubuntu-2004
+    runs-on: ubuntu-2004-paid
     steps:
     - name: Install Indy SDK
       run: >
@@ -37,7 +37,7 @@ jobs:
         export GITVERSION=$(git describe --tags | awk -F'.' '{print $$1}')
         echo "GITVERSION=$GITVERSION" >> $GITHUB_ENV
 
-    - uses: actions/setup-java@v2
+    - uses: actions/setup-java@v3.11.0
       with:
         distribution: 'adopt'
         java-version: '8'
