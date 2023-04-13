@@ -16,12 +16,12 @@ concurrency:
 
 jobs:
   unit_test_interopcc:
-    runs-on: buildjet-2vcpu-ubuntu-2204
+    runs-on: ubuntu-latest-m
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3.1.0
 
     - name: Set up Go
-      uses: actions/setup-go@v2
+      uses: actions/setup-go@v4.0.0
       with:
         go-version: '1.20.2'
         
@@ -39,12 +39,12 @@ jobs:
 
   unit_test_assetmgmt:
     # if: ${{ false }}  # disable
-    runs-on: buildjet-2vcpu-ubuntu-2204
+    runs-on: ubuntu-latest-m
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3.1.0
 
     - name: Set up Go
-      uses: actions/setup-go@v2
+      uses: actions/setup-go@v4.0.0
       with:
         go-version: '1.20.2'
         
@@ -61,12 +61,12 @@ jobs:
       working-directory: weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt
 
   unit_test_simplestate:
-    runs-on: buildjet-2vcpu-ubuntu-2204
+    runs-on: ubuntu-latest-m
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3.1.0
 
     - name: Set up Go
-      uses: actions/setup-go@v2
+      uses: actions/setup-go@v4.0.0
       with:
         go-version: '1.20.2'
 
@@ -83,12 +83,12 @@ jobs:
       working-directory: weaver/samples/fabric/simplestate
  
   unit_test_simpleasset:
-    runs-on: buildjet-2vcpu-ubuntu-2204
+    runs-on: ubuntu-latest-m
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3.1.0
 
     - name: Set up Go
-      uses: actions/setup-go@v2
+      uses: actions/setup-go@v4.0.0
       with:
         go-version: '1.20.2'
 
@@ -105,12 +105,12 @@ jobs:
       working-directory: weaver/samples/fabric/simpleasset
 
   unit_test_simpleassetandinterop:
-    runs-on: buildjet-2vcpu-ubuntu-2204
+    runs-on: ubuntu-latest-m
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3.1.0
 
     - name: Set up Go
-      uses: actions/setup-go@v2
+      uses: actions/setup-go@v4.0.0
       with:
         go-version: '1.20.2'
 
@@ -127,12 +127,12 @@ jobs:
       working-directory: weaver/samples/fabric/simpleassetandinterop
 
   unit_test_simpleassettransfer:
-    runs-on: buildjet-2vcpu-ubuntu-2204
+    runs-on: ubuntu-latest-m
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3.1.0
 
     - name: Set up Go
-      uses: actions/setup-go@v2
+      uses: actions/setup-go@v4.0.0
       with:
         go-version: '1.20.2'
 

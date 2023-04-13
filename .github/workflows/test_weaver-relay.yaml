@@ -17,13 +17,13 @@ concurrency:
 jobs:
   unit_test_relay_local:
     # if: ${{ false }}
-    runs-on: buildjet-2vcpu-ubuntu-2204
+    runs-on: ubuntu-latest-m
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3.1.0
 
       - name: Install RUST Toolchain minimal stable with clippy and rustfmt
-        uses: actions-rs/toolchain@v1
+        uses: actions-rs/toolchain@v1.0.6
         with:
           profile: minimal
           toolchain: stable
@@ -68,13 +68,13 @@ jobs:
 
   unit_test_relay_tls_local:
     # if: ${{ false }}
-    runs-on: buildjet-2vcpu-ubuntu-2204
+    runs-on: ubuntu-latest-m
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3.1.0
 
       - name: Install RUST Toolchain minimal stable with clippy and rustfmt
-        uses: actions-rs/toolchain@v1
+        uses: actions-rs/toolchain@v1.0.6
         with:
           profile: minimal
           toolchain: stable
@@ -119,13 +119,13 @@ jobs:
 
   unit_test_relay:
     if: ${{ false }}
-    runs-on: buildjet-2vcpu-ubuntu-2204
+    runs-on: ubuntu-latest-m
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3.1.0
 
       - name: Install RUST Toolchain minimal stable with clippy and rustfmt
-        uses: actions-rs/toolchain@v1
+        uses: actions-rs/toolchain@v1.0.6
         with:
           profile: minimal
           toolchain: stable
@@ -158,13 +158,13 @@ jobs:
 
   unit_test_relay_tls:
     if: ${{ false }}
-    runs-on: buildjet-2vcpu-ubuntu-2204
+    runs-on: ubuntu-latest-m
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3.1.0
 
       - name: Install RUST Toolchain minimal stable with clippy and rustfmt
-        uses: actions-rs/toolchain@v1
+        uses: actions-rs/toolchain@v1.0.6
         with:
           profile: minimal
           toolchain: stable

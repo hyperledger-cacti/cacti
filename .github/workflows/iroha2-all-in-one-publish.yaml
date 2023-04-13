@@ -21,7 +21,7 @@ jobs:
   # Push image to GitHub Packages.
   # See also https://docs.docker.com/docker-hub/builds/
   build-tag-push-container:
-    runs-on: buildjet-2vcpu-ubuntu-2004
+    runs-on: ubuntu-2004-paid
     env:
       DOCKER_BUILDKIT: 1
       DOCKERFILE_PATH: ./tools/docker/iroha2-all-in-one/Dockerfile
@@ -31,7 +31,7 @@ jobs:
       contents: read
 
     steps:
-      - uses: actions/checkout@v2.4.0
+      - uses: actions/checkout@v3.1.0
 
       - name: Build image
         run: docker build $DOCKER_BUILD_DIR --file $DOCKERFILE_PATH --tag $IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}"

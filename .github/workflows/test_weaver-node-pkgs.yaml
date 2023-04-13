@@ -20,7 +20,7 @@ concurrency:
 jobs:
   unit_test_weaver_node_sdk_local:
 
-    runs-on: buildjet-2vcpu-ubuntu-2204
+    runs-on: ubuntu-latest-m
 
     strategy:
       matrix:
@@ -28,7 +28,7 @@ jobs:
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3.1.0
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3.6.0
       with:
@@ -51,7 +51,7 @@ jobs:
 
   unit_test_iin_agent_local:
 
-    runs-on: buildjet-2vcpu-ubuntu-2204
+    runs-on: ubuntu-latest-m
 
     strategy:
       matrix:
@@ -59,7 +59,7 @@ jobs:
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3.1.0
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3.6.0
       with:
@@ -84,10 +84,10 @@ jobs:
       working-directory: weaver/core/identity-management/iin-agent
 
   build_docs:
-    runs-on: buildjet-2vcpu-ubuntu-2204
+    runs-on: ubuntu-latest-m
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3.1.0
       
       - name: Use Node.js 16.x
         uses: actions/setup-node@v3.6.0

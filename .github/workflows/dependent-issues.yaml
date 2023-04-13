@@ -21,7 +21,7 @@ concurrency:
 
 jobs:
   check:
-    runs-on: buildjet-2vcpu-ubuntu-2204
+    runs-on: ubuntu-latest-m
     name: Dependent Issues
     steps:
       - uses: z0al/dependent-issues@v1
