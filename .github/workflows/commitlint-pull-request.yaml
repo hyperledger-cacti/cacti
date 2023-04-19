@@ -7,7 +7,7 @@ concurrency:
 
 jobs:
   commitlint:
-    runs-on: ubuntu-2004-paid
+    runs-on: cacti-ubuntu-20.04
     steps:
       - uses: actions/checkout@v3.1.0
         with:

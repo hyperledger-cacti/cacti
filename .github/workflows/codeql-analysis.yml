@@ -16,7 +16,7 @@ concurrency:
 jobs:
   analyze:
     name: Analyze
-    runs-on: ubuntu-2004-paid
+    runs-on: cacti-ubuntu-20.04
 
     strategy:
       fail-fast: false

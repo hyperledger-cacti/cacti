@@ -21,7 +21,7 @@ concurrency:
 
 jobs:
   check:
-    runs-on: ubuntu-latest-m
+    runs-on: cacti-ubuntu-latest
     name: Dependent Issues
     steps:
       - uses: z0al/dependent-issues@v1
