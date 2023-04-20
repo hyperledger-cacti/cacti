@@ -16,11 +16,11 @@ import events_grpc_pb from '@hyperledger-labs/weaver-protos-js/relay/events_grpc
 import state_pb from '@hyperledger-labs/weaver-protos-js/common/state_pb';
 import { invoke, packageFabricView } from './fabric-code';
 import 'dotenv/config';
-import { loadEventSubscriptionsFromStorage } from './listener'
+import { loadEventSubscriptionsFromStorage, monitorBlockForMissedEvents } from './listener'
 import { walletSetup } from './walletSetup';
 import { subscribeEventHelper, unsubscribeEventHelper, signEventSubscriptionQuery, writeExternalStateHelper } from "./events"
 import * as path from 'path';
-import { handlePromise, relayCallback, getRelayClientForQueryResponse, getRelayClientForEventSubscription } from './utils';
+import { handlePromise, relayCallback, getRelayClientForQueryResponse, getRelayClientForEventSubscription, delay } from './utils';
 import { dbConnectionTest, eventSubscriptionTest } from "./tests"
 import driverPb from '@hyperledger-labs/weaver-protos-js/driver/driver_pb';
 import logger from './logger';
@@ -253,6 +253,22 @@ const configSetup = async () => {
     logger.info(`Load Event Subscriptions Status: ${status}`);
 };
 
+const monitorService = async () => {
+    const delayTime: number = parseInt(process.env.MONITOR_SYNC_PERIOD ? process.env.MONITOR_SYNC_PERIOD : '30');
+    const networkName = process.env.NETWORK_NAME ? process.env.NETWORK_NAME : 'network1';
+    const flagEnable = process.env.ENABLE_MONITOR === 'false' ? false : true;
+    if (flagEnable) {
+        logger.info("Starting monitor...");
+        logger.info(`Monitor sync period: ${delayTime}`);
+    } else {
+        logger.info("Monitor disabled.");
+    }
+    while (flagEnable) {
+        await monitorBlockForMissedEvents(networkName);
+        await delay(delayTime * 1000);
+    }
+}
+
 // SERVER: Start the server with the provided url.
 // TODO: We should have credentials locally to ensure that the driver can only communicate with the local relay.
 if (process.env.DRIVER_TLS === 'true') {
@@ -268,6 +284,7 @@ if (process.env.DRIVER_TLS === 'true') {
         configSetup().then(() => {
             logger.info('Starting server with TLS');
             server.start();
+            monitorService();
         });
     });
 } else {
@@ -275,6 +292,7 @@ if (process.env.DRIVER_TLS === 'true') {
         configSetup().then(() => {
             logger.info('Starting server without TLS');
             server.start();
+            monitorService();
         });
     });
 }

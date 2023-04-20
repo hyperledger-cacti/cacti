@@ -117,7 +117,7 @@ const getDriverKeyCert = async (): Promise<any> => {
     const walletPath = process.env.WALLET_PATH ? process.env.WALLET_PATH : path.join(process.cwd(), `wallet-${process.env.NETWORK_NAME ? process.env.NETWORK_NAME : 'network1'}`);
     const config = getConfig();
     const wallet = await Wallets.newFileSystemWallet(walletPath);
-    logger.debug(`Wallet path: ${walletPath}`);
+    logger.info(`Wallet path: ${walletPath}, relay id: ${config.relay.name}`);
 
     const [keyCert, keyCertError] = await handlePromise(
         InteroperableHelper.getKeyAndCertForRemoteRequestbyUserName(wallet, config.relay.name)

@@ -48,7 +48,8 @@ class LevelDBConnector implements DBConnector {
     dbRetryBackoffTime: number;
     
     constructor(
-        dbName: string
+        dbName: string,
+        retryTimeout: number = 0
     ) {
         if (!dbName || dbName.length == 0) {
             dbName = "driverdb";
@@ -59,6 +60,9 @@ class LevelDBConnector implements DBConnector {
         this.dbOpenMaxRetries = process.env.LEVELDB_LOCKED_MAX_RETRIES ? parseInt(process.env.LEVELDB_LOCKED_MAX_RETRIES) : 250;
         // Retry back off time in ms, default 20ms
         this.dbRetryBackoffTime = process.env.LEVELDB_LOCKED_RETRY_BACKOFF_MSEC ? parseInt(process.env.LEVELDB_LOCKED_RETRY_BACKOFF_MSEC) : 20;
+        if (retryTimeout > 0) {
+            this.dbOpenMaxRetries = Math.floor(retryTimeout / this.dbRetryBackoffTime);
+        }
     }
 
     async open(
