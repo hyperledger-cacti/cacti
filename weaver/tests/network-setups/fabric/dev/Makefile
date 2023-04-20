@@ -1,6 +1,5 @@
-FABRIC_VERSION=2.4.7
-FABRIC_CA_VERSION=1.5.5
-FABRIC_COUCH_VERSION=0.4.20
+FABRIC_VERSION=2.5.0
+FABRIC_CA_VERSION=1.5.6
 CHAINCODE_NAME?=simplestate
 NW?=network1
 E2E_CONFIDENTIALITY?=false
@@ -100,7 +99,8 @@ deploy-cc-local: setup-cc-local
 
 
 .fabric-setup:
-	curl -sSL https://bit.ly/2ysbOFE | bash -s -- $(FABRIC_VERSION) $(FABRIC_CA_VERSION) $(FABRIC_COUCH_VERSION) -s
+	curl -sSLO https://raw.githubusercontent.com/hyperledger/fabric/main/scripts/install-fabric.sh && chmod +x install-fabric.sh
+	./install-fabric.sh --fabric-version $(FABRIC_VERSION) --ca-version $(FABRIC_CA_VERSION) docker binary
 	touch .fabric-setup
 
 .PHONY: stop
@@ -130,11 +130,14 @@ remove-network2:
 .PHONY: clean
 clean:	remove
 	+docker system prune -f || true
-	+rm -rf bin || true
 	+rm -rf config || true
-	+rm .fabric-setup || true
 	+chmod -R 755 ../shared/chaincode/interop
 	+rm -rf ../shared/chaincode/*
+
+.PHONY: clean-all	
+clean-all: clean
+	+rm -rf bin || true
+	+rm .fabric-setup || true
 
 chmod-artifacts:
 	sudo chmod 644 ../shared/network1/fabric-ca/ordererOrg/msp/keystore/*
