@@ -26,6 +26,8 @@ services:
       - DEBUG=false
       - LEVELDB_LOCKED_MAX_RETRIES=${LEVELDB_LOCKED_MAX_RETRIES}
       - LEVELDB_LOCKED_RETRY_BACKOFF_MSEC=${LEVELDB_LOCKED_RETRY_BACKOFF_MSEC}
+      - ENABLE_MONITOR=${ENABLE_MONITOR}
+      - MONITOR_SYNC_PERIOD=${MONITOR_SYNC_PERIOD}
     volumes:
       - ${CONNECTION_PROFILE}:/fabric-driver/ccp.json
       - ${DRIVER_CONFIG}:/fabric-driver/config.json
