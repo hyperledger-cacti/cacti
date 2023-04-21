@@ -6,25 +6,31 @@ name: Deploy Node JS Packages
 
 on:
   push:
-    branches:
-      - main
-    paths:
-      - 'common/protos-js/package.json'
-      - 'sdks/fabric/interoperation-node-sdk/package.json'
-      - 'sdks/besu/node/package.json'
-      - 'core/drivers/fabric-driver/VERSION'
-      - 'core/identity-management/iin-agent/VERSION'
+    # branches:
+    #   - main
+    # paths:
+    #   - 'common/protos-js/package.json'
+    #   - 'sdks/fabric/interoperation-node-sdk/package.json'
+    #   - 'sdks/besu/node/package.json'
+    #   - 'core/drivers/fabric-driver/VERSION'
+    #   - 'core/identity-management/iin-agent/VERSION'
+    tags:
+      - v*
       
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
-  publish-protos:
-    if: github.repository_owner == 'hyperledger-labs'
+  publish-protos-js:
+    if: github.repository_owner == 'hyperledger'
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3.1.0
       
       - name: Use Node.js 14.x
         uses: actions/setup-node@v2
@@ -41,13 +47,22 @@ jobs:
           cp .npmrc.template .npmrc
           sed -i "s/<personal-access-token>/${{ secrets.GITHUB_TOKEN }}/g" .npmrc
           cat .npmrc
-        working-directory: common/protos-js
+        working-directory: weaver/common/protos-js
+        
+      - name: Update version
+        run: |
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          # Strip "v" prefix from tag name
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+          sed -i "s#\"version\":.*#\"version\": \"${VERSION}\"#g" package.json
+          head -4 package.json
+        working-directory: weaver/common/protos-js
         
       - name: Build
         run: |
           export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
           make build
-        working-directory: common/protos-js
+        working-directory: weaver/common/protos-js
         
       - name: Check if package already exists
         run : |
@@ -59,20 +74,24 @@ jobs:
           else
             echo "PROTOS_JS_PUBLISH=true" >> $GITHUB_ENV
           fi
-        working-directory: common/protos-js
+        working-directory: weaver/common/protos-js
         
       - name: Publish
         if: ${{ env.PROTOS_JS_PUBLISH == 'true' }}
         run: make publish
-        working-directory: common/protos-js
+        working-directory: weaver/common/protos-js
         
   publish-fabric-sdk:
-    if: ${{ always() && github.repository_owner == 'hyperledger-labs' }}
-    needs: [publish-protos]
+    if: ${{ always() && github.repository_owner == 'hyperledger' }}
+    needs: [publish-protos-js]
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3.1.0
       
       - name: Use Node.js 14.x
         uses: actions/setup-node@v2
@@ -84,11 +103,20 @@ jobs:
           cp .npmrc.template .npmrc
           sed -i "s/<personal-access-token>/${{ secrets.GITHUB_TOKEN }}/g" .npmrc
           cat .npmrc
-        working-directory: sdks/fabric/interoperation-node-sdk
+        working-directory: weaver/sdks/fabric/interoperation-node-sdk
+        
+      - name: Update version
+        run: |
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          # Strip "v" prefix from tag name
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+          sed -i "s#\"version\":.*#\"version\": \"${VERSION}\"#g" package.json
+          head -4 package.json
+        working-directory: weaver/sdks/fabric/interoperation-node-sdk
         
       - name: Build
         run: make build
-        working-directory: sdks/fabric/interoperation-node-sdk
+        working-directory: weaver/sdks/fabric/interoperation-node-sdk
         
       - name: Check if package already exists
         run : |
@@ -100,20 +128,24 @@ jobs:
           else
             echo "WEAVER_FABRIC_SDK_PUBLISH=true" >> $GITHUB_ENV
           fi
-        working-directory: sdks/fabric/interoperation-node-sdk
+        working-directory: weaver/sdks/fabric/interoperation-node-sdk
         
       - name: Publish
         if: ${{ env.WEAVER_FABRIC_SDK_PUBLISH == 'true' }}
         run: make publish
-        working-directory: sdks/fabric/interoperation-node-sdk
+        working-directory: weaver/sdks/fabric/interoperation-node-sdk
         
   publish-besu-sdk:
-    if: ${{ always() && github.repository_owner == 'hyperledger-labs' }}
-    needs: [publish-protos]
+    if: ${{ always() && github.repository_owner == 'hyperledger' }}
+    needs: [publish-protos-js]
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3.1.0
       
       - name: Use Node.js 14.x
         uses: actions/setup-node@v2
@@ -125,6 +157,15 @@ jobs:
           cp .npmrc.template .npmrc
           sed -i "s/<personal-access-token>/${{ secrets.GITHUB_TOKEN }}/g" .npmrc
           cat .npmrc
+        working-directory: weaver/sdks/besu/node
+        
+      - name: Update version
+        run: |
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          # Strip "v" prefix from tag name
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+          sed -i "s#\"version\":.*#\"version\": \"${VERSION}\"#g" package.json
+          head -4 package.json
         working-directory: weaver/sdks/besu/node
         
       - name: Build
@@ -149,12 +190,16 @@ jobs:
         working-directory: weaver/sdks/besu/node
     
   publish-driver-image:
-    if: ${{ always() && github.repository_owner == 'hyperledger-labs' }}
-    needs: [publish-protos, publish-fabric-sdk]
+    if: ${{ always() && github.repository_owner == 'hyperledger' }}
+    needs: [publish-protos-js, publish-fabric-sdk]
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3.1.0
       
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v1
@@ -168,29 +213,42 @@ jobs:
           cp .npmrc.template .npmrc
           sed -i "s/<personal-access-token>/${{ secrets.GITHUB_TOKEN }}/g" .npmrc
           cat .npmrc
-        working-directory: core/drivers/fabric-driver
+        working-directory: weaver/core/drivers/fabric-driver
+        
+      - name: Update version
+        run: |
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          # Strip "v" prefix from tag name
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+          echo -n $VERSION > VERSION
+          cat VERSION
+        working-directory: weaver/core/drivers/fabric-driver
 
       - name: Check if package already exists
         run: (make check-if-tag-exists && echo "FABRIC_DRIVER_PUSH=true" >> $GITHUB_ENV) || echo "FABRIC_DRIVER_PUSH=false" >> $GITHUB_ENV
-        working-directory: core/drivers/fabric-driver
+        working-directory: weaver/core/drivers/fabric-driver
 
       - name: Build and Push
         if: ${{ env.FABRIC_DRIVER_PUSH == 'true' }}
         run: make push-image
-        working-directory: core/drivers/fabric-driver
+        working-directory: weaver/core/drivers/fabric-driver
         
       - name: Push latest tag
         if: ${{ env.FABRIC_DRIVER_PUSH == 'true' }}
         run: make push-image-latest
-        working-directory: core/drivers/fabric-driver
+        working-directory: weaver/core/drivers/fabric-driver
         
   publish-iin-agent-image:
-    if: ${{ always() && github.repository_owner == 'hyperledger-labs' }}
-    needs: [publish-protos, publish-fabric-sdk]
+    if: ${{ always() && github.repository_owner == 'hyperledger' }}
+    needs: [publish-protos-js, publish-fabric-sdk]
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3.1.0
       
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v1
@@ -204,18 +262,27 @@ jobs:
           cp .npmrc.template .npmrc
           sed -i "s/<personal-access-token>/${{ secrets.GITHUB_TOKEN }}/g" .npmrc
           cat .npmrc
-        working-directory: core/identity-management/iin-agent
+        working-directory: weaver/core/identity-management/iin-agent
+        
+      - name: Update version
+        run: |
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          # Strip "v" prefix from tag name
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+          echo -n $VERSION > VERSION
+          cat VERSION
+        working-directory: weaver/core/identity-management/iin-agent
 
       - name: Check if package already exists
         run: (make check-if-tag-exists && echo "IINAGENT_PUSH=true" >> $GITHUB_ENV) || echo "IINAGENT_PUSH=false" >> $GITHUB_ENV
-        working-directory: core/identity-management/iin-agent
+        working-directory: weaver/core/identity-management/iin-agent
 
       - name: Build and Push
         if: ${{ env.IINAGENT_PUSH == 'true' }}
         run: make push-image
-        working-directory: core/identity-management/iin-agent
+        working-directory: weaver/core/identity-management/iin-agent
         
       - name: Push latest tag
         if: ${{ env.IINAGENT_PUSH == 'true' }}
         run: make push-image-latest
-        working-directory: core/identity-management/iin-agent
+        working-directory: weaver/core/identity-management/iin-agent

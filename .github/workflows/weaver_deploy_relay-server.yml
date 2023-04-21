@@ -1,0 +1,94 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: CC-BY-4.0
+
+name: Deploy Relay Docker Image
+
+on:
+  push:
+    # branches:
+    #   - main
+    # paths:
+    #   - 'common/protos-rs/pkg/Cargo.toml'
+    #   - 'core/relay/VERSION'
+    tags:
+      - v*
+      
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  publish-protos-rs:
+      if: github.repository_owner == 'hyperledger'
+      runs-on: ubuntu-latest
+      permissions:
+        packages: write
+        contents: read
+
+      steps:
+        # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+        - uses: actions/checkout@v3.1.0
+
+        - name: Install RUST Toolchain minimal stable with clippy and rustfmt
+          uses: actions-rs/toolchain@v1.0.6
+          with:
+            profile: minimal
+            toolchain: stable
+            components: rustfmt, clippy
+            
+        - name: Update version
+          run: |
+            VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+            # Strip "v" prefix from tag name
+            [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+            sed -i "s#^version\s*=.*#version = ${VERSION}#g" Cargo.toml
+            head -4 Cargo.toml
+          working-directory: weaver/common/protos-rs/pkg
+            
+        - name: Publish
+          run: cargo publish --token ${CRATES_TOKEN}
+          env:
+            CRATES_TOKEN: ${{ secrets.CARGO_CRATES_IO_TOKEN }}
+          working-directory: weaver/common/protos-rs/pkg
+    
+  publish-relay-image:
+    if: github.repository_owner == 'hyperledger'
+    needs: publish_protos-rs
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3.1.0
+      
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Update version
+        run: |
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          # Strip "v" prefix from tag name
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+          echo -n $VERSION > VERSION
+          cat VERSION
+        working-directory: weaver/core/relay
+          
+      - name: Check if package already exists
+        run: (make check-if-tag-exists && echo "RELAY_PUSH=true" >> $GITHUB_ENV) || echo "RELAY_PUSH=false" >> $GITHUB_ENV
+        working-directory: weaver/core/relay
+          
+      - name: Build and Push
+        if: ${{ env.RELAY_PUSH == 'true' }}
+        run: make push-server
+        working-directory: weaver/core/relay
+        
+      - name: Push latest tag
+        if: ${{ env.RELAY_PUSH == 'true' }}
+        run: (cat out | grep "exists") || make push-server-latest
+        working-directory: weaver/core/relay

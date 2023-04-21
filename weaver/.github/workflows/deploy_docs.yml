@@ -15,11 +15,11 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy-docs:
+  publish-docs:
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3.1.0
       
       - name: Use Node.js 16.x
         uses: actions/setup-node@v2
@@ -28,11 +28,11 @@ jobs:
 
       - name: NPM INSTALL
         run: npm install
-        working-directory: docs
+        working-directory: weaver/docs
         
       - name: Build
         run: npm run build
-        working-directory: docs
+        working-directory: weaver/docs
         
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4.3.0
