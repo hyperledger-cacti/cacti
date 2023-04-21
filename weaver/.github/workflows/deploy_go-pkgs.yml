@@ -20,12 +20,12 @@ on:
   workflow_dispatch:
 
 jobs:
-  publish-protos:
-    if: github.repository_owner == 'hyperledger-labs'
+  publish-protos-go:
+    if: github.repository_owner == 'hyperledger'
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3.1.0
           
       - name: Set current date as env
         run: echo "RELEASE_DATE=$(date +%b\ %d,\ %Y)" >> $GITHUB_ENV
@@ -37,11 +37,11 @@ jobs:
         
       - name: Set module version
         run: echo "VERSION=v$(cat VERSION)" >> $GITHUB_ENV
-        working-directory: common/protos-go
+        working-directory: weaver/common/protos-go
         
       - name: Check if release already exists
         run: (git ls-remote origin | grep "$MODULE_TAG/$VERSION" && echo "PROTOS_GO_RELEASE=false" >> $GITHUB_ENV) || echo "PROTOS_GO_RELEASE=true" >> $GITHUB_ENV
-        working-directory: common/protos-go
+        working-directory: weaver/common/protos-go
             
       - name: Create Release
         if: ${{ env.PROTOS_GO_RELEASE == 'true' }}
@@ -65,12 +65,12 @@ jobs:
         run: sleep 300
           
   publish-lib-utils:
-    if: ${{ always() && github.repository_owner == 'hyperledger-labs' }}
-    needs: publish-protos
+    if: ${{ always() && github.repository_owner == 'hyperledger' }}
+    needs: publish-protos-go
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3.1.0
       
       - name: Set up Go
         uses: actions/setup-go@v2
@@ -87,15 +87,15 @@ jobs:
         
       - name: Set module version
         run: echo "VERSION=v$(cat VERSION)" >> $GITHUB_ENV
-        working-directory: core/network/fabric-interop-cc/libs/utils
+        working-directory: weaver/core/network/fabric-interop-cc/libs/utils
         
       - name: Build test
         run: go build -v ./...
-        working-directory: core/network/fabric-interop-cc/libs/utils
+        working-directory: weaver/core/network/fabric-interop-cc/libs/utils
         
       - name: Check if release already exists
         run: (git ls-remote origin | grep "$MODULE_TAG/$VERSION" && echo "LIB_UTILS_RELEASE=false" >> $GITHUB_ENV) || echo "LIB_UTILS_RELEASE=true" >> $GITHUB_ENV
-        working-directory: core/network/fabric-interop-cc/libs/utils
+        working-directory: weaver/core/network/fabric-interop-cc/libs/utils
             
       - name: Create Release
         if: ${{ env.LIB_UTILS_RELEASE == 'true' }}
@@ -119,12 +119,12 @@ jobs:
         run: sleep 300
 
   publish-lib-asset-exchange:
-    if: ${{ always() && github.repository_owner == 'hyperledger-labs' }}
-    needs: publish-protos
+    if: ${{ always() && github.repository_owner == 'hyperledger' }}
+    needs: publish-protos-go
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3.1.0
       
       - name: Set up Go
         uses: actions/setup-go@v2
@@ -141,15 +141,15 @@ jobs:
         
       - name: Set module version
         run: echo "VERSION=v$(cat VERSION)" >> $GITHUB_ENV
-        working-directory: core/network/fabric-interop-cc/libs/assetexchange
+        working-directory: weaver/core/network/fabric-interop-cc/libs/assetexchange
 
       - name: Build test
         run: go build -v ./...
-        working-directory: core/network/fabric-interop-cc/libs/assetexchange
+        working-directory: weaver/core/network/fabric-interop-cc/libs/assetexchange
         
       - name: Check if release already exists
         run: (git ls-remote origin | grep "$MODULE_TAG/$VERSION" && echo "LIB_ASSET_EXCHANGE_RELEASE=false" >> $GITHUB_ENV) || echo "LIB_ASSET_EXCHANGE_RELEASE=true" >> $GITHUB_ENV
-        working-directory: core/network/fabric-interop-cc/libs/assetexchange
+        working-directory: weaver/core/network/fabric-interop-cc/libs/assetexchange
             
       - name: Create Release
         if: ${{ env.LIB_ASSET_EXCHANGE_RELEASE == 'true' }}
@@ -173,12 +173,12 @@ jobs:
         run: sleep 300
       
   publish-interface-asset-mgmt:
-    if: ${{ always() && github.repository_owner == 'hyperledger-labs' }}
-    needs: [publish-protos]
+    if: ${{ always() && github.repository_owner == 'hyperledger' }}
+    needs: [publish-protos-go]
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3.1.0
       
       - name: Set up Go
         uses: actions/setup-go@v2
@@ -195,15 +195,15 @@ jobs:
         
       - name: Set module version
         run: echo "VERSION=v$(cat VERSION)" >> $GITHUB_ENV
-        working-directory: core/network/fabric-interop-cc/interfaces/asset-mgmt
+        working-directory: weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt
       
       - name: Build test
         run: go build -v ./...
-        working-directory: core/network/fabric-interop-cc/interfaces/asset-mgmt
+        working-directory: weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt
         
       - name: Check if release already exists
         run: (git ls-remote origin | grep "$MODULE_TAG/$VERSION" && echo "INTERFACE_ASSET_MGMT_RELEASE=false" >> $GITHUB_ENV) || echo "INTERFACE_ASSET_MGMT_RELEASE=true" >> $GITHUB_ENV
-        working-directory: core/network/fabric-interop-cc/interfaces/asset-mgmt
+        working-directory: weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt
             
       - name: Create Release
         if: ${{ env.INTERFACE_ASSET_MGMT_RELEASE == 'true' }}
@@ -227,12 +227,12 @@ jobs:
         run: sleep 300
 
   publish-interop-cc:
-    if: ${{ always() && github.repository_owner == 'hyperledger-labs' }}
-    needs: [publish-protos, publish-lib-utils, publish-lib-asset-exchange]
+    if: ${{ always() && github.repository_owner == 'hyperledger' }}
+    needs: [publish-protos-go, publish-lib-utils, publish-lib-asset-exchange]
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3.1.0
       
       - name: Set up Go
         uses: actions/setup-go@v2
@@ -249,15 +249,15 @@ jobs:
         
       - name: Set module version
         run: echo "VERSION=v$(cat VERSION)" >> $GITHUB_ENV
-        working-directory: core/network/fabric-interop-cc/contracts/interop
+        working-directory: weaver/core/network/fabric-interop-cc/contracts/interop
         
       - name: Build test
         run: make build
-        working-directory: core/network/fabric-interop-cc/contracts/interop
+        working-directory: weaver/core/network/fabric-interop-cc/contracts/interop
         
       - name: Check if release already exists
         run: (git ls-remote origin | grep "$MODULE_TAG/$VERSION" && echo "INTEROPCC_RELEASE=false" >> $GITHUB_ENV) || echo "INTEROPCC_RELEASE=true" >> $GITHUB_ENV
-        working-directory: core/network/fabric-interop-cc/contracts/interop
+        working-directory: weaver/core/network/fabric-interop-cc/contracts/interop
             
       - name: Create Release
         if: ${{ env.INTEROPCC_RELEASE == 'true' }}
@@ -281,12 +281,12 @@ jobs:
         run: sleep 300
 
   publish-go-sdk:
-    if: ${{ always() && github.repository_owner == 'hyperledger-labs' }}
-    needs: [publish-protos]
+    if: ${{ always() && github.repository_owner == 'hyperledger' }}
+    needs: [publish-protos-go]
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3.1.0
       
       - name: Set up Go
         uses: actions/setup-go@v2
@@ -303,15 +303,15 @@ jobs:
         
       - name: Set module version
         run: echo "VERSION=v$(cat VERSION)" >> $GITHUB_ENV
-        working-directory: sdks/fabric/go-sdk
+        working-directory: weaver/sdks/fabric/go-sdk
         
       - name: Build test
         run: go build -v ./...
-        working-directory: sdks/fabric/go-sdk
+        working-directory: weaver/sdks/fabric/go-sdk
         
       - name: Check if release already exists
         run: (git ls-remote origin | grep "$MODULE_TAG/$VERSION" && echo "WEAVER_FABRIC_GO_SDK=false" >> $GITHUB_ENV) || echo "WEAVER_FABRIC_GO_SDK=true" >> $GITHUB_ENV
-        working-directory: sdks/fabric/go-sdk
+        working-directory: weaver/sdks/fabric/go-sdk
             
       - name: Create Release
         if: ${{ env.WEAVER_FABRIC_GO_SDK == 'true' }}
@@ -335,12 +335,12 @@ jobs:
         run: sleep 300
         
   publish-weaver-fabric-cc-image:
-    if: ${{ always() && github.repository_owner == 'hyperledger-labs' }}
-    needs: [publish-protos, publish-lib-utils, publish-lib-asset-exchange]
+    if: ${{ always() && github.repository_owner == 'hyperledger' }}
+    needs: [publish-protos-go, publish-lib-utils, publish-lib-asset-exchange]
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3.1.0
       
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v1
@@ -351,14 +351,14 @@ jobs:
 
       - name: Check if package already exists
         run: (make check-if-tag-exists && echo "WEAVER_FABRIC_CC_PUSH=true" >> $GITHUB_ENV) || echo "WEAVER_FABRIC_CC_PUSH=false" >> $GITHUB_ENV
-        working-directory: core/network/fabric-interop-cc
+        working-directory: weaver/core/network/fabric-interop-cc
 
       - name: Build and Push
         if: ${{ env.WEAVER_FABRIC_CC_PUSH == 'true' }}
         run: make push-image
-        working-directory: core/network/fabric-interop-cc
+        working-directory: weaver/core/network/fabric-interop-cc
         
       - name: Push latest tag
         if: ${{ env.WEAVER_FABRIC_CC_PUSH == 'true' }}
         run: make push-image-latest
-        working-directory: core/network/fabric-interop-cc
+        working-directory: weaver/core/network/fabric-interop-cc
