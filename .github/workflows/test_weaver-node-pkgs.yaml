@@ -20,7 +20,7 @@ concurrency:
 jobs:
   unit_test_weaver_node_sdk_local:
 
-    runs-on: cacti-ubuntu-latest
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:
@@ -51,7 +51,7 @@ jobs:
 
   unit_test_iin_agent_local:
 
-    runs-on: cacti-ubuntu-latest
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:
@@ -84,7 +84,7 @@ jobs:
       working-directory: weaver/core/identity-management/iin-agent
 
   build_docs:
-    runs-on: cacti-ubuntu-latest
+    runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3.1.0
