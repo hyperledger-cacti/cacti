@@ -17,7 +17,7 @@ concurrency:
 jobs:
   build_docker_relay:
     # if: ${{ false }}
-    runs-on: cacti-ubuntu-latest
+    runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3.1.0
@@ -28,7 +28,7 @@ jobs:
         
   build_docker_fabric_driver_local:
     # if: ${{ false }}
-    runs-on: cacti-ubuntu-latest
+    runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3.1.0
@@ -58,7 +58,7 @@ jobs:
         
   build_docker_fabric_driver_packages:
     if: ${{ false }}
-    runs-on: cacti-ubuntu-latest
+    runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3.1.0
@@ -75,7 +75,7 @@ jobs:
         working-directory: weaver/core/drivers/fabric-driver
         
   build_docker_corda_driver_local:
-    runs-on: cacti-ubuntu-latest
+    runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3.1.0
@@ -104,7 +104,7 @@ jobs:
           
   build_docker_corda_driver_packages:
     if: ${{ false }}
-    runs-on: cacti-ubuntu-latest
+    runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3.1.0
@@ -132,7 +132,7 @@ jobs:
         working-directory: weaver/core/drivers/corda-driver
 
   build_docker_iin_agent_local:
-    runs-on: cacti-ubuntu-latest
+    runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3.1.0

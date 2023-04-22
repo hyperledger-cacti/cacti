@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   unit_test_interop_cordapp:
-    runs-on: cacti-ubuntu-latest
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3.1.0
     

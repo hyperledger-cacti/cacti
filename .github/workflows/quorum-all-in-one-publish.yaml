@@ -21,7 +21,7 @@ jobs:
   # Push image to GitHub Packages.
   # See also https://docs.docker.com/docker-hub/builds/
   build-tag-push-container:
-    runs-on: cacti-ubuntu-20.04
+    runs-on: ubuntu-20.04
     env:
       DOCKER_BUILDKIT: 1
       DOCKERFILE_PATH: ./tools/docker/quorum-all-in-one/Dockerfile

@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   publish:
-    runs-on: cacti-ubuntu-20.04
+    runs-on: ubuntu-20.04
     steps:
     - name: Install Indy SDK
       run: >
