@@ -45,6 +45,11 @@ import { PluginHtlcEthBesu } from "@hyperledger/cactus-plugin-htlc-eth-besu";
 const connectorId = uuidv4();
 const logLevel: LogLevelDesc = "INFO";
 
+const FORTY_TWO_AS_HEX_STRING =
+  "0x0000000000000000000000000000000000000000000000000000000000003432";
+const FORTY_TWO_KECCAK_256 =
+  "0xf0095bab87a78fd2afa113b903c90a72ba1fd22c44f55b66cf409390814dfb69";
+
 const testCase = "Test cactus-plugin-htlc-eth-besu openapi validation";
 
 test("BEFORE " + testCase, async (t: Test) => {
@@ -201,14 +206,14 @@ test(testCase, async (t: Test) => {
     };
 
     try {
-      await api.initializeV1((parameters as any) as InitializeRequest);
+      await api.initializeV1((parameters as unknown) as InitializeRequest);
     } catch (e) {
       t2.equal(
         e.response.status,
         400,
         `Endpoint ${fInitialize} without required connectorId: response.status === 400 OK`,
       );
-      const fields = e.response.data.map((param: any) =>
+      const fields = e.response.data.map((param: { path: string }) =>
         param.path.replace(".body.", ""),
       );
       t2.ok(
@@ -231,14 +236,14 @@ test(testCase, async (t: Test) => {
     };
 
     try {
-      await api.initializeV1((parameters as any) as InitializeRequest);
+      await api.initializeV1((parameters as unknown) as InitializeRequest);
     } catch (e) {
       t2.equal(
         e.response.status,
         400,
         `Endpoint ${fInitialize} with fake=4: response.status === 400 OK`,
       );
-      const fields = e.response.data.map((param: any) =>
+      const fields = e.response.data.map((param: { path: string }) =>
         param.path.replace(".body.", ""),
       );
       t2.ok(
@@ -278,7 +283,7 @@ test(testCase, async (t: Test) => {
       inputAmount: 10,
       outputAmount: 0x04,
       expiration: timestamp,
-      hashLock: DataTest.hashLock,
+      hashLock: FORTY_TWO_KECCAK_256,
       receiver: DataTest.receiver,
       outputNetwork: "BTC",
       outputAddress: "1AcVYm7M3kkJQH28FXAvyBFQzFRL6xPKu8",
@@ -310,14 +315,14 @@ test(testCase, async (t: Test) => {
       gas: DataTest.estimated_gas,
     };
     try {
-      await api.newContractV1((parameters as any) as NewContractObj);
+      await api.newContractV1((parameters as unknown) as NewContractObj);
     } catch (e) {
       t2.equal(
         e.response.status,
         400,
         `Endpoint ${fNew} without required contractAddress: response.status === 400 OK`,
       );
-      const fields = e.response.data.map((param: any) =>
+      const fields = e.response.data.map((param: { path: string }) =>
         param.path.replace(".body.", ""),
       );
       t2.ok(
@@ -335,7 +340,7 @@ test(testCase, async (t: Test) => {
       inputAmount: 10,
       outputAmount: 0x04,
       expiration: timestamp,
-      hashLock: DataTest.hashLock,
+      hashLock: FORTY_TWO_KECCAK_256,
       receiver: DataTest.receiver,
       outputNetwork: "BTC",
       outputAddress: "1AcVYm7M3kkJQH28FXAvyBFQzFRL6xPKu8",
@@ -346,14 +351,14 @@ test(testCase, async (t: Test) => {
       fake: 4,
     };
     try {
-      await api.newContractV1((parameters as any) as NewContractObj);
+      await api.newContractV1((parameters as unknown) as NewContractObj);
     } catch (e) {
       t2.equal(
         e.response.status,
         400,
         `Endpoint ${fNew} with fake=4: response.status === 400 OK`,
       );
-      const fields = e.response.data.map((param: any) =>
+      const fields = e.response.data.map((param: { path: string }) =>
         param.path.replace(".body.", ""),
       );
       t2.ok(
@@ -376,7 +381,7 @@ test(testCase, async (t: Test) => {
         firstHighNetWorthAccount,
         DataTest.receiver,
         10,
-        DataTest.hashLock,
+        FORTY_TWO_KECCAK_256,
         timestamp,
       ],
     });
@@ -409,14 +414,14 @@ test(testCase, async (t: Test) => {
       keychainId,
     };
     try {
-      await api.refundV1((parameters as any) as RefundReq);
+      await api.refundV1((parameters as unknown) as RefundReq);
     } catch (e) {
       t2.equal(
         e.response.status,
         400,
         `Endpoint ${fRefund} without required id: response.status === 400 OK`,
       );
-      const fields = e.response.data.map((param: any) =>
+      const fields = e.response.data.map((param: { path: string }) =>
         param.path.replace(".body.", ""),
       );
       t2.ok(fields.includes("id"), "Rejected because id is required");
@@ -434,14 +439,14 @@ test(testCase, async (t: Test) => {
       fake: 4,
     };
     try {
-      await api.refundV1((parameters as any) as RefundReq);
+      await api.refundV1((parameters as unknown) as RefundReq);
     } catch (e) {
       t2.equal(
         e.response.status,
         400,
         `Endpoint ${fRefund} with fake=4: response.status === 400 OK`,
       );
-      const fields = e.response.data.map((param: any) =>
+      const fields = e.response.data.map((param: { path: string }) =>
         param.path.replace(".body.", ""),
       );
       t2.ok(
@@ -459,7 +464,7 @@ test(testCase, async (t: Test) => {
       inputAmount: 10,
       outputAmount: 0x04,
       expiration: DataTest.expiration,
-      hashLock: DataTest.hashLock,
+      hashLock: FORTY_TWO_KECCAK_256,
       receiver: DataTest.receiver,
       outputNetwork: "BTC",
       outputAddress: "1AcVYm7M3kkJQH28FXAvyBFQzFRL6xPKu8",
@@ -480,15 +485,14 @@ test(testCase, async (t: Test) => {
         firstHighNetWorthAccount,
         DataTest.receiver,
         10,
-        DataTest.hashLock,
+        FORTY_TWO_KECCAK_256,
         DataTest.expiration,
       ],
     });
 
     const parameters = {
       id: callOutput,
-      secret:
-        "0x3853485acd2bfc3c632026ee365279743af107a30492e3ceaa7aefc30c2a048a",
+      secret: FORTY_TWO_AS_HEX_STRING,
       web3SigningCredential,
       connectorId,
       keychainId,
@@ -515,14 +519,14 @@ test(testCase, async (t: Test) => {
     };
 
     try {
-      await api.withdrawV1((parameters as any) as WithdrawReq);
+      await api.withdrawV1((parameters as unknown) as WithdrawReq);
     } catch (e) {
       t2.equal(
         e.response.status,
         400,
         `Endpoint ${fWithdraw} without required id: response.status === 400 OK`,
       );
-      const fields = e.response.data.map((param: any) =>
+      const fields = e.response.data.map((param: { path: string }) =>
         param.path.replace(".body.", ""),
       );
       t2.ok(fields.includes("id"), "Rejected because id is required");
@@ -543,14 +547,14 @@ test(testCase, async (t: Test) => {
     };
 
     try {
-      await api.withdrawV1((parameters as any) as WithdrawReq);
+      await api.withdrawV1((parameters as unknown) as WithdrawReq);
     } catch (e) {
       t2.equal(
         e.response.status,
         400,
         `Endpoint ${fWithdraw} with fake=4: response.status === 400 OK`,
       );
-      const fields = e.response.data.map((param: any) =>
+      const fields = e.response.data.map((param: { path: string }) =>
         param.path.replace(".body.", ""),
       );
       t2.ok(
@@ -632,14 +636,14 @@ test(testCase, async (t: Test) => {
     };
 
     try {
-      await api.getStatusV1((parameters as any) as GetStatusRequest);
+      await api.getStatusV1((parameters as unknown) as GetStatusRequest);
     } catch (e) {
       t2.equal(
         e.response.status,
         400,
         `Endpoint ${fStatus} without required ids: response.status === 400 OK`,
       );
-      const fields = e.response.data.map((param: any) =>
+      const fields = e.response.data.map((param: { path: string }) =>
         param.path.replace(".body.", ""),
       );
       t2.ok(fields.includes("ids"), "Rejected because ids is required");
@@ -658,14 +662,14 @@ test(testCase, async (t: Test) => {
     };
 
     try {
-      await api.getStatusV1((parameters as any) as GetStatusRequest);
+      await api.getStatusV1((parameters as unknown) as GetStatusRequest);
     } catch (e) {
       t2.equal(
         e.response.status,
         400,
         `Endpoint ${fStatus} with fake=4: response.status === 400 OK`,
       );
-      const fields = e.response.data.map((param: any) =>
+      const fields = e.response.data.map((param: { path: string }) =>
         param.path.replace(".body.", ""),
       );
       t2.ok(
@@ -746,7 +750,7 @@ test(testCase, async (t: Test) => {
 
     try {
       await api.getSingleStatusV1(
-        (parameters as any) as GetSingleStatusRequest,
+        (parameters as unknown) as GetSingleStatusRequest,
       );
     } catch (e) {
       t2.equal(
@@ -754,7 +758,7 @@ test(testCase, async (t: Test) => {
         400,
         `Endpoint ${fSingleStatus} without required id: response.status === 400 OK`,
       );
-      const fields = e.response.data.map((param: any) =>
+      const fields = e.response.data.map((param: { path: string }) =>
         param.path.replace(".body.", ""),
       );
       t2.ok(fields.includes("id"), "Rejected because id is required");
@@ -774,7 +778,7 @@ test(testCase, async (t: Test) => {
 
     try {
       await api.getSingleStatusV1(
-        (parameters as any) as GetSingleStatusRequest,
+        (parameters as unknown) as GetSingleStatusRequest,
       );
     } catch (e) {
       t2.equal(
@@ -782,7 +786,7 @@ test(testCase, async (t: Test) => {
         400,
         `Endpoint ${fSingleStatus} with fake=4: response.status === 400 OK`,
       );
-      const fields = e.response.data.map((param: any) =>
+      const fields = e.response.data.map((param: { path: string }) =>
         param.path.replace(".body.", ""),
       );
       t2.ok(

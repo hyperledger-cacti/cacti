@@ -69,6 +69,7 @@
         "JORDI",
         "jsrsa",
         "jsrsasign",
+        "keccak",
         "Keychain",
         "Keycloak",
         "KEYUTIL",
@@ -103,6 +104,7 @@
         "openethereum",
         "organisation",
         "Orgs",
+        "ossp",
         "parameterizable",
         "Postgres",
         "proto",
@@ -139,11 +141,7 @@
         "uuidv",
         "vscc",
         "wasm",
-        "Xdai",
-        "goquorum",
-        "hada",
-        "undici",
-        "ossp"
+        "Xdai"
     ],
     "dictionaries": [
         "typescript,node,npm,go,rust"

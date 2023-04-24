@@ -1279,6 +1279,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
       - run: ./tools/ci.sh
+      
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+
+      - name: Run solidity tests
+        run: cd packages/cactus-plugin-htlc-eth-besu && forge test -vvvvv
+              
   cactus-test-plugin-htlc-eth-besu-erc20:
     continue-on-error: false
     env:
