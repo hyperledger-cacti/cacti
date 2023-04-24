@@ -1,0 +1,103 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: CC-BY-4.0
+
+# This workflow will do a clean install of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: Unit Test Weaver Node Packages
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit_test_weaver_node_sdk_local:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [14.x, 16.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+    - uses: actions/checkout@v3.1.0
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3.6.0
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: Use Protoc 3.15
+      run: |
+        curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.15.6/protoc-3.15.6-linux-x86_64.zip
+        unzip protoc-3.15.6-linux-x86_64.zip -d protoc
+    - name: Build JS Protos
+      run: |
+        export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
+        make build
+      working-directory: weaver/common/protos-js
+    - name: Build
+      run: make build-local
+      working-directory: weaver/sdks/fabric/interoperation-node-sdk
+    - name: Tests
+      run: npm run test
+      working-directory: weaver/sdks/fabric/interoperation-node-sdk
+
+  unit_test_iin_agent_local:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+    - uses: actions/checkout@v3.1.0
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3.6.0
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: Use Protoc 3.15
+      run: |
+        curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.15.6/protoc-3.15.6-linux-x86_64.zip
+        unzip protoc-3.15.6-linux-x86_64.zip -d protoc
+    - name: Build JS Protos
+      run: |
+        export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
+        make build
+      working-directory: weaver/common/protos-js
+    - name: Build
+      run: make build-local
+      working-directory: weaver/sdks/fabric/interoperation-node-sdk
+    - name: Build IIN Agent
+      run: make build-local
+      working-directory: weaver/core/identity-management/iin-agent
+    - name: Tests
+      run: npm run test
+      working-directory: weaver/core/identity-management/iin-agent
+
+  build_docs:
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3.1.0
+      
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: 16.x
+
+      - name: NPM INSTALL
+        run: npm install
+        working-directory: weaver/docs
+        
+      - name: Build
+        run: npm run build
+        working-directory: weaver/docs

@@ -1,0 +1,149 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: CC-BY-4.0
+
+name: Unit Test Fabric Interop CC and Sample Chaincode
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit_test_interopcc:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3.1.0
+
+    - name: Set up Go
+      uses: actions/setup-go@v4.0.0
+      with:
+        go-version: '1.20.2'
+        
+    - name: Vendor
+      run: make run-vendor
+      working-directory: weaver/core/network/fabric-interop-cc/contracts/interop
+      
+    - name: Build
+      run: go build -v ./...
+      working-directory: weaver/core/network/fabric-interop-cc/contracts/interop
+
+    - name: Test
+      run: go test -v ./...
+      working-directory: weaver/core/network/fabric-interop-cc/contracts/interop
+
+  unit_test_assetmgmt:
+    # if: ${{ false }}  # disable
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3.1.0
+
+    - name: Set up Go
+      uses: actions/setup-go@v4.0.0
+      with:
+        go-version: '1.20.2'
+        
+    - name: Vendor
+      run: make run-vendor
+      working-directory: weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt
+
+    - name: Build
+      run: go build -v ./...
+      working-directory: weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt
+
+    - name: Test
+      run: go test -v ./...
+      working-directory: weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt
+
+  unit_test_simplestate:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3.1.0
+
+    - name: Set up Go
+      uses: actions/setup-go@v4.0.0
+      with:
+        go-version: '1.20.2'
+
+    - name: Vendor
+      run: make run-vendor
+      working-directory: weaver/samples/fabric/simplestate
+
+    - name: Build
+      run: go build -v ./...
+      working-directory: weaver/samples/fabric/simplestate
+
+    - name: Test
+      run: go test -v ./...
+      working-directory: weaver/samples/fabric/simplestate
+ 
+  unit_test_simpleasset:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3.1.0
+
+    - name: Set up Go
+      uses: actions/setup-go@v4.0.0
+      with:
+        go-version: '1.20.2'
+
+    - name: Vendor
+      run: make run-vendor
+      working-directory: weaver/samples/fabric/simpleasset
+
+    - name: Build
+      run: go build -v ./...
+      working-directory: weaver/samples/fabric/simpleasset
+
+    - name: Test
+      run: go test -v ./...
+      working-directory: weaver/samples/fabric/simpleasset
+
+  unit_test_simpleassetandinterop:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3.1.0
+
+    - name: Set up Go
+      uses: actions/setup-go@v4.0.0
+      with:
+        go-version: '1.20.2'
+
+    - name: Vendor
+      run: make run-vendor
+      working-directory: weaver/samples/fabric/simpleassetandinterop
+
+    - name: Build
+      run: go build -v ./...
+      working-directory: weaver/samples/fabric/simpleassetandinterop
+
+    - name: Test
+      run: go test -v ./...
+      working-directory: weaver/samples/fabric/simpleassetandinterop
+
+  unit_test_simpleassettransfer:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3.1.0
+
+    - name: Set up Go
+      uses: actions/setup-go@v4.0.0
+      with:
+        go-version: '1.20.2'
+
+    - name: Vendor
+      run: make run-vendor
+      working-directory: weaver/samples/fabric/simpleassettransfer
+
+    - name: Build
+      run: go build -v ./...
+      working-directory: weaver/samples/fabric/simpleassettransfer
+
+    - name: Test
+      run: go test -v ./...
+      working-directory: weaver/samples/fabric/simpleassettransfer

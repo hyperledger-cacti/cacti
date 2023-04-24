@@ -329,7 +329,7 @@ class InteroperableHelper {
             if (retryCount > num) {
                 Left(Error("Error: Timeout, remote network took longer than $num seconds to respond"))
             } else {
-                delay(1000L)
+                delay(500L)
                 val requestState = async { client.getState(requestId) }.await()
                 logger.debug("Response from getState: $requestState")
                 when (requestState.status.toString()) {

@@ -46,6 +46,8 @@ impl EventPublish for EventPublishService {
         // Database access/storage
         let remote_db = Database {
             db_path: conf.get_str("remote_db_path").unwrap(),
+            db_open_max_retries: conf.get_int("db_open_max_retries").unwrap_or(500) as u32,
+            db_open_retry_backoff_msec: conf.get_int("db_open_retry_backoff_msec").unwrap_or(10) as u32,
         };
 
         let result =
@@ -84,6 +86,8 @@ impl EventPublish for EventPublishService {
         // Database access/storage
         let db = Database {
             db_path: conf.get_str("db_path").unwrap(),
+            db_open_max_retries: conf.get_int("db_open_max_retries").unwrap_or(500) as u32,
+            db_open_retry_backoff_msec: conf.get_int("db_open_retry_backoff_msec").unwrap_or(10) as u32,
         };
         let result = send_state_helper(request_view_payload, request_id.to_string(), db, conf);
 
@@ -295,6 +299,8 @@ fn spawn_handle_event(state: ViewPayload, publication_spec: EventPublication, re
                         event_id,
                         request_state::Status::EventWritten,
                         conf.get_str("db_path").unwrap(),
+                        conf.get_int("db_open_max_retries").unwrap_or(500) as u32,
+                        conf.get_int("db_open_retry_backoff_msec").unwrap_or(10) as u32,
                         message.to_string(),
                     )
                 }
@@ -308,6 +314,8 @@ fn spawn_handle_event(state: ViewPayload, publication_spec: EventPublication, re
                     event_id,
                     request_state::Status::EventWriteError,
                     conf.get_str("db_path").unwrap(),
+                    conf.get_int("db_open_max_retries").unwrap_or(500) as u32,
+                    conf.get_int("db_open_retry_backoff_msec").unwrap_or(10) as u32,
                     format!("Write Error: {:?}", e),
                 )
             }
@@ -329,7 +337,7 @@ async fn handle_event(
                 match result {
                     Ok(driver_info) => {
                         let client = get_driver_client(driver_info).await?;
-                        println!("Sending Received Event to driver: {:?}", state.clone());
+                        println!("Sending Received Event to driver: {:?}", state.clone().request_id.to_string());
                         let write_external_state_message: WriteExternalStateMessage = WriteExternalStateMessage {
                             view_payload: Some(state),
                             ctx: Some(ctx),

@@ -93,6 +93,11 @@ services:
     # working ok, or if you want to add additional assets such as
     # custom configurations and additional remote relay definitions
     #
+    # - DB_OPEN_MAX_RETRIES=${DB_OPEN_MAX_RETRIES}
+    # max retries opening sled db if it is locked
+    # - DB_OPEN_RETRY_BACKOFF_MSEC=${DB_OPEN_RETRY_BACKOFF_MSEC}
+    # retries back off time for opening sled db if it is locked
+    #
     volumes:
     #
     # Uncomment these two files if you want to mount your specialised

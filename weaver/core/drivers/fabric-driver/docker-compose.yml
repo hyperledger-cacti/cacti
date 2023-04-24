@@ -24,6 +24,8 @@ services:
       - DRIVER_TLS_KEY_PATH=${DRIVER_TLS_KEY_PATH}
       - WALLET_PATH=${WALLET_PATH}
       - DEBUG=false
+      - LEVELDB_LOCKED_MAX_RETRIES=${LEVELDB_LOCKED_MAX_RETRIES}
+      - LEVELDB_LOCKED_RETRY_BACKOFF_MSEC=${LEVELDB_LOCKED_RETRY_BACKOFF_MSEC}
     volumes:
       - ${CONNECTION_PROFILE}:/fabric-driver/ccp.json
       - ${DRIVER_CONFIG}:/fabric-driver/config.json

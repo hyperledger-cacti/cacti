@@ -50,7 +50,9 @@
     "scripts": {
         "codegen": "run-p 'codegen:*'",
         "codegen:openapi": "npm run generate-sdk",
-        "generate-sdk": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
+        "generate-sdk": "run-p generate-sdk:*",
+        "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
+        "generate-sdk:kotlin": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g kotlin -o ./src/main/kotlin/generated/openapi/kotlin-client/ --reserved-words-mappings protected=protected",
         "watch": "npm-watch",
         "webpack": "npm-run-all webpack:dev",
         "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
@@ -64,7 +66,7 @@
         "@hyperledger/cactus-plugin-ledger-connector-besu": "1.2.0",
         "axios": "0.21.4",
         "express": "4.17.1",
-        "joi": "17.4.2",
+        "joi": "17.9.1",
         "openapi-types": "9.1.0",
         "typescript-optional": "2.0.1"
     },
