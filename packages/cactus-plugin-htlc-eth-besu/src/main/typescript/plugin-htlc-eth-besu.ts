@@ -24,6 +24,8 @@ import {
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 
 import HashTimeLockJSON from "../solidity/contracts/HashTimeLock.json";
+const contractName = HashTimeLockJSON.ast.nodes[1].canonicalName || "htlc";
+
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import {
   RefundReq,
@@ -148,7 +150,7 @@ export class PluginHtlcEthBesu implements ICactusPlugin, IPluginWebService {
     ) as PluginLedgerConnectorBesu;
 
     const hashedTimeLockResponse = await connector.deployContract({
-      contractName: HashTimeLockJSON.contractName,
+      contractName: contractName,
       contractAbi: HashTimeLockJSON.abi,
       bytecode: HashTimeLockJSON.bytecode,
       web3SigningCredential: initializeRequest.web3SigningCredential,
@@ -176,7 +178,7 @@ export class PluginHtlcEthBesu implements ICactusPlugin, IPluginWebService {
     ) as PluginLedgerConnectorBesu;
 
     const result = await connector.invokeContract({
-      contractName: HashTimeLockJSON.contractName,
+      contractName: contractName,
       keychainId: newContractRequest.keychainId,
       signingCredential: newContractRequest.web3SigningCredential,
       contractAddress: newContractRequest.contractAddress,
@@ -197,7 +199,7 @@ export class PluginHtlcEthBesu implements ICactusPlugin, IPluginWebService {
     ) as PluginLedgerConnectorBesu;
 
     const result = await connector.invokeContract({
-      contractName: HashTimeLockJSON.contractName,
+      contractName: contractName,
       signingCredential: req.web3SigningCredential,
       invocationType: EthContractInvocationType.Call,
       methodName: "getSingleStatus",
@@ -215,7 +217,7 @@ export class PluginHtlcEthBesu implements ICactusPlugin, IPluginWebService {
     ) as PluginLedgerConnectorBesu;
 
     const result = await connector.invokeContract({
-      contractName: HashTimeLockJSON.contractName,
+      contractName: contractName,
       signingCredential: req.web3SigningCredential,
       invocationType: EthContractInvocationType.Call,
       methodName: "getStatus",
@@ -233,7 +235,7 @@ export class PluginHtlcEthBesu implements ICactusPlugin, IPluginWebService {
     ) as PluginLedgerConnectorBesu;
 
     const result = await connector.invokeContract({
-      contractName: HashTimeLockJSON.contractName,
+      contractName: contractName,
       keychainId: refundRequest.keychainId,
       signingCredential: refundRequest.web3SigningCredential,
       invocationType: EthContractInvocationType.Send,
@@ -252,7 +254,7 @@ export class PluginHtlcEthBesu implements ICactusPlugin, IPluginWebService {
     ) as PluginLedgerConnectorBesu;
     const params = [withdrawRequest.id, withdrawRequest.secret];
     const result = await connector.invokeContract({
-      contractName: HashTimeLockJSON.contractName,
+      contractName: contractName,
       keychainId: withdrawRequest.keychainId,
       signingCredential: withdrawRequest.web3SigningCredential,
       invocationType: EthContractInvocationType.Send,
