@@ -7,7 +7,7 @@ exit-zero: false # default: false
 
 verbose: false # default: false
 
-instance: https://api.gitguardian.com/
+instance: https://dashboard.gitguardian.com/
 
 # Maximum commits to scan in a hook.
 max-commits-for-hook: 50 # default: 50
