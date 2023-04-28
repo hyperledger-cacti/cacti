@@ -1,6 +1,6 @@
 import {
-  Logger,
   Checks,
+  Logger,
   LogLevelDesc,
   LoggerProvider,
 } from "@hyperledger/cactus-common";
