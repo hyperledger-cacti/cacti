@@ -4,6 +4,8 @@
 fabric/dev/config
 fabric/dev/bin
 fabric/dev/.fabric-setup
+fabric/dev/install-fabric.sh
+fabric/dev/builders
 .lock
 *.lock
 fabric/dev/scripts/config.json

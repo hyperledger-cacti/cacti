@@ -98,18 +98,25 @@ function eciesDecryptMessage(recipientPrivateKey, cipherText, options) {
     const privKey = ecdsa.keyFromPrivate(recipientPrivateKey.prvKeyHex, "hex");
 
     const Z = privKey.derive(ephPubKey.pub); // 'z'
-    const kdfOutput = hkdf(Z.toArray(), ECIESKDFOutput, null, null, options); // The 'null's correspond to 's1' and 's2', which are both
-    // empty in our SNAMCC and ESCC plugin implementations
+    // Append missing leading zeros to Z
+    let ZArray = Z.toArray();
+    const zerosToAdd = 32 - ZArray.length;
+    for (let ii=0; ii<zerosToAdd; ii++) {
+        ZArray = new Uint8Array([0, ...ZArray]);
+    }
+    // The 'null's below correspond to 's1' and 's2', 
+    // which are both set to nil in golang implementation of the encryption function
+    const kdfOutput = hkdf(ZArray, ECIESKDFOutput, null, null, options);
+
     const kbuf = Buffer.from(kdfOutput);
     const aesKey = kdfOutput.slice(0, AESKeyLength); // 'Ke'
-    const hmacKey = kdfOutput.slice(AESKeyLength, AESKeyLength + HMACKeyLength); // 'Km'
+    const hmacKey = kdfOutput.slice(AESKeyLength, AESKeyLength + HMACKeyLength);
 
     const hmacKeyHash = new options.hashFunctionKeyDerivation();
     hmacKeyHash.update(bytesToBits(hmacKey));
-    const hKm = bitsToBytes(hmacKeyHash.finalize());
+    const hKm = bitsToBytes(hmacKeyHash.finalize()); // 'Km'
 
     const recoveredD = hmac(hKm, EM, options);
-
     if (D.compare(Buffer.from(recoveredD)) !== 0) {
         throw new Error("HMAC verify failed");
     }
