@@ -1347,10 +1347,18 @@ jobs:
         run: DOCKER_BUILDKIT=1 docker build ./tools/docker/corda-all-in-one/ -f ./tools/docker/corda-all-in-one/corda-v4_8/Dockerfile
   ghcr-dev-container-vscode:
     runs-on: ubuntu-20.04
+    env:
+      IMAGE_NAME: cacti-dev-container-vscode
     steps:
+      - name: Use Node.js v20.3.0
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: v20.3.0
       - uses: actions/checkout@v3.5.2
-      - name: ghcr.io/hyperledger/cactus-dev-container-vscode
-        run: DOCKER_BUILDKIT=1 docker build ./.devcontainer/ -f ./.devcontainer/Dockerfile
+      - name: npm_install_@devcontainers/cli@0.44.0
+        run: npm install -g @devcontainers/cli@0.44.0
+      - name: npx_yes_devcontainers_cli_build
+        run: npx --yes @devcontainers/cli@0.44.0 build --workspace-folder=./ --log-level=trace --push=false --config=./.devcontainer/devcontainer.json --image-name=$IMAGE_NAME
   ghcr-example-carbon-accounting:
     runs-on: ubuntu-20.04
     steps:

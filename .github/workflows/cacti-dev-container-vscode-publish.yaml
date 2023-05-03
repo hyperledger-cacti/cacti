@@ -1,0 +1,64 @@
+name: connector-fabric-publish
+
+on:
+  push:
+    # Publish `v1.2.3` tags as releases.
+    tags:
+      - v*
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  IMAGE_NAME: cacti-dev-container-vscode
+
+jobs:
+  # Push image to GitHub Packages.
+  # See also https://docs.docker.com/docker-hub/builds/
+  build-tag-push-container:
+    runs-on: ubuntu-20.04
+    env:
+      DOCKER_BUILDKIT: 1
+      DOCKERFILE_PATH: ./packages/cactus-plugin-ledger-connector-fabric/Dockerfile
+      DOCKER_BUILD_DIR: ./packages/cactus-plugin-ledger-connector-fabric/
+    permissions:
+      packages: write
+      contents: read
+
+    steps:
+      - name: Use Node.js v20.3.0
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: v20.3.0
+
+      - uses: actions/checkout@v3.5.2
+
+      - name: npm_install_@devcontainers/cli@0.44.0
+        run: npm install -g @devcontainers/cli@0.44.0
+
+      - name: npx_yes_devcontainers_cli_build
+        run: npx --yes @devcontainers/cli@0.44.0 build --workspace-folder=./ --log-level=trace --push=false --config=./.devcontainer/devcontainer.json --image-name=$IMAGE_NAME
+
+      - name: Log in to registry
+        # This is where you will update the PAT to GITHUB_TOKEN
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Push image
+        run: |
+          SHORTHASH=$(git rev-parse --short "$GITHUB_SHA")
+          TODAYS_DATE="$(date +%F)"
+          DOCKER_TAG="$TODAYS_DATE-$SHORTHASH"
+          IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
+          # Change all uppercase to lowercase
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+          # Strip git ref prefix from version
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          # Strip "v" prefix from tag name
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+          # Do not use the `latest` tag at all, tag with date + git short hash if there is no git tag
+          [ "$VERSION" == "main" ] && VERSION=$DOCKER_TAG
+          echo IMAGE_ID=$IMAGE_ID
+          echo VERSION=$VERSION
+          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
+          docker push $IMAGE_ID:$VERSION
