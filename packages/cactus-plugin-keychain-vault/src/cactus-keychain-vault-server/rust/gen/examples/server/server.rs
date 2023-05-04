@@ -92,7 +92,7 @@ impl<C> Api<C> for Server<C> where C: Has<XSpanIdString> + Send + Sync
         // FIXME move configuration parsing logic to main instead
         let temp_host;
         let host: &str;
-        if (env::var("VAULT_HOST").is_err()) {
+        if env::var("VAULT_HOST").is_err() {
             host = "http://localhost:8200"
         } else {
             temp_host = env::var("VAULT_HOST").unwrap();
@@ -119,7 +119,7 @@ impl<C> Api<C> for Server<C> where C: Has<XSpanIdString> + Send + Sync
         // FIXME move configuration parsing logic to main instead
         let temp_host;
         let host: &str;
-        if (env::var("VAULT_HOST").is_err()) {
+        if env::var("VAULT_HOST").is_err() {
             host = "http://localhost:8200"
         } else {
             temp_host = env::var("VAULT_HOST").unwrap();
