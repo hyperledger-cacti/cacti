@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.hyperledger.cacti.weaver.corda.app.interop.test
+package org.hyperledger.cacti.weaver.imodule.corda.test
 
 import co.paralleluniverse.fibers.Suspendable
 import net.corda.core.flows.*
@@ -38,7 +38,7 @@ data class AssetState (
 
 class AssetStateContract : Contract {
     companion object {
-        const val ID = "org.hyperledger.cacti.weaver.corda.app.interop.test.AssetStateContract"
+        const val ID = "org.hyperledger.cacti.weaver.imodule.corda.test.AssetStateContract"
     }
     override fun verify(tx: LedgerTransaction) {
         val command = tx.commands.requireSingleCommand<Commands>()

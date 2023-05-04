@@ -27,13 +27,8 @@ publish-contracts: github.properties
 test:
 	./gradlew test
 
-.PHONY: clean-local
-clean-local:
+.PHONY: clean
+clean:
 	./gradlew clean
-	rm -rf fabric-protos proto || true
 	rm -rf .gradle
 
-.PHONY: clean
-clean:	github.properties
-	./gradlew clean
-	rm -rf .gradle

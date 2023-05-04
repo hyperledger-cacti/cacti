@@ -31,8 +31,8 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@hyperledger-labs/weaver-besu-interop-sdk": "~1.0.0",
-    "@hyperledger-labs/weaver-protos-js": "~1.5.0",
+    "@hyperledger/cacti-weaver-sdk-besu": "2.0.0-alpha-prerelease",
+    "@hyperledger/cacti-weaver-protos-js": "2.0.0-alpha-prerelease",
     "@truffle/contract": "^4.2.14",
     "gluegun": "latest",
     "winston": "^3.3.3"

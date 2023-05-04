@@ -21,7 +21,7 @@ import com.google.protobuf.util.JsonFormat
 import net.corda.core.identity.CordaX500Name
 import net.corda.core.identity.Party
 
-import org.hyperledger.cacti.weaver.corda.sdk.VerificationPolicyManager
+import org.hyperledger.cacti.weaver.sdk.corda.VerificationPolicyManager
 import org.hyperledger.cacti.weaver.protos.common.verification_policy.VerificationPolicyOuterClass
 
 /**

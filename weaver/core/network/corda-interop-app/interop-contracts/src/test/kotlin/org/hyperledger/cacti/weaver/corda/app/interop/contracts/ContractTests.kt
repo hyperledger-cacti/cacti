@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.hyperledger.cacti.weaver.corda.app.interop.contracts
+package org.hyperledger.cacti.weaver.imodule.corda.contracts
 
 import net.corda.testing.node.MockServices
 import org.junit.Test

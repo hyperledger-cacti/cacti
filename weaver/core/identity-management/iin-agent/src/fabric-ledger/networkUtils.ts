@@ -9,8 +9,8 @@ import { Channel } from 'fabric-common';
 import * as path from 'path';
 import * as fs from 'fs';
 
-import membershipPb from '@hyperledger-labs/weaver-protos-js/common/membership_pb';
-import { MembershipManager } from '@hyperledger-labs/weaver-fabric-interop-sdk'
+import membershipPb from '@hyperledger/cacti-weaver-protos-js/common/membership_pb';
+import { MembershipManager } from '@hyperledger/cacti-weaver-sdk-fabric'
 
 import { getWallet } from './walletUtils';
 import * as utils from "../common/utils";

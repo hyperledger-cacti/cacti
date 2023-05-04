@@ -6,15 +6,15 @@
 
 version: '2'
 services:
-  fabric-driver:
+  driver-fabric:
     image: ${DOCKER_IMAGE_NAME}:${DOCKER_TAG}
-    container_name: fabric-driver-${NETWORK_NAME}
+    container_name: driver-fabric-${NETWORK_NAME}
     environment:
       - NETWORK_NAME=${NETWORK_NAME}
       - RELAY_ENDPOINT=${RELAY_ENDPOINT}
       - DRIVER_ENDPOINT=0.0.0.0:${DRIVER_PORT}
-      - CONNECTION_PROFILE=/fabric-driver/ccp.json
-      - DRIVER_CONFIG=/fabric-driver/config.json
+      - CONNECTION_PROFILE=/driver/fabric/ccp.json
+      - DRIVER_CONFIG=/driver/fabric/config.json
       - INTEROP_CHAINCODE=${INTEROP_CHAINCODE}
       - local=false
       - RELAY_TLS=${RELAY_TLS}
@@ -29,10 +29,10 @@ services:
       - ENABLE_MONITOR=${ENABLE_MONITOR}
       - MONITOR_SYNC_PERIOD=${MONITOR_SYNC_PERIOD}
     volumes:
-      - ${CONNECTION_PROFILE}:/fabric-driver/ccp.json
-      - ${DRIVER_CONFIG}:/fabric-driver/config.json
-      - ./wallet-${NETWORK_NAME}:/fabric-driver/wallet-${NETWORK_NAME}
-      - ${TLS_CREDENTIALS_DIR}:/fabric-driver/credentials
+      - ${CONNECTION_PROFILE}:/driver/fabric/ccp.json
+      - ${DRIVER_CONFIG}:/driver/fabric/config.json
+      - ./wallet-${NETWORK_NAME}:/driver/fabric/wallet-${NETWORK_NAME}
+      - ${TLS_CREDENTIALS_DIR}:/driver/fabric/credentials
     ports:
       - "${DRIVER_PORT}:${DRIVER_PORT}"
     command: sh -c "npm run start"

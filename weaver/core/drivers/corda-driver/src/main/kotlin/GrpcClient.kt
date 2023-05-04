@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.hyperledger.cacti.weaver.corda.driver
+package org.hyperledger.cacti.weaver.driver.corda
 
 import io.grpc.ManagedChannel
 import io.grpc.Status

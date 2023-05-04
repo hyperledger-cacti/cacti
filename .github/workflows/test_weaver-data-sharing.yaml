@@ -450,34 +450,34 @@ jobs:
 
       - name: Start Relay for network1
         run: |
-          sed -i "s#^DOCKER_IMAGE_NAME=.*#DOCKER_IMAGE_NAME=weaver-relay-server#g" docker/testnet-envs/.env.n1
+          sed -i "s#^DOCKER_IMAGE_NAME=.*#DOCKER_IMAGE_NAME=cacti-weaver-relay-server#g" docker/testnet-envs/.env.n1
           make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.n1'
         working-directory: weaver/core/relay
 
       - name: Start Relay for network2
         run: |
-          sed -i "s#^DOCKER_IMAGE_NAME=.*#DOCKER_IMAGE_NAME=weaver-relay-server#g" docker/testnet-envs/.env.n2
+          sed -i "s#^DOCKER_IMAGE_NAME=.*#DOCKER_IMAGE_NAME=cacti-weaver-relay-server#g" docker/testnet-envs/.env.n2
           make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.n2'
         working-directory: weaver/core/relay
 
       - name: Start Relay for Corda_Network
         run: |
-          sed -i "s#^DOCKER_IMAGE_NAME=.*#DOCKER_IMAGE_NAME=weaver-relay-server#g" docker/testnet-envs/.env.corda
+          sed -i "s#^DOCKER_IMAGE_NAME=.*#DOCKER_IMAGE_NAME=cacti-weaver-relay-server#g" docker/testnet-envs/.env.corda
           make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.corda'
         working-directory: weaver/core/relay
 
       - name: Start Relay for Corda_Network2
         run: |
-          sed -i "s#^DOCKER_IMAGE_NAME=.*#DOCKER_IMAGE_NAME=weaver-relay-server#g" docker/testnet-envs/.env.corda2
+          sed -i "s#^DOCKER_IMAGE_NAME=.*#DOCKER_IMAGE_NAME=cacti-weaver-relay-server#g" docker/testnet-envs/.env.corda2
           make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.corda2'
         working-directory: weaver/core/relay
 
       # FABRIC DRIVER
       - name: Setup Fabric Driver .env
         run: |
-          sed -i "s#^DOCKER_IMAGE_NAME=.*#DOCKER_IMAGE_NAME=weaver-fabric-driver#g" docker-testnet-envs/.env.n1
+          sed -i "s#^DOCKER_IMAGE_NAME=.*#DOCKER_IMAGE_NAME=cacti-weaver-driver-fabric#g" docker-testnet-envs/.env.n1
           sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}/weaver#g" docker-testnet-envs/.env.n1
-          sed -i "s#^DOCKER_IMAGE_NAME=.*#DOCKER_IMAGE_NAME=weaver-fabric-driver#g" docker-testnet-envs/.env.n2
+          sed -i "s#^DOCKER_IMAGE_NAME=.*#DOCKER_IMAGE_NAME=cacti-weaver-driver-fabric#g" docker-testnet-envs/.env.n2
           sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}/weaver#g" docker-testnet-envs/.env.n2
         working-directory: weaver/core/drivers/fabric-driver
 
@@ -492,19 +492,19 @@ jobs:
       # IIN AGENT
       - name: Setup Fabric IIN Env
         run: |
-          sed -i "s#^DOCKER_IMAGE_NAME=.*#DOCKER_IMAGE_NAME=weaver-iin-agent#g" docker-testnet/envs/.env.n1.org1
+          sed -i "s#^DOCKER_IMAGE_NAME=.*#DOCKER_IMAGE_NAME=cacti-weaver-iin-agent#g" docker-testnet/envs/.env.n1.org1
           sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}/weaver#g" docker-testnet/envs/.env.n1.org1
           sed -i "s#^AUTO_SYNC=true#AUTO_SYNC=false#g" docker-testnet/envs/.env.n1.org1
           sed -i "s#^DNS_CONFIG_PATH=.*#DNS_CONFIG_PATH=./docker-testnet/configs/dnsconfig-2-nodes.json#g" docker-testnet/envs/.env.n1.org1
-          sed -i "s#^DOCKER_IMAGE_NAME=.*#DOCKER_IMAGE_NAME=weaver-iin-agent#g" docker-testnet/envs/.env.n1.org2
+          sed -i "s#^DOCKER_IMAGE_NAME=.*#DOCKER_IMAGE_NAME=cacti-weaver-iin-agent#g" docker-testnet/envs/.env.n1.org2
           sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}/weaver#g" docker-testnet/envs/.env.n1.org2
           sed -i "s#^AUTO_SYNC=true#AUTO_SYNC=false#g" docker-testnet/envs/.env.n1.org2
           sed -i "s#^DNS_CONFIG_PATH=.*#DNS_CONFIG_PATH=./docker-testnet/configs/dnsconfig-2-nodes.json#g" docker-testnet/envs/.env.n1.org2
-          sed -i "s#^DOCKER_IMAGE_NAME=.*#DOCKER_IMAGE_NAME=weaver-iin-agent#g" docker-testnet/envs/.env.n2.org1
+          sed -i "s#^DOCKER_IMAGE_NAME=.*#DOCKER_IMAGE_NAME=cacti-weaver-iin-agent#g" docker-testnet/envs/.env.n2.org1
           sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}/weaver#g" docker-testnet/envs/.env.n2.org1
           sed -i "s#^AUTO_SYNC=true#AUTO_SYNC=false#g" docker-testnet/envs/.env.n2.org1
           sed -i "s#^DNS_CONFIG_PATH=.*#DNS_CONFIG_PATH=./docker-testnet/configs/dnsconfig-2-nodes.json#g" docker-testnet/envs/.env.n2.org1
-          sed -i "s#^DOCKER_IMAGE_NAME=.*#DOCKER_IMAGE_NAME=weaver-iin-agent#g" docker-testnet/envs/.env.n2.org2
+          sed -i "s#^DOCKER_IMAGE_NAME=.*#DOCKER_IMAGE_NAME=cacti-weaver-iin-agent#g" docker-testnet/envs/.env.n2.org2
           sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}/weaver#g" docker-testnet/envs/.env.n2.org2
           sed -i "s#^AUTO_SYNC=true#AUTO_SYNC=false#g" docker-testnet/envs/.env.n2.org2
           sed -i "s#^DNS_CONFIG_PATH=.*#DNS_CONFIG_PATH=./docker-testnet/configs/dnsconfig-2-nodes.json#g" docker-testnet/envs/.env.n2.org2
@@ -525,13 +525,13 @@ jobs:
       # CORDA DRIVER
       - name: Start Corda Driver
         run: |
-          sed -i "s#^DOCKER_IMAGE_NAME=.*#DOCKER_IMAGE_NAME=weaver-corda-driver#g" docker-testnet-envs/.env.corda
+          sed -i "s#^DOCKER_IMAGE_NAME=.*#DOCKER_IMAGE_NAME=cacti-weaver-driver-corda#g" docker-testnet-envs/.env.corda
           make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.corda'
         working-directory: weaver/core/drivers/corda-driver
 
       - name: Start Corda_Network2 Driver
         run: |
-          sed -i "s#^DOCKER_IMAGE_NAME=.*#DOCKER_IMAGE_NAME=weaver-corda-driver#g" docker-testnet-envs/.env.corda2
+          sed -i "s#^DOCKER_IMAGE_NAME=.*#DOCKER_IMAGE_NAME=cacti-weaver-driver-corda#g" docker-testnet-envs/.env.corda2
           make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.corda2'
         working-directory: weaver/core/drivers/corda-driver
 
@@ -899,11 +899,11 @@ jobs:
 
       # CORDA DRIVER
       - name: Start Corda_Network Driver
-        run: ./build/install/corda-driver/bin/corda-driver &> corda-driver.out &
+        run: ./build/install/driver-corda/bin/driver-corda &> corda-driver.out &
         working-directory: weaver/core/drivers/corda-driver
 
       - name: Start Corda_Network2 Driver
-        run: DRIVER_PORT=9098 ./build/install/corda-driver/bin/corda-driver &> corda2-driver.out &
+        run: DRIVER_PORT=9098 ./build/install/driver-corda/bin/driver-corda &> corda2-driver.out &
         working-directory: weaver/core/drivers/corda-driver
 
       # FABRIC CLI

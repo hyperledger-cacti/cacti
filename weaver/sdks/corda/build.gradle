@@ -13,8 +13,7 @@ buildscript {
     ext.corda_gradle_plugins_version = "5.0.12"
     ext.log4j_version = "2.16.0"
     ext.slf4j_version = "1.7.25"
-    ext.weaver_protos_version = "1.5.7"
-    ext.weaver_corda_version = "1.2.14"
+    ext.cacti_version = "2.0.0-alpha-prerelease"
     
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
@@ -68,9 +67,9 @@ dependencies {
     // Corda dependencies.
     compile "$corda_release_group:corda-rpc:$corda_version"
 
-    implementation(group: 'org.hyperledger.cacti.weaver.corda.app.interop', name: 'interop-contracts', version: "$weaver_corda_version")
-    implementation(group: 'org.hyperledger.cacti.weaver.corda.app.interop', name: 'interop-workflows', version: "$weaver_corda_version")
-    implementation(group: 'org.hyperledger.cacti.weaver', name: 'protos-java-kt', version: "$weaver_protos_version")
+    implementation(group: 'org.hyperledger.cacti.weaver.imodule.corda', name: 'interop-contracts', version: "$cacti_version")
+    implementation(group: 'org.hyperledger.cacti.weaver.imodule.corda', name: 'interop-workflows', version: "$cacti_version")
+    implementation(group: 'org.hyperledger.cacti.weaver.protos', name: 'protos-java-kt', version: "$cacti_version")
 
     // gRPC and protobuf dependencies
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"

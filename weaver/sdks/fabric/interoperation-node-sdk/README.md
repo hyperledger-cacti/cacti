@@ -3,7 +3,7 @@
 
  SPDX-License-Identifier: CC-BY-4.0
  -->
-# weaver-fabric-interop-sdk
+# Cacti - Weaver Fabric SDK
 
 Client library functions to augment or complement the Fabric-Node-SDK library
 
@@ -34,7 +34,7 @@ Run `npm run docs` to generate docs. View docs via the generated html file.
 2) Create a copy of `.npmrc.template` as `.npmrc`.
 3) Replace <personal-access-token> in copied `.npmrc` file with your personal access token.
 4) Now put this `.npmrc` file in your application in same level as package.json.
-5) Now you can run `npm install @hyperledger-labs/weaver-fabric-interop-sdk` in your application directory to install the latest version.
+5) Now you can run `npm install @hyperledger/cacti-weaver-sdk-fabric` in your application directory to install the latest version.
 
 # Steps to publish
 1) Create a Personal Access Token from Github with write/read/delete access to packages. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.

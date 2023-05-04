@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import iin_agent_pb from '@hyperledger-labs/weaver-protos-js/identity/agent_pb';
+import iin_agent_pb from '@hyperledger/cacti-weaver-protos-js/identity/agent_pb';
 import * as utils from '../common/utils';
 import { localAgentResponseCount, counterAttestationsMap, getSecurityDomainMapKey, securityDomainMap,  foreignAgentResponseCount} from './externalOperations';
 // import { handlePromise, getLedgerBase, getIINAgentClient, getSecurityDomainDNS, defaultCallback, delay } from '../common/utils';

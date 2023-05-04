@@ -1,6 +1,6 @@
 {
     "name": "iin-agent",
-    "version": "1.5.9",
+    "version": "2.0.0-alpha-prerelease",
     "description": "",
     "main": "index.js",
     "scripts": {
@@ -19,8 +19,8 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
-        "@hyperledger-labs/weaver-protos-js": "file:./protos-js",
-        "@hyperledger-labs/weaver-fabric-interop-sdk": "file:./weaver-fabric-interop-sdk",
+        "@hyperledger/cacti-weaver-protos-js": "file:./protos-js",
+        "@hyperledger/cacti-weaver-sdk-fabric": "file:./cacti-weaver-sdk-fabric",
         "@fidm/x509": "^1.2.1",
         "@grpc/grpc-js": "^1.1.1",
         "@typescript-eslint/eslint-plugin": "^3.5.0",

@@ -40,7 +40,7 @@ The Fabric CLI can be configured either to depend on the published Weaver SDK or
 
 ### Using Published Weaver SDK
 
-The `fabric-cli` depends on the npm package `@hyperledger-labs/weaver-fabric-interop-sdk`. To pull this package from Github, run the following steps:
+The `fabric-cli` depends on the npm package `@hyperledger/cacti-weaver-sdk-fabric`. To pull this package from Github, run the following steps:
 1) Create a Personal Access Token from Github with read access to packages. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help. \
 2) Create a copy of `.npmrc.template` as `.npmrc`. \
 3) Replace <personal-access-token> in copied `.npmrc` file with your personal access token. \

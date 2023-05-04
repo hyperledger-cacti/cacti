@@ -10,7 +10,7 @@ import logger from '../../helpers/logger'
 import * as path from 'path'
 import * as dotenv from 'dotenv'
 import * as fs from 'fs'
-import { MembershipManager } from '@hyperledger-labs/weaver-fabric-interop-sdk'
+import { MembershipManager } from '@hyperledger/cacti-weaver-sdk-fabric'
 dotenv.config({ path: path.resolve(__dirname, '../../.env') })
 
 const command: GluegunCommand = {
