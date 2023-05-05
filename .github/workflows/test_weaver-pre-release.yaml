@@ -130,26 +130,40 @@ jobs:
         working-directory: weaver/core/relay
         
       # GO
-      # - name: check weaver/common/protos-go/VERSION
-      #   run: cat VERSION | grep $VERSION || exit 1
-      #   working-directory: weaver/common/protos-go
-      # 
-      # - name: check weaver/core/network/fabric-interop-cc/libs/utils/VERSION
-      #   run: cat VERSION | grep $VERSION || exit 1
-      #   working-directory: weaver/core/network/fabric-interop-cc/libs/utils
-      # 
-      # - name: check weaver/core/network/fabric-interop-cc/libs/assetexchange/VERSION
-      #   run: cat VERSION | grep $VERSION || exit 1
-      #   working-directory: weaver/core/network/fabric-interop-cc/libs/assetexchange
-      # 
-      # - name: check weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt/VERSION
-      #   run: cat VERSION | grep $VERSION || exit 1
-      #   working-directory: weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt
-      # 
-      # - name: check weaver/core/network/fabric-interop-cc/contracts/interop/VERSION
-      #   run: cat VERSION | grep $VERSION || exit 1
-      #   working-directory: weaver/core/network/fabric-interop-cc/contracts/interop
-      # 
-      # - name: check weaver/sdks/fabric/go-sdk/VERSION
-      #   run: cat VERSION | grep $VERSION || exit 1
-      #   working-directory: weaver/sdks/fabric/go-sdk
+      - name: check weaver/common/protos-go/VERSION
+        run: cat VERSION | grep $VERSION || exit 1
+        working-directory: weaver/common/protos-go
+      
+      - name: check weaver/core/network/fabric-interop-cc/libs/utils/VERSION
+        run: cat VERSION | grep $VERSION || exit 1
+        working-directory: weaver/core/network/fabric-interop-cc/libs/utils
+      
+      - name: check weaver/core/network/fabric-interop-cc/libs/assetexchange/VERSION
+        run: cat VERSION | grep $VERSION || exit 1
+        working-directory: weaver/core/network/fabric-interop-cc/libs/assetexchange
+      
+      - name: check weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt/VERSION
+        run: cat VERSION | grep $VERSION || exit 1
+        working-directory: weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt
+      
+      - name: check weaver/core/network/fabric-interop-cc/contracts/interop/VERSION
+        run: cat VERSION | grep $VERSION || exit 1
+        working-directory: weaver/core/network/fabric-interop-cc/contracts/interop
+      
+      - name: check weaver/sdks/fabric/go-sdk/VERSION
+        run: cat VERSION | grep $VERSION || exit 1
+        working-directory: weaver/sdks/fabric/go-sdk
+
+  test_weaver_go_pre-release:
+    needs: check_release
+    if: needs.check_release.outputs.status == 'continue'
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3.1.0
+      
+      - name: Update GO Checksum
+        run: sh go-gen-checksum.sh
+      
+      - name: Check if changes are committed
+        run: (git status | grep "nothing to commit, working tree clean") || (echo "go-gen-checksum not called before release commit" && exit 1)

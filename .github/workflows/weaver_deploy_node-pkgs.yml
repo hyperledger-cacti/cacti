@@ -54,7 +54,10 @@ jobs:
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
           # Strip "v" prefix from tag name
           [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-          sed -i "s#\"version\":.*#\"version\": \"${VERSION}\"#g" package.json
+          echo $VERSION
+          if [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+[A-Za-z\-]*$ ]]; then
+            sed -i "s#\"version\":.*#\"version\": \"${VERSION}\"#g" package.json
+          fi
           head -4 package.json
         working-directory: weaver/common/protos-js
         
@@ -110,7 +113,10 @@ jobs:
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
           # Strip "v" prefix from tag name
           [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-          sed -i "s#\"version\":.*#\"version\": \"${VERSION}\"#g" package.json
+          echo $VERSION
+          if [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+[A-Za-z\-]*$ ]]; then
+            sed -i "s#\"version\":.*#\"version\": \"${VERSION}\"#g" package.json
+          fi
           head -4 package.json
         working-directory: weaver/sdks/fabric/interoperation-node-sdk
         
@@ -164,7 +170,10 @@ jobs:
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
           # Strip "v" prefix from tag name
           [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-          sed -i "s#\"version\":.*#\"version\": \"${VERSION}\"#g" package.json
+          echo $VERSION
+          if [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+[A-Za-z\-]*$ ]]; then
+            sed -i "s#\"version\":.*#\"version\": \"${VERSION}\"#g" package.json
+          fi
           head -4 package.json
         working-directory: weaver/sdks/besu/node
         
@@ -220,7 +229,10 @@ jobs:
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
           # Strip "v" prefix from tag name
           [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-          echo -n $VERSION > VERSION
+          echo $VERSION
+          if [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+[A-Za-z\-]*$ ]]; then
+            echo -n $VERSION > VERSION
+          fi
           cat VERSION
         working-directory: weaver/core/drivers/fabric-driver
 
@@ -269,7 +281,10 @@ jobs:
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
           # Strip "v" prefix from tag name
           [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-          echo -n $VERSION > VERSION
+          echo $VERSION
+          if [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+[A-Za-z\-]*$ ]]; then
+            echo -n $VERSION > VERSION
+          fi
           cat VERSION
         working-directory: weaver/core/identity-management/iin-agent
 
