@@ -9,7 +9,7 @@ jobs:
   commitlint:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3.1.0
+      - uses: actions/checkout@v3.5.2
         with:
           fetch-depth: 0
-      - uses: wagoid/commitlint-github-action@v3.1.4
+      - uses: wagoid/commitlint-github-action@v5.4.1
