@@ -28,7 +28,7 @@ jobs:
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-    - uses: actions/checkout@v3.1.0
+    - uses: actions/checkout@v3.5.2
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3.6.0
       with:
@@ -59,7 +59,7 @@ jobs:
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-    - uses: actions/checkout@v3.1.0
+    - uses: actions/checkout@v3.5.2
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3.6.0
       with:
@@ -87,7 +87,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3.1.0
+      - uses: actions/checkout@v3.5.2
       
       - name: Use Node.js 16.x
         uses: actions/setup-node@v3.6.0
