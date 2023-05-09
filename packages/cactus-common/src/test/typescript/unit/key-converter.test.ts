@@ -307,7 +307,7 @@ test.skip("Test invalid from key format", async (t: Test) => {
   }, "KeyConverter#publicKeyAs Invalid KeyFormat");
 
   t.throws(() => {
-    keyConverter.publicKeyAs(keyPair.publicKey, KeyFormat.Raw, "abc" as any);
+    keyConverter.publicKeyAs(keyPair.publicKey, KeyFormat.Raw, "abc" as KeyFormat.PEM);
   }, "KeyConverter#publicKeyAs Invalid KeyFormat");
 
   t.throws(() => {
@@ -319,7 +319,7 @@ test.skip("Test invalid from key format", async (t: Test) => {
   }, "KeyConverter#privateKeyAs Invalid KeyFormat");
 
   t.throws(() => {
-    keyConverter.privateKeyAs(keyPair.privateKey, KeyFormat.Raw, "abc" as any);
+    keyConverter.privateKeyAs(keyPair.privateKey, KeyFormat.Raw, "abc" as KeyFormat.PEM);
   }, "KeyConverter#privateKeyAs Invalid KeyFormat");
 
   t.end();
