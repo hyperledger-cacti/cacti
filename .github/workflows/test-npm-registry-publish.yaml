@@ -31,7 +31,7 @@ jobs:
       contents: read
 
     steps:
-      - uses: actions/checkout@v3.1.0
+      - uses: actions/checkout@v3.5.2
 
       - name: Build image
         run: docker build $DOCKER_BUILD_DIR --file $DOCKERFILE_PATH --tag $IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}"
