@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0-alpha-prerelease](https://github.com/hyperledger/cactus/compare/v1.2.0...v2.0.0-alpha-prerelease) (2023-05-11)
+
+### Bug Fixes
+
+* **keychain-memory-wasm:** wee_alloc is Unmaintained GHSA-rc23-xxgq-x27g ([89d5102](https://github.com/hyperledger/cactus/commit/89d5102496adfe98a542a373e805dc38ecb8f269)), closes [#2352](https://github.com/hyperledger/cactus/issues/2352)
+
 # [1.2.0](https://github.com/hyperledger/cactus/compare/v1.1.3...v1.2.0) (2023-03-28)
 
 **Note:** Version bump only for package @hyperledger/cactus-plugin-keychain-memory-wasm

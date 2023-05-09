@@ -17,8 +17,8 @@ import (
 	"strings"
 	"fmt"
 
-	"github.com/hyperledger/cacti/weaver/common/protos-go/common"
-	"github.com/hyperledger/cacti/weaver/common/protos-go/identity"
+	"github.com/hyperledger/cacti/weaver/common/protos-go/v2/common"
+	"github.com/hyperledger/cacti/weaver/common/protos-go/v2/identity"
 	protoV2 "google.golang.org/protobuf/proto"
 )
 

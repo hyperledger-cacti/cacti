@@ -13,7 +13,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/hyperledger/cacti/weaver/common/protos-go/common"
+	"github.com/hyperledger/cacti/weaver/common/protos-go/v2/common"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/golang/protobuf/proto"

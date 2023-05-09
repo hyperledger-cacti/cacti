@@ -13,7 +13,7 @@ import (
 	"github.com/hyperledger/fabric-chaincode-go/shim"
 	"github.com/stretchr/testify/require"
 	sa "github.com/hyperledger/cacti/weaver/samples/fabric/simpleassettransfer"
-	"github.com/hyperledger/cacti/weaver/common/protos-go/common"
+	"github.com/hyperledger/cacti/weaver/common/protos-go/v2/common"
 	wtest "github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/testutils"
 )
 

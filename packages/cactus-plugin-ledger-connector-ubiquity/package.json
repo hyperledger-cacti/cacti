@@ -1,6 +1,6 @@
 {
     "name": "@hyperledger/cactus-plugin-ledger-connector-ubiquity",
-    "version": "1.2.0",
+    "version": "2.0.0-alpha-prerelease",
     "description": "Allows Cacti nodes to connect to a set of public blockchains.",
     "keywords": [
         "Hyperledger",

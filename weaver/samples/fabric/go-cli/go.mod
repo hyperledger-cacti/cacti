@@ -4,8 +4,8 @@ go 1.20
 
 require (
 	github.com/cloudflare/cfssl v1.4.1
-	github.com/hyperledger/cacti/weaver/common/protos-go v1.5.4
-	github.com/hyperledger/cacti/weaver/sdks/fabric/go-sdk v1.2.5
+	github.com/hyperledger/cacti/weaver/common/protos-go/v2 v2.0.0-alpha-prerelease
+	github.com/hyperledger/cacti/weaver/sdks/fabric/go-sdk/v2 v2.0.0-alpha-prerelease
 	github.com/hyperledger/fabric-sdk-go v1.0.0
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.2.1

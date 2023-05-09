@@ -3,7 +3,7 @@ syntax = "proto3";
 package common.asset_transfer;
 
 option java_package = "org.hyperledger.cacti.weaver.protos.common.asset_transfer";
-option go_package = "github.com/hyperledger/cacti/weaver/common/protos-go/common";
+option go_package = "github.com/hyperledger/cacti/weaver/common/protos-go/v2/common";
 
 message AssetPledge {
 	bytes assetDetails = 1;

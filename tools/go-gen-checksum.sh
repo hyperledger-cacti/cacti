@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Root of repo
-ROOT_DIR='..'
+ROOT_DIR=${2:-'..'}
 
 # Repo full go path
 REPO='github.com/hyperledger/cacti'
@@ -21,23 +21,44 @@ GOMODULE_PATHS=("weaver/core/network/fabric-interop-cc/libs/utils"
 "weaver/samples/fabric/simplestatewithacl"
 "weaver/samples/fabric/simplestate")
 
+VERSION=${1:-"2.0.0"}
+
+echo "REPO: $REPO"
+echo "VERSION: $VERSION"
+
+MAJOR_VER=""
+if [ "${VERSION:0:1}" -gt "1" ]; then
+  MAJOR_VER="/v${VERSION:0:1}"
+fi
+
 for GOMODULE in ${GOMODULE_PATHS[@]}; do
   echo "############# START $GOMODULE ################"
-  cd $ROOT_DIR/$GOMODULE
-  GOMOD_DEPS=$(go mod graph | grep "$REPO/$GOMODULE $REPO" | cut -d ' ' -f 2)
-  cd - > /dev/null
+  pushd $ROOT_DIR/$GOMODULE > /dev/null
+  GOMODULE_PATH=$GOMODULE
+  if [ -f VERSION ]; then
+    GOMODULE_PATH=$GOMODULE$MAJOR_VER
+  fi
+  make run-vendor > /dev/null
+  GOMOD_DEPS=$((go mod graph | grep "$REPO/$GOMODULE_PATH $REPO" | cut -d ' ' -f 2) || (make undo-vendor && echo "ERROR: In generating dependency graph" && exit 1))
+  make undo-vendor > /dev/null
+  popd > /dev/null
 
   for GOMOD_DEP in ${GOMOD_DEPS[@]}; do
     echo "--------- START DEP -----------"
-    GOMOD_PATH=$(echo $GOMOD_DEP | cut -d '@' -f 1 | awk -F "$REPO/" '{print $2}')
+    GOMOD_DEP_VERSION=$(echo $GOMOD_DEP | awk -F "@" '{print $2}')
+    GOMOD_DEP_MAJOR_VERSION=""
+    if [ "${GOMOD_DEP_VERSION:1:1}" -gt "1" ]; then
+      GOMOD_DEP_MAJOR_VERSION="/${GOMOD_DEP_VERSION:0:2}"
+    fi
+    GOMOD_PATH=$(echo $GOMOD_DEP | awk -F "$GOMOD_DEP_MAJOR_VERSION@" '{print $1}' | awk -F "$REPO/" '{print $2}')
     echo DEP: $GOMOD_DEP
     echo DEP: $GOMOD_PATH
     cp $ROOT_DIR/LICENSE $ROOT_DIR/$GOMOD_PATH
-    cd $ROOT_DIR/$GOMOD_PATH
-    GOMOD_NAME="$REPO/$GOMOD_PATH"
+    pushd $ROOT_DIR/$GOMOD_PATH > /dev/null
+    GOMOD_NAME="$REPO/$GOMOD_PATH$MAJOR_VER"
     if [ ! -f VERSION ]; then
       echo "INFO: VERSION absent"
-      popd
+      popd > /dev/null
       echo "------------ END --------------"
       continue
     fi
@@ -48,10 +69,10 @@ for GOMODULE in ${GOMODULE_PATHS[@]}; do
     GOMOD_DOTMOD_SUM_ENTRY="$GOMOD_NAME $GOMOD_VERSION/go.mod $GOMOD_DOTMOD_SUM"
     echo GOSUM: $GOMOD_SUM_ENTRY
     echo GOSUM: $GOMOD_DOTMOD_SUM_ENTRY
-    cd - > /dev/null
+    popd > /dev/null
     rm $ROOT_DIR/$GOMOD_PATH/LICENSE
     
-    cd $ROOT_DIR/$GOMODULE
+    pushd $ROOT_DIR/$GOMODULE > /dev/null
     UPDATE=false
     (cat go.mod | grep -q "$GOMOD_NAME $GOMOD_VERSION") || UPDATE=True
     if $UPDATE; then
@@ -70,7 +91,7 @@ for GOMODULE in ${GOMODULE_PATHS[@]}; do
     else
       echo "ERROR: Version $GOMOD_VERSION already there in go.sum, skipping $GOMOD_PATH in $GOMODULE"
     fi
-    cd - > /dev/null
+    popd > /dev/null
     echo "------------ END --------------"
   done
   echo "############# END $GOMODULE ################\n"

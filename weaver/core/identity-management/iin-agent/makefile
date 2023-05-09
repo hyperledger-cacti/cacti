@@ -6,7 +6,7 @@ DLT_SPECIFIC_DIR ?= .
 COMPOSE_ARG ?=
 
 build: .npmrc
-	npm install
+	npm install --workspaces=false
 	npm run build
 
 	
@@ -32,7 +32,7 @@ cacti-weaver-sdk-fabric:
 build-local: protos-js cacti-weaver-sdk-fabric
 	(cp package.json package-remote.json && \
 		cp package-local.json package.json && \
-		npm install) || \
+		npm install --workspaces=false) || \
 		(mv package-remote.json package.json && exit 1) # Only if fails	
 	mv package-remote.json package.json # Only if success
 	npm run build

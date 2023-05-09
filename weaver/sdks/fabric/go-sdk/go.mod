@@ -1,11 +1,11 @@
-module github.com/hyperledger/cacti/weaver/sdks/fabric/go-sdk
+module github.com/hyperledger/cacti/weaver/sdks/fabric/go-sdk/v2
 
 go 1.20
 
 require (
 	github.com/golang/protobuf v1.5.2
 	github.com/google/uuid v1.3.0
-	github.com/hyperledger/cacti/weaver/common/protos-go v1.5.4
+	github.com/hyperledger/cacti/weaver/common/protos-go/v2 v2.0.0-alpha-prerelease
 	github.com/hyperledger/fabric-protos-go v0.3.0
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0

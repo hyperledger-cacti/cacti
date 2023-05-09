@@ -10,7 +10,7 @@ import (
 	"encoding/hex"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/hyperledger/cacti/weaver/common/protos-go/common"
+	"github.com/hyperledger/cacti/weaver/common/protos-go/v2/common"
 	"github.com/hyperledger/fabric-protos-go/ledger/queryresult"
 	sa "github.com/hyperledger/cacti/weaver/samples/fabric/simpleassettransfer"
 	"github.com/stretchr/testify/require"

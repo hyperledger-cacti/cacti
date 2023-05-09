@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0-alpha-prerelease](https://github.com/hyperledger/cacti/compare/v1.2.0...v2.0.0-alpha-prerelease) (2023-05-11)
+
+### Bug Fixes
+
+* **cactus-example-supply-chain-app:** mitigate CVE-2022-24434 and CVE-2022-24999 ([d28d5e8](https://github.com/hyperledger/cacti/commit/d28d5e8f3ed5dff1aa049c8f1bccce79aa21e948)), closes [#2041](https://github.com/hyperledger/cacti/issues/2041)
+* **cmd-api-server:** mitigate CVE-2022-24434 and CVE-2022-24999 [#2039](https://github.com/hyperledger/cacti/issues/2039) ([1cc9667](https://github.com/hyperledger/cacti/commit/1cc9667e2432d1d27c2647b86e42707a2e78e4c3)), closes [#2241](https://github.com/hyperledger/cacti/issues/2241)
+* **interopcc:** build failing after golang.org/x/crypto bump to v0.1.0 ([6b76f6a](https://github.com/hyperledger/cacti/commit/6b76f6a919689320a62fa2a89b5fc1a80c85e6c9))
+* **iroha2-connector:** fix flaky tests to solve [#2370](https://github.com/hyperledger/cacti/issues/2370) and [#2373](https://github.com/hyperledger/cacti/issues/2373) ([669b51f](https://github.com/hyperledger/cacti/commit/669b51f188536fd5de0c970fcb4fca8fe1337b08))
+* **keychain-memory-wasm:** wee_alloc is Unmaintained GHSA-rc23-xxgq-x27g ([89d5102](https://github.com/hyperledger/cacti/commit/89d5102496adfe98a542a373e805dc38ecb8f269)), closes [#2352](https://github.com/hyperledger/cacti/issues/2352)
+* **relay:** rust build fails after tokio bump from 0.2.25 to 1.18.5 ([187f26e](https://github.com/hyperledger/cacti/commit/187f26e39d8dbbc7860fba13a0317ef842cadebe))
+* **security:** upgrade express-jwt to v8.4.1 ([e251168](https://github.com/hyperledger/cacti/commit/e251168fb4067a8036a5168709e57154c0c02fe4)), closes [#2231](https://github.com/hyperledger/cacti/issues/2231)
+* **security:** vulnerabilities found in fabric-all-in-one ([91c0187](https://github.com/hyperledger/cacti/commit/91c0187febf8532caf41b4a27c64adf14c1cb3cc)), closes [#2056](https://github.com/hyperledger/cacti/issues/2056)
+* **security:** vulnerabilities found in quorum-multi-party-all-in-one ([59cc831](https://github.com/hyperledger/cacti/commit/59cc83198ee2f957644f224138fc10730e7b192c)), closes [#2060](https://github.com/hyperledger/cacti/issues/2060)
+* **tools/quorum-all-in-one:** address CVE-2021-36159 and CVE-2022-28391 ([df6be48](https://github.com/hyperledger/cacti/commit/df6be489efa13901d0d83950e372725e16691564)), closes [ConsenSys/quorum#1513](https://github.com/ConsenSys/quorum/issues/1513) [#2059](https://github.com/hyperledger/cacti/issues/2059)
+* **weaver:** address vulnerability CVE-2020-28477 and many others ([5fcfea3](https://github.com/hyperledger/cacti/commit/5fcfea35858ef0296dd26383481b39cb5634267d))
+* **weaversdk:** ecies decrypt bug when z is less than 32Bytes ([b9066a9](https://github.com/hyperledger/cacti/commit/b9066a9c1bb5582d70cdfd701cae654853ca9c42))
+
+### Features
+
+* **cactus-plugin-persistence-ethereum:** add new persistence plugin ([617c4d3](https://github.com/hyperledger/cacti/commit/617c4d38981b450de3777dfe7d26fbc32219aca5)), closes [#2254](https://github.com/hyperledger/cacti/issues/2254) [#2256](https://github.com/hyperledger/cacti/issues/2256)
+* **connector-go-ethereum:** add getBlock and ([3fa9093](https://github.com/hyperledger/cacti/commit/3fa909346074ed91175bfd4b9c81023fa77a6678)), closes [#2255](https://github.com/hyperledger/cacti/issues/2255)
+* **driver:** added Monitor to fabric driver for missed events ([b6fa3ac](https://github.com/hyperledger/cacti/commit/b6fa3acee9ea8d93d452c62293b71838d11ac3bd))
+* **relay:** configurable db_open retry mechanism added and in driver ([22ba550](https://github.com/hyperledger/cacti/commit/22ba550a96dace4d47a2e068572dea0ac81f860c))
+
 # [1.2.0](https://github.com/hyperledger/cacti/compare/v1.1.3...v1.2.0) (2023-03-28)
 
 ### Bug Fixes

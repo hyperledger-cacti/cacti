@@ -1,8 +1,7 @@
 {
-  "name": "besu-cli",
-  "version": "0.0.1",
+  "name": "@hyperledger/cacti-weaver-besu-cli",
+  "version": "2.0.0-alpha-prerelease",
   "description": "besu-cli CLI",
-  "private": true,
   "types": "build/types/types.d.ts",
   "bin": {
     "besu-cli": "bin/besu-cli"
@@ -29,10 +28,10 @@
     "docs",
     "bin"
   ],
-  "license": "MIT",
+  "license": "Apache-2.0",
   "dependencies": {
-    "@hyperledger/cacti-weaver-sdk-besu": "2.0.0-alpha-prerelease",
     "@hyperledger/cacti-weaver-protos-js": "2.0.0-alpha-prerelease",
+    "@hyperledger/cacti-weaver-sdk-besu": "2.0.0-alpha-prerelease",
     "@truffle/contract": "^4.2.14",
     "gluegun": "latest",
     "winston": "^3.3.3"

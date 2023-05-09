@@ -15,10 +15,10 @@ import (
 	"fmt"
 
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
-	"github.com/hyperledger/cacti/weaver/common/protos-go/common"
-	"github.com/hyperledger/cacti/weaver/common/protos-go/identity"
+	"github.com/hyperledger/cacti/weaver/common/protos-go/v2/common"
+	"github.com/hyperledger/cacti/weaver/common/protos-go/v2/identity"
 	protoV2 "google.golang.org/protobuf/proto"
-	wutils "github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/utils"
+	wutils "github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/utils/v2"
 )
 
 const membershipObjectType = "membership"

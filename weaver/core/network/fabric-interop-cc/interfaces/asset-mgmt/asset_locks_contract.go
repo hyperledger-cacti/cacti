@@ -13,7 +13,7 @@ import (
     "github.com/golang/protobuf/proto"
     "github.com/hyperledger/fabric-contract-api-go/contractapi"
     log "github.com/sirupsen/logrus"
-    "github.com/hyperledger/cacti/weaver/common/protos-go/common"
+    "github.com/hyperledger/cacti/weaver/common/protos-go/v2/common"
 )
 
 

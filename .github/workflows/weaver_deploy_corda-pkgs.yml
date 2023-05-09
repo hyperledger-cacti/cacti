@@ -13,7 +13,6 @@ on:
     #   - 'core/network/corda-interop-app/gradle.properties'
     #   - 'sdks/corda/gradle.properties'
     #   - 'core/drivers/corda-driver/VERSION'
-    #   - 'common/protos-go/VERSION'
       
     tags:
       - v*

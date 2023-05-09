@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-workshop-examples-2022-11-14",
-  "version": "1.2.0",
+  "version": "2.0.0-alpha-prerelease",
   "description": "Cacti Workshop 2022-11-14 Examples",
   "keywords": [
     "Hyperledger",
@@ -53,9 +53,9 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../../webpack.config.js"
   },
   "dependencies": {
-    "@hyperledger/cactus-common": "1.2.0",
-    "@hyperledger/cactus-core": "1.2.0",
-    "@hyperledger/cactus-test-tooling": "1.2.0",
+    "@hyperledger/cactus-common": "2.0.0-alpha-prerelease",
+    "@hyperledger/cactus-core": "2.0.0-alpha-prerelease",
+    "@hyperledger/cactus-test-tooling": "2.0.0-alpha-prerelease",
     "typescript-optional": "2.0.1"
   },
   "engines": {
