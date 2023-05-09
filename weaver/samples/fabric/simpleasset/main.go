@@ -6,7 +6,7 @@ import (
 
   "github.com/hyperledger/fabric-chaincode-go/shim"
   "github.com/hyperledger/fabric-contract-api-go/contractapi"
-  am "github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt"
+  am "github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt/v2"
 )
 
 // SmartContract provides functions for managing an BondAsset and TokenAsset

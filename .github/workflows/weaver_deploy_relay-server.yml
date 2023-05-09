@@ -43,7 +43,7 @@ jobs:
             [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
             echo $VERSION
             if [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+[A-Za-z\-]*$ ]]; then
-              sed -i "s#^version\s*=.*#version = ${VERSION}#g" Cargo.toml
+              sed -i "s#^version\ *=.*#version = ${VERSION}#g" Cargo.toml
             fi
             head -4 Cargo.toml
           working-directory: weaver/common/protos-rs/pkg

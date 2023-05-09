@@ -3,7 +3,7 @@ syntax = "proto3";
 package common.access_control;
 
 option java_package = "org.hyperledger.cacti.weaver.protos.common.access_control";
-option go_package = "github.com/hyperledger/cacti/weaver/common/protos-go/common";
+option go_package = "github.com/hyperledger/cacti/weaver/common/protos-go/v2/common";
 
 // AccessControlPolicy specifies a set of data that can be accessed by some
 // SecurityGroup

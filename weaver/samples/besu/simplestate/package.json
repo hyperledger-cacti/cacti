@@ -1,6 +1,6 @@
 {
-  "name": "simple-state-besu-app",
-  "version": "0.1.0",
+  "name": "@hyperledger/cacti-weaver-besu-simplestate",
+  "version": "2.0.0-alpha-prerelease",
   "description": "Sample Besu Application for Storing Key Value Pairs",
   "license": "Apache-2.0",
   "repository": "https://github.com/hyperledger/cacti/samples/besu/simplestate",
@@ -14,7 +14,7 @@
   "scripts": {
     "copy-interop-contracts": "cp -r ../../../core/network/besu/contracts/interop contracts/",
     "update-truffle-config": "node get-network-details.js",
-    "deploy-contract": "npm install && npm run update-truffle-config && truffle compile && truffle migrate",
+    "deploy-contract": "npm install --workspaces=false && npm run update-truffle-config && truffle compile && truffle migrate",
     "compile": "truffle compile",
     "deploy": "npm run update-truffle-config && truffle migrate",
     "clean-build": "rm -rf build",
@@ -30,11 +30,11 @@
   ],
   "homepage": "https://github.com/hyperledger/cacti/weaver/samples/besu/simplestate",
   "dependencies": {
+    "@openzeppelin/contracts": "^4.7.3",
     "@truffle/contract": "^4.2.14",
     "chai": "^4.3.4",
     "dotenv": "latest",
     "ganache-cli": "^6.12.2",
-    "@openzeppelin/contracts": "^4.7.3",
     "solc": "^0.8.8"
   },
   "devDependencies": {

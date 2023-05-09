@@ -9,12 +9,12 @@ import (
 	"time"
 	
 	"github.com/golang/protobuf/proto"
-	"github.com/hyperledger/cacti/weaver/common/protos-go/common"
+	"github.com/hyperledger/cacti/weaver/common/protos-go/v2/common"
 	mspProtobuf "github.com/hyperledger/fabric-protos-go/msp"
 	sa "github.com/hyperledger/cacti/weaver/samples/fabric/simpleassettransfer"
 	"github.com/stretchr/testify/require"
 	wtest "github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/testutils"
-	// wutils "github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/utils"
+	// wutils "github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/utils/v2"
 )
 
 const (

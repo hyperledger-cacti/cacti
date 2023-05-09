@@ -10,7 +10,7 @@ deploy-contract-network2:
 	BESU_NETWORK_HOST=localhost BESU_NETWORK_PORT=9544 npm run deploy
 
 build:
-	npm install
+	npm install --workspaces=false
 	npm run compile
 
 compile:

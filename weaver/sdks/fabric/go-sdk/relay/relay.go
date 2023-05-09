@@ -12,8 +12,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/hyperledger/cacti/weaver/common/protos-go/common"
-	"github.com/hyperledger/cacti/weaver/common/protos-go/networks"
+	"github.com/hyperledger/cacti/weaver/common/protos-go/v2/common"
+	"github.com/hyperledger/cacti/weaver/common/protos-go/v2/networks"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 )

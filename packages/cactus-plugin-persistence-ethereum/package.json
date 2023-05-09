@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-plugin-persistence-ethereum",
-  "version": "1.2.0",
+  "version": "2.0.0-alpha-prerelease",
   "description": "Persistence plugin for Ethereum ledgers to store data into a database.",
   "keywords": [
     "Hyperledger",
@@ -58,27 +58,27 @@
   },
   "dependencies": {
     "@ethersproject/abi": "5.7.0",
-    "@hyperledger/cactus-core": "1.2.0",
-    "@hyperledger/cactus-common": "1.2.0",
+    "@hyperledger/cactus-common": "2.0.0-alpha-prerelease",
+    "@hyperledger/cactus-core": "2.0.0-alpha-prerelease",
+    "async-mutex": "0.4.0",
+    "fast-safe-stringify": "2.1.1",
     "pg": "8.8.0",
     "run-time-error": "1.4.0",
-    "fast-safe-stringify": "2.1.1",
     "sanitize-html": "2.7.0",
-    "web3-utils": "1.5.2",
-    "async-mutex": "0.4.0",
-    "uuid": "8.3.2"
+    "uuid": "8.3.2",
+    "web3-utils": "1.5.2"
   },
   "devDependencies": {
-    "@hyperledger/cactus-core-api": "1.2.0",
-    "@hyperledger/cactus-api-client": "1.2.0",
-    "@hyperledger/cactus-test-tooling": "1.2.0",
+    "@hyperledger/cactus-api-client": "2.0.0-alpha-prerelease",
+    "@hyperledger/cactus-core-api": "2.0.0-alpha-prerelease",
+    "@hyperledger/cactus-test-tooling": "2.0.0-alpha-prerelease",
     "@types/express": "4.17.13",
     "@types/pg": "8.6.5",
+    "jest-extended": "2.0.0",
     "rxjs": "7.3.0",
     "web3": "1.5.2",
-    "web3-eth": "1.5.2",
     "web3-core": "1.5.2",
-    "jest-extended": "2.0.0"
+    "web3-eth": "1.5.2"
   },
   "engines": {
     "node": ">=10",

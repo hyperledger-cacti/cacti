@@ -2,7 +2,6 @@
   "name": "@hyperledger/cacti-weaver-sdk-besu",
   "description": "Supplemental library for Web3JS based Besu client applications to enable interoperability using Weaver",
   "version": "2.0.0-alpha-prerelease",
-  "description": "",
   "main": "build/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -14,11 +13,11 @@
     "type": "git",
     "url": "https://github.com/hyperledger/cacti.git"
   },
-  "license": "ISC",
+  "license": "Apache-2.0",
   "dependencies": {
     "@hyperledger/cacti-weaver-protos-js": "2.0.0-alpha-prerelease",
     "log4js": "^6.7.0",
-    "web3": "^1.8.1"
+    "web3": "1.5.2"
   },
   "devDependencies": {
     "@types/node": "^14.0.14",

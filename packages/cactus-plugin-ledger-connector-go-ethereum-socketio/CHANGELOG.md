@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0-alpha-prerelease](https://github.com/hyperledger/cacti/compare/v1.2.0...v2.0.0-alpha-prerelease) (2023-05-11)
+
+### Features
+
+* **connector-go-ethereum:** add getBlock and ([3fa9093](https://github.com/hyperledger/cacti/commit/3fa909346074ed91175bfd4b9c81023fa77a6678)), closes [#2255](https://github.com/hyperledger/cacti/issues/2255)
+
 # [1.2.0](https://github.com/hyperledger/cacti/compare/v1.1.3...v1.2.0) (2023-03-28)
 
 ### Features

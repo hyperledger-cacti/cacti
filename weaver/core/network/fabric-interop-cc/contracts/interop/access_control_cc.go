@@ -15,8 +15,8 @@ import (
 
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 	log "github.com/sirupsen/logrus"
-	"github.com/hyperledger/cacti/weaver/common/protos-go/common"
-	wutils "github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/utils"
+	"github.com/hyperledger/cacti/weaver/common/protos-go/v2/common"
+	wutils "github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/utils/v2"
 )
 
 const accessControlObjectType = "accessControl"

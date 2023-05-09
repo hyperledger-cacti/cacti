@@ -1,5 +1,5 @@
 {
-    "name": "driver-fabric",
+    "name": "@hyperledger/cacti-weaver-driver-fabric",
     "version": "2.0.0-alpha-prerelease",
     "description": "",
     "main": "out/server.js",
@@ -17,7 +17,7 @@
         "url": "https://github.com/hyperledger/cacti.git"
     },
     "author": "",
-    "license": "ISC",
+    "license": "Apache-2.0",
     "dependencies": {
         "@hyperledger/cacti-weaver-protos-js": "file:./protos-js",
         "@hyperledger/cacti-weaver-sdk-fabric": "file:./cacti-weaver-sdk-fabric",
