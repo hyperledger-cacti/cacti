@@ -56,7 +56,7 @@ test.skip("Logger#debug/error writes to stdout/stderr", async (t: Test) => {
     didNotThrow = false;
   }
 
-  process.stdout.off("data", stdOutDataHandler);
+  process.stdout.off("data", stdOutDataHandler as unknown);
   t.comment(`Aggregate std out messages: ${aggregateStdOut}`);
   t.true(didNotThrow, "Marker appeared on stdout on time OK");
 
