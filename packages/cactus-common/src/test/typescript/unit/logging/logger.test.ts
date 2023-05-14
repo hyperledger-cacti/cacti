@@ -45,7 +45,7 @@ test.skip("Logger#debug/error writes to stdout/stderr", async (t: Test) => {
         }
       };
 
-      process.stdout.on("data", stdOutDataHandler );
+      process.stdout.on("data", stdOutDataHandler);
 
       // send the log now that we have hooked into the stream waiting for the marker to appear
       log.info(marker);
