@@ -216,12 +216,12 @@ export class SupplyChainApp {
     await this.keychain.set(fabricUserKeychainKey, fabricUserKeychainValue);
 
     // Reserve the ports where the Cactus nodes will run API servers, GUI
-    const httpApiA = await Servers.startOnPort(4000, "0.0.0.0");
-    const httpApiB = await Servers.startOnPort(4100, "0.0.0.0");
-    const httpApiC = await Servers.startOnPort(4200, "0.0.0.0");
-    const httpGuiA = await Servers.startOnPort(3000, "0.0.0.0");
-    const httpGuiB = await Servers.startOnPort(3100, "0.0.0.0");
-    const httpGuiC = await Servers.startOnPort(3200, "0.0.0.0");
+    const httpApiA = await Servers.startOnPort(4000, "127.0.0.1");
+    const httpApiB = await Servers.startOnPort(4100, "127.0.0.1");
+    const httpApiC = await Servers.startOnPort(4200, "127.0.0.1");
+    const httpGuiA = await Servers.startOnPort(3000, "127.0.0.1");
+    const httpGuiB = await Servers.startOnPort(3100, "127.0.0.1");
+    const httpGuiC = await Servers.startOnPort(3200, "127.0.0.1");
 
     const addressInfoA = httpApiA.address() as AddressInfo;
     const nodeApiHostA = `http://localhost:${addressInfoA.port}`;
