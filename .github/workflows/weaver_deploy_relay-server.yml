@@ -6,11 +6,6 @@ name: Deploy Relay Docker Image
 
 on:
   push:
-    # branches:
-    #   - main
-    # paths:
-    #   - 'common/protos-rs/pkg/Cargo.toml'
-    #   - 'core/relay/VERSION'
     tags:
       - v*
       
@@ -36,18 +31,6 @@ jobs:
             toolchain: stable
             components: rustfmt, clippy
             
-        - name: Update version
-          run: |
-            VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-            # Strip "v" prefix from tag name
-            [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-            echo $VERSION
-            if [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+[A-Za-z\-]*$ ]]; then
-              sed -i "s#^version\ *=.*#version = ${VERSION}#g" Cargo.toml
-            fi
-            head -4 Cargo.toml
-          working-directory: weaver/common/protos-rs/pkg
-            
         - name: Publish
           run: cargo publish --token ${CRATES_TOKEN}
           env:
@@ -56,7 +39,7 @@ jobs:
     
   publish-relay-image:
     if: github.repository_owner == 'hyperledger'
-    needs: publish_protos-rs
+    needs: publish-protos-rs
     runs-on: ubuntu-latest
     permissions:
       packages: write

@@ -6,14 +6,6 @@ name: Deploy Corda Packages
 
 on:
   push:
-    # branches:
-    #   - main
-    # paths:
-    #   - 'common/protos-java-kt/gradle.properties'
-    #   - 'core/network/corda-interop-app/gradle.properties'
-    #   - 'sdks/corda/gradle.properties'
-    #   - 'core/drivers/corda-driver/VERSION'
-      
     tags:
       - v*
       
@@ -44,18 +36,6 @@ jobs:
           echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.properties
           echo "url=https://maven.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/cacti" >> github.properties
           cat github.properties
-        working-directory: weaver/common/protos-java-kt
-        
-      - name: Update version
-        run: |
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-          # Strip "v" prefix from tag name
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-          echo $VERSION
-          if [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+[A-Za-z\-]*$ ]]; then
-            sed -i "s#version=.*#version=${VERSION}#g" gradle.properties
-          fi
-          cat gradle.properties
         working-directory: weaver/common/protos-java-kt
         
       - name: Publish
@@ -93,18 +73,6 @@ jobs:
           echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.properties
           echo "url=https://maven.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/cacti" >> github.properties
           cat github.properties
-        working-directory: weaver/core/network/corda-interop-app
-        
-      - name: Update version
-        run: |
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-          # Strip "v" prefix from tag name
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-          echo $VERSION
-          if [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+[A-Za-z\-]*$ ]]; then
-            sed -i "s#version=.*#version=${VERSION}#g" gradle.properties
-          fi
-          cat gradle.properties
         working-directory: weaver/core/network/corda-interop-app
         
       - name: Build
@@ -147,18 +115,6 @@ jobs:
           cat github.properties
         working-directory: weaver/sdks/corda
         
-      - name: Update version
-        run: |
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-          # Strip "v" prefix from tag name
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-          echo $VERSION
-          if [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+[A-Za-z\-]*$ ]]; then
-            sed -i "s#version=.*#version=${VERSION}#g" gradle.properties
-          fi
-          cat gradle.properties
-        working-directory: weaver/sdks/corda
-        
       - name: Build
         run: make build
         working-directory: weaver/sdks/corda
@@ -198,18 +154,6 @@ jobs:
           echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.properties
           echo "url=https://maven.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/cacti" >> github.properties
           cat github.properties
-        working-directory: weaver/core/drivers/corda-driver
-        
-      - name: Update version
-        run: |
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-          # Strip "v" prefix from tag name
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-          echo $VERSION
-          if [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+[A-Za-z\-]*$ ]]; then
-            echo -n $VERSION > VERSION
-          fi
-          cat VERSION
         working-directory: weaver/core/drivers/corda-driver
 
       - name: Check if package already exists
