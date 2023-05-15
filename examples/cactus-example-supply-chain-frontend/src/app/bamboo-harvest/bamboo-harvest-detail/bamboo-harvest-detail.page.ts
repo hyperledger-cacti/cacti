@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
+import { RuntimeError } from "run-time-error";
 
 import { Component, Inject, Input, OnInit } from "@angular/core";
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
@@ -6,9 +7,10 @@ import { ModalController } from "@ionic/angular";
 
 import { ApiClient } from "@hyperledger/cactus-api-client";
 import { BambooHarvest } from "@hyperledger/cactus-example-supply-chain-business-logic-plugin";
+import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
 
 import { QUORUM_DEMO_LEDGER_ID } from "../../../constants";
-import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
+import { isBambooHarvest } from "../is-bamboo-harvest";
 
 @Component({
   selector: "app-bamboo-harvest-detail",
@@ -52,8 +54,12 @@ export class BambooHarvestDetailPage implements OnInit {
     });
   }
 
-  public onClickFormSubmit(value: any): void {
+  public onClickFormSubmit(value: unknown): void {
     this.log.debug("form submitted", value);
+    if (!isBambooHarvest(value)) {
+      const errMsg = `Expected the value to be of type BambooHarvest`;
+      throw new RuntimeError(errMsg);
+    }
     this.bambooHarvest = value;
     this.modalController.dismiss(this.bambooHarvest);
   }

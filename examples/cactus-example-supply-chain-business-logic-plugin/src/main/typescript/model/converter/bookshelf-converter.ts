@@ -1,4 +1,5 @@
 import { Bookshelf } from "../../generated/openapi/typescript-axios/index";
+import { RuntimeError } from "run-time-error";
 
 /**
  * Responsible for converting model entities such as the `Bookshelf` to and
@@ -19,15 +20,31 @@ export class BookshelfConverter {
    * @param arr The array containing the values of properties describing a
    * `Bookshelf` model entity.
    */
-  public static ofSolidityStruct(arr: any[]): Bookshelf {
+  public static ofSolidityStruct(arr: unknown[]): Bookshelf {
+    const id = arr[BookshelfConverter.SOLIDITY_FIELD_ID];
+    if (typeof id !== "string") {
+      const errMsg = `Expected the value of arr[${BookshelfConverter.SOLIDITY_FIELD_ID}] to be a string`;
+      throw new RuntimeError(errMsg);
+    }
+    const shelfCount = arr[BookshelfConverter.SOLIDITY_FIELD_SHELF_COUNT];
+    if (typeof shelfCount !== "number") {
+      const errMsg = `Expected the value of arr[${BookshelfConverter.SOLIDITY_FIELD_SHELF_COUNT}] to be a number`;
+      throw new RuntimeError(errMsg);
+    }
+    const bambooHarvestId =
+      arr[BookshelfConverter.SOLIDITY_FIELD_BAMBOO_HARVEST_ID];
+    if (typeof bambooHarvestId !== "string") {
+      const errMsg = `Expected the value of arr[${BookshelfConverter.SOLIDITY_FIELD_BAMBOO_HARVEST_ID}] to be a string`;
+      throw new RuntimeError(errMsg);
+    }
     return {
-      id: arr[BookshelfConverter.SOLIDITY_FIELD_ID],
-      shelfCount: arr[BookshelfConverter.SOLIDITY_FIELD_SHELF_COUNT],
-      bambooHarvestId: arr[BookshelfConverter.SOLIDITY_FIELD_BAMBOO_HARVEST_ID],
+      id,
+      shelfCount,
+      bambooHarvestId,
     };
   }
 
-  public static ofSolidityStructList(arrayOfArrays: any[][]): Bookshelf[] {
+  public static ofSolidityStructList(arrayOfArrays: unknown[][]): Bookshelf[] {
     return arrayOfArrays.map(BookshelfConverter.ofSolidityStruct);
   }
 }
