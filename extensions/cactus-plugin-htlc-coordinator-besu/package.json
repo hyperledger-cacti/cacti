@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-plugin-htlc-coordinator-besu",
-  "version": "2.0.0-alpha-prerelease",
+  "version": "2.0.0-alpha.1",
   "description": "HTLC Coordinator to exchange tokens between networks.",
   "keywords": [
     "Hyperledger",
@@ -9,13 +9,13 @@
     "Blockchain",
     "Distributed Ledger Technology"
   ],
-  "homepage": "https://github.com/hyperledger/cactus#readme",
+  "homepage": "https://github.com/hyperledger/cacti#readme",
   "bugs": {
-    "url": "https://github.com/hyperledger/cactus/issues"
+    "url": "https://github.com/hyperledger/cacti/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hyperledger/cactus.git"
+    "url": "git+https://github.com/hyperledger/cacti.git"
   },
   "license": "Apache-2.0",
   "author": {
@@ -57,13 +57,13 @@
     "webpack:prod:web": "webpack --env=prod --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
-    "@hyperledger/cactus-common": "2.0.0-alpha-prerelease",
-    "@hyperledger/cactus-core": "2.0.0-alpha-prerelease",
-    "@hyperledger/cactus-core-api": "2.0.0-alpha-prerelease",
-    "@hyperledger/cactus-plugin-htlc-eth-besu": "2.0.0-alpha-prerelease",
-    "@hyperledger/cactus-plugin-htlc-eth-besu-erc20": "2.0.0-alpha-prerelease",
-    "@hyperledger/cactus-plugin-ledger-connector-besu": "2.0.0-alpha-prerelease",
-    "@hyperledger/cactus-test-plugin-htlc-eth-besu-erc20": "2.0.0-alpha-prerelease",
+    "@hyperledger/cactus-common": "2.0.0-alpha.1",
+    "@hyperledger/cactus-core": "2.0.0-alpha.1",
+    "@hyperledger/cactus-core-api": "2.0.0-alpha.1",
+    "@hyperledger/cactus-plugin-htlc-eth-besu": "2.0.0-alpha.1",
+    "@hyperledger/cactus-plugin-htlc-eth-besu-erc20": "2.0.0-alpha.1",
+    "@hyperledger/cactus-plugin-ledger-connector-besu": "2.0.0-alpha.1",
+    "@hyperledger/cactus-test-plugin-htlc-eth-besu-erc20": "2.0.0-alpha.1",
     "axios": "0.21.4",
     "body-parser": "1.19.0",
     "joi": "14.3.1",
@@ -73,8 +73,8 @@
     "typescript-optional": "2.0.1"
   },
   "devDependencies": {
-    "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-alpha-prerelease",
-    "@hyperledger/cactus-test-tooling": "2.0.0-alpha-prerelease",
+    "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-alpha.1",
+    "@hyperledger/cactus-test-tooling": "2.0.0-alpha.1",
     "@types/express": "4.17.8",
     "socket.io": "4.4.1"
   },

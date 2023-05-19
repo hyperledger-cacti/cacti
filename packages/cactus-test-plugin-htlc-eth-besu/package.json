@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-test-plugin-htlc-eth-besu",
-  "version": "2.0.0-alpha-prerelease",
+  "version": "2.0.0-alpha.1",
   "description": "Integration tests for the Besu ledger and the API server.",
   "keywords": [
     "Hyperledger",
@@ -9,13 +9,13 @@
     "Blockchain",
     "Distributed Ledger Technology"
   ],
-  "homepage": "https://github.com/hyperledger/cactus#readme",
+  "homepage": "https://github.com/hyperledger/cacti#readme",
   "bugs": {
-    "url": "https://github.com/hyperledger/cactus/issues"
+    "url": "https://github.com/hyperledger/cacti/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hyperledger/cactus.git"
+    "url": "git+https://github.com/hyperledger/cacti.git"
   },
   "license": "Apache-2.0",
   "author": {
@@ -50,14 +50,14 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
-    "@hyperledger/cactus-cmd-api-server": "2.0.0-alpha-prerelease",
-    "@hyperledger/cactus-common": "2.0.0-alpha-prerelease",
-    "@hyperledger/cactus-core": "2.0.0-alpha-prerelease",
-    "@hyperledger/cactus-core-api": "2.0.0-alpha-prerelease",
-    "@hyperledger/cactus-plugin-htlc-eth-besu": "2.0.0-alpha-prerelease",
-    "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-alpha-prerelease",
-    "@hyperledger/cactus-plugin-ledger-connector-besu": "2.0.0-alpha-prerelease",
-    "@hyperledger/cactus-test-tooling": "2.0.0-alpha-prerelease",
+    "@hyperledger/cactus-cmd-api-server": "2.0.0-alpha.1",
+    "@hyperledger/cactus-common": "2.0.0-alpha.1",
+    "@hyperledger/cactus-core": "2.0.0-alpha.1",
+    "@hyperledger/cactus-core-api": "2.0.0-alpha.1",
+    "@hyperledger/cactus-plugin-htlc-eth-besu": "2.0.0-alpha.1",
+    "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-alpha.1",
+    "@hyperledger/cactus-plugin-ledger-connector-besu": "2.0.0-alpha.1",
+    "@hyperledger/cactus-test-tooling": "2.0.0-alpha.1",
     "axios": "0.21.4",
     "key-encoder": "2.0.3",
     "web3": "1.5.2",

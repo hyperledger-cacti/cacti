@@ -1,6 +1,6 @@
 {
     "name": "@hyperledger/cacti-weaver-driver-fabric",
-    "version": "2.0.0-alpha-prerelease",
+    "version": "2.0.0-alpha.1",
     "description": "",
     "main": "out/server.js",
     "scripts": {
@@ -19,10 +19,10 @@
     "author": "",
     "license": "Apache-2.0",
     "dependencies": {
-        "@hyperledger/cacti-weaver-protos-js": "2.0.0-alpha-prerelease",
-        "@hyperledger/cacti-weaver-sdk-fabric": "2.0.0-alpha-prerelease",
         "@fidm/x509": "^1.2.1",
         "@grpc/grpc-js": "^1.1.1",
+        "@hyperledger/cacti-weaver-protos-js": "2.0.0-alpha.1",
+        "@hyperledger/cacti-weaver-sdk-fabric": "2.0.0-alpha.1",
         "@typescript-eslint/eslint-plugin": "^4.29.1",
         "@typescript-eslint/parser": "^4.29.1",
         "dotenv": "^8.2.0",
@@ -34,10 +34,10 @@
         "winston": "^3.3.3"
     },
     "devDependencies": {
-        "patch-package": "^6.2.2",
         "@types/node": "^14.0.14",
+        "nodemon": "^2.0.4",
+        "patch-package": "^6.2.2",
         "typedoc": "^0.23.15",
-        "typescript": "^4.8.4",
-        "nodemon": "^2.0.4"
+        "typescript": "^4.8.4"
     }
 }

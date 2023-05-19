@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0-alpha.1](https://github.com/hyperledger/cacti/compare/v2.0.0-alpha-prerelease...v2.0.0-alpha.1) (2023-05-19)
+
+### Bug Fixes
+
+* **ci:** multiple bug fixes in weaver deployment workflows ([3e6d908](https://github.com/hyperledger/cacti/commit/3e6d908cb4cf732ef057a30df3e8267381f3f806))
+
 # [2.0.0-alpha-prerelease](https://github.com/hyperledger/cacti/compare/v1.2.0...v2.0.0-alpha-prerelease) (2023-05-11)
 
 ### Bug Fixes

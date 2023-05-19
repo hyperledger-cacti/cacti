@@ -80,7 +80,7 @@ GRADLE_FILES=("weaver/core/drivers/corda-driver"
 for MODULE in ${GRADLE_FILES[@]}; do
   echo "DEP UPDATE MODULE: $MODULE"
   pushd $ROOT_DIR/$MODULE > /dev/null
-  sed -i'.scriptbak' "s#cactiVersion=.*#version=${VERSION}#g" constants.properties
+  sed -i'.scriptbak' "s#cactiVersion=.*#cactiVersion=${VERSION}#g" constants.properties
   rm -rf constants.properties.scriptbak
   popd > /dev/null
 done
