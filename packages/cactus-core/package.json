@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-core",
-  "version": "2.0.0-alpha-prerelease",
+  "version": "2.0.0-alpha.1",
   "description": "Contains lower level abstractions/implementation that is to be shared by multiple other, higher level packages of the project.",
   "keywords": [
     "Hyperledger",
@@ -9,13 +9,13 @@
     "Blockchain",
     "Distributed Ledger Technology"
   ],
-  "homepage": "https://github.com/hyperledger/cactus#readme",
+  "homepage": "https://github.com/hyperledger/cacti#readme",
   "bugs": {
-    "url": "https://github.com/hyperledger/cactus/issues"
+    "url": "https://github.com/hyperledger/cacti/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hyperledger/cactus.git"
+    "url": "git+https://github.com/hyperledger/cacti.git"
   },
   "license": "Apache-2.0",
   "author": {
@@ -50,8 +50,8 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
-    "@hyperledger/cactus-common": "2.0.0-alpha-prerelease",
-    "@hyperledger/cactus-core-api": "2.0.0-alpha-prerelease",
+    "@hyperledger/cactus-common": "2.0.0-alpha.1",
+    "@hyperledger/cactus-core-api": "2.0.0-alpha.1",
     "express": "4.17.3",
     "express-jwt-authz": "2.4.1",
     "express-openapi-validator": "4.13.8",

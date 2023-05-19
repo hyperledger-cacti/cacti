@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-core-api",
-  "version": "2.0.0-alpha-prerelease",
+  "version": "2.0.0-alpha.1",
   "description": "Contains type definitions/interfaces for the kernel of the codebase. Kept separate from the implementation so that it is easier to use it as a dependency.",
   "main": "dist/lib/main/typescript/index.js",
   "mainMinified": "dist/cactus-core-api.node.umd.min.js",
@@ -42,7 +42,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hyperledger/cactus.git"
+    "url": "git+https://github.com/hyperledger/cacti.git"
   },
   "keywords": [
     "Hyperledger",
@@ -51,9 +51,9 @@
     "Blockchain",
     "Distributed Ledger Technology"
   ],
-  "homepage": "https://github.com/hyperledger/cactus#readme",
+  "homepage": "https://github.com/hyperledger/cacti#readme",
   "bugs": {
-    "url": "https://github.com/hyperledger/cactus/issues"
+    "url": "https://github.com/hyperledger/cacti/issues"
   },
   "license": "Apache-2.0",
   "author": {
@@ -74,7 +74,7 @@
     }
   ],
   "dependencies": {
-    "@hyperledger/cactus-common": "2.0.0-alpha-prerelease",
+    "@hyperledger/cactus-common": "2.0.0-alpha.1",
     "axios": "0.21.4"
   },
   "devDependencies": {

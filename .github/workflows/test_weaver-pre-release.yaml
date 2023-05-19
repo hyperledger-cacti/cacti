@@ -8,24 +8,6 @@ on:
   pull_request:
     branches:
       - main
-    paths:
-      - 'weaver/common/protos-java-kt/gradle.properties'
-      - 'weaver/core/network/corda-interop-app/gradle.properties'
-      - 'weaver/sdks/corda/gradle.properties'
-      - 'weaver/common/protos-js/package.json'
-      - 'weaver/sdks/fabric/interoperation-node-sdk/package.json'
-      - 'weaver/sdks/besu/node/package.json'
-      - 'weaver/common/protos-rs/pkg/Cargo.toml'
-      - 'weaver/core/drivers/corda-driver/VERSION'
-      - 'weaver/core/drivers/fabric-driver/VERSION'
-      - 'weaver/core/identity-management/iin-agent/VERSION'
-      - 'weaver/core/relay/VERSION'
-      - 'weaver/common/protos-go/VERSION'
-      - 'weaver/core/network/fabric-interop-cc/libs/utils/VERSION'
-      - 'weaver/core/network/fabric-interop-cc/libs/assetexchange/VERSION'
-      - 'weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt/VERSION'
-      - 'weaver/core/network/fabric-interop-cc/contracts/interop/VERSION'
-      - 'weaver/sdks/fabric/go-sdk/VERSION'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}

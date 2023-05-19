@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-example-carbon-accounting-business-logic-plugin",
-  "version": "2.0.0-alpha-prerelease",
+  "version": "2.0.0-alpha.1",
   "description": "An example business logic plugin implementation for Cactus",
   "keywords": [
     "Hyperledger",
@@ -9,13 +9,13 @@
     "Blockchain",
     "Distributed Ledger Technology"
   ],
-  "homepage": "https://github.com/hyperledger/cactus#readme",
+  "homepage": "https://github.com/hyperledger/cacti#readme",
   "bugs": {
-    "url": "https://github.com/hyperledger/cactus/issues"
+    "url": "https://github.com/hyperledger/cacti/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hyperledger/cactus.git"
+    "url": "git+https://github.com/hyperledger/cacti.git"
   },
   "license": "Apache-2.0",
   "author": {
@@ -55,14 +55,14 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
-    "@hyperledger/cactus-api-client": "2.0.0-alpha-prerelease",
-    "@hyperledger/cactus-common": "2.0.0-alpha-prerelease",
-    "@hyperledger/cactus-core": "2.0.0-alpha-prerelease",
-    "@hyperledger/cactus-core-api": "2.0.0-alpha-prerelease",
-    "@hyperledger/cactus-plugin-consortium-manual": "2.0.0-alpha-prerelease",
-    "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-alpha-prerelease",
-    "@hyperledger/cactus-plugin-ledger-connector-fabric": "2.0.0-alpha-prerelease",
-    "@hyperledger/cactus-plugin-ledger-connector-xdai": "2.0.0-alpha-prerelease",
+    "@hyperledger/cactus-api-client": "2.0.0-alpha.1",
+    "@hyperledger/cactus-common": "2.0.0-alpha.1",
+    "@hyperledger/cactus-core": "2.0.0-alpha.1",
+    "@hyperledger/cactus-core-api": "2.0.0-alpha.1",
+    "@hyperledger/cactus-plugin-consortium-manual": "2.0.0-alpha.1",
+    "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-alpha.1",
+    "@hyperledger/cactus-plugin-ledger-connector-fabric": "2.0.0-alpha.1",
+    "@hyperledger/cactus-plugin-ledger-connector-xdai": "2.0.0-alpha.1",
     "async-exit-hook": "2.0.1",
     "axios": "0.21.4",
     "express": "4.17.1",

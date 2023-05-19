@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-plugin-odap-hermes",
-  "version": "2.0.0-alpha-prerelease",
+  "version": "2.0.0-alpha.1",
   "description": "Proof of concept of ODAP",
   "keywords": [
     "Hyperledger",
@@ -12,7 +12,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hyperledger/cactus.git"
+    "url": "git+https://github.com/hyperledger/cacti.git"
   },
   "license": "Apache-2.0",
   "author": {
@@ -48,15 +48,15 @@
     "watch": "npm-watch"
   },
   "dependencies": {
-    "@hyperledger/cactus-cmd-api-server": "2.0.0-alpha-prerelease",
-    "@hyperledger/cactus-common": "2.0.0-alpha-prerelease",
-    "@hyperledger/cactus-core": "2.0.0-alpha-prerelease",
-    "@hyperledger/cactus-core-api": "2.0.0-alpha-prerelease",
-    "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-alpha-prerelease",
-    "@hyperledger/cactus-plugin-ledger-connector-besu": "2.0.0-alpha-prerelease",
-    "@hyperledger/cactus-plugin-ledger-connector-fabric": "2.0.0-alpha-prerelease",
-    "@hyperledger/cactus-plugin-object-store-ipfs": "2.0.0-alpha-prerelease",
-    "@hyperledger/cactus-test-tooling": "2.0.0-alpha-prerelease",
+    "@hyperledger/cactus-cmd-api-server": "2.0.0-alpha.1",
+    "@hyperledger/cactus-common": "2.0.0-alpha.1",
+    "@hyperledger/cactus-core": "2.0.0-alpha.1",
+    "@hyperledger/cactus-core-api": "2.0.0-alpha.1",
+    "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-alpha.1",
+    "@hyperledger/cactus-plugin-ledger-connector-besu": "2.0.0-alpha.1",
+    "@hyperledger/cactus-plugin-ledger-connector-fabric": "2.0.0-alpha.1",
+    "@hyperledger/cactus-plugin-object-store-ipfs": "2.0.0-alpha.1",
+    "@hyperledger/cactus-test-tooling": "2.0.0-alpha.1",
     "axios": "0.21.4",
     "crypto-js": "4.0.0",
     "knex": "2.4.0",

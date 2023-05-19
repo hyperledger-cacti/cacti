@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-plugin-ledger-connector-sawtooth-socketio",
-  "version": "2.0.0-alpha-prerelease",
+  "version": "2.0.0-alpha.1",
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -14,7 +14,7 @@
     "init-sawtooth": "cp -af ../../yarn.lock ./dist/yarn.lock"
   },
   "dependencies": {
-    "@hyperledger/cactus-cmd-socketio-server": "2.0.0-alpha-prerelease",
+    "@hyperledger/cactus-cmd-socketio-server": "2.0.0-alpha.1",
     "@types/node": "14.17.32",
     "body-parser": "1.17.2",
     "cbor": "6.0.1",
@@ -31,9 +31,9 @@
     "xmlhttprequest": "1.8.0"
   },
   "devDependencies": {
-    "@hyperledger/cactus-api-client": "2.0.0-alpha-prerelease",
-    "@hyperledger/cactus-common": "2.0.0-alpha-prerelease",
-    "@hyperledger/cactus-test-tooling": "2.0.0-alpha-prerelease",
+    "@hyperledger/cactus-api-client": "2.0.0-alpha.1",
+    "@hyperledger/cactus-common": "2.0.0-alpha.1",
+    "@hyperledger/cactus-test-tooling": "2.0.0-alpha.1",
     "@types/config": "0.0.41"
   }
 }

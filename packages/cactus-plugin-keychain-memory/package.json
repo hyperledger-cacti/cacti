@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-plugin-keychain-memory",
-  "version": "2.0.0-alpha-prerelease",
+  "version": "2.0.0-alpha.1",
   "description": "Dummy keychain implementation doing NO encryption and storing everything in-memory. Only suitable for development and testing.",
   "keywords": [
     "Hyperledger",
@@ -9,13 +9,13 @@
     "Blockchain",
     "Distributed Ledger Technology"
   ],
-  "homepage": "https://github.com/hyperledger/cactus#readme",
+  "homepage": "https://github.com/hyperledger/cacti#readme",
   "bugs": {
-    "url": "https://github.com/hyperledger/cactus/issues"
+    "url": "https://github.com/hyperledger/cacti/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hyperledger/cactus.git"
+    "url": "git+https://github.com/hyperledger/cacti.git"
   },
   "license": "Apache-2.0",
   "author": {
@@ -55,9 +55,9 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
-    "@hyperledger/cactus-common": "2.0.0-alpha-prerelease",
-    "@hyperledger/cactus-core": "2.0.0-alpha-prerelease",
-    "@hyperledger/cactus-core-api": "2.0.0-alpha-prerelease",
+    "@hyperledger/cactus-common": "2.0.0-alpha.1",
+    "@hyperledger/cactus-core": "2.0.0-alpha.1",
+    "@hyperledger/cactus-core-api": "2.0.0-alpha.1",
     "axios": "0.21.4",
     "express": "4.17.3",
     "prom-client": "13.2.0",

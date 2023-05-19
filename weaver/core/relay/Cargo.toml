@@ -1,6 +1,6 @@
 [package]
 name = "relay"
-version = "2.0.0-alpha-prerelease"
+version = "2.0.0-alpha.1"
 authors = ["Antony Targett <atargett@au1.ibm.com>", "Nick Waywood <nwaywood@au1.ibm.com>", "Sandeep Nishad <sandeep.nishad1@ibm.com"]
 edition = "2018"
 
@@ -35,7 +35,7 @@ base64 = "0.20.0"
 reqwest = { version = "0.11.16", features = ["json"] }
 serde_json = "1.0.95"
 # cacti_weaver_protos_rs = { path = "./protos-rs" }
-cacti_weaver_protos_rs = "2.0.0-alpha-prerelease"
+cacti_weaver_protos_rs = "2.0.0-alpha.1"
 
 [build-dependencies]
 tonic-build = "0.8.4"
