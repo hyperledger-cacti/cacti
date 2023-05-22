@@ -18,7 +18,6 @@ test.skip("Logger#debug/error writes to stdout/stderr", async (t: Test) => {
 
   // wait for the marker to appear on stdout OR crash with timeout if it never comes
   let aggregateStdOut = "";
-  let stdOutDataHandler;
   let didNotThrow: boolean;
   try {
     // hook up to the stdout data stream and wrap it in a promise that can be awaited
@@ -32,7 +31,7 @@ test.skip("Logger#debug/error writes to stdout/stderr", async (t: Test) => {
     // bake in some stream data aggregation instead where you collect and continually append
     // the incoming data chunks and test for marker presence in the aggregate variable not the chunk
     // that is provided in the 'data' event handler callback.
-    await new Promise((resolve, reject) => {
+      async function waitUntilMarkerAppears() {
       const timeoutMsg = "Timed out waiting for marker to appear on stdout";
       const timerId = setTimeout(() => reject(new Error(timeoutMsg)), 5000);
 
@@ -46,17 +45,27 @@ test.skip("Logger#debug/error writes to stdout/stderr", async (t: Test) => {
       };
 
       process.stdout.on("data", stdOutDataHandler);
+      
+      await new Promise((resolve, reject) => {
+         try {
+      resolve(marker);
+    } catch (ex) {
+      reject(ex);
+    }
+  });
+}
 
+await waitUntilMarkerAppears();
       // send the log now that we have hooked into the stream waiting for the marker to appear
-      log.info(marker);
-    });
+     // log.info(marker);
+    //  });
 
     didNotThrow = true;
   } catch (ex) {
     didNotThrow = false;
   }
 
-  process.stdout.off("data", stdOutDataHandler as any);
+  process.stdout.off("data", stdOutDataHandler);
   t.comment(`Aggregate std out messages: ${aggregateStdOut}`);
   t.true(didNotThrow, "Marker appeared on stdout on time OK");
 
