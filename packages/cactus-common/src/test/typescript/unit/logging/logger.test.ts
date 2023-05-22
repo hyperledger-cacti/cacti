@@ -18,6 +18,7 @@ test.skip("Logger#debug/error writes to stdout/stderr", async (t: Test) => {
 
   // wait for the marker to appear on stdout OR crash with timeout if it never comes
   let aggregateStdOut = "";
+  let stdOutDataHandler: (data: Buffer) => void;
   let didNotThrow: boolean;
   try {
     // hook up to the stdout data stream and wrap it in a promise that can be awaited
