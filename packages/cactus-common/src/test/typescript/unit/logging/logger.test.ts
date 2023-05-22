@@ -12,15 +12,15 @@ test.skip("Logger#debug/error writes to stdout/stderr", async (t: Test) => {
 
   let aggregateStdOut = "";
   let didNotThrow: boolean;
-  let stdOutDataHandler;
+  let stdOutDataHandler: (data: Buffer) => void; 
 
   try {
     async function waitUntilMarkerAppears() {
-      return new Promise((resolve, reject) => {
+      return new Promise<void>((resolve, reject) => {
         const timeoutMsg = "Timed out waiting for marker to appear on stdout";
         const timerId = setTimeout(() => reject(new Error(timeoutMsg)), 5000);
 
-        stdOutDataHandler = (data: Buffer) => {
+        stdOutDataHandler = (data: Buffer) => { // Explicitly type stdOutDataHandler
           const msg = data.toString("utf-8");
           aggregateStdOut = aggregateStdOut.concat(msg);
           if (msg.includes(marker)) {
