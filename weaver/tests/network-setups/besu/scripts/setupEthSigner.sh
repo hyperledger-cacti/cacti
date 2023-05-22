@@ -16,7 +16,10 @@ cp ../artifacts/network$1/createKeyFile.js .
 key=`cat $Node/data/key`
 sed -i "s/<AccountPrivateKey>/$key/g" createKeyFile.js
 touch keys/keyFile_${Node}
-npm install web3
+# Without this, the npm install will fail because of conflicting dependency versions
+# that cannot be resolved properly unless "forced" (tested on Ubuntu 22.04)
+# FIXME: Eliminate the need to do an npm install out-of-bounds like this entirely.
+npm install --force web3
 node createKeyFile.js > keys/keyFile_${Node}
 rm createKeyFile.js
 cp ../artifacts/account.toml keys/
