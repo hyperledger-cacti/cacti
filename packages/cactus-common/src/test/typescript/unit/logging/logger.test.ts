@@ -18,7 +18,7 @@ test.skip("Logger#debug/error writes to stdout/stderr", async (t: Test) => {
 
   // wait for the marker to appear on stdout OR crash with timeout if it never comes
   let aggregateStdOut = "";
-  let stdOutDataHandler : ((...args: any[]) => void);
+  let stdOutDataHandler;
   let didNotThrow: boolean;
   try {
     // hook up to the stdout data stream and wrap it in a promise that can be awaited
@@ -36,7 +36,7 @@ test.skip("Logger#debug/error writes to stdout/stderr", async (t: Test) => {
       const timeoutMsg = "Timed out waiting for marker to appear on stdout";
       const timerId = setTimeout(() => reject(new Error(timeoutMsg)), 5000);
 
-      stdOutDataHandler = (data: Buffer) => {
+      stdOutDataHandler : ((...args: any[]) => void) = (data: Buffer) => {
         const msg = data.toString("utf-8");
         aggregateStdOut = aggregateStdOut.concat(msg);
         if (msg.includes(marker)) {
