@@ -40,14 +40,15 @@ test.skip("Logger#debug/error writes to stdout/stderr", async (t: Test) => {
         aggregateStdOut = aggregateStdOut.concat(msg);
         if (msg.includes(marker)) {
           clearInterval(timerId);
-          resolve(marker);
+          log.info(marker);
+          return;
         }
       };
 
       process.stdout.on("data", stdOutDataHandler);
       
       await new Promise((resolve, reject) => {
-         try {
+        try {
       resolve(marker);
     } catch (ex) {
       reject(ex);
@@ -56,9 +57,6 @@ test.skip("Logger#debug/error writes to stdout/stderr", async (t: Test) => {
 }
 
 await waitUntilMarkerAppears();
-      // send the log now that we have hooked into the stream waiting for the marker to appear
-     // log.info(marker);
-    //  });
 
     didNotThrow = true;
   } catch (ex) {
