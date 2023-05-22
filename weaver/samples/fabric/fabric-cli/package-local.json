@@ -1,5 +1,5 @@
 {
-  "name": "@hyperledger-labs/weaver-fabric-cli",
+  "name": "@hyperledger/cacti-weaver-fabric-cli",
   "version": "1.2.1",
   "description": "fabric-cli CLI",
   "types": "build/types/types.d.ts",
@@ -30,7 +30,7 @@
     "docs",
     "bin"
   ],
-  "license": "MIT",
+  "license": "Apache-2.0",
   "dependencies": {
     "@hyperledger/cacti-weaver-protos-js": "file:../../../common/protos-js",
     "@hyperledger/cacti-weaver-sdk-fabric": "file:../../../sdks/fabric/interoperation-node-sdk",

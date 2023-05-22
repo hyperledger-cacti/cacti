@@ -11,7 +11,7 @@ package assetexchange
 import (
     "strconv"
 
-    "github.com/hyperledger/cacti/weaver/common/protos-go/common"
+    "github.com/hyperledger/cacti/weaver/common/protos-go/v2/common"
     "github.com/hyperledger/fabric-contract-api-go/contractapi"
 )
 

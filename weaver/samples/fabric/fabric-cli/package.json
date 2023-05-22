@@ -1,6 +1,6 @@
 {
-  "name": "@hyperledger-labs/weaver-fabric-cli",
-  "version": "1.2.1",
+  "name": "@hyperledger/cacti-weaver-fabric-cli",
+  "version": "2.0.0-alpha-prerelease",
   "description": "fabric-cli CLI",
   "types": "build/types/types.d.ts",
   "bin": {
@@ -30,11 +30,11 @@
     "docs",
     "bin"
   ],
-  "license": "MIT",
+  "license": "Apache-2.0",
   "dependencies": {
     "@fidm/x509": "^1.2.1",
-    "@hyperledger/cacti-weaver-sdk-fabric": "latest",
-    "@hyperledger/cacti-weaver-protos-js": "latest",
+    "@hyperledger/cacti-weaver-protos-js": "2.0.0-alpha-prerelease",
+    "@hyperledger/cacti-weaver-sdk-fabric": "2.0.0-alpha-prerelease",
     "body-parser": "^1.20.0",
     "crypto": "^1.0.1",
     "dotenv": "^8.2.0",

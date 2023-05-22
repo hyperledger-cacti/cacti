@@ -18,7 +18,7 @@ jobs:
   unit_test_interopcc:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3.1.0
+    - uses: actions/checkout@v3.5.2
 
     - name: Set up Go
       uses: actions/setup-go@v4.0.0
@@ -41,7 +41,7 @@ jobs:
     # if: ${{ false }}  # disable
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3.1.0
+    - uses: actions/checkout@v3.5.2
 
     - name: Set up Go
       uses: actions/setup-go@v4.0.0
@@ -63,7 +63,7 @@ jobs:
   unit_test_simplestate:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3.1.0
+    - uses: actions/checkout@v3.5.2
 
     - name: Set up Go
       uses: actions/setup-go@v4.0.0
@@ -85,7 +85,7 @@ jobs:
   unit_test_simpleasset:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3.1.0
+    - uses: actions/checkout@v3.5.2
 
     - name: Set up Go
       uses: actions/setup-go@v4.0.0
@@ -107,7 +107,7 @@ jobs:
   unit_test_simpleassetandinterop:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3.1.0
+    - uses: actions/checkout@v3.5.2
 
     - name: Set up Go
       uses: actions/setup-go@v4.0.0
@@ -129,7 +129,7 @@ jobs:
   unit_test_simpleassettransfer:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3.1.0
+    - uses: actions/checkout@v3.5.2
 
     - name: Set up Go
       uses: actions/setup-go@v4.0.0

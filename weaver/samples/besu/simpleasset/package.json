@@ -1,6 +1,6 @@
 {
-  "name": "sample-besu-app",
-  "version": "0.1.0",
+  "name": "@hyperledger/cacti-weaver-besu-simpleasset",
+  "version": "2.0.0-alpha-prerelease",
   "description": "Sample Besu Application for Demonstrating Interoperation With Other Networks",
   "license": "Apache-2.0",
   "repository": "https://github.com/hyperledger/cacti/samples/besu/simpleasset",
@@ -14,7 +14,7 @@
   "scripts": {
     "copy-interop-contracts": "cp ../../../core/network/besu/contracts/interop/manageAssetAny.sol contracts/ && cp ../../../core/network/besu/interface/asset-exchange/transferInterface.sol contracts/ && cp ../../../common/protos-sol/asset_locks.proto.sol contracts/",
     "update-truffle-config": "node get-network-details.js",
-    "deploy-contract": "npm run copy-interop-contracts && npm install && npm run update-truffle-config && truffle compile && truffle migrate",
+    "deploy-contract": "npm run copy-interop-contracts && npm install --workspaces=false && npm run update-truffle-config && truffle compile && truffle migrate",
     "clean-run": "rm -rf package-lock.json build",
     "clean": "rm -rf node_modules package-lock.json build",
     "redeploy": "npm run copy-interop-contracts && truffle migrate --reset"
@@ -29,8 +29,6 @@
   ],
   "homepage": "https://github.com/hyperledger/cacti/weaver/samples/besu/simpleasset",
   "dependencies": {
-    "@hyperledger/cacti-weaver-sdk-besu": "file:../../../sdks/besu/node",
-    "@hyperledger/cacti-weaver-protos-js": "file:../../../common/protos-js",
     "@lazyledger/protobuf3-solidity-lib": "^0.6.0",
     "@openzeppelin/contracts": "^4.3.2",
     "@truffle/contract": "^4.2.14",

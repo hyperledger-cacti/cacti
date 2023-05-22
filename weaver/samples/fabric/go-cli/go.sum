@@ -346,7 +346,7 @@ github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9de
 github.com/yuin/goldmark v1.1.32/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.2.1/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.3.5/go.mod h1:mwnBkeHKe2W/ZEtQ+71ViKU8L12m81fl3OWwC1Zlc8k=
-github.com/ziutek/mymysql v1.5.4/go.mod h1:LMSpPZ6DbqWFxNCHW77HeMg9I646SAhApZ/wKdgO/C0=
+github.com/ziutek/mymysql v2.0.0/go.mod h1:LMSpPZ6DbqWFxNCHW77HeMg9I646SAhApZ/wKdgO/C0=
 github.com/zmap/rc2 v0.0.0-20131011165748-24b9757f5521/go.mod h1:3YZ9o3WnatTIZhuOtot4IcUfzoKVjUHqu6WALIyI0nE=
 github.com/zmap/zcertificate v0.0.0-20180516150559-0e3d58b1bac4/go.mod h1:5iU54tB79AMBcySS0R2XIyZBAVmeHranShAFELYx7is=
 github.com/zmap/zcrypto v0.0.0-20190729165852-9051775e6a2e h1:mvOa4+/DXStR4ZXOks/UsjeFdn5O5JpLUtzqk9U8xXw=
@@ -731,3 +731,7 @@ honnef.co/go/tools v0.0.1-2020.1.4/go.mod h1:X/FiERA/W4tHapMX5mGpAtMSVEeEUOyHaw9
 rsc.io/binaryregexp v0.2.0/go.mod h1:qTv7/COck+e2FymRvadv62gMdZztPaShugOCi3I+8D8=
 rsc.io/quote/v3 v3.1.0/go.mod h1:yEA65RcK8LyAZtP9Kv3t0HmxON59tX3rD+tICJqUlj0=
 rsc.io/sampler v1.3.0/go.mod h1:T1hPZKmBbMNahiBKFy5HrXp6adAjACjK9JXDnKaTXpA=
+github.com/hyperledger/cacti/weaver/common/protos-go/v2 v2.0.0-alpha-prerelease h1:MpVTzM8FvQ+2Qij/0DH0cGy2NoC1S5gD5c40HuEQlsI=
+github.com/hyperledger/cacti/weaver/common/protos-go/v2 v2.0.0-alpha-prerelease/go.mod h1:3DmkYfZoc+TtcAgF3kX6CmQDNKKKCHgbaoQuYu/3ayc=
+github.com/hyperledger/cacti/weaver/sdks/fabric/go-sdk/v2 v2.0.0-alpha-prerelease h1:pUkt89xRIjyTZhdLn5Ho9+Cv8DTKB7JI3s5KYgob3bI=
+github.com/hyperledger/cacti/weaver/sdks/fabric/go-sdk/v2 v2.0.0-alpha-prerelease/go.mod h1:RhGMpW0//3tWeQfD2qmKavIGoK1KDucN5engVpqPAUE=

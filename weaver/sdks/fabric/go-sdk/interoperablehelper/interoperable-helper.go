@@ -14,12 +14,12 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
-	"github.com/hyperledger/cacti/weaver/common/protos-go/common"
-	"github.com/hyperledger/cacti/weaver/common/protos-go/corda"
-	"github.com/hyperledger/cacti/weaver/common/protos-go/fabric"
-	"github.com/hyperledger/cacti/weaver/sdks/fabric/go-sdk/helpers"
-	"github.com/hyperledger/cacti/weaver/sdks/fabric/go-sdk/relay"
-	"github.com/hyperledger/cacti/weaver/sdks/fabric/go-sdk/types"
+	"github.com/hyperledger/cacti/weaver/common/protos-go/v2/common"
+	"github.com/hyperledger/cacti/weaver/common/protos-go/v2/corda"
+	"github.com/hyperledger/cacti/weaver/common/protos-go/v2/fabric"
+	"github.com/hyperledger/cacti/weaver/sdks/fabric/go-sdk/v2/helpers"
+	"github.com/hyperledger/cacti/weaver/sdks/fabric/go-sdk/v2/relay"
+	"github.com/hyperledger/cacti/weaver/sdks/fabric/go-sdk/v2/types"
 	log "github.com/sirupsen/logrus"
 	protoV2 "google.golang.org/protobuf/proto"
 )

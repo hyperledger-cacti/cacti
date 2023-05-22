@@ -37,7 +37,7 @@ jobs:
       status: ${{ steps.early.outputs.status }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3.1.0
+      - uses: actions/checkout@v3.5.2
       
       - name: Ignore if not a release PR
         id: early
@@ -54,7 +54,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3.1.0
+      - uses: actions/checkout@v3.5.2
       
       - name: Get release verison from PR title
         run: |
@@ -64,6 +64,7 @@ jobs:
           # Strip "v" from version
           VERSION=$(echo $VERSION | sed -e 's/^v//')
           echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo $VERSION
 
       # Gradle
       - name: check weaver/common/protos-java-kt/gradle.properties
@@ -160,10 +161,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3.1.0
+      - uses: actions/checkout@v3.5.2
+      
+      - name: Get release verison from PR title
+        run: |
+          # Assuming release PR follows pattern: chore(release): publish vA.B.C
+          # Split PR title by space, and take 3rd word
+          VERSION=$(echo "${{ github.event.pull_request.title }}" | cut -d ' ' -f 3)
+          # Strip "v" from version
+          VERSION=$(echo $VERSION | sed -e 's/^v//')
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo $VERSION
       
       - name: Update GO Checksum
-        run: sh go-gen-checksum.sh
+        run: ./go-gen-checksum.sh $VERSION
+        working-directory: tools
       
       - name: Check if changes are committed
         run: (git status | grep "nothing to commit, working tree clean") || (echo "go-gen-checksum not called before release commit" && exit 1)

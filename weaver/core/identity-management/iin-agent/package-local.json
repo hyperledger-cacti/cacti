@@ -1,5 +1,5 @@
 {
-    "name": "iin-agent",
+    "name": "@hyperledger/cacti-weaver-iin-agent",
     "version": "2.0.0-alpha-prerelease",
     "description": "",
     "main": "index.js",
@@ -17,7 +17,7 @@
         "url": "https://github.com/hyperledger/cacti.git"
     },
     "author": "",
-    "license": "ISC",
+    "license": "Apache-2.0",
     "dependencies": {
         "@hyperledger/cacti-weaver-protos-js": "file:./protos-js",
         "@hyperledger/cacti-weaver-sdk-fabric": "file:./cacti-weaver-sdk-fabric",

@@ -6,14 +6,6 @@ name: Deploy Node JS Packages
 
 on:
   push:
-    # branches:
-    #   - main
-    # paths:
-    #   - 'common/protos-js/package.json'
-    #   - 'sdks/fabric/interoperation-node-sdk/package.json'
-    #   - 'sdks/besu/node/package.json'
-    #   - 'core/drivers/fabric-driver/VERSION'
-    #   - 'core/identity-management/iin-agent/VERSION'
     tags:
       - v*
       
@@ -30,10 +22,10 @@ jobs:
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3.1.0
+      - uses: actions/checkout@v3.5.2
       
       - name: Use Node.js 14.x
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: 14.x
           
@@ -47,18 +39,6 @@ jobs:
           cp .npmrc.template .npmrc
           sed -i "s/<personal-access-token>/${{ secrets.GITHUB_TOKEN }}/g" .npmrc
           cat .npmrc
-        working-directory: weaver/common/protos-js
-        
-      - name: Update version
-        run: |
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-          # Strip "v" prefix from tag name
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-          echo $VERSION
-          if [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+[A-Za-z\-]*$ ]]; then
-            sed -i "s#\"version\":.*#\"version\": \"${VERSION}\"#g" package.json
-          fi
-          head -4 package.json
         working-directory: weaver/common/protos-js
         
       - name: Build
@@ -94,10 +74,10 @@ jobs:
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3.1.0
+      - uses: actions/checkout@v3.5.2
       
       - name: Use Node.js 14.x
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: 14.x
           
@@ -106,18 +86,6 @@ jobs:
           cp .npmrc.template .npmrc
           sed -i "s/<personal-access-token>/${{ secrets.GITHUB_TOKEN }}/g" .npmrc
           cat .npmrc
-        working-directory: weaver/sdks/fabric/interoperation-node-sdk
-        
-      - name: Update version
-        run: |
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-          # Strip "v" prefix from tag name
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-          echo $VERSION
-          if [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+[A-Za-z\-]*$ ]]; then
-            sed -i "s#\"version\":.*#\"version\": \"${VERSION}\"#g" package.json
-          fi
-          head -4 package.json
         working-directory: weaver/sdks/fabric/interoperation-node-sdk
         
       - name: Build
@@ -151,10 +119,10 @@ jobs:
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3.1.0
+      - uses: actions/checkout@v3.5.2
       
       - name: Use Node.js 14.x
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3.6.0
         with:
           node-version: 14.x
           
@@ -163,18 +131,6 @@ jobs:
           cp .npmrc.template .npmrc
           sed -i "s/<personal-access-token>/${{ secrets.GITHUB_TOKEN }}/g" .npmrc
           cat .npmrc
-        working-directory: weaver/sdks/besu/node
-        
-      - name: Update version
-        run: |
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-          # Strip "v" prefix from tag name
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-          echo $VERSION
-          if [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+[A-Za-z\-]*$ ]]; then
-            sed -i "s#\"version\":.*#\"version\": \"${VERSION}\"#g" package.json
-          fi
-          head -4 package.json
         working-directory: weaver/sdks/besu/node
         
       - name: Build
@@ -208,10 +164,10 @@ jobs:
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3.1.0
+      - uses: actions/checkout@v3.5.2
       
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2.1.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -222,18 +178,6 @@ jobs:
           cp .npmrc.template .npmrc
           sed -i "s/<personal-access-token>/${{ secrets.GITHUB_TOKEN }}/g" .npmrc
           cat .npmrc
-        working-directory: weaver/core/drivers/fabric-driver
-        
-      - name: Update version
-        run: |
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-          # Strip "v" prefix from tag name
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-          echo $VERSION
-          if [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+[A-Za-z\-]*$ ]]; then
-            echo -n $VERSION > VERSION
-          fi
-          cat VERSION
         working-directory: weaver/core/drivers/fabric-driver
 
       - name: Check if package already exists
@@ -260,10 +204,10 @@ jobs:
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3.1.0
+      - uses: actions/checkout@v3.5.2
       
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2.1.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -274,18 +218,6 @@ jobs:
           cp .npmrc.template .npmrc
           sed -i "s/<personal-access-token>/${{ secrets.GITHUB_TOKEN }}/g" .npmrc
           cat .npmrc
-        working-directory: weaver/core/identity-management/iin-agent
-        
-      - name: Update version
-        run: |
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-          # Strip "v" prefix from tag name
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-          echo $VERSION
-          if [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+[A-Za-z\-]*$ ]]; then
-            echo -n $VERSION > VERSION
-          fi
-          cat VERSION
         working-directory: weaver/core/identity-management/iin-agent
 
       - name: Check if package already exists

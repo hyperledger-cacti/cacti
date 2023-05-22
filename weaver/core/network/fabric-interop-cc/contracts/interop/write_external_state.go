@@ -19,9 +19,9 @@ import (
 	"github.com/hyperledger/fabric-protos-go/msp"
 	"github.com/hyperledger/fabric-protos-go/peer"
 	log "github.com/sirupsen/logrus"
-	"github.com/hyperledger/cacti/weaver/common/protos-go/common"
-	"github.com/hyperledger/cacti/weaver/common/protos-go/corda"
-	"github.com/hyperledger/cacti/weaver/common/protos-go/fabric"
+	"github.com/hyperledger/cacti/weaver/common/protos-go/v2/common"
+	"github.com/hyperledger/cacti/weaver/common/protos-go/v2/corda"
+	"github.com/hyperledger/cacti/weaver/common/protos-go/v2/fabric"
 	protoV2 "google.golang.org/protobuf/proto"
 )
 

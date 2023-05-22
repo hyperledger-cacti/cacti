@@ -8,7 +8,7 @@ import "common/events.proto";
 import "common/state.proto";
 
 option java_package = "org.hyperledger.cacti.weaver.protos.driver.driver";
-option go_package = "github.com/hyperledger/cacti/weaver/common/protos-go/driver";
+option go_package = "github.com/hyperledger/cacti/weaver/common/protos-go/v2/driver";
 
 // Data for a View processing by dest-driver
 message WriteExternalStateMessage {

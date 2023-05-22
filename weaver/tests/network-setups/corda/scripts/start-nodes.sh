@@ -9,7 +9,7 @@ simpleAppVersion="0.4"
 houseTokenAppVersion="1.0"
 tokenVersion="1.2"
 
-cactiVersion="2.0.0-alpha-prerelease"
+. $directory/../constants.properties
 
 parties="Notary PartyA PartyB PartyC"
 

@@ -6,15 +6,6 @@ name: Deploy Go Modules
 
 on:
   push:
-    # branches:
-    #   - main
-    # paths:
-    #   - 'common/protos-go/VERSION'
-    #   - 'core/network/fabric-interop-cc/libs/utils/VERSION'
-    #   - 'core/network/fabric-interop-cc/libs/assetexchange/VERSION'
-    #   - 'core/network/fabric-interop-cc/interfaces/asset-mgmt/VERSION'
-    #   - 'core/network/fabric-interop-cc/contracts/interop/VERSION'
-    #   - 'sdks/fabric/go-sdk/VERSION'
     tags:
       - v*
       
@@ -27,14 +18,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3.1.0
+      - uses: actions/checkout@v3.5.2
           
       - name: Set current date as env
         run: echo "RELEASE_DATE=$(date +%b\ %d,\ %Y)" >> $GITHUB_ENV
                 
       - name: Set module tag and description
         run: |
-          echo "MODULE_TAG=common/protos-go" >> $GITHUB_ENV
+          echo "MODULE_TAG=weaver/common/protos-go" >> $GITHUB_ENV
           echo "MODULE_DESC=GO Weaver Protos" >> $GITHUB_ENV
         
       - name: Update version
@@ -84,10 +75,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3.1.0
+      - uses: actions/checkout@v3.5.2
       
       - name: Set up Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v4.0.0
         with:
           go-version: '1.20.2'
           
@@ -96,7 +87,7 @@ jobs:
                 
       - name: Set module tag and description
         run: |
-          echo "MODULE_TAG=core/network/fabric-interop-cc/libs/utils" >> $GITHUB_ENV
+          echo "MODULE_TAG=weaver/core/network/fabric-interop-cc/libs/utils" >> $GITHUB_ENV
           echo "MODULE_DESC=GO Fabric Utils Library for Interoperation" >> $GITHUB_ENV
         
       - name: Update version
@@ -150,10 +141,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3.1.0
+      - uses: actions/checkout@v3.5.2
       
       - name: Set up Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v4.0.0
         with:
           go-version: '1.20.2'
           
@@ -162,7 +153,7 @@ jobs:
                 
       - name: Set module tag and description
         run: |
-          echo "MODULE_TAG=core/network/fabric-interop-cc/libs/assetexchange" >> $GITHUB_ENV
+          echo "MODULE_TAG=weaver/core/network/fabric-interop-cc/libs/assetexchange" >> $GITHUB_ENV
           echo "MODULE_DESC=GO Fabric Library for Asset Exchange" >> $GITHUB_ENV
         
       - name: Update version
@@ -216,10 +207,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3.1.0
+      - uses: actions/checkout@v3.5.2
       
       - name: Set up Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v4.0.0
         with:
           go-version: '1.20.2'
           
@@ -228,7 +219,7 @@ jobs:
                 
       - name: Set module tag and description
         run: |
-          echo "MODULE_TAG=core/network/fabric-interop-cc/interfaces/asset-mgmt" >> $GITHUB_ENV
+          echo "MODULE_TAG=weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt" >> $GITHUB_ENV
           echo "MODULE_DESC=GO Fabric Asset Management Interface" >> $GITHUB_ENV
         
       - name: Update version
@@ -282,10 +273,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3.1.0
+      - uses: actions/checkout@v3.5.2
       
       - name: Set up Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v4.0.0
         with:
           go-version: '1.20.2'
           
@@ -294,7 +285,7 @@ jobs:
                 
       - name: Set module tag and description
         run: |
-          echo "MODULE_TAG=core/network/fabric-interop-cc/contracts/interop" >> $GITHUB_ENV
+          echo "MODULE_TAG=weaver/core/network/fabric-interop-cc/contracts/interop" >> $GITHUB_ENV
           echo "MODULE_DESC=GO Fabric Interop Chaincode" >> $GITHUB_ENV
         
       - name: Update version
@@ -348,10 +339,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3.1.0
+      - uses: actions/checkout@v3.5.2
       
       - name: Set up Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v4.0.0
         with:
           go-version: '1.20.2'
           
@@ -360,7 +351,7 @@ jobs:
                 
       - name: Set module tag and description
         run: |
-            echo "MODULE_TAG=sdks/fabric/go-sdk" >> $GITHUB_ENV
+            echo "MODULE_TAG=weaver/sdks/fabric/go-sdk" >> $GITHUB_ENV
             echo "MODULE_DESC=GO Fabric Weaver SDK" >> $GITHUB_ENV
           
       - name: Update version
@@ -414,7 +405,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3.1.0
+      - uses: actions/checkout@v3.5.2
       
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v1
