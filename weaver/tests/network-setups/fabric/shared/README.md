@@ -38,6 +38,7 @@ All paths in following steps are relative to this folder (`tests/network-setups/
 4. Build `fabric-cli`. Set up `.env` and `config.json` as per the steps in docs. (Don't run anything else in fabric-cli from the steps there).
 4. Go to `samples/fabric/fabric-cli`, and run following commands to create credentials for fabric networks:
     ```
+    ./scripts/createUsers.sh
     ./bin/fabric-cli configure create all --local-network=network1
     ./bin/fabric-cli configure create all --local-network=network2
     ```

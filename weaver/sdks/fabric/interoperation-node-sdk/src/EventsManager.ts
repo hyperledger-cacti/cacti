@@ -129,7 +129,7 @@ const subscribeRemoteEvent = async (
         throw new Error(`InteropFlow failed to get policy criteria: ${policyCriteriaError}`);
     }
 
-    const relay = useTls ? new Relay(localRelayEndpoint, Relay.defaultTimeout, true, tlsRootCACertPaths) : new Relay(localRelayEndpoint);
+    const relay = useTls ? new Relay(localRelayEndpoint, true, tlsRootCACertPaths) : new Relay(localRelayEndpoint);
     const uuidValue = uuidv4();
     
     logger.debug("Making event subscription call to relay for \
@@ -201,7 +201,7 @@ const unsubscribeRemoteEvent = async (
         throw new Error(`InteropFlow failed to get policy criteria: ${policyCriteriaError}`);
     }
 
-    const relay = useTls ? new Relay(localRelayEndpoint, Relay.defaultTimeout, true, tlsRootCACertPaths) : new Relay(localRelayEndpoint);
+    const relay = useTls ? new Relay(localRelayEndpoint, true, tlsRootCACertPaths) : new Relay(localRelayEndpoint);
     const uuidValue = uuidv4();
     
     logger.debug("Making event unsubscription call to relay for \
@@ -241,7 +241,7 @@ const getSubscriptionStatus = async (
 ): Promise<any> => {
     logger.debug("Get Event Subscription Status")
 
-    const relay = useTls ? new Relay(localRelayEndpoint, Relay.defaultTimeout, true, tlsRootCACertPaths) : new Relay(localRelayEndpoint);
+    const relay = useTls ? new Relay(localRelayEndpoint, true, tlsRootCACertPaths) : new Relay(localRelayEndpoint);
 
     const [relayResponse, relayResponseError] = await helpers.handlePromise(
         relay.GetEventSubscriptionState(
@@ -279,7 +279,7 @@ const getAllReceivedEvents = async (
 ): Promise<any> => {
     logger.debug("Get all received event states")
 
-    const relay = useTls ? new Relay(localRelayEndpoint, Relay.defaultTimeout, true, tlsRootCACertPaths) : new Relay(localRelayEndpoint);
+    const relay = useTls ? new Relay(localRelayEndpoint, true, tlsRootCACertPaths) : new Relay(localRelayEndpoint);
     
     const [relayResponse, relayResponseError] = await helpers.handlePromise(
         relay.GetEventStates(

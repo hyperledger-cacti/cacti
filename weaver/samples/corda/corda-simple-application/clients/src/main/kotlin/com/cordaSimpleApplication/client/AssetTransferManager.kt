@@ -621,6 +621,7 @@ fun requestStateFromRemoteNetwork(
             config["RELAY_TLSCA_CERT_PATHS"]!!
         ).fold({
             println("Error in Interop Flow: ${it.message}")
+            exitProcess(1)
         }, {
             linearId = it.toString()
             println("Interop flow successful and external-state was stored with linearId $linearId.\n")

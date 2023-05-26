@@ -61,7 +61,9 @@ jobs:
         
       - name: Publish
         if: ${{ env.PROTOS_JS_PUBLISH == 'true' }}
-        run: make publish
+        run: |
+            export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
+            make publish
         working-directory: weaver/common/protos-js
         
   publish-fabric-sdk:

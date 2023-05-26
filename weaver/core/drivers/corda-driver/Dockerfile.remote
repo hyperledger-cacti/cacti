@@ -2,6 +2,12 @@
 FROM gradle:4.10.3-jdk8 AS builder-remote
 
 USER root
+
+#Update stretch repositories
+RUN sed -i s/deb.debian.org/archive.debian.org/g /etc/apt/sources.list
+RUN sed -i 's|security.debian.org|archive.debian.org/|g' /etc/apt/sources.list
+RUN sed -i '/stretch-updates/d' /etc/apt/sources.list
+
 RUN apt-get update && apt-get install -y maven
 
 WORKDIR /driver/corda

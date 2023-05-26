@@ -241,7 +241,7 @@ describe("Relay", () => {
     });
     describe("#fail relay api calls 2", () => {
         const localRelayEndpoint = "localhost:19082"
-        const relay = new Relay(localRelayEndpoint, 2000);
+        const relay = new Relay(localRelayEndpoint, false, [], 2000);
         const requestId = "ABC-123"
 
         const ack = {
