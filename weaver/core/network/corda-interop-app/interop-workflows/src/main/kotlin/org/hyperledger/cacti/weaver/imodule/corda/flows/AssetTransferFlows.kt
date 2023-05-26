@@ -14,6 +14,7 @@ import org.hyperledger.cacti.weaver.imodule.corda.states.AssetClaimStatusState
 import org.hyperledger.cacti.weaver.imodule.corda.states.NetworkIdState
 import org.hyperledger.cacti.weaver.protos.common.asset_transfer.AssetTransfer
 import org.hyperledger.cacti.weaver.protos.corda.ViewDataOuterClass
+import org.hyperledger.cacti.weaver.protos.common.interop_payload.InteropPayloadOuterClass
 import com.google.protobuf.ByteString
 
 import net.corda.core.contracts.ContractState
@@ -474,7 +475,8 @@ object ReclaimPledgedAsset {
 
             val viewData = subFlow(GetExternalStateByLinearId(claimStatusLinearId))
             val externalStateView = ViewDataOuterClass.ViewData.parseFrom(viewData)
-            val payloadDecoded = Base64.getDecoder().decode(externalStateView.notarizedPayloadsList[0].payload.toByteArray())
+            val interopPayload = InteropPayloadOuterClass.InteropPayload.parseFrom(externalStateView.notarizedPayloadsList[0].payload)
+            val payloadDecoded = Base64.getDecoder().decode(interopPayload.payload.toByteArray())
             val assetClaimStatus = AssetTransfer.AssetClaimStatus.parseFrom(payloadDecoded)
             println("Asset claim status details obtained via interop query: ${assetClaimStatus}")
 
@@ -683,7 +685,8 @@ object ClaimRemoteAsset {
             // get the asset pledge details fetched earlier via interop query from import to export n/w
             val viewData = subFlow(GetExternalStateByLinearId(pledgeStatusLinearId))
             val externalStateView = ViewDataOuterClass.ViewData.parseFrom(viewData)
-            val payloadDecoded = Base64.getDecoder().decode(externalStateView.notarizedPayloadsList[0].payload.toByteArray())
+            val interopPayload = InteropPayloadOuterClass.InteropPayload.parseFrom(externalStateView.notarizedPayloadsList[0].payload)
+            val payloadDecoded = Base64.getDecoder().decode(interopPayload.payload.toByteArray())
             val assetPledgeStatus = AssetTransfer.AssetPledge.parseFrom(payloadDecoded)
             println("Asset pledge status details obtained via interop query: ${assetPledgeStatus}")
             println("getAssetAndContractIdFlowName: ${getAssetAndContractIdFlowName} assetIdOrQuantity: ${assetIdOrQuantity}")

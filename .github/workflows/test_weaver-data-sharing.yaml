@@ -55,12 +55,12 @@ jobs:
           echo "Using ${GITHUB_ACTOR} user."
           echo "username=${GITHUB_ACTOR}" >> github.properties
           echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.properties
-          echo "url=https://maven.pkg.github.com/${GITHUB_ACTOR}/weaver-dlt-interoperability" >> github.properties
+          echo "url=https://maven.pkg.github.com/${GITHUB_ACTOR}/cacti" >> github.properties
 
           echo "Using ${GITHUB_ACTOR} user."
           echo "username=${GITHUB_ACTOR}" >> github.main.properties
           echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.main.properties
-          echo "url=https://maven.pkg.github.com/hyperledger-labs/weaver-dlt-interoperability" >> github.main.properties
+          echo "url=https://maven.pkg.github.com/hyperledger/cacti" >> github.main.properties
 
           ./scripts/get-cordapps.sh || mv github.main.properties github.properties
 
@@ -337,6 +337,46 @@ jobs:
               exit 1
           fi
         working-directory: weaver/samples/fabric/fabric-cli
+        
+      - name: DEBUG Logs - corda partya
+        if: failure()
+        run: docker logs corda_partya_1
+        
+      - name: DEBUG Logs - corda network2 partya
+        if: failure()
+        run: docker logs corda_network2_partya_1
+        
+      - name: DEBUG Logs - fabric n1 relay
+        if: failure()
+        run: docker logs relay-network1
+        
+      - name: DEBUG Logs - fabric n2 relay
+        if: failure()
+        run: docker logs relay-network2
+        
+      - name: DEBUG Logs - corda relay
+        if: failure()
+        run: docker logs relay-corda
+        
+      - name: DEBUG Logs - corda2 relay
+        if: failure()
+        run: docker logs relay-corda2
+        
+      - name: DEBUG Logs - fabric n1 driver
+        if: failure()
+        run: docker logs driver-fabric-network1
+        
+      - name: DEBUG Logs - fabric n2 driver
+        if: failure()
+        run: docker logs driver-fabric-network2
+        
+      - name: DEBUG Logs - corda driver
+        if: failure()
+        run: docker logs driver-corda-Corda_Network
+        
+      - name: DEBUG Logs - corda2 driver
+        if: failure()
+        run: docker logs driver-corda-Corda_Network2
 
   data-sharing-docker-local:
     # if: ${{ false }}
@@ -703,6 +743,46 @@ jobs:
               exit 1
           fi
         working-directory: weaver/samples/fabric/fabric-cli
+        
+      - name: DEBUG Logs - corda partya
+        if: failure()
+        run: docker logs corda_partya_1
+        
+      - name: DEBUG Logs - corda network2 partya
+        if: failure()
+        run: docker logs corda_network2_partya_1
+        
+      - name: DEBUG Logs - fabric n1 relay
+        if: failure()
+        run: docker logs relay-network1
+        
+      - name: DEBUG Logs - fabric n2 relay
+        if: failure()
+        run: docker logs relay-network2
+        
+      - name: DEBUG Logs - corda relay
+        if: failure()
+        run: docker logs relay-corda
+        
+      - name: DEBUG Logs - corda2 relay
+        if: failure()
+        run: docker logs relay-corda2
+        
+      - name: DEBUG Logs - fabric n1 driver
+        if: failure()
+        run: docker logs driver-fabric-network1
+        
+      - name: DEBUG Logs - fabric n2 driver
+        if: failure()
+        run: docker logs driver-fabric-network2
+        
+      - name: DEBUG Logs - corda driver
+        if: failure()
+        run: docker logs driver-corda-Corda_Network
+        
+      - name: DEBUG Logs - corda2 driver
+        if: failure()
+        run: docker logs driver-corda-Corda_Network2
 
   data-sharing-local:
     # if: ${{ false }}
@@ -1073,3 +1153,43 @@ jobs:
               exit 1
           fi
         working-directory: weaver/samples/fabric/fabric-cli
+        
+      - name: DEBUG Logs - corda partya
+        if: failure()
+        run: docker logs corda_partya_1
+        
+      - name: DEBUG Logs - corda network2 partya
+        if: failure()
+        run: docker logs corda_network2_partya_1
+        
+      - name: DEBUG Logs - fabric n1 relay
+        if: failure()
+        run: cat weaver/core/relay/relay-n1.out
+        
+      - name: DEBUG Logs - fabric n2 relay
+        if: failure()
+        run: cat weaver/core/relay/relay-n2.out
+        
+      - name: DEBUG Logs - corda relay
+        if: failure()
+        run: cat weaver/core/relay/relay-corda.out
+        
+      - name: DEBUG Logs - corda2 relay
+        if: failure()
+        run: cat weaver/core/relay/relay-corda2.out
+        
+      - name: DEBUG Logs - fabric n1 driver
+        if: failure()
+        run: cat weaver/core/drivers/fabric-driver/fdriver-n1.out
+        
+      - name: DEBUG Logs - fabric n2 driver
+        if: failure()
+        run: cat weaver/core/drivers/fabric-driver/fdriver-n2.out
+        
+      - name: DEBUG Logs - corda driver
+        if: failure()
+        run: cat weaver/core/drivers/corda-driver/corda-driver.out
+        
+      - name: DEBUG Logs - corda2 driver
+        if: failure()
+        run: cat weaver/core/drivers/corda-driver/corda2-driver.out

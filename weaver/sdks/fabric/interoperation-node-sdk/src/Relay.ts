@@ -20,13 +20,14 @@ import * as helpers from "./helpers";
  * The Relay class represents a relay in the target blockchain network.
  */
 class Relay {
-    static defaultTimeout = 3000;
+    static defaultTimeout = 30000;
+    static defaultBackOffMSec = 500;
     timeoutTime = Relay.defaultTimeout;
+    backOffMSec = Relay.defaultBackOffMSec;
     _endPoint = "";
     _useTls = false;
     _tlsRootCACerts = '';
     // TODO: make this configurable parameter
-    backOffMSec = 500;
 
     /**
      * Construct a Relay object with the given url. A Relay object
@@ -36,11 +37,12 @@ class Relay {
      * @param {string} url - The URL with format of "http(s)://host:port".
      * @returns {Relay} The Relay instance.
      */
-    constructor(endPoint: string, timeoutTime = 30000, useTls = false, tlsRootCACertPaths?: Array<string>) {
+    constructor(endPoint: string, useTls = false, tlsRootCACertPaths?: Array<string>, timeoutTime = 30000, backOffMSec = 500) {
         if (!endPoint) {
             throw new Error("Invalid Arguments");
         }
         this.timeoutTime = timeoutTime;
+        this.backOffMSec = backOffMSec;
         // eslint-disable-next-line
         this._endPoint = endPoint;
         this._useTls = useTls;

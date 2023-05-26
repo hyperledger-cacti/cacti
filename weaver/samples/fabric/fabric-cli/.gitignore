@@ -24,6 +24,10 @@ iinagent.id
 src/wallet-network1/*.id
 !src/wallet-network1/networkadmin.id
 !src/wallet-network1/user1.id
+!src/wallet-network1/alice.id
+!src/wallet-network1/bob.id
 src/wallet-network2/*.id
 !src/wallet-network2/networkadmin.id
 !src/wallet-network2/user1.id
+!src/wallet-network2/alice.id
+!src/wallet-network2/bob.id

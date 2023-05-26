@@ -169,23 +169,28 @@ class InteroperableHelper {
                 return Left(Error("Error creating channel to relay: ${e.message}\n"))
             }
             val client = RelayClient(channel)
-            var result: Either<Error, String> = Left(Error(""))
-            runBlocking {
-                val eitherErrorQuery = constructNetworkQuery(proxy, externalStateAddress, networkName)
-                logger.debug("\nCorda network returned: $eitherErrorQuery \n")
-                eitherErrorQuery.map { networkQuery ->
-                    logger.debug("Network query: $networkQuery")
-                    runBlocking {
-                        val ack = async { client.requestState(networkQuery) }.await()
-                        pollForState(ack.requestId, client).map {
-                            result = writeExternalStateToVault(
-                                proxy,  
-                                it,
-                                externalStateAddress)
-                        }
-                    }
+            val eitherErrorQuery = constructNetworkQuery(proxy, externalStateAddress, networkName)
+            logger.debug("Corda network returned: $eitherErrorQuery \n")
+            val result = eitherErrorQuery.fold({
+                logger.error("error ${it}")
+                Left(it)
+            }, { networkQuery ->
+                logger.debug("Network query: $networkQuery")
+                var eitherErrorResult: Either<Error, String> = Left(Error("Unknown Error"))
+                runBlocking {
+                    val ack = async { client.requestState(networkQuery) }.await()
+                    pollForState(ack.requestId, client).fold({
+                        logger.error("Error in Interop Flow: ${it.message}\n")
+                        eitherErrorResult = Left(Error("Error in Interop Flow: ${it.message}\n"))
+                    }, { state ->
+                        eitherErrorResult = writeExternalStateToVault(
+                            proxy,  
+                            state,
+                            externalStateAddress)
+                    })
                 }
-            }
+                eitherErrorResult
+            })
             return result
         }
         
@@ -288,14 +293,15 @@ class InteroperableHelper {
          * @property proxy The proxy to the Corda node RPC connection.
          * @return Returns an Either with an error if the RPC connection failed or the interop flow failed, or a NetworkQuery.
          */
-        suspend fun constructNetworkQuery(
+        fun constructNetworkQuery(
             proxy: CordaRPCOps,
             address: String,
             requestingNetwork: String
         ): Either<Error, Networks.NetworkQuery> {
             logger.debug("Getting query information for foreign network from Corda network")
-            try {
-                val eitherErrorRequest = proxy.startFlow(::CreateExternalRequest, address)
+            return try {
+                val eitherErrorRequest = runCatching {
+                    proxy.startFlow(::CreateExternalRequest, address)
                         .returnValue.get().map {
                             Networks.NetworkQuery.newBuilder()
                                     .addAllPolicy(it.policy)
@@ -308,9 +314,14 @@ class InteroperableHelper {
                                     .setNonce(it.nonce)
                                     .build()
                         }
-                return eitherErrorRequest
+                }.getOrThrow()
+                if (eitherErrorRequest.isLeft())    {
+                    Left(Error("Corda Network Error: ${eitherErrorRequest}"))
+                } else {
+                    eitherErrorRequest
+                }
             } catch (e: Exception) {
-                return Left(Error("Corda Network Error: ${e.message}"))
+                Left(Error("Corda Network Error: ${e.message}"))
             }
         }
         
@@ -325,11 +336,13 @@ class InteroperableHelper {
          * @return Returns the request state when it has status "COMPLETED" or "ERROR".
          */
         suspend fun pollForState(requestId: String, client: RelayClient, retryCount: Int = 0): Either<Error, State.RequestState> = coroutineScope {
-            val num = 30
+            val timeout = 30
+            val delayTime = 500L
+            val num = 30*1000/delayTime
             if (retryCount > num) {
-                Left(Error("Error: Timeout, remote network took longer than $num seconds to respond"))
+                Left(Error("Error: Timeout, remote network took longer than $timeout seconds to respond"))
             } else {
-                delay(500L)
+                delay(delayTime)
                 val requestState = async { client.getState(requestId) }.await()
                 logger.debug("Response from getState: $requestState")
                 when (requestState.status.toString()) {

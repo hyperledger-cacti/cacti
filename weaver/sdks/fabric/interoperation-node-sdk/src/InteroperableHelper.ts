@@ -685,7 +685,7 @@ const getRemoteView = async (
     if (policyCriteriaError) {
         throw new Error(`InteropFlow failed to get policy criteria: ${policyCriteriaError}`);
     }
-    const relay = useTls ? new Relay(localRelayEndpoint, Relay.defaultTimeout, true, tlsRootCACertPaths) : new Relay(localRelayEndpoint);
+    const relay = useTls ? new Relay(localRelayEndpoint, true, tlsRootCACertPaths) : new Relay(localRelayEndpoint);
     const uuidValue = uuidv4();
     // Step 3
     // TODO fix types here so can return proper view

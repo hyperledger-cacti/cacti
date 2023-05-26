@@ -24,6 +24,10 @@ secret:
     - 'doc/*'
     - 'LICENSE'
     - '**/examples/cactus-example-carbon-accounting-backend/example-config.json'
+    - 'weaver/samples/**/*'
+    - 'weaver/tests/**/*'
+    - 'weaver/core/drivers/fabric-driver/wallet-network1/*.id'
+    - 'weaver/core/drivers/fabric-driver/wallet-network2/*.id'
 
   # Detectors to ignore.
   ignored-detectors: # default: []

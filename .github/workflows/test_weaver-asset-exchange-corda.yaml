@@ -46,12 +46,12 @@ jobs:
           echo "Using ${GITHUB_ACTOR} user."
           echo "username=${GITHUB_ACTOR}" >> github.properties
           echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.properties
-          echo "url=https://maven.pkg.github.com/${GITHUB_ACTOR}/weaver-dlt-interoperability" >> github.properties
+          echo "url=https://maven.pkg.github.com/${GITHUB_ACTOR}/cacti" >> github.properties
           
           echo "Using ${GITHUB_ACTOR} user."
           echo "username=${GITHUB_ACTOR}" >> github.main.properties
           echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.main.properties
-          echo "url=https://maven.pkg.github.com/hyperledger-labs/weaver-dlt-interoperability" >> github.main.properties
+          echo "url=https://maven.pkg.github.com/hyperledger/cacti" >> github.main.properties
           
           ./scripts/get-cordapps.sh || mv github.main.properties github.properties
           
@@ -236,12 +236,12 @@ jobs:
           echo "Using ${GITHUB_ACTOR} user."
           echo "username=${GITHUB_ACTOR}" >> github.properties
           echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.properties
-          echo "url=https://maven.pkg.github.com/${GITHUB_ACTOR}/weaver-dlt-interoperability" >> github.properties
+          echo "url=https://maven.pkg.github.com/${GITHUB_ACTOR}/cacti" >> github.properties
           
           echo "Using ${GITHUB_ACTOR} user."
           echo "username=${GITHUB_ACTOR}" >> github.main.properties
           echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.main.properties
-          echo "url=https://maven.pkg.github.com/hyperledger-labs/weaver-dlt-interoperability" >> github.main.properties
+          echo "url=https://maven.pkg.github.com/hyperledger/cacti" >> github.main.properties
           
           ./scripts/get-cordapps.sh || mv github.main.properties github.properties
           
