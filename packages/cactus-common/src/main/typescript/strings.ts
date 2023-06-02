@@ -9,7 +9,7 @@ export class Strings {
     return source.replace(new RegExp(searchValue, "gm"), replaceValue);
   }
 
-  public static isString(val: any): val is string {
+  public static isString(val: unknown): val is string {
     return typeof val === "string" || val instanceof String;
   }
 
