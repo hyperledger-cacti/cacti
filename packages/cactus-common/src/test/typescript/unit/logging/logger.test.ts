@@ -15,11 +15,14 @@ test.skip("Logger#debug/error writes to stdout/stderr", async (t: Test) => {
 
   // generate random UUID v4 to guarantee we don't mistake something else as the marker
   const marker = uuidv4();
-
+  interface DataHandler {
+    (data: Buffer): void;
+  }
   // wait for the marker to appear on stdout OR crash with timeout if it never comes
   let aggregateStdOut = "";
-  let stdOutDataHandler;
+  let stdOutDataHandler: undefined | DataHandler;
   let didNotThrow: boolean;
+
   try {
     // hook up to the stdout data stream and wrap it in a promise that can be awaited
     // for when the marker does appear on stdout (which would be a passing test)
@@ -32,16 +35,16 @@ test.skip("Logger#debug/error writes to stdout/stderr", async (t: Test) => {
     // bake in some stream data aggregation instead where you collect and continually append
     // the incoming data chunks and test for marker presence in the aggregate variable not the chunk
     // that is provided in the 'data' event handler callback.
-    await new Promise((resolve, reject) => {
+    await new Promise<void>((resolve, reject) => {
       const timeoutMsg = "Timed out waiting for marker to appear on stdout";
       const timerId = setTimeout(() => reject(new Error(timeoutMsg)), 5000);
 
-      stdOutDataHandler = (data: Buffer) => {
+      const stdOutDataHandler: DataHandler = (data: Buffer) => {
         const msg = data.toString("utf-8");
         aggregateStdOut = aggregateStdOut.concat(msg);
         if (msg.includes(marker)) {
           clearInterval(timerId);
-          resolve(marker);
+          resolve();
         }
       };
 
@@ -50,13 +53,12 @@ test.skip("Logger#debug/error writes to stdout/stderr", async (t: Test) => {
       // send the log now that we have hooked into the stream waiting for the marker to appear
       log.info(marker);
     });
-
     didNotThrow = true;
   } catch (ex) {
     didNotThrow = false;
   }
 
-  process.stdout.off("data", stdOutDataHandler as any);
+  process.stdout.off("data", stdOutDataHandler as DataHandler);
   t.comment(`Aggregate std out messages: ${aggregateStdOut}`);
   t.true(didNotThrow, "Marker appeared on stdout on time OK");
 
