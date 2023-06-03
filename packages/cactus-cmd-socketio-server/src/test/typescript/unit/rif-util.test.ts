@@ -2,10 +2,10 @@
  * Copyright 2020-2021 Hyperledger Cactus Contributors
  * SPDX-License-Identifier: Apache-2.0
  *
- * RIFUtil.test.ts
+ * rif-util.test.ts
  */
 
-import { RIFUtil } from "./RIFUtil";
+import { RIFUtil } from "../../../main/typescript/routing-interface/util/RIFUtil";
 
 test("test", () => {
   const objJson = { aaa: "abc", bbb: "def" };
