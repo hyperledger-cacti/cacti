@@ -13,13 +13,15 @@
  */
 
 
-import { Configuration } from './configuration';
-import globalAxios, { AxiosPromise, AxiosInstance } from 'axios';
+import type { Configuration } from './configuration';
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from './common';
+import type { RequestArgs } from './base';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from './base';
+import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from './base';
 
 /**
  * Defines the parameters for retrieving the single status of the HTLC swap.
@@ -32,25 +34,25 @@ export interface GetSingleStatusRequest {
      * @type {string}
      * @memberof GetSingleStatusRequest
      */
-    id: string;
+    'id': string;
     /**
      * 
      * @type {Web3SigningCredential}
      * @memberof GetSingleStatusRequest
      */
-    web3SigningCredential: Web3SigningCredential;
+    'web3SigningCredential': Web3SigningCredential;
     /**
      * 
      * @type {string}
      * @memberof GetSingleStatusRequest
      */
-    connectorId: string;
+    'connectorId': string;
     /**
      * 
      * @type {string}
      * @memberof GetSingleStatusRequest
      */
-    keychainId: string;
+    'keychainId': string;
 }
 /**
  * Defines the parameters for retrieving the status of the HTLC swap.
@@ -63,25 +65,25 @@ export interface GetStatusRequest {
      * @type {Array<string>}
      * @memberof GetStatusRequest
      */
-    ids: Array<string>;
+    'ids': Array<string>;
     /**
      * 
      * @type {Web3SigningCredential}
      * @memberof GetStatusRequest
      */
-    web3SigningCredential: Web3SigningCredential;
+    'web3SigningCredential': Web3SigningCredential;
     /**
      * 
      * @type {string}
      * @memberof GetStatusRequest
      */
-    connectorId: string;
+    'connectorId': string;
     /**
      * 
      * @type {string}
      * @memberof GetStatusRequest
      */
-    keychainId: string;
+    'keychainId': string;
 }
 /**
  * 
@@ -94,31 +96,31 @@ export interface InitializeRequest {
      * @type {string}
      * @memberof InitializeRequest
      */
-    connectorId: string;
+    'connectorId': string;
     /**
      * keychainId for the keychain plugin
      * @type {string}
      * @memberof InitializeRequest
      */
-    keychainId: string;
+    'keychainId': string;
     /**
      * 
      * @type {Array<any>}
      * @memberof InitializeRequest
      */
-    constructorArgs: Array<any>;
+    'constructorArgs': Array<any>;
     /**
      * 
      * @type {Web3SigningCredential}
      * @memberof InitializeRequest
      */
-    web3SigningCredential: Web3SigningCredential;
+    'web3SigningCredential': Web3SigningCredential;
     /**
      * 
      * @type {number}
      * @memberof InitializeRequest
      */
-    gas?: number;
+    'gas'?: number;
 }
 /**
  * 
@@ -131,19 +133,19 @@ export interface InvokeContractV1Response {
      * @type {Web3TransactionReceipt}
      * @memberof InvokeContractV1Response
      */
-    transactionReceipt?: Web3TransactionReceipt;
+    'transactionReceipt'?: Web3TransactionReceipt;
     /**
      * 
      * @type {any}
      * @memberof InvokeContractV1Response
      */
-    callOutput?: any | null;
+    'callOutput'?: any;
     /**
      * 
      * @type {boolean}
      * @memberof InvokeContractV1Response
      */
-    success: boolean;
+    'success': boolean;
 }
 /**
  * 
@@ -156,74 +158,80 @@ export interface NewContractObj {
      * @type {string}
      * @memberof NewContractObj
      */
-    contractAddress: string;
+    'contractAddress': string;
     /**
      * 
      * @type {number}
      * @memberof NewContractObj
      */
-    inputAmount?: number;
+    'inputAmount'?: number;
     /**
      * 
      * @type {number}
      * @memberof NewContractObj
      */
-    outputAmount: number;
+    'outputAmount': number;
     /**
      * 
      * @type {number}
      * @memberof NewContractObj
      */
-    expiration: number;
+    'expiration': number;
     /**
      * 
      * @type {string}
      * @memberof NewContractObj
      */
-    hashLock: string;
+    'hashLock': string;
     /**
      * 
      * @type {string}
      * @memberof NewContractObj
      */
-    receiver?: string;
+    'receiver'?: string;
     /**
      * 
      * @type {string}
      * @memberof NewContractObj
      */
-    outputNetwork: string;
+    'outputNetwork': string;
     /**
      * 
      * @type {string}
      * @memberof NewContractObj
      */
-    outputAddress: string;
+    'outputAddress': string;
     /**
      * connectorId for the connector besu plugin
      * @type {string}
      * @memberof NewContractObj
      */
-    connectorId: string;
+    'connectorId': string;
     /**
      * 
      * @type {Web3SigningCredential}
      * @memberof NewContractObj
      */
-    web3SigningCredential: Web3SigningCredential;
+    'web3SigningCredential': Web3SigningCredential;
     /**
      * keychainId for the keychian plugin
      * @type {string}
      * @memberof NewContractObj
      */
-    keychainId: string;
+    'keychainId': string;
     /**
      * 
-     * @type {string | number}
+     * @type {NewContractObjGas}
      * @memberof NewContractObj
      */
-    gas?: string | number;
+    'gas'?: NewContractObjGas;
 }
+/**
+ * @type NewContractObjGas
+ * @export
+ */
+export type NewContractObjGas = number | string;
+
 /**
  * 
  * @export
@@ -235,31 +243,31 @@ export interface RefundReq {
      * @type {string}
      * @memberof RefundReq
      */
-    id: string;
+    'id': string;
     /**
      * 
      * @type {Web3SigningCredential}
      * @memberof RefundReq
      */
-    web3SigningCredential: Web3SigningCredential;
+    'web3SigningCredential': Web3SigningCredential;
     /**
      * connectorId for the connector besu plugin
      * @type {string}
      * @memberof RefundReq
      */
-    connectorId: string;
+    'connectorId': string;
     /**
      * keychainId for the keychain plugin
      * @type {string}
      * @memberof RefundReq
      */
-    keychainId: string;
+    'keychainId': string;
     /**
      * 
-     * @type {string | number}
+     * @type {NewContractObjGas}
      * @memberof RefundReq
      */
-    gas?: string | number;
+    'gas'?: NewContractObjGas;
 }
 /**
  * 
@@ -272,7 +280,7 @@ export interface RunTransactionResponse {
      * @type {Web3TransactionReceipt}
      * @memberof RunTransactionResponse
      */
-    transactionReceipt: Web3TransactionReceipt;
+    'transactionReceipt': Web3TransactionReceipt;
 }
 /**
  * @type Web3SigningCredential
@@ -291,26 +299,28 @@ export interface Web3SigningCredentialCactusKeychainRef {
      * @type {Web3SigningCredentialType}
      * @memberof Web3SigningCredentialCactusKeychainRef
      */
-    type: Web3SigningCredentialType;
+    'type': Web3SigningCredentialType;
     /**
      * The ethereum account (public key) that the credential  belongs to. Basically the username in the traditional  terminology of authentication.
      * @type {string}
      * @memberof Web3SigningCredentialCactusKeychainRef
      */
-    ethAccount: string;
+    'ethAccount': string;
     /**
      * The key to use when looking up the the keychain entry holding the secret pointed to by the  keychainEntryKey parameter.
      * @type {string}
      * @memberof Web3SigningCredentialCactusKeychainRef
      */
-    keychainEntryKey: string;
+    'keychainEntryKey': string;
     /**
      * The keychain ID to use when looking up the the keychain plugin instance that will be used to retrieve the secret pointed to by the keychainEntryKey parameter.
      * @type {string}
      * @memberof Web3SigningCredentialCactusKeychainRef
      */
-    keychainId: string;
+    'keychainId': string;
 }
+
+
 /**
  * Using this denotes that there is no signing required because the transaction is pre-signed.
  * @export
@@ -322,8 +332,10 @@ export interface Web3SigningCredentialNone {
      * @type {Web3SigningCredentialType}
      * @memberof Web3SigningCredentialNone
      */
-    type: Web3SigningCredentialType;
+    'type': Web3SigningCredentialType;
 }
+
+
 /**
  * 
  * @export
@@ -335,32 +347,37 @@ export interface Web3SigningCredentialPrivateKeyHex {
      * @type {Web3SigningCredentialType}
      * @memberof Web3SigningCredentialPrivateKeyHex
      */
-    type: Web3SigningCredentialType;
+    'type': Web3SigningCredentialType;
     /**
      * The ethereum account (public key) that the credential belongs to. Basically the username in the traditional terminology of authentication.
      * @type {string}
      * @memberof Web3SigningCredentialPrivateKeyHex
      */
-    ethAccount: string;
+    'ethAccount': string;
     /**
      * The HEX encoded private key of an eth account.
      * @type {string}
      * @memberof Web3SigningCredentialPrivateKeyHex
      */
-    secret: string;
+    'secret': string;
 }
+
+
 /**
  * 
  * @export
  * @enum {string}
  */
 
-export enum Web3SigningCredentialType {
-    CactusKeychainRef = 'CACTUS_KEYCHAIN_REF',
-    GethKeychainPassword = 'GETH_KEYCHAIN_PASSWORD',
-    PrivateKeyHex = 'PRIVATE_KEY_HEX',
-    None = 'NONE'
-}
+export const Web3SigningCredentialType = {
+    CactusKeychainRef: 'CACTUS_KEYCHAIN_REF',
+    GethKeychainPassword: 'GETH_KEYCHAIN_PASSWORD',
+    PrivateKeyHex: 'PRIVATE_KEY_HEX',
+    None: 'NONE'
+} as const;
+
+export type Web3SigningCredentialType = typeof Web3SigningCredentialType[keyof typeof Web3SigningCredentialType];
+
 
 /**
  * 
@@ -368,62 +385,62 @@ export enum Web3SigningCredentialType {
  * @interface Web3TransactionReceipt
  */
 export interface Web3TransactionReceipt {
-    [key: string]: object | any;
+    [key: string]: any;
 
     /**
      * 
      * @type {boolean}
      * @memberof Web3TransactionReceipt
      */
-    status: boolean;
+    'status': boolean;
     /**
      * 
      * @type {string}
      * @memberof Web3TransactionReceipt
      */
-    transactionHash: string;
+    'transactionHash': string;
     /**
      * 
      * @type {number}
      * @memberof Web3TransactionReceipt
      */
-    transactionIndex: number;
+    'transactionIndex': number;
     /**
      * 
      * @type {string}
      * @memberof Web3TransactionReceipt
      */
-    blockHash: string;
+    'blockHash': string;
     /**
      * 
      * @type {number}
      * @memberof Web3TransactionReceipt
      */
-    blockNumber: number;
+    'blockNumber': number;
     /**
      * 
      * @type {number}
      * @memberof Web3TransactionReceipt
      */
-    gasUsed: number;
+    'gasUsed': number;
     /**
      * 
      * @type {string}
      * @memberof Web3TransactionReceipt
      */
-    contractAddress?: string | null;
+    'contractAddress'?: string | null;
     /**
      * 
      * @type {string}
      * @memberof Web3TransactionReceipt
      */
-    from: string;
+    'from': string;
     /**
      * 
      * @type {string}
      * @memberof Web3TransactionReceipt
      */
-    to: string;
+    'to': string;
 }
 /**
  * 
@@ -436,37 +453,37 @@ export interface WithdrawReq {
      * @type {string}
      * @memberof WithdrawReq
      */
-    id: string;
+    'id': string;
     /**
      * Secret need to unlock the contract
      * @type {string}
      * @memberof WithdrawReq
      */
-    secret: string;
+    'secret': string;
     /**
      * 
      * @type {Web3SigningCredential}
      * @memberof WithdrawReq
      */
-    web3SigningCredential: Web3SigningCredential;
+    'web3SigningCredential': Web3SigningCredential;
     /**
      * connectorId for the connector besu plugin
      * @type {string}
      * @memberof WithdrawReq
      */
-    connectorId: string;
+    'connectorId': string;
     /**
      * keychainId for the keychain plugin
      * @type {string}
      * @memberof WithdrawReq
      */
-    keychainId: string;
+    'keychainId': string;
     /**
      * 
-     * @type {string | number}
+     * @type {NewContractObjGas}
      * @memberof WithdrawReq
      */
-    gas?: string | number;
+    'gas'?: NewContractObjGas;
 }
 
 /**
@@ -481,7 +498,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getSingleStatusV1: async (getSingleStatusRequest?: GetSingleStatusRequest, options: any = {}): Promise<RequestArgs> => {
+        getSingleStatusV1: async (getSingleStatusRequest?: GetSingleStatusRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/get-single-status`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -498,7 +515,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(getSingleStatusRequest, localVarRequestOptions, configuration)
@@ -514,7 +531,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getStatusV1: async (getStatusRequest?: GetStatusRequest, options: any = {}): Promise<RequestArgs> => {
+        getStatusV1: async (getStatusRequest?: GetStatusRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/get-status`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -531,7 +548,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(getStatusRequest, localVarRequestOptions, configuration)
@@ -547,7 +564,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        initializeV1: async (initializeRequest?: InitializeRequest, options: any = {}): Promise<RequestArgs> => {
+        initializeV1: async (initializeRequest?: InitializeRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/initialize`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -564,7 +581,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(initializeRequest, localVarRequestOptions, configuration)
@@ -580,7 +597,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        newContractV1: async (newContractObj?: NewContractObj, options: any = {}): Promise<RequestArgs> => {
+        newContractV1: async (newContractObj?: NewContractObj, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/new-contract`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -597,7 +614,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(newContractObj, localVarRequestOptions, configuration)
@@ -613,7 +630,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        refundV1: async (refundReq?: RefundReq, options: any = {}): Promise<RequestArgs> => {
+        refundV1: async (refundReq?: RefundReq, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/refund`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -630,7 +647,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(refundReq, localVarRequestOptions, configuration)
@@ -646,7 +663,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        withdrawV1: async (withdrawReq?: WithdrawReq, options: any = {}): Promise<RequestArgs> => {
+        withdrawV1: async (withdrawReq?: WithdrawReq, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/withdraw`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -663,7 +680,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(withdrawReq, localVarRequestOptions, configuration)
@@ -689,7 +706,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getSingleStatusV1(getSingleStatusRequest?: GetSingleStatusRequest, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<number>> {
+        async getSingleStatusV1(getSingleStatusRequest?: GetSingleStatusRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<number>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getSingleStatusV1(getSingleStatusRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -699,7 +716,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getStatusV1(getStatusRequest?: GetStatusRequest, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<number>>> {
+        async getStatusV1(getStatusRequest?: GetStatusRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<number>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getStatusV1(getStatusRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -709,7 +726,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async initializeV1(initializeRequest?: InitializeRequest, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RunTransactionResponse>> {
+        async initializeV1(initializeRequest?: InitializeRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RunTransactionResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.initializeV1(initializeRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -719,7 +736,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async newContractV1(newContractObj?: NewContractObj, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<InvokeContractV1Response>> {
+        async newContractV1(newContractObj?: NewContractObj, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<InvokeContractV1Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.newContractV1(newContractObj, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -729,7 +746,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async refundV1(refundReq?: RefundReq, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<InvokeContractV1Response>> {
+        async refundV1(refundReq?: RefundReq, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<InvokeContractV1Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.refundV1(refundReq, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -739,7 +756,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async withdrawV1(withdrawReq?: WithdrawReq, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<InvokeContractV1Response>> {
+        async withdrawV1(withdrawReq?: WithdrawReq, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<InvokeContractV1Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.withdrawV1(withdrawReq, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -824,7 +841,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public getSingleStatusV1(getSingleStatusRequest?: GetSingleStatusRequest, options?: any) {
+    public getSingleStatusV1(getSingleStatusRequest?: GetSingleStatusRequest, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getSingleStatusV1(getSingleStatusRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -835,7 +852,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public getStatusV1(getStatusRequest?: GetStatusRequest, options?: any) {
+    public getStatusV1(getStatusRequest?: GetStatusRequest, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getStatusV1(getStatusRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -846,7 +863,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public initializeV1(initializeRequest?: InitializeRequest, options?: any) {
+    public initializeV1(initializeRequest?: InitializeRequest, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).initializeV1(initializeRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -857,7 +874,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public newContractV1(newContractObj?: NewContractObj, options?: any) {
+    public newContractV1(newContractObj?: NewContractObj, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).newContractV1(newContractObj, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -868,7 +885,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public refundV1(refundReq?: RefundReq, options?: any) {
+    public refundV1(refundReq?: RefundReq, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).refundV1(refundReq, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -879,7 +896,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public withdrawV1(withdrawReq?: WithdrawReq, options?: any) {
+    public withdrawV1(withdrawReq?: WithdrawReq, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).withdrawV1(withdrawReq, options).then((request) => request(this.axios, this.basePath));
     }
 }

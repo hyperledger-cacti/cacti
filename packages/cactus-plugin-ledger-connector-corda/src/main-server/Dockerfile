@@ -13,8 +13,8 @@ FROM openjdk:8u275-jre-slim-buster
 ARG APP=/usr/src/app
 ENV APP=/usr/src/app
 
-RUN apt-get update
-RUN apt-get install -y ca-certificates tzdata curl tini
+RUN apt update
+RUN apt install -y ca-certificates tzdata curl tini
 RUN rm -rf /var/lib/apt/lists/*
 
 ENV TZ=Etc/UTC \

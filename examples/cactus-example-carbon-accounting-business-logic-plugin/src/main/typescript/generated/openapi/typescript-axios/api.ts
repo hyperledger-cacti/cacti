@@ -13,13 +13,15 @@
  */
 
 
-import { Configuration } from './configuration';
-import globalAxios, { AxiosPromise, AxiosInstance } from 'axios';
+import type { Configuration } from './configuration';
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from './common';
+import type { RequestArgs } from './base';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from './base';
+import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from './base';
 
 /**
  * Stores global constants related to the authorization of the application. Specifically enumerates the claims to validate for as per RFC 7519, section 4.1. See: https://tools.ietf.org/html/rfc7519#section-4.1
@@ -27,12 +29,15 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
  * @enum {string}
  */
 
-export enum AuthzJwtClaim {
+export const AuthzJwtClaim = {
     /**
     * The &quot;iss&quot; (issuer) claim identifies the principal that issued the JWT.  The processing of this claim is generally application specific. The &quot;iss&quot; value is a case-sensitive string containing a StringOrURI value.  Use of this claim is OPTIONAL.
     */
-    iss = 'Hyperledger Labs - Carbon Accounting Tool'
-}
+    iss: 'Hyperledger Labs - Carbon Accounting Tool'
+} as const;
+
+export type AuthzJwtClaim = typeof AuthzJwtClaim[keyof typeof AuthzJwtClaim];
+
 
 /**
  * 
@@ -40,16 +45,19 @@ export enum AuthzJwtClaim {
  * @enum {string}
  */
 
-export enum AuthzScope {
+export const AuthzScope = {
     /**
     * Identities with the group:admin scope are administrators of the system.
     */
-    GroupAdmin = 'group:admin',
+    GroupAdmin: 'group:admin',
     /**
     * Identities with the group:user scope are end users of the system who only have authorization to perform a limited set of actions.
     */
-    GroupUser = 'group:user'
-}
+    GroupUser: 'group:user'
+} as const;
+
+export type AuthzScope = typeof AuthzScope[keyof typeof AuthzScope];
+
 
 /**
  * 
@@ -62,13 +70,13 @@ export interface Checkpoint {
      * @type {number}
      * @memberof Checkpoint
      */
-    fromBlock: number;
+    'fromBlock': number;
     /**
      * 
      * @type {string}
      * @memberof Checkpoint
      */
-    votes: string;
+    'votes': string;
 }
 /**
  * 
@@ -81,13 +89,13 @@ export interface DaoTokenGetAllowanceNotFoundResponse {
      * @type {boolean}
      * @memberof DaoTokenGetAllowanceNotFoundResponse
      */
-    accountFound: boolean;
+    'accountFound': boolean;
     /**
      * Indicates whether the spender was found or not.
      * @type {boolean}
      * @memberof DaoTokenGetAllowanceNotFoundResponse
      */
-    spenderFound: boolean;
+    'spenderFound': boolean;
 }
 /**
  * 
@@ -100,13 +108,13 @@ export interface DaoTokenGetAllowanceRequest {
      * @type {string}
      * @memberof DaoTokenGetAllowanceRequest
      */
-    account: string;
+    'account': string;
     /**
      * The address of the account spending the funds
      * @type {string}
      * @memberof DaoTokenGetAllowanceRequest
      */
-    spender: string;
+    'spender': string;
 }
 /**
  * 
@@ -119,7 +127,7 @@ export interface DaoTokenGetAllowanceResponse {
      * @type {number}
      * @memberof DaoTokenGetAllowanceResponse
      */
-    allowance: number;
+    'allowance': number;
 }
 /**
  * 
@@ -127,10 +135,13 @@ export interface DaoTokenGetAllowanceResponse {
  * @enum {string}
  */
 
-export enum EnrollAdminInfo {
-    SUCCESSFULLY_ENROLLED_ADMIN = 'Successfully enrolled admin user and imported it into the wallet',
-    ORG_ADMIN_REGISTERED = 'ORG ADMIN REGISTERED'
-}
+export const EnrollAdminInfo = {
+    SUCCESSFULLY_ENROLLED_ADMIN: 'Successfully enrolled admin user and imported it into the wallet',
+    ORG_ADMIN_REGISTERED: 'ORG ADMIN REGISTERED'
+} as const;
+
+export type EnrollAdminInfo = typeof EnrollAdminInfo[keyof typeof EnrollAdminInfo];
+
 
 /**
  * 
@@ -143,7 +154,7 @@ export interface EnrollAdminV1Request {
      * @type {string}
      * @memberof EnrollAdminV1Request
      */
-    orgName: string;
+    'orgName': string;
 }
 /**
  * 
@@ -156,31 +167,31 @@ export interface EnrollAdminV1Response {
      * @type {string}
      * @memberof EnrollAdminV1Response
      */
-    info: string;
+    'info': string;
     /**
      * 
      * @type {string}
      * @memberof EnrollAdminV1Response
      */
-    orgName: string;
+    'orgName': string;
     /**
      * 
      * @type {string}
      * @memberof EnrollAdminV1Response
      */
-    msp: string;
+    'msp': string;
     /**
      * 
      * @type {string}
      * @memberof EnrollAdminV1Response
      */
-    caName: string;
+    'caName': string;
     /**
      * The key under which the identity created will be persisted to the keychain for later retrieval.
      * @type {string}
      * @memberof EnrollAdminV1Response
      */
-    identityId?: string;
+    'identityId'?: string;
 }
 
 /**
@@ -196,7 +207,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        daoTokenGetAllowanceV1: async (daoTokenGetAllowanceRequest?: DaoTokenGetAllowanceRequest, options: any = {}): Promise<RequestArgs> => {
+        daoTokenGetAllowanceV1: async (daoTokenGetAllowanceRequest?: DaoTokenGetAllowanceRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-example-carbon-accounting-backend/dao-token/get-allowance`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -213,7 +224,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(daoTokenGetAllowanceRequest, localVarRequestOptions, configuration)
@@ -230,7 +241,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        enrollAdminV1: async (enrollAdminV1Request?: EnrollAdminV1Request, options: any = {}): Promise<RequestArgs> => {
+        enrollAdminV1: async (enrollAdminV1Request?: EnrollAdminV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/utilityemissionchannel/registerEnroll/admin`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -247,7 +258,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(enrollAdminV1Request, localVarRequestOptions, configuration)
@@ -274,7 +285,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async daoTokenGetAllowanceV1(daoTokenGetAllowanceRequest?: DaoTokenGetAllowanceRequest, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DaoTokenGetAllowanceResponse>> {
+        async daoTokenGetAllowanceV1(daoTokenGetAllowanceRequest?: DaoTokenGetAllowanceRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DaoTokenGetAllowanceResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.daoTokenGetAllowanceV1(daoTokenGetAllowanceRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -285,7 +296,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async enrollAdminV1(enrollAdminV1Request?: EnrollAdminV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<EnrollAdminV1Response>> {
+        async enrollAdminV1(enrollAdminV1Request?: EnrollAdminV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<EnrollAdminV1Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.enrollAdminV1(enrollAdminV1Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -337,7 +348,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public daoTokenGetAllowanceV1(daoTokenGetAllowanceRequest?: DaoTokenGetAllowanceRequest, options?: any) {
+    public daoTokenGetAllowanceV1(daoTokenGetAllowanceRequest?: DaoTokenGetAllowanceRequest, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).daoTokenGetAllowanceV1(daoTokenGetAllowanceRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -349,7 +360,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public enrollAdminV1(enrollAdminV1Request?: EnrollAdminV1Request, options?: any) {
+    public enrollAdminV1(enrollAdminV1Request?: EnrollAdminV1Request, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).enrollAdminV1(enrollAdminV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 }

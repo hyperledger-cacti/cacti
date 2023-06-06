@@ -6,7 +6,7 @@ settings.gradle
 src/main/kotlin/org/openapitools/client/apis/DefaultApi.kt
 src/main/kotlin/org/openapitools/client/infrastructure/ApiAbstractions.kt
 src/main/kotlin/org/openapitools/client/infrastructure/ApiClient.kt
-src/main/kotlin/org/openapitools/client/infrastructure/ApiInfrastructureResponse.kt
+src/main/kotlin/org/openapitools/client/infrastructure/ApiResponse.kt
 src/main/kotlin/org/openapitools/client/infrastructure/BigDecimalAdapter.kt
 src/main/kotlin/org/openapitools/client/infrastructure/BigIntegerAdapter.kt
 src/main/kotlin/org/openapitools/client/infrastructure/ByteArrayAdapter.kt
@@ -14,6 +14,7 @@ src/main/kotlin/org/openapitools/client/infrastructure/Errors.kt
 src/main/kotlin/org/openapitools/client/infrastructure/LocalDateAdapter.kt
 src/main/kotlin/org/openapitools/client/infrastructure/LocalDateTimeAdapter.kt
 src/main/kotlin/org/openapitools/client/infrastructure/OffsetDateTimeAdapter.kt
+src/main/kotlin/org/openapitools/client/infrastructure/PartConfig.kt
 src/main/kotlin/org/openapitools/client/infrastructure/RequestConfig.kt
 src/main/kotlin/org/openapitools/client/infrastructure/RequestMethod.kt
 src/main/kotlin/org/openapitools/client/infrastructure/ResponseExtensions.kt
@@ -25,6 +26,7 @@ src/main/kotlin/org/openapitools/client/models/GetStatusRequest.kt
 src/main/kotlin/org/openapitools/client/models/InitializeRequest.kt
 src/main/kotlin/org/openapitools/client/models/InvokeContractV1Response.kt
 src/main/kotlin/org/openapitools/client/models/NewContractRequest.kt
+src/main/kotlin/org/openapitools/client/models/NewContractRequestGas.kt
 src/main/kotlin/org/openapitools/client/models/RefundRequest.kt
 src/main/kotlin/org/openapitools/client/models/RunTransactionResponse.kt
 src/main/kotlin/org/openapitools/client/models/Web3SigningCredential.kt

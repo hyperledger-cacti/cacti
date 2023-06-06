@@ -13,13 +13,15 @@
  */
 
 
-import { Configuration } from './configuration';
-import globalAxios, { AxiosPromise, AxiosInstance } from 'axios';
+import type { Configuration } from './configuration';
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from './common';
+import type { RequestArgs } from './base';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from './base';
+import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from './base';
 
 /**
  * 
@@ -32,73 +34,73 @@ export interface AssetProfile {
      * @type {string}
      * @memberof AssetProfile
      */
-    issuer?: string;
+    'issuer'?: string;
     /**
      * 
      * @type {string}
      * @memberof AssetProfile
      */
-    assetCode?: string;
+    'assetCode'?: string;
     /**
      * 
      * @type {string}
      * @memberof AssetProfile
      */
-    assetCodeType?: string;
+    'assetCodeType'?: string;
     /**
      * 
      * @type {string}
      * @memberof AssetProfile
      */
-    issuanceDate?: string;
+    'issuanceDate'?: string;
     /**
      * 
      * @type {string}
      * @memberof AssetProfile
      */
-    expirationDate: string;
+    'expirationDate': string;
     /**
      * 
      * @type {string}
      * @memberof AssetProfile
      */
-    verificationEndPoint?: string;
+    'verificationEndPoint'?: string;
     /**
      * 
      * @type {string}
      * @memberof AssetProfile
      */
-    digitalSignature?: string;
+    'digitalSignature'?: string;
     /**
      * 
      * @type {string}
      * @memberof AssetProfile
      */
-    prospectusLink?: string;
+    'prospectusLink'?: string;
     /**
      * 
      * @type {Array<any>}
      * @memberof AssetProfile
      */
-    keyInformationLink?: Array<any>;
+    'keyInformationLink'?: Array<any>;
     /**
      * 
      * @type {Array<any>}
      * @memberof AssetProfile
      */
-    keyWord?: Array<any>;
+    'keyWord'?: Array<any>;
     /**
      * 
      * @type {Array<any>}
      * @memberof AssetProfile
      */
-    transferRestriction?: Array<any>;
+    'transferRestriction'?: Array<any>;
     /**
      * 
      * @type {Array<any>}
      * @memberof AssetProfile
      */
-    ledgerRequirements?: Array<any>;
+    'ledgerRequirements'?: Array<any>;
 }
 /**
  * 
@@ -111,133 +113,133 @@ export interface ClientV1Request {
      * @type {string}
      * @memberof ClientV1Request
      */
-    version: string;
+    'version': string;
     /**
      * 
      * @type {string}
      * @memberof ClientV1Request
      */
-    loggingProfile: string;
+    'loggingProfile': string;
     /**
      * 
      * @type {string}
      * @memberof ClientV1Request
      */
-    accessControlProfile: string;
+    'accessControlProfile': string;
     /**
      * 
      * @type {string}
      * @memberof ClientV1Request
      */
-    assetControlProfile: string;
+    'assetControlProfile': string;
     /**
      * 
      * @type {string}
      * @memberof ClientV1Request
      */
-    applicationProfile: string;
+    'applicationProfile': string;
     /**
      * 
      * @type {AssetProfile}
      * @memberof ClientV1Request
      */
-    assetProfile: AssetProfile;
+    'assetProfile': AssetProfile;
     /**
      * 
      * @type {PayloadProfile}
      * @memberof ClientV1Request
      */
-    payloadProfile: PayloadProfile;
+    'payloadProfile': PayloadProfile;
     /**
      * 
      * @type {string}
      * @memberof ClientV1Request
      */
-    sourceGatewayDltSystem: string;
+    'sourceGatewayDltSystem': string;
     /**
      * 
      * @type {string}
      * @memberof ClientV1Request
      */
-    recipientGatewayDltSystem: string;
+    'recipientGatewayDltSystem': string;
     /**
      * 
      * @type {string}
      * @memberof ClientV1Request
      */
-    recipientGatewayPubkey: string;
+    'recipientGatewayPubkey': string;
     /**
      * 
      * @type {string}
      * @memberof ClientV1Request
      */
-    originatorPubkey: string;
+    'originatorPubkey': string;
     /**
      * 
      * @type {string}
      * @memberof ClientV1Request
      */
-    beneficiaryPubkey: string;
+    'beneficiaryPubkey': string;
     /**
      * 
      * @type {string}
      * @memberof ClientV1Request
      */
-    clientIdentityPubkey: string;
+    'clientIdentityPubkey': string;
     /**
      * 
      * @type {string}
      * @memberof ClientV1Request
      */
-    serverIdentityPubkey: string;
+    'serverIdentityPubkey': string;
     /**
      * 
      * @type {string}
      * @memberof ClientV1Request
      */
-    clientDltSystem: string;
+    'clientDltSystem': string;
     /**
      * 
      * @type {string}
      * @memberof ClientV1Request
      */
-    serverDltSystem: string;
+    'serverDltSystem': string;
     /**
      * 
      * @type {ClientV1RequestClientGatewayConfiguration}
      * @memberof ClientV1Request
      */
-    clientGatewayConfiguration: ClientV1RequestClientGatewayConfiguration;
+    'clientGatewayConfiguration': ClientV1RequestClientGatewayConfiguration;
     /**
      * 
      * @type {ClientV1RequestClientGatewayConfiguration}
      * @memberof ClientV1Request
      */
-    serverGatewayConfiguration: ClientV1RequestClientGatewayConfiguration;
+    'serverGatewayConfiguration': ClientV1RequestClientGatewayConfiguration;
     /**
      * 
      * @type {number}
      * @memberof ClientV1Request
      */
-    maxRetries: number;
+    'maxRetries': number;
     /**
      * 
      * @type {number}
      * @memberof ClientV1Request
      */
-    maxTimeout: number;
+    'maxTimeout': number;
     /**
      * 
      * @type {string}
      * @memberof ClientV1Request
      */
-    sourceLedgerAssetID: string;
+    'sourceLedgerAssetID': string;
     /**
      * 
      * @type {string}
      * @memberof ClientV1Request
      */
-    recipientLedgerAssetID: string;
+    'recipientLedgerAssetID': string;
 }
 /**
  * 
@@ -250,7 +252,7 @@ export interface ClientV1RequestClientGatewayConfiguration {
      * @type {string}
      * @memberof ClientV1RequestClientGatewayConfiguration
      */
-    apiHost: string;
+    'apiHost': string;
 }
 /**
  * 
@@ -263,61 +265,61 @@ export interface CommitFinalV1Request {
      * @type {string}
      * @memberof CommitFinalV1Request
      */
-    sessionID: string;
+    'sessionID': string;
     /**
      * 
      * @type {string}
      * @memberof CommitFinalV1Request
      */
-    messageType: string;
+    'messageType': string;
     /**
      * 
      * @type {string}
      * @memberof CommitFinalV1Request
      */
-    clientIdentityPubkey: string;
+    'clientIdentityPubkey': string;
     /**
      * 
      * @type {string}
      * @memberof CommitFinalV1Request
      */
-    serverIdentityPubkey: string;
+    'serverIdentityPubkey': string;
     /**
      * 
      * @type {string}
      * @memberof CommitFinalV1Request
      */
-    commitFinalClaim: string;
+    'commitFinalClaim': string;
     /**
      * 
      * @type {object}
      * @memberof CommitFinalV1Request
      */
-    commitFinalClaimFormat?: object;
+    'commitFinalClaimFormat'?: object;
     /**
      * 
      * @type {string}
      * @memberof CommitFinalV1Request
      */
-    hashCommitPrepareAck: string;
+    'hashCommitPrepareAck': string;
     /**
      * 
      * @type {number}
      * @memberof CommitFinalV1Request
      */
-    clientTransferNumber?: number | null;
+    'clientTransferNumber'?: number | null;
     /**
      * 
      * @type {string}
      * @memberof CommitFinalV1Request
      */
-    signature: string;
+    'signature': string;
     /**
      * 
      * @type {number}
      * @memberof CommitFinalV1Request
      */
-    sequenceNumber: number;
+    'sequenceNumber': number;
 }
 /**
  * 
@@ -330,61 +332,61 @@ export interface CommitFinalV1Response {
      * @type {string}
      * @memberof CommitFinalV1Response
      */
-    sessionID: string;
+    'sessionID': string;
     /**
      * 
      * @type {string}
      * @memberof CommitFinalV1Response
      */
-    messageType: string;
+    'messageType': string;
     /**
      * 
      * @type {string}
      * @memberof CommitFinalV1Response
      */
-    clientIdentityPubkey: string;
+    'clientIdentityPubkey': string;
     /**
      * 
      * @type {string}
      * @memberof CommitFinalV1Response
      */
-    serverIdentityPubkey: string;
+    'serverIdentityPubkey': string;
     /**
      * 
      * @type {string}
      * @memberof CommitFinalV1Response
      */
-    commitAcknowledgementClaim: string;
+    'commitAcknowledgementClaim': string;
     /**
      * 
      * @type {object}
      * @memberof CommitFinalV1Response
      */
-    commitAcknowledgementClaimFormat?: object;
+    'commitAcknowledgementClaimFormat'?: object;
     /**
      * 
      * @type {string}
      * @memberof CommitFinalV1Response
      */
-    hashCommitFinal: string;
+    'hashCommitFinal': string;
     /**
      * 
      * @type {number}
      * @memberof CommitFinalV1Response
      */
-    serverTransferNumber?: number;
+    'serverTransferNumber'?: number;
     /**
      * 
      * @type {string}
      * @memberof CommitFinalV1Response
      */
-    signature: string;
+    'signature': string;
     /**
      * 
      * @type {number}
      * @memberof CommitFinalV1Response
      */
-    sequenceNumber: number;
+    'sequenceNumber': number;
 }
 /**
  * 
@@ -397,49 +399,49 @@ export interface CommitPreparationV1Request {
      * @type {string}
      * @memberof CommitPreparationV1Request
      */
-    sessionID: string;
+    'sessionID': string;
     /**
      * 
      * @type {string}
      * @memberof CommitPreparationV1Request
      */
-    messageType: string;
+    'messageType': string;
     /**
      * 
      * @type {string}
      * @memberof CommitPreparationV1Request
      */
-    clientIdentityPubkey: string;
+    'clientIdentityPubkey': string;
     /**
      * 
      * @type {string}
      * @memberof CommitPreparationV1Request
      */
-    serverIdentityPubkey: string;
+    'serverIdentityPubkey': string;
     /**
      * 
      * @type {string}
      * @memberof CommitPreparationV1Request
      */
-    hashLockEvidenceAck: string;
+    'hashLockEvidenceAck': string;
     /**
      * 
      * @type {number}
      * @memberof CommitPreparationV1Request
      */
-    clientTransferNumber?: number;
+    'clientTransferNumber'?: number;
     /**
      * 
      * @type {string}
      * @memberof CommitPreparationV1Request
      */
-    signature: string;
+    'signature': string;
     /**
      * 
      * @type {number}
      * @memberof CommitPreparationV1Request
      */
-    sequenceNumber: number;
+    'sequenceNumber': number;
 }
 /**
  * 
@@ -452,49 +454,49 @@ export interface CommitPreparationV1Response {
      * @type {string}
      * @memberof CommitPreparationV1Response
      */
-    sessionID: string;
+    'sessionID': string;
     /**
      * 
      * @type {string}
      * @memberof CommitPreparationV1Response
      */
-    messageType: string;
+    'messageType': string;
     /**
      * 
      * @type {string}
      * @memberof CommitPreparationV1Response
      */
-    clientIdentityPubkey: string;
+    'clientIdentityPubkey': string;
     /**
      * 
      * @type {string}
      * @memberof CommitPreparationV1Response
      */
-    serverIdentityPubkey: string;
+    'serverIdentityPubkey': string;
     /**
      * 
      * @type {string}
      * @memberof CommitPreparationV1Response
      */
-    hashCommitPrep: string;
+    'hashCommitPrep': string;
     /**
      * 
      * @type {string}
      * @memberof CommitPreparationV1Response
      */
-    serverTransferNumber?: string;
+    'serverTransferNumber'?: string;
     /**
      * 
      * @type {string}
      * @memberof CommitPreparationV1Response
      */
-    signature: string;
+    'signature': string;
     /**
      * 
      * @type {number}
      * @memberof CommitPreparationV1Response
      */
-    sequenceNumber: number;
+    'sequenceNumber': number;
 }
 /**
  * 
@@ -502,11 +504,14 @@ export interface CommitPreparationV1Response {
  * @enum {string}
  */
 
-export enum CredentialProfile {
-    Saml = 'SAML',
-    Oauth = 'OAUTH',
-    X509 = 'X509'
-}
+export const CredentialProfile = {
+    Saml: 'SAML',
+    Oauth: 'OAUTH',
+    X509: 'X509'
+} as const;
+
+export type CredentialProfile = typeof CredentialProfile[keyof typeof CredentialProfile];
+
 
 /**
  * 
@@ -519,43 +524,43 @@ export interface History {
      * @type {Array<object>}
      * @memberof History
      */
-    Transactions?: Array<object>;
+    'Transactions'?: Array<object>;
     /**
      * 
      * @type {Array<object>}
      * @memberof History
      */
-    Actions?: Array<object>;
+    'Actions'?: Array<object>;
     /**
      * 
      * @type {string}
      * @memberof History
      */
-    Origin?: string;
+    'Origin'?: string;
     /**
      * 
      * @type {string}
      * @memberof History
      */
-    Destination?: string;
+    'Destination'?: string;
     /**
      * 
      * @type {string}
      * @memberof History
      */
-    Balance?: string;
+    'Balance'?: string;
     /**
      * 
      * @type {object}
      * @memberof History
      */
-    CurrentStatus?: object;
+    'CurrentStatus'?: object;
     /**
      * 
      * @type {object}
      * @memberof History
      */
-    ApplicationSpecificParameters?: object;
+    'ApplicationSpecificParameters'?: object;
 }
 /**
  * 
@@ -568,73 +573,73 @@ export interface LockEvidenceV1Request {
      * @type {string}
      * @memberof LockEvidenceV1Request
      */
-    sessionID: string;
+    'sessionID': string;
     /**
      * 
      * @type {string}
      * @memberof LockEvidenceV1Request
      */
-    clientIdentityPubkey: string;
+    'clientIdentityPubkey': string;
     /**
      * 
      * @type {string}
      * @memberof LockEvidenceV1Request
      */
-    serverIdentityPubkey: string;
+    'serverIdentityPubkey': string;
     /**
      * 
      * @type {string}
      * @memberof LockEvidenceV1Request
      */
-    lockEvidenceClaim: string;
+    'lockEvidenceClaim': string;
     /**
      * 
      * @type {object}
      * @memberof LockEvidenceV1Request
      */
-    lockEvidenceFormat?: object;
+    'lockEvidenceFormat'?: object;
     /**
      * 
      * @type {string}
      * @memberof LockEvidenceV1Request
      */
-    lockEvidenceExpiration: string;
+    'lockEvidenceExpiration': string;
     /**
      * 
      * @type {string}
      * @memberof LockEvidenceV1Request
      */
-    hashCommenceAckRequest: string;
+    'hashCommenceAckRequest': string;
     /**
      * 
      * @type {number}
      * @memberof LockEvidenceV1Request
      */
-    clientTransferNumber?: number | null;
+    'clientTransferNumber'?: number | null;
     /**
      * 
      * @type {string}
      * @memberof LockEvidenceV1Request
      */
-    signature: string;
+    'signature': string;
     /**
      * 
      * @type {string}
      * @memberof LockEvidenceV1Request
      */
-    messageType: string;
+    'messageType': string;
     /**
      * 
      * @type {string}
      * @memberof LockEvidenceV1Request
      */
-    messageHash?: string;
+    'messageHash'?: string;
     /**
      * 
      * @type {number}
      * @memberof LockEvidenceV1Request
      */
-    sequenceNumber: number;
+    'sequenceNumber': number;
 }
 /**
  * 
@@ -647,49 +652,49 @@ export interface LockEvidenceV1Response {
      * @type {string}
      * @memberof LockEvidenceV1Response
      */
-    sessionID: string;
+    'sessionID': string;
     /**
      * 
      * @type {string}
      * @memberof LockEvidenceV1Response
      */
-    clientIdentityPubkey: string;
+    'clientIdentityPubkey': string;
     /**
      * 
      * @type {string}
      * @memberof LockEvidenceV1Response
      */
-    serverIdentityPubkey: string;
+    'serverIdentityPubkey': string;
     /**
      * 
      * @type {string}
      * @memberof LockEvidenceV1Response
      */
-    hashLockEvidenceRequest: string;
+    'hashLockEvidenceRequest': string;
     /**
      * 
      * @type {number}
      * @memberof LockEvidenceV1Response
      */
-    serverTransferNumber?: number | null;
+    'serverTransferNumber'?: number | null;
     /**
      * 
      * @type {string}
      * @memberof LockEvidenceV1Response
      */
-    signature: string;
+    'signature': string;
     /**
      * 
      * @type {string}
      * @memberof LockEvidenceV1Response
      */
-    messageType: string;
+    'messageType': string;
     /**
      * 
      * @type {number}
      * @memberof LockEvidenceV1Response
      */
-    sequenceNumber: number;
+    'sequenceNumber': number;
 }
 /**
  * 
@@ -702,37 +707,37 @@ export interface OdapLocalLog {
      * @type {string}
      * @memberof OdapLocalLog
      */
-    key?: string;
+    'key'?: string;
     /**
      * 
      * @type {string}
      * @memberof OdapLocalLog
      */
-    sessionID: string;
+    'sessionID': string;
     /**
      * 
      * @type {string}
      * @memberof OdapLocalLog
      */
-    data?: string;
+    'data'?: string;
     /**
      * 
      * @type {string}
      * @memberof OdapLocalLog
      */
-    type: string;
+    'type': string;
     /**
      * 
      * @type {string}
      * @memberof OdapLocalLog
      */
-    operation: string;
+    'operation': string;
     /**
      * 
      * @type {string}
      * @memberof OdapLocalLog
      */
-    timestamp?: string;
+    'timestamp'?: string;
 }
 /**
  * 
@@ -745,93 +750,89 @@ export interface OdapMessage {
      * @type {number}
      * @memberof OdapMessage
      */
-    SequenceNumber?: number;
+    'SequenceNumber'?: number;
     /**
      * 
      * @type {string}
      * @memberof OdapMessage
      */
-    Phase?: OdapMessagePhaseEnum;
+    'Phase'?: OdapMessagePhaseEnum;
     /**
      * 
      * @type {string}
      * @memberof OdapMessage
      */
-    ResourceURL?: string;
+    'ResourceURL'?: string;
     /**
      * 
      * @type {string}
      * @memberof OdapMessage
      */
-    DeveloperURN?: string;
+    'DeveloperURN'?: string;
     /**
      * 
      * @type {OdapMessageActionResponse}
      * @memberof OdapMessage
      */
-    ActionResponse?: OdapMessageActionResponse;
+    'ActionResponse'?: OdapMessageActionResponse;
     /**
      * 
      * @type {string}
      * @memberof OdapMessage
      */
-    CredentialProfile?: OdapMessageCredentialProfileEnum;
+    'CredentialProfile'?: OdapMessageCredentialProfileEnum;
     /**
      * 
      * @type {Array<any>}
      * @memberof OdapMessage
      */
-    CredentialBlock?: Array<any>;
+    'CredentialBlock'?: Array<any>;
     /**
      * 
      * @type {PayloadProfile}
      * @memberof OdapMessage
      */
-    CredentialsProfile?: PayloadProfile;
+    'CredentialsProfile'?: PayloadProfile;
     /**
      * 
      * @type {object}
      * @memberof OdapMessage
      */
-    ApplicationProfile?: object;
+    'ApplicationProfile'?: object;
     /**
      * 
      * @type {object}
      * @memberof OdapMessage
      */
-    Payload?: object;
+    'Payload'?: object;
     /**
      * 
      * @type {string}
      * @memberof OdapMessage
      */
-    PayloadHash?: string;
+    'PayloadHash'?: string;
     /**
      * 
      * @type {string}
      * @memberof OdapMessage
      */
-    MessageSignature?: string;
+    'MessageSignature'?: string;
 }
 
-/**
-    * @export
-    * @enum {string}
-    */
-export enum OdapMessagePhaseEnum {
-    TransferInitialization = 'TransferInitialization',
-    LockEvidenceVerification = 'LockEvidenceVerification',
-    CommitmentEstablishment = 'CommitmentEstablishment'
-}
-/**
-    * @export
-    * @enum {string}
-    */
-export enum OdapMessageCredentialProfileEnum {
-    Saml = 'SAML',
-    OAuth = 'OAuth',
-    X509 = 'X509'
-}
+export const OdapMessagePhaseEnum = {
+    TransferInitialization: 'TransferInitialization',
+    LockEvidenceVerification: 'LockEvidenceVerification',
+    CommitmentEstablishment: 'CommitmentEstablishment'
+} as const;
+
+export type OdapMessagePhaseEnum = typeof OdapMessagePhaseEnum[keyof typeof OdapMessagePhaseEnum];
+export const OdapMessageCredentialProfileEnum = {
+    Saml: 'SAML',
+    OAuth: 'OAuth',
+    X509: 'X509'
+} as const;
+
+export type OdapMessageCredentialProfileEnum = typeof OdapMessageCredentialProfileEnum[keyof typeof OdapMessageCredentialProfileEnum];
 
 /**
  * 
@@ -844,23 +845,21 @@ export interface OdapMessageActionResponse {
      * @type {string}
      * @memberof OdapMessageActionResponse
      */
-    ResponseCode?: OdapMessageActionResponseResponseCodeEnum;
+    'ResponseCode'?: OdapMessageActionResponseResponseCodeEnum;
     /**
      * 
      * @type {Array<any>}
      * @memberof OdapMessageActionResponse
      */
-    Arguments?: Array<any>;
+    'Arguments'?: Array<any>;
 }
 
-/**
-    * @export
-    * @enum {string}
-    */
-export enum OdapMessageActionResponseResponseCodeEnum {
-    OK = '200',
-    RESOURCE_NOT_FOUND = '404'
-}
+export const OdapMessageActionResponseResponseCodeEnum = {
+    OK: '200',
+    RESOURCE_NOT_FOUND: '404'
+} as const;
+
+export type OdapMessageActionResponseResponseCodeEnum = typeof OdapMessageActionResponseResponseCodeEnum[keyof typeof OdapMessageActionResponseResponseCodeEnum];
 
 /**
  * 
@@ -873,13 +872,13 @@ export interface PayloadProfile {
      * @type {AssetProfile}
      * @memberof PayloadProfile
      */
-    assetProfile: AssetProfile;
+    'assetProfile': AssetProfile;
     /**
      * 
      * @type {string}
      * @memberof PayloadProfile
      */
-    capabilities?: string;
+    'capabilities'?: string;
 }
 /**
  * 
@@ -892,19 +891,19 @@ export interface RecoverSuccessV1Message {
      * @type {string}
      * @memberof RecoverSuccessV1Message
      */
-    sessionID: string;
+    'sessionID': string;
     /**
      * 
      * @type {boolean}
      * @memberof RecoverSuccessV1Message
      */
-    success: boolean;
+    'success': boolean;
     /**
      * 
      * @type {string}
      * @memberof RecoverSuccessV1Message
      */
-    signature: string;
+    'signature': string;
 }
 /**
  * 
@@ -917,25 +916,25 @@ export interface RecoverUpdateAckV1Message {
      * @type {string}
      * @memberof RecoverUpdateAckV1Message
      */
-    sessionID: string;
+    'sessionID': string;
     /**
      * 
      * @type {boolean}
      * @memberof RecoverUpdateAckV1Message
      */
-    success: boolean;
+    'success': boolean;
     /**
      * 
      * @type {Array<string>}
      * @memberof RecoverUpdateAckV1Message
      */
-    changedEntriesHash: Array<string>;
+    'changedEntriesHash': Array<string>;
     /**
      * 
      * @type {string}
      * @memberof RecoverUpdateAckV1Message
      */
-    signature: string;
+    'signature': string;
 }
 /**
  * 
@@ -948,19 +947,19 @@ export interface RecoverUpdateV1Message {
      * @type {string}
      * @memberof RecoverUpdateV1Message
      */
-    sessionID: string;
+    'sessionID': string;
     /**
      * 
      * @type {Array<OdapLocalLog>}
      * @memberof RecoverUpdateV1Message
      */
-    recoveredLogs: Array<OdapLocalLog>;
+    'recoveredLogs': Array<OdapLocalLog>;
     /**
      * 
      * @type {string}
      * @memberof RecoverUpdateV1Message
      */
-    signature: string;
+    'signature': string;
 }
 /**
  * 
@@ -973,49 +972,49 @@ export interface RecoverV1Message {
      * @type {string}
      * @memberof RecoverV1Message
      */
-    sessionID: string;
+    'sessionID': string;
     /**
      * 
      * @type {string}
      * @memberof RecoverV1Message
      */
-    odapPhase: string;
+    'odapPhase': string;
     /**
      * 
      * @type {number}
      * @memberof RecoverV1Message
      */
-    sequenceNumber: number;
+    'sequenceNumber': number;
     /**
      * 
      * @type {string}
      * @memberof RecoverV1Message
      */
-    lastLogEntryTimestamp: string;
+    'lastLogEntryTimestamp': string;
     /**
      * 
      * @type {boolean}
      * @memberof RecoverV1Message
      */
-    isBackup: boolean;
+    'isBackup': boolean;
     /**
      * 
      * @type {string}
      * @memberof RecoverV1Message
      */
-    newBasePath: string;
+    'newBasePath': string;
     /**
      * 
      * @type {string}
      * @memberof RecoverV1Message
      */
-    newGatewayPubKey?: string;
+    'newGatewayPubKey'?: string;
     /**
      * 
      * @type {string}
      * @memberof RecoverV1Message
      */
-    signature: string;
+    'signature': string;
 }
 /**
  * 
@@ -1028,19 +1027,19 @@ export interface RollbackAckV1Message {
      * @type {string}
      * @memberof RollbackAckV1Message
      */
-    sessionID: string;
+    'sessionID': string;
     /**
      * 
      * @type {boolean}
      * @memberof RollbackAckV1Message
      */
-    success: boolean;
+    'success': boolean;
     /**
      * 
      * @type {string}
      * @memberof RollbackAckV1Message
      */
-    signature: string;
+    'signature': string;
 }
 /**
  * 
@@ -1053,31 +1052,31 @@ export interface RollbackV1Message {
      * @type {string}
      * @memberof RollbackV1Message
      */
-    sessionID: string;
+    'sessionID': string;
     /**
      * 
      * @type {boolean}
      * @memberof RollbackV1Message
      */
-    success: boolean;
+    'success': boolean;
     /**
      * 
      * @type {Array<string>}
      * @memberof RollbackV1Message
      */
-    actionPerformed: Array<string>;
+    'actionPerformed': Array<string>;
     /**
      * 
      * @type {Array<string>}
      * @memberof RollbackV1Message
      */
-    proofs: Array<string>;
+    'proofs': Array<string>;
     /**
      * 
      * @type {string}
      * @memberof RollbackV1Message
      */
-    signature: string;
+    'signature': string;
 }
 /**
  * 
@@ -1090,379 +1089,377 @@ export interface SessionData {
      * @type {string}
      * @memberof SessionData
      */
-    id?: string;
+    'id'?: string;
     /**
      * 
      * @type {number}
      * @memberof SessionData
      */
-    step?: number;
+    'step'?: number;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    version?: string;
+    'version'?: string;
     /**
      * 
      * @type {number}
      * @memberof SessionData
      */
-    lastSequenceNumber?: number;
+    'lastSequenceNumber'?: number;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    loggingProfile?: string;
+    'loggingProfile'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    accessControlProfile?: string;
+    'accessControlProfile'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    applicationProfile?: string;
+    'applicationProfile'?: string;
     /**
      * 
      * @type {PayloadProfile}
      * @memberof SessionData
      */
-    payloadProfile?: PayloadProfile;
+    'payloadProfile'?: PayloadProfile;
     /**
      * 
      * @type {AssetProfile}
      * @memberof SessionData
      */
-    assetProfile?: AssetProfile;
+    'assetProfile'?: AssetProfile;
     /**
      * 
      * @type {Array<string>}
      * @memberof SessionData
      */
-    allowedSourceBackupGateways?: Array<string>;
+    'allowedSourceBackupGateways'?: Array<string>;
     /**
      * 
      * @type {Array<string>}
      * @memberof SessionData
      */
-    allowedRecipientBackupGateways?: Array<string>;
+    'allowedRecipientBackupGateways'?: Array<string>;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    sourceBasePath?: string;
+    'sourceBasePath'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    recipientBasePath?: string;
+    'recipientBasePath'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    originatorPubkey?: string;
+    'originatorPubkey'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    beneficiaryPubkey?: string;
+    'beneficiaryPubkey'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    sourceGatewayPubkey?: string;
+    'sourceGatewayPubkey'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    sourceGatewayDltSystem?: string;
+    'sourceGatewayDltSystem'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    recipientGatewayPubkey?: string;
+    'recipientGatewayPubkey'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    recipientGatewayDltSystem?: string;
+    'recipientGatewayDltSystem'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    initializationRequestMessageHash?: string;
+    'initializationRequestMessageHash'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    initializationResponseMessageHash?: string;
+    'initializationResponseMessageHash'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    initializationRequestMessageRcvTimeStamp?: string;
+    'initializationRequestMessageRcvTimeStamp'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    initializationRequestMessageProcessedTimeStamp?: string;
+    'initializationRequestMessageProcessedTimeStamp'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    clientSignatureInitializationRequestMessage?: string;
+    'clientSignatureInitializationRequestMessage'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    serverSignatureInitializationResponseMessage?: string;
+    'serverSignatureInitializationResponseMessage'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    transferCommenceMessageRequestHash?: string;
+    'transferCommenceMessageRequestHash'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    transferCommenceMessageResponseHash?: string;
+    'transferCommenceMessageResponseHash'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    clientSignatureTransferCommenceRequestMessage?: string;
+    'clientSignatureTransferCommenceRequestMessage'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    serverSignatureTransferCommenceResponseMessage?: string;
+    'serverSignatureTransferCommenceResponseMessage'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    lockEvidenceRequestMessageHash?: string;
+    'lockEvidenceRequestMessageHash'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    lockEvidenceResponseMessageHash?: string;
+    'lockEvidenceResponseMessageHash'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    clientSignatureLockEvidenceRequestMessage?: string;
+    'clientSignatureLockEvidenceRequestMessage'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    serverSignatureLockEvidenceResponseMessage?: string;
+    'serverSignatureLockEvidenceResponseMessage'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    lockEvidenceClaim?: string;
+    'lockEvidenceClaim'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    commitPrepareRequestMessageHash?: string;
+    'commitPrepareRequestMessageHash'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    commitPrepareResponseMessageHash?: string;
+    'commitPrepareResponseMessageHash'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    clientSignatureCommitPreparationRequestMessage?: string;
+    'clientSignatureCommitPreparationRequestMessage'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    serverSignatureCommitPreparationResponseMessage?: string;
+    'serverSignatureCommitPreparationResponseMessage'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    commitFinalRequestMessageHash?: string;
+    'commitFinalRequestMessageHash'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    commitFinalResponseMessageHash?: string;
+    'commitFinalResponseMessageHash'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    commitFinalClaim?: string;
+    'commitFinalClaim'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    commitFinalClaimFormat?: string;
+    'commitFinalClaimFormat'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    commitAcknowledgementClaim?: string;
+    'commitAcknowledgementClaim'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    commitAcknowledgementClaimFormat?: string;
+    'commitAcknowledgementClaimFormat'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    clientSignatureCommitFinalRequestMessage?: string;
+    'clientSignatureCommitFinalRequestMessage'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    serverSignatureCommitFinalResponseMessage?: string;
+    'serverSignatureCommitFinalResponseMessage'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    transferCompleteMessageHash?: string;
+    'transferCompleteMessageHash'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    clientSignatureTransferCompleteMessage?: string;
+    'clientSignatureTransferCompleteMessage'?: string;
     /**
      * 
      * @type {number}
      * @memberof SessionData
      */
-    maxRetries?: number;
+    'maxRetries'?: number;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    recipientLedgerAssetID?: string;
+    'recipientLedgerAssetID'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    sourceLedgerAssetID?: string;
+    'sourceLedgerAssetID'?: string;
     /**
      * 
      * @type {number}
      * @memberof SessionData
      */
-    maxTimeout?: number;
+    'maxTimeout'?: number;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    lastLogEntryTimestamp?: string;
+    'lastLogEntryTimestamp'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    unlockAssetClaim?: string;
+    'unlockAssetClaim'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    recreateAssetClaim?: string;
+    'recreateAssetClaim'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    deleteAssetClaim?: string;
+    'deleteAssetClaim'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    lastMessageReceivedTimestamp?: string;
+    'lastMessageReceivedTimestamp'?: string;
     /**
      * 
      * @type {boolean}
      * @memberof SessionData
      */
-    rollback?: boolean;
+    'rollback'?: boolean;
     /**
      * 
      * @type {string}
      * @memberof SessionData
      */
-    rollbackMessageHash?: string;
+    'rollbackMessageHash'?: string;
     /**
      * 
      * @type {Array<string>}
      * @memberof SessionData
      */
-    rollbackProofs?: Array<string>;
+    'rollbackProofs'?: Array<string>;
     /**
      * 
      * @type {Array<string>}
      * @memberof SessionData
      */
-    rollbackActionsPerformed?: Array<SessionDataRollbackActionsPerformedEnum>;
+    'rollbackActionsPerformed'?: Array<SessionDataRollbackActionsPerformedEnum>;
 }
 
-/**
-    * @export
-    * @enum {string}
-    */
-export enum SessionDataRollbackActionsPerformedEnum {
-    Create = 'CREATE',
-    Delete = 'DELETE',
-    Lock = 'LOCK',
-    Unlock = 'UNLOCK'
-}
+export const SessionDataRollbackActionsPerformedEnum = {
+    Create: 'CREATE',
+    Delete: 'DELETE',
+    Lock: 'LOCK',
+    Unlock: 'UNLOCK'
+} as const;
+
+export type SessionDataRollbackActionsPerformedEnum = typeof SessionDataRollbackActionsPerformedEnum[keyof typeof SessionDataRollbackActionsPerformedEnum];
 
 /**
  * 
@@ -1475,85 +1472,85 @@ export interface TransferCommenceV1Request {
      * @type {string}
      * @memberof TransferCommenceV1Request
      */
-    sessionID: string;
+    'sessionID': string;
     /**
      * 
      * @type {string}
      * @memberof TransferCommenceV1Request
      */
-    messageType: string;
+    'messageType': string;
     /**
      * 
      * @type {string}
      * @memberof TransferCommenceV1Request
      */
-    originatorPubkey: string;
+    'originatorPubkey': string;
     /**
      * 
      * @type {string}
      * @memberof TransferCommenceV1Request
      */
-    beneficiaryPubkey: string;
+    'beneficiaryPubkey': string;
     /**
      * 
      * @type {string}
      * @memberof TransferCommenceV1Request
      */
-    senderDltSystem: string;
+    'senderDltSystem': string;
     /**
      * 
      * @type {string}
      * @memberof TransferCommenceV1Request
      */
-    recipientDltSystem: string;
+    'recipientDltSystem': string;
     /**
      * 
      * @type {string}
      * @memberof TransferCommenceV1Request
      */
-    clientIdentityPubkey: string;
+    'clientIdentityPubkey': string;
     /**
      * 
      * @type {string}
      * @memberof TransferCommenceV1Request
      */
-    serverIdentityPubkey: string;
+    'serverIdentityPubkey': string;
     /**
      * 
      * @type {string}
      * @memberof TransferCommenceV1Request
      */
-    hashAssetProfile: string;
+    'hashAssetProfile': string;
     /**
      * 
      * @type {number}
      * @memberof TransferCommenceV1Request
      */
-    assetUnit?: number;
+    'assetUnit'?: number;
     /**
      * 
      * @type {string}
      * @memberof TransferCommenceV1Request
      */
-    hashPrevMessage: string;
+    'hashPrevMessage': string;
     /**
      * 
      * @type {number}
      * @memberof TransferCommenceV1Request
      */
-    clientTransferNumber?: number | null;
+    'clientTransferNumber'?: number | null;
     /**
      * 
      * @type {string}
      * @memberof TransferCommenceV1Request
      */
-    signature: string;
+    'signature': string;
     /**
      * 
      * @type {number}
      * @memberof TransferCommenceV1Request
      */
-    sequenceNumber: number;
+    'sequenceNumber': number;
 }
 /**
  * 
@@ -1566,55 +1563,55 @@ export interface TransferCommenceV1Response {
      * @type {string}
      * @memberof TransferCommenceV1Response
      */
-    sessionID: string;
+    'sessionID': string;
     /**
      * 
      * @type {string}
      * @memberof TransferCommenceV1Response
      */
-    clientIdentityPubkey: string;
+    'clientIdentityPubkey': string;
     /**
      * 
      * @type {string}
      * @memberof TransferCommenceV1Response
      */
-    serverIdentityPubkey: string;
+    'serverIdentityPubkey': string;
     /**
      * 
      * @type {string}
      * @memberof TransferCommenceV1Response
      */
-    hashCommenceRequest: string;
+    'hashCommenceRequest': string;
     /**
      * 
      * @type {number}
      * @memberof TransferCommenceV1Response
      */
-    serverTransferNumber?: number | null;
+    'serverTransferNumber'?: number | null;
     /**
      * 
      * @type {string}
      * @memberof TransferCommenceV1Response
      */
-    signature: string;
+    'signature': string;
     /**
      * 
      * @type {string}
      * @memberof TransferCommenceV1Response
      */
-    messageType: string;
+    'messageType': string;
     /**
      * 
      * @type {string}
      * @memberof TransferCommenceV1Response
      */
-    messageHash?: string;
+    'messageHash'?: string;
     /**
      * 
      * @type {number}
      * @memberof TransferCommenceV1Response
      */
-    sequenceNumber: number;
+    'sequenceNumber': number;
 }
 /**
  * 
@@ -1627,55 +1624,55 @@ export interface TransferCompleteV1Request {
      * @type {string}
      * @memberof TransferCompleteV1Request
      */
-    sessionID: string;
+    'sessionID': string;
     /**
      * 
      * @type {string}
      * @memberof TransferCompleteV1Request
      */
-    messageType: string;
+    'messageType': string;
     /**
      * 
      * @type {string}
      * @memberof TransferCompleteV1Request
      */
-    clientIdentityPubkey: string;
+    'clientIdentityPubkey': string;
     /**
      * 
      * @type {string}
      * @memberof TransferCompleteV1Request
      */
-    serverIdentityPubkey: string;
+    'serverIdentityPubkey': string;
     /**
      * 
      * @type {string}
      * @memberof TransferCompleteV1Request
      */
-    hashCommitFinalAck: string;
+    'hashCommitFinalAck': string;
     /**
      * 
      * @type {number}
      * @memberof TransferCompleteV1Request
      */
-    clientTransferNumber?: number | null;
+    'clientTransferNumber'?: number | null;
     /**
      * 
      * @type {string}
      * @memberof TransferCompleteV1Request
      */
-    signature: string;
+    'signature': string;
     /**
      * 
      * @type {string}
      * @memberof TransferCompleteV1Request
      */
-    hashTransferCommence: string;
+    'hashTransferCommence': string;
     /**
      * 
      * @type {number}
      * @memberof TransferCompleteV1Request
      */
-    sequenceNumber: number;
+    'sequenceNumber': number;
 }
 /**
  * 
@@ -1688,202 +1685,200 @@ export interface TransferInitializationV1Request {
      * @type {string}
      * @memberof TransferInitializationV1Request
      */
-    messageType: string;
+    'messageType': string;
     /**
      * 
      * @type {string}
      * @memberof TransferInitializationV1Request
      */
-    sessionID: string;
+    'sessionID': string;
     /**
      * 
      * @type {string}
      * @memberof TransferInitializationV1Request
      */
-    version?: string;
+    'version'?: string;
     /**
      * 
      * @type {string}
      * @memberof TransferInitializationV1Request
      */
-    developerURN?: string;
+    'developerURN'?: string;
     /**
      * 
      * @type {CredentialProfile}
      * @memberof TransferInitializationV1Request
      */
-    credentialProfile?: CredentialProfile;
+    'credentialProfile'?: CredentialProfile;
     /**
      * 
      * @type {PayloadProfile}
      * @memberof TransferInitializationV1Request
      */
-    payloadProfile: PayloadProfile;
+    'payloadProfile': PayloadProfile;
     /**
      * 
      * @type {string}
      * @memberof TransferInitializationV1Request
      */
-    applicationProfile: string;
+    'applicationProfile': string;
     /**
      * 
      * @type {string}
      * @memberof TransferInitializationV1Request
      */
-    loggingProfile: string;
+    'loggingProfile': string;
     /**
      * 
      * @type {string}
      * @memberof TransferInitializationV1Request
      */
-    accessControlProfile: string;
+    'accessControlProfile': string;
     /**
      * 
      * @type {string}
      * @memberof TransferInitializationV1Request
      */
-    signature: string;
+    'signature': string;
     /**
      * 
      * @type {string}
      * @memberof TransferInitializationV1Request
      */
-    sourceGatewayPubkey: string;
+    'sourceGatewayPubkey': string;
     /**
      * 
      * @type {string}
      * @memberof TransferInitializationV1Request
      */
-    sourceGatewayDltSystem: string;
+    'sourceGatewayDltSystem': string;
     /**
      * 
      * @type {string}
      * @memberof TransferInitializationV1Request
      */
-    recipientGatewayPubkey: string;
+    'recipientGatewayPubkey': string;
     /**
      * 
      * @type {string}
      * @memberof TransferInitializationV1Request
      */
-    recipientGatewayDltSystem: string;
+    'recipientGatewayDltSystem': string;
     /**
      * 
      * @type {string}
      * @memberof TransferInitializationV1Request
      */
-    escrowType?: TransferInitializationV1RequestEscrowTypeEnum;
+    'escrowType'?: TransferInitializationV1RequestEscrowTypeEnum;
     /**
      * 
      * @type {string}
      * @memberof TransferInitializationV1Request
      */
-    expiryTime?: string;
+    'expiryTime'?: string;
     /**
      * 
      * @type {boolean}
      * @memberof TransferInitializationV1Request
      */
-    multipleClaimsAllowed?: boolean;
+    'multipleClaimsAllowed'?: boolean;
     /**
      * 
      * @type {boolean}
      * @memberof TransferInitializationV1Request
      */
-    multipleCancelsAllowed?: boolean;
+    'multipleCancelsAllowed'?: boolean;
     /**
      * 
      * @type {object}
      * @memberof TransferInitializationV1Request
      */
-    permissions?: object;
+    'permissions'?: object;
     /**
      * 
      * @type {string}
      * @memberof TransferInitializationV1Request
      */
-    origin?: string;
+    'origin'?: string;
     /**
      * 
      * @type {string}
      * @memberof TransferInitializationV1Request
      */
-    destination?: string;
+    'destination'?: string;
     /**
      * 
      * @type {object}
      * @memberof TransferInitializationV1Request
      */
-    subsequentCalls?: object;
+    'subsequentCalls'?: object;
     /**
      * 
      * @type {Array<History>}
      * @memberof TransferInitializationV1Request
      */
-    histories?: Array<History>;
+    'histories'?: Array<History>;
     /**
      * 
      * @type {number}
      * @memberof TransferInitializationV1Request
      */
-    sequenceNumber: number;
+    'sequenceNumber': number;
     /**
      * 
      * @type {string}
      * @memberof TransferInitializationV1Request
      */
-    sourceBasePath: string;
+    'sourceBasePath': string;
     /**
      * 
      * @type {string}
      * @memberof TransferInitializationV1Request
      */
-    recipientBasePath: string;
+    'recipientBasePath': string;
     /**
      * 
      * @type {number}
      * @memberof TransferInitializationV1Request
      */
-    maxRetries: number;
+    'maxRetries': number;
     /**
      * 
      * @type {number}
      * @memberof TransferInitializationV1Request
      */
-    maxTimeout: number;
+    'maxTimeout': number;
     /**
      * 
      * @type {Array<string>}
      * @memberof TransferInitializationV1Request
      */
-    backupGatewaysAllowed: Array<string>;
+    'backupGatewaysAllowed': Array<string>;
     /**
      * 
      * @type {string}
      * @memberof TransferInitializationV1Request
      */
-    recipientLedgerAssetID: string;
+    'recipientLedgerAssetID': string;
     /**
      * 
      * @type {string}
      * @memberof TransferInitializationV1Request
      */
-    sourceLedgerAssetID: string;
+    'sourceLedgerAssetID': string;
 }
 
-/**
-    * @export
-    * @enum {string}
-    */
-export enum TransferInitializationV1RequestEscrowTypeEnum {
-    Faucet = 'FAUCET',
-    Timelock = 'TIMELOCK',
-    Hashlock = 'HASHLOCK',
-    Hashtimelock = 'HASHTIMELOCK',
-    Multiclaimpc = 'MULTICLAIMPC',
-    Destroy = 'DESTROY',
-    Burn = 'BURN'
-}
+export const TransferInitializationV1RequestEscrowTypeEnum = {
+    Faucet: 'FAUCET',
+    Timelock: 'TIMELOCK',
+    Hashlock: 'HASHLOCK',
+    Hashtimelock: 'HASHTIMELOCK',
+    Multiclaimpc: 'MULTICLAIMPC',
+    Destroy: 'DESTROY',
+    Burn: 'BURN'
+} as const;
+
+export type TransferInitializationV1RequestEscrowTypeEnum = typeof TransferInitializationV1RequestEscrowTypeEnum[keyof typeof TransferInitializationV1RequestEscrowTypeEnum];
 
 /**
  * 
@@ -1896,78 +1891,76 @@ export interface TransferInitializationV1Response {
      * @type {string}
      * @memberof TransferInitializationV1Response
      */
-    messageType: string;
+    'messageType': string;
     /**
      * 
      * @type {string}
      * @memberof TransferInitializationV1Response
      */
-    sessionID: string;
+    'sessionID': string;
     /**
      * 
      * @type {number}
      * @memberof TransferInitializationV1Response
      */
-    sequenceNumber: number;
+    'sequenceNumber': number;
     /**
      * 
      * @type {string}
      * @memberof TransferInitializationV1Response
      */
-    odapPhase?: TransferInitializationV1ResponseOdapPhaseEnum;
+    'odapPhase'?: TransferInitializationV1ResponseOdapPhaseEnum;
     /**
      * 
      * @type {string}
      * @memberof TransferInitializationV1Response
      */
-    initialRequestMessageHash: string;
+    'initialRequestMessageHash': string;
     /**
      * 
      * @type {string}
      * @memberof TransferInitializationV1Response
      */
-    destination?: string;
+    'destination'?: string;
     /**
      * 
      * @type {string}
      * @memberof TransferInitializationV1Response
      */
-    timeStamp: string;
+    'timeStamp': string;
     /**
      * 
      * @type {string}
      * @memberof TransferInitializationV1Response
      */
-    processedTimeStamp: string;
+    'processedTimeStamp': string;
     /**
      * 
      * @type {string}
      * @memberof TransferInitializationV1Response
      */
-    serverIdentityPubkey: string;
+    'serverIdentityPubkey': string;
     /**
      * 
      * @type {string}
      * @memberof TransferInitializationV1Response
      */
-    signature: string;
+    'signature': string;
     /**
      * 
      * @type {Array<string>}
      * @memberof TransferInitializationV1Response
      */
-    backupGatewaysAllowed: Array<string>;
+    'backupGatewaysAllowed': Array<string>;
 }
 
-/**
-    * @export
-    * @enum {string}
-    */
-export enum TransferInitializationV1ResponseOdapPhaseEnum {
-    TransferInitialization = 'TransferInitialization',
-    LockEvidenceVerification = 'LockEvidenceVerification',
-    CommitmentEstablishment = 'CommitmentEstablishment'
-}
+export const TransferInitializationV1ResponseOdapPhaseEnum = {
+    TransferInitialization: 'TransferInitialization',
+    LockEvidenceVerification: 'LockEvidenceVerification',
+    CommitmentEstablishment: 'CommitmentEstablishment'
+} as const;
+
+export type TransferInitializationV1ResponseOdapPhaseEnum = typeof TransferInitializationV1ResponseOdapPhaseEnum[keyof typeof TransferInitializationV1ResponseOdapPhaseEnum];
 
 
 /**
@@ -1982,7 +1975,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        clientRequestV1: async (clientV1Request?: ClientV1Request, options: any = {}): Promise<RequestArgs> => {
+        clientRequestV1: async (clientV1Request?: ClientV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/@hyperledger/cactus-plugin-odap-hermes/clientrequest`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1999,7 +1992,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(clientV1Request, localVarRequestOptions, configuration)
@@ -2015,7 +2008,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        phase1TransferInitiationRequestV1: async (transferInitializationV1Request?: TransferInitializationV1Request, options: any = {}): Promise<RequestArgs> => {
+        phase1TransferInitiationRequestV1: async (transferInitializationV1Request?: TransferInitializationV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase1/transferinitiationrequest`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2032,7 +2025,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(transferInitializationV1Request, localVarRequestOptions, configuration)
@@ -2048,7 +2041,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        phase1TransferInitiationResponseV1: async (transferInitializationV1Response?: TransferInitializationV1Response, options: any = {}): Promise<RequestArgs> => {
+        phase1TransferInitiationResponseV1: async (transferInitializationV1Response?: TransferInitializationV1Response, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase1/transferinitiationresponse`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2065,7 +2058,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(transferInitializationV1Response, localVarRequestOptions, configuration)
@@ -2081,7 +2074,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        phase2LockEvidenceRequestV1: async (lockEvidenceV1Request?: LockEvidenceV1Request, options: any = {}): Promise<RequestArgs> => {
+        phase2LockEvidenceRequestV1: async (lockEvidenceV1Request?: LockEvidenceV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase2/lockevidencerequest`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2098,7 +2091,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(lockEvidenceV1Request, localVarRequestOptions, configuration)
@@ -2114,7 +2107,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        phase2LockEvidenceResponseV1: async (lockEvidenceV1Response?: LockEvidenceV1Response, options: any = {}): Promise<RequestArgs> => {
+        phase2LockEvidenceResponseV1: async (lockEvidenceV1Response?: LockEvidenceV1Response, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase2/lockevidenceresponse`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2131,7 +2124,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(lockEvidenceV1Response, localVarRequestOptions, configuration)
@@ -2147,7 +2140,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        phase2TransferCommenceRequestV1: async (transferCommenceV1Request?: TransferCommenceV1Request, options: any = {}): Promise<RequestArgs> => {
+        phase2TransferCommenceRequestV1: async (transferCommenceV1Request?: TransferCommenceV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase2/transfercommencerequest`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2164,7 +2157,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(transferCommenceV1Request, localVarRequestOptions, configuration)
@@ -2180,7 +2173,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        phase2TransferCommenceResponseV1: async (transferCommenceV1Response?: TransferCommenceV1Response, options: any = {}): Promise<RequestArgs> => {
+        phase2TransferCommenceResponseV1: async (transferCommenceV1Response?: TransferCommenceV1Response, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase2/transfercommenceresponse`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2197,7 +2190,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(transferCommenceV1Response, localVarRequestOptions, configuration)
@@ -2213,7 +2206,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        phase3CommitFinalRequestV1: async (commitFinalV1Request?: CommitFinalV1Request, options: any = {}): Promise<RequestArgs> => {
+        phase3CommitFinalRequestV1: async (commitFinalV1Request?: CommitFinalV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase3/commitfinalrequest`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2230,7 +2223,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(commitFinalV1Request, localVarRequestOptions, configuration)
@@ -2246,7 +2239,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        phase3CommitFinalResponseV1: async (commitFinalV1Response?: CommitFinalV1Response, options: any = {}): Promise<RequestArgs> => {
+        phase3CommitFinalResponseV1: async (commitFinalV1Response?: CommitFinalV1Response, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase3/commitfinalresponse`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2263,7 +2256,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(commitFinalV1Response, localVarRequestOptions, configuration)
@@ -2279,7 +2272,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        phase3CommitPreparationRequestV1: async (commitPreparationV1Request?: CommitPreparationV1Request, options: any = {}): Promise<RequestArgs> => {
+        phase3CommitPreparationRequestV1: async (commitPreparationV1Request?: CommitPreparationV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase3/commitpreparationrequest`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2296,7 +2289,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(commitPreparationV1Request, localVarRequestOptions, configuration)
@@ -2312,7 +2305,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        phase3CommitPreparationResponseV1: async (commitPreparationV1Response?: CommitPreparationV1Response, options: any = {}): Promise<RequestArgs> => {
+        phase3CommitPreparationResponseV1: async (commitPreparationV1Response?: CommitPreparationV1Response, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase3/commitpreparationresponse`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2329,7 +2322,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(commitPreparationV1Response, localVarRequestOptions, configuration)
@@ -2345,7 +2338,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        phase3TransferCompleteRequestV1: async (transferCompleteV1Request?: TransferCompleteV1Request, options: any = {}): Promise<RequestArgs> => {
+        phase3TransferCompleteRequestV1: async (transferCompleteV1Request?: TransferCompleteV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase3/transfercompleterequest`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2362,7 +2355,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(transferCompleteV1Request, localVarRequestOptions, configuration)
@@ -2378,7 +2371,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        recoverUpdateAckV1Message: async (recoverUpdateAckV1Message?: RecoverUpdateAckV1Message, options: any = {}): Promise<RequestArgs> => {
+        recoverUpdateAckV1Message: async (recoverUpdateAckV1Message?: RecoverUpdateAckV1Message, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/@hyperledger/cactus-plugin-odap-hermes/recoverupdateackmessage`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2395,7 +2388,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(recoverUpdateAckV1Message, localVarRequestOptions, configuration)
@@ -2411,7 +2404,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        recoverUpdateV1Message: async (recoverUpdateV1Message?: RecoverUpdateV1Message, options: any = {}): Promise<RequestArgs> => {
+        recoverUpdateV1Message: async (recoverUpdateV1Message?: RecoverUpdateV1Message, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/@hyperledger/cactus-plugin-odap-hermes/recoverupdatemessage`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2428,7 +2421,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(recoverUpdateV1Message, localVarRequestOptions, configuration)
@@ -2444,7 +2437,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        recoverV1Message: async (recoverV1Message?: RecoverV1Message, options: any = {}): Promise<RequestArgs> => {
+        recoverV1Message: async (recoverV1Message?: RecoverV1Message, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/@hyperledger/cactus-plugin-odap-hermes/recovermessage`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2461,7 +2454,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(recoverV1Message, localVarRequestOptions, configuration)
@@ -2477,7 +2470,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        recoverV1Success: async (recoverSuccessV1Message?: RecoverSuccessV1Message, options: any = {}): Promise<RequestArgs> => {
+        recoverV1Success: async (recoverSuccessV1Message?: RecoverSuccessV1Message, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/@hyperledger/cactus-plugin-odap-hermes/recoversuccessmessage`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2494,7 +2487,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(recoverSuccessV1Message, localVarRequestOptions, configuration)
@@ -2510,7 +2503,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        rollbackAckV1Message: async (rollbackAckV1Message?: RollbackAckV1Message, options: any = {}): Promise<RequestArgs> => {
+        rollbackAckV1Message: async (rollbackAckV1Message?: RollbackAckV1Message, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/@hyperledger/cactus-plugin-odap-hermes/rollbackackmessage`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2527,7 +2520,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(rollbackAckV1Message, localVarRequestOptions, configuration)
@@ -2543,7 +2536,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        rollbackV1Message: async (rollbackV1Message?: RollbackV1Message, options: any = {}): Promise<RequestArgs> => {
+        rollbackV1Message: async (rollbackV1Message?: RollbackV1Message, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/@hyperledger/cactus-plugin-odap-hermes/rollbackmessage`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2560,7 +2553,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(rollbackV1Message, localVarRequestOptions, configuration)
@@ -2586,7 +2579,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async clientRequestV1(clientV1Request?: ClientV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
+        async clientRequestV1(clientV1Request?: ClientV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.clientRequestV1(clientV1Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -2596,7 +2589,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async phase1TransferInitiationRequestV1(transferInitializationV1Request?: TransferInitializationV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async phase1TransferInitiationRequestV1(transferInitializationV1Request?: TransferInitializationV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.phase1TransferInitiationRequestV1(transferInitializationV1Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -2606,7 +2599,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async phase1TransferInitiationResponseV1(transferInitializationV1Response?: TransferInitializationV1Response, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async phase1TransferInitiationResponseV1(transferInitializationV1Response?: TransferInitializationV1Response, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.phase1TransferInitiationResponseV1(transferInitializationV1Response, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -2616,7 +2609,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async phase2LockEvidenceRequestV1(lockEvidenceV1Request?: LockEvidenceV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async phase2LockEvidenceRequestV1(lockEvidenceV1Request?: LockEvidenceV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.phase2LockEvidenceRequestV1(lockEvidenceV1Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -2626,7 +2619,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async phase2LockEvidenceResponseV1(lockEvidenceV1Response?: LockEvidenceV1Response, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async phase2LockEvidenceResponseV1(lockEvidenceV1Response?: LockEvidenceV1Response, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.phase2LockEvidenceResponseV1(lockEvidenceV1Response, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -2636,7 +2629,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async phase2TransferCommenceRequestV1(transferCommenceV1Request?: TransferCommenceV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async phase2TransferCommenceRequestV1(transferCommenceV1Request?: TransferCommenceV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.phase2TransferCommenceRequestV1(transferCommenceV1Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -2646,7 +2639,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async phase2TransferCommenceResponseV1(transferCommenceV1Response?: TransferCommenceV1Response, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async phase2TransferCommenceResponseV1(transferCommenceV1Response?: TransferCommenceV1Response, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.phase2TransferCommenceResponseV1(transferCommenceV1Response, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -2656,7 +2649,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async phase3CommitFinalRequestV1(commitFinalV1Request?: CommitFinalV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async phase3CommitFinalRequestV1(commitFinalV1Request?: CommitFinalV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.phase3CommitFinalRequestV1(commitFinalV1Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -2666,7 +2659,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async phase3CommitFinalResponseV1(commitFinalV1Response?: CommitFinalV1Response, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async phase3CommitFinalResponseV1(commitFinalV1Response?: CommitFinalV1Response, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.phase3CommitFinalResponseV1(commitFinalV1Response, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -2676,7 +2669,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async phase3CommitPreparationRequestV1(commitPreparationV1Request?: CommitPreparationV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async phase3CommitPreparationRequestV1(commitPreparationV1Request?: CommitPreparationV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.phase3CommitPreparationRequestV1(commitPreparationV1Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -2686,7 +2679,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async phase3CommitPreparationResponseV1(commitPreparationV1Response?: CommitPreparationV1Response, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async phase3CommitPreparationResponseV1(commitPreparationV1Response?: CommitPreparationV1Response, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.phase3CommitPreparationResponseV1(commitPreparationV1Response, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -2696,7 +2689,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async phase3TransferCompleteRequestV1(transferCompleteV1Request?: TransferCompleteV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async phase3TransferCompleteRequestV1(transferCompleteV1Request?: TransferCompleteV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.phase3TransferCompleteRequestV1(transferCompleteV1Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -2706,7 +2699,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async recoverUpdateAckV1Message(recoverUpdateAckV1Message?: RecoverUpdateAckV1Message, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async recoverUpdateAckV1Message(recoverUpdateAckV1Message?: RecoverUpdateAckV1Message, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.recoverUpdateAckV1Message(recoverUpdateAckV1Message, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -2716,7 +2709,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async recoverUpdateV1Message(recoverUpdateV1Message?: RecoverUpdateV1Message, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async recoverUpdateV1Message(recoverUpdateV1Message?: RecoverUpdateV1Message, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.recoverUpdateV1Message(recoverUpdateV1Message, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -2726,7 +2719,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async recoverV1Message(recoverV1Message?: RecoverV1Message, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async recoverV1Message(recoverV1Message?: RecoverV1Message, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.recoverV1Message(recoverV1Message, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -2736,7 +2729,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async recoverV1Success(recoverSuccessV1Message?: RecoverSuccessV1Message, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async recoverV1Success(recoverSuccessV1Message?: RecoverSuccessV1Message, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.recoverV1Success(recoverSuccessV1Message, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -2746,7 +2739,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async rollbackAckV1Message(rollbackAckV1Message?: RollbackAckV1Message, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async rollbackAckV1Message(rollbackAckV1Message?: RollbackAckV1Message, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.rollbackAckV1Message(rollbackAckV1Message, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -2756,7 +2749,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async rollbackV1Message(rollbackV1Message?: RollbackV1Message, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async rollbackV1Message(rollbackV1Message?: RollbackV1Message, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.rollbackV1Message(rollbackV1Message, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -2949,7 +2942,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public clientRequestV1(clientV1Request?: ClientV1Request, options?: any) {
+    public clientRequestV1(clientV1Request?: ClientV1Request, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).clientRequestV1(clientV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -2960,7 +2953,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public phase1TransferInitiationRequestV1(transferInitializationV1Request?: TransferInitializationV1Request, options?: any) {
+    public phase1TransferInitiationRequestV1(transferInitializationV1Request?: TransferInitializationV1Request, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).phase1TransferInitiationRequestV1(transferInitializationV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -2971,7 +2964,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public phase1TransferInitiationResponseV1(transferInitializationV1Response?: TransferInitializationV1Response, options?: any) {
+    public phase1TransferInitiationResponseV1(transferInitializationV1Response?: TransferInitializationV1Response, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).phase1TransferInitiationResponseV1(transferInitializationV1Response, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -2982,7 +2975,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public phase2LockEvidenceRequestV1(lockEvidenceV1Request?: LockEvidenceV1Request, options?: any) {
+    public phase2LockEvidenceRequestV1(lockEvidenceV1Request?: LockEvidenceV1Request, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).phase2LockEvidenceRequestV1(lockEvidenceV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -2993,7 +2986,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public phase2LockEvidenceResponseV1(lockEvidenceV1Response?: LockEvidenceV1Response, options?: any) {
+    public phase2LockEvidenceResponseV1(lockEvidenceV1Response?: LockEvidenceV1Response, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).phase2LockEvidenceResponseV1(lockEvidenceV1Response, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -3004,7 +2997,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public phase2TransferCommenceRequestV1(transferCommenceV1Request?: TransferCommenceV1Request, options?: any) {
+    public phase2TransferCommenceRequestV1(transferCommenceV1Request?: TransferCommenceV1Request, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).phase2TransferCommenceRequestV1(transferCommenceV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -3015,7 +3008,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public phase2TransferCommenceResponseV1(transferCommenceV1Response?: TransferCommenceV1Response, options?: any) {
+    public phase2TransferCommenceResponseV1(transferCommenceV1Response?: TransferCommenceV1Response, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).phase2TransferCommenceResponseV1(transferCommenceV1Response, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -3026,7 +3019,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public phase3CommitFinalRequestV1(commitFinalV1Request?: CommitFinalV1Request, options?: any) {
+    public phase3CommitFinalRequestV1(commitFinalV1Request?: CommitFinalV1Request, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).phase3CommitFinalRequestV1(commitFinalV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -3037,7 +3030,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public phase3CommitFinalResponseV1(commitFinalV1Response?: CommitFinalV1Response, options?: any) {
+    public phase3CommitFinalResponseV1(commitFinalV1Response?: CommitFinalV1Response, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).phase3CommitFinalResponseV1(commitFinalV1Response, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -3048,7 +3041,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public phase3CommitPreparationRequestV1(commitPreparationV1Request?: CommitPreparationV1Request, options?: any) {
+    public phase3CommitPreparationRequestV1(commitPreparationV1Request?: CommitPreparationV1Request, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).phase3CommitPreparationRequestV1(commitPreparationV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -3059,7 +3052,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public phase3CommitPreparationResponseV1(commitPreparationV1Response?: CommitPreparationV1Response, options?: any) {
+    public phase3CommitPreparationResponseV1(commitPreparationV1Response?: CommitPreparationV1Response, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).phase3CommitPreparationResponseV1(commitPreparationV1Response, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -3070,7 +3063,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public phase3TransferCompleteRequestV1(transferCompleteV1Request?: TransferCompleteV1Request, options?: any) {
+    public phase3TransferCompleteRequestV1(transferCompleteV1Request?: TransferCompleteV1Request, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).phase3TransferCompleteRequestV1(transferCompleteV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -3081,7 +3074,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public recoverUpdateAckV1Message(recoverUpdateAckV1Message?: RecoverUpdateAckV1Message, options?: any) {
+    public recoverUpdateAckV1Message(recoverUpdateAckV1Message?: RecoverUpdateAckV1Message, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).recoverUpdateAckV1Message(recoverUpdateAckV1Message, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -3092,7 +3085,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public recoverUpdateV1Message(recoverUpdateV1Message?: RecoverUpdateV1Message, options?: any) {
+    public recoverUpdateV1Message(recoverUpdateV1Message?: RecoverUpdateV1Message, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).recoverUpdateV1Message(recoverUpdateV1Message, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -3103,7 +3096,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public recoverV1Message(recoverV1Message?: RecoverV1Message, options?: any) {
+    public recoverV1Message(recoverV1Message?: RecoverV1Message, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).recoverV1Message(recoverV1Message, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -3114,7 +3107,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public recoverV1Success(recoverSuccessV1Message?: RecoverSuccessV1Message, options?: any) {
+    public recoverV1Success(recoverSuccessV1Message?: RecoverSuccessV1Message, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).recoverV1Success(recoverSuccessV1Message, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -3125,7 +3118,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public rollbackAckV1Message(rollbackAckV1Message?: RollbackAckV1Message, options?: any) {
+    public rollbackAckV1Message(rollbackAckV1Message?: RollbackAckV1Message, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).rollbackAckV1Message(rollbackAckV1Message, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -3136,7 +3129,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public rollbackV1Message(rollbackV1Message?: RollbackV1Message, options?: any) {
+    public rollbackV1Message(rollbackV1Message?: RollbackV1Message, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).rollbackV1Message(rollbackV1Message, options).then((request) => request(this.axios, this.basePath));
     }
 }

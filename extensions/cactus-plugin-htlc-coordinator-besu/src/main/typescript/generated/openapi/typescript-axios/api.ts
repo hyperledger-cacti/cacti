@@ -13,13 +13,15 @@
  */
 
 
-import { Configuration } from './configuration';
-import globalAxios, { AxiosPromise, AxiosInstance } from 'axios';
+import type { Configuration } from './configuration';
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from './common';
+import type { RequestArgs } from './base';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from './base';
+import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from './base';
 
 /**
  * 
@@ -32,48 +34,53 @@ export interface CounterpartyHTLCRequest {
      * @type {HtlcPackage}
      * @memberof CounterpartyHTLCRequest
      */
-    htlcPackage: HtlcPackage;
+    'htlcPackage': HtlcPackage;
     /**
      * connector Instance Id for the connector plugin
      * @type {string}
      * @memberof CounterpartyHTLCRequest
      */
-    connectorInstanceId: string;
+    'connectorInstanceId': string;
     /**
      * keychainId for the keychain plugin
      * @type {string}
      * @memberof CounterpartyHTLCRequest
      */
-    keychainId: string;
+    'keychainId': string;
     /**
      * Id for the HTLC
      * @type {string}
      * @memberof CounterpartyHTLCRequest
      */
-    htlcId: string;
+    'htlcId': string;
     /**
      * 
      * @type {Web3SigningCredential}
      * @memberof CounterpartyHTLCRequest
      */
-    web3SigningCredential: Web3SigningCredential;
+    'web3SigningCredential': Web3SigningCredential;
     /**
      * 
      * @type {number}
      * @memberof CounterpartyHTLCRequest
      */
-    gas?: number;
+    'gas'?: number;
 }
+
+
 /**
  * 
  * @export
  * @enum {string}
  */
 
-export enum HtlcPackage {
-    Besu = 'BESU',
-    BesuErc20 = 'BESU_ERC20'
-}
+export const HtlcPackage = {
+    Besu: 'BESU',
+    BesuErc20: 'BESU_ERC20'
+} as const;
+
+export type HtlcPackage = typeof HtlcPackage[keyof typeof HtlcPackage];
+
 
 /**
  * 
@@ -86,86 +93,88 @@ export interface OwnHTLCRequest {
      * @type {HtlcPackage}
      * @memberof OwnHTLCRequest
      */
-    htlcPackage: HtlcPackage;
+    'htlcPackage': HtlcPackage;
     /**
      * connector Instance Id for the connector plugin
      * @type {string}
      * @memberof OwnHTLCRequest
      */
-    connectorInstanceId: string;
+    'connectorInstanceId': string;
     /**
      * keychainId for the keychain plugin
      * @type {string}
      * @memberof OwnHTLCRequest
      */
-    keychainId: string;
+    'keychainId': string;
     /**
      * 
      * @type {Array<any>}
      * @memberof OwnHTLCRequest
      */
-    constructorArgs: Array<any>;
+    'constructorArgs': Array<any>;
     /**
      * 
      * @type {Web3SigningCredential}
      * @memberof OwnHTLCRequest
      */
-    web3SigningCredential: Web3SigningCredential;
+    'web3SigningCredential': Web3SigningCredential;
     /**
      * Input amount to lock
      * @type {number}
      * @memberof OwnHTLCRequest
      */
-    inputAmount: number;
+    'inputAmount': number;
     /**
      * Output amount to lock
      * @type {number}
      * @memberof OwnHTLCRequest
      */
-    outputAmount: number;
+    'outputAmount': number;
     /**
      * Timestamp to expire the contract
      * @type {number}
      * @memberof OwnHTLCRequest
      */
-    expiration: number;
+    'expiration': number;
     /**
      * Hashlock needed to refund the amount
      * @type {string}
      * @memberof OwnHTLCRequest
      */
-    hashLock: string;
+    'hashLock': string;
     /**
      * The token address
      * @type {string}
      * @memberof OwnHTLCRequest
      */
-    tokenAddress: string;
+    'tokenAddress': string;
     /**
      * The receiver address
      * @type {string}
      * @memberof OwnHTLCRequest
      */
-    receiver: string;
+    'receiver': string;
     /**
      * The output network id
      * @type {string}
      * @memberof OwnHTLCRequest
      */
-    outputNetwork: string;
+    'outputNetwork': string;
     /**
      * The output addreess to receive the tokens
      * @type {string}
      * @memberof OwnHTLCRequest
      */
-    outputAddress: string;
+    'outputAddress': string;
     /**
      * 
      * @type {number}
      * @memberof OwnHTLCRequest
      */
-    gas?: number;
+    'gas'?: number;
 }
+
+
 /**
  * @type Web3SigningCredential
  * @export
@@ -183,26 +192,28 @@ export interface Web3SigningCredentialCactusKeychainRef {
      * @type {Web3SigningCredentialType}
      * @memberof Web3SigningCredentialCactusKeychainRef
      */
-    type: Web3SigningCredentialType;
+    'type': Web3SigningCredentialType;
     /**
      * The ethereum account (public key) that the credential  belongs to. Basically the username in the traditional  terminology of authentication.
      * @type {string}
      * @memberof Web3SigningCredentialCactusKeychainRef
      */
-    ethAccount: string;
+    'ethAccount': string;
     /**
      * The key to use when looking up the the keychain entry holding the secret pointed to by the  keychainEntryKey parameter.
      * @type {string}
      * @memberof Web3SigningCredentialCactusKeychainRef
      */
-    keychainEntryKey: string;
+    'keychainEntryKey': string;
     /**
      * The keychain ID to use when looking up the the keychain plugin instance that will be used to retrieve the secret pointed to by the keychainEntryKey parameter.
      * @type {string}
      * @memberof Web3SigningCredentialCactusKeychainRef
      */
-    keychainId: string;
+    'keychainId': string;
 }
+
+
 /**
  * Using this denotes that there is no signing required because the transaction is pre-signed.
  * @export
@@ -214,8 +225,10 @@ export interface Web3SigningCredentialNone {
      * @type {Web3SigningCredentialType}
      * @memberof Web3SigningCredentialNone
      */
-    type: Web3SigningCredentialType;
+    'type': Web3SigningCredentialType;
 }
+
+
 /**
  * 
  * @export
@@ -227,32 +240,37 @@ export interface Web3SigningCredentialPrivateKeyHex {
      * @type {Web3SigningCredentialType}
      * @memberof Web3SigningCredentialPrivateKeyHex
      */
-    type: Web3SigningCredentialType;
+    'type': Web3SigningCredentialType;
     /**
      * The ethereum account (public key) that the credential belongs to. Basically the username in the traditional terminology of authentication.
      * @type {string}
      * @memberof Web3SigningCredentialPrivateKeyHex
      */
-    ethAccount: string;
+    'ethAccount': string;
     /**
      * The HEX encoded private key of an eth account.
      * @type {string}
      * @memberof Web3SigningCredentialPrivateKeyHex
      */
-    secret: string;
+    'secret': string;
 }
+
+
 /**
  * 
  * @export
  * @enum {string}
  */
 
-export enum Web3SigningCredentialType {
-    CactusKeychainRef = 'CACTUS_KEYCHAIN_REF',
-    GethKeychainPassword = 'GETH_KEYCHAIN_PASSWORD',
-    PrivateKeyHex = 'PRIVATE_KEY_HEX',
-    None = 'NONE'
-}
+export const Web3SigningCredentialType = {
+    CactusKeychainRef: 'CACTUS_KEYCHAIN_REF',
+    GethKeychainPassword: 'GETH_KEYCHAIN_PASSWORD',
+    PrivateKeyHex: 'PRIVATE_KEY_HEX',
+    None: 'NONE'
+} as const;
+
+export type Web3SigningCredentialType = typeof Web3SigningCredentialType[keyof typeof Web3SigningCredentialType];
+
 
 /**
  * 
@@ -265,50 +283,52 @@ export interface WithdrawCounterpartyRequest {
      * @type {HtlcPackage}
      * @memberof WithdrawCounterpartyRequest
      */
-    htlcPackage: HtlcPackage;
+    'htlcPackage': HtlcPackage;
     /**
      * connector Instance Id for the connector plugin
      * @type {string}
      * @memberof WithdrawCounterpartyRequest
      */
-    connectorInstanceId: string;
+    'connectorInstanceId': string;
     /**
      * keychainId for the keychain plugin
      * @type {string}
      * @memberof WithdrawCounterpartyRequest
      */
-    keychainId: string;
+    'keychainId': string;
     /**
      * contractId for the contract
      * @type {string}
      * @memberof WithdrawCounterpartyRequest
      */
-    contractId?: string;
+    'contractId'?: string;
     /**
      * 
      * @type {Web3SigningCredential}
      * @memberof WithdrawCounterpartyRequest
      */
-    web3SigningCredential: Web3SigningCredential;
+    'web3SigningCredential': Web3SigningCredential;
     /**
      * Id for the HTLC
      * @type {string}
      * @memberof WithdrawCounterpartyRequest
      */
-    htlcId: string;
+    'htlcId': string;
     /**
      * Counterparty HTLC secret
      * @type {string}
      * @memberof WithdrawCounterpartyRequest
      */
-    secret: string;
+    'secret': string;
     /**
      * 
      * @type {number}
      * @memberof WithdrawCounterpartyRequest
      */
-    gas?: number;
+    'gas'?: number;
 }
+
+
 
 /**
  * DefaultApi - axios parameter creator
@@ -323,7 +343,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        counterpartyHtlcV1: async (counterpartyHTLCRequest?: CounterpartyHTLCRequest, options: any = {}): Promise<RequestArgs> => {
+        counterpartyHtlcV1: async (counterpartyHTLCRequest?: CounterpartyHTLCRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-htlc-coordinator-besu/counterparty-htlc`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -340,7 +360,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(counterpartyHTLCRequest, localVarRequestOptions, configuration)
@@ -357,7 +377,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        ownHtlcV1: async (ownHTLCRequest?: OwnHTLCRequest, options: any = {}): Promise<RequestArgs> => {
+        ownHtlcV1: async (ownHTLCRequest?: OwnHTLCRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-htlc-coordinator-besu/own-htlc`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -374,7 +394,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(ownHTLCRequest, localVarRequestOptions, configuration)
@@ -391,7 +411,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        withdrawCounterpartyV1: async (withdrawCounterpartyRequest?: WithdrawCounterpartyRequest, options: any = {}): Promise<RequestArgs> => {
+        withdrawCounterpartyV1: async (withdrawCounterpartyRequest?: WithdrawCounterpartyRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-htlc-coordinator-besu/withdraw-counterparty`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -408,7 +428,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(withdrawCounterpartyRequest, localVarRequestOptions, configuration)
@@ -435,7 +455,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async counterpartyHtlcV1(counterpartyHTLCRequest?: CounterpartyHTLCRequest, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
+        async counterpartyHtlcV1(counterpartyHTLCRequest?: CounterpartyHTLCRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.counterpartyHtlcV1(counterpartyHTLCRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -446,7 +466,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async ownHtlcV1(ownHTLCRequest?: OwnHTLCRequest, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
+        async ownHtlcV1(ownHTLCRequest?: OwnHTLCRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.ownHtlcV1(ownHTLCRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -457,7 +477,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async withdrawCounterpartyV1(withdrawCounterpartyRequest?: WithdrawCounterpartyRequest, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
+        async withdrawCounterpartyV1(withdrawCounterpartyRequest?: WithdrawCounterpartyRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.withdrawCounterpartyV1(withdrawCounterpartyRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -519,7 +539,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public counterpartyHtlcV1(counterpartyHTLCRequest?: CounterpartyHTLCRequest, options?: any) {
+    public counterpartyHtlcV1(counterpartyHTLCRequest?: CounterpartyHTLCRequest, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).counterpartyHtlcV1(counterpartyHTLCRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -531,7 +551,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public ownHtlcV1(ownHTLCRequest?: OwnHTLCRequest, options?: any) {
+    public ownHtlcV1(ownHTLCRequest?: OwnHTLCRequest, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).ownHtlcV1(ownHTLCRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -543,7 +563,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public withdrawCounterpartyV1(withdrawCounterpartyRequest?: WithdrawCounterpartyRequest, options?: any) {
+    public withdrawCounterpartyV1(withdrawCounterpartyRequest?: WithdrawCounterpartyRequest, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).withdrawCounterpartyV1(withdrawCounterpartyRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }

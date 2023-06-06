@@ -13,13 +13,15 @@
  */
 
 
-import { Configuration } from './configuration';
-import globalAxios, { AxiosPromise, AxiosInstance } from 'axios';
+import type { Configuration } from './configuration';
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from './common';
+import type { RequestArgs } from './base';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from './base';
+import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from './base';
 
 /**
  * 
@@ -32,7 +34,7 @@ export interface DeleteKeychainEntryRequestV1 {
      * @type {string}
      * @memberof DeleteKeychainEntryRequestV1
      */
-    key: string;
+    'key': string;
 }
 /**
  * 
@@ -45,7 +47,7 @@ export interface DeleteKeychainEntryResponseV1 {
      * @type {string}
      * @memberof DeleteKeychainEntryResponseV1
      */
-    key: string;
+    'key': string;
 }
 /**
  * 
@@ -58,7 +60,7 @@ export interface GetKeychainEntryRequestV1 {
      * @type {string}
      * @memberof GetKeychainEntryRequestV1
      */
-    key: string;
+    'key': string;
 }
 /**
  * 
@@ -71,13 +73,13 @@ export interface GetKeychainEntryResponseV1 {
      * @type {string}
      * @memberof GetKeychainEntryResponseV1
      */
-    key: string;
+    'key': string;
     /**
      * The value associated with the requested key on the keychain.
      * @type {string}
      * @memberof GetKeychainEntryResponseV1
      */
-    value: string;
+    'value': string;
 }
 /**
  * 
@@ -90,7 +92,7 @@ export interface HasKeychainEntryRequestV1 {
      * @type {string}
      * @memberof HasKeychainEntryRequestV1
      */
-    key: string;
+    'key': string;
 }
 /**
  * 
@@ -103,19 +105,19 @@ export interface HasKeychainEntryResponseV1 {
      * @type {string}
      * @memberof HasKeychainEntryResponseV1
      */
-    key: string;
+    'key': string;
     /**
      * Date and time encoded as JSON when the presence check was performed by the plugin backend.
      * @type {string}
      * @memberof HasKeychainEntryResponseV1
      */
-    checkedAt: string;
+    'checkedAt': string;
     /**
      * The boolean true or false indicating the presence or absence of an entry under \'key\'.
      * @type {boolean}
      * @memberof HasKeychainEntryResponseV1
      */
-    isPresent: boolean;
+    'isPresent': boolean;
 }
 /**
  * 
@@ -128,13 +130,13 @@ export interface SetKeychainEntryRequestV1 {
      * @type {string}
      * @memberof SetKeychainEntryRequestV1
      */
-    key: string;
+    'key': string;
     /**
      * The value that will be associated with the key on the keychain.
      * @type {string}
      * @memberof SetKeychainEntryRequestV1
      */
-    value: string;
+    'value': string;
 }
 /**
  * 
@@ -147,7 +149,7 @@ export interface SetKeychainEntryResponseV1 {
      * @type {string}
      * @memberof SetKeychainEntryResponseV1
      */
-    key: string;
+    'key': string;
 }
 
 /**
@@ -163,7 +165,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deleteKeychainEntryV1: async (deleteKeychainEntryRequestV1: DeleteKeychainEntryRequestV1, options: any = {}): Promise<RequestArgs> => {
+        deleteKeychainEntryV1: async (deleteKeychainEntryRequestV1: DeleteKeychainEntryRequestV1, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'deleteKeychainEntryRequestV1' is not null or undefined
             assertParamExists('deleteKeychainEntryV1', 'deleteKeychainEntryRequestV1', deleteKeychainEntryRequestV1)
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-keychain-memory-wasm/delete-keychain-entry`;
@@ -182,7 +184,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(deleteKeychainEntryRequestV1, localVarRequestOptions, configuration)
@@ -199,7 +201,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getKeychainEntryV1: async (getKeychainEntryRequestV1: GetKeychainEntryRequestV1, options: any = {}): Promise<RequestArgs> => {
+        getKeychainEntryV1: async (getKeychainEntryRequestV1: GetKeychainEntryRequestV1, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'getKeychainEntryRequestV1' is not null or undefined
             assertParamExists('getKeychainEntryV1', 'getKeychainEntryRequestV1', getKeychainEntryRequestV1)
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-keychain-memory-wasm/get-keychain-entry`;
@@ -218,7 +220,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(getKeychainEntryRequestV1, localVarRequestOptions, configuration)
@@ -235,7 +237,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        hasKeychainEntryV1: async (hasKeychainEntryRequestV1: HasKeychainEntryRequestV1, options: any = {}): Promise<RequestArgs> => {
+        hasKeychainEntryV1: async (hasKeychainEntryRequestV1: HasKeychainEntryRequestV1, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'hasKeychainEntryRequestV1' is not null or undefined
             assertParamExists('hasKeychainEntryV1', 'hasKeychainEntryRequestV1', hasKeychainEntryRequestV1)
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-keychain-memory-wasm/has-keychain-entry`;
@@ -254,7 +256,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(hasKeychainEntryRequestV1, localVarRequestOptions, configuration)
@@ -271,7 +273,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        setKeychainEntryV1: async (setKeychainEntryRequestV1: SetKeychainEntryRequestV1, options: any = {}): Promise<RequestArgs> => {
+        setKeychainEntryV1: async (setKeychainEntryRequestV1: SetKeychainEntryRequestV1, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'setKeychainEntryRequestV1' is not null or undefined
             assertParamExists('setKeychainEntryV1', 'setKeychainEntryRequestV1', setKeychainEntryRequestV1)
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-keychain-memory-wasm/set-keychain-entry`;
@@ -290,7 +292,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(setKeychainEntryRequestV1, localVarRequestOptions, configuration)
@@ -317,7 +319,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deleteKeychainEntryV1(deleteKeychainEntryRequestV1: DeleteKeychainEntryRequestV1, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeleteKeychainEntryResponseV1>> {
+        async deleteKeychainEntryV1(deleteKeychainEntryRequestV1: DeleteKeychainEntryRequestV1, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeleteKeychainEntryResponseV1>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.deleteKeychainEntryV1(deleteKeychainEntryRequestV1, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -328,7 +330,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getKeychainEntryV1(getKeychainEntryRequestV1: GetKeychainEntryRequestV1, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetKeychainEntryResponseV1>> {
+        async getKeychainEntryV1(getKeychainEntryRequestV1: GetKeychainEntryRequestV1, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetKeychainEntryResponseV1>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getKeychainEntryV1(getKeychainEntryRequestV1, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -339,7 +341,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async hasKeychainEntryV1(hasKeychainEntryRequestV1: HasKeychainEntryRequestV1, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<HasKeychainEntryResponseV1>> {
+        async hasKeychainEntryV1(hasKeychainEntryRequestV1: HasKeychainEntryRequestV1, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<HasKeychainEntryResponseV1>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.hasKeychainEntryV1(hasKeychainEntryRequestV1, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -350,7 +352,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async setKeychainEntryV1(setKeychainEntryRequestV1: SetKeychainEntryRequestV1, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SetKeychainEntryResponseV1>> {
+        async setKeychainEntryV1(setKeychainEntryRequestV1: SetKeychainEntryRequestV1, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SetKeychainEntryResponseV1>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.setKeychainEntryV1(setKeychainEntryRequestV1, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -422,7 +424,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public deleteKeychainEntryV1(deleteKeychainEntryRequestV1: DeleteKeychainEntryRequestV1, options?: any) {
+    public deleteKeychainEntryV1(deleteKeychainEntryRequestV1: DeleteKeychainEntryRequestV1, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).deleteKeychainEntryV1(deleteKeychainEntryRequestV1, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -434,7 +436,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public getKeychainEntryV1(getKeychainEntryRequestV1: GetKeychainEntryRequestV1, options?: any) {
+    public getKeychainEntryV1(getKeychainEntryRequestV1: GetKeychainEntryRequestV1, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getKeychainEntryV1(getKeychainEntryRequestV1, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -446,7 +448,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public hasKeychainEntryV1(hasKeychainEntryRequestV1: HasKeychainEntryRequestV1, options?: any) {
+    public hasKeychainEntryV1(hasKeychainEntryRequestV1: HasKeychainEntryRequestV1, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).hasKeychainEntryV1(hasKeychainEntryRequestV1, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -458,7 +460,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public setKeychainEntryV1(setKeychainEntryRequestV1: SetKeychainEntryRequestV1, options?: any) {
+    public setKeychainEntryV1(setKeychainEntryRequestV1: SetKeychainEntryRequestV1, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).setKeychainEntryV1(setKeychainEntryRequestV1, options).then((request) => request(this.axios, this.basePath));
     }
 }
