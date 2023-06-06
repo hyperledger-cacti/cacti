@@ -11,7 +11,6 @@ import OAS from "../json/openapi.json";
 import Web3 from "web3";
 
 import type { WebsocketProvider } from "web3-core";
-//import EEAClient, { ICallOptions, IWeb3InstanceExtended } from "web3-eea";
 import Web3JsQuorum, { IWeb3Quorum } from "web3js-quorum";
 
 import { Contract, ContractSendMethod } from "web3-eth-contract";
@@ -486,7 +485,7 @@ export class PluginLedgerConnectorBesu
         });
 
         success = true;
-        this.log.debug(`Web3 EEA Call output: `, callOutput);
+        this.log.debug(`Web3js Quorum Call output: `, callOutput);
       } else {
         callOutput = await method.call();
         success = true;
@@ -638,7 +637,7 @@ export class PluginLedgerConnectorBesu
     const fnTag = `${this.className}#transactPrivate()`;
 
     if (!this.web3Quorum) {
-      throw new Error(`${fnTag} Web3 EEA client not initialized.`);
+      throw new Error(`${fnTag} Web3js Quorum client not initialized.`);
     }
 
     const txHash = await this.web3Quorum.priv.generateAndSendRawTransaction(
@@ -646,7 +645,9 @@ export class PluginLedgerConnectorBesu
     );
 
     if (!txHash) {
-      throw new Error(`${fnTag} eea.sendRawTransaction provided no tx hash.`);
+      throw new Error(
+        `${fnTag} priv.generateAndSendRawTransaction provided no tx hash.`,
+      );
     }
     return this.getPrivateTxReceipt(options.privateFrom, txHash);
   }
@@ -680,7 +681,7 @@ export class PluginLedgerConnectorBesu
       secret,
     } = web3SigningCredential as Web3SigningCredentialPrivateKeyHex;
 
-    // Run transaction to EEA client here if private transaction
+    // Run transaction to Web3js Quorum client here if private transaction
 
     if (req.privateTransactionConfig) {
       const options = {
