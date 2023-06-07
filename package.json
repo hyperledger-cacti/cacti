@@ -17,20 +17,20 @@
       "weaver/samples/besu/simpleasset",
       "weaver/samples/besu/simplestate"
     ],
-    "nohoist": [
+    "installConfig.hoistingLimits": [
       "**/iroha-helpers"
     ]
   },
-  "packageManager": "yarn@1.22.17",
+  "packageManager": "yarn@3.5.1",
   "scripts": {
     "run-ci": "./tools/ci.sh",
     "reset:node-modules": "del-cli '**/node_modules'",
     "reset:git": "git clean -f -X",
-    "reset:yarn-lock": "yarn run init-registries && yarn install --update-checksums --force",
+    "reset:yarn-lock": "yarn install --check-cache && yarn run init-registries",
     "reset": "run-s reset:git reset:node-modules reset:yarn-lock configure",
-    "configure": "yarn run init-registries && yarn install --frozen-lockfile --non-interactive && yarn run build:dev:backend",
-    "install-yarn": "npm install --global yarn@1.22.17",
-    "enable-corepack": "npm i -g corepack && corepack enable && corepack prepare yarn@1.22.17 --activate",
+    "configure": "yarn run init-registries && yarn run build:dev:backend",
+    "install-yarn": "npm install --global yarn@1.22.17 && yarn set version 3.5.1",
+    "enable-corepack": "npm i -g corepack && corepack enable && corepack prepare yarn@3.5.1 --activate",
     "custom-checks": "TS_NODE_PROJECT=./tools/tsconfig.json node --trace-deprecation --experimental-modules --abort-on-uncaught-exception --loader ts-node/esm --experimental-specifier-resolution=node ./tools/custom-checks/run-custom-checks.ts",
     "tools:validate-bundle-names": "TS_NODE_PROJECT=./tools/tsconfig.json node --trace-deprecation --experimental-modules --abort-on-uncaught-exception --loader ts-node/esm --experimental-specifier-resolution=node ./tools/validate-bundle-names.js",
     "generate-api-server-config": "node ./tools/generate-api-server-config.js",
@@ -89,11 +89,11 @@
   "devDependencies": {
     "@commitlint/cli": "13.1.0",
     "@commitlint/config-conventional": "13.1.0",
-    "@openapitools/openapi-generator-cli": "2.4.14",
     "@lerna-lite/cli": "1.17.0",
     "@lerna-lite/exec": "1.17.0",
     "@lerna-lite/list": "1.17.0",
     "@lerna-lite/run": "1.17.0",
+    "@openapitools/openapi-generator-cli": "2.4.14",
     "@types/fs-extra": "9.0.12",
     "@types/jasminewd2": "2.0.10",
     "@types/jest": "27.5.0",
@@ -104,6 +104,8 @@
     "@types/uuid": "8.3.1",
     "@typescript-eslint/eslint-plugin": "5.27.0",
     "@typescript-eslint/parser": "5.27.0",
+    "ajv": "6.0.0",
+    "ajv-openapi": "2.0.0",
     "buffer": "6.0.3",
     "codecov": "3.8.3",
     "cpy-cli": "4.1.0",
@@ -125,8 +127,8 @@
     "git-cz": "4.7.6",
     "globby": "12.0.0",
     "google-protobuf": "3.21.2",
-    "grpc_tools_node_protoc_ts": "5.3.1",
     "grpc-tools": "1.11.2",
+    "grpc_tools_node_protoc_ts": "5.3.1",
     "husky": "7.0.1",
     "inquirer": "8.1.2",
     "jest": "28.1.0",

@@ -50,7 +50,7 @@
     "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios --reserved-words-mappings protected=protected",
     "generate-sdk:kotlin": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g kotlin -o ./src/main/kotlin/generated/openapi/kotlin-client/ --reserved-words-mappings protected=protected",
     "proto:openapi": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g protobuf-schema --model-name-suffix=PB --additional-properties=packageName=org.hyperledger.cactus.cmd_api_server -o ./src/main/proto/generated/openapi/ -t=./src/main/openapi-generator/templates/protobuf-schema/",
-    "proto:protoc-gen-ts": "yarn run grpc_tools_node_protoc --plugin=protoc-gen-ts=../../node_modules/.bin/protoc-gen-ts --ts_out=grpc_js:./src/main/typescript/generated/proto/protoc-gen-ts/ --proto_path ./src/main/proto/generated/openapi/ ./src/main/proto/generated/openapi/services/*.proto",
+    "proto:protoc-gen-ts": "yarn run grpc_tools_node_protoc --plugin=protoc-gen-ts=../../node_modules/protoc-gen-ts/bin/protoc-gen-ts --ts_out=grpc_js:./src/main/typescript/generated/proto/protoc-gen-ts/ --proto_path ./src/main/proto/generated/openapi/ ./src/main/proto/generated/openapi/services/*.proto",
     "watch": "npm-watch",
     "webpack": "npm-run-all webpack:dev",
     "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
@@ -94,6 +94,7 @@
   "devDependencies": {
     "@hyperledger/cactus-plugin-keychain-vault": "2.0.0-alpha.1",
     "@hyperledger/cactus-test-tooling": "2.0.0-alpha.1",
+    "@openapitools/openapi-generator-cli": "2.6.0",
     "@types/compression": "1.7.1",
     "@types/convict": "6.1.1",
     "@types/cors": "2.8.12",
@@ -111,7 +112,9 @@
     "@types/uuid": "8.3.1",
     "@types/xml2js": "0.4.9",
     "artillery": "1.7.2",
-    "http-status-codes": "2.1.4"
+    "grpc-tools": "1.11.2",
+    "http-status-codes": "2.1.4",
+    "protoc-gen-ts": "0.6.0"
   },
   "engines": {
     "node": ">=10",

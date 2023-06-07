@@ -116,6 +116,7 @@ function mainTask()
   if [ "${DEV_BUILD_DISABLED:-false}" = "true" ]; then
     echo "$(date +%FT%T%z) [CI] Dev build disabled. Skipping..."
   else
+    yarn install --immutable
     yarn configure
   fi
 

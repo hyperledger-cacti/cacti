@@ -43,9 +43,9 @@
     "dist/*"
   ],
   "scripts": {
-    "codegen": "run-p 'codegen:*'",
-    "codegen:openapi": "run-p generate-sdk",
-    "generate-sdk": "run-p generate-sdk:*",
+    "codegen": "yarn run codegen:openapi",
+    "codegen:openapi": "npm run generate-sdk",
+    "generate-sdk": "yarn run generate-sdk:typescript-axios",
     "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/",
     "watch": "npm-watch",
     "webpack": "npm-run-all webpack:dev webpack:prod",

@@ -5,7 +5,6 @@
   "main": "dist/www.js",
   "module": "dist/www.js",
   "types": "dist/www.d.ts",
-  "private": false,
   "scripts": {
     "start": "docker-compose build && docker-compose up",
     "build": "npm run build-ts && npm run build:dev:backend:postbuild",
@@ -35,9 +34,9 @@
     "xmlhttprequest": "1.8.0"
   },
   "devDependencies": {
+    "@types/escape-html": "1.0.1",
     "@typescript-eslint/eslint-plugin": "4.33.0",
     "@typescript-eslint/parser": "4.33.0",
-    "@types/escape-html": "1.0.1",
     "eslint": "7.32.0",
     "eslint-config-prettier": "8.4.0",
     "eslint-plugin-prettier": "4.0.0",
