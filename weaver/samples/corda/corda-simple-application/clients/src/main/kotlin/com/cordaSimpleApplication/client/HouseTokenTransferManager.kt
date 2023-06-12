@@ -207,7 +207,7 @@ class ReclaimHouseTokenCommand : CliktCommand(name="reclaim-pledged-asset", help
 
                 //val networkConfig: JSONObject = getRemoteNetworkConfig(assetPledgeState.localNetworkId)
                 //val exportRelayAddress: String = networkConfig.getString("relayEndpoint")
-                val claimStatusLinearId: String = requestStateFromRemoteNetwork(exportRelayAddress!!, externalStateAddress, rpc.proxy, config)
+                val claimStatusLinearId: String = requestStateFromRemoteNetwork(exportRelayAddress!!, externalStateAddress, rpc.proxy, config, listOf(issuer))
 
                 var obs = listOf<Party>()
                 if (observer != null)   {
@@ -292,7 +292,7 @@ class ClaimRemoteHouseTokenCommand : CliktCommand(name="claim-remote-asset", hel
                 //    below from the remote-network-config.json file
                 //val networkConfig: JSONObject = getRemoteNetworkConfig(importNetworkId)
                 //val importRelayAddress: String = networkConfig.getString("relayEndpoint")
-                val pledgeStatusLinearId: String = requestStateFromRemoteNetwork(importRelayAddress!!, externalStateAddress, rpc.proxy, config)
+                val pledgeStatusLinearId: String = requestStateFromRemoteNetwork(importRelayAddress!!, externalStateAddress, rpc.proxy, config, listOf(issuer))
 
                 val res = AssetTransferSDK.claimPledgedFungibleAsset(
                     rpc.proxy,

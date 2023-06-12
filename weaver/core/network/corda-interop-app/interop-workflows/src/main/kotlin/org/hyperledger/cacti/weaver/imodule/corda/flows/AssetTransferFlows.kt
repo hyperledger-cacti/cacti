@@ -473,6 +473,7 @@ object ReclaimPledgedAsset {
         override fun call(): Either<Error, SignedTransaction> = try {
             val linearId = getLinearIdFromString(pledgeId)
 
+            val externalStateAndRef = subFlow(GetExternalStateAndRefByLinearId(claimStatusLinearId))
             val viewData = subFlow(GetExternalStateByLinearId(claimStatusLinearId))
             val externalStateView = ViewDataOuterClass.ViewData.parseFrom(viewData)
             val interopPayload = InteropPayloadOuterClass.InteropPayload.parseFrom(externalStateView.notarizedPayloadsList[0].payload)
@@ -524,6 +525,7 @@ object ReclaimPledgedAsset {
 
                     val txBuilder = TransactionBuilder(notary)
                         .addInputState(assetPledgeStateAndRef)
+                        .addInputState(externalStateAndRef)
                         .addOutputState(reclaimAssetState, assetStateContractId)
                         .addCommand(reclaimCmd).apply {
                             networkIdStateRef!!.let {
@@ -683,6 +685,7 @@ object ClaimRemoteAsset {
         override fun call(): Either<Error, SignedTransaction> = try {
 
             // get the asset pledge details fetched earlier via interop query from import to export n/w
+            val externalStateAndRef = subFlow(GetExternalStateAndRefByLinearId(pledgeStatusLinearId))
             val viewData = subFlow(GetExternalStateByLinearId(pledgeStatusLinearId))
             val externalStateView = ViewDataOuterClass.ViewData.parseFrom(viewData)
             val interopPayload = InteropPayloadOuterClass.InteropPayload.parseFrom(externalStateView.notarizedPayloadsList[0].payload)
@@ -766,6 +769,7 @@ object ClaimRemoteAsset {
                     println("assetContractId: ${assetContractId}")
 
                     val txBuilder = TransactionBuilder(notary)
+                        .addInputState(externalStateAndRef)
                         .addOutputState(outputAssetState, assetContractId)
                         .addOutputState(assetClaimStatusState, AssetTransferContract.ID)
                         .addCommand(claimCmd).apply {
@@ -810,8 +814,8 @@ object ClaimRemoteAsset {
     class Acceptor(val session: FlowSession) : FlowLogic<SignedTransaction>() {
         @Suspendable
         override fun call(): SignedTransaction {
-            val role = session.receive<ResponderRole>().unwrap { it }
-            if (role == ResponderRole.ISSUER) {
+            val role = session.receive<AssetTransferResponderRole>().unwrap { it }
+            if (role == AssetTransferResponderRole.ISSUER) {
                 val signTransactionFlow = object : SignTransactionFlow(session) {
                     override fun checkTransaction(stx: SignedTransaction) = requireThat {
                     }
@@ -824,7 +828,7 @@ object ClaimRemoteAsset {
                     println("Error signing claim asset transaction by issuer: ${e.message}\n")
                     return subFlow(ReceiveFinalityFlow(session))
                 }
-            } else if (role == ResponderRole.OBSERVER) {
+            } else if (role == AssetTransferResponderRole.OBSERVER) {
                 val sTx = subFlow(ReceiveFinalityFlow(session, statesToRecord = StatesToRecord.ALL_VISIBLE))
                 println("Received Tx: ${sTx} and recorded states.")
                 return sTx
