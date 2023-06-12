@@ -50,6 +50,10 @@ data class AssetPledgeState(
     override val participants: List<AbstractParty> get() = listOf(locker)
 }
 
+/*
+ * Since there is a limit on the number of parameters to the workflow
+ * This data class is used as parameter.
+ */
 @CordaSerializable
 data class AssetPledgeParameters(
     var assetType: String,

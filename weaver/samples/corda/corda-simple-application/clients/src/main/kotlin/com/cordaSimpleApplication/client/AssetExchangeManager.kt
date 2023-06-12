@@ -70,7 +70,7 @@ class LockAssetCommand : CliktCommand(
             try {
                 val params = param!!.split(":").toTypedArray()
                 var id: Any
-                val issuer = rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse("O=PartyA,L=London,C=GB"))!!
+                val issuer = rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse(ISSUER_DN))!!
                 hash.setSerializedHashBase64(hashBase64!!)
                 if (fungible) {
                     id = AssetManager.createFungibleHTLC(
@@ -133,7 +133,7 @@ class ClaimAssetCommand : CliktCommand(help = "Claim a locked asset. Only Recipi
                     password = "test",
                     rpcPort = config["CORDA_PORT"]!!.toInt())
             try {
-                val issuer = rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse("O=PartyA,L=London,C=GB"))!!
+                val issuer = rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse(ISSUER_DN))!!
                 hash.setPreimage(secret!!)
                 val res = AssetManager.claimAssetInHTLC(
                     rpc.proxy, 
@@ -169,7 +169,7 @@ class UnlockAssetCommand : CliktCommand(help = "Unlocks a locked asset after tim
                     password = "test",
                     rpcPort = config["CORDA_PORT"]!!.toInt())
             try {
-                val issuer = rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse("O=PartyA,L=London,C=GB"))!!
+                val issuer = rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse(ISSUER_DN))!!
                 val res = AssetManager.reclaimAssetInHTLC(
                     rpc.proxy, 
                     contractId!!,

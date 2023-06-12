@@ -34,11 +34,17 @@ class ExternalStateContract : Contract {
     override fun verify(tx: LedgerTransaction) {
         val command = tx.commands.requireSingleCommand<Commands>()
         when(command.value) {
-            is Commands.Issue -> requireThat {
+            is Commands.Create -> requireThat {
                 "There should be no input states" using (tx.inputs.isEmpty())
                 "There should be one output state" using (tx.outputs.size == 1)
                 "The output state should be of type ExternalState" using (tx.outputs[0].data is ExternalState)
                 val participantKeys = tx.outputs[0].data.participants.map { it.owningKey }
+                "The required signers of the transaction must include all participants" using (command.signers.containsAll(participantKeys))
+            }
+            is Commands.Consume -> requireThat {
+                "There should be one ExternalState input states" using (tx.inputsOfType<ExternalState>().size == 1)
+                "There should be no ExternalState output states" using (tx.outputsOfType<ExternalState>().size == 0)
+                val participantKeys = tx.inputsOfType<ExternalState>()[0].participants.map { it.owningKey }
                 "The required signers of the transaction must include all participants" using (command.signers.containsAll(participantKeys))
             }
         }
@@ -47,9 +53,11 @@ class ExternalStateContract : Contract {
     /**
      * Commands are used to indicate the intent of a transaction.
      * Commands for [ExternalStateContract] are:
-     * - Issue
+     * - Create
+     * - Consume
      */
     interface Commands : CommandData {
-        class Issue : Commands
+        class Create : Commands
+        class Consume : Commands
     }
 }
