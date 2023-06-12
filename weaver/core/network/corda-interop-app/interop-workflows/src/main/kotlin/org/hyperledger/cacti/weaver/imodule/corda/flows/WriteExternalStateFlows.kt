@@ -15,10 +15,15 @@ import net.corda.core.contracts.Command
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.flows.*
 import net.corda.core.transactions.TransactionBuilder
+import net.corda.core.contracts.StateAndRef
 import java.util.Base64
 import net.corda.core.node.services.queryBy
 import net.corda.core.node.services.vault.QueryCriteria
 import com.google.protobuf.ByteString
+import net.corda.core.identity.Party
+import net.corda.core.transactions.SignedTransaction
+import net.corda.core.utilities.unwrap
+import net.corda.core.contracts.requireThat
 
 import org.hyperledger.fabric.protos.msp.Identities
 import org.hyperledger.fabric.protos.peer.ProposalPackage
@@ -39,10 +44,15 @@ import org.hyperledger.cacti.weaver.imodule.corda.states.ExternalState
  * @property view The view received from the foreign network.
  * @property address The address of the view, containing a location, securityDomain and view segment.
  */
+@InitiatingFlow
 @StartableByRPC
-class WriteExternalStateInitiator(
+class WriteExternalStateInitiator
+    @JvmOverloads
+    constructor(
         val viewBase64String: String,
-        val address: String): FlowLogic<Either<Error, UniqueIdentifier>>() {
+        val address: String,
+        val participants: List<Party> = listOf<Party>()
+    ): FlowLogic<Either<Error, UniqueIdentifier>>() {
 
     /**
      * The call() method captures the logic to perform the proof validation and the construction of
@@ -60,16 +70,17 @@ class WriteExternalStateInitiator(
         verifyView(view, address, serviceHub).flatMap {
             println("View verification successful. Creating state to be stored in the vault.")
             // 2. Create the state to be stored
+            var externalStateParticipants = if (participants.contains(ourIdentity)) { participants } else { listOf(ourIdentity) + participants }
             val state = ExternalState(
                     linearId = UniqueIdentifier(),
-                    participants = listOf(ourIdentity),
+                    participants = externalStateParticipants,
                     meta = view.meta.toByteArray(),
                     state = view.data.toByteArray())
             println("Storing ExternalState in the vault:\n\tLinear Id = ${state.linearId}\n\tParticipants = ${state.participants}\n\tMeta = ${view.meta}\tState = ${Base64.getEncoder().encodeToString(state.state)}\n")
 
             // 3. Build the transaction
             val notary = serviceHub.networkMapCache.notaryIdentities.first()
-            val command = Command(ExternalStateContract.Commands.Issue(), ourIdentity.owningKey)
+            val command = Command(ExternalStateContract.Commands.Create(), ourIdentity.owningKey)
             val txBuilder = TransactionBuilder(notary)
                     .addOutputState(state, ExternalStateContract.ID)
                     .addCommand(command)
@@ -77,7 +88,15 @@ class WriteExternalStateInitiator(
             // 4. Verify and collect signatures on the transaction
             txBuilder.verify(serviceHub)
             val tx = serviceHub.signInitialTransaction(txBuilder)
-            val sessions = listOf<FlowSession>()
+            var sessions = listOf<FlowSession>()
+            for (party in externalStateParticipants) {
+                if (!ourIdentity.equals(party)) {
+                    val session = initiateFlow(party)
+                    session.send(address)
+                    sessions += session
+                }
+            }
+            
             val stx = subFlow(CollectSignaturesFlow(tx, sessions))
             subFlow(FinalityFlow(stx, sessions))
 
@@ -87,6 +106,35 @@ class WriteExternalStateInitiator(
         }
     } catch (e: Exception) {
         Left(Error("Failed to store state in ledger: ${e.message}"))
+    }
+}
+
+@InitiatedBy(WriteExternalStateInitiator::class)
+class WriteExternalStateAcceptor(val session: FlowSession) : FlowLogic<SignedTransaction>() {
+    @Suspendable
+    override fun call(): SignedTransaction {
+        val address = session.receive<String>().unwrap { it }
+        val signTransactionFlow = object : SignTransactionFlow(session) {
+            override fun checkTransaction(stx: SignedTransaction) = requireThat {
+                val lTx = stx.tx.toLedgerTransaction(serviceHub)
+                val externalStates = lTx.outputsOfType<ExternalState>()
+                "One External State as output" using (externalStates.size == 1)
+                val externalState = externalStates[0]
+                val view = State.View.newBuilder()
+                    .setMeta(State.Meta.parseFrom(externalState.meta))
+                    .setData(ByteString.copyFrom(externalState.state))
+                    .build()
+                "Proof of state should be valid" using verifyView(view, address, serviceHub).isRight()
+            }
+        }
+        try {
+            val txId = subFlow(signTransactionFlow).id
+            println("Issuer signed transaction.")
+            return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId))
+        } catch (e: Exception) {
+            println("Error signing write external state transaction: ${e.message}\n")
+            return subFlow(ReceiveFinalityFlow(session))
+        }
     }
 }
 
@@ -194,6 +242,41 @@ class GetExternalStateByLinearId(
             }
 
 
+        }
+    }
+
+}
+
+/**
+ * The GetExternalBoLByLinearId flow is used to read an External State and parse
+ * the View Data.
+ *
+ * @property externalStateLinearId the linearId for the ExternalState.
+ */
+@StartableByRPC
+class GetExternalStateAndRefByLinearId(
+        val externalStateLinearId: String
+) : FlowLogic<StateAndRef<ExternalState>>() {
+    /**
+     * The call() method captures the logic to read external state written into the vault,
+     * and parse the payload and proof based on the protocol.
+     *
+     * @return Returns JSON string in ByteArray containing: payload, signatures, and proof message.
+     */
+    @Suspendable
+    override fun call(): StateAndRef<ExternalState> {
+        println("Getting External State for linearId $externalStateLinearId stored in vault\n.")
+        val linearId = UniqueIdentifier.fromString(externalStateLinearId)
+        //val linearId = externalStateLinearId
+        val states = serviceHub.vaultService.queryBy<ExternalState>(
+                QueryCriteria.LinearStateQueryCriteria(linearId = listOf(linearId))
+        ).states
+
+        if (states.isEmpty()) {
+            println("Error: Could not find external state with linearId $linearId")
+            throw IllegalArgumentException("Error: Could not find external state with linearId $linearId")
+        } else {
+            return states.first()
         }
     }
 

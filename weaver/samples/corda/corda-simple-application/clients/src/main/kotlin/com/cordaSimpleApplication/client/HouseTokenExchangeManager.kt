@@ -78,7 +78,7 @@ class LockHouseTokenCommand : CliktCommand(name="lock",
             try {
                 val params = param!!.split(":").toTypedArray()
                 var id: Any
-                val issuer = rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse("O=PartyA,L=London,C=GB"))!!
+                val issuer = rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse(ISSUER_DN))!!
                 val issuedTokenType = rpc.proxy.startFlow(::GetIssuedTokenType, "house").returnValue.get()
                 println("TokenType: $issuedTokenType")
                 var obs = listOf<Party>() 
@@ -151,7 +151,7 @@ class ClaimHouseTokenCommand : CliktCommand(name="claim", help = "Claim a locked
                     rpcPort = config["CORDA_PORT"]!!.toInt())
             try {
                 val issuedTokenType = rpc.proxy.startFlow(::GetIssuedTokenType, "house").returnValue.get()
-                val issuer = rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse("O=PartyA,L=London,C=GB"))!!
+                val issuer = rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse(ISSUER_DN))!!
                 var obs = listOf<Party>() 
                 if (observer != null)   {
                    obs += rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse(observer!!))!!
@@ -193,7 +193,7 @@ class UnlockHouseTokenCommand : CliktCommand(name="unlock", help = "Unlocks a lo
                     password = "test",
                     rpcPort = config["CORDA_PORT"]!!.toInt())
             try {
-                val issuer = rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse("O=PartyA,L=London,C=GB"))!!
+                val issuer = rpc.proxy.wellKnownPartyFromX500Name(CordaX500Name.parse(ISSUER_DN))!!
                 val issuedTokenType = rpc.proxy.startFlow(::GetIssuedTokenType, "house").returnValue.get()
                 println("TokenType: $issuedTokenType")
                 var obs = listOf<Party>() 

@@ -24,6 +24,9 @@ import net.corda.core.identity.CordaX500Name
 import java.lang.Exception
 import net.corda.core.messaging.startFlow
 
+//X500 Name for Issuer in sample corda testnet
+val ISSUER_DN="O=PartyA,L=London,C=GB"
+
 /**
  * The CLI command used to trigger a CreateState flow.
  *

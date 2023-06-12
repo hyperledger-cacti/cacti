@@ -27,6 +27,7 @@ import java.util.*
 import org.slf4j.LoggerFactory
 import net.corda.core.messaging.startFlow
 import net.corda.core.messaging.CordaRPCOps
+import net.corda.core.identity.Party
 
 import org.hyperledger.cacti.weaver.imodule.corda.flows.CreateExternalRequest
 import org.hyperledger.cacti.weaver.imodule.corda.flows.WriteExternalStateInitiator
@@ -148,6 +149,7 @@ class InteroperableHelper {
             localRelayEndpoint: String,
             externalStateAddress: String,
             networkName: String,
+            externalStateParticipants: List<Party> = listOf<Party>() ,
             useTlsForRelay: Boolean = false,
             relayTlsTrustStorePath: String = "",
             relayTlsTrustStorePassword: String = "",
@@ -176,17 +178,17 @@ class InteroperableHelper {
                 Left(it)
             }, { networkQuery ->
                 logger.debug("Network query: $networkQuery")
-                var eitherErrorResult: Either<Error, String> = Left(Error("Unknown Error"))
-                runBlocking {
+                var eitherErrorResult = runBlocking {
                     val ack = async { client.requestState(networkQuery) }.await()
                     pollForState(ack.requestId, client).fold({
                         logger.error("Error in Interop Flow: ${it.message}\n")
-                        eitherErrorResult = Left(Error("Error in Interop Flow: ${it.message}\n"))
+                        Left(Error("Error in Interop Flow: ${it.message}\n"))
                     }, { state ->
-                        eitherErrorResult = writeExternalStateToVault(
+                        writeExternalStateToVault(
                             proxy,  
                             state,
-                            externalStateAddress)
+                            externalStateAddress,
+                            externalStateParticipants)
                     })
                 }
                 eitherErrorResult
@@ -373,13 +375,14 @@ class InteroperableHelper {
         fun writeExternalStateToVault(
             proxy: CordaRPCOps,
             requestState: State.RequestState,
-            address: String
+            address: String,
+            externalStateParticipants: List<Party> = listOf<Party>()
         ): Either<Error, String> {
             return try {
                 logger.debug("Sending response to Corda for view verification.\n")
                 val stateId = runCatching {
                     val viewBase64String = Base64.getEncoder().encodeToString(requestState.view.toByteArray())
-                    proxy.startFlow(::WriteExternalStateInitiator, viewBase64String, address)
+                    proxy.startFlow(::WriteExternalStateInitiator, viewBase64String, address, externalStateParticipants)
                             .returnValue.get()
                 }.fold({
                     it.map { linearId ->

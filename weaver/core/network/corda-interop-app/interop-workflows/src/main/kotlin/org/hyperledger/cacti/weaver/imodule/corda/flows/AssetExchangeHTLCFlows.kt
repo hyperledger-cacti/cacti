@@ -47,7 +47,7 @@ import java.util.Base64
 
 @CordaSerializable
 enum class ResponderRole {
-  LOCKER, RECIPIENT, ISSUER, OBSERVER
+  LOCKER, RECIPIENT, SIGNER, OBSERVER
 }
     
 /**
@@ -121,7 +121,7 @@ object LockAssetHTLC {
             /// Add issuer session if recipient or locker (i.e. me) is not issuer
             if (!recipient.equals(issuer) && !ourIdentity.equals(issuer)) {
                 val issuerSession = initiateFlow(issuer)
-                issuerSession.send(ResponderRole.ISSUER)
+                issuerSession.send(ResponderRole.SIGNER)
                 sessions += issuerSession
             }
             val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, sessions))
@@ -150,7 +150,7 @@ object LockAssetHTLC {
         @Suspendable
         override fun call(): SignedTransaction {
             val role = session.receive<ResponderRole>().unwrap { it }
-            if (role == ResponderRole.ISSUER) {
+            if (role == ResponderRole.SIGNER) {
                 val signTransactionFlow = object : SignTransactionFlow(session) {
                     override fun checkTransaction(stx: SignedTransaction) = requireThat {
                     }
@@ -407,7 +407,7 @@ object ClaimAssetHTLC {
                         var sessions = listOf<FlowSession>()
                         if (!assetExchangeHTLCState.recipient.equals(issuer)) {
                             val issuerSession = initiateFlow(issuer)
-                            issuerSession.send(ResponderRole.ISSUER)
+                            issuerSession.send(ResponderRole.SIGNER)
                             sessions += issuerSession
                         }
                         val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, sessions))
@@ -437,7 +437,7 @@ object ClaimAssetHTLC {
         @Suspendable
         override fun call(): SignedTransaction {
             val role = session.receive<ResponderRole>().unwrap { it }
-            if (role == ResponderRole.ISSUER) {
+            if (role == ResponderRole.SIGNER) {
                 val signTransactionFlow = object : SignTransactionFlow(session) {
                     override fun checkTransaction(stx: SignedTransaction) = requireThat {
                     }
@@ -542,7 +542,7 @@ object UnlockAssetHTLC {
 
                 if (!ourIdentity.equals(issuer)) {
                     val issuerSession = initiateFlow(issuer)
-                    issuerSession.send(ResponderRole.ISSUER)
+                    issuerSession.send(ResponderRole.SIGNER)
                     sessions += issuerSession
                 }
                 if (!ourIdentity.equals(assetExchangeHTLCState.locker)) {
@@ -576,7 +576,7 @@ object UnlockAssetHTLC {
         @Suspendable
         override fun call(): SignedTransaction {
             val role = session.receive<ResponderRole>().unwrap { it }
-            if (role == ResponderRole.ISSUER) {
+            if (role == ResponderRole.SIGNER) {
                 val signTransactionFlow = object : SignTransactionFlow(session) {
                     override fun checkTransaction(stx: SignedTransaction) = requireThat {
                     }

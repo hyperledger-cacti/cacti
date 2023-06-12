@@ -12,9 +12,15 @@ import org.hyperledger.cacti.weaver.imodule.corda.contracts.AssetTransferContrac
 import org.hyperledger.cacti.weaver.imodule.corda.states.AssetPledgeState
 import org.hyperledger.cacti.weaver.imodule.corda.states.AssetClaimStatusState
 import org.hyperledger.cacti.weaver.imodule.corda.states.NetworkIdState
+import org.hyperledger.cacti.weaver.imodule.corda.contracts.ExternalStateContract
+import org.hyperledger.cacti.weaver.imodule.corda.states.ExternalState
 import org.hyperledger.cacti.weaver.protos.common.asset_transfer.AssetTransfer
 import org.hyperledger.cacti.weaver.protos.corda.ViewDataOuterClass
 import org.hyperledger.cacti.weaver.protos.common.interop_payload.InteropPayloadOuterClass
+import org.hyperledger.cacti.weaver.protos.common.state.State
+import org.hyperledger.cacti.weaver.protos.fabric.view_data.ViewData
+
+import org.hyperledger.fabric.protos.peer.ProposalPackage
 import com.google.protobuf.ByteString
 
 import net.corda.core.contracts.ContractState
@@ -49,7 +55,7 @@ import java.util.Calendar
  */
 @CordaSerializable
 enum class AssetTransferResponderRole {
-    PLEDGER, ISSUER, OBSERVER
+    PLEDGER, SIGNER, OBSERVER
 }
 
 /**
@@ -142,7 +148,7 @@ object PledgeAsset {
             // Add issuer session if locker (i.e. me) is not issuer
             if (!ourIdentity.equals(issuer)) {
                 val issuerSession = initiateFlow(issuer)
-                issuerSession.send(AssetTransferResponderRole.ISSUER)
+                issuerSession.send(AssetTransferResponderRole.SIGNER)
                 sessions += issuerSession
             }
             val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, sessions))
@@ -171,9 +177,10 @@ object PledgeAsset {
         @Suspendable
         override fun call(): SignedTransaction {
             val role = session.receive<AssetTransferResponderRole>().unwrap { it }
-            if (role == AssetTransferResponderRole.ISSUER) {
+            if (role == AssetTransferResponderRole.SIGNER) {
                 val signTransactionFlow = object : SignTransactionFlow(session) {
                     override fun checkTransaction(stx: SignedTransaction) = requireThat {
+                        
                     }
                 }
                 try {
@@ -473,6 +480,7 @@ object ReclaimPledgedAsset {
         override fun call(): Either<Error, SignedTransaction> = try {
             val linearId = getLinearIdFromString(pledgeId)
 
+            val externalStateAndRef = subFlow(GetExternalStateAndRefByLinearId(claimStatusLinearId))
             val viewData = subFlow(GetExternalStateByLinearId(claimStatusLinearId))
             val externalStateView = ViewDataOuterClass.ViewData.parseFrom(viewData)
             val interopPayload = InteropPayloadOuterClass.InteropPayload.parseFrom(externalStateView.notarizedPayloadsList[0].payload)
@@ -513,6 +521,10 @@ object ReclaimPledgedAsset {
                             issuer.owningKey
                         ).toList()
                     )
+                    
+                    val externalStateConsumeCommand = Command(ExternalStateContract.Commands.Consume(), 
+                        externalStateAndRef.state.data.participants.map { it.owningKey }
+                    )
 
                     val networkIdStateRef = subFlow(RetrieveNetworkIdStateAndRef())
 
@@ -524,6 +536,7 @@ object ReclaimPledgedAsset {
 
                     val txBuilder = TransactionBuilder(notary)
                         .addInputState(assetPledgeStateAndRef)
+                        .addInputState(externalStateAndRef)
                         .addOutputState(reclaimAssetState, assetStateContractId)
                         .addCommand(reclaimCmd).apply {
                             networkIdStateRef!!.let {
@@ -531,6 +544,7 @@ object ReclaimPledgedAsset {
                             }
                         }
                         .addCommand(assetCreateCmd)
+                        .addCommand(externalStateConsumeCommand)
                         .setTimeWindow(TimeWindow.fromOnly(Instant.ofEpochSecond(assetPledgeState.expiryTimeSecs).plusNanos(1)))
 
                     // Verify and collect signatures on the transaction
@@ -542,7 +556,7 @@ object ReclaimPledgedAsset {
 
                     if (!ourIdentity.equals(issuer)) {
                         val issuerSession = initiateFlow(issuer)
-                        issuerSession.send(AssetTransferResponderRole.ISSUER)
+                        issuerSession.send(AssetTransferResponderRole.SIGNER)
                         sessions += issuerSession
                     }
                     if (!ourIdentity.equals(assetPledgeState.locker)) {
@@ -572,9 +586,20 @@ object ReclaimPledgedAsset {
         @Suspendable
         override fun call(): SignedTransaction {
             val role = session.receive<AssetTransferResponderRole>().unwrap { it }
-            if (role == AssetTransferResponderRole.ISSUER) {
+            if (role == AssetTransferResponderRole.SIGNER) {
                 val signTransactionFlow = object : SignTransactionFlow(session) {
                     override fun checkTransaction(stx: SignedTransaction) = requireThat {
+                        val tx = stx.tx.toLedgerTransaction(serviceHub)
+                        // Get the input remote pledge state (external state)
+                        val remoteClaimStatus = parseExternalStateForClaimStatus(
+                            tx.inputsOfType<ExternalState>()[0]
+                        )
+                        val pledgeState = tx.inputsOfType<AssetPledgeState>()[0]
+                        
+                        // Claim Status checks
+                        "Expiry Time should match in PledgeState and ClaimStatus" using (remoteClaimStatus.expiryTimeSecs == pledgeState.expiryTimeSecs)
+                        "ClaimStatus should be false" using (remoteClaimStatus.claimStatus == false)
+                        "Expiration status should be true" using (remoteClaimStatus.expirationStatus == true)
                     }
                 }
                 try {
@@ -683,6 +708,7 @@ object ClaimRemoteAsset {
         override fun call(): Either<Error, SignedTransaction> = try {
 
             // get the asset pledge details fetched earlier via interop query from import to export n/w
+            val externalStateAndRef = subFlow(GetExternalStateAndRefByLinearId(pledgeStatusLinearId))
             val viewData = subFlow(GetExternalStateByLinearId(pledgeStatusLinearId))
             val externalStateView = ViewDataOuterClass.ViewData.parseFrom(viewData)
             val interopPayload = InteropPayloadOuterClass.InteropPayload.parseFrom(externalStateView.notarizedPayloadsList[0].payload)
@@ -730,6 +756,10 @@ object ClaimRemoteAsset {
                     issuer.owningKey
                 ).toList()
             )
+            
+            val externalStateConsumeCommand = Command(ExternalStateContract.Commands.Consume(), 
+                externalStateAndRef.state.data.participants.map { it.owningKey }
+            )
 
             // Make sure the pledge has not expired (we assume the expiry timestamp set by the remote network)
             if (currentTimeSecs >= assetPledgeStatus.expiryTimeSecs) {
@@ -766,6 +796,7 @@ object ClaimRemoteAsset {
                     println("assetContractId: ${assetContractId}")
 
                     val txBuilder = TransactionBuilder(notary)
+                        .addInputState(externalStateAndRef)
                         .addOutputState(outputAssetState, assetContractId)
                         .addOutputState(assetClaimStatusState, AssetTransferContract.ID)
                         .addCommand(claimCmd).apply {
@@ -774,6 +805,7 @@ object ClaimRemoteAsset {
                             }
                         }
                         .addCommand(assetCreateCmd)
+                        .addCommand(externalStateConsumeCommand)
                         .setTimeWindow(TimeWindow.untilOnly(Instant.ofEpochSecond(assetPledgeStatus.expiryTimeSecs)))
 
                     // Verify and collect signatures on the transaction
@@ -785,7 +817,7 @@ object ClaimRemoteAsset {
 
                     if (!ourIdentity.equals(issuer)) {
                         val issuerSession = initiateFlow(issuer)
-                        issuerSession.send(AssetTransferResponderRole.ISSUER)
+                        issuerSession.send(AssetTransferResponderRole.SIGNER)
                         sessions += issuerSession
                     }
 
@@ -810,21 +842,30 @@ object ClaimRemoteAsset {
     class Acceptor(val session: FlowSession) : FlowLogic<SignedTransaction>() {
         @Suspendable
         override fun call(): SignedTransaction {
-            val role = session.receive<ResponderRole>().unwrap { it }
-            if (role == ResponderRole.ISSUER) {
+            val role = session.receive<AssetTransferResponderRole>().unwrap { it }
+            if (role == AssetTransferResponderRole.SIGNER) {
                 val signTransactionFlow = object : SignTransactionFlow(session) {
                     override fun checkTransaction(stx: SignedTransaction) = requireThat {
+                        val tx = stx.tx.toLedgerTransaction(serviceHub)
+                        val remotePledgeStatus = parseExternalStateForPledgeStatus(
+                            tx.inputsOfType<ExternalState>()[0]
+                        )
+                        val claimState = tx.outputsOfType<AssetClaimStatusState>()[0]
+                        // Pledge State checks
+                        "Expiry Time should match in PledgeState and ClaimStatus" using (remotePledgeStatus.expiryTimeSecs == claimState.expiryTimeSecs)
+                        "Recipient should match in Pledge State and ClaimStatus" using (remotePledgeStatus.recipient == claimState.recipientCert)
+                        "NetworkId should match in Pledge State and ClaimStatu" using (remotePledgeStatus.remoteNetworkID == claimState.localNetworkID)
                     }
                 }
                 try {
                     val txId = subFlow(signTransactionFlow).id
-                    println("Issuer signed transaction.")
+                    println("Party: ${ourIdentity} signed transaction.")
                     return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId))
                 } catch (e: Exception) {
                     println("Error signing claim asset transaction by issuer: ${e.message}\n")
                     return subFlow(ReceiveFinalityFlow(session))
                 }
-            } else if (role == ResponderRole.OBSERVER) {
+            } else if (role == AssetTransferResponderRole.OBSERVER) {
                 val sTx = subFlow(ReceiveFinalityFlow(session, statesToRecord = StatesToRecord.ALL_VISIBLE))
                 println("Received Tx: ${sTx} and recorded states.")
                 return sTx
@@ -864,3 +905,74 @@ fun resolveGetAssetStateAndContractIdFlow(flowName: String, flowArgs: List<Any>)
     println("Flow Resolution Error: ${e.message} \n")
     Left(Error("Flow Resolution Error: ${e.message}"))
 }
+
+
+
+@Suspendable
+fun parseExternalStateForPledgeStatus(
+    externalState: ExternalState
+): AssetTransfer.AssetPledge {
+    val viewMetaByteArray = externalState.meta
+    val viewDataByteArray = externalState.state
+    val meta = State.Meta.parseFrom(viewMetaByteArray)
+
+    var payload: ByteArray
+    when (meta.protocol) {
+        State.Meta.Protocol.CORDA -> {
+            val cordaViewData = ViewDataOuterClass.ViewData.parseFrom(viewDataByteArray)
+            println("cordaViewData: $cordaViewData")
+            val interopPayload = InteropPayloadOuterClass.InteropPayload.parseFrom(cordaViewData.notarizedPayloadsList[0].payload)
+            payload = interopPayload.payload.toByteArray()
+        }
+        State.Meta.Protocol.FABRIC -> {
+            val fabricViewData = ViewData.FabricView.parseFrom(viewDataByteArray)
+            println("fabricViewData: $fabricViewData")
+            // TODO: We assume here that the response payloads have been matched earlier, but perhaps we should match them here too
+            val chaincodeAction = ProposalPackage.ChaincodeAction.parseFrom(fabricViewData.endorsedProposalResponsesList[0].payload.extension)
+            val interopPayload = InteropPayloadOuterClass.InteropPayload.parseFrom(chaincodeAction.response.payload)
+            payload = interopPayload.payload.toByteArray()
+        }
+        else -> {
+            println("GetExternalStateByLinearId Error: Unrecognized protocol.\n")
+            throw IllegalArgumentException("Error: Unrecognized protocol.")
+        }
+    }
+    val payloadDecoded = Base64.getDecoder().decode(payload)
+    val assetPledgeStatus = AssetTransfer.AssetPledge.parseFrom(payloadDecoded)
+    return assetPledgeStatus
+}
+
+@Suspendable
+fun parseExternalStateForClaimStatus(
+    externalState: ExternalState
+): AssetTransfer.AssetClaimStatus {
+    val viewMetaByteArray = externalState.meta
+    val viewDataByteArray = externalState.state
+    val meta = State.Meta.parseFrom(viewMetaByteArray)
+
+    var payload: ByteArray
+    when (meta.protocol) {
+        State.Meta.Protocol.CORDA -> {
+            val cordaViewData = ViewDataOuterClass.ViewData.parseFrom(viewDataByteArray)
+            println("cordaViewData: $cordaViewData")
+            val interopPayload = InteropPayloadOuterClass.InteropPayload.parseFrom(cordaViewData.notarizedPayloadsList[0].payload)
+            payload = interopPayload.payload.toByteArray()
+        }
+        State.Meta.Protocol.FABRIC -> {
+            val fabricViewData = ViewData.FabricView.parseFrom(viewDataByteArray)
+            println("fabricViewData: $fabricViewData")
+            // TODO: We assume here that the response payloads have been matched earlier, but perhaps we should match them here too
+            val chaincodeAction = ProposalPackage.ChaincodeAction.parseFrom(fabricViewData.endorsedProposalResponsesList[0].payload.extension)
+            val interopPayload = InteropPayloadOuterClass.InteropPayload.parseFrom(chaincodeAction.response.payload)
+            payload = interopPayload.payload.toByteArray()
+        }
+        else -> {
+            println("GetExternalStateByLinearId Error: Unrecognized protocol.\n")
+            throw IllegalArgumentException("Error: Unrecognized protocol.")
+        }
+    }
+    val payloadDecoded = Base64.getDecoder().decode(payload)
+    val assetClaimStatus = AssetTransfer.AssetClaimStatus.parseFrom(payloadDecoded)
+    return assetClaimStatus
+}
+
