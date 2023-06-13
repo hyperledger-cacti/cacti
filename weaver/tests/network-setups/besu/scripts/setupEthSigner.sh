@@ -19,7 +19,7 @@ touch keys/keyFile_${Node}
 # Without this, the npm install will fail because of conflicting dependency versions
 # that cannot be resolved properly unless "forced" (tested on Ubuntu 22.04)
 # FIXME: Eliminate the need to do an npm install out-of-bounds like this entirely.
-npm install --force web3
+# npm install --force web3
 node createKeyFile.js > keys/keyFile_${Node}
 rm createKeyFile.js
 cp ../artifacts/account.toml keys/
