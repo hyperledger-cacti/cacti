@@ -1,9 +1,12 @@
 start: start-network1 start-network2
 
-start-network1:
+npm-install:
+	npm install
+
+start-network1: npm-install
 	bash scripts/setupNetwork.sh 1
 
-start-network2:
+start-network2: npm-install
 	bash scripts/setupNetwork.sh 2
 
 test: test-network1 test-network2
@@ -23,6 +26,7 @@ clean-network1:
 	tmux kill-session -t Network1_Node3_session || true
 	tmux kill-session -t Network1_Node4_session || true
 	rm -rf SampleBesuNetwork1/
+	rm -rf node_modules
 
 clean-network2:
 	tmux kill-session -t Network2_EthSigner_session || true
@@ -31,3 +35,4 @@ clean-network2:
 	tmux kill-session -t Network2_Node3_session || true
 	tmux kill-session -t Network2_Node4_session || true
 	rm -rf SampleBesuNetwork2/
+	rm -rf node_modules
