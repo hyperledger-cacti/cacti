@@ -2,7 +2,7 @@ FROM docker:20.10.2-dind
 
 # cordaVersion=4.8.5
 # cordaCoreVersion=4.8.5
-ARG SAMPLES_KOTLIN_SHA=c70f846b6f3d43fe0a35b6583238944843bf9393
+ARG SAMPLES_KOTLIN_SHA=9a6de78bc4a2eabd74ba75b338b6268b2c46485c
 ARG SAMPLES_KOTLIN_CORDAPP_SUB_DIR_PATH="./Advanced/obligation-cordapp/"
 ARG CORDA_TOOLS_SHELL_CLI_VERSION=4.8
 
@@ -33,6 +33,7 @@ RUN apk add --no-cache gradle
 ENV CACTUS_CFG_PATH=/etc/hyperledger/cactus
 RUN mkdir -p $CACTUS_CFG_PATH
 
+RUN apk upgrade
 # OpenSSH - need to have it so we can shell in and install/instantiate contracts and troubleshoot
 RUN apk add --no-cache openssh augeas
 
