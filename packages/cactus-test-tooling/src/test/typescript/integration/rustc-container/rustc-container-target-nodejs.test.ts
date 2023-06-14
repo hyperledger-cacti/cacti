@@ -91,6 +91,8 @@ describe(testCase, () => {
     ];
 
     const filesOnFs = await Containers.ls(dockerodeContainer, containerPkDir);
+    console.log("log filesOnFs:", filesOnFs);
+    console.log("log expectedFiles:", expectedFiles);
     expect(filesOnFs).toBeTruthy();
     expect(Array.isArray(filesOnFs)).toBe(true);
     expect(filesOnFs).toEqual(expectedFiles);

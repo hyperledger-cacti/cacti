@@ -58,6 +58,7 @@
     "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
     "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
+    
   },
   "dependencies": {
     "@hyperledger/cactus-common": "2.0.0-alpha-prerelease",
