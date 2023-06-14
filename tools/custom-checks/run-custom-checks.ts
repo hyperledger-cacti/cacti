@@ -12,7 +12,7 @@ export async function runCustomChecks(
   let overallSuccess = true;
   let overallErrors: string[] = [];
 
-  console.log("${TAG} Current NodeJS version is v", version);
+  console.log(`${TAG} Current NodeJS version is v${version}`);
 
   {
     const [success, errors] = await checkOpenApiJsonSpecs({ argv, env });

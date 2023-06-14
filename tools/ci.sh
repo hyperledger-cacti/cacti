@@ -120,6 +120,7 @@ function mainTask()
   fi
 
   yarn tools:validate-bundle-names
+  yarn custom-checks
 
   if [ "${JEST_TEST_RUNNER_DISABLED:-false}" = "true" ]; then
     echo "$(date +%FT%T%z) [CI] Jest test runner disabled. Skipping..."

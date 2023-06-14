@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "@hyperledger/cactus-api-client": "2.0.0-alpha.1",
-    "@hyperledger/cactus-common": "1.2.0",
+    "@hyperledger/cactus-common": "2.0.0-alpha.1",
     "@hyperledger/cactus-test-tooling": "2.0.0-alpha.1",
     "@types/config": "0.0.41"
   }
