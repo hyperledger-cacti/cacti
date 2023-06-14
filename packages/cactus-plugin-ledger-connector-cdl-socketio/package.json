@@ -1,0 +1,84 @@
+{
+  "name": "@hyperledger/cactus-plugin-ledger-connector-cdl-socketio",
+  "version": "2.0.0-alpha.1",
+  "description": "Allows Cacti nodes to connect to Fujitsu CDL.",
+  "keywords": [
+    "Hyperledger",
+    "Cacti",
+    "Integration",
+    "Blockchain",
+    "Distributed Ledger Technology"
+  ],
+  "homepage": "https://github.com/hyperledger/cacti#readme",
+  "bugs": {
+    "url": "https://github.com/hyperledger/cacti/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger/cacti.git"
+  },
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Hyperledger Cacti Contributors",
+    "email": "cacti@lists.hyperledger.org",
+    "url": "https://www.hyperledger.org/use/cacti"
+  },
+  "contributors": [
+    {
+      "name": "Please add yourself to the list of contributors",
+      "email": "your.name@example.com",
+      "url": "https://example.com"
+    },
+    {
+      "name": "Michal Bajer",
+      "email": "michal.bajer@fujitsu.com",
+      "url": "https://www.fujitsu.com/global/"
+    }
+  ],
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "scripts": {
+    "build": "npm run build-ts && npm run build:dev:backend:postbuild",
+    "build-ts": "tsc",
+    "build:dev:backend:postbuild": "npm run init-cdl",
+    "debug": "nodemon --inspect ./dist/lib/main/typescript/common/core/bin/www.js",
+    "init-cdl": "cp -af ../../yarn.lock ./dist/yarn.lock",
+    "start": "node ./dist/lib/main/typescript/common/core/bin/www.js"
+  },
+  "dependencies": {
+    "axios": "0.27.2",
+    "body-parser": "1.20.2",
+    "config": "3.3.7",
+    "cookie-parser": "1.4.6",
+    "express": "4.18.2",
+    "fast-safe-stringify": "2.1.1",
+    "http-errors": "1.6.3",
+    "js-yaml": "3.14.1",
+    "jsonwebtoken": "9.0.0",
+    "log4js": "6.4.1",
+    "sanitize-html": "2.7.0",
+    "socket.io": "4.5.4"
+  },
+  "devDependencies": {
+    "@hyperledger/cactus-api-client": "2.0.0-alpha.1",
+    "@hyperledger/cactus-common": "2.0.0-alpha.1",
+    "@types/config": "0.0.41",
+    "@types/express": "4.17.13",
+    "@types/node": "14.17.32",
+    "@types/sanitize-html": "2.6.2",
+    "jest-extended": "0.11.5",
+    "uuid": "8.3.2"
+  },
+  "engines": {
+    "node": ">=10",
+    "npm": ">=6"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "watch": {}
+}
