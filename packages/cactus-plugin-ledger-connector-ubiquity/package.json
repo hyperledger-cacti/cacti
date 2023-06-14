@@ -55,15 +55,15 @@
         "tsc": "tsc --project ./tsconfig.json"
     },
     "dependencies": {
-        "@hyperledger/cactus-core": "1.1.2",
-        "@hyperledger/cactus-core-api": "1.1.2",
+        "@hyperledger/cactus-core": "2.0.0-alpha.1",
+        "@hyperledger/cactus-core-api": "2.0.0-alpha.1",
         "@ubiquity/ubiquity-ts-client-modified": "https://github.com/RafaelAPB/ubiquity-ts-client-mirror.git",
         "dotenv": "16.0.1",
         "typescript-optional": "2.0.1"
     },
     "devDependencies": {
-        "@hyperledger/cactus-common": "1.1.2",
-        "@hyperledger/cactus-test-tooling": "1.1.2",
+        "@hyperledger/cactus-common": "2.0.0-alpha.1",
+        "@hyperledger/cactus-test-tooling": "2.0.0-alpha.1",
         "@types/express": "4.17.8"
     },
     "engines": {
