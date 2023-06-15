@@ -186,3 +186,149 @@ this.quorum = new QuorumTestLedger({
   ...
 });
 ```
+## Setting up the machine for cacti as developing environment and modyfications.
+I ) install curl
+`sudo apt-get install curl`
+
+
+II) install docker 👍 and docker compose you can follow oficial instructions 👍
+https://docs.docker.com/engine/install/ubuntu/
+
+
+setup repository 👍
+`sudo apt-get update`
+
+
+`sudo apt-get install ca-certificates curl gnupg`
+
+
+add keys :
+`sudo install -m 0755 -d /etc/apt/keyrings`
+
+
+`curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg`
+
+
+`sudo chmod a+r /etc/apt/keyrings/docker.gpg`
+
+
+setup repo
+`echo \
+  "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null `
+
+
+
+
+Install engine:
+
+
+`sudo apt-get update`
+
+
+
+
+`sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin`
+
+
+setting proper permissions      
+`usermod -aG docker *HereTypeYoursUserName*`
+       
+`usermod -aG docker root`
+test  installation:
+`sudo docker run hello-world`
+
+
+if not working try restart of  machine
+   
+
+
+
+
+
+
+"retest list of container using " :
+ `docker ps `
+III ) NVM
+   `curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash`
+   ` export NVM_DIR="$HOME/.nvm"`
+   ` [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" ` # This loads nvm
+   ` nvm install 16`
+   ` nvm install 16.18.1`
+   ` nvm install 14`
+   ` nvm alias default 16`
+   ` nvm use 16.18.1`
+   ` npm install -g npm@7.19.1`
+
+
+   ` npm install -g npm@7.19.1`
+
+
+IV ) splint
+
+
+
+
+   `sudo apt-get install splint`
+   `sudo apt update`
+
+
+V ) yarn
+
+
+    `npm install yarn -g`
+
+
+VI)
+   `sudo apt install build-essential`
+
+
+
+
+VII) Git:
+    `sudo apt install git`
+
+
+
+
+VIII ) Jest
+    `npm install jest@28.1.0`
+
+
+
+
+IV ) Java SDK
+
+
+    `sudo apt-get install openjdk-11-jdk`
+
+
+X ) Rust
+    `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`
+
+
+
+
+## If you plan using hyperledger using fabric ledger examples and or modyfing them. Best If you install and follow below.
+
+
+XI) install GO
+`rm -rf /usr/local/go && tar -C /usr/local -xzf go1.19.4.linux-amd64.tar.gz`
+
+
+`rm -rf /usr/local/go && tar -C /usr/local -xzf go1.13.8.linux-amd64.tar.gz`
+
+
+XII ) follow
+https://hyperledger-fabric.readthedocs.io/en/latest/prereqs.html
+
+
+https://hyperledger-fabric.readthedocs.io/en/latest/install.html
+
+
+https://github.com/hyperledger/fabric-samples/tree/main/test-network
+
+
+XIII)
+run `npm run configure` in main root folder for test
