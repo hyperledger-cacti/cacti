@@ -810,8 +810,8 @@ object ClaimRemoteAsset {
     class Acceptor(val session: FlowSession) : FlowLogic<SignedTransaction>() {
         @Suspendable
         override fun call(): SignedTransaction {
-            val role = session.receive<ResponderRole>().unwrap { it }
-            if (role == ResponderRole.ISSUER) {
+            val role = session.receive<AssetTransferResponderRole>().unwrap { it }
+            if (role == AssetTransferResponderRole.ISSUER) {
                 val signTransactionFlow = object : SignTransactionFlow(session) {
                     override fun checkTransaction(stx: SignedTransaction) = requireThat {
                     }
@@ -824,7 +824,7 @@ object ClaimRemoteAsset {
                     println("Error signing claim asset transaction by issuer: ${e.message}\n")
                     return subFlow(ReceiveFinalityFlow(session))
                 }
-            } else if (role == ResponderRole.OBSERVER) {
+            } else if (role == AssetTransferResponderRole.OBSERVER) {
                 val sTx = subFlow(ReceiveFinalityFlow(session, statesToRecord = StatesToRecord.ALL_VISIBLE))
                 println("Received Tx: ${sTx} and recorded states.")
                 return sTx
