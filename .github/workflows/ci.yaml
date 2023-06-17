@@ -20,27 +20,86 @@ jobs:
       TAPE_TEST_RUNNER_DISABLED: true
     runs-on: ubuntu-20.04
     steps:
+      - uses: actions/checkout@v3.5.2
+
       - name: Use Node.js v16.14.2
         uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
+          cache: 'yarn'
+
       - run: ./tools/ci.sh
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Initialize Yarn Cache
-        uses: actions/cache@v3.0.4
+
+      - name: populate_tsc_dist_dirs_list
+        id: populate_tsc_dist_dirs_list
+        run: |
+          echo 'TSC_DIST_DIRS_LIST=$(find ./ -type d -name dist -not -path "./node_modules/*")' >> $GITHUB_ENV
+
+      - name: print_tsc_dist_dirs_list
+        id: print_tsc_dist_dirs_list
+        run: |
+          echo "${{ env.TSC_DIST_DIRS_LIST }}"
+
+      - name: save_tsc_dist_dirs_to_cache
+        id: cache-tsc-dist-dirs
+        uses: actions/cache/save@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+          path: |
+            ./.build-cache
+            ./packages/cactus-plugin-odap-hermes/dist
+            ./packages/cactus-test-verifier-client/dist
+            ./packages/cactus-plugin-keychain-aws-sm/dist
+            ./packages/cactus-test-plugin-htlc-eth-besu/dist
+            ./packages/cactus-test-plugin-consortium-manual/dist
+            ./packages/cactus-core/dist
+            ./packages/cactus-plugin-keychain-memory-wasm/dist
+            ./packages/cactus-test-tooling/dist
+            ./packages/cactus-plugin-ledger-connector-fabric-socketio/dist
+            ./packages/cactus-plugin-keychain-azure-kv/dist
+            ./packages/cactus-plugin-htlc-eth-besu/dist
+            ./packages/cactus-plugin-htlc-eth-besu-erc20/dist
+            ./packages/cactus-plugin-keychain-google-sm/dist
+            ./packages/cactus-plugin-keychain-memory/dist
+            ./packages/cactus-cmd-socketio-server/dist
+            ./packages/cactus-plugin-ledger-connector-go-ethereum-socketio/dist
+            ./packages/cactus-test-cmd-api-server/dist
+            ./packages/cactus-plugin-ledger-connector-sawtooth-socketio/dist
+            ./packages/cactus-plugin-ledger-connector-ubiquity/dist
+            ./packages/cactus-plugin-keychain-vault/dist
+            ./packages/cactus-verifier-client/dist
+            ./packages/cactus-plugin-ledger-connector-fabric/dist
+            ./packages/cactus-cmd-api-server/dist
+            ./packages/cactus-plugin-ledger-connector-quorum/dist
+            ./packages/cactus-common/dist
+            ./packages/cactus-plugin-ledger-connector-corda/dist
+            ./packages/cactus-api-client/dist
+            ./packages/cactus-test-plugin-ledger-connector-besu/dist
+            ./packages/cactus-test-api-client/dist
+            ./packages/cactus-plugin-ledger-connector-besu/dist
+            ./packages/cactus-core-api/dist
+            ./packages/cactus-plugin-persistence-ethereum/dist
+            ./packages/cactus-test-plugin-htlc-eth-besu-erc20/dist
+            ./packages/cactus-test-plugin-ledger-connector-quorum/dist
+            ./packages/cactus-plugin-persistence-fabric/dist
+            ./packages/cactus-plugin-ledger-connector-iroha/dist
+            ./packages/cactus-plugin-ledger-connector-iroha2/dist
+            ./packages/cactus-plugin-ledger-connector-xdai/dist
+            ./packages/cactus-plugin-consortium-manual/dist
+            ./examples/cactus-example-discounted-asset-trade/dist
+            ./examples/cactus-example-carbon-accounting-backend/dist
+            ./examples/cactus-example-electricity-trade/dist
+            ./examples/cactus-example-carbon-accounting-business-logic-plugin/dist
+            ./examples/cactus-example-supply-chain-business-logic-plugin/dist
+            ./examples/cactus-example-carbon-accounting-frontend/dist
+            ./examples/cactus-example-supply-chain-frontend/dist
+            ./examples/cactus-example-supply-chain-backend/dist
+            ./extensions/cactus-plugin-htlc-coordinator-besu/dist
+            ./extensions/cactus-plugin-object-store-ipfs/dist
+          key: "cache-tsc-dist-dirs-git-sha_${{ github.sha }}_yarn_lock_${{ hashFiles('yarn.lock') }}"
   cactus-api-client:
     continue-on-error: false
     env:
-      DEV_BUILD_DISABLED: false
+      DEV_BUILD_DISABLED: true
       FULL_BUILD_DISABLED: true
       JEST_TEST_PATTERN: packages/cactus-api-client/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_RUNNER_DISABLED: false
@@ -49,27 +108,32 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
+      - uses: actions/checkout@v3.5.2
+
       - name: Use Node.js v16.14.2
         uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+          cache: 'yarn'
+
+      - name: print_tsc_dist_dirs_list
+        id: print_tsc_dist_dirs_list
+        run: |
+          echo "${{ env.TSC_DIST_DIRS_LIST }}"
+
+      - name: restore_tsc_dist_dirs_to_cache
+        id: cache-tsc-dist-dirs
+        uses: actions/cache/restore@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+          fail-on-cache-miss: true
+          path: "${{ env.TSC_DIST_DIRS_LIST }}"
+          key: "cache-tsc-dist-dirs-git-sha_${{ github.sha }}_yarn_lock_${{ hashFiles('yarn.lock') }}"
+
       - run: ./tools/ci.sh
   cactus-cmd-api-server:
     continue-on-error: false
     env:
-      DEV_BUILD_DISABLED: false
+      DEV_BUILD_DISABLED: true
       FULL_BUILD_DISABLED: true
       JEST_TEST_PATTERN: packages/cactus-cmd-api-server/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_RUNNER_DISABLED: false
@@ -79,22 +143,79 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
+      - uses: actions/checkout@v3.5.2
+      
       - name: Use Node.js v16.14.2
         uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+          cache: 'yarn'
+
+      - name: print_tsc_dist_dirs_list
+        id: print_tsc_dist_dirs_list
+        run: |
+          echo "${{ env.TSC_DIST_DIRS_LIST }}"
+
+      - name: restore_tsc_dist_dirs_to_cache
+        id: cache-tsc-dist-dirs
+        uses: actions/cache/restore@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+          fail-on-cache-miss: true
+          path: |
+            ./.build-cache
+            ./packages/cactus-plugin-odap-hermes/dist
+            ./packages/cactus-test-verifier-client/dist
+            ./packages/cactus-plugin-keychain-aws-sm/dist
+            ./packages/cactus-test-plugin-htlc-eth-besu/dist
+            ./packages/cactus-test-plugin-consortium-manual/dist
+            ./packages/cactus-core/dist
+            ./packages/cactus-plugin-keychain-memory-wasm/dist
+            ./packages/cactus-test-tooling/dist
+            ./packages/cactus-plugin-ledger-connector-fabric-socketio/dist
+            ./packages/cactus-plugin-keychain-azure-kv/dist
+            ./packages/cactus-plugin-htlc-eth-besu/dist
+            ./packages/cactus-plugin-htlc-eth-besu-erc20/dist
+            ./packages/cactus-plugin-keychain-google-sm/dist
+            ./packages/cactus-plugin-keychain-memory/dist
+            ./packages/cactus-cmd-socketio-server/dist
+            ./packages/cactus-plugin-ledger-connector-go-ethereum-socketio/dist
+            ./packages/cactus-test-cmd-api-server/dist
+            ./packages/cactus-plugin-ledger-connector-sawtooth-socketio/dist
+            ./packages/cactus-plugin-ledger-connector-ubiquity/dist
+            ./packages/cactus-plugin-keychain-vault/dist
+            ./packages/cactus-verifier-client/dist
+            ./packages/cactus-plugin-ledger-connector-fabric/dist
+            ./packages/cactus-cmd-api-server/dist
+            ./packages/cactus-plugin-ledger-connector-quorum/dist
+            ./packages/cactus-common/dist
+            ./packages/cactus-plugin-ledger-connector-corda/dist
+            ./packages/cactus-api-client/dist
+            ./packages/cactus-test-plugin-ledger-connector-besu/dist
+            ./packages/cactus-test-api-client/dist
+            ./packages/cactus-plugin-ledger-connector-besu/dist
+            ./packages/cactus-core-api/dist
+            ./packages/cactus-plugin-persistence-ethereum/dist
+            ./packages/cactus-test-plugin-htlc-eth-besu-erc20/dist
+            ./packages/cactus-test-plugin-ledger-connector-quorum/dist
+            ./packages/cactus-plugin-persistence-fabric/dist
+            ./packages/cactus-plugin-ledger-connector-iroha/dist
+            ./packages/cactus-plugin-ledger-connector-iroha2/dist
+            ./packages/cactus-plugin-ledger-connector-xdai/dist
+            ./packages/cactus-plugin-consortium-manual/dist
+            ./examples/cactus-example-discounted-asset-trade/dist
+            ./examples/cactus-example-carbon-accounting-backend/dist
+            ./examples/cactus-example-electricity-trade/dist
+            ./examples/cactus-example-carbon-accounting-business-logic-plugin/dist
+            ./examples/cactus-example-supply-chain-business-logic-plugin/dist
+            ./examples/cactus-example-carbon-accounting-frontend/dist
+            ./examples/cactus-example-supply-chain-frontend/dist
+            ./examples/cactus-example-supply-chain-backend/dist
+            ./extensions/cactus-plugin-htlc-coordinator-besu/dist
+            ./extensions/cactus-plugin-object-store-ipfs/dist
+          key: "cache-tsc-dist-dirs-git-sha_${{ github.sha }}_yarn_lock_${{ hashFiles('yarn.lock') }}"
+
+      - run: yarn install --frozen-lockfile --non-interactive
+
       - run: ./tools/ci.sh
   cactus-cmd-socketio-server:
     continue-on-error: false
@@ -106,22 +227,14 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
+      - uses: actions/checkout@v3.5.2
+      
       - name: Use Node.js v16.14.2
         uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+          cache: 'yarn'
+
       - run: ./tools/ci.sh
   cactus-common:
     continue-on-error: false
@@ -135,22 +248,22 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
+      - uses: actions/checkout@v3.5.2
+      
       - name: Use Node.js v16.14.2
         uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+          cache: 'yarn'
+
+      - name: restore_tsc_dist_dirs_to_cache
+        id: cache-tsc-dist-dirs
+        uses: actions/cache/restore@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+          fail-on-cache-miss: true
+          path: $(find ./ -type d -name dist -not -path "./node_modules/*")
+          key: "cache-tsc-dist-dirs-git-sha_${{ github.sha }}_yarn_lock_${{ hashFiles('yarn.lock') }}"
+
       - run: ./tools/ci.sh
   cactus-core:
     continue-on-error: false
@@ -162,26 +275,19 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
+      - uses: actions/checkout@v3.5.2
+
       - name: Use Node.js v16.14.2
         uses: actions/setup-node@v3.6.0
         with:
           node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+          cache: 'yarn'
+
       - run: ./tools/ci.sh
   cactus-core-api:
     continue-on-error: false
     env:
+      DEV_BUILD_DISABLED: false
       FULL_BUILD_DISABLED: true
       JEST_TEST_PATTERN: packages/cactus-core-api/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_RUNNER_DISABLED: false
@@ -194,800 +300,538 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+
       - run: ./tools/ci.sh
-  cactus-example-carbon-accounting-backend:
-    continue-on-error: false
-    env:
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: examples/cactus-example-carbon-accounting-backend/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: false
-      TAPE_TEST_PATTERN: ./examples/cactus-example-carbon-accounting-backend/src/test/typescript/integration/admin-enroll-v1-endpoint.test.ts
-      TAPE_TEST_RUNNER_DISABLED: false
-    needs: build-dev
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - run: ./tools/ci.sh
-  cactus-example-carbon-accounting-business-logic-plugin:
-    continue-on-error: false
-    env:
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: examples/cactus-example-carbon-accounting-business-logic-plugin/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: false
-      TAPE_TEST_RUNNER_DISABLED: true
-    needs: build-dev
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - run: ./tools/ci.sh
-  cactus-example-carbon-accounting-frontend:
-    continue-on-error: false
-    env:
-      DEV_BUILD_DISABLED: false
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: examples/cactus-example-carbon-accounting-frontend/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: true
-      TAPE_TEST_RUNNER_DISABLED: true
-    needs: build-dev
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - run: ./tools/ci.sh
-  cactus-example-supply-chain-backend:
-    continue-on-error: false
-    env:
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: examples/cactus-example-supply-chain-backend/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: false
-      TAPE_TEST_PATTERN: '--files={./examples/cactus-example-supply-chain-backend/src/test/typescript/integration/supply-chain-backend-api-calls.test.ts,./examples/cactus-example-supply-chain-backend/src/test/typescript/integration/supply-chain-cli-via-npm-script.test.ts}'
-      TAPE_TEST_RUNNER_DISABLED: false
-    needs: build-dev
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - run: ./tools/ci.sh
-  cactus-example-supply-chain-business-logic-plugin:
-    continue-on-error: false
-    env:
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: examples/cactus-example-supply-chain-business-logic-plugin/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: false
-      TAPE_TEST_RUNNER_DISABLED: true
-    needs: build-dev
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - run: ./tools/ci.sh
-  cactus-example-supply-chain-frontend:
-    continue-on-error: false
-    env:
-      DEV_BUILD_DISABLED: false
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: examples/cactus-example-supply-chain-frontend/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: true
-      TAPE_TEST_RUNNER_DISABLED: true
-    needs: build-dev
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - run: ./tools/ci.sh
-  cactus-plugin-consortium-manual:
-    continue-on-error: false
-    env:
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cactus-plugin-consortium-manual/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: false
-      TAPE_TEST_RUNNER_DISABLED: true
-    needs: build-dev
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - run: ./tools/ci.sh
-  cactus-plugin-htlc-coordinator-besu:
-    continue-on-error: false
-    env:
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: extensions/cactus-plugin-htlc-coordinator-besu/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: false
-      TAPE_TEST_PATTERN: >-
-        --files={./extensions/cactus-plugin-htlc-coordinator-besu/src/test/typescript/integration/plugin-htlc-coordinator/counterparty-htlc-endpoint.test.ts,./extensions/cactus-plugin-htlc-coordinator-besu/src/test/typescript/integration/plugin-htlc-coordinator/own-htlc-endpoint.test.ts,./extensions/cactus-plugin-htlc-coordinator-besu/src/test/typescript/integration/plugin-htlc-coordinator/refund.test.ts,./extensions/cactus-plugin-htlc-coordinator-besu/src/test/typescript/integration/plugin-htlc-coordinator/withdraw-counterparty-endpoint.test.ts}
-      TAPE_TEST_RUNNER_DISABLED: false
-    needs: build-dev
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - run: ./tools/ci.sh
-  cactus-plugin-htlc-eth-besu:
-    continue-on-error: false
-    env:
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cactus-plugin-htlc-eth-besu/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: false
-      TAPE_TEST_RUNNER_DISABLED: true
-    needs: build-dev
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - run: ./tools/ci.sh
-  cactus-plugin-htlc-eth-besu-erc20:
-    continue-on-error: false
-    env:
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cactus-plugin-htlc-eth-besu-erc20/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: false
-      TAPE_TEST_RUNNER_DISABLED: true
-    needs: build-dev
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - run: ./tools/ci.sh
-  cactus-plugin-keychain-aws-sm:
-    continue-on-error: false
-    env:
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cactus-plugin-keychain-aws-sm/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: true
-      TAPE_TEST_PATTERN: '--files={./packages/cactus-plugin-keychain-aws-sm/src/test/typescript/integration/openapi/openapi-validation.test.ts,./packages/cactus-plugin-keychain-aws-sm/src/test/typescript/integration/plugin-factory-keychain.test.ts,./packages/cactus-plugin-keychain-aws-sm/src/test/typescript/integration/plugin-factory-keychain.test.ts,./packages/cactus-plugin-keychain-aws-sm/src/test/typescript/integration/plugin-keychain-aws-sm.test.ts}'
-      TAPE_TEST_RUNNER_DISABLED: false
-    needs: build-dev
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - run: ./tools/ci.sh
-  cactus-plugin-keychain-azure-kv:
-    continue-on-error: false
-    env:
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cactus-plugin-keychain-azure-kv/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: false
-      TAPE_TEST_PATTERN: ./packages/cactus-plugin-keychain-azure-kv/src/test/typescript/integration/plugin-keychain-azure-kv.test.ts
-      TAPE_TEST_RUNNER_DISABLED: false
-    needs: build-dev
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - run: ./tools/ci.sh
-  cactus-plugin-keychain-google-sm:
-    continue-on-error: false
-    env:
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cactus-plugin-keychain-google-sm/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: false
-      TAPE_TEST_PATTERN: '--files={./packages/cactus-plugin-keychain-google-sm/src/test/typescript/integration/openapi/openapi-validation.test.ts,./packages/cactus-plugin-keychain-google-sm/src/test/typescript/integration/plugin-factory-keychain.test.ts,./packages/cactus-plugin-keychain-google-sm/src/test/typescript/integration/plugin-keychain-google-sm.test.ts}'
-      TAPE_TEST_RUNNER_DISABLED: false
-    needs: build-dev
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - run: ./tools/ci.sh
-  cactus-plugin-keychain-memory:
-    continue-on-error: false
-    env:
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cactus-plugin-keychain-memory/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: false
-      TAPE_TEST_RUNNER_DISABLED: true
-    needs: build-dev
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - run: ./tools/ci.sh
-  cactus-plugin-keychain-memory-wasm:
-    continue-on-error: false
-    env:
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cactus-plugin-keychain-memory-wasm/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: false
-      TAPE_TEST_PATTERN: ./packages/cactus-plugin-keychain-memory-wasm/src/test/typescript/unit/plugin-keychain-memory-wasm.test.ts
-      TAPE_TEST_RUNNER_DISABLED: false
-    needs: build-dev
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - run: ./tools/ci.sh
-  cactus-plugin-keychain-vault:
-    continue-on-error: false
-    env:
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cactus-plugin-keychain-vault/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: false
-      TAPE_TEST_PATTERN: '--files={./packages/cactus-plugin-keychain-vault/src/test/typescript/integration/cactus-keychain-vault-server.test.ts,./packages/cactus-plugin-keychain-vault/src/test/typescript/integration/openapi/openapi-validation.test.ts,./packages/cactus-plugin-keychain-vault/src/test/typescript/integration/plugin-keychain-vault.test.ts}'
-      TAPE_TEST_RUNNER_DISABLED: false
-    needs: build-dev
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - run: ./tools/ci.sh
-  cactus-plugin-ledger-connector-besu:
-    continue-on-error: false
-    env:
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-besu/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: false
-      TAPE_TEST_PATTERN: >-
-        --files={./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/deploy-contract-from-json.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/get-block.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/get-past-logs.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/get-record-locator.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/private-deploy-contract-from-json-cactus.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/private-deploy-contract-from-json-web3-eea.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/v21-deploy-contract-from-json.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/v21-get-balance.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/v21-get-block.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/v21-get-past-logs.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/v21-get-record-locator.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/v21-invoke-contract.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/lock-contract.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/openapi/openapi-validation.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/v21-besu-get-transaction.test.ts}
-      TAPE_TEST_RUNNER_DISABLED: false
-    needs: build-dev
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - run: ./tools/ci.sh
-  cactus-plugin-ledger-connector-corda:
-    continue-on-error: false
-    env:
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-corda/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: false
-      TAPE_TEST_PATTERN: >-
-        --files={./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/deploy-cordapp-jars-to-nodes-v4.7.test.ts,./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/deploy-cordapp-jars-to-nodes-v4.8-express.test.ts,./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/deploy-cordapp-jars-to-nodes-v4.8.test.ts,./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/deploy-cordapp-jars-to-nodes.test.ts,./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/flow-database-access-v4.8.test.ts,./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/jvm-kotlin-spring-server-v4.7.test.ts,./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/jvm-kotlin-spring-server-v4.8.test.ts,./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/openapi/openapi-validation.test.ts}
-      TAPE_TEST_RUNNER_DISABLED: false
-    needs: build-dev
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - run: ./tools/ci.sh
-  cactus-plugin-ledger-connector-fabric:
-    continue-on-error: false
-    env:
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: false
-      TAPE_TEST_PATTERN: >-
-        --files={./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v1-4-x/deploy-cc-from-golang-source.test.ts,./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v1-4-x/run-transaction-endpoint-v1.test.ts,./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/add-orgs.test.ts,./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/deploy-cc-from-golang-source.test.ts,./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/deploy-cc-from-javascript-source.test.ts,./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/deploy-cc-from-typescript-source.test.ts,./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/deploy-lock-asset.test.ts,./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/obtain-profiles.test.ts,./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/run-transaction-with-identities.test.ts,./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/run-transaction-with-ws-ids.test.ts,./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/identity-client.test.ts,./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/openapi/openapi-validation-go.test.ts,./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/openapi/openapi-validation.test.ts,./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/unit/identity-internal-crypto-utils.test.ts}
-      TAPE_TEST_RUNNER_DISABLED: false
-    needs: build-dev
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - run: ./tools/ci.sh
-  cactus-plugin-ledger-connector-fabric-socketio:
-    continue-on-error: false
-    env:
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-fabric-socketio/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: false
-      TAPE_TEST_RUNNER_DISABLED: true
-    needs: build-dev
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - run: ./tools/ci.sh
-  cactus-plugin-ledger-connector-go-ethereum-socketio:
-    continue-on-error: false
-    env:
-      DEV_BUILD_DISABLED: false
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-go-ethereum-socketio/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: true
-      TAPE_TEST_RUNNER_DISABLED: true
-    needs: build-dev
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - run: ./tools/ci.sh
-  cactus-plugin-ledger-connector-iroha:
-    continue-on-error: false
-    env:
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-iroha/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: false
-      TAPE_TEST_PATTERN: >-
-        --files={./packages/cactus-plugin-ledger-connector-iroha/src/test/typescript/integration/iroha-iroha-transfer-example.test.ts,./packages/cactus-plugin-ledger-connector-iroha/src/test/typescript/integration/openapi/openapi-validation.test.ts,./packages/cactus-plugin-ledger-connector-iroha/src/test/typescript/integration/run-transaction-endpoint-v1.test.ts,./packages/cactus-plugin-ledger-connector-iroha/src/test/typescript/unit/iroha-test-ledger-parameters.test.ts,./packages/cactus-plugin-ledger-connector-iroha/src/test/typescript/unit/postgres-test-container-parameters.test.ts}
-      TAPE_TEST_RUNNER_DISABLED: false
-    needs: build-dev
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - run: ./tools/ci.sh
-  cactus-plugin-ledger-connector-iroha2:
-    continue-on-error: false
-    env:
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-iroha2/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: false
-      TAPE_TEST_RUNNER_DISABLED: true
-    needs: build-dev
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - run: ./tools/ci.sh
-  cactus-plugin-ledger-connector-quorum:
-    continue-on-error: false
-    env:
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-quorum/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: false
-      TAPE_TEST_PATTERN: >-
-        --files={./packages/cactus-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/openapi/openapi-validation-no-keychain.test.ts,./packages/cactus-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/openapi/openapi-validation.test.ts,./packages/cactus-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/v2.3.0-deploy-contract-from-json-json-object-endpoints.test.ts,./packages/cactus-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/v2.3.0-deploy-contract-from-json-json-object.test.ts,./packages/cactus-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/v2.3.0-invoke-contract-json-object-endpoints.test.ts,./packages/cactus-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/v2.3.0-invoke-contract-json-object.test.ts,./packages/cactus-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/v21.4.1-deploy-contract-from-json-json-object-endpoints.test.ts,./packages/cactus-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/v21.4.1-deploy-contract-from-json-json-object.test.ts,./packages/cactus-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/v21.4.1-invoke-contract-json-object-endpoints.test.ts,./packages/cactus-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/v21.4.1-invoke-contract-json-object.test.ts}
-      TAPE_TEST_RUNNER_DISABLED: false
-    needs: build-dev
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - run: ./tools/ci.sh
-  cactus-plugin-ledger-connector-sawtooth-socketio:
-    continue-on-error: false
-    env:
-      DEV_BUILD_DISABLED: false
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-sawtooth-socketio/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: true
-      TAPE_TEST_RUNNER_DISABLED: true
-    needs: build-dev
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - run: ./tools/ci.sh
-  cactus-plugin-ledger-connector-xdai:
-    continue-on-error: false
-    env:
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-xdai/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: false
-      TAPE_TEST_PATTERN: >-
-        --files={./packages/cactus-plugin-ledger-connector-xdai/src/test/typescript/integration/deploy-contract-from-json-xdai-json-object.test.ts,./packages/cactus-plugin-ledger-connector-xdai/src/test/typescript/integration/invoke-contract-xdai-json-object.test.ts,./packages/cactus-plugin-ledger-connector-xdai/src/test/typescript/integration/openapi/openapi-validation-no-keychain.test.ts,./packages/cactus-plugin-ledger-connector-xdai/src/test/typescript/integration/openapi/openapi-validation.test.ts}
-      TAPE_TEST_RUNNER_DISABLED: false
-    needs: build-dev
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - run: ./tools/ci.sh
-  cactus-plugin-persistence-ethereum:
-    continue-on-error: false
-    env:
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cactus-plugin-persistence-ethereum/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: false
-      TAPE_TEST_RUNNER_DISABLED: true
-    needs: build-dev
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - run: ./tools/ci.sh
-  cactus-plugin-object-store-ipfs:
-    continue-on-error: false
-    env:
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: extensions/cactus-plugin-object-store-ipfs/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: false
-      TAPE_TEST_PATTERN: '--files={./extensions/cactus-plugin-object-store-ipfs/src/test/typescript/integration/plugin-object-store-ipfs.test.ts,./extensions/cactus-plugin-object-store-ipfs/src/test/typescript/unit/plugin-object-store-ipfs.test.ts}'
-      TAPE_TEST_RUNNER_DISABLED: false
-    needs: build-dev
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - run: ./tools/ci.sh
+  # cactus-example-carbon-accounting-backend:
+  #   continue-on-error: false
+  #   env:
+  #     FULL_BUILD_DISABLED: true
+  #     JEST_TEST_PATTERN: examples/cactus-example-carbon-accounting-backend/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+  #     JEST_TEST_RUNNER_DISABLED: false
+  #     TAPE_TEST_PATTERN: ./examples/cactus-example-carbon-accounting-backend/src/test/typescript/integration/admin-enroll-v1-endpoint.test.ts
+  #     TAPE_TEST_RUNNER_DISABLED: false
+  #   needs: build-dev
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - name: Use Node.js v16.14.2
+  #       uses: actions/setup-node@v3.6.0
+  #       with:
+  #         node-version: v16.14.2
+  #         cache: 'yarn'
+  #     - uses: actions/checkout@v3.5.2
+
+  #     - run: ./tools/ci.sh
+  # cactus-example-carbon-accounting-business-logic-plugin:
+  #   continue-on-error: false
+  #   env:
+  #     FULL_BUILD_DISABLED: true
+  #     JEST_TEST_PATTERN: examples/cactus-example-carbon-accounting-business-logic-plugin/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+  #     JEST_TEST_RUNNER_DISABLED: false
+  #     TAPE_TEST_RUNNER_DISABLED: true
+  #   needs: build-dev
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - name: Use Node.js v16.14.2
+  #       uses: actions/setup-node@v3.6.0
+  #       with:
+  #         node-version: v16.14.2
+  #         cache: 'yarn'
+  #     - uses: actions/checkout@v3.5.2
+
+  #     - run: ./tools/ci.sh
+  # cactus-example-carbon-accounting-frontend:
+  #   continue-on-error: false
+  #   env:
+  #     DEV_BUILD_DISABLED: false
+  #     FULL_BUILD_DISABLED: true
+  #     JEST_TEST_PATTERN: examples/cactus-example-carbon-accounting-frontend/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+  #     JEST_TEST_RUNNER_DISABLED: true
+  #     TAPE_TEST_RUNNER_DISABLED: true
+  #   needs: build-dev
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - name: Use Node.js v16.14.2
+  #       uses: actions/setup-node@v3.6.0
+  #       with:
+  #         node-version: v16.14.2
+  #         cache: 'yarn'
+  #     - uses: actions/checkout@v3.5.2
+
+  #     - run: ./tools/ci.sh
+  # cactus-example-supply-chain-backend:
+  #   continue-on-error: false
+  #   env:
+  #     FULL_BUILD_DISABLED: true
+  #     JEST_TEST_PATTERN: examples/cactus-example-supply-chain-backend/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+  #     JEST_TEST_RUNNER_DISABLED: false
+  #     TAPE_TEST_PATTERN: '--files={./examples/cactus-example-supply-chain-backend/src/test/typescript/integration/supply-chain-backend-api-calls.test.ts,./examples/cactus-example-supply-chain-backend/src/test/typescript/integration/supply-chain-cli-via-npm-script.test.ts}'
+  #     TAPE_TEST_RUNNER_DISABLED: false
+  #   needs: build-dev
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - name: Use Node.js v16.14.2
+  #       uses: actions/setup-node@v3.6.0
+  #       with:
+  #         node-version: v16.14.2
+  #         cache: 'yarn'
+  #     - uses: actions/checkout@v3.5.2
+
+  #     - run: ./tools/ci.sh
+  # cactus-example-supply-chain-business-logic-plugin:
+  #   continue-on-error: false
+  #   env:
+  #     FULL_BUILD_DISABLED: true
+  #     JEST_TEST_PATTERN: examples/cactus-example-supply-chain-business-logic-plugin/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+  #     JEST_TEST_RUNNER_DISABLED: false
+  #     TAPE_TEST_RUNNER_DISABLED: true
+  #   needs: build-dev
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - name: Use Node.js v16.14.2
+  #       uses: actions/setup-node@v3.6.0
+  #       with:
+  #         node-version: v16.14.2
+  #         cache: 'yarn'
+  #     - uses: actions/checkout@v3.5.2
+
+  #     - run: ./tools/ci.sh
+  # cactus-example-supply-chain-frontend:
+  #   continue-on-error: false
+  #   env:
+  #     DEV_BUILD_DISABLED: false
+  #     FULL_BUILD_DISABLED: true
+  #     JEST_TEST_PATTERN: examples/cactus-example-supply-chain-frontend/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+  #     JEST_TEST_RUNNER_DISABLED: true
+  #     TAPE_TEST_RUNNER_DISABLED: true
+  #   needs: build-dev
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - name: Use Node.js v16.14.2
+  #       uses: actions/setup-node@v3.6.0
+  #       with:
+  #         node-version: v16.14.2
+  #         cache: 'yarn'
+  #     - uses: actions/checkout@v3.5.2
+
+  #     - run: ./tools/ci.sh
+  # cactus-plugin-consortium-manual:
+  #   continue-on-error: false
+  #   env:
+  #     FULL_BUILD_DISABLED: true
+  #     JEST_TEST_PATTERN: packages/cactus-plugin-consortium-manual/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+  #     JEST_TEST_RUNNER_DISABLED: false
+  #     TAPE_TEST_RUNNER_DISABLED: true
+  #   needs: build-dev
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - name: Use Node.js v16.14.2
+  #       uses: actions/setup-node@v3.6.0
+  #       with:
+  #         node-version: v16.14.2
+  #         cache: 'yarn'
+  #     - uses: actions/checkout@v3.5.2
+
+  #     - run: ./tools/ci.sh
+  # cactus-plugin-htlc-coordinator-besu:
+  #   continue-on-error: false
+  #   env:
+  #     FULL_BUILD_DISABLED: true
+  #     JEST_TEST_PATTERN: extensions/cactus-plugin-htlc-coordinator-besu/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+  #     JEST_TEST_RUNNER_DISABLED: false
+  #     TAPE_TEST_PATTERN: >-
+  #       --files={./extensions/cactus-plugin-htlc-coordinator-besu/src/test/typescript/integration/plugin-htlc-coordinator/counterparty-htlc-endpoint.test.ts,./extensions/cactus-plugin-htlc-coordinator-besu/src/test/typescript/integration/plugin-htlc-coordinator/own-htlc-endpoint.test.ts,./extensions/cactus-plugin-htlc-coordinator-besu/src/test/typescript/integration/plugin-htlc-coordinator/refund.test.ts,./extensions/cactus-plugin-htlc-coordinator-besu/src/test/typescript/integration/plugin-htlc-coordinator/withdraw-counterparty-endpoint.test.ts}
+  #     TAPE_TEST_RUNNER_DISABLED: false
+  #   needs: build-dev
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - name: Use Node.js v16.14.2
+  #       uses: actions/setup-node@v3.6.0
+  #       with:
+  #         node-version: v16.14.2
+  #         cache: 'yarn'
+  #     - uses: actions/checkout@v3.5.2
+
+  #     - run: ./tools/ci.sh
+  # cactus-plugin-htlc-eth-besu:
+  #   continue-on-error: false
+  #   env:
+  #     FULL_BUILD_DISABLED: true
+  #     JEST_TEST_PATTERN: packages/cactus-plugin-htlc-eth-besu/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+  #     JEST_TEST_RUNNER_DISABLED: false
+  #     TAPE_TEST_RUNNER_DISABLED: true
+  #   needs: build-dev
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - name: Use Node.js v16.14.2
+  #       uses: actions/setup-node@v3.6.0
+  #       with:
+  #         node-version: v16.14.2
+  #         cache: 'yarn'
+  #     - uses: actions/checkout@v3.5.2
+
+  #     - run: ./tools/ci.sh
+  # cactus-plugin-htlc-eth-besu-erc20:
+  #   continue-on-error: false
+  #   env:
+  #     FULL_BUILD_DISABLED: true
+  #     JEST_TEST_PATTERN: packages/cactus-plugin-htlc-eth-besu-erc20/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+  #     JEST_TEST_RUNNER_DISABLED: false
+  #     TAPE_TEST_RUNNER_DISABLED: true
+  #   needs: build-dev
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - name: Use Node.js v16.14.2
+  #       uses: actions/setup-node@v3.6.0
+  #       with:
+  #         node-version: v16.14.2
+  #         cache: 'yarn'
+  #     - uses: actions/checkout@v3.5.2
+
+  #     - run: ./tools/ci.sh
+  # cactus-plugin-keychain-aws-sm:
+  #   continue-on-error: false
+  #   env:
+  #     FULL_BUILD_DISABLED: true
+  #     JEST_TEST_PATTERN: packages/cactus-plugin-keychain-aws-sm/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+  #     JEST_TEST_RUNNER_DISABLED: true
+  #     TAPE_TEST_PATTERN: '--files={./packages/cactus-plugin-keychain-aws-sm/src/test/typescript/integration/openapi/openapi-validation.test.ts,./packages/cactus-plugin-keychain-aws-sm/src/test/typescript/integration/plugin-factory-keychain.test.ts,./packages/cactus-plugin-keychain-aws-sm/src/test/typescript/integration/plugin-factory-keychain.test.ts,./packages/cactus-plugin-keychain-aws-sm/src/test/typescript/integration/plugin-keychain-aws-sm.test.ts}'
+  #     TAPE_TEST_RUNNER_DISABLED: false
+  #   needs: build-dev
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - name: Use Node.js v16.14.2
+  #       uses: actions/setup-node@v3.6.0
+  #       with:
+  #         node-version: v16.14.2
+  #         cache: 'yarn'
+  #     - uses: actions/checkout@v3.5.2
+
+  #     - run: ./tools/ci.sh
+  # cactus-plugin-keychain-azure-kv:
+  #   continue-on-error: false
+  #   env:
+  #     FULL_BUILD_DISABLED: true
+  #     JEST_TEST_PATTERN: packages/cactus-plugin-keychain-azure-kv/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+  #     JEST_TEST_RUNNER_DISABLED: false
+  #     TAPE_TEST_PATTERN: ./packages/cactus-plugin-keychain-azure-kv/src/test/typescript/integration/plugin-keychain-azure-kv.test.ts
+  #     TAPE_TEST_RUNNER_DISABLED: false
+  #   needs: build-dev
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - name: Use Node.js v16.14.2
+  #       uses: actions/setup-node@v3.6.0
+  #       with:
+  #         node-version: v16.14.2
+  #         cache: 'yarn'
+  #     - uses: actions/checkout@v3.5.2
+
+  #     - run: ./tools/ci.sh
+  # cactus-plugin-keychain-google-sm:
+  #   continue-on-error: false
+  #   env:
+  #     FULL_BUILD_DISABLED: true
+  #     JEST_TEST_PATTERN: packages/cactus-plugin-keychain-google-sm/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+  #     JEST_TEST_RUNNER_DISABLED: false
+  #     TAPE_TEST_PATTERN: '--files={./packages/cactus-plugin-keychain-google-sm/src/test/typescript/integration/openapi/openapi-validation.test.ts,./packages/cactus-plugin-keychain-google-sm/src/test/typescript/integration/plugin-factory-keychain.test.ts,./packages/cactus-plugin-keychain-google-sm/src/test/typescript/integration/plugin-keychain-google-sm.test.ts}'
+  #     TAPE_TEST_RUNNER_DISABLED: false
+  #   needs: build-dev
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - name: Use Node.js v16.14.2
+  #       uses: actions/setup-node@v3.6.0
+  #       with:
+  #         node-version: v16.14.2
+  #         cache: 'yarn'
+  #     - uses: actions/checkout@v3.5.2
+
+  #     - run: ./tools/ci.sh
+  # cactus-plugin-keychain-memory:
+  #   continue-on-error: false
+  #   env:
+  #     FULL_BUILD_DISABLED: true
+  #     JEST_TEST_PATTERN: packages/cactus-plugin-keychain-memory/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+  #     JEST_TEST_RUNNER_DISABLED: false
+  #     TAPE_TEST_RUNNER_DISABLED: true
+  #   needs: build-dev
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - name: Use Node.js v16.14.2
+  #       uses: actions/setup-node@v3.6.0
+  #       with:
+  #         node-version: v16.14.2
+  #         cache: 'yarn'
+  #     - uses: actions/checkout@v3.5.2
+
+  #     - run: ./tools/ci.sh
+  # cactus-plugin-keychain-memory-wasm:
+  #   continue-on-error: false
+  #   env:
+  #     FULL_BUILD_DISABLED: true
+  #     JEST_TEST_PATTERN: packages/cactus-plugin-keychain-memory-wasm/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+  #     JEST_TEST_RUNNER_DISABLED: false
+  #     TAPE_TEST_PATTERN: ./packages/cactus-plugin-keychain-memory-wasm/src/test/typescript/unit/plugin-keychain-memory-wasm.test.ts
+  #     TAPE_TEST_RUNNER_DISABLED: false
+  #   needs: build-dev
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - name: Use Node.js v16.14.2
+  #       uses: actions/setup-node@v3.6.0
+  #       with:
+  #         node-version: v16.14.2
+  #         cache: 'yarn'
+  #     - uses: actions/checkout@v3.5.2
+
+  #     - run: ./tools/ci.sh
+  # cactus-plugin-keychain-vault:
+  #   continue-on-error: false
+  #   env:
+  #     FULL_BUILD_DISABLED: true
+  #     JEST_TEST_PATTERN: packages/cactus-plugin-keychain-vault/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+  #     JEST_TEST_RUNNER_DISABLED: false
+  #     TAPE_TEST_PATTERN: '--files={./packages/cactus-plugin-keychain-vault/src/test/typescript/integration/cactus-keychain-vault-server.test.ts,./packages/cactus-plugin-keychain-vault/src/test/typescript/integration/openapi/openapi-validation.test.ts,./packages/cactus-plugin-keychain-vault/src/test/typescript/integration/plugin-keychain-vault.test.ts}'
+  #     TAPE_TEST_RUNNER_DISABLED: false
+  #   needs: build-dev
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - name: Use Node.js v16.14.2
+  #       uses: actions/setup-node@v3.6.0
+  #       with:
+  #         node-version: v16.14.2
+  #         cache: 'yarn'
+  #     - uses: actions/checkout@v3.5.2
+
+  #     - run: ./tools/ci.sh
+  # cactus-plugin-ledger-connector-besu:
+  #   continue-on-error: false
+  #   env:
+  #     FULL_BUILD_DISABLED: true
+  #     JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-besu/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+  #     JEST_TEST_RUNNER_DISABLED: false
+  #     TAPE_TEST_PATTERN: >-
+  #       --files={./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/deploy-contract-from-json.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/get-block.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/get-past-logs.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/get-record-locator.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/private-deploy-contract-from-json-cactus.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/private-deploy-contract-from-json-web3-eea.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/v21-deploy-contract-from-json.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/v21-get-balance.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/v21-get-block.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/v21-get-past-logs.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/v21-get-record-locator.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/v21-invoke-contract.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/lock-contract.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/openapi/openapi-validation.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/v21-besu-get-transaction.test.ts}
+  #     TAPE_TEST_RUNNER_DISABLED: false
+  #   needs: build-dev
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - name: Use Node.js v16.14.2
+  #       uses: actions/setup-node@v3.6.0
+  #       with:
+  #         node-version: v16.14.2
+  #         cache: 'yarn'
+  #     - uses: actions/checkout@v3.5.2
+
+  #     - run: ./tools/ci.sh
+  # cactus-plugin-ledger-connector-corda:
+  #   continue-on-error: false
+  #   env:
+  #     FULL_BUILD_DISABLED: true
+  #     JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-corda/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+  #     JEST_TEST_RUNNER_DISABLED: false
+  #     TAPE_TEST_PATTERN: >-
+  #       --files={./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/deploy-cordapp-jars-to-nodes-v4.7.test.ts,./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/deploy-cordapp-jars-to-nodes-v4.8-express.test.ts,./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/deploy-cordapp-jars-to-nodes-v4.8.test.ts,./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/deploy-cordapp-jars-to-nodes.test.ts,./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/flow-database-access-v4.8.test.ts,./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/jvm-kotlin-spring-server-v4.7.test.ts,./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/jvm-kotlin-spring-server-v4.8.test.ts,./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/openapi/openapi-validation.test.ts}
+  #     TAPE_TEST_RUNNER_DISABLED: false
+  #   needs: build-dev
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - name: Use Node.js v16.14.2
+  #       uses: actions/setup-node@v3.6.0
+  #       with:
+  #         node-version: v16.14.2
+  #         cache: 'yarn'
+  #     - uses: actions/checkout@v3.5.2
+
+  #     - run: ./tools/ci.sh
+  # cactus-plugin-ledger-connector-fabric:
+  #   continue-on-error: false
+  #   env:
+  #     FULL_BUILD_DISABLED: true
+  #     JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+  #     JEST_TEST_RUNNER_DISABLED: false
+  #     TAPE_TEST_PATTERN: >-
+  #       --files={./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v1-4-x/deploy-cc-from-golang-source.test.ts,./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v1-4-x/run-transaction-endpoint-v1.test.ts,./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/add-orgs.test.ts,./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/deploy-cc-from-golang-source.test.ts,./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/deploy-cc-from-javascript-source.test.ts,./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/deploy-cc-from-typescript-source.test.ts,./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/deploy-lock-asset.test.ts,./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/obtain-profiles.test.ts,./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/run-transaction-with-identities.test.ts,./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/run-transaction-with-ws-ids.test.ts,./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/identity-client.test.ts,./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/openapi/openapi-validation-go.test.ts,./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/openapi/openapi-validation.test.ts,./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/unit/identity-internal-crypto-utils.test.ts}
+  #     TAPE_TEST_RUNNER_DISABLED: false
+  #   needs: build-dev
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - name: Use Node.js v16.14.2
+  #       uses: actions/setup-node@v3.6.0
+  #       with:
+  #         node-version: v16.14.2
+  #         cache: 'yarn'
+  #     - uses: actions/checkout@v3.5.2
+
+  #     - run: ./tools/ci.sh
+  # cactus-plugin-ledger-connector-fabric-socketio:
+  #   continue-on-error: false
+  #   env:
+  #     FULL_BUILD_DISABLED: true
+  #     JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-fabric-socketio/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+  #     JEST_TEST_RUNNER_DISABLED: false
+  #     TAPE_TEST_RUNNER_DISABLED: true
+  #   needs: build-dev
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - name: Use Node.js v16.14.2
+  #       uses: actions/setup-node@v3.6.0
+  #       with:
+  #         node-version: v16.14.2
+  #         cache: 'yarn'
+  #     - uses: actions/checkout@v3.5.2
+
+  #     - run: ./tools/ci.sh
+  # cactus-plugin-ledger-connector-go-ethereum-socketio:
+  #   continue-on-error: false
+  #   env:
+  #     DEV_BUILD_DISABLED: false
+  #     FULL_BUILD_DISABLED: true
+  #     JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-go-ethereum-socketio/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+  #     JEST_TEST_RUNNER_DISABLED: true
+  #     TAPE_TEST_RUNNER_DISABLED: true
+  #   needs: build-dev
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - name: Use Node.js v16.14.2
+  #       uses: actions/setup-node@v3.6.0
+  #       with:
+  #         node-version: v16.14.2
+  #         cache: 'yarn'
+  #     - uses: actions/checkout@v3.5.2
+
+  #     - run: ./tools/ci.sh
+  # cactus-plugin-ledger-connector-iroha:
+  #   continue-on-error: false
+  #   env:
+  #     FULL_BUILD_DISABLED: true
+  #     JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-iroha/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+  #     JEST_TEST_RUNNER_DISABLED: false
+  #     TAPE_TEST_PATTERN: >-
+  #       --files={./packages/cactus-plugin-ledger-connector-iroha/src/test/typescript/integration/iroha-iroha-transfer-example.test.ts,./packages/cactus-plugin-ledger-connector-iroha/src/test/typescript/integration/openapi/openapi-validation.test.ts,./packages/cactus-plugin-ledger-connector-iroha/src/test/typescript/integration/run-transaction-endpoint-v1.test.ts,./packages/cactus-plugin-ledger-connector-iroha/src/test/typescript/unit/iroha-test-ledger-parameters.test.ts,./packages/cactus-plugin-ledger-connector-iroha/src/test/typescript/unit/postgres-test-container-parameters.test.ts}
+  #     TAPE_TEST_RUNNER_DISABLED: false
+  #   needs: build-dev
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - name: Use Node.js v16.14.2
+  #       uses: actions/setup-node@v3.6.0
+  #       with:
+  #         node-version: v16.14.2
+  #         cache: 'yarn'
+  #     - uses: actions/checkout@v3.5.2
+
+  #     - run: ./tools/ci.sh
+  # cactus-plugin-ledger-connector-iroha2:
+  #   continue-on-error: false
+  #   env:
+  #     FULL_BUILD_DISABLED: true
+  #     JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-iroha2/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+  #     JEST_TEST_RUNNER_DISABLED: false
+  #     TAPE_TEST_RUNNER_DISABLED: true
+  #   needs: build-dev
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - name: Use Node.js v16.14.2
+  #       uses: actions/setup-node@v3.6.0
+  #       with:
+  #         node-version: v16.14.2
+  #         cache: 'yarn'
+  #     - uses: actions/checkout@v3.5.2
+
+  #     - run: ./tools/ci.sh
+  # cactus-plugin-ledger-connector-quorum:
+  #   continue-on-error: false
+  #   env:
+  #     FULL_BUILD_DISABLED: true
+  #     JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-quorum/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+  #     JEST_TEST_RUNNER_DISABLED: false
+  #     TAPE_TEST_PATTERN: >-
+  #       --files={./packages/cactus-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/openapi/openapi-validation-no-keychain.test.ts,./packages/cactus-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/openapi/openapi-validation.test.ts,./packages/cactus-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/v2.3.0-deploy-contract-from-json-json-object-endpoints.test.ts,./packages/cactus-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/v2.3.0-deploy-contract-from-json-json-object.test.ts,./packages/cactus-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/v2.3.0-invoke-contract-json-object-endpoints.test.ts,./packages/cactus-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/v2.3.0-invoke-contract-json-object.test.ts,./packages/cactus-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/v21.4.1-deploy-contract-from-json-json-object-endpoints.test.ts,./packages/cactus-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/v21.4.1-deploy-contract-from-json-json-object.test.ts,./packages/cactus-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/v21.4.1-invoke-contract-json-object-endpoints.test.ts,./packages/cactus-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/v21.4.1-invoke-contract-json-object.test.ts}
+  #     TAPE_TEST_RUNNER_DISABLED: false
+  #   needs: build-dev
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - name: Use Node.js v16.14.2
+  #       uses: actions/setup-node@v3.6.0
+  #       with:
+  #         node-version: v16.14.2
+  #         cache: 'yarn'
+  #     - uses: actions/checkout@v3.5.2
+
+  #     - run: ./tools/ci.sh
+  # cactus-plugin-ledger-connector-sawtooth-socketio:
+  #   continue-on-error: false
+  #   env:
+  #     DEV_BUILD_DISABLED: false
+  #     FULL_BUILD_DISABLED: true
+  #     JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-sawtooth-socketio/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+  #     JEST_TEST_RUNNER_DISABLED: true
+  #     TAPE_TEST_RUNNER_DISABLED: true
+  #   needs: build-dev
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - name: Use Node.js v16.14.2
+  #       uses: actions/setup-node@v3.6.0
+  #       with:
+  #         node-version: v16.14.2
+  #         cache: 'yarn'
+  #     - uses: actions/checkout@v3.5.2
+
+  #     - run: ./tools/ci.sh
+  # cactus-plugin-ledger-connector-xdai:
+  #   continue-on-error: false
+  #   env:
+  #     FULL_BUILD_DISABLED: true
+  #     JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-xdai/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+  #     JEST_TEST_RUNNER_DISABLED: false
+  #     TAPE_TEST_PATTERN: >-
+  #       --files={./packages/cactus-plugin-ledger-connector-xdai/src/test/typescript/integration/deploy-contract-from-json-xdai-json-object.test.ts,./packages/cactus-plugin-ledger-connector-xdai/src/test/typescript/integration/invoke-contract-xdai-json-object.test.ts,./packages/cactus-plugin-ledger-connector-xdai/src/test/typescript/integration/openapi/openapi-validation-no-keychain.test.ts,./packages/cactus-plugin-ledger-connector-xdai/src/test/typescript/integration/openapi/openapi-validation.test.ts}
+  #     TAPE_TEST_RUNNER_DISABLED: false
+  #   needs: build-dev
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - name: Use Node.js v16.14.2
+  #       uses: actions/setup-node@v3.6.0
+  #       with:
+  #         node-version: v16.14.2
+  #         cache: 'yarn'
+  #     - uses: actions/checkout@v3.5.2
+
+  #     - run: ./tools/ci.sh
+  # cactus-plugin-persistence-ethereum:
+  #   continue-on-error: false
+  #   env:
+  #     FULL_BUILD_DISABLED: true
+  #     JEST_TEST_PATTERN: packages/cactus-plugin-persistence-ethereum/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+  #     JEST_TEST_RUNNER_DISABLED: false
+  #     TAPE_TEST_RUNNER_DISABLED: true
+  #   needs: build-dev
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - name: Use Node.js v16.14.2
+  #       uses: actions/setup-node@v3.6.0
+  #       with:
+  #         node-version: v16.14.2
+  #         cache: 'yarn'
+  #     - uses: actions/checkout@v3.5.2
+
+  #     - run: ./tools/ci.sh
+  # cactus-plugin-object-store-ipfs:
+  #   continue-on-error: false
+  #   env:
+  #     FULL_BUILD_DISABLED: true
+  #     JEST_TEST_PATTERN: extensions/cactus-plugin-object-store-ipfs/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+  #     JEST_TEST_RUNNER_DISABLED: false
+  #     TAPE_TEST_PATTERN: '--files={./extensions/cactus-plugin-object-store-ipfs/src/test/typescript/integration/plugin-object-store-ipfs.test.ts,./extensions/cactus-plugin-object-store-ipfs/src/test/typescript/unit/plugin-object-store-ipfs.test.ts}'
+  #     TAPE_TEST_RUNNER_DISABLED: false
+  #   needs: build-dev
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - name: Use Node.js v16.14.2
+  #       uses: actions/setup-node@v3.6.0
+  #       with:
+  #         node-version: v16.14.2
+  #         cache: 'yarn'
+  #     - uses: actions/checkout@v3.5.2
+
+  #     - run: ./tools/ci.sh
   # cactus-plugin-odap-hermes:
   #   continue-on-error: false
   #   env:
@@ -1002,429 +846,330 @@ jobs:
   #       uses: actions/setup-node@v3.6.0
   #       with:
   #         node-version: v16.14.2
+  #         cache: 'yarn'
   #     - uses: actions/checkout@v3.5.2
-  #     - id: yarn-cache-dir-path
-  #       name: Get yarn cache directory path
-  #       run: echo "::set-output name=dir::$(yarn cache dir)"
-  #     - id: yarn-cache
-  #       name: Restore Yarn Cache
-  #       uses: actions/cache@v3.0.4
-  #       with:
-  #         key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-  #         path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-  #         restore-keys: |
-  #           ${{ runner.os }}-yarn-
+
   #     - run: ./tools/ci.sh
-  cactus-plugin-connector-ubiquity:
-    continue-on-error: false
-    env:
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-ubiquity/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: false
-      TAPE_TEST_RUNNER_DISABLED: true
-      UBIQUITY_AUTH_TOKEN: ${{ secrets.UBIQUITY_AUTH_TOKEN }}
-    needs: build-dev
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - run: ./tools/ci.sh
-        env:
-         UBIQUITY_AUTH_TOKEN: ${{ secrets.UBIQUITY_AUTH_TOKEN }}
-  cactus-test-api-client:
-    continue-on-error: false
-    env:
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cactus-test-api-client/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: false
-      TAPE_TEST_RUNNER_DISABLED: true
-    needs: build-dev
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - run: ./tools/ci.sh
-  cactus-test-cmd-api-server:
-    continue-on-error: false
-    env:
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cactus-test-cmd-api-server/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: false
-      TAPE_TEST_PATTERN: ./packages/cactus-test-cmd-api-server/src/test/typescript/integration/plugin-import-with-npm-install-version-selection.test.ts
-      TAPE_TEST_RUNNER_DISABLED: false
-    needs: build-dev
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - run: ./tools/ci.sh
-  cactus-test-plugin-consortium-manual:
-    continue-on-error: false
-    env:
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cactus-test-plugin-consortium-manual/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: false
-      TAPE_TEST_PATTERN: ./packages/cactus-test-plugin-consortium-manual/src/test/typescript/integration/plugin-consortium-manual/openapi/openapi-validation.test.ts
-      TAPE_TEST_RUNNER_DISABLED: false
-    needs: build-dev
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - run: ./tools/ci.sh
-  cactus-test-plugin-htlc-eth-besu:
-    continue-on-error: false
-    env:
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cactus-test-plugin-htlc-eth-besu/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: false
-      TAPE_TEST_PATTERN: '--files={./packages/cactus-test-plugin-htlc-eth-besu/src/test/typescript/integration/plugin-htlc-eth-besu/get-single-status-endpoint.test.ts,./packages/cactus-test-plugin-htlc-eth-besu/src/test/typescript/integration/plugin-htlc-eth-besu/openapi/openapi-validation.test.ts}'
-      TAPE_TEST_RUNNER_DISABLED: false
-    needs: build-dev
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - run: ./tools/ci.sh
-  cactus-test-plugin-htlc-eth-besu-erc20:
-    continue-on-error: false
-    env:
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cactus-test-plugin-htlc-eth-besu-erc20/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: false
-      TAPE_TEST_PATTERN: >-
-        --files={./packages/cactus-test-plugin-htlc-eth-besu-erc20/src/test/typescript/integration/plugin-htlc-eth-besu-erc20/get-status-endpoint.test.ts,./packages/cactus-test-plugin-htlc-eth-besu-erc20/src/test/typescript/integration/plugin-htlc-eth-besu-erc20/openapi/openapi-validation.test.ts,./packages/cactus-test-plugin-htlc-eth-besu-erc20/src/test/typescript/integration/plugin-htlc-eth-besu-erc20/refund-endpoint.test.ts}
-      TAPE_TEST_RUNNER_DISABLED: false
-    needs: build-dev
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - run: ./tools/ci.sh
-  cactus-test-plugin-ledger-connector-besu:
-    continue-on-error: false
-    env:
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: false
-      TAPE_TEST_PATTERN: >-
-        --files={./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/get-balance-endpoint.test.ts,./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/get-block-endpoint.test.ts,./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/get-past-logs-endpoint.test.ts,./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/get-transaction-endpoint.test.ts,./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/v21-get-balance-endpoint.test.ts,./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/v21-get-block-endpoint.test.ts,./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/v21-get-past-logs-endpoint.test.ts,./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/v21-get-transaction-endpoint.test.ts,./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/v21-sign-transaction-endpoint.test.ts}
-      TAPE_TEST_RUNNER_DISABLED: false
-    needs: build-dev
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - run: ./tools/ci.sh
-  cactus-test-plugin-ledger-connector-quorum:
-    continue-on-error: false
-    env:
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: false
-      TAPE_TEST_RUNNER_DISABLED: true
-    needs: build-dev
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - run: ./tools/ci.sh
-  cactus-test-tooling:
-    continue-on-error: false
-    env:
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cactus-test-tooling/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: false
-      TAPE_TEST_PATTERN: >-
-        --files={./packages/cactus-test-tooling/src/test/typescript/integration/besu/besu-test-ledger/constructor-validates-options.test.ts,./packages/cactus-test-tooling/src/test/typescript/integration/fabric/fabric-test-ledger-v1/constructor-validates-options.test.ts,./packages/cactus-test-tooling/src/test/typescript/integration/iroha/iroha-test-ledger/constructor-validates-options.test.ts,./packages/cactus-test-tooling/src/test/typescript/integration/postgres/postgres-test-container/constructor-validates-options.test.ts,./packages/cactus-test-tooling/src/test/typescript/integration/quorum/quorum-test-ledger/constructor-validates-options.test.ts,./packages/cactus-test-tooling/src/test/typescript/integration/rustc-container/rustc-container-target-bundler.test.ts,./packages/cactus-test-tooling/src/test/typescript/integration/substrate/substrate-test-ledger-constructor.test.ts,./packages/cactus-test-tooling/src/test/typescript/integration/substrate/substrate-test-ledger-multiple-concurrent.test.ts}
-      TAPE_TEST_RUNNER_DISABLED: false
-    needs: build-dev
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - run: ./tools/ci.sh
-  cactus-verifier-client:
-    continue-on-error: false
-    env:
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cactus-verifier-client/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: false
-      TAPE_TEST_RUNNER_DISABLED: true
-    needs: build-dev
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - run: ./tools/ci.sh
-  ghcr-besu-all-in-one:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3.5.2
-      - name: ghcr.io/hyperledger/cactus-besu-all-in-one
-        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/besu-all-in-one/ -f ./tools/docker/besu-all-in-one/Dockerfile
-  ghcr-cmd-api-server:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3.5.2
-      - name: ghcr.io/hyperledger/cactus-cmd-api-server
-        run: DOCKER_BUILDKIT=1 docker build . -f ./packages/cactus-cmd-api-server/Dockerfile
-  ghcr-connector-besu:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3.5.2
-      - name: ghcr.io/hyperledger/cactus-connector-besu
-        run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-ledger-connector-besu/ -f ./packages/cactus-plugin-ledger-connector-besu/Dockerfile
-  ghcr-connector-corda-server:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3.5.2
-      - name: ghcr.io/hyperledger/cactus-connector-corda-server
-        run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-ledger-connector-corda/src/main-server/ -f ./packages/cactus-plugin-ledger-connector-corda/src/main-server/Dockerfile
-  ghcr-connector-fabric:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3.5.2
-      - name: ghcr.io/hyperledger/cactus-connector-fabric
-        run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-ledger-connector-fabric/ -f ./packages/cactus-plugin-ledger-connector-fabric/Dockerfile
-  ghcr-corda-all-in-one:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3.5.2
-      - name: ghcr.io/hyperledger/cactus-corda-all-in-one
-        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/corda-all-in-one/ -f ./tools/docker/corda-all-in-one/Dockerfile
-  ghcr-corda-all-in-one-flowdb:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3.5.2
-      - name: ghcr.io/hyperledger/cactus-corda-all-in-one-flowdb
-        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/corda-all-in-one/corda-v4_8-flowdb/
-  ghcr-corda-all-in-one-obligation:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3.5.2
-      - name: ghcr.io/hyperledger/cactus-corda-all-in-one-obligation
-        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/corda-all-in-one/ -f ./tools/docker/corda-all-in-one/corda-v4_8/Dockerfile
-  ghcr-dev-container-vscode:
-    runs-on: ubuntu-20.04
-    env:
-      IMAGE_NAME: cacti-dev-container-vscode
-    steps:
-      - name: Use Node.js v20.3.0
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: v20.3.0
-      - uses: actions/checkout@v3.5.2
-      - name: npm_install_@devcontainers/cli@0.44.0
-        run: npm install -g @devcontainers/cli@0.44.0
-      - name: npx_yes_devcontainers_cli_build
-        run: npx --yes @devcontainers/cli@0.44.0 build --workspace-folder=./ --log-level=trace --push=false --config=./.devcontainer/devcontainer.json --image-name=$IMAGE_NAME
-  ghcr-example-carbon-accounting:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3.5.2
-      - name: ghcr.io/hyperledger/cactus-example-carbon-accounting
-        run: DOCKER_BUILDKIT=1 docker build . -f ./examples/carbon-accounting/Dockerfile
-  ghcr-example-supply-chain-app:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3.5.2
-      - name: ghcr.io/hyperledger/cactus-example-supply-chain-app
-        run: DOCKER_BUILDKIT=1 docker build . -f ./examples/supply-chain-app/Dockerfile
-  ghcr-fabric-all-in-one:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3.5.2
-      - name: ghcr.io/hyperledger/cactus-fabric-all-in-one
-        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/fabric-all-in-one/ -f ./tools/docker/fabric-all-in-one/Dockerfile_v1.4.x
-  ghcr-fabric2-all-in-one:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3.5.2
-      - name: ghcr.io/hyperledger/cactus-fabric2-all-in-one
-        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/fabric-all-in-one/ -f ./tools/docker/fabric-all-in-one/Dockerfile_v2.x
-  ghcr-iroha-all-in-one:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3.5.2
-      - name: ghcr.io/hyperledger/cactus-iroha-all-in-one
-        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/iroha-all-in-one/ -f ./tools/docker/iroha-all-in-one/Dockerfile
-  ghcr-keychain-vault-server:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3.5.2
-      - name: ghcr.io/hyperledger/cactus-keychain-vault-server
-        run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-keychain-vault/src/cactus-keychain-vault-server/ -f ./packages/cactus-plugin-keychain-vault/src/cactus-keychain-vault-server/Dockerfile
-  ghcr-quorum-all-in-one:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3.5.2
-      - name: ghcr.io/hyperledger/cactus-quorum-all-in-one
-        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/quorum-all-in-one/ -f ./tools/docker/quorum-all-in-one/Dockerfile
-  ghcr-quorum-multi-party-all-in-one:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3.5.2
-      - name: ghcr.io/hyperledger/cactus-quorum-multi-party-all-in-one
-        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/quorum-multi-party-all-in-one/ -f ./tools/docker/quorum-multi-party-all-in-one/Dockerfile
-  ghcr-rust-compiler:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3.5.2
-      - name: ghcr.io/hyperledger/cactus-rust-compiler
-        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/rust-compiler/ -f ./tools/docker/rust-compiler/Dockerfile
-  ghcr-test-npm-registry:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3.5.2
-      - name: ghcr.io/hyperledger/cactus-test-npm-registry
-        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/test-npm-registry/ -f ./tools/docker/test-npm-registry/Dockerfile
-  ghcr-whitepaper:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3.5.2
-      - name: ghcr.io/hyperledger/cactus-whitepaper
-        run: DOCKER_BUILDKIT=1 docker build ./whitepaper/ -f ./whitepaper/Dockerfile
+  # cactus-plugin-connector-ubiquity:
+  #   continue-on-error: false
+  #   env:
+  #     FULL_BUILD_DISABLED: true
+  #     JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-ubiquity/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+  #     JEST_TEST_RUNNER_DISABLED: false
+  #     TAPE_TEST_RUNNER_DISABLED: true
+  #     UBIQUITY_AUTH_TOKEN: ${{ secrets.UBIQUITY_AUTH_TOKEN }}
+  #   needs: build-dev
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - name: Use Node.js v16.14.2
+  #       uses: actions/setup-node@v3.6.0
+  #       with:
+  #         node-version: v16.14.2
+  #         cache: 'yarn'
+  #     - uses: actions/checkout@v3.5.2
+
+  #     - run: ./tools/ci.sh
+  #       env:
+  #        UBIQUITY_AUTH_TOKEN: ${{ secrets.UBIQUITY_AUTH_TOKEN }}
+  # cactus-test-api-client:
+  #   continue-on-error: false
+  #   env:
+  #     FULL_BUILD_DISABLED: true
+  #     JEST_TEST_PATTERN: packages/cactus-test-api-client/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+  #     JEST_TEST_RUNNER_DISABLED: false
+  #     TAPE_TEST_RUNNER_DISABLED: true
+  #   needs: build-dev
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - name: Use Node.js v16.14.2
+  #       uses: actions/setup-node@v3.6.0
+  #       with:
+  #         node-version: v16.14.2
+  #         cache: 'yarn'
+  #     - uses: actions/checkout@v3.5.2
+
+  #     - run: ./tools/ci.sh
+  # cactus-test-cmd-api-server:
+  #   continue-on-error: false
+  #   env:
+  #     FULL_BUILD_DISABLED: true
+  #     JEST_TEST_PATTERN: packages/cactus-test-cmd-api-server/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+  #     JEST_TEST_RUNNER_DISABLED: false
+  #     TAPE_TEST_PATTERN: ./packages/cactus-test-cmd-api-server/src/test/typescript/integration/plugin-import-with-npm-install-version-selection.test.ts
+  #     TAPE_TEST_RUNNER_DISABLED: false
+  #   needs: build-dev
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - name: Use Node.js v16.14.2
+  #       uses: actions/setup-node@v3.6.0
+  #       with:
+  #         node-version: v16.14.2
+  #         cache: 'yarn'
+  #     - uses: actions/checkout@v3.5.2
+
+  #     - run: ./tools/ci.sh
+  # cactus-test-plugin-consortium-manual:
+  #   continue-on-error: false
+  #   env:
+  #     FULL_BUILD_DISABLED: true
+  #     JEST_TEST_PATTERN: packages/cactus-test-plugin-consortium-manual/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+  #     JEST_TEST_RUNNER_DISABLED: false
+  #     TAPE_TEST_PATTERN: ./packages/cactus-test-plugin-consortium-manual/src/test/typescript/integration/plugin-consortium-manual/openapi/openapi-validation.test.ts
+  #     TAPE_TEST_RUNNER_DISABLED: false
+  #   needs: build-dev
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - name: Use Node.js v16.14.2
+  #       uses: actions/setup-node@v3.6.0
+  #       with:
+  #         node-version: v16.14.2
+  #         cache: 'yarn'
+  #     - uses: actions/checkout@v3.5.2
+
+  #     - run: ./tools/ci.sh
+  # cactus-test-plugin-htlc-eth-besu:
+  #   continue-on-error: false
+  #   env:
+  #     FULL_BUILD_DISABLED: true
+  #     JEST_TEST_PATTERN: packages/cactus-test-plugin-htlc-eth-besu/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+  #     JEST_TEST_RUNNER_DISABLED: false
+  #     TAPE_TEST_PATTERN: '--files={./packages/cactus-test-plugin-htlc-eth-besu/src/test/typescript/integration/plugin-htlc-eth-besu/get-single-status-endpoint.test.ts,./packages/cactus-test-plugin-htlc-eth-besu/src/test/typescript/integration/plugin-htlc-eth-besu/openapi/openapi-validation.test.ts}'
+  #     TAPE_TEST_RUNNER_DISABLED: false
+  #   needs: build-dev
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - name: Use Node.js v16.14.2
+  #       uses: actions/setup-node@v3.6.0
+  #       with:
+  #         node-version: v16.14.2
+  #         cache: 'yarn'
+  #     - uses: actions/checkout@v3.5.2
+
+  #     - run: ./tools/ci.sh
+  # cactus-test-plugin-htlc-eth-besu-erc20:
+  #   continue-on-error: false
+  #   env:
+  #     FULL_BUILD_DISABLED: true
+  #     JEST_TEST_PATTERN: packages/cactus-test-plugin-htlc-eth-besu-erc20/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+  #     JEST_TEST_RUNNER_DISABLED: false
+  #     TAPE_TEST_PATTERN: >-
+  #       --files={./packages/cactus-test-plugin-htlc-eth-besu-erc20/src/test/typescript/integration/plugin-htlc-eth-besu-erc20/get-status-endpoint.test.ts,./packages/cactus-test-plugin-htlc-eth-besu-erc20/src/test/typescript/integration/plugin-htlc-eth-besu-erc20/openapi/openapi-validation.test.ts,./packages/cactus-test-plugin-htlc-eth-besu-erc20/src/test/typescript/integration/plugin-htlc-eth-besu-erc20/refund-endpoint.test.ts}
+  #     TAPE_TEST_RUNNER_DISABLED: false
+  #   needs: build-dev
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - name: Use Node.js v16.14.2
+  #       uses: actions/setup-node@v3.6.0
+  #       with:
+  #         node-version: v16.14.2
+  #         cache: 'yarn'
+  #     - uses: actions/checkout@v3.5.2
+
+  #     - run: ./tools/ci.sh
+  # cactus-test-plugin-ledger-connector-besu:
+  #   continue-on-error: false
+  #   env:
+  #     FULL_BUILD_DISABLED: true
+  #     JEST_TEST_PATTERN: packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+  #     JEST_TEST_RUNNER_DISABLED: false
+  #     TAPE_TEST_PATTERN: >-
+  #       --files={./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/get-balance-endpoint.test.ts,./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/get-block-endpoint.test.ts,./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/get-past-logs-endpoint.test.ts,./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/get-transaction-endpoint.test.ts,./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/v21-get-balance-endpoint.test.ts,./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/v21-get-block-endpoint.test.ts,./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/v21-get-past-logs-endpoint.test.ts,./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/v21-get-transaction-endpoint.test.ts,./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/v21-sign-transaction-endpoint.test.ts}
+  #     TAPE_TEST_RUNNER_DISABLED: false
+  #   needs: build-dev
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - name: Use Node.js v16.14.2
+  #       uses: actions/setup-node@v3.6.0
+  #       with:
+  #         node-version: v16.14.2
+  #         cache: 'yarn'
+  #     - uses: actions/checkout@v3.5.2
+
+  #     - run: ./tools/ci.sh
+  # cactus-test-plugin-ledger-connector-quorum:
+  #   continue-on-error: false
+  #   env:
+  #     FULL_BUILD_DISABLED: true
+  #     JEST_TEST_PATTERN: packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+  #     JEST_TEST_RUNNER_DISABLED: false
+  #     TAPE_TEST_RUNNER_DISABLED: true
+  #   needs: build-dev
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - name: Use Node.js v16.14.2
+  #       uses: actions/setup-node@v3.6.0
+  #       with:
+  #         node-version: v16.14.2
+  #         cache: 'yarn'
+  #     - uses: actions/checkout@v3.5.2
+
+  #     - run: ./tools/ci.sh
+  # cactus-test-tooling:
+  #   continue-on-error: false
+  #   env:
+  #     FULL_BUILD_DISABLED: true
+  #     JEST_TEST_PATTERN: packages/cactus-test-tooling/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+  #     JEST_TEST_RUNNER_DISABLED: false
+  #     TAPE_TEST_PATTERN: >-
+  #       --files={./packages/cactus-test-tooling/src/test/typescript/integration/besu/besu-test-ledger/constructor-validates-options.test.ts,./packages/cactus-test-tooling/src/test/typescript/integration/fabric/fabric-test-ledger-v1/constructor-validates-options.test.ts,./packages/cactus-test-tooling/src/test/typescript/integration/iroha/iroha-test-ledger/constructor-validates-options.test.ts,./packages/cactus-test-tooling/src/test/typescript/integration/postgres/postgres-test-container/constructor-validates-options.test.ts,./packages/cactus-test-tooling/src/test/typescript/integration/quorum/quorum-test-ledger/constructor-validates-options.test.ts,./packages/cactus-test-tooling/src/test/typescript/integration/rustc-container/rustc-container-target-bundler.test.ts,./packages/cactus-test-tooling/src/test/typescript/integration/substrate/substrate-test-ledger-constructor.test.ts,./packages/cactus-test-tooling/src/test/typescript/integration/substrate/substrate-test-ledger-multiple-concurrent.test.ts}
+  #     TAPE_TEST_RUNNER_DISABLED: false
+  #   needs: build-dev
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - name: Use Node.js v16.14.2
+  #       uses: actions/setup-node@v3.6.0
+  #       with:
+  #         node-version: v16.14.2
+  #         cache: 'yarn'
+  #     - uses: actions/checkout@v3.5.2
+
+  #     - run: ./tools/ci.sh
+  # cactus-verifier-client:
+  #   continue-on-error: false
+  #   env:
+  #     FULL_BUILD_DISABLED: true
+  #     JEST_TEST_PATTERN: packages/cactus-verifier-client/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+  #     JEST_TEST_RUNNER_DISABLED: false
+  #     TAPE_TEST_RUNNER_DISABLED: true
+  #   needs: build-dev
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - name: Use Node.js v16.14.2
+  #       uses: actions/setup-node@v3.6.0
+  #       with:
+  #         node-version: v16.14.2
+  #         cache: 'yarn'
+  #     - uses: actions/checkout@v3.5.2
+
+  #     - run: ./tools/ci.sh
+  # ghcr-besu-all-in-one:
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - uses: actions/checkout@v3.5.2
+  #     - name: ghcr.io/hyperledger/cactus-besu-all-in-one
+  #       run: DOCKER_BUILDKIT=1 docker build ./tools/docker/besu-all-in-one/ -f ./tools/docker/besu-all-in-one/Dockerfile
+  # ghcr-cmd-api-server:
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - uses: actions/checkout@v3.5.2
+  #     - name: ghcr.io/hyperledger/cactus-cmd-api-server
+  #       run: DOCKER_BUILDKIT=1 docker build . -f ./packages/cactus-cmd-api-server/Dockerfile
+  # ghcr-connector-besu:
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - uses: actions/checkout@v3.5.2
+  #     - name: ghcr.io/hyperledger/cactus-connector-besu
+  #       run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-ledger-connector-besu/ -f ./packages/cactus-plugin-ledger-connector-besu/Dockerfile
+  # ghcr-connector-corda-server:
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - uses: actions/checkout@v3.5.2
+  #     - name: ghcr.io/hyperledger/cactus-connector-corda-server
+  #       run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-ledger-connector-corda/src/main-server/ -f ./packages/cactus-plugin-ledger-connector-corda/src/main-server/Dockerfile
+  # ghcr-connector-fabric:
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - uses: actions/checkout@v3.5.2
+  #     - name: ghcr.io/hyperledger/cactus-connector-fabric
+  #       run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-ledger-connector-fabric/ -f ./packages/cactus-plugin-ledger-connector-fabric/Dockerfile
+  # ghcr-corda-all-in-one:
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - uses: actions/checkout@v3.5.2
+  #     - name: ghcr.io/hyperledger/cactus-corda-all-in-one
+  #       run: DOCKER_BUILDKIT=1 docker build ./tools/docker/corda-all-in-one/ -f ./tools/docker/corda-all-in-one/Dockerfile
+  # ghcr-corda-all-in-one-flowdb:
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - uses: actions/checkout@v3.5.2
+  #     - name: ghcr.io/hyperledger/cactus-corda-all-in-one-flowdb
+  #       run: DOCKER_BUILDKIT=1 docker build ./tools/docker/corda-all-in-one/corda-v4_8-flowdb/
+  # ghcr-corda-all-in-one-obligation:
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - uses: actions/checkout@v3.5.2
+  #     - name: ghcr.io/hyperledger/cactus-corda-all-in-one-obligation
+  #       run: DOCKER_BUILDKIT=1 docker build ./tools/docker/corda-all-in-one/ -f ./tools/docker/corda-all-in-one/corda-v4_8/Dockerfile
+  # ghcr-dev-container-vscode:
+  #   runs-on: ubuntu-20.04
+  #   env:
+  #     IMAGE_NAME: cacti-dev-container-vscode
+  #   steps:
+  #     - name: Use Node.js v20.3.0
+  #       uses: actions/setup-node@v3.6.0
+  #       with:
+  #         node-version: v20.3.0
+  #     - uses: actions/checkout@v3.5.2
+  #     - name: npm_install_@devcontainers/cli@0.44.0
+  #       run: npm install -g @devcontainers/cli@0.44.0
+  #     - name: npx_yes_devcontainers_cli_build
+  #       run: npx --yes @devcontainers/cli@0.44.0 build --workspace-folder=./ --log-level=trace --push=false --config=./.devcontainer/devcontainer.json --image-name=$IMAGE_NAME
+  # ghcr-example-carbon-accounting:
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - uses: actions/checkout@v3.5.2
+  #     - name: ghcr.io/hyperledger/cactus-example-carbon-accounting
+  #       run: DOCKER_BUILDKIT=1 docker build . -f ./examples/carbon-accounting/Dockerfile
+  # ghcr-example-supply-chain-app:
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - uses: actions/checkout@v3.5.2
+  #     - name: ghcr.io/hyperledger/cactus-example-supply-chain-app
+  #       run: DOCKER_BUILDKIT=1 docker build . -f ./examples/supply-chain-app/Dockerfile
+  # ghcr-fabric-all-in-one:
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - uses: actions/checkout@v3.5.2
+  #     - name: ghcr.io/hyperledger/cactus-fabric-all-in-one
+  #       run: DOCKER_BUILDKIT=1 docker build ./tools/docker/fabric-all-in-one/ -f ./tools/docker/fabric-all-in-one/Dockerfile_v1.4.x
+  # ghcr-fabric2-all-in-one:
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - uses: actions/checkout@v3.5.2
+  #     - name: ghcr.io/hyperledger/cactus-fabric2-all-in-one
+  #       run: DOCKER_BUILDKIT=1 docker build ./tools/docker/fabric-all-in-one/ -f ./tools/docker/fabric-all-in-one/Dockerfile_v2.x
+  # ghcr-iroha-all-in-one:
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - uses: actions/checkout@v3.5.2
+  #     - name: ghcr.io/hyperledger/cactus-iroha-all-in-one
+  #       run: DOCKER_BUILDKIT=1 docker build ./tools/docker/iroha-all-in-one/ -f ./tools/docker/iroha-all-in-one/Dockerfile
+  # ghcr-keychain-vault-server:
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - uses: actions/checkout@v3.5.2
+  #     - name: ghcr.io/hyperledger/cactus-keychain-vault-server
+  #       run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-keychain-vault/src/cactus-keychain-vault-server/ -f ./packages/cactus-plugin-keychain-vault/src/cactus-keychain-vault-server/Dockerfile
+  # ghcr-quorum-all-in-one:
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - uses: actions/checkout@v3.5.2
+  #     - name: ghcr.io/hyperledger/cactus-quorum-all-in-one
+  #       run: DOCKER_BUILDKIT=1 docker build ./tools/docker/quorum-all-in-one/ -f ./tools/docker/quorum-all-in-one/Dockerfile
+  # ghcr-quorum-multi-party-all-in-one:
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - uses: actions/checkout@v3.5.2
+  #     - name: ghcr.io/hyperledger/cactus-quorum-multi-party-all-in-one
+  #       run: DOCKER_BUILDKIT=1 docker build ./tools/docker/quorum-multi-party-all-in-one/ -f ./tools/docker/quorum-multi-party-all-in-one/Dockerfile
+  # ghcr-rust-compiler:
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - uses: actions/checkout@v3.5.2
+  #     - name: ghcr.io/hyperledger/cactus-rust-compiler
+  #       run: DOCKER_BUILDKIT=1 docker build ./tools/docker/rust-compiler/ -f ./tools/docker/rust-compiler/Dockerfile
+  # ghcr-test-npm-registry:
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - uses: actions/checkout@v3.5.2
+  #     - name: ghcr.io/hyperledger/cactus-test-npm-registry
+  #       run: DOCKER_BUILDKIT=1 docker build ./tools/docker/test-npm-registry/ -f ./tools/docker/test-npm-registry/Dockerfile
+  # ghcr-whitepaper:
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - uses: actions/checkout@v3.5.2
+  #     - name: ghcr.io/hyperledger/cactus-whitepaper
+  #       run: DOCKER_BUILDKIT=1 docker build ./whitepaper/ -f ./whitepaper/Dockerfile
 name: Cactus_CI
 'on':
   pull_request:
