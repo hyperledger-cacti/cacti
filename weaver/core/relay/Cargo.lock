@@ -159,6 +159,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "89b2fd2a0dcf38d7971e2194b6b6eebab45ae01067456a7fd93d5547a61b70be"
 
 [[package]]
+name = "cacti_weaver_protos_rs"
+version = "2.0.0-alpha-prerelease"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b624ae96a5a9265e603855d3a69555dad230ee98c9da57eaa71547a4d2b8d26d"
+dependencies = [
+ "prost",
+ "serde 1.0.159",
+ "tonic",
+]
+
+[[package]]
 name = "cc"
 version = "1.0.79"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -809,9 +820,9 @@ checksum = "b7e5500299e16ebb147ae15a00a942af264cf3688f47923b8fc2cd5858f23ad3"
 
 [[package]]
 name = "openssl"
-version = "0.10.49"
+version = "0.10.55"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4d2f106ab837a24e03672c59b1239669a0596406ff657c3c0835b6b7f0f35a33"
+checksum = "345df152bc43501c5eb9e4654ff05f794effb78d4efe3d53abc158baddc0703d"
 dependencies = [
  "bitflags",
  "cfg-if",
@@ -841,9 +852,9 @@ checksum = "ff011a302c396a5197692431fc1948019154afc178baf7d8e37367442a4601cf"
 
 [[package]]
 name = "openssl-sys"
-version = "0.9.84"
+version = "0.9.90"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3a20eace9dc2d82904039cb76dcf50fb1a0bba071cfd1629720b5d6f1ddba0fa"
+checksum = "374533b0e45f3a7ced10fcaeccca020e66656bc03dac384f852e4e5a7a8104a6"
 dependencies = [
  "cc",
  "libc",
@@ -1085,10 +1096,11 @@ checksum = "f162c6dd7b008981e4d40210aca20b4bd0f9b60ca9271061b07f78537722f2e1"
 
 [[package]]
 name = "relay"
-version = "1.5.4"
+version = "2.0.0-alpha.1"
 dependencies = [
  "base64 0.20.0",
  "bincode",
+ "cacti_weaver_protos_rs",
  "config",
  "futures",
  "listenfd",
@@ -1100,7 +1112,6 @@ dependencies = [
  "tonic",
  "tonic-build",
  "uuid",
- "weaver_protos_rs",
 ]
 
 [[package]]
@@ -1786,15 +1797,6 @@ name = "wasm-bindgen-shared"
 version = "0.2.84"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0046fef7e28c3804e5e38bfa31ea2a0f73905319b677e57ebe37e49358989b5d"
-
-[[package]]
-name = "weaver_protos_rs"
-version = "1.5.4"
-dependencies = [
- "prost",
- "serde 1.0.159",
- "tonic",
-]
 
 [[package]]
 name = "web-sys"
