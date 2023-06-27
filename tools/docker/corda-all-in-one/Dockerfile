@@ -1,4 +1,4 @@
-FROM docker:20.10.2-dind
+FROM docker:24.0.2-dind
 
 ARG SAMPLES_KOTLIN_SHA=30fd841dd035934bae75ab8910da3b6e3d5d6ee7
 ARG SAMPLES_KOTLIN_CORDAPP_SUB_DIR_PATH="./Advanced/obligation-cordapp/"

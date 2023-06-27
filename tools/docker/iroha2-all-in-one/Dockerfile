@@ -1,4 +1,4 @@
-FROM docker:20.10.21-dind
+FROM docker:24.0.2-dind
 
 ENV APP_ROOT="/app"
 ENV FREEZE_TMP_DIR="/opt/docker-freeze"
