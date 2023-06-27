@@ -17,7 +17,7 @@ RUN quorum-dev-quickstart --clientType goquorum --outputPath ./ --monitoring def
 # docker-compose base
 ################################
 
-FROM docker:20.10.21-dind
+FROM docker:24.0.2-dind
 
 ENV ROOT_DIR=/opt/quorum-dev-quickstart
 

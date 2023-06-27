@@ -1,4 +1,4 @@
-FROM docker:20.10.17-dind
+FROM docker:24.0.2-dind
 
 # Install docker-compose and it's dependencies
 RUN apk update \

@@ -1,4 +1,4 @@
-FROM docker:20.10.3-dind
+FROM docker:24.0.2-dind
 
 ARG BESU_VERSION=21.1.2
 ARG QUORUM_VERSION=21.4.1

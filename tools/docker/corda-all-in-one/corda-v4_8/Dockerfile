@@ -1,4 +1,4 @@
-FROM docker:20.10.2-dind
+FROM docker:24.0.2-dind
 
 # cordaVersion=4.8.5
 # cordaCoreVersion=4.8.5
