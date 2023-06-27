@@ -33,7 +33,7 @@ This solution, implemented as a stopgap measure, suffers from various drawbacks:
 4. Fourth, it again relies on a single designated member (participant unit) of a network to configure the identity information of foreign networks.
 
 
-To enable data and asset exchange protocols between permissioned networks on-demand, we need a more secure and systematized process for exposing, discovering, verifying, and configuring network identity information. Further, this process should be decentralized in a way that allows participating networks and their units to own, control, and expose their identity information as they see fit and not have to rely on centralized parties as mediums of exchange. The process should also ensure extensibility, and scalability to the extent possible, by enabling a network with units owning decentralized identities (DIDs) which can be verified by well-known and trusted identity providers to exchange data or assets with permissioned networks already part of the ecosystem. Finally, trust in identity providers should be based on blockchain (or distributed ledger) principles, mitigating the possibility of collusion between networks and identity providers.
+To enable data and asset exchange protocols between permissioned networks on-demand, we need a more secure and systematized process for exposing, discovering, verifying, and configuring security domain identity information across networks. Further, this process should be decentralized in a way that allows participating networks and their units to own, control, and expose their identity information as they see fit and not have to rely on centralized parties as mediums of exchange. The process should also ensure extensibility, and scalability to the extent possible, by enabling a network with units owning decentralized identities (DIDs) which can be verified by well-known and trusted identity providers to exchange data or assets with permissioned networks already part of the ecosystem. Finally, trust in identity providers should be based on blockchain (or distributed ledger) principles, mitigating the possibility of collusion between networks and identity providers.
 
 A slightly amended figure (Fig.2) illustrates our view of the solution below, where you can see that the identity plane protocol relies both on bilateral communication and a "cloud" of identity providers that provides the fundamental trust basis for interoperation. We will sketch out the details of this cloud and the identity information exchanges later.
 
@@ -115,17 +115,17 @@ Our framework consists of both hierarchical and decentralized identities. Decent
 * _Trust Anchors_: Trust anchors are identities of well-known entities that issue VCs to attest the real world identities of both Organizational Units and Security Domains.
 * _Security Domain Member Identity_: In the data plane, network members may use different identities scoped within their security domain as necessitated by the DLT platform on which the network is built. Such identities are not a requirement in the identity plane. But a member uses its _Organizational Unit Identity_ (in the identity plane) to self attest its _Security Domain Member Identity_.
 
-See the [data format specifications](../../network/identity.md) for more details.
+See the [identity format specifications](../../formats/network/identity.md) for more details.
 
 
 ## Security Domain Identity Creation, Exchange and Validation
 
-DLT networks and their members must create and configure their respective identities in the identity plane. See the protocols for [cross-network identity exchange and validation](../../protocols/identity/readme.md) for more details.
+DLT networks and their members must create and configure their respective identities in the identity plane. See the protocols for [cross-security domain identity exchange and validation](../../protocols/identity/identity-syncing.md) for more details.
 
 
 ## Security Domain Identity Discovery
 
 For two different DLT networks to interoperate seamlessly, a network must fetch, validate, and record its counterparty network's members' identities on its ledger. But discovering the counterparty network and obtaining its security domain identity is a prerequisite for any identity plane protocol in which members' identities can be synced. IIN infrastructure facilitates such discovery by allowing networks to register and record their security domain identities in the forms of Network DIDs. We will assume that each network will have a unique Network DID, analogous to a domain name in the Internet.
 
-See the [network discovery protocols specifications](../../protocols/discovery/discovery.md) for more details.
+See the [security domain discovery protocols specifications](../../protocols/discovery/discovery.md) for more details.
 

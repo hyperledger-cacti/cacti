@@ -40,7 +40,7 @@ X500 name attribute types are:
 
 There are various constraints placed on the X500 name, including maximum length
 of attributes, valid country attribute, etc. For the full list of constraints,
-see the [Corda docs for node identity](https://docs.corda.net/docs/corda-os/4.5/node-naming.html).
+see the [Corda docs for node identity](https://docs.r3.com/en/platform/corda/4.7/enterprise/node/setup/node-naming.html).
 
 ## Authenticating Corda nodes as an external network
 

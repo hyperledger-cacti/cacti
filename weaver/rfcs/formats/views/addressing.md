@@ -13,7 +13,7 @@
 
 ## Summary
 
-* Addresses are unique references to [views](../models/views.md) on distributed ledgers.
+* Addresses are unique references to [views](../../models/ledger/views.md) on distributed ledgers.
 * Addresses are composed of three segments: an endpoint segment, followed by a segment that identifies a ledger, followed by a segment that identifies a view.
 * Addresses are shared out-of-band by networks with external counterparties as an expression of interest in collaborating.
 

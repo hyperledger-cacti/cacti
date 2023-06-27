@@ -26,9 +26,9 @@ The format of the proof provided by each network needs to be as generic as possi
 
 The structure of the message is network dependant. For the details on the message structure for fabric and corda, refer to their view documentation:
 
-- [fabric](/formats/fabric.md)
-- [corda](/formats/corda.md)
+- [Hyperledger Fabric](../../formats/views/fabric.md)
+- [R3 Corda](../../formats/views/corda.md)
 
 ## Examples
 
-For example, in the data sharing protocol, this message structure would be embedded in the [response message type](../../protocols/data-sharing/generic.md#response-message-type)
+For example, in the [data sharing protocol](../../protocols/data-sharing/generic.md), this message structure would be embedded in the [view payload](../../formats/views/request-response.md#viewpayload).
