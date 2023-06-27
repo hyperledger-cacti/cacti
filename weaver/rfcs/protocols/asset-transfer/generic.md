@@ -93,3 +93,10 @@ In the future, we will also engineer the protocol using [event pub/sub](../event
 ## Safety and Liveness
 
 At no point in time is asset *M* available in both the ledgers *A* and *B*. This is ensured by allowing minting of asset by Alice in ledger *A* only if the asset was not already minted by Bob in ledger *B*. Also note that Alice could mint the asset *M* in ledger *A* anytime after the period *t*.
+
+
+## DLT-Specific Designs
+
+Implementation of the protocol is DLT-specific. See the following for details on currently supported DLTs:
+- [Hyperledger Fabric](./fabric.md)
+- [R3 Corda](./corda.md)

@@ -29,3 +29,5 @@ It is also possible for the members of a security domain to be empty, implying t
 The application of policies helps guard against unauthorized access to state or presentation of proofs that are either invalid or don't meet an expected integrity criteria.
 
 ## Securing the Relay
+
+_This is work-in-progress_.

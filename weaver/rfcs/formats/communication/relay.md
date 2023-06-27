@@ -17,7 +17,7 @@ This document specifies the format of messages used in any protocol whenever the
 ## NetworkQuery
 
 This message is created by client application to encapsulate the query for the relay.
-Whenever a client application needs to query a foreign network for a [ledger state view](../../models/ledger/views.md), it must wrap the query comprising of a [view address](../views/addressing.md), a [verification policy](../policies/proof-verification.md), and other metadata, into a DLT-neutral structure as follows for the [relays](../../models/infrastructure/relay.md) that will accept and route the request.
+Whenever a client application needs to query a foreign network for a [ledger state view](../../models/ledger/views.md), it must wrap the query comprising of a [view address](../views/addressing.md), a [verification policy](../policies/proof-verification.md), and other metadata, into a DLT-neutral structure as follows for the [relays](../../models/infrastructure/relays.md) that will accept and route the request.
 
 ```protobuf
 message NetworkQuery {
@@ -103,7 +103,7 @@ service DataTransfer {
 }
 ```
 
-For more details on the `RequestState`, `SendState`, and `SendDriverState` API functions, see the [relay model](../../models/infrastructure/relays.md#api-for-other-relays)
+For more details on the `RequestState`, `SendState`, and `SendDriverState` API functions, see the [relay model](../../models/infrastructure/relays.md#api-for-other-relays).
 
 ## Database
 
@@ -113,5 +113,5 @@ A relay should maintain a database to store remote queries and state of the loca
 
 The local database should be used to store the state of the query i.e. [RequestState](../views/request-response.md#requeststate) payload with key as `request_id`. This `request_id` is a unique ID, which is generated for each query. The same `request_id` is used for all communications regarding this particular query request.
 
-The remote database should be used to store the request [Query]((../views/request-response.md#query)) from remote (destination) relay (i.e. for which this relay is the source relay) to track the requests recieved from remote relay and then sent to the intended driver. In future, the remote database can be replaced with a task queue, where the requests coming from remote relay can be queued, before sending to the driver.
+The remote database should be used to store the request [Query](../views/request-response.md#query) from remote (destination) relay (i.e. for which this relay is the source relay) to track the requests recieved from remote relay and then sent to the intended driver. In future, the remote database can be replaced with a task queue, where the requests coming from remote relay can be queued, before sending to the driver.
 

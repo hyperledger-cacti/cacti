@@ -12,7 +12,7 @@
 
 ## Locking Mechanisms for the Exchange Protocol
 
-This document specifies the data formats used in the [cross-network asset exchange protocol](../../protocols/asset-exchange/). We envision supporting several distinct kinds of asset locking mechanisms for asset exchanges in Weaver, which are listed in and can be selected from an enumeration as follows:
+This document specifies the data formats used in the [cross-network asset exchange protocol](../../protocols/asset-exchange/generic-htlc.md). We envision supporting several distinct kinds of asset locking mechanisms for asset exchanges in Weaver, which are listed in and can be selected from an enumeration as follows:
 ```protobuf
 enum LockMechanism {
   HTLC = 0;
@@ -22,7 +22,7 @@ Currently, only the [HTLC protocol](../../protocols/asset-exchange/generic-htlc.
 
 ## Representing Locks on Assets
 
-To communicate locking instructions between the application layer or a contract and the [interoperation module](models/infrastructure/interoperation-modules.md) or across networks, we need common DLT-neutral structures. The general structure to lock assets (both fungible and non-fungible) is as follows:
+To communicate locking instructions between the application layer or a contract and the [interoperation module](../../models/infrastructure/interoperation-modules.md) or across networks, we need common DLT-neutral structures. The general structure to lock assets (both fungible and non-fungible) is as follows:
 ```protobuf
 message AssetLock {
   LockMechanism lockMechanism = 1;
@@ -58,7 +58,7 @@ enum HashMechanism {
 
 ## Representing Claims on Assets
 
-To communicate claiming instructions between the application layer or a contract and the [interoperation module](models/infrastructure/interoperation-modules.md) or across networks, we need common DLT-neutral structures. The general structure to claim assets (both fungible and non-fungible) is as follows:
+To communicate claiming instructions between the application layer or a contract and the [interoperation module](../../models/infrastructure/interoperation-modules.md) or across networks, we need common DLT-neutral structures. The general structure to claim assets (both fungible and non-fungible) is as follows:
 ```protobuf
 message AssetClaim {
   LockMechanism lockMechanism = 1;

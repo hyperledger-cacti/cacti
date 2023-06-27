@@ -15,7 +15,7 @@
 - Permissioned networks rely on the identity of its members for validating state.
 - Membership credentials, in the form of digital certificates, are issued by trust authorities local to the network.
 - Remote agents must be in possession of the necesary identity information in order to verify attestations from a network.
-- There are multiple approaches to sharing network identity with external agents, each having differenet trade-offs.
+- There are multiple approaches to sharing security domain identity with external agents, each having differenet trade-offs.
 
 ## Point-to-Point Identity Exchange
 
@@ -46,7 +46,7 @@ When multiple networks are involved, sharing identity information across each re
 
 <img src="../../resources/images/identity-design-choice-2.jpg">
 
-- A well-known registry is used to publish and share network identity information.
+- A well-known registry is used to publish and share security domain identity information from networks.
  - The registry can be public or limit access to a group of networks, such as those part of an ecosystem.
  - The registry can be a centralized web service or database, or decentralized.
 - Remote networks source identity information via the registry

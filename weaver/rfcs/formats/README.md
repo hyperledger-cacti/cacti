@@ -5,7 +5,7 @@
  -->
 # Data Structures and Formats
 
-This folder contains specifications of various data structures and formats used in Weaver components and [protocols](../protocols)
+This folder contains specifications of various data structures and formats used in Weaver components and [protocols](../protocols).
 
 Views and view addressing formats are described in the [views](./views) folder.
 
@@ -15,4 +15,4 @@ Message structures used by communication modules like relays and drivers are des
 
 Policy schemas are described in the [policies](./policies) folder.
 
-Network and network unit schemas are described in the [identities](./identities) folder.
+Schemas for networks, network units, and identity management, are described in the [network](./network) folder.

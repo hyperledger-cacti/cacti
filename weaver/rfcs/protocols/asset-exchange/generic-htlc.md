@@ -42,8 +42,15 @@ In the event Alice fails to claim Bob's asset before the refund period *t* elaps
 
 ## Protocol Messages
 
+Data structures and formats for messages used in the asset exchange protocol implementation are described [here](../../formats/assets/exchange.md).
 
 
+## DLT-Specific Designs
+
+Implementation of the protocol is DLT-specific. See the following for details on currently supported DLTs:
+- [Hyperledger Fabric](./fabric-htlc.md)
+- [R3 Corda](./corda-htlc.md)
+- [Hyperledger Besu](./besu-htlc.md)
 
 
 ## Open Questions 
