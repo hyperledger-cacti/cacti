@@ -2,7 +2,11 @@ import { v4 as uuidv4 } from "uuid";
 import { RuntimeError } from "run-time-error";
 
 import { Component, Inject, Input, OnInit } from "@angular/core";
-import { FormGroup, FormBuilder, Validators } from "@angular/forms";
+import {
+  UntypedFormGroup,
+  UntypedFormBuilder,
+  Validators,
+} from "@angular/forms";
 import { ModalController } from "@ionic/angular";
 
 import { ApiClient } from "@hyperledger/cactus-api-client";
@@ -19,14 +23,14 @@ import { isBambooHarvest } from "../is-bamboo-harvest";
 })
 export class BambooHarvestDetailPage implements OnInit {
   private readonly log: Logger;
-  public form: FormGroup;
+  public form: UntypedFormGroup;
   @Input()
   public bambooHarvest: BambooHarvest;
 
   constructor(
     private readonly baseClient: ApiClient,
     public readonly modalController: ModalController,
-    public readonly formBuilder: FormBuilder,
+    public readonly formBuilder: UntypedFormBuilder,
     @Inject(QUORUM_DEMO_LEDGER_ID) private readonly quorumLedgerId: string,
   ) {
     this.log = LoggerProvider.getOrCreate({ label: "BambooHarvestDetailPage" });
