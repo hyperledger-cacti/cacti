@@ -208,6 +208,30 @@ pub mod network_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
+        /// Asset Transfer endpoints
+        /// endpoint for a network to request asset transfer to relay state via local relay
+        pub async fn request_asset_transfer(
+            &mut self,
+            request: impl tonic::IntoRequest<super::NetworkQuery>,
+        ) -> Result<
+            tonic::Response<super::super::super::common::ack::Ack>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/networks.networks.Network/RequestAssetTransfer",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
         /// Event endpoints
         /// endpoint for a client to subscribe to event via local relay initiating subscription flow.
         pub async fn subscribe_event(
@@ -333,6 +357,15 @@ pub mod network_server {
             &self,
             request: tonic::Request<super::DbName>,
         ) -> Result<tonic::Response<super::RelayDatabase>, tonic::Status>;
+        /// Asset Transfer endpoints
+        /// endpoint for a network to request asset transfer to relay state via local relay
+        async fn request_asset_transfer(
+            &self,
+            request: tonic::Request<super::NetworkQuery>,
+        ) -> Result<
+            tonic::Response<super::super::super::common::ack::Ack>,
+            tonic::Status,
+        >;
         /// Event endpoints
         /// endpoint for a client to subscribe to event via local relay initiating subscription flow.
         async fn subscribe_event(
@@ -530,6 +563,44 @@ pub mod network_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = RequestDatabaseSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/networks.networks.Network/RequestAssetTransfer" => {
+                    #[allow(non_camel_case_types)]
+                    struct RequestAssetTransferSvc<T: Network>(pub Arc<T>);
+                    impl<T: Network> tonic::server::UnaryService<super::NetworkQuery>
+                    for RequestAssetTransferSvc<T> {
+                        type Response = super::super::super::common::ack::Ack;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::NetworkQuery>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).request_asset_transfer(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = RequestAssetTransferSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(

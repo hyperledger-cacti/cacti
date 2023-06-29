@@ -20,6 +20,10 @@ service Network {
   // NOTE: This rpc is just for debugging.
   rpc RequestDatabase(DbName) returns (RelayDatabase) {}
   
+  // Asset Transfer endpoints
+  // endpoint for a network to request asset transfer to relay state via local relay
+  rpc RequestAssetTransfer(NetworkQuery) returns (common.ack.Ack) {}
+
   // Event endpoints
   // endpoint for a client to subscribe to event via local relay initiating subscription flow.
   rpc SubscribeEvent(NetworkEventSubscription) returns (common.ack.Ack) {}

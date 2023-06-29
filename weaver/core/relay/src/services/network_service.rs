@@ -5,7 +5,9 @@ use weaverpb::common::state::{request_state, RequestState};
 use weaverpb::common::events::{EventSubscription, event_subscription_state, EventSubscriptionState, EventSubOperation, event_publication, EventPublication, EventStates};
 use weaverpb::networks::networks::network_server::Network;
 use weaverpb::networks::networks::{DbName, GetStateMessage, NetworkQuery, RelayDatabase, NetworkEventSubscription, NetworkEventUnsubscription};
+use weaverpb::relay::asset_transfer::TransferCommenceRequest;
 use weaverpb::relay::datatransfer::data_transfer_client::DataTransferClient;
+use weaverpb::relay::asset_transfer::asset_transfer_client::AssetTransferClient;
 use weaverpb::relay::events::event_subscribe_client::EventSubscribeClient;
 use crate::relay_proto::{parse_address, LocationSegment};
 // Internal modules
@@ -194,6 +196,88 @@ impl Network for NetworkService {
         }
     }
     
+    /// request_asset_transfer is called from the client to query the requesting relay for the state
+    /// Since this request is async w.r.t the network, the request info/state machine is
+    /// stored in a db on the requesting relay (status polled using get_state)
+    async fn request_asset_transfer(&self, request: Request<NetworkQuery>) -> Result<Response<Ack>, Status> {
+        println!(
+            "Got a NetworkQuery request from {:?} - {:?}",
+            request.remote_addr(),
+            request
+        );
+        let conf = self.config_lock.read().await.clone();
+        // Database access/storage
+        let db = Database {
+            db_path: conf.get_str("db_path").unwrap(),
+            db_open_max_retries: conf.get_int("db_open_max_retries").unwrap_or(500) as u32,
+            db_open_retry_backoff_msec: conf.get_int("db_open_retry_backoff_msec").unwrap_or(10) as u32,
+        };
+
+        let request_id = Uuid::new_v4();
+        // Initial request state stored in DB.
+        let target: RequestState = RequestState {
+            status: request_state::Status::PendingAck as i32,
+            request_id: request_id.to_string(),
+            state: None,
+        };
+        let message_insert = db.set(&request_id.to_string(), &target);
+        // Kept this as a match as the error case returns an Ok.
+        match message_insert {
+            Ok(_) => println!(
+                "Successfully stored NetworkQuery in db with request_id: {}",
+                request_id.to_string()
+            ),
+            Err(e) => {
+                // Internal failure of sled. Send Error response
+                println!(
+                    "Error storing NetworkQuery in db for request_id: {}",
+                    request_id.to_string()
+                );
+                let reply = Ok(Response::new(Ack {
+                    status: ack::Status::Error as i32,
+                    request_id: request_id.to_string(),
+                    message: format!("{:?}", e),
+                }));
+                println!("Sending Ack back to network: {:?}\n", reply);
+                return reply;
+            }
+        }
+
+        let network_query = request.into_inner().clone();
+        let parsed_address = parse_address(network_query.address.to_string());
+        match parsed_address {
+            Ok(address) => {
+                // TODO: verify that host and port are valid
+                // Spawns a child process to handle sending request
+                spawn_send_asset_transfer_request(
+                    conf,
+                    network_query,
+                    request_id.to_string(),
+                    address.location.hostname.to_string(),
+                    address.location.port.to_string()
+                );
+                // Send Ack back to network while request is happening in a thread
+                let reply = Ack {
+                    status: ack::Status::Ok as i32,
+                    request_id: request_id.to_string(),
+                    message: "".to_string(),
+                };
+                println!("Sending Ack back to network: {:?}\n", reply);
+                Ok(Response::new(reply))
+            }
+            Err(e) => {
+                println!("Invalid Address");
+                let reply = Ack {
+                    status: ack::Status::Error as i32,
+                    request_id: request_id.to_string(),
+                    message: format!("Error: {:?}", e),
+                };
+                println!("Sending Ack back to network: {:?}\n", reply);
+                Ok(Response::new(reply))
+            }
+        }
+    }
+
     // Subscribe Event Endpoints
     async fn subscribe_event(&self, request: Request<NetworkEventSubscription>) -> Result<Response<Ack>, Status> {
         println!(
@@ -687,6 +771,167 @@ async fn data_transfer_call(
     });
     println!("Query: {:?}", query_request);
     let response = client.request_state(query_request).await?;
+    Ok(response)
+}
+
+// Sends a request to the remote relay
+fn spawn_send_asset_transfer_request(
+    conf: config::Config,
+    network_query: NetworkQuery,
+    request_id: String,
+    relay_host: String,
+    relay_port: String,
+) {
+    println!("Sending Query to remote relay: {:?}:{:?}", relay_host, relay_port);
+    // Locally scoped function to update request status in db. This function is
+    // called for the first time after an Ack is received from the remote relay.
+    // A locally created RequestState with status Pending or Error is stored.
+    // When a response is received from the remote relay it will write the
+    // returned RequestState with status Completed or Error.
+    fn update_request_status(
+        curr_request_id: String,
+        new_status: request_state::Status,
+        curr_db_path: String,
+        db_open_max_retries: u32,
+        db_open_retry_backoff_msec: u32,
+        state: Option<request_state::State>,
+    ) {
+        let db = Database {
+            db_path: curr_db_path,
+            db_open_max_retries: db_open_max_retries,
+            db_open_retry_backoff_msec: db_open_retry_backoff_msec,
+        };
+        let target: RequestState = RequestState {
+            status: new_status as i32,
+            request_id: curr_request_id.clone(),
+            state,
+        };
+
+        // Panic if this fails, atm the panic is just logged by the tokio runtime
+        db.set(&curr_request_id, &target)
+            .expect("Failed to insert into DB");
+        println!("Successfully written RequestState to database");
+        println!("{:?}\n", db.get::<RequestState>(curr_request_id).unwrap())
+    }
+    // Spawning new thread to make the data_transfer_call to remote relay
+    tokio::spawn(async move {
+        let db_path = conf.get_str("db_path").unwrap();
+
+        // Iterate through the relay entries in the configuration to find a match
+        let relays_table = conf.get_table("relays").unwrap();
+        let mut relay_tls = false;
+        let mut relay_tlsca_cert_path = "".to_string();
+        for (_relay_name, relay_spec) in relays_table {
+            let relay_uri = relay_spec.clone().try_into::<LocationSegment>().unwrap();
+            if relay_host == relay_uri.hostname && relay_port == relay_uri.port {
+                relay_tls = relay_uri.tls;
+                relay_tlsca_cert_path = relay_uri.tlsca_cert_path;
+            }
+        }
+
+        let result = asset_transfer_call(
+            conf.get_str("name").unwrap(),
+            relay_host,
+            relay_port,
+            network_query,
+            request_id.clone(),
+            relay_tls,
+            relay_tlsca_cert_path.to_string(),
+        )
+        .await;
+        println!("Received Ack from remote relay: {:?}\n", result);
+        // Potentially clean up when more skilled at Rust.
+        // Updates the request in the DB depending on the response status from the remote relay
+        match result {
+            Ok(ack_response) => {
+                let ack_response_into_inner = ack_response.into_inner().clone();
+                // This match first checks if the status is valid.
+                match ack::Status::from_i32(ack_response_into_inner.status) {
+                    Some(status) => match status {
+                        ack::Status::Ok => update_request_status(
+                            request_id.to_string(),
+                            request_state::Status::Pending,
+                            db_path.to_string(),
+                            conf.get_int("db_open_max_retries").unwrap_or(500) as u32,
+                            conf.get_int("db_open_retry_backoff_msec").unwrap_or(10) as u32,
+                            None,
+                        ),
+                        ack::Status::Error => update_request_status(
+                            request_id.to_string(),
+                            request_state::Status::Error,
+                            db_path.to_string(),
+                            conf.get_int("db_open_max_retries").unwrap_or(500) as u32,
+                            conf.get_int("db_open_retry_backoff_msec").unwrap_or(10) as u32,
+                            Some(request_state::State::Error(
+                                ack_response_into_inner.message.to_string(),
+                            )),
+                        ),
+                    },
+                    None => update_request_status(
+                        request_id.to_string(),
+                        request_state::Status::Error,
+                        db_path.to_string(),
+                        conf.get_int("db_open_max_retries").unwrap_or(500) as u32,
+                        conf.get_int("db_open_retry_backoff_msec").unwrap_or(10) as u32,
+                        Some(request_state::State::Error(
+                            "Status is not supported or is invalid".to_string(),
+                        )),
+                    ),
+                }
+            }
+            Err(result_error) => update_request_status(
+                request_id.to_string(),
+                request_state::Status::Error,
+                db_path.to_string(),
+                conf.get_int("db_open_max_retries").unwrap_or(500) as u32,
+                conf.get_int("db_open_retry_backoff_msec").unwrap_or(10) as u32,
+                Some(request_state::State::Error(format!("{:?}", result_error))),
+            ),
+        }
+    });
+}
+// Call to remote relay for the data transfer protocol.
+async fn asset_transfer_call(
+    relay_name: String,
+    relay_host: String,
+    relay_port: String,
+    network_query: NetworkQuery,
+    request_id: String,
+    use_tls: bool,
+    tlsca_cert_path: String,
+) -> Result<Response<Ack>, Box<dyn std::error::Error>> {
+    let client_addr = format!("http://{}:{}", relay_host, relay_port);
+    let mut client;
+    if use_tls {
+        let pem = tokio::fs::read(tlsca_cert_path).await?;
+        let ca = Certificate::from_pem(pem);
+
+        let tls = ClientTlsConfig::new()
+            .ca_certificate(ca)
+            .domain_name(relay_host);
+
+        let channel = Channel::from_shared(client_addr)?
+            .tls_config(tls)?
+            .connect()
+            .await?;
+
+        client = AssetTransferClient::new(channel);
+    } else {
+        client = AssetTransferClient::connect(client_addr).await?;
+    }
+    let transfer_commence_request = tonic::Request::new(TransferCommenceRequest {
+        message_type: todo!(),
+        session_id: todo!(),
+        transfer_context_id: todo!(),
+        client_identity_pubkey: todo!(),
+        server_identity_pubkey: todo!(),
+        hash_transfer_init_claims: todo!(),
+        hash_prev_message: todo!(),
+        client_transfer_number: todo!(),
+        client_signature: todo!(),
+    });
+    println!("Transfer commence request: {:?}", transfer_commence_request);
+    let response = client.transfer_commence(transfer_commence_request).await?;
     Ok(response)
 }
 
