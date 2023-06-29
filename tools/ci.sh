@@ -119,8 +119,17 @@ function mainTask()
     yarn configure
   fi
 
-  yarn tools:validate-bundle-names
-  yarn custom-checks
+  if [ "${YARN_TOOLS_VALIDATE_BUNDLE_NAMES_DISABLED:-false}" = "true" ]; then
+    echo "$(date +%FT%T%z) [CI] yarn tools:validate-bundle-names disabled. Skipping..."
+  else
+    yarn tools:validate-bundle-names
+  fi
+
+  if [ "${YARN_CUSTOM_CHECKS_DISABLED:-false}" = "true" ]; then
+    echo "$(date +%FT%T%z) [CI] yarn custom-checks disabled. Skipping..."
+  else
+    yarn custom-checks
+  fi
 
   if [ "${JEST_TEST_RUNNER_DISABLED:-false}" = "true" ]; then
     echo "$(date +%FT%T%z) [CI] Jest test runner disabled. Skipping..."
