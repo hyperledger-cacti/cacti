@@ -43,10 +43,10 @@
     "lint": "eslint '*/*/src/**/*.{js,ts}' --quiet --fix && cspell \"*/*/src/**/*.{js,ts}\"",
     "tsc": "tsc --build --verbose",
     "codegen": "lerna run codegen",
-    "precodegen": "npm-run-all --sequential --continue-on-error --print-label --print-name codegen:warmup-*",
-    "postcodegen": "rm --force --verbose ./openapitools.json",
-    "codegen:warmup-v5.2.1": "yarn openapi-generator-cli version-manager set 5.2.1",
-    "codegen:warmup-v6.3.0": "yarn openapi-generator-cli version-manager set 6.3.0",
+    "precodegen": "npm-run-all --sequential --continue-on-error --print-label --print-name 'codegen:warmup-*'",
+    "codegen:warmup-mkdir": "make-dir ./node_modules/@openapitools/openapi-generator-cli/versions/",
+    "codegen:warmup-v5.2.1": "nwget https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/5.2.1/openapi-generator-cli-5.2.1.jar -O ./node_modules/@openapitools/openapi-generator-cli/versions/5.2.1.jar",
+    "codegen:warmup-v6.3.0": "nwget https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/6.3.0/openapi-generator-cli-6.3.0.jar -O ./node_modules/@openapitools/openapi-generator-cli/versions/6.3.0.jar",
     "watch-other": "lerna run --parallel watch",
     "watch-tsc": "tsc --build --watch",
     "watch": "run-p -r watch-*",
@@ -54,7 +54,7 @@
     "build:prod": "npm-run-all build:prod:frontend",
     "build:prod:frontend": "lerna run build:prod:frontend",
     "build:dev": "npm-run-all build:dev:backend webpack:dev:web build:dev:frontend",
-    "build:dev:backend": "npm-run-all lint clean codegen tsc build:dev:backend:postbuild",
+    "build:dev:backend": "npm-run-all tsc build:dev:backend:postbuild",
     "build:dev:frontend": "lerna run build:dev:frontend --scope=\"@hyperledger/cactus-example-supply-chain-frontend\" && lerna run build:dev:frontend --scope=\"@hyperledger/cactus-example-carbon-accounting-frontend\"",
     "build:dev:common": "lerna exec --stream --scope '*/*common' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",
     "build:dev:backend:postbuild": "lerna run build:dev:backend:postbuild",
@@ -159,7 +159,8 @@
     "typescript": "4.7.4",
     "webpack": "5.76.0",
     "webpack-bundle-analyzer": "4.4.2",
-    "webpack-cli": "4.7.2"
+    "webpack-cli": "4.7.2",
+    "wget-improved": "3.4.0"
   },
   "resolutions": {
     "ansi-html": ">0.0.8",
