@@ -70,6 +70,29 @@ pub struct NetworkEventUnsubscription {
     #[prost(string, tag = "2")]
     pub request_id: ::prost::alloc::string::String,
 }
+#[derive(serde::Serialize, serde::Deserialize)]
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct NetworkAssetTransfer {
+    #[prost(string, repeated, tag = "1")]
+    pub policy: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    #[prost(string, tag = "2")]
+    pub address: ::prost::alloc::string::String,
+    #[prost(string, tag = "3")]
+    pub requesting_relay: ::prost::alloc::string::String,
+    #[prost(string, tag = "4")]
+    pub requesting_network: ::prost::alloc::string::String,
+    #[prost(string, tag = "5")]
+    pub certificate: ::prost::alloc::string::String,
+    #[prost(string, tag = "6")]
+    pub requestor_signature: ::prost::alloc::string::String,
+    #[prost(string, tag = "7")]
+    pub nonce: ::prost::alloc::string::String,
+    #[prost(string, tag = "8")]
+    pub requesting_org: ::prost::alloc::string::String,
+    #[prost(bool, tag = "9")]
+    pub confidential: bool,
+}
 /// Generated client implementations.
 pub mod network_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
@@ -208,11 +231,11 @@ pub mod network_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
-        /// Asset Transfer endpoints
-        /// endpoint for a network to request asset transfer to relay state via local relay
+        /// SATP endpoints
+        /// endpoint for a network to request asset transfer to a receiving gateway via local gateway
         pub async fn request_asset_transfer(
             &mut self,
-            request: impl tonic::IntoRequest<super::NetworkQuery>,
+            request: impl tonic::IntoRequest<super::NetworkAssetTransfer>,
         ) -> Result<
             tonic::Response<super::super::super::common::ack::Ack>,
             tonic::Status,
@@ -357,11 +380,11 @@ pub mod network_server {
             &self,
             request: tonic::Request<super::DbName>,
         ) -> Result<tonic::Response<super::RelayDatabase>, tonic::Status>;
-        /// Asset Transfer endpoints
-        /// endpoint for a network to request asset transfer to relay state via local relay
+        /// SATP endpoints
+        /// endpoint for a network to request asset transfer to a receiving gateway via local gateway
         async fn request_asset_transfer(
             &self,
-            request: tonic::Request<super::NetworkQuery>,
+            request: tonic::Request<super::NetworkAssetTransfer>,
         ) -> Result<
             tonic::Response<super::super::super::common::ack::Ack>,
             tonic::Status,
@@ -577,7 +600,9 @@ pub mod network_server {
                 "/networks.networks.Network/RequestAssetTransfer" => {
                     #[allow(non_camel_case_types)]
                     struct RequestAssetTransferSvc<T: Network>(pub Arc<T>);
-                    impl<T: Network> tonic::server::UnaryService<super::NetworkQuery>
+                    impl<
+                        T: Network,
+                    > tonic::server::UnaryService<super::NetworkAssetTransfer>
                     for RequestAssetTransferSvc<T> {
                         type Response = super::super::super::common::ack::Ack;
                         type Future = BoxFuture<
@@ -586,7 +611,7 @@ pub mod network_server {
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::NetworkQuery>,
+                            request: tonic::Request<super::NetworkAssetTransfer>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
                             let fut = async move {

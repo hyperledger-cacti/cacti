@@ -209,7 +209,7 @@ pub mod satp_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/relay.asset_transfer.SATP/TransferCommence",
+                "/relay.satp.SATP/TransferCommence",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
@@ -233,7 +233,7 @@ pub mod satp_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/relay.asset_transfer.SATP/CommenceResponse",
+                "/relay.satp.SATP/CommenceResponse",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
@@ -258,7 +258,7 @@ pub mod satp_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/relay.asset_transfer.SATP/LockAssertion",
+                "/relay.satp.SATP/LockAssertion",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
@@ -282,7 +282,7 @@ pub mod satp_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/relay.asset_transfer.SATP/LockAssertionReceipt",
+                "/relay.satp.SATP/LockAssertionReceipt",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
@@ -392,7 +392,7 @@ pub mod satp_server {
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             let inner = self.inner.clone();
             match req.uri().path() {
-                "/relay.asset_transfer.SATP/TransferCommence" => {
+                "/relay.satp.SATP/TransferCommence" => {
                     #[allow(non_camel_case_types)]
                     struct TransferCommenceSvc<T: Satp>(pub Arc<T>);
                     impl<
@@ -432,7 +432,7 @@ pub mod satp_server {
                     };
                     Box::pin(fut)
                 }
-                "/relay.asset_transfer.SATP/CommenceResponse" => {
+                "/relay.satp.SATP/CommenceResponse" => {
                     #[allow(non_camel_case_types)]
                     struct CommenceResponseSvc<T: Satp>(pub Arc<T>);
                     impl<
@@ -472,7 +472,7 @@ pub mod satp_server {
                     };
                     Box::pin(fut)
                 }
-                "/relay.asset_transfer.SATP/LockAssertion" => {
+                "/relay.satp.SATP/LockAssertion" => {
                     #[allow(non_camel_case_types)]
                     struct LockAssertionSvc<T: Satp>(pub Arc<T>);
                     impl<
@@ -512,7 +512,7 @@ pub mod satp_server {
                     };
                     Box::pin(fut)
                 }
-                "/relay.asset_transfer.SATP/LockAssertionReceipt" => {
+                "/relay.satp.SATP/LockAssertionReceipt" => {
                     #[allow(non_camel_case_types)]
                     struct LockAssertionReceiptSvc<T: Satp>(pub Arc<T>);
                     impl<
@@ -588,6 +588,6 @@ pub mod satp_server {
         }
     }
     impl<T: Satp> tonic::server::NamedService for SatpServer<T> {
-        const NAME: &'static str = "relay.asset_transfer.SATP";
+        const NAME: &'static str = "relay.satp.SATP";
     }
 }

@@ -1,13 +1,15 @@
 // Internal generated modules
 use weaverpb::common::ack::{ack, Ack};
-use weaverpb::relay::asset_transfer::asset_transfer_client::AssetTransferClient;
-use weaverpb::relay::asset_transfer::asset_transfer_server::AssetTransfer;
-use weaverpb::relay::asset_transfer::{TransferCommenceRequest, CommenceResponseRequest, LockAssertionRequest, LockAssertionReceiptRequest};
+use weaverpb::common::query::Query;
+use weaverpb::relay::satp::satp_client::SatpClient;
+use weaverpb::relay::satp::satp_server::Satp;
+use weaverpb::relay::satp::{TransferCommenceRequest, CommenceResponseRequest, LockAssertionRequest, LockAssertionReceiptRequest};
 
 // Internal modules
 use crate::db::Database;
 use crate::error::Error;
 use crate::relay_proto::{LocationSegment};
+use crate::services::satp_helper::log_request_in_remote_sapt_db;
 
 // external modules
 use config;
@@ -16,15 +18,17 @@ use tonic::{Request, Response, Status};
 
 use tonic::transport::{Certificate, Channel, ClientTlsConfig};
 
+use super::satp_helper::create_commence_response_request;
+
 #[derive(Debug, Default)]
-pub struct AssetTransferService {
+pub struct SatpService {
     pub config_lock: RwLock<config::Config>,
 }
 
 /// AssetTransferService is the gRPC server implementation that handles the logic for
 /// communication of the asset transfer protocol SATP between two gateways.
 #[tonic::async_trait]
-impl AssetTransfer for AssetTransferService {
+impl Satp for SatpService {
     /// transfer_commence is run on the receiver gateway to allow the sender gateway to signal to the 
     /// receiver gateway that it is ready to start the transfer of the digital asset
     async fn transfer_commence(
@@ -32,26 +36,46 @@ impl AssetTransfer for AssetTransferService {
         request: Request<TransferCommenceRequest>
     ) -> Result<Response<Ack>, Status> {
         println!(
-            "Got a transfer commence request from {:?} - {:?}",
+            "Got a TransferCommenceRequest from {:?} - {:?}",
             request.remote_addr(),
             request
         );
 
         let transfer_commence_request = request.into_inner().clone();
+        let request_id = transfer_commence_request.session_id.to_string();
         let conf = self.config_lock.read().await;
 
-        // Database access/storage
-        let remote_satp_db = Database {
-            db_path: conf.get_str("satp_db_path").unwrap(),
-            db_open_max_retries: conf.get_int("db_open_max_retries").unwrap_or(500) as u32,
-            db_open_retry_backoff_msec: conf
-                .get_int("db_open_retry_backoff_msec")
-                .unwrap_or(10) as u32,
-        };
-        // TODO replace the session_id with request_id
-        let request_id = transfer_commence_request.session_id.to_string();
+        let request_logged: Result<Option<sled::IVec>, crate::error::Error> = log_request_in_remote_sapt_db(&request_id, &transfer_commence_request, conf.clone());
+        match request_logged {
+            Ok(_) => println!(
+                "Successfully stored TransferCommenceRequest in local satp_db with request_id: {}",
+                request_id
+            ),
+            Err(e) => {
+                // Internal failure of sled. Send Error response
+                println!(
+                    "Error storing TransferCommenceRequest in local satp_db for request_id: {}",
+                    request_id
+                );
+                let reply = Ok(Response::new(Ack {
+                    status: ack::Status::Error as i32,
+                    request_id: request_id,
+                    message: format!("Error storing TransferCommenceRequest in local satp_db {:?}", e),
+                }));
+                println!("Sending Ack back with an error to network of the asset transfer request: {:?}\n", reply);
+                return reply;
+            }
+        }
 
-        match transfer_commence_helper(remote_satp_db, &request_id, transfer_commence_request, conf.clone()) {
+        // // Database access/storage
+        // let remote_satp_db = Database {
+        //     db_path: conf.get_str("db_satp_path").unwrap(),
+        //     db_open_max_retries: conf.get_int("db_open_max_retries").unwrap_or(500) as u32,
+        //     db_open_retry_backoff_msec: conf
+        //         .get_int("db_open_retry_backoff_msec")
+        //         .unwrap_or(10) as u32,
+        // };
+        match transfer_commence_helper(transfer_commence_request, conf.clone()) {
             Ok(ack) => {
                 let reply = Ok(Response::new(ack));
                 println!("Sending Ack of transfer commence request back: {:?}\n", reply);
@@ -135,24 +159,19 @@ impl AssetTransfer for AssetTransferService {
     }
 }
 
-/// transfer_commence_helper is run on the receiving gateway to initiate asset transfer protocol that was
-/// requested from the requesting gateway
+/// transfer_commence_helper is run on the receiver gateway to initiate asset transfer protocol that was
+/// requested from the sender gateway
 pub fn transfer_commence_helper(
-    remote_satp_db: Database,
-    request_id: &String,
     transfer_commence_request: TransferCommenceRequest,
     conf: config::Config
 ) -> Result<Ack, Error> {
  
-    let _set_query = remote_satp_db
-        .set(&request_id.to_string(), &transfer_commence_request)
-        .map_err(|e| Error::Simple(format!("DB Failure: {:?}", e)))?;
-
+    let request_id = transfer_commence_request.session_id.to_string();
     let is_valid_request = check_transfer_commence_request(transfer_commence_request.clone());
     
     if is_valid_request {
         println!("The transfer commence request is valid\n");
-        match send_commence_response_helper(&request_id, remote_satp_db, conf) {
+        match send_commence_response_helper(&request_id, conf) {
             Ok(ack) => {
                 println!("Ack transfer commence request.");
                 let reply = Ok(ack);
@@ -168,7 +187,6 @@ pub fn transfer_commence_helper(
                 });
             }
         }
-
     } else {
         println!("The transfer commence request is invalid\n");
         return Ok(Ack {
@@ -181,32 +199,17 @@ pub fn transfer_commence_helper(
 
 fn send_commence_response_helper(
     request_id: &String,
-    remote_satp_db: Database,
     conf: config::Config
 ) -> Result<Ack, Error> {
-    let transfer_commence_request: TransferCommenceRequest = remote_satp_db
-        .get::<TransferCommenceRequest>(request_id.to_string())
-        .map_err(|e| Error::GetQuery(format!("Failed to get transfer commence request from db. Error: {:?}", e)))?;
+    let query: Query = remote_satp_db
+        .get::<Query>(request_id.to_string())
+        .map_err(|e| Error::GetQuery(format!("Failed to get query from db. Error: {:?}", e)))?;
     let relays_table = conf.get_table("relays")?;
-    // let relay_uri = relays_table
-    //     .get(&transfer_commence_request.requesting_relay.to_string())
-    //     .ok_or(Error::Simple("Relay name not found".to_string()))?;
-    // TODO: 
     let relay_uri = relays_table
-        .get(&"Dummy_Relay".to_string())
+        .get(&query.requesting_relay.to_string())
         .ok_or(Error::Simple("Relay name not found".to_string()))?;
     let uri = relay_uri.clone().try_into::<LocationSegment>()?;
-
-    let commence_response_request = CommenceResponseRequest {
-        message_type: "message_type1".to_string(),
-        session_id: "session_id1".to_string(),
-        transfer_context_id: "transfer_context_id1".to_string(),
-        client_identity_pubkey: "client_identity_pubkey1".to_string(),
-        server_identity_pubkey: "server_identity_pubkey1".to_string(),
-        hash_prev_message: "hash_prev_message1".to_string(),
-        server_transfer_number: "server_transfer_number1".to_string(),
-        server_signature: "server_signature1".to_string(),
-    };
+    let commence_response_request = create_commence_response_request();
 
     spawn_send_commence_response(
         commence_response_request,
@@ -231,7 +234,7 @@ fn spawn_send_commence_response(commence_response_request: CommenceResponseReque
         //     view_payload::State::View(v) => println!("View Meta: {:?}, View Data: {:?}", v.meta, base64::encode(&v.data)),
         //     view_payload::State::Error(e) => println!("Error: {:?}", e),
         // }
-        let client_addr = format!("http://{}:{}", requestor_host, requester_port);
+        let satp_client_addr = format!("http://{}:{}", requestor_host, requester_port);
         if use_tls {
             let pem = tokio::fs::read(tlsca_cert_path).await.unwrap();
             let ca = Certificate::from_pem(pem);
@@ -240,20 +243,20 @@ fn spawn_send_commence_response(commence_response_request: CommenceResponseReque
                 .ca_certificate(ca)
                 .domain_name(requestor_host);
 
-            let channel = Channel::from_shared(client_addr.to_string()).unwrap()
-                .tls_config(tls).expect(&format!("Error in TLS configuration for client: {}", client_addr.to_string()))
+            let channel = Channel::from_shared(satp_client_addr.to_string()).unwrap()
+                .tls_config(tls).expect(&format!("Error in TLS configuration for client: {}", satp_client_addr.to_string()))
                 .connect()
                 .await
                 .unwrap();
 
-            let mut client_result = AssetTransferClient::new(channel);
-            let response = client_result.commence_response(commence_response_request).await;
+            let mut satp_client_result = SatpClient::new(channel);
+            let response = satp_client_result.commence_response(commence_response_request).await;
             println!("Response ACK from sending gateway={:?}\n", response);
         } else {
-            let client_result = AssetTransferClient::connect(client_addr).await;
-            match client_result {
-                Ok(client) => {
-                    let response = client.clone().commence_response(commence_response_request).await;
+            let satp_client_result = SatpClient::connect(satp_client_addr).await;
+            match satp_client_result {
+                Ok(satp_client) => {
+                    let response = satp_client.clone().commence_response(commence_response_request).await;
                     println!("Response ACK from sending gateway={:?}\n", response);
                     // Not returning anything here
                 }
@@ -273,5 +276,6 @@ fn spawn_send_commence_response(commence_response_request: CommenceResponseReque
 }
 
 fn check_transfer_commence_request(transfer_commence_request: TransferCommenceRequest) -> bool {
+    //TODO
     true
 }

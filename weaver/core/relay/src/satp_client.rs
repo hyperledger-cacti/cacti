@@ -1,15 +1,8 @@
 mod relay_proto;
-use futures::future::{BoxFuture, FutureExt};
-use weaverpb::common::ack::ack;
-use weaverpb::common::state::{request_state, view_payload, ViewPayload, View, Meta, meta};
-use weaverpb::common::events::{event_subscription_state, EventMatcher, EventPublication, event_publication, ContractTransaction};
-use weaverpb::relay::events::{event_publish_client::EventPublishClient};
-use weaverpb::networks::networks::{network_client::NetworkClient, GetStateMessage, NetworkQuery, NetworkEventSubscription, NetworkEventUnsubscription};
 use relay_proto::get_url;
 use std::env;
-use std::thread::sleep;
-use std::time;
-use serde_json;
+use weaverpb::common::ack::ack;
+use weaverpb::networks::networks::{network_client::NetworkClient, NetworkAssetTransfer};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -25,10 +18,10 @@ async fn asset_transfer() -> Result<(), Box<dyn std::error::Error>> {
     // localhost:9081/Corda_Network/test
     // {locationsegment}/{Network_id}/{query}
     // localhost:9081/Corda_Network/mychannel:simplestate:read:TestState
-    let request = tonic::Request::new(NetworkQuery {
+    let request = tonic::Request::new(NetworkAssetTransfer {
         policy: vec!["test".to_string()],
         address: args[2].to_string(),
-        requesting_relay: "".to_string(),
+        requesting_relay: "Dummy_relay".to_string(),
         requesting_network: "".to_string(),
         requesting_org: "".to_string(),
         certificate: "test".to_string(),
@@ -42,7 +35,7 @@ async fn asset_transfer() -> Result<(), Box<dyn std::error::Error>> {
     match ack::Status::from_i32(response.get_ref().status) {
         Some(ack_status) => match ack_status {
             ack::Status::Ok => {
-                //poll_for_asset_state(request_id.to_string(), network_client, 0).await;
+                // TODO poll for asset transfer status
                 println!("Asset Transfer: Success!");
             }
             ack::Status::Error => {

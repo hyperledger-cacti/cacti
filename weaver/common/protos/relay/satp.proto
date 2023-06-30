@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package relay.asset_transfer;
+package relay.satp;
 
 import "common/ack.proto";
 import "common/state.proto";
@@ -9,7 +9,7 @@ import "common/query.proto";
 option java_package = "org.hyperledger.cacti.weaver.protos.relay.datatransfer";
 option go_package = "github.com/hyperledger/cacti/weaver/common/protos-go/v2/relay";
 
-service AssetTransfer {
+service SATP {
   // Stage 2 endpoints
 
   // The sender gateway sends a TransferCommence request to signal to the receiver gateway 
