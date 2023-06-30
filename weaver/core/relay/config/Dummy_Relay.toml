@@ -2,8 +2,10 @@ name = "Dummy_Relay"
 port="9085"
 hostname="localhost"
 db_path="db/Dummy_Relay/requests"
+satp_db_path="satp_db/Dummy_Relay/requests"
 # This will be replaced by the task queue.
 remote_db_path="db/Dummy_Relay/remote_request"
+remote_satp_db_path="satp_db/Dummy_Relay/remote_request"
 # max retries opening sled db if it is locked
 db_open_max_retries=500
 # retry back off time in ms if sled db is locked

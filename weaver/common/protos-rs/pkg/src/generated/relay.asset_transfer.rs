@@ -1,7 +1,7 @@
 #[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct AssetTransferInitializationClaim {
+pub struct AssetTransferInitializationClaims {
     #[prost(string, tag = "1")]
     pub asset_asset_id: ::prost::alloc::string::String,
     #[prost(string, tag = "2")]
@@ -47,6 +47,7 @@ pub struct TransferCommenceRequest {
     pub hash_prev_message: ::prost::alloc::string::String,
     #[prost(string, tag = "8")]
     pub client_transfer_number: ::prost::alloc::string::String,
+    /// AssetTransferInitializationClaims asset_transfer_initialization_claims = 10;
     #[prost(string, tag = "9")]
     pub client_signature: ::prost::alloc::string::String,
 }

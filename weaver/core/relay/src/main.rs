@@ -1,11 +1,13 @@
 // Internal generated modules
 use weaverpb::networks::networks::network_server::NetworkServer;
+use weaverpb::relay::asset_transfer::asset_transfer_server::AssetTransferServer;
 use weaverpb::relay::datatransfer::data_transfer_server::DataTransferServer;
 use weaverpb::relay::events::event_subscribe_server::EventSubscribeServer;
 use weaverpb::relay::events::event_publish_server::EventPublishServer;
 
 // Internal modules
 use services::data_transfer_service::DataTransferService;
+use services::asset_transfer_service::AssetTransferService;
 use services::event_subscribe_service::EventSubscribeService;
 use services::event_publish_service::EventPublishService;
 use services::network_service::NetworkService;
@@ -54,6 +56,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let relay = DataTransferService {
         config_lock: RwLock::new(settings.clone()),
     };
+    let gateway = AssetTransferService {
+        config_lock: RwLock::new(settings.clone()),
+    };
     let event_subscribe = EventSubscribeService {
         config_lock: RwLock::new(settings.clone()),
     };
@@ -73,6 +78,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         let server = Server::builder()
             .tls_config(ServerTlsConfig::new().identity(identity))?
             .add_service(DataTransferServer::new(relay))
+            .add_service(AssetTransferServer::new(gateway))
             .add_service(EventSubscribeServer::new(event_subscribe))
             .add_service(EventPublishServer::new(event_publish))
             .add_service(NetworkServer::new(network));
@@ -81,6 +87,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         // Spins up two gRPC services in a tonic server. One for relay to relay and one for network to relay communication.
         let server = Server::builder()
             .add_service(DataTransferServer::new(relay))
+            .add_service(AssetTransferServer::new(gateway))
             .add_service(EventSubscribeServer::new(event_subscribe))
             .add_service(EventPublishServer::new(event_publish))
             .add_service(NetworkServer::new(network));

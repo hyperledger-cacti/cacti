@@ -30,7 +30,7 @@ service AssetTransfer {
   rpc LockAssertionReceipt(LockAssertionReceiptRequest) returns (common.ack.Ack) {};
 }
   
-message AssetTransferInitializationClaim {
+message AssetTransferInitializationClaims {
   string asset_asset_id = 1;
   string asset_profile_id = 2;
   string verified_originator_entity_id = 3;
@@ -55,6 +55,7 @@ message TransferCommenceRequest {
   string hash_prev_message = 7;
   string client_transfer_number = 8;
   string client_signature = 9;
+  // AssetTransferInitializationClaims asset_transfer_initialization_claims = 10;
 }
 
 message CommenceResponseRequest {
