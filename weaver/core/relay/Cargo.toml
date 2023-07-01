@@ -11,6 +11,11 @@ path = "src/main.rs"
 [[bin]]
 name = "client"
 path = "src/client.rs"
+
+[[bin]]
+name = "satp_client"
+path = "src/satp_client.rs"
+
 [[bin]]
 name = "client-tls"
 path = "src/client_tls.rs"

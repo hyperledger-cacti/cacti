@@ -1,6 +1,7 @@
 // Internal generated modules
 use weaverpb::common::ack::{ack, Ack};
 use weaverpb::common::query::Query;
+use weaverpb::networks::networks::NetworkAssetTransfer;
 use weaverpb::relay::satp::satp_client::SatpClient;
 use weaverpb::relay::satp::satp_server::Satp;
 use weaverpb::relay::satp::{TransferCommenceRequest, CommenceResponseRequest, LockAssertionRequest, LockAssertionReceiptRequest};
@@ -18,7 +19,7 @@ use tonic::{Request, Response, Status};
 
 use tonic::transport::{Certificate, Channel, ClientTlsConfig};
 
-use super::satp_helper::create_commence_response_request;
+use super::satp_helper::{create_commence_response_request, get_request_from_remote_sapt_db, get_requesting_relay};
 
 #[derive(Debug, Default)]
 pub struct SatpService {
@@ -35,32 +36,29 @@ impl Satp for SatpService {
         &self,
         request: Request<TransferCommenceRequest>
     ) -> Result<Response<Ack>, Status> {
-        println!(
-            "Got a TransferCommenceRequest from {:?} - {:?}",
-            request.remote_addr(),
-            request
-        );
+        println!("Got a TransferCommenceRequest from {:?} - {:?}", request.remote_addr(), request);
 
         let transfer_commence_request = request.into_inner().clone();
         let request_id = transfer_commence_request.session_id.to_string();
         let conf = self.config_lock.read().await;
 
-        let request_logged: Result<Option<sled::IVec>, crate::error::Error> = log_request_in_remote_sapt_db(&request_id, &transfer_commence_request, conf.clone());
+        // TODO refactor
+        let request_logged: Result<Option<sled::IVec>, Error> = log_request_in_remote_sapt_db(&request_id, &transfer_commence_request, conf.clone());
         match request_logged {
             Ok(_) => println!(
-                "Successfully stored TransferCommenceRequest in local satp_db with request_id: {}",
+                "Successfully stored TransferCommenceRequest in remote satp_db with request_id: {}",
                 request_id
             ),
             Err(e) => {
                 // Internal failure of sled. Send Error response
                 println!(
-                    "Error storing TransferCommenceRequest in local satp_db for request_id: {}",
+                    "Error storing TransferCommenceRequest in remote satp_db for request_id: {}",
                     request_id
                 );
                 let reply = Ok(Response::new(Ack {
                     status: ack::Status::Error as i32,
                     request_id: request_id,
-                    message: format!("Error storing TransferCommenceRequest in local satp_db {:?}", e),
+                    message: format!("Error storing TransferCommenceRequest in remote satp_db {:?}", e),
                 }));
                 println!("Sending Ack back with an error to network of the asset transfer request: {:?}\n", reply);
                 return reply;
@@ -107,6 +105,32 @@ impl Satp for SatpService {
             request
         );
 
+        let commence_response_request = request.into_inner().clone();
+        let request_id = commence_response_request.session_id.to_string();
+        let conf = self.config_lock.read().await;
+
+        // TODO refactor
+        let request_logged: Result<Option<sled::IVec>, Error> = log_request_in_remote_sapt_db(&request_id, &commence_response_request, conf.clone());
+        match request_logged {
+            Ok(_) => println!(
+                "Successfully stored CommenceResponseRequest in remote satp_db with request_id: {}",
+                request_id
+            ),
+            Err(e) => {
+                // Internal failure of sled. Send Error response
+                println!(
+                    "Error storing CommenceResponseRequest in remote satp_db for request_id: {}",
+                    request_id
+                );
+                let reply = Ok(Response::new(Ack {
+                    status: ack::Status::Error as i32,
+                    request_id: request_id,
+                    message: format!("Error storing CommenceResponseRequest in remote satp_db {:?}", e),
+                }));
+                println!("Sending Ack back with an error to network of the asset transfer request: {:?}\n", reply);
+                return reply;
+            }
+        }
         let reply = Ok(
             Response::new(Ack {
                 status: ack::Status::Error as i32,
@@ -171,7 +195,7 @@ pub fn transfer_commence_helper(
     
     if is_valid_request {
         println!("The transfer commence request is valid\n");
-        match send_commence_response_helper(&request_id, conf) {
+        match send_commence_response_helper(transfer_commence_request, conf) {
             Ok(ack) => {
                 println!("Ack transfer commence request.");
                 let reply = Ok(ack);
@@ -198,18 +222,23 @@ pub fn transfer_commence_helper(
 }
 
 fn send_commence_response_helper(
-    request_id: &String,
+    transfer_commence_request: TransferCommenceRequest,
     conf: config::Config
 ) -> Result<Ack, Error> {
-    let query: Query = remote_satp_db
-        .get::<Query>(request_id.to_string())
-        .map_err(|e| Error::GetQuery(format!("Failed to get query from db. Error: {:?}", e)))?;
+
+    let request_id = &transfer_commence_request.session_id.to_string();
+    // let network_asset_transfer: Result<NetworkAssetTransfer, Error> = get_request_from_remote_sapt_db(request_id, conf.clone());
+
+    // let query: Query = remote_satp_db
+    //     .get::<Query>(request_id.to_string())
+    //     .map_err(|e| Error::GetQuery(format!("Failed to get query from db. Error: {:?}", e)))?;
     let relays_table = conf.get_table("relays")?;
+    let requesting_relay = get_requesting_relay(transfer_commence_request.clone());
     let relay_uri = relays_table
-        .get(&query.requesting_relay.to_string())
+        .get(&requesting_relay.to_string())
         .ok_or(Error::Simple("Relay name not found".to_string()))?;
     let uri = relay_uri.clone().try_into::<LocationSegment>()?;
-    let commence_response_request = create_commence_response_request();
+    let commence_response_request = create_commence_response_request(transfer_commence_request.clone());
 
     spawn_send_commence_response(
         commence_response_request,

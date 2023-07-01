@@ -1,5 +1,6 @@
 use std::error::Error;
 
+use futures::TryFutureExt;
 // Internal generated modules
 use weaverpb::common::ack::{ack, Ack};
 use weaverpb::common::query::Query;
@@ -15,7 +16,7 @@ use crate::relay_proto::{parse_address, LocationSegment};
 // Internal modules
 use crate::db::Database;
 use crate::services::helpers::{update_event_subscription_status, driver_sign_subscription_helper, try_mark_request_state_deleted, mark_event_states_deleted, delete_event_pub_spec, get_event_publication_key, get_event_subscription_key};
-use crate::services::satp_helper::{derive_transfer_commence_request, log_request_state_in_local_sapt_db, log_request_in_local_sapt_db, update_request_state_in_local_satp_db};
+use crate::services::satp_helper::{derive_transfer_commence_request, log_request_state_in_local_sapt_db, log_request_in_local_sapt_db, update_request_state_in_local_satp_db, get_relay_params, create_satp_client};
 
 // External modules
 use config::{self, Config};
@@ -801,26 +802,9 @@ fn spawn_send_asset_transfer_request(
     relay_port: String,
 ) {
     println!("Sending asset transfer request to receiving gateway: {:?}:{:?}", relay_host, relay_port);
-    // Locally scoped function to update request status in db. This function is
-    // called for the first time after an Ack is received from the receiving gateway.
-    // A locally created RequestState with status Pending or Error is stored.
-    // When a response is received from the receiving gateway it will write the
-    // returned RequestState with status Completed or Error.
-
     // Spawning new thread to make the data_transfer_call to receiving gateway
     tokio::spawn(async move {
-        // Iterate through the relay entries in the configuration to find a match
-        let relays_table = conf.get_table("relays").unwrap();
-        let mut relay_tls = false;
-        let mut relay_tlsca_cert_path = "".to_string();
-        for (_relay_name, relay_spec) in relays_table {
-            let relay_uri = relay_spec.clone().try_into::<LocationSegment>().unwrap();
-            if relay_host == relay_uri.hostname && relay_port == relay_uri.port {
-                relay_tls = relay_uri.tls;
-                relay_tlsca_cert_path = relay_uri.tlsca_cert_path;
-            }
-        }
-
+        let (relay_tls, relay_tlsca_cert_path) = get_relay_params(relay_host.clone(), relay_port.clone(), conf.clone());
         let request_id = transfer_commence_request.session_id.to_string();
         let result = asset_transfer_call(
             relay_host,
@@ -883,31 +867,11 @@ async fn asset_transfer_call(
     use_tls: bool,
     tlsca_cert_path: String,
 ) -> Result<Response<Ack>, Box<dyn std::error::Error>> {
-    let client_addr = format!("http://{}:{}", relay_host, relay_port);
-    let mut satp_client;
-    if use_tls {
-        let pem = tokio::fs::read(tlsca_cert_path).await?;
-        let ca = Certificate::from_pem(pem);
-
-        let tls = ClientTlsConfig::new()
-            .ca_certificate(ca)
-            .domain_name(relay_host);
-
-        let channel = Channel::from_shared(client_addr)?
-            .tls_config(tls)?
-            .connect()
-            .await?;
-
-        satp_client = SatpClient::new(channel);
-    } else {
-        satp_client = SatpClient::connect(client_addr).await?;
-    }
-
+    let satp_client: Result<SatpClient<Channel>, _> = create_satp_client(relay_host, relay_port, use_tls, tlsca_cert_path).await;
     println!("Transfer commence request: {:?}", transfer_commence_request);
-    let response = satp_client.transfer_commence(transfer_commence_request).await?;
+    let response = satp_client.unwrap().transfer_commence(transfer_commence_request);
     Ok(response)
 }
-
 
 // Sends a request to the remote relay
 fn spawn_send_event_subscription_request(
