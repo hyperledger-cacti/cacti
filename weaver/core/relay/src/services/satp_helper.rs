@@ -127,6 +127,17 @@ pub fn log_result(request_id: &String, result: Result<Response<Ack>, Box<dyn std
     }
 }
 
+pub fn create_ack_error_message(request_id: String, error_message: String, e: Error) -> Result<tonic::Response<Ack>, tonic::Status> {
+    println!("{}: {}", error_message, request_id);
+    let reply: Result<Response<Ack>, tonic::Status> = Ok(Response::new(Ack {
+        status: ack::Status::Error as i32,
+        request_id: request_id,
+        message: format!("{} {:?}", error_message, e),
+    }));
+    println!("Sending Ack back with an error: {:?}\n", reply);
+    return reply;
+}
+
 pub fn derive_transfer_commence_request(network_asset_transfer: NetworkAssetTransfer) -> TransferCommenceRequest {
     let session_id = "to_be_calculated_session_id"; 
     let transfer_commence_request = TransferCommenceRequest {

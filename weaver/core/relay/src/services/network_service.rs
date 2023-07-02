@@ -1,6 +1,3 @@
-use std::error::Error;
-
-use futures::TryFutureExt;
 // Internal generated modules
 use weaverpb::common::ack::{ack, Ack};
 use weaverpb::common::query::Query;
@@ -8,18 +5,17 @@ use weaverpb::common::state::{request_state, RequestState};
 use weaverpb::common::events::{EventSubscription, event_subscription_state, EventSubscriptionState, EventSubOperation, event_publication, EventPublication, EventStates};
 use weaverpb::networks::networks::network_server::Network;
 use weaverpb::networks::networks::{DbName, GetStateMessage, NetworkQuery, RelayDatabase, NetworkEventSubscription, NetworkEventUnsubscription, NetworkAssetTransfer};
-use weaverpb::relay::satp::{TransferCommenceRequest, CommenceResponseRequest};
+use weaverpb::relay::satp::{TransferCommenceRequest};
 use weaverpb::relay::datatransfer::data_transfer_client::DataTransferClient;
-use weaverpb::relay::satp::satp_client::SatpClient;
 use weaverpb::relay::events::event_subscribe_client::EventSubscribeClient;
 use crate::relay_proto::{parse_address, LocationSegment};
 // Internal modules
 use crate::db::Database;
 use crate::services::helpers::{update_event_subscription_status, driver_sign_subscription_helper, try_mark_request_state_deleted, mark_event_states_deleted, delete_event_pub_spec, get_event_publication_key, get_event_subscription_key};
-use crate::services::satp_helper::{derive_transfer_commence_request, log_request_state_in_local_sapt_db, log_request_in_local_sapt_db, update_request_state_in_local_satp_db, get_relay_params, create_satp_client, spawn_send_transfer_commence_request};
+use crate::services::satp_helper::{derive_transfer_commence_request, log_request_state_in_local_sapt_db, log_request_in_local_sapt_db, spawn_send_transfer_commence_request};
 
 // External modules
-use config::{self, Config};
+use config::{self};
 use sled::open;
 use tokio::sync::RwLock;
 use tonic::{Code, Request, Response, Status};

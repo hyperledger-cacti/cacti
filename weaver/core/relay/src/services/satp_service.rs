@@ -1,18 +1,15 @@
 // Internal generated modules
 use weaverpb::common::ack::{ack, Ack};
-use weaverpb::relay::satp::satp_client::SatpClient;
 use weaverpb::relay::satp::satp_server::Satp;
 use weaverpb::relay::satp::{TransferCommenceRequest, CommenceResponseRequest, LockAssertionRequest, LockAssertionReceiptRequest};
 
 // Internal modules
 use crate::error::Error;
-use crate::services::satp_helper::{log_request_in_remote_sapt_db, log_request_in_local_sapt_db, create_satp_client, commence_response_call, log_result};
+use crate::services::satp_helper::{log_request_in_remote_sapt_db, log_request_in_local_sapt_db, create_ack_error_message};
 
 // external modules
-use config::{self, Config};
 use tokio::sync::RwLock;
 use tonic::{Request, Response, Status};
-use tonic::transport::{Certificate, Channel, ClientTlsConfig};
 use super::satp_helper::{create_commence_response_request, get_requesting_relay_host_and_port, get_relay_params, spawn_send_commence_response_request};
 
 #[derive(Debug, Default)]
@@ -36,25 +33,14 @@ impl Satp for SatpService {
         let request_id = transfer_commence_request.session_id.to_string();
         let conf = self.config_lock.read().await;
 
-        // TODO refactor
-        let request_logged: Result<Option<sled::IVec>, Error> = log_request_in_remote_sapt_db(&request_id, &transfer_commence_request, conf.clone());
-        match request_logged {
-            Ok(_) => println!(
-                "Successfully stored TransferCommenceRequest in remote satp_db with request_id: {}",
-                request_id
-            ),
+        match log_request_in_remote_sapt_db(&request_id, &transfer_commence_request, conf.clone()) {
+            Ok(_) => {
+                println!("Successfully stored TransferCommenceRequest in remote satp_db with request_id: {}", request_id);
+            },
             Err(e) => {
                 // Internal failure of sled. Send Error response
-                println!(
-                    "Error storing TransferCommenceRequest in remote satp_db for request_id: {}",
-                    request_id
-                );
-                let reply = Ok(Response::new(Ack {
-                    status: ack::Status::Error as i32,
-                    request_id: request_id,
-                    message: format!("Error storing TransferCommenceRequest in remote satp_db {:?}", e),
-                }));
-                println!("Sending Ack back with an error to network of the asset transfer request: {:?}\n", reply);
+                let error_message = "Error storing TransferCommenceRequest in remote satp_db for request_id".to_string();
+                let reply = create_ack_error_message(request_id, error_message, e);
                 return reply;
             }
         }
@@ -66,16 +52,8 @@ impl Satp for SatpService {
                 reply
             }
             Err(e) => {
-                println!("Transfer commence failed.");
-                let reply = Ok(
-                    // TODO: remove the hardcoded value
-                    Response::new(Ack {
-                        status: ack::Status::Error as i32,
-                        request_id: request_id.to_string(),
-                        message: format!("Error: Transfer initiation failed. {:?}", e),
-                    })
-                );
-                println!("Sending back Ack: {:?}\n", reply);
+                let error_message = "Transfer commence failed.".to_string();
+                let reply = create_ack_error_message(request_id, error_message, e);
                 reply
             }
         }
