@@ -115,9 +115,9 @@ pub fn update_request_state_in_local_satp_db(request_id: String, new_status: req
     println!("{:?}\n", db.get::<RequestState>(request_id).unwrap())
 }
 
-pub fn get_requesting_relay(transfer_commence_request: TransferCommenceRequest) -> String {
+pub fn get_requesting_relay_host_and_port(transfer_commence_request: TransferCommenceRequest) -> (String, String) {
     // TODO 
-    return "Dummy_Relay".to_string();
+    return ("localhost".to_string(), "9085".to_string())
 }
 
 pub fn get_relay_params(relay_host: String, relay_port: String, conf: Config) -> (bool, String) {
@@ -154,9 +154,9 @@ pub async fn create_satp_client(relay_host: String, relay_port: String, use_tls:
             .connect()
             .await?;
 
-        satp_client = Ok(SatpClient::new(channel));
+        satp_client = SatpClient::new(channel);
     } else {
-        satp_client = Ok(SatpClient::connect(client_addr).await?);
+        satp_client = SatpClient::connect(client_addr).await?;
     }
-    return satp_client;
+    return Ok(satp_client);
 }

@@ -426,8 +426,8 @@ impl Network for NetworkService {
         );
         let conf = self.config_lock.read().await.clone();
         let network_asset_transfer = request.into_inner().clone();
-        // TODO: request_id should be the hash of network_asset_transfer
-        let request_id = network_asset_transfer.requesting_relay.to_string();
+        let transfer_commence_request: TransferCommenceRequest = derive_transfer_commence_request(network_asset_transfer.clone());
+        let request_id = transfer_commence_request.session_id.to_string();
         // TODO refactor
         let request_logged: Result<Option<sled::IVec>, crate::error::Error> = log_request_in_local_sapt_db(&request_id, &network_asset_transfer, conf.clone());
         match request_logged {
@@ -479,7 +479,6 @@ impl Network for NetworkService {
             }
         }
 
-        let transfer_commence_request: TransferCommenceRequest = derive_transfer_commence_request(network_asset_transfer.clone());
         let parsed_address = parse_address(network_asset_transfer.address.to_string());
         match parsed_address {
             Ok(address) => {
@@ -495,7 +494,7 @@ impl Network for NetworkService {
                 let reply = Ack {
                     status: ack::Status::Ok as i32,
                     request_id: request_id,
-                    message: "".to_string(),
+                    message: "Ack of the asset transfer request".to_string(),
                 };
                 println!("Sending Ack of the asset transfer request back to network: {:?}\n", reply);
                 Ok(Response::new(reply))
@@ -505,7 +504,7 @@ impl Network for NetworkService {
                 let reply = Ack {
                     status: ack::Status::Error as i32,
                     request_id: request_id,
-                    message: format!("Error: {:?}", e),
+                    message: format!("Error: Ack of the asset transfer request {:?}", e),
                 };
                 println!("Sending Ack back with an error to network: {:?}\n", reply);
                 Ok(Response::new(reply))
@@ -798,26 +797,41 @@ async fn data_transfer_call(
 fn spawn_send_asset_transfer_request(
     conf: config::Config,
     transfer_commence_request: TransferCommenceRequest,
-    relay_host: String,
-    relay_port: String,
+    receiver_relay_host: String,
+    receiver_relay_port: String,
 ) {
-    println!("Sending asset transfer request to receiving gateway: {:?}:{:?}", relay_host, relay_port);
-    // Spawning new thread to make the data_transfer_call to receiving gateway
+    println!("Sending asset transfer request to receiver gateway: {:?}:{:?}", receiver_relay_host, receiver_relay_port);
+    // Spawning new thread to make the asset_transfer_call to receiver gateway
     tokio::spawn(async move {
-        let (relay_tls, relay_tlsca_cert_path) = get_relay_params(relay_host.clone(), relay_port.clone(), conf.clone());
+        let (use_tls, relay_tlsca_cert_path) = get_relay_params(receiver_relay_host.clone(), receiver_relay_port.clone(), conf.clone());
         let request_id = transfer_commence_request.session_id.to_string();
         let result = asset_transfer_call(
-            relay_host,
-            relay_port,
-            transfer_commence_request,
-            relay_tls,
+            receiver_relay_host,
+            receiver_relay_port,
+            use_tls,
             relay_tlsca_cert_path.to_string(),
+            transfer_commence_request.clone(),
         )
         .await;
-        println!("Received Ack from receiving gateway: {:?}\n", result);
+
+        println!("Received Ack from receiver gateway: {:?}\n", result);
         // Updates the request in the DB depending on the response status from the receiving gateway
         log_result(&request_id, result, conf);
     });
+}
+
+// Call the transfer_commence endpoint on the receiver gateway
+async fn asset_transfer_call(
+    relay_host: String,
+    relay_port: String,
+    use_tls: bool,
+    tlsca_cert_path: String,
+    transfer_commence_request: TransferCommenceRequest,
+) -> Result<Response<Ack>, Box<dyn std::error::Error>> {
+    let mut satp_client: SatpClient<Channel> = create_satp_client(relay_host, relay_port, use_tls, tlsca_cert_path).await?;
+    println!("Sending the transfer commence request: {:?}", transfer_commence_request.clone());
+    let response = satp_client.transfer_commence(transfer_commence_request.clone()).await?;
+    Ok(response)
 }
 
 fn log_result(request_id: &String, result: Result<Response<Ack>, Box<dyn Error>>, conf: Config) {
@@ -850,27 +864,13 @@ fn log_result(request_id: &String, result: Result<Response<Ack>, Box<dyn Error>>
                     )), 
                     conf)
             }
-        }
+        },
         Err(result_error) => update_request_state_in_local_satp_db(
             request_id.to_string(), 
             request_state::Status::Error, 
             Some(request_state::State::Error(format!("{:?}", result_error))), 
             conf)
     }
-
-}
-// Call to remote relay for the data transfer protocol.
-async fn asset_transfer_call(
-    relay_host: String,
-    relay_port: String,
-    transfer_commence_request: TransferCommenceRequest,
-    use_tls: bool,
-    tlsca_cert_path: String,
-) -> Result<Response<Ack>, Box<dyn std::error::Error>> {
-    let satp_client: Result<SatpClient<Channel>, _> = create_satp_client(relay_host, relay_port, use_tls, tlsca_cert_path).await;
-    println!("Transfer commence request: {:?}", transfer_commence_request);
-    let response = satp_client.unwrap().transfer_commence(transfer_commence_request);
-    Ok(response)
 }
 
 // Sends a request to the remote relay

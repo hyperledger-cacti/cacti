@@ -1,25 +1,19 @@
 // Internal generated modules
 use weaverpb::common::ack::{ack, Ack};
-use weaverpb::common::query::Query;
-use weaverpb::networks::networks::NetworkAssetTransfer;
 use weaverpb::relay::satp::satp_client::SatpClient;
 use weaverpb::relay::satp::satp_server::Satp;
 use weaverpb::relay::satp::{TransferCommenceRequest, CommenceResponseRequest, LockAssertionRequest, LockAssertionReceiptRequest};
 
 // Internal modules
-use crate::db::Database;
 use crate::error::Error;
-use crate::relay_proto::{LocationSegment};
-use crate::services::satp_helper::log_request_in_remote_sapt_db;
+use crate::services::satp_helper::{log_request_in_remote_sapt_db, log_request_in_local_sapt_db};
 
 // external modules
 use config;
 use tokio::sync::RwLock;
 use tonic::{Request, Response, Status};
-
 use tonic::transport::{Certificate, Channel, ClientTlsConfig};
-
-use super::satp_helper::{create_commence_response_request, get_request_from_remote_sapt_db, get_requesting_relay};
+use super::satp_helper::{create_commence_response_request, get_requesting_relay_host_and_port, get_relay_params};
 
 #[derive(Debug, Default)]
 pub struct SatpService {
@@ -65,14 +59,6 @@ impl Satp for SatpService {
             }
         }
 
-        // // Database access/storage
-        // let remote_satp_db = Database {
-        //     db_path: conf.get_str("db_satp_path").unwrap(),
-        //     db_open_max_retries: conf.get_int("db_open_max_retries").unwrap_or(500) as u32,
-        //     db_open_retry_backoff_msec: conf
-        //         .get_int("db_open_retry_backoff_msec")
-        //         .unwrap_or(10) as u32,
-        // };
         match transfer_commence_helper(transfer_commence_request, conf.clone()) {
             Ok(ack) => {
                 let reply = Ok(Response::new(ack));
@@ -110,22 +96,22 @@ impl Satp for SatpService {
         let conf = self.config_lock.read().await;
 
         // TODO refactor
-        let request_logged: Result<Option<sled::IVec>, Error> = log_request_in_remote_sapt_db(&request_id, &commence_response_request, conf.clone());
+        let request_logged: Result<Option<sled::IVec>, Error> = log_request_in_local_sapt_db(&request_id, &commence_response_request, conf.clone());
         match request_logged {
             Ok(_) => println!(
-                "Successfully stored CommenceResponseRequest in remote satp_db with request_id: {}",
+                "Successfully stored CommenceResponseRequest in local satp_db with request_id: {}",
                 request_id
             ),
             Err(e) => {
                 // Internal failure of sled. Send Error response
                 println!(
-                    "Error storing CommenceResponseRequest in remote satp_db for request_id: {}",
+                    "Error storing CommenceResponseRequest in local satp_db for request_id: {}",
                     request_id
                 );
                 let reply = Ok(Response::new(Ack {
                     status: ack::Status::Error as i32,
                     request_id: request_id,
-                    message: format!("Error storing CommenceResponseRequest in remote satp_db {:?}", e),
+                    message: format!("Error storing CommenceResponseRequest in local satp_db {:?}", e),
                 }));
                 println!("Sending Ack back with an error to network of the asset transfer request: {:?}\n", reply);
                 return reply;
@@ -134,7 +120,7 @@ impl Satp for SatpService {
         let reply = Ok(
             Response::new(Ack {
                 status: ack::Status::Error as i32,
-                request_id: "xxxxxxxxx".to_string(),
+                request_id: request_id.to_string(),
                 message: format!("Error: Not implemented yet."),
             })
         );
@@ -227,30 +213,21 @@ fn send_commence_response_helper(
 ) -> Result<Ack, Error> {
 
     let request_id = &transfer_commence_request.session_id.to_string();
-    // let network_asset_transfer: Result<NetworkAssetTransfer, Error> = get_request_from_remote_sapt_db(request_id, conf.clone());
-
-    // let query: Query = remote_satp_db
-    //     .get::<Query>(request_id.to_string())
-    //     .map_err(|e| Error::GetQuery(format!("Failed to get query from db. Error: {:?}", e)))?;
-    let relays_table = conf.get_table("relays")?;
-    let requesting_relay = get_requesting_relay(transfer_commence_request.clone());
-    let relay_uri = relays_table
-        .get(&requesting_relay.to_string())
-        .ok_or(Error::Simple("Relay name not found".to_string()))?;
-    let uri = relay_uri.clone().try_into::<LocationSegment>()?;
+    let (requesting_relay_host, requesting_relay_port) = get_requesting_relay_host_and_port(transfer_commence_request.clone());
+    let (use_tls, relay_tlsca_cert_path) = get_relay_params(requesting_relay_host.clone(), requesting_relay_port.clone(), conf.clone());
     let commence_response_request = create_commence_response_request(transfer_commence_request.clone());
 
     spawn_send_commence_response(
         commence_response_request,
-        uri.hostname.to_string(),
-        uri.port.to_string(),
-        uri.tls,
-        uri.tlsca_cert_path.to_string(),
+        requesting_relay_host,
+        requesting_relay_port,
+        use_tls,
+        relay_tlsca_cert_path,
     );
     let reply = Ack {
         status: ack::Status::Ok as i32,
         request_id: request_id.to_string(),
-        message: "".to_string(),
+        message: "Ack of the Commence Response request".to_string(),
     };
 
     return Ok(reply);
