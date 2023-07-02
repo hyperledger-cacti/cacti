@@ -1,16 +1,24 @@
 // Internal generated modules
 use weaverpb::common::ack::{ack, Ack};
 use weaverpb::relay::satp::satp_server::Satp;
-use weaverpb::relay::satp::{TransferCommenceRequest, CommenceResponseRequest, LockAssertionRequest, LockAssertionReceiptRequest};
+use weaverpb::relay::satp::{
+    CommenceResponseRequest, LockAssertionReceiptRequest, LockAssertionRequest,
+    TransferCommenceRequest,
+};
 
 // Internal modules
 use crate::error::Error;
-use crate::services::satp_helper::{log_request_in_remote_sapt_db, log_request_in_local_sapt_db, create_ack_error_message};
+use crate::services::satp_helper::{
+    create_ack_error_message, log_request_in_local_sapt_db, log_request_in_remote_sapt_db,
+};
 
 // external modules
+use super::satp_helper::{
+    create_commence_response_request, get_relay_params, get_requesting_relay_host_and_port,
+    spawn_send_commence_response_request,
+};
 use tokio::sync::RwLock;
 use tonic::{Request, Response, Status};
-use super::satp_helper::{create_commence_response_request, get_requesting_relay_host_and_port, get_relay_params, spawn_send_commence_response_request};
 
 #[derive(Debug, Default)]
 pub struct SatpService {
@@ -21,13 +29,17 @@ pub struct SatpService {
 /// communication of the asset transfer protocol SATP between two gateways.
 #[tonic::async_trait]
 impl Satp for SatpService {
-    /// transfer_commence is run on the receiver gateway to allow the sender gateway to signal to the 
+    /// transfer_commence is run on the receiver gateway to allow the sender gateway to signal to the
     /// receiver gateway that it is ready to start the transfer of the digital asset
     async fn transfer_commence(
         &self,
-        request: Request<TransferCommenceRequest>
+        request: Request<TransferCommenceRequest>,
     ) -> Result<Response<Ack>, Status> {
-        println!("Got a TransferCommenceRequest from {:?} - {:?}", request.remote_addr(), request);
+        println!(
+            "Got a TransferCommenceRequest from {:?} - {:?}",
+            request.remote_addr(),
+            request
+        );
 
         let transfer_commence_request = request.into_inner().clone();
         let request_id = transfer_commence_request.session_id.to_string();
@@ -36,10 +48,12 @@ impl Satp for SatpService {
         match log_request_in_remote_sapt_db(&request_id, &transfer_commence_request, conf.clone()) {
             Ok(_) => {
                 println!("Successfully stored TransferCommenceRequest in remote satp_db with request_id: {}", request_id);
-            },
+            }
             Err(e) => {
                 // Internal failure of sled. Send Error response
-                let error_message = "Error storing TransferCommenceRequest in remote satp_db for request_id".to_string();
+                let error_message =
+                    "Error storing TransferCommenceRequest in remote satp_db for request_id"
+                        .to_string();
                 let reply = create_ack_error_message(request_id, error_message, e);
                 return reply;
             }
@@ -48,7 +62,10 @@ impl Satp for SatpService {
         match transfer_commence_helper(transfer_commence_request, conf.clone()) {
             Ok(ack) => {
                 let reply = Ok(Response::new(ack));
-                println!("Sending Ack of transfer commence request back: {:?}\n", reply);
+                println!(
+                    "Sending Ack of transfer commence request back: {:?}\n",
+                    reply
+                );
                 reply
             }
             Err(e) => {
@@ -61,7 +78,7 @@ impl Satp for SatpService {
 
     async fn commence_response(
         &self,
-        request: Request<CommenceResponseRequest>
+        request: Request<CommenceResponseRequest>,
     ) -> Result<Response<Ack>, Status> {
         println!(
             "Got a commence response request from {:?} - {:?}",
@@ -74,74 +91,63 @@ impl Satp for SatpService {
         let conf = self.config_lock.read().await;
 
         // TODO refactor
-        let request_logged: Result<Option<sled::IVec>, Error> = log_request_in_local_sapt_db(&request_id, &commence_response_request, conf.clone());
+        let request_logged: Result<Option<sled::IVec>, Error> =
+            log_request_in_local_sapt_db(&request_id, &commence_response_request, conf.clone());
         match request_logged {
-            Ok(_) => println!(
-                "Successfully stored CommenceResponseRequest in local satp_db with request_id: {}",
-                request_id
-            ),
+            Ok(_) => {
+                println!("Successfully stored CommenceResponseRequest in local satp_db with request_id: {}", request_id)
+            }
             Err(e) => {
                 // Internal failure of sled. Send Error response
-                println!(
-                    "Error storing CommenceResponseRequest in local satp_db for request_id: {}",
-                    request_id
-                );
-                let reply = Ok(Response::new(Ack {
-                    status: ack::Status::Error as i32,
-                    request_id: request_id,
-                    message: format!("Error storing CommenceResponseRequest in local satp_db {:?}", e),
-                }));
-                println!("Sending Ack back with an error to network of the asset transfer request: {:?}\n", reply);
+                let error_message =
+                    "Error storing CommenceResponseRequest in local satp_db for request_id"
+                        .to_string();
+                let reply = create_ack_error_message(request_id, error_message, e);
                 return reply;
             }
         }
-        let reply = Ok(
-            Response::new(Ack {
-                status: ack::Status::Error as i32,
-                request_id: request_id.to_string(),
-                message: format!("Error: Not implemented yet."),
-            })
-        );
+
+        let reply = Ok(Response::new(Ack {
+            status: ack::Status::Error as i32,
+            request_id: request_id.to_string(),
+            message: format!("Error: Not implemented yet."),
+        }));
         println!("Sending back Ack: {:?}\n", reply);
         reply
     }
 
     async fn lock_assertion(
         &self,
-        request: Request<LockAssertionRequest>
+        request: Request<LockAssertionRequest>,
     ) -> Result<Response<Ack>, Status> {
         println!(
             "Got a lock assertion request from {:?} - {:?}",
             request.remote_addr(),
             request
         );
-        let reply = Ok(
-            Response::new(Ack {
-                status: ack::Status::Error as i32,
-                request_id: "xxxxxxxxx".to_string(),
-                message: format!("Error: Not implemented yet."),
-            })
-        );
+        let reply = Ok(Response::new(Ack {
+            status: ack::Status::Error as i32,
+            request_id: "xxxxxxxxx".to_string(),
+            message: format!("Error: Not implemented yet."),
+        }));
         println!("Sending back Ack: {:?}\n", reply);
         reply
     }
 
     async fn lock_assertion_receipt(
         &self,
-        request: Request<LockAssertionReceiptRequest>
+        request: Request<LockAssertionReceiptRequest>,
     ) -> Result<Response<Ack>, Status> {
         println!(
             "Got a lock assertion receipt request from {:?} - {:?}",
             request.remote_addr(),
             request
         );
-        let reply = Ok(
-            Response::new(Ack {
-                status: ack::Status::Error as i32,
-                request_id: "xxxxxxxxx".to_string(),
-                message: format!("Error: Not implemented yet."),
-            })
-        );
+        let reply = Ok(Response::new(Ack {
+            status: ack::Status::Error as i32,
+            request_id: "xxxxxxxxx".to_string(),
+            message: format!("Error: Not implemented yet."),
+        }));
         println!("Sending back Ack: {:?}\n", reply);
         reply
     }
@@ -151,12 +157,11 @@ impl Satp for SatpService {
 /// requested from the sender gateway
 pub fn transfer_commence_helper(
     transfer_commence_request: TransferCommenceRequest,
-    conf: config::Config
+    conf: config::Config,
 ) -> Result<Ack, Error> {
- 
     let request_id = transfer_commence_request.session_id.to_string();
     let is_valid_request = check_transfer_commence_request(transfer_commence_request.clone());
-    
+
     if is_valid_request {
         println!("The transfer commence request is valid\n");
         match send_commence_response_helper(transfer_commence_request, conf) {
@@ -167,7 +172,6 @@ pub fn transfer_commence_helper(
                 reply
             }
             Err(e) => {
-                println!("Transfer commence request failed.");
                 return Ok(Ack {
                     status: ack::Status::Error as i32,
                     request_id: request_id.to_string(),
@@ -180,20 +184,25 @@ pub fn transfer_commence_helper(
         return Ok(Ack {
             status: ack::Status::Error as i32,
             request_id: request_id.to_string(),
-            message: "Invalid transfer commence request".to_string(),
+            message: "Error: The transfer commence request is invalid".to_string(),
         });
     }
 }
 
 fn send_commence_response_helper(
     transfer_commence_request: TransferCommenceRequest,
-    conf: config::Config
+    conf: config::Config,
 ) -> Result<Ack, Error> {
-
     let request_id = &transfer_commence_request.session_id.to_string();
-    let (requesting_relay_host, requesting_relay_port) = get_requesting_relay_host_and_port(transfer_commence_request.clone());
-    let (use_tls, relay_tlsca_cert_path) = get_relay_params(requesting_relay_host.clone(), requesting_relay_port.clone(), conf.clone());
-    let commence_response_request = create_commence_response_request(transfer_commence_request.clone());
+    let (requesting_relay_host, requesting_relay_port) =
+        get_requesting_relay_host_and_port(transfer_commence_request.clone());
+    let (use_tls, relay_tlsca_cert_path) = get_relay_params(
+        requesting_relay_host.clone(),
+        requesting_relay_port.clone(),
+        conf.clone(),
+    );
+    let commence_response_request =
+        create_commence_response_request(transfer_commence_request.clone());
 
     spawn_send_commence_response_request(
         commence_response_request,
@@ -201,7 +210,7 @@ fn send_commence_response_helper(
         requesting_relay_port,
         use_tls,
         relay_tlsca_cert_path,
-        conf
+        conf,
     );
     let reply = Ack {
         status: ack::Status::Ok as i32,

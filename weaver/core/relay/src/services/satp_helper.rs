@@ -1,14 +1,14 @@
 use config::Config;
 use serde::de::DeserializeOwned;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use sled::IVec;
+use tonic::transport::{Certificate, Channel, ClientTlsConfig};
 use tonic::Response;
-use tonic::transport::{ClientTlsConfig, Certificate, Channel};
 use weaverpb::common::ack::{ack, Ack};
-use weaverpb::common::state::{RequestState, request_state};
-use weaverpb::networks::networks::{NetworkAssetTransfer};
+use weaverpb::common::state::{request_state, RequestState};
+use weaverpb::networks::networks::NetworkAssetTransfer;
 use weaverpb::relay::satp::satp_client::SatpClient;
-use weaverpb::relay::satp::{TransferCommenceRequest, CommenceResponseRequest};
+use weaverpb::relay::satp::{CommenceResponseRequest, TransferCommenceRequest};
 
 use crate::db::Database;
 use crate::error::{self, Error};
@@ -21,10 +21,17 @@ pub fn spawn_send_transfer_commence_request(
     receiver_relay_host: String,
     receiver_relay_port: String,
 ) {
-    println!("Sending transfer commence request to receiver gateway: {:?}:{:?}", receiver_relay_host, receiver_relay_port);
+    println!(
+        "Sending transfer commence request to receiver gateway: {:?}:{:?}",
+        receiver_relay_host, receiver_relay_port
+    );
     // Spawning new thread to make the asset_transfer_call to receiver gateway
     tokio::spawn(async move {
-        let (use_tls, relay_tlsca_cert_path) = get_relay_params(receiver_relay_host.clone(), receiver_relay_port.clone(), conf.clone());
+        let (use_tls, relay_tlsca_cert_path) = get_relay_params(
+            receiver_relay_host.clone(),
+            receiver_relay_port.clone(),
+            conf.clone(),
+        );
         let request_id = transfer_commence_request.session_id.to_string();
         let result = transfer_commence_call(
             receiver_relay_host,
@@ -37,13 +44,23 @@ pub fn spawn_send_transfer_commence_request(
 
         println!("Received Ack from receiver gateway: {:?}\n", result);
         // Updates the request in the DB depending on the response status from the receiving gateway
-        log_result(&request_id, result, conf);
+        log_request_result_in_local_satp_db(&request_id, result, conf);
     });
 }
 
-pub fn spawn_send_commence_response_request(commence_response_request: CommenceResponseRequest, requesting_relay_host: String, requesting_relay_port: String, use_tls: bool, relay_tlsca_cert_path: String, conf: Config) {
+pub fn spawn_send_commence_response_request(
+    commence_response_request: CommenceResponseRequest,
+    requesting_relay_host: String,
+    requesting_relay_port: String,
+    use_tls: bool,
+    relay_tlsca_cert_path: String,
+    conf: Config,
+) {
     tokio::spawn(async move {
-        println!("Sending commence response back to sending gateway: Request ID = {:?}", commence_response_request.session_id);
+        println!(
+            "Sending commence response back to sending gateway: Request ID = {:?}",
+            commence_response_request.session_id
+        );
         let result = commence_response_call(
             requesting_relay_host,
             requesting_relay_port,
@@ -56,7 +73,7 @@ pub fn spawn_send_commence_response_request(commence_response_request: CommenceR
         println!("Received Ack from sending gateway: {:?}\n", result);
         // Updates the request in the DB depending on the response status from the sending gateway
         let request_id = commence_response_request.session_id.to_string();
-        log_result(&request_id, result, conf);
+        log_request_result_in_local_satp_db(&request_id, result, conf);
     });
 }
 
@@ -68,9 +85,15 @@ pub async fn transfer_commence_call(
     tlsca_cert_path: String,
     transfer_commence_request: TransferCommenceRequest,
 ) -> Result<Response<Ack>, Box<dyn std::error::Error>> {
-    let mut satp_client: SatpClient<Channel> = create_satp_client(relay_host, relay_port, use_tls, tlsca_cert_path).await?;
-    println!("Sending the transfer commence request: {:?}", transfer_commence_request.clone());
-    let response = satp_client.transfer_commence(transfer_commence_request.clone()).await?;
+    let mut satp_client: SatpClient<Channel> =
+        create_satp_client(relay_host, relay_port, use_tls, tlsca_cert_path).await?;
+    println!(
+        "Sending the transfer commence request: {:?}",
+        transfer_commence_request.clone()
+    );
+    let response = satp_client
+        .transfer_commence(transfer_commence_request.clone())
+        .await?;
     Ok(response)
 }
 
@@ -82,13 +105,23 @@ pub async fn commence_response_call(
     tlsca_cert_path: String,
     commence_response_request: CommenceResponseRequest,
 ) -> Result<Response<Ack>, Box<dyn std::error::Error>> {
-    let mut satp_client: SatpClient<Channel> = create_satp_client(relay_host, relay_port, use_tls, tlsca_cert_path).await?;
-    println!("Sending the commence response request: {:?}", commence_response_request.clone());
-    let response = satp_client.commence_response(commence_response_request.clone()).await?;
+    let mut satp_client: SatpClient<Channel> =
+        create_satp_client(relay_host, relay_port, use_tls, tlsca_cert_path).await?;
+    println!(
+        "Sending the commence response request: {:?}",
+        commence_response_request.clone()
+    );
+    let response = satp_client
+        .commence_response(commence_response_request.clone())
+        .await?;
     Ok(response)
 }
 
-pub fn log_result(request_id: &String, result: Result<Response<Ack>, Box<dyn std::error::Error>>, conf: Config) {
+pub fn log_request_result_in_local_satp_db(
+    request_id: &String,
+    result: Result<Response<Ack>, Box<dyn std::error::Error>>,
+    conf: Config,
+) {
     match result {
         Ok(ack_response) => {
             let ack_response_into_inner = ack_response.into_inner().clone();
@@ -96,38 +129,44 @@ pub fn log_result(request_id: &String, result: Result<Response<Ack>, Box<dyn std
             match ack::Status::from_i32(ack_response_into_inner.status) {
                 Some(status) => match status {
                     ack::Status::Ok => update_request_state_in_local_satp_db(
-                        request_id.to_string(), 
-                        request_state::Status::Pending, 
-                        None, 
-                        conf)
-                    ,
+                        request_id.to_string(),
+                        request_state::Status::Pending,
+                        None,
+                        conf,
+                    ),
                     ack::Status::Error => update_request_state_in_local_satp_db(
-                        request_id.to_string(), 
-                        request_state::Status::Error, 
+                        request_id.to_string(),
+                        request_state::Status::Error,
                         Some(request_state::State::Error(
                             ack_response_into_inner.message.to_string(),
-                        )), 
-                        conf)
-                    ,
+                        )),
+                        conf,
+                    ),
                 },
                 None => update_request_state_in_local_satp_db(
-                    request_id.to_string(), 
-                    request_state::Status::Error, 
+                    request_id.to_string(),
+                    request_state::Status::Error,
                     Some(request_state::State::Error(
                         "Status is not supported or is invalid".to_string(),
-                    )), 
-                    conf)
+                    )),
+                    conf,
+                ),
             }
-        },
+        }
         Err(result_error) => update_request_state_in_local_satp_db(
-            request_id.to_string(), 
-            request_state::Status::Error, 
-            Some(request_state::State::Error(format!("{:?}", result_error))), 
-            conf)
+            request_id.to_string(),
+            request_state::Status::Error,
+            Some(request_state::State::Error(format!("{:?}", result_error))),
+            conf,
+        ),
     }
 }
 
-pub fn create_ack_error_message(request_id: String, error_message: String, e: Error) -> Result<tonic::Response<Ack>, tonic::Status> {
+pub fn create_ack_error_message(
+    request_id: String,
+    error_message: String,
+    e: Error,
+) -> Result<tonic::Response<Ack>, tonic::Status> {
     println!("{}: {}", error_message, request_id);
     let reply: Result<Response<Ack>, tonic::Status> = Ok(Response::new(Ack {
         status: ack::Status::Error as i32,
@@ -138,8 +177,10 @@ pub fn create_ack_error_message(request_id: String, error_message: String, e: Er
     return reply;
 }
 
-pub fn derive_transfer_commence_request(network_asset_transfer: NetworkAssetTransfer) -> TransferCommenceRequest {
-    let session_id = "to_be_calculated_session_id"; 
+pub fn derive_transfer_commence_request(
+    network_asset_transfer: NetworkAssetTransfer,
+) -> TransferCommenceRequest {
+    let session_id = "to_be_calculated_session_id";
     let transfer_commence_request = TransferCommenceRequest {
         message_type: "message_type1".to_string(),
         session_id: session_id.to_string(),
@@ -149,13 +190,15 @@ pub fn derive_transfer_commence_request(network_asset_transfer: NetworkAssetTran
         hash_transfer_init_claims: "hash_transfer_init_claims1".to_string(),
         hash_prev_message: "hash_prev_message1".to_string(),
         client_transfer_number: "client_transfer_number1".to_string(),
-        client_signature: "client_signature1".to_string()
+        client_signature: "client_signature1".to_string(),
     };
 
     return transfer_commence_request;
 }
 
-pub fn create_commence_response_request(transfer_commence_request: TransferCommenceRequest) -> CommenceResponseRequest {
+pub fn create_commence_response_request(
+    transfer_commence_request: TransferCommenceRequest,
+) -> CommenceResponseRequest {
     let commence_response_request = CommenceResponseRequest {
         message_type: "message_type1".to_string(),
         session_id: "session_id1".to_string(),
@@ -206,29 +249,50 @@ pub fn get_satp_requests_states_remote_db(conf: Config) -> Database {
     return db;
 }
 
-pub fn log_request_state_in_local_sapt_db(request_id: &String, target: &RequestState, conf: Config) -> Result<std::option::Option<IVec>, error::Error>{
+pub fn log_request_state_in_local_sapt_db(
+    request_id: &String,
+    target: &RequestState,
+    conf: Config,
+) -> Result<std::option::Option<IVec>, error::Error> {
     let db = get_satp_requests_states_local_db(conf);
     return db.set(&request_id, &target);
 }
 
-pub fn log_request_in_local_sapt_db<T: Serialize>(request_id: &String, value: T, conf: Config) -> Result<std::option::Option<IVec>, error::Error>{
+pub fn log_request_in_local_sapt_db<T: Serialize>(
+    request_id: &String,
+    value: T,
+    conf: Config,
+) -> Result<std::option::Option<IVec>, error::Error> {
     let db = get_satp_requests_local_db(conf);
     return db.set(&request_id, &value);
 }
 
-pub fn log_request_in_remote_sapt_db<T: Serialize>(request_id: &String, value: T, conf: Config) -> Result<std::option::Option<IVec>, error::Error>{
+pub fn log_request_in_remote_sapt_db<T: Serialize>(
+    request_id: &String,
+    value: T,
+    conf: Config,
+) -> Result<std::option::Option<IVec>, error::Error> {
     let db = get_satp_requests_remote_db(conf);
     return db.set(&request_id, &value);
 }
 
-pub fn get_request_from_remote_sapt_db<T: DeserializeOwned>(request_id: &String, conf: Config) -> Result<T, error::Error> {
+pub fn get_request_from_remote_sapt_db<T: DeserializeOwned>(
+    request_id: &String,
+    conf: Config,
+) -> Result<T, error::Error> {
     let db = get_satp_requests_remote_db(conf);
-    let query: Result<T, error::Error> = db.get::<T>(request_id.to_string())
-    .map_err(|e| Error::GetQuery(format!("Failed to get query from db. Error: {:?}", e)));
+    let query: Result<T, error::Error> = db
+        .get::<T>(request_id.to_string())
+        .map_err(|e| Error::GetQuery(format!("Failed to get query from db. Error: {:?}", e)));
     return query;
 }
 
-pub fn update_request_state_in_local_satp_db(request_id: String, new_status: request_state::Status, state: Option<request_state::State>, conf: Config) {
+pub fn update_request_state_in_local_satp_db(
+    request_id: String,
+    new_status: request_state::Status,
+    state: Option<request_state::State>,
+    conf: Config,
+) {
     let db = get_satp_requests_states_local_db(conf);
     let target: RequestState = RequestState {
         status: new_status as i32,
@@ -241,9 +305,11 @@ pub fn update_request_state_in_local_satp_db(request_id: String, new_status: req
     println!("{:?}\n", db.get::<RequestState>(request_id).unwrap())
 }
 
-pub fn get_requesting_relay_host_and_port(transfer_commence_request: TransferCommenceRequest) -> (String, String) {
-    // TODO 
-    return ("localhost".to_string(), "9085".to_string())
+pub fn get_requesting_relay_host_and_port(
+    transfer_commence_request: TransferCommenceRequest,
+) -> (String, String) {
+    // TODO
+    return ("localhost".to_string(), "9085".to_string());
 }
 
 pub fn get_relay_params(relay_host: String, relay_port: String, conf: Config) -> (bool, String) {
@@ -260,11 +326,16 @@ pub fn get_relay_params(relay_host: String, relay_port: String, conf: Config) ->
     (relay_tls, relay_tlsca_cert_path)
 }
 
-fn create_client_address (relay_host: String, relay_port: String) -> String {
+fn create_client_address(relay_host: String, relay_port: String) -> String {
     return format!("http://{}:{}", relay_host, relay_port);
 }
 
-pub async fn create_satp_client(relay_host: String, relay_port: String, use_tls: bool, tlsca_cert_path: String) -> Result<SatpClient<Channel>, Box<dyn std::error::Error>> {
+pub async fn create_satp_client(
+    relay_host: String,
+    relay_port: String,
+    use_tls: bool,
+    tlsca_cert_path: String,
+) -> Result<SatpClient<Channel>, Box<dyn std::error::Error>> {
     let client_addr = create_client_address(relay_host.clone(), relay_port.clone());
     let satp_client;
     if use_tls {
