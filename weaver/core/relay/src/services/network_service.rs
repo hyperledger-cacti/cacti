@@ -8,7 +8,7 @@ use weaverpb::common::state::{request_state, RequestState};
 use weaverpb::common::events::{EventSubscription, event_subscription_state, EventSubscriptionState, EventSubOperation, event_publication, EventPublication, EventStates};
 use weaverpb::networks::networks::network_server::Network;
 use weaverpb::networks::networks::{DbName, GetStateMessage, NetworkQuery, RelayDatabase, NetworkEventSubscription, NetworkEventUnsubscription, NetworkAssetTransfer};
-use weaverpb::relay::satp::{TransferCommenceRequest};
+use weaverpb::relay::satp::{TransferCommenceRequest, CommenceResponseRequest};
 use weaverpb::relay::datatransfer::data_transfer_client::DataTransferClient;
 use weaverpb::relay::satp::satp_client::SatpClient;
 use weaverpb::relay::events::event_subscribe_client::EventSubscribeClient;
@@ -16,7 +16,7 @@ use crate::relay_proto::{parse_address, LocationSegment};
 // Internal modules
 use crate::db::Database;
 use crate::services::helpers::{update_event_subscription_status, driver_sign_subscription_helper, try_mark_request_state_deleted, mark_event_states_deleted, delete_event_pub_spec, get_event_publication_key, get_event_subscription_key};
-use crate::services::satp_helper::{derive_transfer_commence_request, log_request_state_in_local_sapt_db, log_request_in_local_sapt_db, update_request_state_in_local_satp_db, get_relay_params, create_satp_client};
+use crate::services::satp_helper::{derive_transfer_commence_request, log_request_state_in_local_sapt_db, log_request_in_local_sapt_db, update_request_state_in_local_satp_db, get_relay_params, create_satp_client, spawn_send_transfer_commence_request};
 
 // External modules
 use config::{self, Config};
@@ -484,7 +484,7 @@ impl Network for NetworkService {
             Ok(address) => {
                 // TODO: verify that host and port are valid
                 // Spawns a child process to handle sending request
-                spawn_send_asset_transfer_request(
+                spawn_send_transfer_commence_request(
                     conf,
                     transfer_commence_request,
                     address.location.hostname.to_string(),
@@ -791,86 +791,6 @@ async fn data_transfer_call(
     println!("Query: {:?}", query_request);
     let response = client.request_state(query_request).await?;
     Ok(response)
-}
-
-// Sends a request to the receiving gateway
-fn spawn_send_asset_transfer_request(
-    conf: config::Config,
-    transfer_commence_request: TransferCommenceRequest,
-    receiver_relay_host: String,
-    receiver_relay_port: String,
-) {
-    println!("Sending asset transfer request to receiver gateway: {:?}:{:?}", receiver_relay_host, receiver_relay_port);
-    // Spawning new thread to make the asset_transfer_call to receiver gateway
-    tokio::spawn(async move {
-        let (use_tls, relay_tlsca_cert_path) = get_relay_params(receiver_relay_host.clone(), receiver_relay_port.clone(), conf.clone());
-        let request_id = transfer_commence_request.session_id.to_string();
-        let result = asset_transfer_call(
-            receiver_relay_host,
-            receiver_relay_port,
-            use_tls,
-            relay_tlsca_cert_path.to_string(),
-            transfer_commence_request.clone(),
-        )
-        .await;
-
-        println!("Received Ack from receiver gateway: {:?}\n", result);
-        // Updates the request in the DB depending on the response status from the receiving gateway
-        log_result(&request_id, result, conf);
-    });
-}
-
-// Call the transfer_commence endpoint on the receiver gateway
-async fn asset_transfer_call(
-    relay_host: String,
-    relay_port: String,
-    use_tls: bool,
-    tlsca_cert_path: String,
-    transfer_commence_request: TransferCommenceRequest,
-) -> Result<Response<Ack>, Box<dyn std::error::Error>> {
-    let mut satp_client: SatpClient<Channel> = create_satp_client(relay_host, relay_port, use_tls, tlsca_cert_path).await?;
-    println!("Sending the transfer commence request: {:?}", transfer_commence_request.clone());
-    let response = satp_client.transfer_commence(transfer_commence_request.clone()).await?;
-    Ok(response)
-}
-
-fn log_result(request_id: &String, result: Result<Response<Ack>, Box<dyn Error>>, conf: Config) {
-    match result {
-        Ok(ack_response) => {
-            let ack_response_into_inner = ack_response.into_inner().clone();
-            // This match first checks if the status is valid.
-            match ack::Status::from_i32(ack_response_into_inner.status) {
-                Some(status) => match status {
-                    ack::Status::Ok => update_request_state_in_local_satp_db(
-                        request_id.to_string(), 
-                        request_state::Status::Pending, 
-                        None, 
-                        conf)
-                    ,
-                    ack::Status::Error => update_request_state_in_local_satp_db(
-                        request_id.to_string(), 
-                        request_state::Status::Error, 
-                        Some(request_state::State::Error(
-                            ack_response_into_inner.message.to_string(),
-                        )), 
-                        conf)
-                    ,
-                },
-                None => update_request_state_in_local_satp_db(
-                    request_id.to_string(), 
-                    request_state::Status::Error, 
-                    Some(request_state::State::Error(
-                        "Status is not supported or is invalid".to_string(),
-                    )), 
-                    conf)
-            }
-        },
-        Err(result_error) => update_request_state_in_local_satp_db(
-            request_id.to_string(), 
-            request_state::Status::Error, 
-            Some(request_state::State::Error(format!("{:?}", result_error))), 
-            conf)
-    }
 }
 
 // Sends a request to the remote relay

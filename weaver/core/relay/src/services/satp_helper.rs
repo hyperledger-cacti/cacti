@@ -2,7 +2,9 @@ use config::Config;
 use serde::de::DeserializeOwned;
 use serde::{Serialize, Deserialize};
 use sled::IVec;
+use tonic::Response;
 use tonic::transport::{ClientTlsConfig, Certificate, Channel};
+use weaverpb::common::ack::{ack, Ack};
 use weaverpb::common::state::{RequestState, request_state};
 use weaverpb::networks::networks::{NetworkAssetTransfer};
 use weaverpb::relay::satp::satp_client::SatpClient;
@@ -11,6 +13,119 @@ use weaverpb::relay::satp::{TransferCommenceRequest, CommenceResponseRequest};
 use crate::db::Database;
 use crate::error::{self, Error};
 use crate::relay_proto::LocationSegment;
+
+// Sends a request to the receiving gateway
+pub fn spawn_send_transfer_commence_request(
+    conf: config::Config,
+    transfer_commence_request: TransferCommenceRequest,
+    receiver_relay_host: String,
+    receiver_relay_port: String,
+) {
+    println!("Sending transfer commence request to receiver gateway: {:?}:{:?}", receiver_relay_host, receiver_relay_port);
+    // Spawning new thread to make the asset_transfer_call to receiver gateway
+    tokio::spawn(async move {
+        let (use_tls, relay_tlsca_cert_path) = get_relay_params(receiver_relay_host.clone(), receiver_relay_port.clone(), conf.clone());
+        let request_id = transfer_commence_request.session_id.to_string();
+        let result = transfer_commence_call(
+            receiver_relay_host,
+            receiver_relay_port,
+            use_tls,
+            relay_tlsca_cert_path.to_string(),
+            transfer_commence_request.clone(),
+        )
+        .await;
+
+        println!("Received Ack from receiver gateway: {:?}\n", result);
+        // Updates the request in the DB depending on the response status from the receiving gateway
+        log_result(&request_id, result, conf);
+    });
+}
+
+pub fn spawn_send_commence_response_request(commence_response_request: CommenceResponseRequest, requesting_relay_host: String, requesting_relay_port: String, use_tls: bool, relay_tlsca_cert_path: String, conf: Config) {
+    tokio::spawn(async move {
+        println!("Sending commence response back to sending gateway: Request ID = {:?}", commence_response_request.session_id);
+        let result = commence_response_call(
+            requesting_relay_host,
+            requesting_relay_port,
+            use_tls,
+            relay_tlsca_cert_path.to_string(),
+            commence_response_request.clone(),
+        )
+        .await;
+
+        println!("Received Ack from sending gateway: {:?}\n", result);
+        // Updates the request in the DB depending on the response status from the sending gateway
+        let request_id = commence_response_request.session_id.to_string();
+        log_result(&request_id, result, conf);
+    });
+}
+
+// Call the transfer_commence endpoint on the receiver gateway
+pub async fn transfer_commence_call(
+    relay_host: String,
+    relay_port: String,
+    use_tls: bool,
+    tlsca_cert_path: String,
+    transfer_commence_request: TransferCommenceRequest,
+) -> Result<Response<Ack>, Box<dyn std::error::Error>> {
+    let mut satp_client: SatpClient<Channel> = create_satp_client(relay_host, relay_port, use_tls, tlsca_cert_path).await?;
+    println!("Sending the transfer commence request: {:?}", transfer_commence_request.clone());
+    let response = satp_client.transfer_commence(transfer_commence_request.clone()).await?;
+    Ok(response)
+}
+
+// Call the commence_response endpoint on the sending gateway
+pub async fn commence_response_call(
+    relay_host: String,
+    relay_port: String,
+    use_tls: bool,
+    tlsca_cert_path: String,
+    commence_response_request: CommenceResponseRequest,
+) -> Result<Response<Ack>, Box<dyn std::error::Error>> {
+    let mut satp_client: SatpClient<Channel> = create_satp_client(relay_host, relay_port, use_tls, tlsca_cert_path).await?;
+    println!("Sending the commence response request: {:?}", commence_response_request.clone());
+    let response = satp_client.commence_response(commence_response_request.clone()).await?;
+    Ok(response)
+}
+
+pub fn log_result(request_id: &String, result: Result<Response<Ack>, Box<dyn std::error::Error>>, conf: Config) {
+    match result {
+        Ok(ack_response) => {
+            let ack_response_into_inner = ack_response.into_inner().clone();
+            // This match first checks if the status is valid.
+            match ack::Status::from_i32(ack_response_into_inner.status) {
+                Some(status) => match status {
+                    ack::Status::Ok => update_request_state_in_local_satp_db(
+                        request_id.to_string(), 
+                        request_state::Status::Pending, 
+                        None, 
+                        conf)
+                    ,
+                    ack::Status::Error => update_request_state_in_local_satp_db(
+                        request_id.to_string(), 
+                        request_state::Status::Error, 
+                        Some(request_state::State::Error(
+                            ack_response_into_inner.message.to_string(),
+                        )), 
+                        conf)
+                    ,
+                },
+                None => update_request_state_in_local_satp_db(
+                    request_id.to_string(), 
+                    request_state::Status::Error, 
+                    Some(request_state::State::Error(
+                        "Status is not supported or is invalid".to_string(),
+                    )), 
+                    conf)
+            }
+        },
+        Err(result_error) => update_request_state_in_local_satp_db(
+            request_id.to_string(), 
+            request_state::Status::Error, 
+            Some(request_state::State::Error(format!("{:?}", result_error))), 
+            conf)
+    }
+}
 
 pub fn derive_transfer_commence_request(network_asset_transfer: NetworkAssetTransfer) -> TransferCommenceRequest {
     let session_id = "to_be_calculated_session_id"; 

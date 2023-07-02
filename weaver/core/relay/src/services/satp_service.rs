@@ -6,14 +6,14 @@ use weaverpb::relay::satp::{TransferCommenceRequest, CommenceResponseRequest, Lo
 
 // Internal modules
 use crate::error::Error;
-use crate::services::satp_helper::{log_request_in_remote_sapt_db, log_request_in_local_sapt_db};
+use crate::services::satp_helper::{log_request_in_remote_sapt_db, log_request_in_local_sapt_db, create_satp_client, commence_response_call, log_result};
 
 // external modules
-use config;
+use config::{self, Config};
 use tokio::sync::RwLock;
 use tonic::{Request, Response, Status};
 use tonic::transport::{Certificate, Channel, ClientTlsConfig};
-use super::satp_helper::{create_commence_response_request, get_requesting_relay_host_and_port, get_relay_params};
+use super::satp_helper::{create_commence_response_request, get_requesting_relay_host_and_port, get_relay_params, spawn_send_commence_response_request};
 
 #[derive(Debug, Default)]
 pub struct SatpService {
@@ -217,68 +217,20 @@ fn send_commence_response_helper(
     let (use_tls, relay_tlsca_cert_path) = get_relay_params(requesting_relay_host.clone(), requesting_relay_port.clone(), conf.clone());
     let commence_response_request = create_commence_response_request(transfer_commence_request.clone());
 
-    spawn_send_commence_response(
+    spawn_send_commence_response_request(
         commence_response_request,
         requesting_relay_host,
         requesting_relay_port,
         use_tls,
         relay_tlsca_cert_path,
+        conf
     );
     let reply = Ack {
         status: ack::Status::Ok as i32,
         request_id: request_id.to_string(),
         message: "Ack of the Commence Response request".to_string(),
     };
-
     return Ok(reply);
-}
-
-fn spawn_send_commence_response(commence_response_request: CommenceResponseRequest, requestor_host: String, requester_port: String, use_tls: bool, tlsca_cert_path: String) {
-    tokio::spawn(async move {
-        println!("Sending state back to sending gateway: Request ID = {:?}", commence_response_request.session_id);
-        // match state.state.as_ref().unwrap() {
-        //     view_payload::State::View(v) => println!("View Meta: {:?}, View Data: {:?}", v.meta, base64::encode(&v.data)),
-        //     view_payload::State::Error(e) => println!("Error: {:?}", e),
-        // }
-        let satp_client_addr = format!("http://{}:{}", requestor_host, requester_port);
-        if use_tls {
-            let pem = tokio::fs::read(tlsca_cert_path).await.unwrap();
-            let ca = Certificate::from_pem(pem);
-
-            let tls = ClientTlsConfig::new()
-                .ca_certificate(ca)
-                .domain_name(requestor_host);
-
-            let channel = Channel::from_shared(satp_client_addr.to_string()).unwrap()
-                .tls_config(tls).expect(&format!("Error in TLS configuration for client: {}", satp_client_addr.to_string()))
-                .connect()
-                .await
-                .unwrap();
-
-            let mut satp_client_result = SatpClient::new(channel);
-            let response = satp_client_result.commence_response(commence_response_request).await;
-            println!("Response ACK from sending gateway={:?}\n", response);
-        } else {
-            let satp_client_result = SatpClient::connect(satp_client_addr).await;
-            match satp_client_result {
-                Ok(satp_client) => {
-                    let response = satp_client.clone().commence_response(commence_response_request).await;
-                    println!("Response ACK from sending gateway={:?}\n", response);
-                    // Not returning anything here
-                }
-                Err(e) => {
-                    // TODO: Add better error handling (Attempt a few times?)
-                    println!(
-                        "Failed to connect to client: ${:?}. Error: {}\n",
-                        requester_port,
-                        e.to_string()
-                    );
-                    // TODO: Handle this error thorugh join handle after thread completes.
-                    // Not actually returning anything here yet
-                }
-            }
-        }
-    });
 }
 
 fn check_transfer_commence_request(transfer_commence_request: TransferCommenceRequest) -> bool {
