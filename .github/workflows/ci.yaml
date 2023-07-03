@@ -39,7 +39,6 @@ jobs:
           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
           restore-keys: |
             ${{ runner.os }}-yarn-
-  # lint clean codegen
   yarn_lint:
     continue-on-error: false
     env:
