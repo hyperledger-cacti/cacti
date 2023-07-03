@@ -132,8 +132,9 @@ class WriteExternalStateAcceptor(val session: FlowSession) : FlowLogic<SignedTra
             println("Issuer signed transaction.")
             return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId))
         } catch (e: Exception) {
-            println("Error signing write external state transaction: ${e.message}\n")
-            return subFlow(ReceiveFinalityFlow(session))
+            val errorMsg = "Error signing write external state transaction: ${e.message}\n"
+            println(errorMsg)
+            throw Error(errorMsg)
         }
     }
 }

@@ -105,8 +105,9 @@ class CreateVerificationPolicyStateResponder(val session: FlowSession) : FlowLog
             println("${ourIdentity} signed transaction.")
             return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId))
         } catch (e: Exception) {
-            println("Error during transaction by ${ourIdentity}: ${e.message}\n")
-            return subFlow(ReceiveFinalityFlow(session))
+            val errorMsg = "Error during transaction by ${ourIdentity}: ${e.message}\n"
+            println(errorMsg)
+            throw Error(errorMsg)
         }
     }
 }
@@ -192,8 +193,9 @@ class UpdateVerificationPolicyStateResponder(val session: FlowSession) : FlowLog
             println("${ourIdentity} signed transaction.")
             return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId))
         } catch (e: Exception) {
-            println("Error during transaction by ${ourIdentity}: ${e.message}\n")
-            return subFlow(ReceiveFinalityFlow(session))
+            val errorMsg = "Error during transaction by ${ourIdentity}: ${e.message}\n"
+            println(errorMsg)
+            throw Error(errorMsg)
         }
     }
 }
@@ -270,8 +272,9 @@ class DeleteVerificationPolicyStateResponder(val session: FlowSession) : FlowLog
             println("${ourIdentity} signed transaction.")
             return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId))
         } catch (e: Exception) {
-            println("Error during transaction by ${ourIdentity}: ${e.message}\n")
-            return subFlow(ReceiveFinalityFlow(session))
+            val errorMsg = "Error during transaction by ${ourIdentity}: ${e.message}\n"
+            println(errorMsg)
+            throw Error(errorMsg)
         }
     }
 }

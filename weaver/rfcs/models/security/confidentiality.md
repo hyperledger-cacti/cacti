@@ -46,5 +46,5 @@ This protocol ensures confidentiality against potentially malicious relays and a
 There are different ways in which the above protocol can be realized, and these are listed and discussed in the [appendix](confidentiality-design-choices.md). We use [Protocol #5](./confidentiality-design-choices.md#protocol-5) in the above model, as it is the most secure and usable option, and this is implemented in Weaver as a reference.
 
 Additional notes:
-- Initially, Weaver will support encryption and decryption using [ECIES](https://github.com/ethereum/go-ethereum/tree/master/crypto/ecies) but other asymmetric key algorithms may be supported in the future, including with Ed25519 keys.
+- Initially, Weaver will support encryption and decryption using [ECIES](https://github.com/ethereum/go-ethereum/tree/v1.11.5/crypto/ecies) but other asymmetric key algorithms may be supported in the future, including with Ed25519 keys.
 - We can consider an alternative solution whereby even the applicaton client does not possess the private key, which instead is maintained by the interoperation module in the destination network. But this requires a private key to be disseminated to, and maintained in secondary storage by, multiple nodes. This is both logistically challenging and insecure; hence, we recommend the procedure describes above.

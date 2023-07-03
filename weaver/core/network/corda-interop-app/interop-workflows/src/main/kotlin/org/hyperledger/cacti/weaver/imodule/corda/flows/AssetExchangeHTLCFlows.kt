@@ -160,8 +160,9 @@ object LockAssetHTLC {
                     println("Issuer signed transaction.")
                     return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId))
                 } catch (e: Exception) {
-                    println("Error signing unlock asset transaction by Issuer: ${e.message}\n")
-                    return subFlow(ReceiveFinalityFlow(session))
+                    val errorMsg = "Error signing lock asset transaction: ${e.message}\n"
+                    println(errorMsg)
+                    throw Error(errorMsg)
                 }
             } else if (role == ResponderRole.RECIPIENT) {
               val signTransactionFlow = object : SignTransactionFlow(session) {
@@ -176,8 +177,9 @@ object LockAssetHTLC {
                   println("Recipient signed transaction.")
                   return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId))
               } catch (e: Exception) {
-                  println("Error signing unlock asset transaction by Recipient: ${e.message}\n")
-                  return subFlow(ReceiveFinalityFlow(session))
+                  val errorMsg = "Error signing lock asset transaction by Recipient: ${e.message}\n"
+                  println(errorMsg)
+                  throw Error(errorMsg)
               }
             } else if (role == ResponderRole.OBSERVER) {
                 val sTx = subFlow(ReceiveFinalityFlow(session, statesToRecord = StatesToRecord.ALL_VISIBLE))
@@ -447,8 +449,9 @@ object ClaimAssetHTLC {
                     println("Issuer signed transaction.")
                     return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId))
                 } catch (e: Exception) {
-                    println("Error signing claim asset transaction by issuer: ${e.message}\n")
-                    return subFlow(ReceiveFinalityFlow(session))
+                    val errorMsg = "Error signing claim asset transaction: ${e.message}\n"
+                    println(errorMsg)
+                    throw Error(errorMsg)
                 }
             } else if (role == ResponderRole.LOCKER) {
                 val sTx = subFlow(ReceiveFinalityFlow(session))
@@ -586,8 +589,9 @@ object UnlockAssetHTLC {
                     println("Issuer signed transaction.")
                     return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId))
                 } catch (e: Exception) {
-                    println("Error signing unlock asset transaction by Issuer: ${e.message}\n")
-                    return subFlow(ReceiveFinalityFlow(session))
+                    val errorMsg = "Error signing unlock asset transaction: ${e.message}\n"
+                    println(errorMsg)
+                    throw Error(errorMsg)
                 }
             } else if (role == ResponderRole.LOCKER) {
               val signTransactionFlow = object : SignTransactionFlow(session) {
@@ -603,8 +607,9 @@ object UnlockAssetHTLC {
                   println("Locker signed transaction.")
                   return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId))
               } catch (e: Exception) {
-                  println("Error signing unlock asset transaction by Locker: ${e.message}\n")
-                  return subFlow(ReceiveFinalityFlow(session))
+                  val errorMsg = "Error signing unlock asset transaction by Locker: ${e.message}\n"
+                  println(errorMsg)
+                  throw Error(errorMsg)
               }
             } else if (role == ResponderRole.RECIPIENT) {
                 val sTx = subFlow(ReceiveFinalityFlow(session))
