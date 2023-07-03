@@ -1,4 +1,5 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-./node_modules/.bin/lint-staged
+# TODO: re-enable this once we were able to upgrade to the newer ESLint
+# ./node_modules/.bin/lint-staged

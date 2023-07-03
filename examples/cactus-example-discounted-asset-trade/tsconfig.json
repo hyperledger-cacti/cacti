@@ -3,6 +3,7 @@
   "compilerOptions": {
     "composite": true,
     "outDir": "./dist/",
+    "rootDir": "./",
     "tsBuildInfoFile": "../../.build-cache/cactus-example-discounted-asset-trade.tsbuildinfo",
   },
   "include": [
