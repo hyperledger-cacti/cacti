@@ -99,8 +99,9 @@ class CreateMembershipStateResponder(val session: FlowSession) : FlowLogic<Signe
             println("${ourIdentity} signed transaction.")
             return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId))
         } catch (e: Exception) {
-            println("Error during transaction by ${ourIdentity}: ${e.message}\n")
-            return subFlow(ReceiveFinalityFlow(session))
+            val errorMsg = "Error during transaction by ${ourIdentity}: ${e.message}\n"
+            println(errorMsg)
+            throw Error(errorMsg)
         }
     }
 }
@@ -188,8 +189,9 @@ class UpdateMembershipStateResponder(val session: FlowSession) : FlowLogic<Signe
             println("${ourIdentity} signed transaction.")
             return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId))
         } catch (e: Exception) {
-            println("Error during transaction by ${ourIdentity}: ${e.message}\n")
-            return subFlow(ReceiveFinalityFlow(session))
+            val errorMsg = "Error during transaction by ${ourIdentity}: ${e.message}\n"
+            println(errorMsg)
+            throw Error(errorMsg)
         }
     }
 }
@@ -265,8 +267,9 @@ class DeleteMembershipStateResponder(val session: FlowSession) : FlowLogic<Signe
             println("${ourIdentity} signed transaction.")
             return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId))
         } catch (e: Exception) {
-            println("Error during transaction by ${ourIdentity}: ${e.message}\n")
-            return subFlow(ReceiveFinalityFlow(session))
+            val errorMsg = "Error during transaction by ${ourIdentity}: ${e.message}\n"
+            println(errorMsg)
+            throw Error(errorMsg)
         }
     }
 }
