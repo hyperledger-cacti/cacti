@@ -8,11 +8,13 @@ use weaverpb::common::ack::{ack, Ack};
 use weaverpb::common::state::{request_state, RequestState};
 use weaverpb::networks::networks::NetworkAssetTransfer;
 use weaverpb::relay::satp::satp_client::SatpClient;
-use weaverpb::relay::satp::{CommenceResponseRequest, TransferCommenceRequest};
+use weaverpb::relay::satp::{AckCommenceRequest, TransferCommenceRequest, LockAssertionRequest};
 
 use crate::db::Database;
 use crate::error::{self, Error};
 use crate::relay_proto::LocationSegment;
+
+use super::constants::{SATP_DB_PATH, SATP_REQUESTS_DB_PATH, SATP_REMOTE_REQUESTS_DB_PATH, SATP_REMOTE_REQUESTS_STATES_DB_PATH, SATP_REQUESTS_STATES_DB_PATH};
 
 // Sends a request to the receiving gateway
 pub fn spawn_send_transfer_commence_request(
@@ -25,7 +27,7 @@ pub fn spawn_send_transfer_commence_request(
         "Sending transfer commence request to receiver gateway: {:?}:{:?}",
         receiver_relay_host, receiver_relay_port
     );
-    // Spawning new thread to make the asset_transfer_call to receiver gateway
+    // Spawning new thread to make the call_asset_transfer to receiver gateway
     tokio::spawn(async move {
         let (use_tls, relay_tlsca_cert_path) = get_relay_params(
             receiver_relay_host.clone(),
@@ -33,7 +35,7 @@ pub fn spawn_send_transfer_commence_request(
             conf.clone(),
         );
         let request_id = transfer_commence_request.session_id.to_string();
-        let result = transfer_commence_call(
+        let result = call_transfer_commence(
             receiver_relay_host,
             receiver_relay_port,
             use_tls,
@@ -48,8 +50,8 @@ pub fn spawn_send_transfer_commence_request(
     });
 }
 
-pub fn spawn_send_commence_response_request(
-    commence_response_request: CommenceResponseRequest,
+pub fn spawn_send_ack_commence_request(
+    ack_commence_request: AckCommenceRequest,
     requesting_relay_host: String,
     requesting_relay_port: String,
     use_tls: bool,
@@ -59,26 +61,60 @@ pub fn spawn_send_commence_response_request(
     tokio::spawn(async move {
         println!(
             "Sending commence response back to sending gateway: Request ID = {:?}",
-            commence_response_request.session_id
+            ack_commence_request.session_id
         );
-        let result = commence_response_call(
+        let result = call_ack_commence(
             requesting_relay_host,
             requesting_relay_port,
             use_tls,
             relay_tlsca_cert_path.to_string(),
-            commence_response_request.clone(),
+            ack_commence_request.clone(),
         )
         .await;
 
         println!("Received Ack from sending gateway: {:?}\n", result);
         // Updates the request in the DB depending on the response status from the sending gateway
-        let request_id = commence_response_request.session_id.to_string();
+        let request_id = ack_commence_request.session_id.to_string();
+        log_request_result_in_local_satp_db(&request_id, result, conf);
+    });
+}
+
+pub fn spawn_send_perform_lock_request(
+    lock_assertion_request: LockAssertionRequest,
+    requesting_relay_host: String,
+    requesting_relay_port: String,
+    use_tls: bool,
+    relay_tlsca_cert_path: String,
+    conf: Config,
+) {
+    tokio::spawn(async move {
+        println!(
+            "Locking the asset of the lock assertion request {:?}",
+            lock_assertion_request
+        );
+        // TODO
+        // Call the driver to check the asset status
+        // Subscribe to the status event
+        // Once the asset is locked, call the lock_assertion endpoint
+        // log the results
+        let result = call_lock_assertion(
+            requesting_relay_host,
+            requesting_relay_port,
+            use_tls,
+            relay_tlsca_cert_path.to_string(),
+            lock_assertion_request.clone(),
+        )
+        .await;
+
+        println!("Received Ack from sending gateway: {:?}\n", result);
+        // Updates the request in the DB depending on the response status from the sending gateway
+        let request_id = lock_assertion_request.session_id.to_string();
         log_request_result_in_local_satp_db(&request_id, result, conf);
     });
 }
 
 // Call the transfer_commence endpoint on the receiver gateway
-pub async fn transfer_commence_call(
+pub async fn call_transfer_commence(
     relay_host: String,
     relay_port: String,
     use_tls: bool,
@@ -97,22 +133,42 @@ pub async fn transfer_commence_call(
     Ok(response)
 }
 
-// Call the commence_response endpoint on the sending gateway
-pub async fn commence_response_call(
+// Call the ack_commence endpoint on the sending gateway
+pub async fn call_ack_commence(
     relay_host: String,
     relay_port: String,
     use_tls: bool,
     tlsca_cert_path: String,
-    commence_response_request: CommenceResponseRequest,
+    ack_commence_request: AckCommenceRequest,
 ) -> Result<Response<Ack>, Box<dyn std::error::Error>> {
     let mut satp_client: SatpClient<Channel> =
         create_satp_client(relay_host, relay_port, use_tls, tlsca_cert_path).await?;
     println!(
         "Sending the commence response request: {:?}",
-        commence_response_request.clone()
+        ack_commence_request.clone()
     );
     let response = satp_client
-        .commence_response(commence_response_request.clone())
+        .ack_commence(ack_commence_request.clone())
+        .await?;
+    Ok(response)
+}
+
+// Call the lock_assertion endpoint on the sending gateway
+pub async fn call_lock_assertion(
+    relay_host: String,
+    relay_port: String,
+    use_tls: bool,
+    tlsca_cert_path: String,
+    lock_assertion_request: LockAssertionRequest,
+) -> Result<Response<Ack>, Box<dyn std::error::Error>> {
+    let mut satp_client: SatpClient<Channel> =
+        create_satp_client(relay_host, relay_port, use_tls, tlsca_cert_path).await?;
+    println!(
+        "Sending the lock assertion request: {:?}",
+        lock_assertion_request.clone()
+    );
+    let response = satp_client
+        .lock_assertion(lock_assertion_request.clone())
         .await?;
     Ok(response)
 }
@@ -196,10 +252,10 @@ pub fn derive_transfer_commence_request(
     return transfer_commence_request;
 }
 
-pub fn create_commence_response_request(
+pub fn create_ack_commence_request(
     transfer_commence_request: TransferCommenceRequest,
-) -> CommenceResponseRequest {
-    let commence_response_request = CommenceResponseRequest {
+) -> AckCommenceRequest {
+    let ack_commence_request = AckCommenceRequest {
         message_type: "message_type1".to_string(),
         session_id: "session_id1".to_string(),
         transfer_context_id: "transfer_context_id1".to_string(),
@@ -209,22 +265,31 @@ pub fn create_commence_response_request(
         server_transfer_number: "server_transfer_number1".to_string(),
         server_signature: "server_signature1".to_string(),
     };
+    return ack_commence_request;
+}
 
-    return commence_response_request;
+pub fn create_lock_assertion_request(
+    ack_commence_request: AckCommenceRequest,
+) -> LockAssertionRequest {
+    let lock_assertion_request = LockAssertionRequest {
+        message_type: "message_type1".to_string(),
+        session_id: "session_id1".to_string(),
+        transfer_context_id: "transfer_context_id1".to_string(),
+        client_identity_pubkey: "client_identity_pubkey1".to_string(),
+        server_identity_pubkey: "server_identity_pubkey1".to_string(),
+        hash_prev_message: "hash_prev_message1".to_string(),
+        lock_assertion_claim: "lock_assertion_claim1".to_string(),
+        lock_assertion_claim_format: "lock_assertion_claim_format1".to_string(),
+        lock_assertion_expiration: "lock_assertion_expiration".to_string(),
+        client_transfer_number: "client_transfer_number1".to_string(),
+        client_signature: "client_signature1".to_string(),
+    };
+    return lock_assertion_request;
 }
 
 pub fn get_satp_requests_local_db(conf: Config) -> Database {
     let db = Database {
-        db_path: conf.get_str("db_satp_requests_path").unwrap(),
-        db_open_max_retries: conf.get_int("db_open_max_retries").unwrap_or(500) as u32,
-        db_open_retry_backoff_msec: conf.get_int("db_open_retry_backoff_msec").unwrap_or(10) as u32,
-    };
-    return db;
-}
-
-pub fn get_satp_requests_states_local_db(conf: Config) -> Database {
-    let db = Database {
-        db_path: conf.get_str("db_satp_requests_states_path").unwrap(),
+        db_path: format!("{}{}", conf.get_str(SATP_DB_PATH).unwrap(), SATP_REQUESTS_DB_PATH),
         db_open_max_retries: conf.get_int("db_open_max_retries").unwrap_or(500) as u32,
         db_open_retry_backoff_msec: conf.get_int("db_open_retry_backoff_msec").unwrap_or(10) as u32,
     };
@@ -233,7 +298,16 @@ pub fn get_satp_requests_states_local_db(conf: Config) -> Database {
 
 pub fn get_satp_requests_remote_db(conf: Config) -> Database {
     let db = Database {
-        db_path: conf.get_str("remote_db_satp_requests_path").unwrap(),
+        db_path: format!("{}{}", conf.get_str(SATP_DB_PATH).unwrap(), SATP_REMOTE_REQUESTS_DB_PATH),
+        db_open_max_retries: conf.get_int("db_open_max_retries").unwrap_or(500) as u32,
+        db_open_retry_backoff_msec: conf.get_int("db_open_retry_backoff_msec").unwrap_or(10) as u32,
+    };
+    return db;
+}
+
+pub fn get_satp_requests_states_local_db(conf: Config) -> Database {
+    let db = Database {
+        db_path: format!("{}{}", conf.get_str(SATP_DB_PATH).unwrap(), SATP_REQUESTS_STATES_DB_PATH),
         db_open_max_retries: conf.get_int("db_open_max_retries").unwrap_or(500) as u32,
         db_open_retry_backoff_msec: conf.get_int("db_open_retry_backoff_msec").unwrap_or(10) as u32,
     };
@@ -242,7 +316,7 @@ pub fn get_satp_requests_remote_db(conf: Config) -> Database {
 
 pub fn get_satp_requests_states_remote_db(conf: Config) -> Database {
     let db = Database {
-        db_path: conf.get_str("remote_db_satp_requests_states_path").unwrap(),
+        db_path: format!("{}{}", conf.get_str(SATP_DB_PATH).unwrap(), SATP_REMOTE_REQUESTS_STATES_DB_PATH),
         db_open_max_retries: conf.get_int("db_open_max_retries").unwrap_or(500) as u32,
         db_open_retry_backoff_msec: conf.get_int("db_open_retry_backoff_msec").unwrap_or(10) as u32,
     };
@@ -305,8 +379,17 @@ pub fn update_request_state_in_local_satp_db(
     println!("{:?}\n", db.get::<RequestState>(request_id).unwrap())
 }
 
-pub fn get_requesting_relay_host_and_port(
+// Get the requesting relay host and port
+pub fn get_relay_from_transfer_commence(
     transfer_commence_request: TransferCommenceRequest,
+) -> (String, String) {
+    // TODO
+    return ("localhost".to_string(), "9085".to_string());
+}
+
+// Get the requesting relay host and port
+pub fn get_relay_from_ack_commence(
+    ack_commence_request: AckCommenceRequest,
 ) -> (String, String) {
     // TODO
     return ("localhost".to_string(), "9085".to_string());

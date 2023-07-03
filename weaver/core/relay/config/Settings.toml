@@ -2,12 +2,9 @@ name = "Fabric_Relay"
 port="9080"
 hostname="localhost"
 db_path="db/requests"
-db_satp_requests_path="db/satp/requests"
-db_satp_requests_states_path="db/satp/requests_states"
 # This will be replaced by the task queue.
 remote_db_path="db/remote_requests"
-remote_db_satp_requests_path="db/satp/remote_requests_states"
-remote_db_satp_requests_states_path="db/satp/requests_states"
+db_satp_path="db"
 # max retries opening sled db if it is locked
 db_open_max_retries=500
 # retry back off time in ms if sled db is locked

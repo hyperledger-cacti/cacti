@@ -54,7 +54,7 @@ pub struct TransferCommenceRequest {
 #[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct CommenceResponseRequest {
+pub struct AckCommenceRequest {
     #[prost(string, tag = "1")]
     pub message_type: ::prost::alloc::string::String,
     #[prost(string, tag = "2")]
@@ -213,11 +213,11 @@ pub mod satp_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
-        /// The receiver gateway sends a CommenceResponse request to the sender gateway to indicate agreement
+        /// The receiver gateway sends a AckCommence request to the sender gateway to indicate agreement
         /// to proceed with the asset transfe
-        pub async fn commence_response(
+        pub async fn ack_commence(
             &mut self,
-            request: impl tonic::IntoRequest<super::CommenceResponseRequest>,
+            request: impl tonic::IntoRequest<super::AckCommenceRequest>,
         ) -> Result<
             tonic::Response<super::super::super::common::ack::Ack>,
             tonic::Status,
@@ -233,7 +233,7 @@ pub mod satp_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/relay.satp.SATP/CommenceResponse",
+                "/relay.satp.SATP/AckCommence",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
@@ -304,11 +304,11 @@ pub mod satp_server {
             tonic::Response<super::super::super::common::ack::Ack>,
             tonic::Status,
         >;
-        /// The receiver gateway sends a CommenceResponse request to the sender gateway to indicate agreement
+        /// The receiver gateway sends a AckCommence request to the sender gateway to indicate agreement
         /// to proceed with the asset transfe
-        async fn commence_response(
+        async fn ack_commence(
             &self,
-            request: tonic::Request<super::CommenceResponseRequest>,
+            request: tonic::Request<super::AckCommenceRequest>,
         ) -> Result<
             tonic::Response<super::super::super::common::ack::Ack>,
             tonic::Status,
@@ -432,13 +432,11 @@ pub mod satp_server {
                     };
                     Box::pin(fut)
                 }
-                "/relay.satp.SATP/CommenceResponse" => {
+                "/relay.satp.SATP/AckCommence" => {
                     #[allow(non_camel_case_types)]
-                    struct CommenceResponseSvc<T: Satp>(pub Arc<T>);
-                    impl<
-                        T: Satp,
-                    > tonic::server::UnaryService<super::CommenceResponseRequest>
-                    for CommenceResponseSvc<T> {
+                    struct AckCommenceSvc<T: Satp>(pub Arc<T>);
+                    impl<T: Satp> tonic::server::UnaryService<super::AckCommenceRequest>
+                    for AckCommenceSvc<T> {
                         type Response = super::super::super::common::ack::Ack;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
@@ -446,11 +444,11 @@ pub mod satp_server {
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::CommenceResponseRequest>,
+                            request: tonic::Request<super::AckCommenceRequest>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
                             let fut = async move {
-                                (*inner).commence_response(request).await
+                                (*inner).ack_commence(request).await
                             };
                             Box::pin(fut)
                         }
@@ -460,7 +458,7 @@ pub mod satp_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = CommenceResponseSvc(inner);
+                        let method = AckCommenceSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(

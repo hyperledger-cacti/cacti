@@ -16,9 +16,9 @@ service SATP {
   // that the it is ready to start the transfer of the digital asset
   rpc TransferCommence(TransferCommenceRequest) returns (common.ack.Ack) {};
 
-  // The receiver gateway sends a CommenceResponse request to the sender gateway to indicate agreement
+  // The receiver gateway sends a AckCommence request to the sender gateway to indicate agreement
   // to proceed with the asset transfe
-  rpc CommenceResponse(CommenceResponseRequest) returns (common.ack.Ack) {};
+  rpc AckCommence(AckCommenceRequest) returns (common.ack.Ack) {};
 
   // The sender gateway sends a LockAssertion request to convey a signed claim to the receiver gateway 
   // declaring that the asset in question has been locked or escrowed by the sender gateway in
@@ -58,7 +58,7 @@ message TransferCommenceRequest {
   // AssetTransferInitializationClaims asset_transfer_initialization_claims = 10;
 }
 
-message CommenceResponseRequest {
+message AckCommenceRequest {
   string message_type = 1;
   string session_id = 2;
   string transfer_context_id = 3;
