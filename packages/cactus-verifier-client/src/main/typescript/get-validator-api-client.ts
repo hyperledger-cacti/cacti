@@ -21,6 +21,11 @@ import {
 } from "@hyperledger/cactus-plugin-ledger-connector-quorum";
 
 import {
+  EthereumApiClient,
+  EthereumApiClientOptions,
+} from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
+
+import {
   CordaApiClient,
   CordaApiClientOptions,
 } from "@hyperledger/cactus-plugin-ledger-connector-corda";
@@ -63,6 +68,10 @@ export type ClientApiConfig = {
     in: QuorumApiClientOptions;
     out: QuorumApiClient;
   };
+  ETH_1X: {
+    in: EthereumApiClientOptions;
+    out: EthereumApiClient;
+  };
   CORDA_4X: {
     in: CordaApiClientOptions;
     out: CordaApiClient;
@@ -102,6 +111,8 @@ export function getValidatorApiClient<K extends keyof ClientApiConfig>(
       return new BesuApiClient(options as BesuApiClientOptions);
     case "QUORUM_2X":
       return new QuorumApiClient(options as QuorumApiClientOptions);
+    case "ETH_1X":
+      return new EthereumApiClient(options as EthereumApiClientOptions);
     case "CORDA_4X":
       return new CordaApiClient(options as CordaApiClientOptions);
     case "IROHA_1X":

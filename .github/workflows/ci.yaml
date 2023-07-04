@@ -1319,6 +1319,35 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
+  cactus-plugin-ledger-connector-ethereum:
+    continue-on-error: false
+    env:
+      FULL_BUILD_DISABLED: true
+      JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_RUNNER_DISABLED: false
+      TAPE_TEST_PATTERN: >-
+        --files={./packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/integration/plugin-ledger-connector-ethereum/deploy-contract/openapi/openapi-validation-no-keychain.test.ts,./packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/integration/plugin-ledger-connector-ethereum/deploy-contract/openapi/openapi-validation.test.ts,./packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/integration/plugin-ledger-connector-ethereum/deploy-contract/v2.3.0-deploy-contract-from-json-json-object-endpoints.test.ts,./packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/integration/plugin-ledger-connector-ethereum/deploy-contract/v2.3.0-deploy-contract-from-json-json-object.test.ts,./packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/integration/plugin-ledger-connector-ethereum/deploy-contract/v2.3.0-invoke-contract-json-object-endpoints.test.ts,./packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/integration/plugin-ledger-connector-ethereum/deploy-contract/v2.3.0-invoke-contract-json-object.test.ts,./packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/integration/plugin-ledger-connector-ethereum/deploy-contract/v21.4.1-deploy-contract-from-json-json-object-endpoints.test.ts,./packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/integration/plugin-ledger-connector-ethereum/deploy-contract/v21.4.1-deploy-contract-from-json-json-object.test.ts,./packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/integration/plugin-ledger-connector-ethereum/deploy-contract/v21.4.1-invoke-contract-json-object-endpoints.test.ts,./packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/integration/plugin-ledger-connector-ethereum/deploy-contract/v21.4.1-invoke-contract-json-object.test.ts}
+      TAPE_TEST_RUNNER_DISABLED: false
+    needs: build-dev
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Use Node.js v16.14.2
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: v16.14.2
+      - uses: actions/checkout@v3.5.2
+      - id: yarn-cache-dir-path
+        name: Get yarn cache directory path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - id: yarn-cache
+        name: Restore Yarn Cache
+        uses: actions/cache@v3.0.4
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - run: ./tools/ci.sh
   cactus-plugin-ledger-connector-quorum:
     continue-on-error: false
     env:
@@ -1693,6 +1722,33 @@ jobs:
           path: ./.yarn/
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+      - run: ./tools/ci.sh
+  cactus-test-plugin-ledger-connector-ethereum:
+    continue-on-error: false
+    env:
+      FULL_BUILD_DISABLED: true
+      JEST_TEST_PATTERN: packages/cactus-test-plugin-ledger-connector-ethereum/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_RUNNER_DISABLED: false
+      TAPE_TEST_RUNNER_DISABLED: true
+    needs: build-dev
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Use Node.js v16.14.2
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: v16.14.2
+      - uses: actions/checkout@v3.5.2
+      - id: yarn-cache-dir-path
+        name: Get yarn cache directory path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - id: yarn-cache
+        name: Restore Yarn Cache
+        uses: actions/cache@v3.0.4
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
       - run: ./tools/ci.sh
   cactus-test-tooling:
     continue-on-error: false

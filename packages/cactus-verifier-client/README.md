@@ -8,7 +8,8 @@ This package provides `Verifier` and `VerifierFactory` components that can be us
 | validatorType          | cactus ledger connector plugin                  |
 | ---------------------- | ----------------------------------------------- |
 | BESU_1X<br />BESU_2X   | cactus-plugin-ledger-connector-besu             |
-| QUORUM_2X              | cactus-test-plugin-ledger-connector-quorum      |
+| QUORUM_2X              | cactus-plugin-ledger-connector-quorum           |
+| ETH_1X                 | cactus-plugin-ledger-connector-ethereum         |
 | CORDA_4X               | cactus-plugin-ledger-connector-corda            |
 | IROHA_1X               | cactus-plugin-ledger-connector-iroha            |
 | IROHA_2X               | cactus-plugin-ledger-connector-iroha2           |

@@ -27,6 +27,9 @@
       "path": "../cactus-plugin-ledger-connector-quorum/tsconfig.json"
     },
     {
+      "path": "../cactus-plugin-ledger-connector-ethereum/tsconfig.json"
+    },
+    {
       "path": "../cactus-plugin-ledger-connector-corda/tsconfig.json"
     },
     {
