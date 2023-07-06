@@ -12,6 +12,10 @@ import Web3JsQuorum, {
   ISendRawTransaction,
   IPrivateTransactionReceipt,
 } from "web3js-quorum";
+import {
+  WebsocketProviderOptions,
+  HttpProviderOptions,
+} from "web3-core-helpers";
 import { AbiItem } from "web3-utils";
 import { Contract } from "web3-eth-contract";
 import { ContractSendMethod } from "web3-eth-contract";
@@ -84,6 +88,8 @@ export interface IPluginLedgerConnectorQuorumOptions
   prometheusExporter?: PrometheusExporter;
   pluginRegistry: PluginRegistry;
   privateUrl?: string;
+  wsProviderOptions?: WebsocketProviderOptions;
+  httpProviderOptions?: HttpProviderOptions;
 }
 
 export class PluginLedgerConnectorQuorum
@@ -113,9 +119,20 @@ export class PluginLedgerConnectorQuorum
 
   private getWeb3Provider() {
     if (!this.options.rpcApiWsHost) {
-      return new Web3.providers.HttpProvider(this.options.rpcApiHttpHost);
+      return this.options.httpProviderOptions
+        ? new Web3.providers.HttpProvider(
+            this.options.rpcApiHttpHost,
+            this.options.httpProviderOptions,
+          )
+        : new Web3.providers.HttpProvider(this.options.rpcApiHttpHost);
     }
-    return new Web3.providers.WebsocketProvider(this.options.rpcApiWsHost);
+
+    return this.options.wsProviderOptions
+      ? new Web3.providers.WebsocketProvider(
+          this.options.rpcApiWsHost,
+          this.options.wsProviderOptions,
+        )
+      : new Web3.providers.WebsocketProvider(this.options.rpcApiWsHost);
   }
 
   constructor(public readonly options: IPluginLedgerConnectorQuorumOptions) {

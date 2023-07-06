@@ -51,7 +51,9 @@ describe("invokeRawWeb3EthMethod Tests", () => {
     await quorumTestLedger.start();
 
     const rpcApiHttpHost = await quorumTestLedger.getRpcApiHttpHost();
-    log.debug("rpcApiHttpHost:", rpcApiHttpHost);
+    const getRpcApiWsHost = await quorumTestLedger.getRpcApiWsHost();
+    log.warn("rpcApiHttpHost:", rpcApiHttpHost);
+    log.warn("getRpcApiWsHost:", getRpcApiWsHost);
 
     log.info("Create PluginLedgerConnectorQuorum...");
     connector = new PluginLedgerConnectorQuorum({

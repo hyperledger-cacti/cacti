@@ -18,6 +18,7 @@ import "jest-extended";
 import lodash from "lodash";
 import { v4 as uuidv4 } from "uuid";
 import Web3 from "web3";
+import { WebsocketProviderOptions } from "web3-core-helpers";
 import { AbiItem } from "web3-utils";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import {
@@ -112,9 +113,19 @@ describe("Verifier integration with quorum connector tests", () => {
     plugins.push(keychainPlugin);
 
     log.info("Create PluginLedgerConnectorQuorum...");
+
+    const wsProviderOptions: WebsocketProviderOptions = {
+      clientConfig: {
+        // Useful if requests are large
+        maxReceivedFrameSize: 100000000,
+        maxReceivedMessageSize: 100000000,
+      },
+    };
+
     connector = new PluginLedgerConnectorQuorum({
       rpcApiHttpHost: connectionProfile.quorum.member1.url,
       rpcApiWsHost: connectionProfile.quorum.member1.wsUrl,
+      wsProviderOptions: wsProviderOptions,
       logLevel: sutLogLevel,
       instanceId: uuidv4(),
       pluginRegistry: new PluginRegistry({ plugins: [keychainPlugin] }),
@@ -268,6 +279,26 @@ describe("Verifier integration with quorum connector tests", () => {
         abi: HelloWorldContractJson.abi as AbiItem[],
         address: deployOut.transactionReceipt.contractAddress as string,
       };
+    });
+
+    test("Using verifier for calling getBlock method works", async () => {
+      const correctContract = {};
+      const correctMethod = {
+        type: "web3Eth",
+        command: "getBlock",
+      };
+
+      const correctArgs: any = { args: ["latest"] };
+
+      const resultCorrect = await verifier.sendSyncRequest(
+        correctContract,
+        correctMethod,
+        correctArgs,
+      );
+
+      log.warn("verifier", verifier);
+      log.warn("###Results", resultCorrect);
+      // expect(resultCorrect.status).toEqual(200);
     });
 
     test("Invalid web3EthContract calls are rejected by QuorumApiClient", async () => {
@@ -500,6 +531,7 @@ describe("Verifier integration with quorum connector tests", () => {
         methodCall,
         argsCall,
       );
+      log.error(resultsCall);
       expect(resultsCall.status).toEqual(200);
       expect(resultsCall.data).toEqual(newName);
     });

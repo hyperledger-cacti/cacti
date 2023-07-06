@@ -35,7 +35,7 @@ tap.test("starts/stops/destroys a docker container", async (assert: any) => {
   assert.ok(ipAddress);
   assert.ok(ipAddress.length);
 
-  const hostPort: number = await ledger.getRpcApiPublicPort();
+  const hostPort: number = await ledger.getRpcHttpApiPublicPort();
   assert.ok(hostPort, "getRpcApiPublicPort() returns truthy OK");
   assert.ok(isFinite(hostPort), "getRpcApiPublicPort() returns finite OK");
 
