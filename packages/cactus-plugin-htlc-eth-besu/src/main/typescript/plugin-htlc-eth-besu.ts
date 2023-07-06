@@ -34,6 +34,7 @@ import {
   InitializeRequest,
   GetStatusRequest,
   GetSingleStatusRequest,
+  Web3SigningCredentialPrivateKeyHex,
 } from "./generated/openapi/typescript-axios";
 export interface IPluginHtlcEthBesuOptions extends ICactusPluginOptions {
   logLevel?: LogLevelDesc;
@@ -188,6 +189,23 @@ export class PluginHtlcEthBesu implements ICactusPlugin, IPluginWebService {
       gas: newContractRequest.gas || this.estimatedGas,
       value: newContractRequest.inputAmount,
     });
+
+    console.log(
+      "newContractV1() args to hash for ID: ",
+      JSON.stringify(
+        [
+          (newContractRequest.web3SigningCredential as Web3SigningCredentialPrivateKeyHex)
+            .ethAccount,
+          newContractRequest.receiver,
+          newContractRequest.inputAmount,
+          newContractRequest.hashLock,
+          newContractRequest.expiration,
+        ],
+        null,
+        4,
+      ),
+    );
+
     return result;
   }
 

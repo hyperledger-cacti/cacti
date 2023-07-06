@@ -1,5 +1,6 @@
-pragma solidity ^0.8.0;
+// SPDX-License-Identifier: Apache-2.0
 
+pragma solidity 0.8.19;
 
 
 /**
@@ -405,7 +406,7 @@ contract HashedTimeLockContract {
         IERC20(tokenAddress).transferFrom(msg.sender, address(this), inputAmount);
 
         bytes32 id = keccak256(
-            abi.encodePacked(
+            abi.encode(
                 msg.sender,
                 receiver,
                 inputAmount,
@@ -454,7 +455,7 @@ contract HashedTimeLockContract {
         require(c.expiration > block.timestamp, "INVALID_TIME");
 
         require(
-            c.hashLock == sha256(abi.encodePacked(secret)),
+            c.hashLock == keccak256(abi.encode(secret)),
             "INVALID_SECRET"
         );
 

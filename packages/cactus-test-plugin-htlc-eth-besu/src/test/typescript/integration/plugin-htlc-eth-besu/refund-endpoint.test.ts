@@ -41,6 +41,9 @@ const connectorId = uuidv4();
 const logLevel: LogLevelDesc = "INFO";
 const testCase = "Test refund";
 
+const FORTY_TWO_AS_HEX_STRING =
+  "0x0000000000000000000000000000000000000000000000000000000000003432";
+
 describe(testCase, () => {
   const besuTestLedger = new BesuTestLedger({ logLevel });
   const expressApp = express();
@@ -191,7 +194,7 @@ describe(testCase, () => {
       inputAmount: 10,
       outputAmount: 0x04,
       expiration: timestamp,
-      hashLock: DataTest.hashLock,
+      hashLock: FORTY_TWO_AS_HEX_STRING,
       receiver: DataTest.receiver,
       outputNetwork: "BTC",
       outputAddress: "1AcVYm7M3kkJQH28FXAvyBFQzFRL6xPKu8",
@@ -204,26 +207,24 @@ describe(testCase, () => {
     expect(resp).toBeTruthy();
     expect(resp.status).toEqual(200);
 
-    const responseTxId = await connector.invokeContract({
-      contractName: DemoHelperJSON.contractName,
-      keychainId,
-      signingCredential: web3SigningCredential,
-      invocationType: EthContractInvocationType.Call,
-      methodName: "getTxId",
-      params: [
-        firstHighNetWorthAccount,
-        DataTest.receiver,
-        10,
-        DataTest.hashLock,
-        timestamp,
-      ],
-    });
-    expect(responseTxId.callOutput).toBeTruthy();
-    const id = responseTxId.callOutput as string;
+    const id = web3.utils.soliditySha3(
+      web3.eth.abi.encodeParameters(
+        ["address", "address", "uint256", "bytes32", "uint256"],
+        [
+          firstHighNetWorthAccount,
+          DataTest.receiver,
+          10,
+          FORTY_TWO_AS_HEX_STRING,
+          timestamp,
+        ],
+      ),
+    );
+    expect(id).toBeTruthy();
+    expect(id).toBeString();
 
     await timeout(6000);
     const refundRequest: RefundReq = {
-      id,
+      id: id as string,
       web3SigningCredential,
       connectorId,
       keychainId,
@@ -236,7 +237,7 @@ describe(testCase, () => {
     const balance2 = await web3.eth.getBalance(firstHighNetWorthAccount);
     expect(balance1).toEqual(balance2);
     const res = await api.getSingleStatusV1({
-      id,
+      id: id as string,
       web3SigningCredential,
       connectorId,
       keychainId,

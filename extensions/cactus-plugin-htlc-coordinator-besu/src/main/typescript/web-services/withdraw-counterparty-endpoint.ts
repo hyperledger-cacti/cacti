@@ -1,4 +1,5 @@
-import { Express, Request, Response } from "express";
+import type { Express, Request, Response } from "express";
+import fastSafeStringify from "fast-safe-stringify";
 
 import {
   IWebServiceEndpoint,
@@ -19,6 +20,7 @@ import {
 } from "@hyperledger/cactus-core";
 import { WithdrawCounterpartyRequest } from "../generated/openapi/typescript-axios";
 import { PluginHTLCCoordinatorBesu } from "../plugin-htlc-coordinator-besu";
+import { WithdrawCounterpartyTxReverted } from "../plugin-htlc-coordinator-besu";
 import OAS from "../../json/openapi.json";
 
 export interface IWithdrawCounterpartyOptions {
@@ -101,11 +103,17 @@ export class WithdrawCounterpartyEndpoint implements IWebServiceEndpoint {
       }) as unknown) as PluginHTLCCoordinatorBesu;
       const resBody = await connector.withdrawCounterparty(request);
       res.json(resBody);
-    } catch (ex) {
-      res.status(500).json({
-        message: "Internal Server Error",
-        error: ex,
-      });
+    } catch (ex: unknown) {
+      if (ex instanceof WithdrawCounterpartyTxReverted) {
+        this.log.debug("%o %o", reqTag, ex);
+        res.status(400).json(ex);
+      } else {
+        const error = ex instanceof Error ? ex.message : fastSafeStringify(ex);
+        res.status(500).json({
+          message: "Internal Server Error",
+          error,
+        });
+      }
     }
   }
 }
