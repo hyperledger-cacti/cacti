@@ -43,6 +43,11 @@ geth \
   --http.vhosts "*" \
   --http.addr 0.0.0.0 \
   --http.port 8545 \
+  --ws \
+  --wsaddr "0.0.0.0" \
+  --wsport "8546" \
+  --wsapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum,${QUORUM_CONSENSUS:-raft} \
+  --wsorigins "*" \
   --http.api admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum,${QUORUM_CONSENSUS:-raft} \
   --port 21000 \
   --allow-insecure-unlock \

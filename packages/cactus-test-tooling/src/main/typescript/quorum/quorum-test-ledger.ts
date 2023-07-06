@@ -23,6 +23,7 @@ export interface IQuorumTestLedgerConstructorOptions {
   containerImageVersion?: string;
   containerImageName?: string;
   rpcApiHttpPort?: number;
+  rpcApiWsPort?: number;
   logLevel?: LogLevelDesc;
   emitContainerLogs?: boolean;
   readonly envVars?: string[];
@@ -32,6 +33,7 @@ export const QUORUM_TEST_LEDGER_DEFAULT_OPTIONS = Object.freeze({
   containerImageVersion: "2021-01-08-7a055c3",
   containerImageName: "ghcr.io/hyperledger/cactus-quorum-all-in-one",
   rpcApiHttpPort: 8545,
+  rpcApiWsPort: 8546,
 });
 
 export const QUORUM_TEST_LEDGER_OPTIONS_JOI_SCHEMA: Joi.Schema = Joi.object().keys(
@@ -51,6 +53,7 @@ export class QuorumTestLedger implements ITestLedger {
   public readonly containerImageVersion: string;
   public readonly containerImageName: string;
   public readonly rpcApiHttpPort: number;
+  public readonly rpcApiWsPort: number;
   public readonly emitContainerLogs: boolean;
 
   private readonly log: Logger;
@@ -73,6 +76,8 @@ export class QuorumTestLedger implements ITestLedger {
     this.rpcApiHttpPort =
       options.rpcApiHttpPort ||
       QUORUM_TEST_LEDGER_DEFAULT_OPTIONS.rpcApiHttpPort;
+    this.rpcApiWsPort =
+      options.rpcApiWsPort || QUORUM_TEST_LEDGER_DEFAULT_OPTIONS.rpcApiWsPort;
 
     this.envVars = options.envVars || [];
 
@@ -102,8 +107,13 @@ export class QuorumTestLedger implements ITestLedger {
 
   public async getRpcApiHttpHost(): Promise<string> {
     const ipAddress = "127.0.0.1";
-    const hostPort = await this.getRpcApiPublicPort();
+    const hostPort = await this.getRpcHttpApiPublicPort();
     return `http://${ipAddress}:${hostPort}`;
+  }
+  public async getRpcApiWsHost(): Promise<string> {
+    const ipAddress = "127.0.0.1";
+    const hostPort = await this.getRpcWsApiPublicPort();
+    return `ws://${ipAddress}:${hostPort}`;
   }
 
   public async getFileContents(filePath: string): Promise<string> {
@@ -221,7 +231,7 @@ export class QuorumTestLedger implements ITestLedger {
           Env: this.envVars,
           ExposedPorts: {
             [`${this.rpcApiHttpPort}/tcp`]: {}, // quorum RPC - HTTP
-            "8546/tcp": {}, // quorum RPC - WebSocket
+            [`${this.rpcApiWsPort}/tcp`]: {}, // quorum RPC - WebSocket
             "8888/tcp": {}, // orion Client Port - HTTP
             "8080/tcp": {}, // orion Node Port - HTTP
             "9001/tcp": {}, // supervisord - HTTP
@@ -339,10 +349,33 @@ export class QuorumTestLedger implements ITestLedger {
     }
   }
 
-  public async getRpcApiPublicPort(): Promise<number> {
+  public async getRpcHttpApiPublicPort(): Promise<number> {
     const fnTag = "QuorumTestLedger#getRpcApiPublicPort()";
     const aContainerInfo = await this.getContainerInfo();
     const { rpcApiHttpPort: thePort } = this;
+    const { Ports: ports } = aContainerInfo;
+
+    if (ports.length < 1) {
+      throw new Error(`${fnTag} no ports exposed or mapped at all`);
+    }
+    const mapping = ports.find((x) => x.PrivatePort === thePort);
+    if (mapping) {
+      if (!mapping.PublicPort) {
+        throw new Error(`${fnTag} port ${thePort} mapped but not public`);
+      } else if (mapping.IP !== "0.0.0.0") {
+        throw new Error(`${fnTag} port ${thePort} mapped to localhost`);
+      } else {
+        return mapping.PublicPort;
+      }
+    } else {
+      throw new Error(`${fnTag} no mapping found for ${thePort}`);
+    }
+  }
+
+  public async getRpcWsApiPublicPort(): Promise<number> {
+    const fnTag = "QuorumTestLedger#getRpcWsApiPublicPort()";
+    const aContainerInfo = await this.getContainerInfo();
+    const { rpcApiWsPort: thePort } = this;
     const { Ports: ports } = aContainerInfo;
 
     if (ports.length < 1) {

@@ -70,6 +70,7 @@
     "socket.io-client": "4.5.4",
     "typescript-optional": "2.0.1",
     "web3": "1.6.1",
+    "web3-core-helpers": "1.6.1",
     "web3-eth-contract": "1.6.1",
     "web3-utils": "1.6.1",
     "web3js-quorum": "22.4.0"
