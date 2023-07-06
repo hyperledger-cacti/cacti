@@ -4,6 +4,8 @@ import { v4 as uuidv4 } from "uuid";
 import { Express } from "express";
 import { promisify } from "util";
 import { Optional } from "typescript-optional";
+import { RuntimeError } from "run-time-error";
+import fastSafeStringify from "fast-safe-stringify";
 import OAS from "../json/openapi.json";
 import {
   ICactusPlugin,
@@ -328,8 +330,13 @@ export class PluginHTLCCoordinatorBesu
           connectorId: withdrawCounterpartyRequest.connectorInstanceId,
           keychainId: withdrawCounterpartyRequest.keychainId,
         };
-        const res = await pluginHtlc.withdraw(withdrawRequest);
-        return res;
+        try {
+          const res = await pluginHtlc.withdraw(withdrawRequest);
+          return res;
+        } catch (ex: unknown) {
+          const cause = ex instanceof Error ? ex : fastSafeStringify(ex);
+          throw new WithdrawCounterpartyTxReverted(`EVM tx reverted:`, cause);
+        }
       }
       case HtlcPackage.Besu: {
         const pluginOptions: IPluginHtlcEthBesuOptions = {
@@ -361,3 +368,5 @@ export class PluginHTLCCoordinatorBesu
     }
   }
 }
+
+export class WithdrawCounterpartyTxReverted extends RuntimeError {}

@@ -77,7 +77,7 @@ contract PrivateHashTimeLock {
 
         require(inputAmount > 0, "INVALID_AMOUNT");
 
-        bytes32 id = keccak256(abi.encodePacked(sender, receiver, inputAmount, hashLock, expiration));
+        bytes32 id = keccak256(abi.encode(sender, receiver, inputAmount, hashLock, expiration));
 
         require(contracts[id].status == INIT, "SWAP_EXISTS");
         require(priv.generator > 0);

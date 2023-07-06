@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: Apache-2.0
+
 pragma solidity 0.8.19;
 
 contract HashTimeLock {
@@ -58,7 +60,7 @@ contract HashTimeLock {
 
         require(inputAmount > 0, "INVALID_AMOUNT");
 
-        bytes32 id = sha256(abi.encodePacked(sender, receiver, inputAmount, hashLock, expiration));
+        bytes32 id = keccak256(abi.encode(sender, receiver, inputAmount, hashLock, expiration));
 
         require(contracts[id].status == INIT, "SWAP_EXISTS");
 
@@ -78,7 +80,7 @@ contract HashTimeLock {
 
         require(c.expiration > block.timestamp, "INVALID_TIME");
 
-        require(c.hashLock == keccak256(abi.encodePacked(secret)), "INVALID_SECRET");
+        require(c.hashLock == keccak256(abi.encode(secret)), "INVALID_SECRET");
 
         c.status = WITHDRAWN;
 

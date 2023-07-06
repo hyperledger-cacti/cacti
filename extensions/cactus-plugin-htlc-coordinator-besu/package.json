@@ -66,9 +66,11 @@
     "@hyperledger/cactus-test-plugin-htlc-eth-besu-erc20": "2.0.0-alpha.1",
     "axios": "0.21.4",
     "body-parser": "1.19.0",
+    "fast-safe-stringify": "2.1.1",
     "joi": "14.3.1",
     "openapi-types": "7.0.1",
     "prom-client": "13.1.0",
+    "run-time-error": "1.4.0",
     "socket.io-client": "4.5.4",
     "typescript-optional": "2.0.1"
   },
@@ -77,7 +79,9 @@
     "@hyperledger/cactus-test-tooling": "2.0.0-alpha.1",
     "@types/express": "4.17.8",
     "express": "4.17.3",
-    "socket.io": "4.5.4"
+    "socket.io": "4.5.4",
+    "web3-eth-abi": "4.0.3",
+    "web3-utils": "4.0.3"
   },
   "engines": {
     "node": ">=10",

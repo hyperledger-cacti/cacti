@@ -1,3 +1,4 @@
+import axios from "axios";
 import test, { Test } from "tape-promise/tape";
 import { v4 as uuidv4 } from "uuid";
 import { AddressInfo } from "net";
@@ -312,11 +313,15 @@ test(testCase, async (t: Test) => {
 
   try {
     await htlcCoordinatorBesuApi.withdrawCounterpartyV1(withdrawCounterparty);
-  } catch (exp) {
-    const revertReason = exp.response.data.error.receipt.revertReason;
-    const regExp = new RegExp(/0e494e56414c49445f5345435245540/);
-    const rejectMsg = "response === throws OK";
-    t.match(revertReason, regExp, rejectMsg);
+  } catch (exp: unknown) {
+    if (axios.isAxiosError(exp) && exp.response) {
+      const revertReason = exp.response.data.cause.receipt.revertReason;
+      const regExp = new RegExp(/0e494e56414c49445f5345435245540/);
+      const rejectMsg = "response === throws OK";
+      t.match(revertReason, regExp, rejectMsg);
+    } else {
+      throw exp;
+    }
   }
 
   t.comment("Get balance of receiver account");
