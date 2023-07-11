@@ -57,7 +57,7 @@ module.exports = {
 
 ## Test Setup
 
-- TODO
+- Use typescript [GethTestLedger helper class](../../../packages/cactus-test-geth-ledger) to start this ledger and use it from inside of automatic test.
 
 ## Possible improvements
 
