@@ -4,11 +4,15 @@ ARG TESSERA_VERSION=22.1.7
 FROM quorumengineering/quorum:$QUORUM_VERSION AS quorum
 FROM quorumengineering/tessera:$TESSERA_VERSION AS tessera
 
-COPY --from=quorum /usr/local/bin/geth /usr/local/bin/
 COPY --from=quorum /usr/local/bin/bootnode /usr/local/bin/
+
+#LIBSODIUM
+RUN apt-get update && apt-get install -y libsodium23
 
 # BASH
 RUN apt update && apt-get -y install bash
+RUN apt update && apt-get -y install software-properties-common
+RUN apt update && apt-get -y install tar
 
 # SUPERVISORD
 RUN apt update && apt-get -y install supervisor
