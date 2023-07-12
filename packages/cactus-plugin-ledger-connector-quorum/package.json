@@ -68,9 +68,9 @@
     "rxjs": "7.8.1",
     "sanitize-html": "2.7.0",
     "typescript-optional": "2.0.1",
-    "web3": "1.5.2",
-    "web3-eth-contract": "1.5.2",
-    "web3-utils": "1.5.2"
+    "web3": "1.6.1",
+    "web3-eth-contract": "1.6.1",
+    "web3-utils": "1.6.1"
   },
   "devDependencies": {
     "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-alpha.1",
@@ -79,7 +79,7 @@
     "@types/minimist": "1.2.2",
     "@types/sanitize-html": "2.6.2",
     "chalk": "4.1.2",
-    "web3-eth": "1.5.2"
+    "web3-eth": "1.6.1"
   },
   "engines": {
     "node": ">=10",

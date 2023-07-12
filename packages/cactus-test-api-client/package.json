@@ -57,7 +57,7 @@
     "@hyperledger/cactus-core-api": "2.0.0-alpha.1",
     "@hyperledger/cactus-plugin-consortium-manual": "2.0.0-alpha.1",
     "jose": "4.9.2",
-    "web3": "1.5.2"
+    "web3": "1.6.1"
   },
   "devDependencies": {
     "@hyperledger/cactus-test-tooling": "2.0.0-alpha.1"

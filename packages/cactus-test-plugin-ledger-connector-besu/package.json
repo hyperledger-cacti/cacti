@@ -58,7 +58,7 @@
     "@hyperledger/cactus-test-tooling": "2.0.0-alpha.1",
     "@hyperledger/cactus-verifier-client": "2.0.0-alpha.1",
     "key-encoder": "2.0.3",
-    "web3": "1.5.2",
+    "web3": "1.6.1",
     "web3js-quorum": "21.7.0-rc1"
   },
   "engines": {

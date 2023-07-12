@@ -83,9 +83,9 @@
     "temp": "0.9.4",
     "typescript-optional": "2.0.1",
     "uuid": "8.3.2",
-    "web3": "1.5.2",
-    "web3-core": "1.5.2",
-    "web3-utils": "1.5.2"
+    "web3": "1.6.1",
+    "web3-core": "1.6.1",
+    "web3-utils": "1.6.1"
   },
   "devDependencies": {
     "@types/dockerode": "3.2.7",

@@ -5,6 +5,7 @@ import { Logger, Checks } from "@hyperledger/cactus-common";
 import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
 import { WatchBlocksV1Progress } from "../generated/openapi/typescript-axios";
 import { WatchBlocksV1 } from "../generated/openapi/typescript-axios";
+import { Web3BlockHeader } from "../generated/openapi/typescript-axios";
 
 export interface IWatchBlocksV1EndpointOptions {
   logLevel?: LogLevelDesc;
@@ -43,12 +44,17 @@ export class WatchBlocksV1Endpoint {
   public async subscribe(): Promise<void> {
     const { socket, log, web3 } = this;
     log.debug(`${WatchBlocksV1.Subscribe} => ${socket.id}`);
-
     const sub = web3.eth.subscribe("newBlockHeaders", (ex, blockHeader) => {
       log.debug("newBlockHeaders: Error=%o BlockHeader=%o", ex, blockHeader);
       if (blockHeader) {
         const next: WatchBlocksV1Progress = {
-          blockHeader,
+          // Cast needed because somewhere between Web3 v1.5.2 and v1.6.1 they
+          // made the receiptRoot property of the BlockHeader type optional.
+          // This could be accopmanied by a breaking change in their code or
+          // it could've been just a mistake in their typings that they corrected.
+          // Either way, with the next major release, we need to make it optional
+          // in our API specs as well so that they match up.
+          blockHeader: (blockHeader as unknown as Web3BlockHeader),
         };
         socket.emit(WatchBlocksV1.Next, next);
       }

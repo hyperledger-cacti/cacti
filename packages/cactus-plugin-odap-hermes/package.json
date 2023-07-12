@@ -64,8 +64,8 @@
     "socket.io": "4.5.4",
     "sqlite3": "5.1.5",
     "typescript-optional": "2.0.1",
-    "web3": "1.5.2",
-    "web3-utils": "1.5.2"
+    "web3": "1.6.1",
+    "web3-utils": "1.6.1"
   },
   "devDependencies": {
     "@types/crypto-js": "4.0.1",
