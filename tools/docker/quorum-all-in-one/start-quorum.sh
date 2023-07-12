@@ -1,5 +1,11 @@
 #!/bin/bash
 
+curl -o geth-v22.7.4.tar.gz https://artifacts.consensys.net/public/go-quorum/raw/versions/v22.7.4/geth_v22.7.4_linux_amd64.tar.gz
+tar xvfz geth-v22.7.4.tar.gz
+mv geth /usr/local/bin
+
+export PATH=$PATH:/usr/local/bin
+
 UDS_WAIT=10
 for i in $(seq 1 100)
 do
@@ -32,12 +38,12 @@ geth \
   --nodiscover \
   --verbosity 2 \
   --networkid ${NETWORK_ID} \
-  --rpc \
-  --rpccorsdomain "*" \
-  --rpcvhosts "*" \
-  --rpcaddr 0.0.0.0 \
-  --rpcport 8545 \
-  --rpcapi admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum,${QUORUM_CONSENSUS:-raft} \
+  --http \
+  --http.corsdomain "*" \
+  --http.vhosts "*" \
+  --http.addr 0.0.0.0 \
+  --http.port 8545 \
+  --http.api admin,db,eth,debug,miner,net,shh,txpool,personal,web3,quorum,${QUORUM_CONSENSUS:-raft} \
   --port 21000 \
   --allow-insecure-unlock \
   --unlock 0 \
