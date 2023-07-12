@@ -66,7 +66,7 @@
     "run-time-error": "1.4.0",
     "sanitize-html": "2.7.0",
     "uuid": "8.3.2",
-    "web3-utils": "1.5.2"
+    "web3-utils": "1.6.1"
   },
   "devDependencies": {
     "@hyperledger/cactus-api-client": "2.0.0-alpha.1",
@@ -76,9 +76,9 @@
     "@types/pg": "8.6.5",
     "jest-extended": "2.0.0",
     "rxjs": "7.8.1",
-    "web3": "1.5.2",
-    "web3-core": "1.5.2",
-    "web3-eth": "1.5.2"
+    "web3": "1.6.1",
+    "web3-core": "1.6.1",
+    "web3-eth": "1.6.1"
   },
   "engines": {
     "node": ">=10",
