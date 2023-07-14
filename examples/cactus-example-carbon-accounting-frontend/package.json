@@ -77,9 +77,12 @@
     "@angular/compiler-cli": "15.2.9",
     "@angular/language-service": "15.2.9",
     "@ionic/angular-toolkit": "9.0.0",
+    "browserify-fs": "1.0.0",
     "https-browserify": "1.0.0",
+    "net-browserify": "0.2.4",
     "os-browserify": "0.3.0",
-    "path-browserify": "1.0.1"
+    "path-browserify": "1.0.1",
+    "tls-browserify": "0.2.2"
   },
   "engines": {
     "node": ">=10",
