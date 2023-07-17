@@ -37,7 +37,7 @@ import {
 import cryptoHelper from "iroha-helpers/lib/cryptoHelper";
 import { Constants } from "@hyperledger/cactus-core-api";
 
-const testCase = "runs tx on an Iroha v1.2.0 ledger";
+const testCase = "runs tx on an Iroha v1.4.0-patch-3 ledger";
 const logLevel: LogLevelDesc = "INFO";
 
 test.onFailure(async () => {
@@ -87,7 +87,7 @@ test(testCase, async (t: Test) => {
   test.onFinish(async () => {
     await iroha.stop();
   });
-  await iroha.start();
+  await iroha.start(false);
   const irohaPort = await iroha.getRpcToriiPort();
   const rpcToriiPortHost = await iroha.getRpcToriiPortHost();
   const rpcApiWsHost = await iroha.getRpcApiWsHost();

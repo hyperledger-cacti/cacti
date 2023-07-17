@@ -32,13 +32,14 @@ export interface IIrohaTestLedgerOptions {
   readonly logLevel?: LogLevelDesc;
   readonly emitContainerLogs?: boolean;
   readonly rpcApiWsPort?: number;
+  readonly healthcheckPort?: number;
 }
 
 /*
  * Provides default options for Iroha container
  */
 export const IROHA_TEST_LEDGER_DEFAULT_OPTIONS = Object.freeze({
-  imageVersion: "2021-08-16--1183",
+  imageVersion: "2023-07-17-issue-2524",
   imageName: "ghcr.io/hyperledger/cactus-iroha-all-in-one",
   adminPriv: " ",
   adminPub: " ",
@@ -46,11 +47,30 @@ export const IROHA_TEST_LEDGER_DEFAULT_OPTIONS = Object.freeze({
   nodePub: " ",
   tlsCert: " ",
   tlsKey: " ",
+  healthcheckPort: 50508,
   rpcToriiPort: 50051,
   toriiTlsPort: 55552,
   envVars: [
+    "IROHA_MST_EXPIRATION_TIME=1440",
+    "IROHA_MST_ENABLE=false",
+    "IROHA_HEALTHCHECK_PORT=50508",
+    "IROHA_PROPOSAL_CREATION_TIMEOUT=3000",
+    "IROHA_VOTE_DELAY=5000",
+    "IROHA_PROPOSAL_DELAY=5000",
+    "IROHA_MAX_PROPOSAL_SIZE=10",
+    "IROHA_DATABASE_TYPE=postgres",
+    "IROHA_INTER_PEER_TLS_KEY_PAIR_PATH=/opt/iroha_data/node0",
+    "IROHA_TORII_TLS_PARAMS_PORT=55552",
+    "IROHA_INTERNAL_PORT=10001",
+    "IROHA_BLOCK_STORE_PATH=/tmp/block_store/",
+    "IROHA_TORII_PORT=50051",
+    "IROHA_LOG_LEVEL=info",
     "IROHA_POSTGRES_USER=postgres",
     "IROHA_POSTGRES_PASSWORD=my-secret-password",
+    "IROHA_DATABASE_USER=postgres",
+    "IROHA_DATABASE_PASSWORD=my-secret-password",
+    "IROHA_DATABASE_WORKING DATABASE=iroha_default",
+    "IROHA_DATABASE_MAINTENANCE DATABASE=postgres",
     "KEY=node0",
   ],
   rpcApiWsPort: 50052,
@@ -67,6 +87,9 @@ export const IROHA_TEST_LEDGER_OPTIONS_JOI_SCHEMA: Joi.Schema = Joi.object().key
     nodePub: Joi.string().min(1).max(64).required(),
     tlsCert: Joi.string().min(1).required(),
     tlsKey: Joi.string().min(1).required(),
+    healthcheckPort: Joi.number()
+      .port()
+      .default(IROHA_TEST_LEDGER_DEFAULT_OPTIONS.healthcheckPort),
     toriiTlsPort: Joi.number().port().required(),
     postgresPort: Joi.number().port().required(),
     postgresHost: Joi.string().hostname().required(),
@@ -92,6 +115,7 @@ export class IrohaTestLedger implements ITestLedger {
   public readonly rpcApiWsPort: number;
   public readonly tlsCert?: string;
   public readonly tlsKey?: string;
+  public readonly healthcheckPort?: number;
   public readonly toriiTlsPort?: number;
 
   private readonly log: Logger;
@@ -131,6 +155,12 @@ export class IrohaTestLedger implements ITestLedger {
       options.toriiTlsPort || IROHA_TEST_LEDGER_DEFAULT_OPTIONS.toriiTlsPort;
     this.rpcApiWsPort =
       options.rpcApiWsPort || IROHA_TEST_LEDGER_DEFAULT_OPTIONS.rpcApiWsPort;
+    this.healthcheckPort =
+      options.healthcheckPort ||
+      IROHA_TEST_LEDGER_DEFAULT_OPTIONS.healthcheckPort;
+
+    this.envVars.push(`IROHA_DATABASE_HOST=${this.postgresHost}`);
+    this.envVars.push(`IROHA_DATABASE_PORT=${this.postgresPort}`);
 
     this.envVars.push(`IROHA_POSTGRES_HOST=${this.postgresHost}`);
     this.envVars.push(`IROHA_POSTGRES_PORT=${this.postgresPort}`);
@@ -295,6 +325,7 @@ export class IrohaTestLedger implements ITestLedger {
             [`${this.rpcToriiPort}/tcp`]: {}, // Iroha RPC - Torii
             [`${this.toriiTlsPort}/tcp`]: {}, // Iroha TLS RPC
             [`${this.rpcApiWsPort}/tcp`]: {}, // Iroha RPC WS
+            [`${this.healthcheckPort}/tcp`]: {}, // Iroha Healthcheck Service
           },
           Env: this.envVars,
           Healthcheck: {
