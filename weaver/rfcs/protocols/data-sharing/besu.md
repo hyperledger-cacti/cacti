@@ -48,12 +48,12 @@ At the source network:
     2. Checks that the certificate of the requester is valid according to the network's Membership.
     3. Checks the access control policy for the requester and view address is met.
     4. Performs a contract to contract call to the application contract, according to the view address (either verify the encoded value passed from driver, or generate the encoded value from the view address here).
-    5. Packages the response in InteropPayload and emit it as event `Weaver_Data_Sharing`. Make sure there is only one event defined with the name `Weaver_Data_Sharing` in Besu interop contract.
+    5. Packages the response in InteropPayload and emit it as event `Cacti_Data_Sharing`. Make sure there is only one event defined with the name `Cacti_Data_Sharing` in Besu interop contract.
 4. Source Besu Driver:
     1. Get transaction Hash (txHash) and block hash from response of interop contract call.
     2. Get transactionReceipt object from txHash (`web3.eth.getTransactionReceipt`) -> txRcpt.
     3. Get Interop Payload:
-        1. Get logs of response object, and get the `logIndex` (or `id`) of the log whose address is interop contract and the event name is `Weaver_Data_Sharing`.
+        1. Get logs of response object, and get the `logIndex` (or `id`) of the log whose address is interop contract and the event name is `Cacti_Data_Sharing`.
         2. Parse the txRcpt object to obtain the logs[logIndex] (check if `id` matches) and then get the payload by `logs[logIndex].data`, which needs to be abi decoded. (Or parse the response object to obtain `logs[logIndex].args.interop_payload`)
     4. Generate Proof: 
          1. Get Block Object from `blockHash`.
