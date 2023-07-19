@@ -5,17 +5,22 @@ sslParam:
   clientCert: "/etc/cactus/connector-tcs-huawei/cert.pem"
   clientKey: "/etc/cactus/connector-tcs-huawei/key.pem"
 blockMonitor:
-  request:
-    method: "GET"
-    host: "https://127.0.0.1:30081/"
-    getChannelListCommand: "v1/blockcross/channel/list"
-    getLatestBlockNumberCommand: "blocks?limit=1"
-    periodicMonitoringCommand1: "blocks?start="
-    periodicMonitoringCommand2: "&reverse"
+  requestOptions:
+    method: "POST"
+    host: ""
+    port: "8001"
+    path: "/v1/cactus/getblockbynumber"
   pollingInterval: 5000
-testURL:
-  request:
-    method: "GET"
-    host: "https://relay1/v1/blockcross/channel/list"
+getLatestBlockNumber:
+  requestOptions:
+    method: "POST"
+    host: ""
+    port: "8001"
+    path: "/v1/cactus/getblocknumber"
+sendTransaction:
+  requestOptions:
+    method: "post"
+    host: ""
+    port: "8001"
+    path: "/v1/cactus/runtransaction"
 logLevel: "debug"
-CertCheck:

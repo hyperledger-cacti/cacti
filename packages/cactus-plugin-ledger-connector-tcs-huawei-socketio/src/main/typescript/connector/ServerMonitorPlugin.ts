@@ -56,22 +56,22 @@ export class ServerMonitorPlugin {
    */
   startMonitor(clientId: string, filterKey: string, cb: MonitorCallback) {
     const request_blocknum_body = JSON.stringify({
-      to_chain: "B0123456789012345678901234567890123456789",
-      from_chaincode_id: "QueryChainCode",
-      to_chaincode_id: "QueryChainCode",
-      to_query_func_name: "QueryBlockNum",
-      args: ["a"],
     });
     //- (not recommended - only for development): Temporarily set CertCheck to false when using a self-signed certificate
     var CertCheck = config.read<boolean>("CertCheck")
     if (CertCheck == undefined){
       CertCheck = true
     }
+    var hostname : string = config.read("getLatestBlockNumber.requestOptions.host");
+    var port : string = config.read("getLatestBlockNumber.requestOptions.port");
+    var method : string = config.read("getLatestBlockNumber.requestOptions.method");
+    var path : string = config.read("getLatestBlockNumber.requestOptions.path");
+
     const options: https.RequestOptions = {
-      hostname: "agent",
-      port: 8080,
-      path: "/v1/cross/transaction/query",
-      method: "POST",
+      hostname: hostname,
+      port: port,
+      path: path,
+      method: method,
       headers: {
         "Content-Type": "text/plain",
         "Content-Length": Buffer.byteLength(request_blocknum_body),
@@ -116,22 +116,22 @@ export class ServerMonitorPlugin {
   periodicMonitoring(clientId: string, filterKey: string, cb: MonitorCallback) {
     let targetBlockNum: number = this.currentBlockNumber;
     targetBlockNum++;
+    var hostname : string = config.read("blockMonitor.requestOptions.host");
+    var port : string= config.read("blockMonitor.requestOptions.port");
+    var method : string= config.read("blockMonitor.requestOptions.method");
+    var path : string= config.read("blockMonitor.requestOptions.path");
     const request_block_body = JSON.stringify({
-      to_chain: "B0123456789012345678901234567890123456789",
-      from_chaincode_id: "QueryChainCode",
-      to_chaincode_id: "QueryChainCode",
-      to_query_func_name: "GetBlockByNumber",
-      args: [targetBlockNum.toString()],
+      'blocknum' : targetBlockNum.toString()
     });
     var CertCheck = config.read<boolean>("CertCheck")
     if (CertCheck == undefined){
       CertCheck = true
     }
     const options: https.RequestOptions = {
-      hostname: "agent",
-      port: 8080,
-      path: "/v1/cross/transaction/query",
-      method: "POST",
+      hostname: hostname,
+      port: port,
+      path: path,
+      method: method,
       headers: {
         "Content-Type": "text/plain",
         "Content-Length": Buffer.byteLength(request_block_body),
@@ -154,10 +154,10 @@ export class ServerMonitorPlugin {
         const payload = JSON.parse(resData.data.payload);
         if (payload.Header.BlockNum != targetBlockNum) {
           logger.error(
-            "expected ",
-            targetBlockNum,
-            " get ",
-            payload.Header.BlockNum,
+              "expected ",
+              targetBlockNum,
+              " get ",
+              payload.Header.BlockNum,
           );
           return;
         }
@@ -170,13 +170,13 @@ export class ServerMonitorPlugin {
         if (transactionDataArray.length > 0) {
           logger.info("*** SEND TRANSACTION DATA ***");
           logger.debug(
-            `transactionDataArray = ${JSON.stringify(transactionDataArray)}`,
+              `transactionDataArray = ${JSON.stringify(transactionDataArray)}`,
           );
           const signedTransactionDataArray = ValidatorAuthentication.sign({
             blockData: transactionDataArray,
           });
           logger.debug(
-            `signedTransactionDataArray = ${signedTransactionDataArray}`,
+              `signedTransactionDataArray = ${signedTransactionDataArray}`,
           );
           const retObj = {
             status: 200,

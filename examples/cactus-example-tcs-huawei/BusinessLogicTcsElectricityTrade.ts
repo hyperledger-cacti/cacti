@@ -36,8 +36,8 @@ const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;
 const connectInfo = new LPInfoHolder();
 const routesVerifierFactory = new VerifierFactory(
-  connectInfo.ledgerPluginInfo as VerifierFactoryConfig,
-  config.logLevel,
+    connectInfo.ledgerPluginInfo as VerifierFactoryConfig,
+    config.logLevel,
 );
 
 export class BusinessLogicElectricityTrade extends BusinessLogicBase {
@@ -62,8 +62,8 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
 
     // Create trade information
     const tradeInfo: TradeInfo = new TradeInfo(
-      requestInfo.businessLogicID,
-      requestInfo.tradeID,
+        requestInfo.businessLogicID,
+        requestInfo.tradeID,
     );
 
     this.startMonitor(tradeInfo);
@@ -71,34 +71,34 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
 
   startMonitor(tradeInfo: TradeInfo) {
     // Get Verifier Instance
-    logger.debug( 
-      `##startMonitor(): businessLogicID: ${tradeInfo.businessLogicID}`,
+    logger.debug(
+        `##startMonitor(): businessLogicID: ${tradeInfo.businessLogicID}`,
     );
     const useValidator = JSON.parse(
-      routesTransactionManagement.getValidatorToUse(tradeInfo.businessLogicID),
+        routesTransactionManagement.getValidatorToUse(tradeInfo.businessLogicID),
     );
     logger.debug(
-      `filterKey: ${config.electricityTradeInfo.tcsHuawei.filterKey}`,
+        `filterKey: ${config.electricityTradeInfo.tcsHuawei.filterKey}`,
     );
     const options = {
       filterKey: config.electricityTradeInfo.tcsHuawei.filterKey,
     };
     const verifierTcs = routesVerifierFactory.getVerifier(
-      useValidator["validatorID"][0],
+        useValidator["validatorID"][0],
     );
     verifierTcs.startMonitor(
-      "BusinessLogicTcsElectricityTrade",
-      options,
-      routesTransactionManagement,
+        "BusinessLogicTcsElectricityTrade",
+        options,
+        routesTransactionManagement,
     );
     logger.debug("getVerifierTcs");
   }
 
   remittanceTransaction(transactionSubset: object) {
     logger.debug(
-      `called remittanceTransaction(), accountInfo = ${json2str(
-        transactionSubset,
-      )}`,
+        `called remittanceTransaction(), accountInfo = ${json2str(
+            transactionSubset,
+        )}`,
     );
 
     const accountInfo = this.getAccountInfo(transactionSubset);
@@ -124,55 +124,55 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
 
     // Get Verifier Instance
     logger.debug(
-      `##remittanceTransaction(): businessLogicID: ${this.businessLogicID}`,
+        `##remittanceTransaction(): businessLogicID: ${this.businessLogicID}`,
     );
     const useValidator = JSON.parse(
-      routesTransactionManagement.getValidatorToUse(this.businessLogicID),
+        routesTransactionManagement.getValidatorToUse(this.businessLogicID),
     );
     //        const verifierEthereum = routesTransactionManagement.getVerifier(useValidator['validatorID'][1]);
     const verifierEthereum = routesVerifierFactory.getVerifier(
-      useValidator["validatorID"][1],
+        useValidator["validatorID"][1],
     );
     verifierEthereum.startMonitor(
-      "BusinessLogicElectricityTrade",
-      {},
-      routesTransactionManagement,
+        "BusinessLogicElectricityTrade",
+        {},
+        routesTransactionManagement,
     );
     logger.debug("getVerifierEthereum");
 
     // Generate parameters for// sendRawTransaction
     logger.debug(`####exec makeRawTransaction!!`);
     makeRawTransaction(txParam)
-      .then((result) => {
-        logger.info("remittanceTransaction txId : " + result.txId);
+        .then((result) => {
+          logger.info("remittanceTransaction txId : " + result.txId);
 
-        // Set Parameter
-        logger.debug("remittanceTransaction data : " + json2str(result.data));
-        const contract = {}; // NOTE: Since contract does not need to be specified, specify an empty object.
-        const method = { type: "web3Eth", command: "sendRawTransaction" };
-        const args = { args: [result.data["serializedTx"]] };
+          // Set Parameter
+          logger.debug("remittanceTransaction data : " + json2str(result.data));
+          const contract = {}; // NOTE: Since contract does not need to be specified, specify an empty object.
+          const method = { type: "web3Eth", command: "sendRawTransaction" };
+          const args = { args: [result.data["serializedTx"]] };
 
-        // Run Verifier (Ethereum)
-        verifierEthereum
-          .sendAsyncRequest(contract, method, args)
-          .then(() => {
-            logger.debug(`##remittanceTransaction sendAsyncRequest finish`);
-          })
-          .catch((err) => {
-            logger.error(err);
-          });
-      })
-      .catch((err) => {
-        logger.error(err);
-      });
+          // Run Verifier (Ethereum)
+          verifierEthereum
+              .sendAsyncRequest(contract, method, args)
+              .then(() => {
+                logger.debug(`##remittanceTransaction sendAsyncRequest finish`);
+              })
+              .catch((err) => {
+                logger.error(err);
+              });
+        })
+        .catch((err) => {
+          logger.error(err);
+        });
   }
 
   onEvent(ledgerEvent: LedgerEvent, targetIndex: number): void {
     logger.debug(`##in BLP:onEvent()`);
     logger.debug(
-      `##onEvent(): ${json2str(ledgerEvent["data"]["blockData"][targetIndex])}`,
+        `##onEvent(): ${json2str(ledgerEvent["data"]["blockData"][targetIndex])}`,
     );
-      switch (ledgerEvent.verifierId) {
+    switch (ledgerEvent.verifierId) {
       case config.electricityTradeInfo.tcsHuawei.validatorID:
         this.onEventTCS(ledgerEvent.data, targetIndex);
         break;
@@ -181,7 +181,7 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
         break;
       default:
         logger.error(
-          `##onEvent(), invalid verifierId: ${ledgerEvent.verifierId}`,
+            `##onEvent(), invalid verifierId: ${ledgerEvent.verifierId}`,
         );
         return;
     }
@@ -200,34 +200,34 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
       return
     }
     try {
-      if (trxPayload["Verb"].Verb !== "set") {
+      if (trxPayload["Func"] !== "set") {
         const transactionSubset = {
-          Name: trxPayload["Name"],
-          Value: trxPayload["Value"],
-          Verb: trxPayload["Verb"],
+          Name: trxPayload["Arg"][0],
+          Value: trxPayload["Arg"][1],
+          Verb: trxPayload["Func"],
         };
         this.remittanceTransaction(transactionSubset);
       }
     } catch (err) {
       logger.error(
-        `##onEventTCS(): err: ${err}, event: ${json2str(event)}`,
+          `##onEventTCS(): err: ${err}, event: ${json2str(event)}`,
       );
     }
   }
 
   getTransactionFromTCSEvent(
-    event: object,
-    targetIndex: number,
+      event: object,
+      targetIndex: number,
   ): object | null {
     try {
       const retTransaction = event["blockData"][targetIndex];
       logger.debug(
-        `##getTransactionFromTCSEvent(), retTransaction: ${retTransaction}`,
+          `##getTransactionFromTCSEvent(), retTransaction: ${retTransaction}`,
       );
       return retTransaction;
     } catch (err) {
       logger.error(
-        `##getTransactionFromTCSEvent(): invalid even, err:${err}, event:${event}`,
+          `##getTransactionFromTCSEvent(): invalid even, err:${err}, event:${event}`,
       );
     }
   }
@@ -239,7 +239,20 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
       logger.error(`##onEventEthereum(): invalid event: ${json2str(event)}`);
       return;
     }
-
+    const contract = {contract:"cactustest"};
+    const method = { type: "contract",method: "inc" };
+    const args = { args: ["MI000001", "24"], crossChain: true };
+    const verifierTcs = routesVerifierFactory.getVerifier(
+        "sUr7dZly" ,
+    );
+    verifierTcs
+        .sendAsyncRequest(contract, method, args)
+        .then(() => {
+          logger.debug(`##tcshuawei sendAsyncRequest finish`);
+        })
+        .catch((err) => {
+          logger.error(err);
+        });
     try {
       const txId = tx["hash"];
       const status = event["status"];
@@ -248,30 +261,30 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
 
       if (status !== 200) {
         logger.error(
-          `##onEventEthereum(): error event, status: ${status}, txId: ${txId}`,
+            `##onEventEthereum(): error event, status: ${status}, txId: ${txId}`,
         );
         return;
       }
     } catch (err) {
       logger.error(
-        `##onEventEthereum(): err: ${err}, event: ${json2str(event)}`,
+          `##onEventEthereum(): err: ${err}, event: ${json2str(event)}`,
       );
     }
   }
 
   getTransactionFromEthereumEvent(
-    event: object,
-    targetIndex: number,
+      event: object,
+      targetIndex: number,
   ): object | null {
     try {
       const retTransaction = event["blockData"]["transactions"][targetIndex];
       logger.debug(
-        `##getTransactionFromEthereumEvent(), retTransaction: ${retTransaction}`,
+          `##getTransactionFromEthereumEvent(), retTransaction: ${retTransaction}`,
       );
       return retTransaction;
     } catch (err) {
       logger.error(
-        `##getTransactionFromEthereumEvent(): invalid even, err:${err}, event:${event}`,
+          `##getTransactionFromEthereumEvent(): invalid even, err:${err}, event:${event}`,
       );
     }
   }
@@ -282,8 +295,8 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
   }
 
   getTxIDFromEvent(
-    ledgerEvent: LedgerEvent,
-    targetIndex: number,
+      ledgerEvent: LedgerEvent,
+      targetIndex: number,
   ): string | null {
     logger.debug(`##in getTxIDFromEvent`);
     //        logger.debug(`##event: ${json2str(ledgerEvent)}`);
@@ -295,7 +308,7 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
         return this.getTxIDFromEventEtherem(ledgerEvent.data, targetIndex);
       default:
         logger.error(
-          `##getTxIDFromEvent(): invalid verifierId: ${ledgerEvent.verifierId}`,
+            `##getTxIDFromEvent(): invalid verifierId: ${ledgerEvent.verifierId}`,
         );
     }
     return null;
@@ -315,9 +328,9 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
 
       if (typeof txId !== "string") {
         logger.warn(
-          `#getTxIDFromEventTCS(): skip(invalid block, not found txId.), event: ${json2str(
-            event,
-          )}`,
+            `#getTxIDFromEventTCS(): skip(invalid block, not found txId.), event: ${json2str(
+                event,
+            )}`,
         );
         return null;
       }
@@ -326,7 +339,7 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
       return txId;
     } catch (err) {
       logger.error(
-        `##getTxIDFromEventTCS(): err: ${err}, event: ${json2str(event)}`,
+          `##getTxIDFromEventTCS(): err: ${err}, event: ${json2str(event)}`,
       );
       return null;
     }
@@ -345,9 +358,9 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
 
       if (typeof txId !== "string") {
         logger.warn(
-          `#getTxIDFromEventEtherem(): skip(invalid block, not found txId.), event: ${json2str(
-            event,
-          )}`,
+            `#getTxIDFromEventEtherem(): skip(invalid block, not found txId.), event: ${json2str(
+                event,
+            )}`,
         );
         return null;
       }
@@ -356,7 +369,7 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
       return txId;
     } catch (err) {
       logger.error(
-        `##getTxIDFromEventEtherem(): err: ${err}, event: ${json2str(event)}`,
+          `##getTxIDFromEventEtherem(): err: ${err}, event: ${json2str(event)}`,
       );
       return null;
     }
@@ -364,7 +377,7 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
 
   getEventDataNum(ledgerEvent: LedgerEvent): number {
     logger.debug(
-      `##in BLP:getEventDataNum(), ledgerEvent.verifierId: ${ledgerEvent.verifierId}`,
+        `##in BLP:getEventDataNum(), ledgerEvent.verifierId: ${ledgerEvent.verifierId}`,
     );
     const event = ledgerEvent.data;
     let retEventNum = 0;
@@ -379,17 +392,17 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
           break;
         default:
           logger.error(
-            `##getEventDataNum(): invalid verifierId: ${ledgerEvent.verifierId}`,
+              `##getEventDataNum(): invalid verifierId: ${ledgerEvent.verifierId}`,
           );
           break;
       }
       logger.debug(
-        `##getEventDataNum(): retEventNum: ${retEventNum}, verifierId: ${ledgerEvent.verifierId}`,
+          `##getEventDataNum(): retEventNum: ${retEventNum}, verifierId: ${ledgerEvent.verifierId}`,
       );
       return retEventNum;
     } catch (err) {
       logger.error(
-        `##getEventDataNum(): invalid even, err: ${err}, event: ${event}`,
+          `##getEventDataNum(): invalid even, err: ${err}, event: ${event}`,
       );
       return 0;
     }
@@ -400,7 +413,7 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
 
     // Get Meter Information.
     const meterInfo: MeterInfo | null = this.meterManagement.getMeterInfo(
-      transactionSubset["Name"],
+        transactionSubset["Name"],
     );
     if (meterInfo === null) {
       logger.debug(`Not registered. meterID = ${transactionSubset["Name"]}`);

@@ -1,0 +1,112 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Hyperledger Cactus Plugin - Connector tcs",
+        "description": "Can perform basic tasks on a huawei tcs",
+        "version": "0.0.1",
+        "license": {
+            "name": "Apache 2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "components": {
+        "schemas": {
+        "RunTransactionRequest": {
+            "type" : "object",
+            "additionalProperties": false,
+            "properties": {
+                "chainCodeName": {
+                    "description": "",
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                },
+                "functionName": {
+                    "description": "Function name that was executed.",
+                    "nullable": false,
+                    "type": "string"
+                },
+                "functionArgs": {
+                    "description": "List of function arguments.",
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "minLength": 0,
+                        "nullable": false
+                    }
+                },
+                "crossChainReq": {
+                    "description": "",
+                    "type": "boolean"
+                }
+            }
+        },
+        "RunTransactionResponse": {
+            "type": "object",
+            "required": [
+                "functionOutput",
+                "success",
+                "transactionId"
+            ],
+            "properties": {
+                "functionOutput": {
+                    "type": "string",
+                    "nullable": false
+                },
+                "success": {
+                    "type": "boolean",
+                    "nullable": false
+                },
+                "transactionId": {
+                    "type": "string",
+                    "nullable": false
+                }
+            }
+        }
+        }
+    },
+    "paths": {
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-tcs/run-transaction": {
+            "post": {
+                "x-hyperledger-cactus": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-tcs/run-transaction"
+                    }
+                },
+                "operationId": "runTransactionV1",
+                "summary": "Runs a transaction on a huawei tcs.",
+                "description": "",
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RunTransactionRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RunTransactionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": ""
+                    },
+                    "default":{
+                        "description": ""
+                    }
+                }
+            }
+        }
+    }
+}

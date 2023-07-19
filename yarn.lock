@@ -7315,6 +7315,18 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@hyperledger/cactus-plugin-ledger-connector-tcs-huawei@workspace:packages/cactus-plugin-ledger-connector-tcs-huawei":
+  version: 0.0.0-use.local
+  resolution: "@hyperledger/cactus-plugin-ledger-connector-tcs-huawei@workspace:packages/cactus-plugin-ledger-connector-tcs-huawei"
+  dependencies:
+    "@fidm/x509": 1.2.1
+    "@hyperledger/cactus-common": 2.0.0-alpha.1
+    "@hyperledger/cactus-core": 2.0.0-alpha.1
+    "@hyperledger/cactus-core-api": 2.0.0-alpha.1
+    "@hyperledger/cactus-test-tooling": 2.0.0-alpha.1
+  languageName: unknown
+  linkType: soft
+
 "@hyperledger/cactus-plugin-ledger-connector-ubiquity@workspace:packages/cactus-plugin-ledger-connector-ubiquity":
   version: 0.0.0-use.local
   resolution: "@hyperledger/cactus-plugin-ledger-connector-ubiquity@workspace:packages/cactus-plugin-ledger-connector-ubiquity"
