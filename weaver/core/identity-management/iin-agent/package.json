@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@fidm/x509": "1.2.1",
-    "@grpc/grpc-js": "1.9.0",
+    "@grpc/grpc-js": "1.9.5",
     "@hyperledger/cacti-weaver-protos-js": "2.0.0-alpha.2",
     "@hyperledger/cacti-weaver-sdk-fabric": "2.0.0-alpha.2",
     "@typescript-eslint/eslint-plugin": "3.10.1",
@@ -28,9 +28,9 @@
     "dotenv": "8.6.0",
     "eslint-config-prettier": "6.15.0",
     "eslint-plugin-prettier": "5.0.0",
-    "fabric-ca-client": "2.2.18",
-    "fabric-common": "2.2.18",
-    "fabric-network": "2.2.18"
+    "fabric-ca-client": "2.2.19",
+    "fabric-common": "2.2.19",
+    "fabric-network": "2.2.19"
   },
   "devDependencies": {
     "@types/node": "16.18.41",

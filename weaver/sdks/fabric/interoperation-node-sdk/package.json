@@ -38,13 +38,13 @@
     ]
   },
   "dependencies": {
-    "@grpc/grpc-js": "1.9.0",
+    "@grpc/grpc-js": "1.9.5",
     "@grpc/proto-loader": "0.7.8",
     "@hyperledger/cacti-weaver-protos-js": "2.0.0-alpha.2",
     "elliptic": "6.5.4",
-    "fabric-common": "2.2.18",
-    "fabric-network": "2.2.18",
-    "fabric-protos": "2.2.18",
+    "fabric-common": "2.2.19",
+    "fabric-network": "2.2.19",
+    "fabric-protos": "2.2.19",
     "js-sha3": "0.8.0",
     "jsrsasign": "10.8.6",
     "log4js": "6.9.1",

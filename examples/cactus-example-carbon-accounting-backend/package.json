@@ -65,7 +65,7 @@
     "@openzeppelin/contracts": "4.9.3",
     "@openzeppelin/contracts-upgradeable": "4.9.3",
     "async-exit-hook": "2.0.1",
-    "fabric-network": "2.2.18",
+    "fabric-network": "2.2.19",
     "fs-extra": "10.1.0",
     "openapi-types": "9.1.0",
     "typescript-optional": "2.0.1",

@@ -37,6 +37,8 @@ import {
   getSignerIdentity,
 } from "./fabric-connector";
 import { sendEthereumTransaction } from "./transaction-ethereum";
+import { hasKey } from "@hyperledger/cactus-common";
+import { RuntimeError } from "run-time-error";
 
 const moduleName = "BusinessLogicAssetTrade";
 const logger = getLogger(`${moduleName}`);
@@ -346,11 +348,11 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
       });
   }
 
-  secondTransaction(
+  async secondTransaction(
     assetID: string,
     fabricAccountTo: string,
     tradeInfo: TradeInfo,
-  ): void {
+  ): Promise<void> {
     logger.debug("called secondTransaction");
 
     // Start monitoring
@@ -395,20 +397,28 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
       },
     });
 
-    transferOwnership(assetID, fabricAccountTo).then((result) => {
-      logger.info("secondTransaction txId : " + result.transactionId);
-
-      // Register transaction data in DB
-      const transactionData: TransactionData = new TransactionData(
-        "transfer",
-        "ledger002",
+    const result = await transferOwnership(assetID, fabricAccountTo);
+    if (
+      !hasKey(result, "transactionId") ||
+      typeof result.transactionId !== "string"
+    ) {
+      throw new RuntimeError(
+        "secondTransaction() Invalid transactionId returned from transferOwnership: %s",
         result.transactionId,
       );
-      this.transactionInfoManagement.setTransactionData(
-        tradeInfo,
-        transactionData,
-      );
-    });
+    }
+    logger.info("secondTransaction txId : " + result.transactionId);
+
+    // Register transaction data in DB
+    const transactionData: TransactionData = new TransactionData(
+      "transfer",
+      "ledger002",
+      result.transactionId,
+    );
+    this.transactionInfoManagement.setTransactionData(
+      tradeInfo,
+      transactionData,
+    );
   }
 
   thirdTransaction(
