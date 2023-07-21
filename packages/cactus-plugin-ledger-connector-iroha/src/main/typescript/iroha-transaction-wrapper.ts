@@ -13,7 +13,7 @@ import {
 } from "./generated/openapi/typescript-axios";
 
 import { RuntimeError } from "run-time-error";
-import * as grpc from "grpc";
+import * as grpc from "@grpc/grpc-js";
 
 import {
   GrantablePermission,

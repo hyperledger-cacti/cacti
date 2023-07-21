@@ -55,6 +55,7 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
+    "@grpc/grpc-js": "1.9.5",
     "@hyperledger/cactus-common": "2.0.0-alpha.2",
     "@hyperledger/cactus-core": "2.0.0-alpha.2",
     "@hyperledger/cactus-core-api": "2.0.0-alpha.2",
@@ -62,7 +63,6 @@
     "axios": "0.21.4",
     "express": "4.17.1",
     "fast-safe-stringify": "2.1.1",
-    "grpc": "1.24.11",
     "iroha-helpers": "1.5.0",
     "key-encoder": "2.0.3",
     "openapi-types": "7.0.1",

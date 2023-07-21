@@ -24,11 +24,11 @@ router.get("/:assetID", (req: Request, res: Response, next: NextFunction) => {
     logger.debug(`start queryAsset`);
 
     queryAsset(req.params.assetID)
-      .then((result) => {
+      .then((result: unknown) => {
         logger.debug("result(queryAsset) = " + JSON.stringify(result));
         res.status(200).json(result);
       })
-      .catch((err) => {
+      .catch((err: unknown) => {
         logger.error(err);
       });
   } catch (err) {
@@ -54,11 +54,11 @@ router.get("/", (req: Request, res: Response, next: NextFunction) => {
     logger.debug(`start queryAllAssets`);
 
     queryAllAssets()
-      .then((result) => {
+      .then((result: unknown) => {
         logger.debug("result(queryAllAssets) = " + JSON.stringify(result));
         res.status(200).json(result);
       })
-      .catch((err) => {
+      .catch((err: unknown) => {
         logger.error(err);
       });
   } catch (err) {

@@ -73,7 +73,7 @@
     "axios": "^0.27.2",
     "crypto-js": "4.1.1",
     "dotenv": "^16.0.1",
-    "fabric-network": "2.2.10",
+    "fabric-network": "2.2.19",
     "fs-extra": "10.1.0",
     "ipfs-http-client": "51.0.1",
     "knex": "2.5.1",

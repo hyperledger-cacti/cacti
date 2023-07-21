@@ -69,7 +69,6 @@ module.exports = {
   externals: {
     "swarm-js": "swarm-js",
     "node-ssh": "node-ssh",
-    "grpc": "grpc",      
     npm: "npm",
     "fabric-client": "fabric-client",
     "fabric-ca-client": "fabric-ca-client",
