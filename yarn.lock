@@ -5365,7 +5365,7 @@ __metadata:
     tslint: ^5.12.0
     tslint-config-prettier: ^1.17.0
     tslint-config-standard: ^8.0.1
-    typescript: ^4.9.5
+    typescript: 4.9.5
     winston: ^3.3.3
   bin:
     besu-cli: bin/besu-cli
@@ -5384,7 +5384,7 @@ __metadata:
     ganache-cli: ^6.12.2
     solc: ^0.8.8
     truffle: ^5.4.15
-    typescript: ^4.9.3
+    typescript: 4.9.5
   languageName: unknown
   linkType: soft
 
@@ -5422,7 +5422,7 @@ __metadata:
     nodemon: ^2.0.4
     patch-package: ^6.2.2
     typedoc: ^0.23.15
-    typescript: ^4.8.4
+    typescript: 4.9.5
     winston: ^3.3.3
   languageName: unknown
   linkType: soft
@@ -5462,7 +5462,7 @@ __metadata:
     protobufjs: ^6.9.0
     ts-jest: ^24.1.0
     ts-node: ^10.8.0
-    typescript: ^4.7.2
+    typescript: 4.9.5
     uuid: ^8.3.1
     winston: ^3.3.3
     y18n: ^4.0.1
@@ -5500,7 +5500,7 @@ __metadata:
     sinon-chai: ^3.3.0
     ts-node: ^10.9.0
     typedoc: ^0.23.15
-    typescript: ^4.8.4
+    typescript: 4.9.5
   languageName: unknown
   linkType: soft
 
@@ -5542,7 +5542,7 @@ __metadata:
     sinon-chai: ^3.3.0
     ts-node: ^10.9.0
     typedoc: ^0.23.15
-    typescript: ^4.8.4
+    typescript: 4.9.5
     web3: 1.10.0
   languageName: unknown
   linkType: soft
@@ -5583,7 +5583,7 @@ __metadata:
     sshpk: ^1.16.1
     ts-node: ^10.9.0
     typedoc: ^0.23.15
-    typescript: ^4.8.4
+    typescript: 4.9.5
     uuid: ^8.3.1
   languageName: unknown
   linkType: soft
@@ -6744,7 +6744,7 @@ __metadata:
     secp256k1: 4.0.2
     socket.io: 4.5.4
     sqlite3: 5.1.5
-    typescript: 4.3.2
+    typescript: 4.9.5
     typescript-optional: 2.0.1
     web3: 1.6.1
     web3-utils: 1.6.1
@@ -41420,17 +41420,7 @@ gluegun@latest:
   languageName: node
   linkType: hard
 
-"typescript@npm:4.3.2":
-  version: 4.3.2
-  resolution: "typescript@npm:4.3.2"
-  bin:
-    tsc: bin/tsc
-    tsserver: bin/tsserver
-  checksum: c2a86fa03ce03b255adc13ccd70a55173ca6539ae12114feca59f34a4e9bb69f14fb7cd5adc6c2416e568cff05c870b89d1366768ec55fce04fbdffb429a1cee
-  languageName: node
-  linkType: hard
-
-"typescript@npm:4.9.5, typescript@npm:^4.7.2, typescript@npm:^4.8.4, typescript@npm:^4.9.3, typescript@npm:^4.9.5":
+"typescript@npm:4.9.5":
   version: 4.9.5
   resolution: "typescript@npm:4.9.5"
   bin:
@@ -41460,17 +41450,7 @@ gluegun@latest:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@4.3.2#~builtin<compat/typescript>":
-  version: 4.3.2
-  resolution: "typescript@patch:typescript@npm%3A4.3.2#~builtin<compat/typescript>::version=4.3.2&hash=dba6d9"
-  bin:
-    tsc: bin/tsc
-    tsserver: bin/tsserver
-  checksum: 67da730521568e0de52b13926ad714288a1a6f265b3563c0e646731e6676454bad78bea9e29eafeeb922987e09df9c52d22fabbcddd225dc88783d3610df5209
-  languageName: node
-  linkType: hard
-
-"typescript@patch:typescript@4.9.5#~builtin<compat/typescript>, typescript@patch:typescript@^4.7.2#~builtin<compat/typescript>, typescript@patch:typescript@^4.8.4#~builtin<compat/typescript>, typescript@patch:typescript@^4.9.3#~builtin<compat/typescript>, typescript@patch:typescript@^4.9.5#~builtin<compat/typescript>":
+"typescript@patch:typescript@4.9.5#~builtin<compat/typescript>":
   version: 4.9.5
   resolution: "typescript@patch:typescript@npm%3A4.9.5#~builtin<compat/typescript>::version=4.9.5&hash=289587"
   bin:

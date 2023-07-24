@@ -18,6 +18,6 @@
     "socket.io": "4.5.4"
   },
   "devDependencies": {
-    "typescript": "3.9.10"
+    "typescript": "4.9.5"
   }
 }
