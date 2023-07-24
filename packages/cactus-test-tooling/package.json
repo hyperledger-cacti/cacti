@@ -79,6 +79,7 @@
     "node-ssh": "12.0.0",
     "p-retry": "4.6.1",
     "run-time-error": "1.4.0",
+    "socket.io": "4.5.4",
     "socket.io-client": "4.5.4",
     "tar-stream": "2.2.0",
     "temp": "0.9.4",
