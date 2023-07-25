@@ -1,0 +1,22 @@
+version: "3.5"
+
+services:
+  geth-aio-testnet:
+    container_name: ${CACTUS_GETH_LEDGER_CONTAINER_NAME:-geth_aio_testnet}
+    image: ${CACTUS_GETH_LEDGER_IMAGE_NAME:-cactus_geth_all_in_one:local-build}
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - 8545:8545/tcp # RPC - HTTP
+      - 8546:8546/tcp # RPC - WS
+    expose:
+      - 8545/tcp # RPC - HTTP
+      - 8546/tcp # RPC - WS
+    networks:
+      - geth-network
+
+networks:
+  geth-network:
+    name: geth_aio_network
+    driver: bridge
