@@ -2,6 +2,7 @@ import esMain from "es-main";
 import { checkOpenApiJsonSpecs } from "./check-open-api-json-specs";
 import { checkPackageJsonSort } from "./check-package-json-sort";
 import { checkSiblingDepVersionConsistency } from "./check-sibling-dep-version-consistency";
+import { checkPkgNpmScope } from "./check-pkg-npm-scope";
 
 export async function runCustomChecks(
   argv: string[],
@@ -13,6 +14,21 @@ export async function runCustomChecks(
   let overallErrors: string[] = [];
 
   console.log(`${TAG} Current NodeJS version is v${version}`);
+
+  {
+    const req = {
+      argv,
+      env,
+      scope: "@hyperledger",
+      allowedPrefixes: ["cacti-", "cactus-"],
+      preferredPrefix: "cacti-",
+      autoFixErrors: false,
+      excludePatterns: ["./package.json"],
+    };
+    const [success, errors] = await checkPkgNpmScope(req);
+    overallErrors = overallErrors.concat(errors);
+    overallSuccess = overallSuccess && success;
+  }
 
   {
     const [success, errors] = await checkOpenApiJsonSpecs({ argv, env });
