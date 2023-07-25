@@ -6097,6 +6097,17 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@hyperledger/cactus-examples-check-connection-ethereum-validator@workspace:examples/cactus-check-connection-ethereum-validator":
+  version: 0.0.0-use.local
+  resolution: "@hyperledger/cactus-examples-check-connection-ethereum-validator@workspace:examples/cactus-check-connection-ethereum-validator"
+  dependencies:
+    "@types/escape-html": 1.0.1
+    "@types/node": 15.14.7
+    escape-html: 1.0.3
+    socket.io: 4.5.4
+  languageName: unknown
+  linkType: soft
+
 "@hyperledger/cactus-plugin-consortium-manual@2.0.0-alpha.1, @hyperledger/cactus-plugin-consortium-manual@workspace:packages/cactus-plugin-consortium-manual":
   version: 0.0.0-use.local
   resolution: "@hyperledger/cactus-plugin-consortium-manual@workspace:packages/cactus-plugin-consortium-manual"
@@ -15804,17 +15815,6 @@ __metadata:
   checksum: 9ab0c0ac01215af0b3f020f2e313030fd6e347b48ed17d5484ee9c4e8ead45e78ae71bea16c397621c386b409ce0b14bf17f9f6c2492cd15b56c0f433efdfff6
   languageName: node
   linkType: hard
-
-"check-connection-ethereum-validator@workspace:examples/cactus-check-connection-ethereum-validator":
-  version: 0.0.0-use.local
-  resolution: "check-connection-ethereum-validator@workspace:examples/cactus-check-connection-ethereum-validator"
-  dependencies:
-    "@types/escape-html": 1.0.1
-    "@types/node": 15.14.7
-    escape-html: 1.0.3
-    socket.io: 4.5.4
-  languageName: unknown
-  linkType: soft
 
 "check-error@npm:^1.0.2":
   version: 1.0.2

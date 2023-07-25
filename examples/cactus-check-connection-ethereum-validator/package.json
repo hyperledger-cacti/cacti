@@ -1,5 +1,5 @@
 {
-  "name": "check-connection-ethereum-validator",
+  "name": "@hyperledger/cactus-examples-check-connection-ethereum-validator",
   "version": "2.0.0-alpha.1",
   "private": true,
   "scripts": {
