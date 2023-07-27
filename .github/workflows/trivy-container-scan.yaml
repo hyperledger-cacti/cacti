@@ -1,0 +1,41 @@
+name: trivy-container-image-scan
+
+ 
+
+on:
+  push:
+  pull_request:
+    # Publish `main` as Docker `latest` image.
+    branches:
+      - main
+
+ 
+
+    # Publish `v1.2.3` tags as releases.
+    tags:
+      - v*
+
+ 
+
+
+jobs:
+
+ 
+
+  build:
+    name: Scan cactus-example-carbon-accounting image
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Build an image from Dockerfile
+        run: DOCKER_BUILDKIT=1 docker build ./examples/carbon-accounting -f ./examples/carbon-accounting/Dockerfile -t cactus-example-carbon-accounting
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.11.2
+        with:
+          image-ref: 'cactus-connector-besu'
+          format: 'table'
+          exit-code: '0'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
