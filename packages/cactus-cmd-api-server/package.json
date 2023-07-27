@@ -113,7 +113,7 @@
     "@types/semver": "7.3.8",
     "@types/uuid": "8.3.1",
     "@types/xml2js": "0.4.9",
-    "artillery": "1.7.9",
+    "artillery": "2.0.0-35",
     "google-protobuf": "3.18.0-rc.2",
     "grpc-tools": "1.11.2",
     "grpc_tools_node_protoc_ts": "5.3.1",
