@@ -7175,10 +7175,10 @@ __metadata:
     "@hyperledger/cactus-core-api": 2.0.0-alpha.1
     "@hyperledger/cactus-plugin-keychain-memory": 2.0.0-alpha.1
     "@hyperledger/cactus-test-tooling": 2.0.0-alpha.1
-    "@iroha2/client": 3.0.0
+    "@iroha2/client": 4.0.0
     "@iroha2/crypto-core": 0.1.1
     "@iroha2/crypto-target-node": 0.4.0
-    "@iroha2/data-model": 3.0.0
+    "@iroha2/data-model": 4.0.0
     "@types/express": 4.17.8
     "@types/sanitize-html": 2.6.2
     body-parser: 1.19.0
@@ -7920,18 +7920,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@iroha2/client@npm:3.0.0":
-  version: 3.0.0
-  resolution: "@iroha2/client@npm:3.0.0"
+"@iroha2/client@npm:4.0.0":
+  version: 4.0.0
+  resolution: "@iroha2/client@npm:4.0.0"
   dependencies:
     "@iroha2/crypto-core": ^0.1.1
-    "@iroha2/data-model": 3.0.0
+    "@iroha2/data-model": 4.0.0
     "@types/ws": ^8.2.2
     debug: ^4.3.4
     emittery: ^0.10.1
     json-bigint: ^1.0.0
     ws: ^8.4.0
-  checksum: 22db8b73fa0ea547b1e371a864ae90ed1df5b0584882cd6b7e5f43645fa90635439453ffe878404d9541ceeef63a7e34992117c85f88d6cfa26a3033df4f9a0a
+  checksum: a49699ffa102fc6db72b7ccaa0d2633bfe535c057618d4ac62d6cb013fa402a95e336054f1d478f45e625d25049565f7bb60b6317960f9093e5537eab9e9ddfa
   languageName: node
   linkType: hard
 
@@ -7951,13 +7951,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@iroha2/data-model@npm:3.0.0":
-  version: 3.0.0
-  resolution: "@iroha2/data-model@npm:3.0.0"
+"@iroha2/data-model@npm:4.0.0":
+  version: 4.0.0
+  resolution: "@iroha2/data-model@npm:4.0.0"
   dependencies:
     "@iroha2/i64-fixnum": ^0.4.2
     "@scale-codec/definition-runtime": ^2.2.2
-  checksum: fbcf133978f682f7f415c57dd1832d1800d7e926cf93813ff8c9c9a5bd521bf551d5c2e292b037d3102c15b0d36d8d4c4f421df48ae424fc09f4e42bcb72e6cf
+  checksum: 37a0eb7e265e4abd86d320f4ae295e50b7d5c01ca2cbbf807bc89b25e3f0d1de620eb954ca4f093b162afad0ebfd64bb56bce1a66bd5e55a8e03b0fb53efd6c4
   languageName: node
   linkType: hard
 

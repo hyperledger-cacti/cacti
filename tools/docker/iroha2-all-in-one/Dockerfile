@@ -1,27 +1,41 @@
-FROM docker:24.0.2-dind
+################################
+# Build
+################################
+
+FROM alpine:3.18.2 as builder
+
+# LTS image pulled at 28.07.2023
+ENV IROHA_IMAGE_DIGEST="sha256:57d8d2c8dd5ead90200f365be6809b995ecfad14a77796b9f6de1e32d0da62a3"
+
+RUN apk update && apk add --no-cache skopeo
+
+WORKDIR "/build"
+
+# Freeze images
+RUN skopeo copy docker://hyperledger/iroha2@${IROHA_IMAGE_DIGEST} docker-archive:iroha2.tar:hyperledger/iroha2:local
+RUN tar -zcf iroha2.tar.gz iroha2.tar
+
+################################
+# Runtime
+################################
+
+FROM docker:24.0.5-dind
 
 ENV APP_ROOT="/app"
-ENV FREEZE_TMP_DIR="/opt/docker-freeze"
-ENV IROHA_VERSION="dev-nightly-75da907f66d5270f407a50e06bc76cec41d3d409"
-ENV IROHA_CLI_VERSION="dev-nightly-75da907f66d5270f407a50e06bc76cec41d3d409"
+ENV FREEZE_TMP_DIR="/media/docker/"
+ENV IROHA_IMAGE_TAG="local"
 
 # Install docker-compose
 RUN apk update \
   && apk add --no-cache \
-    # docker-compose dependencies
-    py-pip \
-    python3-dev \
-    libffi-dev \
-    openssl-dev \
-    # Other dependencies
-    supervisor \
-    jq \
-    curl \
-    bash \
-  && pip install wheel \
-  && pip install docker-compose
+  docker-cli \
+  docker-cli-compose \
+  supervisor \
+  jq \
+  curl \
+  bash
 
-# Copy iroha_client_cli proxy script
+# Copy iroha_client_cli
 COPY ./iroha_client_cli.sh /bin/iroha_client_cli
 RUN chmod +x /bin/iroha_client_cli
 
@@ -30,9 +44,8 @@ COPY ./healthcheck.sh /bin/healthcheck
 RUN chmod +x /bin/healthcheck
 HEALTHCHECK --interval=5s --timeout=10s --start-period=45s --retries=60 CMD /bin/healthcheck
 
-# Freeze docker images
-COPY ./freeze-images.sh /usr/bin/freeze-images.sh
-RUN bash /usr/bin/freeze-images.sh
+# Copy frozen image
+COPY --from=builder /build/iroha2.tar.gz ${FREEZE_TMP_DIR}
 
 WORKDIR ${APP_ROOT}
 

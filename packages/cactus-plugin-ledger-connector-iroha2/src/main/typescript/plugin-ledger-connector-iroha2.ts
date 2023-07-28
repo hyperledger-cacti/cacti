@@ -171,17 +171,24 @@ export class PluginLedgerConnectorIroha2
     socket: SocketIoSocket,
   ): SocketIoSocket {
     this.log.debug("Register WatchBlocks.Subscribe handler.");
+
     socket.on(
       WatchBlocksV1.Subscribe,
       async (options: WatchBlocksOptionsV1) => {
-        // Get client
-        const cactusIrohaClient = await this.createClient(options.baseConfig);
+        const apiURL = options.baseConfig?.torii.apiURL;
+        if (!apiURL) {
+          socket.emit(WatchBlocksV1.Error, {
+            message: "WatchBlocksV1.Subscribe error",
+            error: "WatchBlocksV1.Subscribe requires apiURL torii parameter",
+          });
+          return socket;
+        }
 
         // Start monitoring
         const monitor = new Iroha2WatchBlocksEndpointV1({
           socket,
           logLevel: this.options.logLevel,
-          torii: cactusIrohaClient.irohaToriiClient,
+          apiURL,
         });
         this.runningWatchBlocksMonitors.add(monitor);
         await monitor.subscribe(options);
@@ -191,7 +198,6 @@ export class PluginLedgerConnectorIroha2
         );
 
         socket.on("disconnect", async () => {
-          cactusIrohaClient.clear();
           this.runningWatchBlocksMonitors.delete(monitor);
           this.log.debug(
             "Running monitors count:",
@@ -357,11 +363,10 @@ export class PluginLedgerConnectorIroha2
       mergedConfig.accountId.domainId,
     );
 
-    // TODO - confirm which args are optional and remove type casts accordingly
     return new CactusIrohaV2Client(
       {
-        apiURL: mergedConfig.torii.apiURL as string,
-        telemetryURL: mergedConfig.torii.telemetryURL as string,
+        apiURL: mergedConfig.torii.apiURL,
+        telemetryURL: mergedConfig.torii.telemetryURL,
       },
       accountId,
       keyPair,
