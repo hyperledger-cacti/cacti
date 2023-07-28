@@ -4,7 +4,7 @@
 
 // Ledger settings
 const containerImageName = "ghcr.io/hyperledger/cactus-iroha2-all-in-one";
-const containerImageVersion = "2022-12-22-6c715bdb";
+const containerImageVersion = "2023-07-29-f2bc772ee";
 const useRunningLedger = false;
 
 // Log settings
@@ -162,6 +162,8 @@ export class IrohaV2TestEnv {
       useRunningLedger,
       emitContainerLogs: true,
       logLevel: testLogLevel,
+      // Uncomment to test against the latest LTS image (pinned, older version of LTS is used by default)
+      // envVars: ["IROHA_IMAGE_TAG=lts"],
     });
     this.log.debug("IrohaV2 image:", this.ledger.fullContainerImageName);
     expect(this.ledger).toBeTruthy();
@@ -203,14 +205,18 @@ export class IrohaV2TestEnv {
       logLevel: sutLogLevel,
     });
 
+    const [accountName, accountDomain] = this.clientConfig.ACCOUNT_ID.split(
+      "@",
+    );
+
     this._defaultBaseConfig = {
       torii: {
         apiURL: this.clientConfig.TORII_API_URL,
         telemetryURL: this.clientConfig.TORII_TELEMETRY_URL,
       },
       accountId: {
-        name: this.clientConfig.ACCOUNT_ID.name,
-        domainId: this.clientConfig.ACCOUNT_ID.domain_id.name,
+        name: accountName,
+        domainId: accountDomain,
       },
       signingCredential: this.keychainCredentials,
     };
@@ -252,7 +258,7 @@ export class IrohaV2TestEnv {
     this.log.info("FINISHING THE TESTS");
 
     if (this.ledger) {
-      this.log.info("Stop the fabric ledger...");
+      this.log.info("Stop the iroha2 ledger...");
       await this.ledger.stop();
       await this.ledger.destroy();
     }
@@ -265,7 +271,7 @@ export class IrohaV2TestEnv {
     }
 
     if (this.connectorServer) {
-      this.log.info("Stop the fabric connector...");
+      this.log.info("Stop the iroha2 connector...");
       await new Promise<void>((resolve) =>
         this.connectorServer?.close(() => resolve()),
       );
