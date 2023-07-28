@@ -5,11 +5,9 @@
     "outDir": "./dist/lib/",
     "declarationDir": "./dist/lib/",
     "rootDir": "./src",
-    "tsBuildInfoFile": "../../.build-cache/cactus-test-geth-ledger.tsbuildinfo"
+    "tsBuildInfoFile": "../../.build-cache/cacti-test-geth-ledger.tsbuildinfo"
   },
-  "include": [
-    "./src"
-  ],
+  "include": ["./src", "./src/**/*.json"],
   "references": [
     {
       "path": "../cactus-common/tsconfig.json"

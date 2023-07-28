@@ -27,8 +27,8 @@ export interface IGethTestLedgerOptions {
  * Default values used by GethTestLedger constructor.
  */
 export const GETH_TEST_LEDGER_DEFAULT_OPTIONS = Object.freeze({
-  containerImageName: "cactus_geth_all_in_one",
-  containerImageVersion: "latest",
+  containerImageName: "ghcr.io/hyperledger/cacti-geth-all-in-one",
+  containerImageVersion: "2023-07-27-2a8c48ed6",
   logLevel: "info" as LogLevelDesc,
   emitContainerLogs: false,
   envVars: [],
@@ -36,9 +36,9 @@ export const GETH_TEST_LEDGER_DEFAULT_OPTIONS = Object.freeze({
 });
 
 export const WHALE_ACCOUNT_PRIVATE_KEY =
-  "86bbf98cf5e5b1c43d2c8701764897357e0fa24982c0137efabf6dc3a6e7b69e";
+  "0x86bbf98cf5e5b1c43d2c8701764897357e0fa24982c0137efabf6dc3a6e7b69e";
 export const WHALE_ACCOUNT_PUBLIC_KEY =
-  "6a2ec8c50ba1a9ce47c52d1cb5b7136ee9d0ccc0";
+  "0x6a2ec8c50ba1a9ce47c52d1cb5b7136ee9d0ccc0";
 
 export class GethTestLedger {
   public static readonly CLASS_NAME = "GethTestLedger";
@@ -205,13 +205,20 @@ export class GethTestLedger {
           });
         }
 
-        try {
-          await Containers.waitForHealthCheck(this._containerId);
-          this._web3 = new Web3(await this.getRpcApiHttpHost());
-          resolve(container);
-        } catch (ex) {
-          reject(ex);
+        if (!this._containerId) {
+          const eMsg =
+            "InvalidState: this._container is falsy. " +
+            "Cannot attempt to wait for a passing healthcheck without it.";
+          throw new RuntimeError(eMsg);
         }
+
+        // If this (the promise factory function) throws, the parent promise
+        // will re-throw it for us by default so we don't need to wrap it in a
+        // try-catch block of it's own just to make sure it gets rejected.
+        await Containers.waitForHealthCheck(this._containerId);
+        const rpcApiHttpHost = await this.getRpcApiHttpHost();
+        this._web3 = new Web3(rpcApiHttpHost);
+        resolve(container);
       });
     });
   }
@@ -289,11 +296,10 @@ export class GethTestLedger {
    * @returns New account address
    */
   public async newEthPersonalAccount(
-    seedMoney = 10e8,
+    seedMoney = 0x10e8,
     password = "test",
   ): Promise<string> {
     const account = await this.web3.eth.personal.newAccount(password);
-
     const receipt = await this.transferAssetFromCoinbase(account, seedMoney);
 
     if (receipt instanceof Error) {
@@ -321,6 +327,7 @@ export class GethTestLedger {
         from: WHALE_ACCOUNT_PUBLIC_KEY,
         to: targetAccount,
         value: value,
+        gasPrice: await this.web3.eth.getGasPrice(),
         gas: 1000000,
       },
       WHALE_ACCOUNT_PRIVATE_KEY,
@@ -358,7 +365,8 @@ export class GethTestLedger {
       {
         from: WHALE_ACCOUNT_PUBLIC_KEY,
         data: contractTx.encodeABI(),
-        gas: 8000000, // Max possible gas
+        gasPrice: await this.web3.eth.getGasPrice(),
+        gas: 1000000,
         nonce: await this.web3.eth.getTransactionCount(
           WHALE_ACCOUNT_PUBLIC_KEY,
         ),

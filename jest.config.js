@@ -8,6 +8,7 @@ module.exports = {
   testTimeout: 60 * 60 * 1000,
   testMatch: [
     `**/cactus-*/src/test/typescript/{unit,integration,benchmark}/**/*.test.ts`,
+    `**/cacti-*/src/test/typescript/{unit,integration,benchmark}/**/*.test.ts`,
   ],
   // Ignore the tests that are still using tap/tape for as their test runner
   testPathIgnorePatterns: [

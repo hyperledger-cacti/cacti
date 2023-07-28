@@ -1,27 +1,27 @@
 {
-  "name": "@hyperledger/cactus-test-geth-ledger",
+  "name": "@hyperledger/cacti-test-geth-ledger",
   "version": "2.0.0-alpha.1",
   "description": "Helpers for running test go-ethereum ledger in test scripts.",
   "keywords": [
     "Hyperledger",
-    "Cactus",
+    "Cacti",
     "Integration",
     "Blockchain",
     "Distributed Ledger Technology"
   ],
-  "homepage": "https://github.com/hyperledger/cactus#readme",
+  "homepage": "https://github.com/hyperledger/cacti#readme",
   "bugs": {
-    "url": "https://github.com/hyperledger/cactus/issues"
+    "url": "https://github.com/hyperledger/cacti/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hyperledger/cactus.git"
+    "url": "git+https://github.com/hyperledger/cacti.git"
   },
   "license": "Apache-2.0",
   "author": {
-    "name": "Hyperledger Cactus Contributors",
+    "name": "Hyperledger Cacti Contributors",
     "email": "cactus@lists.hyperledger.org",
-    "url": "https://www.hyperledger.org/use/cactus"
+    "url": "https://www.hyperledger.org/use/cacti"
   },
   "contributors": [
     {
@@ -37,7 +37,7 @@
   ],
   "main": "dist/lib/main/typescript/index.js",
   "module": "dist/lib/main/typescript/index.js",
-  "browser": "dist/cactus-test-geth-ledger.web.umd.js",
+  "browser": "dist/cacti-test-geth-ledger.web.umd.js",
   "types": "dist/lib/main/typescript/index.d.ts",
   "files": [
     "dist/*"
@@ -54,9 +54,12 @@
     "@hyperledger/cactus-test-tooling": "2.0.0-alpha.1",
     "dockerode": "3.3.0",
     "internal-ip": "6.2.0",
+    "run-time-error": "1.4.0",
     "web3": "dev",
-    "web3-eth-accounts": "dev",
-    "run-time-error": "1.4.0"
+    "web3-eth-accounts": "dev"
+  },
+  "devDependencies": {
+    "@types/dockerode": "3.2.7"
   },
   "engines": {
     "node": ">=10",
@@ -65,7 +68,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "browserMinified": "dist/cactus-test-geth-ledger.web.umd.min.js",
-  "mainMinified": "dist/cactus-test-geth-ledger.node.umd.min.js",
+  "browserMinified": "dist/cacti-test-geth-ledger.web.umd.min.js",
+  "mainMinified": "dist/cacti-test-geth-ledger.node.umd.min.js",
   "watch": {}
 }

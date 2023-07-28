@@ -1,3 +1,3 @@
-# `@hyperledger/cactus-test-geth-ledger`
+# `@hyperledger/cacti-test-geth-ledger`
 
 - Helpers for running test go-ethereum ledger in test scripts.
