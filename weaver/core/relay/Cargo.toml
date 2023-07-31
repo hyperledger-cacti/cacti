@@ -21,10 +21,6 @@ name = "client-tls"
 path = "src/client_tls.rs"
 
 [[bin]]
-name = "satp-client"
-path = "src/satp_client.rs"
-
-[[bin]]
 name = "dummy-driver"
 path = "driver/driver.rs"
 
