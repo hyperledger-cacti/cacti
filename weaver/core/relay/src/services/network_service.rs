@@ -23,8 +23,8 @@ use crate::services::helpers::{
     update_event_subscription_status,
 };
 use crate::services::satp_helper::{
-    derive_transfer_commence_request, log_request_in_local_sapt_db,
-    log_request_state_in_local_sapt_db, spawn_send_transfer_commence_request,
+    derive_transfer_commence_request, log_request_in_local_satp_db,
+    log_request_state_in_local_satp_db, spawn_send_transfer_commence_request,
 };
 
 // External modules
@@ -531,7 +531,7 @@ impl Network for NetworkService {
         let request_id = transfer_commence_request.session_id.to_string();
         // TODO refactor
         let request_logged: Result<Option<sled::IVec>, crate::error::Error> =
-            log_request_in_local_sapt_db(&request_id, &network_asset_transfer, conf.clone());
+            log_request_in_local_satp_db(&request_id, &network_asset_transfer, conf.clone());
         match request_logged {
             Ok(_) => println!(
                 "Successfully stored NetworkAssetTransfer in local satp_db with request_id: {}",
@@ -563,7 +563,7 @@ impl Network for NetworkService {
             state: None,
         };
         let request_state_logged: Result<Option<sled::IVec>, crate::error::Error> =
-            log_request_state_in_local_sapt_db(&request_id, &target, conf.clone());
+            log_request_state_in_local_satp_db(&request_id, &target, conf.clone());
         match request_state_logged {
             Ok(_) => println!(
                 "Successfully stored RequestState in local satp_db with request_id: {}",

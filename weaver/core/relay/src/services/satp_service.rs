@@ -8,7 +8,7 @@ use weaverpb::relay::satp::{
 // Internal modules
 use crate::error::Error;
 use crate::services::satp_helper::{
-    create_ack_error_message, log_request_in_local_sapt_db, log_request_in_remote_sapt_db,
+    create_ack_error_message, log_request_in_local_satp_db, log_request_in_remote_satp_db,
 };
 
 // external modules
@@ -45,7 +45,7 @@ impl Satp for SatpService {
         let request_id = transfer_commence_request.session_id.to_string();
         let conf = self.config_lock.read().await;
 
-        match log_request_in_remote_sapt_db(&request_id, &transfer_commence_request, conf.clone()) {
+        match log_request_in_remote_satp_db(&request_id, &transfer_commence_request, conf.clone()) {
             Ok(_) => {
                 println!("Successfully stored TransferCommenceRequest in remote satp_db with request_id: {}", request_id);
             }
@@ -92,7 +92,7 @@ impl Satp for SatpService {
 
         // TODO refactor
         let request_logged: Result<Option<sled::IVec>, Error> =
-            log_request_in_local_sapt_db(&request_id, &ack_commence_request, conf.clone());
+            log_request_in_local_satp_db(&request_id, &ack_commence_request, conf.clone());
         match request_logged {
             Ok(_) => {
                 println!(

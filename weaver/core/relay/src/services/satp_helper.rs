@@ -323,7 +323,7 @@ pub fn get_satp_requests_states_remote_db(conf: Config) -> Database {
     return db;
 }
 
-pub fn log_request_state_in_local_sapt_db(
+pub fn log_request_state_in_local_satp_db(
     request_id: &String,
     target: &RequestState,
     conf: Config,
@@ -332,7 +332,7 @@ pub fn log_request_state_in_local_sapt_db(
     return db.set(&request_id, &target);
 }
 
-pub fn log_request_in_local_sapt_db<T: Serialize>(
+pub fn log_request_in_local_satp_db<T: Serialize>(
     request_id: &String,
     value: T,
     conf: Config,
@@ -341,7 +341,7 @@ pub fn log_request_in_local_sapt_db<T: Serialize>(
     return db.set(&request_id, &value);
 }
 
-pub fn log_request_in_remote_sapt_db<T: Serialize>(
+pub fn log_request_in_remote_satp_db<T: Serialize>(
     request_id: &String,
     value: T,
     conf: Config,
@@ -350,7 +350,7 @@ pub fn log_request_in_remote_sapt_db<T: Serialize>(
     return db.set(&request_id, &value);
 }
 
-pub fn get_request_from_remote_sapt_db<T: DeserializeOwned>(
+pub fn get_request_from_remote_satp_db<T: DeserializeOwned>(
     request_id: &String,
     conf: Config,
 ) -> Result<T, error::Error> {
