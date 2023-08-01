@@ -14,7 +14,7 @@ use weaverpb::networks::networks::{
 };
 use weaverpb::relay::datatransfer::data_transfer_client::DataTransferClient;
 use weaverpb::relay::events::event_subscribe_client::EventSubscribeClient;
-use weaverpb::relay::satp::TransferCommenceRequest;
+use weaverpb::relay::satp::TransferProposalClaimsRequest;
 // Internal modules
 use crate::db::Database;
 use crate::services::helpers::{
@@ -23,8 +23,9 @@ use crate::services::helpers::{
     update_event_subscription_status,
 };
 use crate::services::satp_helper::{
-    derive_transfer_commence_request, log_request_in_local_satp_db,
-    log_request_state_in_local_satp_db, spawn_send_transfer_commence_request,
+    create_transfer_proposal_claims_request, get_relay_from_transfer_proposal_claims,
+    get_relay_params, get_request_id_from_transfer_proposal_claims, log_request_in_local_satp_db,
+    log_request_state_in_local_satp_db, spawn_send_transfer_proposal_claims_request,
 };
 
 // External modules
@@ -526,9 +527,10 @@ impl Network for NetworkService {
         );
         let conf = self.config_lock.read().await.clone();
         let network_asset_transfer = request.into_inner().clone();
-        let transfer_commence_request: TransferCommenceRequest =
-            derive_transfer_commence_request(network_asset_transfer.clone());
-        let request_id = transfer_commence_request.session_id.to_string();
+        let transfer_proposal_claims_request: TransferProposalClaimsRequest =
+            create_transfer_proposal_claims_request(network_asset_transfer.clone());
+        let request_id =
+            get_request_id_from_transfer_proposal_claims(transfer_proposal_claims_request.clone());
         // TODO refactor
         let request_logged: Result<Option<sled::IVec>, crate::error::Error> =
             log_request_in_local_satp_db(&request_id, &network_asset_transfer, conf.clone());
@@ -588,13 +590,21 @@ impl Network for NetworkService {
         let parsed_address = parse_address(network_asset_transfer.address.to_string());
         match parsed_address {
             Ok(address) => {
+                let (relay_host, relay_port) = get_relay_from_transfer_proposal_claims(
+                    transfer_proposal_claims_request.clone(),
+                );
+                let (use_tls, relay_tlsca_cert_path) =
+                    get_relay_params(relay_host.clone(), relay_port.clone(), conf.clone());
+
                 // TODO: verify that host and port are valid
                 // Spawns a child process to handle sending request
-                spawn_send_transfer_commence_request(
+                spawn_send_transfer_proposal_claims_request(
+                    transfer_proposal_claims_request,
+                    relay_host,
+                    relay_port,
+                    use_tls,
+                    relay_tlsca_cert_path,
                     conf,
-                    transfer_commence_request,
-                    address.location.hostname.to_string(),
-                    address.location.port.to_string(),
                 );
                 // Send Ack back to network while request is happening in a thread
                 let reply = Ack {

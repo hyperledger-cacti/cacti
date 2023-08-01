@@ -1,30 +1,63 @@
 #[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct AssetTransferInitializationClaims {
+pub struct TransferProposalClaimsRequest {
     #[prost(string, tag = "1")]
-    pub asset_asset_id: ::prost::alloc::string::String,
+    pub message_type: ::prost::alloc::string::String,
     #[prost(string, tag = "2")]
-    pub asset_profile_id: ::prost::alloc::string::String,
+    pub asset_asset_id: ::prost::alloc::string::String,
     #[prost(string, tag = "3")]
-    pub verified_originator_entity_id: ::prost::alloc::string::String,
+    pub asset_profile_id: ::prost::alloc::string::String,
     #[prost(string, tag = "4")]
-    pub verified_beneficiary_entity_id: ::prost::alloc::string::String,
+    pub verified_originator_entity_id: ::prost::alloc::string::String,
     #[prost(string, tag = "5")]
-    pub originator_pubkey: ::prost::alloc::string::String,
+    pub verified_beneficiary_entity_id: ::prost::alloc::string::String,
     #[prost(string, tag = "6")]
-    pub beneficiary_pubkey: ::prost::alloc::string::String,
+    pub originator_pubkey: ::prost::alloc::string::String,
     #[prost(string, tag = "7")]
-    pub sender_gateway_network_id: ::prost::alloc::string::String,
+    pub beneficiary_pubkey: ::prost::alloc::string::String,
     #[prost(string, tag = "8")]
-    pub recipient_gateway_network_id: ::prost::alloc::string::String,
+    pub sender_gateway_network_id: ::prost::alloc::string::String,
     #[prost(string, tag = "9")]
-    pub client_identity_pubkey: ::prost::alloc::string::String,
+    pub recipient_gateway_network_id: ::prost::alloc::string::String,
     #[prost(string, tag = "10")]
-    pub server_identity_pubkey: ::prost::alloc::string::String,
+    pub client_identity_pubkey: ::prost::alloc::string::String,
     #[prost(string, tag = "11")]
-    pub sender_gateway_owner_id: ::prost::alloc::string::String,
+    pub server_identity_pubkey: ::prost::alloc::string::String,
     #[prost(string, tag = "12")]
+    pub sender_gateway_owner_id: ::prost::alloc::string::String,
+    #[prost(string, tag = "13")]
+    pub receiver_gateway_owner_id: ::prost::alloc::string::String,
+}
+#[derive(serde::Serialize, serde::Deserialize)]
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct TransferProposalReceiptRequest {
+    #[prost(string, tag = "1")]
+    pub message_type: ::prost::alloc::string::String,
+    #[prost(string, tag = "2")]
+    pub asset_asset_id: ::prost::alloc::string::String,
+    #[prost(string, tag = "3")]
+    pub asset_profile_id: ::prost::alloc::string::String,
+    #[prost(string, tag = "4")]
+    pub verified_originator_entity_id: ::prost::alloc::string::String,
+    #[prost(string, tag = "5")]
+    pub verified_beneficiary_entity_id: ::prost::alloc::string::String,
+    #[prost(string, tag = "6")]
+    pub originator_pubkey: ::prost::alloc::string::String,
+    #[prost(string, tag = "7")]
+    pub beneficiary_pubkey: ::prost::alloc::string::String,
+    #[prost(string, tag = "8")]
+    pub sender_gateway_network_id: ::prost::alloc::string::String,
+    #[prost(string, tag = "9")]
+    pub recipient_gateway_network_id: ::prost::alloc::string::String,
+    #[prost(string, tag = "10")]
+    pub client_identity_pubkey: ::prost::alloc::string::String,
+    #[prost(string, tag = "11")]
+    pub server_identity_pubkey: ::prost::alloc::string::String,
+    #[prost(string, tag = "12")]
+    pub sender_gateway_owner_id: ::prost::alloc::string::String,
+    #[prost(string, tag = "13")]
     pub receiver_gateway_owner_id: ::prost::alloc::string::String,
 }
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -47,7 +80,6 @@ pub struct TransferCommenceRequest {
     pub hash_prev_message: ::prost::alloc::string::String,
     #[prost(string, tag = "8")]
     pub client_transfer_number: ::prost::alloc::string::String,
-    /// AssetTransferInitializationClaims asset_transfer_initialization_claims = 10;
     #[prost(string, tag = "9")]
     pub client_signature: ::prost::alloc::string::String,
 }
@@ -189,6 +221,54 @@ pub mod satp_client {
             self.inner = self.inner.accept_compressed(encoding);
             self
         }
+        /// The sender gateway sends a TransferProposalClaims request to to initiate an asset transfer.
+        /// Depending on the proposal, multiple rounds of communication between the two gateways may happen.
+        pub async fn transfer_proposal_claims(
+            &mut self,
+            request: impl tonic::IntoRequest<super::TransferProposalClaimsRequest>,
+        ) -> Result<
+            tonic::Response<super::super::super::common::ack::Ack>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/relay.satp.SATP/TransferProposalClaims",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        /// The sender gateway sends a TransferProposalClaims request to signal to the receiver gateway
+        /// that the it is ready to start the transfer of the digital asset
+        pub async fn transfer_proposal_receipt(
+            &mut self,
+            request: impl tonic::IntoRequest<super::TransferProposalReceiptRequest>,
+        ) -> Result<
+            tonic::Response<super::super::super::common::ack::Ack>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/relay.satp.SATP/TransferProposalReceipt",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
         /// The sender gateway sends a TransferCommence request to signal to the receiver gateway
         /// that the it is ready to start the transfer of the digital asset
         pub async fn transfer_commence(
@@ -295,6 +375,24 @@ pub mod satp_server {
     /// Generated trait containing gRPC methods that should be implemented for use with SatpServer.
     #[async_trait]
     pub trait Satp: Send + Sync + 'static {
+        /// The sender gateway sends a TransferProposalClaims request to to initiate an asset transfer.
+        /// Depending on the proposal, multiple rounds of communication between the two gateways may happen.
+        async fn transfer_proposal_claims(
+            &self,
+            request: tonic::Request<super::TransferProposalClaimsRequest>,
+        ) -> Result<
+            tonic::Response<super::super::super::common::ack::Ack>,
+            tonic::Status,
+        >;
+        /// The sender gateway sends a TransferProposalClaims request to signal to the receiver gateway
+        /// that the it is ready to start the transfer of the digital asset
+        async fn transfer_proposal_receipt(
+            &self,
+            request: tonic::Request<super::TransferProposalReceiptRequest>,
+        ) -> Result<
+            tonic::Response<super::super::super::common::ack::Ack>,
+            tonic::Status,
+        >;
         /// The sender gateway sends a TransferCommence request to signal to the receiver gateway
         /// that the it is ready to start the transfer of the digital asset
         async fn transfer_commence(
@@ -392,6 +490,88 @@ pub mod satp_server {
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             let inner = self.inner.clone();
             match req.uri().path() {
+                "/relay.satp.SATP/TransferProposalClaims" => {
+                    #[allow(non_camel_case_types)]
+                    struct TransferProposalClaimsSvc<T: Satp>(pub Arc<T>);
+                    impl<
+                        T: Satp,
+                    > tonic::server::UnaryService<super::TransferProposalClaimsRequest>
+                    for TransferProposalClaimsSvc<T> {
+                        type Response = super::super::super::common::ack::Ack;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::TransferProposalClaimsRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).transfer_proposal_claims(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = TransferProposalClaimsSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/relay.satp.SATP/TransferProposalReceipt" => {
+                    #[allow(non_camel_case_types)]
+                    struct TransferProposalReceiptSvc<T: Satp>(pub Arc<T>);
+                    impl<
+                        T: Satp,
+                    > tonic::server::UnaryService<super::TransferProposalReceiptRequest>
+                    for TransferProposalReceiptSvc<T> {
+                        type Response = super::super::super::common::ack::Ack;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                super::TransferProposalReceiptRequest,
+                            >,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).transfer_proposal_receipt(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = TransferProposalReceiptSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
                 "/relay.satp.SATP/TransferCommence" => {
                     #[allow(non_camel_case_types)]
                     struct TransferCommenceSvc<T: Satp>(pub Arc<T>);

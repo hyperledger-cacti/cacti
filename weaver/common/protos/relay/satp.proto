@@ -10,7 +10,15 @@ option java_package = "org.hyperledger.cacti.weaver.protos.relay.datatransfer";
 option go_package = "github.com/hyperledger/cacti/weaver/common/protos-go/v2/relay";
 
 service SATP {
-  // Stage 2 endpoints
+  // Stage 1 endpoints
+
+  // The sender gateway sends a TransferProposalClaims request to initiate an asset transfer. 
+  // Depending on the proposal, multiple rounds of communication between the two gateways may happen.
+  rpc TransferProposalClaims(TransferProposalClaimsRequest) returns (common.ack.Ack) {};
+  
+  // The sender gateway sends a TransferProposalClaims request to signal to the receiver gateway 
+  // that the it is ready to start the transfer of the digital asset
+  rpc TransferProposalReceipt(TransferProposalReceiptRequest) returns (common.ack.Ack) {};
 
   // The sender gateway sends a TransferCommence request to signal to the receiver gateway 
   // that the it is ready to start the transfer of the digital asset
@@ -20,9 +28,11 @@ service SATP {
   // to proceed with the asset transfe
   rpc AckCommence(AckCommenceRequest) returns (common.ack.Ack) {};
 
+  // Stage 2 endpoints
+
   // The sender gateway sends a LockAssertion request to convey a signed claim to the receiver gateway 
   // declaring that the asset in question has been locked or escrowed by the sender gateway in
-  // the origin network (e.g. to prevent double spending
+  // the origin network (e.g. to prevent double spending)
   rpc LockAssertion(LockAssertionRequest) returns (common.ack.Ack) {};
 
   // The receiver gateway sends a LockAssertionReceipt request to the sender gateway to indicate acceptance
@@ -30,19 +40,36 @@ service SATP {
   rpc LockAssertionReceipt(LockAssertionReceiptRequest) returns (common.ack.Ack) {};
 }
   
-message AssetTransferInitializationClaims {
-  string asset_asset_id = 1;
-  string asset_profile_id = 2;
-  string verified_originator_entity_id = 3;
-  string verified_beneficiary_entity_id = 4;
-  string originator_pubkey = 5;
-  string beneficiary_pubkey = 6;
-  string sender_gateway_network_id = 7;
-  string recipient_gateway_network_id = 8;
-  string client_identity_pubkey = 9;
-  string server_identity_pubkey = 10;
-  string sender_gateway_owner_id = 11;
-  string receiver_gateway_owner_id = 12;
+message TransferProposalClaimsRequest {
+  string message_type = 1;
+  string asset_asset_id = 2;
+  string asset_profile_id = 3;
+  string verified_originator_entity_id = 4;
+  string verified_beneficiary_entity_id = 5;
+  string originator_pubkey = 6;
+  string beneficiary_pubkey = 7;
+  string sender_gateway_network_id = 8;
+  string recipient_gateway_network_id = 9;
+  string client_identity_pubkey = 10;
+  string server_identity_pubkey = 11;
+  string sender_gateway_owner_id = 12;
+  string receiver_gateway_owner_id = 13;
+}
+
+message TransferProposalReceiptRequest {
+  string message_type = 1;
+  string asset_asset_id = 2;
+  string asset_profile_id = 3;
+  string verified_originator_entity_id = 4;
+  string verified_beneficiary_entity_id = 5;
+  string originator_pubkey = 6;
+  string beneficiary_pubkey = 7;
+  string sender_gateway_network_id = 8;
+  string recipient_gateway_network_id = 9;
+  string client_identity_pubkey = 10;
+  string server_identity_pubkey = 11;
+  string sender_gateway_owner_id = 12;
+  string receiver_gateway_owner_id = 13;
 }
 
 message TransferCommenceRequest {
@@ -55,7 +82,6 @@ message TransferCommenceRequest {
   string hash_prev_message = 7;
   string client_transfer_number = 8;
   string client_signature = 9;
-  // AssetTransferInitializationClaims asset_transfer_initialization_claims = 10;
 }
 
 message AckCommenceRequest {
