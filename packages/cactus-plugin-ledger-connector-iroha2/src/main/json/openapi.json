@@ -1,11 +1,12 @@
 {
-  "openapi": "3.0.3",
+  "openapi": "3.1.0",
   "info": {
     "title": "Hyperledger Cactus Plugin - Connector Iroha V2",
     "description": "Can perform basic tasks on a Iroha V2 ledger",
     "version": "1.0.0",
     "license": {
-      "name": "Apache 2.0",
+      "name": "Apache-2.0",
+      "identifier": "Apache-2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     }
   },
@@ -109,37 +110,23 @@
       "BlockTypeV1": {
         "type": "string",
         "description": "Iroha V2 block response type.",
-        "enum": [
-          "raw",
-          "binary"
-        ],
+        "enum": ["raw", "binary"],
         "x-enum-descriptions": [
           "Default JSON-encoded string full block data.",
           "Encoded format that must be decoded with Iroha SDK on client side before use"
         ],
-        "x-enum-varnames": [
-          "Raw",
-          "Binary"
-        ]
+        "x-enum-varnames": ["Raw", "Binary"]
       },
       "TransactionStatusV1": {
         "type": "string",
         "description": "Status of Iroha V2 transaction.",
-        "enum": [
-          "submitted",
-          "committed",
-          "rejected"
-        ],
+        "enum": ["submitted", "committed", "rejected"],
         "x-enum-descriptions": [
           "Transaction was submitted to the ledger - use other tools to check if it was accepted and committed.",
           "Transaction was committed to the ledger.",
           "Transaction was rejected."
         ],
-        "x-enum-varnames": [
-          "Submitted",
-          "Committed",
-          "Rejected"
-        ]
+        "x-enum-varnames": ["Submitted", "Committed", "Rejected"]
       },
       "WatchBlocksOptionsV1": {
         "type": "object",
@@ -167,9 +154,7 @@
       "WatchBlocksRawResponseV1": {
         "type": "object",
         "description": "Default JSON-encoded string full block data.",
-        "required": [
-          "blockData"
-        ],
+        "required": ["blockData"],
         "properties": {
           "blockData": {
             "type": "string",
@@ -180,9 +165,7 @@
       "WatchBlocksBinaryResponseV1": {
         "type": "object",
         "description": "Binary encoded response of block data.",
-        "required": [
-          "binaryBlock"
-        ],
+        "required": ["binaryBlock"],
         "properties": {
           "binaryBlock": {
             "type": "string",
@@ -212,10 +195,7 @@
         "description": "Iroha V2 account ID.",
         "additionalProperties": false,
         "nullable": false,
-        "required": [
-          "name",
-          "domainId"
-        ],
+        "required": ["name", "domainId"],
         "properties": {
           "name": {
             "type": "string",
@@ -232,10 +212,7 @@
         "description": "Private/Public key JSON containing payload and digest function.",
         "additionalProperties": false,
         "nullable": false,
-        "required": [
-          "digestFunction",
-          "payload"
-        ],
+        "required": ["digestFunction", "payload"],
         "properties": {
           "digestFunction": {
             "type": "string",
@@ -250,10 +227,7 @@
       "KeychainReference": {
         "type": "object",
         "description": "Reference to entry stored in Cactus keychain plugin.",
-        "required": [
-          "keychainId",
-          "keychainRef"
-        ],
+        "required": ["keychainId", "keychainRef"],
         "properties": {
           "keychainId": {
             "type": "string",
@@ -274,10 +248,7 @@
       "Iroha2KeyPair": {
         "type": "object",
         "description": "Pair of Iroha account private and public keys.",
-        "required": [
-          "privateKey",
-          "publicKey"
-        ],
+        "required": ["privateKey", "publicKey"],
         "properties": {
           "privateKey": {
             "$ref": "#/components/schemas/Iroha2KeyJson",
@@ -309,9 +280,7 @@
         "type": "object",
         "description": "Iroha V2 connection configuration.",
         "additionalProperties": false,
-        "required": [
-          "torii"
-        ],
+        "required": ["torii"],
         "properties": {
           "torii": {
             "$ref": "#/components/schemas/Iroha2BaseConfigTorii",
@@ -338,10 +307,7 @@
       "IrohaInstructionRequestV1": {
         "type": "object",
         "description": "Single Iroha V2 instruction to be executed request.",
-        "required": [
-          "name",
-          "params"
-        ],
+        "required": ["name", "params"],
         "additionalProperties": false,
         "properties": {
           "name": {
@@ -381,9 +347,7 @@
       "IrohaTransactionDefinitionV1": {
         "type": "object",
         "description": "Iroha V2 transaction definition",
-        "required": [
-          "instruction"
-        ],
+        "required": ["instruction"],
         "additionalProperties": false,
         "properties": {
           "instruction": {
@@ -410,9 +374,7 @@
       "IrohaQueryDefinitionV1": {
         "type": "object",
         "description": "Iroha V2 query definition.",
-        "required": [
-          "query"
-        ],
+        "required": ["query"],
         "additionalProperties": false,
         "properties": {
           "query": {
@@ -430,10 +392,7 @@
       "IrohaSignedQueryDefinitionV1": {
         "type": "object",
         "description": "Iroha V2 signed query definition",
-        "required": [
-          "query",
-          "payload"
-        ],
+        "required": ["query", "payload"],
         "additionalProperties": false,
         "properties": {
           "query": {
@@ -481,10 +440,7 @@
       "TransactResponseV1": {
         "type": "object",
         "description": "Response from transaction endpoint with operation status.",
-        "required": [
-          "hash",
-          "status"
-        ],
+        "required": ["hash", "status"],
         "properties": {
           "hash": {
             "type": "string",
@@ -528,9 +484,7 @@
       "QueryResponseV1": {
         "type": "object",
         "description": "Response with the query results.",
-        "required": [
-          "response"
-        ],
+        "required": ["response"],
         "properties": {
           "response": {
             "description": "Query response data that varies between different queries.",
@@ -542,9 +496,7 @@
         "type": "object",
         "description": "Request for generating transaction or query payload that can be signed on the client side.",
         "additionalProperties": false,
-        "required": [
-          "request"
-        ],
+        "required": ["request"],
         "properties": {
           "request": {
             "oneOf": [
@@ -570,10 +522,7 @@
       "ErrorExceptionResponseV1": {
         "type": "object",
         "description": "Error response from the connector.",
-        "required": [
-          "message",
-          "error"
-        ],
+        "required": ["message", "error"],
         "properties": {
           "message": {
             "type": "string",

@@ -39,10 +39,10 @@ export async function checkOpenApiJsonSpecs(
 
   const globbyOpts: GlobbyOptions = {
     cwd: PROJECT_DIR,
-    ignore: ["node_modules"],
+    ignore: ["**/node_modules"],
   };
 
-  const DEFAULT_GLOB = "**/cactus-*/src/main/json/openapi.json";
+  const DEFAULT_GLOB = "**/src/main/json/openapi.json";
 
   const oasPaths = await globby(DEFAULT_GLOB, globbyOpts);
   console.log(`openapi.json paths: (${oasPaths.length}): `);
@@ -66,6 +66,58 @@ export async function checkOpenApiJsonSpecs(
     }
     if (!hasProperty(oas, "paths")) {
       return;
+    }
+
+    const defaultOpenApiSpecVersion = "3.1.0";
+    const oasVersion =
+      !!req.env.CACTI_CUSTOM_CHECKS_REQUIRED_OPENAPI_SPEC_VERSION ||
+      defaultOpenApiSpecVersion;
+
+    const DEFAULT_LICENSE_SPDX = "Apache-2.0";
+    const licenseSpdx =
+      !!req.env.CACTI_CUSTOM_CHECKS_REQUIRED_OPENAPI_LICENSE_SPDX ||
+      DEFAULT_LICENSE_SPDX;
+
+    const DEFAULT_LICENSE_URL =
+      "https://www.apache.org/licenses/LICENSE-2.0.html";
+    const licenseUrl =
+      !!req.env.CACTI_CUSTOM_CHECKS_REQUIRED_OPENAPI_LICENSE_URL ||
+      DEFAULT_LICENSE_URL;
+
+    if (!hasProperty(oas, "openapi")) {
+      errors.push(`ERROR: ${oasPathRel} "openapi" must equal "${oasVersion}"`);
+    } else if (oas.openapi !== oasVersion) {
+      errors.push(`ERROR: ${oasPathRel} "openapi" must equal "${oasVersion}"`);
+    }
+
+    if (!hasProperty(oas, "info")) {
+      errors.push(`ERROR: ${oasPathRel} "info" must be an object`);
+    } else if (!hasProperty(oas.info, "license")) {
+      errors.push(`ERROR: ${oasPathRel} "info.license" must be an object`);
+    } else {
+      if (!hasProperty(oas.info.license, "identifier")) {
+        const msg = `ERROR: ${oasPathRel} "info.license.identifier" must be set`;
+        errors.push(msg);
+      } else if (oas.info.license.identifier !== licenseSpdx) {
+        const msg = `ERROR: ${oasPathRel} "info.license.identifier" must be ${licenseSpdx}`;
+        errors.push(msg);
+      }
+
+      if (!hasProperty(oas.info.license, "name")) {
+        const msg = `ERROR: ${oasPathRel} "info.license.name" must be set`;
+        errors.push(msg);
+      } else if (oas.info.license.name !== licenseSpdx) {
+        const msg = `ERROR: ${oasPathRel} "info.license.name" must be ${licenseSpdx}`;
+        errors.push(msg);
+      }
+
+      if (!hasProperty(oas.info.license, "url")) {
+        const msg = `ERROR: ${oasPathRel} "info.license.url" must be set`;
+        errors.push(msg);
+      } else if (oas.info.license.url !== licenseUrl) {
+        const msg = `ERROR: ${oasPathRel} "info.license.url" must be ${licenseUrl}`;
+        errors.push(msg);
+      }
     }
 
     const { paths } = oas;
