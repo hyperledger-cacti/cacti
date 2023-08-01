@@ -1,11 +1,12 @@
 {
-  "openapi": "3.0.3",
+  "openapi": "3.1.0",
   "info": {
     "title": "Hyperledger Cactus Plugin - Persistence Ethereum",
     "description": "Synchronizes state of an ethereum ledger into a DB that can later be viewed in GUI",
     "version": "1.0.0",
     "license": {
-      "name": "Apache 2.0",
+      "name": "Apache-2.0",
+      "identifier": "Apache-2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     }
   },
@@ -13,27 +14,17 @@
     "schemas": {
       "TokenTypeV1": {
         "type": "string",
-        "enum": [
-          "erc20",
-          "erc721"
-        ],
+        "enum": ["erc20", "erc721"],
         "x-enum-descriptions": [
           "EIP-20: Token Standard",
           "EIP-721: Non-Fungible Token Standard"
         ],
-        "x-enum-varnames": [
-          "ERC20",
-          "ERC721"
-        ]
+        "x-enum-varnames": ["ERC20", "ERC721"]
       },
       "MonitoredToken": {
         "description": "Ethereum tokens that are being monitored by the persistence plugin.",
         "type": "object",
-        "required": [
-          "type",
-          "name",
-          "symbol"
-        ],
+        "required": ["type", "name", "symbol"],
         "properties": {
           "type": {
             "$ref": "#/components/schemas/TokenTypeV1"
@@ -53,10 +44,7 @@
       "TrackedOperationV1": {
         "description": "Persistence plugin operation that is tracked and returned in status report.",
         "type": "object",
-        "required": [
-          "startAt",
-          "operation"
-        ],
+        "required": ["startAt", "operation"],
         "properties": {
           "startAt": {
             "type": "string",
@@ -123,10 +111,7 @@
       },
       "ErrorExceptionResponseV1": {
         "type": "object",
-        "required": [
-          "message",
-          "error"
-        ],
+        "required": ["message", "error"],
         "properties": {
           "message": {
             "type": "string",

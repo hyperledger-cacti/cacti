@@ -1,11 +1,12 @@
 {
-  "openapi": "3.0.3",
+  "openapi": "3.1.0",
   "info": {
     "title": "Hyperledger Cactus Plugin - Connector Iroha",
     "description": "Can perform basic tasks on a Iroha ledger",
     "version": "0.0.1",
     "license": {
-      "name": "Apache 2.0",
+      "name": "Apache-2.0",
+      "identifier": "Apache-2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     }
   },
@@ -136,10 +137,7 @@
       },
       "KeyPair": {
         "type": "object",
-        "required": [
-          "publicKey",
-          "privateKey"
-        ],
+        "required": ["publicKey", "privateKey"],
         "properties": {
           "publicKey": {
             "description": "SHA-3 ed25519 public keys of length 64 are recommended.",
@@ -268,11 +266,7 @@
       },
       "RunTransactionRequestV1": {
         "type": "object",
-        "required": [
-          "commandName",
-          "baseConfig",
-          "params"
-        ],
+        "required": ["commandName", "baseConfig", "params"],
         "additionalProperties": false,
         "properties": {
           "commandName": {
@@ -292,10 +286,7 @@
       "AddAssetQuantityRequestParameters": {
         "description": "The list of arguments to pass in to the transaction request to Add Asset Quantity.",
         "type": "object",
-        "required": [
-          "assetId",
-          "amount"
-        ],
+        "required": ["assetId", "amount"],
         "properties": {
           "assetId": {
             "type": "string"
@@ -308,18 +299,15 @@
       "AddPeerRequestParameters": {
         "description": "The list of arguments to pass in to the transaction request to Add Peer.",
         "type": "object",
-        "required": [
-          "address",
-          "peerKey"
-        ],
+        "required": ["address", "peerKey"],
         "properties": {
           "address": {
             "type": "string"
           },
-          "peerKey":{
+          "peerKey": {
             "type": "string"
           },
-          "tlsCertificate":{
+          "tlsCertificate": {
             "type": "string"
           },
           "syncingPeer": {
@@ -330,10 +318,7 @@
       "AddSignatoryRequestParameters": {
         "description": "The list of arguments to pass in to the transaction request to Add Signatory.",
         "type": "object",
-        "required": [
-          "accountId",
-          "publicKey"
-        ],
+        "required": ["accountId", "publicKey"],
         "properties": {
           "accountId": {
             "type": "string"
@@ -346,10 +331,7 @@
       "AppendRoleRequestParameters": {
         "description": "The list of arguments to pass in to the transaction request to Append Role.",
         "type": "object",
-        "required": [
-          "accountId",
-          "roleName"
-        ],
+        "required": ["accountId", "roleName"],
         "properties": {
           "accountId": {
             "type": "string"
@@ -362,11 +344,7 @@
       "CallEngineRequestParameters": {
         "description": "The list of arguments to pass in to the transaction request to Call Engine.",
         "type": "object",
-        "required": [
-          "caller",
-          "callee",
-          "input"
-        ],
+        "required": ["caller", "callee", "input"],
         "properties": {
           "caller": {
             "type": "string"
@@ -382,11 +360,7 @@
       "CreateAccountRequestParameters": {
         "description": "The list of arguments to pass in to the transaction request to Create Account.",
         "type": "object",
-        "required": [
-          "accountName",
-          "domainId",
-          "publicKey"
-        ],
+        "required": ["accountName", "domainId", "publicKey"],
         "properties": {
           "accountName": {
             "type": "string"
@@ -402,11 +376,7 @@
       "CreateAssetRequestParameters": {
         "description": "The list of arguments to pass in to the transaction request to Create Asset.",
         "type": "object",
-        "required": [
-          "assetName",
-          "domainId",
-          "precision"
-        ],
+        "required": ["assetName", "domainId", "precision"],
         "properties": {
           "assetName": {
             "type": "string"
@@ -422,10 +392,7 @@
       "CreateDomainRequestParameters": {
         "description": "The list of arguments to pass in to the transaction request to Create Domain.",
         "type": "object",
-        "required": [
-          "domainId",
-          "defaultRole"
-        ],
+        "required": ["domainId", "defaultRole"],
         "properties": {
           "domainId": {
             "type": "string"
@@ -438,10 +405,7 @@
       "CreateRoleRequestParameters": {
         "description": "The list of arguments to pass in to the transaction request to Create Role.",
         "type": "object",
-        "required": [
-          "roleName",
-          "permissionsList"
-        ],
+        "required": ["roleName", "permissionsList"],
         "properties": {
           "roleName": {
             "type": "string"
@@ -457,10 +421,7 @@
       "DetachRoleRequestParameters": {
         "description": "The list of arguments to pass in to the transaction request to Detach Role.",
         "type": "object",
-        "required": [
-          "accountId",
-          "roleName"
-        ],
+        "required": ["accountId", "roleName"],
         "properties": {
           "accountId": {
             "type": "string"
@@ -473,10 +434,7 @@
       "GrantPermissionRequestParameters": {
         "description": "The list of arguments to pass in to the transaction request to Grant Permission.",
         "type": "object",
-        "required": [
-          "accountId",
-          "permission"
-        ],
+        "required": ["accountId", "permission"],
         "properties": {
           "accountId": {
             "type": "string"
@@ -489,9 +447,7 @@
       "RemovePeerRequestParameters": {
         "description": "The list of arguments to pass in to the transaction request to Remove Peer.",
         "type": "object",
-        "required": [
-          "publicKey"
-        ],
+        "required": ["publicKey"],
         "properties": {
           "publicKey": {
             "type": "string"
@@ -501,10 +457,7 @@
       "RemoveSignatoryRequestParameters": {
         "description": "The list of arguments to pass in to the transaction request to Remove Signatory.",
         "type": "object",
-        "required": [
-          "accountId",
-          "publicKey"
-        ],
+        "required": ["accountId", "publicKey"],
         "properties": {
           "accountId": {
             "type": "string"
@@ -517,10 +470,7 @@
       "RevokePermissionRequestParameters": {
         "description": "The list of arguments to pass in to the transaction request to Revoke Permission.",
         "type": "object",
-        "required": [
-          "accountId",
-          "permission"
-        ],
+        "required": ["accountId", "permission"],
         "properties": {
           "accountId": {
             "type": "string"
@@ -533,11 +483,7 @@
       "SetAccountDetailRequestParameters": {
         "description": "The list of arguments to pass in to the transaction request to Set Account Detail.",
         "type": "object",
-        "required": [
-          "accountId",
-          "key",
-          "value"
-        ],
+        "required": ["accountId", "key", "value"],
         "properties": {
           "accountId": {
             "type": "string"
@@ -553,10 +499,7 @@
       "SetAccountQuorumRequestParameters": {
         "description": "The list of arguments to pass in to the transaction request to Set Account Quorum.",
         "type": "object",
-        "required": [
-          "accountId",
-          "quorum"
-        ],
+        "required": ["accountId", "quorum"],
         "properties": {
           "accountId": {
             "type": "string"
@@ -569,10 +512,7 @@
       "SubtractAssetQuantityRequestParameters": {
         "description": "The list of arguments to pass in to the transaction request to Subtract Asset Quantity.",
         "type": "object",
-        "required": [
-          "assetId",
-          "amount"
-        ],
+        "required": ["assetId", "amount"],
         "properties": {
           "assetId": {
             "type": "string"
@@ -613,12 +553,7 @@
       "CompareAndSetAccountDetailRequestParameters": {
         "description": "The list of arguments to pass in to the transaction request to Compare And Set Account Detail.",
         "type": "object",
-        "required": [
-          "accountId",
-          "key",
-          "value",
-          "check_empty"
-        ],
+        "required": ["accountId", "key", "value", "check_empty"],
         "properties": {
           "accountId": {
             "type": "string"
@@ -640,9 +575,7 @@
       "GetAccountRequestParameters": {
         "description": "The list of arguments to pass in to the transaction request to Get Account.",
         "type": "object",
-        "required": [
-          "accountId"
-        ],
+        "required": ["accountId"],
         "properties": {
           "accountId": {
             "type": "string"
@@ -652,9 +585,7 @@
       "GetBlockRequestParameters": {
         "description": "The list of arguments to pass in to the transaction request to Get Block.",
         "type": "object",
-        "required": [
-          "height"
-        ],
+        "required": ["height"],
         "properties": {
           "height": {
             "type": "integer"
@@ -664,9 +595,7 @@
       "GetSignatoriesRequestParameters": {
         "description": "The list of arguments to pass in to the transaction request to Get Signatories.",
         "type": "object",
-        "required": [
-          "accountId"
-        ],
+        "required": ["accountId"],
         "properties": {
           "accountId": {
             "type": "string"
@@ -676,13 +605,11 @@
       "GetTransactionsRequestParameters": {
         "description": "The list of arguments to pass in to the transaction request to Get Transactions.",
         "type": "object",
-        "required": [
-          "txHashesList"
-        ],
+        "required": ["txHashesList"],
         "properties": {
           "txHashesList": {
             "type": "array",
-            "items":{
+            "items": {
               "type": "string"
             }
           }
@@ -691,9 +618,7 @@
       "GetPendingTransactionsRequestParameters": {
         "description": "The list of arguments to pass in to the transaction request to Get Pending Transactions.",
         "type": "object",
-        "required": [
-          "pageSize"
-        ],
+        "required": ["pageSize"],
         "properties": {
           "pageSize": {
             "type": "integer"
@@ -712,11 +637,7 @@
       "GetAccountTransactionsRequestParameters": {
         "description": "The list of arguments to pass in to the transaction request to Get Account Transactions.",
         "type": "object",
-        "required": [
-          "accountId",
-          "pageSize",
-          "firstTxHash"
-        ],
+        "required": ["accountId", "pageSize", "firstTxHash"],
         "properties": {
           "accountId": {
             "type": "string"
@@ -744,12 +665,7 @@
       "GetAccountAssetTransactionsRequestParameters": {
         "description": "The list of arguments to pass in to the transaction request to Get Account Asset Transactions.",
         "type": "object",
-        "required": [
-          "accountId",
-          "assetId",
-          "pageSize",
-          "firstTxHash"
-        ],
+        "required": ["accountId", "assetId", "pageSize", "firstTxHash"],
         "properties": {
           "accountId": {
             "type": "string"
@@ -768,10 +684,7 @@
       "GetAccountAssetsRequestParameters": {
         "description": "The list of arguments to pass in to the transaction request to Get Account Assets.",
         "type": "object",
-        "required": [
-          "accountId",
-          "pageSize"
-        ],
+        "required": ["accountId", "pageSize"],
         "properties": {
           "accountId": {
             "type": "string"
@@ -787,11 +700,7 @@
       "GetAccountDetailRequestParameters": {
         "description": "The list of arguments to pass in to the transaction request to Get Account Detail.",
         "type": "object",
-        "required": [
-          "pageSize",
-          "paginationKey",
-          "paginationWriter"
-        ],
+        "required": ["pageSize", "paginationKey", "paginationWriter"],
         "properties": {
           "accountId": {
             "type": "string"
@@ -816,9 +725,7 @@
       "GetAssetInfoRequestParameters": {
         "description": "The list of arguments to pass in to the transaction request to Get Asset Info.",
         "type": "object",
-        "required": [
-          "assetId"
-        ],
+        "required": ["assetId"],
         "properties": {
           "assetId": {
             "type": "string"
@@ -828,9 +735,7 @@
       "GetRolePermissionsRequestParameters": {
         "description": "The list of arguments to pass in to the transaction request to Get Role Permissions.",
         "type": "object",
-        "required": [
-          "roleId"
-        ],
+        "required": ["roleId"],
         "properties": {
           "roleId": {
             "type": "string"
@@ -840,20 +745,16 @@
       "GetEngineReceiptsRequestParameters": {
         "description": "The list of arguments to pass in to the transaction request to Get Engine Receipts.",
         "type": "object",
-        "required": [
-          "txHash"
-        ],
+        "required": ["txHash"],
         "properties": {
-          "txHash":{
+          "txHash": {
             "type": "string"
           }
         }
       },
       "RunTransactionSignedRequestV1": {
         "type": "object",
-        "required": [
-          "signedTransaction"
-        ],
+        "required": ["signedTransaction"],
         "properties": {
           "signedTransaction": {
             "description": "Signed transaction binary data received from generate-transaction endpoint.",
@@ -868,11 +769,7 @@
       },
       "GenerateTransactionRequestV1": {
         "type": "object",
-        "required": [
-          "commandName",
-          "commandParams",
-          "creatorAccountId"
-        ],
+        "required": ["commandName", "commandParams", "creatorAccountId"],
         "additionalProperties": false,
         "properties": {
           "commandName": {
@@ -941,9 +838,7 @@
       },
       "RunTransactionResponse": {
         "type": "object",
-        "required": [
-          "transactionReceipt"
-        ],
+        "required": ["transactionReceipt"],
         "properties": {
           "transactionReceipt": {}
         }
@@ -954,9 +849,7 @@
       },
       "ErrorExceptionJsonResponseV1": {
         "type": "object",
-        "required": [
-          "message"
-        ],
+        "required": ["message"],
         "properties": {
           "message": {
             "type": "string",
@@ -982,10 +875,7 @@
       },
       "ErrorExceptionResponseV1": {
         "type": "object",
-        "required": [
-          "message",
-          "error"
-        ],
+        "required": ["message", "error"],
         "properties": {
           "message": {
             "type": "string",
@@ -1000,39 +890,33 @@
       "WatchBlocksV1": {
         "type": "string",
         "enum": [
-            "org.hyperledger.cactus.api.async.iroha.WatchBlocksV1.Subscribe",
-            "org.hyperledger.cactus.api.async.iroha.WatchBlocksV1.Next",
-            "org.hyperledger.cactus.api.async.iroha.WatchBlocksV1.Unsubscribe",
-            "org.hyperledger.cactus.api.async.iroha.WatchBlocksV1.Error",
-            "org.hyperledger.cactus.api.async.iroha.WatchBlocksV1.Complete"
+          "org.hyperledger.cactus.api.async.iroha.WatchBlocksV1.Subscribe",
+          "org.hyperledger.cactus.api.async.iroha.WatchBlocksV1.Next",
+          "org.hyperledger.cactus.api.async.iroha.WatchBlocksV1.Unsubscribe",
+          "org.hyperledger.cactus.api.async.iroha.WatchBlocksV1.Error",
+          "org.hyperledger.cactus.api.async.iroha.WatchBlocksV1.Complete"
         ],
         "x-enum-varnames": [
-            "Subscribe",
-            "Next",
-            "Unsubscribe",
-            "Error",
-            "Complete",
-            "SendAsyncRequest",
-            "SendSyncRequest"
+          "Subscribe",
+          "Next",
+          "Unsubscribe",
+          "Error",
+          "Complete",
+          "SendAsyncRequest",
+          "SendSyncRequest"
         ]
       },
       "IrohaSocketIOTransactV1": {
         "type": "string",
         "enum": [
-            "org.hyperledger.cactus.api.async.iroha.IrohaSocketIOTransactV1.SendAsyncRequest",
-            "org.hyperledger.cactus.api.async.iroha.IrohaSocketIOTransactV1.SendSyncRequest"
+          "org.hyperledger.cactus.api.async.iroha.IrohaSocketIOTransactV1.SendAsyncRequest",
+          "org.hyperledger.cactus.api.async.iroha.IrohaSocketIOTransactV1.SendSyncRequest"
         ],
-        "x-enum-varnames": [
-            "SendAsyncRequest",
-            "SendSyncRequest"
-        ]
+        "x-enum-varnames": ["SendAsyncRequest", "SendSyncRequest"]
       },
       "IrohaBlockResponse": {
         "type": "object",
-        "required": [
-           "payload",
-           "signaturesList"
-        ],
+        "required": ["payload", "signaturesList"],
         "properties": {
           "payload": {
             "type": "object",
@@ -1067,7 +951,7 @@
               }
             }
           },
-          "signaturesList":{
+          "signaturesList": {
             "type": "array",
             "items": {}
           }
@@ -1077,9 +961,9 @@
         "type": "object",
         "required": ["transactionReceipt"],
         "properties": {
-            "transactionReceipt": {
-                "$ref": "#/components/schemas/IrohaBlockResponse"
-            }
+          "transactionReceipt": {
+            "$ref": "#/components/schemas/IrohaBlockResponse"
+          }
         }
       }
     }
