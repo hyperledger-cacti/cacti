@@ -9,8 +9,8 @@ use weaverpb::common::state::{request_state, RequestState};
 use weaverpb::networks::networks::NetworkAssetTransfer;
 use weaverpb::relay::satp::satp_client::SatpClient;
 use weaverpb::relay::satp::{
-    AckCommenceRequest, LockAssertionRequest, TransferCommenceRequest,
-    TransferProposalClaimsRequest, TransferProposalReceiptRequest, LockAssertionReceiptRequest,
+    AckCommenceRequest, LockAssertionReceiptRequest, LockAssertionRequest, TransferCommenceRequest,
+    TransferProposalClaimsRequest, TransferProposalReceiptRequest,
 };
 
 use crate::db::Database;
@@ -162,9 +162,10 @@ pub fn spawn_send_perform_lock_request(
     conf: Config,
 ) {
     tokio::spawn(async move {
+        let request_id = lock_assertion_request.session_id.to_string();
         println!(
-            "Locking the asset of the lock assertion request {:?}",
-            lock_assertion_request
+            "Locking the asset of the lock assertion request id: {:?}",
+            request_id
         );
         // TODO
         // Call the driver to check the asset status
@@ -187,7 +188,7 @@ pub fn spawn_send_perform_lock_request(
     });
 }
 
-pub fn spawn_send_lock_assertion_receipt_request(
+pub fn spawn_send_lock_assertion_broadcast_request(
     lock_assertion_receipt_request: LockAssertionReceiptRequest,
     relay_host: String,
     relay_port: String,
@@ -197,10 +198,12 @@ pub fn spawn_send_lock_assertion_receipt_request(
 ) {
     tokio::spawn(async move {
         let request_id = lock_assertion_receipt_request.session_id.to_string();
-        println!(
-            "Sending lock assertion receipt back to sending gateway: Request ID = {:?}",
-            request_id
-        );
+        println!("Broadcasting the lock assertion request {:?}", request_id);
+        // TODO
+        // Broadcast the message to the network
+        // Subscribe to the status event
+        // Once the message is broadcast, call the call_lock_assertion_receipt endpoint
+        // log the results
         let result = call_lock_assertion_receipt(
             relay_host,
             relay_port,
@@ -212,6 +215,7 @@ pub fn spawn_send_lock_assertion_receipt_request(
 
         println!("Received Ack from sending gateway: {:?}\n", result);
         // Updates the request in the DB depending on the response status from the sending gateway
+        let request_id = lock_assertion_receipt_request.session_id.to_string();
         log_request_result_in_local_satp_db(&request_id, result, conf);
     });
 }
