@@ -1,6 +1,6 @@
 base58==2.1.0
 bidict==0.21.4
-certifi==2022.12.7
+certifi==2023.7.22
 cffi==1.14.6
 charset-normalizer==2.0.3
 click==8.0.1
