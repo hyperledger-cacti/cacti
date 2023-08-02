@@ -32,6 +32,19 @@ import {
   IInvokeContractEndpointV1Options,
   InvokeContractEndpointV1,
 } from "./web-services/invoke-contract-endpoint-v1";
+
+import {
+  IListCPIEndpointV1Options,
+  ListCPIEndpointV1,
+} from "./web-services/get-cpi-endpoint-v1";
+import {
+  IFlowStatusEndpointV1Options,
+  FlowStatusEndpointV1,
+} from "./web-services/list-flow-status-endpoint-v1";
+import {
+  IFlowStatusResponseEndpointV1Options,
+  FlowStatusResponseEndpointV1,
+} from "./web-services/get-flow-status-response-endpoint-v1";
 import {
   IListFlowsEndpointV1Options,
   ListFlowsEndpointV1,
@@ -47,6 +60,10 @@ import {
 
 import fs from "fs";
 
+export enum CordaVersion {
+  CORDA_V4X = "CORDA_V4X",
+  CORDA_V5 = "CORDA_V5",
+}
 export interface IPluginLedgerConnectorCordaOptions
   extends ICactusPluginOptions {
   logLevel?: LogLevelDesc;
@@ -56,6 +73,9 @@ export interface IPluginLedgerConnectorCordaOptions
   cordaStartCmd?: string;
   cordaStopCmd?: string;
   apiUrl?: string;
+  cordaVersion?: CordaVersion;
+  holdingIDShortHash?: any;
+  clientRequestID?: any;
   /**
    * Path to the file where the private key for the ssh configuration is located
    * This property is optional. Its use is not recommended for most cases, it will override the privateKey property of the sshConfigAdminShell.
@@ -204,11 +224,12 @@ export class PluginLedgerConnectorCorda
       const endpoint = new GetPrometheusExporterMetricsEndpointV1(opts);
       endpoints.push(endpoint);
     }
-
     {
       const opts: IListFlowsEndpointV1Options = {
         apiUrl: this.options.apiUrl,
         logLevel: this.options.logLevel,
+        cordaVersion: this.options.cordaVersion,
+        connector: this,
       };
       const endpoint = new ListFlowsEndpointV1(opts);
       endpoints.push(endpoint);
@@ -232,6 +253,35 @@ export class PluginLedgerConnectorCorda
       endpoints.push(endpoint);
     }
 
+    {
+      const opts: IListCPIEndpointV1Options = {
+        apiUrl: this.options.apiUrl,
+        logLevel: this.options.logLevel,
+      };
+      const endpoint = new ListCPIEndpointV1(opts);
+      endpoints.push(endpoint);
+    }
+
+    {
+      const opts: IFlowStatusEndpointV1Options = {
+        apiUrl: this.options.apiUrl,
+        logLevel: this.options.logLevel,
+        holdingIDShortHash: this.options.holdingIDShortHash,
+      };
+      const endpoint = new FlowStatusEndpointV1(opts);
+      endpoints.push(endpoint);
+    }
+
+    {
+      const opts: IFlowStatusResponseEndpointV1Options = {
+        apiUrl: this.options.apiUrl,
+        logLevel: this.options.logLevel,
+        holdingIDShortHash: this.options.holdingIDShortHash,
+        clientRequestID: this.options.clientRequestID,
+      };
+      const endpoint = new FlowStatusResponseEndpointV1(opts);
+      endpoints.push(endpoint);
+    }
     this.log.info(`Instantiated endpoints of ${pkgName}`);
     return endpoints;
   }

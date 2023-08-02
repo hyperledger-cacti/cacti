@@ -24,9 +24,15 @@ import {
   ListFlowsV1Response,
 } from "../generated/openapi/typescript-axios";
 
+import {
+  PluginLedgerConnectorCorda,
+  CordaVersion,
+} from "../plugin-ledger-connector-corda";
 export interface IListFlowsEndpointV1Options {
   logLevel?: LogLevelDesc;
   apiUrl?: string;
+  cordaVersion?: CordaVersion;
+  connector?: PluginLedgerConnectorCorda;
 }
 
 export class ListFlowsEndpointV1 implements IWebServiceEndpoint {
