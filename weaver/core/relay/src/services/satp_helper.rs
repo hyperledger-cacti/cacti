@@ -10,7 +10,7 @@ use weaverpb::networks::networks::NetworkAssetTransfer;
 use weaverpb::relay::satp::satp_client::SatpClient;
 use weaverpb::relay::satp::{
     AckCommenceRequest, LockAssertionRequest, TransferCommenceRequest,
-    TransferProposalClaimsRequest, TransferProposalReceiptRequest,
+    TransferProposalClaimsRequest, TransferProposalReceiptRequest, LockAssertionReceiptRequest,
 };
 
 use crate::db::Database;
@@ -187,6 +187,35 @@ pub fn spawn_send_perform_lock_request(
     });
 }
 
+pub fn spawn_send_lock_assertion_receipt_request(
+    lock_assertion_receipt_request: LockAssertionReceiptRequest,
+    relay_host: String,
+    relay_port: String,
+    use_tls: bool,
+    relay_tlsca_cert_path: String,
+    conf: Config,
+) {
+    tokio::spawn(async move {
+        let request_id = lock_assertion_receipt_request.session_id.to_string();
+        println!(
+            "Sending lock assertion receipt back to sending gateway: Request ID = {:?}",
+            request_id
+        );
+        let result = call_lock_assertion_receipt(
+            relay_host,
+            relay_port,
+            use_tls,
+            relay_tlsca_cert_path.to_string(),
+            lock_assertion_receipt_request.clone(),
+        )
+        .await;
+
+        println!("Received Ack from sending gateway: {:?}\n", result);
+        // Updates the request in the DB depending on the response status from the sending gateway
+        log_request_result_in_local_satp_db(&request_id, result, conf);
+    });
+}
+
 // Call the transfer_commence endpoint on the receiver gateway
 pub async fn call_transfer_commence(
     relay_host: String,
@@ -283,6 +312,26 @@ pub async fn call_lock_assertion(
     );
     let response = satp_client
         .lock_assertion(lock_assertion_request.clone())
+        .await?;
+    Ok(response)
+}
+
+// Call the ack_commence endpoint on the sending gateway
+pub async fn call_lock_assertion_receipt(
+    relay_host: String,
+    relay_port: String,
+    use_tls: bool,
+    tlsca_cert_path: String,
+    lock_assertion_receipt_request: LockAssertionReceiptRequest,
+) -> Result<Response<Ack>, Box<dyn std::error::Error>> {
+    let mut satp_client: SatpClient<Channel> =
+        create_satp_client(relay_host, relay_port, use_tls, tlsca_cert_path).await?;
+    println!(
+        "Sending the lock assertion receipt request: {:?}",
+        lock_assertion_receipt_request.clone()
+    );
+    let response = satp_client
+        .lock_assertion_receipt(lock_assertion_receipt_request.clone())
         .await?;
     Ok(response)
 }
@@ -446,6 +495,23 @@ pub fn create_lock_assertion_request(
     return lock_assertion_request;
 }
 
+pub fn create_lock_assertion_receipt_request(
+    lock_assertion_request: LockAssertionRequest,
+) -> LockAssertionReceiptRequest {
+    // TODO: remove hard coded values
+    let lock_assertion_receipt_request = LockAssertionReceiptRequest {
+        message_type: "message_type1".to_string(),
+        session_id: "session_id1".to_string(),
+        transfer_context_id: "transfer_context_id1".to_string(),
+        client_identity_pubkey: "client_identity_pubkey1".to_string(),
+        server_identity_pubkey: "server_identity_pubkey1".to_string(),
+        hash_prev_message: "hash_prev_message1".to_string(),
+        server_transfer_number: "server_transfer_number1".to_string(),
+        server_signature: "server_signature1".to_string(),
+    };
+    return lock_assertion_receipt_request;
+}
+
 pub fn get_satp_requests_local_db(conf: Config) -> Database {
     let db = Database {
         db_path: format!(
@@ -554,7 +620,6 @@ pub fn update_request_state_in_local_satp_db(
     println!("{:?}\n", db.get::<RequestState>(request_id).unwrap())
 }
 
-// Get the requesting relay host and port
 pub fn get_relay_from_transfer_proposal_claims(
     transfer_proposal_claims_request: TransferProposalClaimsRequest,
 ) -> (String, String) {
@@ -562,7 +627,6 @@ pub fn get_relay_from_transfer_proposal_claims(
     return ("localhost".to_string(), "9085".to_string());
 }
 
-// Get the requesting relay host and port
 pub fn get_relay_from_transfer_proposal_receipt(
     transfer_proposal_receipt_request: TransferProposalReceiptRequest,
 ) -> (String, String) {
@@ -570,7 +634,6 @@ pub fn get_relay_from_transfer_proposal_receipt(
     return ("localhost".to_string(), "9085".to_string());
 }
 
-// Get the requesting relay host and port
 pub fn get_relay_from_transfer_commence(
     transfer_commence_request: TransferCommenceRequest,
 ) -> (String, String) {
@@ -578,8 +641,21 @@ pub fn get_relay_from_transfer_commence(
     return ("localhost".to_string(), "9085".to_string());
 }
 
-// Get the requesting relay host and port
 pub fn get_relay_from_ack_commence(ack_commence_request: AckCommenceRequest) -> (String, String) {
+    // TODO
+    return ("localhost".to_string(), "9085".to_string());
+}
+
+pub fn get_relay_from_lock_assertion(
+    lock_assertion_request: LockAssertionRequest,
+) -> (String, String) {
+    // TODO
+    return ("localhost".to_string(), "9085".to_string());
+}
+
+pub fn get_relay_from_lock_assertion_receipt(
+    lock_assertion_receipt_request: LockAssertionReceiptRequest,
+) -> (String, String) {
     // TODO
     return ("localhost".to_string(), "9085".to_string());
 }

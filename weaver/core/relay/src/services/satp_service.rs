@@ -21,7 +21,7 @@ use super::satp_helper::{
     get_relay_from_transfer_proposal_receipt, get_relay_params,
     get_request_id_from_transfer_proposal_claims, spawn_send_ack_commence_request,
     spawn_send_perform_lock_request, spawn_send_transfer_commence_request,
-    spawn_send_transfer_proposal_receipt_request,
+    spawn_send_transfer_proposal_receipt_request, get_relay_from_lock_assertion, create_lock_assertion_receipt_request, get_relay_from_lock_assertion_receipt, spawn_send_lock_assertion_receipt_request,
 };
 use tokio::sync::RwLock;
 use tonic::{Request, Response, Status};
@@ -247,17 +247,44 @@ impl Satp for SatpService {
         request: Request<LockAssertionRequest>,
     ) -> Result<Response<Ack>, Status> {
         println!(
-            "Got a lock assertion request from {:?} - {:?}",
+            "Got a LockAssertionRequest from {:?} - {:?}",
             request.remote_addr(),
             request
         );
-        let reply = Ok(Response::new(Ack {
-            status: ack::Status::Error as i32,
-            request_id: "xxxxxxxxx".to_string(),
-            message: format!("Error: Not implemented yet."),
-        }));
-        println!("Sending back Ack: {:?}\n", reply);
-        reply
+
+        let lock_assertion_request = request.into_inner().clone();
+        let request_id = lock_assertion_request.session_id.to_string();
+        let conf = self.config_lock.read().await;
+
+        match log_request_in_remote_satp_db(&request_id, &lock_assertion_request, conf.clone()) {
+            Ok(_) => {
+                println!("Successfully stored LockAssertionRequest in remote satp_db with request_id: {}", request_id);
+            }
+            Err(e) => {
+                // Internal failure of sled. Send Error response
+                let error_message =
+                    "Error storing LockAssertionRequest in remote satp_db for request_id"
+                        .to_string();
+                let reply = create_ack_error_message(request_id, error_message, e);
+                return reply;
+            }
+        }
+
+        match process_lock_assertion_request(lock_assertion_request, conf.clone()) {
+            Ok(ack) => {
+                let reply = Ok(Response::new(ack));
+                println!(
+                    "Sending Ack of lock assertion request back: {:?}\n",
+                    reply
+                );
+                reply
+            }
+            Err(e) => {
+                let error_message = "Lock assertion failed.".to_string();
+                let reply = create_ack_error_message(request_id, error_message, e);
+                reply
+            }
+        }
     }
 
     async fn lock_assertion_receipt(
@@ -461,6 +488,40 @@ pub fn process_ack_commence_request(
     }
 }
 
+pub fn process_lock_assertion_request(
+    lock_assertion_request: LockAssertionRequest,
+    conf: config::Config,
+) -> Result<Ack, Error> {
+    let request_id = lock_assertion_request.session_id.to_string();
+    let is_valid_request = is_valid_lock_assertion_request(lock_assertion_request.clone());
+
+    if is_valid_request {
+        println!("The lock assertion request is valid\n");
+        match send_lock_assertion_receipt_request(lock_assertion_request, conf) {
+            Ok(ack) => {
+                println!("Ack lock assertion request.");
+                let reply = Ok(ack);
+                println!("Sending back Ack: {:?}\n", reply);
+                reply
+            }
+            Err(e) => {
+                return Ok(Ack {
+                    status: ack::Status::Error as i32,
+                    request_id: request_id.to_string(),
+                    message: format!("Error: Ack lock assertion failed. {:?}", e),
+                });
+            }
+        }
+    } else {
+        println!("The lock assertion request is invalid\n");
+        return Ok(Ack {
+            status: ack::Status::Error as i32,
+            request_id: request_id.to_string(),
+            message: "Error: The lock assertion request is invalid".to_string(),
+        });
+    }
+}
+
 fn send_transfer_proposal_receipt_request(
     transfer_proposal_claims_request: TransferProposalClaimsRequest,
     conf: config::Config,
@@ -546,6 +607,33 @@ fn send_ack_commence_request(
     return Ok(reply);
 }
 
+fn send_lock_assertion_receipt_request(
+    lock_assertion_request: LockAssertionRequest,
+    conf: config::Config,
+) -> Result<Ack, Error> {
+    let request_id = &lock_assertion_request.session_id.to_string();
+    let (relay_host, relay_port) =
+        get_relay_from_lock_assertion(lock_assertion_request.clone());
+    let (use_tls, relay_tlsca_cert_path) =
+        get_relay_params(relay_host.clone(), relay_port.clone(), conf.clone());
+    let lock_assertion_receipt_request = create_lock_assertion_receipt_request(lock_assertion_request.clone());
+
+    spawn_send_lock_assertion_receipt_request(
+        lock_assertion_receipt_request,
+        relay_host,
+        relay_port,
+        use_tls,
+        relay_tlsca_cert_path,
+        conf,
+    );
+    let reply = Ack {
+        status: ack::Status::Ok as i32,
+        request_id: request_id.to_string(),
+        message: "Ack of the Lock Assertion request".to_string(),
+    };
+    return Ok(reply);
+}
+
 fn send_perform_lock_request(
     ack_commence_request: AckCommenceRequest,
     conf: config::Config,
@@ -592,6 +680,11 @@ fn is_valid_transfer_commence_request(transfer_commence_request: TransferCommenc
 }
 
 fn is_valid_ack_commence_request(ack_commence_request: AckCommenceRequest) -> bool {
+    //TODO
+    true
+}
+
+fn is_valid_lock_assertion_request(lock_assertion_request: LockAssertionRequest) -> bool {
     //TODO
     true
 }
