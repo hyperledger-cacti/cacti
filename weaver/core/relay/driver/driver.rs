@@ -10,7 +10,7 @@ use weaverpb::common::query::Query;
 use weaverpb::common::events::EventSubscription;
 use weaverpb::common::state::{view_payload, Meta, meta, ViewPayload, View};
 use weaverpb::driver::driver::driver_communication_server::{DriverCommunication, DriverCommunicationServer};
-use weaverpb::driver::driver::WriteExternalStateMessage;
+use weaverpb::driver::driver::{WriteExternalStateMessage, PerformLockRequest};
 use weaverpb::relay::datatransfer::data_transfer_client::DataTransferClient;
 use weaverpb::relay::events::event_subscribe_client::EventSubscribeClient;
 
@@ -207,6 +207,18 @@ impl DriverCommunication for DriverCommunicationService {
             message: "Error".to_string(),
         };
         return Ok(Response::new(reply_error));
+    }
+    
+    async fn perform_lock(&self, request: Request<PerformLockRequest>) -> Result<Response<Ack>, Status> {
+        println!("Got a request from {:?}", request.remote_addr());
+        println!("The asset has been locked");
+        let request_id = "to_do".to_string();
+        let reply = Ack {
+            status: ack::Status::Ok as i32,
+            request_id: request_id,
+            message: "".to_string(),
+        };
+        return Ok(Response::new(reply));
     }
 }
 

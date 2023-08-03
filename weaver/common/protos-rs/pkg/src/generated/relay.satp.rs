@@ -221,7 +221,7 @@ pub mod satp_client {
             self.inner = self.inner.accept_compressed(encoding);
             self
         }
-        /// The sender gateway sends a TransferProposalClaims request to to initiate an asset transfer.
+        /// The sender gateway sends a TransferProposalClaims request to initiate an asset transfer.
         /// Depending on the proposal, multiple rounds of communication between the two gateways may happen.
         pub async fn transfer_proposal_claims(
             &mut self,
@@ -319,7 +319,7 @@ pub mod satp_client {
         }
         /// The sender gateway sends a LockAssertion request to convey a signed claim to the receiver gateway
         /// declaring that the asset in question has been locked or escrowed by the sender gateway in
-        /// the origin network (e.g. to prevent double spending
+        /// the origin network (e.g. to prevent double spending)
         pub async fn lock_assertion(
             &mut self,
             request: impl tonic::IntoRequest<super::LockAssertionRequest>,
@@ -375,7 +375,7 @@ pub mod satp_server {
     /// Generated trait containing gRPC methods that should be implemented for use with SatpServer.
     #[async_trait]
     pub trait Satp: Send + Sync + 'static {
-        /// The sender gateway sends a TransferProposalClaims request to to initiate an asset transfer.
+        /// The sender gateway sends a TransferProposalClaims request to initiate an asset transfer.
         /// Depending on the proposal, multiple rounds of communication between the two gateways may happen.
         async fn transfer_proposal_claims(
             &self,
@@ -413,7 +413,7 @@ pub mod satp_server {
         >;
         /// The sender gateway sends a LockAssertion request to convey a signed claim to the receiver gateway
         /// declaring that the asset in question has been locked or escrowed by the sender gateway in
-        /// the origin network (e.g. to prevent double spending
+        /// the origin network (e.g. to prevent double spending)
         async fn lock_assertion(
             &self,
             request: tonic::Request<super::LockAssertionRequest>,
