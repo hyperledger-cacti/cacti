@@ -6,6 +6,7 @@ use tonic::transport::{Certificate, Channel, ClientTlsConfig};
 use tonic::Response;
 use weaverpb::common::ack::{ack, Ack};
 use weaverpb::common::state::{request_state, RequestState};
+use weaverpb::driver::driver::PerformLockRequest;
 use weaverpb::networks::networks::NetworkAssetTransfer;
 use weaverpb::relay::satp::satp_client::SatpClient;
 use weaverpb::relay::satp::{
@@ -16,11 +17,13 @@ use weaverpb::relay::satp::{
 use crate::db::Database;
 use crate::error::{self, Error};
 use crate::relay_proto::LocationSegment;
+use crate::services::helpers::get_driver_client;
 
 use super::constants::{
     SATP_DB_PATH, SATP_REMOTE_REQUESTS_DB_PATH, SATP_REMOTE_REQUESTS_STATES_DB_PATH,
     SATP_REQUESTS_DB_PATH, SATP_REQUESTS_STATES_DB_PATH,
 };
+use super::types::Driver;
 
 // Sends a request to the receiving gateway
 pub fn spawn_send_transfer_proposal_claims_request(
@@ -154,6 +157,8 @@ pub fn spawn_send_ack_commence_request(
 }
 
 pub fn spawn_send_perform_lock_request(
+    driver_info: Driver,
+    ack_commence_request: AckCommenceRequest,
     lock_assertion_request: LockAssertionRequest,
     relay_host: String,
     relay_port: String,
@@ -167,11 +172,21 @@ pub fn spawn_send_perform_lock_request(
             "Locking the asset of the lock assertion request id: {:?}",
             request_id
         );
-        // TODO
-        // Call the driver to check the asset status
-        // Subscribe to the status event
+        // TODO: pass the required info to lock the relevant asset
+        // Call the driver to lock the asset
+        let result = call_perform_lock(driver_info, ack_commence_request).await;
+        match result {
+            Ok(_) => {
+                println!("Ack Ok from driver\n")
+            }
+            Err(e) => {
+                println!("Error sending query to driver: {:?}\n", e);
+                // TODO: what to do in this case?
+            }
+        }
+
+        // TODO: Subscribe to the status event
         // Once the asset is locked, call the lock_assertion endpoint
-        // log the results
         let result = call_lock_assertion(
             relay_host,
             relay_port,
@@ -218,6 +233,30 @@ pub fn spawn_send_lock_assertion_broadcast_request(
         let request_id = lock_assertion_receipt_request.session_id.to_string();
         log_request_result_in_local_satp_db(&request_id, result, conf);
     });
+}
+
+async fn call_perform_lock(
+    driver_info: Driver,
+    ack_commence_request: AckCommenceRequest,
+) -> Result<(), Error> {
+    let client = get_driver_client(driver_info).await?;
+    println!("Sending request to driver to lock the asset");
+    let perform_lock_request = create_perform_lock_request(ack_commence_request);
+    let ack = client
+        .clone()
+        .perform_lock(perform_lock_request)
+        .await?
+        .into_inner();
+    println!("Response ACK from driver={:?}\n", ack);
+    let status = ack::Status::from_i32(ack.status)
+        .ok_or(Error::Simple("Status from Driver error".to_string()))?;
+    match status {
+        ack::Status::Ok => {
+            // Do nothing
+            return Ok(());
+        }
+        ack::Status::Error => Err(Error::Simple(format!("Error from driver: {}", ack.message))),
+    }
 }
 
 // Call the transfer_commence endpoint on the receiver gateway
@@ -516,6 +555,12 @@ pub fn create_lock_assertion_receipt_request(
     return lock_assertion_receipt_request;
 }
 
+pub fn create_perform_lock_request(ack_commence_request: AckCommenceRequest) -> PerformLockRequest {
+    // TODO: remove hard coded values
+    let perform_lock_request = PerformLockRequest {};
+    return perform_lock_request;
+}
+
 pub fn get_satp_requests_local_db(conf: Config) -> Database {
     let db = Database {
         db_path: format!(
@@ -662,6 +707,11 @@ pub fn get_relay_from_lock_assertion_receipt(
 ) -> (String, String) {
     // TODO
     return ("localhost".to_string(), "9085".to_string());
+}
+
+pub fn get_driver_address_from_ack_commence(ack_commence_request: AckCommenceRequest) -> String {
+    // TODO
+    return "localhost:9085/Dummy_Network/abc:abc:abc:abc".to_string();
 }
 
 pub fn get_relay_params(relay_host: String, relay_port: String, conf: Config) -> (bool, String) {
