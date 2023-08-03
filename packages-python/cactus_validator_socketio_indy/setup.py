@@ -67,7 +67,7 @@ setup(
         'cffi==1.14.6',
         'charset-normalizer==2.0.3',
         'click==8.0.1',
-        'cryptography==41.0.2',
+        'cryptography==41.0.3',
         'dnspython==1.16.0',
         'eventlet==0.31.1',
         'Flask==2.3.2',
