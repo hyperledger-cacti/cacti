@@ -603,7 +603,7 @@ fn send_transfer_proposal_receipt_request(
         get_request_id_from_transfer_proposal_claims(transfer_proposal_claims_request.clone());
     let (relay_host, relay_port) =
         get_relay_from_transfer_proposal_claims(transfer_proposal_claims_request.clone());
-    let (use_tls, relay_tlsca_cert_path) =
+    let (use_tls, tlsca_cert_path) =
         get_relay_params(relay_host.clone(), relay_port.clone(), conf.clone());
     let transfer_proposal_receipt_request =
         create_transfer_proposal_receipt_request(transfer_proposal_claims_request.clone());
@@ -613,7 +613,7 @@ fn send_transfer_proposal_receipt_request(
         relay_host,
         relay_port,
         use_tls,
-        relay_tlsca_cert_path,
+        tlsca_cert_path,
         conf,
     );
     let reply = Ack {
@@ -632,7 +632,7 @@ fn send_transfer_commence_request(
         get_request_id_from_transfer_proposal_receipt(transfer_proposal_receipt_request.clone());
     let (relay_host, relay_port) =
         get_relay_from_transfer_proposal_receipt(transfer_proposal_receipt_request.clone());
-    let (use_tls, relay_tlsca_cert_path) =
+    let (use_tls, tlsca_cert_path) =
         get_relay_params(relay_host.clone(), relay_port.clone(), conf.clone());
     let transfer_commence_request =
         create_transfer_commence_request(transfer_proposal_receipt_request.clone());
@@ -642,7 +642,7 @@ fn send_transfer_commence_request(
         relay_host,
         relay_port,
         use_tls,
-        relay_tlsca_cert_path,
+        tlsca_cert_path,
         conf,
     );
     let reply = Ack {
@@ -660,7 +660,7 @@ fn send_ack_commence_request(
     let request_id = &transfer_commence_request.session_id.to_string();
     let (relay_host, relay_port) =
         get_relay_from_transfer_commence(transfer_commence_request.clone());
-    let (use_tls, relay_tlsca_cert_path) =
+    let (use_tls, tlsca_cert_path) =
         get_relay_params(relay_host.clone(), relay_port.clone(), conf.clone());
     let ack_commence_request = create_ack_commence_request(transfer_commence_request.clone());
 
@@ -669,7 +669,7 @@ fn send_ack_commence_request(
         relay_host,
         relay_port,
         use_tls,
-        relay_tlsca_cert_path,
+        tlsca_cert_path,
         conf,
     );
     let reply = Ack {
@@ -686,7 +686,7 @@ fn send_lock_assertion_receipt_request(
 ) -> Result<Ack, Error> {
     let request_id = &lock_assertion_request.session_id.to_string();
     let (relay_host, relay_port) = get_relay_from_lock_assertion(lock_assertion_request.clone());
-    let (use_tls, relay_tlsca_cert_path) =
+    let (use_tls, tlsca_cert_path) =
         get_relay_params(relay_host.clone(), relay_port.clone(), conf.clone());
     let lock_assertion_receipt_request =
         create_lock_assertion_receipt_request(lock_assertion_request.clone());
@@ -696,7 +696,7 @@ fn send_lock_assertion_receipt_request(
         relay_host,
         relay_port,
         use_tls,
-        relay_tlsca_cert_path,
+        tlsca_cert_path,
         conf,
     );
     let reply = Ack {
@@ -713,7 +713,7 @@ fn send_perform_lock_request(
 ) -> Result<Ack, Error> {
     let request_id = &ack_commence_request.session_id.to_string();
     let (relay_host, relay_port) = get_relay_from_ack_commence(ack_commence_request.clone());
-    let (use_tls, relay_tlsca_cert_path) =
+    let (use_tls, tlsca_cert_path) =
         get_relay_params(relay_host.clone(), relay_port.clone(), conf.clone());
     let lock_assertion_request = create_lock_assertion_request(ack_commence_request.clone());
     let driver_address = get_driver_address_from_ack_commence(ack_commence_request.clone());
@@ -728,7 +728,7 @@ fn send_perform_lock_request(
                 relay_host,
                 relay_port,
                 use_tls,
-                relay_tlsca_cert_path,
+                tlsca_cert_path,
                 conf,
             );
             let reply = Ack {
@@ -757,7 +757,7 @@ fn send_lock_assertion_broadcast_request(
 ) -> Result<Ack, Error> {
     let request_id = &lock_assertion_request.session_id.to_string();
     let (relay_host, relay_port) = get_relay_from_lock_assertion(lock_assertion_request.clone());
-    let (use_tls, relay_tlsca_cert_path) =
+    let (use_tls, tlsca_cert_path) =
         get_relay_params(relay_host.clone(), relay_port.clone(), conf.clone());
     let lock_assertion_receipt_request =
         create_lock_assertion_receipt_request(lock_assertion_request.clone());
@@ -767,7 +767,7 @@ fn send_lock_assertion_broadcast_request(
         relay_host,
         relay_port,
         use_tls,
-        relay_tlsca_cert_path,
+        tlsca_cert_path,
         conf,
     );
     let reply = Ack {

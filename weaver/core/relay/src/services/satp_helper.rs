@@ -31,7 +31,7 @@ pub fn spawn_send_transfer_proposal_claims_request(
     relay_host: String,
     relay_port: String,
     use_tls: bool,
-    relay_tlsca_cert_path: String,
+    tlsca_cert_path: String,
     conf: Config,
 ) {
     println!(
@@ -50,7 +50,7 @@ pub fn spawn_send_transfer_proposal_claims_request(
             relay_host,
             relay_port,
             use_tls,
-            relay_tlsca_cert_path.to_string(),
+            tlsca_cert_path.to_string(),
             transfer_proposal_claims_request.clone(),
         )
         .await;
@@ -67,7 +67,7 @@ pub fn spawn_send_transfer_commence_request(
     relay_host: String,
     relay_port: String,
     use_tls: bool,
-    relay_tlsca_cert_path: String,
+    tlsca_cert_path: String,
     conf: Config,
 ) {
     println!(
@@ -85,7 +85,7 @@ pub fn spawn_send_transfer_commence_request(
             relay_host,
             relay_port,
             use_tls,
-            relay_tlsca_cert_path.to_string(),
+            tlsca_cert_path.to_string(),
             transfer_commence_request.clone(),
         )
         .await;
@@ -101,7 +101,7 @@ pub fn spawn_send_transfer_proposal_receipt_request(
     relay_host: String,
     relay_port: String,
     use_tls: bool,
-    relay_tlsca_cert_path: String,
+    tlsca_cert_path: String,
     conf: Config,
 ) {
     tokio::spawn(async move {
@@ -116,7 +116,7 @@ pub fn spawn_send_transfer_proposal_receipt_request(
             relay_host,
             relay_port,
             use_tls,
-            relay_tlsca_cert_path.to_string(),
+            tlsca_cert_path.to_string(),
             transfer_proposal_receipt_request.clone(),
         )
         .await;
@@ -132,7 +132,7 @@ pub fn spawn_send_ack_commence_request(
     relay_host: String,
     relay_port: String,
     use_tls: bool,
-    relay_tlsca_cert_path: String,
+    tlsca_cert_path: String,
     conf: Config,
 ) {
     tokio::spawn(async move {
@@ -145,7 +145,7 @@ pub fn spawn_send_ack_commence_request(
             relay_host,
             relay_port,
             use_tls,
-            relay_tlsca_cert_path.to_string(),
+            tlsca_cert_path.to_string(),
             ack_commence_request.clone(),
         )
         .await;
@@ -163,7 +163,7 @@ pub fn spawn_send_perform_lock_request(
     relay_host: String,
     relay_port: String,
     use_tls: bool,
-    relay_tlsca_cert_path: String,
+    tlsca_cert_path: String,
     conf: Config,
 ) {
     tokio::spawn(async move {
@@ -177,10 +177,10 @@ pub fn spawn_send_perform_lock_request(
         let result = call_perform_lock(driver_info, ack_commence_request).await;
         match result {
             Ok(_) => {
-                println!("Ack Ok from driver\n")
+                println!("Perform lock request sent to driver\n")
             }
             Err(e) => {
-                println!("Error sending query to driver: {:?}\n", e);
+                println!("Error sending perform lock request to driver: {:?}\n", e);
                 // TODO: what to do in this case?
             }
         }
@@ -191,7 +191,7 @@ pub fn spawn_send_perform_lock_request(
             relay_host,
             relay_port,
             use_tls,
-            relay_tlsca_cert_path.to_string(),
+            tlsca_cert_path.to_string(),
             lock_assertion_request.clone(),
         )
         .await;
@@ -208,7 +208,7 @@ pub fn spawn_send_lock_assertion_broadcast_request(
     relay_host: String,
     relay_port: String,
     use_tls: bool,
-    relay_tlsca_cert_path: String,
+    tlsca_cert_path: String,
     conf: Config,
 ) {
     tokio::spawn(async move {
@@ -223,7 +223,7 @@ pub fn spawn_send_lock_assertion_broadcast_request(
             relay_host,
             relay_port,
             use_tls,
-            relay_tlsca_cert_path.to_string(),
+            tlsca_cert_path.to_string(),
             lock_assertion_receipt_request.clone(),
         )
         .await;
@@ -247,7 +247,7 @@ async fn call_perform_lock(
         .perform_lock(perform_lock_request)
         .await?
         .into_inner();
-    println!("Response ACK from driver={:?}\n", ack);
+    println!("Response ACK from driver to perform lock {:?}\n", ack);
     let status = ack::Status::from_i32(ack.status)
         .ok_or(Error::Simple("Status from Driver error".to_string()))?;
     match status {
@@ -717,15 +717,15 @@ pub fn get_driver_address_from_ack_commence(ack_commence_request: AckCommenceReq
 pub fn get_relay_params(relay_host: String, relay_port: String, conf: Config) -> (bool, String) {
     let relays_table = conf.get_table("relays").unwrap();
     let mut relay_tls = false;
-    let mut relay_tlsca_cert_path = "".to_string();
+    let mut tlsca_cert_path = "".to_string();
     for (_relay_name, relay_spec) in relays_table {
         let relay_uri = relay_spec.clone().try_into::<LocationSegment>().unwrap();
         if relay_host == relay_uri.hostname && relay_port == relay_uri.port {
             relay_tls = relay_uri.tls;
-            relay_tlsca_cert_path = relay_uri.tlsca_cert_path;
+            tlsca_cert_path = relay_uri.tlsca_cert_path;
         }
     }
-    (relay_tls, relay_tlsca_cert_path)
+    (relay_tls, tlsca_cert_path)
 }
 
 fn create_client_address(relay_host: String, relay_port: String) -> String {
