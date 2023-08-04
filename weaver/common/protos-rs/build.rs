@@ -7,6 +7,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .compile(
             &[
                 "../protos/relay/datatransfer.proto",
+                "../protos/relay/satp.proto",
                 "../protos/relay/events.proto",
                 "../protos/networks/networks.proto",
                 "../protos/driver/driver.proto",

@@ -1,110 +1,167 @@
 #[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct DbName {
+pub struct TransferProposalClaimsRequest {
     #[prost(string, tag = "1")]
-    pub name: ::prost::alloc::string::String,
+    pub message_type: ::prost::alloc::string::String,
+    #[prost(string, tag = "2")]
+    pub asset_asset_id: ::prost::alloc::string::String,
+    #[prost(string, tag = "3")]
+    pub asset_profile_id: ::prost::alloc::string::String,
+    #[prost(string, tag = "4")]
+    pub verified_originator_entity_id: ::prost::alloc::string::String,
+    #[prost(string, tag = "5")]
+    pub verified_beneficiary_entity_id: ::prost::alloc::string::String,
+    #[prost(string, tag = "6")]
+    pub originator_pubkey: ::prost::alloc::string::String,
+    #[prost(string, tag = "7")]
+    pub beneficiary_pubkey: ::prost::alloc::string::String,
+    #[prost(string, tag = "8")]
+    pub sender_gateway_network_id: ::prost::alloc::string::String,
+    #[prost(string, tag = "9")]
+    pub recipient_gateway_network_id: ::prost::alloc::string::String,
+    #[prost(string, tag = "10")]
+    pub client_identity_pubkey: ::prost::alloc::string::String,
+    #[prost(string, tag = "11")]
+    pub server_identity_pubkey: ::prost::alloc::string::String,
+    #[prost(string, tag = "12")]
+    pub sender_gateway_owner_id: ::prost::alloc::string::String,
+    #[prost(string, tag = "13")]
+    pub receiver_gateway_owner_id: ::prost::alloc::string::String,
 }
 #[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct RelayDatabase {
-    #[prost(map = "string, string", tag = "1")]
-    pub pairs: ::std::collections::HashMap<
-        ::prost::alloc::string::String,
-        ::prost::alloc::string::String,
-    >,
-}
-#[derive(serde::Serialize, serde::Deserialize)]
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct GetStateMessage {
+pub struct TransferProposalReceiptRequest {
     #[prost(string, tag = "1")]
-    pub request_id: ::prost::alloc::string::String,
-}
-#[derive(serde::Serialize, serde::Deserialize)]
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct NetworkQuery {
-    #[prost(string, repeated, tag = "1")]
-    pub policy: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    pub message_type: ::prost::alloc::string::String,
     #[prost(string, tag = "2")]
-    pub address: ::prost::alloc::string::String,
+    pub asset_asset_id: ::prost::alloc::string::String,
     #[prost(string, tag = "3")]
-    pub requesting_relay: ::prost::alloc::string::String,
+    pub asset_profile_id: ::prost::alloc::string::String,
     #[prost(string, tag = "4")]
-    pub requesting_network: ::prost::alloc::string::String,
+    pub verified_originator_entity_id: ::prost::alloc::string::String,
     #[prost(string, tag = "5")]
-    pub certificate: ::prost::alloc::string::String,
+    pub verified_beneficiary_entity_id: ::prost::alloc::string::String,
     #[prost(string, tag = "6")]
-    pub requestor_signature: ::prost::alloc::string::String,
+    pub originator_pubkey: ::prost::alloc::string::String,
     #[prost(string, tag = "7")]
-    pub nonce: ::prost::alloc::string::String,
+    pub beneficiary_pubkey: ::prost::alloc::string::String,
     #[prost(string, tag = "8")]
-    pub requesting_org: ::prost::alloc::string::String,
-    #[prost(bool, tag = "9")]
-    pub confidential: bool,
-}
-/// Below message is used for network/client to dest-relay communication
-#[derive(serde::Serialize, serde::Deserialize)]
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct NetworkEventSubscription {
-    #[prost(message, optional, tag = "1")]
-    pub event_matcher: ::core::option::Option<
-        super::super::common::events::EventMatcher,
-    >,
-    #[prost(message, optional, tag = "2")]
-    pub query: ::core::option::Option<NetworkQuery>,
-    #[prost(message, optional, tag = "3")]
-    pub event_publication_spec: ::core::option::Option<
-        super::super::common::events::EventPublication,
-    >,
+    pub sender_gateway_network_id: ::prost::alloc::string::String,
+    #[prost(string, tag = "9")]
+    pub recipient_gateway_network_id: ::prost::alloc::string::String,
+    #[prost(string, tag = "10")]
+    pub client_identity_pubkey: ::prost::alloc::string::String,
+    #[prost(string, tag = "11")]
+    pub server_identity_pubkey: ::prost::alloc::string::String,
+    #[prost(string, tag = "12")]
+    pub sender_gateway_owner_id: ::prost::alloc::string::String,
+    #[prost(string, tag = "13")]
+    pub receiver_gateway_owner_id: ::prost::alloc::string::String,
 }
 #[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct NetworkEventUnsubscription {
-    #[prost(message, optional, tag = "1")]
-    pub request: ::core::option::Option<NetworkEventSubscription>,
+pub struct TransferCommenceRequest {
+    #[prost(string, tag = "1")]
+    pub message_type: ::prost::alloc::string::String,
     #[prost(string, tag = "2")]
-    pub request_id: ::prost::alloc::string::String,
-}
-#[derive(serde::Serialize, serde::Deserialize)]
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct NetworkAssetTransfer {
-    #[prost(string, repeated, tag = "1")]
-    pub policy: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
-    #[prost(string, tag = "2")]
-    pub address: ::prost::alloc::string::String,
+    pub session_id: ::prost::alloc::string::String,
     #[prost(string, tag = "3")]
-    pub requesting_relay: ::prost::alloc::string::String,
+    pub transfer_context_id: ::prost::alloc::string::String,
     #[prost(string, tag = "4")]
-    pub requesting_network: ::prost::alloc::string::String,
+    pub client_identity_pubkey: ::prost::alloc::string::String,
     #[prost(string, tag = "5")]
-    pub certificate: ::prost::alloc::string::String,
+    pub server_identity_pubkey: ::prost::alloc::string::String,
     #[prost(string, tag = "6")]
-    pub requestor_signature: ::prost::alloc::string::String,
+    pub hash_transfer_init_claims: ::prost::alloc::string::String,
     #[prost(string, tag = "7")]
-    pub nonce: ::prost::alloc::string::String,
+    pub hash_prev_message: ::prost::alloc::string::String,
     #[prost(string, tag = "8")]
-    pub requesting_org: ::prost::alloc::string::String,
-    #[prost(bool, tag = "9")]
-    pub confidential: bool,
+    pub client_transfer_number: ::prost::alloc::string::String,
+    #[prost(string, tag = "9")]
+    pub client_signature: ::prost::alloc::string::String,
+}
+#[derive(serde::Serialize, serde::Deserialize)]
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct AckCommenceRequest {
+    #[prost(string, tag = "1")]
+    pub message_type: ::prost::alloc::string::String,
+    #[prost(string, tag = "2")]
+    pub session_id: ::prost::alloc::string::String,
+    #[prost(string, tag = "3")]
+    pub transfer_context_id: ::prost::alloc::string::String,
+    #[prost(string, tag = "4")]
+    pub client_identity_pubkey: ::prost::alloc::string::String,
+    #[prost(string, tag = "5")]
+    pub server_identity_pubkey: ::prost::alloc::string::String,
+    #[prost(string, tag = "6")]
+    pub hash_prev_message: ::prost::alloc::string::String,
+    #[prost(string, tag = "7")]
+    pub server_transfer_number: ::prost::alloc::string::String,
+    #[prost(string, tag = "8")]
+    pub server_signature: ::prost::alloc::string::String,
+}
+#[derive(serde::Serialize, serde::Deserialize)]
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct LockAssertionRequest {
+    #[prost(string, tag = "1")]
+    pub message_type: ::prost::alloc::string::String,
+    #[prost(string, tag = "2")]
+    pub session_id: ::prost::alloc::string::String,
+    #[prost(string, tag = "3")]
+    pub transfer_context_id: ::prost::alloc::string::String,
+    #[prost(string, tag = "4")]
+    pub client_identity_pubkey: ::prost::alloc::string::String,
+    #[prost(string, tag = "5")]
+    pub server_identity_pubkey: ::prost::alloc::string::String,
+    #[prost(string, tag = "6")]
+    pub lock_assertion_claim: ::prost::alloc::string::String,
+    #[prost(string, tag = "7")]
+    pub lock_assertion_claim_format: ::prost::alloc::string::String,
+    #[prost(string, tag = "8")]
+    pub lock_assertion_expiration: ::prost::alloc::string::String,
+    #[prost(string, tag = "9")]
+    pub hash_prev_message: ::prost::alloc::string::String,
+    #[prost(string, tag = "10")]
+    pub client_transfer_number: ::prost::alloc::string::String,
+    #[prost(string, tag = "11")]
+    pub client_signature: ::prost::alloc::string::String,
+}
+#[derive(serde::Serialize, serde::Deserialize)]
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct LockAssertionReceiptRequest {
+    #[prost(string, tag = "1")]
+    pub message_type: ::prost::alloc::string::String,
+    #[prost(string, tag = "2")]
+    pub session_id: ::prost::alloc::string::String,
+    #[prost(string, tag = "3")]
+    pub transfer_context_id: ::prost::alloc::string::String,
+    #[prost(string, tag = "4")]
+    pub client_identity_pubkey: ::prost::alloc::string::String,
+    #[prost(string, tag = "5")]
+    pub server_identity_pubkey: ::prost::alloc::string::String,
+    #[prost(string, tag = "6")]
+    pub hash_prev_message: ::prost::alloc::string::String,
+    #[prost(string, tag = "7")]
+    pub server_transfer_number: ::prost::alloc::string::String,
+    #[prost(string, tag = "8")]
+    pub server_signature: ::prost::alloc::string::String,
 }
 /// Generated client implementations.
-pub mod network_client {
+pub mod satp_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
     use tonic::codegen::http::Uri;
-    /// This service is the interface for how the network communicates with
-    /// its relay.
     #[derive(Debug, Clone)]
-    pub struct NetworkClient<T> {
+    pub struct SatpClient<T> {
         inner: tonic::client::Grpc<T>,
     }
-    impl NetworkClient<tonic::transport::Channel> {
+    impl SatpClient<tonic::transport::Channel> {
         /// Attempt to create a new client by connecting to a given endpoint.
         pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
         where
@@ -115,7 +172,7 @@ pub mod network_client {
             Ok(Self::new(conn))
         }
     }
-    impl<T> NetworkClient<T>
+    impl<T> SatpClient<T>
     where
         T: tonic::client::GrpcService<tonic::body::BoxBody>,
         T::Error: Into<StdError>,
@@ -133,7 +190,7 @@ pub mod network_client {
         pub fn with_interceptor<F>(
             inner: T,
             interceptor: F,
-        ) -> NetworkClient<InterceptedService<T, F>>
+        ) -> SatpClient<InterceptedService<T, F>>
         where
             F: tonic::service::Interceptor,
             T::ResponseBody: Default,
@@ -147,7 +204,7 @@ pub mod network_client {
                 http::Request<tonic::body::BoxBody>,
             >>::Error: Into<StdError> + Send + Sync,
         {
-            NetworkClient::new(InterceptedService::new(inner, interceptor))
+            SatpClient::new(InterceptedService::new(inner, interceptor))
         }
         /// Compress requests with the given encoding.
         ///
@@ -164,11 +221,11 @@ pub mod network_client {
             self.inner = self.inner.accept_compressed(encoding);
             self
         }
-        /// Data Sharing endpoints
-        /// endpoint for a network to request remote relay state via local relay
-        pub async fn request_state(
+        /// The sender gateway sends a TransferProposalClaims request to to initiate an asset transfer.
+        /// Depending on the proposal, multiple rounds of communication between the two gateways may happen.
+        pub async fn transfer_proposal_claims(
             &mut self,
-            request: impl tonic::IntoRequest<super::NetworkQuery>,
+            request: impl tonic::IntoRequest<super::TransferProposalClaimsRequest>,
         ) -> Result<
             tonic::Response<super::super::super::common::ack::Ack>,
             tonic::Status,
@@ -184,58 +241,15 @@ pub mod network_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/networks.networks.Network/RequestState",
+                "/relay.satp.SATP/TransferProposalClaims",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
-        /// This rpc endpoint is for polling the local relay for request state.
-        pub async fn get_state(
+        /// The sender gateway sends a TransferProposalClaims request to signal to the receiver gateway
+        /// that the it is ready to start the transfer of the digital asset
+        pub async fn transfer_proposal_receipt(
             &mut self,
-            request: impl tonic::IntoRequest<super::GetStateMessage>,
-        ) -> Result<
-            tonic::Response<super::super::super::common::state::RequestState>,
-            tonic::Status,
-        > {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/networks.networks.Network/GetState",
-            );
-            self.inner.unary(request.into_request(), path, codec).await
-        }
-        /// NOTE: This rpc is just for debugging.
-        pub async fn request_database(
-            &mut self,
-            request: impl tonic::IntoRequest<super::DbName>,
-        ) -> Result<tonic::Response<super::RelayDatabase>, tonic::Status> {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/networks.networks.Network/RequestDatabase",
-            );
-            self.inner.unary(request.into_request(), path, codec).await
-        }
-        /// SATP endpoints
-        /// endpoint for a network to request asset transfer to a receiving gateway via local gateway
-        pub async fn request_asset_transfer(
-            &mut self,
-            request: impl tonic::IntoRequest<super::NetworkAssetTransfer>,
+            request: impl tonic::IntoRequest<super::TransferProposalReceiptRequest>,
         ) -> Result<
             tonic::Response<super::super::super::common::ack::Ack>,
             tonic::Status,
@@ -251,15 +265,15 @@ pub mod network_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/networks.networks.Network/RequestAssetTransfer",
+                "/relay.satp.SATP/TransferProposalReceipt",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
-        /// Event endpoints
-        /// endpoint for a client to subscribe to event via local relay initiating subscription flow.
-        pub async fn subscribe_event(
+        /// The sender gateway sends a TransferCommence request to signal to the receiver gateway
+        /// that the it is ready to start the transfer of the digital asset
+        pub async fn transfer_commence(
             &mut self,
-            request: impl tonic::IntoRequest<super::NetworkEventSubscription>,
+            request: impl tonic::IntoRequest<super::TransferCommenceRequest>,
         ) -> Result<
             tonic::Response<super::super::super::common::ack::Ack>,
             tonic::Status,
@@ -275,37 +289,15 @@ pub mod network_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/networks.networks.Network/SubscribeEvent",
+                "/relay.satp.SATP/TransferCommence",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
-        /// This rpc endpoint is for polling the local relay for subscription state.
-        pub async fn get_event_subscription_state(
+        /// The receiver gateway sends a AckCommence request to the sender gateway to indicate agreement
+        /// to proceed with the asset transfe
+        pub async fn ack_commence(
             &mut self,
-            request: impl tonic::IntoRequest<super::GetStateMessage>,
-        ) -> Result<
-            tonic::Response<super::super::super::common::events::EventSubscriptionState>,
-            tonic::Status,
-        > {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
-            let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/networks.networks.Network/GetEventSubscriptionState",
-            );
-            self.inner.unary(request.into_request(), path, codec).await
-        }
-        /// endpoint for a client to subscribe to event via local relay initiating subscription flow.
-        pub async fn unsubscribe_event(
-            &mut self,
-            request: impl tonic::IntoRequest<super::NetworkEventUnsubscription>,
+            request: impl tonic::IntoRequest<super::AckCommenceRequest>,
         ) -> Result<
             tonic::Response<super::super::super::common::ack::Ack>,
             tonic::Status,
@@ -321,17 +313,18 @@ pub mod network_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/networks.networks.Network/UnsubscribeEvent",
+                "/relay.satp.SATP/AckCommence",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
-        /// endpoint for a client to fetch received events.
-        /// Note: events are marked as deleted from relay database as soon as client fetches them.
-        pub async fn get_event_states(
+        /// The sender gateway sends a LockAssertion request to convey a signed claim to the receiver gateway
+        /// declaring that the asset in question has been locked or escrowed by the sender gateway in
+        /// the origin network (e.g. to prevent double spending
+        pub async fn lock_assertion(
             &mut self,
-            request: impl tonic::IntoRequest<super::GetStateMessage>,
+            request: impl tonic::IntoRequest<super::LockAssertionRequest>,
         ) -> Result<
-            tonic::Response<super::super::super::common::events::EventStates>,
+            tonic::Response<super::super::super::common::ack::Ack>,
             tonic::Status,
         > {
             self.inner
@@ -345,95 +338,107 @@ pub mod network_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/networks.networks.Network/GetEventStates",
+                "/relay.satp.SATP/LockAssertion",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        /// The receiver gateway sends a LockAssertionReceipt request to the sender gateway to indicate acceptance
+        /// of the claim(s) delivered by the sender gateway in the previous message
+        pub async fn lock_assertion_receipt(
+            &mut self,
+            request: impl tonic::IntoRequest<super::LockAssertionReceiptRequest>,
+        ) -> Result<
+            tonic::Response<super::super::super::common::ack::Ack>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/relay.satp.SATP/LockAssertionReceipt",
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
     }
 }
 /// Generated server implementations.
-pub mod network_server {
+pub mod satp_server {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
-    /// Generated trait containing gRPC methods that should be implemented for use with NetworkServer.
+    /// Generated trait containing gRPC methods that should be implemented for use with SatpServer.
     #[async_trait]
-    pub trait Network: Send + Sync + 'static {
-        /// Data Sharing endpoints
-        /// endpoint for a network to request remote relay state via local relay
-        async fn request_state(
+    pub trait Satp: Send + Sync + 'static {
+        /// The sender gateway sends a TransferProposalClaims request to to initiate an asset transfer.
+        /// Depending on the proposal, multiple rounds of communication between the two gateways may happen.
+        async fn transfer_proposal_claims(
             &self,
-            request: tonic::Request<super::NetworkQuery>,
+            request: tonic::Request<super::TransferProposalClaimsRequest>,
         ) -> Result<
             tonic::Response<super::super::super::common::ack::Ack>,
             tonic::Status,
         >;
-        /// This rpc endpoint is for polling the local relay for request state.
-        async fn get_state(
+        /// The sender gateway sends a TransferProposalClaims request to signal to the receiver gateway
+        /// that the it is ready to start the transfer of the digital asset
+        async fn transfer_proposal_receipt(
             &self,
-            request: tonic::Request<super::GetStateMessage>,
-        ) -> Result<
-            tonic::Response<super::super::super::common::state::RequestState>,
-            tonic::Status,
-        >;
-        /// NOTE: This rpc is just for debugging.
-        async fn request_database(
-            &self,
-            request: tonic::Request<super::DbName>,
-        ) -> Result<tonic::Response<super::RelayDatabase>, tonic::Status>;
-        /// SATP endpoints
-        /// endpoint for a network to request asset transfer to a receiving gateway via local gateway
-        async fn request_asset_transfer(
-            &self,
-            request: tonic::Request<super::NetworkAssetTransfer>,
+            request: tonic::Request<super::TransferProposalReceiptRequest>,
         ) -> Result<
             tonic::Response<super::super::super::common::ack::Ack>,
             tonic::Status,
         >;
-        /// Event endpoints
-        /// endpoint for a client to subscribe to event via local relay initiating subscription flow.
-        async fn subscribe_event(
+        /// The sender gateway sends a TransferCommence request to signal to the receiver gateway
+        /// that the it is ready to start the transfer of the digital asset
+        async fn transfer_commence(
             &self,
-            request: tonic::Request<super::NetworkEventSubscription>,
+            request: tonic::Request<super::TransferCommenceRequest>,
         ) -> Result<
             tonic::Response<super::super::super::common::ack::Ack>,
             tonic::Status,
         >;
-        /// This rpc endpoint is for polling the local relay for subscription state.
-        async fn get_event_subscription_state(
+        /// The receiver gateway sends a AckCommence request to the sender gateway to indicate agreement
+        /// to proceed with the asset transfe
+        async fn ack_commence(
             &self,
-            request: tonic::Request<super::GetStateMessage>,
-        ) -> Result<
-            tonic::Response<super::super::super::common::events::EventSubscriptionState>,
-            tonic::Status,
-        >;
-        /// endpoint for a client to subscribe to event via local relay initiating subscription flow.
-        async fn unsubscribe_event(
-            &self,
-            request: tonic::Request<super::NetworkEventUnsubscription>,
+            request: tonic::Request<super::AckCommenceRequest>,
         ) -> Result<
             tonic::Response<super::super::super::common::ack::Ack>,
             tonic::Status,
         >;
-        /// endpoint for a client to fetch received events.
-        /// Note: events are marked as deleted from relay database as soon as client fetches them.
-        async fn get_event_states(
+        /// The sender gateway sends a LockAssertion request to convey a signed claim to the receiver gateway
+        /// declaring that the asset in question has been locked or escrowed by the sender gateway in
+        /// the origin network (e.g. to prevent double spending
+        async fn lock_assertion(
             &self,
-            request: tonic::Request<super::GetStateMessage>,
+            request: tonic::Request<super::LockAssertionRequest>,
         ) -> Result<
-            tonic::Response<super::super::super::common::events::EventStates>,
+            tonic::Response<super::super::super::common::ack::Ack>,
+            tonic::Status,
+        >;
+        /// The receiver gateway sends a LockAssertionReceipt request to the sender gateway to indicate acceptance
+        /// of the claim(s) delivered by the sender gateway in the previous message
+        async fn lock_assertion_receipt(
+            &self,
+            request: tonic::Request<super::LockAssertionReceiptRequest>,
+        ) -> Result<
+            tonic::Response<super::super::super::common::ack::Ack>,
             tonic::Status,
         >;
     }
-    /// This service is the interface for how the network communicates with
-    /// its relay.
     #[derive(Debug)]
-    pub struct NetworkServer<T: Network> {
+    pub struct SatpServer<T: Satp> {
         inner: _Inner<T>,
         accept_compression_encodings: EnabledCompressionEncodings,
         send_compression_encodings: EnabledCompressionEncodings,
     }
     struct _Inner<T>(Arc<T>);
-    impl<T: Network> NetworkServer<T> {
+    impl<T: Satp> SatpServer<T> {
         pub fn new(inner: T) -> Self {
             Self::from_arc(Arc::new(inner))
         }
@@ -467,9 +472,9 @@ pub mod network_server {
             self
         }
     }
-    impl<T, B> tonic::codegen::Service<http::Request<B>> for NetworkServer<T>
+    impl<T, B> tonic::codegen::Service<http::Request<B>> for SatpServer<T>
     where
-        T: Network,
+        T: Satp,
         B: Body + Send + 'static,
         B::Error: Into<StdError> + Send + 'static,
     {
@@ -485,125 +490,13 @@ pub mod network_server {
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             let inner = self.inner.clone();
             match req.uri().path() {
-                "/networks.networks.Network/RequestState" => {
+                "/relay.satp.SATP/TransferProposalClaims" => {
                     #[allow(non_camel_case_types)]
-                    struct RequestStateSvc<T: Network>(pub Arc<T>);
-                    impl<T: Network> tonic::server::UnaryService<super::NetworkQuery>
-                    for RequestStateSvc<T> {
-                        type Response = super::super::super::common::ack::Ack;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::NetworkQuery>,
-                        ) -> Self::Future {
-                            let inner = self.0.clone();
-                            let fut = async move {
-                                (*inner).request_state(request).await
-                            };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = RequestStateSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/networks.networks.Network/GetState" => {
-                    #[allow(non_camel_case_types)]
-                    struct GetStateSvc<T: Network>(pub Arc<T>);
-                    impl<T: Network> tonic::server::UnaryService<super::GetStateMessage>
-                    for GetStateSvc<T> {
-                        type Response = super::super::super::common::state::RequestState;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::GetStateMessage>,
-                        ) -> Self::Future {
-                            let inner = self.0.clone();
-                            let fut = async move { (*inner).get_state(request).await };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = GetStateSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/networks.networks.Network/RequestDatabase" => {
-                    #[allow(non_camel_case_types)]
-                    struct RequestDatabaseSvc<T: Network>(pub Arc<T>);
-                    impl<T: Network> tonic::server::UnaryService<super::DbName>
-                    for RequestDatabaseSvc<T> {
-                        type Response = super::RelayDatabase;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::DbName>,
-                        ) -> Self::Future {
-                            let inner = self.0.clone();
-                            let fut = async move {
-                                (*inner).request_database(request).await
-                            };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = RequestDatabaseSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/networks.networks.Network/RequestAssetTransfer" => {
-                    #[allow(non_camel_case_types)]
-                    struct RequestAssetTransferSvc<T: Network>(pub Arc<T>);
+                    struct TransferProposalClaimsSvc<T: Satp>(pub Arc<T>);
                     impl<
-                        T: Network,
-                    > tonic::server::UnaryService<super::NetworkAssetTransfer>
-                    for RequestAssetTransferSvc<T> {
+                        T: Satp,
+                    > tonic::server::UnaryService<super::TransferProposalClaimsRequest>
+                    for TransferProposalClaimsSvc<T> {
                         type Response = super::super::super::common::ack::Ack;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
@@ -611,11 +504,11 @@ pub mod network_server {
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::NetworkAssetTransfer>,
+                            request: tonic::Request<super::TransferProposalClaimsRequest>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
                             let fut = async move {
-                                (*inner).request_asset_transfer(request).await
+                                (*inner).transfer_proposal_claims(request).await
                             };
                             Box::pin(fut)
                         }
@@ -625,7 +518,7 @@ pub mod network_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = RequestAssetTransferSvc(inner);
+                        let method = TransferProposalClaimsSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -637,13 +530,13 @@ pub mod network_server {
                     };
                     Box::pin(fut)
                 }
-                "/networks.networks.Network/SubscribeEvent" => {
+                "/relay.satp.SATP/TransferProposalReceipt" => {
                     #[allow(non_camel_case_types)]
-                    struct SubscribeEventSvc<T: Network>(pub Arc<T>);
+                    struct TransferProposalReceiptSvc<T: Satp>(pub Arc<T>);
                     impl<
-                        T: Network,
-                    > tonic::server::UnaryService<super::NetworkEventSubscription>
-                    for SubscribeEventSvc<T> {
+                        T: Satp,
+                    > tonic::server::UnaryService<super::TransferProposalReceiptRequest>
+                    for TransferProposalReceiptSvc<T> {
                         type Response = super::super::super::common::ack::Ack;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
@@ -651,11 +544,13 @@ pub mod network_server {
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::NetworkEventSubscription>,
+                            request: tonic::Request<
+                                super::TransferProposalReceiptRequest,
+                            >,
                         ) -> Self::Future {
                             let inner = self.0.clone();
                             let fut = async move {
-                                (*inner).subscribe_event(request).await
+                                (*inner).transfer_proposal_receipt(request).await
                             };
                             Box::pin(fut)
                         }
@@ -665,7 +560,7 @@ pub mod network_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = SubscribeEventSvc(inner);
+                        let method = TransferProposalReceiptSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -677,51 +572,13 @@ pub mod network_server {
                     };
                     Box::pin(fut)
                 }
-                "/networks.networks.Network/GetEventSubscriptionState" => {
+                "/relay.satp.SATP/TransferCommence" => {
                     #[allow(non_camel_case_types)]
-                    struct GetEventSubscriptionStateSvc<T: Network>(pub Arc<T>);
-                    impl<T: Network> tonic::server::UnaryService<super::GetStateMessage>
-                    for GetEventSubscriptionStateSvc<T> {
-                        type Response = super::super::super::common::events::EventSubscriptionState;
-                        type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
-                            tonic::Status,
-                        >;
-                        fn call(
-                            &mut self,
-                            request: tonic::Request<super::GetStateMessage>,
-                        ) -> Self::Future {
-                            let inner = self.0.clone();
-                            let fut = async move {
-                                (*inner).get_event_subscription_state(request).await
-                            };
-                            Box::pin(fut)
-                        }
-                    }
-                    let accept_compression_encodings = self.accept_compression_encodings;
-                    let send_compression_encodings = self.send_compression_encodings;
-                    let inner = self.inner.clone();
-                    let fut = async move {
-                        let inner = inner.0;
-                        let method = GetEventSubscriptionStateSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
-                        let mut grpc = tonic::server::Grpc::new(codec)
-                            .apply_compression_config(
-                                accept_compression_encodings,
-                                send_compression_encodings,
-                            );
-                        let res = grpc.unary(method, req).await;
-                        Ok(res)
-                    };
-                    Box::pin(fut)
-                }
-                "/networks.networks.Network/UnsubscribeEvent" => {
-                    #[allow(non_camel_case_types)]
-                    struct UnsubscribeEventSvc<T: Network>(pub Arc<T>);
+                    struct TransferCommenceSvc<T: Satp>(pub Arc<T>);
                     impl<
-                        T: Network,
-                    > tonic::server::UnaryService<super::NetworkEventUnsubscription>
-                    for UnsubscribeEventSvc<T> {
+                        T: Satp,
+                    > tonic::server::UnaryService<super::TransferCommenceRequest>
+                    for TransferCommenceSvc<T> {
                         type Response = super::super::super::common::ack::Ack;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
@@ -729,11 +586,11 @@ pub mod network_server {
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::NetworkEventUnsubscription>,
+                            request: tonic::Request<super::TransferCommenceRequest>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
                             let fut = async move {
-                                (*inner).unsubscribe_event(request).await
+                                (*inner).transfer_commence(request).await
                             };
                             Box::pin(fut)
                         }
@@ -743,7 +600,7 @@ pub mod network_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = UnsubscribeEventSvc(inner);
+                        let method = TransferCommenceSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -755,23 +612,23 @@ pub mod network_server {
                     };
                     Box::pin(fut)
                 }
-                "/networks.networks.Network/GetEventStates" => {
+                "/relay.satp.SATP/AckCommence" => {
                     #[allow(non_camel_case_types)]
-                    struct GetEventStatesSvc<T: Network>(pub Arc<T>);
-                    impl<T: Network> tonic::server::UnaryService<super::GetStateMessage>
-                    for GetEventStatesSvc<T> {
-                        type Response = super::super::super::common::events::EventStates;
+                    struct AckCommenceSvc<T: Satp>(pub Arc<T>);
+                    impl<T: Satp> tonic::server::UnaryService<super::AckCommenceRequest>
+                    for AckCommenceSvc<T> {
+                        type Response = super::super::super::common::ack::Ack;
                         type Future = BoxFuture<
                             tonic::Response<Self::Response>,
                             tonic::Status,
                         >;
                         fn call(
                             &mut self,
-                            request: tonic::Request<super::GetStateMessage>,
+                            request: tonic::Request<super::AckCommenceRequest>,
                         ) -> Self::Future {
                             let inner = self.0.clone();
                             let fut = async move {
-                                (*inner).get_event_states(request).await
+                                (*inner).ack_commence(request).await
                             };
                             Box::pin(fut)
                         }
@@ -781,7 +638,87 @@ pub mod network_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
-                        let method = GetEventStatesSvc(inner);
+                        let method = AckCommenceSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/relay.satp.SATP/LockAssertion" => {
+                    #[allow(non_camel_case_types)]
+                    struct LockAssertionSvc<T: Satp>(pub Arc<T>);
+                    impl<
+                        T: Satp,
+                    > tonic::server::UnaryService<super::LockAssertionRequest>
+                    for LockAssertionSvc<T> {
+                        type Response = super::super::super::common::ack::Ack;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::LockAssertionRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).lock_assertion(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = LockAssertionSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/relay.satp.SATP/LockAssertionReceipt" => {
+                    #[allow(non_camel_case_types)]
+                    struct LockAssertionReceiptSvc<T: Satp>(pub Arc<T>);
+                    impl<
+                        T: Satp,
+                    > tonic::server::UnaryService<super::LockAssertionReceiptRequest>
+                    for LockAssertionReceiptSvc<T> {
+                        type Response = super::super::super::common::ack::Ack;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::LockAssertionReceiptRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).lock_assertion_receipt(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = LockAssertionReceiptSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
@@ -808,7 +745,7 @@ pub mod network_server {
             }
         }
     }
-    impl<T: Network> Clone for NetworkServer<T> {
+    impl<T: Satp> Clone for SatpServer<T> {
         fn clone(&self) -> Self {
             let inner = self.inner.clone();
             Self {
@@ -818,7 +755,7 @@ pub mod network_server {
             }
         }
     }
-    impl<T: Network> Clone for _Inner<T> {
+    impl<T: Satp> Clone for _Inner<T> {
         fn clone(&self) -> Self {
             Self(self.0.clone())
         }
@@ -828,7 +765,7 @@ pub mod network_server {
             write!(f, "{:?}", self.0)
         }
     }
-    impl<T: Network> tonic::server::NamedService for NetworkServer<T> {
-        const NAME: &'static str = "networks.networks.Network";
+    impl<T: Satp> tonic::server::NamedService for SatpServer<T> {
+        const NAME: &'static str = "relay.satp.SATP";
     }
 }

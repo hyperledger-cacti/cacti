@@ -2,6 +2,9 @@ pub mod relay {
     pub mod datatransfer {
         include!(concat!("./generated", "/relay.datatransfer.rs"));
     }
+    pub mod satp {
+        include!(concat!("./generated", "/relay.satp.rs"));
+    }
     pub mod events {
         include!(concat!("./generated", "/relay.events.rs"));
     }
