@@ -2,7 +2,7 @@ no-check-coverage: true
 node-arg:
   - --max-old-space-size=4096
 jobs: 1
-timeout: 900
+timeout: 3600
 ts: true
 files:
   - ./packages/cactus-plugin-keychain-aws-sm/src/test/typescript/integration/openapi/openapi-validation.test.ts

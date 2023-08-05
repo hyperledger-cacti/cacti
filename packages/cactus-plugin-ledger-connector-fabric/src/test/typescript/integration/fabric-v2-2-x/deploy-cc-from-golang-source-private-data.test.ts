@@ -10,6 +10,9 @@ import bodyParser from "body-parser";
 
 import {
   Containers,
+  DEFAULT_FABRIC_2_AIO_FABRIC_VERSION,
+  DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
+  DEFAULT_FABRIC_2_AIO_IMAGE_VERSION,
   FabricTestLedgerV1,
   pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
@@ -18,6 +21,7 @@ import {
   Checks,
   IListenOptions,
   LogLevelDesc,
+  LoggerProvider,
   Servers,
 } from "@hyperledger/cactus-common";
 import { PluginRegistry } from "@hyperledger/cactus-core";
@@ -45,9 +49,9 @@ describe(testCase, () => {
   const ledger = new FabricTestLedgerV1({
     emitContainerLogs: true,
     publishAllPorts: true,
-    imageName: "ghcr.io/hyperledger/cactus-fabric2-all-in-one",
-    imageVersion: "2021-09-02--fix-876-supervisord-retries",
-    envVars: new Map([["FABRIC_VERSION", "2.2.0"]]),
+    imageName: DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
+    imageVersion: DEFAULT_FABRIC_2_AIO_IMAGE_VERSION,
+    envVars: new Map([["FABRIC_VERSION", DEFAULT_FABRIC_2_AIO_FABRIC_VERSION]]),
     logLevel,
   });
   let addressInfo,
@@ -75,7 +79,7 @@ describe(testCase, () => {
     await expect(pruning).resolves.toBeTruthy();
   });
   beforeAll(async () => {
-    await ledger.start();
+    await ledger.start({ omitPull: false });
 
     const listenOptions: IListenOptions = {
       hostname: "localhost",
@@ -91,6 +95,11 @@ describe(testCase, () => {
   });
 
   test(testCase, async () => {
+    const LOG = LoggerProvider.getOrCreate({
+      label: "deploy-cc-from-golang-source-private-data",
+      level: logLevel,
+    });
+
     const channelId = "mychannel";
     const channelName = channelId;
 
@@ -178,6 +187,11 @@ describe(testCase, () => {
         commitTimeout: 300,
       },
     };
+
+    LOG.debug("Creating connector - connection profile: %o", connectionProfile);
+    LOG.debug("Creating connector - discovery options: %o", discoveryOptions);
+    LOG.debug("Creating connector - SSH config: %o", sshConfig);
+
     const connector = new PluginLedgerConnectorFabric(pluginOptions);
     await connector.getOrCreateWebServices();
     await connector.registerWebServices(expressApp);

@@ -11,6 +11,8 @@ import bodyParser from "body-parser";
 
 import {
   Containers,
+  DEFAULT_FABRIC_2_AIO_FABRIC_VERSION,
+  DEFAULT_FABRIC_2_AIO_IMAGE_VERSION,
   FabricTestLedgerV1,
   pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
@@ -37,6 +39,7 @@ import { IPluginLedgerConnectorFabricOptions } from "../../../../main/typescript
 import { DiscoveryOptions } from "fabric-network";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import { Configuration } from "@hyperledger/cactus-core-api";
+import { DEFAULT_FABRIC_2_AIO_IMAGE_NAME } from "@hyperledger/cactus-test-tooling";
 
 const testCase = "deploys Fabric 2.x contract from go source";
 const logLevel: LogLevelDesc = "TRACE";
@@ -58,8 +61,9 @@ test(testCase, async (t: Test) => {
   const ledger = new FabricTestLedgerV1({
     emitContainerLogs: true,
     publishAllPorts: true,
-    imageName: "ghcr.io/hyperledger/cactus-fabric2-all-in-one",
-    envVars: new Map([["FABRIC_VERSION", "2.2.0"]]),
+    imageName: DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
+    imageVersion: DEFAULT_FABRIC_2_AIO_IMAGE_VERSION,
+    envVars: new Map([["FABRIC_VERSION", DEFAULT_FABRIC_2_AIO_FABRIC_VERSION]]),
     logLevel,
   });
 

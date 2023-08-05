@@ -14,35 +14,11 @@
  *  More details: https://github.com/facebook/jest/pull/12789
  */
 
-//////////////////////////////////
-// Constants
-//////////////////////////////////
-
-// const postgresImageName = "postgres";
-// const postgresImageVersion = "14.6-alpine";
-const testLogLevel: LogLevelDesc = "info";
-const sutLogLevel: LogLevelDesc = "info";
-const setupTimeout = 1000 * 60; // 1 minute timeout for setup
-// const testTimeout = 1000 * 60 * 3; // 3 minutes timeout for some async tests
-
-const imageName = "ghcr.io/hyperledger/cactus-fabric2-all-in-one";
-const imageVersion = "2021-09-02--fix-876-supervisord-retries";
-const fabricEnvVersion = "2.2.0";
-const fabricEnvCAVersion = "1.4.9";
-const ledgerUserName = "appUser";
-const ledgerChannelName = "mychannel";
-const ledgerContractName = "basic";
-const leaveLedgerRunning = false; // default: false
-const useRunningLedger = false; // default: false
-
-/////////////////////////////////
-
 import fs from "fs";
 import path from "path";
 import os from "os";
 import "jest-extended";
 
-import "jest-extended";
 import http from "http";
 import { AddressInfo } from "net";
 import { v4 as uuidv4 } from "uuid";
@@ -52,6 +28,9 @@ import { Server as SocketIoServer } from "socket.io";
 import { DiscoveryOptions } from "fabric-network";
 import { PluginPersistenceFabric } from "../../../main/typescript";
 import {
+  DEFAULT_FABRIC_2_AIO_FABRIC_VERSION,
+  DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
+  DEFAULT_FABRIC_2_AIO_IMAGE_VERSION,
   FabricTestLedgerV1,
   pruneDockerAllIfGithubAction,
   SelfSignedPkiGenerator,
@@ -90,6 +69,29 @@ import {
   enrollUser,
   getUserCryptoFromWallet,
 } from "./fabric-setup-helpers";
+
+//////////////////////////////////
+// Constants
+//////////////////////////////////
+
+// const postgresImageName = "postgres";
+// const postgresImageVersion = "14.6-alpine";
+const testLogLevel: LogLevelDesc = "info";
+const sutLogLevel: LogLevelDesc = "info";
+const setupTimeout = 1000 * 60; // 1 minute timeout for setup
+// const testTimeout = 1000 * 60 * 3; // 3 minutes timeout for some async tests
+
+const imageName = DEFAULT_FABRIC_2_AIO_IMAGE_NAME;
+const imageVersion = DEFAULT_FABRIC_2_AIO_IMAGE_VERSION;
+const fabricEnvVersion = DEFAULT_FABRIC_2_AIO_FABRIC_VERSION;
+const fabricEnvCAVersion = "1.4.9";
+const ledgerUserName = "appUser";
+const ledgerChannelName = "mychannel";
+const ledgerContractName = "basic";
+const leaveLedgerRunning = false; // default: false
+const useRunningLedger = false; // default: false
+
+/////////////////////////////////
 
 // Logger setup
 const log: Logger = LoggerProvider.getOrCreate({
@@ -304,7 +306,7 @@ describe("Persistence Fabric", () => {
       useRunningLedger,
     });
     log.debug("Fabric image:", ledger.getContainerImageName());
-    await ledger.start();
+    await ledger.start({ omitPull: false });
 
     // Get connection profile
     log.info("Get fabric connection profile for Org1...");
