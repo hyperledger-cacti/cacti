@@ -2,7 +2,8 @@
 # https://github.com/docker-library/docker/issues/170
 FROM docker:24.0.5-dind
 
-ARG FABRIC_VERSION=2.2.0
+ARG FABRIC_VERSION=2.2.13
+ARG FABRIC_NODEENV_VERSION=2.4.2
 ARG CA_VERSION=1.4.9
 ARG COUCH_VERSION_FABRIC=0.4
 ARG COUCH_VERSION=3.1.1
@@ -29,13 +30,21 @@ RUN apk add --no-cache file
 # Need NodeJS tooling for the Typescript contracts
 RUN apk add --no-cache npm nodejs
 
+# Need YQ to mutate the core.yaml and docker-compose files for Fabric config changes
+RUN apk add --no-cache yq
+
 # Download and setup path variables for Go
-RUN wget https://golang.org/dl/go1.15.5.linux-amd64.tar.gz
-RUN tar -xvf go1.15.5.linux-amd64.tar.gz
+RUN wget https://golang.org/dl/go1.20.6.linux-amd64.tar.gz
+RUN tar -xvf go1.20.6.linux-amd64.tar.gz
 RUN mv go /usr/local
 ENV GOROOT=/usr/local/go
 ENV GOPATH=/usr/local/go
 ENV PATH=$PATH:$GOPATH/bin
+RUN rm go1.20.6.linux-amd64.tar.gz
+
+# Needed as of as of go v1.20
+# @see https://github.com/golang/go/issues/59305#issuecomment-1488478737
+RUN apk add gcompat
 
 # Needed because the Fabric binaries need the GNU libc dynamic linker to be executed
 # and alpine does not have that by default
@@ -45,7 +54,21 @@ RUN apk add --no-cache libc6-compat
 
 ENV CACTUS_CFG_PATH=/etc/hyperledger/cactus
 RUN mkdir -p $CACTUS_CFG_PATH
-# OpenSSH - need to have it so we can shell in and install/instantiate contracts
+# Installing OpenSSH:
+# 1. OpenSSH - need to have it so we can shell in and install/instantiate contracts
+# 2. Before installing we need to wipe all pre-existing installations which Alpine
+# started shipping in recent versions. Without cleaning up first, our installation
+# crash with this:
+#
+#    => ERROR [17/64] RUN apk add --no-cache openssh augeas                                                                                                                                                     1.1s
+#   ------
+#    > [17/64] RUN apk add --no-cache openssh augeas:
+#   0.300 fetch https://dl-cdn.alpinelinux.org/alpine/v3.18/main/x86_64/APKINDEX.tar.gz
+#   0.560 fetch https://dl-cdn.alpinelinux.org/alpine/v3.18/community/x86_64/APKINDEX.tar.gz
+#   1.041 ERROR: unable to select packages:
+#   1.043   openssh-client-common-9.3_p1-r3:
+#   1.043     breaks: openssh-client-default-9.3_p2-r0[openssh-client-common=9.3_p2-r0]
+RUN apk del openssh*
 RUN apk add --no-cache openssh augeas
 
 # Configure the OpenSSH server we just installed
@@ -130,7 +153,7 @@ RUN mkdir -p /etc/couchdb/
 RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/fabric-peer/ hyperledger/fabric-peer:${FABRIC_VERSION}
 RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/fabric-orderer/ hyperledger/fabric-orderer:${FABRIC_VERSION}
 RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/fabric-ccenv/ hyperledger/fabric-ccenv:${FABRIC_VERSION}
-RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/fabric-nodeenv/ hyperledger/fabric-nodeenv:${FABRIC_VERSION}
+RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/fabric-nodeenv/ hyperledger/fabric-nodeenv:${FABRIC_NODEENV_VERSION}
 RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/fabric-tools/ hyperledger/fabric-tools:${FABRIC_VERSION}
 RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/fabric-baseos/ hyperledger/fabric-baseos:${FABRIC_VERSION}
 RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/fabric-ca/ hyperledger/fabric-ca:${CA_VERSION}
@@ -145,6 +168,30 @@ RUN chmod +x bootstrap.sh
 # Run the bootstrap here so that at least we can pre-fetch the git clone and the binary downloads resulting in
 # faster container startup speed since these steps will not have to be done, only the docker image pulls.
 RUN /bootstrap.sh ${FABRIC_VERSION} ${CA_VERSION} -d
+
+# Update the image version used by the Fabric peers when installing chaincodes.
+# This is necessary because the older (default) image uses NodeJS v12 and npm v6
+# But we need at least NodeJS 16 and npm v7 for the dependency installation to work.
+RUN sed -i "s/fabric-nodeenv:\$(TWO_DIGIT_VERSION)/fabric-nodeenv:${FABRIC_NODEENV_VERSION}/g" /fabric-samples/config/core.yaml
+
+# Set the log level of the peers and other containers to DEBUG instead of the default INFO
+RUN sed -i "s/FABRIC_LOGGING_SPEC=INFO/FABRIC_LOGGING_SPEC=DEBUG/g" /fabric-samples/test-network/docker/docker-compose-test-net.yaml
+
+# Update the docker-compose file of the fabric-samples repo so that the 
+# core.yaml configuration file of the peer containers can be customized.
+# We need the above because we need to override the NodeJS version the peers are
+# using when building the chaincodes in the tests. This is necessary because the
+# older npm version (v6) that NodeJS v12 ships with breaks down and crashes with
+# an error when the peer tries to install the dependencies as part of the
+# chaincode installation.
+RUN yq '.services."peer0.org1.example.com".volumes += "../..:/opt/gopath/src/github.com/hyperledger/fabric-samples"' \
+    --inplace /fabric-samples/test-network/docker/docker-compose-test-net.yaml
+RUN yq '.services."peer0.org1.example.com".volumes += "../../config/core.yaml:/etc/hyperledger/fabric/core.yaml"' \
+    --inplace /fabric-samples/test-network/docker/docker-compose-test-net.yaml
+RUN yq '.services."peer0.org2.example.com".volumes += "../..:/opt/gopath/src/github.com/hyperledger/fabric-samples"' \
+    --inplace /fabric-samples/test-network/docker/docker-compose-test-net.yaml
+RUN yq '.services."peer0.org2.example.com".volumes += "../../config/core.yaml:/etc/hyperledger/fabric/core.yaml"' \
+    --inplace /fabric-samples/test-network/docker/docker-compose-test-net.yaml
 
 # Install supervisord because we need to run the docker daemon and also the fabric network
 # meaning that we have multiple processes to run.

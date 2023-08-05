@@ -1,27 +1,3 @@
-/**
- * Functional test of WatchBlocksV1Endpoint on connector-fabric (packages/cactus-plugin-ledger-connector-fabric)
- * Assumes sample CC was already deployed on the test ledger.
- *
- * @note - this test sometimes hangs infinitely when used with fabric-node-sdk 2.3.0,
- * probably due to bug in the underlying dependency grpc-js. Problem does not occur on 2.5.0.
- */
-
-//////////////////////////////////
-// Constants
-//////////////////////////////////
-
-// Ledger settings
-const imageName = "ghcr.io/hyperledger/cactus-fabric2-all-in-one";
-const imageVersion = "2021-09-02--fix-876-supervisord-retries";
-const fabricEnvVersion = "2.2.0";
-const fabricEnvCAVersion = "1.4.9";
-const ledgerChannelName = "mychannel";
-const ledgerContractName = "basic";
-
-// Log settings
-const testLogLevel: LogLevelDesc = "info"; // default: info
-const sutLogLevel: LogLevelDesc = "info"; // default: info
-
 import "jest-extended";
 import http from "http";
 import { AddressInfo } from "net";
@@ -32,6 +8,9 @@ import { Server as SocketIoServer } from "socket.io";
 import { DiscoveryOptions } from "fabric-network";
 
 import {
+  DEFAULT_FABRIC_2_AIO_FABRIC_VERSION,
+  DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
+  DEFAULT_FABRIC_2_AIO_IMAGE_VERSION,
   FabricTestLedgerV1,
   pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
@@ -59,6 +38,30 @@ import {
   WatchBlocksListenerTypeV1,
   WatchBlocksResponseV1,
 } from "../../../../main/typescript/public-api";
+
+/**
+ * Functional test of WatchBlocksV1Endpoint on connector-fabric (packages/cactus-plugin-ledger-connector-fabric)
+ * Assumes sample CC was already deployed on the test ledger.
+ *
+ * @note - this test sometimes hangs infinitely when used with fabric-node-sdk 2.3.0,
+ * probably due to bug in the underlying dependency grpc-js. Problem does not occur on 2.5.0.
+ */
+
+//////////////////////////////////
+// Constants
+//////////////////////////////////
+
+// Ledger settings
+const imageName = DEFAULT_FABRIC_2_AIO_IMAGE_NAME;
+const imageVersion = DEFAULT_FABRIC_2_AIO_IMAGE_VERSION;
+const fabricEnvVersion = DEFAULT_FABRIC_2_AIO_FABRIC_VERSION;
+const fabricEnvCAVersion = "1.4.9";
+const ledgerChannelName = "mychannel";
+const ledgerContractName = "basic";
+
+// Log settings
+const testLogLevel: LogLevelDesc = "info"; // default: info
+const sutLogLevel: LogLevelDesc = "info"; // default: info
 
 // Logger setup
 const log: Logger = LoggerProvider.getOrCreate({
@@ -100,7 +103,7 @@ describe("watchBlocksV1 of fabric connector tests", () => {
       ]),
     });
     log.debug("Fabric image:", ledger.getContainerImageName());
-    await ledger.start();
+    await ledger.start({ omitPull: false });
 
     // Get connection profile
     log.info("Get fabric connection profile for Org1...");
