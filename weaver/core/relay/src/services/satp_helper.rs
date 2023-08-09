@@ -10,8 +10,9 @@ use weaverpb::driver::driver::PerformLockRequest;
 use weaverpb::networks::networks::NetworkAssetTransfer;
 use weaverpb::relay::satp::satp_client::SatpClient;
 use weaverpb::relay::satp::{
-    AckCommenceRequest, LockAssertionReceiptRequest, LockAssertionRequest, TransferCommenceRequest,
-    TransferProposalClaimsRequest, TransferProposalReceiptRequest,
+    AckCommenceRequest, AckFinalReceiptRequest, CommitFinalAssertionRequest, CommitPrepareRequest,
+    CommitReadyRequest, LockAssertionReceiptRequest, LockAssertionRequest, TransferCommenceRequest,
+    TransferCompletedRequest, TransferProposalClaimsRequest, TransferProposalReceiptRequest,
 };
 
 use crate::db::Database;
@@ -235,6 +236,178 @@ pub fn spawn_send_lock_assertion_broadcast_request(
     });
 }
 
+// Sends a request to the receiving gateway
+pub fn spawn_send_commit_prepare_request(
+    commit_prepare_request: CommitPrepareRequest,
+    relay_host: String,
+    relay_port: String,
+    use_tls: bool,
+    tlsca_cert_path: String,
+    conf: Config,
+) {
+    println!(
+        "Sending commit prepare request to receiver gateway: {:?}:{:?}",
+        relay_host, relay_port
+    );
+    // Spawning new thread to make the call_commit_prepare to receiver gateway
+    tokio::spawn(async move {
+        let request_id = commit_prepare_request.session_id.to_string();
+        println!(
+            "Sending commit prepare request to receiver gateway: Request ID = {:?}",
+            request_id
+        );
+        let result = call_commit_prepare(
+            relay_host,
+            relay_port,
+            use_tls,
+            tlsca_cert_path.to_string(),
+            commit_prepare_request.clone(),
+        )
+        .await;
+
+        println!("Received Ack from sending gateway: {:?}\n", result);
+        // Updates the request in the DB depending on the response status from the sending gateway
+        log_request_result_in_local_satp_db(&request_id, result, conf);
+    });
+}
+
+pub fn spawn_send_create_asset_request(
+    commit_ready_request: CommitReadyRequest,
+    relay_host: String,
+    relay_port: String,
+    use_tls: bool,
+    tlsca_cert_path: String,
+    conf: Config,
+) {
+    tokio::spawn(async move {
+        let request_id = commit_ready_request.session_id.to_string();
+        println!(
+            "Creating the asset corresponding to the  commit ready request {:?}",
+            request_id
+        );
+        // TODO
+        // Creating the asset in the target network
+        // Subscribe to the status event
+        // Once the message is broadcast, call the call_commit_ready endpoint
+        // log the results
+        let result = call_commit_ready(
+            relay_host,
+            relay_port,
+            use_tls,
+            tlsca_cert_path,
+            commit_ready_request.clone(),
+        )
+        .await;
+
+        println!("Received Ack from sending gateway: {:?}\n", result);
+        // Updates the request in the DB depending on the response status from the sending gateway
+        let request_id = commit_ready_request.session_id.to_string();
+        log_request_result_in_local_satp_db(&request_id, result, conf);
+    });
+}
+
+pub fn spawn_send_assign_asset_request(
+    ack_final_receipt_request: AckFinalReceiptRequest,
+    relay_host: String,
+    relay_port: String,
+    use_tls: bool,
+    tlsca_cert_path: String,
+    conf: Config,
+) {
+    tokio::spawn(async move {
+        let request_id = ack_final_receipt_request.session_id.to_string();
+        println!(
+            "Assigning the asset corresponding to the  commit final assertion request {:?}",
+            request_id
+        );
+        // TODO
+        // Assigning the asset in the target network
+        // Once the asset is assigned, call the call_ack_final_receipt endpoint
+        // log the results
+        let result = call_ack_final_receipt(
+            relay_host,
+            relay_port,
+            use_tls,
+            tlsca_cert_path,
+            ack_final_receipt_request.clone(),
+        )
+        .await;
+
+        println!("Received Ack from sending gateway: {:?}\n", result);
+        // Updates the request in the DB depending on the response status from the sending gateway
+        let request_id = ack_final_receipt_request.session_id.to_string();
+        log_request_result_in_local_satp_db(&request_id, result, conf);
+    });
+}
+
+pub fn spawn_send_ack_final_receipt_broadcast_request(
+    transfer_completed_request: TransferCompletedRequest,
+    relay_host: String,
+    relay_port: String,
+    use_tls: bool,
+    tlsca_cert_path: String,
+    conf: Config,
+) {
+    tokio::spawn(async move {
+        let request_id = transfer_completed_request.session_id.to_string();
+        println!(
+            "Acknowledge final receipt broadcast of the transfer completed request {:?}",
+            request_id
+        );
+        // TODO
+        // Ack final receipt broadcast
+        // Once the broadcast is done, call the call_transfer_completed endpoint
+        // log the results
+        let result = call_transfer_completed(
+            relay_host,
+            relay_port,
+            use_tls,
+            tlsca_cert_path,
+            transfer_completed_request.clone(),
+        )
+        .await;
+
+        println!("Received Ack from sending gateway: {:?}\n", result);
+        // Updates the request in the DB depending on the response status from the sending gateway
+        let request_id = transfer_completed_request.session_id.to_string();
+        log_request_result_in_local_satp_db(&request_id, result, conf);
+    });
+}
+
+pub fn spawn_send_extinguish_request(
+    commit_final_assertion_request: CommitFinalAssertionRequest,
+    relay_host: String,
+    relay_port: String,
+    use_tls: bool,
+    tlsca_cert_path: String,
+    conf: Config,
+) {
+    tokio::spawn(async move {
+        let request_id = commit_final_assertion_request.session_id.to_string();
+        println!(
+            "Extinguishing the asset corresponding to the commit final assertion request {:?}",
+            request_id
+        );
+        // TODO
+        // Assigning the asset in the target network
+        // Once the asset is assigned, call the call_ack_final_receipt endpoint
+        // log the results
+        let result = call_commit_final_assertion_receipt(
+            relay_host,
+            relay_port,
+            use_tls,
+            tlsca_cert_path,
+            commit_final_assertion_request.clone(),
+        )
+        .await;
+
+        println!("Received Ack from sending gateway: {:?}\n", result);
+        // Updates the request in the DB depending on the response status from the sending gateway
+        let request_id = commit_final_assertion_request.session_id.to_string();
+        log_request_result_in_local_satp_db(&request_id, result, conf);
+    });
+}
+
 async fn call_perform_lock(
     driver_info: Driver,
     ack_commence_request: AckCommenceRequest,
@@ -375,6 +548,106 @@ pub async fn call_lock_assertion_receipt(
     );
     let response = satp_client
         .lock_assertion_receipt(lock_assertion_receipt_request.clone())
+        .await?;
+    Ok(response)
+}
+
+// Call the call_commit_ready endpoint on the sending gateway
+pub async fn call_commit_prepare(
+    relay_host: String,
+    relay_port: String,
+    use_tls: bool,
+    tlsca_cert_path: String,
+    commit_prepare_request: CommitPrepareRequest,
+) -> Result<Response<Ack>, Box<dyn std::error::Error>> {
+    let mut satp_client: SatpClient<Channel> =
+        create_satp_client(relay_host, relay_port, use_tls, tlsca_cert_path).await?;
+    println!(
+        "Sending the commit prepare request: {:?}",
+        commit_prepare_request.clone()
+    );
+    let response = satp_client
+        .commit_prepare(commit_prepare_request.clone())
+        .await?;
+    Ok(response)
+}
+
+// Call the call_commit_ready endpoint on the sending gateway
+pub async fn call_commit_ready(
+    relay_host: String,
+    relay_port: String,
+    use_tls: bool,
+    tlsca_cert_path: String,
+    commit_ready_request: CommitReadyRequest,
+) -> Result<Response<Ack>, Box<dyn std::error::Error>> {
+    let mut satp_client: SatpClient<Channel> =
+        create_satp_client(relay_host, relay_port, use_tls, tlsca_cert_path).await?;
+    println!(
+        "Sending the commit ready request: {:?}",
+        commit_ready_request.clone()
+    );
+    let response = satp_client
+        .commit_ready(commit_ready_request.clone())
+        .await?;
+    Ok(response)
+}
+
+// Call the call_ack_final_receipt endpoint on the sending gateway
+pub async fn call_ack_final_receipt(
+    relay_host: String,
+    relay_port: String,
+    use_tls: bool,
+    tlsca_cert_path: String,
+    ack_final_receipt_request: AckFinalReceiptRequest,
+) -> Result<Response<Ack>, Box<dyn std::error::Error>> {
+    let mut satp_client: SatpClient<Channel> =
+        create_satp_client(relay_host, relay_port, use_tls, tlsca_cert_path).await?;
+    println!(
+        "Sending the ack final receipt request: {:?}",
+        ack_final_receipt_request.clone()
+    );
+    let response = satp_client
+        .ack_final_receipt(ack_final_receipt_request.clone())
+        .await?;
+    Ok(response)
+}
+
+// Call the call_transfer_completed endpoint on the sending gateway
+pub async fn call_transfer_completed(
+    relay_host: String,
+    relay_port: String,
+    use_tls: bool,
+    tlsca_cert_path: String,
+    transfer_completed_request: TransferCompletedRequest,
+) -> Result<Response<Ack>, Box<dyn std::error::Error>> {
+    let mut satp_client: SatpClient<Channel> =
+        create_satp_client(relay_host, relay_port, use_tls, tlsca_cert_path).await?;
+    println!(
+        "Sending the transfer completed request: {:?}",
+        transfer_completed_request.clone()
+    );
+    let response = satp_client
+        .transfer_completed(transfer_completed_request.clone())
+        .await?;
+    Ok(response)
+}
+
+// Call the call_commit_final_assertion_receipt endpoint on the sending gateway
+pub async fn call_commit_final_assertion_receipt(
+    relay_host: String,
+    relay_port: String,
+    use_tls: bool,
+    tlsca_cert_path: String,
+    commit_final_assertion_request: CommitFinalAssertionRequest,
+) -> Result<Response<Ack>, Box<dyn std::error::Error>> {
+    let mut satp_client: SatpClient<Channel> =
+        create_satp_client(relay_host, relay_port, use_tls, tlsca_cert_path).await?;
+    println!(
+        "Sending the commit final assertion request: {:?}",
+        commit_final_assertion_request.clone()
+    );
+    let response = satp_client
+        .commit_final_assertion(commit_final_assertion_request.clone())
         .await?;
     Ok(response)
 }
@@ -555,6 +828,66 @@ pub fn create_lock_assertion_receipt_request(
     return lock_assertion_receipt_request;
 }
 
+pub fn create_commit_prepare_request(
+    lock_assertion_receipt_request: LockAssertionReceiptRequest,
+) -> CommitPrepareRequest {
+    // TODO: remove hard coded values
+    let commit_prepare_request = CommitPrepareRequest {
+        message_type: "message_type1".to_string(),
+        session_id: "session_id1".to_string(),
+        transfer_context_id: "transfer_context_id1".to_string(),
+    };
+    return commit_prepare_request;
+}
+
+pub fn create_commit_ready_request(
+    commit_prepare_request: CommitPrepareRequest,
+) -> CommitReadyRequest {
+    // TODO: remove hard coded values
+    let commit_ready_request = CommitReadyRequest {
+        message_type: "message_type1".to_string(),
+        session_id: "session_id1".to_string(),
+        transfer_context_id: "transfer_context_id1".to_string(),
+    };
+    return commit_ready_request;
+}
+
+pub fn create_commit_final_assertion_request(
+    commit_ready_request: CommitReadyRequest,
+) -> CommitFinalAssertionRequest {
+    // TODO: remove hard coded values
+    let commit_final_assertion_request = CommitFinalAssertionRequest {
+        message_type: "message_type1".to_string(),
+        session_id: "session_id1".to_string(),
+        transfer_context_id: "transfer_context_id1".to_string(),
+    };
+    return commit_final_assertion_request;
+}
+
+pub fn create_ack_final_receipt_request(
+    commit_final_assertion_request: CommitFinalAssertionRequest,
+) -> AckFinalReceiptRequest {
+    // TODO: remove hard coded values
+    let ack_final_receipt_request = AckFinalReceiptRequest {
+        message_type: "message_type1".to_string(),
+        session_id: "session_id1".to_string(),
+        transfer_context_id: "transfer_context_id1".to_string(),
+    };
+    return ack_final_receipt_request;
+}
+
+pub fn create_transfer_completed_request(
+    ack_final_receipt_request: AckFinalReceiptRequest,
+) -> TransferCompletedRequest {
+    // TODO: remove hard coded values
+    let transfer_completed_request = TransferCompletedRequest {
+        message_type: "message_type1".to_string(),
+        session_id: "session_id1".to_string(),
+        transfer_context_id: "transfer_context_id1".to_string(),
+    };
+    return transfer_completed_request;
+}
+
 pub fn create_perform_lock_request(ack_commence_request: AckCommenceRequest) -> PerformLockRequest {
     // TODO: remove hard coded values
     let perform_lock_request = PerformLockRequest {};
@@ -704,6 +1037,32 @@ pub fn get_relay_from_lock_assertion(
 
 pub fn get_relay_from_lock_assertion_receipt(
     lock_assertion_receipt_request: LockAssertionReceiptRequest,
+) -> (String, String) {
+    // TODO
+    return ("localhost".to_string(), "9085".to_string());
+}
+
+pub fn get_relay_from_commit_prepare(
+    commit_prepare_request: CommitPrepareRequest,
+) -> (String, String) {
+    // TODO
+    return ("localhost".to_string(), "9085".to_string());
+}
+
+pub fn get_relay_from_commit_ready(commit_ready_request: CommitReadyRequest) -> (String, String) {
+    // TODO
+    return ("localhost".to_string(), "9085".to_string());
+}
+
+pub fn get_relay_from_commit_final_assertion(
+    commit_final_assertion_request: CommitFinalAssertionRequest,
+) -> (String, String) {
+    // TODO
+    return ("localhost".to_string(), "9085".to_string());
+}
+
+pub fn get_relay_from_ack_final_receipt(
+    ack_final_receipt_request: AckFinalReceiptRequest,
 ) -> (String, String) {
     // TODO
     return ("localhost".to_string(), "9085".to_string());
