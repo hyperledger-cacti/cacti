@@ -47,6 +47,10 @@ import {
 
 import fs from "fs";
 
+export enum CordaVersion {
+  CORDA_V4X = "CORDA_V4X",
+  CORDA_V5 = "CORDA_V5",
+}
 export interface IPluginLedgerConnectorCordaOptions
   extends ICactusPluginOptions {
   logLevel?: LogLevelDesc;
@@ -56,6 +60,7 @@ export interface IPluginLedgerConnectorCordaOptions
   cordaStartCmd?: string;
   cordaStopCmd?: string;
   apiUrl?: string;
+  cordaVersion?: CordaVersion;
   /**
    * Path to the file where the private key for the ssh configuration is located
    * This property is optional. Its use is not recommended for most cases, it will override the privateKey property of the sshConfigAdminShell.
@@ -232,6 +237,13 @@ export class PluginLedgerConnectorCorda
       endpoints.push(endpoint);
     }
 
+    /*{
+      const opts: IFlowManagementEndpointV1 = {
+        apiUrl: this.options.apiUrl,
+        logLevel: this.options.logLevel,
+      }
+    }*/
+
     this.log.info(`Instantiated endpoints of ${pkgName}`);
     return endpoints;
   }
@@ -241,6 +253,14 @@ export class PluginLedgerConnectorCorda
   }
 
   public async getFlowList(): Promise<string[]> {
+    return ["getFlowList()_NOT_IMPLEMENTED"];
+  }
+
+  public async getCPI(): Promise<string[]> {
+    return ["getFlowList()_NOT_IMPLEMENTED"];
+  }
+
+  public async getFlow(): Promise<string[]> {
     return ["getFlowList()_NOT_IMPLEMENTED"];
   }
 }

@@ -61,7 +61,7 @@ COPY supervisord.conf /etc/supervisord.conf
 COPY start-services.sh /start-services.sh
 RUN chmod +x /start-services.sh
 
-WORKDIR /CSDE-cordapp-template-java/
+WORKDIR /CSDE-cordapp-template-kotlin/
 
 # Extend the parent image's entrypoint
 # https://superuser.com/questions/1459466/can-i-add-an-additional-docker-entrypoint-script

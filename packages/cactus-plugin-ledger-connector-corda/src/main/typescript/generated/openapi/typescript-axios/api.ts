@@ -775,6 +775,44 @@ export interface PublicKey {
     'encoded': string;
 }
 /**
+ * Parameter used in Corda 5
+ * @export
+ * @interface HttpStartFlowRequest
+ */
+export interface HttpStartFlowRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof HttpStartFlowRequest
+     */
+    clientId: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof HttpStartFlowRequest
+     */
+    flowName?: string;
+    /**
+     * 
+     * @type {HttpStartFlowRequestParameters}
+     * @memberof HttpStartFlowRequest
+     */
+    parameters: HttpStartFlowRequestParameters;
+}
+/**
+ * 
+ * @export
+ * @interface HttpStartFlowRequestParameters
+ */
+export interface HttpStartFlowRequestParameters {
+    /**
+     * 
+     * @type {string}
+     * @memberof HttpStartFlowRequestParameters
+     */
+    parametersInJson: string;
+}
+/**
  * SHA-256 is part of the SHA-2 hash function family. Generated hash is fixed size, 256-bits (32-bytes).
  * @export
  * @interface SHA256
