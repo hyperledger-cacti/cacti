@@ -38,6 +38,16 @@ service SATP {
   // The receiver gateway sends a LockAssertionReceipt request to the sender gateway to indicate acceptance
   // of the claim(s) delivered by the sender gateway in the previous message
   rpc LockAssertionReceipt(LockAssertionReceiptRequest) returns (common.ack.Ack) {};
+
+  rpc CommitPrepare(CommitPrepareRequest) returns (common.ack.Ack) {};
+
+  rpc CommitReady(CommitReadyRequest) returns (common.ack.Ack) {};
+
+  rpc CommitFinalAssertion(CommitFinalAssertionRequest) returns (common.ack.Ack) {};
+
+  rpc AckFinalReceipt(AckFinalReceiptRequest) returns (common.ack.Ack) {};
+
+  rpc TransferCompleted(TransferCompletedRequest) returns (common.ack.Ack) {};
 }
   
 message TransferProposalClaimsRequest {
@@ -118,4 +128,34 @@ message LockAssertionReceiptRequest {
   string hash_prev_message = 6;
   string server_transfer_number = 7;
   string server_signature = 8;
+}
+
+message CommitPrepareRequest {
+  string message_type = 1;
+  string session_id = 2;
+  string transfer_context_id = 3;
+}
+
+message CommitReadyRequest {
+  string message_type = 1;
+  string session_id = 2;
+  string transfer_context_id = 3;
+}
+
+message CommitFinalAssertionRequest {
+  string message_type = 1;
+  string session_id = 2;
+  string transfer_context_id = 3;
+}
+
+message AckFinalReceiptRequest {
+  string message_type = 1;
+  string session_id = 2;
+  string transfer_context_id = 3;
+}
+
+message TransferCompletedRequest {
+  string message_type = 1;
+  string session_id = 2;
+  string transfer_context_id = 3;
 }

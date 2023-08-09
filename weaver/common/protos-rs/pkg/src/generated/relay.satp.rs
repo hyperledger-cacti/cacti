@@ -152,6 +152,61 @@ pub struct LockAssertionReceiptRequest {
     #[prost(string, tag = "8")]
     pub server_signature: ::prost::alloc::string::String,
 }
+#[derive(serde::Serialize, serde::Deserialize)]
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CommitPrepareRequest {
+    #[prost(string, tag = "1")]
+    pub message_type: ::prost::alloc::string::String,
+    #[prost(string, tag = "2")]
+    pub session_id: ::prost::alloc::string::String,
+    #[prost(string, tag = "3")]
+    pub transfer_context_id: ::prost::alloc::string::String,
+}
+#[derive(serde::Serialize, serde::Deserialize)]
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CommitReadyRequest {
+    #[prost(string, tag = "1")]
+    pub message_type: ::prost::alloc::string::String,
+    #[prost(string, tag = "2")]
+    pub session_id: ::prost::alloc::string::String,
+    #[prost(string, tag = "3")]
+    pub transfer_context_id: ::prost::alloc::string::String,
+}
+#[derive(serde::Serialize, serde::Deserialize)]
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CommitFinalAssertionRequest {
+    #[prost(string, tag = "1")]
+    pub message_type: ::prost::alloc::string::String,
+    #[prost(string, tag = "2")]
+    pub session_id: ::prost::alloc::string::String,
+    #[prost(string, tag = "3")]
+    pub transfer_context_id: ::prost::alloc::string::String,
+}
+#[derive(serde::Serialize, serde::Deserialize)]
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct AckFinalReceiptRequest {
+    #[prost(string, tag = "1")]
+    pub message_type: ::prost::alloc::string::String,
+    #[prost(string, tag = "2")]
+    pub session_id: ::prost::alloc::string::String,
+    #[prost(string, tag = "3")]
+    pub transfer_context_id: ::prost::alloc::string::String,
+}
+#[derive(serde::Serialize, serde::Deserialize)]
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct TransferCompletedRequest {
+    #[prost(string, tag = "1")]
+    pub message_type: ::prost::alloc::string::String,
+    #[prost(string, tag = "2")]
+    pub session_id: ::prost::alloc::string::String,
+    #[prost(string, tag = "3")]
+    pub transfer_context_id: ::prost::alloc::string::String,
+}
 /// Generated client implementations.
 pub mod satp_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
@@ -366,6 +421,116 @@ pub mod satp_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
+        pub async fn commit_prepare(
+            &mut self,
+            request: impl tonic::IntoRequest<super::CommitPrepareRequest>,
+        ) -> Result<
+            tonic::Response<super::super::super::common::ack::Ack>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/relay.satp.SATP/CommitPrepare",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn commit_ready(
+            &mut self,
+            request: impl tonic::IntoRequest<super::CommitReadyRequest>,
+        ) -> Result<
+            tonic::Response<super::super::super::common::ack::Ack>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/relay.satp.SATP/CommitReady",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn commit_final_assertion(
+            &mut self,
+            request: impl tonic::IntoRequest<super::CommitFinalAssertionRequest>,
+        ) -> Result<
+            tonic::Response<super::super::super::common::ack::Ack>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/relay.satp.SATP/CommitFinalAssertion",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn ack_final_receipt(
+            &mut self,
+            request: impl tonic::IntoRequest<super::AckFinalReceiptRequest>,
+        ) -> Result<
+            tonic::Response<super::super::super::common::ack::Ack>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/relay.satp.SATP/AckFinalReceipt",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        pub async fn transfer_completed(
+            &mut self,
+            request: impl tonic::IntoRequest<super::TransferCompletedRequest>,
+        ) -> Result<
+            tonic::Response<super::super::super::common::ack::Ack>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/relay.satp.SATP/TransferCompleted",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
     }
 }
 /// Generated server implementations.
@@ -426,6 +591,41 @@ pub mod satp_server {
         async fn lock_assertion_receipt(
             &self,
             request: tonic::Request<super::LockAssertionReceiptRequest>,
+        ) -> Result<
+            tonic::Response<super::super::super::common::ack::Ack>,
+            tonic::Status,
+        >;
+        async fn commit_prepare(
+            &self,
+            request: tonic::Request<super::CommitPrepareRequest>,
+        ) -> Result<
+            tonic::Response<super::super::super::common::ack::Ack>,
+            tonic::Status,
+        >;
+        async fn commit_ready(
+            &self,
+            request: tonic::Request<super::CommitReadyRequest>,
+        ) -> Result<
+            tonic::Response<super::super::super::common::ack::Ack>,
+            tonic::Status,
+        >;
+        async fn commit_final_assertion(
+            &self,
+            request: tonic::Request<super::CommitFinalAssertionRequest>,
+        ) -> Result<
+            tonic::Response<super::super::super::common::ack::Ack>,
+            tonic::Status,
+        >;
+        async fn ack_final_receipt(
+            &self,
+            request: tonic::Request<super::AckFinalReceiptRequest>,
+        ) -> Result<
+            tonic::Response<super::super::super::common::ack::Ack>,
+            tonic::Status,
+        >;
+        async fn transfer_completed(
+            &self,
+            request: tonic::Request<super::TransferCompletedRequest>,
         ) -> Result<
             tonic::Response<super::super::super::common::ack::Ack>,
             tonic::Status,
@@ -719,6 +919,204 @@ pub mod satp_server {
                     let fut = async move {
                         let inner = inner.0;
                         let method = LockAssertionReceiptSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/relay.satp.SATP/CommitPrepare" => {
+                    #[allow(non_camel_case_types)]
+                    struct CommitPrepareSvc<T: Satp>(pub Arc<T>);
+                    impl<
+                        T: Satp,
+                    > tonic::server::UnaryService<super::CommitPrepareRequest>
+                    for CommitPrepareSvc<T> {
+                        type Response = super::super::super::common::ack::Ack;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::CommitPrepareRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).commit_prepare(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = CommitPrepareSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/relay.satp.SATP/CommitReady" => {
+                    #[allow(non_camel_case_types)]
+                    struct CommitReadySvc<T: Satp>(pub Arc<T>);
+                    impl<T: Satp> tonic::server::UnaryService<super::CommitReadyRequest>
+                    for CommitReadySvc<T> {
+                        type Response = super::super::super::common::ack::Ack;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::CommitReadyRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).commit_ready(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = CommitReadySvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/relay.satp.SATP/CommitFinalAssertion" => {
+                    #[allow(non_camel_case_types)]
+                    struct CommitFinalAssertionSvc<T: Satp>(pub Arc<T>);
+                    impl<
+                        T: Satp,
+                    > tonic::server::UnaryService<super::CommitFinalAssertionRequest>
+                    for CommitFinalAssertionSvc<T> {
+                        type Response = super::super::super::common::ack::Ack;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::CommitFinalAssertionRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).commit_final_assertion(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = CommitFinalAssertionSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/relay.satp.SATP/AckFinalReceipt" => {
+                    #[allow(non_camel_case_types)]
+                    struct AckFinalReceiptSvc<T: Satp>(pub Arc<T>);
+                    impl<
+                        T: Satp,
+                    > tonic::server::UnaryService<super::AckFinalReceiptRequest>
+                    for AckFinalReceiptSvc<T> {
+                        type Response = super::super::super::common::ack::Ack;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::AckFinalReceiptRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).ack_final_receipt(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = AckFinalReceiptSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/relay.satp.SATP/TransferCompleted" => {
+                    #[allow(non_camel_case_types)]
+                    struct TransferCompletedSvc<T: Satp>(pub Arc<T>);
+                    impl<
+                        T: Satp,
+                    > tonic::server::UnaryService<super::TransferCompletedRequest>
+                    for TransferCompletedSvc<T> {
+                        type Response = super::super::super::common::ack::Ack;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::TransferCompletedRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).transfer_completed(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = TransferCompletedSvc(inner);
                         let codec = tonic::codec::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(

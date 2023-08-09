@@ -2,8 +2,9 @@
 use weaverpb::common::ack::{ack, Ack};
 use weaverpb::relay::satp::satp_server::Satp;
 use weaverpb::relay::satp::{
-    AckCommenceRequest, LockAssertionReceiptRequest, LockAssertionRequest, TransferCommenceRequest,
-    TransferProposalClaimsRequest, TransferProposalReceiptRequest,
+    AckCommenceRequest, AckFinalReceiptRequest, CommitFinalAssertionRequest, CommitPrepareRequest,
+    CommitReadyRequest, LockAssertionReceiptRequest, LockAssertionRequest, TransferCommenceRequest,
+    TransferCompletedRequest, TransferProposalClaimsRequest, TransferProposalReceiptRequest,
 };
 
 // Internal modules
@@ -17,15 +18,22 @@ use crate::services::satp_helper::{
 use super::helpers::get_driver;
 // external modules
 use super::satp_helper::{
-    create_ack_commence_request, create_lock_assertion_receipt_request,
+    create_ack_commence_request, create_ack_final_receipt_request,
+    create_commit_final_assertion_request, create_commit_prepare_request,
+    create_commit_ready_request, create_lock_assertion_receipt_request,
     create_lock_assertion_request, create_transfer_commence_request,
-    create_transfer_proposal_receipt_request, get_driver_address_from_ack_commence,
-    get_relay_from_ack_commence, get_relay_from_lock_assertion, get_relay_from_transfer_commence,
+    create_transfer_completed_request, create_transfer_proposal_receipt_request,
+    get_driver_address_from_ack_commence, get_relay_from_ack_commence,
+    get_relay_from_ack_final_receipt, get_relay_from_commit_final_assertion,
+    get_relay_from_commit_prepare, get_relay_from_commit_ready, get_relay_from_lock_assertion,
+    get_relay_from_lock_assertion_receipt, get_relay_from_transfer_commence,
     get_relay_from_transfer_proposal_claims, get_relay_from_transfer_proposal_receipt,
     get_relay_params, get_request_id_from_transfer_proposal_claims,
-    spawn_send_ack_commence_request, spawn_send_lock_assertion_broadcast_request,
-    spawn_send_perform_lock_request, spawn_send_transfer_commence_request,
-    spawn_send_transfer_proposal_receipt_request,
+    spawn_send_ack_commence_request, spawn_send_ack_final_receipt_broadcast_request,
+    spawn_send_assign_asset_request, spawn_send_commit_prepare_request,
+    spawn_send_create_asset_request, spawn_send_extinguish_request,
+    spawn_send_lock_assertion_broadcast_request, spawn_send_perform_lock_request,
+    spawn_send_transfer_commence_request, spawn_send_transfer_proposal_receipt_request,
 };
 use tokio::sync::RwLock;
 use tonic::{Request, Response, Status};
@@ -341,6 +349,248 @@ impl Satp for SatpService {
             }
         }
     }
+
+    async fn commit_prepare(
+        &self,
+        request: Request<CommitPrepareRequest>,
+    ) -> Result<Response<Ack>, Status> {
+        println!(
+            "Got commit prepare request from {:?} - {:?}",
+            request.remote_addr(),
+            request
+        );
+
+        let commit_prepare_request = request.into_inner().clone();
+        let request_id = commit_prepare_request.session_id.to_string();
+        let conf = self.config_lock.read().await;
+
+        // TODO refactor
+        let request_logged: Result<Option<sled::IVec>, Error> =
+            log_request_in_local_satp_db(&request_id, &commit_prepare_request, conf.clone());
+        match request_logged {
+            Ok(_) => {
+                println!(
+                    "Successfully stored CommitPrepareRequest in local satp_db with request_id: {}",
+                    request_id
+                )
+            }
+            Err(e) => {
+                // Internal failure of sled. Send Error response
+                let error_message =
+                    "Error storing CommitPrepareRequest in local satp_db for request_id"
+                        .to_string();
+                let reply = create_ack_error_message(request_id, error_message, e);
+                return reply;
+            }
+        }
+
+        match process_commit_prepare_request(commit_prepare_request, conf.clone()) {
+            Ok(ack) => {
+                let reply = Ok(Response::new(ack));
+                println!("Sending Ack of commit prepare request back: {:?}\n", reply);
+                reply
+            }
+            Err(e) => {
+                let error_message = "Commit prepare failed.".to_string();
+                let reply = create_ack_error_message(request_id, error_message, e);
+                reply
+            }
+        }
+    }
+
+    async fn commit_ready(
+        &self,
+        request: Request<CommitReadyRequest>,
+    ) -> Result<Response<Ack>, Status> {
+        println!(
+            "Got commit ready request from {:?} - {:?}",
+            request.remote_addr(),
+            request
+        );
+
+        let commit_ready_request = request.into_inner().clone();
+        let request_id = commit_ready_request.session_id.to_string();
+        let conf = self.config_lock.read().await;
+
+        // TODO refactor
+        let request_logged: Result<Option<sled::IVec>, Error> =
+            log_request_in_local_satp_db(&request_id, &commit_ready_request, conf.clone());
+        match request_logged {
+            Ok(_) => {
+                println!(
+                    "Successfully stored CommitReadyRequest in local satp_db with request_id: {}",
+                    request_id
+                )
+            }
+            Err(e) => {
+                // Internal failure of sled. Send Error response
+                let error_message =
+                    "Error storing CommitReadyRequest in local satp_db for request_id".to_string();
+                let reply = create_ack_error_message(request_id, error_message, e);
+                return reply;
+            }
+        }
+
+        match process_commit_ready_request(commit_ready_request, conf.clone()) {
+            Ok(ack) => {
+                let reply = Ok(Response::new(ack));
+                println!("Sending Ack of commit ready request back: {:?}\n", reply);
+                reply
+            }
+            Err(e) => {
+                let error_message = "Commit ready failed.".to_string();
+                let reply = create_ack_error_message(request_id, error_message, e);
+                reply
+            }
+        }
+    }
+
+    async fn commit_final_assertion(
+        &self,
+        request: Request<CommitFinalAssertionRequest>,
+    ) -> Result<Response<Ack>, Status> {
+        println!(
+            "Got commit final assertion request from {:?} - {:?}",
+            request.remote_addr(),
+            request
+        );
+
+        let commit_final_assertion_request = request.into_inner().clone();
+        let request_id = commit_final_assertion_request.session_id.to_string();
+        let conf = self.config_lock.read().await;
+
+        // TODO refactor
+        let request_logged: Result<Option<sled::IVec>, Error> = log_request_in_local_satp_db(
+            &request_id,
+            &commit_final_assertion_request,
+            conf.clone(),
+        );
+        match request_logged {
+            Ok(_) => {
+                println!(
+                    "Successfully stored CommitFinalAssertionRequest in local satp_db with request_id: {}",
+                    request_id
+                )
+            }
+            Err(e) => {
+                // Internal failure of sled. Send Error response
+                let error_message =
+                    "Error storing CommitFinalAssertionRequest in local satp_db for request_id"
+                        .to_string();
+                let reply = create_ack_error_message(request_id, error_message, e);
+                return reply;
+            }
+        }
+
+        match process_commit_final_assertion_request(commit_final_assertion_request, conf.clone()) {
+            Ok(ack) => {
+                let reply = Ok(Response::new(ack));
+                println!(
+                    "Sending Ack of commit final assertion request back: {:?}\n",
+                    reply
+                );
+                reply
+            }
+            Err(e) => {
+                let error_message = "Commit final assertion failed.".to_string();
+                let reply = create_ack_error_message(request_id, error_message, e);
+                reply
+            }
+        }
+    }
+
+    async fn ack_final_receipt(
+        &self,
+        request: Request<AckFinalReceiptRequest>,
+    ) -> Result<Response<Ack>, Status> {
+        println!(
+            "Got commit final assertion request from {:?} - {:?}",
+            request.remote_addr(),
+            request
+        );
+
+        let ack_final_receipt_request = request.into_inner().clone();
+        let request_id = ack_final_receipt_request.session_id.to_string();
+        let conf = self.config_lock.read().await;
+
+        // TODO refactor
+        let request_logged: Result<Option<sled::IVec>, Error> =
+            log_request_in_local_satp_db(&request_id, &ack_final_receipt_request, conf.clone());
+        match request_logged {
+            Ok(_) => {
+                println!(
+                    "Successfully stored AckFinalReceiptRequest in local satp_db with request_id: {}",
+                    request_id
+                )
+            }
+            Err(e) => {
+                // Internal failure of sled. Send Error response
+                let error_message =
+                    "Error storing AckFinalReceiptRequest in local satp_db for request_id"
+                        .to_string();
+                let reply = create_ack_error_message(request_id, error_message, e);
+                return reply;
+            }
+        }
+
+        match process_ack_final_receipt_request(ack_final_receipt_request, conf.clone()) {
+            Ok(ack) => {
+                let reply = Ok(Response::new(ack));
+                println!(
+                    "Sending Ack of ack final receipt request back: {:?}\n",
+                    reply
+                );
+                reply
+            }
+            Err(e) => {
+                let error_message = "Ack final receipt failed.".to_string();
+                let reply = create_ack_error_message(request_id, error_message, e);
+                reply
+            }
+        }
+    }
+
+    async fn transfer_completed(
+        &self,
+        request: Request<TransferCompletedRequest>,
+    ) -> Result<Response<Ack>, Status> {
+        println!(
+            "Got commit final assertion request from {:?} - {:?}",
+            request.remote_addr(),
+            request
+        );
+
+        let transfer_completed_request = request.into_inner().clone();
+        let request_id = transfer_completed_request.session_id.to_string();
+        let conf = self.config_lock.read().await;
+
+        // TODO refactor
+        let request_logged: Result<Option<sled::IVec>, Error> =
+            log_request_in_local_satp_db(&request_id, &transfer_completed_request, conf.clone());
+        match request_logged {
+            Ok(_) => {
+                println!(
+                    "Successfully stored TransferCompletedRequest in local satp_db with request_id: {}",
+                    request_id
+                )
+            }
+            Err(e) => {
+                // Internal failure of sled. Send Error response
+                let error_message =
+                    "Error storing TransferCompletedRequest in local satp_db for request_id"
+                        .to_string();
+                let reply = create_ack_error_message(request_id, error_message, e);
+                return reply;
+            }
+        }
+
+        let reply = Ack {
+            status: ack::Status::Ok as i32,
+            request_id: request_id.to_string(),
+            message: "Ack of the Transfer Completed request".to_string(),
+        };
+        return Ok(Response::new(reply));
+    }
 }
 
 pub fn process_transfer_proposal_claims_request(
@@ -595,6 +845,147 @@ pub fn process_lock_assertion_receipt_request(
     }
 }
 
+pub fn process_commit_prepare_request(
+    commit_prepare_request: CommitPrepareRequest,
+    conf: config::Config,
+) -> Result<Ack, Error> {
+    let request_id = commit_prepare_request.session_id.to_string();
+    let is_valid_request = is_valid_commit_prepare_request(commit_prepare_request.clone());
+
+    // TODO some processing
+    if is_valid_request {
+        println!("The commit prepare request is valid\n");
+        match send_commit_ready_request(commit_prepare_request, conf) {
+            Ok(ack) => {
+                println!("Ack commit prepare request.");
+                let reply = Ok(ack);
+                println!("Sending back Ack: {:?}\n", reply);
+                reply
+            }
+            Err(e) => {
+                return Ok(Ack {
+                    status: ack::Status::Error as i32,
+                    request_id: request_id.to_string(),
+                    message: format!("Error: commit prepare request failed. {:?}", e),
+                });
+            }
+        }
+    } else {
+        println!("The commit prepare request is invalid\n");
+        return Ok(Ack {
+            status: ack::Status::Error as i32,
+            request_id: request_id.to_string(),
+            message: "Error: The commit prepare request is invalid".to_string(),
+        });
+    }
+}
+
+pub fn process_commit_ready_request(
+    commit_ready_request: CommitReadyRequest,
+    conf: config::Config,
+) -> Result<Ack, Error> {
+    let request_id = commit_ready_request.session_id.to_string();
+    let is_valid_request = is_valid_commit_ready_request(commit_ready_request.clone());
+
+    // TODO some processing
+    if is_valid_request {
+        println!("The commit ready request is valid\n");
+        match send_commit_final_assertion_request(commit_ready_request, conf) {
+            Ok(ack) => {
+                println!("Ack commit ready request.");
+                let reply = Ok(ack);
+                println!("Sending back Ack: {:?}\n", reply);
+                reply
+            }
+            Err(e) => {
+                return Ok(Ack {
+                    status: ack::Status::Error as i32,
+                    request_id: request_id.to_string(),
+                    message: format!("Error: commit ready request failed. {:?}", e),
+                });
+            }
+        }
+    } else {
+        println!("The commit ready request is invalid\n");
+        return Ok(Ack {
+            status: ack::Status::Error as i32,
+            request_id: request_id.to_string(),
+            message: "Error: The commit ready request is invalid".to_string(),
+        });
+    }
+}
+
+pub fn process_commit_final_assertion_request(
+    commit_final_assertion_request: CommitFinalAssertionRequest,
+    conf: config::Config,
+) -> Result<Ack, Error> {
+    let request_id = commit_final_assertion_request.session_id.to_string();
+    let is_valid_request =
+        is_valid_commit_final_assertion_request(commit_final_assertion_request.clone());
+
+    // TODO some processing
+    if is_valid_request {
+        println!("The commit final assertion request is valid\n");
+        match send_ack_final_receipt_request(commit_final_assertion_request, conf) {
+            Ok(ack) => {
+                println!("Ack commit final assertion request.");
+                let reply = Ok(ack);
+                println!("Sending back Ack: {:?}\n", reply);
+                reply
+            }
+            Err(e) => {
+                return Ok(Ack {
+                    status: ack::Status::Error as i32,
+                    request_id: request_id.to_string(),
+                    message: format!("Error: commit final assertion request failed. {:?}", e),
+                });
+            }
+        }
+    } else {
+        println!("The commit final assertion request is invalid\n");
+        return Ok(Ack {
+            status: ack::Status::Error as i32,
+            request_id: request_id.to_string(),
+            message: "Error: The commit final assertion request is invalid".to_string(),
+        });
+    }
+}
+
+pub fn process_ack_final_receipt_request(
+    ack_final_receipt_request: AckFinalReceiptRequest,
+    conf: config::Config,
+) -> Result<Ack, Error> {
+    let request_id = ack_final_receipt_request.session_id.to_string();
+    let is_valid_request = is_valid_ack_final_receipt_request(ack_final_receipt_request.clone());
+
+    // TODO some processing
+    if is_valid_request {
+        println!("The ack final receipt request is valid\n");
+        match send_transfer_completed_request(ack_final_receipt_request, conf) {
+            Ok(ack) => {
+                println!("Ack ack final receipt request.");
+                let reply = Ok(ack);
+                println!("Sending back Ack: {:?}\n", reply);
+                reply
+            }
+            Err(e) => {
+                return Ok(Ack {
+                    status: ack::Status::Error as i32,
+                    request_id: request_id.to_string(),
+                    message: format!("Error: ack final receipt request failed. {:?}", e),
+                });
+            }
+        }
+    } else {
+        println!("The ack final receipt request is invalid\n");
+        return Ok(Ack {
+            status: ack::Status::Error as i32,
+            request_id: request_id.to_string(),
+            message: "Error: The ack final receipt request is invalid".to_string(),
+        });
+    }
+}
+
 fn send_transfer_proposal_receipt_request(
     transfer_proposal_claims_request: TransferProposalClaimsRequest,
     conf: config::Config,
@@ -782,12 +1173,143 @@ fn send_commit_prepare_request(
     lock_assertion_receipt_request: LockAssertionReceiptRequest,
     conf: config::Config,
 ) -> Result<Ack, Error> {
-    // TODO
     let request_id = &lock_assertion_receipt_request.session_id.to_string();
+    let (relay_host, relay_port) =
+        get_relay_from_lock_assertion_receipt(lock_assertion_receipt_request.clone());
+    let (use_tls, tlsca_cert_path) =
+        get_relay_params(relay_host.clone(), relay_port.clone(), conf.clone());
+    let commit_prepare_request =
+        create_commit_prepare_request(lock_assertion_receipt_request.clone());
+
+    spawn_send_commit_prepare_request(
+        commit_prepare_request,
+        relay_host,
+        relay_port,
+        use_tls,
+        tlsca_cert_path,
+        conf,
+    );
     let reply = Ack {
         status: ack::Status::Ok as i32,
         request_id: request_id.to_string(),
-        message: "Ack of the Lock Assertion Receipt request".to_string(),
+        message: "Ack of the Lock Assertion request".to_string(),
+    };
+    return Ok(reply);
+}
+
+fn send_commit_ready_request(
+    commit_prepare_request: CommitPrepareRequest,
+    conf: config::Config,
+) -> Result<Ack, Error> {
+    // TODO
+    let request_id = &commit_prepare_request.session_id.to_string();
+    let (relay_host, relay_port) = get_relay_from_commit_prepare(commit_prepare_request.clone());
+    let (use_tls, tlsca_cert_path) =
+        get_relay_params(relay_host.clone(), relay_port.clone(), conf.clone());
+    let commit_ready_request = create_commit_ready_request(commit_prepare_request.clone());
+
+    spawn_send_create_asset_request(
+        commit_ready_request,
+        relay_host,
+        relay_port,
+        use_tls,
+        tlsca_cert_path,
+        conf,
+    );
+
+    let reply = Ack {
+        status: ack::Status::Ok as i32,
+        request_id: request_id.to_string(),
+        message: "Ack of the commit prepare request".to_string(),
+    };
+    return Ok(reply);
+}
+
+fn send_commit_final_assertion_request(
+    commit_ready_request: CommitReadyRequest,
+    conf: config::Config,
+) -> Result<Ack, Error> {
+    // TODO
+    let request_id = &commit_ready_request.session_id.to_string();
+    let (relay_host, relay_port) = get_relay_from_commit_ready(commit_ready_request.clone());
+    let (use_tls, tlsca_cert_path) =
+        get_relay_params(relay_host.clone(), relay_port.clone(), conf.clone());
+    let commit_final_assertion_request =
+        create_commit_final_assertion_request(commit_ready_request.clone());
+
+    spawn_send_extinguish_request(
+        commit_final_assertion_request,
+        relay_host,
+        relay_port,
+        use_tls,
+        tlsca_cert_path,
+        conf,
+    );
+
+    let reply = Ack {
+        status: ack::Status::Ok as i32,
+        request_id: request_id.to_string(),
+        message: "Ack of the commit prepare request".to_string(),
+    };
+    return Ok(reply);
+}
+
+fn send_ack_final_receipt_request(
+    commit_final_assertion_request: CommitFinalAssertionRequest,
+    conf: config::Config,
+) -> Result<Ack, Error> {
+    // TODO
+    let request_id = &commit_final_assertion_request.session_id.to_string();
+    let (relay_host, relay_port) =
+        get_relay_from_commit_final_assertion(commit_final_assertion_request.clone());
+    let (use_tls, tlsca_cert_path) =
+        get_relay_params(relay_host.clone(), relay_port.clone(), conf.clone());
+    let ack_final_receipt_request =
+        create_ack_final_receipt_request(commit_final_assertion_request.clone());
+
+    spawn_send_assign_asset_request(
+        ack_final_receipt_request,
+        relay_host,
+        relay_port,
+        use_tls,
+        tlsca_cert_path,
+        conf,
+    );
+
+    let reply = Ack {
+        status: ack::Status::Ok as i32,
+        request_id: request_id.to_string(),
+        message: "Ack of the commit prepare request".to_string(),
+    };
+    return Ok(reply);
+}
+
+fn send_transfer_completed_request(
+    ack_final_receipt_request: AckFinalReceiptRequest,
+    conf: config::Config,
+) -> Result<Ack, Error> {
+    // TODO
+    let request_id = &ack_final_receipt_request.session_id.to_string();
+    let (relay_host, relay_port) =
+        get_relay_from_ack_final_receipt(ack_final_receipt_request.clone());
+    let (use_tls, tlsca_cert_path) =
+        get_relay_params(relay_host.clone(), relay_port.clone(), conf.clone());
+    let transfer_completed_request =
+        create_transfer_completed_request(ack_final_receipt_request.clone());
+
+    spawn_send_ack_final_receipt_broadcast_request(
+        transfer_completed_request,
+        relay_host,
+        relay_port,
+        use_tls,
+        tlsca_cert_path,
+        conf,
+    );
+
+    let reply = Ack {
+        status: ack::Status::Ok as i32,
+        request_id: request_id.to_string(),
+        message: "Ack of the commit prepare request".to_string(),
     };
     return Ok(reply);
 }
@@ -823,6 +1345,35 @@ fn is_valid_lock_assertion_request(lock_assertion_request: LockAssertionRequest)
 
 fn is_valid_lock_assertion_receipt_request(
     lock_assertion_receipt_request: LockAssertionReceiptRequest,
+) -> bool {
+    //TODO
+    true
+}
+
+fn is_valid_commit_prepare_request(commit_prepare_request: CommitPrepareRequest) -> bool {
+    //TODO
+    true
+}
+
+fn is_valid_commit_ready_request(commit_ready_request: CommitReadyRequest) -> bool {
+    //TODO
+    true
+}
+
+fn is_valid_commit_final_assertion_request(
+    commit_final_assertion_request: CommitFinalAssertionRequest,
+) -> bool {
+    //TODO
+    true
+}
+
+fn is_valid_ack_final_receipt_request(ack_final_receipt_request: AckFinalReceiptRequest) -> bool {
+    //TODO
+    true
+}
+
+fn is_valid_transfer_completed_request(
+    transfer_completed_request: TransferCompletedRequest,
 ) -> bool {
     //TODO
     true
