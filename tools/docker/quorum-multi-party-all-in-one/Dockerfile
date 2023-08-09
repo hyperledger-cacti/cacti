@@ -3,9 +3,9 @@
 # Setup quorum-dev-quickstart
 ################################
 
-FROM node:16.17.0 AS quorum-dev-quickstart-setup
+FROM node:18.17.0 AS quorum-dev-quickstart-setup
 
-ENV QUORUM_QUICKSTART_VERSION=0.0.80
+ENV QUORUM_QUICKSTART_VERSION=0.1.5
 ENV ROOT_DIR=/opt/quorum-dev-quickstart
 
 WORKDIR "${ROOT_DIR}"
@@ -14,38 +14,41 @@ RUN quorum-dev-quickstart --clientType goquorum --outputPath ./ --monitoring def
 
 ################################
 # STAGE 2
-# docker-compose base
+# docker compose base
 ################################
 
-FROM docker:24.0.2-dind
+FROM docker:24.0.5-dind
 
 ENV ROOT_DIR=/opt/quorum-dev-quickstart
 
-# Install docker-compose and quorum-dev-quickstart setup dependencies
+# Install docker compose and quorum-dev-quickstart setup dependencies
 RUN apk update \
   && apk add --no-cache \
-    py-pip \
-    python3-dev \
-    libffi-dev \
-    openssl-dev \
-    gcc \
-    libc-dev \
-    rust \
-    cargo \
-    make \
-    bash \
-    ncurses \
-    supervisor \
-  && pip install docker-compose
+  docker-cli \
+  docker-cli-compose \
+  gcc \
+  libc-dev \
+  rust \
+  cargo \
+  make \
+  bash \
+  ncurses \
+  supervisor
+
+RUN addgroup -g 1000 quorum \
+  && adduser -u 1000 -G quorum -g docker -s /bin/sh -D quorum \
+  && addgroup docker \
+  && addgroup quorum docker
 
 # Copy quorum-dev-quickstart from the base
-COPY --from=quorum-dev-quickstart-setup "${ROOT_DIR}" "${ROOT_DIR}"
+COPY --chown=quorum:quorum --from=quorum-dev-quickstart-setup "${ROOT_DIR}" "${ROOT_DIR}"
 WORKDIR "${ROOT_DIR}"
+COPY --chown=quorum:quorum env-config.ini .env
 
 COPY healthcheck.sh /healthcheck.sh
 HEALTHCHECK --interval=10s --timeout=5s --start-period=60s --retries=500 CMD /healthcheck.sh
 
-COPY supervisord.conf /etc/supervisord.conf
+COPY --chown=quorum:quorum supervisord.conf /etc/supervisord.conf
 ENTRYPOINT ["/usr/bin/supervisord"]
 CMD ["--configuration", "/etc/supervisord.conf", "--nodaemon"]
 

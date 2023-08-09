@@ -6,6 +6,9 @@ import { BesuMpTestLedger } from "@hyperledger/cactus-test-tooling";
 import { AbiItem } from "web3-utils";
 import { LogLevelDesc } from "@hyperledger/cactus-common";
 
+const containerImageName =
+  "ghcr.io/hyperledger/cactus-besu-all-in-one-multi-party";
+const containerImageTag = "2023-08-08-pr-2596";
 const testCase = "Executes private transactions on Hyperledger Besu";
 const logLevel: LogLevelDesc = "TRACE";
 
@@ -62,7 +65,12 @@ test(testCase, async (t: Test) => {
   if (preWarmedLedger) {
     keys = keysStatic;
   } else {
-    const ledger = new BesuMpTestLedger({ logLevel });
+    const ledger = new BesuMpTestLedger({
+      logLevel,
+      imageName: containerImageName,
+      imageTag: containerImageTag,
+      emitContainerLogs: false,
+    });
     test.onFinish(() => ledger.stop());
     await ledger.start();
     keys = await ledger.getKeys();

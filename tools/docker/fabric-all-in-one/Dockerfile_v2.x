@@ -1,6 +1,6 @@
 # We need to use the older, more stable v18 here because of
 # https://github.com/docker-library/docker/issues/170
-FROM docker:24.0.2-dind
+FROM docker:24.0.5-dind
 
 ARG FABRIC_VERSION=2.2.0
 ARG CA_VERSION=1.4.9
@@ -9,26 +9,10 @@ ARG COUCH_VERSION=3.1.1
 
 WORKDIR /
 
-RUN apk update
+RUN apk update && apk --no-cache upgrade openssh-client
 
 # Install dependencies of Docker Compose
-RUN apk add py-pip python3-dev libffi-dev openssl-dev gcc libc-dev make
-
-# Install python/pip - We need this because DinD 18.x has Python 2
-# And we cannot upgrade to DinD 19 because of
-# https://github.com/docker-library/docker/issues/170
-ENV PYTHONUNBUFFERED=1
-RUN apk add --update --no-cache python3 && ln -sf python3 /usr/bin/python
-RUN python3 -m ensurepip
-RUN pip3 install --no-cache --upgrade "pip>=21" setuptools
-
-# Without this the docker-compose installation crashes, complaining about
-# a lack of rust compiler...
-# RUN pip install setuptools_rust
-ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
-
-# Install Docker Compose which is a dependency of Fabric Samples
-RUN pip install docker-compose
+RUN apk add docker-cli docker-cli-compose
 
 # Need git to clone the sources of the Fabric Samples repository from GitHub
 RUN apk add --no-cache git
@@ -88,11 +72,8 @@ RUN cp $CACTUS_CFG_PATH/fabric-aio-image.pub ~/.ssh/authorized_keys
 # OpenSSH Server (needed for chaincode deployment )
 EXPOSE 22
 
-# supervisord web ui/dashboard
-EXPOSE 9001
-
-# peer1.org2.example.com
-EXPOSE 10051
+# orderer.example.com
+EXPOSE 7050
 
 # peer0.org1.example.com
 EXPOSE 7051
@@ -100,17 +81,17 @@ EXPOSE 7051
 # peer0.org2.example.com
 EXPOSE 9051
 
-# peer1.org1.example.com
-EXPOSE 8051
-
-# orderer.example.com
-EXPOSE 7050
-
-# ca_peerOrg1
+# ca_org1
 EXPOSE 7054
 
-# ca_peerOrg2
+# ca_org2
 EXPOSE 8054
+
+# ca_orderer
+EXPOSE 9054
+
+# supervisord web ui/dashboard
+EXPOSE 9001
 
 # couchdb0, couchdb1, couchdb2, couchdb3
 EXPOSE 5984 6984 7984 8984
