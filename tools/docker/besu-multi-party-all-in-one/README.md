@@ -101,3 +101,7 @@ docker run \
   --publish 25000:25000 \
   cbmpaio
 ```
+
+## Updating the Besu version
+- `env-config.ini` is the configuration file of `quorum-dev-quickstart` npm package (it's copied as `.env` in the container).
+- To use another version of besu ledger update specific variables in `env-config.ini` and build the container.

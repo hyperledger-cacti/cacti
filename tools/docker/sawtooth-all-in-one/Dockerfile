@@ -1,20 +1,15 @@
-FROM docker:24.0.2-dind
+FROM docker:24.0.5-dind
 
-# Install docker-compose and it's dependencies
 RUN apk update \
   && apk add --no-cache \
-    py-pip \
-    python3-dev \
-    libffi-dev \
-    openssl-dev \
-    gcc \
-    libc-dev \
-    rust \
-    cargo \
-    make \
-    supervisor \
-  && pip install wheel \
-  && pip install docker-compose
+  docker-cli \
+  docker-cli-compose \
+  gcc \
+  libc-dev \
+  rust \
+  cargo \
+  make \
+  supervisor
 
 # Copy sawtooth docker-compose
 COPY ./sawtooth-default.yaml /app/docker-compose.yaml
