@@ -65,7 +65,7 @@ import { io } from "socket.io-client";
 
   const gas = 21000;
 
-  const json2str = (jsonObj) => {
+  const json2str = (jsonObj: any) => {
     try {
       return JSON.stringify(jsonObj);
     } catch (error) {
@@ -75,7 +75,7 @@ import { io } from "socket.io-client";
 
   const makeTxTransferNumericAsset = () => {
     //web3_v1.2.9_support
-    web3.eth.getTransactionCount("0x" + fromAddress).then((_nance) => {
+    web3.eth.getTransactionCount("0x" + fromAddress).then((_nance: any) => {
       const txnCount = _nance;
       //  NOTE: No need to count up.
 
@@ -115,25 +115,25 @@ import { io } from "socket.io-client";
     });
   };
 
-  socket.on("connect_error", (err) => {
+  socket.on("connect_error", (err: object) => {
     console.log("####connect_error:", err);
     // end communication
     socket.disconnect();
     process.exit(0);
   });
 
-  socket.on("connect_timeout", (err) => {
+  socket.on("connect_timeout", (err: object) => {
     console.log("####Error:", err);
     // end communication
     socket.disconnect();
     process.exit(0);
   });
 
-  socket.on("error", (err) => {
+  socket.on("error", (err: any) => {
     console.log("####Error:", err);
   });
 
-  socket.on("eventReceived", function (res) {
+  socket.on("eventReceived", function (res: object) {
     // output the data received from the client
     console.log("#[recv]eventReceived, res: " + json2str(res));
   });
