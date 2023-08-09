@@ -1,13 +1,15 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "rootDir": "./src/main/typescript",
     "composite": true,
-    "outDir": "./dist",
+    "outDir": "./dist/lib/",
+    "declarationDir": "dist/lib", 
+    "resolveJsonModule": true,
+    "rootDir": "./src",
     "sourceMap": false,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "tsBuildInfoFile": "../../.build-cache/cactus-plugin-ledger-connector-tcs-huawei-socketio.tsbuildinfo",
+    "tsBuildInfoFile": "../../.build-cache/cactus-plugin-ledger-connector-tcs-huawei-socketio.tsbuildinfo"
   },
   "include": [
     "./src/main/typescript/common/core/*.ts",
