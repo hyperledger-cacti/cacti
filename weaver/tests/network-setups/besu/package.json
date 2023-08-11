@@ -17,6 +17,6 @@
   },
   "homepage": "https://github.com/hyperledger/cacti#readme",
   "dependencies": {
-    "web3": "^1.10.0"
+    "web3": "1.10.0"
   }
 }

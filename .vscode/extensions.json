@@ -13,6 +13,7 @@
       "esbenp.prettier-vscode",
       "eamodio.gitlens",
       "streetsidesoftware.code-spell-checker",
-      "github.vscode-pull-request-github"
+      "github.vscode-pull-request-github",
+      "codeandstuff.package-json-upgrade"
     ]
   }
