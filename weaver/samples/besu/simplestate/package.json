@@ -30,14 +30,14 @@
   ],
   "homepage": "https://github.com/hyperledger/cacti/weaver/samples/besu/simplestate",
   "dependencies": {
-    "@openzeppelin/contracts": "^4.7.3",
-    "@truffle/contract": "^4.2.14",
-    "chai": "^4.3.4",
-    "dotenv": "latest",
-    "ganache-cli": "^6.12.2",
-    "solc": "^0.8.8"
+    "@openzeppelin/contracts": "4.9.3",
+    "@truffle/contract": "4.6.28",
+    "chai": "4.3.7",
+    "dotenv": "16.3.1",
+    "ganache-cli": "6.12.2",
+    "solc": "0.8.21"
   },
   "devDependencies": {
-    "truffle": "^5.4.15"
+    "truffle": "5.11.2"
   }
 }

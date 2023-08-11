@@ -29,16 +29,16 @@
   ],
   "homepage": "https://github.com/hyperledger/cacti/weaver/samples/besu/simpleasset",
   "dependencies": {
-    "@lazyledger/protobuf3-solidity-lib": "^0.6.0",
-    "@openzeppelin/contracts": "^4.3.2",
-    "@truffle/contract": "^4.2.14",
-    "chai": "^4.3.4",
-    "dotenv": "latest",
-    "ganache-cli": "^6.12.2",
-    "solc": "^0.8.8"
+    "@lazyledger/protobuf3-solidity-lib": "0.6.0",
+    "@openzeppelin/contracts": "4.9.3",
+    "@truffle/contract": "4.6.28",
+    "chai": "4.3.7",
+    "dotenv": "16.3.1",
+    "ganache-cli": "6.12.2",
+    "solc": "0.8.21"
   },
   "devDependencies": {
-    "truffle": "^5.4.15",
+    "truffle": "5.11.2",
     "typescript": "4.9.5"
   }
 }

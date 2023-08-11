@@ -58,8 +58,8 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
-    "@grpc/grpc-js": "1.8.8",
-    "@grpc/proto-loader": "0.6.4",
+    "@grpc/grpc-js": "1.9.0",
+    "@grpc/proto-loader": "0.7.8",
     "@hyperledger/cactus-common": "2.0.0-alpha.1",
     "@hyperledger/cactus-core": "2.0.0-alpha.1",
     "@hyperledger/cactus-core-api": "2.0.0-alpha.1",
@@ -117,7 +117,8 @@
     "google-protobuf": "3.18.0-rc.2",
     "grpc-tools": "1.11.2",
     "grpc_tools_node_protoc_ts": "5.3.1",
-    "http-status-codes": "2.1.4"
+    "http-status-codes": "2.1.4",
+    "protobufjs": "7.2.4"
   },
   "engines": {
     "node": ">=10",
