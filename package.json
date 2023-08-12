@@ -134,8 +134,8 @@
     "grpc_tools_node_protoc_ts": "5.3.1",
     "husky": "7.0.1",
     "inquirer": "8.1.2",
-    "jest": "29.6.1",
-    "jest-extended": "4.0.0",
+    "jest": "29.6.2",
+    "jest-extended": "4.0.1",
     "json5": "2.2.2",
     "license-report": "6.4.0",
     "lint-staged": "11.1.2",
@@ -228,6 +228,9 @@
       "built": false
     },
     "nice-napi": {
+      "built": false
+    },
+    "nodemon": {
       "built": false
     },
     "pkcs11js": {
