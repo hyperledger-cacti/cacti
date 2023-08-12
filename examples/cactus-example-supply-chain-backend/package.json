@@ -68,7 +68,7 @@
     "dotenv": "16.0.0",
     "express": "4.17.3",
     "express-jwt": "8.4.1",
-    "fabric-network": "2.2.10",
+    "fabric-network": "2.2.18",
     "jose": "4.9.2",
     "openapi-types": "9.1.0",
     "solc": "0.8.6",
