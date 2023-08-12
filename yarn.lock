@@ -5826,16 +5826,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@grpc/grpc-js@npm:1.6.7":
-  version: 1.6.7
-  resolution: "@grpc/grpc-js@npm:1.6.7"
-  dependencies:
-    "@grpc/proto-loader": ^0.6.4
-    "@types/node": ">=12.12.47"
-  checksum: 2668b08c2eec433970561384b22cf81443106835077ff1d8b7989cb5519fb7d2284c7a46b6ae94968f3b488ffbd9326ba9b4fbe4971a185d3b89eb0ee99e4fcd
-  languageName: node
-  linkType: hard
-
 "@grpc/grpc-js@npm:1.9.0":
   version: 1.9.0
   resolution: "@grpc/grpc-js@npm:1.9.0"
@@ -5891,7 +5881,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@grpc/proto-loader@npm:^0.6.1, @grpc/proto-loader@npm:^0.6.10, @grpc/proto-loader@npm:^0.6.2, @grpc/proto-loader@npm:^0.6.4":
+"@grpc/proto-loader@npm:^0.6.1, @grpc/proto-loader@npm:^0.6.2, @grpc/proto-loader@npm:^0.6.4":
   version: 0.6.13
   resolution: "@grpc/proto-loader@npm:0.6.13"
   dependencies:
@@ -6444,7 +6434,7 @@ __metadata:
     "@types/uuid": 8.3.1
     async-exit-hook: 2.0.1
     express-jwt: 8.4.1
-    fabric-network: 2.2.10
+    fabric-network: 2.2.18
     fs-extra: 10.0.0
     hardhat: 2.13.1
     http-status-codes: 2.1.4
@@ -6631,8 +6621,8 @@ __metadata:
     ethereumjs-common: 1.5.2
     ethereumjs-tx: 2.1.2
     express: 4.16.4
-    fabric-ca-client: 2.2.10
-    fabric-network: 2.2.10
+    fabric-ca-client: 2.2.18
+    fabric-network: 2.2.18
     http-errors: 1.6.3
     js-yaml: 3.14.1
     jsonwebtoken: 9.0.0
@@ -6671,7 +6661,7 @@ __metadata:
     dotenv: 16.0.0
     express: 4.17.3
     express-jwt: 8.4.1
-    fabric-network: 2.2.10
+    fabric-network: 2.2.18
     jose: 4.9.2
     openapi-types: 9.1.0
     solc: 0.8.6
@@ -6770,8 +6760,8 @@ __metadata:
     ethereumjs-common: 1.5.2
     ethereumjs-tx: 2.1.2
     express: 4.16.4
-    fabric-ca-client: 2.2.10
-    fabric-network: 2.2.10
+    fabric-ca-client: 2.2.18
+    fabric-network: 2.2.18
     http-errors: 1.6.3
     js-yaml: 3.14.1
     jsonwebtoken: 8.5.1
@@ -7153,10 +7143,10 @@ __metadata:
     bl: 5.0.0
     bn.js: 4.12.0
     express: 4.17.3
-    fabric-ca-client: 2.5.0-snapshot.8
-    fabric-common: 2.5.0-snapshot.8
-    fabric-network: 2.5.0-snapshot.8
-    fabric-protos: 2.5.0-snapshot.8
+    fabric-ca-client: 2.5.0-snapshot.23
+    fabric-common: 2.5.0-snapshot.23
+    fabric-network: 2.5.0-snapshot.23
+    fabric-protos: 2.5.0-snapshot.23
     fast-safe-stringify: 2.1.1
     form-data: 4.0.0
     fs-extra: 10.0.0
@@ -7437,7 +7427,7 @@ __metadata:
     "@types/tape": 4.13.0
     axios: 0.21.4
     crypto-js: 4.0.0
-    fabric-network: 2.2.10
+    fabric-network: 2.2.18
     ipfs-http-client: 51.0.1
     knex: 2.4.0
     secp256k1: 4.0.2
@@ -7652,8 +7642,8 @@ __metadata:
     elliptic: 6.5.4
     esm: 3.2.25
     execa: 5.1.1
-    fabric-ca-client: 2.5.0-snapshot.8
-    fabric-network: 2.5.0-snapshot.8
+    fabric-ca-client: 2.5.0-snapshot.23
+    fabric-network: 2.5.0-snapshot.23
     fs-extra: 10.0.0
     internal-ip: 6.2.0
     is-port-reachable: 3.0.0
@@ -22917,18 +22907,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fabric-ca-client@npm:2.2.10":
-  version: 2.2.10
-  resolution: "fabric-ca-client@npm:2.2.10"
-  dependencies:
-    fabric-common: 2.2.10
-    jsrsasign: ^10.4.1
-    url: ^0.11.0
-    winston: ^2.4.5
-  checksum: eefd19a135ac118d207fb609bf2a43c3dbeb844b416c4697b3c715eb4cfd752cfcfd128e0cbdc069b6afa22b0a1dffc45d2fddb41d7b816a408813829739b5c5
-  languageName: node
-  linkType: hard
-
 "fabric-ca-client@npm:2.2.18":
   version: 2.2.18
   resolution: "fabric-ca-client@npm:2.2.18"
@@ -22941,15 +22919,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fabric-ca-client@npm:2.5.0-snapshot.8":
-  version: 2.5.0-snapshot.8
-  resolution: "fabric-ca-client@npm:2.5.0-snapshot.8"
+"fabric-ca-client@npm:2.5.0-snapshot.23":
+  version: 2.5.0-snapshot.23
+  resolution: "fabric-ca-client@npm:2.5.0-snapshot.23"
   dependencies:
-    fabric-common: 2.5.0-snapshot.8
+    fabric-common: 2.5.0-snapshot.23
     jsrsasign: ^10.5.25
     url: ^0.11.0
     winston: ^2.4.5
-  checksum: 378b596757d77a99f6c709b810a6ce90e0b7c7ea1a2834d6baca01a149d59b1d190cfde744498b6da634777c873c7a2ae628042ec4908dc1b7907683ab520bad
+  checksum: 11eed23e79ea44ac6907414036d2eb91f1b85bf2b0eaee23847a39da45745c621b9d9fae67699e11ce4a0780406a72c50140117e97dc6bbc4d77936b45ec076b
   languageName: node
   linkType: hard
 
@@ -23033,13 +23011,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fabric-common@npm:2.5.0-snapshot.8":
-  version: 2.5.0-snapshot.8
-  resolution: "fabric-common@npm:2.5.0-snapshot.8"
+"fabric-common@npm:2.5.0-snapshot.23":
+  version: 2.5.0-snapshot.23
+  resolution: "fabric-common@npm:2.5.0-snapshot.23"
   dependencies:
     callsite: ^1.0.0
     elliptic: ^6.5.4
-    fabric-protos: 2.5.0-snapshot.8
+    fabric-protos: 2.5.0-snapshot.23
     js-sha3: ^0.8.0
     jsrsasign: ^10.5.25
     nconf: ^0.12.0
@@ -23051,7 +23029,7 @@ __metadata:
   dependenciesMeta:
     pkcs11js:
       optional: true
-  checksum: d5df5dc5853b0eb9e65c9bbecde1366533623719aef074d4d142d2dabcc65f1212c2189773e348f08864011cf4a2ddce35066029b4420027534a18479422e8be
+  checksum: aa49a613f555d116d19b30e6ae7d3ec3a0ec42cec11e9339e7053522bda752890a8182f1049ce37b408c805358ed13f8376ccee0cdcf83de9f8dabf038b5244b
   languageName: node
   linkType: hard
 
@@ -23091,14 +23069,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fabric-network@npm:2.5.0-snapshot.8":
-  version: 2.5.0-snapshot.8
-  resolution: "fabric-network@npm:2.5.0-snapshot.8"
+"fabric-network@npm:2.5.0-snapshot.23":
+  version: 2.5.0-snapshot.23
+  resolution: "fabric-network@npm:2.5.0-snapshot.23"
   dependencies:
-    fabric-common: 2.5.0-snapshot.8
-    fabric-protos: 2.5.0-snapshot.8
+    fabric-common: 2.5.0-snapshot.23
+    fabric-protos: 2.5.0-snapshot.23
     nano: ^10.0.0
-  checksum: ad98a6054e711d96368096de7a97fafe1603b385d253c71049b375f34f3c940c6653caf7789325ab29534fad3c61c8b5c101e69a5df438b26c723939bb9f5c68
+  checksum: 8de63cc5fe5fb44309c26340f96604692a944f11fef5104d893212ee89d98cf95eb26a3adc408877303741997b95e6ab63aae6af31ea2b63f7f782bd366f039b
   languageName: node
   linkType: hard
 
@@ -23124,14 +23102,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fabric-protos@npm:2.5.0-snapshot.8":
-  version: 2.5.0-snapshot.8
-  resolution: "fabric-protos@npm:2.5.0-snapshot.8"
+"fabric-protos@npm:2.5.0-snapshot.23":
+  version: 2.5.0-snapshot.23
+  resolution: "fabric-protos@npm:2.5.0-snapshot.23"
   dependencies:
-    "@grpc/grpc-js": 1.6.7
-    "@grpc/proto-loader": ^0.6.10
-    protobufjs: ^6.11.2
-  checksum: d1a2506cb2edf4a4850dfd08fe80e7036a9ad456ba927d43f1bfe3f7548105fcb1fba3ff11e8067a89d25692f69618b14eda7b338b76b4b98ac15db505a583b3
+    "@grpc/grpc-js": ~1.7.3
+    "@grpc/proto-loader": ^0.7.0
+    protobufjs: ^7.0.0
+  checksum: c2080beac50ba713340dcc3b04095ba4a9eac9196536c7ba013d4554f03a1af3f60c2d8a6447029cc4f04f71fb87c65ec7c5b013d57be552d928db301c978358
   languageName: node
   linkType: hard
 
