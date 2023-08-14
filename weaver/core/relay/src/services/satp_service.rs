@@ -3,8 +3,9 @@ use weaverpb::common::ack::{ack, Ack};
 use weaverpb::relay::satp::satp_server::Satp;
 use weaverpb::relay::satp::{
     AckCommenceRequest, AckFinalReceiptRequest, CommitFinalAssertionRequest, CommitPrepareRequest,
-    CommitReadyRequest, LockAssertionReceiptRequest, LockAssertionRequest, TransferCommenceRequest,
-    TransferCompletedRequest, TransferProposalClaimsRequest, TransferProposalReceiptRequest,
+    CommitReadyRequest, LockAssertionReceiptRequest, LockAssertionRequest, SendAssetStatusRequest,
+    TransferCommenceRequest, TransferCompletedRequest, TransferProposalClaimsRequest,
+    TransferProposalReceiptRequest,
 };
 
 // Internal modules
@@ -26,13 +27,14 @@ use super::satp_helper::{
     get_driver_address_from_ack_commence, get_relay_from_ack_commence,
     get_relay_from_ack_final_receipt, get_relay_from_commit_final_assertion,
     get_relay_from_commit_prepare, get_relay_from_commit_ready, get_relay_from_lock_assertion,
-    get_relay_from_lock_assertion_receipt, get_relay_from_transfer_commence,
-    get_relay_from_transfer_proposal_claims, get_relay_from_transfer_proposal_receipt,
-    get_relay_params, get_request_id_from_transfer_proposal_claims,
-    spawn_send_ack_commence_request, spawn_send_ack_final_receipt_broadcast_request,
-    spawn_send_assign_asset_request, spawn_send_commit_prepare_request,
-    spawn_send_create_asset_request, spawn_send_extinguish_request,
-    spawn_send_lock_assertion_broadcast_request, spawn_send_perform_lock_request,
+    get_relay_from_lock_assertion_receipt, get_relay_from_send_asset_status,
+    get_relay_from_transfer_commence, get_relay_from_transfer_proposal_claims,
+    get_relay_from_transfer_proposal_receipt, get_relay_params,
+    get_request_id_from_transfer_proposal_claims, spawn_send_ack_commence_request,
+    spawn_send_ack_final_receipt_broadcast_request, spawn_send_assign_asset_request,
+    spawn_send_commit_prepare_request, spawn_send_create_asset_request,
+    spawn_send_extinguish_request, spawn_send_lock_assertion_broadcast_request,
+    spawn_send_lock_assertion_request, spawn_send_perform_lock_request,
     spawn_send_transfer_commence_request, spawn_send_transfer_proposal_receipt_request,
 };
 use tokio::sync::RwLock;
@@ -248,6 +250,57 @@ impl Satp for SatpService {
             }
             Err(e) => {
                 let error_message = "Ack commence failed.".to_string();
+                let reply = create_ack_error_message(request_id, error_message, e);
+                reply
+            }
+        }
+    }
+
+    async fn send_asset_status(
+        &self,
+        request: Request<SendAssetStatusRequest>,
+    ) -> Result<Response<Ack>, Status> {
+        println!(
+            "Got a send asset status request from {:?} - {:?}",
+            request.remote_addr(),
+            request
+        );
+
+        let send_asset_status_request = request.into_inner().clone();
+        let request_id = send_asset_status_request.session_id.to_string();
+        let conf = self.config_lock.read().await;
+
+        // TODO refactor
+        let request_logged: Result<Option<sled::IVec>, Error> =
+            log_request_in_local_satp_db(&request_id, &send_asset_status_request, conf.clone());
+        match request_logged {
+            Ok(_) => {
+                println!(
+                    "Successfully stored SendAssetStatusRequest in local satp_db with request_id: {}",
+                    request_id
+                )
+            }
+            Err(e) => {
+                // Internal failure of sled. Send Error response
+                let error_message =
+                    "Error storing SendAssetStatusRequest in local satp_db for request_id"
+                        .to_string();
+                let reply = create_ack_error_message(request_id, error_message, e);
+                return reply;
+            }
+        }
+
+        match process_send_asset_status_request(send_asset_status_request, conf.clone()) {
+            Ok(ack) => {
+                let reply = Ok(Response::new(ack));
+                println!(
+                    "Sending Ack of send asset status request back: {:?}\n",
+                    reply
+                );
+                reply
+            }
+            Err(e) => {
+                let error_message = "Send asset status failed.".to_string();
                 let reply = create_ack_error_message(request_id, error_message, e);
                 reply
             }
@@ -775,6 +828,41 @@ pub fn process_ack_commence_request(
     }
 }
 
+pub fn process_send_asset_status_request(
+    send_asset_status_request: SendAssetStatusRequest,
+    conf: config::Config,
+) -> Result<Ack, Error> {
+    let request_id = send_asset_status_request.session_id.to_string();
+    let is_valid_request = is_valid_send_asset_status_request(send_asset_status_request.clone());
+
+    // TODO some processing
+    if is_valid_request {
+        println!("The send asset status request is valid\n");
+        match send_lock_assertion_request(send_asset_status_request, conf) {
+            Ok(ack) => {
+                println!("Ack send asset status request.");
+                let reply = Ok(ack);
+                println!("Sending back Ack: {:?}\n", reply);
+                reply
+            }
+            Err(e) => {
+                return Ok(Ack {
+                    status: ack::Status::Error as i32,
+                    request_id: request_id.to_string(),
+                    message: format!("Error: send asset status request failed. {:?}", e),
+                });
+            }
+        }
+    } else {
+        println!("The send asset status request is invalid\n");
+        return Ok(Ack {
+            status: ack::Status::Error as i32,
+            request_id: request_id.to_string(),
+            message: "Error: The send asset status request is invalid".to_string(),
+        });
+    }
+}
+
 pub fn process_lock_assertion_request(
     lock_assertion_request: LockAssertionRequest,
     conf: config::Config,
@@ -1071,6 +1159,33 @@ fn send_ack_commence_request(
     return Ok(reply);
 }
 
+fn send_lock_assertion_request(
+    send_asset_status_request: SendAssetStatusRequest,
+    conf: config::Config,
+) -> Result<Ack, Error> {
+    let request_id = &send_asset_status_request.session_id.to_string();
+    let (relay_host, relay_port) =
+        get_relay_from_send_asset_status(send_asset_status_request.clone());
+    let (use_tls, tlsca_cert_path) =
+        get_relay_params(relay_host.clone(), relay_port.clone(), conf.clone());
+    let lock_assertion_request = create_lock_assertion_request(send_asset_status_request.clone());
+
+    spawn_send_lock_assertion_request(
+        lock_assertion_request,
+        relay_host,
+        relay_port,
+        use_tls,
+        tlsca_cert_path,
+        conf,
+    );
+    let reply = Ack {
+        status: ack::Status::Ok as i32,
+        request_id: request_id.to_string(),
+        message: "Ack of the Send Asset Status request".to_string(),
+    };
+    return Ok(reply);
+}
+
 fn send_lock_assertion_receipt_request(
     lock_assertion_request: LockAssertionRequest,
     conf: config::Config,
@@ -1103,25 +1218,12 @@ fn send_perform_lock_request(
     conf: config::Config,
 ) -> Result<Ack, Error> {
     let request_id = &ack_commence_request.session_id.to_string();
-    let (relay_host, relay_port) = get_relay_from_ack_commence(ack_commence_request.clone());
-    let (use_tls, tlsca_cert_path) =
-        get_relay_params(relay_host.clone(), relay_port.clone(), conf.clone());
-    let lock_assertion_request = create_lock_assertion_request(ack_commence_request.clone());
     let driver_address = get_driver_address_from_ack_commence(ack_commence_request.clone());
     let parsed_address = parse_address(driver_address)?;
     let result = get_driver(parsed_address.network_id.to_string(), conf.clone());
     match result {
         Ok(driver_info) => {
-            spawn_send_perform_lock_request(
-                driver_info,
-                ack_commence_request,
-                lock_assertion_request,
-                relay_host,
-                relay_port,
-                use_tls,
-                tlsca_cert_path,
-                conf,
-            );
+            spawn_send_perform_lock_request(driver_info, ack_commence_request);
             let reply = Ack {
                 status: ack::Status::Ok as i32,
                 request_id: request_id.to_string(),
@@ -1140,33 +1242,6 @@ fn send_perform_lock_request(
             });
         }
     }
-}
-
-fn send_lock_assertion_broadcast_request(
-    lock_assertion_request: LockAssertionRequest,
-    conf: config::Config,
-) -> Result<Ack, Error> {
-    let request_id = &lock_assertion_request.session_id.to_string();
-    let (relay_host, relay_port) = get_relay_from_lock_assertion(lock_assertion_request.clone());
-    let (use_tls, tlsca_cert_path) =
-        get_relay_params(relay_host.clone(), relay_port.clone(), conf.clone());
-    let lock_assertion_receipt_request =
-        create_lock_assertion_receipt_request(lock_assertion_request.clone());
-
-    spawn_send_lock_assertion_broadcast_request(
-        lock_assertion_receipt_request,
-        relay_host,
-        relay_port,
-        use_tls,
-        tlsca_cert_path,
-        conf,
-    );
-    let reply = Ack {
-        status: ack::Status::Ok as i32,
-        request_id: request_id.to_string(),
-        message: "Ack of lock assert request".to_string(),
-    };
-    return Ok(reply);
 }
 
 fn send_commit_prepare_request(
@@ -1375,6 +1450,11 @@ fn is_valid_ack_final_receipt_request(ack_final_receipt_request: AckFinalReceipt
 fn is_valid_transfer_completed_request(
     transfer_completed_request: TransferCompletedRequest,
 ) -> bool {
+    //TODO
+    true
+}
+
+fn is_valid_send_asset_status_request(send_asset_status_request: SendAssetStatusRequest) -> bool {
     //TODO
     true
 }

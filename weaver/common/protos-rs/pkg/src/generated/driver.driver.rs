@@ -11,7 +11,10 @@ pub struct WriteExternalStateMessage {
 #[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct PerformLockRequest {}
+pub struct PerformLockRequest {
+    #[prost(string, tag = "1")]
+    pub session_id: ::prost::alloc::string::String,
+}
 /// Generated client implementations.
 pub mod driver_communication_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]

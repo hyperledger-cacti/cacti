@@ -16,7 +16,9 @@ message WriteExternalStateMessage {
   common.events.ContractTransaction ctx = 2;
 }
 
-message PerformLockRequest {}
+message PerformLockRequest {
+  string session_id = 1;
+}
 
 service DriverCommunication {
   // Data Sharing 
