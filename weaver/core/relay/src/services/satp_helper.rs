@@ -11,8 +11,9 @@ use weaverpb::networks::networks::NetworkAssetTransfer;
 use weaverpb::relay::satp::satp_client::SatpClient;
 use weaverpb::relay::satp::{
     AckCommenceRequest, AckFinalReceiptRequest, CommitFinalAssertionRequest, CommitPrepareRequest,
-    CommitReadyRequest, LockAssertionReceiptRequest, LockAssertionRequest, TransferCommenceRequest,
-    TransferCompletedRequest, TransferProposalClaimsRequest, TransferProposalReceiptRequest,
+    CommitReadyRequest, LockAssertionReceiptRequest, LockAssertionRequest, SendAssetStatusRequest,
+    TransferCommenceRequest, TransferCompletedRequest, TransferProposalClaimsRequest,
+    TransferProposalReceiptRequest,
 };
 
 use crate::db::Database;
@@ -160,15 +161,9 @@ pub fn spawn_send_ack_commence_request(
 pub fn spawn_send_perform_lock_request(
     driver_info: Driver,
     ack_commence_request: AckCommenceRequest,
-    lock_assertion_request: LockAssertionRequest,
-    relay_host: String,
-    relay_port: String,
-    use_tls: bool,
-    tlsca_cert_path: String,
-    conf: Config,
 ) {
     tokio::spawn(async move {
-        let request_id = lock_assertion_request.session_id.to_string();
+        let request_id = ack_commence_request.session_id.to_string();
         println!(
             "Locking the asset of the lock assertion request id: {:?}",
             request_id
@@ -185,22 +180,6 @@ pub fn spawn_send_perform_lock_request(
                 // TODO: what to do in this case?
             }
         }
-
-        // TODO: Subscribe to the status event
-        // Once the asset is locked, call the lock_assertion endpoint
-        let result = call_lock_assertion(
-            relay_host,
-            relay_port,
-            use_tls,
-            tlsca_cert_path.to_string(),
-            lock_assertion_request.clone(),
-        )
-        .await;
-
-        println!("Received Ack from sending gateway: {:?}\n", result);
-        // Updates the request in the DB depending on the response status from the sending gateway
-        let request_id = lock_assertion_request.session_id.to_string();
-        log_request_result_in_local_satp_db(&request_id, result, conf);
     });
 }
 
@@ -232,6 +211,33 @@ pub fn spawn_send_lock_assertion_broadcast_request(
         println!("Received Ack from sending gateway: {:?}\n", result);
         // Updates the request in the DB depending on the response status from the sending gateway
         let request_id = lock_assertion_receipt_request.session_id.to_string();
+        log_request_result_in_local_satp_db(&request_id, result, conf);
+    });
+}
+
+pub fn spawn_send_lock_assertion_request(
+    lock_assertion_request: LockAssertionRequest,
+    relay_host: String,
+    relay_port: String,
+    use_tls: bool,
+    tlsca_cert_path: String,
+    conf: Config,
+) {
+    tokio::spawn(async move {
+        let request_id = lock_assertion_request.session_id.to_string();
+        println!("Sending the lock assertion request {:?}", request_id);
+        let result = call_lock_assertion(
+            relay_host,
+            relay_port,
+            use_tls,
+            tlsca_cert_path.to_string(),
+            lock_assertion_request.clone(),
+        )
+        .await;
+
+        println!("Received Ack from sending gateway: {:?}\n", result);
+        // Updates the request in the DB depending on the response status from the sending gateway
+        let request_id = lock_assertion_request.session_id.to_string();
         log_request_result_in_local_satp_db(&request_id, result, conf);
     });
 }
@@ -792,7 +798,7 @@ pub fn create_ack_commence_request(
 }
 
 pub fn create_lock_assertion_request(
-    ack_commence_request: AckCommenceRequest,
+    send_asset_status_request: SendAssetStatusRequest,
 ) -> LockAssertionRequest {
     // TODO: remove hard coded values
     let lock_assertion_request = LockAssertionRequest {
@@ -890,7 +896,9 @@ pub fn create_transfer_completed_request(
 
 pub fn create_perform_lock_request(ack_commence_request: AckCommenceRequest) -> PerformLockRequest {
     // TODO: remove hard coded values
-    let perform_lock_request = PerformLockRequest {};
+    let perform_lock_request = PerformLockRequest {
+        session_id: "session_id1".to_string(),
+    };
     return perform_lock_request;
 }
 
@@ -1063,6 +1071,13 @@ pub fn get_relay_from_commit_final_assertion(
 
 pub fn get_relay_from_ack_final_receipt(
     ack_final_receipt_request: AckFinalReceiptRequest,
+) -> (String, String) {
+    // TODO
+    return ("localhost".to_string(), "9085".to_string());
+}
+
+pub fn get_relay_from_send_asset_status(
+    send_asset_status_request: SendAssetStatusRequest,
 ) -> (String, String) {
     // TODO
     return ("localhost".to_string(), "9085".to_string());
