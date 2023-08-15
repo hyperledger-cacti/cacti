@@ -235,7 +235,7 @@ test(testCase, async (t: Test) => {
         `Endpoint ${fDeployGo} without required targetPeerAddresses: response.status === 400 OK`,
       );
       const fields = e.response.data.map((param: any) =>
-        param.path.replace(".body.", ""),
+        param.path.replace("/body/", ""),
       );
       t2.ok(
         fields.includes("targetPeerAddresses"),
@@ -297,7 +297,7 @@ test(testCase, async (t: Test) => {
         `Endpoint ${fDeployGo} with fake=4: response.status === 400 OK`,
       );
       const fields = e.response.data.map((param: any) =>
-        param.path.replace(".body.", ""),
+        param.path.replace("/body/", ""),
       );
       t2.ok(
         fields.includes("fake"),
