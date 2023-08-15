@@ -186,7 +186,7 @@ test(testCase, async (t: Test) => {
         `Endpoint ${fDeploy} without required contractName and bytecode: response.status === 400 OK`,
       );
       const fields = e.response.data.map((param: any) =>
-        param.path.replace(".body.", ""),
+        param.path.replace("/body/", ""),
       );
       t2.ok(
         fields.includes("contractName"),
@@ -221,7 +221,7 @@ test(testCase, async (t: Test) => {
         `Endpoint ${fDeploy} with fake=4: response.status === 400 OK`,
       );
       const fields = e.response.data.map((param: any) =>
-        param.path.replace(".body.", ""),
+        param.path.replace("/body/", ""),
       );
       t2.ok(
         fields.includes("fake"),
@@ -282,7 +282,7 @@ test(testCase, async (t: Test) => {
         `Endpoint ${fInvoke} without required methodName: response.status === 400 OK`,
       );
       const fields = e.response.data.map((param: any) =>
-        param.path.replace(".body.", ""),
+        param.path.replace("/body/", ""),
       );
       t2.ok(
         fields.includes("methodName"),
@@ -320,7 +320,7 @@ test(testCase, async (t: Test) => {
         `Endpoint ${fInvoke} with fake=4: response.status === 400 OK`,
       );
       const fields = e.response.data.map((param: any) =>
-        param.path.replace(".body.", ""),
+        param.path.replace("/body/", ""),
       );
       t2.ok(
         fields.includes("fake"),
@@ -371,7 +371,7 @@ test(testCase, async (t: Test) => {
         `Endpoint ${fRun} without required transactionConfig: response.status === 400 OK`,
       );
       const fields = e.response.data.map((param: { path: string }) =>
-        param.path.replace(".body.", ""),
+        param.path.replace("/body/", ""),
       );
       t2.ok(
         fields.includes("transactionConfig"),
@@ -406,7 +406,7 @@ test(testCase, async (t: Test) => {
         `Endpoint ${fRun} with fake=4: response.status === 400 OK`,
       );
       const fields = e.response.data.map((param: { path: string }) =>
-        param.path.replace(".body.", ""),
+        param.path.replace("/body/", ""),
       );
       t2.ok(
         fields.includes("fake"),
