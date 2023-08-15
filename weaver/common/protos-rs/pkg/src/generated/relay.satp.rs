@@ -124,6 +124,8 @@ pub struct SendAssetStatusRequest {
     pub server_transfer_number: ::prost::alloc::string::String,
     #[prost(string, tag = "8")]
     pub server_signature: ::prost::alloc::string::String,
+    #[prost(string, tag = "9")]
+    pub status: ::prost::alloc::string::String,
 }
 #[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]

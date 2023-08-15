@@ -116,6 +116,7 @@ message SendAssetStatusRequest {
   string hash_prev_message = 6;
   string server_transfer_number = 7;
   string server_signature = 8;
+  string status = 9;
 }
 
 message LockAssertionRequest {

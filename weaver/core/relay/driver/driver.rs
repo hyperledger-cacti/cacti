@@ -367,6 +367,7 @@ fn send_driver_mock_send_asset_status_helper(client: SatpClient<Channel>, reques
             hash_prev_message: "hash_prev_message1".to_string(),
             server_transfer_number: "server_transfer_number1".to_string(),
             server_signature: "server_signature1".to_string(),
+            status: "status1".to_string(),
         };
         println!("Sending send asset status request to remote gateway ...");
         let response = client
