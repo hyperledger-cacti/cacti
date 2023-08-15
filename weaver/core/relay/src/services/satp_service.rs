@@ -1,5 +1,6 @@
 // Internal generated modules
 use weaverpb::common::ack::{ack, Ack};
+use weaverpb::driver::driver::PerformLockRequest;
 use weaverpb::relay::satp::satp_server::Satp;
 use weaverpb::relay::satp::{
     AckCommenceRequest, AckFinalReceiptRequest, CommitFinalAssertionRequest, CommitPrepareRequest,
@@ -12,8 +13,9 @@ use weaverpb::relay::satp::{
 use crate::error::Error;
 use crate::relay_proto::parse_address;
 use crate::services::satp_helper::{
-    create_ack_error_message, get_request_id_from_transfer_proposal_receipt,
-    log_request_in_local_satp_db, log_request_in_remote_satp_db,
+    create_ack_error_message, create_perform_lock_request,
+    get_request_id_from_transfer_proposal_receipt, log_request_in_local_satp_db,
+    log_request_in_remote_satp_db,
 };
 
 use super::helpers::get_driver;
@@ -21,21 +23,20 @@ use super::helpers::get_driver;
 use super::satp_helper::{
     create_ack_commence_request, create_ack_final_receipt_request,
     create_commit_final_assertion_request, create_commit_prepare_request,
-    create_commit_ready_request, create_lock_assertion_receipt_request,
-    create_lock_assertion_request, create_transfer_commence_request,
+    create_commit_ready_request, create_lock_assertion_request, create_transfer_commence_request,
     create_transfer_completed_request, create_transfer_proposal_receipt_request,
-    get_driver_address_from_ack_commence, get_relay_from_ack_commence,
+    get_driver_address_from_perform_lock, get_relay_from_ack_commence,
     get_relay_from_ack_final_receipt, get_relay_from_commit_final_assertion,
     get_relay_from_commit_prepare, get_relay_from_commit_ready, get_relay_from_lock_assertion,
-    get_relay_from_lock_assertion_receipt, get_relay_from_send_asset_status,
-    get_relay_from_transfer_commence, get_relay_from_transfer_proposal_claims,
-    get_relay_from_transfer_proposal_receipt, get_relay_params,
+    get_relay_from_transfer_commence, get_relay_from_transfer_proposal_receipt, get_relay_params,
     get_request_id_from_transfer_proposal_claims, spawn_send_ack_commence_request,
-    spawn_send_ack_final_receipt_broadcast_request, spawn_send_assign_asset_request,
-    spawn_send_commit_prepare_request, spawn_send_create_asset_request,
-    spawn_send_extinguish_request, spawn_send_lock_assertion_broadcast_request,
-    spawn_send_lock_assertion_request, spawn_send_perform_lock_request,
-    spawn_send_transfer_commence_request, spawn_send_transfer_proposal_receipt_request,
+    spawn_send_ack_final_receipt_broadcast_request, spawn_send_ack_final_receipt_request,
+    spawn_send_assign_asset_request, spawn_send_commit_final_assertion_request,
+    spawn_send_commit_prepare_request, spawn_send_commit_ready_request,
+    spawn_send_create_asset_request, spawn_send_extinguish_request,
+    spawn_send_lock_assertion_broadcast_request, spawn_send_lock_assertion_request,
+    spawn_send_perform_lock_request, spawn_send_transfer_commence_request,
+    spawn_send_transfer_proposal_receipt_request,
 };
 use tokio::sync::RwLock;
 use tonic::{Request, Response, Status};
@@ -657,7 +658,9 @@ pub fn process_transfer_proposal_claims_request(
 
     if is_valid_request {
         println!("The transfer proposal claims request is valid\n");
-        match send_transfer_proposal_receipt_request(transfer_proposal_claims_request, conf) {
+        let transfer_proposal_receipt_request =
+            create_transfer_proposal_receipt_request(transfer_proposal_claims_request.clone());
+        match send_transfer_proposal_receipt_request(transfer_proposal_receipt_request, conf) {
             Ok(ack) => {
                 println!("Ack transfer proposal claims request.");
                 let reply = Ok(ack);
@@ -693,7 +696,9 @@ pub fn process_transfer_proposal_receipt_request(
 
     if is_valid_request {
         println!("The transfer proposal receipt request is valid\n");
-        match send_transfer_commence_request(transfer_proposal_receipt_request, conf) {
+        let transfer_commence_request =
+            create_transfer_commence_request(transfer_proposal_receipt_request.clone());
+        match send_transfer_commence_request(transfer_commence_request, conf) {
             Ok(ack) => {
                 println!("Ack transfer proposal receipt request.");
                 let reply = Ok(ack);
@@ -729,7 +734,8 @@ pub fn process_transfer_commence_request(
 
     if is_valid_request {
         println!("The transfer commence request is valid\n");
-        match send_ack_commence_request(transfer_commence_request, conf) {
+        let ack_commence_request = create_ack_commence_request(transfer_commence_request.clone());
+        match send_ack_commence_request(ack_commence_request, conf) {
             Ok(ack) => {
                 println!("Ack transfer commence request.");
                 let reply = Ok(ack);
@@ -754,43 +760,6 @@ pub fn process_transfer_commence_request(
     }
 }
 
-pub fn process_tranfer_proposal_receipt_request(
-    transfer_proposal_receipt_request: TransferProposalReceiptRequest,
-    conf: config::Config,
-) -> Result<Ack, Error> {
-    let request_id =
-        get_request_id_from_transfer_proposal_receipt(transfer_proposal_receipt_request.clone());
-    let is_valid_request =
-        is_valid_transfer_proposal_receipt_request(transfer_proposal_receipt_request.clone());
-
-    // TODO some processing
-    if is_valid_request {
-        println!("The transfer proposal receipt request is valid\n");
-        match send_transfer_commence_request(transfer_proposal_receipt_request, conf) {
-            Ok(ack) => {
-                println!("Ack transfer proposal receipt request.");
-                let reply = Ok(ack);
-                println!("Sending back Ack: {:?}\n", reply);
-                reply
-            }
-            Err(e) => {
-                return Ok(Ack {
-                    status: ack::Status::Error as i32,
-                    request_id: request_id.to_string(),
-                    message: format!("Error: Ack transfer proposal receipt failed. {:?}", e),
-                });
-            }
-        }
-    } else {
-        println!("The transfer proposal receipt request is invalid\n");
-        return Ok(Ack {
-            status: ack::Status::Error as i32,
-            request_id: request_id.to_string(),
-            message: "Error: The transfer proposal receipt request is invalid".to_string(),
-        });
-    }
-}
-
 /// process_ack_commence_request is invoked by the receiver gateway to ack the transfer commence request
 /// requested ed by the sender gateway
 pub fn process_ack_commence_request(
@@ -803,7 +772,8 @@ pub fn process_ack_commence_request(
     // TODO some processing
     if is_valid_request {
         println!("The ack commence request is valid\n");
-        match send_perform_lock_request(ack_commence_request, conf) {
+        let perform_lock_request = create_perform_lock_request(ack_commence_request);
+        match send_perform_lock_request(perform_lock_request, conf) {
             Ok(ack) => {
                 println!("Ack ack commence request.");
                 let reply = Ok(ack);
@@ -838,9 +808,40 @@ pub fn process_send_asset_status_request(
     // TODO some processing
     if is_valid_request {
         println!("The send asset status request is valid\n");
-        match send_lock_assertion_request(send_asset_status_request, conf) {
+
+        let result;
+        let status = send_asset_status_request.status.as_str();
+        match status {
+            "Locked" => {
+                println!("Received asset status as Locked. Sending the lock assertion request");
+                let lock_assertion_request =
+                    create_lock_assertion_request(send_asset_status_request);
+                result = send_lock_assertion_request(lock_assertion_request, conf)
+            }
+            "Created" => {
+                println!("Received asset status as Created. Sending the commit ready request");
+                let commit_ready_request = create_commit_ready_request(send_asset_status_request);
+                result = send_commit_ready_request(commit_ready_request, conf);
+            }
+            "Extinguished" => {
+                println!("Received asset status as Extinguished. Sending the commit final assertion request");
+                let commit_final_assertion_request =
+                    create_commit_final_assertion_request(send_asset_status_request);
+                result = send_commit_final_assertion_request(commit_final_assertion_request, conf)
+            }
+            "Finalized" => {
+                println!(
+                    "Received asset status as Finalized. Sending the ack final receipt request"
+                );
+                let ack_final_receipt_request =
+                    create_ack_final_receipt_request(send_asset_status_request.clone());
+                result = send_ack_final_receipt_request(ack_final_receipt_request, conf)
+            }
+            _ => result = Err(Error::Simple(format!("Invalid asset status: {}", status))),
+        }
+
+        match result {
             Ok(ack) => {
-                println!("Ack send asset status request.");
                 let reply = Ok(ack);
                 println!("Sending back Ack: {:?}\n", reply);
                 reply
@@ -849,7 +850,7 @@ pub fn process_send_asset_status_request(
                 return Ok(Ack {
                     status: ack::Status::Error as i32,
                     request_id: request_id.to_string(),
-                    message: format!("Error: send asset status request failed. {:?}", e),
+                    message: format!("Error: sending request failed. {:?}", e),
                 });
             }
         }
@@ -872,7 +873,7 @@ pub fn process_lock_assertion_request(
 
     if is_valid_request {
         println!("The lock assertion request is valid\n");
-        match send_lock_assertion_receipt_request(lock_assertion_request, conf) {
+        match send_lock_assertion_broadcast_request(lock_assertion_request, conf) {
             Ok(ack) => {
                 println!("Ack lock assertion request.");
                 let reply = Ok(ack);
@@ -908,7 +909,9 @@ pub fn process_lock_assertion_receipt_request(
     // TODO some processing
     if is_valid_request {
         println!("The lock assertion receipt request is valid\n");
-        match send_commit_prepare_request(lock_assertion_receipt_request, conf) {
+        let commit_prepare_request =
+            create_commit_prepare_request(lock_assertion_receipt_request.clone());
+        match send_commit_prepare_request(commit_prepare_request, conf) {
             Ok(ack) => {
                 println!("Ack lock assertion receipt request.");
                 let reply = Ok(ack);
@@ -943,7 +946,7 @@ pub fn process_commit_prepare_request(
     // TODO some processing
     if is_valid_request {
         println!("The commit prepare request is valid\n");
-        match send_commit_ready_request(commit_prepare_request, conf) {
+        match send_create_asset_request(commit_prepare_request, conf) {
             Ok(ack) => {
                 println!("Ack commit prepare request.");
                 let reply = Ok(ack);
@@ -978,7 +981,7 @@ pub fn process_commit_ready_request(
     // TODO some processing
     if is_valid_request {
         println!("The commit ready request is valid\n");
-        match send_commit_final_assertion_request(commit_ready_request, conf) {
+        match send_extinguish_request(commit_ready_request, conf) {
             Ok(ack) => {
                 println!("Ack commit ready request.");
                 let reply = Ok(ack);
@@ -1014,7 +1017,7 @@ pub fn process_commit_final_assertion_request(
     // TODO some processing
     if is_valid_request {
         println!("The commit final assertion request is valid\n");
-        match send_ack_final_receipt_request(commit_final_assertion_request, conf) {
+        match send_assign_asset_request(commit_final_assertion_request, conf) {
             Ok(ack) => {
                 println!("Ack commit final assertion request.");
                 let reply = Ok(ack);
@@ -1049,7 +1052,7 @@ pub fn process_ack_final_receipt_request(
     // TODO some processing
     if is_valid_request {
         println!("The ack final receipt request is valid\n");
-        match send_transfer_completed_request(ack_final_receipt_request, conf) {
+        match send_ack_final_receipt_broadcast_request(ack_final_receipt_request, conf) {
             Ok(ack) => {
                 println!("Ack ack final receipt request.");
                 let reply = Ok(ack);
@@ -1075,17 +1078,15 @@ pub fn process_ack_final_receipt_request(
 }
 
 fn send_transfer_proposal_receipt_request(
-    transfer_proposal_claims_request: TransferProposalClaimsRequest,
+    transfer_proposal_receipt_request: TransferProposalReceiptRequest,
     conf: config::Config,
 ) -> Result<Ack, Error> {
     let request_id =
-        get_request_id_from_transfer_proposal_claims(transfer_proposal_claims_request.clone());
+        get_request_id_from_transfer_proposal_receipt(transfer_proposal_receipt_request.clone());
     let (relay_host, relay_port) =
-        get_relay_from_transfer_proposal_claims(transfer_proposal_claims_request.clone());
+        get_relay_from_transfer_proposal_receipt(transfer_proposal_receipt_request.clone());
     let (use_tls, tlsca_cert_path) =
         get_relay_params(relay_host.clone(), relay_port.clone(), conf.clone());
-    let transfer_proposal_receipt_request =
-        create_transfer_proposal_receipt_request(transfer_proposal_claims_request.clone());
 
     spawn_send_transfer_proposal_receipt_request(
         transfer_proposal_receipt_request,
@@ -1104,17 +1105,14 @@ fn send_transfer_proposal_receipt_request(
 }
 
 fn send_transfer_commence_request(
-    transfer_proposal_receipt_request: TransferProposalReceiptRequest,
+    transfer_commence_request: TransferCommenceRequest,
     conf: config::Config,
 ) -> Result<Ack, Error> {
-    let request_id =
-        get_request_id_from_transfer_proposal_receipt(transfer_proposal_receipt_request.clone());
+    let request_id = transfer_commence_request.session_id.clone();
     let (relay_host, relay_port) =
-        get_relay_from_transfer_proposal_receipt(transfer_proposal_receipt_request.clone());
+        get_relay_from_transfer_commence(transfer_commence_request.clone());
     let (use_tls, tlsca_cert_path) =
         get_relay_params(relay_host.clone(), relay_port.clone(), conf.clone());
-    let transfer_commence_request =
-        create_transfer_commence_request(transfer_proposal_receipt_request.clone());
 
     spawn_send_transfer_commence_request(
         transfer_commence_request,
@@ -1133,15 +1131,13 @@ fn send_transfer_commence_request(
 }
 
 fn send_ack_commence_request(
-    transfer_commence_request: TransferCommenceRequest,
+    ack_commence_request: AckCommenceRequest,
     conf: config::Config,
 ) -> Result<Ack, Error> {
-    let request_id = &transfer_commence_request.session_id.to_string();
-    let (relay_host, relay_port) =
-        get_relay_from_transfer_commence(transfer_commence_request.clone());
+    let request_id = &ack_commence_request.session_id.to_string();
+    let (relay_host, relay_port) = get_relay_from_ack_commence(ack_commence_request.clone());
     let (use_tls, tlsca_cert_path) =
         get_relay_params(relay_host.clone(), relay_port.clone(), conf.clone());
-    let ack_commence_request = create_ack_commence_request(transfer_commence_request.clone());
 
     spawn_send_ack_commence_request(
         ack_commence_request,
@@ -1160,15 +1156,13 @@ fn send_ack_commence_request(
 }
 
 fn send_lock_assertion_request(
-    send_asset_status_request: SendAssetStatusRequest,
+    lock_assertion_request: LockAssertionRequest,
     conf: config::Config,
 ) -> Result<Ack, Error> {
-    let request_id = &send_asset_status_request.session_id.to_string();
-    let (relay_host, relay_port) =
-        get_relay_from_send_asset_status(send_asset_status_request.clone());
+    let request_id = &lock_assertion_request.session_id.to_string();
+    let (relay_host, relay_port) = get_relay_from_lock_assertion(lock_assertion_request.clone());
     let (use_tls, tlsca_cert_path) =
         get_relay_params(relay_host.clone(), relay_port.clone(), conf.clone());
-    let lock_assertion_request = create_lock_assertion_request(send_asset_status_request.clone());
 
     spawn_send_lock_assertion_request(
         lock_assertion_request,
@@ -1186,7 +1180,7 @@ fn send_lock_assertion_request(
     return Ok(reply);
 }
 
-fn send_lock_assertion_receipt_request(
+fn send_lock_assertion_broadcast_request(
     lock_assertion_request: LockAssertionRequest,
     conf: config::Config,
 ) -> Result<Ack, Error> {
@@ -1194,11 +1188,9 @@ fn send_lock_assertion_receipt_request(
     let (relay_host, relay_port) = get_relay_from_lock_assertion(lock_assertion_request.clone());
     let (use_tls, tlsca_cert_path) =
         get_relay_params(relay_host.clone(), relay_port.clone(), conf.clone());
-    let lock_assertion_receipt_request =
-        create_lock_assertion_receipt_request(lock_assertion_request.clone());
 
     spawn_send_lock_assertion_broadcast_request(
-        lock_assertion_receipt_request,
+        lock_assertion_request,
         relay_host,
         relay_port,
         use_tls,
@@ -1214,16 +1206,16 @@ fn send_lock_assertion_receipt_request(
 }
 
 fn send_perform_lock_request(
-    ack_commence_request: AckCommenceRequest,
+    perform_lock_request: PerformLockRequest,
     conf: config::Config,
 ) -> Result<Ack, Error> {
-    let request_id = &ack_commence_request.session_id.to_string();
-    let driver_address = get_driver_address_from_ack_commence(ack_commence_request.clone());
+    let request_id = &perform_lock_request.session_id.to_string();
+    let driver_address = get_driver_address_from_perform_lock(perform_lock_request.clone());
     let parsed_address = parse_address(driver_address)?;
     let result = get_driver(parsed_address.network_id.to_string(), conf.clone());
     match result {
         Ok(driver_info) => {
-            spawn_send_perform_lock_request(driver_info, ack_commence_request);
+            spawn_send_perform_lock_request(driver_info, perform_lock_request);
             let reply = Ack {
                 status: ack::Status::Ok as i32,
                 request_id: request_id.to_string(),
@@ -1245,16 +1237,13 @@ fn send_perform_lock_request(
 }
 
 fn send_commit_prepare_request(
-    lock_assertion_receipt_request: LockAssertionReceiptRequest,
+    commit_prepare_request: CommitPrepareRequest,
     conf: config::Config,
 ) -> Result<Ack, Error> {
-    let request_id = &lock_assertion_receipt_request.session_id.to_string();
-    let (relay_host, relay_port) =
-        get_relay_from_lock_assertion_receipt(lock_assertion_receipt_request.clone());
+    let request_id = &commit_prepare_request.session_id.to_string();
+    let (relay_host, relay_port) = get_relay_from_commit_prepare(commit_prepare_request.clone());
     let (use_tls, tlsca_cert_path) =
         get_relay_params(relay_host.clone(), relay_port.clone(), conf.clone());
-    let commit_prepare_request =
-        create_commit_prepare_request(lock_assertion_receipt_request.clone());
 
     spawn_send_commit_prepare_request(
         commit_prepare_request,
@@ -1273,6 +1262,33 @@ fn send_commit_prepare_request(
 }
 
 fn send_commit_ready_request(
+    commit_ready_request: CommitReadyRequest,
+    conf: config::Config,
+) -> Result<Ack, Error> {
+    // TODO
+    let request_id = &commit_ready_request.session_id.to_string();
+    let (relay_host, relay_port) = get_relay_from_commit_ready(commit_ready_request.clone());
+    let (use_tls, tlsca_cert_path) =
+        get_relay_params(relay_host.clone(), relay_port.clone(), conf.clone());
+
+    spawn_send_commit_ready_request(
+        commit_ready_request,
+        relay_host,
+        relay_port,
+        use_tls,
+        tlsca_cert_path,
+        conf,
+    );
+
+    let reply = Ack {
+        status: ack::Status::Ok as i32,
+        request_id: request_id.to_string(),
+        message: "Ack of the commit prepare request".to_string(),
+    };
+    return Ok(reply);
+}
+
+fn send_create_asset_request(
     commit_prepare_request: CommitPrepareRequest,
     conf: config::Config,
 ) -> Result<Ack, Error> {
@@ -1281,9 +1297,35 @@ fn send_commit_ready_request(
     let (relay_host, relay_port) = get_relay_from_commit_prepare(commit_prepare_request.clone());
     let (use_tls, tlsca_cert_path) =
         get_relay_params(relay_host.clone(), relay_port.clone(), conf.clone());
-    let commit_ready_request = create_commit_ready_request(commit_prepare_request.clone());
 
     spawn_send_create_asset_request(
+        commit_prepare_request,
+        relay_host,
+        relay_port,
+        use_tls,
+        tlsca_cert_path,
+        conf,
+    );
+
+    let reply = Ack {
+        status: ack::Status::Ok as i32,
+        request_id: request_id.to_string(),
+        message: "Ack of the commit prepare request".to_string(),
+    };
+    return Ok(reply);
+}
+
+fn send_extinguish_request(
+    commit_ready_request: CommitReadyRequest,
+    conf: config::Config,
+) -> Result<Ack, Error> {
+    // TODO
+    let request_id = &commit_ready_request.session_id.to_string();
+    let (relay_host, relay_port) = get_relay_from_commit_ready(commit_ready_request.clone());
+    let (use_tls, tlsca_cert_path) =
+        get_relay_params(relay_host.clone(), relay_port.clone(), conf.clone());
+
+    spawn_send_extinguish_request(
         commit_ready_request,
         relay_host,
         relay_port,
@@ -1301,18 +1343,17 @@ fn send_commit_ready_request(
 }
 
 fn send_commit_final_assertion_request(
-    commit_ready_request: CommitReadyRequest,
+    commit_final_assertion_request: CommitFinalAssertionRequest,
     conf: config::Config,
 ) -> Result<Ack, Error> {
     // TODO
-    let request_id = &commit_ready_request.session_id.to_string();
-    let (relay_host, relay_port) = get_relay_from_commit_ready(commit_ready_request.clone());
+    let request_id = &commit_final_assertion_request.session_id.to_string();
+    let (relay_host, relay_port) =
+        get_relay_from_commit_final_assertion(commit_final_assertion_request.clone());
     let (use_tls, tlsca_cert_path) =
         get_relay_params(relay_host.clone(), relay_port.clone(), conf.clone());
-    let commit_final_assertion_request =
-        create_commit_final_assertion_request(commit_ready_request.clone());
 
-    spawn_send_extinguish_request(
+    spawn_send_commit_final_assertion_request(
         commit_final_assertion_request,
         relay_host,
         relay_port,
@@ -1330,19 +1371,17 @@ fn send_commit_final_assertion_request(
 }
 
 fn send_ack_final_receipt_request(
-    commit_final_assertion_request: CommitFinalAssertionRequest,
+    ack_final_receipt_request: AckFinalReceiptRequest,
     conf: config::Config,
 ) -> Result<Ack, Error> {
     // TODO
-    let request_id = &commit_final_assertion_request.session_id.to_string();
+    let request_id = &ack_final_receipt_request.session_id.to_string();
     let (relay_host, relay_port) =
-        get_relay_from_commit_final_assertion(commit_final_assertion_request.clone());
+        get_relay_from_ack_final_receipt(ack_final_receipt_request.clone());
     let (use_tls, tlsca_cert_path) =
         get_relay_params(relay_host.clone(), relay_port.clone(), conf.clone());
-    let ack_final_receipt_request =
-        create_ack_final_receipt_request(commit_final_assertion_request.clone());
 
-    spawn_send_assign_asset_request(
+    spawn_send_ack_final_receipt_request(
         ack_final_receipt_request,
         relay_host,
         relay_port,
@@ -1359,7 +1398,35 @@ fn send_ack_final_receipt_request(
     return Ok(reply);
 }
 
-fn send_transfer_completed_request(
+fn send_assign_asset_request(
+    commit_final_assertion_request: CommitFinalAssertionRequest,
+    conf: config::Config,
+) -> Result<Ack, Error> {
+    // TODO
+    let request_id = &commit_final_assertion_request.session_id.to_string();
+    let (relay_host, relay_port) =
+        get_relay_from_commit_final_assertion(commit_final_assertion_request.clone());
+    let (use_tls, tlsca_cert_path) =
+        get_relay_params(relay_host.clone(), relay_port.clone(), conf.clone());
+
+    spawn_send_assign_asset_request(
+        commit_final_assertion_request,
+        relay_host,
+        relay_port,
+        use_tls,
+        tlsca_cert_path,
+        conf,
+    );
+
+    let reply = Ack {
+        status: ack::Status::Ok as i32,
+        request_id: request_id.to_string(),
+        message: "Ack of the commit prepare request".to_string(),
+    };
+    return Ok(reply);
+}
+
+fn send_ack_final_receipt_broadcast_request(
     ack_final_receipt_request: AckFinalReceiptRequest,
     conf: config::Config,
 ) -> Result<Ack, Error> {
@@ -1373,7 +1440,7 @@ fn send_transfer_completed_request(
         create_transfer_completed_request(ack_final_receipt_request.clone());
 
     spawn_send_ack_final_receipt_broadcast_request(
-        transfer_completed_request,
+        ack_final_receipt_request,
         relay_host,
         relay_port,
         use_tls,

@@ -160,17 +160,17 @@ pub fn spawn_send_ack_commence_request(
 
 pub fn spawn_send_perform_lock_request(
     driver_info: Driver,
-    ack_commence_request: AckCommenceRequest,
+    perform_lock_request: PerformLockRequest,
 ) {
     tokio::spawn(async move {
-        let request_id = ack_commence_request.session_id.to_string();
+        let request_id = perform_lock_request.session_id.to_string();
         println!(
             "Locking the asset of the lock assertion request id: {:?}",
             request_id
         );
         // TODO: pass the required info to lock the relevant asset
         // Call the driver to lock the asset
-        let result = call_perform_lock(driver_info, ack_commence_request).await;
+        let result = call_perform_lock(driver_info, perform_lock_request).await;
         match result {
             Ok(_) => {
                 println!("Perform lock request sent to driver\n")
@@ -184,7 +184,7 @@ pub fn spawn_send_perform_lock_request(
 }
 
 pub fn spawn_send_lock_assertion_broadcast_request(
-    lock_assertion_receipt_request: LockAssertionReceiptRequest,
+    lock_assertion_request: LockAssertionRequest,
     relay_host: String,
     relay_port: String,
     use_tls: bool,
@@ -192,13 +192,16 @@ pub fn spawn_send_lock_assertion_broadcast_request(
     conf: Config,
 ) {
     tokio::spawn(async move {
-        let request_id = lock_assertion_receipt_request.session_id.to_string();
+        let request_id = lock_assertion_request.session_id.to_string();
         println!("Broadcasting the lock assertion request {:?}", request_id);
         // TODO
         // Broadcast the message to the network
         // Subscribe to the status event
         // Once the message is broadcast, call the call_lock_assertion_receipt endpoint
         // log the results
+
+        let lock_assertion_receipt_request =
+            create_lock_assertion_receipt_request(lock_assertion_request.clone());
         let result = call_lock_assertion_receipt(
             relay_host,
             relay_port,
@@ -258,10 +261,6 @@ pub fn spawn_send_commit_prepare_request(
     // Spawning new thread to make the call_commit_prepare to receiver gateway
     tokio::spawn(async move {
         let request_id = commit_prepare_request.session_id.to_string();
-        println!(
-            "Sending commit prepare request to receiver gateway: Request ID = {:?}",
-            request_id
-        );
         let result = call_commit_prepare(
             relay_host,
             relay_port,
@@ -278,6 +277,28 @@ pub fn spawn_send_commit_prepare_request(
 }
 
 pub fn spawn_send_create_asset_request(
+    commit_prepare_request: CommitPrepareRequest,
+    relay_host: String,
+    relay_port: String,
+    use_tls: bool,
+    tlsca_cert_path: String,
+    conf: Config,
+) {
+    tokio::spawn(async move {
+        let request_id = commit_prepare_request.session_id.to_string();
+        println!(
+            "Creating the asset corresponding to the commit prepare request {:?}",
+            request_id
+        );
+        // TODO
+        // Creating the asset in the target network
+        // Subscribe to the status event
+        // Once the message is broadcast, call the call_commit_ready endpoint
+        // log the results
+    });
+}
+
+pub fn spawn_send_commit_ready_request(
     commit_ready_request: CommitReadyRequest,
     relay_host: String,
     relay_port: String,
@@ -287,15 +308,6 @@ pub fn spawn_send_create_asset_request(
 ) {
     tokio::spawn(async move {
         let request_id = commit_ready_request.session_id.to_string();
-        println!(
-            "Creating the asset corresponding to the  commit ready request {:?}",
-            request_id
-        );
-        // TODO
-        // Creating the asset in the target network
-        // Subscribe to the status event
-        // Once the message is broadcast, call the call_commit_ready endpoint
-        // log the results
         let result = call_commit_ready(
             relay_host,
             relay_port,
@@ -313,6 +325,27 @@ pub fn spawn_send_create_asset_request(
 }
 
 pub fn spawn_send_assign_asset_request(
+    commit_final_assertion_request: CommitFinalAssertionRequest,
+    relay_host: String,
+    relay_port: String,
+    use_tls: bool,
+    tlsca_cert_path: String,
+    conf: Config,
+) {
+    tokio::spawn(async move {
+        let request_id = commit_final_assertion_request.session_id.to_string();
+        println!(
+            "Assigning the asset corresponding to the commit final assertion request {:?}",
+            request_id
+        );
+        // TODO
+        // Assigning the asset in the target network
+        // Once the asset is assigned, call the call_ack_final_receipt endpoint
+        // log the results
+    });
+}
+
+pub fn spawn_send_ack_final_receipt_request(
     ack_final_receipt_request: AckFinalReceiptRequest,
     relay_host: String,
     relay_port: String,
@@ -322,14 +355,6 @@ pub fn spawn_send_assign_asset_request(
 ) {
     tokio::spawn(async move {
         let request_id = ack_final_receipt_request.session_id.to_string();
-        println!(
-            "Assigning the asset corresponding to the  commit final assertion request {:?}",
-            request_id
-        );
-        // TODO
-        // Assigning the asset in the target network
-        // Once the asset is assigned, call the call_ack_final_receipt endpoint
-        // log the results
         let result = call_ack_final_receipt(
             relay_host,
             relay_port,
@@ -347,7 +372,7 @@ pub fn spawn_send_assign_asset_request(
 }
 
 pub fn spawn_send_ack_final_receipt_broadcast_request(
-    transfer_completed_request: TransferCompletedRequest,
+    ack_final_receipt_request: AckFinalReceiptRequest,
     relay_host: String,
     relay_port: String,
     use_tls: bool,
@@ -355,15 +380,18 @@ pub fn spawn_send_ack_final_receipt_broadcast_request(
     conf: Config,
 ) {
     tokio::spawn(async move {
-        let request_id = transfer_completed_request.session_id.to_string();
+        let request_id = ack_final_receipt_request.session_id.to_string();
         println!(
-            "Acknowledge final receipt broadcast of the transfer completed request {:?}",
+            "Acknowledge final receipt broadcast of the ack final receipt request {:?}",
             request_id
         );
         // TODO
         // Ack final receipt broadcast
         // Once the broadcast is done, call the call_transfer_completed endpoint
         // log the results
+
+        let transfer_completed_request =
+            create_transfer_completed_request(ack_final_receipt_request);
         let result = call_transfer_completed(
             relay_host,
             relay_port,
@@ -381,6 +409,27 @@ pub fn spawn_send_ack_final_receipt_broadcast_request(
 }
 
 pub fn spawn_send_extinguish_request(
+    commit_ready_request: CommitReadyRequest,
+    relay_host: String,
+    relay_port: String,
+    use_tls: bool,
+    tlsca_cert_path: String,
+    conf: Config,
+) {
+    tokio::spawn(async move {
+        let request_id = commit_ready_request.session_id.to_string();
+        println!(
+            "Extinguishing the asset corresponding to the commit final assertion request {:?}",
+            request_id
+        );
+        // TODO
+        // Assigning the asset in the target network
+        // Once the asset is assigned, call the call_ack_final_receipt endpoint
+        // log the results
+    });
+}
+
+pub fn spawn_send_commit_final_assertion_request(
     commit_final_assertion_request: CommitFinalAssertionRequest,
     relay_host: String,
     relay_port: String,
@@ -394,10 +443,6 @@ pub fn spawn_send_extinguish_request(
             "Extinguishing the asset corresponding to the commit final assertion request {:?}",
             request_id
         );
-        // TODO
-        // Assigning the asset in the target network
-        // Once the asset is assigned, call the call_ack_final_receipt endpoint
-        // log the results
         let result = call_commit_final_assertion_receipt(
             relay_host,
             relay_port,
@@ -416,11 +461,10 @@ pub fn spawn_send_extinguish_request(
 
 async fn call_perform_lock(
     driver_info: Driver,
-    ack_commence_request: AckCommenceRequest,
+    perform_lock_request: PerformLockRequest,
 ) -> Result<(), Error> {
     let client = get_driver_client(driver_info).await?;
     println!("Sending request to driver to lock the asset");
-    let perform_lock_request = create_perform_lock_request(ack_commence_request);
     let ack = client
         .clone()
         .perform_lock(perform_lock_request)
@@ -558,7 +602,7 @@ pub async fn call_lock_assertion_receipt(
     Ok(response)
 }
 
-// Call the call_commit_ready endpoint on the sending gateway
+// Call the call_commit_prepare endpoint on the sending gateway
 pub async fn call_commit_prepare(
     relay_host: String,
     relay_port: String,
@@ -847,7 +891,7 @@ pub fn create_commit_prepare_request(
 }
 
 pub fn create_commit_ready_request(
-    commit_prepare_request: CommitPrepareRequest,
+    send_asset_status_request: SendAssetStatusRequest,
 ) -> CommitReadyRequest {
     // TODO: remove hard coded values
     let commit_ready_request = CommitReadyRequest {
@@ -859,7 +903,7 @@ pub fn create_commit_ready_request(
 }
 
 pub fn create_commit_final_assertion_request(
-    commit_ready_request: CommitReadyRequest,
+    send_asset_status_request: SendAssetStatusRequest,
 ) -> CommitFinalAssertionRequest {
     // TODO: remove hard coded values
     let commit_final_assertion_request = CommitFinalAssertionRequest {
@@ -871,7 +915,7 @@ pub fn create_commit_final_assertion_request(
 }
 
 pub fn create_ack_final_receipt_request(
-    commit_final_assertion_request: CommitFinalAssertionRequest,
+    send_asset_status_request: SendAssetStatusRequest,
 ) -> AckFinalReceiptRequest {
     // TODO: remove hard coded values
     let ack_final_receipt_request = AckFinalReceiptRequest {
@@ -900,6 +944,45 @@ pub fn create_perform_lock_request(ack_commence_request: AckCommenceRequest) -> 
         session_id: "session_id1".to_string(),
     };
     return perform_lock_request;
+}
+
+pub fn generate_commit_final_assertion_request(
+    commit_ready_request: CommitReadyRequest,
+) -> CommitFinalAssertionRequest {
+    // TODO Get the corresponding send_asset_status_request from db
+    // TODO: remove hard coded values
+    let commit_final_assertion_request = CommitFinalAssertionRequest {
+        message_type: "message_type1".to_string(),
+        session_id: "session_id1".to_string(),
+        transfer_context_id: "transfer_context_id1".to_string(),
+    };
+    return commit_final_assertion_request;
+}
+
+pub fn generate_commit_ready_request(
+    commit_prepare_request: CommitPrepareRequest,
+) -> CommitReadyRequest {
+    // TODO Get the corresponding send_asset_status_request from db
+    // TODO: remove hard coded values
+    let commit_ready_request = CommitReadyRequest {
+        message_type: "message_type1".to_string(),
+        session_id: "session_id1".to_string(),
+        transfer_context_id: "transfer_context_id1".to_string(),
+    };
+    return commit_ready_request;
+}
+
+pub fn generate_ack_final_receipt_request(
+    commit_final_assertion_request: CommitFinalAssertionRequest,
+) -> AckFinalReceiptRequest {
+    // TODO Get the corresponding send_asset_status_request from db
+    // TODO: remove hard coded values
+    let ack_final_receipt_request = AckFinalReceiptRequest {
+        message_type: "message_type1".to_string(),
+        session_id: "session_id1".to_string(),
+        transfer_context_id: "transfer_context_id1".to_string(),
+    };
+    return ack_final_receipt_request;
 }
 
 pub fn get_satp_requests_local_db(conf: Config) -> Database {
@@ -1083,7 +1166,7 @@ pub fn get_relay_from_send_asset_status(
     return ("localhost".to_string(), "9085".to_string());
 }
 
-pub fn get_driver_address_from_ack_commence(ack_commence_request: AckCommenceRequest) -> String {
+pub fn get_driver_address_from_perform_lock(perform_lock_request: PerformLockRequest) -> String {
     // TODO
     return "localhost:9085/Dummy_Network/abc:abc:abc:abc".to_string();
 }
