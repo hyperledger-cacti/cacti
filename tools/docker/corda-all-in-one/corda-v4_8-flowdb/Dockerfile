@@ -59,7 +59,7 @@ RUN cp $CACTUS_CFG_PATH/corda-aio-image.pub ~/.ssh/authorized_keys
 # RUN cat /root-password.txt | chpasswd
 RUN echo "root:root" | chpasswd
 
-RUN curl https://software.r3.com/artifactory/corda-releases/net/corda/corda-tools-shell-cli/${CORDA_TOOLS_SHELL_CLI_VERSION}/corda-tools-shell-cli-${CORDA_TOOLS_SHELL_CLI_VERSION}-all.jar --output /corda-tools-shell-cli-all.jar
+RUN curl https://download.corda.net/maven/corda-releases/net/corda/corda-tools-shell-cli/${CORDA_TOOLS_SHELL_CLI_VERSION}/corda-tools-shell-cli-${CORDA_TOOLS_SHELL_CLI_VERSION}-all.jar --output /corda-tools-shell-cli-all.jar
 # This is what makes the "corda-shell" alias avaialble on the terminal
 RUN java -jar /corda-tools-shell-cli-all.jar install-shell-extensions
 
