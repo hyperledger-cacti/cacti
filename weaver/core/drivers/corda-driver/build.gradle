@@ -19,7 +19,9 @@ buildscript {
 
     repositories {
         mavenCentral()
-        maven { url 'https://ci-artifactory.corda.r3cev.com/artifactory/corda-releases' }
+        maven { url 'https://download.corda.net/maven/corda-dependencies' }
+        maven { url 'https://download.corda.net/maven/corda-releases' }
+        maven { url 'https://download.corda.net/maven/corda-lib' }
     }
    dependencies {
        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
@@ -40,7 +42,9 @@ repositories {
     mavenCentral()
     mavenLocal()
     maven { url 'https://repo1.maven.org/maven2' }
-    maven { url 'https://software.r3.com/artifactory/corda' }
+    maven { url 'https://download.corda.net/maven/corda-dependencies' }
+    maven { url 'https://download.corda.net/maven/corda-releases' }
+    maven { url 'https://download.corda.net/maven/corda-lib' }
     if (file("$projectDir/./github.properties").exists()) {
         def styler = 'black red green yellow blue magenta cyan white'
                 .split().toList().withIndex(30)
