@@ -68,7 +68,7 @@
     "@hyperledger/cactus-plugin-odap-hermes": "2.0.0-alpha.1",
     "@hyperledger/cactus-test-tooling": "2.0.0-alpha.1",
     "@openzeppelin/contracts": "4.4.2",
-    "@openzeppelin/contracts-upgradeable": "4.4.2",
+    "@openzeppelin/contracts-upgradeable": "4.9.3",
     "async-exit-hook": "2.0.1",
     "axios": "^0.27.2",
     "crypto-js": "4.1.1",
