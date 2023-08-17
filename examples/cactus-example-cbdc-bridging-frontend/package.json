@@ -1,0 +1,71 @@
+{
+  "name": "@hyperledger/cacti-example-cbdc-bridging-frontend",
+  "version": "0.1.0",
+  "description": "An example UI showing how to use Cacti when implementing a CBDC bridging application between Hyperledger Fabric and Hyperledger Besu.",
+  "keywords": [
+    "Hyperledger",
+    "Cacti",
+    "ODAP",
+    "Fabric",
+    "Besu",
+    "Blockchain",
+    "CBDC"
+  ],
+  "bugs": {
+    "url": "https://github.com/hyperledger/cacti/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger/cacti.git"
+  },
+  "license": "Apache-2.0",
+  "contributors": [
+    {
+      "name": "Please add yourself to the list of contributors",
+      "email": "your.name@example.com",
+      "url": "https://example.com"
+    },
+    {
+      "name": "Peter Somogyvari",
+      "email": "peter.somogyvari@accenture.com",
+      "url": "https://accenture.com"
+    },
+    {
+      "name": "André Augusto",
+      "email": "andre.augusto@tecnico.ulisboa.pt"
+    }
+  ],
+  "dependencies": {
+    "@emotion/react": "11.11.1",
+    "@emotion/styled": "11.11.0",
+    "@mui/material": "5.14.13",
+    "@mui/styles": "5.14.13",
+    "axios": "1.5.1",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "uuid": "9.0.1"
+  },
+  "devDependencies": {
+    "eslint-config-react-app": "7.0.1",
+    "react-scripts": "5.0.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {},
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
