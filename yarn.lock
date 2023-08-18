@@ -6538,7 +6538,7 @@ __metadata:
     hardhat: 2.6.0
     http-status-codes: 2.1.4
     ipfs-http-client: 51.0.1
-    jose: 4.1.0
+    jose: 4.9.2
     knex: 2.5.1
     nyc: ^13.1.0
     openapi-types: 9.1.0
@@ -29000,13 +29000,6 @@ __metadata:
     "@sideway/formula": ^3.0.1
     "@sideway/pinpoint": ^2.0.0
   checksum: 8c3709849293411c524e5a679dba7b42598a29a663478941767b8d5b06288611dece58803c468a2c7320cc2429a3e71e3d94337fe47aefcf6c22174dbd90b601
-  languageName: node
-  linkType: hard
-
-"jose@npm:4.1.0":
-  version: 4.1.0
-  resolution: "jose@npm:4.1.0"
-  checksum: a86a9fef296c9b2bff53366dce6aa25dd78178a7188cffbc71629608ad6dcb7b30361688bdac409c75fda5d2e1ef67ea7aa92f9894e5fb72526919d814dfc8a5
   languageName: node
   linkType: hard
 
