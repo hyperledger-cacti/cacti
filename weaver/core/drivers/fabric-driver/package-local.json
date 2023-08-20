@@ -23,10 +23,10 @@
         "@grpc/grpc-js": "1.9.0",
         "@hyperledger/cacti-weaver-protos-js": "file:./protos-js",
         "@hyperledger/cacti-weaver-sdk-fabric": "file:./cacti-weaver-sdk-fabric",
-        "@typescript-eslint/eslint-plugin": "5.54.1",
-        "@typescript-eslint/parser": "5.54.1",
+        "@typescript-eslint/eslint-plugin": "5.62.0",
+        "@typescript-eslint/parser": "5.62.0",
         "dotenv": "8.6.0",
-        "eslint-config-prettier": "8.9.0",
+        "eslint-config-prettier": "8.10.0",
         "eslint-plugin-prettier": "3.4.1",
         "fabric-ca-client": "2.2.18",
         "fabric-network": "2.2.18",
@@ -34,7 +34,7 @@
         "winston": "3.10.0"
     },
     "devDependencies": {
-        "@types/node": "16.11.7",
+        "@types/node": "16.18.41",
         "nodemon": "2.0.22",
         "patch-package": "6.5.1",
         "typedoc": "0.24.8",

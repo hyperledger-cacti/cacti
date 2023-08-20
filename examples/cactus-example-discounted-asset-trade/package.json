@@ -18,7 +18,7 @@
     "@hyperledger/cactus-cmd-socketio-server": "2.0.0-alpha.1",
     "@hyperledger/cactus-core-api": "2.0.0-alpha.1",
     "@hyperledger/cactus-verifier-client": "2.0.0-alpha.1",
-    "@types/node": "14.18.12",
+    "@types/node": "14.18.54",
     "axios": "0.24.0",
     "body-parser": "1.19.2",
     "cookie-parser": "1.4.6",
