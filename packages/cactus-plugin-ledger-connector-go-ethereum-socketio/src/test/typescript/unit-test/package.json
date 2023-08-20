@@ -9,7 +9,7 @@
     "copy-static-assets": "ts-node copyStaticAssets.ts"
   },
   "dependencies": {
-    "@types/node": "14.18.12",
+    "@types/node": "14.18.54",
     "config": "1.31.0",
     "ethereumjs-common": "1.5.2",
     "ethereumjs-tx": "2.1.2",

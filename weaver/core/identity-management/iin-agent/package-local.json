@@ -33,7 +33,7 @@
         "fabric-network": "2.2.18"
     },
     "devDependencies": {
-        "@types/node": "16.11.7",
+        "@types/node": "16.18.41",
         "chai": "4.3.7",
         "chai-as-promised": "7.1.1",
         "mocha": "5.2.0",

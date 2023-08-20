@@ -46,7 +46,7 @@
     "init": "cp -af ../../yarn.lock ./dist/yarn.lock"
   },
   "dependencies": {
-    "@types/node": "14.17.32",
+    "@types/node": "14.18.54",
     "body-parser": "1.17.2",
     "cbor": "6.0.1",
     "config": "3.3.7",
