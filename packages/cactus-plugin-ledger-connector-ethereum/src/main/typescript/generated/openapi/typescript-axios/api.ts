@@ -124,16 +124,10 @@ export interface DeployContractSolidityBytecodeJsonObjectV1Request {
     'web3SigningCredential': Web3SigningCredential;
     /**
      * 
-     * @type {number}
+     * @type {GasTransactionConfig}
      * @memberof DeployContractSolidityBytecodeJsonObjectV1Request
      */
-    'gas'?: number;
-    /**
-     * 
-     * @type {string}
-     * @memberof DeployContractSolidityBytecodeJsonObjectV1Request
-     */
-    'gasPrice'?: string;
+    'gasConfig'?: GasTransactionConfig;
     /**
      * The amount of milliseconds to wait for a transaction receipt with theaddress of the contract(which indicates successful deployment) beforegiving up and crashing.
      * @type {number}
@@ -191,16 +185,10 @@ export interface DeployContractSolidityBytecodeV1Request {
     'keychainId': string;
     /**
      * 
-     * @type {number}
+     * @type {GasTransactionConfig}
      * @memberof DeployContractSolidityBytecodeV1Request
      */
-    'gas'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof DeployContractSolidityBytecodeV1Request
-     */
-    'gasPrice'?: number;
+    'gasConfig'?: GasTransactionConfig;
     /**
      * 
      * @type {number}
@@ -281,8 +269,6 @@ export type EthContractInvocationWeb3Method = typeof EthContractInvocationWeb3Me
  * @interface EthereumTransactionConfig
  */
 export interface EthereumTransactionConfig {
-    [key: string]: any;
-
     /**
      * 
      * @type {string}
@@ -312,18 +298,6 @@ export interface EthereumTransactionConfig {
      * @type {string}
      * @memberof EthereumTransactionConfig
      */
-    'gas'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof EthereumTransactionConfig
-     */
-    'gasPrice'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof EthereumTransactionConfig
-     */
     'nonce'?: string;
     /**
      * 
@@ -331,6 +305,63 @@ export interface EthereumTransactionConfig {
      * @memberof EthereumTransactionConfig
      */
     'data'?: string;
+    /**
+     * 
+     * @type {GasTransactionConfig}
+     * @memberof EthereumTransactionConfig
+     */
+    'gasConfig'?: GasTransactionConfig;
+}
+/**
+ * @type GasTransactionConfig
+ * Transaction gas settings.
+ * @export
+ */
+export type GasTransactionConfig = GasTransactionConfigEIP1559 | GasTransactionConfigLegacy;
+
+/**
+ * Transaction gas settings in networks after EIP-1559 (London fork).
+ * @export
+ * @interface GasTransactionConfigEIP1559
+ */
+export interface GasTransactionConfigEIP1559 {
+    /**
+     * A maximum amount of gas a user is willing to provide for the execution of the transaction.
+     * @type {string}
+     * @memberof GasTransactionConfigEIP1559
+     */
+    'gasLimit'?: string;
+    /**
+     * A maximum fee (including the base fee and the tip) a user is willing to pay per unit of gas.
+     * @type {string}
+     * @memberof GasTransactionConfigEIP1559
+     */
+    'maxFeePerGas'?: string;
+    /**
+     * A maximum tip amount a user is willing to pay per unit of gas.
+     * @type {string}
+     * @memberof GasTransactionConfigEIP1559
+     */
+    'maxPriorityFeePerGas'?: string;
+}
+/**
+ * Transaction gas settings in networks before EIP-1559 (London fork).
+ * @export
+ * @interface GasTransactionConfigLegacy
+ */
+export interface GasTransactionConfigLegacy {
+    /**
+     * A maximum amount of gas a user is willing to provide for the execution of the transaction. (gasLimit)
+     * @type {string}
+     * @memberof GasTransactionConfigLegacy
+     */
+    'gas'?: string;
+    /**
+     * A price (in Wei) a user is willing to pay for each unit of gas used during the execution of the transaction. In EIP-1559 (London fork) networks, it will be set as both maxFeePerGas and maxPriorityFeePerGas.
+     * @type {string}
+     * @memberof GasTransactionConfigLegacy
+     */
+    'gasPrice'?: string;
 }
 /**
  * 
@@ -376,16 +407,10 @@ export interface InvokeContractJsonObjectV1Request {
     'value'?: string;
     /**
      * 
-     * @type {string}
+     * @type {GasTransactionConfig}
      * @memberof InvokeContractJsonObjectV1Request
      */
-    'gas'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof InvokeContractJsonObjectV1Request
-     */
-    'gasPrice'?: string;
+    'gasConfig'?: GasTransactionConfig;
     /**
      * 
      * @type {string}
@@ -451,16 +476,10 @@ export interface InvokeContractV1Request {
     'value'?: string;
     /**
      * 
-     * @type {string}
+     * @type {GasTransactionConfig}
      * @memberof InvokeContractV1Request
      */
-    'gas'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof InvokeContractV1Request
-     */
-    'gasPrice'?: string;
+    'gasConfig'?: GasTransactionConfig;
     /**
      * 
      * @type {string}
@@ -1521,7 +1540,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @summary Invokes a contract on a besu ledger
+         * @summary Invokes a contract on an ethereum ledger
          * @param {InvokeContractV1Request} [invokeContractV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1555,7 +1574,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @summary Invokes a contract on a besu ledger
+         * @summary Invokes a contract on an ethereum ledger
          * @param {InvokeContractJsonObjectV1Request} [invokeContractJsonObjectV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1733,7 +1752,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @summary Invokes a contract on a besu ledger
+         * @summary Invokes a contract on an ethereum ledger
          * @param {InvokeContractV1Request} [invokeContractV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1744,7 +1763,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @summary Invokes a contract on a besu ledger
+         * @summary Invokes a contract on an ethereum ledger
          * @param {InvokeContractJsonObjectV1Request} [invokeContractJsonObjectV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1827,7 +1846,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
-         * @summary Invokes a contract on a besu ledger
+         * @summary Invokes a contract on an ethereum ledger
          * @param {InvokeContractV1Request} [invokeContractV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1837,7 +1856,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
-         * @summary Invokes a contract on a besu ledger
+         * @summary Invokes a contract on an ethereum ledger
          * @param {InvokeContractJsonObjectV1Request} [invokeContractJsonObjectV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -1922,7 +1941,7 @@ export class DefaultApi extends BaseAPI {
 
     /**
      * 
-     * @summary Invokes a contract on a besu ledger
+     * @summary Invokes a contract on an ethereum ledger
      * @param {InvokeContractV1Request} [invokeContractV1Request] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -1934,7 +1953,7 @@ export class DefaultApi extends BaseAPI {
 
     /**
      * 
-     * @summary Invokes a contract on a besu ledger
+     * @summary Invokes a contract on an ethereum ledger
      * @param {InvokeContractJsonObjectV1Request} [invokeContractJsonObjectV1Request] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}

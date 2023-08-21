@@ -1,5 +1,7 @@
 import "jest-extended";
 import {
+  isGasTransactionConfigEIP1559,
+  isGasTransactionConfigLegacy,
   isWeb3SigningCredentialGethKeychainPassword,
   isWeb3SigningCredentialNone,
   isWeb3SigningCredentialPrivateKeyHex,
@@ -41,5 +43,65 @@ describe("Type guards for OpenAPI spec model type definitions", () => {
 
     expect(isWeb3SigningCredentialNone(valid)).toBe(true);
     expect(isWeb3SigningCredentialNone({})).not.toBe(true);
+  });
+
+  test("isGasTransactionConfigLegacy()", () => {
+    expect(
+      isGasTransactionConfigLegacy({
+        gas: "1234",
+      }),
+    ).toBe(true);
+    expect(
+      isGasTransactionConfigLegacy({
+        gasPrice: "1234",
+      }),
+    ).toBe(true);
+
+    expect(
+      isGasTransactionConfigLegacy({
+        gasLimit: "1234",
+      }),
+    ).toBe(false);
+    expect(
+      isGasTransactionConfigLegacy({
+        maxFeePerGas: "1234",
+      }),
+    ).toBe(false);
+    expect(
+      isGasTransactionConfigLegacy({
+        maxPriorityFeePerGas: "1234",
+      }),
+    ).toBe(false);
+    expect(isGasTransactionConfigLegacy({})).toBe(false);
+  });
+
+  test("isGasTransactionConfigEIP1559()", () => {
+    expect(
+      isGasTransactionConfigEIP1559({
+        gasLimit: "1234",
+      }),
+    ).toBe(true);
+    expect(
+      isGasTransactionConfigEIP1559({
+        maxFeePerGas: "1234",
+      }),
+    ).toBe(true);
+    expect(
+      isGasTransactionConfigEIP1559({
+        maxPriorityFeePerGas: "1234",
+      }),
+    ).toBe(true);
+
+    expect(
+      isGasTransactionConfigEIP1559({
+        gas: "1234",
+      }),
+    ).toBe(false);
+    expect(
+      isGasTransactionConfigEIP1559({
+        gasPrice: "1234",
+      }),
+    ).toBe(false);
+    expect(isGasTransactionConfigEIP1559({})).toBe(false);
   });
 });

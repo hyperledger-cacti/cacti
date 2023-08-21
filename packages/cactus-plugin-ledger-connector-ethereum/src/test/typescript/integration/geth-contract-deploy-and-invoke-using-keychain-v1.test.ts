@@ -18,8 +18,7 @@ import http from "http";
 import { v4 as uuidV4 } from "uuid";
 import { AddressInfo } from "net";
 import { Server as SocketIoServer } from "socket.io";
-import Web3 from "web3";
-import { Web3Account } from "web3-eth-accounts";
+import Web3, { HexString } from "web3";
 
 import {
   LogLevelDesc,
@@ -54,7 +53,10 @@ const containerImageVersion = "2023-07-27-2a8c48ed6";
 
 describe("Ethereum contract deploy and invoke using keychain tests", () => {
   const keychainEntryKey = uuidV4();
-  let testEthAccount: Web3Account,
+  let testEthAccount: {
+      address: HexString;
+      privateKey: HexString;
+    },
     web3: Web3,
     addressInfo,
     address: string,
@@ -175,7 +177,6 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
         secret: "",
         type: Web3SigningCredentialType.GethKeychainPassword,
       },
-      gas: 1000000,
     });
     expect(deployOut).toBeTruthy();
     expect(deployOut.data).toBeTruthy();
@@ -196,7 +197,6 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
         secret: "",
         type: Web3SigningCredentialType.GethKeychainPassword,
       },
-      gas: "1000000",
     });
     expect(invokeOut).toBeTruthy();
     expect(invokeOut.data).toBeTruthy();
@@ -213,7 +213,6 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
         secret: "",
         type: Web3SigningCredentialType.GethKeychainPassword,
       },
-      gas: 1000000,
       constructorArgs: ["Johnny"],
     });
     expect(deployOut).toBeTruthy();
@@ -231,7 +230,6 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
           secret: "",
           type: Web3SigningCredentialType.GethKeychainPassword,
         },
-        gas: 1000000,
       } as DeployContractSolidityBytecodeV1Request);
       fail(
         "Expected deployContractSolBytecodeV1 call to fail but it succeeded.",
@@ -292,7 +290,6 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
         methodName: "setName",
         keychainId: keychainPlugin.getKeychainId(),
         params: [newName],
-        gas: "1000000",
         web3SigningCredential: {
           ethAccount: WHALE_ACCOUNT_ADDRESS,
           secret: "",
@@ -385,6 +382,7 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
   });
 
   test("invoke Web3SigningCredentialType.PrivateKeyHex", async () => {
+    const priorityFee = web3.utils.toWei(2, "gwei");
     const nonce = await web3.eth.getTransactionCount(testEthAccount.address);
     const newName = `DrCactus${uuidV4()}`;
     const setNameOut = await apiClient.invokeContractV1({
@@ -393,6 +391,9 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
       methodName: "setName",
       keychainId: keychainPlugin.getKeychainId(),
       params: [newName],
+      gasConfig: {
+        maxPriorityFeePerGas: priorityFee,
+      },
       web3SigningCredential: {
         ethAccount: testEthAccount.address,
         secret: testEthAccount.privateKey,
@@ -410,7 +411,9 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
         methodName: "setName",
         keychainId: keychainPlugin.getKeychainId(),
         params: [newName],
-        gas: "1000000",
+        gasConfig: {
+          maxPriorityFeePerGas: priorityFee,
+        },
         web3SigningCredential: {
           ethAccount: testEthAccount.address,
           secret: testEthAccount.privateKey,
@@ -429,7 +432,6 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
       methodName: "getName",
       keychainId: keychainPlugin.getKeychainId(),
       params: [],
-      gas: "1000000",
       web3SigningCredential: {
         ethAccount: testEthAccount.address,
         secret: testEthAccount.privateKey,
@@ -445,6 +447,7 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
   test("invoke Web3SigningCredentialType.CactusKeychainRef", async () => {
     const newName = `DrCactus${uuidV4()}`;
     const nonce = await web3.eth.getTransactionCount(testEthAccount.address);
+    const priorityFee = web3.utils.toWei(2, "gwei");
 
     const web3SigningCredential: Web3SigningCredentialCactusKeychainRef = {
       ethAccount: testEthAccount.address,
@@ -460,7 +463,9 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
       methodName: "setName",
       keychainId: keychainPlugin.getKeychainId(),
       params: [newName],
-      gas: "1000000",
+      gasConfig: {
+        maxPriorityFeePerGas: priorityFee,
+      },
       web3SigningCredential,
       nonce: nonce.toString(),
     });
@@ -474,7 +479,9 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
         methodName: "setName",
         keychainId: keychainPlugin.getKeychainId(),
         params: [newName],
-        gas: "1000000",
+        gasConfig: {
+          maxPriorityFeePerGas: priorityFee,
+        },
         web3SigningCredential: {
           ethAccount: WHALE_ACCOUNT_ADDRESS,
           secret: "",
@@ -493,7 +500,6 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
       methodName: "getName",
       keychainId: keychainPlugin.getKeychainId(),
       params: [],
-      gas: "1000000",
       web3SigningCredential,
     });
     expect(invokeGetNameOut).toBeTruthy();

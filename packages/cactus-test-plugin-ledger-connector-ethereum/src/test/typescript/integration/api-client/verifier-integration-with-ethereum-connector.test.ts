@@ -249,7 +249,6 @@ describe("Verifier integration with ethereum connector tests", () => {
           secret: "",
           type: Web3SigningCredentialType.GethKeychainPassword,
         },
-        gas: 1000000,
       });
       expect(deployOut).toBeTruthy();
       expect(deployOut.transactionReceipt).toBeTruthy();
@@ -415,7 +414,7 @@ describe("Verifier integration with ethereum connector tests", () => {
         contractCommon.abi,
         contractCommon.address,
       );
-      const methodRef = web3Contract.methods.setName as (
+      const methodRef = web3Contract.methods.setName as unknown as (
         ...args: unknown[]
       ) => PayableMethodObject;
       const web3Encode = methodRef(...methodEncode.params).encodeABI();
@@ -445,7 +444,7 @@ describe("Verifier integration with ethereum connector tests", () => {
         contractCommon.abi,
         contractCommon.address,
       );
-      const methodRef = web3Contract.methods.setName as (
+      const methodRef = web3Contract.methods.setName as unknown as (
         ...args: unknown[]
       ) => PayableMethodObject;
       const web3Encode = await methodRef(

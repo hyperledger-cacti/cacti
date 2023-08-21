@@ -5,13 +5,14 @@ import type {
 
 import { Express } from "express";
 import Web3, {
-  ContractAbi,
+  Contract,
   HttpProvider,
+  Transaction,
   TransactionReceiptBase,
   WebSocketProvider,
 } from "web3";
 import { NewHeadsSubscription } from "web3-eth";
-import { Contract, PayableMethodObject } from "web3-eth-contract";
+import { PayableMethodObject } from "web3-eth-contract";
 
 import OAS from "../json/openapi.json";
 
@@ -58,6 +59,7 @@ import {
   WatchBlocksV1Options,
   InvokeRawWeb3EthMethodV1Request,
   InvokeRawWeb3EthContractV1Request,
+  EthereumTransactionConfig,
 } from "./generated/openapi/typescript-axios";
 
 import { RunTransactionEndpoint } from "./web-services/run-transaction-endpoint";
@@ -68,7 +70,11 @@ import { GetPrometheusExporterMetricsEndpointV1 } from "./web-services/get-prome
 import { InvokeRawWeb3EthMethodEndpoint } from "./web-services/invoke-raw-web3eth-method-v1-endpoint";
 import { InvokeRawWeb3EthContractEndpoint } from "./web-services/invoke-raw-web3eth-contract-v1-endpoint";
 
-import { isWeb3SigningCredentialNone } from "./types/model-type-guards";
+import {
+  isGasTransactionConfigEIP1559,
+  isGasTransactionConfigLegacy,
+  isWeb3SigningCredentialNone,
+} from "./types/model-type-guards";
 import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
 import { RuntimeError } from "run-time-error";
 import {
@@ -482,7 +488,7 @@ export class PluginLedgerConnectorEthereum
         "Can't estimate maxFeePerGas - could not get recent baseFeePerGas",
       );
     }
-    const estimate = BigInt(2) * baseFee + BigInt(priorityFee);
+    const estimate = baseFee + BigInt(priorityFee);
     return estimate.toString();
   }
 
@@ -507,7 +513,7 @@ export class PluginLedgerConnectorEthereum
     const contractInstance = new this.web3.eth.Contract(abi, contractAddress);
 
     const isSafeToCall = await this.isSafeToCallContractMethod(
-      contractInstance as unknown as Contract<ContractAbi>,
+      contractInstance,
       req.methodName,
     );
     if (!isSafeToCall) {
@@ -535,18 +541,10 @@ export class PluginLedgerConnectorEthereum
         | Web3SigningCredentialPrivateKeyHex
         | Web3SigningCredentialCactusKeychainRef;
 
-      if (!req.gas) {
-        const estimatedGas = await method.estimateGas();
-        req.gas = estimatedGas.toString();
-      }
-
-      const maxFeePerGas = await this.estimateMaxFeePerGas();
       const transactionConfig = {
         from: web3SigningCredential.ethAccount,
         to: contractAddress,
-        maxPriorityFeePerGas: req.gasPrice ?? 0,
-        maxFeePerGas,
-        gasLimit: req.gas,
+        gasConfig: req.gasConfig,
         value: req.value,
         nonce: req.nonce,
         data: method.encodeABI(),
@@ -638,7 +636,7 @@ export class PluginLedgerConnectorEthereum
 
     try {
       const txHash = await this.web3.eth.personal.sendTransaction(
-        transactionConfig,
+        await this.getTransactionFromTxConfig(transactionConfig),
         secret,
       );
       const transactionReceipt = await this.pollForTxReceipt(txHash);
@@ -665,7 +663,7 @@ export class PluginLedgerConnectorEthereum
       web3SigningCredential as Web3SigningCredentialPrivateKeyHex;
 
     const signedTx = await this.web3.eth.accounts.signTransaction(
-      transactionConfig,
+      await this.getTransactionFromTxConfig(transactionConfig),
       secret,
     );
 
@@ -697,18 +695,6 @@ export class PluginLedgerConnectorEthereum
     // Now use the found keychain plugin to actually perform the lookup of
     // the private key that we need to run the transaction.
     const privateKeyHex = await keychainPlugin?.get(keychainEntryKey as string);
-
-    if (!transactionConfig.gas) {
-      this.log.debug(
-        `${fnTag} Gas not specified in the transaction values. Using the estimate from web3`,
-      );
-      const estimatedGas = await this.web3.eth.estimateGas(transactionConfig);
-      transactionConfig.gas = estimatedGas.toString();
-      this.log.debug(
-        `${fnTag} Gas estimated from web3 is: `,
-        transactionConfig.gas,
-      );
-    }
 
     return this.transactPrivateKey({
       transactionConfig,
@@ -773,8 +759,7 @@ export class PluginLedgerConnectorEthereum
       transactionConfig: {
         data: bytecode,
         from: web3SigningCredential.ethAccount,
-        gas: req.gas,
-        gasPrice: req.gasPrice,
+        gasConfig: req.gasConfig,
       },
       web3SigningCredential,
     });
@@ -901,7 +886,7 @@ export class PluginLedgerConnectorEthereum
     const contract = new this.web3.eth.Contract(args.abi, args.address);
 
     const isSafeToCall = await this.isSafeToCallContractMethod(
-      contract as unknown as Contract<ContractAbi>,
+      contract,
       args.contractMethod,
     );
     if (!isSafeToCall) {
@@ -916,5 +901,62 @@ export class PluginLedgerConnectorEthereum
     return methodRef(...contractMethodArgs)[args.invocationType](
       args.invocationParams,
     );
+  }
+
+  /**
+   * Convert connector transaction config to web3js transaction object.
+   * @param txConfig connector transaction config
+   * @returns web3js transaction
+   */
+  private async getTransactionFromTxConfig(
+    txConfig: EthereumTransactionConfig,
+  ): Promise<Transaction> {
+    const tx: Transaction = {
+      from: txConfig.from,
+      to: txConfig.to,
+      value: txConfig.value,
+      nonce: txConfig.nonce,
+      data: txConfig.data,
+    };
+
+    // Apply gas config to the transaction
+    if (txConfig.gasConfig) {
+      if (isGasTransactionConfigLegacy(txConfig.gasConfig)) {
+        if (isGasTransactionConfigEIP1559(txConfig.gasConfig)) {
+          throw new RuntimeError(
+            `Detected mixed gasConfig! Use either legacy or EIP-1559 mode. gasConfig - ${JSON.stringify(
+              txConfig.gasConfig,
+            )}`,
+          );
+        }
+        tx.maxPriorityFeePerGas = txConfig.gasConfig.gasPrice;
+        tx.maxFeePerGas = txConfig.gasConfig.gasPrice;
+        tx.gasLimit = txConfig.gasConfig.gas;
+      } else {
+        tx.maxPriorityFeePerGas = txConfig.gasConfig.maxPriorityFeePerGas;
+        tx.maxFeePerGas = txConfig.gasConfig.maxFeePerGas;
+        tx.gasLimit = txConfig.gasConfig.gasLimit;
+      }
+    }
+
+    if (tx.maxPriorityFeePerGas && !tx.maxFeePerGas) {
+      tx.maxFeePerGas = await this.estimateMaxFeePerGas(
+        tx.maxPriorityFeePerGas.toString(),
+      );
+      this.log.info(
+        `Estimated maxFeePerGas of ${tx.maxFeePerGas} becuase maxPriorityFeePerGas was provided.`,
+      );
+    }
+
+    // Fill missing gas fields (do it last)
+    if (!tx.gasLimit) {
+      const estimatedGas = await this.web3.eth.estimateGas(tx);
+      this.log.debug(
+        `Gas not specified in the transaction values, estimated ${estimatedGas.toString()}`,
+      );
+      tx.gasLimit = estimatedGas;
+    }
+
+    return tx;
   }
 }

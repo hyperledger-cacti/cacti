@@ -83,8 +83,6 @@ describe("Alchemy integration manual tests", () => {
         secret: ETH_PRIVATE_KEY,
         type: Web3SigningCredentialType.PrivateKeyHex,
       },
-      gas: 300000,
-      gasPrice: 400000,
     });
     expect(deployOut).toBeTruthy();
     expect(deployOut.transactionReceipt).toBeTruthy();
@@ -109,7 +107,6 @@ describe("Alchemy integration manual tests", () => {
         secret: ETH_PRIVATE_KEY,
         type: Web3SigningCredentialType.PrivateKeyHex,
       },
-      gas: "300000",
     });
     expect(invokeOut).toBeTruthy();
     expect(invokeOut.callOutput).toBeTruthy();

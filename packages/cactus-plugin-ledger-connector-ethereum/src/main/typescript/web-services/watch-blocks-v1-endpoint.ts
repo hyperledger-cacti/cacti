@@ -119,6 +119,6 @@ export class WatchBlocksV1Endpoint {
     });
 
     log.debug("Subscribing to Web3 new block headers event...");
-    return newBlocksSubscription as unknown as NewHeadsSubscription;
+    return newBlocksSubscription as NewHeadsSubscription;
   }
 }

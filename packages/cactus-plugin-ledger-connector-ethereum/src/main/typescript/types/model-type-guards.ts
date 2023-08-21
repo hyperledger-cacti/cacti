@@ -1,4 +1,7 @@
 import {
+  GasTransactionConfig,
+  GasTransactionConfigEIP1559,
+  GasTransactionConfigLegacy,
   Web3SigningCredentialCactusKeychainRef,
   Web3SigningCredentialGethKeychainPassword,
   Web3SigningCredentialNone,
@@ -38,5 +41,26 @@ export function isWeb3SigningCredentialCactusKeychainRef(x?: {
     !!x?.keychainId &&
     typeof x?.keychainId === "string" &&
     x?.keychainId.trim().length > 0
+  );
+}
+
+export function isGasTransactionConfigLegacy(
+  gasConfig: GasTransactionConfig,
+): gasConfig is GasTransactionConfigLegacy {
+  const typedGasConfig = gasConfig as GasTransactionConfigLegacy;
+  return (
+    typeof typedGasConfig.gas !== "undefined" ||
+    typeof typedGasConfig.gasPrice !== "undefined"
+  );
+}
+
+export function isGasTransactionConfigEIP1559(
+  gasConfig: GasTransactionConfig,
+): gasConfig is GasTransactionConfigEIP1559 {
+  const typedGasConfig = gasConfig as GasTransactionConfigEIP1559;
+  return (
+    typeof typedGasConfig.gasLimit !== "undefined" ||
+    typeof typedGasConfig.maxFeePerGas !== "undefined" ||
+    typeof typedGasConfig.maxPriorityFeePerGas !== "undefined"
   );
 }

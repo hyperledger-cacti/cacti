@@ -207,10 +207,59 @@
           }
         }
       },
+      "GasTransactionConfigLegacy": {
+        "type": "object",
+        "description": "Transaction gas settings in networks before EIP-1559 (London fork).",
+        "required": [],
+        "properties": {
+          "gas": {
+            "type": "string",
+            "description": "A maximum amount of gas a user is willing to provide for the execution of the transaction. (gasLimit)"
+          },
+          "gasPrice": {
+            "type": "string",
+            "description": "A price (in Wei) a user is willing to pay for each unit of gas used during the execution of the transaction. In EIP-1559 (London fork) networks, it will be set as both maxFeePerGas and maxPriorityFeePerGas."
+          }
+        }
+      },
+      "GasTransactionConfigEIP1559": {
+        "type": "object",
+        "description": "Transaction gas settings in networks after EIP-1559 (London fork).",
+        "required": [],
+        "properties": {
+          "gasLimit": {
+            "type": "string",
+            "description": "A maximum amount of gas a user is willing to provide for the execution of the transaction.",
+            "nullable": false
+          },
+          "maxFeePerGas": {
+            "type": "string",
+            "description": "A maximum fee (including the base fee and the tip) a user is willing to pay per unit of gas.",
+            "nullable": false
+          },
+          "maxPriorityFeePerGas": {
+            "type": "string",
+            "description": "A maximum tip amount a user is willing to pay per unit of gas.",
+            "nullable": false
+          }
+        }
+      },
+      "GasTransactionConfig": {
+        "type": "object",
+        "description": "Transaction gas settings.",
+        "required": [],
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/GasTransactionConfigLegacy"
+          },
+          {
+            "$ref": "#/components/schemas/GasTransactionConfigEIP1559"
+          }
+        ]
+      },
       "EthereumTransactionConfig": {
         "type": "object",
         "required": [],
-        "additionalProperties": true,
         "properties": {
           "rawTransaction": {
             "type": "string",
@@ -225,17 +274,15 @@
           "value": {
             "type": "string"
           },
-          "gas": {
-            "type": "string"
-          },
-          "gasPrice": {
-            "type": "string"
-          },
           "nonce": {
             "type": "string"
           },
           "data": {
             "type": "string"
+          },
+          "gasConfig": {
+            "$ref": "#/components/schemas/GasTransactionConfig",
+            "nullable": false
           }
         }
       },
@@ -450,12 +497,8 @@
             "maxLength": 100,
             "nullable": false
           },
-          "gas": {
-            "type": "number",
-            "nullable": false
-          },
-          "gasPrice": {
-            "type": "number",
+          "gasConfig": {
+            "$ref": "#/components/schemas/GasTransactionConfig",
             "nullable": false
           },
           "nonce": {
@@ -504,12 +547,8 @@
             "$ref": "#/components/schemas/Web3SigningCredential",
             "nullable": false
           },
-          "gas": {
-            "type": "number",
-            "nullable": false
-          },
-          "gasPrice": {
-            "type": "string",
+          "gasConfig": {
+            "$ref": "#/components/schemas/GasTransactionConfig",
             "nullable": false
           },
           "timeoutMs": {
@@ -574,11 +613,9 @@
           "value": {
             "type": "string"
           },
-          "gas": {
-            "type": "string"
-          },
-          "gasPrice": {
-            "type": "string"
+          "gasConfig": {
+            "$ref": "#/components/schemas/GasTransactionConfig",
+            "nullable": false
           },
           "nonce": {
             "type": "string"
@@ -640,11 +677,9 @@
           "value": {
             "type": "string"
           },
-          "gas": {
-            "type": "string"
-          },
-          "gasPrice": {
-            "type": "string"
+          "gasConfig": {
+            "$ref": "#/components/schemas/GasTransactionConfig",
+            "nullable": false
           },
           "nonce": {
             "type": "string"
@@ -799,12 +834,7 @@
       },
       "Web3BlockHeader": {
         "type": "object",
-        "required": [
-          "sha3Uncles",
-          "transactionRoot",
-          "gasLimit",
-          "gasUsed"
-        ],
+        "required": ["sha3Uncles", "transactionRoot", "gasLimit", "gasUsed"],
         "properties": {
           "number": {
             "type": "string"
@@ -1145,7 +1175,7 @@
           }
         },
         "operationId": "invokeContractV1",
-        "summary": "Invokes a contract on a besu ledger",
+        "summary": "Invokes a contract on an ethereum ledger",
         "parameters": [],
         "requestBody": {
           "content": {
@@ -1179,7 +1209,7 @@
           }
         },
         "operationId": "invokeContractV1NoKeychain",
-        "summary": "Invokes a contract on a besu ledger",
+        "summary": "Invokes a contract on an ethereum ledger",
         "parameters": [],
         "requestBody": {
           "content": {
