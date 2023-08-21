@@ -1,4 +1,3 @@
-.openapi-generator-ignore
 README.md
 models/health_check_response_pb.proto
 models/memory_usage_pb.proto

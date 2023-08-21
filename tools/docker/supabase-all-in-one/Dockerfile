@@ -1,4 +1,4 @@
-FROM docker:20.10.21-dind
+FROM docker:24.0.2-dind
 
 ARG SUPABSE_TAG="v0.22.10"
 

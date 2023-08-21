@@ -29,7 +29,7 @@
   "author": {
     "name": "Hyperledger Cactus Contributors",
     "email": "cactus@lists.hyperledger.org",
-    "url": "https://www.hyperledger.org/use/cactus"
+    "url": "https://www.hyperledger.org/use/cacti"
   },
   "contributors": [
     {
@@ -56,8 +56,9 @@
     "@hyperledger/cactus-plugin-ledger-connector-corda": "2.0.0-alpha.1",
     "@hyperledger/cactus-plugin-ledger-connector-fabric": "2.0.0-alpha.1",
     "@hyperledger/cactus-plugin-ledger-connector-iroha": "2.0.0-alpha.1",
+    "@hyperledger/cactus-plugin-ledger-connector-iroha2": "2.0.0-alpha.1",
     "@hyperledger/cactus-plugin-ledger-connector-quorum": "2.0.0-alpha.1",
-    "jest-extended": "0.11.5",
+    "jest-extended": "4.0.1",
     "rxjs": "7.8.1"
   }
 }

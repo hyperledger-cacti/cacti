@@ -9,6 +9,9 @@ import express from "express";
 
 import {
   Containers,
+  DEFAULT_FABRIC_2_AIO_FABRIC_VERSION,
+  DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
+  DEFAULT_FABRIC_2_AIO_IMAGE_VERSION,
   FabricTestLedgerV1,
   pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
@@ -59,10 +62,10 @@ describe(testCase, () => {
     emitContainerLogs: true,
     publishAllPorts: true,
     logLevel,
-    imageName: "ghcr.io/hyperledger/cactus-fabric2-all-in-one",
-    imageVersion: "2021-09-02--fix-876-supervisord-retries",
+    imageName: DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
+    imageVersion: DEFAULT_FABRIC_2_AIO_IMAGE_VERSION,
     envVars: new Map([
-      ["FABRIC_VERSION", "2.2.0"],
+      ["FABRIC_VERSION", DEFAULT_FABRIC_2_AIO_FABRIC_VERSION],
       ["CA_VERSION", "1.4.9"],
     ]),
   });
@@ -93,7 +96,7 @@ describe(testCase, () => {
   });
 
   beforeAll(async () => {
-    await ledger.start();
+    await ledger.start({ omitPull: false });
 
     const listenOptions: IListenOptions = {
       hostname: "localhost",
@@ -225,8 +228,8 @@ describe(testCase, () => {
       const assets = JSON.parse(res.data.functionOutput);
       const asset277 = assets.find((c: { ID: string }) => c.ID === assetId);
       expect(asset277).toBeTruthy();
-      expect(asset277.owner).toBeTruthy();
-      expect(asset277.owner).toEqual(assetOwner);
+      expect(asset277.Owner).toBeTruthy();
+      expect(asset277.Owner).toEqual(assetOwner);
     }
 
     {
@@ -299,8 +302,8 @@ describe(testCase, () => {
       const assets = JSON.parse(res.data.functionOutput);
       const asset277 = assets.find((c: { ID: string }) => c.ID === assetId);
       expect(asset277).toBeTruthy();
-      expect(asset277.owner).toBeTruthy();
-      expect(asset277.owner).toEqual(assetOwner);
+      expect(asset277.Owner).toBeTruthy();
+      expect(asset277.Owner).toEqual(assetOwner);
     }
   });
 });

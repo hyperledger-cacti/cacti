@@ -11,6 +11,9 @@
       "path": "./packages/cactus-cmd-socketio-server/tsconfig.json"
     },
     {
+      "path": "./packages/cacti-cmd-gui-app/tsconfig.json"
+    },
+    {
       "path": "./packages/cactus-common/tsconfig.json"
     },
     {
@@ -65,7 +68,13 @@
       "path": "./packages/cactus-plugin-ledger-connector-go-ethereum-socketio/tsconfig.json"
     },
     {
+      "path": "./packages/cactus-plugin-ledger-connector-cdl-socketio/tsconfig.json"
+    },
+    {
       "path": "./packages/cactus-plugin-ledger-connector-iroha/tsconfig.json"
+    },
+    {
+      "path": "./packages/cactus-plugin-ledger-connector-tcs-huawei-socketio/tsconfig.json"
     },
     {
       "path": "./packages/cactus-plugin-ledger-connector-xdai/tsconfig.json"
@@ -125,6 +134,9 @@
       "path": "./examples/cactus-example-supply-chain-frontend/tsconfig.json"
     },
     {
+      "path": "./examples/cactus-example-tcs-huawei/tsconfig.json"
+    },
+    {
       "path": "./packages/cactus-plugin-odap-hermes/tsconfig.json"
     },
     {
@@ -132,6 +144,9 @@
     },
     {
       "path": "./examples/cactus-example-discounted-asset-trade/tsconfig.json"
+    },
+    {
+      "path": "./examples/cactus-example-cbdc-bridging-backend/tsconfig.json"
     },
     {
       "path": "./extensions/cactus-plugin-object-store-ipfs/tsconfig.json"

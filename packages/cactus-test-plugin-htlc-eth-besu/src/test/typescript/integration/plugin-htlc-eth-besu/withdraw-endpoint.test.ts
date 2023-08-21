@@ -40,6 +40,11 @@ import HashTimeLockJSON from "../../../../../../cactus-plugin-htlc-eth-besu/src/
 const connectorId = uuidv4();
 const logLevel: LogLevelDesc = "INFO";
 
+const FORTY_TWO_AS_HEX_STRING =
+  "0x0000000000000000000000000000000000000000000000000000000000003432";
+const FORTY_TWO_KECCAK_256 =
+  "0xf0095bab87a78fd2afa113b903c90a72ba1fd22c44f55b66cf409390814dfb69";
+
 const testCase = "Test withdraw";
 
 describe(testCase, () => {
@@ -172,7 +177,7 @@ describe(testCase, () => {
       inputAmount: 10,
       outputAmount: 0x04,
       expiration: DataTest.expiration,
-      hashLock: DataTest.hashLock,
+      hashLock: FORTY_TWO_KECCAK_256,
       receiver: DataTest.receiver,
       outputNetwork: "BTC",
       outputAddress: "1AcVYm7M3kkJQH28FXAvyBFQzFRL6xPKu8",
@@ -195,7 +200,7 @@ describe(testCase, () => {
         firstHighNetWorthAccount,
         DataTest.receiver,
         10,
-        DataTest.hashLock,
+        FORTY_TWO_KECCAK_256,
         DataTest.expiration,
       ],
     });
@@ -203,8 +208,7 @@ describe(testCase, () => {
     // Test for 200 valid response test case
     const bodyWithdraw: WithdrawReq = {
       id: callOutput,
-      secret:
-        "0x3853485acd2bfc3c632026ee365279743af107a30492e3ceaa7aefc30c2a048a",
+      secret: FORTY_TWO_AS_HEX_STRING,
       web3SigningCredential,
       connectorId,
       keychainId,

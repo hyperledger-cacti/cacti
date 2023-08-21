@@ -44,7 +44,7 @@ exports.convNum = function convNum(value: number | string, defaultValue: number 
       break;
   } // switch(typeof(defaultValue))
 
-  if (defValue == NaN) {
+  if (Number.isNaN(defValue)) {
     // number is guaranteed.
     defValue = 0;
   }
@@ -63,7 +63,7 @@ exports.convNum = function convNum(value: number | string, defaultValue: number 
       break;
   } // switch(typeof(value))
 
-  if (retValue == NaN) {
+  if (Number.isNaN(retValue)) {
     // number is guaranteed.
     retValue = defValue;
   }

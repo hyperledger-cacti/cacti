@@ -17,7 +17,7 @@ import {
 import { OdapMessageType, PluginOdapGateway } from "../plugin-odap-gateway";
 
 export class ServerGatewayHelper {
-  public static readonly CLASS_NAME = "ServerGatewayHelper";
+  public static readonly CLASS_NAME: string = "ServerGatewayHelper";
   private _log: Logger;
 
   constructor() {

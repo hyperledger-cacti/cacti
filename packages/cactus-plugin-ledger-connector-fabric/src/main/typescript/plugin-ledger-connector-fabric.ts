@@ -3,6 +3,7 @@ import path from "path";
 
 import { Certificate } from "@fidm/x509";
 import { Express } from "express";
+import { RuntimeError } from "run-time-error";
 import "multer";
 import temp from "temp";
 import {
@@ -123,6 +124,7 @@ import {
 } from "./common/get-transaction-receipt-by-tx-id";
 import { GetBlockEndpointV1 } from "./get-block/get-block-endpoint-v1";
 import { querySystemChainCode } from "./common/query-system-chain-code";
+import { isSshExecOk } from "./common/is-ssh-exec-ok";
 
 /**
  * Constant value holding the default $GOPATH in the Fabric CLI container as
@@ -148,6 +150,7 @@ export interface IPluginLedgerConnectorFabricOptions
   cliContainerEnv: NodeJS.ProcessEnv;
   pluginRegistry: PluginRegistry;
   sshConfig: SshConfig;
+  readonly sshDebugOn?: boolean;
   connectionProfile: ConnectionProfile;
   prometheusExporter?: PrometheusExporter;
   discoveryOptions?: GatewayDiscoveryOptions;
@@ -178,6 +181,7 @@ export class PluginLedgerConnectorFabric
   private endpoints: IWebServiceEndpoint[] | undefined;
   private readonly secureIdentity: SecureIdentityProviders;
   private readonly certStore: CertDatastore;
+  private readonly sshDebugOn: boolean;
   private runningWatchBlocksMonitors = new Set<WatchBlocksV1Endpoint>();
 
   public get className(): string {
@@ -225,6 +229,11 @@ export class PluginLedgerConnectorFabric
       webSocketConfig: opts.webSocketConfig,
     });
     this.certStore = new CertDatastore(opts.pluginRegistry);
+
+    this.sshDebugOn = opts.sshDebugOn === true;
+    if (this.sshDebugOn) {
+      this.opts.sshConfig = this.enableSshDebugLogs(this.opts.sshConfig);
+    }
   }
 
   public getOpenApiSpec(): unknown {
@@ -268,6 +277,16 @@ export class PluginLedgerConnectorFabric
 
     return consensusHasTransactionFinality(currentConsensusAlgorithmFamily);
   }
+
+  private enableSshDebugLogs(cfg: SshConfig): SshConfig {
+    const fnTag = `${this.className}#decorateSshConfigWithLogger()`;
+    Checks.truthy(cfg, `${fnTag} cfg must be truthy.`);
+    return {
+      ...cfg,
+      debug: (msg: unknown) => this.log.debug(`[NodeSSH] %o`, msg),
+    };
+  }
+
   private async sshExec(
     cmd: string,
     label: string,
@@ -276,8 +295,13 @@ export class PluginLedgerConnectorFabric
   ): Promise<SSHExecCommandResponse> {
     this.log.debug(`${label} CMD: ${cmd}`);
     const cmdRes = await ssh.execCommand(cmd, sshCmdOptions);
-    this.log.debug(`${label} CMD Response: %o`, cmdRes);
-    Checks.truthy(cmdRes.code === null, `${label} cmdRes.code === null`);
+    this.log.debug(`${label} CMD Response .code: %o`, cmdRes.code);
+    this.log.debug(`${label} CMD Response .signal: %o`, cmdRes.signal);
+    this.log.debug(`${label} CMD Response .stderr: %s`, cmdRes.stderr);
+    this.log.debug(`${label} CMD Response .stdout: %s`, cmdRes.stdout);
+    if (cmdRes.code !== null && cmdRes.code !== 0) {
+      throw new RuntimeError(`Expected ${label} cmdRes.code as null or 0`);
+    }
     return cmdRes;
   }
 
@@ -292,7 +316,10 @@ export class PluginLedgerConnectorFabric
     const { log, opts } = this;
 
     const ssh = new NodeSSH();
+    this.log.debug(`${fnTag} Establishing SSH connection to peer...`);
     await ssh.connect(opts.sshConfig);
+    this.log.debug(`${fnTag} Established SSH connection to peer OK.`);
+
     if (req.collectionsConfigFile) {
       log.debug(`Has private data collection definition`);
     }
@@ -569,7 +596,7 @@ export class PluginLedgerConnectorFabric
       {
         const res = await this.sshExec(commitCmd, "Commit", ssh, sshCmdOptions);
         lifecycle.commit = res;
-        success = success && res.code === null;
+        success = success && isSshExecOk(res);
       }
 
       {
@@ -781,7 +808,7 @@ export class PluginLedgerConnectorFabric
       );
 
       log.debug(`Instantiate CMD Response:%o`, instantiationCommandResponse);
-      success = success && instantiationCommandResponse.code === null;
+      success = success && isSshExecOk(instantiationCommandResponse);
 
       log.debug(`EXIT doDeploy()`);
       const res: DeployContractGoSourceV1Response = {
@@ -1081,7 +1108,7 @@ export class PluginLedgerConnectorFabric
     req: RunTransactionRequest,
   ): Promise<RunTransactionResponse> {
     const fnTag = `${this.className}#transact()`;
-
+    this.log.debug("%s ENTER", fnTag);
     const {
       channelName,
       contractName,
@@ -1094,12 +1121,26 @@ export class PluginLedgerConnectorFabric
     } = req;
 
     try {
+      this.log.debug("%s Creating Fabric Gateway instance...", fnTag);
       const gateway = await this.createGateway(req);
       // const gateway = await this.createGatewayLegacy(req.signingCredential);
+      this.log.debug("%s Obtaining Fabric gateway network instance...", fnTag);
       const network = await gateway.getNetwork(channelName);
-      // const channel = network.getChannel();
-      // const endorsers = channel.getEndorsers();
+      this.log.debug("%s Obtaining Fabric contract instance...", fnTag);
       const contract = network.getContract(contractName);
+
+      const channel = network.getChannel();
+      const endorsers = channel.getEndorsers();
+
+      const endorsersMetadata = endorsers.map((x) => ({
+        mspid: x.mspid,
+        discovered: x.discovered,
+        endpoint: x.endpoint,
+        name: x.name,
+        hasChaincode: x.hasChaincode(contractName),
+        isTLS: x.isTLS(),
+      }));
+      this.log.debug("%s Endorsers metadata: %o", fnTag, endorsersMetadata);
 
       let out: Buffer;
       let success: boolean;
@@ -1111,7 +1152,10 @@ export class PluginLedgerConnectorFabric
           break;
         }
         case FabricContractInvocationType.Send: {
+          this.log.debug("%s Creating tx instance on %s", fnTag, contractName);
+          this.log.debug("%s Endorsing peers: %o", fnTag, req.endorsingPeers);
           const tx = contract.createTransaction(fnName);
+          this.log.debug("%s Created TX OK %o", fnTag, tx);
           if (req.endorsingPeers) {
             const { endorsingPeers } = req;
             const channel = network.getChannel();
@@ -1141,8 +1185,11 @@ export class PluginLedgerConnectorFabric
             );
             tx.setEndorsingPeers(endorsers);
           }
+          this.log.debug("%s Submitting TX... (%o)", fnTag, params);
           out = await tx.submit(...params);
+          this.log.debug("%s Submitted TX OK (%o)", fnTag, params);
           transactionId = tx.getTransactionId();
+          this.log.debug("%s Obtained TX ID OK (%s)", fnTag, transactionId);
           success = true;
           break;
         }

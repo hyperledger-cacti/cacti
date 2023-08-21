@@ -39,7 +39,7 @@ repositories {
     jcenter()
     mavenCentral()
     mavenLocal()
-    maven { url 'https://software.r3.com/artifactory/corda-lib' }
+    maven { url 'https://download.corda.net/maven/corda-lib' }
     flatDir {
         dirs '../../fungible-house-token/source/contracts/build/libs'
         dirs '../../fungible-house-token/source/workflows/build/libs'

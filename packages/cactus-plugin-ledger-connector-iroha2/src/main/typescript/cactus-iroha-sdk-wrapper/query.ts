@@ -8,7 +8,7 @@ import {
   Signer,
   ToriiQueryResult,
   makeQueryPayload,
-  makeSignedQuery,
+  makeVersionedSignedQuery,
 } from "@iroha2/client";
 import {
   DomainId,
@@ -42,6 +42,7 @@ import {
   createAssetDefinitionId,
   createAssetId,
 } from "./data-factories";
+import { IrohaV2PrerequisitesProvider } from "./prerequisites-provider";
 
 /**
  * Action context for specific query.
@@ -81,13 +82,13 @@ interface QueryContext<
  */
 export class CactusIrohaV2QueryClient {
   constructor(
-    public readonly irohaToriiClient: Torii,
+    private readonly prerequisitesProvider: IrohaV2PrerequisitesProvider,
     public readonly irohaSigner: Signer | AccountId,
     private readonly log: Logger,
   ) {
     Checks.truthy(
-      irohaToriiClient,
-      "CactusIrohaV2QueryClient irohaToriiClient",
+      prerequisitesProvider,
+      "CactusIrohaV2QueryClient prerequisitesProvider",
     );
     Checks.truthy(irohaSigner, "CactusIrohaV2QueryClient irohaSigner");
     Checks.truthy(log, "CactusIrohaV2QueryClient log");
@@ -152,9 +153,15 @@ export class CactusIrohaV2QueryClient {
         accountId: this.signerAccountId,
         query: args.getQueryBox(...params),
       });
-      const signedQuery = makeSignedQuery(queryPayload, this.irohaSigner);
+      const signedQuery = makeVersionedSignedQuery(
+        queryPayload,
+        this.irohaSigner,
+      );
 
-      const result = await this.irohaToriiClient.request(signedQuery);
+      const result = await Torii.request(
+        this.prerequisitesProvider.getApiHttpProperties(),
+        signedQuery,
+      );
 
       return args.parseQueryResponse(result);
     };
@@ -177,7 +184,10 @@ export class CactusIrohaV2QueryClient {
         signedPayload = VersionedSignedQueryRequest.fromBuffer(signedPayload);
       }
 
-      const result = await this.irohaToriiClient.request(signedPayload);
+      const result = await Torii.request(
+        this.prerequisitesProvider.getApiHttpProperties(),
+        signedPayload,
+      );
       return args.parseQueryResponse(result);
     };
 
@@ -484,7 +494,9 @@ export class CactusIrohaV2QueryClient {
         result,
         "findAllTransactions",
       );
-      const transactions = vectorResult.map((i) => i.as("TransactionValue"));
+      const transactions = vectorResult.map(
+        (i) => i.as("TransactionQueryResult").tx_value,
+      );
 
       this.log.debug("findAllTransactions:", transactions);
       return transactions;

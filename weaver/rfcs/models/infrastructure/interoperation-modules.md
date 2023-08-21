@@ -34,7 +34,7 @@ The basic capabilities an interoperation module offers are listed below (in the 
 - [Proof verification](../../formats/policies/proof-verification.md) for ledger views
 - Locks, claims, and unlocks for [asset exchanges](../../protocols/asset-exchange/generic-htlc.md)
 - Pledges and reclaims for [asset transfers](../../protocols/asset-transfer/generic.md)
-- [Ledger commitments](../../protocols/contract-invocation/invocation.md) requested by parties outside the network
+- [Ledger commitments](../ledger/observation-of-state.md) requested by parties outside the network
 
 These functions are illustrated in the layer marked '_Distributed Application: Smart Contracts and/or Flows_' in the figure below.
 

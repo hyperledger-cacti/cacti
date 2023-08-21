@@ -145,9 +145,10 @@ test("Start API server, and run Artillery benchmark test.", async (t: Test) => {
   if (report == null) {
     t.fail("Test failed, cannot find Artillery report.");
   } else {
-    const avgLatency = report.aggregate.latency.median;
-    log.info(`Average Latency: ${avgLatency}`);
-    t.assert(avgLatency < 5, "Average latency should be less than 10");
+    const avgHttpResponseTime =
+      report.aggregate.summaries["http.response_time"].median;
+    log.info(`Average Http Response Time: ${avgHttpResponseTime}`);
+    t.assert(avgHttpResponseTime < 5, "Average latency should be less than 10");
     // Removing report after processing.
     try {
       unlinkSync("./report.json");
@@ -159,7 +160,7 @@ test("Start API server, and run Artillery benchmark test.", async (t: Test) => {
 
 async function fireArtilleryCommand(t: Test) {
   try {
-    const artilleryCommand = `artillery run ${artilleryScriptLocation} --output report.json`;
+    const artilleryCommand = `./packages/cactus-cmd-api-server/node_modules/artillery/bin/run run ${artilleryScriptLocation} --output report.json`;
     await shell_exec(artilleryCommand);
   } catch (err) {
     log.error(`Failed to run artillery execution.`, err);

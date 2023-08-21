@@ -14,26 +14,10 @@
  *  More details: https://github.com/facebook/jest/pull/12789
  */
 
-//////////////////////////////////
-// Constants
-//////////////////////////////////
-
-// Ledger settings
-const imageName = "ghcr.io/hyperledger/cactus-fabric2-all-in-one";
-const imageVersion = "2021-09-02--fix-876-supervisord-retries";
-const fabricEnvVersion = "2.2.0";
-const fabricEnvCAVersion = "1.4.9";
-const ledgerUserName = "appUser";
-const ledgerChannelName = "mychannel";
-const ledgerContractName = "basic";
-const leaveLedgerRunning = false; // default: false
-const useRunningLedger = false; // default: false
-
-// Log settings
-const testLogLevel: LogLevelDesc = "info"; // default: info
-const sutLogLevel: LogLevelDesc = "info"; // default: info
-
 import {
+  DEFAULT_FABRIC_2_AIO_FABRIC_VERSION,
+  DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
+  DEFAULT_FABRIC_2_AIO_IMAGE_VERSION,
   FabricTestLedgerV1,
   pruneDockerAllIfGithubAction,
   SelfSignedPkiGenerator,
@@ -60,6 +44,25 @@ import path from "path";
 import os from "os";
 import "jest-extended";
 import { Server as HttpsServer } from "https";
+
+//////////////////////////////////
+// Constants
+//////////////////////////////////
+
+// Ledger settings
+const imageName = DEFAULT_FABRIC_2_AIO_IMAGE_NAME;
+const imageVersion = DEFAULT_FABRIC_2_AIO_IMAGE_VERSION;
+const fabricEnvVersion = DEFAULT_FABRIC_2_AIO_FABRIC_VERSION;
+const fabricEnvCAVersion = "1.4.9";
+const ledgerUserName = "appUser";
+const ledgerChannelName = "mychannel";
+const ledgerContractName = "basic";
+const leaveLedgerRunning = false; // default: false
+const useRunningLedger = false; // default: false
+
+// Log settings
+const testLogLevel: LogLevelDesc = "debug"; // default: info
+const sutLogLevel: LogLevelDesc = "debug"; // default: info
 
 // Logger setup
 const log: Logger = LoggerProvider.getOrCreate({
@@ -203,7 +206,7 @@ describe("Fabric-SocketIO connector tests", () => {
       useRunningLedger,
     });
     log.debug("Fabric image:", ledger.getContainerImageName());
-    await ledger.start();
+    await ledger.start({ omitPull: false });
 
     // Get connection profile
     log.info("Get fabric connection profile for Org1...");

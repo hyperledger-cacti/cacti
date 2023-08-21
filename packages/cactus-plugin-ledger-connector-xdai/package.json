@@ -21,7 +21,7 @@
   "author": {
     "name": "Hyperledger Cactus Contributors",
     "email": "cactus@lists.hyperledger.org",
-    "url": "https://www.hyperledger.org/use/cactus"
+    "url": "https://www.hyperledger.org/use/cacti"
   },
   "contributors": [
     {
@@ -45,7 +45,7 @@
   "scripts": {
     "codegen": "run-p 'codegen:*'",
     "codegen:openapi": "npm run generate-sdk",
-    "generate-sdk": "run-p generate-sdk:*",
+    "generate-sdk": "run-p 'generate-sdk:*'",
     "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
     "watch": "npm-watch",
     "webpack": "npm-run-all webpack:dev",
@@ -63,8 +63,8 @@
     "openapi-types": "9.1.0",
     "prom-client": "13.2.0",
     "typescript-optional": "2.0.1",
-    "web3": "1.5.2",
-    "web3-utils": "1.5.2"
+    "web3": "1.6.1",
+    "web3-utils": "1.6.1"
   },
   "devDependencies": {
     "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-alpha.1",

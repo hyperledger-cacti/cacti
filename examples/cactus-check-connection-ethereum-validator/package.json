@@ -1,5 +1,5 @@
 {
-  "name": "check-connection-ethereum-validator",
+  "name": "@hyperledger/cactus-examples-check-connection-ethereum-validator",
   "version": "2.0.0-alpha.1",
   "private": true,
   "scripts": {
@@ -15,10 +15,10 @@
   },
   "dependencies": {
     "escape-html": "1.0.3",
-    "socket.io": "4.4.1"
+    "socket.io": "4.5.4"
   },
   "devDependencies": {
     "@types/escape-html": "1.0.1",
-    "@types/node": "15.14.7"
+    "@types/node": "15.14.9"
   }
 }

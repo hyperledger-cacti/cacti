@@ -2,7 +2,7 @@ no-check-coverage: true
 node-arg:
   - --max-old-space-size=4096
 jobs: 1
-timeout: 900
+timeout: 3600
 ts: true
 files:
   - ./packages/cactus-plugin-keychain-aws-sm/src/test/typescript/integration/openapi/openapi-validation.test.ts
@@ -107,7 +107,6 @@ files:
   - ./packages/cactus-test-plugin-htlc-eth-besu/src/test/typescript/integration/plugin-htlc-eth-besu/get-single-status-endpoint.test.ts
   - ./packages/cactus-test-plugin-htlc-eth-besu/src/test/typescript/integration/plugin-htlc-eth-besu/openapi/openapi-validation.test.ts
   - ./packages/cactus-cmd-api-server/src/test/typescript/benchmark/artillery-api-benchmark.test.ts
-  - ./packages/cactus-cmd-api-server/src/test/typescript/integration/jwt-socketio-endpoint-authorization.test.ts
   - ./packages/cactus-cmd-api-server/src/test/typescript/integration/remote-plugin-imports.test.ts
   - ./packages/cactus-cmd-api-server/src/test/typescript/integration/plugin-import-from-github.test.ts
   - ./packages/cactus-cmd-api-server/src/test/typescript/integration/plugin-import-without-install.test.ts

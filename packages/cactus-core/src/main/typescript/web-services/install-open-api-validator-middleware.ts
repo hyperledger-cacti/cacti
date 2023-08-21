@@ -2,6 +2,8 @@ import type { Application, NextFunction, Request, Response } from "express";
 import * as OpenApiValidator from "express-openapi-validator";
 import { OpenAPIV3 } from "express-openapi-validator/dist/framework/types";
 
+import { error as EovErrors } from "express-openapi-validator";
+
 import {
   Checks,
   LoggerProvider,
@@ -62,12 +64,55 @@ export async function installOpenapiValidationMiddleware(
       res: Response,
       next: NextFunction,
     ) => {
-      if (err) {
-        res.status(err.status || 500);
-        res.send(err.errors);
+      const tag = "[express-openapi-validator-middleware-handler]";
+      if (isOpenApiRequestValidationError(err)) {
+        if (err.status) {
+          const { errors, status } = err;
+          log.debug("%s Got valid error, status=%s - %o", tag, status, errors);
+          res.status(err.status);
+          res.send(err.errors);
+        } else {
+          log.debug("%s Got invalid error - status missing - %o", tag, err);
+          res.status(500);
+          res.send(err);
+        }
+      } else if (err) {
+        log.debug("%s Got invalid error - validator crash(?) - %o", tag, err);
+        res.status(500);
+        res.send(err);
       } else {
+        log.debug("%s Validation Passed OK - %s", tag, req.url);
         next();
       }
     },
   );
+}
+
+/**
+ * Determines if an error object is an instance of one of the types that are
+ * designed to be thrown by the "express-openapi-validator" package specifically
+ * when it finds issues it is designed to find.
+ *
+ * In other words, we are detecting if the error was thrown intentionally or if
+ * the validator had just crashed because of some other issue such as when the
+ * Open API spec file is invalid.
+ *
+ * To give an example to the above, the "properties" key in one of the specs
+ * was being assigned a string value but according to the meta schema (the
+ * schema of the Open API spec documents themselves) the "properties" property
+ * must be defined as an object that lists the properties of a schema element.
+ *
+ * The above mistake made by the person who wrote the Open API spec in question
+ * was causing the "express-openapi-validator" package to crash, throwing errors
+ * but different ones from the ones that it is "expected" to throw and we could
+ * not detect this at the time and hence this function was made so that in the
+ * future, debugging these kind of errors are much easier and can be done based
+ * on the logs alone (hopefully).
+ */
+export function isOpenApiRequestValidationError(ex: unknown): boolean {
+  if (ex) {
+    return Object.values(EovErrors).some((x) => ex instanceof x);
+  } else {
+    return false;
+  }
 }

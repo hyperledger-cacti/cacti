@@ -16,6 +16,7 @@
  */
 
 import { ConfigUtil } from "@hyperledger/cactus-cmd-socketio-server";
+import { ISocketApiClient } from "@hyperledger/cactus-core-api";
 import { Verifier } from "@hyperledger/cactus-verifier-client";
 import { signProposal } from "./sign-utils";
 
@@ -27,7 +28,7 @@ const moduleName = "TransactionFabric";
 const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;
 
-export function makeSignedProposal<T>(
+export function makeSignedProposal<T extends ISocketApiClient<unknown>>(
   ccFncName: string,
   ccArgs: string[],
   verifierFabric: Verifier<T>,

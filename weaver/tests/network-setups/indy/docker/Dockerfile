@@ -21,7 +21,8 @@ RUN python3 -m pip install -U pip
 RUN python3 -m pip uninstall -y indy-plenum
 RUN python3 -m pip uninstall -y indy-node
 
-RUN cd indy-plenum && python3 setup.py install
+RUN pip3 install jsonpickle==0.9.6 ujson==1.33 prompt_toolkit==0.57 pygments==2.2.0 rlp==0.5.1 sha3==0.2.1 leveldb ioflo==1.5.4 semver==2.7.9 base58==1.0.0 orderedset==2.0.3 sortedcontainers==1.5.7 psutil==5.6.6 importlib_metadata>=2.0 portalocker==0.5.7 libnacl==1.6.1 six==1.11.0 intervaltree==2.1.0 msgpack-python==0.4.6 python-rocksdb==0.6.9 python-dateutil==2.6.1 pympler==0.8 packaging==19.0 python-ursa==0.1.1 pyzmq==18.1.0
+
 
 WORKDIR /usr/src/indy_projects/indy-node
 RUN python3 setup.py install

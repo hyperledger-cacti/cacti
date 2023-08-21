@@ -1,0 +1,5 @@
+.env
+cache
+lib
+vendor
+.gas-snapshot

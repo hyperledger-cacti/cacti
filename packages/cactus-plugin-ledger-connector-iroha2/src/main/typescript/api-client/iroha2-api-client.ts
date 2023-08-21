@@ -5,7 +5,8 @@
 
 import { Observable, ReplaySubject } from "rxjs";
 import { finalize } from "rxjs/operators";
-import { io } from "socket.io-client";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const io = require("socket.io-client");
 import { Logger, Checks } from "@hyperledger/cactus-common";
 import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
 import { Constants, ISocketApiClient } from "@hyperledger/cactus-core-api";

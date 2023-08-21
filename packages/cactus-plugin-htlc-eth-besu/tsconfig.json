@@ -12,6 +12,7 @@
     "./src",
     "src/**/*.json"
   ],
+  "exclude": ["./vendor"],
   "references": [
     {
       "path": "../cactus-common/tsconfig.json"

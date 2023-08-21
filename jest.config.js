@@ -1,9 +1,10 @@
+/** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
 module.exports = {
   preset: "ts-jest",
   testEnvironment: "node",
   maxWorkers: 1,
   maxConcurrency: 1,
-  setupFilesAfterEnv: ["jest-extended/all"],
+  setupFilesAfterEnv: ["jest-extended/all", "./jest.setup.console.logs.js"],
   testTimeout: 60 * 60 * 1000,
   testMatch: [
     `**/cactus-*/src/test/typescript/{unit,integration,benchmark}/**/*.test.ts`,
@@ -97,6 +98,7 @@ module.exports = {
     `./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/openapi/openapi-validation-go.test.ts`,
     `./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/openapi/openapi-validation.test.ts`,
     `./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/unit/identity-internal-crypto-utils.test.ts`,
+    `./packages/cactus-plugin-ledger-connector-cdl-socketio/src/test/typescript/integration/cdl-connector-manual.test.ts`,
     `./packages/cactus-plugin-keychain-vault/src/test/typescript/integration/cactus-keychain-vault-server.test.ts`,
     `./packages/cactus-plugin-keychain-vault/src/test/typescript/integration/plugin-keychain-vault.test.ts`,
     `./packages/cactus-plugin-keychain-vault/src/test/typescript/integration/openapi/openapi-validation.test.ts`,
@@ -112,7 +114,6 @@ module.exports = {
     `./packages/cactus-test-plugin-htlc-eth-besu/src/test/typescript/integration/plugin-htlc-eth-besu/get--status-endpoint-invalid.test.ts`,
     `./packages/cactus-test-plugin-htlc-eth-besu/src/test/typescript/integration/plugin-htlc-eth-besu/openapi/openapi-validation.test.ts`,
     `./packages/cactus-cmd-api-server/src/test/typescript/benchmark/artillery-api-benchmark.test.ts`,
-    `./packages/cactus-cmd-api-server/src/test/typescript/integration/jwt-socketio-endpoint-authorization.test.ts`,
     `./packages/cactus-cmd-api-server/src/test/typescript/integration/remote-plugin-imports.test.ts`,
     `./packages/cactus-cmd-api-server/src/test/typescript/integration/plugin-import-from-github.test.ts`,
     `./packages/cactus-cmd-api-server/src/test/typescript/integration/plugin-import-without-install.test.ts`,

@@ -1,14 +1,16 @@
 #!/bin/bash
 
+curl -o tessera-22.1.7.tar https://s01.oss.sonatype.org/service/local/repositories/releases/content/net/consensys/quorum/tessera/tessera-dist/22.1.7/tessera-dist-22.1.7.tar
+
 DDIR=/qdata/tm
 rm -rf ${DDIR}
 mkdir -p ${DDIR}
 cp /tm.pub ${DDIR}/tm.pub
 cp /tm.key ${DDIR}/tm.key
 
-#extract the tessera version from the jar
-TESSERA_VERSION=$(unzip -p /tessera/tessera-app.jar META-INF/MANIFEST.MF | grep Tessera-Version | cut -d" " -f2)
-echo "Tessera version (extracted from manifest file): ${TESSERA_VERSION}"
+tar xvf tessera-22.1.7.tar
+export PATH=$PATH:tessera-22.1.7/bin
+
 # sorting versions to target correct configuration
 TESSERA_CONFIG_TYPE="-09"
 
@@ -65,4 +67,4 @@ cat <<EOF > ${DDIR}/tessera-config-09.json
 EOF
 
 cat ${DDIR}/tessera-config-09.json
-java -Xms128M -Xmx128M -Dverbosity=WARN -jar /tessera/tessera-app.jar -configfile ${DDIR}/tessera-config-09.json
+tessera -configfile ${DDIR}/tessera-config-09.json

@@ -119,7 +119,7 @@ test(testCase, async (t: Test) => {
         `Endpoint ${fSet} without required key: response.status === 400 OK`,
       );
       const fields = e.response.data.map((param: any) =>
-        param.path.replace(".body.", ""),
+        param.path.replace("/body/", ""),
       );
       t2.ok(fields.includes("key"), "Rejected because key is required");
     }
@@ -138,7 +138,7 @@ test(testCase, async (t: Test) => {
         `Endpoint ${fGet} without required key: response.status === 400 OK`,
       );
       const fields = e.response.data.map((param: any) =>
-        param.path.replace(".body.", ""),
+        param.path.replace("/body/", ""),
       );
       t2.ok(fields.includes("key"), "Rejected because key is required");
     }
@@ -157,7 +157,7 @@ test(testCase, async (t: Test) => {
         `Endpoint ${fHas} without required key: response.status === 400 OK`,
       );
       const fields = e.response.data.map((param: any) =>
-        param.path.replace(".body.", ""),
+        param.path.replace("/body/", ""),
       );
       t2.ok(fields.includes("key"), "Rejected because key is required");
     }
@@ -176,7 +176,7 @@ test(testCase, async (t: Test) => {
         `Endpoint ${fDelete} without required key: response.status === 400 OK`,
       );
       const fields = e.response.data.map((param: any) =>
-        param.path.replace(".body.", ""),
+        param.path.replace("/body/", ""),
       );
       t2.ok(fields.includes("key"), "Rejected because key is required");
     }
@@ -197,7 +197,7 @@ test(testCase, async (t: Test) => {
         `Endpoint ${fSet} with fake=4: response.status === 400 OK`,
       );
       const fields = e.response.data.map((param: any) =>
-        param.path.replace(".body.", ""),
+        param.path.replace("/body/", ""),
       );
       t2.ok(
         fields.includes("fake"),
@@ -220,7 +220,7 @@ test(testCase, async (t: Test) => {
         `Endpoint ${fGet} with fake=4: response.status === 400 OK`,
       );
       const fields = e.response.data.map((param: any) =>
-        param.path.replace(".body.", ""),
+        param.path.replace("/body/", ""),
       );
       t2.ok(
         fields.includes("fake"),
@@ -243,7 +243,7 @@ test(testCase, async (t: Test) => {
         `Endpoint ${fHas} with fake=4: response.status === 400 OK`,
       );
       const fields = e.response.data.map((param: any) =>
-        param.path.replace(".body.", ""),
+        param.path.replace("/body/", ""),
       );
       t2.ok(
         fields.includes("fake"),
@@ -266,7 +266,7 @@ test(testCase, async (t: Test) => {
         `Endpoint ${fDelete} with fake=4: response.status === 400 OK`,
       );
       const fields = e.response.data.map((param: any) =>
-        param.path.replace(".body.", ""),
+        param.path.replace("/body/", ""),
       );
       t2.ok(
         fields.includes("fake"),

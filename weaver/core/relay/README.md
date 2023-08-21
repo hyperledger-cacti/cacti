@@ -35,7 +35,7 @@ To run relay dummy client test:
 
 `cargo run --bin client <port-number-of-requesting-relay> <address>`
 
-NOTE: Please read through the addressing specification in the [rfcs](../../rfcs/formats/addressing.md). Make sure the network-type has a running supported driver and is specified in the config.
+NOTE: Please read through the addressing specification in the [rfcs](../../rfcs/formats/views/addressing.md). Make sure the network-type has a running supported driver and is specified in the config.
 
 EXAMPLE:
 

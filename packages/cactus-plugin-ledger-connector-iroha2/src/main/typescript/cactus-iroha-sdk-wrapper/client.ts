@@ -7,11 +7,10 @@ import {
   Signer,
   Torii,
   setCrypto,
-  CreateToriiProps,
   makeTransactionPayload,
   executableIntoSignedTransaction,
   computeTransactionHash,
-  makeSignedTransaction,
+  makeVersionedSignedTransaction,
 } from "@iroha2/client";
 import {
   AssetDefinitionId,
@@ -44,7 +43,6 @@ import {
   TransferBox,
   TransactionPayload,
   AccountId,
-  VersionedTransaction,
   RejectionReason,
   FilterBox,
   PipelineEventFilter,
@@ -52,12 +50,9 @@ import {
   PipelineEntityKind,
   OptionPipelineStatusKind,
   OptionHash,
+  VersionedSignedTransaction,
 } from "@iroha2/data-model";
 import { Key, KeyPair } from "@iroha2/crypto-core";
-
-// This module can't be imported unless we use `nodenext` moduleResolution
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { adapter: irohaWSAdapter } = require("@iroha2/client/web-socket/node");
 
 import {
   Checks,
@@ -67,7 +62,6 @@ import {
 } from "@hyperledger/cactus-common";
 
 import { bytesToHex, hexToBytes } from "hada";
-import { fetch as undiciFetch } from "undici";
 
 import { CactusIrohaV2QueryClient } from "./query";
 import {
@@ -79,7 +73,9 @@ import {
 import {
   TransactResponseV1,
   TransactionStatusV1,
+  Iroha2BaseConfigTorii,
 } from "../generated/openapi/typescript-axios";
+import { IrohaV2PrerequisitesProvider } from "./prerequisites-provider";
 
 setCrypto(crypto);
 
@@ -149,11 +145,7 @@ export type TransactionPayloadParameters = Exclude<
 export class CactusIrohaV2Client {
   private readonly log: Logger;
   private readonly transactions: Array<NamedIrohaV2Instruction> = [];
-
-  /**
-   * Iroha Torii client used to send transactions to the ledger.
-   */
-  public readonly irohaToriiClient: Torii;
+  private readonly prerequisitesProvider: IrohaV2PrerequisitesProvider;
 
   /**
    * Iroha signer used to sign transaction with user private key and account.
@@ -166,20 +158,12 @@ export class CactusIrohaV2Client {
   public readonly query: CactusIrohaV2QueryClient;
 
   constructor(
-    public readonly toriiOptions: Omit<CreateToriiProps, "ws" | "fetch">,
+    public readonly toriiOptions: Iroha2BaseConfigTorii,
     public readonly accountId: AccountId,
     private readonly keyPair?: KeyPair,
     private readonly logLevel: LogLevelDesc = "info",
   ) {
-    Checks.truthy(toriiOptions.apiURL, "toriiOptions apiURL");
-    Checks.truthy(toriiOptions.telemetryURL, "toriiOptions telemetryURL");
     Checks.truthy(accountId, "signerOptions accountId");
-
-    this.irohaToriiClient = new Torii({
-      ...toriiOptions,
-      ws: irohaWSAdapter,
-      fetch: undiciFetch as any,
-    });
 
     const label = this.constructor.name;
     this.log = LoggerProvider.getOrCreate({ level: this.logLevel, label });
@@ -190,8 +174,12 @@ export class CactusIrohaV2Client {
       this.irohaSigner = new Signer(accountId, keyPair);
     }
 
+    this.prerequisitesProvider = new IrohaV2PrerequisitesProvider(
+      toriiOptions.apiURL,
+    );
+
     this.query = new CactusIrohaV2QueryClient(
-      this.irohaToriiClient,
+      this.prerequisitesProvider,
       this.irohaSigner ?? this.accountId,
       this.log,
     );
@@ -717,19 +705,22 @@ export class CactusIrohaV2Client {
     const txHashHex = bytesToHex([...txHash]);
     this.log.debug("waitForTransactionStatus() - hash:", txHashHex);
 
-    const monitor = await this.irohaToriiClient.listenForEvents({
-      filter: FilterBox(
-        "Pipeline",
-        PipelineEventFilter({
-          entity_kind: OptionPipelineEntityKind(
-            "Some",
-            PipelineEntityKind("Transaction"),
-          ),
-          status_kind: OptionPipelineStatusKind("None"),
-          hash: OptionHash("Some", txHash),
-        }),
-      ),
-    });
+    const monitor = await Torii.listenForEvents(
+      this.prerequisitesProvider.getApiWebSocketProperties(),
+      {
+        filter: FilterBox(
+          "Pipeline",
+          PipelineEventFilter({
+            entity_kind: OptionPipelineEntityKind(
+              "Some",
+              PipelineEntityKind("Transaction"),
+            ),
+            status_kind: OptionPipelineStatusKind("None"),
+            hash: OptionHash("Some", txHash),
+          }),
+        ),
+      },
+    );
     this.log.debug("waitForTransactionStatus() - monitoring started.");
 
     const txStatusPromise = new Promise<TransactResponseV1>(
@@ -821,8 +812,14 @@ export class CactusIrohaV2Client {
       statusPromise = this.waitForTransactionStatus(hash);
     }
 
-    const signedTx = makeSignedTransaction(txPayload, this.irohaSigner);
-    await this.irohaToriiClient.submit(signedTx);
+    const signedTx = makeVersionedSignedTransaction(
+      txPayload,
+      this.irohaSigner,
+    );
+    await Torii.submit(
+      this.prerequisitesProvider.getApiHttpProperties(),
+      signedTx,
+    );
     this.clear();
 
     if (statusPromise) {
@@ -838,28 +835,34 @@ export class CactusIrohaV2Client {
   /**
    * Send signed transaction payload to the ledger.
    *
-   * @param signedPayload Encoded or plain `VersionedTransaction`
+   * @param signedPayload Encoded or plain `VersionedSignedTransaction`
    * @param waitForCommit If `true` - block and return the final transaction status. Otherwise - return immediately.
    *
    * @returns `TransactResponseV1`
    */
   public async sendSignedPayload(
-    signedPayload: VersionedTransaction | ArrayBufferView,
+    signedPayload: VersionedSignedTransaction | ArrayBufferView,
     waitForCommit = false,
   ): Promise<TransactResponseV1> {
     Checks.truthy(signedPayload, "sendSigned arg signedPayload");
 
     if (ArrayBuffer.isView(signedPayload)) {
-      signedPayload = VersionedTransaction.fromBuffer(signedPayload);
+      signedPayload = VersionedSignedTransaction.fromBuffer(signedPayload);
     }
 
     const hash = computeTransactionHash(signedPayload.as("V1").payload);
     if (waitForCommit) {
       const statusPromise = this.waitForTransactionStatus(hash);
-      await this.irohaToriiClient.submit(signedPayload);
+      await Torii.submit(
+        this.prerequisitesProvider.getApiHttpProperties(),
+        signedPayload,
+      );
       return await statusPromise;
     } else {
-      await this.irohaToriiClient.submit(signedPayload);
+      await Torii.submit(
+        this.prerequisitesProvider.getApiHttpProperties(),
+        signedPayload,
+      );
       return {
         hash: bytesToHex([...hash]),
         status: TransactionStatusV1.Submitted,

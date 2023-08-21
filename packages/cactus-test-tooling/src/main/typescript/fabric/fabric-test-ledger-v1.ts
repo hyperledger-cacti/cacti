@@ -21,6 +21,7 @@ import {
   LogLevelDesc,
   LoggerProvider,
   Bools,
+  safeStringifyException,
 } from "@hyperledger/cactus-common";
 import Dockerode from "dockerode";
 import {
@@ -33,6 +34,7 @@ import path from "path";
 import fs from "fs";
 import yaml from "js-yaml";
 import { envMapToDocker } from "../common/env-map-to-docker";
+import { RuntimeError } from "run-time-error";
 
 export interface organizationDefinitionFabricV2 {
   path: string;
@@ -41,6 +43,12 @@ export interface organizationDefinitionFabricV2 {
   certificateAuthority: boolean;
   stateDatabase: STATE_DATABASE;
   port: string;
+}
+
+export interface EnrollFabricIdentityOptionsV1 {
+  readonly wallet: Wallet;
+  readonly enrollmentID: string;
+  readonly organization: string;
 }
 
 /*
@@ -69,6 +77,11 @@ export interface LedgerStartOptions {
   setContainer?: boolean;
   containerID?: string;
 }
+
+export const DEFAULT_FABRIC_2_AIO_IMAGE_NAME =
+  "ghcr.io/hyperledger/cactus-fabric2-all-in-one";
+export const DEFAULT_FABRIC_2_AIO_IMAGE_VERSION = "2023-08-17-issue2057-pr2135";
+export const DEFAULT_FABRIC_2_AIO_FABRIC_VERSION = "2.4.4";
 
 /*
  * Provides default options for Fabric container
@@ -173,33 +186,59 @@ export class FabricTestLedgerV1 implements ITestLedger {
     return `${this.envVars.get("FABRIC_VERSION")}`;
   }
 
+  public capitalizedMspIdOfOrg(organization: string): string {
+    return organization.charAt(0).toUpperCase() + organization.slice(1) + "MSP";
+  }
+
   public getDefaultMspId(): string {
     return "Org1MSP";
+  }
+
+  public async createCaClientV2(
+    organization: string,
+  ): Promise<FabricCAServices> {
+    const fnTag = `${this.className}#createCaClientV2()`;
+    this.log.debug(`${fnTag} ENTER`);
+    try {
+      const ccp = await this.getConnectionProfileOrgX(organization);
+      const caInfo =
+        ccp.certificateAuthorities["ca." + organization + ".example.com"];
+      const { tlsCACerts, url: caUrl, caName } = caInfo;
+      const { pem: caTLSCACertPem } = tlsCACerts;
+      const tlsOptions = { trustedRoots: caTLSCACertPem, verify: false };
+      this.log.debug(`createCaClientV2() caName=%o caUrl=%o`, caName, caUrl);
+      this.log.debug(`createCaClientV2() tlsOptions=%o`, tlsOptions);
+      return new FabricCAServices(caUrl, tlsOptions, caName);
+    } catch (ex) {
+      this.log.error(`createCaClientV2() Failure:`, ex);
+      throw new RuntimeError(`${fnTag} Inner Exception:`, ex);
+    }
   }
 
   public async createCaClient(): Promise<FabricCAServices> {
     const fnTag = `${this.className}#createCaClient()`;
     try {
-      const ccp = await this.getConnectionProfileOrg1();
-      const caInfo = ccp.certificateAuthorities["ca.org1.example.com"];
-      const { tlsCACerts, url: caUrl, caName } = caInfo;
-      const { pem: caTLSCACertPem } = tlsCACerts;
-      const tlsOptions = { trustedRoots: caTLSCACertPem, verify: false };
-      this.log.debug(`createCaClient() caName=%o caUrl=%o`, caName, caUrl);
-      this.log.debug(`createCaClient() tlsOptions=%o`, tlsOptions);
-      return new FabricCAServices(caUrl, tlsOptions, caName);
+      return this.createCaClientV2("org1");
     } catch (ex) {
       this.log.error(`createCaClient() Failure:`, ex);
-      throw new Error(`${fnTag} Inner Exception: ${ex}`);
+      throw new RuntimeError(`${fnTag} Inner Exception:`, ex);
     }
   }
 
-  public async enrollUser(wallet: Wallet): Promise<any> {
-    const fnTag = `${this.className}#enrollUser()`;
+  public async enrollUserV2(opts: EnrollFabricIdentityOptionsV1): Promise<any> {
+    const fnTag = `${this.className}#enrollUserV2()`;
+
+    Checks.truthy(opts, "enrollUserV2 opts");
+    Checks.nonBlankString(opts.organization, "enrollUserV2 opts.organization");
+    Checks.nonBlankString(opts.enrollmentID, "enrollUserV2 opts.enrollmentID");
+    Checks.truthy(opts.wallet, "enrollUserV2 opts.wallet");
+
+    const { enrollmentID, organization, wallet } = opts;
     try {
-      const mspId = this.getDefaultMspId();
-      const enrollmentID = "user";
-      const connectionProfile = await this.getConnectionProfileOrg1();
+      const mspId = this.capitalizedMspIdOfOrg(organization);
+      const connectionProfile = await this.getConnectionProfileOrgX(
+        organization,
+      );
       // Create a new gateway for connecting to our peer node.
       const gateway = new Gateway();
       const discovery = { enabled: true, asLocalhost: true };
@@ -212,17 +251,17 @@ export class FabricTestLedgerV1 implements ITestLedger {
 
       // Get the CA client object from the gateway for interacting with the CA.
       // const ca = gateway.getClient().getCertificateAuthority();
-      const ca = await this.createCaClient();
+      const ca = await this.createCaClientV2(opts.organization);
       const adminIdentity = gateway.getIdentity();
 
       // Register the user, enroll the user, and import the new identity into the wallet.
       const registrationRequest = {
-        affiliation: "org1.department1",
-        enrollmentID,
+        affiliation: opts.organization + ".department1",
+        enrollmentID: opts.enrollmentID,
         role: "client",
       };
 
-      const provider = wallet
+      const provider = opts.wallet
         .getProviderRegistry()
         .getProvider(adminIdentity.type);
       const adminUser = await provider.getUserContext(adminIdentity, "admin");
@@ -250,8 +289,21 @@ export class FabricTestLedgerV1 implements ITestLedger {
 
       return [x509Identity, wallet];
     } catch (ex) {
-      this.log.error(`enrollUser() Failure:`, ex);
-      throw new Error(`${fnTag} Exception: ${ex}`);
+      this.log.error(`${fnTag} failed with inner exception:`, ex);
+      throw new RuntimeError(`${fnTag} failed with inner exception:`, ex);
+    }
+  }
+
+  public async enrollUser(wallet: Wallet): Promise<any> {
+    const fnTag = `${this.className}#enrollUser()`;
+    try {
+      const enrollmentID = "user";
+      const opts = { enrollmentID, organization: "org1", wallet };
+      const out = await this.enrollUserV2(opts);
+      return out;
+    } catch (ex) {
+      this.log.error(`${fnTag} failed with inner exception:`, ex);
+      throw new RuntimeError(`${fnTag} failed with inner exception:`, ex);
     }
   }
 
@@ -262,10 +314,20 @@ export class FabricTestLedgerV1 implements ITestLedger {
     return ["admin", "adminpw"];
   }
 
-  public async enrollAdmin(): Promise<[X509Identity, Wallet]> {
-    const fnTag = `${this.className}#enrollAdmin()`;
+  public async enrollAdminV2(
+    opts: Partial<EnrollFabricIdentityOptionsV1>,
+  ): Promise<[X509Identity, Wallet]> {
+    const fnTag = `${this.className}#enrollAdminV2()`;
+    this.log.debug(`${fnTag} ENTER`);
+
+    const { organization } = opts;
+    if (!organization) {
+      throw new RuntimeError(`${fnTag} opts.organization cannot be falsy.`);
+    }
+    Checks.nonBlankString(organization, `${fnTag}:opts.organization`);
+
     try {
-      const ca = await this.createCaClient();
+      const ca = await this.createCaClientV2(organization);
       const wallet = await Wallets.newInMemoryWallet();
 
       // Enroll the admin user, and import the new identity into the wallet.
@@ -275,7 +337,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
       };
       const enrollment = await ca.enroll(request);
 
-      const mspId = this.getDefaultMspId();
+      const mspId = this.capitalizedMspIdOfOrg(organization);
       const { certificate, key } = enrollment;
       const keyBytes = key.toBytes();
 
@@ -291,8 +353,19 @@ export class FabricTestLedgerV1 implements ITestLedger {
       await wallet.put("admin", x509Identity);
       return [x509Identity, wallet];
     } catch (ex) {
-      this.log.error(`enrollAdmin() Failure:`, ex);
-      throw new Error(`${fnTag} Exception: ${ex}`);
+      this.log.error(`${fnTag} Failure:`, ex);
+      throw new RuntimeError(`${fnTag} Exception:`, ex);
+    }
+  }
+
+  public async enrollAdmin(): Promise<[X509Identity, Wallet]> {
+    const fnTag = `${this.className}#enrollAdmin()`;
+    try {
+      const out = await this.enrollAdminV2({ organization: "org1" });
+      return out;
+    } catch (ex) {
+      this.log.error(`${fnTag} Failure:`, ex);
+      throw new RuntimeError(`${fnTag} Exception:`, ex);
     }
   }
 
@@ -400,27 +473,30 @@ export class FabricTestLedgerV1 implements ITestLedger {
     return ccp;
   }
 
-  public async getConnectionProfileOrgX(OrgName: string): Promise<any> {
+  public async getConnectionProfileOrgX(orgName: string): Promise<any> {
+    const fnTag = `${this.className}:getConnectionProfileOrgX()`;
+    this.log.debug(`${fnTag} ENTER - orgName=%s`, orgName);
+
     const connectionProfilePath =
-      OrgName === "org1" || OrgName === "org2"
+      orgName === "org1" || orgName === "org2"
         ? path.join(
             "fabric-samples/test-network",
             "organizations/peerOrganizations",
-            OrgName + ".example.com",
-            "connection-" + OrgName + ".json",
+            orgName + ".example.com",
+            "connection-" + orgName + ".json",
           )
         : path.join(
-            "add-org-" + OrgName,
+            "add-org-" + orgName,
             "organizations/peerOrganizations",
-            OrgName + ".example.com",
-            "connection-" + OrgName + ".json",
+            orgName + ".example.com",
+            "connection-" + orgName + ".json",
           );
-    const peer0Name = `peer0.${OrgName}.example.com`;
-    const peer1Name = `peer1.${OrgName}.example.com`;
+    const peer0Name = `peer0.${orgName}.example.com`;
+    const peer1Name = `peer1.${orgName}.example.com`;
     const cInfo = await this.getContainerInfo();
     const container = this.getContainer();
     const CCP_JSON_PATH_FABRIC_V1 =
-      "/fabric-samples/first-network/connection-org" + OrgName + ".json";
+      "/fabric-samples/first-network/connection-org" + orgName + ".json";
     const CCP_JSON_PATH_FABRIC_V2 = connectionProfilePath;
     const ccpJsonPath = compareVersions.compare(
       this.getFabricVersion(),
@@ -430,7 +506,10 @@ export class FabricTestLedgerV1 implements ITestLedger {
       ? CCP_JSON_PATH_FABRIC_V1
       : CCP_JSON_PATH_FABRIC_V2;
     try {
+      const cId = container.id;
+      this.log.debug(`${fnTag} Pull Fabric CP %s :: %s`, cId, ccpJsonPath);
       const ccpJson = await Containers.pullFile(container, ccpJsonPath);
+      this.log.debug(`${fnTag} Got Fabric CP %s :: %s OK`, cId, ccpJsonPath);
       const ccp = JSON.parse(ccpJson);
 
       // Treat peer0
@@ -441,7 +520,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
       ccp["peers"][peer0Name]["url"] = `grpcs://localhost:${hostPort}`;
 
       // if there is a peer1
-      if (ccp.peers["peer1.org" + OrgName + ".example.com"]) {
+      if (ccp.peers["peer1.org" + orgName + ".example.com"]) {
         const urlGrpcs = ccp["peers"][peer1Name]["url"];
         const privatePortPeer1 = parseFloat(urlGrpcs.replace(/^\D+/g, ""));
 
@@ -453,7 +532,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
       }
       {
         // ca_peerOrg1
-        const caName = `ca.${OrgName}.example.com`;
+        const caName = `ca.${orgName}.example.com`;
         const urlGrpcs = ccp["certificateAuthorities"][caName]["url"];
         const caPort = parseFloat(urlGrpcs.replace(/^\D+/g, ""));
 
@@ -498,7 +577,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
             },
           },
         };
-        const specificPeer = "peer0." + OrgName + ".example.com";
+        const specificPeer = "peer0." + orgName + ".example.com";
 
         ccp.channels = {
           mychannel: {
@@ -527,9 +606,10 @@ export class FabricTestLedgerV1 implements ITestLedger {
         // }
       }
       return ccp;
-    } catch (error) {
-      this.log.debug(`error on get connection profile`);
-      throw new Error(error as string);
+    } catch (ex: unknown) {
+      this.log.debug(`getConnectionProfileOrgX() crashed: `, ex);
+      const e = ex instanceof Error ? ex : safeStringifyException(ex);
+      throw new RuntimeError(`getConnectionProfileOrgX() crashed.`, e);
     }
   }
 

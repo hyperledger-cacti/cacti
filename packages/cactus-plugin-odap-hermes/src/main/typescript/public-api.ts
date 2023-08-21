@@ -3,6 +3,7 @@ export * from "./generated/openapi/typescript-axios/index";
 export {
   IPluginOdapGatewayConstructorOptions,
   PluginOdapGateway,
+  OdapMessageType,
 } from "./gateway/plugin-odap-gateway";
 
 import { IPluginFactoryOptions } from "@hyperledger/cactus-core-api";
@@ -20,3 +21,5 @@ export async function createBesuPluginFactory(
 ): Promise<PluginFactoryBesuOdapGateway> {
   return new PluginFactoryBesuOdapGateway(pluginFactoryOptions);
 }
+
+export { ServerGatewayHelper } from "./gateway/server/server-helper";

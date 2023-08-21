@@ -52,10 +52,32 @@ function checkOnlyDocumentation()
       ENDED_AT=`date +%s`
       runtime=$((ENDED_AT-STARTED_AT))
       echo "$(date +%FT%T%z) [CI] SUCCESS - runtime=$runtime seconds."
-      checkWorkTreeStatus
       exit 0
     fi
   done
+}
+
+function freeUpGitHubRunnerDiskSpace() {
+  # If we are running in a GitHub Actions runner, then free up 30 GB space by
+  # removing things we do not need such as the Android SDK and .NET.
+  #
+  # Huge thanks to Maxim Lobanov for the advice:
+  # https://github.com/actions/virtual-environments/issues/2606#issuecomment-772683150
+  #
+  # Why do this? Because we've been getting warnings about the runners being
+  # left with less than a hundred megabytes of disk space during the tests.
+  #
+  # This operation takes about 2 minutes to do and so is disabled by default to get better
+  # performance from the CI by default. It can be enabled on a per job basis via
+  # the env variables defined in the action's .yaml files.
+  #
+  if [ "${FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED:-true}" = "true" ]; then
+    echo "$(date +%FT%T%z) [CI] Freeing up GitHub Action Runner disk space disabled. Skipping..."
+  else
+    echo "$(date +%FT%T%z) [CI] Freeing up GitHub Action Runner disk space by deleting Android and .NET ..."
+    sudo rm -rf /usr/local/lib/android # will release about 10 GB if you don't need Android
+    sudo rm -rf /usr/share/dotnet # will release about 20GB if you don't need .NET
+  fi
 }
 
 function mainTask()
@@ -83,44 +105,44 @@ function mainTask()
   # Check if the modified files are only for documentation.
   checkOnlyDocumentation
 
-  # If we are running in a GitHub Actions runner, then free up 30 GB space by
-  # removing things we do not need such as the Android SDK and .NET.
-  #
-  # Huge thanks to Maxim Lobanov for the advice:
-  # https://github.com/actions/virtual-environments/issues/2606#issuecomment-772683150
-  #
-  # Why do this? Because we've been getting warnings about the runners being
-  # left with less than a hundred megabytes of disk space during the tests.
-  if [ "${GITHUB_ACTIONS:-false}" = "true" ]; then
-    echo 'Detected GitHub Action Runner deleting Android and .NET ...'
-    sudo rm -rf /usr/local/lib/android # will release about 10 GB if you don't need Android
-    sudo rm -rf /usr/share/dotnet # will release about 20GB if you don't need .NET
-  fi
+  # Can be turned ON/OFF via env var FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED=true/false
+  freeUpGitHubRunnerDiskSpace
 
-  dumpDiskUsageInfo
+  if [ "${DUMP_DISK_USAGE_INFO_DISABLED:-true}" = "true" ]; then
+    echo "$(date +%FT%T%z) [CI] dumpDiskUsageInfo disabled. Skipping..."
+  else
+    dumpDiskUsageInfo
+  fi
 
   docker --version
   docker-compose --version
   node --version
   npm --version
   java -version
-
-  # install npm 7 globally - needed because Node v12, v14 default to npm v6
-  npm install -g npm@7.19.1
-  npm --version
   yarn --version
+
+  export NODE_OPTIONS=--max_old_space_size=5120
 
   ### COMMON
   cd $PROJECT_ROOT_DIR
 
-  if [ "${DEV_BUILD_DISABLED:-false}" = "true" ]; then
-    echo "$(date +%FT%T%z) [CI] Dev build disabled. Skipping..."
+  if [ "${CONFIGURE_DISABLED:-false}" = "true" ]; then
+    echo "$(date +%FT%T%z) [CI] npm run configure disabled. Skipping..."
   else
-    yarn configure
+    npm run configure
   fi
 
-  yarn tools:validate-bundle-names
-  yarn custom-checks
+  if [ "${TOOLS_VALIDATE_BUNDLE_NAMES_DISABLED:-false}" = "true" ]; then
+    echo "$(date +%FT%T%z) [CI] yarn tools:validate-bundle-names disabled. Skipping..."
+  else
+    yarn tools:validate-bundle-names
+  fi
+
+  if [ "${CUSTOM_CHECKS_DISABLED:-false}" = "true" ]; then
+    echo "$(date +%FT%T%z) [CI] yarn custom-checks disabled. Skipping..."
+  else
+    yarn custom-checks
+  fi
 
   if [ "${JEST_TEST_RUNNER_DISABLED:-false}" = "true" ]; then
     echo "$(date +%FT%T%z) [CI] Jest test runner disabled. Skipping..."
@@ -128,7 +150,11 @@ function mainTask()
     yarn test:jest:all $JEST_TEST_PATTERN
   fi
 
-  dumpDiskUsageInfo
+  if [ "${DUMP_DISK_USAGE_INFO_DISABLED:-true}" = "true" ]; then
+    echo "$(date +%FT%T%z) [CI] dumpDiskUsageInfo disabled. Skipping..."
+  else
+    dumpDiskUsageInfo
+  fi
 
   if [ "${TAPE_TEST_RUNNER_DISABLED:-false}" = "true" ]; then
     echo "$(date +%FT%T%z) [CI] Tape test runner disabled. Skipping..."
@@ -136,10 +162,11 @@ function mainTask()
     yarn test:tap:all --bail $TAPE_TEST_PATTERN
   fi
 
-  dumpDiskUsageInfo
-
-  # The webpack production build needs more memory than the default allocation
-  export NODE_OPTIONS=--max_old_space_size=4096
+  if [ "${DUMP_DISK_USAGE_INFO_DISABLED:-true}" = "true" ]; then
+    echo "$(date +%FT%T%z) [CI] dumpDiskUsageInfo disabled. Skipping..."
+  else
+    dumpDiskUsageInfo
+  fi
 
   # We run the full build last because the tests don't need it so in the interest
   # of providing feedback about failing tests as early as possible we run the
@@ -151,10 +178,15 @@ function mainTask()
     yarn run build
   fi
 
+  if [ "${CHECK_WORK_TREE_STATUS_DISABLED:-true}" = "true" ]; then
+    echo "$(date +%FT%T%z) [CI] checkWorkTreeStatus disabled. Skipping..."
+  else
+    checkWorkTreeStatus
+  fi
+
   ENDED_AT=`date +%s`
   runtime=$((ENDED_AT-STARTED_AT))
   echo "$(date +%FT%T%z) [CI] SUCCESS - runtime=$runtime seconds."
-  checkWorkTreeStatus
   exit 0
 }
 

@@ -14,7 +14,7 @@
 
 ## Introduction
 
-An Interoperation Identity Network (IIN) is a system built on a distributed shared ledger that supports registration of DIDs representing networks (e.g. permissioned consortium networks) and their units, as well as resolution of network DID documents from their DID. An IIN is also associated with one or more reputed [trust anchors](https://hyperledger-indy.readthedocs.io/projects/sdk/en/latest/docs/getting-started/indy-walkthrough.html#step-1-getting-trust-anchor-credentials-for-faber-acme-thrift-and-government), which play the important role of certifying (or validating) the identity of owners of those DIDs, as well as their memberships in their respective networks, in effect creating roots of trust for cross-network interoperations. Thus, IINs provide a foundation to enable the discovery and validation of blockchain/DLT networks and their participants. The IIN DID Method specification conforms to the requirements specified in [Decentralized Identifiers (DIDs) v1.0](https://w3c.github.io/did-core/). The IIN as a system is detailed further [here](./iin.md).
+An Interoperation Identity Network (IIN) is a system built on a distributed shared ledger that supports registration of DIDs representing networks (e.g. permissioned consortium networks) and their units, as well as resolution of network DID documents from their DID. An IIN is also associated with one or more reputed [trust anchors](https://hyperledger-indy.readthedocs.io/projects/sdk/en/latest/docs/getting-started/indy-walkthrough.html#step-1-getting-trust-anchor-credentials-for-faber-acme-thrift-and-government), which play the important role of certifying (or validating) the identity of owners of those DIDs, as well as their memberships in their respective networks, in effect creating roots of trust for cross-network interoperations. Thus, IINs provide a foundation to enable the discovery and validation of blockchain/DLT networks and their participants. The IIN DID Method specification conforms to the requirements specified in [Decentralized Identifiers (DIDs) v1.0](https://w3c.github.io/did-core/). The IIN as a system is detailed further [here](../../models/identity/iin.md).
 
 ## IIN Method Syntax
 
@@ -87,7 +87,7 @@ Each participant in `networkParticipants` must already have a registered DID in 
 
 The DID, that is the `id` property in the Network DID document can be chosen by the network. The chosen `id` *MUST* end with ".network" and *MUST*.
 
-See  [Network DID Identity format](../../formats/identity.md) for details about Network DID format.
+See [Network DID Identity format](./identity.md) for details about Network DID format.
 
 
 ##### Preparing Network DID creation request

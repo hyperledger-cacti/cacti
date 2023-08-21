@@ -34,7 +34,7 @@ export interface IIroha2TestLedgerOptions {
  */
 export const IROHA2_TEST_LEDGER_DEFAULT_OPTIONS = Object.freeze({
   containerImageName: "ghcr.io/hyperledger/cactus-iroha2-all-in-one",
-  containerImageVersion: "2022-10-18-06770b6c",
+  containerImageVersion: "2023-07-29-f2bc772ee",
   logLevel: "info" as LogLevelDesc,
   emitContainerLogs: true,
   envVars: [],
@@ -46,24 +46,25 @@ export const IROHA2_TEST_LEDGER_DEFAULT_OPTIONS = Object.freeze({
  * Contains all the necessary data needed to connect to the Iroha ledger.
  */
 export type Iroha2ClientConfig = {
-  TORII_API_URL: string;
-  TORII_TELEMETRY_URL: string;
-  ACCOUNT_ID: {
-    name: string;
-    domain_id: {
-      name: string;
-    };
-  };
-  BASIC_AUTH: {
-    web_login: string;
-    password: string;
-  };
   PUBLIC_KEY: string;
   PRIVATE_KEY: {
     digest_function: string;
     payload: string;
   };
-  LOGGER_CONFIGURATION: Record<string, unknown>;
+  ACCOUNT_ID: string;
+  BASIC_AUTH: {
+    web_login: string;
+    password: string;
+  };
+  TORII_API_URL: string;
+  TORII_TELEMETRY_URL: string;
+  TRANSACTION_TIME_TO_LIVE_MS: number;
+  TRANSACTION_STATUS_TIMEOUT_MS: number;
+  TRANSACTION_LIMITS: {
+    max_instruction_number: number;
+    max_wasm_size_bytes: number;
+  };
+  ADD_TRANSACTION_NONCE: boolean;
 };
 
 /**

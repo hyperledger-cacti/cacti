@@ -18,6 +18,10 @@ jobs:
       FULL_BUILD_DISABLED: true
       JEST_TEST_RUNNER_DISABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
+      TOOLS_VALIDATE_BUNDLE_NAMES_DISABLED: true
+      CUSTOM_CHECKS_DISABLED: true
+      CONFIGURE_DISABLED: false
+      CHECK_WORK_TREE_STATUS_DISABLED: true
     runs-on: ubuntu-20.04
     steps:
       - name: Use Node.js v16.14.2
@@ -25,18 +29,130 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - run: ./tools/ci.sh
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Initialize Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+
+      - if : ${{ (steps.yarn-cache.outputs.cache-hit != 'true') }}
+        name: tools_ci_sh
+        run: ./tools/ci.sh
+
+  yarn_lint:
+    continue-on-error: false
+    env:
+      DEV_BUILD_DISABLED: false
+      FULL_BUILD_DISABLED: true
+      JEST_TEST_RUNNER_DISABLED: true
+      TAPE_TEST_RUNNER_DISABLED: true
+      TOOLS_VALIDATE_BUNDLE_NAMES_DISABLED: true
+      CUSTOM_CHECKS_DISABLED: true
+    needs: build-dev
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Use Node.js v16.14.2
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: v16.14.2
+      - uses: actions/checkout@v3.5.2
+      - id: yarn-cache
+        name: Restore Yarn Cache
+        uses: actions/cache@v3.3.1
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
+          restore-keys: |
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+      - run: ./tools/ci.sh
+      - run: yarn lint
+  yarn_codegen:
+    continue-on-error: false
+    env:
+      DEV_BUILD_DISABLED: false
+      FULL_BUILD_DISABLED: true
+      JEST_TEST_RUNNER_DISABLED: true
+      TAPE_TEST_RUNNER_DISABLED: true
+      TOOLS_VALIDATE_BUNDLE_NAMES_DISABLED: true
+      CUSTOM_CHECKS_DISABLED: true
+      CONFIGURE_DISABLED: false
+    needs: build-dev
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Use Node.js v16.14.2
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: v16.14.2
+      - uses: actions/checkout@v3.5.2
+
+      - id: yarn-cache
+        name: Restore Yarn Cache
+        uses: actions/cache@v3.3.1
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
+          restore-keys: |
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+      - run: ./tools/ci.sh
+      - run: yarn codegen
+  yarn_custom_checks:
+    continue-on-error: false
+    env:
+      DEV_BUILD_DISABLED: false
+      FULL_BUILD_DISABLED: true
+      JEST_TEST_RUNNER_DISABLED: true
+      TAPE_TEST_RUNNER_DISABLED: true
+      TOOLS_VALIDATE_BUNDLE_NAMES_DISABLED: true
+      CUSTOM_CHECKS_DISABLED: false
+      CONFIGURE_DISABLED: false
+    needs: build-dev
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Use Node.js v16.14.2
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: v16.14.2
+      - uses: actions/checkout@v3.5.2
+      - id: yarn-cache
+        name: Restore Yarn Cache
+        uses: actions/cache@v3.3.1
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
+          restore-keys: |
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+      - run: ./tools/ci.sh
+  yarn_tools_validate_bundle_names:
+    continue-on-error: false
+    env:
+      DEV_BUILD_DISABLED: false
+      FULL_BUILD_DISABLED: true
+      JEST_TEST_RUNNER_DISABLED: true
+      TAPE_TEST_RUNNER_DISABLED: true
+      TOOLS_VALIDATE_BUNDLE_NAMES_DISABLED: false
+      CUSTOM_CHECKS_DISABLED: true
+      CONFIGURE_DISABLED: false
+    needs: build-dev
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Use Node.js v16.14.2
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: v16.14.2
+      - uses: actions/checkout@v3.5.2
+      - id: yarn-cache
+        name: Restore Yarn Cache
+        uses: actions/cache@v3.3.1
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
+          restore-keys: |
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+      - run: ./tools/ci.sh
   cactus-api-client:
     continue-on-error: false
     env:
@@ -54,17 +170,16 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+
       - run: ./tools/ci.sh
   cactus-cmd-api-server:
     continue-on-error: false
@@ -74,7 +189,7 @@ jobs:
       JEST_TEST_PATTERN: packages/cactus-cmd-api-server/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_RUNNER_DISABLED: false
       TAPE_TEST_PATTERN: >-
-        --files={./packages/cactus-cmd-api-server/src/test/typescript/benchmark/artillery-api-benchmark.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/integration/jwt-socketio-endpoint-authorization.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/integration/plugin-import-from-github.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/integration/plugin-import-without-install.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/integration/remote-plugin-imports.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/config/self-signed-certificate-generator/certificates-work-for-mutual-tls.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/config/self-signed-certificate-generator/generates-working-certificates.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/grpc-js-proto-loader-client-healthcheck.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/grpc-proto-gen-ts-client-healthcheck.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/grpc-proto-gen-ts-client-m-tls-enabled.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/plugins/install-basic-plugin-consortium-manual.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/plugins/install-basic-plugin-keychain-memory.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/plugins/install-basic-plugin-ledger-connector-fabric-0-7-0.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/plugins/install-basic-plugin-ledger-connector-quorum-0-7-0.test.ts}
+        --files={./packages/cactus-cmd-api-server/src/test/typescript/benchmark/artillery-api-benchmark.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/integration/plugin-import-from-github.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/integration/plugin-import-without-install.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/integration/remote-plugin-imports.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/config/self-signed-certificate-generator/certificates-work-for-mutual-tls.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/config/self-signed-certificate-generator/generates-working-certificates.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/grpc-js-proto-loader-client-healthcheck.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/grpc-proto-gen-ts-client-healthcheck.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/grpc-proto-gen-ts-client-m-tls-enabled.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/plugins/install-basic-plugin-consortium-manual.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/plugins/install-basic-plugin-keychain-memory.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/plugins/install-basic-plugin-ledger-connector-fabric-0-7-0.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/plugins/install-basic-plugin-ledger-connector-quorum-0-7-0.test.ts}
       TAPE_TEST_RUNNER_DISABLED: false
     needs: build-dev
     runs-on: ubuntu-20.04
@@ -84,17 +199,16 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+
       - run: ./tools/ci.sh
   cactus-cmd-socketio-server:
     continue-on-error: false
@@ -111,18 +225,18 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+
       - run: ./tools/ci.sh
+
   cactus-common:
     continue-on-error: false
     env:
@@ -140,17 +254,16 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+
       - run: ./tools/ci.sh
   cactus-core:
     continue-on-error: false
@@ -167,17 +280,15 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
   cactus-core-api:
     continue-on-error: false
@@ -194,17 +305,15 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
   cactus-example-carbon-accounting-backend:
     continue-on-error: false
@@ -222,17 +331,15 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
   cactus-example-carbon-accounting-business-logic-plugin:
     continue-on-error: false
@@ -249,17 +356,15 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
   cactus-example-carbon-accounting-frontend:
     continue-on-error: false
@@ -277,17 +382,15 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
   cactus-example-supply-chain-backend:
     continue-on-error: false
@@ -305,17 +408,15 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
   cactus-example-supply-chain-business-logic-plugin:
     continue-on-error: false
@@ -332,17 +433,15 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
   cactus-example-supply-chain-frontend:
     continue-on-error: false
@@ -360,17 +459,15 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
   cactus-plugin-consortium-manual:
     continue-on-error: false
@@ -387,17 +484,15 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
   cactus-plugin-htlc-coordinator-besu:
     continue-on-error: false
@@ -416,17 +511,15 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
   cactus-plugin-htlc-eth-besu:
     continue-on-error: false
@@ -443,17 +536,15 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
   cactus-plugin-htlc-eth-besu-erc20:
     continue-on-error: false
@@ -470,17 +561,15 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
   cactus-plugin-keychain-aws-sm:
     continue-on-error: false
@@ -498,17 +587,15 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
   cactus-plugin-keychain-azure-kv:
     continue-on-error: false
@@ -526,17 +613,15 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
   cactus-plugin-keychain-google-sm:
     continue-on-error: false
@@ -554,17 +639,15 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
   cactus-plugin-keychain-memory:
     continue-on-error: false
@@ -581,17 +664,15 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
   cactus-plugin-keychain-memory-wasm:
     continue-on-error: false
@@ -609,17 +690,15 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
   cactus-plugin-keychain-vault:
     continue-on-error: false
@@ -637,17 +716,15 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
   cactus-plugin-ledger-connector-besu:
     continue-on-error: false
@@ -666,17 +743,15 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
   cactus-plugin-ledger-connector-corda:
     continue-on-error: false
@@ -695,27 +770,27 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cactus-plugin-ledger-connector-fabric:
+
+  plugin-ledger-connector-fabric-0:
     continue-on-error: false
     env:
+      CACTI_NPM_PACKAGE_NAME: "@hyperledger/cactus-plugin-ledger-connector-fabric"
+      HFC_LOGGING: '{"debug":"console","info":"console","warn": "console","error":"console"}'
       FULL_BUILD_DISABLED: true
       JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_RUNNER_DISABLED: false
-      TAPE_TEST_PATTERN: >-
-        --files={./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v1-4-x/deploy-cc-from-golang-source.test.ts,./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v1-4-x/run-transaction-endpoint-v1.test.ts,./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/add-orgs.test.ts,./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/deploy-cc-from-golang-source.test.ts,./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/deploy-cc-from-javascript-source.test.ts,./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/deploy-cc-from-typescript-source.test.ts,./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/deploy-lock-asset.test.ts,./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/obtain-profiles.test.ts,./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/run-transaction-with-identities.test.ts,./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/run-transaction-with-ws-ids.test.ts,./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/identity-client.test.ts,./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/openapi/openapi-validation-go.test.ts,./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/openapi/openapi-validation.test.ts,./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/unit/identity-internal-crypto-utils.test.ts}
-      TAPE_TEST_RUNNER_DISABLED: false
+      TAPE_TEST_PATTERN: ""
+      TAPE_TEST_RUNNER_DISABLED: true
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
@@ -724,18 +799,377 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
+
+  plugin-ledger-connector-fabric-1:
+    continue-on-error: false
+    env:
+      CACTI_NPM_PACKAGE_NAME: "@hyperledger/cactus-plugin-ledger-connector-fabric"
+      HFC_LOGGING: '{"debug":"console","info":"console","warn": "console","error":"console"}'
+      FULL_BUILD_DISABLED: true
+      JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_RUNNER_DISABLED: true
+      TAPE_TEST_PATTERN: ""
+      TAPE_TEST_RUNNER_DISABLED: true
+    needs: build-dev
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Use Node.js v16.14.2
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: v16.14.2
+      - uses: actions/checkout@v3.5.2
+
+      - id: yarn-cache
+        name: Restore Yarn Cache
+        uses: actions/cache@v3.3.1
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
+          restore-keys: |
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+      - run: npm run configure
+      - run: yarn ts-node ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/deploy-cc-from-javascript-source.test.ts
+
+  plugin-ledger-connector-fabric-2:
+    continue-on-error: false
+    env:
+      CACTI_NPM_PACKAGE_NAME: "@hyperledger/cactus-plugin-ledger-connector-fabric"
+      HFC_LOGGING: '{"debug":"console","info":"console","warn": "console","error":"console"}'
+      FULL_BUILD_DISABLED: true
+      JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_RUNNER_DISABLED: true
+      TAPE_TEST_PATTERN: ""
+      TAPE_TEST_RUNNER_DISABLED: true
+    needs: build-dev
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Use Node.js v16.14.2
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: v16.14.2
+      - uses: actions/checkout@v3.5.2
+
+      - id: yarn-cache
+        name: Restore Yarn Cache
+        uses: actions/cache@v3.3.1
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
+          restore-keys: |
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+      - run: npm run configure
+      - run: yarn ts-node ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/deploy-cc-from-typescript-source.test.ts
+
+  plugin-ledger-connector-fabric-3:
+    continue-on-error: false
+    env:
+      CACTI_NPM_PACKAGE_NAME: "@hyperledger/cactus-plugin-ledger-connector-fabric"
+      HFC_LOGGING: '{"debug":"console","info":"console","warn": "console","error":"console"}'
+      FULL_BUILD_DISABLED: true
+      JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_RUNNER_DISABLED: true
+      TAPE_TEST_PATTERN: ""
+      TAPE_TEST_RUNNER_DISABLED: true
+    needs: build-dev
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Use Node.js v16.14.2
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: v16.14.2
+      - uses: actions/checkout@v3.5.2
+
+      - id: yarn-cache
+        name: Restore Yarn Cache
+        uses: actions/cache@v3.3.1
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
+          restore-keys: |
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+      - run: npm run configure
+      - run: yarn ts-node ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/deploy-lock-asset.test.ts
+
+  plugin-ledger-connector-fabric-4:
+    continue-on-error: false
+    env:
+      CACTI_NPM_PACKAGE_NAME: "@hyperledger/cactus-plugin-ledger-connector-fabric"
+      HFC_LOGGING: '{"debug":"console","info":"console","warn": "console","error":"console"}'
+      FULL_BUILD_DISABLED: true
+      JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_RUNNER_DISABLED: true
+      TAPE_TEST_PATTERN: ""
+      TAPE_TEST_RUNNER_DISABLED: true
+    needs: build-dev
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Use Node.js v16.14.2
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: v16.14.2
+      - uses: actions/checkout@v3.5.2
+
+      - id: yarn-cache
+        name: Restore Yarn Cache
+        uses: actions/cache@v3.3.1
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
+          restore-keys: |
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+      - run: npm run configure
+      - run: yarn ts-node ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/openapi/openapi-validation.test.ts
+
+  plugin-ledger-connector-fabric-5:
+    continue-on-error: false
+    env:
+      CACTI_NPM_PACKAGE_NAME: "@hyperledger/cactus-plugin-ledger-connector-fabric"
+      HFC_LOGGING: '{"debug":"console","info":"console","warn": "console","error":"console"}'
+      FULL_BUILD_DISABLED: true
+      JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_RUNNER_DISABLED: true
+      TAPE_TEST_PATTERN: ""
+      TAPE_TEST_RUNNER_DISABLED: true
+    needs: build-dev
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Use Node.js v16.14.2
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: v16.14.2
+      - uses: actions/checkout@v3.5.2
+
+      - id: yarn-cache
+        name: Restore Yarn Cache
+        uses: actions/cache@v3.3.1
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
+          restore-keys: |
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+      - run: npm run configure
+      - run: yarn ts-node ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/openapi/openapi-validation-go.test.ts
+
+  plugin-ledger-connector-fabric-6:
+    continue-on-error: false
+    env:
+      CACTI_NPM_PACKAGE_NAME: "@hyperledger/cactus-plugin-ledger-connector-fabric"
+      HFC_LOGGING: '{"debug":"console","info":"console","warn": "console","error":"console"}'
+      FULL_BUILD_DISABLED: true
+      JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_RUNNER_DISABLED: true
+      TAPE_TEST_PATTERN: ""
+      TAPE_TEST_RUNNER_DISABLED: true
+    needs: build-dev
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Use Node.js v16.14.2
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: v16.14.2
+      - uses: actions/checkout@v3.5.2
+
+      - id: yarn-cache
+        name: Restore Yarn Cache
+        uses: actions/cache@v3.3.1
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
+          restore-keys: |
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+      - run: npm run configure
+      - run: yarn ts-node ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/unit/identity-internal-crypto-utils.test.ts
+
+  plugin-ledger-connector-fabric-7:
+    continue-on-error: false
+    env:
+      CACTI_NPM_PACKAGE_NAME: "@hyperledger/cactus-plugin-ledger-connector-fabric"
+      HFC_LOGGING: '{"debug":"console","info":"console","warn": "console","error":"console"}'
+      FULL_BUILD_DISABLED: true
+      JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_RUNNER_DISABLED: true
+      TAPE_TEST_PATTERN: ""
+      TAPE_TEST_RUNNER_DISABLED: true
+    needs: build-dev
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Use Node.js v16.14.2
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: v16.14.2
+      - uses: actions/checkout@v3.5.2
+
+      - id: yarn-cache
+        name: Restore Yarn Cache
+        uses: actions/cache@v3.3.1
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
+          restore-keys: |
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+      - run: npm run configure
+      - run: yarn ts-node ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/identity-client.test.ts
+
+  plugin-ledger-connector-fabric-8:
+    continue-on-error: false
+    env:
+      CACTI_NPM_PACKAGE_NAME: "@hyperledger/cactus-plugin-ledger-connector-fabric"
+      HFC_LOGGING: '{"debug":"console","info":"console","warn": "console","error":"console"}'
+      FULL_BUILD_DISABLED: true
+      JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_RUNNER_DISABLED: true
+      TAPE_TEST_PATTERN: ""
+      TAPE_TEST_RUNNER_DISABLED: true
+    needs: build-dev
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Use Node.js v16.14.2
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: v16.14.2
+      - uses: actions/checkout@v3.5.2
+
+      - id: yarn-cache
+        name: Restore Yarn Cache
+        uses: actions/cache@v3.3.1
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
+          restore-keys: |
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+      - run: npm run configure
+      - run: yarn ts-node ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/run-transaction-with-identities.test.ts
+
+  plugin-ledger-connector-fabric-9:
+    continue-on-error: false
+    env:
+      CACTI_NPM_PACKAGE_NAME: "@hyperledger/cactus-plugin-ledger-connector-fabric"
+      HFC_LOGGING: '{"debug":"console","info":"console","warn": "console","error":"console"}'
+      FULL_BUILD_DISABLED: true
+      JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_RUNNER_DISABLED: true
+      TAPE_TEST_PATTERN: ""
+      TAPE_TEST_RUNNER_DISABLED: true
+    needs: build-dev
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Use Node.js v16.14.2
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: v16.14.2
+      - uses: actions/checkout@v3.5.2
+
+      - id: yarn-cache
+        name: Restore Yarn Cache
+        uses: actions/cache@v3.3.1
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
+          restore-keys: |
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+      - run: npm run configure
+      - run: yarn ts-node ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/obtain-profiles.test.ts
+
+  plugin-ledger-connector-fabric-10:
+    continue-on-error: false
+    env:
+      CACTI_NPM_PACKAGE_NAME: "@hyperledger/cactus-plugin-ledger-connector-fabric"
+      HFC_LOGGING: '{"debug":"console","info":"console","warn": "console","error":"console"}'
+      FULL_BUILD_DISABLED: true
+      JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_RUNNER_DISABLED: true
+      TAPE_TEST_PATTERN: ""
+      TAPE_TEST_RUNNER_DISABLED: true
+    needs: build-dev
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Use Node.js v16.14.2
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: v16.14.2
+      - uses: actions/checkout@v3.5.2
+
+      - id: yarn-cache
+        name: Restore Yarn Cache
+        uses: actions/cache@v3.3.1
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
+          restore-keys: |
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+      - run: npm run configure
+      - run: yarn ts-node ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/deploy-cc-from-golang-source.test.ts
+
+  plugin-ledger-connector-fabric-11:
+    continue-on-error: false
+    env:
+      CACTI_NPM_PACKAGE_NAME: "@hyperledger/cactus-plugin-ledger-connector-fabric"
+      HFC_LOGGING: '{"debug":"console","info":"console","warn": "console","error":"console"}'
+      FULL_BUILD_DISABLED: true
+      JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_RUNNER_DISABLED: true
+      TAPE_TEST_PATTERN: ""
+      TAPE_TEST_RUNNER_DISABLED: true
+    needs: build-dev
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Use Node.js v16.14.2
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: v16.14.2
+      - uses: actions/checkout@v3.5.2
+
+      - id: yarn-cache
+        name: Restore Yarn Cache
+        uses: actions/cache@v3.3.1
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
+          restore-keys: |
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+      - run: npm run configure
+      - run: yarn ts-node ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/add-orgs.test.ts
+
+  plugin-ledger-connector-fabric-12:
+    continue-on-error: false
+    env:
+      CACTI_NPM_PACKAGE_NAME: "@hyperledger/cactus-plugin-ledger-connector-fabric"
+      HFC_LOGGING: '{"debug":"console","info":"console","warn": "console","error":"console"}'
+      FULL_BUILD_DISABLED: true
+      JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_RUNNER_DISABLED: true
+      TAPE_TEST_PATTERN: ""
+      TAPE_TEST_RUNNER_DISABLED: true
+    needs: build-dev
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Use Node.js v16.14.2
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: v16.14.2
+      - uses: actions/checkout@v3.5.2
+
+      - id: yarn-cache
+        name: Restore Yarn Cache
+        uses: actions/cache@v3.3.1
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
+          restore-keys: |
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+      - run: npm run configure
+      - run: yarn ts-node ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/run-transaction-with-ws-ids.test.ts
+
   cactus-plugin-ledger-connector-fabric-socketio:
     continue-on-error: false
     env:
@@ -751,17 +1185,17 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+      - run: yarn --version
+      - run: yarn install
       - run: ./tools/ci.sh
   cactus-plugin-ledger-connector-go-ethereum-socketio:
     continue-on-error: false
@@ -779,17 +1213,15 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
   cactus-plugin-ledger-connector-iroha:
     continue-on-error: false
@@ -808,17 +1240,15 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
   cactus-plugin-ledger-connector-iroha2:
     continue-on-error: false
@@ -835,17 +1265,15 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
   cactus-plugin-ledger-connector-quorum:
     continue-on-error: false
@@ -864,17 +1292,15 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
   cactus-plugin-ledger-connector-sawtooth-socketio:
     continue-on-error: false
@@ -892,17 +1318,15 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
   cactus-plugin-ledger-connector-xdai:
     continue-on-error: false
@@ -921,17 +1345,15 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
   cactus-plugin-persistence-ethereum:
     continue-on-error: false
@@ -948,17 +1370,15 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
   cactus-plugin-object-store-ipfs:
     continue-on-error: false
@@ -976,17 +1396,15 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
   # cactus-plugin-odap-hermes:
   #   continue-on-error: false
@@ -1008,10 +1426,10 @@ jobs:
   #       run: echo "::set-output name=dir::$(yarn cache dir)"
   #     - id: yarn-cache
   #       name: Restore Yarn Cache
-  #       uses: actions/cache@v3.0.4
+  #       uses: actions/cache@v3.3.1
   #       with:
-  #         key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-  #         path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+  #         key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+  #         path: ./.yarn/
   #         restore-keys: |
   #           ${{ runner.os }}-yarn-
   #     - run: ./tools/ci.sh
@@ -1031,17 +1449,15 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
         env:
          UBIQUITY_AUTH_TOKEN: ${{ secrets.UBIQUITY_AUTH_TOKEN }}
@@ -1060,17 +1476,15 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
   cactus-test-cmd-api-server:
     continue-on-error: false
@@ -1088,17 +1502,15 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
   cactus-test-plugin-consortium-manual:
     continue-on-error: false
@@ -1116,17 +1528,15 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
   cactus-test-plugin-htlc-eth-besu:
     continue-on-error: false
@@ -1144,18 +1554,23 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
+      
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+
+      - name: Run solidity tests
+        run: cd packages/cactus-plugin-htlc-eth-besu && forge test -vvvvv
+              
   cactus-test-plugin-htlc-eth-besu-erc20:
     continue-on-error: false
     env:
@@ -1173,17 +1588,15 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
   cactus-test-plugin-ledger-connector-besu:
     continue-on-error: false
@@ -1202,17 +1615,15 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
   cactus-test-plugin-ledger-connector-quorum:
     continue-on-error: false
@@ -1229,17 +1640,15 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
   cactus-test-tooling:
     continue-on-error: false
@@ -1258,17 +1667,15 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
   cactus-verifier-client:
     continue-on-error: false
@@ -1285,17 +1692,15 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
   ghcr-besu-all-in-one:
     runs-on: ubuntu-20.04
