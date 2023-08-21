@@ -19,6 +19,7 @@ import 'dotenv/config';
 import { loadEventSubscriptionsFromStorage, monitorBlockForMissedEvents } from './listener'
 import { walletSetup } from './walletSetup';
 import { subscribeEventHelper, unsubscribeEventHelper, signEventSubscriptionQuery, writeExternalStateHelper } from "./events"
+import { performLockHelper } from "./satp"
 import * as path from 'path';
 import { handlePromise, relayCallback, getRelayClientForQueryResponse, getRelayClientForEventSubscription, delay } from './utils';
 import { dbConnectionTest, eventSubscriptionTest } from "./tests"
@@ -216,6 +217,27 @@ server.addService(driver_pb_grpc.DriverCommunicationService, {
         const requestId: string = viewPayload.getRequestId();
 
         writeExternalStateHelper(call.request, process.env.NETWORK_NAME ? process.env.NETWORK_NAME : 'network1').then(() => {
+            const ack_response = new ack_pb.Ack();
+            ack_response.setRequestId(requestId);
+            ack_response.setMessage('Successfully written to the ledger');
+            ack_response.setStatus(ack_pb.Ack.STATUS.OK);
+            // gRPC response.
+            logger.info(`Responding to caller with Ack: ${JSON.stringify(ack_response.toObject())}`);
+            callback(null, ack_response);
+        }).catch((error) => {
+            const ack_err_response = new ack_pb.Ack();
+            ack_err_response.setRequestId(requestId);
+            ack_err_response.setMessage(error.toString());
+            ack_err_response.setStatus(ack_pb.Ack.STATUS.ERROR);
+            // gRPC response.
+            logger.info(`Responding to caller with error Ack: ${JSON.stringify(ack_err_response.toObject())}`);
+            callback(null, ack_err_response);
+        });
+    },
+    performLock: (call: { request: driverPb.PerformLockRequest }, callback: (_: any, object: ack_pb.Ack) => void) => {
+        const requestId: string = call.request.getSessionId();
+
+        performLockHelper(call.request, process.env.NETWORK_NAME ? process.env.NETWORK_NAME : 'network1').then(() => {
             const ack_response = new ack_pb.Ack();
             ack_response.setRequestId(requestId);
             ack_response.setMessage('Successfully written to the ledger');
