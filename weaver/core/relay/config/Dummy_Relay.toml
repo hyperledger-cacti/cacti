@@ -53,6 +53,6 @@ tls=false
 tlsca_cert_path="credentials/fabric_ca_cert.pem"
 [drivers.Dummy]
 hostname="localhost"
-port="9092"
+port="9090"
 tls=false
 tlsca_cert_path="credentials/fabric_ca_cert.pem"
