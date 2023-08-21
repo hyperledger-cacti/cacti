@@ -60,7 +60,7 @@ import { io } from "socket.io-client";
     reqID: reqID,
   };
 
-  const json2str = (jsonObj) => {
+  const json2str = (jsonObj: object) => {
     try {
       return JSON.stringify(jsonObj);
     } catch (error) {
@@ -68,25 +68,25 @@ import { io } from "socket.io-client";
     }
   };
 
-  socket.on("connect_error", (err) => {
+  socket.on("connect_error", (err: object) => {
     console.log("####connect_error:", err);
     // end communication
     socket.disconnect();
     process.exit(0);
   });
 
-  socket.on("connect_timeout", (err) => {
+  socket.on("connect_timeout", (err: object) => {
     console.log("####Error:", err);
     // end communication
     socket.disconnect();
     process.exit(0);
   });
 
-  socket.on("error", (err) => {
+  socket.on("error", (err: object) => {
     console.log("####Error:", err);
   });
 
-  socket.on("eventReceived", function (res) {
+  socket.on("eventReceived", function (res: object) {
     // output the data received from the client
     console.log("#[recv]eventReceived, res: " + json2str(res));
   });

@@ -7,6 +7,8 @@
     "resolveJsonModule": true,
     "allowJs": false,
     "skipLibCheck": true,
+    "rootDir": "./src/",
+    "tsBuildInfoFile": "../../.build-cache/cactus-plugin-odap-hermes.tsbuildinfo"
   },
   "ts-node": {
     "files": true

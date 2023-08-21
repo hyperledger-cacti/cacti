@@ -1,0 +1,35 @@
+General:
+  AgentServer:
+    Address: 0.0.0.0
+    GRPCPort: 8098
+  RelayInfo:
+    Address: relay1
+    Port: 8082
+FabricConfiguration:
+  SupportContractEntry:
+    BlockCrossContract: blockcross
+    BlockCrossInvoke: invoke
+  FabricCfgFilePath:
+    CfgFile: /root/Certs/blockcrossA-NoDelete-channel-sdk-config.yaml
+  AppchainInfo:
+    UserName: Admin
+    ChaincodeID: blockcross
+    Name: A
+CrossChannel:
+  CrossChannelID: channelidA
+  CrossChannelName: mychannel
+CryptoPath:
+  SelfTLSPath:
+    PrivateKey: /root/Certs/A/channelidA/tls/A.key
+    Certificate: /root/Certs/A/channelidA/tls/A.crt
+    RootCA: /root/Certs/A/tlsca.crt
+  SelfMemPath:
+    PrivateKey: /root/Certs/A/membership/A.key
+    Certificate: /root/Certs/A/membership/A.crt
+    RootCA: /root/Certs/A/memca.crt
+  ServerTLSPath:
+    PrivateKey: /root/Certs/Server/key.pem
+    Certificate: /root/Certs/Server/cert.pem
+    RootCA: /root/Certs/Server/cacert.pem
+PersistentData:
+  DBPath: /root/tcdas/production/agent/DB

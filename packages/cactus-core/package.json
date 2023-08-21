@@ -21,7 +21,7 @@
   "author": {
     "name": "Hyperledger Cactus Contributors",
     "email": "cactus@lists.hyperledger.org",
-    "url": "https://www.hyperledger.org/use/cactus"
+    "url": "https://www.hyperledger.org/use/cacti"
   },
   "contributors": [
     {
@@ -54,7 +54,7 @@
     "@hyperledger/cactus-core-api": "2.0.0-alpha.1",
     "express": "4.17.3",
     "express-jwt-authz": "2.4.1",
-    "express-openapi-validator": "4.13.8",
+    "express-openapi-validator": "5.0.4",
     "typescript-optional": "2.0.1"
   },
   "devDependencies": {

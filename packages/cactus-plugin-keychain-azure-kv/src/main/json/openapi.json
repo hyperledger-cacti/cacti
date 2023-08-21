@@ -1,26 +1,27 @@
 {
-    "openapi": "3.0.3",
-    "info": {
-      "title": "Hyperledger Cactus - Keychain API",
-      "description": "Contains/describes the Keychain API types/paths for Hyperledger Cactus.",
-      "version": "0.3.0",
-      "license": {
-        "name": "Apache 2.0",
-        "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Hyperledger Cactus - Keychain API",
+    "description": "Contains/describes the Keychain API types/paths for Hyperledger Cactus.",
+    "version": "0.3.0",
+    "license": {
+      "name": "Apache-2.0",
+      "identifier": "Apache-2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "components": {
+    "schemas": {
+      "GetSecretRequest": {
+        "type": "string",
+        "nullable": false
+      },
+      "GetSecretResponse": {
+        "type": "string",
+        "nullable": false
       }
-    },
-    "components": {
-      "schemas": {
-        "GetSecretRequest": {
-            "type": "string",
-            "nullable": false
-        },
-        "GetSecretResponse": {
-            "type": "string",
-            "nullable": false
-        } 
-      }
-    },
+    }
+  },
   "paths": {
     "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-azure-kv/get-keychain-entry": {
       "post": {
@@ -147,4 +148,3 @@
     }
   }
 }
-

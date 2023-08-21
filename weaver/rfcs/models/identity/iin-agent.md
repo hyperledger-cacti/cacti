@@ -36,7 +36,7 @@ The following artifacts in the data plane are relevant to identity plane protoco
 * _Identity trust store_: this is a set of IINs and Trust anchors `<IIN>,<Trust-Anchor-DID>`. It implies that the network trusts a given trust anchor or all trust anchors in a given IIN to certify the identity/membership credentials of foreign network units. 
 
 * The IIN definition can additionally contain peer connectivity information (to access the IIN ledger). This data will be looked up in the identity sharing protocol, while fetching membership information for a foreign network. It can also be used in proof verification (or view validation) in data plane protocols.
-* _Security Domain identities and configurations_: these are identities and certificates corresponding to foreign [security domains](../security/security-domains.md) and their members. See the [security domain identity](../../formats/network/identity.md#security-domain-identity) and [membership](../../formats/network/membership.md) for more details. (_Each security domain is also associated with an Organizational Unit Identity, or a DID record maintained in an IIN_). The IIN Agent of the network members collectively update these configurations using an [identity plane protocol](../../protocols/identity/id-config-sharing.md).
+* _Security Domain identities and configurations_: these are identities and certificates corresponding to foreign [security domains](../security/security-domains.md) and their members. See the [security domain identity](../../formats/network/identity.md#security-domain-identity) and [membership](../../formats/network/membership.md) for more details. (_Each security domain is also associated with an Organizational Unit Identity, or a DID record maintained in an IIN_). The IIN Agent of the network members collectively update these configurations using an [identity plane protocol](../../protocols/identity/identity-syncing.md).
 
 
 # IIN Agent Design and Interface
@@ -86,7 +86,7 @@ In another mode, it serves a destination (or identity syncing) network or securi
 <br/>
 
 
-Collectively, IIN Agents in source and destination modes can sync and register a foreign security domain's identity and membership info for use in data plane protocols. See the [description](../../protocols/identity/id-config-sharing.md) of the identity plane protocol that performs this sync for more details. The protocol relies on the DID infrastructure (IINs and trust anchors) as a root of trust but is otherwise bilateral (network-to-network).
+Collectively, IIN Agents in source and destination modes can sync and register a foreign security domain's identity and membership info for use in data plane protocols. See the [description](../../protocols/identity/identity-syncing.md) of the identity plane protocol that performs this sync for more details. The protocol relies on the DID infrastructure (IINs and trust anchors) as a root of trust but is otherwise bilateral (network-to-network).
 
 ### IIN Agent Functional API
 

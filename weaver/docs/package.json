@@ -13,17 +13,17 @@
     "deploy-gh-pages": "gh-pages -d build"
   },
   "dependencies": {
-    "@docusaurus/core": "2.2.0",
-    "@docusaurus/preset-classic": "2.2.0",
-    "@mdx-js/react": "^1.6.21",
-    "clsx": "^1.1.1",
-    "react": "^16.8.4",
-    "react-dom": "^16.8.4",
-    "gh-pages": "^2.2.0",
-    "elliptic": "^6.5.4",
-    "immer": "^9.0.21",
-    "react-dev-utils": "^11.0.4",
-    "is-svg": "^4.2.2"
+    "@docusaurus/core": "2.4.1",
+    "@docusaurus/preset-classic": "2.4.1",
+    "@mdx-js/react": "1.6.22",
+    "clsx": "1.2.1",
+    "elliptic": "6.5.4",
+    "gh-pages": "2.2.0",
+    "immer": "9.0.21",
+    "is-svg": "4.4.0",
+    "react": "16.14.0",
+    "react-dev-utils": "11.0.4",
+    "react-dom": "16.14.0"
   },
   "browserslist": {
     "production": [

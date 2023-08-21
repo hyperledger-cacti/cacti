@@ -6,12 +6,16 @@
  * Remember to free key objects supplied to the signing methods.
  */
 
-import { Signer, makeSignedTransaction, makeSignedQuery } from "@iroha2/client";
+import {
+  Signer,
+  makeVersionedSignedTransaction,
+  makeVersionedSignedQuery,
+} from "@iroha2/client";
 import {
   QueryPayload,
   TransactionPayload,
   VersionedSignedQueryRequest,
-  VersionedTransaction,
+  VersionedSignedTransaction,
 } from "@iroha2/data-model";
 
 import { generateIrohaV2KeyPair } from "./cactus-iroha-sdk-wrapper/client";
@@ -59,8 +63,8 @@ export function signIrohaV2Transaction(
 ): Uint8Array {
   const unsignedTx = TransactionPayload.fromBuffer(serializedTx);
   const signer = getSigner(accountName, domainName, keyPair);
-  const signedTx = makeSignedTransaction(unsignedTx, signer);
-  return VersionedTransaction.toBuffer(signedTx);
+  const signedTx = makeVersionedSignedTransaction(unsignedTx, signer);
+  return VersionedSignedTransaction.toBuffer(signedTx);
 }
 
 /**
@@ -81,6 +85,6 @@ export function signIrohaV2Query(
 ): Uint8Array {
   const unsignedQueryReq = QueryPayload.fromBuffer(serializedQuery);
   const signer = getSigner(accountName, domainName, keyPair);
-  const queryReq = makeSignedQuery(unsignedQueryReq, signer);
+  const queryReq = makeVersionedSignedQuery(unsignedQueryReq, signer);
   return VersionedSignedQueryRequest.toBuffer(queryReq);
 }

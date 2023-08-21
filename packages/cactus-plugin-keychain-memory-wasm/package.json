@@ -21,7 +21,7 @@
   "author": {
     "name": "Hyperledger Cactus Contributors",
     "email": "cactus@lists.hyperledger.org",
-    "url": "https://www.hyperledger.org/use/cactus"
+    "url": "https://www.hyperledger.org/use/cacti"
   },
   "contributors": [
     {
@@ -48,7 +48,7 @@
     "copy-wasm-bg": "cpy './main/typescript/generated/wasm-pack/cactus_plugin_keychain_memory_wasm_bg*' '../dist/lib/' --cwd=src --parents",
     "del-wasm-pack-project-files": "del-cli src/main/typescript/generated/wasm-pack/{package.json,README.md,.gitignore}",
     "generate-rust-server": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g rust-server -o ./src/main/rust/generated/openapi/rust-server",
-    "generate-sdk": "run-p generate-sdk:*",
+    "generate-sdk": "run-p 'generate-sdk:*'",
     "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
     "generate-sdk:kotlin": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g kotlin -o ./src/main/kotlin/generated/openapi/kotlin-client/ --reserved-words-mappings protected=protected",
     "wasm-pack": "CARGO_TARGET_DIR=${PWD}/dist/target-rustc/ wasm-pack build src/main/rust/cactus-plugin-keychain-memory-wasm/ --release --scope=hyperledger --target=nodejs --out-dir=../../../../src/main/typescript/generated/wasm-pack/",
@@ -70,7 +70,7 @@
   },
   "devDependencies": {
     "@types/express": "4.17.13",
-    "cpy-cli": "4.1.0",
+    "cpy-cli": "4.2.0",
     "del-cli": "4.0.1"
   },
   "engines": {

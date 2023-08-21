@@ -54,6 +54,8 @@ export function verifyValidatorJwt(
       algorithms: supportedJwtAlgos,
     };
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore: FIXME https://github.com/hyperledger/cacti/issues/2523
     verify(
       targetData,
       publicKey,
@@ -196,9 +198,7 @@ export class SocketIOApiClient implements ISocketApiClient<SocketLedgerEvent> {
     args: any,
   ): Promise<any> {
     let timeout: ReturnType<typeof setTimeout> | undefined;
-    // `Function` is used by socketio `socket.off()` method
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    const freeableListeners = new Map<string, Function>();
+    const freeableListeners = new Map<string, (...args: any[]) => void>();
 
     return new Promise((resolve, reject) => {
       this.log.debug("call : sendSyncRequest");
@@ -333,9 +333,7 @@ export class SocketIOApiClient implements ISocketApiClient<SocketLedgerEvent> {
     } else {
       this.log.debug("Create new observable subject...");
 
-      // `Function` is used by socketio `socket.off()` method
-      // eslint-disable-next-line @typescript-eslint/ban-types
-      const freeableListeners = new Map<string, Function>();
+      const freeableListeners = new Map<string, (...args: any[]) => void>();
       const freeListeners = () =>
         freeableListeners.forEach((listener, eventName) =>
           this.socket.off(eventName, listener),

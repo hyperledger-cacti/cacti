@@ -138,8 +138,9 @@ class Acceptor(val session: FlowSession) : FlowLogic<SignedTransaction>() {
             println("Network member signed transaction.")
             return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId))
         } catch (e: Exception) {
-            println("Error signing create network id transaction by network member: ${e.message}\n")
-            return subFlow(ReceiveFinalityFlow(session))
+            val errorMsg = "Error signing create network id transaction by network member: ${e.message}\n"
+            println(errorMsg)
+            throw Error(errorMsg)
         }
     }
 }

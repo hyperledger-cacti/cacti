@@ -8,9 +8,11 @@
 // Constants
 //////////////////////////////////
 
+import { IROHA_TEST_LEDGER_DEFAULT_OPTIONS } from "@hyperledger/cactus-test-tooling";
+
 // Ledger settings
 const ledgerImageName = "ghcr.io/hyperledger/cactus-iroha-all-in-one";
-const ledgerImageVersion = "2021-08-16--1183";
+const ledgerImageVersion = IROHA_TEST_LEDGER_DEFAULT_OPTIONS.imageVersion;
 const postgresImageName = "postgres";
 const postgresImageVersion = "9.5-alpine";
 

@@ -21,6 +21,9 @@ import {
   K_DEFAULT_VAULT_HTTP_PORT,
   FabricTestLedgerV1,
   pruneDockerAllIfGithubAction,
+  DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
+  DEFAULT_FABRIC_2_AIO_IMAGE_VERSION,
+  DEFAULT_FABRIC_2_AIO_FABRIC_VERSION,
 } from "@hyperledger/cactus-test-tooling";
 import { v4 as internalIpV4 } from "internal-ip";
 import axios from "axios";
@@ -41,8 +44,9 @@ test("run-transaction-with-identities", async (t: Test) => {
   const ledger = new FabricTestLedgerV1({
     emitContainerLogs: true,
     publishAllPorts: true,
-    imageName: "ghcr.io/hyperledger/cactus-fabric2-all-in-one",
-    envVars: new Map([["FABRIC_VERSION", "2.2.0"]]),
+    imageName: DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
+    imageVersion: DEFAULT_FABRIC_2_AIO_IMAGE_VERSION,
+    envVars: new Map([["FABRIC_VERSION", DEFAULT_FABRIC_2_AIO_FABRIC_VERSION]]),
     logLevel,
   });
 
@@ -53,7 +57,7 @@ test("run-transaction-with-identities", async (t: Test) => {
   };
 
   test.onFinish(tearDown);
-  await ledger.start();
+  await ledger.start({ omitPull: false });
 
   const connectionProfile = await ledger.getConnectionProfileOrg1();
   t.ok(connectionProfile, "getConnectionProfileOrg1() out truthy OK");
@@ -362,7 +366,7 @@ test("run-transaction-with-identities", async (t: Test) => {
       });
       t.true(resp.success);
       const asset = JSON.parse(resp.functionOutput);
-      t.equal(asset.owner, "client2");
+      t.equal(asset.Owner, "client2");
     }
     t.end();
   });

@@ -49,6 +49,9 @@ export {
 } from "./http-echo/http-echo-container";
 
 export {
+  DEFAULT_FABRIC_2_AIO_FABRIC_VERSION,
+  DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
+  DEFAULT_FABRIC_2_AIO_IMAGE_VERSION,
   FabricTestLedgerV1,
   IFabricTestLedgerV1ConstructorOptions,
   FABRIC_TEST_LEDGER_DEFAULT_OPTIONS,

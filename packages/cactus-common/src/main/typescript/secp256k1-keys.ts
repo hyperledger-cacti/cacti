@@ -2,8 +2,8 @@ import crypto from "crypto";
 import secp256k1 from "secp256k1";
 
 export interface ISignerKeyPair {
-  privateKey: any;
-  publicKey: any;
+  privateKey: Buffer;
+  publicKey: Uint8Array;
 }
 
 export class Secp256k1Keys {
@@ -12,7 +12,7 @@ export class Secp256k1Keys {
    * @return Generated key pair
    */
   static generateKeyPairsBuffer(): ISignerKeyPair {
-    let privKey: any;
+    let privKey: Buffer;
     // generate secp256K1 private key
     do {
       privKey = crypto.randomBytes(32);

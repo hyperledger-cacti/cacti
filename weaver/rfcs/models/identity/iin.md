@@ -19,7 +19,7 @@ An IIN for our family of interoperability protocols has some special requirement
 
 1. It has to be decentralized and preferably based on distributed ledger technology.
 
-2. The IIN DID registry must support Network DIDs and implement the DID methods as specified in the [identity management protocol](../../protocols/identity/readme.md). Most importantly, the DID method of the IIN must support [Group Control](https://www.w3.org/TR/did-core/#group-control) for the DID controller.
+2. The IIN DID registry must support Network DIDs and implement the DID methods as specified in the [identity management protocol](../../protocols/identity/identity-syncing.md). Most importantly, the DID method of the IIN must support [Group Control](https://www.w3.org/TR/did-core/#group-control) for the DID controller.
 
 3. The IIN must allow a DID resolver even from outside the IIN  to resolve a DID document from its registry, and verify the authenticity of the response. This property enables blockchain network discovery.
 
@@ -50,7 +50,7 @@ A DID Document is not inherently mapped to any entity's physical identity [did-c
 
 The IIN must support two kinds of claims to be issued by trust anchors to the DIDs:
 
-1. Identity VCs - for associating real world identity to individuals/organizations which are members of networks -  *Organizational Unit Identity VC*, or to a network as a whole - *security Domain Identity VC*. (See [Network Identity Validation protocol](../../protocols/identity/security-domain-identity-validation.md) for details.)
+1. Identity VCs - for associating real world identity to individuals/organizations which are members of networks -  *Organizational Unit Identity VC*, or to a network as a whole - *security Domain Identity VC*. (See [Security Domain Identity Validation protocol](../../protocols/identity/security-domain-identity-validation.md) for details.)
 
 2. Membership VCs - to assert the membership of an individual/organization in a blockchain network.
 

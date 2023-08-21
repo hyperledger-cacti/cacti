@@ -52,13 +52,13 @@ site/
 
 .build-cache/*.tsbuildinfo
 
+.pnp.*
 .yarn/*
 !.yarn/patches
-!.yarn/releases
 !.yarn/plugins
+!.yarn/releases
 !.yarn/sdks
 !.yarn/versions
-.pnp.*
 
 !packages/cactus-plugin-ledger-connector-*-socketio/src/main/typescript/common/core/bin
 

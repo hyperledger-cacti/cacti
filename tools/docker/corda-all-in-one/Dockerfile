@@ -1,4 +1,4 @@
-FROM docker:20.10.2-dind
+FROM docker:24.0.2-dind
 
 ARG SAMPLES_KOTLIN_SHA=30fd841dd035934bae75ab8910da3b6e3d5d6ee7
 ARG SAMPLES_KOTLIN_CORDAPP_SUB_DIR_PATH="./Advanced/obligation-cordapp/"
@@ -59,7 +59,7 @@ RUN cp $CACTUS_CFG_PATH/corda-aio-image.pub ~/.ssh/authorized_keys
 # RUN cat /root-password.txt | chpasswd
 RUN echo "root:root" | chpasswd
 
-RUN curl https://software.r3.com/artifactory/corda-releases/net/corda/corda-tools-shell-cli/${CORDA_TOOLS_SHELL_CLI_VERSION}/corda-tools-shell-cli-${CORDA_TOOLS_SHELL_CLI_VERSION}-all.jar --output /corda-tools-shell-cli-all.jar
+RUN curl https://download.corda.net/maven/corda-releases/net/corda/corda-tools-shell-cli/${CORDA_TOOLS_SHELL_CLI_VERSION}/corda-tools-shell-cli-${CORDA_TOOLS_SHELL_CLI_VERSION}-all.jar --output /corda-tools-shell-cli-all.jar
 # This is what makes the "corda-shell" alias avaialble on the terminal
 RUN java -jar /corda-tools-shell-cli-all.jar install-shell-extensions
 

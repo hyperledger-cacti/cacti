@@ -53,8 +53,32 @@
 		},
 		"ghcr.io/devcontainers-contrib/features/kind:1": {
 			"version": "v0.18.0"
+		},
+		"ghcr.io/devcontainers-contrib/features/protoc:1": {
+			"version": "v3.20.3"
 		}
-	}
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"bierner.markdown-mermaid",
+				"mhutchie.git-graph",
+				"alefragnani.bookmarks",
+				"yzhang.markdown-all-in-one",
+				"trabpukcip.vscode-npm-scripts",
+				"jebbs.plantuml",
+				"ms-vscode-remote.vscode-remote-extensionpack",
+				"juanblanco.solidity",
+				"dbaeumer.vscode-eslint",
+				"42crunch.vscode-openapi",
+				"esbenp.prettier-vscode",
+				"eamodio.gitlens",
+				"streetsidesoftware.code-spell-checker",
+				"github.vscode-pull-request-github",
+				"codeandstuff.package-json-upgrade"
+			]
+		}
+	}	
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},

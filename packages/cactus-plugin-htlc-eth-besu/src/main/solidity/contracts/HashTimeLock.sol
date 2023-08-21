@@ -1,19 +1,19 @@
-pragma solidity ^0.7.3;
-pragma experimental ABIEncoderV2;
+// SPDX-License-Identifier: Apache-2.0
+
+pragma solidity 0.8.19;
 
 contract HashTimeLock {
-
     mapping(bytes32 => LockContract) public contracts;
 
     //                   / - WITHDRAWN
     // INVALID - ACTIVE |
     //                   \ - EXPIRED - REFUNDED
 
-    uint256 public constant INVALID = 0; // Uninitialized  swap -> can go to ACTIVE
-    uint256 public constant ACTIVE = 1; // Active swap -> can go to WITHDRAWN or EXPIRED
-    uint256 public constant REFUNDED = 2; // Swap is refunded -> final state.
-    uint256 public constant WITHDRAWN = 3; // Swap is withdrawn -> final state.
-    uint256 public constant EXPIRED = 4; // Swap is expired -> can go to REFUNDED
+    uint256 constant INIT = 0; // Uninitialized  swap -> can go to ACTIVE
+    uint256 constant ACTIVE = 1; // Active swap -> can go to WITHDRAWN or EXPIRED
+    uint256 constant REFUNDED = 2; // Swap is refunded -> final state.
+    uint256 constant WITHDRAWN = 3; // Swap is withdrawn -> final state.
+    uint256 constant EXPIRED = 4; // Swap is expired -> can go to REFUNDED
 
     struct LockContract {
         uint256 inputAmount;
@@ -28,19 +28,10 @@ contract HashTimeLock {
     }
 
     event Withdraw(
-        bytes32 indexed id,
-        bytes32 secret,
-        bytes32 hashLock,
-        address indexed sender,
-        address indexed receiver
+        bytes32 indexed id, bytes32 secret, bytes32 hashLock, address indexed sender, address indexed receiver
     );
 
-    event Refund(
-        bytes32 indexed id,
-        bytes32 hashLock,
-        address indexed sender,
-        address indexed receiver
-    );
+    event Refund(bytes32 indexed id, bytes32 hashLock, address indexed sender, address indexed receiver);
 
     event NewContract(
         uint256 inputAmount,
@@ -62,41 +53,23 @@ contract HashTimeLock {
         string calldata outputNetwork,
         string calldata outputAddress
     ) external payable {
-        address payable sender = msg.sender;
+        address payable sender = payable(msg.sender);
         uint256 inputAmount = msg.value;
 
-        require(expiration > block.timestamp, 'INVALID_TIME');
+        require(expiration > block.timestamp, "INVALID_TIME");
 
-        require(inputAmount > 0, 'INVALID_AMOUNT');
+        require(inputAmount > 0, "INVALID_AMOUNT");
 
-        bytes32 id = sha256(
-            abi.encodePacked(sender, receiver, inputAmount, hashLock, expiration)
-        );
+        bytes32 id = keccak256(abi.encode(sender, receiver, inputAmount, hashLock, expiration));
 
-        require(contracts[id].status == INVALID, "SWAP_EXISTS");
+        require(contracts[id].status == INIT, "SWAP_EXISTS");
 
         contracts[id] = LockContract(
-            inputAmount,
-            outputAmount,
-            expiration,
-            ACTIVE,
-            hashLock,
-            sender,
-            receiver,
-            outputNetwork,
-            outputAddress
+            inputAmount, outputAmount, expiration, ACTIVE, hashLock, sender, receiver, outputNetwork, outputAddress
         );
 
         emit NewContract(
-            inputAmount,
-            outputAmount,
-            expiration,
-            id,
-            hashLock,
-            sender,
-            receiver,
-            outputNetwork,
-            outputAddress
+            inputAmount, outputAmount, expiration, id, hashLock, sender, receiver, outputNetwork, outputAddress
         );
     }
 
@@ -107,7 +80,7 @@ contract HashTimeLock {
 
         require(c.expiration > block.timestamp, "INVALID_TIME");
 
-        require(c.hashLock == sha256(abi.encodePacked(secret)),"INVALID_SECRET");
+        require(c.hashLock == keccak256(abi.encode(secret)), "INVALID_SECRET");
 
         c.status = WITHDRAWN;
 
@@ -143,10 +116,7 @@ contract HashTimeLock {
     function getSingleStatus(bytes32 id) public view returns (uint256 result) {
         LockContract memory tempContract = contracts[id];
 
-        if (
-            tempContract.status == ACTIVE &&
-            tempContract.expiration < block.timestamp
-        ) {
+        if (tempContract.status == ACTIVE && tempContract.expiration < block.timestamp) {
             result = EXPIRED;
         } else {
             result = tempContract.status;
@@ -156,7 +126,7 @@ contract HashTimeLock {
     function contractExists(bytes32 id) public view returns (bool result) {
         LockContract memory tempContract = contracts[id];
 
-        if (tempContract.status == INVALID) {
+        if (tempContract.status == INIT) {
             return false;
         } else {
             return true;

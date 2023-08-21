@@ -11,6 +11,9 @@ import bodyParser from "body-parser";
 
 import {
   Containers,
+  DEFAULT_FABRIC_2_AIO_FABRIC_VERSION,
+  DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
+  DEFAULT_FABRIC_2_AIO_IMAGE_VERSION,
   FabricTestLedgerV1,
   pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
@@ -50,7 +53,7 @@ test.skip("BEFORE " + testCase, async (t: Test) => {
 });
 
 // Skipping due to test being flaky, see https://github.com/hyperledger/cactus/issues/1471
-test.skip(testCase, async (t: Test) => {
+test(testCase, async (t: Test) => {
   const channelId = "mychannel";
   const channelName = channelId;
 
@@ -61,8 +64,9 @@ test.skip(testCase, async (t: Test) => {
   const ledger = new FabricTestLedgerV1({
     emitContainerLogs: true,
     publishAllPorts: true,
-    imageName: "ghcr.io/hyperledger/cactus-fabric2-all-in-one",
-    envVars: new Map([["FABRIC_VERSION", "2.2.0"]]),
+    imageName: DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
+    imageVersion: DEFAULT_FABRIC_2_AIO_IMAGE_VERSION,
+    envVars: new Map([["FABRIC_VERSION", DEFAULT_FABRIC_2_AIO_FABRIC_VERSION]]),
     logLevel,
   });
   const tearDown = async () => {
@@ -72,7 +76,7 @@ test.skip(testCase, async (t: Test) => {
   };
 
   test.onFinish(tearDown);
-  await ledger.start();
+  await ledger.start({ omitPull: false });
 
   const connectionProfile = await ledger.getConnectionProfileOrg1();
   t.ok(connectionProfile, "getConnectionProfileOrg1() out truthy OK");
@@ -283,7 +287,7 @@ test.skip(testCase, async (t: Test) => {
   // does the same thing, it just waits 10 seconds for good measure so there
   // might not be a way for us to avoid doing this, but if there is a way we
   // absolutely should not have timeouts like this, anywhere...
-  await new Promise((resolve) => setTimeout(resolve, 10000));
+  await new Promise((resolve) => setTimeout(resolve, 30000));
 
   const assetId = uuidv4();
   const assetOwner = uuidv4();

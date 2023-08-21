@@ -7,16 +7,6 @@
       <option name="url" value="https://repo.maven.apache.org/maven2" />
     </remote-repository>
     <remote-repository>
-      <option name="id" value="maven7" />
-      <option name="name" value="maven7" />
-      <option name="url" value="https://ci-artifactory.corda.r3cev.com/artifactory/corda-lib-dev" />
-    </remote-repository>
-    <remote-repository>
-      <option name="id" value="maven6" />
-      <option name="name" value="maven6" />
-      <option name="url" value="https://ci-artifactory.corda.r3cev.com/artifactory/corda-lib" />
-    </remote-repository>
-    <remote-repository>
       <option name="id" value="maven8" />
       <option name="name" value="maven8" />
       <option name="url" value="https://jitpack.io" />
@@ -44,7 +34,7 @@
     <remote-repository>
       <option name="id" value="maven5" />
       <option name="name" value="maven5" />
-      <option name="url" value="https://ci-artifactory.corda.r3cev.com/artifactory/corda" />
+      <option name="url" value="https://download.corda.net/maven/corda-dependencies" />
     </remote-repository>
     <remote-repository>
       <option name="id" value="MavenLocal" />

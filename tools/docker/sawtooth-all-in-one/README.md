@@ -18,11 +18,10 @@ docker-compose build && docker-compose up -d
 ```
 
 ### Docker
-> Excute from `tools/docker/sawtooth-all-in-one` or adjust the paths accordingly.
 
 ``` bash
 # Build
-DOCKER_BUILDKIT=1 docker build . -t cactus-sawtooth-all-in-one
+DOCKER_BUILDKIT=1 docker build ./tools/docker/sawtooth-all-in-one/ -t cactus-sawtooth-all-in-one
 
 # Run
 docker run --name sawtooth_all_in_one_ledger_1x --detach --privileged -p 8008:8008 cactus-sawtooth-all-in-one

@@ -190,7 +190,7 @@ test(testCase, async (t: Test) => {
         `Endpoint ${fRun} without required params: response.status === 400 OK`,
       );
       const fields = e.response.data.map((param: any) =>
-        param.path.replace(".body.", ""),
+        param.path.replace("/body/", ""),
       );
       t2.ok(fields.includes("params"), "Rejected because params is required");
     }
@@ -223,7 +223,7 @@ test(testCase, async (t: Test) => {
         `Endpoint ${fRun} with fake=4: response.status === 400 OK`,
       );
       const fields = e.response.data.map((param: any) =>
-        param.path.replace(".body.", ""),
+        param.path.replace("/body/", ""),
       );
       t2.ok(
         fields.includes("fake"),

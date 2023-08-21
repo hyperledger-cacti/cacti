@@ -21,7 +21,7 @@
   "author": {
     "name": "Hyperledger Cactus Contributors",
     "email": "cactus@lists.hyperledger.org",
-    "url": "https://www.hyperledger.org/use/cactus"
+    "url": "https://www.hyperledger.org/use/cacti"
   },
   "contributors": [
     {
@@ -60,7 +60,7 @@
     "@hyperledger/cactus-test-tooling": "2.0.0-alpha.1",
     "axios": "0.21.4",
     "key-encoder": "2.0.3",
-    "web3": "1.5.2",
+    "web3": "1.6.1",
     "web3js-quorum": "21.7.0-rc1"
   },
   "devDependencies": {

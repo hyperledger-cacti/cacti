@@ -1,20 +1,21 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "rootDir": "./src/main/typescript",
+    "rootDir": "./src",
     "composite": true,
-    "outDir": "./dist",
+    "outDir": "./dist/lib",
     "sourceMap": false,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "tsBuildInfoFile": "../../.build-cache/cactus-plugin-ledger-connector-sawtooth-socketio.tsbuildinfo",
+    "tsBuildInfoFile": "../../.build-cache/cactus-plugin-ledger-connector-sawtooth-socketio.tsbuildinfo"
   },
   "include": [
     "./src/main/typescript/common/core/*.ts",
     "./src/main/typescript/common/core/bin/*.ts",
     "./src/main/typescript/common/core/config/*.ts",
     "./src/main/typescript/connector/*.ts",
-    "./src/main/typescript/*.ts"
+    "./src/main/typescript/*.ts",
+    "./src/test/typescript/integration/*.ts"
   ],
   "references": [
     {

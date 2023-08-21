@@ -101,7 +101,7 @@ export enum OdapMessageType {
   CommitPreparationRequest = "urn:ietf:odap:msgtype:commit-prepare-msg",
   CommitPreparationResponse = "urn:ietf:odap:msgtype:commit-ack-msg",
   CommitFinalRequest = "urn:ietf:odap:msgtype:commit-final-msg",
-  CommitFinalResponse = "urn:ietf:odap:msgtype:commit-ack-msg",
+  CommitFinalResponse = "urn:ietf:odap:msgtype:commit-final-ack-msg",
   TransferCompleteRequest = "urn:ietf:odap:msgtype:commit-transfer-complete-msg",
 }
 

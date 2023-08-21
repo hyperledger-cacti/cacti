@@ -5,7 +5,7 @@
  * BusinessLogicElectricityTrade.ts
  */
 
-import { Request } from "express";
+import type { Request } from "express";
 import { RequestInfo } from "./RequestInfo";
 import { MeterManagement } from "./MeterManagement";
 import { MeterInfo } from "./MeterInfo";

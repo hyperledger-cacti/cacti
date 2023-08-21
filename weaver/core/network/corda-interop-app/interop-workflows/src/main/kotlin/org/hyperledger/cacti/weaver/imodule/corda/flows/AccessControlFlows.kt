@@ -112,8 +112,9 @@ class CreateAccessControlPolicyResponder(val session: FlowSession) : FlowLogic<S
             println("${ourIdentity} signed transaction.")
             return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId))
         } catch (e: Exception) {
-            println("Error during transaction by ${ourIdentity}: ${e.message}\n")
-            return subFlow(ReceiveFinalityFlow(session))
+            val errorMsg = "Error during transaction by ${ourIdentity}: ${e.message}\n"
+            println(errorMsg)
+            throw Error(errorMsg)
         }
     }
 }
@@ -207,8 +208,9 @@ class UpdateAccessControlPolicyStateResponder(val session: FlowSession) : FlowLo
             println("${ourIdentity} signed transaction.")
             return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId))
         } catch (e: Exception) {
-            println("Error during transaction by ${ourIdentity}: ${e.message}\n")
-            return subFlow(ReceiveFinalityFlow(session))
+            val errorMsg = "Error during transaction by ${ourIdentity}: ${e.message}\n"
+            println(errorMsg)
+            throw Error(errorMsg)
         }
     }
 }
@@ -285,8 +287,9 @@ class DeleteAccessControlPolicyStateResponder(val session: FlowSession) : FlowLo
             println("${ourIdentity} signed transaction.")
             return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId))
         } catch (e: Exception) {
-            println("Error during transaction by ${ourIdentity}: ${e.message}\n")
-            return subFlow(ReceiveFinalityFlow(session))
+            val errorMsg = "Error during transaction by ${ourIdentity}: ${e.message}\n"
+            println(errorMsg)
+            throw Error(errorMsg)
         }
     }
 }

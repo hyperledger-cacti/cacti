@@ -82,10 +82,7 @@ repositories {
 
     mavenLocal()
     mavenCentral()
-    maven { url = uri("https://ci-artifactory.corda.r3cev.com/artifactory/corda") }
-    // Can be removed post-release - used to get nightly snapshot build.
-    maven { url = uri("https://ci-artifactory.corda.r3cev.com/artifactory/corda-lib") }
-    maven { url = uri("https://ci-artifactory.corda.r3cev.com/artifactory/corda-lib-dev") }
+    maven { url = uri("https://download.corda.net/maven/corda-dependencies") }
     maven { url = uri("https://jitpack.io") }
     maven { url = uri("https://repo.gradle.org/gradle/libs-releases-local") }
 }

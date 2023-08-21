@@ -2,12 +2,12 @@
 
 This folder contains configurations for setting up a reference IIN implementation based on a modified version of [`indy-plenum`](https://github.com/hyperledger/indy-plenum).
 
-The Interoperation Identity Network (IIN) is an essential component of the decentralized network-identity discovery and management infrastructure ([RFC: 01-011](../../../../rfcs/models/identity/network-identity-management.md)). Multiple IINs, along with trust anchors and IIN Agents provide the trust basis for identity interoperation ([RFC: 01-012](../../../../rfcs/models/identity/iin.md)).
+The Interoperation Identity Network (IIN) is an essential component of the decentralized network-identity discovery and management infrastructure ([RFC: 01-011](../../../rfcs/models/identity/network-identity-management.md)). Multiple IINs, along with trust anchors and IIN Agents provide the trust basis for identity interoperation ([RFC: 01-012](../../../rfcs/models/identity/iin.md)).
 
 An IIN contains a registry that is ideally decentralized, that supports registration of [DIDs](https://www.w3.org/TR/did-core/) to networks and their units, as well as resolution of network DID documents form their DID. The IIN registry also maintains other artifacts namely Verifiable Credential Schemas, Credential Definition, and
 Revocation Registry.
 
-The test IIN network configured in this folder uses a modified indy-plenum based Indy network which supports group controllers for DID Documents, implementing Security Domain DID ([https://github.com/ghoshbishakh/indy-plenum/tree/did_plugin](https://github.com/ghoshbishakh/indy-plenum/tree/did_plugin)). Security Domain DIDs support group control, so that the network members can jointly control the Security Domain DID Document ([RFC: 03-012](../../../../rfcs/formats/network/identity.md)). Such group control mechanism is not available in `hyperledger/indy-plenum` yet.
+The test IIN network configured in this folder uses a modified indy-plenum based Indy network which supports group controllers for DID Documents, implementing Security Domain DID ([https://github.com/ghoshbishakh/indy-plenum/tree/did_plugin](https://github.com/ghoshbishakh/indy-plenum/tree/did_plugin)). Security Domain DIDs support group control, so that the network members can jointly control the Security Domain DID Document ([RFC: 03-012](../../../rfcs/formats/network/identity.md)). Such group control mechanism is not available in `hyperledger/indy-plenum` yet.
 
 ## Requirements
 

@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 set -e
 
-# sync the local config file with the environment variables for pg opts
-export pg_opt_value="host=${IROHA_POSTGRES_HOST} port=${IROHA_POSTGRES_PORT} user=${IROHA_POSTGRES_USER} password=${IROHA_POSTGRES_PASSWORD}"
-
 if [ ! $ADMIN_PRIV = *" "* ] && [ -n "$ADMIN_PRIV" ]; then
     sed -i "1s/.*/$ADMIN_PRIV/" admin@test.priv
 fi
@@ -26,10 +23,6 @@ if [ ! $NODE_PUB = *" "* ] && [ -n "$NODE_PUB" ]; then
     genesis.block|sponge genesis.block    
 fi
 
-jq --arg pg_opt "${pg_opt_value}" \
-    '.pg_opt = $pg_opt' \
-    config.docker|sponge config.docker
-
 # if first arg looks like a flag, assume we want to run irohad server
 if [ "${1:0:1}" = '-' ]; then
   set -- irohad "$@"
@@ -46,7 +39,7 @@ if [ "$1" = 'irohad' ]; then
     echo "WARNING: IROHA_POSTGRES_HOST is not defined.
       Do not wait for Postgres to become ready. Iroha may fail to start up"
   fi
-	exec "$@" --genesis_block genesis.block --config config.docker --keypair_name $KEY
+	exec "$@" --genesis_block genesis.block --keypair_name $KEY --verbosity=${IROHA_LOG_LEVEL}
 fi
 
 exec "$@"

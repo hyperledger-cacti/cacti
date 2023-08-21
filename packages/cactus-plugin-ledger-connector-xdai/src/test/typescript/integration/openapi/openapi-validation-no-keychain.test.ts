@@ -148,7 +148,7 @@ test(testCase, async (t: Test) => {
         `Endpoint ${fDeploy} without required contractJSON: response.status === 400 OK`,
       );
       const fields = e.response.data.map((param: any) =>
-        param.path.replace(".body.", ""),
+        param.path.replace("/body/", ""),
       );
       t2.ok(
         fields.includes("contractJSON"),
@@ -182,7 +182,7 @@ test(testCase, async (t: Test) => {
         `Endpoint ${fDeploy} with fake=4: response.status === 400 OK`,
       );
       const fields = e.response.data.map((param: any) =>
-        param.path.replace(".body.", ""),
+        param.path.replace("/body/", ""),
       );
       t2.ok(
         fields.includes("fake"),
@@ -243,7 +243,7 @@ test(testCase, async (t: Test) => {
         `Endpoint ${fInvoke} without required contractJSON: response.status === 400 OK`,
       );
       const fields = e.response.data.map((param: any) =>
-        param.path.replace(".body.", ""),
+        param.path.replace("/body/", ""),
       );
       t2.ok(
         fields.includes("contractJSON"),
@@ -280,7 +280,7 @@ test(testCase, async (t: Test) => {
         `Endpoint ${fInvoke} with fake=4: response.status === 400 OK`,
       );
       const fields = e.response.data.map((param: any) =>
-        param.path.replace(".body.", ""),
+        param.path.replace("/body/", ""),
       );
       t2.ok(
         fields.includes("fake"),

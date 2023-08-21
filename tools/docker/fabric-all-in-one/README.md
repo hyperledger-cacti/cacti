@@ -7,14 +7,27 @@ An all in one fabric docker image with the `fabric-samples` repo fully embedded.
 
 ## Usage
 
-### Building Local Image
+### Local Image Builds
+
+From the project root:
 
 ```sh
+# Fabric 1.4.X
 DOCKER_BUILDKIT=1 docker build ./tools/docker/fabric-all-in-one/ -f ./tools/docker/fabric-all-in-one/Dockerfile_v1.4.x -t faio14x
-```
-### VSCode
+docker run --detach --privileged --publish-all --name faio14x-testnet faio14x
 
-## Usage
+# Fabric 2.X
+DOCKER_BUILDKIT=1 docker build ./tools/docker/fabric-all-in-one/ -f ./tools/docker/fabric-all-in-one/Dockerfile_v2.x -t faio2x
+docker run --detach --privileged --publish-all --name faio2x-testnet faio2x
+
+# Docker compose (Fabric 2.X)
+docker-compose -f ./tools/docker/fabric-all-in-one/docker-compose-v2.x.yml build
+docker-compose -f ./tools/docker/fabric-all-in-one/docker-compose-v2.x.yml up -d
+
+# Check SSH
+docker cp IMG_NAME:/etc/hyperledger/cactus/fabric-aio-image.key ./fabric-aio-image.key
+ssh root@localhost -p IMG_SSH_PORT -i fabric-aio-image.key
+```
 
 ### Visual Studio Code
 
@@ -54,7 +67,7 @@ From the project root:
 
 ```sh
 DOCKER_BUILDKIT=1 docker build ./tools/docker/fabric-all-in-one/ -f ./tools/docker/fabric-all-in-one/Dockerfile_v2.x -t faio2x
-docker run --detach --privileged --publish-all --env FABRIC_VERSION=2.2.0 faio2x
+docker run --detach --privileged --publish-all --env FABRIC_VERSION=2.2.13 faio2x
 
 docker ps
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS                     PORTS                                                                                                                                                                                                                                                                                                                                                                                  NAMES

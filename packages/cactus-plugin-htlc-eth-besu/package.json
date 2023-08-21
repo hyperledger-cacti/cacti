@@ -21,7 +21,7 @@
   "author": {
     "name": "Hyperledger Cactus Contributors",
     "email": "cactus@lists.hyperledger.org",
-    "url": "https://www.hyperledger.org/use/cactus"
+    "url": "https://www.hyperledger.org/use/cacti"
   },
   "contributors": [
     {
@@ -38,6 +38,11 @@
       "name": "Azahara Castaño",
       "email": "a.castano.benito@accenture.com",
       "url": "https://accenture.com"
+    },
+    {
+      "name": "Rafael Belchior",
+      "email": "rafael.belchior@tecnico.ulisboa.pt",
+      "url": "https://rafaelapb.github.io/"
     }
   ],
   "main": "dist/lib/main/typescript/index.js",
@@ -50,13 +55,15 @@
   "scripts": {
     "codegen": "run-p 'codegen:*'",
     "codegen:openapi": "npm run generate-sdk",
-    "generate-sdk": "run-p generate-sdk:*",
+    "generate-sdk": "run-p 'generate-sdk:*'",
     "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
+    "lint": "solhint --fix",
     "watch": "npm-watch",
     "webpack": "npm-run-all webpack:dev",
     "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
     "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
-    "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
+    "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js",
+    "compile-contracts": "forge build"
   },
   "dependencies": {
     "@hyperledger/cactus-common": "2.0.0-alpha.1",
@@ -66,17 +73,21 @@
     "@hyperledger/cactus-plugin-ledger-connector-besu": "2.0.0-alpha.1",
     "@hyperledger/cactus-test-tooling": "2.0.0-alpha.1",
     "axios": "0.21.4",
+    "bn.js": "5.2.1",
+    "dotenv": "16.0.3",
+    "ethers": "6.3.0",
     "express": "4.17.1",
     "joi": "17.9.1",
     "openapi-types": "9.1.0",
     "typescript-optional": "2.0.1",
-    "web3": "1.5.2",
     "web3js-quorum": "21.7.0-rc1"
   },
   "devDependencies": {
     "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-alpha.1",
     "@hyperledger/cactus-test-tooling": "2.0.0-alpha.1",
-    "@types/express": "4.17.13"
+    "@types/express": "4.17.13",
+    "ds-test": "https://github.com/dapphub/ds-test.git#e282159d5170298eb2455a6c05280ab5a73a4ef0",
+    "forge-std": "https://github.com/foundry-rs/forge-std.git#66bf4e2c92cf507531599845e8d5a08cc2e3b5bb"
   },
   "engines": {
     "node": ">=10",

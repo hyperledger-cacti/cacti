@@ -12,7 +12,7 @@
     "moduleResolution": "node",
     "esModuleInterop": true,
     "importHelpers": true,
-    "target": "es2015",
+    "target": "ES2022",
     "lib": [
       "es2018",
       "dom"
@@ -20,7 +20,8 @@
     "resolveJsonModule": true,
     "rootDir": "./src",
     "skipLibCheck": true,
-    "tsBuildInfoFile": "../../.build-cache/cactus-example-carbon-accounting-frontend.tsbuildinfo"
+    "tsBuildInfoFile": "../../.build-cache/cactus-example-carbon-accounting-frontend.tsbuildinfo",
+    "useDefineForClassFields": false
   },
   "angularCompilerOptions": {
     "fullTemplateTypeCheck": true,

@@ -21,7 +21,7 @@
   "author": {
     "name": "Hyperledger Cactus Contributors",
     "email": "cactus@lists.hyperledger.org",
-    "url": "https://www.hyperledger.org/use/cactus"
+    "url": "https://www.hyperledger.org/use/cacti"
   },
   "contributors": [
     {
@@ -53,13 +53,18 @@
     "@hyperledger/cactus-cmd-api-server": "2.0.0-alpha.1",
     "@hyperledger/cactus-common": "2.0.0-alpha.1",
     "@hyperledger/cactus-core": "2.0.0-alpha.1",
+    "@hyperledger/cactus-core-api": "2.0.0-alpha.1",
     "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-alpha.1",
     "@hyperledger/cactus-plugin-ledger-connector-besu": "2.0.0-alpha.1",
     "@hyperledger/cactus-test-tooling": "2.0.0-alpha.1",
     "@hyperledger/cactus-verifier-client": "2.0.0-alpha.1",
     "key-encoder": "2.0.3",
-    "web3": "1.5.2",
+    "socket.io": "4.5.4",
+    "web3": "1.6.1",
     "web3js-quorum": "21.7.0-rc1"
+  },
+  "devDependencies": {
+    "@types/express": "4.17.13"
   },
   "engines": {
     "node": ">=10",

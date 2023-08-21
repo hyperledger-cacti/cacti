@@ -1,0 +1,37 @@
+version: '3'
+networks:
+  tcs_huawei_testnet_1x:
+services:
+  agent1:
+    image: "registry-cbu.huawei.com/tcdas/tcdas-agent:0.0.1.test-x86_64"
+    container_name: agent
+    volumes:
+      # 以下为需要外部生成并导入容器的物料
+      - $PWD/cross_config:/home/service/config
+      - $PWD/Server_Cert:/home/service/Certs/Server
+      # 以下为需要挂载到容器外部的文件夹
+      - /var/paas/sys/log/agent1/tcdas:/var/log/tcdas
+      - /home/paas/tcdas/agent1:/home/service/tcdas/production/agent/DB
+    environment:
+      - AGENT_CONFIG_PATH=/home/service/config
+      - AGENT_GENERAL_RELAYINFO_ADDRESS=relay1
+      - AGENT_FABRICCONFIGURATION_FABRICCFGFILEPATH_CFGFILE=/home/service/Certs/blockcrossA-NoDelete-channel-sdk-config.yaml
+      - AGENT_FABRICCONFIGURATION_APPCHAININFO_NAME=A0123456789012345678901234567890123456789
+      - AGENT_GENERAL_AGENTID=channelidA
+      - AGENT_CROSSCHANNEL_CROSSCHANNELID=channelidA
+      - AGENT_CROSSCHANNEL_CROSSCHANNELNAME=mychannel
+      - AGENT_CRYPTOPATH_SERVERTLSPATH_PRIVATEKEY=/home/service/Certs/Server/key.pem
+      - AGENT_CRYPTOPATH_SERVERTLSPATH_CERTIFICATE=/home/service/Certs/Server/cert.pem
+      - AGENT_CRYPTOPATH_SERVERTLSPATH_ROOTCA=/home/service/Certs/Server/cacert.pem
+      - AGENT_PERSISTENTDATA_DBPATH=/home/service/tcdas/production/agent/DB
+      - AGENT_LOGGER_ROOT=/var/log/tcdas/agent
+      - AGENT_LOGGER_LEVEL=LevelInformational
+    ports:
+      - "8001:8080"
+    networks:
+      - tcs_huawei_testnet_1x
+    command:
+      - /bin/bash
+      - -c
+      - |
+        bash -x /usr/local/bin/start.sh

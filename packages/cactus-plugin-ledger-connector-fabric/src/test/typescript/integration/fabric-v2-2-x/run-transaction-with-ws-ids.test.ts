@@ -14,17 +14,21 @@ import {
 } from "../../../../main/typescript/public-api";
 import { DiscoveryOptions } from "fabric-network";
 
-const logLevel: LogLevelDesc = "ERROR";
 import {
   Containers,
   FabricTestLedgerV1,
   pruneDockerAllIfGithubAction,
   WsTestServer,
   WS_IDENTITY_HTTP_PORT,
+  DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
+  DEFAULT_FABRIC_2_AIO_IMAGE_VERSION,
+  DEFAULT_FABRIC_2_AIO_FABRIC_VERSION,
 } from "@hyperledger/cactus-test-tooling";
 import { v4 as internalIpV4 } from "internal-ip";
 import { WsWallet } from "ws-wallet";
 import { WsIdentityClient } from "ws-identity-client";
+
+const logLevel: LogLevelDesc = "DEBUG";
 
 // test scenario
 // - enroll registrar (both using default identity and webSocket(p256) identity)
@@ -42,8 +46,9 @@ test("run-transaction-with-ws-ids", async (t: Test) => {
   const ledger = new FabricTestLedgerV1({
     emitContainerLogs: true,
     publishAllPorts: true,
-    imageName: "ghcr.io/hyperledger/cactus-fabric2-all-in-one",
-    envVars: new Map([["FABRIC_VERSION", "2.2.0"]]),
+    imageName: DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
+    imageVersion: DEFAULT_FABRIC_2_AIO_IMAGE_VERSION,
+    envVars: new Map([["FABRIC_VERSION", DEFAULT_FABRIC_2_AIO_FABRIC_VERSION]]),
     logLevel,
   });
 
@@ -55,7 +60,7 @@ test("run-transaction-with-ws-ids", async (t: Test) => {
 
   const wsTestContainer = new WsTestServer({});
   await wsTestContainer.start();
-  await ledger.start();
+  await ledger.start({ omitPull: false });
 
   const connectionProfile = await ledger.getConnectionProfileOrg1();
   t.ok(connectionProfile, "getConnectionProfileOrg1() out truthy OK");
@@ -313,7 +318,7 @@ test("run-transaction-with-ws-ids", async (t: Test) => {
       });
       t.true(resp.success);
       const asset = JSON.parse(resp.functionOutput);
-      t.equal(asset.owner, "client2");
+      t.equal(asset.Owner, "client2");
     }
     t.end();
   });

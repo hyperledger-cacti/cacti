@@ -5,6 +5,8 @@ import express from "express";
 import bodyParser from "body-parser";
 import http from "http";
 import { Server as SocketIoServer } from "socket.io";
+import { encodeParameter } from "web3-eth-abi";
+import { keccak256 } from "web3-utils";
 import {
   DefaultApi as HtlcCoordinatorBesuApi,
   PluginFactoryHTLCCoordinatorBesu,
@@ -44,14 +46,12 @@ import HashTimeLockJSON from "@hyperledger/cactus-plugin-htlc-eth-besu-erc20/src
 import TestTokenJSON from "@hyperledger/cactus-test-plugin-htlc-eth-besu-erc20/src/test/solidity/token-erc20-contract/Test_Token.json";
 import DemoHelperJSON from "@hyperledger/cactus-test-plugin-htlc-eth-besu-erc20/src/test/solidity/token-erc20-contract/DemoHelpers.json";
 
-const logLevel: LogLevelDesc = "INFO";
+const logLevel: LogLevelDesc = "DEBUG";
 const estimatedGas = 6721975;
 const expiration = 2147483648;
 const secret =
   "0x3853485acd2bfc3c632026ee365279743af107a30492e3ceaa7aefc30c2a048a";
 const receiver = "0x627306090abaB3A6e1400e9345bC60c78a8BEf57";
-const hashLock =
-  "0x3c335ba7f06a8b01d0596589f73c19069e21c81e5013b91f408165d1bf623d32";
 const firstHighNetWorthAccount = "0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1";
 const privateKey =
   "0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d";
@@ -72,6 +72,10 @@ test("BEFORE " + testCase, async (t: Test) => {
 });
 
 test(testCase, async (t: Test) => {
+
+  const secretEthAbiEncoded = encodeParameter("uint256", secret);
+  const hashLock = keccak256(secretEthAbiEncoded);
+
   t.comment("Starting Besu Test Ledger");
   const besuTestLedger = new BesuTestLedger();
   await besuTestLedger.start();
