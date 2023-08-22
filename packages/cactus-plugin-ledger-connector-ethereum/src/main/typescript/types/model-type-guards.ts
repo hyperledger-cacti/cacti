@@ -1,8 +1,11 @@
 import {
+  ContractJsonDefinition,
+  ContractKeychainDefinition,
+  DeployedContractJsonDefinition,
   GasTransactionConfig,
   GasTransactionConfigEIP1559,
   GasTransactionConfigLegacy,
-  Web3SigningCredentialCactusKeychainRef,
+  Web3SigningCredentialCactiKeychainRef,
   Web3SigningCredentialGethKeychainPassword,
   Web3SigningCredentialNone,
   Web3SigningCredentialPrivateKeyHex,
@@ -27,14 +30,14 @@ export function isWeb3SigningCredentialGethKeychainPassword(x?: {
   return x?.type === Web3SigningCredentialType.GethKeychainPassword;
 }
 
-export function isWeb3SigningCredentialCactusKeychainRef(x?: {
+export function isWeb3SigningCredentialCactiKeychainRef(x?: {
   type?: Web3SigningCredentialType;
   keychainEntryKey?: string | unknown;
   keychainId?: string | unknown;
-}): x is Web3SigningCredentialCactusKeychainRef {
+}): x is Web3SigningCredentialCactiKeychainRef {
   return (
     !!x?.type &&
-    x?.type === Web3SigningCredentialType.CactusKeychainRef &&
+    x?.type === Web3SigningCredentialType.CactiKeychainRef &&
     !!x?.keychainEntryKey &&
     typeof x?.keychainEntryKey === "string" &&
     x?.keychainEntryKey.trim().length > 0 &&
@@ -62,5 +65,32 @@ export function isGasTransactionConfigEIP1559(
     typeof typedGasConfig.gasLimit !== "undefined" ||
     typeof typedGasConfig.maxFeePerGas !== "undefined" ||
     typeof typedGasConfig.maxPriorityFeePerGas !== "undefined"
+  );
+}
+
+export function isContractJsonDefinition(
+  contract: unknown,
+): contract is ContractJsonDefinition {
+  const typedContract = contract as ContractJsonDefinition;
+  return typeof typedContract.contractJSON !== "undefined";
+}
+
+export function isDeployedContractJsonDefinition(
+  contract: unknown,
+): contract is DeployedContractJsonDefinition {
+  const typedContract = contract as DeployedContractJsonDefinition;
+  return (
+    typeof typedContract.contractJSON !== "undefined" &&
+    typeof typedContract.contractAddress !== "undefined"
+  );
+}
+
+export function isContractKeychainDefinition(
+  contract: unknown,
+): contract is ContractKeychainDefinition {
+  const typedContract = contract as ContractKeychainDefinition;
+  return (
+    typeof typedContract.contractName !== "undefined" &&
+    typeof typedContract.keychainId !== "undefined"
   );
 }

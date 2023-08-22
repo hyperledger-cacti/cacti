@@ -76,8 +76,10 @@ describe("Alchemy integration manual tests", () => {
 
   test("deploy sample contract to testnet", async () => {
     const deployOut = await connector.deployContract({
-      contractName: HelloWorldContractJson.contractName,
-      keychainId: keychainPlugin.getKeychainId(),
+      contract: {
+        contractName: HelloWorldContractJson.contractName,
+        keychainId: keychainPlugin.getKeychainId(),
+      },
       web3SigningCredential: {
         ethAccount: ETH_ADDRESS,
         secret: ETH_PRIVATE_KEY,
@@ -96,11 +98,13 @@ describe("Alchemy integration manual tests", () => {
     );
 
     expect(typeof contractAddress).toBe("string");
-    const invokeOut = await connector.getContractInfoKeychain({
-      contractName: HelloWorldContractJson.contractName,
+    const invokeOut = await connector.invokeContract({
+      contract: {
+        contractName: HelloWorldContractJson.contractName,
+        keychainId: keychainPlugin.getKeychainId(),
+      },
       invocationType: EthContractInvocationType.Call,
       methodName: "sayHello",
-      keychainId: keychainPlugin.getKeychainId(),
       params: [],
       web3SigningCredential: {
         ethAccount: ETH_ADDRESS,

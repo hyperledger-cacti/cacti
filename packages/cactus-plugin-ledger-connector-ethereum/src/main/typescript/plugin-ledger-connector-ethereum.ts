@@ -37,22 +37,18 @@ import {
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
 
-import { DeployContractSolidityBytecodeEndpoint } from "./web-services/deploy-contract-solidity-bytecode-endpoint";
-import { DeployContractSolidityBytecodeJsonObjectEndpoint } from "./web-services/deploy-contract-solidity-bytecode-endpoint-json-object";
+import { DeployContractEndpoint } from "./web-services/deploy-contract-v1-endpoint";
 
 import {
-  DeployContractSolidityBytecodeV1Request,
-  DeployContractSolidityBytecodeJsonObjectV1Request,
-  DeployContractSolidityBytecodeV1Response,
+  DeployContractV1Request,
   EthContractInvocationType,
   EthContractInvocationWeb3Method,
   InvokeContractV1Request,
-  InvokeContractJsonObjectV1Request,
   InvokeContractV1Response,
   RunTransactionRequest,
   RunTransactionResponse,
   Web3SigningCredentialGethKeychainPassword,
-  Web3SigningCredentialCactusKeychainRef,
+  Web3SigningCredentialCactiKeychainRef,
   Web3SigningCredentialPrivateKeyHex,
   Web3SigningCredentialType,
   WatchBlocksV1,
@@ -60,17 +56,22 @@ import {
   InvokeRawWeb3EthMethodV1Request,
   InvokeRawWeb3EthContractV1Request,
   EthereumTransactionConfig,
+  ContractKeychainDefinition,
+  GasTransactionConfig,
+  ContractJSON,
 } from "./generated/openapi/typescript-axios";
 
-import { RunTransactionEndpoint } from "./web-services/run-transaction-endpoint";
-import { InvokeContractEndpoint } from "./web-services/invoke-contract-endpoint";
-import { InvokeContractJsonObjectEndpoint } from "./web-services/invoke-contract-endpoint-json-object";
+import { RunTransactionEndpoint } from "./web-services/run-transaction-v1-endpoint";
+import { InvokeContractEndpoint } from "./web-services/invoke-contract-v1-endpoint";
 import { WatchBlocksV1Endpoint } from "./web-services/watch-blocks-v1-endpoint";
-import { GetPrometheusExporterMetricsEndpointV1 } from "./web-services/get-prometheus-exporter-metrics-endpoint-v1";
+import { GetPrometheusExporterMetricsEndpointV1 } from "./web-services/get-prometheus-exporter-metrics-v1-endpoint";
 import { InvokeRawWeb3EthMethodEndpoint } from "./web-services/invoke-raw-web3eth-method-v1-endpoint";
 import { InvokeRawWeb3EthContractEndpoint } from "./web-services/invoke-raw-web3eth-contract-v1-endpoint";
 
 import {
+  isContractJsonDefinition,
+  isContractKeychainDefinition,
+  isDeployedContractJsonDefinition,
   isGasTransactionConfigEIP1559,
   isGasTransactionConfigLegacy,
   isWeb3SigningCredentialNone,
@@ -85,6 +86,16 @@ import {
 // Used when waiting for WS requests to be send correctly before disconnecting
 const waitForWsProviderRequestsTimeout = 5 * 1000; // 5s
 const waitForWsProviderRequestsStep = 500; // 500ms
+type RunContractDeploymentInput = {
+  web3SigningCredential:
+    | Web3SigningCredentialCactiKeychainRef
+    | Web3SigningCredentialGethKeychainPassword
+    | Web3SigningCredentialPrivateKeyHex;
+  contractJSON: ContractJSON;
+  gasConfig?: GasTransactionConfig;
+  constructorArgs?: unknown[];
+  value?: string;
+};
 
 export interface IPluginLedgerConnectorEthereumOptions
   extends ICactusPluginOptions {
@@ -98,8 +109,8 @@ export interface IPluginLedgerConnectorEthereumOptions
 export class PluginLedgerConnectorEthereum
   implements
     IPluginLedgerConnector<
-      DeployContractSolidityBytecodeV1Request,
-      DeployContractSolidityBytecodeV1Response,
+      DeployContractV1Request,
+      RunTransactionResponse,
       RunTransactionRequest,
       RunTransactionResponse
     >,
@@ -276,14 +287,7 @@ export class PluginLedgerConnectorEthereum
     }
     const endpoints: IWebServiceEndpoint[] = [];
     {
-      const endpoint = new DeployContractSolidityBytecodeEndpoint({
-        connector: this,
-        logLevel: this.options.logLevel,
-      });
-      endpoints.push(endpoint);
-    }
-    {
-      const endpoint = new DeployContractSolidityBytecodeJsonObjectEndpoint({
+      const endpoint = new DeployContractEndpoint({
         connector: this,
         logLevel: this.options.logLevel,
       });
@@ -298,13 +302,6 @@ export class PluginLedgerConnectorEthereum
     }
     {
       const endpoint = new InvokeContractEndpoint({
-        connector: this,
-        logLevel: this.options.logLevel,
-      });
-      endpoints.push(endpoint);
-    }
-    {
-      const endpoint = new InvokeContractJsonObjectEndpoint({
         connector: this,
         logLevel: this.options.logLevel,
       });
@@ -407,71 +404,6 @@ export class PluginLedgerConnectorEthereum
     return this.isSafeToCallObjectMethod(contract.methods, name);
   }
 
-  public async getContractInfoKeychain(
-    req: InvokeContractV1Request,
-  ): Promise<InvokeContractV1Response> {
-    const fnTag = `${this.className}#invokeContract()`;
-
-    const { contractName, keychainId } = req;
-    if (!contractName) {
-      throw new Error(
-        `${fnTag} Cannot recover the keychain plugin because the contractName is empty`,
-      );
-    }
-    if (!keychainId) {
-      throw new Error(`${fnTag} Cannot invoke contract without keychainId`);
-    }
-    const keychainPlugin = this.pluginRegistry.findOneByKeychainId(keychainId);
-    if (!keychainPlugin.has(contractName)) {
-      throw new Error(
-        `${fnTag} Cannot invoke the contract because contractName is not in the keychainPlugin`,
-      );
-    }
-    const contractStr = await keychainPlugin.get(contractName);
-    const contractJSON = JSON.parse(contractStr);
-
-    // if not exists a contract deployed, we deploy it
-    const networkId = (await this.web3.eth.net.getId()).toString();
-    if (
-      !contractJSON.networks ||
-      !contractJSON.networks[networkId] ||
-      !contractJSON.networks[networkId].address
-    ) {
-      if (isWeb3SigningCredentialNone(req.web3SigningCredential)) {
-        throw new Error(`${fnTag} Cannot deploy contract with pre-signed TX`);
-      }
-
-      const receipt = await this.runDeploy(req);
-
-      const address = {
-        address: receipt.transactionReceipt.contractAddress,
-      };
-      const network = { [networkId]: address };
-      contractJSON.networks = network;
-      keychainPlugin.set(req.contractName, JSON.stringify(contractJSON));
-    }
-
-    return this.invokeContract({
-      ...req,
-      contractAddress: contractJSON.networks[networkId].address,
-      contractJSON: contractJSON,
-    });
-  }
-
-  public async getContractInfo(
-    req: InvokeContractJsonObjectV1Request,
-  ): Promise<InvokeContractV1Response> {
-    const fnTag = `${this.className}#invokeContractNoKeychain()`;
-    const { contractJSON, contractAddress } = req;
-    if (!contractJSON) {
-      throw new Error(`${fnTag} The contractJson param is needed`);
-    }
-    if (!contractAddress) {
-      throw new Error(`${fnTag} The contractAddress param is needed`);
-    }
-    return this.invokeContract(req);
-  }
-
   /**
    * Simple function for estimating `maxFeePerGas` to sent with transaction.
    * @warn It's not optimized for either speed or cost, consider using more complex solution on production!
@@ -492,12 +424,105 @@ export class PluginLedgerConnectorEthereum
     return estimate.toString();
   }
 
+  ////////////////////////////
+  // Invoke
+  ////////////////////////////
+
+  /**
+   * Invoke contract method.
+   *
+   * @param req contract method and transaction definition
+   * @returns transaction receipt
+   */
   public async invokeContract(
-    req: InvokeContractJsonObjectV1Request,
+    req: InvokeContractV1Request,
+  ): Promise<InvokeContractV1Response> {
+    Checks.truthy(req, "invokeContract() request arg");
+
+    if (isDeployedContractJsonDefinition(req.contract)) {
+      return this.runContractInvoke(
+        req,
+        req.contract.contractAddress,
+        req.contract.contractJSON,
+      );
+    } else if (isContractKeychainDefinition(req.contract)) {
+      return this.invokeContractFromKeychain(req, req.contract);
+    } else {
+      // Exhaustive check
+      const unknownContract: never = req.contract;
+      throw new Error(
+        `Unknown contract definition provided: ${unknownContract}`,
+      );
+    }
+  }
+
+  /**
+   *  Invoke contract method using contract instance stored in a kechain plugin.
+   *
+   * @param req contract method and transaction definition
+   * @param contract contract keychain reference
+   * @returns transaction receipt
+   */
+  private async invokeContractFromKeychain(
+    req: InvokeContractV1Request,
+    contract: ContractKeychainDefinition,
   ): Promise<InvokeContractV1Response> {
     const fnTag = `${this.className}#invokeContract()`;
+    Checks.truthy(contract.contractName, `${fnTag} contractName arg`);
+    Checks.truthy(contract.keychainId, `${fnTag} keychainId arg`);
 
-    const { contractAddress, contractJSON } = req;
+    const keychainPlugin = this.pluginRegistry.findOneByKeychainId(
+      contract.keychainId,
+    );
+    if (!keychainPlugin.has(contract.contractName)) {
+      throw new Error(
+        `${fnTag} Cannot invoke the contract because contractName is not in the keychainPlugin`,
+      );
+    }
+    const contractStr = await keychainPlugin.get(contract.contractName);
+    const contractJSON = JSON.parse(contractStr);
+
+    // if not exists a contract deployed, we deploy it
+    const networkId = (await this.web3.eth.net.getId()).toString();
+    if (
+      !contractJSON.networks ||
+      !contractJSON.networks[networkId] ||
+      !contractJSON.networks[networkId].address
+    ) {
+      throw new Error(
+        `Contract has not been deployed yet on this network (id ${networkId}) - can't invoke!`,
+      );
+    }
+
+    return this.runContractInvoke(
+      req,
+      contractJSON.networks[networkId].address,
+      contractJSON,
+    );
+  }
+
+  /**
+   * Internal logic for invoking actual transaction given address and ABI.
+   *
+   * @param req contract method and transaction definition
+   * @param contractAddress deployed contract address
+   * @param contractJSON contract ABI and bytecode
+   * @returns transaction receipt
+   */
+  private async runContractInvoke(
+    req: InvokeContractV1Request,
+    contractAddress: string,
+    contractJSON: ContractJSON,
+  ): Promise<InvokeContractV1Response> {
+    const fnTag = `${this.className}#runContractInvoke()`;
+    Checks.truthy(req, "runContractInvoke() contractAddress arg");
+    Checks.truthy(req, "runContractInvoke() contractJSON arg");
+
+    if (!req.web3SigningCredential) {
+      req.web3SigningCredential = {
+        type: Web3SigningCredentialType.None,
+      };
+    }
 
     let abi;
     if (contractJSON.abi) {
@@ -511,7 +536,6 @@ export class PluginLedgerConnectorEthereum
     }
 
     const contractInstance = new this.web3.eth.Contract(abi, contractAddress);
-
     const isSafeToCall = await this.isSafeToCallContractMethod(
       contractInstance,
       req.methodName,
@@ -539,14 +563,13 @@ export class PluginLedgerConnectorEthereum
       }
       const web3SigningCredential = req.web3SigningCredential as
         | Web3SigningCredentialPrivateKeyHex
-        | Web3SigningCredentialCactusKeychainRef;
+        | Web3SigningCredentialCactiKeychainRef;
 
       const transactionConfig = {
         from: web3SigningCredential.ethAccount,
         to: contractAddress,
         gasConfig: req.gasConfig,
         value: req.value,
-        nonce: req.nonce,
         data: method.encodeABI(),
       };
 
@@ -565,50 +588,60 @@ export class PluginLedgerConnectorEthereum
     }
   }
 
+  ////////////////////////////
+  // Transact
+  ////////////////////////////
+
+  /**
+   * Send ethereum transaction.
+   *
+   * @param req transaction definition.
+   * @returns transaction receipt.
+   */
   public async transact(
     req: RunTransactionRequest,
   ): Promise<RunTransactionResponse> {
     const fnTag = `${this.className}#transact()`;
-    try {
-      switch (req.web3SigningCredential.type) {
-        case Web3SigningCredentialType.CactusKeychainRef: {
-          return await this.transactCactusKeychainRef(req);
-        }
-        case Web3SigningCredentialType.GethKeychainPassword: {
-          return await this.transactGethKeychain(req);
-        }
-        case Web3SigningCredentialType.PrivateKeyHex: {
-          return await this.transactPrivateKey(req);
-        }
-        case Web3SigningCredentialType.None: {
-          if (req.transactionConfig.rawTransaction) {
-            return await this.transactSigned(
-              req.transactionConfig.rawTransaction,
-            );
-          } else {
-            throw new Error(
-              `${fnTag} Expected pre-signed raw transaction ` +
-                ` since signing credential is specified as` +
-                `Web3SigningCredentialType.NONE`,
-            );
-          }
-        }
-        default: {
+
+    switch (req.web3SigningCredential.type) {
+      case Web3SigningCredentialType.CactiKeychainRef: {
+        return await this.transactCactiKeychainRef(req);
+      }
+      case Web3SigningCredentialType.GethKeychainPassword: {
+        return await this.transactGethKeychain(req);
+      }
+      case Web3SigningCredentialType.PrivateKeyHex: {
+        return await this.transactPrivateKey(req);
+      }
+      case Web3SigningCredentialType.None: {
+        if (req.transactionConfig.rawTransaction) {
+          return await this.transactSigned(
+            req.transactionConfig.rawTransaction,
+          );
+        } else {
           throw new Error(
-            `${fnTag} Unrecognized Web3SigningCredentialType: ` +
-              `${req.web3SigningCredential.type} Supported ones are: ` +
-              `${Object.values(Web3SigningCredentialType).join(";")}`,
+            `${fnTag} Expected pre-signed raw transaction ` +
+              ` since signing credential is specified as` +
+              `Web3SigningCredentialType.NONE`,
           );
         }
       }
-    } catch (error) {
-      if ("toJSON" in error) {
-        this.log.debug("transact() failed with error:", error.toJSON());
+      default: {
+        throw new Error(
+          `${fnTag} Unrecognized Web3SigningCredentialType: ` +
+            `${req.web3SigningCredential.type} Supported ones are: ` +
+            `${Object.values(Web3SigningCredentialType).join(";")}`,
+        );
       }
-      throw error;
     }
   }
 
+  /**
+   * Send already signed transaction.
+   *
+   * @param rawTransaction signed transaction payload.
+   * @returns transaction receipt.
+   */
   public async transactSigned(
     rawTransaction: string,
   ): Promise<RunTransactionResponse> {
@@ -625,87 +658,14 @@ export class PluginLedgerConnectorEthereum
     };
   }
 
-  public async transactGethKeychain(
-    txIn: RunTransactionRequest,
-  ): Promise<RunTransactionResponse> {
-    const fnTag = `${this.className}#transactGethKeychain()`;
-    const { transactionConfig, web3SigningCredential } = txIn;
-    const { secret } =
-      web3SigningCredential as Web3SigningCredentialGethKeychainPassword;
-
-    try {
-      const txHash = await this.web3.eth.personal.sendTransaction(
-        await this.getTransactionFromTxConfig(transactionConfig),
-        secret,
-      );
-      const transactionReceipt = await this.pollForTxReceipt(txHash);
-      return {
-        transactionReceipt: {
-          ...transactionReceipt,
-          status:
-            convertWeb3ReceiptStatusToBool(transactionReceipt.status) ?? true,
-        },
-      };
-    } catch (ex) {
-      throw new Error(
-        `${fnTag} Failed to invoke web3.eth.personal.sendTransaction(). ` +
-          `InnerException: ${ex.stack}`,
-      );
-    }
-  }
-
-  public async transactPrivateKey(
-    req: RunTransactionRequest,
-  ): Promise<RunTransactionResponse> {
-    const fnTag = `${this.className}#transactPrivateKey()`;
-    const { transactionConfig, web3SigningCredential } = req;
-    const { secret } =
-      web3SigningCredential as Web3SigningCredentialPrivateKeyHex;
-
-    const signedTx = await this.web3.eth.accounts.signTransaction(
-      await this.getTransactionFromTxConfig(transactionConfig),
-      secret,
-    );
-
-    if (signedTx.rawTransaction) {
-      return this.transactSigned(signedTx.rawTransaction);
-    } else {
-      throw new Error(
-        `${fnTag} Failed to sign eth transaction. ` +
-          `signedTransaction.rawTransaction is blank after .signTransaction().`,
-      );
-    }
-  }
-
-  public async transactCactusKeychainRef(
-    req: RunTransactionRequest,
-  ): Promise<RunTransactionResponse> {
-    const fnTag = `${this.className}#transactCactusKeychainRef()`;
-    const { transactionConfig, web3SigningCredential } = req;
-    const { ethAccount, keychainEntryKey, keychainId } =
-      web3SigningCredential as Web3SigningCredentialCactusKeychainRef;
-
-    // locate the keychain plugin that has access to the keychain backend
-    // denoted by the keychainID from the request.
-    const keychainPlugin = this.pluginRegistry.findOneByKeychainId(
-      keychainId as string,
-    );
-    Checks.truthy(keychainPlugin, `${fnTag} keychain for ID:"${keychainId}"`);
-
-    // Now use the found keychain plugin to actually perform the lookup of
-    // the private key that we need to run the transaction.
-    const privateKeyHex = await keychainPlugin?.get(keychainEntryKey as string);
-
-    return this.transactPrivateKey({
-      transactionConfig,
-      web3SigningCredential: {
-        ethAccount,
-        type: Web3SigningCredentialType.PrivateKeyHex,
-        secret: privateKeyHex,
-      },
-    });
-  }
-
+  /**
+   * Wait until receipt for transaction with specified hash is returned.
+   * Throws if timeout expires.
+   *
+   * @param txHash sent transaction hash
+   * @param timeoutMs timeout in miliseconds
+   * @returns transaction receipt.
+   */
   public async pollForTxReceipt(
     txHash: string,
     timeoutMs = 60000,
@@ -736,106 +696,242 @@ export class PluginLedgerConnectorEthereum
     throw new Error(`${fnTag} Timed out ${timeoutMs}ms, polls=${tries}`);
   }
 
-  private async generateBytecode(req: any): Promise<string> {
-    const tmpContracts = new this.web3.eth.Contract(
-      (req.contractJSON as any).abi,
-    );
-    const deployment = tmpContracts.deploy({
-      data: req.contractJSON.bytecode,
-      arguments: req.constructorArgs,
-    });
-    const abi = deployment.encodeABI();
-    return abi.startsWith("0x") ? abi : `0x${abi}`;
-  }
+  /**
+   * Transact with identity stored in Geth node.
+   *
+   * @param txIn transaction definition.
+   * @returns transaction receipt.
+   */
+  private async transactGethKeychain(
+    txIn: RunTransactionRequest,
+  ): Promise<RunTransactionResponse> {
+    const fnTag = `${this.className}#transactGethKeychain()`;
+    const { transactionConfig, web3SigningCredential } = txIn;
+    const { secret } =
+      web3SigningCredential as Web3SigningCredentialGethKeychainPassword;
 
-  async runDeploy(req: any): Promise<DeployContractSolidityBytecodeV1Response> {
-    const web3SigningCredential = req.web3SigningCredential as
-      | Web3SigningCredentialGethKeychainPassword
-      | Web3SigningCredentialPrivateKeyHex;
-
-    const bytecode = await this.generateBytecode(req);
-
-    const receipt = await this.transact({
-      transactionConfig: {
-        data: bytecode,
-        from: web3SigningCredential.ethAccount,
-        gasConfig: req.gasConfig,
-      },
-      web3SigningCredential,
-    });
-
-    return receipt;
-  }
-
-  public async deployContract(
-    req: DeployContractSolidityBytecodeV1Request,
-  ): Promise<DeployContractSolidityBytecodeV1Response> {
-    const fnTag = `${this.className}#deployContract()`;
-    Checks.truthy(req, `${fnTag} req`);
-
-    if (isWeb3SigningCredentialNone(req.web3SigningCredential)) {
-      throw new Error(`${fnTag} Cannot deploy contract with pre-signed TX`);
-    }
-    if (!req.keychainId || !req.contractName) {
+    try {
+      const txHash = await this.web3.eth.personal.sendTransaction(
+        await this.getTransactionFromTxConfig(transactionConfig),
+        secret,
+      );
+      const transactionReceipt = await this.pollForTxReceipt(txHash);
+      return {
+        transactionReceipt: {
+          ...transactionReceipt,
+          status:
+            convertWeb3ReceiptStatusToBool(transactionReceipt.status) ?? true,
+        },
+      };
+    } catch (ex) {
       throw new Error(
-        `${fnTag} Cannot deploy contract without keychainId and the contractName`,
+        `${fnTag} Failed to invoke web3.eth.personal.sendTransaction(). ` +
+          `InnerException: ${ex.stack}`,
       );
     }
+  }
+
+  /**
+   * Transact with private key passed in argument.
+   *
+   * @param req transaction definition.
+   * @returns transaction receipt.
+   */
+  private async transactPrivateKey(
+    req: RunTransactionRequest,
+  ): Promise<RunTransactionResponse> {
+    const fnTag = `${this.className}#transactPrivateKey()`;
+    const { transactionConfig, web3SigningCredential } = req;
+    const { secret } =
+      web3SigningCredential as Web3SigningCredentialPrivateKeyHex;
+
+    const signedTx = await this.web3.eth.accounts.signTransaction(
+      await this.getTransactionFromTxConfig(transactionConfig),
+      secret,
+    );
+
+    if (signedTx.rawTransaction) {
+      return this.transactSigned(signedTx.rawTransaction);
+    } else {
+      throw new Error(
+        `${fnTag} Failed to sign eth transaction. ` +
+          `signedTransaction.rawTransaction is blank after .signTransaction().`,
+      );
+    }
+  }
+
+  /**
+   * Transact with identity stored in cacti keychain.
+   *
+   * @param req transaction definition.
+   * @returns transaction receipt.
+   */
+  private async transactCactiKeychainRef(
+    req: RunTransactionRequest,
+  ): Promise<RunTransactionResponse> {
+    const fnTag = `${this.className}#transactCactiKeychainRef()`;
+    const { transactionConfig, web3SigningCredential } = req;
+    const { ethAccount, keychainEntryKey, keychainId } =
+      web3SigningCredential as Web3SigningCredentialCactiKeychainRef;
+
+    // locate the keychain plugin that has access to the keychain backend
+    // denoted by the keychainID from the request.
     const keychainPlugin = this.pluginRegistry.findOneByKeychainId(
-      req.keychainId,
+      keychainId as string,
+    );
+    Checks.truthy(keychainPlugin, `${fnTag} keychain for ID:"${keychainId}"`);
+
+    // Now use the found keychain plugin to actually perform the lookup of
+    // the private key that we need to run the transaction.
+    const privateKeyHex = await keychainPlugin?.get(keychainEntryKey as string);
+
+    return this.transactPrivateKey({
+      transactionConfig,
+      web3SigningCredential: {
+        ethAccount,
+        type: Web3SigningCredentialType.PrivateKeyHex,
+        secret: privateKeyHex,
+      },
+    });
+  }
+
+  ////////////////////////////
+  // Contract Deployment
+  ////////////////////////////
+
+  /**
+   * Deploy contract to an Ethereum based ledger.
+   *
+   * @param req contract and transaction definition
+   * @returns transaction receipt
+   */
+  public async deployContract(
+    req: DeployContractV1Request,
+  ): Promise<RunTransactionResponse> {
+    Checks.truthy(req, "deployContract() request arg");
+
+    if (isWeb3SigningCredentialNone(req.web3SigningCredential)) {
+      throw new Error(`Cannot deploy contract with pre-signed TX`);
+    }
+
+    if (isContractJsonDefinition(req.contract)) {
+      return this.runContractDeployment({
+        web3SigningCredential: req.web3SigningCredential,
+        gasConfig: req.gasConfig,
+        constructorArgs: req.constructorArgs,
+        value: req.value,
+        contractJSON: req.contract.contractJSON,
+      });
+    } else if (isContractKeychainDefinition(req.contract)) {
+      return this.deployContractFromKeychain(req, req.contract);
+    } else {
+      // Exhaustive check
+      const unknownContract: never = req.contract;
+      throw new Error(
+        `Unknown contract definition provided: ${unknownContract}`,
+      );
+    }
+  }
+
+  /**
+   * Internal function for creating and sending contract deployment transaction.
+   *
+   * @param config deployment configuration
+   * @returns transaction receipt
+   */
+  private async runContractDeployment(
+    config: RunContractDeploymentInput,
+  ): Promise<RunTransactionResponse> {
+    Checks.truthy(config, "runContractDeployment() config arg");
+
+    const mockContract = new this.web3.eth.Contract(config.contractJSON.abi);
+    const mockDeployment = mockContract.deploy({
+      data: config.contractJSON.bytecode,
+      arguments: config.constructorArgs as [],
+    });
+    const abi = mockDeployment.encodeABI();
+
+    return this.transact({
+      transactionConfig: {
+        data: abi.startsWith("0x") ? abi : `0x${abi}`,
+        from: config.web3SigningCredential.ethAccount,
+        gasConfig: config.gasConfig,
+        value: config.value,
+      },
+      web3SigningCredential: config.web3SigningCredential,
+    });
+  }
+
+  /**
+   * Internal function for deploying contract that has it's JSON stored in a keychain plugin.
+   *
+   * @param req contract and transaction definition
+   * @param contract contract on keychain definition
+   * @returns transaction receipt
+   */
+  private async deployContractFromKeychain(
+    req: DeployContractV1Request,
+    contract: ContractKeychainDefinition,
+  ): Promise<RunTransactionResponse> {
+    Checks.truthy(req, "deployContractFromKeychain() request arg");
+    Checks.truthy(req, "deployContractFromKeychain() contract arg");
+
+    // Obtain the contractJSON from keychainPlugin
+    const keychainPlugin = this.pluginRegistry.findOneByKeychainId(
+      contract.keychainId,
     );
     Checks.truthy(
       keychainPlugin,
-      `${fnTag} keychain for ID:"${req.keychainId}"`,
+      `Deployment contract keychain with ID:"${contract.keychainId}"`,
     );
-    if (!keychainPlugin.has(req.contractName)) {
+    if (!keychainPlugin.has(contract.contractName)) {
       throw new Error(
-        `${fnTag} Cannot create an instance of the contract because the contractName sent and the contractName of the JSON doesn't match`,
+        `Cannot create an instance of the contract because the contractName sent and the contractName of the JSON doesn't match`,
       );
     }
-
-    // obtain the contractJSON from keychainPlugin
-    const contractStr = await keychainPlugin.get(req.contractName);
+    const contractStr = await keychainPlugin.get(contract.contractName);
     const contractJSON = JSON.parse(contractStr);
-    req.contractJSON = contractJSON;
 
-    // deploy the contract
-    const receipt = await this.runDeploy(req);
+    const receipt = await this.runContractDeployment({
+      web3SigningCredential: req.web3SigningCredential as
+        | Web3SigningCredentialCactiKeychainRef
+        | Web3SigningCredentialGethKeychainPassword
+        | Web3SigningCredentialPrivateKeyHex,
+      gasConfig: req.gasConfig,
+      constructorArgs: req.constructorArgs,
+      value: req.value,
+      contractJSON,
+    });
 
-    // save the contract address in the keychainPlugin
+    // Save the contract address in the keychainPlugin
     if (
       receipt.transactionReceipt.status &&
       receipt.transactionReceipt.contractAddress &&
       receipt.transactionReceipt.contractAddress != null
     ) {
-      const networkId = (await this.web3.eth.net.getId()).toString();
+      this.log.info(
+        "Contract deployed successfully, saving address in keychain entry",
+      );
+      const networkId = await this.web3.eth.net.getId();
       const address = { address: receipt.transactionReceipt.contractAddress };
-      const network = { [networkId]: address };
-      contractJSON.networks = network;
-      keychainPlugin.set(req.contractName, JSON.stringify(contractJSON));
+      contractJSON.networks = { [networkId.toString()]: address };
+      keychainPlugin.set(contract.contractName, JSON.stringify(contractJSON));
     }
 
     return receipt;
   }
 
-  public async deployContractJsonObject(
-    req: DeployContractSolidityBytecodeJsonObjectV1Request,
-  ): Promise<DeployContractSolidityBytecodeV1Response> {
-    const fnTag = `${this.className}#deployContractNoKeychain()`;
-    if (
-      !req.contractJSON ||
-      !req.contractJSON.bytecode ||
-      !req.web3SigningCredential
-    ) {
-      throw new Error(
-        `${fnTag} Cannot deploy contract without contractJSON, bytecode or web3SigningCredential`,
-      );
-    }
-    return this.runDeploy(req);
-  }
+  ////////////////////////////
+  // Invoke Web3 Methods
+  ////////////////////////////
 
-  // Low level function to call any method from web3.eth
-  // Should be used only if given functionality is not already covered by another endpoint.
+  /**
+   * Low level function to call any method from web3.eth.
+   * Should be used only if given functionality is not already covered by another endpoint.
+   *
+   * @param args web3.eth method and arguments
+   * @returns method response
+   */
   public async invokeRawWeb3EthMethod(
     args: InvokeRawWeb3EthMethodV1Request,
   ): Promise<any> {
@@ -864,8 +960,13 @@ export class PluginLedgerConnectorEthereum
     return looseWeb3Eth[args.methodName](...web3MethodArgs);
   }
 
-  // Low level function to invoke contract
-  // Should be used only if given functionality is not already covered by another endpoint.
+  /**
+   * Low level function to invoke contract.
+   * Should be used only if given functionality is not already covered by another endpoint.
+   *
+   * @param args web3 contract method and arguments
+   * @returns method response
+   */
   public async invokeRawWeb3EthContract(
     args: InvokeRawWeb3EthContractV1Request,
   ): Promise<any> {

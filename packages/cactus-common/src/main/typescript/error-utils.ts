@@ -28,5 +28,16 @@ export function safeStringifyException(error: unknown): string {
     return sanitizeHtml(error.stack || error.message);
   }
 
+  // Axios and possibly other lib errors produce nicer output with toJSON() method.
+  // Use it if available
+  if (
+    error &&
+    typeof error === "object" &&
+    "toJSON" in error &&
+    typeof error.toJSON === "function"
+  ) {
+    return sanitizeHtml(error.toJSON());
+  }
+
   return sanitizeHtml(safeStringify(error));
 }

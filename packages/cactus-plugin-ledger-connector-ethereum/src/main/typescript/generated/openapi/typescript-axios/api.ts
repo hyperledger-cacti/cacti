@@ -1,7 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Hyperledger Cactus Plugin - Connector Ethereum
+ * Hyperledger Cacti Plugin - Connector Ethereum
  * Can perform basic tasks on a Ethereum ledger
  *
  * The version of the OpenAPI document: v2.0.0-alpha.2
@@ -48,7 +48,7 @@ export interface ContractJSON {
      * @type {Array<any>}
      * @memberof ContractJSON
      */
-    'abi'?: Array<any>;
+    'abi': Array<any>;
     /**
      * 
      * @type {string}
@@ -113,125 +113,115 @@ export interface ContractJSON {
 /**
  * 
  * @export
- * @interface DeployContractSolidityBytecodeJsonObjectV1Request
+ * @interface ContractJsonDefinition
  */
-export interface DeployContractSolidityBytecodeJsonObjectV1Request {
-    /**
-     * 
-     * @type {Web3SigningCredential}
-     * @memberof DeployContractSolidityBytecodeJsonObjectV1Request
-     */
-    'web3SigningCredential': Web3SigningCredential;
-    /**
-     * 
-     * @type {GasTransactionConfig}
-     * @memberof DeployContractSolidityBytecodeJsonObjectV1Request
-     */
-    'gasConfig'?: GasTransactionConfig;
-    /**
-     * The amount of milliseconds to wait for a transaction receipt with theaddress of the contract(which indicates successful deployment) beforegiving up and crashing.
-     * @type {number}
-     * @memberof DeployContractSolidityBytecodeJsonObjectV1Request
-     */
-    'timeoutMs'?: number;
+export interface ContractJsonDefinition {
     /**
      * 
      * @type {ContractJSON}
-     * @memberof DeployContractSolidityBytecodeJsonObjectV1Request
+     * @memberof ContractJsonDefinition
      */
     'contractJSON': ContractJSON;
-    /**
-     * The list of arguments to pass in to the constructor of the contract being deployed.
-     * @type {Array<any>}
-     * @memberof DeployContractSolidityBytecodeJsonObjectV1Request
-     */
-    'constructorArgs'?: Array<any>;
 }
 /**
  * 
  * @export
- * @interface DeployContractSolidityBytecodeV1Request
+ * @interface ContractKeychainDefinition
  */
-export interface DeployContractSolidityBytecodeV1Request {
+export interface ContractKeychainDefinition {
     /**
      * The contract name for retrieve the contracts json on the keychain.
      * @type {string}
-     * @memberof DeployContractSolidityBytecodeV1Request
+     * @memberof ContractKeychainDefinition
      */
     'contractName': string;
     /**
-     * The application binary interface of the solidity contract
-     * @type {Array<any>}
-     * @memberof DeployContractSolidityBytecodeV1Request
-     */
-    'contractAbi'?: Array<any>;
-    /**
-     * 
-     * @type {Web3SigningCredential}
-     * @memberof DeployContractSolidityBytecodeV1Request
-     */
-    'web3SigningCredential': Web3SigningCredential;
-    /**
-     * See https://ethereum.stackexchange.com/a/47556 regarding the maximum length of the bytecode
-     * @type {string}
-     * @memberof DeployContractSolidityBytecodeV1Request
-     */
-    'bytecode'?: string;
-    /**
      * The keychainId for retrieve the contracts json.
      * @type {string}
-     * @memberof DeployContractSolidityBytecodeV1Request
+     * @memberof ContractKeychainDefinition
      */
     'keychainId': string;
-    /**
-     * 
-     * @type {GasTransactionConfig}
-     * @memberof DeployContractSolidityBytecodeV1Request
-     */
-    'gasConfig'?: GasTransactionConfig;
-    /**
-     * 
-     * @type {number}
-     * @memberof DeployContractSolidityBytecodeV1Request
-     */
-    'nonce'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof DeployContractSolidityBytecodeV1Request
-     */
-    'value'?: number;
-    /**
-     * The amount of milliseconds to wait for a transaction receipt with theaddress of the contract(which indicates successful deployment) beforegiving up and crashing.
-     * @type {number}
-     * @memberof DeployContractSolidityBytecodeV1Request
-     */
-    'timeoutMs'?: number;
-    /**
-     * For use when not using keychain, pass the contract in as this variable
-     * @type {object}
-     * @memberof DeployContractSolidityBytecodeV1Request
-     */
-    'contractJSON'?: object;
-    /**
-     * The list of arguments to pass in to the constructor of the contract being deployed.
-     * @type {Array<any>}
-     * @memberof DeployContractSolidityBytecodeV1Request
-     */
-    'constructorArgs'?: Array<any>;
 }
 /**
  * 
  * @export
- * @interface DeployContractSolidityBytecodeV1Response
+ * @interface DeployContractV1Request
  */
-export interface DeployContractSolidityBytecodeV1Response {
+export interface DeployContractV1Request {
     /**
      * 
-     * @type {Web3TransactionReceipt}
-     * @memberof DeployContractSolidityBytecodeV1Response
+     * @type {Web3SigningCredential}
+     * @memberof DeployContractV1Request
      */
-    'transactionReceipt': Web3TransactionReceipt;
+    'web3SigningCredential': Web3SigningCredential;
+    /**
+     * 
+     * @type {DeployContractV1RequestContract}
+     * @memberof DeployContractV1Request
+     */
+    'contract': DeployContractV1RequestContract;
+    /**
+     * The list of arguments to pass in to the constructor of the contract being deployed.
+     * @type {Array<any>}
+     * @memberof DeployContractV1Request
+     */
+    'constructorArgs'?: Array<any>;
+    /**
+     * 
+     * @type {GasTransactionConfig}
+     * @memberof DeployContractV1Request
+     */
+    'gasConfig'?: GasTransactionConfig;
+    /**
+     * Ether balance to send on deployment.
+     * @type {string}
+     * @memberof DeployContractV1Request
+     */
+    'value'?: string;
+}
+/**
+ * @type DeployContractV1RequestContract
+ * @export
+ */
+export type DeployContractV1RequestContract = ContractJsonDefinition | ContractKeychainDefinition;
+
+/**
+ * 
+ * @export
+ * @interface DeployedContractJsonDefinition
+ */
+export interface DeployedContractJsonDefinition {
+    /**
+     * 
+     * @type {ContractJSON}
+     * @memberof DeployedContractJsonDefinition
+     */
+    'contractJSON': ContractJSON;
+    /**
+     * 
+     * @type {string}
+     * @memberof DeployedContractJsonDefinition
+     */
+    'contractAddress': string;
+}
+/**
+ * Error response from the connector.
+ * @export
+ * @interface ErrorExceptionResponseV1
+ */
+export interface ErrorExceptionResponseV1 {
+    /**
+     * Short error description message.
+     * @type {string}
+     * @memberof ErrorExceptionResponseV1
+     */
+    'message': string;
+    /**
+     * Detailed error information.
+     * @type {string}
+     * @memberof ErrorExceptionResponseV1
+     */
+    'error': string;
 }
 /**
  * 
@@ -366,96 +356,15 @@ export interface GasTransactionConfigLegacy {
 /**
  * 
  * @export
- * @interface InvokeContractJsonObjectV1Request
- */
-export interface InvokeContractJsonObjectV1Request {
-    /**
-     * 
-     * @type {Web3SigningCredential}
-     * @memberof InvokeContractJsonObjectV1Request
-     */
-    'web3SigningCredential': Web3SigningCredential;
-    /**
-     * 
-     * @type {EthContractInvocationType}
-     * @memberof InvokeContractJsonObjectV1Request
-     */
-    'invocationType': EthContractInvocationType;
-    /**
-     * The name of the contract method to invoke.
-     * @type {string}
-     * @memberof InvokeContractJsonObjectV1Request
-     */
-    'methodName': string;
-    /**
-     * The list of arguments to pass in to the contract method being invoked.
-     * @type {Array<any>}
-     * @memberof InvokeContractJsonObjectV1Request
-     */
-    'params': Array<any>;
-    /**
-     * Address of the solidity contract
-     * @type {string}
-     * @memberof InvokeContractJsonObjectV1Request
-     */
-    'contractAddress': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof InvokeContractJsonObjectV1Request
-     */
-    'value'?: string;
-    /**
-     * 
-     * @type {GasTransactionConfig}
-     * @memberof InvokeContractJsonObjectV1Request
-     */
-    'gasConfig'?: GasTransactionConfig;
-    /**
-     * 
-     * @type {string}
-     * @memberof InvokeContractJsonObjectV1Request
-     */
-    'nonce'?: string;
-    /**
-     * The amount of milliseconds to wait for a transaction receipt beforegiving up and crashing. Only has any effect if the invocation type is SEND
-     * @type {number}
-     * @memberof InvokeContractJsonObjectV1Request
-     */
-    'timeoutMs'?: number;
-    /**
-     * 
-     * @type {ContractJSON}
-     * @memberof InvokeContractJsonObjectV1Request
-     */
-    'contractJSON': ContractJSON;
-}
-
-
-/**
- * 
- * @export
  * @interface InvokeContractV1Request
  */
 export interface InvokeContractV1Request {
     /**
-     * The contract name to find it in the keychain plugin
-     * @type {string}
-     * @memberof InvokeContractV1Request
-     */
-    'contractName': string;
-    /**
      * 
-     * @type {Web3SigningCredential}
+     * @type {InvokeContractV1RequestContract}
      * @memberof InvokeContractV1Request
      */
-    'web3SigningCredential': Web3SigningCredential;
-    /**
-     * 
-     * @type {EthContractInvocationType}
-     * @memberof InvokeContractV1Request
-     */
-    'invocationType': EthContractInvocationType;
+    'contract': InvokeContractV1RequestContract;
     /**
      * The name of the contract method to invoke.
      * @type {string}
@@ -470,10 +379,16 @@ export interface InvokeContractV1Request {
     'params': Array<any>;
     /**
      * 
-     * @type {string}
+     * @type {EthContractInvocationType}
      * @memberof InvokeContractV1Request
      */
-    'value'?: string;
+    'invocationType': EthContractInvocationType;
+    /**
+     * 
+     * @type {Web3SigningCredential}
+     * @memberof InvokeContractV1Request
+     */
+    'web3SigningCredential'?: Web3SigningCredential;
     /**
      * 
      * @type {GasTransactionConfig}
@@ -485,21 +400,21 @@ export interface InvokeContractV1Request {
      * @type {string}
      * @memberof InvokeContractV1Request
      */
-    'nonce'?: string;
+    'value'?: string;
     /**
-     * The amount of milliseconds to wait for a transaction receipt beforegiving up and crashing. Only has any effect if the invocation type is SEND
+     * The amount of milliseconds to wait for a transaction receipt before returning an error. Only has any effect if the invocation type is SEND
      * @type {number}
      * @memberof InvokeContractV1Request
      */
     'timeoutMs'?: number;
-    /**
-     * The keychainId for retrieve the contracts json.
-     * @type {string}
-     * @memberof InvokeContractV1Request
-     */
-    'keychainId': string;
 }
 
+
+/**
+ * @type InvokeContractV1RequestContract
+ * @export
+ */
+export type InvokeContractV1RequestContract = ContractKeychainDefinition | DeployedContractJsonDefinition;
 
 /**
  * 
@@ -681,147 +596,15 @@ export interface RunTransactionResponse {
 /**
  * 
  * @export
- * @interface SolidityContractJsonArtifact
- */
-export interface SolidityContractJsonArtifact {
-    /**
-     * 
-     * @type {string}
-     * @memberof SolidityContractJsonArtifact
-     */
-    'contractName': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof SolidityContractJsonArtifact
-     */
-    'metadata'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof SolidityContractJsonArtifact
-     */
-    'bytecode'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof SolidityContractJsonArtifact
-     */
-    'deployedBytecode'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof SolidityContractJsonArtifact
-     */
-    'sourceMap'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof SolidityContractJsonArtifact
-     */
-    'deployedSourceMap'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof SolidityContractJsonArtifact
-     */
-    'sourcePath'?: string;
-    /**
-     * 
-     * @type {SolidityContractJsonArtifactCompiler}
-     * @memberof SolidityContractJsonArtifact
-     */
-    'compiler'?: SolidityContractJsonArtifactCompiler;
-    /**
-     * 
-     * @type {{ [key: string]: any; }}
-     * @memberof SolidityContractJsonArtifact
-     */
-    'functionHashes'?: { [key: string]: any; };
-    /**
-     * 
-     * @type {SolidityContractJsonArtifactGasEstimates}
-     * @memberof SolidityContractJsonArtifact
-     */
-    'gasEstimates'?: SolidityContractJsonArtifactGasEstimates;
-}
-/**
- * 
- * @export
- * @interface SolidityContractJsonArtifactCompiler
- */
-export interface SolidityContractJsonArtifactCompiler {
-    [key: string]: any;
-
-    /**
-     * 
-     * @type {string}
-     * @memberof SolidityContractJsonArtifactCompiler
-     */
-    'name'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof SolidityContractJsonArtifactCompiler
-     */
-    'version'?: string;
-}
-/**
- * 
- * @export
- * @interface SolidityContractJsonArtifactGasEstimates
- */
-export interface SolidityContractJsonArtifactGasEstimates {
-    /**
-     * 
-     * @type {SolidityContractJsonArtifactGasEstimatesCreation}
-     * @memberof SolidityContractJsonArtifactGasEstimates
-     */
-    'creation'?: SolidityContractJsonArtifactGasEstimatesCreation;
-    /**
-     * 
-     * @type {{ [key: string]: any; }}
-     * @memberof SolidityContractJsonArtifactGasEstimates
-     */
-    'external'?: { [key: string]: any; };
-}
-/**
- * 
- * @export
- * @interface SolidityContractJsonArtifactGasEstimatesCreation
- */
-export interface SolidityContractJsonArtifactGasEstimatesCreation {
-    /**
-     * 
-     * @type {string}
-     * @memberof SolidityContractJsonArtifactGasEstimatesCreation
-     */
-    'codeDepositCost'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof SolidityContractJsonArtifactGasEstimatesCreation
-     */
-    'executionCost'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof SolidityContractJsonArtifactGasEstimatesCreation
-     */
-    'totalCost'?: string;
-}
-/**
- * 
- * @export
  * @enum {string}
  */
 
 export const WatchBlocksV1 = {
-    Subscribe: 'org.hyperledger.cactus.api.async.ethereum.WatchBlocksV1.Subscribe',
-    Next: 'org.hyperledger.cactus.api.async.ethereum.WatchBlocksV1.Next',
-    Unsubscribe: 'org.hyperledger.cactus.api.async.ethereum.WatchBlocksV1.Unsubscribe',
-    Error: 'org.hyperledger.cactus.api.async.ethereum.WatchBlocksV1.Error',
-    Complete: 'org.hyperledger.cactus.api.async.ethereum.WatchBlocksV1.Complete'
+    Subscribe: 'org.hyperledger.cacti.api.async.ethereum.WatchBlocksV1.Subscribe',
+    Next: 'org.hyperledger.cacti.api.async.ethereum.WatchBlocksV1.Next',
+    Unsubscribe: 'org.hyperledger.cacti.api.async.ethereum.WatchBlocksV1.Unsubscribe',
+    Error: 'org.hyperledger.cacti.api.async.ethereum.WatchBlocksV1.Error',
+    Complete: 'org.hyperledger.cacti.api.async.ethereum.WatchBlocksV1.Complete'
 } as const;
 
 export type WatchBlocksV1 = typeof WatchBlocksV1[keyof typeof WatchBlocksV1];
@@ -1099,36 +882,36 @@ export interface Web3BlockHeader {
  * @type Web3SigningCredential
  * @export
  */
-export type Web3SigningCredential = Web3SigningCredentialCactusKeychainRef | Web3SigningCredentialGethKeychainPassword | Web3SigningCredentialNone | Web3SigningCredentialPrivateKeyHex;
+export type Web3SigningCredential = Web3SigningCredentialCactiKeychainRef | Web3SigningCredentialGethKeychainPassword | Web3SigningCredentialNone | Web3SigningCredentialPrivateKeyHex;
 
 /**
  * 
  * @export
- * @interface Web3SigningCredentialCactusKeychainRef
+ * @interface Web3SigningCredentialCactiKeychainRef
  */
-export interface Web3SigningCredentialCactusKeychainRef {
+export interface Web3SigningCredentialCactiKeychainRef {
     /**
      * 
      * @type {Web3SigningCredentialType}
-     * @memberof Web3SigningCredentialCactusKeychainRef
+     * @memberof Web3SigningCredentialCactiKeychainRef
      */
     'type': Web3SigningCredentialType;
     /**
      * The ethereum account (public key) that the credential  belongs to. Basically the username in the traditional  terminology of authentication.
      * @type {string}
-     * @memberof Web3SigningCredentialCactusKeychainRef
+     * @memberof Web3SigningCredentialCactiKeychainRef
      */
     'ethAccount': string;
     /**
      * The key to use when looking up the the keychain entry holding the secret pointed to by the  keychainEntryKey parameter.
      * @type {string}
-     * @memberof Web3SigningCredentialCactusKeychainRef
+     * @memberof Web3SigningCredentialCactiKeychainRef
      */
     'keychainEntryKey': string;
     /**
      * The keychain ID to use when looking up the the keychain plugin instance that will be used to retrieve the secret pointed to by the keychainEntryKey parameter.
      * @type {string}
-     * @memberof Web3SigningCredentialCactusKeychainRef
+     * @memberof Web3SigningCredentialCactiKeychainRef
      */
     'keychainId'?: string;
 }
@@ -1210,7 +993,7 @@ export interface Web3SigningCredentialPrivateKeyHex {
  */
 
 export const Web3SigningCredentialType = {
-    CactusKeychainRef: 'CACTUS_KEYCHAIN_REF',
+    CactiKeychainRef: 'CACTI_KEYCHAIN_REF',
     GethKeychainPassword: 'GETH_KEYCHAIN_PASSWORD',
     PrivateKeyHex: 'PRIVATE_KEY_HEX',
     None: 'NONE'
@@ -1442,13 +1225,13 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     return {
         /**
          * 
-         * @summary Deploys the bytecode of a Solidity contract.
-         * @param {DeployContractSolidityBytecodeJsonObjectV1Request} [deployContractSolidityBytecodeJsonObjectV1Request] 
+         * @summary Deploys the contract to ethereum ledger.
+         * @param {DeployContractV1Request} [deployContractV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deployContractSolBytecodeJsonObjectV1: async (deployContractSolidityBytecodeJsonObjectV1Request?: DeployContractSolidityBytecodeJsonObjectV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/deploy-contract-solidity-bytecode-json-object`;
+        deployContract: async (deployContractV1Request?: DeployContractV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/deploy-contract`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1467,41 +1250,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(deployContractSolidityBytecodeJsonObjectV1Request, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary Deploys the bytecode of a Solidity contract.
-         * @param {DeployContractSolidityBytecodeV1Request} [deployContractSolidityBytecodeV1Request] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        deployContractSolBytecodeV1: async (deployContractSolidityBytecodeV1Request?: DeployContractSolidityBytecodeV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/deploy-contract-solidity-bytecode`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(deployContractSolidityBytecodeV1Request, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(deployContractV1Request, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -1566,40 +1315,6 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(invokeContractV1Request, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary Invokes a contract on an ethereum ledger
-         * @param {InvokeContractJsonObjectV1Request} [invokeContractJsonObjectV1Request] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        invokeContractV1NoKeychain: async (invokeContractJsonObjectV1Request?: InvokeContractJsonObjectV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/invoke-contract-json-object`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(invokeContractJsonObjectV1Request, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -1720,24 +1435,13 @@ export const DefaultApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
-         * @summary Deploys the bytecode of a Solidity contract.
-         * @param {DeployContractSolidityBytecodeJsonObjectV1Request} [deployContractSolidityBytecodeJsonObjectV1Request] 
+         * @summary Deploys the contract to ethereum ledger.
+         * @param {DeployContractV1Request} [deployContractV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deployContractSolBytecodeJsonObjectV1(deployContractSolidityBytecodeJsonObjectV1Request?: DeployContractSolidityBytecodeJsonObjectV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeployContractSolidityBytecodeV1Response>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.deployContractSolBytecodeJsonObjectV1(deployContractSolidityBytecodeJsonObjectV1Request, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * 
-         * @summary Deploys the bytecode of a Solidity contract.
-         * @param {DeployContractSolidityBytecodeV1Request} [deployContractSolidityBytecodeV1Request] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async deployContractSolBytecodeV1(deployContractSolidityBytecodeV1Request?: DeployContractSolidityBytecodeV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeployContractSolidityBytecodeV1Response>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.deployContractSolBytecodeV1(deployContractSolidityBytecodeV1Request, options);
+        async deployContract(deployContractV1Request?: DeployContractV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RunTransactionResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deployContract(deployContractV1Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -1759,17 +1463,6 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          */
         async invokeContractV1(invokeContractV1Request?: InvokeContractV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<InvokeContractV1Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.invokeContractV1(invokeContractV1Request, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * 
-         * @summary Invokes a contract on an ethereum ledger
-         * @param {InvokeContractJsonObjectV1Request} [invokeContractJsonObjectV1Request] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async invokeContractV1NoKeychain(invokeContractJsonObjectV1Request?: InvokeContractJsonObjectV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<InvokeContractV1Response>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.invokeContractV1NoKeychain(invokeContractJsonObjectV1Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -1817,23 +1510,13 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
     return {
         /**
          * 
-         * @summary Deploys the bytecode of a Solidity contract.
-         * @param {DeployContractSolidityBytecodeJsonObjectV1Request} [deployContractSolidityBytecodeJsonObjectV1Request] 
+         * @summary Deploys the contract to ethereum ledger.
+         * @param {DeployContractV1Request} [deployContractV1Request] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deployContractSolBytecodeJsonObjectV1(deployContractSolidityBytecodeJsonObjectV1Request?: DeployContractSolidityBytecodeJsonObjectV1Request, options?: any): AxiosPromise<DeployContractSolidityBytecodeV1Response> {
-            return localVarFp.deployContractSolBytecodeJsonObjectV1(deployContractSolidityBytecodeJsonObjectV1Request, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary Deploys the bytecode of a Solidity contract.
-         * @param {DeployContractSolidityBytecodeV1Request} [deployContractSolidityBytecodeV1Request] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        deployContractSolBytecodeV1(deployContractSolidityBytecodeV1Request?: DeployContractSolidityBytecodeV1Request, options?: any): AxiosPromise<DeployContractSolidityBytecodeV1Response> {
-            return localVarFp.deployContractSolBytecodeV1(deployContractSolidityBytecodeV1Request, options).then((request) => request(axios, basePath));
+        deployContract(deployContractV1Request?: DeployContractV1Request, options?: any): AxiosPromise<RunTransactionResponse> {
+            return localVarFp.deployContract(deployContractV1Request, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -1853,16 +1536,6 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         invokeContractV1(invokeContractV1Request?: InvokeContractV1Request, options?: any): AxiosPromise<InvokeContractV1Response> {
             return localVarFp.invokeContractV1(invokeContractV1Request, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary Invokes a contract on an ethereum ledger
-         * @param {InvokeContractJsonObjectV1Request} [invokeContractJsonObjectV1Request] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        invokeContractV1NoKeychain(invokeContractJsonObjectV1Request?: InvokeContractJsonObjectV1Request, options?: any): AxiosPromise<InvokeContractV1Response> {
-            return localVarFp.invokeContractV1NoKeychain(invokeContractJsonObjectV1Request, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -1906,26 +1579,14 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
 export class DefaultApi extends BaseAPI {
     /**
      * 
-     * @summary Deploys the bytecode of a Solidity contract.
-     * @param {DeployContractSolidityBytecodeJsonObjectV1Request} [deployContractSolidityBytecodeJsonObjectV1Request] 
+     * @summary Deploys the contract to ethereum ledger.
+     * @param {DeployContractV1Request} [deployContractV1Request] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public deployContractSolBytecodeJsonObjectV1(deployContractSolidityBytecodeJsonObjectV1Request?: DeployContractSolidityBytecodeJsonObjectV1Request, options?: AxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).deployContractSolBytecodeJsonObjectV1(deployContractSolidityBytecodeJsonObjectV1Request, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary Deploys the bytecode of a Solidity contract.
-     * @param {DeployContractSolidityBytecodeV1Request} [deployContractSolidityBytecodeV1Request] 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApi
-     */
-    public deployContractSolBytecodeV1(deployContractSolidityBytecodeV1Request?: DeployContractSolidityBytecodeV1Request, options?: AxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).deployContractSolBytecodeV1(deployContractSolidityBytecodeV1Request, options).then((request) => request(this.axios, this.basePath));
+    public deployContract(deployContractV1Request?: DeployContractV1Request, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).deployContract(deployContractV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1949,18 +1610,6 @@ export class DefaultApi extends BaseAPI {
      */
     public invokeContractV1(invokeContractV1Request?: InvokeContractV1Request, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).invokeContractV1(invokeContractV1Request, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary Invokes a contract on an ethereum ledger
-     * @param {InvokeContractJsonObjectV1Request} [invokeContractJsonObjectV1Request] 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApi
-     */
-    public invokeContractV1NoKeychain(invokeContractJsonObjectV1Request?: InvokeContractJsonObjectV1Request, options?: AxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).invokeContractV1NoKeychain(invokeContractJsonObjectV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

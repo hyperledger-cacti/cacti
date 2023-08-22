@@ -52,7 +52,7 @@ async transact(req: RunTransactionRequest): Promise<RunTransactionResponse>;
 async transactSigned(rawTransaction: string): Promise<RunTransactionResponse>;
 async transactGethKeychain(txIn: RunTransactionRequest): Promise<RunTransactionResponse>;
 async transactPrivateKey(req: RunTransactionRequest): Promise<RunTransactionResponse>;
-async transactCactusKeychainRef(req: RunTransactionRequest):Promise<RunTransactionResponse>;
+async transactCactiKeychainRef(req: RunTransactionRequest):Promise<RunTransactionResponse>;
 async deployContract(req: DeployContractSolidityBytecodeV1Request :Promise<DeployContractSolidityBytecodeV1Response>;
 async deployContractJsonObject(req: DeployContractSolidityBytecodeJsonObjectV1Request): Promise<DeployContractSolidityBytecodeV1Response>
 async invokeRawWeb3EthMethod(req: InvokeRawWeb3EthMethodV1Request): Promise<any>;
@@ -77,7 +77,7 @@ The field "type" can have the following values:
 
 ```typescript
 enum Web3SigningCredentialType {
-  CACTUSKEYCHAINREF = "CACTUS_KEYCHAIN_REF",
+  CACTUSKEYCHAINREF = "CACTI_KEYCHAIN_REF",
   GETHKEYCHAINPASSWORD = "GETH_KEYCHAIN_PASSWORD",
   PRIVATEKEYHEX = "PRIVATE_KEY_HEX",
   NONE = "NONE",

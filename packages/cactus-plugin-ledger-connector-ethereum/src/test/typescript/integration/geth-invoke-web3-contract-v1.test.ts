@@ -86,8 +86,10 @@ describe("invokeRawWeb3EthContract Tests", () => {
 
     log.info("Deploy contract to interact with...");
     const deployOut = await connector.deployContract({
-      contractName: HelloWorldContractJson.contractName,
-      keychainId: keychainPlugin.getKeychainId(),
+      contract: {
+        contractName: HelloWorldContractJson.contractName,
+        keychainId: keychainPlugin.getKeychainId(),
+      },
       web3SigningCredential: {
         ethAccount: WHALE_ACCOUNT_ADDRESS,
         secret: "",

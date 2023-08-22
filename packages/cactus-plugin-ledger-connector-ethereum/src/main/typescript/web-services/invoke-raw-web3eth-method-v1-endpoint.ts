@@ -5,6 +5,7 @@ import {
   LogLevelDesc,
   LoggerProvider,
   IAsyncProvider,
+  safeStringifyException,
 } from "@hyperledger/cactus-common";
 import {
   IEndpointAuthzOptions,
@@ -14,7 +15,6 @@ import {
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 import { PluginLedgerConnectorEthereum } from "../plugin-ledger-connector-ethereum";
 import OAS from "../../json/openapi.json";
-import sanitizeHtml from "sanitize-html";
 import { InvokeRawWeb3EthMethodV1Response } from "../public-api";
 
 export interface IInvokeRawWeb3EthMethodEndpointOptions {
@@ -48,11 +48,11 @@ export class InvokeRawWeb3EthMethodEndpoint implements IWebServiceEndpoint {
   }
 
   public getPath(): string {
-    return this.oasPath.post["x-hyperledger-cactus"].http.path;
+    return this.oasPath.post["x-hyperledger-cacti"].http.path;
   }
 
   public getVerbLowerCase(): string {
-    return this.oasPath.post["x-hyperledger-cactus"].http.verbLowerCase;
+    return this.oasPath.post["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getOperationId(): string {
@@ -92,14 +92,11 @@ export class InvokeRawWeb3EthMethodEndpoint implements IWebServiceEndpoint {
         data: methodResponse,
       };
       res.json(response);
-    } catch (ex: any) {
-      this.log.warn(`Error while serving ${reqTag}`, ex);
-      res.json({
-        status: 504,
-        errorDetail: sanitizeHtml(ex, {
-          allowedTags: [],
-          allowedAttributes: {},
-        }),
+    } catch (ex) {
+      this.log.error(`Crash while serving ${reqTag}`, ex);
+      res.status(500).json({
+        message: "Internal Server Error",
+        error: safeStringifyException(ex),
       });
     }
   }

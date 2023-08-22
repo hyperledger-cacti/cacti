@@ -1,5 +1,8 @@
 import "jest-extended";
 import {
+  isContractJsonDefinition,
+  isContractKeychainDefinition,
+  isDeployedContractJsonDefinition,
   isGasTransactionConfigEIP1559,
   isGasTransactionConfigLegacy,
   isWeb3SigningCredentialGethKeychainPassword,
@@ -103,5 +106,78 @@ describe("Type guards for OpenAPI spec model type definitions", () => {
       }),
     ).toBe(false);
     expect(isGasTransactionConfigEIP1559({})).toBe(false);
+  });
+
+  test("isContractJsonDefinition()", () => {
+    expect(
+      isContractJsonDefinition({
+        contractJSON: {
+          abi: "test",
+        },
+      }),
+    ).toBe(true);
+
+    expect(
+      isContractJsonDefinition({
+        foo: "1234",
+      }),
+    ).toBe(false);
+    expect(isContractJsonDefinition({})).toBe(false);
+  });
+
+  test("isDeployedContractJsonDefinition()", () => {
+    expect(
+      isDeployedContractJsonDefinition({
+        contractJSON: {
+          abi: "test",
+        },
+        contractAddress: "asd",
+      }),
+    ).toBe(true);
+
+    expect(
+      isDeployedContractJsonDefinition({
+        contractJSON: {
+          abi: "test",
+        },
+      }),
+    ).toBe(false);
+    expect(
+      isDeployedContractJsonDefinition({
+        contractAddress: "asd",
+      }),
+    ).toBe(false);
+    expect(
+      isDeployedContractJsonDefinition({
+        foo: "1234",
+      }),
+    ).toBe(false);
+    expect(isDeployedContractJsonDefinition({})).toBe(false);
+  });
+
+  test("isContractKeychainDefinition()", () => {
+    expect(
+      isContractKeychainDefinition({
+        contractName: "foo",
+        keychainId: "bar",
+      }),
+    ).toBe(true);
+
+    expect(
+      isContractKeychainDefinition({
+        contractName: "foo",
+      }),
+    ).toBe(false);
+    expect(
+      isContractKeychainDefinition({
+        keychainId: "foo",
+      }),
+    ).toBe(false);
+    expect(
+      isContractKeychainDefinition({
+        foo: "bar",
+      }),
+    ).toBe(false);
+    expect(isContractKeychainDefinition({})).toBe(false);
   });
 });

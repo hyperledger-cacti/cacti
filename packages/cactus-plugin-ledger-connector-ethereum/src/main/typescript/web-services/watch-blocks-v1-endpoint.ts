@@ -7,6 +7,7 @@ import {
   LogLevelDesc,
   LoggerProvider,
   Checks,
+  safeStringifyException,
 } from "@hyperledger/cactus-common";
 import {
   WatchBlocksV1Options,
@@ -108,7 +109,14 @@ export class WatchBlocksV1Endpoint {
 
     newBlocksSubscription.on("error", async (error) => {
       console.log("Error when subscribing to New block header: ", error);
-      socket.emit(WatchBlocksV1.Error, error.message);
+      socket.emit(WatchBlocksV1.Error, safeStringifyException(error));
+      newBlocksSubscription.unsubscribe();
+    });
+
+    log.debug("Subscribing to Web3 new block headers event...");
+
+    socket.on("disconnect", async (reason: string) => {
+      log.debug("WebSocket:disconnect reason=%o", reason);
       await newBlocksSubscription.unsubscribe();
     });
 

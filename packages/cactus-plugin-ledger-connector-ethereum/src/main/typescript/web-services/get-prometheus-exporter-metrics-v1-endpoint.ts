@@ -16,6 +16,7 @@ import {
   LoggerProvider,
   Checks,
   IAsyncProvider,
+  safeStringifyException,
 } from "@hyperledger/cactus-common";
 
 import { PluginLedgerConnectorEthereum } from "../plugin-ledger-connector-ethereum";
@@ -54,11 +55,11 @@ export class GetPrometheusExporterMetricsEndpointV1
   }
 
   public getPath(): string {
-    return this.oasPath.get["x-hyperledger-cactus"].http.path;
+    return this.oasPath.get["x-hyperledger-cacti"].http.path;
   }
 
   public getVerbLowerCase(): string {
-    return this.oasPath.get["x-hyperledger-cactus"].http.verbLowerCase;
+    return this.oasPath.get["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getOperationId(): string {
@@ -88,15 +89,14 @@ export class GetPrometheusExporterMetricsEndpointV1
     this.log.debug(`${verbUpper} ${this.getPath()}`);
 
     try {
-      const resBody =
-        await this.options.connector.getPrometheusExporterMetrics();
-      res.status(200);
-      res.send(resBody);
+      res
+        .status(200)
+        .send(await this.options.connector.getPrometheusExporterMetrics());
     } catch (ex) {
-      this.log.error(`${fnTag} failed to serve request`, ex);
+      this.log.error(`Crash while serving ${fnTag}`, ex);
       res.status(500);
       res.statusMessage = ex.message;
-      res.json({ error: ex.stack });
+      res.json({ error: safeStringifyException(ex) });
     }
   }
 }

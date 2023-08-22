@@ -1,40 +1,40 @@
 import { Express, Request, Response } from "express";
 
 import {
+  IWebServiceEndpoint,
+  IExpressRequestHandler,
+  IEndpointAuthzOptions,
+} from "@hyperledger/cactus-core-api";
+
+import {
   Logger,
   Checks,
   LogLevelDesc,
   LoggerProvider,
   IAsyncProvider,
+  safeStringifyException,
 } from "@hyperledger/cactus-common";
-import {
-  IEndpointAuthzOptions,
-  IExpressRequestHandler,
-  IWebServiceEndpoint,
-} from "@hyperledger/cactus-core-api";
+
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
 import { PluginLedgerConnectorEthereum } from "../plugin-ledger-connector-ethereum";
-
 import OAS from "../../json/openapi.json";
 
-export interface IInvokeContractEndpointJsonObjectOptions {
+export interface IDeployContractSolidityBytecodeOptions {
   logLevel?: LogLevelDesc;
   connector: PluginLedgerConnectorEthereum;
 }
 
-export class InvokeContractJsonObjectEndpoint implements IWebServiceEndpoint {
-  public static readonly CLASS_NAME = "InvokeContractJsonObjectEndpoint";
+export class DeployContractEndpoint implements IWebServiceEndpoint {
+  public static readonly CLASS_NAME = "DeployContractEndpoint";
 
   private readonly log: Logger;
 
   public get className(): string {
-    return InvokeContractJsonObjectEndpoint.CLASS_NAME;
+    return DeployContractEndpoint.CLASS_NAME;
   }
 
-  constructor(
-    public readonly options: IInvokeContractEndpointJsonObjectOptions,
-  ) {
+  constructor(public readonly options: IDeployContractSolidityBytecodeOptions) {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
     Checks.truthy(options.connector, `${fnTag} arg options.connector`);
@@ -44,24 +44,22 @@ export class InvokeContractJsonObjectEndpoint implements IWebServiceEndpoint {
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public getOasPath() {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/deploy-contract"] {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/invoke-contract-json-object"
+      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/deploy-contract"
     ];
   }
 
   public getPath(): string {
-    const apiPath = this.getOasPath();
-    return apiPath.post["x-hyperledger-cactus"].http.path;
+    return this.oasPath.post["x-hyperledger-cacti"].http.path;
   }
 
   public getVerbLowerCase(): string {
-    const apiPath = this.getOasPath();
-    return apiPath.post["x-hyperledger-cactus"].http.verbLowerCase;
+    return this.oasPath.post["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getOperationId(): string {
-    return this.getOasPath().post.operationId;
+    return this.oasPath.post.operationId;
   }
 
   getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {
@@ -88,15 +86,15 @@ export class InvokeContractJsonObjectEndpoint implements IWebServiceEndpoint {
   public async handleRequest(req: Request, res: Response): Promise<void> {
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(reqTag);
-    const reqBody = req.body;
     try {
-      const resBody = await this.options.connector.getContractInfo(reqBody);
-      res.json(resBody);
+      res
+        .status(200)
+        .json(await this.options.connector.deployContract(req.body));
     } catch (ex) {
       this.log.error(`Crash while serving ${reqTag}`, ex);
       res.status(500).json({
         message: "Internal Server Error",
-        error: ex?.stack || ex?.message,
+        error: safeStringifyException(ex),
       });
     }
   }

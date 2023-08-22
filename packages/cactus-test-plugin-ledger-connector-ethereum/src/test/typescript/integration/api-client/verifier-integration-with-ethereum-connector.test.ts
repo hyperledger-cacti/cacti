@@ -242,8 +242,10 @@ describe("Verifier integration with ethereum connector tests", () => {
 
       // Deploy contract to interact with
       const deployOut = await connector.deployContract({
-        contractName: HelloWorldContractJson.contractName,
-        keychainId: keychainPlugin.getKeychainId(),
+        contract: {
+          contractName: HelloWorldContractJson.contractName,
+          keychainId: keychainPlugin.getKeychainId(),
+        },
         web3SigningCredential: {
           ethAccount: WHALE_ACCOUNT_ADDRESS,
           secret: "",
@@ -561,13 +563,14 @@ describe("Verifier integration with ethereum connector tests", () => {
     const method = { type: "web3Eth", command: "foo" };
     const args = {};
 
-    const results = await globalVerifierFactory
-      .getVerifier(ethereumValidatorId)
-      .sendSyncRequest(contract, method, args);
-
-    expect(results).toBeTruthy();
-    expect(results.status).toEqual(504);
-    expect(results.errorDetail).toBeTruthy();
+    try {
+      await globalVerifierFactory
+        .getVerifier(ethereumValidatorId)
+        .sendSyncRequest(contract, method, args);
+      fail("Expected sendSyncRequest call to fail but it succeeded.");
+    } catch (error) {
+      console.log("sendSyncRequest failed as expected");
+    }
   });
 
   function assertBlockHeader(header?: Web3BlockHeader) {
