@@ -75,7 +75,7 @@ jobs:
   yarn_codegen:
     continue-on-error: false
     env:
-      DEV_BUILD_DISABLED: false
+      DEV_BUILD_DISABLED: true
       FULL_BUILD_DISABLED: true
       JEST_TEST_RUNNER_DISABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
@@ -100,7 +100,48 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
+      - run: git status --porcelain
+      - run: git status --porcelain | wc -l
       - run: yarn codegen
+      - run: git status --porcelain
+      - run: git status --porcelain | wc -l
+
+      - name: Set env.GIT_INDEX_FILE_COUNT
+        id: set_env_git_index_file_count
+        run: |
+            echo "GIT_INDEX_FILE_COUNT=$(git status --porcelain | wc -l)" >> $GITHUB_ENV
+
+      - name: Print env.GIT_INDEX_FILE_COUNT
+        id: print_env_git_index_file_count
+        run: |
+            echo "${{ env.GIT_INDEX_FILE_COUNT }}"
+
+      - uses: actions/github-script@v6.4.1
+        id: set-result-git_index_file_count
+        with:
+          script: |
+            const { GIT_INDEX_FILE_COUNT } = process.env;
+            console.log(`env.GIT_INDEX_FILE_COUNT ${GIT_INDEX_FILE_COUNT}`);
+            return parseInt(GIT_INDEX_FILE_COUNT, 10);
+          result-encoding: string
+
+      - name: Get result Git Index File Count
+        id: get_result_git_index_file_count
+        run: echo "${{steps.set-result-git_index_file_count.outputs.result}}"
+
+      - name: Check CodeGen Side-effects
+        if: ${{ steps.set-result-git_index_file_count.outputs.result != 0 }}
+        uses: actions/github-script@v6.4.1
+        with:
+          script: |
+            const failMsg = "yarn codegen script produced version control " + 
+              "side-effects: source files have been changed by it that are " + 
+              "otherwise are under version control. " + 
+              "This means (99% of the time) that you need to run the " + 
+              "yarn codegen script locally and then include the changes it " + 
+              "makes in your own commit when submitting your pull request.";
+            core.setFailed(failMsg)
+
   yarn_custom_checks:
     continue-on-error: false
     env:
@@ -111,6 +152,7 @@ jobs:
       TOOLS_VALIDATE_BUNDLE_NAMES_DISABLED: true
       CUSTOM_CHECKS_DISABLED: false
       CONFIGURE_DISABLED: false
+      CACTI_CUSTOM_CHECKS_REQUIRED_OPENAPI_SPEC_VERSION: 3.0.3
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
