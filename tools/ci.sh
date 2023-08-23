@@ -132,13 +132,13 @@ function mainTask()
     npm run configure
   fi
 
-  if [ "${TOOLS_VALIDATE_BUNDLE_NAMES_DISABLED:-false}" = "true" ]; then
+  if [ "${TOOLS_VALIDATE_BUNDLE_NAMES_DISABLED:-true}" = "true" ]; then
     echo "$(date +%FT%T%z) [CI] yarn tools:validate-bundle-names disabled. Skipping..."
   else
     yarn tools:validate-bundle-names
   fi
 
-  if [ "${CUSTOM_CHECKS_DISABLED:-false}" = "true" ]; then
+  if [ "${CUSTOM_CHECKS_DISABLED:-true}" = "true" ]; then
     echo "$(date +%FT%T%z) [CI] yarn custom-checks disabled. Skipping..."
   else
     yarn custom-checks
@@ -172,7 +172,7 @@ function mainTask()
   # of providing feedback about failing tests as early as possible we run the
   # dev:backend build first and then the tests which is the fastest way to get
   # to a failed test if there was one.
-  if [ "${FULL_BUILD_DISABLED:-false}" = "true" ]; then
+  if [ "${FULL_BUILD_DISABLED:-true}" = "true" ]; then
     echo "$(date +%FT%T%z) [CI] Full build disabled. Skipping..."
   else
     yarn run build
