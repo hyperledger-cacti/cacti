@@ -19,6 +19,7 @@ import org.openapitools.client.models.NewContractRequestGas
 import org.openapitools.client.models.Web3SigningCredential
 
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 /**
  * 

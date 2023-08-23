@@ -19,6 +19,7 @@ import org.openapitools.client.models.OdapMessageActionResponse
 import org.openapitools.client.models.PayloadProfile
 
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 /**
  * 
@@ -83,6 +84,7 @@ data class OdapMessage (
      *
      * Values: transferInitialization,lockEvidenceVerification,commitmentEstablishment
      */
+    @JsonClass(generateAdapter = false)
     enum class Phase(val value: kotlin.String) {
         @Json(name = "TransferInitialization") transferInitialization("TransferInitialization"),
         @Json(name = "LockEvidenceVerification") lockEvidenceVerification("LockEvidenceVerification"),
@@ -93,6 +95,7 @@ data class OdapMessage (
      *
      * Values: sAML,oAuth,x509
      */
+    @JsonClass(generateAdapter = false)
     enum class CredentialProfile(val value: kotlin.String) {
         @Json(name = "SAML") sAML("SAML"),
         @Json(name = "OAuth") oAuth("OAuth"),

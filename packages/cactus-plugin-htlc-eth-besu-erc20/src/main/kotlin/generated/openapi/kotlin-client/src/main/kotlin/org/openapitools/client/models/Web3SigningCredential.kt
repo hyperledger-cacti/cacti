@@ -21,6 +21,7 @@ import org.openapitools.client.models.Web3SigningCredentialPrivateKeyHex
 import org.openapitools.client.models.Web3SigningCredentialType
 
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 /**
  * 

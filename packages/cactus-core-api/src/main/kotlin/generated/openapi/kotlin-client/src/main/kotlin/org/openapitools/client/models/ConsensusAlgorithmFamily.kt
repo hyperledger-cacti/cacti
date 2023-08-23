@@ -17,6 +17,7 @@ package org.openapitools.client.models
 
 
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 /**
  * Enumerates a list of consensus algorithm families in existence. Does not intend to be an exhaustive list, just a practical one, meaning that we only include items here that are relevant to Hyperledger Cactus in fulfilling its own duties. This can be extended later as more sophisticated features of Cactus get implemented. This enum is meant to be first and foremost a useful abstraction for achieving practical tasks, not an encyclopedia and therefore we ask of everyone that this to be extended only in ways that serve a practical purpose for the runtime behavior of Cactus or Cactus plugins in general. The bottom line is that we can accept this enum being not 100% accurate as long as it 100% satisfies what it was designed to do.
@@ -24,6 +25,7 @@ import com.squareup.moshi.Json
  * Values: aUTHORITY,sTAKE,wORK
  */
 
+@JsonClass(generateAdapter = false)
 enum class ConsensusAlgorithmFamily(val value: kotlin.String) {
 
     @Json(name = "org.hyperledger.cactus.consensusalgorithm.PROOF_OF_AUTHORITY")
@@ -36,7 +38,7 @@ enum class ConsensusAlgorithmFamily(val value: kotlin.String) {
     wORK("org.hyperledger.cactus.consensusalgorithm.PROOF_OF_WORK");
 
     /**
-     * Override toString() to avoid using the enum variable name as the value, and instead use
+     * Override [toString()] to avoid using the enum variable name as the value, and instead use
      * the actual value defined in the API spec file.
      *
      * This solves a problem when the variable name and its value are different, and ensures that

@@ -13,13 +13,15 @@
  */
 
 
-import { Configuration } from './configuration';
-import globalAxios, { AxiosPromise, AxiosInstance } from 'axios';
+import type { Configuration } from './configuration';
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from './common';
+import type { RequestArgs } from './base';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from './base';
+import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from './base';
 
 /**
  * 
@@ -32,19 +34,19 @@ export interface ClearMonitorTransactionsV1Request {
      * @type {string}
      * @memberof ClearMonitorTransactionsV1Request
      */
-    clientAppId: string;
+    'clientAppId': string;
     /**
      * The fully qualified name of the Corda state to monitor
      * @type {string}
      * @memberof ClearMonitorTransactionsV1Request
      */
-    stateFullClassName: string;
+    'stateFullClassName': string;
     /**
      * 
      * @type {Array<string>}
      * @memberof ClearMonitorTransactionsV1Request
      */
-    txIndexes: Array<string>;
+    'txIndexes': Array<string>;
 }
 /**
  * 
@@ -57,13 +59,13 @@ export interface ClearMonitorTransactionsV1Response {
      * @type {boolean}
      * @memberof ClearMonitorTransactionsV1Response
      */
-    success: boolean;
+    'success': boolean;
     /**
      * Message describing operation status or any errors that occurred.
      * @type {string}
      * @memberof ClearMonitorTransactionsV1Response
      */
-    msg: string;
+    'msg': string;
 }
 /**
  * 
@@ -76,31 +78,31 @@ export interface CordaNodeSshCredentials {
      * @type {string}
      * @memberof CordaNodeSshCredentials
      */
-    hostKeyEntry: string;
+    'hostKeyEntry': string;
     /**
      * 
      * @type {string}
      * @memberof CordaNodeSshCredentials
      */
-    username: string;
+    'username': string;
     /**
      * 
      * @type {string}
      * @memberof CordaNodeSshCredentials
      */
-    password: string;
+    'password': string;
     /**
      * 
      * @type {string}
      * @memberof CordaNodeSshCredentials
      */
-    hostname: string;
+    'hostname': string;
     /**
      * 
      * @type {number}
      * @memberof CordaNodeSshCredentials
      */
-    port: number;
+    'port': number;
 }
 /**
  * 
@@ -113,25 +115,25 @@ export interface CordaRpcCredentials {
      * @type {string}
      * @memberof CordaRpcCredentials
      */
-    hostname: string;
+    'hostname': string;
     /**
      * 
      * @type {number}
      * @memberof CordaRpcCredentials
      */
-    port: number;
+    'port': number;
     /**
      * 
      * @type {string}
      * @memberof CordaRpcCredentials
      */
-    username: string;
+    'username': string;
     /**
      * 
      * @type {string}
      * @memberof CordaRpcCredentials
      */
-    password: string;
+    'password': string;
 }
 /**
  * 
@@ -144,43 +146,43 @@ export interface CordaX500Name {
      * @type {string}
      * @memberof CordaX500Name
      */
-    commonName?: string;
+    'commonName'?: string;
     /**
      * 
      * @type {string}
      * @memberof CordaX500Name
      */
-    organisationUnit?: string;
+    'organisationUnit'?: string;
     /**
      * 
      * @type {string}
      * @memberof CordaX500Name
      */
-    organisation: string;
+    'organisation': string;
     /**
      * 
      * @type {string}
      * @memberof CordaX500Name
      */
-    locality: string;
+    'locality': string;
     /**
      * 
      * @type {string}
      * @memberof CordaX500Name
      */
-    state?: string;
+    'state'?: string;
     /**
      * 
      * @type {string}
      * @memberof CordaX500Name
      */
-    country: string;
+    'country': string;
     /**
      * 
      * @type {X500Principal}
      * @memberof CordaX500Name
      */
-    x500Principal: X500Principal;
+    'x500Principal': X500Principal;
 }
 /**
  * 
@@ -193,37 +195,37 @@ export interface CordappDeploymentConfig {
      * @type {CordaNodeSshCredentials}
      * @memberof CordappDeploymentConfig
      */
-    sshCredentials: CordaNodeSshCredentials;
+    'sshCredentials': CordaNodeSshCredentials;
     /**
      * 
      * @type {CordaRpcCredentials}
      * @memberof CordappDeploymentConfig
      */
-    rpcCredentials: CordaRpcCredentials;
+    'rpcCredentials': CordaRpcCredentials;
     /**
      * The shell command to execute in order to start back up a Corda node after having placed new jars in the cordapp directory of said node.
      * @type {string}
      * @memberof CordappDeploymentConfig
      */
-    cordaNodeStartCmd: string;
+    'cordaNodeStartCmd': string;
     /**
      * The absolute file system path where the Corda Node is expecting deployed Cordapp jar files to be placed.
      * @type {string}
      * @memberof CordappDeploymentConfig
      */
-    cordappDir: string;
+    'cordappDir': string;
     /**
      * The absolute file system path where the corda.jar file of the node can be found. This is used to execute database schema migrations where applicable (H2 database in use in development environments).
      * @type {string}
      * @memberof CordappDeploymentConfig
      */
-    cordaJarPath: string;
+    'cordaJarPath': string;
     /**
      * The absolute file system path where the base directory of the Corda node can be found. This is used to pass in to corda.jar when being invoked for certain tasks such as executing database schema migrations for a deployed contract.
      * @type {string}
      * @memberof CordappDeploymentConfig
      */
-    nodeBaseDirPath: string;
+    'nodeBaseDirPath': string;
 }
 /**
  * A CordappInfo describes a single CorDapp currently installed on the node
@@ -236,55 +238,55 @@ export interface CordappInfo {
      * @type {SHA256}
      * @memberof CordappInfo
      */
-    jarHash: SHA256;
+    'jarHash': SHA256;
     /**
      * The name of the licence this CorDapp is released under
      * @type {string}
      * @memberof CordappInfo
      */
-    licence: string;
+    'licence': string;
     /**
      * The minimum platform version the node must be at for the CorDapp to run
      * @type {number}
      * @memberof CordappInfo
      */
-    minimumPlatformVersion: number;
+    'minimumPlatformVersion': number;
     /**
      * The name of the JAR file that defines the CorDapp
      * @type {string}
      * @memberof CordappInfo
      */
-    name: string;
+    'name': string;
     /**
      * The name of the CorDapp
      * @type {string}
      * @memberof CordappInfo
      */
-    shortName: string;
+    'shortName': string;
     /**
      * The target platform version this CorDapp has been tested against
      * @type {number}
      * @memberof CordappInfo
      */
-    targetPlatformVersion: number;
+    'targetPlatformVersion': number;
     /**
      * A description of what sort of CorDapp this is - either a contract, workflow, or a combination.
      * @type {string}
      * @memberof CordappInfo
      */
-    type: string;
+    'type': string;
     /**
      * The vendor of this CorDapp
      * @type {string}
      * @memberof CordappInfo
      */
-    vendor: string;
+    'vendor': string;
     /**
      * The version of this CorDapp
      * @type {string}
      * @memberof CordappInfo
      */
-    version: string;
+    'version': string;
 }
 /**
  * 
@@ -297,7 +299,7 @@ export interface DeployContractJarsBadRequestV1Response {
      * @type {Array<string>}
      * @memberof DeployContractJarsBadRequestV1Response
      */
-    errors: Array<string>;
+    'errors': Array<string>;
 }
 /**
  * 
@@ -310,7 +312,7 @@ export interface DeployContractJarsSuccessV1Response {
      * @type {Array<string>}
      * @memberof DeployContractJarsSuccessV1Response
      */
-    deployedJarFiles: Array<string>;
+    'deployedJarFiles': Array<string>;
 }
 /**
  * 
@@ -323,13 +325,13 @@ export interface DeployContractJarsV1Request {
      * @type {Array<CordappDeploymentConfig>}
      * @memberof DeployContractJarsV1Request
      */
-    cordappDeploymentConfigs: Array<CordappDeploymentConfig>;
+    'cordappDeploymentConfigs': Array<CordappDeploymentConfig>;
     /**
      * 
      * @type {Array<JarFile>}
      * @memberof DeployContractJarsV1Request
      */
-    jarFiles: Array<JarFile>;
+    'jarFiles': Array<JarFile>;
 }
 /**
  * 
@@ -342,7 +344,7 @@ export interface DiagnoseNodeV1Request {
      * @type {Array<string>}
      * @memberof DiagnoseNodeV1Request
      */
-    nodeIds?: Array<string>;
+    'nodeIds'?: Array<string>;
 }
 /**
  * 
@@ -355,7 +357,7 @@ export interface DiagnoseNodeV1Response {
      * @type {NodeDiagnosticInfo}
      * @memberof DiagnoseNodeV1Response
      */
-    nodeDiagnosticInfo: NodeDiagnosticInfo;
+    'nodeDiagnosticInfo': NodeDiagnosticInfo;
 }
 /**
  * Determines which flow starting method will be used on the back-end when invoking the flow. Based on the value here the plugin back-end might invoke the rpc.startFlowDynamic() method or the rpc.startTrackedFlowDynamic() method. Streamed responses are aggregated and returned in a single response to HTTP callers who are not equipped to handle streams like WebSocket/gRPC/etc. do.
@@ -363,10 +365,13 @@ export interface DiagnoseNodeV1Response {
  * @enum {string}
  */
 
-export enum FlowInvocationType {
-    TrackedFlowDynamic = 'TRACKED_FLOW_DYNAMIC',
-    FlowDynamic = 'FLOW_DYNAMIC'
-}
+export const FlowInvocationType = {
+    TrackedFlowDynamic: 'TRACKED_FLOW_DYNAMIC',
+    FlowDynamic: 'FLOW_DYNAMIC'
+} as const;
+
+export type FlowInvocationType = typeof FlowInvocationType[keyof typeof FlowInvocationType];
+
 
 /**
  * 
@@ -379,13 +384,13 @@ export interface GetMonitorTransactionsV1Request {
      * @type {string}
      * @memberof GetMonitorTransactionsV1Request
      */
-    clientAppId: string;
+    'clientAppId': string;
     /**
      * The fully qualified name of the Corda state to monitor
      * @type {string}
      * @memberof GetMonitorTransactionsV1Request
      */
-    stateFullClassName: string;
+    'stateFullClassName': string;
 }
 /**
  * 
@@ -398,44 +403,44 @@ export interface GetMonitorTransactionsV1Response {
      * @type {boolean}
      * @memberof GetMonitorTransactionsV1Response
      */
-    success: boolean;
+    'success': boolean;
     /**
      * Message describing operation status or any errors that occurred.
      * @type {string}
      * @memberof GetMonitorTransactionsV1Response
      */
-    msg: string;
+    'msg': string;
     /**
      * The fully qualified name of the Corda state to monitor
      * @type {string}
      * @memberof GetMonitorTransactionsV1Response
      */
-    stateFullClassName?: string;
+    'stateFullClassName'?: string;
     /**
      * 
-     * @type {Array<GetMonitorTransactionsV1ResponseTx>}
+     * @type {Array<GetMonitorTransactionsV1ResponseTxInner>}
      * @memberof GetMonitorTransactionsV1Response
      */
-    tx?: Array<GetMonitorTransactionsV1ResponseTx>;
+    'tx'?: Array<GetMonitorTransactionsV1ResponseTxInner>;
 }
 /**
  * 
  * @export
- * @interface GetMonitorTransactionsV1ResponseTx
+ * @interface GetMonitorTransactionsV1ResponseTxInner
  */
-export interface GetMonitorTransactionsV1ResponseTx {
+export interface GetMonitorTransactionsV1ResponseTxInner {
     /**
      * 
      * @type {string}
-     * @memberof GetMonitorTransactionsV1ResponseTx
+     * @memberof GetMonitorTransactionsV1ResponseTxInner
      */
-    index?: string;
+    'index'?: string;
     /**
      * 
      * @type {string}
-     * @memberof GetMonitorTransactionsV1ResponseTx
+     * @memberof GetMonitorTransactionsV1ResponseTxInner
      */
-    data?: string;
+    'data'?: string;
 }
 /**
  * 
@@ -448,26 +453,28 @@ export interface InvokeContractV1Request {
      * @type {string}
      * @memberof InvokeContractV1Request
      */
-    flowFullClassName: string;
+    'flowFullClassName': string;
     /**
      * 
      * @type {FlowInvocationType}
      * @memberof InvokeContractV1Request
      */
-    flowInvocationType: FlowInvocationType;
+    'flowInvocationType': FlowInvocationType;
     /**
      * The list of arguments to pass in to the contract method being invoked.
      * @type {Array<JvmObject>}
      * @memberof InvokeContractV1Request
      */
-    params: Array<JvmObject>;
+    'params': Array<JvmObject>;
     /**
      * The amount of milliseconds to wait for a transaction receipt beforegiving up and crashing.
      * @type {number}
      * @memberof InvokeContractV1Request
      */
-    timeoutMs?: number;
+    'timeoutMs'?: number;
 }
+
+
 /**
  * 
  * @export
@@ -479,31 +486,31 @@ export interface InvokeContractV1Response {
      * @type {boolean}
      * @memberof InvokeContractV1Response
      */
-    success: boolean;
+    'success': boolean;
     /**
      * Data returned from the JVM when no transaction is running
      * @type {object}
      * @memberof InvokeContractV1Response
      */
-    callOutput: object;
+    'callOutput': object;
     /**
      * The net.corda.core.flows.StateMachineRunId value returned by the flow execution.
      * @type {string}
      * @memberof InvokeContractV1Response
      */
-    transactionId?: string;
+    'transactionId'?: string;
     /**
      * An array of strings representing the aggregated stream of progress updates provided by a *tracked* flow invocation. If the flow invocation was not tracked, this array is still returned, but as empty.
      * @type {Array<string>}
      * @memberof InvokeContractV1Response
      */
-    progress?: Array<string>;
+    'progress'?: Array<string>;
     /**
      * The id for the flow handle
      * @type {string}
      * @memberof InvokeContractV1Response
      */
-    flowId: string;
+    'flowId': string;
 }
 /**
  * 
@@ -511,26 +518,26 @@ export interface InvokeContractV1Response {
  * @interface JarFile
  */
 export interface JarFile {
-    [key: string]: object | any;
+    [key: string]: any;
 
     /**
      * 
      * @type {string}
      * @memberof JarFile
      */
-    filename: string;
+    'filename': string;
     /**
      * Indicates whether the cordapp jar in question contains any embedded migrations that Cactus can/should execute between copying the jar into the cordapp directory and starting the node back up.
      * @type {boolean}
      * @memberof JarFile
      */
-    hasDbMigrations: boolean;
+    'hasDbMigrations': boolean;
     /**
      * 
      * @type {string}
      * @memberof JarFile
      */
-    contentBase64: string;
+    'contentBase64': string;
 }
 /**
  * Can represent JVM primitive and reference types as well. The jvmTypeKind field indicates which one is being stored. If the jvmTypeKind field is set to REFERENCE then the jvmCtorArgs array is expected to be filled, otherwise (e.g. PRIMITIVE jvmTypeKind) it is expected that the primitiveValue property is filled with a primitive data type supported by the JSON standard such as strings, booleans, numbers, etc.
@@ -543,26 +550,28 @@ export interface JvmObject {
      * @type {JvmTypeKind}
      * @memberof JvmObject
      */
-    jvmTypeKind: JvmTypeKind;
+    'jvmTypeKind': JvmTypeKind;
     /**
      * 
      * @type {object}
      * @memberof JvmObject
      */
-    primitiveValue?: object;
+    'primitiveValue'?: object;
     /**
      * 
      * @type {Array<JvmObject>}
      * @memberof JvmObject
      */
-    jvmCtorArgs?: Array<JvmObject>;
+    'jvmCtorArgs'?: Array<JvmObject>;
     /**
      * 
      * @type {JvmType}
      * @memberof JvmObject
      */
-    jvmType: JvmType;
+    'jvmType': JvmType;
 }
+
+
 /**
  * Represents a reference to a JVM type (such as a Java class)
  * @export
@@ -574,19 +583,19 @@ export interface JvmType {
      * @type {string}
      * @memberof JvmType
      */
-    fqClassName: string;
+    'fqClassName': string;
     /**
      * This parameter is used to specify that the function used to construct this JvmType is not a constructor function but instead is a factory function. Setting this parameter will cause the plugin to look up methods of the class denoted by fqClassName instead of its constructors.
      * @type {string}
      * @memberof JvmType
      */
-    constructorName?: string;
+    'constructorName'?: string;
     /**
      * 
      * @type {JvmObject}
      * @memberof JvmType
      */
-    invocationTarget?: JvmObject;
+    'invocationTarget'?: JvmObject;
 }
 /**
  * 
@@ -594,10 +603,13 @@ export interface JvmType {
  * @enum {string}
  */
 
-export enum JvmTypeKind {
-    Primitive = 'PRIMITIVE',
-    Reference = 'REFERENCE'
-}
+export const JvmTypeKind = {
+    Primitive: 'PRIMITIVE',
+    Reference: 'REFERENCE'
+} as const;
+
+export type JvmTypeKind = typeof JvmTypeKind[keyof typeof JvmTypeKind];
+
 
 /**
  * 
@@ -610,7 +622,7 @@ export interface ListFlowsV1Request {
      * @type {string}
      * @memberof ListFlowsV1Request
      */
-    filter?: string;
+    'filter'?: string;
 }
 /**
  * 
@@ -623,7 +635,7 @@ export interface ListFlowsV1Response {
      * @type {Array<string>}
      * @memberof ListFlowsV1Response
      */
-    flowNames: Array<string>;
+    'flowNames': Array<string>;
 }
 /**
  * 
@@ -636,13 +648,13 @@ export interface NetworkHostAndPort {
      * @type {string}
      * @memberof NetworkHostAndPort
      */
-    host: string;
+    'host': string;
     /**
      * 
      * @type {number}
      * @memberof NetworkHostAndPort
      */
-    port: number;
+    'port': number;
 }
 /**
  * A NodeDiagnosticInfo holds information about the current node version.
@@ -655,31 +667,31 @@ export interface NodeDiagnosticInfo {
      * @type {Array<CordappInfo>}
      * @memberof NodeDiagnosticInfo
      */
-    cordapps: Array<CordappInfo>;
+    'cordapps': Array<CordappInfo>;
     /**
      * The platform version of this node. This number represents a released API version, and should be used to make functionality decisions (e.g. enabling an app feature only if an underlying platform feature exists)
      * @type {number}
      * @memberof NodeDiagnosticInfo
      */
-    platformVersion: number;
+    'platformVersion': number;
     /**
      * The git commit hash this node was built from
      * @type {string}
      * @memberof NodeDiagnosticInfo
      */
-    revision: string;
+    'revision': string;
     /**
      * The vendor of this node
      * @type {string}
      * @memberof NodeDiagnosticInfo
      */
-    vendor: string;
+    'vendor': string;
     /**
      * The current node version string, e.g. 4.3, 4.4-SNAPSHOT. Note that this string is effectively freeform, and so should only be used for providing diagnostic information. It should not be used to make functionality decisions (the platformVersion is a better fit for this).
      * @type {string}
      * @memberof NodeDiagnosticInfo
      */
-    version: string;
+    'version': string;
 }
 /**
  * 
@@ -692,31 +704,31 @@ export interface NodeInfo {
      * @type {Array<NetworkHostAndPort>}
      * @memberof NodeInfo
      */
-    addresses: Array<NetworkHostAndPort>;
+    'addresses': Array<NetworkHostAndPort>;
     /**
      * 
      * @type {number}
      * @memberof NodeInfo
      */
-    platformVersion: number;
+    'platformVersion': number;
     /**
      * 
      * @type {number}
      * @memberof NodeInfo
      */
-    serial: number;
+    'serial': number;
     /**
      * 
      * @type {Array<Party>}
      * @memberof NodeInfo
      */
-    legalIdentities: Array<Party>;
+    'legalIdentities': Array<Party>;
     /**
      * 
      * @type {Array<object>}
      * @memberof NodeInfo
      */
-    legalIdentitiesAndCerts: Array<object>;
+    'legalIdentitiesAndCerts': Array<object>;
 }
 /**
  * 
@@ -729,13 +741,13 @@ export interface Party {
      * @type {CordaX500Name}
      * @memberof Party
      */
-    name: CordaX500Name;
+    'name': CordaX500Name;
     /**
      * 
      * @type {PublicKey}
      * @memberof Party
      */
-    owningKey: PublicKey;
+    'owningKey': PublicKey;
 }
 /**
  * An instance of a java.security.PublicKey (which is an interface) implementation such as org.hyperledger.cactus.plugin.ledger.connector.corda.server.impl.PublicKeyImpl
@@ -748,19 +760,19 @@ export interface PublicKey {
      * @type {string}
      * @memberof PublicKey
      */
-    algorithm: string;
+    'algorithm': string;
     /**
      * 
      * @type {string}
      * @memberof PublicKey
      */
-    format: string;
+    'format': string;
     /**
      * 
      * @type {string}
      * @memberof PublicKey
      */
-    encoded: string;
+    'encoded': string;
 }
 /**
  * SHA-256 is part of the SHA-2 hash function family. Generated hash is fixed size, 256-bits (32-bytes).
@@ -773,19 +785,19 @@ export interface SHA256 {
      * @type {string}
      * @memberof SHA256
      */
-    bytes: string;
+    'bytes': string;
     /**
      * 
      * @type {number}
      * @memberof SHA256
      */
-    offset: number;
+    'offset': number;
     /**
      * 
      * @type {number}
      * @memberof SHA256
      */
-    size: number;
+    'size': number;
 }
 /**
  * 
@@ -798,13 +810,13 @@ export interface StartMonitorV1Request {
      * @type {string}
      * @memberof StartMonitorV1Request
      */
-    clientAppId: string;
+    'clientAppId': string;
     /**
      * The fully qualified name of the Corda state to monitor
      * @type {string}
      * @memberof StartMonitorV1Request
      */
-    stateFullClassName: string;
+    'stateFullClassName': string;
 }
 /**
  * 
@@ -817,13 +829,13 @@ export interface StartMonitorV1Response {
      * @type {boolean}
      * @memberof StartMonitorV1Response
      */
-    success: boolean;
+    'success': boolean;
     /**
      * Message describing operation status or any errors that occurred.
      * @type {string}
      * @memberof StartMonitorV1Response
      */
-    msg: string;
+    'msg': string;
 }
 /**
  * 
@@ -836,13 +848,13 @@ export interface StopMonitorV1Request {
      * @type {string}
      * @memberof StopMonitorV1Request
      */
-    clientAppId: string;
+    'clientAppId': string;
     /**
      * The fully qualified name of the Corda state to monitor
      * @type {string}
      * @memberof StopMonitorV1Request
      */
-    stateFullClassName: string;
+    'stateFullClassName': string;
 }
 /**
  * 
@@ -855,13 +867,13 @@ export interface StopMonitorV1Response {
      * @type {boolean}
      * @memberof StopMonitorV1Response
      */
-    success: boolean;
+    'success': boolean;
     /**
      * Message describing operation status or any errors that occurred.
      * @type {string}
      * @memberof StopMonitorV1Response
      */
-    msg: string;
+    'msg': string;
 }
 /**
  * 
@@ -874,13 +886,13 @@ export interface X500Principal {
      * @type {string}
      * @memberof X500Principal
      */
-    name: string;
+    'name': string;
     /**
      * Base64 encoded public key
      * @type {string}
      * @memberof X500Principal
      */
-    encoded: string;
+    'encoded': string;
 }
 
 /**
@@ -896,7 +908,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        clearMonitorTransactionsV1: async (clearMonitorTransactionsV1Request?: ClearMonitorTransactionsV1Request, options: any = {}): Promise<RequestArgs> => {
+        clearMonitorTransactionsV1: async (clearMonitorTransactionsV1Request?: ClearMonitorTransactionsV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/clear-monitor-transactions`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -913,7 +925,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(clearMonitorTransactionsV1Request, localVarRequestOptions, configuration)
@@ -930,7 +942,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deployContractJarsV1: async (deployContractJarsV1Request?: DeployContractJarsV1Request, options: any = {}): Promise<RequestArgs> => {
+        deployContractJarsV1: async (deployContractJarsV1Request?: DeployContractJarsV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/deploy-contract-jars`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -947,7 +959,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(deployContractJarsV1Request, localVarRequestOptions, configuration)
@@ -963,7 +975,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        diagnoseNodeV1: async (diagnoseNodeV1Request?: DiagnoseNodeV1Request, options: any = {}): Promise<RequestArgs> => {
+        diagnoseNodeV1: async (diagnoseNodeV1Request?: DiagnoseNodeV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/diagnose-node`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -980,7 +992,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(diagnoseNodeV1Request, localVarRequestOptions, configuration)
@@ -997,7 +1009,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getMonitorTransactionsV1: async (getMonitorTransactionsV1Request?: GetMonitorTransactionsV1Request, options: any = {}): Promise<RequestArgs> => {
+        getMonitorTransactionsV1: async (getMonitorTransactionsV1Request?: GetMonitorTransactionsV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-monitor-transactions`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1014,7 +1026,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(getMonitorTransactionsV1Request, localVarRequestOptions, configuration)
@@ -1030,7 +1042,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getPrometheusMetricsV1: async (options: any = {}): Promise<RequestArgs> => {
+        getPrometheusMetricsV1: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-prometheus-exporter-metrics`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1045,7 +1057,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
 
 
     
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
 
@@ -1061,7 +1073,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        invokeContractV1: async (invokeContractV1Request?: InvokeContractV1Request, options: any = {}): Promise<RequestArgs> => {
+        invokeContractV1: async (invokeContractV1Request?: InvokeContractV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/invoke-contract`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1078,7 +1090,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(invokeContractV1Request, localVarRequestOptions, configuration)
@@ -1094,7 +1106,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listFlowsV1: async (listFlowsV1Request?: ListFlowsV1Request, options: any = {}): Promise<RequestArgs> => {
+        listFlowsV1: async (listFlowsV1Request?: ListFlowsV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-flows`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1111,7 +1123,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(listFlowsV1Request, localVarRequestOptions, configuration)
@@ -1127,7 +1139,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        networkMapV1: async (body?: object, options: any = {}): Promise<RequestArgs> => {
+        networkMapV1: async (body?: object, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/network-map`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1144,7 +1156,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(body, localVarRequestOptions, configuration)
@@ -1161,7 +1173,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        startMonitorV1: async (startMonitorV1Request?: StartMonitorV1Request, options: any = {}): Promise<RequestArgs> => {
+        startMonitorV1: async (startMonitorV1Request?: StartMonitorV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/start-monitor`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1178,7 +1190,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(startMonitorV1Request, localVarRequestOptions, configuration)
@@ -1195,7 +1207,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        stopMonitorV1: async (stopMonitorV1Request?: StopMonitorV1Request, options: any = {}): Promise<RequestArgs> => {
+        stopMonitorV1: async (stopMonitorV1Request?: StopMonitorV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/stop-monitor`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1212,7 +1224,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(stopMonitorV1Request, localVarRequestOptions, configuration)
@@ -1239,7 +1251,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async clearMonitorTransactionsV1(clearMonitorTransactionsV1Request?: ClearMonitorTransactionsV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ClearMonitorTransactionsV1Response>> {
+        async clearMonitorTransactionsV1(clearMonitorTransactionsV1Request?: ClearMonitorTransactionsV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ClearMonitorTransactionsV1Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.clearMonitorTransactionsV1(clearMonitorTransactionsV1Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -1250,7 +1262,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deployContractJarsV1(deployContractJarsV1Request?: DeployContractJarsV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeployContractJarsSuccessV1Response>> {
+        async deployContractJarsV1(deployContractJarsV1Request?: DeployContractJarsV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeployContractJarsSuccessV1Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.deployContractJarsV1(deployContractJarsV1Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -1260,7 +1272,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async diagnoseNodeV1(diagnoseNodeV1Request?: DiagnoseNodeV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DiagnoseNodeV1Response>> {
+        async diagnoseNodeV1(diagnoseNodeV1Request?: DiagnoseNodeV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DiagnoseNodeV1Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.diagnoseNodeV1(diagnoseNodeV1Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -1271,7 +1283,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getMonitorTransactionsV1(getMonitorTransactionsV1Request?: GetMonitorTransactionsV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetMonitorTransactionsV1Response>> {
+        async getMonitorTransactionsV1(getMonitorTransactionsV1Request?: GetMonitorTransactionsV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetMonitorTransactionsV1Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getMonitorTransactionsV1(getMonitorTransactionsV1Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -1281,7 +1293,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getPrometheusMetricsV1(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
+        async getPrometheusMetricsV1(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getPrometheusMetricsV1(options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -1292,7 +1304,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async invokeContractV1(invokeContractV1Request?: InvokeContractV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<InvokeContractV1Response>> {
+        async invokeContractV1(invokeContractV1Request?: InvokeContractV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<InvokeContractV1Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.invokeContractV1(invokeContractV1Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -1302,7 +1314,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listFlowsV1(listFlowsV1Request?: ListFlowsV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListFlowsV1Response>> {
+        async listFlowsV1(listFlowsV1Request?: ListFlowsV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListFlowsV1Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listFlowsV1(listFlowsV1Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -1312,7 +1324,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async networkMapV1(body?: object, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<NodeInfo>>> {
+        async networkMapV1(body?: object, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<NodeInfo>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.networkMapV1(body, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -1323,7 +1335,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async startMonitorV1(startMonitorV1Request?: StartMonitorV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<StartMonitorV1Response>> {
+        async startMonitorV1(startMonitorV1Request?: StartMonitorV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<StartMonitorV1Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.startMonitorV1(startMonitorV1Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -1334,7 +1346,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async stopMonitorV1(stopMonitorV1Request?: StopMonitorV1Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<StopMonitorV1Response>> {
+        async stopMonitorV1(stopMonitorV1Request?: StopMonitorV1Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<StopMonitorV1Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.stopMonitorV1(stopMonitorV1Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -1462,7 +1474,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public clearMonitorTransactionsV1(clearMonitorTransactionsV1Request?: ClearMonitorTransactionsV1Request, options?: any) {
+    public clearMonitorTransactionsV1(clearMonitorTransactionsV1Request?: ClearMonitorTransactionsV1Request, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).clearMonitorTransactionsV1(clearMonitorTransactionsV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -1474,7 +1486,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public deployContractJarsV1(deployContractJarsV1Request?: DeployContractJarsV1Request, options?: any) {
+    public deployContractJarsV1(deployContractJarsV1Request?: DeployContractJarsV1Request, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).deployContractJarsV1(deployContractJarsV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -1485,7 +1497,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public diagnoseNodeV1(diagnoseNodeV1Request?: DiagnoseNodeV1Request, options?: any) {
+    public diagnoseNodeV1(diagnoseNodeV1Request?: DiagnoseNodeV1Request, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).diagnoseNodeV1(diagnoseNodeV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -1497,7 +1509,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public getMonitorTransactionsV1(getMonitorTransactionsV1Request?: GetMonitorTransactionsV1Request, options?: any) {
+    public getMonitorTransactionsV1(getMonitorTransactionsV1Request?: GetMonitorTransactionsV1Request, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getMonitorTransactionsV1(getMonitorTransactionsV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -1508,7 +1520,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public getPrometheusMetricsV1(options?: any) {
+    public getPrometheusMetricsV1(options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getPrometheusMetricsV1(options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -1520,7 +1532,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public invokeContractV1(invokeContractV1Request?: InvokeContractV1Request, options?: any) {
+    public invokeContractV1(invokeContractV1Request?: InvokeContractV1Request, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).invokeContractV1(invokeContractV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -1531,7 +1543,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public listFlowsV1(listFlowsV1Request?: ListFlowsV1Request, options?: any) {
+    public listFlowsV1(listFlowsV1Request?: ListFlowsV1Request, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).listFlowsV1(listFlowsV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -1542,7 +1554,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public networkMapV1(body?: object, options?: any) {
+    public networkMapV1(body?: object, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).networkMapV1(body, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -1554,7 +1566,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public startMonitorV1(startMonitorV1Request?: StartMonitorV1Request, options?: any) {
+    public startMonitorV1(startMonitorV1Request?: StartMonitorV1Request, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).startMonitorV1(startMonitorV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -1566,7 +1578,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public stopMonitorV1(stopMonitorV1Request?: StopMonitorV1Request, options?: any) {
+    public stopMonitorV1(stopMonitorV1Request?: StopMonitorV1Request, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).stopMonitorV1(stopMonitorV1Request, options).then((request) => request(this.axios, this.basePath));
     }
 }

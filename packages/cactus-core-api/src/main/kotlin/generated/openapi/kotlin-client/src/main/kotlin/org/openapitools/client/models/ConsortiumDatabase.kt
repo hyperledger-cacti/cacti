@@ -22,6 +22,7 @@ import org.openapitools.client.models.Ledger
 import org.openapitools.client.models.PluginInstance
 
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 /**
  * 

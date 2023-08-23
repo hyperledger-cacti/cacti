@@ -17,6 +17,7 @@ package org.openapitools.client.models
 
 
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 /**
  * 
@@ -24,6 +25,7 @@ import com.squareup.moshi.Json
  * Values: cACTUSKEYCHAINREF,gETHKEYCHAINPASSWORD,pRIVATEKEYHEX,nONE
  */
 
+@JsonClass(generateAdapter = false)
 enum class Web3SigningCredentialType(val value: kotlin.String) {
 
     @Json(name = "CACTUS_KEYCHAIN_REF")
@@ -39,7 +41,7 @@ enum class Web3SigningCredentialType(val value: kotlin.String) {
     nONE("NONE");
 
     /**
-     * Override toString() to avoid using the enum variable name as the value, and instead use
+     * Override [toString()] to avoid using the enum variable name as the value, and instead use
      * the actual value defined in the API spec file.
      *
      * This solves a problem when the variable name and its value are different, and ensures that

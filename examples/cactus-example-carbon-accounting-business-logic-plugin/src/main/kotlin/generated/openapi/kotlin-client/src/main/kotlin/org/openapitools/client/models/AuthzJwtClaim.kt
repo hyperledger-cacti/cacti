@@ -17,6 +17,7 @@ package org.openapitools.client.models
 
 
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 /**
  * Stores global constants related to the authorization of the application. Specifically enumerates the claims to validate for as per RFC 7519, section 4.1. See: https://tools.ietf.org/html/rfc7519#section-4.1
@@ -24,13 +25,14 @@ import com.squareup.moshi.Json
  * Values: iss
  */
 
+@JsonClass(generateAdapter = false)
 enum class AuthzJwtClaim(val value: kotlin.String) {
 
     @Json(name = "Hyperledger Labs - Carbon Accounting Tool")
     iss("Hyperledger Labs - Carbon Accounting Tool");
 
     /**
-     * Override toString() to avoid using the enum variable name as the value, and instead use
+     * Override [toString()] to avoid using the enum variable name as the value, and instead use
      * the actual value defined in the API spec file.
      *
      * This solves a problem when the variable name and its value are different, and ensures that

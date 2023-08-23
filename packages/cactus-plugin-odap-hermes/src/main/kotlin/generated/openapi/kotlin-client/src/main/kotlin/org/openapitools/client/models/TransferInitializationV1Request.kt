@@ -20,6 +20,7 @@ import org.openapitools.client.models.History
 import org.openapitools.client.models.PayloadProfile
 
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 /**
  * 
@@ -160,6 +161,7 @@ data class TransferInitializationV1Request (
      *
      * Values: fAUCET,tIMELOCK,hASHLOCK,hASHTIMELOCK,mULTICLAIMPC,dESTROY,bURN
      */
+    @JsonClass(generateAdapter = false)
     enum class EscrowType(val value: kotlin.String) {
         @Json(name = "FAUCET") fAUCET("FAUCET"),
         @Json(name = "TIMELOCK") tIMELOCK("TIMELOCK"),
