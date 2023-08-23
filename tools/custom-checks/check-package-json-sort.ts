@@ -28,7 +28,9 @@ export async function checkPackageJsonSort(
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
   const SCRIPT_DIR = __dirname;
+  const LERNA_JSON = "lerna.json";
   const PROJECT_DIR = path.join(SCRIPT_DIR, "../../");
+  const PACKAGE_JSON = "package.json";
   console.log(`${TAG} SCRIPT_DIR=${SCRIPT_DIR}`);
   console.log(`${TAG} PROJECT_DIR=${PROJECT_DIR}`);
 
@@ -41,6 +43,11 @@ export async function checkPackageJsonSort(
   if (!req.env) {
     throw new RuntimeError(`req.env cannot be falsy.`);
   }
+
+  const pkgJsonGlobPatterns = lernaCfg.packages.map((it: string) =>
+    "./".concat(it).concat(`/${PACKAGE_JSON}`),
+  );
+  console.log("Globbing lerna package patterns: ", pkgJsonGlobPatterns);
 
   const globbyOpts: GlobbyOptions = {
     cwd: PROJECT_DIR,
