@@ -13,13 +13,15 @@
  */
 
 
-import { Configuration } from './configuration';
-import globalAxios, { AxiosPromise, AxiosInstance } from 'axios';
+import type { Configuration } from './configuration';
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from './common';
+import type { RequestArgs } from './base';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from './base';
+import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from './base';
 
 /**
  * Iroha V2 block response type.
@@ -27,16 +29,19 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
  * @enum {string}
  */
 
-export enum BlockTypeV1 {
+export const BlockTypeV1 = {
     /**
     * Default JSON-encoded string full block data.
     */
-    Raw = 'raw',
+    Raw: 'raw',
     /**
     * Encoded format that must be decoded with Iroha SDK on client side before use
     */
-    Binary = 'binary'
-}
+    Binary: 'binary'
+} as const;
+
+export type BlockTypeV1 = typeof BlockTypeV1[keyof typeof BlockTypeV1];
+
 
 /**
  * Error response from the connector.
@@ -49,13 +54,13 @@ export interface ErrorExceptionResponseV1 {
      * @type {string}
      * @memberof ErrorExceptionResponseV1
      */
-    message: string;
+    'message': string;
     /**
      * Detailed error information.
      * @type {string}
      * @memberof ErrorExceptionResponseV1
      */
-    error: string;
+    'error': string;
 }
 /**
  * Request for generating transaction or query payload that can be signed on the client side.
@@ -65,17 +70,23 @@ export interface ErrorExceptionResponseV1 {
 export interface GenerateTransactionRequestV1 {
     /**
      * 
-     * @type {IrohaTransactionDefinitionV1 | IrohaQueryDefinitionV1}
+     * @type {GenerateTransactionRequestV1Request}
      * @memberof GenerateTransactionRequestV1
      */
-    request: IrohaTransactionDefinitionV1 | IrohaQueryDefinitionV1;
+    'request': GenerateTransactionRequestV1Request;
     /**
      * 
      * @type {Iroha2BaseConfig}
      * @memberof GenerateTransactionRequestV1
      */
-    baseConfig?: Iroha2BaseConfig;
+    'baseConfig'?: Iroha2BaseConfig;
 }
+/**
+ * @type GenerateTransactionRequestV1Request
+ * @export
+ */
+export type GenerateTransactionRequestV1Request = IrohaQueryDefinitionV1 | IrohaTransactionDefinitionV1;
+
 /**
  * Iroha V2 account ID.
  * @export
@@ -87,13 +98,13 @@ export interface Iroha2AccountId {
      * @type {string}
      * @memberof Iroha2AccountId
      */
-    name: string;
+    'name': string;
     /**
      * 
      * @type {string}
      * @memberof Iroha2AccountId
      */
-    domainId: string;
+    'domainId': string;
 }
 /**
  * Iroha V2 connection configuration.
@@ -106,20 +117,26 @@ export interface Iroha2BaseConfig {
      * @type {Iroha2BaseConfigTorii}
      * @memberof Iroha2BaseConfig
      */
-    torii: Iroha2BaseConfigTorii;
+    'torii': Iroha2BaseConfigTorii;
     /**
      * 
      * @type {Iroha2AccountId}
      * @memberof Iroha2BaseConfig
      */
-    accountId?: Iroha2AccountId;
+    'accountId'?: Iroha2AccountId;
     /**
      * 
-     * @type {Iroha2KeyPair | KeychainReference}
+     * @type {Iroha2BaseConfigSigningCredential}
      * @memberof Iroha2BaseConfig
      */
-    signingCredential?: Iroha2KeyPair | KeychainReference;
+    'signingCredential'?: Iroha2BaseConfigSigningCredential;
 }
+/**
+ * @type Iroha2BaseConfigSigningCredential
+ * @export
+ */
+export type Iroha2BaseConfigSigningCredential = Iroha2KeyPair | KeychainReference;
+
 /**
  * Iroha V2 peer connection information.
  * @export
@@ -131,13 +148,13 @@ export interface Iroha2BaseConfigTorii {
      * @type {string}
      * @memberof Iroha2BaseConfigTorii
      */
-    apiURL?: string;
+    'apiURL'?: string;
     /**
      * 
      * @type {string}
      * @memberof Iroha2BaseConfigTorii
      */
-    telemetryURL?: string;
+    'telemetryURL'?: string;
 }
 /**
  * Private/Public key JSON containing payload and digest function.
@@ -150,13 +167,13 @@ export interface Iroha2KeyJson {
      * @type {string}
      * @memberof Iroha2KeyJson
      */
-    digestFunction: string;
+    'digestFunction': string;
     /**
      * 
      * @type {string}
      * @memberof Iroha2KeyJson
      */
-    payload: string;
+    'payload': string;
 }
 /**
  * Pair of Iroha account private and public keys.
@@ -169,13 +186,13 @@ export interface Iroha2KeyPair {
      * @type {Iroha2KeyJson}
      * @memberof Iroha2KeyPair
      */
-    privateKey: Iroha2KeyJson;
+    'privateKey': Iroha2KeyJson;
     /**
      * 
      * @type {string}
      * @memberof Iroha2KeyPair
      */
-    publicKey: string;
+    'publicKey': string;
 }
 /**
  * Command names that correspond to Iroha Special Instructions (https://hyperledger.github.io/iroha-2-docs/guide/advanced/isi.html)
@@ -183,36 +200,39 @@ export interface Iroha2KeyPair {
  * @enum {string}
  */
 
-export enum IrohaInstruction {
+export const IrohaInstruction = {
     /**
     * Register new domain
     */
-    RegisterDomain = 'registerDomain',
+    RegisterDomain: 'registerDomain',
     /**
     * Register new asset definition
     */
-    RegisterAssetDefinition = 'registerAssetDefinition',
+    RegisterAssetDefinition: 'registerAssetDefinition',
     /**
     * Register new asset
     */
-    RegisterAsset = 'registerAsset',
+    RegisterAsset: 'registerAsset',
     /**
     * Mint asset value
     */
-    MintAsset = 'mintAsset',
+    MintAsset: 'mintAsset',
     /**
     * Burn asset value
     */
-    BurnAsset = 'burnAsset',
+    BurnAsset: 'burnAsset',
     /**
     * Transfer asset between accounts
     */
-    TransferAsset = 'transferAsset',
+    TransferAsset: 'transferAsset',
     /**
     * Register new account
     */
-    RegisterAccount = 'registerAccount'
-}
+    RegisterAccount: 'registerAccount'
+} as const;
+
+export type IrohaInstruction = typeof IrohaInstruction[keyof typeof IrohaInstruction];
+
 
 /**
  * Single Iroha V2 instruction to be executed request.
@@ -225,13 +245,13 @@ export interface IrohaInstructionRequestV1 {
      * @type {IrohaInstruction}
      * @memberof IrohaInstructionRequestV1
      */
-    name: IrohaInstruction;
+    'name': IrohaInstruction;
     /**
      * The list of arguments to pass with specified instruction.
      * @type {Array<any>}
      * @memberof IrohaInstructionRequestV1
      */
-    params: Array<any>;
+    'params': Array<any>;
 }
 /**
  * Command names that correspond to Iroha queries (https://hyperledger.github.io/iroha-2-docs/guide/advanced/queries.html)
@@ -239,56 +259,59 @@ export interface IrohaInstructionRequestV1 {
  * @enum {string}
  */
 
-export enum IrohaQuery {
+export const IrohaQuery = {
     /**
     * Get list of all registered domains
     */
-    FindAllDomains = 'findAllDomains',
+    FindAllDomains: 'findAllDomains',
     /**
     * Get domain with specified ID
     */
-    FindDomainById = 'findDomainById',
+    FindDomainById: 'findDomainById',
     /**
     * Get asset definition with specified ID
     */
-    FindAssetDefinitionById = 'findAssetDefinitionById',
+    FindAssetDefinitionById: 'findAssetDefinitionById',
     /**
     * Get list of all registered asset definition
     */
-    FindAllAssetsDefinitions = 'findAllAssetsDefinitions',
+    FindAllAssetsDefinitions: 'findAllAssetsDefinitions',
     /**
     * Get asset with specified ID
     */
-    FindAssetById = 'findAssetById',
+    FindAssetById: 'findAssetById',
     /**
     * Get list of all registered assets
     */
-    FindAllAssets = 'findAllAssets',
+    FindAllAssets: 'findAllAssets',
     /**
     * Get list of all ledger peers
     */
-    FindAllPeers = 'findAllPeers',
+    FindAllPeers: 'findAllPeers',
     /**
     * Get list of all ledger blocks
     */
-    FindAllBlocks = 'findAllBlocks',
+    FindAllBlocks: 'findAllBlocks',
     /**
     * Get account with specified ID
     */
-    FindAccountById = 'findAccountById',
+    FindAccountById: 'findAccountById',
     /**
     * Get list of all registered accounts
     */
-    FindAllAccounts = 'findAllAccounts',
+    FindAllAccounts: 'findAllAccounts',
     /**
     * Get list of all transactions
     */
-    FindAllTransactions = 'findAllTransactions',
+    FindAllTransactions: 'findAllTransactions',
     /**
     * Get transaction with specified hash
     */
-    FindTransactionByHash = 'findTransactionByHash'
-}
+    FindTransactionByHash: 'findTransactionByHash'
+} as const;
+
+export type IrohaQuery = typeof IrohaQuery[keyof typeof IrohaQuery];
+
 
 /**
  * Iroha V2 query definition.
@@ -301,13 +324,13 @@ export interface IrohaQueryDefinitionV1 {
      * @type {IrohaQuery}
      * @memberof IrohaQueryDefinitionV1
      */
-    query: IrohaQuery;
+    'query': IrohaQuery;
     /**
      * The list of arguments to pass with the query.
      * @type {Array<any>}
      * @memberof IrohaQueryDefinitionV1
      */
-    params?: Array<any>;
+    'params'?: Array<any>;
 }
 /**
  * Iroha V2 signed query definition
@@ -320,13 +343,13 @@ export interface IrohaSignedQueryDefinitionV1 {
      * @type {IrohaQuery}
      * @memberof IrohaSignedQueryDefinitionV1
      */
-    query: IrohaQuery;
+    'query': IrohaQuery;
     /**
      * Signed query transaction binary data received from generate-transaction endpoint.
-     * @type {any}
+     * @type {string}
      * @memberof IrohaSignedQueryDefinitionV1
      */
-    payload: any;
+    'payload': string;
 }
 /**
  * Iroha V2 transaction definition
@@ -336,43 +359,49 @@ export interface IrohaSignedQueryDefinitionV1 {
 export interface IrohaTransactionDefinitionV1 {
     /**
      * 
-     * @type {IrohaInstructionRequestV1 | Array<IrohaInstructionRequestV1>}
+     * @type {IrohaTransactionDefinitionV1Instruction}
      * @memberof IrohaTransactionDefinitionV1
      */
-    instruction: IrohaInstructionRequestV1 | Array<IrohaInstructionRequestV1>;
+    'instruction': IrohaTransactionDefinitionV1Instruction;
     /**
      * 
      * @type {IrohaTransactionParametersV1}
      * @memberof IrohaTransactionDefinitionV1
      */
-    params?: IrohaTransactionParametersV1;
+    'params'?: IrohaTransactionParametersV1;
 }
+/**
+ * @type IrohaTransactionDefinitionV1Instruction
+ * @export
+ */
+export type IrohaTransactionDefinitionV1Instruction = Array<IrohaInstructionRequestV1> | IrohaInstructionRequestV1;
+
 /**
  * Iroha V2 transaction payload parameters
  * @export
  * @interface IrohaTransactionParametersV1
  */
 export interface IrohaTransactionParametersV1 {
-    [key: string]: object | any;
+    [key: string]: any;
 
     /**
      * BigInt time to live.
      * @type {string}
      * @memberof IrohaTransactionParametersV1
      */
-    ttl?: string;
+    'ttl'?: string;
     /**
      * BigInt creation time
      * @type {string}
      * @memberof IrohaTransactionParametersV1
      */
-    creationTime?: string;
+    'creationTime'?: string;
     /**
      * Transaction nonce
      * @type {number}
      * @memberof IrohaTransactionParametersV1
      */
-    nonce?: number;
+    'nonce'?: number;
 }
 /**
  * Reference to entry stored in Cactus keychain plugin.
@@ -385,13 +414,13 @@ export interface KeychainReference {
      * @type {string}
      * @memberof KeychainReference
      */
-    keychainId: string;
+    'keychainId': string;
     /**
      * Key reference name.
      * @type {string}
      * @memberof KeychainReference
      */
-    keychainRef: string;
+    'keychainRef': string;
 }
 /**
  * Request to query endpoint.
@@ -404,19 +433,19 @@ export interface QueryRequestV1 {
      * @type {IrohaQueryDefinitionV1}
      * @memberof QueryRequestV1
      */
-    query?: IrohaQueryDefinitionV1;
+    'query'?: IrohaQueryDefinitionV1;
     /**
      * 
      * @type {IrohaSignedQueryDefinitionV1}
      * @memberof QueryRequestV1
      */
-    signedQuery?: IrohaSignedQueryDefinitionV1;
+    'signedQuery'?: IrohaSignedQueryDefinitionV1;
     /**
      * 
      * @type {Iroha2BaseConfig}
      * @memberof QueryRequestV1
      */
-    baseConfig?: Iroha2BaseConfig;
+    'baseConfig'?: Iroha2BaseConfig;
 }
 /**
  * Response with the query results.
@@ -429,7 +458,7 @@ export interface QueryResponseV1 {
      * @type {any}
      * @memberof QueryResponseV1
      */
-    response: any;
+    'response': any;
 }
 /**
  * Request to transact endpoint.
@@ -439,28 +468,28 @@ export interface QueryResponseV1 {
 export interface TransactRequestV1 {
     /**
      * Signed transaction binary data received from generate-transaction endpoint.
-     * @type {any}
+     * @type {string}
      * @memberof TransactRequestV1
      */
-    signedTransaction?: any;
+    'signedTransaction'?: string;
     /**
      * 
      * @type {IrohaTransactionDefinitionV1}
      * @memberof TransactRequestV1
      */
-    transaction?: IrohaTransactionDefinitionV1;
+    'transaction'?: IrohaTransactionDefinitionV1;
     /**
      * Wait unitl transaction is sent and return the final status (committed / rejected)
      * @type {boolean}
      * @memberof TransactRequestV1
      */
-    waitForCommit?: boolean;
+    'waitForCommit'?: boolean;
     /**
      * 
      * @type {Iroha2BaseConfig}
      * @memberof TransactRequestV1
      */
-    baseConfig?: Iroha2BaseConfig;
+    'baseConfig'?: Iroha2BaseConfig;
 }
 /**
  * Response from transaction endpoint with operation status.
@@ -473,40 +502,45 @@ export interface TransactResponseV1 {
      * @type {string}
      * @memberof TransactResponseV1
      */
-    hash: string;
+    'hash': string;
     /**
      * 
      * @type {TransactionStatusV1}
      * @memberof TransactResponseV1
      */
-    status: TransactionStatusV1;
+    'status': TransactionStatusV1;
     /**
      * When waitForCommit was suplied and the transaction was rejected, contains the reason of the rejection.
      * @type {string}
      * @memberof TransactResponseV1
      */
-    rejectReason?: string;
+    'rejectReason'?: string;
 }
+
+
 /**
  * Status of Iroha V2 transaction.
  * @export
  * @enum {string}
  */
 
-export enum TransactionStatusV1 {
+export const TransactionStatusV1 = {
     /**
     * Transaction was submitted to the ledger - use other tools to check if it was accepted and committed.
     */
-    Submitted = 'submitted',
+    Submitted: 'submitted',
     /**
     * Transaction was committed to the ledger.
     */
-    Committed = 'committed',
+    Committed: 'committed',
     /**
     * Transaction was rejected.
     */
-    Rejected = 'rejected'
-}
+    Rejected: 'rejected'
+} as const;
+
+export type TransactionStatusV1 = typeof TransactionStatusV1[keyof typeof TransactionStatusV1];
+
 
 /**
  * Binary encoded response of block data.
@@ -516,10 +550,10 @@ export enum TransactionStatusV1 {
 export interface WatchBlocksBinaryResponseV1 {
     /**
      * 
-     * @type {any}
+     * @type {string}
      * @memberof WatchBlocksBinaryResponseV1
      */
-    binaryBlock: any;
+    'binaryBlock': string;
 }
 /**
  * Options passed when subscribing to block monitoring.
@@ -532,20 +566,22 @@ export interface WatchBlocksOptionsV1 {
      * @type {BlockTypeV1}
      * @memberof WatchBlocksOptionsV1
      */
-    type?: BlockTypeV1;
+    'type'?: BlockTypeV1;
     /**
      * Number of block to start monitoring from.
      * @type {string}
      * @memberof WatchBlocksOptionsV1
      */
-    startBlock?: string;
+    'startBlock'?: string;
     /**
      * 
      * @type {Iroha2BaseConfig}
      * @memberof WatchBlocksOptionsV1
      */
-    baseConfig?: Iroha2BaseConfig;
+    'baseConfig'?: Iroha2BaseConfig;
 }
+
+
 /**
  * Default JSON-encoded string full block data.
  * @export
@@ -557,7 +593,7 @@ export interface WatchBlocksRawResponseV1 {
      * @type {string}
      * @memberof WatchBlocksRawResponseV1
      */
-    blockData: string;
+    'blockData': string;
 }
 /**
  * @type WatchBlocksResponseV1
@@ -571,13 +607,16 @@ export type WatchBlocksResponseV1 = ErrorExceptionResponseV1 | WatchBlocksBinary
  * @enum {string}
  */
 
-export enum WatchBlocksV1 {
-    Subscribe = 'org.hyperledger.cactus.api.async.hliroha2.WatchBlocksV1.Subscribe',
-    Next = 'org.hyperledger.cactus.api.async.hliroha2.WatchBlocksV1.Next',
-    Unsubscribe = 'org.hyperledger.cactus.api.async.hliroha2.WatchBlocksV1.Unsubscribe',
-    Error = 'org.hyperledger.cactus.api.async.hliroha2.WatchBlocksV1.Error',
-    Complete = 'org.hyperledger.cactus.api.async.hliroha2.WatchBlocksV1.Complete'
-}
+export const WatchBlocksV1 = {
+    Subscribe: 'org.hyperledger.cactus.api.async.hliroha2.WatchBlocksV1.Subscribe',
+    Next: 'org.hyperledger.cactus.api.async.hliroha2.WatchBlocksV1.Next',
+    Unsubscribe: 'org.hyperledger.cactus.api.async.hliroha2.WatchBlocksV1.Unsubscribe',
+    Error: 'org.hyperledger.cactus.api.async.hliroha2.WatchBlocksV1.Error',
+    Complete: 'org.hyperledger.cactus.api.async.hliroha2.WatchBlocksV1.Complete'
+} as const;
+
+export type WatchBlocksV1 = typeof WatchBlocksV1[keyof typeof WatchBlocksV1];
+
 
 
 /**
@@ -593,7 +632,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        generateTransactionV1: async (generateTransactionRequestV1?: GenerateTransactionRequestV1, options: any = {}): Promise<RequestArgs> => {
+        generateTransactionV1: async (generateTransactionRequestV1?: GenerateTransactionRequestV1, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/generate-transaction`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -610,7 +649,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(generateTransactionRequestV1, localVarRequestOptions, configuration)
@@ -627,7 +666,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        queryV1: async (queryRequestV1?: QueryRequestV1, options: any = {}): Promise<RequestArgs> => {
+        queryV1: async (queryRequestV1?: QueryRequestV1, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/query`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -644,7 +683,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(queryRequestV1, localVarRequestOptions, configuration)
@@ -661,7 +700,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        transactV1: async (transactRequestV1?: TransactRequestV1, options: any = {}): Promise<RequestArgs> => {
+        transactV1: async (transactRequestV1?: TransactRequestV1, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/transact`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -678,7 +717,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(transactRequestV1, localVarRequestOptions, configuration)
@@ -705,7 +744,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async generateTransactionV1(generateTransactionRequestV1?: GenerateTransactionRequestV1, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
+        async generateTransactionV1(generateTransactionRequestV1?: GenerateTransactionRequestV1, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.generateTransactionV1(generateTransactionRequestV1, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -716,7 +755,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async queryV1(queryRequestV1?: QueryRequestV1, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<QueryResponseV1>> {
+        async queryV1(queryRequestV1?: QueryRequestV1, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<QueryResponseV1>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.queryV1(queryRequestV1, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -727,7 +766,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async transactV1(transactRequestV1?: TransactRequestV1, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TransactResponseV1>> {
+        async transactV1(transactRequestV1?: TransactRequestV1, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TransactResponseV1>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.transactV1(transactRequestV1, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -748,7 +787,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        generateTransactionV1(generateTransactionRequestV1?: GenerateTransactionRequestV1, options?: any): AxiosPromise<any> {
+        generateTransactionV1(generateTransactionRequestV1?: GenerateTransactionRequestV1, options?: any): AxiosPromise<string> {
             return localVarFp.generateTransactionV1(generateTransactionRequestV1, options).then((request) => request(axios, basePath));
         },
         /**
@@ -789,7 +828,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public generateTransactionV1(generateTransactionRequestV1?: GenerateTransactionRequestV1, options?: any) {
+    public generateTransactionV1(generateTransactionRequestV1?: GenerateTransactionRequestV1, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).generateTransactionV1(generateTransactionRequestV1, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -801,7 +840,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public queryV1(queryRequestV1?: QueryRequestV1, options?: any) {
+    public queryV1(queryRequestV1?: QueryRequestV1, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).queryV1(queryRequestV1, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -813,7 +852,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public transactV1(transactRequestV1?: TransactRequestV1, options?: any) {
+    public transactV1(transactRequestV1?: TransactRequestV1, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).transactV1(transactRequestV1, options).then((request) => request(this.axios, this.basePath));
     }
 }

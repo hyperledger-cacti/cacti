@@ -16,7 +16,7 @@ docs/DiagnoseNodeV1Response.md
 docs/FlowInvocationType.md
 docs/GetMonitorTransactionsV1Request.md
 docs/GetMonitorTransactionsV1Response.md
-docs/GetMonitorTransactionsV1ResponseTx.md
+docs/GetMonitorTransactionsV1ResponseTxInner.md
 docs/InvokeContractV1Request.md
 docs/InvokeContractV1Response.md
 docs/JarFile.md
@@ -44,7 +44,7 @@ settings.gradle
 src/main/kotlin/org/openapitools/client/apis/DefaultApi.kt
 src/main/kotlin/org/openapitools/client/infrastructure/ApiAbstractions.kt
 src/main/kotlin/org/openapitools/client/infrastructure/ApiClient.kt
-src/main/kotlin/org/openapitools/client/infrastructure/ApiInfrastructureResponse.kt
+src/main/kotlin/org/openapitools/client/infrastructure/ApiResponse.kt
 src/main/kotlin/org/openapitools/client/infrastructure/BigDecimalAdapter.kt
 src/main/kotlin/org/openapitools/client/infrastructure/BigIntegerAdapter.kt
 src/main/kotlin/org/openapitools/client/infrastructure/ByteArrayAdapter.kt
@@ -52,6 +52,7 @@ src/main/kotlin/org/openapitools/client/infrastructure/Errors.kt
 src/main/kotlin/org/openapitools/client/infrastructure/LocalDateAdapter.kt
 src/main/kotlin/org/openapitools/client/infrastructure/LocalDateTimeAdapter.kt
 src/main/kotlin/org/openapitools/client/infrastructure/OffsetDateTimeAdapter.kt
+src/main/kotlin/org/openapitools/client/infrastructure/PartConfig.kt
 src/main/kotlin/org/openapitools/client/infrastructure/RequestConfig.kt
 src/main/kotlin/org/openapitools/client/infrastructure/RequestMethod.kt
 src/main/kotlin/org/openapitools/client/infrastructure/ResponseExtensions.kt
@@ -73,7 +74,7 @@ src/main/kotlin/org/openapitools/client/models/DiagnoseNodeV1Response.kt
 src/main/kotlin/org/openapitools/client/models/FlowInvocationType.kt
 src/main/kotlin/org/openapitools/client/models/GetMonitorTransactionsV1Request.kt
 src/main/kotlin/org/openapitools/client/models/GetMonitorTransactionsV1Response.kt
-src/main/kotlin/org/openapitools/client/models/GetMonitorTransactionsV1ResponseTx.kt
+src/main/kotlin/org/openapitools/client/models/GetMonitorTransactionsV1ResponseTxInner.kt
 src/main/kotlin/org/openapitools/client/models/InvokeContractV1Request.kt
 src/main/kotlin/org/openapitools/client/models/InvokeContractV1Response.kt
 src/main/kotlin/org/openapitools/client/models/JarFile.kt

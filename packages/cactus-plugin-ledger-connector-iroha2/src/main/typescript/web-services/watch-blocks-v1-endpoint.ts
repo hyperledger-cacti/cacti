@@ -111,11 +111,14 @@ export class Iroha2WatchBlocksEndpointV1 {
                 blockData: JSON.stringify(block, stringifyBigIntReplacer),
               });
               break;
-            case BlockTypeV1.Binary:
+            case BlockTypeV1.Binary: {
+              const asU8Array = VersionedCommittedBlock.toBuffer(block);
+              const asB64Str = Buffer.from(asU8Array).toString("base64");
               socket.emit(WatchBlocksV1.Next, {
-                binaryBlock: VersionedCommittedBlock.toBuffer(block),
+                binaryBlock: asB64Str,
               });
               break;
+            }
             default:
               const unknownType: never = blockType;
               throw new Error(

@@ -302,9 +302,9 @@ describe("Generate and send signed transaction tests", () => {
     expect(genTxResponse).toBeTruthy();
     expect(genTxResponse.data).toBeTruthy();
     expect(genTxResponse.status).toEqual(200);
-    const unsignedTransaction = Uint8Array.from(
-      Object.values(genTxResponse.data),
-    );
+
+    const genTxResponseDataBuffer = Buffer.from(genTxResponse.data, "base64");
+    const unsignedTransaction = Uint8Array.from(genTxResponseDataBuffer);
     expect(unsignedTransaction).toBeTruthy();
     log.info("Received unsigned transcation");
     log.debug("unsignedTransaction:", unsignedTransaction);
@@ -318,9 +318,11 @@ describe("Generate and send signed transaction tests", () => {
     log.info("Transaction signed with local private key");
     log.debug("signedTx:", signedTransaction);
 
+    const signedTxB64 = Buffer.from(signedTransaction).toString("base64");
+
     // Send
     const sendTransactionResponse = await apiClient.runTransactionV1({
-      signedTransaction,
+      signedTransaction: signedTxB64,
       baseConfig: {
         irohaHost: irohaLedgerHost,
         irohaPort: irohaLedgerPort,

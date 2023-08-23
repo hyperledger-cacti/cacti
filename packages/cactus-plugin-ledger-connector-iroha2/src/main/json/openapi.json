@@ -1,12 +1,12 @@
 {
-  "openapi": "3.1.0",
+  "openapi": "3.0.3",
   "info": {
     "title": "Hyperledger Cactus Plugin - Connector Iroha V2",
     "description": "Can perform basic tasks on a Iroha V2 ledger",
     "version": "1.0.0",
     "license": {
       "name": "Apache-2.0",
-      "identifier": "Apache-2.0",
+
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     }
   },
@@ -169,7 +169,6 @@
         "properties": {
           "binaryBlock": {
             "type": "string",
-            "format": "binary",
             "nullable": false
           }
         }
@@ -403,7 +402,6 @@
           "payload": {
             "description": "Signed query transaction binary data received from generate-transaction endpoint.",
             "type": "string",
-            "format": "binary",
             "nullable": false
           }
         }
@@ -416,7 +414,6 @@
           "signedTransaction": {
             "description": "Signed transaction binary data received from generate-transaction endpoint.",
             "type": "string",
-            "format": "binary",
             "nullable": false
           },
           "transaction": {
@@ -607,10 +604,9 @@
           "200": {
             "description": "OK",
             "content": {
-              "application/octet-stream": {
+              "text/plain": {
                 "schema": {
-                  "type": "string",
-                  "format": "binary"
+                  "type": "string"
                 }
               }
             }

@@ -17,6 +17,7 @@ package org.openapitools.client.models
 
 
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 /**
  * 
@@ -77,6 +78,7 @@ data class TransferInitializationV1Response (
      *
      * Values: transferInitialization,lockEvidenceVerification,commitmentEstablishment
      */
+    @JsonClass(generateAdapter = false)
     enum class OdapPhase(val value: kotlin.String) {
         @Json(name = "TransferInitialization") transferInitialization("TransferInitialization"),
         @Json(name = "LockEvidenceVerification") lockEvidenceVerification("LockEvidenceVerification"),

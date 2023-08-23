@@ -71,7 +71,8 @@ export class PluginLedgerConnectorIroha
       RunTransactionResponse
     >,
     ICactusPlugin,
-    IPluginWebService {
+    IPluginWebService
+{
   private readonly instanceId: string;
   public prometheusExporter: PrometheusExporter;
   private readonly log: Logger;
@@ -234,13 +235,12 @@ export class PluginLedgerConnectorIroha
     return `@hyperledger/cactus-plugin-ledger-connector-iroha`;
   }
 
-  public async getConsensusAlgorithmFamily(): Promise<
-    ConsensusAlgorithmFamily
-  > {
+  public async getConsensusAlgorithmFamily(): Promise<ConsensusAlgorithmFamily> {
     return ConsensusAlgorithmFamily.Authority;
   }
   public async hasTransactionFinality(): Promise<boolean> {
-    const currentConsensusAlgorithmFamily = await this.getConsensusAlgorithmFamily();
+    const currentConsensusAlgorithmFamily =
+      await this.getConsensusAlgorithmFamily();
 
     return consensusHasTransactionFinality(currentConsensusAlgorithmFamily);
   }
@@ -272,6 +272,7 @@ export class PluginLedgerConnectorIroha
   private async transactSigned(
     req: RunTransactionSignedRequestV1,
   ): Promise<RunTransactionResponse> {
+    const fnTag = `${this.className}:transactSigned(RunTransactionSignedRequestV1)`;
     if (!req.baseConfig || !req.baseConfig.timeoutLimit) {
       throw new RuntimeError("baseConfig.timeoutLimit is undefined");
     }
@@ -281,12 +282,10 @@ export class PluginLedgerConnectorIroha
     );
 
     try {
-      const transactionBinary = Uint8Array.from(
-        Object.values(req.signedTransaction),
-      );
-      const signedTransaction = Transaction.deserializeBinary(
-        transactionBinary,
-      );
+      const signedTxBuffer = Buffer.from(req.signedTransaction, "base64");
+      const txBinary = Uint8Array.from(signedTxBuffer);
+
+      const signedTransaction = Transaction.deserializeBinary(txBinary);
       this.log.debug("Received signed transaction:", signedTransaction);
 
       const sendResponse = await new TxBuilder(signedTransaction).send(
@@ -295,8 +294,8 @@ export class PluginLedgerConnectorIroha
       );
 
       return { transactionReceipt: sendResponse };
-    } catch (error) {
-      throw new RuntimeError(error as any);
+    } catch (ex) {
+      throw new RuntimeError(`${fnTag} crashed with: `, ex);
     }
   }
 

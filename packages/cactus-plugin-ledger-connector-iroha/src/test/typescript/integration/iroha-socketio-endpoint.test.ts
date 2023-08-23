@@ -1,4 +1,15 @@
+import "jest-extended";
+import http from "http";
+import { AddressInfo } from "net";
 import KeyEncoder from "key-encoder";
+import { v4 as internalIpV4 } from "internal-ip";
+import { v4 as uuidv4 } from "uuid";
+import { RuntimeError } from "run-time-error";
+import cryptoHelper from "iroha-helpers/lib/cryptoHelper";
+import express from "express";
+import bodyParser from "body-parser";
+import { Server as SocketIoServer } from "socket.io";
+
 import { PluginRegistry } from "@hyperledger/cactus-core";
 
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
@@ -18,10 +29,6 @@ import {
   pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 
-import { v4 as internalIpV4 } from "internal-ip";
-import { v4 as uuidv4 } from "uuid";
-import { RuntimeError } from "run-time-error";
-import cryptoHelper from "iroha-helpers/lib/cryptoHelper";
 import {
   IrohaBlockProgress,
   IrohaBlockResponse,
@@ -36,12 +43,7 @@ import {
   PluginFactoryLedgerConnector,
 } from "../../../main/typescript";
 
-import { AddressInfo } from "net";
 import { Constants, PluginImportType } from "@hyperledger/cactus-core-api";
-import express from "express";
-import bodyParser from "body-parser";
-import http from "http";
-import { Server as SocketIoServer } from "socket.io";
 
 const logLevel: LogLevelDesc = "info";
 

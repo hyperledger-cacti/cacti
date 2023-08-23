@@ -1,12 +1,12 @@
 {
-  "openapi": "3.1.0",
+  "openapi": "3.0.3",
   "info": {
     "title": "Hyperledger Cactus Plugin - Connector Fabric",
     "description": "Can perform basic tasks on a fabric ledger",
     "version": "0.0.1",
     "license": {
       "name": "Apache-2.0",
-      "identifier": "Apache-2.0",
+
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     }
   },
@@ -952,7 +952,6 @@
                   },
                   "buffer": {
                     "type": "string",
-                    "format": "binary",
                     "description": "Buffer of blockHash. It's encoding should be described in `encoding` parameter.",
                     "nullable": false
                   }
@@ -994,8 +993,7 @@
         "required": ["encodedBlock"],
         "properties": {
           "encodedBlock": {
-            "type": "string",
-            "format": "binary"
+            "type": "string"
           }
         }
       },

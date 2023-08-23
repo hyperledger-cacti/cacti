@@ -13,13 +13,15 @@
  */
 
 
-import { Configuration } from './configuration';
-import globalAxios, { AxiosPromise, AxiosInstance } from 'axios';
+import type { Configuration } from './configuration';
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from './common';
+import type { RequestArgs } from './base';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from './base';
+import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from './base';
 
 /**
  * 
@@ -32,13 +34,13 @@ export interface ErrorExceptionResponseV1 {
      * @type {string}
      * @memberof ErrorExceptionResponseV1
      */
-    message: string;
+    'message': string;
     /**
      * 
      * @type {string}
      * @memberof ErrorExceptionResponseV1
      */
-    error: string;
+    'error': string;
 }
 /**
  * Ethereum tokens that are being monitored by the persistence plugin.
@@ -51,20 +53,22 @@ export interface MonitoredToken {
      * @type {TokenTypeV1}
      * @memberof MonitoredToken
      */
-    type: TokenTypeV1;
+    'type': TokenTypeV1;
     /**
      * Token name
      * @type {string}
      * @memberof MonitoredToken
      */
-    name: string;
+    'name': string;
     /**
      * Token symbol
      * @type {string}
      * @memberof MonitoredToken
      */
-    symbol: string;
+    'symbol': string;
 }
+
+
 /**
  * Response with plugin status report.
  * @export
@@ -76,43 +80,43 @@ export interface StatusResponseV1 {
      * @type {string}
      * @memberof StatusResponseV1
      */
-    instanceId: string;
+    'instanceId': string;
     /**
      * True if successfully connected to the database, false otherwise.
      * @type {boolean}
      * @memberof StatusResponseV1
      */
-    connected: boolean;
+    'connected': boolean;
     /**
      * True if web services were correctly exported.
      * @type {boolean}
      * @memberof StatusResponseV1
      */
-    webServicesRegistered: boolean;
+    'webServicesRegistered': boolean;
     /**
      * Total number of tokens being monitored by the plugin.
      * @type {number}
      * @memberof StatusResponseV1
      */
-    monitoredTokensCount: number;
+    'monitoredTokensCount': number;
     /**
      * 
      * @type {Array<TrackedOperationV1>}
      * @memberof StatusResponseV1
      */
-    operationsRunning: Array<TrackedOperationV1>;
+    'operationsRunning': Array<TrackedOperationV1>;
     /**
      * True if block monitoring is running, false otherwise.
      * @type {boolean}
      * @memberof StatusResponseV1
      */
-    monitorRunning: boolean;
+    'monitorRunning': boolean;
     /**
      * Number of the last block seen by the block monitor.
      * @type {number}
      * @memberof StatusResponseV1
      */
-    lastSeenBlock: number;
+    'lastSeenBlock': number;
 }
 /**
  * 
@@ -120,16 +124,19 @@ export interface StatusResponseV1 {
  * @enum {string}
  */
 
-export enum TokenTypeV1 {
+export const TokenTypeV1 = {
     /**
     * EIP-20: Token Standard
     */
-    ERC20 = 'erc20',
+    ERC20: 'erc20',
     /**
     * EIP-721: Non-Fungible Token Standard
     */
-    ERC721 = 'erc721'
-}
+    ERC721: 'erc721'
+} as const;
+
+export type TokenTypeV1 = typeof TokenTypeV1[keyof typeof TokenTypeV1];
+
 
 /**
  * Persistence plugin operation that is tracked and returned in status report.
@@ -142,13 +149,13 @@ export interface TrackedOperationV1 {
      * @type {string}
      * @memberof TrackedOperationV1
      */
-    startAt: string;
+    'startAt': string;
     /**
      * Operation name.
      * @type {string}
      * @memberof TrackedOperationV1
      */
-    operation: string;
+    'operation': string;
 }
 
 /**
@@ -163,7 +170,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getStatusV1: async (options: any = {}): Promise<RequestArgs> => {
+        getStatusV1: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-persistence-ethereum/status`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -178,7 +185,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
 
 
     
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
 
@@ -203,7 +210,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getStatusV1(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<StatusResponseV1>> {
+        async getStatusV1(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<StatusResponseV1>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getStatusV1(options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -243,7 +250,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public getStatusV1(options?: any) {
+    public getStatusV1(options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getStatusV1(options).then((request) => request(this.axios, this.basePath));
     }
 }

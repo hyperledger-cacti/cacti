@@ -17,6 +17,7 @@ package org.openapitools.client.models
 
 
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 /**
  * Enumerates a list of consensus algorithm families that do not provide immediate finality
@@ -24,13 +25,14 @@ import com.squareup.moshi.Json
  * Values: WORK
  */
 
+@JsonClass(generateAdapter = false)
 enum class ConsensusAlgorithmFamiliesWithOutTxFinality(val value: kotlin.String) {
 
     @Json(name = "org.hyperledger.cactus.consensusalgorithm.PROOF_OF_WORK")
     WORK("org.hyperledger.cactus.consensusalgorithm.PROOF_OF_WORK");
 
     /**
-     * Override toString() to avoid using the enum variable name as the value, and instead use
+     * Override [toString()] to avoid using the enum variable name as the value, and instead use
      * the actual value defined in the API spec file.
      *
      * This solves a problem when the variable name and its value are different, and ensures that

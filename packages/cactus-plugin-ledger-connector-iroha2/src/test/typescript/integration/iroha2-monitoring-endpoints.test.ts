@@ -154,9 +154,8 @@ describe("Block monitoring tests", () => {
         throw new Error("Unknown response type, wanted binary data");
       }
       Checks.truthy(event.binaryBlock);
-      const decodedBlock = VersionedCommittedBlock.fromBuffer(
-        Buffer.from(event.binaryBlock),
-      );
+      const asBuffer = Buffer.from(event.binaryBlock, "base64");
+      const decodedBlock = VersionedCommittedBlock.fromBuffer(asBuffer);
       log.debug("decodedBlock:", decodedBlock);
       expect(decodedBlock.as("V1").header).toBeTruthy();
     });
@@ -188,9 +187,8 @@ describe("Block monitoring tests", () => {
               throw new Error("Unknown response type, wanted binary data");
             }
             Checks.truthy(event.binaryBlock);
-            const decodedBlock = VersionedCommittedBlock.fromBuffer(
-              Buffer.from(event.binaryBlock),
-            );
+            const asBuffer = Buffer.from(event.binaryBlock, "base64");
+            const decodedBlock = VersionedCommittedBlock.fromBuffer(asBuffer);
             decodedBlock.as("V1").transactions.forEach((tx) => {
               const txPayload = tx.as("V1").payload;
               const hashByes = computeTransactionHash(txPayload);

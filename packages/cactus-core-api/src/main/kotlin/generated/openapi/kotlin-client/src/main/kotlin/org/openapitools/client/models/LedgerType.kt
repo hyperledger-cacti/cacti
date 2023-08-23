@@ -17,6 +17,7 @@ package org.openapitools.client.models
 
 
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 /**
  * Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example \"BESU_1X\" involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation.
@@ -24,6 +25,7 @@ import com.squareup.moshi.Json
  * Values: bESU1X,bESU2X,bURROW0X,cORDA4X,fABRIC14X,fABRIC2,qUORUM2X,sAWTOOTH1X
  */
 
+@JsonClass(generateAdapter = false)
 enum class LedgerType(val value: kotlin.String) {
 
     @Json(name = "BESU_1X")
@@ -51,7 +53,7 @@ enum class LedgerType(val value: kotlin.String) {
     sAWTOOTH1X("SAWTOOTH_1X");
 
     /**
-     * Override toString() to avoid using the enum variable name as the value, and instead use
+     * Override [toString()] to avoid using the enum variable name as the value, and instead use
      * the actual value defined in the API spec file.
      *
      * This solves a problem when the variable name and its value are different, and ensures that
