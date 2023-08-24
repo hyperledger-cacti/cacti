@@ -1,5 +1,6 @@
 {
   "name": "test-run-transaction",
+  "license": "Apache-2.0",
   "private": true,
   "scripts": {
     "start": "node ../../dist/packages/cactus-cmd-socketio-server/src/main/typescript/routing-interface/www.js",
