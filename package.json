@@ -1,5 +1,6 @@
 {
   "name": "@hyperledger/cactus",
+  "license": "Apache-2.0",
   "private": true,
   "description": "Root project for Cactus which contains all core components and plugins developed by the project.",
   "workspaces": {
