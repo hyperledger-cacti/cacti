@@ -1,6 +1,7 @@
 import esMain from "es-main";
 import { checkOpenApiJsonSpecs } from "./check-open-api-json-specs";
 import { checkPackageJsonSort } from "./check-package-json-sort";
+import { checkPkgLicenses } from "./check-pkg-licenses";
 import { checkSiblingDepVersionConsistency } from "./check-sibling-dep-version-consistency";
 import { checkPkgNpmScope } from "./check-pkg-npm-scope";
 
@@ -50,6 +51,11 @@ export async function runCustomChecks(
     overallSuccess = overallSuccess && success;
   }
 
+  {
+    const [success, errors] = await checkPkgLicenses({ argv, env });
+    overallErrors = overallErrors.concat(errors);
+    overallSuccess = overallSuccess && success;
+  }
   if (!overallSuccess) {
     overallErrors.forEach((it) => console.error(it));
   } else {
