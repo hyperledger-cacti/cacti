@@ -58,10 +58,10 @@ jobs:
           tag_name: ${{ env.MODULE_TAG }}/${{ env.VERSION }}
           release_name: ${{ env.VERSION }} - ${{ env.MODULE_DESC }} - ${{ env.RELEASE_DATE }}
           body: |
-            - Go Module: `github.com/${{ github.repository_owner }}/weaver-dlt-interoperability/${{ env.MODULE_TAG }}`
+            - Go Module: `github.com/${{ github.repository_owner }}/cacti/${{ env.MODULE_TAG }}`
             - Release: ${{ env.VERSION }}
-            - Readme: [Here](https://github.com/${{ github.repository_owner }}/weaver-dlt-interoperability/blob/${{ env.MODULE_TAG }}/${{ env.VERSION }}/${{ env.MODULE_TAG }}/README.md).
-            - Source: [Here](https://github.com/${{ github.repository_owner }}/weaver-dlt-interoperability/blob/${{ env.MODULE_TAG }}/${{ env.VERSION }}/${{ env.MODULE_TAG }})
+            - Readme: [Here](https://github.com/${{ github.repository_owner }}/cacti/blob/${{ env.MODULE_TAG }}/${{ env.VERSION }}/${{ env.MODULE_TAG }}/README.md).
+            - Source: [Here](https://github.com/${{ github.repository_owner }}/cacti/blob/${{ env.MODULE_TAG }}/${{ env.VERSION }}/${{ env.MODULE_TAG }})
           draft: false
           prerelease: false
           
@@ -124,10 +124,10 @@ jobs:
           tag_name: ${{ env.MODULE_TAG }}/${{ env.VERSION }}
           release_name: ${{ env.VERSION }} - ${{ env.MODULE_DESC }} - ${{ env.RELEASE_DATE }}
           body: |
-            - Go Module: `github.com/${{ github.repository_owner }}/weaver-dlt-interoperability/${{ env.MODULE_TAG }}`
+            - Go Module: `github.com/${{ github.repository_owner }}/cacti/${{ env.MODULE_TAG }}`
             - Release: ${{ env.VERSION }}
-            - Readme: [Here](https://github.com/${{ github.repository_owner }}/weaver-dlt-interoperability/blob/${{ env.MODULE_TAG }}/${{ env.VERSION }}/${{ env.MODULE_TAG }}/README.md).
-            - Source: [Here](https://github.com/${{ github.repository_owner }}/weaver-dlt-interoperability/blob/${{ env.MODULE_TAG }}/${{ env.VERSION }}/${{ env.MODULE_TAG }})
+            - Readme: [Here](https://github.com/${{ github.repository_owner }}/cacti/blob/${{ env.MODULE_TAG }}/${{ env.VERSION }}/${{ env.MODULE_TAG }}/README.md).
+            - Source: [Here](https://github.com/${{ github.repository_owner }}/cacti/blob/${{ env.MODULE_TAG }}/${{ env.VERSION }}/${{ env.MODULE_TAG }})
           draft: false
           prerelease: false    
       
@@ -190,10 +190,10 @@ jobs:
           tag_name: ${{ env.MODULE_TAG }}/${{ env.VERSION }}
           release_name: ${{ env.VERSION }} - ${{ env.MODULE_DESC }} - ${{ env.RELEASE_DATE }}
           body: |
-            - Go Module: `github.com/${{ github.repository_owner }}/weaver-dlt-interoperability/${{ env.MODULE_TAG }}`
+            - Go Module: `github.com/${{ github.repository_owner }}/cacti/${{ env.MODULE_TAG }}`
             - Release: ${{ env.VERSION }}
-            - Readme: [Here](https://github.com/${{ github.repository_owner }}/weaver-dlt-interoperability/blob/${{ env.MODULE_TAG }}/${{ env.VERSION }}/${{ env.MODULE_TAG }}/README.md).
-            - Source: [Here](https://github.com/${{ github.repository_owner }}/weaver-dlt-interoperability/blob/${{ env.MODULE_TAG }}/${{ env.VERSION }}/${{ env.MODULE_TAG }})
+            - Readme: [Here](https://github.com/${{ github.repository_owner }}/cacti/blob/${{ env.MODULE_TAG }}/${{ env.VERSION }}/${{ env.MODULE_TAG }}/README.md).
+            - Source: [Here](https://github.com/${{ github.repository_owner }}/cacti/blob/${{ env.MODULE_TAG }}/${{ env.VERSION }}/${{ env.MODULE_TAG }})
           draft: false
           prerelease: false
                 
@@ -256,10 +256,10 @@ jobs:
           tag_name: ${{ env.MODULE_TAG }}/${{ env.VERSION }}
           release_name: ${{ env.VERSION }} - ${{ env.MODULE_DESC }} - ${{ env.RELEASE_DATE }}
           body: |
-            - Go Module: `github.com/${{ github.repository_owner }}/weaver-dlt-interoperability/${{ env.MODULE_TAG }}`
+            - Go Module: `github.com/${{ github.repository_owner }}/cacti/${{ env.MODULE_TAG }}`
             - Release: ${{ env.VERSION }}
-            - Readme: [Here](https://github.com/${{ github.repository_owner }}/weaver-dlt-interoperability/blob/${{ env.MODULE_TAG }}/${{ env.VERSION }}/${{ env.MODULE_TAG }}/README.md).
-            - Source: [Here](https://github.com/${{ github.repository_owner }}/weaver-dlt-interoperability/blob/${{ env.MODULE_TAG }}/${{ env.VERSION }}/${{ env.MODULE_TAG }})
+            - Readme: [Here](https://github.com/${{ github.repository_owner }}/cacti/blob/${{ env.MODULE_TAG }}/${{ env.VERSION }}/${{ env.MODULE_TAG }}/README.md).
+            - Source: [Here](https://github.com/${{ github.repository_owner }}/cacti/blob/${{ env.MODULE_TAG }}/${{ env.VERSION }}/${{ env.MODULE_TAG }})
           draft: false
           prerelease: false
                 
@@ -322,10 +322,10 @@ jobs:
           tag_name: ${{ env.MODULE_TAG }}/${{ env.VERSION }}
           release_name: ${{ env.VERSION }} - ${{ env.MODULE_DESC }} - ${{ env.RELEASE_DATE }}
           body: |
-            - Go Module: `github.com/${{ github.repository_owner }}/weaver-dlt-interoperability/${{ env.MODULE_TAG }}`
+            - Go Module: `github.com/${{ github.repository_owner }}/cacti/${{ env.MODULE_TAG }}`
             - Release: ${{ env.VERSION }}
-            - Readme: [Here](https://github.com/${{ github.repository_owner }}/weaver-dlt-interoperability/blob/${{ env.MODULE_TAG }}/${{ env.VERSION }}/${{ env.MODULE_TAG }}/README.md).
-            - Source: [Here](https://github.com/${{ github.repository_owner }}/weaver-dlt-interoperability/blob/${{ env.MODULE_TAG }}/${{ env.VERSION }}/${{ env.MODULE_TAG }})
+            - Readme: [Here](https://github.com/${{ github.repository_owner }}/cacti/blob/${{ env.MODULE_TAG }}/${{ env.VERSION }}/${{ env.MODULE_TAG }}/README.md).
+            - Source: [Here](https://github.com/${{ github.repository_owner }}/cacti/blob/${{ env.MODULE_TAG }}/${{ env.VERSION }}/${{ env.MODULE_TAG }})
           draft: false
           prerelease: false
                 
@@ -388,10 +388,10 @@ jobs:
           tag_name: ${{ env.MODULE_TAG }}/${{ env.VERSION }}
           release_name: ${{ env.VERSION }} - ${{ env.MODULE_DESC }} - ${{ env.RELEASE_DATE }}
           body: |
-            - Go Module: `github.com/${{ github.repository_owner }}/weaver-dlt-interoperability/${{ env.MODULE_TAG }}`
+            - Go Module: `github.com/${{ github.repository_owner }}/cacti/${{ env.MODULE_TAG }}`
             - Release: ${{ env.VERSION }}
-            - Readme: [Here](https://github.com/${{ github.repository_owner }}/weaver-dlt-interoperability/blob/${{ env.MODULE_TAG }}/${{ env.VERSION }}/${{ env.MODULE_TAG }}/README.md).
-            - Source: [Here](https://github.com/${{ github.repository_owner }}/weaver-dlt-interoperability/blob/${{ env.MODULE_TAG }}/${{ env.VERSION }}/${{ env.MODULE_TAG }})
+            - Readme: [Here](https://github.com/${{ github.repository_owner }}/cacti/blob/${{ env.MODULE_TAG }}/${{ env.VERSION }}/${{ env.MODULE_TAG }}/README.md).
+            - Source: [Here](https://github.com/${{ github.repository_owner }}/cacti/blob/${{ env.MODULE_TAG }}/${{ env.VERSION }}/${{ env.MODULE_TAG }})
           draft: false
           prerelease: false
                 
