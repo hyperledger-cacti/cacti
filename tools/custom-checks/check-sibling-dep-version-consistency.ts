@@ -63,7 +63,7 @@ export async function checkSiblingDepVersionConsistency(
 
   const pkgJsonPaths = await globby(DEFAULT_GLOB, globbyOpts);
   console.log(`${TAG} package.json paths: (${pkgJsonPaths.length}): `);
-  
+
   const lernaJsonPathAbs = path.join(PROJECT_DIR, "./lerna.json");
   console.log(`${TAG} Reading root lerna.json at ${lernaJsonPathAbs}`);
   const lernaJson = await fs.readJSON(lernaJsonPathAbs);
