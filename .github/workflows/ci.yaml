@@ -1,5 +1,7 @@
 ---
 jobs:
+  ActionLint:
+    uses: ./.github/workflows/actionlint.yaml
   DCI-Lint:
     name: DCI-Lint
     runs-on: ubuntu-20.04
