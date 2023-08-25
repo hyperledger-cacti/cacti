@@ -47,14 +47,14 @@
     "dist/*"
   ],
   "scripts": {
-    "codegen": "run-p 'codegen:*'",
-    "codegen:openapi": "npm run generate-sdk",
-    "generate-sdk": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
     "build": "npm run build-ts && npm run build:dev:backend:postbuild",
     "build-ts": "tsc",
     "build:dev:backend:postbuild": "npm run copy-sql && npm run copy-yarn-lock",
+    "codegen": "run-p 'codegen:*'",
+    "codegen:openapi": "npm run generate-sdk",
     "copy-sql": "cp -raf ./src/main/sql ./dist/lib/main/",
-    "copy-yarn-lock": "cp -af ../../yarn.lock ./dist/yarn.lock"
+    "copy-yarn-lock": "cp -af ../../yarn.lock ./dist/yarn.lock",
+    "generate-sdk": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected"
   },
   "dependencies": {
     "@ethersproject/abi": "5.7.0",

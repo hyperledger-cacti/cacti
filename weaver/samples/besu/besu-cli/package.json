@@ -2,22 +2,10 @@
   "name": "@hyperledger/cacti-weaver-besu-cli",
   "version": "2.0.0-alpha.1",
   "description": "besu-cli CLI",
+  "license": "Apache-2.0",
   "types": "build/types/types.d.ts",
   "bin": {
     "besu-cli": "bin/besu-cli"
-  },
-  "scripts": {
-    "format": "prettier --write **/*.{js,ts,tsx,json}",
-    "lint": "tslint -p .",
-    "clean-build": "rm -rf ./build",
-    "compile": "tsc -p .",
-    "copy-templates": "if [ -e ./src/templates ]; then cp -a ./src/templates ./build/; fi",
-    "build": "yarn format && yarn lint && yarn clean-build && yarn compile && yarn copy-templates",
-    "prepublishOnly": "yarn build",
-    "test": "jest",
-    "watch": "jest --watch",
-    "snapupdate": "jest --updateSnapshot",
-    "coverage": "jest --coverage"
   },
   "files": [
     "tsconfig.json",
@@ -28,7 +16,27 @@
     "docs",
     "bin"
   ],
-  "license": "Apache-2.0",
+  "scripts": {
+    "build": "yarn format && yarn lint && yarn clean-build && yarn compile && yarn copy-templates",
+    "clean-build": "rm -rf ./build",
+    "compile": "tsc -p .",
+    "copy-templates": "if [ -e ./src/templates ]; then cp -a ./src/templates ./build/; fi",
+    "coverage": "jest --coverage",
+    "format": "prettier --write **/*.{js,ts,tsx,json}",
+    "lint": "tslint -p .",
+    "prepublishOnly": "yarn build",
+    "snapupdate": "jest --updateSnapshot",
+    "test": "jest",
+    "watch": "jest --watch"
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node"
+  },
   "dependencies": {
     "@hyperledger/cacti-weaver-protos-js": "2.0.0-alpha.1",
     "@hyperledger/cacti-weaver-sdk-besu": "2.0.0-alpha.1",
@@ -47,13 +55,5 @@
     "tslint-config-prettier": "1.18.0",
     "tslint-config-standard": "8.0.1",
     "typescript": "4.9.5"
-  },
-  "jest": {
-    "preset": "ts-jest",
-    "testEnvironment": "node"
-  },
-  "prettier": {
-    "semi": false,
-    "singleQuote": true
   }
 }

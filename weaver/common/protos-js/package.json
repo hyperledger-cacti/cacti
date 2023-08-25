@@ -2,7 +2,25 @@
   "name": "@hyperledger/cacti-weaver-protos-js",
   "version": "2.0.0-alpha.1",
   "description": "Interop protos for Node JS (Weaver)",
-  "main": "index.js",
+  "keywords": [
+    "hyperledger",
+    "blockchain",
+    "interoperability",
+    "weaver",
+    "protos",
+    "nodejs",
+    "js"
+  ],
+  "homepage": "https://github.com/hyperledger/cacti#readme",
+  "bugs": {
+    "url": "https://github.com/hyperledger/cacti/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger/cacti.git"
+  },
+  "license": "Apache-2.0",
+  "author": "Sandeep Nishad",
   "exports": {
     "./common/*": "./common/*.js",
     "./corda/*": "./corda/*.js",
@@ -14,23 +32,11 @@
     "./identity/*": "./identity/*.js",
     "./relay/*": "./relay/*.js"
   },
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "sh ./build-protos.sh"
+    "build": "sh ./build-protos.sh",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/hyperledger/cacti.git"
-  },
-  "keywords": [
-    "hyperledger",
-    "blockchain",
-    "interoperability",
-    "weaver",
-    "protos",
-    "nodejs",
-    "js"
-  ],
   "dependencies": {
     "@grpc/grpc-js": "1.9.0",
     "@grpc/proto-loader": "0.7.8",
@@ -41,19 +47,13 @@
   "devDependencies": {
     "grpc_tools_node_protoc_ts": "5.3.3"
   },
-  "author": "Sandeep Nishad",
-  "license": "Apache-2.0",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/hyperledger"
+  },
   "licenses": [
     {
       "type": "Apache-2.0",
       "url": "https://github.com/hyperledger/cacti/blob/main/weaver/LICENSE"
     }
-  ],
-  "bugs": {
-    "url": "https://github.com/hyperledger/cacti/issues"
-  },
-  "homepage": "https://github.com/hyperledger/cacti#readme",
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/hyperledger"
-  }
+  ]
 }

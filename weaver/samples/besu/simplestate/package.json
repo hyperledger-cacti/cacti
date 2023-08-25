@@ -2,24 +2,6 @@
   "name": "@hyperledger/cacti-weaver-besu-simplestate",
   "version": "2.0.0-alpha.1",
   "description": "Sample Besu Application for Storing Key Value Pairs",
-  "license": "Apache-2.0",
-  "repository": "https://github.com/hyperledger/cacti/samples/besu/simplestate",
-  "bugs": {
-    "url": "https://github.com/hyperledger/cacti/issues"
-  },
-  "directories": {
-    "doc": "docs",
-    "test": "test"
-  },
-  "scripts": {
-    "copy-interop-contracts": "cp -r ../../../core/network/besu/contracts/interop contracts/",
-    "update-truffle-config": "node get-network-details.js",
-    "deploy-contract": "npm install --workspaces=false && npm run update-truffle-config && truffle compile && truffle migrate",
-    "compile": "truffle compile",
-    "deploy": "npm run update-truffle-config && truffle migrate",
-    "clean-build": "rm -rf build",
-    "clean": "rm -rf node_modules package-lock.json build"
-  },
   "keywords": [
     "ethereum",
     "besu",
@@ -29,6 +11,24 @@
     "smart-contract"
   ],
   "homepage": "https://github.com/hyperledger/cacti/weaver/samples/besu/simplestate",
+  "bugs": {
+    "url": "https://github.com/hyperledger/cacti/issues"
+  },
+  "repository": "https://github.com/hyperledger/cacti/samples/besu/simplestate",
+  "license": "Apache-2.0",
+  "directories": {
+    "doc": "docs",
+    "test": "test"
+  },
+  "scripts": {
+    "clean": "rm -rf node_modules package-lock.json build",
+    "clean-build": "rm -rf build",
+    "compile": "truffle compile",
+    "copy-interop-contracts": "cp -r ../../../core/network/besu/contracts/interop contracts/",
+    "deploy": "npm run update-truffle-config && truffle migrate",
+    "deploy-contract": "npm install --workspaces=false && npm run update-truffle-config && truffle compile && truffle migrate",
+    "update-truffle-config": "node get-network-details.js"
+  },
   "dependencies": {
     "@openzeppelin/contracts": "4.9.3",
     "@truffle/contract": "4.6.28",

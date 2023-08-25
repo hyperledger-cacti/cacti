@@ -2,23 +2,6 @@
   "name": "@hyperledger/cactus-verifier-client",
   "version": "2.0.0-alpha.1",
   "description": "Verifier cactus client library to communicate with validators through socket.io",
-  "main": "dist/lib/main/typescript/index.js",
-  "module": "dist/lib/main/typescript/index.js",
-  "types": "dist/lib/main/typescript/index.d.ts",
-  "scripts": {
-    "build": "tsc"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
-  "engines": {
-    "node": ">=10",
-    "npm": ">=6"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/hyperledger/cactus.git"
-  },
   "keywords": [
     "Hyperledger",
     "Cactus",
@@ -26,6 +9,15 @@
     "Blockchain",
     "Distributed Ledger Technology"
   ],
+  "homepage": "https://github.com/hyperledger/cactus#readme",
+  "bugs": {
+    "url": "https://github.com/hyperledger/cactus/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger/cactus.git"
+  },
+  "license": "Apache-2.0",
   "author": {
     "name": "Hyperledger Cactus Contributors",
     "email": "cactus@lists.hyperledger.org",
@@ -43,11 +35,12 @@
       "url": "https://www.fujitsu.com/global/"
     }
   ],
-  "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/hyperledger/cactus/issues"
+  "main": "dist/lib/main/typescript/index.js",
+  "module": "dist/lib/main/typescript/index.js",
+  "types": "dist/lib/main/typescript/index.d.ts",
+  "scripts": {
+    "build": "tsc"
   },
-  "homepage": "https://github.com/hyperledger/cactus#readme",
   "dependencies": {
     "@hyperledger/cactus-api-client": "2.0.0-alpha.1",
     "@hyperledger/cactus-common": "2.0.0-alpha.1",
@@ -60,5 +53,12 @@
     "@hyperledger/cactus-plugin-ledger-connector-quorum": "2.0.0-alpha.1",
     "jest-extended": "4.0.1",
     "rxjs": "7.8.1"
+  },
+  "engines": {
+    "node": ">=10",
+    "npm": ">=6"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

@@ -2,25 +2,10 @@
   "name": "@hyperledger/cacti-weaver-fabric-cli",
   "version": "2.0.0-alpha.1",
   "description": "fabric-cli CLI",
+  "license": "Apache-2.0",
   "types": "build/types/types.d.ts",
   "bin": {
     "fabric-cli": "bin/fabric-cli"
-  },
-  "scripts": {
-    "lint": "eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
-    "clean-build": "rm -rf ./build",
-    "compile": "tsc -p .",
-    "copy-templates": "if [ -e ./src/templates ]; then cp -a ./src/templates ./build/; fi",
-    "copy-basic-wallets": "cp -a ./src/wallet-network1 ./build/ && cp -a ./src/wallet-network2 ./build/",
-    "copy-data": "if [ -e ./src/data ]; then cp -a ./src/data ./build/; fi",
-    "copy-credentials": "if [ -e ./src/credentials ]; then cp -a ./src/credentials ./build/; fi",
-    "copy-config": "if [ -f ./config.json ]; then cp ./config.json ./build/; fi",
-    "build": "yarn clean-build && yarn compile && yarn copy-templates && yarn copy-data && yarn copy-basic-wallets && yarn copy-credentials",
-    "prepublishOnly": "yarn build",
-    "test": "jest",
-    "watch": "jest --watch",
-    "snapupdate": "jest --updateSnapshot",
-    "coverage": "jest --coverage"
   },
   "files": [
     "tsconfig.json",
@@ -30,7 +15,30 @@
     "docs",
     "bin"
   ],
-  "license": "Apache-2.0",
+  "scripts": {
+    "build": "yarn clean-build && yarn compile && yarn copy-templates && yarn copy-data && yarn copy-basic-wallets && yarn copy-credentials",
+    "clean-build": "rm -rf ./build",
+    "compile": "tsc -p .",
+    "copy-basic-wallets": "cp -a ./src/wallet-network1 ./build/ && cp -a ./src/wallet-network2 ./build/",
+    "copy-config": "if [ -f ./config.json ]; then cp ./config.json ./build/; fi",
+    "copy-credentials": "if [ -e ./src/credentials ]; then cp -a ./src/credentials ./build/; fi",
+    "copy-data": "if [ -e ./src/data ]; then cp -a ./src/data ./build/; fi",
+    "copy-templates": "if [ -e ./src/templates ]; then cp -a ./src/templates ./build/; fi",
+    "coverage": "jest --coverage",
+    "lint": "eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
+    "prepublishOnly": "yarn build",
+    "snapupdate": "jest --updateSnapshot",
+    "test": "jest",
+    "watch": "jest --watch"
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node"
+  },
   "dependencies": {
     "@fidm/x509": "1.2.1",
     "@hyperledger/cacti-weaver-protos-js": "2.0.0-alpha.1",
@@ -69,14 +77,6 @@
     "ts-jest": "29.1.1",
     "ts-node": "10.9.1",
     "typescript": "4.9.5"
-  },
-  "jest": {
-    "preset": "ts-jest",
-    "testEnvironment": "node"
-  },
-  "prettier": {
-    "semi": false,
-    "singleQuote": true
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/hyperledger-labs"

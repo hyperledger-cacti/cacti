@@ -47,12 +47,12 @@
     "codegen": "run-p 'codegen:*'",
     "codegen:openapi": "npm run generate-sdk",
     "generate-sdk": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
+    "tsc": "tsc --project ./tsconfig.json",
     "watch": "npm-watch",
     "webpack": "npm-run-all webpack:dev",
     "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
     "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
-    "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js",
-    "tsc": "tsc --project ./tsconfig.json"
+    "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
     "@hyperledger/cactus-core": "2.0.0-alpha.1",
