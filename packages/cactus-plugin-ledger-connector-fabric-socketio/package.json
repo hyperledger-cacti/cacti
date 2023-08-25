@@ -6,12 +6,12 @@
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "start": "cd ./dist && node common/core/bin/www.js",
-    "debug": "nodemon --inspect ./dist/common/core/bin/www.js",
     "build": "npm run build-ts && npm run build:dev:backend:postbuild",
     "build-ts": "tsc",
     "build:dev:backend:postbuild": "npm run prepare-docker-build",
-    "prepare-docker-build": "cp -af ../../yarn.lock ./dist/yarn.lock"
+    "debug": "nodemon --inspect ./dist/common/core/bin/www.js",
+    "prepare-docker-build": "cp -af ../../yarn.lock ./dist/yarn.lock",
+    "start": "cd ./dist && node common/core/bin/www.js"
   },
   "dependencies": {
     "@hyperledger/cactus-cmd-socketio-server": "2.0.0-alpha.1",

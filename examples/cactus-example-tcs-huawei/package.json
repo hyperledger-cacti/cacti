@@ -6,10 +6,10 @@
   "module": "dist/www.js",
   "types": "dist/www.d.ts",
   "scripts": {
-    "start": "docker-compose build && docker-compose up",
     "build": "npm run build-ts && npm run build:dev:backend:postbuild",
     "build-ts": "tsc",
-    "build:dev:backend:postbuild": "cp -f ../../yarn.lock ./dist/"
+    "build:dev:backend:postbuild": "cp -f ../../yarn.lock ./dist/",
+    "start": "docker-compose build && docker-compose up"
   },
   "dependencies": {
     "@hyperledger/cactus-cmd-socketio-server": "2.0.0-alpha.1",
