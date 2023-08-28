@@ -1,10 +1,10 @@
-# `@hyperledger/cacti-cmd-gui-app`
+# `@hyperledger/cacti-ledger-browser`
 
 This component allows viewing ledger data in Supabase or other postgreSQL compatible database. The data is fed to supabase by persistence plugins for each ledgers.
 
 ## Summary
 
-- [`@hyperledger/cacti-cmd-gui-app`](#hyperledgercacti-cmd-gui-app)
+- [`@hyperledger/cacti-ledger-browser`](#hyperledgercacti-gui-tx-viewer)
   - [Summary](#summary)
   - [Remarks](#remarks)
   - [Getting Started](#getting-started)
