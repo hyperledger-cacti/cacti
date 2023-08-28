@@ -11,7 +11,7 @@
       "path": "./packages/cactus-cmd-socketio-server/tsconfig.json"
     },
     {
-      "path": "./packages/cacti-cmd-gui-app/tsconfig.json"
+      "path": "./packages/cacti-ledger-browser/tsconfig.json"
     },
     {
       "path": "./packages/cactus-common/tsconfig.json"

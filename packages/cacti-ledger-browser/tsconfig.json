@@ -13,7 +13,7 @@
     ],
     "outDir": "./dist/out-tsc",
     "rootDir": "./src",
-    "tsBuildInfoFile": "../../.build-cache/cactus-cmd-gui-app.tsbuildinfo"
+    "tsBuildInfoFile": "../../.build-cache/cacti-ledger-browser.tsbuildinfo"
   },
 
 }

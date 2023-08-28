@@ -5949,9 +5949,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hyperledger/cacti-cmd-gui-app@workspace:packages/cacti-cmd-gui-app":
+"@hyperledger/cacti-ledger-browser@workspace:packages/cacti-ledger-browser":
   version: 0.0.0-use.local
-  resolution: "@hyperledger/cacti-cmd-gui-app@workspace:packages/cacti-cmd-gui-app"
+  resolution: "@hyperledger/cacti-ledger-browser@workspace:packages/cacti-ledger-browser"
   dependencies:
     "@solidjs/router": 0.4.2
     "@supabase/supabase-js": 1.35.6
