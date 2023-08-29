@@ -12,6 +12,7 @@ use weaverpb::relay::satp::{
 // Internal modules
 use crate::error::Error;
 use crate::relay_proto::parse_address;
+use crate::services::helpers::{println_stage_heading, println_step_heading};
 use crate::services::satp_helper::{
     create_ack_error_message, create_perform_lock_request,
     get_request_id_from_transfer_proposal_receipt, log_request_in_local_satp_db,
@@ -55,6 +56,8 @@ impl Satp for SatpService {
         &self,
         request: Request<TransferProposalClaimsRequest>,
     ) -> Result<Response<Ack>, Status> {
+        println_stage_heading("1".to_string());
+        println_step_heading("1.1".to_string());
         println!(
             "Got a TransferProposalClaimsRequest from {:?} - {:?}",
             request.remote_addr(),
@@ -108,6 +111,7 @@ impl Satp for SatpService {
         &self,
         request: Request<TransferProposalReceiptRequest>,
     ) -> Result<Response<Ack>, Status> {
+        println_step_heading("1.2".to_string());
         println!(
             "Got an ack transfer proposal receipt request from {:?} - {:?}",
             request.remote_addr(),
@@ -169,6 +173,7 @@ impl Satp for SatpService {
         &self,
         request: Request<TransferCommenceRequest>,
     ) -> Result<Response<Ack>, Status> {
+        println_step_heading("1.3".to_string());
         println!(
             "Got a TransferCommenceRequest from {:?} - {:?}",
             request.remote_addr(),
@@ -214,6 +219,7 @@ impl Satp for SatpService {
         &self,
         request: Request<AckCommenceRequest>,
     ) -> Result<Response<Ack>, Status> {
+        println_step_heading("1.4".to_string());
         println!(
             "Got an ack commence request from {:?} - {:?}",
             request.remote_addr(),
@@ -312,6 +318,7 @@ impl Satp for SatpService {
         &self,
         request: Request<LockAssertionRequest>,
     ) -> Result<Response<Ack>, Status> {
+        println_step_heading("2.2".to_string());
         println!(
             "Got a LockAssertionRequest from {:?} - {:?}",
             request.remote_addr(),
@@ -354,6 +361,7 @@ impl Satp for SatpService {
         &self,
         request: Request<LockAssertionReceiptRequest>,
     ) -> Result<Response<Ack>, Status> {
+        println_step_heading("2.4".to_string());
         println!(
             "Got an lock assertion receipt request from {:?} - {:?}",
             request.remote_addr(),
@@ -408,6 +416,7 @@ impl Satp for SatpService {
         &self,
         request: Request<CommitPrepareRequest>,
     ) -> Result<Response<Ack>, Status> {
+        println_step_heading("3.1".to_string());
         println!(
             "Got commit prepare request from {:?} - {:?}",
             request.remote_addr(),
@@ -456,6 +465,7 @@ impl Satp for SatpService {
         &self,
         request: Request<CommitReadyRequest>,
     ) -> Result<Response<Ack>, Status> {
+        println_step_heading("3.3".to_string());
         println!(
             "Got commit ready request from {:?} - {:?}",
             request.remote_addr(),
@@ -503,6 +513,7 @@ impl Satp for SatpService {
         &self,
         request: Request<CommitFinalAssertionRequest>,
     ) -> Result<Response<Ack>, Status> {
+        println_step_heading("3.5".to_string());
         println!(
             "Got commit final assertion request from {:?} - {:?}",
             request.remote_addr(),
@@ -557,6 +568,7 @@ impl Satp for SatpService {
         &self,
         request: Request<AckFinalReceiptRequest>,
     ) -> Result<Response<Ack>, Status> {
+        println_step_heading("3.7".to_string());
         println!(
             "Got commit final assertion request from {:?} - {:?}",
             request.remote_addr(),
@@ -608,6 +620,7 @@ impl Satp for SatpService {
         &self,
         request: Request<TransferCompletedRequest>,
     ) -> Result<Response<Ack>, Status> {
+        println_step_heading("3.9".to_string());
         println!(
             "Got commit final assertion request from {:?} - {:?}",
             request.remote_addr(),
@@ -813,23 +826,27 @@ pub fn process_send_asset_status_request(
         let status = send_asset_status_request.status.as_str();
         match status {
             "Locked" => {
+                println_step_heading("2.1B".to_string());
                 println!("Received asset status as Locked. Sending the lock assertion request");
                 let lock_assertion_request =
                     create_lock_assertion_request(send_asset_status_request);
                 result = send_lock_assertion_request(lock_assertion_request, conf)
             }
             "Created" => {
+                println_step_heading("3.2B".to_string());
                 println!("Received asset status as Created. Sending the commit ready request");
                 let commit_ready_request = create_commit_ready_request(send_asset_status_request);
                 result = send_commit_ready_request(commit_ready_request, conf);
             }
             "Extinguished" => {
+                println_step_heading("3.4B".to_string());
                 println!("Received asset status as Extinguished. Sending the commit final assertion request");
                 let commit_final_assertion_request =
                     create_commit_final_assertion_request(send_asset_status_request);
                 result = send_commit_final_assertion_request(commit_final_assertion_request, conf)
             }
             "Finalized" => {
+                println_step_heading("3.6B".to_string());
                 println!(
                     "Received asset status as Finalized. Sending the ack final receipt request"
                 );
@@ -1184,6 +1201,8 @@ fn send_lock_assertion_broadcast_request(
     lock_assertion_request: LockAssertionRequest,
     conf: config::Config,
 ) -> Result<Ack, Error> {
+    println_step_heading("2.3".to_string());
+
     let request_id = &lock_assertion_request.session_id.to_string();
     let (relay_host, relay_port) = get_relay_from_lock_assertion(lock_assertion_request.clone());
     let (use_tls, tlsca_cert_path) =
@@ -1209,6 +1228,9 @@ fn send_perform_lock_request(
     perform_lock_request: PerformLockRequest,
     conf: config::Config,
 ) -> Result<Ack, Error> {
+    println_stage_heading("2".to_string());
+    println_step_heading("2.1A".to_string());
+
     let request_id = &perform_lock_request.session_id.to_string();
     let driver_address = get_driver_address_from_perform_lock(perform_lock_request.clone());
     let parsed_address = parse_address(driver_address)?;
@@ -1240,6 +1262,7 @@ fn send_commit_prepare_request(
     commit_prepare_request: CommitPrepareRequest,
     conf: config::Config,
 ) -> Result<Ack, Error> {
+    println_stage_heading("3".to_string());
     let request_id = &commit_prepare_request.session_id.to_string();
     let (relay_host, relay_port) = get_relay_from_commit_prepare(commit_prepare_request.clone());
     let (use_tls, tlsca_cert_path) =
@@ -1293,6 +1316,7 @@ fn send_create_asset_request(
     conf: config::Config,
 ) -> Result<Ack, Error> {
     // TODO
+    println_step_heading("3.2A".to_string());
     let request_id = &commit_prepare_request.session_id.to_string();
     let (relay_host, relay_port) = get_relay_from_commit_prepare(commit_prepare_request.clone());
     let (use_tls, tlsca_cert_path) =
@@ -1320,6 +1344,7 @@ fn send_extinguish_request(
     conf: config::Config,
 ) -> Result<Ack, Error> {
     // TODO
+    println_step_heading("3.4A".to_string());
     let request_id = &commit_ready_request.session_id.to_string();
     let (relay_host, relay_port) = get_relay_from_commit_ready(commit_ready_request.clone());
     let (use_tls, tlsca_cert_path) =
@@ -1375,6 +1400,7 @@ fn send_ack_final_receipt_request(
     conf: config::Config,
 ) -> Result<Ack, Error> {
     // TODO
+    println_step_heading("3.8".to_string());
     let request_id = &ack_final_receipt_request.session_id.to_string();
     let (relay_host, relay_port) =
         get_relay_from_ack_final_receipt(ack_final_receipt_request.clone());
@@ -1403,6 +1429,7 @@ fn send_assign_asset_request(
     conf: config::Config,
 ) -> Result<Ack, Error> {
     // TODO
+    println_step_heading("3.6A".to_string());
     let request_id = &commit_final_assertion_request.session_id.to_string();
     let (relay_host, relay_port) =
         get_relay_from_commit_final_assertion(commit_final_assertion_request.clone());

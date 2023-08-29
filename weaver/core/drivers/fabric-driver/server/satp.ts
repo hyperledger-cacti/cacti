@@ -26,10 +26,10 @@ async function performLockHelper(
     let performLockRequest2 = {};
     performLockRequest2['target-network'] = 'network1';
     performLockRequest2['hashBase64'] = 'ivHErp1x4bJDKuRo6L5bApO/DdoyD/dG0mAZrzLZEIs=';
-    performLockRequest2['timeout-duration'] = '3600';
+    performLockRequest2['timeout-duration'] = parseInt('3600');
     performLockRequest2['locker'] = 'alice';
     performLockRequest2['recipient'] = 'bob';
-    performLockRequest2['param'] = 'bond01:a03';
+    performLockRequest2['param'] = 'bond01:a05';
 
     // Locker and Recipient
     const locker = performLockRequest2['locker'];
@@ -84,11 +84,8 @@ async function performLockHelper(
         userString: locker
     })
 
-    logger.info(`network details: ${network}`);
     const lockerId = await network.wallet.get(locker)
-
     const lockerCert = Buffer.from((lockerId).credentials.certificate).toString('base64')
-
     const recipientId = await network.wallet.get(recipient)
     const recipientCert = Buffer.from((recipientId).credentials.certificate).toString('base64')
 
@@ -103,20 +100,19 @@ async function performLockHelper(
     }
 
     console.info(`Asset Exchange: Lock ${asset}:\n`);
-
     try {
         console.info(`Trying ${asset} Lock: ${params[0]}, ${params[1]} by ${locker} for ${recipient}`)
-        // const res = await funcToCall(network.contract,
-        //     params[0],
-        //     params[1],
-        //     recipientCert,
-        //     hash,
-        //     timeout,
-        //     null)
-        // if (!res.result) {
-        //     throw new Error()
-        // }
-        // console.info(`${asset} Locked with Contract Id: ${res.result}, preimage: ${res.hash.getPreimage()}, hashvalue: ${res.hash.getSerializedHashBase64()}`)
+        const res = await funcToCall(network.contract,
+            params[0],
+            params[1],
+            recipientCert,
+            hash,
+            timeout,
+            null)
+        if (!res.result) {
+            throw new Error()
+        }
+        console.info(`${asset} Locked with Contract Id: ${res.result}, preimage: ${res.hash.getPreimage()}, hashvalue: ${res.hash.getSerializedHashBase64()}`)
         console.info('Asset Exchange: Lock Complete.')
 
     } catch (error) {
