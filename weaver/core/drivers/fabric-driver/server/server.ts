@@ -19,7 +19,7 @@ import 'dotenv/config';
 import { loadEventSubscriptionsFromStorage, monitorBlockForMissedEvents } from './listener'
 import { walletSetup } from './walletSetup';
 import { subscribeEventHelper, unsubscribeEventHelper, signEventSubscriptionQuery, writeExternalStateHelper } from "./events"
-import { performLockHelper } from "./satp"
+import { performLockHelper, createAssetHelper, extinguishHelper, assignAssetHelper } from "./satp"
 import * as path from 'path';
 import { handlePromise, relayCallback, getRelayClientForQueryResponse, getRelayClientForEventSubscription, delay } from './utils';
 import { dbConnectionTest, eventSubscriptionTest } from "./tests"
@@ -240,7 +240,7 @@ server.addService(driver_pb_grpc.DriverCommunicationService, {
         performLockHelper(call.request, process.env.NETWORK_NAME ? process.env.NETWORK_NAME : 'network1').then(() => {
             const ack_response = new ack_pb.Ack();
             ack_response.setRequestId(requestId);
-            ack_response.setMessage('Successfully written to the ledger');
+            ack_response.setMessage('Successfully locked the asset');
             ack_response.setStatus(ack_pb.Ack.STATUS.OK);
             // gRPC response.
             logger.info(`Responding to caller with Ack: ${JSON.stringify(ack_response.toObject())}`);
@@ -255,6 +255,70 @@ server.addService(driver_pb_grpc.DriverCommunicationService, {
             callback(null, ack_err_response);
         });
     },
+    createAsset: (call: { request: driverPb.CreateAssetRequest }, callback: (_: any, object: ack_pb.Ack) => void) => {
+        const requestId: string = call.request.getSessionId();
+
+        createAssetHelper(call.request, process.env.NETWORK_NAME ? process.env.NETWORK_NAME : 'network1').then(() => {
+            const ack_response = new ack_pb.Ack();
+            ack_response.setRequestId(requestId);
+            ack_response.setMessage('Successfully created the asset');
+            ack_response.setStatus(ack_pb.Ack.STATUS.OK);
+            // gRPC response.
+            logger.info(`Responding to caller with Ack: ${JSON.stringify(ack_response.toObject())}`);
+            callback(null, ack_response);
+        }).catch((error) => {
+            const ack_err_response = new ack_pb.Ack();
+            ack_err_response.setRequestId(requestId);
+            ack_err_response.setMessage(error.toString());
+            ack_err_response.setStatus(ack_pb.Ack.STATUS.ERROR);
+            // gRPC response.
+            logger.info(`Responding to caller with error Ack: ${JSON.stringify(ack_err_response.toObject())}`);
+            callback(null, ack_err_response);
+        });
+    },
+    extinguish: (call: { request: driverPb.ExtinguishRequest }, callback: (_: any, object: ack_pb.Ack) => void) => {
+        const requestId: string = call.request.getSessionId();
+
+        extinguishHelper(call.request, process.env.NETWORK_NAME ? process.env.NETWORK_NAME : 'network1').then(() => {
+            const ack_response = new ack_pb.Ack();
+            ack_response.setRequestId(requestId);
+            ack_response.setMessage('Successfully extinguished the asset');
+            ack_response.setStatus(ack_pb.Ack.STATUS.OK);
+            // gRPC response.
+            logger.info(`Responding to caller with Ack: ${JSON.stringify(ack_response.toObject())}`);
+            callback(null, ack_response);
+        }).catch((error) => {
+            const ack_err_response = new ack_pb.Ack();
+            ack_err_response.setRequestId(requestId);
+            ack_err_response.setMessage(error.toString());
+            ack_err_response.setStatus(ack_pb.Ack.STATUS.ERROR);
+            // gRPC response.
+            logger.info(`Responding to caller with error Ack: ${JSON.stringify(ack_err_response.toObject())}`);
+            callback(null, ack_err_response);
+        });
+    },
+    assignAsset: (call: { request: driverPb.AssignAssetRequest }, callback: (_: any, object: ack_pb.Ack) => void) => {
+        const requestId: string = call.request.getSessionId();
+
+        assignAssetHelper(call.request, process.env.NETWORK_NAME ? process.env.NETWORK_NAME : 'network1').then(() => {
+            const ack_response = new ack_pb.Ack();
+            ack_response.setRequestId(requestId);
+            ack_response.setMessage('Successfully assigned the asset');
+            ack_response.setStatus(ack_pb.Ack.STATUS.OK);
+            // gRPC response.
+            logger.info(`Responding to caller with Ack: ${JSON.stringify(ack_response.toObject())}`);
+            callback(null, ack_response);
+        }).catch((error) => {
+            const ack_err_response = new ack_pb.Ack();
+            ack_err_response.setRequestId(requestId);
+            ack_err_response.setMessage(error.toString());
+            ack_err_response.setStatus(ack_pb.Ack.STATUS.ERROR);
+            // gRPC response.
+            logger.info(`Responding to caller with error Ack: ${JSON.stringify(ack_err_response.toObject())}`);
+            callback(null, ack_err_response);
+        });
+    },
+
 });
 
 // Prepares required crypto material for communication with the fabric network

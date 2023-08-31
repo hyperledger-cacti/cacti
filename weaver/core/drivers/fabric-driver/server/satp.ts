@@ -102,17 +102,17 @@ async function performLockHelper(
     console.info(`Asset Exchange: Lock ${asset}:\n`);
     try {
         console.info(`Trying ${asset} Lock: ${params[0]}, ${params[1]} by ${locker} for ${recipient}`)
-        const res = await funcToCall(network.contract,
-            params[0],
-            params[1],
-            recipientCert,
-            hash,
-            timeout,
-            null)
-        if (!res.result) {
-            throw new Error()
-        }
-        console.info(`${asset} Locked with Contract Id: ${res.result}, preimage: ${res.hash.getPreimage()}, hashvalue: ${res.hash.getSerializedHashBase64()}`)
+        // const res = await funcToCall(network.contract,
+        //     params[0],
+        //     params[1],
+        //     recipientCert,
+        //     hash,
+        //     timeout,
+        //     null)
+        // if (!res.result) {
+        //     throw new Error()
+        // }
+        // console.info(`${asset} Locked with Contract Id: ${res.result}, preimage: ${res.hash.getPreimage()}, hashvalue: ${res.hash.getSerializedHashBase64()}`)
         console.info('Asset Exchange: Lock Complete.')
 
     } catch (error) {
@@ -128,6 +128,45 @@ async function performLockHelper(
     const request = new satp_pb.SendAssetStatusRequest();
     request.setSessionId(performLockRequest.getSessionId());
     request.setStatus("Locked");
+    client.sendAssetStatus(request, relayCallback);
+}
+
+async function createAssetHelper(
+    createAssetRequest: driverPb.CreateAssetRequest,
+    networkName: string
+): Promise<any> {
+
+    // TODO
+    const client = getRelayClientForAssetStatusResponse();
+    const request = new satp_pb.SendAssetStatusRequest();
+    request.setSessionId(createAssetRequest.getSessionId());
+    request.setStatus("Created");
+    client.sendAssetStatus(request, relayCallback);
+}
+
+async function extinguishHelper(
+    extinguishRequest: driverPb.ExtinguishRequest,
+    networkName: string
+): Promise<any> {
+
+    // TODO
+    const client = getRelayClientForAssetStatusResponse();
+    const request = new satp_pb.SendAssetStatusRequest();
+    request.setSessionId(extinguishRequest.getSessionId());
+    request.setStatus("Extinguished");
+    client.sendAssetStatus(request, relayCallback);
+}
+
+async function assignAssetHelper(
+    assignAssetRequest: driverPb.AssignAssetRequest,
+    networkName: string
+): Promise<any> {
+
+    // TODO
+    const client = getRelayClientForAssetStatusResponse();
+    const request = new satp_pb.SendAssetStatusRequest();
+    request.setSessionId(assignAssetRequest.getSessionId());
+    request.setStatus("Finalized");
     client.sendAssetStatus(request, relayCallback);
 }
 
@@ -168,5 +207,8 @@ function relayCallback(err: any, response: any) {
 }
 
 export {
-    performLockHelper
+    performLockHelper,
+    createAssetHelper,
+    extinguishHelper,
+    assignAssetHelper
 }

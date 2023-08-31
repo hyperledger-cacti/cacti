@@ -6,7 +6,9 @@ use tonic::transport::{Certificate, Channel, ClientTlsConfig};
 use tonic::Response;
 use weaverpb::common::ack::{ack, Ack};
 use weaverpb::common::state::{request_state, RequestState};
-use weaverpb::driver::driver::PerformLockRequest;
+use weaverpb::driver::driver::{
+    AssignAssetRequest, CreateAssetRequest, ExtinguishRequest, PerformLockRequest,
+};
 use weaverpb::networks::networks::NetworkAssetTransfer;
 use weaverpb::relay::satp::satp_client::SatpClient;
 use weaverpb::relay::satp::{
@@ -277,24 +279,28 @@ pub fn spawn_send_commit_prepare_request(
 }
 
 pub fn spawn_send_create_asset_request(
-    commit_prepare_request: CommitPrepareRequest,
-    relay_host: String,
-    relay_port: String,
-    use_tls: bool,
-    tlsca_cert_path: String,
-    conf: Config,
+    driver_info: Driver,
+    create_asset_request: CreateAssetRequest,
 ) {
     tokio::spawn(async move {
-        let request_id = commit_prepare_request.session_id.to_string();
+        let request_id = create_asset_request.session_id.to_string();
         println!(
-            "Creating the asset corresponding to the commit prepare request {:?}",
+            "Creating the asset corresponding to the create asset request {:?}",
             request_id
         );
-        // TODO
-        // Creating the asset in the target network
-        // Subscribe to the status event
-        // Once the message is broadcast, call the call_commit_ready endpoint
-        // log the results
+
+        // TODO: pass the required info to lock the relevant asset
+        // Call the driver to lock the asset
+        let result = call_create_asset(driver_info, create_asset_request).await;
+        match result {
+            Ok(_) => {
+                println!("Create asset request sent to driver\n")
+            }
+            Err(e) => {
+                println!("Error sending create asset request to driver: {:?}\n", e);
+                // TODO: what to do in this case?
+            }
+        }
     });
 }
 
@@ -325,23 +331,28 @@ pub fn spawn_send_commit_ready_request(
 }
 
 pub fn spawn_send_assign_asset_request(
-    commit_final_assertion_request: CommitFinalAssertionRequest,
-    relay_host: String,
-    relay_port: String,
-    use_tls: bool,
-    tlsca_cert_path: String,
-    conf: Config,
+    driver_info: Driver,
+    assign_asset_request: AssignAssetRequest,
 ) {
     tokio::spawn(async move {
-        let request_id = commit_final_assertion_request.session_id.to_string();
+        let request_id = assign_asset_request.session_id.to_string();
         println!(
-            "Assigning the asset corresponding to the commit final assertion request {:?}",
+            "Assigning the asset corresponding to the assign asset request {:?}",
             request_id
         );
-        // TODO
-        // Assigning the asset in the target network
-        // Once the asset is assigned, call the call_ack_final_receipt endpoint
-        // log the results
+
+        // TODO: pass the required info to assign the relevant asset
+        // Call the driver to assign the asset
+        let result = call_assign_asset(driver_info, assign_asset_request).await;
+        match result {
+            Ok(_) => {
+                println!("Assign asset request sent to driver\n")
+            }
+            Err(e) => {
+                println!("Error sending assign asset request to driver: {:?}\n", e);
+                // TODO: what to do in this case?
+            }
+        }
     });
 }
 
@@ -408,24 +419,29 @@ pub fn spawn_send_ack_final_receipt_broadcast_request(
     });
 }
 
-pub fn spawn_send_extinguish_request(
-    commit_ready_request: CommitReadyRequest,
-    relay_host: String,
-    relay_port: String,
-    use_tls: bool,
-    tlsca_cert_path: String,
-    conf: Config,
-) {
+pub fn spawn_send_extinguish_request(driver_info: Driver, extinguish_request: ExtinguishRequest) {
     tokio::spawn(async move {
-        let request_id = commit_ready_request.session_id.to_string();
+        let request_id = extinguish_request.session_id.to_string();
         println!(
-            "Extinguishing the asset corresponding to the commit final assertion request {:?}",
+            "Extinguishing the asset corresponding to the extinguish request {:?}",
             request_id
         );
-        // TODO
-        // Assigning the asset in the target network
-        // Once the asset is assigned, call the call_ack_final_receipt endpoint
-        // log the results
+
+        // TODO: pass the required info to lock the relevant asset
+        // Call the driver to lock the asset
+        let result = call_extinguish(driver_info, extinguish_request).await;
+        match result {
+            Ok(_) => {
+                println!("Extinguishing asset request sent to driver\n")
+            }
+            Err(e) => {
+                println!(
+                    "Error sending extinguishing asset request to driver: {:?}\n",
+                    e
+                );
+                // TODO: what to do in this case?
+            }
+        }
     });
 }
 
@@ -471,6 +487,78 @@ async fn call_perform_lock(
         .await?
         .into_inner();
     println!("Response ACK from driver to perform lock {:?}\n", ack);
+    let status = ack::Status::from_i32(ack.status)
+        .ok_or(Error::Simple("Status from Driver error".to_string()))?;
+    match status {
+        ack::Status::Ok => {
+            // Do nothing
+            return Ok(());
+        }
+        ack::Status::Error => Err(Error::Simple(format!("Error from driver: {}", ack.message))),
+    }
+}
+
+async fn call_create_asset(
+    driver_info: Driver,
+    create_asset_request: CreateAssetRequest,
+) -> Result<(), Error> {
+    let client = get_driver_client(driver_info).await?;
+    println!("Sending request to driver to create the asset");
+    let ack = client
+        .clone()
+        .create_asset(create_asset_request)
+        .await?
+        .into_inner();
+    println!("Response ACK from driver to create the asset {:?}\n", ack);
+    let status = ack::Status::from_i32(ack.status)
+        .ok_or(Error::Simple("Status from Driver error".to_string()))?;
+    match status {
+        ack::Status::Ok => {
+            // Do nothing
+            return Ok(());
+        }
+        ack::Status::Error => Err(Error::Simple(format!("Error from driver: {}", ack.message))),
+    }
+}
+
+async fn call_extinguish(
+    driver_info: Driver,
+    extinguish_request: ExtinguishRequest,
+) -> Result<(), Error> {
+    let client = get_driver_client(driver_info).await?;
+    println!("Sending request to driver to extinguish the asset");
+    let ack = client
+        .clone()
+        .extinguish(extinguish_request)
+        .await?
+        .into_inner();
+    println!(
+        "Response ACK from driver to extinguish the asset {:?}\n",
+        ack
+    );
+    let status = ack::Status::from_i32(ack.status)
+        .ok_or(Error::Simple("Status from Driver error".to_string()))?;
+    match status {
+        ack::Status::Ok => {
+            // Do nothing
+            return Ok(());
+        }
+        ack::Status::Error => Err(Error::Simple(format!("Error from driver: {}", ack.message))),
+    }
+}
+
+async fn call_assign_asset(
+    driver_info: Driver,
+    assign_asset_request: AssignAssetRequest,
+) -> Result<(), Error> {
+    let client = get_driver_client(driver_info).await?;
+    println!("Sending request to driver to assign the asset");
+    let ack = client
+        .clone()
+        .assign_asset(assign_asset_request)
+        .await?
+        .into_inner();
+    println!("Response ACK from driver to assign the asset {:?}\n", ack);
     let status = ack::Status::from_i32(ack.status)
         .ok_or(Error::Simple("Status from Driver error".to_string()))?;
     match status {
@@ -946,6 +1034,34 @@ pub fn create_perform_lock_request(ack_commence_request: AckCommenceRequest) -> 
     return perform_lock_request;
 }
 
+pub fn create_create_asset_request(
+    commit_prepare_request: CommitPrepareRequest,
+) -> CreateAssetRequest {
+    // TODO: remove hard coded values
+    let create_asset_request = CreateAssetRequest {
+        session_id: "session_id1".to_string(),
+    };
+    return create_asset_request;
+}
+
+pub fn create_extinguish_request(commit_ready_request: CommitReadyRequest) -> ExtinguishRequest {
+    // TODO: remove hard coded values
+    let extinguish_request = ExtinguishRequest {
+        session_id: "session_id1".to_string(),
+    };
+    return extinguish_request;
+}
+
+pub fn create_assign_asset_request(
+    commit_final_assertion_request: CommitFinalAssertionRequest,
+) -> AssignAssetRequest {
+    // TODO: remove hard coded values
+    let assign_asset_request = AssignAssetRequest {
+        session_id: "session_id1".to_string(),
+    };
+    return assign_asset_request;
+}
+
 pub fn generate_commit_final_assertion_request(
     commit_ready_request: CommitReadyRequest,
 ) -> CommitFinalAssertionRequest {
@@ -1167,6 +1283,21 @@ pub fn get_relay_from_send_asset_status(
 }
 
 pub fn get_driver_address_from_perform_lock(perform_lock_request: PerformLockRequest) -> String {
+    // TODO
+    return "localhost:9085/Dummy_Network/abc:abc:abc:abc".to_string();
+}
+
+pub fn get_driver_address_from_create_asset(create_asset_request: CreateAssetRequest) -> String {
+    // TODO
+    return "localhost:9085/Dummy_Network/abc:abc:abc:abc".to_string();
+}
+
+pub fn get_driver_address_from_extinguish(extinguish_request: ExtinguishRequest) -> String {
+    // TODO
+    return "localhost:9085/Dummy_Network/abc:abc:abc:abc".to_string();
+}
+
+pub fn get_driver_address_from_assign_asset(assign_asset_request: AssignAssetRequest) -> String {
     // TODO
     return "localhost:9085/Dummy_Network/abc:abc:abc:abc".to_string();
 }
