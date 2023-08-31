@@ -6880,7 +6880,7 @@ __metadata:
     joi: 17.9.1
     openapi-types: 9.1.0
     typescript-optional: 2.0.1
-    web3js-quorum: 21.7.0-rc1
+    web3js-quorum: 22.4.0
   languageName: unknown
   linkType: soft
 
@@ -7028,7 +7028,7 @@ __metadata:
     web3-core: 1.6.1
     web3-eth: 1.6.1
     web3-utils: 1.6.1
-    web3js-quorum: 21.7.0-rc1
+    web3js-quorum: 22.4.0
   languageName: unknown
   linkType: soft
 
@@ -7618,7 +7618,7 @@ __metadata:
     axios: 0.21.4
     key-encoder: 2.0.3
     web3: 1.6.1
-    web3js-quorum: 21.7.0-rc1
+    web3js-quorum: 22.4.0
   languageName: unknown
   linkType: soft
 
@@ -7638,7 +7638,7 @@ __metadata:
     key-encoder: 2.0.3
     socket.io: 4.5.4
     web3: 1.6.1
-    web3js-quorum: 21.7.0-rc1
+    web3js-quorum: 22.4.0
   languageName: unknown
   linkType: soft
 
@@ -15828,7 +15828,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bindings@npm:^1.2.1, bindings@npm:^1.5.0":
+"bindings@npm:^1.5.0":
   version: 1.5.0
   resolution: "bindings@npm:1.5.0"
   dependencies:
@@ -15841,15 +15841,6 @@ __metadata:
   version: 1.0.1
   resolution: "bintrees@npm:1.0.1"
   checksum: 71d00ce450ee7ad080a3c86ae5f05fac841bdf95c0d78f3b3bbf8f754c19d7cb732f0f9213a46ed27cbec47eb124ffe2b686bef870718a4b9918c23210b55c73
-  languageName: node
-  linkType: hard
-
-"bip66@npm:^1.1.5":
-  version: 1.1.5
-  resolution: "bip66@npm:1.1.5"
-  dependencies:
-    safe-buffer: ^5.0.1
-  checksum: 956cff6e51d7206571ef8ce875bc5fa61b5c181589790b9155799b7edcae4b20dbb3eed43b188ff3eec27cdbe98e0b7e0ec9f1cb2e4f5370c119028b248ad859
   languageName: node
   linkType: hard
 
@@ -15939,7 +15930,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bn.js@npm:4.12.0, bn.js@npm:^4.0.0, bn.js@npm:^4.1.0, bn.js@npm:^4.11.0, bn.js@npm:^4.11.1, bn.js@npm:^4.11.3, bn.js@npm:^4.11.6, bn.js@npm:^4.11.8, bn.js@npm:^4.11.9":
+"bn.js@npm:4.12.0, bn.js@npm:^4.0.0, bn.js@npm:^4.1.0, bn.js@npm:^4.11.0, bn.js@npm:^4.11.3, bn.js@npm:^4.11.6, bn.js@npm:^4.11.8, bn.js@npm:^4.11.9":
   version: 4.12.0
   resolution: "bn.js@npm:4.12.0"
   checksum: 39afb4f15f4ea537b55eaf1446c896af28ac948fdcf47171961475724d1bb65118cca49fa6e3d67706e4790955ec0e74de584e45c8f1ef89f46c812bee5b5a12
@@ -16259,7 +16250,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"browserify-aes@npm:^1.0.0, browserify-aes@npm:^1.0.4, browserify-aes@npm:^1.0.6, browserify-aes@npm:^1.2.0":
+"browserify-aes@npm:^1.0.0, browserify-aes@npm:^1.0.4, browserify-aes@npm:^1.2.0":
   version: 1.2.0
   resolution: "browserify-aes@npm:1.2.0"
   dependencies:
@@ -20472,17 +20463,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"drbg.js@npm:^1.0.1":
-  version: 1.0.1
-  resolution: "drbg.js@npm:1.0.1"
-  dependencies:
-    browserify-aes: ^1.0.6
-    create-hash: ^1.1.2
-    create-hmac: ^1.1.4
-  checksum: f8df5cdd4fb792e548d6187cbc446fbd0afd8f1ef7fa486e1c286c2adee55a687183ce48ab178e9f24965c2deabb6e2ba7a7ee2d675264b951356480eb042476
-  languageName: node
-  linkType: hard
-
 "driftless@npm:2.0.3, driftless@npm:^2.0.3":
   version: 2.0.3
   resolution: "driftless@npm:2.0.3"
@@ -22452,21 +22432,6 @@ __metadata:
     ethereumjs-common: ^1.5.0
     ethereumjs-util: ^6.0.0
   checksum: a5b607b4e125ed696d76a9e4db8a95e03a967323c66694912d799619b16fa43985336924221f9e7582dc1b09ff88a62116bf2290ee14d952bf7e6715e5728525
-  languageName: node
-  linkType: hard
-
-"ethereumjs-util@npm:6.1.0":
-  version: 6.1.0
-  resolution: "ethereumjs-util@npm:6.1.0"
-  dependencies:
-    bn.js: ^4.11.0
-    create-hash: ^1.1.2
-    ethjs-util: 0.1.6
-    keccak: ^1.0.2
-    rlp: ^2.0.0
-    safe-buffer: ^5.1.1
-    secp256k1: ^3.0.1
-  checksum: 76c87c2be9e380608e5bed21979483ad4d09c0aa9f9e3c9c913fbeff5610581631b661d6411c390556d8d47e56d7039861ae9c2821a54493cfab7fc88756315c
   languageName: node
   linkType: hard
 
@@ -29948,19 +29913,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"keccak@npm:^1.0.2":
-  version: 1.4.0
-  resolution: "keccak@npm:1.4.0"
-  dependencies:
-    bindings: ^1.2.1
-    inherits: ^2.0.3
-    nan: ^2.2.1
-    node-gyp: latest
-    safe-buffer: ^5.1.0
-  checksum: 236ba4183d64e1118566c4f123d812cc8fa5fb0fa477b6743bc398aced42595816f46a322bf0240a6a7589eff932aa1540066a30db2367e4049436d9fa30f537
-  languageName: node
-  linkType: hard
-
 "keccak@npm:^3.0.2":
   version: 3.0.3
   resolution: "keccak@npm:3.0.3"
@@ -33137,7 +33089,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nan@npm:^2.13.2, nan@npm:^2.14.0, nan@npm:^2.14.1, nan@npm:^2.15.0, nan@npm:^2.2.1":
+"nan@npm:^2.13.2, nan@npm:^2.14.1, nan@npm:^2.15.0":
   version: 2.15.0
   resolution: "nan@npm:2.15.0"
   dependencies:
@@ -38912,17 +38864,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rlp@npm:2.2.4":
-  version: 2.2.4
-  resolution: "rlp@npm:2.2.4"
-  dependencies:
-    bn.js: ^4.11.1
-  bin:
-    rlp: ./bin/rlp
-  checksum: 834043c740733860ba3d831a0ecfe45788644b125df922ad3328f783adbaddbfc8d00438293d506beafc313cfb1f2e4e9064c6fa87ba995638f244c57475d1a9
-  languageName: node
-  linkType: hard
-
 "rlp@npm:2.2.7, rlp@npm:^2.0.0, rlp@npm:^2.2.1, rlp@npm:^2.2.2, rlp@npm:^2.2.3, rlp@npm:^2.2.4":
   version: 2.2.7
   resolution: "rlp@npm:2.2.7"
@@ -39337,23 +39278,6 @@ __metadata:
     node-gyp: latest
     node-gyp-build: ^4.2.0
   checksum: 21e219adc0024fbd75021001358780a3cc6ac21273c3fcaef46943af73969729709b03f1df7c012a0baab0830fb9a06ccc6b42f8d50050c665cb98078eab477b
-  languageName: node
-  linkType: hard
-
-"secp256k1@npm:^3.0.1":
-  version: 3.8.0
-  resolution: "secp256k1@npm:3.8.0"
-  dependencies:
-    bindings: ^1.5.0
-    bip66: ^1.1.5
-    bn.js: ^4.11.8
-    create-hash: ^1.2.0
-    drbg.js: ^1.0.1
-    elliptic: ^6.5.2
-    nan: ^2.14.0
-    node-gyp: latest
-    safe-buffer: ^5.1.2
-  checksum: 37aaae687a8de9b7bc733ab26bc89c4302b9c681d69d71d531842d99d3af9301a4e30dbe40122793ec64b7a08b8fee8d2330397b7b2dd3a7e404ed259a458089
   languageName: node
   linkType: hard
 
@@ -46910,19 +46834,6 @@ __metadata:
     web3-shh: 1.10.1
     web3-utils: 1.10.1
   checksum: f70c6658daec5d860946081d5eeea55edd991a8d4bacdca1d8335859f6d34b08ba815803aff7001a32e36d482379e291fa1a68313cff4afa83717d54f8d42721
-  languageName: node
-  linkType: hard
-
-"web3js-quorum@npm:21.7.0-rc1":
-  version: 21.7.0-rc1
-  resolution: "web3js-quorum@npm:21.7.0-rc1"
-  dependencies:
-    ethereumjs-tx: ^2.1.2
-    ethereumjs-util: 6.1.0
-    lodash: ^4.17.21
-    request-promise-native: ^1.0.9
-    rlp: 2.2.4
-  checksum: a346c6cde3f00debf67512eff9d023d81645411f661d74989c695010cad0376af0d25901354b36c9e13b21ab35b79cd102cac8d1fc3a159db1b530eb71541ce4
   languageName: node
   linkType: hard
 
