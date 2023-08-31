@@ -1,6 +1,8 @@
 // Internal generated modules
 use weaverpb::common::ack::{ack, Ack};
-use weaverpb::driver::driver::PerformLockRequest;
+use weaverpb::driver::driver::{
+    AssignAssetRequest, CreateAssetRequest, ExtinguishRequest, PerformLockRequest,
+};
 use weaverpb::relay::satp::satp_server::Satp;
 use weaverpb::relay::satp::{
     AckCommenceRequest, AckFinalReceiptRequest, CommitFinalAssertionRequest, CommitPrepareRequest,
@@ -14,7 +16,8 @@ use crate::error::Error;
 use crate::relay_proto::parse_address;
 use crate::services::helpers::{println_stage_heading, println_step_heading};
 use crate::services::satp_helper::{
-    create_ack_error_message, create_perform_lock_request,
+    create_ack_error_message, create_assign_asset_request, create_create_asset_request,
+    create_extinguish_request, create_perform_lock_request,
     get_request_id_from_transfer_proposal_receipt, log_request_in_local_satp_db,
     log_request_in_remote_satp_db,
 };
@@ -26,10 +29,12 @@ use super::satp_helper::{
     create_commit_final_assertion_request, create_commit_prepare_request,
     create_commit_ready_request, create_lock_assertion_request, create_transfer_commence_request,
     create_transfer_completed_request, create_transfer_proposal_receipt_request,
-    get_driver_address_from_perform_lock, get_relay_from_ack_commence,
-    get_relay_from_ack_final_receipt, get_relay_from_commit_final_assertion,
-    get_relay_from_commit_prepare, get_relay_from_commit_ready, get_relay_from_lock_assertion,
-    get_relay_from_transfer_commence, get_relay_from_transfer_proposal_receipt, get_relay_params,
+    get_driver_address_from_assign_asset, get_driver_address_from_create_asset,
+    get_driver_address_from_extinguish, get_driver_address_from_perform_lock,
+    get_relay_from_ack_commence, get_relay_from_ack_final_receipt,
+    get_relay_from_commit_final_assertion, get_relay_from_commit_prepare,
+    get_relay_from_commit_ready, get_relay_from_lock_assertion, get_relay_from_transfer_commence,
+    get_relay_from_transfer_proposal_receipt, get_relay_params,
     get_request_id_from_transfer_proposal_claims, spawn_send_ack_commence_request,
     spawn_send_ack_final_receipt_broadcast_request, spawn_send_ack_final_receipt_request,
     spawn_send_assign_asset_request, spawn_send_commit_final_assertion_request,
@@ -785,7 +790,8 @@ pub fn process_ack_commence_request(
     // TODO some processing
     if is_valid_request {
         println!("The ack commence request is valid\n");
-        let perform_lock_request = create_perform_lock_request(ack_commence_request);
+        let perform_lock_request: PerformLockRequest =
+            create_perform_lock_request(ack_commence_request);
         match send_perform_lock_request(perform_lock_request, conf) {
             Ok(ack) => {
                 println!("Ack ack commence request.");
@@ -963,7 +969,9 @@ pub fn process_commit_prepare_request(
     // TODO some processing
     if is_valid_request {
         println!("The commit prepare request is valid\n");
-        match send_create_asset_request(commit_prepare_request, conf) {
+        let create_asset_request: CreateAssetRequest =
+            create_create_asset_request(commit_prepare_request);
+        match send_create_asset_request(create_asset_request, conf) {
             Ok(ack) => {
                 println!("Ack commit prepare request.");
                 let reply = Ok(ack);
@@ -998,7 +1006,8 @@ pub fn process_commit_ready_request(
     // TODO some processing
     if is_valid_request {
         println!("The commit ready request is valid\n");
-        match send_extinguish_request(commit_ready_request, conf) {
+        let extinguish_request: ExtinguishRequest = create_extinguish_request(commit_ready_request);
+        match send_extinguish_request(extinguish_request, conf) {
             Ok(ack) => {
                 println!("Ack commit ready request.");
                 let reply = Ok(ack);
@@ -1034,7 +1043,9 @@ pub fn process_commit_final_assertion_request(
     // TODO some processing
     if is_valid_request {
         println!("The commit final assertion request is valid\n");
-        match send_assign_asset_request(commit_final_assertion_request, conf) {
+        let assign_asset_request: AssignAssetRequest =
+            create_assign_asset_request(commit_final_assertion_request);
+        match send_assign_asset_request(assign_asset_request, conf) {
             Ok(ack) => {
                 println!("Ack commit final assertion request.");
                 let reply = Ok(ack);
@@ -1312,59 +1323,72 @@ fn send_commit_ready_request(
 }
 
 fn send_create_asset_request(
-    commit_prepare_request: CommitPrepareRequest,
+    create_asset_request: CreateAssetRequest,
     conf: config::Config,
 ) -> Result<Ack, Error> {
     // TODO
     println_step_heading("3.2A".to_string());
-    let request_id = &commit_prepare_request.session_id.to_string();
-    let (relay_host, relay_port) = get_relay_from_commit_prepare(commit_prepare_request.clone());
-    let (use_tls, tlsca_cert_path) =
-        get_relay_params(relay_host.clone(), relay_port.clone(), conf.clone());
 
-    spawn_send_create_asset_request(
-        commit_prepare_request,
-        relay_host,
-        relay_port,
-        use_tls,
-        tlsca_cert_path,
-        conf,
-    );
+    let request_id = &create_asset_request.session_id.to_string();
+    let driver_address = get_driver_address_from_create_asset(create_asset_request.clone());
+    let parsed_address = parse_address(driver_address)?;
+    let result = get_driver(parsed_address.network_id.to_string(), conf.clone());
 
-    let reply = Ack {
-        status: ack::Status::Ok as i32,
-        request_id: request_id.to_string(),
-        message: "Ack of the commit prepare request".to_string(),
-    };
-    return Ok(reply);
+    match result {
+        Ok(driver_info) => {
+            spawn_send_create_asset_request(driver_info, create_asset_request);
+            let reply = Ack {
+                status: ack::Status::Ok as i32,
+                request_id: request_id.to_string(),
+                message: "Ack of the commit prepare request".to_string(),
+            };
+            return Ok(reply);
+        }
+        Err(e) => {
+            return Ok(Ack {
+                status: ack::Status::Error as i32,
+                request_id: request_id.to_string(),
+                message: format!(
+                    "Error: Ack of the commit prepare request failed. Driver not found {:?}",
+                    e
+                ),
+            });
+        }
+    }
 }
 
 fn send_extinguish_request(
-    commit_ready_request: CommitReadyRequest,
+    extinguish_request: ExtinguishRequest,
     conf: config::Config,
 ) -> Result<Ack, Error> {
     // TODO
     println_step_heading("3.4A".to_string());
-    let request_id = &commit_ready_request.session_id.to_string();
-    let (relay_host, relay_port) = get_relay_from_commit_ready(commit_ready_request.clone());
-    let (use_tls, tlsca_cert_path) =
-        get_relay_params(relay_host.clone(), relay_port.clone(), conf.clone());
+    let request_id = &extinguish_request.session_id.to_string();
+    let driver_address = get_driver_address_from_extinguish(extinguish_request.clone());
+    let parsed_address = parse_address(driver_address)?;
+    let result = get_driver(parsed_address.network_id.to_string(), conf.clone());
 
-    spawn_send_extinguish_request(
-        commit_ready_request,
-        relay_host,
-        relay_port,
-        use_tls,
-        tlsca_cert_path,
-        conf,
-    );
-
-    let reply = Ack {
-        status: ack::Status::Ok as i32,
-        request_id: request_id.to_string(),
-        message: "Ack of the commit prepare request".to_string(),
-    };
-    return Ok(reply);
+    match result {
+        Ok(driver_info) => {
+            spawn_send_extinguish_request(driver_info, extinguish_request);
+            let reply = Ack {
+                status: ack::Status::Ok as i32,
+                request_id: request_id.to_string(),
+                message: "Ack of the commit prepare request".to_string(),
+            };
+            return Ok(reply);
+        }
+        Err(e) => {
+            return Ok(Ack {
+                status: ack::Status::Error as i32,
+                request_id: request_id.to_string(),
+                message: format!(
+                    "Error: Ack of the commit prepare request failed. Driver not found {:?}",
+                    e
+                ),
+            });
+        }
+    }
 }
 
 fn send_commit_final_assertion_request(
@@ -1400,7 +1424,6 @@ fn send_ack_final_receipt_request(
     conf: config::Config,
 ) -> Result<Ack, Error> {
     // TODO
-    println_step_heading("3.8".to_string());
     let request_id = &ack_final_receipt_request.session_id.to_string();
     let (relay_host, relay_port) =
         get_relay_from_ack_final_receipt(ack_final_receipt_request.clone());
@@ -1425,32 +1448,37 @@ fn send_ack_final_receipt_request(
 }
 
 fn send_assign_asset_request(
-    commit_final_assertion_request: CommitFinalAssertionRequest,
+    assign_asset_request: AssignAssetRequest,
     conf: config::Config,
 ) -> Result<Ack, Error> {
     // TODO
     println_step_heading("3.6A".to_string());
-    let request_id = &commit_final_assertion_request.session_id.to_string();
-    let (relay_host, relay_port) =
-        get_relay_from_commit_final_assertion(commit_final_assertion_request.clone());
-    let (use_tls, tlsca_cert_path) =
-        get_relay_params(relay_host.clone(), relay_port.clone(), conf.clone());
+    let request_id = &assign_asset_request.session_id.to_string();
+    let driver_address = get_driver_address_from_assign_asset(assign_asset_request.clone());
+    let parsed_address = parse_address(driver_address)?;
+    let result = get_driver(parsed_address.network_id.to_string(), conf.clone());
 
-    spawn_send_assign_asset_request(
-        commit_final_assertion_request,
-        relay_host,
-        relay_port,
-        use_tls,
-        tlsca_cert_path,
-        conf,
-    );
-
-    let reply = Ack {
-        status: ack::Status::Ok as i32,
-        request_id: request_id.to_string(),
-        message: "Ack of the commit prepare request".to_string(),
-    };
-    return Ok(reply);
+    match result {
+        Ok(driver_info) => {
+            spawn_send_assign_asset_request(driver_info, assign_asset_request);
+            let reply = Ack {
+                status: ack::Status::Ok as i32,
+                request_id: request_id.to_string(),
+                message: "Ack of the commit final assertion request".to_string(),
+            };
+            return Ok(reply);
+        }
+        Err(e) => {
+            return Ok(Ack {
+                status: ack::Status::Error as i32,
+                request_id: request_id.to_string(),
+                message: format!(
+                    "Error: Ack of the commit final assertion request failed. Driver not found {:?}",
+                    e
+                ),
+            });
+        }
+    }
 }
 
 fn send_ack_final_receipt_broadcast_request(
@@ -1458,6 +1486,7 @@ fn send_ack_final_receipt_broadcast_request(
     conf: config::Config,
 ) -> Result<Ack, Error> {
     // TODO
+    println_step_heading("3.8".to_string());
     let request_id = &ack_final_receipt_request.session_id.to_string();
     let (relay_host, relay_port) =
         get_relay_from_ack_final_receipt(ack_final_receipt_request.clone());
