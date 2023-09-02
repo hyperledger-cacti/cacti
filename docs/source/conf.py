@@ -37,7 +37,7 @@ release = '{}'.format(config['version'])
 extensions = [
     'sphinx.ext.todo',
     'sphinx_markdown_tables',
- #   'recommonmark',
+    'recommonmark',  # Uncomment this line
     'sphinx.ext.viewcode',
     'myst_parser',
     'sphinxemoji.sphinxemoji'
