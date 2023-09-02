@@ -9,3 +9,6 @@ sphinx-markdown-tables
 
 # Install the emojis pack
 sphinxemoji
+
+# Install MyST parser
+myst-parser
