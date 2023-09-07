@@ -5,9 +5,16 @@
  -->
 
 ## Integration tests for `asset-exchange` using go-sdk
-A sample of integration tests for asset-exchange can be exercised by running the file `exerciseSDK.go`.
+To run integration tests:
+- First, [launch a pair of test networks](../../../tests/network-setups/fabric/dev/), one of which must be a Fabric network.
+- Next, navigate to the [Go CLI](../../../samples/fabric/go-cli/) folder to run test scripts as per the below instructions.
 
-Before executing `go run exerciseSDK.go`, please ensure that the below `keys` are populated appropriately in the network connection profile (e.g., in the network1 connection profile available at `../../../tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json`).
+Integration tests for data-sharing and asset-exchange are programmed in the file `exerciseSDK.go`. You can run this in either of the following ways:
+- Compile the source using `go build -o ./bin/exerciseSDK exerciseSDK.go`, and then run the executable `./bin/exerciseSDK`.
+- Build and run the executable using `go run exerciseSDK.go`.
+
+Before running the tests, please ensure that the below `keys` are populated appropriately in the network connection profile (e.g., in the network1 connection profile available at `../../../tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json`).
+
 ### keys in the connection profile `json` file: channels, orderers, certificateAuthorities
 
 Sample content for the values of these keys can be found in the file `helpers/testdata/example/peerOrganizations/org1.example.com/connection-tls.json` (please note that the value of the key "certificateAuthorities"."ca.org1.example.com"."tlsCACerts"."pem" in this file is an array).

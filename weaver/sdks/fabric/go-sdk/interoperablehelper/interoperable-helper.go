@@ -10,10 +10,13 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"bytes"
 	"fmt"
 	"strings"
 
 	"github.com/google/uuid"
+	"github.com/golang/protobuf/proto"
+	"github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/hyperledger/cacti/weaver/common/protos-go/v2/common"
 	"github.com/hyperledger/cacti/weaver/common/protos-go/v2/corda"
 	"github.com/hyperledger/cacti/weaver/common/protos-go/v2/fabric"
@@ -220,16 +223,40 @@ func isPatternAndAddressMatch(pattern string, address string) bool {
  * Argument is a View protobuf ('statePb.View')
  **/
 func GetResponseDataFromView(view *common.View) ([]byte, error) {
-	var interopPayload common.InteropPayload
+	var viewAddress string
+	var viewPayload []byte
 	if view.Meta.Protocol == common.Meta_FABRIC {
 		var fabricViewData fabric.FabricView
 		err := protoV2.Unmarshal(view.Data, &fabricViewData)
 		if err != nil {
 			return nil, logThenErrorf("fabricView unmarshal error: %s", err.Error())
 		}
-		err = protoV2.Unmarshal(fabricViewData.Response.Payload, &interopPayload)
-		if err != nil {
-			return nil, logThenErrorf("unable to unmarshal interopPayload: %s", err.Error())
+		for i := 0; i < len(fabricViewData.EndorsedProposalResponses); i++ {
+			var ccAction peer.ChaincodeAction
+			err = proto.Unmarshal(fabricViewData.EndorsedProposalResponses[i].GetPayload().GetExtension(), &ccAction)
+			if err != nil {
+				return nil, logThenErrorf("unable to unmarshal chaincodeAction: %s", err.Error())
+			}
+			var interopPayload common.InteropPayload
+			err = protoV2.Unmarshal(ccAction.Response.Payload, &interopPayload)
+			if err != nil {
+				return nil, logThenErrorf("unable to unmarshal interopPayload: %s", err.Error())
+			}
+			if interopPayload.GetConfidential() {
+				// TODO Add support for confidential (encrypted) view payloads
+				return nil, logThenErrorf("Encrypted view payloads not currently supported in Weaver Go SDK")
+			}
+			if i == 0 {
+				viewAddress = interopPayload.GetAddress()
+				viewPayload = interopPayload.GetPayload()
+			} else {
+				if viewAddress != interopPayload.GetAddress() {
+					return nil, logThenErrorf("Proposal response view addresses mismatch: 0 - %s, %d - %s", viewAddress, i, interopPayload.GetAddress())
+				}
+				if bytes.Compare(viewPayload, interopPayload.GetPayload()) != 0 {
+					return nil, logThenErrorf("Proposal response payloads mismatch: 0 - %s, %d - %s", string(viewPayload), i, string(interopPayload.GetPayload()))
+				}
+			}
 		}
 	} else if view.Meta.Protocol == common.Meta_CORDA {
 		var cordaViewData corda.ViewData
@@ -237,14 +264,32 @@ func GetResponseDataFromView(view *common.View) ([]byte, error) {
 		if err != nil {
 			return nil, fmt.Errorf("cordaView unmarshal error: %s", err.Error())
 		}
-		err = protoV2.Unmarshal(cordaViewData.Payload, &interopPayload)
-		if err != nil {
-			return nil, fmt.Errorf("unable to unmarshal interopPayload: %s", err.Error())
+		for i := 0; i < len(cordaViewData.NotarizedPayloads); i++ {
+			var interopPayload common.InteropPayload
+			err = protoV2.Unmarshal(cordaViewData.NotarizedPayloads[i].Payload, &interopPayload)
+			if err != nil {
+				return nil, fmt.Errorf("unable to unmarshal interopPayload: %s", err.Error())
+			}
+			if interopPayload.GetConfidential() {
+				// TODO Add support for confidential (encrypted) view payloads
+				return nil, logThenErrorf("Encrypted view payloads not currently supported in Weaver Go SDK")
+			}
+			if i == 0 {
+				viewAddress = interopPayload.GetAddress()
+				viewPayload = interopPayload.GetPayload()
+			} else {
+				if viewAddress != interopPayload.GetAddress() {
+					return nil, logThenErrorf("Proposal response view addresses mismatch: 0 - %s, %d - %s", viewAddress, i, interopPayload.GetAddress())
+				}
+				if bytes.Compare(viewPayload, interopPayload.GetPayload()) != 0 {
+					return nil, logThenErrorf("Proposal response payloads mismatch: 0 - %s, %d - %s", string(viewPayload), i, string(interopPayload.GetPayload()))
+				}
+			}
 		}
 	} else {
 		return nil, logThenErrorf("cannot extract data from view; unsupported DLT type: %+v", view.Meta.Protocol)
 	}
-	return interopPayload.Payload, nil
+	return viewPayload, nil
 }
 
 func verifyView(contract GatewayContract, b64ViewProto string, address string) error {
