@@ -894,6 +894,7 @@ func main() {
 	// need the chaincodes simplestate and interop to exercise the below interop calls
 	//interop("a", "network1", "Org1MSP", "localhost:9080/network1/mychannel:simplestate:Read:a")
 	//interop("a", "network1", "Org1MSP", "localhost:9083/network2/mychannel:simplestate:Read:Arcturus")
+	//interop("c", "network2", "Org1MSP", "relay-network1:9080/network1/mychannel:simplestate:Read:c")
 
 	//configureNetwork("network1")
 	//fetchAccessControlPolicy("network1")

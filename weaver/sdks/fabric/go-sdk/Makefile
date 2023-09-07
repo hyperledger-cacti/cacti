@@ -9,7 +9,7 @@ undo-vendor:
 build-local: run-vendor build undo-vendor
 
 build:
-	go build -v .
+	go build -v ./...
 
 clean:
 	rm -rf vendor
