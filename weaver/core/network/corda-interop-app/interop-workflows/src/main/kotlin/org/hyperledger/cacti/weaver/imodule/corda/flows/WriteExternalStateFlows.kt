@@ -34,6 +34,7 @@ import org.hyperledger.cacti.weaver.protos.corda.ViewDataOuterClass
 import org.hyperledger.cacti.weaver.protos.common.interop_payload.InteropPayloadOuterClass
 import org.hyperledger.cacti.weaver.imodule.corda.contracts.ExternalStateContract
 import org.hyperledger.cacti.weaver.imodule.corda.states.ExternalState
+import org.hyperledger.cacti.weaver.imodule.corda.states.InvocationSpec
 
 
 /**
@@ -44,15 +45,17 @@ import org.hyperledger.cacti.weaver.imodule.corda.states.ExternalState
  * @property view The view received from the foreign network.
  * @property address The address of the view, containing a location, securityDomain and view segment.
  */
+
 @InitiatingFlow
 @StartableByRPC
 class WriteExternalStateInitiator
-    @JvmOverloads
-    constructor(
-        val viewBase64String: String,
-        val address: String,
-        val participants: List<Party> = listOf<Party>()
-    ): FlowLogic<Either<Error, UniqueIdentifier>>() {
+@JvmOverloads
+constructor(
+    val views64: Array<String>,
+    val addresses: Array<String>,
+    val invokeObject: InvocationSpec = InvocationSpec(),
+    val participants: List<Party> = listOf<Party>()
+): FlowLogic<Either<Error, Any>>() {
 
     /**
      * The call() method captures the logic to perform the proof validation and the construction of
@@ -61,51 +64,85 @@ class WriteExternalStateInitiator
      * @return Returns the linearId of the newly created [ExternalState].
      */
     @Suspendable
-    override fun call(): Either<Error, UniqueIdentifier> = try {
-        println("External network returned view: $viewBase64String\n")
+    override fun call(): Either<Error, Any> {
+        try {
+            var externalStatesLinearIdArray = Array<UniqueIdentifier>(addresses.size) { UniqueIdentifier() }
+            for (i in 0..addresses.size-1)    {
+                val viewBase64String = views64[i]
+                val address = addresses[i]
+            
+                println("External network returned view #${i}: $viewBase64String\n")
 
-        val view = State.View.parseFrom(Base64.getDecoder().decode(viewBase64String))
+                val view = State.View.parseFrom(Base64.getDecoder().decode(viewBase64String))
 
-        // 1. Verify the proofs that are returned
-        verifyView(view, address, serviceHub).flatMap {
-            println("View verification successful. Creating state to be stored in the vault.")
-            // 2. Create the state to be stored
-            var externalStateParticipants = if (participants.contains(ourIdentity)) { participants } else { listOf(ourIdentity) + participants }
-            val state = ExternalState(
-                    linearId = UniqueIdentifier(),
-                    participants = externalStateParticipants,
-                    meta = view.meta.toByteArray(),
-                    state = view.data.toByteArray())
-            println("Storing ExternalState in the vault:\n\tLinear Id = ${state.linearId}\n\tParticipants = ${state.participants}\n\tMeta = ${view.meta}\tState = ${Base64.getEncoder().encodeToString(state.state)}\n")
+                // 1. Verify the proofs that are returned
+                val verifyResult = verifyView(view, address, serviceHub).fold({
+                    println("View verification failed with error: ${it.message}")
+                    Left(Error("View verification failed with error: ${it.message}"))
+                }, {
+                    println("View verification successful. Creating state to be stored in the vault.")
+                    // 2. Create the state to be stored
+                    var externalStateParticipants = if (participants.contains(ourIdentity)) { participants } else { listOf(ourIdentity) + participants }
+                    val state = ExternalState(
+                            linearId = UniqueIdentifier(),
+                            participants = externalStateParticipants,
+                            meta = view.meta.toByteArray(),
+                            state = view.data.toByteArray())
+                    println("Storing ExternalState in the vault:\n\tLinear Id = ${state.linearId}\n\tParticipants = ${state.participants}\n\tMeta = ${view.meta}\tState = ${Base64.getEncoder().encodeToString(state.state)}\n")
 
-            // 3. Build the transaction
-            val notary = serviceHub.networkMapCache.notaryIdentities.first()
-            val command = Command(ExternalStateContract.Commands.Create(), ourIdentity.owningKey)
-            val txBuilder = TransactionBuilder(notary)
-                    .addOutputState(state, ExternalStateContract.ID)
-                    .addCommand(command)
+                    // 3. Build the transaction
+                    val notary = serviceHub.networkMapCache.notaryIdentities.first()
+                    val command = Command(ExternalStateContract.Commands.Create(), externalStateParticipants.map { it.owningKey })
+                    val txBuilder = TransactionBuilder(notary)
+                            .addOutputState(state, ExternalStateContract.ID)
+                            .addCommand(command)
 
-            // 4. Verify and collect signatures on the transaction
-            txBuilder.verify(serviceHub)
-            val tx = serviceHub.signInitialTransaction(txBuilder)
-            var sessions = listOf<FlowSession>()
-            for (party in externalStateParticipants) {
-                if (!ourIdentity.equals(party)) {
-                    val session = initiateFlow(party)
-                    session.send(address)
-                    sessions += session
+                    // 4. Verify and collect signatures on the transaction
+                    txBuilder.verify(serviceHub)
+                    val tx = serviceHub.signInitialTransaction(txBuilder)
+                    var sessions = listOf<FlowSession>()
+                    for (party in externalStateParticipants) {
+                        if (!ourIdentity.equals(party)) {
+                            println("Sending Tx to ${party}")
+                            val session = initiateFlow(party)
+                            session.send(address)
+                            sessions += session
+                        }
+                    }
+                    
+                    val stx = subFlow(CollectSignaturesFlow(tx, sessions))
+                    val storedExternalState = subFlow(FinalityFlow(
+                        stx,
+                        sessions)).tx.outputStates.first() as ExternalState
+
+                    // 5. Return the linearId of the state
+                    println("State stored successfully.\n")
+                    externalStatesLinearIdArray[i] = storedExternalState.linearId
+                    Right(Unit)
+                })
+                if (verifyResult.isLeft()) {
+                    return verifyResult
                 }
             }
-            
-            val stx = subFlow(CollectSignaturesFlow(tx, sessions))
-            subFlow(FinalityFlow(stx, sessions))
-
-            // 5. Return the linearId of the state
-            println("State stored successfully.\n")
-            Right(state.linearId)
+            if (invokeObject.disableInvocation)   {
+                println("Invocation disabled!")
+                return Right(externalStatesLinearIdArray)
+            } else {
+                val argsMList = invokeObject.invokeFlowArgs.toMutableList()
+                argsMList[invokeObject.interopArgsIndex] = externalStatesLinearIdArray
+                println("Calling Workflow: ${invokeObject.invokeFlowName} with args: ${argsMList}")
+                val userFlow = resolveGenericFlow(invokeObject.invokeFlowName, argsMList.toList())
+                return userFlow.fold({
+                    println("Error in resolving user flow: ${it.message}")
+                    Left(Error("Error in resolving user flow: ${it.message}"))
+                }, {
+                    Right(subFlow(it))
+                })
+            }
+        } catch (e: Exception) {
+            println("Error in WriteExternalState: ${e.message}")
+            return Left(Error("Error in WriteExternalState: ${e.message}"))
         }
-    } catch (e: Exception) {
-        Left(Error("Failed to store state in ledger: ${e.message}"))
     }
 }
 
@@ -129,7 +166,7 @@ class WriteExternalStateAcceptor(val session: FlowSession) : FlowLogic<SignedTra
         }
         try {
             val txId = subFlow(signTransactionFlow).id
-            println("Issuer signed transaction.")
+            println("${ourIdentity} signed transaction.")
             return subFlow(ReceiveFinalityFlow(session, expectedTxId = txId))
         } catch (e: Exception) {
             val errorMsg = "Error signing write external state transaction: ${e.message}\n"
@@ -169,80 +206,7 @@ class GetExternalStateByLinearId(
             println("Error: Could not find external state with linearId $linearId")
             throw IllegalArgumentException("Error: Could not find external state with linearId $linearId")
         } else {
-            val viewMetaByteArray = states.first().state.data.meta
-            val viewDataByteArray = states.first().state.data.state
-            val meta = State.Meta.parseFrom(viewMetaByteArray)
-
-            when (meta.protocol) {
-                State.Meta.Protocol.CORDA -> {
-                    val cordaViewData = ViewDataOuterClass.ViewData.parseFrom(viewDataByteArray)
-                    println("cordaViewData: $cordaViewData")
-                    val interopPayload = InteropPayloadOuterClass.InteropPayload.parseFrom(cordaViewData.notarizedPayloadsList[0].payload)
-                    val payloadString = interopPayload.payload.toStringUtf8()
-                    println("response from remote: ${payloadString}.\n")
-                    println("query address: ${interopPayload.address}.\n")
-                    val viewData = ViewDataOuterClass.ViewData.newBuilder()
-                            .addAllNotarizedPayloads(cordaViewData.notarizedPayloadsList)
-                            .build()
-                            
-                    return viewData.toByteArray()
-                }
-                State.Meta.Protocol.FABRIC -> {
-                    val fabricViewData = ViewData.FabricView.parseFrom(viewDataByteArray)
-                    println("fabricViewData: $fabricViewData")
-                    // TODO: We assume here that the response payloads have been matched earlier, but perhaps we should match them here too
-                    val chaincodeAction = ProposalPackage.ChaincodeAction.parseFrom(fabricViewData.endorsedProposalResponsesList[0].payload.extension)
-                    val interopPayload = InteropPayloadOuterClass.InteropPayload.parseFrom(chaincodeAction.response.payload)
-                    val payloadString = interopPayload.payload.toStringUtf8()
-                    println("response from remote: ${payloadString}.\n")
-                    println("query address: ${interopPayload.address}.\n")
-
-                    val securityDomain = interopPayload.address.split("/")[1]
-                    val proofStringPrefix = "Verified Proof: Endorsed by members: ["
-                    val proofStringSuffix = "] of security domain: $securityDomain"
-                    var mspIdList = ""
-                    fabricViewData.endorsedProposalResponsesList.map { endorsedProposalResponse ->
-                        val endorsement = endorsedProposalResponse.endorsement
-                        val mspId = Identities.SerializedIdentity.parseFrom(endorsement.endorser).mspid
-                        if (mspIdList.isNotEmpty()) {
-                            mspIdList += ", "
-                        }
-                        mspIdList += mspId
-                    }
-                    val proofMessage = proofStringPrefix + mspIdList + proofStringSuffix
-                    println("Proof Message: ${proofMessage}.\n")
-
-                    var notarizationList: List<ViewDataOuterClass.ViewData.NotarizedPayload> = listOf()
-
-                    fabricViewData.endorsedProposalResponsesList.map { endorsedProposalResponse ->
-                        val endorsement = endorsedProposalResponse.endorsement
-                        val serializedIdentity = Identities.SerializedIdentity.parseFrom(endorsement.endorser)
-                        val mspId = serializedIdentity.mspid
-                        val certString = Base64.getEncoder().encodeToString(serializedIdentity.idBytes.toByteArray())
-                        val signature = Base64.getEncoder().encodeToString(endorsement.signature.toByteArray())
-                        
-                        val notarization = ViewDataOuterClass.ViewData.NotarizedPayload.newBuilder()
-                                .setCertificate(certString)
-                                .setSignature(signature)
-                                .setId(mspId)
-                                .setPayload(chaincodeAction.response.payload)
-                                .build()
-                        notarizationList = notarizationList + notarization
-                    }
-
-                    val viewData = ViewDataOuterClass.ViewData.newBuilder()
-                            .addAllNotarizedPayloads(notarizationList)
-                            .build()
-                            
-                    return viewData.toByteArray()
-                }
-                else -> {
-                    println("GetExternalStateByLinearId Error: Unrecognized protocol.\n")
-                    throw IllegalArgumentException("Error: Unrecognized protocol.")
-                }
-            }
-
-
+            return getViewFromExternalState(states.first().state.data)
         }
     }
 
@@ -281,4 +245,103 @@ class GetExternalStateAndRefByLinearId(
         }
     }
 
+}
+
+fun getViewFromExternalState(state: ExternalState): ByteArray  {
+    val viewMetaByteArray = state.meta
+    val viewDataByteArray = state.state
+    val meta = State.Meta.parseFrom(viewMetaByteArray)
+    var viewData = when (meta.protocol) {
+        State.Meta.Protocol.CORDA -> {
+            val cordaViewData = ViewDataOuterClass.ViewData.parseFrom(viewDataByteArray)
+            println("cordaViewData: $cordaViewData")
+            val interopPayload = InteropPayloadOuterClass.InteropPayload.parseFrom(cordaViewData.notarizedPayloadsList[0].payload)
+            val payloadString = interopPayload.payload.toStringUtf8()
+            println("response from remote: ${payloadString}.\n")
+            println("query address: ${interopPayload.address}.\n")
+            ViewDataOuterClass.ViewData.newBuilder()
+                .addAllNotarizedPayloads(cordaViewData.notarizedPayloadsList)
+                .build()
+        }
+        State.Meta.Protocol.FABRIC -> {
+            val fabricViewData = ViewData.FabricView.parseFrom(viewDataByteArray)
+            println("fabricViewData: $fabricViewData")
+            // TODO: We assume here that the response payloads have been matched earlier, but perhaps we should match them here too
+            val chaincodeAction = ProposalPackage.ChaincodeAction.parseFrom(fabricViewData.endorsedProposalResponsesList[0].payload.extension)
+            val interopPayload = InteropPayloadOuterClass.InteropPayload.parseFrom(chaincodeAction.response.payload)
+            val payloadString = interopPayload.payload.toStringUtf8()
+            println("response from remote: ${payloadString}.\n")
+            println("query address: ${interopPayload.address}.\n")
+
+            val securityDomain = interopPayload.address.split("/")[1]
+            val proofStringPrefix = "Verified Proof: Endorsed by members: ["
+            val proofStringSuffix = "] of security domain: $securityDomain"
+            var mspIdList = ""
+            fabricViewData.endorsedProposalResponsesList.map { endorsedProposalResponse ->
+                val endorsement = endorsedProposalResponse.endorsement
+                val mspId = Identities.SerializedIdentity.parseFrom(endorsement.endorser).mspid
+                if (mspIdList.isNotEmpty()) {
+                    mspIdList += ", "
+                }
+                mspIdList += mspId
+            }
+            val proofMessage = proofStringPrefix + mspIdList + proofStringSuffix
+            println("Proof Message: ${proofMessage}.\n")
+
+            var notarizationList: List<ViewDataOuterClass.ViewData.NotarizedPayload> = listOf()
+
+            fabricViewData.endorsedProposalResponsesList.map { endorsedProposalResponse ->
+                val endorsement = endorsedProposalResponse.endorsement
+                val serializedIdentity = Identities.SerializedIdentity.parseFrom(endorsement.endorser)
+                val mspId = serializedIdentity.mspid
+                val certString = Base64.getEncoder().encodeToString(serializedIdentity.idBytes.toByteArray())
+                val signature = Base64.getEncoder().encodeToString(endorsement.signature.toByteArray())
+                
+                val notarization = ViewDataOuterClass.ViewData.NotarizedPayload.newBuilder()
+                        .setCertificate(certString)
+                        .setSignature(signature)
+                        .setId(mspId)
+                        .setPayload(chaincodeAction.response.payload)
+                        .build()
+                notarizationList = notarizationList + notarization
+            }
+
+            ViewDataOuterClass.ViewData.newBuilder()
+                .addAllNotarizedPayloads(notarizationList)
+                .build()
+        }
+        else -> {
+            println("GetExternalStateByLinearId Error: Unrecognized protocol.\n")
+            throw IllegalArgumentException("Error: Unrecognized protocol.")
+        }
+    }
+    return viewData.toByteArray()
+}
+
+fun getPayloadFromView(viewBytes: ByteArray): ByteArray {
+    val externalStateView = ViewDataOuterClass.ViewData.parseFrom(viewBytes)
+    val interopPayload = InteropPayloadOuterClass.InteropPayload.parseFrom(externalStateView.notarizedPayloadsList[0].payload)
+    return interopPayload.payload.toByteArray()
+}
+
+@Suppress("UNCHECKED_CAST")
+fun resolveGenericFlow(flowName: String, flowArgs: List<Any>): Either<Error, FlowLogic<Any>> = try {
+    println("Attempting to resolve $flowName to a Corda flow.")
+    val kotlinClass = Class.forName(flowName).kotlin
+    val ctor = kotlinClass.constructors.first()
+    if (ctor.parameters.size != flowArgs.size) {
+        println("Flow Resolution Error: wrong number of arguments supplied.\n")
+        Left(Error("Flow Resolution Error: wrong number of arguments supplied"))
+    } else {
+        println("Resolved flow to ${ctor}")
+        try {
+            Right(ctor.call(*flowArgs.toTypedArray()) as FlowLogic<Any>)
+        } catch (e: Exception) {
+            println("Flow Resolution Error: $flowName not a flow: ${e.message}.\n")
+            Left(Error("Flow Resolution Error: $flowName not a flow"))
+        }
+    }
+} catch (e: Exception) {
+    println("Flow Resolution Error: ${e.message} \n")
+    Left(Error("Flow Resolution Error: ${e.message}"))
 }

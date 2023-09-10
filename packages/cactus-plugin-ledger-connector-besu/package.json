@@ -70,7 +70,7 @@
     "web3-core": "1.6.1",
     "web3-eth": "1.6.1",
     "web3-utils": "1.6.1",
-    "web3js-quorum": "21.7.0-rc1"
+    "web3js-quorum": "22.4.0"
   },
   "devDependencies": {
     "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-alpha.1",
