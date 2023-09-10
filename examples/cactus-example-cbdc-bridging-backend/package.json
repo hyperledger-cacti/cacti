@@ -96,7 +96,7 @@
     "@types/uuid": "8.3.4",
     "chai": "^4.1.2",
     "cucumber": "^5.0.3",
-    "hardhat": "2.6.0",
+    "hardhat": "2.17.2",
     "http-status-codes": "2.1.4",
     "jose": "4.9.2",
     "remix-tests": "^0.1.34",
