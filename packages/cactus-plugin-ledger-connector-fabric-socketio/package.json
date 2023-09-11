@@ -31,7 +31,7 @@
     "lodash": "4.17.21",
     "log4js": "6.4.1",
     "morgan": "1.10.0",
-    "protobufjs": "5.0.3",
+    "protobufjs": "7.2.5",
     "serve-favicon": "2.4.5",
     "shelljs": "0.8.5",
     "socket.io": "4.5.4"
