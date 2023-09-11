@@ -38182,13 +38182,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"source-map@npm:~0.7.2":
-  version: 0.7.3
-  resolution: "source-map@npm:0.7.3"
-  checksum: cd24efb3b8fa69b64bf28e3c1b1a500de77e84260c5b7f2b873f88284df17974157cc88d386ee9b6d081f08fdd8242f3fc05c953685a6ad81aad94c7393dedea
-  languageName: node
-  linkType: hard
-
 "spark-md5@npm:3.0.2":
   version: 3.0.2
   resolution: "spark-md5@npm:3.0.2"
@@ -39751,9 +39744,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"terser@npm:^5.16.8":
-  version: 5.19.2
-  resolution: "terser@npm:5.19.2"
+"terser@npm:^5.16.8, terser@npm:^5.7.2":
+  version: 5.19.4
+  resolution: "terser@npm:5.19.4"
   dependencies:
     "@jridgewell/source-map": ^0.3.3
     acorn: ^8.8.2
@@ -39761,21 +39754,7 @@ __metadata:
     source-map-support: ~0.5.20
   bin:
     terser: bin/terser
-  checksum: e059177775b4d4f4cff219ad89293175aefbd1b081252270444dc83e42a2c5f07824eb2a85eae6e22ef6eb7ef04b21af36dd7d1dd7cfb93912310e57d416a205
-  languageName: node
-  linkType: hard
-
-"terser@npm:^5.7.2":
-  version: 5.11.0
-  resolution: "terser@npm:5.11.0"
-  dependencies:
-    acorn: ^8.5.0
-    commander: ^2.20.0
-    source-map: ~0.7.2
-    source-map-support: ~0.5.20
-  bin:
-    terser: bin/terser
-  checksum: cc72b7a0e87421b5a6ef3f8a3c86ef251f6e7f8d6327b83c63045b8991a041cc4a42ea64e07701128e1786489902c8c44b5904056b0f12ceedb52924d493db04
+  checksum: 09273ce7d3fbe8fea0ec2603ad1c06cc304838bdac42bbfe77835b0b0b6c4a894054575ca518fe16c95d5c401574a8c703f4fde97da45f1c972ea568e6ecafda
   languageName: node
   linkType: hard
 
