@@ -6,7 +6,7 @@ CHAINCODE_PATH=$PWD/../shared/chaincode
 rm -rf $CHAINCODE_PATH/interop
 
 # interop cc module
-INTEROPCC_MOD=github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/contracts/interop/v2
+INTEROPCC_MOD=github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/contracts/interop/${CACTI_VERSION%%"."*}
 
 # custom gopath for convenient downloading
 mkdir $TMP_PATH
