@@ -5,7 +5,7 @@ import logger from './logger';
 import { credentials } from '@grpc/grpc-js';
 
 import { getNetworkConfig } from './helpers/helpers'
-import { AssetManager, HashFunctions } from '@hyperledger/cacti-weaver-sdk-fabric'
+import { SatpAssetManager, HashFunctions } from '@hyperledger/cacti-weaver-sdk-fabric'
 
 import fs from 'fs';
 import path from 'path';
@@ -23,6 +23,7 @@ async function performLockHelper(
     networkName: string
 ): Promise<any> {
 
+    // TODO: remove the hardcoded values 
     let performLockRequest2 = {};
     performLockRequest2['target-network'] = 'network1';
     performLockRequest2['hashBase64'] = 'ivHErp1x4bJDKuRo6L5bApO/DdoyD/dG0mAZrzLZEIs=';
@@ -31,11 +32,12 @@ async function performLockHelper(
     performLockRequest2['recipient'] = 'bob';
     performLockRequest2['param'] = 'bond01:a05';
 
-    // Locker and Recipient
+    // Locker and recipient
     const locker = performLockRequest2['locker'];
     const recipient = performLockRequest2['recipient'];
     let hashFn = performLockRequest2['hash_fn'];
     let hashBase64 = performLockRequest2['hashBase64'];
+    const targetNetwork = performLockRequest2['target-network'];
 
     // Hash
     let hash: HashFunctions.Hash
@@ -66,11 +68,11 @@ async function performLockHelper(
     }
 
     const params = performLockRequest2['param'].split(':')
-    const netConfig = getNetworkConfig(performLockRequest2['target-network'])
+    const netConfig = getNetworkConfig(targetNetwork)
 
     if (!netConfig.connProfilePath || !netConfig.channelName || !netConfig.chaincode) {
         console.error(
-            `Please use a valid --target-network. No valid environment found for ${performLockRequest2['target-network']} `
+            `Please use a valid --target-network. No valid environment found for ${targetNetwork} `
         )
         return
     }
@@ -79,7 +81,7 @@ async function performLockHelper(
         channel: netConfig.channelName,
         contractName: netConfig.chaincode,
         connProfilePath: netConfig.connProfilePath,
-        networkName: performLockRequest2['target-network'],
+        networkName: targetNetwork,
         mspId: netConfig.mspId,
         userString: locker
     })
@@ -92,14 +94,14 @@ async function performLockHelper(
     var funcToCall, asset
 
     if (performLockRequest2['fungible']) {
-        funcToCall = AssetManager.createFungibleHTLC
+        funcToCall = SatpAssetManager.createFungibleHTLC
         asset = 'Fungible Asset'
     } else {
-        funcToCall = AssetManager.createHTLC
+        funcToCall = SatpAssetManager.createHTLC
         asset = 'Asset'
     }
 
-    console.info(`Asset Exchange: Lock ${asset}:\n`);
+    console.info(`Asset Lock: Lock ${asset}:\n`);
     try {
         console.info(`Trying ${asset} Lock: ${params[0]}, ${params[1]} by ${locker} for ${recipient}`)
         // const res = await funcToCall(network.contract,
@@ -113,13 +115,11 @@ async function performLockHelper(
         //     throw new Error()
         // }
         // console.info(`${asset} Locked with Contract Id: ${res.result}, preimage: ${res.hash.getPreimage()}, hashvalue: ${res.hash.getSerializedHashBase64()}`)
-        console.info('Asset Exchange: Lock Complete.')
+        console.info('Asset has been locked successfully')
 
     } catch (error) {
-        console.error(`Could not Lock ${asset} in ${performLockRequest2['target-network']}`)
+        console.error(`Could not Lock ${asset} in ${targetNetwork}`)
     }
-
-    // await new Promise(f => setTimeout(f, performLockRequest2['timeout-duration'] * 1000 + 3000));
 
     await network.gateway.disconnect()
     logger.info('Gateways disconnected.')
@@ -136,7 +136,88 @@ async function createAssetHelper(
     networkName: string
 ): Promise<any> {
 
-    // TODO
+    // TODO: remove the hardcoded values 
+    let createAssetRequest2 = {};
+    createAssetRequest2['target-network'] = 'network1';
+    createAssetRequest2['hashBase64'] = 'ivHErp1x4bJDKuRo6L5bApO/DdoyD/dG0mAZrzLZEIs=';
+    createAssetRequest2['timeout-duration'] = parseInt('3600');
+    createAssetRequest2['owner'] = 'admin';
+    createAssetRequest2['type'] = 'bond';
+    createAssetRequest2['assetType'] = 'bond01';
+    createAssetRequest2['id'] = 'a065';
+    createAssetRequest2['issuer'] = 'admin';
+    createAssetRequest2['facevalue'] = '300';
+    createAssetRequest2['maturitydate'] = '05 May 48 00:00 MST';
+
+    const targetNetwork = createAssetRequest2['target-network'];
+    const owner = createAssetRequest2['owner'];
+    const ccType = createAssetRequest2['type'];
+    const assetType = createAssetRequest2['assetType'];
+    const id = createAssetRequest2['id'];
+    const issuer = createAssetRequest2['issuer'];
+    const facevalue = createAssetRequest2['facevalue'];
+    const maturitydate = createAssetRequest2['maturitydate'];
+    const tokenassettype = createAssetRequest2['tokenassettype'];
+    const numunits = createAssetRequest2['numunits'];
+
+    const netConfig = getNetworkConfig(targetNetwork)
+    console.info(netConfig)
+    if (!netConfig.connProfilePath || !netConfig.channelName || !netConfig.chaincode) {
+        console.error(
+            `Please use a valid --target-network. No valid environment found for ${targetNetwork} `
+        )
+        return
+    }
+
+    const currentQuery = {
+        channel: netConfig.channelName,
+        contractName: netConfig.chaincode,
+        ccFunc: '',
+        args: []
+    }
+
+    const network = await fabricHelper({
+        channel: netConfig.channelName,
+        contractName: netConfig.chaincode,
+        connProfilePath: netConfig.connProfilePath,
+        networkName: targetNetwork,
+        mspId: netConfig.mspId,
+        userString: owner,
+        registerUser: false
+    })
+
+    const userId = await network.wallet.get(owner)
+    const userCert = Buffer.from((userId).credentials.certificate).toString('base64')
+
+    if (ccType == 'bond') {
+        currentQuery.ccFunc = 'CreateAsset'
+        currentQuery.args = [...currentQuery.args, assetType, id, userCert, issuer, facevalue, maturitydate]
+    } else if (ccType == 'token') {
+        currentQuery.ccFunc = 'IssueTokenAssets'
+        currentQuery.args = [...currentQuery.args, tokenassettype, numunits, userCert]
+    } else {
+        throw new Error(`Unrecognized asset category: ${ccType}`)
+    }
+    console.log(currentQuery)
+
+    try {
+        console.info(`Trying creating the asset: type: ${ccType}, id: ${id}, by: ${owner}, facevalue: ${facevalue}, maturitydate: ${maturitydate}`)
+        const read = await network.contract.submitTransaction(currentQuery.ccFunc, ...currentQuery.args)
+        const state = Buffer.from(read).toString()
+        if (state) {
+            logger.debug(`Response From Network: ${state}`)
+            console.info('Asset has been created successfully')
+        } else {
+            logger.debug('No Response from network')
+        }
+    } catch (error) {
+        console.error(`Failed to submit transaction: ${error}`)
+        throw new Error(error)
+    }
+
+    await network.gateway.disconnect()
+    logger.info('Gateways disconnected.')
+
     const client = getRelayClientForAssetStatusResponse();
     const request = new satp_pb.SendAssetStatusRequest();
     request.setSessionId(createAssetRequest.getSessionId());
@@ -162,12 +243,106 @@ async function assignAssetHelper(
     networkName: string
 ): Promise<any> {
 
-    // TODO
-    const client = getRelayClientForAssetStatusResponse();
-    const request = new satp_pb.SendAssetStatusRequest();
-    request.setSessionId(assignAssetRequest.getSessionId());
-    request.setStatus("Finalized");
-    client.sendAssetStatus(request, relayCallback);
+    // TODO: remove the hardcoded values 
+    let assignAssetRequest2 = {};
+    assignAssetRequest2['target-network'] = 'network1';
+    assignAssetRequest2['hashBase64'] = 'ivHErp1x4bJDKuRo6L5bApO/DdoyD/dG0mAZrzLZEIs=';
+    assignAssetRequest2['timeout-duration'] = parseInt('3600');
+    assignAssetRequest2['locker'] = 'admin';
+    assignAssetRequest2['recipient'] = 'bob';
+    assignAssetRequest2['fungible'] = false;
+    assignAssetRequest2['contract-id'] = 'abc01';
+    assignAssetRequest2['hash_fn'] = '';
+    assignAssetRequest2['secret'] = 'secrettext';
+    assignAssetRequest2['param'] = 'bond01:a065';
+
+    const targetNetwork = assignAssetRequest2['target-network'];
+    const locker = assignAssetRequest2['locker'];
+    const recipient = assignAssetRequest2['recipient'];
+    const fungible = assignAssetRequest2['fungible'];
+    const hashFn = assignAssetRequest2['hash_fn'];
+    const secret = assignAssetRequest2['secret'];
+
+    // Hash
+    let hash: HashFunctions.Hash
+    if (hashFn == 'SHA512') {
+        hash = new HashFunctions.SHA512()
+    } else {
+        hash = new HashFunctions.SHA256()
+    }
+    hash.setPreimage(secret)
+
+    let contractId: string = null, params
+    if (assignAssetRequest2['contract-id']) {
+        contractId = assignAssetRequest2['contract-id']
+    }
+
+    params = assignAssetRequest2['param'].split(':')
+
+    const netConfig = getNetworkConfig(targetNetwork)
+    if (!netConfig.connProfilePath || !netConfig.channelName || !netConfig.chaincode) {
+        console.error(
+            `Please use a valid --target-network. No valid environment found for ${targetNetwork} `
+        )
+        return
+    }
+
+    const network = await fabricHelper({
+        channel: netConfig.channelName,
+        contractName: netConfig.chaincode,
+        connProfilePath: netConfig.connProfilePath,
+        networkName: targetNetwork,
+        mspId: netConfig.mspId,
+        userString: recipient
+    })
+
+    var funcToCall = SatpAssetManager.assignAsset
+    var asset = assignAssetRequest2['param']
+
+    if (assignAssetRequest2['fungible']) {
+        // funcToCall = SatpAssetManager.claimFungibleAssetInHTLC
+        asset = 'Fungible Asset'
+    }
+
+    if (fungible) {
+        try {
+            console.info(`Trying assigning the asset with contract id ${contractId}`)
+
+            // TODO
+        } catch (error) {
+            console.error(`Could not assign ${asset} in ${targetNetwork}`)
+            throw new Error(`Could not assign ${asset} in ${targetNetwork}`)
+        }
+    } else {
+        try {
+            const lockerId = await network.wallet.get(locker)
+            const lockerCert = Buffer.from((lockerId).credentials.certificate).toString('base64')
+
+            console.info(`Trying assign asset with params: ${params[0]}, ${params[1]} locked by ${locker} for ${recipient}`)
+            const res = await funcToCall(network.contract,
+                params[0],
+                params[1],
+                lockerCert,
+                hash)
+            if (!res) {
+                throw new Error()
+            }
+            console.info(`${asset} assigned complete: ${res}`)
+            console.info(`Asset ${asset} assign complete: ${res}`)
+        } catch (error) {
+            console.error(`Could not assign non-fungible ${asset} in ${targetNetwork}: ${error}`)
+            throw new Error(`Could not assign non-fungible ${asset} in ${targetNetwork}: ${error}`)
+        }
+
+        await network.gateway.disconnect()
+        logger.info('Gateways disconnected.')
+
+        const client = getRelayClientForAssetStatusResponse();
+        const request = new satp_pb.SendAssetStatusRequest();
+        request.setSessionId(assignAssetRequest.getSessionId());
+        request.setStatus("Finalized");
+        client.sendAssetStatus(request, relayCallback);
+    }
 }
 
 function getRelayClientForAssetStatusResponse() {

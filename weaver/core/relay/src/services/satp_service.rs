@@ -1414,7 +1414,7 @@ fn send_commit_final_assertion_request(
     let reply = Ack {
         status: ack::Status::Ok as i32,
         request_id: request_id.to_string(),
-        message: "Ack of the commit prepare request".to_string(),
+        message: "Commit final assertion request sent".to_string(),
     };
     return Ok(reply);
 }
@@ -1442,7 +1442,7 @@ fn send_ack_final_receipt_request(
     let reply = Ack {
         status: ack::Status::Ok as i32,
         request_id: request_id.to_string(),
-        message: "Ack of the commit prepare request".to_string(),
+        message: "Ack final receipt request sent".to_string(),
     };
     return Ok(reply);
 }
