@@ -104,17 +104,17 @@ async function performLockHelper(
     console.info(`Asset Lock: Lock ${asset}:\n`);
     try {
         console.info(`Trying ${asset} Lock: ${params[0]}, ${params[1]} by ${locker} for ${recipient}`)
-        // const res = await funcToCall(network.contract,
-        //     params[0],
-        //     params[1],
-        //     recipientCert,
-        //     hash,
-        //     timeout,
-        //     null)
-        // if (!res.result) {
-        //     throw new Error()
-        // }
-        // console.info(`${asset} Locked with Contract Id: ${res.result}, preimage: ${res.hash.getPreimage()}, hashvalue: ${res.hash.getSerializedHashBase64()}`)
+        const res = await funcToCall(network.contract,
+            params[0],
+            params[1],
+            recipientCert,
+            hash,
+            timeout,
+            null)
+        if (!res.result) {
+            throw new Error()
+        }
+        console.info(`${asset} Locked with Contract Id: ${res.result}, preimage: ${res.hash.getPreimage()}, hashvalue: ${res.hash.getSerializedHashBase64()}`)
         console.info('Asset has been locked successfully')
 
     } catch (error) {
@@ -144,7 +144,7 @@ async function createAssetHelper(
     createAssetRequest2['owner'] = 'admin';
     createAssetRequest2['type'] = 'bond';
     createAssetRequest2['assetType'] = 'bond01';
-    createAssetRequest2['id'] = 'a065';
+    createAssetRequest2['id'] = 'a0demo';
     createAssetRequest2['issuer'] = 'admin';
     createAssetRequest2['facevalue'] = '300';
     createAssetRequest2['maturitydate'] = '05 May 48 00:00 MST';
@@ -254,7 +254,7 @@ async function assignAssetHelper(
     assignAssetRequest2['contract-id'] = 'abc01';
     assignAssetRequest2['hash_fn'] = '';
     assignAssetRequest2['secret'] = 'secrettext';
-    assignAssetRequest2['param'] = 'bond01:a065';
+    assignAssetRequest2['param'] = 'bond01:a0demo';
 
     const targetNetwork = assignAssetRequest2['target-network'];
     const locker = assignAssetRequest2['locker'];
