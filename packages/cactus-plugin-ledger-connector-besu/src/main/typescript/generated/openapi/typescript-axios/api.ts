@@ -1425,6 +1425,36 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary Retrieves the .json file that contains the OpenAPI specification for the plugin.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getOpenApiSpecV1: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-open-api-spec`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Gets past logs, matching the given options.
          * @param {GetPastLogsV1Request} [getPastLogsV1Request] 
          * @param {*} [options] Override http request option.
@@ -1681,6 +1711,16 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Retrieves the .json file that contains the OpenAPI specification for the plugin.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getOpenApiSpecV1(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getOpenApiSpecV1(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @summary Gets past logs, matching the given options.
          * @param {GetPastLogsV1Request} [getPastLogsV1Request] 
          * @param {*} [options] Override http request option.
@@ -1793,6 +1833,15 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         getBlockV1(getBlockV1Request?: GetBlockV1Request, options?: any): AxiosPromise<GetBlockV1Response> {
             return localVarFp.getBlockV1(getBlockV1Request, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Retrieves the .json file that contains the OpenAPI specification for the plugin.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getOpenApiSpecV1(options?: any): AxiosPromise<string> {
+            return localVarFp.getOpenApiSpecV1(options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -1909,6 +1958,17 @@ export class DefaultApi extends BaseAPI {
      */
     public getBlockV1(getBlockV1Request?: GetBlockV1Request, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getBlockV1(getBlockV1Request, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Retrieves the .json file that contains the OpenAPI specification for the plugin.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getOpenApiSpecV1(options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getOpenApiSpecV1(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
