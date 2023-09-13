@@ -6411,6 +6411,7 @@ __metadata:
     express: 4.17.3
     express-jwt-authz: 2.4.1
     express-openapi-validator: 5.0.4
+    safe-stable-stringify: 2.4.3
     typescript-optional: 2.0.1
     uuid: 8.3.2
   languageName: unknown
