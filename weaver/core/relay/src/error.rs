@@ -1,3 +1,7 @@
+// Copyright IBM Corp. All Rights Reserved.
+//
+// SPDX-License-Identifier: Apache-2.0
+
 /// Custom error type for handling various external library errors.
 /// the 'From' trait is converting different error types into our Custom error type automatically
 /// when using the ? operator

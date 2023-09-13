@@ -1,3 +1,7 @@
+// Copyright IBM Corp. All Rights Reserved.
+//
+// SPDX-License-Identifier: Apache-2.0
+
 mod relay_proto;
 use futures::future::{BoxFuture, FutureExt};
 use weaverpb::common::ack::ack;

@@ -1,3 +1,7 @@
+// Copyright IBM Corp. All Rights Reserved.
+//
+// SPDX-License-Identifier: Apache-2.0
+
 use std::io::{Error, ErrorKind};
 
 #[derive(Clone, PartialEq, serde::Serialize, serde::Deserialize, PartialOrd, Debug)]
