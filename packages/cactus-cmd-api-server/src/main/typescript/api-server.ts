@@ -1,5 +1,8 @@
 import type { AddressInfo } from "net";
 import type { Server as SecureServer } from "https";
+import type { Request, Response, RequestHandler } from "express";
+import type { ServerOptions as SocketIoServerOptions } from "socket.io";
+import type { Socket as SocketIoSocket } from "socket.io";
 import exitHook from "async-exit-hook";
 import os from "os";
 import path from "path";
@@ -13,7 +16,6 @@ import fs from "fs-extra";
 import expressHttpProxy from "express-http-proxy";
 import { Server as GrpcServer } from "@grpc/grpc-js";
 import { ServerCredentials as GrpcServerCredentials } from "@grpc/grpc-js";
-import type { Application, Request, Response, RequestHandler } from "express";
 import express from "express";
 import { OpenAPIV3 } from "express-openapi-validator/dist/framework/types";
 import compression from "compression";
@@ -22,8 +24,6 @@ import cors from "cors";
 
 import rateLimit from "express-rate-limit";
 import { Server as SocketIoServer } from "socket.io";
-import type { ServerOptions as SocketIoServerOptions } from "socket.io";
-import type { Socket as SocketIoSocket } from "socket.io";
 import { authorize as authorizeSocket } from "@thream/socketio-jwt";
 
 import {
@@ -37,7 +37,11 @@ import {
   PluginImportAction,
 } from "@hyperledger/cactus-core-api";
 
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import {
+  PluginRegistry,
+  registerWebServiceEndpoint,
+} from "@hyperledger/cactus-core";
+
 import { installOpenapiValidationMiddleware } from "@hyperledger/cactus-core";
 
 import {
@@ -49,7 +53,6 @@ import {
 
 import { ICactusApiServerOptions } from "./config/config-service";
 import OAS from "../json/openapi.json";
-// import { OpenAPIV3 } from "express-openapi-validator/dist/framework/types";
 
 import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
 import { AuthorizerFactory } from "./authzn/authorizer-factory";
@@ -58,6 +61,10 @@ import { WatchHealthcheckV1Endpoint } from "./web-services/watch-healthcheck-v1-
 import * as default_service from "./generated/proto/protoc-gen-ts/services/default_service";
 import { GrpcServerApiServer } from "./web-services/grpc/grpc-server-api-server";
 import { determineAddressFamily } from "./common/determine-address-family";
+import {
+  GetOpenApiSpecV1Endpoint,
+  IGetOpenApiSpecV1EndpointOptions,
+} from "./web-services/get-open-api-spec-v1-endpoint";
 
 export interface IApiServerConstructorOptions {
   readonly pluginManagerOptions?: { pluginsPath: string };
@@ -91,8 +98,8 @@ export class ApiServer {
   private readonly httpServerCockpit?: Server | SecureServer;
   private readonly wsApi: SocketIoServer;
   private readonly grpcServer: GrpcServer;
-  private readonly expressApi: Application;
-  private readonly expressCockpit: Application;
+  private readonly expressApi: express.Express;
+  private readonly expressCockpit: express.Express;
   private readonly pluginsPath: string;
   private readonly enableShutdownHook: boolean;
 
@@ -305,17 +312,19 @@ export class ApiServer {
     }
   }
 
-  public async initPluginRegistry(): Promise<PluginRegistry> {
-    const registry = new PluginRegistry({ plugins: [] });
+  public async initPluginRegistry(req?: {
+    readonly pluginRegistry: PluginRegistry;
+  }): Promise<PluginRegistry> {
+    const { pluginRegistry = new PluginRegistry({ plugins: [] }) } = req || {};
     const { plugins } = this.options.config;
     this.log.info(`Instantiated empty registry, invoking plugin factories...`);
 
     for (const pluginImport of plugins) {
-      const plugin = await this.instantiatePlugin(pluginImport, registry);
-      registry.add(plugin);
+      const plugin = await this.instantiatePlugin(pluginImport, pluginRegistry);
+      pluginRegistry.add(plugin);
     }
 
-    return registry;
+    return pluginRegistry;
   }
 
   private async instantiatePlugin(
@@ -347,7 +356,8 @@ export class ApiServer {
 
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const pluginPackage = require(/* webpackIgnore: true */ packagePath);
-      const createPluginFactory = pluginPackage.createPluginFactory as PluginFactoryFactory;
+      const createPluginFactory =
+        pluginPackage.createPluginFactory as PluginFactoryFactory;
       const pluginFactoryOptions: IPluginFactoryOptions = {
         pluginImportType: pluginImport.type,
       };
@@ -550,9 +560,27 @@ export class ApiServer {
    * healthcheck and monitoring information.
    * @param app
    */
-  async getOrCreateWebServices(app: express.Application): Promise<void> {
+  async getOrCreateWebServices(app: express.Express): Promise<void> {
     const { log } = this;
     const { logLevel } = this.options.config;
+    const pluginRegistry = await this.getOrInitPluginRegistry();
+
+    {
+      const oasPath = OAS.paths["/api/v1/api-server/get-open-api-spec"];
+
+      const operationId = oasPath.get.operationId;
+      const opts: IGetOpenApiSpecV1EndpointOptions = {
+        oas: OAS,
+        oasPath,
+        operationId,
+        path: oasPath.get["x-hyperledger-cactus"].http.path,
+        pluginRegistry,
+        verbLowerCase: oasPath.get["x-hyperledger-cactus"].http.verbLowerCase,
+        logLevel,
+      };
+      const endpoint = new GetOpenApiSpecV1Endpoint(opts);
+      await registerWebServiceEndpoint(app, endpoint);
+    }
 
     const healthcheckHandler = (req: Request, res: Response) => {
       res.json({
@@ -596,13 +624,10 @@ export class ApiServer {
     const {
       "/api/v1/api-server/get-prometheus-exporter-metrics": oasPathPrometheus,
     } = OAS.paths;
-    const { http: httpPrometheus } = oasPathPrometheus.get[
-      "x-hyperledger-cactus"
-    ];
-    const {
-      path: httpPathPrometheus,
-      verbLowerCase: httpVerbPrometheus,
-    } = httpPrometheus;
+    const { http: httpPrometheus } =
+      oasPathPrometheus.get["x-hyperledger-cactus"];
+    const { path: httpPathPrometheus, verbLowerCase: httpVerbPrometheus } =
+      httpPrometheus;
     (app as any)[httpVerbPrometheus](
       httpPathPrometheus,
       prometheusExporterHandler,
@@ -628,6 +653,12 @@ export class ApiServer {
           )
         : GrpcServerCredentials.createInsecure();
 
+      this.grpcServer.addService(
+        default_service.org.hyperledger.cactus.cmd_api_server
+          .DefaultServiceClient.service,
+        new GrpcServerApiServer(),
+      );
+
       this.grpcServer.bindAsync(
         grpcHostAndPort,
         grpcTlsCredentials,
@@ -636,11 +667,6 @@ export class ApiServer {
             this.log.error("Binding gRPC failed: ", error);
             return reject(new RuntimeError("Binding gRPC failed: ", error));
           }
-          this.grpcServer.addService(
-            default_service.org.hyperledger.cactus.cmd_api_server
-              .UnimplementedDefaultServiceService.definition,
-            new GrpcServerApiServer(),
-          );
           this.grpcServer.start();
           const family = determineAddressFamily(grpcHost);
           resolve({ address: grpcHost, port, family });

@@ -86,6 +86,7 @@
     "prom-client": "13.2.0",
     "run-time-error": "1.4.0",
     "rxjs": "7.8.1",
+    "safe-stable-stringify": "2.4.3",
     "semver": "7.5.2",
     "socket.io": "4.5.4",
     "socket.io-client": "4.5.4",
