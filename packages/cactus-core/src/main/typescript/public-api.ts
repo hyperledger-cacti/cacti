@@ -14,3 +14,7 @@ export { consensusHasTransactionFinality } from "./consensus-has-transaction-fin
 
 export { IInstallOpenapiValidationMiddlewareRequest } from "./web-services/install-open-api-validator-middleware";
 export { installOpenapiValidationMiddleware } from "./web-services/install-open-api-validator-middleware";
+export {
+  GetOpenApiSpecV1EndpointBase,
+  IGetOpenApiSpecV1EndpointBaseOptions,
+} from "./web-services/get-open-api-spec-v1-endpoint-base";
