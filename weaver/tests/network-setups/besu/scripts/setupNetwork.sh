@@ -1,3 +1,7 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+
 # create the project folder
 mkdir SampleBesuNetwork$1
 cd SampleBesuNetwork$1

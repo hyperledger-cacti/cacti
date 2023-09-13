@@ -1,3 +1,7 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+
 #!/bin/bash
 
 echo "Issuing 100 BobERC20 Tokens to Alice in network2"
