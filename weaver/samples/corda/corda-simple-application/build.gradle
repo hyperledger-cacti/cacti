@@ -13,7 +13,9 @@ buildscript {
         log4j_version = constants.getProperty("log4jVersion")
         slf4j_version = constants.getProperty("slf4jVersion")
         corda_platform_version = constants.getProperty("platformVersion").toInteger()
-        cacti_version = constants.getProperty("cactiVersion")        
+        cacti_version = constants.getProperty("cactiVersion")  
+        tokens_release_group = constants.getProperty('cordaTokenSDKGroup')
+        tokens_release_version = constants.getProperty('cordaTokenSDKVersion')      
     }
 
     repositories {
