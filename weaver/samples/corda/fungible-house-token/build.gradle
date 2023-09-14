@@ -16,8 +16,8 @@ buildscript {
         corda_platform_version = constants.getProperty("platformVersion").toInteger()
 
         //TokenSDK
-        tokens_release_group = 'com.r3.corda.lib.tokens'
-        tokens_release_version = '1.2'
+        tokens_release_group = constants.getProperty('cordaTokenSDKGroup')
+        tokens_release_version = constants.getProperty('cordaTokenSDKVersion')
         cacti_version = constants.getProperty("cactiVersion")
     }
 
