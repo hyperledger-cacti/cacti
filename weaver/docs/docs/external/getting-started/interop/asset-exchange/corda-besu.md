@@ -7,7 +7,7 @@ pagination_prev: external/getting-started/interop/asset-exchange/overview
 ---
 
 We will demonstrate asset exchange of an `AliceERC721` NFT in Besu `network1` with `10` tokens on `Corda_Network`.
-For Besu commands, run from `samples/besu/besu-cli` folder, and for Corda commands, run from `samples/corda/corda-simple-application` folder. Here `Alice` with account `1` and `Bob` with account `2` in Besu `network1` correspond to `PartyA` (`CORDA_PORT=10006`) and `PartyB` (`CORDA_PORT=10009`) in `Corda_Network` respectively. Following are the step-by-step asset exchange process:
+For Besu commands, run from `weaver/weaver/samples/besu/besu-cli` folder, and for Corda commands, run from `samples/corda/corda-simple-application` folder, in your clone of the Cacti repository. Here `Alice` with account `1` and `Bob` with account `2` in Besu `network1` correspond to `PartyA` (`CORDA_PORT=10006`) and `PartyB` (`CORDA_PORT=10009`) in `Corda_Network` respectively. Following are the step-by-step asset exchange process:
 
 1. From corda client, generate secret-hash pair using following command (prints hash in base64):
   ```

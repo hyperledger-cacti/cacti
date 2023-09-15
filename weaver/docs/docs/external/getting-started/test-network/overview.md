@@ -30,10 +30,11 @@ You can launch these components in one of several different ways:
     - [Deployed on Host Machine](./setup-local.md): Build the above components purely from your local clone of the Weaver code repository. If you wish to experiment with source code modifications, this is the right option to choose.
     - [Deployed in Docker containers](./setup-local-docker.md): This is similar to the above option, except with relays and drivers launched in Docker containers rather than in the host.
 * **Setup with Imported Weaver Components**:
-    - [Deployed on Host Machine](./setup-packages.md): Import pre-built Weaver components from Github Packages instead of building them locally. If you wish to see how Weaver works using pre-tested components and without, choose this option.
+    - [Deployed on Host Machine](./setup-packages.md): Import pre-built Weaver components from GitHub Packages instead of building them locally. If you wish to see how Weaver works using pre-tested components and without, choose this option.
     - [Deployed in Docker containers](./setup-packages-docker.md): This is similar to the above option, except with relays and drivers launched in Docker containers rather than in the host.
 
-After setting up and launching the components, you must initialize the network by following steps in [Ledger Initialization](ledger-initialization.md). 
+After setting up and launching the components, you must initialize the network by following steps in [Ledger Initialization](./ledger-initialization.md).
 Then you can test the following interoperation modes:
 - [Data Sharing](../interop/data-sharing.md) among Fabric and Corda networks
-- [Asset Exchange](../interop/asset-exchange/overview.md) between Fabric networks
+- [Asset Exchange](../interop/asset-exchange/overview.md) among Fabric, Corda, and Besu networks
+- [Asset Transfer](../interop/asset-transfer.md) between Fabric networks

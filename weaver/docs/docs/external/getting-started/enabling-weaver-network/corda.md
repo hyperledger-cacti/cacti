@@ -25,7 +25,7 @@ The relay and driver are the only additional infrastructure that need to be inst
 
 Existing CorDapp flows and contracts deployed on the network's nodes remain undisturbed. All that is required is the deployment of an Interoperation CorDapp (flows and contracts) on every node that needs to offer or consume state from foreign networks.
 
-Client applications will need some additional code and configuration because the decisions to exercise interoperation mechanisms (relay queries for data sharing or atomic asset exchanges) are strictly part of business logic. But Weaver's Corda Interoperation Node SDK offers various helper functions to ease this process and keep the adaptation to a minimum, as we wil see later in this document. Finally, an _identity service_ must be offered by the network to expose its CAs' certificate chains to foreign networks, thereby laying the basis for interoperation. This service simply needs to offer a REST endpoint, and can be implemented as a standalone application or (more conveniently) as an augmentation of one or more of the existing client layer applications.
+Client applications will need some additional code and configuration because the decisions to exercise interoperation mechanisms (relay queries for data sharing or atomic asset exchanges) are strictly part of business logic. But Weaver's Corda Interoperation Java-Kotlin SDK offers various helper functions to ease this process and keep the adaptation to a minimum, as we wil see later in this document. Finally, an _identity service_ must be offered by the network to expose its CAs' certificate chains to foreign networks, thereby laying the basis for interoperation. This service simply needs to offer a REST endpoint, and can be implemented as a standalone application or (more conveniently) as an augmentation of one or more of the existing client layer applications.
 
 ## Procedural Overview
 
@@ -103,12 +103,12 @@ No code changes are required for Weaver enablement. For asset exchange, Weaver a
 ## Client Layer applications
 
 Weaver provides an SDK to help you adapt your applications to exercise the various interoperability modes. These are called out as **SDK Helpers** in the network model illustrated earlier. Your Corda network's Client layer applications have business logic embedded in them that, broadly speaking, accept data from users and other external agents and invoke workflows from CorDapp over RPC. When you use Weaver for network interoperability, other options can be added, namely requesting and accepting data from foreign networks, and triggering locks and claims for atomic exchanges spanning two networks. Weaver's Corda Interoperation SDK offers a library to exercise these options. But this will involve modification to the application's business logic.
-To use Weaver's Corda SDK, you need to create a [personal access token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) with `read:packages` access in Github, to access weaver packages.
+To use Weaver's Corda SDK, you need to create a [personal access token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) with `read:packages` access in GitHub, to access Weaver packages.
 You also need to add the following to your application's `build.gradle` file:
 ```groovy
 repositories {
   maven {
-      url https://maven.pkg.github.com/hyperledger-labs/weaver-dlt-interoperability
+      url https://maven.pkg.github.com/hyperledger/cacti
       credentials {
           username <github-email>
           password <github-personal-access-token>
@@ -116,22 +116,22 @@ repositories {
   }
 }
 dependencies {
-  implementation(group: 'com.weaver.corda.sdk', name: 'weaver-corda-sdk', version: "1.2.13")
-  implementation(group: 'com.weaver.corda.app.interop', name: 'interop-contracts', version: "1.2.13")
-  implementation(group: 'com.weaver.corda.app.interop', name: 'interop-workflows', version: "1.2.13")
-  implementation(group: 'com.weaver', name: 'protos-java-kt', version: "1.5.7")
+  implementation(group: 'org.hyperledger.cacti.weaver.sdk.corda', name: 'weaver-sdk-corda', version: "2.0.0-alpha.1")
+  implementation(group: 'org.hyperledger.cacti.weaver.imodule.corda', name: 'interop-contracts', version: "2.0.0-alpha.1")
+  implementation(group: 'org.hyperledger.cacti.weaver.imodule.corda', name: 'interop-workflows', version: "2.0.0-alpha.1")
+  implementation(group: 'org.hyperledger.cacti.weaver.protos', name: 'protos-java-kt', version: "2.0.0-alpha.1")
 }
 ```
-(Or check out the [package website](https://github.com/hyperledger-labs/weaver-dlt-interoperability/packages/952245) and select a different version.)
+(Or check out the [package website](https://github.com/hyperledger/cacti/packages/1856827) and select a different version.)
   
 #### For Identity Administration
 
 A Corda network needs to share its security domain (or membership) configuration, i.e., its nodes' CA certificate chains, with a foreign network with which it seeks to interoperate. Though such sharing can be implemented using several different mechanisms, ranging from manual to automated, the simplest and most modular way is to expose a REST endpoint that agents in foreign networks can reach. Further, this REST endpoint can be implemented as a standalone web application or it can be an extension of one or more of the existing client layer applications. (Multiple apps can expose the same endpoint serving the same information for redundancy.) We will demonstrate an example of this while leaving other implementation modes to the user.
 Let's say a Corda network consists of two nodes called `PartyA` and `PartyB`, each running a client layer application with a web server whose URL prefixes are `http://partya.mynetwork.com:9000` and `http://partyb.mynetwork.com:9000` respectively. Each app then can expose a REST endpoint (again, as an example) `http://partya.mynetwork.com:9000/node_sec_grp` and `http://partyb.mynetwork.com:9000/node_sec_grp` respectively.
-At each web server's backend, you need to implement logic to retrieve the node's ID and it's associated certificated chains. Sample code is given below for a Kotlin implementation built on `weaver-corda-sdk`. You can use this code verbatim, except for some minor changes like `<path-to-root-corda-net-folder>`, other parameters like security domain, and list of names of nodes as appropriate for your environment:
+At each web server's backend, you need to implement logic to retrieve the node's ID and it's associated certificated chains. Sample code is given below for a Kotlin implementation built on `weaver-sdk-corda`. You can use this code verbatim, except for some minor changes like `<path-to-root-corda-net-folder>`, other parameters like security domain, and list of names of nodes as appropriate for your environment:
 
 ```kotlin
-import com.weaver.corda.sdk.CredentialsCreator
+import org.hyperledger.cacti.weaver.sdk.corda.CredentialsCreator
 import com.google.protobuf.util.JsonFormat
 
 
@@ -166,10 +166,10 @@ Consider a scenario inspired by the [global trade use case](../../user-stories/g
 
 (In preparation, a suitable access control policy must be recorded on `tradelogisticschannel` in `trade-logistics-network`, and a suitable verification policy must be recorded in the vault of `trade-finance-network`. We will see how to do this in the [Startup and Bootstrap Weaver Components](#startup-and-bootstrap-weaver-components) section later.)
 
-You will need to insert some code in the client layer application that accepts a B/L and submits a `UploadBillOfLading` request in `trade-finance-network`. (No code changes need to be made in any application in the other network.) The logic to accept a B/L should be replaced (or you can simply add an alternative) by a call to the `InteroperableHelper.interopFlow` function offered by the [weaver-corda-sdk](https://github.com/hyperledger-labs/weaver-dlt-interoperability/packages/952245) library. The following code sample illustrates this:
+You will need to insert some code in the client layer application that accepts a B/L and submits a `UploadBillOfLading` request in `trade-finance-network`. (No code changes need to be made in any application in the other network.) The logic to accept a B/L should be replaced (or you can simply add an alternative) by a call to the `InteroperableHelper.interopFlow` function offered by the [cacti-weaver-sdk-corda](https://github.com/hyperledger/cacti/packages/1856827) library. The following code sample illustrates this:
 
 ```kt
-import com.weaver.corda.sdk.InteroperableHelper
+import org.hyperledger.cacti.weaver.sdk.corda.InteroperableHelper
 import com.mynetwork.flow.UploadBillOfLading
 
 val viewAddress = InteroperableHelper.createFabricViewAddress(
@@ -236,8 +236,8 @@ Let's take an example of asset exchange between `Alice` and `Bob`, where Bob wan
 
 `Alice` needs to select a secret text (say `s`), and hash it (say `H`) using say `SHA512`, which will be used to lock her asset in `BondNetwork`. To lock the non-fungible asset using hash `H` and timeout duration of 10 minutes, you need to add following code snippet in your application:
 ```kotlin
-import com.weaver.corda.sdk.AssetManager
-import com.weaver.corda.sdk.HashFunctions
+import org.hyperledger.cacti.weaver.sdk.corda.AssetManager
+import org.hyperledger.cacti.weaver.sdk.corda.HashFunctions
 
 var hash: HashFunctions.Hash = HashFunctions.SHA512
 hash.setSerializedHashBase64(H)
@@ -261,8 +261,8 @@ val contractId = AssetManager.createHTLC(
 
 Now `Bob` will lock his tokens in `TokenNetwork`. To lock the fungible asset using same hash `H` and timeout of 5 minutes (half the timeout duration used by Alice in `BondNetwork`), add following code snippet in your application:
 ```kotlin
-import com.weaver.corda.sdk.AssetManager
-import com.weaver.corda.sdk.HashFunctions
+import org.hyperledger.cacti.weaver.sdk.corda.AssetManager
+import org.hyperledger.cacti.weaver.sdk.corda.HashFunctions
 
 var hash: HashFunctions.Hash = HashFunctions.SHA512
 hash.setSerializedHashBase64(H)
@@ -339,7 +339,7 @@ Typically, pre-configuration involves:
 
 * Generating node folders for each participating node in the network, which contains CorDapps, certificates,  persistence db, etc sub directories. Using Gradle task `net.corda.plugins.Cordform` or `net.corda.plugins.Dockerform`, the folders get created under the directory `build/nodes` (this path is used in above sample code for Identity Service).
     
-* The RPC address, username and password specified in above task will be used to create an instance of `CordaRPCOps`, which is the first argument for most `weaver-corda-sdk` static functions as we saw in previous section. For example, one of them is `InteroperableHelper.interopFlow`:
+* The RPC address, username and password specified in above task will be used to create an instance of `CordaRPCOps`, which is the first argument for most `weaver-sdk-corda` static functions as we saw in previous section. For example, one of them is `InteroperableHelper.interopFlow`:
 ```kotlin
 val response = InteroperableHelper.interopFlow(
     proxy,                                // CordaRPCOps instance to start flows
@@ -399,13 +399,13 @@ To launch a network using containerized components, you will typically use a Doc
 
 ### For Asset Exchange
 
-The asset exchange mode currently requires only the Interoperation CorDapp module from Weaver. Relays, drivers are not necessary. In the future, we expect to make the asset exchange protocol moe automated using these components; the instructions here will be updated appropriately.
+The asset exchange mode currently requires only the Interoperation CorDapp module from Weaver. Relays and drivers are not necessary. In the future, we expect to make the asset exchange protocol moe automated using these components; the instructions here will be updated appropriately.
 
 ### Install Interoperation CorDapp on Nodes
 
 After bootstrapping the nodes folder, copy the following two CorDapps in `build/nodes/PartyA/cordapps` and `build/nodes/PartyB/cordapps` folders (`PartyA` and `PartyB` node names are for example only):
-- [com.weaver.corda.app.interop.interop-contracts](https://github.com/hyperledger-labs/weaver-dlt-interoperability/packages/906215)
-- [com.weaver.corda.app.interop.interop-workflows](https://github.com/hyperledger-labs/weaver-dlt-interoperability/packages/906216)
+- [org.hyperledger.cacti.weaver.imodule.corda.interop-contracts](https://github.com/hyperledger/cacti/packages/1856825)
+- [org.hyperledger.cacti.weaver.imodule.corda.interop-workflows](https://github.com/hyperledger/cacti/packages/1856826)
 
 | Notes |
 |:------|
@@ -418,8 +418,8 @@ Both the data sharing and asset transfer modes require the Interoperation CorDap
 #### Install Interoperation CorDapp on Nodes
 
 After bootstrapping the nodes folder, copy the following two CorDapps in `build/nodes/PartyA/cordapps` and `build/nodes/PartyB/cordapps` folders (`PartyA` and `PartyB` node names are for example only):
-- [com.weaver.corda.app.interop.interop-contracts](https://github.com/hyperledger-labs/weaver-dlt-interoperability/packages/906215)
-- [com.weaver.corda.app.interop.interop-workflows](https://github.com/hyperledger-labs/weaver-dlt-interoperability/packages/906216)
+- [org.hyperledger.cacti.weaver.imodule.corda.interop-contracts](https://github.com/hyperledger/cacti/packages/1856825)
+- [org.hyperledger.cacti.weaver.imodule.corda.interop-workflows](https://github.com/hyperledger/cacti/packages/1856826)
 
 | Notes |
 |:------|
@@ -429,22 +429,21 @@ After bootstrapping the nodes folder, copy the following two CorDapps in `build/
 
 You need to run one or more relays for network-to-network communication. Here we provide instructions to run one relay running in a Docker container, which is sufficient for data sharing. (Later, we will provide instructions to run multiple relays, which will be useful from a failover perspective.)
 
-Weaver provides a [pre-built image](https://github.com/hyperledger-labs/weaver-dlt-interoperability/pkgs/container/weaver-relay-server) for the relay. Before launching a container, you just need to customize its configuration for your Fabric network, which you can do by simply creating a folder (let's call it `relay_config`) and configuring the following files in it:
+Weaver provides a [pre-built image](https://github.com/hyperledger/cacti/pkgs/container/cacti-weaver-relay-server) for the relay. Before launching a container, you just need to customize its configuration for your Fabric network, which you can do by simply creating a folder (let's call it `relay_config`) and configuring the following files in it:
 - `.env`: This sets suitable environment variables within the relay container. Copy the `.env.template` file [from the repository](https://github.com/hyperledger/cacti/blob/main/weaver/core/relay/.env.template) and customize it for your purposes, as indicated in the below sample:
   ```
   PATH_TO_CONFIG=./config.toml
   RELAY_NAME=<"name" in config.toml>
   RELAY_PORT=<relay-server-port/"port" in config.toml>
   EXTERNAL_NETWORK=<docker-bridge-network>
-  DOCKER_REGISTRY=ghcr.io/hyperledger-labs
-  DOCKER_IMAGE_NAME=weaver-relay
-  DOCKER_TAG=1.5.4
+  DOCKER_IMAGE_NAME=ghcr.io/hyperledger/cacti-weaver-relay-server
+  DOCKER_TAG=2.0.0-alpha.1
   ```
   - The `PATH_TO_CONFIG` variable should point to the properties file typically named `config.toml` (you can name this whatever you wish). See further below for instructions to write this file.
   - The `RELAY_NAME` variable specifies a unique name for this relay. It should match what's specified in the `config.toml` (more on that below).
   - The `RELAY_PORT` variable specifies the port this relay server will listen on. It should match what's specified in the `config.toml` (more on that below).
   - The `EXTERNAL_NETWORK` variable should be set to the [name](https://docs.docker.com/compose/networking/) of your Fabric network.
-  - The `DOCKER_*` variables are used to specify the image on which the container will be built. Make sure you set `DOCKER_TAG` to the latest version you see on [Github](https://github.com/hyperledger-labs/weaver-dlt-interoperability/pkgs/container/weaver-relay-server).
+  - The `DOCKER_*` variables are used to specify the image on which the container will be built. Make sure you set `DOCKER_TAG` to the latest version you see on [GitHub](https://github.com/hyperledger/cacti/pkgs/container/cacti-weaver-relay-server).
 
   For more details, see the [Relay Docker README](https://github.com/hyperledger/cacti/blob/main/weaver/core/relay/relay-docker.md) ("Relay Server Image" and "Running With Docker Compose" sections).
 
@@ -519,16 +518,16 @@ docker-compose up -d relay-server
 
 You need to run one or more drivers through which your relay can interact with your Corda network. Here we provide instructions to run one Corda driver running in a Docker container, which is sufficient for data sharing. (Later, we will provide instructions to run multiple drivers, which will be useful both from a failover perspective and to interact with different subsets of your Corda network.)
 
-Weaver provides a [pre-built image](https://github.com/hyperledger-labs/weaver-dlt-interoperability/pkgs/container/weaver-corda-driver) for the Corda driver. Before launching a container, you just need to customize the container configuration for your Corda network, which you can do by simply configuring the following:
-- `.env`: This sets suitable environment variables within the driver container. Copy the `.env.template` file [from the repository](https://github.com/hyperledger/cacti/blob/main/weaver/core/relay/.env.template) and customize it for your purposes, as indicated in the below sample:
+Weaver provides a [pre-built image](https://github.com/hyperledger/cacti/pkgs/container/cacti-weaver-driver-corda) for the Corda driver. Before launching a container, you just need to customize the container configuration for your Corda network, which you can do by simply configuring the following:
+- `.env`: This sets suitable environment variables within the driver container. Copy the `.env.docker.template` file [from the repository](https://github.com/hyperledger/cacti/blob/main/weaver/core/drivers/corda-driver/.env.docker.template) and customize it for your purposes, as indicated in the below sample:
   ```
   NETWORK_NAME=<container-name-suffix>
   DRIVER_PORT=<driver-server-port>
   DRIVER_RPC_USERNAME=<driver-rpc-username>
   DRIVER_RPC_PASSWORD=<driver-rpc-username>
   EXTERNAL_NETWORK=<docker-bridge-network>
-  DOCKER_IMAGE_NAME=ghcr.io/hyperledger-labs/weaver-corda-driver
-  DOCKER_TAG=1.2.13
+  DOCKER_IMAGE_NAME=ghcr.io/hyperledger/cacti-weaver-driver-corda
+  DOCKER_TAG=2.0.0-alpha.1
   RELAY_TLS=<true|false>
   RELAY_TLSCA_TRUST_STORE=<truststore-jks-file-path>
   RELAY_TLSCA_TRUST_STORE_PASSWORD=<truststore-jks-file-password>
@@ -556,7 +555,7 @@ docker-compose up -d
 
 #### Vault Initialization
 
-To prepare your network for interoperation with a foreign network, you need to record the following to your vault using the [Corda SDK](https://github.com/hyperledger-labs/weaver-dlt-interoperability/packages/952245) (`com.weaver.corda.sdk`):
+To prepare your network for interoperation with a foreign network, you need to record the following to your vault using the [Corda SDK](https://github.com/hyperledger/cacti/packages/1856827) (`org.hyperledger.cacti.weaver.sdk.corda.weaver-sdk-corda`):
 - **Access control policies**:
   Let's take the example of the request made from `trade-finance-network` to `trade-logistics-network` for a B/L earlier in this document. `trade-logistics-network` can have a policy of the following form permitting access to the `GetBillOfLading` function from a client representing the `PartyA` node in `trade-finance-network` as follows:
   ```json
@@ -575,7 +574,7 @@ To prepare your network for interoperation with a foreign network, you need to r
   ```
   In this sample, a single rule is specified for requests coming from `trade-finance-network`: it states that a workflow call to `com.mynetwork.flow.GetBillOfLading` made to `exporter` and `carrier` nodes of remote Corda network is permitted for a requestor whose certificate is specified in the `principal` attribute. The `*` at the end indicates that any arguments passed to the function will pass the access control check. The `exporternode:10003` and `carriernode:10003` are of form `<hostname/IP>:<RPC_Port>`, for `exporter` and `carrier` nodes respectively in the remote Corda network.
 
-  You need to record this policy rule on your Corda network's vault by invoking either the `AccessControlPolicyManager.createAccessControlPolicyState` function or the `AccessControlPolicyManager.updateAccessControlPolicyState` function on the `weaver-corda-sdk`; use the former if you are recording a set of rules for the given `securityDomain` for the first time and the latter to overwrite a set of rules recorded earlier. The above JSON needs to be converted to protobuf object of `com.weaver.protos.common.access_control.AccessControl.AccessControlPolicy`, using google's protobuf library, and the object is the second argument of above functions (first being the instance of CordaRPCOps).
+  You need to record this policy rule on your Corda network's vault by invoking either the `AccessControlPolicyManager.createAccessControlPolicyState` function or the `AccessControlPolicyManager.updateAccessControlPolicyState` function on the `weaver-sdk-corda`; use the former if you are recording a set of rules for the given `securityDomain` for the first time and the latter to overwrite a set of rules recorded earlier. The above JSON needs to be converted to protobuf object of `org.hyperledger.cacti.weaver.protos.common.access_control.AccessControl.AccessControlPolicy`, using google's protobuf library, and the object is the second argument of above functions (first being the instance of CordaRPCOps).
   
 - **Verification policies**:
   Taking the same example as above, an example of a verification policy for a B/L requested by the `trade-finance-network` from the `trade-logistics-network` is as follows:
@@ -605,7 +604,7 @@ To prepare your network for interoperation with a foreign network, you need to r
   |:------|
   | If the remote network is built on Corda, the resource specified in the access control policy can be used here as the `pattern`, with different node names specified in the `criteria`. |
 
-  You need to record this policy rule on your Corda network's vault by invoking Corda sdk's function `VerificationPolicyManager.createVerificationPolicyState(proxy, verificationPolicyProto)`, where `proxy` is an instance of `CordaRPCOps` as described in previous sections, and `verificationPolicyProto` is an object of protobuf `com.weaver.protos.common.verification_policy.VerificationPolicyOuterClass.VerificationPolicy`. You can examine the full proto structure [here](https://github.com/hyperledger/cacti/blob/main/weaver/common/protos/common/verification_policy.proto). (_Google's protobuf library can be used to convert above JSON to protobuf object._)
+  You need to record this policy rule on your Corda network's vault by invoking Corda sdk's function `VerificationPolicyManager.createVerificationPolicyState(proxy, verificationPolicyProto)`, where `proxy` is an instance of `CordaRPCOps` as described in previous sections, and `verificationPolicyProto` is an object of protobuf `org.hyperledger.cacti.weaver.protos.common.verification_policy.VerificationPolicyOuterClass.VerificationPolicy`. You can examine the full proto structure [here](https://github.com/hyperledger/cacti/blob/main/weaver/common/protos/common/verification_policy.proto). (_Google's protobuf library can be used to convert above JSON to protobuf object._)
 
   | Notes |
   |:------|
@@ -615,7 +614,7 @@ To prepare your network for interoperation with a foreign network, you need to r
   ```
   for each foreign network:
       send an HTTP GET request to the network's identity service (using 'curl' or 'wget' from a shell script or equivalent programming language APIs).
-      convert the response string to protobuf object of 'com.weaver.protos.common.membership.MembershipOuterClass.Membership'.
+      convert the response string to protobuf object of 'org.hyperledger.cacti.weaver.protos.common.membership.MembershipOuterClass.Membership'.
       invoke 'MembershipManager.createMembershipState(proxy, membershipProto)' or 'MembershipManager.updateMembershipState(proxy, membershipProto)' on Corda sdk.
   ```
   As in the above two cases, use `createMembershipState` to record a confiuration for the first time for a given `securityDomain` and `updateMembershipState` to overwrite a configuration.

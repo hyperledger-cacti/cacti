@@ -7,17 +7,17 @@ pagination_prev: external/getting-started/interop/asset-exchange/overview
 ---
 
 We will demonstrate asset exchange of a bond in Fabric `network1` with tokens on `Corda_Network`.
-For Fabric commands, run from `samples/fabric/fabric-cli` folder, and for Corda commands, run from `samples/corda/corda-simple-application` folder. Here `Alice` and `Bob` in Fabric `network1` correspond to `PartyA` (`CORDA_PORT=10006`) and `PartyB` (`CORDA_PORT=10009`) in `Corda_Network` respectively. Following are the step-by-step asset exchange process:
+For Fabric commands, run from `weaver/samples/fabric/fabric-cli` folder, and for Corda commands, run from `weaver/samples/corda/corda-simple-application` folder, in your clone of the Cacti repository. Here `Alice` and `Bob` in Fabric `network1` correspond to `PartyA` (`CORDA_PORT=10006`) and `PartyB` (`CORDA_PORT=10009`) in `Corda_Network` respectively. Following are the step-by-step asset exchange process:
 
 | Notes |
 |:------|
 | The hash used in following steps can be replaced by any valid `SHA256` hash. |
 
-- Run the following to verify the status of the bond assets owned by `alice` and `bob` in the Fabric network `network1` from `samples/fabric/fabric-cli` folder:
+- Run the following to verify the status of the bond assets owned by `alice` and `bob` in the Fabric network `network1` from `weaver/samples/fabric/fabric-cli` folder:
  ```bash
  ./scripts/getAssetStatus.sh
  ```
-- Run the following to verify the status of the assets owned by `PartyA` and `PartyB` in the `Corda_Network` from `samples/corda/corda-simple-application` folder:
+- Run the following to verify the status of the assets owned by `PartyA` and `PartyB` in the `Corda_Network` from `weaver/samples/corda/corda-simple-application` folder:
   ```bash
   ./scripts/getAssetStatus.sh
   ```
@@ -55,11 +55,11 @@ For Fabric commands, run from `samples/fabric/fabric-cli` folder, and for Corda 
   ```bash
   ./bin/fabric-cli asset exchange claim --recipient=bob --locker=alice --target-network=network1 --param=bond01:a03 --secret=secrettext
   ```
-- Run the following to verify the status of the bond assets owned by `alice` and `bob` in the Fabric network `network1` from `samples/fabric/fabric-cli` folder:
+- Run the following to verify the status of the bond assets owned by `alice` and `bob` in the Fabric network `network1` from `weaver/samples/fabric/fabric-cli` folder:
    ```bash
    ./scripts/getAssetStatus.sh
    ```
-- Run the following to verify the status of the assets owned by `PartyA` and `PartyB` in the `Corda_Network` from `samples/corda/corda-simple-application` folder:
+- Run the following to verify the status of the assets owned by `PartyA` and `PartyB` in the `Corda_Network` from `weaver/samples/corda/corda-simple-application` folder:
   ```bash
   ./scripts/getAssetStatus.sh
   ```

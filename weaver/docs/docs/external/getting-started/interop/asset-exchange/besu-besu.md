@@ -18,7 +18,7 @@ One Besu network transfers an non-fungible `AliceERC721` token with id `0` from 
 
 Run the following steps:
 
-1. Navigate to the `samples/besu/besu-cli` folder in your clone of the Weaver repository.
+1. Navigate to the `weaver/samples/besu/besu-cli` folder in your clone of the Cacti repository.
 2. Run the following to verify the status of the assets owned by `alice` and `bob` in the two networks:
    ```bash
    ./bin/besu-cli asset get-balance --network=network1 --account=1
@@ -77,7 +77,7 @@ One Besu network transfers an non-fungible `5 AliceERC1155` tokens with id `0` f
 
 Run the following steps:
 
-1. Navigate to the `samples/besu/besu-cli` folder in your clone of the Weaver repository.
+1. Navigate to the `weaver/samples/besu/besu-cli` folder in your clone of the Cacti repository.
 2. Run the following to verify the status of the assets owned by `alice` and `bob` in the two networks:
    ```bash
    ./bin/besu-cli asset get-balance --network=network1 --account=1
@@ -137,4 +137,4 @@ Run the following to verify the status of the assets owned by `alice` and `bob` 
   ./bin/besu-cli asset get-balance --network=network2 --account=1
   ./bin/besu-cli asset get-balance --network=network2 --account=2
   ```
-   
+

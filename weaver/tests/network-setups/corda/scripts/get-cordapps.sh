@@ -1,7 +1,3 @@
-# Copyright IBM Corp. All Rights Reserved.
-#
-# SPDX-License-Identifier: Apache-2.0
-
 #!/bin/bash
 
 directory=$(dirname $0)
@@ -84,7 +80,7 @@ fi
 
 if [[ $local == "local" ]]; then
   if [[ ! -f $directory/../../../../common/protos-java-kt/build/libs/protos-java-kt-$cactiVersion.jar ]]; then
-      echo "Please Build the weaver-protos-java-kt version $cactiVersion to use local components."
+      echo "Please Build the protos-java-kt version $cactiVersion to use local components."
   fi  
   if [[ ! -f $directory/../../../../core/network/corda-interop-app/interop-contracts/build/libs/interop-contracts-$cactiVersion.jar ]]; then
       echo "Please Build the corda-interop-app version $cactiVersion to use local components."

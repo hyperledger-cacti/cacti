@@ -18,7 +18,7 @@ Run the following steps:
 |:------|
 | The hash used in following steps can be replaced by any valid `SHA256` hash. |
 
-1. Navigate to either the `samples/fabric/fabric-cli` folder or the `samples/fabric/go-cli` folder in your clone of the Weaver repository.
+1. Navigate to the `weaver/samples/fabric/fabric-cli` (for the Node.js version) or the `weaver/samples/fabric/go-cli` (for the Golang version) folder in your clone of the Cacti repository.
 2. Run the following to verify the status of the assets owned by `alice` and `bob` in the two networks:
    ```bash
    ./scripts/getAssetStatus.sh 2

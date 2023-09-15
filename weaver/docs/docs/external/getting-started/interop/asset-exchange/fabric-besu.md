@@ -7,7 +7,7 @@ pagination_prev: external/getting-started/interop/asset-exchange/overview
 ---
 
 We will demonstrate asset exchange of a bond in Fabric `network1` with `10 BobERC20` tokens on Besu `network2`.
-For Fabric commands, run from `samples/fabric/fabric-cli` folder, and for Besu commands, run from `ssamples/besu/besu-cli` folder. Here `Alice` and `Bob` in Fabric `network1` correspond to account `1` and account `2` in Besu `network2` respectively. Following are the step-by-step asset exchange process:
+For Fabric commands, run from `weaver/samples/fabric/fabric-cli` folder, and for Besu commands, run from `weaver/samples/besu/besu-cli` folder, in your clone of the Cacti repository. Here `Alice` and `Bob` in Fabric `network1` correspond to account `1` and account `2` in Besu `network2` respectively. Following are the step-by-step asset exchange process:
 
 | Notes |
 |:------|
@@ -17,7 +17,7 @@ For Fabric commands, run from `samples/fabric/fabric-cli` folder, and for Besu c
   ```
   ./bin/fabric-cli hash --hash_fn=SHA256 secrettext
   ```
-- Run the following to verify the status of the bond assets owned by `alice` and `bob` in the Fabric network `network1` from `samples/fabric/fabric-cli` folder:
+- Run the following to verify the status of the bond assets owned by `alice` and `bob` in the Fabric network `network1` from `weaver/samples/fabric/fabric-cli` folder:
  ```bash
  ./scripts/getAssetStatus.sh
  ```
@@ -55,7 +55,7 @@ For Fabric commands, run from `samples/fabric/fabric-cli` folder, and for Besu c
   ```bash
   ./bin/fabric-cli asset exchange claim --recipient=bob --locker=alice --target-network=network1 --param=bond01:a03 --secret=secrettext
   ```
-- Run the following to verify the status of the bond assets owned by `alice` and `bob` in the Fabric network `network1` from `samples/fabric/fabric-cli` folder:
+- Run the following to verify the status of the bond assets owned by `alice` and `bob` in the Fabric network `network1` from `weaver/samples/fabric/fabric-cli` folder:
    ```bash
    ./scripts/getAssetStatus.sh
    ```

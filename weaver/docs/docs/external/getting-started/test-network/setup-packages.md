@@ -11,7 +11,7 @@ pagination_next: external/getting-started/test-network/ledger-initialization
  SPDX-License-Identifier: CC-BY-4.0
  -->
 
-In this document, we detail the steps using which you can bring up networks using the default configuration settings and by fetching pre-built Weaver interoperation modules, SDK libraries, and relay drivers from Github Package repositories. To customize these settings (e.g., hostnames, ports), refer to the [Advanced Configuration page](./advanced-configuration.md).
+In this document, we detail the steps using which you can bring up networks using the default configuration settings and by fetching pre-built Weaver interoperation modules, SDK libraries, and relay drivers from GitHub Package repositories. To customize these settings (e.g., hostnames, ports), refer to the [Advanced Configuration page](./advanced-configuration.md).
 
 | Notes |
 |:------|
@@ -41,11 +41,11 @@ Before starting, make sure you have the following software installed on your hos
 ### Credentials
 Make sure you have an SSH or GPG key registered in https://github.com to allow seamless cloning of repositories (at present, various setup scripts clone repositories using the `https://` prefix but this may change to `git@` in the future).
 
-Create a personal access token with `read:packages` access in github in order to use modules published in github packages. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
+Create a personal access token with `read:packages` access in GitHub in order to use modules published in GitHub packages. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
 
 ## Getting the Code and Documentation
 
-Clone the [weaver-dlt-interoperability](https://github.com/hyperledger/cacti/weaver) repository. The code to get a basic test network up and running and test data-sharing interoperation flows lies in the subfolder `tests/network-setups`, which should be your starting point, though the setups will rely on other parts of the repository, as you will find out in the instructions given on this page.
+Clone the [cacti](https://github.com/hyperledger/cacti) repository. The code to get a basic test network up and running and test data-sharing interoperation flows lies in the subfolder `weaver/tests/network-setups`, which should be your starting point, though the setups will rely on other parts of the repository, as you will find out in the instructions given on this page.
 
 ## Securing Components
 
@@ -59,7 +59,7 @@ Using the sequence of instructions below, you can start two separate Fabric netw
 
 ### Fabric Network
 
-The code for this lies in the `tests/network-setups` folder.
+The code for this lies in the `weaver/tests/network-setups` folder.
 
 This folder contains code to create and launch networks `network1` and `network2` of identical specifications:
 - Network: 1 peer, 1 peer CA, 1 ordering service node, 1 ordering service CA
@@ -76,7 +76,7 @@ This folder contains code to create and launch networks `network1` and `network2
 | For new users, we recommend testing the Data Sharing feature first with the `simplestate` contract. To test the other modes, you can simply [tear down](#tear-down-the-setup) the Fabric networks and restart them with the appropriate chaincodes installed. |
 
 Follow the instructions below to build and launch the networks:
-- Navigate to the `tests/network-setups/fabric/dev` folder.
+- Navigate to the `weaver/tests/network-setups/fabric/dev` folder.
 - To spin up both network1 and network2 with the interoperation chaincode and the default `simplestate` chaincode installed, run:
   ```bash
   make start-interop
@@ -104,7 +104,7 @@ For more information, refer to the associated [README](https://github.com/hyperl
 
 The CLI is used to interact with a Fabric network, configure it and run chaincode transactions to record data on the channel ledger or query data. It is also used to interact with remote networks through the relay to trigger an interoperation flow for data request and acceptance.
 
-The `fabric-cli` Node.js source code is located in the `samples/fabric/fabric-cli` folder and the Golang source code in the `samples/fabric/go-cli` folder.
+The `fabric-cli` Node.js source code is located in the `weaver/samples/fabric/fabric-cli` folder and the Golang source code in the `weaver/samples/fabric/go-cli` folder.
 
 #### Prerequisites
 
@@ -117,7 +117,7 @@ If you are using a Linux system, make sure that lib64 is installed.
 #### Installation
 
 You can install `fabric-cli` as follows (for both the Node.js and Golang versions):
-- Navigate to the `samples/fabric/fabric-cli` folder or the `samples/fabric/go-cli` folder.
+- Navigate to the `weaver/samples/fabric/fabric-cli` folder (for the Node.js version) or the `weaver/samples/fabric/go-cli` (for the Golang version) folder.
 - Create `.npmrc` from template `.npmrc.template`, by replacing `<personal-access-token>` with yours created [above](#package-access-token)..
 - Run the following to install dependencies (for the Node.js version) or the executable (for the Golang version):
   ```bash
@@ -128,29 +128,30 @@ You can install `fabric-cli` as follows (for both the Node.js and Golang version
 ### Fabric Relay
 
 The relay is a module acting on behalf of a network, enabling interoperation flows with other networks by communicating with their relays.
-The code for this lies in the `core/relay` folder.
+The code for this lies in the `weaver/core/relay` folder.
 
 #### Building
 
 _Prerequisite_: make sure Rust is already installed and that the `cargo` executable is in your system path (after installation of Rust, this should be available in `$HOME/.cargo/bin`); you can also ensure this by running `source "$HOME/.cargo/env"`.
 
 Build the generic (i.e., common to all DLTs) relay module as follows:
-- Navigate to the `core/relay` folder.
+- Navigate to the `weaver/core/relay` folder.
 - Run the following:
   ```bash
   make
   ```
-- To avoid errors during Weaver Relay compilation, update certain packages (on which the Weaver Relay is dependent) to their latest versions as follows:
+- If you observe errors during the above compilation, update certain packages (on which the Weaver Relay is dependent) to their latest versions and recompile as follows:
   ```bash
   make update-pkgs
+  make
   ```
 
 #### Deployment
 
-An instance or a relay can be run using a suitable configuration file. Samples are available in the `core/relay/config` folder.
+An instance or a relay can be run using a suitable configuration file. Samples are available in the `weaver/core/relay/config` folder.
 
 Run a relay for `network1` as follows:
-- Navigate to the `core/relay` folder.
+- Navigate to the `weaver/core/relay` folder.
 - To launch the server without TLS, leave the configuration file `config/Fabric_Relay.toml` in its default state. Otherwise, edit it to set TLS flags for this relay and the other relays and drivers it will connect to in this demonstration as follows:
   ```toml
   .
@@ -193,7 +194,7 @@ Run a relay for `network1` as follows:
   ```
 
 Run a relay for `network2` as follows (_do this only if you have launched both Fabric networks `network1` and `network2` and wish to test interoperation between them_)
-- Navigate to the `core/relay` folder.
+- Navigate to the `weaver/core/relay` folder.
 - To launch the server without TLS, leave the configuration file `config/Fabric_Relay2.toml` in its default state. Otherwise, edit it to set TLS flags for this relay and the other relays and drivers it will connect to in this demonstration as follows:
   ```toml
   .
@@ -241,18 +242,18 @@ For more information, see the [relay README](https://github.com/hyperledger/cact
 ### Fabric Driver
 
 A driver is a DLT-specific plugin invoked by the relay while conveying external data queries to the local peer network and collecting a response with proofs. The Fabric driver is built as a Fabric client application on the `fabric-network` NPM package.
-The code for this lies in the `core/drivers/fabric-driver` folder.
+The code for this lies in the `weaver/core/drivers/fabric-driver` folder.
 
 #### Configuring
 
-In the `core/drivers/fabric-driver` folder, copy `.env.template` to `.env` and update `CONNECTION_PROFILE` to point to the connection profile of the Fabric network (e.g. `<PATH-TO-WEAVER>/tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json`)
+In the `weaver/core/drivers/fabric-driver` folder, copy `.env.template` to `.env` and update `CONNECTION_PROFILE` to point to the connection profile of the Fabric network (e.g. `<PATH-TO-WEAVER>/tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json`)
 
 Configure `fabric-driver` for `network1` as follows:
-- Navigate to the `core/drivers/fabric-driver` folder.
+- Navigate to the `weaver/core/drivers/fabric-driver` folder.
 - Create a `.env` file by copying `.env.template` and setting suitable parameter values:
   * The `CONNECTION_PROFILE` should point to the absolute path of the connection profile for `network1`.
     - For this exercise, specify the path `<PATH-TO-WEAVER>/tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json` (_you must specify the full absolute path here_).
-    - `<PATH-TO-WEAVER>` here is the absolute path of the `weaver-dlt-interoperability` clone folder.
+    - `<PATH-TO-WEAVER>` here is the absolute path of the `weaver` folder within your Cacti repository clone.
   * If you wish to start the driver without TLS, set the following parameter values:
     ```
     RELAY_TLS=false
@@ -261,7 +262,7 @@ Configure `fabric-driver` for `network1` as follows:
     DRIVER_TLS_CERT_PATH=
     DRIVER_TLS_KEY_PATH=
     ```
-    Otherwise, if you wish to start the driver with TLS enabled, set the following parameter values (replace `<PATH-TO-WEAVER>` with the absolute path of the `weaver-dlt-interoperability` clone folder):
+    Otherwise, if you wish to start the driver with TLS enabled, set the following parameter values (replace `<PATH-TO-WEAVER>` with the absolute path of the `weaver` folder within your Cacti repository clone):
     ```
     RELAY_TLS=true
     RELAY_TLSCA_CERT_PATH=<PATH-TO-WEAVER>/core/relay/credentials/fabric_ca_cert.pem
@@ -274,7 +275,7 @@ Configure `fabric-driver` for `network1` as follows:
 #### Building
 
 Build the Fabric driver module as follows:
-- Navigate to the `core/drivers/fabric-driver` folder.
+- Navigate to the `weaver/core/drivers/fabric-driver` folder.
 - Create `.npmrc` from template `.npmrc.template`, by replacing `<personal-access-token>` with yours created above.
 - Run the following:
   ```bash
@@ -284,14 +285,14 @@ Build the Fabric driver module as follows:
 #### Running
 
 Run a Fabric driver for `network1` as follows:
-- Navigate to the `core/drivers/fabric-driver` folder.
+- Navigate to the `weaver/core/drivers/fabric-driver` folder.
 - Run the following:
   ```bash
   npm run dev
   ```
 
 Run a Fabric driver for `network2` as follows (_do this only if you wish to test interoperation between the two Fabric networks `network1` and `network2`_)
-- Navigate to the `core/drivers/fabric-driver` folder.
+- Navigate to the `weaver/core/drivers/fabric-driver` folder.
 - Run the following:
   ```bash
   CONNECTION_PROFILE=<PATH-TO-WEAVER>/tests/network-setups/fabric/shared/network2/peerOrganizations/org1.network2.com/connection-org1.json NETWORK_NAME=network2 RELAY_ENDPOINT=localhost:9083 DRIVER_ENDPOINT=localhost:9095 npm run dev
@@ -304,14 +305,17 @@ Run a Fabric driver for `network2` as follows (_do this only if you wish to test
 
 ### Fabric IIN Agent
 
-IIN Agent is a client of a member of a DLT network or security domain with special permissions to update security domain identities and configurations on the ledger via the network's interoperation module. The code for this lies in the `core/identity-management/iin-agent` folder. Navigate to the `core/identity-management/iin-agent` folder.
+IIN Agent is a client of a member of a DLT network or security domain with special permissions to update security domain identities and configurations on the ledger via the network's interoperation module. The code for this lies in the `weaver/core/identity-management/iin-agent` folder. Navigate to the `weaver/core/identity-management/iin-agent` folder.
 
 #### Building
 
-To build the IIN Agent, run:
-```bash
-make build-local
-```
+Build the IIN Agent as follows:
+- Navigate to the `weaver/core/drivers/fabric-driver` folder.
+- Create `.npmrc` from template `.npmrc.template`, by replacing `<personal-access-token>` with yours created above.
+- Run the following:
+  ```bash
+  make build
+  ```
 
 #### Configuration
 
@@ -319,7 +323,7 @@ Ledger config file specifies ledger specific IIN Agent details such as identity 
 
 1. To create config file for `Org1MSP`'s Fabric IIN Agent of `network1`, follow the steps:
     * Create copy of template config file for Fabric IIN Agent: `src/fabric-ledger/config.json.template`, say to location `src/fabric-ledger/config-n1-org1.json`.
-    * Replace `<path-to-connection-profile>` with `<PATH-TO-WEAVER>/tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json`, where replace `<PATH-TO-WEAVER>` with the location of your clone of Weaver.
+    * Replace `<path-to-connection-profile>` with `<PATH-TO-WEAVER>/tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json`, where replace `<PATH-TO-WEAVER>` with the absolute path of the `weaver` folder within your Cacti repository clone.
     * Set `mspId` as `Org1MSP`.
     * Set `agent.affiliation` as `org1.department1`.
 
@@ -488,16 +492,16 @@ Using the sequence of instructions below, you can start a Corda network and run 
 
 ### Corda Network
 
-The Corda networks' code lies in the `tests/network-setups/corda` folder. You can launch two separate Corda networks, namely `Corda_Network` and `Corda_Network2`. Each network runs the `samples/corda/corda-simple-application` CorDapp by default, which maintains a state named `SimpleState` containing a set of key-value pairs (of strings).
+The Corda networks' code lies in the `weaver/tests/network-setups/corda` folder. You can launch two separate Corda networks, namely `Corda_Network` and `Corda_Network2`. Each network runs the `weaver/samples/corda/corda-simple-application` CorDapp by default, which maintains a state named `SimpleState` containing a set of key-value pairs (of strings).
 
-The following steps will, in addition to launching the network, build the CorDapp and a Corda client in `samples/corda/corda-simple-application/client`.
+The following steps will, in addition to launching the network, build the CorDapp and a Corda client in `weaver/samples/corda/corda-simple-application/client`.
 
-#### Running with Interoperation CorDapp from Github Packages
+#### Running with Interoperation CorDapp from GitHub Packages
 
 Follow the instructions below to build and launch the network:
-- Navigate to the `tests/network-setups/corda` folder.
+- Navigate to the `weaver/tests/network-setups/corda` folder.
 - Create a copy of `github.properties.template` as `github.properties`.
-- Replace `<GITHUB email>` with your github email, and `<GITHUB Personal Access Token>` with the access token created [above](#package-access-token).
+- Replace `<GITHUB email>` with your GitHub email, and `<GITHUB Personal Access Token>` with the access token created [above](#package-access-token).
 - To spin up the Corda networks with the Interoperation CorDapps:
   - Each consisting of 1 node and a notary (for data-transfer), run:
     ```bash
@@ -529,7 +533,7 @@ Notary node services started for network <network-name>
 The relay was built earlier, so you just need to use a different configuration file to start a relay for the Corda network.
 
 Run a relay for `Corda_Network` as follows:
-- Navigate to the `core/relay` folder.
+- Navigate to the `weaver/core/relay` folder.
 - (Make sure you've already built the relay by running `make`.)
 - To launch the server without TLS, leave the configuration file `config/Corda_Relay.toml` in its default state. Otherwise, edit it to set TLS flags for this relay and the other relays and drivers it will connect to in this demonstration as follows:
   ```toml
@@ -580,7 +584,7 @@ Run a relay for `Corda_Network` as follows:
   ```
 
 Run a relay for `Corda_Network2` as follows (_do this only if you have launched both Corda networks `Corda_Network` and `Corda_Network2` and wish to test interoperation between them_)
-- Navigate to the `core/relay` folder.
+- Navigate to the `weaver/core/relay` folder.
 - To launch the server without TLS, leave the configuration file `config/Corda_Relay2.toml` in its default state. Otherwise, edit it to set TLS flags for this relay and the other relays and drivers it will connect to in this demonstration as follows:
   ```toml
   .
@@ -631,14 +635,14 @@ Run a relay for `Corda_Network2` as follows (_do this only if you have launched 
 
 ### Corda Driver
 
-The code for this lies in the `core/drivers/corda-driver` folder.
+The code for this lies in the `weaver/core/drivers/corda-driver` folder.
 
 #### Building Corda Driver
 
 Build the Corda driver module as follows:
-- Navigate to the `core/drivers/corda-driver` folder.
+- Navigate to the `weaver/core/drivers/corda-driver` folder.
 - Create a copy of `github.properties.template` as `github.properties`.
-- Replace `<GITHUB email>` with your github email, and `<GITHUB Personal Access Token>` with the access token created [above](#package-access-token).
+- Replace `<GITHUB email>` with your GitHub email, and `<GITHUB Personal Access Token>` with the access token created [above](#package-access-token).
 - Run the following:
   ```bash
   make build
@@ -647,7 +651,7 @@ Build the Corda driver module as follows:
 #### Configuring
 
 Configure the drivers as follows (you can skip this if you wish to run the drivers without TLS):
-- Navigate to the `core/drivers/corda-driver` folder and create a `.env` file.
+- Navigate to the `weaver/core/drivers/corda-driver` folder and create a `.env` file.
 - To run the drivers without TLS, set the following default values:
   ```
   RELAY_TLS=false
@@ -655,7 +659,7 @@ Configure the drivers as follows (you can skip this if you wish to run the drive
   RELAY_TLSCA_TRUST_STORE_PASSWORD=
   RELAY_TLSCA_CERT_PATHS=
   ```
-- To run the drivers with TLS, set the following values (replace `<PATH-TO-WEAVER>` with the absolute path of the `weaver-dlt-interoperability` clone folder):
+- To run the drivers with TLS, set the following values (replace `<PATH-TO-WEAVER>` with the absolute path of the `weaver` folder within your Cacti repository clone):
   ```
   RELAY_TLS=true
   RELAY_TLSCA_TRUST_STORE=<PATH-TO-WEAVER>/core/relay/credentials/fabric_trust_store.jks
@@ -666,7 +670,7 @@ Configure the drivers as follows (you can skip this if you wish to run the drive
 #### Running
 
 Run a Corda driver as follows:
-- Navigate to the `core/drivers/corda-driver` folder.
+- Navigate to the `weaver/core/drivers/corda-driver` folder.
 - Run the following to start Corda driver for `Corda_Network`:
   ```bash
   ./build/install/corda-driver/bin/corda-driver
@@ -689,13 +693,13 @@ Run a Corda driver as follows:
 Bring down the test network's components as follows:
 - Simply terminate the various relays and drivers, which are running in the foreground in different terminals
 - To bring down the running Corda network:
-  * Navigate to the `tests/network-setups/corda` folder.
+  * Navigate to the `weaver/tests/network-setups/corda` folder.
   * Run the following:
     ```bash
     make clean
     ```
 - To bring down all the running Fabric networks:
-  * Navigate to the `tests/network-setups/fabric/dev` folder.
+  * Navigate to the `weaver/tests/network-setups/fabric/dev` folder.
   * Run the following:
     ```bash
     make clean
