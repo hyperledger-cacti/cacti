@@ -81,19 +81,19 @@ export class ConfigService {
     `========================\n\n`;
 
   public static getHelpText(): string {
-    const schema: any = ConfigService.getConfigSchema();
+    const schema: Record<string, unknown> = ConfigService.getConfigSchema();
 
     const argsHelpText = Object.keys(schema)
       .map(
         (optionName: string) =>
           `  ${optionName}:` +
-          `\n\t\tDescription: ${schema[optionName].doc}` +
+          `\n\t\tDescription: ${(schema[optionName] as { doc: string }).doc}` +
           `\n\t\tDefault: ${
-            schema[optionName].default ||
+            (schema[optionName] as { default?: string }).default ||
             "Mandatory parameter without a default value."
           }` +
-          `\n\t\tEnv: ${schema[optionName].env}` +
-          `\n\t\tCLI: --${schema[optionName].arg}`,
+          `\n\t\tEnv: ${(schema[optionName] as { env: string }).env}` +
+          `\n\t\tCLI: --${(schema[optionName] as { arg: string }).arg}`,
       )
       .join("\n");
 
@@ -103,8 +103,7 @@ export class ConfigService {
   private static getConfigSchema(): Schema<ICactusApiServerOptions> {
     return {
       pluginManagerOptionsJson: {
-        doc:
-          "Can be used to override npm registry and authentication details for example. See https://www.npmjs.com/package/live-plugin-manager#pluginmanagerconstructoroptions-partialpluginmanageroptions for further details.",
+        doc: "Can be used to override npm registry and authentication details for example. See https://www.npmjs.com/package/live-plugin-manager#pluginmanagerconstructoroptions-partialpluginmanageroptions for further details.",
         format: "*",
         default: "{}",
         env: "PLUGIN_MANAGER_OPTIONS_JSON",
@@ -123,7 +122,7 @@ export class ConfigService {
             throw new Error(m);
           }
         },
-        default: (null as unknown) as AuthorizationProtocol,
+        default: null as unknown as AuthorizationProtocol,
         env: "AUTHORIZATION_PROTOCOL",
         arg: "authorization-protocol",
       },
@@ -173,8 +172,7 @@ export class ConfigService {
         },
       } as SchemaObj<PluginImport[]>,
       configFile: {
-        doc:
-          "The path to a config file that holds the configuration itself which will be parsed and validated.",
+        doc: "The path to a config file that holds the configuration itself which will be parsed and validated.",
         format: "*",
         default: "",
         env: "CONFIG_FILE",
@@ -243,8 +241,7 @@ export class ConfigService {
         default: false,
       },
       cockpitHost: {
-        doc:
-          "The host to bind the Cockpit webserver to. Secure default is: 127.0.0.1. Use 0.0.0.0 to bind for any host.",
+        doc: "The host to bind the Cockpit webserver to. Secure default is: 127.0.0.1. Use 0.0.0.0 to bind for any host.",
         format: "ipaddress",
         default: "127.0.0.1",
         env: "COCKPIT_HOST",
@@ -258,8 +255,7 @@ export class ConfigService {
         default: 3000,
       },
       cockpitWwwRoot: {
-        doc:
-          "The file-system path pointing to the static files of web application served as the cockpit by the API server.",
+        doc: "The file-system path pointing to the static files of web application served as the cockpit by the API server.",
         format: "*",
         env: "COCKPIT_WWW_ROOT",
         arg: "cockpit-www-root",
@@ -331,8 +327,7 @@ export class ConfigService {
         default: null as string | null,
       },
       apiHost: {
-        doc:
-          "The host to bind the API to. Secure default is: 127.0.0.1. Use 0.0.0.0 to bind for any host.",
+        doc: "The host to bind the API to. Secure default is: 127.0.0.1. Use 0.0.0.0 to bind for any host.",
         format: "ipaddress",
         env: "API_HOST",
         arg: "api-host",
@@ -661,7 +656,8 @@ export class ConfigService {
     env?: NodeJS.ProcessEnv;
     args?: string[];
   }): Config<ICactusApiServerOptions> {
-    const schema: Schema<ICactusApiServerOptions> = ConfigService.getConfigSchema();
+    const schema: Schema<ICactusApiServerOptions> =
+      ConfigService.getConfigSchema();
     ConfigService.config = (convict as any)(schema, options);
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     if (ConfigService.config.get("configFile")) {
