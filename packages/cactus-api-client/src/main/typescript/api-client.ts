@@ -34,8 +34,8 @@ export class ApiClient extends BaseAPI {
   public extendWith<T>(
     ctor: new (configuration?: Configuration) => T,
   ): T & this {
-    const instance = new ctor(this.configuration) as any;
-    const self = this as any;
+    const instance = new ctor(this.configuration) as Record<string, unknown>;
+    const self = this as Record<string, unknown>;
 
     Objects.getAllMethodNames(instance).forEach(
       (method: string) => (self[method] = instance[method]),
