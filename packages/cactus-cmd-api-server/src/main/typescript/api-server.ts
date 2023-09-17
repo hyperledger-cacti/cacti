@@ -20,7 +20,7 @@ import express from "express";
 import { OpenAPIV3 } from "express-openapi-validator/dist/framework/types";
 import compression from "compression";
 import bodyParser from "body-parser";
-import cors from "cors";
+import cors, { CorsOptionsDelegate, CorsRequest } from "cors";
 
 import rateLimit from "express-rate-limit";
 import { Server as SocketIoServer } from "socket.io";
@@ -791,8 +791,11 @@ export class ApiServer {
   createCorsMiddleware(allowedDomains: string[]): RequestHandler {
     const allDomainsOk = allowedDomains.includes("*");
 
-    const corsOptionsDelegate = (req: Request, callback: any) => {
-      const origin = req.header("Origin");
+    const corsOptionsDelegate: CorsOptionsDelegate<CorsRequest> = (
+      req,
+      callback,
+    ) => {
+      const origin = req.headers["origin"];
       const isDomainOk = origin && allowedDomains.includes(origin);
       // this.log.debug("CORS %j %j %s", allDomainsOk, isDomainOk, req.originalUrl);
 
