@@ -57,12 +57,12 @@
     "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-alpha.2",
     "@hyperledger/cactus-plugin-ledger-connector-ethereum": "2.0.0-alpha.2",
     "@hyperledger/cactus-verifier-client": "2.0.0-alpha.2",
-    "web3": "1.10.0",
-    "web3-utils": "1.10.0"
+    "web3": "4.0.3",
+    "web3-utils": "4.0.3"
   },
   "devDependencies": {
+    "@hyperledger/cactus-test-geth-ledger": "2.0.0-alpha.2",
     "@hyperledger/cactus-test-tooling": "2.0.0-alpha.2",
-    "@types/convict": "6.1.1",
     "@types/lodash": "4.14.195",
     "lodash": "4.17.21"
   },

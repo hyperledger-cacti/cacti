@@ -134,11 +134,11 @@ jobs:
         uses: actions/github-script@v6.4.1
         with:
           script: |
-            const failMsg = "yarn codegen script produced version control " + 
-              "side-effects: source files have been changed by it that are " + 
-              "otherwise are under version control. " + 
-              "This means (99% of the time) that you need to run the " + 
-              "yarn codegen script locally and then include the changes it " + 
+            const failMsg = "yarn codegen script produced version control " +
+              "side-effects: source files have been changed by it that are " +
+              "otherwise are under version control. " +
+              "This means (99% of the time) that you need to run the " +
+              "yarn codegen script locally and then include the changes it " +
               "makes in your own commit when submitting your pull request.";
             core.setFailed(failMsg)
 
@@ -1325,9 +1325,7 @@ jobs:
       FULL_BUILD_DISABLED: true
       JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_RUNNER_DISABLED: false
-      TAPE_TEST_PATTERN: >-
-        --files={./packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/integration/plugin-ledger-connector-ethereum/deploy-contract/openapi/openapi-validation-no-keychain.test.ts,./packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/integration/plugin-ledger-connector-ethereum/deploy-contract/openapi/openapi-validation.test.ts,./packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/integration/plugin-ledger-connector-ethereum/deploy-contract/v2.3.0-deploy-contract-from-json-json-object-endpoints.test.ts,./packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/integration/plugin-ledger-connector-ethereum/deploy-contract/v2.3.0-deploy-contract-from-json-json-object.test.ts,./packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/integration/plugin-ledger-connector-ethereum/deploy-contract/v2.3.0-invoke-contract-json-object-endpoints.test.ts,./packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/integration/plugin-ledger-connector-ethereum/deploy-contract/v2.3.0-invoke-contract-json-object.test.ts,./packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/integration/plugin-ledger-connector-ethereum/deploy-contract/v21.4.1-deploy-contract-from-json-json-object-endpoints.test.ts,./packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/integration/plugin-ledger-connector-ethereum/deploy-contract/v21.4.1-deploy-contract-from-json-json-object.test.ts,./packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/integration/plugin-ledger-connector-ethereum/deploy-contract/v21.4.1-invoke-contract-json-object-endpoints.test.ts,./packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/integration/plugin-ledger-connector-ethereum/deploy-contract/v21.4.1-invoke-contract-json-object.test.ts}
-      TAPE_TEST_RUNNER_DISABLED: false
+      TAPE_TEST_RUNNER_DISABLED: true
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
@@ -1336,17 +1334,14 @@ jobs:
         with:
           node-version: v16.14.2
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
   cactus-plugin-ledger-connector-quorum:
     continue-on-error: false
@@ -1637,13 +1632,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-      
+
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
 
       - name: Run solidity tests
         run: cd packages/cactus-plugin-htlc-eth-besu && forge test -vvvvv
-              
+
   cactus-test-plugin-htlc-eth-besu-erc20:
     continue-on-error: false
     env:

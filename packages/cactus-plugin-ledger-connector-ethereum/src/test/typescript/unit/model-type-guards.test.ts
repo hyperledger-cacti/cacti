@@ -3,7 +3,7 @@ import {
   isWeb3SigningCredentialGethKeychainPassword,
   isWeb3SigningCredentialNone,
   isWeb3SigningCredentialPrivateKeyHex,
-} from "../../../main/typescript/model-type-guards";
+} from "../../../main/typescript/types/model-type-guards";
 import {
   Web3SigningCredentialGethKeychainPassword,
   Web3SigningCredentialType,

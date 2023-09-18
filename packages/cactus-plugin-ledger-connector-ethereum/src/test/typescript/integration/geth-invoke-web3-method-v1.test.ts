@@ -10,28 +10,30 @@
 const testLogLevel = "info";
 const sutLogLevel = "info";
 
-const containerImageVersion = "2021-05-03-quorum-v21.4.1";
-
 import "jest-extended";
 import { v4 as uuidv4 } from "uuid";
 import { PluginRegistry } from "@hyperledger/cactus-core";
-import { PluginLedgerConnectorEthereum } from "../../../../../main/typescript/index";
-import {
-  QuorumTestLedger,
-  pruneDockerAllIfGithubAction,
-} from "@hyperledger/cactus-test-tooling";
+import { PluginLedgerConnectorEthereum } from "../../../main/typescript/index";
+import { pruneDockerAllIfGithubAction } from "@hyperledger/cactus-test-tooling";
 import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
+import {
+  GethTestLedger,
+  WHALE_ACCOUNT_ADDRESS,
+} from "@hyperledger/cactus-test-geth-ledger";
 import Web3 from "web3";
 
 // Unit Test logger setup
 const log: Logger = LoggerProvider.getOrCreate({
-  label: "v21.4.1-invoke-web3-method-v1.test",
+  label: "geth-invoke-web3-method-v1.test",
   level: testLogLevel,
 });
 log.info("Test started");
 
+const containerImageName = "ghcr.io/hyperledger/cacti-geth-all-in-one";
+const containerImageVersion = "2023-07-27-2a8c48ed6";
+
 describe("invokeRawWeb3EthMethod Tests", () => {
-  let ethereumTestLedger: QuorumTestLedger;
+  let ethereumTestLedger: GethTestLedger;
   let connector: PluginLedgerConnectorEthereum;
   let web3: Web3;
 
@@ -43,9 +45,10 @@ describe("invokeRawWeb3EthMethod Tests", () => {
     log.info("Prune Docker...");
     await pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
 
-    log.info("Start QuorumTestLedger...");
-    log.debug("Ethereum version:", containerImageVersion);
-    ethereumTestLedger = new QuorumTestLedger({
+    log.info("Start GethTestLedger...");
+    // log.debug("Ethereum version:", containerImageVersion);
+    ethereumTestLedger = new GethTestLedger({
+      containerImageName,
       containerImageVersion,
     });
     await ethereumTestLedger.start();
@@ -81,7 +84,7 @@ describe("invokeRawWeb3EthMethod Tests", () => {
       methodName: "getGasPrice",
     });
     expect(connectorResponse).toBeTruthy();
-    expect(connectorResponse).toEqual("0"); // gas is free on ethereum
+    expect(Number(connectorResponse)).toBeGreaterThan(0);
   });
 
   test("invokeRawWeb3EthMethod with 1-argument method works (getBlock)", async () => {
@@ -99,17 +102,16 @@ describe("invokeRawWeb3EthMethod Tests", () => {
   });
 
   test("invokeRawWeb3EthMethod with 2-argument method works (getStorageAt)", async () => {
-    const genesisAccount = await ethereumTestLedger.getGenesisAccount();
-    log.debug("genesisAccount:", genesisAccount);
+    log.debug("WHALE_ACCOUNT_ADDRESS:", WHALE_ACCOUNT_ADDRESS);
 
     const connectorResponse = await connector.invokeRawWeb3EthMethod({
       methodName: "getStorageAt",
-      params: [genesisAccount, 0],
+      params: [WHALE_ACCOUNT_ADDRESS, 0],
     });
     expect(connectorResponse).toBeTruthy();
 
     // Compare with direct web3 response
-    const web3Response = await web3.eth.getStorageAt(genesisAccount, 0);
+    const web3Response = await web3.eth.getStorageAt(WHALE_ACCOUNT_ADDRESS, 0);
     expect(web3Response).toBeTruthy();
     expect(web3Response).toEqual(connectorResponse);
   });

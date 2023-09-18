@@ -4,11 +4,14 @@ import type {
 } from "socket.io";
 
 import { Express } from "express";
-import Web3 from "web3";
-import { AbiItem } from "web3-utils";
-import { Contract } from "web3-eth-contract";
-import { ContractSendMethod } from "web3-eth-contract";
-import { TransactionReceipt } from "web3-eth";
+import Web3, {
+  ContractAbi,
+  HttpProvider,
+  TransactionReceiptBase,
+  WebSocketProvider,
+} from "web3";
+import { NewHeadsSubscription } from "web3-eth";
+import { Contract, PayableMethodObject } from "web3-eth-contract";
 
 import OAS from "../json/openapi.json";
 
@@ -65,9 +68,17 @@ import { GetPrometheusExporterMetricsEndpointV1 } from "./web-services/get-prome
 import { InvokeRawWeb3EthMethodEndpoint } from "./web-services/invoke-raw-web3eth-method-v1-endpoint";
 import { InvokeRawWeb3EthContractEndpoint } from "./web-services/invoke-raw-web3eth-contract-v1-endpoint";
 
-import { isWeb3SigningCredentialNone } from "./model-type-guards";
+import { isWeb3SigningCredentialNone } from "./types/model-type-guards";
 import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
 import { RuntimeError } from "run-time-error";
+import {
+  Web3StringReturnFormat,
+  convertWeb3ReceiptStatusToBool,
+} from "./types/util-types";
+
+// Used when waiting for WS requests to be send correctly before disconnecting
+const waitForWsProviderRequestsTimeout = 5 * 1000; // 5s
+const waitForWsProviderRequestsStep = 500; // 500ms
 
 export interface IPluginLedgerConnectorEthereumOptions
   extends ICactusPluginOptions {
@@ -87,7 +98,8 @@ export class PluginLedgerConnectorEthereum
       RunTransactionResponse
     >,
     ICactusPlugin,
-    IPluginWebService {
+    IPluginWebService
+{
   private readonly pluginRegistry: PluginRegistry;
   public prometheusExporter: PrometheusExporter;
   private readonly instanceId: string;
@@ -95,6 +107,8 @@ export class PluginLedgerConnectorEthereum
   private readonly web3: Web3;
   private endpoints: IWebServiceEndpoint[] | undefined;
   public static readonly CLASS_NAME = "PluginLedgerConnectorEthereum";
+  private watchBlocksSubscriptions: Map<string, NewHeadsSubscription> =
+    new Map();
 
   public get className(): string {
     return PluginLedgerConnectorEthereum.CLASS_NAME;
@@ -102,9 +116,9 @@ export class PluginLedgerConnectorEthereum
 
   private getWeb3Provider() {
     if (!this.options.rpcApiWsHost) {
-      return new Web3.providers.HttpProvider(this.options.rpcApiHttpHost);
+      return new HttpProvider(this.options.rpcApiHttpHost);
     }
-    return new Web3.providers.WebsocketProvider(this.options.rpcApiWsHost);
+    return new WebSocketProvider(this.options.rpcApiWsHost);
   }
 
   constructor(public readonly options: IPluginLedgerConnectorEthereumOptions) {
@@ -150,13 +164,59 @@ export class PluginLedgerConnectorEthereum
     return this.instanceId;
   }
 
+  private async removeWatchBlocksSubscriptionForSocket(socketId: string) {
+    try {
+      const subscription = this.watchBlocksSubscriptions.get(socketId);
+      if (subscription) {
+        await subscription.unsubscribe();
+        this.watchBlocksSubscriptions.delete(socketId);
+        this.log.info(`${socketId} ${WatchBlocksV1.Unsubscribe} OK`);
+      }
+    } catch (error) {
+      this.log.debug(
+        `${socketId} ${WatchBlocksV1.Unsubscribe} Failed (possibly already closed)`,
+      );
+    }
+  }
+
   public async shutdown(): Promise<void> {
     this.log.info(`Shutting down ${this.className}...`);
-    const provider = this.web3.currentProvider;
-    if (provider && typeof provider == "object") {
-      if ("disconnect" in provider) {
-        provider.disconnect(1000, "shutdown");
+
+    this.log.debug("Remove any remaining web3js subscriptions");
+    for (const socketId of this.watchBlocksSubscriptions.keys()) {
+      this.log.debug(`${WatchBlocksV1.Unsubscribe} shutdown`);
+      await this.removeWatchBlocksSubscriptionForSocket(socketId);
+    }
+
+    try {
+      const wsProvider = this.web3.currentProvider as WebSocketProvider;
+      if (!wsProvider || !typeof wsProvider.SocketConnection === undefined) {
+        this.log.debug("Non-WS provider found - finish");
+        return;
       }
+
+      // Wait for WS requests to finish
+      const looseWsProvider = wsProvider as any; // Used to access protected fields of WS provider
+      let waitForRequestRemainingSteps =
+        waitForWsProviderRequestsTimeout / waitForWsProviderRequestsStep;
+      while (
+        waitForRequestRemainingSteps > 0 &&
+        (looseWsProvider._pendingRequestsQueue.size > 0 ||
+          looseWsProvider._sentRequestsQueue.size > 0)
+      ) {
+        this.log.debug(
+          `Waiting for pending and sent requests to finish on web3js WS provider (${waitForWsProviderRequestsStep})...`,
+        );
+        await new Promise((resolve) =>
+          setTimeout(resolve, waitForWsProviderRequestsStep),
+        );
+        waitForRequestRemainingSteps--;
+      }
+
+      // Disconnect the socket provider
+      wsProvider.disconnect();
+    } catch (error) {
+      this.log.error("Error when disconnecting web3js WS provider!", error);
     }
   }
 
@@ -176,14 +236,29 @@ export class PluginLedgerConnectorEthereum
     wsApi.on("connection", (socket: SocketIoSocket) => {
       this.log.debug(`New Socket connected. ID=${socket.id}`);
 
-      socket.on(WatchBlocksV1.Subscribe, (options?: WatchBlocksV1Options) => {
-        new WatchBlocksV1Endpoint({
-          web3,
-          socket,
-          logLevel,
-          options,
-        }).subscribe();
-      });
+      socket.on(
+        WatchBlocksV1.Subscribe,
+        async (options?: WatchBlocksV1Options) => {
+          const watchBlocksEndpoint = new WatchBlocksV1Endpoint({
+            web3,
+            socket,
+            logLevel,
+            options,
+          });
+          this.watchBlocksSubscriptions.set(
+            socket.id,
+            await watchBlocksEndpoint.subscribe(),
+          );
+
+          socket.on("disconnect", async (reason: string) => {
+            this.log.debug(
+              `${WatchBlocksV1.Unsubscribe} disconnect reason=%o`,
+              reason,
+            );
+            await this.removeWatchBlocksSubscriptionForSocket(socket.id);
+          });
+        },
+      );
     });
 
     return webServices;
@@ -258,14 +333,13 @@ export class PluginLedgerConnectorEthereum
     return `@hyperledger/cactus-plugin-ledger-connector-ethereum`;
   }
 
-  public async getConsensusAlgorithmFamily(): Promise<
-    ConsensusAlgorithmFamily
-  > {
+  public async getConsensusAlgorithmFamily(): Promise<ConsensusAlgorithmFamily> {
     return ConsensusAlgorithmFamily.Stake;
   }
 
   public async hasTransactionFinality(): Promise<boolean> {
-    const currentConsensusAlgorithmFamily = await this.getConsensusAlgorithmFamily();
+    const currentConsensusAlgorithmFamily =
+      await this.getConsensusAlgorithmFamily();
 
     return consensusHasTransactionFinality(currentConsensusAlgorithmFamily);
   }
@@ -351,7 +425,7 @@ export class PluginLedgerConnectorEthereum
     const contractJSON = JSON.parse(contractStr);
 
     // if not exists a contract deployed, we deploy it
-    const networkId = await this.web3.eth.net.getId();
+    const networkId = (await this.web3.eth.net.getId()).toString();
     if (
       !contractJSON.networks ||
       !contractJSON.networks[networkId] ||
@@ -392,6 +466,26 @@ export class PluginLedgerConnectorEthereum
     return this.invokeContract(req);
   }
 
+  /**
+   * Simple function for estimating `maxFeePerGas` to sent with transaction.
+   * @warn It's not optimized for either speed or cost, consider using more complex solution on production!
+   * @param priorityFee what priority tip you plan to include.
+   * @returns estimated `maxFeePerGas` value.
+   */
+  public async estimateMaxFeePerGas(
+    priorityFee: number | string = 0,
+  ): Promise<string> {
+    const pendingBlock = await this.web3.eth.getBlock("pending");
+    const baseFee = pendingBlock.baseFeePerGas;
+    if (!baseFee) {
+      throw new Error(
+        "Can't estimate maxFeePerGas - could not get recent baseFeePerGas",
+      );
+    }
+    const estimate = BigInt(2) * baseFee + BigInt(priorityFee);
+    return estimate.toString();
+  }
+
   public async invokeContract(
     req: InvokeContractJsonObjectV1Request,
   ): Promise<InvokeContractV1Response> {
@@ -410,13 +504,10 @@ export class PluginLedgerConnectorEthereum
       throw new Error(`${fnTag} Contract ABI is necessary`);
     }
 
-    const contractInstance: InstanceType<typeof Contract> = new this.web3.eth.Contract(
-      abi,
-      contractAddress,
-    );
+    const contractInstance = new this.web3.eth.Contract(abi, contractAddress);
 
     const isSafeToCall = await this.isSafeToCallContractMethod(
-      contractInstance,
+      contractInstance as unknown as Contract<ContractAbi>,
       req.methodName,
     );
     if (!isSafeToCall) {
@@ -425,13 +516,15 @@ export class PluginLedgerConnectorEthereum
       );
     }
 
-    const methodRef = contractInstance.methods[req.methodName];
+    const methodRef = contractInstance.methods[req.methodName] as (
+      ...args: unknown[]
+    ) => PayableMethodObject;
     Checks.truthy(methodRef, `${fnTag} YourContract.${req.methodName}`);
 
-    const method: ContractSendMethod = methodRef(...req.params);
+    const method = methodRef(...req.params);
     if (req.invocationType === EthContractInvocationType.Call) {
       contractInstance.methods[req.methodName];
-      const callOutput = await (method as any).call();
+      const callOutput = await method.call();
       const success = true;
       return { success, callOutput };
     } else if (req.invocationType === EthContractInvocationType.Send) {
@@ -441,24 +534,29 @@ export class PluginLedgerConnectorEthereum
       const web3SigningCredential = req.web3SigningCredential as
         | Web3SigningCredentialPrivateKeyHex
         | Web3SigningCredentialCactusKeychainRef;
-      const payload = (method.send as any).request();
-      const { params } = payload;
-      const [transactionConfig] = params;
-      if (!req.gas) {
-        req.gas = await this.web3.eth.estimateGas(transactionConfig);
-      }
-      transactionConfig.from = web3SigningCredential.ethAccount;
-      transactionConfig.gas = req.gas;
-      transactionConfig.gasPrice = req.gasPrice;
-      transactionConfig.value = req.value;
-      transactionConfig.nonce = req.nonce;
 
-      const txReq: RunTransactionRequest = {
+      if (!req.gas) {
+        const estimatedGas = await method.estimateGas();
+        req.gas = estimatedGas.toString();
+      }
+
+      const maxFeePerGas = await this.estimateMaxFeePerGas();
+      const transactionConfig = {
+        from: web3SigningCredential.ethAccount,
+        to: contractAddress,
+        maxPriorityFeePerGas: req.gasPrice ?? 0,
+        maxFeePerGas,
+        gasLimit: req.gas,
+        value: req.value,
+        nonce: req.nonce,
+        data: method.encodeABI(),
+      };
+
+      const out = await this.transact({
         transactionConfig,
         web3SigningCredential,
         timeoutMs: req.timeoutMs || 60000,
-      };
-      const out = await this.transact(txReq);
+      });
       const success = out.transactionReceipt.status;
       const data = { success, out };
       return data;
@@ -473,68 +571,83 @@ export class PluginLedgerConnectorEthereum
     req: RunTransactionRequest,
   ): Promise<RunTransactionResponse> {
     const fnTag = `${this.className}#transact()`;
-
-    switch (req.web3SigningCredential.type) {
-      case Web3SigningCredentialType.CactusKeychainRef: {
-        return this.transactCactusKeychainRef(req);
-      }
-      case Web3SigningCredentialType.GethKeychainPassword: {
-        return this.transactGethKeychain(req);
-      }
-      case Web3SigningCredentialType.PrivateKeyHex: {
-        return this.transactPrivateKey(req);
-      }
-      case Web3SigningCredentialType.None: {
-        if (req.transactionConfig.rawTransaction) {
-          return this.transactSigned(req.transactionConfig.rawTransaction);
-        } else {
+    try {
+      switch (req.web3SigningCredential.type) {
+        case Web3SigningCredentialType.CactusKeychainRef: {
+          return await this.transactCactusKeychainRef(req);
+        }
+        case Web3SigningCredentialType.GethKeychainPassword: {
+          return await this.transactGethKeychain(req);
+        }
+        case Web3SigningCredentialType.PrivateKeyHex: {
+          return await this.transactPrivateKey(req);
+        }
+        case Web3SigningCredentialType.None: {
+          if (req.transactionConfig.rawTransaction) {
+            return await this.transactSigned(
+              req.transactionConfig.rawTransaction,
+            );
+          } else {
+            throw new Error(
+              `${fnTag} Expected pre-signed raw transaction ` +
+                ` since signing credential is specified as` +
+                `Web3SigningCredentialType.NONE`,
+            );
+          }
+        }
+        default: {
           throw new Error(
-            `${fnTag} Expected pre-signed raw transaction ` +
-              ` since signing credential is specified as` +
-              `Web3SigningCredentialType.NONE`,
+            `${fnTag} Unrecognized Web3SigningCredentialType: ` +
+              `${req.web3SigningCredential.type} Supported ones are: ` +
+              `${Object.values(Web3SigningCredentialType).join(";")}`,
           );
         }
       }
-      default: {
-        throw new Error(
-          `${fnTag} Unrecognized Web3SigningCredentialType: ` +
-            `${req.web3SigningCredential.type} Supported ones are: ` +
-            `${Object.values(Web3SigningCredentialType).join(";")}`,
-        );
+    } catch (error) {
+      if ("toJSON" in error) {
+        this.log.debug("transact() failed with error:", error.toJSON());
       }
+      throw error;
     }
   }
 
   public async transactSigned(
     rawTransaction: string,
   ): Promise<RunTransactionResponse> {
-    const fnTag = `${this.className}#transactSigned()`;
+    const receipt = (await this.web3.eth.sendSignedTransaction(
+      rawTransaction,
+      Web3StringReturnFormat,
+    )) as TransactionReceiptBase<string, string, string, unknown>;
 
-    const receipt = await this.web3.eth.sendSignedTransaction(rawTransaction);
-
-    if (receipt instanceof Error) {
-      this.log.debug(`${fnTag} Web3 sendSignedTransaction failed`, receipt);
-      throw receipt;
-    } else {
-      this.prometheusExporter.addCurrentTransaction();
-      return { transactionReceipt: receipt };
-    }
+    this.prometheusExporter.addCurrentTransaction();
+    return {
+      transactionReceipt: {
+        ...receipt,
+        status: convertWeb3ReceiptStatusToBool(receipt.status),
+      },
+    };
   }
 
   public async transactGethKeychain(
     txIn: RunTransactionRequest,
   ): Promise<RunTransactionResponse> {
     const fnTag = `${this.className}#transactGethKeychain()`;
-    const { sendTransaction } = this.web3.eth.personal;
     const { transactionConfig, web3SigningCredential } = txIn;
-    const {
-      secret,
-    } = web3SigningCredential as Web3SigningCredentialGethKeychainPassword;
+    const { secret } =
+      web3SigningCredential as Web3SigningCredentialGethKeychainPassword;
 
     try {
-      const txHash = await sendTransaction(transactionConfig, secret);
+      const txHash = await this.web3.eth.personal.sendTransaction(
+        transactionConfig,
+        secret,
+      );
       const transactionReceipt = await this.pollForTxReceipt(txHash);
-      return { transactionReceipt };
+      return {
+        transactionReceipt: {
+          ...transactionReceipt,
+          status: convertWeb3ReceiptStatusToBool(transactionReceipt.status),
+        },
+      };
     } catch (ex) {
       throw new Error(
         `${fnTag} Failed to invoke web3.eth.personal.sendTransaction(). ` +
@@ -548,9 +661,8 @@ export class PluginLedgerConnectorEthereum
   ): Promise<RunTransactionResponse> {
     const fnTag = `${this.className}#transactPrivateKey()`;
     const { transactionConfig, web3SigningCredential } = req;
-    const {
-      secret,
-    } = web3SigningCredential as Web3SigningCredentialPrivateKeyHex;
+    const { secret } =
+      web3SigningCredential as Web3SigningCredentialPrivateKeyHex;
 
     const signedTx = await this.web3.eth.accounts.signTransaction(
       transactionConfig,
@@ -572,11 +684,8 @@ export class PluginLedgerConnectorEthereum
   ): Promise<RunTransactionResponse> {
     const fnTag = `${this.className}#transactCactusKeychainRef()`;
     const { transactionConfig, web3SigningCredential } = req;
-    const {
-      ethAccount,
-      keychainEntryKey,
-      keychainId,
-    } = web3SigningCredential as Web3SigningCredentialCactusKeychainRef;
+    const { ethAccount, keychainEntryKey, keychainId } =
+      web3SigningCredential as Web3SigningCredentialCactusKeychainRef;
 
     // locate the keychain plugin that has access to the keychain backend
     // denoted by the keychainID from the request.
@@ -593,9 +702,8 @@ export class PluginLedgerConnectorEthereum
       this.log.debug(
         `${fnTag} Gas not specified in the transaction values. Using the estimate from web3`,
       );
-      transactionConfig.gas = await this.web3.eth.estimateGas(
-        transactionConfig,
-      );
+      const estimatedGas = await this.web3.eth.estimateGas(transactionConfig);
+      transactionConfig.gas = estimatedGas.toString();
       this.log.debug(
         `${fnTag} Gas estimated from web3 is: `,
         transactionConfig.gas,
@@ -615,24 +723,31 @@ export class PluginLedgerConnectorEthereum
   public async pollForTxReceipt(
     txHash: string,
     timeoutMs = 60000,
-  ): Promise<TransactionReceipt> {
+  ): Promise<TransactionReceiptBase<string, string, string, unknown>> {
     const fnTag = `${this.className}#pollForTxReceipt()`;
-    let txReceipt;
     let timedOut = false;
     let tries = 0;
     const startedAt = new Date();
 
     do {
-      txReceipt = await this.web3.eth.getTransactionReceipt(txHash);
+      try {
+        return (await this.web3.eth.getTransactionReceipt(
+          txHash,
+          Web3StringReturnFormat,
+        )) as TransactionReceiptBase<string, string, string, unknown>;
+      } catch (error) {
+        this.log.debug(
+          "pollForTxReceipt getTransactionReceipt failed - (retry)",
+        );
+      }
+
+      // Sleep for 1 second
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       tries++;
       timedOut = Date.now() >= startedAt.getTime() + timeoutMs;
-    } while (!timedOut && !txReceipt);
+    } while (!timedOut);
 
-    if (!txReceipt) {
-      throw new Error(`${fnTag} Timed out ${timeoutMs}ms, polls=${tries}`);
-    } else {
-      return txReceipt;
-    }
+    throw new Error(`${fnTag} Timed out ${timeoutMs}ms, polls=${tries}`);
   }
 
   private async generateBytecode(req: any): Promise<string> {
@@ -708,7 +823,7 @@ export class PluginLedgerConnectorEthereum
       receipt.transactionReceipt.contractAddress &&
       receipt.transactionReceipt.contractAddress != null
     ) {
-      const networkId = await this.web3.eth.net.getId();
+      const networkId = (await this.web3.eth.net.getId()).toString();
       const address = { address: receipt.transactionReceipt.contractAddress };
       const network = { [networkId]: address };
       contractJSON.networks = network;
@@ -747,10 +862,13 @@ export class PluginLedgerConnectorEthereum
     );
 
     const looseWeb3Eth = this.web3.eth as any;
-    const isSafeToCall = this.isSafeToCallObjectMethod(
-      looseWeb3Eth,
-      args.methodName,
-    );
+    // web3.eth methods in 4.X are stored in parent class
+    const isSafeToCall =
+      this.isSafeToCallObjectMethod(looseWeb3Eth, args.methodName) ||
+      this.isSafeToCallObjectMethod(
+        Object.getPrototypeOf(looseWeb3Eth),
+        args.methodName,
+      );
     if (!isSafeToCall) {
       throw new RuntimeError(
         `Invalid method name provided in request. ${args.methodName} does not exist on the Web3.Eth object.`,
@@ -780,13 +898,10 @@ export class PluginLedgerConnectorEthereum
       );
     }
 
-    const contract = new this.web3.eth.Contract(
-      args.abi as AbiItem[],
-      args.address,
-    );
+    const contract = new this.web3.eth.Contract(args.abi, args.address);
 
     const isSafeToCall = await this.isSafeToCallContractMethod(
-      contract,
+      contract as unknown as Contract<ContractAbi>,
       args.contractMethod,
     );
     if (!isSafeToCall) {
@@ -795,8 +910,11 @@ export class PluginLedgerConnectorEthereum
       );
     }
 
-    return contract.methods[args.contractMethod](...contractMethodArgs)[
-      args.invocationType
-    ](args.invocationParams);
+    const methodRef = contract.methods[args.contractMethod] as (
+      ...args: unknown[]
+    ) => any;
+    return methodRef(...contractMethodArgs)[args.invocationType](
+      args.invocationParams,
+    );
   }
 }

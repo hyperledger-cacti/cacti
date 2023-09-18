@@ -1,6 +1,9 @@
 /*
  * Copyright 2022 Hyperledger Cactus Contributors
  * SPDX-License-Identifier: Apache-2.0
+ *
+ * @todo - there's an ugly warning in the end caused by some issue with clearing web3js ws connection to geth.
+ *  Investigate and report if needed.
  */
 
 //////////////////////////////////
@@ -10,15 +13,10 @@
 const testLogLevel = "info";
 const sutLogLevel = "info";
 
-const containerImageName =
-  "ghcr.io/hyperledger/cactus-quorum-multi-party-all-in-one";
-const containerImageVersion = "2022-04-06-fd10e27";
-
 import "jest-extended";
 import lodash from "lodash";
 import { v4 as uuidv4 } from "uuid";
-import Web3 from "web3";
-import { AbiItem } from "web3-utils";
+import Web3, { ContractAbi } from "web3";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import {
   PluginLedgerConnectorEthereum,
@@ -40,12 +38,13 @@ import {
   AuthorizationProtocol,
   ConfigService,
 } from "@hyperledger/cactus-cmd-api-server";
-
 import { Verifier, VerifierFactory } from "@hyperledger/cactus-verifier-client";
+import { pruneDockerAllIfGithubAction } from "@hyperledger/cactus-test-tooling";
 import {
-  pruneDockerAllIfGithubAction,
-  QuorumMultiPartyTestLedger,
-} from "@hyperledger/cactus-test-tooling";
+  GethTestLedger,
+  WHALE_ACCOUNT_ADDRESS,
+} from "@hyperledger/cactus-test-geth-ledger";
+import { PayableMethodObject } from "web3-eth-contract";
 
 import HelloWorldContractJson from "../../../solidity/hello-world-contract/HelloWorld.json";
 
@@ -54,20 +53,17 @@ const log: Logger = LoggerProvider.getOrCreate({
   level: testLogLevel,
 });
 
+const containerImageName = "ghcr.io/hyperledger/cacti-geth-all-in-one";
+const containerImageVersion = "2023-07-27-2a8c48ed6";
+
 log.info("Test started");
 
 describe("Verifier integration with ethereum connector tests", () => {
-  let ethereumTestLedger: QuorumMultiPartyTestLedger;
+  let ethereumTestLedger: GethTestLedger;
   let apiServer: ApiServer;
   let connector: PluginLedgerConnectorEthereum;
   let web3: Web3;
   let keychainPlugin: PluginKeychainMemory;
-  let connectionProfile: ReturnType<
-    typeof QuorumMultiPartyTestLedger.prototype.getKeys
-  > extends Promise<infer T>
-    ? T
-    : never;
-
   const ethereumValidatorId = "testEthereumId";
   let globalVerifierFactory: VerifierFactory;
 
@@ -80,20 +76,14 @@ describe("Verifier integration with ethereum connector tests", () => {
     await pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
 
     // Start Ledger
-    log.info("Start QuorumMultiPartyTestLedger...");
-    log.debug("QuorumMultiParty image:", containerImageName);
-    log.debug("QuorumMultiParty version:", containerImageVersion);
-    ethereumTestLedger = new QuorumMultiPartyTestLedger({
+    log.info("Start GethTestLedger...");
+    // log.debug("GethTestLedger image:", containerImageName);
+    ethereumTestLedger = new GethTestLedger({
       containerImageName,
       containerImageVersion,
       logLevel: sutLogLevel,
-      emitContainerLogs: false,
-      //useRunningLedger: true,
     });
     await ethereumTestLedger.start();
-
-    connectionProfile = await ethereumTestLedger.getKeys();
-    log.debug("connectionProfile:", connectionProfile);
 
     // Setup ApiServer plugins
     const plugins: ICactusPlugin[] = [];
@@ -112,9 +102,11 @@ describe("Verifier integration with ethereum connector tests", () => {
     plugins.push(keychainPlugin);
 
     log.info("Create PluginLedgerConnectorEthereum...");
+    const rpcApiHttpHost = await ethereumTestLedger.getRpcApiHttpHost();
+    const rpcApiWsHost = await ethereumTestLedger.getRpcApiWebSocketHost();
     connector = new PluginLedgerConnectorEthereum({
-      rpcApiHttpHost: connectionProfile.quorum.member1.url,
-      rpcApiWsHost: connectionProfile.quorum.member1.wsUrl,
+      rpcApiHttpHost,
+      rpcApiWsHost,
       logLevel: sutLogLevel,
       instanceId: uuidv4(),
       pluginRegistry: new PluginRegistry({ plugins: [keychainPlugin] }),
@@ -122,7 +114,7 @@ describe("Verifier integration with ethereum connector tests", () => {
     plugins.push(connector);
 
     // Create web3 provider for test
-    web3 = new Web3(connectionProfile.quorum.member1.url);
+    web3 = new Web3(rpcApiHttpHost);
 
     // Create Api Server
     log.info("Create ApiServer...");
@@ -157,7 +149,7 @@ describe("Verifier integration with ethereum connector tests", () => {
       [
         {
           validatorID: ethereumValidatorId,
-          validatorType: "QUORUM_2X",
+          validatorType: "ETH_1X",
           basePath: apiHost,
           logLevel: sutLogLevel,
         },
@@ -237,7 +229,7 @@ describe("Verifier integration with ethereum connector tests", () => {
   describe("web3EthContract tests", () => {
     let verifier: Verifier<EthereumApiClient>;
     let contractCommon: {
-      abi: AbiItem[];
+      abi: ContractAbi;
       address: string;
     };
 
@@ -253,9 +245,9 @@ describe("Verifier integration with ethereum connector tests", () => {
         contractName: HelloWorldContractJson.contractName,
         keychainId: keychainPlugin.getKeychainId(),
         web3SigningCredential: {
-          ethAccount: connectionProfile.quorum.member2.accountAddress,
-          secret: connectionProfile.quorum.member2.privateKey,
-          type: Web3SigningCredentialType.PrivateKeyHex,
+          ethAccount: WHALE_ACCOUNT_ADDRESS,
+          secret: "",
+          type: Web3SigningCredentialType.GethKeychainPassword,
         },
         gas: 1000000,
       });
@@ -265,16 +257,15 @@ describe("Verifier integration with ethereum connector tests", () => {
       expect(deployOut.transactionReceipt.status).toBeTrue();
 
       contractCommon = {
-        abi: HelloWorldContractJson.abi as AbiItem[],
+        abi: HelloWorldContractJson.abi,
         address: deployOut.transactionReceipt.contractAddress as string,
       };
     });
 
     test("Invalid web3EthContract calls are rejected by EthereumApiClient", async () => {
       // Define correct input parameters
-      const correctContract: Record<string, unknown> = lodash.clone(
-        contractCommon,
-      );
+      const correctContract: Record<string, unknown> =
+        lodash.clone(contractCommon);
       const correctMethod: Record<string, unknown> = {
         type: "web3EthContract",
         command: "call",
@@ -367,7 +358,7 @@ describe("Verifier integration with ethereum connector tests", () => {
       };
       const argsSend = {
         args: {
-          from: connectionProfile.quorum.member1.accountAddress,
+          from: WHALE_ACCOUNT_ADDRESS,
         },
       };
 
@@ -377,7 +368,7 @@ describe("Verifier integration with ethereum connector tests", () => {
         argsSend,
       );
       expect(resultsSend.status).toEqual(200);
-      expect(resultsSend.data.status).toBeTrue();
+      expect(resultsSend.data.status).toEqual("1");
 
       // 2. Get new, updated value (call)
       const methodCall = {
@@ -407,7 +398,7 @@ describe("Verifier integration with ethereum connector tests", () => {
       };
       const argsEncode = {
         args: {
-          from: connectionProfile.quorum.member1.accountAddress,
+          from: WHALE_ACCOUNT_ADDRESS,
         },
       };
 
@@ -424,9 +415,10 @@ describe("Verifier integration with ethereum connector tests", () => {
         contractCommon.abi,
         contractCommon.address,
       );
-      const web3Encode = await web3Contract.methods
-        .setName(...methodEncode.params)
-        .encodeABI(argsEncode);
+      const methodRef = web3Contract.methods.setName as (
+        ...args: unknown[]
+      ) => PayableMethodObject;
+      const web3Encode = methodRef(...methodEncode.params).encodeABI();
       expect(resultsEncode.data).toEqual(web3Encode);
     });
 
@@ -446,17 +438,20 @@ describe("Verifier integration with ethereum connector tests", () => {
         argsEstimateGas,
       );
       expect(resultsEstimateGas.status).toEqual(200);
-      expect(resultsEstimateGas.data).toBeGreaterThan(0);
+      expect(Number(resultsEstimateGas.data)).toBeGreaterThan(0);
 
       // Compare gas estimate with direct web3 call
       const web3Contract = new web3.eth.Contract(
         contractCommon.abi,
         contractCommon.address,
       );
-      const web3Encode = await web3Contract.methods
-        .setName(...methodEstimateGas.params)
-        .estimateGas(argsEstimateGas);
-      expect(resultsEstimateGas.data).toEqual(web3Encode);
+      const methodRef = web3Contract.methods.setName as (
+        ...args: unknown[]
+      ) => PayableMethodObject;
+      const web3Encode = await methodRef(
+        ...methodEstimateGas.params,
+      ).estimateGas(argsEstimateGas);
+      expect(resultsEstimateGas.data).toEqual(web3Encode.toString());
     });
 
     test("Sending transaction with sendAsyncRequest works", async () => {
@@ -472,7 +467,7 @@ describe("Verifier integration with ethereum connector tests", () => {
       };
       const argsSendAsync = {
         args: {
-          from: connectionProfile.quorum.member1.accountAddress,
+          from: WHALE_ACCOUNT_ADDRESS,
         },
       };
 
@@ -509,7 +504,7 @@ describe("Verifier integration with ethereum connector tests", () => {
     // web3Eth.getBalance
     const contract = {};
     const method = { type: "web3Eth", command: "getBalance" };
-    const args = { args: [connectionProfile.quorum.member2.accountAddress] };
+    const args = { args: [WHALE_ACCOUNT_ADDRESS] };
 
     const results = await globalVerifierFactory
       .getVerifier(ethereumValidatorId)
@@ -526,7 +521,7 @@ describe("Verifier integration with ethereum connector tests", () => {
       command: "getBalance",
     };
     const correctArgs: any = {
-      args: [connectionProfile.quorum.member2.accountAddress],
+      args: [WHALE_ACCOUNT_ADDRESS],
     };
     const verifier = globalVerifierFactory.getVerifier(ethereumValidatorId);
 
@@ -576,20 +571,19 @@ describe("Verifier integration with ethereum connector tests", () => {
     expect(results.errorDetail).toBeTruthy();
   });
 
-  function assertBlockHeader(header: Web3BlockHeader) {
+  function assertBlockHeader(header?: Web3BlockHeader) {
+    if (!header) {
+      throw new Error("Header is missing!");
+    }
+
     // Check if defined and with expected type
     // Ignore nullable / undefine-able fields
     expect(typeof header.parentHash).toEqual("string");
     expect(typeof header.sha3Uncles).toEqual("string");
     expect(typeof header.miner).toEqual("string");
-    expect(typeof header.stateRoot).toEqual("string");
-    expect(typeof header.logsBloom).toEqual("string");
-    expect(typeof header.number).toEqual("number");
-    expect(typeof header.gasLimit).toEqual("number");
-    expect(typeof header.gasUsed).toEqual("number");
-    expect(typeof header.extraData).toEqual("string");
-    expect(typeof header.nonce).toEqual("string");
-    expect(typeof header.hash).toEqual("string");
+    expect(typeof header.number).toEqual("string");
+    expect(typeof header.gasLimit).toEqual("string");
+    expect(typeof header.gasUsed).toEqual("string");
     expect(typeof header.difficulty).toEqual("string");
   }
 
@@ -605,11 +599,13 @@ describe("Verifier integration with ethereum connector tests", () => {
     expect(ledgerEvent.data?.blockHeader).toBeTruthy();
 
     // check some fields
-    assertBlockHeader(ledgerEvent.data?.blockHeader as Web3BlockHeader);
+    assertBlockHeader(ledgerEvent.data?.blockHeader);
   });
 
   test("Monitor new blocks data on Ethereum", async () => {
     const ledgerEvent = await monitorAndGetBlock({ getBlockData: true });
+    //const ledgerEvent = await monitorAndGetBlock();
+    log.info("ledgerEvent", ledgerEvent);
     // assert well-formed output
     expect(ledgerEvent.id).toEqual("");
     expect(ledgerEvent.verifierId).toEqual(ethereumValidatorId);
@@ -620,12 +616,13 @@ describe("Verifier integration with ethereum connector tests", () => {
     expect(ledgerEvent.data?.blockData).toBeTruthy();
 
     // check some fields
-    assertBlockHeader(ledgerEvent.data?.blockData as Web3BlockHeader);
-    expect(typeof ledgerEvent.data?.blockData?.size).toEqual("number");
+    assertBlockHeader(
+      ledgerEvent.data?.blockData as unknown as Web3BlockHeader,
+    ); // remove as unknown
+    expect(typeof ledgerEvent.data?.blockData?.size).toEqual("string");
     expect(typeof ledgerEvent.data?.blockData?.totalDifficulty).toEqual(
       "string",
     );
     expect(typeof ledgerEvent.data?.blockData?.uncles).toEqual("object");
-    expect(typeof ledgerEvent.data?.blockData?.transactions).toEqual("object");
   });
 });

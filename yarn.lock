@@ -6472,6 +6472,7 @@ __metadata:
     "@hyperledger/cactus-core": 2.0.0-alpha.2
     "@hyperledger/cactus-core-api": 2.0.0-alpha.2
     "@hyperledger/cactus-plugin-keychain-memory": 2.0.0-alpha.2
+    "@hyperledger/cactus-test-geth-ledger": 2.0.0-alpha.2
     "@hyperledger/cactus-test-tooling": 2.0.0-alpha.2
     "@types/express": 4.17.13
     "@types/minimist": 1.2.2
@@ -6487,10 +6488,11 @@ __metadata:
     socket.io: 4.5.4
     socket.io-client: 4.5.4
     typescript-optional: 2.0.1
-    web3: 1.10.0
-    web3-eth: 1.10.0
-    web3-eth-contract: 1.10.0
-    web3-utils: 1.10.0
+    web3: 4.0.3
+    web3-eth: 4.0.3
+    web3-eth-accounts: 4.0.3
+    web3-eth-contract: 4.0.3
+    web3-utils: 4.0.3
   bin:
     cacti-ethereum-connector-status: dist/lib/scripts/get-ethereum-connector-status.js
   languageName: unknown
@@ -6946,7 +6948,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger/cactus-test-geth-ledger@workspace:packages/cactus-test-geth-ledger":
+"@hyperledger/cactus-test-geth-ledger@2.0.0-alpha.2, @hyperledger/cactus-test-geth-ledger@workspace:packages/cactus-test-geth-ledger":
   version: 0.0.0-use.local
   resolution: "@hyperledger/cactus-test-geth-ledger@workspace:packages/cactus-test-geth-ledger"
   dependencies:
@@ -7046,13 +7048,13 @@ __metadata:
     "@hyperledger/cactus-core-api": 2.0.0-alpha.2
     "@hyperledger/cactus-plugin-keychain-memory": 2.0.0-alpha.2
     "@hyperledger/cactus-plugin-ledger-connector-ethereum": 2.0.0-alpha.2
+    "@hyperledger/cactus-test-geth-ledger": 2.0.0-alpha.2
     "@hyperledger/cactus-test-tooling": 2.0.0-alpha.2
     "@hyperledger/cactus-verifier-client": 2.0.0-alpha.2
-    "@types/convict": 6.1.1
     "@types/lodash": 4.14.195
     lodash: 4.17.21
-    web3: 1.10.0
-    web3-utils: 1.10.0
+    web3: 4.0.3
+    web3-utils: 4.0.3
   languageName: unknown
   linkType: soft
 
@@ -43239,6 +43241,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"web3-eth-contract@npm:4.0.3":
+  version: 4.0.3
+  resolution: "web3-eth-contract@npm:4.0.3"
+  dependencies:
+    web3-core: ^4.0.3
+    web3-errors: ^1.0.2
+    web3-eth: ^4.0.3
+    web3-eth-abi: ^4.0.3
+    web3-types: ^1.0.2
+    web3-utils: ^4.0.3
+    web3-validator: ^1.0.2
+  checksum: 24f5cc9645af7c2c6ffe6ff2dd819c576904b959e4d2388bb9565014bfa256c75903450b9de48a6e734bbca4a5542c441246497a858ed392cf71340bb1e961ca
+  languageName: node
+  linkType: hard
+
 "web3-eth-contract@npm:^4.0.3, web3-eth-contract@npm:^4.0.5":
   version: 4.0.5
   resolution: "web3-eth-contract@npm:4.0.5"
@@ -43714,6 +43731,25 @@ __metadata:
     web3-net: 1.8.1
     web3-utils: 1.8.1
   checksum: 84009426be1a410faa000b5e90a6268ccb90c177fd8f0f9491d0ba6334bad66ffd14c73afcce146e3cff13648e2ca5ba22c9c60f0c322ca007ca9595859fdbed
+  languageName: node
+  linkType: hard
+
+"web3-eth@npm:4.0.3":
+  version: 4.0.3
+  resolution: "web3-eth@npm:4.0.3"
+  dependencies:
+    setimmediate: ^1.0.5
+    web3-core: ^4.0.3
+    web3-errors: ^1.0.2
+    web3-eth-abi: ^4.0.3
+    web3-eth-accounts: ^4.0.3
+    web3-net: ^4.0.3
+    web3-providers-ws: ^4.0.3
+    web3-rpc-methods: ^1.0.2
+    web3-types: ^1.0.2
+    web3-utils: ^4.0.3
+    web3-validator: ^1.0.2
+  checksum: ce758d952cd1bd414a9449defc68d6a3c8fc1d183dfb152a2130e774018bef9ff7af70844884cabe5b4e5238823a061eba2c7622e49ea7afe8f3cec112930f2e
   languageName: node
   linkType: hard
 
