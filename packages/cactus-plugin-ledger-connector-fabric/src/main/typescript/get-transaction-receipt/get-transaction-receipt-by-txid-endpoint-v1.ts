@@ -26,7 +26,8 @@ export interface IRunTransactionEndpointV1Options {
 }
 
 export class GetTransactionReceiptByTxIDEndpointV1
-  implements IWebServiceEndpoint {
+  implements IWebServiceEndpoint
+{
   private readonly log: Logger;
 
   constructor(public readonly opts: IRunTransactionEndpointV1Options) {
@@ -55,7 +56,7 @@ export class GetTransactionReceiptByTxIDEndpointV1
     return this.handleRequest.bind(this);
   }
 
-  public getOasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-transaction-receipt-by-txid"] {
+  public getOasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-transaction-receipt-by-txid"] {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-transaction-receipt-by-txid"
     ];

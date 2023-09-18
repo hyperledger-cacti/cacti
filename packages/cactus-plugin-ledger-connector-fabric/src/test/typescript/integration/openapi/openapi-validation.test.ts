@@ -315,7 +315,7 @@ test(testCase, async (t: Test) => {
 
     try {
       await apiClient.deployContractV1(
-        (parameters as any) as DeployContractV1Request,
+        parameters as any as DeployContractV1Request,
       );
     } catch (e) {
       t2.equal(
@@ -354,7 +354,7 @@ test(testCase, async (t: Test) => {
 
     try {
       await apiClient.deployContractV1(
-        (parameters as any) as DeployContractV1Request,
+        parameters as any as DeployContractV1Request,
       );
     } catch (e) {
       t2.equal(
@@ -416,7 +416,7 @@ test(testCase, async (t: Test) => {
 
     try {
       await apiClient.runTransactionV1(
-        (parameters as any) as RunTransactionRequest,
+        parameters as any as RunTransactionRequest,
       );
     } catch (e) {
       t2.equal(
@@ -455,7 +455,7 @@ test(testCase, async (t: Test) => {
 
     try {
       await apiClient.runTransactionV1(
-        (parameters as any) as RunTransactionRequest,
+        parameters as any as RunTransactionRequest,
       );
     } catch (e) {
       t2.equal(

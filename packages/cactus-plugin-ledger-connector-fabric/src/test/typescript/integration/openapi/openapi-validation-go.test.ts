@@ -226,7 +226,7 @@ test(testCase, async (t: Test) => {
 
     try {
       await apiClient.deployContractGoSourceV1(
-        (parameters as any) as DeployContractGoSourceV1Request,
+        parameters as any as DeployContractGoSourceV1Request,
       );
     } catch (e) {
       t2.equal(
@@ -288,7 +288,7 @@ test(testCase, async (t: Test) => {
 
     try {
       await apiClient.deployContractGoSourceV1(
-        (parameters as any) as DeployContractGoSourceV1Request,
+        parameters as any as DeployContractGoSourceV1Request,
       );
     } catch (e) {
       t2.equal(

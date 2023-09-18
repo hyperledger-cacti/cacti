@@ -77,6 +77,7 @@
     "node-vault": "0.9.22",
     "openapi-types": "9.1.0",
     "prom-client": "13.2.0",
+    "run-time-error": "1.4.0",
     "rxjs": "7.8.1",
     "sanitize-filename": "1.6.3",
     "sanitize-html": "2.7.0",

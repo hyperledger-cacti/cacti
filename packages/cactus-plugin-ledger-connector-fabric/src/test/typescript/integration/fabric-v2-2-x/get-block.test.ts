@@ -270,7 +270,6 @@ describe("Get Block endpoint tests", () => {
     expect(createAssetResponse).toBeTruthy();
     expect(createAssetResponse.status).toEqual(200);
     expect(createAssetResponse.data).toBeTruthy();
-    expect(createAssetResponse.data.success).toBeTrue();
     const txId = createAssetResponse.data.transactionId;
     expect(txId).toBeTruthy();
 

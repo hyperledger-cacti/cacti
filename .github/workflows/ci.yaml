@@ -831,6 +831,7 @@ jobs:
       CACTI_NPM_PACKAGE_NAME: "@hyperledger/cactus-plugin-ledger-connector-fabric"
       HFC_LOGGING: '{"debug":"console","info":"console","warn": "console","error":"console"}'
       FULL_BUILD_DISABLED: true
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
       JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_RUNNER_DISABLED: false
       TAPE_TEST_PATTERN: ""
