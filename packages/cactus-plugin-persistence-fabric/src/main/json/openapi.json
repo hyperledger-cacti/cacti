@@ -3,10 +3,9 @@
   "info": {
     "title": "Hyperledger Cactus Plugin - Block Fabrick PErsistance",
     "description": "Scrap fabric ledger into database. Needs administrative privileges.",
-    "version": "0.0.1",
+    "version": "v2.0.0-alpha.1",
     "license": {
       "name": "Apache-2.0",
-
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     }
   },

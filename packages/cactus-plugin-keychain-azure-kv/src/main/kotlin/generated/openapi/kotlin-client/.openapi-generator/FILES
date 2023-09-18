@@ -23,9 +23,9 @@ src/main/kotlin/org/openapitools/client/infrastructure/URIAdapter.kt
 src/main/kotlin/org/openapitools/client/infrastructure/UUIDAdapter.kt
 src/main/kotlin/org/openapitools/client/models/DeleteKeychainEntryRequestV1.kt
 src/main/kotlin/org/openapitools/client/models/DeleteKeychainEntryResponseV1.kt
-src/main/kotlin/org/openapitools/client/models/GetKeychainEntryRequest.kt
-src/main/kotlin/org/openapitools/client/models/GetKeychainEntryResponse.kt
+src/main/kotlin/org/openapitools/client/models/GetKeychainEntryRequestV1.kt
+src/main/kotlin/org/openapitools/client/models/GetKeychainEntryResponseV1.kt
 src/main/kotlin/org/openapitools/client/models/HasKeychainEntryRequestV1.kt
 src/main/kotlin/org/openapitools/client/models/HasKeychainEntryResponseV1.kt
-src/main/kotlin/org/openapitools/client/models/SetKeychainEntryRequest.kt
-src/main/kotlin/org/openapitools/client/models/SetKeychainEntryResponse.kt
+src/main/kotlin/org/openapitools/client/models/SetKeychainEntryRequestV1.kt
+src/main/kotlin/org/openapitools/client/models/SetKeychainEntryResponseV1.kt

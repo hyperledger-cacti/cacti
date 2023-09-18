@@ -21,12 +21,12 @@ import okhttp3.HttpUrl
 
 import org.openapitools.client.models.DeleteKeychainEntryRequestV1
 import org.openapitools.client.models.DeleteKeychainEntryResponseV1
-import org.openapitools.client.models.GetKeychainEntryRequest
-import org.openapitools.client.models.GetKeychainEntryResponse
+import org.openapitools.client.models.GetKeychainEntryRequestV1
+import org.openapitools.client.models.GetKeychainEntryResponseV1
 import org.openapitools.client.models.HasKeychainEntryRequestV1
 import org.openapitools.client.models.HasKeychainEntryResponseV1
-import org.openapitools.client.models.SetKeychainEntryRequest
-import org.openapitools.client.models.SetKeychainEntryResponse
+import org.openapitools.client.models.SetKeychainEntryRequestV1
+import org.openapitools.client.models.SetKeychainEntryResponseV1
 
 import com.squareup.moshi.Json
 
@@ -127,8 +127,8 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     /**
      * Retrieves the contents of a keychain entry from the backend.
      * 
-     * @param getKeychainEntryRequest Request body to obtain a keychain entry via its key
-     * @return GetKeychainEntryResponse
+     * @param getKeychainEntryRequestV1 Request body to obtain a keychain entry via its key
+     * @return GetKeychainEntryResponseV1
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      * @throws UnsupportedOperationException If the API returns an informational or redirection response
@@ -137,11 +137,11 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun getKeychainEntryV1(getKeychainEntryRequest: GetKeychainEntryRequest) : GetKeychainEntryResponse {
-        val localVarResponse = getKeychainEntryV1WithHttpInfo(getKeychainEntryRequest = getKeychainEntryRequest)
+    fun getKeychainEntryV1(getKeychainEntryRequestV1: GetKeychainEntryRequestV1) : GetKeychainEntryResponseV1 {
+        val localVarResponse = getKeychainEntryV1WithHttpInfo(getKeychainEntryRequestV1 = getKeychainEntryRequestV1)
 
         return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as GetKeychainEntryResponse
+            ResponseType.Success -> (localVarResponse as Success<*>).data as GetKeychainEntryResponseV1
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
@@ -158,17 +158,17 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     /**
      * Retrieves the contents of a keychain entry from the backend.
      * 
-     * @param getKeychainEntryRequest Request body to obtain a keychain entry via its key
-     * @return ApiResponse<GetKeychainEntryResponse?>
+     * @param getKeychainEntryRequestV1 Request body to obtain a keychain entry via its key
+     * @return ApiResponse<GetKeychainEntryResponseV1?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun getKeychainEntryV1WithHttpInfo(getKeychainEntryRequest: GetKeychainEntryRequest) : ApiResponse<GetKeychainEntryResponse?> {
-        val localVariableConfig = getKeychainEntryV1RequestConfig(getKeychainEntryRequest = getKeychainEntryRequest)
+    fun getKeychainEntryV1WithHttpInfo(getKeychainEntryRequestV1: GetKeychainEntryRequestV1) : ApiResponse<GetKeychainEntryResponseV1?> {
+        val localVariableConfig = getKeychainEntryV1RequestConfig(getKeychainEntryRequestV1 = getKeychainEntryRequestV1)
 
-        return request<GetKeychainEntryRequest, GetKeychainEntryResponse>(
+        return request<GetKeychainEntryRequestV1, GetKeychainEntryResponseV1>(
             localVariableConfig
         )
     }
@@ -176,11 +176,11 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     /**
      * To obtain the request config of the operation getKeychainEntryV1
      *
-     * @param getKeychainEntryRequest Request body to obtain a keychain entry via its key
+     * @param getKeychainEntryRequestV1 Request body to obtain a keychain entry via its key
      * @return RequestConfig
      */
-    fun getKeychainEntryV1RequestConfig(getKeychainEntryRequest: GetKeychainEntryRequest) : RequestConfig<GetKeychainEntryRequest> {
-        val localVariableBody = getKeychainEntryRequest
+    fun getKeychainEntryV1RequestConfig(getKeychainEntryRequestV1: GetKeychainEntryRequestV1) : RequestConfig<GetKeychainEntryRequestV1> {
+        val localVariableBody = getKeychainEntryRequestV1
         val localVariableQuery: MultiValueMap = mutableMapOf()
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
         localVariableHeaders["Content-Type"] = "application/json"
@@ -338,8 +338,8 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     /**
      * Sets a value under a key on the keychain backend.
      * 
-     * @param setKeychainEntryRequest Request body to write/update a keychain entry via its key
-     * @return SetKeychainEntryResponse
+     * @param setKeychainEntryRequestV1 Request body to write/update a keychain entry via its key
+     * @return SetKeychainEntryResponseV1
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      * @throws UnsupportedOperationException If the API returns an informational or redirection response
@@ -348,11 +348,11 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun setKeychainEntryV1(setKeychainEntryRequest: SetKeychainEntryRequest) : SetKeychainEntryResponse {
-        val localVarResponse = setKeychainEntryV1WithHttpInfo(setKeychainEntryRequest = setKeychainEntryRequest)
+    fun setKeychainEntryV1(setKeychainEntryRequestV1: SetKeychainEntryRequestV1) : SetKeychainEntryResponseV1 {
+        val localVarResponse = setKeychainEntryV1WithHttpInfo(setKeychainEntryRequestV1 = setKeychainEntryRequestV1)
 
         return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as SetKeychainEntryResponse
+            ResponseType.Success -> (localVarResponse as Success<*>).data as SetKeychainEntryResponseV1
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
@@ -369,17 +369,17 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     /**
      * Sets a value under a key on the keychain backend.
      * 
-     * @param setKeychainEntryRequest Request body to write/update a keychain entry via its key
-     * @return ApiResponse<SetKeychainEntryResponse?>
+     * @param setKeychainEntryRequestV1 Request body to write/update a keychain entry via its key
+     * @return ApiResponse<SetKeychainEntryResponseV1?>
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class)
-    fun setKeychainEntryV1WithHttpInfo(setKeychainEntryRequest: SetKeychainEntryRequest) : ApiResponse<SetKeychainEntryResponse?> {
-        val localVariableConfig = setKeychainEntryV1RequestConfig(setKeychainEntryRequest = setKeychainEntryRequest)
+    fun setKeychainEntryV1WithHttpInfo(setKeychainEntryRequestV1: SetKeychainEntryRequestV1) : ApiResponse<SetKeychainEntryResponseV1?> {
+        val localVariableConfig = setKeychainEntryV1RequestConfig(setKeychainEntryRequestV1 = setKeychainEntryRequestV1)
 
-        return request<SetKeychainEntryRequest, SetKeychainEntryResponse>(
+        return request<SetKeychainEntryRequestV1, SetKeychainEntryResponseV1>(
             localVariableConfig
         )
     }
@@ -387,11 +387,11 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     /**
      * To obtain the request config of the operation setKeychainEntryV1
      *
-     * @param setKeychainEntryRequest Request body to write/update a keychain entry via its key
+     * @param setKeychainEntryRequestV1 Request body to write/update a keychain entry via its key
      * @return RequestConfig
      */
-    fun setKeychainEntryV1RequestConfig(setKeychainEntryRequest: SetKeychainEntryRequest) : RequestConfig<SetKeychainEntryRequest> {
-        val localVariableBody = setKeychainEntryRequest
+    fun setKeychainEntryV1RequestConfig(setKeychainEntryRequestV1: SetKeychainEntryRequestV1) : RequestConfig<SetKeychainEntryRequestV1> {
+        val localVariableBody = setKeychainEntryRequestV1
         val localVariableQuery: MultiValueMap = mutableMapOf()
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
         localVariableHeaders["Content-Type"] = "application/json"

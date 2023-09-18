@@ -3,10 +3,9 @@
   "info": {
     "title": "Hyperledger Cactus API",
     "description": "Interact with a Cactus deployment through HTTP.",
-    "version": "0.0.1",
+    "version": "v2.0.0-alpha.1",
     "license": {
       "name": "Apache-2.0",
-
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     }
   },
@@ -133,28 +132,28 @@
     },
     "/api/v1/api-server/get-open-api-spec": {
       "get": {
-           "description": "Returns the openapi.json document of specific plugin.",
-           "x-hyperledger-cactus": {
-               "http": {
-                   "verbLowerCase": "get",
-                   "path": "/api/v1/api-server/get-open-api-spec"
-               }
-           },
-           "operationId": "getOpenApiSpecV1",
-           "parameters": [],
-           "responses": {
-               "200": {
-                   "description": "OK",
-                   "content": {
-                       "application/json": {
-                           "schema": {
-                             "$ref": "#/components/schemas/GetOpenApiSpecV1EndpointResponse"
-                           }
-                       }
-                   }
-               }
-           } 
-       }
+        "description": "Returns the openapi.json document of specific plugin.",
+        "x-hyperledger-cactus": {
+          "http": {
+            "verbLowerCase": "get",
+            "path": "/api/v1/api-server/get-open-api-spec"
+          }
+        },
+        "operationId": "getOpenApiSpecV1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetOpenApiSpecV1EndpointResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }

@@ -3,10 +3,9 @@
   "info": {
     "title": "Hyperledger Cactus Plugin - Connector Corda",
     "description": "Can perform basic tasks on a Corda ledger",
-    "version": "0.3.0",
+    "version": "v2.0.0-alpha.1",
     "license": {
       "name": "Apache-2.0",
-
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     }
   },
@@ -464,7 +463,7 @@
             "items": {
               "type": "string",
               "minItems": 0,
-              "maxItems": 10e6
+              "maxItems": 10000000
             },
             "default": []
           },
@@ -570,7 +569,7 @@
                 "data": {
                   "type": "string",
                   "minItems": 0,
-                  "maxItems": 10e6
+                  "maxItems": 10000000
                 }
               }
             }
@@ -696,7 +695,7 @@
             "items": {
               "type": "string",
               "minItems": 0,
-              "maxItems": 10e6
+              "maxItems": 10000000
             },
             "default": []
           }
