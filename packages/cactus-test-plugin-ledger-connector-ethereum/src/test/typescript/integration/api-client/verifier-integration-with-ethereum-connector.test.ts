@@ -277,11 +277,11 @@ describe("Verifier integration with ethereum connector tests", () => {
       const correctArgs: any = {};
 
       // Sanity check if correct parameters work
-      const resultCorrect = await verifier.sendSyncRequest(
+      const resultCorrect = (await verifier.sendSyncRequest(
         correctContract,
         correctMethod,
         correctArgs,
-      ) as ISendRequestResultV1<void>;
+      )) as ISendRequestResultV1<void>;
       expect(resultCorrect.status).toEqual(200);
 
       // Failing: Missing contract ABI
@@ -364,11 +364,11 @@ describe("Verifier integration with ethereum connector tests", () => {
         },
       };
 
-      const resultsSend = await verifier.sendSyncRequest(
+      const resultsSend = (await verifier.sendSyncRequest(
         contractCommon,
         methodSend,
         argsSend,
-      ) as ISendRequestResultV1<{ readonly status: string }>;
+      )) as ISendRequestResultV1<{ readonly status: string }>;
       expect(resultsSend.status).toEqual(200);
       expect(resultsSend.data.status).toEqual("1");
 
@@ -381,11 +381,11 @@ describe("Verifier integration with ethereum connector tests", () => {
       };
       const argsCall = {};
 
-      const resultCall = await verifier.sendSyncRequest(
+      const resultCall = (await verifier.sendSyncRequest(
         contractCommon,
         methodCall,
         argsCall,
-      ) as ISendRequestResultV1<string>;
+      )) as ISendRequestResultV1<string>;
       expect(resultCall.status).toEqual(200);
       expect(resultCall.data).toEqual(newName);
     });
@@ -404,11 +404,11 @@ describe("Verifier integration with ethereum connector tests", () => {
         },
       };
 
-      const resultsEncode = await verifier.sendSyncRequest(
+      const resultsEncode = (await verifier.sendSyncRequest(
         contractCommon,
         methodEncode,
         argsEncode,
-      ) as ISendRequestResultV1<string>;
+      )) as ISendRequestResultV1<string>;
       expect(resultsEncode.status).toEqual(200);
       expect(resultsEncode.data.length).toBeGreaterThan(5);
 
@@ -434,11 +434,11 @@ describe("Verifier integration with ethereum connector tests", () => {
       };
       const argsEstimateGas = {};
 
-      const resultsEstimateGas = await verifier.sendSyncRequest(
+      const resultsEstimateGas = (await verifier.sendSyncRequest(
         contractCommon,
         methodEstimateGas,
         argsEstimateGas,
-      ) as ISendRequestResultV1<string>;
+      )) as ISendRequestResultV1<string>;
       expect(resultsEstimateGas.status).toEqual(200);
       expect(Number(resultsEstimateGas.data)).toBeGreaterThan(0);
 
@@ -492,11 +492,11 @@ describe("Verifier integration with ethereum connector tests", () => {
       };
       const argsCall = {};
 
-      const resultsCall = await verifier.sendSyncRequest(
+      const resultsCall = (await verifier.sendSyncRequest(
         contractCommon,
         methodCall,
         argsCall,
-      ) as ISendRequestResultV1<string>;
+      )) as ISendRequestResultV1<string>;
       expect(resultsCall.status).toEqual(200);
       expect(resultsCall.data).toEqual(newName);
     });
@@ -508,9 +508,9 @@ describe("Verifier integration with ethereum connector tests", () => {
     const method = { type: "web3Eth", command: "getBalance" };
     const args = { args: [WHALE_ACCOUNT_ADDRESS] };
 
-    const results = await globalVerifierFactory
+    const results = (await globalVerifierFactory
       .getVerifier(ethereumValidatorId)
-      .sendSyncRequest(contract, method, args) as ISendRequestResultV1<string>;
+      .sendSyncRequest(contract, method, args)) as ISendRequestResultV1<string>;
     expect(results.status).toEqual(200);
     expect(results.data.length).toBeGreaterThan(0);
   });
@@ -528,11 +528,11 @@ describe("Verifier integration with ethereum connector tests", () => {
     const verifier = globalVerifierFactory.getVerifier(ethereumValidatorId);
 
     // Sanity check if correct parameters work
-    const resultCorrect = await verifier.sendSyncRequest(
+    const resultCorrect = (await verifier.sendSyncRequest(
       correctContract,
       correctMethod,
       correctArgs,
-    ) as ISendRequestResultV1<{}>;
+    )) as ISendRequestResultV1<unknown>;
     expect(resultCorrect.status).toEqual(200);
 
     // Failing: Empty web3.eth method

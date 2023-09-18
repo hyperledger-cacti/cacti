@@ -97,10 +97,27 @@ type RunContractDeploymentInput = {
   value?: string;
 };
 
+export type HttpProviderOptions = ConstructorParameters<typeof HttpProvider>[1];
+export type WsProviderSocketOptions = ConstructorParameters<
+  typeof WebSocketProvider
+>[1];
+export type WsProviderReconnectOptions = ConstructorParameters<
+  typeof WebSocketProvider
+>[2];
+
+const defaultWsProviderReconnectOptions: WsProviderReconnectOptions = {
+  delay: 500,
+  autoReconnect: true,
+  maxAttempts: 20,
+};
+
 export interface IPluginLedgerConnectorEthereumOptions
   extends ICactusPluginOptions {
-  rpcApiHttpHost: string;
+  rpcApiHttpHost?: string;
+  rpcApiHttpOptions?: HttpProviderOptions;
   rpcApiWsHost?: string;
+  rpcApiWsSocketOptions?: WsProviderSocketOptions;
+  rpcApiWsReconnectOptions?: WsProviderReconnectOptions;
   logLevel?: LogLevelDesc;
   prometheusExporter?: PrometheusExporter;
   pluginRegistry: PluginRegistry;
@@ -122,6 +139,7 @@ export class PluginLedgerConnectorEthereum
   private readonly instanceId: string;
   private readonly log: Logger;
   private readonly web3: Web3;
+  private readonly web3WatchBlock?: Web3;
   private endpoints: IWebServiceEndpoint[] | undefined;
   public static readonly CLASS_NAME = "PluginLedgerConnectorEthereum";
   private watchBlocksSubscriptions: Map<string, NewHeadsSubscription> =
@@ -131,24 +149,54 @@ export class PluginLedgerConnectorEthereum
     return PluginLedgerConnectorEthereum.CLASS_NAME;
   }
 
-  private getWeb3Provider() {
-    if (!this.options.rpcApiWsHost) {
-      return new HttpProvider(this.options.rpcApiHttpHost);
+  private createWeb3WsProvider() {
+    if (this.options.rpcApiWsHost) {
+      return new WebSocketProvider(
+        this.options.rpcApiWsHost,
+        this.options.rpcApiWsSocketOptions,
+        this.options.rpcApiWsReconnectOptions,
+      );
+    } else {
+      throw new Error(
+        "Can't instantiate WebSocketProvider without a valid rpcApiWsHost!",
+      );
     }
-    return new WebSocketProvider(this.options.rpcApiWsHost);
+  }
+
+  private createWeb3Provider() {
+    if (this.options.rpcApiHttpHost) {
+      this.log.debug(
+        "Using Web3 HttpProvider because rpcApiHttpHost was provided",
+      );
+      return new HttpProvider(
+        this.options.rpcApiHttpHost,
+        this.options.rpcApiHttpOptions,
+      );
+    } else if (this.options.rpcApiWsHost) {
+      this.log.debug(
+        "Using Web3 WebSocketProvider because rpcApiHttpHost is missing but rpcApiWsHost was provided",
+      );
+      return this.createWeb3WsProvider();
+    } else {
+      throw new Error(
+        "Missing web3js RPC Api host (either HTTP or WS is required)",
+      );
+    }
   }
 
   constructor(public readonly options: IPluginLedgerConnectorEthereumOptions) {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
-    Checks.truthy(options.rpcApiHttpHost, `${fnTag} options.rpcApiHttpHost`);
     Checks.truthy(options.instanceId, `${fnTag} options.instanceId`);
     Checks.truthy(options.pluginRegistry, `${fnTag} options.pluginRegistry`);
 
     const level = this.options.logLevel || "INFO";
     const label = this.className;
     this.log = LoggerProvider.getOrCreate({ level, label });
-    this.web3 = new Web3(this.getWeb3Provider());
+    this.web3 = new Web3(this.createWeb3Provider());
+    if (this.options.rpcApiWsHost) {
+      this.web3WatchBlock = new Web3(this.createWeb3WsProvider());
+    }
 
     this.instanceId = options.instanceId;
     this.pluginRegistry = options.pluginRegistry as PluginRegistry;
@@ -159,6 +207,10 @@ export class PluginLedgerConnectorEthereum
       this.prometheusExporter,
       `${fnTag} options.prometheusExporter`,
     );
+
+    if (!this.options.rpcApiWsReconnectOptions) {
+      this.options.rpcApiWsReconnectOptions = defaultWsProviderReconnectOptions;
+    }
 
     this.prometheusExporter.startMetricsCollection();
   }
@@ -196,18 +248,9 @@ export class PluginLedgerConnectorEthereum
     }
   }
 
-  public async shutdown(): Promise<void> {
-    this.log.info(`Shutting down ${this.className}...`);
-
-    this.log.debug("Remove any remaining web3js subscriptions");
-    for (const socketId of this.watchBlocksSubscriptions.keys()) {
-      this.log.debug(`${WatchBlocksV1.Unsubscribe} shutdown`);
-      await this.removeWatchBlocksSubscriptionForSocket(socketId);
-    }
-
+  private async closeWeb3jsConnection(wsProvider?: WebSocketProvider) {
     try {
-      const wsProvider = this.web3.currentProvider as WebSocketProvider;
-      if (!wsProvider || !typeof wsProvider.SocketConnection === undefined) {
+      if (!wsProvider || typeof wsProvider.SocketConnection === "undefined") {
         this.log.debug("Non-WS provider found - finish");
         return;
       }
@@ -233,8 +276,25 @@ export class PluginLedgerConnectorEthereum
       // Disconnect the socket provider
       wsProvider.disconnect();
     } catch (error) {
-      this.log.error("Error when disconnecting web3js WS provider!", error);
+      this.log.error("Error when disconnecting web3js provider!", error);
     }
+  }
+
+  public async shutdown(): Promise<void> {
+    this.log.info(`Shutting down ${this.className}...`);
+
+    this.log.debug("Remove any remaining web3js subscriptions");
+    for (const socketId of this.watchBlocksSubscriptions.keys()) {
+      this.log.debug(`${WatchBlocksV1.Unsubscribe} shutdown`);
+      await this.removeWatchBlocksSubscriptionForSocket(socketId);
+    }
+
+    await this.closeWeb3jsConnection(
+      this.web3.currentProvider as WebSocketProvider,
+    );
+    await this.closeWeb3jsConnection(
+      this.web3WatchBlock?.currentProvider as WebSocketProvider,
+    );
   }
 
   public async onPluginInit(): Promise<unknown> {
@@ -245,38 +305,39 @@ export class PluginLedgerConnectorEthereum
     app: Express,
     wsApi: SocketIoServer,
   ): Promise<IWebServiceEndpoint[]> {
-    const { web3 } = this;
     const { logLevel } = this.options;
     const webServices = await this.getOrCreateWebServices();
     await Promise.all(webServices.map((ws) => ws.registerExpress(app)));
 
-    wsApi.on("connection", (socket: SocketIoSocket) => {
-      this.log.debug(`New Socket connected. ID=${socket.id}`);
+    if (this.web3WatchBlock) {
+      this.log.debug(`WebSocketProvider created for socketio endpoints`);
+      wsApi.on("connection", (socket: SocketIoSocket) => {
+        this.log.info(`New Socket connected. ID=${socket.id}`);
 
-      socket.on(
-        WatchBlocksV1.Subscribe,
-        async (options?: WatchBlocksV1Options) => {
-          const watchBlocksEndpoint = new WatchBlocksV1Endpoint({
-            web3,
+        socket.on(WatchBlocksV1.Subscribe, (options?: WatchBlocksV1Options) => {
+          new WatchBlocksV1Endpoint({
+            web3: this.web3WatchBlock as typeof this.web3WatchBlock,
             socket,
             logLevel,
             options,
-          });
-          this.watchBlocksSubscriptions.set(
-            socket.id,
-            await watchBlocksEndpoint.subscribe(),
-          );
-
-          socket.on("disconnect", async (reason: string) => {
-            this.log.debug(
-              `${WatchBlocksV1.Unsubscribe} disconnect reason=%o`,
-              reason,
-            );
-            await this.removeWatchBlocksSubscriptionForSocket(socket.id);
-          });
-        },
+          }).subscribe();
+        });
+      });
+    } else {
+      this.log.info(
+        `WebSocketProvider was NOT created for socketio endpoints! Socket.IO will not be handled!`,
       );
-    });
+      wsApi.on("connection", (socket: SocketIoSocket) => {
+        this.log.info(
+          "Socket connected but no async endpoint is supported - disconnecting...",
+        );
+        socket.emit(
+          WatchBlocksV1.Error,
+          "Missing rpcApiWsHost - can't listen for new blocks on HTTP provider",
+        );
+        socket.disconnect();
+      });
+    }
 
     return webServices;
   }
@@ -457,7 +518,7 @@ export class PluginLedgerConnectorEthereum
   }
 
   /**
-   *  Invoke contract method using contract instance stored in a kechain plugin.
+   *  Invoke contract method using contract instance stored in a keychain plugin.
    *
    * @param req contract method and transaction definition
    * @param contract contract keychain reference
@@ -663,7 +724,7 @@ export class PluginLedgerConnectorEthereum
    * Throws if timeout expires.
    *
    * @param txHash sent transaction hash
-   * @param timeoutMs timeout in miliseconds
+   * @param timeoutMs timeout in milliseconds
    * @returns transaction receipt.
    */
   public async pollForTxReceipt(
@@ -793,6 +854,64 @@ export class PluginLedgerConnectorEthereum
         secret: privateKeyHex,
       },
     });
+  }
+
+  /**
+   * Convert connector transaction config to web3js transaction object.
+   *
+   * @param txConfig connector transaction config
+   * @returns web3js transaction
+   */
+  private async getTransactionFromTxConfig(
+    txConfig: EthereumTransactionConfig,
+  ): Promise<Transaction> {
+    const tx: Transaction = {
+      from: txConfig.from,
+      to: txConfig.to,
+      value: txConfig.value,
+      nonce: txConfig.nonce,
+      data: txConfig.data,
+    };
+
+    // Apply gas config to the transaction
+    if (txConfig.gasConfig) {
+      if (isGasTransactionConfigLegacy(txConfig.gasConfig)) {
+        if (isGasTransactionConfigEIP1559(txConfig.gasConfig)) {
+          throw new RuntimeError(
+            `Detected mixed gasConfig! Use either legacy or EIP-1559 mode. gasConfig - ${JSON.stringify(
+              txConfig.gasConfig,
+            )}`,
+          );
+        }
+        tx.maxPriorityFeePerGas = txConfig.gasConfig.gasPrice;
+        tx.maxFeePerGas = txConfig.gasConfig.gasPrice;
+        tx.gasLimit = txConfig.gasConfig.gas;
+      } else {
+        tx.maxPriorityFeePerGas = txConfig.gasConfig.maxPriorityFeePerGas;
+        tx.maxFeePerGas = txConfig.gasConfig.maxFeePerGas;
+        tx.gasLimit = txConfig.gasConfig.gasLimit;
+      }
+    }
+
+    if (tx.maxPriorityFeePerGas && !tx.maxFeePerGas) {
+      tx.maxFeePerGas = await this.estimateMaxFeePerGas(
+        tx.maxPriorityFeePerGas.toString(),
+      );
+      this.log.info(
+        `Estimated maxFeePerGas of ${tx.maxFeePerGas} because maxPriorityFeePerGas was provided.`,
+      );
+    }
+
+    // Fill missing gas fields (do it last)
+    if (!tx.gasLimit) {
+      const estimatedGas = await this.web3.eth.estimateGas(tx);
+      this.log.debug(
+        `Gas not specified in the transaction values, estimated ${estimatedGas.toString()}`,
+      );
+      tx.gasLimit = estimatedGas;
+    }
+
+    return tx;
   }
 
   ////////////////////////////
@@ -1002,62 +1121,5 @@ export class PluginLedgerConnectorEthereum
     return methodRef(...contractMethodArgs)[args.invocationType](
       args.invocationParams,
     );
-  }
-
-  /**
-   * Convert connector transaction config to web3js transaction object.
-   * @param txConfig connector transaction config
-   * @returns web3js transaction
-   */
-  private async getTransactionFromTxConfig(
-    txConfig: EthereumTransactionConfig,
-  ): Promise<Transaction> {
-    const tx: Transaction = {
-      from: txConfig.from,
-      to: txConfig.to,
-      value: txConfig.value,
-      nonce: txConfig.nonce,
-      data: txConfig.data,
-    };
-
-    // Apply gas config to the transaction
-    if (txConfig.gasConfig) {
-      if (isGasTransactionConfigLegacy(txConfig.gasConfig)) {
-        if (isGasTransactionConfigEIP1559(txConfig.gasConfig)) {
-          throw new RuntimeError(
-            `Detected mixed gasConfig! Use either legacy or EIP-1559 mode. gasConfig - ${JSON.stringify(
-              txConfig.gasConfig,
-            )}`,
-          );
-        }
-        tx.maxPriorityFeePerGas = txConfig.gasConfig.gasPrice;
-        tx.maxFeePerGas = txConfig.gasConfig.gasPrice;
-        tx.gasLimit = txConfig.gasConfig.gas;
-      } else {
-        tx.maxPriorityFeePerGas = txConfig.gasConfig.maxPriorityFeePerGas;
-        tx.maxFeePerGas = txConfig.gasConfig.maxFeePerGas;
-        tx.gasLimit = txConfig.gasConfig.gasLimit;
-      }
-    }
-
-    if (tx.maxPriorityFeePerGas && !tx.maxFeePerGas) {
-      tx.maxFeePerGas = await this.estimateMaxFeePerGas(
-        tx.maxPriorityFeePerGas.toString(),
-      );
-      this.log.info(
-        `Estimated maxFeePerGas of ${tx.maxFeePerGas} because maxPriorityFeePerGas was provided.`,
-      );
-    }
-
-    // Fill missing gas fields (do it last)
-    if (!tx.gasLimit) {
-      const estimatedGas = await this.web3.eth.estimateGas(tx);
-      this.log.debug(
-        `Gas not specified in the transaction values, estimated ${estimatedGas.toString()}`,
-      );
-      tx.gasLimit = estimatedGas;
-    }
-
-    return tx;
   }
 }

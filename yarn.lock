@@ -6482,11 +6482,13 @@ __metadata:
     "@hyperledger/cactus-test-geth-ledger": 2.0.0-alpha.2
     "@hyperledger/cactus-test-tooling": 2.0.0-alpha.2
     "@types/express": 4.17.13
+    "@types/js-yaml": 4.0.5
     "@types/minimist": 1.2.2
     "@types/sanitize-html": 2.6.2
     axios: 0.21.4
     chalk: 4.1.2
     express: 4.17.3
+    js-yaml: 4.1.0
     minimist: 1.2.8
     prom-client: 13.2.0
     run-time-error: 1.4.0
@@ -6497,6 +6499,7 @@ __metadata:
     typescript-optional: 2.0.1
     web3: 4.1.2
     web3-eth: 4.2.0
+    web3-eth-accounts: 4.0.6
     web3-eth-contract: 4.1.0
   bin:
     cacti-ethereum-connector-status: dist/lib/scripts/get-ethereum-connector-status.js
@@ -43267,6 +43270,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"web3-eth-accounts@npm:4.0.6, web3-eth-accounts@npm:^4.0.6":
+  version: 4.0.6
+  resolution: "web3-eth-accounts@npm:4.0.6"
+  dependencies:
+    "@ethereumjs/rlp": ^4.0.1
+    crc-32: ^1.2.2
+    ethereum-cryptography: ^2.0.0
+    web3-errors: ^1.1.2
+    web3-types: ^1.2.0
+    web3-utils: ^4.0.6
+    web3-validator: ^2.0.2
+  checksum: 07fc3f5b6ccb862696ea2c34cc104323ad2b1e85c54bb8bd8dcb61154b09f592a2cc899ff0ac7bdd2a2e6f39afe3a4cdf2e7630ddc9b4150bf0b45e7004fe209
+  languageName: node
+  linkType: hard
+
 "web3-eth-accounts@npm:^4.0.3, web3-eth-accounts@npm:^4.0.5":
   version: 4.0.5
   resolution: "web3-eth-accounts@npm:4.0.5"
@@ -43279,21 +43297,6 @@ __metadata:
     web3-utils: ^4.0.5
     web3-validator: ^2.0.1
   checksum: 681322374c391391c153011a17e6d00b125fb2d1537f1bd7028610fd09490c985b2fa268517a3b5fe036a1b6a19d70d6a616e587aeb029b8e895ff873a149d1d
-  languageName: node
-  linkType: hard
-
-"web3-eth-accounts@npm:^4.0.6":
-  version: 4.0.6
-  resolution: "web3-eth-accounts@npm:4.0.6"
-  dependencies:
-    "@ethereumjs/rlp": ^4.0.1
-    crc-32: ^1.2.2
-    ethereum-cryptography: ^2.0.0
-    web3-errors: ^1.1.2
-    web3-types: ^1.2.0
-    web3-utils: ^4.0.6
-    web3-validator: ^2.0.2
-  checksum: 07fc3f5b6ccb862696ea2c34cc104323ad2b1e85c54bb8bd8dcb61154b09f592a2cc899ff0ac7bdd2a2e6f39afe3a4cdf2e7630ddc9b4150bf0b45e7004fe209
   languageName: node
   linkType: hard
 
