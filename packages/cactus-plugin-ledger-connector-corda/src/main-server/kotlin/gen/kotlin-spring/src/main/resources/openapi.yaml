@@ -5,7 +5,7 @@ info:
     name: Apache-2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
   title: Hyperledger Cactus Plugin - Connector Corda
-  version: 0.3.0
+  version: v2.0.0-alpha.1
 servers:
 - url: /
 paths:
@@ -832,6 +832,7 @@ components:
             \ progress updates provided by a *tracked* flow invocation. If the flow\
             \ invocation was not tracked, this array is still returned, but as empty."
           items:
+            maxItems: 10000000
             minItems: 0
             type: string
           type: array
@@ -1081,6 +1082,7 @@ components:
           - net.corda.samples.obligation.flows.IOUTransferFlow
           - net.corda.samples.obligation.flows.SelfIssueCashFlow
           items:
+            maxItems: 10000000
             minItems: 0
             type: string
           type: array
@@ -1382,6 +1384,7 @@ components:
         index:
           type: string
         data:
+          maxItems: 10000000
           minItems: 0
           type: string
       type: object

@@ -3,10 +3,9 @@
   "info": {
     "title": "Hyperledger Cactus Plugin - Connector Iroha",
     "description": "Can perform basic tasks on a Iroha ledger",
-    "version": "0.0.1",
+    "version": "v2.0.0-alpha.1",
     "license": {
       "name": "Apache-2.0",
-
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     }
   },
@@ -996,8 +995,8 @@
               }
             }
           },
-          "405": {
-            "description": "Method Not Allowed error.",
+          "400": {
+            "description": "Bad Request error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1006,8 +1005,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request error.",
+          "405": {
+            "description": "Method Not Allowed error.",
             "content": {
               "application/json": {
                 "schema": {

@@ -3,10 +3,9 @@
   "info": {
     "title": "Hyperledger Cactus Plugin - Consortium Web Service",
     "description": "Manage a Cactus consortium through the APIs. Needs administrative privileges.",
-    "version": "0.0.1",
+    "version": "v2.0.0-alpha.1",
     "license": {
       "name": "Apache-2.0",
-
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     }
   },
@@ -18,7 +17,7 @@
         "properties": {
           "jws": {
             "description": "The JSON Web Signature of the Cactus node.",
-            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v0.8.0/packages/cactus-core-api/src/main/json/openapi.json#/components/schemas/JWSGeneral",
+            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.1/packages/cactus-core-api/src/main/json/openapi.json#/components/schemas/JWSGeneral",
             "nullable": false
           }
         }
@@ -29,7 +28,7 @@
         "properties": {
           "jws": {
             "description": "The JSON Web Signature of the Cactus consortium.",
-            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v0.8.0/packages/cactus-core-api/src/main/json/openapi.json#/components/schemas/JWSGeneral",
+            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.1/packages/cactus-core-api/src/main/json/openapi.json#/components/schemas/JWSGeneral",
             "nullable": false,
             "format": "The general format which is a JSON object, not a string."
           }

@@ -26,7 +26,7 @@ class SpringDocConfiguration {
                             .name("Apache-2.0")
                             .url("https://www.apache.org/licenses/LICENSE-2.0.html")
                     )
-                    .version("0.3.0")
+                    .version("v2.0.0-alpha.1")
             )
     }
 }
