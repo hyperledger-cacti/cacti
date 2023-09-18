@@ -59,7 +59,7 @@ export class WatchBlocksV1Endpoint {
 
   public async subscribe(): Promise<NewHeadsSubscription> {
     const { socket, log, web3, isGetBlockData } = this;
-    log.debug(`${WatchBlocksV1.Subscribe} => ${socket.id}`);
+    log.info(`${WatchBlocksV1.Subscribe} => ${socket.id}`);
 
     const newBlocksSubscription = await web3.eth.subscribe(
       "newBlockHeaders",
@@ -116,7 +116,7 @@ export class WatchBlocksV1Endpoint {
     log.debug("Subscribing to Web3 new block headers event...");
 
     socket.on("disconnect", async (reason: string) => {
-      log.debug("WebSocket:disconnect reason=%o", reason);
+      log.info("WebSocket:disconnect reason=%o", reason);
       await newBlocksSubscription.unsubscribe();
     });
 

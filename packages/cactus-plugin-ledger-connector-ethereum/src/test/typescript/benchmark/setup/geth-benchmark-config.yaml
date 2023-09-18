@@ -1,0 +1,183 @@
+# Copyright 2023 Hyperledger Cactus Contributors
+# SPDX-License-Identifier: Apache-2.0
+#
+# Sample artillery config for stress testing ethereum connector
+# You must override target and variables before running manually, e.g. (on linux):
+#   > artillery run geth-benchmark-config.yaml --target http://0.0.0.0:42237 --variables '{"hello_world_contract_name":["HelloWorld"],"keychain_id":["d2e2f1f8-949a-496f-ac16-ca32b6541b70"],"sender_account":["0x6a2ec8c50ba1a9ce47c52d1cb5b7136ee9d0ccc0"]}
+
+config:
+  target: http://0.0.0.0:80
+  socketio:
+    path: /api/v1/async/socket-io/connect
+  http:
+    timeout: 300
+  processor: "./artillery-helper-functions.js"
+  phases:
+    - duration: 60
+      arrivalRate: 5
+      rampTo: 10
+      name: Sample load
+  plugins:
+    expect:
+      expectDefault200: false # TODO - status codes
+      reportFailuresAsErrors: true
+  variables:
+    hello_world_contract_name:
+      - HelloWorld
+    keychain_id:
+      - "0"
+    sender_account:
+      - "0x0"
+    sender_private_key:
+      - "0x0"
+scenarios:
+  - name: contractCallSendWithPrivateKey
+    weight: 10
+    flow:
+      - post:
+          url: >-
+            /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/invoke-contract
+          json:
+            contract:
+              contractName: "{{ hello_world_contract_name }}"
+              keychainId: "{{ keychain_id }}"
+            invocationType: CALL
+            methodName: getName
+            params: []
+            gasConfig:
+              maxPriorityFeePerGas: 2000000000
+            web3SigningCredential:
+              ethAccount: "{{ sender_account }}"
+              secret: "{{ sender_private_key }}"
+              type: PRIVATE_KEY_HEX
+          headers:
+            Content-Type: application/json
+          capture:
+            - json: $.success
+              as: success
+          expect:
+            - contentType: json
+            - hasProperty: success
+            - equals:
+                - "true"
+                - "{{ success }}"
+      - post:
+          url: >-
+            /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/invoke-contract
+          afterResponse: "checkInvokeContractWithPrivateKeyResponse"
+          json:
+            contract:
+              contractName: "{{ hello_world_contract_name }}"
+              keychainId: "{{ keychain_id }}"
+            invocationType: SEND
+            methodName: setName
+            params:
+              - "{{ $randomString() }}"
+            gasConfig:
+              maxPriorityFeePerGas: 2000000000
+            web3SigningCredential:
+              ethAccount: "{{ sender_account }}"
+              secret: "{{ sender_private_key }}"
+              type: PRIVATE_KEY_HEX
+          headers:
+            Content-Type: application/json
+          expect:
+            - contentType: json
+            - statusCode:
+                - 200
+                - 400 # Some errors are expected, other will be reported by afterResponse callback
+  - name: contractCallSendWithGethKeychain
+    weight: 3
+    flow:
+      - post:
+          url: >-
+            /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/invoke-contract
+          json:
+            contract:
+              contractName: "{{ hello_world_contract_name }}"
+              keychainId: "{{ keychain_id }}"
+            invocationType: CALL
+            methodName: getName
+            params: []
+            gasConfig:
+              maxPriorityFeePerGas: 2000000000
+            web3SigningCredential:
+              ethAccount: "{{ sender_account }}"
+              secret: ""
+              type: GETH_KEYCHAIN_PASSWORD
+          headers:
+            Content-Type: application/json
+          capture:
+            - json: $.success
+              as: success
+          expect:
+            - contentType: json
+            - hasProperty: success
+            - equals:
+                - "true"
+                - "{{ success }}"
+      - post:
+          url: >-
+            /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/invoke-contract
+          afterResponse: "checkInvokeContractWithPrivateKeyResponse"
+          json:
+            contract:
+              contractName: "{{ hello_world_contract_name }}"
+              keychainId: "{{ keychain_id }}"
+            invocationType: SEND
+            methodName: setName
+            params:
+              - "{{ $randomString() }}"
+            gasConfig:
+              maxPriorityFeePerGas: 2000000000
+            web3SigningCredential:
+              ethAccount: "{{ sender_account }}"
+              secret: ""
+              type: GETH_KEYCHAIN_PASSWORD
+          headers:
+            Content-Type: application/json
+          capture:
+            - json: $.success
+              as: success
+          expect:
+            - contentType: json
+            - hasProperty: success
+            - equals:
+                - "true"
+                - "{{ success }}"
+  - name: etherTransferWithGethKeychain
+    weight: 1
+    flow:
+      - post:
+          url: >-
+            /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/run-transaction
+          json:
+            web3SigningCredential:
+              ethAccount: "{{ sender_account }}"
+              secret: ""
+              type: GETH_KEYCHAIN_PASSWORD
+            transactionConfig:
+              from: "{{ sender_account }}"
+              to: "0x000000000000000000000000000000000000dEaD"
+              value: 500
+          headers:
+            Content-Type: application/json
+          capture:
+            - json: $.transactionReceipt
+              as: transactionReceipt
+          expect:
+            - contentType: json
+            - hasProperty: transactionReceipt
+  - name: getPrometheusMetrics
+    weight: 1
+    flow:
+      - get:
+          url: >-
+            /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/get-prometheus-exporter-metrics
+  - name: watchBlocksFor30Seconds
+    weight: 1
+    engine: socketio
+    flow:
+      - emit:
+          channel: org.hyperledger.cacti.api.async.ethereum.WatchBlocksV1.Subscribe
+      - think: 30

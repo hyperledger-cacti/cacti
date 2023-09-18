@@ -134,9 +134,8 @@ describe("invokeRawWeb3EthContract Tests", () => {
       contractMethodArgs: [newName],
     };
 
-    const resultsSend = await connector.invokeRawWeb3EthContract(
-      sendInvokeArgs,
-    );
+    const resultsSend =
+      await connector.invokeRawWeb3EthContract(sendInvokeArgs);
     expect(resultsSend).toBeTruthy();
     expect(resultsSend.status.toString()).toEqual("1");
 
@@ -148,9 +147,8 @@ describe("invokeRawWeb3EthContract Tests", () => {
       contractMethod: "getName",
     };
 
-    const resultsCall = await connector.invokeRawWeb3EthContract(
-      callInvokeArgs,
-    );
+    const resultsCall =
+      await connector.invokeRawWeb3EthContract(callInvokeArgs);
     expect(resultsCall).toBeTruthy();
     expect(resultsCall).toEqual(newName);
   });

@@ -15,7 +15,8 @@ import {
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 import { PluginLedgerConnectorEthereum } from "../plugin-ledger-connector-ethereum";
 import OAS from "../../json/openapi.json";
-import { InvokeRawWeb3EthMethodV1Response } from "../public-api";
+import { InvokeRawWeb3EthMethodV1Response, isWeb3Error } from "../public-api";
+import { ERR_INVALID_RESPONSE } from "web3";
 
 export interface IInvokeRawWeb3EthMethodEndpointOptions {
   logLevel?: LogLevelDesc;
@@ -94,6 +95,16 @@ export class InvokeRawWeb3EthMethodEndpoint implements IWebServiceEndpoint {
       res.json(response);
     } catch (ex) {
       this.log.error(`Crash while serving ${reqTag}`, ex);
+
+      // Return errors responses from ethereum node as user errors
+      if (isWeb3Error(ex) && ex.code === ERR_INVALID_RESPONSE) {
+        res.status(400).json({
+          message: "Invalid Response Error",
+          error: safeStringifyException(ex),
+        });
+        return;
+      }
+
       res.status(500).json({
         message: "Internal Server Error",
         error: safeStringifyException(ex),

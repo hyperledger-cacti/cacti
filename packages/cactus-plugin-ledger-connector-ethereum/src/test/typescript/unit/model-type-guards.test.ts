@@ -5,6 +5,7 @@ import {
   isDeployedContractJsonDefinition,
   isGasTransactionConfigEIP1559,
   isGasTransactionConfigLegacy,
+  isWeb3Error,
   isWeb3SigningCredentialGethKeychainPassword,
   isWeb3SigningCredentialNone,
   isWeb3SigningCredentialPrivateKeyHex,
@@ -179,5 +180,31 @@ describe("Type guards for OpenAPI spec model type definitions", () => {
       }),
     ).toBe(false);
     expect(isContractKeychainDefinition({})).toBe(false);
+  });
+
+  test("isWeb3Error()", () => {
+    expect(
+      isWeb3Error({
+        name: "Test",
+        code: 123,
+      }),
+    ).toBe(true);
+
+    expect(
+      isWeb3Error({
+        name: "Test",
+      }),
+    ).toBe(false);
+    expect(
+      isWeb3Error({
+        code: 123,
+      }),
+    ).toBe(false);
+    expect(
+      isWeb3Error({
+        foo: "bar",
+      }),
+    ).toBe(false);
+    expect(isWeb3Error({})).toBe(false);
   });
 });

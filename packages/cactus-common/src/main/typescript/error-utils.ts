@@ -24,10 +24,6 @@ export class CodedError extends Error {
  * @returns Safe string representation of an error.
  */
 export function safeStringifyException(error: unknown): string {
-  if (error instanceof Error) {
-    return sanitizeHtml(error.stack || error.message);
-  }
-
   // Axios and possibly other lib errors produce nicer output with toJSON() method.
   // Use it if available
   if (
@@ -36,7 +32,11 @@ export function safeStringifyException(error: unknown): string {
     "toJSON" in error &&
     typeof error.toJSON === "function"
   ) {
-    return sanitizeHtml(error.toJSON());
+    return sanitizeHtml(safeStringify(error.toJSON()));
+  }
+
+  if (error instanceof Error) {
+    return sanitizeHtml(error.stack || error.message);
   }
 
   return sanitizeHtml(safeStringify(error));

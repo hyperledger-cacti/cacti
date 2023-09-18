@@ -1,3 +1,4 @@
+import { Web3Error } from "web3";
 import {
   ContractJsonDefinition,
   ContractKeychainDefinition,
@@ -92,5 +93,12 @@ export function isContractKeychainDefinition(
   return (
     typeof typedContract.contractName !== "undefined" &&
     typeof typedContract.keychainId !== "undefined"
+  );
+}
+
+export function isWeb3Error(error: unknown): error is Web3Error {
+  return (
+    (error as Web3Error).name !== undefined &&
+    (error as Web3Error).code !== undefined
   );
 }

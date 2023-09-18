@@ -157,6 +157,32 @@ To check that all has been installed correctly and that the pugin has no errors 
 npx jest cactus-plugin-ledger-connector-ethereum
 ```
 
+### Stess test
+- Use CLI for manual setup of test environment and geneartion of artillery config.
+- `artillery` must be installed separately (we do not recommend running it if they are any known open vulnerabilities)
+
+#### Setup
+
+``` sh
+# Start the test environment
+node ./packages/cactus-plugin-ledger-connector-ethereum/dist/lib/test/typescript/benchmark/cli/run-benchmark-environment.js
+# Wait until `> artillery run ./.manual-geth-artillery-config.yaml` is printed
+
+# Review artillery config - change scenarios weights or load configuration, adjust target if running on separate machine etc...
+vim ./.manual-geth-artillery-config.yaml # config is created in cwd() when starting the environment
+
+# Run artillery
+artillery run ./.manual-geth-artillery-config.yaml
+```
+
+#### Files
+- `./src/test/typescript/benchmark/setup`
+  - `geth-benchmark-env.ts` contains helper file for setting up an environment used by both CLI and jest test.
+  - `geth-benchmark-config.yaml` template artillery configuration. You can modify test load and scenarios there.
+  - `artillery-helper-functions.js` request handlers used by artillery to correcty process some response codes.
+- `./src/test/typescript/benchmark/cli`
+  - `run-benchmark-environment.ts` CLI for starting test environment and patching template artillery config
+
 ### Building/running the container image locally
 
 In the Cactus project root say:

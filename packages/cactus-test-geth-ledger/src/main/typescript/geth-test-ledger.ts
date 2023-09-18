@@ -130,7 +130,7 @@ export class GethTestLedger {
    * @param omitPull Don't pull docker image from upstream if true.
    * @returns Promise<Container>
    */
-  public async start(omitPull = false): Promise<Container> {
+  public async start(omitPull = false, cmd: string[] = []): Promise<Container> {
     if (this.useRunningLedger) {
       this.log.info(
         "Search for already running Geth Test Ledger because 'useRunningLedger' flag is enabled.",
@@ -168,7 +168,7 @@ export class GethTestLedger {
       const docker = new Docker();
       const eventEmitter: EventEmitter = docker.run(
         this.fullContainerImageName,
-        [],
+        cmd,
         [],
         {
           ExposedPorts: {
