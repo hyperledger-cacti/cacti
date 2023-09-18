@@ -8,9 +8,8 @@ export {
 export {
   PluginLedgerConnectorFabric,
   IPluginLedgerConnectorFabricOptions,
+  SignPayloadCallback,
 } from "./plugin-ledger-connector-fabric";
-
-export { PluginFactoryLedgerConnector } from "./plugin-factory-ledger-connector";
 
 import { IPluginFactoryOptions } from "@hyperledger/cactus-core-api";
 import { PluginFactoryLedgerConnector } from "./plugin-factory-ledger-connector";
@@ -23,3 +22,5 @@ export async function createPluginFactory(
 
 export { IVaultConfig, IWebSocketConfig } from "./identity/identity-provider";
 export { IIdentityData } from "./identity/internal/cert-datastore";
+
+export { signProposal } from "./common/sign-utils";

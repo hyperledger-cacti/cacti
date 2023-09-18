@@ -23,7 +23,6 @@ import com.squareup.moshi.JsonClass
  * 
  *
  * @param functionOutput 
- * @param success 
  * @param transactionId 
  */
 
@@ -32,9 +31,6 @@ data class RunTransactionResponse (
 
     @Json(name = "functionOutput")
     val functionOutput: kotlin.String,
-
-    @Json(name = "success")
-    val success: kotlin.Boolean,
 
     @Json(name = "transactionId")
     val transactionId: kotlin.String

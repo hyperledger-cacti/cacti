@@ -62,7 +62,7 @@ import {
 
 import DatabaseClient from "../../../main/typescript/db-client/db-client";
 jest.mock("../../../main/typescript/db-client/db-client");
-const DatabaseClientMock = (DatabaseClient as unknown) as jest.Mock;
+const DatabaseClientMock = DatabaseClient as unknown as jest.Mock;
 
 import {
   enrollAdmin,
@@ -190,10 +190,9 @@ describe("Persistence Fabric", () => {
         contractName: ledgerContractName,
         peers: [], // will be filled below
         orderer: {
-          name:
-            connectionProfile.orderers[ordererId].grpcOptions[
-              "ssl-target-name-override"
-            ],
+          name: connectionProfile.orderers[ordererId].grpcOptions[
+            "ssl-target-name-override"
+          ],
           url: connectionProfile.orderers[ordererId].url,
           tlscaValue: connectionProfile.orderers[ordererId].tlsCACerts.pem,
         },
@@ -527,7 +526,6 @@ describe("Persistence Fabric", () => {
     expect(createAssetResponse).toBeTruthy();
     expect(createAssetResponse.status).toEqual(200);
     expect(createAssetResponse.data).toBeTruthy();
-    expect(createAssetResponse.data.success).toBeTrue();
     expect(createAssetResponse.data.transactionId).toBeTruthy();
   });
 
@@ -545,7 +543,6 @@ describe("Persistence Fabric", () => {
     expect(createAssetResponse).toBeTruthy();
     expect(createAssetResponse.status).toEqual(200);
     expect(createAssetResponse.data).toBeTruthy();
-    expect(createAssetResponse.data.success).toBeTrue();
     expect(createAssetResponse.data.transactionId).toBeTruthy();
   });
 
@@ -563,7 +560,6 @@ describe("Persistence Fabric", () => {
     expect(createAssetResponse).toBeTruthy();
     expect(createAssetResponse.status).toEqual(200);
     expect(createAssetResponse.data).toBeTruthy();
-    expect(createAssetResponse.data.success).toBeTrue();
     expect(createAssetResponse.data.transactionId).toBeTruthy();
   });
 
@@ -581,7 +577,6 @@ describe("Persistence Fabric", () => {
     expect(createAssetResponse).toBeTruthy();
     expect(createAssetResponse.status).toEqual(200);
     expect(createAssetResponse.data).toBeTruthy();
-    expect(createAssetResponse.data.success).toBeTrue();
     expect(createAssetResponse.data.transactionId).toBeTruthy();
   });
 
@@ -599,7 +594,6 @@ describe("Persistence Fabric", () => {
     expect(createAssetResponse).toBeTruthy();
     expect(createAssetResponse.status).toEqual(200);
     expect(createAssetResponse.data).toBeTruthy();
-    expect(createAssetResponse.data.success).toBeTrue();
     expect(createAssetResponse.data.transactionId).toBeTruthy();
   });
 
@@ -617,7 +611,6 @@ describe("Persistence Fabric", () => {
     expect(createAssetResponse).toBeTruthy();
     expect(createAssetResponse.status).toEqual(200);
     expect(createAssetResponse.data).toBeTruthy();
-    expect(createAssetResponse.data.success).toBeTrue();
     expect(createAssetResponse.data.transactionId).toBeTruthy();
   });
 
@@ -635,7 +628,6 @@ describe("Persistence Fabric", () => {
     expect(createAssetResponse).toBeTruthy();
     expect(createAssetResponse.status).toEqual(200);
     expect(createAssetResponse.data).toBeTruthy();
-    expect(createAssetResponse.data.success).toBeTrue();
     expect(createAssetResponse.data.transactionId).toBeTruthy();
   });
 
@@ -653,7 +645,6 @@ describe("Persistence Fabric", () => {
     expect(createAssetResponse).toBeTruthy();
     expect(createAssetResponse.status).toEqual(200);
     expect(createAssetResponse.data).toBeTruthy();
-    expect(createAssetResponse.data.success).toBeTrue();
     expect(createAssetResponse.data.transactionId).toBeTruthy();
   });
   // end of helpers
@@ -725,9 +716,8 @@ describe("Persistence Fabric", () => {
   });
 
   test("initialBlocksSynchronization", async () => {
-    const initialBlocksSynchronization = await persistence.initialBlocksSynchronization(
-      10,
-    );
+    const initialBlocksSynchronization =
+      await persistence.initialBlocksSynchronization(10);
     expect(initialBlocksSynchronization).toBeTruthy();
     expect(initialBlocksSynchronization).toEqual("done");
   });
@@ -797,7 +787,8 @@ describe("Persistence Fabric", () => {
 
   test("check missing blocks", async () => {
     missBlock10(10);
-    const missingBlocksCheck = await persistence.whichBlocksAreMissingInDdSimple();
+    const missingBlocksCheck =
+      await persistence.whichBlocksAreMissingInDdSimple();
     log.info(
       "Getting missing blocks from plugin for analyze",
       missingBlocksCheck,

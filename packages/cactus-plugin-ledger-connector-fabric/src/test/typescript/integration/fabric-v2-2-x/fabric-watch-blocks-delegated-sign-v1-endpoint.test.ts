@@ -1,3 +1,27 @@
+/**
+ * Functional test of watchBlocksDelegatedSignV1 on connector-fabric (packages/cactus-plugin-ledger-connector-fabric)
+ * Assumes sample CC was already deployed on the test ledger.
+ *
+ * @note - this test sometimes hangs infinitely when used with fabric-node-sdk 2.3.0,
+ * probably due to bug in the underlying dependency grpc-js. Problem does not occur on 2.5.0.
+ */
+
+//////////////////////////////////
+// Constants
+//////////////////////////////////
+
+// Ledger settings
+const imageName = "ghcr.io/hyperledger/cactus-fabric2-all-in-one";
+const imageVersion = "2021-09-02--fix-876-supervisord-retries";
+const fabricEnvVersion = "2.2.0";
+const fabricEnvCAVersion = "1.4.9";
+const ledgerChannelName = "mychannel";
+const ledgerContractName = "basic";
+
+// Log settings
+const testLogLevel: LogLevelDesc = "info"; // default: info
+const sutLogLevel: LogLevelDesc = "info"; // default: info
+
 import "jest-extended";
 import http from "http";
 import { AddressInfo } from "net";
@@ -5,12 +29,9 @@ import { v4 as uuidv4 } from "uuid";
 import bodyParser from "body-parser";
 import express from "express";
 import { Server as SocketIoServer } from "socket.io";
-import { DiscoveryOptions } from "fabric-network";
+import { DiscoveryOptions, X509Identity } from "fabric-network";
 
 import {
-  DEFAULT_FABRIC_2_AIO_FABRIC_VERSION,
-  DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
-  DEFAULT_FABRIC_2_AIO_IMAGE_VERSION,
   FabricTestLedgerV1,
   pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
@@ -37,48 +58,26 @@ import {
   FabricApiClient,
   WatchBlocksListenerTypeV1,
   WatchBlocksResponseV1,
+  signProposal,
 } from "../../../../main/typescript/public-api";
-
-/**
- * Functional test of WatchBlocksV1Endpoint on connector-fabric (packages/cactus-plugin-ledger-connector-fabric)
- * Assumes sample CC was already deployed on the test ledger.
- *
- * @note - this test sometimes hangs infinitely when used with fabric-node-sdk 2.3.0,
- * probably due to bug in the underlying dependency grpc-js. Problem does not occur on 2.5.0.
- */
-
-//////////////////////////////////
-// Constants
-//////////////////////////////////
-
-// Ledger settings
-const imageName = DEFAULT_FABRIC_2_AIO_IMAGE_NAME;
-const imageVersion = DEFAULT_FABRIC_2_AIO_IMAGE_VERSION;
-const fabricEnvVersion = DEFAULT_FABRIC_2_AIO_FABRIC_VERSION;
-const fabricEnvCAVersion = "1.4.9";
-const ledgerChannelName = "mychannel";
-const ledgerContractName = "basic";
-
-// Log settings
-const testLogLevel: LogLevelDesc = "TRACE"; // default: info
-const sutLogLevel: LogLevelDesc = "TRACE"; // default: info
 
 // Logger setup
 const log: Logger = LoggerProvider.getOrCreate({
-  label: "fabric-watch-blocks-v1-endpoint.test",
+  label: "fabric-watch-blocks-delegated-sign-v1-endpoint.test",
   level: testLogLevel,
 });
 
 /**
  * Main test suite
  */
-describe("watchBlocksV1 of fabric connector tests", () => {
+describe("watchBlocksDelegatedSignV1 of fabric connector tests", () => {
   let ledger: FabricTestLedgerV1;
   let signingCredential: FabricSigningCredential;
   let fabricConnectorPlugin: PluginLedgerConnectorFabric;
   let connectorServer: http.Server;
   let socketioServer: SocketIoServer;
   let apiClient: FabricApiClient;
+  let adminIdentity: X509Identity;
 
   //////////////////////////////////
   // Environment Setup
@@ -103,20 +102,18 @@ describe("watchBlocksV1 of fabric connector tests", () => {
       ]),
     });
     log.debug("Fabric image:", ledger.getContainerImageName());
-    await ledger.start({ omitPull: false });
+    await ledger.start();
 
     // Get connection profile
     log.info("Get fabric connection profile for Org1...");
     const connectionProfile = await ledger.getConnectionProfileOrg1();
-    log.debug("Fabric connection profile for Org1 OK: %o", connectionProfile);
     expect(connectionProfile).toBeTruthy();
 
     // Enroll admin and user
     const enrollAdminOut = await ledger.enrollAdmin();
-    log.debug("Enrolled admin OK.");
+    adminIdentity = enrollAdminOut[0];
     const adminWallet = enrollAdminOut[1];
     const [userIdentity] = await ledger.enrollUser(adminWallet);
-    log.debug("Enrolled user OK.");
 
     // Create Keychain Plugin
     const keychainId = uuidv4();
@@ -149,6 +146,10 @@ describe("watchBlocksV1 of fabric connector tests", () => {
       eventHandlerOptions: {
         strategy: DefaultEventHandlerStrategy.NetworkScopeAnyfortx,
         commitTimeout: 300,
+      },
+      signCallback: async (payload, txData) => {
+        log.debug("signCallback called with txData (token):", txData);
+        return signProposal(adminIdentity.credentials.privateKey, payload);
       },
     });
 
@@ -240,14 +241,10 @@ describe("watchBlocksV1 of fabric connector tests", () => {
   ) {
     // Start monitoring
     const monitorPromise = new Promise<void>((resolve, reject) => {
-      const watchObservable = apiClient.watchBlocksV1({
+      const watchObservable = apiClient.watchBlocksDelegatedSignV1({
         channelName: ledgerChannelName,
-        gatewayOptions: {
-          identity: signingCredential.keychainRef,
-          wallet: {
-            keychain: signingCredential,
-          },
-        },
+        signerCertificate: adminIdentity.credentials.certificate,
+        signerMspID: adminIdentity.mspId,
         type,
       });
 
@@ -259,13 +256,13 @@ describe("watchBlocksV1 of fabric connector tests", () => {
             subscription.unsubscribe();
             resolve();
           } catch (err) {
-            log.error("watchBlocksV1() event check error:", err);
+            log.error("watchBlocksDelegatedSignV1() event check error:", err);
             subscription.unsubscribe();
             reject(err);
           }
         },
         error(err) {
-          log.error("watchBlocksV1() error:", err);
+          log.error("watchBlocksDelegatedSignV1() error:", err);
           subscription.unsubscribe();
           reject(err);
         },
@@ -385,7 +382,6 @@ describe("watchBlocksV1 of fabric connector tests", () => {
 
   /**
    * Check Cactus custom transactions summary block monitoring.
-   * This format is compatible with legacy fabric-socketio output.
    */
   test("Monitoring with type CactusTransactions returns transactions summary", async () => {
     const monitorPromise = testWatchBlock(

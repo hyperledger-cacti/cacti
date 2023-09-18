@@ -14,6 +14,9 @@ import {
   WatchBlocksV1,
   WatchBlocksOptionsV1,
   WatchBlocksResponseV1,
+  WatchBlocksDelegatedSignOptionsV1,
+  WatchBlocksCactusTransactionsResponseV1,
+  WatchBlocksCactusTransactionsEventV1,
 } from "../generated/openapi/typescript-axios";
 import { Configuration } from "../generated/openapi/typescript-axios/configuration";
 
@@ -31,7 +34,8 @@ export class FabricApiClientOptions extends Configuration {
  */
 export class FabricApiClient
   extends DefaultApi
-  implements ISocketApiClient<WatchBlocksResponseV1> {
+  implements ISocketApiClient<WatchBlocksResponseV1>
+{
   public static readonly CLASS_NAME = "FabricApiClient";
 
   private readonly log: Logger;
@@ -117,6 +121,115 @@ export class FabricApiClient
         socket.disconnect();
         this.monitorSubjects.delete(socket.id);
       }),
+    );
+  }
+
+  /**
+   * Watch for new blocks on Fabric ledger. Type of response must be configured in monitorOptions.
+   * Works with delegated signing function (no need to supply identity - requests are signing in a connector callback)
+   *
+   * @param monitorOptions Monitoring configuration.
+   *
+   * @returns Observable that will receive new blocks once they appear.
+   */
+  public watchBlocksDelegatedSignV1(
+    monitorOptions: WatchBlocksDelegatedSignOptionsV1,
+  ): Observable<WatchBlocksResponseV1> {
+    const socket = io(this.wsApiHost, { path: this.wsApiPath });
+    const subject = new ReplaySubject<WatchBlocksResponseV1>(0);
+
+    socket.on(WatchBlocksV1.Next, (data: WatchBlocksResponseV1) => {
+      this.log.debug("Received WatchBlocksV1.Next");
+      subject.next(data);
+    });
+
+    socket.on(WatchBlocksV1.Error, (ex: string) => {
+      this.log.error("Received WatchBlocksV1.Error:", ex);
+      subject.error(ex);
+    });
+
+    socket.on(WatchBlocksV1.Complete, () => {
+      this.log.debug("Received WatchBlocksV1.Complete");
+      subject.complete();
+    });
+
+    socket.on("connect", () => {
+      this.log.info(
+        `Connected client '${socket.id}', sending WatchBlocksV1.Subscribe...`,
+      );
+      this.monitorSubjects.set(socket.id, subject);
+      socket.emit(WatchBlocksV1.SubscribeDelegatedSign, monitorOptions);
+    });
+
+    socket.connect();
+
+    return subject.pipe(
+      finalize(() => {
+        this.log.info(
+          `FINALIZE client ${socket.id} - unsubscribing from the stream...`,
+        );
+        socket.emit(WatchBlocksV1.Unsubscribe);
+        socket.disconnect();
+        this.monitorSubjects.delete(socket.id);
+      }),
+    );
+  }
+
+  /**
+   * Wait for transaction with specified ID to be committed.
+   * Must be started before sending the transaction (uses realtime monitoring).
+   * @warning: Remember to use timeout mechanism on production
+   *
+   * @param txId transactionId to wait for.
+   * @param monitorObservable Block observable in CactusTransactions mode (important - other mode will not work!)
+   * @returns `WatchBlocksCactusTransactionsEventV1` of specified transaction.
+   */
+  public async waitForTransactionCommit(
+    txId: string,
+    monitorObservable: Observable<WatchBlocksCactusTransactionsResponseV1>,
+  ) {
+    this.log.info("waitForTransactionCommit()", txId);
+
+    return new Promise<WatchBlocksCactusTransactionsEventV1>(
+      (resolve, reject) => {
+        const subscription = monitorObservable.subscribe({
+          next: (event) => {
+            try {
+              this.log.debug(
+                "waitForTransactionCommit() Received event:",
+                JSON.stringify(event),
+              );
+              if (!("cactusTransactionsEvents" in event)) {
+                throw new Error("Invalid event type received!");
+              }
+
+              const foundTransaction = event.cactusTransactionsEvents.find(
+                (tx) => tx.transactionId === txId,
+              );
+              if (foundTransaction) {
+                this.log.info(
+                  "waitForTransactionCommit() Found transaction with txId",
+                  txId,
+                );
+                subscription.unsubscribe();
+                resolve(foundTransaction);
+              }
+            } catch (err) {
+              this.log.error(
+                "waitForTransactionCommit() event check error:",
+                err,
+              );
+              subscription.unsubscribe();
+              reject(err);
+            }
+          },
+          error: (err) => {
+            this.log.error("waitForTransactionCommit() error:", err);
+            subscription.unsubscribe();
+            reject(err);
+          },
+        });
+      },
     );
   }
 

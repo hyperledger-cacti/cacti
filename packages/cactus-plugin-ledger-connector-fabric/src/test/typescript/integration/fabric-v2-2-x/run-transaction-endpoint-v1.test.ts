@@ -265,7 +265,7 @@ describe(testCase, () => {
         contractName,
         methodName: "CreateAsset",
         params: ["asset388", "green", "111", assetOwner, "299"],
-        endorsingPeers: ["org1.example.com", "Org2MSP"],
+        endorsingOrgs: ["org1.example.com", "Org2MSP"],
       };
 
       const res = await apiClient.runTransactionV1(req);

@@ -1,6 +1,4 @@
 import { Express, Request, Response } from "express";
-import safeStringify from "fast-safe-stringify";
-import sanitizeHtml from "sanitize-html";
 
 import {
   Logger,
@@ -8,6 +6,7 @@ import {
   LogLevelDesc,
   Checks,
   IAsyncProvider,
+  safeStringifyException,
 } from "@hyperledger/cactus-common";
 
 import {
@@ -55,7 +54,7 @@ export class GetBlockEndpointV1 implements IWebServiceEndpoint {
     return this.handleRequest.bind(this);
   }
 
-  public getOasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-block"] {
+  public getOasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-block"] {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-block"
     ];
@@ -87,32 +86,13 @@ export class GetBlockEndpointV1 implements IWebServiceEndpoint {
     this.log.debug(`POST ${this.getPath()}`);
 
     try {
-      const resBody = await this.opts.connector.getBlock(req.body);
-      res.status(200).send(resBody);
+      res.status(200).send(await this.opts.connector.getBlock(req.body));
     } catch (error) {
-      this.log.error(`Crash while serving ${fnTag}:`, error);
-      const status = 500;
-
-      if (error instanceof Error) {
-        const message = "Internal Server Error";
-        this.log.info(`${message} [${status}]`);
-        res.status(status).json({
-          message,
-          error: sanitizeHtml(error.stack || error.message, {
-            allowedTags: [],
-            allowedAttributes: {},
-          }),
-        });
-      } else {
-        this.log.warn("Unexpected exception that is not instance of Error!");
-        res.status(status).json({
-          message: "Unexpected Error",
-          error: sanitizeHtml(safeStringify(error), {
-            allowedTags: [],
-            allowedAttributes: {},
-          }),
-        });
-      }
+      this.log.error(`Crash while serving ${fnTag}`, error);
+      res.status(500).json({
+        message: "Internal Server Error",
+        error: safeStringifyException(error),
+      });
     }
   }
 }

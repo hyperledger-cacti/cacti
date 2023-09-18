@@ -22,6 +22,7 @@ import {
   GatewayOptions,
   FabricApiClient,
   GetBlockResponseV1,
+  RunTransactionResponseType,
 } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
 
 import PostgresDatabaseClient from "./db-client/db-client";
@@ -46,7 +47,8 @@ export interface IPluginPersistenceFabricOptions extends ICactusPluginOptions {
 }
 
 export class PluginPersistenceFabric
-  implements ICactusPlugin, IPluginWebService {
+  implements ICactusPlugin, IPluginWebService
+{
   private log: Logger;
   public static readonly CLASS_NAME = "PluginPersistenceFabric";
   private dbClient: PostgresDatabaseClient;
@@ -201,7 +203,7 @@ export class PluginPersistenceFabric
       contractName: "qscc",
       methodName: "GetChainInfo",
       params: [this.ledgerChannelName.toString()],
-      responseType: "JSONstring",
+      responseType: RunTransactionResponseType.JSON,
     });
     this.log.warn("lastBlockInChainTest", lastBlockInChainTest);
     const parse = JSON.parse(lastBlockInChainTest.data.functionOutput);
@@ -450,16 +452,15 @@ export class PluginPersistenceFabric
   }
 
   async getBlockFromLedger(blockNumber: string): Promise<any> {
-    const block: AxiosResponse<GetBlockResponseV1> = await this.apiClient.getBlockV1(
-      {
+    const block: AxiosResponse<GetBlockResponseV1> =
+      await this.apiClient.getBlockV1({
         channelName: this.ledgerChannelName,
         gatewayOptions: this.gatewayOptions,
         query: {
           blockNumber,
         },
         skipDecode: false,
-      },
-    );
+      });
 
     const tempBlockParse = block.data;
 
@@ -477,15 +478,14 @@ export class PluginPersistenceFabric
   public async migrateBlockNrWithTransactions(
     blockNumber: string,
   ): Promise<boolean> {
-    const block: AxiosResponse<GetBlockResponseV1> = await this.apiClient.getBlockV1(
-      {
+    const block: AxiosResponse<GetBlockResponseV1> =
+      await this.apiClient.getBlockV1({
         channelName: this.ledgerChannelName,
         gatewayOptions: this.gatewayOptions,
         query: {
           blockNumber,
         },
-      },
-    );
+      });
 
     const tempBlockParse: any = JSON.parse(JSON.stringify(block.data));
 
@@ -560,7 +560,8 @@ export class PluginPersistenceFabric
         ).toString("hex");
       }
 
-      const creator_id_bytes = transactionDataObject.payload.header.signature_header.creator.id_bytes.data.toString();
+      const creator_id_bytes =
+        transactionDataObject.payload.header.signature_header.creator.id_bytes.data.toString();
       if (transactionDataObject.payload.data.actions !== undefined) {
         chaincodeID =
           transactionDataObject.payload.data.actions[0].payload.action
@@ -604,13 +605,15 @@ export class PluginPersistenceFabric
           ).toString("hex");
         }
         // payload_proposal_hash = transactionDataObject.payload.data.actions[0].payload.action.proposal_response_payload.proposal_hash.data.toString(
-        detailedTxData.payload_proposal_hash = transactionDataObject.payload.data.actions[0].payload.action.proposal_response_payload.proposal_hash.data.toString(
-          "hex",
-        );
+        detailedTxData.payload_proposal_hash =
+          transactionDataObject.payload.data.actions[0].payload.action.proposal_response_payload.proposal_hash.data.toString(
+            "hex",
+          );
         // endorser_id_bytes = transactionDataObject.payload.data.actions[0].payload.action.endorsements[0].endorser.id_bytes.data.toString(
-        detailedTxData.endorser_id_bytes = transactionDataObject.payload.data.actions[0].payload.action.endorsements[0].endorser.id_bytes.data.toString(
-          "hex",
-        );
+        detailedTxData.endorser_id_bytes =
+          transactionDataObject.payload.data.actions[0].payload.action.endorsements[0].endorser.id_bytes.data.toString(
+            "hex",
+          );
 
         detailedTxData.endorser_msp_id =
           tempBlockParse.decodedBlock.data.data[
@@ -674,9 +677,8 @@ export class PluginPersistenceFabric
             .signature_header.creator.mspid,
         endorser_msp_id: detailedTxData.endorser_msp_id,
         chaincode_id: chaincode_id, //tempBlockParse.decodedBlock.data.data[0].payload.data.payload.chaincode_proposal_payload.input.chaincode_spec.chaincode_id,
-        type:
-          tempBlockParse.decodedBlock.data.data[txIndex].payload.header
-            .channel_header.typeString,
+        type: tempBlockParse.decodedBlock.data.data[txIndex].payload.header
+          .channel_header.typeString,
         read_set: detailedTxData.read_set, //tempBlockParse.decodedBlock.data.data[0].payload.data.actions[0].payload.action.proposal_response_payload,
         write_set: detailedTxData.write_set, //tempBlockParse.decodedBlock.data.data[0].payload.data.actions[0].payload.chaincode_proposal_payload.input.chaincode_spec.input,
         channel_id:
@@ -729,7 +731,7 @@ export class PluginPersistenceFabric
     return true;
   }
   /**
- * 
+ *
  * @param limitLastBlockConsidered  this parameter - set the last block in ledger which we consider valid by our party and synchronize only to this point in ledger
 If some blocks above this number are already in database they will not be removed.
  * @returns number which is this.lastBlock , artificially set lastBlock in ledger
@@ -781,15 +783,14 @@ If some blocks above this number are already in database they will not be remove
       this.log.info("database start Synchronization");
       do {
         blockNumber = this.missedBlocks[missedIndex];
-        const block: AxiosResponse<GetBlockResponseV1> = await this.apiClient.getBlockV1(
-          {
+        const block: AxiosResponse<GetBlockResponseV1> =
+          await this.apiClient.getBlockV1({
             channelName: this.ledgerChannelName,
             gatewayOptions: this.gatewayOptions,
             query: {
               blockNumber,
             },
-          },
-        );
+          });
 
         if (block.status == 200) {
           // Put scrapped block into database

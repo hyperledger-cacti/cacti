@@ -16,8 +16,6 @@
 package org.openapitools.client.models
 
 import org.openapitools.client.models.FabricContractInvocationType
-import org.openapitools.client.models.FabricSigningCredential
-import org.openapitools.client.models.GatewayOptions
 import org.openapitools.client.models.RunTransactionResponseType
 
 import com.squareup.moshi.Json
@@ -26,7 +24,8 @@ import com.squareup.moshi.JsonClass
 /**
  * 
  *
- * @param signingCredential 
+ * @param signerCertificate 
+ * @param signerMspID 
  * @param channelName 
  * @param contractName 
  * @param invocationType 
@@ -35,15 +34,18 @@ import com.squareup.moshi.JsonClass
  * @param endorsingPeers An array of endorsing peers (name or url) for the transaction.
  * @param endorsingOrgs An array of endorsing organizations (by mspID or issuer org name on certificate) for the transaction.
  * @param transientData 
- * @param gatewayOptions 
+ * @param uniqueTransactionData Can be used to uniquely identify and authorize signing request
  * @param responseType 
  */
 
 
-data class RunTransactionRequest (
+data class RunDelegatedSignTransactionRequest (
 
-    @Json(name = "signingCredential")
-    val signingCredential: FabricSigningCredential,
+    @Json(name = "signerCertificate")
+    val signerCertificate: kotlin.String,
+
+    @Json(name = "signerMspID")
+    val signerMspID: kotlin.String,
 
     @Json(name = "channelName")
     val channelName: kotlin.String,
@@ -71,8 +73,9 @@ data class RunTransactionRequest (
     @Json(name = "transientData")
     val transientData: kotlin.Any? = null,
 
-    @Json(name = "gatewayOptions")
-    val gatewayOptions: GatewayOptions? = null,
+    /* Can be used to uniquely identify and authorize signing request */
+    @Json(name = "uniqueTransactionData")
+    val uniqueTransactionData: kotlin.Any? = null,
 
     @Json(name = "responseType")
     val responseType: RunTransactionResponseType? = null

@@ -1,25 +1,46 @@
-import { Socket as SocketIoSocket } from "socket.io";
-
-import { BlockEvent, BlockListener, EventType, Gateway } from "fabric-network";
-
 import {
   Logger,
   LogLevelDesc,
   LoggerProvider,
   Checks,
+  safeStringifyException,
 } from "@hyperledger/cactus-common";
 
+import {
+  BlockType,
+  Channel,
+  EventCallback,
+  EventInfo,
+  IdentityContext,
+} from "fabric-common";
+import { BlockEvent, BlockListener, EventType, Gateway } from "fabric-network";
+import { Socket as SocketIoSocket } from "socket.io";
+import { v4 as uuidv4 } from "uuid";
+import { RuntimeError } from "run-time-error";
+
+import { assertFabricFunctionIsAvailable } from "../common/utils";
+import { SignPayloadCallback } from "../plugin-ledger-connector-fabric";
 import {
   WatchBlocksV1,
   WatchBlocksResponseV1,
   WatchBlocksListenerTypeV1,
   WatchBlocksOptionsV1,
   WatchBlocksCactusTransactionsEventV1,
+  WatchBlocksDelegatedSignOptionsV1,
 } from "../generated/openapi/typescript-axios";
 
-import safeStringify from "fast-safe-stringify";
-import sanitizeHtml from "sanitize-html";
-import { RuntimeError } from "run-time-error";
+const {
+  newFilteredBlockEvent,
+} = require("fabric-network/lib/impl/event/filteredblockeventfactory");
+assertFabricFunctionIsAvailable(newFilteredBlockEvent, "newFilteredBlockEvent");
+const {
+  newFullBlockEvent,
+} = require("fabric-network/lib/impl/event/fullblockeventfactory");
+assertFabricFunctionIsAvailable(newFullBlockEvent, "newFullBlockEvent");
+const {
+  newPrivateBlockEvent,
+} = require("fabric-network/lib/impl/event/privateblockeventfactory");
+assertFabricFunctionIsAvailable(newPrivateBlockEvent, "newPrivateBlockEvent");
 
 /**
  * WatchBlocksV1Endpoint configuration.
@@ -27,24 +48,6 @@ import { RuntimeError } from "run-time-error";
 export interface IWatchBlocksV1EndpointConfiguration {
   logLevel?: LogLevelDesc;
   socket: SocketIoSocket;
-  gateway: Gateway;
-}
-
-/**
- * Return secure string representation of error from the input.
- * Handles circular structures and removes HTML.`
- *
- * @param error Any object to return as an error, preferable `Error`
- * @returns Safe string representation of an error.
- *
- * @todo use one from cactus-common after #2089 is merged.
- */
-export function safeStringifyException(error: unknown): string {
-  if (error instanceof Error) {
-    return sanitizeHtml(error.stack || error.message);
-  }
-
-  return sanitizeHtml(safeStringify(error));
 }
 
 /**
@@ -129,15 +132,10 @@ export class WatchBlocksV1Endpoint {
           functionArgs: decodedArgs,
         });
       } catch (error) {
-        const errorMessage = safeStringifyException(error);
-        log.error(
+        log.warn(
           "Could not retrieve transaction from received block. Error:",
-          errorMessage,
+          safeStringifyException(error),
         );
-        socket.emit(WatchBlocksV1.Error, {
-          code: 512,
-          errorMessage,
-        });
       }
     }
 
@@ -266,11 +264,38 @@ export class WatchBlocksV1Endpoint {
   }
 
   /**
+   * Use Fabric SDK functions to convert raw `EventInfo` to `BlockEvent` of specified `BlockType`.
+   *
+   * @param blockType block type (e.g. full, filtered)
+   * @param event raw block event from EventService
+   * @returns parsed BlockEvent
+   */
+  private toFabricBlockEvent(
+    blockType: BlockType,
+    event: EventInfo,
+  ): BlockEvent {
+    if (blockType === "filtered") {
+      return newFilteredBlockEvent(event);
+    } else if (blockType === "full") {
+      return newFullBlockEvent(event);
+    } else if (blockType === "private") {
+      return newPrivateBlockEvent(event);
+    } else {
+      // Exhaustive check
+      const unknownBlockType: never = blockType;
+      throw new Error(`Unsupported event type: ${unknownBlockType}`);
+    }
+  }
+
+  /**
    * Subscribe to new blocks on fabric ledger, push them to the client via socketio.
    *
    * @param options Block monitoring options.
    */
-  public async subscribe(options: WatchBlocksOptionsV1): Promise<void> {
+  public async subscribe(
+    options: WatchBlocksOptionsV1,
+    gateway: Gateway,
+  ): Promise<void> {
     const { socket, log } = this;
     const clientId = socket.id;
     log.info(`${WatchBlocksV1.Subscribe} => clientId: ${clientId}`);
@@ -285,7 +310,7 @@ export class WatchBlocksV1Endpoint {
 
     try {
       Checks.truthy(options.channelName, "Missing channel name");
-      const network = await this.config.gateway.getNetwork(options.channelName);
+      const network = await gateway.getNetwork(options.channelName);
 
       const { listener, listenerType } = this.getBlockListener(options.type);
 
@@ -304,6 +329,131 @@ export class WatchBlocksV1Endpoint {
           clientId,
         );
         network.removeBlockListener(listener);
+        gateway.disconnect();
+        this.close();
+      });
+
+      socket.on(WatchBlocksV1.Unsubscribe, () => {
+        log.info(`${WatchBlocksV1.Unsubscribe} => clientId: ${clientId}`);
+        this.close();
+      });
+    } catch (error) {
+      const errorMessage = safeStringifyException(error);
+      log.warn(errorMessage);
+      socket.emit(WatchBlocksV1.Error, {
+        code: 500,
+        errorMessage,
+      });
+    }
+  }
+
+  /**
+   * Subscribe to new blocks on fabric ledger, push them to the client via socketio.
+   * Uses delegate signing callback from the connector to support custom signing scenarios.
+   *
+   * @param options Block monitoring options.
+   * @param channel Target channel to monitor blocks.
+   * @param userIdCtx Signer identity context.
+   * @param signCallback Signing callback to use when sending requests to a network.
+   */
+  public async SubscribeDelegatedSign(
+    options: WatchBlocksDelegatedSignOptionsV1,
+    channel: Channel,
+    userIdCtx: IdentityContext,
+    signCallback: SignPayloadCallback,
+  ): Promise<void> {
+    const { socket, log } = this;
+    const clientId = socket.id;
+    log.info(
+      `${WatchBlocksV1.SubscribeDelegatedSign} => clientId: ${clientId}`,
+    );
+    log.debug(
+      "WatchBlocksV1.SubscribeDelegatedSign args: channelName:",
+      options.channelName,
+      ", startBlock:",
+      options.startBlock,
+      ", type: ",
+      options.type,
+    );
+
+    try {
+      const { listener, listenerType } = this.getBlockListener(options.type);
+      log.debug("Subscribing to new blocks... listenerType:", listenerType);
+
+      // Eventers
+      // (prefer peers from same org)
+      let peers = channel.getEndorsers(options.signerMspID);
+      peers = peers.length > 0 ? peers : channel.getEndorsers();
+      const eventers = peers.map((peer) => {
+        const eventer = channel.client.newEventer(peer.name);
+        eventer.setEndpoint(peer.endpoint);
+        return eventer;
+      });
+      if (eventers.length === 0) {
+        throw new Error("No peers (eventers) available for monitoring");
+      }
+
+      // Event Service
+      const eventService = channel.newEventService(
+        `SubscribeDelegatedSign_${uuidv4()}`,
+      );
+      eventService.setTargets(eventers);
+
+      // Event listener
+      const eventCallback: EventCallback = (
+        error?: Error,
+        event?: EventInfo,
+      ) => {
+        try {
+          if (error) {
+            throw error;
+          }
+
+          if (event) {
+            listener(this.toFabricBlockEvent(listenerType, event));
+          } else {
+            this.log.warn(
+              "SubscribeDelegatedSign() missing event - without an error.",
+            );
+          }
+        } catch (error) {
+          const errorMessage = safeStringifyException(error);
+          log.warn("SubscribeDelegatedSign callback exception:", errorMessage);
+          socket.emit(WatchBlocksV1.Error, {
+            code: 500,
+            errorMessage,
+          });
+        }
+      };
+
+      const eventListener = eventService.registerBlockListener(eventCallback, {
+        startBlock: options.startBlock,
+        unregister: false,
+      });
+
+      // Start monitoring
+      const monitorRequest = eventService.build(userIdCtx, {
+        blockType: listenerType,
+        startBlock: options.startBlock,
+      });
+      const signature = await signCallback(
+        monitorRequest,
+        options.uniqueTransactionData,
+      );
+      eventService.sign(signature);
+      await eventService.send();
+
+      socket.on("disconnect", async (reason: string) => {
+        log.info(
+          "WebSocket:disconnect => reason=%o clientId=%s",
+          reason,
+          clientId,
+        );
+
+        eventListener.unregisterEventListener();
+        eventService.close();
+        channel.close();
+        channel.client.close();
         this.close();
       });
 
@@ -321,10 +471,13 @@ export class WatchBlocksV1Endpoint {
     }
   }
 
+  /**
+   * Disconnect the socket if connected.
+   * This will trigger cleanups for all started monitoring logics that use this socket.
+   */
   close(): void {
     if (this.socket.connected) {
       this.socket.disconnect(true);
     }
-    this.config.gateway.disconnect();
   }
 }
