@@ -37,7 +37,8 @@ export const GETH_TEST_LEDGER_DEFAULT_OPTIONS = Object.freeze({
 
 export const WHALE_ACCOUNT_PRIVATE_KEY =
   "86bbf98cf5e5b1c43d2c8701764897357e0fa24982c0137efabf6dc3a6e7b69e";
-export const WHALE_ACCOUNT_ADDRESS = "6a2ec8c50ba1a9ce47c52d1cb5b7136ee9d0ccc0";
+export const WHALE_ACCOUNT_ADDRESS =
+  "0x6a2ec8c50ba1a9ce47c52d1cb5b7136ee9d0ccc0";
 
 export class GethTestLedger {
   public static readonly CLASS_NAME = "GethTestLedger";

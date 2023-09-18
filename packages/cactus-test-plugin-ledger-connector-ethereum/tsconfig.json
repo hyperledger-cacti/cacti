@@ -33,6 +33,9 @@
     },
     {
       "path": "../cactus-test-tooling/tsconfig.json"
+    },
+    {
+      "path": "../cactus-test-geth-ledger/tsconfig.json"
     }
   ]
 }

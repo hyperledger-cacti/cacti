@@ -217,61 +217,25 @@
             "nullable": false
           },
           "from": {
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "number"
-              }
-            ]
+            "type": "string"
           },
           "to": {
-            "oneOf": [
-              {
-                "type": "string"
-              }
-            ]
+            "type": "string"
           },
           "value": {
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "number"
-              }
-            ]
+            "type": "string"
           },
           "gas": {
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "number"
-              }
-            ]
+            "type": "string"
           },
           "gasPrice": {
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "number"
-              }
-            ]
+            "type": "string"
           },
           "nonce": {
-            "type": "number"
+            "type": "string"
           },
           "data": {
-            "oneOf": [
-              {
-                "type": "string"
-              }
-            ]
+            "type": "string"
           }
         }
       },
@@ -300,7 +264,7 @@
             "pattern": "^0x([A-Fa-f0-9]{64})$"
           },
           "transactionIndex": {
-            "type": "number",
+            "type": "string",
             "nullable": false
           },
           "blockHash": {
@@ -310,11 +274,15 @@
             "pattern": "^0x([A-Fa-f0-9]{64})$"
           },
           "blockNumber": {
-            "type": "number",
+            "type": "string",
             "nullable": false
           },
           "gasUsed": {
-            "type": "number",
+            "type": "string",
+            "nullable": false
+          },
+          "effectiveGasPrice": {
+            "type": "string",
             "nullable": false
           },
           "contractAddress": {
@@ -351,8 +319,12 @@
             "type": "string",
             "nullable": false
           },
-          "cumulativeGasUSed": {
-            "type": "number",
+          "cumulativeGasUsed": {
+            "type": "string",
+            "nullable": false
+          },
+          "type": {
+            "type": "string",
             "nullable": false
           }
         }
@@ -600,37 +572,16 @@
             "items": {}
           },
           "value": {
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "number"
-              }
-            ]
+            "type": "string"
           },
           "gas": {
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "number"
-              }
-            ]
+            "type": "string"
           },
           "gasPrice": {
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "number"
-              }
-            ]
+            "type": "string"
           },
           "nonce": {
-            "type": "number"
+            "type": "string"
           },
           "timeoutMs": {
             "type": "number",
@@ -687,37 +638,16 @@
             "nullable": false
           },
           "value": {
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "number"
-              }
-            ]
+            "type": "string"
           },
           "gas": {
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "number"
-              }
-            ]
+            "type": "string"
           },
           "gasPrice": {
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "number"
-              }
-            ]
+            "type": "string"
           },
           "nonce": {
-            "type": "number"
+            "type": "string"
           },
           "timeoutMs": {
             "type": "number",
@@ -793,9 +723,7 @@
         "additionalProperties": false,
         "properties": {
           "abi": {
-            "description": "The application binary interface of the solidity contract",
-            "type": "array",
-            "items": {}
+            "description": "The application binary interface of the solidity contract"
           },
           "address": {
             "description": "Deployed solidity contract address",
@@ -872,44 +800,22 @@
       "Web3BlockHeader": {
         "type": "object",
         "required": [
-          "number",
-          "hash",
-          "parentHash",
-          "nonce",
           "sha3Uncles",
-          "logsBloom",
           "transactionRoot",
-          "stateRoot",
-          "receiptRoot",
-          "miner",
-          "extraData",
           "gasLimit",
-          "gasUsed",
-          "timestamp"
+          "gasUsed"
         ],
         "properties": {
           "number": {
-            "type": "number"
-          },
-          "hash": {
             "type": "string"
           },
           "parentHash": {
             "type": "string"
           },
-          "nonce": {
-            "type": "string"
-          },
           "sha3Uncles": {
             "type": "string"
           },
-          "logsBloom": {
-            "type": "string"
-          },
           "transactionsRoot": {
-            "type": "string"
-          },
-          "stateRoot": {
             "type": "string"
           },
           "receiptsRoot": {
@@ -924,24 +830,26 @@
           "miner": {
             "type": "string"
           },
+          "gasLimit": {
+            "type": "string"
+          },
+          "gasUsed": {
+            "type": "string"
+          },
+          "stateRoot": {
+            "type": "string"
+          },
+          "logsBloom": {
+            "type": "string"
+          },
           "extraData": {
             "type": "string"
           },
-          "gasLimit": {
-            "type": "integer"
-          },
-          "gasUsed": {
-            "type": "integer"
+          "nonce": {
+            "type": "string"
           },
           "timestamp": {
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "number"
-              }
-            ]
+            "type": "string"
           }
         }
       },
@@ -958,33 +866,31 @@
           "value",
           "gasPrice",
           "gas",
-          "input"
+          "input",
+          "type",
+          "chainId"
         ],
         "properties": {
           "hash": {
             "type": "string"
           },
           "nonce": {
-            "type": "number"
+            "type": "string"
           },
           "blockHash": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "blockNumber": {
-            "type": "number",
-            "nullable": true
+            "type": "string"
           },
           "transactionIndex": {
-            "type": "number",
-            "nullable": true
+            "type": "string"
           },
           "from": {
             "type": "string"
           },
           "to": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "value": {
             "type": "string"
@@ -993,9 +899,15 @@
             "type": "string"
           },
           "gas": {
-            "type": "number"
+            "type": "string"
           },
           "input": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "chainId": {
             "type": "string"
           },
           "v": {
@@ -1013,11 +925,9 @@
         "type": "object",
         "required": [
           "number",
-          "hash",
           "parentHash",
           "nonce",
           "sha3Uncles",
-          "logsBloom",
           "transactionRoot",
           "stateRoot",
           "receiptRoot",
@@ -1033,7 +943,7 @@
         ],
         "properties": {
           "number": {
-            "type": "number"
+            "type": "string"
           },
           "hash": {
             "type": "string"
@@ -1072,10 +982,10 @@
             "type": "string"
           },
           "gasLimit": {
-            "type": "integer"
+            "type": "string"
           },
           "gasUsed": {
-            "type": "integer"
+            "type": "string"
           },
           "timestamp": {
             "oneOf": [
@@ -1088,7 +998,7 @@
             ]
           },
           "size": {
-            "type": "number"
+            "type": "string"
           },
           "totalDifficulty": {
             "type": "string"
@@ -1098,6 +1008,9 @@
             "items": {
               "type": "string"
             }
+          },
+          "baseFeePerGas": {
+            "type": "string"
           },
           "transactions": {
             "type": "array",

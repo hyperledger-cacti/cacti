@@ -26,7 +26,8 @@ export interface IDeployContractSolidityBytecodeOptionsJsonObject {
 }
 
 export class DeployContractSolidityBytecodeJsonObjectEndpoint
-  implements IWebServiceEndpoint {
+  implements IWebServiceEndpoint
+{
   public static readonly CLASS_NAME =
     "DeployContractSolidityBytecodeEndpointJsonObject";
 
