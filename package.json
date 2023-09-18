@@ -29,7 +29,6 @@
     "reset:yarn-lock": "yarn run init-registries && yarn install --update-checksums --force",
     "reset": "run-s reset:git reset:node-modules reset:yarn-lock configure",
     "configure": "npm run init-registries && yarn install && yarn build:dev:backend",
-    "install-yarn": "npm install --global yarn@3.6.0",
     "set-yarn-version": "yarn set version stable",
     "enable-corepack": "npm i -g corepack && corepack enable && corepack prepare yarn@3.6.0 --activate",
     "custom-checks": "TS_NODE_PROJECT=./tools/tsconfig.json node --trace-deprecation --experimental-modules --abort-on-uncaught-exception --loader ts-node/esm --experimental-specifier-resolution=node ./tools/custom-checks/run-custom-checks.ts",
