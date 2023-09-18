@@ -47,7 +47,7 @@ jobs:
       with:
         node-version: v16.9.1
 
-    - run: yarn configure
+    - run: npm run configure
 
     - name: build-cactus-plugin-ledger-connector-corda-kotlin-client
       run: |

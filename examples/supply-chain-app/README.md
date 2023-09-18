@@ -54,16 +54,16 @@ DOCKER_BUILDKIT=1 docker build \
 
 On the terminal, issue the following commands:
 
-1. `npm run install-yarn`
-2. `yarn configure`
+1. `npm run enable-corepack`
+2. `npm run configure`
 3. `yarn start:example-supply-chain`
 
 ## Debugging the Example Application Locally
 
 On the terminal, issue the following commands (steps 1 to 6) and then perform the rest of the steps manually.
 
-1. `npm run install-yarn`
-2. `yarn configure`
+1. `npm run enable-corepack`
+2. `npm run configure`
 3. `yarn build:dev`
 4. `cd ./examples/supply-chain-app/`
 5. `yarn --no-lockfile`
@@ -77,8 +77,8 @@ On the terminal, issue the following commands (steps 1 to 6) and then perform th
 
 ## Live Reloading the GUI Application
 
-1. `npm run install-yarn`
-2. `yarn configure`
+1. `npm run enable-corepack`
+2. `npm run configure`
 3. `yarn build:dev`
 4. Locate the `.vscode/template.launch.json` file
 5. Within that file locate the entry named `"Example: Supply Chain App"`
