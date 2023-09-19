@@ -1,7 +1,3 @@
-// Copyright IBM Corp. All Rights Reserved.
-//
-// SPDX-License-Identifier: Apache-2.0
-
 /// Generated client implementations.
 pub mod data_transfer_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]

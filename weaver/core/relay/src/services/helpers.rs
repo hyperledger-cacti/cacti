@@ -2,7 +2,10 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+use colored::Colorize;
 use weaverpb::common::ack::{ack};
+use weaverpb::common::events::{event_subscription_state, EventSubscriptionState};
+use weaverpb::common::events::{EventPublication, EventState, EventStates, EventSubscription};
 use weaverpb::common::query::Query;
 use weaverpb::common::state::{request_state, RequestState};
 use weaverpb::driver::driver::driver_communication_client::DriverCommunicationClient;
