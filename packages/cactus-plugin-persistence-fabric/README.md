@@ -2,7 +2,7 @@
 
 This plugin allows `Cacti` to persist Fabric Block general data and basic information about transactions into some storage (currently to a `PostgreSQL` database, but this concept can be extended further).
 Data in the database can later be analyzed and viewed in a GUI tool.
-GUI tool is in project root directory of Cacti project in GUI folder. cacti/packages/cacti-cmd-gui-app
+GUI tool is in project root directory of Cacti project in GUI folder. cacti/packages/cacti-ledger-browser
 
 
 ## Summary

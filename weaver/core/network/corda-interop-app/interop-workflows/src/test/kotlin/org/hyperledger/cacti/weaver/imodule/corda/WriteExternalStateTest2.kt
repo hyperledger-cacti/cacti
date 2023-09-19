@@ -126,7 +126,7 @@ class WriteExternalStateTest2 {
         val linearId2 = future2.getOrThrow()
         assert(linearId2.isRight()) { "CreateMembershipState should return a Right(UniqueIdentifier)" }
 
-        val happyFuture = partyA.startFlow(WriteExternalStateInitiator(cordaTestData.B64View, "localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:H"))
+        val happyFuture = partyA.startFlow(WriteExternalStateInitiator(arrayOf(cordaTestData.B64View), arrayOf("localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:H")))
         network.runNetwork()
         val happyLinearId = happyFuture.getOrThrow()
         assertTrue(happyLinearId.isRight())
@@ -143,7 +143,7 @@ class WriteExternalStateTest2 {
         val linearId4 = future4.getOrThrow()
         assert(linearId4.isRight()) { "CreateMembershipState should return a Right(UniqueIdentifier)" }
 
-        val happyFuture2 = partyA.startFlow(WriteExternalStateInitiator(fabricTestData.B64View, "${fabricRelayEndpoint}/${fabricNetwork}/${fabricViewAddress}"))
+        val happyFuture2 = partyA.startFlow(WriteExternalStateInitiator(arrayOf(fabricTestData.B64View), arrayOf("${fabricRelayEndpoint}/${fabricNetwork}/${fabricViewAddress}")))
         network.runNetwork()
         val happyLinearId2 = happyFuture2.getOrThrow()
         assertTrue(happyLinearId2.isRight())
@@ -159,11 +159,11 @@ class WriteExternalStateTest2 {
         val linearId5 = future5.getOrThrow()
         assert(linearId5.isRight()) { "UpdateMembershipState should return a Right(UniqueIdentifier)" }
 
-        val unhappyFuture = partyA.startFlow(WriteExternalStateInitiator(cordaTestData.B64View, "localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:H"))
+        val unhappyFuture = partyA.startFlow(WriteExternalStateInitiator(arrayOf(cordaTestData.B64View), arrayOf("localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:H")))
         network.runNetwork()
         val unhappyLinearId = unhappyFuture.getOrThrow()
         assertTrue(unhappyLinearId.isLeft())
-        assertEquals("Parse Error: failed to parse requester certificate: Illegal base64 character 5f", unhappyLinearId.fold({ it.message }, { "" }))
+        assertEquals("View verification failed with error: Parse Error: failed to parse requester certificate: Illegal base64 character 5f", unhappyLinearId.fold({ it.message }, { "" }))
 
 
         // Test case: Invalid policy in verification policy

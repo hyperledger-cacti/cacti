@@ -12,7 +12,7 @@ We will demonstrate asset exchange of a tokens in `Corda_Network` with tokens on
 |:------|
 | The hash used in following steps can be replaced by any valid `SHA256` hash. |
 
-- Navigate to `samples/corda/corda-simple-application` folder. 
+- Navigate to the `weaver/samples/corda/corda-simple-application` folder in your clone of the Cacti repository.
 - Run the following to verify the status of the tokens owned by `PartyA` and `PartyB` in the `Corda_Network` and `Corda_Network2`:
   ```bash
   ./scripts/getAssetStatus.sh 2

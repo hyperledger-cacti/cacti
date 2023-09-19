@@ -1,3 +1,7 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+
 #!/bin/bash
 
 directory=$(dirname $0)
@@ -7,7 +11,6 @@ nw=${3:-Corda_Network}
 
 simpleAppVersion="0.4"
 houseTokenAppVersion="1.0"
-tokenVersion="1.2"
 
 . $directory/../constants.properties
 
@@ -23,8 +26,8 @@ for party in ${parties}; do
     cp $directory/../shared/artifacts/contracts-$houseTokenAppVersion.jar dev/${nw}/build/nodes/${party}/cordapps
     cp $directory/../shared/artifacts/workflows-$houseTokenAppVersion.jar dev/${nw}/build/nodes/${party}/cordapps
     
-    cp $directory/../shared/artifacts/tokens-contracts-$tokenVersion.jar dev/${nw}/build/nodes/${party}/cordapps
-    cp $directory/../shared/artifacts/tokens-workflows-$tokenVersion.jar dev/${nw}/build/nodes/${party}/cordapps
+    cp $directory/../shared/artifacts/tokens-contracts-$cordaTokenSDKVersion.jar dev/${nw}/build/nodes/${party}/cordapps
+    cp $directory/../shared/artifacts/tokens-workflows-$cordaTokenSDKVersion.jar dev/${nw}/build/nodes/${party}/cordapps
     cp $directory/../shared/artifacts/ci-workflows-1.0.jar dev/${nw}/build/nodes/${party}/cordapps
   else
     echo "Cordapp not found" && exit 1

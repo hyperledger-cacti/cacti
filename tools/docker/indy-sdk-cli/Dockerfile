@@ -1,9 +1,11 @@
 # Indy-SDK CLI Image
 # Contains node and python environments and indy SDK, can be used as base for indy development.
 
-FROM ubuntu:bionic
+FROM ubuntu:bionic-20230530
 
 ENV DEBIAN_FRONTEND 'noninteractive'
+
+WORKDIR /home/setup
 
 RUN apt-get update \
     && apt-get install -y \
@@ -13,15 +15,18 @@ RUN apt-get update \
         curl \
         dirmngr \
         apt-transport-https \
-        lsb-release ca-certificates \
+        lsb-release \
+        ca-certificates \
         gcc \
         g++ \
         make \
     && rm -rf /var/lib/apt/lists/*
 
-# NodeJS and indy-sdk
-RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - \
-    && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CE7709D068DB5E88 \
+# NodeJS
+RUN curl -sL https://deb.nodesource.com/setup_16.x | bash -
+
+# Indy-sdk
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CE7709D068DB5E88 \
     && add-apt-repository "deb https://repo.sovrin.org/sdk/deb bionic stable" \
     && apt-get update && apt-get install -y \
         nodejs \

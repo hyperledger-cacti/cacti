@@ -95,6 +95,10 @@ import { RunTransactionEndpoint } from "./web-services/run-transaction-endpoint"
 import { GetBlockEndpoint } from "./web-services/get-block-v1-endpoint-";
 import { GetBesuRecordEndpointV1 } from "./web-services/get-besu-record-endpoint-v1";
 import { AbiItem } from "web3-utils";
+import {
+  GetOpenApiSpecV1Endpoint,
+  IGetOpenApiSpecV1EndpointOptions,
+} from "./web-services/get-open-api-spec-v1-endpoint";
 
 export const E_KEYCHAIN_NOT_FOUND = "cactus.connector.besu.keychain_not_found";
 
@@ -116,7 +120,8 @@ export class PluginLedgerConnectorBesu
       RunTransactionResponse
     >,
     ICactusPlugin,
-    IPluginWebService {
+    IPluginWebService
+{
   private readonly instanceId: string;
   public prometheusExporter: PrometheusExporter;
   private readonly log: Logger;
@@ -288,6 +293,26 @@ export class PluginLedgerConnectorBesu
       const endpoint = new GetPrometheusExporterMetricsEndpointV1(opts);
       endpoints.push(endpoint);
     }
+    {
+      const oasPath =
+        OAS.paths[
+          "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-open-api-spec"
+        ];
+
+      const operationId = oasPath.get.operationId;
+      const opts: IGetOpenApiSpecV1EndpointOptions = {
+        oas: OAS,
+        oasPath,
+        operationId,
+        path: oasPath.get["x-hyperledger-cactus"].http.path,
+        pluginRegistry: this.pluginRegistry,
+        verbLowerCase: oasPath.get["x-hyperledger-cactus"].http.verbLowerCase,
+        logLevel: this.options.logLevel,
+      };
+      const endpoint = new GetOpenApiSpecV1Endpoint(opts);
+      endpoints.push(endpoint);
+    }
+
     this.endpoints = endpoints;
     return endpoints;
   }
@@ -296,13 +321,12 @@ export class PluginLedgerConnectorBesu
     return `@hyperledger/cactus-plugin-ledger-connector-besu`;
   }
 
-  public async getConsensusAlgorithmFamily(): Promise<
-    ConsensusAlgorithmFamily
-  > {
+  public async getConsensusAlgorithmFamily(): Promise<ConsensusAlgorithmFamily> {
     return ConsensusAlgorithmFamily.Authority;
   }
   public async hasTransactionFinality(): Promise<boolean> {
-    const currentConsensusAlgorithmFamily = await this.getConsensusAlgorithmFamily();
+    const currentConsensusAlgorithmFamily =
+      await this.getConsensusAlgorithmFamily();
 
     return consensusHasTransactionFinality(currentConsensusAlgorithmFamily);
   }
@@ -451,18 +475,16 @@ export class PluginLedgerConnectorBesu
           req.signingCredential.type ==
           Web3SigningCredentialType.CactusKeychainRef
         ) {
-          const {
-            keychainEntryKey,
-            keychainId,
-          } = req.signingCredential as Web3SigningCredentialCactusKeychainRef;
+          const { keychainEntryKey, keychainId } =
+            req.signingCredential as Web3SigningCredentialCactusKeychainRef;
 
-          const keychainPlugin = this.pluginRegistry.findOneByKeychainId(
-            keychainId,
-          );
+          const keychainPlugin =
+            this.pluginRegistry.findOneByKeychainId(keychainId);
           privKey = await keychainPlugin?.get(keychainEntryKey);
         } else {
-          privKey = (req.signingCredential as Web3SigningCredentialPrivateKeyHex)
-            .secret;
+          privKey = (
+            req.signingCredential as Web3SigningCredentialPrivateKeyHex
+          ).secret;
         }
 
         const fnParams = {
@@ -476,9 +498,8 @@ export class PluginLedgerConnectorBesu
           throw new RuntimeError(`InvalidState: web3Quorum not initialized.`);
         }
 
-        const privacyGroupId = this.web3Quorum.utils.generatePrivacyGroup(
-          fnParams,
-        );
+        const privacyGroupId =
+          this.web3Quorum.utils.generatePrivacyGroup(fnParams);
         this.log.debug("Generated privacyGroupId: ", privacyGroupId);
         callOutput = await this.web3Quorum.priv.call(privacyGroupId, {
           to: contractInstance.options.address,
@@ -670,7 +691,7 @@ export class PluginLedgerConnectorBesu
     }
 
     return {
-      transactionReceipt: (txPoolReceipt as unknown) as Web3TransactionReceipt,
+      transactionReceipt: txPoolReceipt as unknown as Web3TransactionReceipt,
     };
   }
 
@@ -679,9 +700,8 @@ export class PluginLedgerConnectorBesu
   ): Promise<RunTransactionResponse> {
     const fnTag = `${this.className}#transactPrivateKey()`;
     const { transactionConfig, web3SigningCredential } = req;
-    const {
-      secret,
-    } = web3SigningCredential as Web3SigningCredentialPrivateKeyHex;
+    const { secret } =
+      web3SigningCredential as Web3SigningCredentialPrivateKeyHex;
 
     // Run transaction to EEA client here if private transaction
 
@@ -727,11 +747,8 @@ export class PluginLedgerConnectorBesu
       web3SigningCredential,
       privateTransactionConfig,
     } = req;
-    const {
-      ethAccount,
-      keychainEntryKey,
-      keychainId,
-    } = web3SigningCredential as Web3SigningCredentialCactusKeychainRef;
+    const { ethAccount, keychainEntryKey, keychainId } =
+      web3SigningCredential as Web3SigningCredentialCactusKeychainRef;
 
     // locate the keychain plugin that has access to the keychain backend
     // denoted by the keychainID from the request.

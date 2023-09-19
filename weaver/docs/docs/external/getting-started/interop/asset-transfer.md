@@ -14,6 +14,7 @@ pagination_next: external/getting-started/enabling-weaver-network/overview
 This document lists sample ways in which you can exercise the asset-transfer interoperation protocol on the test network [launched earlier](external/getting-started/test-network/overview.md).
 
 Once the networks, relays, and drivers have been launched, and the ledgers bootstrapped, you can trigger the following interoperation flows corresponding to distinct asset-sharing combinations _other combinations of DLTs will be supported soon_):
+
 ## 1. Fabric with Fabric
 
 One Fabric network transfers either a bond or some tokens owned by Alice to Bob in the other network
@@ -134,7 +135,7 @@ One Corda network transfers either a bond or some tokens owned by the party `Par
 
 ### Transfer or recover token (fungible) assets
 Assume that the CorDapp `cordaSimpleApplication` has been deployed in both networks.
-- Navigate to `samples/corda/corda-simple-application` folder.
+- Navigate to the `weaver/samples/corda/corda-simple-application` folder in your clone of the Cacti repository.
 - Add `5` tokens of type `t1` to `PartyA` in `Corda_Network`:
   ```bash
   NETWORK_NAME='Corda_Network' CORDA_PORT=10006 ./clients/build/install/clients/bin/clients issue-asset-state 5 t1
@@ -164,7 +165,7 @@ The above steps complete a successful asset transfer from the Corda network `Cor
 
 ### Transfer or recover bond (non-fungible) assets
 Assume that the CorDapp `cordaSimpleApplication` has been deployed in both networks.
-- Navigate to `samples/corda/corda-simple-application` folder.
+- Navigate to the `weaver/samples/corda/corda-simple-application` folder in your clone of the Cacti repository.
 - Add a bond asset with id `a10` and type `bond01` to `PartyA` in `Corda_Network`:
   ```bash
   NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients bond issue-asset 'a10' 'bond01'

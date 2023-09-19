@@ -17,6 +17,7 @@ package org.openapitools.client.models
 
 
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 /**
  * 
@@ -24,13 +25,14 @@ import com.squareup.moshi.Json
  * Values: SocketIoConnectionPathV1
  */
 
+@JsonClass(generateAdapter = false)
 enum class Constants(val value: kotlin.String) {
 
     @Json(name = "/api/v1/async/socket-io/connect")
     SocketIoConnectionPathV1("/api/v1/async/socket-io/connect");
 
     /**
-     * Override toString() to avoid using the enum variable name as the value, and instead use
+     * Override [toString()] to avoid using the enum variable name as the value, and instead use
      * the actual value defined in the API spec file.
      *
      * This solves a problem when the variable name and its value are different, and ensures that

@@ -1,3 +1,9 @@
+/*
+ * Copyright IBM Corp. All Rights Reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 const fs = require('fs')
 const contract = require("@truffle/contract");
 const path = require('path')

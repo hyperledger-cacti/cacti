@@ -1,6 +1,7 @@
 {
   "name": "periodicExecuter",
   "version": "0.0.1",
+  "license": "Apache-2.0",
   "private": true,
   "scripts": {
     "build": "npm run build-ts",

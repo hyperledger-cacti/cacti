@@ -25,54 +25,54 @@ We assume that one of the following chaincodes have been deployed in either Fabr
 
 ## Corda to Corda
 
-To test the scenario where `Corda_Network` requests the value of the state (key) `H` from `Corda_Network2`, do the following:
+To test the scenario where `Corda_Network` requests the value of the state (key) `H` from `Corda_Network2` and writes the value to a key `H` in its local state, do the following:
 - (_Make sure the following are running_: `Corda_Network`, relay, and driver; `Corda_Network2`, relay, and driver)
-- Navigate to the `samples/corda/corda-simple-application` folder.
+- Navigate to the `weaver/samples/corda/corda-simple-application` folder in your clone of the Cacti repository.
 - Run the following:
   * If Relays and Drivers are deployed in the host machine:
     - Without TLS:
       ```bash
-      NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients request-state localhost:9081 localhost:9082/Corda_Network2/localhost:30006#com.cordaSimpleApplication.flow.GetStateByKey:H
+      NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients request-state --wkey=H localhost:9081 localhost:9082/Corda_Network2/localhost:30006#com.cordaSimpleApplication.flow.GetStateByKey:H
       ```
     - With TLS:
       ```bash
-      RELAY_TLS=true RELAY_TLSCA_CERT_PATHS=../../../core/relay/credentials/fabric_ca_cert.pem NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients request-state localhost:9081 localhost:9082/Corda_Network2/localhost:30006#com.cordaSimpleApplication.flow.GetStateByKey:H
+      RELAY_TLS=true RELAY_TLSCA_CERT_PATHS=../../../core/relay/credentials/fabric_ca_cert.pem NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients request-state --wkey=H localhost:9081 localhost:9082/Corda_Network2/localhost:30006#com.cordaSimpleApplication.flow.GetStateByKey:H
       ```
   * If Relays and Drivers are deployed in Docker containers:
     - Without TLS:
       ```bash
-      NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients request-state localhost:9081 relay-corda2:9082/Corda_Network2/corda_network2_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:H
+      NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients request-state --wkey=H localhost:9081 relay-corda2:9082/Corda_Network2/corda_network2_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:H
       ```
     - With TLS:
       ```bash
-      RELAY_TLS=true RELAY_TLSCA_CERT_PATHS=../../../core/relay/credentials/docker/ca-cert.pem NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients request-state localhost:9081 relay-corda2:9082/Corda_Network2/corda_network2_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:H
+      RELAY_TLS=true RELAY_TLSCA_CERT_PATHS=../../../core/relay/credentials/docker/ca-cert.pem NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients request-state --wkey=H localhost:9081 relay-corda2:9082/Corda_Network2/corda_network2_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:H
       ```
 - Query the value of the requested state using key `H` in `Corda_Network` by running the following command:
   ```bash
   NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients get-state H
   ```
 
-To test the scenario where `Corda_Network2` requests the value of the state (key) `C` from `Corda_Network`, do the following:
+To test the scenario where `Corda_Network2` requests the value of the state (key) `C` from `Corda_Network` and writes the value to a key `C` in its local state, do the following:
 - (_Make sure the following are running_: `Corda_Network`, relay, and driver; `Corda_Network2`, relay, and driver)
-- Navigate to the `samples/corda/corda-simple-application` folder.
+- Navigate to the `weaver/samples/corda/corda-simple-application` folder in your clone of the Cacti repository.
 - Run the following:
   * If Relays and Drivers are deployed in the host machine:
     - Without TLS:
       ```bash
-      NETWORK_NAME=Corda_Network2 CORDA_PORT=30006 ./clients/build/install/clients/bin/clients request-state localhost:9082 localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:C
+      NETWORK_NAME=Corda_Network2 CORDA_PORT=30006 ./clients/build/install/clients/bin/clients request-state --wkey=C localhost:9082 localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:C
       ```
     - With TLS:
       ```bash
-      RELAY_TLS=true RELAY_TLSCA_CERT_PATHS=../../../core/relay/credentials/fabric_ca_cert.pem NETWORK_NAME=Corda_Network2 CORDA_PORT=30006 ./clients/build/install/clients/bin/clients request-state localhost:9082 localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:C
+      RELAY_TLS=true RELAY_TLSCA_CERT_PATHS=../../../core/relay/credentials/fabric_ca_cert.pem NETWORK_NAME=Corda_Network2 CORDA_PORT=30006 ./clients/build/install/clients/bin/clients request-state --wkey=C localhost:9082 localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:C
       ```
   * If Relays and Drivers are deployed in Docker containers:
     - Without TLS:
       ```bash
-      NETWORK_NAME=Corda_Network2 CORDA_PORT=30006 ./clients/build/install/clients/bin/clients request-state localhost:9082 relay-corda:9081/Corda_Network/corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:C
+      NETWORK_NAME=Corda_Network2 CORDA_PORT=30006 ./clients/build/install/clients/bin/clients request-state --wkey=C localhost:9082 relay-corda:9081/Corda_Network/corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:C
       ```
     - With TLS:
       ```bash
-      RELAY_TLS=true RELAY_TLSCA_CERT_PATHS=../../../core/relay/credentials/docker/ca-cert.pem NETWORK_NAME=Corda_Network2 CORDA_PORT=30006 ./clients/build/install/clients/bin/clients request-state localhost:9082 relay-corda:9081/Corda_Network/corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:C
+      RELAY_TLS=true RELAY_TLSCA_CERT_PATHS=../../../core/relay/credentials/docker/ca-cert.pem NETWORK_NAME=Corda_Network2 CORDA_PORT=30006 ./clients/build/install/clients/bin/clients request-state --wkey=C localhost:9082 relay-corda:9081/Corda_Network/corda_partya_1:10003#com.cordaSimpleApplication.flow.GetStateByKey:C
       ```
 - Query the value of the requested state, using the key `C` in `Corda_Network` by running the following command:
   ```bash
@@ -81,54 +81,54 @@ To test the scenario where `Corda_Network2` requests the value of the state (key
 
 ## Corda to Fabric
 
-To test the scenario where `Corda_Network` requests the value of the state (key) `a` from `network1`, do the following:
+To test the scenario where `Corda_Network` requests the value of the state (key) `a` from `network1` and writes the value to a key `a` in its local state, do the following:
 - (_Make sure the following are running_: Corda network, relay, and driver; Fabric `network1`, relay, and driver)
-- Navigate to the `samples/corda/corda-simple-application` folder.
+- Navigate to the `weaver/samples/corda/corda-simple-application` folder in your clone of the Cacti repository.
 - Run the following:
   * If Relays and Drivers are deployed in the host machine:
     - Without TLS:
       ```bash
-      NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients request-state localhost:9081 localhost:9080/network1/mychannel:simplestate:Read:a
+      NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients request-state --wkey=a localhost:9081 localhost:9080/network1/mychannel:simplestate:Read:a
       ```
     - With TLS:
       ```bash
-      RELAY_TLS=true RELAY_TLSCA_CERT_PATHS=../../../core/relay/credentials/fabric_ca_cert.pem NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients request-state localhost:9081 localhost:9080/network1/mychannel:simplestate:Read:a
+      RELAY_TLS=true RELAY_TLSCA_CERT_PATHS=../../../core/relay/credentials/fabric_ca_cert.pem NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients request-state --wkey=a localhost:9081 localhost:9080/network1/mychannel:simplestate:Read:a
       ```
   * If Relays and Drivers are deployed in Docker containers:
     - Without TLS:
       ```bash
-      NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients request-state localhost:9081 relay-network1:9080/network1/mychannel:simplestate:Read:a
+      NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients request-state --wkey=a localhost:9081 relay-network1:9080/network1/mychannel:simplestate:Read:a
       ```
     - With TLS:
       ```bash
-      RELAY_TLS=true RELAY_TLSCA_CERT_PATHS=../../../core/relay/credentials/docker/ca-cert.pem NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients request-state localhost:9081 relay-network1:9080/network1/mychannel:simplestate:Read:a
+      RELAY_TLS=true RELAY_TLSCA_CERT_PATHS=../../../core/relay/credentials/docker/ca-cert.pem NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients request-state --wkey=a localhost:9081 relay-network1:9080/network1/mychannel:simplestate:Read:a
       ```
 - Query the value of the requested state (key) `a` in `Corda_Network` using the following:
   ```bash
   NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients get-state a
   ```
 
-To test the scenario where `Corda_Network` requests the value of the state (key) `Arcturus` from `network2`, do the following:
+To test the scenario where `Corda_Network` requests the value of the state (key) `Arcturus` from `network2` and writes the value to a key `Arcturus` in its local state, do the following:
 - (_Make sure the following are running_: Corda network, relay, and driver; Fabric `network2`, relay, and driver)
-- Navigate to the `samples/corda/corda-simple-application` folder.
+- Navigate to the `weaver/samples/corda/corda-simple-application` folder in your clone of the Cacti repository.
 - Run the following:
   * If Relays and Drivers are deployed in the host machine:
     - Without TLS:
       ```bash
-      NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients request-state localhost:9081 localhost:9083/network2/mychannel:simplestate:Read:Arcturus
+      NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients request-state --wkey=Arcturus localhost:9081 localhost:9083/network2/mychannel:simplestate:Read:Arcturus
       ```
     - With TLS:
       ```bash
-      RELAY_TLS=true RELAY_TLSCA_CERT_PATHS=../../../core/relay/credentials/fabric_ca_cert.pem NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients request-state localhost:9081 localhost:9083/network2/mychannel:simplestate:Read:Arcturus
+      RELAY_TLS=true RELAY_TLSCA_CERT_PATHS=../../../core/relay/credentials/fabric_ca_cert.pem NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients request-state --wkey=Arcturus localhost:9081 localhost:9083/network2/mychannel:simplestate:Read:Arcturus
       ```
   * If Relays and Drivers are deployed in Docker containers:
     - Without TLS:
       ```bash
-      NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients request-state localhost:9081 relay-network2:9083/network2/mychannel:simplestate:Read:Arcturus
+      NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients request-state --wkey=Arcturus localhost:9081 relay-network2:9083/network2/mychannel:simplestate:Read:Arcturus
       ```
     - With TLS:
       ```bash
-      RELAY_TLS=true RELAY_TLSCA_CERT_PATHS=../../../core/relay/credentials/docker/ca-cert.pem NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients request-state localhost:9081 relay-network2:9083/network2/mychannel:simplestate:Read:Arcturus
+      RELAY_TLS=true RELAY_TLSCA_CERT_PATHS=../../../core/relay/credentials/docker/ca-cert.pem NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients request-state --wkey=Arcturus localhost:9081 relay-network2:9083/network2/mychannel:simplestate:Read:Arcturus
       ```
 - Query the value of the requested state (key) `Arcturus` in `Corda_Network` using the following:
   ```bash
@@ -141,9 +141,9 @@ To test the scenario where `Corda_Network` requests the value of the state (key)
 
 ## Fabric to Corda
 
-To test the scenario where `network1` requests the value of the state (key) `H` from `Corda_Network`, do the following:
+To test the scenario where `network1` requests the value of the state (key) `H` from `Corda_Network` and writes the value to a key `H` in its local state, do the following:
 - (_Make sure the following are running_: Corda network, relay, and driver; Fabric `network1`, relay, and driver)
-- Navigate to the `samples/fabric/fabric-cli` (for the Node.js version) or the `samples/fabric/go-cli` (for the Golang version) folder.
+- Navigate to the `weaver/samples/fabric/fabric-cli` (for the Node.js version) or the `weaver/samples/fabric/go-cli` (for the Golang version) folder in your clone of the Cacti repository.
 - (Make sure you have configured `fabric-cli` as per earlier instructions)
 - Edit `chaincode.json`: in the `simplestate:Create:args` attribute, replace the argument `"a"` with `"H"` (this specifies the key to which the data from the remote view is to be written into); i.e.,:
   ```json
@@ -177,9 +177,9 @@ To test the scenario where `network1` requests the value of the state (key) `H` 
   ./bin/fabric-cli chaincode query mychannel simplestate read '["H"]' --local-network=network1
   ```
 
-To test the scenario where `network2` requests the value of the state (key) `H` from `Corda_Network`, do the following:
+To test the scenario where `network2` requests the value of the state (key) `H` from `Corda_Network` and writes the value to a key `H` in its local state, do the following:
 - (_Make sure the following are running_: Corda network, relay, and driver; Fabric `network2`, relay, and driver)
-- Navigate to the `samples/fabric/fabric-cli` (for the Node.js version) or the `samples/fabric/go-cli` (for the Golang version) folder.
+- Navigate to the `weaver/samples/fabric/fabric-cli` (for the Node.js version) or the `weaver/samples/fabric/go-cli` (for the Golang version) folder in your clone of the Cacti repository.
 - (Make sure you have configured `fabric-cli` as per earlier instructions)
 - Edit `chaincode.json`: in the `simplestate:Create:args` attribute, replace the argument `"a"` with `"H"` (this specifies the key to which the data from the remote view is to be written into); i.e.,:
   ```json
@@ -219,9 +219,9 @@ To test the scenario where `network2` requests the value of the state (key) `H` 
 
 ## Fabric to Fabric
 
-To test the scenario where `network1` requests the value of the state (key) `Arcturus` from `network2`, do the following:
+To test the scenario where `network1` requests the value of the state (key) `Arcturus` from `network2` and writes the value to a key `Arcturus` in its local state, do the following:
 - (_Make sure the following are running_: Fabric `network1`, relay, and driver; Fabric `network2`, relay, and driver)
-- Navigate to the `samples/fabric/fabric-cli` (for the Node.js version) or the `samples/fabric/go-cli` (for the Golang version) folder.
+- Navigate to the `weaver/samples/fabric/fabric-cli` (for the Node.js version) or the `weaver/samples/fabric/go-cli` (for the Golang version) folder in your clone of the Cacti repository.
 - (Make sure you have configured `fabric-cli` as per earlier instructions)
 - Edit `chaincode.json`: in the `simplestate:Create:args` attribute, replace the argument `"a"` with `"Arcturus"` (this specifies the key to which the data from the remote view is to be written into); i.e.,:
   ```json
@@ -259,9 +259,9 @@ To test the scenario where `network1` requests the value of the state (key) `Arc
   ./bin/fabric-cli chaincode query mychannel simplestate read '["Arcturus"]' --local-network=network1
   ```
 
-To test the scenario where `network2` requests the value of the state (key) `a` from `network1`, do the following:
+To test the scenario where `network2` requests the value of the state (key) `a` from `network1` and writes the value to a key `a` in its local state, do the following:
 - (_Make sure the following are running_: Fabric `network1`, relay, and driver; Fabric `network2`, relay, and driver)
-- Navigate to the `samples/fabric/fabric-cli` (for the Node.js version) or the `samples/fabric/go-cli` (for the Golang version) folder.
+- Navigate to the `weaver/samples/fabric/fabric-cli` (for the Node.js version) or the `weaver/samples/fabric/go-cli` (for the Golang version) folder in your clone of the Cacti repository.
 - (Make sure you have configured `fabric-cli` as per earlier instructions)
 - (There is no need to edit `chaincode.json` to change the key as the default argument `"a"` is what we intend to use in this data sharing use scenario.)
 - Run the following:

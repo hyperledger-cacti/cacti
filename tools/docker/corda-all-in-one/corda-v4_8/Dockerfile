@@ -1,8 +1,8 @@
-FROM docker:24.0.2-dind
+FROM docker:24.0.5-dind
 
 # cordaVersion=4.8.5
 # cordaCoreVersion=4.8.5
-ARG SAMPLES_KOTLIN_SHA=1504878ce446555bd861bbe4dd3d1154e905a07f
+ARG SAMPLES_KOTLIN_SHA=8ce33f57ad1dd77f721af4d1f59d72f3d331fd0c
 ARG SAMPLES_KOTLIN_CORDAPP_SUB_DIR_PATH="./Advanced/obligation-cordapp/"
 ARG CORDA_TOOLS_SHELL_CLI_VERSION=4.8
 
@@ -11,7 +11,7 @@ WORKDIR /
 RUN apk update
 
 # Install dependencies of Docker Compose
-RUN apk add py-pip python3-dev libffi-dev openssl-dev gcc libc-dev make
+RUN apk add docker-cli docker-cli-compose
 
 # Install git so we can check out the kotlin-samples repo of Corda
 RUN apk add --no-cache git
@@ -25,16 +25,17 @@ RUN apk add --no-cache curl
 # The file binary is used to inspect exectubles when debugging container image issues
 RUN apk add --no-cache file
 
-RUN apk add --no-cache openjdk8
-
-# Need gradle to execute the corda sample app setup commands
-RUN apk add --no-cache gradle
+RUN apk add openjdk8
 
 ENV CACTUS_CFG_PATH=/etc/hyperledger/cactus
 RUN mkdir -p $CACTUS_CFG_PATH
 
+# Need to install augtool for manipulating the SSH configuration files below
+RUN apk add --no-cache augeas
+
 # OpenSSH - need to have it so we can shell in and install/instantiate contracts and troubleshoot
-RUN apk add --no-cache openssh augeas
+RUN apk del openssh*
+RUN apk add --no-cache openssh
 
 # Configure the OpenSSH server we just installed
 RUN augtool 'set /files/etc/ssh/sshd_config/AuthorizedKeysFile ".ssh/authorized_keys /etc/authorized_keys/%u"'
@@ -70,6 +71,9 @@ WORKDIR /samples-kotlin
 RUN git checkout ${SAMPLES_KOTLIN_SHA}
 
 WORKDIR /samples-kotlin/${SAMPLES_KOTLIN_CORDAPP_SUB_DIR_PATH}
+
+# Set the platform versionn to 11 instead of the default 12 for the basic cordapps
+RUN sed -i "s/platformVersion=12/platformVersion=11/g" /samples-kotlin/Basic/constants.properties
 
 # Install supervisord because we need to run the docker daemon and also the corda network
 # meaning that we have multiple processes to run.

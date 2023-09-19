@@ -1,3 +1,7 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+
 # Script to generate password and V3 Keystore key files for EthSigner
 
 # Create a directory in the Besu network's home folder to store the password and key files

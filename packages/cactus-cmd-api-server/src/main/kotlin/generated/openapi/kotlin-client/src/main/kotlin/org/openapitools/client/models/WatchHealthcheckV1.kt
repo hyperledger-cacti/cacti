@@ -17,6 +17,7 @@ package org.openapitools.client.models
 
 
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 /**
  * 
@@ -24,6 +25,7 @@ import com.squareup.moshi.Json
  * Values: Subscribe,Next,Unsubscribe,Error,Complete
  */
 
+@JsonClass(generateAdapter = false)
 enum class WatchHealthcheckV1(val value: kotlin.String) {
 
     @Json(name = "org.hyperledger.cactus.api.async.besu.WatchHealthcheckV1.Subscribe")
@@ -42,7 +44,7 @@ enum class WatchHealthcheckV1(val value: kotlin.String) {
     Complete("org.hyperledger.cactus.api.async.besu.WatchHealthcheckV1.Complete");
 
     /**
-     * Override toString() to avoid using the enum variable name as the value, and instead use
+     * Override [toString()] to avoid using the enum variable name as the value, and instead use
      * the actual value defined in the API spec file.
      *
      * This solves a problem when the variable name and its value are different, and ensures that

@@ -12,3 +12,6 @@
 ```
 docker build . -t indy-sdk-cli
 ```
+
+## Notes
+- In case of `gpg: keyserver receive failed: Cannot assign requested address` error - retry until it succeeds. This is some spurious error with keyserver connection.

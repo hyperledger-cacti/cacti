@@ -1,3 +1,7 @@
+// Copyright IBM Corp. All Rights Reserved.
+//
+// SPDX-License-Identifier: Apache-2.0
+
 use std::env;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {

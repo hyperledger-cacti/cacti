@@ -13,13 +13,15 @@
  */
 
 
-import { Configuration } from './configuration';
-import globalAxios, { AxiosPromise, AxiosInstance } from 'axios';
+import type { Configuration } from './configuration';
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from './common';
+import type { RequestArgs } from './base';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from './base';
+import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from './base';
 
 /**
  * The list of arguments to pass in to the transaction request to Add Asset Quantity.
@@ -32,13 +34,13 @@ export interface AddAssetQuantityRequestParameters {
      * @type {string}
      * @memberof AddAssetQuantityRequestParameters
      */
-    assetId: string;
+    'assetId': string;
     /**
      * 
      * @type {number}
      * @memberof AddAssetQuantityRequestParameters
      */
-    amount: number;
+    'amount': number;
 }
 /**
  * The list of arguments to pass in to the transaction request to Add Peer.
@@ -51,25 +53,25 @@ export interface AddPeerRequestParameters {
      * @type {string}
      * @memberof AddPeerRequestParameters
      */
-    address: string;
+    'address': string;
     /**
      * 
      * @type {string}
      * @memberof AddPeerRequestParameters
      */
-    peerKey: string;
+    'peerKey': string;
     /**
      * 
      * @type {string}
      * @memberof AddPeerRequestParameters
      */
-    tlsCertificate?: string;
+    'tlsCertificate'?: string;
     /**
      * 
      * @type {boolean}
      * @memberof AddPeerRequestParameters
      */
-    syncingPeer?: boolean;
+    'syncingPeer'?: boolean;
 }
 /**
  * The list of arguments to pass in to the transaction request to Add Signatory.
@@ -82,13 +84,13 @@ export interface AddSignatoryRequestParameters {
      * @type {string}
      * @memberof AddSignatoryRequestParameters
      */
-    accountId: string;
+    'accountId': string;
     /**
      * 
      * @type {string}
      * @memberof AddSignatoryRequestParameters
      */
-    publicKey: string;
+    'publicKey': string;
 }
 /**
  * The list of arguments to pass in to the transaction request to Append Role.
@@ -101,13 +103,13 @@ export interface AppendRoleRequestParameters {
      * @type {string}
      * @memberof AppendRoleRequestParameters
      */
-    accountId: string;
+    'accountId': string;
     /**
      * 
      * @type {string}
      * @memberof AppendRoleRequestParameters
      */
-    roleName: string;
+    'roleName': string;
 }
 /**
  * The list of arguments to pass in to the transaction request to Call Engine.
@@ -120,19 +122,19 @@ export interface CallEngineRequestParameters {
      * @type {string}
      * @memberof CallEngineRequestParameters
      */
-    caller: string;
+    'caller': string;
     /**
      * 
      * @type {string}
      * @memberof CallEngineRequestParameters
      */
-    callee: string;
+    'callee': string;
     /**
      * 
      * @type {string}
      * @memberof CallEngineRequestParameters
      */
-    input: string;
+    'input': string;
 }
 /**
  * The list of arguments to pass in to the transaction request to Compare And Set Account Detail.
@@ -145,31 +147,31 @@ export interface CompareAndSetAccountDetailRequestParameters {
      * @type {string}
      * @memberof CompareAndSetAccountDetailRequestParameters
      */
-    accountId: string;
+    'accountId': string;
     /**
      * 
      * @type {string}
      * @memberof CompareAndSetAccountDetailRequestParameters
      */
-    key: string;
+    'key': string;
     /**
      * 
      * @type {string}
      * @memberof CompareAndSetAccountDetailRequestParameters
      */
-    value: string;
+    'value': string;
     /**
      * 
      * @type {string}
      * @memberof CompareAndSetAccountDetailRequestParameters
      */
-    oldValue?: string;
+    'oldValue'?: string;
     /**
      * 
      * @type {boolean}
      * @memberof CompareAndSetAccountDetailRequestParameters
      */
-    check_empty: boolean;
+    'check_empty': boolean;
 }
 /**
  * The list of arguments to pass in to the transaction request to Create Account.
@@ -182,19 +184,19 @@ export interface CreateAccountRequestParameters {
      * @type {string}
      * @memberof CreateAccountRequestParameters
      */
-    accountName: string;
+    'accountName': string;
     /**
      * 
      * @type {string}
      * @memberof CreateAccountRequestParameters
      */
-    domainId: string;
+    'domainId': string;
     /**
      * 
      * @type {string}
      * @memberof CreateAccountRequestParameters
      */
-    publicKey: string;
+    'publicKey': string;
 }
 /**
  * The list of arguments to pass in to the transaction request to Create Asset.
@@ -207,19 +209,19 @@ export interface CreateAssetRequestParameters {
      * @type {string}
      * @memberof CreateAssetRequestParameters
      */
-    assetName: string;
+    'assetName': string;
     /**
      * 
      * @type {string}
      * @memberof CreateAssetRequestParameters
      */
-    domainId: string;
+    'domainId': string;
     /**
      * 
      * @type {number}
      * @memberof CreateAssetRequestParameters
      */
-    precision: number;
+    'precision': number;
 }
 /**
  * The list of arguments to pass in to the transaction request to Create Domain.
@@ -232,13 +234,13 @@ export interface CreateDomainRequestParameters {
      * @type {string}
      * @memberof CreateDomainRequestParameters
      */
-    domainId: string;
+    'domainId': string;
     /**
      * 
      * @type {string}
      * @memberof CreateDomainRequestParameters
      */
-    defaultRole: string;
+    'defaultRole': string;
 }
 /**
  * The list of arguments to pass in to the transaction request to Create Role.
@@ -251,13 +253,13 @@ export interface CreateRoleRequestParameters {
      * @type {string}
      * @memberof CreateRoleRequestParameters
      */
-    roleName: string;
+    'roleName': string;
     /**
      * 
      * @type {Array<number>}
      * @memberof CreateRoleRequestParameters
      */
-    permissionsList: Array<number>;
+    'permissionsList': Array<number>;
 }
 /**
  * The list of arguments to pass in to the transaction request to Detach Role.
@@ -270,13 +272,13 @@ export interface DetachRoleRequestParameters {
      * @type {string}
      * @memberof DetachRoleRequestParameters
      */
-    accountId: string;
+    'accountId': string;
     /**
      * 
      * @type {string}
      * @memberof DetachRoleRequestParameters
      */
-    roleName: string;
+    'roleName': string;
 }
 /**
  * 
@@ -289,31 +291,31 @@ export interface ErrorExceptionJsonResponseV1 {
      * @type {string}
      * @memberof ErrorExceptionJsonResponseV1
      */
-    message: string;
+    'message': string;
     /**
      * 
      * @type {string}
      * @memberof ErrorExceptionJsonResponseV1
      */
-    name?: string;
+    'name'?: string;
     /**
      * 
      * @type {string}
      * @memberof ErrorExceptionJsonResponseV1
      */
-    error?: string;
+    'error'?: string;
     /**
      * 
      * @type {string}
      * @memberof ErrorExceptionJsonResponseV1
      */
-    stack?: string;
+    'stack'?: string;
     /**
      * 
      * @type {string}
      * @memberof ErrorExceptionJsonResponseV1
      */
-    cause?: string;
+    'cause'?: string;
 }
 /**
  * 
@@ -326,13 +328,13 @@ export interface ErrorExceptionResponseV1 {
      * @type {string}
      * @memberof ErrorExceptionResponseV1
      */
-    message: string;
+    'message': string;
     /**
      * 
      * @type {string}
      * @memberof ErrorExceptionResponseV1
      */
-    error: string;
+    'error': string;
 }
 /**
  * 
@@ -345,25 +347,25 @@ export interface GenerateTransactionRequestV1 {
      * @type {IrohaCommand}
      * @memberof GenerateTransactionRequestV1
      */
-    commandName: IrohaCommand;
+    'commandName': IrohaCommand;
     /**
      * Parameters for iroha command specified in commandName
      * @type {object}
      * @memberof GenerateTransactionRequestV1
      */
-    commandParams: object;
+    'commandParams': object;
     /**
      * Sender account id
      * @type {string}
      * @memberof GenerateTransactionRequestV1
      */
-    creatorAccountId: string;
+    'creatorAccountId': string;
     /**
      * Requested transaction quorum
      * @type {number}
      * @memberof GenerateTransactionRequestV1
      */
-    quorum?: number;
+    'quorum'?: number;
 }
 /**
  * The list of arguments to pass in to the transaction request to Get Account Asset Transactions.
@@ -376,25 +378,25 @@ export interface GetAccountAssetTransactionsRequestParameters {
      * @type {string}
      * @memberof GetAccountAssetTransactionsRequestParameters
      */
-    accountId: string;
+    'accountId': string;
     /**
      * 
      * @type {string}
      * @memberof GetAccountAssetTransactionsRequestParameters
      */
-    assetId: string;
+    'assetId': string;
     /**
      * 
      * @type {number}
      * @memberof GetAccountAssetTransactionsRequestParameters
      */
-    pageSize: number;
+    'pageSize': number;
     /**
      * 
      * @type {string}
      * @memberof GetAccountAssetTransactionsRequestParameters
      */
-    firstTxHash: string;
+    'firstTxHash': string;
 }
 /**
  * The list of arguments to pass in to the transaction request to Get Account Assets.
@@ -407,19 +409,19 @@ export interface GetAccountAssetsRequestParameters {
      * @type {string}
      * @memberof GetAccountAssetsRequestParameters
      */
-    accountId: string;
+    'accountId': string;
     /**
      * 
      * @type {number}
      * @memberof GetAccountAssetsRequestParameters
      */
-    pageSize: number;
+    'pageSize': number;
     /**
      * 
      * @type {string}
      * @memberof GetAccountAssetsRequestParameters
      */
-    firstAssetId?: string;
+    'firstAssetId'?: string;
 }
 /**
  * The list of arguments to pass in to the transaction request to Get Account Detail.
@@ -432,37 +434,37 @@ export interface GetAccountDetailRequestParameters {
      * @type {string}
      * @memberof GetAccountDetailRequestParameters
      */
-    accountId?: string;
+    'accountId'?: string;
     /**
      * 
      * @type {string}
      * @memberof GetAccountDetailRequestParameters
      */
-    key?: string;
+    'key'?: string;
     /**
      * 
      * @type {string}
      * @memberof GetAccountDetailRequestParameters
      */
-    writer?: string;
+    'writer'?: string;
     /**
      * 
      * @type {number}
      * @memberof GetAccountDetailRequestParameters
      */
-    pageSize: number;
+    'pageSize': number;
     /**
      * 
      * @type {string}
      * @memberof GetAccountDetailRequestParameters
      */
-    paginationKey: string;
+    'paginationKey': string;
     /**
      * 
      * @type {string}
      * @memberof GetAccountDetailRequestParameters
      */
-    paginationWriter: string;
+    'paginationWriter': string;
 }
 /**
  * The list of arguments to pass in to the transaction request to Get Account.
@@ -475,7 +477,7 @@ export interface GetAccountRequestParameters {
      * @type {string}
      * @memberof GetAccountRequestParameters
      */
-    accountId: string;
+    'accountId': string;
 }
 /**
  * The list of arguments to pass in to the transaction request to Get Account Transactions.
@@ -488,43 +490,43 @@ export interface GetAccountTransactionsRequestParameters {
      * @type {string}
      * @memberof GetAccountTransactionsRequestParameters
      */
-    accountId: string;
+    'accountId': string;
     /**
      * 
      * @type {number}
      * @memberof GetAccountTransactionsRequestParameters
      */
-    pageSize: number;
+    'pageSize': number;
     /**
      * 
      * @type {string}
      * @memberof GetAccountTransactionsRequestParameters
      */
-    firstTxHash: string;
+    'firstTxHash': string;
     /**
      * 
      * @type {object}
      * @memberof GetAccountTransactionsRequestParameters
      */
-    firstTxTime?: object;
+    'firstTxTime'?: object;
     /**
      * 
      * @type {object}
      * @memberof GetAccountTransactionsRequestParameters
      */
-    lastTxTime?: object;
+    'lastTxTime'?: object;
     /**
      * 
      * @type {number}
      * @memberof GetAccountTransactionsRequestParameters
      */
-    firstTxHeight?: number;
+    'firstTxHeight'?: number;
     /**
      * 
      * @type {number}
      * @memberof GetAccountTransactionsRequestParameters
      */
-    lastTxHeight?: number;
+    'lastTxHeight'?: number;
 }
 /**
  * The list of arguments to pass in to the transaction request to Get Asset Info.
@@ -537,7 +539,7 @@ export interface GetAssetInfoRequestParameters {
      * @type {string}
      * @memberof GetAssetInfoRequestParameters
      */
-    assetId: string;
+    'assetId': string;
 }
 /**
  * The list of arguments to pass in to the transaction request to Get Block.
@@ -550,7 +552,7 @@ export interface GetBlockRequestParameters {
      * @type {number}
      * @memberof GetBlockRequestParameters
      */
-    height: number;
+    'height': number;
 }
 /**
  * The list of arguments to pass in to the transaction request to Get Engine Receipts.
@@ -563,7 +565,7 @@ export interface GetEngineReceiptsRequestParameters {
      * @type {string}
      * @memberof GetEngineReceiptsRequestParameters
      */
-    txHash: string;
+    'txHash': string;
 }
 /**
  * The list of arguments to pass in to the transaction request to Get Pending Transactions.
@@ -576,25 +578,25 @@ export interface GetPendingTransactionsRequestParameters {
      * @type {number}
      * @memberof GetPendingTransactionsRequestParameters
      */
-    pageSize: number;
+    'pageSize': number;
     /**
      * 
      * @type {string}
      * @memberof GetPendingTransactionsRequestParameters
      */
-    firstTxHash?: string;
+    'firstTxHash'?: string;
     /**
      * 
      * @type {object}
      * @memberof GetPendingTransactionsRequestParameters
      */
-    firstTxTime?: object;
+    'firstTxTime'?: object;
     /**
      * 
      * @type {object}
      * @memberof GetPendingTransactionsRequestParameters
      */
-    lastTxTime?: object;
+    'lastTxTime'?: object;
 }
 /**
  * The list of arguments to pass in to the transaction request to Get Role Permissions.
@@ -607,7 +609,7 @@ export interface GetRolePermissionsRequestParameters {
      * @type {string}
      * @memberof GetRolePermissionsRequestParameters
      */
-    roleId: string;
+    'roleId': string;
 }
 /**
  * The list of arguments to pass in to the transaction request to Get Signatories.
@@ -620,7 +622,7 @@ export interface GetSignatoriesRequestParameters {
      * @type {string}
      * @memberof GetSignatoriesRequestParameters
      */
-    accountId: string;
+    'accountId': string;
 }
 /**
  * The list of arguments to pass in to the transaction request to Get Transactions.
@@ -633,7 +635,7 @@ export interface GetTransactionsRequestParameters {
      * @type {Array<string>}
      * @memberof GetTransactionsRequestParameters
      */
-    txHashesList: Array<string>;
+    'txHashesList': Array<string>;
 }
 /**
  * The list of arguments to pass in to the transaction request to Grant Permission.
@@ -646,13 +648,13 @@ export interface GrantPermissionRequestParameters {
      * @type {string}
      * @memberof GrantPermissionRequestParameters
      */
-    accountId: string;
+    'accountId': string;
     /**
      * 
      * @type {string}
      * @memberof GrantPermissionRequestParameters
      */
-    permission: string;
+    'permission': string;
 }
 /**
  * 
@@ -660,56 +662,56 @@ export interface GrantPermissionRequestParameters {
  * @interface IrohaBaseConfig
  */
 export interface IrohaBaseConfig {
-    [key: string]: object | any;
+    [key: string]: any;
 
     /**
      * 
      * @type {string}
      * @memberof IrohaBaseConfig
      */
-    irohaHost?: string;
+    'irohaHost'?: string;
     /**
      * 
      * @type {number}
      * @memberof IrohaBaseConfig
      */
-    irohaPort?: number;
+    'irohaPort'?: number;
     /**
      * 
      * @type {string}
      * @memberof IrohaBaseConfig
      */
-    creatorAccountId?: string;
+    'creatorAccountId'?: string;
     /**
      * 
      * @type {Array<any>}
      * @memberof IrohaBaseConfig
      */
-    privKey?: Array<any>;
+    'privKey'?: Array<any>;
     /**
      * 
      * @type {number}
      * @memberof IrohaBaseConfig
      */
-    quorum?: number;
+    'quorum'?: number;
     /**
      * 
      * @type {number}
      * @memberof IrohaBaseConfig
      */
-    timeoutLimit?: number;
+    'timeoutLimit'?: number;
     /**
      * Can only be set to false for an insecure grpc connection.
      * @type {boolean}
      * @memberof IrohaBaseConfig
      */
-    tls?: boolean;
+    'tls'?: boolean;
     /**
      * Flag used for monitoring. It changes default beahviour of transaction wrapper so it return error to caller instead of throwing RuntimeError straight away.
      * @type {boolean}
      * @memberof IrohaBaseConfig
      */
-    monitorMode?: boolean | null;
+    'monitorMode'?: boolean | null;
 }
 /**
  * 
@@ -722,7 +724,7 @@ export interface IrohaBlockProgress {
      * @type {IrohaBlockResponse}
      * @memberof IrohaBlockProgress
      */
-    transactionReceipt: IrohaBlockResponse;
+    'transactionReceipt': IrohaBlockResponse;
 }
 /**
  * 
@@ -735,13 +737,13 @@ export interface IrohaBlockResponse {
      * @type {IrohaBlockResponsePayload}
      * @memberof IrohaBlockResponse
      */
-    payload: IrohaBlockResponsePayload;
+    'payload': IrohaBlockResponsePayload;
     /**
      * 
      * @type {Array<any>}
      * @memberof IrohaBlockResponse
      */
-    signaturesList: Array<any>;
+    'signaturesList': Array<any>;
 }
 /**
  * 
@@ -754,37 +756,37 @@ export interface IrohaBlockResponsePayload {
      * @type {Array<any>}
      * @memberof IrohaBlockResponsePayload
      */
-    transactionsList: Array<any>;
+    'transactionsList': Array<any>;
     /**
      * 
      * @type {number}
      * @memberof IrohaBlockResponsePayload
      */
-    txNumber: number;
+    'txNumber': number;
     /**
      * 
      * @type {number}
      * @memberof IrohaBlockResponsePayload
      */
-    height: number;
+    'height': number;
     /**
      * 
      * @type {string}
      * @memberof IrohaBlockResponsePayload
      */
-    prevBlockHash: string;
+    'prevBlockHash': string;
     /**
      * 
      * @type {number}
      * @memberof IrohaBlockResponsePayload
      */
-    createdTime: number;
+    'createdTime': number;
     /**
      * 
      * @type {Array<any>}
      * @memberof IrohaBlockResponsePayload
      */
-    rejectedTransactionsHashesList: Array<any>;
+    'rejectedTransactionsHashesList': Array<any>;
 }
 /**
  * 
@@ -792,88 +794,91 @@ export interface IrohaBlockResponsePayload {
  * @enum {string}
  */
 
-export enum IrohaCommand {
+export const IrohaCommand = {
     /**
     * Make entity in the system, capable of sending transactions or queries, storing signatories, personal data and identifiers.
     */
-    CreateAccount = 'createAccount',
+    CreateAccount: 'createAccount',
     /**
     * Set key-value information for a given account.
     */
-    SetAccountDetail = 'setAccountDetail',
+    SetAccountDetail: 'setAccountDetail',
     /**
     * Set the number of signatories required to confirm the identity of a user, who creates the transaction.
     */
-    SetAccountQuorum = 'setAccountQuorum',
+    SetAccountQuorum: 'setAccountQuorum',
     /**
     * Set key-value information for a given account if the old value matches the value passed.
     */
-    CompareAndSetAccountDetail = 'compareAndSetAccountDetail',
+    CompareAndSetAccountDetail: 'compareAndSetAccountDetail',
     /**
     * Create a new type of asset, unique in a domain. An asset is a countable representation of a commodity.
     */
-    CreateAsset = 'createAsset',
+    CreateAsset: 'createAsset',
     /**
     * Increase the quantity of an asset on account of transaction creator.
     */
-    AddAssetQuantity = 'addAssetQuantity',
+    AddAssetQuantity: 'addAssetQuantity',
     /**
     * Decrease the number of assets on account of transaction creator.
     */
-    SubtractAssetQuantity = 'subtractAssetQuantity',
+    SubtractAssetQuantity: 'subtractAssetQuantity',
     /**
     * Share assets within the account in peer network: in the way that source account transfers assets to the target account.
     */
-    TransferAsset = 'transferAsset',
+    TransferAsset: 'transferAsset',
     /**
     * Make new domain in Iroha network, which is a group of accounts.
     */
-    CreateDomain = 'createDomain',
+    CreateDomain: 'createDomain',
     /**
     * Create a new role in the system from the set of permissions.
     */
-    CreateRole = 'createRole',
+    CreateRole: 'createRole',
     /**
     * Detach a role from the set of roles of an account.
     */
-    DetachRole = 'detachRole',
+    DetachRole: 'detachRole',
     /**
     * Promote an account to some created role in the system, where a role is a set of permissions account has to perform an action (command or query).
     */
-    AppendRole = 'appendRole',
+    AppendRole: 'appendRole',
     /**
     * Add an identifier to the account. Such identifier is a public key of another device or a public key of another user.
     */
-    AddSignatory = 'addSignatory',
+    AddSignatory: 'addSignatory',
     /**
     * Remove a public key, associated with an identity, from an account
     */
-    RemoveSignatory = 'removeSignatory',
+    RemoveSignatory: 'removeSignatory',
     /**
     * Give another account rights to perform actions on the account of transaction sender (give someone right to do something with my account).
     */
-    GrantPermission = 'grantPermission',
+    GrantPermission: 'grantPermission',
     /**
     * Revoke or dismiss given granted permission from another account in the network.
     */
-    RevokePermission = 'revokePermission',
+    RevokePermission: 'revokePermission',
     /**
     * Write into ledger the fact of peer addition into the peer network.
     */
-    AddPeer = 'addPeer',
+    AddPeer: 'addPeer',
     /**
     * Write into ledger the fact of peer removal from the network.
     */
-    RemovePeer = 'removePeer',
+    RemovePeer: 'removePeer',
     /**
     * This command is not available for use, it was added for backward compatibility with Iroha.
     */
-    SetSettingValue = 'setSettingValue',
+    SetSettingValue: 'setSettingValue',
     /**
     * This command is not availalbe for use because it is related to smart contract.
     */
-    CallEngine = 'callEngine'
-}
+    CallEngine: 'callEngine'
+} as const;
+
+export type IrohaCommand = typeof IrohaCommand[keyof typeof IrohaCommand];
+
 
 /**
  * 
@@ -881,68 +886,71 @@ export enum IrohaCommand {
  * @enum {string}
  */
 
-export enum IrohaQuery {
+export const IrohaQuery = {
     /**
     * To get the state of an account
     */
-    GetAccount = 'getAccount',
+    GetAccount: 'getAccount',
     /**
     * To get details of the account.
     */
-    GetAccountDetail = 'getAccountDetail',
+    GetAccountDetail: 'getAccountDetail',
     /**
     * To get information on the given asset (as for now - its precision).
     */
-    GetAssetInfo = 'getAssetInfo',
+    GetAssetInfo: 'getAssetInfo',
     /**
     * To get the state of all assets in an account (a balance).
     */
-    GetAccountAssets = 'getAccountAssets',
+    GetAccountAssets: 'getAccountAssets',
     /**
     * To retrieve information about transactions, based on their hashes.
     */
-    GetTransactions = 'getTransactions',
+    GetTransactions: 'getTransactions',
     /**
     * To retrieve a list of pending (not fully signed) multisignature transactions or batches of transactions issued by account of query creator.
     */
-    GetPendingTransactions = 'getPendingTransactions',
+    GetPendingTransactions: 'getPendingTransactions',
     /**
     * To retrieve a list of transactions per account.
     */
-    GetAccountTransactions = 'getAccountTransactions',
+    GetAccountTransactions: 'getAccountTransactions',
     /**
     * To retrieve all transactions associated with given account and asset.
     */
-    GetAccountAssetTransactions = 'getAccountAssetTransactions',
+    GetAccountAssetTransactions: 'getAccountAssetTransactions',
     /**
     * To get existing roles in the system.
     */
-    GetRoles = 'getRoles',
+    GetRoles: 'getRoles',
     /**
     * To get signatories, which act as an identity of the account.
     */
-    GetSignatories = 'getSignatories',
+    GetSignatories: 'getSignatories',
     /**
     * To get available permissions per role in the system.
     */
-    GetRolePermissions = 'getRolePermissions',
+    GetRolePermissions: 'getRolePermissions',
     /**
     * To get a specific block, using its height as an identifier.
     */
-    GetBlock = 'getBlock',
+    GetBlock: 'getBlock',
     /**
     * To retrieve a receipt of a CallEngine command. Allows to access the event log created during computations inside the EVM.
     */
-    GetEngineReceipts = 'getEngineReceipts',
+    GetEngineReceipts: 'getEngineReceipts',
     /**
     * To get new blocks as soon as they are committed, a user can invoke FetchCommits RPC call to Iroha network.
     */
-    FetchCommits = 'fetchCommits',
+    FetchCommits: 'fetchCommits',
     /**
     * A query that returns a list of peers in Iroha network.
     */
-    GetPeers = 'getPeers'
-}
+    GetPeers: 'getPeers'
+} as const;
+
+export type IrohaQuery = typeof IrohaQuery[keyof typeof IrohaQuery];
+
 
 /**
  * 
@@ -950,10 +958,13 @@ export enum IrohaQuery {
  * @enum {string}
  */
 
-export enum IrohaSocketIOTransactV1 {
-    SendAsyncRequest = 'org.hyperledger.cactus.api.async.iroha.IrohaSocketIOTransactV1.SendAsyncRequest',
-    SendSyncRequest = 'org.hyperledger.cactus.api.async.iroha.IrohaSocketIOTransactV1.SendSyncRequest'
-}
+export const IrohaSocketIOTransactV1 = {
+    SendAsyncRequest: 'org.hyperledger.cactus.api.async.iroha.IrohaSocketIOTransactV1.SendAsyncRequest',
+    SendSyncRequest: 'org.hyperledger.cactus.api.async.iroha.IrohaSocketIOTransactV1.SendSyncRequest'
+} as const;
+
+export type IrohaSocketIOTransactV1 = typeof IrohaSocketIOTransactV1[keyof typeof IrohaSocketIOTransactV1];
+
 
 /**
  * 
@@ -966,13 +977,13 @@ export interface KeyPair {
      * @type {string}
      * @memberof KeyPair
      */
-    publicKey: string;
+    'publicKey': string;
     /**
      * SHA-3 ed25519 private keys of length 64 are recommended.
      * @type {string}
      * @memberof KeyPair
      */
-    privateKey: string;
+    'privateKey': string;
 }
 /**
  * The list of arguments to pass in to the transaction request to Remove Peer.
@@ -985,7 +996,7 @@ export interface RemovePeerRequestParameters {
      * @type {string}
      * @memberof RemovePeerRequestParameters
      */
-    publicKey: string;
+    'publicKey': string;
 }
 /**
  * The list of arguments to pass in to the transaction request to Remove Signatory.
@@ -998,13 +1009,13 @@ export interface RemoveSignatoryRequestParameters {
      * @type {string}
      * @memberof RemoveSignatoryRequestParameters
      */
-    accountId: string;
+    'accountId': string;
     /**
      * 
      * @type {string}
      * @memberof RemoveSignatoryRequestParameters
      */
-    publicKey: string;
+    'publicKey': string;
 }
 /**
  * The list of arguments to pass in to the transaction request to Revoke Permission.
@@ -1017,13 +1028,13 @@ export interface RevokePermissionRequestParameters {
      * @type {string}
      * @memberof RevokePermissionRequestParameters
      */
-    accountId: string;
+    'accountId': string;
     /**
      * 
      * @type {number}
      * @memberof RevokePermissionRequestParameters
      */
-    permission: number;
+    'permission': number;
 }
 /**
  * 
@@ -1036,19 +1047,19 @@ export interface RunTransactionRequestV1 {
      * @type {string}
      * @memberof RunTransactionRequestV1
      */
-    commandName: string;
+    'commandName': string;
     /**
      * 
      * @type {IrohaBaseConfig}
      * @memberof RunTransactionRequestV1
      */
-    baseConfig: IrohaBaseConfig;
+    'baseConfig': IrohaBaseConfig;
     /**
      * 
      * @type {RunTransactionRequestV1Params}
      * @memberof RunTransactionRequestV1
      */
-    params: RunTransactionRequestV1Params;
+    'params': RunTransactionRequestV1Params;
 }
 /**
  * @type RunTransactionRequestV1Body
@@ -1073,7 +1084,7 @@ export interface RunTransactionResponse {
      * @type {any}
      * @memberof RunTransactionResponse
      */
-    transactionReceipt: any | null;
+    'transactionReceipt': any;
 }
 /**
  * 
@@ -1083,16 +1094,16 @@ export interface RunTransactionResponse {
 export interface RunTransactionSignedRequestV1 {
     /**
      * Signed transaction binary data received from generate-transaction endpoint.
-     * @type {any}
+     * @type {string}
      * @memberof RunTransactionSignedRequestV1
      */
-    signedTransaction: any;
+    'signedTransaction': string;
     /**
      * 
      * @type {IrohaBaseConfig}
      * @memberof RunTransactionSignedRequestV1
      */
-    baseConfig?: IrohaBaseConfig;
+    'baseConfig'?: IrohaBaseConfig;
 }
 /**
  * The list of arguments to pass in to the transaction request to Set Account Detail.
@@ -1105,19 +1116,19 @@ export interface SetAccountDetailRequestParameters {
      * @type {string}
      * @memberof SetAccountDetailRequestParameters
      */
-    accountId: string;
+    'accountId': string;
     /**
      * 
      * @type {string}
      * @memberof SetAccountDetailRequestParameters
      */
-    key: string;
+    'key': string;
     /**
      * 
      * @type {string}
      * @memberof SetAccountDetailRequestParameters
      */
-    value: string;
+    'value': string;
 }
 /**
  * The list of arguments to pass in to the transaction request to Set Account Quorum.
@@ -1130,13 +1141,13 @@ export interface SetAccountQuorumRequestParameters {
      * @type {string}
      * @memberof SetAccountQuorumRequestParameters
      */
-    accountId: string;
+    'accountId': string;
     /**
      * 
      * @type {number}
      * @memberof SetAccountQuorumRequestParameters
      */
-    quorum: number;
+    'quorum': number;
 }
 /**
  * The list of arguments to pass in to the transaction request to Subtract Asset Quantity.
@@ -1149,13 +1160,13 @@ export interface SubtractAssetQuantityRequestParameters {
      * @type {string}
      * @memberof SubtractAssetQuantityRequestParameters
      */
-    assetId: string;
+    'assetId': string;
     /**
      * 
      * @type {number}
      * @memberof SubtractAssetQuantityRequestParameters
      */
-    amount: number;
+    'amount': number;
 }
 /**
  * The list of arguments to pass in to the transaction request to Transfer Asset.
@@ -1168,31 +1179,31 @@ export interface TransferAssetRequestParameters {
      * @type {string}
      * @memberof TransferAssetRequestParameters
      */
-    srcAccountId: string;
+    'srcAccountId': string;
     /**
      * 
      * @type {string}
      * @memberof TransferAssetRequestParameters
      */
-    destAccountId: string;
+    'destAccountId': string;
     /**
      * 
      * @type {string}
      * @memberof TransferAssetRequestParameters
      */
-    assetId: string;
+    'assetId': string;
     /**
      * 
      * @type {string}
      * @memberof TransferAssetRequestParameters
      */
-    description: string;
+    'description': string;
     /**
      * 
      * @type {number}
      * @memberof TransferAssetRequestParameters
      */
-    amount: number;
+    'amount': number;
 }
 /**
  * 
@@ -1200,13 +1211,16 @@ export interface TransferAssetRequestParameters {
  * @enum {string}
  */
 
-export enum WatchBlocksV1 {
-    Subscribe = 'org.hyperledger.cactus.api.async.iroha.WatchBlocksV1.Subscribe',
-    Next = 'org.hyperledger.cactus.api.async.iroha.WatchBlocksV1.Next',
-    Unsubscribe = 'org.hyperledger.cactus.api.async.iroha.WatchBlocksV1.Unsubscribe',
-    Error = 'org.hyperledger.cactus.api.async.iroha.WatchBlocksV1.Error',
-    Complete = 'org.hyperledger.cactus.api.async.iroha.WatchBlocksV1.Complete'
-}
+export const WatchBlocksV1 = {
+    Subscribe: 'org.hyperledger.cactus.api.async.iroha.WatchBlocksV1.Subscribe',
+    Next: 'org.hyperledger.cactus.api.async.iroha.WatchBlocksV1.Next',
+    Unsubscribe: 'org.hyperledger.cactus.api.async.iroha.WatchBlocksV1.Unsubscribe',
+    Error: 'org.hyperledger.cactus.api.async.iroha.WatchBlocksV1.Error',
+    Complete: 'org.hyperledger.cactus.api.async.iroha.WatchBlocksV1.Complete'
+} as const;
+
+export type WatchBlocksV1 = typeof WatchBlocksV1[keyof typeof WatchBlocksV1];
+
 
 
 /**
@@ -1222,7 +1236,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        generateTransactionV1: async (generateTransactionRequestV1?: GenerateTransactionRequestV1, options: any = {}): Promise<RequestArgs> => {
+        generateTransactionV1: async (generateTransactionRequestV1?: GenerateTransactionRequestV1, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha/generate-transaction`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1239,7 +1253,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(generateTransactionRequestV1, localVarRequestOptions, configuration)
@@ -1255,7 +1269,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getPrometheusMetricsV1: async (options: any = {}): Promise<RequestArgs> => {
+        getPrometheusMetricsV1: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha/get-prometheus-exporter-metrics`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1270,7 +1284,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
 
 
     
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
 
@@ -1286,7 +1300,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        runTransactionV1: async (runTransactionRequestV1Body?: RunTransactionRequestV1Body, options: any = {}): Promise<RequestArgs> => {
+        runTransactionV1: async (runTransactionRequestV1Body?: RunTransactionRequestV1Body, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha/run-transaction`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1303,7 +1317,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(runTransactionRequestV1Body, localVarRequestOptions, configuration)
@@ -1330,7 +1344,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async generateTransactionV1(generateTransactionRequestV1?: GenerateTransactionRequestV1, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
+        async generateTransactionV1(generateTransactionRequestV1?: GenerateTransactionRequestV1, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.generateTransactionV1(generateTransactionRequestV1, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -1340,7 +1354,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getPrometheusMetricsV1(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
+        async getPrometheusMetricsV1(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getPrometheusMetricsV1(options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -1351,7 +1365,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async runTransactionV1(runTransactionRequestV1Body?: RunTransactionRequestV1Body, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RunTransactionResponse>> {
+        async runTransactionV1(runTransactionRequestV1Body?: RunTransactionRequestV1Body, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RunTransactionResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.runTransactionV1(runTransactionRequestV1Body, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -1372,7 +1386,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        generateTransactionV1(generateTransactionRequestV1?: GenerateTransactionRequestV1, options?: any): AxiosPromise<any> {
+        generateTransactionV1(generateTransactionRequestV1?: GenerateTransactionRequestV1, options?: any): AxiosPromise<string> {
             return localVarFp.generateTransactionV1(generateTransactionRequestV1, options).then((request) => request(axios, basePath));
         },
         /**
@@ -1412,7 +1426,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public generateTransactionV1(generateTransactionRequestV1?: GenerateTransactionRequestV1, options?: any) {
+    public generateTransactionV1(generateTransactionRequestV1?: GenerateTransactionRequestV1, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).generateTransactionV1(generateTransactionRequestV1, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -1423,7 +1437,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public getPrometheusMetricsV1(options?: any) {
+    public getPrometheusMetricsV1(options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getPrometheusMetricsV1(options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -1435,7 +1449,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public runTransactionV1(runTransactionRequestV1Body?: RunTransactionRequestV1Body, options?: any) {
+    public runTransactionV1(runTransactionRequestV1Body?: RunTransactionRequestV1Body, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).runTransactionV1(runTransactionRequestV1Body, options).then((request) => request(this.axios, this.basePath));
     }
 }

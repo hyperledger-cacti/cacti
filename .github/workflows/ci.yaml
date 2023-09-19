@@ -1,5 +1,7 @@
 ---
 jobs:
+  ActionLint:
+    uses: ./.github/workflows/actionlint.yaml
   DCI-Lint:
     name: DCI-Lint
     runs-on: ubuntu-20.04
@@ -73,7 +75,7 @@ jobs:
   yarn_codegen:
     continue-on-error: false
     env:
-      DEV_BUILD_DISABLED: false
+      DEV_BUILD_DISABLED: true
       FULL_BUILD_DISABLED: true
       JEST_TEST_RUNNER_DISABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
@@ -98,7 +100,48 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
+      - run: git status --porcelain
+      - run: git status --porcelain | wc -l
       - run: yarn codegen
+      - run: git status --porcelain
+      - run: git status --porcelain | wc -l
+
+      - name: Set env.GIT_INDEX_FILE_COUNT
+        id: set_env_git_index_file_count
+        run: |
+            echo "GIT_INDEX_FILE_COUNT=$(git status --porcelain | wc -l)" >> $GITHUB_ENV
+
+      - name: Print env.GIT_INDEX_FILE_COUNT
+        id: print_env_git_index_file_count
+        run: |
+            echo "${{ env.GIT_INDEX_FILE_COUNT }}"
+
+      - uses: actions/github-script@v6.4.1
+        id: set-result-git_index_file_count
+        with:
+          script: |
+            const { GIT_INDEX_FILE_COUNT } = process.env;
+            console.log(`env.GIT_INDEX_FILE_COUNT ${GIT_INDEX_FILE_COUNT}`);
+            return parseInt(GIT_INDEX_FILE_COUNT, 10);
+          result-encoding: string
+
+      - name: Get result Git Index File Count
+        id: get_result_git_index_file_count
+        run: echo "${{steps.set-result-git_index_file_count.outputs.result}}"
+
+      - name: Check CodeGen Side-effects
+        if: ${{ steps.set-result-git_index_file_count.outputs.result != 0 }}
+        uses: actions/github-script@v6.4.1
+        with:
+          script: |
+            const failMsg = "yarn codegen script produced version control " + 
+              "side-effects: source files have been changed by it that are " + 
+              "otherwise are under version control. " + 
+              "This means (99% of the time) that you need to run the " + 
+              "yarn codegen script locally and then include the changes it " + 
+              "makes in your own commit when submitting your pull request.";
+            core.setFailed(failMsg)
+
   yarn_custom_checks:
     continue-on-error: false
     env:
@@ -109,6 +152,7 @@ jobs:
       TOOLS_VALIDATE_BUNDLE_NAMES_DISABLED: true
       CUSTOM_CHECKS_DISABLED: false
       CONFIGURE_DISABLED: false
+      CACTI_CUSTOM_CHECKS_REQUIRED_OPENAPI_SPEC_VERSION: 3.0.3
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
@@ -189,7 +233,7 @@ jobs:
       JEST_TEST_PATTERN: packages/cactus-cmd-api-server/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_RUNNER_DISABLED: false
       TAPE_TEST_PATTERN: >-
-        --files={./packages/cactus-cmd-api-server/src/test/typescript/benchmark/artillery-api-benchmark.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/integration/plugin-import-from-github.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/integration/plugin-import-without-install.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/integration/remote-plugin-imports.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/config/self-signed-certificate-generator/certificates-work-for-mutual-tls.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/config/self-signed-certificate-generator/generates-working-certificates.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/grpc-js-proto-loader-client-healthcheck.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/grpc-proto-gen-ts-client-healthcheck.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/grpc-proto-gen-ts-client-m-tls-enabled.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/plugins/install-basic-plugin-consortium-manual.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/plugins/install-basic-plugin-keychain-memory.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/plugins/install-basic-plugin-ledger-connector-fabric-0-7-0.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/plugins/install-basic-plugin-ledger-connector-quorum-0-7-0.test.ts}
+        --files={./packages/cactus-cmd-api-server/src/test/typescript/integration/plugin-import-from-github.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/integration/plugin-import-without-install.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/integration/remote-plugin-imports.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/config/self-signed-certificate-generator/certificates-work-for-mutual-tls.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/config/self-signed-certificate-generator/generates-working-certificates.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/grpc-js-proto-loader-client-healthcheck.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/grpc-proto-gen-ts-client-healthcheck.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/grpc-proto-gen-ts-client-m-tls-enabled.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/plugins/install-basic-plugin-consortium-manual.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/plugins/install-basic-plugin-keychain-memory.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/plugins/install-basic-plugin-ledger-connector-fabric-0-7-0.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/plugins/install-basic-plugin-ledger-connector-quorum-0-7-0.test.ts}
       TAPE_TEST_RUNNER_DISABLED: false
     needs: build-dev
     runs-on: ubuntu-20.04
@@ -1275,6 +1319,35 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
+  cactus-plugin-ledger-connector-ethereum:
+    continue-on-error: false
+    env:
+      FULL_BUILD_DISABLED: true
+      JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_RUNNER_DISABLED: false
+      TAPE_TEST_PATTERN: >-
+        --files={./packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/integration/plugin-ledger-connector-ethereum/deploy-contract/openapi/openapi-validation-no-keychain.test.ts,./packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/integration/plugin-ledger-connector-ethereum/deploy-contract/openapi/openapi-validation.test.ts,./packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/integration/plugin-ledger-connector-ethereum/deploy-contract/v2.3.0-deploy-contract-from-json-json-object-endpoints.test.ts,./packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/integration/plugin-ledger-connector-ethereum/deploy-contract/v2.3.0-deploy-contract-from-json-json-object.test.ts,./packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/integration/plugin-ledger-connector-ethereum/deploy-contract/v2.3.0-invoke-contract-json-object-endpoints.test.ts,./packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/integration/plugin-ledger-connector-ethereum/deploy-contract/v2.3.0-invoke-contract-json-object.test.ts,./packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/integration/plugin-ledger-connector-ethereum/deploy-contract/v21.4.1-deploy-contract-from-json-json-object-endpoints.test.ts,./packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/integration/plugin-ledger-connector-ethereum/deploy-contract/v21.4.1-deploy-contract-from-json-json-object.test.ts,./packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/integration/plugin-ledger-connector-ethereum/deploy-contract/v21.4.1-invoke-contract-json-object-endpoints.test.ts,./packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/integration/plugin-ledger-connector-ethereum/deploy-contract/v21.4.1-invoke-contract-json-object.test.ts}
+      TAPE_TEST_RUNNER_DISABLED: false
+    needs: build-dev
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Use Node.js v16.14.2
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: v16.14.2
+      - uses: actions/checkout@v3.5.2
+      - id: yarn-cache-dir-path
+        name: Get yarn cache directory path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - id: yarn-cache
+        name: Restore Yarn Cache
+        uses: actions/cache@v3.0.4
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - run: ./tools/ci.sh
   cactus-plugin-ledger-connector-quorum:
     continue-on-error: false
     env:
@@ -1650,6 +1723,33 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
+  cactus-test-plugin-ledger-connector-ethereum:
+    continue-on-error: false
+    env:
+      FULL_BUILD_DISABLED: true
+      JEST_TEST_PATTERN: packages/cactus-test-plugin-ledger-connector-ethereum/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_RUNNER_DISABLED: false
+      TAPE_TEST_RUNNER_DISABLED: true
+    needs: build-dev
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Use Node.js v16.14.2
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: v16.14.2
+      - uses: actions/checkout@v3.5.2
+      - id: yarn-cache-dir-path
+        name: Get yarn cache directory path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - id: yarn-cache
+        name: Restore Yarn Cache
+        uses: actions/cache@v3.0.4
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - run: ./tools/ci.sh
   cactus-test-tooling:
     continue-on-error: false
     env:
@@ -1707,37 +1807,91 @@ jobs:
     steps:
       - uses: actions/checkout@v3.5.2
       - name: ghcr.io/hyperledger/cactus-besu-all-in-one
-        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/besu-all-in-one/ -f ./tools/docker/besu-all-in-one/Dockerfile
+        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/besu-all-in-one/ -f ./tools/docker/besu-all-in-one/Dockerfile -t cactus-besu-all-in-one
+      - name: Run Trivy vulnerability scan for cactus-besu-all-in-one
+        uses: aquasecurity/trivy-action@0.11.2
+        with:
+          image-ref: 'cactus-besu-all-in-one'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
   ghcr-cmd-api-server:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3.5.2
       - name: ghcr.io/hyperledger/cactus-cmd-api-server
-        run: DOCKER_BUILDKIT=1 docker build . -f ./packages/cactus-cmd-api-server/Dockerfile
+        run: DOCKER_BUILDKIT=1 docker build . -f ./packages/cactus-cmd-api-server/Dockerfile -t cactus-cmd-api-server
+      - name: Run Trivy vulnerability scan for cactus-cmd-api-server
+        uses: aquasecurity/trivy-action@0.11.2
+        with:
+          image-ref: 'cactus-cmd-api-server'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
   ghcr-connector-besu:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3.5.2
       - name: ghcr.io/hyperledger/cactus-connector-besu
-        run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-ledger-connector-besu/ -f ./packages/cactus-plugin-ledger-connector-besu/Dockerfile
+        run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-ledger-connector-besu/ -f ./packages/cactus-plugin-ledger-connector-besu/Dockerfile -t cactus-connector-besu
+      - name: Run Trivy vulnerability scan for cactus-connector-besu
+        uses: aquasecurity/trivy-action@0.11.2
+        with:
+          image-ref: 'cactus-connector-besu'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
   ghcr-connector-corda-server:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3.5.2
       - name: ghcr.io/hyperledger/cactus-connector-corda-server
-        run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-ledger-connector-corda/src/main-server/ -f ./packages/cactus-plugin-ledger-connector-corda/src/main-server/Dockerfile
+        run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-ledger-connector-corda/src/main-server/ -f ./packages/cactus-plugin-ledger-connector-corda/src/main-server/Dockerfile -t cactus-connector-corda-server
+      - name: Run Trivy vulnerability scan for cactus-connector-corda-server
+        uses: aquasecurity/trivy-action@0.11.2
+        with:
+          image-ref: 'cactus-connector-corda-server'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
   ghcr-connector-fabric:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3.5.2
       - name: ghcr.io/hyperledger/cactus-connector-fabric
-        run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-ledger-connector-fabric/ -f ./packages/cactus-plugin-ledger-connector-fabric/Dockerfile
+        run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-ledger-connector-fabric/ -f ./packages/cactus-plugin-ledger-connector-fabric/Dockerfile -t cactus-connector-fabric
+      - name: Run Trivy vulnerability scan for cactus-connector-fabric
+        uses: aquasecurity/trivy-action@0.11.2
+        with:
+          image-ref: 'cactus-connector-fabric'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
   ghcr-corda-all-in-one:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3.5.2
       - name: ghcr.io/hyperledger/cactus-corda-all-in-one
-        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/corda-all-in-one/ -f ./tools/docker/corda-all-in-one/Dockerfile
+        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/corda-all-in-one/ -f ./tools/docker/corda-all-in-one/Dockerfile -t cactus-corda-all-in-one
+      - name: Run Trivy vulnerability scan for cactus-corda-all-in-one
+        uses: aquasecurity/trivy-action@0.11.2
+        with:
+          image-ref: 'cactus-corda-all-in-one'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
   ghcr-corda-all-in-one-flowdb:
     runs-on: ubuntu-20.04
     steps:
@@ -1749,7 +1903,16 @@ jobs:
     steps:
       - uses: actions/checkout@v3.5.2
       - name: ghcr.io/hyperledger/cactus-corda-all-in-one-obligation
-        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/corda-all-in-one/ -f ./tools/docker/corda-all-in-one/corda-v4_8/Dockerfile
+        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/corda-all-in-one/ -f ./tools/docker/corda-all-in-one/corda-v4_8/Dockerfile -t cactus-corda-all-in-one-obligation
+      - name: Run Trivy vulnerability scan for cactus-corda-all-in-one-obligation
+        uses: aquasecurity/trivy-action@0.11.2
+        with:
+          image-ref: 'cactus-corda-all-in-one-obligation'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
   ghcr-dev-container-vscode:
     runs-on: ubuntu-20.04
     env:
@@ -1769,67 +1932,166 @@ jobs:
     steps:
       - uses: actions/checkout@v3.5.2
       - name: ghcr.io/hyperledger/cactus-example-carbon-accounting
-        run: DOCKER_BUILDKIT=1 docker build . -f ./examples/carbon-accounting/Dockerfile
+        run: DOCKER_BUILDKIT=1 docker build . -f ./examples/carbon-accounting/Dockerfile -t cactus-example-carbon-accounting
+      - name: Run Trivy vulnerability scan for cactus-example-carbon-accounting
+        uses: aquasecurity/trivy-action@0.11.2
+        with:
+          image-ref: 'cactus-example-carbon-accounting'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
   ghcr-example-supply-chain-app:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3.5.2
       - name: ghcr.io/hyperledger/cactus-example-supply-chain-app
-        run: DOCKER_BUILDKIT=1 docker build . -f ./examples/supply-chain-app/Dockerfile
+        run: DOCKER_BUILDKIT=1 docker build . -f ./examples/supply-chain-app/Dockerfile -t cactus-example-supply-chain-app
+      - name: Run Trivy vulnerability scan for cactus-example-supply-chain-app
+        uses: aquasecurity/trivy-action@0.11.2
+        with:
+          image-ref: 'cactus-example-supply-chain-app'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
   ghcr-fabric-all-in-one:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3.5.2
       - name: ghcr.io/hyperledger/cactus-fabric-all-in-one
-        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/fabric-all-in-one/ -f ./tools/docker/fabric-all-in-one/Dockerfile_v1.4.x
+        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/fabric-all-in-one/ -f ./tools/docker/fabric-all-in-one/Dockerfile_v1.4.x -t cactus-fabric-all-in-one
+      - name: Run Trivy vulnerability scan for cactus-fabric-all-in-one
+        uses: aquasecurity/trivy-action@0.11.2
+        with:
+          image-ref: 'cactus-fabric-all-in-one'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
   ghcr-fabric2-all-in-one:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3.5.2
       - name: ghcr.io/hyperledger/cactus-fabric2-all-in-one
-        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/fabric-all-in-one/ -f ./tools/docker/fabric-all-in-one/Dockerfile_v2.x
+        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/fabric-all-in-one/ -f ./tools/docker/fabric-all-in-one/Dockerfile_v2.x -t cactus-fabric2-all-in-one
+      - name: Run Trivy vulnerability scan for cactus-fabric2-all-in-one
+        uses: aquasecurity/trivy-action@0.11.2
+        with:
+          image-ref: 'cactus-fabric2-all-in-one'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
   ghcr-iroha-all-in-one:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3.5.2
       - name: ghcr.io/hyperledger/cactus-iroha-all-in-one
-        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/iroha-all-in-one/ -f ./tools/docker/iroha-all-in-one/Dockerfile
+        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/iroha-all-in-one/ -f ./tools/docker/iroha-all-in-one/Dockerfile -t cactus-iroha-all-in-one
+      - name: Run Trivy vulnerability scan for cactus-iroha-all-in-one
+        uses: aquasecurity/trivy-action@0.11.2
+        with:
+          image-ref: 'cactus-iroha-all-in-one'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
   ghcr-keychain-vault-server:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3.5.2
       - name: ghcr.io/hyperledger/cactus-keychain-vault-server
-        run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-keychain-vault/src/cactus-keychain-vault-server/ -f ./packages/cactus-plugin-keychain-vault/src/cactus-keychain-vault-server/Dockerfile
+        run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-keychain-vault/src/cactus-keychain-vault-server/ -f ./packages/cactus-plugin-keychain-vault/src/cactus-keychain-vault-server/Dockerfile -t cactus-keychain-vault-server
+      - name: Run Trivy vulnerability scan for cactus-keychain-vault-server
+        uses: aquasecurity/trivy-action@0.11.2
+        with:
+          image-ref: 'cactus-keychain-vault-server'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
   ghcr-quorum-all-in-one:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3.5.2
       - name: ghcr.io/hyperledger/cactus-quorum-all-in-one
-        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/quorum-all-in-one/ -f ./tools/docker/quorum-all-in-one/Dockerfile
+        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/quorum-all-in-one/ -f ./tools/docker/quorum-all-in-one/Dockerfile -t cactus-quorum-all-in-one
+      - name: Run Trivy vulnerability scan for cactus-quorum-all-in-one
+        uses: aquasecurity/trivy-action@0.11.2
+        with:
+          image-ref: 'cactus-quorum-all-in-one'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
   ghcr-quorum-multi-party-all-in-one:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3.5.2
       - name: ghcr.io/hyperledger/cactus-quorum-multi-party-all-in-one
-        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/quorum-multi-party-all-in-one/ -f ./tools/docker/quorum-multi-party-all-in-one/Dockerfile
+        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/quorum-multi-party-all-in-one/ -f ./tools/docker/quorum-multi-party-all-in-one/Dockerfile -t cactus-quorum-multi-party-all-in-one
+      - name: Run Trivy vulnerability scan for cactus-quorum-multi-party-all-in-one
+        uses: aquasecurity/trivy-action@0.11.2
+        with:
+          image-ref: 'cactus-quorum-multi-party-all-in-one'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
   ghcr-rust-compiler:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3.5.2
       - name: ghcr.io/hyperledger/cactus-rust-compiler
-        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/rust-compiler/ -f ./tools/docker/rust-compiler/Dockerfile
+        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/rust-compiler/ -f ./tools/docker/rust-compiler/Dockerfile -t cactus-rust-compiler
+      - name: Run Trivy vulnerability scan for cactus-rust-compiler
+        uses: aquasecurity/trivy-action@0.11.2
+        with:
+          image-ref: 'cactus-rust-compiler'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
   ghcr-test-npm-registry:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3.5.2
       - name: ghcr.io/hyperledger/cactus-test-npm-registry
-        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/test-npm-registry/ -f ./tools/docker/test-npm-registry/Dockerfile
+        run: DOCKER_BUILDKIT=1 docker build ./tools/docker/test-npm-registry/ -f ./tools/docker/test-npm-registry/Dockerfile -t cactus-test-npm-registry
+      - name: Run Trivy vulnerability scan for cactus-test-npm-registry
+        uses: aquasecurity/trivy-action@0.11.2
+        with:
+          image-ref: 'cactus-test-npm-registry'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
   ghcr-whitepaper:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3.5.2
       - name: ghcr.io/hyperledger/cactus-whitepaper
-        run: DOCKER_BUILDKIT=1 docker build ./whitepaper/ -f ./whitepaper/Dockerfile
+        run: DOCKER_BUILDKIT=1 docker build ./whitepaper/ -f ./whitepaper/Dockerfile -t cactus-whitepaper
+      - name: Run Trivy vulnerability scan for cactus-whitepaper
+        uses: aquasecurity/trivy-action@0.11.2
+        with:
+          image-ref: 'cactus-whitepaper'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
 name: Cactus_CI
 'on':
   pull_request:

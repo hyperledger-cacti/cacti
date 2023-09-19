@@ -39,7 +39,6 @@ if [ "simple" = "$app" ]; then
 elif [ "house" = "$app" ]; then
   cordappPath=$directory/../../../../samples/corda/fungible-house-token
   houseTokenAppVersion="1.0"
-  tokenVersion="1.2"
 
   ########## Fungible House Token App ##############
 
@@ -70,8 +69,8 @@ elif [ "house" = "$app" ]; then
   ### Token SDK ###
 
   (cd $directory/../shared/artifacts && curl -O https://download.corda.net/maven/corda-lib/com/r3/corda/lib/ci/ci-workflows/1.0/ci-workflows-1.0.jar) || exit 1
-  (cd $directory/../shared/artifacts && curl -O https://download.corda.net/maven/corda-lib/com/r3/corda/lib/tokens/tokens-contracts/$tokenVersion/tokens-contracts-$tokenVersion.jar) || exit 1
-  (cd $directory/../shared/artifacts && curl -O https://download.corda.net/maven/corda-lib/com/r3/corda/lib/tokens/tokens-workflows/$tokenVersion/tokens-workflows-$tokenVersion.jar) || exit 1
+  (cd $directory/../shared/artifacts && curl -O https://download.corda.net/maven/corda-lib/com/r3/corda/lib/tokens/tokens-contracts/$cordaTokenSDKVersion/tokens-contracts-$cordaTokenSDKVersion.jar) || exit 1
+  (cd $directory/../shared/artifacts && curl -O https://download.corda.net/maven/corda-lib/com/r3/corda/lib/tokens/tokens-workflows/$cordaTokenSDKVersion/tokens-workflows-$cordaTokenSDKVersion.jar) || exit 1
 
 else
   echo "Cordapp not found" && exit 1
@@ -81,7 +80,7 @@ fi
 
 if [[ $local == "local" ]]; then
   if [[ ! -f $directory/../../../../common/protos-java-kt/build/libs/protos-java-kt-$cactiVersion.jar ]]; then
-      echo "Please Build the weaver-protos-java-kt version $cactiVersion to use local components."
+      echo "Please Build the protos-java-kt version $cactiVersion to use local components."
   fi  
   if [[ ! -f $directory/../../../../core/network/corda-interop-app/interop-contracts/build/libs/interop-contracts-$cactiVersion.jar ]]; then
       echo "Please Build the corda-interop-app version $cactiVersion to use local components."

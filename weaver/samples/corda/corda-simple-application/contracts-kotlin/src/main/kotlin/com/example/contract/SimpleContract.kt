@@ -13,6 +13,8 @@ import net.corda.core.contracts.requireSingleCommand
 import net.corda.core.contracts.requireThat
 import net.corda.core.transactions.LedgerTransaction
 
+import org.hyperledger.cacti.weaver.imodule.corda.states.ExternalState
+
 /**
  * SimpleContract defines the rules for managing [SimpleState].
  *
@@ -52,6 +54,12 @@ class SimpleContract : Contract {
                 val out = tx.outputsOfType<SimpleState>().single()
                 "The participant must be the signer." using (command.signers.containsAll(out.participants.map { it.owningKey }))
             }
+            is Commands.CreateFromExternal -> requireThat {
+                "One external state as input should be consumed when issuing a SimpleState from ExternalState." using (tx.inputsOfType<ExternalState>().size == 1)
+                "Only one output state should be created." using (tx.outputs.size == 1)
+                val out = tx.outputsOfType<SimpleState>().single()
+                "The participant must be the signer." using (command.signers.containsAll(out.participants.map { it.owningKey }))
+            }
             is Commands.Update -> requireThat {
                 "There should be one input state" using (tx.inputs.size == 1)
                 "The input state should be of type SimpleState" using (tx.inputs[0].state.data is SimpleState)
@@ -79,6 +87,7 @@ class SimpleContract : Contract {
      */
     interface Commands : CommandData {
         class Create : Commands
+        class CreateFromExternal: Commands
         class Update : Commands
         class Delete : Commands
     }

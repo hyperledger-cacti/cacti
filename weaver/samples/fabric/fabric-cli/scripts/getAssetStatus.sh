@@ -1,3 +1,7 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+
 CC=$(cat config.json | jq -r .network1.chaincode)
 echo -e "\n\n############## Fabric network1: $CC ################\n"
 ./bin/fabric-cli chaincode query --local-network=network1 --user=alice mychannel $CC GetMyAssets '[]'

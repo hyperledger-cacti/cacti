@@ -1,3 +1,7 @@
+// Copyright IBM Corp. All Rights Reserved.
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // Internal generated modules
 use weaverpb::common::ack::{ack, Ack};
 use weaverpb::common::query::Query;

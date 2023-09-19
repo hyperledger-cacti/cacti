@@ -60,6 +60,9 @@ restart-with-new-interop-app: stop
 	cd ../../../core/network/corda-interop-app && ./gradlew clean jar
 	./scripts/get-cordapps.sh $(APP_NAME) local
 	./scripts/start-nodes.sh $(APP_NAME) $(PROFILE)
+	./scripts/start-nodes.sh $(APP_NAME) $(PROFILE) Corda_Network2
+	./scripts/check-nodes-status.sh $(PROFILE) 
+	./scripts/check-nodes-status.sh $(PROFILE) Corda_Network2
 
 .PHONY:	stop-network1
 stop-network1: 

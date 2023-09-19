@@ -1,3 +1,7 @@
+// Copyright IBM Corp. All Rights Reserved.
+//
+// SPDX-License-Identifier: Apache-2.0
+
 use serde::{de::DeserializeOwned, Serialize};
 use sled::{Db, open, IVec};
 use std::thread::sleep;

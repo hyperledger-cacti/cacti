@@ -16,7 +16,7 @@ Method | HTTP request | Description
 [**stopMonitorV1**](DefaultApi.md#stopMonitorV1) | **DELETE** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/stop-monitor | Stop monitoring corda changes (transactions) of given state class
 
 
-<a name="clearMonitorTransactionsV1"></a>
+<a id="clearMonitorTransactionsV1"></a>
 # **clearMonitorTransactionsV1**
 > ClearMonitorTransactionsV1Response clearMonitorTransactionsV1(clearMonitorTransactionsV1Request)
 
@@ -61,7 +61,7 @@ No authorization required
  - **Content-Type**: application/json
  - **Accept**: application/json
 
-<a name="deployContractJarsV1"></a>
+<a id="deployContractJarsV1"></a>
 # **deployContractJarsV1**
 > DeployContractJarsSuccessV1Response deployContractJarsV1(deployContractJarsV1Request)
 
@@ -106,7 +106,7 @@ No authorization required
  - **Content-Type**: application/json
  - **Accept**: application/json
 
-<a name="diagnoseNodeV1"></a>
+<a id="diagnoseNodeV1"></a>
 # **diagnoseNodeV1**
 > DiagnoseNodeV1Response diagnoseNodeV1(diagnoseNodeV1Request)
 
@@ -153,7 +153,7 @@ No authorization required
  - **Content-Type**: application/json
  - **Accept**: application/json
 
-<a name="getMonitorTransactionsV1"></a>
+<a id="getMonitorTransactionsV1"></a>
 # **getMonitorTransactionsV1**
 > GetMonitorTransactionsV1Response getMonitorTransactionsV1(getMonitorTransactionsV1Request)
 
@@ -198,7 +198,7 @@ No authorization required
  - **Content-Type**: application/json
  - **Accept**: application/json
 
-<a name="getPrometheusMetricsV1"></a>
+<a id="getPrometheusMetricsV1"></a>
 # **getPrometheusMetricsV1**
 > kotlin.String getPrometheusMetricsV1()
 
@@ -237,9 +237,9 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: Not defined
- - **Accept**: text/plain
+ - **Accept**: Not defined
 
-<a name="invokeContractV1"></a>
+<a id="invokeContractV1"></a>
 # **invokeContractV1**
 > InvokeContractV1Response invokeContractV1(invokeContractV1Request)
 
@@ -284,7 +284,7 @@ No authorization required
  - **Content-Type**: application/json
  - **Accept**: application/json
 
-<a name="listFlowsV1"></a>
+<a id="listFlowsV1"></a>
 # **listFlowsV1**
 > ListFlowsV1Response listFlowsV1(listFlowsV1Request)
 
@@ -331,7 +331,7 @@ No authorization required
  - **Content-Type**: application/json
  - **Accept**: application/json
 
-<a name="networkMapV1"></a>
+<a id="networkMapV1"></a>
 # **networkMapV1**
 > kotlin.collections.List&lt;NodeInfo&gt; networkMapV1(body)
 
@@ -378,7 +378,7 @@ No authorization required
  - **Content-Type**: application/json
  - **Accept**: application/json
 
-<a name="startMonitorV1"></a>
+<a id="startMonitorV1"></a>
 # **startMonitorV1**
 > StartMonitorV1Response startMonitorV1(startMonitorV1Request)
 
@@ -423,7 +423,7 @@ No authorization required
  - **Content-Type**: application/json
  - **Accept**: application/json
 
-<a name="stopMonitorV1"></a>
+<a id="stopMonitorV1"></a>
 # **stopMonitorV1**
 > StopMonitorV1Response stopMonitorV1(stopMonitorV1Request)
 

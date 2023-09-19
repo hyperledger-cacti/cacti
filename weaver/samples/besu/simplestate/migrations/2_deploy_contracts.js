@@ -1,3 +1,9 @@
+/*
+ * Copyright IBM Corp. All Rights Reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 // const Interop = artifacts.require('Interop') // Update this for interop contract after implementing data-sharing in besu and uncomment
 const SimpleState = artifacts.require('./SimpleState.sol')
 

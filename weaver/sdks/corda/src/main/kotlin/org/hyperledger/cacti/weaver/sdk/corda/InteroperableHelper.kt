@@ -29,13 +29,21 @@ import net.corda.core.messaging.startFlow
 import net.corda.core.messaging.CordaRPCOps
 import net.corda.core.identity.Party
 
+import org.hyperledger.cacti.weaver.imodule.corda.states.InvocationSpec
 import org.hyperledger.cacti.weaver.imodule.corda.flows.CreateExternalRequest
 import org.hyperledger.cacti.weaver.imodule.corda.flows.WriteExternalStateInitiator
 import org.hyperledger.cacti.weaver.imodule.corda.flows.GetExternalStateByLinearId
 import org.hyperledger.cacti.weaver.protos.common.interop_payload.InteropPayloadOuterClass
-import org.hyperledger.cacti.weaver.protos.common.state.State
+import org.hyperledger.cacti.weaver.protos.common.state.State.RequestState
 import org.hyperledger.cacti.weaver.protos.corda.ViewDataOuterClass
 import org.hyperledger.cacti.weaver.protos.networks.networks.Networks
+
+data class RelayOptions(
+    val useTlsForRelay: Boolean = false,
+    val relayTlsTrustStorePath: String = "",
+    val relayTlsTrustStorePassword: String = "",
+    val tlsCACertPathsForRelay: String = ""
+)
 
 class InteroperableHelper {
     companion object {
@@ -85,22 +93,19 @@ class InteroperableHelper {
         fun getChannelToRelay (
             localRelayHost: String,
             localRelayPort: Int,
-            useTlsForRelay: Boolean,
-            relayTlsTrustStorePath: String,
-            relayTlsTrustStorePassword: String,
-            tlsCACertPathsForRelay: String
+            relayOptions: RelayOptions
         ): ManagedChannel {
-            if (useTlsForRelay) {
+            if (relayOptions.useTlsForRelay) {
                 var trustStore: KeyStore = KeyStore.getInstance(KeyStore.getDefaultType())
-                if (relayTlsTrustStorePath.length > 0) {
-                    if (relayTlsTrustStorePassword.length == 0) {
+                if (relayOptions.relayTlsTrustStorePath.length > 0) {
+                    if (relayOptions.relayTlsTrustStorePassword.length == 0) {
                         throw Exception("Password not supplied for JKS trust store")
                     }
-                    val trustStream = FileInputStream(relayTlsTrustStorePath)
-                    trustStore.load(trustStream, relayTlsTrustStorePassword.toCharArray())
-                } else if (tlsCACertPathsForRelay.length > 0) {
+                    val trustStream = FileInputStream(relayOptions.relayTlsTrustStorePath)
+                    trustStore.load(trustStream, relayOptions.relayTlsTrustStorePassword.toCharArray())
+                } else if (relayOptions.tlsCACertPathsForRelay.length > 0) {
                     trustStore.load(null, null)
-                    val tlsCACertPaths = tlsCACertPathsForRelay.split(":")
+                    val tlsCACertPaths = relayOptions.tlsCACertPathsForRelay.split(":")
                     var tlsCACertCounter = 0
                     for (tlsCACertPath in tlsCACertPaths) {
                         val certFactory = CertificateFactory.getInstance("X509")
@@ -146,15 +151,17 @@ class InteroperableHelper {
         @JvmStatic
         @JvmOverloads fun interopFlow (
             proxy: CordaRPCOps,
+            externalStateAddresses: Array<String>,
             localRelayEndpoint: String,
-            externalStateAddress: String,
             networkName: String,
-            externalStateParticipants: List<Party> = listOf<Party>() ,
-            useTlsForRelay: Boolean = false,
-            relayTlsTrustStorePath: String = "",
-            relayTlsTrustStorePassword: String = "",
-            tlsCACertPathsForRelay: String = ""
-        ): Either<Error, String> {
+            returnWithoutLocalInvocation: Boolean = true,
+            invokeFlowName: String = "",
+            invokeFlowArgs: List<Any> = listOf(),
+            interopArgsIndex: Int = -1,
+            externalStateParticipants: List<Party> = listOf<Party>(),
+            relayOptions: RelayOptions = RelayOptions()
+        ): Either<Error, Any> {
+            // Create Relay client instance
             val localRelayHost = localRelayEndpoint.split(":").first()
             val localRelayPort = localRelayEndpoint.split(":").last().toInt()
             var channel: ManagedChannel
@@ -162,38 +169,76 @@ class InteroperableHelper {
                 channel = getChannelToRelay(
                     localRelayHost,
                     localRelayPort,
-                    useTlsForRelay,
-                    relayTlsTrustStorePath,
-                    relayTlsTrustStorePassword,
-                    tlsCACertPathsForRelay)
+                    relayOptions)
             } catch(e: Exception) {
                 logger.error("Error creating channel to relay: ${e.message}\n")
                 return Left(Error("Error creating channel to relay: ${e.message}\n"))
             }
             val client = RelayClient(channel)
+            var responseStates = Array<RequestState?>(externalStateAddresses.size) { null }
+            var responseError: Error? = null
+
+            // Fetch remote views
+            runBlocking {
+                coroutineScope { // limits the scope of concurrency
+                    externalStateAddresses.mapIndexed { index, externalStateAddress ->
+                        async { // async means "concurrently", context goes here
+                            getRemoteView(
+                                proxy,
+                                networkName,
+                                externalStateAddress,
+                                client
+                            ).fold({
+                                logger.error("Error in Interop Flow for address ${externalStateAddress}: ${it.message}\n")
+                                responseError = Error("Error in Interop Flow for address ${externalStateAddress}: ${it.message}\n")
+                            },{ state ->
+                                responseStates[index] = state
+                            })
+                        }
+                    }.awaitAll() // waits all of them
+                }
+            }
+            
+            if (responseError is Error){
+                return Left(responseError!!)
+            }
+            
+            // Write external state
+            val views64 = responseStates.mapNotNull {
+                Base64.getEncoder().encodeToString(it!!.view.toByteArray())
+            }.toTypedArray()
+            
+            return writeExternalStateToVault(
+                proxy,  
+                views64,
+                externalStateAddresses,
+                externalStateParticipants,
+                returnWithoutLocalInvocation,
+                invokeFlowName,
+                invokeFlowArgs,
+                interopArgsIndex
+            )
+        }
+        
+        fun getRemoteView(
+            proxy: CordaRPCOps,
+            networkName: String,
+            externalStateAddress: String,
+            client: RelayClient
+        ): Either<Error, RequestState> {
             val eitherErrorQuery = constructNetworkQuery(proxy, externalStateAddress, networkName)
             logger.debug("Corda network returned: $eitherErrorQuery \n")
-            val result = eitherErrorQuery.fold({
+            return eitherErrorQuery.fold({
                 logger.error("error ${it}")
                 Left(it)
             }, { networkQuery ->
                 logger.debug("Network query: $networkQuery")
                 var eitherErrorResult = runBlocking {
                     val ack = async { client.requestState(networkQuery) }.await()
-                    pollForState(ack.requestId, client).fold({
-                        logger.error("Error in Interop Flow: ${it.message}\n")
-                        Left(Error("Error in Interop Flow: ${it.message}\n"))
-                    }, { state ->
-                        writeExternalStateToVault(
-                            proxy,  
-                            state,
-                            externalStateAddress,
-                            externalStateParticipants)
-                    })
+                    pollForState(ack.requestId, client)
                 }
                 eitherErrorResult
             })
-            return result
         }
         
         /**
@@ -337,7 +382,7 @@ class InteroperableHelper {
          * Will have status "PENDING", "PENDING_ACK", "COMPLETED" or "ERROR".
          * @return Returns the request state when it has status "COMPLETED" or "ERROR".
          */
-        suspend fun pollForState(requestId: String, client: RelayClient, retryCount: Int = 0): Either<Error, State.RequestState> = coroutineScope {
+        suspend fun pollForState(requestId: String, client: RelayClient, retryCount: Int = 0): Either<Error, RequestState> = coroutineScope {
             val timeout = 30
             val delayTime = 500L
             val num = 30*1000/delayTime
@@ -374,23 +419,46 @@ class InteroperableHelper {
          */
         fun writeExternalStateToVault(
             proxy: CordaRPCOps,
-            requestState: State.RequestState,
-            address: String,
-            externalStateParticipants: List<Party> = listOf<Party>()
-        ): Either<Error, String> {
+            views64: Array<String>,
+            addresses: Array<String>,
+            externalStateParticipants: List<Party> = listOf<Party>(),
+            returnWithoutLocalInvocation: Boolean = true,
+            invokeFlowName: String = "",
+            invokeFlowArgs: List<Any> = listOf(),
+            interopArgsIndex: Int = -1
+        ): Either<Error, Any> {
             return try {
                 logger.debug("Sending response to Corda for view verification.\n")
-                val stateId = runCatching {
-                    val viewBase64String = Base64.getEncoder().encodeToString(requestState.view.toByteArray())
-                    proxy.startFlow(::WriteExternalStateInitiator, viewBase64String, address, externalStateParticipants)
-                            .returnValue.get()
-                }.fold({
-                    it.map { linearId ->
-                        logger.debug("Verification was successful and external-state was stored with linearId $linearId.\n")
-                        linearId.toString()
-                    }
+                val invokeObject = InvocationSpec(
+                    disableInvocation = returnWithoutLocalInvocation,
+                    invokeFlowName = invokeFlowName,
+                    invokeFlowArgs = invokeFlowArgs,
+                    interopArgsIndex = interopArgsIndex
+                )
+                logger.debug("Invoke Object: ${invokeObject}")
+                val stateId: Either<Error, Any> = runCatching {
+                    proxy.startFlow(::WriteExternalStateInitiator, 
+                        views64, 
+                        addresses,
+                        invokeObject,
+                        externalStateParticipants
+                    ).returnValue.get()
+                }.fold({ 
+                    it.fold({
+                        logger.error("WriteExternalState flow error: ${it.message}\n")
+                        Left(Error("WriteExternalState flow error: ${it.message}\n"))
+                    }, { result: Any ->
+                        if (returnWithoutLocalInvocation)   {
+                            logger.debug("Verification was successful and external-state was stored with array of linearIds $result.\n")
+                            Right(result)
+                        } else {
+                            logger.debug("Verification was successful and called flow: $invokeFlowName with result: $result.\n")
+                            Right(result)
+                        }
+                    })
                 }, {
-                    Left(Error("Corda Network Error: Error running WriteExternalStateInitiator flow: ${it.message}\n"))
+                    logger.error("Corda Network Error: Error running WriteExternalState flow: ${it.message}\n")
+                    Left(Error("Corda Network Error: Error running WriteExternalState flow: ${it.message}\n"))
                 })
                 stateId
             } catch (e: Exception) {

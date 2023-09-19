@@ -1,18 +1,18 @@
 {
   "name": "@hyperledger/cactus-example-discounted-asset-trade",
   "version": "2.0.0-alpha.1",
+  "private": true,
   "license": "Apache-2.0",
   "main": "dist/www.js",
   "module": "dist/www.js",
   "types": "dist/www.d.ts",
-  "private": true,
   "scripts": {
-    "start": "npm run build_pip_indy_package && docker-compose build && docker-compose up",
-    "start-dockerless": "node ./dist/www.js",
     "build": "npm run build-ts && npm run build:dev:backend:postbuild",
     "build-ts": "tsc",
+    "build:dev:backend:postbuild": "cp -f ../../yarn.lock ./dist/",
     "build_pip_indy_package": "cd ../../packages-python/cactus_validator_socketio_indy && python3 setup.py bdist_wheel",
-    "build:dev:backend:postbuild": "cp -f ../../yarn.lock ./dist/"
+    "start": "npm run build_pip_indy_package && docker-compose build && docker-compose up",
+    "start-dockerless": "node ./dist/www.js"
   },
   "dependencies": {
     "@hyperledger/cactus-cmd-socketio-server": "2.0.0-alpha.1",

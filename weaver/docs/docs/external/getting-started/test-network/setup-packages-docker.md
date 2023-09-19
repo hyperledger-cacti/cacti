@@ -11,7 +11,7 @@ pagination_next: external/getting-started/test-network/ledger-initialization
  SPDX-License-Identifier: CC-BY-4.0
  -->
 
- In this document, we detail the steps using which you can bring up networks using the default configuration settings and by fetching pre-built Weaver interoperation modules, SDK libraries, and relay docker image, drivers docker images from Github Package repositories. To customize these settings (e.g., hostnames, ports), refer to the [Advanced Configuration page](./advanced-configuration.md).
+ In this document, we detail the steps using which you can bring up networks using the default configuration settings and by fetching pre-built Weaver interoperation modules, SDK libraries, and relay docker image, drivers docker images from GitHub Package repositories. To customize these settings (e.g., hostnames, ports), refer to the [Advanced Configuration page](./advanced-configuration.md).
 
 | Notes |
 |:------|
@@ -36,13 +36,13 @@ Before starting, make sure you have the following software installed on your hos
 Make sure you have an SSH or GPG key registered in https://github.com to allow seamless cloning of repositories (at present, various setup scripts clone repositories using the `https://` prefix but this may change to `git@` in the future).
 
 #### Package Access Token:
-Create a personal access token with `read:packages` access in github in order to use modules published in github packages. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
+Create a personal access token with `read:packages` access in GitHub in order to use modules published in GitHub packages. Refer [Creating a Personal Access Token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token) for help.
 
-Run `docker login ghcr.io`,  and provide github email id as username and personal access token created above as password. This will allow the docker to fetch images of `relay`, `fabric-driver` and `corda-driver` from `hyperledger-labs/weaver-dlt-interoperability`.
+Run `docker login ghcr.io`,  and provide GitHub email id as username and personal access token created above as password. This will allow Docker to fetch images of `relay`, `fabric-driver` and `corda-driver` from `hyperledger/cacti`.
 
 ## Getting the Code and Documentation
 
-Clone the [weaver-dlt-interoperability](https://github.com/hyperledger/cacti/weaver) repository. The code to get a basic test network up and running and test data-sharing interoperation flows lies in the subfolder `tests/network-setups`, which should be your starting point, though the setups will rely on other parts of the repository, as you will find out in the instructions given on this page.
+Clone the [cacti](https://github.com/hyperledger/cacti) repository. The code to get a basic test network up and running and test data-sharing interoperation flows lies in the subfolder `weaver/tests/network-setups`, which should be your starting point, though the setups will rely on other parts of the repository, as you will find out in the instructions given on this page.
 
 ## Securing Components
 
@@ -56,7 +56,7 @@ Using the sequence of instructions below, you can start two separate Fabric netw
 
 ### Fabric Network
 
-The code for this lies in the `tests/network-setups` folder.
+The code for this lies in the `weaver/tests/network-setups` folder.
 
 This folder contains code to create and launch networks `network1` and `network2` of identical specifications:
 - Network: 1 peer, 1 peer CA, 1 ordering service node, 1 ordering service CA
@@ -73,7 +73,7 @@ This folder contains code to create and launch networks `network1` and `network2
 | For new users, we recommend testing the Data Sharing feature first with the `simplestate` contract. To test the other modes, you can simply [tear down](#tear-down-the-setup) the Fabric networks and restart them with the appropriate chaincodes installed. |
 
 Follow the instructions below to build and launch the networks:
-- Navigate to the `tests/network-setups/fabric/dev` folder.
+- Navigate to the `weaver/tests/network-setups/fabric/dev` folder.
 - To spin up both network1 and network2 with the interoperation chaincode and the default `simplestate` chaincode installed, run:
   ```bash
   make start-interop
@@ -100,9 +100,9 @@ For more information, refer to the associated [README](https://github.com/hyperl
 ### Fabric Relay
 
 The relay is a module acting on behalf of a network, enabling interoperation flows with other networks by communicating with their relays.
-The code for this lies in the `core/relay` folder.
+The code for this lies in the `weaver/core/relay` folder.
 
-Navigate to the `core/relay` folder and run a relay as follows:
+Navigate to the `weaver/core/relay` folder and run a relay as follows:
 
 * The `docker-compose.yaml` in this folder is minimally configured with default values. To modify it for use with the Fabric testnets, run:
   ```bash
@@ -136,12 +136,12 @@ For more information, see the [relay-docker README](https://github.com/hyperledg
 ### Fabric Driver
 
 A driver is a DLT-specific plugin invoked by the relay while channelling external data queries to the local peer network and collecting a response with proofs. The Fabric driver is built as a Fabric client application on the `fabric-network` NPM package.
-The code for this lies in the `core/drivers/fabric-driver` folder.
+The code for this lies in the `weaver/core/drivers/fabric-driver` folder.
 
 Use the following steps to run Fabric drivers in Docker containers:
-- Navigate to the `core/drivers/fabric-driver` folder.
+- Navigate to the `weaver/core/drivers/fabric-driver` folder.
 * The `.env.n1` and `.env.n1.tls` files in the `docker-testnet-envs` directory contain environment variables used by the `network1` driver at startup and runtime. Edit either of these files (depending on whether you wish to start the relay with or without TLS) as follows:
-  - Replace `<PATH-TO-WEAVER>` with the absolute path of the `weaver-dlt-interoperability` clone folder.
+  - Replace `<PATH-TO-WEAVER>` with the absolute path of the `weaver` folder within your Cacti repository clone.
 * Repeat the above step for `.env.n2` or `.env.n2.tls` in `docker-testnet-envs` directory, which contain environment variables for the `network2` driver.
 * To deploy the Fabric driver for `network1` without TLS, run:
   ```bash
@@ -162,13 +162,13 @@ Use the following steps to run Fabric drivers in Docker containers:
 
 ### Fabric IIN Agent
 
-IIN Agent is a client of a member of a DLT network or security domain with special permissions to update security domain identities and configurations on the ledger via the network's interoperation module. The code for this lies in the `core/identity-management/iin-agent` folder. Navigate to the `core/identity-management/iin-agent` folder.
+IIN Agent is a client of a member of a DLT network or security domain with special permissions to update security domain identities and configurations on the ledger via the network's interoperation module. The code for this lies in the `weaver/core/identity-management/iin-agent` folder. Navigate to the `weaver/core/identity-management/iin-agent` folder.
 
 #### Deployment
 
 Use the following steps to run Fabric IIN Agents in Docker containers:
 * The `.env.n1.org1` and `.env.n1.org1.tls` files in the `docker-testnet/envs` directory contain environment variables used by the iin-agent of `org1` of `network1` at startup and runtime. Edit either of these files (depending on whether you wish to start the relay with or without TLS) as follows:
-  - Replace `<PATH-TO-WEAVER>` with the absolute path of the `weaver-dlt-interoperability` clone folder.
+  - Replace `<PATH-TO-WEAVER>` with the absolute path of the `weaver` folder within your Cacti repository clone.
   - If Fabric network was started with 1 org, and IIN Agents are to be started with TLS enabled, update the `DNS_CONFIG_PATH` variable as:
     ```
     DNS_CONFIG_PATH=./docker-testnet/configs/dnsconfig-tls.json
@@ -220,7 +220,7 @@ Use the following steps to run Fabric IIN Agents in Docker containers:
 
 The CLI is used to interact with a Fabric network, configure it and run chaincode transactions to record data on the channel ledger or query data. It is also used to interact with remote networks through the relay in order to trigger an interoperation flow for data request and acceptance.
 
-The `fabric-cli` Node.js source code is located in the `samples/fabric/fabric-cli` folder and the Golang source code in the `samples/fabric/go-cli` folder.
+The `fabric-cli` Node.js source code is located in the `weaver/samples/fabric/fabric-cli` folder and the Golang source code in the `weaver/samples/fabric/go-cli` folder.
 
 #### Prerequisites
 
@@ -233,7 +233,7 @@ If you are using a Linux system, make sure that lib64 is installed.
 #### Installation
 
 You can install `fabric-cli` as follows (for both the Node.js and Golang versions):
-- Navigate to the `samples/fabric/fabric-cli` folder or the `samples/fabric/go-cli` folder.
+- Navigate to the `weaver/samples/fabric/fabric-cli` folder (for the Node.js version) or the `weaver/samples/fabric/go-cli` folder.
 - Create `.npmrc` from template `.npmrc.template`, by replacing `<personal-access-token>` with yours created [above](#package-access-token)..
 - Run the following to install dependencies (for the Node.js version) or the executable (for the Golang version):
   ```bash
@@ -247,16 +247,16 @@ Using the sequence of instructions below, you can start a Corda network and run 
 
 ### Corda Network
 
-The Corda networks' code lies in the `tests/network-setups/corda` folder. You can launch two separate Corda networks, namely `Corda_Network` and `Corda_Network2`. Each network runs the `samples/corda/corda-simple-application` CorDapp by default, which maintains a state named `SimpleState` containing a set of key-value pairs (of strings).
+The Corda networks' code lies in the `weaver/tests/network-setups/corda` folder. You can launch two separate Corda networks, namely `Corda_Network` and `Corda_Network2`. Each network runs the `weaver/samples/corda/corda-simple-application` CorDapp by default, which maintains a state named `SimpleState` containing a set of key-value pairs (of strings).
 
-The following steps will, in addition to launching the network, build the CorDapp and a Corda client in `samples/corda/corda-simple-application/client`.
+The following steps will, in addition to launching the network, build the CorDapp and a Corda client in `weaver/samples/corda/corda-simple-application/client`.
 
-#### Running with Interoperation CorDapp from Github Packages
+#### Running with Interoperation CorDapp from GitHub Packages
 
 Follow the instructions below to build and launch the network:
-- Navigate to the `tests/network-setups/corda` folder.
+- Navigate to the `weaver/tests/network-setups/corda` folder.
 - Create copy of `github.properties.template` as `github.properties`.
-- Replace `<GITHUB email>` with your github email, and `<GITHUB Personal Access Token>` with the access token created [above](#package-access-token).
+- Replace `<GITHUB email>` with your GitHub email, and `<GITHUB Personal Access Token>` with the access token created [above](#package-access-token).
 - To spin up the Corda networks with the Interoperation CorDapps:
   - Each consisting of 1 node and a notary (for data-transfer), run:
     ```bash
@@ -285,7 +285,7 @@ Notary node services started for network <network-name>
 
 ### Corda Relay
 
-Navigate to the `core/relay` folder and run a relay for `Corda_Network` and/or `Corda_Network2` in Docker container as follows:
+Navigate to the `weaver/core/relay` folder and run a relay for `Corda_Network` and/or `Corda_Network2` in Docker container as follows:
 
 * The `docker-compose.yaml` in this folder is minimally configured with default values. To modify it for use with the Fabric testnets, run:
   ```bash
@@ -319,7 +319,7 @@ Navigate to the `core/relay` folder and run a relay for `Corda_Network` and/or `
 ### Corda Driver
 
 Use the following steps to run Corda drivers in Docker containers:
-- Navigate to the `core/drivers/corda-driver` folder.
+- Navigate to the `weaver/core/drivers/corda-driver` folder.
 - (The `.env.corda` and `.env.corda.tls` files in the `docker-testnet-envs` contain environment variables used by the `Corda_Network` driver at startup and runtime.)
 - (The `.env.corda2` and `.env.corda2.tls` files in the `docker-testnet-envs` contain environment variables used by the `Corda_Network2` driver at startup and runtime.)
 - To deploy the Corda driver for `Corda_Network` without TLS, run:
@@ -349,7 +349,7 @@ Use the following steps to run Corda drivers in Docker containers:
 
 ## Tear Down the Setup
 
-Bring down the various components as follows (_Navigate to the root folder of your clone of the Weaver repository_):
+Bring down the various components as follows (_Navigate to the `weaver` folder of your clone of the Cacti repository_):
 
 ### Relay
 To bring down the relays (for all 3 networks), run:

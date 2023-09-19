@@ -22,6 +22,8 @@ dependencies {
     cordaCompile "$corda_core_release_group:corda-core:$corda_core_release_version"
 
     testCompile "$corda_release_group:corda-node-driver:$corda_release_version"
+    
+    implementation(group: 'org.hyperledger.cacti.weaver.imodule.corda', name: 'interop-contracts', version: "$cacti_version")
 }
 
 publishing {

@@ -2,7 +2,6 @@ import fs from "fs-extra";
 import path from "path";
 import { fileURLToPath } from "url";
 import { globby, Options as GlobbyOptions } from "globby";
-// import * as globby from "globby";
 import { RuntimeError } from "run-time-error";
 import { hasProperty } from "./has-property";
 import { isStdLibRecord } from "./is-std-lib-record";
@@ -45,8 +44,62 @@ export async function checkOpenApiJsonSpecs(
   const DEFAULT_GLOB = "**/src/main/json/openapi.json";
 
   const oasPaths = await globby(DEFAULT_GLOB, globbyOpts);
-  console.log(`openapi.json paths: (${oasPaths.length}): `);
+  console.log(`${TAG} openapi.json paths: (${oasPaths.length}): `);
   // const oasPaths = oasPathsEntries.map((it) => it.path);
+
+  const defaultOpenApiSpecVersion = "3.0.3";
+  const oasVersion = !!req.env.CACTI_CUSTOM_CHECKS_REQUIRED_OPENAPI_SPEC_VERSION
+    ? req.env.CACTI_CUSTOM_CHECKS_REQUIRED_OPENAPI_SPEC_VERSION
+    : defaultOpenApiSpecVersion;
+
+  console.log(
+    "%s defaultOpenApiSpecVersion=%s",
+    TAG,
+    defaultOpenApiSpecVersion,
+  );
+  console.log(
+    "%s req.env.CACTI_CUSTOM_CHECKS_REQUIRED_OPENAPI_SPEC_VERSION=%s",
+    TAG,
+    req.env.CACTI_CUSTOM_CHECKS_REQUIRED_OPENAPI_SPEC_VERSION,
+  );
+  console.log("%s Concluded with oasVersion=%s", TAG, oasVersion);
+
+  // Quick and dirty sem-ver parsing because we don't need to care about
+  // anything after the minor number)
+  const [major, minor] = oasVersion.split(".").map((x) => parseInt(x, 10));
+
+  // License identifier field was added in 3.1.0 so we only need it if the
+  // spec version is equal or newer than that.
+  const needsLicenseId = major >= 3 && minor >= 1;
+  console.log("%s Concluded with needsLicenseId=%s", TAG, needsLicenseId);
+
+  const DEFAULT_LICENSE_SPDX = "Apache-2.0";
+  const licenseSpdx = !!req.env
+    .CACTI_CUSTOM_CHECKS_REQUIRED_OPENAPI_LICENSE_SPDX
+    ? req.env.CACTI_CUSTOM_CHECKS_REQUIRED_OPENAPI_LICENSE_SPDX
+    : DEFAULT_LICENSE_SPDX;
+
+  console.log("%s DEFAULT_LICENSE_SPDX=%s", TAG, DEFAULT_LICENSE_SPDX);
+  console.log(
+    "%s  req.env.CACTI_CUSTOM_CHECKS_REQUIRED_OPENAPI_LICENSE_SPDX=%s",
+    TAG,
+    req.env.CACTI_CUSTOM_CHECKS_REQUIRED_OPENAPI_LICENSE_SPDX,
+  );
+  console.log("%s Concluded with licenseSpdx=%s", TAG, licenseSpdx);
+
+  const DEFAULT_LICENSE_URL =
+    "https://www.apache.org/licenses/LICENSE-2.0.html";
+  const licenseUrl = !!req.env.CACTI_CUSTOM_CHECKS_REQUIRED_OPENAPI_LICENSE_URL
+    ? req.env.CACTI_CUSTOM_CHECKS_REQUIRED_OPENAPI_LICENSE_URL
+    : DEFAULT_LICENSE_URL;
+
+  console.log("%s DEFAULT_LICENSE_URL=%s", TAG, DEFAULT_LICENSE_URL);
+  console.log(
+    "%s  req.env.CACTI_CUSTOM_CHECKS_REQUIRED_OPENAPI_LICENSE_URL=%s",
+    TAG,
+    req.env.CACTI_CUSTOM_CHECKS_REQUIRED_OPENAPI_LICENSE_URL,
+  );
+  console.log("%s Concluded with licenseUrl=%s", TAG, licenseUrl);
 
   const errors: string[] = [];
 
@@ -68,22 +121,6 @@ export async function checkOpenApiJsonSpecs(
       return;
     }
 
-    const defaultOpenApiSpecVersion = "3.1.0";
-    const oasVersion =
-      !!req.env.CACTI_CUSTOM_CHECKS_REQUIRED_OPENAPI_SPEC_VERSION ||
-      defaultOpenApiSpecVersion;
-
-    const DEFAULT_LICENSE_SPDX = "Apache-2.0";
-    const licenseSpdx =
-      !!req.env.CACTI_CUSTOM_CHECKS_REQUIRED_OPENAPI_LICENSE_SPDX ||
-      DEFAULT_LICENSE_SPDX;
-
-    const DEFAULT_LICENSE_URL =
-      "https://www.apache.org/licenses/LICENSE-2.0.html";
-    const licenseUrl =
-      !!req.env.CACTI_CUSTOM_CHECKS_REQUIRED_OPENAPI_LICENSE_URL ||
-      DEFAULT_LICENSE_URL;
-
     if (!hasProperty(oas, "openapi")) {
       errors.push(`ERROR: ${oasPathRel} "openapi" must equal "${oasVersion}"`);
     } else if (oas.openapi !== oasVersion) {
@@ -95,10 +132,14 @@ export async function checkOpenApiJsonSpecs(
     } else if (!hasProperty(oas.info, "license")) {
       errors.push(`ERROR: ${oasPathRel} "info.license" must be an object`);
     } else {
-      if (!hasProperty(oas.info.license, "identifier")) {
+      if (!hasProperty(oas.info.license, "identifier") && needsLicenseId) {
         const msg = `ERROR: ${oasPathRel} "info.license.identifier" must be set`;
         errors.push(msg);
-      } else if (oas.info.license.identifier !== licenseSpdx) {
+      } else if (
+        hasProperty(oas.info.license, "identifier") &&
+        oas.info.license.identifier !== licenseSpdx &&
+        needsLicenseId
+      ) {
         const msg = `ERROR: ${oasPathRel} "info.license.identifier" must be ${licenseSpdx}`;
         errors.push(msg);
       }

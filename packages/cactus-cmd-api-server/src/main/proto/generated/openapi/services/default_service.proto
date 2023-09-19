@@ -18,8 +18,14 @@ import "models/health_check_response_pb.proto";
 service DefaultService {
   rpc GetHealthCheckV1 (google.protobuf.Empty) returns (HealthCheckResponsePB);
 
+  rpc GetOpenApiSpecV1 (google.protobuf.Empty) returns (GetOpenApiSpecV1Response);
+
   rpc GetPrometheusMetricsV1 (google.protobuf.Empty) returns (GetPrometheusMetricsV1Response);
 
+}
+
+message GetOpenApiSpecV1Response {
+  string data = 1;
 }
 
 message GetPrometheusMetricsV1Response {

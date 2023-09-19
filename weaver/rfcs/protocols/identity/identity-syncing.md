@@ -120,7 +120,7 @@ A security domain creates its own DID record in an IIN registry. The Security Do
 
 Creation of a Security Domain DID involves the following steps:
 
-**Step 1. Creating Securtiy Domain DID Document**
+**Step 1. Creating Security Domain DID Document**
 
 In addition to the typical fields found in a DID Document, a Security Domain DID document must contain a `verificationMethod` of type `BlockchainNetworkMultiSig`, and `networkMembers` property listing the DIDs of the network's members. This method defines the group controller of the Security Domain DID.
 
@@ -128,7 +128,7 @@ Each member in `networkMembers` must already have a registered DID in some IIN r
 
 The unique identity in the DID document, i.e., the `id` property, can be chosen by the network.
 
-See the [Security Domain DID Identity format specs](../../formats/identity.md) for more details.
+See the [Security Domain DID Identity format specs](../../formats/network/identity.md) for more details.
 
 
 

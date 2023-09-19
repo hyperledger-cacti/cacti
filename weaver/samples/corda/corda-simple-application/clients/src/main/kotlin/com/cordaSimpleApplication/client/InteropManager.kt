@@ -12,17 +12,20 @@ import arrow.core.Right
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.parameters.arguments.argument
+import com.github.ajalt.clikt.parameters.options.option
 import io.grpc.ManagedChannelBuilder
 import java.lang.Exception
 import kotlinx.coroutines.*
 import net.corda.core.messaging.startFlow
 import java.util.*
 import net.corda.core.identity.Party
+import net.corda.core.transactions.SignedTransaction
 
 import com.cordaSimpleApplication.flow.CreateState
 import com.cordaSimpleApplication.state.SimpleState
 
 import org.hyperledger.cacti.weaver.sdk.corda.InteroperableHelper
+import org.hyperledger.cacti.weaver.sdk.corda.RelayOptions
 
 /**
  * The CLI command used to trigger a request for state from an external network.
@@ -39,6 +42,7 @@ import org.hyperledger.cacti.weaver.sdk.corda.InteroperableHelper
  */
 class RequestStateCommand : CliktCommand(help = "Requests state from a foreign network. " +
         "Requires the port number for the local relay and remote relay name") {
+    val key: String? by option("-wk", "--wkey", help="key to write the external state") 
     val localRelayAddress: String by argument()
     val externalStateAddress: String by argument()
     val config by requireObject<Map<String, String>>()
@@ -50,32 +54,39 @@ class RequestStateCommand : CliktCommand(help = "Requests state from a foreign n
                 password = "test",
                 rpcPort = config["CORDA_PORT"]!!.toInt())
         try {
+            val relayOptions = RelayOptions(
+                useTlsForRelay = config["RELAY_TLS"]!!.toBoolean(),
+                relayTlsTrustStorePath = config["RELAY_TLSCA_TRUST_STORE"]!!,
+                relayTlsTrustStorePassword = config["RELAY_TLSCA_TRUST_STORE_PASSWORD"]!!,
+                tlsCACertPathsForRelay = config["RELAY_TLSCA_CERT_PATHS"]!!
+            )
+            val k: String = if (key != null) {
+                key!!
+            } else {
+                "external_state"
+            }
+            val args: List<Any> = listOf<Any>(k, arrayOf<String>())
             InteroperableHelper.interopFlow(
-                rpc.proxy, 
-                localRelayAddress, 
-                externalStateAddress,
+                rpc.proxy,
+                arrayOf(externalStateAddress),
+                localRelayAddress,
                 networkName,
-                listOf<Party>(),
-                config["RELAY_TLS"]!!.toBoolean(),
-                config["RELAY_TLSCA_TRUST_STORE"]!!,
-                config["RELAY_TLSCA_TRUST_STORE_PASSWORD"]!!,
-                config["RELAY_TLSCA_CERT_PATHS"]!!
+                false,
+                "com.cordaSimpleApplication.flow.CreateFromExternalState",
+                args,
+                1,
+                externalStateParticipants = listOf<Party>(),
+                relayOptions = relayOptions
             ).fold({
                 println("Error in Interop Flow: ${it.message}")
             }, {
-                val linearId = it.toString()
-                println("Interop flow successful and external-state was stored with linearId $linearId.\n")
-                val value = InteroperableHelper.getExternalStatePayloadString(
-                                rpc.proxy, 
-                                linearId
-                            )
-        		val key = externalStateAddress.split(":").last()
-        		val createdState = rpc.proxy.startFlow(::CreateState, key, value)
-                            .returnValue.get().tx.outputStates.first() as SimpleState
-        		println("Created simplestate: ${createdState}")
+                println("Successful response: ${it}")
+                val stx = it as SignedTransaction
+                val createdState = stx.tx.outputStates.first() as SimpleState
+                println("Created simplestate: ${createdState}")
             })
         } catch (e: Exception) {
-            println("Error: ${e.toString()}")
+            println("Error in request state: ${e.toString()}")
         } finally {
             rpc.close()
         }

@@ -18,6 +18,7 @@ import java.util.*
 
 import org.hyperledger.cacti.weaver.imodule.corda.flows.HandleExternalRequest
 import org.hyperledger.cacti.weaver.sdk.corda.InteroperableHelper
+import org.hyperledger.cacti.weaver.sdk.corda.RelayOptions
 import org.hyperledger.cacti.weaver.protos.common.query.QueryOuterClass
 import org.hyperledger.cacti.weaver.protos.common.state.State
 import org.hyperledger.cacti.weaver.protos.corda.ViewDataOuterClass
@@ -143,13 +144,16 @@ fun createAggregatedCordaView(views: List<State.View>) : Either<Error, State.Vie
 fun createGrpcConnection(address: String) = try {
     parseRelayAddress(address).map { relayAddresses ->
     // TODO: if the first relay address fails, retry with other relay addresses in the list.
+        val relayOptions = RelayOptions(
+            useTlsForRelay = System.getenv("RELAY_TLS")?.toBoolean() ?: false,
+            relayTlsTrustStorePath = System.getenv("RELAY_TLSCA_TRUST_STORE")?.toString() ?: "",
+            relayTlsTrustStorePassword = System.getenv("RELAY_TLSCA_TRUST_STORE_PASSWORD")?.toString() ?: "",
+            tlsCACertPathsForRelay = System.getenv("RELAY_TLSCA_CERT_PATHS")?.toString() ?: ""
+        )
         val channel = InteroperableHelper.getChannelToRelay(
                 relayAddresses[0].host,
                 relayAddresses[0].port,
-                System.getenv("RELAY_TLS")?.toBoolean() ?: false,
-                System.getenv("RELAY_TLSCA_TRUST_STORE")?.toString() ?: "",
-                System.getenv("RELAY_TLSCA_TRUST_STORE_PASSWORD")?.toString() ?: "",
-                System.getenv("RELAY_TLSCA_CERT_PATHS")?.toString() ?: "")
+                relayOptions)
         GrpcClient(channel)
     }
 } catch (e: Exception) {

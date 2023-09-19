@@ -55,6 +55,7 @@
   "scripts": {
     "codegen": "run-p 'codegen:*'",
     "codegen:openapi": "npm run generate-sdk",
+    "compile-contracts": "forge build",
     "generate-sdk": "run-p 'generate-sdk:*'",
     "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
     "lint": "solhint --fix",
@@ -62,8 +63,7 @@
     "webpack": "npm-run-all webpack:dev",
     "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
     "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
-    "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js",
-    "compile-contracts": "forge build"
+    "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
     "@hyperledger/cactus-common": "2.0.0-alpha.1",
@@ -80,7 +80,7 @@
     "joi": "17.9.1",
     "openapi-types": "9.1.0",
     "typescript-optional": "2.0.1",
-    "web3js-quorum": "21.7.0-rc1"
+    "web3js-quorum": "22.4.0"
   },
   "devDependencies": {
     "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-alpha.1",

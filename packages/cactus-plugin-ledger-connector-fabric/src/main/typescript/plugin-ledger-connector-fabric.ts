@@ -1534,6 +1534,7 @@ export class PluginLedgerConnectorFabric
    * @returns Entire block object or encoded buffer (if req.skipDecode is true)
    */
   public async getBlock(req: GetBlockRequestV1): Promise<GetBlockResponseV1> {
+    const fnTag = `${this.className}:getBlock(req: GetBlockRequestV1)`;
     this.log.debug(
       "getBlock() called, channelName:",
       req.channelName,
@@ -1590,14 +1591,20 @@ export class PluginLedgerConnectorFabric
       );
     }
 
-    if (!responseData) {
-      throw new Error("Could not retrieve block data (got empty response)");
-    }
     this.log.debug("responseData:", responseData);
+    if (!responseData) {
+      const eMsg = `${fnTag} - expected string as GetBlockByTxID response from Fabric system chaincode but received a falsy value instead...`;
+      throw new RuntimeError(eMsg);
+    }
 
     if (skipDecode) {
+      if (!(responseData instanceof Buffer)) {
+        const eMsg = `${fnTag} - expected Buffer as GetBlockByTxID response from Fabric system chaincode but received ${typeof responseData} instead...`;
+        throw new RuntimeError(eMsg);
+      }
+      const encodedBlockB64 = responseData.toString("base64");
       return {
-        encodedBlock: responseData,
+        encodedBlock: encodedBlockB64,
       };
     }
 

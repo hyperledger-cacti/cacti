@@ -1,3 +1,7 @@
+// Copyright IBM Corp. All Rights Reserved.
+//
+// SPDX-License-Identifier: Apache-2.0
+
 use weaverpb::common::ack::{ack};
 use weaverpb::common::query::Query;
 use weaverpb::common::state::{request_state, RequestState};

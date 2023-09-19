@@ -1,3 +1,9 @@
+/*
+ * Copyright IBM Corp. All Rights Reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 const promisify = require('util').promisify
 const sleep = promisify(require('timers').setTimeout)
 const fs = require('fs')

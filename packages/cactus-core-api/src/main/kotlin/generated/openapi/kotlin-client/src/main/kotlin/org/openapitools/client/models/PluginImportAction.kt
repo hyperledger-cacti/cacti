@@ -17,6 +17,7 @@ package org.openapitools.client.models
 
 
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 /**
  * 
@@ -24,6 +25,7 @@ import com.squareup.moshi.Json
  * Values: iNSTANTIATE,iNSTALL
  */
 
+@JsonClass(generateAdapter = false)
 enum class PluginImportAction(val value: kotlin.String) {
 
     @Json(name = "org.hyperledger.cactus.plugin_import_action.INSTANTIATE")
@@ -33,7 +35,7 @@ enum class PluginImportAction(val value: kotlin.String) {
     iNSTALL("org.hyperledger.cactus.plugin_import_action.INSTALL");
 
     /**
-     * Override toString() to avoid using the enum variable name as the value, and instead use
+     * Override [toString()] to avoid using the enum variable name as the value, and instead use
      * the actual value defined in the API spec file.
      *
      * This solves a problem when the variable name and its value are different, and ensures that
