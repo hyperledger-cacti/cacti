@@ -783,7 +783,7 @@ export class ApiServer {
         !unprotectedEndpointExemptions.some((pt) => nse.getPath().match(pt)),
     );
     if (nonExempts.length > 0) {
-      const csv = nonExempts.join(", ");
+      const csv = nonExempts.map((ep) => ep.getPath()).join(", ");
       const { E_NON_EXEMPT_UNPROTECTED_ENDPOINTS } = ApiServer;
       throw new Error(`${E_NON_EXEMPT_UNPROTECTED_ENDPOINTS} ${csv}`);
     }
