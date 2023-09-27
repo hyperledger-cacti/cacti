@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-plugin-ledger-connector-fabric-socketio",
-  "version": "2.0.0-alpha.1",
+  "version": "2.0.0-alpha.2",
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -14,8 +14,8 @@
     "start": "cd ./dist && node common/core/bin/www.js"
   },
   "dependencies": {
-    "@hyperledger/cactus-cmd-socketio-server": "2.0.0-alpha.1",
-    "@hyperledger/cactus-common": "2.0.0-alpha.1",
+    "@hyperledger/cactus-cmd-socketio-server": "2.0.0-alpha.2",
+    "@hyperledger/cactus-common": "2.0.0-alpha.2",
     "@types/node": "14.18.54",
     "body-parser": "1.17.2",
     "cookie-parser": "1.4.6",
@@ -37,8 +37,8 @@
     "socket.io": "4.5.4"
   },
   "devDependencies": {
-    "@hyperledger/cactus-api-client": "2.0.0-alpha.1",
-    "@hyperledger/cactus-test-tooling": "2.0.0-alpha.1",
+    "@hyperledger/cactus-api-client": "2.0.0-alpha.2",
+    "@hyperledger/cactus-test-tooling": "2.0.0-alpha.2",
     "@types/config": "0.0.41",
     "@types/cookie-parser": "1.4.3",
     "@types/elliptic": "6.4.14",

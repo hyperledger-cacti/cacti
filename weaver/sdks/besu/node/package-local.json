@@ -1,7 +1,7 @@
 {
   "name": "@hyperledger/cacti-weaver-sdk-besu",
   "description": "Supplemental library for Web3JS based Besu client applications to enable interoperability using Weaver",
-  "version": "2.0.0-alpha.1",
+  "version": "2.0.0-alpha.2",
   "main": "build/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

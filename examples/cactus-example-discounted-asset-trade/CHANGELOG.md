@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0-alpha.2](https://github.com/hyperledger/cacti/compare/v2.0.0-alpha.1...v2.0.0-alpha.2) (2023-09-27)
+
+### Bug Fixes
+
+* **indy-validator:** fix package dependencies ([a28641a](https://github.com/hyperledger/cacti/commit/a28641ae47bd686af76d85ac22bcc84548211c59)), closes [#2596](https://github.com/hyperledger/cacti/issues/2596)
+* **security:** the CVE-2022-2421 - upgrade socket.io-parser to >=4.2.1 ([9172172](https://github.com/hyperledger/cacti/commit/917217227a3fa53a00429f047cd6318862e6ab8d)), closes [#2229](https://github.com/hyperledger/cacti/issues/2229) [#2228](https://github.com/hyperledger/cacti/issues/2228)
+
 # [2.0.0-alpha.1](https://github.com/hyperledger/cacti/compare/v2.0.0-alpha-prerelease...v2.0.0-alpha.1) (2023-05-19)
 
 **Note:** Version bump only for package @hyperledger/cactus-example-discounted-asset-trade

@@ -41,3 +41,5 @@ gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8
 gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
 gopkg.in/yaml.v3 v3.0.0 h1:hjy8E9ON/egN1tAYqKb61G10WtihqetD4sz2H+8nIeA=
 gopkg.in/yaml.v3 v3.0.0/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
+github.com/hyperledger/cacti/weaver/common/protos-go/v2 v2.0.0-alpha.2 h1:RCScZbqnxdX1RDrp4HATGXs8Pbh2yLI6F6ULjAjTUso=
+github.com/hyperledger/cacti/weaver/common/protos-go/v2 v2.0.0-alpha.2/go.mod h1:3DmkYfZoc+TtcAgF3kX6CmQDNKKKCHgbaoQuYu/3ayc=

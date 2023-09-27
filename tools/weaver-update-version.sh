@@ -62,6 +62,11 @@ for MODULE in ${CARGO_FILES[@]}; do
   popd > /dev/null
 done
 
+## Update Cargo.lock in relay
+pushd $ROOT_DIR/weaver/core/relay > /dev/null
+make build-local
+popd > /dev/null
+
 # Dependencies
 
 ## Node - Lerna handles it

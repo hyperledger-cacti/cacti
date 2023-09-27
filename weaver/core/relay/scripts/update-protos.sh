@@ -10,13 +10,13 @@ if [ -z $WEAVER_ROOT ]; then
 fi
 
 comment () {
-    sed -i'.scriptbak' -e "$1"' s/^weaver_protos_rs/# weaver_protos_rs/' "$2"
+    sed -i'.scriptbak' -e "$1"' s/^cacti_weaver_protos_rs/# cacti_weaver_protos_rs/' "$2"
 }
 uncomment() {
-    sed -i'.scriptbak' -e "$1"' s/^# weaver_protos_rs/weaver_protos_rs/' "$2"
+    sed -i'.scriptbak' -e "$1"' s/^# cacti_weaver_protos_rs/cacti_weaver_protos_rs/' "$2"
 }
 
-lineNum="$(grep -n "weaver_protos_rs" Cargo.toml | head -n 1 | cut -d: -f1)"
+lineNum="$(grep -n "cacti_weaver_protos_rs" Cargo.toml | head -n 1 | cut -d: -f1)"
 
 if [ "$1" = "local" ]; then
     rm -rf protos-rs

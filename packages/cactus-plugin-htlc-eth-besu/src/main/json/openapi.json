@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "Hyperledger Cactus Plugin - HTLC-ETH Besu",
-    "version": "v2.0.0-alpha.1",
+    "version": "v2.0.0-alpha.2",
     "license": {
       "name": "Apache-2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
@@ -59,7 +59,7 @@
             "nullable": false
           },
           "web3SigningCredential": {
-            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.1/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/Web3SigningCredential"
+            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.2/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/Web3SigningCredential"
           },
           "keychainId": {
             "description": "keychainId for the keychian plugin",
@@ -94,7 +94,7 @@
             "nullable": false
           },
           "web3SigningCredential": {
-            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.1/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/Web3SigningCredential"
+            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.2/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/Web3SigningCredential"
           },
           "connectorId": {
             "description": "connectorId for the connector besu plugin",
@@ -141,7 +141,7 @@
           },
           "web3SigningCredential": {
             "description": "Web3SigningCredentialType",
-            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.1/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/Web3SigningCredential",
+            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.2/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/Web3SigningCredential",
             "nullable": false
           },
           "connectorId": {
@@ -193,7 +193,7 @@
           },
           "web3SigningCredential": {
             "description": "Web3SigningCredential",
-            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.1/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/Web3SigningCredential",
+            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.2/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/Web3SigningCredential",
             "nullable": false
           },
           "gas": {
@@ -218,7 +218,7 @@
             }
           },
           "web3SigningCredential": {
-            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.1/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/Web3SigningCredential"
+            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.2/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/Web3SigningCredential"
           },
           "connectorId": {
             "type": "string"
@@ -242,7 +242,7 @@
             "type": "string"
           },
           "web3SigningCredential": {
-            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.1/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/Web3SigningCredential"
+            "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.2/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/Web3SigningCredential"
           },
           "connectorId": {
             "type": "string"
@@ -306,7 +306,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.1/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/InvokeContractV1Response"
+                  "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.2/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/InvokeContractV1Response"
                 }
               }
             }
@@ -338,7 +338,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.1/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/InvokeContractV1Response"
+                  "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.2/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/InvokeContractV1Response"
                 }
               }
             }
@@ -371,7 +371,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.1/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/InvokeContractV1Response"
+                  "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.2/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/InvokeContractV1Response"
                 }
               }
             }
@@ -455,7 +455,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.1/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/RunTransactionResponse"
+                  "$ref": "https://raw.githubusercontent.com/hyperledger/cactus/v2.0.0-alpha.2/packages/cactus-plugin-ledger-connector-besu/src/main/json/openapi.json#/components/schemas/RunTransactionResponse"
                 }
               }
             }

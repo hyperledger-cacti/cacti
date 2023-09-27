@@ -208,7 +208,7 @@ async function bumpOpenApiSpecDepVersionsOneFile(
     throw new RuntimeError(`Could not locate .prettierrc.js in project dir`);
   }
   const prettierOpts = { ...prettierCfg, parser: "json" };
-  const prettyJson = prettier.format(specAsJsonString, prettierOpts);
+  const prettyJson = await prettier.format(specAsJsonString, prettierOpts);
 
   if (replacements.length > 0) {
     console.log(`${TAG} writing changes to disk or ${filePathRel}`);
