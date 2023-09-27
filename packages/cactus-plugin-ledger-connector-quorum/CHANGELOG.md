@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0-alpha.2](https://github.com/hyperledger/cacti/compare/v2.0.0-alpha.1...v2.0.0-alpha.2) (2023-09-27)
+
+### Bug Fixes
+
+* **security:** crash in HeaderParser in dicer ([77fb559](https://github.com/hyperledger/cacti/commit/77fb559532448aae45cfe704da2637119bf93c27))
+* use common conventions: tsconfig.json, package.json ([50f5c02](https://github.com/hyperledger/cacti/commit/50f5c02190ba28b77492c09e81f5d5ba6578e862)), closes [#2216](https://github.com/hyperledger/cacti/issues/2216)
+
+### Features
+
+* **connector-quorum:** add WebsocketProvider options to quorum LP ([b7ad571](https://github.com/hyperledger/cacti/commit/b7ad571e77c6b9e2abb2b5ab8ecd7ffb93172747))
+* **openapi:** upgrade to 6.3.0 phase1 ([a094614](https://github.com/hyperledger/cacti/commit/a094614877d6043a6e3e8c0b3e95203eed7d6203)), closes [#2298](https://github.com/hyperledger/cacti/issues/2298)
+* **quorum-connector:** add script for checking connection status ([d306d21](https://github.com/hyperledger/cacti/commit/d306d211ebaa30b700dce4277c09531ba88d7952)), closes [#2309](https://github.com/hyperledger/cacti/issues/2309)
+* **quorum:** private transaction support ([3c944d6](https://github.com/hyperledger/cacti/commit/3c944d601d5824eaf3cc6a9a8af1f8a6e5fe6db3))
+
 # [2.0.0-alpha.1](https://github.com/hyperledger/cacti/compare/v2.0.0-alpha-prerelease...v2.0.0-alpha.1) (2023-05-19)
 
 **Note:** Version bump only for package @hyperledger/cactus-plugin-ledger-connector-quorum

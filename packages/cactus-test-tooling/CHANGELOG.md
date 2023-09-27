@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0-alpha.2](https://github.com/hyperledger/cactus/compare/v2.0.0-alpha.1...v2.0.0-alpha.2) (2023-09-27)
+
+### Bug Fixes
+
+* **security:** upgrade fabric 2.x deps to 2.2.18 ([36988a5](https://github.com/hyperledger/cactus/commit/36988a5edbf9856a1bcc960a3b9afe443536733e)), closes [#2610](https://github.com/hyperledger/cactus/issues/2610)
+* use common conventions: tsconfig.json, package.json ([50f5c02](https://github.com/hyperledger/cactus/commit/50f5c02190ba28b77492c09e81f5d5ba6578e862)), closes [#2216](https://github.com/hyperledger/cactus/issues/2216)
+
+### Features
+
+* **besu-test-ledger:** send funds to already created address ([3a58508](https://github.com/hyperledger/cactus/commit/3a585085b4510d9755e1d70314187293cbe51222)), closes [#2250](https://github.com/hyperledger/cactus/issues/2250)
+* **cbdc-bridging-app:** implementation of CBDC bridging example ([ca1b3be](https://github.com/hyperledger/cactus/commit/ca1b3be87bcc3242790647a71be8eb5db3dcd931)), closes [#2205](https://github.com/hyperledger/cactus/issues/2205)
+* **connector-iroha2:** update to the new LTS image as of 28.07.2023 ([ccdaa12](https://github.com/hyperledger/cactus/commit/ccdaa1254cb4d46cc6a0af2c0472f3838603123f))
+* **connector-quorum:** add WebsocketProvider options to quorum LP ([b7ad571](https://github.com/hyperledger/cactus/commit/b7ad571e77c6b9e2abb2b5ab8ecd7ffb93172747))
+* **fabric-test-ledger:** add support to enrolling users in different Orgs ([b910681](https://github.com/hyperledger/cactus/commit/b9106810db11a2af19c8c06d6be39d2648f96fba)), closes [#2248](https://github.com/hyperledger/cactus/issues/2248)
+* **quorum:** private transaction support ([3c944d6](https://github.com/hyperledger/cactus/commit/3c944d601d5824eaf3cc6a9a8af1f8a6e5fe6db3))
+
 # [2.0.0-alpha.1](https://github.com/hyperledger/cacti/compare/v2.0.0-alpha-prerelease...v2.0.0-alpha.1) (2023-05-19)
 
 **Note:** Version bump only for package @hyperledger/cactus-test-tooling

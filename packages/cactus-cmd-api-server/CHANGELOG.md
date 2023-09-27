@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0-alpha.2](https://github.com/hyperledger/cacti/compare/v2.0.0-alpha.1...v2.0.0-alpha.2) (2023-09-27)
+
+### Bug Fixes
+
+* **cmd-api-server:** fix CVE-2023-36665 protobufjs Prototype Pollution vuln ([7bb3957](https://github.com/hyperledger/cacti/commit/7bb39576080592919bea0ac89646b32105e1748e)), closes [#2682](https://github.com/hyperledger/cacti/issues/2682)
+* **security:** crash in HeaderParser in dicer ([77fb559](https://github.com/hyperledger/cacti/commit/77fb559532448aae45cfe704da2637119bf93c27))
+* **security:** the CVE-2022-2421 - upgrade socket.io-parser to >=4.2.1 ([9172172](https://github.com/hyperledger/cacti/commit/917217227a3fa53a00429f047cd6318862e6ab8d)), closes [#2229](https://github.com/hyperledger/cacti/issues/2229) [#2228](https://github.com/hyperledger/cacti/issues/2228)
+* use common conventions: tsconfig.json, package.json ([50f5c02](https://github.com/hyperledger/cacti/commit/50f5c02190ba28b77492c09e81f5d5ba6578e862)), closes [#2216](https://github.com/hyperledger/cacti/issues/2216)
+
+### Code Refactoring
+
+* **cmd-api-server:** clean up configuration parameters [#720](https://github.com/hyperledger/cacti/issues/720) ([b8e8388](https://github.com/hyperledger/cacti/commit/b8e8388306b6708c7d3156e005b1ee9693b35a22))
+
+### Features
+
+* **cactus-common:** add createRuntimeErrorWithCause() & newRex() ([b3a508c](https://github.com/hyperledger/cacti/commit/b3a508c9a080e00a5e39ffa352a38e785b8cea9c)), closes [#1702](https://github.com/hyperledger/cacti/issues/1702)
+* **cmd-api-server:** add GetOpenApiSpecV1Endpoint (HTTP GET) ([aeebbd4](https://github.com/hyperledger/cacti/commit/aeebbd4d86cb62f8d1d53fded65ae40eb5e27910))
+* **openapi:** upgrade to 6.3.0 phase1 ([a094614](https://github.com/hyperledger/cacti/commit/a094614877d6043a6e3e8c0b3e95203eed7d6203)), closes [#2298](https://github.com/hyperledger/cacti/issues/2298)
+
+### BREAKING CHANGES
+
+* **cmd-api-server:** Removed the `keyPairPem` parameter from the API server
+configuration.
+
 # [2.0.0-alpha.1](https://github.com/hyperledger/cacti/compare/v2.0.0-alpha-prerelease...v2.0.0-alpha.1) (2023-05-19)
 
 **Note:** Version bump only for package @hyperledger/cactus-cmd-api-server

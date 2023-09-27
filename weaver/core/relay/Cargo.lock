@@ -160,9 +160,7 @@ checksum = "89b2fd2a0dcf38d7971e2194b6b6eebab45ae01067456a7fd93d5547a61b70be"
 
 [[package]]
 name = "cacti_weaver_protos_rs"
-version = "2.0.0-alpha-prerelease"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b624ae96a5a9265e603855d3a69555dad230ee98c9da57eaa71547a4d2b8d26d"
+version = "2.0.0-alpha.2"
 dependencies = [
  "prost",
  "serde 1.0.159",
@@ -1096,7 +1094,7 @@ checksum = "f162c6dd7b008981e4d40210aca20b4bd0f9b60ca9271061b07f78537722f2e1"
 
 [[package]]
 name = "relay"
-version = "2.0.0-alpha.1"
+version = "2.0.0-alpha.2"
 dependencies = [
  "base64 0.20.0",
  "bincode",

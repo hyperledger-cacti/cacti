@@ -22,8 +22,9 @@ RUN npm ci --only=production
 
 FROM node:16-alpine AS prod
 
-RUN addgroup -g 1001 iinagent
-RUN adduser -D -s /bin/sh -u 1001 -G iinagent iinagent
+RUN deluser --remove-home node
+RUN addgroup -g 1000 iinagent
+RUN adduser -D -s /bin/sh -u 1000 -G iinagent iinagent
 
 ENV NODE_ENV production
 
