@@ -42,3 +42,5 @@ export {
   LedgerEvent,
   IVerifierEventListener,
 } from "./client/i-verifier";
+
+export { ISendRequestResultV1 } from "./plugin/ledger-connector/i-send-request-response-v1";
