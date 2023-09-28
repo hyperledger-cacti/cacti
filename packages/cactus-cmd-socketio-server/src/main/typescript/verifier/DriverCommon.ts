@@ -17,7 +17,7 @@ const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;
 
 // for debug
-export function json2str(jsonObj: object) {
+export function json2str(jsonObj: unknown) {
   try {
     return JSON.stringify(jsonObj);
   } catch (error) {

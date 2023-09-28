@@ -10,6 +10,7 @@ import {
   LPInfoHolder,
   TransactionSigner,
 } from "@hyperledger/cactus-cmd-socketio-server";
+import { ISendRequestResultV1 } from "@hyperledger/cactus-core-api";
 
 import {
   VerifierFactory,
@@ -95,8 +96,13 @@ function getNewNonce(fromAddress: string): Promise<{ txnCountHex: string }> {
         .getVerifier("84jUisrs")
         .sendSyncRequest(contract, method, args)
         .then((result) => {
-          let txnCount: number = result.data.nonce;
-          let txnCountHex: string = result.data.nonceHex;
+          const res1 = result as ISendRequestResultV1<{
+            readonly nonce: number;
+            readonly nonceHex: string;
+          }>;
+
+          let txnCount = res1.data.nonce;
+          let txnCountHex: string = res1.data.nonceHex;
 
           const latestNonce = getLatestNonce(fromAddress);
           if (latestNonce) {
@@ -115,11 +121,14 @@ function getNewNonce(fromAddress: string): Promise<{ txnCountHex: string }> {
                 .getVerifier("84jUisrs")
                 .sendSyncRequest(contract, method, args)
                 .then((result) => {
-                  txnCountHex = result.data.hexStr;
+                  const res2 = result as ISendRequestResultV1<{
+                    readonly hexStr: string;
+                  }>;
+                  txnCountHex = res2.data.hexStr;
                   logger.debug(`##getNewNonce(E): txnCountHex: ${txnCountHex}`);
                   setLatestNonce(fromAddress, txnCount);
 
-                  return resolve({ txnCountHex: txnCountHex });
+                  return resolve({ txnCountHex });
                 });
             } else {
               setLatestNonce(fromAddress, txnCount);

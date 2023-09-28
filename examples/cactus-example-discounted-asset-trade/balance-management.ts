@@ -7,12 +7,13 @@
 
 import { LPInfoHolder } from "@hyperledger/cactus-cmd-socketio-server";
 import { ConfigUtil } from "@hyperledger/cactus-cmd-socketio-server";
+import { ISendRequestResultV1 } from "@hyperledger/cactus-core-api";
 import {
   VerifierFactory,
   VerifierFactoryConfig,
 } from "@hyperledger/cactus-verifier-client";
 
-const config: any = ConfigUtil.getConfig() as any;
+const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
 const moduleName = "BalanceManagement";
 const logger = getLogger(`${moduleName}`);
@@ -30,9 +31,7 @@ export class BalanceManagement {
     );
   }
 
-  getBalance(
-    account: string,
-  ): Promise<{
+  getBalance(account: string): Promise<{
     status: number;
     amount: number;
   }> {
@@ -47,9 +46,10 @@ export class BalanceManagement {
         .getVerifier("84jUisrs")
         .sendSyncRequest(contract, method, args)
         .then((result) => {
+          const res1 = result as ISendRequestResultV1<string>;
           const response = {
-            status: result.status,
-            amount: parseFloat(result.data),
+            status: res1.status,
+            amount: parseFloat(res1.data),
           };
           resolve(response);
         })

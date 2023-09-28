@@ -9,6 +9,7 @@ import {
   LPInfoHolder,
   ConfigUtil,
 } from "@hyperledger/cactus-cmd-socketio-server";
+import { ISendRequestResultV1 } from "@hyperledger/cactus-core-api";
 
 import {
   VerifierFactory,
@@ -77,7 +78,7 @@ function sendRequest(
         .getVerifier("3PfTJw8g")
         .sendSyncRequest(contract, method, args)
         .then((result) => {
-          return resolve(result);
+          return resolve(result as ISendRequestResultV1<Array<string>>);
         });
     } catch (err) {
       logger.error(err);

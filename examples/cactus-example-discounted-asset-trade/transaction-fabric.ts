@@ -16,7 +16,10 @@
  */
 
 import { ConfigUtil } from "@hyperledger/cactus-cmd-socketio-server";
-import { ISocketApiClient } from "@hyperledger/cactus-core-api";
+import {
+  ISendRequestResultV1,
+  ISocketApiClient,
+} from "@hyperledger/cactus-core-api";
 import { Verifier } from "@hyperledger/cactus-verifier-client";
 import { signProposal } from "./sign-utils";
 
@@ -57,9 +60,14 @@ export function makeSignedProposal<T extends ISocketApiClient<unknown>>(
 
       const submitterExists = await wallet.exists(submitter);
       if (submitterExists) {
-        const submitterIdentity = await wallet.export(submitter);
-        certPem = (submitterIdentity as any).certificate;
-        privateKeyPem = (submitterIdentity as any).privateKey;
+        const submitterIdentity = (await wallet.export(
+          submitter,
+        )) as unknown as {
+          readonly certificate: string;
+          readonly privateKey: string;
+        };
+        certPem = submitterIdentity.certificate;
+        privateKeyPem = submitterIdentity.privateKey;
       }
 
       if (!certPem || !privateKeyPem) {
@@ -84,11 +92,15 @@ export function makeSignedProposal<T extends ISocketApiClient<unknown>>(
       };
 
       logger.debug("Sending fabric.generateUnsignedProposal");
-      const responseUnsignedProp = await verifierFabric.sendSyncRequest(
+      const responseUnsignedProp = (await verifierFabric.sendSyncRequest(
         contractUnsignedProp,
         methodUnsignedProp,
         argsUnsignedProp,
-      );
+      )) as ISendRequestResultV1<{
+        readonly proposalBuffer: Buffer;
+        readonly proposal: unknown;
+        readonly txId: string;
+      }>;
       const proposalBuffer = Buffer.from(
         responseUnsignedProp.data.proposalBuffer,
       );
@@ -113,11 +125,14 @@ export function makeSignedProposal<T extends ISocketApiClient<unknown>>(
       };
 
       logger.debug("Sending fabric.sendSignedProposalV2");
-      const responseSignedEndorse = await verifierFabric.sendSyncRequest(
+      const responseSignedEndorse = (await verifierFabric.sendSyncRequest(
         contractSignedProposal,
         methodSignedProposal,
         argsSignedProposal,
-      );
+      )) as ISendRequestResultV1<{
+        readonly endorsmentStatus: string;
+        readonly proposalResponses: unknown;
+      }>;
 
       if (!responseSignedEndorse.data.endorsmentStatus) {
         throw new Error("Fabric TX endorsment was not OK.");
@@ -140,11 +155,13 @@ export function makeSignedProposal<T extends ISocketApiClient<unknown>>(
       };
 
       logger.debug("Sending fabric.generateUnsignedTransaction");
-      const responseUnsignedTx = await verifierFabric.sendSyncRequest(
+      const responseUnsignedTx = (await verifierFabric.sendSyncRequest(
         contractUnsignedTx,
         methodUnsignedTx,
         argsUnsignedTx,
-      );
+      )) as ISendRequestResultV1<{
+        readonly txProposalBuffer: Buffer;
+      }>;
 
       const commitProposalBuffer = Buffer.from(
         responseUnsignedTx.data.txProposalBuffer,
