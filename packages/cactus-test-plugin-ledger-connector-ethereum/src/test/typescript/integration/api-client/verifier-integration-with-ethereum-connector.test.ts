@@ -29,6 +29,7 @@ import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory
 import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
 import {
   ICactusPlugin,
+  ISendRequestResultV1,
   IVerifierEventListener,
   LedgerEvent,
 } from "@hyperledger/cactus-core-api";
@@ -280,7 +281,7 @@ describe("Verifier integration with ethereum connector tests", () => {
         correctContract,
         correctMethod,
         correctArgs,
-      );
+      ) as ISendRequestResultV1<void>;
       expect(resultCorrect.status).toEqual(200);
 
       // Failing: Missing contract ABI
@@ -367,7 +368,7 @@ describe("Verifier integration with ethereum connector tests", () => {
         contractCommon,
         methodSend,
         argsSend,
-      );
+      ) as ISendRequestResultV1<{ readonly status: string }>;
       expect(resultsSend.status).toEqual(200);
       expect(resultsSend.data.status).toEqual("1");
 
@@ -384,7 +385,7 @@ describe("Verifier integration with ethereum connector tests", () => {
         contractCommon,
         methodCall,
         argsCall,
-      );
+      ) as ISendRequestResultV1<string>;
       expect(resultCall.status).toEqual(200);
       expect(resultCall.data).toEqual(newName);
     });
@@ -407,7 +408,7 @@ describe("Verifier integration with ethereum connector tests", () => {
         contractCommon,
         methodEncode,
         argsEncode,
-      );
+      ) as ISendRequestResultV1<string>;
       expect(resultsEncode.status).toEqual(200);
       expect(resultsEncode.data.length).toBeGreaterThan(5);
 
@@ -437,7 +438,7 @@ describe("Verifier integration with ethereum connector tests", () => {
         contractCommon,
         methodEstimateGas,
         argsEstimateGas,
-      );
+      ) as ISendRequestResultV1<string>;
       expect(resultsEstimateGas.status).toEqual(200);
       expect(Number(resultsEstimateGas.data)).toBeGreaterThan(0);
 
@@ -495,7 +496,7 @@ describe("Verifier integration with ethereum connector tests", () => {
         contractCommon,
         methodCall,
         argsCall,
-      );
+      ) as ISendRequestResultV1<string>;
       expect(resultsCall.status).toEqual(200);
       expect(resultsCall.data).toEqual(newName);
     });
@@ -509,7 +510,7 @@ describe("Verifier integration with ethereum connector tests", () => {
 
     const results = await globalVerifierFactory
       .getVerifier(ethereumValidatorId)
-      .sendSyncRequest(contract, method, args);
+      .sendSyncRequest(contract, method, args) as ISendRequestResultV1<string>;
     expect(results.status).toEqual(200);
     expect(results.data.length).toBeGreaterThan(0);
   });
@@ -531,7 +532,7 @@ describe("Verifier integration with ethereum connector tests", () => {
       correctContract,
       correctMethod,
       correctArgs,
-    );
+    ) as ISendRequestResultV1<{}>;
     expect(resultCorrect.status).toEqual(200);
 
     // Failing: Empty web3.eth method

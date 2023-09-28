@@ -6129,6 +6129,7 @@ __metadata:
   resolution: "@hyperledger/cactus-example-tcs-huawei@workspace:examples/cactus-example-tcs-huawei"
   dependencies:
     "@hyperledger/cactus-cmd-socketio-server": 2.0.0-alpha.2
+    "@hyperledger/cactus-core-api": 2.0.0-alpha.2
     "@hyperledger/cactus-verifier-client": 2.0.0-alpha.2
     "@types/body-parser": 1.19.2
     "@types/cookie-parser": 1.4.2

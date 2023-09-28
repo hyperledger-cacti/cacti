@@ -9,6 +9,9 @@ import {
   LPInfoHolder,
   ConfigUtil,
 } from "@hyperledger/cactus-cmd-socketio-server";
+
+import { ISendRequestResultV1 } from "@hyperledger/cactus-core-api";
+
 import {
   VerifierFactory,
   VerifierFactoryConfig,
@@ -32,7 +35,7 @@ export class BalanceManagement {
     );
   }
 
-  getBalance(account: string): Promise<any> {
+  getBalance(account: string): Promise<unknown> {
     return new Promise((resolve, reject) => {
       // for LedgerOperation
       // const execData = {"referedAddress": account};
@@ -41,7 +44,6 @@ export class BalanceManagement {
       // for Neo
       const contract = {}; // NOTE: Since contract does not need to be specified, specify an empty object.
       const method = { type: "web3Eth", command: "getBalance" };
-      const template = "default";
       const args = { args: [account] };
       // const method = "default";
       // const args = {"method": {type: "web3Eth", command: "getBalance"}, "args": {"args": [account]}};
@@ -50,9 +52,10 @@ export class BalanceManagement {
         .getVerifier("84jUisrs")
         .sendSyncRequest(contract, method, args)
         .then((result) => {
+          const res1 = result as ISendRequestResultV1<string>;
           const response = {
-            status: result.status,
-            amount: parseFloat(result.data),
+            status: res1.status,
+            amount: parseFloat(res1.data),
           };
           resolve(response);
         })

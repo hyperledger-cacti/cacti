@@ -40,7 +40,8 @@ type BlockTypeFromSocketApi<T> = T extends ISocketApiClient<infer U>
  * @todo Don't throw exception for not supported operations, don't include these methods at all (if possible)
  */
 export class Verifier<LedgerApiType extends ISocketApiClient<unknown>>
-  implements IVerifier {
+  implements IVerifier
+{
   private readonly log: Logger;
   readonly className: string;
   readonly runningMonitors = new Map<string, Subscription>();
@@ -165,7 +166,7 @@ export class Verifier<LedgerApiType extends ISocketApiClient<unknown>>
   async sendAsyncRequest(
     contract: Record<string, unknown>,
     method: Record<string, unknown>,
-    args: any,
+    args: unknown,
   ): Promise<void> {
     if (!this.ledgerApi.sendAsyncRequest) {
       throw new Error("sendAsyncRequest not supported on this ledger");
@@ -184,8 +185,8 @@ export class Verifier<LedgerApiType extends ISocketApiClient<unknown>>
   async sendSyncRequest(
     contract: Record<string, unknown>,
     method: Record<string, unknown>,
-    args: any,
-  ): Promise<any> {
+    args: unknown,
+  ): Promise<unknown> {
     if (!this.ledgerApi.sendSyncRequest) {
       throw new Error("sendSyncRequest not supported on this ledger");
     }

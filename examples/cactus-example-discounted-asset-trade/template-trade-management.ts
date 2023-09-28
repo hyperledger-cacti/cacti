@@ -50,7 +50,7 @@ export class TemplateTradeManagement {
         .getVerifier("84jUisrs")
         .sendSyncRequest(contract, method, args)
         .then((result) => {
-          resolve(result);
+          resolve(result as VerifierFactory);
         })
         .catch((err) => {
           logger.error(err);
