@@ -1,8 +1,8 @@
+#!/bin/sh
+
 # Copyright IBM Corp. All Rights Reserved.
 #
 # SPDX-License-Identifier: Apache-2.0
-
-#!/bin/sh
 
 RELAY_DNS_CONFIG=${RELAY_DNS_CONFIG:-$(pwd)/config/relays}
 RELAY_CONFIG_TEMPLATE=${RELAY_CONFIG_TEMPLATE:-$(pwd)/config/server.template.toml}
