@@ -6,17 +6,17 @@ Maintainers
 | Name | GitHub | Chat |
 |------|--------|------|
 | Jonathan Hamilton | [jonathan-m-hamilton][jonathan-m-hamilton] | JHamilton |
-| Izuru Sato | [izuru0][izuru0] | Izuru Sato#6434 |
-| Peter Somogyvari | [petermetz][petermetz] | peter_somogyvari#3365 |
-| Takuma TAKEUCHI | [takeutak][takeutak] | takeutak#7220 |
+| Izuru Sato | [izuru0][izuru0] | izurusato |
+| Peter Somogyvari | [petermetz][petermetz] | peter_somogyvari |
+| Takuma TAKEUCHI | [takeutak][takeutak] | takeutak |
 | Jagpreet Singh Sasan | [jagpreetsinghsasan][jagpreetsinghsasan] | jagpreetsinghsasan |
-| Venkatraman Ramakrishna | [VRamakrishna][VRamakrishna] | Ramakrishna#6645 |
-| Sandeep Nishad | [sandeepnRES][sandeepnRES] | sandeepn#1092 |
+| Venkatraman Ramakrishna | [VRamakrishna][VRamakrishna] | vramaiitkgp |
+| Sandeep Nishad | [sandeepnRES][sandeepnRES] | sandeepn |
 
 [jonathan-m-hamilton]: https://github.com/jonathan-m-hamilton
 [izuru0]: https://github.com/izuru0
 [petermetz]: https://github.com/petermetz
 [takeutak]: https://github.com/takeutak
 [jagpreetsinghsasan]: https://github.com/jagpreetsinghsasan
-[VRamakrishna]: https://github.com/VRamakrishna/
+[VRamakrishna]: https://github.com/VRamakrishna
 [sandeepnRES]: https://github.com/sandeepnRES

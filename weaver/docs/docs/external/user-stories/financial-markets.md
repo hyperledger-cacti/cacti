@@ -29,9 +29,9 @@ This protocol essentially has three phases:
 
 The process proceeds as follows, and is further illustrated in the figure below:
 1. **Org-A locks its securities in FSN ledger**: *Org-A* first creates some secret S, known only to it and locks its securities using the hash of S. The securities are configured to redeemable by *Org-B* if it presents S within some specified time threshold.
-1. **Org-B locks payments tokens in CBDC ledger**: Org-B, observes that *Org-A* has locked its securities in the FSN network and does a corresponding lock of its payment tokens with the hash of S, used by *Org-A* in locking its securities. The payment tokens are redeemable only by Org-A, if it submits a transaction that reveals S within a specified time.
-1. **Org-A checks Org-B's contract in CBDC ledger**: *Org-A* checks the CBDC network to ensure that the payments tokens are locked by Org-B.
-1. **Org-A claims payments in CBDC ledger**: *Org-A* submits a transaction to claim the payments tokens, by revealing the secret S.
-1. **Org-B claims securities in FSN ledger**: *Org-B* observes that the value of S has been revealed in the CBDC network by *Org-A* in step 4, and submits a transaction to claim the securities in the FSN network using the revealed secret.
+2. **Org-B locks payments tokens in CBDC ledger**: Org-B, observes that *Org-A* has locked its securities in the FSN network and does a corresponding lock of its payment tokens with the hash of S, used by *Org-A* in locking its securities. The payment tokens are redeemable only by Org-A, if it submits a transaction that reveals S within a specified time.
+3. **Org-A checks Org-B's contract in CBDC ledger**: *Org-A* checks the CBDC network to ensure that the payments tokens are locked by Org-B.
+4. **Org-A claims payments in CBDC ledger**: *Org-A* submits a transaction to claim the payments tokens, by revealing the secret S.
+5. **Org-B claims securities in FSN ledger**: *Org-B* observes that the value of S has been revealed in the CBDC network by *Org-A* in step 4, and submits a transaction to claim the securities in the FSN network using the revealed secret.
 
 ![Simple DvP scenario in financial markets](../../../static/use-cases/financial-markets-2.png)
