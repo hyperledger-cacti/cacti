@@ -1,7 +1,7 @@
 site_name: Using and Developing with Hyperledger Cacti
-site_url: https://VRamakrishna.github.io/cacti
+site_url: https://hyperledger.github.io/cacti
 repo_name: hyperledger/cacti
-repo_url: https://github.com/VRamakrishna/cacti
+repo_url: https://github.com/hyperledger/cacti
 theme:
   name: material
   custom_dir: overrides
