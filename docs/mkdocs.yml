@@ -1,0 +1,203 @@
+site_name: Using and Developing with Hyperledger Cacti
+site_url: https://VRamakrishna.github.io/cacti
+repo_name: hyperledger/cacti
+repo_url: https://github.com/VRamakrishna/cacti
+theme:
+  name: material
+  custom_dir: overrides
+  logo: images/HL_Cacti_Logo_Colorreverse.svg
+  favicon: images/HL_Cacti_Logo_Colorreverse.svg
+  icon:
+    repo: fontawesome/brands/github
+  palette:
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+  - content.code.copy
+  - navigation.expand
+  - navigation.footer
+  - navigation.instant
+  - navigation.tabs
+  - navigation.tabs.sticky
+  - navigation.top
+  - navigation.tracking
+  - toc.follow
+  - toc.integrate
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - toc:
+      permalink: true
+      toc_depth: 3
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+      emoji_index: !!python/name:materialx.emoji.twemoji
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.magiclink:
+      repo_url_shorthand: true
+      user: squidfunk
+      repo: mkdocs-material
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+plugins:
+  - search
+  - mike
+extra:
+  analytics:
+    provider: google
+    property: !ENV GOOGLE_ANALYTICS_KEY
+  version:
+    provider: mike
+nav:
+  - Introduction: index.md
+  - Vision: vision.md
+  - Architecture: architecture.md
+  - Key Concepts:
+    - Data Sharing: concepts/data-sharing.md
+  - Use Cases: use-cases.md
+  - Cactus:
+    - Introduction: cactus/introduction.md
+    - Building: cactus/build.md
+    - Examples:
+      - Overview: cactus/examples.md
+      - Supply Chain Application: cactus/examples/supply-chain-app.md
+    - Governance: cactus/governance.md
+    - Code of Conduct: cactus/code-of-conduct.md
+    - Contributing: cactus/contributing.md
+    - Whitepaper: cactus/whitepaper.md
+    - Regulatory and Industry Initiatives: cactus/regulatory-and-industry-initiatives-reading-list.md
+    - Components:
+      - Overview: cactus/packages.md
+      - Api Client: cactus/packages/cactus-api-client.md
+      - CMD Api Server: cactus/packages/cactus-cmd-api-server.md
+      - Cactus Common: cactus/packages/cactus-common.md
+      - Cactus Core: cactus/packages/cactus-core.md
+      - Consortium Manual: cactus/packages/cactus-plugin-consortium-manual.md
+      - Keychain Vault: cactus/packages/cactus-plugin-keychain-vault.md
+      - Connector Besu: cactus/packages/cactus-plugin-ledger-connector-besu.md
+      - Connector Corda: cactus/packages/cactus-plugin-ledger-connector-corda.md
+      - Connector Fabric: cactus/packages/cactus-plugin-ledger-connector-fabric.md
+      - Connector Quorum: cactus/packages/cactus-plugin-ledger-connector-quorum.md
+      - Test Api Client: cactus/packages/cactus-test-api-client.md
+      - Test CMD Api Server: cactus/packages/cactus-test-cmd-api-server.md
+      - Test Connector Quorum: cactus/packages/cactus-test-plugin-ledger-connector-quorum.md
+      - Test Tooling: cactus/packages/cactus-test-tooling.md
+    - Ledger Support:
+      - Overview: cactus/support.md
+      - Hyperledger Besu: cactus/support/besu.md
+      - R3 Corda: cactus/support/corda.md
+      - Hyperledger Fabric: cactus/support/fabric.md
+      - Hyperledger Iroha: cactus/support/iroha.md
+      - Quorum: cactus/support/quorum.md
+      - xDai: cactus/support/xdai.md
+  - Weaver:
+    - Framework: weaver/introduction.md
+    - Getting Started:
+      - Using Weaver: weaver/getting-started/guide.md
+      - Launching a Test Network:
+        - Component Overview: weaver/getting-started/test-network/overview.md
+        - Setup with Locally Built Weaver Components: weaver/getting-started/test-network/setup-local.md
+        - Setup with Locally Built Dockerized Weaver Components: weaver/getting-started/test-network/setup-local-docker.md
+        - Setup with Imported Weaver Components: weaver/getting-started/test-network/setup-packages.md
+        - Setup with Imported Dockerized Weaver Components: weaver/getting-started/test-network/setup-packages-docker.md
+        - Ledger Initialization: weaver/getting-started/test-network/ledger-initialization.md
+        - Advanced Configuration: weaver/getting-started/test-network/advanced-configuration.md
+      - Testing Interoperation Modes:
+        - Overview: weaver/getting-started/interop/overview.md
+        - Data Sharing: weaver/getting-started/interop/data-sharing.md
+        - Asset Exchange:
+          - Overview: weaver/getting-started/interop/asset-exchange/overview.md
+          - Fabric with Fabric: weaver/getting-started/interop/asset-exchange/fabric-fabric.md
+          - Fabric with Corda: weaver/getting-started/interop/asset-exchange/fabric-corda.md
+          - Fabric with Besu: weaver/getting-started/interop/asset-exchange/fabric-besu.md
+          - Corda with Corda: weaver/getting-started/interop/asset-exchange/corda-corda.md
+          - Corda with Besu: weaver/getting-started/interop/asset-exchange/corda-besu.md
+          - Besu with Besu: weaver/getting-started/interop/asset-exchange/besu-besu.md
+        - Asset Transfer: weaver/getting-started/interop/asset-transfer.md
+      - Enabling Weaver in your Network and Application:
+        - Overview: weaver/getting-started/enabling-weaver-network/overview.md
+        - Hyperledger Fabric: weaver/getting-started/enabling-weaver-network/fabric.md
+        - R3 Corda: weaver/getting-started/enabling-weaver-network/corda.md
+        - Hyperledger Besu: weaver/getting-started/enabling-weaver-network/besu.md
+    - What is Interoperability?:
+      - Understanding Interoperability: weaver/what-is-interoperability/understanding-interoperability.md
+      - Levels of Interoperability: weaver/what-is-interoperability/levels-of-interoperability.md
+      - Integration Patterns: weaver/what-is-interoperability/integration-patterns.md
+    - Interoperability Modes: weaver/interoperability-modes.md
+    - Design Principles: weaver/design-principles.md
+    - User Stories:
+      - Overview: weaver/user-stories/overview.md
+      - Global Trade: weaver/user-stories/global-trade.md
+      - DvP in Financial Markets: weaver/user-stories/financial-markets.md
+      - Legacy Integration: weaver/user-stories/legacy-integration.md
+    - Architecture and Design:
+      - Overview: weaver/architecture-and-design/overview.md
+      - Relay: weaver/architecture-and-design/relay.md
+      - Drivers: weaver/architecture-and-design/drivers.md
+      - Weaver DApps: weaver/architecture-and-design/weaver-dapps.md
+      - Decentralized Identity: weaver/architecture-and-design/decentralized-identity.md
+    - Security Model:
+      - Authentication: weaver/security-model/authentication.md
+      - Access Control: weaver/security-model/access-control.md
+      - Proofs and Verification: weaver/security-model/proofs-and-verification.md
+      - End-to-End Security: weaver/security-model/end-to-end-security.md
+    - Deployment Considerations:
+      - Deployment Patterns: weaver/deployment-considerations/deployment-patterns.md
+      - Governance and Policies: weaver/deployment-considerations/governance-and-policies.md
+      - Legal and Regulation: weaver/deployment-considerations/legal-and-regulation.md
+    - Specifications: weaver/specifications.md
+    - Roadmap: weaver/roadmap.md
+    - Publications: weaver/publications.md
+  - Guides:
+    - Operations: guides/operations.md
+    - Developers: guides/developers.md
+    - Upgrading: guides/upgrading.md
+  - References:
+    - Technical Specifications: references/specs.md
+    - Publications: references/publications.md
+    - Events and Podcasts: references/events.md
+    - Business Usage: references/business.md
+    - Project Best Practices: references/best-practices.md
+    - GitHub Contributions: references/github.md
+  - Contributing:
+    - How to Contribute: contributing/how-to-contribute.md
+    - Reporting a Bug: contributing/reporting-a-bug.md
+    - Requesting a Change: contributing/requesting-a-change.md
+    - Asking a Question: contributing/asking-a-question.md
+  - FAQs: faqs.md
+  - Glossary: glossary.md
+  - Contact Us: contact-us.md
+copyright: Copyright &copy; Hyperledger 2020-2023
