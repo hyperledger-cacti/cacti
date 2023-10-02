@@ -5,7 +5,7 @@ info:
     name: Apache-2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
   title: Hyperledger Cactus Plugin - Connector Corda
-  version: v2.0.0-alpha.1
+  version: v2.0.0-alpha.2
 servers:
 - url: /
 paths:
