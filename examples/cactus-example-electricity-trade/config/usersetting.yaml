@@ -2,7 +2,7 @@
 blpRegistry:
   -
     businessLogicID: h40Q9eMD
-    validatorID: [sUr7d10R, 84jUisrs]
+    validatorID: [sUr7d10R]
 
 logLevel: debug
 
@@ -21,7 +21,7 @@ electricityTradeInfo:
     filterKey: intkey
   ethereum:
     validatorID: 84jUisrs
-    gethURL: http://localhost:8545
+    gethURL: ws://localhost:8546
     chainName: geth1
     networkID: 10
     chainID: 10

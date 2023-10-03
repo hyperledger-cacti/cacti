@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 Hyperledger Cactus Contributors
+ * Copyright 2020-2023 Hyperledger Cactus Contributors
  * SPDX-License-Identifier: Apache-2.0
  *
  * balance.ts
@@ -7,25 +7,23 @@
 
 import { Router, NextFunction, Request, Response } from "express";
 import { ConfigUtil, RIFError } from "@hyperledger/cactus-cmd-socketio-server";
-import { BalanceManagement } from "./BalanceManagement";
 
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
+import { getAccountBalance } from "./TransactionEthereum";
 const moduleName = "balance";
 const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;
 
 const router: Router = Router();
-const balanceManagement: BalanceManagement = new BalanceManagement();
 
 /* GET balance. */
 router.get("/:account", (req: Request, res: Response, next: NextFunction) => {
   try {
-    balanceManagement
-      .getBalance(req.params.account)
+    getAccountBalance(req.params.account)
       .then((result) => {
         logger.debug(`#####[sample/balance.ts]`);
-        logger.debug("result(getBalance) = " + JSON.stringify(result));
+        logger.debug("result(getBalance) = " + result);
         res.status(200).json(result);
       })
       .catch((err) => {

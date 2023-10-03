@@ -9,7 +9,7 @@ import { ErrorFromSymbol } from "./error-from-symbol";
  * wrong after a crash.
  *
  * Often in Javascript this is much harder than it could be due to lack of
- * runtime checks by the JSVM (Javascript Virtual Machine) on the values/objects
+ * runtime checks by the Javascript Virtual Machine on the values/objects
  * that are being thrown.
  *
  * @param x The value/object whose type information is completely unknown at

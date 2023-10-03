@@ -5987,6 +5987,11 @@ __metadata:
   resolution: "@hyperledger/cactus-example-electricity-trade@workspace:examples/cactus-example-electricity-trade"
   dependencies:
     "@hyperledger/cactus-cmd-socketio-server": 2.0.0-alpha.2
+    "@hyperledger/cactus-common": 2.0.0-alpha.2
+    "@hyperledger/cactus-core": 2.0.0-alpha.2
+    "@hyperledger/cactus-core-api": 2.0.0-alpha.2
+    "@hyperledger/cactus-plugin-keychain-memory": 2.0.0-alpha.2
+    "@hyperledger/cactus-plugin-ledger-connector-ethereum": 2.0.0-alpha.2
     "@hyperledger/cactus-verifier-client": 2.0.0-alpha.2
     "@types/escape-html": 1.0.1
     "@types/express": 4.17.13

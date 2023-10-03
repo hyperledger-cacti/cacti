@@ -18,9 +18,8 @@ import {
   ConfigUtil,
   LPInfoHolder,
 } from "@hyperledger/cactus-cmd-socketio-server";
-import { makeRawTransaction } from "./TransactionEthereum";
+import { sendEthereumTransaction } from "./TransactionEthereum";
 
-//const config: any = JSON.parse(fs.readFileSync("/etc/cactus/default.json", 'utf8'));
 const config: any = ConfigUtil.getConfig() as any;
 import { getLogger } from "log4js";
 import {
@@ -40,16 +39,6 @@ const routesVerifierFactory = new VerifierFactory(
 interface SawtoothEventData {
   status: number | string;
   blockData: [];
-}
-
-interface EthData {
-  hash: string;
-}
-
-interface EthEvent {
-  blockData: { transactions: { [key: string]: EthData } };
-  hash: string;
-  status: number;
 }
 
 interface SawtoothBlockDataData {
@@ -130,67 +119,27 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
       return;
     }
 
-    const txParam: {
-      fromAddress: string;
-      fromAddressPkey: string;
-      toAddress: string;
-      amount: number;
-      gas: number;
-    } = {
-      fromAddress: accountInfo["fromAddress"],
-      fromAddressPkey: accountInfo["fromAddressPkey"],
-      toAddress: accountInfo["toAddress"],
-      amount: Number(transactionSubset["Value"]),
-      gas: config.electricityTradeInfo.ethereum.gas,
-    };
-    logger.debug(`####txParam = ${json2str(txParam)}`);
-
-    // Get Verifier Instance
     logger.debug(
       `##remittanceTransaction(): businessLogicID: ${this.businessLogicID}`,
     );
-    const useValidator = JSON.parse(
-      routesTransactionManagement.getValidatorToUse(this.businessLogicID),
-    );
-    //        const verifierEthereum = routesTransactionManagement.getVerifier(useValidator['validatorID'][1]);
-    const verifierEthereum = routesVerifierFactory.getVerifier(
-      useValidator["validatorID"][1],
-    );
-    verifierEthereum.startMonitor(
-      "BusinessLogicElectricityTrade",
-      {},
-      routesTransactionManagement,
-    );
-    logger.debug("getVerifierEthereum");
-
-    interface RawTransationResultData {
-      args: unknown;
-    }
-    // Generate parameters for// sendRawTransaction
-    logger.debug(`####exec makeRawTransaction!!`);
-    makeRawTransaction(txParam)
+    sendEthereumTransaction(
+      {
+        to: accountInfo["toAddress"],
+        value: Number(transactionSubset["Value"]),
+        gas: config.electricityTradeInfo.ethereum.gas,
+      },
+      accountInfo["fromAddress"],
+      accountInfo["fromAddressPkey"],
+    )
       .then((result) => {
-        logger.info("remittanceTransaction txId : " + result.txId);
-        // Set Parameter
-        logger.debug("remittanceTransaction data : " + json2str(result.data));
-        const contract = {}; // NOTE: Since contract does not need to be specified, specify an empty object.
-        const method = { type: "web3Eth", command: "sendSignedTransaction" };
-        const args: RawTransationResultData = {
-          args: [result.data["serializedTx"]],
-        };
-
-        // Run Verifier (Ethereum)
-        verifierEthereum
-          .sendAsyncRequest(contract, method, args)
-          .then(() => {
-            logger.debug(`##remittanceTransaction sendAsyncRequest finish`);
-          })
-          .catch((err) => {
-            logger.error(err);
-          });
+        logger.info(
+          "remittanceTransaction txId : " +
+            result.transactionReceipt.transactionHash,
+        );
+        logger.debug(`##remittanceTransaction sendAsyncRequest finish`);
       })
       .catch((err) => {
-        logger.error(err);
+        logger.error("sendEthereumTransaction remittance ERROR:", err);
       });
   }
 
@@ -203,10 +152,6 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
     switch (ledgerEvent.verifierId) {
       case config.electricityTradeInfo.sawtooth.validatorID:
         this.onEventSawtooth(ledgerEvent.data, targetIndex);
-        break;
-      case config.electricityTradeInfo.ethereum.validatorID:
-        this.onEventEthereum(ledgerEvent.data, targetIndex);
-
         break;
       default:
         logger.error(
@@ -263,52 +208,6 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
     }
   }
 
-  onEventEthereum(event: EthEvent, targetIndex: number): void {
-    logger.debug(`##in onEventEthereum()`);
-    const tx = this.getTransactionFromEthereumEvent(event, targetIndex);
-    if (tx == null) {
-      logger.error(`##onEventEthereum(): invalid event: ${json2str(event)}`);
-      return;
-    }
-
-    try {
-      const txId = tx["hash"];
-      const status = event["status"];
-
-      logger.debug(`##txId = ${txId}`);
-      logger.debug(`##status =${status}`);
-
-      if (status !== 200) {
-        logger.error(
-          `##onEventEthereum(): error event, status: ${status}, txId: ${txId}`,
-        );
-        return;
-      }
-    } catch (err) {
-      logger.error(
-        `##onEventEthereum(): err: ${err}, event: ${json2str(event)}`,
-      );
-    }
-  }
-
-  getTransactionFromEthereumEvent(
-    event: EthEvent,
-    targetIndex: number,
-  ): EthData | undefined {
-    try {
-      const retTransaction = event["blockData"]["transactions"][targetIndex];
-      logger.debug(
-        `##getTransactionFromEthereumEvent(), retTransaction: ${retTransaction}`,
-      );
-      return retTransaction;
-      // return (retTransaction as unknown) as EthEvent;
-    } catch (err) {
-      logger.error(
-        `##getTransactionFromEthereumEvent(): invalid even, err:${err}, event:${event}`,
-      );
-    }
-  }
-
   getOperationStatus(): Record<string, unknown> {
     logger.debug(`##in getOperationStatus()`);
     return {};
@@ -324,8 +223,6 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
     switch (ledgerEvent.verifierId) {
       case config.electricityTradeInfo.sawtooth.validatorID:
         return this.getTxIDFromEventSawtooth(ledgerEvent.data, targetIndex);
-      case config.electricityTradeInfo.ethereum.validatorID:
-        return this.getTxIDFromEventEtherem(ledgerEvent.data, targetIndex);
       default:
         logger.error(
           `##getTxIDFromEvent(): invalid verifierId: ${ledgerEvent.verifierId}`,
@@ -367,38 +264,6 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
     }
   }
 
-  getTxIDFromEventEtherem(event: EthEvent, targetIndex: number): string | null {
-    logger.debug(`##in getTxIDFromEventEtherem()`);
-    const tx = this.getTransactionFromEthereumEvent(event, targetIndex);
-    if (tx == null) {
-      logger.warn(`#getTxIDFromEventEtherem(): skip(not found tx)`);
-      return null;
-    }
-
-    try {
-      const txId = tx["hash"];
-
-      if (typeof txId !== "string") {
-        logger.warn(
-          `#getTxIDFromEventEtherem(): skip(invalid block, not found txId.), event: ${json2str(
-            event,
-          )}`,
-        );
-
-        return null;
-      }
-
-      logger.debug(`###getTxIDFromEventEtherem(): txId: ${txId}`);
-
-      return txId;
-    } catch (err) {
-      logger.error(
-        `##getTxIDFromEventEtherem(): err: ${err}, event: ${json2str(event)}`,
-      );
-      return null;
-    }
-  }
-
   getEventDataNum(ledgerEvent: LedgerEvent): number {
     logger.debug(
       `##in BLP:getEventDataNum(), ledgerEvent.verifierId: ${ledgerEvent.verifierId}`,
@@ -412,9 +277,6 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
       switch (ledgerEvent.verifierId) {
         case config.electricityTradeInfo.sawtooth.validatorID:
           retEventNum = event["blockData"].length;
-          break;
-        case config.electricityTradeInfo.ethereum.validatorID:
-          retEventNum = event["blockData"]["transactions"].length;
           break;
         default:
           logger.error(

@@ -30,7 +30,7 @@ describe("createRuntimeErrorWithCause() & newRex()", () => {
     }
   });
 
-  it("avoids losing information of inner exception: nexted RuntimeError instances", () => {
+  it("avoids losing information of inner exception: nested RuntimeError instances", () => {
     const aCauseMessage = uuidV4();
     const eMsg = uuidV4();
     const innerEMsg1 = uuidV4();
