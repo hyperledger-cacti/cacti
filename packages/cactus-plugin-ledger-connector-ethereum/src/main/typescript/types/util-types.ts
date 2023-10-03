@@ -17,10 +17,16 @@ export type ConvertWeb3ReturnToString<T> = {
  * Convert status code to boolean value.
  *
  * @param status transaction receipt status
- * @returns boolean
+ * @returns boolean or undefined if status not defined
  */
-export function convertWeb3ReceiptStatusToBool(status: Numbers): boolean {
-  return status.toString() === WEB3_RECEIPT_SUCCESS_CODE;
+export function convertWeb3ReceiptStatusToBool(
+  status?: Numbers,
+): boolean | undefined {
+  if (status) {
+    return status.toString() === WEB3_RECEIPT_SUCCESS_CODE;
+  }
+
+  return undefined;
 }
 
 /**

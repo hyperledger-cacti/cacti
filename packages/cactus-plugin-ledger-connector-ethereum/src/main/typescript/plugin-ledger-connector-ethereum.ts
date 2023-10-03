@@ -616,12 +616,11 @@ export class PluginLedgerConnectorEthereum
       rawTransaction,
       Web3StringReturnFormat,
     )) as TransactionReceiptBase<string, string, string, unknown>;
-
     this.prometheusExporter.addCurrentTransaction();
     return {
       transactionReceipt: {
         ...receipt,
-        status: convertWeb3ReceiptStatusToBool(receipt.status),
+        status: convertWeb3ReceiptStatusToBool(receipt.status) ?? true,
       },
     };
   }
@@ -643,7 +642,8 @@ export class PluginLedgerConnectorEthereum
       return {
         transactionReceipt: {
           ...transactionReceipt,
-          status: convertWeb3ReceiptStatusToBool(transactionReceipt.status),
+          status:
+            convertWeb3ReceiptStatusToBool(transactionReceipt.status) ?? true,
         },
       };
     } catch (ex) {
@@ -944,7 +944,7 @@ export class PluginLedgerConnectorEthereum
         tx.maxPriorityFeePerGas.toString(),
       );
       this.log.info(
-        `Estimated maxFeePerGas of ${tx.maxFeePerGas} becuase maxPriorityFeePerGas was provided.`,
+        `Estimated maxFeePerGas of ${tx.maxFeePerGas} because maxPriorityFeePerGas was provided.`,
       );
     }
 

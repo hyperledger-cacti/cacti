@@ -37,8 +37,8 @@ import {
   DefaultApi as EthereumApi,
 } from "../../../main/typescript/public-api";
 
-const containerImageName = "ghcr.io/outsh/cactus_geth_all_in_one";
-const containerImageVersion = "test-v01";
+const containerImageName = "ghcr.io/hyperledger/cacti-geth-all-in-one";
+const containerImageVersion = "2023-07-27-2a8c48ed6";
 
 describe("Running ethereum transactions with different gas configurations", () => {
   let web3: Web3,

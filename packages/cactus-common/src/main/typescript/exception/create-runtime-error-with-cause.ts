@@ -28,9 +28,9 @@ import { coerceUnknownToError } from "./coerce-unknown-to-error";
  * an error is legitimate or not most of the time. If you are writing application
  * logic then it's usually a simpler decision with more information at your
  * disposal.
- * 
+ *
  * The underlying concept is that if you log something on an error level, you
- * indicate that another human should fix a bug that is in the code. E.g., 
+ * indicate that another human should fix a bug that is in the code. E.g.,
  * when they see the error logs, they should go and fix something.
  *
  * ```typescript
@@ -48,7 +48,7 @@ import { coerceUnknownToError } from "./coerce-unknown-to-error";
  *
  * In case you need to do a conditional exception-handling:
  *  - Use the RuntimeError to re-throw and
- * provide the previous exception as cause in the new RuntimeError to retain 
+ * provide the previous exception as cause in the new RuntimeError to retain
  * the information and distinguish between an exception you can handle and
  * recover from and one you can't
  *
@@ -69,7 +69,7 @@ import { coerceUnknownToError } from "./coerce-unknown-to-error";
  *        // An "unexpected exception" where we want to fail immediately
  *        // to avoid follow-up problems
  *        const context = "We got an severe failure in 'doSubTaskThatsAPartOfDoingSomething()' and need to stop directly here to avoid follow-up problems";
- *        this.log.erorr(context, ex);
+ *        this.log.error(context, ex);
  *        throw newRex(context, ex);
  *      }
  *    }
@@ -78,7 +78,7 @@ import { coerceUnknownToError } from "./coerce-unknown-to-error";
  *  }
  * ```
  *
- * @param message The contextual information that will be passed into the 
+ * @param message The contextual information that will be passed into the
  * constructor of the returned {@link RuntimeError} instance.
  * @param cause The caught throwable which we do not know the exact type of but
  * need to make sure that whatever information is in t here is not lost.
