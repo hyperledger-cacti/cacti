@@ -40,7 +40,7 @@ jobs:
         with:
           go-version: 1.17
 
-      - run: go install -v github.com/projectdiscovery/nuclei/v2/cmd/nuclei@v2.6.3
+      - run: go install -v github.com/projectdiscovery/nuclei/v2/cmd/nuclei@v2.7.3
 
       - run: nuclei --version
 
@@ -83,7 +83,10 @@ jobs:
       - run: echo "$(jq '.authorizationProtocol = "NONE"' .config.json)" > .config.json
 
       - name: Install Fabric connector into the API server
-        run: echo "$(jq '.plugins += [{"packageName":"@hyperledger/cactus-plugin-ledger-connector-fabric", "type":"org.hyperledger.cactus.plugin_import_type.LOCAL", "action":"org.hyperledger.cactus.plugin_import_action.INSTALL",  "options":{"instanceId":"some-unique-fabric-connector-instance-id", "peerBinary":"/fabric-samples/bin/peer", "connectionProfile":"{}", "dockerBinary":"usr/local/bin/docker","cliContainerEnv":{"CORE_PEER_LOCALMSPID":"Org1MSP","CORE_PEER_ADDRESS":"peer0.org1.example.com:7051","CORE_PEER_MSPCONFIGPATH":"/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp","CORE_PEER_TLS_ROOTCERT_FILE":"/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt","ORDERER_TLS_ROOTCERT_FILE":"/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem"},"discoveryOptions":{"enabled":true,"asLocalhost":true}}}] ' .config.json)" > .config.json
+        #Uncomment line 87 when the fix for the cactus-plugin-ledger-connector-fabric has been published to npm and remove live 89
+        # run: echo "$(jq '.plugins += [{"packageName":"@hyperledger/cactus-plugin-ledger-connector-fabric", "type":"org.hyperledger.cactus.plugin_import_type.LOCAL", "action":"org.hyperledger.cactus.plugin_import_action.INSTALL",  "options":{"instanceId":"some-unique-fabric-connector-instance-id", "peerBinary":"/fabric-samples/bin/peer", "connectionProfile":"{}", "dockerBinary":"usr/local/bin/docker","cliContainerEnv":{"CORE_PEER_LOCALMSPID":"Org1MSP","CORE_PEER_ADDRESS":"peer0.org1.example.com:7051","CORE_PEER_MSPCONFIGPATH":"/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp","CORE_PEER_TLS_ROOTCERT_FILE":"/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt","ORDERER_TLS_ROOTCERT_FILE":"/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem"},"discoveryOptions":{"enabled":true,"asLocalhost":true}}}] ' .config.json)" > .config.json
+        #Line 89 is a workaround for the cactus-plugin-connector-fabric issue
+        run: echo "$(jq '.plugins += [{"packageName":"@hyperledger/cactus-plugin-ledger-connector-fabric", "type":"org.hyperledger.cactus.plugin_import_type.LOCAL", "action":"org.hyperledger.cactus.plugin_import_action.INSTALL",  "options":{ "packageSrc":"/home/runner/work/cacti/cacti/packages/cactus-plugin-ledger-connector-fabric/", "instanceId":"some-unique-fabric-connector-instance-id", "peerBinary":"/fabric-samples/bin/peer", "connectionProfile":"{}", "dockerBinary":"usr/local/bin/docker","cliContainerEnv":{"CORE_PEER_LOCALMSPID":"Org1MSP","CORE_PEER_ADDRESS":"peer0.org1.example.com:7051","CORE_PEER_MSPCONFIGPATH":"/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp","CORE_PEER_TLS_ROOTCERT_FILE":"/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt","ORDERER_TLS_ROOTCERT_FILE":"/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem"},"discoveryOptions":{"enabled":true,"asLocalhost":true}}}] ' .config.json)" > .config.json
 
       - name: Install Besu connector into the API server
         run: echo "$(jq '.plugins += [{"packageName":"@hyperledger/cactus-plugin-ledger-connector-besu","type":"org.hyperledger.cactus.plugin_import_type.LOCAL","action":"org.hyperledger.cactus.plugin_import_action.INSTALL","options":{"rpcApiHttpHost":"http://localhost:8545", "rpcApiWsHost":"ws://localhost:8546", "instanceId":"some-unique-besu-connector-instance-id"}}]' .config.json)" > .config.json
@@ -118,7 +121,7 @@ jobs:
         with:
           build: yarn --version
           start: yarn start:api-server
-          command: "nuclei --config=.nuclei-config.yaml --list=urls.txt --sarif-export ~/nuclei.sarif --output nuclei.log"
+          command: "nuclei -update-templates --config=.nuclei-config.yaml --list=urls.txt --sarif-export ~/nuclei.sarif --output nuclei.log"
           wait-on: "https://localhost:4000/api/v1/api-server/healthcheck"
           # wait for 10 minutes for the server to respond
           wait-on-timeout: 120
