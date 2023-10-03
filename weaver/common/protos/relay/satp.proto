@@ -30,6 +30,8 @@ service SATP {
 
   // Stage 2 endpoints
 
+  rpc SendAssetStatus(SendAssetStatusRequest) returns (common.ack.Ack) {};
+
   // The sender gateway sends a LockAssertion request to convey a signed claim to the receiver gateway 
   // declaring that the asset in question has been locked or escrowed by the sender gateway in
   // the origin network (e.g. to prevent double spending)
@@ -38,6 +40,16 @@ service SATP {
   // The receiver gateway sends a LockAssertionReceipt request to the sender gateway to indicate acceptance
   // of the claim(s) delivered by the sender gateway in the previous message
   rpc LockAssertionReceipt(LockAssertionReceiptRequest) returns (common.ack.Ack) {};
+
+  rpc CommitPrepare(CommitPrepareRequest) returns (common.ack.Ack) {};
+
+  rpc CommitReady(CommitReadyRequest) returns (common.ack.Ack) {};
+
+  rpc CommitFinalAssertion(CommitFinalAssertionRequest) returns (common.ack.Ack) {};
+
+  rpc AckFinalReceipt(AckFinalReceiptRequest) returns (common.ack.Ack) {};
+
+  rpc TransferCompleted(TransferCompletedRequest) returns (common.ack.Ack) {};
 }
   
 message TransferProposalClaimsRequest {
@@ -95,6 +107,18 @@ message AckCommenceRequest {
   string server_signature = 8;
 }
 
+message SendAssetStatusRequest {
+  string message_type = 1;
+  string session_id = 2;
+  string transfer_context_id = 3;
+  string client_identity_pubkey = 4;
+  string server_identity_pubkey = 5;
+  string hash_prev_message = 6;
+  string server_transfer_number = 7;
+  string server_signature = 8;
+  string status = 9;
+}
+
 message LockAssertionRequest {
   string message_type = 1;
   string session_id = 2;
@@ -118,4 +142,34 @@ message LockAssertionReceiptRequest {
   string hash_prev_message = 6;
   string server_transfer_number = 7;
   string server_signature = 8;
+}
+
+message CommitPrepareRequest {
+  string message_type = 1;
+  string session_id = 2;
+  string transfer_context_id = 3;
+}
+
+message CommitReadyRequest {
+  string message_type = 1;
+  string session_id = 2;
+  string transfer_context_id = 3;
+}
+
+message CommitFinalAssertionRequest {
+  string message_type = 1;
+  string session_id = 2;
+  string transfer_context_id = 3;
+}
+
+message AckFinalReceiptRequest {
+  string message_type = 1;
+  string session_id = 2;
+  string transfer_context_id = 3;
+}
+
+message TransferCompletedRequest {
+  string message_type = 1;
+  string session_id = 2;
+  string transfer_context_id = 3;
 }

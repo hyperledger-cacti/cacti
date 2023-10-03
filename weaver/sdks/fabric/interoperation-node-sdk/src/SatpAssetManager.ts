@@ -294,6 +294,64 @@ const claimAssetInHTLC = async (
     return result;
 };
 
+const assignAsset = async (
+    contract: Contract,
+    assetType: string,
+    assetID: string,
+    lockerECert: string,
+    hash: Hash,
+    endorsingOrgs: Array<string> = []
+): Promise<any> => {
+
+    if (!contract)
+    {
+        logger.error("Contract handle not supplied");
+        return false;
+    }
+    if (!assetType)
+    {
+        logger.error("Asset type not supplied");
+        return false;
+    }
+    if (!assetID)
+    {
+        logger.error("Asset ID not supplied");
+        return false;
+    }
+    if (!lockerECert)
+    {
+        logger.error("Locker ECert not supplied");
+        return false;
+    }
+    if (!hash)
+    {
+        logger.error("Instance of Hash interface not supplied")
+        return false
+    }
+    if (!hash.preimage)
+    {
+        logger.error("Hash Preimage not supplied");
+        return false;
+    }
+
+    const assetExchangeAgreementStr = createAssetExchangeAgreementSerialized(assetType, assetID, "", lockerECert);
+    const claimInfoStr = createAssetClaimInfoSerialized(hash);
+
+    // Normal invoke function
+    const tx = contract.createTransaction("AssignAsset")
+    const ccArgs = [assetExchangeAgreementStr, claimInfoStr]
+    if (endorsingOrgs && endorsingOrgs.length > 0) {
+        tx.setEndorsingOrganizations(...endorsingOrgs)
+    }
+    const [result, submitError] = await helpers.handlePromise(
+        tx.submit(...ccArgs)
+    );
+    if (submitError) {
+        throw new Error(`AssignAsset submitTransaction Error: ${submitError}`);
+    }
+    return result;
+};
+
 /**
  * Latter step of a Hashed Time Lock Contract
  * - Claim a unique asset instance using a hash preimage and contractId
@@ -389,64 +447,6 @@ const claimFungibleAssetInHTLC = async (
     );
     if (submitError) {
         throw new Error(`ClaimFungibleAsset submitTransaction Error: ${submitError}`);
-    }
-    return result;
-};
-
-const assignAsset = async (
-    contract: Contract,
-    assetType: string,
-    assetID: string,
-    lockerECert: string,
-    hash: Hash,
-    endorsingOrgs: Array<string> = []
-): Promise<any> => {
-
-    if (!contract)
-    {
-        logger.error("Contract handle not supplied");
-        return false;
-    }
-    if (!assetType)
-    {
-        logger.error("Asset type not supplied");
-        return false;
-    }
-    if (!assetID)
-    {
-        logger.error("Asset ID not supplied");
-        return false;
-    }
-    if (!lockerECert)
-    {
-        logger.error("Locker ECert not supplied");
-        return false;
-    }
-    if (!hash)
-    {
-        logger.error("Instance of Hash interface not supplied")
-        return false
-    }
-    if (!hash.preimage)
-    {
-        logger.error("Hash Preimage not supplied");
-        return false;
-    }
-
-    const assetExchangeAgreementStr = createAssetExchangeAgreementSerialized(assetType, assetID, "", lockerECert);
-    const claimInfoStr = createAssetClaimInfoSerialized(hash);
-
-    // Normal invoke function
-    const tx = contract.createTransaction("AssignAsset")
-    const ccArgs = [assetExchangeAgreementStr, claimInfoStr]
-    if (endorsingOrgs && endorsingOrgs.length > 0) {
-        tx.setEndorsingOrganizations(...endorsingOrgs)
-    }
-    const [result, submitError] = await helpers.handlePromise(
-        tx.submit(...ccArgs)
-    );
-    if (submitError) {
-        throw new Error(`AssignAsset submitTransaction Error: ${submitError}`);
     }
     return result;
 };
@@ -1089,10 +1089,10 @@ export {
     claimAssetInHTLC,
     claimAssetInHTLCusingContractId,
     claimFungibleAssetInHTLC,
-    assignAsset,
     reclaimAssetInHTLC,
     reclaimAssetInHTLCusingContractId,
     reclaimFungibleAssetInHTLC,
+    assignAsset,
     isAssetLockedInHTLC,
     isAssetLockedInHTLCqueryUsingContractId,
     isFungibleAssetLockedInHTLC,

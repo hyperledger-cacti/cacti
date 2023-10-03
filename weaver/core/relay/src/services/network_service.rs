@@ -597,7 +597,7 @@ impl Network for NetworkService {
                 let (relay_host, relay_port) = get_relay_from_transfer_proposal_claims(
                     transfer_proposal_claims_request.clone(),
                 );
-                let (use_tls, relay_tlsca_cert_path) =
+                let (use_tls, tlsca_cert_path) =
                     get_relay_params(relay_host.clone(), relay_port.clone(), conf.clone());
 
                 // TODO: verify that host and port are valid
@@ -607,7 +607,7 @@ impl Network for NetworkService {
                     relay_host,
                     relay_port,
                     use_tls,
-                    relay_tlsca_cert_path,
+                    tlsca_cert_path,
                     conf,
                 );
                 // Send Ack back to network while request is happening in a thread
@@ -809,12 +809,12 @@ fn spawn_send_request(
         // Iterate through the relay entries in the configuration to find a match
         let relays_table = conf.get_table("relays").unwrap();
         let mut relay_tls = false;
-        let mut relay_tlsca_cert_path = "".to_string();
+        let mut tlsca_cert_path = "".to_string();
         for (_relay_name, relay_spec) in relays_table {
             let relay_uri = relay_spec.clone().try_into::<LocationSegment>().unwrap();
             if relay_host == relay_uri.hostname && relay_port == relay_uri.port {
                 relay_tls = relay_uri.tls;
-                relay_tlsca_cert_path = relay_uri.tlsca_cert_path;
+                tlsca_cert_path = relay_uri.tlsca_cert_path;
             }
         }
 
@@ -825,7 +825,7 @@ fn spawn_send_request(
             network_query,
             request_id.clone(),
             relay_tls,
-            relay_tlsca_cert_path.to_string(),
+            tlsca_cert_path.to_string(),
         )
         .await;
         println!("Received Ack from remote relay: {:?}\n", result);
@@ -948,12 +948,12 @@ fn spawn_send_event_subscription_request(
         // Iterate through the relay entries in the configuration to find a match
         let relays_table = conf.get_table("relays").unwrap();
         let mut relay_tls = false;
-        let mut relay_tlsca_cert_path = "".to_string();
+        let mut tlsca_cert_path = "".to_string();
         for (_relay_name, relay_spec) in relays_table {
             let relay_uri = relay_spec.clone().try_into::<LocationSegment>().unwrap();
             if relay_host == relay_uri.hostname && relay_port == relay_uri.port {
                 relay_tls = relay_uri.tls;
-                relay_tlsca_cert_path = relay_uri.tlsca_cert_path;
+                tlsca_cert_path = relay_uri.tlsca_cert_path;
             }
         }
 
@@ -962,7 +962,7 @@ fn spawn_send_event_subscription_request(
             relay_port,
             event_subscription,
             relay_tls,
-            relay_tlsca_cert_path.to_string(),
+            tlsca_cert_path.to_string(),
         )
         .await;
         println!("Received Ack from remote relay: {:?}\n", result);
