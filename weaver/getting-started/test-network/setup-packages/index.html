@@ -1,0 +1,4351 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://hyperledger.github.io/cacti/weaver/getting-started/test-network/setup-packages/">
+      
+      
+        <link rel="prev" href="../setup-local-docker/">
+      
+      
+        <link rel="next" href="../setup-packages-docker/">
+      
+      
+      <link rel="icon" href="../../../../images/HL_Cacti_Logo_Colorreverse.svg">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.4.3">
+    
+    
+      
+        <title>Setup with Imported Weaver Components - Using and Developing with Hyperledger Cacti</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.79e020e9.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.a5377069.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+  
+  
+
+<script id="__analytics">function __md_analytics(){function n(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],n("js",new Date),n("config",""),document.addEventListener("DOMContentLoaded",function(){document.forms.search&&document.forms.search.query.addEventListener("blur",function(){this.value&&n("event","search",{search_term:this.value})}),document$.subscribe(function(){var a=document.forms.feedback;if(void 0!==a)for(var e of a.querySelectorAll("[type=submit]"))e.addEventListener("click",function(e){e.preventDefault();var t=document.location.pathname,e=this.getAttribute("data-md-value");n("event","feedback",{page:t,data:e}),a.firstElementChild.disabled=!0;e=a.querySelector(".md-feedback__note [data-md-value='"+e+"']");e&&(e.hidden=!1)}),a.hidden=!1}),location$.subscribe(function(e){n("config","",{page_path:e.pathname})})});var e=document.createElement("script");e.async=!0,e.src="https://www.googletagmanager.com/gtag/js?id=",document.getElementById("__analytics").insertAdjacentElement("afterEnd",e)}</script>
+  
+    <script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
+  
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#prerequisites" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+          <aside class="md-banner md-banner--warning">
+            <div class="md-banner__inner md-grid md-typeset">
+              
+  You're not viewing the latest version.
+  <a href="../../../../.."> 
+    <strong>Click here to go to latest.</strong>
+  </a>
+
+            </div>
+            <script>var el=document.querySelector("[data-md-component=outdated]"),outdated=__md_get("__outdated",sessionStorage);!0===outdated&&el&&(el.hidden=!1)</script>
+          </aside>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../../.." title="Using and Developing with Hyperledger Cacti" class="md-header__button md-logo" aria-label="Using and Developing with Hyperledger Cacti" data-md-component="logo">
+      
+  <img src="../../../../images/HL_Cacti_Logo_Colorreverse.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Using and Developing with Hyperledger Cacti
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Setup with Imported Weaver Components
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12c0-2.42-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/hyperledger/cacti" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    hyperledger/cacti
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../.." class="md-tabs__link">
+        
+  
+    
+  
+  Introduction
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../../vision/" class="md-tabs__link">
+        
+  
+    
+  
+  Vision
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../../architecture/" class="md-tabs__link">
+        
+  
+    
+  
+  Architecture
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../../concepts/data-sharing/" class="md-tabs__link">
+          
+  
+  Key Concepts
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../../use-cases/" class="md-tabs__link">
+        
+  
+    
+  
+  Use Cases
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../../cactus/introduction/" class="md-tabs__link">
+          
+  
+  Cactus
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../../introduction/" class="md-tabs__link">
+          
+  
+  Weaver
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../../guides/operations/" class="md-tabs__link">
+          
+  
+  Guides
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../../references/specs/" class="md-tabs__link">
+          
+  
+  References
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../../contributing/how-to-contribute/" class="md-tabs__link">
+          
+  
+  Contributing
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../../faqs/" class="md-tabs__link">
+        
+  
+    
+  
+  FAQs
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../../glossary/" class="md-tabs__link">
+        
+  
+    
+  
+  Glossary
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../../contact-us/" class="md-tabs__link">
+        
+  
+    
+  
+  Contact Us
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../.." title="Using and Developing with Hyperledger Cacti" class="md-nav__button md-logo" aria-label="Using and Developing with Hyperledger Cacti" data-md-component="logo">
+      
+  <img src="../../../../images/HL_Cacti_Logo_Colorreverse.svg" alt="logo">
+
+    </a>
+    Using and Developing with Hyperledger Cacti
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/hyperledger/cacti" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    hyperledger/cacti
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../vision/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Vision
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../architecture/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Architecture
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    
+    
+    
+    
+    
+      
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Key Concepts
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Key Concepts
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../concepts/data-sharing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Data Sharing
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../use-cases/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Use Cases
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    
+    
+    
+    
+    
+      
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Cactus
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            Cactus
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../cactus/introduction/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../cactus/build/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Building
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_6_3" id="__nav_6_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Examples
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_3">
+            <span class="md-nav__icon md-icon"></span>
+            Examples
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../cactus/examples/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../cactus/examples/supply-chain-app/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Supply Chain Application
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../cactus/governance/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Governance
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../cactus/code-of-conduct/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Code of Conduct
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../cactus/contributing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Contributing
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../cactus/whitepaper/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Whitepaper
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../cactus/regulatory-and-industry-initiatives-reading-list/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Regulatory and Industry Initiatives
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_6_9" id="__nav_6_9_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Components
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_9">
+            <span class="md-nav__icon md-icon"></span>
+            Components
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../cactus/packages/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../cactus/packages/cactus-api-client/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Api Client
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../cactus/packages/cactus-cmd-api-server/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    CMD Api Server
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../cactus/packages/cactus-common/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Cactus Common
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../cactus/packages/cactus-core/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Cactus Core
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../cactus/packages/cactus-plugin-consortium-manual/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Consortium Manual
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../cactus/packages/cactus-plugin-keychain-vault/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Keychain Vault
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../cactus/packages/cactus-plugin-ledger-connector-besu/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Connector Besu
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../cactus/packages/cactus-plugin-ledger-connector-corda/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Connector Corda
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../cactus/packages/cactus-plugin-ledger-connector-fabric/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Connector Fabric
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../cactus/packages/cactus-plugin-ledger-connector-quorum/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Connector Quorum
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../cactus/packages/cactus-test-api-client/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Test Api Client
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../cactus/packages/cactus-test-cmd-api-server/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Test CMD Api Server
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../cactus/packages/cactus-test-plugin-ledger-connector-quorum/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Test Connector Quorum
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../cactus/packages/cactus-test-tooling/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Test Tooling
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_6_10" id="__nav_6_10_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Ledger Support
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_10">
+            <span class="md-nav__icon md-icon"></span>
+            Ledger Support
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../cactus/support/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../cactus/support/besu/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Hyperledger Besu
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../cactus/support/corda/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    R3 Corda
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../cactus/support/fabric/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Hyperledger Fabric
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../cactus/support/iroha/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Hyperledger Iroha
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../cactus/support/quorum/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Quorum
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../cactus/support/xdai/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    xDai
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+    
+    
+    
+    
+    
+      
+      
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Weaver
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            Weaver
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../introduction/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Framework
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_7_2" id="__nav_7_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Getting Started
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_7_2">
+            <span class="md-nav__icon md-icon"></span>
+            Getting Started
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Using Weaver
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7_2_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_7_2_2" id="__nav_7_2_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Launching a Test Network
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_7_2_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_7_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            Launching a Test Network
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Component Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../setup-local/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Setup with Locally Built Weaver Components
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../setup-local-docker/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Setup with Locally Built Dockerized Weaver Components
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Setup with Imported Weaver Components
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Setup with Imported Weaver Components
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    Prerequisites
+  </a>
+  
+    <nav class="md-nav" aria-label="Prerequisites">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#software" class="md-nav__link">
+    Software
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#credentials" class="md-nav__link">
+    Credentials
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#getting-the-code-and-documentation" class="md-nav__link">
+    Getting the Code and Documentation
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#securing-components" class="md-nav__link">
+    Securing Components
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hyperledger-fabric-components" class="md-nav__link">
+    Hyperledger Fabric Components
+  </a>
+  
+    <nav class="md-nav" aria-label="Hyperledger Fabric Components">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fabric-network" class="md-nav__link">
+    Fabric Network
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fabric-client-fabric-cli" class="md-nav__link">
+    Fabric Client (fabric-cli)
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fabric-relay" class="md-nav__link">
+    Fabric Relay
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fabric-driver" class="md-nav__link">
+    Fabric Driver
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fabric-iin-agent" class="md-nav__link">
+    Fabric IIN Agent
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#corda-components" class="md-nav__link">
+    Corda Components
+  </a>
+  
+    <nav class="md-nav" aria-label="Corda Components">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#corda-network" class="md-nav__link">
+    Corda Network
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#corda-relay" class="md-nav__link">
+    Corda Relay
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#corda-driver" class="md-nav__link">
+    Corda Driver
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tear-down-the-setup" class="md-nav__link">
+    Tear Down the Setup
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../setup-packages-docker/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Setup with Imported Dockerized Weaver Components
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ledger-initialization/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Ledger Initialization
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../advanced-configuration/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Advanced Configuration
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_2_3" id="__nav_7_2_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Testing Interoperation Modes
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_7_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            Testing Interoperation Modes
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../interop/overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../interop/data-sharing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Data Sharing
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_2_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_2_3_3" id="__nav_7_2_3_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Asset Exchange
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_7_2_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_2_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            Asset Exchange
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../interop/asset-exchange/overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../interop/asset-exchange/fabric-fabric/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Fabric with Fabric
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../interop/asset-exchange/fabric-corda/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Fabric with Corda
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../interop/asset-exchange/fabric-besu/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Fabric with Besu
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../interop/asset-exchange/corda-corda/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Corda with Corda
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../interop/asset-exchange/corda-besu/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Corda with Besu
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../interop/asset-exchange/besu-besu/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Besu with Besu
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../interop/asset-transfer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Asset Transfer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_2_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_2_4" id="__nav_7_2_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Enabling Weaver in your Network and Application
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_7_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            Enabling Weaver in your Network and Application
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../enabling-weaver-network/overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../enabling-weaver-network/fabric/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Hyperledger Fabric
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../enabling-weaver-network/corda/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    R3 Corda
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../enabling-weaver-network/besu/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Hyperledger Besu
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_3" id="__nav_7_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    What is Interoperability?
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_3">
+            <span class="md-nav__icon md-icon"></span>
+            What is Interoperability?
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../what-is-interoperability/understanding-interoperability/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Understanding Interoperability
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../what-is-interoperability/levels-of-interoperability/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Levels of Interoperability
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../what-is-interoperability/integration-patterns/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Integration Patterns
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../interoperability-modes/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Interoperability Modes
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../design-principles/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Design Principles
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_6" id="__nav_7_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    User Stories
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_6">
+            <span class="md-nav__icon md-icon"></span>
+            User Stories
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../user-stories/overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../user-stories/global-trade/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Global Trade
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../user-stories/financial-markets/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    DvP in Financial Markets
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../user-stories/legacy-integration/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Legacy Integration
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_7" id="__nav_7_7_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Architecture and Design
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_7">
+            <span class="md-nav__icon md-icon"></span>
+            Architecture and Design
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../architecture-and-design/overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../architecture-and-design/relay/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Relay
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../architecture-and-design/drivers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Drivers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../architecture-and-design/weaver-dapps/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Weaver DApps
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../architecture-and-design/decentralized-identity/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Decentralized Identity
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_8" id="__nav_7_8_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Security Model
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_8">
+            <span class="md-nav__icon md-icon"></span>
+            Security Model
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../security-model/authentication/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Authentication
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../security-model/access-control/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Access Control
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../security-model/proofs-and-verification/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Proofs and Verification
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../security-model/end-to-end-security/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    End-to-End Security
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_9" id="__nav_7_9_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Deployment Considerations
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_9">
+            <span class="md-nav__icon md-icon"></span>
+            Deployment Considerations
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../deployment-considerations/deployment-patterns/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Deployment Patterns
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../deployment-considerations/governance-and-policies/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Governance and Policies
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../deployment-considerations/legal-and-regulation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Legal and Regulation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../specifications/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Specifications
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../roadmap/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Roadmap
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../publications/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Publications
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    
+    
+    
+    
+    
+      
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Guides
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            Guides
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../guides/operations/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Operations
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../guides/developers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Developers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../guides/upgrading/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Upgrading
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    
+    
+    
+    
+    
+      
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    References
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            References
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../references/specs/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Technical Specifications
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../references/publications/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Publications
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../references/events/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Events and Podcasts
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../references/business/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Business Usage
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../references/best-practices/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Project Best Practices
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../references/github/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    GitHub Contributions
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    
+    
+    
+    
+    
+      
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Contributing
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            Contributing
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../contributing/how-to-contribute/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    How to Contribute
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../contributing/reporting-a-bug/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Reporting a Bug
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../contributing/requesting-a-change/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Requesting a Change
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../contributing/asking-a-question/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Asking a Question
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../faqs/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    FAQs
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../glossary/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Glossary
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../contact-us/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Contact Us
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+  <h1>Setup with Imported Weaver Components</h1>
+
+<!--
+ Copyright IBM Corp. All Rights Reserved.
+
+ SPDX-License-Identifier: CC-BY-4.0
+ -->
+
+<p>In this document, we detail the steps using which you can bring up networks using the default configuration settings and by fetching pre-built Weaver interoperation modules, SDK libraries, and relay drivers from GitHub Package repositories. To customize these settings (e.g., hostnames, ports), refer to the <a href="../advanced-configuration/">Advanced Configuration page</a>.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">The default configuration is for a development setup, therefore all components are run on <code>localhost</code>, many within Docker containers.</td>
+</tr>
+</tbody>
+</table>
+<p>Follow the instructions below to build and run components followed by interoperation flows. These instructions have been tested on Ubuntu Linux (bash shell) and Mac OS. In general, they should work on any system and shell as long as the various dependencies have been installed and configured.</p>
+<h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h2>
+<h3 id="software">Software<a class="headerlink" href="#software" title="Permanent link">&para;</a></h3>
+<p>Before starting, make sure you have the following software installed on your host machine:</p>
+<ul>
+<li>Curl: <em>install using package manager, like <code>apt</code> on Debian/Ubuntu Linux</em></li>
+<li>Git: <a href="https://git-scm.com/book/en/v2/Getting-Started-Installing-Git">sample instructions</a></li>
+<li>Docker: <a href="https://docs.docker.com/engine/install/">sample instructions</a> (Latest version)</li>
+<li>Docker-Compose: <a href="https://docs.docker.com/compose/install/">sample instructions</a> (Version 1.28.2 or higher, but lower than version V2)</li>
+<li>Golang: <a href="https://golang.org/dl/">sample instructions</a> (Version 1.16 or higher)</li>
+<li>Java (JDK and JRE): <a href="https://openjdk.java.net/install/">sample instructions</a> (Version 8)</li>
+<li>Node.js and NPM: <a href="https://nodejs.org/en/download/package-manager/">sample instructions</a> (Version 16 Supported)</li>
+<li>Yarn: <a href="https://classic.yarnpkg.com/en/docs/install/">sample instructions</a></li>
+<li>Rust: <a href="https://www.rust-lang.org/tools/install">sample instructions</a><ul>
+<li>To avoid errors during Weaver Relay compilation, update certain packages (on which the Weaver Relay is dependent) to their latest versions as follows:
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>cargo update -p nom
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>cargo update -p lexical-core
+</code></pre></div></li>
+</ul>
+</li>
+</ul>
+<h3 id="credentials">Credentials<a class="headerlink" href="#credentials" title="Permanent link">&para;</a></h3>
+<p>Make sure you have an SSH or GPG key registered in <a href="https://github.com">https://github.com</a> to allow seamless cloning of repositories (at present, various setup scripts clone repositories using the <code>https://</code> prefix but this may change to <code>git@</code> in the future).</p>
+<p>Create a personal access token with <code>read:packages</code> access in GitHub in order to use modules published in GitHub packages. Refer <a href="https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token">Creating a Personal Access Token</a> for help.</p>
+<h2 id="getting-the-code-and-documentation">Getting the Code and Documentation<a class="headerlink" href="#getting-the-code-and-documentation" title="Permanent link">&para;</a></h2>
+<p>Clone the <a href="https://github.com/hyperledger/cacti">cacti</a> repository. The code to get a basic test network up and running and test data-sharing interoperation flows lies in the subfolder <code>weaver/tests/network-setups</code>, which should be your starting point, though the setups will rely on other parts of the repository, as you will find out in the instructions given on this page.</p>
+<h2 id="securing-components">Securing Components<a class="headerlink" href="#securing-components" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">The relays and drivers corresponding to the different test networks you will encounter below can be run with or without TLS enabled. But the default files used in the demonstrations assume that either all relays and drivers are TLS-enabled or none are. Therefore, you should determine at the outset whether or not you wish to run the entire set of components in TLS-enabled mode, and select appropriate commands in the provided instructions.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="hyperledger-fabric-components">Hyperledger Fabric Components<a class="headerlink" href="#hyperledger-fabric-components" title="Permanent link">&para;</a></h2>
+<p>Using the sequence of instructions below, you can start two separate Fabric networks, each with a single channel and application contract (chaincode). You can also start an interoperation contract, a relay, and a <em>driver</em> acting on behalf of each network. You can build a Fabric CLI tool with which you can initialize both networks' ledgers with access control policies, foreign networks' security groups (i.e., membership providers' certificate chains), and some sample key-value pairs that can be shared during subsequent interoperation flows.</p>
+<h3 id="fabric-network">Fabric Network<a class="headerlink" href="#fabric-network" title="Permanent link">&para;</a></h3>
+<p>The code for this lies in the <code>weaver/tests/network-setups</code> folder.</p>
+<p>This folder contains code to create and launch networks <code>network1</code> and <code>network2</code> of identical specifications:</p>
+<ul>
+<li>Network: 1 peer, 1 peer CA, 1 ordering service node, 1 ordering service CA</li>
+<li>Single channel named <code>mychannel</code></li>
+<li>One of the following contracts deployed on <code>mychannel</code>, the choice depending on the <a href="../../../interoperability-modes/">interoperability mode</a> you wish to test:<ul>
+<li><code>simplestate</code> (<a href="../../interop/data-sharing/">Data Sharing</a>): supports simple transactions (<code>Create</code>, <code>Read</code>, <code>Update</code>, <code>Delete</code>) involving storage and lookup of <key, value> pairs.</li>
+<li><code>simplestatewithacl</code> (<a href="../../interop/data-sharing/">Data Sharing</a>): identical to <code>simplestate</code> but with extra security features to ensure that the Weaver infrastructure cannot be bypassed by a malicious client of the network.</li>
+<li><code>simpleasset</code> (<a href="../../interop/asset-exchange/overview/">Asset Exchange</a>): supports creation, modification, transfer, and deletion, as well as locking, unlocking, and claiming, of simple bonds and tokens (examples of non-fungible and fungible assets respectively).</li>
+<li><code>simpleassetandinterop</code> (<a href="../../interop/asset-exchange/overview/">Asset Exchange</a>): identical to <code>simpleasset</code> but where the locking, unlocking, and claiming logic is imported as a library in the chaincode rather than available in the common Fabric Interoperation Chaincode (a Weaver component).</li>
+<li><code>simpleassettransfer</code> (<a href="../../interop/asset-exchange/overview/">Asset Exchange</a> or <a href="../../interop/asset-transfer/">Asset Transfer</a>): augmentation of <code>simpleasset</code> with asset pledging, claiming, and reclaiming features for cross-network transfers.</li>
+</ul>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">For new users, we recommend testing the Data Sharing feature first with the <code>simplestate</code> contract. To test the other modes, you can simply <a href="#tear-down-the-setup">tear down</a> the Fabric networks and restart them with the appropriate chaincodes installed.</td>
+</tr>
+</tbody>
+</table>
+<p>Follow the instructions below to build and launch the networks:</p>
+<ul>
+<li>Navigate to the <code>weaver/tests/network-setups/fabric/dev</code> folder.</li>
+<li>To spin up both network1 and network2 with the interoperation chaincode and the default <code>simplestate</code> chaincode installed, run:
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>make<span class="w"> </span>start-interop
+</code></pre></div></li>
+<li><em>To launch the networks with a different application chaincode from the above list, run</em>:
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>make<span class="w"> </span>start-interop<span class="w"> </span><span class="nv">CHAINCODE_NAME</span><span class="o">=</span>&lt;chaincode-name&gt;
+</code></pre></div></li>
+<li><em>To launch the networks with 2 organizations, each with a peer (this will enable more variation and experimentation, which you can attempt after testing interoperation protocols across basic network configurations), run</em>:
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>make<span class="w"> </span>start-interop-local<span class="w"> </span><span class="nv">PROFILE</span><span class="o">=</span><span class="s2">&quot;2-nodes&quot;</span>
+</code></pre></div></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">If you do not wish to test Fabric-Fabric interoperation, you can choose to launch only one of the two networks along with its interoperation chaincode. For <code>network1</code>, run <code>make start-interop-network1</code>, and for <code>network2</code>, run <code>make start-interop-network2</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">If you wish to enable end-to-end confidentiality by default in the interoperation modules that are deployed during network launch, set the environment variable <code>E2E_CONFIDENTIALITY</code> to <code>true</code> in the command line as follows: <code>E2E_CONFIDENTIALITY=true make start-interop</code></td>
+</tr>
+</tbody>
+</table>
+<p>For more information, refer to the associated <a href="https://github.com/hyperledger/cacti/tree/main/weaver/tests/network-setups/fabric/dev">README</a>.</p>
+<p><strong>Troubleshooting Tips</strong>:</p>
+<ul>
+<li>If you see any errors during the launches, re-check the prerequisites (software installations and credentials). Ensure your network connection is working. As a safe bet, you can retry after cleanup: kill and remove all Docker containers and associated volumes.</li>
+</ul>
+<h3 id="fabric-client-fabric-cli">Fabric Client (fabric-cli)<a class="headerlink" href="#fabric-client-fabric-cli" title="Permanent link">&para;</a></h3>
+<p>The CLI is used to interact with a Fabric network, configure it and run chaincode transactions to record data on the channel ledger or query data. It is also used to interact with remote networks through the relay to trigger an interoperation flow for data request and acceptance.</p>
+<p>The <code>fabric-cli</code> Node.js source code is located in the <code>weaver/samples/fabric/fabric-cli</code> folder and the Golang source code in the <code>weaver/samples/fabric/go-cli</code> folder.</p>
+<h4 id="prerequisites_1">Prerequisites<a class="headerlink" href="#prerequisites_1" title="Permanent link">&para;</a></h4>
+<p>If you are using a Linux system, make sure that lib64 is installed.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">For the Node.js version of the <code>fabric-cli</code>, the setup and running instructions below were tested with all Node.js versions from v11.14.0 to v14.17.3.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h4>
+<p>You can install <code>fabric-cli</code> as follows (for both the Node.js and Golang versions):</p>
+<ul>
+<li>Navigate to the <code>weaver/samples/fabric/fabric-cli</code> folder (for the Node.js version) or the <code>weaver/samples/fabric/go-cli</code> (for the Golang version) folder.</li>
+<li>Create <code>.npmrc</code> from template <code>.npmrc.template</code>, by replacing <code>&lt;personal-access-token&gt;</code> with yours created <a href="#package-access-token">above</a>..</li>
+<li>Run the following to install dependencies (for the Node.js version) or the executable (for the Golang version):
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>make<span class="w"> </span>build
+</code></pre></div></li>
+<li>Use the <code>fabric-cli</code> executable in the <code>bin</code> folder for <a href="../ledger-initialization/">subsequent actions</a>.</li>
+</ul>
+<h3 id="fabric-relay">Fabric Relay<a class="headerlink" href="#fabric-relay" title="Permanent link">&para;</a></h3>
+<p>The relay is a module acting on behalf of a network, enabling interoperation flows with other networks by communicating with their relays.
+The code for this lies in the <code>weaver/core/relay</code> folder.</p>
+<h4 id="building">Building<a class="headerlink" href="#building" title="Permanent link">&para;</a></h4>
+<p><em>Prerequisite</em>: make sure Rust is already installed and that the <code>cargo</code> executable is in your system path (after installation of Rust, this should be available in <code>$HOME/.cargo/bin</code>); you can also ensure this by running <code>source "$HOME/.cargo/env"</code>.</p>
+<p>Build the generic (i.e., common to all DLTs) relay module as follows:</p>
+<ul>
+<li>Navigate to the <code>weaver/core/relay</code> folder.</li>
+<li>Run the following:
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>make
+</code></pre></div></li>
+<li>If you observe errors during the above compilation, update certain packages (on which the Weaver Relay is dependent) to their latest versions and recompile as follows:
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>make<span class="w"> </span>update-pkgs
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>make
+</code></pre></div></li>
+</ul>
+<h4 id="deployment">Deployment<a class="headerlink" href="#deployment" title="Permanent link">&para;</a></h4>
+<p>An instance or a relay can be run using a suitable configuration file. Samples are available in the <code>weaver/core/relay/config</code> folder.</p>
+<p>Run a relay for <code>network1</code> as follows:</p>
+<ul>
+<li>Navigate to the <code>weaver/core/relay</code> folder.</li>
+<li>To launch the server without TLS, leave the configuration file <code>config/Fabric_Relay.toml</code> in its default state. Otherwise, edit it to set TLS flags for this relay and the other relays and drivers it will connect to in this demonstration as follows:
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="p">.</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="p">.</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="n">cert_path</span><span class="o">=</span><span class="s">&quot;credentials/fabric_cert.pem&quot;</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="n">key_path</span><span class="o">=</span><span class="s">&quot;credentials/fabric_key&quot;</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="p">.</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="p">.</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="k">[relays]</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="k">[relays.Corda_Relay]</span>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="n">hostname</span><span class="o">=</span><span class="s">&quot;localhost&quot;</span>
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="n">port</span><span class="o">=</span><span class="s">&quot;9081&quot;</span>
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
+<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s">&quot;credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="k">[relays.Corda_Relay2]</span>
+<a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a><span class="n">hostname</span><span class="o">=</span><span class="s">&quot;localhost&quot;</span>
+<a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a><span class="n">port</span><span class="o">=</span><span class="s">&quot;9082&quot;</span>
+<a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
+<a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s">&quot;credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a><span class="k">[relays.Fabric_Relay2]</span>
+<a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a><span class="n">hostname</span><span class="o">=</span><span class="s">&quot;localhost&quot;</span>
+<a id="__codelineno-7-21" name="__codelineno-7-21" href="#__codelineno-7-21"></a><span class="n">port</span><span class="o">=</span><span class="s">&quot;9083&quot;</span>
+<a id="__codelineno-7-22" name="__codelineno-7-22" href="#__codelineno-7-22"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
+<a id="__codelineno-7-23" name="__codelineno-7-23" href="#__codelineno-7-23"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s">&quot;credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-7-24" name="__codelineno-7-24" href="#__codelineno-7-24"></a><span class="p">.</span>
+<a id="__codelineno-7-25" name="__codelineno-7-25" href="#__codelineno-7-25"></a><span class="p">.</span>
+<a id="__codelineno-7-26" name="__codelineno-7-26" href="#__codelineno-7-26"></a><span class="k">[drivers]</span>
+<a id="__codelineno-7-27" name="__codelineno-7-27" href="#__codelineno-7-27"></a><span class="k">[drivers.Fabric]</span>
+<a id="__codelineno-7-28" name="__codelineno-7-28" href="#__codelineno-7-28"></a><span class="n">hostname</span><span class="o">=</span><span class="s">&quot;localhost&quot;</span>
+<a id="__codelineno-7-29" name="__codelineno-7-29" href="#__codelineno-7-29"></a><span class="n">port</span><span class="o">=</span><span class="s">&quot;9090&quot;</span>
+<a id="__codelineno-7-30" name="__codelineno-7-30" href="#__codelineno-7-30"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
+<a id="__codelineno-7-31" name="__codelineno-7-31" href="#__codelineno-7-31"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s">&quot;credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-7-32" name="__codelineno-7-32" href="#__codelineno-7-32"></a><span class="p">.</span>
+<a id="__codelineno-7-33" name="__codelineno-7-33" href="#__codelineno-7-33"></a><span class="p">.</span>
+</code></pre></div></li>
+<li>To launch the server, simply run the following:
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nv">RELAY_CONFIG</span><span class="o">=</span>config/Fabric_Relay.toml<span class="w"> </span>cargo<span class="w"> </span>run<span class="w"> </span>--bin<span class="w"> </span>server
+</code></pre></div></li>
+</ul>
+<p>Run a relay for <code>network2</code> as follows (<em>do this only if you have launched both Fabric networks <code>network1</code> and <code>network2</code> and wish to test interoperation between them</em>)</p>
+<ul>
+<li>Navigate to the <code>weaver/core/relay</code> folder.</li>
+<li>To launch the server without TLS, leave the configuration file <code>config/Fabric_Relay2.toml</code> in its default state. Otherwise, edit it to set TLS flags for this relay and the other relays and drivers it will connect to in this demonstration as follows:
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="p">.</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="p">.</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="n">cert_path</span><span class="o">=</span><span class="s">&quot;credentials/fabric_cert.pem&quot;</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="n">key_path</span><span class="o">=</span><span class="s">&quot;credentials/fabric_key&quot;</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="p">.</span>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="p">.</span>
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="k">[relays]</span>
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="k">[relays.Corda_Relay]</span>
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="n">hostname</span><span class="o">=</span><span class="s">&quot;localhost&quot;</span>
+<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="n">port</span><span class="o">=</span><span class="s">&quot;9081&quot;</span>
+<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
+<a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s">&quot;credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a><span class="k">[relays.Corda_Relay2]</span>
+<a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a><span class="n">hostname</span><span class="o">=</span><span class="s">&quot;localhost&quot;</span>
+<a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a><span class="n">port</span><span class="o">=</span><span class="s">&quot;9082&quot;</span>
+<a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
+<a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s">&quot;credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a><span class="k">[relays.Fabric_Relay]</span>
+<a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a><span class="n">hostname</span><span class="o">=</span><span class="s">&quot;localhost&quot;</span>
+<a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a><span class="n">port</span><span class="o">=</span><span class="s">&quot;9080&quot;</span>
+<a id="__codelineno-9-22" name="__codelineno-9-22" href="#__codelineno-9-22"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
+<a id="__codelineno-9-23" name="__codelineno-9-23" href="#__codelineno-9-23"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s">&quot;credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-9-24" name="__codelineno-9-24" href="#__codelineno-9-24"></a><span class="p">.</span>
+<a id="__codelineno-9-25" name="__codelineno-9-25" href="#__codelineno-9-25"></a><span class="p">.</span>
+<a id="__codelineno-9-26" name="__codelineno-9-26" href="#__codelineno-9-26"></a><span class="k">[drivers]</span>
+<a id="__codelineno-9-27" name="__codelineno-9-27" href="#__codelineno-9-27"></a><span class="k">[drivers.Fabric]</span>
+<a id="__codelineno-9-28" name="__codelineno-9-28" href="#__codelineno-9-28"></a><span class="n">hostname</span><span class="o">=</span><span class="s">&quot;localhost&quot;</span>
+<a id="__codelineno-9-29" name="__codelineno-9-29" href="#__codelineno-9-29"></a><span class="n">port</span><span class="o">=</span><span class="s">&quot;9095&quot;</span>
+<a id="__codelineno-9-30" name="__codelineno-9-30" href="#__codelineno-9-30"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
+<a id="__codelineno-9-31" name="__codelineno-9-31" href="#__codelineno-9-31"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s">&quot;credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-9-32" name="__codelineno-9-32" href="#__codelineno-9-32"></a><span class="p">.</span>
+<a id="__codelineno-9-33" name="__codelineno-9-33" href="#__codelineno-9-33"></a><span class="p">.</span>
+</code></pre></div></li>
+<li>To launch the server, simply run the following:
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nv">RELAY_CONFIG</span><span class="o">=</span>config/Fabric_Relay2.toml<span class="w"> </span>cargo<span class="w"> </span>run<span class="w"> </span>--bin<span class="w"> </span>server
+</code></pre></div></li>
+</ul>
+<p>For more information, see the <a href="https://github.com/hyperledger/cacti/tree/main/weaver/core/relay">relay README</a>.</p>
+<h3 id="fabric-driver">Fabric Driver<a class="headerlink" href="#fabric-driver" title="Permanent link">&para;</a></h3>
+<p>A driver is a DLT-specific plugin invoked by the relay while conveying external data queries to the local peer network and collecting a response with proofs. The Fabric driver is built as a Fabric client application on the <code>fabric-network</code> NPM package.
+The code for this lies in the <code>weaver/core/drivers/fabric-driver</code> folder.</p>
+<h4 id="configuring">Configuring<a class="headerlink" href="#configuring" title="Permanent link">&para;</a></h4>
+<p>In the <code>weaver/core/drivers/fabric-driver</code> folder, copy <code>.env.template</code> to <code>.env</code> and update <code>CONNECTION_PROFILE</code> to point to the connection profile of the Fabric network (e.g. <code>&lt;PATH-TO-WEAVER&gt;/tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json</code>)</p>
+<p>Configure <code>fabric-driver</code> for <code>network1</code> as follows:</p>
+<ul>
+<li>Navigate to the <code>weaver/core/drivers/fabric-driver</code> folder.</li>
+<li>Create a <code>.env</code> file by copying <code>.env.template</code> and setting suitable parameter values:<ul>
+<li>The <code>CONNECTION_PROFILE</code> should point to the absolute path of the connection profile for <code>network1</code>.<ul>
+<li>For this exercise, specify the path <code>&lt;PATH-TO-WEAVER&gt;/tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json</code> (<em>you must specify the full absolute path here</em>).</li>
+<li><code>&lt;PATH-TO-WEAVER&gt;</code> here is the absolute path of the <code>weaver</code> folder within your Cacti repository clone.</li>
+</ul>
+</li>
+<li>If you wish to start the driver without TLS, set the following parameter values:
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>RELAY_TLS=false
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>RELAY_TLSCA_CERT_PATH=
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>DRIVER_TLS=false
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>DRIVER_TLS_CERT_PATH=
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>DRIVER_TLS_KEY_PATH=
+</code></pre></div>
+  Otherwise, if you wish to start the driver with TLS enabled, set the following parameter values (replace <code>&lt;PATH-TO-WEAVER&gt;</code> with the absolute path of the <code>weaver</code> folder within your Cacti repository clone):
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>RELAY_TLS=true
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>RELAY_TLSCA_CERT_PATH=&lt;PATH-TO-WEAVER&gt;/core/relay/credentials/fabric_ca_cert.pem
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>DRIVER_TLS=true
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>DRIVER_TLS_CERT_PATH=&lt;PATH-TO-WEAVER&gt;/core/relay/credentials/fabric_cert.pem
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>DRIVER_TLS_KEY_PATH=&lt;PATH-TO-WEAVER&gt;/core/relay/credentials/fabric_key
+</code></pre></div></li>
+<li>Leave the default values unchanged for the other parameters. The relay and driver endpoints as well as the network name are already specified.</li>
+</ul>
+</li>
+</ul>
+<h4 id="building_1">Building<a class="headerlink" href="#building_1" title="Permanent link">&para;</a></h4>
+<p>Build the Fabric driver module as follows:</p>
+<ul>
+<li>Navigate to the <code>weaver/core/drivers/fabric-driver</code> folder.</li>
+<li>Create <code>.npmrc</code> from template <code>.npmrc.template</code>, by replacing <code>&lt;personal-access-token&gt;</code> with yours created above.</li>
+<li>Run the following:
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>make<span class="w"> </span>build
+</code></pre></div></li>
+</ul>
+<h4 id="running">Running<a class="headerlink" href="#running" title="Permanent link">&para;</a></h4>
+<p>Run a Fabric driver for <code>network1</code> as follows:</p>
+<ul>
+<li>Navigate to the <code>weaver/core/drivers/fabric-driver</code> folder.</li>
+<li>Run the following:
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>npm<span class="w"> </span>run<span class="w"> </span>dev
+</code></pre></div></li>
+</ul>
+<p>Run a Fabric driver for <code>network2</code> as follows (<em>do this only if you wish to test interoperation between the two Fabric networks <code>network1</code> and <code>network2</code></em>)</p>
+<ul>
+<li>Navigate to the <code>weaver/core/drivers/fabric-driver</code> folder.</li>
+<li>Run the following:
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="nv">CONNECTION_PROFILE</span><span class="o">=</span>&lt;PATH-TO-WEAVER&gt;/tests/network-setups/fabric/shared/network2/peerOrganizations/org1.network2.com/connection-org1.json<span class="w"> </span><span class="nv">NETWORK_NAME</span><span class="o">=</span>network2<span class="w"> </span><span class="nv">RELAY_ENDPOINT</span><span class="o">=</span>localhost:9083<span class="w"> </span><span class="nv">DRIVER_ENDPOINT</span><span class="o">=</span>localhost:9095<span class="w"> </span>npm<span class="w"> </span>run<span class="w"> </span>dev
+</code></pre></div></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">The variables we specified earlier in the <code>.env</code> for <code>network1</code> are now passed in the command line. Alternatively, you can make a copy of the <code>fabric-driver</code> folder with a different  name and create a separate <code>.env</code> file within it that contains links to the connection profile, relay, and driver for <code>network2</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="fabric-iin-agent">Fabric IIN Agent<a class="headerlink" href="#fabric-iin-agent" title="Permanent link">&para;</a></h3>
+<p>IIN Agent is a client of a member of a DLT network or security domain with special permissions to update security domain identities and configurations on the ledger via the network's interoperation module. The code for this lies in the <code>weaver/core/identity-management/iin-agent</code> folder. Navigate to the <code>weaver/core/identity-management/iin-agent</code> folder.</p>
+<h4 id="building_2">Building<a class="headerlink" href="#building_2" title="Permanent link">&para;</a></h4>
+<p>Build the IIN Agent as follows:</p>
+<ul>
+<li>Navigate to the <code>weaver/core/drivers/fabric-driver</code> folder.</li>
+<li>Create <code>.npmrc</code> from template <code>.npmrc.template</code>, by replacing <code>&lt;personal-access-token&gt;</code> with yours created above.</li>
+<li>Run the following:
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>make<span class="w"> </span>build
+</code></pre></div></li>
+</ul>
+<h4 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h4>
+<p>Ledger config file specifies ledger specific IIN Agent details such as identity and which network and organization to connect to.</p>
+<ol>
+<li>
+<p>To create config file for <code>Org1MSP</code>'s Fabric IIN Agent of <code>network1</code>, follow the steps:</p>
+<ul>
+<li>Create copy of template config file for Fabric IIN Agent: <code>src/fabric-ledger/config.json.template</code>, say to location <code>src/fabric-ledger/config-n1-org1.json</code>.</li>
+<li>Replace <code>&lt;path-to-connection-profile&gt;</code> with <code>&lt;PATH-TO-WEAVER&gt;/tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json</code>, where replace <code>&lt;PATH-TO-WEAVER&gt;</code> with the absolute path of the <code>weaver</code> folder within your Cacti repository clone.</li>
+<li>Set <code>mspId</code> as <code>Org1MSP</code>.</li>
+<li>Set <code>agent.affiliation</code> as <code>org1.department1</code>.</li>
+</ul>
+</li>
+<li>
+<p>To create config file for <code>Org2MSP</code>'s Fabric IIN Agent of <code>network1</code>, repeat <code>Step 1</code> with different name for config file, say <code>src/fabric-ledger/config-n1-org2.json</code>, and replace <code>org1</code> with <code>org2</code> and <code>Org1MSP</code> with <code>Org2MSP</code>.</p>
+</li>
+<li>To create config file for <code>Org1MSP</code>'s Fabric IIN Agent of <code>network2</code>, repeat <code>Step 1</code> with different name for config file, say <code>src/fabric-ledger/config-n2-org1.json</code>, and replace <code>network1</code> with <code>network2</code>.</li>
+<li>To create config file for <code>Org2MSP</code>'s Fabric IIN Agent of <code>network2</code>, repeat <code>Step 1</code> with different name for config file, say <code>src/fabric-ledger/config-n2-org2.json</code>, and replace <code>network1</code> with <code>network2</code>, <code>org1</code> with <code>org2</code> and <code>Org1MSP</code> with <code>Org2MSP</code>.</li>
+</ol>
+<h4 id="security-domain-configuration">Security Domain Configuration<a class="headerlink" href="#security-domain-configuration" title="Permanent link">&para;</a></h4>
+<p>Security Domain config file specifies the scope of security domain, which can be a channel in Fabric networks or list of nodes. File <code>docker-testnet/configs/security-domain-config.json</code> can be used for Weaver testnets.</p>
+<h4 id="dns-configuration">DNS Configuration<a class="headerlink" href="#dns-configuration" title="Permanent link">&para;</a></h4>
+<p>To allow an IIN Agent's to be able to discover other IIN Agents, a config file for DNS is required. Create one <code>dnsconfig.json</code> by creating a copy of template <code>dnsconfig.json.template</code>, and replace the values with:</p>
+<ul>
+<li>
+<p>If Fabric networks are started with 1 org, and IIN Agent are to be started without TLS, use following values:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="p">{</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="w">    </span><span class="nt">&quot;network1&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="w">        </span><span class="nt">&quot;Org1MSP&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="w">            </span><span class="nt">&quot;endpoint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;localhost:9500&quot;</span><span class="p">,</span>
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="w">            </span><span class="nt">&quot;tls&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="w">            </span><span class="nt">&quot;tlsCACertPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a><span class="w">    </span><span class="p">},</span>
+<a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a><span class="w">    </span><span class="nt">&quot;network2&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a><span class="w">        </span><span class="nt">&quot;Org1MSP&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-17-11" name="__codelineno-17-11" href="#__codelineno-17-11"></a><span class="w">            </span><span class="nt">&quot;endpoint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;localhost:9501&quot;</span><span class="p">,</span>
+<a id="__codelineno-17-12" name="__codelineno-17-12" href="#__codelineno-17-12"></a><span class="w">            </span><span class="nt">&quot;tls&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<a id="__codelineno-17-13" name="__codelineno-17-13" href="#__codelineno-17-13"></a><span class="w">            </span><span class="nt">&quot;tlsCACertPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<a id="__codelineno-17-14" name="__codelineno-17-14" href="#__codelineno-17-14"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-17-15" name="__codelineno-17-15" href="#__codelineno-17-15"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-17-16" name="__codelineno-17-16" href="#__codelineno-17-16"></a><span class="p">}</span>
+</code></pre></div></p>
+</li>
+<li>
+<p>If Fabric networks are started with 1 org, and IIN Agent are to be started with TLS, use following values:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="p">{</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">    </span><span class="nt">&quot;network1&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">        </span><span class="nt">&quot;Org1MSP&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="w">            </span><span class="nt">&quot;endpoint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;localhost:9500&quot;</span><span class="p">,</span>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="w">            </span><span class="nt">&quot;tls&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="w">            </span><span class="nt">&quot;tlsCACertPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;../../relay/credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="w">    </span><span class="p">},</span>
+<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="w">    </span><span class="nt">&quot;network2&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a><span class="w">        </span><span class="nt">&quot;Org1MSP&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a><span class="w">            </span><span class="nt">&quot;endpoint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;localhost:9501&quot;</span><span class="p">,</span>
+<a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a><span class="w">            </span><span class="nt">&quot;tls&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<a id="__codelineno-18-13" name="__codelineno-18-13" href="#__codelineno-18-13"></a><span class="w">            </span><span class="nt">&quot;tlsCACertPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;../../relay/credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-18-14" name="__codelineno-18-14" href="#__codelineno-18-14"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-18-15" name="__codelineno-18-15" href="#__codelineno-18-15"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-18-16" name="__codelineno-18-16" href="#__codelineno-18-16"></a><span class="p">}</span>
+</code></pre></div></p>
+</li>
+<li>
+<p>If Fabric networks are started with 2 orgs, and IIN Agent are to be started without TLS, use following values:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="p">{</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="w">    </span><span class="nt">&quot;network1&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="w">        </span><span class="nt">&quot;Org1MSP&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="w">            </span><span class="nt">&quot;endpoint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;localhost:9500&quot;</span><span class="p">,</span>
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="w">            </span><span class="nt">&quot;tls&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="w">            </span><span class="nt">&quot;tlsCACertPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="w">        </span><span class="p">},</span>
+<a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a><span class="w">        </span><span class="nt">&quot;Org2MSP&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a><span class="w">            </span><span class="nt">&quot;endpoint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;localhost:9510&quot;</span><span class="p">,</span>
+<a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a><span class="w">            </span><span class="nt">&quot;tls&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<a id="__codelineno-19-11" name="__codelineno-19-11" href="#__codelineno-19-11"></a><span class="w">            </span><span class="nt">&quot;tlsCACertPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<a id="__codelineno-19-12" name="__codelineno-19-12" href="#__codelineno-19-12"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-19-13" name="__codelineno-19-13" href="#__codelineno-19-13"></a><span class="w">    </span><span class="p">},</span>
+<a id="__codelineno-19-14" name="__codelineno-19-14" href="#__codelineno-19-14"></a><span class="w">    </span><span class="nt">&quot;network2&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-19-15" name="__codelineno-19-15" href="#__codelineno-19-15"></a><span class="w">        </span><span class="nt">&quot;Org1MSP&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-19-16" name="__codelineno-19-16" href="#__codelineno-19-16"></a><span class="w">            </span><span class="nt">&quot;endpoint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;localhost:9501&quot;</span><span class="p">,</span>
+<a id="__codelineno-19-17" name="__codelineno-19-17" href="#__codelineno-19-17"></a><span class="w">            </span><span class="nt">&quot;tls&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<a id="__codelineno-19-18" name="__codelineno-19-18" href="#__codelineno-19-18"></a><span class="w">            </span><span class="nt">&quot;tlsCACertPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<a id="__codelineno-19-19" name="__codelineno-19-19" href="#__codelineno-19-19"></a><span class="w">        </span><span class="p">},</span>
+<a id="__codelineno-19-20" name="__codelineno-19-20" href="#__codelineno-19-20"></a><span class="w">        </span><span class="nt">&quot;Org2MSP&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-19-21" name="__codelineno-19-21" href="#__codelineno-19-21"></a><span class="w">            </span><span class="nt">&quot;endpoint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;localhost:9511&quot;</span><span class="p">,</span>
+<a id="__codelineno-19-22" name="__codelineno-19-22" href="#__codelineno-19-22"></a><span class="w">            </span><span class="nt">&quot;tls&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<a id="__codelineno-19-23" name="__codelineno-19-23" href="#__codelineno-19-23"></a><span class="w">            </span><span class="nt">&quot;tlsCACertPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<a id="__codelineno-19-24" name="__codelineno-19-24" href="#__codelineno-19-24"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-19-25" name="__codelineno-19-25" href="#__codelineno-19-25"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-19-26" name="__codelineno-19-26" href="#__codelineno-19-26"></a><span class="p">}</span>
+</code></pre></div></p>
+</li>
+<li>
+<p>If Fabric networks are started with 2 orgs, and IIN Agent are to be started with TLS, use following values:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="p">{</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="w">    </span><span class="nt">&quot;network1&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="w">        </span><span class="nt">&quot;Org1MSP&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="w">            </span><span class="nt">&quot;endpoint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;localhost:9500&quot;</span><span class="p">,</span>
+<a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="w">            </span><span class="nt">&quot;tls&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a><span class="w">            </span><span class="nt">&quot;tlsCACertPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;../../relay/credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a><span class="w">        </span><span class="p">},</span>
+<a id="__codelineno-20-8" name="__codelineno-20-8" href="#__codelineno-20-8"></a><span class="w">        </span><span class="nt">&quot;Org2MSP&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-20-9" name="__codelineno-20-9" href="#__codelineno-20-9"></a><span class="w">            </span><span class="nt">&quot;endpoint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;localhost:9510&quot;</span><span class="p">,</span>
+<a id="__codelineno-20-10" name="__codelineno-20-10" href="#__codelineno-20-10"></a><span class="w">            </span><span class="nt">&quot;tls&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<a id="__codelineno-20-11" name="__codelineno-20-11" href="#__codelineno-20-11"></a><span class="w">            </span><span class="nt">&quot;tlsCACertPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;../../relay/credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-20-12" name="__codelineno-20-12" href="#__codelineno-20-12"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-20-13" name="__codelineno-20-13" href="#__codelineno-20-13"></a><span class="w">    </span><span class="p">},</span>
+<a id="__codelineno-20-14" name="__codelineno-20-14" href="#__codelineno-20-14"></a><span class="w">    </span><span class="nt">&quot;network2&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-20-15" name="__codelineno-20-15" href="#__codelineno-20-15"></a><span class="w">        </span><span class="nt">&quot;Org1MSP&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-20-16" name="__codelineno-20-16" href="#__codelineno-20-16"></a><span class="w">            </span><span class="nt">&quot;endpoint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;localhost:9501&quot;</span><span class="p">,</span>
+<a id="__codelineno-20-17" name="__codelineno-20-17" href="#__codelineno-20-17"></a><span class="w">            </span><span class="nt">&quot;tls&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<a id="__codelineno-20-18" name="__codelineno-20-18" href="#__codelineno-20-18"></a><span class="w">            </span><span class="nt">&quot;tlsCACertPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;../../relay/credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-20-19" name="__codelineno-20-19" href="#__codelineno-20-19"></a><span class="w">        </span><span class="p">},</span>
+<a id="__codelineno-20-20" name="__codelineno-20-20" href="#__codelineno-20-20"></a><span class="w">        </span><span class="nt">&quot;Org2MSP&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-20-21" name="__codelineno-20-21" href="#__codelineno-20-21"></a><span class="w">            </span><span class="nt">&quot;endpoint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;localhost:9511&quot;</span><span class="p">,</span>
+<a id="__codelineno-20-22" name="__codelineno-20-22" href="#__codelineno-20-22"></a><span class="w">            </span><span class="nt">&quot;tls&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<a id="__codelineno-20-23" name="__codelineno-20-23" href="#__codelineno-20-23"></a><span class="w">            </span><span class="nt">&quot;tlsCACertPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;../../relay/credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-20-24" name="__codelineno-20-24" href="#__codelineno-20-24"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-20-25" name="__codelineno-20-25" href="#__codelineno-20-25"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-20-26" name="__codelineno-20-26" href="#__codelineno-20-26"></a><span class="p">}</span>
+</code></pre></div></p>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">The variables we specified earlier in the <code>.env</code> for <code>network1</code> are now passed in the command line. Alternatively, you can make a copy of the <code>fabric-driver</code> folder with a different  name and create a separate <code>.env</code> file within it that contains links to the connection profile, relay, and driver for <code>network2</code>.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="environment-variables">Environment Variables<a class="headerlink" href="#environment-variables" title="Permanent link">&para;</a></h4>
+<p>To configure environment variables for <code>Org1MSP</code>'s Fabric IIN Agent of <code>network1</code>, follow the steps:</p>
+<ol>
+<li>Create a copy of <code>.env.template</code> as <code>.env</code>, and update following values based on previous configuration file paths:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>IIN_AGENT_ENDPOINT=localhost:9500
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>MEMBER_ID=Org1MSP
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>SECURITY_DOMAIN=network1
+<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>DLT_TYPE=fabric
+<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>CONFIG_PATH=./src/fabric-ledger/config-n1-org1.json
+<a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a>DNS_CONFIG_PATH=./dnsconfig.json
+<a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a>SECURITY_DOMAIN_CONFIG_PATH=./docker-testnet/configs/security-domain-config.json
+<a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a>WEAVER_CONTRACT_ID=interop
+<a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a>AUTO_SYNC=true
+</code></pre></div></li>
+<li>If IIN Agent has to be started with TLS enabled, also update following values:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>IIN_AGENT_TLS=false
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>IIN_AGENT_TLS_CERT_PATH=../../relay/credentials/fabric_cert.pem
+<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>IIN_AGENT_TLS_KEY_PATH=../../relay/credentials/fabric_key
+</code></pre></div></li>
+</ol>
+<h4 id="deployment_1">Deployment<a class="headerlink" href="#deployment_1" title="Permanent link">&para;</a></h4>
+<p>Use the following steps to run Fabric IIN Agents in host machine:</p>
+<ul>
+<li>To start IIN Agent for <code>Org1MSP</code> of <code>network1</code>, run:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>npm<span class="w"> </span>run<span class="w"> </span>dev
+</code></pre></div></li>
+<li>To start IIN Agent for <code>Org2MSP</code> of <code>network1</code> (<em>only required if Fabric network was started with 2 orgs</em>), run:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="nv">IIN_AGENT_ENDPOINT</span><span class="o">=</span>localhost:9510<span class="w"> </span><span class="nv">MEMBER_ID</span><span class="o">=</span>Org2MSP<span class="w"> </span><span class="nv">CONFIG_PATH</span><span class="o">=</span>./src/fabric-ledger/config-n1-org2.json<span class="w"> </span>npm<span class="w"> </span>run<span class="w"> </span>dev
+</code></pre></div></li>
+<li>To start IIN Agent for <code>Org1MSP</code> of <code>network2</code>, run:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="nv">IIN_AGENT_ENDPOINT</span><span class="o">=</span>localhost:9501<span class="w"> </span><span class="nv">SECURITY_DOMAIN</span><span class="o">=</span>network2<span class="w"> </span><span class="nv">CONFIG_PATH</span><span class="o">=</span>./src/fabric-ledger/config-n2-org1.json<span class="w"> </span>npm<span class="w"> </span>run<span class="w"> </span>dev
+</code></pre></div></li>
+<li>To start IIN Agent for <code>Org2MSP</code> of <code>network2</code> (<em>only required if Fabric network was started with 2 orgs</em>), run:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="nv">IIN_AGENT_ENDPOINT</span><span class="o">=</span>localhost:9511<span class="w"> </span><span class="nv">MEMBER_ID</span><span class="o">=</span>Org2MSP<span class="w"> </span><span class="nv">SECURITY_DOMAIN</span><span class="o">=</span>network2<span class="w"> </span><span class="nv">CONFIG_PATH</span><span class="o">=</span>./src/fabric-ledger/config-n2-org2.json<span class="w"> </span>npm<span class="w"> </span>run<span class="w"> </span>dev
+</code></pre></div></li>
+</ul>
+<h2 id="corda-components">Corda Components<a class="headerlink" href="#corda-components" title="Permanent link">&para;</a></h2>
+<p>Using the sequence of instructions below, you can start a Corda network and run an application CorDapp on it. You can also run an interoperation CorDapp, a relay and a <em>driver</em> acting on behalf of the network. You can initialize the network's vault with access control policies, foreign networks' security groups (i.e., membership providers' certificate chains), and some sample state values that can be shared during subsequent interoperation flows.</p>
+<h3 id="corda-network">Corda Network<a class="headerlink" href="#corda-network" title="Permanent link">&para;</a></h3>
+<p>The Corda networks' code lies in the <code>weaver/tests/network-setups/corda</code> folder. You can launch two separate Corda networks, namely <code>Corda_Network</code> and <code>Corda_Network2</code>. Each network runs the <code>weaver/samples/corda/corda-simple-application</code> CorDapp by default, which maintains a state named <code>SimpleState</code> containing a set of key-value pairs (of strings).</p>
+<p>The following steps will, in addition to launching the network, build the CorDapp and a Corda client in <code>weaver/samples/corda/corda-simple-application/client</code>.</p>
+<h4 id="running-with-interoperation-cordapp-from-github-packages">Running with Interoperation CorDapp from GitHub Packages<a class="headerlink" href="#running-with-interoperation-cordapp-from-github-packages" title="Permanent link">&para;</a></h4>
+<p>Follow the instructions below to build and launch the network:</p>
+<ul>
+<li>Navigate to the <code>weaver/tests/network-setups/corda</code> folder.</li>
+<li>Create a copy of <code>github.properties.template</code> as <code>github.properties</code>.</li>
+<li>Replace <code>&lt;GITHUB email&gt;</code> with your GitHub email, and <code>&lt;GITHUB Personal Access Token&gt;</code> with the access token created <a href="#package-access-token">above</a>.</li>
+<li>To spin up the Corda networks with the Interoperation CorDapps:<ul>
+<li>Each consisting of 1 node and a notary (for data-transfer), run:
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>make<span class="w"> </span>start
+</code></pre></div></li>
+<li>Each consisting of 2 nodes and a notary (for asset-exchange/transfer), run:
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>make<span class="w"> </span>start<span class="w"> </span><span class="nv">PROFILE</span><span class="o">=</span><span class="s2">&quot;2-nodes&quot;</span>
+</code></pre></div></li>
+<li>Each consisting of 3 nodes and a notary (for asset-exchange/transfer), run:
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>make<span class="w"> </span>start<span class="w"> </span><span class="nv">PROFILE</span><span class="o">=</span><span class="s2">&quot;3-nodes&quot;</span>
+</code></pre></div></li>
+</ul>
+</li>
+</ul>
+<p>You should see the following message in the terminal:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>Waiting for network node services to start
+</code></pre></div>
+The Corda nodes and notary may take a while (several minutes on memory-constrained systems) to start. If they start up successfully, you should something like the following for each network, though the number of node entries will depend on the profile you used to start the network with (replace <code>&lt;network-name&gt;</code> with <code>Corda_Network</code> or <code>Corda_Network2</code>):
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>PartyA<span class="w"> </span>node<span class="w"> </span>services<span class="w"> </span>started<span class="w"> </span><span class="k">for</span><span class="w"> </span>network<span class="w"> </span>&lt;network-name&gt;
+<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>PartyB<span class="w"> </span>node<span class="w"> </span>services<span class="w"> </span>started<span class="w"> </span><span class="k">for</span><span class="w"> </span>network<span class="w"> </span>&lt;network-name&gt;
+<a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a>PartyC<span class="w"> </span>node<span class="w"> </span>services<span class="w"> </span>started<span class="w"> </span><span class="k">for</span><span class="w"> </span>network<span class="w"> </span>&lt;network-name&gt;
+<a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a>Notary<span class="w"> </span>node<span class="w"> </span>services<span class="w"> </span>started<span class="w"> </span><span class="k">for</span><span class="w"> </span>network<span class="w"> </span>&lt;network-name&gt;
+</code></pre></div></p>
+<h3 id="corda-relay">Corda Relay<a class="headerlink" href="#corda-relay" title="Permanent link">&para;</a></h3>
+<p>The relay was built earlier, so you just need to use a different configuration file to start a relay for the Corda network.</p>
+<p>Run a relay for <code>Corda_Network</code> as follows:</p>
+<ul>
+<li>Navigate to the <code>weaver/core/relay</code> folder.</li>
+<li>(Make sure you've already built the relay by running <code>make</code>.)</li>
+<li>To launch the server without TLS, leave the configuration file <code>config/Corda_Relay.toml</code> in its default state. Otherwise, edit it to set TLS flags for this relay and the other relays and drivers it will connect to in this demonstration as follows:
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="p">.</span>
+<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a><span class="p">.</span>
+<a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a><span class="n">cert_path</span><span class="o">=</span><span class="s">&quot;credentials/fabric_cert.pem&quot;</span>
+<a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a><span class="n">key_path</span><span class="o">=</span><span class="s">&quot;credentials/fabric_key&quot;</span>
+<a id="__codelineno-32-5" name="__codelineno-32-5" href="#__codelineno-32-5"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
+<a id="__codelineno-32-6" name="__codelineno-32-6" href="#__codelineno-32-6"></a><span class="p">.</span>
+<a id="__codelineno-32-7" name="__codelineno-32-7" href="#__codelineno-32-7"></a><span class="p">.</span>
+<a id="__codelineno-32-8" name="__codelineno-32-8" href="#__codelineno-32-8"></a><span class="k">[relays]</span>
+<a id="__codelineno-32-9" name="__codelineno-32-9" href="#__codelineno-32-9"></a><span class="k">[relays.Fabric_Relay]</span>
+<a id="__codelineno-32-10" name="__codelineno-32-10" href="#__codelineno-32-10"></a><span class="n">hostname</span><span class="o">=</span><span class="s">&quot;localhost&quot;</span>
+<a id="__codelineno-32-11" name="__codelineno-32-11" href="#__codelineno-32-11"></a><span class="n">port</span><span class="o">=</span><span class="s">&quot;9080&quot;</span>
+<a id="__codelineno-32-12" name="__codelineno-32-12" href="#__codelineno-32-12"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
+<a id="__codelineno-32-13" name="__codelineno-32-13" href="#__codelineno-32-13"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s">&quot;credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-32-14" name="__codelineno-32-14" href="#__codelineno-32-14"></a><span class="k">[relays.Fabric_Relay2]</span>
+<a id="__codelineno-32-15" name="__codelineno-32-15" href="#__codelineno-32-15"></a><span class="n">hostname</span><span class="o">=</span><span class="s">&quot;localhost&quot;</span>
+<a id="__codelineno-32-16" name="__codelineno-32-16" href="#__codelineno-32-16"></a><span class="n">port</span><span class="o">=</span><span class="s">&quot;9083&quot;</span>
+<a id="__codelineno-32-17" name="__codelineno-32-17" href="#__codelineno-32-17"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
+<a id="__codelineno-32-18" name="__codelineno-32-18" href="#__codelineno-32-18"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s">&quot;credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-32-19" name="__codelineno-32-19" href="#__codelineno-32-19"></a><span class="k">[relays.Corda_Relay2]</span>
+<a id="__codelineno-32-20" name="__codelineno-32-20" href="#__codelineno-32-20"></a><span class="n">hostname</span><span class="o">=</span><span class="s">&quot;localhost&quot;</span>
+<a id="__codelineno-32-21" name="__codelineno-32-21" href="#__codelineno-32-21"></a><span class="n">port</span><span class="o">=</span><span class="s">&quot;9082&quot;</span>
+<a id="__codelineno-32-22" name="__codelineno-32-22" href="#__codelineno-32-22"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
+<a id="__codelineno-32-23" name="__codelineno-32-23" href="#__codelineno-32-23"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s">&quot;credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-32-24" name="__codelineno-32-24" href="#__codelineno-32-24"></a><span class="p">.</span>
+<a id="__codelineno-32-25" name="__codelineno-32-25" href="#__codelineno-32-25"></a><span class="p">.</span>
+<a id="__codelineno-32-26" name="__codelineno-32-26" href="#__codelineno-32-26"></a><span class="k">[drivers]</span>
+<a id="__codelineno-32-27" name="__codelineno-32-27" href="#__codelineno-32-27"></a><span class="k">[drivers.Corda]</span>
+<a id="__codelineno-32-28" name="__codelineno-32-28" href="#__codelineno-32-28"></a><span class="n">hostname</span><span class="o">=</span><span class="s">&quot;localhost&quot;</span>
+<a id="__codelineno-32-29" name="__codelineno-32-29" href="#__codelineno-32-29"></a><span class="n">port</span><span class="o">=</span><span class="s">&quot;9099&quot;</span>
+<a id="__codelineno-32-30" name="__codelineno-32-30" href="#__codelineno-32-30"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
+<a id="__codelineno-32-31" name="__codelineno-32-31" href="#__codelineno-32-31"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s">&quot;credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-32-32" name="__codelineno-32-32" href="#__codelineno-32-32"></a><span class="p">.</span>
+<a id="__codelineno-32-33" name="__codelineno-32-33" href="#__codelineno-32-33"></a><span class="p">.</span>
+</code></pre></div></li>
+<li>To launch the server, simply run the following:
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="nv">RELAY_CONFIG</span><span class="o">=</span>config/Corda_Relay.toml<span class="w"> </span>cargo<span class="w"> </span>run<span class="w"> </span>--bin<span class="w"> </span>server
+</code></pre></div></li>
+</ul>
+<p>If the relay starts up successfully, the following will be logged on your terminal:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>Relay Name: &quot;Corda_Relay&quot;
+<a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a>RelayServer listening on [::1]:9081
+</code></pre></div>
+<p>Run a relay for <code>Corda_Network2</code> as follows (<em>do this only if you have launched both Corda networks <code>Corda_Network</code> and <code>Corda_Network2</code> and wish to test interoperation between them</em>)</p>
+<ul>
+<li>Navigate to the <code>weaver/core/relay</code> folder.</li>
+<li>To launch the server without TLS, leave the configuration file <code>config/Corda_Relay2.toml</code> in its default state. Otherwise, edit it to set TLS flags for this relay and the other relays and drivers it will connect to in this demonstration as follows:
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="p">.</span>
+<a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a><span class="p">.</span>
+<a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a><span class="n">cert_path</span><span class="o">=</span><span class="s">&quot;credentials/fabric_cert.pem&quot;</span>
+<a id="__codelineno-35-4" name="__codelineno-35-4" href="#__codelineno-35-4"></a><span class="n">key_path</span><span class="o">=</span><span class="s">&quot;credentials/fabric_key&quot;</span>
+<a id="__codelineno-35-5" name="__codelineno-35-5" href="#__codelineno-35-5"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
+<a id="__codelineno-35-6" name="__codelineno-35-6" href="#__codelineno-35-6"></a><span class="p">.</span>
+<a id="__codelineno-35-7" name="__codelineno-35-7" href="#__codelineno-35-7"></a><span class="p">.</span>
+<a id="__codelineno-35-8" name="__codelineno-35-8" href="#__codelineno-35-8"></a><span class="k">[relays]</span>
+<a id="__codelineno-35-9" name="__codelineno-35-9" href="#__codelineno-35-9"></a><span class="k">[relays.Fabric_Relay]</span>
+<a id="__codelineno-35-10" name="__codelineno-35-10" href="#__codelineno-35-10"></a><span class="n">hostname</span><span class="o">=</span><span class="s">&quot;localhost&quot;</span>
+<a id="__codelineno-35-11" name="__codelineno-35-11" href="#__codelineno-35-11"></a><span class="n">port</span><span class="o">=</span><span class="s">&quot;9080&quot;</span>
+<a id="__codelineno-35-12" name="__codelineno-35-12" href="#__codelineno-35-12"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
+<a id="__codelineno-35-13" name="__codelineno-35-13" href="#__codelineno-35-13"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s">&quot;credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-35-14" name="__codelineno-35-14" href="#__codelineno-35-14"></a><span class="k">[relays.Fabric_Relay2]</span>
+<a id="__codelineno-35-15" name="__codelineno-35-15" href="#__codelineno-35-15"></a><span class="n">hostname</span><span class="o">=</span><span class="s">&quot;localhost&quot;</span>
+<a id="__codelineno-35-16" name="__codelineno-35-16" href="#__codelineno-35-16"></a><span class="n">port</span><span class="o">=</span><span class="s">&quot;9083&quot;</span>
+<a id="__codelineno-35-17" name="__codelineno-35-17" href="#__codelineno-35-17"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
+<a id="__codelineno-35-18" name="__codelineno-35-18" href="#__codelineno-35-18"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s">&quot;credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-35-19" name="__codelineno-35-19" href="#__codelineno-35-19"></a><span class="k">[relays.Corda_Relay]</span>
+<a id="__codelineno-35-20" name="__codelineno-35-20" href="#__codelineno-35-20"></a><span class="n">hostname</span><span class="o">=</span><span class="s">&quot;localhost&quot;</span>
+<a id="__codelineno-35-21" name="__codelineno-35-21" href="#__codelineno-35-21"></a><span class="n">port</span><span class="o">=</span><span class="s">&quot;9081&quot;</span>
+<a id="__codelineno-35-22" name="__codelineno-35-22" href="#__codelineno-35-22"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
+<a id="__codelineno-35-23" name="__codelineno-35-23" href="#__codelineno-35-23"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s">&quot;credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-35-24" name="__codelineno-35-24" href="#__codelineno-35-24"></a><span class="p">.</span>
+<a id="__codelineno-35-25" name="__codelineno-35-25" href="#__codelineno-35-25"></a><span class="p">.</span>
+<a id="__codelineno-35-26" name="__codelineno-35-26" href="#__codelineno-35-26"></a><span class="k">[drivers]</span>
+<a id="__codelineno-35-27" name="__codelineno-35-27" href="#__codelineno-35-27"></a><span class="k">[drivers.Corda]</span>
+<a id="__codelineno-35-28" name="__codelineno-35-28" href="#__codelineno-35-28"></a><span class="n">hostname</span><span class="o">=</span><span class="s">&quot;localhost&quot;</span>
+<a id="__codelineno-35-29" name="__codelineno-35-29" href="#__codelineno-35-29"></a><span class="n">port</span><span class="o">=</span><span class="s">&quot;9098&quot;</span>
+<a id="__codelineno-35-30" name="__codelineno-35-30" href="#__codelineno-35-30"></a><span class="n">tls</span><span class="o">=</span><span class="kc">true</span>
+<a id="__codelineno-35-31" name="__codelineno-35-31" href="#__codelineno-35-31"></a><span class="n">tlsca_cert_path</span><span class="o">=</span><span class="s">&quot;credentials/fabric_ca_cert.pem&quot;</span>
+<a id="__codelineno-35-32" name="__codelineno-35-32" href="#__codelineno-35-32"></a><span class="p">.</span>
+<a id="__codelineno-35-33" name="__codelineno-35-33" href="#__codelineno-35-33"></a><span class="p">.</span>
+</code></pre></div></li>
+<li>To launch the server, simply run the following:
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="nv">RELAY_CONFIG</span><span class="o">=</span>config/Corda_Relay2.toml<span class="w"> </span>cargo<span class="w"> </span>run<span class="w"> </span>--bin<span class="w"> </span>server
+</code></pre></div></li>
+</ul>
+<p>If the relay starts up successfully, the following will be logged on your terminal:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a>Relay Name: &quot;Corda2_Relay&quot;
+<a id="__codelineno-37-2" name="__codelineno-37-2" href="#__codelineno-37-2"></a>RelayServer listening on [::1]:9082
+</code></pre></div>
+<h3 id="corda-driver">Corda Driver<a class="headerlink" href="#corda-driver" title="Permanent link">&para;</a></h3>
+<p>The code for this lies in the <code>weaver/core/drivers/corda-driver</code> folder.</p>
+<h4 id="building-corda-driver">Building Corda Driver<a class="headerlink" href="#building-corda-driver" title="Permanent link">&para;</a></h4>
+<p>Build the Corda driver module as follows:</p>
+<ul>
+<li>Navigate to the <code>weaver/core/drivers/corda-driver</code> folder.</li>
+<li>Create a copy of <code>github.properties.template</code> as <code>github.properties</code>.</li>
+<li>Replace <code>&lt;GITHUB email&gt;</code> with your GitHub email, and <code>&lt;GITHUB Personal Access Token&gt;</code> with the access token created <a href="#package-access-token">above</a>.</li>
+<li>Run the following:
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a>make<span class="w"> </span>build
+</code></pre></div></li>
+</ul>
+<h4 id="configuring_1">Configuring<a class="headerlink" href="#configuring_1" title="Permanent link">&para;</a></h4>
+<p>Configure the drivers as follows (you can skip this if you wish to run the drivers without TLS):</p>
+<ul>
+<li>Navigate to the <code>weaver/core/drivers/corda-driver</code> folder and create a <code>.env</code> file.</li>
+<li>To run the drivers without TLS, set the following default values:
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>RELAY_TLS=false
+<a id="__codelineno-39-2" name="__codelineno-39-2" href="#__codelineno-39-2"></a>RELAY_TLSCA_TRUST_STORE=
+<a id="__codelineno-39-3" name="__codelineno-39-3" href="#__codelineno-39-3"></a>RELAY_TLSCA_TRUST_STORE_PASSWORD=
+<a id="__codelineno-39-4" name="__codelineno-39-4" href="#__codelineno-39-4"></a>RELAY_TLSCA_CERT_PATHS=
+</code></pre></div></li>
+<li>To run the drivers with TLS, set the following values (replace <code>&lt;PATH-TO-WEAVER&gt;</code> with the absolute path of the <code>weaver</code> folder within your Cacti repository clone):
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a>RELAY_TLS=true
+<a id="__codelineno-40-2" name="__codelineno-40-2" href="#__codelineno-40-2"></a>RELAY_TLSCA_TRUST_STORE=&lt;PATH-TO-WEAVER&gt;/core/relay/credentials/fabric_trust_store.jks
+<a id="__codelineno-40-3" name="__codelineno-40-3" href="#__codelineno-40-3"></a>RELAY_TLSCA_TRUST_STORE_PASSWORD=trelay
+<a id="__codelineno-40-4" name="__codelineno-40-4" href="#__codelineno-40-4"></a>RELAY_TLSCA_CERT_PATHS=&lt;PATH-TO-WEAVER&gt;/core/relay/credentials/fabric_ca_cert.pem
+</code></pre></div></li>
+</ul>
+<h4 id="running_1">Running<a class="headerlink" href="#running_1" title="Permanent link">&para;</a></h4>
+<p>Run a Corda driver as follows:</p>
+<ul>
+<li>Navigate to the <code>weaver/core/drivers/corda-driver</code> folder.</li>
+<li>Run the following to start Corda driver for <code>Corda_Network</code>:
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a>./build/install/corda-driver/bin/corda-driver
+</code></pre></div>
+  If the driver starts successfully, it should log the following message on your terminal:
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a>Corda driver gRPC server started. Listening on port 9099
+</code></pre></div></li>
+<li>Run the following to start Corda driver for <code>Corda_Network2</code>:
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a><span class="nv">DRIVER_PORT</span><span class="o">=</span><span class="m">9098</span><span class="w"> </span>./build/install/corda-driver/bin/corda-driver
+</code></pre></div>
+  If the driver starts successfully, it should log the following message on your terminal:
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a>Corda driver gRPC server started. Listening on port 9098
+</code></pre></div></li>
+</ul>
+<h2 id="tear-down-the-setup">Tear Down the Setup<a class="headerlink" href="#tear-down-the-setup" title="Permanent link">&para;</a></h2>
+<p>Bring down the test network's components as follows:</p>
+<ul>
+<li>Simply terminate the various relays and drivers, which are running in the foreground in different terminals</li>
+<li>To bring down the running Corda network:<ul>
+<li>Navigate to the <code>weaver/tests/network-setups/corda</code> folder.</li>
+<li>Run the following:
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a>make<span class="w"> </span>clean
+</code></pre></div></li>
+</ul>
+</li>
+<li>To bring down all the running Fabric networks:<ul>
+<li>Navigate to the <code>weaver/tests/network-setups/fabric/dev</code> folder.</li>
+<li>Run the following:
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a>make<span class="w"> </span>clean
+</code></pre></div></li>
+</ul>
+</li>
+</ul>
+
+
+  
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../setup-local-docker/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Setup with Locally Built Dockerized Weaver Components">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Setup with Locally Built Dockerized Weaver Components
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../setup-packages-docker/" class="md-footer__link md-footer__link--next" aria-label="Next: Setup with Imported Dockerized Weaver Components">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Setup with Imported Dockerized Weaver Components
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; Hyperledger 2020-2023
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.code.copy", "navigation.expand", "navigation.footer", "navigation.instant", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "toc.follow", "toc.integrate"], "search": "../../../../assets/javascripts/workers/search.a264c092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../../../../assets/javascripts/bundle.6eac0284.min.js"></script>
+      
+    
+  </body>
+</html>

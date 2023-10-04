@@ -1,0 +1,4232 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://hyperledger.github.io/cacti/cactus/contributing/">
+      
+      
+        <link rel="prev" href="../code-of-conduct/">
+      
+      
+        <link rel="next" href="../whitepaper/">
+      
+      
+      <link rel="icon" href="../../images/HL_Cacti_Logo_Colorreverse.svg">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.4.3">
+    
+    
+      
+        <title>Contributing - Using and Developing with Hyperledger Cacti</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.79e020e9.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.a5377069.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+  
+  
+
+<script id="__analytics">function __md_analytics(){function n(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],n("js",new Date),n("config",""),document.addEventListener("DOMContentLoaded",function(){document.forms.search&&document.forms.search.query.addEventListener("blur",function(){this.value&&n("event","search",{search_term:this.value})}),document$.subscribe(function(){var a=document.forms.feedback;if(void 0!==a)for(var e of a.querySelectorAll("[type=submit]"))e.addEventListener("click",function(e){e.preventDefault();var t=document.location.pathname,e=this.getAttribute("data-md-value");n("event","feedback",{page:t,data:e}),a.firstElementChild.disabled=!0;e=a.querySelector(".md-feedback__note [data-md-value='"+e+"']");e&&(e.hidden=!1)}),a.hidden=!1}),location$.subscribe(function(e){n("config","",{page_path:e.pathname})})});var e=document.createElement("script");e.async=!0,e.src="https://www.googletagmanager.com/gtag/js?id=",document.getElementById("__analytics").insertAdjacentElement("afterEnd",e)}</script>
+  
+    <script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
+  
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#contributing" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+          <aside class="md-banner md-banner--warning">
+            <div class="md-banner__inner md-grid md-typeset">
+              
+  You're not viewing the latest version.
+  <a href="../../.."> 
+    <strong>Click here to go to latest.</strong>
+  </a>
+
+            </div>
+            <script>var el=document.querySelector("[data-md-component=outdated]"),outdated=__md_get("__outdated",sessionStorage);!0===outdated&&el&&(el.hidden=!1)</script>
+          </aside>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Using and Developing with Hyperledger Cacti" class="md-header__button md-logo" aria-label="Using and Developing with Hyperledger Cacti" data-md-component="logo">
+      
+  <img src="../../images/HL_Cacti_Logo_Colorreverse.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Using and Developing with Hyperledger Cacti
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Contributing
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12c0-2.42-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69Z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/hyperledger/cacti" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    hyperledger/cacti
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+    
+  
+  Introduction
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../vision/" class="md-tabs__link">
+        
+  
+    
+  
+  Vision
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../architecture/" class="md-tabs__link">
+        
+  
+    
+  
+  Architecture
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../concepts/data-sharing/" class="md-tabs__link">
+          
+  
+  Key Concepts
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../use-cases/" class="md-tabs__link">
+        
+  
+    
+  
+  Use Cases
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../introduction/" class="md-tabs__link">
+          
+  
+  Cactus
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../weaver/introduction/" class="md-tabs__link">
+          
+  
+  Weaver
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../guides/operations/" class="md-tabs__link">
+          
+  
+  Guides
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../references/specs/" class="md-tabs__link">
+          
+  
+  References
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../contributing/how-to-contribute/" class="md-tabs__link">
+          
+  
+  Contributing
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../faqs/" class="md-tabs__link">
+        
+  
+    
+  
+  FAQs
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../glossary/" class="md-tabs__link">
+        
+  
+    
+  
+  Glossary
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../contact-us/" class="md-tabs__link">
+        
+  
+    
+  
+  Contact Us
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Using and Developing with Hyperledger Cacti" class="md-nav__button md-logo" aria-label="Using and Developing with Hyperledger Cacti" data-md-component="logo">
+      
+  <img src="../../images/HL_Cacti_Logo_Colorreverse.svg" alt="logo">
+
+    </a>
+    Using and Developing with Hyperledger Cacti
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/hyperledger/cacti" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    hyperledger/cacti
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../vision/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Vision
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Architecture
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    
+    
+    
+    
+    
+      
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Key Concepts
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Key Concepts
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/data-sharing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Data Sharing
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Use Cases
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+    
+    
+    
+    
+    
+      
+      
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Cactus
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            Cactus
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../introduction/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../build/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Building
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_6_3" id="__nav_6_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Examples
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_3">
+            <span class="md-nav__icon md-icon"></span>
+            Examples
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/supply-chain-app/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Supply Chain Application
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../governance/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Governance
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../code-of-conduct/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Code of Conduct
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Contributing
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Contributing
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#git-know-how-reading-list" class="md-nav__link">
+    Git Know How / Reading List
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pr-checklist-contributordeveloper" class="md-nav__link">
+    PR Checklist - Contributor/Developer
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pr-checklist-maintainerreviewer" class="md-nav__link">
+    PR Checklist - Maintainer/Reviewer
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-local-branch" class="md-nav__link">
+    Create local branch
+  </a>
+  
+    <nav class="md-nav" aria-label="Create local branch">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#directory-structure" class="md-nav__link">
+    Directory structure
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-automation" class="md-nav__link">
+    Test Automation
+  </a>
+  
+    <nav class="md-nav" aria-label="Test Automation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    Summary
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-case-core-principles" class="md-nav__link">
+    Test Case Core Principles
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#working-with-the-code" class="md-nav__link">
+    Working with the Code
+  </a>
+  
+    <nav class="md-nav" aria-label="Working with the Code">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#runningdebugging-the-tests" class="md-nav__link">
+    Running/Debugging the tests
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#all-in-one-docker-images-for-ledger-connector-plugins" class="md-nav__link">
+    All-In-One Docker Images for Ledger Connector Plugins
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#building-the-api-clients" class="md-nav__link">
+    Building the API Client(S)
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adding-new-dependencies" class="md-nav__link">
+    Adding new dependencies
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reload-vscode-window-after-adding-dependencies" class="md-nav__link">
+    Reload VSCode Window After Adding Dependencies
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#on-reproducible-builds" class="md-nav__link">
+    On Reproducible Builds
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../whitepaper/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Whitepaper
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../regulatory-and-industry-initiatives-reading-list/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Regulatory and Industry Initiatives
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_6_9" id="__nav_6_9_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Components
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_9">
+            <span class="md-nav__icon md-icon"></span>
+            Components
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../packages/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../packages/cactus-api-client/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Api Client
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../packages/cactus-cmd-api-server/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    CMD Api Server
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../packages/cactus-common/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Cactus Common
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../packages/cactus-core/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Cactus Core
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../packages/cactus-plugin-consortium-manual/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Consortium Manual
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../packages/cactus-plugin-keychain-vault/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Keychain Vault
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../packages/cactus-plugin-ledger-connector-besu/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Connector Besu
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../packages/cactus-plugin-ledger-connector-corda/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Connector Corda
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../packages/cactus-plugin-ledger-connector-fabric/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Connector Fabric
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../packages/cactus-plugin-ledger-connector-quorum/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Connector Quorum
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../packages/cactus-test-api-client/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Test Api Client
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../packages/cactus-test-cmd-api-server/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Test CMD Api Server
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../packages/cactus-test-plugin-ledger-connector-quorum/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Test Connector Quorum
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../packages/cactus-test-tooling/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Test Tooling
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_6_10" id="__nav_6_10_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Ledger Support
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_10">
+            <span class="md-nav__icon md-icon"></span>
+            Ledger Support
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../support/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../support/besu/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Hyperledger Besu
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../support/corda/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    R3 Corda
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../support/fabric/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Hyperledger Fabric
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../support/iroha/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Hyperledger Iroha
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../support/quorum/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Quorum
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../support/xdai/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    xDai
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    
+    
+    
+    
+    
+      
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Weaver
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            Weaver
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/introduction/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Framework
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_2" id="__nav_7_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Getting Started
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_2">
+            <span class="md-nav__icon md-icon"></span>
+            Getting Started
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/getting-started/guide/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Using Weaver
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_2_2" id="__nav_7_2_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Launching a Test Network
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_7_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            Launching a Test Network
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/getting-started/test-network/overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Component Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/getting-started/test-network/setup-local/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Setup with Locally Built Weaver Components
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/getting-started/test-network/setup-local-docker/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Setup with Locally Built Dockerized Weaver Components
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/getting-started/test-network/setup-packages/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Setup with Imported Weaver Components
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/getting-started/test-network/setup-packages-docker/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Setup with Imported Dockerized Weaver Components
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/getting-started/test-network/ledger-initialization/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Ledger Initialization
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/getting-started/test-network/advanced-configuration/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Advanced Configuration
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_2_3" id="__nav_7_2_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Testing Interoperation Modes
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_7_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            Testing Interoperation Modes
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/getting-started/interop/overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/getting-started/interop/data-sharing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Data Sharing
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_2_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_2_3_3" id="__nav_7_2_3_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Asset Exchange
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_7_2_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_2_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            Asset Exchange
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/getting-started/interop/asset-exchange/overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/getting-started/interop/asset-exchange/fabric-fabric/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Fabric with Fabric
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/getting-started/interop/asset-exchange/fabric-corda/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Fabric with Corda
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/getting-started/interop/asset-exchange/fabric-besu/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Fabric with Besu
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/getting-started/interop/asset-exchange/corda-corda/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Corda with Corda
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/getting-started/interop/asset-exchange/corda-besu/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Corda with Besu
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/getting-started/interop/asset-exchange/besu-besu/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Besu with Besu
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/getting-started/interop/asset-transfer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Asset Transfer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_2_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_2_4" id="__nav_7_2_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Enabling Weaver in your Network and Application
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_7_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            Enabling Weaver in your Network and Application
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/getting-started/enabling-weaver-network/overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/getting-started/enabling-weaver-network/fabric/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Hyperledger Fabric
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/getting-started/enabling-weaver-network/corda/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    R3 Corda
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/getting-started/enabling-weaver-network/besu/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Hyperledger Besu
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_3" id="__nav_7_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    What is Interoperability?
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_3">
+            <span class="md-nav__icon md-icon"></span>
+            What is Interoperability?
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/what-is-interoperability/understanding-interoperability/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Understanding Interoperability
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/what-is-interoperability/levels-of-interoperability/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Levels of Interoperability
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/what-is-interoperability/integration-patterns/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Integration Patterns
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/interoperability-modes/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Interoperability Modes
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/design-principles/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Design Principles
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_6" id="__nav_7_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    User Stories
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_6">
+            <span class="md-nav__icon md-icon"></span>
+            User Stories
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/user-stories/overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/user-stories/global-trade/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Global Trade
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/user-stories/financial-markets/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    DvP in Financial Markets
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/user-stories/legacy-integration/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Legacy Integration
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_7" id="__nav_7_7_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Architecture and Design
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_7">
+            <span class="md-nav__icon md-icon"></span>
+            Architecture and Design
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/architecture-and-design/overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/architecture-and-design/relay/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Relay
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/architecture-and-design/drivers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Drivers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/architecture-and-design/weaver-dapps/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Weaver DApps
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/architecture-and-design/decentralized-identity/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Decentralized Identity
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_8" id="__nav_7_8_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Security Model
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_8">
+            <span class="md-nav__icon md-icon"></span>
+            Security Model
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/security-model/authentication/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Authentication
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/security-model/access-control/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Access Control
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/security-model/proofs-and-verification/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Proofs and Verification
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/security-model/end-to-end-security/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    End-to-End Security
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_9" id="__nav_7_9_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Deployment Considerations
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_9">
+            <span class="md-nav__icon md-icon"></span>
+            Deployment Considerations
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/deployment-considerations/deployment-patterns/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Deployment Patterns
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/deployment-considerations/governance-and-policies/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Governance and Policies
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/deployment-considerations/legal-and-regulation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Legal and Regulation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/specifications/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Specifications
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/roadmap/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Roadmap
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../weaver/publications/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Publications
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    
+    
+    
+    
+    
+      
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Guides
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            Guides
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/operations/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Operations
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/developers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Developers
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/upgrading/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Upgrading
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    
+    
+    
+    
+    
+      
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    References
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            References
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../references/specs/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Technical Specifications
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../references/publications/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Publications
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../references/events/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Events and Podcasts
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../references/business/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Business Usage
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../references/best-practices/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Project Best Practices
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../references/github/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    GitHub Contributions
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    
+    
+    
+    
+    
+      
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Contributing
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+            Contributing
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/how-to-contribute/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    How to Contribute
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/reporting-a-bug/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Reporting a Bug
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/requesting-a-change/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Requesting a Change
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/asking-a-question/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Asking a Question
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../faqs/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    FAQs
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../glossary/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Glossary
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contact-us/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Contact Us
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="contributing">Contributing<a class="headerlink" href="#contributing" title="Permanent link">&para;</a></h1>
+<p>Thank you for your interest to contribute to Hyperledger Cactus! <img alt="🎉" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@14.1.2/assets/svg/1f389.svg" title=":tada:" /></p>
+<p>First things first, please review the <a href="https://wiki.hyperledger.org/display/HYP/Hyperledger+Code+of+Conduct">Hyperledger Code of Conduct</a> before participating.</p>
+<p>There are many ways to contribute to Hyperledger Cactus, both as a user and as a developer.</p>
+<p>As a user, this can include:</p>
+<ul>
+<li>
+<p><a href="https://github.com/hyperledger/cactus/issues/new?assignees=&amp;labels=enhancement&amp;template=feature_request.md&amp;title=">Making Feature/Enhancement Proposals</a></p>
+</li>
+<li>
+<p><a href="https://github.com/hyperledger/cactus/issues/new?assignees=&amp;labels=bug&amp;template=bug_report.md&amp;title=">Reporting bugs</a></p>
+</li>
+</ul>
+<p>As a developer:</p>
+<ul>
+<li>
+<p>if you only have a little time, consider picking up a <a href="https://github.com/hyperledger/cactus/labels/help%20wanted">“help-wanted”</a> or <a href="https://github.com/hyperledger/cactus/labels/good%20first%20issue">“good-first-issue”</a> task</p>
+</li>
+<li>
+<p>If you can commit to full-time development, then please contact us on our <a href="https://chat.hyperledger.org/channel/cactus">Rocketchat channel</a> to work through logistics!</p>
+</li>
+</ul>
+<h2 id="git-know-how-reading-list">Git Know How / Reading List<a class="headerlink" href="#git-know-how-reading-list" title="Permanent link">&para;</a></h2>
+<p>This section is for you if you do not know your way around advanced git concepts such as</p>
+<ul>
+<li>
+<p>rebasing (interactive or otherwise)</p>
+</li>
+<li>
+<p>splitting commits/PRs</p>
+</li>
+<li>
+<p>when to use and not to use force push</p>
+</li>
+</ul>
+<p>A word on the controversial topic of force pushes: In many git guides you will read that force push is basically forbidden. This is true 99% of the time, BUT if you are the only person working on a branch (which is most of time true for a feature/fix branch of yours that you are planning to submit as a PR) then force pushing is not just allowed but necessary to avoid messy git commit logs. The question you need to ask yourself before force pushing is this: Am I going to destroy someone else’s work on the remote branch? If nobody else is working on the branch then the answer is of course no and force push can be used safely. If others are working with you on the branch on the other hand, it is considered polite to ask and warn them in advance prior to force pushing so that they can take the necessary precautions on their side as well.</p>
+<p>A handy tool to avoid destroying other’s work accidentally is the new(ish) git feature called <code>--force-with-lease</code>: Using <code>git push --force-with-lease</code> instead of vanilla <code>--force</code> is highly recommended: <a href="https://softwareengineering.stackexchange.com/a/312710">https://softwareengineering.stackexchange.com/a/312710</a></p>
+<p>The rustlang documentation has an excellent write-up and additional links on pretty much everything you need to know. The only difference between their PR requirements and Cactus’ is that we do encourage people referencing github issues in commit messages. Quoting the most relevant parts below (and thanks to the Rust maintainers for this).</p>
+<blockquote>
+<p>Pull requests are the primary mechanism we use to change Rust. GitHub itself has some great documentation on using the Pull Request feature. We use the “fork and pull” model described here, where contributors push changes to their personal fork and create pull requests to bring those changes into the source repository.</p>
+<p>Please make pull requests against the main branch.</p>
+<p>Rust follows a no merge policy, meaning, when you encounter merge conflicts you are expected to always rebase instead of merge. E.g. always use rebase when bringing the latest changes from the main branch to your feature branch. Also, please make sure that fixup commits are squashed into other related commits with meaningful commit messages.</p>
+<p>GitHub allows closing issues using keywords. This feature should be used to keep the issue tracker tidy.</p>
+</blockquote>
+<p>Source: <a href="https://github.com/rust-lang/rust/blob/53702a67e2ae8a404169a0329f6a38d73bf7494d/CONTRIBUTING.md#pull-requests">https://github.com/rust-lang/rust/blob/53702a67e2ae8a404169a0329f6a38d73bf7494d/CONTRIBUTING.md#pull-requests</a></p>
+<p>Further reading:</p>
+<ul>
+<li>
+<p><a href="https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-collaborative-development-models">https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-collaborative-development-models</a></p>
+</li>
+<li>
+<p><a href="https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests">https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests</a></p>
+</li>
+</ul>
+<h2 id="pr-checklist-contributordeveloper">PR Checklist - Contributor/Developer<a class="headerlink" href="#pr-checklist-contributordeveloper" title="Permanent link">&para;</a></h2>
+<p><strong>To avoid issues in the future, do not install dependencies globally. Ensure all dependencies are kept self-contained.</strong></p>
+<ol>
+<li>
+<p>Fork <a href="https://github.com/hyperledger/cactus">hyperledger/cactus</a> via Github UI</p>
+<ul>
+<li>
+<p>If you are using the Git client on the Windows operating system, you will need to enable long paths for git which you can do in PowerShell by executing the command below. To clarify, this may also apply if you are using any Git GUI application on Windows such as <code>Github Desktop</code> or others.</p>
+<p>git config --global core.longpaths true</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Clone the fork to your local machine</p>
+</li>
+<li>
+<p>(Optional) <a href="#create-local-branch">Create local branch</a> for minimizing code conflicts when you want to contribute multiple changes regarding different issues in parallel.</p>
+</li>
+<li>
+<p>Complete the desired changes and where possible test locally</p>
+<ol>
+<li>
+<p>You can run the full CI suite on Mac/Linux/WSL by running the script at <code>./tools/ci.sh</code></p>
+</li>
+<li>
+<p>If you do not have your environment set up for running bash scripts, do not worry, all pull requests will automatically have the same script executed for it when opened. The only downside is the slower feedback loop.</p>
+</li>
+</ol>
+</li>
+<li>
+<p>Make sure you have set up your git signatures</p>
+<ol>
+<li>
+<p>Note: Always sign your commits using the <code>git commit -S</code></p>
+</li>
+<li>
+<p>For more information see <a href="https://gist.github.com/tkuhrt/10211ae0a26a91a8c030d00344f7d11b">here</a></p>
+</li>
+</ol>
+</li>
+<li>
+<p>Think about/decide on what your commit message will be.</p>
+<ol>
+<li>
+<p>The commit message syntax might be hard to remember at first so you we invite you to use the <code>npm run commit</code> command which upon execution presents you with a series of prompts that you can fill out and have your input validated in realtime, making it impossible (or at least much harder) to produce an invalid commit message that the commit lint bot on Github will flag with an error.</p>
+<ol>
+<li>
+<p>The use of this tool described above is entirely optional in case you need a crutch.</p>
+</li>
+<li>
+<p>Note that running the <code>npm run commit</code> command will also attempt to perform the actual commit at the end unless you kill the process with <code>Ctrl + C</code> or whatever is your terminal’s shortcut for the same action.</p>
+</li>
+<li>
+<p>The <code>npm run commit</code> command will also attempt to sign the produced commit so make sure that it is set up properly prior to using it.</p>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>
+<p>Commit your changes</p>
+<ol>
+<li>
+<p>Make sure your commit message follows the formatting requirements (details above) and here: <a href="https://www.conventionalcommits.org/en/v1.0.0-beta.4/#specification">Conventional Commits syntax</a>; this aids in release notes generation which we intend to automate</p>
+</li>
+<li>
+<p>Be aware that we are using git commit hooks for the automation of certain mundane tasks such as applying the required code style and formatting so your code will be wrapped at 80 characters each line automatically. If you wish to see how your changes will be altered by the formatter you can run the <code>npm run prettier</code> command from a terminal or install an IDE extension for the <code>Prettier</code> tool that can do the same (VSCode has one that is known to work).</p>
+</li>
+</ol>
+</li>
+<li>
+<p>Ensure your branch is rebased onto the <code>upstream</code> main branch where <code>upstream</code> is fancy git talk for the main Cactus repo on Github (the one you created your fork from).</p>
+<ol>
+<li>
+<p><strong>Do not</strong> duplicate your pull request after it has been reviewed. Duplication here means closing the existing PR and then opening a brand new one which does not contain the review history anymore. If you encounter issues with version control that you do not know how to solve the maintainers will be happy to assist to ensure that you do not need to open a new pull request from scratch.</p>
+<ol>
+<li>The only exception from the rule above is if you mistakenly named your branch to contain special characters and somehow ended up in a state where it has become impossible to push changes to the remote due to this (which has happened before with branch names like <code>refactor(core-api): x</code> that had to be renamed to <code>refactor-core-api-x</code> and then a new PR had to be created in that case because GitHub does not let you rename the remote branch that your pull request is tied to)</li>
+</ol>
+</li>
+<li>
+<p>If you are having trouble, there are many great resources out there (so we will not write another here).</p>
+<ol>
+<li>
+<p>If you are having trouble locating a suitable guide specifically on the mechanics of rebasing, we can recommend <a href="https://thoughtbot.com/blog/git-interactive-rebase-squash-amend-rewriting-history">this one</a>. Thanks to Rafael for the link!</p>
+</li>
+<li>
+<p>If you went through that tutorial and still not quite sure what’s up, give this one a shot as well: <a href="https://about.gitlab.com/blog/2020/11/23/keep-git-history-clean-with-interactive-rebase/">https://about.gitlab.com/blog/2020/11/23/keep-git-history-clean-with-interactive-rebase/</a></p>
+</li>
+</ol>
+</li>
+<li>
+<p>If merge conflicts arise, you must fix these at rebase time since omitting this step does not magically make the conflicts go away, just pushes it over the fence to the maintainer who will attempt to merge your pull request at a later point in time.</p>
+</li>
+<li>
+<p>If the above happens, at that point said maintainer will most likely ask you (if not already) to perform the rebase anyway since as the author of a change you are best positioned to resolve any conflicts on the code level. Occassionally maintainers may do the merge/conflict resolution themselves, but do not count on this nor try to make a habit out of relying on the potential kindness.</p>
+</li>
+<li>
+<p>After successful rebasing, take another look at your commit(s). Ideally there should be just one in each pull request, but also on the other hand each commit should be as small, simple and self contained as possible, so there can be cases where it makes sense to submit a PR with multiple commits if for example you also had to change something in the test tooling while implementing a feature (in which case there could be a commit for the feature itself and another for the necessary changes to the test tooling package). What we respectfully ask though is that you try to avoid these situations and submit most of your PRs with a single, self contained commit that does not touch multiple things. This significantly reduces the cognitive load required to review the changes which in turn makes everyone happier: the maintainers will have an easier job reviewing, which means they’ll be doing it faster which will (probably) cause you joy in turn.</p>
+</li>
+</ol>
+</li>
+<li>
+<p>Push your changes to your main (or whatever you named your feature branch, that is entirely up to you at the end of the day)</p>
+</li>
+<li>
+<p>Initiate a pull request from your fork to the base repository</p>
+</li>
+<li>
+<p>Remember: Opening a pull request is like saying “Hey maintainers, I have this change finalized and ready for you to spend time on reviewing it.” The word <code>finalized</code> here is understood to imply that you are not planning on doing any more changes on the branch apart from when being asked to by the reviewers.</p>
+</li>
+<li>
+<p>It is perfectly acceptable to open a pull request and mark it as <code>draft</code> (a GitHub feature) which then signals to the maintainers that if they have time, they are welcome to look at the change, but it may or may not be in its final form yet so you are not responsible for potential loss of time on their end if the review has to be performed multiple times on account of changes. Once you promote your draft PR to a real one, the comments from the point above apply however.</p>
+</li>
+<li>
+<p>If your pull request contains a significant change, we recommend that you apply the similarly named github label on in it as well. It is okay if you do not do this, if we detect that the change is indeed significant, we will apply the label. If you do it in advance however, it will probably speed up the proceedings by removing one communication roundtrip from the review process of your pull request.</p>
+</li>
+<li>
+<p>Await CI, DCO &amp; linting quality checks, as well as any feedback from reviewers</p>
+</li>
+<li>
+<p>If you need to update your pull request either because you discovered an issue or because you were asked to do so we ask that you:</p>
+</li>
+<li>
+<p>try to add the change in a way that does not produce additional commits on the PR but instead do an <code>git commit --amend --signoff</code> on your local branch and then a force push to the remote branch of yours (the PR essentially). Again, if the change you are doing does not fit within any one of the existing commits of your PR, then it is justified to add a new commit and this is up to your discretion (maintainers may respectfully ask you to squash if they see otherwise)</p>
+</li>
+<li>
+<p>The rule of thumb for any and all things in git/Cactus is to maintain a clean, tidy commit log/history that enables everyone to easily look up changes and find accurate answers to the basic questions of <code>Who? / What? / When / Why?</code>. If you have ever been in a situation when you tried to figure out the original point a bug was introduced (and tried to figure out why the offending change was made in the first place) and the git blame just lead you to a 10 megabyte large patch with the message ‘merge xyz’, then you know exactly what it is we are trying to avoid here. :-)</p>
+</li>
+</ol>
+<h2 id="pr-checklist-maintainerreviewer">PR Checklist - Maintainer/Reviewer<a class="headerlink" href="#pr-checklist-maintainerreviewer" title="Permanent link">&para;</a></h2>
+<p>Ensure all the following conditions are met (on top of you agreeing with the change itself)</p>
+<ol>
+<li>
+<p>All automated checks that are not explicitly called out here are also passing/green.</p>
+</li>
+<li>
+<p>Branch is rebased onto main and there are no dangling/duplicate commits.</p>
+</li>
+<li>
+<p>Commits appear simple and self contained. Simple is always relative to the mangitude of the change itself of course. A 1k line change can still be simple if all it does is rename some commonly used variable in each place its being used.</p>
+</li>
+<li>
+<p>If the contributors are having trouble with git basic functionality such as rebasing / force pushing, DCO, do your best to help them out, when in doubt feel free to reach out to Peter (who is the one insisting an all these git rules so he deserves to be the primary contact for all git related issues).</p>
+<ol>
+<li>Remember that we want to foster a welcoming community so if someone is new to git try to be extra patient with them on this front.</li>
+</ol>
+</li>
+<li>
+<p>Ensure the commit messages are according to the standard format.</p>
+<ol>
+<li>
+<p>Remember that if you select ‘squash’ on the Github UI when accepting the pull request, Github will (by default) offer up the title of the pull request as the new commit message for your squash commit. This is not good unless the title happens to be a valid commit message, but in the likely event of it not being as such, you must take special care to type in a valid commit message right there and then on the Github UI.</p>
+</li>
+<li>
+<p>To avoid the hassle/potential issues with the above, it is recommended that you always use ‘rebase’ when accepting a pull request even if there are multiple commits that you’d otherwise like to see squashed.</p>
+</li>
+<li>
+<p>If you are adamant that you do not want to merge a PR with multiple commits, that is completely understandable and fair game. The recommended approach there is to ask the contributor to break the pull request up to multiple pull requests by doing an interactive rebase on their branch and cherry picking/re-ordering things accordingly. This is a fairly advanced git use case so you might want to help them out with it (or ask Peter who is the one constantly nagging everyone about these git rules…)</p>
+</li>
+</ol>
+</li>
+</ol>
+<p>To protect the Hyperledger Cactus source code, GitHub pull requests are accepted from forked repositories only. There are also quality standards identified and documented here that will be enhanced over time.</p>
+<h2 id="create-local-branch">Create local branch<a class="headerlink" href="#create-local-branch" title="Permanent link">&para;</a></h2>
+<blockquote>
+<p>Whenever you begin work on a new feature or bugfix, it’s important that you create a new branch.</p>
+</blockquote>
+<ol>
+<li>
+<p>Clone your fork to your local machine</p>
+</li>
+<li>
+<p>Setup your local fork to keep up-to-date (optional)</p>
+<p># Add 'upstream' repo to list of remotes
+git remote add upstream <a href="https://github.com/hyperledger/cactus.git">https://github.com/hyperledger/cactus.git</a></p>
+<p># Verify the new remote named 'upstream'
+git remote -v</p>
+<p># Checkout your main branch and rebase to upstream.
+# Run those commands whenever you want to synchronize with main branch
+git fetch upstream
+git checkout main
+git rebase upstream/main</p>
+</li>
+<li>
+<p>Create your branch.</p>
+<p># Checkout the main branch - you want your new branch to come from main
+git checkout main</p>
+<p># Create a new branch named `<newfeature>` (give simple informative name)
+git branch &lt;newfeature&gt;</p>
+</li>
+<li>
+<p>Checkout your branch and add/modify files.</p>
+<p>git checkout &lt;newfeature&gt;
+git rebase main
+# Happy coding !</p>
+</li>
+<li>
+<p>Commit changes to your branch.</p>
+<p># Commit and push your changes to your fork
+git add -A
+git commit -s -m "<type>[optional scope]: <description>"
+git push origin &lt;newfeature&gt;</p>
+</li>
+<li>
+<p>Once you’ve committed and pushed all of your changes to GitHub, go to the page for your fork on GitHub, select your development branch, and click the pull request button.</p>
+</li>
+<li>
+<p>Repeat step 3 to 6 when you need to prepare posting new pull request.</p>
+</li>
+</ol>
+<p>NOTE: Once you submitted pull request to Cactus repository, step 6 is not necessary when you made further changes with <code>git commit --amend</code> since your amends will be sent automatically.</p>
+<p>NOTE: You can refer original tutorial <a href="https://gist.github.com/Chaser324/ce0505fbed06b947d962">‘GitHub Standard Fork &amp; Pull Request Workflow’</a></p>
+<h3 id="directory-structure">Directory structure<a class="headerlink" href="#directory-structure" title="Permanent link">&para;</a></h3>
+<p>Whenever you begin to use your codes on Hyperledger Cactus, you should follow the directory strecture on Hyperledger Cactus. The current directory structure is described as the following:</p>
+<blockquote>
+<ul>
+<li>
+<p>contrib/ : Contributions from each participants, which are not directly dependent on Cactus code.</p>
+<ul>
+<li>
+<p>Fujitsu-ConnectionChain/</p>
+</li>
+<li>
+<p>Accenture-BIF/</p>
+</li>
+</ul>
+</li>
+<li>
+<p>docs/</p>
+<ul>
+<li>
+<p>API/</p>
+<ul>
+<li>
+<p>business-logic-plugin.md</p>
+</li>
+<li>
+<p>ledger-plugin.md</p>
+</li>
+<li>
+<p>routing-interface.md</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>examples/</p>
+<ul>
+<li>
+<p>example01-car-trade/</p>
+<ul>
+<li>src/</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>plugins/</p>
+<ul>
+<li>
+<p>business-logic-plugin/</p>
+<ul>
+<li>lib/ : libraries for building Business Logic Plugin</li>
+</ul>
+</li>
+<li>
+<p>ledger-plugin/ : Codes of Ledger Plugin</p>
+<ul>
+<li>
+<p>(ledger-name)/ : Including the ledger name (e.g. Ethereum, Fabric, …)</p>
+<ul>
+<li>
+<p>verifier/</p>
+<ul>
+<li>
+<p>src/ : Source codes of Verifier on Ledger Plugin</p>
+</li>
+<li>
+<p>unit-test/ : Unit test codes of Verifier on Ledger Plugin (single driver / driver and docker env / …)</p>
+</li>
+</ul>
+</li>
+<li>
+<p>validator/</p>
+<ul>
+<li>
+<p>src/ : Source codes of Validator on Ledger Plugin</p>
+</li>
+<li>
+<p>unit-test/ : Unit test codes of Validator on Ledger Plugin (single driver / driver and docker env / …)</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>routing-interface/</p>
+</li>
+</ul>
+</li>
+<li>
+<p>whitepaper/</p>
+</li>
+<li>
+<p>test/</p>
+<ul>
+<li>
+<p>docker-env/</p>
+</li>
+<li>
+<p>kubernetes-env/
+</p>
+</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<h2 id="test-automation">Test Automation<a class="headerlink" href="#test-automation" title="Permanent link">&para;</a></h2>
+<blockquote>
+<p>Mantra: Testable code is maintainable code</p>
+</blockquote>
+<h3 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h3>
+<p>We are all about automating the developer flow wherever possible and a big part of this is automated testing of course.</p>
+<p>Whenever contributing a change it is important to have test coverage for the specific change that you are making. This is especially important for bugs and absolutely essential for security related changes/fixes.</p>
+<p>Writing testable code is very important to us as not doing so can (and will) snowball into an avalanche of technical debt that will eventually destroy code quality and drive people away who would otherwise be happy to contribute and use the software. So, we want to make sure that does not happen with all this.</p>
+<p>This also means that occassionally, when making a change that looks simple on the surface you may find that the reviewer of your pull request asks you to do additional, seemingly unrelated changes that have nothing to do with the actual feature/bug that you just implemented/fixed, but instead are designed to ensure that tests can be written for it or for related code.</p>
+<p>This can feel like a chore (because it is) but we respectfully ask everyone to try their best in accomodating this because it really helps steering the ship on the long run.</p>
+<p>One of the simplest examples for the above is when you have a class that does something, anything, and it depends on some shared resource to achieve it. The shared resource can be the file system or a network port that is open for TCP connections for example. You can implement your class hardcoding the port number and functionally it will be correct (if you did that part right) <em>BUT</em> if your class does not allow for the customization of said port through the constructor or a setter method, then one of our more obsessive maintainers (like Peter) will immediately be onto you asking for a change so that the port can be customized at runtime, allowing test cases to pass in port 0 that makes the test executable in parallel with other tests without being flaky.</p>
+<p>If you oppose this idea, said maintainers will happily refer you to this writing or conjure up an entirely new essay right there on the pull request.</p>
+<h3 id="test-case-core-principles">Test Case Core Principles<a class="headerlink" href="#test-case-core-principles" title="Permanent link">&para;</a></h3>
+<p>There are other principles specific per unit and integration tests, but the list below applies to all tests regardless of their nature.</p>
+<p><code>All test cases must be...</code></p>
+<ul>
+<li>
+<p>Self contained programs that can be executed on their own if necessary</p>
+<ul>
+<li>This ensures that if you are iterating on a single test case while trying to make it pass, you will always have the freedom to run just that one test instead of running the full suite of which the execution time will grow rapidly as we add test coverage, so, better nip that in the bud with this principle.</li>
+</ul>
+</li>
+<li>
+<p>Excluded from the public API surface of the package they are in by ensuring that the test classes/types/interfaces are NOT exported through the <code>public-api.ts</code> file of that particular package.</p>
+<ul>
+<li>The only exception from this is if a package is itself designed for tests for which a delightful example is the <code>test-tooling</code> package which as the name suggests is entirely designated for providing utilities for writing tests and therefore in the case of this package it is allowed and even expected that it will expose test related classes/types in it’s public API surface. Do note however that indirectly the principle still applies, meaning that any package must not depend on the <code>test-tooling</code> package as an npm <code>dependency</code> but rather it must declare it as a <code>devDependency</code> in the relevant section of the <code>package.json</code> file.</li>
+</ul>
+</li>
+<li>
+<p>Compatible with the <a href="https://testanything.org/">TestAnythingProtocol</a></p>
+<ul>
+<li>
+<p>The NodeJS implementation of said protocol is in the <code>node-tap</code> npm package:</p>
+</li>
+<li>
+<p><a href="https://node-tap.org/docs/api/asserts/">Assertions API</a> of Node TAP</p>
+</li>
+<li>
+<p>Simplest possible test case:</p>
+<p>const test, { Test } = require("tape");
+import * as publicApi from "../../../main/typescript/public-api";</p>
+<p>test("Module can be loaded", (t: Test) =&gt; {
+   t.ok(publicApi);
+   t.end(); // yaay, test coverage
+});</p>
+</li>
+<li>
+<p>An <a href="#./packages/cactus-test-plugin-consortium-manual/src/test/typescript/integration/plugin-consortium-manual/security-isolation-via-api-server-ports.ts">end to end test case</a> showcasing everything in action that is being preached in this document about test automation</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Focus/verify a single bug-fix/feature/etc.</p>
+</li>
+<li>
+<p>Clearly separated from non-test (aka <code>main</code>) source code. This means in practice that we ask that your test cases are either in the</p>
+<ol>
+<li>
+<p><code>./src/test/...</code> tree of the package that you are testing OR</p>
+</li>
+<li>
+<p>your test cases are in the <code>./src/test/...</code> tree (yes same name) BUT in an entirely separate package if the dependencies necessitate so. An example to when you would need a separate testing package is if you are developing a ledger plugin that has REST API endpoints shipping with it and you wish to verify in a test that the plugin can be loaded to the <code>ApiServer</code> and then called via the web service/SDK. In this case, you cannot place your test case in the ledger plugin’s package because you want to avoid having to pull in the API server as a dependency of your ledger plugin package (to ensure that there will be no circular dependencies).</p>
+</li>
+</ol>
+</li>
+<li>
+<p>Executable with unlimited parallelism (so if I have a 128 test cases and run all of them in parallel on my new 128 CPU core computer, then every single test case runs at the same time)</p>
+<ul>
+<li>
+<p>This is important because it weeds out flakyness and hardcoded references to shared resources (Remember the rant about network ports in the previous section?)</p>
+</li>
+<li>
+<p><em>BUT</em> it is also very important because we (as in humanity) spent the last decade making the average CPUs ship with more and more cores as increasing frequency failed in the late 2000s as a performance increasing strategy.</p>
+<p>What this means is that to utilize the average consumer laptop that most people will have for development, you will need your test cases to run in parallel which will save time for everyone working on the code and faster turnaround times make for a better developer experience which makes for a happier community around our open source project. It’s all connected. ;-)</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Test cases don’t depend on code outside of the <code>./src/*</code> directory trees of the packages.</p>
+<ul>
+<li>
+<p>Do not depend on any of the example code in your test cases.</p>
+</li>
+<li>
+<p>If you need to import code that is not JS/JSON/TS you can still do so via the Typescript compiler’s relevant feature that allows importing arbitrary files.</p>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="working-with-the-code">Working with the Code<a class="headerlink" href="#working-with-the-code" title="Permanent link">&para;</a></h2>
+<p>There are additional details about this in the <a href="#./BUILD.md">BUILD.md</a> file in the project root as well.</p>
+<p>We use Lerna for managing the <a href="https://blog.npmjs.org/post/186494959890/monorepos-and-npm">monorepo</a> that is Cactus.</p>
+<blockquote>
+<p>We heavily rely on Docker for testing the ledger plugins.</p>
+</blockquote>
+<h3 id="runningdebugging-the-tests">Running/Debugging the tests<a class="headerlink" href="#runningdebugging-the-tests" title="Permanent link">&para;</a></h3>
+<p>Make sure to have the build succeed prior to attempting to run the tests. If you just checked out the project, it is best to just to just run the CI script which will do a full build and run all tests for you. If it fails you can open a bug in the issue tracker.</p>
+<p>Assuming you have built the sources, below are the different methods to run the tests:</p>
+<h4 id="running-a-single-test-case">Running a single test case<a class="headerlink" href="#running-a-single-test-case" title="Permanent link">&para;</a></h4>
+<p>You execute unit and integration tests in the same way, but here are examples for both them separately anyway:</p>
+<ul>
+<li>
+<p>An integration test:</p>
+<p>yarn jest packages/cactus-test-plugin-consortium-manual/src/test/typescript/integration/plugin-consortium-manual/get-consortium-jws-endpoint.test.ts</p>
+</li>
+<li>
+<p>A unit test:</p>
+<p>npx jest packages/cactus-common/src/test/typescript/unit/objects/get-all-method-names.test.ts</p>
+<p>You can also run tests via the VS Code user interface. To do so, make sure you rename <code>template.launch.json</code> to ``launch.json`. Under the “Run and Debug” window of VS Code, select “JEST: Current TS file” to test the currently opened file.</p>
+</li>
+</ul>
+<h4 id="running-all-test-cases-unitintegration">Running all test cases (unit+integration)<a class="headerlink" href="#running-all-test-cases-unitintegration" title="Permanent link">&para;</a></h4>
+<p>npm run test:all</p>
+<h4 id="running-unit-tests-only">Running unit tests only<a class="headerlink" href="#running-unit-tests-only" title="Permanent link">&para;</a></h4>
+<p>npm run test:unit</p>
+<h4 id="running-integration-tests-only">Running integration tests only<a class="headerlink" href="#running-integration-tests-only" title="Permanent link">&para;</a></h4>
+<p>npm run test:integration</p>
+<h4 id="what-is-npx-used-for">What is npx used for?<a class="headerlink" href="#what-is-npx-used-for" title="Permanent link">&para;</a></h4>
+<p><code>npx</code> is a standard top level binary placed on the path by NodeJS at installation time. We use it to avoid having to place every node module (project dependencies) on the OS path or to install them globally (<code>npm install some-pkg -g</code>)</p>
+<p>Read more about npx here: <a href="https://blog.npmjs.org/post/162869356040/introducing-npx-an-npm-package-runner">https://blog.npmjs.org/post/162869356040/introducing-npx-an-npm-package-runner</a></p>
+<h4 id="whats-the-equivalent-of-npx-for-yarn">What’s the equivalent of npx for Yarn?<a class="headerlink" href="#whats-the-equivalent-of-npx-for-yarn" title="Permanent link">&para;</a></h4>
+<p>Yarn itself. E.g. <code>npx lerna clean</code> becomes <code>yarn lerna clean</code>.</p>
+<h4 id="debugging-a-test-case">Debugging a test case<a class="headerlink" href="#debugging-a-test-case" title="Permanent link">&para;</a></h4>
+<p>Open the <code>.vscode/template.launch.json</code> file and either copy it with a name of <code>launch.json</code> (if you don’t already have such a file) or just cherry pick the example Visual Studio Code debug tasks that you’d like to use. For debugging a single test case, you need the debug task from the template launch.json file that is called <code>TAP: Current TS Test File</code>. Prior to running that debug task you must have your VSCode editor opened to the test file that you wish to run. Breakpoints will work as long as you are debugging code in the same package.</p>
+<blockquote>
+<p>Source map support is partial at this point but actively being worked on.</p>
+</blockquote>
+<h3 id="all-in-one-docker-images-for-ledger-connector-plugins">All-In-One Docker Images for Ledger Connector Plugins<a class="headerlink" href="#all-in-one-docker-images-for-ledger-connector-plugins" title="Permanent link">&para;</a></h3>
+<p>If you are working on a new ledger connector you’ll need an <code>all-in-one</code> docker image as well, which will allow the expected level of test automation. If your chosen ledger’s maintainers provide an adequate docker image, then you might not need to develop this yourself, but this is rarely the case so YMMV.</p>
+<p>To see an existing set of examples for <code>besu</code> and <code>quorum</code> images take a peek at the <code>tools/docker/besu-all-in-one</code> and <code>tools/docker/quorum-all-in-one</code> folders. These produce the <code>ghcr.io/hyperledger/cactus-besu-all-in-one</code> and <code>ghcr.io/hyperledger/cactus-quorum-all-in-one</code> images respectively. Both of these are used in the test cases that are written for the specific ledger connector plugins at:</p>
+<ul>
+<li>
+<p><code>packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/deploy-contract-via-web-service.test.ts</code></p>
+</li>
+<li>
+<p><code>packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/deploy-contract-from-json.test.ts</code></p>
+</li>
+</ul>
+<p>The specific classes that utilize the <code>all-in-one</code> images can be found in the <code>test-tooling</code> package under these paths:</p>
+<ul>
+<li>
+<p><code>packages/cactus-test-tooling/src/main/typescript/besu/besu-test-ledger.ts</code></p>
+</li>
+<li>
+<p><code>packages/cactus-test-tooling/src/main/typescript/quorum/quorum-test-ledger.ts</code></p>
+</li>
+</ul>
+<h4 id="test-automation-of-ledger-plugins">Test Automation of Ledger Plugins<a class="headerlink" href="#test-automation-of-ledger-plugins" title="Permanent link">&para;</a></h4>
+<p>Ledger plugin tests are written the same way as any other test (which is difficult to achieve, but we thrive to get it done).</p>
+<p>The only difference between a ledger connector plugin test case and any unit test is that the ledger connector plugin’s test case will pull up a docker container from one of the <code>all-in-one</code> images that we maintain as part of Cactus and then use that <code>all-in-one-*</code> container to verify things such as the ability of the ledger connector plugin to deploy a contract to said ledger.</p>
+<p>As a generic best practice, the test cases should never re-use any <code>all-in-one</code> ledger container for the execution of multiple test cases because that will almost surely lead to flaky/unstable test cases over the long run and needless complexity, ordering dependencies and so on. It is recommended that if you have two test cases for a ledger connector plugin, they both pull up a newly created container from scratch, execute the test scenario and then tear down and delete the container completely.</p>
+<p>An example for a ledger connector plugin and it’s test automation implemented the way it is explained above: <code>packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/deploy-contract-via-web-service.test.ts</code></p>
+<blockquote>
+<p>This test case is also an example of how to run an ApiServer independently with a single ledger plugin which is how the test case is set up to begin with.</p>
+</blockquote>
+<p>Another option if you want to perform some tests manually is to run the API server with a configuration of your choice:</p>
+<p># Starting from the project root directory</p>
+<p>chmod +x ./packages/cactus-cmd-api-server/dist/lib/main/typescript/cmd/cactus-api.js</p>
+<p>./packages/cactus-cmd-api-server/dist/lib/main/typescript/cmd/cactus-api.js --config-file=.config.json</p>
+<p>You can run this test case the same way you would run any other test case (which is also a requirement in itself for each test case):</p>
+<p>npx tap --ts --timeout=600 packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/deploy-contract-via-web-service.test.ts</p>
+<p>You can specify an arbitrary set of test cases to run in a single execution via glob patterns. Examples of these glob patterns can be observed in the root directory’s <code>package.json</code> file which has npm scripts for executing all tests with a single command (the CI script uses these):</p>
+<p>"test:all": "tap --ts --jobs=1 --timeout=600 \"packages/cactus-*/src/test/typescript/{unit,integration}/\"",
+"test:unit": "tap --ts --timeout=600 \"packages/cactus-*/src/test/typescript/unit/\"",
+"test:integration": "tap --ts --jobs=1 --timeout=600 \"packages/cactus-*/src/test/typescript/integration/\""</p>
+<p>Following a similar pattern if you have a specific folder where your test cases are, you can run everything in that folder by specifying the appropriate glob patterns (asterisks and double asterisks as necessary depending on the folder being a flat structure or with sub-directories and tests nested deep within them).</p>
+<p>For example this can work as well:</p>
+<p># Starting from the project root
+cd packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum
+npx tap --ts --jobs=1 --timeout=600 \"./\"</p>
+<blockquote>
+<p>Be aware that glob patterns need quoting in some operating system’s shell environments and not necessarily on others. In the npm scripts Cactus uses we quote all of them to ensure a wider shell compatibility.</p>
+</blockquote>
+<h3 id="building-the-api-clients">Building the API Client(S)<a class="headerlink" href="#building-the-api-clients" title="Permanent link">&para;</a></h3>
+<p>You do not need to do anything special to have the API Client sources generated and compiled. It is all part of the <code>npm run build:dev:backend</code> task which you can run yourself or as part of the CI script (<code>./tools/ci.sh</code>).</p>
+<p>The API client code is automatically generated from the respective <code>openapi.json</code> file of each package that exposes ay web serices (REST/SocketIO/gRPC/etc.) and can be dependend on by other packages where applicable. There’s a dedicated <code>@hyperledger/cactus-api-client</code> package that is meant to contain common functionality among the rest of API clients. The concept here is similar to abstract classes and their sub-class implementations.</p>
+<p>Each <code>openapi.json</code> produces its own API client via the code generator that also contains relevant model definitions, such as interfaces describing the request/response bodies of all possible operations and validation constraints as well.</p>
+<p>The API clients are designed to be a universal components, meaning that it runs just fine in browser and also NodeJS environments. This is very important as we do not wish to maintain two (or more) separate API client codebases for the various platforms and we also want as much of it being generated automatically as possible (currently this is close to 100%).</p>
+<h3 id="adding-new-dependencies">Adding new dependencies<a class="headerlink" href="#adding-new-dependencies" title="Permanent link">&para;</a></h3>
+<p>Example:</p>
+<p># Adds "got" as a dependency to the cactus common package
+# Note that you must specify the fully qualified package name as present in
+# the package.json file
+yarn workspace <a class="magiclink magiclink-github magiclink-repository" href="https://github.com/hyperledger/cactus-common" title="GitHub Repository: hyperledger/cactus-common">hyperledger/cactus-common</a> add got --save-exact</p>
+<p>You need to know which package of the monorepo will be using the package and then run the <code>yarn workspace</code> command with an additional parameters specifying the package name and the dependency name. See <a href="https://classic.yarnpkg.com/en/docs/cli/workspace/">Yarn Workspaces Documentation</a> for the official Yarn documentation for further details and examples.</p>
+<p>After adding new dependencies, you might need to <a href="#reload-vscode-window-after-adding-dependencies">Reload VSCode Window After Adding Dependencies</a></p>
+<blockquote>
+<p><strong>Always specify the <code>--save-exact</code> when installing new dependencies to ensure <a href="https://reproducible-builds.org/">reproducible builds</a></strong></p>
+</blockquote>
+<h3 id="reload-vscode-window-after-adding-dependencies">Reload VSCode Window After Adding Dependencies<a class="headerlink" href="#reload-vscode-window-after-adding-dependencies" title="Permanent link">&para;</a></h3>
+<p>If you added a new dependency and VSCode is showing an error when you try to import it, then sometimes the issue is just a matter of nudging VSCode to reload the Typescript definitions from scratch so that it “notices” the new dependency you just added.</p>
+<p>The recommended way of doing this is by hitting the <code>F1</code> key (or whatever you have bound the command menu to) and then searching and selecting <code>Developer: Reload Window</code> As a simpler alternative you can also just quit and relaunch the VSCode application of course.</p>
+<h3 id="on-reproducible-builds">On Reproducible Builds<a class="headerlink" href="#on-reproducible-builds" title="Permanent link">&para;</a></h3>
+<p>As a best practice, any given revision (commit hash) stored in version control should produce the exact same build artifacts regardless of when or where the build was performed. This can only be achieved if npm dependency versions are locked down instead of being automatically upgraded by npm (which makes the build time and machine dependent).</p>
+<p>Bottom line: Do not use the the <code>^</code>, <code>~</code> and <code>*</code> syntax elements while declaring your npm dependencies.</p>
+<p>Further details:</p>
+<ul>
+<li>
+<p><a href="https://reproducible-builds.org/">https://reproducible-builds.org/</a></p>
+</li>
+<li>
+<p><a href="https://spin.atomicobject.com/2016/12/16/reproducible-builds-npm-yarn/">https://spin.atomicobject.com/2016/12/16/reproducible-builds-npm-yarn/</a></p>
+</li>
+</ul>
+<p><a href="../code-of-conduct/" title="Code of Conduct Guidelines">Previous</a> <a href="../whitepaper/" title="Hyperledger Cactus White Paper">Next</a></p>
+<hr />
+
+
+  
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../code-of-conduct/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Code of Conduct">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Code of Conduct
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../whitepaper/" class="md-footer__link md-footer__link--next" aria-label="Next: Whitepaper">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Whitepaper
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; Hyperledger 2020-2023
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["content.code.copy", "navigation.expand", "navigation.footer", "navigation.instant", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "toc.follow", "toc.integrate"], "search": "../../assets/javascripts/workers/search.a264c092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.6eac0284.min.js"></script>
+      
+    
+  </body>
+</html>
