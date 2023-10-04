@@ -527,18 +527,19 @@ beforeAll(async () => {
 
   {
     // Gateways configuration
-    const odapClientGatewayPluginOptions: IFabricOdapGatewayConstructorOptions = {
-      name: "cactus-plugin#odapGateway",
-      dltIDs: ["DLT2"],
-      instanceId: uuidv4(),
-      ipfsPath: ipfsApiHost,
-      fabricPath: fabricPath,
-      fabricSigningCredential: fabricSigningCredential,
-      fabricChannelName: fabricChannelName,
-      fabricContractName: fabricContractName,
-      clientHelper: new ClientGatewayHelper(),
-      serverHelper: new ServerGatewayHelper(),
-    };
+    const odapClientGatewayPluginOptions: IFabricOdapGatewayConstructorOptions =
+      {
+        name: "cactus-plugin#odapGateway",
+        dltIDs: ["DLT2"],
+        instanceId: uuidv4(),
+        ipfsPath: ipfsApiHost,
+        fabricPath: fabricPath,
+        fabricSigningCredential: fabricSigningCredential,
+        fabricChannelName: fabricChannelName,
+        fabricContractName: fabricContractName,
+        clientHelper: new ClientGatewayHelper(),
+        serverHelper: new ServerGatewayHelper(),
+      };
 
     const odapServerGatewayPluginOptions: IBesuOdapGatewayConstructorOptions = {
       name: "cactus-plugin#odapGateway",

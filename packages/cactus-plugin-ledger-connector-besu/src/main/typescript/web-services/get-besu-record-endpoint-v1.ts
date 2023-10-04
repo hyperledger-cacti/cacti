@@ -88,7 +88,8 @@ export class GetBesuRecordEndpointV1 implements IWebServiceEndpoint {
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(reqTag);
     try {
-      const reqBody: GetBesuRecordV1Request = req.body as GetBesuRecordV1Request;
+      const reqBody: GetBesuRecordV1Request =
+        req.body as GetBesuRecordV1Request;
       const resBody = await this.options.connector.getBesuRecord(reqBody);
       res.json(resBody);
     } catch (ex) {

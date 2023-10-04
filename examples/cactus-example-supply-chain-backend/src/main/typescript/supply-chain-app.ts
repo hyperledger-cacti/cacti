@@ -277,7 +277,8 @@ export class SupplyChainApp {
     const rpcApiWsHostA = await this.ledgers.besu.getRpcApiWsHost();
     const rpcApiHostB = await this.ledgers.quorum.getRpcApiHttpHost();
 
-    const connectionProfile = await this.ledgers.fabric.getConnectionProfileOrg1();
+    const connectionProfile =
+      await this.ledgers.fabric.getConnectionProfileOrg1();
     const sshConfig = await this.ledgers.fabric.getSshConfig();
 
     const registryA = new PluginRegistry({
@@ -586,7 +587,8 @@ export class SupplyChainApp {
     properties.grpcPort = 0; // TODO - make this configurable as well
     properties.logLevel = this.options.logLevel || "INFO";
     properties.authorizationProtocol = AuthorizationProtocol.JSON_WEB_TOKEN;
-    properties.authorizationConfigJson = await this.getOrCreateAuthorizationConfig();
+    properties.authorizationConfigJson =
+      await this.getOrCreateAuthorizationConfig();
 
     const apiServer = new ApiServer({
       config: properties,

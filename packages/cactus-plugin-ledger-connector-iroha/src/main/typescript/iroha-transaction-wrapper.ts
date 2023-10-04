@@ -50,9 +50,7 @@ export class IrohaTransactionWrapper {
    * @param baseConfig iroha configuration from request, must contain Iroha URL information.
    * @returns {commandService, queryService}
    */
-  public static getIrohaServices(
-    baseConfig: IrohaBaseConfig,
-  ): {
+  public static getIrohaServices(baseConfig: IrohaBaseConfig): {
     commandService: CommandService;
     queryService: QueryService;
   } {
@@ -96,10 +94,8 @@ export class IrohaTransactionWrapper {
       throw new Error("Should never happen - Checks should catch this first");
     }
 
-    const {
-      commandService,
-      queryService,
-    } = IrohaTransactionWrapper.getIrohaServices(baseConfig);
+    const { commandService, queryService } =
+      IrohaTransactionWrapper.getIrohaServices(baseConfig);
 
     const commandOptions = {
       privateKeys: baseConfig.privKey, //need an array of keys for command

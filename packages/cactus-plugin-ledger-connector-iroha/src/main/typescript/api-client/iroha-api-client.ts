@@ -41,7 +41,8 @@ export class IrohaApiClientOptions extends Configuration {
 
 export class IrohaApiClient
   extends DefaultApi
-  implements ISocketApiClient<IrohaBlockProgress> {
+  implements ISocketApiClient<IrohaBlockProgress>
+{
   public static readonly CLASS_NAME = "IrohaApiClient";
   private readonly log: Logger;
   private readonly wsApiHost: string;
@@ -172,11 +173,14 @@ export class IrohaApiClient
 
       // Connector should disconnect us after receiving this request.
       // If he doesn't, disconnect after specified amount of time.
-      setTimeout(() => {
-        if (socket.connected) {
-          socket.disconnect();
-        }
-      }, this.options.timeoutLimit ?? 10 * 1000);
+      setTimeout(
+        () => {
+          if (socket.connected) {
+            socket.disconnect();
+          }
+        },
+        this.options.timeoutLimit ?? 10 * 1000,
+      );
     } catch (err) {
       this.log.error("Exception in: sendAsyncRequest(): ", err);
       throw err;

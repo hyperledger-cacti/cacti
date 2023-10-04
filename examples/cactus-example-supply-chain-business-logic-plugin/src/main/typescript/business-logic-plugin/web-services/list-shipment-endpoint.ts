@@ -38,7 +38,7 @@ export class ListShipmentEndpoint implements IWebServiceEndpoint {
     return ListShipmentEndpoint.CLASS_NAME;
   }
 
-  public getOasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-shipment"] {
+  public getOasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-shipment"] {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-shipment"
     ];

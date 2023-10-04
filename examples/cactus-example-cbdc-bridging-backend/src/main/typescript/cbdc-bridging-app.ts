@@ -78,7 +78,8 @@ export class CbdcBridgingApp {
     await this.infrastructure.start();
     this.onShutdown(() => this.infrastructure.stop());
 
-    const fabricPlugin = await this.infrastructure.createFabricLedgerConnector();
+    const fabricPlugin =
+      await this.infrastructure.createFabricLedgerConnector();
     const besuPlugin = await this.infrastructure.createBesuLedgerConnector();
     const clientIpfsPlugin = await this.infrastructure.createIPFSConnector();
     const serverIpfsPlugin = await this.infrastructure.createIPFSConnector();

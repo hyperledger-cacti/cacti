@@ -67,9 +67,8 @@ export function getCO2EmissionFactor(
   // calculate emissions using percent_of_renewables if found
   if (factor.percent_of_renewables.length !== 0) {
     emissionsUOM = "g";
-    const co2EquivalentEmissionsUOM = factor.co2_equivalent_emissions_uom.split(
-      "/",
-    );
+    const co2EquivalentEmissionsUOM =
+      factor.co2_equivalent_emissions_uom.split("/");
     if (co2EquivalentEmissionsUOM.length === 0) {
       console.error("co2_equivalent_emissions_uom not found in factor");
     }

@@ -38,14 +38,13 @@ export const POSTGRES_TEST_CONTAINER_DEFAULT_OPTIONS = Object.freeze({
 /*
  * Provides validations for Postgres container's options
  */
-export const POSTGRES_TEST_CONTAINER_OPTIONS_JOI_SCHEMA: Joi.Schema = Joi.object().keys(
-  {
+export const POSTGRES_TEST_CONTAINER_OPTIONS_JOI_SCHEMA: Joi.Schema =
+  Joi.object().keys({
     imageVersion: Joi.string().min(5).required(),
     imageName: Joi.string().min(1).required(),
     postgresPort: Joi.number().min(1024).max(65535).required(),
     envVars: Joi.array().allow(null).required(),
-  },
-);
+  });
 
 export class PostgresTestContainer implements ITestLedger {
   public readonly imageVersion: string;
@@ -308,14 +307,13 @@ export class PostgresTestContainer implements ITestLedger {
   }
 
   private validateConstructorOptions(): void {
-    const validationResult = POSTGRES_TEST_CONTAINER_OPTIONS_JOI_SCHEMA.validate(
-      {
+    const validationResult =
+      POSTGRES_TEST_CONTAINER_OPTIONS_JOI_SCHEMA.validate({
         imageVersion: this.imageVersion,
         imageName: this.imageName,
         postgresPort: this.postgresPort,
         envVars: this.envVars,
-      },
-    );
+      });
 
     if (validationResult.error) {
       throw new Error(

@@ -8,7 +8,7 @@ export interface IPluginLedgerConnector<
   DeployIn,
   DeployOut,
   TransactIn,
-  TransactOut
+  TransactOut,
 > extends ICactusPlugin {
   /**
    * Deploys a contract written for a ledger that the connector is aimed at

@@ -26,7 +26,8 @@ export interface IDeployContractSolidityBytecodeOptions {
 }
 
 export class DeployContractSolidityBytecodeEndpoint
-  implements IWebServiceEndpoint {
+  implements IWebServiceEndpoint
+{
   public static readonly CLASS_NAME = "DeployContractSolidityBytecodeEndpoint";
 
   private readonly log: Logger;
@@ -45,7 +46,7 @@ export class DeployContractSolidityBytecodeEndpoint
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public get oasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/deploy-contract-solidity-bytecode"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/deploy-contract-solidity-bytecode"] {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/deploy-contract-solidity-bytecode"
     ];

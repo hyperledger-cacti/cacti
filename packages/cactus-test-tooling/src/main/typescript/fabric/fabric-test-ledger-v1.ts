@@ -236,9 +236,8 @@ export class FabricTestLedgerV1 implements ITestLedger {
     const { enrollmentID, organization, wallet } = opts;
     try {
       const mspId = this.capitalizedMspIdOfOrg(organization);
-      const connectionProfile = await this.getConnectionProfileOrgX(
-        organization,
-      );
+      const connectionProfile =
+        await this.getConnectionProfileOrgX(organization);
       // Create a new gateway for connecting to our peer node.
       const gateway = new Gateway();
       const discovery = { enabled: true, asLocalhost: true };
@@ -752,9 +751,8 @@ export class FabricTestLedgerV1 implements ITestLedger {
           delete dataCompose["services"][peer0OrgName]["labels"];
 
           //l.18: container name
-          dataCompose["services"][peer0OrgName][
-            "container_name"
-          ] = peer0OrgName;
+          dataCompose["services"][peer0OrgName]["container_name"] =
+            peer0OrgName;
 
           //       - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=cactusfabrictestnetwork_test
 

@@ -93,7 +93,9 @@ export class CbdcBridgingAppDummyInfrastructure {
       publishAllPorts: true,
       imageName: DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
       imageVersion: DEFAULT_FABRIC_2_AIO_IMAGE_VERSION,
-      envVars: new Map([["FABRIC_VERSION", DEFAULT_FABRIC_2_AIO_FABRIC_VERSION]]),
+      envVars: new Map([
+        ["FABRIC_VERSION", DEFAULT_FABRIC_2_AIO_FABRIC_VERSION],
+      ]),
       logLevel: level || "DEBUG",
     });
 
@@ -166,9 +168,7 @@ export class CbdcBridgingAppDummyInfrastructure {
     }
   }
 
-  public async createFabricLedgerConnector(): Promise<
-    PluginLedgerConnectorFabric
-  > {
+  public async createFabricLedgerConnector(): Promise<PluginLedgerConnectorFabric> {
     const connectionProfileOrg1 = await this.fabric.getConnectionProfileOrg1();
     const enrollAdminOutOrg1 = await this.fabric.enrollAdminV2({
       organization: "org1",
@@ -646,8 +646,8 @@ export class CbdcBridgingAppDummyInfrastructure {
   public async deployBesuContracts(besuApiClient: BesuApi): Promise<void> {
     const fnTag = `${this.className}#deployBesuContracts()`;
 
-    const deployCbdcContractResponse = await besuApiClient.deployContractSolBytecodeV1(
-      {
+    const deployCbdcContractResponse =
+      await besuApiClient.deployContractSolBytecodeV1({
         keychainId: CryptoMaterial.keychains.keychain2.id,
         contractName: CBDCcontractJson.contractName,
         contractAbi: CBDCcontractJson.abi,
@@ -659,15 +659,14 @@ export class CbdcBridgingAppDummyInfrastructure {
         },
         bytecode: CBDCcontractJson.bytecode,
         gas: 10000000,
-      } as DeployContractSolidityBytecodeV1Request,
-    );
+      } as DeployContractSolidityBytecodeV1Request);
 
     if (deployCbdcContractResponse == undefined) {
       throw new Error(`${fnTag}, error when deploying CBDC smart contract`);
     }
 
-    const deployAssetReferenceContractResponse = await besuApiClient.deployContractSolBytecodeV1(
-      {
+    const deployAssetReferenceContractResponse =
+      await besuApiClient.deployContractSolBytecodeV1({
         keychainId: CryptoMaterial.keychains.keychain2.id,
         contractName: AssetReferenceContractJson.contractName,
         contractAbi: AssetReferenceContractJson.abi,
@@ -681,8 +680,7 @@ export class CbdcBridgingAppDummyInfrastructure {
         },
         bytecode: AssetReferenceContractJson.bytecode,
         gas: 10000000,
-      } as DeployContractSolidityBytecodeV1Request,
-    );
+      } as DeployContractSolidityBytecodeV1Request);
 
     if (deployAssetReferenceContractResponse == undefined) {
       throw new Error(

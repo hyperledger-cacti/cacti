@@ -82,9 +82,8 @@ describe(testCase, () => {
     apiServerOptions.grpcPort = 0;
     apiServerOptions.apiTlsEnabled = false;
     apiServerOptions.plugins = [];
-    const config = await configService.newExampleConfigConvict(
-      apiServerOptions,
-    );
+    const config =
+      await configService.newExampleConfigConvict(apiServerOptions);
 
     const factory = new PluginFactoryKeychain({
       pluginImportType: PluginImportType.Remote,

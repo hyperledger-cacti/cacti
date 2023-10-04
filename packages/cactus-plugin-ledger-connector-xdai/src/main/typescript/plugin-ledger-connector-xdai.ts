@@ -80,7 +80,8 @@ export class PluginLedgerConnectorXdai
       RunTransactionV1Response
     >,
     ICactusPlugin,
-    IPluginWebService {
+    IPluginWebService
+{
   private readonly instanceId: string;
   public prometheusExporter: PrometheusExporter;
   private readonly log: Logger;
@@ -222,9 +223,7 @@ export class PluginLedgerConnectorXdai
     return `@hyperledger/cactus-plugin-ledger-connector-xdai`;
   }
 
-  public async getConsensusAlgorithmFamily(): Promise<
-    ConsensusAlgorithmFamily
-  > {
+  public async getConsensusAlgorithmFamily(): Promise<ConsensusAlgorithmFamily> {
     return ConsensusAlgorithmFamily.Authority;
   }
 
@@ -276,10 +275,8 @@ export class PluginLedgerConnectorXdai
       throw new Error(`${fnTag} Contract ABI is necessary`);
     }
 
-    const contractInstance: InstanceType<typeof Contract> = new this.web3.eth.Contract(
-      abi,
-      contractAddress,
-    );
+    const contractInstance: InstanceType<typeof Contract> =
+      new this.web3.eth.Contract(abi, contractAddress);
 
     const isSafeToCall = await this.isSafeToCallContractMethod(
       contractInstance,
@@ -529,9 +526,8 @@ export class PluginLedgerConnectorXdai
   ): Promise<RunTransactionV1Response> {
     const fnTag = `${this.className}#transactPrivateKey()`;
     const { transactionConfig, web3SigningCredential } = req;
-    const {
-      secret,
-    } = web3SigningCredential as Web3SigningCredentialPrivateKeyHex;
+    const { secret } =
+      web3SigningCredential as Web3SigningCredentialPrivateKeyHex;
 
     const signedTx = await this.web3.eth.accounts.signTransaction(
       transactionConfig,
@@ -554,11 +550,8 @@ export class PluginLedgerConnectorXdai
   ): Promise<RunTransactionV1Response> {
     const fnTag = `${this.className}#transactCactusKeychainRef()`;
     const { transactionConfig, web3SigningCredential } = req;
-    const {
-      ethAccount,
-      keychainEntryKey,
-      keychainId,
-    } = web3SigningCredential as Web3SigningCredentialCactusKeychainRef;
+    const { ethAccount, keychainEntryKey, keychainId } =
+      web3SigningCredential as Web3SigningCredentialCactusKeychainRef;
 
     // locate the keychain plugin that has access to the keychain backend
     // denoted by the keychainID from the request.

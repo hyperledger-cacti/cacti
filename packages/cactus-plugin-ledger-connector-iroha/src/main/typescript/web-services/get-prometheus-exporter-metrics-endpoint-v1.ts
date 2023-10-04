@@ -26,7 +26,8 @@ export interface IGetPrometheusExporterMetricsEndpointV1Options {
 }
 
 export class GetPrometheusExporterMetricsEndpointV1
-  implements IWebServiceEndpoint {
+  implements IWebServiceEndpoint
+{
   private readonly log: Logger;
 
   constructor(
@@ -81,7 +82,8 @@ export class GetPrometheusExporterMetricsEndpointV1
     this.log.debug(`${verbUpper} ${this.getPath()}`);
 
     try {
-      const resBody = await this.options.connector.getPrometheusExporterMetrics();
+      const resBody =
+        await this.options.connector.getPrometheusExporterMetrics();
       res.status(200);
       res.send(resBody);
     } catch (ex) {

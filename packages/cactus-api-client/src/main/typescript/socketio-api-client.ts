@@ -110,10 +110,8 @@ export class SocketIOApiClient implements ISocketApiClient<SocketLedgerEvent> {
 
   readonly className: string;
   counterReqID = 1;
-  checkValidator: (
-    publicKey: string,
-    data: string,
-  ) => Promise<JwtPayload> = verifyValidatorJwt;
+  checkValidator: (publicKey: string, data: string) => Promise<JwtPayload> =
+    verifyValidatorJwt;
 
   /**
    * @param validatorID - (required) ID of validator.

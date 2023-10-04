@@ -253,11 +253,8 @@ test("check valid built of recover update message", async () => {
 
   await checkValidRecoverMessage(recoverMessage, pluginRecipientGateway);
 
-  const recoverUpdateMessage: RecoverUpdateV1Message | void = await sendRecoverUpdateMessage(
-    sessionID,
-    pluginRecipientGateway,
-    false,
-  );
+  const recoverUpdateMessage: RecoverUpdateV1Message | void =
+    await sendRecoverUpdateMessage(sessionID, pluginRecipientGateway, false);
 
   if (recoverUpdateMessage == void 0) {
     throw new Error("Test Failed");

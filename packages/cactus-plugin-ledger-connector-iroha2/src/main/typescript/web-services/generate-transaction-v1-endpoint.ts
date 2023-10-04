@@ -29,7 +29,8 @@ export interface IGenerateTransactionOptions {
 }
 
 export class Iroha2GenerateTransactionEndpointV1
-  implements IWebServiceEndpoint {
+  implements IWebServiceEndpoint
+{
   public static readonly CLASS_NAME = "GenerateTransaction";
 
   private readonly log: Logger;

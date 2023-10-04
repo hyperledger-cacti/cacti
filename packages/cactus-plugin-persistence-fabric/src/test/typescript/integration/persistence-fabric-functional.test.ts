@@ -658,9 +658,8 @@ describe("Persistence Fabric", () => {
       fabric_block_data: "testData",
     };
     insertResponseMock(dataForInsert);
-    const insertBlockDataEntry = await persistence.insertBlockDataEntry(
-      dataForInsert,
-    );
+    const insertBlockDataEntry =
+      await persistence.insertBlockDataEntry(dataForInsert);
 
     expect(insertBlockDataEntry).toBeTruthy();
     log.warn("insertBlockDataEntry", insertBlockDataEntry);
@@ -723,9 +722,8 @@ describe("Persistence Fabric", () => {
   });
 
   test("get latest block in ledger from within persistence plugin", async () => {
-    const lastBlockInPlugin = await persistence.lastBlockInLedger(
-      signingCredential,
-    );
+    const lastBlockInPlugin =
+      await persistence.lastBlockInLedger(signingCredential);
     log.info(
       "latest block in ledger collected from within plugin: ",
       lastBlockInPlugin,

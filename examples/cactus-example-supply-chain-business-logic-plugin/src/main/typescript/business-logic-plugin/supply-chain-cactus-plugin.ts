@@ -46,7 +46,8 @@ export interface ISupplyChainCactusPluginOptions {
 }
 
 export class SupplyChainCactusPlugin
-  implements ICactusPlugin, IPluginWebService {
+  implements ICactusPlugin, IPluginWebService
+{
   public static readonly CLASS_NAME = "SupplyChainCactusPlugin";
 
   private readonly log: Logger;

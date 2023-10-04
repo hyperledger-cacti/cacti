@@ -130,7 +130,8 @@ describe("Config files check tests", () => {
         usersettingYaml.logLevel === "trace",
     ).toBe(true);
 
-    const ipRegex = /^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+    const ipRegex =
+      /^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
     expect(
       usersettingYaml.applicationHostInfo.hostName.replace("http://", ""),
     ).toMatch(ipRegex);

@@ -6,7 +6,6 @@ export const K_CACTUS_KEYCHAIN_AWSSM_MANAGED_KEY_COUNT =
 export const totalKeyCount = new Gauge({
   registers: [],
   name: K_CACTUS_KEYCHAIN_AWSSM_MANAGED_KEY_COUNT,
-  help:
-    "The number of keys that were set in the backing Aws Secret Manager deployment via this specific keychain plugin instance",
+  help: "The number of keys that were set in the backing Aws Secret Manager deployment via this specific keychain plugin instance",
   labelNames: ["type"],
 });

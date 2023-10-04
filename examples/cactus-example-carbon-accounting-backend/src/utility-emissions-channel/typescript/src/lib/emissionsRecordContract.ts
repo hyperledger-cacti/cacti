@@ -48,13 +48,13 @@ export class EmissionsRecordContract {
     md5: string,
   ): Promise<Uint8Array> {
     // get emissions factors from eGRID database; convert energy use to emissions factor UOM; calculate energy use
-    const lookup = await this.utilityLookupState.getUtilityLookupItem(
-      utilityId,
-    );
-    const factor = await this.utilityEmissionsFactorState.getEmissionsFactorByLookupItem(
-      lookup.item,
-      thruDate,
-    );
+    const lookup =
+      await this.utilityLookupState.getUtilityLookupItem(utilityId);
+    const factor =
+      await this.utilityEmissionsFactorState.getEmissionsFactorByLookupItem(
+        lookup.item,
+        thruDate,
+      );
     const co2Emission = getCO2EmissionFactor(
       factor.factor,
       Number(energyUseAmount),
@@ -128,11 +128,12 @@ export class EmissionsRecordContract {
     partyId: string,
   ): Promise<Uint8Array> {
     const partyIdsha256 = SHA256(partyId).toString();
-    const records = await this.emissionsState.getAllEmissionsDataByDateRangeAndParty(
-      fromDate,
-      thruDate,
-      partyIdsha256,
-    );
+    const records =
+      await this.emissionsState.getAllEmissionsDataByDateRangeAndParty(
+        fromDate,
+        thruDate,
+        partyIdsha256,
+      );
     return Buffer.from(JSON.stringify(records));
   }
   async importUtilityFactor(

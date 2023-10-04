@@ -75,9 +75,8 @@ describe(testcase, () => {
         },
       },
     ];
-    const config = await configService.newExampleConfigConvict(
-      apiServerOptions,
-    );
+    const config =
+      await configService.newExampleConfigConvict(apiServerOptions);
 
     apiServer = new ApiServer({
       config: config.getProperties(),

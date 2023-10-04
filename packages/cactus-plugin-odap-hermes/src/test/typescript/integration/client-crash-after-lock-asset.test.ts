@@ -680,11 +680,12 @@ test("client gateway crashes after lock fabric asset", async () => {
 
   const sessionID = pluginSourceGateway.configureOdapSession(odapClientRequest);
 
-  const transferInitializationRequest = await pluginSourceGateway.clientHelper.sendTransferInitializationRequest(
-    sessionID,
-    pluginSourceGateway,
-    false,
-  );
+  const transferInitializationRequest =
+    await pluginSourceGateway.clientHelper.sendTransferInitializationRequest(
+      sessionID,
+      pluginSourceGateway,
+      false,
+    );
 
   if (transferInitializationRequest == void 0) {
     expect(false);
@@ -696,11 +697,12 @@ test("client gateway crashes after lock fabric asset", async () => {
     pluginRecipientGateway,
   );
 
-  const transferInitializationResponse = await pluginRecipientGateway.serverHelper.sendTransferInitializationResponse(
-    transferInitializationRequest.sessionID,
-    pluginRecipientGateway,
-    false,
-  );
+  const transferInitializationResponse =
+    await pluginRecipientGateway.serverHelper.sendTransferInitializationResponse(
+      transferInitializationRequest.sessionID,
+      pluginRecipientGateway,
+      false,
+    );
 
   if (transferInitializationResponse == void 0) {
     expect(false);
@@ -712,11 +714,12 @@ test("client gateway crashes after lock fabric asset", async () => {
     pluginSourceGateway,
   );
 
-  const transferCommenceRequest = await pluginSourceGateway.clientHelper.sendTransferCommenceRequest(
-    sessionID,
-    pluginSourceGateway,
-    false,
-  );
+  const transferCommenceRequest =
+    await pluginSourceGateway.clientHelper.sendTransferCommenceRequest(
+      sessionID,
+      pluginSourceGateway,
+      false,
+    );
 
   if (transferCommenceRequest == void 0) {
     expect(false);
@@ -728,11 +731,12 @@ test("client gateway crashes after lock fabric asset", async () => {
     pluginRecipientGateway,
   );
 
-  const transferCommenceResponse = await pluginRecipientGateway.serverHelper.sendTransferCommenceResponse(
-    transferCommenceRequest.sessionID,
-    pluginRecipientGateway,
-    false,
-  );
+  const transferCommenceResponse =
+    await pluginRecipientGateway.serverHelper.sendTransferCommenceResponse(
+      transferCommenceRequest.sessionID,
+      pluginRecipientGateway,
+      false,
+    );
 
   if (transferCommenceResponse == void 0) {
     expect(false);

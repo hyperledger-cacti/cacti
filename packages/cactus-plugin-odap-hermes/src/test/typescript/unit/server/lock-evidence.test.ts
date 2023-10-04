@@ -141,7 +141,8 @@ beforeEach(async () => {
     id: sessionID,
     sourceGatewayPubkey: pluginSourceGateway.pubKey,
     recipientGatewayPubkey: pluginRecipientGateway.pubKey,
-    transferCommenceMessageResponseHash: dummyTransferCommenceResponseMessageHash,
+    transferCommenceMessageResponseHash:
+      dummyTransferCommenceResponseMessageHash,
     step: 2,
     lastSequenceNumber: sequenceNumber,
     maxTimeout: 0,

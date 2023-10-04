@@ -25,7 +25,8 @@ export interface ICommitPreparationResponseEndpointOptions {
 }
 
 export class CommitPreparationResponseEndpointV1
-  implements IWebServiceEndpoint {
+  implements IWebServiceEndpoint
+{
   public static readonly CLASS_NAME = "CommitPrepareResponseEndpointV1";
 
   private readonly log: Logger;

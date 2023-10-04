@@ -72,7 +72,8 @@ beforeEach(async () => {
     sourceGatewayPubkey: pluginSourceGateway.pubKey,
     recipientGatewayPubkey: pluginRecipientGateway.pubKey,
     commitFinalResponseMessageHash: dummyCommitFinalResponseMessageHash,
-    transferCommenceMessageRequestHash: dummyTransferCommenceResponseMessageHash,
+    transferCommenceMessageRequestHash:
+      dummyTransferCommenceResponseMessageHash,
     step: 2,
     lastSequenceNumber: sequenceNumber,
     maxTimeout: 0,

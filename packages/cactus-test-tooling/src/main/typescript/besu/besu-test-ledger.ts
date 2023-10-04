@@ -34,8 +34,8 @@ export const BESU_TEST_LEDGER_DEFAULT_OPTIONS = Object.freeze({
   envVars: ["BESU_NETWORK=dev"],
 });
 
-export const BESU_TEST_LEDGER_OPTIONS_JOI_SCHEMA: Joi.Schema = Joi.object().keys(
-  {
+export const BESU_TEST_LEDGER_OPTIONS_JOI_SCHEMA: Joi.Schema =
+  Joi.object().keys({
     containerImageVersion: Joi.string().min(5).required(),
     containerImageName: Joi.string().min(1).required(),
     rpcApiHttpPort: Joi.number()
@@ -45,8 +45,7 @@ export const BESU_TEST_LEDGER_OPTIONS_JOI_SCHEMA: Joi.Schema = Joi.object().keys
       .max(65535)
       .required(),
     envVars: Joi.array().allow(null).required(),
-  },
-);
+  });
 
 export class BesuTestLedger implements ITestLedger {
   public readonly containerImageVersion: string;

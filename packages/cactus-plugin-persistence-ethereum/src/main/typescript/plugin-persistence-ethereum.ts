@@ -61,7 +61,8 @@ export interface IPluginPersistenceEthereumOptions
  * Remember to call `onPluginInit()` before using any of the plugin method, and `shutdown()` when closing the app.
  */
 export class PluginPersistenceEthereum
-  implements ICactusPlugin, IPluginWebService {
+  implements ICactusPlugin, IPluginWebService
+{
   public static readonly CLASS_NAME = "PluginPersistenceEthereum";
   public monitoredTokens = new Map<string, MonitoredToken>();
 
@@ -471,7 +472,7 @@ export class PluginPersistenceEthereum
     try {
       const block = await this.dbClient.getBlock(blockNumber);
 
-      if (((block.number as unknown) as string) !== blockNumber.toString()) {
+      if ((block.number as unknown as string) !== blockNumber.toString()) {
         throw new Error("Invalid response from the DB");
       }
 
@@ -701,9 +702,8 @@ export class PluginPersistenceEthereum
             "Synchronize issued ERC721 tokens of contract",
             contractAddress,
           );
-          const syncTokenCount = await this.syncERC721TokensForContract(
-            contractAddress,
-          );
+          const syncTokenCount =
+            await this.syncERC721TokensForContract(contractAddress);
           this.log.info(
             `Synchronized ${syncTokenCount} tokens for contract ${contractAddress}`,
           );
@@ -756,7 +756,8 @@ export class PluginPersistenceEthereum
             return;
           }
 
-          const block = (ledgerEvent.blockData as unknown) as BlockTransactionObject;
+          const block =
+            ledgerEvent.blockData as unknown as BlockTransactionObject;
           await this.pushNewBlock(block);
         } catch (error: unknown) {
           this.log.error("Unexpected error when pushing new block:", error);

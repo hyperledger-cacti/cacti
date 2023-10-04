@@ -43,7 +43,7 @@ export class InvokeContractEndpoint implements IWebServiceEndpoint {
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public get oasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/invoke-contract"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/invoke-contract"] {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/invoke-contract"
     ];
@@ -87,9 +87,8 @@ export class InvokeContractEndpoint implements IWebServiceEndpoint {
     this.log.debug(reqTag);
     const reqBody: InvokeContractV1Request = req.body;
     try {
-      const resBody = await this.options.connector.getContractInfoKeychain(
-        reqBody,
-      );
+      const resBody =
+        await this.options.connector.getContractInfoKeychain(reqBody);
       res.json(resBody);
     } catch (ex) {
       this.log.error(`Crash while serving ${reqTag}`, ex);

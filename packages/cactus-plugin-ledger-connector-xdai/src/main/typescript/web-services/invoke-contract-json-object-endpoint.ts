@@ -45,7 +45,7 @@ export class InvokeContractJsonObjectEndpoint implements IWebServiceEndpoint {
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public get oasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/invoke-contract-json-object"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/invoke-contract-json-object"] {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/invoke-contract-json-object"
     ];
@@ -89,9 +89,8 @@ export class InvokeContractJsonObjectEndpoint implements IWebServiceEndpoint {
     this.log.debug(reqTag);
     const reqBody: InvokeContractJsonObjectV1Request = req.body;
     try {
-      const resBody = await this.options.connector.invokeContractJsonObject(
-        reqBody,
-      );
+      const resBody =
+        await this.options.connector.invokeContractJsonObject(reqBody);
       res.json(resBody);
     } catch (ex) {
       this.log.error(`Crash while serving ${reqTag}`, ex);

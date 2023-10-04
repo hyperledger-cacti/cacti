@@ -26,7 +26,8 @@ export interface IDeployContractSolidityBytecodeJsonObjectOptions {
 }
 
 export class DeployContractSolidityBytecodeJsonObjectEndpoint
-  implements IWebServiceEndpoint {
+  implements IWebServiceEndpoint
+{
   public static readonly CLASS_NAME =
     "DeployContractSolidityBytecodeJsonObjectEndpoint";
 
@@ -48,7 +49,7 @@ export class DeployContractSolidityBytecodeJsonObjectEndpoint
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public get oasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/deploy-contract-solidity-bytecode-json-object"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/deploy-contract-solidity-bytecode-json-object"] {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/deploy-contract-solidity-bytecode-json-object"
     ];
@@ -92,9 +93,8 @@ export class DeployContractSolidityBytecodeJsonObjectEndpoint
     this.log.debug(reqTag);
     const reqBody: DeployContractJsonObjectV1Request = req.body;
     try {
-      const resBody = await this.options.connector.deployContractJsonObject(
-        reqBody,
-      );
+      const resBody =
+        await this.options.connector.deployContractJsonObject(reqBody);
       res.json(resBody);
     } catch (ex) {
       this.log.error(`Crash while serving ${reqTag}`, ex);

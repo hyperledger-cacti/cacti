@@ -323,8 +323,7 @@ describe("Ethereum persistence PostgreSQL PostgresDatabaseClient tests", () => {
     const block = {
       number: 18,
       created_at: blockTimestamp.toUTCString(),
-      hash:
-        "0x2bdfd1957e88297b012a1dc15a51f3691371980749378d10a6186b221d6687e5",
+      hash: "0x2bdfd1957e88297b012a1dc15a51f3691371980749378d10a6186b221d6687e5",
       number_of_tx: 1,
     };
 
@@ -336,8 +335,7 @@ describe("Ethereum persistence PostgreSQL PostgresDatabaseClient tests", () => {
 
     const transaction = {
       index: 0,
-      hash:
-        "0x29a3ad97041d01ed610cfab19a091239135ee6bef6d2d7513e94dbb26f8bb1f4",
+      hash: "0x29a3ad97041d01ed610cfab19a091239135ee6bef6d2d7513e94dbb26f8bb1f4",
       from: "0x00a329c0648769A73afAc7F9381E08FB43dBEA72",
       to: "0x53F6337d308FfB2c52eDa319Be216cC7321D3725",
       eth_value: 0,
@@ -390,8 +388,7 @@ describe("Ethereum persistence PostgreSQL PostgresDatabaseClient tests", () => {
     const block = {
       number: 18,
       created_at: blockTimestamp.toUTCString(),
-      hash:
-        "0x2bdfd1957e88297b012a1dc15a51f3691371980749378d10a6186b221d6687e5",
+      hash: "0x2bdfd1957e88297b012a1dc15a51f3691371980749378d10a6186b221d6687e5",
       number_of_tx: 1,
     };
 
@@ -403,8 +400,7 @@ describe("Ethereum persistence PostgreSQL PostgresDatabaseClient tests", () => {
 
     const transaction = {
       index: 0,
-      hash:
-        "0x29a3ad97041d01ed610cfab19a091239135ee6bef6d2d7513e94dbb26f8bb1f4",
+      hash: "0x29a3ad97041d01ed610cfab19a091239135ee6bef6d2d7513e94dbb26f8bb1f4",
       from: "0x00a329c0648769A73afAc7F9381E08FB43dBEA72",
       to: "0x53F6337d308FfB2c52eDa319Be216cC7321D3725",
       eth_value: 0,
@@ -458,15 +454,13 @@ describe("Ethereum persistence PostgreSQL PostgresDatabaseClient tests", () => {
       block: {
         number: 18,
         created_at: blockTimestamp.toUTCString(),
-        hash:
-          "0x2bdfd1957e88297b012a1dc15a51f3691371980749378d10a6186b221d6687e5",
+        hash: "0x2bdfd1957e88297b012a1dc15a51f3691371980749378d10a6186b221d6687e5",
         number_of_tx: 1,
       },
       transactions: [
         {
           index: 0,
-          hash:
-            "0x29a3ad97041d01ed610cfab19a091239135ee6bef6d2d7513e94dbb26f8bb1f4",
+          hash: "0x29a3ad97041d01ed610cfab19a091239135ee6bef6d2d7513e94dbb26f8bb1f4",
           from: "0x00a329c0648769A73afAc7F9381E08FB43dBEA72",
           to: contractAddr,
           eth_value: 0,
@@ -528,15 +522,13 @@ describe("Ethereum persistence PostgreSQL PostgresDatabaseClient tests", () => {
       block: {
         number: 18,
         created_at: new Date(1671702925 * 1000).toUTCString(),
-        hash:
-          "0x2bdfd1957e88297b012a1dc15a51f3691371980749378d10a6186b221d6687e5",
+        hash: "0x2bdfd1957e88297b012a1dc15a51f3691371980749378d10a6186b221d6687e5",
         number_of_tx: 1,
       },
       transactions: [
         {
           index: 0,
-          hash:
-            "0x29a3ad97041d01ed610cfab19a091239135ee6bef6d2d7513e94dbb26f8bb1f4",
+          hash: "0x29a3ad97041d01ed610cfab19a091239135ee6bef6d2d7513e94dbb26f8bb1f4",
           from: "0x00a329c0648769A73afAc7F9381E08FB43dBEA72",
           to: contractAddr,
           eth_value: 0,
@@ -564,15 +556,13 @@ describe("Ethereum persistence PostgreSQL PostgresDatabaseClient tests", () => {
       block: {
         number: 19,
         created_at: new Date(1671702999 * 1000).toUTCString(),
-        hash:
-          "0x2bdfd1957e88297b012a1dc15a51f3691371980749378d10a6186b221d6687ff",
+        hash: "0x2bdfd1957e88297b012a1dc15a51f3691371980749378d10a6186b221d6687ff",
         number_of_tx: 1,
       },
       transactions: [
         {
           index: 0,
-          hash:
-            "0x29a3ad97041d01ed610cfab19a091239135ee6bef6d2d7513e94dbb26f8bb1aa",
+          hash: "0x29a3ad97041d01ed610cfab19a091239135ee6bef6d2d7513e94dbb26f8bb1aa",
           from: "0x00a329c0648769A73afAc7F9381E08FB43dBEA72",
           to: contractAddr,
           eth_value: 0,
@@ -596,14 +586,14 @@ describe("Ethereum persistence PostgreSQL PostgresDatabaseClient tests", () => {
 
     // Assert first token owner
     const firstToken = balanceAfterInsert.find(
-      (b) => ((b.token_id as unknown) as string) === "1",
+      (b) => (b.token_id as unknown as string) === "1",
     );
     expect(firstToken).toBeTruthy();
     expect(firstToken?.account_address).toEqual(firstAccount);
 
     // Assert second token owner
     const secondToken = balanceAfterInsert.find(
-      (b) => ((b.token_id as unknown) as string) === "2",
+      (b) => (b.token_id as unknown as string) === "2",
     );
     expect(secondToken).toBeTruthy();
     expect(secondToken?.account_address).toEqual(secondAccount);
@@ -640,15 +630,13 @@ describe("Ethereum persistence PostgreSQL PostgresDatabaseClient tests", () => {
       block: {
         number: 18,
         created_at: new Date(blockTimestamp).toUTCString(),
-        hash:
-          "0x2bdfd1957e88297b012a1dc15a51f3691371980749378d10a6186b221d6687e5",
+        hash: "0x2bdfd1957e88297b012a1dc15a51f3691371980749378d10a6186b221d6687e5",
         number_of_tx: 1,
       },
       transactions: [
         {
           index: 0,
-          hash:
-            "0x29a3ad97041d01ed610cfab19a091239135ee6bef6d2d7513e94dbb26f8bb1f4",
+          hash: "0x29a3ad97041d01ed610cfab19a091239135ee6bef6d2d7513e94dbb26f8bb1f4",
           from: "0x00a329c0648769A73afAc7F9381E08FB43dBEA72",
           to: contractAddress,
           eth_value: 0,
@@ -715,15 +703,13 @@ describe("Ethereum persistence PostgreSQL PostgresDatabaseClient tests", () => {
       block: {
         number: 18,
         created_at: new Date(blockTimestamp).toUTCString(),
-        hash:
-          "0x2bdfd1957e88297b012a1dc15a51f3691371980749378d10a6186b221d6687e5",
+        hash: "0x2bdfd1957e88297b012a1dc15a51f3691371980749378d10a6186b221d6687e5",
         number_of_tx: 1,
       },
       transactions: [
         {
           index: 0,
-          hash:
-            "0x29a3ad97041d01ed610cfab19a091239135ee6bef6d2d7513e94dbb26f8bb1f4",
+          hash: "0x29a3ad97041d01ed610cfab19a091239135ee6bef6d2d7513e94dbb26f8bb1f4",
           from: "0x00a329c0648769A73afAc7F9381E08FB43dBEA72",
           to: contractAddress,
           eth_value: 0,

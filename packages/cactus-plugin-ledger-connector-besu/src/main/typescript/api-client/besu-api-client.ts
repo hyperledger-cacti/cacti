@@ -19,7 +19,8 @@ export class BesuApiClientOptions extends Configuration {
 
 export class BesuApiClient
   extends DefaultApi
-  implements ISocketApiClient<WatchBlocksV1Progress> {
+  implements ISocketApiClient<WatchBlocksV1Progress>
+{
   public static readonly CLASS_NAME = "BesuApiClient";
 
   private readonly log: Logger;

@@ -1,6 +1,5 @@
 import {
   ALL_EXPRESS_HTTP_VERB_METHOD_NAMES,
-  ExpressHttpVerbMethodName,
   isExpressHttpVerbMethodName,
 } from "../../../../main/typescript/public-api";
 

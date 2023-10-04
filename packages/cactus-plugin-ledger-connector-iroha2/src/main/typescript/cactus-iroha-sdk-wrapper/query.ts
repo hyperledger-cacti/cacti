@@ -50,7 +50,7 @@ import { IrohaV2PrerequisitesProvider } from "./prerequisites-provider";
  */
 interface QueryContext<
   QueryBoxFactory extends (...args: any[]) => QueryBox,
-  QueryResponseType
+  QueryResponseType,
 > {
   /**
    * Request query response from the ledger.
@@ -136,7 +136,7 @@ export class CactusIrohaV2QueryClient {
    */
   private createQueryContext<
     QueryBoxFactory extends (...args: any[]) => QueryBox,
-    QueryResponseType
+    QueryResponseType,
   >(args: {
     getQueryBox: QueryBoxFactory;
     parseQueryResponse: (result: ToriiQueryResult) => QueryResponseType;
