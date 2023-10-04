@@ -262,7 +262,8 @@ export class ClientGatewayHelper {
       JSON.stringify(transferCommenceRequestMessage),
     ).toString();
 
-    sessionData.clientSignatureTransferCommenceRequestMessage = messageSignature;
+    sessionData.clientSignatureTransferCommenceRequestMessage =
+      messageSignature;
 
     odap.sessions.set(sessionID, sessionData);
 
@@ -535,7 +536,8 @@ export class ClientGatewayHelper {
       JSON.stringify(commitPrepareRequestMessage),
     ).toString();
 
-    sessionData.clientSignatureCommitPreparationRequestMessage = messageSignature;
+    sessionData.clientSignatureCommitPreparationRequestMessage =
+      messageSignature;
 
     odap.sessions.set(sessionID, sessionData);
 

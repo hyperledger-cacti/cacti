@@ -163,7 +163,7 @@ test(testCase, async (t: Test) => {
         gas: 1000000,
       };
       await apiClient.deployContractV1(
-        (parameters as unknown) as DeployContractV1Request,
+        parameters as unknown as DeployContractV1Request,
       );
     } catch (e) {
       t2.equal(
@@ -257,7 +257,7 @@ test(testCase, async (t: Test) => {
         },
       };
       await apiClient.invokeContractV1(
-        (parameters as unknown) as InvokeContractV1Request,
+        parameters as unknown as InvokeContractV1Request,
       );
     } catch (e) {
       t2.equal(
@@ -294,7 +294,7 @@ test(testCase, async (t: Test) => {
         fake: 4,
       };
       await apiClient.invokeContractV1(
-        (parameters as any) as InvokeContractV1Request,
+        parameters as any as InvokeContractV1Request,
       );
     } catch (e) {
       t2.equal(
@@ -357,7 +357,7 @@ test(testCase, async (t: Test) => {
         },
       };
       await apiClient.runTransactionV1(
-        (parameters as any) as RunTransactionV1Request,
+        parameters as any as RunTransactionV1Request,
       );
     } catch (e) {
       t2.equal(
@@ -399,7 +399,7 @@ test(testCase, async (t: Test) => {
         fake: 4,
       };
       await apiClient.runTransactionV1(
-        (parameters as any) as RunTransactionV1Request,
+        parameters as any as RunTransactionV1Request,
       );
     } catch (e) {
       t2.equal(

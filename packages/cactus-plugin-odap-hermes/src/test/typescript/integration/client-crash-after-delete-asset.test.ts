@@ -679,11 +679,12 @@ test("client gateway crashes after deleting fabric asset", async () => {
 
   const sessionID = pluginSourceGateway.configureOdapSession(odapClientRequest);
 
-  const transferInitializationRequest = await pluginSourceGateway.clientHelper.sendTransferInitializationRequest(
-    sessionID,
-    pluginSourceGateway,
-    false,
-  );
+  const transferInitializationRequest =
+    await pluginSourceGateway.clientHelper.sendTransferInitializationRequest(
+      sessionID,
+      pluginSourceGateway,
+      false,
+    );
 
   if (transferInitializationRequest == void 0) {
     expect(false);
@@ -695,11 +696,12 @@ test("client gateway crashes after deleting fabric asset", async () => {
     pluginRecipientGateway,
   );
 
-  const transferInitializationResponse = await pluginRecipientGateway.serverHelper.sendTransferInitializationResponse(
-    transferInitializationRequest.sessionID,
-    pluginRecipientGateway,
-    false,
-  );
+  const transferInitializationResponse =
+    await pluginRecipientGateway.serverHelper.sendTransferInitializationResponse(
+      transferInitializationRequest.sessionID,
+      pluginRecipientGateway,
+      false,
+    );
 
   if (transferInitializationResponse == void 0) {
     expect(false);
@@ -711,11 +713,12 @@ test("client gateway crashes after deleting fabric asset", async () => {
     pluginSourceGateway,
   );
 
-  const transferCommenceRequest = await pluginSourceGateway.clientHelper.sendTransferCommenceRequest(
-    sessionID,
-    pluginSourceGateway,
-    false,
-  );
+  const transferCommenceRequest =
+    await pluginSourceGateway.clientHelper.sendTransferCommenceRequest(
+      sessionID,
+      pluginSourceGateway,
+      false,
+    );
 
   if (transferCommenceRequest == void 0) {
     expect(false);
@@ -727,11 +730,12 @@ test("client gateway crashes after deleting fabric asset", async () => {
     pluginRecipientGateway,
   );
 
-  const transferCommenceResponse = await pluginRecipientGateway.serverHelper.sendTransferCommenceResponse(
-    transferCommenceRequest.sessionID,
-    pluginRecipientGateway,
-    false,
-  );
+  const transferCommenceResponse =
+    await pluginRecipientGateway.serverHelper.sendTransferCommenceResponse(
+      transferCommenceRequest.sessionID,
+      pluginRecipientGateway,
+      false,
+    );
 
   if (transferCommenceResponse == void 0) {
     expect(false);
@@ -745,11 +749,12 @@ test("client gateway crashes after deleting fabric asset", async () => {
 
   await pluginSourceGateway.lockAsset(sessionID);
 
-  const lockEvidenceRequest = await pluginSourceGateway.clientHelper.sendLockEvidenceRequest(
-    sessionID,
-    pluginSourceGateway,
-    false,
-  );
+  const lockEvidenceRequest =
+    await pluginSourceGateway.clientHelper.sendLockEvidenceRequest(
+      sessionID,
+      pluginSourceGateway,
+      false,
+    );
 
   if (lockEvidenceRequest == void 0) {
     expect(false);
@@ -761,11 +766,12 @@ test("client gateway crashes after deleting fabric asset", async () => {
     pluginRecipientGateway,
   );
 
-  const lockEvidenceResponse = await pluginRecipientGateway.serverHelper.sendLockEvidenceResponse(
-    lockEvidenceRequest.sessionID,
-    pluginRecipientGateway,
-    false,
-  );
+  const lockEvidenceResponse =
+    await pluginRecipientGateway.serverHelper.sendLockEvidenceResponse(
+      lockEvidenceRequest.sessionID,
+      pluginRecipientGateway,
+      false,
+    );
 
   if (lockEvidenceResponse == void 0) {
     expect(false);
@@ -777,11 +783,12 @@ test("client gateway crashes after deleting fabric asset", async () => {
     pluginSourceGateway,
   );
 
-  const commitPreparationRequest = await pluginSourceGateway.clientHelper.sendCommitPreparationRequest(
-    sessionID,
-    pluginSourceGateway,
-    false,
-  );
+  const commitPreparationRequest =
+    await pluginSourceGateway.clientHelper.sendCommitPreparationRequest(
+      sessionID,
+      pluginSourceGateway,
+      false,
+    );
 
   if (commitPreparationRequest == void 0) {
     expect(false);
@@ -793,11 +800,12 @@ test("client gateway crashes after deleting fabric asset", async () => {
     pluginRecipientGateway,
   );
 
-  const commitPreparationResponse = await pluginRecipientGateway.serverHelper.sendCommitPreparationResponse(
-    lockEvidenceRequest.sessionID,
-    pluginRecipientGateway,
-    false,
-  );
+  const commitPreparationResponse =
+    await pluginRecipientGateway.serverHelper.sendCommitPreparationResponse(
+      lockEvidenceRequest.sessionID,
+      pluginRecipientGateway,
+      false,
+    );
 
   if (commitPreparationResponse == void 0) {
     expect(false);

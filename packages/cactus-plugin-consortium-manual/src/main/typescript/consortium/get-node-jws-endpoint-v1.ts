@@ -70,7 +70,7 @@ export class GetNodeJwsEndpoint implements IWebServiceEndpoint {
     return this.handleRequest.bind(this);
   }
 
-  public get oasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/node/jws"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/node/jws"] {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/node/jws"
     ];

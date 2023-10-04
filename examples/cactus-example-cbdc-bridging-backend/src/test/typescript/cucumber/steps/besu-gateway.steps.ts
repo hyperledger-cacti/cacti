@@ -114,12 +114,12 @@ Then(
   },
 );
 
-Then("{string} has {int} CBDC available in the sidechain", async function (
-  user: string,
-  amount: number,
-) {
-  expect(await getBesuBalance(getEthAddress(user))).to.equal(amount);
-});
+Then(
+  "{string} has {int} CBDC available in the sidechain",
+  async function (user: string, amount: number) {
+    expect(await getBesuBalance(getEthAddress(user))).to.equal(amount);
+  },
+);
 
 Then(
   "the asset reference with id {string} is locked in the sidechain",

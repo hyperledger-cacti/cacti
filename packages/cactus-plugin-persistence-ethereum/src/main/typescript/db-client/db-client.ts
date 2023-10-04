@@ -30,12 +30,15 @@ type TokenTransferInsertType = SchemaTables["token_transfer"]["Insert"];
 type TokenERC72RowType = SchemaTables["token_erc721"]["Row"];
 type TokenERC72InsertType = SchemaTables["token_erc721"]["Insert"];
 type TokenMetadataERC20RowType = SchemaTables["token_metadata_erc20"]["Row"];
-type TokenMetadataERC20InsertType = SchemaTables["token_metadata_erc20"]["Insert"];
+type TokenMetadataERC20InsertType =
+  SchemaTables["token_metadata_erc20"]["Insert"];
 type TokenMetadataERC721RowType = SchemaTables["token_metadata_erc721"]["Row"];
-type TokenMetadataERC721InsertType = SchemaTables["token_metadata_erc721"]["Insert"];
+type TokenMetadataERC721InsertType =
+  SchemaTables["token_metadata_erc721"]["Insert"];
 
 type SchemaFunctions = DatabaseSchemaType["public"]["Functions"];
-type GetMissingBlocksInRangeReturnType = SchemaFunctions["get_missing_blocks_in_range"]["Returns"];
+type GetMissingBlocksInRangeReturnType =
+  SchemaFunctions["get_missing_blocks_in_range"]["Returns"];
 
 // Supabase doesn't generate materialized view types
 type TokenERC20RowType = {

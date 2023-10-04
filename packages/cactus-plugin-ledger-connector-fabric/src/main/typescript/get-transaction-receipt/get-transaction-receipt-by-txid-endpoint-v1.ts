@@ -89,9 +89,8 @@ export class GetTransactionReceiptByTxIDEndpointV1
 
     try {
       const reqBody = req.body as RunTransactionRequest;
-      const resBody = await this.opts.connector.getTransactionReceiptByTxID(
-        reqBody,
-      );
+      const resBody =
+        await this.opts.connector.getTransactionReceiptByTxID(reqBody);
       res.status(200);
       res.json(resBody);
     } catch (ex) {

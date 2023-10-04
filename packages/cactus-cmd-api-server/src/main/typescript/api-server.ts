@@ -415,7 +415,8 @@ export class ApiServer {
       ]);
       this.log.debug("%o install result: %o", pkgName, out);
       if (out?.exitCode && out.exitCode !== 0) {
-        const eMsg = "Non-zero exit code returned by lmify.install() indicating that the underlying npm install OS process had encountered a problem:";
+        const eMsg =
+          "Non-zero exit code returned by lmify.install() indicating that the underlying npm install OS process had encountered a problem:";
         throw newRex(eMsg, out);
       }
       this.log.info(`Installed ${pkgName} OK`);
@@ -465,7 +466,8 @@ export class ApiServer {
       await new Promise<void>((resolve, reject) => {
         this.grpcServer.tryShutdown((ex?: Error) => {
           if (ex) {
-            const eMsg = "Failed to shut down gRPC server of the Cacti API server.";
+            const eMsg =
+              "Failed to shut down gRPC server of the Cacti API server.";
             this.log.debug(eMsg, ex);
             reject(newRex(eMsg, ex));
           } else {
@@ -593,7 +595,10 @@ export class ApiServer {
     const { "/api/v1/api-server/healthcheck": oasPath } = OAS.paths;
     const { http } = oasPath.get["x-hyperledger-cactus"];
     const { path: httpPath, verbLowerCase: httpVerb } = http;
-    (app as express.Express)[httpVerb as keyof express.Express](httpPath, healthcheckHandler);
+    (app as express.Express)[httpVerb as keyof express.Express](
+      httpPath,
+      healthcheckHandler,
+    );
 
     this.wsApi.on("connection", (socket: SocketIoSocket) => {
       const { id } = socket;

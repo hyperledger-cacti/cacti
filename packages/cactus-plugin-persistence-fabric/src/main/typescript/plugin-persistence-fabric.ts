@@ -412,9 +412,8 @@ export class PluginPersistenceFabric
         }
 
         if (block.status == 200) {
-          const isThisBlockPresent = await this.dbClient.isThisBlockInDB(
-            tempBlockNumber,
-          );
+          const isThisBlockPresent =
+            await this.dbClient.isThisBlockInDB(tempBlockNumber);
 
           if (isThisBlockPresent.rowCount === 0) {
             checkBlock = true;
@@ -794,9 +793,8 @@ If some blocks above this number are already in database they will not be remove
 
         if (block.status == 200) {
           // Put scrapped block into database
-          const migrateBlock = await this.migrateBlockNrWithTransactions(
-            blockNumber,
-          );
+          const migrateBlock =
+            await this.migrateBlockNrWithTransactions(blockNumber);
           if (migrateBlock) {
             const delSynchronized = this.missedBlocks.indexOf(blockNumber);
             delete this.missedBlocks[delSynchronized];

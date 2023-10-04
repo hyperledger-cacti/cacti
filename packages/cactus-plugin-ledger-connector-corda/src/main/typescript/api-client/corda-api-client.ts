@@ -35,7 +35,8 @@ export class CordaApiClientOptions extends Configuration {
  */
 export class CordaApiClient
   extends DefaultApi
-  implements ISocketApiClient<CordaBlock> {
+  implements ISocketApiClient<CordaBlock>
+{
   public static readonly CLASS_NAME = "CordaApiClient";
 
   private readonly log: Logger;

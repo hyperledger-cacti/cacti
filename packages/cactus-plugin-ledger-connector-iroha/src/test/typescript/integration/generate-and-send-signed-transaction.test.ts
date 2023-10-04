@@ -364,7 +364,8 @@ describe("Generate and send signed transaction tests", () => {
         "Call generateTransactionV1 with invalid command name - should fail.",
       );
       await apiClient.generateTransactionV1({
-        commandName: "MaliciousError <script type='text/javascript'>var i = 10</script>" as any,
+        commandName:
+          "MaliciousError <script type='text/javascript'>var i = 10</script>" as any,
         commandParams: {
           accountName: username,
           domainId: defaultDomain,

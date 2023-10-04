@@ -24,7 +24,8 @@ export interface ITransferInitiationRequestEndpointOptions {
 }
 
 export class TransferInitiationRequestEndpointV1
-  implements IWebServiceEndpoint {
+  implements IWebServiceEndpoint
+{
   public static readonly CLASS_NAME = "TransferInitiationRequestEndpointV1";
 
   private readonly log: Logger;

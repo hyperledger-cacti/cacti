@@ -47,8 +47,7 @@ export class RunTransactionEndpoint implements IWebServiceEndpoint {
         operationId: "runTransactionV1",
         "x-hyperledger-cactus": {
           http: {
-            path:
-              "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-stub/run-transaction",
+            path: "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-stub/run-transaction",
             verbLowerCase: "post",
           },
         },

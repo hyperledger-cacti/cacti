@@ -33,9 +33,10 @@ export async function sendRecoverUpdateMessage(
     throw new Error(`${fnTag}, session data is not correctly initialized`);
   }
 
-  const recoveredLogs: OdapLocalLog[] = await odap.getLogsMoreRecentThanTimestamp(
-    sessionData.lastLogEntryTimestamp,
-  );
+  const recoveredLogs: OdapLocalLog[] =
+    await odap.getLogsMoreRecentThanTimestamp(
+      sessionData.lastLogEntryTimestamp,
+    );
 
   const recoverUpdateMessage: RecoverUpdateV1Message = {
     sessionID: sessionID,

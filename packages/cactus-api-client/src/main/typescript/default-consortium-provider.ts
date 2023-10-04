@@ -18,7 +18,8 @@ export interface IDefaultConsortiumProviderOptions {
 }
 
 export class DefaultConsortiumProvider
-  implements IAsyncProvider<ConsortiumDatabase> {
+  implements IAsyncProvider<ConsortiumDatabase>
+{
   public static readonly CLASS_NAME = "DefaultConsortiumProvider";
 
   private readonly log: Logger;
@@ -45,9 +46,8 @@ export class DefaultConsortiumProvider
 
     const json = Buffer.from(response.jws.payload, "base64").toString();
     const body = JSON.parse(json);
-    const {
-      consortiumDatabase,
-    }: { consortiumDatabase: ConsortiumDatabase } = body;
+    const { consortiumDatabase }: { consortiumDatabase: ConsortiumDatabase } =
+      body;
 
     Checks.truthy(consortiumDatabase, `${fnTag}::consortiumDatabase`);
 

@@ -55,7 +55,8 @@ test(testCase, async (t: Test) => {
   await ledger.start();
 
   const rpcApiHttpHost = await ledger.getRpcApiHttpHost();
-  const quorumGenesisOptions: IQuorumGenesisOptions = await ledger.getGenesisJsObject();
+  const quorumGenesisOptions: IQuorumGenesisOptions =
+    await ledger.getGenesisJsObject();
   t.ok(quorumGenesisOptions);
   t.ok(quorumGenesisOptions.alloc);
 
@@ -71,14 +72,13 @@ test(testCase, async (t: Test) => {
   const web3 = new Web3(rpcApiHttpHost);
   const testEthAccount = web3.eth.accounts.create(uuidV4());
 
-  const connector: PluginLedgerConnectorQuorum = new PluginLedgerConnectorQuorum(
-    {
+  const connector: PluginLedgerConnectorQuorum =
+    new PluginLedgerConnectorQuorum({
       instanceId: uuidV4(),
       rpcApiHttpHost,
       logLevel,
       pluginRegistry: new PluginRegistry(),
-    },
-  );
+    });
 
   const expressApp = express();
   expressApp.use(bodyParser.json({ limit: "250mb" }));

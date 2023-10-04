@@ -53,7 +53,8 @@ export interface IPluginHTLCCoordinatorBesuOptions
 }
 
 export class PluginHTLCCoordinatorBesu
-  implements ICactusPlugin, IPluginWebService {
+  implements ICactusPlugin, IPluginWebService
+{
   private readonly instanceId: string;
   private readonly log: Logger;
   private readonly pluginRegistry: PluginRegistry;
@@ -159,14 +160,14 @@ export class PluginHTLCCoordinatorBesu
 
     switch (ownHTLCRequest.htlcPackage) {
       case HtlcPackage.BesuErc20: {
-        const pluginHtlc = (this.pluginRegistry.plugins.find((plugin) => {
+        const pluginHtlc = this.pluginRegistry.plugins.find((plugin) => {
           return (
             plugin.getPackageName() ==
             "@hyperledger/cactus-plugin-htlc-eth-besu-erc20" /*&&
             ((plugin as unknown) as PluginHtlcEthBesuErc20).getKeychainId() ==
               ownHTLCRequest.keychainId*/
           );
-        }) as unknown) as PluginHtlcEthBesuErc20;
+        }) as unknown as PluginHtlcEthBesuErc20;
         const request: InitializeRequestBesuERC20 = {
           connectorId: connector.getInstanceId(),
           keychainId: ownHTLCRequest.keychainId,
@@ -255,14 +256,14 @@ export class PluginHTLCCoordinatorBesu
 
     switch (counterpartyHTLCRequest.htlcPackage) {
       case HtlcPackage.BesuErc20: {
-        const pluginHtlc = (this.pluginRegistry.plugins.find((plugin) => {
+        const pluginHtlc = this.pluginRegistry.plugins.find((plugin) => {
           return (
             plugin.getPackageName() ==
             "@hyperledger/cactus-plugin-htlc-eth-besu-erc20" /*&&
             ((plugin as unknown) as PluginHtlcEthBesuErc20).getKeychainId() ==
               counterpartyHTLCRequest.keychainId*/
           );
-        }) as unknown) as PluginHtlcEthBesuErc20;
+        }) as unknown as PluginHtlcEthBesuErc20;
 
         const getSingleStatusReq = {
           id: counterpartyHTLCRequest.htlcId,
@@ -314,14 +315,14 @@ export class PluginHTLCCoordinatorBesu
 
     switch (withdrawCounterpartyRequest.htlcPackage) {
       case HtlcPackage.BesuErc20: {
-        const pluginHtlc = (this.pluginRegistry.plugins.find((plugin) => {
+        const pluginHtlc = this.pluginRegistry.plugins.find((plugin) => {
           return (
             plugin.getPackageName() ==
             "@hyperledger/cactus-plugin-htlc-eth-besu-erc20" /*&&
             ((plugin as unknown) as PluginHtlcEthBesuErc20).getKeychainId() ==
               withdrawCounterpartyRequest.keychainId*/
           );
-        }) as unknown) as PluginHtlcEthBesuErc20;
+        }) as unknown as PluginHtlcEthBesuErc20;
         const withdrawRequest: WithdrawRequestBesuERC20 = {
           id: withdrawCounterpartyRequest.htlcId,
           secret: withdrawCounterpartyRequest.secret,

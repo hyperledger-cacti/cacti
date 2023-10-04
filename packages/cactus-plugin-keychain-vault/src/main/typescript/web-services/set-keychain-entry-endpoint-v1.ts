@@ -49,7 +49,7 @@ export class SetKeychainEntryEndpointV1 implements IWebServiceEndpoint {
     this.log.debug(`Instantiated ${this.className} OK`);
   }
 
-  public get oasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/set-keychain-entry"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/set-keychain-entry"] {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/set-keychain-entry"
     ];

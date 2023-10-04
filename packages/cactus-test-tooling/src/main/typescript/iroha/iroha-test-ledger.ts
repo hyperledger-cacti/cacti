@@ -79,8 +79,8 @@ export const IROHA_TEST_LEDGER_DEFAULT_OPTIONS = Object.freeze({
 /*
  * Provides validations for Iroha container's options
  */
-export const IROHA_TEST_LEDGER_OPTIONS_JOI_SCHEMA: Joi.Schema = Joi.object().keys(
-  {
+export const IROHA_TEST_LEDGER_OPTIONS_JOI_SCHEMA: Joi.Schema =
+  Joi.object().keys({
     adminPriv: Joi.string().min(1).max(64).required(),
     adminPub: Joi.string().min(1).max(64).required(),
     nodePriv: Joi.string().min(1).max(64).required(),
@@ -97,8 +97,7 @@ export const IROHA_TEST_LEDGER_OPTIONS_JOI_SCHEMA: Joi.Schema = Joi.object().key
     imageName: Joi.string().min(1).required(),
     rpcToriiPort: Joi.number().port().required(),
     envVars: Joi.array().allow(null).required(),
-  },
-);
+  });
 
 export class IrohaTestLedger implements ITestLedger {
   public readonly imageVersion: string;

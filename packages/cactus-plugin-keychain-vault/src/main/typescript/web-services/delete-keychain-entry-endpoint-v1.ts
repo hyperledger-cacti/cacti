@@ -50,7 +50,7 @@ export class DeleteKeychainEntryEndpointV1 implements IWebServiceEndpoint {
     this.log.debug(`Instantiated ${this.className} OK`);
   }
 
-  public get oasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/delete-keychain-entry"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/delete-keychain-entry"] {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/delete-keychain-entry"
     ];

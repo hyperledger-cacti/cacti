@@ -49,7 +49,8 @@ export class PluginLedgerConnectorUbiquity
   implements
     IPluginLedgerConnector<never, never, never, never>,
     ICactusPlugin,
-    IPluginWebService {
+    IPluginWebService
+{
   public static readonly CLASS_NAME = "PluginLedgerConnectorUbiquity";
   private readonly instanceId: string;
   private readonly log: Logger;
@@ -227,12 +228,11 @@ export class PluginLedgerConnectorUbiquity
     }
 
     // Server endpoints
-    const getTransactionsByAddressEndpoint = new GetTransactionsByAddressEndpoint(
-      {
+    const getTransactionsByAddressEndpoint =
+      new GetTransactionsByAddressEndpoint({
         logLevel: "DEBUG",
         ubiquity: this,
-      },
-    );
+      });
 
     this.endpoints = [getTransactionsByAddressEndpoint];
     return this.endpoints;

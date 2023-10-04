@@ -94,13 +94,14 @@ export class WithdrawCounterpartyEndpoint implements IWebServiceEndpoint {
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(reqTag);
     try {
-      const request: WithdrawCounterpartyRequest = req.body as WithdrawCounterpartyRequest;
-      const connector = (this.options.pluginRegistry.plugins.find((plugin) => {
+      const request: WithdrawCounterpartyRequest =
+        req.body as WithdrawCounterpartyRequest;
+      const connector = this.options.pluginRegistry.plugins.find((plugin) => {
         return (
           plugin.getPackageName() ==
           "@hyperledger/cactus-plugin-htlc-coordinator-besu"
         );
-      }) as unknown) as PluginHTLCCoordinatorBesu;
+      }) as unknown as PluginHTLCCoordinatorBesu;
       const resBody = await connector.withdrawCounterparty(request);
       res.json(resBody);
     } catch (ex: unknown) {

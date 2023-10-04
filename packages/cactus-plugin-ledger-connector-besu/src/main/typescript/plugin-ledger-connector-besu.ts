@@ -663,9 +663,8 @@ export class PluginLedgerConnectorBesu
       throw new Error(`${fnTag} Web3 EEA client not initialized.`);
     }
 
-    const txHash = await this.web3Quorum.priv.generateAndSendRawTransaction(
-      options,
-    );
+    const txHash =
+      await this.web3Quorum.priv.generateAndSendRawTransaction(options);
 
     if (!txHash) {
       throw new Error(`${fnTag} eea.sendRawTransaction provided no tx hash.`);
@@ -683,9 +682,8 @@ export class PluginLedgerConnectorBesu
       throw new Error(`${fnTag} Web3 Quorum client not initialized.`);
     }
 
-    const txPoolReceipt = await this.web3Quorum.priv.waitForTransactionReceipt(
-      txHash,
-    );
+    const txPoolReceipt =
+      await this.web3Quorum.priv.waitForTransactionReceipt(txHash);
     if (!txPoolReceipt) {
       throw new RuntimeError(`priv.getTransactionReceipt provided no receipt.`);
     }

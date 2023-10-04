@@ -20,7 +20,7 @@ describe(testCase, () => {
       await expect(
         Servers.listen({
           hostname: "x",
-          port: ("" as unknown) as number,
+          port: "" as unknown as number,
           server,
         }),
       ).toReject();
@@ -30,7 +30,7 @@ describe(testCase, () => {
       await expect(
         Servers.listen({
           hostname: "localhost",
-          port: (false as unknown) as number,
+          port: false as unknown as number,
           server,
         }),
       ).toReject();

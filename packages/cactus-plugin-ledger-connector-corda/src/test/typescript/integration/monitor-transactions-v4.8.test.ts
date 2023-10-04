@@ -135,7 +135,7 @@ async function deployContract(
 }
 
 async function invokeContract(apiClient: CordaApiClient, publicKey: PublicKey) {
-  const req: InvokeContractV1Request = ({
+  const req: InvokeContractV1Request = {
     timeoutMs: 60000,
     flowFullClassName: flowToInvoke,
     flowInvocationType: FlowInvocationType.FlowDynamic,
@@ -215,7 +215,7 @@ async function invokeContract(apiClient: CordaApiClient, publicKey: PublicKey) {
         ],
       },
     ],
-  } as unknown) as InvokeContractV1Request;
+  } as unknown as InvokeContractV1Request;
 
   const res = await apiClient.invokeContractV1(req);
   expect(res).toBeTruthy();

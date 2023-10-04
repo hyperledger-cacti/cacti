@@ -38,7 +38,7 @@ export class InitializeEndpoint implements IWebServiceEndpoint {
     return InitializeEndpoint.CLASS_NAME;
   }
 
-  public get oasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/initialize"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/initialize"] {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/initialize"
     ];

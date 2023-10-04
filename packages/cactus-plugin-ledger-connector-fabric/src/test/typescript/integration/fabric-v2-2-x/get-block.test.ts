@@ -392,9 +392,8 @@ describe("Get Block endpoint tests", () => {
         },
       },
     };
-    const getBlockByHexHashResponse = await apiClient.getBlockV1(
-      getBlockByHexHashReq,
-    );
+    const getBlockByHexHashResponse =
+      await apiClient.getBlockV1(getBlockByHexHashReq);
     if (!("decodedBlock" in getBlockByHexHashResponse.data)) {
       // narrow the type
       throw new Error(

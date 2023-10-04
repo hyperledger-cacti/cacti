@@ -7,13 +7,13 @@ import {
 export function consensusHasTransactionFinality(
   consensusAlgorithmFamily: ConsensusAlgorithmFamily,
 ): boolean {
-  const isInConsensusAlgorithmFamiliesWithTxFinality = (Object.values(
-    ConsensusAlgorithmFamiliesWithTxFinality,
-  ) as string[]).includes(consensusAlgorithmFamily.toString());
+  const isInConsensusAlgorithmFamiliesWithTxFinality = (
+    Object.values(ConsensusAlgorithmFamiliesWithTxFinality) as string[]
+  ).includes(consensusAlgorithmFamily.toString());
 
-  const isInConsensusAlgorithmFamiliesWithOutTxFinality = (Object.values(
-    ConsensusAlgorithmFamiliesWithOutTxFinality,
-  ) as string[]).includes(consensusAlgorithmFamily.toString());
+  const isInConsensusAlgorithmFamiliesWithOutTxFinality = (
+    Object.values(ConsensusAlgorithmFamiliesWithOutTxFinality) as string[]
+  ).includes(consensusAlgorithmFamily.toString());
 
   const unrecognizedConsensusAlgorithmFamily =
     !isInConsensusAlgorithmFamiliesWithTxFinality &&

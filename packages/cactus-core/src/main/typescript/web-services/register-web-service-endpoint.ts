@@ -21,7 +21,7 @@ export async function registerWebServiceEndpoint(
   const provider = endpoint.getAuthorizationOptionsProvider();
   const { isProtected, requiredRoles } = await provider.get();
 
-  const webAppCasted = (webApp as unknown) as Record<
+  const webAppCasted = webApp as unknown as Record<
     string,
     (...a: unknown[]) => unknown
   >;

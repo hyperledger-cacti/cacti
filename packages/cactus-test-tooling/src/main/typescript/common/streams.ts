@@ -20,7 +20,7 @@ export class Streams {
 
     return new Promise((resolve, reject) => {
       stream.on("data", (buffer: Buffer) => {
-        const item = (buffer.toString(encoding) as unknown) as T;
+        const item = buffer.toString(encoding) as unknown as T;
         data.push(item);
       });
 

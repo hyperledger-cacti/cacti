@@ -206,7 +206,7 @@ test(testCase, async (t: Test) => {
     };
 
     try {
-      await api.initializeV1((parameters as unknown) as InitializeRequest);
+      await api.initializeV1(parameters as unknown as InitializeRequest);
     } catch (e) {
       t2.equal(
         e.response.status,
@@ -236,7 +236,7 @@ test(testCase, async (t: Test) => {
     };
 
     try {
-      await api.initializeV1((parameters as unknown) as InitializeRequest);
+      await api.initializeV1(parameters as unknown as InitializeRequest);
     } catch (e) {
       t2.equal(
         e.response.status,
@@ -315,7 +315,7 @@ test(testCase, async (t: Test) => {
       gas: DataTest.estimated_gas,
     };
     try {
-      await api.newContractV1((parameters as unknown) as NewContractObj);
+      await api.newContractV1(parameters as unknown as NewContractObj);
     } catch (e) {
       t2.equal(
         e.response.status,
@@ -351,7 +351,7 @@ test(testCase, async (t: Test) => {
       fake: 4,
     };
     try {
-      await api.newContractV1((parameters as unknown) as NewContractObj);
+      await api.newContractV1(parameters as unknown as NewContractObj);
     } catch (e) {
       t2.equal(
         e.response.status,
@@ -414,7 +414,7 @@ test(testCase, async (t: Test) => {
       keychainId,
     };
     try {
-      await api.refundV1((parameters as unknown) as RefundReq);
+      await api.refundV1(parameters as unknown as RefundReq);
     } catch (e) {
       t2.equal(
         e.response.status,
@@ -439,7 +439,7 @@ test(testCase, async (t: Test) => {
       fake: 4,
     };
     try {
-      await api.refundV1((parameters as unknown) as RefundReq);
+      await api.refundV1(parameters as unknown as RefundReq);
     } catch (e) {
       t2.equal(
         e.response.status,
@@ -519,7 +519,7 @@ test(testCase, async (t: Test) => {
     };
 
     try {
-      await api.withdrawV1((parameters as unknown) as WithdrawReq);
+      await api.withdrawV1(parameters as unknown as WithdrawReq);
     } catch (e) {
       t2.equal(
         e.response.status,
@@ -547,7 +547,7 @@ test(testCase, async (t: Test) => {
     };
 
     try {
-      await api.withdrawV1((parameters as unknown) as WithdrawReq);
+      await api.withdrawV1(parameters as unknown as WithdrawReq);
     } catch (e) {
       t2.equal(
         e.response.status,
@@ -636,7 +636,7 @@ test(testCase, async (t: Test) => {
     };
 
     try {
-      await api.getStatusV1((parameters as unknown) as GetStatusRequest);
+      await api.getStatusV1(parameters as unknown as GetStatusRequest);
     } catch (e) {
       t2.equal(
         e.response.status,
@@ -662,7 +662,7 @@ test(testCase, async (t: Test) => {
     };
 
     try {
-      await api.getStatusV1((parameters as unknown) as GetStatusRequest);
+      await api.getStatusV1(parameters as unknown as GetStatusRequest);
     } catch (e) {
       t2.equal(
         e.response.status,
@@ -750,7 +750,7 @@ test(testCase, async (t: Test) => {
 
     try {
       await api.getSingleStatusV1(
-        (parameters as unknown) as GetSingleStatusRequest,
+        parameters as unknown as GetSingleStatusRequest,
       );
     } catch (e) {
       t2.equal(
@@ -778,7 +778,7 @@ test(testCase, async (t: Test) => {
 
     try {
       await api.getSingleStatusV1(
-        (parameters as unknown) as GetSingleStatusRequest,
+        parameters as unknown as GetSingleStatusRequest,
       );
     } catch (e) {
       t2.equal(

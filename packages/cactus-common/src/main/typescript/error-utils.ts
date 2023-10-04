@@ -7,7 +7,10 @@ import sanitizeHtml from "sanitize-html";
  * thrown, essentially acting as a discriminator property.
  */
 export class CodedError extends Error {
-  constructor(public readonly message: string, public readonly code: string) {
+  constructor(
+    public readonly message: string,
+    public readonly code: string,
+  ) {
     super(message);
   }
 

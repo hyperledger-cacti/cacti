@@ -18,16 +18,16 @@ export const ALL_EXPRESS_HTTP_VERB_METHOD_NAMES = [
  * A type that represents all the HTTP verb method names that Express.js supports.
  */
 export type ExpressHttpVerbMethodName =
-  typeof ALL_EXPRESS_HTTP_VERB_METHOD_NAMES[number];
+  (typeof ALL_EXPRESS_HTTP_VERB_METHOD_NAMES)[number];
 
 /**
  * Custom (user-defined) typescript type-guard that checks whether the given
  * value is an Express.js HTTP verb method name or not.
  * Useful for verifying at runtime if we can safely call a method on the Express.js
  * application object where the method's name is the value of the given variable.
- * 
+ *
  * Example:
- * 
+ *
  * ```typescript
  * import express from "express";
  * import { isExpressHttpVerbMethodName } from "@hyperledger/cactus-core-api-server";
@@ -46,6 +46,7 @@ export function isExpressHttpVerbMethodName(
   x: unknown,
 ): x is ExpressHttpVerbMethodName {
   return (
-    typeof x === "string" && ALL_EXPRESS_HTTP_VERB_METHOD_NAMES.includes(x as never)
+    typeof x === "string" &&
+    ALL_EXPRESS_HTTP_VERB_METHOD_NAMES.includes(x as never)
   );
 }

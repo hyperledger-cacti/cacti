@@ -49,8 +49,7 @@ export class DeployContractEndpoint implements IWebServiceEndpoint {
         operationId: "deployContractV1",
         "x-hyperledger-cactus": {
           http: {
-            path:
-              "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-stub/deploy-contract-stub",
+            path: "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-stub/deploy-contract-stub",
             verbLowerCase: "post",
           },
         },

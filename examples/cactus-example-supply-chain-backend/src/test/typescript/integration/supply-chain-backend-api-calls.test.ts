@@ -40,14 +40,13 @@ test.skip("Supply chain backend API calls can be executed", async (t: Test) => {
 
   // FIXME - this hack should not be necessary, we need to re-think how we
   // do configuration parsing. The convict library may not be the path forward.
-  exampleConfig.authorizationConfigJson = (JSON.stringify(
+  exampleConfig.authorizationConfigJson = JSON.stringify(
     exampleConfig.authorizationConfigJson,
-  ) as unknown) as IAuthorizationConfig;
+  ) as unknown as IAuthorizationConfig;
   exampleConfig.authorizationProtocol = AuthorizationProtocol.NONE;
 
-  const convictConfig = await configService.newExampleConfigConvict(
-    exampleConfig,
-  );
+  const convictConfig =
+    await configService.newExampleConfigConvict(exampleConfig);
   t.ok(convictConfig, "configService.newExampleConfigConvict() truthy OK");
 
   const env = await configService.newExampleConfigEnv(
@@ -111,7 +110,8 @@ test.skip("Supply chain backend API calls can be executed", async (t: Test) => {
     supplyChainApiClientC,
   } = startResult;
 
-  const listBambooHarvestRes = await supplyChainApiClientA.listBambooHarvestV1();
+  const listBambooHarvestRes =
+    await supplyChainApiClientA.listBambooHarvestV1();
   t.ok(listBambooHarvestRes, "listBambooHarvestRes truthy OK");
   t.true(
     listBambooHarvestRes.status > 199,

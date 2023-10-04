@@ -14,5 +14,4 @@
  * place of an `Error` object. This - as per the rules of Javascript - can be
  * literally anything, NaN, undefined, null, etc.
  */
-export class ErrorFromUnknownThrowable extends Error {
-}
+export class ErrorFromUnknownThrowable extends Error {}

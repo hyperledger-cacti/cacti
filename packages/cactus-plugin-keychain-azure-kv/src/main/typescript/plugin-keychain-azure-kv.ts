@@ -52,7 +52,8 @@ export interface IPluginKeychainAzureKvOptions extends ICactusPluginOptions {
 }
 
 export class PluginKeychainAzureKv
-  implements ICactusPlugin, IPluginWebService, IPluginKeychain {
+  implements ICactusPlugin, IPluginWebService, IPluginKeychain
+{
   public static readonly CLASS_NAME = "PluginKeychainAzureKv";
 
   readonly vaultUrl: string;
@@ -200,7 +201,7 @@ export class PluginKeychainAzureKv
   }
 
   public getEncryptionAlgorithm(): string {
-    return (null as unknown) as string;
+    return null as unknown as string;
   }
 
   public getAzureKvClient(): SecretClient {
@@ -208,9 +209,8 @@ export class PluginKeychainAzureKv
   }
 
   async get(key: string): Promise<string> {
-    const keyVaultSecret: KeyVaultSecret = await this.azureKvClient.getSecret(
-      key,
-    );
+    const keyVaultSecret: KeyVaultSecret =
+      await this.azureKvClient.getSecret(key);
     if (keyVaultSecret) {
       const result = keyVaultSecret.value;
       return result as string;
@@ -236,7 +236,7 @@ export class PluginKeychainAzureKv
   }
 
   async set<T>(key: string, value: T): Promise<void> {
-    await this.azureKvClient.setSecret(key, (value as unknown) as string);
+    await this.azureKvClient.setSecret(key, value as unknown as string);
   }
 
   async delete(key: string): Promise<void> {

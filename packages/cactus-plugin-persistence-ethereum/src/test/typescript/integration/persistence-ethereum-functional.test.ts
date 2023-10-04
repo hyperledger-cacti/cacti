@@ -40,7 +40,7 @@ import { SocketIOApiClient } from "@hyperledger/cactus-api-client";
 
 import DatabaseClient from "../../../main/typescript/db-client/db-client";
 jest.mock("../../../main/typescript/db-client/db-client");
-const DatabaseClientMock = (DatabaseClient as unknown) as jest.Mock;
+const DatabaseClientMock = DatabaseClient as unknown as jest.Mock;
 import { PluginPersistenceEthereum } from "../../../main/typescript";
 import TestERC20ContractJson from "../../solidity/TestERC20.json";
 import TestERC721ContractJson from "../../solidity/TestERC721.json";
@@ -696,15 +696,15 @@ describe("Ethereum persistence plugin tests", () => {
       async () => {
         // Freeze on getMissingBlocksInRange method until status is checked
         let isStatusChecked = false;
-        (dbClientInstance.getMissingBlocksInRange as jest.Mock).mockImplementation(
-          async () => {
-            while (!isStatusChecked) {
-              await new Promise((resolve) => setTimeout(resolve, 1000));
-            }
+        (
+          dbClientInstance.getMissingBlocksInRange as jest.Mock
+        ).mockImplementation(async () => {
+          while (!isStatusChecked) {
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+          }
 
-            return [];
-          },
-        );
+          return [];
+        });
 
         const syncAllPromise = persistence.syncAll();
 
@@ -738,9 +738,9 @@ describe("Ethereum persistence plugin tests", () => {
         await persistence.refreshMonitoredTokens();
 
         const insertBlockPromise = new Promise<any>((resolve, reject) => {
-          (dbClientInstance.getMissingBlocksInRange as jest.Mock).mockReturnValue(
-            [],
-          );
+          (
+            dbClientInstance.getMissingBlocksInRange as jest.Mock
+          ).mockReturnValue([]);
 
           (dbClientInstance.insertBlockData as jest.Mock).mockImplementation(
             (blockData) => resolve(blockData),

@@ -230,7 +230,7 @@ export class PluginKeychainVault implements IPluginWebService, IPluginKeychain {
     } catch (ex) {
       // FIXME: Throw if not found, detect it in the endpoint code, status=404
       if (ex?.response?.statusCode === HttpStatus.NOT_FOUND) {
-        return (null as unknown) as string;
+        return null as unknown as string;
       } else {
         this.log.error(`Retrieval of "${key}" crashed:`, ex);
         throw ex;

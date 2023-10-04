@@ -188,9 +188,8 @@ test("successful logging of proof to ipfs and sqlite", async () => {
   });
 
   const retrievedLogIPFS = await pluginSourceGateway.getLogFromIPFS(odapLogKey);
-  const retrievedLogDB = await pluginSourceGateway.getLogFromDatabase(
-    odapLogKey,
-  );
+  const retrievedLogDB =
+    await pluginSourceGateway.getLogFromDatabase(odapLogKey);
 
   if (retrievedLogDB == undefined || retrievedLogIPFS == undefined) {
     throw new Error("Test Failed");
@@ -219,9 +218,8 @@ test("successful logging to ipfs and sqlite", async () => {
   await pluginSourceGateway.storeOdapLog(odapLog);
 
   const retrievedLogIPFS = await pluginSourceGateway.getLogFromIPFS(odapLogKey);
-  const retrievedLogDB = await pluginSourceGateway.getLogFromDatabase(
-    odapLogKey,
-  );
+  const retrievedLogDB =
+    await pluginSourceGateway.getLogFromDatabase(odapLogKey);
 
   if (
     retrievedLogIPFS == undefined ||
@@ -329,9 +327,10 @@ test("successful retrieval of logs more recent than another log", async () => {
   await pluginSourceGateway.storeOdapLog(odapLog);
   await pluginSourceGateway.storeOdapLog(odapLog3);
 
-  const moreRecentLogs = await pluginSourceGateway.getLogsMoreRecentThanTimestamp(
-    referenceTimestamp,
-  );
+  const moreRecentLogs =
+    await pluginSourceGateway.getLogsMoreRecentThanTimestamp(
+      referenceTimestamp,
+    );
 
   if (
     moreRecentLogs == undefined ||
@@ -370,9 +369,10 @@ test("successful retrieval of logs more recent than another log", async () => {
 });
 
 test("successful retrieval of logs when there are no more recent logs", async () => {
-  const moreRecentLogs = await pluginSourceGateway.getLogsMoreRecentThanTimestamp(
-    Date.now().toString(),
-  );
+  const moreRecentLogs =
+    await pluginSourceGateway.getLogsMoreRecentThanTimestamp(
+      Date.now().toString(),
+    );
 
   expect(moreRecentLogs).not.toBeUndefined();
   expect(moreRecentLogs?.length).toBe(0);

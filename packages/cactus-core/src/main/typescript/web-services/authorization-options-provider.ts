@@ -17,7 +17,8 @@ export interface IEndpointAuthzOptionsProviderOptions {
 }
 
 export class AuthorizationOptionsProvider
-  implements IAsyncProvider<IEndpointAuthzOptions> {
+  implements IAsyncProvider<IEndpointAuthzOptions>
+{
   public static readonly CLASS_NAME = "AuthorizationOptionsProvider";
 
   private readonly authorizationOptions: IEndpointAuthzOptions;

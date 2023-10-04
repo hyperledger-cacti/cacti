@@ -158,7 +158,7 @@ export class VerifierFactory {
 
       const clientApi = getValidatorApiClient(
         validatorConfig.validatorType,
-        (validatorConfig as unknown) as ClientApiConfig[K]["in"],
+        validatorConfig as unknown as ClientApiConfig[K]["in"],
       );
 
       const verifier = new Verifier(validatorId, clientApi, this.loglevel);

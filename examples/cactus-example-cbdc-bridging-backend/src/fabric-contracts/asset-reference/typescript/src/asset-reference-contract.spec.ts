@@ -25,12 +25,10 @@ chai.use(chaiAsPromised);
 chai.use(sinonChai);
 
 class TestContext extends Context {
-  public stub: sinon.SinonStubbedInstance<
-    ChaincodeStub
-  > = sinon.createStubInstance(ChaincodeStub);
-  public clientIdentity: sinon.SinonStubbedInstance<
-    ClientIdentity
-  > = sinon.createStubInstance(ClientIdentity);
+  public stub: sinon.SinonStubbedInstance<ChaincodeStub> =
+    sinon.createStubInstance(ChaincodeStub);
+  public clientIdentity: sinon.SinonStubbedInstance<ClientIdentity> =
+    sinon.createStubInstance(ClientIdentity);
   public logging = {
     getLogger: sinon
       .stub()

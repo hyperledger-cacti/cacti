@@ -54,7 +54,7 @@ export class ListBookshelfEndpoint implements IWebServiceEndpoint {
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public getOasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-bookshelf"] {
+  public getOasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-bookshelf"] {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-bookshelf"
     ];

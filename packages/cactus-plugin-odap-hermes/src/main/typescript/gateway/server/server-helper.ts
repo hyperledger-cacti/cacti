@@ -69,9 +69,10 @@ export class ServerGatewayHelper {
       backupGatewaysAllowed: odap.backupGatewaysAllowed,
     };
 
-    transferInitializationResponse.signature = PluginOdapGateway.bufArray2HexStr(
-      odap.sign(JSON.stringify(transferInitializationResponse)),
-    );
+    transferInitializationResponse.signature =
+      PluginOdapGateway.bufArray2HexStr(
+        odap.sign(JSON.stringify(transferInitializationResponse)),
+      );
 
     sessionData.initializationResponseMessageHash = SHA256(
       JSON.stringify(transferInitializationResponse),
@@ -183,7 +184,8 @@ export class ServerGatewayHelper {
 
     sessionData.clientSignatureInitializationRequestMessage = request.signature;
 
-    sessionData.initializationRequestMessageProcessedTimeStamp = Date.now().toString();
+    sessionData.initializationRequestMessageProcessedTimeStamp =
+      Date.now().toString();
 
     odap.sessions.set(request.sessionID, sessionData);
 
@@ -567,9 +569,10 @@ export class ServerGatewayHelper {
       sequenceNumber: ++sessionData.lastSequenceNumber,
     };
 
-    commitPreparationResponseMessage.signature = PluginOdapGateway.bufArray2HexStr(
-      await odap.sign(JSON.stringify(commitPreparationResponseMessage)),
-    );
+    commitPreparationResponseMessage.signature =
+      PluginOdapGateway.bufArray2HexStr(
+        await odap.sign(JSON.stringify(commitPreparationResponseMessage)),
+      );
 
     sessionData.commitPrepareResponseMessageHash = SHA256(
       JSON.stringify(commitPreparationResponseMessage),

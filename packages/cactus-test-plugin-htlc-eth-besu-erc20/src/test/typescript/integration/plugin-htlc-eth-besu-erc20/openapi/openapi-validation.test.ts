@@ -216,7 +216,7 @@ test(testCase, async (t: Test) => {
     };
 
     try {
-      await api.initializeV1((parameters as any) as InitializeRequest);
+      await api.initializeV1(parameters as any as InitializeRequest);
     } catch (e) {
       t2.equal(
         e.response.status,
@@ -246,7 +246,7 @@ test(testCase, async (t: Test) => {
     };
 
     try {
-      await api.initializeV1((parameters as any) as InitializeRequest);
+      await api.initializeV1(parameters as any as InitializeRequest);
     } catch (e) {
       t2.equal(
         e.response.status,
@@ -360,7 +360,7 @@ test(testCase, async (t: Test) => {
       gas: estimatedGas,
     };
     try {
-      await api.newContractV1((parameters as any) as NewContractRequest);
+      await api.newContractV1(parameters as any as NewContractRequest);
     } catch (e) {
       t2.equal(
         e.response.status,
@@ -397,7 +397,7 @@ test(testCase, async (t: Test) => {
       fake: 4,
     };
     try {
-      await api.newContractV1((parameters as any) as NewContractRequest);
+      await api.newContractV1(parameters as any as NewContractRequest);
     } catch (e) {
       t2.equal(
         e.response.status,
@@ -461,7 +461,7 @@ test(testCase, async (t: Test) => {
       keychainId,
     };
     try {
-      await api.refundV1((parameters as any) as RefundRequest);
+      await api.refundV1(parameters as any as RefundRequest);
     } catch (e) {
       t2.equal(
         e.response.status,
@@ -486,7 +486,7 @@ test(testCase, async (t: Test) => {
       fake: 4,
     };
     try {
-      await api.refundV1((parameters as any) as RefundRequest);
+      await api.refundV1(parameters as any as RefundRequest);
     } catch (e) {
       t2.equal(
         e.response.status,
@@ -603,7 +603,7 @@ test(testCase, async (t: Test) => {
     };
 
     try {
-      await api.withdrawV1((parameters as any) as WithdrawRequest);
+      await api.withdrawV1(parameters as any as WithdrawRequest);
     } catch (e) {
       t2.equal(
         e.response.status,
@@ -630,7 +630,7 @@ test(testCase, async (t: Test) => {
     };
 
     try {
-      await api.withdrawV1((parameters as any) as WithdrawRequest);
+      await api.withdrawV1(parameters as any as WithdrawRequest);
     } catch (e) {
       t2.equal(
         e.response.status,
@@ -677,7 +677,7 @@ test(testCase, async (t: Test) => {
     };
 
     try {
-      await api.getStatusV1((parameters as any) as GetStatusRequest);
+      await api.getStatusV1(parameters as any as GetStatusRequest);
     } catch (e) {
       t2.equal(
         e.response.status,
@@ -703,7 +703,7 @@ test(testCase, async (t: Test) => {
     };
 
     try {
-      await api.getStatusV1((parameters as any) as GetStatusRequest);
+      await api.getStatusV1(parameters as any as GetStatusRequest);
     } catch (e) {
       t2.equal(
         e.response.status,
@@ -748,9 +748,7 @@ test(testCase, async (t: Test) => {
     };
 
     try {
-      await api.getSingleStatusV1(
-        (parameters as any) as GetSingleStatusRequest,
-      );
+      await api.getSingleStatusV1(parameters as any as GetSingleStatusRequest);
     } catch (e) {
       t2.equal(
         e.response.status,

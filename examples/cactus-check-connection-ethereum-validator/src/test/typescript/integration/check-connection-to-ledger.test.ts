@@ -281,12 +281,10 @@ describe("Ledger operation tests", () => {
     let options = createOptionObj(path, "POST", postData);
 
     // Get current balances on accounts before sending request
-    let srcBalanceBeforeTransaction = await getCurrentBalanceOnAccount(
-      srcAccount,
-    );
-    let destBalanceBeforeTransaction = await getCurrentBalanceOnAccount(
-      destAccount,
-    );
+    let srcBalanceBeforeTransaction =
+      await getCurrentBalanceOnAccount(srcAccount);
+    let destBalanceBeforeTransaction =
+      await getCurrentBalanceOnAccount(destAccount);
     logger.debug(`Balances before transaction:\nsource account:${srcBalanceBeforeTransaction}
                  \ndestination account: ${destBalanceBeforeTransaction}`);
 
@@ -308,12 +306,10 @@ describe("Ledger operation tests", () => {
     expect(foo).toBeDefined();
 
     // Check balances after transaction
-    let srcBalanceAfterTransaction = await getCurrentBalanceOnAccount(
-      srcAccount,
-    );
-    let destBalanceAfterTransaction = await getCurrentBalanceOnAccount(
-      destAccount,
-    );
+    let srcBalanceAfterTransaction =
+      await getCurrentBalanceOnAccount(srcAccount);
+    let destBalanceAfterTransaction =
+      await getCurrentBalanceOnAccount(destAccount);
 
     // Check if differences from before and after transaction are correct
 
@@ -338,9 +334,8 @@ describe("Ledger operation tests", () => {
 
     // Get current balances on accounts before sending request
     srcBalanceBeforeTransaction = await getCurrentBalanceOnAccount(srcAccount);
-    destBalanceBeforeTransaction = await getCurrentBalanceOnAccount(
-      destAccount,
-    );
+    destBalanceBeforeTransaction =
+      await getCurrentBalanceOnAccount(destAccount);
     logger.debug(`Balances before transaction:\nsource account:${srcBalanceBeforeTransaction}
                  destination account: ${destBalanceBeforeTransaction}`);
 

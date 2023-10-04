@@ -58,7 +58,8 @@ test(testCase, async (t: Test) => {
   const rpcApiHttpHost = await quorumTestLedger.getRpcApiHttpHost();
 
   // obtain accounts from genesis
-  const quorumGenesisOptions: IQuorumGenesisOptions = await quorumTestLedger.getGenesisJsObject();
+  const quorumGenesisOptions: IQuorumGenesisOptions =
+    await quorumTestLedger.getGenesisJsObject();
   const highNetWorthAccounts: string[] = Object.keys(
     quorumGenesisOptions.alloc,
   ).filter((address: string) => {
@@ -92,14 +93,13 @@ test(testCase, async (t: Test) => {
   });
 
   // create the connector including test ledger host and plugin registry
-  const connector: PluginLedgerConnectorQuorum = new PluginLedgerConnectorQuorum(
-    {
+  const connector: PluginLedgerConnectorQuorum =
+    new PluginLedgerConnectorQuorum({
       instanceId: uuidV4(),
       rpcApiHttpHost,
       logLevel,
       pluginRegistry,
-    },
-  );
+    });
 
   const expressApp = express();
   expressApp.use(bodyParser.json({ limit: "250mb" }));

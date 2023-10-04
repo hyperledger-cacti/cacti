@@ -52,8 +52,7 @@ export class UnprotectedActionEndpoint implements IWebServiceEndpoint {
         operationId: "runTransactionV1",
         "x-hyperledger-cactus": {
           http: {
-            path:
-              "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-stub/unprotected-action",
+            path: "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-stub/unprotected-action",
             verbLowerCase: "post",
           },
         },

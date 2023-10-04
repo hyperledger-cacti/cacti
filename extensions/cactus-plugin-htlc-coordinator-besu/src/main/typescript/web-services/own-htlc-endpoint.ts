@@ -93,12 +93,12 @@ export class OwnHTLCEndpoint implements IWebServiceEndpoint {
     this.log.debug(reqTag);
     try {
       const request: OwnHTLCRequest = req.body as OwnHTLCRequest;
-      const connector = (this.options.pluginRegistry.plugins.find((plugin) => {
+      const connector = this.options.pluginRegistry.plugins.find((plugin) => {
         return (
           plugin.getPackageName() ==
           "@hyperledger/cactus-plugin-htlc-coordinator-besu"
         );
-      }) as unknown) as PluginHTLCCoordinatorBesu;
+      }) as unknown as PluginHTLCCoordinatorBesu;
       const resBody = await connector.ownHTLC(request);
       res.json(resBody);
     } catch (ex) {

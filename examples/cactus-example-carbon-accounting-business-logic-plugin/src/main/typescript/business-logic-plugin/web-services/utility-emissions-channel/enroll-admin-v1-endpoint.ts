@@ -52,7 +52,7 @@ export class EnrollAdminV1Endpoint implements IWebServiceEndpoint {
     };
   }
 
-  public get oasPath(): typeof OAS.paths["/api/v1/utilityemissionchannel/registerEnroll/admin"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/utilityemissionchannel/registerEnroll/admin"] {
     return OAS.paths["/api/v1/utilityemissionchannel/registerEnroll/admin"];
   }
 

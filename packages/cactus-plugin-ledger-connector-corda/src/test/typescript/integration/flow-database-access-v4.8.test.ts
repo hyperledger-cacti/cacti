@@ -141,7 +141,7 @@ test(testCase, async (t: Test) => {
   const finalValue = 11;
 
   // add a new token value
-  const reqAdd: InvokeContractV1Request = ({
+  const reqAdd: InvokeContractV1Request = {
     timeoutMs: 60000,
     flowFullClassName: "net.corda.samples.flowdb.AddTokenValueFlow",
     flowInvocationType: FlowInvocationType.FlowDynamic,
@@ -161,14 +161,14 @@ test(testCase, async (t: Test) => {
         primitiveValue: initialValue,
       },
     ],
-  } as unknown) as InvokeContractV1Request;
+  } as unknown as InvokeContractV1Request;
 
   const resAdd = await apiClient.invokeContractV1(reqAdd);
   t.ok(resAdd, "InvokeContractV1Request truthy OK");
   t.equal(resAdd.status, 200, "InvokeContractV1Request status code === 200 OK");
 
   // query a token value
-  const reqQuery: InvokeContractV1Request = ({
+  const reqQuery: InvokeContractV1Request = {
     timeoutMs: 60000,
     flowFullClassName: "net.corda.samples.flowdb.QueryTokenValueFlow",
     flowInvocationType: FlowInvocationType.FlowDynamic,
@@ -181,7 +181,7 @@ test(testCase, async (t: Test) => {
         primitiveValue: myToken,
       },
     ],
-  } as unknown) as InvokeContractV1Request;
+  } as unknown as InvokeContractV1Request;
 
   const resQuery = await apiClient.invokeContractV1(reqQuery);
   t.ok(resQuery, "InvokeContractV1Request truthy OK");
@@ -197,7 +197,7 @@ test(testCase, async (t: Test) => {
   );
 
   // update a token value
-  const reqUpd: InvokeContractV1Request = ({
+  const reqUpd: InvokeContractV1Request = {
     timeoutMs: 60000,
     flowFullClassName: "net.corda.samples.flowdb.UpdateTokenValueFlow",
     flowInvocationType: FlowInvocationType.FlowDynamic,
@@ -217,7 +217,7 @@ test(testCase, async (t: Test) => {
         primitiveValue: finalValue,
       },
     ],
-  } as unknown) as InvokeContractV1Request;
+  } as unknown as InvokeContractV1Request;
 
   const resUpd = await apiClient.invokeContractV1(reqUpd);
   t.ok(resUpd, "InvokeContractV1Request truthy OK");

@@ -36,8 +36,8 @@ export const QUORUM_TEST_LEDGER_DEFAULT_OPTIONS = Object.freeze({
   rpcApiWsPort: 8546,
 });
 
-export const QUORUM_TEST_LEDGER_OPTIONS_JOI_SCHEMA: Joi.Schema = Joi.object().keys(
-  {
+export const QUORUM_TEST_LEDGER_OPTIONS_JOI_SCHEMA: Joi.Schema =
+  Joi.object().keys({
     containerImageVersion: Joi.string().min(5).required(),
     containerImageName: Joi.string().min(1).required(),
     rpcApiHttpPort: Joi.number()
@@ -46,8 +46,7 @@ export const QUORUM_TEST_LEDGER_OPTIONS_JOI_SCHEMA: Joi.Schema = Joi.object().ke
       .min(1024)
       .max(65535)
       .required(),
-  },
-);
+  });
 
 export class QuorumTestLedger implements ITestLedger {
   public readonly containerImageVersion: string;
@@ -117,11 +116,10 @@ export class QuorumTestLedger implements ITestLedger {
   }
 
   public async getFileContents(filePath: string): Promise<string> {
-    const response: NodeJS.ReadableStream = await this.getContainer().getArchive(
-      {
+    const response: NodeJS.ReadableStream =
+      await this.getContainer().getArchive({
         path: filePath,
-      },
-    );
+      });
     const extract: tar.Extract = tar.extract({ autoDestroy: true });
 
     return new Promise((resolve, reject) => {
@@ -195,9 +193,8 @@ export class QuorumTestLedger implements ITestLedger {
   }
 
   public async getGenesisJsObject(): Promise<IQuorumGenesisOptions> {
-    const quorumGenesisJson: string = await this.getFileContents(
-      "/genesis.json",
-    );
+    const quorumGenesisJson: string =
+      await this.getFileContents("/genesis.json");
     return JSON.parse(quorumGenesisJson);
   }
 

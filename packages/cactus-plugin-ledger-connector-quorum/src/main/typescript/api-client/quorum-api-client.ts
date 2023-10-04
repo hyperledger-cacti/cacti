@@ -49,7 +49,8 @@ export type QuorumRequestInputArgs = {
 
 export class QuorumApiClient
   extends DefaultApi
-  implements ISocketApiClient<WatchBlocksV1Progress> {
+  implements ISocketApiClient<WatchBlocksV1Progress>
+{
   public static readonly CLASS_NAME = "QuorumApiClient";
 
   private readonly log: Logger;

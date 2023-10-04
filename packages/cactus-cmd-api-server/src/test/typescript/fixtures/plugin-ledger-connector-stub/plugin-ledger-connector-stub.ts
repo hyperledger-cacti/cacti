@@ -35,7 +35,8 @@ export class PluginLedgerConnectorStub
   implements
     IPluginLedgerConnector<unknown, unknown, unknown, unknown>,
     ICactusPlugin,
-    IPluginWebService {
+    IPluginWebService
+{
   private readonly instanceId: string;
   private readonly log: Logger;
   private readonly pluginRegistry: PluginRegistry;
@@ -121,13 +122,12 @@ export class PluginLedgerConnectorStub
     return `@hyperledger/cactus-plugin-ledger-connector-stub`;
   }
 
-  public async getConsensusAlgorithmFamily(): Promise<
-    ConsensusAlgorithmFamily
-  > {
+  public async getConsensusAlgorithmFamily(): Promise<ConsensusAlgorithmFamily> {
     return ConsensusAlgorithmFamily.Authority;
   }
   public async hasTransactionFinality(): Promise<boolean> {
-    const currentConsensusAlgorithmFamily = await this.getConsensusAlgorithmFamily();
+    const currentConsensusAlgorithmFamily =
+      await this.getConsensusAlgorithmFamily();
 
     return consensusHasTransactionFinality(currentConsensusAlgorithmFamily);
   }

@@ -43,7 +43,7 @@ export class InvokeRawWeb3EthContractEndpoint implements IWebServiceEndpoint {
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public get oasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/invoke-raw-web3eth-contract"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/invoke-raw-web3eth-contract"] {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/invoke-raw-web3eth-contract"
     ];
@@ -87,9 +87,8 @@ export class InvokeRawWeb3EthContractEndpoint implements IWebServiceEndpoint {
     this.log.debug(reqTag);
 
     try {
-      const methodResponse = await this.options.connector.invokeRawWeb3EthContract(
-        req.body,
-      );
+      const methodResponse =
+        await this.options.connector.invokeRawWeb3EthContract(req.body);
       const response: InvokeRawWeb3EthContractV1Response = {
         status: 200,
         data: methodResponse,

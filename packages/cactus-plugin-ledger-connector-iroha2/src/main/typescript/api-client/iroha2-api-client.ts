@@ -32,7 +32,8 @@ export class Iroha2ApiClientOptions extends Configuration {
  */
 export class Iroha2ApiClient
   extends DefaultApi
-  implements ISocketApiClient<WatchBlocksResponseV1> {
+  implements ISocketApiClient<WatchBlocksResponseV1>
+{
   public readonly className = "Iroha2ApiClient";
 
   private readonly log: Logger;

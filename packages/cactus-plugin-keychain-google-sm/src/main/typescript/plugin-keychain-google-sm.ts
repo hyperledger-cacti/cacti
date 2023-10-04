@@ -30,7 +30,8 @@ export interface IPluginKeychainGoogleSmOptions extends ICactusPluginOptions {
 }
 
 export class PluginKeychainGoogleSm
-  implements ICactusPlugin, IPluginWebService, IPluginKeychain {
+  implements ICactusPlugin, IPluginWebService, IPluginKeychain
+{
   public static readonly CLASS_NAME = "PluginKeychainGoogleSm";
   private readonly log: Logger;
   private readonly instanceId: string;
@@ -154,7 +155,7 @@ export class PluginKeychainGoogleSm
       const result = accessResponse[0];
       // FIXME: We need to verify if this actually works because
       // based on the type definitions of the underlying library it should not.
-      return (result as unknown) as string;
+      return result as unknown as string;
     } else {
       throw new Error(`${key} secret not found.`);
     }
@@ -196,7 +197,7 @@ export class PluginKeychainGoogleSm
     await this.googleSmClient.addSecretVersion({
       parent: secret[0].name,
       payload: {
-        data: (value as unknown) as string,
+        data: value as unknown as string,
       },
     });
   }

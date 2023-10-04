@@ -25,27 +25,27 @@ After({ timeout: 20 * 1000, tags: "@fabric" }, async function () {
   await resetFabric();
 });
 
-Given("{string} with {int} CBDC available in the source chain", async function (
-  user: string,
-  amount: number,
-) {
-  await axios.post(
-    "http://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction",
-    {
-      contractName: FABRIC_CONTRACT_CBDC_ERC20_NAME,
-      channelName: FABRIC_CHANNEL_NAME,
-      params: [amount.toString()],
-      methodName: "Mint",
-      invocationType: "FabricContractInvocationType.SEND",
-      signingCredential: {
-        keychainId: CryptoMaterial.keychains.keychain1.id,
-        keychainRef: getUserFromPseudonim("alice"),
+Given(
+  "{string} with {int} CBDC available in the source chain",
+  async function (user: string, amount: number) {
+    await axios.post(
+      "http://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction",
+      {
+        contractName: FABRIC_CONTRACT_CBDC_ERC20_NAME,
+        channelName: FABRIC_CHANNEL_NAME,
+        params: [amount.toString()],
+        methodName: "Mint",
+        invocationType: "FabricContractInvocationType.SEND",
+        signingCredential: {
+          keychainId: CryptoMaterial.keychains.keychain1.id,
+          keychainRef: getUserFromPseudonim("alice"),
+        },
       },
-    },
-  );
+    );
 
-  expect(await getFabricBalance(getFabricId(user))).to.equal(amount);
-});
+    expect(await getFabricBalance(getFabricId(user))).to.equal(amount);
+  },
+);
 
 When(
   "{string} escrows {int} CBDC and creates an asset reference with id {string} in the source chain",
@@ -83,15 +83,15 @@ When(
   },
 );
 
-When("bob refunds {int} CBDC to {string} in the source chain", async function (
-  amount: number,
-  userTo: string,
-) {
-  const finalUserFabricID = getFabricId(userTo);
-  const finalUserEthAddress = getEthAddress(userTo);
+When(
+  "bob refunds {int} CBDC to {string} in the source chain",
+  async function (amount: number, userTo: string) {
+    const finalUserFabricID = getFabricId(userTo);
+    const finalUserEthAddress = getEthAddress(userTo);
 
-  await refundFabricTokens(finalUserFabricID, amount, finalUserEthAddress);
-});
+    await refundFabricTokens(finalUserFabricID, amount, finalUserEthAddress);
+  },
+);
 
 Then(
   "{string} fails to lock the asset reference with id {string} in the source chain",
@@ -119,39 +119,38 @@ Then(
   },
 );
 
-Then("{string} fails to transfer {int} CBDC to {string}", async function (
-  userFrom: string,
-  amount: number,
-  userTo: string,
-) {
-  const recipient = getFabricId(userTo);
+Then(
+  "{string} fails to transfer {int} CBDC to {string}",
+  async function (userFrom: string, amount: number, userTo: string) {
+    const recipient = getFabricId(userTo);
 
-  axios
-    .post(
-      "http://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction",
-      {
-        contractName: FABRIC_CONTRACT_CBDC_ERC20_NAME,
-        channelName: FABRIC_CHANNEL_NAME,
-        params: [recipient, amount.toString()],
-        methodName: "Transfer",
-        invocationType: "FabricContractInvocationType.CALL",
-        signingCredential: {
-          keychainId: CryptoMaterial.keychains.keychain1.id,
-          keychainRef: getUserFromPseudonim(userFrom),
+    axios
+      .post(
+        "http://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction",
+        {
+          contractName: FABRIC_CONTRACT_CBDC_ERC20_NAME,
+          channelName: FABRIC_CHANNEL_NAME,
+          params: [recipient, amount.toString()],
+          methodName: "Transfer",
+          invocationType: "FabricContractInvocationType.CALL",
+          signingCredential: {
+            keychainId: CryptoMaterial.keychains.keychain1.id,
+            keychainRef: getUserFromPseudonim(userFrom),
+          },
         },
-      },
-    )
-    .catch((err) => {
-      expect(err.response.statusText).to.contain("has insufficient funds");
-    });
-});
+      )
+      .catch((err) => {
+        expect(err.response.statusText).to.contain("has insufficient funds");
+      });
+  },
+);
 
-Then("{string} has {int} CBDC available in the source chain", async function (
-  user: string,
-  amount: number,
-) {
-  expect(await getFabricBalance(getFabricId(user))).to.equal(amount);
-});
+Then(
+  "{string} has {int} CBDC available in the source chain",
+  async function (user: string, amount: number) {
+    expect(await getFabricBalance(getFabricId(user))).to.equal(amount);
+  },
+);
 
 Then(
   "the asset reference chaincode has an asset reference with id {string}",

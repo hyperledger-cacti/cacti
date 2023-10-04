@@ -227,7 +227,7 @@ test.skip("Tests are passing on the JVM side", async (t: Test) => {
   );
   const partyBPublicKey = partyB?.legalIdentities[0].owningKey;
 
-  const req: InvokeContractV1Request = ({
+  const req: InvokeContractV1Request = {
     timeoutMs: 60000,
     flowFullClassName: "net.corda.samples.example.flows.ExampleFlow$Initiator",
     flowInvocationType: FlowInvocationType.FlowDynamic,
@@ -307,7 +307,7 @@ test.skip("Tests are passing on the JVM side", async (t: Test) => {
         ],
       },
     ],
-  } as unknown) as InvokeContractV1Request;
+  } as unknown as InvokeContractV1Request;
 
   const res = await apiClient.invokeContractV1(req);
   t.ok(res, "InvokeContractV1Request truthy OK");

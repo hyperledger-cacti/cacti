@@ -129,7 +129,8 @@ export interface IOdapLogIPFS {
 }
 
 export abstract class PluginOdapGateway
-  implements ICactusPlugin, IPluginWebService {
+  implements ICactusPlugin, IPluginWebService
+{
   public static readonly CLASS_NAME = "OdapGateway";
   private readonly instanceId: string;
   private readonly _log: Logger;
@@ -234,55 +235,48 @@ export abstract class PluginOdapGateway
     }
 
     // Server endpoints
-    const transferInitiationRequestEndpoint = new TransferInitiationRequestEndpointV1(
-      {
+    const transferInitiationRequestEndpoint =
+      new TransferInitiationRequestEndpointV1({
         gateway: this,
-      },
-    );
-    const transferCommenceRequestEndpoint = new TransferCommenceRequestEndpointV1(
-      {
+      });
+    const transferCommenceRequestEndpoint =
+      new TransferCommenceRequestEndpointV1({
         gateway: this,
-      },
-    );
+      });
     const lockEvidenceRequestEndpoint = new LockEvidenceRequestEndpointV1({
       gateway: this,
     });
-    const commitPreparationRequestEndpoint = new CommitPreparationRequestEndpointV1(
-      {
+    const commitPreparationRequestEndpoint =
+      new CommitPreparationRequestEndpointV1({
         gateway: this,
-      },
-    );
+      });
     const commitFinalRequestEndpoint = new CommitFinalRequestEndpointV1({
       gateway: this,
     });
-    const transferCompleteRequestEndpoint = new TransferCompleteRequestEndpointV1(
-      {
+    const transferCompleteRequestEndpoint =
+      new TransferCompleteRequestEndpointV1({
         gateway: this,
-      },
-    );
+      });
 
     // Client endpoints
     const clientRequestEndpoint = new ClientRequestEndpointV1({
       gateway: this,
     });
-    const transferInitiationResponseEndpoint = new TransferInitiationResponseEndpointV1(
-      {
+    const transferInitiationResponseEndpoint =
+      new TransferInitiationResponseEndpointV1({
         gateway: this,
-      },
-    );
-    const transferCommenceResponseEndpoint = new TransferCommenceResponseEndpointV1(
-      {
+      });
+    const transferCommenceResponseEndpoint =
+      new TransferCommenceResponseEndpointV1({
         gateway: this,
-      },
-    );
+      });
     const lockEvidenceResponseEndpoint = new LockEvidenceResponseEndpointV1({
       gateway: this,
     });
-    const commitPreparationResponseEndpoint = new CommitPreparationResponseEndpointV1(
-      {
+    const commitPreparationResponseEndpoint =
+      new CommitPreparationResponseEndpointV1({
         gateway: this,
-      },
-    );
+      });
     const commitFinalResponseEndpoint = new CommitFinalResponseEndpointV1({
       gateway: this,
     });

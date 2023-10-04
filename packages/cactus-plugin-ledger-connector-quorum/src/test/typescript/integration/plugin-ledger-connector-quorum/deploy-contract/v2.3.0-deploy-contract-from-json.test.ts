@@ -76,7 +76,8 @@ describe(testCase, () => {
     ledger = new QuorumTestLedger(ledgerOptions);
     await ledger.start();
 
-    const quorumGenesisOptions: IQuorumGenesisOptions = await ledger.getGenesisJsObject();
+    const quorumGenesisOptions: IQuorumGenesisOptions =
+      await ledger.getGenesisJsObject();
 
     expect(quorumGenesisOptions).toBeTruthy();
     expect(quorumGenesisOptions.alloc).toBeTruthy();

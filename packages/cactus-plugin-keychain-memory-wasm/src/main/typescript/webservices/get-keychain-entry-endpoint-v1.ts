@@ -42,7 +42,7 @@ export class GetKeychainEntryV1Endpoint implements IWebServiceEndpoint {
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public getOasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-keychain-memory-wasm/get-keychain-entry"] {
+  public getOasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-keychain-memory-wasm/get-keychain-entry"] {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-memory-wasm/get-keychain-entry"
     ];

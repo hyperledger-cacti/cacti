@@ -26,7 +26,8 @@ export interface IDeployContractSolidityBytecodeOptionsJsonObject {
 }
 
 export class DeployContractSolidityBytecodeJsonObjectEndpoint
-  implements IWebServiceEndpoint {
+  implements IWebServiceEndpoint
+{
   public static readonly CLASS_NAME =
     "DeployContractSolidityBytecodeEndpointJsonObject";
 
@@ -94,9 +95,8 @@ export class DeployContractSolidityBytecodeJsonObjectEndpoint
     this.log.debug(reqTag);
     const reqBody: DeployContractSolidityBytecodeJsonObjectV1Request = req.body;
     try {
-      const resBody = await this.options.connector.deployContractJsonObject(
-        reqBody,
-      );
+      const resBody =
+        await this.options.connector.deployContractJsonObject(reqBody);
       res.json(resBody);
     } catch (ex) {
       this.log.error(`Crash while serving ${reqTag}`, ex);
