@@ -23,6 +23,7 @@ export interface ICordaV5TestLedgerConstructorOptions {
   imageVersion?: string;
   imageName?: string;
   publicPort?: number;
+  postgresPort?: number;
   logLevel?: LogLevelDesc;
   emitContainerLogs?: boolean;
 }
@@ -32,8 +33,9 @@ export interface ICordaV5TestLedgerConstructorOptions {
  */
 const DEFAULTS = Object.freeze({
   imageVersion: "latest",
-  imageName: "docker pull cactuts/newcordaimg",
+  imageName: "cactuts/newcordaimg",
   publicPort: 8888,
+  postgresPort: 5431,
 });
 export const CORDA_V5_TEST_LEDGER_DEFAULT_OPTIONS = DEFAULTS;
 
@@ -44,6 +46,7 @@ export const JOI_SCHEMA: Joi.Schema = Joi.object().keys({
   imageVersion: Joi.string().min(5).required(),
   imageName: Joi.string().min(1).required(),
   publicPort: Joi.number().min(1).max(65535).required(),
+  postgresPort: Joi.number().min(1).max(65535).required(),
 });
 export const CORDA_V5_TEST_LEDGER_OPTIONS_JOI_SCHEMA = JOI_SCHEMA;
 
@@ -60,6 +63,7 @@ export class CordaV5TestLedger implements ITestLedger {
   public readonly imageVersion: string;
   public readonly imageName: string;
   public readonly publicPort: number;
+  public readonly postgresPort: number;
   public readonly emitContainerLogs: boolean;
 
   private container: Container | undefined;
@@ -73,6 +77,7 @@ export class CordaV5TestLedger implements ITestLedger {
     this.imageName = opts.imageName || DEFAULTS.imageName;
 
     this.publicPort = opts.publicPort || DEFAULTS.publicPort;
+    this.postgresPort = opts.postgresPort || DEFAULTS.postgresPort;
     this.emitContainerLogs = Bools.isBooleanStrict(opts.emitContainerLogs)
       ? (opts.emitContainerLogs as boolean)
       : true;
@@ -109,13 +114,10 @@ export class CordaV5TestLedger implements ITestLedger {
         [],
         {
           User: "root",
-          ExposedPorts: {
-            [`${this.publicPort}/tcp`]: {}, // corda endpoint
-            "22/tcp": {}, // ssh server
-          },
+          NetworkMode: "host", // Set the container to use the host network
+          Binds: ["/var/run/docker.sock:/var/run/docker.sock"], // Mount the Docker socket
           PublishAllPorts: true,
           Privileged: true,
-          // Env: this.envVars,
         },
         {},
         (err: unknown) => {
@@ -197,17 +199,12 @@ export class CordaV5TestLedger implements ITestLedger {
 
   public async getPublicPort(): Promise<number> {
     const aContainerInfo = await this.getContainerInfo();
-    return Containers.getPublicPort(this.publicPort, aContainerInfo);
-  }
-
-  public async getSupervisorDPublicPort(): Promise<number> {
-    const aContainerInfo = await this.getContainerInfo();
-    return Containers.getPublicPort(9001, aContainerInfo);
+    return Containers.getPublicPort(8888, aContainerInfo);
   }
 
   public async getSupervisorDLocalhostUrl(): Promise<string> {
-    const port = await this.getSupervisorDPublicPort();
-    return `http://localhost:${port}`;
+    const port = await this.getPublicPort();
+    return `https://localhost:${port}/api/v1/swagger#`;
   }
 
   public async getSSHPublicPort(): Promise<number> {
@@ -216,10 +213,11 @@ export class CordaV5TestLedger implements ITestLedger {
   }
 
   public async getSshConfig(): Promise<SshConfig> {
-    const publicPort = await this.getSSHPublicPort();
+    //port 22 is not being checked as of now because we can't modify the export ports unless we change the gradle sample
+    //const publicPort = await this.getSSHPublicPort();
     const sshConfig: SshConfig = {
-      host: "0.0.0.0",
-      port: publicPort,
+      host: "127.0.0.1",
+      port: 22,
       username: "root",
     };
 
@@ -245,6 +243,7 @@ export class CordaV5TestLedger implements ITestLedger {
       imageVersion: this.imageVersion,
       imageName: this.imageName,
       publicPort: this.publicPort,
+      postgresPort: this.postgresPort,
     });
 
     if (validationResult.error) {

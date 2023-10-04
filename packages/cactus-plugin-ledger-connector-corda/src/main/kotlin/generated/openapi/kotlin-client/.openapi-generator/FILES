@@ -1,5 +1,9 @@
 README.md
 build.gradle
+docs/CPIIDV5.md
+docs/CPIV5Response.md
+docs/CPIV5ResponseCpis.md
+docs/CPIV5ResponseCpks.md
 docs/ClearMonitorTransactionsV1Request.md
 docs/ClearMonitorTransactionsV1Response.md
 docs/CordaNodeSshCredentials.md
@@ -14,6 +18,12 @@ docs/DeployContractJarsV1Request.md
 docs/DiagnoseNodeV1Request.md
 docs/DiagnoseNodeV1Response.md
 docs/FlowInvocationType.md
+docs/FlowStatus.md
+docs/FlowStatusFlowError.md
+docs/FlowStatusV5Response.md
+docs/FlowStatusV5Responses.md
+docs/FlowStatusV5ResponsesFlowStatusResponses.md
+docs/FlowV5Error.md
 docs/GetMonitorTransactionsV1Request.md
 docs/GetMonitorTransactionsV1Response.md
 docs/GetMonitorTransactionsV1ResponseTxInner.md
@@ -31,6 +41,8 @@ docs/NodeInfo.md
 docs/Party.md
 docs/PublicKey.md
 docs/SHA256.md
+docs/StartFlowV5Request.md
+docs/StartFlowV5RequestRequestBody.md
 docs/StartMonitorV1Request.md
 docs/StartMonitorV1Response.md
 docs/StopMonitorV1Request.md
@@ -59,6 +71,10 @@ src/main/kotlin/org/openapitools/client/infrastructure/ResponseExtensions.kt
 src/main/kotlin/org/openapitools/client/infrastructure/Serializer.kt
 src/main/kotlin/org/openapitools/client/infrastructure/URIAdapter.kt
 src/main/kotlin/org/openapitools/client/infrastructure/UUIDAdapter.kt
+src/main/kotlin/org/openapitools/client/models/CPIIDV5.kt
+src/main/kotlin/org/openapitools/client/models/CPIV5Response.kt
+src/main/kotlin/org/openapitools/client/models/CPIV5ResponseCpis.kt
+src/main/kotlin/org/openapitools/client/models/CPIV5ResponseCpks.kt
 src/main/kotlin/org/openapitools/client/models/ClearMonitorTransactionsV1Request.kt
 src/main/kotlin/org/openapitools/client/models/ClearMonitorTransactionsV1Response.kt
 src/main/kotlin/org/openapitools/client/models/CordaNodeSshCredentials.kt
@@ -72,6 +88,12 @@ src/main/kotlin/org/openapitools/client/models/DeployContractJarsV1Request.kt
 src/main/kotlin/org/openapitools/client/models/DiagnoseNodeV1Request.kt
 src/main/kotlin/org/openapitools/client/models/DiagnoseNodeV1Response.kt
 src/main/kotlin/org/openapitools/client/models/FlowInvocationType.kt
+src/main/kotlin/org/openapitools/client/models/FlowStatus.kt
+src/main/kotlin/org/openapitools/client/models/FlowStatusFlowError.kt
+src/main/kotlin/org/openapitools/client/models/FlowStatusV5Response.kt
+src/main/kotlin/org/openapitools/client/models/FlowStatusV5Responses.kt
+src/main/kotlin/org/openapitools/client/models/FlowStatusV5ResponsesFlowStatusResponses.kt
+src/main/kotlin/org/openapitools/client/models/FlowV5Error.kt
 src/main/kotlin/org/openapitools/client/models/GetMonitorTransactionsV1Request.kt
 src/main/kotlin/org/openapitools/client/models/GetMonitorTransactionsV1Response.kt
 src/main/kotlin/org/openapitools/client/models/GetMonitorTransactionsV1ResponseTxInner.kt
@@ -89,6 +111,8 @@ src/main/kotlin/org/openapitools/client/models/NodeInfo.kt
 src/main/kotlin/org/openapitools/client/models/Party.kt
 src/main/kotlin/org/openapitools/client/models/PublicKey.kt
 src/main/kotlin/org/openapitools/client/models/SHA256.kt
+src/main/kotlin/org/openapitools/client/models/StartFlowV5Request.kt
+src/main/kotlin/org/openapitools/client/models/StartFlowV5RequestRequestBody.kt
 src/main/kotlin/org/openapitools/client/models/StartMonitorV1Request.kt
 src/main/kotlin/org/openapitools/client/models/StartMonitorV1Response.kt
 src/main/kotlin/org/openapitools/client/models/StopMonitorV1Request.kt

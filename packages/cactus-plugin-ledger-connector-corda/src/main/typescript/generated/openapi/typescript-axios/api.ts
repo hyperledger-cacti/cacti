@@ -26,6 +26,130 @@ import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from './base';
 /**
  * 
  * @export
+ * @interface CPIIDV5
+ */
+export interface CPIIDV5 {
+    /**
+     * 
+     * @type {string}
+     * @memberof CPIIDV5
+     */
+    name: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CPIIDV5
+     */
+    signerSummaryHash?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof CPIIDV5
+     */
+    version: string;
+}
+/**
+ * 
+ * @export
+ * @interface CPIV5Response
+ */
+export interface CPIV5Response {
+    /**
+     * 
+     * @type {Array<CPIV5ResponseCpis>}
+     * @memberof CPIV5Response
+     */
+    cpis?: Array<CPIV5ResponseCpis>;
+}
+/**
+ * 
+ * @export
+ * @interface CPIV5ResponseCpis
+ */
+export interface CPIV5ResponseCpis {
+    /**
+     * 
+     * @type {string}
+     * @memberof CPIV5ResponseCpis
+     */
+    cpiFileChecksum?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CPIV5ResponseCpis
+     */
+    cpiFileFullChecksum?: string;
+    /**
+     * 
+     * @type {Array<CPIV5ResponseCpks>}
+     * @memberof CPIV5ResponseCpis
+     */
+    cpks?: Array<CPIV5ResponseCpks>;
+    /**
+     * 
+     * @type {string}
+     * @memberof CPIV5ResponseCpis
+     */
+    groupPolicy?: string | null;
+    /**
+     * 
+     * @type {CPIIDV5}
+     * @memberof CPIV5ResponseCpis
+     */
+    id?: CPIIDV5;
+    /**
+     * 
+     * @type {string}
+     * @memberof CPIV5ResponseCpis
+     */
+    timestamp?: string;
+}
+/**
+ * 
+ * @export
+ * @interface CPIV5ResponseCpks
+ */
+export interface CPIV5ResponseCpks {
+    /**
+     * 
+     * @type {string}
+     * @memberof CPIV5ResponseCpks
+     */
+    hash?: string;
+    /**
+     * 
+     * @type {CPIIDV5}
+     * @memberof CPIV5ResponseCpks
+     */
+    id?: CPIIDV5;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof CPIV5ResponseCpks
+     */
+    libraries?: Array<string>;
+    /**
+     * 
+     * @type {string}
+     * @memberof CPIV5ResponseCpks
+     */
+    mainBundle?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CPIV5ResponseCpks
+     */
+    timestamp?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CPIV5ResponseCpks
+     */
+    type?: string;
+}
+/**
+ * 
+ * @export
  * @interface ClearMonitorTransactionsV1Request
  */
 export interface ClearMonitorTransactionsV1Request {
@@ -373,6 +497,204 @@ export const FlowInvocationType = {
 export type FlowInvocationType = typeof FlowInvocationType[keyof typeof FlowInvocationType];
 
 
+/**
+ * 
+ * @export
+ * @interface FlowStatus
+ */
+export interface FlowStatus {
+    /**
+     * 
+     * @type {string}
+     * @memberof FlowStatus
+     */
+    clientRequestId?: string | null;
+    /**
+     * 
+     * @type {FlowStatusFlowError}
+     * @memberof FlowStatus
+     */
+    flowError: FlowStatusFlowError;
+    /**
+     * 
+     * @type {string}
+     * @memberof FlowStatus
+     */
+    flowId?: string | null;
+    /**
+     * 
+     * @type {Array<any>}
+     * @memberof FlowStatus
+     */
+    flowResult?: Array<any>;
+    /**
+     * 
+     * @type {string}
+     * @memberof FlowStatus
+     */
+    flowStatus: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof FlowStatus
+     */
+    holdingIdentityShortHash: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof FlowStatus
+     */
+    timestamp: string;
+}
+/**
+ * 
+ * @export
+ * @interface FlowStatusFlowError
+ */
+export interface FlowStatusFlowError {
+    /**
+     * 
+     * @type {string}
+     * @memberof FlowStatusFlowError
+     */
+    message: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof FlowStatusFlowError
+     */
+    type: string;
+}
+/**
+ * 
+ * @export
+ * @interface FlowStatusV5Response
+ */
+export interface FlowStatusV5Response {
+    /**
+     * 
+     * @type {string}
+     * @memberof FlowStatusV5Response
+     */
+    clientRequestId?: string | null;
+    /**
+     * 
+     * @type {FlowV5Error}
+     * @memberof FlowStatusV5Response
+     */
+    flowError?: FlowV5Error;
+    /**
+     * 
+     * @type {string}
+     * @memberof FlowStatusV5Response
+     */
+    flowId?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof FlowStatusV5Response
+     */
+    flowResult?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof FlowStatusV5Response
+     */
+    flowStatus: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof FlowStatusV5Response
+     */
+    holdingIdentityShortHash: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof FlowStatusV5Response
+     */
+    timestamp: string;
+}
+/**
+ * 
+ * @export
+ * @interface FlowStatusV5Responses
+ */
+export interface FlowStatusV5Responses {
+    /**
+     * 
+     * @type {Array<FlowStatusV5ResponsesFlowStatusResponses>}
+     * @memberof FlowStatusV5Responses
+     */
+    flowStatusResponses?: Array<FlowStatusV5ResponsesFlowStatusResponses>;
+}
+/**
+ * 
+ * @export
+ * @interface FlowStatusV5ResponsesFlowStatusResponses
+ */
+export interface FlowStatusV5ResponsesFlowStatusResponses {
+    /**
+     * 
+     * @type {string}
+     * @memberof FlowStatusV5ResponsesFlowStatusResponses
+     */
+    clientRequestId?: string | null;
+    /**
+     * 
+     * @type {FlowV5Error}
+     * @memberof FlowStatusV5ResponsesFlowStatusResponses
+     */
+    flowError?: FlowV5Error;
+    /**
+     * 
+     * @type {string}
+     * @memberof FlowStatusV5ResponsesFlowStatusResponses
+     */
+    flowId?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof FlowStatusV5ResponsesFlowStatusResponses
+     */
+    flowResult?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof FlowStatusV5ResponsesFlowStatusResponses
+     */
+    flowStatus?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof FlowStatusV5ResponsesFlowStatusResponses
+     */
+    holdingIdentityShortHash?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof FlowStatusV5ResponsesFlowStatusResponses
+     */
+    timestamp?: string;
+}
+/**
+ * 
+ * @export
+ * @interface FlowV5Error
+ */
+export interface FlowV5Error {
+    /**
+     * 
+     * @type {string}
+     * @memberof FlowV5Error
+     */
+    message: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof FlowV5Error
+     */
+    type: string;
+}
 /**
  * 
  * @export
@@ -775,44 +1097,6 @@ export interface PublicKey {
     'encoded': string;
 }
 /**
- * Parameter used in Corda 5
- * @export
- * @interface HttpStartFlowRequest
- */
-export interface HttpStartFlowRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof HttpStartFlowRequest
-     */
-    clientId: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof HttpStartFlowRequest
-     */
-    flowName?: string;
-    /**
-     * 
-     * @type {HttpStartFlowRequestParameters}
-     * @memberof HttpStartFlowRequest
-     */
-    parameters: HttpStartFlowRequestParameters;
-}
-/**
- * 
- * @export
- * @interface HttpStartFlowRequestParameters
- */
-export interface HttpStartFlowRequestParameters {
-    /**
-     * 
-     * @type {string}
-     * @memberof HttpStartFlowRequestParameters
-     */
-    parametersInJson: string;
-}
-/**
  * SHA-256 is part of the SHA-2 hash function family. Generated hash is fixed size, 256-bits (32-bytes).
  * @export
  * @interface SHA256
@@ -836,6 +1120,56 @@ export interface SHA256 {
      * @memberof SHA256
      */
     'size': number;
+}
+/**
+ * This method starts a new instance for the specified flow for the specified holding identity.
+ * @export
+ * @interface StartFlowV5Request
+ */
+export interface StartFlowV5Request {
+    /**
+     * 
+     * @type {string}
+     * @memberof StartFlowV5Request
+     */
+    clientRequestId: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof StartFlowV5Request
+     */
+    flowClassName: string;
+    /**
+     * 
+     * @type {StartFlowV5RequestRequestBody}
+     * @memberof StartFlowV5Request
+     */
+    requestBody: StartFlowV5RequestRequestBody;
+}
+/**
+ * 
+ * @export
+ * @interface StartFlowV5RequestRequestBody
+ */
+export interface StartFlowV5RequestRequestBody {
+    /**
+     * 
+     * @type {string}
+     * @memberof StartFlowV5RequestRequestBody
+     */
+    chatName?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof StartFlowV5RequestRequestBody
+     */
+    otherMember?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof StartFlowV5RequestRequestBody
+     */
+    message?: string;
 }
 /**
  * 
@@ -1042,6 +1376,108 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary This method gets the current status of the specified flow instance.
+         * @param {string} holdingidentityshorthash Holding identity short hash
+         * @param {string} clientrequestid Client request ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        flowStatusResponse: async (holdingidentityshorthash: string, clientrequestid: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'holdingidentityshorthash' is not null or undefined
+            assertParamExists('flowStatusResponse', 'holdingidentityshorthash', holdingidentityshorthash)
+            // verify required parameter 'clientrequestid' is not null or undefined
+            assertParamExists('flowStatusResponse', 'clientrequestid', clientrequestid)
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingidentityshorthash}/{clientrequestid}`
+                .replace(`{${"holdingidentityshorthash"}}`, encodeURIComponent(String(holdingidentityshorthash)))
+                .replace(`{${"clientrequestid"}}`, encodeURIComponent(String(clientrequestid)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary This method returns an array containing the statuses of all flows running for a specified holding identity. An empty array is returned if there are no flows running.
+         * @param {string} holdingidentityshorthash Holding identity short hash
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        flowStatusResponses: async (holdingidentityshorthash: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'holdingidentityshorthash' is not null or undefined
+            assertParamExists('flowStatusResponses', 'holdingidentityshorthash', holdingidentityshorthash)
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingidentityshorthash}`
+                .replace(`{${"holdingidentityshorthash"}}`, encodeURIComponent(String(holdingidentityshorthash)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary List all CPIs uploaded to the cluster
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCPIResponse: async (options: any = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/cpi`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Get transactions for monitored state classes.
          * @param {GetMonitorTransactionsV1Request} [getMonitorTransactionsV1Request] 
          * @param {*} [options] Override http request option.
@@ -1206,6 +1642,46 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary This method starts a new instance for the specified flow for the specified holding identity.
+         * @param {string} holdingidentityshorthash Holding identity short hash
+         * @param {StartFlowV5Request} startFlowV5Request Request body for starting a flow
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        startFlowParameters: async (holdingidentityshorthash: string, startFlowV5Request: StartFlowV5Request, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'holdingidentityshorthash' is not null or undefined
+            assertParamExists('startFlowParameters', 'holdingidentityshorthash', holdingidentityshorthash)
+            // verify required parameter 'startFlowV5Request' is not null or undefined
+            assertParamExists('startFlowParameters', 'startFlowV5Request', startFlowV5Request)
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingidentityshorthash}`
+                .replace(`{${"holdingidentityshorthash"}}`, encodeURIComponent(String(holdingidentityshorthash)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(startFlowV5Request, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Start monitoring corda changes (transactions) of given state class
          * @param {StartMonitorV1Request} [startMonitorV1Request] 
          * @param {*} [options] Override http request option.
@@ -1316,6 +1792,39 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary This method gets the current status of the specified flow instance.
+         * @param {string} holdingidentityshorthash Holding identity short hash
+         * @param {string} clientrequestid Client request ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async flowStatusResponse(holdingidentityshorthash: string, clientrequestid: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FlowStatusV5Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.flowStatusResponse(holdingidentityshorthash, clientrequestid, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary This method returns an array containing the statuses of all flows running for a specified holding identity. An empty array is returned if there are no flows running.
+         * @param {string} holdingidentityshorthash Holding identity short hash
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async flowStatusResponses(holdingidentityshorthash: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FlowStatusV5Responses>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.flowStatusResponses(holdingidentityshorthash, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary List all CPIs uploaded to the cluster
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getCPIResponse(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CPIV5Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getCPIResponse(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @summary Get transactions for monitored state classes.
          * @param {GetMonitorTransactionsV1Request} [getMonitorTransactionsV1Request] 
          * @param {*} [options] Override http request option.
@@ -1364,6 +1873,18 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          */
         async networkMapV1(body?: object, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<NodeInfo>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.networkMapV1(body, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
+         * @summary This method starts a new instance for the specified flow for the specified holding identity.
+         * @param {string} holdingidentityshorthash Holding identity short hash
+         * @param {StartFlowV5Request} startFlowV5Request Request body for starting a flow
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async startFlowParameters(holdingidentityshorthash: string, startFlowV5Request: StartFlowV5Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FlowStatusV5Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.startFlowParameters(holdingidentityshorthash, startFlowV5Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -1429,6 +1950,36 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @summary This method gets the current status of the specified flow instance.
+         * @param {string} holdingidentityshorthash Holding identity short hash
+         * @param {string} clientrequestid Client request ID
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        flowStatusResponse(holdingidentityshorthash: string, clientrequestid: string, options?: any): AxiosPromise<FlowStatusV5Response> {
+            return localVarFp.flowStatusResponse(holdingidentityshorthash, clientrequestid, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary This method returns an array containing the statuses of all flows running for a specified holding identity. An empty array is returned if there are no flows running.
+         * @param {string} holdingidentityshorthash Holding identity short hash
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        flowStatusResponses(holdingidentityshorthash: string, options?: any): AxiosPromise<FlowStatusV5Responses> {
+            return localVarFp.flowStatusResponses(holdingidentityshorthash, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary List all CPIs uploaded to the cluster
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCPIResponse(options?: any): AxiosPromise<CPIV5Response> {
+            return localVarFp.getCPIResponse(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Get transactions for monitored state classes.
          * @param {GetMonitorTransactionsV1Request} [getMonitorTransactionsV1Request] 
          * @param {*} [options] Override http request option.
@@ -1473,6 +2024,17 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         networkMapV1(body?: object, options?: any): AxiosPromise<Array<NodeInfo>> {
             return localVarFp.networkMapV1(body, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary This method starts a new instance for the specified flow for the specified holding identity.
+         * @param {string} holdingidentityshorthash Holding identity short hash
+         * @param {StartFlowV5Request} startFlowV5Request Request body for starting a flow
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        startFlowParameters(holdingidentityshorthash: string, startFlowV5Request: StartFlowV5Request, options?: any): AxiosPromise<FlowStatusV5Response> {
+            return localVarFp.startFlowParameters(holdingidentityshorthash, startFlowV5Request, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -1541,6 +2103,42 @@ export class DefaultApi extends BaseAPI {
 
     /**
      * 
+     * @summary This method gets the current status of the specified flow instance.
+     * @param {string} holdingidentityshorthash Holding identity short hash
+     * @param {string} clientrequestid Client request ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public flowStatusResponse(holdingidentityshorthash: string, clientrequestid: string, options?: any) {
+        return DefaultApiFp(this.configuration).flowStatusResponse(holdingidentityshorthash, clientrequestid, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary This method returns an array containing the statuses of all flows running for a specified holding identity. An empty array is returned if there are no flows running.
+     * @param {string} holdingidentityshorthash Holding identity short hash
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public flowStatusResponses(holdingidentityshorthash: string, options?: any) {
+        return DefaultApiFp(this.configuration).flowStatusResponses(holdingidentityshorthash, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary List all CPIs uploaded to the cluster
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getCPIResponse(options?: any) {
+        return DefaultApiFp(this.configuration).getCPIResponse(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary Get transactions for monitored state classes.
      * @param {GetMonitorTransactionsV1Request} [getMonitorTransactionsV1Request] 
      * @param {*} [options] Override http request option.
@@ -1594,6 +2192,19 @@ export class DefaultApi extends BaseAPI {
      */
     public networkMapV1(body?: object, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).networkMapV1(body, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary This method starts a new instance for the specified flow for the specified holding identity.
+     * @param {string} holdingidentityshorthash Holding identity short hash
+     * @param {StartFlowV5Request} startFlowV5Request Request body for starting a flow
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public startFlowParameters(holdingidentityshorthash: string, startFlowV5Request: StartFlowV5Request, options?: any) {
+        return DefaultApiFp(this.configuration).startFlowParameters(holdingidentityshorthash, startFlowV5Request, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

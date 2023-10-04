@@ -48,13 +48,13 @@ RUN cd CSDE-cordapp-template-kotlin/ && \
     git checkout release/corda-5-0
 
 RUN apk add --no-cache supervisor
-## Exposing the required ports 5005, 5432 and 8888 for CSDE
+## TO FIX: Exposing the required ports 5005, 5432 and 8888 for CSDE
 ## and 9001 for supervisor. Currently commented because of "--network host" being used to run the container
 # EXPOSE 5005
 # EXPOSE 5432
 # EXPOSE 8888
-
 # EXPOSE 9001
+EXPOSE 22
 
 COPY supervisord.conf /etc/supervisord.conf
 

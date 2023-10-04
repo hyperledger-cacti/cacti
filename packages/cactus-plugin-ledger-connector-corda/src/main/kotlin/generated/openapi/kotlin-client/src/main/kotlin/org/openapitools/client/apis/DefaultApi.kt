@@ -26,6 +26,8 @@ import org.openapitools.client.models.DeployContractJarsSuccessV1Response
 import org.openapitools.client.models.DeployContractJarsV1Request
 import org.openapitools.client.models.DiagnoseNodeV1Request
 import org.openapitools.client.models.DiagnoseNodeV1Response
+import org.openapitools.client.models.FlowStatusV5Response
+import org.openapitools.client.models.FlowStatusV5Responses
 import org.openapitools.client.models.GetMonitorTransactionsV1Request
 import org.openapitools.client.models.GetMonitorTransactionsV1Response
 import org.openapitools.client.models.InvokeContractV1Request
@@ -33,6 +35,7 @@ import org.openapitools.client.models.InvokeContractV1Response
 import org.openapitools.client.models.ListFlowsV1Request
 import org.openapitools.client.models.ListFlowsV1Response
 import org.openapitools.client.models.NodeInfo
+import org.openapitools.client.models.StartFlowV5Request
 import org.openapitools.client.models.StartMonitorV1Request
 import org.openapitools.client.models.StartMonitorV1Response
 import org.openapitools.client.models.StopMonitorV1Request
@@ -279,6 +282,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     }
 
     /**
+<<<<<<< HEAD
      * Get transactions for monitored state classes.
      * 
      * @param getMonitorTransactionsV1Request  (optional)
@@ -289,6 +293,175 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
      * @throws ClientException If the API returns a client error response
      * @throws ServerException If the API returns a server error response
      */
+=======
+    * This method gets the current status of the specified flow instance.
+    * 
+    * @param holdingidentityshorthash Holding identity short hash 
+    * @param clientrequestid Client request ID 
+    * @return FlowStatusV5Response
+    * @throws UnsupportedOperationException If the API returns an informational or redirection response
+    * @throws ClientException If the API returns a client error response
+    * @throws ServerException If the API returns a server error response
+    */
+    @Suppress("UNCHECKED_CAST")
+    @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
+    fun flowStatusResponse(holdingidentityshorthash: kotlin.String, clientrequestid: kotlin.String) : FlowStatusV5Response {
+        val localVariableConfig = flowStatusResponseRequestConfig(holdingidentityshorthash = holdingidentityshorthash, clientrequestid = clientrequestid)
+
+        val localVarResponse = request<Unit, FlowStatusV5Response>(
+            localVariableConfig
+        )
+
+        return when (localVarResponse.responseType) {
+            ResponseType.Success -> (localVarResponse as Success<*>).data as FlowStatusV5Response
+            ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
+            ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
+            ResponseType.ClientError -> {
+                val localVarError = localVarResponse as ClientError<*>
+                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+            }
+            ResponseType.ServerError -> {
+                val localVarError = localVarResponse as ServerError<*>
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+            }
+        }
+    }
+
+    /**
+    * To obtain the request config of the operation flowStatusResponse
+    *
+    * @param holdingidentityshorthash Holding identity short hash 
+    * @param clientrequestid Client request ID 
+    * @return RequestConfig
+    */
+    fun flowStatusResponseRequestConfig(holdingidentityshorthash: kotlin.String, clientrequestid: kotlin.String) : RequestConfig<Unit> {
+        val localVariableBody = null
+        val localVariableQuery: MultiValueMap = mutableMapOf()
+        val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
+
+        return RequestConfig(
+            method = RequestMethod.GET,
+            path = "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingidentityshorthash}/{clientrequestid}".replace("{"+"holdingidentityshorthash"+"}", "$holdingidentityshorthash").replace("{"+"clientrequestid"+"}", "$clientrequestid"),
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            body = localVariableBody
+        )
+    }
+
+    /**
+    * This method returns an array containing the statuses of all flows running for a specified holding identity. An empty array is returned if there are no flows running.
+    * 
+    * @param holdingidentityshorthash Holding identity short hash 
+    * @return FlowStatusV5Responses
+    * @throws UnsupportedOperationException If the API returns an informational or redirection response
+    * @throws ClientException If the API returns a client error response
+    * @throws ServerException If the API returns a server error response
+    */
+    @Suppress("UNCHECKED_CAST")
+    @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
+    fun flowStatusResponses(holdingidentityshorthash: kotlin.String) : FlowStatusV5Responses {
+        val localVariableConfig = flowStatusResponsesRequestConfig(holdingidentityshorthash = holdingidentityshorthash)
+
+        val localVarResponse = request<Unit, FlowStatusV5Responses>(
+            localVariableConfig
+        )
+
+        return when (localVarResponse.responseType) {
+            ResponseType.Success -> (localVarResponse as Success<*>).data as FlowStatusV5Responses
+            ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
+            ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
+            ResponseType.ClientError -> {
+                val localVarError = localVarResponse as ClientError<*>
+                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+            }
+            ResponseType.ServerError -> {
+                val localVarError = localVarResponse as ServerError<*>
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+            }
+        }
+    }
+
+    /**
+    * To obtain the request config of the operation flowStatusResponses
+    *
+    * @param holdingidentityshorthash Holding identity short hash 
+    * @return RequestConfig
+    */
+    fun flowStatusResponsesRequestConfig(holdingidentityshorthash: kotlin.String) : RequestConfig<Unit> {
+        val localVariableBody = null
+        val localVariableQuery: MultiValueMap = mutableMapOf()
+        val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
+
+        return RequestConfig(
+            method = RequestMethod.GET,
+            path = "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingidentityshorthash}".replace("{"+"holdingidentityshorthash"+"}", "$holdingidentityshorthash"),
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            body = localVariableBody
+        )
+    }
+
+    /**
+    * List all CPIs uploaded to the cluster
+    * 
+    * @return CPIV5Response
+    * @throws UnsupportedOperationException If the API returns an informational or redirection response
+    * @throws ClientException If the API returns a client error response
+    * @throws ServerException If the API returns a server error response
+    */
+    @Suppress("UNCHECKED_CAST")
+    @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
+    fun getCPIResponse() : CPIV5Response {
+        val localVariableConfig = getCPIResponseRequestConfig()
+
+        val localVarResponse = request<Unit, CPIV5Response>(
+            localVariableConfig
+        )
+
+        return when (localVarResponse.responseType) {
+            ResponseType.Success -> (localVarResponse as Success<*>).data as CPIV5Response
+            ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
+            ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
+            ResponseType.ClientError -> {
+                val localVarError = localVarResponse as ClientError<*>
+                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+            }
+            ResponseType.ServerError -> {
+                val localVarError = localVarResponse as ServerError<*>
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+            }
+        }
+    }
+
+    /**
+    * To obtain the request config of the operation getCPIResponse
+    *
+    * @return RequestConfig
+    */
+    fun getCPIResponseRequestConfig() : RequestConfig<Unit> {
+        val localVariableBody = null
+        val localVariableQuery: MultiValueMap = mutableMapOf()
+        val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
+
+        return RequestConfig(
+            method = RequestMethod.GET,
+            path = "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/cpi",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            body = localVariableBody
+        )
+    }
+
+    /**
+    * Get transactions for monitored state classes.
+    * 
+    * @param getMonitorTransactionsV1Request  (optional)
+    * @return GetMonitorTransactionsV1Response
+    * @throws UnsupportedOperationException If the API returns an informational or redirection response
+    * @throws ClientException If the API returns a client error response
+    * @throws ServerException If the API returns a server error response
+    */
+>>>>>>> 6fc422aab (feat(connector-corda):  testing changes for plugin ledger Corda v5)
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
     fun getMonitorTransactionsV1(getMonitorTransactionsV1Request: GetMonitorTransactionsV1Request? = null) : GetMonitorTransactionsV1Response {
@@ -634,6 +807,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     }
 
     /**
+<<<<<<< HEAD
      * Start monitoring corda changes (transactions) of given state class
      * 
      * @param startMonitorV1Request  (optional)
@@ -644,6 +818,71 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
      * @throws ClientException If the API returns a client error response
      * @throws ServerException If the API returns a server error response
      */
+=======
+    * This method starts a new instance for the specified flow for the specified holding identity.
+    * 
+    * @param holdingidentityshorthash Holding identity short hash 
+    * @param startFlowV5Request Request body for starting a flow 
+    * @return FlowStatusV5Response
+    * @throws UnsupportedOperationException If the API returns an informational or redirection response
+    * @throws ClientException If the API returns a client error response
+    * @throws ServerException If the API returns a server error response
+    */
+    @Suppress("UNCHECKED_CAST")
+    @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
+    fun startFlowParameters(holdingidentityshorthash: kotlin.String, startFlowV5Request: StartFlowV5Request) : FlowStatusV5Response {
+        val localVariableConfig = startFlowParametersRequestConfig(holdingidentityshorthash = holdingidentityshorthash, startFlowV5Request = startFlowV5Request)
+
+        val localVarResponse = request<StartFlowV5Request, FlowStatusV5Response>(
+            localVariableConfig
+        )
+
+        return when (localVarResponse.responseType) {
+            ResponseType.Success -> (localVarResponse as Success<*>).data as FlowStatusV5Response
+            ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
+            ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
+            ResponseType.ClientError -> {
+                val localVarError = localVarResponse as ClientError<*>
+                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+            }
+            ResponseType.ServerError -> {
+                val localVarError = localVarResponse as ServerError<*>
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+            }
+        }
+    }
+
+    /**
+    * To obtain the request config of the operation startFlowParameters
+    *
+    * @param holdingidentityshorthash Holding identity short hash 
+    * @param startFlowV5Request Request body for starting a flow 
+    * @return RequestConfig
+    */
+    fun startFlowParametersRequestConfig(holdingidentityshorthash: kotlin.String, startFlowV5Request: StartFlowV5Request) : RequestConfig<StartFlowV5Request> {
+        val localVariableBody = startFlowV5Request
+        val localVariableQuery: MultiValueMap = mutableMapOf()
+        val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
+
+        return RequestConfig(
+            method = RequestMethod.POST,
+            path = "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingidentityshorthash}".replace("{"+"holdingidentityshorthash"+"}", "$holdingidentityshorthash"),
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            body = localVariableBody
+        )
+    }
+
+    /**
+    * Start monitoring corda changes (transactions) of given state class
+    * 
+    * @param startMonitorV1Request  (optional)
+    * @return StartMonitorV1Response
+    * @throws UnsupportedOperationException If the API returns an informational or redirection response
+    * @throws ClientException If the API returns a client error response
+    * @throws ServerException If the API returns a server error response
+    */
+>>>>>>> 6fc422aab (feat(connector-corda):  testing changes for plugin ledger Corda v5)
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
     fun startMonitorV1(startMonitorV1Request: StartMonitorV1Request? = null) : StartMonitorV1Response {

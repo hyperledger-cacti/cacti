@@ -1,5 +1,6 @@
 package org.hyperledger.cactus.plugin.ledger.connector.corda.server.api
 
+import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.CPIV5Response
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.ClearMonitorTransactionsV1Request
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.ClearMonitorTransactionsV1Response
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.DeployContractJarsBadRequestV1Response
@@ -7,6 +8,8 @@ import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.DeployC
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.DeployContractJarsV1Request
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.DiagnoseNodeV1Request
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.DiagnoseNodeV1Response
+import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.FlowStatusV5Response
+import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.FlowStatusV5Responses
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.GetMonitorTransactionsV1Request
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.GetMonitorTransactionsV1Response
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.InvokeContractV1Request
@@ -14,6 +17,7 @@ import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.InvokeC
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.ListFlowsV1Request
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.ListFlowsV1Response
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.NodeInfo
+import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.StartFlowV5Request
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.StartMonitorV1Request
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.StartMonitorV1Response
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.StopMonitorV1Request
@@ -96,6 +100,7 @@ interface ApiPluginLedgerConnectorCordaService {
      */
     fun networkMapV1(body: kotlin.Any?): List<NodeInfo>
 
+<<<<<<< HEAD
     /**
      * POST /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/start-monitor : Start monitoring corda changes (transactions) of given state class
      *
@@ -103,6 +108,10 @@ interface ApiPluginLedgerConnectorCordaService {
      * @return OK (status code 200)
      * @see ApiPluginLedgerConnectorCorda#startMonitorV1
      */
+=======
+    fun startFlowParameters(holdingidentityshorthash: kotlin.String, startFlowV5Request: StartFlowV5Request): FlowStatusV5Response
+
+>>>>>>> 6fc422aab (feat(connector-corda):  testing changes for plugin ledger Corda v5)
     fun startMonitorV1(startMonitorV1Request: StartMonitorV1Request?): StartMonitorV1Response
 
     /**
