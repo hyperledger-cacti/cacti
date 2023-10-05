@@ -8022,29 +8022,30 @@ __metadata:
   resolution: "@hyperledger/cactus-plugin-persistence-ethereum@workspace:packages/cactus-plugin-persistence-ethereum"
   dependencies:
     "@ethersproject/abi": 5.7.0
-    "@hyperledger/cactus-api-client": 2.0.0-alpha.2
     "@hyperledger/cactus-common": 2.0.0-alpha.2
     "@hyperledger/cactus-core": 2.0.0-alpha.2
     "@hyperledger/cactus-core-api": 2.0.0-alpha.2
-    "@hyperledger/cactus-plugin-ledger-connector-go-ethereum-socketio": 2.0.0-alpha.2
+    "@hyperledger/cactus-plugin-keychain-memory": 2.0.0-alpha.2
+    "@hyperledger/cactus-plugin-ledger-connector-ethereum": 2.0.0-alpha.2
+    "@hyperledger/cactus-test-geth-ledger": 2.0.0-alpha.2
     "@hyperledger/cactus-test-tooling": 2.0.0-alpha.2
     "@openapitools/openapi-generator-cli": 2.4.14
     "@types/express": 4.17.13
     "@types/pg": 8.6.5
-    "@types/sanitize-html": 2.9.0
     async-mutex: 0.4.0
-    fast-safe-stringify: 2.1.1
+    body-parser: 1.19.0
+    express: 4.17.1
     jest-extended: 4.0.1
     npm-run-all: 4.1.5
     pg: 8.8.0
     run-time-error: 1.4.0
     rxjs: 7.8.1
-    sanitize-html: 2.7.0
+    socket.io: 4.5.4
     uuid: 8.3.2
-    web3: 1.6.1
-    web3-core: 1.6.1
-    web3-eth: 1.6.1
-    web3-utils: 1.6.1
+    web3: 4.0.3
+    web3-eth-accounts: 4.0.3
+    web3-utils: 4.0.6
+    web3-validator: 2.0.2
   languageName: unknown
   linkType: soft
 
@@ -13342,15 +13343,6 @@ __metadata:
   dependencies:
     htmlparser2: ^6.0.0
   checksum: 08b43427427cbd8acd2843bbf9e00576c06e3916fc523d27fd9016f39563f7999f78b632ff473ef83a77f86bdea9286de2f81e3a8f8a05af6721687651c84f1c
-  languageName: node
-  linkType: hard
-
-"@types/sanitize-html@npm:2.9.0":
-  version: 2.9.0
-  resolution: "@types/sanitize-html@npm:2.9.0"
-  dependencies:
-    htmlparser2: ^8.0.0
-  checksum: b60f42b740bbfb1b1434ce8b43925a38ecc608b60aa654fd009d2e22e33f324b61d370768c55bd2fd98e03de08518ffa8911d61606c483526fb931bb8b59d1b0
   languageName: node
   linkType: hard
 
@@ -27892,18 +27884,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"htmlparser2@npm:^8.0.0, htmlparser2@npm:^8.0.2":
-  version: 8.0.2
-  resolution: "htmlparser2@npm:8.0.2"
-  dependencies:
-    domelementtype: ^2.3.0
-    domhandler: ^5.0.3
-    domutils: ^3.0.1
-    entities: ^4.4.0
-  checksum: 29167a0f9282f181da8a6d0311b76820c8a59bc9e3c87009e21968264c2987d2723d6fde5a964d4b7b6cba663fca96ffb373c06d8223a85f52a6089ced942700
-  languageName: node
-  linkType: hard
-
 "htmlparser2@npm:^8.0.1":
   version: 8.0.1
   resolution: "htmlparser2@npm:8.0.1"
@@ -27913,6 +27893,18 @@ __metadata:
     domutils: ^3.0.1
     entities: ^4.3.0
   checksum: 06d5c71e8313597722bc429ae2a7a8333d77bd3ab07ccb916628384b37332027b047f8619448d8f4a3312b6609c6ea3302a4e77435d859e9e686999e6699ca39
+  languageName: node
+  linkType: hard
+
+"htmlparser2@npm:^8.0.2":
+  version: 8.0.2
+  resolution: "htmlparser2@npm:8.0.2"
+  dependencies:
+    domelementtype: ^2.3.0
+    domhandler: ^5.0.3
+    domutils: ^3.0.1
+    entities: ^4.4.0
+  checksum: 29167a0f9282f181da8a6d0311b76820c8a59bc9e3c87009e21968264c2987d2723d6fde5a964d4b7b6cba663fca96ffb373c06d8223a85f52a6089ced942700
   languageName: node
   linkType: hard
 
@@ -50494,7 +50486,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"web3-utils@npm:^4.0.6":
+"web3-utils@npm:4.0.6, web3-utils@npm:^4.0.6":
   version: 4.0.6
   resolution: "web3-utils@npm:4.0.6"
   dependencies:
@@ -50503,6 +50495,19 @@ __metadata:
     web3-types: ^1.2.0
     web3-validator: ^2.0.2
   checksum: dadc688fefe893f06ecc4d961400ad68a81f49c5484e5a06397902f30980dd3bb4945fddc45b732f90e7fa574531ee8355aaba5b417aad2cfcbf935faf843ec8
+  languageName: node
+  linkType: hard
+
+"web3-validator@npm:2.0.2, web3-validator@npm:^2.0.2":
+  version: 2.0.2
+  resolution: "web3-validator@npm:2.0.2"
+  dependencies:
+    ethereum-cryptography: ^2.0.0
+    util: ^0.12.5
+    web3-errors: ^1.1.2
+    web3-types: ^1.2.0
+    zod: ^3.21.4
+  checksum: 690eb297c517dd4016c9a9e6929236d394367793903242e788bd43a323c7934cf4a47e68b7f6526f9f0d1c8cf4d9bee0693331e4edff489e17b749e9d2538542
   languageName: node
   linkType: hard
 
@@ -50529,19 +50534,6 @@ __metadata:
     web3-types: ^1.1.1
     zod: ^3.21.4
   checksum: 4382a0d034751ca04d3f919efd4f1115abecee8541585179158662e46dd10b051c4ee29c885067d7aeff618dec971c4a2075baeb7df63249e3ed5b2d5695b782
-  languageName: node
-  linkType: hard
-
-"web3-validator@npm:^2.0.2":
-  version: 2.0.2
-  resolution: "web3-validator@npm:2.0.2"
-  dependencies:
-    ethereum-cryptography: ^2.0.0
-    util: ^0.12.5
-    web3-errors: ^1.1.2
-    web3-types: ^1.2.0
-    zod: ^3.21.4
-  checksum: 690eb297c517dd4016c9a9e6929236d394367793903242e788bd43a323c7934cf4a47e68b7f6526f9f0d1c8cf4d9bee0693331e4edff489e17b749e9d2538542
   languageName: node
   linkType: hard
 

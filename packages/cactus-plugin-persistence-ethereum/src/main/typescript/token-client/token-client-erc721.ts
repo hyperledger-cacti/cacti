@@ -2,10 +2,10 @@
  * Client for calling methods on ERC721 token contract.
  */
 
-import type { SocketIOApiClient } from "@hyperledger/cactus-api-client";
+import { EthereumApiClient } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
 import type { LogLevelDesc } from "@hyperledger/cactus-common";
 import TokenClient from "./base-token-client";
-import ERC721_ABI from "../../json/contract_abi/Erc721Full.json";
+import ERC721 from "../../json/contract-abi/ERC721.json";
 import { RuntimeError } from "run-time-error";
 
 /**
@@ -23,11 +23,11 @@ export default class TokenClientERC721 extends TokenClient {
   }
 
   constructor(
-    apiClient: SocketIOApiClient,
+    apiClient: EthereumApiClient,
     public address: string,
     logLevel: LogLevelDesc = "info",
   ) {
-    super(apiClient, ERC721_ABI, address, logLevel);
+    super(apiClient, ERC721, address, logLevel);
     this.log.debug("TokenClientERC721 created");
   }
 
@@ -38,7 +38,7 @@ export default class TokenClientERC721 extends TokenClient {
    */
   private logOperation(methodName: string): void {
     this.log.info(
-      `Call '${methodName}' on ERC721 contract at ${this.contract.address}`,
+      `Call '${methodName}' on ERC721 contract at ${this.contract.contractAddress}`,
     );
   }
 

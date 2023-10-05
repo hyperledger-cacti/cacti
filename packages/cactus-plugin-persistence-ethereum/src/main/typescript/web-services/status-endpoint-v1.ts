@@ -8,6 +8,7 @@ import {
   LogLevelDesc,
   LoggerProvider,
   IAsyncProvider,
+  safeStringifyException,
 } from "@hyperledger/cactus-common";
 import type {
   IEndpointAuthzOptions,
@@ -20,8 +21,6 @@ import { PluginPersistenceEthereum } from "../plugin-persistence-ethereum";
 import OAS from "../../json/openapi.json";
 
 import type { Express, Request, Response } from "express";
-import safeStringify from "fast-safe-stringify";
-import sanitizeHtml from "sanitize-html";
 
 export interface IStatusEndpointV1Options {
   logLevel?: LogLevelDesc;
@@ -98,30 +97,12 @@ export class StatusEndpointV1 implements IWebServiceEndpoint {
     try {
       const resBody = this.options.connector.getStatus();
       res.status(200).json(resBody);
-    } catch (error: unknown) {
-      this.log.error(`Crash while serving ${reqTag}:`, error);
-
-      if (error instanceof Error) {
-        const status = 500;
-        const message = "Internal Server Error";
-        this.log.info(`${message} [${status}]`);
-        res.status(status).json({
-          message,
-          error: sanitizeHtml(error.stack || error.message, {
-            allowedTags: [],
-            allowedAttributes: {},
-          }),
-        });
-      } else {
-        this.log.warn("Unexpected exception that is not instance of Error!");
-        res.status(500).json({
-          message: "Unexpected Error",
-          error: sanitizeHtml(safeStringify(error), {
-            allowedTags: [],
-            allowedAttributes: {},
-          }),
-        });
-      }
+    } catch (ex) {
+      this.log.warn(`Crash while serving ${reqTag}`, ex);
+      res.status(500).json({
+        message: "Internal Server Error",
+        error: safeStringifyException(ex),
+      });
     }
   }
 }

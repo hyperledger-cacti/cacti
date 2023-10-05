@@ -636,7 +636,6 @@ export class PluginLedgerConnectorEthereum
 
     const method = methodRef(...req.params);
     if (req.invocationType === EthContractInvocationType.Call) {
-      contractInstance.methods[req.methodName];
       const callOutput = await method.call();
       const success = true;
       return { success, callOutput };

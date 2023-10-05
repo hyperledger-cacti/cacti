@@ -2,7 +2,13 @@
  * Base class for calling ethereum token contract methods.
  */
 
-import type { SocketIOApiClient } from "@hyperledger/cactus-api-client";
+import {
+  ContractJSON,
+  DeployedContractJsonDefinition,
+  EthContractInvocationType,
+  EthereumApiClient,
+  Web3SigningCredentialType,
+} from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
 import {
   Checks,
   Logger,
@@ -12,19 +18,12 @@ import {
 import { RuntimeError } from "run-time-error";
 import { getRuntimeErrorCause } from "../utils";
 
-export type EthereumContractMethodType =
-  | "call"
-  | "send"
-  | "estimateGas"
-  | "encodeABI";
-
 /**
  * Base class for calling ethereum token contract methods.
  * Can be extended by other, token specific classes.
  */
 export default class TokenClient {
-  private apiClient: SocketIOApiClient;
-  protected contract: { abi: unknown; address: string };
+  protected contract: DeployedContractJsonDefinition;
   protected log: Logger;
   public static readonly CLASS_NAME: string = "TokenClient";
 
@@ -37,8 +36,8 @@ export default class TokenClient {
   }
 
   constructor(
-    apiClient: SocketIOApiClient,
-    abi: unknown,
+    private apiClient: EthereumApiClient,
+    abi: ContractJSON,
     address: string,
     logLevel: LogLevelDesc = "info",
   ) {
@@ -50,8 +49,8 @@ export default class TokenClient {
     this.apiClient = apiClient;
 
     this.contract = {
-      abi,
-      address,
+      contractJSON: abi as ContractJSON,
+      contractAddress: address,
     };
 
     this.log = LoggerProvider.getOrCreate({
@@ -64,41 +63,48 @@ export default class TokenClient {
    * Call specific contract method with some args.
    * Throws on error.
    *
-   * @param type method execution type (`call`, `send`, etc...)
+   * @param type method execution type (only `call` supported for now)
    * @param method contract method name
    * @param ...args contract method arguments (any number)
    * @returns response from the method execution.
    */
   protected async contractMethod(
-    type: EthereumContractMethodType,
+    type: EthContractInvocationType,
     method: string,
     ...args: unknown[]
   ): Promise<unknown> {
     this.log.debug(`Execute contract method ${method} using '${type}'`);
 
+    if (type !== EthContractInvocationType.Call) {
+      throw new Error("Only Call execution method is supported for now!");
+    }
+
     try {
-      const reqMethod = {
-        type: "contract",
-        command: method,
-        function: type,
-      };
-      const reqArgs = { args: args };
-
-      const response = await this.apiClient.sendSyncRequest(
-        this.contract,
-        reqMethod,
-        reqArgs,
+      const response = await this.apiClient.invokeContractV1({
+        contract: this.contract,
+        invocationType: type,
+        methodName: method,
+        params: args,
+        web3SigningCredential: {
+          // Credentials not needed when using "Call" execution method
+          type: Web3SigningCredentialType.None,
+        },
+      });
+      this.log.debug(
+        "Executing contract method status:",
+        response.statusText,
+        "success:",
+        response.data.success,
       );
-      this.log.debug("Executing contract method status:", response.status);
 
-      if (response.status != 200) {
-        throw new Error(response);
+      if (response.status != 200 || !response.data.success) {
+        throw new Error(response.data.callOutput);
       }
 
-      return response.data;
+      return response.data.callOutput;
     } catch (err: unknown) {
       throw new RuntimeError(
-        `Calling contract method ${method} with args ${args} failed`,
+        `Calling contract method ${method} with args '${args}' failed`,
         getRuntimeErrorCause(err),
       );
     }
@@ -106,6 +112,7 @@ export default class TokenClient {
 
   /**
    * Execute method on a contract using `call`
+   *
    * @param method contract method name
    * @param ...args contract method arguments (any number)
    * @returns response from the method execution.
@@ -114,19 +121,10 @@ export default class TokenClient {
     method: string,
     ...args: unknown[]
   ): Promise<unknown> {
-    return await this.contractMethod("call", method, ...args);
-  }
-
-  /**
-   * Execute method on a contract using `send`
-   * @param method contract method name
-   * @param ...args contract method arguments (any number)
-   * @returns response from the method execution.
-   */
-  protected async sendContractMethod(
-    method: string,
-    ...args: unknown[]
-  ): Promise<unknown> {
-    return await this.contractMethod("send", method, ...args);
+    return await this.contractMethod(
+      EthContractInvocationType.Call,
+      method,
+      ...args,
+    );
   }
 }

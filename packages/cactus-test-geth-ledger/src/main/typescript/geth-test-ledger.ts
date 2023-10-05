@@ -262,9 +262,9 @@ export class GethTestLedger {
    *
    * Uses `web3.eth.accounts.create`
    *
-   * @param [seedMoney=10e8] The amount of money to seed the new test account with.
+   * @param [seedMoney=10e18 (1ETH)] The amount of money to seed the new test account with.
    */
-  public async createEthTestAccount(seedMoney = 10e8): Promise<Web3Account> {
+  public async createEthTestAccount(seedMoney = 10e18): Promise<Web3Account> {
     const ethTestAccount = this.web3.eth.accounts.create();
 
     const receipt = await this.transferAssetFromCoinbase(
@@ -289,7 +289,7 @@ export class GethTestLedger {
    * @returns New account address
    */
   public async newEthPersonalAccount(
-    seedMoney = 10e8,
+    seedMoney = 10e18,
     password = "test",
   ): Promise<string> {
     const account = await this.web3.eth.personal.newAccount(password);
@@ -321,6 +321,7 @@ export class GethTestLedger {
         from: WHALE_ACCOUNT_ADDRESS,
         to: targetAccount,
         value: value,
+        gasPrice: await this.web3.eth.getGasPrice(),
         gas: 1000000,
       },
       WHALE_ACCOUNT_PRIVATE_KEY,
@@ -358,7 +359,8 @@ export class GethTestLedger {
       {
         from: WHALE_ACCOUNT_ADDRESS,
         data: contractTx.encodeABI(),
-        gas: 8000000, // Max possible gas
+        gasPrice: await this.web3.eth.getGasPrice(),
+        gasLimit: 8000000,
         nonce: await this.web3.eth.getTransactionCount(WHALE_ACCOUNT_ADDRESS),
       },
       WHALE_ACCOUNT_PRIVATE_KEY,

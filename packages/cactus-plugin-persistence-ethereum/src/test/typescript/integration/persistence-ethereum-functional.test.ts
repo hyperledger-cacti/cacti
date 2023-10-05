@@ -8,12 +8,8 @@
 
 const testLogLevel: LogLevelDesc = "info";
 const sutLogLevel: LogLevelDesc = "info";
-const setupTimeout = 1000 * 60; // 1 minute timeout for setup
-const testTimeout = 1000 * 60 * 3; // 3 minutes timeout for some async tests
-
-// Ledger settings
-const imageName = "openethereum/openethereum";
-const imageVersion = "v3.3.5";
+const setupTimeout = 1000 * 60 * 3; // 3 minutes timeout for setup
+const testTimeout = 1000 * 60 * 5; // 5 minutes timeout for some async tests
 
 // Token details (read from contract)
 const erc20TokenName = "TestERC20";
@@ -22,21 +18,46 @@ const erc20TokenSupply = 1000;
 const erc721TokenName = "TestErc721Token";
 const erc721TokenSymbol = "T721";
 
-// ApiClient settings
-const syncReqTimeout = 1000 * 5; // 5 seconds
+// Geth environment
+const containerImageName = "ghcr.io/hyperledger/cacti-geth-all-in-one";
+const containerImageVersion = "2023-07-27-2a8c48ed6";
 
 import {
   LogLevelDesc,
   LoggerProvider,
   Logger,
+  Servers,
 } from "@hyperledger/cactus-common";
+import { PluginRegistry } from "@hyperledger/cactus-core";
+import { Configuration, Constants } from "@hyperledger/cactus-core-api";
 import {
-  OpenEthereumTestLedger,
-  pruneDockerAllIfGithubAction,
-  SelfSignedPkiGenerator,
-  K_DEV_WHALE_ACCOUNT_PRIVATE_KEY,
-} from "@hyperledger/cactus-test-tooling";
-import { SocketIOApiClient } from "@hyperledger/cactus-api-client";
+  GethTestLedger,
+  WHALE_ACCOUNT_PRIVATE_KEY,
+} from "@hyperledger/cactus-test-geth-ledger";
+import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+import {
+  EthereumApiClient,
+  PluginLedgerConnectorEthereum,
+  WatchBlocksV1BlockData,
+} from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
+import { pruneDockerAllIfGithubAction } from "@hyperledger/cactus-test-tooling";
+
+import "jest-extended";
+import http from "http";
+import { AddressInfo } from "net";
+import express from "express";
+import bodyParser from "body-parser";
+import { Server as SocketIoServer } from "socket.io";
+import { v4 as uuidV4 } from "uuid";
+import Web3, {
+  ContractAbi,
+  FMT_BYTES,
+  FMT_NUMBER,
+  TransactionReceipt,
+  Web3BaseWalletAccount,
+} from "web3";
+import { Web3Account } from "web3-eth-accounts";
+import { checkAddressCheckSum } from "web3-validator";
 
 import DatabaseClient from "../../../main/typescript/db-client/db-client";
 jest.mock("../../../main/typescript/db-client/db-client");
@@ -45,13 +66,6 @@ import { PluginPersistenceEthereum } from "../../../main/typescript";
 import TestERC20ContractJson from "../../solidity/TestERC20.json";
 import TestERC721ContractJson from "../../solidity/TestERC721.json";
 
-import "jest-extended";
-import Web3 from "web3";
-import express from "express";
-import { Server as HttpsServer } from "https";
-import { Account, TransactionReceipt } from "web3-core";
-import { AbiItem } from "web3-utils";
-
 // Logger setup
 const log: Logger = LoggerProvider.getOrCreate({
   label: "persistence-ethereum-functional.test",
@@ -59,93 +73,145 @@ const log: Logger = LoggerProvider.getOrCreate({
 });
 
 describe("Ethereum persistence plugin tests", () => {
-  let ledger: OpenEthereumTestLedger;
+  let ledger: GethTestLedger;
   let web3: Web3;
-  let connectorCertValue: string;
-  let connectorPrivKeyValue: string;
-  let connectorServer: HttpsServer;
-  let constTestAcc: Account;
-  const constTestAccBalance = 5 * 1000000;
+  let constTestAcc: Web3Account;
+  const constTestAccBalance = 2 * 10e18;
   let instanceId: string;
   let persistence: PluginPersistenceEthereum;
   let dbClientInstance: any;
   let defaultAccountAddress: string;
-  let apiClient: SocketIOApiClient;
-  let connectorModule: any;
   let erc20ContractCreationReceipt: Required<TransactionReceipt>;
   let erc721ContractCreationReceipt: Required<TransactionReceipt>;
+
+  /**
+   * Replace bigint to print web3js outputs in test.
+   */
+  function stringifyBigIntReplacer(
+    _key: string,
+    value: bigint | unknown,
+  ): string | unknown {
+    if (typeof value === "bigint") {
+      return value.toString();
+    }
+    return value;
+  }
+
+  const expressAppConnector = express();
+  expressAppConnector.use(bodyParser.json({ limit: "250mb" }));
+  expressAppConnector.set("json replacer", stringifyBigIntReplacer);
+  const connectorServer = http.createServer(expressAppConnector);
+  const connectorWsApi = new SocketIoServer(connectorServer, {
+    path: Constants.SocketIoConnectionPathV1,
+  });
+  let connector: PluginLedgerConnectorEthereum;
 
   //////////////////////////////////
   // Helper Functions
   //////////////////////////////////
 
   async function deploySmartContract(
-    abi: AbiItem | AbiItem[],
+    abi: ContractAbi,
     bytecode: string,
     args?: unknown[],
   ): Promise<Required<TransactionReceipt>> {
-    const txReceipt = await ledger.deployContract(abi, "0x" + bytecode, args);
-    expect(txReceipt.contractAddress).toBeTruthy();
-    expect(txReceipt.status).toBeTrue();
-    expect(txReceipt.blockHash).toBeTruthy();
-    expect(txReceipt.blockNumber).toBeGreaterThan(0);
-    log.debug(
-      "Deployed test smart contract, TX on block number",
-      txReceipt.blockNumber,
-    );
-    // Force response without optional fields
-    return txReceipt as Required<TransactionReceipt>;
+    try {
+      const txReceipt = await ledger.deployContract(abi, "0x" + bytecode, args);
+      log.debug("deploySmartContract txReceipt:", txReceipt);
+      expect(txReceipt.contractAddress).toBeTruthy();
+      expect(Number(txReceipt.status)).toEqual(1);
+      expect(txReceipt.blockHash).toBeTruthy();
+      log.debug(
+        "Deployed test smart contract, TX on block number",
+        txReceipt.blockNumber,
+      );
+      // Force response without optional fields
+      return txReceipt as Required<TransactionReceipt>;
+    } catch (error) {
+      log.error("deploySmartContract ERROR", error);
+      throw error;
+    }
   }
 
   async function mintErc721Token(
     targetAddress: string,
     tokenId: number,
   ): Promise<unknown> {
-    log.info(`Mint ERC721 token ID ${tokenId} for address ${targetAddress}`);
+    try {
+      log.info(
+        `Mint ERC721 token ID ${tokenId} for address ${targetAddress} by ${defaultAccountAddress}`,
+      );
 
-    const tokenContract = new web3.eth.Contract(
-      TestERC721ContractJson.abi as AbiItem[],
-      erc721ContractCreationReceipt.contractAddress,
-    );
+      const tokenContract = new web3.eth.Contract(
+        TestERC721ContractJson.abi,
+        erc721ContractCreationReceipt.contractAddress,
+      );
 
-    const mintResponse = await tokenContract.methods
-      .safeMint(targetAddress, tokenId)
-      .send({
-        from: defaultAccountAddress,
-        gas: 8000000,
-      });
-    log.debug("mintResponse:", mintResponse);
-    expect(mintResponse).toBeTruthy();
-    expect(mintResponse.status).toBeTrue();
+      const mintResponse = await (tokenContract.methods as any)
+        .safeMint(targetAddress, tokenId)
+        .send({
+          from: defaultAccountAddress,
+          gas: 8000000,
+        });
+      log.debug("mintErc721Token mintResponse:", mintResponse);
+      expect(mintResponse).toBeTruthy();
+      expect(Number(mintResponse.status)).toEqual(1);
 
-    return mintResponse;
+      return mintResponse;
+    } catch (error) {
+      log.error("mintErc721Token ERROR", error);
+      throw error;
+    }
   }
 
+  /**
+   * For some reasons Contract doesn't detect additional (non whale) identities even if they are in web3js wallet.
+   * Because of that we sign and send transaction manually.
+   */
   async function transferErc721Token(
     sourceAddress: string,
     targetAddress: string,
     tokenId: number,
   ): Promise<unknown> {
-    log.info(
-      `Transfer ERC721 with ID ${tokenId} from ${sourceAddress} to ${targetAddress}`,
-    );
+    try {
+      log.info(
+        `Transfer ERC721 with ID ${tokenId} from ${sourceAddress} to ${targetAddress}`,
+      );
 
-    const tokenContract = new web3.eth.Contract(
-      TestERC721ContractJson.abi as AbiItem[],
-      erc721ContractCreationReceipt.contractAddress,
-    );
+      const tokenContract = new web3.eth.Contract(
+        TestERC721ContractJson.abi,
+        erc721ContractCreationReceipt.contractAddress,
+      );
+      const methodAbi = await (tokenContract.methods as any)
+        .transferFrom(sourceAddress, targetAddress, tokenId)
+        .encodeABI();
 
-    const transferResponse = await tokenContract.methods
-      .transferFrom(sourceAddress, targetAddress, tokenId)
-      .send({
+      const srcAccount = web3.eth.accounts.wallet.get(
+        sourceAddress,
+      ) as Web3BaseWalletAccount;
+      const signedTx = await srcAccount.signTransaction({
         from: sourceAddress,
-        gas: 8000000,
+        to: erc721ContractCreationReceipt.contractAddress,
+        data: methodAbi,
+        gasPrice: await web3.eth.getGasPrice(),
+        gasLimit: 8000000,
       });
-    log.debug("transferResponse:", transferResponse);
-    expect(transferResponse).toBeTruthy();
-    expect(transferResponse.status).toBeTrue();
 
-    return transferResponse;
+      if (!signedTx.rawTransaction) {
+        throw new Error(`Signing transaction failed, reason unknown.`);
+      }
+
+      const transferResponse = await web3.eth.sendSignedTransaction(
+        signedTx.rawTransaction,
+      );
+      log.debug("transferErc721Token transferResponse:", transferResponse);
+      expect(transferResponse).toBeTruthy();
+      expect(Number(transferResponse.status)).toEqual(1);
+      return transferResponse;
+    } catch (error) {
+      log.error("transferErc721Token ERROR", error);
+      throw error;
+    }
   }
 
   /**
@@ -193,136 +259,92 @@ describe("Ethereum persistence plugin tests", () => {
     await pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
 
     // Create test ledger
-    log.info(`Start Ledger ${imageName}:${imageVersion}...`);
-    ledger = new OpenEthereumTestLedger({
-      imageName,
-      imageVersion,
-      emitContainerLogs: true,
-      logLevel: sutLogLevel,
+    log.info(`Start Ledger ${containerImageName}:${containerImageVersion}...`);
+    ledger = new GethTestLedger({
+      containerImageName,
+      containerImageVersion,
     });
     await ledger.start();
-    const ledgerRpcUrl = await ledger.getRpcApiWebSocketHost();
-    log.info(`Ledger started, RPC: ${ledgerRpcUrl}`);
+    const rpcApiHttpHost = await ledger.getRpcApiHttpHost();
+    const rpcApiWsHost = await ledger.getRpcApiWebSocketHost();
+    log.info(`Ledger started, RPC: ${rpcApiHttpHost} WS: ${rpcApiWsHost}`);
 
     // Create Test Account
     constTestAcc = await ledger.createEthTestAccount(constTestAccBalance);
 
     // Create Web3 provider for testing
-    web3 = new Web3();
-    web3.setProvider(new Web3.providers.WebsocketProvider(ledgerRpcUrl));
+    web3 = new Web3(rpcApiHttpHost);
     const account = web3.eth.accounts.privateKeyToAccount(
-      "0x" + K_DEV_WHALE_ACCOUNT_PRIVATE_KEY,
+      "0x" + WHALE_ACCOUNT_PRIVATE_KEY,
     );
-    web3.eth.accounts.wallet.add(account);
     web3.eth.accounts.wallet.add(constTestAcc);
+    web3.eth.accounts.wallet.add(account);
     defaultAccountAddress = account.address;
-    web3.eth.defaultAccount = defaultAccountAddress;
 
-    // Generate connector private key and certificate
-    const pkiGenerator = new SelfSignedPkiGenerator();
-    const pki = pkiGenerator.create("localhost");
-    connectorPrivKeyValue = pki.privateKeyPem;
-    connectorCertValue = pki.certificatePem;
-    const jwtAlgo = "RS512";
+    const addressInfo = (await Servers.listen({
+      hostname: "0.0.0.0",
+      port: 0,
+      server: connectorServer,
+    })) as AddressInfo;
+    const { address, port } = addressInfo;
+    const apiHost = `http://${address}:${port}`;
 
-    // Load go-ethereum connector
-    const connectorConfig: any = {
-      sslParam: {
-        port: 0, // random port
-        keyValue: connectorPrivKeyValue,
-        certValue: connectorCertValue,
-        jwtAlgo: jwtAlgo,
-      },
+    const keychainPlugin = new PluginKeychainMemory({
+      instanceId: uuidV4(),
+      keychainId: uuidV4(),
+      backend: new Map([]),
+      logLevel: testLogLevel,
+    });
+    connector = new PluginLedgerConnectorEthereum({
+      instanceId: uuidV4(),
+      rpcApiHttpHost,
+      rpcApiWsHost,
       logLevel: sutLogLevel,
-      ledgerUrl: ledgerRpcUrl,
-    };
-    const configJson = JSON.stringify(connectorConfig);
-    log.debug("Connector Config:", configJson);
+      pluginRegistry: new PluginRegistry({ plugins: [keychainPlugin] }),
+    });
+    await connector.getOrCreateWebServices();
+    await connector.registerWebServices(expressAppConnector, connectorWsApi);
 
-    log.info("Export connector config before loading the module...");
-    process.env["NODE_CONFIG"] = configJson;
-
-    // Load connector module
-    connectorModule = await import(
-      "@hyperledger/cactus-plugin-ledger-connector-go-ethereum-socketio"
-    );
-
-    // Run the connector
-    connectorServer = await connectorModule.startGoEthereumSocketIOConnector();
-    expect(connectorServer).toBeTruthy();
-    const connectorAddress = connectorServer.address();
-    if (!connectorAddress || typeof connectorAddress === "string") {
-      throw new Error("Unexpected go-ethereum connector AddressInfo type");
-    }
-    const connectorFullAddress = `${connectorAddress.address}:${connectorAddress.port}`;
-    log.info(
-      "Go-Ethereum-SocketIO Connector started on:",
-      connectorFullAddress,
-    );
-
-    // Create ApiClient instance
-    const apiConfigOptions = {
-      validatorID: "go-eth-socketio-test",
-      validatorURL: `https://localhost:${connectorAddress.port}`,
-      validatorKeyValue: connectorCertValue,
-      logLevel: sutLogLevel,
-      maxCounterRequestID: 1000,
-      syncFunctionTimeoutMillisecond: syncReqTimeout,
-      socketOptions: {
-        rejectUnauthorized: false,
-        reconnection: false,
-        timeout: syncReqTimeout * 2,
-      },
-    };
-    log.debug("ApiClient config:", apiConfigOptions);
-    apiClient = new SocketIOApiClient(apiConfigOptions);
+    const apiConfig = new Configuration({ basePath: apiHost });
+    const apiClient = new EthereumApiClient(apiConfig);
 
     // Create Ethereum persistence plugin
     instanceId = "functional-test";
     DatabaseClientMock.mockClear();
     persistence = new PluginPersistenceEthereum({
       apiClient,
-      logLevel: testLogLevel,
+      logLevel: sutLogLevel,
       instanceId,
       connectionString: "db-is-mocked",
     });
     expect(DatabaseClientMock).toHaveBeenCalledTimes(1);
     dbClientInstance = DatabaseClientMock.mock.instances[0];
     expect(dbClientInstance).toBeTruthy();
-
-    const expressApp = express();
-    expressApp.use(express.json({ limit: "250mb" }));
-
-    await persistence.registerWebServices(expressApp);
   }, setupTimeout);
 
   afterAll(async () => {
     log.info("FINISHING THE TESTS");
 
     if (persistence) {
+      log.info("Stop persistence plugin...");
       await persistence.shutdown();
     }
 
-    if (connectorModule) {
-      connectorModule.shutdown();
+    if (connectorServer) {
+      log.info("Stop connector http servers...");
+      await Servers.shutdown(connectorServer);
     }
 
-    if (connectorServer) {
-      log.info("Stop the ethereum connector...");
-      await new Promise<void>((resolve) =>
-        connectorServer.close(() => resolve()),
-      );
+    if (connector) {
+      log.info("Stop the connector...");
+      await connector.shutdown();
     }
 
     if (ledger) {
-      log.info("Stop the ethereum ledger...");
+      log.info("Stop ethereum ledger...");
       await ledger.stop();
       await ledger.destroy();
     }
-
-    // SocketIOApiClient has timeout running for each request which is not cancellable at the moment.
-    // Wait timeout amount of seconds to make sure all handles are closed.
-    await new Promise((resolve) => setTimeout(resolve, syncReqTimeout * 2));
 
     log.info("Prune Docker...");
     await pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
@@ -343,7 +365,7 @@ describe("Ethereum persistence plugin tests", () => {
   test("Sanity check ledger connection", async () => {
     const balance = await web3.eth.getBalance(constTestAcc.address);
     expect(balance).toBeTruthy();
-    expect(balance.valueOf()).toEqual(constTestAccBalance.toString());
+    expect(balance.toString()).toEqual(constTestAccBalance.toString());
   });
 
   test("Basic methods test", async () => {
@@ -366,10 +388,9 @@ describe("Ethereum persistence plugin tests", () => {
   describe("Basic plugin method tests", () => {
     beforeAll(async () => {
       // Deploy smart contracts
-      const erc20Abi = TestERC20ContractJson.abi as AbiItem[];
       const erc20Bytecode = TestERC20ContractJson.data.bytecode.object;
       erc20ContractCreationReceipt = await deploySmartContract(
-        erc20Abi,
+        TestERC20ContractJson.abi,
         erc20Bytecode,
         [erc20TokenSupply],
       );
@@ -378,10 +399,9 @@ describe("Ethereum persistence plugin tests", () => {
         erc20ContractCreationReceipt.contractAddress,
       );
 
-      const erc721Abi = TestERC721ContractJson.abi as AbiItem[];
       const erc721Bytecode = TestERC721ContractJson.data.bytecode.object;
       erc721ContractCreationReceipt = await deploySmartContract(
-        erc721Abi,
+        TestERC721ContractJson.abi,
         erc721Bytecode,
       );
       log.info(
@@ -411,7 +431,7 @@ describe("Ethereum persistence plugin tests", () => {
       expect(status).toBeTruthy();
       expect(status.instanceId).toEqual(instanceId);
       expect(status.connected).toBeTrue();
-      expect(status.webServicesRegistered).toBeTrue();
+      expect(status.webServicesRegistered).toBeFalse();
       expect(status.monitoredTokensCount).toEqual(2);
       expect(status.lastSeenBlock).toEqual(0);
     });
@@ -432,7 +452,7 @@ describe("Ethereum persistence plugin tests", () => {
       expect(token.address.toLowerCase()).toEqual(
         erc20ContractCreationReceipt.contractAddress.toLowerCase(),
       );
-      expect(web3.utils.checkAddressChecksum(token.address)).toBeTrue();
+      expect(checkAddressCheckSum(token.address)).toBeTrue();
       expect(token.name).toEqual(erc20TokenName);
       expect(token.symbol).toEqual(erc20TokenSymbol);
       expect(token.total_supply).toEqual(erc20TokenSupply);
@@ -472,7 +492,7 @@ describe("Ethereum persistence plugin tests", () => {
       expect(token.address.toLowerCase()).toEqual(
         erc721ContractCreationReceipt.contractAddress.toLowerCase(),
       );
-      expect(web3.utils.checkAddressChecksum(token.address)).toBeTrue();
+      expect(checkAddressCheckSum(token.address)).toBeTrue();
       expect(token.name).toEqual(erc721TokenName);
       expect(token.symbol).toEqual(erc721TokenSymbol);
     });
@@ -504,10 +524,9 @@ describe("Ethereum persistence plugin tests", () => {
   describe("Data synchronization tests", () => {
     beforeEach(async () => {
       // Deploy smart contracts
-      const erc20Abi = TestERC20ContractJson.abi as AbiItem[];
       const erc20Bytecode = TestERC20ContractJson.data.bytecode.object;
       erc20ContractCreationReceipt = await deploySmartContract(
-        erc20Abi,
+        TestERC20ContractJson.abi,
         erc20Bytecode,
         [erc20TokenSupply],
       );
@@ -516,10 +535,9 @@ describe("Ethereum persistence plugin tests", () => {
         erc20ContractCreationReceipt.contractAddress,
       );
 
-      const erc721Abi = TestERC721ContractJson.abi as AbiItem[];
       const erc721Bytecode = TestERC721ContractJson.data.bytecode.object;
       erc721ContractCreationReceipt = await deploySmartContract(
-        erc721Abi,
+        TestERC721ContractJson.abi,
         erc721Bytecode,
       );
       log.info(
@@ -560,10 +578,9 @@ describe("Ethereum persistence plugin tests", () => {
   describe("Block parsing and monitoring tests", () => {
     beforeEach(async () => {
       // Deploy smart contracts
-      const erc20Abi = TestERC20ContractJson.abi as AbiItem[];
       const erc20Bytecode = TestERC20ContractJson.data.bytecode.object;
       erc20ContractCreationReceipt = await deploySmartContract(
-        erc20Abi,
+        TestERC20ContractJson.abi,
         erc20Bytecode,
         [erc20TokenSupply],
       );
@@ -572,10 +589,9 @@ describe("Ethereum persistence plugin tests", () => {
         erc20ContractCreationReceipt.contractAddress,
       );
 
-      const erc721Abi = TestERC721ContractJson.abi as AbiItem[];
       const erc721Bytecode = TestERC721ContractJson.data.bytecode.object;
       erc721ContractCreationReceipt = await deploySmartContract(
-        erc721Abi,
+        TestERC721ContractJson.abi,
         erc721Bytecode,
       );
       log.info(
@@ -600,10 +616,16 @@ describe("Ethereum persistence plugin tests", () => {
       const mintTxBlock = await web3.eth.getBlock(
         mintResponse.blockNumber,
         true,
+        {
+          number: FMT_NUMBER.STR,
+          bytes: FMT_BYTES.HEX,
+        },
       );
 
       // Parse block data
-      await persistence.parseAndStoreBlockData(mintTxBlock);
+      await persistence.parseAndStoreBlockData(
+        mintTxBlock as WatchBlocksV1BlockData,
+      );
 
       // Check if DBClient was called
       const insertCalls = dbClientInstance.insertBlockData.mock.calls;
@@ -659,10 +681,16 @@ describe("Ethereum persistence plugin tests", () => {
       const transferTxBlock = await web3.eth.getBlock(
         tranferResponse.blockNumber,
         true,
+        {
+          number: FMT_NUMBER.STR,
+          bytes: FMT_BYTES.HEX,
+        },
       );
 
       // Parse block data
-      await persistence.parseAndStoreBlockData(transferTxBlock);
+      await persistence.parseAndStoreBlockData(
+        transferTxBlock as WatchBlocksV1BlockData,
+      );
 
       // Check if DBClient was called
       const insertCalls = dbClientInstance.insertBlockData.mock.calls;
