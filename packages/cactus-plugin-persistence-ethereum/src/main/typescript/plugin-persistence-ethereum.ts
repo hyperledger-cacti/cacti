@@ -14,14 +14,14 @@ import type {
   ICactusPlugin,
   ICactusPluginOptions,
 } from "@hyperledger/cactus-core-api";
-import type {
-  SocketIOApiClient,
-  SocketLedgerEvent,
-} from "@hyperledger/cactus-api-client";
+import {
+  EthereumApiClient,
+  WatchBlocksV1BlockData,
+} from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
 
-import ERC20_ABI from "../json/contract_abi/Erc20Token.json";
+import ERC20 from "../json/contract-abi/ERC20.json";
 import TokenClientERC20 from "./token-client/token-client-erc20";
-import ERC721_ABI from "../json/contract_abi/Erc721Full.json";
+import ERC721 from "../json/contract-abi/ERC721.json";
 import TokenClientERC721 from "./token-client/token-client-erc721";
 import OAS from "../json/openapi.json";
 import { getRuntimeErrorCause, normalizeAddress } from "./utils";
@@ -36,13 +36,11 @@ import {
   TokenTypeV1,
   TrackedOperationV1,
 } from "./generated/openapi/typescript-axios";
-
 import { RuntimeError } from "run-time-error";
 import { Interface as EthersInterface } from "@ethersproject/abi";
 import { Mutex } from "async-mutex";
 import { v4 as uuidv4 } from "uuid";
-import type { BlockTransactionObject } from "web3-eth";
-import type { Transaction, TransactionReceipt } from "web3-core";
+import type { TransactionInfo, TransactionReceipt } from "web3";
 import type { Express } from "express";
 import type { Subscription } from "rxjs";
 
@@ -51,7 +49,7 @@ import type { Subscription } from "rxjs";
  */
 export interface IPluginPersistenceEthereumOptions
   extends ICactusPluginOptions {
-  apiClient: SocketIOApiClient;
+  apiClient: EthereumApiClient;
   connectionString: string;
   logLevel: LogLevelDesc;
 }
@@ -67,15 +65,15 @@ export class PluginPersistenceEthereum
   public monitoredTokens = new Map<string, MonitoredToken>();
 
   private readonly instanceId: string;
-  private apiClient: SocketIOApiClient;
+  private apiClient: EthereumApiClient;
   private watchBlocksSubscription: Subscription | undefined;
   private dbClient: PostgresDatabaseClient;
   private log: Logger;
   private isConnected = false;
   private isWebServicesRegistered = false;
   private endpoints: IWebServiceEndpoint[] | undefined;
-  private ethersInterfaceERC721 = new EthersInterface(ERC721_ABI);
-  private ethersInterfaceERC20 = new EthersInterface(ERC20_ABI);
+  private ethersInterfaceERC721 = new EthersInterface(ERC721.abi);
+  private ethersInterfaceERC20 = new EthersInterface(ERC20.abi);
   private pushBlockMutex = new Mutex();
   private syncBlocksMutex = new Mutex();
   private syncTokenBalancesMutex = new Mutex();
@@ -171,12 +169,13 @@ export class PluginPersistenceEthereum
   private async getTransactionReceipt(
     txId: string,
   ): Promise<TransactionReceipt> {
-    const method = { type: "function", command: "getTransactionReceipt" };
-    const args = { args: [txId] };
-    const response = await this.apiClient.sendSyncRequest({}, method, args);
+    const response = await this.apiClient.invokeWeb3EthMethodV1({
+      methodName: "getTransactionReceipt",
+      params: [txId],
+    });
 
-    if (response && response.data && response.data.txReceipt) {
-      return response.data.txReceipt;
+    if (response && response.status === 200) {
+      return response.data.data;
     } else {
       throw new Error(
         `Could not get transaction receipt for transaction ID ${txId}`,
@@ -187,6 +186,8 @@ export class PluginPersistenceEthereum
   /**
    * Get block data from the ledger using the cactus connector.
    *
+   * @todo Add json-rpc proxy to connector and use it instead of invokeWeb3EthMethodV1
+   *
    * @param blockNumber number, hash or keyword description of a block to read.
    * @param returnTransactionObjects boolean flag to return full transaction object or just the hashes.
    * @returns block data (with transactions if `returnTransactionObjects` was true)
@@ -194,13 +195,21 @@ export class PluginPersistenceEthereum
   private async getBlockFromLedger(
     blockNumber: number | string,
     returnTransactionObjects = false,
-  ): Promise<BlockTransactionObject> {
-    const method = { type: "function", command: "getBlock" };
-    const args = { args: [blockNumber, returnTransactionObjects] };
-    const response = await this.apiClient.sendSyncRequest({}, method, args);
+  ): Promise<WatchBlocksV1BlockData> {
+    const response = await this.apiClient.invokeWeb3EthMethodV1({
+      methodName: "getBlock",
+      params: [
+        blockNumber,
+        returnTransactionObjects,
+        {
+          number: "NUMBER_STR",
+          bytes: "BYTES_HEX",
+        },
+      ],
+    });
 
-    if (response && response.data && response.data.blockData) {
-      return response.data.blockData;
+    if (response && response.status === 200) {
+      return response.data.data;
     } else {
       throw new Error(
         `Could not get block with number ${blockNumber} from the ledger`,
@@ -281,27 +290,27 @@ export class PluginPersistenceEthereum
    *
    * @param block `web3.js` block data object.
    */
-  private async pushNewBlock(block: BlockTransactionObject): Promise<void> {
+  private async pushNewBlock(block: WatchBlocksV1BlockData): Promise<void> {
     // Push one block at a time, in case previous block is still being processed
     // (example: filling the gap takes longer than expected)
     await this.pushBlockMutex.runExclusive(async () => {
       const previousBlockNumber = this.lastSeenBlock;
-
+      const blockNumber = parseInt(block.number, 10);
       try {
-        this.lastSeenBlock = block.number;
+        this.lastSeenBlock = blockNumber;
         await this.parseAndStoreBlockData(block);
       } catch (error: unknown) {
         this.log.warn(
           `Could not add new block #${block.number}, error:`,
           error,
         );
-        this.addFailedBlock(block.number);
+        this.addFailedBlock(blockNumber);
       }
 
-      const isGap = block.number - previousBlockNumber > 1;
+      const isGap = blockNumber - previousBlockNumber > 1;
       if (isGap) {
         const gapFrom = previousBlockNumber + 1;
-        const gapTo = block.number - 1;
+        const gapTo = blockNumber - 1;
         try {
           await this.syncBlocks(gapFrom, gapTo);
         } catch (error: unknown) {
@@ -336,13 +345,13 @@ export class PluginPersistenceEthereum
    * @returns name of the method or an empty string
    */
   private decodeTokenMethodName(
-    tx: Transaction,
+    tx: TransactionInfo,
     tokenType: TokenTypeV1,
   ): string {
     try {
       const tokenInterface = this.getEthersTokenInterface(tokenType);
       const decodedTx = tokenInterface.parseTransaction({
-        data: tx.input,
+        data: tx.input as string,
         value: tx.value,
       });
       return decodedTx.name;
@@ -369,8 +378,8 @@ export class PluginPersistenceEthereum
     const transferLogs = txReceipt.logs
       .map((l) =>
         tokenInterface.parseLog({
-          data: l.data,
-          topics: l.topics,
+          data: l.data as string,
+          topics: l.topics as string[],
         }),
       )
       .filter((ld) => ld.name === "Transfer");
@@ -405,11 +414,11 @@ export class PluginPersistenceEthereum
    * @returns parsed transaction data
    */
   private async parseBlockTransaction(
-    tx: Transaction,
+    tx: TransactionInfo,
   ): Promise<BlockDataTransactionInput> {
     this.log.debug("parseBlockTransaction(): Parsing ", tx.hash);
 
-    const txReceipt = await this.getTransactionReceipt(tx.hash);
+    const txReceipt = await this.getTransactionReceipt(tx.hash as string);
     let methodName = "";
     let tokenTransfers: BlockDataTransferInput[] = [];
 
@@ -425,12 +434,12 @@ export class PluginPersistenceEthereum
     }
 
     return {
-      hash: tx.hash,
-      index: txReceipt.transactionIndex,
+      hash: tx.hash as string,
+      index: parseInt(txReceipt.transactionIndex as string, 10),
       from: normalizeAddress(tx.from),
       to: normalizeAddress(tx.to ?? undefined),
-      eth_value: parseInt(tx.value, 10),
-      method_signature: tx.input.slice(0, 10),
+      eth_value: parseInt(tx.value as string, 10),
+      method_signature: (tx.input as string).slice(0, 10),
       method_name: methodName,
       token_transfers: tokenTransfers,
     };
@@ -563,7 +572,7 @@ export class PluginPersistenceEthereum
    * Close the connection to the DB, cleanup any allocated resources.
    */
   public async shutdown(): Promise<void> {
-    this.apiClient.close();
+    await this.stopMonitor();
     await this.dbClient.shutdown();
     this.isConnected = false;
   }
@@ -736,7 +745,7 @@ export class PluginPersistenceEthereum
     this.lastSeenBlock = await this.syncAll();
 
     const blocksObservable = this.apiClient.watchBlocksV1({
-      allBlocks: true,
+      getBlockData: true,
     });
 
     if (!blocksObservable) {
@@ -746,19 +755,16 @@ export class PluginPersistenceEthereum
     }
 
     this.watchBlocksSubscription = blocksObservable.subscribe({
-      next: async (event: unknown) => {
+      next: async (event) => {
         try {
           this.log.debug("Received new block.");
 
-          const ledgerEvent = event as SocketLedgerEvent;
-          if (!ledgerEvent || ledgerEvent.status !== 200) {
-            this.log.warn("Received invalid block ledger event:", ledgerEvent);
+          if (!event || !event.blockData) {
+            this.log.warn("Received invalid block ledger event:", event);
             return;
           }
 
-          const block =
-            ledgerEvent.blockData as unknown as BlockTransactionObject;
-          await this.pushNewBlock(block);
+          await this.pushNewBlock(event.blockData);
         } catch (error: unknown) {
           this.log.error("Unexpected error when pushing new block:", error);
         }
@@ -865,7 +871,7 @@ export class PluginPersistenceEthereum
    * @param block `web3.js` block object.
    */
   public async parseAndStoreBlockData(
-    block: BlockTransactionObject,
+    block: WatchBlocksV1BlockData,
   ): Promise<void> {
     try {
       // Note: Use batching / synchronous loop if there are performance issues for large blocks.
@@ -882,9 +888,9 @@ export class PluginPersistenceEthereum
 
       await this.dbClient.insertBlockData({
         block: {
-          number: block.number,
+          number: parseInt(block.number, 10),
           created_at: blockCreatedAt,
-          hash: block.hash,
+          hash: block.hash ?? "",
           number_of_tx: transactions.length,
         },
         transactions,
@@ -951,11 +957,12 @@ export class PluginPersistenceEthereum
       await this.syncFailedBlocks();
 
       const block = await this.getBlockFromLedger("latest");
-      await this.syncBlocks(1, block.number);
+      const blockNumber = parseInt(block.number, 10);
+      await this.syncBlocks(1, blockNumber);
 
       await this.syncTokenBalances(1);
 
-      return block.number;
+      return blockNumber;
     } finally {
       this.removeTrackedOperation(operationId);
     }

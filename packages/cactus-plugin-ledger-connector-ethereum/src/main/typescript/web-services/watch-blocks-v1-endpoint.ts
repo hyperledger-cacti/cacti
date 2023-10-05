@@ -80,13 +80,12 @@ export class WatchBlocksV1Endpoint {
             bytes: FMT_BYTES.HEX,
           },
         );
-
         next = {
           blockData: {
             ...web3BlockData,
             // Return with full tx objects is not detected, must manually force correct type
-            transactions:
-              web3BlockData.transactions as unknown as Web3Transaction[],
+            transactions: (web3BlockData.transactions ??
+              []) as unknown as Web3Transaction[],
           },
         };
       } else {
