@@ -13,11 +13,3 @@ ledgerPluginInfo:
     ledgerInfo:
       ledgerAbstract: Sawtooth Ledger
     apiInfo: []
-
-signTxInfo:
-  ethereum:
-    chainName: geth1
-    networkID: 10
-    chainID: 10
-    network: mainnet
-    hardfork: petersburg

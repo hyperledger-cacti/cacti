@@ -5,6 +5,8 @@ export {
   IPluginLedgerConnectorEthereumOptions,
 } from "./plugin-ledger-connector-ethereum";
 
+export * from "./sign-utils";
+
 export * from "./types/model-type-guards";
 
 export { PluginFactoryLedgerConnector } from "./plugin-factory-ledger-connector";

@@ -46,6 +46,7 @@ import {
   InvokeContractV1Request,
   DeployContractV1Request,
   ContractKeychainDefinition,
+  signTransaction,
 } from "../../../main/typescript/public-api";
 import { K_CACTI_ETHEREUM_TOTAL_TX_COUNT } from "../../../main/typescript/prometheus-exporter/metrics";
 
@@ -348,13 +349,12 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
     expect(invokeGetNameOut.data.callOutput).toBe(newName);
   });
 
-  test("invoke Web3SigningCredentialType.NONE", async () => {
+  test("invoke Web3SigningCredentialType.None", async () => {
     const testEthAccount2 = web3.eth.accounts.create();
 
     const value = 10e6;
-    const { rawTransaction } = await web3.eth.accounts.signTransaction(
+    const { serializedTransactionHex } = signTransaction(
       {
-        from: testEthAccount.address,
         to: testEthAccount2.address,
         value,
         maxPriorityFeePerGas: 0,
@@ -363,6 +363,11 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
         type: 2,
       },
       testEthAccount.privateKey,
+      {
+        networkId: 10,
+        chainId: 10,
+        defaultHardfork: "london",
+      },
     );
 
     await apiClient.runTransactionV1({
@@ -370,7 +375,7 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
         type: Web3SigningCredentialType.None,
       },
       transactionConfig: {
-        rawTransaction,
+        rawTransaction: serializedTransactionHex,
       },
     });
 

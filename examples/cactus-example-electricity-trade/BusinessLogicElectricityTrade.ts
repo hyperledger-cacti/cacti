@@ -126,7 +126,7 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
       {
         to: accountInfo["toAddress"],
         value: Number(transactionSubset["Value"]),
-        gas: config.electricityTradeInfo.ethereum.gas,
+        gasLimit: config.electricityTradeInfo.ethereum.gas,
       },
       accountInfo["fromAddress"],
       accountInfo["fromAddressPkey"],

@@ -147,6 +147,74 @@ args: {
 },
 ```
 
+### Offline signing utils
+- Use `signTransaction` from this package to sign transactions payload locally (outside of connector process).
+- Offline signed transaction can be send with `Web3SigningCredentialType.None` signing credetnial type in runTransactionV1 endpoint.
+
+``` typescript
+// Offline sign transaction
+const { serializedTransactionHex } = signTransaction(
+  {
+    to: anotherAccount,
+    value: 10e6,
+    maxPriorityFeePerGas: 0,
+    maxFeePerGas: 0x40000000,
+    gasLimit: 21000,
+    type: 2
+  },
+  myPrivateKey,
+  {
+    networkId: 10,
+    chainId: 10,
+    defaultHardfork: "london",
+  },
+);
+
+// Send transaction payload to connector
+await apiClient.runTransactionV1({
+  web3SigningCredential: {
+    type: Web3SigningCredentialType.None,
+  },
+  transactionConfig: {
+    rawTransaction: serializedTransactionHex,
+  },
+});
+```
+
+### Offline signing utils
+- Use `signTransaction` from this package to sign transactions payload locally (outside of connector process).
+- Offline signed transaction can be send with `Web3SigningCredentialType.None` signing credetnial type in runTransactionV1 endpoint.
+
+``` typescript
+// Offline sign transaction
+const { serializedTransactionHex } = signTransaction(
+  {
+    to: anotherAccount,
+    value: 10e6,
+    maxPriorityFeePerGas: 0,
+    maxFeePerGas: 0x40000000,
+    gasLimit: 21000,
+    type: 2
+  },
+  myPrivateKey,
+  {
+    networkId: 10,
+    chainId: 10,
+    defaultHardfork: "london",
+  },
+);
+
+// Send transaction payload to connector
+await apiClient.runTransactionV1({
+  web3SigningCredential: {
+    type: Web3SigningCredentialType.None,
+  },
+  transactionConfig: {
+    rawTransaction: serializedTransactionHex,
+  },
+});
+```
+
 ## JSON-RPC Proxy
 - Connector can be used with web3js to send any JSON-RPC request to the ethereum node.
 

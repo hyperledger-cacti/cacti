@@ -6,6 +6,13 @@ blpRegistry:
 
 logLevel: debug
 
+signTxInfo:
+  ethereum:
+    chainName: geth1
+    networkID: 10
+    chainID: 10
+    defaultHardfork: petersburg
+
 appRouters:
   -
     path: /api/v1/bl/electricity-trade/

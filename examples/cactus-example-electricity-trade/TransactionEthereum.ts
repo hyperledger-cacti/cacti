@@ -5,11 +5,11 @@
  * transaction-ethereum.ts
  */
 
+import { ConfigUtil } from "@hyperledger/cactus-cmd-socketio-server";
 import {
-  ConfigUtil,
-  TransactionSigner,
-} from "@hyperledger/cactus-cmd-socketio-server";
-import { Web3SigningCredentialType } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
+  Web3SigningCredentialType,
+  signTransaction,
+} from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
 
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
@@ -37,9 +37,15 @@ export async function sendEthereumTransaction(
   }
   logger.debug("sendEthereumTransaction", transaction);
 
-  const { serializedTx, txId } = TransactionSigner.signTxEthereum(
+  const { serializedTransactionHex, txId } = signTransaction(
     transaction,
     privateKey,
+    {
+      name: config.signTxInfo.ethereum.chainName,
+      chainId: config.signTxInfo.ethereum.chainID,
+      networkId: config.signTxInfo.ethereum.networkID,
+      defaultHardfork: config.signTxInfo.ethereum.defaultHardfork,
+    },
   );
   logger.info("Sending ethereum transaction with ID", txId);
 
@@ -48,7 +54,7 @@ export async function sendEthereumTransaction(
       type: Web3SigningCredentialType.None,
     },
     transactionConfig: {
-      rawTransaction: serializedTx,
+      rawTransaction: serializedTransactionHex,
     },
   });
 }

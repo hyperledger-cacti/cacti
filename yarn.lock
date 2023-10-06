@@ -4335,6 +4335,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ethereumjs/common@npm:4.0.0, @ethereumjs/common@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "@ethereumjs/common@npm:4.0.0"
+  dependencies:
+    "@ethereumjs/util": ^9.0.0
+    crc: ^4.3.2
+  checksum: 3fa2f6a55ff5a2406241fc1ffbdc6f60cfa139edaf9afac2164d25ca35e31a0d2901de40a517f42e5a466aab316f9187c5b787f33f3260e746b13209c910c67f
+  languageName: node
+  linkType: hard
+
 "@ethereumjs/common@npm:^2.3.0, @ethereumjs/common@npm:^2.4.0, @ethereumjs/common@npm:^2.6.1":
   version: 2.6.2
   resolution: "@ethereumjs/common@npm:2.6.2"
@@ -4374,6 +4384,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ethereumjs/rlp@npm:^5.0.0":
+  version: 5.0.0
+  resolution: "@ethereumjs/rlp@npm:5.0.0"
+  bin:
+    rlp: bin/rlp
+  checksum: 86d42f88945f25fc2874f80efc4d4c37cc85fc375920134392b658c0140346fb22b815e73680b87d1fea3ae55ad6ca42ea9fec7150583be496577b01bffb9e58
+  languageName: node
+  linkType: hard
+
 "@ethereumjs/tx@npm:3.3.2":
   version: 3.3.2
   resolution: "@ethereumjs/tx@npm:3.3.2"
@@ -4381,6 +4400,23 @@ __metadata:
     "@ethereumjs/common": ^2.5.0
     ethereumjs-util: ^7.1.2
   checksum: e18c871fa223fcb23af1c3dde0ff9c82c91e962556fd531e1c75df63afb3941dd71e3def733d8c442a80224c6dcefb256f169cc286176e6ffb33c19349189c53
+  languageName: node
+  linkType: hard
+
+"@ethereumjs/tx@npm:5.0.0":
+  version: 5.0.0
+  resolution: "@ethereumjs/tx@npm:5.0.0"
+  dependencies:
+    "@ethereumjs/common": ^4.0.0
+    "@ethereumjs/rlp": ^5.0.0
+    "@ethereumjs/util": ^9.0.0
+    ethereum-cryptography: ^2.1.2
+  peerDependencies:
+    c-kzg: ^2.1.0
+  peerDependenciesMeta:
+    c-kzg:
+      optional: true
+  checksum: 1f642781cca8251fb036ef9b77e95c8e3e8e7b1996d295e01f9875a581ccf25fa38eea270d032a8ab4cb1b6d716b50496b7400ccc37875b896912e6fd0300de8
   languageName: node
   linkType: hard
 
@@ -4412,6 +4448,21 @@ __metadata:
     ethereum-cryptography: ^2.0.0
     micro-ftch: ^0.3.1
   checksum: 9ae5dee8f12b0faf81cd83f06a41560e79b0ba96a48262771d897a510ecae605eb6d84f687da001ab8ccffd50f612ae50f988ef76e6312c752897f462f3ac08d
+  languageName: node
+  linkType: hard
+
+"@ethereumjs/util@npm:^9.0.0":
+  version: 9.0.0
+  resolution: "@ethereumjs/util@npm:9.0.0"
+  dependencies:
+    "@ethereumjs/rlp": ^5.0.0
+    ethereum-cryptography: ^2.1.2
+  peerDependencies:
+    c-kzg: ^2.1.0
+  peerDependenciesMeta:
+    c-kzg:
+      optional: true
+  checksum: c0e2a50aac614a8167df060f0fe6d7b9805adebd83df81a26b596c92eb76454e2e6f25d8f5b9e49cb629355020a8a07feb4d6c1b8238990dcf82e256153bf328
   languageName: node
   linkType: hard
 
@@ -6475,6 +6526,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger/cactus-plugin-ledger-connector-ethereum@workspace:packages/cactus-plugin-ledger-connector-ethereum"
   dependencies:
+    "@ethereumjs/common": 4.0.0
+    "@ethereumjs/tx": 5.0.0
     "@hyperledger/cactus-common": 2.0.0-alpha.2
     "@hyperledger/cactus-core": 2.0.0-alpha.2
     "@hyperledger/cactus-core-api": 2.0.0-alpha.2
@@ -17338,6 +17391,18 @@ __metadata:
   bin:
     crc32: bin/crc32.njs
   checksum: ad2d0ad0cbd465b75dcaeeff0600f8195b686816ab5f3ba4c6e052a07f728c3e70df2e3ca9fd3d4484dc4ba70586e161ca5a2334ec8bf5a41bf022a6103ff243
+  languageName: node
+  linkType: hard
+
+"crc@npm:^4.3.2":
+  version: 4.3.2
+  resolution: "crc@npm:4.3.2"
+  peerDependencies:
+    buffer: ">=6.0.3"
+  peerDependenciesMeta:
+    buffer:
+      optional: true
+  checksum: 8231cc25331727083ffd22da3575110fc49b4dc8725de973bd43261d4426aba134ed3a75cc247f7c5e97a6e171f87dffc3325b82890e86d032de2e6bcef09c32
   languageName: node
   linkType: hard
 
