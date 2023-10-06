@@ -593,7 +593,7 @@ export class ApiServer {
     const { "/api/v1/api-server/healthcheck": oasPath } = OAS.paths;
     const { http } = oasPath.get["x-hyperledger-cactus"];
     const { path: httpPath, verbLowerCase: httpVerb } = http;
-    (app as any)[httpVerb](httpPath, healthcheckHandler);
+    (app as express.Express)[httpVerb as keyof express.Express](httpPath, healthcheckHandler);
 
     this.wsApi.on("connection", (socket: SocketIoSocket) => {
       const { id } = socket;
@@ -628,7 +628,7 @@ export class ApiServer {
       oasPathPrometheus.get["x-hyperledger-cactus"];
     const { path: httpPathPrometheus, verbLowerCase: httpVerbPrometheus } =
       httpPrometheus;
-    (app as any)[httpVerbPrometheus](
+    (app as express.Express)[httpVerbPrometheus as keyof express.Express](
       httpPathPrometheus,
       prometheusExporterHandler,
     );
