@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+use log::debug;
+use log::info;
 // Internal generated modules
 use weaverpb::networks::networks::network_server::NetworkServer;
 use weaverpb::relay::datatransfer::data_transfer_server::DataTransferServer;
@@ -38,7 +40,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!("Using default config `config/Settings`");
         "config/Settings".to_string()
     });
+    let log_level = env::var("RUST_LOG").unwrap_or_else(|_| {
+        println!("Using default log level"); 
+        return "debug".to_string();
+    });
+    println!("Log level: {}", log_level);
 
+    // Set the RUST_LOG environment variable
+    env::set_var("RUST_LOG", &log_level);
+
+    // Initialize the logger
+    env_logger::init();
+    
     settings
         .merge(config::File::with_name(&config_file_name))
         .unwrap()
@@ -47,7 +60,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .unwrap();
 
     let relay_name = settings.get_str("name").expect("No Relay name provided");
-    println!("Relay Name: {:?}", relay_name);
+    info!("Relay Name: {:?}", relay_name);
     let relay_port = settings.get_str("port").expect(&format!("Port does not exist for relay name {}. Make sure the config file <{}> has the name and port specified.", relay_name, config_file_name.to_string()));
     let host = settings
         .get_str("hostname")
@@ -75,9 +88,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let network = NetworkService {
         config_lock: RwLock::new(settings.clone()),
     };
-    println!("RelayServer listening on {}", addr);
+    info!("RelayServer listening on {}", addr);
     if with_tls == true {
-        println!("Starting Server with TLS");
+        debug!("Starting Server with TLS");
         let cert = tokio::fs::read(settings.get_str("cert_path").unwrap()).await?;
         let key = tokio::fs::read(settings.get_str("key_path").unwrap()).await?;
         let identity = Identity::from_pem(cert, key);
