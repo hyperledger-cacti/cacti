@@ -46,6 +46,7 @@ import { installOpenapiValidationMiddleware } from "@hyperledger/cactus-core";
 
 import {
   Bools,
+  isExpressHttpVerbMethodName,
   Logger,
   LoggerProvider,
   newRex,
@@ -563,6 +564,7 @@ export class ApiServer {
    * @param app
    */
   async getOrCreateWebServices(app: express.Express): Promise<void> {
+    const fnTag = `${this.className}#getOrCreateWebServices()}`;
     const { log } = this;
     const { logLevel } = this.options.config;
     const pluginRegistry = await this.getOrInitPluginRegistry();
@@ -595,10 +597,11 @@ export class ApiServer {
     const { "/api/v1/api-server/healthcheck": oasPath } = OAS.paths;
     const { http } = oasPath.get["x-hyperledger-cactus"];
     const { path: httpPath, verbLowerCase: httpVerb } = http;
-    (app as express.Express)[httpVerb as keyof express.Express](
-      httpPath,
-      healthcheckHandler,
-    );
+    if (!isExpressHttpVerbMethodName(httpVerb)) {
+      const eMsg = `${fnTag} Invalid HTTP verb "${httpVerb}" in cmd-api-server OpenAPI specification for HTTP path: "${httpPath}"`;
+      throw new RuntimeError(eMsg);
+    }
+    app[httpVerb](httpPath, healthcheckHandler);
 
     this.wsApi.on("connection", (socket: SocketIoSocket) => {
       const { id } = socket;
@@ -629,14 +632,19 @@ export class ApiServer {
     const {
       "/api/v1/api-server/get-prometheus-exporter-metrics": oasPathPrometheus,
     } = OAS.paths;
+
     const { http: httpPrometheus } =
       oasPathPrometheus.get["x-hyperledger-cactus"];
+
     const { path: httpPathPrometheus, verbLowerCase: httpVerbPrometheus } =
       httpPrometheus;
-    (app as express.Express)[httpVerbPrometheus as keyof express.Express](
-      httpPathPrometheus,
-      prometheusExporterHandler,
-    );
+
+    if (!isExpressHttpVerbMethodName(httpVerbPrometheus)) {
+      const eMsg = `${fnTag} Invalid HTTP verb "${httpVerbPrometheus}" in cmd-api-server OpenAPI specification for HTTP path: "${httpPathPrometheus}"`;
+      throw new RuntimeError(eMsg);
+    }
+
+    app[httpVerbPrometheus](httpPathPrometheus, prometheusExporterHandler);
   }
 
   async startGrpcServer(): Promise<AddressInfo> {
