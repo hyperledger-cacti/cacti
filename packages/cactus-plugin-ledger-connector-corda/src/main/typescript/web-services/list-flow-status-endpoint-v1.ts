@@ -28,7 +28,7 @@ import OAS from "../../json/openapi.json";
 export interface IFlowStatusEndpointV1Options {
   logLevel?: LogLevelDesc;
   apiUrl?: string;
-  holdingidentityshorthash: string;
+  holdingIDShortHash: string;
 }
 
 export class FlowStatusEndpointV1 implements IWebServiceEndpoint {
@@ -36,7 +36,7 @@ export class FlowStatusEndpointV1 implements IWebServiceEndpoint {
 
   private readonly log: Logger;
   private readonly apiUrl?: string;
-  //private readonly holdingidentityshorthash: string;
+  //private readonly holdingIDShortHash: string;
   //private readonly authorizationOptionsProvider: AuthorizationOptionsProvider;
   //private readonly apiUrl?: string;
 
@@ -66,10 +66,8 @@ export class FlowStatusEndpointV1 implements IWebServiceEndpoint {
     };
   }
 
-  public get oasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingidentityshorthash}"] {
-    return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingidentityshorthash}"
-    ];
+  public get oasPath(): typeof OAS.paths["/api/v1/flow/{holdingIDShortHash}"] {
+    return OAS.paths["/api/v1/flow/{holdingIDShortHash}"];
   }
 
   /**
@@ -125,9 +123,9 @@ export class FlowStatusEndpointV1 implements IWebServiceEndpoint {
   ): Promise<FlowStatusV5Response> {
     const apiConfig = new Configuration({ basePath: this.apiUrl });
     const apiClient = new DefaultApi(apiConfig);
-    //const holdingidentityshorthash = req.clientRequestId;
+    //const holdingIDShortHash = req.clientRequestId;
     const res = await apiClient.startFlowParameters(
-      this.options.holdingidentityshorthash,
+      this.options.holdingIDShortHash,
       req,
     );
     return res.data;

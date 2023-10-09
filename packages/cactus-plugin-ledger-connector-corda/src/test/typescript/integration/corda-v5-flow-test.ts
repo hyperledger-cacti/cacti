@@ -2,6 +2,8 @@ import test, { Test } from "tape-promise/tape";
 import { v4 as uuidv4 } from "uuid";
 import { AddressInfo } from "net";
 import "jest-extended";
+//import { Server as SecureServer } from "https";
+//import { AxiosRequestConfig } from "axios";
 
 import {
   CordaV5TestLedger,
@@ -23,17 +25,23 @@ import {
 } from "../../../main/typescript/plugin-ledger-connector-corda";
 import {
   DefaultApi as CordaApi,
+  Configuration,
   CPIIDV5,
   CPIV5Response,
+  DefaultApi,
 } from "../../../main/typescript/generated/openapi/typescript-axios/index";
-import { Configuration } from "@hyperledger/cactus-core-api";
+import axios, { AxiosRequestConfig } from "axios";
+//import { Configuration } from "@hyperledger/cactus-core-api";
 
 const testCase = "Tests are passing on the JVM side";
 const logLevel: LogLevelDesc = "TRACE";
 
+/* Working POST
 import express from "express";
 import bodyParser from "body-parser";
 import http from "http";
+*/
+import https from "https";
 
 test.onFailure(async () => {
   await Containers.logDiagnostics({ logLevel });
@@ -67,9 +75,9 @@ test("can get past logs of an account", async (t: Test) => {
     corDappsDir: "",
     logLevel,
     cordaVersion: CordaVersion.CORDA_V5,
-    apiUrl: "127.0.0.1:8888/api/v1",
+    apiUrl: "https://127.0.0.1:8888",
   });
-  const apiUrl = "127.0.0.1:8888/api/v1";
+  const apiUrl = "https://127.0.0.1:8888";
 
   //const expressApp = express();
   //expressApp.use(bodyParser.json({ limit: "250mb" }));
@@ -99,15 +107,28 @@ test("can get past logs of an account", async (t: Test) => {
     server,
   };
  */
-  const config = new Configuration({
-    basePath: apiUrl,
-    username: "admin",
-    password: "admin",
+  const customHttpsAgent = new https.Agent({
+    // Configure your custom settings here
+    rejectUnauthorized: false, // Example: Allow self-signed certificates (use with caution)
   });
-  const apiClient = new CordaApi(config);
 
-  //const response = await connector.startFlow();
-  //t.ok(cpi, "ok");
+  const username = "admin";
+  const password = "admin";
+  const axiosConfig: AxiosRequestConfig = {
+    baseURL: apiUrl,
+    headers: {
+      Authorization: `Basic ${Buffer.from(`${username}:${password}`).toString(
+        "base64",
+      )}`,
+    },
+    httpsAgent: customHttpsAgent,
+  };
+
+  //const apiConfig = new Configuration({ basePath: apiUrl });
+  //const apiClient = new CordaApi(apiConfig);
+  const axiosInstance = axios.create(axiosConfig);
+  const apiClient = new DefaultApi(undefined, apiUrl, axiosInstance);
+
   const container = cordaV5TestLedger.getContainer();
   const cmd = ["./gradlew", "listVNodes"];
   const timeout = 180000; // 3 minutes
@@ -129,6 +150,7 @@ test("can get past logs of an account", async (t: Test) => {
       return "err";
     }
   }
+
   const shortHashBob = extractShortHash("Bob");
   t.ok(shortHashBob, `Short hash ID for Bob: ${shortHashBob}`);
 
@@ -142,34 +164,38 @@ test("can get past logs of an account", async (t: Test) => {
   t.ok(shortHashAlice, `Short hash ID for Alice: ${shortHashAlice}`);
 
   const request = {
-    clientRequestId: "r1",
+    clientRequestId: "create-1",
     flowClassName:
-      "com.r3.developers.csdetemplate.flowexample.workflows.MyFirstFlow",
+      "com.r3.developers.csdetemplate.utxoexample.workflows.CreateNewChatFlow",
     requestBody: {
-      chatName: "Charlie",
+      chatName: "Chat with Bob",
       otherMember: "CN=Bob, OU=Test Dept, O=R3, L=London, C=GB",
-      message: "YourMessage",
+      message: "Hello Bob",
     },
   };
+
+  const listCPI = await apiClient.getCPIResponse();
+  t.ok(listCPI, "getCPIResponse truthy OK");
 
   const startflow = await apiClient.startFlowParameters(
     shortHashCharlie,
     request,
   );
-  t.ok(startflow.status, "ok!");
+  t.ok(startflow.status, "startFlowParameters OK");
+  const checkflow = await apiClient.flowStatusResponse(shortHashCharlie, "r1");
+  t.ok(checkflow.status, "flowStatusResponse OK");
   // TO FIX: Address and port checking is still having an issue because of
   // "--network host" parameters set during container creation
   //const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
   //const { address, port } = addressInfo;
+
+  // Working POST
   //const apiHost = `https://127.0.0.1:8888`;
   //const apiConfig = new Configuration({ basePath: apiHost });
   //const apiClient = new CordaApi(apiConfig);
   //const flowsRes1 = await apiClient.listFlowsV1();
   //t.ok(flowsRes1, "listFlowsV1() out truthy OK");
 
-  //const apiService = new cordaV5TestLedger();
-
-  //const idHash = "yourIdHash";
   //Testing using a created axios instance in plugin-ledger-connector-corda
   //TEST
   /*const request = {
@@ -189,9 +215,6 @@ test("can get past logs of an account", async (t: Test) => {
   */
   //const response = await connector.startFlow(shortHashCharlie, request);
   //t.ok(response.status, "ok!");
-  //const response = await connector.startFlow(idHash, param);
-  //t.ok(response.success, "New Flow Instance Initiated Successfully!");
-  //await.connector.
-  //await connector.registerWebServices(expressApp);
+
   t.end();
 });

@@ -15,7 +15,7 @@ import javax.validation.Valid
 /**
  * 
  * @param flowStatus 
- * @param holdingIdentityShortHash 
+ * @param holdingIDShortHash 
  * @param timestamp 
  * @param clientRequestId 
  * @param flowError 
@@ -26,7 +26,7 @@ data class FlowStatusV5Response(
 
     @field:JsonProperty("flowStatus", required = true) val flowStatus: kotlin.String,
 
-    @field:JsonProperty("holdingIdentityShortHash", required = true) val holdingIdentityShortHash: kotlin.String,
+    @field:JsonProperty("holdingIDShortHash", required = true) val holdingIDShortHash: kotlin.String,
 
     @field:JsonProperty("timestamp", required = true) val timestamp: java.time.OffsetDateTime,
 

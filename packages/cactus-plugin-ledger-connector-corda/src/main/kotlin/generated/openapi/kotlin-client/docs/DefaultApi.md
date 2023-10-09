@@ -7,15 +7,15 @@ Method | HTTP request | Description
 [**clearMonitorTransactionsV1**](DefaultApi.md#clearMonitorTransactionsV1) | **DELETE** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/clear-monitor-transactions | Clear transactions from internal store so they&#39;ll not be available by GetMonitorTransactionsV1 anymore.
 [**deployContractJarsV1**](DefaultApi.md#deployContractJarsV1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/deploy-contract-jars | Deploys a set of jar files (Cordapps, e.g. the contracts in Corda speak).
 [**diagnoseNodeV1**](DefaultApi.md#diagnoseNodeV1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/diagnose-node | 
-[**flowStatusResponse**](DefaultApi.md#flowStatusResponse) | **GET** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingidentityshorthash}/{clientrequestid} | This method gets the current status of the specified flow instance.
-[**flowStatusResponses**](DefaultApi.md#flowStatusResponses) | **GET** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingidentityshorthash} | This method returns an array containing the statuses of all flows running for a specified holding identity. An empty array is returned if there are no flows running.
-[**getCPIResponse**](DefaultApi.md#getCPIResponse) | **GET** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/cpi | List all CPIs uploaded to the cluster
+[**flowStatusResponse**](DefaultApi.md#flowStatusResponse) | **GET** /api/v1/flow/{holdingIDShortHash}/{clientRequestID} | This method gets the current status of the specified flow instance.
+[**flowStatusResponses**](DefaultApi.md#flowStatusResponses) | **GET** /api/v1/flow/{holdingIDShortHash} | This method returns an array containing the statuses of all flows running for a specified holding identity. An empty array is returned if there are no flows running.
+[**getCPIResponse**](DefaultApi.md#getCPIResponse) | **GET** /api/v1/cpi | List all CPIs uploaded to the cluster
 [**getMonitorTransactionsV1**](DefaultApi.md#getMonitorTransactionsV1) | **GET** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-monitor-transactions | Get transactions for monitored state classes.
 [**getPrometheusMetricsV1**](DefaultApi.md#getPrometheusMetricsV1) | **GET** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-prometheus-exporter-metrics | Get the Prometheus Metrics
 [**invokeContractV1**](DefaultApi.md#invokeContractV1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/invoke-contract | Invokes a contract on a Corda ledger (e.g. a flow)
 [**listFlowsV1**](DefaultApi.md#listFlowsV1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-flows | 
 [**networkMapV1**](DefaultApi.md#networkMapV1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/network-map | 
-[**startFlowParameters**](DefaultApi.md#startFlowParameters) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingidentityshorthash} | This method starts a new instance for the specified flow for the specified holding identity.
+[**startFlowParameters**](DefaultApi.md#startFlowParameters) | **POST** /api/v1/flow/{holdingIDShortHash} | This method starts a new instance for the specified flow for the specified holding identity.
 [**startMonitorV1**](DefaultApi.md#startMonitorV1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/start-monitor | Start monitoring corda changes (transactions) of given state class
 [**stopMonitorV1**](DefaultApi.md#stopMonitorV1) | **DELETE** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/stop-monitor | Stop monitoring corda changes (transactions) of given state class
 
@@ -157,144 +157,7 @@ No authorization required
  - **Content-Type**: application/json
  - **Accept**: application/json
 
-<<<<<<< HEAD
 <a id="getMonitorTransactionsV1"></a>
-=======
-<a name="flowStatusResponse"></a>
-# **flowStatusResponse**
-> FlowStatusV5Response flowStatusResponse(holdingidentityshorthash, clientrequestid)
-
-This method gets the current status of the specified flow instance.
-
-### Example
-```kotlin
-// Import classes:
-//import org.openapitools.client.infrastructure.*
-//import org.openapitools.client.models.*
-
-val apiInstance = DefaultApi()
-val holdingidentityshorthash : kotlin.String = holdingidentityshorthash_example // kotlin.String | Holding identity short hash
-val clientrequestid : kotlin.String = clientrequestid_example // kotlin.String | Client request ID
-try {
-    val result : FlowStatusV5Response = apiInstance.flowStatusResponse(holdingidentityshorthash, clientrequestid)
-    println(result)
-} catch (e: ClientException) {
-    println("4xx response calling DefaultApi#flowStatusResponse")
-    e.printStackTrace()
-} catch (e: ServerException) {
-    println("5xx response calling DefaultApi#flowStatusResponse")
-    e.printStackTrace()
-}
-```
-
-### Parameters
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **holdingidentityshorthash** | **kotlin.String**| Holding identity short hash |
- **clientrequestid** | **kotlin.String**| Client request ID |
-
-### Return type
-
-[**FlowStatusV5Response**](FlowStatusV5Response.md)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
- - **Content-Type**: Not defined
- - **Accept**: text/plain
-
-<a name="flowStatusResponses"></a>
-# **flowStatusResponses**
-> FlowStatusV5Responses flowStatusResponses(holdingidentityshorthash)
-
-This method returns an array containing the statuses of all flows running for a specified holding identity. An empty array is returned if there are no flows running.
-
-### Example
-```kotlin
-// Import classes:
-//import org.openapitools.client.infrastructure.*
-//import org.openapitools.client.models.*
-
-val apiInstance = DefaultApi()
-val holdingidentityshorthash : kotlin.String = holdingidentityshorthash_example // kotlin.String | Holding identity short hash
-try {
-    val result : FlowStatusV5Responses = apiInstance.flowStatusResponses(holdingidentityshorthash)
-    println(result)
-} catch (e: ClientException) {
-    println("4xx response calling DefaultApi#flowStatusResponses")
-    e.printStackTrace()
-} catch (e: ServerException) {
-    println("5xx response calling DefaultApi#flowStatusResponses")
-    e.printStackTrace()
-}
-```
-
-### Parameters
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **holdingidentityshorthash** | **kotlin.String**| Holding identity short hash |
-
-### Return type
-
-[**FlowStatusV5Responses**](FlowStatusV5Responses.md)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
- - **Content-Type**: Not defined
- - **Accept**: text/plain
-
-<a name="getCPIResponse"></a>
-# **getCPIResponse**
-> CPIV5Response getCPIResponse()
-
-List all CPIs uploaded to the cluster
-
-### Example
-```kotlin
-// Import classes:
-//import org.openapitools.client.infrastructure.*
-//import org.openapitools.client.models.*
-
-val apiInstance = DefaultApi()
-try {
-    val result : CPIV5Response = apiInstance.getCPIResponse()
-    println(result)
-} catch (e: ClientException) {
-    println("4xx response calling DefaultApi#getCPIResponse")
-    e.printStackTrace()
-} catch (e: ServerException) {
-    println("5xx response calling DefaultApi#getCPIResponse")
-    e.printStackTrace()
-}
-```
-
-### Parameters
-This endpoint does not need any parameter.
-
-### Return type
-
-[**CPIV5Response**](CPIV5Response.md)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
- - **Content-Type**: Not defined
- - **Accept**: application/json
-
-<a name="getMonitorTransactionsV1"></a>
->>>>>>> 6fc422aab (feat(connector-corda):  testing changes for plugin ledger Corda v5)
 # **getMonitorTransactionsV1**
 > GetMonitorTransactionsV1Response getMonitorTransactionsV1(getMonitorTransactionsV1Request)
 

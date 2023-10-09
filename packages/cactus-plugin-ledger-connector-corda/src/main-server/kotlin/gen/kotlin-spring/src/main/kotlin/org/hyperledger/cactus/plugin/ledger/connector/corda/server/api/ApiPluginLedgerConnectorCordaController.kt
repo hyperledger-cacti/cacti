@@ -115,30 +115,30 @@ class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) val se
     )
     @RequestMapping(
         method = [RequestMethod.GET],
-        value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingidentityshorthash}/{clientrequestid}"],
+        value = ["/api/v1/flow/{holdingIDShortHash}/{clientRequestID}"],
         produces = ["text/plain"]
     )
-    fun flowStatusResponse( @PathVariable("holdingidentityshorthash") holdingidentityshorthash: kotlin.String
-, @PathVariable("clientrequestid") clientrequestid: kotlin.String
+    fun flowStatusResponse( @PathVariable("holdingIDShortHash") holdingIDShortHash: kotlin.String
+, @PathVariable("clientRequestID") clientRequestID: kotlin.String
 ): ResponseEntity<FlowStatusV5Response> {
-        return ResponseEntity(service.flowStatusResponse(holdingidentityshorthash, clientrequestid), HttpStatus.valueOf(200))
+        return ResponseEntity(service.flowStatusResponse(holdingIDShortHash, clientRequestID), HttpStatus.valueOf(200))
     }
 
 
     @RequestMapping(
         method = [RequestMethod.GET],
-        value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingidentityshorthash}"],
+        value = ["/api/v1/flow/{holdingIDShortHash}"],
         produces = ["text/plain"]
     )
-    fun flowStatusResponses( @PathVariable("holdingidentityshorthash") holdingidentityshorthash: kotlin.String
+    fun flowStatusResponses( @PathVariable("holdingIDShortHash") holdingIDShortHash: kotlin.String
 ): ResponseEntity<FlowStatusV5Responses> {
-        return ResponseEntity(service.flowStatusResponses(holdingidentityshorthash), HttpStatus.valueOf(200))
+        return ResponseEntity(service.flowStatusResponses(holdingIDShortHash), HttpStatus.valueOf(200))
     }
 
 
     @RequestMapping(
         method = [RequestMethod.GET],
-        value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/cpi"],
+        value = ["/api/v1/cpi"],
         produces = ["application/json"]
     )
     fun getCPIResponse(): ResponseEntity<CPIV5Response> {
@@ -232,14 +232,14 @@ class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) val se
     )
     @RequestMapping(
         method = [RequestMethod.POST],
-        value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingidentityshorthash}"],
+        value = ["/api/v1/flow/{holdingIDShortHash}"],
         produces = ["application/json"],
         consumes = ["application/json"]
     )
-    fun startFlowParameters( @PathVariable("holdingidentityshorthash") holdingidentityshorthash: kotlin.String
+    fun startFlowParameters( @PathVariable("holdingIDShortHash") holdingIDShortHash: kotlin.String
 , @Valid @RequestBody startFlowV5Request: StartFlowV5Request
 ): ResponseEntity<FlowStatusV5Response> {
-        return ResponseEntity(service.startFlowParameters(holdingidentityshorthash, startFlowV5Request), HttpStatus.valueOf(200))
+        return ResponseEntity(service.startFlowParameters(holdingIDShortHash, startFlowV5Request), HttpStatus.valueOf(200))
     }
 
 

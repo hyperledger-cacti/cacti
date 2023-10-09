@@ -100,7 +100,6 @@ interface ApiPluginLedgerConnectorCordaService {
      */
     fun networkMapV1(body: kotlin.Any?): List<NodeInfo>
 
-<<<<<<< HEAD
     /**
      * POST /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/start-monitor : Start monitoring corda changes (transactions) of given state class
      *
@@ -108,10 +107,7 @@ interface ApiPluginLedgerConnectorCordaService {
      * @return OK (status code 200)
      * @see ApiPluginLedgerConnectorCorda#startMonitorV1
      */
-=======
-    fun startFlowParameters(holdingidentityshorthash: kotlin.String, startFlowV5Request: StartFlowV5Request): FlowStatusV5Response
 
->>>>>>> 6fc422aab (feat(connector-corda):  testing changes for plugin ledger Corda v5)
     fun startMonitorV1(startMonitorV1Request: StartMonitorV1Request?): StartMonitorV1Response
 
     /**

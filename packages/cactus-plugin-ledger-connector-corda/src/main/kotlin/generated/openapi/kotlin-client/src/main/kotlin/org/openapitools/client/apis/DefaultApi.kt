@@ -296,8 +296,8 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
 =======
     * This method gets the current status of the specified flow instance.
     * 
-    * @param holdingidentityshorthash Holding identity short hash 
-    * @param clientrequestid Client request ID 
+    * @param holdingIDShortHash Holding identity short hash 
+    * @param clientRequestID Client request ID 
     * @return FlowStatusV5Response
     * @throws UnsupportedOperationException If the API returns an informational or redirection response
     * @throws ClientException If the API returns a client error response
@@ -305,8 +305,8 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun flowStatusResponse(holdingidentityshorthash: kotlin.String, clientrequestid: kotlin.String) : FlowStatusV5Response {
-        val localVariableConfig = flowStatusResponseRequestConfig(holdingidentityshorthash = holdingidentityshorthash, clientrequestid = clientrequestid)
+    fun flowStatusResponse(holdingIDShortHash: kotlin.String, clientRequestID: kotlin.String) : FlowStatusV5Response {
+        val localVariableConfig = flowStatusResponseRequestConfig(holdingIDShortHash = holdingIDShortHash, clientRequestID = clientRequestID)
 
         val localVarResponse = request<Unit, FlowStatusV5Response>(
             localVariableConfig
@@ -330,18 +330,18 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     /**
     * To obtain the request config of the operation flowStatusResponse
     *
-    * @param holdingidentityshorthash Holding identity short hash 
-    * @param clientrequestid Client request ID 
+    * @param holdingIDShortHash Holding identity short hash 
+    * @param clientRequestID Client request ID 
     * @return RequestConfig
     */
-    fun flowStatusResponseRequestConfig(holdingidentityshorthash: kotlin.String, clientrequestid: kotlin.String) : RequestConfig<Unit> {
+    fun flowStatusResponseRequestConfig(holdingIDShortHash: kotlin.String, clientRequestID: kotlin.String) : RequestConfig<Unit> {
         val localVariableBody = null
         val localVariableQuery: MultiValueMap = mutableMapOf()
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
 
         return RequestConfig(
             method = RequestMethod.GET,
-            path = "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingidentityshorthash}/{clientrequestid}".replace("{"+"holdingidentityshorthash"+"}", "$holdingidentityshorthash").replace("{"+"clientrequestid"+"}", "$clientrequestid"),
+            path = "/api/v1/flow/{holdingIDShortHash}/{clientRequestID}".replace("{"+"holdingIDShortHash"+"}", "$holdingIDShortHash").replace("{"+"clientRequestID"+"}", "$clientRequestID"),
             query = localVariableQuery,
             headers = localVariableHeaders,
             body = localVariableBody
@@ -351,7 +351,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     /**
     * This method returns an array containing the statuses of all flows running for a specified holding identity. An empty array is returned if there are no flows running.
     * 
-    * @param holdingidentityshorthash Holding identity short hash 
+    * @param holdingIDShortHash Holding identity short hash 
     * @return FlowStatusV5Responses
     * @throws UnsupportedOperationException If the API returns an informational or redirection response
     * @throws ClientException If the API returns a client error response
@@ -359,8 +359,8 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun flowStatusResponses(holdingidentityshorthash: kotlin.String) : FlowStatusV5Responses {
-        val localVariableConfig = flowStatusResponsesRequestConfig(holdingidentityshorthash = holdingidentityshorthash)
+    fun flowStatusResponses(holdingIDShortHash: kotlin.String) : FlowStatusV5Responses {
+        val localVariableConfig = flowStatusResponsesRequestConfig(holdingIDShortHash = holdingIDShortHash)
 
         val localVarResponse = request<Unit, FlowStatusV5Responses>(
             localVariableConfig
@@ -384,17 +384,17 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     /**
     * To obtain the request config of the operation flowStatusResponses
     *
-    * @param holdingidentityshorthash Holding identity short hash 
+    * @param holdingIDShortHash Holding identity short hash 
     * @return RequestConfig
     */
-    fun flowStatusResponsesRequestConfig(holdingidentityshorthash: kotlin.String) : RequestConfig<Unit> {
+    fun flowStatusResponsesRequestConfig(holdingIDShortHash: kotlin.String) : RequestConfig<Unit> {
         val localVariableBody = null
         val localVariableQuery: MultiValueMap = mutableMapOf()
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
 
         return RequestConfig(
             method = RequestMethod.GET,
-            path = "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingidentityshorthash}".replace("{"+"holdingidentityshorthash"+"}", "$holdingidentityshorthash"),
+            path = "/api/v1/flow/{holdingIDShortHash}".replace("{"+"holdingIDShortHash"+"}", "$holdingIDShortHash"),
             query = localVariableQuery,
             headers = localVariableHeaders,
             body = localVariableBody
@@ -445,7 +445,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
 
         return RequestConfig(
             method = RequestMethod.GET,
-            path = "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/cpi",
+            path = "/api/v1/cpi",
             query = localVariableQuery,
             headers = localVariableHeaders,
             body = localVariableBody
@@ -821,7 +821,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
 =======
     * This method starts a new instance for the specified flow for the specified holding identity.
     * 
-    * @param holdingidentityshorthash Holding identity short hash 
+    * @param holdingIDShortHash Holding identity short hash 
     * @param startFlowV5Request Request body for starting a flow 
     * @return FlowStatusV5Response
     * @throws UnsupportedOperationException If the API returns an informational or redirection response
@@ -830,8 +830,8 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun startFlowParameters(holdingidentityshorthash: kotlin.String, startFlowV5Request: StartFlowV5Request) : FlowStatusV5Response {
-        val localVariableConfig = startFlowParametersRequestConfig(holdingidentityshorthash = holdingidentityshorthash, startFlowV5Request = startFlowV5Request)
+    fun startFlowParameters(holdingIDShortHash: kotlin.String, startFlowV5Request: StartFlowV5Request) : FlowStatusV5Response {
+        val localVariableConfig = startFlowParametersRequestConfig(holdingIDShortHash = holdingIDShortHash, startFlowV5Request = startFlowV5Request)
 
         val localVarResponse = request<StartFlowV5Request, FlowStatusV5Response>(
             localVariableConfig
@@ -855,18 +855,18 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     /**
     * To obtain the request config of the operation startFlowParameters
     *
-    * @param holdingidentityshorthash Holding identity short hash 
+    * @param holdingIDShortHash Holding identity short hash 
     * @param startFlowV5Request Request body for starting a flow 
     * @return RequestConfig
     */
-    fun startFlowParametersRequestConfig(holdingidentityshorthash: kotlin.String, startFlowV5Request: StartFlowV5Request) : RequestConfig<StartFlowV5Request> {
+    fun startFlowParametersRequestConfig(holdingIDShortHash: kotlin.String, startFlowV5Request: StartFlowV5Request) : RequestConfig<StartFlowV5Request> {
         val localVariableBody = startFlowV5Request
         val localVariableQuery: MultiValueMap = mutableMapOf()
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
 
         return RequestConfig(
             method = RequestMethod.POST,
-            path = "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingidentityshorthash}".replace("{"+"holdingidentityshorthash"+"}", "$holdingidentityshorthash"),
+            path = "/api/v1/flow/{holdingIDShortHash}".replace("{"+"holdingIDShortHash"+"}", "$holdingIDShortHash"),
             query = localVariableQuery,
             headers = localVariableHeaders,
             body = localVariableBody

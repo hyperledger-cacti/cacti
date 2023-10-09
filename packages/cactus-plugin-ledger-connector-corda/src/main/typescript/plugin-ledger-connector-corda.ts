@@ -43,6 +43,10 @@ import {
   FlowStatusEndpointV1,
 } from "./web-services/list-flow-status-endpoint-v1";
 import {
+  IFlowStatusResponseEndpointV1Options,
+  FlowStatusResponseEndpointV1,
+} from "./web-services/get-flow-status-response-endpoint-v1";
+import {
   IListFlowsEndpointV1Options,
   ListFlowsEndpointV1,
 } from "./web-services/list-flows-endpoint-v1";
@@ -80,7 +84,8 @@ export interface IPluginLedgerConnectorCordaOptions
   cordaStopCmd?: string;
   apiUrl?: string;
   cordaVersion?: CordaVersion;
-  holdingidentityshorthash?: any;
+  holdingIDShortHash?: any;
+  clientRequestID?: any;
   /**
    * Path to the file where the private key for the ssh configuration is located
    * This property is optional. Its use is not recommended for most cases, it will override the privateKey property of the sshConfigAdminShell.
@@ -230,14 +235,6 @@ export class PluginLedgerConnectorCorda
       endpoints.push(endpoint);
     }
     {
-      const opts: IListCPIEndpointV1Options = {
-        apiUrl: this.options.apiUrl,
-        logLevel: this.options.logLevel,
-      };
-      const endpoint = new ListCPIEndpointV1(opts);
-      endpoints.push(endpoint);
-    }
-    {
       const opts: IListFlowsEndpointV1Options = {
         apiUrl: this.options.apiUrl,
         logLevel: this.options.logLevel,
@@ -245,15 +242,6 @@ export class PluginLedgerConnectorCorda
         connector: this,
       };
       const endpoint = new ListFlowsEndpointV1(opts);
-      endpoints.push(endpoint);
-    }
-    {
-      const opts: IFlowStatusEndpointV1Options = {
-        apiUrl: this.options.apiUrl,
-        logLevel: this.options.logLevel,
-        holdingidentityshorthash: this.options.holdingidentityshorthash,
-      };
-      const endpoint = new FlowStatusEndpointV1(opts);
       endpoints.push(endpoint);
     }
 
@@ -275,6 +263,35 @@ export class PluginLedgerConnectorCorda
       endpoints.push(endpoint);
     }
 
+    {
+      const opts: IListCPIEndpointV1Options = {
+        apiUrl: this.options.apiUrl,
+        logLevel: this.options.logLevel,
+      };
+      const endpoint = new ListCPIEndpointV1(opts);
+      endpoints.push(endpoint);
+    }
+
+    {
+      const opts: IFlowStatusEndpointV1Options = {
+        apiUrl: this.options.apiUrl,
+        logLevel: this.options.logLevel,
+        holdingIDShortHash: this.options.holdingIDShortHash,
+      };
+      const endpoint = new FlowStatusEndpointV1(opts);
+      endpoints.push(endpoint);
+    }
+
+    {
+      const opts: IFlowStatusResponseEndpointV1Options = {
+        apiUrl: this.options.apiUrl,
+        logLevel: this.options.logLevel,
+        holdingIDShortHash: this.options.holdingIDShortHash,
+        clientRequestID: this.options.clientRequestID,
+      };
+      const endpoint = new FlowStatusResponseEndpointV1(opts);
+      endpoints.push(endpoint);
+    }
     this.log.info(`Instantiated endpoints of ${pkgName}`);
     return endpoints;
   }

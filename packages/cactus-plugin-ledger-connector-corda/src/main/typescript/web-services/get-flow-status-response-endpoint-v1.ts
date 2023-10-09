@@ -1,5 +1,5 @@
 import { Express, Request, Response } from "express";
-import { Server as SecureServer } from "https";
+
 import {
   IWebServiceEndpoint,
   IExpressRequestHandler,
@@ -19,35 +19,39 @@ import {
 
 import {
   DefaultApi,
-  CPIV5Response,
+  StartFlowV5Request,
+  FlowStatusV5Response,
 } from "../generated/openapi/typescript-axios";
 
 import OAS from "../../json/openapi.json";
-import https from "https";
-export interface IListCPIEndpointV1Options {
+
+export interface IFlowStatusResponseEndpointV1Options {
   logLevel?: LogLevelDesc;
   apiUrl?: string;
+  holdingIDShortHash: string;
+  clientRequestID: string;
 }
 
-export class ListCPIEndpointV1 implements IWebServiceEndpoint {
-  public static readonly CLASS_NAME = "ListCPIEndpointV1";
+export class FlowStatusResponseEndpointV1 implements IWebServiceEndpoint {
+  public static readonly CLASS_NAME = "FlowStatusResponseEndpointV1";
 
   private readonly log: Logger;
   private readonly apiUrl?: string;
+  //private readonly holdingIDShortHash: string;
   //private readonly authorizationOptionsProvider: AuthorizationOptionsProvider;
   //private readonly apiUrl?: string;
 
   public get className(): string {
-    return ListCPIEndpointV1.CLASS_NAME;
+    return FlowStatusResponseEndpointV1.CLASS_NAME;
   }
 
-  constructor(public readonly options: IListCPIEndpointV1Options) {
+  constructor(public readonly options: IFlowStatusResponseEndpointV1Options) {
     const fnTag = `${this.className}#constructor()`;
 
     Checks.truthy(options, `${fnTag} options`);
 
     this.log = LoggerProvider.getOrCreate({
-      label: "list-cpi-endpoint-v1",
+      label: "list-flow-status-response-endpoint-v1",
       level: options.logLevel || "INFO",
     });
 
@@ -59,13 +63,12 @@ export class ListCPIEndpointV1 implements IWebServiceEndpoint {
       get: async () => ({
         isProtected: true,
         requiredRoles: [],
-        httpsAgent: new https.Agent({ rejectUnauthorized: false }),
       }),
     };
   }
 
-  public get oasPath(): typeof OAS.paths["/api/v1/cpi"] {
-    return OAS.paths["/api/v1/cpi"];
+  public get oasPath(): typeof OAS.paths["/api/v1/flow/{holdingIDShortHash}/{clientRequestID}"] {
+    return OAS.paths["/api/v1/flow/{holdingIDShortHash}/{clientRequestID}"];
   }
 
   /**
@@ -73,11 +76,11 @@ export class ListCPIEndpointV1 implements IWebServiceEndpoint {
    * API server of Cactus.
    */
   public getPath(): string {
-    return this.oasPath.get["x-hyperledger-cactus"].https.path;
+    return this.oasPath.get["x-hyperledger-cactus"].http.path;
   }
 
   public getVerbLowerCase(): string {
-    return this.oasPath.get["x-hyperledger-cactus"].https.verbLowerCase;
+    return this.oasPath.get["x-hyperledger-cactus"].http.verbLowerCase;
   }
 
   public getOperationId(): string {
@@ -96,7 +99,7 @@ export class ListCPIEndpointV1 implements IWebServiceEndpoint {
   }
 
   async handleRequest(req: Request, res: Response): Promise<void> {
-    const fnTag = "GetCPIResponseV1#constructor()";
+    const fnTag = "sFlowStatusResponseEndpointV1#constructor()";
     const verbUpper = this.getVerbLowerCase().toUpperCase();
     this.log.debug(`${verbUpper} ${this.getPath()}`);
     //const verb = this.getVerbLowerCase();
@@ -116,10 +119,15 @@ export class ListCPIEndpointV1 implements IWebServiceEndpoint {
     }
   }
 
-  async callInternalContainer(req: any): Promise<CPIV5Response> {
+  async callInternalContainer(req: any): Promise<FlowStatusV5Response> {
     const apiConfig = new Configuration({ basePath: this.apiUrl });
     const apiClient = new DefaultApi(apiConfig);
-    const res = await apiClient.getCPIResponse(req);
+    //const holdingIDShortHash = req.clientRequestId;
+    const res = await apiClient.flowStatusResponse(
+      this.options.holdingIDShortHash,
+      this.options.clientRequestID,
+      req,
+    );
     return res.data;
   }
 }

@@ -6,7 +6,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **flowError** | [**FlowStatusFlowError**](FlowStatusFlowError.md) |  | 
 **flowStatus** | **kotlin.String** |  | 
-**holdingIdentityShortHash** | **kotlin.String** |  | 
+**holdingIDShortHash** | **kotlin.String** |  | 
 **timestamp** | [**java.time.OffsetDateTime**](java.time.OffsetDateTime.md) |  | 
 **clientRequestId** | **kotlin.String** |  |  [optional]
 **flowId** | **kotlin.String** |  |  [optional]

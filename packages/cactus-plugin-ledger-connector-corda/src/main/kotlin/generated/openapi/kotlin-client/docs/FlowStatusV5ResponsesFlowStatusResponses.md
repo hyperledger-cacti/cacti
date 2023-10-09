@@ -9,7 +9,7 @@ Name | Type | Description | Notes
 **flowId** | **kotlin.String** |  |  [optional]
 **flowResult** | **kotlin.String** |  |  [optional]
 **flowStatus** | **kotlin.String** |  |  [optional]
-**holdingIdentityShortHash** | **kotlin.String** |  |  [optional]
+**holdingIDShortHash** | **kotlin.String** |  |  [optional]
 **timestamp** | [**java.time.OffsetDateTime**](java.time.OffsetDateTime.md) |  |  [optional]
 
 

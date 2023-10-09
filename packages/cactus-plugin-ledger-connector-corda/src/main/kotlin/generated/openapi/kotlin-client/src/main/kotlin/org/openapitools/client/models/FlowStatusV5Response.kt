@@ -28,7 +28,7 @@ import com.squareup.moshi.Json
  * 
  *
  * @param flowStatus 
- * @param holdingIdentityShortHash 
+ * @param holdingIDShortHash 
  * @param timestamp 
  * @param clientRequestId 
  * @param flowError 
@@ -41,8 +41,8 @@ data class FlowStatusV5Response (
     @Json(name = "flowStatus")
     val flowStatus: kotlin.String,
 
-    @Json(name = "holdingIdentityShortHash")
-    val holdingIdentityShortHash: kotlin.String,
+    @Json(name = "holdingIDShortHash")
+    val holdingIDShortHash: kotlin.String,
 
     @Json(name = "timestamp")
     val timestamp: java.time.OffsetDateTime,
