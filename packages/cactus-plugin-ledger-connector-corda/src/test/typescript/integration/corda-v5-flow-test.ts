@@ -181,34 +181,37 @@ test("can get past logs of an account", async (t: Test) => {
     shortHashCharlie,
     request,
   );
-  // console.log("checking startFlow " + JSON.stringify(startflow));
-  t.ok(startflow.status, "startFlowParameters OK");
+
+  t.ok(startflow.status, "startFlowParameters endpoint OK");
+
+  //Need to check further, might need to add a delay here. Getting 404 status code
   const checkflow = await apiClient.flowStatusResponse(shortHashCharlie, "create-1");
-  // console.log("checking checkflow " + JSON.stringify(checkflow));
   t.ok(checkflow.status, "flowStatusResponse OK");
 
-  test("Check flowStatus and flowError", (t) => {
-    function checkFlowStatus() {
-      const status = checkflow.data.flowStatus;
-      const error = checkflow.data.flowError;
+  //Test case is inconsistent, need to investigate further. Might need to add some delay to the execution.
+  test("Check if flowStatus is COMPLETED and display flowError if there is an error", async (t) => {
+    async function checkStatus() {
+      const checkflow = await apiClient.flowStatusResponse(shortHashCharlie, "create-1");
 
-      if (status === "COMPLETED") {
-        t.equal(status, "COMPLETED", "flowStatus is COMPLETED");
-        t.equal(
-          error,
-          null,
-          "flowError should be null when flowStatus is COMPLETED",
-        );
-        t.end();
-      } else if (status === "RUNNING") {
-        setTimeout(checkFlowStatus, 5000);
+      if (checkflow.data.flowStatus === "COMPLETED") {
+        t.equal(checkflow.data.flowStatus, "COMPLETED", "flowStatus is COMPLETED");
+        t.equal(checkflow.data.flowError, null, "flowError should be null");
+      } else if (checkflow.data.flowStatus === "RUNNING") {
+        // Poll again after a delay
+        setTimeout(checkStatus, 10000);
       } else {
-        t.fail(`Unexpected flowStatus: ${status}`);
-        t.end();
+        t.fail("Unexpected flowStatus " + checkflow.data.flowStatus);
       }
     }
+    // Start the initial check
+    await checkStatus();
+  });
 
-    checkFlowStatus();
+  //TODO Simulate conversation between Bob and Alice
+  // Follow the flow as per https://docs.r3.com/en/platform/corda/5.0/developing-applications/getting-started/utxo-ledger-example-cordapp/running-the-chat-cordapp.html
+  test("Simulate a conversation between Alice and Bob", (t) => {
+    //Add code here
+    t.end();
   });
 
   // TO FIX: Address and port checking is still having an issue because of
@@ -243,5 +246,5 @@ test("can get past logs of an account", async (t: Test) => {
   //const response = await connector.startFlow(shortHashCharlie, request);
   //t.ok(response.status, "ok!");
 
-  t.end();
+  // t.end();
 });
