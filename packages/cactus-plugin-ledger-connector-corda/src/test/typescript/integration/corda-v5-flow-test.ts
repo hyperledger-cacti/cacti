@@ -181,9 +181,36 @@ test("can get past logs of an account", async (t: Test) => {
     shortHashCharlie,
     request,
   );
+  // console.log("checking startFlow " + JSON.stringify(startflow));
   t.ok(startflow.status, "startFlowParameters OK");
-  const checkflow = await apiClient.flowStatusResponse(shortHashCharlie, "r1");
+  const checkflow = await apiClient.flowStatusResponse(shortHashCharlie, "create-1");
+  // console.log("checking checkflow " + JSON.stringify(checkflow));
   t.ok(checkflow.status, "flowStatusResponse OK");
+
+  test("Check flowStatus and flowError", (t) => {
+    function checkFlowStatus() {
+      const status = checkflow.data.flowStatus;
+      const error = checkflow.data.flowError;
+
+      if (status === "COMPLETED") {
+        t.equal(status, "COMPLETED", "flowStatus is COMPLETED");
+        t.equal(
+          error,
+          null,
+          "flowError should be null when flowStatus is COMPLETED",
+        );
+        t.end();
+      } else if (status === "RUNNING") {
+        setTimeout(checkFlowStatus, 5000);
+      } else {
+        t.fail(`Unexpected flowStatus: ${status}`);
+        t.end();
+      }
+    }
+
+    checkFlowStatus();
+  });
+
   // TO FIX: Address and port checking is still having an issue because of
   // "--network host" parameters set during container creation
   //const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
