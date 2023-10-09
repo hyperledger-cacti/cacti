@@ -6488,6 +6488,7 @@ __metadata:
     axios: 0.21.4
     chalk: 4.1.2
     express: 4.17.3
+    http-proxy-middleware: 2.0.6
     js-yaml: 4.1.0
     minimist: 1.2.8
     prom-client: 13.2.0
@@ -24695,7 +24696,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"http-proxy-middleware@npm:^2.0.3":
+"http-proxy-middleware@npm:2.0.6, http-proxy-middleware@npm:^2.0.3":
   version: 2.0.6
   resolution: "http-proxy-middleware@npm:2.0.6"
   dependencies:

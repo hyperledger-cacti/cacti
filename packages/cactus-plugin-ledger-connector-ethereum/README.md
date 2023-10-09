@@ -147,6 +147,19 @@ args: {
 },
 ```
 
+## JSON-RPC Proxy
+- Connector can be used with web3js to send any JSON-RPC request to the ethereum node.
+
+### Example
+``` typescript
+  const proxyUrl = new URL(
+    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/json-rpc",
+    apiHost,
+  );
+  const web3ProxyClient = new Web3(proxyUrl.toString());
+  const gasPrice = await web3ProxyClient.eth.getGasPrice();
+```
+
 ## Running the tests
 
 To check that all has been installed correctly and that the pugin has no errors run jest test suites.

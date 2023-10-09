@@ -63,7 +63,7 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
     address: string,
     port: number,
     contractAddress: string,
-    apiHost,
+    apiHost: string,
     apiConfig,
     ledger: GethTestLedger,
     apiClient: EthereumApi,
@@ -129,6 +129,9 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
       logLevel: testLogLevel,
       pluginRegistry: new PluginRegistry({ plugins: [keychainPlugin] }),
     });
+
+    await connector.getOrCreateWebServices();
+    await connector.registerWebServices(expressApp, wsApi);
   });
 
   afterAll(async () => {
@@ -143,9 +146,6 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
   test("setup ethereum connector", async () => {
     // Instantiate connector with the keychain plugin that already has the
     // private key we want to use for one of our tests
-    await connector.getOrCreateWebServices();
-    await connector.registerWebServices(expressApp, wsApi);
-
     const initTransferValue = web3.utils.toWei(5000, "ether");
     await apiClient.runTransactionV1({
       web3SigningCredential: {
@@ -360,6 +360,7 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
         maxPriorityFeePerGas: 0,
         maxFeePerGas: 0x40000000,
         gasLimit: 21000,
+        type: 2,
       },
       testEthAccount.privateKey,
     );

@@ -11,16 +11,29 @@ const testLogLevel = "info";
 const sutLogLevel = "info";
 
 import "jest-extended";
+import express from "express";
+import bodyParser from "body-parser";
+import http from "http";
+import Web3 from "web3";
 import { v4 as uuidv4 } from "uuid";
+import { Server as SocketIoServer } from "socket.io";
+import { AddressInfo } from "net";
+
 import { PluginRegistry } from "@hyperledger/cactus-core";
-import { PluginLedgerConnectorEthereum } from "../../../main/typescript/index";
+import { Constants } from "@hyperledger/cactus-core-api";
+import {
+  IListenOptions,
+  Logger,
+  LoggerProvider,
+  Servers,
+} from "@hyperledger/cactus-common";
 import { pruneDockerAllIfGithubAction } from "@hyperledger/cactus-test-tooling";
-import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
 import {
   GethTestLedger,
   WHALE_ACCOUNT_ADDRESS,
 } from "@hyperledger/cactus-test-geth-ledger";
-import Web3 from "web3";
+
+import { PluginLedgerConnectorEthereum } from "../../../main/typescript/index";
 
 // Unit Test logger setup
 const log: Logger = LoggerProvider.getOrCreate({
@@ -36,6 +49,13 @@ describe("invokeRawWeb3EthMethod Tests", () => {
   let ethereumTestLedger: GethTestLedger;
   let connector: PluginLedgerConnectorEthereum;
   let web3: Web3;
+  let apiHost: string;
+  const expressApp = express();
+  expressApp.use(bodyParser.json({ limit: "250mb" }));
+  const server = http.createServer(expressApp);
+  const wsApi = new SocketIoServer(server, {
+    path: Constants.SocketIoConnectionPathV1,
+  });
 
   //////////////////////////////////
   // Environment Setup
@@ -64,19 +84,49 @@ describe("invokeRawWeb3EthMethod Tests", () => {
       pluginRegistry: new PluginRegistry(),
     });
 
+    const listenOptions: IListenOptions = {
+      hostname: "0.0.0.0",
+      port: 0,
+      server,
+    };
+    const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
+    const { address, port } = addressInfo;
+    apiHost = `http://${address}:${port}`;
+
+    await connector.getOrCreateWebServices();
+    await connector.registerWebServices(expressApp, wsApi);
+
     web3 = new Web3(rpcApiHttpHost);
   });
 
   afterAll(async () => {
-    log.info("Shutdown connector");
-    await connector.shutdown();
+    log.info("Shutdown server");
+    await Servers.shutdown(server);
 
-    log.info("Stop and destroy the test ledger...");
-    await ethereumTestLedger.stop();
-    await ethereumTestLedger.destroy();
+    if (connector) {
+      log.info("Shutdown connector");
+      await connector.shutdown();
+    }
+
+    if (ethereumTestLedger) {
+      log.info("Stop and destroy the test ledger...");
+      await ethereumTestLedger.stop();
+      await ethereumTestLedger.destroy();
+    }
 
     log.info("Prune docker...");
     await pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
+  });
+
+  test("invoke method using json-rpc proxy", async () => {
+    const proxyUrl = new URL(
+      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/json-rpc",
+      apiHost,
+    );
+    const web3ProxyClient = new Web3(proxyUrl.toString());
+    const gasPrice = await web3ProxyClient.eth.getGasPrice();
+    expect(gasPrice).toBeTruthy();
+    expect(Number(gasPrice)).toBeGreaterThan(0);
   });
 
   test("invokeRawWeb3EthMethod with 0-argument method works (getGasPrice)", async () => {

@@ -78,6 +78,8 @@ import {
 } from "./types/model-type-guards";
 import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
 import { RuntimeError } from "run-time-error";
+import { createProxyMiddleware, fixRequestBody } from "http-proxy-middleware";
+
 import {
   Web3StringReturnFormat,
   convertWeb3ReceiptStatusToBool,
@@ -337,6 +339,26 @@ export class PluginLedgerConnectorEthereum
         );
         socket.disconnect();
       });
+    }
+
+    // Register JSON-RPC proxy to pass requests directly to ethereum node
+    if (this.options.rpcApiHttpHost) {
+      const proxyUrl =
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/json-rpc";
+      const targetUrl = this.options.rpcApiHttpHost;
+      app.use(
+        proxyUrl,
+        createProxyMiddleware({
+          target: targetUrl,
+          changeOrigin: true,
+          pathRewrite: {
+            [".*"]: "",
+          },
+          onProxyReq: fixRequestBody,
+          logLevel: "error",
+        }),
+      );
+      this.log.info(`Registered proxy from ${proxyUrl} to ${targetUrl}`);
     }
 
     return webServices;

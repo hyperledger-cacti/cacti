@@ -1159,6 +1159,9 @@
           }
         }
       }
+    },
+    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/json-rpc": {
+      "summary": "Proxy endpoint to pass JSON-RPC requests to remote ethereum node."
     }
   }
 }
