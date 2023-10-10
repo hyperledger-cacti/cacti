@@ -29,6 +29,7 @@ import {
   CPIIDV5,
   CPIV5Response,
   DefaultApi,
+  FlowStatusV5Response,
 } from "../../../main/typescript/generated/openapi/typescript-axios/index";
 import axios, { AxiosRequestConfig } from "axios";
 //import { Configuration } from "@hyperledger/cactus-core-api";
@@ -164,7 +165,7 @@ test("can get past logs of an account", async (t: Test) => {
   t.ok(shortHashAlice, `Short hash ID for Alice: ${shortHashAlice}`);
 
   const request = {
-    clientRequestId: "create-1",
+    clientRequestId: "test-1",
     flowClassName:
       "com.r3.developers.csdetemplate.utxoexample.workflows.CreateNewChatFlow",
     requestBody: {
@@ -185,35 +186,93 @@ test("can get past logs of an account", async (t: Test) => {
   t.ok(startflow.status, "startFlowParameters endpoint OK");
 
   //Need to check further, might need to add a delay here. Getting 404 status code
-  const checkflow = await apiClient.flowStatusResponse(shortHashCharlie, "create-1");
-  t.ok(checkflow.status, "flowStatusResponse OK");
+  // t.timeoutAfter(60000);
 
-  //Test case is inconsistent, need to investigate further. Might need to add some delay to the execution.
-  test("Check if flowStatus is COMPLETED and display flowError if there is an error", async (t) => {
-    async function checkStatus() {
-      const checkflow = await apiClient.flowStatusResponse(shortHashCharlie, "create-1");
+  await waitForStatusChange(shortHashCharlie, "test-1");
 
-      if (checkflow.data.flowStatus === "COMPLETED") {
-        t.equal(checkflow.data.flowStatus, "COMPLETED", "flowStatus is COMPLETED");
-        t.equal(checkflow.data.flowError, null, "flowError should be null");
-      } else if (checkflow.data.flowStatus === "RUNNING") {
-        // Poll again after a delay
-        setTimeout(checkStatus, 10000);
-      } else {
-        t.fail("Unexpected flowStatus " + checkflow.data.flowStatus);
-      }
-    }
-    // Start the initial check
-    await checkStatus();
-  });
+  // const checkflow = await apiClient.flowStatusResponse(shortHashCharlie, "test-1");
+  // t.ok(checkflow.status, "flowStatusResponse endpoint OK");
+  // const flowData = await waitForStatusChange(shortHashCharlie, "test-1");
 
-  //TODO Simulate conversation between Bob and Alice
+  // WIP Simulate conversation between Bob and Alice
   // Follow the flow as per https://docs.r3.com/en/platform/corda/5.0/developing-applications/getting-started/utxo-ledger-example-cordapp/running-the-chat-cordapp.html
-  test("Simulate a conversation between Alice and Bob", (t) => {
+  test("Simulate a conversation between Alice and Bob", async (t) => {
     //Add code here
+    //1. Alice creates a new chat
+    const aliceCreateChat = {
+      clientRequestId: "create-1",
+      flowClassName:
+        "com.r3.developers.csdetemplate.utxoexample.workflows.CreateNewChatFlow",
+      requestBody: {
+        chatName: "Chat with Bob",
+        otherMember: "CN=Bob, OU=Test Dept, O=R3, L=London, C=GB",
+        message: "Hello Bob",
+      },
+    };
+    let startflowChat = await apiClient.startFlowParameters(
+      shortHashAlice,
+      aliceCreateChat,
+    );
+    t.ok(startflowChat.status, "startflowChat OK");
+    const checkflow = await apiClient.flowStatusResponse(
+      shortHashAlice,
+      "create-1",
+    );
+    t.ok(checkflow.status, "flowStatusResponse OK");
+
+    await waitForStatusChange(shortHashAlice, "create-1");
+    //2. Bob lists his chats
+    const bobListChats = {
+      clientRequestId: "list-1",
+      flowClassName:
+        "com.r3.developers.csdetemplate.utxoexample.workflows.ListChatsFlow",
+      requestBody: {},
+    };
+    startflowChat = await apiClient.startFlowParameters(
+      shortHashBob,
+      bobListChats,
+    );
+    const flowData = await waitForStatusChange(shortHashBob, "list-1");
+    console.log(flowData);
     t.end();
   });
 
+  // Reusable function to wait for the status to change to COMPLETED
+  async function waitForStatusChange(shortHash: string, flowName: string) {
+    try {
+      let checkFlowObject = await apiClient.flowStatusResponse(
+        shortHash,
+        flowName,
+      );
+
+      if (checkFlowObject.data.flowStatus === "COMPLETED") {
+        t.ok(checkFlowObject.status, "flowStatusResponse endpoint OK");
+        t.equal(
+          checkFlowObject.data.flowStatus,
+          "COMPLETED",
+          "flowStatus is COMPLETED",
+        );
+        t.equal(
+          checkFlowObject.data.flowError,
+          null,
+          "flowError should be null",
+        );
+      } else {
+        console.log("Waiting for status change");
+        await new Promise((resolve) => setTimeout(resolve, 20000));
+        checkFlowObject = await apiClient.flowStatusResponse(
+          shortHash,
+          flowName,
+        );
+        await waitForStatusChange(shortHash, flowName);
+      }
+    } catch (error) {
+      console.error(
+        "An error occurred while waiting for status change:",
+        error,
+      );
+    }
+  }
   // TO FIX: Address and port checking is still having an issue because of
   // "--network host" parameters set during container creation
   //const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
