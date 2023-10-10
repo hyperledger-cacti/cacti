@@ -200,4 +200,12 @@ nav:
   - FAQs: faqs.md
   - Glossary: glossary.md
   - Contact Us: contact-us.md
+  - Blog:
+    - January 21, 2021:
+      - Enabling Cross-Chain Asset Exchange On Permissioned Blockchains: blog/2021-01-21-cross-chain-asset.md
+      - Emergence of Enterprise DLT Interoperability: blog/2021-01-21-emergence-enterprise-interoperability.md
+    - November 07, 2022:
+      - Introducing Hyperledger Cacti, a multi-faceted pluggable interoperability framework: blog/2022-11-07-introducing-hyperledger-cacti.md
+    - October 03, 2023:
+      - Hyperledger Cacti, A General-Purpose Modular Interoperability Framework, Moves to Graduated Status: blog/2023-10-03-hyperledger-cacti-graduation.md
 copyright: Copyright &copy; Hyperledger 2020-2023
