@@ -1170,6 +1170,12 @@ export interface StartFlowV5RequestRequestBody {
      * @memberof StartFlowV5RequestRequestBody
      */
     message?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof StartFlowV5RequestRequestBody
+     */
+    numberOfRecords?: string;
 }
 /**
  * 

@@ -169,9 +169,9 @@ test("can get past logs of an account", async (t: Test) => {
     flowClassName:
       "com.r3.developers.csdetemplate.utxoexample.workflows.CreateNewChatFlow",
     requestBody: {
-      chatName: "Chat with Bob",
+      chatName: "Test-1",
       otherMember: "CN=Bob, OU=Test Dept, O=R3, L=London, C=GB",
-      message: "Hello Bob",
+      message: "Testing",
     },
   };
 
@@ -189,15 +189,15 @@ test("can get past logs of an account", async (t: Test) => {
   // t.timeoutAfter(60000);
 
   await waitForStatusChange(shortHashCharlie, "test-1");
-
-  // const checkflow = await apiClient.flowStatusResponse(shortHashCharlie, "test-1");
-  // t.ok(checkflow.status, "flowStatusResponse endpoint OK");
-  // const flowData = await waitForStatusChange(shortHashCharlie, "test-1");
+  const checkflow = await apiClient.flowStatusResponse(
+    shortHashCharlie,
+    "test-1",
+  );
+  t.ok(checkflow.status, "flowStatusResponse endpoint OK");
 
   // WIP Simulate conversation between Bob and Alice
   // Follow the flow as per https://docs.r3.com/en/platform/corda/5.0/developing-applications/getting-started/utxo-ledger-example-cordapp/running-the-chat-cordapp.html
   test("Simulate a conversation between Alice and Bob", async (t) => {
-    //Add code here
     //1. Alice creates a new chat
     const aliceCreateChat = {
       clientRequestId: "create-1",
@@ -221,6 +221,7 @@ test("can get past logs of an account", async (t: Test) => {
     t.ok(checkflow.status, "flowStatusResponse OK");
 
     await waitForStatusChange(shortHashAlice, "create-1");
+
     //2. Bob lists his chats
     const bobListChats = {
       clientRequestId: "list-1",
@@ -233,8 +234,66 @@ test("can get past logs of an account", async (t: Test) => {
       bobListChats,
     );
     const flowData = await waitForStatusChange(shortHashBob, "list-1");
-    console.log(flowData);
-    t.end();
+
+    const flowResult =
+      flowData !== null && flowData !== undefined ? flowData.flowResult : null;
+    const chatWithBobId = (() => {
+      if (typeof flowResult === "string") {
+        const parseFlowResult = JSON.parse(flowResult);
+        const chatWithBobObj = parseFlowResult.find(
+          (item: { chatName: string }) => item.chatName === "Chat with Bob",
+        );
+        return chatWithBobObj && "id" in chatWithBobObj
+          ? chatWithBobObj.id
+          : undefined;
+      }
+    })();
+
+    //3. Bob updates chat twice
+    const bobUpdate1 = {
+      clientRequestId: "update-1",
+      flowClassName:
+        "com.r3.developers.csdetemplate.utxoexample.workflows.UpdateChatFlow",
+      requestBody: {
+        id: chatWithBobId,
+        message: "Hi Alice",
+      },
+    };
+    await apiClient.startFlowParameters(shortHashBob, bobUpdate1);
+    await waitForStatusChange(shortHashBob, "update-1");
+    const bobUpdate2 = {
+      clientRequestId: "update-2",
+      flowClassName:
+        "com.r3.developers.csdetemplate.utxoexample.workflows.UpdateChatFlow",
+      requestBody: {
+        id: chatWithBobId,
+        message: "How are you today?",
+      },
+    };
+    await apiClient.startFlowParameters(shortHashBob, bobUpdate2);
+    await waitForStatusChange(shortHashBob, "update-2");
+    //4. Alice lists chat
+    const aliceListsChat = {
+      clientRequestId: "list-2",
+      flowClassName:
+        "com.r3.developers.csdetemplate.utxoexample.workflows.ListChatsFlow",
+      requestBody: {},
+    };
+    await apiClient.startFlowParameters(shortHashAlice, aliceListsChat);
+    await waitForStatusChange(shortHashAlice, "list-2");
+
+    //5. Alice checks the history of the chat with Bob
+    const aliceHistoryRequest = {
+      clientRequestId: "get-1",
+      flowClassName:
+        "com.r3.developers.csdetemplate.utxoexample.workflows.GetChatFlow",
+      requestBody: {
+        id: chatWithBobId,
+        numberOfRecords: "4",
+      },
+    };
+    await apiClient.startFlowParameters(shortHashAlice, aliceHistoryRequest);
+    await waitForStatusChange(shortHashAlice, "get-1");
   });
 
   // Reusable function to wait for the status to change to COMPLETED
@@ -246,7 +305,7 @@ test("can get past logs of an account", async (t: Test) => {
       );
 
       if (checkFlowObject.data.flowStatus === "COMPLETED") {
-        t.ok(checkFlowObject.status, "flowStatusResponse endpoint OK");
+        // t.ok(checkFlowObject.status, "flowStatusResponse endpoint OK");
         t.equal(
           checkFlowObject.data.flowStatus,
           "COMPLETED",
@@ -257,6 +316,8 @@ test("can get past logs of an account", async (t: Test) => {
           null,
           "flowError should be null",
         );
+        console.log("Status changed to COMPLETED");
+        return checkFlowObject.data;
       } else {
         console.log("Waiting for status change");
         await new Promise((resolve) => setTimeout(resolve, 20000));
@@ -273,6 +334,7 @@ test("can get past logs of an account", async (t: Test) => {
       );
     }
   }
+
   // TO FIX: Address and port checking is still having an issue because of
   // "--network host" parameters set during container creation
   //const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;

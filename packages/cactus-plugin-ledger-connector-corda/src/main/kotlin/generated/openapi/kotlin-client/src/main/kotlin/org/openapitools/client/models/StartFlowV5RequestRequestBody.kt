@@ -29,6 +29,7 @@ import com.squareup.moshi.Json
  * @param chatName 
  * @param otherMember 
  * @param message 
+ * @param numberOfRecords 
  */
 
 data class StartFlowV5RequestRequestBody (
@@ -40,7 +41,10 @@ data class StartFlowV5RequestRequestBody (
     val otherMember: kotlin.String? = null,
 
     @Json(name = "message")
-    val message: kotlin.String? = null
+    val message: kotlin.String? = null,
+
+    @Json(name = "numberOfRecords")
+    val numberOfRecords: kotlin.String? = null
 
 )
 

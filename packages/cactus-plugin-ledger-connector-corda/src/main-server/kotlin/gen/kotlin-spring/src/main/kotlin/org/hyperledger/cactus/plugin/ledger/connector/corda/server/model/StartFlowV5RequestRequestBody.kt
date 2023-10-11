@@ -16,6 +16,7 @@ import javax.validation.Valid
  * @param chatName 
  * @param otherMember 
  * @param message 
+ * @param numberOfRecords 
  */
 data class StartFlowV5RequestRequestBody(
 
@@ -23,7 +24,9 @@ data class StartFlowV5RequestRequestBody(
 
     @field:JsonProperty("otherMember") val otherMember: kotlin.String? = null,
 
-    @field:JsonProperty("message") val message: kotlin.String? = null
+    @field:JsonProperty("message") val message: kotlin.String? = null,
+
+    @field:JsonProperty("numberOfRecords") val numberOfRecords: kotlin.String? = null
 ) {
 
 }
