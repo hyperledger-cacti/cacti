@@ -26,10 +26,10 @@ Alice will use credentials and other Indy formats such as schema and definition 
 
 ## Setup Overview
 
-### fabric-socketio-validator
+### fabric-connector
 
 - Validator for fabric ledger.
-- Docker networks: `fabric-all-in-one_testnet-2x`, `cactus-example-discounted-asset-trade-net`
+- Started as part of discounted asset trade BLP.
 
 ### ethereum-validator
 
@@ -114,8 +114,6 @@ Alice will use credentials and other Indy formats such as schema and definition 
    ```
    cactus-example-discounted-asset-trade-ethereum-validator | listening on *:5050
    ...
-   cactus-example-discounted-asset-trade-fabric-socketio-validator | listening on *:5040
-   ...
    cactus-example-discounted-asset-trade-indy-validator | 2022-01-31 16:00:49,552 INFO success: validator entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
    ...
    cactus-example-discounted-asset-trade-indy-validator-nginx | 2022/01/31 16:00:49 [notice] 1#1: start worker process 35
@@ -154,9 +152,6 @@ For development purposes, it might be useful to run the sample application outsi
 1. Configure cactus and start the ledgers as described above.
 1. Run `./script-dockerless-config-patch.sh` from `cactus-example-discounted-asset-trade/` directory. This will patch the configs and copy it to global location.
 1. Start validators (each in separate cmd window).
-   1. ```bash
-      cd packages/cactus-plugin-ledger-connector-fabric-socketio/ && npm run start
-      ```
    1. ```bash
       cd packages/cactus-plugin-ledger-connector-go-ethereum-socketio/ && npm run start
       ```
@@ -207,8 +202,6 @@ For development purposes, it might be useful to run the sample application outsi
 
 1. Run the transaction execution:
 
-   **For docker-compose environment, run:**
-
    ```
    ./script-post-trade-request.sh
    ```
@@ -219,17 +212,10 @@ For development purposes, it might be useful to run the sample application outsi
    docker run --rm -ti -v "$(pwd)/etc/cactus/":"/etc/cactus/" --net="host" register-indy-data
    ```
 
-   **For dockerless environment, run:**
-
-   ```bash
-   pushd ../register-indy-data && sh ./script-build-docker.sh && popd &&
-   docker run --rm -ti -v/etc/cactus/:/etc/cactus/ --net="host" register-indy-data --force
-   ```
-
    **After sending the requests**
 
    - The transactions are executed by order.
-   - When the following log appears on the BLP console, the transactions are completed.
+   - When the following log appears on the BLP console, the transactions are completed (you may need to scroll a bit to find it).
 
    ```
    [INFO] BusinessLogicAssetTrade - ##INFO: completed asset-trade, businessLogicID: guks32pf, tradeID: *******-001
@@ -295,3 +281,8 @@ For development purposes, it might be useful to run the sample application outsi
    ./script-cleanup.sh
    popd
    ```
+
+#### Possible improvements
+- Ethereum events are duplicated, causing trade to proceed even if previous step was not successfull.
+   - Handle this case properly - ignore duplciated events, move forward only if current step was completed.
+   - Investigate and fix duplicated events in Verifier / Ethereum connector (or use openapi ethereum connector).

@@ -25,7 +25,7 @@ async function main() {
     "http://localhost:5034/api/v1/bl/fabric-asset/",
   );
   console.log("\n# Fabric:");
-  console.log(fabricResponse.data.data);
+  console.log(fabricResponse.data);
 }
 
 main();

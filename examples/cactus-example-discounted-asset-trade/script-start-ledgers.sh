@@ -94,19 +94,13 @@ function start_fabric_testnet() {
 function copy_fabric_tlsca() {
     echo ">> copy_fabric_tlsca()"
     docker cp "${CACTUS_FABRIC_ALL_IN_ONE_CONTAINER_NAME}:/fabric-samples/test-network/organizations/" \
-        "${CONFIG_VOLUME_PATH}/connector-fabric-socketio/crypto-config/"
+        "${CONFIG_VOLUME_PATH}/connector-fabric/crypto-config/"
     echo ">> copy_fabric_tlsca() done."
 }
 
 function copy_fabric_validator_config() {
-    echo ">> copy_fabric_validator_config()"
-    cp -fr ${ROOT_DIR}/packages/cactus-plugin-ledger-connector-fabric-socketio/sample-config/* \
-        "${CONFIG_VOLUME_PATH}/connector-fabric-socketio/"
-    generate_certificate "FabricSocketIOCactusValidator" "${CONFIG_VOLUME_PATH}/connector-fabric-socketio/CA/"
-    echo ">> copy_fabric_validator_config() done."
-
     echo ">> copy_fabric_wallet()"
-    cp -fr "${ROOT_DIR}/tools/docker/fabric-all-in-one/asset-transfer-basic-utils/wallet" "${CONFIG_VOLUME_PATH}/connector-fabric-socketio/"
+    cp -fr "${ROOT_DIR}/tools/docker/fabric-all-in-one/asset-transfer-basic-utils/wallet" "${CONFIG_VOLUME_PATH}/connector-fabric/"
     echo ">> copy_fabric_wallet() done."
 }
 
@@ -155,7 +149,7 @@ function start_ledgers() {
 
     # Start Fabric
     start_fabric_testnet
-    mkdir -p "${CONFIG_VOLUME_PATH}/connector-fabric-socketio"
+    mkdir -p "${CONFIG_VOLUME_PATH}/connector-fabric"
     copy_fabric_tlsca
     copy_fabric_validator_config
 
