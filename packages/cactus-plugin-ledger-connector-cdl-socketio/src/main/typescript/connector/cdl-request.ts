@@ -1,3 +1,8 @@
+import {
+  AuthInfoArgsType,
+  isAuthInfoAccessTokenArgsType,
+  isAuthInfoSubscriptionKeyArgsType,
+} from "./type-defs";
 import { read as configRead } from "../common/core/config";
 import axios from "axios";
 import https from "https";
@@ -43,7 +48,7 @@ const COMMON_HTTPS_AGENT = getHttpsAgent();
 
 export async function cdlRequest(
   url: string,
-  accessToken: [string, string],
+  authInfo: AuthInfoArgsType,
   queryParams?: any,
   dataPayload?: any,
 ) {
@@ -59,13 +64,12 @@ export async function cdlRequest(
       httpsAgent: COMMON_HTTPS_AGENT,
       method: httpMethod,
       baseURL: configRead<string>("cdlApiGateway.url"),
-      url: `api/v1/${url}`,
+      url,
       responseType: "json",
       headers: {
         "User-Agent": configRead<string>("userAgent", "CactiCDLConnector"),
-        Authorization: `Bearer ${accessToken[0]}`,
-        "Trust-Agent-Id": accessToken[1],
         "Content-Type": "application/json;charset=UTF-8",
+        ...getAuthorizationHeaders(authInfo),
       },
       params: queryParams,
       data: dataPayload,
@@ -78,5 +82,37 @@ export async function cdlRequest(
     }
 
     throw error;
+  }
+}
+
+function getAuthorizationHeaders(
+  authInfo: AuthInfoArgsType,
+): Record<string, string | number | boolean> {
+  if (
+    isAuthInfoAccessTokenArgsType(authInfo) &&
+    isAuthInfoSubscriptionKeyArgsType(authInfo)
+  ) {
+    throw new Error(
+      "Mixed authInfo configuration detected - use either accessToken or subscriptionKey!",
+    );
+  }
+
+  if (isAuthInfoAccessTokenArgsType(authInfo)) {
+    return {
+      Authorization: `Bearer ${authInfo.accessToken}`,
+      "Trust-Agent-Id": authInfo.trustAgentId,
+    };
+  } else if (isAuthInfoSubscriptionKeyArgsType(authInfo)) {
+    return {
+      "Ocp-Apim-Subscription-Key": authInfo.subscriptionKey,
+      "Trust-User-Id": authInfo.trustUserId,
+      "Trust-User-Role": authInfo.trustUserRole,
+      "Trust-Agent-Id": authInfo.trustAgentId,
+      "Trust-Agent-Role": authInfo.trustAgentRole,
+    };
+  } else {
+    throw new Error(
+      "Missing authInfo information or information not complete!",
+    );
   }
 }

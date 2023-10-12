@@ -1,3 +1,4 @@
+import { FunctionArgsType } from "./type-defs";
 import { read as configRead } from "../common/core/config";
 import { cdlRequest } from "./cdl-request";
 import sanitizeHtml from "sanitize-html";
@@ -7,23 +8,6 @@ import safeStringify from "fast-safe-stringify";
 import { getLogger } from "log4js";
 const logger = getLogger("ServerPlugin[" + process.pid + "]");
 logger.level = configRead("logLevel", "info");
-
-type SupportedFunctions =
-  | "registerHistoryData"
-  | "getLineage"
-  | "searchByHeader"
-  | "searchByGlobalData"
-  | "status";
-
-type FunctionArgsType = {
-  method: {
-    type: SupportedFunctions;
-    accessToken?: string;
-    trustAgentId?: string;
-  };
-  args: any;
-  reqID?: string;
-};
 
 /*
  * ServerPlugin
@@ -87,7 +71,7 @@ export class ServerPlugin {
 
     const responseData = await cdlRequest(
       `trail_registration`,
-      getAccessTokenOrThrow(args),
+      args.method.authInfo,
       {},
       {
         "cdl:EventId": typedArgs.eventId ?? "",
@@ -133,7 +117,7 @@ export class ServerPlugin {
 
     const responseData = await cdlRequest(
       `trail_acquisition/${sanitizeHtml(typedArgs.eventId)}`,
-      getAccessTokenOrThrow(args),
+      args.method.authInfo,
       {
         direction,
         depth,
@@ -197,7 +181,7 @@ async function searchRequest(
 
   const responseData = await cdlRequest(
     searchType,
-    getAccessTokenOrThrow(args),
+    args.method.authInfo,
     {},
     {
       searchType: typedArgs.searchType,
@@ -210,19 +194,4 @@ async function searchRequest(
   }
 
   return responseData;
-}
-
-function getAccessTokenOrThrow(args: FunctionArgsType): [string, string] {
-  const accessToken = args?.method?.accessToken;
-  const trustAgentId = args?.method?.trustAgentId;
-
-  if (!accessToken) {
-    throw new Error("Missing CDL accessToken");
-  }
-
-  if (!trustAgentId) {
-    throw new Error("Missing CDL trustAgentId");
-  }
-
-  return [accessToken, trustAgentId];
 }

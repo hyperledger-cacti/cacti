@@ -36,7 +36,7 @@ This plugin provides `Cacti` a way to interact with Fujitsu CDL networks. Using 
 
 #### Configuring CDL API Gateway Access
 
-- Set the base URL of GW service in `cdlApiGateway.url`. Do not include `api/v1`, just the base URL. (example: `"http://localhost:3000"`).
+- Set the base URL of GW service in `cdlApiGateway.url` (example: `"http://localhost:3000"`).
 - If the service certificate is signed with a known CA (node uses Mozilla DB), then you can skip the next steps.
 - If the service is signed with unknown CA, you can specify the gateway certificate to trust manually:
   - Set `cdlApiGateway.caPath` to path of API Gateway certificate (in PEM format). (example: `"/etc/cactus/connector-cdl-socketio/CA/cdl-api-gateway-ca.pem"`)
@@ -67,14 +67,16 @@ npm run start
 
 ## Manual Tests
 
-- There are no automatic tests for this plugin.
-- `cdl-connector-manual.test` contains a Jest test script that will check every implemented operation on a running CDL instance.
+- There are no automatic tests for this plugin because there's no private instance of CDL available at a time.
+- `cdl-connector-manual.test` contains a Jest test script that will check every implemented operation on a running CDL service.
 - **You need access to a running instance of CDL in order to run this script.**
 - Before running the script you must update the following variables in it:
-  - `ACCESS_TOKEN` - JWT token for authorization in CDL gateway.
-  - `TOKEN_AGENT_ID` - Token agent ID.
+  - `authInfo` - either `accessToken` or `subscriptionKey` based configuration.
   - `VALIDATOR_KEY_PATH` - Path to validator public certificate.
 - Script can be used as a quick reference for using this connector plugin.
+- Since script is not part of project jest suite, to run in execute the following commands from a package dir:
+  - `npm run build`
+  - `npx jest dist/lib/test/typescript/integration/cdl-connector-manual.test.js`
 
 ## Contributing
 
