@@ -16,7 +16,11 @@
   },
   "dependencies": {
     "@hyperledger/cactus-cmd-socketio-server": "2.0.0-alpha.2",
+    "@hyperledger/cactus-common": "2.0.0-alpha.2",
+    "@hyperledger/cactus-core": "2.0.0-alpha.2",
     "@hyperledger/cactus-core-api": "2.0.0-alpha.2",
+    "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-alpha.2",
+    "@hyperledger/cactus-plugin-ledger-connector-fabric": "2.0.0-alpha.2",
     "@hyperledger/cactus-verifier-client": "2.0.0-alpha.2",
     "@types/node": "14.18.54",
     "axios": "0.24.0",
@@ -28,9 +32,8 @@
     "ethereumjs-common": "1.5.2",
     "ethereumjs-tx": "2.1.2",
     "express": "4.16.4",
-    "fabric-ca-client": "1.4.19",
-    "fabric-client": "1.4.19",
-    "fabric-network": "1.4.19",
+    "fabric-ca-client": "2.2.18",
+    "fabric-network": "2.2.18",
     "http-errors": "1.6.3",
     "jsonwebtoken": "9.0.0",
     "jsrsasign": "10.5.25",
@@ -46,6 +49,7 @@
     "@types/elliptic": "6.4.14",
     "@types/escape-html": "1.0.1",
     "@types/express": "4.17.13",
+    "@types/jsonwebtoken": "9.0.2",
     "@types/jsrsasign": "10.5.8"
   }
 }

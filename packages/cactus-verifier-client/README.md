@@ -14,7 +14,7 @@ This package provides `Verifier` and `VerifierFactory` components that can be us
 | IROHA_1X               | cactus-plugin-ledger-connector-iroha            |
 | IROHA_2X               | cactus-plugin-ledger-connector-iroha2           |
 | FABRIC_2X              | cactus-plugin-ledger-connector-fabric           |
-| legacy-socketio        | cactus-plugin-ledger-connector-fabric-socketio<br />cactus-plugin-ledger-connector-go-ethereum-socketio<br />cactus-plugin-ledger-connector-sawtooth-socketio |
+| legacy-socketio        | cactus-plugin-ledger-connector-go-ethereum-socketio<br />cactus-plugin-ledger-connector-sawtooth-socketio |
 
 ## VerifierFactory
 - Used to create single verifier per ledger based on pre-defined configuration.

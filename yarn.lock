@@ -5705,13 +5705,10 @@ __metadata:
     ethereumjs-common: 1.5.2
     ethereumjs-tx: 2.1.2
     express: 4.16.4
-    fabric-ca-client: 1.4.19
-    fabric-network: 1.4.19
     http-errors: 1.6.3
     http-terminator: 3.2.0
     js-yaml: 3.14.1
     jsonwebtoken: 9.0.0
-    jsrsasign: 10.5.25
     lodash: 4.17.21
     log4js: 6.4.1
     morgan: 1.10.0
@@ -5950,11 +5947,16 @@ __metadata:
   resolution: "@hyperledger/cactus-example-discounted-asset-trade@workspace:examples/cactus-example-discounted-asset-trade"
   dependencies:
     "@hyperledger/cactus-cmd-socketio-server": 2.0.0-alpha.2
+    "@hyperledger/cactus-common": 2.0.0-alpha.2
+    "@hyperledger/cactus-core": 2.0.0-alpha.2
     "@hyperledger/cactus-core-api": 2.0.0-alpha.2
+    "@hyperledger/cactus-plugin-keychain-memory": 2.0.0-alpha.2
+    "@hyperledger/cactus-plugin-ledger-connector-fabric": 2.0.0-alpha.2
     "@hyperledger/cactus-verifier-client": 2.0.0-alpha.2
     "@types/elliptic": 6.4.14
     "@types/escape-html": 1.0.1
     "@types/express": 4.17.13
+    "@types/jsonwebtoken": 9.0.2
     "@types/jsrsasign": 10.5.8
     "@types/node": 14.18.54
     axios: 0.24.0
@@ -5966,9 +5968,8 @@ __metadata:
     ethereumjs-common: 1.5.2
     ethereumjs-tx: 2.1.2
     express: 4.16.4
-    fabric-ca-client: 1.4.19
-    fabric-client: 1.4.19
-    fabric-network: 1.4.19
+    fabric-ca-client: 2.2.18
+    fabric-network: 2.2.18
     http-errors: 1.6.3
     jsonwebtoken: 9.0.0
     jsrsasign: 10.5.25
@@ -6499,44 +6500,6 @@ __metadata:
     web3-eth-contract: 4.1.0
   bin:
     cacti-ethereum-connector-status: dist/lib/scripts/get-ethereum-connector-status.js
-  languageName: unknown
-  linkType: soft
-
-"@hyperledger/cactus-plugin-ledger-connector-fabric-socketio@workspace:packages/cactus-plugin-ledger-connector-fabric-socketio":
-  version: 0.0.0-use.local
-  resolution: "@hyperledger/cactus-plugin-ledger-connector-fabric-socketio@workspace:packages/cactus-plugin-ledger-connector-fabric-socketio"
-  dependencies:
-    "@hyperledger/cactus-api-client": 2.0.0-alpha.2
-    "@hyperledger/cactus-cmd-socketio-server": 2.0.0-alpha.2
-    "@hyperledger/cactus-common": 2.0.0-alpha.2
-    "@hyperledger/cactus-test-tooling": 2.0.0-alpha.2
-    "@types/config": 0.0.41
-    "@types/cookie-parser": 1.4.3
-    "@types/elliptic": 6.4.14
-    "@types/express": 4.17.13
-    "@types/http-errors": 2.0.1
-    "@types/jsrsasign": 10.5.8
-    "@types/lodash": 4.14.195
-    "@types/node": 14.18.54
-    body-parser: 1.17.2
-    cookie-parser: 1.4.6
-    debug: 3.1.0
-    express: 4.17.3
-    fabric-ca-client: 1.4.19
-    fabric-client: 1.4.19
-    fabric-network: 1.4.19
-    fs-extra: 10.1.0
-    grpc: 1.24.11
-    js-yaml: 3.14.1
-    jsonwebtoken: 9.0.0
-    lodash: 4.17.21
-    log4js: 6.4.1
-    morgan: 1.10.0
-    protobufjs: 7.2.5
-    serve-favicon: 2.4.5
-    shelljs: 0.8.5
-    socket.io: 4.5.4
-    ts-node: 9.1.1
   languageName: unknown
   linkType: soft
 
@@ -10380,7 +10343,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/bytebuffer@npm:^5.0.34, @types/bytebuffer@npm:^5.0.40":
+"@types/bytebuffer@npm:^5.0.34":
+  version: 5.0.44
+  resolution: "@types/bytebuffer@npm:5.0.44"
+  dependencies:
+    "@types/long": ^3.0.0
+    "@types/node": "*"
+  checksum: 86a58be037037b039a645da89b4319f5923b7d506fa770312e8f5f37d251a70cc4f34e59d7d392651a9223d85ca1d072e9ae8126eb874ab0302b91dc40cf352c
+  languageName: node
+  linkType: hard
+
+"@types/bytebuffer@npm:^5.0.40":
   version: 5.0.43
   resolution: "@types/bytebuffer@npm:5.0.43"
   dependencies:
@@ -10982,6 +10955,13 @@ __metadata:
   version: 4.0.1
   resolution: "@types/long@npm:4.0.1"
   checksum: ff9653c33f5000d0f131fd98a950a0343e2e33107dd067a97ac4a3b9678e1a2e39ea44772ad920f54ef6e8f107f76bc92c2584ba905a0dc4253282a4101166d0
+  languageName: node
+  linkType: hard
+
+"@types/long@npm:^3.0.0":
+  version: 3.0.32
+  resolution: "@types/long@npm:3.0.32"
+  checksum: 7c64c64b4a8bf38d9a6690f725ed5e92383905b22c1320493749729c4f476a74fa2507cc9364268ecdfdba1cf11573a46648157f3e34cb0c39f51b05d13c37eb
   languageName: node
   linkType: hard
 
@@ -28240,9 +28220,9 @@ __metadata:
   linkType: hard
 
 "klaw@npm:^4.0.1":
-  version: 4.0.1
-  resolution: "klaw@npm:4.0.1"
-  checksum: 7835649ef632f96099d500f94b38c032acf1432ad5e87da596a2509c2f6a63a7fc346fb357e2227091cc433af5c1378ed448e1c0522ed028981dcd446152291e
+  version: 4.1.0
+  resolution: "klaw@npm:4.1.0"
+  checksum: 23fcdd8b837f7d51f0a62bebc4e5f83ee8338083597f33f97ae6aed3305c53220c8bf9f1a81024c11658b2e71022868f3b2ba4c39298af4eaacd38ef1e3a878e
   languageName: node
   linkType: hard
 
@@ -40652,27 +40632,6 @@ __metadata:
     ts-node-transpile-only: dist/bin-transpile.js
     ts-script: dist/bin-script-deprecated.js
   checksum: 59997e32cfb84323317f9fd33ff62d025b467ff36c296c3ad1ee54f08fd355c58fab37e096e2a63fd01fced929384b16b9d74bf324713a21844e527ddd5f6c17
-  languageName: node
-  linkType: hard
-
-"ts-node@npm:9.1.1":
-  version: 9.1.1
-  resolution: "ts-node@npm:9.1.1"
-  dependencies:
-    arg: ^4.1.0
-    create-require: ^1.1.0
-    diff: ^4.0.1
-    make-error: ^1.1.1
-    source-map-support: ^0.5.17
-    yn: 3.1.1
-  peerDependencies:
-    typescript: ">=2.7"
-  bin:
-    ts-node: dist/bin.js
-    ts-node-script: dist/bin-script.js
-    ts-node-transpile-only: dist/bin-transpile.js
-    ts-script: dist/bin-script-deprecated.js
-  checksum: 356e2647b8b1e6ab00380c0537fa569b63bd9b6f006cc40fd650f81fae1817bd8fecc075300036950d8f45c1d85b95be33cd1e48a1a424a7d86c3dbb42bf60e5
   languageName: node
   linkType: hard
 

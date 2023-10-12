@@ -1,25 +1,29 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
- * Source: https://github.com/hyperledger/fabric-samples/releases/tag/v1.4.8
+ * Source: https://github.com/hyperledger/fabric-samples
  */
 
 "use strict";
 
-const { FileSystemWallet, Gateway } = require("fabric-network");
+const { Gateway, Wallets } = require("fabric-network");
 const path = require("path");
+const fs = require("fs");
 
 const ccpPath = "./connection.json";
 
 async function main() {
   try {
+    // load the network configuration
+    const ccp = JSON.parse(fs.readFileSync(ccpPath, "utf8"));
+
     // Create a new file system based wallet for managing identities.
     const walletPath = path.join(process.cwd(), "wallet");
-    const wallet = new FileSystemWallet(walletPath);
+    const wallet = await Wallets.newFileSystemWallet(walletPath);
     console.log(`Wallet path: ${walletPath}`);
 
     // Check to see if we've already enrolled the user.
-    const userExists = await wallet.exists("appUser");
-    if (!userExists) {
+    const identity = await wallet.get("appUser");
+    if (!identity) {
       console.log(
         'An identity for the user "appUser" does not exist in the wallet',
       );
@@ -29,7 +33,7 @@ async function main() {
 
     // Create a new gateway for connecting to our peer node.
     const gateway = new Gateway();
-    await gateway.connect(ccpPath, {
+    await gateway.connect(ccp, {
       wallet,
       identity: "appUser",
       discovery: { enabled: true, asLocalhost: true },
@@ -46,9 +50,11 @@ async function main() {
     // GetAllAssets transaction - requires no arguments, ex: ('GetAllAssets')
     const result = await contract.evaluateTransaction("GetAllAssets");
     console.log(
-      "Transaction has been evaluated, result is:",
-      JSON.parse(result.toString()),
+      `Transaction has been evaluated, result is: ${result.toString()}`,
     );
+
+    // Disconnect from the gateway.
+    await gateway.disconnect();
   } catch (error) {
     console.error(`Failed to evaluate transaction: ${error}`);
     process.exit(1);

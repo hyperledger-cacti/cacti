@@ -17,7 +17,7 @@ import { routesTransactionManagement } from "@hyperledger/cactus-cmd-socketio-se
 import { BusinessLogicBase } from "@hyperledger/cactus-cmd-socketio-server";
 import { LPInfoHolder } from "@hyperledger/cactus-cmd-socketio-server";
 import { makeRawTransaction } from "./transaction-ethereum";
-import { makeSignedProposal } from "./transaction-fabric";
+import { transferOwnership } from "./transaction-fabric";
 import { getDataFromIndy } from "./transaction-indy";
 import {
   LedgerEvent,
@@ -29,10 +29,20 @@ import {
   VerifierFactory,
   VerifierFactoryConfig,
 } from "@hyperledger/cactus-verifier-client";
+import {
+  WatchBlocksCactusTransactionsEventV1,
+  WatchBlocksListenerTypeV1,
+  WatchBlocksResponseV1,
+} from "@hyperledger/cactus-plugin-ledger-connector-fabric";
 
 const config: any = ConfigUtil.getConfig();
 
 import { getLogger } from "log4js";
+import {
+  createSigningToken,
+  getFabricApiClient,
+  getSignerIdentity,
+} from "./fabric-connector";
 const moduleName = "BusinessLogicAssetTrade";
 const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;
@@ -220,15 +230,8 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
     // get schema & credential definition from indy
     // now verifierGetEntitiesFromLedger don't get revRegDefs & revRegs
     // did is null. If it is null, indy.buidlGetSchemaRequest API get data by default param.
-    const [
-      schemasJson,
-      credDefsJson,
-      revRegDefsJson,
-      revRegsJson,
-    ] = await this.verifierGetEntitiesFromLedger(
-      null,
-      proofJson["identifiers"],
-    );
+    const [schemasJson, credDefsJson, revRegDefsJson, revRegsJson] =
+      await this.verifierGetEntitiesFromLedger(null, proofJson["identifiers"]);
 
     assert(
       "Permanent" ===
@@ -412,70 +415,62 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
   ): void {
     logger.debug("called secondTransaction");
 
-    ///// Fab Transfer
+    // Start monitoring
+    const fabricApiClient = getFabricApiClient();
+    const watchObservable = fabricApiClient.watchBlocksDelegatedSignV1({
+      channelName: config.assetTradeInfo.fabric.channelName,
+      type: WatchBlocksListenerTypeV1.CactusTransactions,
+      signerCertificate: getSignerIdentity().credentials.certificate,
+      signerMspID: getSignerIdentity().mspId,
+      uniqueTransactionData: createSigningToken("watchBlock"),
+    });
+    const watchSub = watchObservable.subscribe({
+      next: (event: WatchBlocksResponseV1) => {
+        if (!("cactusTransactionsEvents" in event)) {
+          logger.error("Wrong input block format!", event);
+          return;
+        }
 
-    // Get Verifier Instance
-    logger.debug(
-      `##secondTransaction(): businessLogicID: ${tradeInfo.businessLogicID}`,
-    );
-    const useValidator = JSON.parse(
-      routesTransactionManagement.getValidatorToUse(tradeInfo.businessLogicID),
-    );
-    const verifierFabric = routesVerifierFactory.getVerifier(
-      useValidator["validatorID"][1],
-    );
-    verifierFabric.startMonitor(
-      "BusinessLogicAssetTrade",
-      {},
-      routesTransactionManagement,
-    );
-    logger.debug("getVerifierFabric");
+        for (const ev of event.cactusTransactionsEvents) {
+          logger.debug(`##in onEventFabric()`);
 
-    // Generate parameters for sendSignedProposal(TransferAsset)
-    const ccFncName = "TransferAsset";
+          try {
+            const txId = ev.transactionId;
+            logger.debug(`##txId = ${txId}`);
+            if (this.hasTxIDInTransactions(txId)) {
+              watchSub.unsubscribe();
+              this.executeNextTransaction(ev, txId);
+              break;
+            }
+          } catch (err) {
+            logger.error(
+              `##onEventFabric(): onEvent, err: ${err}, event: ${JSON.stringify(
+                ev,
+              )}`,
+              ev,
+            );
+          }
+        }
+      },
+      error(err: unknown) {
+        logger.error("Fabric watchBlocksV1() error:", err);
+      },
+    });
 
-    const ccArgs: string[] = [
-      assetID, // assetID
-      fabricAccountTo, // Owner
-    ];
-    makeSignedProposal(ccFncName, ccArgs, verifierFabric)
-      .then((result) => {
-        logger.info("secondTransaction txId : " + result.txId);
+    transferOwnership(assetID, fabricAccountTo).then((result) => {
+      logger.info("secondTransaction txId : " + result.transactionId);
 
-        // Register transaction data in DB
-        const transactionData: TransactionData = new TransactionData(
-          "transfer",
-          "ledger002",
-          result.txId,
-        );
-        this.transactionInfoManagement.setTransactionData(
-          tradeInfo,
-          transactionData,
-        );
-
-        // Call sendSignedTransactionV2
-        const contract = {
-          channelName: config.assetTradeInfo.fabric.channelName,
-        };
-        const method = { type: "function", command: "sendSignedTransactionV2" };
-        const args = {
-          args: result.signedTxArgs,
-        };
-
-        // Run Verifier (Fabric)
-        logger.debug("Sending fabric.sendSignedTransactionV2");
-        verifierFabric
-          .sendAsyncRequest(contract, method, args)
-          .then(() => {
-            logger.debug(`##secondTransaction sendAsyncRequest finish`);
-          })
-          .catch((err) => {
-            logger.error(err);
-          });
-      })
-      .catch((err) => {
-        logger.error(err);
-      });
+      // Register transaction data in DB
+      const transactionData: TransactionData = new TransactionData(
+        "transfer",
+        "ledger002",
+        result.transactionId,
+      );
+      this.transactionInfoManagement.setTransactionData(
+        tradeInfo,
+        transactionData,
+      );
+    });
   }
 
   thirdTransaction(
@@ -578,9 +573,6 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
       case config.assetTradeInfo.ethereum.validatorID:
         this.onEvenEtherem(ledgerEvent.data, targetIndex);
         break;
-      case config.assetTradeInfo.fabric.validatorID:
-        this.onEvenFabric(ledgerEvent.data, targetIndex);
-        break;
       default:
         logger.error(
           `##onEvent(), invalid verifierId: ${ledgerEvent.verifierId}`,
@@ -634,67 +626,15 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
     }
   }
 
-  onEvenFabric(event: FabricEvent, targetIndex: number): void {
-    logger.debug(`##in onEvenFabric()`);
-    const tx:
-      | {
-          txId: string;
-        }
-      | undefined = this.getTransactionFromFabricEvent(event, targetIndex);
-    if (tx == null) {
-      logger.warn(`##onEvenFabric(): invalid event: ${json2str(event)}`);
-      return;
-    }
-
-    try {
-      const txId = tx["txId"];
-      const status = event["status"];
-      logger.debug(`##txId = ${txId}`);
-      logger.debug(`##status =${status}`);
-
-      if (status !== 200) {
-        logger.error(
-          `##onEvenFabric(): error event, status: ${status}, txId: ${txId}`,
-        );
-        return;
-      }
-
-      // Perform the following transaction actions
-      this.executeNextTransaction(tx, txId);
-    } catch (err) {
-      logger.error(
-        `##onEvenFabric(): onEvent, err: ${err}, event: ${json2str(event)}`,
-      );
-    }
-  }
-
-  getTransactionFromFabricEvent(
-    event: FabricEvent,
-    targetIndex: number,
-  ): FabricEvent | undefined {
-    try {
-      const retTransaction = event["blockData"][targetIndex];
-      logger.debug(
-        `##getTransactionFromFabricEvent(): retTransaction: ${retTransaction}`,
-      );
-      return retTransaction;
-    } catch (err) {
-      logger.error(
-        `##getTransactionFromFabricEvent(): invalid even, err:${err}, event:${event}`,
-      );
-    }
-  }
-
   executeNextTransaction(
-    txInfo: Record<string, unknown> | EthData,
+    txInfo: WatchBlocksCactusTransactionsEventV1 | EthData,
     txId: string,
   ): void {
     let transactionInfo: TransactionInfo | null = null;
     try {
       // Retrieve DB transaction information
-      transactionInfo = this.transactionInfoManagement.getTransactionInfoByTxId(
-        txId,
-      );
+      transactionInfo =
+        this.transactionInfoManagement.getTransactionInfoByTxId(txId);
       if (transactionInfo != null) {
         logger.debug(
           `##onEvent(A), transactionInfo: ${json2str(transactionInfo)}`,
@@ -704,9 +644,8 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
         return;
       }
       const txStatus = transactionInfo.status;
-      const tradeInfo = this.createTradeInfoFromTransactionInfo(
-        transactionInfo,
-      );
+      const tradeInfo =
+        this.createTradeInfoFromTransactionInfo(transactionInfo);
       let txInfoData: TxInfoData;
 
       switch (txStatus) {
@@ -792,10 +731,12 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
 
   getOperationStatus(tradeID: string): TransactionStatusData {
     logger.debug(`##in getOperationStatus()`);
-    const businessLogicInquireAssetTradeStatus: BusinessLogicInquireAssetTradeStatus = new BusinessLogicInquireAssetTradeStatus();
-    const transactionStatusData = businessLogicInquireAssetTradeStatus.getAssetTradeOperationStatus(
-      tradeID,
-    );
+    const businessLogicInquireAssetTradeStatus: BusinessLogicInquireAssetTradeStatus =
+      new BusinessLogicInquireAssetTradeStatus();
+    const transactionStatusData =
+      businessLogicInquireAssetTradeStatus.getAssetTradeOperationStatus(
+        tradeID,
+      );
 
     return transactionStatusData;
   }
@@ -807,22 +748,17 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
     logger.debug(`##in getTxIDFromEvent`);
     logger.debug(`##event: ${json2str(ledgerEvent)}`);
 
-    switch (ledgerEvent.verifierId) {
-      case config.assetTradeInfo.ethereum.validatorID:
-        return this.getTxIDFromEventEtherem(ledgerEvent.data, targetIndex);
-      case config.assetTradeInfo.fabric.validatorID:
-        return this.getTxIDFromEventFabric(ledgerEvent.data, targetIndex);
-      default:
-        logger.error(
-          `##getTxIDFromEvent(): invalid verifierId: ${ledgerEvent.verifierId}`,
-        );
+    if (ledgerEvent.verifierId !== config.assetTradeInfo.ethereum.validatorID) {
+      logger.error(
+        `##getTxIDFromEvent(): invalid verifierId: ${ledgerEvent.verifierId}`,
+      );
     }
-    return null;
-  }
 
-  getTxIDFromEventEtherem(event: EthEvent, targetIndex: number): string | null {
     logger.debug(`##in getTxIDFromEventEtherem()`);
-    const tx = this.getTransactionFromEthereumEvent(event, targetIndex);
+    const tx = this.getTransactionFromEthereumEvent(
+      ledgerEvent.data,
+      targetIndex,
+    );
     if (tx == null) {
       logger.warn(`#getTxIDFromEventEtherem(): skip(not found tx)`);
       return null;
@@ -834,7 +770,7 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
       if (typeof txId !== "string") {
         logger.warn(
           `#getTxIDFromEventEtherem(): skip(invalid block, not found txId.), event: ${json2str(
-            event,
+            ledgerEvent.data,
           )}`,
         );
         return null;
@@ -844,40 +780,9 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
       return txId;
     } catch (err) {
       logger.error(
-        `##getTxIDFromEventEtherem(): err: ${err}, event: ${json2str(event)}`,
-      );
-      return null;
-    }
-  }
-
-  getTxIDFromEventFabric(
-    event: FabricEvent,
-    targetIndex: number,
-  ): string | null {
-    logger.debug(`##in getTxIDFromEventFabric()`);
-    const tx = this.getTransactionFromFabricEvent(event, targetIndex);
-    if (tx == null) {
-      logger.warn(`#getTxIDFromEventFabric(): skip(not found tx)`);
-      return null;
-    }
-
-    try {
-      const txId = tx["txId"];
-
-      if (typeof txId !== "string") {
-        logger.warn(
-          `#getTxIDFromEventFabric(): skip(invalid block, not found txId.), event: ${json2str(
-            event,
-          )}`,
-        );
-        return null;
-      }
-
-      logger.debug(`###getTxIDFromEventFabric(): txId: ${txId}`);
-      return txId;
-    } catch (err) {
-      logger.error(
-        `##getTxIDFromEventFabric(): err: ${err}, event: ${json2str(event)}`,
+        `##getTxIDFromEventEtherem(): err: ${err}, event: ${json2str(
+          ledgerEvent.data,
+        )}`,
       );
       return null;
     }
@@ -885,9 +790,8 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
 
   hasTxIDInTransactions(txID: string): boolean {
     logger.debug(`##in hasTxIDInTransactions(), txID: ${txID}`);
-    const transactionInfo = this.transactionInfoManagement.getTransactionInfoByTxId(
-      txID,
-    );
+    const transactionInfo =
+      this.transactionInfoManagement.getTransactionInfoByTxId(txID);
     logger.debug(`##hasTxIDInTransactions(), ret: ${transactionInfo !== null}`);
     return transactionInfo !== null;
   }

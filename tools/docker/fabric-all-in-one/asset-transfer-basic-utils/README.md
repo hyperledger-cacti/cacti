@@ -1,7 +1,7 @@
 # fabric-cli-.14
 
 Helper CLI tools for interacting with `asset-transfer-basic` CC deployed in `fabric-all-in-one` image.
-Sources are based on official fabric-samples 1.4.8 - https://github.com/hyperledger/fabric-samples/releases/tag/v1.4.8.
+Sources are based on official fabric-samples - https://github.com/hyperledger/fabric-samples/
 
 ## Usage
 

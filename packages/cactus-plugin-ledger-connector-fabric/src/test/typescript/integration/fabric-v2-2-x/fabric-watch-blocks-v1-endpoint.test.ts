@@ -385,7 +385,6 @@ describe("watchBlocksV1 of fabric connector tests", () => {
 
   /**
    * Check Cactus custom transactions summary block monitoring.
-   * This format is compatible with legacy fabric-socketio output.
    */
   test("Monitoring with type CactusTransactions returns transactions summary", async () => {
     const monitorPromise = testWatchBlock(
