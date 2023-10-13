@@ -194,6 +194,9 @@ test("can get past logs of an account", async (t: Test) => {
     "test-1",
   );
   t.ok(checkflow.status, "flowStatusResponse endpoint OK");
+  t.equal(checkflow.data.flowStatus, "COMPLETED", "flowStatus is COMPLETED");
+  t.equal(checkflow.data.flowError, null, "flowError should be null");
+  //Negative Testing
 
   // WIP Simulate conversation between Bob and Alice
   // Follow the flow as per https://docs.r3.com/en/platform/corda/5.0/developing-applications/getting-started/utxo-ledger-example-cordapp/running-the-chat-cordapp.html
@@ -272,6 +275,7 @@ test("can get past logs of an account", async (t: Test) => {
     };
     await apiClient.startFlowParameters(shortHashBob, bobUpdate2);
     await waitForStatusChange(shortHashBob, "update-2");
+
     //4. Alice lists chat
     const aliceListsChat = {
       clientRequestId: "list-2",
@@ -294,6 +298,32 @@ test("can get past logs of an account", async (t: Test) => {
     };
     await apiClient.startFlowParameters(shortHashAlice, aliceHistoryRequest);
     await waitForStatusChange(shortHashAlice, "get-1");
+
+    //6. Alice replies to Bob
+    const aliceReply = {
+      clientRequestId: "update-4",
+      flowClassName:
+        "com.r3.developers.csdetemplate.utxoexample.workflows.UpdateChatFlow",
+      requestBody: {
+        id: chatWithBobId,
+        message: "I am very well thank you",
+      },
+    };
+    await apiClient.startFlowParameters(shortHashAlice, aliceReply);
+    await waitForStatusChange(shortHashAlice, "update-4");
+
+    //7. Bob gets the chat history
+    const bobHistoryRequest = {
+      clientRequestId: "get-2",
+      flowClassName:
+        "com.r3.developers.csdetemplate.utxoexample.workflows.GetChatFlow",
+      requestBody: {
+        id: chatWithBobId,
+        numberOfRecords: "2",
+      },
+    };
+    await apiClient.startFlowParameters(shortHashBob, bobHistoryRequest);
+    await waitForStatusChange(shortHashBob, "get-2");
   });
 
   // Reusable function to wait for the status to change to COMPLETED
@@ -303,23 +333,11 @@ test("can get past logs of an account", async (t: Test) => {
         shortHash,
         flowName,
       );
-
       if (checkFlowObject.data.flowStatus === "COMPLETED") {
-        // t.ok(checkFlowObject.status, "flowStatusResponse endpoint OK");
-        t.equal(
-          checkFlowObject.data.flowStatus,
-          "COMPLETED",
-          "flowStatus is COMPLETED",
-        );
-        t.equal(
-          checkFlowObject.data.flowError,
-          null,
-          "flowError should be null",
-        );
-        console.log("Status changed to COMPLETED");
+        console.log("Flow Status is COMPLETED");
         return checkFlowObject.data;
-      } else {
-        console.log("Waiting for status change");
+      } else if (checkFlowObject.data.flowStatus === "RUNNING") {
+        console.log("Flow Status is RUNNING");
         await new Promise((resolve) => setTimeout(resolve, 20000));
         checkFlowObject = await apiClient.flowStatusResponse(
           shortHash,
