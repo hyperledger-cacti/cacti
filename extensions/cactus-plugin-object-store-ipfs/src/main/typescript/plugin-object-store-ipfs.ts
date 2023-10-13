@@ -1,6 +1,6 @@
 import path from "path";
 import type { Express } from "express";
-import { create } from "ipfs-http-client";
+import { create, IPFSHTTPClient } from "ipfs-http-client";
 import type { Options } from "ipfs-http-client";
 import { RuntimeError } from "run-time-error";
 import { Logger, Checks, LoggerProvider } from "@hyperledger/cactus-common";
@@ -22,7 +22,6 @@ import OAS from "../json/openapi.json";
 import { GetObjectEndpointV1 } from "./web-services/get-object-endpoint-v1";
 import { SetObjectEndpointV1 } from "./web-services/set-object-endpoint-v1";
 import { HasObjectEndpointV1 } from "./web-services/has-object-endpoint-v1";
-import type { IIpfsHttpClient } from "./i-ipfs-http-client";
 import { isIpfsHttpClientOptions } from "./i-ipfs-http-client";
 
 export const K_IPFS_JS_HTTP_ERROR_FILE_DOES_NOT_EXIST =
@@ -31,13 +30,13 @@ export const K_IPFS_JS_HTTP_ERROR_FILE_DOES_NOT_EXIST =
 export interface IPluginObjectStoreIpfsOptions extends ICactusPluginOptions {
   readonly logLevel?: LogLevelDesc;
   readonly parentDir: string;
-  readonly ipfsClientOrOptions: Options | IIpfsHttpClient;
+  readonly ipfsClientOrOptions: Options | IPFSHTTPClient;
 }
 
 export class PluginObjectStoreIpfs implements IPluginObjectStore {
   public static readonly CLASS_NAME = "PluginObjectStoreIpfs";
 
-  private readonly ipfs: IIpfsHttpClient;
+  private readonly ipfs: IPFSHTTPClient;
   private readonly log: Logger;
   private readonly instanceId: string;
   private readonly parentDir: string;

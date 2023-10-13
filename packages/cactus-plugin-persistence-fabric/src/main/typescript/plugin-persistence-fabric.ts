@@ -224,14 +224,8 @@ export class PluginPersistenceFabric
   public async lastBlockInLedgerWithoutFabricProto(): Promise<number> {
     let tempBlockNumber = this.lastBlock;
     let blockNumber = tempBlockNumber.toString();
-    let block: AxiosResponse<GetBlockResponseV1> = {
-      data: { decodedBlock: {} },
-      status: 0,
-      statusText: "",
-      headers: undefined,
-      config: {},
-      request: undefined,
-    };
+    let block: AxiosResponse<GetBlockResponseV1> =
+      null as unknown as AxiosResponse<GetBlockResponseV1>;
     let moreBlocks = true;
     do {
       try {
@@ -247,7 +241,7 @@ export class PluginPersistenceFabric
         moreBlocks = false;
       }
 
-      if (block.status == 200) {
+      if (block?.status == 200) {
         if (moreBlocks) {
           // Update information about last Block in Ledger - this.lastBlock
           this.lastBlock = tempBlockNumber;
@@ -271,14 +265,8 @@ export class PluginPersistenceFabric
   async initialBlocksSynchronization(edgeOfLedger: number): Promise<string> {
     let tempBlockNumber = 0;
     let blockNumber = tempBlockNumber.toString();
-    let block: AxiosResponse<GetBlockResponseV1> = {
-      data: { decodedBlock: {} },
-      status: 0,
-      statusText: "string",
-      headers: undefined,
-      config: {},
-      request: undefined,
-    };
+    let block: AxiosResponse<GetBlockResponseV1> =
+      null as unknown as AxiosResponse<GetBlockResponseV1>;
     let moreBlocks = true;
     do {
       try {
@@ -294,7 +282,7 @@ export class PluginPersistenceFabric
         moreBlocks = false;
       }
 
-      if (block.status == 200) {
+      if (block?.status == 200) {
         const logBlock = JSON.stringify(block.data);
 
         // Put scrapped block into database
@@ -332,14 +320,8 @@ export class PluginPersistenceFabric
     let tempBlockNumber = this.lastSeenBlock;
     let blockNumber = tempBlockNumber.toString();
     this.lastBlock = await this.lastBlockInLedger(signingCredential);
-    let block: AxiosResponse<GetBlockResponseV1> = {
-      data: { decodedBlock: {} },
-      status: 0,
-      statusText: "",
-      headers: undefined,
-      config: {},
-      request: undefined,
-    };
+    let block: AxiosResponse<GetBlockResponseV1> =
+      null as unknown as AxiosResponse<GetBlockResponseV1>;
     this.synchronizationGo = true;
     do {
       if (this.lastBlock > this.lastSeenBlock) {
@@ -355,7 +337,7 @@ export class PluginPersistenceFabric
           this.log.info("Last block in ledger", tempBlockNumber - 1);
         }
 
-        if (block.status == 200) {
+        if (block?.status == 200) {
           await this.migrateBlockNrWithTransactions(blockNumber);
           this.lastSeenBlock = tempBlockNumber;
           tempBlockNumber = tempBlockNumber + 1;
@@ -388,14 +370,8 @@ export class PluginPersistenceFabric
     let tempBlockNumber = this.lastSeenBlock; //last block migrated to database
     let blockNumber = tempBlockNumber.toString();
     this.lastBlock = await this.lastBlockInLedger(signingCredential);
-    let block: AxiosResponse<GetBlockResponseV1> = {
-      data: { decodedBlock: {} },
-      status: 0,
-      statusText: "",
-      headers: undefined,
-      config: {},
-      request: undefined,
-    };
+    let block: AxiosResponse<GetBlockResponseV1> =
+      null as unknown as AxiosResponse<GetBlockResponseV1>;
     let checkBlock = true;
     do {
       if (this.lastBlock > this.lastSeenBlock) {
@@ -411,7 +387,7 @@ export class PluginPersistenceFabric
           this.log.info("Last block in ledger", tempBlockNumber - 1);
         }
 
-        if (block.status == 200) {
+        if (block?.status == 200) {
           const isThisBlockPresent =
             await this.dbClient.isThisBlockInDB(tempBlockNumber);
 
