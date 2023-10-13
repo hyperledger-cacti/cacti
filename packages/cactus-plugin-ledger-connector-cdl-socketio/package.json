@@ -68,7 +68,7 @@
     "@hyperledger/cactus-common": "2.0.0-alpha.2",
     "@types/config": "0.0.41",
     "@types/cookie-parser": "1.4.3",
-    "@types/express": "4.17.13",
+    "@types/express": "4.17.19",
     "@types/http-errors": "2.0.1",
     "@types/jsonwebtoken": "9.0.2",
     "@types/node": "14.18.54",
