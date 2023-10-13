@@ -75,7 +75,7 @@
     "dotenv": "^16.0.1",
     "fabric-network": "2.2.19",
     "fs-extra": "10.1.0",
-    "ipfs-http-client": "51.0.1",
+    "ipfs-http-client": "60.0.1",
     "knex": "2.5.1",
     "nyc": "^13.1.0",
     "openapi-types": "9.1.0",
