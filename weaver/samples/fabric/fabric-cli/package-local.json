@@ -42,7 +42,7 @@
     "express": "4.18.2",
     "fabric-ca-client": "2.2.19",
     "fabric-network": "2.2.19",
-    "gluegun": "5.1.3",
+    "gluegun": "5.1.6",
     "grpc-tools": "1.12.4",
     "ini": "1.3.8",
     "node-notifier": "8.0.2",

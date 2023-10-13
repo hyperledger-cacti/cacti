@@ -1,11 +1,11 @@
 import type { IPFS } from "ipfs-core-types";
-import type { EndpointConfig } from "ipfs-http-client";
+import type { EndpointConfig, IPFSHTTPClient } from "ipfs-http-client";
 
 export interface IIpfsHttpClient extends IPFS {
   getEndpointConfig: () => EndpointConfig;
 }
 
-export function isIpfsHttpClientOptions(x: unknown): x is IIpfsHttpClient {
+export function isIpfsHttpClientOptions(x: unknown): x is IPFSHTTPClient {
   if (!x) {
     return false;
   }

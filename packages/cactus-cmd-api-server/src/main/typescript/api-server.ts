@@ -531,8 +531,8 @@ export class ApiServer {
     const middlewareIndexHtml: RequestHandler = (_, res) =>
       res.sendFile(resolvedIndexHtml);
 
-    app.use("/api/v*", apiProxyMiddleware);
-    app.use(compression());
+    app.use("/api/v*", apiProxyMiddleware as RequestHandler);
+    app.use(compression() as RequestHandler);
     app.use(corsMiddleware);
     app.use(express.static(resolvedWwwRoot));
     app.get("/*", rateLimiterIndexHtml, middlewareIndexHtml);
@@ -700,7 +700,7 @@ export class ApiServer {
 
     const pluginRegistry = await this.getOrInitPluginRegistry();
 
-    app.use(compression());
+    app.use(compression() as RequestHandler);
 
     const apiCorsDomainCsv = this.options.config.apiCorsDomainCsv;
     const allowedDomains = apiCorsDomainCsv.split(",");

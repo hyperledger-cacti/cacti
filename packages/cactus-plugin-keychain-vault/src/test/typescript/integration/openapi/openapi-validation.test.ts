@@ -294,7 +294,7 @@ test(`${testCase}`, async (t: Test) => {
         400,
         `Endpoint ${fDelete} with fake=4: response.status === 400 OK`,
       );
-      const fields = e?.response?.data.map((param: { path: string }) =>
+      const fields = (e?.response?.data as []).map((param: { path: string }) =>
         param.path.replace("/body/", ""),
       );
       t2.ok(
