@@ -1,5 +1,3 @@
-import { type } from "os";
-
 export type SupportedFunctions =
   | "registerHistoryData"
   | "getLineage"
@@ -57,3 +55,9 @@ export type FunctionArgsType = {
   args: any;
   reqID?: string;
 };
+
+export const HTTP_HEADER_SUBSCRIPTION_KEY = "Ocp-Apim-Subscription-Key";
+export const HTTP_HEADER_TRUST_USER_ID = "Trust-User-Id";
+export const HTTP_HEADER_TRUST_USER_ROLE = "Trust-User-Role";
+export const HTTP_HEADER_TRUST_AGENT_ID = "Trust-Agent-Id";
+export const HTTP_HEADER_TRUST_AGENT_ROLE = "Trust-Agent-Role";

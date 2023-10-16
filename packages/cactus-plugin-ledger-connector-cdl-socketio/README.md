@@ -36,12 +36,13 @@ This plugin provides `Cacti` a way to interact with Fujitsu CDL networks. Using 
 
 #### Configuring CDL API Gateway Access
 
-- Set the base URL of GW service in `cdlApiGateway.url` (example: `"http://localhost:3000"`).
+- Set the base URL of GW service in `cdlApiGateway.url` (when using JWT access token - DEFAULT) and/or `cdlApiSubscriptionGateway.url` (when using subscription-key)
+  - Example: `"http://localhost:3000"`
 - If the service certificate is signed with a known CA (node uses Mozilla DB), then you can skip the next steps.
 - If the service is signed with unknown CA, you can specify the gateway certificate to trust manually:
-  - Set `cdlApiGateway.caPath` to path of API Gateway certificate (in PEM format). (example: `"/etc/cactus/connector-cdl-socketio/CA/cdl-api-gateway-ca.pem"`)
-  - (optional) If server name in cert doesn't match the one in `cdlApiGateway.url`, you can overwrite it in `cdlApiGateway.serverName`
-- (not recommended - only for development): To ignore certificate rejection (e.g. use self-signed certificate) set `cdlApiGateway.skipCertCheck` to `true`.
+  - Set `cdlApiGateway.caPath`/`cdlApiSubscriptionGateway.caPath` to path of API Gateway certificate (in PEM format). (example: `"/etc/cactus/connector-cdl-socketio/CA/cdl-api-gateway-ca.pem"`)
+  - (optional) If server name in cert doesn't match the one in `url`, you can overwrite it in `cdlApiGateway.serverName`/`cdlApiSubscriptionGateway.serverName`
+- (not recommended - only for development): To ignore certificate rejection (e.g. use self-signed certificate) set `cdlApiGateway.skipCertCheck`/`cdlApiSubscriptionGateway.skipCertCheck` to `true`.
 
 ### Docker
 
