@@ -1,5 +1,10 @@
 import {
   AuthInfoArgsType,
+  HTTP_HEADER_SUBSCRIPTION_KEY,
+  HTTP_HEADER_TRUST_USER_ID,
+  HTTP_HEADER_TRUST_USER_ROLE,
+  HTTP_HEADER_TRUST_AGENT_ID,
+  HTTP_HEADER_TRUST_AGENT_ROLE,
   isAuthInfoAccessTokenArgsType,
   isAuthInfoSubscriptionKeyArgsType,
 } from "./type-defs";
@@ -13,11 +18,15 @@ import { readFileSync } from "fs";
 const logger = getLogger("cdl-request[" + process.pid + "]");
 logger.level = configRead("logLevel", "info");
 
-function getHttpsAgent() {
+type HTTPAuthHeadersType = Record<string, string | number | boolean>;
+
+function createHttpsGatewayConfig(
+  gatewayKey: "cdlApiGateway" | "cdlApiSubscriptionGateway",
+) {
   const agentOptions: https.AgentOptions = {};
 
   const skipCertCheck = configRead<boolean>(
-    "cdlApiGateway.skipCertCheck",
+    `${gatewayKey}.skipCertCheck`,
     false,
   );
   if (skipCertCheck) {
@@ -27,7 +36,7 @@ function getHttpsAgent() {
     agentOptions.rejectUnauthorized = !skipCertCheck;
   }
 
-  const caPath = configRead<string>("cdlApiGateway.caPath", "");
+  const caPath = configRead<string>(`${gatewayKey}.caPath`, "");
   if (caPath) {
     logger.info(`Using CDL API GW CA ${caPath}`);
     const gatewayCAString = readFileSync(caPath, "ascii");
@@ -35,16 +44,32 @@ function getHttpsAgent() {
     agentOptions.ca = gatewayCAString;
   }
 
-  const serverName = configRead<string>("cdlApiGateway.serverName", "");
+  const serverName = configRead<string>(`${gatewayKey}.serverName`, "");
   if (serverName) {
     logger.info(`Overwrite CDL API GW server name with '${serverName}'`);
     agentOptions.servername = serverName;
   }
 
-  return new https.Agent(agentOptions);
+  return {
+    baseURL: configRead<string>(`${gatewayKey}.url`),
+    httpsAgent: new https.Agent(agentOptions),
+  };
 }
 
-const COMMON_HTTPS_AGENT = getHttpsAgent();
+const API_GATEWAY_CONFIG = createHttpsGatewayConfig("cdlApiGateway");
+const API_SUBSCRIPTION_GATEWAY_CONFIG = createHttpsGatewayConfig(
+  "cdlApiSubscriptionGateway",
+);
+
+function getHttpsGatewayConfigForHeaders(headers: HTTPAuthHeadersType) {
+  if (HTTP_HEADER_SUBSCRIPTION_KEY in headers) {
+    logger.debug("Using subscription key gateway for this request");
+    return API_SUBSCRIPTION_GATEWAY_CONFIG;
+  }
+
+  logger.debug("Using access token gateway for this request");
+  return API_GATEWAY_CONFIG;
+}
 
 export async function cdlRequest(
   url: string,
@@ -59,17 +84,20 @@ export async function cdlRequest(
 
   logger.debug(`cdlRequest ${httpMethod} ${url} executed`);
 
+  const authHeaders = getAuthorizationHeaders(authInfo);
+  const { httpsAgent, baseURL } = getHttpsGatewayConfigForHeaders(authHeaders);
+
   try {
     const requestResponse = await axios({
-      httpsAgent: COMMON_HTTPS_AGENT,
+      httpsAgent,
       method: httpMethod,
-      baseURL: configRead<string>("cdlApiGateway.url"),
+      baseURL,
       url,
       responseType: "json",
       headers: {
         "User-Agent": configRead<string>("userAgent", "CactiCDLConnector"),
         "Content-Type": "application/json;charset=UTF-8",
-        ...getAuthorizationHeaders(authInfo),
+        ...authHeaders,
       },
       params: queryParams,
       data: dataPayload,
@@ -87,7 +115,7 @@ export async function cdlRequest(
 
 function getAuthorizationHeaders(
   authInfo: AuthInfoArgsType,
-): Record<string, string | number | boolean> {
+): HTTPAuthHeadersType {
   if (
     isAuthInfoAccessTokenArgsType(authInfo) &&
     isAuthInfoSubscriptionKeyArgsType(authInfo)
@@ -100,15 +128,15 @@ function getAuthorizationHeaders(
   if (isAuthInfoAccessTokenArgsType(authInfo)) {
     return {
       Authorization: `Bearer ${authInfo.accessToken}`,
-      "Trust-Agent-Id": authInfo.trustAgentId,
+      [HTTP_HEADER_TRUST_AGENT_ID]: authInfo.trustAgentId,
     };
   } else if (isAuthInfoSubscriptionKeyArgsType(authInfo)) {
     return {
-      "Ocp-Apim-Subscription-Key": authInfo.subscriptionKey,
-      "Trust-User-Id": authInfo.trustUserId,
-      "Trust-User-Role": authInfo.trustUserRole,
-      "Trust-Agent-Id": authInfo.trustAgentId,
-      "Trust-Agent-Role": authInfo.trustAgentRole,
+      [HTTP_HEADER_SUBSCRIPTION_KEY]: authInfo.subscriptionKey,
+      [HTTP_HEADER_TRUST_USER_ID]: authInfo.trustUserId,
+      [HTTP_HEADER_TRUST_USER_ROLE]: authInfo.trustUserRole,
+      [HTTP_HEADER_TRUST_AGENT_ID]: authInfo.trustAgentId,
+      [HTTP_HEADER_TRUST_AGENT_ROLE]: authInfo.trustAgentRole,
     };
   } else {
     throw new Error(
