@@ -60,7 +60,7 @@
     "sanitize-html": "2.7.0",
     "socket.io": "4.4.1",
     "socket.io-client": "4.5.4",
-    "undici": "5.19.1"
+    "undici": "5.26.2"
   },
   "devDependencies": {
     "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-alpha.2",
