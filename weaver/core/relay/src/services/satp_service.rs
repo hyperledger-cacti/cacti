@@ -1,3 +1,4 @@
+use chrono::Utc;
 // Internal generated modules
 use weaverpb::common::ack::{ack, Ack};
 use weaverpb::driver::driver::{
@@ -14,12 +15,13 @@ use weaverpb::relay::satp::{
 // Internal modules
 use crate::error::Error;
 use crate::relay_proto::parse_address;
+use crate::services::database::{Log, Operation};
 use crate::services::helpers::{println_stage_heading, println_step_heading};
 use crate::services::satp_helper::{
     create_ack_error_message, create_assign_asset_request, create_create_asset_request,
     create_extinguish_request, create_perform_lock_request,
     get_request_id_from_transfer_proposal_receipt, log_request_in_local_satp_db,
-    log_request_in_remote_satp_db,
+    log_request_in_remote_satp_db, log_request,
 };
 
 use super::helpers::get_driver;
@@ -61,8 +63,10 @@ impl Satp for SatpService {
         &self,
         request: Request<TransferProposalClaimsRequest>,
     ) -> Result<Response<Ack>, Status> {
+        let step_id = "1.1".to_string();
+
         println_stage_heading("1".to_string());
-        println_step_heading("1.1".to_string());
+        println_step_heading(step_id.clone());
         println!(
             "Got a TransferProposalClaimsRequest from {:?} - {:?}",
             request.remote_addr(),
@@ -74,26 +78,21 @@ impl Satp for SatpService {
             get_request_id_from_transfer_proposal_claims(transfer_proposal_claims_request.clone());
         let conf = self.config_lock.read().await;
 
-        match log_request_in_remote_satp_db(
-            &request_id,
-            &transfer_proposal_claims_request,
-            conf.clone(),
-        ) {
-            Ok(_) => {
-                println!("Successfully stored TransferProposalClaimsRequest in remote satp_db with request_id: {}", request_id);
-            }
-            Err(e) => {
-                // Internal failure of sled. Send Error response
-                let error_message =
-                    "Error storing TransferProposalClaimsRequest in remote satp_db for request_id"
-                        .to_string();
-                let reply = create_ack_error_message(request_id, error_message, e);
-                return reply;
-            }
-        }
+        let log = Log {
+            timestamp: Utc::now().naive_utc().to_string(),
+            request_id: request_id.clone(),
+            request: serde_json::to_string(&transfer_proposal_claims_request.clone()).unwrap(),
+            step_id: step_id.clone(),
+            operation: Operation::Init,
+            network_id: "todo_network_id".to_string(),
+            gateway_id: transfer_proposal_claims_request.clone().sender_gateway_network_id,
+            received: true,
+            details: None,
+        };
+        log_request(log);
 
         match process_transfer_proposal_claims_request(
-            transfer_proposal_claims_request,
+            transfer_proposal_claims_request.clone(),
             conf.clone(),
         ) {
             Ok(ack) => {
@@ -102,11 +101,35 @@ impl Satp for SatpService {
                     "Sending Ack of transfer proposal claims request back: {:?}\n",
                     reply
                 );
+                let log = Log {
+                    timestamp: Utc::now().naive_utc().to_string(),
+                    request_id: request_id.clone(),
+                    request: serde_json::to_string(&transfer_proposal_claims_request).unwrap(),
+                    step_id: step_id.clone(),
+                    operation: Operation::Done,
+                    network_id: "todo_network_id".to_string(),
+                    gateway_id: transfer_proposal_claims_request.clone().sender_gateway_network_id,
+                    received: true,
+                    details: None,
+                };
+                log_request(log);
                 reply
             }
             Err(e) => {
                 let error_message = "Transfer proposal claims failed.".to_string();
-                let reply = create_ack_error_message(request_id, error_message, e);
+                let reply = create_ack_error_message(request_id.clone(), error_message.clone(), e);
+                let log = Log {
+                    timestamp: Utc::now().naive_utc().to_string(),
+                    request_id: request_id.clone(),
+                    request: serde_json::to_string(&transfer_proposal_claims_request).unwrap(),
+                    step_id: step_id.clone(),
+                    operation: Operation::Failed,
+                    network_id: "todo_network_id".to_string(),
+                    gateway_id: transfer_proposal_claims_request.clone().sender_gateway_network_id,
+                    received: true,
+                    details: Some(error_message),
+                };
+                log_request(log);
                 reply
             }
         }
@@ -678,6 +701,20 @@ pub fn process_transfer_proposal_claims_request(
         println!("The transfer proposal claims request is valid\n");
         let transfer_proposal_receipt_request =
             create_transfer_proposal_receipt_request(transfer_proposal_claims_request.clone());
+
+        let log = Log {
+            timestamp: Utc::now().naive_utc().to_string(),
+            request_id: request_id.clone(),
+            request: serde_json::to_string(&transfer_proposal_claims_request.clone()).unwrap(),
+            step_id: "1.1".to_string(),
+            operation: Operation::Exec,
+            network_id: "todo_network_id".to_string(),
+            gateway_id: transfer_proposal_claims_request.clone().sender_gateway_network_id,
+            received: true,
+            details: None,
+        };
+        log_request(log);
+
         match send_transfer_proposal_receipt_request(transfer_proposal_receipt_request, conf) {
             Ok(ack) => {
                 println!("Ack transfer proposal claims request.");
@@ -1117,13 +1154,13 @@ fn send_transfer_proposal_receipt_request(
         get_relay_params(relay_host.clone(), relay_port.clone(), conf.clone());
 
     spawn_send_transfer_proposal_receipt_request(
-        transfer_proposal_receipt_request,
+        transfer_proposal_receipt_request.clone(),
         relay_host,
         relay_port,
         use_tls,
-        tlsca_cert_path,
-        conf,
+        tlsca_cert_path
     );
+
     let reply = Ack {
         status: ack::Status::Ok as i32,
         request_id: request_id.to_string(),
@@ -1224,8 +1261,7 @@ fn send_lock_assertion_broadcast_request(
         relay_host,
         relay_port,
         use_tls,
-        tlsca_cert_path,
-        conf,
+        tlsca_cert_path
     );
     let reply = Ack {
         status: ack::Status::Ok as i32,

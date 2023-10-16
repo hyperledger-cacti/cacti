@@ -22,12 +22,44 @@ use crate::db::Database;
 use crate::error::{self, Error};
 use crate::relay_proto::LocationSegment;
 use crate::services::helpers::get_driver_client;
+use dotenv::dotenv;
+use chrono::Utc;
+use crate::services::database::Operation;
+use super::database::{Log, PostgresDatabase, SqliteDatabase};
 
 use super::constants::{
     SATP_DB_PATH, SATP_REMOTE_REQUESTS_DB_PATH, SATP_REMOTE_REQUESTS_STATES_DB_PATH,
     SATP_REQUESTS_DB_PATH, SATP_REQUESTS_STATES_DB_PATH,
 };
 use super::types::Driver;
+
+fn choose_database() -> Box<dyn super::database::Database> {
+    // Choose the appropriate database type (e.g., based on an environment variable)
+    let use_sqlite = std::env::var("USE_SQLITE").is_ok();
+
+    // Create a database instance
+    if use_sqlite {
+        Box::new(SqliteDatabase)
+    } else {
+        Box::new(PostgresDatabase)
+    }
+}
+
+fn add_log(
+    database: &dyn super::database::Database,
+    log: Log,
+) -> Result<(), Box<dyn std::error::Error>> {
+    // Log the entry using the provided database
+    database.log(&log)?;
+    Ok(())
+}
+
+pub fn log_request(log: Log) {
+    dotenv().ok();
+
+    let database = choose_database();
+    add_log(&*database, log).unwrap();
+}
 
 // Sends a request to the receiving gateway
 pub fn spawn_send_transfer_proposal_claims_request(
@@ -61,7 +93,7 @@ pub fn spawn_send_transfer_proposal_claims_request(
 
         println!("Received Ack from sending gateway: {:?}\n", result);
         // Updates the request in the DB depending on the response status from the sending gateway
-        log_request_result_in_local_satp_db(&request_id, result, conf);
+        log_request_result(&request_id, result);
     });
 }
 
@@ -96,7 +128,7 @@ pub fn spawn_send_transfer_commence_request(
 
         println!("Received Ack from sending gateway: {:?}\n", result);
         // Updates the request in the DB depending on the response status from the sending gateway
-        log_request_result_in_local_satp_db(&request_id, result, conf);
+        log_request_result(&request_id, result);
     });
 }
 
@@ -105,8 +137,7 @@ pub fn spawn_send_transfer_proposal_receipt_request(
     relay_host: String,
     relay_port: String,
     use_tls: bool,
-    tlsca_cert_path: String,
-    conf: Config,
+    tlsca_cert_path: String
 ) {
     tokio::spawn(async move {
         let request_id = get_request_id_from_transfer_proposal_receipt(
@@ -116,6 +147,22 @@ pub fn spawn_send_transfer_proposal_receipt_request(
             "Sending transfer proposal receipt back to sending gateway: Request ID = {:?}",
             request_id
         );
+
+        let log = Log {
+            timestamp: Utc::now().naive_utc().to_string(),
+            request_id: request_id.clone(),
+            request: serde_json::to_string(&transfer_proposal_receipt_request.clone()).unwrap(),
+            step_id: "1.2".to_string(),
+            operation: Operation::Init,
+            network_id: "todo_network_id".to_string(),
+            gateway_id: transfer_proposal_receipt_request
+                .clone()
+                .sender_gateway_network_id,
+            received: false,
+            details: None,
+        };
+        log_request(log);
+
         let result = call_transfer_proposal_receipt(
             relay_host,
             relay_port,
@@ -127,7 +174,7 @@ pub fn spawn_send_transfer_proposal_receipt_request(
 
         println!("Received Ack from sending gateway: {:?}\n", result);
         // Updates the request in the DB depending on the response status from the sending gateway
-        log_request_result_in_local_satp_db(&request_id, result, conf);
+        log_request_result(&request_id, result);
     });
 }
 
@@ -156,7 +203,7 @@ pub fn spawn_send_ack_commence_request(
 
         println!("Received Ack from sending gateway: {:?}\n", result);
         // Updates the request in the DB depending on the response status from the sending gateway
-        log_request_result_in_local_satp_db(&request_id, result, conf);
+        log_request_result(&request_id, result);
     });
 }
 
@@ -190,8 +237,7 @@ pub fn spawn_send_lock_assertion_broadcast_request(
     relay_host: String,
     relay_port: String,
     use_tls: bool,
-    tlsca_cert_path: String,
-    conf: Config,
+    tlsca_cert_path: String
 ) {
     tokio::spawn(async move {
         let request_id = lock_assertion_request.session_id.to_string();
@@ -216,7 +262,7 @@ pub fn spawn_send_lock_assertion_broadcast_request(
         println!("Received Ack from sending gateway: {:?}\n", result);
         // Updates the request in the DB depending on the response status from the sending gateway
         let request_id = lock_assertion_receipt_request.session_id.to_string();
-        log_request_result_in_local_satp_db(&request_id, result, conf);
+        log_request_result(&request_id, result);
     });
 }
 
@@ -243,7 +289,7 @@ pub fn spawn_send_lock_assertion_request(
         println!("Received Ack from sending gateway: {:?}\n", result);
         // Updates the request in the DB depending on the response status from the sending gateway
         let request_id = lock_assertion_request.session_id.to_string();
-        log_request_result_in_local_satp_db(&request_id, result, conf);
+        log_request_result(&request_id, result);
     });
 }
 
@@ -274,7 +320,7 @@ pub fn spawn_send_commit_prepare_request(
 
         println!("Received Ack from sending gateway: {:?}\n", result);
         // Updates the request in the DB depending on the response status from the sending gateway
-        log_request_result_in_local_satp_db(&request_id, result, conf);
+        log_request_result(&request_id, result);
     });
 }
 
@@ -326,7 +372,7 @@ pub fn spawn_send_commit_ready_request(
         println!("Received Ack from sending gateway: {:?}\n", result);
         // Updates the request in the DB depending on the response status from the sending gateway
         let request_id = commit_ready_request.session_id.to_string();
-        log_request_result_in_local_satp_db(&request_id, result, conf);
+        log_request_result(&request_id, result);
     });
 }
 
@@ -378,7 +424,7 @@ pub fn spawn_send_ack_final_receipt_request(
         println!("Received Ack from sending gateway: {:?}\n", result);
         // Updates the request in the DB depending on the response status from the sending gateway
         let request_id = ack_final_receipt_request.session_id.to_string();
-        log_request_result_in_local_satp_db(&request_id, result, conf);
+        log_request_result(&request_id, result);
     });
 }
 
@@ -415,7 +461,7 @@ pub fn spawn_send_ack_final_receipt_broadcast_request(
         println!("Received Ack from sending gateway: {:?}\n", result);
         // Updates the request in the DB depending on the response status from the sending gateway
         let request_id = transfer_completed_request.session_id.to_string();
-        log_request_result_in_local_satp_db(&request_id, result, conf);
+        log_request_result(&request_id, result);
     });
 }
 
@@ -471,7 +517,7 @@ pub fn spawn_send_commit_final_assertion_request(
         println!("Received Ack from sending gateway: {:?}\n", result);
         // Updates the request in the DB depending on the response status from the sending gateway
         let request_id = commit_final_assertion_request.session_id.to_string();
-        log_request_result_in_local_satp_db(&request_id, result, conf);
+        log_request_result(&request_id, result);
     });
 }
 
@@ -790,10 +836,9 @@ pub async fn call_commit_final_assertion_receipt(
     Ok(response)
 }
 
-pub fn log_request_result_in_local_satp_db(
+pub fn log_request_result(
     request_id: &String,
     result: Result<Response<Ack>, Box<dyn std::error::Error>>,
-    conf: Config,
 ) {
     match result {
         Ok(ack_response) => {
@@ -801,37 +846,54 @@ pub fn log_request_result_in_local_satp_db(
             // This match first checks if the status is valid.
             match ack::Status::from_i32(ack_response_into_inner.status) {
                 Some(status) => match status {
-                    ack::Status::Ok => update_request_state_in_local_satp_db(
-                        request_id.to_string(),
-                        request_state::Status::Pending,
-                        None,
-                        conf,
-                    ),
-                    ack::Status::Error => update_request_state_in_local_satp_db(
-                        request_id.to_string(),
-                        request_state::Status::Error,
-                        Some(request_state::State::Error(
-                            ack_response_into_inner.message.to_string(),
-                        )),
-                        conf,
-                    ),
+                    ack::Status::Ok => {
+                        let log = Log {
+                            timestamp: Utc::now().naive_utc().to_string(),
+                            request_id: request_id.clone(),
+                            request: "".to_string(),
+                            step_id: "".to_string(),
+                            operation: Operation::Done,
+                            network_id: "".to_string(),
+                            gateway_id: "".to_string(),
+                            received: false,
+                            details: None,
+                        };
+                        log_request(log);
+                    }
+                    ack::Status::Error => {
+                        let log = Log {
+                            timestamp: Utc::now().naive_utc().to_string(),
+                            request_id: request_id.clone(),
+                            request: "".to_string(),
+                            step_id: "".to_string(),
+                            operation: Operation::Failed,
+                            network_id: "".to_string(),
+                            gateway_id: "".to_string(),
+                            received: false,
+                            details: Some(ack_response_into_inner.message),
+                        };
+                        log_request(log);
+                    }
                 },
-                None => update_request_state_in_local_satp_db(
-                    request_id.to_string(),
-                    request_state::Status::Error,
-                    Some(request_state::State::Error(
-                        "Status is not supported or is invalid".to_string(),
-                    )),
-                    conf,
-                ),
+                None => {
+                    // TODO
+                }
             }
         }
-        Err(result_error) => update_request_state_in_local_satp_db(
-            request_id.to_string(),
-            request_state::Status::Error,
-            Some(request_state::State::Error(format!("{:?}", result_error))),
-            conf,
-        ),
+        Err(result_error) => {
+            let log = Log {
+                timestamp: Utc::now().naive_utc().to_string(),
+                request_id: request_id.clone(),
+                request: "".to_string(),
+                step_id: "".to_string(),
+                operation: Operation::Failed,
+                network_id: "".to_string(),
+                gateway_id: "".to_string(),
+                received: false,
+                details: Some(result_error.to_string()),
+            };
+            log_request(log);
+        }
     }
 }
 
