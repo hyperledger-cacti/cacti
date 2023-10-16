@@ -27,7 +27,7 @@ The above means that the `ApiClient` class is not the one containing the impleme
 
 For example you can use the `@hyperledger/cactus-api-client` node package to perform Cactus node discovery based on ledger IDs (that can be obtained from the `ConsortiumDatabase` as defined by the [generated models](https://github.com/hyperledger/cactus/blob/main/packages/cactus-core-api/src/main/typescript/generated/openapi/typescript-axios/api.ts) of the `@hyperledger/cactus-core-api` package.
 
-> While you can generate API Clients for the Cactus API specifications in any supported langauge of the [OpenAPI Generator](https://github.com/OpenAPITools/openapi-generator) the features provided by this package will have to be developed separately (if not already done by the Cactus maintainers). Currently the only implementation of the abstract API Client and its features (node discovery) is in Typescript (e.g. the `@hyperledger/cactus-api-client` package).
+> While you can generate API Clients for the Cactus API specifications in any supported language of the [OpenAPI Generator](https://github.com/OpenAPITools/openapi-generator) the features provided by this package will have to be developed separately (if not already done by the Cactus maintainers). Currently the only implementation of the abstract API Client and its features (node discovery) is in Typescript (e.g. the `@hyperledger/cactus-api-client` package).
 
 Usage
 --------------------------------------------

@@ -21,11 +21,11 @@ When Fabric is the responding network, the IOP module is in charge of verifying 
 
 ![](../../../images-weaver-docs/architecture-assets/fabric_dapp_flow2.png)
 
-Verification Policy, Access Control and Membership are modular components within the interop chaincode for seperation of concerns of the code.
+Verification Policy, Access Control and Membership are modular components within the interop chaincode for separation of concerns of the code.
 
 ## Corda
 
-As can be seen from the diagrams below, the architecture for Corda is very similar to that of Fabric. The main difference is that the interop module and the application specific flows are in seperate CorDapps, instead of seperate chaincodes like in Fabric.
+As can be seen from the diagrams below, the architecture for Corda is very similar to that of Fabric. The main difference is that the interop module and the application specific flows are in separate CorDapps, instead of separate chaincodes like in Fabric.
 
 ![](../../../images-weaver-docs/architecture-assets/corda_dapp_flow1.png)
 
