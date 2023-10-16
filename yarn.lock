@@ -6157,6 +6157,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fastify/busboy@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "@fastify/busboy@npm:2.0.0"
+  checksum: 41879937ce1dee6421ef9cd4da53239830617e1f0bb7a0e843940772cd72827205d05e518af6adabe6e1ea19301285fff432b9d11bad01a531e698bea95c781b
+  languageName: node
+  linkType: hard
+
 "@fidm/asn1@npm:^1.0.4":
   version: 1.0.4
   resolution: "@fidm/asn1@npm:1.0.4"
@@ -7817,7 +7824,7 @@ __metadata:
     sanitize-html: 2.7.0
     socket.io: 4.5.4
     socket.io-client: 4.5.4
-    undici: 5.19.1
+    undici: 5.26.2
     uuid: 8.3.2
   languageName: unknown
   linkType: soft
@@ -46995,12 +47002,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"undici@npm:5.19.1":
-  version: 5.19.1
-  resolution: "undici@npm:5.19.1"
+"undici@npm:5.26.2":
+  version: 5.26.2
+  resolution: "undici@npm:5.26.2"
   dependencies:
-    busboy: ^1.6.0
-  checksum: 57ee94ee74d944faa41dbcb2faf4e0c90069708d3aaae860185884e51376b5d457728352a8396d69a3c9cb752b62ff99a19a664c5aacb7ee61cc488af499a01c
+    "@fastify/busboy": ^2.0.0
+  checksum: 04691e736d32319ec56e430dc706625ba79b98852e47f408d253329d833e6d252a84cef9e698c7f78c7f5955c052c8d4790254b0d3a8ee388df02bb0c2a8994c
   languageName: node
   linkType: hard
 
