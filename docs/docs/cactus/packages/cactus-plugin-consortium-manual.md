@@ -8,7 +8,7 @@ This class creates a prometheus exporter, which scrapes the total Cactus node co
 
 ### Usage Prometheus
 
-The prometheus exporter object is initialized in the `PluginConsortiumManual` class constructor itself, so instantiating the object of the `PluginConsortiumManual` class, gives access to the exporter object. You can also initialize the prometheus exporter object seperately and then pass it to the `IPluginConsortiumManualOptions` interface for `PluginConsortiumManual` constructor.
+The prometheus exporter object is initialized in the `PluginConsortiumManual` class constructor itself, so instantiating the object of the `PluginConsortiumManual` class, gives access to the exporter object. You can also initialize the prometheus exporter object separately and then pass it to the `IPluginConsortiumManualOptions` interface for `PluginConsortiumManual` constructor.
 
 `getPrometheusMetricsV1` function returns the prometheus exporter metrics, currently displaying the total cactus node count, which currently refreshes to match the node count in the consortium, everytime `updateMetricNodeCount` method of the `PluginConsortiumManual` class is called.
 

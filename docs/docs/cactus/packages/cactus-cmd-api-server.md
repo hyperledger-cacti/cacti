@@ -213,7 +213,7 @@ Many different configurations are possible here as well. One way to have two mem
 
 This is an example to showcase how you can pull up a full consortium even from within a single operating system process (API server) with multiple members and their respective nodes. It is not something that’s recommended for a production grade environment, ever, but it is great for demos and integration tests where you have to simulate a fully functioning consortium with as little hardware footprint as possible to save on time and cost.
 
-The individual nodes/API servers are isolated by listening on seperate TCP ports of the machine they are hosted on:
+The individual nodes/API servers are isolated by listening on separate TCP ports of the machine they are hosted on:
 
 ![deployment-low-resource-example.png](https://github.com/hyperledger/cactus/raw/4a337be719a9d2e2ccb877edccd7849f4be477ec/whitepaper/deployment-low-resource-example.png)
 
@@ -375,7 +375,7 @@ This class creates a prometheus exporter, which scrapes the total Cactus node co
 
 ### Usage Prometheus
 
-The prometheus exporter object is initialized in the `ApiServer` class constructor itself, so instantiating the object of the `ApiServer` class, gives access to the exporter object. You can also initialize the prometheus exporter object seperately and then pass it to the `IApiServerConstructorOptions` interface for `ApiServer` constructor.
+The prometheus exporter object is initialized in the `ApiServer` class constructor itself, so instantiating the object of the `ApiServer` class, gives access to the exporter object. You can also initialize the prometheus exporter object separately and then pass it to the `IApiServerConstructorOptions` interface for `ApiServer` constructor.
 
 `getPrometheusMetricsV1` function returns the prometheus exporter metrics, currently displaying the total plugins imported, which currently refreshes to match the plugin count, everytime `setTotalPluginImports` method is called.
 
