@@ -62,9 +62,8 @@ export class TransactionInfoManagement {
     );
     transactionInfoTable = JSON.parse(transactionInfoFileData);
     transactionInfoTable.table.push(transactionInfoJson);
-    const transactionInfoTableJson: string = JSON.stringify(
-      transactionInfoTable,
-    );
+    const transactionInfoTableJson: string =
+      JSON.stringify(transactionInfoTable);
     fs.writeFileSync(this.fileName, transactionInfoTableJson, "utf8");
 
     this.fileDump();

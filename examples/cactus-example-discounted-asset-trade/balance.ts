@@ -8,25 +8,23 @@
 import { Router, NextFunction, Request, Response } from "express";
 import { ConfigUtil } from "@hyperledger/cactus-cmd-socketio-server";
 import { RIFError } from "@hyperledger/cactus-cmd-socketio-server";
-import { BalanceManagement } from "./balance-management";
 
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
+import { getAccountBalance } from "./transaction-ethereum";
 const moduleName = "balance";
 const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;
 
 const router: Router = Router();
-const balanceManagement: BalanceManagement = new BalanceManagement();
 
 /* GET balance. */
 router.get("/:account", (req: Request, res: Response, next: NextFunction) => {
   try {
-    balanceManagement
-      .getBalance(req.params.account)
+    getAccountBalance(req.params.account)
       .then((result) => {
         logger.debug(`#####[sample/balance.ts]`);
-        logger.debug("result(getBalance) = " + JSON.stringify(result));
+        logger.debug("result(getBalance) = " + result);
         res.status(200).json(result);
       })
       .catch((err) => {

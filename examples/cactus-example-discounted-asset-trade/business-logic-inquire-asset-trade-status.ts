@@ -18,9 +18,10 @@ export class BusinessLogicInquireAssetTradeStatus extends BusinessLogicBase {
     super();
   }
 
-  getAssetTradeOperationStatus(
-    tradeID: string,
-  ): { stateInfo: number | undefined; transactionStatus: TransactionStatus[] } {
+  getAssetTradeOperationStatus(tradeID: string): {
+    stateInfo: number | undefined;
+    transactionStatus: TransactionStatus[];
+  } {
     // Existence check of table file
     try {
       fs.statSync(this.fileName);
@@ -34,7 +35,8 @@ export class BusinessLogicInquireAssetTradeStatus extends BusinessLogicBase {
       .table as string[];
 
     // Create Response Information
-    const resultTransactionStatusData: ResultTransactionStatusData = new ResultTransactionStatusData();
+    const resultTransactionStatusData: ResultTransactionStatusData =
+      new ResultTransactionStatusData();
     for (const transactionInfoJson of transactionInfoTable) {
       const transactionInfo: TransactionInfo = JSON.parse(
         transactionInfoJson,
@@ -45,7 +47,8 @@ export class BusinessLogicInquireAssetTradeStatus extends BusinessLogicBase {
         // Set information
         resultTransactionStatusData.stateInfo = transactionInfo.status;
 
-        const escrowTransactionStatus: TransactionStatus = new TransactionStatus();
+        const escrowTransactionStatus: TransactionStatus =
+          new TransactionStatus();
         escrowTransactionStatus.state = "escrow";
         escrowTransactionStatus.ledger = transactionInfo.escrowLedger;
         escrowTransactionStatus.txID = transactionInfo.escrowTxID;
