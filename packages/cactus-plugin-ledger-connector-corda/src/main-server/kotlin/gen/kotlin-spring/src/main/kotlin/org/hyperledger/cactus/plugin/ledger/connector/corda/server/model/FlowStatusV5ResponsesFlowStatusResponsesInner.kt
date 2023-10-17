@@ -16,24 +16,15 @@ import io.swagger.v3.oas.annotations.media.Schema
 
 /**
  * 
- * @param flowStatus 
- * @param holdingIDShortHash 
- * @param timestamp 
  * @param clientRequestId 
  * @param flowError 
  * @param flowId 
  * @param flowResult 
+ * @param flowStatus 
+ * @param holdingIDShortHash 
+ * @param timestamp 
  */
-data class FlowStatusV5Response(
-
-    @Schema(example = "string", required = true, description = "")
-    @get:JsonProperty("flowStatus", required = true) val flowStatus: kotlin.String,
-
-    @Schema(example = "string", required = true, description = "")
-    @get:JsonProperty("holdingIDShortHash", required = true) val holdingIDShortHash: kotlin.String,
-
-    @Schema(example = "2022-06-24T10:15:30Z", required = true, description = "")
-    @get:JsonProperty("timestamp", required = true) val timestamp: java.time.OffsetDateTime,
+data class FlowStatusV5ResponsesFlowStatusResponsesInner(
 
     @Schema(example = "string", description = "")
     @get:JsonProperty("clientRequestId") val clientRequestId: kotlin.String? = null,
@@ -46,7 +37,16 @@ data class FlowStatusV5Response(
     @get:JsonProperty("flowId") val flowId: kotlin.String? = null,
 
     @Schema(example = "string", description = "")
-    @get:JsonProperty("flowResult") val flowResult: kotlin.String? = null
+    @get:JsonProperty("flowResult") val flowResult: kotlin.String? = null,
+
+    @Schema(example = "string", description = "")
+    @get:JsonProperty("flowStatus") val flowStatus: kotlin.String? = null,
+
+    @Schema(example = "string", description = "")
+    @get:JsonProperty("holdingIDShortHash") val holdingIDShortHash: kotlin.String? = null,
+
+    @Schema(example = "2022-06-24T10:15:30Z", description = "")
+    @get:JsonProperty("timestamp") val timestamp: java.time.OffsetDateTime? = null
 ) {
 
 }

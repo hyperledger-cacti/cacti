@@ -34,19 +34,19 @@ export interface CPIIDV5 {
      * @type {string}
      * @memberof CPIIDV5
      */
-    name: string;
+    'name': string;
     /**
      * 
      * @type {string}
      * @memberof CPIIDV5
      */
-    signerSummaryHash?: string | null;
+    'signerSummaryHash'?: string | null;
     /**
      * 
      * @type {string}
      * @memberof CPIIDV5
      */
-    version: string;
+    'version': string;
 }
 /**
  * 
@@ -56,96 +56,96 @@ export interface CPIIDV5 {
 export interface CPIV5Response {
     /**
      * 
-     * @type {Array<CPIV5ResponseCpis>}
+     * @type {Array<CPIV5ResponseCpisInner>}
      * @memberof CPIV5Response
      */
-    cpis?: Array<CPIV5ResponseCpis>;
+    'cpis'?: Array<CPIV5ResponseCpisInner>;
 }
 /**
  * 
  * @export
- * @interface CPIV5ResponseCpis
+ * @interface CPIV5ResponseCpisInner
  */
-export interface CPIV5ResponseCpis {
+export interface CPIV5ResponseCpisInner {
     /**
      * 
      * @type {string}
-     * @memberof CPIV5ResponseCpis
+     * @memberof CPIV5ResponseCpisInner
      */
-    cpiFileChecksum?: string;
+    'cpiFileChecksum'?: string;
     /**
      * 
      * @type {string}
-     * @memberof CPIV5ResponseCpis
+     * @memberof CPIV5ResponseCpisInner
      */
-    cpiFileFullChecksum?: string;
+    'cpiFileFullChecksum'?: string;
     /**
      * 
-     * @type {Array<CPIV5ResponseCpks>}
-     * @memberof CPIV5ResponseCpis
+     * @type {Array<CPIV5ResponseCpisInnerCpksInner>}
+     * @memberof CPIV5ResponseCpisInner
      */
-    cpks?: Array<CPIV5ResponseCpks>;
+    'cpks'?: Array<CPIV5ResponseCpisInnerCpksInner>;
     /**
      * 
      * @type {string}
-     * @memberof CPIV5ResponseCpis
+     * @memberof CPIV5ResponseCpisInner
      */
-    groupPolicy?: string | null;
+    'groupPolicy'?: string | null;
     /**
      * 
      * @type {CPIIDV5}
-     * @memberof CPIV5ResponseCpis
+     * @memberof CPIV5ResponseCpisInner
      */
-    id?: CPIIDV5;
+    'id'?: CPIIDV5;
     /**
      * 
      * @type {string}
-     * @memberof CPIV5ResponseCpis
+     * @memberof CPIV5ResponseCpisInner
      */
-    timestamp?: string;
+    'timestamp'?: string;
 }
 /**
  * 
  * @export
- * @interface CPIV5ResponseCpks
+ * @interface CPIV5ResponseCpisInnerCpksInner
  */
-export interface CPIV5ResponseCpks {
+export interface CPIV5ResponseCpisInnerCpksInner {
     /**
      * 
      * @type {string}
-     * @memberof CPIV5ResponseCpks
+     * @memberof CPIV5ResponseCpisInnerCpksInner
      */
-    hash?: string;
+    'hash'?: string;
     /**
      * 
      * @type {CPIIDV5}
-     * @memberof CPIV5ResponseCpks
+     * @memberof CPIV5ResponseCpisInnerCpksInner
      */
-    id?: CPIIDV5;
+    'id'?: CPIIDV5;
     /**
      * 
      * @type {Array<string>}
-     * @memberof CPIV5ResponseCpks
+     * @memberof CPIV5ResponseCpisInnerCpksInner
      */
-    libraries?: Array<string>;
+    'libraries'?: Array<string>;
     /**
      * 
      * @type {string}
-     * @memberof CPIV5ResponseCpks
+     * @memberof CPIV5ResponseCpisInnerCpksInner
      */
-    mainBundle?: string;
+    'mainBundle'?: string;
     /**
      * 
      * @type {string}
-     * @memberof CPIV5ResponseCpks
+     * @memberof CPIV5ResponseCpisInnerCpksInner
      */
-    timestamp?: string;
+    'timestamp'?: string;
     /**
      * 
      * @type {string}
-     * @memberof CPIV5ResponseCpks
+     * @memberof CPIV5ResponseCpisInnerCpksInner
      */
-    type?: string;
+    'type'?: string;
 }
 /**
  * 
@@ -500,74 +500,6 @@ export type FlowInvocationType = typeof FlowInvocationType[keyof typeof FlowInvo
 /**
  * 
  * @export
- * @interface FlowStatus
- */
-export interface FlowStatus {
-    /**
-     * 
-     * @type {string}
-     * @memberof FlowStatus
-     */
-    clientRequestId?: string | null;
-    /**
-     * 
-     * @type {FlowStatusFlowError}
-     * @memberof FlowStatus
-     */
-    flowError: FlowStatusFlowError;
-    /**
-     * 
-     * @type {string}
-     * @memberof FlowStatus
-     */
-    flowId?: string | null;
-    /**
-     * 
-     * @type {Array<any>}
-     * @memberof FlowStatus
-     */
-    flowResult?: Array<any>;
-    /**
-     * 
-     * @type {string}
-     * @memberof FlowStatus
-     */
-    flowStatus: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof FlowStatus
-     */
-    holdingIDShortHash: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof FlowStatus
-     */
-    timestamp: string;
-}
-/**
- * 
- * @export
- * @interface FlowStatusFlowError
- */
-export interface FlowStatusFlowError {
-    /**
-     * 
-     * @type {string}
-     * @memberof FlowStatusFlowError
-     */
-    message: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof FlowStatusFlowError
-     */
-    type: string;
-}
-/**
- * 
- * @export
  * @interface FlowStatusV5Response
  */
 export interface FlowStatusV5Response {
@@ -576,43 +508,43 @@ export interface FlowStatusV5Response {
      * @type {string}
      * @memberof FlowStatusV5Response
      */
-    clientRequestId?: string | null;
+    'clientRequestId'?: string | null;
     /**
      * 
      * @type {FlowV5Error}
      * @memberof FlowStatusV5Response
      */
-    flowError?: FlowV5Error;
+    'flowError'?: FlowV5Error;
     /**
      * 
      * @type {string}
      * @memberof FlowStatusV5Response
      */
-    flowId?: string | null;
+    'flowId'?: string | null;
     /**
      * 
      * @type {string}
      * @memberof FlowStatusV5Response
      */
-    flowResult?: string | null;
+    'flowResult'?: string | null;
     /**
      * 
      * @type {string}
      * @memberof FlowStatusV5Response
      */
-    flowStatus: string;
+    'flowStatus': string;
     /**
      * 
      * @type {string}
      * @memberof FlowStatusV5Response
      */
-    holdingIDShortHash: string;
+    'holdingIDShortHash': string;
     /**
      * 
      * @type {string}
      * @memberof FlowStatusV5Response
      */
-    timestamp: string;
+    'timestamp': string;
 }
 /**
  * 
@@ -622,59 +554,59 @@ export interface FlowStatusV5Response {
 export interface FlowStatusV5Responses {
     /**
      * 
-     * @type {Array<FlowStatusV5ResponsesFlowStatusResponses>}
+     * @type {Array<FlowStatusV5ResponsesFlowStatusResponsesInner>}
      * @memberof FlowStatusV5Responses
      */
-    flowStatusResponses?: Array<FlowStatusV5ResponsesFlowStatusResponses>;
+    'flowStatusResponses'?: Array<FlowStatusV5ResponsesFlowStatusResponsesInner>;
 }
 /**
  * 
  * @export
- * @interface FlowStatusV5ResponsesFlowStatusResponses
+ * @interface FlowStatusV5ResponsesFlowStatusResponsesInner
  */
-export interface FlowStatusV5ResponsesFlowStatusResponses {
+export interface FlowStatusV5ResponsesFlowStatusResponsesInner {
     /**
      * 
      * @type {string}
-     * @memberof FlowStatusV5ResponsesFlowStatusResponses
+     * @memberof FlowStatusV5ResponsesFlowStatusResponsesInner
      */
-    clientRequestId?: string | null;
+    'clientRequestId'?: string | null;
     /**
      * 
      * @type {FlowV5Error}
-     * @memberof FlowStatusV5ResponsesFlowStatusResponses
+     * @memberof FlowStatusV5ResponsesFlowStatusResponsesInner
      */
-    flowError?: FlowV5Error;
+    'flowError'?: FlowV5Error;
     /**
      * 
      * @type {string}
-     * @memberof FlowStatusV5ResponsesFlowStatusResponses
+     * @memberof FlowStatusV5ResponsesFlowStatusResponsesInner
      */
-    flowId?: string | null;
+    'flowId'?: string | null;
     /**
      * 
      * @type {string}
-     * @memberof FlowStatusV5ResponsesFlowStatusResponses
+     * @memberof FlowStatusV5ResponsesFlowStatusResponsesInner
      */
-    flowResult?: string | null;
+    'flowResult'?: string | null;
     /**
      * 
      * @type {string}
-     * @memberof FlowStatusV5ResponsesFlowStatusResponses
+     * @memberof FlowStatusV5ResponsesFlowStatusResponsesInner
      */
-    flowStatus?: string;
+    'flowStatus'?: string;
     /**
      * 
      * @type {string}
-     * @memberof FlowStatusV5ResponsesFlowStatusResponses
+     * @memberof FlowStatusV5ResponsesFlowStatusResponsesInner
      */
-    holdingIDShortHash?: string;
+    'holdingIDShortHash'?: string;
     /**
      * 
      * @type {string}
-     * @memberof FlowStatusV5ResponsesFlowStatusResponses
+     * @memberof FlowStatusV5ResponsesFlowStatusResponsesInner
      */
-    timestamp?: string;
+    'timestamp'?: string;
 }
 /**
  * 
@@ -687,13 +619,13 @@ export interface FlowV5Error {
      * @type {string}
      * @memberof FlowV5Error
      */
-    message: string;
+    'message': string;
     /**
      * 
      * @type {string}
      * @memberof FlowV5Error
      */
-    type: string;
+    'type': string;
 }
 /**
  * 
@@ -1132,19 +1064,19 @@ export interface StartFlowV5Request {
      * @type {string}
      * @memberof StartFlowV5Request
      */
-    clientRequestId: string;
+    'clientRequestId': string;
     /**
      * 
      * @type {string}
      * @memberof StartFlowV5Request
      */
-    flowClassName: string;
+    'flowClassName': string;
     /**
      * 
      * @type {StartFlowV5RequestRequestBody}
      * @memberof StartFlowV5Request
      */
-    requestBody: StartFlowV5RequestRequestBody;
+    'requestBody': StartFlowV5RequestRequestBody;
 }
 /**
  * 
@@ -1157,25 +1089,25 @@ export interface StartFlowV5RequestRequestBody {
      * @type {string}
      * @memberof StartFlowV5RequestRequestBody
      */
-    chatName?: string;
+    'chatName'?: string;
     /**
      * 
      * @type {string}
      * @memberof StartFlowV5RequestRequestBody
      */
-    otherMember?: string;
+    'otherMember'?: string;
     /**
      * 
      * @type {string}
      * @memberof StartFlowV5RequestRequestBody
      */
-    message?: string;
+    'message'?: string;
     /**
      * 
      * @type {string}
      * @memberof StartFlowV5RequestRequestBody
      */
-    numberOfRecords?: string;
+    'numberOfRecords'?: string;
 }
 /**
  * 
@@ -1388,7 +1320,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        flowStatusResponse: async (holdingIDShortHash: string, clientRequestID: string, options: any = {}): Promise<RequestArgs> => {
+        flowStatusResponse: async (holdingIDShortHash: string, clientRequestID: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'holdingIDShortHash' is not null or undefined
             assertParamExists('flowStatusResponse', 'holdingIDShortHash', holdingIDShortHash)
             // verify required parameter 'clientRequestID' is not null or undefined
@@ -1409,7 +1341,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
 
 
     
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
 
@@ -1425,7 +1357,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        flowStatusResponses: async (holdingIDShortHash: string, options: any = {}): Promise<RequestArgs> => {
+        flowStatusResponses: async (holdingIDShortHash: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'holdingIDShortHash' is not null or undefined
             assertParamExists('flowStatusResponses', 'holdingIDShortHash', holdingIDShortHash)
             const localVarPath = `/api/v1/flow/{holdingIDShortHash}`
@@ -1443,7 +1375,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
 
 
     
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
 
@@ -1458,7 +1390,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getCPIResponse: async (options: any = {}): Promise<RequestArgs> => {
+        getCPIResponse: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/cpi`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1473,7 +1405,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
 
 
     
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
 
@@ -1654,7 +1586,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        startFlowParameters: async (holdingIDShortHash: string, startFlowV5Request: StartFlowV5Request, options: any = {}): Promise<RequestArgs> => {
+        startFlowParameters: async (holdingIDShortHash: string, startFlowV5Request: StartFlowV5Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'holdingIDShortHash' is not null or undefined
             assertParamExists('startFlowParameters', 'holdingIDShortHash', holdingIDShortHash)
             // verify required parameter 'startFlowV5Request' is not null or undefined
@@ -1676,7 +1608,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
-            setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(startFlowV5Request, localVarRequestOptions, configuration)
@@ -1804,7 +1736,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async flowStatusResponse(holdingIDShortHash: string, clientRequestID: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FlowStatusV5Response>> {
+        async flowStatusResponse(holdingIDShortHash: string, clientRequestID: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FlowStatusV5Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.flowStatusResponse(holdingIDShortHash, clientRequestID, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -1815,7 +1747,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async flowStatusResponses(holdingIDShortHash: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FlowStatusV5Responses>> {
+        async flowStatusResponses(holdingIDShortHash: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FlowStatusV5Responses>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.flowStatusResponses(holdingIDShortHash, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -1825,7 +1757,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getCPIResponse(options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CPIV5Response>> {
+        async getCPIResponse(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CPIV5Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getCPIResponse(options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -1889,7 +1821,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async startFlowParameters(holdingIDShortHash: string, startFlowV5Request: StartFlowV5Request, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FlowStatusV5Response>> {
+        async startFlowParameters(holdingIDShortHash: string, startFlowV5Request: StartFlowV5Request, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FlowStatusV5Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.startFlowParameters(holdingIDShortHash, startFlowV5Request, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -2116,7 +2048,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public flowStatusResponse(holdingIDShortHash: string, clientRequestID: string, options?: any) {
+    public flowStatusResponse(holdingIDShortHash: string, clientRequestID: string, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).flowStatusResponse(holdingIDShortHash, clientRequestID, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -2128,7 +2060,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public flowStatusResponses(holdingIDShortHash: string, options?: any) {
+    public flowStatusResponses(holdingIDShortHash: string, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).flowStatusResponses(holdingIDShortHash, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -2139,7 +2071,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public getCPIResponse(options?: any) {
+    public getCPIResponse(options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getCPIResponse(options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -2209,7 +2141,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public startFlowParameters(holdingIDShortHash: string, startFlowV5Request: StartFlowV5Request, options?: any) {
+    public startFlowParameters(holdingIDShortHash: string, startFlowV5Request: StartFlowV5Request, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).startFlowParameters(holdingIDShortHash, startFlowV5Request, options).then((request) => request(this.axios, this.basePath));
     }
 

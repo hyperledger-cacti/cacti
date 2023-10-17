@@ -869,7 +869,242 @@
       "PrometheusExporterMetricsResponse": {
         "type": "string",
         "nullable": false
-      }
+      },
+      "CPIV5Response":{
+        "type": "object",
+        "required": ["hash", "id", "libraries", "mainBundle", "timestamp", "type"],
+        "properties": {
+          "cpis": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "cpiFileChecksum": {
+                  "type": "string",
+                  "nullable": false,
+                  "example": "string"
+                },
+                "cpiFileFullChecksum": {
+                  "type": "string",
+                  "nullable": false,
+                  "example": "string"
+                },
+                "cpks": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "hash": {
+                        "type": "string",
+                        "nullable": false,
+                        "example": "string"
+                      },
+                      "id": {
+                        "$ref": "#/components/schemas/CPIIDV5"
+                      },
+                      "libraries": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "nullable": false,
+                          "example": "string"
+                        }
+                      },
+                      "mainBundle": {
+                        "type": "string",
+                        "nullable": false,
+                        "example": "string"
+                      },
+                      "timestamp": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": false,
+                        "example": "2022-06-24T10:15:30Z"
+                      },
+                      "type": {
+                        "type": "string",
+                        "nullable": false,
+                        "example": "string"
+                      }
+                    }
+                  }
+                },
+                "groupPolicy": {
+                  "type": "string",
+                  "nullable": true,
+                  "example": "string"
+                },
+                "id": {
+                    "$ref": "#/components/schemas/CPIIDV5"
+                },
+                "timestamp": {
+                  "type": "string",
+                  "format": "date-time",
+                  "nullable": false,
+                  "example": "2022-06-24T10:15:30Z"
+                }
+              }
+            }
+          }
+        }
+    },
+    "StartFlowV5Request": {
+        "description": "This method starts a new instance for the specified flow for the specified holding identity.",
+        "type": "object",
+        "required": ["clientRequestId", "flowClassName", "requestBody"],
+        "properties": {
+          "clientRequestId": {
+            "type": "string",
+            "nullable": false
+          },
+          "flowClassName": {
+            "type": "string",
+            "nullable": false
+          },
+          "requestBody": {
+            "type": "object",
+            "properties": {
+            "chatName": {
+                "type": "string"
+            },
+            "otherMember": {
+                "type": "string"
+            },
+            "message": {
+                "type": "string"
+            },
+            "numberOfRecords": {
+                "type": "string"
+            }
+    }
+           }
+        }
+    },
+    "FlowStatusV5Response": {
+        "type": "object",
+        "required": ["flowStatus", "holdingIDShortHash", "timestamp"],
+        "properties": {   
+            "clientRequestId": {
+              "type": "string",
+              "nullable": true,
+              "example": "string"
+            },
+            "flowError": {
+                "$ref": "#/components/schemas/FlowV5Error"
+            },
+            "flowId": {
+              "type": "string",
+              "nullable": true,
+              "example": "string"
+            },
+            "flowResult": {
+              "type": "string",
+              "nullable": true,
+              "example": "string"
+            },
+            "flowStatus": {
+              "type": "string",
+              "nullable": false,
+              "example": "string"
+            },
+            "holdingIDShortHash": {
+              "type": "string",
+              "nullable": false,
+              "example": "string"
+            },
+            "timestamp": {
+              "type": "string",
+              "format": "date-time",
+              "nullable": false,
+              "example": "2022-06-24T10:15:30Z"
+            }
+        }
+    },
+    "FlowStatusV5Responses": {
+        "type": "object",
+        "required": ["flowStatus", "holdingIDShortHash", "timestamp"],
+        "properties": {
+          "flowStatusResponses": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "clientRequestId": {
+                  "type": "string",
+                  "nullable": true,
+                  "example": "string"
+                },
+                "flowError": {
+                    "$ref": "#/components/schemas/FlowV5Error"
+                },
+                "flowId": {
+                  "type": "string",
+                  "nullable": true,
+                  "example": "string"
+                },
+                "flowResult": {
+                  "type": "string",
+                  "nullable": true,
+                  "example": "string"
+                },
+                "flowStatus": {
+                  "type": "string",
+                  "nullable": false,
+                  "example": "string"
+                },
+                "holdingIDShortHash": {
+                  "type": "string",
+                  "nullable": false,
+                  "example": "string"
+                },
+                "timestamp": {
+                  "type": "string",
+                  "format": "date-time",
+                  "nullable": false,
+                  "example": "2022-06-24T10:15:30Z"
+                }
+              }
+            }
+          }
+        }
+    },
+    "CPIIDV5":{
+        "type": "object",
+        "required": ["name", "version"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": false,
+            "example": "string"
+          },
+          "signerSummaryHash": {
+            "type": "string",
+            "nullable": true,
+            "example": "string"
+          },
+          "version": {
+            "type": "string",
+            "nullable": false,
+            "example": "string"
+          }
+        }
+    },
+    "FlowV5Error": {
+        "type": "object",
+        "required": ["message", "type"],
+        "properties": {
+          "message": {
+            "type": "string",
+            "nullable": false,
+            "example": "string"
+          },
+          "type": {
+            "type": "string",
+            "nullable": false,
+            "example": "string"
+          }
+        }
+    }
     }
   },
   "paths": {
@@ -1212,6 +1447,165 @@
             }
           }
         }
+      }
+    },
+    "/api/v1/cpi": {
+      "get": {
+          "x-hyperledger-cactus": {
+              "https": {
+                  "verbLowerCase": "get",
+                  "path": "/api/v1/cpi"
+              }
+          },
+          "operationId": "getCPIResponse",
+          "summary": "List all CPIs uploaded to the cluster",
+          "responses": {
+              "200": {
+                  "description": "OK",
+                  "content": {
+                      "application/json": {
+                          "schema": {
+                              "$ref": "#/components/schemas/CPIV5Response"
+                          }
+                      }
+                  }
+              }
+          }
+      }
+  },
+  "/api/v1/flow/{holdingIDShortHash}": {
+      "get": {
+          "x-hyperledger-cactus": {
+              "http": {
+                  "verbLowerCase": "get",
+                  "path": "/api/v1/flow/{holdingIDShortHash}"
+              }
+          },
+          "operationId": "flowStatusResponses",
+          "summary": "This method returns an array containing the statuses of all flows running for a specified holding identity. An empty array is returned if there are no flows running.",
+          "parameters": [
+              {
+                "name": "holdingIDShortHash",
+                "in": "path",
+                "required": true,
+                "description": "Holding identity short hash",
+                "schema": {
+                  "type": "string"
+                }
+              }
+          ],
+          "responses": {
+              "200": {
+                  "description": "OK",
+                  "content": {
+                      "text/plain": {
+                          "schema": {
+                              "$ref": "#/components/schemas/FlowStatusV5Responses"
+                          }
+                      }
+                  }
+              },
+              "401": {
+                  "description": "Unauthorized" 
+              },
+              "403": {
+                  "description": "Forbidden" 
+              }
+          }
+      },
+      "post": {
+          "x-hyperledger-cactus": {
+              "http": {
+                  "verbLowerCase": "post",
+                  "path": "/api/v1/flow/{holdingIDShortHash}"
+              }
+          },
+          "operationId": "startFlowParameters",
+          "summary": "This method starts a new instance for the specified flow for the specified holding identity.",
+          "requestBody": {
+              "description": "Request body for starting a flow",
+              "required": true,
+              "content": {
+                  "application/json": {
+                    "schema": {
+                      "$ref": "#/components/schemas/StartFlowV5Request"
+                    }
+                  }
+              }
+          },
+          "parameters": [
+              {
+                "name": "holdingIDShortHash",
+                "in": "path",
+                "required": true,
+                "description": "Holding identity short hash",
+                "schema": {
+                  "type": "string"
+                }
+              }
+          ],
+          "responses": {
+              "200": {
+                  "description": "OK",
+                  "content": {
+                      "application/json": {
+                          "schema": {
+                              "$ref": "#/components/schemas/FlowStatusV5Response"
+                          }
+                      }
+                  }
+              }
+          }
+      }
+  },
+  "/api/v1/flow/{holdingIDShortHash}/{clientRequestID}": {
+      "get": {
+          "x-hyperledger-cactus": {
+              "http": {
+                  "verbLowerCase": "get",
+                  "path": "/api/v1/flow/{holdingIDShortHash}/{clientRequestID}"
+              }
+          },
+          "operationId": "flowStatusResponse",
+          "summary": "This method gets the current status of the specified flow instance.",
+          "parameters": [
+              {
+                "name": "holdingIDShortHash",
+                "in": "path",
+                "required": true,
+                "description": "Holding identity short hash",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              {
+                "name": "clientRequestID",
+                "in": "path",
+                "required": true,
+                "description": "Client request ID",
+                "schema": {
+                  "type": "string"
+                }
+              }
+          ],
+          "responses": {
+              "200": {
+                  "description": "OK",
+                  "content": {
+                      "text/plain": {
+                          "schema": {
+                              "$ref": "#/components/schemas/FlowStatusV5Response"
+                          }
+                      }
+                  }
+              },
+              "401": {
+                  "description": "Unauthorized" 
+              },
+              "403": {
+                  "description": "Forbidden" 
+              }
+          }
       }
     }
   }

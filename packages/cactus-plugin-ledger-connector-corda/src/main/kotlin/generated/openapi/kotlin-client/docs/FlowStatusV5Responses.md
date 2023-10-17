@@ -4,7 +4,7 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**flowStatusResponses** | [**kotlin.collections.List&lt;FlowStatusV5ResponsesFlowStatusResponses&gt;**](FlowStatusV5ResponsesFlowStatusResponses.md) |  |  [optional]
+**flowStatusResponses** | [**kotlin.collections.List&lt;FlowStatusV5ResponsesFlowStatusResponsesInner&gt;**](FlowStatusV5ResponsesFlowStatusResponsesInner.md) |  |  [optional]
 
 
 

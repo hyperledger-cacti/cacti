@@ -23,26 +23,17 @@ import com.squareup.moshi.JsonClass
 /**
  * 
  *
- * @param flowStatus 
- * @param holdingIDShortHash 
- * @param timestamp 
  * @param clientRequestId 
  * @param flowError 
  * @param flowId 
  * @param flowResult 
+ * @param flowStatus 
+ * @param holdingIDShortHash 
+ * @param timestamp 
  */
 
 
-data class FlowStatusV5Response (
-
-    @Json(name = "flowStatus")
-    val flowStatus: kotlin.String,
-
-    @Json(name = "holdingIDShortHash")
-    val holdingIDShortHash: kotlin.String,
-
-    @Json(name = "timestamp")
-    val timestamp: java.time.OffsetDateTime,
+data class FlowStatusV5ResponsesFlowStatusResponsesInner (
 
     @Json(name = "clientRequestId")
     val clientRequestId: kotlin.String? = null,
@@ -54,7 +45,16 @@ data class FlowStatusV5Response (
     val flowId: kotlin.String? = null,
 
     @Json(name = "flowResult")
-    val flowResult: kotlin.String? = null
+    val flowResult: kotlin.String? = null,
+
+    @Json(name = "flowStatus")
+    val flowStatus: kotlin.String? = null,
+
+    @Json(name = "holdingIDShortHash")
+    val holdingIDShortHash: kotlin.String? = null,
+
+    @Json(name = "timestamp")
+    val timestamp: java.time.OffsetDateTime? = null
 
 )
 

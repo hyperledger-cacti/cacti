@@ -8,8 +8,8 @@ src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/api/
 src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/api/ApiUtil.kt
 src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/CPIIDV5.kt
 src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/CPIV5Response.kt
-src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/CPIV5ResponseCpis.kt
-src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/CPIV5ResponseCpks.kt
+src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/CPIV5ResponseCpisInner.kt
+src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/CPIV5ResponseCpisInnerCpksInner.kt
 src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/ClearMonitorTransactionsV1Request.kt
 src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/ClearMonitorTransactionsV1Response.kt
 src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/CordaNodeSshCredentials.kt
@@ -23,11 +23,9 @@ src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/mode
 src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/DiagnoseNodeV1Request.kt
 src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/DiagnoseNodeV1Response.kt
 src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/FlowInvocationType.kt
-src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/FlowStatus.kt
-src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/FlowStatusFlowError.kt
 src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/FlowStatusV5Response.kt
 src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/FlowStatusV5Responses.kt
-src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/FlowStatusV5ResponsesFlowStatusResponses.kt
+src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/FlowStatusV5ResponsesFlowStatusResponsesInner.kt
 src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/FlowV5Error.kt
 src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/GetMonitorTransactionsV1Request.kt
 src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/model/GetMonitorTransactionsV1Response.kt

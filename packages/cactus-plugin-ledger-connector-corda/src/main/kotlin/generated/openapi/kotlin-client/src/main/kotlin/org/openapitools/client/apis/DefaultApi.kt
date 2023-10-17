@@ -19,6 +19,7 @@ import java.io.IOException
 import okhttp3.OkHttpClient
 import okhttp3.HttpUrl
 
+import org.openapitools.client.models.CPIV5Response
 import org.openapitools.client.models.ClearMonitorTransactionsV1Request
 import org.openapitools.client.models.ClearMonitorTransactionsV1Response
 import org.openapitools.client.models.DeployContractJarsBadRequestV1Response
@@ -282,35 +283,21 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     }
 
     /**
-<<<<<<< HEAD
-     * Get transactions for monitored state classes.
+     * This method gets the current status of the specified flow instance.
      * 
-     * @param getMonitorTransactionsV1Request  (optional)
-     * @return GetMonitorTransactionsV1Response
+     * @param holdingIDShortHash Holding identity short hash
+     * @param clientRequestID Client request ID
+     * @return FlowStatusV5Response
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      * @throws UnsupportedOperationException If the API returns an informational or redirection response
      * @throws ClientException If the API returns a client error response
      * @throws ServerException If the API returns a server error response
      */
-=======
-    * This method gets the current status of the specified flow instance.
-    * 
-    * @param holdingIDShortHash Holding identity short hash 
-    * @param clientRequestID Client request ID 
-    * @return FlowStatusV5Response
-    * @throws UnsupportedOperationException If the API returns an informational or redirection response
-    * @throws ClientException If the API returns a client error response
-    * @throws ServerException If the API returns a server error response
-    */
     @Suppress("UNCHECKED_CAST")
-    @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
+    @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
     fun flowStatusResponse(holdingIDShortHash: kotlin.String, clientRequestID: kotlin.String) : FlowStatusV5Response {
-        val localVariableConfig = flowStatusResponseRequestConfig(holdingIDShortHash = holdingIDShortHash, clientRequestID = clientRequestID)
-
-        val localVarResponse = request<Unit, FlowStatusV5Response>(
-            localVariableConfig
-        )
+        val localVarResponse = flowStatusResponseWithHttpInfo(holdingIDShortHash = holdingIDShortHash, clientRequestID = clientRequestID)
 
         return when (localVarResponse.responseType) {
             ResponseType.Success -> (localVarResponse as Success<*>).data as FlowStatusV5Response
@@ -328,43 +315,61 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     }
 
     /**
-    * To obtain the request config of the operation flowStatusResponse
-    *
-    * @param holdingIDShortHash Holding identity short hash 
-    * @param clientRequestID Client request ID 
-    * @return RequestConfig
-    */
+     * This method gets the current status of the specified flow instance.
+     * 
+     * @param holdingIDShortHash Holding identity short hash
+     * @param clientRequestID Client request ID
+     * @return ApiResponse<FlowStatusV5Response?>
+     * @throws IllegalStateException If the request is not correctly configured
+     * @throws IOException Rethrows the OkHttp execute method exception
+     */
+    @Suppress("UNCHECKED_CAST")
+    @Throws(IllegalStateException::class, IOException::class)
+    fun flowStatusResponseWithHttpInfo(holdingIDShortHash: kotlin.String, clientRequestID: kotlin.String) : ApiResponse<FlowStatusV5Response?> {
+        val localVariableConfig = flowStatusResponseRequestConfig(holdingIDShortHash = holdingIDShortHash, clientRequestID = clientRequestID)
+
+        return request<Unit, FlowStatusV5Response>(
+            localVariableConfig
+        )
+    }
+
+    /**
+     * To obtain the request config of the operation flowStatusResponse
+     *
+     * @param holdingIDShortHash Holding identity short hash
+     * @param clientRequestID Client request ID
+     * @return RequestConfig
+     */
     fun flowStatusResponseRequestConfig(holdingIDShortHash: kotlin.String, clientRequestID: kotlin.String) : RequestConfig<Unit> {
         val localVariableBody = null
         val localVariableQuery: MultiValueMap = mutableMapOf()
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
-
+        
         return RequestConfig(
             method = RequestMethod.GET,
-            path = "/api/v1/flow/{holdingIDShortHash}/{clientRequestID}".replace("{"+"holdingIDShortHash"+"}", "$holdingIDShortHash").replace("{"+"clientRequestID"+"}", "$clientRequestID"),
+            path = "/api/v1/flow/{holdingIDShortHash}/{clientRequestID}".replace("{"+"holdingIDShortHash"+"}", encodeURIComponent(holdingIDShortHash.toString())).replace("{"+"clientRequestID"+"}", encodeURIComponent(clientRequestID.toString())),
             query = localVariableQuery,
             headers = localVariableHeaders,
+            requiresAuthentication = false,
             body = localVariableBody
         )
     }
 
     /**
-    * This method returns an array containing the statuses of all flows running for a specified holding identity. An empty array is returned if there are no flows running.
-    * 
-    * @param holdingIDShortHash Holding identity short hash 
-    * @return FlowStatusV5Responses
-    * @throws UnsupportedOperationException If the API returns an informational or redirection response
-    * @throws ClientException If the API returns a client error response
-    * @throws ServerException If the API returns a server error response
-    */
+     * This method returns an array containing the statuses of all flows running for a specified holding identity. An empty array is returned if there are no flows running.
+     * 
+     * @param holdingIDShortHash Holding identity short hash
+     * @return FlowStatusV5Responses
+     * @throws IllegalStateException If the request is not correctly configured
+     * @throws IOException Rethrows the OkHttp execute method exception
+     * @throws UnsupportedOperationException If the API returns an informational or redirection response
+     * @throws ClientException If the API returns a client error response
+     * @throws ServerException If the API returns a server error response
+     */
     @Suppress("UNCHECKED_CAST")
-    @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
+    @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
     fun flowStatusResponses(holdingIDShortHash: kotlin.String) : FlowStatusV5Responses {
-        val localVariableConfig = flowStatusResponsesRequestConfig(holdingIDShortHash = holdingIDShortHash)
-
-        val localVarResponse = request<Unit, FlowStatusV5Responses>(
-            localVariableConfig
-        )
+        val localVarResponse = flowStatusResponsesWithHttpInfo(holdingIDShortHash = holdingIDShortHash)
 
         return when (localVarResponse.responseType) {
             ResponseType.Success -> (localVarResponse as Success<*>).data as FlowStatusV5Responses
@@ -382,41 +387,58 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     }
 
     /**
-    * To obtain the request config of the operation flowStatusResponses
-    *
-    * @param holdingIDShortHash Holding identity short hash 
-    * @return RequestConfig
-    */
+     * This method returns an array containing the statuses of all flows running for a specified holding identity. An empty array is returned if there are no flows running.
+     * 
+     * @param holdingIDShortHash Holding identity short hash
+     * @return ApiResponse<FlowStatusV5Responses?>
+     * @throws IllegalStateException If the request is not correctly configured
+     * @throws IOException Rethrows the OkHttp execute method exception
+     */
+    @Suppress("UNCHECKED_CAST")
+    @Throws(IllegalStateException::class, IOException::class)
+    fun flowStatusResponsesWithHttpInfo(holdingIDShortHash: kotlin.String) : ApiResponse<FlowStatusV5Responses?> {
+        val localVariableConfig = flowStatusResponsesRequestConfig(holdingIDShortHash = holdingIDShortHash)
+
+        return request<Unit, FlowStatusV5Responses>(
+            localVariableConfig
+        )
+    }
+
+    /**
+     * To obtain the request config of the operation flowStatusResponses
+     *
+     * @param holdingIDShortHash Holding identity short hash
+     * @return RequestConfig
+     */
     fun flowStatusResponsesRequestConfig(holdingIDShortHash: kotlin.String) : RequestConfig<Unit> {
         val localVariableBody = null
         val localVariableQuery: MultiValueMap = mutableMapOf()
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
-
+        
         return RequestConfig(
             method = RequestMethod.GET,
-            path = "/api/v1/flow/{holdingIDShortHash}".replace("{"+"holdingIDShortHash"+"}", "$holdingIDShortHash"),
+            path = "/api/v1/flow/{holdingIDShortHash}".replace("{"+"holdingIDShortHash"+"}", encodeURIComponent(holdingIDShortHash.toString())),
             query = localVariableQuery,
             headers = localVariableHeaders,
+            requiresAuthentication = false,
             body = localVariableBody
         )
     }
 
     /**
-    * List all CPIs uploaded to the cluster
-    * 
-    * @return CPIV5Response
-    * @throws UnsupportedOperationException If the API returns an informational or redirection response
-    * @throws ClientException If the API returns a client error response
-    * @throws ServerException If the API returns a server error response
-    */
+     * List all CPIs uploaded to the cluster
+     * 
+     * @return CPIV5Response
+     * @throws IllegalStateException If the request is not correctly configured
+     * @throws IOException Rethrows the OkHttp execute method exception
+     * @throws UnsupportedOperationException If the API returns an informational or redirection response
+     * @throws ClientException If the API returns a client error response
+     * @throws ServerException If the API returns a server error response
+     */
     @Suppress("UNCHECKED_CAST")
-    @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
+    @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
     fun getCPIResponse() : CPIV5Response {
-        val localVariableConfig = getCPIResponseRequestConfig()
-
-        val localVarResponse = request<Unit, CPIV5Response>(
-            localVariableConfig
-        )
+        val localVarResponse = getCPIResponseWithHttpInfo()
 
         return when (localVarResponse.responseType) {
             ResponseType.Success -> (localVarResponse as Success<*>).data as CPIV5Response
@@ -434,34 +456,54 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     }
 
     /**
-    * To obtain the request config of the operation getCPIResponse
-    *
-    * @return RequestConfig
-    */
+     * List all CPIs uploaded to the cluster
+     * 
+     * @return ApiResponse<CPIV5Response?>
+     * @throws IllegalStateException If the request is not correctly configured
+     * @throws IOException Rethrows the OkHttp execute method exception
+     */
+    @Suppress("UNCHECKED_CAST")
+    @Throws(IllegalStateException::class, IOException::class)
+    fun getCPIResponseWithHttpInfo() : ApiResponse<CPIV5Response?> {
+        val localVariableConfig = getCPIResponseRequestConfig()
+
+        return request<Unit, CPIV5Response>(
+            localVariableConfig
+        )
+    }
+
+    /**
+     * To obtain the request config of the operation getCPIResponse
+     *
+     * @return RequestConfig
+     */
     fun getCPIResponseRequestConfig() : RequestConfig<Unit> {
         val localVariableBody = null
         val localVariableQuery: MultiValueMap = mutableMapOf()
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
+        localVariableHeaders["Accept"] = "application/json"
 
         return RequestConfig(
             method = RequestMethod.GET,
             path = "/api/v1/cpi",
             query = localVariableQuery,
             headers = localVariableHeaders,
+            requiresAuthentication = false,
             body = localVariableBody
         )
     }
 
     /**
-    * Get transactions for monitored state classes.
-    * 
-    * @param getMonitorTransactionsV1Request  (optional)
-    * @return GetMonitorTransactionsV1Response
-    * @throws UnsupportedOperationException If the API returns an informational or redirection response
-    * @throws ClientException If the API returns a client error response
-    * @throws ServerException If the API returns a server error response
-    */
->>>>>>> 6fc422aab (feat(connector-corda):  testing changes for plugin ledger Corda v5)
+     * Get transactions for monitored state classes.
+     * 
+     * @param getMonitorTransactionsV1Request  (optional)
+     * @return GetMonitorTransactionsV1Response
+     * @throws IllegalStateException If the request is not correctly configured
+     * @throws IOException Rethrows the OkHttp execute method exception
+     * @throws UnsupportedOperationException If the API returns an informational or redirection response
+     * @throws ClientException If the API returns a client error response
+     * @throws ServerException If the API returns a server error response
+     */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
     fun getMonitorTransactionsV1(getMonitorTransactionsV1Request: GetMonitorTransactionsV1Request? = null) : GetMonitorTransactionsV1Response {
@@ -807,35 +849,21 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     }
 
     /**
-<<<<<<< HEAD
-     * Start monitoring corda changes (transactions) of given state class
+     * This method starts a new instance for the specified flow for the specified holding identity.
      * 
-     * @param startMonitorV1Request  (optional)
-     * @return StartMonitorV1Response
+     * @param holdingIDShortHash Holding identity short hash
+     * @param startFlowV5Request Request body for starting a flow
+     * @return FlowStatusV5Response
      * @throws IllegalStateException If the request is not correctly configured
      * @throws IOException Rethrows the OkHttp execute method exception
      * @throws UnsupportedOperationException If the API returns an informational or redirection response
      * @throws ClientException If the API returns a client error response
      * @throws ServerException If the API returns a server error response
      */
-=======
-    * This method starts a new instance for the specified flow for the specified holding identity.
-    * 
-    * @param holdingIDShortHash Holding identity short hash 
-    * @param startFlowV5Request Request body for starting a flow 
-    * @return FlowStatusV5Response
-    * @throws UnsupportedOperationException If the API returns an informational or redirection response
-    * @throws ClientException If the API returns a client error response
-    * @throws ServerException If the API returns a server error response
-    */
     @Suppress("UNCHECKED_CAST")
-    @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
+    @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
     fun startFlowParameters(holdingIDShortHash: kotlin.String, startFlowV5Request: StartFlowV5Request) : FlowStatusV5Response {
-        val localVariableConfig = startFlowParametersRequestConfig(holdingIDShortHash = holdingIDShortHash, startFlowV5Request = startFlowV5Request)
-
-        val localVarResponse = request<StartFlowV5Request, FlowStatusV5Response>(
-            localVariableConfig
-        )
+        val localVarResponse = startFlowParametersWithHttpInfo(holdingIDShortHash = holdingIDShortHash, startFlowV5Request = startFlowV5Request)
 
         return when (localVarResponse.responseType) {
             ResponseType.Success -> (localVarResponse as Success<*>).data as FlowStatusV5Response
@@ -853,36 +881,59 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     }
 
     /**
-    * To obtain the request config of the operation startFlowParameters
-    *
-    * @param holdingIDShortHash Holding identity short hash 
-    * @param startFlowV5Request Request body for starting a flow 
-    * @return RequestConfig
-    */
+     * This method starts a new instance for the specified flow for the specified holding identity.
+     * 
+     * @param holdingIDShortHash Holding identity short hash
+     * @param startFlowV5Request Request body for starting a flow
+     * @return ApiResponse<FlowStatusV5Response?>
+     * @throws IllegalStateException If the request is not correctly configured
+     * @throws IOException Rethrows the OkHttp execute method exception
+     */
+    @Suppress("UNCHECKED_CAST")
+    @Throws(IllegalStateException::class, IOException::class)
+    fun startFlowParametersWithHttpInfo(holdingIDShortHash: kotlin.String, startFlowV5Request: StartFlowV5Request) : ApiResponse<FlowStatusV5Response?> {
+        val localVariableConfig = startFlowParametersRequestConfig(holdingIDShortHash = holdingIDShortHash, startFlowV5Request = startFlowV5Request)
+
+        return request<StartFlowV5Request, FlowStatusV5Response>(
+            localVariableConfig
+        )
+    }
+
+    /**
+     * To obtain the request config of the operation startFlowParameters
+     *
+     * @param holdingIDShortHash Holding identity short hash
+     * @param startFlowV5Request Request body for starting a flow
+     * @return RequestConfig
+     */
     fun startFlowParametersRequestConfig(holdingIDShortHash: kotlin.String, startFlowV5Request: StartFlowV5Request) : RequestConfig<StartFlowV5Request> {
         val localVariableBody = startFlowV5Request
         val localVariableQuery: MultiValueMap = mutableMapOf()
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
+        localVariableHeaders["Content-Type"] = "application/json"
+        localVariableHeaders["Accept"] = "application/json"
 
         return RequestConfig(
             method = RequestMethod.POST,
-            path = "/api/v1/flow/{holdingIDShortHash}".replace("{"+"holdingIDShortHash"+"}", "$holdingIDShortHash"),
+            path = "/api/v1/flow/{holdingIDShortHash}".replace("{"+"holdingIDShortHash"+"}", encodeURIComponent(holdingIDShortHash.toString())),
             query = localVariableQuery,
             headers = localVariableHeaders,
+            requiresAuthentication = false,
             body = localVariableBody
         )
     }
 
     /**
-    * Start monitoring corda changes (transactions) of given state class
-    * 
-    * @param startMonitorV1Request  (optional)
-    * @return StartMonitorV1Response
-    * @throws UnsupportedOperationException If the API returns an informational or redirection response
-    * @throws ClientException If the API returns a client error response
-    * @throws ServerException If the API returns a server error response
-    */
->>>>>>> 6fc422aab (feat(connector-corda):  testing changes for plugin ledger Corda v5)
+     * Start monitoring corda changes (transactions) of given state class
+     * 
+     * @param startMonitorV1Request  (optional)
+     * @return StartMonitorV1Response
+     * @throws IllegalStateException If the request is not correctly configured
+     * @throws IOException Rethrows the OkHttp execute method exception
+     * @throws UnsupportedOperationException If the API returns an informational or redirection response
+     * @throws ClientException If the API returns a client error response
+     * @throws ServerException If the API returns a server error response
+     */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
     fun startMonitorV1(startMonitorV1Request: StartMonitorV1Request? = null) : StartMonitorV1Response {

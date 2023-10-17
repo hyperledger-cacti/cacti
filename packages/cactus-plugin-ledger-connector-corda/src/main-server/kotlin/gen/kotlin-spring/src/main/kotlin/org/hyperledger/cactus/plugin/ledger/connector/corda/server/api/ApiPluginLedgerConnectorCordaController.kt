@@ -107,35 +107,48 @@ class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) val se
     }
 
     @Operation(
-        summary = "Get transactions for monitored state classes.",
-        operationId = "getMonitorTransactionsV1",
+        summary = "This method gets the current status of the specified flow instance.",
+        operationId = "flowStatusResponse",
         description = """""",
         responses = [
-            ApiResponse(responseCode = "200", description = "OK", content = [Content(schema = Schema(implementation = GetMonitorTransactionsV1Response::class))]) ]
+            ApiResponse(responseCode = "200", description = "OK", content = [Content(schema = Schema(implementation = FlowStatusV5Response::class))]),
+            ApiResponse(responseCode = "401", description = "Unauthorized"),
+            ApiResponse(responseCode = "403", description = "Forbidden") ]
     )
     @RequestMapping(
         method = [RequestMethod.GET],
         value = ["/api/v1/flow/{holdingIDShortHash}/{clientRequestID}"],
         produces = ["text/plain"]
     )
-    fun flowStatusResponse( @PathVariable("holdingIDShortHash") holdingIDShortHash: kotlin.String
-, @PathVariable("clientRequestID") clientRequestID: kotlin.String
-): ResponseEntity<FlowStatusV5Response> {
+    fun flowStatusResponse(@Parameter(description = "Holding identity short hash", required = true) @PathVariable("holdingIDShortHash") holdingIDShortHash: kotlin.String,@Parameter(description = "Client request ID", required = true) @PathVariable("clientRequestID") clientRequestID: kotlin.String): ResponseEntity<FlowStatusV5Response> {
         return ResponseEntity(service.flowStatusResponse(holdingIDShortHash, clientRequestID), HttpStatus.valueOf(200))
     }
 
-
+    @Operation(
+        summary = "This method returns an array containing the statuses of all flows running for a specified holding identity. An empty array is returned if there are no flows running.",
+        operationId = "flowStatusResponses",
+        description = """""",
+        responses = [
+            ApiResponse(responseCode = "200", description = "OK", content = [Content(schema = Schema(implementation = FlowStatusV5Responses::class))]),
+            ApiResponse(responseCode = "401", description = "Unauthorized"),
+            ApiResponse(responseCode = "403", description = "Forbidden") ]
+    )
     @RequestMapping(
         method = [RequestMethod.GET],
         value = ["/api/v1/flow/{holdingIDShortHash}"],
         produces = ["text/plain"]
     )
-    fun flowStatusResponses( @PathVariable("holdingIDShortHash") holdingIDShortHash: kotlin.String
-): ResponseEntity<FlowStatusV5Responses> {
+    fun flowStatusResponses(@Parameter(description = "Holding identity short hash", required = true) @PathVariable("holdingIDShortHash") holdingIDShortHash: kotlin.String): ResponseEntity<FlowStatusV5Responses> {
         return ResponseEntity(service.flowStatusResponses(holdingIDShortHash), HttpStatus.valueOf(200))
     }
 
-
+    @Operation(
+        summary = "List all CPIs uploaded to the cluster",
+        operationId = "getCPIResponse",
+        description = """""",
+        responses = [
+            ApiResponse(responseCode = "200", description = "OK", content = [Content(schema = Schema(implementation = CPIV5Response::class))]) ]
+    )
     @RequestMapping(
         method = [RequestMethod.GET],
         value = ["/api/v1/cpi"],
@@ -145,7 +158,13 @@ class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) val se
         return ResponseEntity(service.getCPIResponse(), HttpStatus.valueOf(200))
     }
 
-
+    @Operation(
+        summary = "Get transactions for monitored state classes.",
+        operationId = "getMonitorTransactionsV1",
+        description = """""",
+        responses = [
+            ApiResponse(responseCode = "200", description = "OK", content = [Content(schema = Schema(implementation = GetMonitorTransactionsV1Response::class))]) ]
+    )
     @RequestMapping(
         method = [RequestMethod.GET],
         value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-monitor-transactions"],
@@ -224,11 +243,11 @@ class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) val se
     }
 
     @Operation(
-        summary = "Start monitoring corda changes (transactions) of given state class",
-        operationId = "startMonitorV1",
+        summary = "This method starts a new instance for the specified flow for the specified holding identity.",
+        operationId = "startFlowParameters",
         description = """""",
         responses = [
-            ApiResponse(responseCode = "200", description = "OK", content = [Content(schema = Schema(implementation = StartMonitorV1Response::class))]) ]
+            ApiResponse(responseCode = "200", description = "OK", content = [Content(schema = Schema(implementation = FlowStatusV5Response::class))]) ]
     )
     @RequestMapping(
         method = [RequestMethod.POST],
@@ -236,13 +255,17 @@ class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) val se
         produces = ["application/json"],
         consumes = ["application/json"]
     )
-    fun startFlowParameters( @PathVariable("holdingIDShortHash") holdingIDShortHash: kotlin.String
-, @Valid @RequestBody startFlowV5Request: StartFlowV5Request
-): ResponseEntity<FlowStatusV5Response> {
+    fun startFlowParameters(@Parameter(description = "Holding identity short hash", required = true) @PathVariable("holdingIDShortHash") holdingIDShortHash: kotlin.String,@Parameter(description = "Request body for starting a flow", required = true) @Valid @RequestBody startFlowV5Request: StartFlowV5Request): ResponseEntity<FlowStatusV5Response> {
         return ResponseEntity(service.startFlowParameters(holdingIDShortHash, startFlowV5Request), HttpStatus.valueOf(200))
     }
 
-
+    @Operation(
+        summary = "Start monitoring corda changes (transactions) of given state class",
+        operationId = "startMonitorV1",
+        description = """""",
+        responses = [
+            ApiResponse(responseCode = "200", description = "OK", content = [Content(schema = Schema(implementation = StartMonitorV1Response::class))]) ]
+    )
     @RequestMapping(
         method = [RequestMethod.POST],
         value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/start-monitor"],

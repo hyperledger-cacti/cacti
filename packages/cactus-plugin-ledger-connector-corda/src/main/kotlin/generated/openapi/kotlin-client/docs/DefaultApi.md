@@ -157,6 +157,139 @@ No authorization required
  - **Content-Type**: application/json
  - **Accept**: application/json
 
+<a id="flowStatusResponse"></a>
+# **flowStatusResponse**
+> FlowStatusV5Response flowStatusResponse(holdingIDShortHash, clientRequestID)
+
+This method gets the current status of the specified flow instance.
+
+### Example
+```kotlin
+// Import classes:
+//import org.openapitools.client.infrastructure.*
+//import org.openapitools.client.models.*
+
+val apiInstance = DefaultApi()
+val holdingIDShortHash : kotlin.String = holdingIDShortHash_example // kotlin.String | Holding identity short hash
+val clientRequestID : kotlin.String = clientRequestID_example // kotlin.String | Client request ID
+try {
+    val result : FlowStatusV5Response = apiInstance.flowStatusResponse(holdingIDShortHash, clientRequestID)
+    println(result)
+} catch (e: ClientException) {
+    println("4xx response calling DefaultApi#flowStatusResponse")
+    e.printStackTrace()
+} catch (e: ServerException) {
+    println("5xx response calling DefaultApi#flowStatusResponse")
+    e.printStackTrace()
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **holdingIDShortHash** | **kotlin.String**| Holding identity short hash |
+ **clientRequestID** | **kotlin.String**| Client request ID |
+
+### Return type
+
+[**FlowStatusV5Response**](FlowStatusV5Response.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: Not defined
+
+<a id="flowStatusResponses"></a>
+# **flowStatusResponses**
+> FlowStatusV5Responses flowStatusResponses(holdingIDShortHash)
+
+This method returns an array containing the statuses of all flows running for a specified holding identity. An empty array is returned if there are no flows running.
+
+### Example
+```kotlin
+// Import classes:
+//import org.openapitools.client.infrastructure.*
+//import org.openapitools.client.models.*
+
+val apiInstance = DefaultApi()
+val holdingIDShortHash : kotlin.String = holdingIDShortHash_example // kotlin.String | Holding identity short hash
+try {
+    val result : FlowStatusV5Responses = apiInstance.flowStatusResponses(holdingIDShortHash)
+    println(result)
+} catch (e: ClientException) {
+    println("4xx response calling DefaultApi#flowStatusResponses")
+    e.printStackTrace()
+} catch (e: ServerException) {
+    println("5xx response calling DefaultApi#flowStatusResponses")
+    e.printStackTrace()
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **holdingIDShortHash** | **kotlin.String**| Holding identity short hash |
+
+### Return type
+
+[**FlowStatusV5Responses**](FlowStatusV5Responses.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: Not defined
+
+<a id="getCPIResponse"></a>
+# **getCPIResponse**
+> CPIV5Response getCPIResponse()
+
+List all CPIs uploaded to the cluster
+
+### Example
+```kotlin
+// Import classes:
+//import org.openapitools.client.infrastructure.*
+//import org.openapitools.client.models.*
+
+val apiInstance = DefaultApi()
+try {
+    val result : CPIV5Response = apiInstance.getCPIResponse()
+    println(result)
+} catch (e: ClientException) {
+    println("4xx response calling DefaultApi#getCPIResponse")
+    e.printStackTrace()
+} catch (e: ServerException) {
+    println("5xx response calling DefaultApi#getCPIResponse")
+    e.printStackTrace()
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**CPIV5Response**](CPIV5Response.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
 <a id="getMonitorTransactionsV1"></a>
 # **getMonitorTransactionsV1**
 > GetMonitorTransactionsV1Response getMonitorTransactionsV1(getMonitorTransactionsV1Request)
@@ -372,6 +505,53 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**kotlin.collections.List&lt;NodeInfo&gt;**](NodeInfo.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+<a id="startFlowParameters"></a>
+# **startFlowParameters**
+> FlowStatusV5Response startFlowParameters(holdingIDShortHash, startFlowV5Request)
+
+This method starts a new instance for the specified flow for the specified holding identity.
+
+### Example
+```kotlin
+// Import classes:
+//import org.openapitools.client.infrastructure.*
+//import org.openapitools.client.models.*
+
+val apiInstance = DefaultApi()
+val holdingIDShortHash : kotlin.String = holdingIDShortHash_example // kotlin.String | Holding identity short hash
+val startFlowV5Request : StartFlowV5Request =  // StartFlowV5Request | Request body for starting a flow
+try {
+    val result : FlowStatusV5Response = apiInstance.startFlowParameters(holdingIDShortHash, startFlowV5Request)
+    println(result)
+} catch (e: ClientException) {
+    println("4xx response calling DefaultApi#startFlowParameters")
+    e.printStackTrace()
+} catch (e: ServerException) {
+    println("5xx response calling DefaultApi#startFlowParameters")
+    e.printStackTrace()
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **holdingIDShortHash** | **kotlin.String**| Holding identity short hash |
+ **startFlowV5Request** | [**StartFlowV5Request**](StartFlowV5Request.md)| Request body for starting a flow |
+
+### Return type
+
+[**FlowStatusV5Response**](FlowStatusV5Response.md)
 
 ### Authorization
 
