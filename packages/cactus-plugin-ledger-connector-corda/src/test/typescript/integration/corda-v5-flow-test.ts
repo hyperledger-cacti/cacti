@@ -1,6 +1,9 @@
 import test, { Test } from "tape-promise/tape";
 import { v4 as uuidv4 } from "uuid";
+import { AddressInfo } from "net";
 import "jest-extended";
+//import { Server as SecureServer } from "https";
+//import { AxiosRequestConfig } from "axios";
 
 import {
   CordaV5TestLedger,
@@ -10,19 +13,35 @@ import {
 
 import {
   LogLevelDesc,
+  Servers,
   Logger,
   LoggerProvider,
+  IListenOptions,
 } from "@hyperledger/cactus-common";
 import {
+  IPluginLedgerConnectorCordaOptions,
   PluginLedgerConnectorCorda,
   CordaVersion,
 } from "../../../main/typescript/plugin-ledger-connector-corda";
-import { DefaultApi } from "../../../main/typescript/generated/openapi/typescript-axios/index";
+import {
+  DefaultApi as CordaApi,
+  Configuration,
+  CPIIDV5,
+  CPIV5Response,
+  DefaultApi,
+  FlowStatusV5Response,
+} from "../../../main/typescript/generated/openapi/typescript-axios/index";
 import axios, { AxiosRequestConfig } from "axios";
+//import { Configuration } from "@hyperledger/cactus-core-api";
 
 const testCase = "Tests are passing on the JVM side";
 const logLevel: LogLevelDesc = "TRACE";
 
+/* Working POST
+import express from "express";
+import bodyParser from "body-parser";
+import http from "http";
+*/
 import https from "https";
 
 test.onFailure(async () => {
@@ -61,10 +80,37 @@ test("can get past logs of an account", async (t: Test) => {
   });
   const apiUrl = "https://127.0.0.1:8888";
 
-  await connector.getOrCreateWebServices();
+  //const expressApp = express();
+  //expressApp.use(bodyParser.json({ limit: "250mb" }));
+  //const server = http.createServer(expressApp);
+  //test.onFinish(async () => await Servers.shutdown(server));
 
+  /*
+  const idHash = "0A63C81EDC93";
+  const param: StartFlowRequest = {
+    parameters: {
+      clientRequestId: "create-1",
+      flowClassName:
+        "com.r3.developers.csdetemplate.utxoexample.workflows.CreateNewChatFlow",
+      requestBody: {
+        chatName: "Chat with Bob",
+        otherMember: "CN=Bob, OU=Test Dept, O=R3, L=London, C=GB",
+        message: "Hello Bob",
+      },
+    },
+  };*/
+
+  await connector.getOrCreateWebServices();
+  //await connector.registerWebServices(expressApp);
+  /*const listenOptions: IListenOptions = {
+    hostname: "localhost",
+    port: 8888,
+    server,
+  };
+ */
   const customHttpsAgent = new https.Agent({
-    rejectUnauthorized: false, //Allow self-signed certificates
+    // Configure your custom settings here
+    rejectUnauthorized: false, // Example: Allow self-signed certificates (use with caution)
   });
 
   const username = "admin";
@@ -79,6 +125,8 @@ test("can get past logs of an account", async (t: Test) => {
     httpsAgent: customHttpsAgent,
   };
 
+  //const apiConfig = new Configuration({ basePath: apiUrl });
+  //const apiClient = new CordaApi(apiConfig);
   const axiosInstance = axios.create(axiosConfig);
   const apiClient = new DefaultApi(undefined, apiUrl, axiosInstance);
 
@@ -137,9 +185,7 @@ test("can get past logs of an account", async (t: Test) => {
 
   t.ok(startflow.status, "startFlowParameters endpoint OK");
 
-  //Need to check further, might need to add a delay here. Getting 404 status code
-  // t.timeoutAfter(60000);
-
+  await waitProcess(5);
   await waitForStatusChange(shortHashCharlie, "test-1");
   const checkflow = await apiClient.flowStatusResponse(
     shortHashCharlie,
@@ -148,9 +194,7 @@ test("can get past logs of an account", async (t: Test) => {
   t.ok(checkflow.status, "flowStatusResponse endpoint OK");
   t.equal(checkflow.data.flowStatus, "COMPLETED", "flowStatus is COMPLETED");
   t.equal(checkflow.data.flowError, null, "flowError should be null");
-  //Negative Testing
 
-  // WIP Simulate conversation between Bob and Alice
   // Follow the flow as per https://docs.r3.com/en/platform/corda/5.0/developing-applications/getting-started/utxo-ledger-example-cordapp/running-the-chat-cordapp.html
   test("Simulate a conversation between Alice and Bob", async (t) => {
     //1. Alice creates a new chat
@@ -169,6 +213,7 @@ test("can get past logs of an account", async (t: Test) => {
       aliceCreateChat,
     );
     t.ok(startflowChat.status, "startflowChat OK");
+    await waitProcess(5);
     const checkflow = await apiClient.flowStatusResponse(
       shortHashAlice,
       "create-1",
@@ -188,6 +233,7 @@ test("can get past logs of an account", async (t: Test) => {
       shortHashBob,
       bobListChats,
     );
+    await waitProcess(10);
     const flowData = await waitForStatusChange(shortHashBob, "list-1");
 
     const flowResult =
@@ -215,6 +261,7 @@ test("can get past logs of an account", async (t: Test) => {
       },
     };
     await apiClient.startFlowParameters(shortHashBob, bobUpdate1);
+    await waitProcess(5);
     await waitForStatusChange(shortHashBob, "update-1");
     const bobUpdate2 = {
       clientRequestId: "update-2",
@@ -226,6 +273,7 @@ test("can get past logs of an account", async (t: Test) => {
       },
     };
     await apiClient.startFlowParameters(shortHashBob, bobUpdate2);
+    await waitProcess(5);
     await waitForStatusChange(shortHashBob, "update-2");
 
     //4. Alice lists chat
@@ -236,6 +284,7 @@ test("can get past logs of an account", async (t: Test) => {
       requestBody: {},
     };
     await apiClient.startFlowParameters(shortHashAlice, aliceListsChat);
+    await waitProcess(5);
     await waitForStatusChange(shortHashAlice, "list-2");
 
     //5. Alice checks the history of the chat with Bob
@@ -249,6 +298,7 @@ test("can get past logs of an account", async (t: Test) => {
       },
     };
     await apiClient.startFlowParameters(shortHashAlice, aliceHistoryRequest);
+    await waitProcess(5);
     await waitForStatusChange(shortHashAlice, "get-1");
 
     //6. Alice replies to Bob
@@ -262,6 +312,7 @@ test("can get past logs of an account", async (t: Test) => {
       },
     };
     await apiClient.startFlowParameters(shortHashAlice, aliceReply);
+    await waitProcess(5);
     await waitForStatusChange(shortHashAlice, "update-4");
 
     //7. Bob gets the chat history
@@ -275,7 +326,50 @@ test("can get past logs of an account", async (t: Test) => {
       },
     };
     await apiClient.startFlowParameters(shortHashBob, bobHistoryRequest);
+    await waitProcess(5);
     await waitForStatusChange(shortHashBob, "get-2");
+  });
+
+  test("Negative Test, invalid flow class name", async (t: Test) => {
+    const invalidFlowName = "nonExistentFlow";
+    const shortHash = shortHashBob;
+    const request = {
+      clientRequestId: "test-1",
+      flowClassName: invalidFlowName,
+      requestBody: {
+        chatName: "Test-1",
+        otherMember: "CN=Bob, OU=Test Dept, O=R3, L=London, C=GB",
+        message: "Testing",
+      },
+    };
+    try {
+      await apiClient.startFlowParameters(shortHash, request);
+      t.fail("Expected an error for an invalid flow name but it succeeded.");
+    } catch (error) {
+      t.pass("Failed as expected for an invalid flow name.");
+    }
+  });
+
+  test("Negative Test, invalid username and password ", async (t: Test) => {
+    const apiUrl = "https://127.0.0.1:8888";
+    const username = "invalidUsername";
+    const password = "invalidPassword";
+    const axiosConfig: AxiosRequestConfig = {
+      baseURL: apiUrl,
+      headers: {
+        Authorization: `Basic ${Buffer.from(`${username}:${password}`).toString(
+          "base64",
+        )}`,
+      },
+    };
+    const axiosInstance = axios.create(axiosConfig);
+    const apiClient = new DefaultApi(undefined, apiUrl, axiosInstance);
+    try {
+      await apiClient.getCPIResponse();
+      t.fail("Expected an error for unauthorized access but it succeeded.");
+    } catch (error) {
+      t.pass("Failed as expected for unauthorized access.");
+    }
   });
 
   // Reusable function to wait for the status to change to COMPLETED
@@ -291,10 +385,6 @@ test("can get past logs of an account", async (t: Test) => {
       } else if (checkFlowObject.data.flowStatus === "RUNNING") {
         console.log("Flow Status is RUNNING");
         await new Promise((resolve) => setTimeout(resolve, 20000));
-        checkFlowObject = await apiClient.flowStatusResponse(
-          shortHash,
-          flowName,
-        );
         await waitForStatusChange(shortHash, flowName);
       }
     } catch (error) {
@@ -304,4 +394,48 @@ test("can get past logs of an account", async (t: Test) => {
       );
     }
   }
+
+  //Function to add a delay
+  function waitProcess(seconds: number) {
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        console.log("Processing");
+        resolve();
+      }, seconds * 1000);
+    });
+  }
+
+  // TO FIX: Address and port checking is still having an issue because of
+  // "--network host" parameters set during container creation
+  //const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
+  //const { address, port } = addressInfo;
+
+  // Working POST
+  //const apiHost = `https://127.0.0.1:8888`;
+  //const apiConfig = new Configuration({ basePath: apiHost });
+  //const apiClient = new CordaApi(apiConfig);
+  //const flowsRes1 = await apiClient.listFlowsV1();
+  //t.ok(flowsRes1, "listFlowsV1() out truthy OK");
+
+  //Testing using a created axios instance in plugin-ledger-connector-corda
+  //TEST
+  /*const request = {
+    clientRequestId: "r1",
+    flowClassName:
+      "com.r3.developers.csdetemplate.flowexample.workflows.MyFirstFlow",
+    requestBody: {
+      otherMember: "CN=Bob, OU=Test Dept, O=R3, L=London, C=GB",
+    },
+  };*/
+
+  /*
+  requestBody: {
+    chatName: "YourChatName",
+    otherMember: "CN=Bob, OU=Test Dept, O=R3, L=London, C=GB",
+    message: "YourMessage",
+  */
+  //const response = await connector.startFlow(shortHashCharlie, request);
+  //t.ok(response.status, "ok!");
+
+  // t.end();
 });
