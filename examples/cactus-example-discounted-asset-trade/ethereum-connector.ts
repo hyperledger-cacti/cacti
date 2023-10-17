@@ -43,8 +43,8 @@ async function createEthereumConnector() {
   });
 
   ethereumConnectorPlugin = new PluginLedgerConnectorEthereum({
-    instanceId: `ethElectricityTrade-${uuidv4()}`,
-    rpcApiWsHost: config.electricityTradeInfo.ethereum.gethURL,
+    instanceId: `ethAssetTrade-${uuidv4()}`,
+    rpcApiWsHost: config.assetTradeInfo.ethereum.gethURL,
     logLevel: config.logLevel,
     pluginRegistry: new PluginRegistry({ plugins: [keychainPlugin] }),
   });

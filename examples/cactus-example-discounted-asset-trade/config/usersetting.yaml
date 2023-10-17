@@ -1,9 +1,16 @@
 # Overwrite defaults
 blpRegistry:
   - businessLogicID: guks32pf
-    validatorID: [84jUisrs]
+    validatorID: []
 
 logLevel: debug
+
+signTxInfo:
+  ethereum:
+    chainName: geth1
+    networkID: 10
+    chainID: 10
+    defaultHardfork: petersburg
 
 appRouters:
   - path: /api/v1/bl/trades/
@@ -41,7 +48,7 @@ assetTradeInfo:
 
   ethereum:
     validatorID: 84jUisrs
-    gethURL: http://localhost:8545
+    gethURL: ws://localhost:8546
     chainName: geth1
     networkID: 10
     chainID: 10

@@ -184,7 +184,7 @@ async function createFabricConnector(signerIdentity: FabricIdentity) {
   });
 
   fabricConnectorPlugin = new PluginLedgerConnectorFabric({
-    instanceId: "cactus-example-discounted-asset-trade",
+    instanceId: `fabricAssetTrade-${uuidv4()}`,
     pluginRegistry: new PluginRegistry({ plugins: [keychainPlugin] }),
     sshConfig: {}, // Provide SSH config to deploy contracts through connector
     cliContainerEnv: {},

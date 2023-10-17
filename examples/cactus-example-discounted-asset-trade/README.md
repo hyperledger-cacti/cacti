@@ -34,7 +34,7 @@ Alice will use credentials and other Indy formats such as schema and definition 
 ### ethereum-validator
 
 - Validator for ethereum ledger.
-- Docker network: `geth1net`, `cactus-example-discounted-asset-trade-net`
+- Started as part of discounted asset trade BLP.
 
 ### indy-sdk-cli-base-image
 
@@ -112,7 +112,6 @@ Alice will use credentials and other Indy formats such as schema and definition 
    This will build and launch all needed containers, the final output should look like this:
 
    ```
-   cactus-example-discounted-asset-trade-ethereum-validator | listening on *:5050
    ...
    cactus-example-discounted-asset-trade-indy-validator | 2022-01-31 16:00:49,552 INFO success: validator entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
    ...
@@ -151,10 +150,7 @@ For development purposes, it might be useful to run the sample application outsi
 1. Add indy-sdk node package: `yarn add indy-sdk@1.16.0-dev-1649` (or edit `package.json` directly)
 1. Configure cactus and start the ledgers as described above.
 1. Run `./script-dockerless-config-patch.sh` from `cactus-example-discounted-asset-trade/` directory. This will patch the configs and copy it to global location.
-1. Start validators (each in separate cmd window).
-   1. ```bash
-      cd packages/cactus-plugin-ledger-connector-go-ethereum-socketio/ && npm run start
-      ```
+1. Start Indy validator (in separate cmd window).
    1. ```bash
       docker build tools/docker/indy-sdk-cli -t indy-sdk-cli &&
       pushd packages-python/cactus_validator_socketio_indy/ && sh ./setup_indy.sh && popd &&
@@ -175,13 +171,13 @@ For development purposes, it might be useful to run the sample application outsi
 
    ```
    # Ethereum fromAccount:
-   { status: 200, amount: 1e+26 }
+   1e+26
 
    # Ethereum escrowAccount:
-   { status: 200, amount: 0 }
+   0
 
    # Ethereum toAccount:
-   { status: 200, amount: 0 }
+   0
 
 
    # Fabric:
@@ -231,13 +227,13 @@ For development purposes, it might be useful to run the sample application outsi
 
    ```
    # Ethereum fromAccount:
-   { status: 200, amount: 1.00000045e+26 }
+   100000184999999999999999975
 
    # Ethereum escrowAccount:
-   { status: 200, amount: 0 }
+   0
 
    # Ethereum toAccount:
-   { status: 200, amount: 25 }
+   25
 
 
    # Fabric:

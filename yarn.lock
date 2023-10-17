@@ -7135,6 +7135,7 @@ __metadata:
     "@hyperledger/cactus-core": 2.0.0-alpha.2
     "@hyperledger/cactus-core-api": 2.0.0-alpha.2
     "@hyperledger/cactus-plugin-keychain-memory": 2.0.0-alpha.2
+    "@hyperledger/cactus-plugin-ledger-connector-ethereum": 2.0.0-alpha.2
     "@hyperledger/cactus-plugin-ledger-connector-fabric": 2.0.0-alpha.2
     "@hyperledger/cactus-verifier-client": 2.0.0-alpha.2
     "@types/elliptic": 6.4.14
@@ -7162,7 +7163,6 @@ __metadata:
     shelljs: 0.8.5
     socket.io: 4.5.4
     ts-node: 8.9.1
-    web3: 1.8.1
     xmlhttprequest: 1.8.0
   languageName: unknown
   linkType: soft

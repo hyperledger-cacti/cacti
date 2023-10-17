@@ -12,23 +12,6 @@ services:
       context: ../../packages/cactus-cmd-socketio-server/
     command: ["echo", "OK - Exit"]
 
-  ethereum-validator:
-    container_name: cactus-example-discounted-asset-trade-ethereum-validator
-    image: cactus-plugin-ledger-connector-go-ethereum-socketio
-    build:
-      context: ../../packages/cactus-plugin-ledger-connector-go-ethereum-socketio/
-    ports:
-      - "5050:5050"
-    depends_on:
-      - cmd-socketio-base-image
-    volumes:
-      - type: bind
-        source: ./etc/cactus
-        target: /etc/cactus
-    networks:
-      - geth1net
-      - cactus-example-discounted-asset-trade-net
-
   indy-sdk-cli-base-image:
     # Build base image and immediately exit
     container_name: indy-sdk-cli-base-dummy
@@ -81,7 +64,6 @@ services:
     networks:
       - cactus-example-discounted-asset-trade-net
     depends_on:
-      - ethereum-validator
       - indy-validator-nginx
       - cmd-socketio-base-image
       - indy-sdk-cli-base-image
@@ -110,8 +92,6 @@ services:
 
 networks:
   fabric-all-in-one_testnet-2x:
-    external: true
-  geth1net:
     external: true
   indy-testnet_indy_net:
     external: true
