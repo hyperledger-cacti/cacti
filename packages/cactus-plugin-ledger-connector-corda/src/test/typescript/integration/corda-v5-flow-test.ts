@@ -1,9 +1,6 @@
 import test, { Test } from "tape-promise/tape";
 import { v4 as uuidv4 } from "uuid";
-import { AddressInfo } from "net";
 import "jest-extended";
-//import { Server as SecureServer } from "https";
-//import { AxiosRequestConfig } from "axios";
 
 import {
   CordaV5TestLedger,
@@ -13,35 +10,19 @@ import {
 
 import {
   LogLevelDesc,
-  Servers,
   Logger,
   LoggerProvider,
-  IListenOptions,
 } from "@hyperledger/cactus-common";
 import {
-  IPluginLedgerConnectorCordaOptions,
   PluginLedgerConnectorCorda,
   CordaVersion,
 } from "../../../main/typescript/plugin-ledger-connector-corda";
-import {
-  DefaultApi as CordaApi,
-  Configuration,
-  CPIIDV5,
-  CPIV5Response,
-  DefaultApi,
-  FlowStatusV5Response,
-} from "../../../main/typescript/generated/openapi/typescript-axios/index";
+import { DefaultApi } from "../../../main/typescript/generated/openapi/typescript-axios/index";
 import axios, { AxiosRequestConfig } from "axios";
-//import { Configuration } from "@hyperledger/cactus-core-api";
 
 const testCase = "Tests are passing on the JVM side";
 const logLevel: LogLevelDesc = "TRACE";
 
-/* Working POST
-import express from "express";
-import bodyParser from "body-parser";
-import http from "http";
-*/
 import https from "https";
 
 test.onFailure(async () => {
@@ -80,37 +61,10 @@ test("can get past logs of an account", async (t: Test) => {
   });
   const apiUrl = "https://127.0.0.1:8888";
 
-  //const expressApp = express();
-  //expressApp.use(bodyParser.json({ limit: "250mb" }));
-  //const server = http.createServer(expressApp);
-  //test.onFinish(async () => await Servers.shutdown(server));
-
-  /*
-  const idHash = "0A63C81EDC93";
-  const param: StartFlowRequest = {
-    parameters: {
-      clientRequestId: "create-1",
-      flowClassName:
-        "com.r3.developers.csdetemplate.utxoexample.workflows.CreateNewChatFlow",
-      requestBody: {
-        chatName: "Chat with Bob",
-        otherMember: "CN=Bob, OU=Test Dept, O=R3, L=London, C=GB",
-        message: "Hello Bob",
-      },
-    },
-  };*/
-
   await connector.getOrCreateWebServices();
-  //await connector.registerWebServices(expressApp);
-  /*const listenOptions: IListenOptions = {
-    hostname: "localhost",
-    port: 8888,
-    server,
-  };
- */
+
   const customHttpsAgent = new https.Agent({
-    // Configure your custom settings here
-    rejectUnauthorized: false, // Example: Allow self-signed certificates (use with caution)
+    rejectUnauthorized: false, //Allow self-signed certificates
   });
 
   const username = "admin";
@@ -125,8 +79,6 @@ test("can get past logs of an account", async (t: Test) => {
     httpsAgent: customHttpsAgent,
   };
 
-  //const apiConfig = new Configuration({ basePath: apiUrl });
-  //const apiClient = new CordaApi(apiConfig);
   const axiosInstance = axios.create(axiosConfig);
   const apiClient = new DefaultApi(undefined, apiUrl, axiosInstance);
 
@@ -352,38 +304,4 @@ test("can get past logs of an account", async (t: Test) => {
       );
     }
   }
-
-  // TO FIX: Address and port checking is still having an issue because of
-  // "--network host" parameters set during container creation
-  //const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
-  //const { address, port } = addressInfo;
-
-  // Working POST
-  //const apiHost = `https://127.0.0.1:8888`;
-  //const apiConfig = new Configuration({ basePath: apiHost });
-  //const apiClient = new CordaApi(apiConfig);
-  //const flowsRes1 = await apiClient.listFlowsV1();
-  //t.ok(flowsRes1, "listFlowsV1() out truthy OK");
-
-  //Testing using a created axios instance in plugin-ledger-connector-corda
-  //TEST
-  /*const request = {
-    clientRequestId: "r1",
-    flowClassName:
-      "com.r3.developers.csdetemplate.flowexample.workflows.MyFirstFlow",
-    requestBody: {
-      otherMember: "CN=Bob, OU=Test Dept, O=R3, L=London, C=GB",
-    },
-  };*/
-
-  /*
-  requestBody: {
-    chatName: "YourChatName",
-    otherMember: "CN=Bob, OU=Test Dept, O=R3, L=London, C=GB",
-    message: "YourMessage",
-  */
-  //const response = await connector.startFlow(shortHashCharlie, request);
-  //t.ok(response.status, "ok!");
-
-  // t.end();
 });

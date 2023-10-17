@@ -61,15 +61,6 @@ import {
 
 import fs from "fs";
 
-/*
-//Needed for axios created testing
-import {
-  StartFlowV5Request,
-  CPIV5Response,
-} from "./generated/openapi/typescript-axios/index";
-
-import axios from "axios";
-import https from "https";*/
 export enum CordaVersion {
   CORDA_V4X = "CORDA_V4X",
   CORDA_V5 = "CORDA_V5",
@@ -303,72 +294,4 @@ export class PluginLedgerConnectorCorda
   public async getFlowList(): Promise<string[]> {
     return ["getFlowList()_NOT_IMPLEMENTED"];
   }
-
-  //Testing using a created axios instance in plugin-ledger-connector-corda
-  /*
-  async handleRequest(req: Request, res: Response): Promise<void> {
-    const fnTag = `${this.className}#handleRequest()`;
-    const verbUpper = this.getVerbLowerCase().toUpperCase();
-    this.log.debug(`${verbUpper} ${this.getPath()}`);
-
-    try {
-      const { connector } = this.opts;
-      const reqBody = req.body as DeployContractV1Request;
-      const resBody = await connector.deployContract(reqBody);
-      res.status(HttpStatus.OK);
-      res.json(resBody);
-    } catch (ex) {
-      this.log.error(`${fnTag} failed to serve contract deploy request`, ex);
-      res.status(HttpStatus.INTERNAL_SERVER_ERROR);
-      res.statusMessage = ex.message;
-      res.json({ error: ex.stack });
-    }
-  }
-  */
-  /*public async getCPIResponse(req: any | null): Promise<CPIV5Response> {
-    const fnTag = `${this.className}#getCPIResponse()`;
-    /*const instance = axios.create({
-      baseURL: "https://localhost:8888/api/v1/",
-      timeout: 1000,
-      auth: {
-        username: "admin",
-        password: "admin",
-      },
-      responseType: "json",
-      httpsAgent: new https.Agent({ rejectUnauthorized: false }),
-    });
-    try {
-      //const { parameters } = req;
-      const response = await this.post(`/flow/${idHash}`, req);
-      return response; // Assuming the response contains the data you need
-    } catch (error) {
-      throw error; // Handle errors or throw them for the caller to handle
-    }
-  } */
-  /*
-  public async startFlow(
-    idHash: string | null,
-    req: StartFlowV5Request,
-  ): Promise<any> {
-    //const httpsProxyAgent = require("https-proxy-agent");
-    //const agent = new httpsProxyAgent("http://localhost:8888/api/v1/"); // If you're using a proxy
-    const instance = axios.create({
-      baseURL: "https://localhost:8888/api/v1/",
-      timeout: 1000,
-      auth: {
-        username: "admin",
-        password: "admin",
-      },
-      responseType: "json",
-      httpsAgent: new https.Agent({ rejectUnauthorized: false }),
-    });
-    try {
-      //const { parameters } = req;
-      const response = await instance.post(`/flow/${idHash}`, req);
-      return response; // Assuming the response contains the data you need
-    } catch (error) {
-      throw error; // Handle errors or throw them for the caller to handle
-    }
-  }
-  */
 }
