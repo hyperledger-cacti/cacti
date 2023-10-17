@@ -373,7 +373,7 @@ class TokenERC20Contract extends Contract {
    * @param {Integer} amount amount of tokens to be minted
    * @returns {Object} The balance
    */
-  async Mint(ctx, amount) {
+  async Mint(ctx, amount, minter) {
     //check contract options are already set first to execute the function
     await this.CheckInitialized(ctx);
 
@@ -383,9 +383,6 @@ class TokenERC20Contract extends Contract {
     if (clientMSPID !== "Org1MSP") {
       throw new Error("client is not authorized to mint new tokens");
     }
-
-    // Get ID of submitting client identity
-    const minter = ctx.clientIdentity.getID();
 
     const amountInt = parseInt(amount);
     if (amountInt <= 0) {
