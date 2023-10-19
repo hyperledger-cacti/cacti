@@ -55,7 +55,7 @@ interface ApiPluginLedgerConnectorCordaService {
     fun diagnoseNodeV1(diagnoseNodeV1Request: DiagnoseNodeV1Request?): DiagnoseNodeV1Response
 
     /**
-     * GET /api/v1/flow/{holdingIDShortHash}/{clientRequestID} : This method gets the current status of the specified flow instance.
+     * GET /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingIDShortHash}/{clientRequestID} : This method gets the current status of the specified flow instance.
      *
      * @param holdingIDShortHash Holding identity short hash (required)
      * @param clientRequestID Client request ID (required)
@@ -67,7 +67,7 @@ interface ApiPluginLedgerConnectorCordaService {
     fun flowStatusResponse(holdingIDShortHash: kotlin.String, clientRequestID: kotlin.String): FlowStatusV5Response
 
     /**
-     * GET /api/v1/flow/{holdingIDShortHash} : This method returns an array containing the statuses of all flows running for a specified holding identity. An empty array is returned if there are no flows running.
+     * GET /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingIDShortHash} : This method returns an array containing the statuses of all flows running for a specified holding identity. An empty array is returned if there are no flows running.
      *
      * @param holdingIDShortHash Holding identity short hash (required)
      * @return OK (status code 200)
@@ -78,7 +78,7 @@ interface ApiPluginLedgerConnectorCordaService {
     fun flowStatusResponses(holdingIDShortHash: kotlin.String): FlowStatusV5Responses
 
     /**
-     * GET /api/v1/cpi : List all CPIs uploaded to the cluster
+     * GET /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/cpi : List all CPIs uploaded to the cluster
      *
      * @return OK (status code 200)
      * @see ApiPluginLedgerConnectorCorda#getCPIResponse
@@ -132,7 +132,7 @@ interface ApiPluginLedgerConnectorCordaService {
     fun networkMapV1(body: kotlin.Any?): List<NodeInfo>
 
     /**
-     * POST /api/v1/flow/{holdingIDShortHash} : This method starts a new instance for the specified flow for the specified holding identity.
+     * POST /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingIDShortHash} : This method starts a new instance for the specified flow for the specified holding identity.
      *
      * @param holdingIDShortHash Holding identity short hash (required)
      * @param startFlowV5Request Request body for starting a flow (required)

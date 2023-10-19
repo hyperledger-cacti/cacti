@@ -117,7 +117,7 @@ class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) val se
     )
     @RequestMapping(
         method = [RequestMethod.GET],
-        value = ["/api/v1/flow/{holdingIDShortHash}/{clientRequestID}"],
+        value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingIDShortHash}/{clientRequestID}"],
         produces = ["text/plain"]
     )
     fun flowStatusResponse(@Parameter(description = "Holding identity short hash", required = true) @PathVariable("holdingIDShortHash") holdingIDShortHash: kotlin.String,@Parameter(description = "Client request ID", required = true) @PathVariable("clientRequestID") clientRequestID: kotlin.String): ResponseEntity<FlowStatusV5Response> {
@@ -135,7 +135,7 @@ class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) val se
     )
     @RequestMapping(
         method = [RequestMethod.GET],
-        value = ["/api/v1/flow/{holdingIDShortHash}"],
+        value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingIDShortHash}"],
         produces = ["text/plain"]
     )
     fun flowStatusResponses(@Parameter(description = "Holding identity short hash", required = true) @PathVariable("holdingIDShortHash") holdingIDShortHash: kotlin.String): ResponseEntity<FlowStatusV5Responses> {
@@ -151,7 +151,7 @@ class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) val se
     )
     @RequestMapping(
         method = [RequestMethod.GET],
-        value = ["/api/v1/cpi"],
+        value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/cpi"],
         produces = ["application/json"]
     )
     fun getCPIResponse(): ResponseEntity<CPIV5Response> {
@@ -251,7 +251,7 @@ class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) val se
     )
     @RequestMapping(
         method = [RequestMethod.POST],
-        value = ["/api/v1/flow/{holdingIDShortHash}"],
+        value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingIDShortHash}"],
         produces = ["application/json"],
         consumes = ["application/json"]
     )

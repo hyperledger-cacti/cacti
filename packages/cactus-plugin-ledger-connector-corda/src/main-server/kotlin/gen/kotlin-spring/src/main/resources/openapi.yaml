@@ -224,7 +224,7 @@ paths:
         http:
           verbLowerCase: get
           path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-prometheus-exporter-metrics
-  /api/v1/cpi:
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/cpi:
     get:
       operationId: getCPIResponse
       responses:
@@ -238,8 +238,8 @@ paths:
       x-hyperledger-cactus:
         https:
           verbLowerCase: get
-          path: /api/v1/cpi
-  /api/v1/flow/{holdingIDShortHash}:
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/cpi
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingIDShortHash}:
     get:
       operationId: flowStatusResponses
       parameters:
@@ -268,7 +268,7 @@ paths:
       x-hyperledger-cactus:
         http:
           verbLowerCase: get
-          path: "/api/v1/flow/{holdingIDShortHash}"
+          path: "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingIDShortHash}"
     post:
       operationId: startFlowParameters
       parameters:
@@ -299,8 +299,8 @@ paths:
       x-hyperledger-cactus:
         http:
           verbLowerCase: post
-          path: "/api/v1/flow/{holdingIDShortHash}"
-  /api/v1/flow/{holdingIDShortHash}/{clientRequestID}:
+          path: "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingIDShortHash}"
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingIDShortHash}/{clientRequestID}:
     get:
       operationId: flowStatusResponse
       parameters:
@@ -335,7 +335,7 @@ paths:
       x-hyperledger-cactus:
         http:
           verbLowerCase: get
-          path: "/api/v1/flow/{holdingIDShortHash}/{clientRequestID}"
+          path: "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingIDShortHash}/{clientRequestID}"
 components:
   schemas:
     SHA256:

@@ -23,11 +23,6 @@ import axios, { AxiosRequestConfig } from "axios";
 const testCase = "Tests are passing on the JVM side";
 const logLevel: LogLevelDesc = "TRACE";
 
-/* Working POST
-import express from "express";
-import bodyParser from "body-parser";
-import http from "http";
-*/
 import https from "https";
 
 test.onFailure(async () => {

@@ -1,5 +1,4 @@
 import { Express, Request, Response } from "express";
-import { Server as SecureServer } from "https";
 import {
   IWebServiceEndpoint,
   IExpressRequestHandler,
@@ -64,8 +63,10 @@ export class ListCPIEndpointV1 implements IWebServiceEndpoint {
     };
   }
 
-  public get oasPath(): typeof OAS.paths["/api/v1/cpi"] {
-    return OAS.paths["/api/v1/cpi"];
+  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/cpi"] {
+    return OAS.paths[
+      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/cpi"
+    ];
   }
 
   /**
@@ -99,9 +100,6 @@ export class ListCPIEndpointV1 implements IWebServiceEndpoint {
     const fnTag = "GetCPIResponseV1#constructor()";
     const verbUpper = this.getVerbLowerCase().toUpperCase();
     this.log.debug(`${verbUpper} ${this.getPath()}`);
-    //const verb = this.getVerbLowerCase();
-    //const thePath = this.getPath();
-    //this.log.debug(`${verbUpper} ${thePath} handleRequest()`);
 
     try {
       if (this.apiUrl === undefined) throw "apiUrl option is necessary";

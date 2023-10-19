@@ -347,7 +347,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
         
         return RequestConfig(
             method = RequestMethod.GET,
-            path = "/api/v1/flow/{holdingIDShortHash}/{clientRequestID}".replace("{"+"holdingIDShortHash"+"}", encodeURIComponent(holdingIDShortHash.toString())).replace("{"+"clientRequestID"+"}", encodeURIComponent(clientRequestID.toString())),
+            path = "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingIDShortHash}/{clientRequestID}".replace("{"+"holdingIDShortHash"+"}", encodeURIComponent(holdingIDShortHash.toString())).replace("{"+"clientRequestID"+"}", encodeURIComponent(clientRequestID.toString())),
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = false,
@@ -417,7 +417,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
         
         return RequestConfig(
             method = RequestMethod.GET,
-            path = "/api/v1/flow/{holdingIDShortHash}".replace("{"+"holdingIDShortHash"+"}", encodeURIComponent(holdingIDShortHash.toString())),
+            path = "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingIDShortHash}".replace("{"+"holdingIDShortHash"+"}", encodeURIComponent(holdingIDShortHash.toString())),
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = false,
@@ -485,7 +485,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
 
         return RequestConfig(
             method = RequestMethod.GET,
-            path = "/api/v1/cpi",
+            path = "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/cpi",
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = false,
@@ -915,7 +915,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
 
         return RequestConfig(
             method = RequestMethod.POST,
-            path = "/api/v1/flow/{holdingIDShortHash}".replace("{"+"holdingIDShortHash"+"}", encodeURIComponent(holdingIDShortHash.toString())),
+            path = "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingIDShortHash}".replace("{"+"holdingIDShortHash"+"}", encodeURIComponent(holdingIDShortHash.toString())),
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = false,

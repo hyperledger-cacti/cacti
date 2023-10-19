@@ -1449,12 +1449,12 @@
         }
       }
     },
-    "/api/v1/cpi": {
+    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/cpi": {
       "get": {
           "x-hyperledger-cactus": {
               "https": {
                   "verbLowerCase": "get",
-                  "path": "/api/v1/cpi"
+                  "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/cpi"
               }
           },
           "operationId": "getCPIResponse",
@@ -1473,12 +1473,12 @@
           }
       }
   },
-  "/api/v1/flow/{holdingIDShortHash}": {
+  "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingIDShortHash}": {
       "get": {
           "x-hyperledger-cactus": {
               "http": {
                   "verbLowerCase": "get",
-                  "path": "/api/v1/flow/{holdingIDShortHash}"
+                  "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingIDShortHash}"
               }
           },
           "operationId": "flowStatusResponses",
@@ -1517,7 +1517,7 @@
           "x-hyperledger-cactus": {
               "http": {
                   "verbLowerCase": "post",
-                  "path": "/api/v1/flow/{holdingIDShortHash}"
+                  "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingIDShortHash}"
               }
           },
           "operationId": "startFlowParameters",
@@ -1558,12 +1558,12 @@
           }
       }
   },
-  "/api/v1/flow/{holdingIDShortHash}/{clientRequestID}": {
+  "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingIDShortHash}/{clientRequestID}": {
       "get": {
           "x-hyperledger-cactus": {
               "http": {
                   "verbLowerCase": "get",
-                  "path": "/api/v1/flow/{holdingIDShortHash}/{clientRequestID}"
+                  "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingIDShortHash}/{clientRequestID}"
               }
           },
           "operationId": "flowStatusResponse",

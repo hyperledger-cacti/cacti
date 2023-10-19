@@ -7,15 +7,15 @@ Method | HTTP request | Description
 [**clearMonitorTransactionsV1**](DefaultApi.md#clearMonitorTransactionsV1) | **DELETE** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/clear-monitor-transactions | Clear transactions from internal store so they&#39;ll not be available by GetMonitorTransactionsV1 anymore.
 [**deployContractJarsV1**](DefaultApi.md#deployContractJarsV1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/deploy-contract-jars | Deploys a set of jar files (Cordapps, e.g. the contracts in Corda speak).
 [**diagnoseNodeV1**](DefaultApi.md#diagnoseNodeV1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/diagnose-node | 
-[**flowStatusResponse**](DefaultApi.md#flowStatusResponse) | **GET** /api/v1/flow/{holdingIDShortHash}/{clientRequestID} | This method gets the current status of the specified flow instance.
-[**flowStatusResponses**](DefaultApi.md#flowStatusResponses) | **GET** /api/v1/flow/{holdingIDShortHash} | This method returns an array containing the statuses of all flows running for a specified holding identity. An empty array is returned if there are no flows running.
-[**getCPIResponse**](DefaultApi.md#getCPIResponse) | **GET** /api/v1/cpi | List all CPIs uploaded to the cluster
+[**flowStatusResponse**](DefaultApi.md#flowStatusResponse) | **GET** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingIDShortHash}/{clientRequestID} | This method gets the current status of the specified flow instance.
+[**flowStatusResponses**](DefaultApi.md#flowStatusResponses) | **GET** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingIDShortHash} | This method returns an array containing the statuses of all flows running for a specified holding identity. An empty array is returned if there are no flows running.
+[**getCPIResponse**](DefaultApi.md#getCPIResponse) | **GET** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/cpi | List all CPIs uploaded to the cluster
 [**getMonitorTransactionsV1**](DefaultApi.md#getMonitorTransactionsV1) | **GET** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-monitor-transactions | Get transactions for monitored state classes.
 [**getPrometheusMetricsV1**](DefaultApi.md#getPrometheusMetricsV1) | **GET** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-prometheus-exporter-metrics | Get the Prometheus Metrics
 [**invokeContractV1**](DefaultApi.md#invokeContractV1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/invoke-contract | Invokes a contract on a Corda ledger (e.g. a flow)
 [**listFlowsV1**](DefaultApi.md#listFlowsV1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-flows | 
 [**networkMapV1**](DefaultApi.md#networkMapV1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/network-map | 
-[**startFlowParameters**](DefaultApi.md#startFlowParameters) | **POST** /api/v1/flow/{holdingIDShortHash} | This method starts a new instance for the specified flow for the specified holding identity.
+[**startFlowParameters**](DefaultApi.md#startFlowParameters) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingIDShortHash} | This method starts a new instance for the specified flow for the specified holding identity.
 [**startMonitorV1**](DefaultApi.md#startMonitorV1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/start-monitor | Start monitoring corda changes (transactions) of given state class
 [**stopMonitorV1**](DefaultApi.md#stopMonitorV1) | **DELETE** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/stop-monitor | Stop monitoring corda changes (transactions) of given state class
 

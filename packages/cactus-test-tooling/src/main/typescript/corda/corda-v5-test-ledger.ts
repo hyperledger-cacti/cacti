@@ -33,7 +33,7 @@ export interface ICordaV5TestLedgerConstructorOptions {
  */
 const DEFAULTS = Object.freeze({
   imageVersion: "latest",
-  imageName: "cactuts/newcordaimg",
+  imageName: "ghcr.io/hyperledger/cactus-corda-5-all-in-one-alpha-2023-10-18",
   publicPort: 8888,
   postgresPort: 5431,
 });

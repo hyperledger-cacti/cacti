@@ -1325,7 +1325,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('flowStatusResponse', 'holdingIDShortHash', holdingIDShortHash)
             // verify required parameter 'clientRequestID' is not null or undefined
             assertParamExists('flowStatusResponse', 'clientRequestID', clientRequestID)
-            const localVarPath = `/api/v1/flow/{holdingIDShortHash}/{clientRequestID}`
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingIDShortHash}/{clientRequestID}`
                 .replace(`{${"holdingIDShortHash"}}`, encodeURIComponent(String(holdingIDShortHash)))
                 .replace(`{${"clientRequestID"}}`, encodeURIComponent(String(clientRequestID)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -1360,7 +1360,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         flowStatusResponses: async (holdingIDShortHash: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'holdingIDShortHash' is not null or undefined
             assertParamExists('flowStatusResponses', 'holdingIDShortHash', holdingIDShortHash)
-            const localVarPath = `/api/v1/flow/{holdingIDShortHash}`
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingIDShortHash}`
                 .replace(`{${"holdingIDShortHash"}}`, encodeURIComponent(String(holdingIDShortHash)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1391,7 +1391,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getCPIResponse: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/cpi`;
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/cpi`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1591,7 +1591,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('startFlowParameters', 'holdingIDShortHash', holdingIDShortHash)
             // verify required parameter 'startFlowV5Request' is not null or undefined
             assertParamExists('startFlowParameters', 'startFlowV5Request', startFlowV5Request)
-            const localVarPath = `/api/v1/flow/{holdingIDShortHash}`
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingIDShortHash}`
                 .replace(`{${"holdingIDShortHash"}}`, encodeURIComponent(String(holdingIDShortHash)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);

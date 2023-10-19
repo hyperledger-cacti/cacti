@@ -19,7 +19,6 @@ import {
 
 import {
   DefaultApi,
-  StartFlowV5Request,
   FlowStatusV5Response,
 } from "../generated/openapi/typescript-axios";
 
@@ -37,10 +36,6 @@ export class FlowStatusResponseEndpointV1 implements IWebServiceEndpoint {
 
   private readonly log: Logger;
   private readonly apiUrl?: string;
-  //private readonly holdingIDShortHash: string;
-  //private readonly authorizationOptionsProvider: AuthorizationOptionsProvider;
-  //private readonly apiUrl?: string;
-
   public get className(): string {
     return FlowStatusResponseEndpointV1.CLASS_NAME;
   }
@@ -67,8 +62,10 @@ export class FlowStatusResponseEndpointV1 implements IWebServiceEndpoint {
     };
   }
 
-  public get oasPath(): typeof OAS.paths["/api/v1/flow/{holdingIDShortHash}/{clientRequestID}"] {
-    return OAS.paths["/api/v1/flow/{holdingIDShortHash}/{clientRequestID}"];
+  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingIDShortHash}/{clientRequestID}"] {
+    return OAS.paths[
+      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/flow/{holdingIDShortHash}/{clientRequestID}"
+    ];
   }
 
   /**
@@ -102,9 +99,6 @@ export class FlowStatusResponseEndpointV1 implements IWebServiceEndpoint {
     const fnTag = "sFlowStatusResponseEndpointV1#constructor()";
     const verbUpper = this.getVerbLowerCase().toUpperCase();
     this.log.debug(`${verbUpper} ${this.getPath()}`);
-    //const verb = this.getVerbLowerCase();
-    //const thePath = this.getPath();
-    //this.log.debug(`${verbUpper} ${thePath} handleRequest()`);
 
     try {
       if (this.apiUrl === undefined) throw "apiUrl option is necessary";
@@ -122,7 +116,6 @@ export class FlowStatusResponseEndpointV1 implements IWebServiceEndpoint {
   async callInternalContainer(req: any): Promise<FlowStatusV5Response> {
     const apiConfig = new Configuration({ basePath: this.apiUrl });
     const apiClient = new DefaultApi(apiConfig);
-    //const holdingIDShortHash = req.clientRequestId;
     const res = await apiClient.flowStatusResponse(
       this.options.holdingIDShortHash,
       this.options.clientRequestID,
