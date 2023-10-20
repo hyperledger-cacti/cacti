@@ -1,0 +1,91 @@
+{
+  "name": "@hyperledger/cactus-plugin-ledger-connector-sawtooth",
+  "version": "2.0.0-alpha.2",
+  "description": "Allows Cactus nodes to connect to a Sawtooth ledger.",
+  "keywords": [
+    "Hyperledger",
+    "Cacti",
+    "Cactus",
+    "Integration",
+    "Blockchain",
+    "Distributed Ledger Technology"
+  ],
+  "homepage": "https://github.com/hyperledger/cacti#readme",
+  "bugs": {
+    "url": "https://github.com/hyperledger/cacti/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger/cacti.git"
+  },
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Hyperledger Cacti Contributors",
+    "email": "cacti@lists.hyperledger.org",
+    "url": "https://www.hyperledger.org/use/cacti"
+  },
+  "contributors": [
+    {
+      "name": "Please add yourself to the list of contributors",
+      "email": "your.name@example.com",
+      "url": "https://example.com"
+    },
+    {
+      "name": "Michal Bajer",
+      "email": "michal.bajer@fujitsu.com",
+      "url": "https://www.fujitsu.com/global/"
+    }
+  ],
+  "main": "dist/lib/main/typescript/index.js",
+  "module": "dist/lib/main/typescript/index.js",
+  "browser": "dist/cactus-plugin-ledger-connector-sawtooth.web.umd.js",
+  "types": "dist/lib/main/typescript/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "scripts": {
+    "codegen": "run-p 'codegen:*'",
+    "codegen:openapi": "npm run generate-sdk",
+    "generate-sdk": "run-p 'generate-sdk:*'",
+    "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
+    "generate-sdk:sawtooth-axios": "openapi-generator-cli generate -i ./src/main/json/sawtooth-openapi.json -g typescript-axios -o ./src/main/typescript/sawtooth-api/ --reserved-words-mappings protected=protected",
+    "webpack": "npm-run-all webpack:dev",
+    "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
+    "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
+    "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
+  },
+  "dependencies": {
+    "@hyperledger/cactus-common": "2.0.0-alpha.2",
+    "@hyperledger/cactus-core": "2.0.0-alpha.2",
+    "@hyperledger/cactus-core-api": "2.0.0-alpha.2",
+    "axios": "1.5.1",
+    "cbor": "9.0.1",
+    "rxjs": "7.8.1",
+    "socket.io-client": "4.5.4"
+  },
+  "devDependencies": {
+    "@hyperledger/cactus-test-tooling": "2.0.0-alpha.2",
+    "@types/express": "4.17.20",
+    "@types/uuid": "9.0.6",
+    "body-parser": "1.20.2",
+    "express": "4.18.2",
+    "socket.io": "4.5.4",
+    "uuid": "9.0.1"
+  },
+  "engines": {
+    "node": ">=16",
+    "npm": ">=8"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "browserMinified": "dist/cactus-plugin-ledger-connector-sawtooth.web.umd.min.js",
+  "mainMinified": "dist/cactus-plugin-ledger-connector-sawtooth.node.umd.min.js",
+  "watch": {
+    "codegen:openapi": {
+      "patterns": [
+        "./src/main/json/openapi.json"
+      ]
+    }
+  }
+}
