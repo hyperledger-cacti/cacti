@@ -8,11 +8,7 @@ import {
   pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 
-import {
-  LogLevelDesc,
-  Logger,
-  LoggerProvider,
-} from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger/cactus-common";
 import {
   PluginLedgerConnectorCorda,
   CordaVersion,
@@ -37,11 +33,6 @@ test("BEFORE " + testCase, async (t: Test) => {
 
 test("can get past logs of an account", async (t: Test) => {
   const logLevel: LogLevelDesc = "TRACE";
-  const logger: Logger = LoggerProvider.getOrCreate({
-    label: "test-check-connection-to-ethereum-ledger",
-    level: logLevel,
-  });
-
   const cordaV5TestLedger = new CordaV5TestLedger();
   await cordaV5TestLedger.start();
   t.ok(cordaV5TestLedger, "cordaV5TestLedger started OK");

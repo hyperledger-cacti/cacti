@@ -11,7 +11,6 @@ import {
   IPluginWebService,
   ICactusPluginOptions,
   ConsensusAlgorithmFamily,
-  IExpressRequestHandler,
 } from "@hyperledger/cactus-core-api";
 import { consensusHasTransactionFinality } from "@hyperledger/cactus-core";
 import {

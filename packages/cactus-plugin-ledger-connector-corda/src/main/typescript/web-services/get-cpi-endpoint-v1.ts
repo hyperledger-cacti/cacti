@@ -33,8 +33,6 @@ export class ListCPIEndpointV1 implements IWebServiceEndpoint {
 
   private readonly log: Logger;
   private readonly apiUrl?: string;
-  //private readonly authorizationOptionsProvider: AuthorizationOptionsProvider;
-  //private readonly apiUrl?: string;
 
   public get className(): string {
     return ListCPIEndpointV1.CLASS_NAME;
