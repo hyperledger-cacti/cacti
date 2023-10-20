@@ -45,6 +45,11 @@ import {
   FabricApiClientOptions,
 } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
 
+import {
+  SawtoothApiClient,
+  SawtoothApiClientOptions,
+} from "@hyperledger/cactus-plugin-ledger-connector-sawtooth";
+
 /**
  * Configuration of ApiClients currently supported by Verifier and VerifierFactory
  * Each entry key defines the name of the connection type that has to be specified in VerifierFactory config.
@@ -88,6 +93,10 @@ export type ClientApiConfig = {
     in: FabricApiClientOptions;
     out: FabricApiClient;
   };
+  SAWTOOTH_1X: {
+    in: SawtoothApiClientOptions;
+    out: SawtoothApiClient;
+  };
 };
 
 /**
@@ -121,6 +130,8 @@ export function getValidatorApiClient<K extends keyof ClientApiConfig>(
       return new Iroha2ApiClient(options as CordaApiClientOptions);
     case "FABRIC_2X":
       return new FabricApiClient(options as FabricApiClientOptions);
+    case "SAWTOOTH_1X":
+      return new SawtoothApiClient(options as SawtoothApiClientOptions);
     default:
       // Will not compile if any ClientApiConfig key was not handled by this switch
       const _: never = validatorType;

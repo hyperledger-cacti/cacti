@@ -52,6 +52,7 @@
     "@hyperledger/cactus-plugin-ledger-connector-iroha": "2.0.0-alpha.2",
     "@hyperledger/cactus-plugin-ledger-connector-iroha2": "2.0.0-alpha.2",
     "@hyperledger/cactus-plugin-ledger-connector-quorum": "2.0.0-alpha.2",
+    "@hyperledger/cactus-plugin-ledger-connector-sawtooth": "2.0.0-alpha.2",
     "jest-extended": "4.0.1",
     "rxjs": "7.8.1"
   },
