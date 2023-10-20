@@ -13683,7 +13683,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/tough-cookie@npm:*, @types/tough-cookie@npm:^4.0.0":
+"@types/tough-cookie@npm:*":
   version: 4.0.1
   resolution: "@types/tough-cookie@npm:4.0.1"
   checksum: 7570c1c2d74201f4ead3512cf8e4c99e97d92ab8a02ae2fb987fd720ced0ca1a2baf250c98a861a170b86762606c9bf6d32207675f13dffc5ab75c08c96578d2
@@ -16056,21 +16056,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios-cookiejar-support@npm:^1.0.1":
-  version: 1.0.1
-  resolution: "axios-cookiejar-support@npm:1.0.1"
-  dependencies:
-    is-redirect: ^1.0.0
-    pify: ^5.0.0
-  peerDependencies:
-    "@types/tough-cookie": ">=2.3.3"
-    axios: ">=0.16.2"
-    tough-cookie: ">=2.3.3"
-  checksum: 5479790240d108fc3ff1e393dc57ec51524f080ae3492f9d0aece876dab68513d79e99db72b642c72d6bc82d82dd64f26bd32eddc783739b0ab13ac9d5179dba
-  languageName: node
-  linkType: hard
-
-"axios@npm:>=0.22.0":
+"axios@npm:>=0.27.2":
   version: 1.5.1
   resolution: "axios@npm:1.5.1"
   dependencies:
@@ -29311,13 +29297,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"is-redirect@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "is-redirect@npm:1.0.0"
-  checksum: 25dd3d9943f57ef0f29d28e2d9deda8288e0c7098ddc65abec3364ced9a6491ea06cfaf5110c61fc40ec1fde706b73cee5d171f85278edbf4e409b85725bfea7
-  languageName: node
-  linkType: hard
-
 "is-regex@npm:^1.1.4":
   version: 1.1.4
   resolution: "is-regex@npm:1.1.4"
@@ -34783,29 +34762,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nano@npm:^10.0.0":
-  version: 10.0.0
-  resolution: "nano@npm:10.0.0"
+"nano@npm:>=10.0.0":
+  version: 10.1.2
+  resolution: "nano@npm:10.1.2"
   dependencies:
-    "@types/tough-cookie": ^4.0.0
-    axios: ^0.26.1
-    axios-cookiejar-support: ^1.0.1
-    qs: ^6.10.3
-    tough-cookie: ^4.0.0
-  checksum: 73cb0bbd209649622e15b8a481ca65579cfd14152ad2f3a63d379751a00c0b1156006322efa0823e2d1fb0328a962e552503675b647e1d8a304b26dea0a6c0bd
-  languageName: node
-  linkType: hard
-
-"nano@npm:^9.0.5":
-  version: 9.0.5
-  resolution: "nano@npm:9.0.5"
-  dependencies:
-    "@types/tough-cookie": ^4.0.0
-    axios: ^0.21.1
-    axios-cookiejar-support: ^1.0.1
-    qs: ^6.9.4
-    tough-cookie: ^4.0.0
-  checksum: 31bc5e2f784a6b3a9a872b24860152c31c4d5e3e3e096a3b1fc2660252c69b498c1094525972669fd3bfebe853a1471f5d20daf108d39067c505e58d4f2e4b8d
+    axios: ^1.2.2
+    node-abort-controller: ^3.0.1
+    qs: ^6.11.0
+  checksum: bf866bbeecd376d372974f347c3d4601c3058207bbe660fac46f69676420815ddeedce98f056be9aaefbfbb8d05bef342ce0ac492aa04133b92737454e7f61ce
   languageName: node
   linkType: hard
 
@@ -37623,13 +37587,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pify@npm:^5.0.0":
-  version: 5.0.0
-  resolution: "pify@npm:5.0.0"
-  checksum: 443e3e198ad6bfa8c0c533764cf75c9d5bc976387a163792fb553ffe6ce923887cf14eebf5aea9b7caa8eab930da8c33612990ae85bd8c2bc18bedb9eae94ecb
-  languageName: node
-  linkType: hard
-
 "pify@npm:^6.1.0":
   version: 6.1.0
   resolution: "pify@npm:6.1.0"
@@ -39603,7 +39560,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"qs@npm:^6.10.3, qs@npm:^6.9.4":
+"qs@npm:^6.11.0":
   version: 6.11.2
   resolution: "qs@npm:6.11.2"
   dependencies:
