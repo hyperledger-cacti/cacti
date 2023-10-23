@@ -1368,32 +1368,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cactus-plugin-ledger-connector-sawtooth-socketio:
-    continue-on-error: false
-    env:
-      DEV_BUILD_DISABLED: false
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-sawtooth-socketio/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: true
-      TAPE_TEST_RUNNER_DISABLED: true
-    needs: build-dev
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.3.1
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
-          path: ./.yarn/
-          restore-keys: |
-            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
-      - run: ./tools/ci.sh
   cactus-plugin-ledger-connector-xdai:
     continue-on-error: false
     env:

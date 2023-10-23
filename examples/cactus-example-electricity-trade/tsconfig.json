@@ -27,6 +27,9 @@
       "path": "../../packages/cactus-plugin-ledger-connector-ethereum/tsconfig.json"
     },
     {
+      "path": "../../packages/cactus-plugin-ledger-connector-sawtooth/tsconfig.json"
+    },
+    {
       "path": "../../packages/cactus-verifier-client/tsconfig.json"
     }
   ]

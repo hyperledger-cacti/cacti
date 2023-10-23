@@ -12,23 +12,6 @@ services:
       context: ../../packages/cactus-cmd-socketio-server/
     command: ["echo", "OK - Exit"]
 
-  sawtooth-validator:
-    container_name: cactus-example-electricity-trade-sawtooth-validator
-    image: cactus-plugin-ledger-connector-sawtooth-socketio
-    build:
-      context: ../../packages/cactus-plugin-ledger-connector-sawtooth-socketio/
-    ports:
-      - "5140:5140"
-    networks:
-      - sawtooth_aio_testnet_1x
-      - cactus-example-electricity-trade-net
-    depends_on:
-      - cmd-socketio-base-image
-    volumes:
-        - type: bind
-          source: ./etc/cactus
-          target: /etc/cactus
-
   cactus-example-electricity-trade-blp:
     container_name: cactus-example-electricity-trade-blp
     image: cactus-example-electricity-trade-blp
@@ -39,7 +22,6 @@ services:
     networks:
      - cactus-example-electricity-trade-net
     depends_on:
-      - sawtooth-validator
       - cmd-socketio-base-image
     volumes:
         - type: bind
@@ -47,7 +29,5 @@ services:
           target: /etc/cactus
 
 networks:
-  sawtooth_aio_testnet_1x:
-    external: true
   cactus-example-electricity-trade-net:
     driver: bridge

@@ -2,7 +2,7 @@
 blpRegistry:
   -
     businessLogicID: h40Q9eMD
-    validatorID: [sUr7d10R]
+    validatorID: []
 
 logLevel: debug
 
@@ -24,10 +24,9 @@ appRouters:
 # BLP Config
 electricityTradeInfo:
   sawtooth:
-    validatorID: sUr7d10R
     filterKey: intkey
+    restApiURL: http://localhost:8008
   ethereum:
-    validatorID: 84jUisrs
     gethURL: ws://localhost:8546
     chainName: geth1
     networkID: 10

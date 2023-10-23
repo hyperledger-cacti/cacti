@@ -116,9 +116,6 @@
       "path": "./packages/cactus-plugin-ledger-connector-sawtooth/tsconfig.json"
     },
     {
-      "path": "./packages/cactus-plugin-ledger-connector-sawtooth-socketio/tsconfig.json"
-    },
-    {
       "path": "./packages/cactus-test-tooling/tsconfig.json"
     },
     {
