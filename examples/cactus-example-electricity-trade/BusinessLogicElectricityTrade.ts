@@ -10,42 +10,25 @@ import { RequestInfo } from "./RequestInfo";
 import { MeterManagement } from "./MeterManagement";
 import { MeterInfo } from "./MeterInfo";
 import {
-  TradeInfo,
-  routesTransactionManagement,
   BusinessLogicBase,
   LedgerEvent,
   json2str,
   ConfigUtil,
-  LPInfoHolder,
 } from "@hyperledger/cactus-cmd-socketio-server";
 import { sendEthereumTransaction } from "./TransactionEthereum";
 
 const config: any = ConfigUtil.getConfig() as any;
 import { getLogger } from "log4js";
+import { getSawtoothApiClient } from "./sawtooth-connector";
 import {
-  VerifierFactory,
-  VerifierFactoryConfig,
-} from "@hyperledger/cactus-verifier-client";
+  isWatchBlocksV1CactiTransactionsResponse,
+  WatchBlocksV1ListenerType,
+  WatchBlocksV1Progress,
+} from "@hyperledger/cactus-plugin-ledger-connector-sawtooth";
 
 const moduleName = "BusinessLogicElectricityTrade";
 const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;
-const connectInfo = new LPInfoHolder();
-const routesVerifierFactory = new VerifierFactory(
-  connectInfo.ledgerPluginInfo as VerifierFactoryConfig,
-  config.logLevel,
-);
-
-interface SawtoothEventData {
-  status: number | string;
-  blockData: [];
-}
-
-interface SawtoothBlockDataData {
-  header_signature: string;
-  hash: string;
-  payload_decoded: { Verb: string; Name: string; Value: string }[];
-}
 
 export class BusinessLogicElectricityTrade extends BusinessLogicBase {
   businessLogicID: string;
@@ -71,39 +54,54 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
     // set TradeID
     requestInfo.setTradeID(tradeID);
 
-    // Create trade information
-    const tradeInfo: TradeInfo = new TradeInfo(
-      requestInfo.businessLogicID,
-      requestInfo.tradeID,
-    );
-
-    this.startMonitor(tradeInfo);
+    this.startSawtoothMonitor();
   }
 
-  startMonitor(tradeInfo: TradeInfo): void {
-    // Get Verifier Instance
-    logger.debug(
-      `##startMonitor(): businessLogicID: ${tradeInfo.businessLogicID}`,
-    );
-    const useValidator = JSON.parse(
-      routesTransactionManagement.getValidatorToUse(tradeInfo.businessLogicID),
-    );
-    logger.debug(
-      `filterKey: ${config.electricityTradeInfo.sawtooth.filterKey}`,
-    );
-    const options = {
-      filterKey: config.electricityTradeInfo.sawtooth.filterKey,
-    };
-    //        const verifierSawtooth = transactionManagement.getVerifier(useValidator['validatorID'][0], options);
-    const verifierSawtooth = routesVerifierFactory.getVerifier(
-      useValidator["validatorID"][0],
-    );
-    verifierSawtooth.startMonitor(
-      "BusinessLogicElectricityTrade",
-      options,
-      routesTransactionManagement,
-    );
-    logger.debug("getVerifierSawtooth");
+  startSawtoothMonitor(): void {
+    // Start monitoring
+    const sawtoothApiClient = getSawtoothApiClient();
+    const watchObservable = sawtoothApiClient.watchBlocksV1({
+      type: WatchBlocksV1ListenerType.CactiTransactions,
+      txFilterBy: {
+        family_name: config.electricityTradeInfo.sawtooth.filterKey,
+      },
+    });
+    watchObservable.subscribe({
+      next: (event: WatchBlocksV1Progress) => {
+        logger.debug(`##in onEventSawtooth()`);
+
+        if (!isWatchBlocksV1CactiTransactionsResponse(event)) {
+          logger.error("Wrong input block format!", event);
+          return;
+        }
+
+        for (const tx of event.cactiTransactionsEvents) {
+          try {
+            const txId = tx.header_signature;
+            logger.debug(`##txId = ${txId}`);
+
+            const txPayload = tx.payload_decoded[0];
+            if (txPayload && txPayload.Verb !== "set") {
+              this.remittanceTransaction({
+                Name: txPayload.Name,
+                Value: txPayload.Value,
+                Verb: txPayload.Verb,
+              });
+            }
+          } catch (err) {
+            logger.error(
+              `##onEventSawtooth(): onEvent, err: ${err}, event: ${JSON.stringify(
+                tx,
+              )}`,
+              tx,
+            );
+          }
+        }
+      },
+      error(err: unknown) {
+        logger.error("Sawtooth watchBlocksV1() error:", err);
+      },
+    });
   }
 
   remittanceTransaction(transactionSubset: Record<string, string>): void {
@@ -144,156 +142,15 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
   }
 
   onEvent(ledgerEvent: LedgerEvent, targetIndex: number): void {
-    logger.debug(`##in BLP:onEvent()`);
-    logger.debug(
-      `##onEvent(): ${json2str(ledgerEvent["data"]["blockData"][targetIndex])}`,
+    logger.error(
+      "onEvent() ERROR - No monitors are running, should not be called!",
     );
-
-    switch (ledgerEvent.verifierId) {
-      case config.electricityTradeInfo.sawtooth.validatorID:
-        this.onEventSawtooth(ledgerEvent.data, targetIndex);
-        break;
-      default:
-        logger.error(
-          `##onEvent(), invalid verifierId: ${ledgerEvent.verifierId}`,
-        );
-        return;
-    }
-  }
-
-  onEventSawtooth(event: SawtoothEventData, targetIndex: number): void {
-    logger.debug(`##in onEventSawtooth()`);
-    const tx = this.getTransactionFromSawtoothEvent(event, targetIndex);
-    if (tx == null) {
-      logger.error(`##onEventSawtooth(): invalid event: ${json2str(event)}`);
-      return;
-    }
-
-    try {
-      const txId = tx["header_signature"];
-      logger.debug(`##txId = ${txId}`);
-
-      if (tx["payload_decoded"][0].Verb !== "set") {
-        const transactionSubset = {
-          Name: tx["payload_decoded"][0].Name,
-          Value: tx["payload_decoded"][0].Value,
-          Verb: tx["payload_decoded"][0].Verb,
-        };
-        this.remittanceTransaction(transactionSubset);
-      }
-    } catch (err) {
-      logger.error(
-        `##onEventSawtooth(): err: ${err}, event: ${json2str(event)}`,
-      );
-    }
-  }
-
-  getTransactionFromSawtoothEvent(
-    event: SawtoothEventData,
-    targetIndex: number | string,
-  ): SawtoothBlockDataData | undefined {
-    try {
-      if (typeof targetIndex === "number") {
-        const retTransaction = event["blockData"][targetIndex];
-
-        logger.debug(
-          `##getTransactionFromSawtoothEvent(), retTransaction: ${retTransaction}`,
-        );
-        return retTransaction;
-      }
-    } catch (err) {
-      logger.error(
-        `##getTransactionFromSawtoothEvent(): invalid even, err:${err}, event:${event}`,
-      );
-    }
+    return;
   }
 
   getOperationStatus(): Record<string, unknown> {
     logger.debug(`##in getOperationStatus()`);
     return {};
-  }
-
-  getTxIDFromEvent(
-    ledgerEvent: LedgerEvent,
-    targetIndex: number,
-  ): string | null {
-    logger.debug(`##in getTxIDFromEvent`);
-    //        logger.debug(`##event: ${json2str(ledgerEvent)}`);
-
-    switch (ledgerEvent.verifierId) {
-      case config.electricityTradeInfo.sawtooth.validatorID:
-        return this.getTxIDFromEventSawtooth(ledgerEvent.data, targetIndex);
-      default:
-        logger.error(
-          `##getTxIDFromEvent(): invalid verifierId: ${ledgerEvent.verifierId}`,
-        );
-    }
-    return null;
-  }
-
-  getTxIDFromEventSawtooth(
-    event: SawtoothEventData,
-    targetIndex: number | string,
-  ): string | null {
-    logger.debug(`##in getTxIDFromEventSawtooth()`);
-    const tx = this.getTransactionFromSawtoothEvent(event, targetIndex);
-    if (tx == null) {
-      logger.warn(`#getTxIDFromEventSawtooth(): skip(not found tx)`);
-      return null;
-    }
-
-    try {
-      const txId = tx["header_signature"];
-
-      if (typeof txId !== "string") {
-        logger.warn(
-          `#getTxIDFromEventSawtooth(): skip(invalid block, not found txId.), event: ${json2str(
-            event,
-          )}`,
-        );
-        return null;
-      }
-
-      logger.debug(`###getTxIDFromEventSawtooth(): txId: ${txId}`);
-      return txId;
-    } catch (err) {
-      logger.error(
-        `##getTxIDFromEventSawtooth(): err: ${err}, event: ${json2str(event)}`,
-      );
-      return null;
-    }
-  }
-
-  getEventDataNum(ledgerEvent: LedgerEvent): number {
-    logger.debug(
-      `##in BLP:getEventDataNum(), ledgerEvent.verifierId: ${ledgerEvent.verifierId}`,
-    );
-    const event = ledgerEvent.data;
-    let retEventNum = 0;
-
-    try {
-      logger.error(ledgerEvent.data);
-
-      switch (ledgerEvent.verifierId) {
-        case config.electricityTradeInfo.sawtooth.validatorID:
-          retEventNum = event["blockData"].length;
-          break;
-        default:
-          logger.error(
-            `##getEventDataNum(): invalid verifierId: ${ledgerEvent.verifierId}`,
-          );
-          break;
-      }
-      logger.debug(
-        `##getEventDataNum(): retEventNum: ${retEventNum}, verifierId: ${ledgerEvent.verifierId}`,
-      );
-      return retEventNum;
-    } catch (err) {
-      logger.error(
-        `##getEventDataNum(): invalid even, err: ${err}, event: ${event}`,
-      );
-      return 0;
-    }
   }
 
   getAccountInfo(

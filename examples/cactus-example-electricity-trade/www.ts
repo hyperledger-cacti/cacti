@@ -1,10 +1,12 @@
 import { BusinessLogicElectricityTrade } from "./BusinessLogicElectricityTrade";
 import { startCactusSocketIOServer } from "@hyperledger/cactus-cmd-socketio-server";
 import { initEthereumConnector } from "./ethereum-connector";
+import { initSawtoothConnector } from "./sawtooth-connector";
 
 async function startBLP() {
   try {
     await initEthereumConnector();
+    await initSawtoothConnector();
 
     startCactusSocketIOServer({
       id: "h40Q9eMD",
