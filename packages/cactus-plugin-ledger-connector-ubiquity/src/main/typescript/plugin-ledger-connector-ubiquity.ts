@@ -27,9 +27,9 @@ import { GetTransactionsByAddressEndpoint } from "./endpoints/transaction/get-tr
 import {
   UbiquityClient,
   TxPage,
-  Balance,
+  BalanceV1,
   Tx,
-} from "@ubiquity/ubiquity-ts-client-modified";
+} from "ubiquity-ts-client-renovated";
 
 export interface IPluginLedgerConnectorUbiquity {
   logLevel?: LogLevelDesc;
@@ -135,7 +135,7 @@ export class PluginLedgerConnectorUbiquity
     protocol: PROTOCOL_TYPE,
     network: NETWORK_TYPE,
     address: string,
-  ): Promise<AxiosResponse<Balance[]>> {
+  ): Promise<AxiosResponse<BalanceV1[]>> {
     const fnTag = `${this.className}:GetBalancesByAddresses`;
     this.log.debug("enter ", fnTag);
     const accounts = this.client.accountsApi.getListOfBalancesByAddress(
