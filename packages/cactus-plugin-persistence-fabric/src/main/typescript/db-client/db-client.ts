@@ -21,7 +21,7 @@ import {
   InsertBlockTransactionEntryInterface,
   InsertDetailedTransactionEntryInterface,
 } from "../types";
-// import { RuntimeError } from "run-time-error";
+// import { RuntimeError } from "run-time-error-cjs";
 
 export interface PostgresDatabaseClientOptions {
   connectionString: string;

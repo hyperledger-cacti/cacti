@@ -4,7 +4,7 @@
 
 import { toChecksumAddress } from "web3-utils";
 import { isAddress } from "web3-validator";
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 
 /**
  * Get error cause for RuntimeError (instance of `Error`, string or undefined)

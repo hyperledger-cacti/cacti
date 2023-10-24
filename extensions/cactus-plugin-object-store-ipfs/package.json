@@ -59,19 +59,22 @@
     "@hyperledger/cactus-core": "2.0.0-alpha.2",
     "@hyperledger/cactus-core-api": "2.0.0-alpha.2",
     "axios": "1.5.1",
-    "ipfs-http-client": "60.0.1",
-    "run-time-error": "1.4.0",
+    "run-time-error-cjs": "1.4.0",
     "typescript-optional": "2.0.1",
     "uuid": "8.3.2"
   },
   "devDependencies": {
     "@hyperledger/cactus-test-tooling": "2.0.0-alpha.2",
+    "@multiformats/multiaddr": "11.6.1",
     "@types/body-parser": "1.19.4",
     "@types/express": "4.17.19",
     "body-parser": "1.20.2",
     "express": "4.18.2",
     "ipfs-core-types": "0.14.1",
-    "multiformats": "9.4.9"
+    "ipfs-unixfs": "9.0.1",
+    "kubo-rpc-client": "3.0.1",
+    "kubo-rpc-client-esm-cjs": "3.0.1",
+    "multiformats": "11.0.2"
   },
   "engines": {
     "node": ">=10",

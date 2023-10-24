@@ -1,6 +1,6 @@
 import type { EventEmitter } from "events";
 import { Optional } from "typescript-optional";
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 import type {
   Container,
   ContainerCreateOptions,

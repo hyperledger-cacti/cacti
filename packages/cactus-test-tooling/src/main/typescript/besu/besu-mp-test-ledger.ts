@@ -9,7 +9,7 @@ import {
 } from "@hyperledger/cactus-common";
 import { LoggerProvider } from "@hyperledger/cactus-common";
 import { Containers } from "../common/containers";
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 import { EventEmitter } from "events";
 
 export interface IBesuMpTestLedgerOptions {

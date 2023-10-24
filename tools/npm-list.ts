@@ -2,7 +2,7 @@ import { ExecOptions, exec } from "child_process";
 import { promisify } from "util";
 
 import fastSafeStringify from "fast-safe-stringify";
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 import { hasKey } from "./has-key";
 
 const execAsync = promisify(exec);

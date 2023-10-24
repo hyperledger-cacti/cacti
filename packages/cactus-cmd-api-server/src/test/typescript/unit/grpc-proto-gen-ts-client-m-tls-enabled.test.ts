@@ -10,7 +10,7 @@ import { AuthorizationProtocol } from "../../../main/typescript/public-api";
 import { default_service } from "../../../main/typescript/public-api";
 import { health_check_response_pb } from "../../../main/typescript/public-api";
 import { empty } from "../../../main/typescript/public-api";
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 
 const testCase = "API server: runs gRPC web services - mTLS";
 const logLevel: LogLevelDesc = "TRACE";

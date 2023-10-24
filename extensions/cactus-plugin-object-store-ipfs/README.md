@@ -46,7 +46,7 @@ This plugin uses OpenAPI to generate the API paths. There are three endpoints de
 Firstly create an instance of the plugin.
 
 ```typescript
-import { create } from "ipfs-http-client";
+import { create } from "kubo-rpc-client";
 
 const logLevel: LogLevelDesc = "TRACE";
 const ipfsClientOrOptions = create();

@@ -1,7 +1,6 @@
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
 import fs from "fs-extra";
-import { create } from "ipfs-http-client";
 import {
   Logger,
   Checks,
@@ -289,7 +288,8 @@ export class CbdcBridgingAppDummyInfrastructure {
   public async createIPFSConnector(): Promise<PluginObjectStoreIpfs> {
     this.log.info(`Creating Besu Connector...`);
 
-    const ipfsClientOrOptions = create({
+    const kuboRpcClientModule = await import("kubo-rpc-client");
+    const ipfsClientOrOptions = kuboRpcClientModule.create({
       url: await this.ipfs.getApiUrl(),
     });
 

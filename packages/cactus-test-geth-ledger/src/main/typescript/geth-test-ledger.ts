@@ -3,7 +3,7 @@ import Docker, { Container } from "dockerode";
 import { v4 as internalIpV4 } from "internal-ip";
 import Web3, { ContractAbi, TransactionReceipt } from "web3";
 import type { Web3Account } from "web3-eth-accounts";
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 
 import {
   Logger,

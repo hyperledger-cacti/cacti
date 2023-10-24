@@ -22,7 +22,7 @@ import { v4 as uuidv4 } from "uuid";
 import { default_service, empty } from "../../../main/typescript/public-api";
 import * as grpc from "@grpc/grpc-js";
 import { GrpcServerApiServer } from "../../../main/typescript/web-services/grpc/grpc-server-api-server";
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 
 describe("cmd-api-server:getOpenApiSpecV1Endpoint", () => {
   const logLevel: LogLevelDesc = "TRACE";

@@ -1,9 +1,7 @@
 import type { AddressInfo } from "net";
 import http from "http";
 import test, { Test } from "tape-promise/tape";
-
 import { v4 as uuidv4 } from "uuid";
-import { create } from "ipfs-http-client";
 import express from "express";
 import bodyParser from "body-parser";
 
@@ -13,12 +11,12 @@ import { Configuration } from "@hyperledger/cactus-core-api";
 
 import { PluginObjectStoreIpfs } from "../../../main/typescript";
 import type { IPluginObjectStoreIpfsOptions } from "../../../main/typescript";
-
 import { DefaultApi as ObjectStoreIpfsApi } from "../../../main/typescript/public-api";
 
-test("PluginObjectStoreIpfs", (t1: Test) => {
+test("PluginObjectStoreIpfs", async (t1: Test) => {
   const logLevel: LogLevelDesc = "TRACE";
-  const ipfsClientOrOptions = create();
+  const kuboRpcModule = await import("kubo-rpc-client");
+  const ipfsClientOrOptions = kuboRpcModule.create();
   t1.doesNotThrow(
     () =>
       new PluginObjectStoreIpfs({
@@ -50,8 +48,9 @@ test("PluginObjectStoreIpfs", (t1: Test) => {
   });
 
   test.skip("get,set,has,delete alters state as expected", async (t: Test) => {
+    const kuboRpcModule = await import("kubo-rpc-client");
     const options: IPluginObjectStoreIpfsOptions = {
-      ipfsClientOrOptions: create(), // FIXME: use an actual mock IPFS client
+      ipfsClientOrOptions: kuboRpcModule.create(), // FIXME: use an actual mock IPFS client
       instanceId: uuidv4(),
       parentDir: "/" + uuidv4(),
       logLevel,

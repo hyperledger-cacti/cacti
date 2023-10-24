@@ -3,7 +3,6 @@ import type { AddressInfo } from "net";
 import { v4 as uuidv4 } from "uuid";
 import "jest-extended";
 import { PluginObjectStoreIpfs } from "@hyperledger/cactus-plugin-object-store-ipfs";
-import { create } from "ipfs-http-client";
 import bodyParser from "body-parser";
 import express from "express";
 import { DefaultApi as ObjectStoreIpfsApi } from "@hyperledger/cactus-plugin-object-store-ipfs";
@@ -20,6 +19,7 @@ import {
   PluginOdapGateway,
 } from "../../../../main/typescript/gateway/plugin-odap-gateway";
 import { GoIpfsTestContainer } from "@hyperledger/cactus-test-tooling";
+
 import { RecoverV1Message } from "../../../../main/typescript/public-api";
 import { randomInt } from "crypto";
 import { checkValidRecoverMessage } from "../../../../main/typescript/gateway/recovery/recover";
@@ -73,7 +73,8 @@ beforeAll(async () => {
 
   const ipfsApiUrl = await ipfsContainer.getApiUrl();
 
-  const ipfsClientOrOptions = create({
+  const kuboRpcModule = await import("kubo-rpc-client");
+  const ipfsClientOrOptions = kuboRpcModule.create({
     url: ipfsApiUrl,
   });
 

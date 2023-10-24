@@ -14,7 +14,7 @@
     "config": "1.31.0",
     "ethereumjs-common": "1.5.2",
     "ethereumjs-tx": "2.1.2",
-    "socket.io-client": "4.5.4",
+    "socket.io-client-fixed-types": "4.5.4",
     "ts-node": "9.1.1",
     "web3": "1.7.0"
   },

@@ -36,7 +36,7 @@ import {
   TokenTypeV1,
   TrackedOperationV1,
 } from "./generated/openapi/typescript-axios";
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 import { Interface as EthersInterface } from "@ethersproject/abi";
 import { Mutex } from "async-mutex";
 import { v4 as uuidv4 } from "uuid";

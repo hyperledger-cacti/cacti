@@ -9,7 +9,7 @@ import path from "path";
 import tls from "tls";
 import { Server, createServer } from "http";
 import { createServer as createSecureServer } from "https";
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 import { gte } from "semver";
 import lmify from "lmify";
 import fs from "fs-extra";
@@ -22,7 +22,6 @@ import compression from "compression";
 import bodyParser from "body-parser";
 import cors, { CorsOptionsDelegate, CorsRequest } from "cors";
 
-import rateLimit from "express-rate-limit";
 import { Server as SocketIoServer } from "socket.io";
 import { authorize as authorizeSocket } from "@thream/socketio-jwt";
 
@@ -521,6 +520,7 @@ export class ApiServer {
       },
     });
 
+    const { rateLimit } = await import("express-rate-limit");
     const rateLimiterIndexHtml = rateLimit({
       windowMs: 15 * 60 * 1000, // 15 minutes
       max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)

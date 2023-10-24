@@ -3,7 +3,7 @@ import path from "path";
 import { v4 as uuidv4 } from "uuid";
 import { Certificate } from "@fidm/x509";
 import { Express } from "express";
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 import "multer";
 import temp from "temp";
 import {

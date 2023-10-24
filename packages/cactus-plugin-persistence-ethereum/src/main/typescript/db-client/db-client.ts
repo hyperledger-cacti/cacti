@@ -15,7 +15,7 @@ import { getRuntimeErrorCause } from "../utils";
 import fs from "fs";
 import path from "path";
 import { Client as PostgresClient } from "pg";
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 
 //////////////////////////////////
 // Helper Types

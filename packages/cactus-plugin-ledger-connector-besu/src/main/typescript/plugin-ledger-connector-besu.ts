@@ -87,7 +87,7 @@ import {
   IGetPrometheusExporterMetricsEndpointV1Options,
 } from "./web-services/get-prometheus-exporter-metrics-endpoint-v1";
 import { WatchBlocksV1Endpoint } from "./web-services/watch-blocks-v1-endpoint";
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 import { GetBalanceEndpoint } from "./web-services/get-balance-endpoint";
 import { GetTransactionEndpoint } from "./web-services/get-transaction-endpoint";
 import { GetPastLogsEndpoint } from "./web-services/get-past-logs-endpoint";
