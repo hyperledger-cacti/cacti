@@ -70,8 +70,8 @@
     "joi": "14.3.1",
     "openapi-types": "7.0.1",
     "prom-client": "13.1.0",
-    "run-time-error": "1.4.0",
-    "socket.io-client": "4.5.4",
+    "run-time-error-cjs": "1.4.0",
+    "socket.io-client-fixed-types": "4.5.4",
     "typescript-optional": "2.0.1",
     "uuid": "9.0.1"
   },

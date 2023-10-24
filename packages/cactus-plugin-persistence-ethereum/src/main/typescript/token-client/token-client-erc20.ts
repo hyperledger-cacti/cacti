@@ -6,7 +6,7 @@ import { EthereumApiClient } from "@hyperledger/cactus-plugin-ledger-connector-e
 import type { LogLevelDesc } from "@hyperledger/cactus-common";
 import TokenClient from "./base-token-client";
 import ERC20 from "../../json/contract-abi/ERC20.json";
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 
 /**
  * Client for calling methods on ERC20 token contract.

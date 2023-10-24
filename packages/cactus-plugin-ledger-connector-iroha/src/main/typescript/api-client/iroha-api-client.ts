@@ -1,6 +1,6 @@
 import { Observable, ReplaySubject, share } from "rxjs";
 import { finalize } from "rxjs/operators";
-import { Socket, io } from "socket.io-client";
+import { Socket, io } from "socket.io-client-fixed-types";
 import { Logger, Checks } from "@hyperledger/cactus-common";
 import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
 import { Constants, ISocketApiClient } from "@hyperledger/cactus-core-api";
@@ -15,7 +15,7 @@ import {
   Configuration,
   ConfigurationParameters,
 } from "../generated/openapi/typescript-axios/configuration";
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 
 export interface IrohaApiClientParameters extends ConfigurationParameters {
   logLevel?: LogLevelDesc;

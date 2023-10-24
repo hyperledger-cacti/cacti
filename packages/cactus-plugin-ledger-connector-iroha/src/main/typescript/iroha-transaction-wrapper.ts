@@ -12,7 +12,7 @@ import {
   RunTransactionResponse,
 } from "./generated/openapi/typescript-axios";
 
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 import * as grpc from "@grpc/grpc-js";
 
 import {

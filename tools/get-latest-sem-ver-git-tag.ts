@@ -2,7 +2,7 @@ import path from "path";
 import { fileURLToPath } from "url"
 import { simpleGit, SimpleGit, SimpleGitOptions } from "simple-git";
 import { compareSemVer, isValidSemVer } from "semver-parser";
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 
 const TAG = "[tools/get-latest-sem-ver-git-tag.ts]";
 

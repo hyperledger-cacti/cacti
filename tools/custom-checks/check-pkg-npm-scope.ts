@@ -3,7 +3,6 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { globby, Options as GlobbyOptions } from "globby";
 import { RuntimeError } from "run-time-error";
-import { sortPackageJson } from "sort-package-json";
 import { hasKey } from "../has-key";
 // eslint-disable-next-line prettier/prettier
 import lernaCfg from "../../lerna.json" assert { type: "json" };
@@ -66,7 +65,7 @@ export async function checkPkgNpmScope(req: {
     ignore: ["**/node_modules", ...req.excludePatterns],
   };
 
-  const includeGlobs = lernaCfg.packages.map(x => x.concat("/package.json"));
+  const includeGlobs = lernaCfg.packages.map((x) => x.concat("/package.json"));
 
   const pkgJsonPaths = await globby(includeGlobs, globbyOpts);
   console.log(`${TAG} Found ${pkgJsonPaths.length} package.json files.`);

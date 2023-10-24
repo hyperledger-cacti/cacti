@@ -78,7 +78,7 @@ import { InvokeRawWeb3EthContractEndpoint } from "./web-services/invoke-raw-web3
 
 import { isWeb3SigningCredentialNone } from "./model-type-guards";
 import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 
 export interface IPluginLedgerConnectorQuorumOptions
   extends ICactusPluginOptions {

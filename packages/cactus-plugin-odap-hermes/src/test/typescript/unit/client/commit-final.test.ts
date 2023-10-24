@@ -3,7 +3,6 @@ import { SHA256 } from "crypto-js";
 import bodyParser from "body-parser";
 import { v4 as uuidv4 } from "uuid";
 import http, { Server } from "http";
-import { create } from "ipfs-http-client";
 import {
   OdapMessageType,
   PluginOdapGateway,
@@ -21,6 +20,7 @@ import {
 import { Configuration } from "@hyperledger/cactus-core-api";
 import { PluginObjectStoreIpfs } from "@hyperledger/cactus-plugin-object-store-ipfs";
 import { GoIpfsTestContainer } from "@hyperledger/cactus-test-tooling";
+
 import express from "express";
 import { AddressInfo } from "net";
 
@@ -76,7 +76,8 @@ beforeAll(async () => {
 
   const ipfsApiUrl = await ipfsContainer.getApiUrl();
 
-  const ipfsClientOrOptions = create({
+  const kuboRpcModule = await import("kubo-rpc-client");
+  const ipfsClientOrOptions = kuboRpcModule.create({
     url: ipfsApiUrl,
   });
 

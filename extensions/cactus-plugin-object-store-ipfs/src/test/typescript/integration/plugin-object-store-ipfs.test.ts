@@ -1,21 +1,23 @@
 import test, { Test } from "tape-promise/tape";
 
-import { create } from "ipfs-http-client";
 import express from "express";
 import bodyParser from "body-parser";
 import http from "http";
 import type { AddressInfo } from "net";
-
 import { v4 as uuidv4 } from "uuid";
 
-import { IListenOptions, Servers } from "@hyperledger/cactus-common";
-import type { LogLevelDesc } from "@hyperledger/cactus-common";
+import {
+  IListenOptions,
+  Servers,
+  LogLevelDesc,
+} from "@hyperledger/cactus-common";
 import { Configuration } from "@hyperledger/cactus-core-api";
-import { GoIpfsTestContainer } from "@hyperledger/cactus-test-tooling";
-import { Containers } from "@hyperledger/cactus-test-tooling";
+import {
+  GoIpfsTestContainer,
+  Containers,
+} from "@hyperledger/cactus-test-tooling";
 
 import { PluginObjectStoreIpfs } from "../../../main/typescript";
-
 import { DefaultApi as ObjectStoreIpfsApi } from "../../../main/typescript/public-api";
 
 const logLevel: LogLevelDesc = "TRACE";
@@ -57,6 +59,9 @@ test(testCase, async (t: Test) => {
   const ipfsGatewayUrl = await ipfsContainer.getWebGatewayUrl();
   t.comment(`Go IPFS Test Container API URL: ${ipfsApiUrl}`);
   t.comment(`Go IPFS Test Container Gateway URL: ${ipfsGatewayUrl}`);
+
+
+  const { create } = await import("kubo-rpc-client");
 
   const ipfsClientOrOptions = create({
     url: ipfsApiUrl,

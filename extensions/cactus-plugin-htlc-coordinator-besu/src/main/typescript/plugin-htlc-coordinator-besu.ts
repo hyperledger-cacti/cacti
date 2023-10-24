@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import { Express } from "express";
 import { promisify } from "util";
 import { Optional } from "typescript-optional";
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 import fastSafeStringify from "fast-safe-stringify";
 import OAS from "../json/openapi.json";
 import {

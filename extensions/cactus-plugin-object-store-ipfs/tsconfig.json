@@ -7,6 +7,7 @@
     "tsBuildInfoFile": "../../.build-cache/cactus-plugin-object-store-ipfs.tsbuildinfo",
     "skipLibCheck": true,
     "composite": true,
+    "moduleResolution": "Node16"
   },
   "include": [
     "./src",

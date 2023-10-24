@@ -2,8 +2,8 @@
  * Helper module for setting up client/server test sockets.
  */
 
-import { Server, Socket as ServerSocket } from "socket.io";
-import { io, Socket as ClientSocket } from "socket.io-client";
+import { Server, ServerOptions as SocketServerOptions, Socket as ServerSocket } from "socket.io";
+import { io, Socket as ClientSocket, ManagerOptions, SocketOptions } from "socket.io-client-fixed-types";
 import { createServer } from "http";
 
 export { Server, ServerSocket, ClientSocket };
@@ -18,10 +18,12 @@ export function createListeningMockServer(): Promise<[Server, string]> {
     const httpServer = createServer();
     httpServer.unref();
 
-    const testServer = new Server(httpServer, {
+    const socketServerOptions: Partial<SocketServerOptions> = {
       transports: ["websocket"],
-      cookie: false,
-    });
+      cookie: false
+    };
+
+    const testServer = new Server(httpServer, socketServerOptions);
 
     httpServer.listen(0, () => {
       const addrInfo = httpServer.address();
@@ -42,11 +44,15 @@ export function createListeningMockServer(): Promise<[Server, string]> {
  * @port - Localhost port to connect to.
  */
 export function createClientSocket(port: string): ClientSocket {
-  return io(`http://localhost:${port}`, {
+
+  const clientSocketOpts: Partial<ManagerOptions & SocketOptions> = {
     reconnectionAttempts: 10,
     reconnectionDelay: 1000,
+    // @ts-ignore
     transports: ["websocket"],
-  });
+  };
+
+  return io(`http://localhost:${port}`, clientSocketOpts as any);
 }
 
 /**

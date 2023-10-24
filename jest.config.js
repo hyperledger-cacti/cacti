@@ -1,6 +1,7 @@
-/** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
+/** @type {import('ts-jest/dist/types').JestConfigWithTsJest} */
 module.exports = {
   preset: "ts-jest",
+  logHeapUsage: true,
   testEnvironment: "node",
   maxWorkers: 1,
   maxConcurrency: 1,
@@ -8,6 +9,7 @@ module.exports = {
   testTimeout: 60 * 60 * 1000,
   testMatch: [
     `**/cactus-*/src/test/typescript/{unit,integration,benchmark}/**/*.test.ts`,
+    `**/cacti-*/src/test/typescript/{unit,integration,benchmark}/**/*.test.ts`,
   ],
   // Ignore the tests that are still using tap/tape for as their test runner
   testPathIgnorePatterns: [

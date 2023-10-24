@@ -8,7 +8,7 @@ import execa from "execa";
 import tar from "tar-stream";
 import fs from "fs-extra";
 import pRetry from "p-retry";
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 import { Streams } from "../common/streams";
 import {
   Checks,

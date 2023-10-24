@@ -5,7 +5,7 @@
  * transferNumericAsset.ts
  */
 
-import { io } from "socket.io-client";
+import { io } from "socket.io-client-fixed-types";
 
 {
   // Validator test program.(socket.io client)

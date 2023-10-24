@@ -61,7 +61,7 @@
     "morgan": "1.10.0",
     "shelljs": "0.8.5",
     "socket.io": "4.5.4",
-    "socket.io-client": "4.5.4",
+    "socket.io-client-fixed-types": "4.5.4",
     "web3": "1.6.1",
     "xmlhttprequest": "1.8.0"
   },

@@ -21,7 +21,7 @@ import {
   LogLevelDesc,
   Servers,
 } from "@hyperledger/cactus-common";
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 import {
   PluginLedgerConnectorIroha,
   DefaultApi as IrohaApi,

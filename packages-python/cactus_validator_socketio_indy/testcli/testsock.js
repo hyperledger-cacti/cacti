@@ -1,7 +1,7 @@
 const fs = require("fs");
 const jwt = require("jsonwebtoken");
 const { exit } = require("process");
-const io = require("socket.io-client");
+const io = require("socket.io-client-fixed-types");
 
 const url = "http://localhost:10080";
 const socket = io(url, {

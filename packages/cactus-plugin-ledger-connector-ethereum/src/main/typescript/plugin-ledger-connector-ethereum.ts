@@ -77,7 +77,7 @@ import {
   isWeb3SigningCredentialNone,
 } from "./types/model-type-guards";
 import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 import { createProxyMiddleware, fixRequestBody } from "http-proxy-middleware";
 
 import {

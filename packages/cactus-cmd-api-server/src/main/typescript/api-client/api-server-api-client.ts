@@ -1,6 +1,6 @@
 import { Observable, ReplaySubject } from "rxjs";
 import { finalize } from "rxjs/operators";
-import { Socket, io, SocketOptions } from "socket.io-client";
+const { Socket, io, SocketOptions } = require("socket.io-client-fixed-types");
 import { Logger, Checks, IAsyncProvider } from "@hyperledger/cactus-common";
 import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
 import { Constants } from "@hyperledger/cactus-core-api";
@@ -78,12 +78,12 @@ export class ApiServerApiClient extends DefaultApi {
   public async watchHealthcheckV1(): Promise<Observable<HealthCheckResponse>> {
     const { log, tokenProvider } = this;
 
-    const socketOptions: SocketOptions = {
+    const socketOptions: typeof SocketOptions = {
       auth: { token: this.configuration?.baseOptions.headers.Authorization },
       path: this.wsApiPath,
-    } as SocketOptions; // TODO
+    } as typeof SocketOptions; // TODO
 
-    const socket: Socket = io(this.wsApiHost, socketOptions);
+    const socket: typeof Socket = io(this.wsApiHost, socketOptions);
     const subject = new ReplaySubject<HealthCheckResponse>(1);
 
     socket.on("error", (ex: Error) => {
@@ -97,7 +97,7 @@ export class ApiServerApiClient extends DefaultApi {
       log.error("[SocketIOClient] DISCONNECT=%s Active=%b", reason, active);
     });
 
-    socket.on("connect_error", async (err) => {
+    socket.on("connect_error", async (err: unknown) => {
       log.debug("[SocketIOClient] CONNECT_ERROR: %o", err);
       if (tokenProvider.isPresent()) {
         const theProvider = tokenProvider.get(); // unwrap the Optional

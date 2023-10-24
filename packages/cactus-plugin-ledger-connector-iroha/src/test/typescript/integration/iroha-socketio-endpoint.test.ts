@@ -4,7 +4,7 @@ import { AddressInfo } from "net";
 import KeyEncoder from "key-encoder";
 import { v4 as internalIpV4 } from "internal-ip";
 import { v4 as uuidv4 } from "uuid";
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 import cryptoHelper from "iroha-helpers/lib/cryptoHelper";
 import express from "express";
 import bodyParser from "body-parser";

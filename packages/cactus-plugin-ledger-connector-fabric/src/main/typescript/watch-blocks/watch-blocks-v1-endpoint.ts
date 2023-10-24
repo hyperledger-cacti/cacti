@@ -16,7 +16,7 @@ import {
 import { BlockEvent, BlockListener, EventType, Gateway } from "fabric-network";
 import { Socket as SocketIoSocket } from "socket.io";
 import { v4 as uuidv4 } from "uuid";
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 
 import { assertFabricFunctionIsAvailable } from "../common/utils";
 import { SignPayloadCallback } from "../plugin-ledger-connector-fabric";

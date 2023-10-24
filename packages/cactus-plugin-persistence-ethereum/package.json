@@ -65,7 +65,7 @@
     "async-mutex": "0.4.0",
     "axios": "1.6.0",
     "pg": "8.8.0",
-    "run-time-error": "1.4.0",
+    "run-time-error-cjs": "1.4.0",
     "uuid": "8.3.2",
     "web3-utils": "4.0.6",
     "web3-validator": "2.0.2"
