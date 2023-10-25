@@ -82,7 +82,7 @@ setup(
         'python3-indy==1.16.0',
         'PyYAML==5.4.1',
         'six==1.16.0',
-        'Werkzeug==2.3.6',
+        'Werkzeug==3.0.1',
         'zipp==3.16.2'
     ],
     classifiers=[
