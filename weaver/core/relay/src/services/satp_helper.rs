@@ -1,6 +1,13 @@
+use crate::db::Database;
+use crate::error::{self, Error};
+use crate::relay_proto::LocationSegment;
+use crate::services::helpers::get_driver_client;
+use crate::services::logger::Operation;
+use chrono::Utc;
 use config::Config;
+use dotenv::dotenv;
 use serde::de::DeserializeOwned;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use sled::IVec;
 use tonic::transport::{Certificate, Channel, ClientTlsConfig};
 use tonic::Response;
@@ -18,47 +25,16 @@ use weaverpb::relay::satp::{
     TransferProposalReceiptRequest,
 };
 
-use crate::db::Database;
-use crate::error::{self, Error};
-use crate::relay_proto::LocationSegment;
-use crate::services::helpers::get_driver_client;
-use dotenv::dotenv;
-use chrono::Utc;
-use crate::services::database::Operation;
-use super::database::{Log, PostgresDatabase, SqliteDatabase};
-
 use super::constants::{
     SATP_DB_PATH, SATP_REMOTE_REQUESTS_DB_PATH, SATP_REMOTE_REQUESTS_STATES_DB_PATH,
     SATP_REQUESTS_DB_PATH, SATP_REQUESTS_STATES_DB_PATH,
 };
+use super::logger::LogEntry;
 use super::types::Driver;
 
-fn choose_database() -> Box<dyn super::database::Database> {
-    // Choose the appropriate database type (e.g., based on an environment variable)
-    let use_sqlite = std::env::var("USE_SQLITE").is_ok();
-
-    // Create a database instance
-    if use_sqlite {
-        Box::new(SqliteDatabase)
-    } else {
-        Box::new(PostgresDatabase)
-    }
-}
-
-fn add_log(
-    database: &dyn super::database::Database,
-    log: Log,
-) -> Result<(), Box<dyn std::error::Error>> {
-    // Log the entry using the provided database
-    database.log(&log)?;
-    Ok(())
-}
-
-pub fn log_request(log: Log) {
+pub fn log_request(log_entry: LogEntry) {
     dotenv().ok();
-
-    let database = choose_database();
-    add_log(&*database, log).unwrap();
+    log::debug!("{}", log_entry);
 }
 
 // Sends a request to the receiving gateway
@@ -137,7 +113,7 @@ pub fn spawn_send_transfer_proposal_receipt_request(
     relay_host: String,
     relay_port: String,
     use_tls: bool,
-    tlsca_cert_path: String
+    tlsca_cert_path: String,
 ) {
     tokio::spawn(async move {
         let request_id = get_request_id_from_transfer_proposal_receipt(
@@ -148,8 +124,7 @@ pub fn spawn_send_transfer_proposal_receipt_request(
             request_id
         );
 
-        let log = Log {
-            timestamp: Utc::now().naive_utc().to_string(),
+        let log_entry = LogEntry {
             request_id: request_id.clone(),
             request: serde_json::to_string(&transfer_proposal_receipt_request.clone()).unwrap(),
             step_id: "1.2".to_string(),
@@ -161,7 +136,7 @@ pub fn spawn_send_transfer_proposal_receipt_request(
             received: false,
             details: None,
         };
-        log_request(log);
+        log::debug!("{}", log_entry);
 
         let result = call_transfer_proposal_receipt(
             relay_host,
@@ -237,7 +212,7 @@ pub fn spawn_send_lock_assertion_broadcast_request(
     relay_host: String,
     relay_port: String,
     use_tls: bool,
-    tlsca_cert_path: String
+    tlsca_cert_path: String,
 ) {
     tokio::spawn(async move {
         let request_id = lock_assertion_request.session_id.to_string();
@@ -847,8 +822,7 @@ pub fn log_request_result(
             match ack::Status::from_i32(ack_response_into_inner.status) {
                 Some(status) => match status {
                     ack::Status::Ok => {
-                        let log = Log {
-                            timestamp: Utc::now().naive_utc().to_string(),
+                        let log_entry = LogEntry {
                             request_id: request_id.clone(),
                             request: "".to_string(),
                             step_id: "".to_string(),
@@ -858,11 +832,10 @@ pub fn log_request_result(
                             received: false,
                             details: None,
                         };
-                        log_request(log);
+                        log::debug!("{}", log_entry);
                     }
                     ack::Status::Error => {
-                        let log = Log {
-                            timestamp: Utc::now().naive_utc().to_string(),
+                        let log_entry = LogEntry {
                             request_id: request_id.clone(),
                             request: "".to_string(),
                             step_id: "".to_string(),
@@ -872,7 +845,7 @@ pub fn log_request_result(
                             received: false,
                             details: Some(ack_response_into_inner.message),
                         };
-                        log_request(log);
+                        log::debug!("{}", log_entry);
                     }
                 },
                 None => {
@@ -881,8 +854,7 @@ pub fn log_request_result(
             }
         }
         Err(result_error) => {
-            let log = Log {
-                timestamp: Utc::now().naive_utc().to_string(),
+            let log_entry = LogEntry {
                 request_id: request_id.clone(),
                 request: "".to_string(),
                 step_id: "".to_string(),
@@ -892,7 +864,7 @@ pub fn log_request_result(
                 received: false,
                 details: Some(result_error.to_string()),
             };
-            log_request(log);
+            log::debug!("{}", log_entry);
         }
     }
 }

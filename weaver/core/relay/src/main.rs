@@ -24,14 +24,26 @@ use tokio::sync::RwLock;
 use tonic::transport::{Identity, Server, ServerTlsConfig};
 
 use crate::services::satp_service::SatpService;
+use lazy_static::lazy_static;
+use crate::services::logger::DbLogger;
 
 mod db;
 mod error;
 mod relay_proto;
 mod services;
 
+const SQLITE_DATABASE_FILE: &str = "gateway_log.db";
+lazy_static! {
+    static ref DB_LOGGER: DbLogger = DbLogger::new(SQLITE_DATABASE_FILE);
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    log::set_logger(&*DB_LOGGER)
+        // TODO: database name and debug level should be configurable
+        .map(|()| log::set_max_level(log::LevelFilter::Debug))
+        .expect("Logger should not have been set up yet");
+
     let mut settings = config::Config::default();
     // Either get config path from environment variable or uses default.
     let config_file_name = env::var("RELAY_CONFIG").unwrap_or_else(|_| {
