@@ -50,7 +50,6 @@ pub fn spawn_send_transfer_proposal_claims_request(
         .await;
 
         println!("Received Ack from sending gateway: {:?}\n", result);
-        // Updates the request in the DB depending on the response status from the sending gateway
     });
 }
 
@@ -83,7 +82,6 @@ pub fn spawn_send_transfer_commence_request(
         .await;
 
         println!("Received Ack from sending gateway: {:?}\n", result);
-        // Updates the request in the DB depending on the response status from the sending gateway
     });
 }
 
@@ -127,7 +125,6 @@ pub fn spawn_send_transfer_proposal_receipt_request(
         .await;
 
         println!("Received Ack from sending gateway: {:?}\n", result);
-        // Updates the request in the DB depending on the response status from the sending gateway
     });
 }
 
@@ -154,7 +151,6 @@ pub fn spawn_send_ack_commence_request(
         .await;
 
         println!("Received Ack from sending gateway: {:?}\n", result);
-        // Updates the request in the DB depending on the response status from the sending gateway
     });
 }
 
@@ -211,8 +207,6 @@ pub fn spawn_send_lock_assertion_broadcast_request(
         .await;
 
         println!("Received Ack from sending gateway: {:?}\n", result);
-        // Updates the request in the DB depending on the response status from the sending gateway
-        let request_id = lock_assertion_receipt_request.session_id.to_string();
     });
 }
 
@@ -236,8 +230,6 @@ pub fn spawn_send_lock_assertion_request(
         .await;
 
         println!("Received Ack from sending gateway: {:?}\n", result);
-        // Updates the request in the DB depending on the response status from the sending gateway
-        let request_id = lock_assertion_request.session_id.to_string();
     });
 }
 
@@ -255,7 +247,6 @@ pub fn spawn_send_commit_prepare_request(
     );
     // Spawning new thread to make the call_commit_prepare to receiver gateway
     tokio::spawn(async move {
-        let request_id = commit_prepare_request.session_id.to_string();
         let result = call_commit_prepare(
             relay_host,
             relay_port,
@@ -266,7 +257,6 @@ pub fn spawn_send_commit_prepare_request(
         .await;
 
         println!("Received Ack from sending gateway: {:?}\n", result);
-        // Updates the request in the DB depending on the response status from the sending gateway
     });
 }
 
@@ -314,8 +304,6 @@ pub fn spawn_send_commit_ready_request(
         .await;
 
         println!("Received Ack from sending gateway: {:?}\n", result);
-        // Updates the request in the DB depending on the response status from the sending gateway
-        let request_id = commit_ready_request.session_id.to_string();
     });
 }
 
@@ -363,8 +351,6 @@ pub fn spawn_send_ack_final_receipt_request(
         .await;
 
         println!("Received Ack from sending gateway: {:?}\n", result);
-        // Updates the request in the DB depending on the response status from the sending gateway
-        let request_id = ack_final_receipt_request.session_id.to_string();
     });
 }
 
@@ -398,8 +384,6 @@ pub fn spawn_send_ack_final_receipt_broadcast_request(
         .await;
 
         println!("Received Ack from sending gateway: {:?}\n", result);
-        // Updates the request in the DB depending on the response status from the sending gateway
-        let request_id = transfer_completed_request.session_id.to_string();
     });
 }
 
@@ -452,8 +436,6 @@ pub fn spawn_send_commit_final_assertion_request(
         .await;
 
         println!("Received Ack from sending gateway: {:?}\n", result);
-        // Updates the request in the DB depending on the response status from the sending gateway
-        let request_id = commit_final_assertion_request.session_id.to_string();
     });
 }
 
