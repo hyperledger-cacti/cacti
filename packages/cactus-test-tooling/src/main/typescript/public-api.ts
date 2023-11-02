@@ -62,6 +62,12 @@ export {
 } from "./fabric/fabric-test-ledger-v1";
 
 export {
+  IndyTestLedger,
+  IIndyTestLedgerOptions,
+  INDY_TEST_LEDGER_DEFAULT_OPTIONS,
+} from "./indy/indy-test-ledger";
+
+export {
   IrohaTestLedger,
   IIrohaTestLedgerOptions,
   IROHA_TEST_LEDGER_DEFAULT_OPTIONS,
