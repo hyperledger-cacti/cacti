@@ -51,7 +51,6 @@ pub fn spawn_send_transfer_proposal_claims_request(
 
         println!("Received Ack from sending gateway: {:?}\n", result);
         // Updates the request in the DB depending on the response status from the sending gateway
-        log_request_result(&request_id, result);
     });
 }
 
@@ -85,7 +84,6 @@ pub fn spawn_send_transfer_commence_request(
 
         println!("Received Ack from sending gateway: {:?}\n", result);
         // Updates the request in the DB depending on the response status from the sending gateway
-        log_request_result(&request_id, result);
     });
 }
 
@@ -130,7 +128,6 @@ pub fn spawn_send_transfer_proposal_receipt_request(
 
         println!("Received Ack from sending gateway: {:?}\n", result);
         // Updates the request in the DB depending on the response status from the sending gateway
-        log_request_result(&request_id, result);
     });
 }
 
@@ -158,7 +155,6 @@ pub fn spawn_send_ack_commence_request(
 
         println!("Received Ack from sending gateway: {:?}\n", result);
         // Updates the request in the DB depending on the response status from the sending gateway
-        log_request_result(&request_id, result);
     });
 }
 
@@ -217,7 +213,6 @@ pub fn spawn_send_lock_assertion_broadcast_request(
         println!("Received Ack from sending gateway: {:?}\n", result);
         // Updates the request in the DB depending on the response status from the sending gateway
         let request_id = lock_assertion_receipt_request.session_id.to_string();
-        log_request_result(&request_id, result);
     });
 }
 
@@ -243,7 +238,6 @@ pub fn spawn_send_lock_assertion_request(
         println!("Received Ack from sending gateway: {:?}\n", result);
         // Updates the request in the DB depending on the response status from the sending gateway
         let request_id = lock_assertion_request.session_id.to_string();
-        log_request_result(&request_id, result);
     });
 }
 
@@ -273,7 +267,6 @@ pub fn spawn_send_commit_prepare_request(
 
         println!("Received Ack from sending gateway: {:?}\n", result);
         // Updates the request in the DB depending on the response status from the sending gateway
-        log_request_result(&request_id, result);
     });
 }
 
@@ -323,7 +316,6 @@ pub fn spawn_send_commit_ready_request(
         println!("Received Ack from sending gateway: {:?}\n", result);
         // Updates the request in the DB depending on the response status from the sending gateway
         let request_id = commit_ready_request.session_id.to_string();
-        log_request_result(&request_id, result);
     });
 }
 
@@ -373,7 +365,6 @@ pub fn spawn_send_ack_final_receipt_request(
         println!("Received Ack from sending gateway: {:?}\n", result);
         // Updates the request in the DB depending on the response status from the sending gateway
         let request_id = ack_final_receipt_request.session_id.to_string();
-        log_request_result(&request_id, result);
     });
 }
 
@@ -409,7 +400,6 @@ pub fn spawn_send_ack_final_receipt_broadcast_request(
         println!("Received Ack from sending gateway: {:?}\n", result);
         // Updates the request in the DB depending on the response status from the sending gateway
         let request_id = transfer_completed_request.session_id.to_string();
-        log_request_result(&request_id, result);
     });
 }
 
@@ -464,7 +454,6 @@ pub fn spawn_send_commit_final_assertion_request(
         println!("Received Ack from sending gateway: {:?}\n", result);
         // Updates the request in the DB depending on the response status from the sending gateway
         let request_id = commit_final_assertion_request.session_id.to_string();
-        log_request_result(&request_id, result);
     });
 }
 
@@ -781,64 +770,6 @@ pub async fn call_commit_final_assertion_receipt(
         .commit_final_assertion(commit_final_assertion_request.clone())
         .await?;
     Ok(response)
-}
-
-pub fn log_request_result(
-    request_id: &String,
-    result: Result<Response<Ack>, Box<dyn std::error::Error>>,
-) {
-    match result {
-        Ok(ack_response) => {
-            let ack_response_into_inner = ack_response.into_inner().clone();
-            // This match first checks if the status is valid.
-            match ack::Status::from_i32(ack_response_into_inner.status) {
-                Some(status) => match status {
-                    ack::Status::Ok => {
-                        let log_entry = LogEntry {
-                            request_id: request_id.clone(),
-                            request: "".to_string(),
-                            step_id: "".to_string(),
-                            operation: Operation::Done,
-                            network_id: "".to_string(),
-                            gateway_id: "".to_string(),
-                            received: false,
-                            details: None,
-                        };
-                        log::debug!("{}", log_entry);
-                    }
-                    ack::Status::Error => {
-                        let log_entry = LogEntry {
-                            request_id: request_id.clone(),
-                            request: "".to_string(),
-                            step_id: "".to_string(),
-                            operation: Operation::Failed,
-                            network_id: "".to_string(),
-                            gateway_id: "".to_string(),
-                            received: false,
-                            details: Some(ack_response_into_inner.message),
-                        };
-                        log::debug!("{}", log_entry);
-                    }
-                },
-                None => {
-                    // TODO
-                }
-            }
-        }
-        Err(result_error) => {
-            let log_entry = LogEntry {
-                request_id: request_id.clone(),
-                request: "".to_string(),
-                step_id: "".to_string(),
-                operation: Operation::Failed,
-                network_id: "".to_string(),
-                gateway_id: "".to_string(),
-                received: false,
-                details: Some(result_error.to_string()),
-            };
-            log::debug!("{}", log_entry);
-        }
-    }
 }
 
 pub fn create_ack_error_message(
