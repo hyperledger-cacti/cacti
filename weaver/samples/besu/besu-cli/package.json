@@ -42,6 +42,7 @@
     "@hyperledger/cacti-weaver-sdk-besu": "2.0.0-alpha.2",
     "@truffle/contract": "4.6.28",
     "gluegun": "5.1.6",
+    "web3": "1.10.0",
     "winston": "3.10.0"
   },
   "devDependencies": {

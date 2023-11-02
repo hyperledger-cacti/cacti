@@ -49,6 +49,7 @@
     "elliptic": "6.5.4",
     "express": "4.18.2",
     "fabric-ca-client": "2.2.19",
+    "fabric-common": "2.2.19",
     "fabric-network": "2.2.19",
     "gluegun": "5.1.6",
     "grpc-tools": "1.12.4",

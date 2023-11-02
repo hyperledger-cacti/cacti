@@ -59,7 +59,7 @@ import {
 } from "./web-services/get-prometheus-exporter-metrics-endpoint-v1";
 import { DeployContractSolidityBytecodeJsonObjectEndpoint } from "./web-services/deploy-contract-solidity-bytecode-json-object-endpoint";
 import { InvokeContractJsonObjectEndpoint } from "./web-services/invoke-contract-json-object-endpoint";
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 
 export const E_KEYCHAIN_NOT_FOUND = "cactus.connector.xdai.keychain_not_found";
 

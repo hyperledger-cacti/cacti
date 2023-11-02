@@ -35,7 +35,8 @@
     "chai": "4.3.7",
     "dotenv": "16.3.1",
     "ganache-cli": "6.12.2",
-    "solc": "0.8.21"
+    "solc": "0.8.21",
+    "web3": "1.10.0"
   },
   "devDependencies": {
     "truffle": "5.11.2"

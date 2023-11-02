@@ -58,12 +58,17 @@
     "@hyperledger/cactus-plugin-ledger-connector-quorum": "2.0.0-alpha.2",
     "@hyperledger/cactus-verifier-client": "2.0.0-alpha.2",
     "web3": "1.6.1",
+    "web3-core-helpers": "1.6.1",
     "web3-utils": "1.6.1"
   },
   "devDependencies": {
     "@hyperledger/cactus-test-tooling": "2.0.0-alpha.2",
     "@types/convict": "6.1.1",
-    "@types/lodash": "4.14.195"
+    "@types/lodash": "4.14.195",
+    "@types/uuid": "9.0.6",
+    "convict": "6.2.4",
+    "lodash": "4.17.21",
+    "uuid": "9.0.1"
   },
   "engines": {
     "node": ">=10",

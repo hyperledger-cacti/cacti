@@ -1,4 +1,4 @@
-import { Express } from "express";
+import type { Express } from "express";
 import { IAsyncProvider } from "@hyperledger/cactus-common";
 import { IEndpointAuthzOptions } from "./i-endpoint-authz-options";
 import { IExpressRequestHandler } from "./i-express-request-handler";

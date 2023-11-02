@@ -38,7 +38,7 @@ import {
 } from "./fabric-connector";
 import { sendEthereumTransaction } from "./transaction-ethereum";
 import { hasKey } from "@hyperledger/cactus-common";
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 
 const moduleName = "BusinessLogicAssetTrade";
 const logger = getLogger(`${moduleName}`);

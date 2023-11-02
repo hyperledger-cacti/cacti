@@ -29,7 +29,9 @@
     "eslint-config-prettier": "8.9.0",
     "eslint-plugin-prettier": "5.0.0",
     "fabric-ca-client": "2.2.19",
+    "fabric-common": "2.2.19",
     "fabric-network": "2.2.19",
+    "fabric-protos": "2.2.19",
     "level": "8.0.0",
     "winston": "3.10.0"
   },

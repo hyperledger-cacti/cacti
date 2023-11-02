@@ -53,6 +53,7 @@
     "@iroha2/crypto-core": "0.1.1",
     "@iroha2/crypto-target-node": "0.4.0",
     "@iroha2/data-model": "4.0.0",
+    "axios": "1.6.0",
     "express": "4.18.2",
     "fast-safe-stringify": "2.1.1",
     "hada": "0.0.8",

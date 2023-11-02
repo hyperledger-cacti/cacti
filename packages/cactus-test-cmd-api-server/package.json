@@ -56,10 +56,12 @@
     "@hyperledger/cactus-core-api": "2.0.0-alpha.2",
     "@hyperledger/cactus-plugin-keychain-vault": "2.0.0-alpha.2",
     "express-jwt-authz": "2.4.1",
-    "jose": "4.9.2"
+    "jose": "4.9.2",
+    "uuid": "9.0.1"
   },
   "devDependencies": {
-    "@hyperledger/cactus-test-tooling": "2.0.0-alpha.2"
+    "@hyperledger/cactus-test-tooling": "2.0.0-alpha.2",
+    "@types/uuid": "9.0.6"
   },
   "engines": {
     "node": ">=10",

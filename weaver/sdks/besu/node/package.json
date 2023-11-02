@@ -16,7 +16,8 @@
   "dependencies": {
     "@hyperledger/cacti-weaver-protos-js": "2.0.0-alpha.2",
     "log4js": "6.9.1",
-    "web3": "1.10.0"
+    "web3": "1.10.0",
+    "web3-utils": "1.10.0"
   },
   "devDependencies": {
     "@types/node": "16.18.41",
