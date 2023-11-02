@@ -7156,7 +7156,7 @@ __metadata:
     async-exit-hook: 2.0.1
     axios: 1.5.1
     chai: ^4.1.2
-    crypto-js: 4.1.1
+    crypto-js: 4.2.0
     cucumber: ^5.0.3
     dotenv: ^16.0.1
     fabric-network: 2.2.19
@@ -8076,7 +8076,7 @@ __metadata:
     "@types/express": 4.17.19
     "@types/tape": 4.13.4
     axios: 1.5.1
-    crypto-js: 4.0.0
+    crypto-js: 4.2.0
     fabric-network: 2.2.19
     ipfs-http-client: 60.0.1
     knex: 2.4.0
@@ -19997,17 +19997,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"crypto-js@npm:4.0.0":
-  version: 4.0.0
-  resolution: "crypto-js@npm:4.0.0"
-  checksum: f769e9331f037d79873061656a26d21cae7a04dde0a64f37b9a6af45989ef0cd1461e64e0e72e6b842b3c865473489f55dfd05653609b90306baf3ea79d7c250
-  languageName: node
-  linkType: hard
-
-"crypto-js@npm:4.1.1":
-  version: 4.1.1
-  resolution: "crypto-js@npm:4.1.1"
-  checksum: b3747c12ee3a7632fab3b3e171ea50f78b182545f0714f6d3e7e2858385f0f4101a15f2517e033802ce9d12ba50a391575ff4638c9de3dd9b2c4bc47768d5425
+"crypto-js@npm:4.2.0":
+  version: 4.2.0
+  resolution: "crypto-js@npm:4.2.0"
+  checksum: f051666dbc077c8324777f44fbd3aaea2986f198fe85092535130d17026c7c2ccf2d23ee5b29b36f7a4a07312db2fae23c9094b644cc35f7858b1b4fcaf27774
   languageName: node
   linkType: hard
 
