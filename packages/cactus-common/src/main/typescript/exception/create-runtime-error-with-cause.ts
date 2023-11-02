@@ -1,4 +1,4 @@
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 import { coerceUnknownToError } from "./coerce-unknown-to-error";
 
 /**

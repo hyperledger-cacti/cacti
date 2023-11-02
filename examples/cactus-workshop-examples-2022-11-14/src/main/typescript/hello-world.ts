@@ -2,7 +2,6 @@
 import { ApiServer, ConfigService } from "@hyperledger/cactus-cmd-api-server";
 import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
 import { GoIpfsTestContainer } from "@hyperledger/cactus-test-tooling";
-import { create } from "ipfs-http-client";
 import { createServer } from "http";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -23,6 +22,7 @@ const main = async () => {
   // retrieve the url so that the IPFS connector plugin is
   // able to connect to the IPFS network. This will be used
   // as an argument for the plugin bellow
+  const { create } = await import("kubo-rpc-client");
   const ipfsClientOrOptions = create({
     url: await ipfsNetwork.getApiUrl(),
   });

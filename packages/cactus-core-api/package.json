@@ -67,6 +67,7 @@
     "@grpc/proto-loader": "0.7.8",
     "@types/express": "4.17.19",
     "@types/google-protobuf": "3.15.5",
+    "google-protobuf": "3.21.2",
     "grpc-tools": "1.12.4",
     "grpc_tools_node_protoc_ts": "5.3.3",
     "make-dir-cli": "3.1.0",

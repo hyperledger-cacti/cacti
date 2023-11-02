@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 
 import { Component, Inject, Input, OnInit } from "@angular/core";
 import {

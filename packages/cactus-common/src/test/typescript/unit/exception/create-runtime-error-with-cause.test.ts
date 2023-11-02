@@ -3,7 +3,7 @@ import "jest-extended";
 
 import { createRuntimeErrorWithCause } from "../../../../main/typescript/public-api";
 import stringify from "fast-safe-stringify";
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 
 describe("createRuntimeErrorWithCause() & newRex()", () => {
   it("avoids losing information of inner exception: RuntimeError instance", () => {

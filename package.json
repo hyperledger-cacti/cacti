@@ -39,6 +39,7 @@
     "tools:generate-sbom": "TS_NODE_PROJECT=tools/tsconfig.json node --experimental-json-modules --trace-deprecation --experimental-modules --abort-on-uncaught-exception --loader ts-node/esm --experimental-specifier-resolution=node ./tools/generate-sbom.ts",
     "tools:fix-pkg-npm-scope": "TS_NODE_PROJECT=tools/tsconfig.json node --experimental-json-modules --trace-deprecation --experimental-modules --abort-on-uncaught-exception --loader ts-node/esm --experimental-specifier-resolution=node ./tools/custom-checks/check-pkg-npm-scope.ts",
     "tools:sort-package-json": "TS_NODE_PROJECT=tools/tsconfig.json node --experimental-json-modules --trace-deprecation --experimental-modules --abort-on-uncaught-exception --loader ts-node/esm --experimental-specifier-resolution=node ./tools/sort-package-json.ts",
+    "tools:check-missing-node-deps": "TS_NODE_PROJECT=tools/tsconfig.json node --experimental-json-modules --trace-deprecation --experimental-modules --abort-on-uncaught-exception --loader ts-node/esm --experimental-specifier-resolution=node ./tools/custom-checks/check-missing-node-deps.ts",
     "generate-api-server-config": "node ./tools/generate-api-server-config.js",
     "sync-ts-config": "TS_NODE_PROJECT=tools/tsconfig.json node --experimental-json-modules --loader ts-node/esm ./tools/sync-npm-deps-to-tsc-projects.ts",
     "start:api-server": "node ./packages/cactus-cmd-api-server/dist/lib/main/typescript/cmd/cactus-api.js --config-file=.config.json",
@@ -117,6 +118,7 @@
     "cspell": "5.21.2",
     "del": "7.1.0",
     "del-cli": "4.0.1",
+    "depcheck": "1.4.7",
     "es-main": "1.2.0",
     "eslint": "7.32.0",
     "eslint-config-prettier": "8.10.0",
@@ -209,6 +211,9 @@
       "built": false
     },
     "esbuild": {
+      "built": false
+    },
+    "indy-sdk": {
       "built": false
     },
     "iso-constants": {

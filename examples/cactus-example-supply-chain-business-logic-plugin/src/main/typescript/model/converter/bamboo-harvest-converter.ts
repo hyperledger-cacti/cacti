@@ -1,5 +1,5 @@
 import { BambooHarvest } from "../../generated/openapi/typescript-axios";
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 
 /**
  * Responsible for converting model entities such as the `BambooHarvest` to and

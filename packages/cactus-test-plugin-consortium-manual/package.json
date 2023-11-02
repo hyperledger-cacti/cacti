@@ -59,6 +59,10 @@
     "axios": "1.5.1",
     "jose": "4.9.2"
   },
+  "devDependencies": {
+    "@types/uuid": "9.0.6",
+    "uuid": "9.0.1"
+  },
   "engines": {
     "node": ">=10",
     "npm": ">=6"

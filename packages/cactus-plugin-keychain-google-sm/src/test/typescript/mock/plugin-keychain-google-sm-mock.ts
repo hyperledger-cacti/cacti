@@ -4,8 +4,7 @@ import {
   protos,
 } from "@google-cloud/secret-manager";
 
-import * as gax from "google-gax";
-import { Descriptors } from "google-gax";
+import type { GoogleAuth } from "google-gax";
 
 import {
   Logger,
@@ -38,12 +37,8 @@ export class SecretManagerServiceClientMock extends SecretManagerServiceClient {
 
     this.log = LoggerProvider.getOrCreate({ level, label });
 
-    this.auth = "" as unknown as gax.GoogleAuth;
-    this.descriptors = "" as unknown as Descriptors;
+    this.auth = "" as unknown as GoogleAuth;
     this.innerApiCalls = "" as unknown as { [name: string]: Function };
-    this.pathTemplates = "" as unknown as {
-      [name: string]: gax.PathTemplate;
-    };
 
     this.secrets = new Map<string, string>();
     this.log.info(`Created ${this.className}.`);

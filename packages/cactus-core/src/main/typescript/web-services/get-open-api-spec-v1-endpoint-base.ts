@@ -1,5 +1,5 @@
 import type { Express, Request, Response } from "express";
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 import { stringify } from "safe-stable-stringify";
 
 import {

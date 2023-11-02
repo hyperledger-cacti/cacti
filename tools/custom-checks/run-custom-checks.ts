@@ -4,6 +4,11 @@ import { checkPackageJsonSort } from "./check-package-json-sort";
 import { checkPkgLicenses } from "./check-pkg-licenses";
 import { checkSiblingDepVersionConsistency } from "./check-sibling-dep-version-consistency";
 import { checkPkgNpmScope } from "./check-pkg-npm-scope";
+import {
+  ICheckMissingNodeDepsRequest,
+  checkMissingNodeDeps,
+} from "./check-missing-node-deps";
+import { getAllPkgDirs } from "./get-all-pkg-dirs";
 
 export async function runCustomChecks(
   argv: string[],
@@ -56,6 +61,18 @@ export async function runCustomChecks(
     overallErrors = overallErrors.concat(errors);
     overallSuccess = overallSuccess && success;
   }
+
+  {
+    const { absolutePaths: pkgDirsToCheck } = await getAllPkgDirs();
+
+    const req: ICheckMissingNodeDepsRequest = {
+      pkgDirsToCheck,
+    };
+    const [success, errors] = await checkMissingNodeDeps(req);
+    overallErrors = overallErrors.concat(errors);
+    overallSuccess = overallSuccess && success;
+  }
+
   if (!overallSuccess) {
     overallErrors.forEach((it) => console.error(it));
   } else {
