@@ -12,7 +12,10 @@ use weaverpb::common::state::{meta, view_payload, Meta, View, ViewPayload};
 use weaverpb::driver::driver::driver_communication_server::{
     DriverCommunication, DriverCommunicationServer,
 };
-use weaverpb::driver::driver::{PerformLockRequest, WriteExternalStateMessage};
+use weaverpb::driver::driver::{
+    AssignAssetRequest, CreateAssetRequest, ExtinguishRequest, PerformLockRequest,
+    WriteExternalStateMessage,
+};
 use weaverpb::relay::datatransfer::data_transfer_client::DataTransferClient;
 use weaverpb::relay::events::event_subscribe_client::EventSubscribeClient;
 
@@ -307,6 +310,45 @@ impl DriverCommunication for DriverCommunicationService {
         let reply = Ack {
             status: ack::Status::Ok as i32,
             request_id: request_id,
+            message: "".to_string(),
+        };
+        return Ok(Response::new(reply));
+    }
+
+    async fn create_asset(
+        &self,
+        _request: Request<CreateAssetRequest>,
+    ) -> Result<Response<Ack>, Status> {
+        // TODO
+        let reply = Ack {
+            status: ack::Status::Ok as i32,
+            request_id: "".to_string(),
+            message: "".to_string(),
+        };
+        return Ok(Response::new(reply));
+    }
+
+    async fn extinguish(
+        &self,
+        _request: Request<ExtinguishRequest>,
+    ) -> Result<Response<Ack>, Status> {
+        // TODO
+        let reply = Ack {
+            status: ack::Status::Ok as i32,
+            request_id: "".to_string(),
+            message: "".to_string(),
+        };
+        return Ok(Response::new(reply));
+    }
+
+    async fn assign_asset(
+        &self,
+        _request: Request<AssignAssetRequest>,
+    ) -> Result<Response<Ack>, Status> {
+        // TODO
+        let reply = Ack {
+            status: ack::Status::Ok as i32,
+            request_id: "".to_string(),
             message: "".to_string(),
         };
         return Ok(Response::new(reply));
