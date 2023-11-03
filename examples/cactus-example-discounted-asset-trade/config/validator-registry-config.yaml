@@ -1,18 +1,3 @@
-ledgerPluginInfo:
-  - validatorID: 3PfTJw8g
-    validatorType: legacy-socketio
-    validatorURL: http://indy-validator-nginx:10080
-    validatorKeyPath: /etc/cactus/validator_socketio_indy/CA/connector.crt
-    maxCounterRequestID: 100
-    syncFunctionTimeoutMillisecond: 5000
-    socketOptions:
-      rejectUnauthorized: false
-      reconnection: false
-      timeout: 20000
-    ledgerInfo:
-      ledgerAbstract: "Indy Ledger"
-    apiInfo: []
-
 signTxInfo:
   fabric:
     mspID: Org1MSP

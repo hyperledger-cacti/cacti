@@ -5,7 +5,7 @@
 set -e
 
 ROOT_DIR="../.." # Path to cactus root dir
-WAIT_TIME=30 # How often to check container status
+WAIT_TIME=15 # How often to check container status
 CONFIG_VOLUME_PATH="./etc/cactus" # Docker volume with shared configuration
 
 # Fabric Env Variables
@@ -16,6 +16,9 @@ export CACTUS_FABRIC_ALL_IN_ONE_CA_VERSION="1.5.3"
 export CACTUS_FABRIC_ALL_IN_ONE_COUCH_VERSION_FABRIC="0.4"
 export CACTUS_FABRIC_ALL_IN_ONE_COUCH_VERSION="3.2.2"
 export CACTUS_FABRIC_TEST_LOOSE_MEMBERSHIP=1
+
+# Indy Env Variables
+export CACTUS_INDY_ALL_IN_ONE_NAME="asset_trade_indy_all_in_one"
 
 # Cert options
 CERT_CURVE_NAME="prime256v1"
@@ -120,23 +123,28 @@ function copy_ethereum_validator_config() {
 
 function start_indy_testnet() {
     echo ">> start_indy_testnet()"
-    pushd "${ROOT_DIR}/tools/docker/indy-testnet"
-    echo ">> Start Indy pool..."
-    docker-compose build
-    docker-compose up -d
+    pushd "${ROOT_DIR}/tools/docker/indy-all-in-one"
+    ./script-start-docker.sh
     popd
+
+    # Wait for fabric cotnainer to become healthy
+    health_status="$(docker inspect -f '{{.State.Health.Status}}' ${CACTUS_INDY_ALL_IN_ONE_NAME})"
+    while ! [ "${health_status}" == "healthy" ]
+    do
+        echo "Waiting for indy container... current status => ${health_status}"
+        sleep $WAIT_TIME
+        health_status="$(docker inspect -f '{{.State.Health.Status}}' ${CACTUS_INDY_ALL_IN_ONE_NAME})"
+    done
+    echo ">> Indy test ledger started."
 }
 
-function copy_indy_validator_config() {
-    echo ">> copy_indy_validator_config()"
-    cp -fr ${ROOT_DIR}/packages-python/cactus_validator_socketio_indy/config/* "${CONFIG_VOLUME_PATH}/validator_socketio_indy/"
-    echo ">> copy_indy_validator_config() done."
-}
-
-function copy_indy_validator_ca() {
-    echo ">> copy_indy_validator_ca()"
-    generate_certificate "IndyCactusValidator" "${CONFIG_VOLUME_PATH}/validator_socketio_indy/CA/"
-    echo ">> copy_indy_validator_ca() done."
+function copy_indy_ledger_config() {
+    echo ">> copy_indy_ledger_config()"
+    mkdir -p "${CONFIG_VOLUME_PATH}/indy-all-in-one/"
+    mkdir -p "/etc/cactus/indy-all-in-one/"
+    cp -fr "/tmp/indy-all-in-one/pool_transactions_genesis" "${CONFIG_VOLUME_PATH}/indy-all-in-one/"
+    cp -fr "/tmp/indy-all-in-one/pool_transactions_genesis" "/etc/cactus/indy-all-in-one/"
+    echo ">> copy_indy_ledger_config() done."
 }
 
 function start_ledgers() {
@@ -159,10 +167,8 @@ function start_ledgers() {
     copy_ethereum_validator_config
 
     # Start Indy
-    mkdir -p "${CONFIG_VOLUME_PATH}/validator_socketio_indy"
     start_indy_testnet
-    copy_indy_validator_ca
-    copy_indy_validator_config
+    copy_indy_ledger_config
 }
 
 start_ledgers

@@ -1,4 +1,4 @@
-FROM indy-sdk-cli
+FROM ghcr.io/hyperledger/indy-node-container/indy_node:1.12.6-ubuntu18-main
 
 USER root
 RUN apt-get update \
