@@ -1,89 +1,75 @@
 /*
- * Copyright 2022 Hyperledger Cactus Contributors
- * SPDX-License-Identifier: Apache-2.0
- *
- * transaction-indy.ts
+ * TODO - Replace these methods with their counterparts in Indy connector (when it's ready).
+ * For now we import utility functions from @hyperledger/cactus-example-discounted-asset-trade-client for simplicity.
  */
 
+import { getLogger } from "log4js";
+import { ConfigUtil } from "@hyperledger/cactus-cmd-socketio-server";
 import {
-  LPInfoHolder,
-  ConfigUtil,
-} from "@hyperledger/cactus-cmd-socketio-server";
-import { ISendRequestResultV1 } from "@hyperledger/cactus-core-api";
-
-import {
-  VerifierFactory,
-  VerifierFactoryConfig,
-} from "@hyperledger/cactus-verifier-client";
+  acceptInvitation,
+  checkCredentialProof,
+  waitForConnectionReady,
+} from "@hyperledger/cactus-example-discounted-asset-trade-client";
+import { getIndyAgent } from "./indy-agent";
 
 const config: any = ConfigUtil.getConfig();
-import { getLogger } from "log4js";
-const moduleName = "TransactionIndy";
+
+const moduleName = "transaction-indy";
 const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;
 
-const xConnectInfo = new LPInfoHolder();
-const verifierFactory = new VerifierFactory(
-  xConnectInfo.ledgerPluginInfo as VerifierFactoryConfig,
-  config.logLevel,
-);
+/**
+ * Connect remote client indy agent using it's invitation URL.
+ * Wait until connection is established and ready to use.
+ *
+ * @param invitationUrl anoncreds invitation URL.
+ * @returns connection ID of newly created connection
+ */
+export async function connectToClientAgent(
+  invitationUrl: string,
+): Promise<string> {
+  logger.info("Accepting invitation from client agent...");
 
-export function getDataFromIndy(
-  arg_request: {
-    did: string | null;
-    schemaId: string;
-  },
-  identifier: string,
-): Promise<{ data: string[] }> {
-  return new Promise(async (resolve, reject) => {
-    try {
-      logger.debug(`getDataFromIndy: arg_request: ${arg_request}`);
-      sendRequest(arg_request, identifier).then((result) => {
-        logger.debug(`##getDataFromIndy: result: ${JSON.stringify(result)}`);
+  const blpAgent = await getIndyAgent();
+  const outOfBandRecord = await acceptInvitation(blpAgent, invitationUrl);
+  await waitForConnectionReady(blpAgent, outOfBandRecord.id);
 
-        return resolve(result);
-      });
-    } catch (err) {
-      logger.error(err);
-      return reject(err);
-    }
-  });
+  logger.debug(
+    "connectToClientAgent() - outOfBandRecord ID:",
+    outOfBandRecord.id,
+  );
+  const [connection] = await blpAgent.connections.findAllByOutOfBandId(
+    outOfBandRecord.id,
+  );
+
+  if (!connection) {
+    throw Error(
+      "Could not establish a connection to remote client indy agent!",
+    );
+  }
+  logger.debug("connectToClientAgent() - connection ID:", connection.id);
+
+  return connection.id;
 }
 
-function sendRequest(
-  arg_request: Record<string, unknown>,
-  identifier: string,
-): Promise<{ data: string[] }> {
-  return new Promise(async (resolve, reject) => {
-    try {
-      logger.debug(`##sendRequest: arg_request: ${arg_request}`);
+/**
+ * Request and verify employment proof from client agent connected with specified ID.
+ *
+ * @param indyAgentConId client agent connection ID.
+ * @param credentialDefinitionId employment credential definition ID.
+ * @returns true if agent is an employee, false otherwise
+ */
+export async function isEmploymentCredentialProofValid(
+  indyAgentConId: string,
+  credentialDefinitionId: string,
+) {
+  const blpAgent = await getIndyAgent();
+  const proof = await checkCredentialProof(
+    blpAgent,
+    credentialDefinitionId,
+    indyAgentConId,
+  );
+  logger.debug("Received employment proof response:", proof);
 
-      let commandName = "";
-
-      if (identifier === "schema") {
-        commandName = "get_schema";
-      } else if (identifier === "credDef") {
-        commandName = "get_cred_def";
-      }
-
-      const contract = {
-        channelName: "mychannel",
-        contractName: "indysomething",
-      }; // NOTE: Since contract does not need to be specified, specify an empty object.
-      const method = { type: "evaluateTransaction", command: commandName };
-
-      const args = { args: arg_request };
-
-      const verifier = await verifierFactory.getVerifier(
-        "3PfTJw8g",
-        "legacy-socketio",
-      );
-      verifier.sendSyncRequest(contract, method, args).then((result) => {
-        return resolve(result as ISendRequestResultV1<Array<string>>);
-      });
-    } catch (err) {
-      logger.error(err);
-      return reject(err);
-    }
-  });
+  return proof.state === "done";
 }

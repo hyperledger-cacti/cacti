@@ -12,48 +12,6 @@ services:
       context: ../../packages/cactus-cmd-socketio-server/
     command: ["echo", "OK - Exit"]
 
-  indy-sdk-cli-base-image:
-    # Build base image and immediately exit
-    container_name: indy-sdk-cli-base-dummy
-    image: indy-sdk-cli
-    build:
-      context: ../../tools/docker/indy-sdk-cli
-    command: ["echo", "OK - Exit"]
-
-  indy-validator:
-    container_name: cactus-example-discounted-asset-trade-indy-validator
-    image: cactus_validator_socketio_indy
-    environment:
-      - TEST_POOL_IP=172.16.0.2
-    depends_on:
-      - indy-sdk-cli-base-image
-    build:
-      context: ../../packages-python/cactus_validator_socketio_indy
-      dockerfile: Dockerfile
-    ports:
-      - "8000:8000"
-    volumes:
-      - type: bind
-        source: ./etc/cactus
-        target: /etc/cactus
-    networks:
-      - indy-testnet_indy_net
-
-  indy-validator-nginx:
-    container_name: cactus-example-discounted-asset-trade-indy-validator-nginx
-    image: nginx:1.20-alpine
-    volumes:
-      - type: bind
-        source: "./nginx/nginx.conf"
-        target: "/etc/nginx/nginx.conf"
-    depends_on:
-      - indy-validator
-    ports:
-      - "10080:10080"
-    networks:
-      - indy-testnet_indy_net
-      - cactus-example-discounted-asset-trade-net
-
   cactus-example-discounted-asset-trade-blp:
     container_name: cactus-example-discounted-asset-trade-blp
     image: cactus-example-discounted-asset-trade-blp
@@ -64,36 +22,14 @@ services:
     networks:
       - cactus-example-discounted-asset-trade-net
     depends_on:
-      - indy-validator-nginx
       - cmd-socketio-base-image
-      - indy-sdk-cli-base-image
     volumes:
       - type: bind
         source: ./etc/cactus
         target: /etc/cactus
-
-  register-indy-data:
-    container_name: register-indy-data
-    image: register-indy-data
-    environment:
-      - TEST_POOL_IP=172.16.0.2
-    build:
-      context: ../register-indy-data
-    networks:
-      - indy-testnet_indy_net
-    depends_on:
-      - cactus-example-discounted-asset-trade-blp
-    volumes:
-      - type: bind
-        source: ./etc/cactus
-        target: /etc/cactus
-    # One-off command executed in container that will store a proof in /etc/cactus
-    command: ["--proof_only"]
 
 networks:
   fabric-all-in-one_testnet-2x:
-    external: true
-  indy-testnet_indy_net:
     external: true
   cactus-example-discounted-asset-trade-net:
     driver: bridge

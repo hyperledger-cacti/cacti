@@ -19,6 +19,8 @@ appRouters:
     routerJs: /root/cactus/dist/balance.js
   - path: /api/v1/bl/fabric-asset/
     routerJs: /root/cactus/dist/fabric-asset.js
+  - path: /api/v1/bl/indy/
+    routerJs: /root/cactus/dist/indy-endpoints.js
 
 # BLP Config
 assetTradeInfo:
@@ -45,6 +47,9 @@ assetTradeInfo:
 
     channelName: mychannel
     chaincodeID: basic
+
+  indy:
+    credentialDefinitionId: "__CREDENTIAL_DEFINITION_ID__"
 
   ethereum:
     validatorID: 84jUisrs

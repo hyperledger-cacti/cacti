@@ -16,7 +16,6 @@ sed -i 's/geth1/localhost/g' "${COMMON_CACTUS_CONFIG}/connector-go-ethereum-sock
 
 echo "Patch validator-registry-config.yaml..."
 sed -i 's/ethereum-validator/localhost/g' "${COMMON_CACTUS_CONFIG}/validator-registry-config.yaml"
-sed -i 's/indy-validator-nginx/localhost/g' "${COMMON_CACTUS_CONFIG}/validator-registry-config.yaml"
 
 echo "Patch path to asset-trade modules."
 current_pwd=$(pwd)

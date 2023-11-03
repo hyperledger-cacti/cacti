@@ -11,12 +11,6 @@ docs-cactus/source/conf.py
 docs/docs/contributing/requesting-a-change.md
 
 # Cannot be edited due to configuration schema of third party software
-examples/register-indy-data/register-indy-data.py
-
-# Cannot be edited due to configuration schema of third party software
-tools/docker/indy-testnet/Dockerfile
-
-# Cannot be edited due to configuration schema of third party software
 packages/cactus-test-tooling/src/main/typescript/keycloak/keycloak-container.ts
 
 # Generated code that cannot be modified

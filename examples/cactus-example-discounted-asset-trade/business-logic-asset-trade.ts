@@ -15,7 +15,7 @@ import { BusinessLogicInquireAssetTradeStatus } from "./business-logic-inquire-a
 import { TxInfoData } from "./tx-info-data";
 import { BusinessLogicBase } from "@hyperledger/cactus-cmd-socketio-server";
 import { transferOwnership } from "./transaction-fabric";
-import { getDataFromIndy } from "./transaction-indy";
+import { isEmploymentCredentialProofValid } from "./transaction-indy";
 import {
   LedgerEvent,
   ConfigUtil,
@@ -43,11 +43,6 @@ import { RuntimeError } from "run-time-error-cjs";
 const moduleName = "BusinessLogicAssetTrade";
 const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;
-
-const indy = require("indy-sdk");
-const assert = require("assert");
-const identifierSchema = "schema";
-const identifierCredDef = "credDef";
 
 interface TransactionStatusData {
   stateInfo: number | undefined;
@@ -81,10 +76,8 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
     requestInfo.tradeInfo.ethereumAccountTo = req.body.tradeParams[1];
     requestInfo.tradeInfo.fabricAccountFrom = req.body.tradeParams[2];
     requestInfo.tradeInfo.fabricAccountTo = req.body.tradeParams[3];
-    //requestInfo.tradeInfo.tradingValue = req.body.tradeParams[4];
     requestInfo.tradeInfo.assetID = req.body.tradeParams[4];
-    requestInfo.tradeInfo.proofJson = JSON.parse(req.body.tradeParams[5]);
-    // requestInfo.authInfo.company = req.body.authParams[0];
+    requestInfo.tradeInfo.indyAgentConId = req.body.tradeParams[5];
 
     // set TradeID
     requestInfo.setTradeID(tradeID);
@@ -96,23 +89,19 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
     this.Pricing(requestInfo)
       .then((result) => {
         requestInfo = result;
-
         // Create trade information
         const tradeInfo: TradeInfo = new TradeInfo(
           requestInfo.businessLogicID,
           requestInfo.tradeID,
         );
-
         // Save transaction value
         transactionInfo.setRequestInfo(1, requestInfo);
         this.transactionInfoManagement.addTransactionInfo(transactionInfo);
-
         // trade status update
         this.transactionInfoManagement.setStatus(
           tradeInfo,
           AssetTradeStatus.UnderEscrow,
         );
-
         this.firstTransaction(requestInfo, tradeInfo);
       })
       .catch((err) => {
@@ -167,9 +156,16 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
     // price list
     const priceList = { default: "50", employee: "25" };
 
-    logger.debug(JSON.stringify(requestInfo.tradeInfo.proofJson));
-    const isPreferredCustomer = await this.isPreferredCustomer(
-      requestInfo.tradeInfo.proofJson,
+    const credentialDefinitionId =
+      config?.assetTradeInfo?.indy?.credentialDefinitionId;
+    if (!credentialDefinitionId) {
+      throw new Error(
+        "Missing employment credentialDefinitionId! Can't proof employment status!",
+      );
+    }
+    const isPreferredCustomer = await isEmploymentCredentialProofValid(
+      requestInfo.tradeInfo.indyAgentConId,
+      credentialDefinitionId,
     );
 
     // decide the price from result of isPreferredCustomer
@@ -182,119 +178,6 @@ export class BusinessLogicAssetTrade extends BusinessLogicBase {
     }
 
     return requestInfo;
-  }
-
-  async isPreferredCustomer(input_obj: {
-    tradeInfo: string;
-    proof_request: string;
-    proof: string;
-  }): Promise<boolean | unknown> {
-    let proofRequestJson;
-    let proofJson;
-    try {
-      proofRequestJson = JSON.parse(input_obj["proof_request"]);
-      proofJson = JSON.parse(input_obj["proof"]);
-    } catch (err) {
-      logger.error(
-        "Error while reading proof and proof request. returning false.",
-      );
-      return false;
-    }
-
-    // get schema & credential definition from indy
-    // now verifierGetEntitiesFromLedger don't get revRegDefs & revRegs
-    // did is null. If it is null, indy.buidlGetSchemaRequest API get data by default param.
-    const [schemasJson, credDefsJson, revRegDefsJson, revRegsJson] =
-      await this.verifierGetEntitiesFromLedger(null, proofJson["identifiers"]);
-
-    assert(
-      "Permanent" ===
-        proofJson["requested_proof"]["revealed_attrs"]["attr1_referent"]["raw"],
-    );
-
-    logger.debug(
-      `##isPreferredCustomer verifierGetEntitiesFromLedger schemasJson : ${JSON.stringify(
-        schemasJson,
-      )}`,
-    );
-    logger.debug(
-      `##isPreferredCustomer verifierGetEntitiesFromLedger credDefsJson : ${JSON.stringify(
-        credDefsJson,
-      )}`,
-    );
-    logger.debug(
-      `##isPreferredCustomer verifierGetEntitiesFromLedger revRegDefsJson : ${JSON.stringify(
-        revRegDefsJson,
-      )}`,
-    );
-    logger.debug(
-      `##isPreferredCustomer verifierGetEntitiesFromLedger revRegsJson : ${JSON.stringify(
-        revRegsJson,
-      )}`,
-    );
-
-    try {
-      const verif_result = await indy.verifierVerifyProof(
-        proofRequestJson,
-        proofJson,
-        schemasJson,
-        credDefsJson,
-        revRegDefsJson,
-        revRegsJson,
-      );
-      logger.debug("verify proof: " + (verif_result ? "ok" : "not ok"));
-      return verif_result;
-    } catch (err) {
-      logger.error(
-        "error raised during indy.verifierVerifyProof() invocation. defaulting to false (= NO DISCOUNT)",
-      );
-      logger.error(err);
-      return false;
-    }
-  }
-
-  async verifierGetEntitiesFromLedger(
-    did: string | null,
-    identifiers: {
-      [keyof: string]: { schema_id: string; cred_def_id: string };
-    },
-  ): Promise<
-    [
-      Record<string, unknown>,
-      Record<string, unknown>,
-      Record<string, unknown>,
-      Record<string, unknown>,
-    ]
-  > {
-    const schemas: { [keyof: string]: string } = {};
-    const credDefs: { [keyof: string]: string } = {};
-    const revRegDefs = {};
-    const revRegs = {};
-
-    for (const referent of Object.keys(identifiers)) {
-      const item = identifiers[referent];
-      const args_request_getSchema = { did: did, schemaId: item["schema_id"] };
-      const responseSchema: {
-        data: string[];
-      } = await getDataFromIndy(args_request_getSchema, identifierSchema);
-      const [receivedSchemaId, receivedSchema] = responseSchema["data"];
-      schemas[receivedSchemaId] = JSON.parse(receivedSchema);
-
-      const args_request_getCredDef = {
-        did: did,
-        schemaId: item["cred_def_id"],
-      };
-      const responseCredDef: {
-        data: string[];
-      } = await getDataFromIndy(args_request_getCredDef, identifierCredDef);
-
-      const [receivedCredDefId, receivedCredDef] = responseCredDef["data"];
-      credDefs[receivedCredDefId] = JSON.parse(receivedCredDef);
-    }
-
-    logger.debug("finish get Data from indy");
-
-    return [schemas, credDefs, revRegDefs, revRegs];
   }
 
   /**
