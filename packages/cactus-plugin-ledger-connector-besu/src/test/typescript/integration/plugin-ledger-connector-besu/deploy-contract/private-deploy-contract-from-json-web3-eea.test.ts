@@ -109,7 +109,7 @@ test(testCase, async (t: Test) => {
         keys.tessera.member2.publicKey,
       ],
       privateKey: keys.besu.member1.privateKey,
-      gasLimit: "3000000",
+      gasLimit: "0x2DC6C0",
     });
 
   t.ok(commitmentHash, "commitmentHash truthy OK");
