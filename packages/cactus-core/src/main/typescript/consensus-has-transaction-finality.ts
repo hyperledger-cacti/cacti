@@ -31,13 +31,13 @@ export function consensusHasTransactionFinality(
     !isInConsensusAlgorithmFamiliesWithTxFinality &&
     !isInConsensusAlgorithmFamiliesWithOutTxFinality;
 
-    if (unrecognizedConsensusAlgorithmFamily) {
-      throw new BadRequestError(
-        `Unrecognized consensus algorithm family: ${consensusAlgorithmFamily}`,
-        {
-          acceptedValuesCsv,
-        },
-      );
-    }
-    return isInConsensusAlgorithmFamiliesWithTxFinality;
+  if (unrecognizedConsensusAlgorithmFamily) {
+    throw new BadRequestError(
+      `Unrecognized consensus algorithm family: ${consensusAlgorithmFamily}`,
+      {
+        acceptedValuesCsv,
+      },
+    );
+  }
+  return isInConsensusAlgorithmFamiliesWithTxFinality;
 }

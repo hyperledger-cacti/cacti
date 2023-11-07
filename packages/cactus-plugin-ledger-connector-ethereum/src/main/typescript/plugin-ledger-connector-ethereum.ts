@@ -15,6 +15,8 @@ import { PayableMethodObject } from "web3-eth-contract";
 
 import OAS from "../json/openapi.json";
 
+import { Interface, FunctionFragment, isAddress } from "ethers";
+
 import {
   ConsensusAlgorithmFamily,
   IPluginLedgerConnector,
@@ -1125,6 +1127,53 @@ export class PluginLedgerConnectorEthereum
       throw new RuntimeError(
         `Invalid method name provided in request. ${args.contractMethod} does not exist on the Web3 contract object's "methods" property.`,
       );
+    }
+    const abiInterface = new Interface(args.abi);
+    const methodFragment: FunctionFragment | null = abiInterface.getFunction(
+      args.contractMethod,
+    );
+    if (!methodFragment) {
+      throw new RuntimeError(
+        `Method ${args.contractMethod} not found in ABI interface.`,
+      );
+    }
+
+    // validation for the contractMethod
+    if (methodFragment.inputs.length !== contractMethodArgs.length) {
+      throw new Error(
+        `Incorrect number of arguments for ${args.contractMethod}`,
+      );
+    }
+    methodFragment.inputs.forEach((input, index) => {
+      const argValue = contractMethodArgs[index];
+      const isValidType = typeof argValue === input.type;
+
+      if (!isValidType) {
+        throw new Error(
+          `Invalid type for argument ${index + 1} in ${args.contractMethod}`,
+        );
+      }
+    });
+
+    //validation for the invocationParams
+    const invocationParams = args.invocationParams as Record<string, any>;
+    const allowedKeys = ["from", "gasLimit", "gasPrice", "value"];
+
+    if (invocationParams) {
+      Object.keys(invocationParams).forEach((key) => {
+        if (!allowedKeys.includes(key)) {
+          throw new Error(`Invalid key '${key}' in invocationParams`);
+        }
+        if (key === "from" && !isAddress(invocationParams[key])) {
+          throw new Error(`Invalid type for 'from' in invocationParams`);
+        }
+        if (key === "gasLimit" && typeof invocationParams[key] !== "number") {
+          throw new Error(`Invalid type for '${key}' in invocationParams`);
+        }
+        if (key === "gasPrice" && typeof invocationParams[key] !== "number") {
+          throw new Error(`Invalid type for '${key}'in invocationParams`);
+        }
+      });
     }
 
     const methodRef = contract.methods[args.contractMethod] as (

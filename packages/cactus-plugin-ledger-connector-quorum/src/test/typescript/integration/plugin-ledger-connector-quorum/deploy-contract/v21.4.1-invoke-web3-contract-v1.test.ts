@@ -110,6 +110,7 @@ describe("invokeRawWeb3EthContract Tests", () => {
       },
       gas: 1000000,
     });
+    log.debug("Contract deployed OK");
     expect(deployOut).toBeTruthy();
     expect(deployOut.transactionReceipt).toBeTruthy();
     expect(deployOut.transactionReceipt.contractAddress).toBeTruthy();
@@ -198,5 +199,23 @@ describe("invokeRawWeb3EthContract Tests", () => {
     };
 
     await expect(connector.invokeRawWeb3EthContract(callInvokeArgs)).toReject();
+  });
+
+  it("validates input parameters based on their solidity type declarations", async () => {
+    const req: InvokeRawWeb3EthContractV1Request = {
+      abi: contractAbi,
+      address: contractAddress,
+      invocationType: EthContractInvocationWeb3Method.Call,
+      contractMethod: "setName",
+      contractMethodArgs: [42],
+      invocationParams: {
+        gasLimit: 999999,
+      },
+    };
+
+    const eMsgExpected = `Invalid type for argument ${0 + 1} in ${"setName"}`;
+
+    const theInvocation = connector.invokeRawWeb3EthContract(req);
+    await expect(theInvocation).rejects.toThrowWithMessage(Error, eMsgExpected);
   });
 });

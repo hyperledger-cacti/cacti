@@ -27,17 +27,20 @@ const contractName = "HelloWorld";
 const testCase = "Quorum Ledger Connector Plugin";
 
 describe(testCase, () => {
+  const containerImageVersion = "2021-05-03-quorum-v21.4.1";
+  const ledgerOptions = { containerImageVersion };
+  const ledger = new QuorumTestLedger(ledgerOptions);
+
   afterAll(async () => {
     await ledger.stop();
     await ledger.destroy();
   });
 
-  const containerImageVersion = "2021-05-03-quorum-v21.4.1";
-  const ledgerOptions = { containerImageVersion };
-  const ledger = new QuorumTestLedger(ledgerOptions);
-
-  test(testCase, async () => {
+  beforeAll(async () => {
     await ledger.start();
+  });
+
+  test("can invoke contract methods", async () => {
     const rpcApiHttpHost = await ledger.getRpcApiHttpHost();
     const quorumGenesisOptions: IQuorumGenesisOptions =
       await ledger.getGenesisJsObject();

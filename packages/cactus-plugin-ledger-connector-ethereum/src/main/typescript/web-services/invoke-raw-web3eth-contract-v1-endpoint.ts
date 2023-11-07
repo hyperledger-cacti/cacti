@@ -87,7 +87,6 @@ export class InvokeRawWeb3EthContractEndpoint implements IWebServiceEndpoint {
   public async handleRequest(req: Request, res: Response): Promise<void> {
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(reqTag);
-
     try {
       const methodResponse =
         await this.options.connector.invokeRawWeb3EthContract(req.body);
