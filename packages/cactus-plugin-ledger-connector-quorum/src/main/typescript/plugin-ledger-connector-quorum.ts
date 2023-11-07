@@ -21,7 +21,11 @@ import { Contract } from "web3-eth-contract";
 import { ContractSendMethod } from "web3-eth-contract";
 import { TransactionReceipt } from "web3-eth";
 
+import { BadRequestError } from "http-errors-enhanced-cjs";
+
 import OAS from "../json/openapi.json";
+
+import { Interface, FunctionFragment, isAddress } from "ethers";
 
 import {
   ConsensusAlgorithmFamily,
@@ -884,9 +888,8 @@ export class PluginLedgerConnectorQuorum
         args.invocationType,
       )
     ) {
-      throw new Error(
-        `Unknown invocationType (${args.invocationType}), must be specified in EthContractInvocationWeb3Method`,
-      );
+      const eMsg = `Unknown invocationType (${args.invocationType}), must be specified in EthContractInvocationWeb3Method`;
+      throw new BadRequestError(eMsg);
     }
 
     const contract = new this.web3.eth.Contract(
@@ -899,13 +902,66 @@ export class PluginLedgerConnectorQuorum
       args.contractMethod,
     );
     if (!isSafeToCall) {
-      throw new RuntimeError(
-        `Invalid method name provided in request. ${args.contractMethod} does not exist on the Web3 contract object's "methods" property.`,
-      );
+      const msg = `Invalid method name provided in request. ${args.contractMethod} does not exist on the Web3 contract object's "methods" property.`;
+      throw new BadRequestError(msg);
+    }
+    const abiInterface = new Interface(args.abi);
+    const methodFragment: FunctionFragment | null = abiInterface.getFunction(
+      args.contractMethod,
+    );
+    if (!methodFragment) {
+      const msg = `Method ${args.contractMethod} not found in ABI interface.`;
+      throw new BadRequestError(msg);
     }
 
-    return contract.methods[args.contractMethod](...contractMethodArgs)[
-      args.invocationType
-    ](args.invocationParams);
+    // validation for the contractMethod
+    if (methodFragment.inputs.length !== contractMethodArgs.length) {
+      const msg = `Incorrect number of arguments for ${args.contractMethod}`;
+      throw new BadRequestError(msg);
+    }
+    methodFragment.inputs.forEach((input, index) => {
+      const argValue = contractMethodArgs[index];
+      const isValidType = typeof argValue === input.type;
+
+      if (!isValidType) {
+        const msg = `Invalid type for argument ${index + 1} in ${
+          args.contractMethod
+        }`;
+        throw new BadRequestError(msg);
+      }
+    });
+
+    //validation for the invocationParams
+    const invocationParams = args.invocationParams as Record<string, unknown>;
+    const allowedKeys = ["from", "gasLimit", "gasPrice", "value"];
+
+    if (invocationParams) {
+      Object.keys(invocationParams).forEach((key) => {
+        if (!allowedKeys.includes(key)) {
+          throw new BadRequestError(`Invalid key '${key}' in invocationParams`);
+        }
+        if (key === "from" && !isAddress(invocationParams[key])) {
+          throw new BadRequestError(
+            `Invalid type for 'from' in invocationParams`,
+          );
+        }
+        if (key === "gasLimit" && typeof invocationParams[key] !== "number") {
+          throw new BadRequestError(
+            `Invalid type for '${key}' in invocationParams`,
+          );
+        }
+        if (key === "gasPrice" && typeof invocationParams[key] !== "number") {
+          throw new BadRequestError(
+            `Invalid type for '${key}'in invocationParams`,
+          );
+        }
+      });
+    }
+
+    const txObjectFactory = contract.methods[args.contractMethod];
+    const txObject = txObjectFactory(...contractMethodArgs);
+    const executor = txObject[args.invocationType];
+    const output = await executor(args.invocationParams);
+    return output;
   }
 }
