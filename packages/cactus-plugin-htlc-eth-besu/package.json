@@ -57,7 +57,7 @@
     "codegen:openapi": "npm run generate-sdk",
     "compile-contracts": "forge build",
     "generate-sdk": "run-p 'generate-sdk:*'",
-    "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
+    "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
     "lint": "solhint --fix",
     "watch": "npm-watch",
     "webpack": "npm-run-all webpack:dev",

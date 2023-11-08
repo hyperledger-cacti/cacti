@@ -53,6 +53,7 @@
     "codegen": "run-s 'codegen:warmup-*' codegen:lerna codegen:cleanup",
     "codegen:cleanup": "rm --force --verbose ./openapitools.json",
     "codegen:lerna": "lerna run codegen",
+    "codegen:warmup-cleancodegendir": "node tools/clear-openapi-codegen-folders.js",
     "codegen:warmup-mkdir": "make-dir ./node_modules/@openapitools/openapi-generator-cli/versions/",
     "codegen:warmup-v6.6.0": "nwget https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/6.6.0/openapi-generator-cli-6.6.0.jar -O ./node_modules/@openapitools/openapi-generator-cli/versions/6.6.0.jar",
     "watch-other": "lerna run --parallel watch",

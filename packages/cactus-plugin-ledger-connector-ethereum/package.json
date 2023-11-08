@@ -57,7 +57,7 @@
     "build:dev:backend:postbuild": "npm run copy-artillery-config",
     "copy-artillery-config": "cp -af  ./src/test/typescript/benchmark/setup/geth-benchmark-config.yaml ./src/test/typescript/benchmark/setup/artillery-helper-functions.js ./dist/lib/test/typescript/benchmark/setup",
     "generate-sdk": "run-p 'generate-sdk:*'",
-    "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
+    "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
     "watch": "npm-watch",
     "webpack": "npm-run-all webpack:dev",
     "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
