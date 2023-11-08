@@ -1,4 +1,3 @@
-.npmignore
 api.ts
 base.ts
 common.ts

@@ -1,0 +1,6 @@
+**/git_push.sh
+**/.npmignore
+**/.gitignore
+**/generated/openapi/kotlin-client/docs/**
+**/generated/openapi/kotlin-client/gradle/**
+**/generated/**/.openapi-generator-ignore
