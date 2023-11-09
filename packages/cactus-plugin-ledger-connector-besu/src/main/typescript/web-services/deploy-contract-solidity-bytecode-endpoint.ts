@@ -1,4 +1,4 @@
-import { Express, Request, Response } from "express";
+import type { Express, Request, Response } from "express";
 
 import {
   IWebServiceEndpoint,
@@ -14,7 +14,10 @@ import {
   IAsyncProvider,
 } from "@hyperledger/cactus-common";
 
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import {
+  handleRestEndpointException,
+  registerWebServiceEndpoint,
+} from "@hyperledger/cactus-core";
 
 import { PluginLedgerConnectorBesu } from "../plugin-ledger-connector-besu";
 import { DeployContractSolidityBytecodeV1Request } from "../generated/openapi/typescript-axios";
@@ -86,6 +89,7 @@ export class DeployContractSolidityBytecodeEndpoint
   }
 
   public async handleRequest(req: Request, res: Response): Promise<void> {
+    const fnTag = `${this.className}#handleRequest()`;
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(reqTag);
     const reqBody: DeployContractSolidityBytecodeV1Request = req.body;
@@ -93,11 +97,8 @@ export class DeployContractSolidityBytecodeEndpoint
       const resBody = await this.options.connector.deployContract(reqBody);
       res.json(resBody);
     } catch (ex) {
-      this.log.error(`Crash while serving ${reqTag}`, ex);
-      res.status(500).json({
-        message: "Internal Server Error",
-        error: ex?.stack || ex?.message,
-      });
+      const errorMsg = `${reqTag} ${fnTag} Failed to deploy contract:`;
+      handleRestEndpointException({ errorMsg, log: this.log, error: ex, res });
     }
   }
 }

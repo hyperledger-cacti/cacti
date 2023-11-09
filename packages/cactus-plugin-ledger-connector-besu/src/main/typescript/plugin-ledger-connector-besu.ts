@@ -5,6 +5,7 @@ import type { Server as SocketIoServer } from "socket.io";
 import type { Socket as SocketIoSocket } from "socket.io";
 import type { Express } from "express";
 import { Optional } from "typescript-optional";
+import createHttpError from "http-errors";
 
 import OAS from "../json/openapi.json";
 
@@ -814,93 +815,101 @@ export class PluginLedgerConnectorBesu
     const fnTag = `${this.className}#deployContract()`;
     Checks.truthy(req, `${fnTag} req`);
     if (isWeb3SigningCredentialNone(req.web3SigningCredential)) {
-      throw new Error(`${fnTag} Cannot deploy contract with pre-signed TX`);
-    }
-    const { contractName } = req;
-    if (req.keychainId != undefined && req.contractName != undefined) {
-      const keychainPlugin = this.pluginRegistry.findOneByKeychainId(
-        req.keychainId,
+      throw createHttpError[400](
+        `${fnTag} Cannot deploy contract with pre-signed TX`,
       );
-      Checks.truthy(
-        keychainPlugin,
-        `${fnTag} keychain for ID:"${req.keychainId}"`,
-      );
-      if (!keychainPlugin.has(req.contractName)) {
-        throw new Error(
-          `${fnTag} Cannot create an instance of the contract because the contractName and the contractName on the keychain does not match`,
-        );
-      }
-      const networkId = await this.web3.eth.net.getId();
-
-      const tmpContract = new this.web3.eth.Contract(req.contractAbi);
-      const deployment = tmpContract.deploy({
-        data: req.bytecode,
-        arguments: req.constructorArgs,
-      });
-
-      const abi = deployment.encodeABI();
-      const data = abi.startsWith("0x") ? abi : `0x${abi}`;
-      this.log.debug(`Deploying "${req.contractName}" with data %o`, data);
-
-      const web3SigningCredential = req.web3SigningCredential as
-        | Web3SigningCredentialPrivateKeyHex
-        | Web3SigningCredentialCactusKeychainRef;
-
-      const runTxResponse = await this.transact({
-        transactionConfig: {
-          data,
-          from: web3SigningCredential.ethAccount,
-          gas: req.gas,
-          gasPrice: req.gasPrice,
-        },
-        consistencyStrategy: {
-          blockConfirmations: 0,
-          receiptType: ReceiptType.NodeTxPoolAck,
-          timeoutMs: req.timeoutMs || 60000,
-        },
-        web3SigningCredential,
-        privateTransactionConfig: req.privateTransactionConfig,
-      });
-
-      const keychainHasContract = await keychainPlugin.has(contractName);
-      if (keychainHasContract) {
-        this.log.debug(`Keychain has the contract, updating networks...`);
-
-        const { transactionReceipt: receipt } = runTxResponse;
-        const { status, contractAddress } = receipt;
-
-        if (status && contractAddress) {
-          const networkInfo = { address: contractAddress };
-          const contractStr = await keychainPlugin.get(contractName);
-          const contractJSON = JSON.parse(contractStr);
-          this.log.debug("Contract JSON: \n%o", JSON.stringify(contractJSON));
-          const contract = new this.web3.eth.Contract(
-            contractJSON.abi,
-            contractAddress,
-          );
-          this.contracts[contractName] = contract;
-
-          const network = { [networkId]: networkInfo };
-          contractJSON.networks = network;
-
-          await keychainPlugin.set(contractName, JSON.stringify(contractJSON));
-        }
-      } else {
-        throw new Error(
-          `${fnTag} Cannot create an instance of the contract because the contractName and the contractName on the keychain does not match`,
-        );
-      }
-
-      // creating solidity byte code response
-      const deployResponse: DeployContractSolidityBytecodeV1Response = {
-        transactionReceipt: runTxResponse.transactionReceipt,
-      };
-
-      return deployResponse;
     }
-    throw new Error(
-      `${fnTag} Cannot deploy contract without keychainId and the contractName`,
-    );
+    const { keychainId, contractName } = req;
+    if (!keychainId || !req.contractName) {
+      const errorMessage = `${fnTag} Cannot deploy contract without keychainId and the contractName.`;
+      throw createHttpError[400](errorMessage);
+    }
+
+    const keychainPlugin = this.pluginRegistry.findOneByKeychainId(keychainId);
+
+    if (!keychainPlugin) {
+      const errorMessage =
+        `${fnTag} The plugin registry does not contain` +
+        ` a keychain plugin for ID:"${req.keychainId}"`;
+      throw createHttpError[400](errorMessage);
+    }
+
+    if (!keychainPlugin.has(contractName)) {
+      const errorMessage =
+        `${fnTag} Cannot create an instance of the contract instance because` +
+        `the contractName in the request does not exist on the keychain`;
+      throw new createHttpError[400](errorMessage);
+    }
+
+    const networkId = await this.web3.eth.net.getId();
+
+    const tmpContract = new this.web3.eth.Contract(req.contractAbi);
+    const deployment = tmpContract.deploy({
+      data: req.bytecode,
+      arguments: req.constructorArgs,
+    });
+
+    const abi = deployment.encodeABI();
+    const data = abi.startsWith("0x") ? abi : `0x${abi}`;
+    this.log.debug(`Deploying "${req.contractName}" with data %o`, data);
+
+    const web3SigningCredential = req.web3SigningCredential as
+      | Web3SigningCredentialPrivateKeyHex
+      | Web3SigningCredentialCactusKeychainRef;
+
+    const runTxResponse = await this.transact({
+      transactionConfig: {
+        data,
+        from: web3SigningCredential.ethAccount,
+        gas: req.gas,
+        gasPrice: req.gasPrice,
+      },
+      consistencyStrategy: {
+        blockConfirmations: 0,
+        receiptType: ReceiptType.NodeTxPoolAck,
+        timeoutMs: req.timeoutMs || 60000,
+      },
+      web3SigningCredential,
+      privateTransactionConfig: req.privateTransactionConfig,
+    });
+
+    const keychainHasContract = await keychainPlugin.has(contractName);
+
+    if (!keychainHasContract) {
+      const errorMessage =
+        `${fnTag} Cannot create an instance of the contract instance because` +
+        `the contractName in the request does not exist on the keychain`;
+      throw new createHttpError[400](errorMessage);
+    }
+
+    this.log.debug(`Keychain has the contract, updating networks...`);
+
+    const { transactionReceipt: receipt } = runTxResponse;
+    const { status, contractAddress } = receipt;
+
+    if (status && contractAddress) {
+      const networkInfo = { address: contractAddress };
+      const contractStr = await keychainPlugin.get(contractName);
+      const contractJSON = JSON.parse(contractStr);
+      this.log.debug("Contract JSON: \n%o", JSON.stringify(contractJSON));
+      const contract = new this.web3.eth.Contract(
+        contractJSON.abi,
+        contractAddress,
+      );
+      this.contracts[contractName] = contract;
+
+      const network = { [networkId]: networkInfo };
+      contractJSON.networks = network;
+
+      await keychainPlugin.set(contractName, JSON.stringify(contractJSON));
+    }
+
+    // creating solidity byte code response
+    const deployResponse: DeployContractSolidityBytecodeV1Response = {
+      transactionReceipt: runTxResponse.transactionReceipt,
+    };
+
+    return deployResponse;
   }
 
   public async signTransaction(
