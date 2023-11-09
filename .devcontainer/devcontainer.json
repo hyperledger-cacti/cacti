@@ -78,7 +78,7 @@
 				"codeandstuff.package-json-upgrade"
 			]
 		}
-	}	
+	},	
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
@@ -87,7 +87,7 @@
 	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "uname -a",
+	"postCreateCommand": "echo \"source /usr/share/bash-completion/completions/git\" >> ~/.bashrc"
 
 	// Configure tool-specific properties.
 	// "customizations": {},
