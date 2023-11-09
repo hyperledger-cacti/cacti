@@ -7041,9 +7041,11 @@ __metadata:
     "@hyperledger/cactus-common": 2.0.0-alpha.2
     "@hyperledger/cactus-core-api": 2.0.0-alpha.2
     "@types/express": 4.17.19
+    "@types/http-errors": 2.0.2
     express: 4.18.2
     express-jwt-authz: 2.4.1
     express-openapi-validator: 5.0.4
+    http-errors: 2.0.0
     run-time-error-cjs: 1.4.0
     safe-stable-stringify: 2.4.3
     typescript-optional: 2.0.1
@@ -13101,6 +13103,13 @@ __metadata:
   version: 1.6.3
   resolution: "@types/http-errors@npm:1.6.3"
   checksum: c769ed815bb2efe7fc8646d0eeb98bc04868d5c6ac9132c3fa4a9efbb3b2b89c3363ad61753ae89c464ce47fd3406ad8ffcf2a8e64aec3e202808adcde0e2eca
+  languageName: node
+  linkType: hard
+
+"@types/http-errors@npm:2.0.2":
+  version: 2.0.2
+  resolution: "@types/http-errors@npm:2.0.2"
+  checksum: d7f14045240ac4b563725130942b8e5c8080bfabc724c8ff3f166ea928ff7ae02c5194763bc8f6aaf21897e8a44049b0492493b9de3e058247e58fdfe0f86692
   languageName: node
   linkType: hard
 
