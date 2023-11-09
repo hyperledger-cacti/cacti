@@ -18,3 +18,8 @@ export {
   GetOpenApiSpecV1EndpointBase,
   IGetOpenApiSpecV1EndpointBaseOptions,
 } from "./web-services/get-open-api-spec-v1-endpoint-base";
+
+export {
+  IHandleRestEndpointExceptionOptions,
+  handleRestEndpointException,
+} from "./web-services/handle-rest-endpoint-exception";
