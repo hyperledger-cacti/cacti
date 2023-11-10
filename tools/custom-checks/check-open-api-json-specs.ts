@@ -184,33 +184,33 @@ export async function checkOpenApiJsonSpecs(
         }
         const oasExtension = verbObjProp["x-hyperledger-cactus"];
         if (!isStdLibRecord(oasExtension)) {
-          const errorMessage = `${oasPathRel} is missing "paths"."${pathObjKey}"."${verbObjKey}"."x-hyperledger-cactus" from the path definition of ${pathObjKey}. Please add it. If you do not know how to, search for existing examples in other openapi.json files within the project for the string "x-hyperledger-cactus"`;
+          const errorMessage = `ERROR: ${oasPathRel} is missing "paths"."${pathObjKey}"."${verbObjKey}"."x-hyperledger-cactus" from the path definition of ${pathObjKey}. Please add it. If you do not know how to, search for existing examples in other openapi.json files within the project for the string "x-hyperledger-cactus"`;
           errors.push(errorMessage);
           return;
         }
         if (!hasProperty(oasExtension, "http")) {
-          const errorMessage = `${oasPathRel} is missing "paths"."${pathObjKey}"."${verbObjKey}"."x-hyperledger-cactus"."http" from the path definition of ${pathObjKey}. Please add it. If you do not know how to, search for existing examples in other openapi.json files within the project for the string "x-hyperledger-cactus"`;
+          const errorMessage = `ERROR: ${oasPathRel} is missing "paths"."${pathObjKey}"."${verbObjKey}"."x-hyperledger-cactus"."http" from the path definition of ${pathObjKey}. Please add it. If you do not know how to, search for existing examples in other openapi.json files within the project for the string "x-hyperledger-cactus"`;
           errors.push(errorMessage);
           return;
         }
         const { http } = oasExtension;
         if (!hasProperty(http, "verbLowerCase")) {
-          const errorMessage = `${oasPathRel} is missing "paths"."${pathObjKey}"."${verbObjKey}"."x-hyperledger-cactus"."http"."verbLowerCase" from the path definition of ${pathObjKey}. Please add it. If you do not know how to, search for existing examples in other openapi.json files within the project for the string "x-hyperledger-cactus"`;
+          const errorMessage = `ERROR: ${oasPathRel} is missing "paths"."${pathObjKey}"."${verbObjKey}"."x-hyperledger-cactus"."http"."verbLowerCase" from the path definition of ${pathObjKey}. Please add it. If you do not know how to, search for existing examples in other openapi.json files within the project for the string "x-hyperledger-cactus"`;
           errors.push(errorMessage);
           return;
         }
         if (!hasProperty(http, "path")) {
-          const errorMessage = `${oasPathRel} is missing "paths"."${pathObjKey}"."${verbObjKey}"."x-hyperledger-cactus"."http"."path" from the path definition object of ${pathObjKey}. Please add it. If you do not know how to, search for existing examples in other openapi.json files within the project for the string "x-hyperledger-cactus"`;
+          const errorMessage = `ERROR: ${oasPathRel} is missing "paths"."${pathObjKey}"."${verbObjKey}"."x-hyperledger-cactus"."http"."path" from the path definition object of ${pathObjKey}. Please add it. If you do not know how to, search for existing examples in other openapi.json files within the project for the string "x-hyperledger-cactus"`;
           errors.push(errorMessage);
           return;
         }
         if (http.path !== pathObjKey) {
-          const errorMessage = `${oasPathRel} HTTP paths at "paths"."${pathObjKey}"."${verbObjKey}"."x-hyperledger-cactus"."http"."path" must match "${pathObjKey}" but it is currently set to "${http.path}"`;
+          const errorMessage = `ERROR: ${oasPathRel} HTTP paths at "paths"."${pathObjKey}"."${verbObjKey}"."x-hyperledger-cactus"."http"."path" must match "${pathObjKey}" but it is currently set to "${http.path}"`;
           errors.push(errorMessage);
           return;
         }
         if (http.verbLowerCase !== verbObjKey) {
-          const errorMessage = `${oasPathRel} HTTP verbs at "paths"."${pathObjKey}"."${verbObjKey}"."x-hyperledger-cactus"."http"."verbLowerCase" must match "${verbObjKey}" but it is currently set to "${http.verbLowerCase}"`;
+          const errorMessage = `ERROR: ${oasPathRel} HTTP verbs at "paths"."${pathObjKey}"."${verbObjKey}"."x-hyperledger-cactus"."http"."verbLowerCase" must match "${verbObjKey}" but it is currently set to "${http.verbLowerCase}"`;
           errors.push(errorMessage);
           return;
         }
