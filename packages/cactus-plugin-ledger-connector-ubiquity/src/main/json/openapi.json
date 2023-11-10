@@ -32,7 +32,7 @@
   "paths": {
     "/api/v1/@hyperledger/cactus-plugin-ledger-connector-ubiquity/GetTransactionByAddress": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/@hyperledger/cactus-plugin-ledger-connector-ubiquity/GetTransactionByAddress"

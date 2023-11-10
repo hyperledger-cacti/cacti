@@ -51,7 +51,7 @@ export class TransferInitiationRequestEndpointV1
       OAS.paths[
         "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase1/transferinitiationrequest"
       ];
-    return apiPath.post["x-hyperledger-cactus"].http.path;
+    return apiPath.post["x-hyperledger-cacti"].http.path;
   }
 
   public getVerbLowerCase(): string {
@@ -59,7 +59,7 @@ export class TransferInitiationRequestEndpointV1
       OAS.paths[
         "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase1/transferinitiationrequest"
       ];
-    return apiPath.post["x-hyperledger-cactus"].http.verbLowerCase;
+    return apiPath.post["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getOperationId(): string {

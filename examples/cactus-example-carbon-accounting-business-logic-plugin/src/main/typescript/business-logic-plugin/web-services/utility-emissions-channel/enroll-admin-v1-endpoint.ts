@@ -48,7 +48,7 @@ export class EnrollAdminV1Endpoint implements IWebServiceEndpoint {
 
   getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {
     return {
-      get: async () => this.oasPath.post["x-hyperledger-cactus"].authz,
+      get: async () => this.oasPath.post["x-hyperledger-cacti"].authz,
     };
   }
 
@@ -57,11 +57,11 @@ export class EnrollAdminV1Endpoint implements IWebServiceEndpoint {
   }
 
   public getVerbLowerCase(): string {
-    return this.oasPath.post["x-hyperledger-cactus"].http.verbLowerCase;
+    return this.oasPath.post["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getPath(): string {
-    return this.oasPath.post["x-hyperledger-cactus"].http.path;
+    return this.oasPath.post["x-hyperledger-cacti"].http.path;
   }
 
   public getExpressRequestHandler(): IExpressRequestHandler {

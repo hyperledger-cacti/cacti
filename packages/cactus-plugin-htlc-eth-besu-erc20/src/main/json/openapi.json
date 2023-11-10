@@ -309,7 +309,7 @@
   "paths": {
     "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/initialize": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/initialize"
@@ -343,7 +343,7 @@
     },
     "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/withdraw": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/withdraw"
@@ -377,7 +377,7 @@
     },
     "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/get-status": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/get-status"
@@ -403,7 +403,7 @@
     },
     "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/get-single-status": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/get-single-status"
@@ -429,7 +429,7 @@
     },
     "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/refund": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/refund"
@@ -463,7 +463,7 @@
     },
     "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/new-contract": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/new-contract"

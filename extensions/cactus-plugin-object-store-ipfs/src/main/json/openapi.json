@@ -37,7 +37,7 @@
   "paths": {
     "/api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/get-object": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/get-object"
@@ -58,7 +58,7 @@
     },
     "/api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/set-object": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/set-object"
@@ -79,7 +79,7 @@
     },
     "/api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/has-object": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/has-object"

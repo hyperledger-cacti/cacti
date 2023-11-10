@@ -215,7 +215,7 @@
     "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-bookshelf": {
       "post": {
         "operationId": "insertBookshelfV1",
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-bookshelf"
@@ -249,7 +249,7 @@
     "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-bookshelf": {
       "get": {
         "operationId": "listBookshelfV1",
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
             "path": "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-bookshelf"
@@ -273,7 +273,7 @@
     },
     "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-shipment": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-shipment"
@@ -307,7 +307,7 @@
     },
     "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-shipment": {
       "get": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
             "path": "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-shipment"
@@ -333,7 +333,7 @@
     "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-bamboo-harvest": {
       "post": {
         "operationId": "insertBambooHarvestV1",
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-bamboo-harvest"
@@ -367,7 +367,7 @@
     "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-bamboo-harvest": {
       "get": {
         "operationId": "listBambooHarvestV1",
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
             "path": "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-bamboo-harvest"

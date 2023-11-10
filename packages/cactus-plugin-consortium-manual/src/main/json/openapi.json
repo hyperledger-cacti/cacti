@@ -53,7 +53,7 @@
   "paths": {
     "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/consortium/jws": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/consortium/jws"
@@ -88,7 +88,7 @@
     },
     "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/node/jws": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/node/jws"
@@ -122,7 +122,7 @@
     },
     "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/get-prometheus-exporter-metrics": {
       "get": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/get-prometheus-exporter-metrics"

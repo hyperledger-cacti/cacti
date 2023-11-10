@@ -46,13 +46,13 @@ export class ClientRequestEndpointV1 implements IWebServiceEndpoint {
   public getPath(): string {
     const apiPath =
       OAS.paths["/api/v1/@hyperledger/cactus-plugin-odap-hermes/clientrequest"];
-    return apiPath.post["x-hyperledger-cactus"].http.path;
+    return apiPath.post["x-hyperledger-cacti"].http.path;
   }
 
   public getVerbLowerCase(): string {
     const apiPath =
       OAS.paths["/api/v1/@hyperledger/cactus-plugin-odap-hermes/clientrequest"];
-    return apiPath.post["x-hyperledger-cactus"].http.verbLowerCase;
+    return apiPath.post["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getOperationId(): string {

@@ -65,11 +65,11 @@ export class GetPrometheusExporterMetricsEndpointV1
   }
 
   public getPath(): string {
-    return this.oasPath.get["x-hyperledger-cactus"].http.path;
+    return this.oasPath.get["x-hyperledger-cacti"].http.path;
   }
 
   public getVerbLowerCase(): string {
-    return this.oasPath.get["x-hyperledger-cactus"].http.verbLowerCase;
+    return this.oasPath.get["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getOperationId(): string {
