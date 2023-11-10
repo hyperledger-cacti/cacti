@@ -79,12 +79,12 @@ export class ListBookshelfEndpoint implements IWebServiceEndpoint {
 
   public getVerbLowerCase(): string {
     const apiPath = this.getOasPath();
-    return apiPath.get["x-hyperledger-cactus"].http.verbLowerCase;
+    return apiPath.get["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getPath(): string {
     const apiPath = this.getOasPath();
-    return apiPath.get["x-hyperledger-cactus"].http.path;
+    return apiPath.get["x-hyperledger-cacti"].http.path;
   }
 
   public getExpressRequestHandler(): IExpressRequestHandler {

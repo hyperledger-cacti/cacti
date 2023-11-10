@@ -51,7 +51,7 @@ export class LockEvidenceResponseEndpointV1 implements IWebServiceEndpoint {
       OAS.paths[
         "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase2/lockevidenceresponse"
       ];
-    return apiPath.post["x-hyperledger-cactus"].http.path;
+    return apiPath.post["x-hyperledger-cacti"].http.path;
   }
 
   public getVerbLowerCase(): string {
@@ -59,7 +59,7 @@ export class LockEvidenceResponseEndpointV1 implements IWebServiceEndpoint {
       OAS.paths[
         "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase2/lockevidenceresponse"
       ];
-    return apiPath.post["x-hyperledger-cactus"].http.verbLowerCase;
+    return apiPath.post["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getOperationId(): string {

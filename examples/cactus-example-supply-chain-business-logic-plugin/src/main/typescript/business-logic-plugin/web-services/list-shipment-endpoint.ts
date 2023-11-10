@@ -46,12 +46,12 @@ export class ListShipmentEndpoint implements IWebServiceEndpoint {
 
   getPath(): string {
     const apiPath = this.getOasPath();
-    return apiPath.get["x-hyperledger-cactus"].http.path;
+    return apiPath.get["x-hyperledger-cacti"].http.path;
   }
 
   getVerbLowerCase(): string {
     const apiPath = this.getOasPath();
-    return apiPath.get["x-hyperledger-cactus"].http.verbLowerCase;
+    return apiPath.get["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getOperationId(): string {

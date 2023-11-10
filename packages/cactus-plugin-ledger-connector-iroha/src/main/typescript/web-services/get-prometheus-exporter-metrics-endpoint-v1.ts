@@ -60,13 +60,13 @@ export class GetPrometheusExporterMetricsEndpointV1
   getPath(): string {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha/get-prometheus-exporter-metrics"
-    ].get["x-hyperledger-cactus"].http.path;
+    ].get["x-hyperledger-cacti"].http.path;
   }
 
   getVerbLowerCase(): string {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha/get-prometheus-exporter-metrics"
-    ].get["x-hyperledger-cactus"].http.verbLowerCase;
+    ].get["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public async registerExpress(

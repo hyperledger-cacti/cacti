@@ -75,12 +75,12 @@ export class InsertShipmentEndpoint implements IWebServiceEndpoint {
 
   getPath(): string {
     const apiPath = this.getOasPath();
-    return apiPath.post["x-hyperledger-cactus"].http.path;
+    return apiPath.post["x-hyperledger-cacti"].http.path;
   }
 
   getVerbLowerCase(): string {
     const apiPath = this.getOasPath();
-    return apiPath.post["x-hyperledger-cactus"].http.verbLowerCase;
+    return apiPath.post["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getOperationId(): string {

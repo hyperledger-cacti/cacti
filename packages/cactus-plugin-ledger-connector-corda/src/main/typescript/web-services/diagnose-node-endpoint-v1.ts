@@ -67,11 +67,11 @@ export class DiagnoseNodeEndpointV1 implements IWebServiceEndpoint {
   }
 
   public getPath(): string {
-    return this.oasPath.post["x-hyperledger-cactus"].http.path;
+    return this.oasPath.post["x-hyperledger-cacti"].http.path;
   }
 
   public getVerbLowerCase(): string {
-    return this.oasPath.post["x-hyperledger-cactus"].http.verbLowerCase;
+    return this.oasPath.post["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getOperationId(): string {

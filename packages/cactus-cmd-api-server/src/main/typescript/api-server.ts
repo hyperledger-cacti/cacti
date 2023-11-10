@@ -577,9 +577,9 @@ export class ApiServer {
         oas: OAS,
         oasPath,
         operationId,
-        path: oasPath.get["x-hyperledger-cactus"].http.path,
+        path: oasPath.get["x-hyperledger-cacti"].http.path,
         pluginRegistry,
-        verbLowerCase: oasPath.get["x-hyperledger-cactus"].http.verbLowerCase,
+        verbLowerCase: oasPath.get["x-hyperledger-cacti"].http.verbLowerCase,
         logLevel,
       };
       const endpoint = new GetOpenApiSpecV1Endpoint(opts);
@@ -595,7 +595,7 @@ export class ApiServer {
     };
 
     const { "/api/v1/api-server/healthcheck": oasPath } = OAS.paths;
-    const { http } = oasPath.get["x-hyperledger-cactus"];
+    const { http } = oasPath.get["x-hyperledger-cacti"];
     const { path: httpPath, verbLowerCase: httpVerb } = http;
     if (!isExpressHttpVerbMethodName(httpVerb)) {
       const eMsg = `${fnTag} Invalid HTTP verb "${httpVerb}" in cmd-api-server OpenAPI specification for HTTP path: "${httpPath}"`;
@@ -634,7 +634,7 @@ export class ApiServer {
     } = OAS.paths;
 
     const { http: httpPrometheus } =
-      oasPathPrometheus.get["x-hyperledger-cactus"];
+      oasPathPrometheus.get["x-hyperledger-cacti"];
 
     const { path: httpPathPrometheus, verbLowerCase: httpVerbPrometheus } =
       httpPrometheus;

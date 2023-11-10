@@ -155,7 +155,7 @@
       "post": {
         "operationId": "enrollAdminV1",
         "summary": "Registers an admin account within the Fabric organization specified.",
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "authz": {
             "isProtected": true,
             "requiredRoles": ["group:admin"]
@@ -192,7 +192,7 @@
       "post": {
         "operationId": "daoTokenGetAllowanceV1",
         "summary": "Get the number of tokens `spender` is approved to spend on behalf of `account`",
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-example-carbon-accounting-backend/dao-token/get-allowance"

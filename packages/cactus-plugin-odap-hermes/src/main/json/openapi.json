@@ -1290,7 +1290,7 @@
   "paths": {
     "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase1/transferinitiationrequest": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase1/transferinitiationrequest"
@@ -1316,7 +1316,7 @@
     },
     "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase2/transfercommencerequest": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase2/transfercommencerequest"
@@ -1342,7 +1342,7 @@
     },
     "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase2/lockevidencerequest": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase2/lockevidencerequest"
@@ -1368,7 +1368,7 @@
     },
     "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase3/commitpreparationrequest": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase3/commitpreparationrequest"
@@ -1394,7 +1394,7 @@
     },
     "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase3/commitfinalrequest": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase3/commitfinalrequest"
@@ -1420,7 +1420,7 @@
     },
     "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase3/transfercompleterequest": {
       "get": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
             "path": "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase3/transfercompleterequest"
@@ -1446,7 +1446,7 @@
     },
     "/api/v1/@hyperledger/cactus-plugin-odap-hermes/clientrequest": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/@hyperledger/cactus-plugin-odap-hermes/clientrequest"
@@ -1477,7 +1477,7 @@
     },
     "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase1/transferinitiationresponse": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase1/transferinitiationresponse"
@@ -1503,7 +1503,7 @@
     },
     "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase2/transfercommenceresponse": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase2/transfercommenceresponse"
@@ -1529,7 +1529,7 @@
     },
     "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase2/lockevidenceresponse": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase2/lockevidenceresponse"
@@ -1555,7 +1555,7 @@
     },
     "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase3/commitpreparationresponse": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase3/commitpreparationresponse"
@@ -1581,7 +1581,7 @@
     },
     "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase3/commitfinalresponse": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase3/commitfinalresponse"
@@ -1607,7 +1607,7 @@
     },
     "/api/v1/@hyperledger/cactus-plugin-odap-hermes/recovermessage": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/@hyperledger/cactus-plugin-odap-hermes/recovermessage"
@@ -1633,7 +1633,7 @@
     },
     "/api/v1/@hyperledger/cactus-plugin-odap-hermes/recoverupdatemessage": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/@hyperledger/cactus-plugin-odap-hermes/recoverupdatemessage"
@@ -1659,7 +1659,7 @@
     },
     "/api/v1/@hyperledger/cactus-plugin-odap-hermes/recoverupdateackmessage": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/@hyperledger/cactus-plugin-odap-hermes/recoverupdateackmessage"
@@ -1685,7 +1685,7 @@
     },
     "/api/v1/@hyperledger/cactus-plugin-odap-hermes/recoversuccessmessage": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/@hyperledger/cactus-plugin-odap-hermes/recoversuccessmessage"
@@ -1711,7 +1711,7 @@
     },
     "/api/v1/@hyperledger/cactus-plugin-odap-hermes/rollbackmessage": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/@hyperledger/cactus-plugin-odap-hermes/rollbackmessage"
@@ -1737,7 +1737,7 @@
     },
     "/api/v1/@hyperledger/cactus-plugin-odap-hermes/rollbackackmessage": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/@hyperledger/cactus-plugin-odap-hermes/rollbackackmessage"

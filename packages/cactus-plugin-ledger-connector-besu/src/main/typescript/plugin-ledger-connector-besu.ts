@@ -304,9 +304,9 @@ export class PluginLedgerConnectorBesu
         oas: OAS,
         oasPath,
         operationId,
-        path: oasPath.get["x-hyperledger-cactus"].http.path,
+        path: oasPath.get["x-hyperledger-cacti"].http.path,
         pluginRegistry: this.pluginRegistry,
-        verbLowerCase: oasPath.get["x-hyperledger-cactus"].http.verbLowerCase,
+        verbLowerCase: oasPath.get["x-hyperledger-cacti"].http.verbLowerCase,
         logLevel: this.options.logLevel,
       };
       const endpoint = new GetOpenApiSpecV1Endpoint(opts);

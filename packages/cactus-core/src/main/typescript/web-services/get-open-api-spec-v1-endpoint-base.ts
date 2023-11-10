@@ -87,7 +87,7 @@ export interface IGetOpenApiSpecV1EndpointBaseOptions<S, P> {
  * ```json
  * "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-open-api-spec": {
  *   "get": {
- *     "x-hyperledger-cactus": {
+ *     "x-hyperledger-cacti": {
  *       "http": {
  *         "verbLowerCase": "get",
  *         "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-open-api-spec"

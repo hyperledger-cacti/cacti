@@ -284,7 +284,7 @@
   "paths": {
     "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/new-contract": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/new-contract"
@@ -316,7 +316,7 @@
     },
     "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/withdraw": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/withdraw"
@@ -348,7 +348,7 @@
     },
     "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/refund": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/refund"
@@ -381,7 +381,7 @@
     },
     "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/get-status": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/get-status"
@@ -407,7 +407,7 @@
     },
     "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/get-single-status": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/get-single-status"
@@ -433,7 +433,7 @@
     },
     "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/initialize": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/initialize"

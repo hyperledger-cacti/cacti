@@ -57,12 +57,12 @@ export class StatusEndpointV1 implements IWebServiceEndpoint {
 
   public getPath(): string {
     const apiPath = this.getOasPath();
-    return apiPath.get["x-hyperledger-cactus"].http.path;
+    return apiPath.get["x-hyperledger-cacti"].http.path;
   }
 
   public getVerbLowerCase(): string {
     const apiPath = this.getOasPath();
-    return apiPath.get["x-hyperledger-cactus"].http.verbLowerCase;
+    return apiPath.get["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getOperationId(): string {
