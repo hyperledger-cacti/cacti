@@ -679,9 +679,6 @@
             "type": "array",
             "description": "An array of strings storing the names of the flows as returned by the flowList Corda RPC.",
             "example": [
-              "net.corda.core.flows.ContractUpgradeFlow$Authorise",
-              "net.corda.core.flows.ContractUpgradeFlow$Deauthorise",
-              "net.corda.core.flows.ContractUpgradeFlow$Initiate",
               "net.corda.finance.flows.CashExitFlow",
               "net.corda.finance.flows.CashIssueAndPaymentFlow",
               "net.corda.finance.flows.CashIssueFlow",

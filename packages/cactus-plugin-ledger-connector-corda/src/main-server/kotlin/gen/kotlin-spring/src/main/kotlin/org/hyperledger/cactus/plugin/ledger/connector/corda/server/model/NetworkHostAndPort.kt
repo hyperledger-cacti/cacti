@@ -11,7 +11,6 @@ import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
 import javax.validation.Valid
-import io.swagger.v3.oas.annotations.media.Schema
 
 /**
  * 
@@ -20,12 +19,9 @@ import io.swagger.v3.oas.annotations.media.Schema
  */
 data class NetworkHostAndPort(
 
-    @Schema(example = "null", required = true, description = "")
     @get:JsonProperty("host", required = true) val host: kotlin.String,
 
-    @Schema(example = "null", required = true, description = "")
     @get:JsonProperty("port", required = true) val port: java.math.BigDecimal
 ) {
 
 }
-
