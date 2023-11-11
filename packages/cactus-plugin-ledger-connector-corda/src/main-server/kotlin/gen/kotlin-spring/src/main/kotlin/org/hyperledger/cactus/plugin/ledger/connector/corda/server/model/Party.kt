@@ -13,7 +13,6 @@ import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
 import javax.validation.Valid
-import io.swagger.v3.oas.annotations.media.Schema
 
 /**
  * 
@@ -23,13 +22,10 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class Party(
 
     @field:Valid
-    @Schema(example = "null", required = true, description = "")
     @get:JsonProperty("name", required = true) val name: CordaX500Name,
 
     @field:Valid
-    @Schema(example = "null", required = true, description = "")
     @get:JsonProperty("owningKey", required = true) val owningKey: PublicKey
 ) {
 
 }
-

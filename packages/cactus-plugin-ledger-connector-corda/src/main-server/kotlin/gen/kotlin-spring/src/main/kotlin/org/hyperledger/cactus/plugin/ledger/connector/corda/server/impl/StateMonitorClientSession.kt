@@ -6,7 +6,7 @@ import net.corda.core.node.services.vault.DEFAULT_PAGE_NUM
 import net.corda.core.node.services.vault.PageSpecification
 import net.corda.core.node.services.vault.QueryCriteria
 import net.corda.core.utilities.loggerFor
-import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.GetMonitorTransactionsV1ResponseTx
+import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.GetMonitorTransactionsV1ResponseTxInner
 import rx.Subscription
 import java.math.BigInteger
 import java.time.LocalDateTime
@@ -26,7 +26,7 @@ class StateMonitorClientSession(private val rpc: NodeRPCConnection, private val 
      * Simple data class for monitor reactive `subscription`, and queue of `stateChanges` received from corda
      */
     private data class StateMonitor(
-        val stateChanges: MutableSet<GetMonitorTransactionsV1ResponseTx>,
+        val stateChanges: MutableSet<GetMonitorTransactionsV1ResponseTxInner>,
         val subscription: Subscription
     )
 
@@ -57,10 +57,10 @@ class StateMonitorClientSession(private val rpc: NodeRPCConnection, private val 
         val stateUpdates = this.rpc.proxy.vaultTrackByWithPagingSpec(cordaState, criteria, pagingSpec).updates
 
         var indexCounter = BigInteger.valueOf(0)
-        val stateChanges = mutableSetOf<GetMonitorTransactionsV1ResponseTx>()
+        val stateChanges = mutableSetOf<GetMonitorTransactionsV1ResponseTxInner>()
         val monitorSub = stateUpdates.subscribe { update ->
             update.produced.forEach { change ->
-                val txResponse = GetMonitorTransactionsV1ResponseTx(indexCounter.toString(), change.toString())
+                val txResponse = GetMonitorTransactionsV1ResponseTxInner(indexCounter.toString(), change.toString())
                 indexCounter = indexCounter.add(BigInteger.valueOf(1))
                 logger.debug("Pushing new transaction for state '{}', index {}", stateName, indexCounter)
                 stateChanges.add(txResponse)
@@ -78,7 +78,7 @@ class StateMonitorClientSession(private val rpc: NodeRPCConnection, private val 
      * @param stateName String representation of corda state to monitor.
      * @return Set of corda state changes
      */
-    fun getTransactions(stateName: String): MutableSet<GetMonitorTransactionsV1ResponseTx> {
+    fun getTransactions(stateName: String): MutableSet<GetMonitorTransactionsV1ResponseTxInner> {
         if (!monitors.containsKey(stateName)) {
             throw Exception("No monitor running for corda state $stateName on requested client")
         }

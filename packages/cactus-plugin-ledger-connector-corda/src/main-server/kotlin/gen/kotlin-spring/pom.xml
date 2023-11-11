@@ -4,9 +4,8 @@
     <artifactId>cactus-connector-corda-server</artifactId>
     <packaging>jar</packaging>
     <name>cactus-connector-corda-server</name>
-    <version>0.3.0</version>
+    <version>2.0.0-alpha.2</version>
     <properties>
-        <springdoc-openapi.version>1.6.8</springdoc-openapi.version>
         <findbugs-jsr305.version>3.0.2</findbugs-jsr305.version>
         <jakarta-annotation.version>2.1.0</jakarta-annotation.version>
         <kotlin-test-junit5.version>1.6.21</kotlin-test-junit5.version>
@@ -86,12 +85,7 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!--SpringDoc dependencies -->
-        <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-ui</artifactId>
-            <version>${springdoc-openapi.version}</version>
-        </dependency>
+
 
         <!-- @Nullable annotation -->
         <dependency>
