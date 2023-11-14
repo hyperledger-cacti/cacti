@@ -8073,7 +8073,7 @@ __metadata:
     "@hyperledger/cactus-plugin-consortium-manual": 2.0.0-alpha.2
     "@hyperledger/cactus-plugin-keychain-memory": 2.0.0-alpha.2
     "@types/uuid": 9.0.6
-    axios: 1.5.1
+    axios: 1.6.0
     jose: 4.9.2
     uuid: 9.0.1
   languageName: unknown
