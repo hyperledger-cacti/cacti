@@ -8214,7 +8214,7 @@ __metadata:
     "@types/ssh2-streams": 0.1.9
     "@types/tar-stream": 2.2.1
     "@types/temp": 0.9.1
-    axios: 1.5.1
+    axios: 1.6.0
     compare-versions: 3.6.0
     dockerode: 3.3.0
     elliptic: 6.5.4
