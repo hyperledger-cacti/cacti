@@ -105,7 +105,7 @@ Further reading:
       1. If you are having trouble locating a suitable guide specifically on the mechanics of rebasing, we can recommend [this one](https://thoughtbot.com/blog/git-interactive-rebase-squash-amend-rewriting-history). Thanks to Rafael for the link!
       2. If you went through that tutorial and still not quite sure what's up, give this one a shot as well: https://about.gitlab.com/blog/2020/11/23/keep-git-history-clean-with-interactive-rebase/
    3. If merge conflicts arise, you must fix these at rebase time since omitting this step does not magically make the conflicts go away, just pushes it over the fence to the maintainer who will attempt to merge your pull request at a later point in time.
-   4. If the above happens, at that point said maintainer will most likely ask you (if not already) to perform the rebase anyway since as the author of a change you are best positioned to resolve any conflicts on the code level. Occassionally maintainers may do the merge/conflict resolution themselves, but do not count on this nor try to make a habit out of relying on the potential kindness.
+   4. If the above happens, at that point said maintainer will most likely ask you (if not already) to perform the rebase anyway since as the author of a change you are best positioned to resolve any conflicts on the code level. Occasionally maintainers may do the merge/conflict resolution themselves, but do not count on this nor try to make a habit out of relying on the potential kindness.
    5. After successful rebasing, take another look at your commit(s). Ideally there should be just one in each pull request, but also on the other hand each commit should be as small, simple and self contained as possible, so there can be cases where it makes sense to submit a PR with multiple commits if for example you also had to change something in the test tooling while implementing a feature (in which case there could be a commit for the feature itself and another for the necessary changes to the test tooling package). What we respectfully ask though is that you try to avoid these situations and submit most of your PRs with a single, self contained commit that does not touch multiple things. This significantly reduces the cognitive load required to review the changes which in turn makes everyone happier: the maintainers will have an easier job reviewing, which means they'll be doing it faster which will (probably) cause you joy in turn.
 9.  Push your changes to your main (or whatever you named your feature branch, that is entirely up to you at the end of the day)
 10. Initiate a pull request from your fork to the base repository
@@ -123,7 +123,7 @@ Ensure all the following conditions are met (on top of you agreeing with the cha
 
 1. All automated checks that are not explicitly called out here are also passing/green.
 2. Branch is rebased onto main and there are no dangling/duplicate commits.
-3. Commits appear simple and self contained. Simple is always relative to the mangitude of the change itself of course. A 1k line change can still be simple if all it does is rename some commonly used variable in each place its being used.
+3. Commits appear simple and self contained. Simple is always relative to the magnitude of the change itself of course. A 1k line change can still be simple if all it does is rename some commonly used variable in each place its being used.
 4. If the contributors are having trouble with git basic functionality such as rebasing / force pushing, DCO, do your best to help them out, when in doubt feel free to reach out to Peter (who is the one insisting an all these git rules so he deserves to be the primary contact for all git related issues).
    1. Remember that we want to foster a welcoming community so if someone is new to git try to be extra patient with them on this front.
 5. Ensure the commit messages are according to the standard format.
@@ -231,7 +231,7 @@ snowball into an avalanche of technical debt that will eventually destroy code
 quality and drive people away who would otherwise be happy to contribute and use
 the software. So, we want to make sure that does not happen with all this.
 
-This also means that occassionally, when making a change that looks simple on
+This also means that occasionally, when making a change that looks simple on
 the surface you may find that the reviewer of your pull request asks you to do
 additional, seemingly unrelated changes that have nothing to do with the actual
 feature/bug that you just implemented/fixed, but instead are designed to ensure
