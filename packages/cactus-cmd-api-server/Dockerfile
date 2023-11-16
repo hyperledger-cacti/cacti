@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 SHELL ["/bin/bash", "-c"]
 
@@ -11,7 +11,7 @@ EXPOSE 3000 4000 5000
 RUN groupadd --gid 1000 appuser \
   && useradd --uid 1000 --gid appuser --shell /bin/bash --create-home ${APP_USER}
 
-RUN apt update && apt install -y curl
+RUN apt update && apt install -y curl wget
 
 RUN mkdir -p "${APP}log/"
 RUN chown -R $APP_USER:$APP_USER "${APP}log/"
@@ -22,7 +22,6 @@ COPY --chown=${APP_USER}:${APP_USER} ./packages/cactus-cmd-api-server/healthchec
 RUN chown -R $APP_USER:$APP_USER ${APP}
 
 USER $APP_USER
-ARG NPM_PKG_VERSION=latest
 
 ENV TZ=Etc/UTC
 ENV NODE_ENV=production
@@ -47,21 +46,21 @@ ENV API_PORT=4000
 ENV LOG_LEVEL=INFO
 
 ENV NVM_DIR /home/${APP_USER}/.nvm
-ENV NODE_VERSION 16.15.1
+ENV NODE_VERSION 20.9.0
 ENV NODE_PATH $NVM_DIR/v$NODE_VERSION/lib/node_modules
 ENV PATH      $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 
 # Install nvm with node and npm
 RUN mkdir -p ${NVM_DIR}
-RUN curl https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash \
+RUN curl https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash \
   && source $NVM_DIR/nvm.sh \
   && nvm install $NODE_VERSION \
   && nvm alias default $NODE_VERSION \
   && nvm use default \
-  && npm install -g npm@8.11.0
+  && npm install -g npm@10.2.4
 
-RUN npm install -g yarn@1.22.17
-RUN yarn add @hyperledger/cactus-cmd-api-server@${NPM_PKG_VERSION} --production
+ARG NPM_PKG_VERSION=latest
+RUN npm install @hyperledger/cactus-cmd-api-server@${NPM_PKG_VERSION}
 
 COPY ./packages/cactus-cmd-api-server/docker-entrypoint.sh /usr/local/bin/
 HEALTHCHECK --interval=5s --timeout=5s --start-period=1s --retries=30 CMD /healthcheck.sh
