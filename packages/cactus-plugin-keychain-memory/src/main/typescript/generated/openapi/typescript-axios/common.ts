@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * Hyperledger Cactus Plugin - Keychain Memory 
- * Contains/describes the Hyperledger Cactus Keychain Memory plugin.
+ * Contains/describes the Hyperledger Cacti Keychain Memory plugin.
  *
  * The version of the OpenAPI document: v2.0.0-alpha.2
  * 
