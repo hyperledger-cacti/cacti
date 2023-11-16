@@ -6,6 +6,8 @@ import {
 } from "@hyperledger/cactus-common";
 import {
   ICactusPluginOptions,
+  IPluginKeychain,
+  IPluginWebService,
   IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
 
@@ -14,10 +16,11 @@ import OAS from "../json/openapi.json";
 import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
 import { Express } from "express";
 
-import {
-  IGetPrometheusExporterMetricsEndpointV1Options,
-  GetPrometheusExporterMetricsEndpointV1,
-} from "./get-prometheus-exporter-metrics/get-prometheus-exporter-metrics-endpoint-v1";
+import { GetPrometheusExporterMetricsEndpointV1 } from "./get-prometheus-exporter-metrics/get-prometheus-exporter-metrics-endpoint-v1";
+import { SetKeychainEntryV1Endpoint } from "./web-services/set-keychain-entry-endpoint-v1";
+import { GetKeychainEntryV1Endpoint } from "./web-services/get-keychain-entry-endpoint-v1";
+import { DeleteKeychainEntryV1Endpoint } from "./web-services/delete-keychain-entry-endpoint-v1";
+import { HasKeychainEntryV1Endpoint } from "./web-services/has-keychain-entry-endpoint-v1";
 
 export interface IPluginKeychainMemoryOptions extends ICactusPluginOptions {
   logLevel?: LogLevelDesc;
@@ -26,12 +29,15 @@ export interface IPluginKeychainMemoryOptions extends ICactusPluginOptions {
   prometheusExporter?: PrometheusExporter;
 }
 
-export class PluginKeychainMemory {
+export class PluginKeychainMemory
+  implements IPluginKeychain, IPluginWebService
+{
   public static readonly CLASS_NAME = "PluginKeychainMemory";
 
   private readonly backend: Map<string, string>;
   private readonly log: Logger;
   private readonly instanceId: string;
+  private endpoints: IWebServiceEndpoint[] | undefined;
   public prometheusExporter: PrometheusExporter;
 
   public get className(): string {
@@ -83,28 +89,53 @@ export class PluginKeychainMemory {
     return res;
   }
 
-  public async getOrCreateWebServices(
-    expressApp: Express,
-  ): Promise<IWebServiceEndpoint[]> {
+  async registerWebServices(app: Express): Promise<IWebServiceEndpoint[]> {
+    const webServices = await this.getOrCreateWebServices();
+    await Promise.all(webServices.map((ws) => ws.registerExpress(app)));
+    return webServices;
+  }
+
+  public async getOrCreateWebServices(): Promise<IWebServiceEndpoint[]> {
     const { log } = this;
 
     log.info(`Installing web services for plugin ${this.getPackageName()}...`);
 
-    const endpoints: IWebServiceEndpoint[] = [];
-    {
-      const opts: IGetPrometheusExporterMetricsEndpointV1Options = {
+    if (Array.isArray(this.endpoints)) {
+      return this.endpoints;
+    }
+    const endpoints: IWebServiceEndpoint[] = [
+      new SetKeychainEntryV1Endpoint({
         plugin: this,
         logLevel: this.opts.logLevel,
-      };
-      const endpoint = new GetPrometheusExporterMetricsEndpointV1(opts);
-      endpoint.registerExpress(expressApp);
-      endpoints.push(endpoint);
-    }
+      }),
+      new GetKeychainEntryV1Endpoint({
+        plugin: this,
+        logLevel: this.opts.logLevel,
+      }),
+      new DeleteKeychainEntryV1Endpoint({
+        plugin: this,
+        logLevel: this.opts.logLevel,
+      }),
+      new HasKeychainEntryV1Endpoint({
+        plugin: this,
+        logLevel: this.opts.logLevel,
+      }),
+      new GetPrometheusExporterMetricsEndpointV1({
+        plugin: this,
+        logLevel: this.opts.logLevel,
+      }),
+    ];
+
+    this.endpoints = endpoints;
 
     const pkg = this.getPackageName();
     log.info(`Installed web services for plugin ${pkg} OK`, { endpoints });
 
     return endpoints;
+  }
+
+  public async shutdown(): Promise<void> {
+    return;
   }
 
   public getInstanceId(): string {
