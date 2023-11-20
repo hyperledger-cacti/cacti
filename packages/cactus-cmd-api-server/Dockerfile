@@ -46,21 +46,21 @@ ENV API_PORT=4000
 ENV LOG_LEVEL=INFO
 
 ENV NVM_DIR /home/${APP_USER}/.nvm
-ENV NODE_VERSION 20.9.0
+ENV NODE_VERSION 20.11.1
 ENV NODE_PATH $NVM_DIR/v$NODE_VERSION/lib/node_modules
 ENV PATH      $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
-
+ 
 # Install nvm with node and npm
 RUN mkdir -p ${NVM_DIR}
-RUN curl https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash \
-  && source $NVM_DIR/nvm.sh \
-  && nvm install $NODE_VERSION \
-  && nvm alias default $NODE_VERSION \
-  && nvm use default \
-  && npm install -g npm@10.2.4
-
-ARG NPM_PKG_VERSION=latest
-RUN npm install @hyperledger/cactus-cmd-api-server@${NPM_PKG_VERSION}
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash \
+    && source $NVM_DIR/nvm.sh \
+    && nvm alias default $NODE_VERSION \
+    && nvm use default \
+    nvm install ${NODE_VERSION} && \
+    npm install --location=global yarn && \
+    yarn config set nodeLinker node-modules && \
+    yarn set version 4.1.0 && \
+    yarn add @hyperledger/cactus-cmd-api-server@2.0.0-alpha.2
 
 COPY ./packages/cactus-cmd-api-server/docker-entrypoint.sh /usr/local/bin/
 HEALTHCHECK --interval=5s --timeout=5s --start-period=1s --retries=30 CMD /healthcheck.sh
