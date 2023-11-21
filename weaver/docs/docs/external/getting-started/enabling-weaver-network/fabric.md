@@ -304,13 +304,12 @@ A Fabric network channel must share its security domain (or membership) configur
       const response = await MembershipManager.createLocalMembership(
           gateway,
           members,        // list of all organization MSPIDs that are part of the channel
-          securityDomain, // name of the local network's security domain
           channelName,    // Channel Name
           contractName    // Fabric Interoperation Chaincode installation ID on the channel
       )
   } catch (e) {
       // On error try updating local membership
-      const response = await MembershipManager.updateLocalMembership(gateway, members, securityDomain, channelName, contractName)
+      const response = await MembershipManager.updateLocalMembership(gateway, members, channelName, contractName)
   }
   ```
   - `<get-fabric-network-gateway-instance>` should be replaced with standard (boilerplate) code to get a handle to your network's gateway. This requires a special wallet identity, namely one with a `network-admin` attribute indicating that the caller is a trusted network administrator who is authorized to record local memberships on the `channelName` channel.

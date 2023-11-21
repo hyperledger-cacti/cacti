@@ -183,6 +183,7 @@ func (s *SmartContract) CreateLocalMembership(ctx contractapi.TransactionContext
 	if err != nil {
 		return fmt.Errorf("Unmarshal error: %s", err)
 	}
+	membership.SecurityDomain = membershipLocalSecurityDomain
 
 	membershipLocalKey, err := ctx.GetStub().CreateCompositeKey(membershipObjectType, []string{membershipLocalSecurityDomain})
 	acp, getErr := ctx.GetStub().GetState(membershipLocalKey)
@@ -220,6 +221,7 @@ func (s *SmartContract) UpdateLocalMembership(ctx contractapi.TransactionContext
 	if err != nil {
 		return fmt.Errorf("Unmarshal error: %s", err)
 	}
+	membership.SecurityDomain = membershipLocalSecurityDomain
 
 	membershipLocalKey, err := ctx.GetStub().CreateCompositeKey(membershipObjectType, []string{membershipLocalSecurityDomain})
 	_, getErr := s.GetMembershipBySecurityDomain(ctx, membershipLocalSecurityDomain)

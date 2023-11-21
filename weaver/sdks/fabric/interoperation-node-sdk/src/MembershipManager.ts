@@ -22,13 +22,12 @@ import { handlePromise, promisifyAll } from './helpers'
 async function createLocalMembership(
     gateway: Gateway,
     memberMspIds: Array<string>,
-    securityDomain: string,
     channelName: string,
     weaverCCId: string
 ): Promise<any> {
     const network = await gateway.getNetwork(channelName)
     const membership = getMSPConfigurations(network, memberMspIds)
-    membership.setSecuritydomain(securityDomain)
+    membership.setSecuritydomain('')
     const membership64 = Buffer.from(membership.serializeBinary()).toString('base64')
     const contract = network.getContract(weaverCCId)
     return await contract.submitTransaction("CreateLocalMembership", membership64);
@@ -37,13 +36,12 @@ async function createLocalMembership(
 async function updateLocalMembership(
     gateway: Gateway,
     memberMspIds: Array<string>,
-    securityDomain: string,
     channelName: string,
     weaverCCId: string
 ): Promise<any> {
     const network = await gateway.getNetwork(channelName)
     const membership = getMSPConfigurations(network, memberMspIds)
-    membership.setSecuritydomain(securityDomain)
+    membership.setSecuritydomain('')
     const membership64 = Buffer.from(membership.serializeBinary()).toString('base64')
     const contract = network.getContract(weaverCCId)
     return await contract.submitTransaction("UpdateLocalMembership", membership64);
@@ -51,16 +49,15 @@ async function updateLocalMembership(
 
 async function deleteLocalMembership(
     gateway: Gateway,
-    securityDomain: string,
     channelName: string,
     weaverCCId: string
 ): Promise<any> {
     const network = await gateway.getNetwork(channelName)
     const contract = network.getContract(weaverCCId)
-    return await contract.submitTransaction("DeleteLocalMembership", securityDomain);
+    return await contract.submitTransaction("DeleteLocalMembership");
 }
 
-async function readLocalMembership(
+async function readMembership(
     gateway: Gateway,
     securityDomain: string,
     channelName: string,
@@ -68,7 +65,7 @@ async function readLocalMembership(
 ): Promise<any> {
     const network = await gateway.getNetwork(channelName)
     const contract = network.getContract(weaverCCId)
-    return await contract.submitTransaction("DeleteLocalMembership", securityDomain);
+    return await contract.submitTransaction("GetMembershipBySecurityDomain", securityDomain);
 }
 
 function getMembershipUnit(channel: Channel, mspId: string): membership_pb.Member {
@@ -204,6 +201,7 @@ export {
     createLocalMembership,
     updateLocalMembership,
     deleteLocalMembership,
+    readMembership,
     getMembershipUnit,
     getAllMSPConfigurations,
     syncMembershipFromIINAgent

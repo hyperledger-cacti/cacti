@@ -142,13 +142,13 @@ const loadLocalHelper = async (
     registerUser: false
   })
   try {
-    const response = await MembershipManager.createLocalMembership(gateway, members, networkName, channelName, contractName)
+    const response = await MembershipManager.createLocalMembership(gateway, members, channelName, contractName)
     logger.info('CreateLocalMembership Successful.')
   } catch (e) {
     logger.error(e)
     logger.info('CreateLocalMembership attempting Update')
-    const response = await MembershipManager.updateLocalMembership(gateway, members, networkName, channelName, contractName)
-    logger.info('Update Local Memebrship response: success: ', response)
+    const response = await MembershipManager.updateLocalMembership(gateway, members, channelName, contractName)
+    logger.info('UpdateLocalMembership response: success: ', response)
   }
 }
 
