@@ -16,7 +16,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/golang/protobuf/proto"
-	"github.com/hyperledger/fabric-protos-go/peer"
+	"github.com/hyperledger/fabric-protos-go-apiv2/peer"
 	"github.com/hyperledger/cacti/weaver/common/protos-go/v2/common"
 	"github.com/hyperledger/cacti/weaver/common/protos-go/v2/corda"
 	"github.com/hyperledger/cacti/weaver/common/protos-go/v2/fabric"
