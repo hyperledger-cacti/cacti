@@ -5,7 +5,10 @@ tools/docker/besu-all-in-one/supervisord.conf
 .yarn/**
 
 # Cannot be edited due to configuration schema of third party software
-docs/source/conf.py
+docs-cactus/source/conf.py
+
+# Links would be broken if we refactored the offending lines
+docs/docs/contributing/requesting-a-change.md
 
 # Cannot be edited due to configuration schema of third party software
 examples/register-indy-data/register-indy-data.py
