@@ -38,7 +38,7 @@ enhancement. Here are some example scenarios:
 * If a PR is opened with several commits, where the first commit fixes one issue and the rest fix a separate issue, the PR should be rebased to two commits (one for each issue).
 
 !!! important
-    Your pull request should be rebased against the current master branch. Do not merge the current master branch in with your topic branch. Do not use the Update Branch button provided by GitHub on the pull request page.
+    Your pull request should be rebased against the current main branch. Do not merge the current main branch in with your topic branch. Do not use the Update Branch button provided by GitHub on the pull request page.
 
 ### Commit Messages
 
