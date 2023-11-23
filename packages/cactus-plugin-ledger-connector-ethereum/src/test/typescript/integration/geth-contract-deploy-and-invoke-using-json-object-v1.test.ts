@@ -90,7 +90,7 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
     await ledger.start();
 
     const listenOptions: IListenOptions = {
-      hostname: "0.0.0.0",
+      hostname: "127.0.0.1",
       port: 0,
       server,
     };

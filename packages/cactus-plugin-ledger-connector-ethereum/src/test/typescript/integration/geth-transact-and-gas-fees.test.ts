@@ -74,7 +74,7 @@ describe("Running ethereum transactions with different gas configurations", () =
     await ledger.start();
 
     const listenOptions: IListenOptions = {
-      hostname: "0.0.0.0",
+      hostname: "127.0.0.1",
       port: 0,
       server,
     };
