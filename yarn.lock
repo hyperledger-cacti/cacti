@@ -7236,25 +7236,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger/cactus-examples-check-connection-ethereum-validator@workspace:examples/cactus-check-connection-ethereum-validator":
-  version: 0.0.0-use.local
-  resolution: "@hyperledger/cactus-examples-check-connection-ethereum-validator@workspace:examples/cactus-check-connection-ethereum-validator"
-  dependencies:
-    "@hyperledger/cactus-common": 2.0.0-alpha.2
-    "@types/escape-html": 1.0.1
-    "@types/express": 4.17.20
-    "@types/js-yaml": 4.0.8
-    "@types/node": 15.14.9
-    "@types/shelljs": 0.8.14
-    escape-html: 1.0.3
-    express: 4.18.2
-    js-yaml: 4.1.0
-    log4js: 6.9.1
-    shelljs: 0.8.5
-    socket.io: 4.5.4
-  languageName: unknown
-  linkType: soft
-
 "@hyperledger/cactus-plugin-consortium-manual@2.0.0-alpha.2, @hyperledger/cactus-plugin-consortium-manual@workspace:packages/cactus-plugin-consortium-manual":
   version: 0.0.0-use.local
   resolution: "@hyperledger/cactus-plugin-consortium-manual@workspace:packages/cactus-plugin-consortium-manual"
@@ -13108,13 +13089,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/js-yaml@npm:4.0.8":
-  version: 4.0.8
-  resolution: "@types/js-yaml@npm:4.0.8"
-  checksum: a5a77a5a1eac7e7fb667156c251c2b947ca4ddfdda570726369dd50bd5b2b1d0da2d0fb4273d1b10aa1782406d7b3da8923d957df4fb89dbfa1db06f43297de2
-  languageName: node
-  linkType: hard
-
 "@types/json-schema@npm:*, @types/json-schema@npm:^7.0.6, @types/json-schema@npm:^7.0.7, @types/json-schema@npm:^7.0.8":
   version: 7.0.9
   resolution: "@types/json-schema@npm:7.0.9"
@@ -13806,16 +13780,6 @@ __metadata:
     "@types/glob": ~7.2.0
     "@types/node": "*"
   checksum: ffb47809abef9ee53f900c6b49adb1382d1d78af7f8b50dd474534e3f73127bc4a3849394e4c9de16481cd50203b12464141b4b49d48e88ba6b4c7cc2c85948c
-  languageName: node
-  linkType: hard
-
-"@types/shelljs@npm:0.8.14":
-  version: 0.8.14
-  resolution: "@types/shelljs@npm:0.8.14"
-  dependencies:
-    "@types/glob": ~7.2.0
-    "@types/node": "*"
-  checksum: d49ed5e5494e30a9d22c0d1104af8587a748da8ff372a6bb0aadf4329b4ae88360238473841f444a8eb067b8478829e55570c627c94f50ea45489bd36e99e567
   languageName: node
   linkType: hard
 
