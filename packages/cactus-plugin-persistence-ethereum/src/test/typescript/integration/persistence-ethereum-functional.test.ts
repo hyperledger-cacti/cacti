@@ -282,7 +282,7 @@ describe("Ethereum persistence plugin tests", () => {
     defaultAccountAddress = account.address;
 
     const addressInfo = (await Servers.listen({
-      hostname: "0.0.0.0",
+      hostname: "127.0.0.1",
       port: 0,
       server: connectorServer,
     })) as AddressInfo;

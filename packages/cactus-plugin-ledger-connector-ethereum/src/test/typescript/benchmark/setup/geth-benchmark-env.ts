@@ -113,7 +113,7 @@ export async function setupBenchmarkEnvironment(
     path: Constants.SocketIoConnectionPathV1,
   });
   const addressInfo = (await Servers.listen({
-    hostname: "0.0.0.0",
+    hostname: "127.0.0.1",
     port: 0,
     server: httpServer,
   })) as AddressInfo;

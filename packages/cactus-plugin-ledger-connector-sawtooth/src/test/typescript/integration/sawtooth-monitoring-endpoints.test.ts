@@ -171,7 +171,7 @@ describe("Sawtooth monitoring endpoints tests", () => {
 
     log.info("Setup ApiServer...");
     const listenOptions: IListenOptions = {
-      hostname: "0.0.0.0",
+      hostname: "127.0.0.1",
       port: 0,
       server,
     };

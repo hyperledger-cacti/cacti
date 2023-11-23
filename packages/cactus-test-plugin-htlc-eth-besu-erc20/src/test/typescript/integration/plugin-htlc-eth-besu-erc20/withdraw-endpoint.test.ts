@@ -88,7 +88,7 @@ describe(testCase, () => {
     expressApp.use(bodyParser.json({ limit: "250mb" }));
     server = http.createServer(expressApp);
     const listenOptions: IListenOptions = {
-      hostname: "0.0.0.0",
+      hostname: "127.0.0.1",
       port: 0,
       server,
     };

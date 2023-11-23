@@ -1,6 +1,6 @@
 /**
  * Stress test to detect possible memory leaks in cactus-verifier-client.
- * Repeated requests are sent to go-ethereum validator (packages/cactus-plugin-ledger-connector-go-ethereum-socketio).
+ * Repeated requests are sent to ethereum validator (packages/cactus-plugin-ledger-connector-ethereum).
  * Run command:
  *  node --expose-gc --no-opt dist/main/typescript/verifier-with-go-eth-stress-check.js
  */
@@ -10,34 +10,34 @@ const testLogLevel: LogLevelDesc = "info";
 const sutLogLevel: LogLevelDesc = "info";
 
 // Ledger settings
-const imageName = "openethereum/openethereum";
-const imageVersion = "v3.3.5";
+const containerImageName = "ghcr.io/hyperledger/cacti-geth-all-in-one";
+const containerImageVersion = "2023-07-27-2a8c48ed6";
 
-// ApiClient settings
-const syncReqTimeout = 1000 * 10; // 10 seconds
-
+import { PluginRegistry } from "@hyperledger/cactus-core";
 import {
   LogLevelDesc,
   LoggerProvider,
   Logger,
+  IListenOptions,
+  Servers,
 } from "@hyperledger/cactus-common";
-
+import { Constants } from "@hyperledger/cactus-core-api";
+import { GethTestLedger } from "@hyperledger/cactus-test-geth-ledger";
 import {
-  OpenEthereumTestLedger,
-  pruneDockerAllIfGithubAction,
-} from "@hyperledger/cactus-test-tooling";
+  EthereumApiClient,
+  PluginLedgerConnectorEthereum,
+} from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
+import { pruneDockerAllIfGithubAction } from "@hyperledger/cactus-test-tooling";
+import { Verifier, VerifierFactory } from "@hyperledger/cactus-verifier-client";
 
-import { SelfSignedPkiGenerator } from "@hyperledger/cactus-cmd-api-server";
-import { SocketIOApiClient } from "@hyperledger/cactus-api-client";
-import {
-  Verifier,
-  VerifierFactory,
-  VerifierFactoryConfig,
-} from "@hyperledger/cactus-verifier-client";
-
-import { Server as HttpsServer } from "https";
-import { Account } from "web3-core";
-import { appendFileSync, writeFileSync } from "fs";
+import http from "http";
+import express from "express";
+import bodyParser from "body-parser";
+import { v4 as uuidV4 } from "uuid";
+import { Server as SocketIoServer } from "socket.io";
+import type { Web3Account } from "web3-eth-accounts";
+import { appendFileSync, writeFileSync } from "node:fs";
+import { AddressInfo } from "node:net";
 
 // Logger setup
 const log: Logger = LoggerProvider.getOrCreate({
@@ -45,13 +45,25 @@ const log: Logger = LoggerProvider.getOrCreate({
   level: testLogLevel,
 });
 
-let ledger: OpenEthereumTestLedger;
-let connectorCertValue: string;
-let connectorPrivKeyValue: string;
-let connectorServer: HttpsServer;
-let verifier: Verifier<SocketIOApiClient>;
-let constTestAcc: Account;
+let ledger: GethTestLedger;
+let connector: PluginLedgerConnectorEthereum;
+let verifier: Verifier<EthereumApiClient>;
+let constTestAcc: Web3Account;
 const constTestAccBalance = 5 * 1000000;
+
+const expressApp = express();
+expressApp.use(bodyParser.json({ limit: "250mb" }));
+const server = http.createServer(expressApp);
+const wsApi = new SocketIoServer(server, {
+  path: Constants.SocketIoConnectionPathV1,
+});
+// Add custom replacer to handle bigint responses correctly
+expressApp.set("json replacer", (_key: string, value: bigint | unknown) => {
+  if (typeof value === "bigint") {
+    return value.toString();
+  }
+  return value;
+});
 
 /**
  * Check current memory usage, log it to the screen and write it to a file for future analysis.
@@ -84,83 +96,50 @@ async function setupEnvironment(): Promise<void> {
   log.info("Prune Docker...");
   await pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
 
-  log.info(`Start Ledger ${imageName}:${imageVersion}...`);
-  ledger = new OpenEthereumTestLedger({
-    imageName,
-    imageVersion,
-    emitContainerLogs: true,
-    logLevel: sutLogLevel,
+  log.info(`Start Ledger ${containerImageName}:${containerImageVersion}...`);
+  ledger = new GethTestLedger({
+    containerImageName,
+    containerImageVersion,
   });
   await ledger.start();
   const ledgerRpcUrl = await ledger.getRpcApiWebSocketHost();
   log.info(`Ledger started, RPC: ${ledgerRpcUrl}`);
 
+  const listenOptions: IListenOptions = {
+    hostname: "127.0.0.1",
+    port: 0,
+    server,
+  };
+  const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
+  const { address, port } = addressInfo;
+  const apiHost = `http://${address}:${port}`;
+  connector = new PluginLedgerConnectorEthereum({
+    instanceId: uuidV4(),
+    rpcApiWsHost: ledgerRpcUrl,
+    logLevel: testLogLevel,
+    pluginRegistry: new PluginRegistry({ plugins: [] }),
+  });
+  await connector.getOrCreateWebServices();
+  await connector.registerWebServices(expressApp, wsApi);
+
   // Create Test Account
   constTestAcc = await ledger.createEthTestAccount(constTestAccBalance);
 
-  // Generate connector private key and certificate
-  const pkiGenerator = new SelfSignedPkiGenerator();
-  const pki = pkiGenerator.create("localhost");
-  connectorPrivKeyValue = pki.privateKeyPem;
-  connectorCertValue = pki.certificatePem;
-  const jwtAlgo = "RS512";
-
-  const connectorConfig: any = {
-    sslParam: {
-      port: 0, // random port
-      keyValue: connectorPrivKeyValue,
-      certValue: connectorCertValue,
-      jwtAlgo: jwtAlgo,
-    },
-    logLevel: sutLogLevel,
-    ledgerUrl: ledgerRpcUrl,
-  };
-  const configJson = JSON.stringify(connectorConfig);
-  log.debug("Connector Config:", configJson);
-
-  log.info("Export connector config before loading the module...");
-  process.env["NODE_CONFIG"] = configJson;
-
-  const conenctorModule = await import(
-    "@hyperledger/cactus-plugin-ledger-connector-go-ethereum-socketio"
-  );
-  // Run the connector
-  connectorServer = await conenctorModule.startGoEthereumSocketIOConnector();
-  const connectorAddress = connectorServer.address();
-  if (!connectorAddress || typeof connectorAddress === "string") {
-    throw new Error("Unexpected go-ethereum connector AddressInfo type");
-  }
-  log.info(
-    "Go-Ethereum-SocketIO Connector started on:",
-    `${connectorAddress.address}:${connectorAddress.port}`,
-  );
-
   // Create Verifier
-  const ledgerPluginInfo: VerifierFactoryConfig = [
-    {
-      validatorID: "go-eth-socketio-test",
-      validatorType: "legacy-socketio",
-      validatorURL: `https://localhost:${connectorAddress.port}`,
-      validatorKeyValue: connectorCertValue,
-      logLevel: sutLogLevel,
-      maxCounterRequestID: 1000,
-      syncFunctionTimeoutMillisecond: syncReqTimeout,
-      socketOptions: {
-        rejectUnauthorized: false,
-        reconnection: false,
-        timeout: syncReqTimeout * 2,
+  const ethereumValidatorId = "eth_openapi_connector";
+  const verifierFactory = new VerifierFactory(
+    [
+      {
+        validatorID: ethereumValidatorId,
+        validatorType: "ETH_1X",
+        basePath: apiHost,
+        logLevel: sutLogLevel,
       },
-      ledgerInfo: {
-        ledgerAbstract: "Go-Ethereum Ledger",
-      },
-      apiInfo: [],
-    },
-  ];
-  const verifierFactory = new VerifierFactory(ledgerPluginInfo);
-  verifier = verifierFactory.getVerifier(
-    "go-eth-socketio-test",
-    "legacy-socketio",
+    ],
+    sutLogLevel,
   );
+
+  verifier = verifierFactory.getVerifier(ethereumValidatorId, "ETH_1X");
 
   // Clear the stress log file
   writeFileSync(STRESS_LOG_FILENAME, "");
@@ -170,31 +149,27 @@ async function setupEnvironment(): Promise<void> {
  * Cleanup the ledger and cactus connector
  */
 async function cleanupEnvironment(): Promise<void> {
-  log.info("FINISHING THE TESTS");
-
-  if (verifier) {
-    log.info("Close Verifier ApiClient connection...");
-    verifier.ledgerApi.close();
+  if (server) {
+    log.info("Shutdown the connector server...");
+    await Servers.shutdown(server);
   }
 
-  // Report after verifier close
-  await new Promise((resolve) => setTimeout(resolve, 2000));
-  checkMemory();
-
-  if (connectorServer) {
-    log.info("Stop the ethereum connector...");
-    await new Promise<void>((resolve) =>
-      connectorServer.close(() => resolve()),
-    );
+  if (connector) {
+    log.info("Shutdown the connector...");
+    await connector.shutdown();
   }
 
   if (ledger) {
-    log.info("Stop the ethereum ledger...");
+    log.info("Stop and destroy the test ledger...");
     await ledger.stop();
     await ledger.destroy();
   }
 
-  log.info("Prune Docker...");
+  // Report after connector close
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+  checkMemory();
+
+  log.info("Prune docker...");
   await pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
 }
 
@@ -203,7 +178,7 @@ async function cleanupEnvironment(): Promise<void> {
  */
 async function executeTest(): Promise<void> {
   // getNumericBalance input
-  const getBalanceMethod = { type: "function", command: "getNumericBalance" };
+  const getBalanceMethod = { type: "web3Eth", command: "getBalance" };
   const getBalanceArgs = {
     args: [constTestAcc.address],
   };
