@@ -7,12 +7,7 @@ import {
   ServerOptions as SocketServerOptions,
   Socket as ServerSocket,
 } from "socket.io";
-import {
-  io,
-  Socket as ClientSocket,
-  ManagerOptions,
-  SocketOptions,
-} from "socket.io-client-fixed-types";
+import { io, Socket as ClientSocket } from "socket.io-client-fixed-types";
 import { createServer } from "http";
 
 export { Server, ServerSocket, ClientSocket };
@@ -53,13 +48,13 @@ export function createListeningMockServer(): Promise<[Server, string]> {
  * @port - Localhost port to connect to.
  */
 export function createClientSocket(port: string): ClientSocket {
-  const clientSocketOpts: Partial<ManagerOptions & SocketOptions> = {
+  const clientSocketOpts = {
     reconnectionAttempts: 10,
     reconnectionDelay: 1000,
     transports: ["websocket"],
   };
 
-  return io(`http://127.0.0.1:${port}`, clientSocketOpts as any);
+  return io(`http://127.0.0.1:${port}`, clientSocketOpts);
 }
 
 /**
