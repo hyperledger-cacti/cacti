@@ -161,7 +161,7 @@ function eciesEncryptMessage(recipientPublicKey, msg, options) {
     const hKm = bitsToBytes(hmacKeyHash.finalize());
 
     const iv = crypto.randomBytes(IVLength);
-    const cipher = crypto.createCipheriv("aes-128-ctr", Buffer.from(aesKey), iv);
+    const cipher = crypto.createCipheriv("aes-256-ctr", Buffer.from(aesKey), iv);
     const encryptedBytes = cipher.update(msg);
     const EM = Buffer.concat([iv, encryptedBytes]);
     const D = hmac(hKm, EM, options);
