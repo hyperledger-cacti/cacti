@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"hash"
 	"math/big"
-	mrand "math/rand"
 	"time"
 
 	"golang.org/x/crypto/ed25519"
@@ -207,7 +206,7 @@ func ecdsaVerify(verKey *ecdsa.PublicKey, msgHash, signature []byte) error {
 	return nil
 }
 
-//Validate Ed25519 signature
+// Validate Ed25519 signature
 func verifyEd25519Signature(pubKey []byte, hashedMessage []byte, signature []byte) error {
 
 	result := ed25519.Verify(pubKey, hashedMessage, signature)
@@ -297,12 +296,31 @@ func encryptWithEd25519PublicKey(message []byte, pubKey []byte) ([]byte, error) 
 	return []byte(""), nil
 }
 
+func generateSecureRandomKey(length int) ([]byte, error) {
+	key := make([]byte, length)
+	_, err := rand.Read(key)
+	if err != nil {
+		return nil, err
+	}
+	return key, nil
+}
+
+func generateHMAC(data, key []byte) ([]byte, error) {
+	hmacHash := hmac.New(sha256.New, key)
+	_, err := hmacHash.Write(data)
+	if err != nil {
+		return nil, err
+	}
+	return hmacHash.Sum(nil), nil
+}
+
 func generateConfidentialInteropPayloadAndHash(message []byte, cert string) ([]byte, error) {
 	// Generate a 16-byte random key for the HMAC
-	hashKey := make([]byte, 16)
-	for i := 0; i < 16 ; i++ {
-		hashKey[i] = byte(mrand.Intn(255))
+	hashKey, err := generateSecureRandomKey(16)
+	if err != nil {
+		return []byte(""), err
 	}
+
 	confidentialPayloadContents := common.ConfidentialPayloadContents{
 		Payload: message,
 		Random: hashKey,
@@ -311,22 +329,26 @@ func generateConfidentialInteropPayloadAndHash(message []byte, cert string) ([]b
 	if err != nil {
 		return []byte(""), err
 	}
+
 	x509Cert, err := parseCert(cert)
 	if err != nil {
 		return []byte(""), err
 	}
+
 	encryptedPayload, err := encryptWithCert(confidentialPayloadContentsBytes, x509Cert)
 	if err != nil {
 		return []byte(""), err
 	}
 
-	payloadHMAC := hmac.New(sha256.New, hashKey)
-	payloadHMAC.Write(message)
-	payloadHMACBytes := payloadHMAC.Sum(nil)
+	payloadHMAC, err := generateHMAC(message, hashKey)
+	if err != nil {
+		return []byte(""), err
+	}
+
 	confidentialPayload := common.ConfidentialPayload{
 		EncryptedPayload: encryptedPayload,
 		HashType: common.ConfidentialPayload_HMAC,
-		Hash: payloadHMACBytes,
+		Hash: payloadHMAC,
 	}
 	confidentialPayloadBytes, err := proto.Marshal(&confidentialPayload)
 	if err != nil {
