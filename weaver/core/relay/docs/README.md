@@ -10,6 +10,30 @@ $ make start-interop-local CHAINCODE_NAME=satpsimpleasset
 
 ## Run the gateway
 
+Before running the gateway, you need to ensure SQLite (the default database for logs) is installed:
+
+```
+sudo apt-get update
+sudo apt-get install libsqlite3-dev
+```
+
+Use your favorite tool to create a SQLite database named 'gateway_log.db' and create the following table:
+```
+CREATE TABLE log_entries (
+    id INTEGER PRIMARY KEY,
+    debug_level TEXT,
+    timestamp TEXT,
+    request_id TEXT,
+    request TEXT,
+    step_id TEXT,
+    operation TEXT,
+    network_id TEXT,
+    gateway_id TEXT,
+    received TEXT,
+    details TEXT
+);
+```
+
 In a new terminal, run the following commands:
 ```
 $ cd weaver/core/relay

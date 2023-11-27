@@ -11,3 +11,4 @@ pub mod helpers;
 pub mod satp_helper;
 pub mod types;
 pub mod constants;
+pub mod logger;

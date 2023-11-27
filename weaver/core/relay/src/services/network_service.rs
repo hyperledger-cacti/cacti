@@ -28,8 +28,8 @@ use crate::services::helpers::{
 };
 use crate::services::satp_helper::{
     create_transfer_proposal_claims_request, get_relay_from_transfer_proposal_claims,
-    get_relay_params, get_request_id_from_transfer_proposal_claims, log_request_in_local_satp_db,
-    log_request_state_in_local_satp_db, spawn_send_transfer_proposal_claims_request,
+    get_relay_params, get_request_id_from_transfer_proposal_claims,
+    spawn_send_transfer_proposal_claims_request,
 };
 
 // External modules
@@ -535,65 +535,11 @@ impl Network for NetworkService {
             create_transfer_proposal_claims_request(network_asset_transfer.clone());
         let request_id =
             get_request_id_from_transfer_proposal_claims(transfer_proposal_claims_request.clone());
-        // TODO refactor
-        let request_logged: Result<Option<sled::IVec>, crate::error::Error> =
-            log_request_in_local_satp_db(&request_id, &network_asset_transfer, conf.clone());
-        match request_logged {
-            Ok(_) => println!(
-                "Successfully stored NetworkAssetTransfer in local satp_db with request_id: {}",
-                request_id
-            ),
-            Err(e) => {
-                // Internal failure of sled. Send Error response
-                println!(
-                    "Error storing NetworkAssetTransfer in local satp_db for request_id: {}",
-                    request_id
-                );
-                let reply = Ok(Response::new(Ack {
-                    status: ack::Status::Error as i32,
-                    request_id: request_id,
-                    message: format!(
-                        "Error storing NetworkAssetTransfer in local satp_db {:?}",
-                        e
-                    ),
-                }));
-                println!("Sending Ack back with an error to network of the asset transfer request: {:?}\n", reply);
-                return reply;
-            }
-        }
-
-        // Initial request state stored in DB.
-        let target: RequestState = RequestState {
-            status: request_state::Status::PendingAck as i32,
-            request_id: request_id.clone(),
-            state: None,
-        };
-        let request_state_logged: Result<Option<sled::IVec>, crate::error::Error> =
-            log_request_state_in_local_satp_db(&request_id, &target, conf.clone());
-        match request_state_logged {
-            Ok(_) => println!(
-                "Successfully stored RequestState in local satp_db with request_id: {}",
-                request_id
-            ),
-            Err(e) => {
-                // Internal failure of sled. Send Error response
-                println!(
-                    "Error storing RequestState in local satp_db for request_id: {}",
-                    request_id
-                );
-                let reply = Ok(Response::new(Ack {
-                    status: ack::Status::Error as i32,
-                    request_id: request_id,
-                    message: format!("Error storing RequestState in local satp_db {:?}", e),
-                }));
-                println!("Sending Ack back with an error to network of the asset transfer request: {:?}\n", reply);
-                return reply;
-            }
-        }
+        // TODO refactor / add log entry
 
         let parsed_address = parse_address(network_asset_transfer.address.to_string());
         match parsed_address {
-            Ok(address) => {
+            Ok(_address) => {
                 let (relay_host, relay_port) = get_relay_from_transfer_proposal_claims(
                     transfer_proposal_claims_request.clone(),
                 );
@@ -608,7 +554,6 @@ impl Network for NetworkService {
                     relay_port,
                     use_tls,
                     tlsca_cert_path,
-                    conf,
                 );
                 // Send Ack back to network while request is happening in a thread
                 let reply = Ack {

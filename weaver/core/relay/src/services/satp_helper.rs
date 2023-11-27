@@ -1,11 +1,11 @@
+use crate::error::Error;
+use crate::relay_proto::LocationSegment;
+use crate::services::helpers::get_driver_client;
+use crate::services::logger::Operation;
 use config::Config;
-use serde::de::DeserializeOwned;
-use serde::Serialize;
-use sled::IVec;
 use tonic::transport::{Certificate, Channel, ClientTlsConfig};
 use tonic::Response;
 use weaverpb::common::ack::{ack, Ack};
-use weaverpb::common::state::{request_state, RequestState};
 use weaverpb::driver::driver::{
     AssignAssetRequest, CreateAssetRequest, ExtinguishRequest, PerformLockRequest,
 };
@@ -17,16 +17,7 @@ use weaverpb::relay::satp::{
     TransferCommenceRequest, TransferCompletedRequest, TransferProposalClaimsRequest,
     TransferProposalReceiptRequest,
 };
-
-use crate::db::Database;
-use crate::error::{self, Error};
-use crate::relay_proto::LocationSegment;
-use crate::services::helpers::get_driver_client;
-
-use super::constants::{
-    SATP_DB_PATH, SATP_REMOTE_REQUESTS_DB_PATH, SATP_REMOTE_REQUESTS_STATES_DB_PATH,
-    SATP_REQUESTS_DB_PATH, SATP_REQUESTS_STATES_DB_PATH,
-};
+use super::logger::LogEntry;
 use super::types::Driver;
 
 // Sends a request to the receiving gateway
@@ -36,7 +27,6 @@ pub fn spawn_send_transfer_proposal_claims_request(
     relay_port: String,
     use_tls: bool,
     tlsca_cert_path: String,
-    conf: Config,
 ) {
     println!(
         "Sending transfer proposal claims request to receiver gateway: {:?}:{:?}",
@@ -61,7 +51,7 @@ pub fn spawn_send_transfer_proposal_claims_request(
 
         println!("Received Ack from sending gateway: {:?}\n", result);
         // Updates the request in the DB depending on the response status from the sending gateway
-        log_request_result_in_local_satp_db(&request_id, result, conf);
+        log_request_result(&request_id, result);
     });
 }
 
@@ -72,7 +62,6 @@ pub fn spawn_send_transfer_commence_request(
     relay_port: String,
     use_tls: bool,
     tlsca_cert_path: String,
-    conf: Config,
 ) {
     println!(
         "Sending transfer commence request to receiver gateway: {:?}:{:?}",
@@ -96,7 +85,7 @@ pub fn spawn_send_transfer_commence_request(
 
         println!("Received Ack from sending gateway: {:?}\n", result);
         // Updates the request in the DB depending on the response status from the sending gateway
-        log_request_result_in_local_satp_db(&request_id, result, conf);
+        log_request_result(&request_id, result);
     });
 }
 
@@ -106,7 +95,6 @@ pub fn spawn_send_transfer_proposal_receipt_request(
     relay_port: String,
     use_tls: bool,
     tlsca_cert_path: String,
-    conf: Config,
 ) {
     tokio::spawn(async move {
         let request_id = get_request_id_from_transfer_proposal_receipt(
@@ -116,6 +104,21 @@ pub fn spawn_send_transfer_proposal_receipt_request(
             "Sending transfer proposal receipt back to sending gateway: Request ID = {:?}",
             request_id
         );
+
+        let log_entry = LogEntry {
+            request_id: request_id.clone(),
+            request: serde_json::to_string(&transfer_proposal_receipt_request.clone()).unwrap(),
+            step_id: "1.2".to_string(),
+            operation: Operation::Init,
+            network_id: "todo_network_id".to_string(),
+            gateway_id: transfer_proposal_receipt_request
+                .clone()
+                .sender_gateway_network_id,
+            received: false,
+            details: None,
+        };
+        log::debug!("{}", log_entry);
+
         let result = call_transfer_proposal_receipt(
             relay_host,
             relay_port,
@@ -127,7 +130,7 @@ pub fn spawn_send_transfer_proposal_receipt_request(
 
         println!("Received Ack from sending gateway: {:?}\n", result);
         // Updates the request in the DB depending on the response status from the sending gateway
-        log_request_result_in_local_satp_db(&request_id, result, conf);
+        log_request_result(&request_id, result);
     });
 }
 
@@ -137,7 +140,6 @@ pub fn spawn_send_ack_commence_request(
     relay_port: String,
     use_tls: bool,
     tlsca_cert_path: String,
-    conf: Config,
 ) {
     tokio::spawn(async move {
         let request_id = ack_commence_request.session_id.to_string();
@@ -156,7 +158,7 @@ pub fn spawn_send_ack_commence_request(
 
         println!("Received Ack from sending gateway: {:?}\n", result);
         // Updates the request in the DB depending on the response status from the sending gateway
-        log_request_result_in_local_satp_db(&request_id, result, conf);
+        log_request_result(&request_id, result);
     });
 }
 
@@ -191,7 +193,6 @@ pub fn spawn_send_lock_assertion_broadcast_request(
     relay_port: String,
     use_tls: bool,
     tlsca_cert_path: String,
-    conf: Config,
 ) {
     tokio::spawn(async move {
         let request_id = lock_assertion_request.session_id.to_string();
@@ -216,7 +217,7 @@ pub fn spawn_send_lock_assertion_broadcast_request(
         println!("Received Ack from sending gateway: {:?}\n", result);
         // Updates the request in the DB depending on the response status from the sending gateway
         let request_id = lock_assertion_receipt_request.session_id.to_string();
-        log_request_result_in_local_satp_db(&request_id, result, conf);
+        log_request_result(&request_id, result);
     });
 }
 
@@ -226,7 +227,6 @@ pub fn spawn_send_lock_assertion_request(
     relay_port: String,
     use_tls: bool,
     tlsca_cert_path: String,
-    conf: Config,
 ) {
     tokio::spawn(async move {
         let request_id = lock_assertion_request.session_id.to_string();
@@ -243,7 +243,7 @@ pub fn spawn_send_lock_assertion_request(
         println!("Received Ack from sending gateway: {:?}\n", result);
         // Updates the request in the DB depending on the response status from the sending gateway
         let request_id = lock_assertion_request.session_id.to_string();
-        log_request_result_in_local_satp_db(&request_id, result, conf);
+        log_request_result(&request_id, result);
     });
 }
 
@@ -254,7 +254,6 @@ pub fn spawn_send_commit_prepare_request(
     relay_port: String,
     use_tls: bool,
     tlsca_cert_path: String,
-    conf: Config,
 ) {
     println!(
         "Sending commit prepare request to receiver gateway: {:?}:{:?}",
@@ -274,7 +273,7 @@ pub fn spawn_send_commit_prepare_request(
 
         println!("Received Ack from sending gateway: {:?}\n", result);
         // Updates the request in the DB depending on the response status from the sending gateway
-        log_request_result_in_local_satp_db(&request_id, result, conf);
+        log_request_result(&request_id, result);
     });
 }
 
@@ -310,10 +309,8 @@ pub fn spawn_send_commit_ready_request(
     relay_port: String,
     use_tls: bool,
     tlsca_cert_path: String,
-    conf: Config,
 ) {
     tokio::spawn(async move {
-        let request_id = commit_ready_request.session_id.to_string();
         let result = call_commit_ready(
             relay_host,
             relay_port,
@@ -326,7 +323,7 @@ pub fn spawn_send_commit_ready_request(
         println!("Received Ack from sending gateway: {:?}\n", result);
         // Updates the request in the DB depending on the response status from the sending gateway
         let request_id = commit_ready_request.session_id.to_string();
-        log_request_result_in_local_satp_db(&request_id, result, conf);
+        log_request_result(&request_id, result);
     });
 }
 
@@ -362,10 +359,8 @@ pub fn spawn_send_ack_final_receipt_request(
     relay_port: String,
     use_tls: bool,
     tlsca_cert_path: String,
-    conf: Config,
 ) {
     tokio::spawn(async move {
-        let request_id = ack_final_receipt_request.session_id.to_string();
         let result = call_ack_final_receipt(
             relay_host,
             relay_port,
@@ -378,7 +373,7 @@ pub fn spawn_send_ack_final_receipt_request(
         println!("Received Ack from sending gateway: {:?}\n", result);
         // Updates the request in the DB depending on the response status from the sending gateway
         let request_id = ack_final_receipt_request.session_id.to_string();
-        log_request_result_in_local_satp_db(&request_id, result, conf);
+        log_request_result(&request_id, result);
     });
 }
 
@@ -388,7 +383,6 @@ pub fn spawn_send_ack_final_receipt_broadcast_request(
     relay_port: String,
     use_tls: bool,
     tlsca_cert_path: String,
-    conf: Config,
 ) {
     tokio::spawn(async move {
         let request_id = ack_final_receipt_request.session_id.to_string();
@@ -415,7 +409,7 @@ pub fn spawn_send_ack_final_receipt_broadcast_request(
         println!("Received Ack from sending gateway: {:?}\n", result);
         // Updates the request in the DB depending on the response status from the sending gateway
         let request_id = transfer_completed_request.session_id.to_string();
-        log_request_result_in_local_satp_db(&request_id, result, conf);
+        log_request_result(&request_id, result);
     });
 }
 
@@ -451,7 +445,6 @@ pub fn spawn_send_commit_final_assertion_request(
     relay_port: String,
     use_tls: bool,
     tlsca_cert_path: String,
-    conf: Config,
 ) {
     tokio::spawn(async move {
         let request_id = commit_final_assertion_request.session_id.to_string();
@@ -471,7 +464,7 @@ pub fn spawn_send_commit_final_assertion_request(
         println!("Received Ack from sending gateway: {:?}\n", result);
         // Updates the request in the DB depending on the response status from the sending gateway
         let request_id = commit_final_assertion_request.session_id.to_string();
-        log_request_result_in_local_satp_db(&request_id, result, conf);
+        log_request_result(&request_id, result);
     });
 }
 
@@ -790,10 +783,9 @@ pub async fn call_commit_final_assertion_receipt(
     Ok(response)
 }
 
-pub fn log_request_result_in_local_satp_db(
+pub fn log_request_result(
     request_id: &String,
     result: Result<Response<Ack>, Box<dyn std::error::Error>>,
-    conf: Config,
 ) {
     match result {
         Ok(ack_response) => {
@@ -801,37 +793,51 @@ pub fn log_request_result_in_local_satp_db(
             // This match first checks if the status is valid.
             match ack::Status::from_i32(ack_response_into_inner.status) {
                 Some(status) => match status {
-                    ack::Status::Ok => update_request_state_in_local_satp_db(
-                        request_id.to_string(),
-                        request_state::Status::Pending,
-                        None,
-                        conf,
-                    ),
-                    ack::Status::Error => update_request_state_in_local_satp_db(
-                        request_id.to_string(),
-                        request_state::Status::Error,
-                        Some(request_state::State::Error(
-                            ack_response_into_inner.message.to_string(),
-                        )),
-                        conf,
-                    ),
+                    ack::Status::Ok => {
+                        let log_entry = LogEntry {
+                            request_id: request_id.clone(),
+                            request: "".to_string(),
+                            step_id: "".to_string(),
+                            operation: Operation::Done,
+                            network_id: "".to_string(),
+                            gateway_id: "".to_string(),
+                            received: false,
+                            details: None,
+                        };
+                        log::debug!("{}", log_entry);
+                    }
+                    ack::Status::Error => {
+                        let log_entry = LogEntry {
+                            request_id: request_id.clone(),
+                            request: "".to_string(),
+                            step_id: "".to_string(),
+                            operation: Operation::Failed,
+                            network_id: "".to_string(),
+                            gateway_id: "".to_string(),
+                            received: false,
+                            details: Some(ack_response_into_inner.message),
+                        };
+                        log::debug!("{}", log_entry);
+                    }
                 },
-                None => update_request_state_in_local_satp_db(
-                    request_id.to_string(),
-                    request_state::Status::Error,
-                    Some(request_state::State::Error(
-                        "Status is not supported or is invalid".to_string(),
-                    )),
-                    conf,
-                ),
+                None => {
+                    // TODO
+                }
             }
         }
-        Err(result_error) => update_request_state_in_local_satp_db(
-            request_id.to_string(),
-            request_state::Status::Error,
-            Some(request_state::State::Error(format!("{:?}", result_error))),
-            conf,
-        ),
+        Err(result_error) => {
+            let log_entry = LogEntry {
+                request_id: request_id.clone(),
+                request: "".to_string(),
+                step_id: "".to_string(),
+                operation: Operation::Failed,
+                network_id: "".to_string(),
+                gateway_id: "".to_string(),
+                received: false,
+                details: Some(result_error.to_string()),
+            };
+            log::debug!("{}", log_entry);
+        }
     }
 }
 
@@ -851,9 +857,8 @@ pub fn create_ack_error_message(
 }
 
 pub fn create_transfer_proposal_claims_request(
-    network_asset_transfer: NetworkAssetTransfer,
+    _network_asset_transfer: NetworkAssetTransfer,
 ) -> TransferProposalClaimsRequest {
-    let session_id = "to_be_calculated_session_id";
     let transfer_proposal_claims_request = TransferProposalClaimsRequest {
         message_type: "message_type1".to_string(),
         client_identity_pubkey: "client_identity_pubkey1".to_string(),
@@ -873,7 +878,7 @@ pub fn create_transfer_proposal_claims_request(
 }
 
 pub fn create_transfer_commence_request(
-    transfer_proposal_receipt_request: TransferProposalReceiptRequest,
+    _transfer_proposal_receipt_request: TransferProposalReceiptRequest,
 ) -> TransferCommenceRequest {
     let session_id = "to_be_calculated_session_id";
     let transfer_commence_request = TransferCommenceRequest {
@@ -891,7 +896,7 @@ pub fn create_transfer_commence_request(
 }
 
 pub fn create_transfer_proposal_receipt_request(
-    transfer_proposal_claims_request: TransferProposalClaimsRequest,
+    _transfer_proposal_claims_request: TransferProposalClaimsRequest,
 ) -> TransferProposalReceiptRequest {
     // TODO: remove hard coded values
     let transfer_proposal_receipt_request = TransferProposalReceiptRequest {
@@ -913,7 +918,7 @@ pub fn create_transfer_proposal_receipt_request(
 }
 
 pub fn create_ack_commence_request(
-    transfer_commence_request: TransferCommenceRequest,
+    _transfer_commence_request: TransferCommenceRequest,
 ) -> AckCommenceRequest {
     // TODO: remove hard coded values
     let ack_commence_request = AckCommenceRequest {
@@ -930,7 +935,7 @@ pub fn create_ack_commence_request(
 }
 
 pub fn create_lock_assertion_request(
-    send_asset_status_request: SendAssetStatusRequest,
+    _send_asset_status_request: SendAssetStatusRequest,
 ) -> LockAssertionRequest {
     // TODO: remove hard coded values
     let lock_assertion_request = LockAssertionRequest {
@@ -950,7 +955,7 @@ pub fn create_lock_assertion_request(
 }
 
 pub fn create_lock_assertion_receipt_request(
-    lock_assertion_request: LockAssertionRequest,
+    _lock_assertion_request: LockAssertionRequest,
 ) -> LockAssertionReceiptRequest {
     // TODO: remove hard coded values
     let lock_assertion_receipt_request = LockAssertionReceiptRequest {
@@ -967,7 +972,7 @@ pub fn create_lock_assertion_receipt_request(
 }
 
 pub fn create_commit_prepare_request(
-    lock_assertion_receipt_request: LockAssertionReceiptRequest,
+    _lock_assertion_receipt_request: LockAssertionReceiptRequest,
 ) -> CommitPrepareRequest {
     // TODO: remove hard coded values
     let commit_prepare_request = CommitPrepareRequest {
@@ -979,7 +984,7 @@ pub fn create_commit_prepare_request(
 }
 
 pub fn create_commit_ready_request(
-    send_asset_status_request: SendAssetStatusRequest,
+    _send_asset_status_request: SendAssetStatusRequest,
 ) -> CommitReadyRequest {
     // TODO: remove hard coded values
     let commit_ready_request = CommitReadyRequest {
@@ -991,7 +996,7 @@ pub fn create_commit_ready_request(
 }
 
 pub fn create_commit_final_assertion_request(
-    send_asset_status_request: SendAssetStatusRequest,
+    _send_asset_status_request: SendAssetStatusRequest,
 ) -> CommitFinalAssertionRequest {
     // TODO: remove hard coded values
     let commit_final_assertion_request = CommitFinalAssertionRequest {
@@ -1003,7 +1008,7 @@ pub fn create_commit_final_assertion_request(
 }
 
 pub fn create_ack_final_receipt_request(
-    send_asset_status_request: SendAssetStatusRequest,
+    _send_asset_status_request: SendAssetStatusRequest,
 ) -> AckFinalReceiptRequest {
     // TODO: remove hard coded values
     let ack_final_receipt_request = AckFinalReceiptRequest {
@@ -1015,7 +1020,7 @@ pub fn create_ack_final_receipt_request(
 }
 
 pub fn create_transfer_completed_request(
-    ack_final_receipt_request: AckFinalReceiptRequest,
+    _ack_final_receipt_request: AckFinalReceiptRequest,
 ) -> TransferCompletedRequest {
     // TODO: remove hard coded values
     let transfer_completed_request = TransferCompletedRequest {
@@ -1026,7 +1031,7 @@ pub fn create_transfer_completed_request(
     return transfer_completed_request;
 }
 
-pub fn create_perform_lock_request(ack_commence_request: AckCommenceRequest) -> PerformLockRequest {
+pub fn create_perform_lock_request(_ack_commence_request: AckCommenceRequest) -> PerformLockRequest {
     // TODO: remove hard coded values
     let perform_lock_request = PerformLockRequest {
         session_id: "session_id1".to_string(),
@@ -1035,7 +1040,7 @@ pub fn create_perform_lock_request(ack_commence_request: AckCommenceRequest) -> 
 }
 
 pub fn create_create_asset_request(
-    commit_prepare_request: CommitPrepareRequest,
+    _commit_prepare_request: CommitPrepareRequest,
 ) -> CreateAssetRequest {
     // TODO: remove hard coded values
     let create_asset_request = CreateAssetRequest {
@@ -1044,7 +1049,7 @@ pub fn create_create_asset_request(
     return create_asset_request;
 }
 
-pub fn create_extinguish_request(commit_ready_request: CommitReadyRequest) -> ExtinguishRequest {
+pub fn create_extinguish_request(_commit_ready_request: CommitReadyRequest) -> ExtinguishRequest {
     // TODO: remove hard coded values
     let extinguish_request = ExtinguishRequest {
         session_id: "session_id1".to_string(),
@@ -1053,7 +1058,7 @@ pub fn create_extinguish_request(commit_ready_request: CommitReadyRequest) -> Ex
 }
 
 pub fn create_assign_asset_request(
-    commit_final_assertion_request: CommitFinalAssertionRequest,
+    _commit_final_assertion_request: CommitFinalAssertionRequest,
 ) -> AssignAssetRequest {
     // TODO: remove hard coded values
     let assign_asset_request = AssignAssetRequest {
@@ -1062,242 +1067,81 @@ pub fn create_assign_asset_request(
     return assign_asset_request;
 }
 
-pub fn generate_commit_final_assertion_request(
-    commit_ready_request: CommitReadyRequest,
-) -> CommitFinalAssertionRequest {
-    // TODO Get the corresponding send_asset_status_request from db
-    // TODO: remove hard coded values
-    let commit_final_assertion_request = CommitFinalAssertionRequest {
-        message_type: "message_type1".to_string(),
-        session_id: "session_id1".to_string(),
-        transfer_context_id: "transfer_context_id1".to_string(),
-    };
-    return commit_final_assertion_request;
-}
-
-pub fn generate_commit_ready_request(
-    commit_prepare_request: CommitPrepareRequest,
-) -> CommitReadyRequest {
-    // TODO Get the corresponding send_asset_status_request from db
-    // TODO: remove hard coded values
-    let commit_ready_request = CommitReadyRequest {
-        message_type: "message_type1".to_string(),
-        session_id: "session_id1".to_string(),
-        transfer_context_id: "transfer_context_id1".to_string(),
-    };
-    return commit_ready_request;
-}
-
-pub fn generate_ack_final_receipt_request(
-    commit_final_assertion_request: CommitFinalAssertionRequest,
-) -> AckFinalReceiptRequest {
-    // TODO Get the corresponding send_asset_status_request from db
-    // TODO: remove hard coded values
-    let ack_final_receipt_request = AckFinalReceiptRequest {
-        message_type: "message_type1".to_string(),
-        session_id: "session_id1".to_string(),
-        transfer_context_id: "transfer_context_id1".to_string(),
-    };
-    return ack_final_receipt_request;
-}
-
-pub fn get_satp_requests_local_db(conf: Config) -> Database {
-    let db = Database {
-        db_path: format!(
-            "{}{}",
-            conf.get_str(SATP_DB_PATH).unwrap(),
-            SATP_REQUESTS_DB_PATH
-        ),
-        db_open_max_retries: conf.get_int("db_open_max_retries").unwrap_or(500) as u32,
-        db_open_retry_backoff_msec: conf.get_int("db_open_retry_backoff_msec").unwrap_or(10) as u32,
-    };
-    return db;
-}
-
-pub fn get_satp_requests_remote_db(conf: Config) -> Database {
-    let db = Database {
-        db_path: format!(
-            "{}{}",
-            conf.get_str(SATP_DB_PATH).unwrap(),
-            SATP_REMOTE_REQUESTS_DB_PATH
-        ),
-        db_open_max_retries: conf.get_int("db_open_max_retries").unwrap_or(500) as u32,
-        db_open_retry_backoff_msec: conf.get_int("db_open_retry_backoff_msec").unwrap_or(10) as u32,
-    };
-    return db;
-}
-
-pub fn get_satp_requests_states_local_db(conf: Config) -> Database {
-    let db = Database {
-        db_path: format!(
-            "{}{}",
-            conf.get_str(SATP_DB_PATH).unwrap(),
-            SATP_REQUESTS_STATES_DB_PATH
-        ),
-        db_open_max_retries: conf.get_int("db_open_max_retries").unwrap_or(500) as u32,
-        db_open_retry_backoff_msec: conf.get_int("db_open_retry_backoff_msec").unwrap_or(10) as u32,
-    };
-    return db;
-}
-
-pub fn get_satp_requests_states_remote_db(conf: Config) -> Database {
-    let db = Database {
-        db_path: format!(
-            "{}{}",
-            conf.get_str(SATP_DB_PATH).unwrap(),
-            SATP_REMOTE_REQUESTS_STATES_DB_PATH
-        ),
-        db_open_max_retries: conf.get_int("db_open_max_retries").unwrap_or(500) as u32,
-        db_open_retry_backoff_msec: conf.get_int("db_open_retry_backoff_msec").unwrap_or(10) as u32,
-    };
-    return db;
-}
-
-pub fn log_request_state_in_local_satp_db(
-    request_id: &String,
-    target: &RequestState,
-    conf: Config,
-) -> Result<std::option::Option<IVec>, error::Error> {
-    let db = get_satp_requests_states_local_db(conf);
-    return db.set(&request_id, &target);
-}
-
-pub fn log_request_in_local_satp_db<T: Serialize>(
-    request_id: &String,
-    value: T,
-    conf: Config,
-) -> Result<std::option::Option<IVec>, error::Error> {
-    let db = get_satp_requests_local_db(conf);
-    return db.set(&request_id, &value);
-}
-
-pub fn log_request_in_remote_satp_db<T: Serialize>(
-    request_id: &String,
-    value: T,
-    conf: Config,
-) -> Result<std::option::Option<IVec>, error::Error> {
-    let db = get_satp_requests_remote_db(conf);
-    return db.set(&request_id, &value);
-}
-
-pub fn get_request_from_remote_satp_db<T: DeserializeOwned>(
-    request_id: &String,
-    conf: Config,
-) -> Result<T, error::Error> {
-    let db = get_satp_requests_remote_db(conf);
-    let query: Result<T, error::Error> = db
-        .get::<T>(request_id.to_string())
-        .map_err(|e| Error::GetQuery(format!("Failed to get query from db. Error: {:?}", e)));
-    return query;
-}
-
-pub fn update_request_state_in_local_satp_db(
-    request_id: String,
-    new_status: request_state::Status,
-    state: Option<request_state::State>,
-    conf: Config,
-) {
-    let db = get_satp_requests_states_local_db(conf);
-    let target: RequestState = RequestState {
-        status: new_status as i32,
-        request_id: request_id.clone(),
-        state,
-    };
-    db.set(&request_id, &target)
-        .expect("Failed to insert into DB");
-    println!("Successfully written RequestState to database");
-    println!("{:?}\n", db.get::<RequestState>(request_id).unwrap())
-}
-
 pub fn get_relay_from_transfer_proposal_claims(
-    transfer_proposal_claims_request: TransferProposalClaimsRequest,
+    _transfer_proposal_claims_request: TransferProposalClaimsRequest,
 ) -> (String, String) {
     // TODO
     return ("localhost".to_string(), "9085".to_string());
 }
 
 pub fn get_relay_from_transfer_proposal_receipt(
-    transfer_proposal_receipt_request: TransferProposalReceiptRequest,
+    _transfer_proposal_receipt_request: TransferProposalReceiptRequest,
 ) -> (String, String) {
     // TODO
     return ("localhost".to_string(), "9085".to_string());
 }
 
 pub fn get_relay_from_transfer_commence(
-    transfer_commence_request: TransferCommenceRequest,
+    _transfer_commence_request: TransferCommenceRequest,
 ) -> (String, String) {
     // TODO
     return ("localhost".to_string(), "9085".to_string());
 }
 
-pub fn get_relay_from_ack_commence(ack_commence_request: AckCommenceRequest) -> (String, String) {
+pub fn get_relay_from_ack_commence(_ack_commence_request: AckCommenceRequest) -> (String, String) {
     // TODO
     return ("localhost".to_string(), "9085".to_string());
 }
 
 pub fn get_relay_from_lock_assertion(
-    lock_assertion_request: LockAssertionRequest,
-) -> (String, String) {
-    // TODO
-    return ("localhost".to_string(), "9085".to_string());
-}
-
-pub fn get_relay_from_lock_assertion_receipt(
-    lock_assertion_receipt_request: LockAssertionReceiptRequest,
+    _lock_assertion_request: LockAssertionRequest,
 ) -> (String, String) {
     // TODO
     return ("localhost".to_string(), "9085".to_string());
 }
 
 pub fn get_relay_from_commit_prepare(
-    commit_prepare_request: CommitPrepareRequest,
+    _commit_prepare_request: CommitPrepareRequest,
 ) -> (String, String) {
     // TODO
     return ("localhost".to_string(), "9085".to_string());
 }
 
-pub fn get_relay_from_commit_ready(commit_ready_request: CommitReadyRequest) -> (String, String) {
+pub fn get_relay_from_commit_ready(_commit_ready_request: CommitReadyRequest) -> (String, String) {
     // TODO
     return ("localhost".to_string(), "9085".to_string());
 }
 
 pub fn get_relay_from_commit_final_assertion(
-    commit_final_assertion_request: CommitFinalAssertionRequest,
+    _commit_final_assertion_request: CommitFinalAssertionRequest,
 ) -> (String, String) {
     // TODO
     return ("localhost".to_string(), "9085".to_string());
 }
 
 pub fn get_relay_from_ack_final_receipt(
-    ack_final_receipt_request: AckFinalReceiptRequest,
+    _ack_final_receipt_request: AckFinalReceiptRequest,
 ) -> (String, String) {
     // TODO
     return ("localhost".to_string(), "9085".to_string());
 }
 
-pub fn get_relay_from_send_asset_status(
-    send_asset_status_request: SendAssetStatusRequest,
-) -> (String, String) {
-    // TODO
-    return ("localhost".to_string(), "9085".to_string());
-}
-
-pub fn get_driver_address_from_perform_lock(perform_lock_request: PerformLockRequest) -> String {
+pub fn get_driver_address_from_perform_lock(_perform_lock_request: PerformLockRequest) -> String {
     // TODO
     return "localhost:9085/Dummy_Network/abc:abc:abc:abc".to_string();
 }
 
-pub fn get_driver_address_from_create_asset(create_asset_request: CreateAssetRequest) -> String {
+pub fn get_driver_address_from_create_asset(_create_asset_request: CreateAssetRequest) -> String {
     // TODO
     return "localhost:9085/Dummy_Network/abc:abc:abc:abc".to_string();
 }
 
-pub fn get_driver_address_from_extinguish(extinguish_request: ExtinguishRequest) -> String {
+pub fn get_driver_address_from_extinguish(_extinguish_request: ExtinguishRequest) -> String {
     // TODO
     return "localhost:9085/Dummy_Network/abc:abc:abc:abc".to_string();
 }
 
-pub fn get_driver_address_from_assign_asset(assign_asset_request: AssignAssetRequest) -> String {
+pub fn get_driver_address_from_assign_asset(_assign_asset_request: AssignAssetRequest) -> String {
     // TODO
     return "localhost:9085/Dummy_Network/abc:abc:abc:abc".to_string();
 }
@@ -1349,14 +1193,14 @@ pub async fn create_satp_client(
 }
 
 pub fn get_request_id_from_transfer_proposal_claims(
-    request: TransferProposalClaimsRequest,
+    _request: TransferProposalClaimsRequest,
 ) -> String {
     // TODO
     return "hard_coded_transfer_proposal_claims_request_id".to_string();
 }
 
 pub fn get_request_id_from_transfer_proposal_receipt(
-    request: TransferProposalReceiptRequest,
+    _request: TransferProposalReceiptRequest,
 ) -> String {
     // TODO
     return "hard_coded_transfer_proposal_receipt_request_id".to_string();
