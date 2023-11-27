@@ -1,10 +1,5 @@
-// Copyright IBM Corp. All Rights Reserved.
-//
-// SPDX-License-Identifier: Apache-2.0
-
 use colored::Colorize;
-use log::info;
-use weaverpb::common::ack::{ack};
+use weaverpb::common::ack::ack;
 use weaverpb::common::events::{event_subscription_state, EventSubscriptionState};
 use weaverpb::common::events::{EventPublication, EventState, EventStates, EventSubscription};
 use weaverpb::common::query::Query;
@@ -510,7 +505,7 @@ pub fn get_event_publication_key(request_id: String) -> String {
 }
 
 pub fn println_stage_heading(stage_id: String) {
-    info!(
+    println!(
         "{} {} {}",
         "\n --------- Stage".yellow().bold(),
         stage_id.yellow().bold(),
@@ -519,7 +514,7 @@ pub fn println_stage_heading(stage_id: String) {
 }
 
 pub fn println_step_heading(step_id: String) {
-    info!(
+    println!(
         "{} {} {}",
         "\n --------- Step".bright_cyan().bold(),
         step_id.bright_cyan().bold(),
