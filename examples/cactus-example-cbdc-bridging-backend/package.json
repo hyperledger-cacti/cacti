@@ -44,15 +44,15 @@
     "dist/*"
   ],
   "scripts": {
+    "build:dev:backend:postbuild": "mkdir -p ./dist/lib/fabric-contracts && cp -r ./src/fabric-contracts/* ./dist/lib/fabric-contracts/",
     "solidity": "hardhat compile",
     "start": "CONFIG_FILE=./example-config.json node dist/lib/main/typescript/cbdc-bridging-app-cli.js",
-    "watch": "npm-watch",
     "test": "nyc cucumber-js ./src/test/typescript/cucumber/features/*.feature --require-module ts-node/register --require './src/test/typescript/cucumber/*/*.ts'",
+    "watch": "npm-watch",
     "webpack": "npm-run-all webpack:dev",
     "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
     "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
-    "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js",
-    "build:dev:backend:postbuild": "mkdir -p ./dist/lib/fabric-contracts && cp -r ./src/fabric-contracts/* ./dist/lib/fabric-contracts/"
+    "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
     "@hyperledger/cactus-api-client": "2.0.0-alpha.1",
@@ -96,7 +96,7 @@
     "@types/uuid": "8.3.4",
     "chai": "^4.1.2",
     "cucumber": "^5.0.3",
-    "hardhat": "2.6.0",
+    "hardhat": "2.17.2",
     "http-status-codes": "2.1.4",
     "jose": "4.9.2",
     "remix-tests": "^0.1.34",

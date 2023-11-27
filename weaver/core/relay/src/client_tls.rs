@@ -1,3 +1,7 @@
+// Copyright IBM Corp. All Rights Reserved.
+//
+// SPDX-License-Identifier: Apache-2.0
+
 mod relay_proto;
 use weaverpb::common::ack::ack;
 use weaverpb::common::state::{request_state, view_payload, ViewPayload, View, Meta, meta};

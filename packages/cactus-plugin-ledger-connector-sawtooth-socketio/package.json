@@ -33,13 +33,16 @@
   "main": "dist/lib/main/typescript/index.js",
   "module": "dist/lib/main/typescript/index.js",
   "types": "dist/lib/main/typescript/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
   "scripts": {
-    "start": "cd ./dist && node common/core/bin/www.js",
-    "debug": "nodemon --inspect ./dist/common/core/bin/www.js",
     "build": "npm run build-ts && npm run build:dev:backend:postbuild",
     "build-ts": "tsc",
     "build:dev:backend:postbuild": "npm run init-sawtooth",
-    "init-sawtooth": "cp -af ../../yarn.lock ./dist/lib/yarn.lock"
+    "debug": "nodemon --inspect ./dist/common/core/bin/www.js",
+    "init-sawtooth": "cp -af ../../yarn.lock ./dist/lib/yarn.lock",
+    "start": "cd ./dist && node common/core/bin/www.js"
   },
   "dependencies": {
     "@hyperledger/cactus-cmd-socketio-server": "2.0.0-alpha.1",
@@ -72,9 +75,6 @@
     "node": ">=10",
     "npm": ">=6"
   },
-  "files": [
-    "dist/*"
-  ],
   "publishConfig": {
     "access": "public"
   }

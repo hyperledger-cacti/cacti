@@ -2,23 +2,6 @@
   "name": "@hyperledger/cacti-weaver-besu-simpleasset",
   "version": "2.0.0-alpha.1",
   "description": "Sample Besu Application for Demonstrating Interoperation With Other Networks",
-  "license": "Apache-2.0",
-  "repository": "https://github.com/hyperledger/cacti/samples/besu/simpleasset",
-  "bugs": {
-    "url": "https://github.com/hyperledger/cacti/issues"
-  },
-  "directories": {
-    "doc": "docs",
-    "test": "test"
-  },
-  "scripts": {
-    "copy-interop-contracts": "cp ../../../core/network/besu/contracts/interop/manageAssetAny.sol contracts/ && cp ../../../core/network/besu/interface/asset-exchange/transferInterface.sol contracts/ && cp ../../../common/protos-sol/asset_locks.proto.sol contracts/",
-    "update-truffle-config": "node get-network-details.js",
-    "deploy-contract": "npm run copy-interop-contracts && npm install --workspaces=false && npm run update-truffle-config && truffle compile && truffle migrate",
-    "clean-run": "rm -rf package-lock.json build",
-    "clean": "rm -rf node_modules package-lock.json build",
-    "redeploy": "npm run copy-interop-contracts && truffle migrate --reset"
-  },
   "keywords": [
     "ethereum",
     "besu",
@@ -28,6 +11,23 @@
     "smart-contract"
   ],
   "homepage": "https://github.com/hyperledger/cacti/weaver/samples/besu/simpleasset",
+  "bugs": {
+    "url": "https://github.com/hyperledger/cacti/issues"
+  },
+  "repository": "https://github.com/hyperledger/cacti/samples/besu/simpleasset",
+  "license": "Apache-2.0",
+  "directories": {
+    "doc": "docs",
+    "test": "test"
+  },
+  "scripts": {
+    "clean": "rm -rf node_modules package-lock.json build",
+    "clean-run": "rm -rf package-lock.json build",
+    "copy-interop-contracts": "cp ../../../core/network/besu/contracts/interop/manageAssetAny.sol contracts/ && cp ../../../core/network/besu/interface/asset-exchange/transferInterface.sol contracts/ && cp ../../../common/protos-sol/asset_locks.proto.sol contracts/",
+    "deploy-contract": "npm run copy-interop-contracts && npm install --workspaces=false && npm run update-truffle-config && truffle compile && truffle migrate",
+    "redeploy": "npm run copy-interop-contracts && truffle migrate --reset",
+    "update-truffle-config": "node get-network-details.js"
+  },
   "dependencies": {
     "@lazyledger/protobuf3-solidity-lib": "0.6.0",
     "@openzeppelin/contracts": "4.9.3",

@@ -62,6 +62,7 @@ import {
 } from "../../../../../main/typescript/public-api";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { PluginImportType } from "@hyperledger/cactus-core-api";
+import { EnclaveOptions } from "web3js-quorum";
 
 const logLevel: LogLevelDesc = "INFO";
 
@@ -116,21 +117,21 @@ describe("PluginLedgerConnectorQuorum", () => {
 
     web3JsQuorumMember1 = Web3JsQuorum(
       web3Member1,
-      { privateUrl: keys.quorum.member1.privateUrl } as any,
+      { privateUrl: keys.quorum.member1.privateUrl } as EnclaveOptions,
       true,
     );
     expect(web3JsQuorumMember1).toBeTruthy();
 
     web3JsQuorumMember2 = Web3JsQuorum(
       web3Member2,
-      { privateUrl: keys.quorum.member2.privateUrl } as any,
+      { privateUrl: keys.quorum.member2.privateUrl } as EnclaveOptions,
       true,
     );
     expect(web3JsQuorumMember2).toBeTruthy();
 
     web3JsQuorumMember3 = Web3JsQuorum(
       web3Member3,
-      { privateUrl: keys.quorum.member3.privateUrl } as any,
+      { privateUrl: keys.quorum.member3.privateUrl } as EnclaveOptions,
       true,
     );
     expect(web3JsQuorumMember3).toBeTruthy();
@@ -263,9 +264,10 @@ describe("PluginLedgerConnectorQuorum", () => {
       nonce: txCount,
     });
 
-    const contractDeployReceipt = await web3JsQuorumMember1.eth.getTransactionReceipt(
-      deployRes.transactionReceipt.transactionHash,
-    );
+    const contractDeployReceipt =
+      await web3JsQuorumMember1.eth.getTransactionReceipt(
+        deployRes.transactionReceipt.transactionHash,
+      );
 
     expect(contractDeployReceipt).toBeTruthy();
     const receipt = contractDeployReceipt;
@@ -292,10 +294,14 @@ describe("PluginLedgerConnectorQuorum", () => {
       contractAddress,
     );
 
-    await expect(member3Contract.methods.getName().call()).rejects.toThrow();
+    const ERROR_WHEN_MEMBER_CANT_SEE_CONTRACT =
+      "Returned values aren't valid, did it run Out of Gas? You might also see this error if you are not using the correct ABI for the contract you are retrieving data from, requesting data from a block number that does not exist, or querying a node which is not fully synced.";
+    await expect(member3Contract.methods.getName().call()).rejects.toThrow(
+      ERROR_WHEN_MEMBER_CANT_SEE_CONTRACT,
+    );
 
-    const newName = "Captain Cacti " + uuidV4;
-    await member1Contract.methods.setName(newName).send({
+    const newName = "Captain Cacti " + uuidV4();
+    const setNameTxRes = await member1Contract.methods.setName(newName).send({
       from: signingAddr,
       privateFrom: keys.tessera.member1.publicKey,
       privateFor: [
@@ -306,6 +312,20 @@ describe("PluginLedgerConnectorQuorum", () => {
       gasLimit: 10000000,
       gasPrice: 0,
     });
+
+    expect(setNameTxRes).toBeTruthy();
+    expect(setNameTxRes.transactionHash).toBeString();
+    expect(setNameTxRes.blockHash).toBeString();
+    expect(setNameTxRes.status).toBeTrue();
+
+    // Wait for the receipt to appear on member 2 otherwise there might be a
+    // race condition in the test case where member 1 already has the receipt
+    // but then we check the contract state on member 2 and it still has the
+    // old state for the contract because it hasn't propagated yet. So, the
+    // code below makes sure that we wait for member 2 as well.
+    await web3JsQuorumMember2.eth.getTransactionReceipt(
+      setNameTxRes.transactionHash,
+    );
 
     // Verify that member 1 can read the updated name
     const member1NewNameResponse = await member1Contract.methods

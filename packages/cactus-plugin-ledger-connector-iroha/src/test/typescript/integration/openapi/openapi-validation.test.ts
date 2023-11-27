@@ -42,7 +42,7 @@ import { installOpenapiValidationMiddleware } from "@hyperledger/cactus-core";
 import { Constants } from "@hyperledger/cactus-core-api";
 
 const testCase = "Iroha plugin openapi validation";
-const logLevel: LogLevelDesc = "INFO";
+const logLevel: LogLevelDesc = "DEBUG";
 
 test.onFailure(async () => {
   await Containers.logDiagnostics({ logLevel });

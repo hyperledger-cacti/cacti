@@ -19,6 +19,7 @@ import org.openapitools.client.models.AssetProfile
 import org.openapitools.client.models.PayloadProfile
 
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 /**
  * 
@@ -279,6 +280,7 @@ data class SessionData (
      *
      * Values: cREATE,dELETE,lOCK,uNLOCK
      */
+    @JsonClass(generateAdapter = false)
     enum class RollbackActionsPerformed(val value: kotlin.String) {
         @Json(name = "CREATE") cREATE("CREATE"),
         @Json(name = "DELETE") dELETE("DELETE"),

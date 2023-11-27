@@ -6,12 +6,12 @@
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "start": "cd ./dist && node common/core/bin/www.js",
-    "debug": "nodemon --inspect ./dist/common/core/bin/www.js",
     "build": "npm run build-ts && npm run build:dev:backend:postbuild",
     "build-ts": "tsc",
     "build:dev:backend:postbuild": "npm run prepare-docker-build",
-    "prepare-docker-build": "cp -af ../../yarn.lock ./dist/yarn.lock"
+    "debug": "nodemon --inspect ./dist/common/core/bin/www.js",
+    "prepare-docker-build": "cp -af ../../yarn.lock ./dist/yarn.lock",
+    "start": "cd ./dist && node common/core/bin/www.js"
   },
   "dependencies": {
     "@hyperledger/cactus-cmd-socketio-server": "2.0.0-alpha.1",
@@ -31,7 +31,7 @@
     "lodash": "4.17.21",
     "log4js": "6.4.1",
     "morgan": "1.10.0",
-    "protobufjs": "5.0.3",
+    "protobufjs": "7.2.5",
     "serve-favicon": "2.4.5",
     "shelljs": "0.8.5",
     "socket.io": "4.5.4"

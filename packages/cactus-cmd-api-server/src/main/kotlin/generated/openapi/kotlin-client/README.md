@@ -37,7 +37,7 @@ This runs all tests and packages the library.
 * Some Kotlin and Java types are fully qualified to avoid conflicts with types defined in OpenAPI definitions.
 * Implementation of ApiClient is intended to reduce method counts, specifically to benefit Android targets.
 
-<a name="documentation-for-api-endpoints"></a>
+<a id="documentation-for-api-endpoints"></a>
 ## Documentation for API Endpoints
 
 All URIs are relative to *http://localhost*
@@ -45,10 +45,11 @@ All URIs are relative to *http://localhost*
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
 *DefaultApi* | [**getHealthCheckV1**](docs/DefaultApi.md#gethealthcheckv1) | **GET** /api/v1/api-server/healthcheck | Can be used to verify liveness of an API server instance
+*DefaultApi* | [**getOpenApiSpecV1**](docs/DefaultApi.md#getopenapispecv1) | **GET** /api/v1/api-server/get-open-api-spec | 
 *DefaultApi* | [**getPrometheusMetricsV1**](docs/DefaultApi.md#getprometheusmetricsv1) | **GET** /api/v1/api-server/get-prometheus-exporter-metrics | Get the Prometheus Metrics
 
 
-<a name="documentation-for-models"></a>
+<a id="documentation-for-models"></a>
 ## Documentation for Models
 
  - [org.openapitools.client.models.HealthCheckResponse](docs/HealthCheckResponse.md)
@@ -56,7 +57,8 @@ Class | Method | HTTP request | Description
  - [org.openapitools.client.models.WatchHealthcheckV1](docs/WatchHealthcheckV1.md)
 
 
-<a name="documentation-for-authorization"></a>
+<a id="documentation-for-authorization"></a>
 ## Documentation for Authorization
 
-All endpoints do not require authorization.
+Endpoints do not require authorization.
+

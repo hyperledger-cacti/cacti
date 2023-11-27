@@ -49,6 +49,11 @@ Corda example:
 
 `localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:H`
 
+## Logging
+We use a simple logger for messaging. In the future we can use ``log4rs``to persist applicational log.
+On the other hand, we persist message flow payloads, but we want to support the [gateway crash-recovery logging procedure](https://www.techrxiv.org/articles/preprint/HERMES_Fault-Tolerant_Middleware_for_Blockchain_Interoperability/14120291).
+
+
 ### Settings
 
 The `Settings.toml` file is used for storing configurations as well as acting as the remote relay discovery service.

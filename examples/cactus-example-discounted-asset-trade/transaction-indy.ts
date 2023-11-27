@@ -38,7 +38,7 @@ export function getDataFromIndy(
     try {
       logger.debug(`getDataFromIndy: arg_request: ${arg_request}`);
       sendRequest(arg_request, identifier).then((result) => {
-        logger.debug(`##getDataFromIndy: result: ${result}`);
+        logger.debug(`##getDataFromIndy: result: ${JSON.stringify(result)}`);
 
         return resolve(result);
       });

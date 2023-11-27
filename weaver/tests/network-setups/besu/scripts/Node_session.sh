@@ -1,3 +1,7 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+
 cd Node-$1/
 
 if [ $2 == 1 ] # Network 1 with http-port as 8545

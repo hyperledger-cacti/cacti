@@ -4,12 +4,14 @@ import java.util.Objects
 import com.fasterxml.jackson.annotation.JsonProperty
 import javax.validation.constraints.DecimalMax
 import javax.validation.constraints.DecimalMin
+import javax.validation.constraints.Email
 import javax.validation.constraints.Max
 import javax.validation.constraints.Min
 import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
 import javax.validation.Valid
+import io.swagger.v3.oas.annotations.media.Schema
 
 /**
  * 
@@ -20,12 +22,15 @@ import javax.validation.Valid
 data class ClearMonitorTransactionsV1Request(
 
     @get:Size(min=1,max=1024)
-    @field:JsonProperty("clientAppId", required = true) val clientAppId: kotlin.String,
+    @Schema(example = "frond_v1_x_7Hdg6s", required = true, description = "ID of a client application that wants to monitor the state changes")
+    @get:JsonProperty("clientAppId", required = true) val clientAppId: kotlin.String,
 
     @get:Size(min=1,max=1024)
-    @field:JsonProperty("stateFullClassName", required = true) val stateFullClassName: kotlin.String,
+    @Schema(example = "net.corda.samples.example.states.IOUState", required = true, description = "The fully qualified name of the Corda state to monitor")
+    @get:JsonProperty("stateFullClassName", required = true) val stateFullClassName: kotlin.String,
 
-    @field:JsonProperty("txIndexes", required = true) val txIndexes: kotlin.collections.List<kotlin.String> = arrayListOf()
+    @Schema(example = "null", required = true, description = "")
+    @get:JsonProperty("txIndexes", required = true) val txIndexes: kotlin.collections.List<kotlin.String> = arrayListOf()
 ) {
 
 }

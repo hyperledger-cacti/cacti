@@ -6,7 +6,7 @@ settings.gradle
 src/main/kotlin/org/openapitools/client/apis/DefaultApi.kt
 src/main/kotlin/org/openapitools/client/infrastructure/ApiAbstractions.kt
 src/main/kotlin/org/openapitools/client/infrastructure/ApiClient.kt
-src/main/kotlin/org/openapitools/client/infrastructure/ApiInfrastructureResponse.kt
+src/main/kotlin/org/openapitools/client/infrastructure/ApiResponse.kt
 src/main/kotlin/org/openapitools/client/infrastructure/BigDecimalAdapter.kt
 src/main/kotlin/org/openapitools/client/infrastructure/BigIntegerAdapter.kt
 src/main/kotlin/org/openapitools/client/infrastructure/ByteArrayAdapter.kt
@@ -14,6 +14,7 @@ src/main/kotlin/org/openapitools/client/infrastructure/Errors.kt
 src/main/kotlin/org/openapitools/client/infrastructure/LocalDateAdapter.kt
 src/main/kotlin/org/openapitools/client/infrastructure/LocalDateTimeAdapter.kt
 src/main/kotlin/org/openapitools/client/infrastructure/OffsetDateTimeAdapter.kt
+src/main/kotlin/org/openapitools/client/infrastructure/PartConfig.kt
 src/main/kotlin/org/openapitools/client/infrastructure/RequestConfig.kt
 src/main/kotlin/org/openapitools/client/infrastructure/RequestMethod.kt
 src/main/kotlin/org/openapitools/client/infrastructure/ResponseExtensions.kt
@@ -26,6 +27,7 @@ src/main/kotlin/org/openapitools/client/models/ChainCodeProgrammingLanguage.kt
 src/main/kotlin/org/openapitools/client/models/ConnectionProfile.kt
 src/main/kotlin/org/openapitools/client/models/ConnectionProfileClient.kt
 src/main/kotlin/org/openapitools/client/models/DefaultEventHandlerStrategy.kt
+src/main/kotlin/org/openapitools/client/models/DeployContractGoSourceV1501Response.kt
 src/main/kotlin/org/openapitools/client/models/DeployContractGoSourceV1Request.kt
 src/main/kotlin/org/openapitools/client/models/DeployContractGoSourceV1RequestConstructorArgs.kt
 src/main/kotlin/org/openapitools/client/models/DeployContractGoSourceV1Response.kt
@@ -49,7 +51,6 @@ src/main/kotlin/org/openapitools/client/models/GetBlockResponseDecodedV1.kt
 src/main/kotlin/org/openapitools/client/models/GetBlockResponseEncodedV1.kt
 src/main/kotlin/org/openapitools/client/models/GetBlockResponseV1.kt
 src/main/kotlin/org/openapitools/client/models/GetTransactionReceiptResponse.kt
-src/main/kotlin/org/openapitools/client/models/InlineResponse501.kt
 src/main/kotlin/org/openapitools/client/models/RunTransactionRequest.kt
 src/main/kotlin/org/openapitools/client/models/RunTransactionResponse.kt
 src/main/kotlin/org/openapitools/client/models/SSHExecCommandResponse.kt

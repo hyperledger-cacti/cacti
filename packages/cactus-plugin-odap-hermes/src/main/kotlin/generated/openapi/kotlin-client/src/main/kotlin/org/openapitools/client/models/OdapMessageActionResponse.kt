@@ -17,6 +17,7 @@ package org.openapitools.client.models
 
 
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 /**
  * 
@@ -41,6 +42,7 @@ data class OdapMessageActionResponse (
      *
      * Values: OK,RESOURCE_NOT_FOUND
      */
+    @JsonClass(generateAdapter = false)
     enum class ResponseCode(val value: kotlin.String) {
         @Json(name = "200") OK("200"),
         @Json(name = "404") RESOURCE_NOT_FOUND("404");

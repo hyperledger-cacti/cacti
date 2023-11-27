@@ -139,7 +139,8 @@ For development purposes, it might be useful to run the sample application outsi
    - [Build the SDK from source](https://github.com/hyperledger/indy-sdk#how-to-build-indy-sdk-from-source)
    - Or use these steps for Ubuntu 20.04:
    ```bash
-   sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CE7709D068DB5E88 \
+   sudo apt-get install ca-certificates -y \
+    && sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CE7709D068DB5E88 \
     && sudo add-apt-repository "deb https://repo.sovrin.org/sdk/deb bionic stable" \
     && sudo apt-get update \
     && sudo apt-get install -y \

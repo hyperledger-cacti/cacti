@@ -5,7 +5,7 @@
  */
 
 /**
- * This file provides helper functions for interoperability operations.
+ * This file provides helper functions for interoperation event management.
  **/
 /** End file docs */
 

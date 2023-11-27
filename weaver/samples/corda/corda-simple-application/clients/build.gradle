@@ -6,8 +6,6 @@ buildscript {
     ext.grpc_version = "1.29.0" // CURRENT_GRPC_VERSION
     ext.grpc_kotlin_version = "0.1.4" // CURRENT_GRPC_KOTLIN_VERSION
     ext.arrow_version = "0.10.4"
-    ext.tokens_release_group = 'com.r3.corda.lib.tokens'
-    ext.tokens_release_version = '1.2'
 
     repositories {
         mavenCentral()

@@ -1,3 +1,9 @@
+/*
+ * Copyright IBM Corp. All Rights Reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 package net.corda.samples.tokenizedhouse.states
 import com.google.gson.annotations.*
 

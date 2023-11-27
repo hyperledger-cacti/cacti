@@ -1,3 +1,7 @@
+// Copyright IBM Corp. All Rights Reserved.
+//
+// SPDX-License-Identifier: Apache-2.0
+
 pub mod relay {
     pub mod datatransfer {
         include!(concat!("./generated", "/relay.datatransfer.rs"));

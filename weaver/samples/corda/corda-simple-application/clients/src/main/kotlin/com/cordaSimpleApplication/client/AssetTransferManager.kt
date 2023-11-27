@@ -24,8 +24,12 @@ import kotlin.system.exitProcess
 import net.corda.core.messaging.startFlow
 import java.util.Base64
 import net.corda.core.identity.CordaX500Name
+import net.corda.core.identity.Party
+import net.corda.core.contracts.UniqueIdentifier
+
 import org.hyperledger.cacti.weaver.sdk.corda.AssetTransferSDK
 import org.hyperledger.cacti.weaver.sdk.corda.InteroperableHelper
+import org.hyperledger.cacti.weaver.sdk.corda.RelayOptions
 import com.cordaSimpleApplication.contract.AssetContract
 import com.cordaSimpleApplication.contract.BondAssetContract
 import java.util.Calendar
@@ -36,7 +40,6 @@ import com.cordaSimpleApplication.flow.GetAssetClaimStatusByPledgeId
 import com.cordaSimpleApplication.flow.GetBondAssetPledgeStatusByPledgeId
 import com.cordaSimpleApplication.flow.GetBondAssetClaimStatusByPledgeId
 import com.cordaSimpleApplication.flow.GetAssetPledgeStatusByPledgeId
-import net.corda.core.identity.Party
 
 class AssetTransferCommand : CliktCommand(name = "transfer", help ="Manages simple asset transfer") {
     override fun run() {
@@ -613,21 +616,24 @@ fun requestStateFromRemoteNetwork(
     val networkName = System.getenv("NETWORK_NAME") ?: "Corda_Network"
 
     try {
+        val relayOptions = RelayOptions(
+            useTlsForRelay = config["RELAY_TLS"]!!.toBoolean(),
+            relayTlsTrustStorePath = config["RELAY_TLSCA_TRUST_STORE"]!!,
+            relayTlsTrustStorePassword = config["RELAY_TLSCA_TRUST_STORE_PASSWORD"]!!,
+            tlsCACertPathsForRelay = config["RELAY_TLSCA_CERT_PATHS"]!!
+        )
         InteroperableHelper.interopFlow(
             proxy,
+            arrayOf(externalStateAddress),
             localRelayAddress,
-            externalStateAddress,
             networkName,
-            externalStateParticipants,
-            config["RELAY_TLS"]!!.toBoolean(),
-            config["RELAY_TLSCA_TRUST_STORE"]!!,
-            config["RELAY_TLSCA_TRUST_STORE_PASSWORD"]!!,
-            config["RELAY_TLSCA_CERT_PATHS"]!!
+            externalStateParticipants = externalStateParticipants,
+            relayOptions = relayOptions
         ).fold({
             println("Error in Interop Flow: ${it.message}")
             exitProcess(1)
         }, {
-            linearId = it.toString()
+            linearId = (it as Array<UniqueIdentifier>)[0].toString() // Get the first linearId, as only requested one external state
             println("Interop flow successful and external-state was stored with linearId $linearId.\n")
         })
     } catch (e: Exception) {

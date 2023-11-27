@@ -4,6 +4,7 @@ import { fileURLToPath } from "url";
 import { globby, Options as GlobbyOptions } from "globby";
 import { RuntimeError } from "run-time-error";
 import { isStdLibRecord } from "./is-std-lib-record";
+import { readFile } from "fs/promises";
 
 export interface ICheckSiblingDepVersionConsistencyRequest {
   readonly argv: string[];
@@ -40,7 +41,9 @@ export async function checkSiblingDepVersionConsistency(
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
   const SCRIPT_DIR = __dirname;
+  const LERNA_JSON = "lerna.json";
   const PROJECT_DIR = path.join(SCRIPT_DIR, "../../");
+  const PACKAGE_JSON = "package.json";
   console.log(`${TAG} SCRIPT_DIR=${SCRIPT_DIR}`);
   console.log(`${TAG} PROJECT_DIR=${PROJECT_DIR}`);
 
@@ -53,6 +56,13 @@ export async function checkSiblingDepVersionConsistency(
   if (!req.env) {
     throw new RuntimeError(`req.env cannot be falsy.`);
   }
+  const lernaJsonStr = await readFile(PROJECT_DIR + LERNA_JSON, "utf-8");
+  const lernaJson = JSON.parse(lernaJsonStr);
+
+  const pkgJsonGlobPatterns = lernaJson.packages.map((it: string) =>
+    "./".concat(it).concat(`/${PACKAGE_JSON}`),
+  );
+  console.log("Globbing lerna package patterns: ", pkgJsonGlobPatterns);
 
   const globbyOpts: GlobbyOptions = {
     cwd: PROJECT_DIR,
@@ -63,10 +73,9 @@ export async function checkSiblingDepVersionConsistency(
 
   const pkgJsonPaths = await globby(DEFAULT_GLOB, globbyOpts);
   console.log(`${TAG} package.json paths: (${pkgJsonPaths.length}): `);
-  
+
   const lernaJsonPathAbs = path.join(PROJECT_DIR, "./lerna.json");
   console.log(`${TAG} Reading root lerna.json at ${lernaJsonPathAbs}`);
-  const lernaJson = await fs.readJSON(lernaJsonPathAbs);
   const correctVersion = req.version || lernaJson.version;
   console.log(`${TAG} Correct Version: ${correctVersion}`);
 

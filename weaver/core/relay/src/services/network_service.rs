@@ -1,3 +1,7 @@
+// Copyright IBM Corp. All Rights Reserved.
+//
+// SPDX-License-Identifier: Apache-2.0
+
 // Internal generated modules
 use crate::relay_proto::{parse_address, LocationSegment};
 use weaverpb::common::ack::{ack, Ack};

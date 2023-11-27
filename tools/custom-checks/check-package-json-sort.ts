@@ -5,16 +5,18 @@ import { globby, Options as GlobbyOptions } from "globby";
 import { RuntimeError } from "run-time-error";
 import { isStdLibRecord } from "./is-std-lib-record";
 import { sortPackageJson } from "sort-package-json";
-
+import lernaCfg from "../../lerna.json" assert { type: "json" };
 export interface ICheckPackageJsonSort {
   readonly argv: string[];
   readonly env: NodeJS.ProcessEnv;
 }
 
 /**
- * Sorts and checks that all the package.json files within the Cactus project
- * Note: this only sorts and checks the package.json files that are within the
- * `packages` folder for this proeject
+ * Sorts and checks that all the package.json files within the Cacti project
+ *
+ * Note: this sorts every package.json file that are included in the workspace
+ * globs (see lerna.json and package.json files in the **root** directory of the
+ * project)
  *
  * @returns An array with the first item being a boolean indicating
  * 1) success (`true`) or 2) failure (`false`)
@@ -26,7 +28,9 @@ export async function checkPackageJsonSort(
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
   const SCRIPT_DIR = __dirname;
+  const LERNA_JSON = "lerna.json";
   const PROJECT_DIR = path.join(SCRIPT_DIR, "../../");
+  const PACKAGE_JSON = "package.json";
   console.log(`${TAG} SCRIPT_DIR=${SCRIPT_DIR}`);
   console.log(`${TAG} PROJECT_DIR=${PROJECT_DIR}`);
 
@@ -40,16 +44,31 @@ export async function checkPackageJsonSort(
     throw new RuntimeError(`req.env cannot be falsy.`);
   }
 
+  const pkgJsonGlobPatterns = lernaCfg.packages.map((it: string) =>
+    "./".concat(it).concat(`/${PACKAGE_JSON}`),
+  );
+  console.log("Globbing lerna package patterns: ", pkgJsonGlobPatterns);
+
   const globbyOpts: GlobbyOptions = {
     cwd: PROJECT_DIR,
     ignore: ["**/node_modules"],
   };
 
-  const DEFAULT_GLOB = "**/cactus-*/package.json";
+  const includeGlobs = lernaCfg.packages.map((x) => x.concat("/package.json"));
 
-  const pkgJsonPaths = await globby(DEFAULT_GLOB, globbyOpts);
-  sortPackageJson(pkgJsonPaths);
+  const pkgJsonPaths = await globby(includeGlobs, globbyOpts);
 
+  const notSortedFilesPaths: string[] = [];
+
+  for (const pkg of pkgJsonPaths) {
+    const json = await fs.readJSON(pkg);
+    const sortedJson = await sortPackageJson(json);
+
+    if (JSON.stringify(json) !== JSON.stringify(sortedJson)) {
+      notSortedFilesPaths.push(pkg);
+    }
+  }
+  console.log("%s notSortedFiles=%o", TAG, notSortedFilesPaths);
   const errors: string[] = [];
 
   const checks = pkgJsonPaths.map(async (pathRel) => {
@@ -65,6 +84,9 @@ export async function checkPackageJsonSort(
     }
     if (!isStdLibRecord(pkgJson)) {
       return;
+    }
+    if (notSortedFilesPaths.includes(pathRel)) {
+      errors.push(`ERROR: Packages ${pathRel} is not sorted`);
     }
   });
 

@@ -1,5 +1,8 @@
 import type { AddressInfo } from "net";
 import type { Server as SecureServer } from "https";
+import type { Request, Response, RequestHandler } from "express";
+import type { ServerOptions as SocketIoServerOptions } from "socket.io";
+import type { Socket as SocketIoSocket } from "socket.io";
 import exitHook from "async-exit-hook";
 import os from "os";
 import path from "path";
@@ -13,17 +16,14 @@ import fs from "fs-extra";
 import expressHttpProxy from "express-http-proxy";
 import { Server as GrpcServer } from "@grpc/grpc-js";
 import { ServerCredentials as GrpcServerCredentials } from "@grpc/grpc-js";
-import type { Application, Request, Response, RequestHandler } from "express";
 import express from "express";
 import { OpenAPIV3 } from "express-openapi-validator/dist/framework/types";
 import compression from "compression";
 import bodyParser from "body-parser";
-import cors from "cors";
+import cors, { CorsOptionsDelegate, CorsRequest } from "cors";
 
 import rateLimit from "express-rate-limit";
 import { Server as SocketIoServer } from "socket.io";
-import type { ServerOptions as SocketIoServerOptions } from "socket.io";
-import type { Socket as SocketIoSocket } from "socket.io";
 import { authorize as authorizeSocket } from "@thream/socketio-jwt";
 
 import {
@@ -37,19 +37,23 @@ import {
   PluginImportAction,
 } from "@hyperledger/cactus-core-api";
 
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import {
+  PluginRegistry,
+  registerWebServiceEndpoint,
+} from "@hyperledger/cactus-core";
+
 import { installOpenapiValidationMiddleware } from "@hyperledger/cactus-core";
 
 import {
   Bools,
   Logger,
   LoggerProvider,
+  newRex,
   Servers,
 } from "@hyperledger/cactus-common";
 
 import { ICactusApiServerOptions } from "./config/config-service";
 import OAS from "../json/openapi.json";
-// import { OpenAPIV3 } from "express-openapi-validator/dist/framework/types";
 
 import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
 import { AuthorizerFactory } from "./authzn/authorizer-factory";
@@ -58,6 +62,10 @@ import { WatchHealthcheckV1Endpoint } from "./web-services/watch-healthcheck-v1-
 import * as default_service from "./generated/proto/protoc-gen-ts/services/default_service";
 import { GrpcServerApiServer } from "./web-services/grpc/grpc-server-api-server";
 import { determineAddressFamily } from "./common/determine-address-family";
+import {
+  GetOpenApiSpecV1Endpoint,
+  IGetOpenApiSpecV1EndpointOptions,
+} from "./web-services/get-open-api-spec-v1-endpoint";
 
 export interface IApiServerConstructorOptions {
   readonly pluginManagerOptions?: { pluginsPath: string };
@@ -91,8 +99,8 @@ export class ApiServer {
   private readonly httpServerCockpit?: Server | SecureServer;
   private readonly wsApi: SocketIoServer;
   private readonly grpcServer: GrpcServer;
-  private readonly expressApi: Application;
-  private readonly expressCockpit: Application;
+  private readonly expressApi: express.Express;
+  private readonly expressCockpit: express.Express;
   private readonly pluginsPath: string;
   private readonly enableShutdownHook: boolean;
 
@@ -241,17 +249,17 @@ export class ApiServer {
       }
 
       return { addressInfoCockpit, addressInfoApi, addressInfoGrpc };
-    } catch (ex) {
-      const errorMessage = `Failed to start ApiServer: ${ex.stack}`;
-      this.log.error(errorMessage);
+    } catch (ex1: unknown) {
+      const context = "Failed to start ApiServer";
+      this.log.error(context, ex1);
       this.log.error(`Attempting shutdown...`);
       try {
         await this.shutdown();
         this.log.info(`Server shut down after crash OK`);
-      } catch (ex) {
-        this.log.error(ApiServer.E_POST_CRASH_SHUTDOWN, ex);
+      } catch (ex2: unknown) {
+        this.log.error(ApiServer.E_POST_CRASH_SHUTDOWN, ex2);
       }
-      throw new Error(errorMessage);
+      throw newRex(context, ex1);
     }
   }
 
@@ -297,25 +305,27 @@ export class ApiServer {
         await this.getPluginImportsCount(),
       );
       return this.pluginRegistry;
-    } catch (e) {
+    } catch (ex: unknown) {
       this.pluginRegistry = new PluginRegistry({ plugins: [] });
-      const errorMessage = `Failed init PluginRegistry: ${e.stack}`;
-      this.log.error(errorMessage);
-      throw new Error(errorMessage);
+      const context = "Failed to init PluginRegistry";
+      this.log.debug(context, ex);
+      throw newRex(context, ex);
     }
   }
 
-  public async initPluginRegistry(): Promise<PluginRegistry> {
-    const registry = new PluginRegistry({ plugins: [] });
+  public async initPluginRegistry(req?: {
+    readonly pluginRegistry: PluginRegistry;
+  }): Promise<PluginRegistry> {
+    const { pluginRegistry = new PluginRegistry({ plugins: [] }) } = req || {};
     const { plugins } = this.options.config;
     this.log.info(`Instantiated empty registry, invoking plugin factories...`);
 
     for (const pluginImport of plugins) {
-      const plugin = await this.instantiatePlugin(pluginImport, registry);
-      registry.add(plugin);
+      const plugin = await this.instantiatePlugin(pluginImport, pluginRegistry);
+      pluginRegistry.add(plugin);
     }
 
-    return registry;
+    return pluginRegistry;
   }
 
   private async instantiatePlugin(
@@ -347,7 +357,8 @@ export class ApiServer {
 
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const pluginPackage = require(/* webpackIgnore: true */ packagePath);
-      const createPluginFactory = pluginPackage.createPluginFactory as PluginFactoryFactory;
+      const createPluginFactory =
+        pluginPackage.createPluginFactory as PluginFactoryFactory;
       const pluginFactoryOptions: IPluginFactoryOptions = {
         pluginImportType: pluginImport.type,
       };
@@ -358,15 +369,10 @@ export class ApiServer {
       await plugin.onPluginInit();
 
       return plugin;
-    } catch (error) {
-      const errorMessage = `${fnTag} failed instantiating plugin '${packageName}' with the instanceId '${options.instanceId}'`;
-      this.log.error(errorMessage, error);
-
-      if (error instanceof Error) {
-        throw new RuntimeError(errorMessage, error);
-      } else {
-        throw new RuntimeError(errorMessage, JSON.stringify(error));
-      }
+    } catch (ex: unknown) {
+      const context = `${fnTag} failed instantiating plugin '${packageName}' with the instanceId '${options.instanceId}'`;
+      this.log.debug(context, ex);
+      throw newRex(context, ex);
     }
   }
 
@@ -387,10 +393,10 @@ export class ApiServer {
     try {
       await fs.mkdirp(pluginPackageDir);
       this.log.debug(`${pkgName} plugin package dir: %o`, pluginPackageDir);
-    } catch (ex) {
-      const errorMessage =
+    } catch (ex: unknown) {
+      const context =
         "Could not create plugin installation directory, check the file-system permissions.";
-      throw new RuntimeError(errorMessage, ex);
+      throw newRex(context, ex);
     }
     try {
       lmify.setPackageManager("npm");
@@ -408,19 +414,15 @@ export class ApiServer {
         // "--ignore-workspace-root-check",
       ]);
       this.log.debug("%o install result: %o", pkgName, out);
-      if (out.exitCode !== 0) {
-        throw new RuntimeError("Non-zero exit code: ", JSON.stringify(out));
+      if (out?.exitCode && out.exitCode !== 0) {
+        const eMsg = "Non-zero exit code returned by lmify.install() indicating that the underlying npm install OS process had encountered a problem:";
+        throw newRex(eMsg, out);
       }
       this.log.info(`Installed ${pkgName} OK`);
-    } catch (ex) {
-      const errorMessage = `${fnTag} failed installing plugin '${pkgName}`;
-      this.log.error(errorMessage, ex);
-
-      if (ex instanceof Error) {
-        throw new RuntimeError(errorMessage, ex);
-      } else {
-        throw new RuntimeError(errorMessage, JSON.stringify(ex));
-      }
+    } catch (ex: unknown) {
+      const context = `${fnTag} failed installing plugin '${pkgName}`;
+      this.log.debug(ex, context);
+      throw newRex(context, ex);
     }
   }
 
@@ -441,24 +443,25 @@ export class ApiServer {
     this.log.info(`Stopped ${webServicesShutdown.length} WS plugin(s) OK`);
 
     if (this.httpServerApi?.listening) {
-      this.log.info(`Closing HTTP server of the API...`);
+      this.log.info(`Closing Cacti HTTP server of the API...`);
       await Servers.shutdown(this.httpServerApi);
       this.log.info(`Close HTTP server of the API OK`);
     }
 
     if (this.httpServerCockpit?.listening) {
-      this.log.info(`Closing HTTP server of the cockpit ...`);
+      this.log.info(`Closing Cacti HTTP server of the cockpit ...`);
       await Servers.shutdown(this.httpServerCockpit);
       this.log.info(`Close HTTP server of the cockpit OK`);
     }
 
     if (this.grpcServer) {
-      this.log.info(`Closing gRPC server ...`);
+      this.log.info(`Closing Cacti gRPC server ...`);
       await new Promise<void>((resolve, reject) => {
         this.grpcServer.tryShutdown((ex?: Error) => {
           if (ex) {
-            this.log.error("Failed to shut down gRPC server: ", ex);
-            reject(ex);
+            const eMsg = "Failed to shut down gRPC server of the Cacti API server.";
+            this.log.debug(eMsg, ex);
+            reject(newRex(eMsg, ex));
           } else {
             resolve();
           }
@@ -503,7 +506,8 @@ export class ApiServer {
         this.log.debug(`PROXY ${srcHost} => ${destHost} :: ${thePath}`);
 
         // make sure self signed certs are accepted if it was configured as such by the user
-        (proxyReqOpts as any).rejectUnauthorized = rejectUnauthorized;
+        (proxyReqOpts as Record<string, unknown>).rejectUnauthorized =
+          rejectUnauthorized;
         return proxyReqOpts;
       },
     });
@@ -550,9 +554,27 @@ export class ApiServer {
    * healthcheck and monitoring information.
    * @param app
    */
-  async getOrCreateWebServices(app: express.Application): Promise<void> {
+  async getOrCreateWebServices(app: express.Express): Promise<void> {
     const { log } = this;
     const { logLevel } = this.options.config;
+    const pluginRegistry = await this.getOrInitPluginRegistry();
+
+    {
+      const oasPath = OAS.paths["/api/v1/api-server/get-open-api-spec"];
+
+      const operationId = oasPath.get.operationId;
+      const opts: IGetOpenApiSpecV1EndpointOptions = {
+        oas: OAS,
+        oasPath,
+        operationId,
+        path: oasPath.get["x-hyperledger-cactus"].http.path,
+        pluginRegistry,
+        verbLowerCase: oasPath.get["x-hyperledger-cactus"].http.verbLowerCase,
+        logLevel,
+      };
+      const endpoint = new GetOpenApiSpecV1Endpoint(opts);
+      await registerWebServiceEndpoint(app, endpoint);
+    }
 
     const healthcheckHandler = (req: Request, res: Response) => {
       res.json({
@@ -596,13 +618,10 @@ export class ApiServer {
     const {
       "/api/v1/api-server/get-prometheus-exporter-metrics": oasPathPrometheus,
     } = OAS.paths;
-    const { http: httpPrometheus } = oasPathPrometheus.get[
-      "x-hyperledger-cactus"
-    ];
-    const {
-      path: httpPathPrometheus,
-      verbLowerCase: httpVerbPrometheus,
-    } = httpPrometheus;
+    const { http: httpPrometheus } =
+      oasPathPrometheus.get["x-hyperledger-cactus"];
+    const { path: httpPathPrometheus, verbLowerCase: httpVerbPrometheus } =
+      httpPrometheus;
     (app as any)[httpVerbPrometheus](
       httpPathPrometheus,
       prometheusExporterHandler,
@@ -628,6 +647,12 @@ export class ApiServer {
           )
         : GrpcServerCredentials.createInsecure();
 
+      this.grpcServer.addService(
+        default_service.org.hyperledger.cactus.cmd_api_server
+          .DefaultServiceClient.service,
+        new GrpcServerApiServer(),
+      );
+
       this.grpcServer.bindAsync(
         grpcHostAndPort,
         grpcTlsCredentials,
@@ -636,11 +661,6 @@ export class ApiServer {
             this.log.error("Binding gRPC failed: ", error);
             return reject(new RuntimeError("Binding gRPC failed: ", error));
           }
-          this.grpcServer.addService(
-            default_service.org.hyperledger.cactus.cmd_api_server
-              .UnimplementedDefaultServiceService.definition,
-            new GrpcServerApiServer(),
-          );
           this.grpcServer.start();
           const family = determineAddressFamily(grpcHost);
           resolve({ address: grpcHost, port, family });
@@ -764,8 +784,11 @@ export class ApiServer {
   createCorsMiddleware(allowedDomains: string[]): RequestHandler {
     const allDomainsOk = allowedDomains.includes("*");
 
-    const corsOptionsDelegate = (req: Request, callback: any) => {
-      const origin = req.header("Origin");
+    const corsOptionsDelegate: CorsOptionsDelegate<CorsRequest> = (
+      req,
+      callback,
+    ) => {
+      const origin = req.headers["origin"];
       const isDomainOk = origin && allowedDomains.includes(origin);
       // this.log.debug("CORS %j %j %s", allDomainsOk, isDomainOk, req.originalUrl);
 

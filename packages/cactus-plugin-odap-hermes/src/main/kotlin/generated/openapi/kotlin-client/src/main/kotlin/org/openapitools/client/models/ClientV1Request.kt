@@ -20,6 +20,7 @@ import org.openapitools.client.models.ClientV1RequestClientGatewayConfiguration
 import org.openapitools.client.models.PayloadProfile
 
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 /**
  * 

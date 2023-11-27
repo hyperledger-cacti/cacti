@@ -5,6 +5,8 @@ import { v4 as uuidv4 } from "uuid";
 import bodyParser from "body-parser";
 import express from "express";
 import { DiscoveryOptions } from "fabric-network";
+// BlockDecoder is not exported in ts definition so we need to use legacy import.
+const { BlockDecoder } = require("fabric-common");
 
 import {
   DEFAULT_FABRIC_2_AIO_FABRIC_VERSION,
@@ -33,6 +35,7 @@ import {
   DefaultEventHandlerStrategy,
   DefaultApi as FabricApi,
   GatewayOptions,
+  GetBlockRequestV1,
   FabricContractInvocationType,
   FabricSigningCredential,
 } from "../../../../main/typescript/public-api";
@@ -55,8 +58,8 @@ const ledgerChannelName = "mychannel";
 const ledgerContractName = "basic";
 
 // Log settings
-const testLogLevel: LogLevelDesc = "info"; // default: info
-const sutLogLevel: LogLevelDesc = "info"; // default: info
+const testLogLevel: LogLevelDesc = "debug"; // default: info
+const sutLogLevel: LogLevelDesc = "debug"; // default: info
 
 // Logger setup
 const log: Logger = LoggerProvider.getOrCreate({
@@ -221,6 +224,7 @@ describe("Get Block endpoint tests", () => {
     };
 
     const getBlockResponse = await apiClient.getBlockV1(getBlockReq);
+    log.debug("getBlockResponse=%o", getBlockResponse);
 
     expect(getBlockResponse).toBeTruthy();
     expect(getBlockResponse.status).toEqual(200);
@@ -281,7 +285,7 @@ describe("Get Block endpoint tests", () => {
   /**
    * GetBlock endpoint using block number
    */
-  test("Get first block by it's number, both decoded and encoded.", async () => {
+  test("Get first block by it's number - decoded.", async () => {
     // Check decoded
     const decodedFirstBlock = await getBlockByNumber("0", false);
     log.debug("Received decodedFirstBlock:", decodedFirstBlock);
@@ -290,12 +294,19 @@ describe("Get Block endpoint tests", () => {
     expect(decodedFirstBlock.header.number.high).toBe(0);
     expect(decodedFirstBlock.data).toBeTruthy();
     expect(decodedFirstBlock.metadata).toBeTruthy();
+  });
 
-    // Check encoded
+  test("Get first block by it's number - encoded.", async () => {
+    // Check decoded
     const encodedFirstBlock = await getBlockByNumber("0", true);
-    log.debug("Received encodedFirstBlock:", encodedFirstBlock);
-    const blockBuffer = Buffer.from(encodedFirstBlock);
-    expect(blockBuffer).toBeTruthy();
+    const decodedFirstBlockBuffer = Buffer.from(encodedFirstBlock, "base64");
+    const decodedFirstBlock = BlockDecoder.decode(decodedFirstBlockBuffer);
+    log.debug("Received decodedFirstBlock:", decodedFirstBlock);
+    expect(decodedFirstBlock.header).toBeTruthy();
+    expect(decodedFirstBlock.header.number.low).toBe(0);
+    expect(decodedFirstBlock.header.number.high).toBe(0);
+    expect(decodedFirstBlock.data).toBeTruthy();
+    expect(decodedFirstBlock.metadata).toBeTruthy();
   });
 
   /**
@@ -372,7 +383,7 @@ describe("Get Block endpoint tests", () => {
     // Get using HEX encoded hash representation
     const firstBlockHashHex = Buffer.from(firstBlockHashJSON).toString("hex");
     log.info("Get by HEX hash:", firstBlockHashHex);
-    const getBlockByHexHashReq = {
+    const getBlockByHexHashReq: GetBlockRequestV1 = {
       channelName: ledgerChannelName,
       gatewayOptions,
       query: {

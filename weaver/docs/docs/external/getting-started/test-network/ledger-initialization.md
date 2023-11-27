@@ -19,7 +19,7 @@ Follow the below instructions to prepare your networks for data sharing tests.
 
 ### Initializing the Fabric Networks
 
-We use the Fabric CLI (`fabric-cli`) built earlier (in `samples/fabric/fabric-cli` and `samples/fabric/go-cli`) for this purpose.
+We use the Fabric CLI (`fabric-cli`) built earlier (in `weaver/samples/fabric/fabric-cli` for the Node.js version and `weaver/samples/fabric/go-cli` for the Golang version) for this purpose.
 
 #### Configuring the Fabric CLI
 
@@ -34,10 +34,10 @@ Knowledge of foreign networks that must be configured in this stage is as follow
 The ledgers must also be populated with sample key-value pairs for testing interoperation flows, scoped by the sample application chaincode.
 
 Prepare `fabric-cli` for configuration suitably as follows.
-- Navigate to the `samples/fabric/fabric-cli` (for the Node.js version) or the `samples/fabric/go-cli` (for the Golang version) folder.
+- Navigate to the `weaver/samples/fabric/fabric-cli` (for the Node.js version) or the `weaver/samples/fabric/go-cli` (for the Golang version) folder.
 - Create a `config.json` file by copying the `config.template.json` and setting (or adding or removing) suitable values:
   * For each network, the relay port and connection profile paths are specified using the keys `relayPort` and `connProfilePath` respectively.
-    - Replace `<PATH-TO-WEAVER>` with the absolute path location of the `weaver-dlt-interoperability` clone folder.
+    - Replace `<PATH-TO-WEAVER>` with the absolute path location of the `weaver` folder within your Cacti repository clone.
     - Otherwise, leave the default values unchanged.
 - Create a `chaincode.json` file by copying the `chaincode.json.template` and leaving the default values unchanged. This file specified the arguments of the transaction to be locally invoked after fetching a remote view.
 - Create a `.env` file by copying `.env.template` and setting the following parameter values:
@@ -57,7 +57,7 @@ Prepare `fabric-cli` for configuration suitably as follows.
     CONFIG_PATH=./config.json
     CHAINCODE_PATH=./chaincode.json
     ```
-  * In each case, replace `<PATH-TO-WEAVER>` with the location of your clone of Weaver and `<chaincode-name>` with the name of the deployed chaincode, either `simplestate` or `simplestatewithacl`.
+  * In each case, replace `<PATH-TO-WEAVER>` with the absolute path location of the `weaver` folder within your Cacti repository clone and `<chaincode-name>` with the name of the deployed chaincode, either `simplestate` or `simplestatewithacl`.
   * If `simplestate` is deployed, set `<function-name>` to `Create`, and if `simplestatewithacl` if deployed, set `<function-name>` to `CreateFromRemote`.
   * Leave the default values unchanged for the other parameters.
 - Run the following command:
@@ -106,7 +106,7 @@ Once the Corda networks are launched, the client applications (built earlier) ne
 Just as we did for either Fabric network, the Corda network ledger (or _vault_ on each node) must be initialized with access control policies, verification policies, and security group information for the two Fabric networks. Further, sample key-value pairs need to be recorded so we can later share them with a Fabric network via an interoperation flow.
 
 Bootstrap the Corda networks and application states as follows (_the following instructions will initialize either or both Corda networks, depending on which of those are up and running_):
-- Navigate to the `samples/corda/corda-simple-application` folder.
+- Navigate to the `weaver/samples/corda/corda-simple-application` folder.
 - Run the following: 
   * If Relays and Drivers are deployed in the host machine:
     ```bash
@@ -116,6 +116,7 @@ Bootstrap the Corda networks and application states as follows (_the following i
     ```bash
     make initialise-vault-docker
     ```
+(Add a note about ignoring errors if only one of the two networks was launched, as the init command tries to initialize both networks.)
 
 ### Next Steps
 
@@ -128,17 +129,17 @@ Follow the below instructions to prepare your networks for asset exchange tests.
 
 ### Initializing the Fabric Networks
 
-We use the Fabric CLI (`fabric-cli`) built earlier (in `samples/fabric/fabric-cli` and `samples/fabric/go-cli`) for this purpose.
+We use the Fabric CLI (`fabric-cli`) built earlier (in `weaver/samples/fabric/fabric-cli` for the Node.js version and `weaver/samples/fabric/go-cli` for the Golang version) for this purpose.
 
 #### Configuring the Fabric CLI
 
 The ledgers must be populated with sample key-value pairs for testing interoperation flows, scoped by the sample application chaincode.
 
 Prepare `fabric-cli` for configuration suitably as follows.
-- Navigate to the `samples/fabric/fabric-cli` (for the Node.js version) or the `samples/fabric/go-cli` (for the Golang version) folder.
+- Navigate to the `weaver/samples/fabric/fabric-cli` (for the Node.js version) or the `weaver/samples/fabric/go-cli` (for the Golang version) folder.
 - Create a `config.json` file by copying the `config.template.json` and setting (or adding or removing) suitable values:
   * For each network, the relay port and connection profile paths are specified using the keys `relayPort` and `connProfilePath` respectively.
-    - Replace `<PATH-TO-WEAVER>` with the absolute path location of the `weaver-dlt-interoperability` clone folder.
+    - Replace `<PATH-TO-WEAVER>` with the absolute path location of the `weaver` folder within your Cacti repository clone.
     - Set the `chaincode` attribute in each network to the deployed chaincode name (`simpleasset` or `simpleassetandinterop` or `simpleassettransfer`).
     - Otherwise, leave the default values unchanged.
 - Create a `.env` file by copying `.env.template` and setting following parameter values:
@@ -152,7 +153,7 @@ Prepare `fabric-cli` for configuration suitably as follows.
     MEMBER_CREDENTIAL_FOLDER=<PATH-TO-WEAVER>/samples/fabric/fabric-cli/src/data/credentials_docker
     CONFIG_PATH=./config.json
     ```
-  * In each case, replace `<PATH-TO-WEAVER>` with the location of your clone of Weaver.
+  * In each case, replace `<PATH-TO-WEAVER>` with the absolute path location of the `weaver` folder within your Cacti repository clone.
   * Leave the default values unchanged for the other parameters.
 - Run the following command:
   ```bash
@@ -174,7 +175,7 @@ Finally, to prepare both `network1` and `network2` for interoperation, run:
 
 Corda Network needs to be initialized with assets for asset-exchange to be performed:
 Bootstrap the Corda network and application states as follows:
-- Navigate to the `samples/corda/corda-simple-application` folder.
+- Navigate to the `weaver/samples/corda/corda-simple-application` folder.
 - Run the following: 
   - For `cordaSimpleApplication` app, run:
     ```
@@ -183,7 +184,7 @@ Bootstrap the Corda network and application states as follows:
 
 ### Initializing the Besu Networks
 
-Let's assume that `network1` can either manage NFT `AliceERC721` or Hybrid `AliceERC1155` tokens, while `network2` manages fungible `BobERC20` tokens. Here we use account `1` for Alice and account `2` for Bob in both neworks. To prepare Besu networks for asset exchange, navigate to the `samples/besu/besu-cli` and then follow the steps in next subsections.
+Let's assume that `network1` can either manage NFT `AliceERC721` or Hybrid `AliceERC1155` tokens, while `network2` manages fungible `BobERC20` tokens. Here we use account `1` for Alice and account `2` for Bob in both neworks. To prepare Besu networks for asset exchange, navigate to the `weaver/samples/besu/besu-cli` and then follow the steps in next subsections.
 
 #### Configuring the Besu-CLI
 
@@ -216,7 +217,7 @@ Follow the below instructions to prepare your networks for asset transfer tests.
 
 ### Initializing the Fabric Networks
 
-We use the Fabric CLI (`fabric-cli`) built earlier (in `samples/fabric/fabric-cli` and `samples/fabric/go-cli`) for this purpose.
+We use the Fabric CLI (`fabric-cli`) built earlier (in `weaver/samples/fabric/fabric-cli` for the Node.js version and `weaver/samples/fabric/go-cli` for the Golang version) for this purpose.
 
 #### Configuring the Fabric CLI
 
@@ -231,10 +232,10 @@ Knowledge of foreign networks that must be configured in this stage is as follow
 The ledgers must also be populated with sample key-value pairs for testing interoperation flows, scoped by the sample application chaincode.
 
 Prepare `fabric-cli` for configuration suitably as follows.
-- Navigate to the `samples/fabric/fabric-cli` folder (_the Go CLI doesn't support asset transfer yet_).
+- Navigate to the `weaver/samples/fabric/fabric-cli` folder (_the Go CLI doesn't support asset transfer yet_).
 - Create a `config.json` file by copying the `config.template.json` and setting (or adding or removing) suitable values:
   * For each network, the relay port and connection profile paths are specified using the keys `relayPort` and `connProfilePath` respectively.
-    - Replace `<PATH-TO-WEAVER>` with the absolute path location of the `weaver-dlt-interoperability` clone folder.
+    - Replace `<PATH-TO-WEAVER>` with the absolute path location of the `weaver` folder within your Cacti repository clone.
     - Set the `chaincode` attribute in each network to `simpleassettransfer`.
     - Set the `aclPolicyPrincipalType` attribute in `network2` to `ca`.
     - Otherwise, leave the default values unchanged.
@@ -263,7 +264,7 @@ Prepare `fabric-cli` for configuration suitably as follows.
     REMOTE_CONFIG_PATH=./remote-network-config.json
     CHAINCODE_PATH=./chaincode.json
     ```
-  * In each case, replace `<PATH-TO-WEAVER>` with the location of your clone of Weaver.
+  * In each case, replace `<PATH-TO-WEAVER>` with the absolute path location of the `weaver` folder within your Cacti repository clone.
   * Leave the default values unchanged for the other parameters.
 - Run the following command:
   ```
@@ -315,7 +316,7 @@ Once the Corda networks (`Corda_Network` and `Corda_Network2`) are launched, the
 The Corda network ledger (or _vault_ on each node) must be initialized with access control policies, verification policies, and security group information for the other networks (two Fabric networks and other Corda network).
 
 Bootstrap the Corda networks and application states as follows (_the following instructions will initialize either or both Corda networks, depending on which of those are up and running_):
-- Navigate to the `samples/corda/corda-simple-application` folder.
+- Navigate to the `weaver/samples/corda/corda-simple-application` folder.
 - Run the following:
   ```bash
   cp clients/src/main/resources/config/remote-network-config.json.template clients/src/main/resources/config/remote-network-config.json

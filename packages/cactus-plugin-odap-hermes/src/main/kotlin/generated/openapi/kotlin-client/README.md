@@ -37,7 +37,7 @@ This runs all tests and packages the library.
 * Some Kotlin and Java types are fully qualified to avoid conflicts with types defined in OpenAPI definitions.
 * Implementation of ApiClient is intended to reduce method counts, specifically to benefit Android targets.
 
-<a name="documentation-for-api-endpoints"></a>
+<a id="documentation-for-api-endpoints"></a>
 ## Documentation for API Endpoints
 
 All URIs are relative to *http://localhost*
@@ -64,7 +64,7 @@ Class | Method | HTTP request | Description
 *DefaultApi* | [**rollbackV1Message**](docs/DefaultApi.md#rollbackv1message) | **POST** /api/v1/@hyperledger/cactus-plugin-odap-hermes/rollbackmessage | 
 
 
-<a name="documentation-for-models"></a>
+<a id="documentation-for-models"></a>
 ## Documentation for Models
 
  - [org.openapitools.client.models.AssetProfile](docs/AssetProfile.md)
@@ -96,7 +96,8 @@ Class | Method | HTTP request | Description
  - [org.openapitools.client.models.TransferInitializationV1Response](docs/TransferInitializationV1Response.md)
 
 
-<a name="documentation-for-authorization"></a>
+<a id="documentation-for-authorization"></a>
 ## Documentation for Authorization
 
-All endpoints do not require authorization.
+Endpoints do not require authorization.
+

@@ -607,6 +607,7 @@ export class PluginLedgerConnectorIroha2
    * @returns Status of the operation.
    */
   public async transact(req: TransactRequestV1): Promise<TransactResponseV1> {
+    const fnTag = `${this.className}:transact()`;
     const client = await this.createClient(req.baseConfig);
 
     try {
@@ -617,17 +618,18 @@ export class PluginLedgerConnectorIroha2
           req.waitForCommit,
         );
       } else if (req.signedTransaction) {
-        const transactionBinary = Uint8Array.from(
-          Object.values(req.signedTransaction),
-        );
+        const signedTxB64 = Buffer.from(req.signedTransaction, "base64");
+        const transactionBinary = Uint8Array.from(signedTxB64);
+
         return await client.sendSignedPayload(
           transactionBinary,
           req.waitForCommit,
         );
       } else {
-        throw new Error(
-          "To submit transaction you must provide either signed transaction payload or list of instructions with signingCredential",
-        );
+        const eMsg =
+          `${fnTag} To submit transaction you must provide either signed transaction` +
+          ` payload (.signedTransaction) or list of instructions with signingCredential`;
+        throw new Error(eMsg);
       }
     } finally {
       client.free();
@@ -662,9 +664,8 @@ export class PluginLedgerConnectorIroha2
           req.signedQuery.query,
         );
 
-        const queryBinary = Uint8Array.from(
-          Object.values(req.signedQuery.payload),
-        );
+        const payloadBuffer = Buffer.from(req.signedQuery.payload, "base64");
+        const queryBinary = Uint8Array.from(payloadBuffer);
 
         return {
           response: await queryContext.requestSigned(queryBinary),
@@ -687,15 +688,17 @@ export class PluginLedgerConnectorIroha2
    */
   public async generateTransaction(
     req: GenerateTransactionRequestV1,
-  ): Promise<Uint8Array> {
+  ): Promise<string> {
     const client = await this.createClient(req.baseConfig);
 
     try {
       if ("instruction" in req.request) {
         this.processInstructionsRequests(client, req.request.instruction);
-        return client.getTransactionPayloadBuffer(
-          this.tryParseTransactionParams(req.request.params),
-        );
+        const txParams = this.tryParseTransactionParams(req.request.params);
+        const payloadTypedArray = client.getTransactionPayloadBuffer(txParams);
+        const payloadBuffer = Buffer.from(payloadTypedArray);
+        const payloadBase64 = payloadBuffer.toString("base64");
+        return payloadBase64;
       } else if ("query" in req.request) {
         const queryContext = this.getQueryContext(
           client.query,
@@ -703,7 +706,10 @@ export class PluginLedgerConnectorIroha2
         );
 
         const params = req.request.params ?? [];
-        return await queryContext.payload(...params);
+        const payloadTypedArray = await queryContext.payload(...params);
+        const payloadBuffer = Buffer.from(payloadTypedArray);
+        const payloadBase64 = payloadBuffer.toString("base64");
+        return payloadBase64;
       } else {
         throw new Error("Missing required transaction or query definition");
       }

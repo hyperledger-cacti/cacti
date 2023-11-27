@@ -8,7 +8,7 @@
 //////////////////////////////////
 
 // Log settings
-const testLogLevel: LogLevelDesc = "info";
+const testLogLevel: LogLevelDesc = "debug";
 
 import {
   LogLevelDesc,
@@ -133,9 +133,10 @@ describe("Generate and send signed transaction tests", () => {
     expect(genTxResponse).toBeTruthy();
     expect(genTxResponse.data).toBeTruthy();
     expect(genTxResponse.status).toEqual(200);
-    const unsignedTransaction = Uint8Array.from(
-      Object.values(genTxResponse.data),
-    );
+
+    const genTxResponseDataB64 = Buffer.from(genTxResponse.data, "base64");
+    const unsignedTransaction = Uint8Array.from(genTxResponseDataB64);
+
     expect(unsignedTransaction).toBeTruthy();
     log.info("Received unsigned transcation");
     log.debug("unsignedTransaction:", unsignedTransaction);
@@ -156,9 +157,12 @@ describe("Generate and send signed transaction tests", () => {
     log.info("Transaction signed with local private key");
     log.debug("signedTransaction:", signedTransaction);
 
+    const signedTxBuffer = Buffer.from(signedTransaction);
+    const signedTxBase64 = signedTxBuffer.toString("base64");
+
     // 3. Send
     const transactionResponse = await env.apiClient.transactV1({
-      signedTransaction,
+      signedTransaction: signedTxBase64,
       waitForCommit: true,
       baseConfig: env.defaultBaseConfig,
     });
@@ -201,9 +205,10 @@ describe("Generate and send signed transaction tests", () => {
     expect(genTxResponse).toBeTruthy();
     expect(genTxResponse.data).toBeTruthy();
     expect(genTxResponse.status).toEqual(200);
-    const unsignedTransaction = Uint8Array.from(
-      Object.values(genTxResponse.data),
-    );
+
+    const dataBuffer = Buffer.from(genTxResponse.data, "base64");
+    const unsignedTransaction = Uint8Array.from(dataBuffer);
+
     expect(unsignedTransaction).toBeTruthy();
     log.info("Received unsigned transcation");
 
@@ -255,9 +260,10 @@ describe("Generate and send signed transaction tests", () => {
     expect(genQueryResponse).toBeTruthy();
     expect(genQueryResponse.data).toBeTruthy();
     expect(genQueryResponse.status).toEqual(200);
-    const unsignedQueryReq = Uint8Array.from(
-      Object.values(genQueryResponse.data),
-    );
+
+    const queryResponseDataBuf = Buffer.from(genQueryResponse.data, "base64");
+    const unsignedQueryReq = Uint8Array.from(queryResponseDataBuf);
+
     expect(unsignedQueryReq).toBeTruthy();
     log.info("Received unsigned query request");
     log.debug("unsignedQueryReq:", unsignedQueryReq);
@@ -278,11 +284,14 @@ describe("Generate and send signed transaction tests", () => {
     log.info("Query request signed with a local private key");
     log.debug("signedQueryReq:", signedQueryReq);
 
+    const payloadBuffer = Buffer.from(signedQueryReq);
+    const payloadBase64 = payloadBuffer.toString("base64");
+
     // 3. Send
     const queryResponse = await env.apiClient.queryV1({
       signedQuery: {
         query: IrohaQuery.FindDomainById,
-        payload: signedQueryReq,
+        payload: payloadBase64,
       },
       baseConfig: env.defaultBaseConfig,
     });
@@ -536,9 +545,10 @@ describe("Generate and send signed transaction tests", () => {
     expect(genTxResponse).toBeTruthy();
     expect(genTxResponse.data).toBeTruthy();
     expect(genTxResponse.status).toEqual(200);
-    const unsignedTransaction = Uint8Array.from(
-      Object.values(genTxResponse.data),
-    );
+
+    const genTxResponseDataBuffer = Buffer.from(genTxResponse.data, "base64");
+    const unsignedTransaction = Uint8Array.from(genTxResponseDataBuffer);
+
     expect(unsignedTransaction).toBeTruthy();
     log.info("Received unsigned transcation");
     log.debug("unsignedTransaction:", unsignedTransaction);
@@ -556,9 +566,12 @@ describe("Generate and send signed transaction tests", () => {
     log.info("Transaction signed with bob private key");
     log.debug("signedTransaction:", signedTransaction);
 
+    const signedTxBuffer = Buffer.from(signedTransaction);
+    const signedTxBase64 = signedTxBuffer.toString("base64");
+
     // 7. Send signed transfer transaction
     const transactionResponse = await env.apiClient.transactV1({
-      signedTransaction,
+      signedTransaction: signedTxBase64,
       waitForCommit: true,
       baseConfig: bobConfig,
     });

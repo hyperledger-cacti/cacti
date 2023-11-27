@@ -5,6 +5,9 @@ import * as health_check_response_pb from "../../generated/proto/protoc-gen-ts/m
 import * as memory_usage_pb from "../../generated/proto/protoc-gen-ts/models/memory_usage_pb";
 import * as default_service from "../../generated/proto/protoc-gen-ts/services/default_service";
 
+import OAS from "../../../json/openapi.json";
+import { stringify } from "safe-stable-stringify";
+
 export class GrpcServerApiServer extends default_service.org.hyperledger.cactus
   .cmd_api_server.UnimplementedDefaultServiceService {
   GetHealthCheckV1(
@@ -12,21 +15,21 @@ export class GrpcServerApiServer extends default_service.org.hyperledger.cactus
       Empty,
       health_check_response_pb.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB
     >,
-    callback: requestCallback<
-      health_check_response_pb.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB
-    >,
+    callback: requestCallback<health_check_response_pb.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB>,
   ): void {
-    const memoryUsage = new memory_usage_pb.org.hyperledger.cactus.cmd_api_server.MemoryUsagePB(
-      process.memoryUsage(),
-    );
+    const memoryUsage =
+      new memory_usage_pb.org.hyperledger.cactus.cmd_api_server.MemoryUsagePB(
+        process.memoryUsage(),
+      );
 
-    const healthCheckResponse = new health_check_response_pb.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB(
-      {
-        success: true,
-        createdAt: new Date().toJSON(),
-        memoryUsage,
-      },
-    );
+    const healthCheckResponse =
+      new health_check_response_pb.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB(
+        {
+          success: true,
+          createdAt: new Date().toJSON(),
+          memoryUsage,
+        },
+      );
     callback(null, healthCheckResponse);
   }
 
@@ -35,11 +38,24 @@ export class GrpcServerApiServer extends default_service.org.hyperledger.cactus
       Empty,
       default_service.org.hyperledger.cactus.cmd_api_server.GetPrometheusMetricsV1Response
     >,
-    callback: requestCallback<
-      default_service.org.hyperledger.cactus.cmd_api_server.GetPrometheusMetricsV1Response
-    >,
+    callback: requestCallback<default_service.org.hyperledger.cactus.cmd_api_server.GetPrometheusMetricsV1Response>,
   ): void {
-    const res = new default_service.org.hyperledger.cactus.cmd_api_server.GetPrometheusMetricsV1Response();
+    const res =
+      new default_service.org.hyperledger.cactus.cmd_api_server.GetPrometheusMetricsV1Response();
+    callback(null, res);
+  }
+
+  GetOpenApiSpecV1(
+    call: ServerUnaryCall<
+      Empty,
+      default_service.org.hyperledger.cactus.cmd_api_server.GetOpenApiSpecV1Response
+    >,
+    callback: requestCallback<default_service.org.hyperledger.cactus.cmd_api_server.GetOpenApiSpecV1Response>,
+  ): void {
+    const res =
+      new default_service.org.hyperledger.cactus.cmd_api_server.GetOpenApiSpecV1Response();
+    const specAsJson = stringify(OAS);
+    res.data = specAsJson;
     callback(null, res);
   }
 }

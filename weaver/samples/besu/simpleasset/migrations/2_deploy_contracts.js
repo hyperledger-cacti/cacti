@@ -1,3 +1,9 @@
+/*
+ * Copyright IBM Corp. All Rights Reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 const AliceERC20 = artifacts.require('./AliceERC20.sol')
 const BobERC20 = artifacts.require('./BobERC20.sol')
 const AliceERC721 = artifacts.require('./AliceERC721.sol')

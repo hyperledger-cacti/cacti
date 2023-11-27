@@ -1,3 +1,7 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+
 #!/usr/bin/env bash
 
 # This script is a modification of indy-node/scripts/create_dirs.sh just to remove the 'sudo' commands.

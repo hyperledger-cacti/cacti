@@ -23,7 +23,7 @@
         "url": "git@github.ibm.com:dlt-interoperability/policy-dsl.git"
     },
     "author": "",
-    "license": "ISC",
+    "license": "Apache-2.0",
     "devDependencies": {
         "ava": "4.3.3",
         "jest": "29.6.2"

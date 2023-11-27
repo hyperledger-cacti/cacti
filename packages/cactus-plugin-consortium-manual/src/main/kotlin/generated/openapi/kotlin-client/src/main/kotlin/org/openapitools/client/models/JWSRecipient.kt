@@ -17,6 +17,7 @@ package org.openapitools.client.models
 
 
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 /**
  * A JSON Web Signature. See: https://tools.ietf.org/html/rfc7515 for info about standard.

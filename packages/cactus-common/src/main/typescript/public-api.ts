@@ -27,3 +27,9 @@ export {
 } from "./authzn/i-jose-fitting-jwt-params";
 
 export { isRecord } from "./types/is-record";
+export { hasKey } from "./types/has-key";
+
+export { asError, coerceUnknownToError } from "./exception/coerce-unknown-to-error";
+export { createRuntimeErrorWithCause, newRex } from "./exception/create-runtime-error-with-cause";
+export { ErrorFromUnknownThrowable } from "./exception/error-from-unknown-throwable";
+export { ErrorFromSymbol } from "./exception/error-from-symbol";

@@ -1,3 +1,7 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+
 #!/bin/sh
 
 RELAY_DNS_CONFIG=${RELAY_DNS_CONFIG:-$(pwd)/config/relays}
