@@ -1,9 +1,5 @@
-// Copyright IBM Corp. All Rights Reserved.
-//
-// SPDX-License-Identifier: Apache-2.0
-
 use colored::Colorize;
-use weaverpb::common::ack::{ack};
+use weaverpb::common::ack::ack;
 use weaverpb::common::events::{event_subscription_state, EventSubscriptionState};
 use weaverpb::common::events::{EventPublication, EventState, EventStates, EventSubscription};
 use weaverpb::common::query::Query;
