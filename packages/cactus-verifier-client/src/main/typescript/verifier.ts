@@ -1,18 +1,17 @@
 /*
- * Copyright 2020-2021 Hyperledger Cactus Contributors
+ * Copyright 2020-2023 Hyperledger Cactus Contributors
  * SPDX-License-Identifier: Apache-2.0
  *
- * Verifier.ts
+ * verifier.ts
  */
 
-import { Subscription } from "rxjs";
+import type { Subscription } from "rxjs";
 
 import {
   Logger,
   LogLevelDesc,
   LoggerProvider,
 } from "@hyperledger/cactus-common";
-
 import {
   ISocketApiClient,
   IVerifier,
@@ -33,9 +32,6 @@ type BlockTypeFromSocketApi<T> = T extends ISocketApiClient<infer U>
 
 /**
  * Extends ledger connector ApiClient with additional monitoring methods (using callbacks, instead of reactive).
- *
- * @remarks
- * Migrated from cmd-socketio-server for merging the codebases.
  *
  * @todo Don't throw exception for not supported operations, don't include these methods at all (if possible)
  */

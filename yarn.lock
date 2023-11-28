@@ -7029,7 +7029,6 @@ __metadata:
     "@hyperledger/cactus-plugin-keychain-memory": 2.0.0-alpha.2
     "@hyperledger/cactus-plugin-ledger-connector-ethereum": 2.0.0-alpha.2
     "@hyperledger/cactus-plugin-ledger-connector-sawtooth": 2.0.0-alpha.2
-    "@hyperledger/cactus-verifier-client": 2.0.0-alpha.2
     "@types/escape-html": 1.0.1
     "@types/express": 4.17.19
     "@types/node": 14.18.54
@@ -8285,6 +8284,33 @@ __metadata:
     "@hyperledger/cactus-plugin-ledger-connector-sawtooth": 2.0.0-alpha.2
     jest-extended: 4.0.1
     rxjs: 7.8.1
+  peerDependencies:
+    "@hyperledger/cactus-api-client": 2.x
+    "@hyperledger/cactus-plugin-ledger-connector-besu": 2.x
+    "@hyperledger/cactus-plugin-ledger-connector-corda": 2.x
+    "@hyperledger/cactus-plugin-ledger-connector-ethereum": 2.x
+    "@hyperledger/cactus-plugin-ledger-connector-fabric": 2.x
+    "@hyperledger/cactus-plugin-ledger-connector-iroha": 2.x
+    "@hyperledger/cactus-plugin-ledger-connector-iroha2": 2.x
+    "@hyperledger/cactus-plugin-ledger-connector-quorum": 2.x
+    "@hyperledger/cactus-plugin-ledger-connector-sawtooth": 2.x
+  peerDependenciesMeta:
+    "@hyperledger/cactus-plugin-ledger-connector-besu":
+      optional: true
+    "@hyperledger/cactus-plugin-ledger-connector-corda":
+      optional: true
+    "@hyperledger/cactus-plugin-ledger-connector-ethereum":
+      optional: true
+    "@hyperledger/cactus-plugin-ledger-connector-fabric":
+      optional: true
+    "@hyperledger/cactus-plugin-ledger-connector-iroha":
+      optional: true
+    "@hyperledger/cactus-plugin-ledger-connector-iroha2":
+      optional: true
+    "@hyperledger/cactus-plugin-ledger-connector-quorum":
+      optional: true
+    "@hyperledger/cactus-plugin-ledger-connector-sawtooth":
+      optional: true
   languageName: unknown
   linkType: soft
 
@@ -9811,7 +9837,6 @@ __metadata:
   version: 5.14.19
   resolution: "@mui/core-downloads-tracker@npm:5.14.19"
   checksum: e71c886f12bbd83791638545017c0b8439c3c6b51125979fea105f938f2f5b109629d4deddd38448c05b8be10b3249334324f1505c1306c52a2b8d315a1005c3
-<<<<<<< HEAD
   languageName: node
   linkType: hard
 
@@ -9836,32 +9861,6 @@ __metadata:
   resolution: "@mui/material@npm:5.14.19"
   dependencies:
     "@babel/runtime": ^7.23.4
-=======
-  languageName: node
-  linkType: hard
-
-"@mui/icons-material@npm:^5.14.19":
-  version: 5.14.19
-  resolution: "@mui/icons-material@npm:5.14.19"
-  dependencies:
-    "@babel/runtime": ^7.23.4
-  peerDependencies:
-    "@mui/material": ^5.0.0
-    "@types/react": ^17.0.0 || ^18.0.0
-    react: ^17.0.0 || ^18.0.0
-  peerDependenciesMeta:
-    "@types/react":
-      optional: true
-  checksum: 31182d4c3416e76c868544d3f604b7d2ef32b59e0445e0b3a794118c55be1e62a24c2f7ed3ae6f46356bd21b913e01a5b0a46d23a897ea7646fb0ee36134dee0
-  languageName: node
-  linkType: hard
-
-"@mui/material@npm:^5.14.19":
-  version: 5.14.19
-  resolution: "@mui/material@npm:5.14.19"
-  dependencies:
-    "@babel/runtime": ^7.23.4
->>>>>>> c1ad57262143868cf2b6301f25b2c78c082926e6
     "@mui/base": 5.0.0-beta.25
     "@mui/core-downloads-tracker": ^5.14.19
     "@mui/system": ^5.14.19
@@ -13601,7 +13600,6 @@ __metadata:
 "@types/react-dom@npm:^18.0.0, @types/react-dom@npm:^18.2.17":
   version: 18.2.17
   resolution: "@types/react-dom@npm:18.2.17"
-<<<<<<< HEAD
   dependencies:
     "@types/react": "*"
   checksum: 7a4e704ed4be6e0c3ccd8a22ff69386fe548304bf4db090513f42e059ff4c65f7a427790320051524d6578a2e4c9667bb7a80a4c989b72361c019fbe851d9385
@@ -13613,19 +13611,6 @@ __metadata:
   resolution: "@types/react-transition-group@npm:4.4.9"
   dependencies:
     "@types/react": "*"
-=======
-  dependencies:
-    "@types/react": "*"
-  checksum: 7a4e704ed4be6e0c3ccd8a22ff69386fe548304bf4db090513f42e059ff4c65f7a427790320051524d6578a2e4c9667bb7a80a4c989b72361c019fbe851d9385
-  languageName: node
-  linkType: hard
-
-"@types/react-transition-group@npm:^4.4.9":
-  version: 4.4.9
-  resolution: "@types/react-transition-group@npm:4.4.9"
-  dependencies:
-    "@types/react": "*"
->>>>>>> c1ad57262143868cf2b6301f25b2c78c082926e6
   checksum: be9e256e53919a7cf3b4a075f6d01c0a2dd3a67911dd28276aa6158be4beade4ca5327cbf1f096c28b413e04989f069122319b02e5a09c280d903a0accea9ead
   languageName: node
   linkType: hard

@@ -98,56 +98,55 @@ function getNewNonce(fromAddress: string): Promise<{ txnCountHex: string }> {
       const args = { args: { args: [fromAddress] } };
 
       logger.debug(`##getNewNonce(A): call validator#getNonce()`);
-      xVerifierFactory
-        .getVerifier("84jUisrs")
-        .sendSyncRequest(contract, method, args)
-        .then((result) => {
-          // logger.debug(`##getNewNonce(A): result: ${JSON.stringify(result)}`);
+      const verifier = await this.verifierFactory.getVerifier(
+        "84jUisrs",
+        "legacy-socketio",
+      );
 
-          const res1 = result as ISendRequestResultV1<{
-            readonly nonce: number;
-            readonly nonceHex: string;
-          }>;
+      verifier.sendSyncRequest(contract, method, args).then((result) => {
+        // logger.debug(`##getNewNonce(A): result: ${JSON.stringify(result)}`);
 
-          let txnCount: number = res1.data.nonce;
-          let txnCountHex: string = res1.data.nonceHex;
+        const res1 = result as ISendRequestResultV1<{
+          readonly nonce: number;
+          readonly nonceHex: string;
+        }>;
 
-          const latestNonce = getLatestNonce(fromAddress);
-          // logger.debug(`##getNewNonce(B): fromAddress: ${fromAddress}, txnCount: ${txnCount}, latestNonce: ${latestNonce}`);
-          if (txnCount <= latestNonce) {
-            // nonce correction
-            txnCount = latestNonce + 1;
-            logger.debug(
-              `##getNewNonce(C): Adjust txnCount, fromAddress: ${fromAddress}, txnCount: ${txnCount}, latestNonce: ${latestNonce}`,
-            );
+        let txnCount: number = res1.data.nonce;
+        let txnCountHex: string = res1.data.nonceHex;
 
-            const method = { type: "function", command: "toHex" };
-            const args = { args: { args: [txnCount] } };
+        const latestNonce = getLatestNonce(fromAddress);
+        // logger.debug(`##getNewNonce(B): fromAddress: ${fromAddress}, txnCount: ${txnCount}, latestNonce: ${latestNonce}`);
+        if (txnCount <= latestNonce) {
+          // nonce correction
+          txnCount = latestNonce + 1;
+          logger.debug(
+            `##getNewNonce(C): Adjust txnCount, fromAddress: ${fromAddress}, txnCount: ${txnCount}, latestNonce: ${latestNonce}`,
+          );
 
-            logger.debug(`##getNewNonce(D): call validator#toHex()`);
-            xVerifierFactory
-              .getVerifier("84jUisrs")
-              .sendSyncRequest(contract, method, args)
-              .then((result) => {
-                const res2 = result as ISendRequestResultV1<{
-                  readonly hexStr: string;
-                }>;
-                txnCountHex = res2.data.hexStr;
-                logger.debug(`##getNewNonce(E): txnCountHex: ${txnCountHex}`);
+          const method = { type: "function", command: "toHex" };
+          const args = { args: { args: [txnCount] } };
 
-                // logger.debug(`##getNewNonce(F) _nonce: ${txnCount}, latestNonce: ${latestNonce}`);
-                setLatestNonce(fromAddress, txnCount);
+          logger.debug(`##getNewNonce(D): call validator#toHex()`);
+          verifier.sendSyncRequest(contract, method, args).then((result) => {
+            const res2 = result as ISendRequestResultV1<{
+              readonly hexStr: string;
+            }>;
+            txnCountHex = res2.data.hexStr;
+            logger.debug(`##getNewNonce(E): txnCountHex: ${txnCountHex}`);
 
-                return resolve({ txnCountHex: txnCountHex });
-              });
-          } else {
             // logger.debug(`##getNewNonce(F) _nonce: ${txnCount}, latestNonce: ${latestNonce}`);
             setLatestNonce(fromAddress, txnCount);
 
-            logger.debug(`##getNewNonce(G): txnCountHex: ${txnCountHex}`);
             return resolve({ txnCountHex: txnCountHex });
-          }
-        });
+          });
+        } else {
+          // logger.debug(`##getNewNonce(F) _nonce: ${txnCount}, latestNonce: ${latestNonce}`);
+          setLatestNonce(fromAddress, txnCount);
+
+          logger.debug(`##getNewNonce(G): txnCountHex: ${txnCountHex}`);
+          return resolve({ txnCountHex: txnCountHex });
+        }
+      });
     } catch (err) {
       logger.error(err);
       return reject(err);

@@ -81,18 +81,20 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
     const options = {
       filterKey: config.electricityTradeInfo.tcsHuawei.filterKey,
     };
-    const verifierTcs = routesVerifierFactory.getVerifier(
-      useValidator["validatorID"][0],
-    );
-    verifierTcs.startMonitor(
-      "BusinessLogicTcsElectricityTrade",
-      options,
-      routesTransactionManagement,
-    );
+    routesVerifierFactory
+      .getVerifier(useValidator["validatorID"][0])
+      .then((verifierTcs) => {
+        verifierTcs.startMonitor(
+          "BusinessLogicTcsElectricityTrade",
+          options,
+          routesTransactionManagement,
+        );
+      });
+
     logger.debug("getVerifierTcs");
   }
 
-  remittanceTransaction(transactionSubset: object) {
+  async remittanceTransaction(transactionSubset: object) {
     logger.debug(
       `called remittanceTransaction(), accountInfo = ${json2str(
         transactionSubset,
@@ -128,7 +130,7 @@ export class BusinessLogicElectricityTrade extends BusinessLogicBase {
       routesTransactionManagement.getValidatorToUse(this.businessLogicID),
     );
     //        const verifierEthereum = routesTransactionManagement.getVerifier(useValidator['validatorID'][1]);
-    const verifierEthereum = routesVerifierFactory.getVerifier(
+    const verifierEthereum = await routesVerifierFactory.getVerifier(
       useValidator["validatorID"][1],
     );
     verifierEthereum.startMonitor(

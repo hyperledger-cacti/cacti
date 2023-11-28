@@ -74,12 +74,13 @@ function sendRequest(
 
       const args = { args: arg_request };
 
-      verifierFactory
-        .getVerifier("3PfTJw8g")
-        .sendSyncRequest(contract, method, args)
-        .then((result) => {
-          return resolve(result as ISendRequestResultV1<Array<string>>);
-        });
+      const verifier = await verifierFactory.getVerifier(
+        "3PfTJw8g",
+        "legacy-socketio",
+      );
+      verifier.sendSyncRequest(contract, method, args).then((result) => {
+        return resolve(result as ISendRequestResultV1<Array<string>>);
+      });
     } catch (err) {
       logger.error(err);
       return reject(err);

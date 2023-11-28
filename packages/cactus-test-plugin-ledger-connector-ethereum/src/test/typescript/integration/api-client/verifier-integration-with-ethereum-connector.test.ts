@@ -179,14 +179,14 @@ describe("Verifier integration with ethereum connector tests", () => {
   // Helper Functions
   //////////////////////////////////
 
-  function monitorAndGetBlock(
+  async function monitorAndGetBlock(
     options: Record<string, unknown> = {},
   ): Promise<LedgerEvent<WatchBlocksV1Progress>> {
+    const appId = "testMonitor";
+    const sut = await globalVerifierFactory.getVerifier(ethereumValidatorId);
+
     return new Promise<LedgerEvent<WatchBlocksV1Progress>>(
       (resolve, reject) => {
-        const appId = "testMonitor";
-        const sut = globalVerifierFactory.getVerifier(ethereumValidatorId);
-
         const monitor: IVerifierEventListener<WatchBlocksV1Progress> = {
           onEvent(ledgerEvent: LedgerEvent<WatchBlocksV1Progress>): void {
             try {
@@ -222,8 +222,8 @@ describe("Verifier integration with ethereum connector tests", () => {
   // Tests
   //////////////////////////////////
 
-  test("Verifier of EthereumApiClient is created by VerifierFactory", () => {
-    const sut = globalVerifierFactory.getVerifier(ethereumValidatorId);
+  test("Verifier of EthereumApiClient is created by VerifierFactory", async () => {
+    const sut = await globalVerifierFactory.getVerifier(ethereumValidatorId);
     expect(sut.ledgerApi.className).toEqual("EthereumApiClient");
   });
 
@@ -236,7 +236,7 @@ describe("Verifier integration with ethereum connector tests", () => {
 
     beforeAll(async () => {
       // Setup verifier
-      verifier = globalVerifierFactory.getVerifier(
+      verifier = await globalVerifierFactory.getVerifier(
         ethereumValidatorId,
         "ETH_1X",
       );
@@ -508,9 +508,13 @@ describe("Verifier integration with ethereum connector tests", () => {
     const method = { type: "web3Eth", command: "getBalance" };
     const args = { args: [WHALE_ACCOUNT_ADDRESS] };
 
-    const results = (await globalVerifierFactory
-      .getVerifier(ethereumValidatorId)
-      .sendSyncRequest(contract, method, args)) as ISendRequestResultV1<string>;
+    const verifier =
+      await globalVerifierFactory.getVerifier(ethereumValidatorId);
+    const results = (await verifier.sendSyncRequest(
+      contract,
+      method,
+      args,
+    )) as ISendRequestResultV1<string>;
     expect(results.status).toEqual(200);
     expect(results.data.length).toBeGreaterThan(0);
   });
@@ -525,7 +529,8 @@ describe("Verifier integration with ethereum connector tests", () => {
     const correctArgs: any = {
       args: [WHALE_ACCOUNT_ADDRESS],
     };
-    const verifier = globalVerifierFactory.getVerifier(ethereumValidatorId);
+    const verifier =
+      await globalVerifierFactory.getVerifier(ethereumValidatorId);
 
     // Sanity check if correct parameters work
     const resultCorrect = (await verifier.sendSyncRequest(
@@ -565,9 +570,9 @@ describe("Verifier integration with ethereum connector tests", () => {
     const args = {};
 
     try {
-      await globalVerifierFactory
-        .getVerifier(ethereumValidatorId)
-        .sendSyncRequest(contract, method, args);
+      const verifier =
+        await globalVerifierFactory.getVerifier(ethereumValidatorId);
+      await verifier.sendSyncRequest(contract, method, args);
       fail("Expected sendSyncRequest call to fail but it succeeded.");
     } catch (error) {
       console.log("sendSyncRequest failed as expected");
