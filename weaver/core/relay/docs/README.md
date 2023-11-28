@@ -102,7 +102,7 @@ The Fabric-cli could be used for creating testing assets. Ensure you have the co
 $ cd weaver/samples/fabric/fabric-cli
 $ cat config.json 
 
-{``
+{
   "network1": {
     "connProfilePath": "/home/user/cacti/weaver/tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json",
     "relayEndpoint": "localhost:9080",

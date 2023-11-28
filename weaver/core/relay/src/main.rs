@@ -61,8 +61,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Set the RUST_LOG environment variable
     env::set_var("RUST_LOG", &log_level);
 
-    // Initialize the logger
-    env_logger::init();
+    // // Initialize the logger
+    // env_logger::init();
     
     settings
         .merge(config::File::with_name(&config_file_name))
