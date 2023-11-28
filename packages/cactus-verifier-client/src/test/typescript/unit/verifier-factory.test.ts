@@ -8,7 +8,6 @@ import {
   VerifierFactory,
   VerifierFactoryConfig,
 } from "../../../main/typescript/verifier-factory";
-import { BesuApiClient } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 
 describe("Constructor Tests", () => {
   test("Basic construction", () => {
@@ -100,27 +99,41 @@ describe("getVerifier Tests", () => {
     sut = new VerifierFactory(ledgerPluginInfo);
   });
 
-  test("Throws when requesting validator not defined in config", () => {
-    expect(() => sut.getVerifier("missingValidatorId")).toThrow();
+  test("Throws when requesting validator not defined in config", async () => {
+    try {
+      await sut.getVerifier("missingValidatorId");
+      expect(1).toBe("getVerifier with invalid Id should throw an error!");
+    } catch (error) {
+      console.log("getVerifier with invalid Id throw error as expected.");
+    }
   });
 
-  test("Throws when requested client type differs from configured type", () => {
-    expect(() =>
-      sut.getVerifier("myBesuValidatorId", "legacy-socketio"),
-    ).toThrow();
+  test("Throws when requested client type differs from configured type", async () => {
+    try {
+      await sut.getVerifier("myBesuValidatorId", "legacy-socketio");
+      expect(1).toBe(
+        "getVerifier with invalid verifier type should throw an error!",
+      );
+    } catch (error) {
+      console.log("getVerifier with invalid type throw error as expected.");
+    }
 
     // even though the same clientApi is used for both BESU_1X and BESU_2X this should fail
     // client code should not depend on internal implementation detail.
-    expect(() => sut.getVerifier("myBesuValidatorId", "BESU_1X")).toThrow();
+    try {
+      await sut.getVerifier("myBesuValidatorId", "BESU_1X");
+      expect(1).toBe(
+        "getVerifier with invalid verifier type should throw an error!",
+      );
+    } catch (error) {
+      console.log("getVerifier with invalid type throw error as expected.");
+    }
   });
 
-  test("Creates a legacy socketio client", () => {
+  test("Creates a legacy socketio client", async () => {
     const validatorId = "mySocketSawtoothValidatorId";
 
-    const client: Verifier<SocketIOApiClient> = sut.getVerifier(
-      validatorId,
-      "legacy-socketio",
-    );
+    const client = await sut.getVerifier(validatorId, "legacy-socketio");
 
     expect(client.verifierID).toEqual(validatorId);
     expect(client.ledgerApi.className).toEqual("SocketIOApiClient");
@@ -129,25 +142,22 @@ describe("getVerifier Tests", () => {
     client.ledgerApi.close();
   });
 
-  test("Creates a open-api based client", () => {
+  test("Creates a open-api based client", async () => {
     const validatorId = "myBesuValidatorId";
 
-    const client: Verifier<BesuApiClient> = sut.getVerifier(
-      validatorId,
-      "BESU_2X",
-    );
+    const client = await sut.getVerifier(validatorId, "BESU_2X");
 
     expect(client.verifierID).toEqual(validatorId);
     expect(client.ledgerApi.className).toEqual("BesuApiClient");
     expect(client.ledgerApi.options.basePath).toEqual("myBesuPath");
   });
 
-  test("Creates correct api client without explicit type specification", () => {
+  test("Creates correct api client without explicit type specification", async () => {
     const validatorId = "mySocketSawtoothValidatorId";
 
-    const client: Verifier<SocketIOApiClient> = sut.getVerifier(
+    const client = (await sut.getVerifier(
       validatorId,
-    ) as Verifier<SocketIOApiClient>;
+    )) as Verifier<SocketIOApiClient>;
 
     expect(client.verifierID).toEqual(validatorId);
     expect(client.ledgerApi.className).toEqual("SocketIOApiClient");
@@ -156,20 +166,14 @@ describe("getVerifier Tests", () => {
     client.ledgerApi.close();
   });
 
-  test("Factory reuses already created verifiers", () => {
+  test("Factory reuses already created verifiers", async () => {
     const validatorId = "mySocketSawtoothValidatorId";
 
-    const client: Verifier<SocketIOApiClient> = sut.getVerifier(
-      validatorId,
-      "legacy-socketio",
-    );
+    const client = await sut.getVerifier(validatorId, "legacy-socketio");
     expect(client.verifierID).toEqual(validatorId);
     expect(sut["verifierMap"].size).toBe(1);
 
-    const anotherClient: Verifier<SocketIOApiClient> = sut.getVerifier(
-      validatorId,
-      "legacy-socketio",
-    );
+    const anotherClient = await sut.getVerifier(validatorId, "legacy-socketio");
     expect(anotherClient.verifierID).toEqual(validatorId);
     expect(sut["verifierMap"].size).toBe(1); // No new verifier added
 

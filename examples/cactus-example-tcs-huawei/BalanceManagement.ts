@@ -36,7 +36,7 @@ export class BalanceManagement {
   }
 
   getBalance(account: string): Promise<unknown> {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       // for LedgerOperation
       // const execData = {"referedAddress": account};
       // const ledgerOperation: LedgerOperation = new LedgerOperation("getNumericBalance", "", execData);
@@ -48,8 +48,11 @@ export class BalanceManagement {
       // const method = "default";
       // const args = {"method": {type: "web3Eth", command: "getBalance"}, "args": {"args": [account]}};
 
-      this.verifierFactory
-        .getVerifier("84jUisrs")
+      const verifier = await this.verifierFactory.getVerifier(
+        "84jUisrs",
+        "legacy-socketio",
+      );
+      verifier
         .sendSyncRequest(contract, method, args)
         .then((result) => {
           const res1 = result as ISendRequestResultV1<string>;

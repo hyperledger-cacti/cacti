@@ -139,7 +139,7 @@ async function setupEnvironment(): Promise<void> {
     sutLogLevel,
   );
 
-  verifier = verifierFactory.getVerifier(ethereumValidatorId, "ETH_1X");
+  verifier = await verifierFactory.getVerifier(ethereumValidatorId, "ETH_1X");
 
   // Clear the stress log file
   writeFileSync(STRESS_LOG_FILENAME, "");
