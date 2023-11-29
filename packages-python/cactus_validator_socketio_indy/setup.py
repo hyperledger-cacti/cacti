@@ -65,7 +65,7 @@ setup(
         'blinker==1.6.2',
        ' cffi==1.15.1',
         'click==8.1.6',
-        'cryptography==41.0.4',
+        'cryptography==41.0.6',
         'dnspython==1.16.0',
         'eventlet==0.31.1',
         'Flask==2.3.2',
