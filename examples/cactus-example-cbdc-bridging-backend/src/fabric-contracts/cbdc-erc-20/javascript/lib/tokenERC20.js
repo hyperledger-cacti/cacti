@@ -373,9 +373,11 @@ class TokenERC20Contract extends Contract {
    * @param {Integer} amount amount of tokens to be minted
    * @returns {Object} The balance
    */
-  async Mint(ctx, amount, minter) {
+  async Mint(ctx, amount) {
     //check contract options are already set first to execute the function
     await this.CheckInitialized(ctx);
+
+    const minter = ctx.clientIdentity.getID();
 
     // Check minter authorization - this sample assumes Org1 is the central banker with privilege to mint new tokens
     const clientMSPID = ctx.clientIdentity.getMSPID();

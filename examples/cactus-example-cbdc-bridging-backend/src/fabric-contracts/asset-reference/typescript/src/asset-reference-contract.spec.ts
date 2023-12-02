@@ -15,10 +15,10 @@ import * as sinonChai from "sinon-chai";
 const bridgedOutAmountKey = "amountBridgedOut";
 
 const USER_A_FABRIC_ID =
-  "x509::/OU=client/OU=org1/OU=department1/CN=userA::/C=US/ST=North Carolina/L=Durham/O=org1.example.com/CN=ca.org1.example.com";
+  "x509::/OU=org1/OU=client/OU=department1/CN=userA::/C=US/ST=North Carolina/L=Durham/O=org1.example.com/CN=ca.org1.example.com";
 
 const USER_A_ETH_ADDRESS =
-  "x509::/OU=client/OU=org1/OU=department1/CN=userA::/C=US/ST=North Carolina/L=Durham/O=org1.example.com/CN=ca.org1.example.com";
+  "x509::/OU=org1/OU=client/OU=department1/CN=userA::/C=US/ST=North Carolina/L=Durham/O=org1.example.com/CN=ca.org1.example.com";
 
 chai.should();
 chai.use(chaiAsPromised);
