@@ -1,12 +1,13 @@
 import {
   Logger,
   createRuntimeErrorWithCause,
+  safeStringifyException,
 } from "@hyperledger/cactus-common";
 import type { Response } from "express";
 import createHttpError from "http-errors";
 
 /**
- * An interface describing the object contaiing the contextual information needed by the
+ * An interface describing the object containing the contextual information needed by the
  * `#handleRestEndpointException()` method to perform its duties.
  *
  * @param ctx - An object containing options for handling the REST endpoint exception.
@@ -35,39 +36,46 @@ export interface IHandleRestEndpointExceptionOptions {
  *
  * @param ctx - An object containing options for handling the REST endpoint exception.
  */
-export function handleRestEndpointException(
+export async function handleRestEndpointException(
   ctx: Readonly<IHandleRestEndpointExceptionOptions>,
-): void {
+): Promise<void> {
+  const errorAsSanitizedJson = safeStringifyException(ctx.error);
+
+  const { identifierByCodes, INTERNAL_SERVER_ERROR } = await import(
+    "http-errors-enhanced"
+  );
+
   if (createHttpError.isHttpError(ctx.error)) {
     ctx.res.status(ctx.error.statusCode);
 
     // Log either an error or a debug message depending on what the statusCode is
     // For 5xx errors we treat it as a production bug that needs to be fixed on
     // our side and for everything else we treat it a user error and debug log it.
-    if (ctx.error.statusCode >= 500) {
-      ctx.log.debug(ctx.errorMsg, ctx.error);
+    if (ctx.error.statusCode >= INTERNAL_SERVER_ERROR) {
+      ctx.log.debug(ctx.errorMsg, errorAsSanitizedJson);
     } else {
-      ctx.log.error(ctx.errorMsg, ctx.error);
+      ctx.log.error(ctx.errorMsg, errorAsSanitizedJson);
     }
 
     // If the `expose` property is set to true it implies that we can safely
     // expose the contents of the exception to the calling client.
     if (ctx.error.expose) {
       ctx.res.json({
-        message: ctx.error.message,
-        error: ctx.error,
+        message: identifierByCodes[ctx.error.statusCode],
+        error: errorAsSanitizedJson,
       });
     }
   } else {
     // If the exception was not an http-error then we assume it was an internal
     // error (e.g. same behavior as if we had received an HTTP 500 statusCode)
-    ctx.log.error(ctx.errorMsg, ctx.error);
+    ctx.log.error(ctx.errorMsg, errorAsSanitizedJson);
 
     const rex = createRuntimeErrorWithCause(ctx.errorMsg, ctx.error);
+    const sanitizedJsonRex = safeStringifyException(rex);
 
-    ctx.res.status(500).json({
-      message: "Internal Server Error",
-      error: rex,
+    ctx.res.status(INTERNAL_SERVER_ERROR).json({
+      message: identifierByCodes[INTERNAL_SERVER_ERROR],
+      error: sanitizedJsonRex,
     });
   }
 }

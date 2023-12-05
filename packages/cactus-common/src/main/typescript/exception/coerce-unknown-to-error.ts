@@ -1,4 +1,5 @@
 import stringify from "fast-safe-stringify";
+import sanitizeHtml from "sanitize-html";
 import { ErrorFromUnknownThrowable } from "./error-from-unknown-throwable";
 import { ErrorFromSymbol } from "./error-from-symbol";
 
@@ -26,10 +27,11 @@ export function coerceUnknownToError(x: unknown): Error {
   } else if (x instanceof Error) {
     return x;
   } else {
-    const xAsJson = stringify(x, (_, value) =>
+    const xAsJsonUnsafe = stringify(x, (_, value) =>
       typeof value === "bigint" ? value.toString() + "n" : value,
     );
-    return new ErrorFromUnknownThrowable(xAsJson);
+    const xAsJsonSanitized = sanitizeHtml(xAsJsonUnsafe);
+    return new ErrorFromUnknownThrowable(xAsJsonSanitized);
   }
 }
 
