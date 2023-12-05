@@ -10,8 +10,8 @@ import {
 import {
   IOdapPluginKeyPair,
   PluginOdapGateway,
-} from "@hyperledger/cactus-plugin-odap-hermes/src/main/typescript/gateway/plugin-odap-gateway";
-import { SessionDataRollbackActionsPerformedEnum } from "@hyperledger/cactus-plugin-odap-hermes/src/main/typescript";
+} from "@hyperledger/cactus-plugin-odap-hermes";
+import { SessionDataRollbackActionsPerformedEnum } from "@hyperledger/cactus-plugin-odap-hermes";
 import { ClientHelper } from "./client-helper";
 import { ServerHelper } from "./server-helper";
 

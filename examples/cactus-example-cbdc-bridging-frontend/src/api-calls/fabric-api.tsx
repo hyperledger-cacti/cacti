@@ -6,7 +6,7 @@ const FABRIC_CHANNEL_NAME = "mychannel";
 const FABRIC_CONTRACT_CBDC_ERC20_NAME = "cbdc";
 const FABRIC_CONTRACT_ASSET_REF_NAME = "asset-reference-contract";
 
-export async function getFabricBalance(frontendUser) {
+export async function getFabricBalance(frontendUser: string) {
   const fabricID = getFabricId(frontendUser);
   const response = await axios.post(
     "http://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction",
@@ -26,7 +26,7 @@ export async function getFabricBalance(frontendUser) {
   return parseInt(response.data.functionOutput);
 }
 
-export async function mintTokensFabric(frontendUser, amount) {
+export async function mintTokensFabric(frontendUser: string, amount: string) {
   const response = await axios.post(
     "http://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction",
     {
@@ -48,9 +48,9 @@ export async function mintTokensFabric(frontendUser, amount) {
 }
 
 export async function transferTokensFabric(
-  frontendUserFrom,
-  frontendUserTo,
-  amount,
+  frontendUserFrom: string,
+  frontendUserTo: string,
+  amount: string,
 ) {
   const to = getFabricId(frontendUserTo);
   const response = await axios.post(
@@ -73,7 +73,7 @@ export async function transferTokensFabric(
   }
 }
 
-export async function escrowTokensFabric(frontendUser, amount, assetRefID) {
+export async function escrowTokensFabric(frontendUser: string, amount: string, assetRefID: string) {
   const response = await axios.post(
     "http://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction",
     {
@@ -94,7 +94,7 @@ export async function escrowTokensFabric(frontendUser, amount, assetRefID) {
   }
 }
 
-export async function bridgeOutTokensFabric(frontendUser, amount, assetRefID) {
+export async function bridgeOutTokensFabric(frontendUser: string, amount: string, assetRefID: string) {
   const fabricID = getFabricId(frontendUser);
   const address = getEthAddress(frontendUser);
 
@@ -144,7 +144,7 @@ export async function bridgeOutTokensFabric(frontendUser, amount, assetRefID) {
   );
 }
 
-export async function getAssetReferencesFabric(frontendUser) {
+export async function getAssetReferencesFabric(frontendUser: string) {
   const response = await axios.post(
     "http://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction",
     {
@@ -161,14 +161,14 @@ export async function getAssetReferencesFabric(frontendUser) {
   );
 
   return JSON.parse(response.data.functionOutput)
-    .filter((asset) => typeof asset === "object")
-    .map((asset) => {
+    .filter((asset: any) => typeof asset === "object")
+    .map((asset: any) => {
       asset.recipient = getUserFromFabricId(asset.recipient);
       return asset;
     });
 }
 
-export function getUserFromFabricId(fabricID) {
+export function getUserFromFabricId(fabricID: string): string {
   switch (fabricID) {
     case CryptoMaterial.accounts["userA"].fabricID:
       return "Alice";
@@ -177,6 +177,6 @@ export function getUserFromFabricId(fabricID) {
     case CryptoMaterial.accounts["bridge"].fabricID:
       return "Bridge";
     default:
-      break;
+      return "";
   }
 }

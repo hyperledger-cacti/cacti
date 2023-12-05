@@ -1,10 +1,10 @@
-import React from "react";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
+import { AssetReference } from "../models/AssetReference";
 
 const headCells = [
   {
@@ -47,7 +47,12 @@ function ItemsTableHead() {
   );
 }
 
-export default function AssetReferencesTable(props) {
+export interface IAssetReferencesTableOptions {
+  ledger: string;
+  assetRefs: AssetReference[];
+}
+
+export default function AssetReferencesTable(props: IAssetReferencesTableOptions) {
   return (
     <div>
       {props.assetRefs && (

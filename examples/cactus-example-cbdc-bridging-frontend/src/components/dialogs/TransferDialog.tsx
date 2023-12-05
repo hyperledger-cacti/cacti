@@ -1,13 +1,11 @@
-import React, { useState, useEffect } from "react";
-import makeStyles from "@mui/styles/makeStyles";
-
+import { useState, useEffect, ChangeEvent } from "react";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import Alert from "@mui/material/Alert";
@@ -15,18 +13,14 @@ import { transferTokensFabric } from "../../api-calls/fabric-api";
 import { transferTokensBesu } from "../../api-calls/besu-api";
 
 const recipients = ["Alice", "Charlie", "Bridge"];
+export interface ITransferDialogOptions {
+  open: boolean
+  ledger: string
+  user: string
+  onClose: () => any
+}
 
-const useStyles = makeStyles(() => ({
-  errorMessage: {
-    marginTop: "1rem",
-  },
-  amountField: {
-    margin: "1rem 0",
-  },
-}));
-
-export default function TransferDialog(props) {
-  const classes = useStyles();
+export default function TransferDialog(props: ITransferDialogOptions) {
   const [recipient, setRecipient] = useState("");
   const [amount, setAmount] = useState(0);
   const [errorMessage, setErrorMessage] = useState("");
@@ -40,8 +34,8 @@ export default function TransferDialog(props) {
     }
   }, [props.open]);
 
-  const handleChangeAmount = (event) => {
-    const value = event.target.value;
+  const handleChangeAmount = (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+    const value = parseInt(event.target.value);
 
     if (value < 0) {
       setErrorMessage("Amount must be a positive value");
@@ -52,19 +46,19 @@ export default function TransferDialog(props) {
     }
   };
 
-  const handleChangeRecipient = (event) => {
+  const handleChangeRecipient = (event: SelectChangeEvent<string>) => {
     setRecipient(event.target.value);
   };
 
   const performTransferTransaction = async () => {
-    if (parseInt(amount) === 0) {
+    if (amount === 0) {
       setErrorMessage("Amount must be a positive value");
     } else {
       setSending(true);
       if (props.ledger === "Fabric") {
         await transferTokensFabric(props.user, recipient, amount.toString());
       } else {
-        await transferTokensBesu(props.user, recipient, parseInt(amount));
+        await transferTokensBesu(props.user, recipient, amount);
       }
 
       props.onClose();
@@ -109,10 +103,10 @@ export default function TransferDialog(props) {
           placeholder="Amount"
           variant="outlined"
           onChange={handleChangeAmount}
-          className={classes.amountField}
+          sx={{ margin: "1rem 0" }}
         />
         {errorMessage !== "" && (
-          <Alert severity="error" className={classes.errorMessage}>
+          <Alert severity="error" sx={{ marginTop: "1rem" }}>
             {errorMessage}
           </Alert>
         )}

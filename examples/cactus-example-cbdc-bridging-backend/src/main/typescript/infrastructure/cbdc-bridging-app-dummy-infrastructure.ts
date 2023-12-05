@@ -38,7 +38,7 @@ import { PluginRegistry } from "@hyperledger/cactus-core";
 import { PluginObjectStoreIpfs } from "@hyperledger/cactus-plugin-object-store-ipfs";
 import AssetReferenceContractJson from "../../../solidity/asset-reference-contract/AssetReferenceContract.json";
 import CBDCcontractJson from "../../../solidity/cbdc-erc-20/CBDCcontract.json";
-import { IOdapPluginKeyPair } from "@hyperledger/cactus-plugin-odap-hermes/src/main/typescript/gateway/plugin-odap-gateway";
+import { IOdapPluginKeyPair } from "@hyperledger/cactus-plugin-odap-hermes";
 import { FabricOdapGateway } from "../odap-extension/fabric-odap-gateway";
 import { BesuOdapGateway } from "../odap-extension/besu-odap-gateway";
 import { PluginImportType } from "@hyperledger/cactus-core-api";

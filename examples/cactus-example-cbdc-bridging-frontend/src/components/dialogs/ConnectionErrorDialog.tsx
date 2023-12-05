@@ -1,26 +1,20 @@
-import React from "react";
-import makeStyles from "@mui/styles/makeStyles";
-
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Dialog from "@mui/material/Dialog";
 import Alert from "@mui/material/Alert";
 
-const useStyles = makeStyles(() => ({
-  alert: {
-    marginBottom: "1rem",
-  },
-}));
+export interface IConnectionErrorDialogOptions {
+  open: boolean
+  onClose: () => any
+}
 
-export default function ConnectionErrorDialog(props) {
-  const classes = useStyles();
-
-  const handleClose = (event, reason) => {
+export default function ConnectionErrorDialog(props: IConnectionErrorDialogOptions) {
+  const handleClose = (event: any, reason: any) => {
     if (reason && reason === "backdropClick") {
       return;
     }
 
-    props.close();
+    props.onClose();
   };
 
   return (
@@ -32,7 +26,7 @@ export default function ConnectionErrorDialog(props) {
     >
       <DialogTitle>{"API Servers Connection Error"}</DialogTitle>
       <DialogContent>
-        <Alert severity="error" className={classes.alert}>
+        <Alert severity="error" sx={{ marginBottom: "1rem" }}>
           Please check the connection with the API Servers and refresh the page.
         </Alert>
       </DialogContent>
