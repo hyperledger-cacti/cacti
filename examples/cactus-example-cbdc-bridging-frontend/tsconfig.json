@@ -1,4 +1,31 @@
 {
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "target": "es5",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "tsBuildInfoFile": "../../.build-cache/cactus-example-cbdc-bridging-frontend.tsbuildinfo"
+  },
+  "include": [
+    "src",
+    "src/**/*.json"
+  ],
   "references": [
     {
       "path": "../../packages/cactus-plugin-ledger-connector-besu/tsconfig.json"

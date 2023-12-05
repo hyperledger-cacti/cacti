@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import Alert from "@mui/material/Alert";
@@ -12,9 +12,16 @@ import {
   bridgeBackTokensBesu,
   getAssetReferencesBesu,
 } from "../../api-calls/besu-api";
+import { AssetReference } from "../../models/AssetReference";
 
-export default function BridgeBackDialog(props) {
-  const [assetRefs, setAssetRefs] = useState([]);
+export interface IBridgeBackDialogOptions {
+  user: string
+  open: boolean
+  onClose: () => any
+}
+
+export default function BridgeBackDialog(props: IBridgeBackDialogOptions) {
+  const [assetRefs, setAssetRefs] = useState<AssetReference[]>([]);
   const [assetRefID, setAssetRefID] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [sending, setSending] = useState(false);
@@ -22,7 +29,7 @@ export default function BridgeBackDialog(props) {
   useEffect(() => {
     async function fetchData() {
       const list = await getAssetReferencesBesu(props.user);
-      setAssetRefs(list.filter((asset) => asset.recipient === props.user));
+      setAssetRefs(list.filter((asset: AssetReference) => asset.recipient === props.user));
     }
 
     if (props.open) {
@@ -32,7 +39,7 @@ export default function BridgeBackDialog(props) {
     }
   }, [props.open, props.user]);
 
-  const handleChangeAssetRefID = (event) => {
+  const handleChangeAssetRefID = (event: SelectChangeEvent<string>) => {
     setAssetRefID(event.target.value);
   };
 
@@ -41,10 +48,14 @@ export default function BridgeBackDialog(props) {
       setErrorMessage("Please choose a valid Asset Reference ID");
     } else {
       setSending(true);
-      const amount = assetRefs.find(
+      const assetRef = assetRefs.find(
         (asset) => asset.id === assetRefID,
-      ).numberTokens;
-      await bridgeBackTokensBesu(props.user, amount, assetRefID);
+      );
+      if (assetRef === undefined) {
+        setErrorMessage("Something went wrong. Asset Reference not found");
+        return;
+      }
+      await bridgeBackTokensBesu(props.user, parseInt(assetRef.numberTokens), assetRefID);
       props.onClose();
     }
   };

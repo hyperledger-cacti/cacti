@@ -155,6 +155,9 @@
       "path": "./examples/cactus-example-cbdc-bridging-backend/tsconfig.json"
     },
     {
+      "path": "./examples/cactus-example-cbdc-bridging-frontend/tsconfig.json"
+    },
+    {
       "path": "./extensions/cactus-plugin-object-store-ipfs/tsconfig.json"
     },
     {

@@ -6,9 +6,9 @@ const BESU_CONTRACT_CBDC_ERC20_NAME = "CBDCcontract";
 const BESU_CONTRACT_ASSET_REF_NAME = "AssetReferenceContract";
 
 export async function transferTokensBesu(
-  frontendUserFrom,
-  frontendUserTo,
-  amount,
+  frontendUserFrom: string,
+  frontendUserTo: string,
+  amount: number,
 ) {
   const from = getEthAddress(frontendUserFrom);
   const to = getEthAddress(frontendUserTo);
@@ -30,7 +30,11 @@ export async function transferTokensBesu(
   );
 }
 
-export async function escrowTokensBesu(frontendUserFrom, amount, assetRefID) {
+export async function escrowTokensBesu(
+  frontendUserFrom: string,
+  amount: number,
+  assetRefID: string
+) {
   const from = getEthAddress(frontendUserFrom);
 
   await axios.post(
@@ -51,7 +55,7 @@ export async function escrowTokensBesu(frontendUserFrom, amount, assetRefID) {
   );
 }
 
-export async function getAssetReferencesBesu(frontendUser) {
+export async function getAssetReferencesBesu(frontendUser: string) {
   const from = getEthAddress(frontendUser);
 
   const response = await axios.post(
@@ -71,7 +75,7 @@ export async function getAssetReferencesBesu(frontendUser) {
     },
   );
 
-  return response.data.callOutput.map((asset) => {
+  return response.data.callOutput.map((asset: any) => {
     return {
       id: asset[0],
       numberTokens: asset[2],
@@ -80,7 +84,7 @@ export async function getAssetReferencesBesu(frontendUser) {
   });
 }
 
-export async function bridgeBackTokensBesu(frontendUser, amount, assetRefID) {
+export async function bridgeBackTokensBesu(frontendUser: string, amount: number, assetRefID: string) {
   const address = getEthAddress(frontendUser);
   const fabricID = getFabricId(frontendUser);
 
@@ -130,7 +134,7 @@ export async function bridgeBackTokensBesu(frontendUser, amount, assetRefID) {
   );
 }
 
-export async function getBesuBalance(frontendUser) {
+export async function getBesuBalance(frontendUser: string) {
   const userEthAddress = getEthAddress(frontendUser);
 
   const response = await axios.post(
@@ -153,7 +157,7 @@ export async function getBesuBalance(frontendUser) {
   return parseInt(response.data.callOutput);
 }
 
-function getUserFromEthAddress(ethAddress) {
+function getUserFromEthAddress(ethAddress: string) {
   switch (ethAddress) {
     case CryptoMaterial.accounts["userA"].ethAddress:
       return "Alice";

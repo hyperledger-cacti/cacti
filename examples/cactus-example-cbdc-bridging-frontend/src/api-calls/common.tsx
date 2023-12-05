@@ -2,7 +2,7 @@ import axios from "axios";
 import CryptoMaterial from "../crypto-material/crypto-material.json";
 
 // Input: [Alice, Charlie, Bridge]
-export function getUserFromPseudonim(user) {
+export function getUserFromPseudonim(user: string) {
   switch (user) {
     case "Alice":
       return "userA";
@@ -15,7 +15,7 @@ export function getUserFromPseudonim(user) {
   }
 }
 
-export function getFabricId(user) {
+export function getFabricId(user: string) {
   switch (getUserFromPseudonim(user)) {
     case "userA":
       return CryptoMaterial.accounts["userA"].fabricID;
@@ -28,7 +28,7 @@ export function getFabricId(user) {
   }
 }
 
-export function getEthAddress(user) {
+export function getEthAddress(user: string) {
   switch (getUserFromPseudonim(user)) {
     case "userA":
       return CryptoMaterial.accounts["userA"].ethAddress;
@@ -41,7 +41,7 @@ export function getEthAddress(user) {
   }
 }
 
-export function getEthUserPrKey(user) {
+export function getEthUserPrKey(user: string) {
   switch (getUserFromPseudonim(user)) {
     case "userA":
       return CryptoMaterial.accounts["userA"].privateKey;
@@ -55,13 +55,9 @@ export function getEthUserPrKey(user) {
 }
 
 export async function checkApiServer1Connection() {
-  await axios.get("http://localhost:4000/api/v1/api-server/healthcheck", {
-    timeout: 2000,
-  });
+  await axios.get("http://localhost:4000/api/v1/api-server/healthcheck");
 }
 
 export async function checkApiServer2Connection() {
-  await axios.get("http://localhost:4100/api/v1/api-server/healthcheck", {
-    timeout: 2000,
-  });
+  await axios.get("http://localhost:4100/api/v1/api-server/healthcheck");
 }
