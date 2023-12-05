@@ -87,6 +87,7 @@ export class HasKeychainEntryV1Endpoint implements IWebServiceEndpoint {
   }
 
   public async handleRequest(req: Request, res: Response): Promise<void> {
+    const { log } = this;
     const fnTag = `${this.className}#handleRequest()`;
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(reqTag);
@@ -103,7 +104,7 @@ export class HasKeychainEntryV1Endpoint implements IWebServiceEndpoint {
       res.json(resBody);
     } catch (ex) {
       const errorMsg = `${reqTag} ${fnTag} Failed to deploy contract:`;
-      handleRestEndpointException({ errorMsg, log: this.log, error: ex, res });
+      await handleRestEndpointException({ errorMsg, log, error: ex, res });
     }
   }
 }
