@@ -36,13 +36,12 @@ async fn get_tls_channel(url: String) -> Result<Channel, Box<dyn std::error::Err
     let tls = ClientTlsConfig::new()
         .ca_certificate(ca)
         .domain_name("example.com");
-    let net_addr = format!("http://{}", url);
+    let net_addr = format!("https://{}", url);
 
     let channel = Channel::from_shared(net_addr.to_string())?
         .tls_config(tls)?
         .connect()
         .await?;
-        
     Ok(channel)
 }
 

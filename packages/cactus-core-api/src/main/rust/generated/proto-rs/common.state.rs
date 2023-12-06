@@ -1,5 +1,7 @@
 /// Metadata for a View
-#[derive(serde::Serialize, serde::Deserialize, Clone, PartialEq, ::prost::Message)]
+#[derive(serde::Serialize, serde::Deserialize)]
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Meta {
     /// Underlying distributed ledger protocol.
     #[prost(enumeration = "meta::Protocol", tag = "1")]
@@ -18,9 +20,8 @@ pub struct Meta {
 }
 /// Nested message and enum types in `Meta`.
 pub mod meta {
+    #[derive(serde::Serialize, serde::Deserialize)]
     #[derive(
-        serde::Serialize,
-        serde::Deserialize,
         Clone,
         Copy,
         Debug,
@@ -29,7 +30,7 @@ pub mod meta {
         Hash,
         PartialOrd,
         Ord,
-        ::prost::Enumeration,
+        ::prost::Enumeration
     )]
     #[repr(i32)]
     pub enum Protocol {
@@ -38,8 +39,34 @@ pub mod meta {
         Fabric = 3,
         Corda = 4,
     }
+    impl Protocol {
+        /// String value of the enum field names used in the ProtoBuf definition.
+        ///
+        /// The values are not transformed in any way and thus are considered stable
+        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+        pub fn as_str_name(&self) -> &'static str {
+            match self {
+                Protocol::Bitcoin => "BITCOIN",
+                Protocol::Ethereum => "ETHEREUM",
+                Protocol::Fabric => "FABRIC",
+                Protocol::Corda => "CORDA",
+            }
+        }
+        /// Creates an enum from field names used in the ProtoBuf definition.
+        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+            match value {
+                "BITCOIN" => Some(Self::Bitcoin),
+                "ETHEREUM" => Some(Self::Ethereum),
+                "FABRIC" => Some(Self::Fabric),
+                "CORDA" => Some(Self::Corda),
+                _ => None,
+            }
+        }
+    }
 }
-#[derive(serde::Serialize, serde::Deserialize, Clone, PartialEq, ::prost::Message)]
+#[derive(serde::Serialize, serde::Deserialize)]
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
 pub struct View {
     #[prost(message, optional, tag = "1")]
     pub meta: ::core::option::Option<Meta>,
@@ -50,7 +77,9 @@ pub struct View {
     pub data: ::prost::alloc::vec::Vec<u8>,
 }
 /// View represents the response from a remote network
-#[derive(serde::Serialize, serde::Deserialize, Clone, PartialEq, ::prost::Message)]
+#[derive(serde::Serialize, serde::Deserialize)]
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ViewPayload {
     #[prost(string, tag = "1")]
     pub request_id: ::prost::alloc::string::String,
@@ -59,7 +88,9 @@ pub struct ViewPayload {
 }
 /// Nested message and enum types in `ViewPayload`.
 pub mod view_payload {
-    #[derive(serde::Serialize, serde::Deserialize, Clone, PartialEq, ::prost::Oneof)]
+    #[derive(serde::Serialize, serde::Deserialize)]
+    #[allow(clippy::derive_partial_eq_without_eq)]
+    #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum State {
         #[prost(message, tag = "2")]
         View(super::View),
@@ -69,7 +100,9 @@ pub mod view_payload {
 }
 /// the payload that is used for the communication between the requesting relay
 /// and its network
-#[derive(serde::Serialize, serde::Deserialize, Clone, PartialEq, ::prost::Message)]
+#[derive(serde::Serialize, serde::Deserialize)]
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
 pub struct RequestState {
     #[prost(string, tag = "1")]
     pub request_id: ::prost::alloc::string::String,
@@ -80,9 +113,8 @@ pub struct RequestState {
 }
 /// Nested message and enum types in `RequestState`.
 pub mod request_state {
+    #[derive(serde::Serialize, serde::Deserialize)]
     #[derive(
-        serde::Serialize,
-        serde::Deserialize,
         Clone,
         Copy,
         Debug,
@@ -91,7 +123,7 @@ pub mod request_state {
         Hash,
         PartialOrd,
         Ord,
-        ::prost::Enumeration,
+        ::prost::Enumeration
     )]
     #[repr(i32)]
     pub enum Status {
@@ -102,7 +134,33 @@ pub mod request_state {
         Error = 2,
         Completed = 3,
     }
-    #[derive(serde::Serialize, serde::Deserialize, Clone, PartialEq, ::prost::Oneof)]
+    impl Status {
+        /// String value of the enum field names used in the ProtoBuf definition.
+        ///
+        /// The values are not transformed in any way and thus are considered stable
+        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+        pub fn as_str_name(&self) -> &'static str {
+            match self {
+                Status::PendingAck => "PENDING_ACK",
+                Status::Pending => "PENDING",
+                Status::Error => "ERROR",
+                Status::Completed => "COMPLETED",
+            }
+        }
+        /// Creates an enum from field names used in the ProtoBuf definition.
+        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+            match value {
+                "PENDING_ACK" => Some(Self::PendingAck),
+                "PENDING" => Some(Self::Pending),
+                "ERROR" => Some(Self::Error),
+                "COMPLETED" => Some(Self::Completed),
+                _ => None,
+            }
+        }
+    }
+    #[derive(serde::Serialize, serde::Deserialize)]
+    #[allow(clippy::derive_partial_eq_without_eq)]
+    #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum State {
         #[prost(message, tag = "3")]
         View(super::View),

@@ -163,8 +163,8 @@ fn spawn_send_state(state: ViewPayload, requestor_host: String, requester_port: 
             view_payload::State::View(v) => println!("View Meta: {:?}, View Data: {:?}", v.meta, base64::encode(&v.data)),
             view_payload::State::Error(e) => println!("Error: {:?}", e),
         }
-        let client_addr = format!("http://{}:{}", requestor_host, requester_port);
         if use_tls {
+            let client_addr = format!("https://{}:{}", requestor_host, requester_port);
             let pem = tokio::fs::read(tlsca_cert_path).await.unwrap();
             let ca = Certificate::from_pem(pem);
 
@@ -182,6 +182,7 @@ fn spawn_send_state(state: ViewPayload, requestor_host: String, requester_port: 
             let response = client_result.send_state(state).await;
             println!("Event Publish: Response ACK from requesting relay={:?}\n", response);
         } else {
+            let client_addr = format!("http://{}:{}", requestor_host, requester_port);
             let client_result = EventPublishClient::connect(client_addr).await;
             match client_result {
                 Ok(client) => {
