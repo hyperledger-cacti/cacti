@@ -34,7 +34,7 @@
 			"version": "18.19.0"
 		},
 		"ghcr.io/devcontainers/features/rust:1": {
-			"version": "1.63",
+			"version": "1.74",
 			"profile": "complete"
 		},
 		"ghcr.io/devcontainers-contrib/features/curl-apt-get:1": {},
