@@ -1,7 +1,3 @@
-// Copyright IBM Corp. All Rights Reserved.
-//
-// SPDX-License-Identifier: Apache-2.0
-
 /// Generated client implementations.
 pub mod event_subscribe_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
@@ -15,7 +11,7 @@ pub mod event_subscribe_client {
         /// Attempt to create a new client by connecting to a given endpoint.
         pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
         where
-            D: std::convert::TryInto<tonic::transport::Endpoint>,
+            D: TryInto<tonic::transport::Endpoint>,
             D::Error: Into<StdError>,
         {
             let conn = tonic::transport::Endpoint::new(dst)?.connect().await?;
@@ -71,13 +67,29 @@ pub mod event_subscribe_client {
             self.inner = self.inner.accept_compressed(encoding);
             self
         }
+        /// Limits the maximum size of a decoded message.
+        ///
+        /// Default: `4MB`
+        #[must_use]
+        pub fn max_decoding_message_size(mut self, limit: usize) -> Self {
+            self.inner = self.inner.max_decoding_message_size(limit);
+            self
+        }
+        /// Limits the maximum size of an encoded message.
+        ///
+        /// Default: `usize::MAX`
+        #[must_use]
+        pub fn max_encoding_message_size(mut self, limit: usize) -> Self {
+            self.inner = self.inner.max_encoding_message_size(limit);
+            self
+        }
         /// the dest-relay forwards the request from client as EventSubscription to the src-relay
         pub async fn subscribe_event(
             &mut self,
             request: impl tonic::IntoRequest<
                 super::super::super::common::events::EventSubscription,
             >,
-        ) -> Result<
+        ) -> std::result::Result<
             tonic::Response<super::super::super::common::ack::Ack>,
             tonic::Status,
         > {
@@ -94,14 +106,19 @@ pub mod event_subscribe_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/relay.events.EventSubscribe/SubscribeEvent",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("relay.events.EventSubscribe", "SubscribeEvent"),
+                );
+            self.inner.unary(req, path, codec).await
         }
         /// Src-relay based upon query (EventSubscription) forwards the same response (Ack)
         /// from driver to the dest-relay by calling a new endpoint in dest-relay
         pub async fn send_subscription_status(
             &mut self,
             request: impl tonic::IntoRequest<super::super::super::common::ack::Ack>,
-        ) -> Result<
+        ) -> std::result::Result<
             tonic::Response<super::super::super::common::ack::Ack>,
             tonic::Status,
         > {
@@ -118,14 +135,22 @@ pub mod event_subscribe_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/relay.events.EventSubscribe/SendSubscriptionStatus",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new(
+                        "relay.events.EventSubscribe",
+                        "SendSubscriptionStatus",
+                    ),
+                );
+            self.inner.unary(req, path, codec).await
         }
         /// Src-driver status of event subscription (Ack)
         /// to the src-relay by calling a new endpoint in src-relay
         pub async fn send_driver_subscription_status(
             &mut self,
             request: impl tonic::IntoRequest<super::super::super::common::ack::Ack>,
-        ) -> Result<
+        ) -> std::result::Result<
             tonic::Response<super::super::super::common::ack::Ack>,
             tonic::Status,
         > {
@@ -142,7 +167,15 @@ pub mod event_subscribe_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/relay.events.EventSubscribe/SendDriverSubscriptionStatus",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new(
+                        "relay.events.EventSubscribe",
+                        "SendDriverSubscriptionStatus",
+                    ),
+                );
+            self.inner.unary(req, path, codec).await
         }
     }
 }
@@ -159,7 +192,7 @@ pub mod event_publish_client {
         /// Attempt to create a new client by connecting to a given endpoint.
         pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
         where
-            D: std::convert::TryInto<tonic::transport::Endpoint>,
+            D: TryInto<tonic::transport::Endpoint>,
             D::Error: Into<StdError>,
         {
             let conn = tonic::transport::Endpoint::new(dst)?.connect().await?;
@@ -215,13 +248,29 @@ pub mod event_publish_client {
             self.inner = self.inner.accept_compressed(encoding);
             self
         }
+        /// Limits the maximum size of a decoded message.
+        ///
+        /// Default: `4MB`
+        #[must_use]
+        pub fn max_decoding_message_size(mut self, limit: usize) -> Self {
+            self.inner = self.inner.max_decoding_message_size(limit);
+            self
+        }
+        /// Limits the maximum size of an encoded message.
+        ///
+        /// Default: `usize::MAX`
+        #[must_use]
+        pub fn max_encoding_message_size(mut self, limit: usize) -> Self {
+            self.inner = self.inner.max_encoding_message_size(limit);
+            self
+        }
         /// src-driver forwards the state as part of event subscription to src-relay
         pub async fn send_driver_state(
             &mut self,
             request: impl tonic::IntoRequest<
                 super::super::super::common::state::ViewPayload,
             >,
-        ) -> Result<
+        ) -> std::result::Result<
             tonic::Response<super::super::super::common::ack::Ack>,
             tonic::Status,
         > {
@@ -238,7 +287,10 @@ pub mod event_publish_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/relay.events.EventPublish/SendDriverState",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("relay.events.EventPublish", "SendDriverState"));
+            self.inner.unary(req, path, codec).await
         }
         /// src-relay will forward the state as part of event subscription to dest-relay
         pub async fn send_state(
@@ -246,7 +298,7 @@ pub mod event_publish_client {
             request: impl tonic::IntoRequest<
                 super::super::super::common::state::ViewPayload,
             >,
-        ) -> Result<
+        ) -> std::result::Result<
             tonic::Response<super::super::super::common::ack::Ack>,
             tonic::Status,
         > {
@@ -263,7 +315,10 @@ pub mod event_publish_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/relay.events.EventPublish/SendState",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("relay.events.EventPublish", "SendState"));
+            self.inner.unary(req, path, codec).await
         }
     }
 }
@@ -280,7 +335,7 @@ pub mod event_subscribe_server {
             request: tonic::Request<
                 super::super::super::common::events::EventSubscription,
             >,
-        ) -> Result<
+        ) -> std::result::Result<
             tonic::Response<super::super::super::common::ack::Ack>,
             tonic::Status,
         >;
@@ -289,7 +344,7 @@ pub mod event_subscribe_server {
         async fn send_subscription_status(
             &self,
             request: tonic::Request<super::super::super::common::ack::Ack>,
-        ) -> Result<
+        ) -> std::result::Result<
             tonic::Response<super::super::super::common::ack::Ack>,
             tonic::Status,
         >;
@@ -298,7 +353,7 @@ pub mod event_subscribe_server {
         async fn send_driver_subscription_status(
             &self,
             request: tonic::Request<super::super::super::common::ack::Ack>,
-        ) -> Result<
+        ) -> std::result::Result<
             tonic::Response<super::super::super::common::ack::Ack>,
             tonic::Status,
         >;
@@ -308,6 +363,8 @@ pub mod event_subscribe_server {
         inner: _Inner<T>,
         accept_compression_encodings: EnabledCompressionEncodings,
         send_compression_encodings: EnabledCompressionEncodings,
+        max_decoding_message_size: Option<usize>,
+        max_encoding_message_size: Option<usize>,
     }
     struct _Inner<T>(Arc<T>);
     impl<T: EventSubscribe> EventSubscribeServer<T> {
@@ -320,6 +377,8 @@ pub mod event_subscribe_server {
                 inner,
                 accept_compression_encodings: Default::default(),
                 send_compression_encodings: Default::default(),
+                max_decoding_message_size: None,
+                max_encoding_message_size: None,
             }
         }
         pub fn with_interceptor<F>(
@@ -343,6 +402,22 @@ pub mod event_subscribe_server {
             self.send_compression_encodings.enable(encoding);
             self
         }
+        /// Limits the maximum size of a decoded message.
+        ///
+        /// Default: `4MB`
+        #[must_use]
+        pub fn max_decoding_message_size(mut self, limit: usize) -> Self {
+            self.max_decoding_message_size = Some(limit);
+            self
+        }
+        /// Limits the maximum size of an encoded message.
+        ///
+        /// Default: `usize::MAX`
+        #[must_use]
+        pub fn max_encoding_message_size(mut self, limit: usize) -> Self {
+            self.max_encoding_message_size = Some(limit);
+            self
+        }
     }
     impl<T, B> tonic::codegen::Service<http::Request<B>> for EventSubscribeServer<T>
     where
@@ -356,7 +431,7 @@ pub mod event_subscribe_server {
         fn poll_ready(
             &mut self,
             _cx: &mut Context<'_>,
-        ) -> Poll<Result<(), Self::Error>> {
+        ) -> Poll<std::result::Result<(), Self::Error>> {
             Poll::Ready(Ok(()))
         }
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
@@ -381,15 +456,18 @@ pub mod event_subscribe_server {
                                 super::super::super::common::events::EventSubscription,
                             >,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                (*inner).subscribe_event(request).await
+                                <T as EventSubscribe>::subscribe_event(&inner, request)
+                                    .await
                             };
                             Box::pin(fut)
                         }
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -399,6 +477,10 @@ pub mod event_subscribe_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -423,15 +505,21 @@ pub mod event_subscribe_server {
                                 super::super::super::common::ack::Ack,
                             >,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                (*inner).send_subscription_status(request).await
+                                <T as EventSubscribe>::send_subscription_status(
+                                        &inner,
+                                        request,
+                                    )
+                                    .await
                             };
                             Box::pin(fut)
                         }
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -441,6 +529,10 @@ pub mod event_subscribe_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -467,15 +559,21 @@ pub mod event_subscribe_server {
                                 super::super::super::common::ack::Ack,
                             >,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                (*inner).send_driver_subscription_status(request).await
+                                <T as EventSubscribe>::send_driver_subscription_status(
+                                        &inner,
+                                        request,
+                                    )
+                                    .await
                             };
                             Box::pin(fut)
                         }
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -485,6 +583,10 @@ pub mod event_subscribe_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -513,12 +615,14 @@ pub mod event_subscribe_server {
                 inner,
                 accept_compression_encodings: self.accept_compression_encodings,
                 send_compression_encodings: self.send_compression_encodings,
+                max_decoding_message_size: self.max_decoding_message_size,
+                max_encoding_message_size: self.max_encoding_message_size,
             }
         }
     }
     impl<T: EventSubscribe> Clone for _Inner<T> {
         fn clone(&self) -> Self {
-            Self(self.0.clone())
+            Self(Arc::clone(&self.0))
         }
     }
     impl<T: std::fmt::Debug> std::fmt::Debug for _Inner<T> {
@@ -541,7 +645,7 @@ pub mod event_publish_server {
         async fn send_driver_state(
             &self,
             request: tonic::Request<super::super::super::common::state::ViewPayload>,
-        ) -> Result<
+        ) -> std::result::Result<
             tonic::Response<super::super::super::common::ack::Ack>,
             tonic::Status,
         >;
@@ -549,7 +653,7 @@ pub mod event_publish_server {
         async fn send_state(
             &self,
             request: tonic::Request<super::super::super::common::state::ViewPayload>,
-        ) -> Result<
+        ) -> std::result::Result<
             tonic::Response<super::super::super::common::ack::Ack>,
             tonic::Status,
         >;
@@ -559,6 +663,8 @@ pub mod event_publish_server {
         inner: _Inner<T>,
         accept_compression_encodings: EnabledCompressionEncodings,
         send_compression_encodings: EnabledCompressionEncodings,
+        max_decoding_message_size: Option<usize>,
+        max_encoding_message_size: Option<usize>,
     }
     struct _Inner<T>(Arc<T>);
     impl<T: EventPublish> EventPublishServer<T> {
@@ -571,6 +677,8 @@ pub mod event_publish_server {
                 inner,
                 accept_compression_encodings: Default::default(),
                 send_compression_encodings: Default::default(),
+                max_decoding_message_size: None,
+                max_encoding_message_size: None,
             }
         }
         pub fn with_interceptor<F>(
@@ -594,6 +702,22 @@ pub mod event_publish_server {
             self.send_compression_encodings.enable(encoding);
             self
         }
+        /// Limits the maximum size of a decoded message.
+        ///
+        /// Default: `4MB`
+        #[must_use]
+        pub fn max_decoding_message_size(mut self, limit: usize) -> Self {
+            self.max_decoding_message_size = Some(limit);
+            self
+        }
+        /// Limits the maximum size of an encoded message.
+        ///
+        /// Default: `usize::MAX`
+        #[must_use]
+        pub fn max_encoding_message_size(mut self, limit: usize) -> Self {
+            self.max_encoding_message_size = Some(limit);
+            self
+        }
     }
     impl<T, B> tonic::codegen::Service<http::Request<B>> for EventPublishServer<T>
     where
@@ -607,7 +731,7 @@ pub mod event_publish_server {
         fn poll_ready(
             &mut self,
             _cx: &mut Context<'_>,
-        ) -> Poll<Result<(), Self::Error>> {
+        ) -> Poll<std::result::Result<(), Self::Error>> {
             Poll::Ready(Ok(()))
         }
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
@@ -632,15 +756,18 @@ pub mod event_publish_server {
                                 super::super::super::common::state::ViewPayload,
                             >,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                (*inner).send_driver_state(request).await
+                                <T as EventPublish>::send_driver_state(&inner, request)
+                                    .await
                             };
                             Box::pin(fut)
                         }
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -650,6 +777,10 @@ pub mod event_publish_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -675,13 +806,17 @@ pub mod event_publish_server {
                                 super::super::super::common::state::ViewPayload,
                             >,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
-                            let fut = async move { (*inner).send_state(request).await };
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                <T as EventPublish>::send_state(&inner, request).await
+                            };
                             Box::pin(fut)
                         }
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -691,6 +826,10 @@ pub mod event_publish_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -719,12 +858,14 @@ pub mod event_publish_server {
                 inner,
                 accept_compression_encodings: self.accept_compression_encodings,
                 send_compression_encodings: self.send_compression_encodings,
+                max_decoding_message_size: self.max_decoding_message_size,
+                max_encoding_message_size: self.max_encoding_message_size,
             }
         }
     }
     impl<T: EventPublish> Clone for _Inner<T> {
         fn clone(&self) -> Self {
-            Self(self.0.clone())
+            Self(Arc::clone(&self.0))
         }
     }
     impl<T: std::fmt::Debug> std::fmt::Debug for _Inner<T> {

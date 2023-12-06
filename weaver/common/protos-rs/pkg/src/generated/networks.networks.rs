@@ -1,7 +1,3 @@
-// Copyright IBM Corp. All Rights Reserved.
-//
-// SPDX-License-Identifier: Apache-2.0
-
 #[derive(serde::Serialize, serde::Deserialize)]
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -89,7 +85,7 @@ pub mod network_client {
         /// Attempt to create a new client by connecting to a given endpoint.
         pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
         where
-            D: std::convert::TryInto<tonic::transport::Endpoint>,
+            D: TryInto<tonic::transport::Endpoint>,
             D::Error: Into<StdError>,
         {
             let conn = tonic::transport::Endpoint::new(dst)?.connect().await?;
@@ -145,12 +141,28 @@ pub mod network_client {
             self.inner = self.inner.accept_compressed(encoding);
             self
         }
+        /// Limits the maximum size of a decoded message.
+        ///
+        /// Default: `4MB`
+        #[must_use]
+        pub fn max_decoding_message_size(mut self, limit: usize) -> Self {
+            self.inner = self.inner.max_decoding_message_size(limit);
+            self
+        }
+        /// Limits the maximum size of an encoded message.
+        ///
+        /// Default: `usize::MAX`
+        #[must_use]
+        pub fn max_encoding_message_size(mut self, limit: usize) -> Self {
+            self.inner = self.inner.max_encoding_message_size(limit);
+            self
+        }
         /// Data Sharing endpoints
         /// endpoint for a network to request remote relay state via local relay
         pub async fn request_state(
             &mut self,
             request: impl tonic::IntoRequest<super::NetworkQuery>,
-        ) -> Result<
+        ) -> std::result::Result<
             tonic::Response<super::super::super::common::ack::Ack>,
             tonic::Status,
         > {
@@ -167,13 +179,16 @@ pub mod network_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/networks.networks.Network/RequestState",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("networks.networks.Network", "RequestState"));
+            self.inner.unary(req, path, codec).await
         }
         /// This rpc endpoint is for polling the local relay for request state.
         pub async fn get_state(
             &mut self,
             request: impl tonic::IntoRequest<super::GetStateMessage>,
-        ) -> Result<
+        ) -> std::result::Result<
             tonic::Response<super::super::super::common::state::RequestState>,
             tonic::Status,
         > {
@@ -190,13 +205,16 @@ pub mod network_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/networks.networks.Network/GetState",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("networks.networks.Network", "GetState"));
+            self.inner.unary(req, path, codec).await
         }
         /// NOTE: This rpc is just for debugging.
         pub async fn request_database(
             &mut self,
             request: impl tonic::IntoRequest<super::DbName>,
-        ) -> Result<tonic::Response<super::RelayDatabase>, tonic::Status> {
+        ) -> std::result::Result<tonic::Response<super::RelayDatabase>, tonic::Status> {
             self.inner
                 .ready()
                 .await
@@ -210,14 +228,17 @@ pub mod network_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/networks.networks.Network/RequestDatabase",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("networks.networks.Network", "RequestDatabase"));
+            self.inner.unary(req, path, codec).await
         }
         /// Event endpoints
         /// endpoint for a client to subscribe to event via local relay initiating subscription flow.
         pub async fn subscribe_event(
             &mut self,
             request: impl tonic::IntoRequest<super::NetworkEventSubscription>,
-        ) -> Result<
+        ) -> std::result::Result<
             tonic::Response<super::super::super::common::ack::Ack>,
             tonic::Status,
         > {
@@ -234,13 +255,16 @@ pub mod network_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/networks.networks.Network/SubscribeEvent",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("networks.networks.Network", "SubscribeEvent"));
+            self.inner.unary(req, path, codec).await
         }
         /// This rpc endpoint is for polling the local relay for subscription state.
         pub async fn get_event_subscription_state(
             &mut self,
             request: impl tonic::IntoRequest<super::GetStateMessage>,
-        ) -> Result<
+        ) -> std::result::Result<
             tonic::Response<super::super::super::common::events::EventSubscriptionState>,
             tonic::Status,
         > {
@@ -257,13 +281,21 @@ pub mod network_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/networks.networks.Network/GetEventSubscriptionState",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new(
+                        "networks.networks.Network",
+                        "GetEventSubscriptionState",
+                    ),
+                );
+            self.inner.unary(req, path, codec).await
         }
         /// endpoint for a client to subscribe to event via local relay initiating subscription flow.
         pub async fn unsubscribe_event(
             &mut self,
             request: impl tonic::IntoRequest<super::NetworkEventUnsubscription>,
-        ) -> Result<
+        ) -> std::result::Result<
             tonic::Response<super::super::super::common::ack::Ack>,
             tonic::Status,
         > {
@@ -280,14 +312,19 @@ pub mod network_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/networks.networks.Network/UnsubscribeEvent",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(
+                    GrpcMethod::new("networks.networks.Network", "UnsubscribeEvent"),
+                );
+            self.inner.unary(req, path, codec).await
         }
         /// endpoint for a client to fetch received events.
         /// Note: events are marked as deleted from relay database as soon as client fetches them.
         pub async fn get_event_states(
             &mut self,
             request: impl tonic::IntoRequest<super::GetStateMessage>,
-        ) -> Result<
+        ) -> std::result::Result<
             tonic::Response<super::super::super::common::events::EventStates>,
             tonic::Status,
         > {
@@ -304,7 +341,10 @@ pub mod network_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/networks.networks.Network/GetEventStates",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("networks.networks.Network", "GetEventStates"));
+            self.inner.unary(req, path, codec).await
         }
     }
 }
@@ -320,7 +360,7 @@ pub mod network_server {
         async fn request_state(
             &self,
             request: tonic::Request<super::NetworkQuery>,
-        ) -> Result<
+        ) -> std::result::Result<
             tonic::Response<super::super::super::common::ack::Ack>,
             tonic::Status,
         >;
@@ -328,7 +368,7 @@ pub mod network_server {
         async fn get_state(
             &self,
             request: tonic::Request<super::GetStateMessage>,
-        ) -> Result<
+        ) -> std::result::Result<
             tonic::Response<super::super::super::common::state::RequestState>,
             tonic::Status,
         >;
@@ -336,13 +376,13 @@ pub mod network_server {
         async fn request_database(
             &self,
             request: tonic::Request<super::DbName>,
-        ) -> Result<tonic::Response<super::RelayDatabase>, tonic::Status>;
+        ) -> std::result::Result<tonic::Response<super::RelayDatabase>, tonic::Status>;
         /// Event endpoints
         /// endpoint for a client to subscribe to event via local relay initiating subscription flow.
         async fn subscribe_event(
             &self,
             request: tonic::Request<super::NetworkEventSubscription>,
-        ) -> Result<
+        ) -> std::result::Result<
             tonic::Response<super::super::super::common::ack::Ack>,
             tonic::Status,
         >;
@@ -350,7 +390,7 @@ pub mod network_server {
         async fn get_event_subscription_state(
             &self,
             request: tonic::Request<super::GetStateMessage>,
-        ) -> Result<
+        ) -> std::result::Result<
             tonic::Response<super::super::super::common::events::EventSubscriptionState>,
             tonic::Status,
         >;
@@ -358,7 +398,7 @@ pub mod network_server {
         async fn unsubscribe_event(
             &self,
             request: tonic::Request<super::NetworkEventUnsubscription>,
-        ) -> Result<
+        ) -> std::result::Result<
             tonic::Response<super::super::super::common::ack::Ack>,
             tonic::Status,
         >;
@@ -367,7 +407,7 @@ pub mod network_server {
         async fn get_event_states(
             &self,
             request: tonic::Request<super::GetStateMessage>,
-        ) -> Result<
+        ) -> std::result::Result<
             tonic::Response<super::super::super::common::events::EventStates>,
             tonic::Status,
         >;
@@ -379,6 +419,8 @@ pub mod network_server {
         inner: _Inner<T>,
         accept_compression_encodings: EnabledCompressionEncodings,
         send_compression_encodings: EnabledCompressionEncodings,
+        max_decoding_message_size: Option<usize>,
+        max_encoding_message_size: Option<usize>,
     }
     struct _Inner<T>(Arc<T>);
     impl<T: Network> NetworkServer<T> {
@@ -391,6 +433,8 @@ pub mod network_server {
                 inner,
                 accept_compression_encodings: Default::default(),
                 send_compression_encodings: Default::default(),
+                max_decoding_message_size: None,
+                max_encoding_message_size: None,
             }
         }
         pub fn with_interceptor<F>(
@@ -414,6 +458,22 @@ pub mod network_server {
             self.send_compression_encodings.enable(encoding);
             self
         }
+        /// Limits the maximum size of a decoded message.
+        ///
+        /// Default: `4MB`
+        #[must_use]
+        pub fn max_decoding_message_size(mut self, limit: usize) -> Self {
+            self.max_decoding_message_size = Some(limit);
+            self
+        }
+        /// Limits the maximum size of an encoded message.
+        ///
+        /// Default: `usize::MAX`
+        #[must_use]
+        pub fn max_encoding_message_size(mut self, limit: usize) -> Self {
+            self.max_encoding_message_size = Some(limit);
+            self
+        }
     }
     impl<T, B> tonic::codegen::Service<http::Request<B>> for NetworkServer<T>
     where
@@ -427,7 +487,7 @@ pub mod network_server {
         fn poll_ready(
             &mut self,
             _cx: &mut Context<'_>,
-        ) -> Poll<Result<(), Self::Error>> {
+        ) -> Poll<std::result::Result<(), Self::Error>> {
             Poll::Ready(Ok(()))
         }
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
@@ -447,15 +507,17 @@ pub mod network_server {
                             &mut self,
                             request: tonic::Request<super::NetworkQuery>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                (*inner).request_state(request).await
+                                <T as Network>::request_state(&inner, request).await
                             };
                             Box::pin(fut)
                         }
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -465,6 +527,10 @@ pub mod network_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -485,13 +551,17 @@ pub mod network_server {
                             &mut self,
                             request: tonic::Request<super::GetStateMessage>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
-                            let fut = async move { (*inner).get_state(request).await };
+                            let inner = Arc::clone(&self.0);
+                            let fut = async move {
+                                <T as Network>::get_state(&inner, request).await
+                            };
                             Box::pin(fut)
                         }
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -501,6 +571,10 @@ pub mod network_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -521,15 +595,17 @@ pub mod network_server {
                             &mut self,
                             request: tonic::Request<super::DbName>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                (*inner).request_database(request).await
+                                <T as Network>::request_database(&inner, request).await
                             };
                             Box::pin(fut)
                         }
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -539,6 +615,10 @@ pub mod network_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -561,15 +641,17 @@ pub mod network_server {
                             &mut self,
                             request: tonic::Request<super::NetworkEventSubscription>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                (*inner).subscribe_event(request).await
+                                <T as Network>::subscribe_event(&inner, request).await
                             };
                             Box::pin(fut)
                         }
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -579,6 +661,10 @@ pub mod network_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -599,15 +685,21 @@ pub mod network_server {
                             &mut self,
                             request: tonic::Request<super::GetStateMessage>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                (*inner).get_event_subscription_state(request).await
+                                <T as Network>::get_event_subscription_state(
+                                        &inner,
+                                        request,
+                                    )
+                                    .await
                             };
                             Box::pin(fut)
                         }
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -617,6 +709,10 @@ pub mod network_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -639,15 +735,17 @@ pub mod network_server {
                             &mut self,
                             request: tonic::Request<super::NetworkEventUnsubscription>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                (*inner).unsubscribe_event(request).await
+                                <T as Network>::unsubscribe_event(&inner, request).await
                             };
                             Box::pin(fut)
                         }
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -657,6 +755,10 @@ pub mod network_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -677,15 +779,17 @@ pub mod network_server {
                             &mut self,
                             request: tonic::Request<super::GetStateMessage>,
                         ) -> Self::Future {
-                            let inner = self.0.clone();
+                            let inner = Arc::clone(&self.0);
                             let fut = async move {
-                                (*inner).get_event_states(request).await
+                                <T as Network>::get_event_states(&inner, request).await
                             };
                             Box::pin(fut)
                         }
                     }
                     let accept_compression_encodings = self.accept_compression_encodings;
                     let send_compression_encodings = self.send_compression_encodings;
+                    let max_decoding_message_size = self.max_decoding_message_size;
+                    let max_encoding_message_size = self.max_encoding_message_size;
                     let inner = self.inner.clone();
                     let fut = async move {
                         let inner = inner.0;
@@ -695,6 +799,10 @@ pub mod network_server {
                             .apply_compression_config(
                                 accept_compression_encodings,
                                 send_compression_encodings,
+                            )
+                            .apply_max_message_size_config(
+                                max_decoding_message_size,
+                                max_encoding_message_size,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)
@@ -723,12 +831,14 @@ pub mod network_server {
                 inner,
                 accept_compression_encodings: self.accept_compression_encodings,
                 send_compression_encodings: self.send_compression_encodings,
+                max_decoding_message_size: self.max_decoding_message_size,
+                max_encoding_message_size: self.max_encoding_message_size,
             }
         }
     }
     impl<T: Network> Clone for _Inner<T> {
         fn clone(&self) -> Self {
-            Self(self.0.clone())
+            Self(Arc::clone(&self.0))
         }
     }
     impl<T: std::fmt::Debug> std::fmt::Debug for _Inner<T> {

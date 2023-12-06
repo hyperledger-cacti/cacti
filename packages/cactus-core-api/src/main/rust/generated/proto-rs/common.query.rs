@@ -1,5 +1,7 @@
 /// the payload to define the data that is being requested
-#[derive(serde::Serialize, serde::Deserialize, Clone, PartialEq, ::prost::Message)]
+#[derive(serde::Serialize, serde::Deserialize)]
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Query {
     #[prost(string, repeated, tag = "1")]
     pub policy: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
