@@ -1,4 +1,4 @@
-FROM rust:1.62.1-slim-bullseye AS builder
+FROM rust:1.69.0-slim-bullseye AS builder
 
 RUN apt-get update
 
@@ -14,7 +14,7 @@ RUN rustup target add x86_64-unknown-linux-musl
 # on linux (debian), we can use the toolchain mentioned below also because
 # custom toolchains are not supported.
 # 
-RUN rustup component add rustfmt --toolchain 1.62.1-x86_64-unknown-linux-gnu
+RUN rustup component add rustfmt --toolchain 1.69.0-x86_64-unknown-linux-gnu
 RUN mkdir -p /opt/relay
 COPY . /opt/relay
 
