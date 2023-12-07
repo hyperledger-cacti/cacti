@@ -7384,7 +7384,7 @@ __metadata:
     "@types/express": 4.17.19
     "@types/request": 2.48.7
     "@types/uuid": 9.0.6
-    axios: 1.5.1
+    axios: 1.6.0
     body-parser: 1.20.2
     express: 4.18.2
     google-gax: 4.0.5
