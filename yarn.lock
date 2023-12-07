@@ -7538,7 +7538,7 @@ __metadata:
     "@types/multer": 1.4.7
     "@types/temp": 0.9.1
     "@types/uuid": 9.0.6
-    axios: 1.5.1
+    axios: 1.6.0
     body-parser: 1.20.2
     express: 4.18.2
     express-openapi-validator: 5.0.4

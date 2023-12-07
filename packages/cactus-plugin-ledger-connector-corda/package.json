@@ -59,7 +59,7 @@
     "@hyperledger/cactus-common": "2.0.0-alpha.2",
     "@hyperledger/cactus-core": "2.0.0-alpha.2",
     "@hyperledger/cactus-core-api": "2.0.0-alpha.2",
-    "axios": "1.5.1",
+    "axios": "1.6.0",
     "express-openapi-validator": "5.0.4",
     "internal-ip": "6.2.0",
     "joi": "17.9.1",
