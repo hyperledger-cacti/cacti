@@ -7360,7 +7360,7 @@ __metadata:
     "@types/body-parser": 1.19.4
     "@types/express": 4.17.19
     "@types/request": 2.48.7
-    axios: 1.5.1
+    axios: 1.6.0
     body-parser: 1.20.2
     express: 4.18.2
     http-status-codes: 2.1.4
