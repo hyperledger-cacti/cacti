@@ -17,7 +17,7 @@ tap.test("works with HTTPS NodeJS module", async (assert: any) => {
 
   const generator = new SelfSignedPkiGenerator();
   assert.ok(generator, "Instantiated SelfSignedCertificateGenerator OK.");
-  const serverCertData: IPki = generator.create("localhost");
+  const serverCertData: IPki = generator.create("127.0.0.1");
   assert.ok(serverCertData, "Returned cert data truthy");
   assert.ok(serverCertData.certificatePem, "certData.certificatePem truthy");
   assert.ok(serverCertData.privateKeyPem, "certData.privateKeyPem truthy");
@@ -42,7 +42,7 @@ tap.test("works with HTTPS NodeJS module", async (assert: any) => {
       reject(err);
     });
     aServer.once("listening", () => resolve(aServer));
-    aServer.listen(0, "localhost");
+    aServer.listen(0, "127.0.0.1");
     assert.tearDown(() => aServer.close());
   });
 

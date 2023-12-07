@@ -112,7 +112,7 @@ describe("Go-Ethereum-SocketIO connector tests", () => {
 
     // Generate connector private key and certificate
     const pkiGenerator = new SelfSignedPkiGenerator();
-    const pki = pkiGenerator.create("localhost");
+    const pki = pkiGenerator.create("127.0.0.1");
     connectorPrivKeyValue = pki.privateKeyPem;
     connectorCertValue = pki.certificatePem;
     const jwtAlgo = "RS512";

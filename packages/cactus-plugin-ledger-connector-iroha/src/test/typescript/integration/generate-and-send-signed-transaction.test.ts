@@ -143,7 +143,7 @@ describe("Generate and send signed transaction tests", () => {
     expressApp.use(bodyParser.json({ limit: "250mb" }));
     connectorServer = http.createServer(expressApp);
     const listenOptions = {
-      hostname: "localhost",
+      hostname: "127.0.0.1",
       port: 0,
       server: connectorServer,
     };

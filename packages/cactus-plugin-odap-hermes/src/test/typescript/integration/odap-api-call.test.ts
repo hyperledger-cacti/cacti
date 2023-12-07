@@ -63,7 +63,7 @@ beforeAll(async () => {
   expressApp.use(bodyParser.json({ limit: "250mb" }));
   ipfsServer = http.createServer(expressApp);
   const listenOptions: IListenOptions = {
-    hostname: "localhost",
+    hostname: "127.0.0.1",
     port: 0,
     server: ipfsServer,
   };
@@ -134,7 +134,7 @@ test("runs ODAP between two gateways via openApi", async () => {
     expressApp.use(bodyParser.json({ limit: "250mb" }));
     recipientGatewayserver = http.createServer(expressApp);
     const listenOptions: IListenOptions = {
-      hostname: "localhost",
+      hostname: "127.0.0.1",
       port: 3000,
       server: recipientGatewayserver,
     };
@@ -153,7 +153,7 @@ test("runs ODAP between two gateways via openApi", async () => {
     expressApp.use(bodyParser.json({ limit: "250mb" }));
     sourceGatewayServer = http.createServer(expressApp);
     const listenOptions: IListenOptions = {
-      hostname: "localhost",
+      hostname: "127.0.0.1",
       port: 2000,
       server: sourceGatewayServer,
     };

@@ -25,7 +25,7 @@ test("works with HTTPS NodeJS module", async (t: Test) => {
   const generator = new SelfSignedPkiGenerator();
   t.ok(generator, "Instantiated SelfSignedCertificateGenerator OK.");
 
-  const serverCert: IPki = generator.create("localhost");
+  const serverCert: IPki = generator.create("127.0.0.1");
   t.ok(serverCert, "serverCert truthy");
   t.ok(serverCert.certificatePem, "serverCert.certificatePem truthy");
   t.ok(serverCert.privateKeyPem, "serverCert.privateKeyPem truthy");
@@ -81,7 +81,7 @@ test("works with HTTPS NodeJS module", async (t: Test) => {
 
     aServer.once("tlsClientError", (err: Error) => reject(err));
     aServer.once("listening", () => resolve(aServer));
-    aServer.listen(0, "localhost");
+    aServer.listen(0, "127.0.0.1");
     test.onFinish(() => aServer.close());
   });
 

@@ -18,7 +18,7 @@ test.skip("constructor throws if invalid input is provided", (t: Test) => {
     () =>
       new IrohaTestLedger({
         imageVersion: "nope",
-        postgresHost: "localhost",
+        postgresHost: "127.0.0.1",
         postgresPort: 5432,
       }),
   );
@@ -30,7 +30,7 @@ test.skip("constructor does not throw if valid input is provided", (t: Test) => 
   t.doesNotThrow(
     () =>
       new IrohaTestLedger({
-        postgresHost: "localhost",
+        postgresHost: "127.0.0.1",
         postgresPort: 5432,
       }),
   );
@@ -97,7 +97,7 @@ test.skip("starts/stops/destroys a docker container", async (t: Test) => {
   t.ok(hostPort, "getRpcApiPublicPort() returns truthy OK");
   t.ok(isFinite(hostPort), "getRpcApiPublicPort() returns finite OK");
 
-  const isReachable = await isPortReachable(hostPort, { host: "localhost" });
+  const isReachable = await isPortReachable(hostPort, { host: "127.0.0.1" });
   t.ok(isReachable, `HostPort ${hostPort} is reachable via localhost`);
 
   const irohaKeyPair: IKeyPair = await irohaTestLedger.getNodeKeyPair();
