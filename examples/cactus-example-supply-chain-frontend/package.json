@@ -67,7 +67,7 @@
     "@ionic-native/status-bar": "5.36.0",
     "@ionic/angular": "7.3.3",
     "net-browserify": "0.2.4",
-    "run-time-error-cjs": "1.4.0",
+    "run-time-error": "1.4.0",
     "rxjs": "7.8.1",
     "tls-browserify": "0.2.2",
     "tslib": "2.6.2",
