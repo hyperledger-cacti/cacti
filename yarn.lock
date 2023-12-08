@@ -6790,7 +6790,7 @@ __metadata:
     "@hyperledger/cactus-common": 2.0.0-alpha.2
     "@types/express": 4.17.19
     "@types/google-protobuf": 3.15.5
-    axios: 1.5.1
+    axios: 1.6.0
     google-protobuf: 3.21.2
     grpc-tools: 1.12.4
     grpc_tools_node_protoc_ts: 5.3.3
