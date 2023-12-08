@@ -18454,7 +18454,7 @@ __metadata:
     "@types/react": ^18.2.39
     "@types/react-dom": ^18.2.17
     "@types/uuid": ^9.0.7
-    axios: ^1.6.2
+    axios: 1.6.0
     react: ^18.2.0
     react-dom: ^18.2.0
     react-scripts: 5.0.1
