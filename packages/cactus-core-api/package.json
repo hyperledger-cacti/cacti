@@ -60,7 +60,7 @@
   },
   "dependencies": {
     "@hyperledger/cactus-common": "2.0.0-alpha.2",
-    "axios": "1.5.1"
+    "axios": "1.6.0"
   },
   "devDependencies": {
     "@grpc/grpc-js": "1.9.5",
