@@ -7289,7 +7289,7 @@ __metadata:
     "@hyperledger/cactus-core-api": 2.0.0-alpha.2
     "@hyperledger/cactus-plugin-ledger-connector-besu": 2.0.0-alpha.2
     "@types/express": 4.17.19
-    axios: 1.5.1
+    axios: 1.6.0
     express: 4.18.2
     joi: 17.9.1
     openapi-types: 9.1.0
