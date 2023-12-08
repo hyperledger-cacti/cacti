@@ -6668,7 +6668,7 @@ __metadata:
     "@types/uuid": 8.3.4
     "@types/xml2js": 0.4.9
     async-exit-hook: 2.0.1
-    axios: 1.5.1
+    axios: 1.6.0
     bluebird: 3.7.2
     body-parser: 1.20.2
     compression: 1.7.4
