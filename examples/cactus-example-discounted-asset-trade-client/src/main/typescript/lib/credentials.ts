@@ -128,6 +128,7 @@ export async function registerCredentialDefinition(
       options: {
         endorserMode: "internal",
         endorserDid: did,
+        supportRevocation: false,
       },
     });
 

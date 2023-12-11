@@ -4,7 +4,8 @@
 
 echo ">> Remove the config files on your machine"
 rm -rf ./etc/cactus/
-rm -rf /etc/cactus/indy-all-in-one/
+rm -rf /etc/cactus/*
+rm -rf ~/.cacti/cactus-example-discounted-asset-trade/
 
 echo ">> Stop the docker containers of Ethereum, Fabric and Indy"
 docker stop geth1 asset_trade_faio2x_testnet asset_trade_indy_all_in_one

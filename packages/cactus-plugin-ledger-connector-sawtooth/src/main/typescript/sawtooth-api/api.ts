@@ -102,19 +102,6 @@ export interface BatchStatusesGet200Response {
 /**
  * 
  * @export
- * @interface BatchStatusesGet200Response1
- */
-export interface BatchStatusesGet200Response1 {
-    /**
-     * 
-     * @type {Array<BatchStatusesInner>}
-     * @memberof BatchStatusesGet200Response1
-     */
-    'data'?: Array<BatchStatusesInner>;
-}
-/**
- * 
- * @export
  * @interface BatchStatusesInner
  */
 export interface BatchStatusesInner {
@@ -175,6 +162,19 @@ export interface BatchStatusesInnerInvalidTransactionsInner {
 /**
  * 
  * @export
+ * @interface BatchStatusesPost200Response
+ */
+export interface BatchStatusesPost200Response {
+    /**
+     * 
+     * @type {Array<BatchStatusesInner>}
+     * @memberof BatchStatusesPost200Response
+     */
+    'data'?: Array<BatchStatusesInner>;
+}
+/**
+ * 
+ * @export
  * @interface BatchesBatchIdGet200Response
  */
 export interface BatchesBatchIdGet200Response {
@@ -231,13 +231,13 @@ export interface BatchesGet200Response {
 /**
  * 
  * @export
- * @interface BatchesGet202Response
+ * @interface BatchesPost202Response
  */
-export interface BatchesGet202Response {
+export interface BatchesPost202Response {
     /**
      * 
      * @type {string}
-     * @memberof BatchesGet202Response
+     * @memberof BatchesPost202Response
      */
     'link'?: string;
 }
@@ -1442,7 +1442,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async batchStatusesPost(requestBody: Array<string>, wait?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BatchStatusesGet200Response1>> {
+        async batchStatusesPost(requestBody: Array<string>, wait?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BatchStatusesPost200Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.batchStatusesPost(requestBody, wait, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -1478,7 +1478,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async batchesPost(batchList: BatchList, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BatchesGet202Response>> {
+        async batchesPost(batchList: BatchList, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BatchesPost202Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.batchesPost(batchList, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -1631,7 +1631,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        batchStatusesPost(requestBody: Array<string>, wait?: number, options?: any): AxiosPromise<BatchStatusesGet200Response1> {
+        batchStatusesPost(requestBody: Array<string>, wait?: number, options?: any): AxiosPromise<BatchStatusesPost200Response> {
             return localVarFp.batchStatusesPost(requestBody, wait, options).then((request) => request(axios, basePath));
         },
         /**
@@ -1664,7 +1664,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        batchesPost(batchList: BatchList, options?: any): AxiosPromise<BatchesGet202Response> {
+        batchesPost(batchList: BatchList, options?: any): AxiosPromise<BatchesPost202Response> {
             return localVarFp.batchesPost(batchList, options).then((request) => request(axios, basePath));
         },
         /**
