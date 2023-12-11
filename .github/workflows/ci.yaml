@@ -19,6 +19,7 @@ jobs:
   compute_changed_packages:
     outputs:
       cmd-api-server-changed: ${{ steps.changes.outputs.cmd-api-server-changed }}
+      plugin-ledger-connector-aries-changed: ${{ steps.changes.outputs.plugin-ledger-connector-aries-changed }}
       plugin-ledger-connector-besu-changed: ${{ steps.changes.outputs.plugin-ledger-connector-besu-changed }}
       plugin-ledger-connector-corda-changed: ${{ steps.changes.outputs.plugin-ledger-connector-corda-changed }}
       plugin-ledger-connector-fabric-changed: ${{ steps.changes.outputs.plugin-ledger-connector-fabric-changed }}
@@ -48,6 +49,14 @@ jobs:
               - './packages/cactus-plugin-keychain-vault/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
               # - './.github/workflows/ci.yaml'
 
+            plugin-ledger-connector-aries-changed:
+              - './packages/cactus-plugin-ledger-connector-aries/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-common/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-core/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-core-api/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-test-tooling/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              # - './.github/workflows/ci.yaml'
+
             plugin-ledger-connector-besu-changed:
               - './packages/cactus-plugin-ledger-connector-besu/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
               - './packages/cactus-test-plugin-ledger-connector-besu/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
@@ -57,7 +66,7 @@ jobs:
               - './packages/cactus-test-tooling/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
               - './packages/cactus-plugin-keychain-memory/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
               # - './.github/workflows/ci.yaml''
-  
+
             plugin-ledger-connector-corda-changed:
               - './packages/cactus-plugin-ledger-connector-corda/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
               - './packages/cactus-common/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
@@ -84,7 +93,7 @@ jobs:
               - './packages/cactus-test-geth-ledger/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
               - './packages/cactus-plugin-keychain-memory/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
               # - './.github/workflows/ci.yaml'
-     
+
             plugin-ledger-connector-iroha2-changed:
               - './packages/cactus-plugin-ledger-connector-iroha2/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
               - './packages/cactus-common/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
@@ -347,7 +356,7 @@ jobs:
       - run: ./tools/ci.sh
   cactus-cmd-api-server:
     continue-on-error: false
-    needs: 
+    needs:
       - build-dev
       - compute_changed_packages
     if: needs.compute_changed_packages.outputs.cmd-api-server-changed == 'true'
@@ -893,9 +902,36 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
+  cactus-plugin-ledger-connector-aries:
+    continue-on-error: false
+    needs:
+      - build-dev
+      - compute_changed_packages
+    if: needs.compute_changed_packages.outputs.plugin-ledger-connector-aries-changed == 'true'
+    env:
+      FULL_BUILD_DISABLED: true
+      JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-aries/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_RUNNER_DISABLED: false
+      TAPE_TEST_RUNNER_DISABLED: true
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: ${{ env.NODEJS_VERSION }}
+      - uses: actions/checkout@v3.5.2
+      - id: yarn-cache
+        name: Restore Yarn Cache
+        uses: actions/cache@v3.3.1
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
+          restore-keys: |
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+      - run: ./tools/ci.sh
   cactus-plugin-ledger-connector-besu:
     continue-on-error: false
-    needs: 
+    needs:
       - build-dev
       - compute_changed_packages
     if: needs.compute_changed_packages.outputs.plugin-ledger-connector-besu-changed == 'true'
@@ -925,7 +961,7 @@ jobs:
       - run: ./tools/ci.sh
   cactus-plugin-ledger-connector-corda:
     continue-on-error: false
-    needs: 
+    needs:
       - build-dev
       - compute_changed_packages
     if: needs.compute_changed_packages.outputs.plugin-ledger-connector-corda-changed == 'true'
@@ -955,7 +991,7 @@ jobs:
       - run: ./tools/ci.sh
 
   plugin-ledger-connector-fabric-0:
-    needs: 
+    needs:
       - build-dev
       - compute_changed_packages
     if: needs.compute_changed_packages.outputs.plugin-ledger-connector-fabric-changed == 'true'
@@ -988,7 +1024,7 @@ jobs:
       - run: ./tools/ci.sh
 
   plugin-ledger-connector-fabric-1:
-    needs: 
+    needs:
       - build-dev
       - compute_changed_packages
     if: needs.compute_changed_packages.outputs.plugin-ledger-connector-fabric-changed == 'true'
@@ -1022,7 +1058,7 @@ jobs:
 
   plugin-ledger-connector-fabric-2:
     continue-on-error: false
-    needs: 
+    needs:
       - build-dev
       - compute_changed_packages
     if: needs.compute_changed_packages.outputs.plugin-ledger-connector-fabric-changed == 'true'
@@ -1054,7 +1090,7 @@ jobs:
       - run: yarn ts-node ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/deploy-cc-from-typescript-source.test.ts
 
   plugin-ledger-connector-fabric-3:
-    needs: 
+    needs:
       - build-dev
       - compute_changed_packages
     if: needs.compute_changed_packages.outputs.plugin-ledger-connector-fabric-changed == 'true'
@@ -1088,7 +1124,7 @@ jobs:
 
   plugin-ledger-connector-fabric-4:
     continue-on-error: false
-    needs: 
+    needs:
       - build-dev
       - compute_changed_packages
     if: needs.compute_changed_packages.outputs.plugin-ledger-connector-fabric-changed == 'true'
@@ -1121,7 +1157,7 @@ jobs:
 
   plugin-ledger-connector-fabric-5:
     continue-on-error: false
-    needs: 
+    needs:
       - build-dev
       - compute_changed_packages
     if: needs.compute_changed_packages.outputs.plugin-ledger-connector-fabric-changed == 'true'
@@ -1154,7 +1190,7 @@ jobs:
 
   plugin-ledger-connector-fabric-6:
     continue-on-error: false
-    needs: 
+    needs:
       - build-dev
       - compute_changed_packages
     if: needs.compute_changed_packages.outputs.plugin-ledger-connector-fabric-changed == 'true'
@@ -1187,7 +1223,7 @@ jobs:
 
   plugin-ledger-connector-fabric-7:
     continue-on-error: false
-    needs: 
+    needs:
       - build-dev
       - compute_changed_packages
     if: needs.compute_changed_packages.outputs.plugin-ledger-connector-fabric-changed == 'true'
@@ -1220,7 +1256,7 @@ jobs:
 
   plugin-ledger-connector-fabric-8:
     continue-on-error: false
-    needs: 
+    needs:
       - build-dev
       - compute_changed_packages
     if: needs.compute_changed_packages.outputs.plugin-ledger-connector-fabric-changed == 'true'
@@ -1253,7 +1289,7 @@ jobs:
 
   plugin-ledger-connector-fabric-9:
     continue-on-error: false
-    needs: 
+    needs:
       - build-dev
       - compute_changed_packages
     if: needs.compute_changed_packages.outputs.plugin-ledger-connector-fabric-changed == 'true'
@@ -1285,7 +1321,7 @@ jobs:
       - run: yarn ts-node ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/obtain-profiles.test.ts
 
   plugin-ledger-connector-fabric-10:
-    needs: 
+    needs:
       - build-dev
       - compute_changed_packages
     if: needs.compute_changed_packages.outputs.plugin-ledger-connector-fabric-changed == 'true'
@@ -1319,7 +1355,7 @@ jobs:
 
   plugin-ledger-connector-fabric-11:
     continue-on-error: false
-    needs: 
+    needs:
       - build-dev
       - compute_changed_packages
     if: needs.compute_changed_packages.outputs.plugin-ledger-connector-fabric-changed == 'true'
@@ -1352,7 +1388,7 @@ jobs:
 
   plugin-ledger-connector-fabric-12:
     continue-on-error: false
-    needs: 
+    needs:
       - build-dev
       - compute_changed_packages
     if: needs.compute_changed_packages.outputs.plugin-ledger-connector-fabric-changed == 'true'
@@ -1438,7 +1474,7 @@ jobs:
       - run: ./tools/ci.sh
   cactus-plugin-ledger-connector-iroha2:
     continue-on-error: false
-    needs: 
+    needs:
       - build-dev
       - compute_changed_packages
     if: needs.compute_changed_packages.outputs.plugin-ledger-connector-iroha2-changed == 'true'
@@ -1466,7 +1502,7 @@ jobs:
       - run: ./tools/ci.sh
   cactus-plugin-ledger-connector-ethereum:
     continue-on-error: false
-    needs: 
+    needs:
       - build-dev
       - compute_changed_packages
     if: needs.compute_changed_packages.outputs.plugin-ledger-connector-ethereum-changed == 'true'
@@ -1493,7 +1529,7 @@ jobs:
       - run: ./tools/ci.sh
   cactus-plugin-ledger-connector-quorum:
     continue-on-error: false
-    needs: 
+    needs:
       - build-dev
       - compute_changed_packages
     if: needs.compute_changed_packages.outputs.plugin-ledger-connector-quorum-changed == 'true'
@@ -1705,7 +1741,7 @@ jobs:
       - run: ./tools/ci.sh
   cactus-test-cmd-api-server:
     continue-on-error: false
-    needs: 
+    needs:
       - build-dev
       - compute_changed_packages
     if: needs.compute_changed_packages.outputs.cmd-api-server-changed == 'true'
@@ -1845,7 +1881,7 @@ jobs:
       - run: ./tools/ci.sh
   cactus-test-plugin-ledger-connector-besu:
     continue-on-error: false
-    needs: 
+    needs:
       - build-dev
       - compute_changed_packages
     if: needs.compute_changed_packages.outputs.plugin-ledger-connector-fabric-changed == 'true'
@@ -1875,7 +1911,7 @@ jobs:
       - run: ./tools/ci.sh
   cactus-test-plugin-ledger-connector-quorum:
     continue-on-error: false
-    needs: 
+    needs:
       - build-dev
       - compute_changed_packages
     if: needs.compute_changed_packages.outputs.plugin-ledger-connector-quorum-changed == 'true'
@@ -1930,7 +1966,7 @@ jobs:
       - run: ./tools/ci.sh
   cactus-test-tooling:
     continue-on-error: false
-    needs: 
+    needs:
       - build-dev
       - compute_changed_packages
     if: needs.compute_changed_packages.outputs.test-tooling-changed == 'true'
@@ -2000,7 +2036,7 @@ jobs:
           severity: 'CRITICAL,HIGH'
   ghcr-cmd-api-server:
     runs-on: ubuntu-20.04
-    needs: 
+    needs:
       - compute_changed_packages
     if: needs.compute_changed_packages.outputs.cmd-api-server-changed == 'true'
     steps:
@@ -2017,7 +2053,7 @@ jobs:
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
   ghcr-connector-besu:
-    needs: 
+    needs:
       - compute_changed_packages
     if: needs.compute_changed_packages.outputs.plugin-ledger-connector-besu-changed == 'true'
     runs-on: ubuntu-20.04
@@ -2036,7 +2072,7 @@ jobs:
           severity: 'CRITICAL,HIGH'
   ghcr-connector-corda-server:
     runs-on: ubuntu-20.04
-    needs: 
+    needs:
       - compute_changed_packages
     if: needs.compute_changed_packages.outputs.plugin-ledger-connector-corda-changed == 'true'
 
@@ -2055,7 +2091,7 @@ jobs:
           severity: 'CRITICAL,HIGH'
   ghcr-connector-fabric:
     runs-on: ubuntu-20.04
-    needs: 
+    needs:
       - compute_changed_packages
     if: needs.compute_changed_packages.outputs.plugin-ledger-connector-fabric-changed == 'true'
 
@@ -2074,7 +2110,7 @@ jobs:
           severity: 'CRITICAL,HIGH'
   ghcr-corda-all-in-one:
     runs-on: ubuntu-20.04
-    needs: 
+    needs:
       - compute_changed_packages
     if: needs.compute_changed_packages.outputs.ghcr-corda-all-in-one-changed == 'true'
     steps:
@@ -2098,7 +2134,7 @@ jobs:
         run: DOCKER_BUILDKIT=1 docker build ./tools/docker/corda-all-in-one/corda-v4_8-flowdb/
   ghcr-corda-all-in-one-obligation:
     runs-on: ubuntu-20.04
-    needs: 
+    needs:
       - compute_changed_packages
     if: needs.compute_changed_packages.outputs.ghcr-corda-all-in-one-obligation-changed == 'true'
     steps:
@@ -2116,7 +2152,7 @@ jobs:
           severity: 'CRITICAL,HIGH'
   ghcr-dev-container-vscode:
     runs-on: ubuntu-20.04
-    needs: 
+    needs:
       - compute_changed_packages
     if: needs.compute_changed_packages.outputs.ghcr-dev-container-vscode-changed == 'true'
     env:

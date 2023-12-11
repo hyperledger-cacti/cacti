@@ -200,12 +200,12 @@ export async function connectAgents(
  * Block until given connection is operational.
  *
  * @param agent Aries agent
- * @param outOfBandRecordId connection outOfBandRecordId
+ * @param outOfBandId connection outOfBandId
  * @param timeout operation timeout (will throw exception if timeout exceeded)
  */
-export async function waitForConnectionReady(
+export async function waitForConnectionReadyV1(
   agent: Agent,
-  outOfBandRecordId: string,
+  outOfBandId: string,
   timeout = WAIT_FOR_CLIENT_ACCEPT_TIMEOUT,
 ): Promise<void> {
   let connection: ConnectionRecord | undefined;
@@ -218,11 +218,11 @@ export async function waitForConnectionReady(
     );
 
     connection = (
-      await agent.connections.findAllByOutOfBandId(outOfBandRecordId)
+      await agent.connections.findAllByOutOfBandId(outOfBandId)
     ).pop();
   } while (counter > 0 && (!connection || !connection.isReady));
 
   if (counter <= 0) {
-    throw new Error("waitForConnectionReady() timeout reached!");
+    throw new Error("waitForConnectionReadyV1() timeout reached!");
   }
 }

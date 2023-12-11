@@ -3,6 +3,8 @@
  */
 
 import * as log from "loglevel";
+import * as path from "node:path";
+import * as os from "node:os";
 import { readFileSync } from "fs";
 
 import { AskarModule } from "@aries-framework/askar";
@@ -51,6 +53,11 @@ const ISSUER_AGENT_PORT = 3004;
 const ISSUER_DID_SEED = "000000000000000000000000Steward1";
 const DID_INDY_NAMESPACE = "cacti:test";
 
+const WALLET_PATH = path.join(
+  os.homedir(),
+  ".cacti/cactus-example-discounted-asset-trade/wallet",
+);
+
 // Read Genesis transactions
 const genesisTransactionsPath =
   "/etc/cactus/indy-all-in-one/pool_transactions_genesis";
@@ -58,9 +65,9 @@ log.info(
   "Reading Indy genesis transactions from file:",
   genesisTransactionsPath,
 );
-const genesisTransactions = readFileSync(
-  "/etc/cactus/indy-all-in-one/pool_transactions_genesis",
-).toString("utf-8");
+const genesisTransactions = readFileSync(genesisTransactionsPath).toString(
+  "utf-8",
+);
 
 /**
  * Configuration for local indy-all-in-one ledger.
@@ -142,11 +149,17 @@ export async function setupAgent(
   name: string,
   port: number,
 ): Promise<AnoncredAgent> {
+  const walletPath = path.join(WALLET_PATH, `${name}.sqlite`);
+
   const config: InitConfig = {
     label: name,
     walletConfig: {
       id: name,
       key: name,
+      storage: {
+        type: "sqlite",
+        path: walletPath,
+      },
     },
     endpoints: [`http://localhost:${port}`],
   };

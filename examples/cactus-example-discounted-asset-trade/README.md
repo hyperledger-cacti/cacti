@@ -66,6 +66,13 @@ Alice knows that Acme Corp. provides digital certificates. She asks Acme Corp. t
    popd
    ```
 
+1. Create settings directory and make sure you have write permission on it
+
+   ```bash
+   sudo mkdir /etc/cactus
+   sudo chown -R __YOUR_USERNAME__ /etc/cactus/
+   ```
+
 1. Start the ledgers:
 
    ```
@@ -84,7 +91,7 @@ Alice knows that Acme Corp. provides digital certificates. She asks Acme Corp. t
    - Use `setup-credentials` script from `cactus-example-discounted-asset-trade-client`.
 
 ```bash
-# In separat shell (can be used later for client app)
+# In separate shell (can be used later for client app)
 cd ./examples/cactus-example-discounted-asset-trade-client
 yarn setup-credentials
 popd
@@ -294,33 +301,43 @@ Action: Get assets
 
 1. Press `Ctrl+C` in `docker-compose` console to stop the application.
 1. Run cleanup script
-   ```
-   sudo ./script-cleanup.sh # for root owned files
-   ./script-cleanup.sh # for user owner files
-   ```
+```
+
+sudo ./script-cleanup.sh # for root owned files
+./script-cleanup.sh # for user owner files
+
+```
 
 #### Manual cleanup instructions
 
 1. Remove the config files on your machine
-   ```
-   sudo rm -r ./etc/cactus/
-   ```
+```
+
+sudo rm -r ./etc/cactus/
+
+```
 1. Stop the docker containers of Ethereum, Fabric and Indy
 
-   - `docker stop geth1 asset_trade_faio2x_testnet asset_trade_indy_all_in_one`
-   - `docker rm geth1 asset_trade_faio2x_testnet asset_trade_indy_all_in_one`
+- `docker stop geth1 asset_trade_faio2x_testnet asset_trade_indy_all_in_one`
+- `docker rm geth1 asset_trade_faio2x_testnet asset_trade_indy_all_in_one`
 
 1. Clear indy-all-in-one
 
-   ```
-   pushd ../../tools/docker/indy-all-in-one/
-   ./script-cleanup.sh
-   popd
-   ```
+```
+
+pushd ../../tools/docker/indy-all-in-one/
+./script-cleanup.sh
+popd
+
+```
 
 1. Remove geth files
-   ```
-   pushd ../../tools/docker/geth-testnet/
-   rm -fr ./data-geth1/geth/
-   popd
-   ```
+```
+
+pushd ../../tools/docker/geth-testnet/
+rm -fr ./data-geth1/geth/
+popd
+
+```
+
+```
