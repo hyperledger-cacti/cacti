@@ -62,13 +62,13 @@ const command: GluegunCommand = {
     if (options.port) {
         port = options.port
     }
-    
+
     const app = express();
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({
         extended: false
     }));
-    
+
     app.post('/simple-event-callback', (req, res) => {
         console.log("Received Event State: ", req.body.state)
         if (req.body.state) {
@@ -79,7 +79,7 @@ const command: GluegunCommand = {
         }
         res.status(200).send('Ok');
     });
-    console.log(`Server is running at https://localhost:${port}`);
+    console.log(`Server is running at https://127.0.0.1:${port}`);
     console.log(`Use endpoint '/simple-event-callback' for event publishing`);
     await app.listen(port);
   }

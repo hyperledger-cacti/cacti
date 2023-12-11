@@ -1,6 +1,5 @@
 import path from "path";
 import type { Express } from "express";
-// @ts-ignore
 import { RuntimeError } from "run-time-error-cjs";
 import {
   Logger,

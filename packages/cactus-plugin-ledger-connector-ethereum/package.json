@@ -52,9 +52,9 @@
     "dist/*"
   ],
   "scripts": {
+    "build:dev:backend:postbuild": "npm run copy-artillery-config",
     "codegen": "run-p 'codegen:*'",
     "codegen:openapi": "npm run generate-sdk",
-    "build:dev:backend:postbuild": "npm run copy-artillery-config",
     "copy-artillery-config": "cp -af  ./src/test/typescript/benchmark/setup/geth-benchmark-config.yaml ./src/test/typescript/benchmark/setup/artillery-helper-functions.js ./dist/lib/test/typescript/benchmark/setup",
     "generate-sdk": "run-p 'generate-sdk:*'",
     "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
@@ -102,8 +102,8 @@
     "web3-eth-accounts": "4.0.6"
   },
   "engines": {
-    "node": ">=10",
-    "npm": ">=6"
+    "node": ">=18",
+    "npm": ">=8"
   },
   "publishConfig": {
     "access": "public"

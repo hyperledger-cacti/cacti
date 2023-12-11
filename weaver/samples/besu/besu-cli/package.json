@@ -56,5 +56,9 @@
     "tslint-config-prettier": "1.18.0",
     "tslint-config-standard": "8.0.1",
     "typescript": "4.9.5"
+  },
+  "engines": {
+    "node": ">=18",
+    "npm": ">=8"
   }
 }

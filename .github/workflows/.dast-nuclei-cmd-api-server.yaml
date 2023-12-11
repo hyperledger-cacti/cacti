@@ -1,5 +1,8 @@
 name: DAST_Scan_Nuclei
 
+env:
+  NODEJS_VERSION: v18.18.2
+
 on:
   push:
     branches: [main, dev]
@@ -23,10 +26,10 @@ jobs:
                 indy-cli \
             && sudo rm -f /etc/apt/sources.list.d/sovrin.list*
 
-      - name: Set up NodeJS v16.9.1
+      - name: Set up NodeJS ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.9.1
+          node-version: ${{ env.NODEJS_VERSION }}
 
       - name: Install jq
         run: sudo apt update && sudo apt install -y jq

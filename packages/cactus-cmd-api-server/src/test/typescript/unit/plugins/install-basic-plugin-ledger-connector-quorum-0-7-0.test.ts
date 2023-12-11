@@ -62,7 +62,7 @@ test.skip("can import plugins at runtime (CLI)", async (t: Test) => {
       options: {
         instanceId: uuidv4(),
         logLevel,
-        rpcApiHttpHost: "localhost:8545",
+        rpcApiHttpHost: "127.0.0.1:8545",
       },
     },
   ];

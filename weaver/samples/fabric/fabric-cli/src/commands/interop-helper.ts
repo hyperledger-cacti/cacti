@@ -36,7 +36,7 @@ const command: GluegunCommand = {
       commandHelp(
         print,
         toolbox,
-        `fabric-cli interop --local-network=network2  --requesting-org=Org1MSP localhost:9080/network1/mychannel:interop:Read:a`,
+        `fabric-cli interop --local-network=network2  --requesting-org=Org1MSP 127.0.0.1:9080/network1/mychannel:interop:Read:a`,
         'fabric-cli interop <address>',
         [
           {
@@ -99,7 +99,7 @@ const command: GluegunCommand = {
     if (!options['user']) {
       options['user'] = `user1`     //Default user
     }
-    // TEST: fabric-cli interop --local-network=network1 localhost:9081/Nick_Network/test
+    // TEST: fabric-cli interop --local-network=network1 127.0.0.1:9081/Nick_Network/test
     // Making Interop Call using gRPC calls.
     print.info('Making Interop Call using gRPC calls.')
     const relayEnv = getNetworkConfig(options['local-network'])
@@ -110,12 +110,12 @@ const command: GluegunCommand = {
       )
       return
     }
-    
+
     try {
       const appChaincodeId = process.env.DEFAULT_APPLICATION_CHAINCODE ? process.env.DEFAULT_APPLICATION_CHAINCODE : 'simplestate'
       const applicationFunction = process.env.DEFAULT_APPLICATION_FUNC ? process.env.DEFAULT_APPLICATION_FUNC : 'Create'
       const { args, replaceIndices } = getChaincodeConfig(appChaincodeId, applicationFunction)
-      
+
       await interopHelper(
         options['local-network'],
         await generateViewAddress(           // Typically a noop, but for some functions, we may want to do some extra processing
@@ -138,6 +138,6 @@ const command: GluegunCommand = {
   }
 }
 
-// fabric-cli interop --local-network=network1 --sign=true localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:H
-// fabric-cli interop --local-network=network2 --remote-network=network1 localhost:9080/Fabric_Network/mychannel:interop:Read:a
+// fabric-cli interop --local-network=network1 --sign=true 127.0.0.1:9081/Corda_Network/127.0.0.1:10006#com.cordaSimpleApplication.flow.GetStateByKey:H
+// fabric-cli interop --local-network=network2 --remote-network=network1 127.0.0.1:9080/Fabric_Network/mychannel:interop:Read:a
 module.exports = command

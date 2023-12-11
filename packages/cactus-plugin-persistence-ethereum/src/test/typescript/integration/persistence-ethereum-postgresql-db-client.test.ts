@@ -91,11 +91,11 @@ describe("Ethereum persistence PostgreSQL PostgresDatabaseClient tests", () => {
     await postgresContainer.start();
     const postgresPort = await postgresContainer.getPostgresPort();
     expect(postgresPort).toBeTruthy();
-    log.info(`Postgres running at localhost:${postgresPort}`);
+    log.info(`Postgres running at 127.0.0.1:${postgresPort}`);
 
     log.info("Create PostgresDatabaseClient");
     dbClient = new PostgresDatabaseClient({
-      connectionString: `postgresql://postgres:postgres@localhost:${postgresPort}/postgres`,
+      connectionString: `postgresql://postgres:postgres@127.0.0.1:${postgresPort}/postgres`,
       logLevel: sutLogLevel,
     });
 

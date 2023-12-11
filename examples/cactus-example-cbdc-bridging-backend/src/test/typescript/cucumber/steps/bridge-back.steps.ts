@@ -30,13 +30,13 @@ Then(
     };
 
     const response = await axios.post(
-      "http://localhost:4100/api/v1/@hyperledger/cactus-plugin-odap-hermes/clientrequest",
+      "http://127.0.0.1:4100/api/v1/@hyperledger/cactus-plugin-odap-hermes/clientrequest",
       {
         clientGatewayConfiguration: {
-          apiHost: `http://localhost:4100`,
+          apiHost: `http://127.0.0.1:4100`,
         },
         serverGatewayConfiguration: {
-          apiHost: `http://localhost:4000`,
+          apiHost: `http://127.0.0.1:4000`,
         },
         version: "0.0.0",
         loggingProfile: "dummyLoggingProfile",
@@ -92,13 +92,13 @@ Then(
 
     await axios
       .post(
-        "http://localhost:4100/api/v1/@hyperledger/cactus-plugin-odap-hermes/clientrequest",
+        "http://127.0.0.1:4100/api/v1/@hyperledger/cactus-plugin-odap-hermes/clientrequest",
         {
           clientGatewayConfiguration: {
-            apiHost: `http://localhost:4100`,
+            apiHost: `http://127.0.0.1:4100`,
           },
           serverGatewayConfiguration: {
-            apiHost: `http://localhost:4000`,
+            apiHost: `http://127.0.0.1:4000`,
           },
           version: "0.0.0",
           loggingProfile: "dummyLoggingProfile",

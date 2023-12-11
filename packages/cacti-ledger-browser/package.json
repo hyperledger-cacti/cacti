@@ -68,7 +68,8 @@
     "vite-plugin-solid": "2.3.0"
   },
   "engines": {
-    "npm": ">=6"
+    "node": ">=18",
+    "npm": ">=8"
   },
   "publishConfig": {
     "access": "public"

@@ -124,7 +124,7 @@ export class OpenEthereumTestLedger {
     const Env = [...[], ...this.envVars];
     this.log.debug(`Effective Env of container: %o`, Env);
 
-    const apiUrl = await this.getRpcApiHttpHost("localhost", this.httpPort);
+    const apiUrl = await this.getRpcApiHttpHost("127.0.0.1", this.httpPort);
     const Healthcheck = {
       Test: ["CMD-SHELL", `curl -v '${apiUrl}'`],
       Interval: 1000000000, // 1 second

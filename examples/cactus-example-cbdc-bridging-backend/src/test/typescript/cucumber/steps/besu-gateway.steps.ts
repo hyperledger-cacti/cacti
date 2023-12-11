@@ -27,7 +27,7 @@ Given(
   "{string} with {int} CBDC available in the sidechain smart contract",
   async function (user: string, amount: number) {
     await axios.post(
-      "http://localhost:4100/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract",
+      "http://127.0.0.1:4100/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract",
       {
         contractName: BESU_CONTRACT_ASSET_REF_NAME,
         invocationType: "SEND",
@@ -49,7 +49,7 @@ When(
   "{string} escrows {int} CBDC and creates an asset reference with id {string} in the sidechain",
   async function (user: string, amount: number, assetRefID: string) {
     await axios.post(
-      "http://localhost:4100/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract",
+      "http://127.0.0.1:4100/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract",
       {
         contractName: BESU_CONTRACT_CBDC_ERC20_NAME,
         invocationType: "SEND",
@@ -82,7 +82,7 @@ When(
   "bob deletes the asset reference with id {string} in the sidechain",
   async function (assetRefID: string) {
     await axios.post(
-      "http://localhost:4100/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract",
+      "http://127.0.0.1:4100/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract",
       {
         contractName: BESU_CONTRACT_ASSET_REF_NAME,
         invocationType: "SEND",
@@ -125,7 +125,7 @@ Then(
   "the asset reference with id {string} is locked in the sidechain",
   async function (assetRefID: string) {
     const response = await axios.post(
-      "http://localhost:4100/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract",
+      "http://127.0.0.1:4100/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract",
       {
         contractName: BESU_CONTRACT_ASSET_REF_NAME,
         invocationType: "CALL",

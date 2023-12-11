@@ -25,7 +25,7 @@ describe("Constructor Tests", () => {
       {
         validatorID: "besu_openapi_connector",
         validatorType: "BESU_2X",
-        basePath: "localhost",
+        basePath: "127.0.0.1",
         ledgerInfo: {
           ledgerAbstract: "Besu-OpenAPI Ledger",
         },
@@ -54,7 +54,7 @@ describe("Constructor Tests", () => {
       {
         validatorID: "",
         validatorType: "BESU_2X",
-        basePath: "localhost",
+        basePath: "127.0.0.1",
         username: "admin",
         password: "password",
         ledgerInfo: {

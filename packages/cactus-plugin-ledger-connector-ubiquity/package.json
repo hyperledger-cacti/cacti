@@ -59,7 +59,7 @@
     "@hyperledger/cactus-core-api": "2.0.0-alpha.2",
     "axios": "1.6.0",
     "dotenv": "16.0.1",
-    "node-fetch": "3.3.2",
+    "node-fetch": "2.7.0",
     "prom-client": "13.2.0",
     "typescript-optional": "2.0.1",
     "ubiquity-ts-client-renovated": "1.0.0",
@@ -72,8 +72,8 @@
     "@types/uuid": "9.0.6"
   },
   "engines": {
-    "node": ">=10",
-    "npm": ">=6"
+    "node": ">=18",
+    "npm": ">=8"
   },
   "publishConfig": {
     "access": "public"

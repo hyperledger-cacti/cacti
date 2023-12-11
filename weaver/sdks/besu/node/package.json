@@ -41,6 +41,10 @@
     "typedoc": "0.24.8",
     "typescript": "4.9.5"
   },
+  "engines": {
+    "node": ">=18",
+    "npm": ">=8"
+  },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/hyperledger"
   },

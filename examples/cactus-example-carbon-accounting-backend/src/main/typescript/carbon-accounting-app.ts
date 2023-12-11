@@ -126,7 +126,7 @@ export class CarbonAccountingApp {
     }
 
     const addressInfo = httpApi.address() as AddressInfo;
-    const nodeApiHost = `http://localhost:${addressInfo.port}`;
+    const nodeApiHost = `http://127.0.0.1:${addressInfo.port}`;
 
     const config = new Configuration({ basePath: nodeApiHost });
 

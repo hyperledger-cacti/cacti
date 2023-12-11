@@ -227,7 +227,7 @@ export class SawtoothTestLedger implements ITestLedger {
   }
 
   /**
-   * Get localhost port that can be used to access ledger rest API in the container.
+   * Get 127.0.0.1 port that can be used to access ledger rest API in the container.
    *
    * @returns port
    */
@@ -243,7 +243,7 @@ export class SawtoothTestLedger implements ITestLedger {
   }
 
   /**
-   * Get localhost URL that can be used to access ledger rest API in the container.
+   * Get 127.0.0.1 URL that can be used to access ledger rest API in the container.
    *
    * @returns Sawtooth Rest API URL.
    */

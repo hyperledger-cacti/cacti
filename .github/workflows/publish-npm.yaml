@@ -1,5 +1,8 @@
 name: publish-npm-manually
 
+env:
+  NODEJS_VERSION: v18.18.2
+
 on:
   workflow_dispatch:
     inputs:
@@ -24,7 +27,7 @@ jobs:
     - uses: actions/setup-node@v3.6.0
       with:
         always-auth: true
-        node-version: '16.14.2'
+        node-version: ${{ env.NODEJS_VERSION }}
         registry-url: 'https://registry.npmjs.org'
     - name: ./tools/ci.sh
       run: ./tools/ci.sh

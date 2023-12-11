@@ -80,8 +80,8 @@
     "socket.io-client-fixed-types": "4.5.4"
   },
   "engines": {
-    "node": ">=10",
-    "npm": ">=6"
+    "node": ">=18",
+    "npm": ">=8"
   },
   "publishConfig": {
     "access": "public"

@@ -380,7 +380,7 @@ export class Containers {
       if (!mapping.PublicPort) {
         throw new Error(`${fnTag} port ${privatePort} mapped but not public`);
       } else if (mapping.IP !== "0.0.0.0") {
-        throw new Error(`${fnTag} port ${privatePort} mapped to localhost`);
+        throw new Error(`${fnTag} port ${privatePort} mapped to 127.0.0.1`);
       } else {
         return mapping.PublicPort;
       }

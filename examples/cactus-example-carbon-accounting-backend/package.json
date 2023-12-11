@@ -85,8 +85,8 @@
     "json-stable-stringify": "1.0.2"
   },
   "engines": {
-    "node": ">=10",
-    "npm": ">=6"
+    "node": ">=18",
+    "npm": ">=8"
   },
   "publishConfig": {
     "access": "public"

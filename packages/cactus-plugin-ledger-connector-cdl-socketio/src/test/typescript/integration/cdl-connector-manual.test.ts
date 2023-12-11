@@ -161,7 +161,7 @@ describe("CDL Connector manual tests", () => {
     // Create ApiClient instance
     const apiConfigOptions = {
       validatorID: "cdl-connector-manual.test",
-      validatorURL: `https://localhost:${connectorAddress.port}`,
+      validatorURL: `https://127.0.0.1:${connectorAddress.port}`,
       validatorKeyPath: VALIDATOR_KEY_PATH,
       logLevel: sutLogLevel,
       maxCounterRequestID: 1000,

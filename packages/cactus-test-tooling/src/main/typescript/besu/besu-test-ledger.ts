@@ -254,7 +254,7 @@ export class BesuTestLedger implements ITestLedger {
           Healthcheck: {
             Test: [
               "CMD-SHELL",
-              `curl -X POST --data '{"jsonrpc":"2.0","method":"eth_chainId","params":[],"id":1}' localhost:8545`,
+              `curl -X POST --data '{"jsonrpc":"2.0","method":"eth_chainId","params":[],"id":1}' 127.0.0.1:8545`,
             ],
             Interval: 1000000000, // 1 second
             Timeout: 3000000000, // 3 seconds
@@ -375,7 +375,7 @@ export class BesuTestLedger implements ITestLedger {
       if (!mapping.PublicPort) {
         throw new Error(`${fnTag} port ${thePort} mapped but not public`);
       } else if (mapping.IP !== "0.0.0.0") {
-        throw new Error(`${fnTag} port ${thePort} mapped to localhost`);
+        throw new Error(`${fnTag} port ${thePort} mapped to 127.0.0.1`);
       } else {
         return mapping.PublicPort;
       }

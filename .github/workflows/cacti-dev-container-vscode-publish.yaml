@@ -1,5 +1,8 @@
 name: connector-fabric-publish
 
+env:
+  NODEJS_VERSION: v20.3.0
+
 on:
   push:
     # Publish `v1.2.3` tags as releases.
@@ -27,10 +30,10 @@ jobs:
       contents: read
 
     steps:
-      - name: Use Node.js v20.3.0
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v20.3.0
+          node-version: ${{ env.NODEJS_VERSION }}
 
       - uses: actions/checkout@v3.5.2
 

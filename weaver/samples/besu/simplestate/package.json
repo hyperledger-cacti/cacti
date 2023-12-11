@@ -40,5 +40,9 @@
   },
   "devDependencies": {
     "truffle": "5.11.2"
+  },
+  "engines": {
+    "node": ">=18",
+    "npm": ">=8"
   }
 }

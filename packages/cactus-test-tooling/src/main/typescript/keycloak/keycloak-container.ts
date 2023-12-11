@@ -101,7 +101,7 @@ export class KeycloakContainer {
     this.log.debug(`Effective Env of container: %o`, Env);
 
     const Healthcheck = {
-      Test: ["CMD-SHELL", `curl -v 'http://localhost:9990/'`],
+      Test: ["CMD-SHELL", `curl -v 'http://127.0.0.1:9990/'`],
       Interval: 1000000000, // 1 second
       Timeout: 3000000000, // 3 seconds
       Retries: 99,
@@ -144,7 +144,7 @@ export class KeycloakContainer {
   //   tokenURL: "https://www.example.com/oauth2/token",
   //   clientID: "EXAMPLE_CLIENT_ID",
   //   clientSecret: "EXAMPLE_CLIENT_SECRET",
-  //   callbackURL: "http://localhost:3000/auth/example/callback",
+  //   callbackURL: "http://127.0.0.1:3000/auth/example/callback",
   // }
   public async getOauth2Options(clientId = "account"): Promise<unknown> {
     const fnTag = `${this.className}#getOauth2Options()`;
@@ -219,7 +219,7 @@ export class KeycloakContainer {
     Checks.truthy(clientId, `${fnTag}:clientId`);
     const { log } = this;
     const defaultRealm = await this.getDefaultRealm();
-    const apiBaseUrl = await this.getApiBaseUrl("localhost");
+    const apiBaseUrl = await this.getApiBaseUrl("127.0.0.1");
     const realm = defaultRealm.realm;
     const realmBaseUrl = `${apiBaseUrl}/realms/${realm}`;
 
@@ -228,7 +228,7 @@ export class KeycloakContainer {
     const client = clients.find((c) => c.clientId === clientId);
     log.debug("SAML2 client: %o", JSON.stringify(client, null, 4));
 
-    // http://localhost:32819/auth/realms/master/protocol/saml
+    // http://127.0.0.1:32819/auth/realms/master/protocol/saml
     const saml2Opts = {
       entryPoint: `${realmBaseUrl}/protocol/saml`,
       // issuer: 'https://your-app.example.net/login/callback',

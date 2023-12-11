@@ -16,7 +16,6 @@ import { Configuration } from "@hyperledger/cactus-core-api";
 import { PluginOdapGateway } from "../../../../main/typescript/gateway/plugin-odap-gateway";
 import { GoIpfsTestContainer } from "@hyperledger/cactus-test-tooling";
 
-
 import {
   RecoverUpdateAckV1Message,
   SessionData,
@@ -54,7 +53,7 @@ beforeAll(async () => {
   expressApp.use(bodyParser.json({ limit: "250mb" }));
   ipfsServer = http.createServer(expressApp);
   const listenOptions: IListenOptions = {
-    hostname: "localhost",
+    hostname: "127.0.0.1",
     port: 0,
     server: ipfsServer,
   };

@@ -41,5 +41,9 @@
   "devDependencies": {
     "truffle": "5.11.2",
     "typescript": "4.9.5"
+  },
+  "engines": {
+    "node": ">=18",
+    "npm": ">=8"
   }
 }

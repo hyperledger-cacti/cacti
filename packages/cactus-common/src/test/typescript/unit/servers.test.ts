@@ -29,7 +29,7 @@ describe(testCase, () => {
     {
       await expect(
         Servers.listen({
-          hostname: "localhost",
+          hostname: "127.0.0.1",
           port: false as unknown as number,
           server,
         }),
@@ -38,12 +38,12 @@ describe(testCase, () => {
 
     {
       await expect(
-        Servers.listen({ hostname: "localhost", port: 0, server }),
+        Servers.listen({ hostname: "127.0.0.1", port: 0, server }),
       ).toResolve();
     }
 
     const prefPort = 4123;
-    const host = "localhost";
+    const host = "127.0.0.1";
 
     const listenOptionsBlocker = {
       server: portBlocker,
