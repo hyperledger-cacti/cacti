@@ -49,7 +49,7 @@ In a new terminal, run the following commands:
 $ cd weaver/core/drivers/fabric-driver
 $ cat .env
 
-CONNECTION_PROFILE=/home/user/cacti/weaver/tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json
+CONNECTION_PROFILE=/home/user/cacti/weaver/tests/network-setups/fabric/network-artifacts/network1/peerOrganizations/org1.network1.com/connection-org1.json
 RELAY_ENDPOINT=localhost:9085
 RELAY_TLS=false
 RELAY_TLSCA_CERT_PATH=path_to_tls_ca_cert_pem_for_relay
@@ -104,7 +104,7 @@ $ cat config.json
 
 {
   "network1": {
-    "connProfilePath": "/home/user/cacti/weaver/tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json",
+    "connProfilePath": "/home/user/cacti/weaver/tests/network-setups/fabric/network-artifacts/network1/peerOrganizations/org1.network1.com/connection-org1.json",
     "relayEndpoint": "localhost:9080",
     "mspId": "Org1MSP",
     "channelName": "mychannel",
@@ -112,7 +112,7 @@ $ cat config.json
     "aclPolicyPrincipalType": "ca"
   },
   "network2": {
-    "connProfilePath": "/home/user/cacti/weaver/tests/network-setups/fabric/shared/network2/peerOrganizations/org1.network2.com/connection-org1.json",
+    "connProfilePath": "/home/user/cacti/weaver/tests/network-setups/fabric/network-artifacts/network2/peerOrganizations/org1.network2.com/connection-org1.json",
     "relayEndpoint": "localhost:9083",
     "mspId": "Org1MSP",
     "channelName": "mychannel",
@@ -153,10 +153,3 @@ $ cargo run --bin satp_client "9085" "localhost:9085/Dummy_Network/abc:abc:abc:a
 
 You should noticed that the messages started to be exchanged between the two gateways. The logs can be seen in the corresponding terminals. 
 
-
-## Run the gateway unit tests
-```
-$ cd weaver/core/relay
-$ cargo test --bin server 
-
-```
