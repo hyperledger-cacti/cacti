@@ -4,12 +4,12 @@ import driverPb from '@hyperledger/cacti-weaver-protos-js/driver/driver_pb';
 import logger from './logger';
 import { credentials } from '@grpc/grpc-js';
 
-import { getNetworkConfig } from './helpers/helpers'
+import { getNetworkConfig } from '../../../../samples/fabric/fabric-cli/src/helpers/helpers'
 import { SatpAssetManager, HashFunctions } from '@hyperledger/cacti-weaver-sdk-fabric'
 
 import fs from 'fs';
 import path from 'path';
-import { fabricHelper } from './helpers/fabric-functions';
+import { fabricHelper } from '../../../../samples/fabric/fabric-cli/src/helpers/fabric-functions';
 
 const DB_NAME: string = "driverdb";
 const DRIVER_ERROR_CONSTANTS = JSON.parse(
