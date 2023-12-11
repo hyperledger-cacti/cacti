@@ -23,7 +23,7 @@ test("Iroha environment variables passed correctly", async (t: Test) => {
   ];
 
   const irohaOptions = {
-    postgresHost: "localhost",
+    postgresHost: "127.0.0.1",
     postgresPort: 5432,
     envVars: simpleEnvVars,
   };

@@ -36,8 +36,8 @@ test("starts/stops/destroys a docker container", async (assert: Test) => {
   assert.ok(hostPort, "getRpcApiPublicPort() returns truthy OK");
   assert.ok(isFinite(hostPort), "getRpcApiPublicPort() returns finite OK");
 
-  const isReachable = await isPortReachable(hostPort, { host: "localhost" });
-  assert.ok(isReachable, `HostPort ${hostPort} is reachable via localhost`);
+  const isReachable = await isPortReachable(hostPort, { host: "127.0.0.1" });
+  assert.ok(isReachable, `HostPort ${hostPort} is reachable via 127.0.0.1`);
 
   const besuKeyPair: IKeyPair = await besuTestLedger.getBesuKeyPair();
   assert.ok(besuKeyPair, "getBesuKeyPair() returns truthy OK");

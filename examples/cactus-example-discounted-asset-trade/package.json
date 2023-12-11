@@ -56,5 +56,9 @@
     "@types/jsonwebtoken": "9.0.2",
     "@types/jsrsasign": "10.5.8",
     "@types/uuid": "9.0.6"
+  },
+  "engines": {
+    "node": ">=18",
+    "npm": ">=8"
   }
 }

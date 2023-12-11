@@ -19,8 +19,8 @@ test(testCase, async (t: Test) => {
   const generator = new SelfSignedPkiGenerator();
   t.ok(generator, "Instantiated SelfSignedCertificateGenerator OK.");
 
-  const serverCert = generator.create("localhost");
-  const clientCert = generator.create("client.localhost", serverCert);
+  const serverCert = generator.create("127.0.0.1");
+  const clientCert = generator.create("client.127.0.0.1", serverCert);
   const serverRootCertPemBuf = Buffer.from(serverCert.certificatePem);
 
   const configService = new ConfigService();

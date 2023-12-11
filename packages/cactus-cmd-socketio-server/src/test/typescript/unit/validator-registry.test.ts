@@ -25,7 +25,7 @@ test("ValidatorRegistry constructor parses required fields", () => {
   const mockLedgerPluginInfo = {
     validatorID: "abc123",
     validatorType: "socketio",
-    validatorURL: "https://localhost:1234",
+    validatorURL: "https://127.0.0.1:1234",
     validatorKeyPath: "./path/to/validator/key.crt",
     ledgerInfo: {
       ledgerAbstract: "Test ledger input",
@@ -56,15 +56,15 @@ test("ValidatorRegistry constructor parses required fields", () => {
       peers: [
         {
           name: "peer.test.com",
-          requests: "grpc://localhost/1234",
+          requests: "grpc://127.0.0.1/1234",
         },
       ],
       orderer: {
-        URL: "grpc://localhost/1234",
+        URL: "grpc://127.0.0.1/1234",
       },
       ca: {
         name: "myca.test.com",
-        URL: "http://localhost/1234",
+        URL: "http://127.0.0.1/1234",
       },
       submitter: {
         name: "admin",

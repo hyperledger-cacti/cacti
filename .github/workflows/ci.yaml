@@ -1,4 +1,6 @@
 ---
+env:
+  NODEJS_VERSION: v18.18.2
 jobs:
   ActionLint:
     uses: ./.github/workflows/actionlint.yaml
@@ -26,10 +28,10 @@ jobs:
       CHECK_WORK_TREE_STATUS_DISABLED: true
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -57,10 +59,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
       - id: yarn-cache
         name: Restore Yarn Cache
@@ -85,10 +87,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -156,10 +158,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
       - id: yarn-cache
         name: Restore Yarn Cache
@@ -183,10 +185,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
       - id: yarn-cache
         name: Restore Yarn Cache
@@ -209,10 +211,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -238,10 +240,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -264,10 +266,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -293,10 +295,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -319,10 +321,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -344,10 +346,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -370,10 +372,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -395,10 +397,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -421,10 +423,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -447,10 +449,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -472,10 +474,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -498,10 +500,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -523,10 +525,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -550,10 +552,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -575,10 +577,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -600,10 +602,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -626,10 +628,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -652,10 +654,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -678,10 +680,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -703,10 +705,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -729,10 +731,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -755,10 +757,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -782,10 +784,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -809,10 +811,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -839,10 +841,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -868,10 +870,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -898,10 +900,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -928,10 +930,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -958,10 +960,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -988,10 +990,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1018,10 +1020,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1048,10 +1050,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1078,10 +1080,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1108,10 +1110,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1138,10 +1140,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1168,10 +1170,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1198,10 +1200,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1226,10 +1228,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1253,10 +1255,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1278,10 +1280,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1303,10 +1305,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
       - id: yarn-cache
         name: Restore Yarn Cache
@@ -1329,10 +1331,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1354,10 +1356,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
       - id: yarn-cache
         name: Restore Yarn Cache
@@ -1380,10 +1382,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1405,10 +1407,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1431,10 +1433,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1456,10 +1458,10 @@ jobs:
   #   needs: build-dev
   #   runs-on: ubuntu-20.04
   #   steps:
-  #     - name: Use Node.js v16.14.2
+  #     - name: Use Node.js ${{ env.NODEJS_VERSION }}
   #       uses: actions/setup-node@v3.6.0
   #       with:
-  #         node-version: v16.14.2
+  #         node-version: ${{ env.NODEJS_VERSION }}
   #     - uses: actions/checkout@v3.5.2
   #     - id: yarn-cache-dir-path
   #       name: Get yarn cache directory path
@@ -1484,10 +1486,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1511,10 +1513,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1537,10 +1539,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1563,10 +1565,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1589,10 +1591,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1623,10 +1625,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1650,10 +1652,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1675,10 +1677,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1700,10 +1702,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
       - id: yarn-cache-dir-path
         name: Get yarn cache directory path
@@ -1729,10 +1731,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1754,10 +1756,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1885,10 +1887,10 @@ jobs:
     env:
       IMAGE_NAME: cacti-dev-container-vscode
     steps:
-      - name: Use Node.js v20.3.0
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v20.3.0
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
       - name: npm_install_@devcontainers/cli@0.44.0
         run: npm install -g @devcontainers/cli@0.44.0

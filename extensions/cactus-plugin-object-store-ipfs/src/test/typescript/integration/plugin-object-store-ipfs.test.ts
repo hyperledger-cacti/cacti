@@ -42,7 +42,7 @@ test(testCase, async (t: Test) => {
   expressApp.use(bodyParser.json({ limit: "250mb" }));
   const server = http.createServer(expressApp);
   const listenOptions: IListenOptions = {
-    hostname: "localhost",
+    hostname: "127.0.0.1",
     port: 0,
     server,
   };
@@ -59,7 +59,6 @@ test(testCase, async (t: Test) => {
   const ipfsGatewayUrl = await ipfsContainer.getWebGatewayUrl();
   t.comment(`Go IPFS Test Container API URL: ${ipfsApiUrl}`);
   t.comment(`Go IPFS Test Container Gateway URL: ${ipfsGatewayUrl}`);
-
 
   const { create } = await import("kubo-rpc-client");
 

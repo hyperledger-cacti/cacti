@@ -16,7 +16,12 @@ import {
 } from "@hyperledger/cactus-common";
 import { ISocketApiClient } from "@hyperledger/cactus-core-api";
 
-import { Socket, SocketOptions, ManagerOptions, io } from "socket.io-client-fixed-types";
+import {
+  Socket,
+  SocketOptions,
+  ManagerOptions,
+  io,
+} from "socket.io-client-fixed-types";
 import { readFileSync } from "fs";
 import { resolve as resolvePath } from "path";
 import {

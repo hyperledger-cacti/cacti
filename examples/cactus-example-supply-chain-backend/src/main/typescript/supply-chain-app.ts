@@ -224,13 +224,13 @@ export class SupplyChainApp {
     const httpGuiC = await Servers.startOnPort(3200, "0.0.0.0");
 
     const addressInfoA = httpApiA.address() as AddressInfo;
-    const nodeApiHostA = `http://localhost:${addressInfoA.port}`;
+    const nodeApiHostA = `http://127.0.0.1:${addressInfoA.port}`;
 
     const addressInfoB = httpApiB.address() as AddressInfo;
-    const nodeApiHostB = `http://localhost:${addressInfoB.port}`;
+    const nodeApiHostB = `http://127.0.0.1:${addressInfoB.port}`;
 
     const addressInfoC = httpApiC.address() as AddressInfo;
-    const nodeApiHostC = `http://localhost:${addressInfoC.port}`;
+    const nodeApiHostC = `http://127.0.0.1:${addressInfoC.port}`;
 
     const token = await this.getOrCreateToken();
     const baseOptions = { headers: { Authorization: `Bearer ${token}` } };
@@ -464,7 +464,7 @@ export class SupplyChainApp {
     const memberIdA = uuidv4();
     const nodeIdA = uuidv4();
     const addressInfoA = serverA.address() as AddressInfo;
-    const nodeApiHostA = `http://localhost:${addressInfoA.port}`;
+    const nodeApiHostA = `http://127.0.0.1:${addressInfoA.port}`;
 
     const publickKeyPemA = await exportSPKI(keyPairA);
     const cactusNodeA: CactusNode = {
@@ -492,7 +492,7 @@ export class SupplyChainApp {
     const memberIdB = uuidv4();
     const nodeIdB = uuidv4();
     const addressInfoB = serverB.address() as AddressInfo;
-    const nodeApiHostB = `http://localhost:${addressInfoB.port}`;
+    const nodeApiHostB = `http://127.0.0.1:${addressInfoB.port}`;
 
     const publickKeyPemB = await exportSPKI(keyPairB);
     const cactusNodeB: CactusNode = {
@@ -521,7 +521,7 @@ export class SupplyChainApp {
     const memberIdC = uuidv4();
     const nodeIdC = uuidv4();
     const addressInfoC = serverC.address() as AddressInfo;
-    const nodeApiHostC = `http://localhost:${addressInfoC.port}`;
+    const nodeApiHostC = `http://127.0.0.1:${addressInfoC.port}`;
 
     const publickKeyPemC = await exportSPKI(keyPairC);
     const cactusNodeC: CactusNode = {

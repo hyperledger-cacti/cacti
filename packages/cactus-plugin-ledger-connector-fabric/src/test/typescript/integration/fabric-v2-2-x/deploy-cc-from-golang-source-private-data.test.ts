@@ -82,13 +82,13 @@ describe(testCase, () => {
     await ledger.start({ omitPull: false });
 
     const listenOptions: IListenOptions = {
-      hostname: "localhost",
+      hostname: "127.0.0.1",
       port: 0,
       server,
     };
     addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
     ({ port } = addressInfo);
-    apiUrl = `http://localhost:${port}`;
+    apiUrl = `http://127.0.0.1:${port}`;
 
     configuration = new Configuration({ basePath: apiUrl });
     apiClient = new FabricApi(configuration);
@@ -377,8 +377,8 @@ describe(testCase, () => {
         keychainRef: keychainEntryKey,
       },
     });
- 
- 
+
+
     */
 
     const getResQuery = await apiClient.runTransactionV1({

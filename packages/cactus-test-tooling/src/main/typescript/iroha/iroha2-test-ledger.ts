@@ -294,7 +294,7 @@ export class Iroha2TestLedger implements ITestLedger {
 
   /**
    * Change the port in URL from original to the one that was exported by docker
-   * (i.e. the one that is available in `localhost` running this container, not inside the container).
+   * (i.e. the one that is available in `127.0.0.1` running this container, not inside the container).
    *
    * @param url some URL ending with a port (e.g. `http://127.0.0.1:8080`)
    * @param containerInfo dockerode container info.
@@ -320,7 +320,7 @@ export class Iroha2TestLedger implements ITestLedger {
 
   /**
    * Read client config file from the container. Adjust the ports in URL so that the endpoints
-   * can be used from localhost.
+   * can be used from 127.0.0.1.
    *
    * @returns parsed `Iroha2ClientConfig`
    */

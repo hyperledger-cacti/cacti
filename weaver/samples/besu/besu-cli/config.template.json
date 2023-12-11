@@ -1,6 +1,6 @@
 {
 	"network1": {
-		"networkHost": "localhost",
+		"networkHost": "127.0.0.1",
 		"networkPort": 8545,
 		"tokenContract": "../simpleasset/build/contracts/AliceERC721.json",
 		"interopContract": "../simpleasset/build/contracts/AssetExchangeContract.json",
@@ -8,7 +8,7 @@
 		"recipientAccountIndex": 2
 	},
 	"network2": {
-		"networkHost": "localhost",
+		"networkHost": "127.0.0.1",
 		"networkPort": 9544,
 		"tokenContract": "../simpleasset/build/contracts/BobERC20.json",
 		"interopContract": "../simpleasset/build/contracts/AssetExchangeContract.json",

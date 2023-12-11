@@ -207,7 +207,7 @@ describe("Iroha SocketIo TestSuite", () => {
     });
 
     const listenOptions: IListenOptions = {
-      hostname: "localhost",
+      hostname: "127.0.0.1",
       port: 0,
       server,
     };

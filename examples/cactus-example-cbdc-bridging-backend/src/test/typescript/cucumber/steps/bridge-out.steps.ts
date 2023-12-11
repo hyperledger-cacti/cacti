@@ -14,7 +14,7 @@ Then(
   "the bridged out amount in the chaincode is {int} CBDC",
   async function (amount: string) {
     const response = await axios.post(
-      "http://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction",
+      "http://127.0.0.1:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction",
       {
         contractName: FABRIC_CONTRACT_ASSET_REF_NAME,
         channelName: FABRIC_CHANNEL_NAME,
@@ -55,13 +55,13 @@ When(
     };
 
     const response = await axios.post(
-      "http://localhost:4000/api/v1/@hyperledger/cactus-plugin-odap-hermes/clientrequest",
+      "http://127.0.0.1:4000/api/v1/@hyperledger/cactus-plugin-odap-hermes/clientrequest",
       {
         clientGatewayConfiguration: {
-          apiHost: `http://localhost:4000`,
+          apiHost: `http://127.0.0.1:4000`,
         },
         serverGatewayConfiguration: {
-          apiHost: `http://localhost:4100`,
+          apiHost: `http://127.0.0.1:4100`,
         },
         version: "0.0.0",
         loggingProfile: "dummyLoggingProfile",
@@ -118,13 +118,13 @@ Then(
 
     await axios
       .post(
-        "http://localhost:4000/api/v1/@hyperledger/cactus-plugin-odap-hermes/clientrequest",
+        "http://127.0.0.1:4000/api/v1/@hyperledger/cactus-plugin-odap-hermes/clientrequest",
         {
           clientGatewayConfiguration: {
-            apiHost: `http://localhost:4000`,
+            apiHost: `http://127.0.0.1:4000`,
           },
           serverGatewayConfiguration: {
-            apiHost: `http://localhost:4100`,
+            apiHost: `http://127.0.0.1:4100`,
           },
           version: "0.0.0",
           loggingProfile: "dummyLoggingProfile",

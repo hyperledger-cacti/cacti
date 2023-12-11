@@ -511,7 +511,7 @@ export class ConfigService {
     const cockpitPort = (schema.cockpitPort as SchemaObj).default;
 
     const pkiGenerator = new SelfSignedPkiGenerator();
-    const pkiServer: IPki = pkiGenerator.create("localhost");
+    const pkiServer: IPki = pkiGenerator.create("127.0.0.1");
 
     const plugins: PluginImport[] = [
       {

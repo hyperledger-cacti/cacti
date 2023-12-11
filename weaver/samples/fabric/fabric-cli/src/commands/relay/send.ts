@@ -34,7 +34,7 @@ const command: GluegunCommand = {
       commandHelp(
         print,
         toolbox,
-        `fabric-cli relay send localhost:9081/Fabric_Network/mychannel:interop:Read:TestState`,
+        `fabric-cli relay send 127.0.0.1:9081/Fabric_Network/mychannel:interop:Read:TestState`,
         'fabric-cli relay send <query>',
         [
           {
@@ -161,5 +161,5 @@ const command: GluegunCommand = {
       })
   }
 }
-//localhost:9081/Corda_Network/localhost:10006#com.cordaSimpleApplication.flow.GetStateByKey:H
+//127.0.0.1:9081/Corda_Network/127.0.0.1:10006#com.cordaSimpleApplication.flow.GetStateByKey:H
 module.exports = command

@@ -76,7 +76,7 @@ beforeAll(async () => {
     expressApp.use(bodyParser.json({ limit: "250mb" }));
     ipfsServer = http.createServer(expressApp);
     const listenOptions: IListenOptions = {
-      hostname: "localhost",
+      hostname: "127.0.0.1",
       port: 0,
       server: ipfsServer,
     };
@@ -125,7 +125,7 @@ beforeAll(async () => {
     serverExpressApp.use(bodyParser.json({ limit: "250mb" }));
     recipientGatewayserver = http.createServer(serverExpressApp);
     serverListenOptions = {
-      hostname: "localhost",
+      hostname: "127.0.0.1",
       port: 3000,
       server: recipientGatewayserver,
     };
@@ -165,7 +165,7 @@ beforeAll(async () => {
     clientExpressApp.use(bodyParser.json({ limit: "250mb" }));
     sourceGatewayServer = http.createServer(clientExpressApp);
     clientListenOptions = {
-      hostname: "localhost",
+      hostname: "127.0.0.1",
       port: 2000,
       server: sourceGatewayServer,
     };
@@ -289,7 +289,7 @@ test("successful run ODAP after client gateway crashed after after receiving tra
   clientExpressApp.use(bodyParser.json({ limit: "250mb" }));
   sourceGatewayServer = http.createServer(clientExpressApp);
   const listenOptions: IListenOptions = {
-    hostname: "localhost",
+    hostname: "127.0.0.1",
     port: 2000,
     server: sourceGatewayServer,
   };

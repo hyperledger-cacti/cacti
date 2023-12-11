@@ -3,15 +3,19 @@
  * To fix this we define required types here, based on their counterparts in kubo-rpc-client.
  */
 
-// @ts-ignore
+// TODO: Remove after migration to ESM or if better workaround was found.
+// @ts-expect-error Importing ESM from CJS module causes error, but works fine in practice since we only import the types.
 import type { Multiaddr } from "@multiformats/multiaddr";
-// @ts-ignore
+// TODO: Remove after migration to ESM or if better workaround was found.
+// @ts-expect-error Importing ESM from CJS module causes error, but works fine in practice since we only import the types.
 import type { MultihashHasher } from "multiformats/hashes/interface";
 import type { Agent as HttpAgent } from "http";
 import type { Agent as HttpsAgent } from "https";
-// @ts-ignore
+// TODO: Remove after migration to ESM or if better workaround was found.
+// @ts-expect-error Importing ESM from CJS module causes error, but works fine in practice since we only import the types.
 import type { CID } from "multiformats/cid";
-// @ts-ignore
+// TODO: Remove after migration to ESM or if better workaround was found.
+// @ts-expect-error Importing ESM from CJS module causes error, but works fine in practice since we only import the types.
 import type { Mtime } from "ipfs-unixfs";
 
 /////////////////////////////////////
@@ -20,12 +24,14 @@ import type { Mtime } from "ipfs-unixfs";
 // Some are simplified when details are not needed
 
 export type MultibaseCodec<Prefix extends string = any> =
-// @ts-ignore
-import("multiformats/bases/interface").MultibaseCodec<Prefix>;
+  // TODO: Remove after migration to ESM or if better workaround was found.
+  // @ts-expect-error Importing ESM from CJS module causes error, but works fine in practice since we only import the types.
+  import("multiformats/bases/interface").MultibaseCodec<Prefix>;
 export type BlockCodec<
-T1 = any,
-T2 = any,
-// @ts-ignore
+  T1 = any,
+  T2 = any,
+  // TODO: Remove after migration to ESM or if better workaround was found.
+  // @ts-expect-error Importing ESM from CJS module causes error, but works fine in practice since we only import the types.
 > = import("multiformats/codecs/interface").BlockCodec<T1, T2>;
 
 export interface LoadBaseFn {

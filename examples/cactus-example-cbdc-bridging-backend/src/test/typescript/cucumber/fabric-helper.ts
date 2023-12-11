@@ -8,7 +8,7 @@ const FABRIC_CONTRACT_ASSET_REF_NAME = "asset-reference-contract";
 
 export async function getFabricBalance(identity: string): Promise<number> {
   const response = await axios.post(
-    "http://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction",
+    "http://127.0.0.1:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction",
     {
       contractName: FABRIC_CONTRACT_CBDC_ERC20_NAME,
       channelName: FABRIC_CHANNEL_NAME,
@@ -29,7 +29,7 @@ export async function readFabricAssetReference(
   assetRefID: string,
 ): Promise<any> {
   const response = await axios.post(
-    "http://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction",
+    "http://127.0.0.1:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction",
     {
       contractName: FABRIC_CONTRACT_ASSET_REF_NAME,
       channelName: FABRIC_CHANNEL_NAME,
@@ -50,7 +50,7 @@ export async function fabricAssetReferenceExists(
   assetRefID: string,
 ): Promise<string> {
   const response = await axios.post(
-    "http://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction",
+    "http://127.0.0.1:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction",
     {
       contractName: FABRIC_CONTRACT_ASSET_REF_NAME,
       channelName: FABRIC_CHANNEL_NAME,
@@ -72,7 +72,7 @@ export async function lockFabricAssetReference(
   assetRefID: string,
 ): Promise<any> {
   return axios.post(
-    "http://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction",
+    "http://127.0.0.1:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction",
     {
       contractName: FABRIC_CONTRACT_ASSET_REF_NAME,
       channelName: FABRIC_CHANNEL_NAME,
@@ -92,7 +92,7 @@ export async function deleteFabricAssetReference(
   assetRefID: string,
 ): Promise<any> {
   return axios.post(
-    "http://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction",
+    "http://127.0.0.1:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction",
     {
       contractName: FABRIC_CONTRACT_ASSET_REF_NAME,
       channelName: FABRIC_CHANNEL_NAME,
@@ -113,7 +113,7 @@ export async function refundFabricTokens(
   finalUserEthAddress: string,
 ): Promise<any> {
   return axios.post(
-    "http://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction",
+    "http://127.0.0.1:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction",
     {
       contractName: FABRIC_CONTRACT_ASSET_REF_NAME,
       channelName: FABRIC_CHANNEL_NAME,
@@ -130,7 +130,7 @@ export async function refundFabricTokens(
 
 export async function resetFabric(): Promise<void> {
   await axios.post(
-    "http://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction",
+    "http://127.0.0.1:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction",
     {
       contractName: FABRIC_CONTRACT_CBDC_ERC20_NAME,
       channelName: FABRIC_CHANNEL_NAME,
@@ -145,7 +145,7 @@ export async function resetFabric(): Promise<void> {
   );
 
   await axios.post(
-    "http://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction",
+    "http://127.0.0.1:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction",
     {
       contractName: FABRIC_CONTRACT_ASSET_REF_NAME,
       channelName: FABRIC_CHANNEL_NAME,

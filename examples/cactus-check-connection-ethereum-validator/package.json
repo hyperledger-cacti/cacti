@@ -29,5 +29,9 @@
     "@types/js-yaml": "4.0.8",
     "@types/node": "15.14.9",
     "@types/shelljs": "0.8.14"
+  },
+  "engines": {
+    "node": ">=18",
+    "npm": ">=8"
   }
 }

@@ -10,7 +10,7 @@ import { ECCurveType } from "./internal/crypto-util";
 
 export interface IVaultTransitClientOptions {
   // full url of vault server
-  // eg : http://localhost:8200
+  // eg : http://127.0.0.1:8200
   endpoint: string;
 
   // mountPath of transit secret engine

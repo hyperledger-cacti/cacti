@@ -41,5 +41,9 @@
     "patch-package": "6.5.1",
     "typedoc": "0.24.8",
     "typescript": "4.9.5"
+  },
+  "engines": {
+    "node": ">=18",
+    "npm": ">=8"
   }
 }

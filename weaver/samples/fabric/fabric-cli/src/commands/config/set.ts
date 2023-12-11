@@ -21,7 +21,7 @@ const command: GluegunCommand = {
       commandHelp(
         print,
         toolbox,
-        `fabric-cli config set network1 relayEndpoint localhost:9080`,
+        `fabric-cli config set network1 relayEndpoint 127.0.0.1:9080`,
         `fabric-cli config set <network1|network2> <${configKeys.join('|')}> <value>`,
         [],
         command,

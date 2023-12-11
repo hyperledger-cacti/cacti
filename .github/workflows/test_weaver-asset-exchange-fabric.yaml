@@ -6,6 +6,9 @@
 
 name: Test Asset Exchange Fabric
 
+env:
+  NODEJS_VERSION: v18.18.2
+
 # Controls when the workflow will run
 on:
   # Triggers the workflow on push or pull request events but only for the main branch
@@ -33,22 +36,22 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3.5.2
-      
+
       - name: Set up Go
         uses: actions/setup-go@v4.0.0
         with:
           go-version: '1.20.2'
-          
-      - name: Use Node.js 14.x
+
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: 14.x
-      
+          node-version: ${{ env.NODEJS_VERSION }}
+
       # FABRIC NETWORK
       - name: Start Fabric Network
         run: make start-interop CHAINCODE_NAME=simpleasset PROFILE="2-nodes"
         working-directory: weaver/tests/network-setups/fabric/dev
-        
+
       # FABRIC CLI
       - name: Setup Fabric CLI .npmrc
         run: |
@@ -73,11 +76,11 @@ jobs:
           ./bin/fabric-cli env set CONFIG_PATH ${GITHUB_WORKSPACE}/weaver/samples/fabric/fabric-cli/config.json
           cat .env
         working-directory: weaver/samples/fabric/fabric-cli
-        
+
       - name: Fabric CLI Init
         run: ./scripts/initAsset.sh
         working-directory: weaver/samples/fabric/fabric-cli
-        
+
       - name: Asset Exchange Fabric CLI Tests
         run: |
           COUNT=0
@@ -107,45 +110,45 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3.5.2
-      
+
       - name: Set up Go
         uses: actions/setup-go@v4.0.0
         with:
           go-version: '1.20.2'
-          
-      - name: Use Node.js 14.x
+
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: 14.x
-          
+          node-version: ${{ env.NODEJS_VERSION }}
+
       - name: Use Protoc 3.15
         run: |
           curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.15.6/protoc-3.15.6-linux-x86_64.zip
           unzip protoc-3.15.6-linux-x86_64.zip -d protoc
           go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
           go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
-          
+
       # PROTOS
       - name: Build JS Protos
         run: |
           export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
           make build
         working-directory: weaver/common/protos-js
-        
+
       # Build Dependencies
       - name: Build Fabric Interop SDK
         run: make build-local
         working-directory: weaver/sdks/fabric/interoperation-node-sdk
-    
+
       - name: Build Fabric CLI
         run: make build-local
         working-directory: weaver/samples/fabric/fabric-cli
-        
+
       # FABRIC NETWORK
       - name: Start Fabric Network
         run: make start-interop-local CHAINCODE_NAME=simpleasset
         working-directory: weaver/tests/network-setups/fabric/dev
-        
+
       # FABRIC CLI
       - name: Setup Fabric CLI Config
         run: |
@@ -161,11 +164,11 @@ jobs:
           ./bin/fabric-cli env set CONFIG_PATH ${GITHUB_WORKSPACE}/weaver/samples/fabric/fabric-cli/config.json
           cat .env
         working-directory: weaver/samples/fabric/fabric-cli
-        
+
       - name: Fabric CLI Init
         run: ./scripts/initAsset.sh
         working-directory: weaver/samples/fabric/fabric-cli
-        
+
       - name: Asset Exchange Fabric CLI Tests
         run: |
           COUNT=0

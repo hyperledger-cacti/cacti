@@ -1,6 +1,6 @@
 import { Observable, ReplaySubject } from "rxjs";
 import { finalize } from "rxjs/operators";
-import { io } from "socket.io-client";
+const { io } = require("socket.io-client-fixed-types");
 import {
   Logger,
   Checks,
