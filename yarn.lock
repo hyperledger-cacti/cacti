@@ -6948,7 +6948,7 @@ __metadata:
     "@types/node": ^10.17.60
     "@types/uuid": 8.3.4
     async-exit-hook: 2.0.1
-    axios: 1.5.1
+    axios: 1.6.0
     chai: ^4.1.2
     crypto-js: 4.2.0
     cucumber: ^5.0.3
