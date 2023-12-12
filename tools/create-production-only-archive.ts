@@ -63,7 +63,6 @@ export const DEFAULT_DELETE_INCLUDE_GLOBS = [
   ".yarn/**",
   "./docs/**",
   "./images/**",
-  "./packages-python/**",
   "./tools/**",
   "./typings/**",
   "./whitepaper/**",
