@@ -58,8 +58,6 @@ export class PluginPersistenceFabric
   private isConnected = false;
   private isWebServicesRegistered = false;
 
-  private failedBlocks = new Set<number>();
-
   // = > private lastSeenBlock = 0;
   private lastSeenBlock = 0;
   // Last Block in Ledger
@@ -69,12 +67,11 @@ export class PluginPersistenceFabric
   private missedBlocks: string[] = [];
   private howManyBlocksMissing = 0;
 
-  public ledgerChannelName = "mychannel";
-  public ledgerContractName = "basic";
+  private ledgerChannelName = "mychannel";
   // gateway options
-  public gatewayOptions: GatewayOptions;
+  private gatewayOptions: GatewayOptions;
   // synchronization ongoing
-  public synchronizationGo = true;
+  private synchronizationGo = true;
 
   constructor(public readonly options: IPluginPersistenceFabricOptions) {
     const level = this.options.logLevel || "INFO";
@@ -128,12 +125,6 @@ export class PluginPersistenceFabric
   public getInstanceId(): string {
     return this.instanceId;
   }
-  // this is just test function to check if you correctly created instance of plugin
-  public async helloWorldTest(): Promise<string> {
-    return new Promise<string>((resolve) => {
-      resolve("hello World test");
-    });
-  }
 
   public getPackageName(): string {
     return `@hyperledger/cactus-plugin-persistence-fabric`;
@@ -154,6 +145,7 @@ export class PluginPersistenceFabric
     webServices.forEach((ws) => ws.registerExpress(app));
     return webServices;
   }
+
   // For future development
   public async getOrCreateWebServices(): Promise<IWebServiceEndpoint[]> {
     const pkgName = this.getPackageName();
@@ -173,27 +165,11 @@ export class PluginPersistenceFabric
     return endpoints;
   }
 
-  // current last block from ledger ( not in database )
-  public currentLastBlock(): number {
-    return this.lastBlock;
-  }
-  // this is greatest block number successfully migrated to database
-  public currentLastSeenBlock(): number {
-    return this.lastSeenBlock;
-  }
-  // Additional check if ledger is in synchronization
-  public isLastBlockGreatherThenLastSeen(): boolean {
-    if (this.lastSeenBlock >= this.lastBlock) {
-      return false;
-    } else {
-      return true;
-    }
-  }
   /**
    * lastBlockInLedger
    * @returns this.lastBlock which is last block in ledger assuming using getBlock and node js SDK
    */
-  public async lastBlockInLedger(
+  private async lastBlockInLedger(
     signingCredentialInput: FabricSigningCredential,
   ): Promise<number> {
     const lastBlockInChainTest = await this.apiClient.runTransactionV1({
@@ -216,12 +192,13 @@ export class PluginPersistenceFabric
     const lastBlock = lastBlockPreview.height;
     return lastBlock;
   }
+
   //test
   /**
    * lastBlockInLedgerWithoutFabricProto
    * @returns this.lastBlock which is last block in ledger assuming using getBlock and node js SDK
    */
-  public async lastBlockInLedgerWithoutFabricProto(): Promise<number> {
+  private async lastBlockInLedgerWithoutFabricProto(): Promise<number> {
     let tempBlockNumber = this.lastBlock;
     let blockNumber = tempBlockNumber.toString();
     let block: AxiosResponse<GetBlockResponseV1> =
@@ -254,6 +231,7 @@ export class PluginPersistenceFabric
     } while (moreBlocks);
     return this.lastBlock;
   }
+
   /**  Synchronization of blocks
    * - Synchronize entire first edgeOfLedger blocks of ledger state
    * @param edgeOfLedger defines which part of blockchain do we want to include in database
@@ -262,7 +240,9 @@ export class PluginPersistenceFabric
    * // future changes - parameter to set which part of blokchain to move to database
    */
 
-  async initialBlocksSynchronization(edgeOfLedger: number): Promise<string> {
+  private async initialBlocksSynchronization(
+    edgeOfLedger: number,
+  ): Promise<string> {
     let tempBlockNumber = 0;
     let blockNumber = tempBlockNumber.toString();
     let block: AxiosResponse<GetBlockResponseV1> =
@@ -312,10 +292,9 @@ export class PluginPersistenceFabric
    * @returns string promise lastBlock number after finishing the process
    *
    */
-
-  async continueBlocksSynchronization(
+  public async syncAll(
     signingCredential: FabricSigningCredential,
-  ): Promise<string> {
+  ): Promise<number> {
     this.lastSeenBlock = await this.dbClient.getMaxBlockNumber();
     let tempBlockNumber = this.lastSeenBlock;
     let blockNumber = tempBlockNumber.toString();
@@ -351,7 +330,7 @@ export class PluginPersistenceFabric
         this.synchronizationGo = false;
       }
     } while (this.synchronizationGo);
-    return "done";
+    return 1;
   }
 
   /**  Synchronization of blocks
@@ -362,8 +341,9 @@ export class PluginPersistenceFabric
    */
   // NOTE: this function can loop into very long almost infinite loop or even
   // infinite loop
-  async continuousBlocksSynchronization(
+  public async startMonitor(
     signingCredential: FabricSigningCredential,
+    onError?: (err: unknown) => void,
   ): Promise<string> {
     this.lastSeenBlock = await this.dbClient.getMaxBlockNumber();
     this.synchronizationGo = true;
@@ -384,7 +364,9 @@ export class PluginPersistenceFabric
             },
           });
         } catch (error) {
-          this.log.info("Last block in ledger", tempBlockNumber - 1);
+          if (onError) {
+            onError(error);
+          }
         }
 
         if (block?.status == 200) {
@@ -417,7 +399,7 @@ export class PluginPersistenceFabric
     return "stopped";
   }
 
-  async changeSynchronization(): Promise<boolean> {
+  private async changeSynchronization(): Promise<boolean> {
     if (this.synchronizationGo) {
       this.synchronizationGo = false;
     } else {
@@ -426,7 +408,7 @@ export class PluginPersistenceFabric
     return this.synchronizationGo;
   }
 
-  async getBlockFromLedger(blockNumber: string): Promise<any> {
+  private async getBlockFromLedger(blockNumber: string): Promise<any> {
     const block: AxiosResponse<GetBlockResponseV1> =
       await this.apiClient.getBlockV1({
         channelName: this.ledgerChannelName,
@@ -450,7 +432,7 @@ export class PluginPersistenceFabric
    * block number to be moved from ledger to database
    * @returns true a boolean which indicates successfull migration
    */
-  public async migrateBlockNrWithTransactions(
+  private async migrateBlockNrWithTransactions(
     blockNumber: string,
   ): Promise<boolean> {
     const block: AxiosResponse<GetBlockResponseV1> =
@@ -711,7 +693,7 @@ export class PluginPersistenceFabric
 If some blocks above this number are already in database they will not be removed.
  * @returns number which is this.lastBlock , artificially set lastBlock in ledger
  */
-  public setLastBlockConsidered(limitLastBlockConsidered: number): number {
+  private setLastBlockConsidered(limitLastBlockConsidered: number): number {
     this.lastBlock = limitLastBlockConsidered;
     return this.lastBlock;
   }
@@ -721,7 +703,7 @@ If some blocks above this number are already in database they will not be remove
    * @returns number blocks missing according to last run of function which checks missing blocks
    * whichBlocksAreMissingInDdSimple
    */
-  public showHowManyBlocksMissing(): number {
+  private showHowManyBlocksMissing(): number {
     return this.howManyBlocksMissing;
   }
 
@@ -730,7 +712,7 @@ If some blocks above this number are already in database they will not be remove
    * that could not be synchronized with the DB for some reasons and list them
    * @returns number of missing blocks
    */
-  public async whichBlocksAreMissingInDdSimple(): Promise<number> {
+  private async whichBlocksAreMissingInDdSimple(): Promise<number> {
     this.howManyBlocksMissing = 0;
 
     for (let iterator: number = this.lastBlock; iterator >= 0; iterator--) {
@@ -750,7 +732,7 @@ If some blocks above this number are already in database they will not be remove
    * run function whichBlocksAreMissingInDdSimple before using this one
    * @returns number of missing blocks if any , should return 0
    */
-  async synchronizeOnlyMissedBlocks(): Promise<number> {
+  public async syncFailedBlocks(): Promise<number> {
     if (this.howManyBlocksMissing > 0) {
       let missedIndex = 0;
       let blockNumber: string = this.missedBlocks[missedIndex];
@@ -791,7 +773,7 @@ If some blocks above this number are already in database they will not be remove
   /** migrateNextBlock
    * tries to migrate next block according to lastBlock information stored in plugin
    */
-  public async migrateNextBlock(): Promise<number> {
+  private async migrateNextBlock(): Promise<number> {
     const toMigrate: number = this.lastBlock + 1;
     try {
       await this.migrateBlockNrWithTransactions(toMigrate.toString());
@@ -804,7 +786,7 @@ If some blocks above this number are already in database they will not be remove
     return 0;
   }
 
-  public async insertBlockDataEntry(
+  private async insertBlockDataEntry(
     data: InsertBlockDataEntryInterface,
   ): Promise<QueryResult> {
     console.log("insert Block Data Entry");
