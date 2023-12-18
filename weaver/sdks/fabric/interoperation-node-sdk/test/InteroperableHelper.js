@@ -107,7 +107,7 @@ describe("InteroperableHelper", () => {
     });
 
     describe("cryptographic functions", () => {
-        it("encrypt and decrypt a message", () => {
+        it("encrypt and decrypt a message with default 128-bit AES key", () => {
             const data = '{ "data": "xyz" }';
             const privKeyFile = `${__dirname}/data/privKey.pem`;
             const privKeyPEM = fs.readFileSync(privKeyFile).toString();
@@ -121,6 +121,28 @@ describe("InteroperableHelper", () => {
                 expect(encryptedData).to.be.a("Uint8Array");
                 expect(() => {
                     const decryptedData = ecies.eciesDecryptMessage(privKey, encryptedData, cryptoOptions);
+                    expect(decryptedData).to.be.a("Uint8Array");
+                    expect(decryptedData.toString()).to.equal(data);
+                }).to.not.throw();
+            }).to.not.throw();
+        });
+    });
+
+    describe("cryptographic functions", () => {
+        it("encrypt and decrypt a message with 256-bit AES key", () => {
+            const data = '{ "data": "xyz" }';
+            const privKeyFile = `${__dirname}/data/privKey.pem`;
+            const privKeyPEM = fs.readFileSync(privKeyFile).toString();
+            const privKey = keyutil.getKeyFromPlainPrivatePKCS8PEM(privKeyPEM);
+            const signCertFile = `${__dirname}/data/signCert.pem`;
+            const signCertPEM = fs.readFileSync(signCertFile).toString();
+            const pubKey = keyutil.getKey(signCertPEM);
+            const cryptoOptions = { hashAlgorithm: "SHA2" };
+            expect(() => {
+                const encryptedData = ecies.eciesEncryptMessage(pubKey, Buffer.from(data), cryptoOptions, 32);    // 32 * 8 == 256
+                expect(encryptedData).to.be.a("Uint8Array");
+                expect(() => {
+                    const decryptedData = ecies.eciesDecryptMessage(privKey, encryptedData, cryptoOptions, 32);   // 32 * 8 == 256
                     expect(decryptedData).to.be.a("Uint8Array");
                     expect(decryptedData.toString()).to.equal(data);
                 }).to.not.throw();
