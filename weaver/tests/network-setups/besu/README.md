@@ -10,7 +10,7 @@
 - Besu: 
 	* Download and unpack the latest https://github.com/hyperledger/besu/releases/latest. You will find it in the link of the form: https://hyperledger.jfrog.io/artifactory/besu-binaries/besu/x.y.z/besu-x.y.z.zip with x.y.z replaced with the version number. For instance, run the following command after updating version number accordingly.
 ```
-wget https://hyperledger.jfrog.io/artifactory/besu-binaries/besu/21.7.0/besu-21.7.0.zip
+wget https://hyperledger.jfrog.io/artifactory/besu-binaries/besu/23.10.2/besu-23.10.2.zip
 ```
 	* Add the path to besu-x.y.z/bin to PATH
 - EthSigner: 
