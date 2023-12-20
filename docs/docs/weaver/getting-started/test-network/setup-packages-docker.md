@@ -172,6 +172,7 @@ IIN Agent is a client of a member of a DLT network or security domain with speci
 #### Deployment
 
 Use the following steps to run Fabric IIN Agents in Docker containers:
+
 * The `.env.n1.org1` and `.env.n1.org1.tls` files in the `docker-testnet/envs` directory contain environment variables used by the iin-agent of `org1` of `network1` at startup and runtime. Edit either of these files (depending on whether you wish to start the relay with or without TLS) as follows:
     - Replace `<PATH-TO-WEAVER>` with the absolute path of the `weaver` folder within your Cacti repository clone.
     - If Fabric network was started with 1 org, and IIN Agents are to be started with TLS enabled, update the `DNS_CONFIG_PATH` variable as:

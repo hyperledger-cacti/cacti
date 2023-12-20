@@ -22,12 +22,13 @@ import { handlePromise, promisifyAll } from './helpers'
 async function createLocalMembership(
     gateway: Gateway,
     memberMspIds: Array<string>,
+    securityDomain: string,
     channelName: string,
     weaverCCId: string
 ): Promise<any> {
     const network = await gateway.getNetwork(channelName)
     const membership = getMSPConfigurations(network, memberMspIds)
-    membership.setSecuritydomain('')
+    membership.setSecuritydomain(securityDomain)
     const membership64 = Buffer.from(membership.serializeBinary()).toString('base64')
     const contract = network.getContract(weaverCCId)
     return await contract.submitTransaction("CreateLocalMembership", membership64);
@@ -36,12 +37,13 @@ async function createLocalMembership(
 async function updateLocalMembership(
     gateway: Gateway,
     memberMspIds: Array<string>,
+    securityDomain: string,
     channelName: string,
     weaverCCId: string
 ): Promise<any> {
     const network = await gateway.getNetwork(channelName)
     const membership = getMSPConfigurations(network, memberMspIds)
-    membership.setSecuritydomain('')
+    membership.setSecuritydomain(securityDomain)
     const membership64 = Buffer.from(membership.serializeBinary()).toString('base64')
     const contract = network.getContract(weaverCCId)
     return await contract.submitTransaction("UpdateLocalMembership", membership64);
