@@ -45,11 +45,11 @@ The [membership manager functions](./membershipmanager) are currently not covere
     fmt.Printf("%+v\n", membership)
 
     fmt.Printf("Create Local Membership: ")
-    err := CreateLocalMembership(walletPath, userName, connectionProfilePath, "mychannel", "interop", []string{"Org1MSP"})
+    err := CreateLocalMembership(walletPath, userName, connectionProfilePath, "network1", "mychannel", "interop", []string{"Org1MSP"})
     fmt.Println(err)
 
     fmt.Printf("Update Local Membership: ")
-    err = UpdateLocalMembership(walletPath, userName, connectionProfilePath, "mychannel", "interop", []string{"Org1MSP"})
+    err = UpdateLocalMembership(walletPath, userName, connectionProfilePath, "network1", "mychannel", "interop", []string{"Org1MSP"})
     fmt.Println(err)
 
     fmt.Printf("Read Local Membership: ")

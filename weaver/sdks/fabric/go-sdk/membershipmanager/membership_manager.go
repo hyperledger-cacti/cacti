@@ -35,12 +35,12 @@ import (
 )
 
 
-func CreateLocalMembership(walletPath, userName, connectionProfilePath, channelId, weaverCCId string, mspIds []string) error {
+func CreateLocalMembership(walletPath, userName, connectionProfilePath, securityDomain, channelId, weaverCCId string, mspIds []string) error {
 	membership, err := GetMSPConfigurations(walletPath, userName, connectionProfilePath, channelId, mspIds)
 	if err != nil {
 		return err
 	}
-	membership.SecurityDomain = ""		// We don't need this as the Weaver chaincode will internally use a designated keyword
+	membership.SecurityDomain = securityDomain
 	membershipBytes, err := protoV2.Marshal(membership)
 	if err != nil {
 		return err
@@ -55,12 +55,12 @@ func CreateLocalMembership(walletPath, userName, connectionProfilePath, channelI
 	return nil
 }
 
-func UpdateLocalMembership(walletPath, userName, connectionProfilePath, channelId, weaverCCId string, mspIds []string) error {
+func UpdateLocalMembership(walletPath, userName, connectionProfilePath, securityDomain, channelId, weaverCCId string, mspIds []string) error {
 	membership, err := GetMSPConfigurations(walletPath, userName, connectionProfilePath, channelId, mspIds)
 	if err != nil {
 		return err
 	}
-	membership.SecurityDomain = ""		// We don't need this as the Weaver chaincode will internally use a designated keyword
+	membership.SecurityDomain = securityDomain
 	membershipBytes, err := protoV2.Marshal(membership)
 	if err != nil {
 		return err
