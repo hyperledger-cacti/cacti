@@ -69,6 +69,7 @@ Prepare `fabric-cli` for configuration suitably as follows.
   ```bash
   ./bin/fabric-cli env set-file ./.env
   ```
+
 | Notes |
 |:------|
 | If the `CONFIG_PATH` environment variable is omitted from `.env`, then you must also run:<br/>```./bin/fabric-cli config set-file ./config.json``` |
@@ -166,6 +167,7 @@ Prepare `fabric-cli` for configuration suitably as follows.
   ```bash
   ./bin/fabric-cli env set-file ./.env
   ```
+
 | Notes |
 |:------|
 | If the `CONFIG_PATH` environment variable is omitted from `.env`, then you must also run:<br/>```./bin/fabric-cli config set-file ./config.json``` |
@@ -283,6 +285,7 @@ Prepare `fabric-cli` for configuration suitably as follows.
   ```
   ./bin/fabric-cli env set-file ./.env
   ```
+
 | Notes |
 |:------|
 | If the `CONFIG_PATH` environment variable is omitted from `.env`, then you must also run:<br/>```./bin/fabric-cli config set-file ./config.json``` |
