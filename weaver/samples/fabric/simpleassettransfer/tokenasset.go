@@ -374,7 +374,7 @@ func (s *SmartContract) GetTokenAssetClaimStatus(ctx contractapi.TransactionCont
 	}
 
 	// Fetch asset claim details using common (library) logic
-	claimAssetDetails, claimBytes64, blankClaimBytes64, err := wutils.GetAssetClaimStatus(ctx, pledgeId, recipientCert, pledger, pledgerNetworkId, pledgeExpiryTimeSecs, blankAssetJSON)
+	claimAssetDetails, claimBytes64, blankClaimBytes64, err := wutils.GetAssetClaimStatus(ctx, pledgeId, recipientCert, pledgerNetworkId, pledgeExpiryTimeSecs, blankAssetJSON)
 	if err != nil {
 		return blankClaimBytes64, err
 	}
