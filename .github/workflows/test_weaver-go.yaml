@@ -7,8 +7,20 @@ name: Unit Test Fabric Interop CC and Sample Chaincode
 on:
   push:
     branches: [ main ]
+    paths:
+        - '.github/workflows/test_weaver-**'
+        - 'weaver/common/protos-go/**'
+        - 'weaver/core/network/fabric-interop-cc/**'
+        - 'weaver/samples/fabric/**'
+        - '!weaver/samples/fabric/fabric-cli/**'
   pull_request:
     branches: [ main ]
+    paths:
+        - '.github/workflows/test_weaver-**'
+        - 'weaver/common/protos-go/**'
+        - 'weaver/core/network/fabric-interop-cc/**'
+        - 'weaver/samples/fabric/**'
+        - '!weaver/samples/fabric/fabric-cli/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
