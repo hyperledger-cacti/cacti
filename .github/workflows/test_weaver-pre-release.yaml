@@ -47,6 +47,7 @@ jobs:
           VERSION=$(echo $VERSION | sed -e 's/^v//')
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo $VERSION
+          echo $GITHUB_ENV
 
       # Gradle
       - name: check weaver/common/protos-java-kt/gradle.properties
