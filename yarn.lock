@@ -7381,6 +7381,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@hyperledger/cacti-plugin-weaver-driver-fabric@workspace:packages/cacti-plugin-weaver-driver-fabric":
+  version: 0.0.0-use.local
+  resolution: "@hyperledger/cacti-plugin-weaver-driver-fabric@workspace:packages/cacti-plugin-weaver-driver-fabric"
+  languageName: unknown
+  linkType: soft
+
 "@hyperledger/cacti-weaver-besu-cli@workspace:weaver/samples/besu/besu-cli":
   version: 0.0.0-use.local
   resolution: "@hyperledger/cacti-weaver-besu-cli@workspace:weaver/samples/besu/besu-cli"

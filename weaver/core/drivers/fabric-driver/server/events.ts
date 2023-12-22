@@ -66,7 +66,7 @@ async function subscribeEventHelper(
     if (newRequestId == requestId) {
       // event being subscribed for the first time
       // Start an appropriate type of event listener for this event subscription if one is not already active
-      const [listenerHandle, error] = await handlePromise(
+      const [, error] = await handlePromise(
         registerListenerForEventSubscription(
           call_request.getEventMatcher()!,
           network_name,
@@ -74,7 +74,7 @@ async function subscribeEventHelper(
       );
       if (error) {
         // Need to delete subscription in database too, for consistency
-        const [deletedSubscription, err] = await handlePromise(
+        const [, err] = await handlePromise(
           deleteEventSubscription(
             call_request.getEventMatcher()!,
             newRequestId,
@@ -212,7 +212,7 @@ async function addEventSubscription(
 
     try {
       // fetch the current values in the DB against the given key
-      var subscriptionsSerialized: string = (await db.read(key)) as string;
+      const subscriptionsSerialized: string = (await db.read(key)) as string;
       subscriptions = JSON.parse(subscriptionsSerialized);
 
       logger.debug(`existing subscriptions.length: ${subscriptions.length}`);
@@ -264,7 +264,7 @@ async function addEventSubscription(
     }
 
     logger.debug(`new subscriptions.length: ${subscriptions.length}`);
-    subscriptionsSerialized = JSON.stringify(subscriptions);
+    const subscriptionsSerialized = JSON.stringify(subscriptions);
     // insert the value against key in the DB (it can be the scenario of a new key addition, or update to the value of an existing key)
     await db.insert(key, subscriptionsSerialized);
     await db.close();
@@ -302,7 +302,7 @@ const deleteEventSubscription = async (
     );
     try {
       // fetch the current values in the DB against the given key
-      var subscriptionsSerialized: string = (await db.read(key)) as string;
+      const subscriptionsSerialized: string = (await db.read(key)) as string;
       subscriptions = JSON.parse(subscriptionsSerialized);
 
       logger.debug(`subscriptions.length: ${subscriptions.length}`);
@@ -341,7 +341,7 @@ const deleteEventSubscription = async (
     if (subscriptions.length == 0) {
       await db.delete(key);
     } else {
-      subscriptionsSerialized = JSON.stringify(subscriptions);
+      const subscriptionsSerialized = JSON.stringify(subscriptions);
       await db.insert(key, subscriptionsSerialized);
     }
 
@@ -505,7 +505,6 @@ async function writeExternalStateHelper(
   const ctx: eventsPb.ContractTransaction = writeExternalStateMessage.getCtx();
   const keyCert = await getDriverKeyCert();
 
-  const requestId: string = viewPayload.getRequestId();
   if (!viewPayload.getError()) {
     const interopArgIndices = [],
       viewsSerializedBase64 = [],
@@ -568,6 +567,7 @@ async function writeExternalStateHelper(
       gateway.disconnect();
       throw responseError;
     }
+    logger.debug(`write external state response: ${response}`);
     logger.debug(`write successful`);
     gateway.disconnect();
   } else {

@@ -11,7 +11,6 @@ import * as fs from "fs";
 import query_pb from "@hyperledger/cacti-weaver-protos-js/common/query_pb";
 import view_data from "@hyperledger/cacti-weaver-protos-js/fabric/view_data_pb";
 import proposalResponse from "@hyperledger/cacti-weaver-protos-js/peer/proposal_response_pb";
-import interopPayload from "@hyperledger/cacti-weaver-protos-js/common/interop_payload_pb";
 import state_pb from "@hyperledger/cacti-weaver-protos-js/common/state_pb";
 import { Certificate } from "@fidm/x509";
 import { getConfig } from "./walletSetup";
@@ -153,7 +152,7 @@ async function invoke(
     let proposalRequest;
     if (identities.length > 0) {
       const endorserList = endorsers.filter((endorser: Endorser) => {
-        //@ts-ignore
+        //@ts-expect-error: should expect string
         const cert = Certificate.fromPEM(endorser.options.pem);
         const orgName = cert.issuer.organizationName;
         return (
@@ -182,8 +181,7 @@ async function invoke(
     const viewPayload = new view_data.FabricView();
     const endorsedProposalResponses: view_data.FabricView.EndorsedProposalResponse[] =
       [];
-    //TODO Fix ts error
-    //@ts-ignore
+
     let endorsementCounter = 0;
     proposalResponseResult.responses.forEach((response) => {
       const endorsement = new proposalResponse.Endorsement();

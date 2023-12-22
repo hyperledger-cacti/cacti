@@ -70,7 +70,7 @@ function mockCommunication(query: query_pb.Query) {
     const view = new state_pb.View();
     view.setMeta(meta);
     const viewDataBinary = fabricViewPb.FabricView.deserializeBinary(
-      //@ts-ignore
+      //@ts-expect-error: should expect string
       mockedB64Data,
     ).serializeBinary();
     logger.info(`viewData ${viewDataBinary}`);
@@ -161,7 +161,6 @@ const spawnSubscribeEventHelper = async (
 };
 
 // Service for receiving communication from a relay. Will communicate with the network and respond with an ack to the relay while the fabric communication is being completed.
-//@ts-ignore
 server.addService(driver_pb_grpc.DriverCommunicationService, {
   requestDriverState: (
     call: { request: query_pb.Query },
@@ -245,8 +244,6 @@ server.addService(driver_pb_grpc.DriverCommunicationService, {
     call: { request: eventsPb.EventSubscription },
     callback: (_: any, object: query_pb.Query) => void,
   ) => {
-    const ack_response = new ack_pb.Ack();
-
     signEventSubscriptionQuery(call.request.getQuery()!)
       .then((signedQuery) => {
         // gRPC response.
@@ -445,11 +442,7 @@ const configSetup = async () => {
         `wallet-${process.env.NETWORK_NAME ? process.env.NETWORK_NAME : "network1"}`,
       );
   if (process.env.CONNECTION_PROFILE) {
-    await walletSetup(
-      walletPath,
-      process.env.CONNECTION_PROFILE,
-      process.env.NETWORK_NAME ? process.env.NETWORK_NAME : "network1",
-    );
+    await walletSetup(walletPath, process.env.CONNECTION_PROFILE);
   } else {
     logger.error("No CONNECTION_PROFILE provided in the .env");
   }
@@ -500,7 +493,7 @@ if (process.env.DRIVER_TLS === "true") {
   server.bindAsync(
     `${process.env.DRIVER_ENDPOINT}`,
     ServerCredentials.createSsl(null, [keyCertPair], false),
-    (cb) => {
+    () => {
       configSetup().then(() => {
         logger.info("Starting server with TLS");
         monitorService();
@@ -511,7 +504,7 @@ if (process.env.DRIVER_TLS === "true") {
   server.bindAsync(
     `${process.env.DRIVER_ENDPOINT}`,
     ServerCredentials.createInsecure(),
-    (cb) => {
+    () => {
       configSetup().then(() => {
         logger.info("Starting server without TLS");
         monitorService();

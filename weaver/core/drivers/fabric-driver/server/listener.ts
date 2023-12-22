@@ -6,16 +6,7 @@
 
 import * as fabproto6 from "fabric-protos";
 import { BlockDecoder } from "fabric-common/index";
-import {
-  Gateway,
-  Network,
-  Contract,
-  ContractEvent,
-  BlockListener,
-  ContractListener,
-  BlockEvent,
-  ListenerOptions,
-} from "fabric-network";
+import { Gateway, Network, BlockListener, BlockEvent } from "fabric-network";
 import query_pb from "@hyperledger/cacti-weaver-protos-js/common/query_pb";
 import events_pb from "@hyperledger/cacti-weaver-protos-js/common/events_pb";
 import { lookupEventSubscriptions, readAllEventMatchers } from "./events";
@@ -24,14 +15,8 @@ import {
   handlePromise,
   relayCallback,
   getRelayClientForEventPublish,
-  delay,
 } from "./utils";
-import {
-  DBConnector,
-  LevelDBConnector,
-  DBLockedError,
-  DBKeyNotFoundError,
-} from "./dbConnector";
+import { DBConnector, LevelDBConnector } from "./dbConnector";
 import logger from "./logger";
 
 const networkGatewayMap = new Map<string, Gateway>();
@@ -242,8 +227,7 @@ const initBlockEventListenerForChannel = async (
   channelId: string,
 ): Promise<any> => {
   const listener: BlockListener = async (event: BlockEvent) => {
-    let bh_db: DBConnector;
-    bh_db = new LevelDBConnector(DB_NAME!, DB_OPEN_TIMEOUT);
+    const bh_db: DBConnector = new LevelDBConnector(DB_NAME!, DB_OPEN_TIMEOUT);
     await bh_db.open();
     try {
       const lastBlockNum = await getLastReadBlockNumber(bh_db, channelId);
@@ -309,8 +293,7 @@ const registerListenerForEventSubscription = async (
       globalLedgerListenerCount.get(channelId) + 1,
     );
   } else {
-    let bh_db: DBConnector;
-    bh_db = new LevelDBConnector(DB_NAME!, DB_OPEN_TIMEOUT);
+    const bh_db: DBConnector = new LevelDBConnector(DB_NAME!, DB_OPEN_TIMEOUT);
     await bh_db.open();
     try {
       const currBlockNum = await getCurrBlockNumber(network, channelId);
@@ -373,8 +356,7 @@ const unregisterListenerForEventSubscription = async (
     );
     return true;
   } else {
-    let bh_db: DBConnector;
-    bh_db = new LevelDBConnector(DB_NAME!, DB_OPEN_TIMEOUT);
+    const bh_db: DBConnector = new LevelDBConnector(DB_NAME!, DB_OPEN_TIMEOUT);
     await bh_db.open();
     try {
       // Set DB Height to -1 if no listener running
@@ -411,10 +393,7 @@ const loadEventSubscriptionsFromStorage = async (
     const eventMatchers = await readAllEventMatchers();
     for (const eventMatcher of eventMatchers) {
       try {
-        const listenerHandle = await registerListenerForEventSubscription(
-          eventMatcher,
-          networkName,
-        );
+        await registerListenerForEventSubscription(eventMatcher, networkName);
       } catch (error) {
         logger.error(
           `Error: Could not start event listener for ${JSON.stringify(eventMatcher.toObject())} with error: ${error}`,
@@ -478,12 +457,10 @@ async function getCurrBlockNumber(
 const monitorBlockForMissedEvents = async (networkName: string) => {
   logger.debug("############### Monitor Begin #################");
   // Create connection to a database
-  let bh_db: DBConnector;
-  bh_db = new LevelDBConnector(DB_NAME!, DB_OPEN_TIMEOUT);
+  const bh_db: DBConnector = new LevelDBConnector(DB_NAME!, DB_OPEN_TIMEOUT);
   await bh_db.open();
   try {
     if (networkGatewayMap.has(networkName)) {
-      const gateway = networkGatewayMap.get(networkName);
       // Handle Block Events
       for (const [channelId, network] of networkChannelMap) {
         const currBlockNum = await getCurrBlockNumber(network, channelId);
