@@ -31,7 +31,6 @@ const getConfig = () => {
 const walletSetup = async (
   walletPath: string,
   conn_profile_path: string,
-  networkName: string,
 ): Promise<any> => {
   const ccpPath = conn_profile_path
     ? path.resolve(__dirname, conn_profile_path)
@@ -56,6 +55,7 @@ const walletSetup = async (
   logger.debug(`CA URL ${caURL}`);
   const ca = new FabricCAServices(caURL);
   const ident = ca.newIdentityService();
+  logger.debug(ident);
 
   const wallet = await Wallets.newFileSystemWallet(walletPath);
   const adminName = config.admin.name;
