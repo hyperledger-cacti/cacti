@@ -7812,36 +7812,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger/cactus-plugin-ledger-connector-cdl-socketio@workspace:packages/cactus-plugin-ledger-connector-cdl-socketio":
-  version: 0.0.0-use.local
-  resolution: "@hyperledger/cactus-plugin-ledger-connector-cdl-socketio@workspace:packages/cactus-plugin-ledger-connector-cdl-socketio"
-  dependencies:
-    "@hyperledger/cactus-api-client": 2.0.0-alpha.2
-    "@hyperledger/cactus-common": 2.0.0-alpha.2
-    "@types/config": 0.0.41
-    "@types/cookie-parser": 1.4.3
-    "@types/express": 4.17.19
-    "@types/http-errors": 2.0.1
-    "@types/jsonwebtoken": 9.0.2
-    "@types/node": 14.18.54
-    "@types/sanitize-html": 2.6.2
-    axios: 1.6.0
-    body-parser: 1.20.2
-    config: 3.3.7
-    cookie-parser: 1.4.6
-    express: 4.18.2
-    fast-safe-stringify: 2.1.1
-    http-errors: 1.6.3
-    jest-extended: 4.0.1
-    js-yaml: 3.14.1
-    jsonwebtoken: 9.0.0
-    log4js: 6.4.1
-    sanitize-html: 2.7.0
-    socket.io: 4.5.4
-    uuid: 8.3.2
-  languageName: unknown
-  linkType: soft
-
 "@hyperledger/cactus-plugin-ledger-connector-cdl@workspace:packages/cactus-plugin-ledger-connector-cdl":
   version: 0.0.0-use.local
   resolution: "@hyperledger/cactus-plugin-ledger-connector-cdl@workspace:packages/cactus-plugin-ledger-connector-cdl"
@@ -13072,15 +13042,6 @@ __metadata:
   dependencies:
     "@types/express": "*"
   checksum: d5b3c0e193cc95289444306ad396b27b92c9ff1ffd0769268b374d09315c8df1ae94de5fe2a81a79c0629560646763136e15c8a4069d3dc5ba5cb6bc185eaccd
-  languageName: node
-  linkType: hard
-
-"@types/cookie-parser@npm:1.4.3":
-  version: 1.4.3
-  resolution: "@types/cookie-parser@npm:1.4.3"
-  dependencies:
-    "@types/express": "*"
-  checksum: f390f3af1b1711190dee2c2ecd9af33af81fbde8d81ee820dadb6fe1e0d80c3faba40af37c6ed36fb88b04b64870f6a021f7e9edceecd17c42fe22abe0af5005
   languageName: node
   linkType: hard
 
