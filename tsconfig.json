@@ -71,9 +71,6 @@
       "path": "./packages/cactus-plugin-ledger-connector-cdl/tsconfig.json"
     },
     {
-      "path": "./packages/cactus-plugin-ledger-connector-cdl-socketio/tsconfig.json"
-    },
-    {
       "path": "./packages/cactus-plugin-ledger-connector-iroha/tsconfig.json"
     },
     {
