@@ -20,6 +20,22 @@ message WriteExternalStateMessage {
   common.events.ContractTransaction ctx = 2;
 }
 
+message PerformLockRequest {
+  string session_id = 1;
+}
+
+message CreateAssetRequest {
+  string session_id = 1;
+}
+
+message ExtinguishRequest {
+  string session_id = 1;
+}
+
+message AssignAssetRequest {
+  string session_id = 1;
+}
+
 service DriverCommunication {
   // Data Sharing 
   // the remote relay sends a RequestDriverState request to its driver with a
@@ -38,4 +54,20 @@ service DriverCommunication {
   // Events Publication
   // the dest-relay calls the dest-driver on this end point to write the remote network state to the local ledger
   rpc WriteExternalState(WriteExternalStateMessage) returns (common.ack.Ack) {}
+
+  // As part of SATP, the source reply (sender gateway) sends a PerformLock request to its driver
+  // to lock a specific asset
+  rpc PerformLock(PerformLockRequest) returns (common.ack.Ack) {}
+
+  // As part of SATP, the destination reply (receiver gateway) sends a CreateAsset request to its driver
+  // to create a specific asset
+  rpc CreateAsset(CreateAssetRequest) returns (common.ack.Ack) {}
+
+  // As part of SATP, the source reply (sender gateway) sends a Extinguish request to its driver
+  // to extinguish a specific asset
+  rpc Extinguish(ExtinguishRequest) returns (common.ack.Ack) {}
+
+  // As part of SATP, the destination reply (receiver gateway) sends a AssignAsset request to its driver
+  // to assign a specific asset
+  rpc AssignAsset(AssignAssetRequest) returns (common.ack.Ack) {}
 }

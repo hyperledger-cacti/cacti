@@ -1,0 +1,29 @@
+{
+  "securityDomain": "",
+  "rules": [
+    {
+      "principal": "<certificate>",
+      "principalType": "certificate",
+      "resource": "mychannel:satpsimpleasset:GetHTLCHash:*",
+      "read": true
+    },
+    {
+      "principal": "<certificate>",
+      "principalType": "certificate",
+      "resource": "mychannel:satpsimpleasset:GetHTLCHashByContractId:*",
+      "read": true
+    },
+    {
+      "principal": "<certificate>",
+      "principalType": "certificate",
+      "resource": "mychannel:satpsimpleasset:GetHTLCHashPreImage:*",
+      "read": true
+    },
+    {
+      "principal": "<certificate>",
+      "principalType": "certificate",
+      "resource": "mychannel:satpsimpleasset:GetHTLCHashPreImageByContractId:*",
+      "read": true
+    }
+  ]
+}
