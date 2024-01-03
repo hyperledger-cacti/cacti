@@ -22,7 +22,7 @@ import { v4 as uuidv4 } from "uuid";
 import { default_service, empty } from "../../../main/typescript/public-api";
 import * as grpc from "@grpc/grpc-js";
 import { GrpcServerApiServer } from "../../../main/typescript/web-services/grpc/grpc-server-api-server";
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 
 describe("cmd-api-server:getOpenApiSpecV1Endpoint", () => {
   const logLevel: LogLevelDesc = "TRACE";
@@ -141,14 +141,14 @@ describe("cmd-api-server:getOpenApiSpecV1Endpoint", () => {
     );
 
     const res1Promise = new Promise((resolve, reject) => {
-      server.bindAsync("localhost:0", serverInsecureCreds, (err, port) => {
+      server.bindAsync("127.0.0.1:0", serverInsecureCreds, (err, port) => {
         if (err) {
           reject(err);
         } else {
           server.start();
 
           const client = new grpc.Client(
-            `localhost:${port}`,
+            `127.0.0.1:${port}`,
             clientInsecureCreds,
           );
 
@@ -199,7 +199,7 @@ describe("cmd-api-server:getOpenApiSpecV1Endpoint", () => {
     );
 
     const res1Promise = new Promise((resolve, reject) => {
-      server.bindAsync("localhost:0", serverInsecureCreds, (err, port) => {
+      server.bindAsync("127.0.0.1:0", serverInsecureCreds, (err, port) => {
         if (err) {
           reject(err);
         } else {
@@ -207,7 +207,7 @@ describe("cmd-api-server:getOpenApiSpecV1Endpoint", () => {
 
           const client =
             new default_service.org.hyperledger.cactus.cmd_api_server.DefaultServiceClient(
-              `localhost:${port}`,
+              `127.0.0.1:${port}`,
               clientInsecureCreds,
             );
           client.makeUnaryRequest(
@@ -257,10 +257,10 @@ describe("cmd-api-server:getOpenApiSpecV1Endpoint", () => {
     );
 
     const res1Promise = new Promise((resolve, reject) => {
-      server.bindAsync("localhost:0", serverInsecureCreds, (err, port) => {
+      server.bindAsync("127.0.0.1:0", serverInsecureCreds, (err, port) => {
         const client =
           new default_service.org.hyperledger.cactus.cmd_api_server.DefaultServiceClient(
-            `localhost:${port}`,
+            `127.0.0.1:${port}`,
             clientInsecureCreds,
           );
         if (err) {

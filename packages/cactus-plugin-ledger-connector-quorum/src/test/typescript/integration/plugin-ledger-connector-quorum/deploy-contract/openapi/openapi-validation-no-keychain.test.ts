@@ -57,7 +57,8 @@ test(testCase, async (t: Test) => {
   await ledger.start();
 
   const rpcApiHttpHost = await ledger.getRpcApiHttpHost();
-  const quorumGenesisOptions: IQuorumGenesisOptions = await ledger.getGenesisJsObject();
+  const quorumGenesisOptions: IQuorumGenesisOptions =
+    await ledger.getGenesisJsObject();
   t.ok(quorumGenesisOptions);
   t.ok(quorumGenesisOptions.alloc);
 
@@ -70,20 +71,19 @@ test(testCase, async (t: Test) => {
   });
   const [firstHighNetWorthAccount] = highNetWorthAccounts;
 
-  const connector: PluginLedgerConnectorQuorum = new PluginLedgerConnectorQuorum(
-    {
+  const connector: PluginLedgerConnectorQuorum =
+    new PluginLedgerConnectorQuorum({
       instanceId: uuidV4(),
       rpcApiHttpHost,
       logLevel,
       pluginRegistry: new PluginRegistry(),
-    },
-  );
+    });
 
   const expressApp = express();
   expressApp.use(bodyParser.json({ limit: "250mb" }));
   const server = http.createServer(expressApp);
   const listenOptions: IListenOptions = {
-    hostname: "localhost",
+    hostname: "127.0.0.1",
     port: 0,
     server,
   };
@@ -188,7 +188,7 @@ test(testCase, async (t: Test) => {
         gas: 1000000,
       };
       await apiClient.deployContractSolBytecodeJsonObjectV1(
-        (parameters as any) as DeployContractSolidityBytecodeJsonObjectV1Request,
+        parameters as any as DeployContractSolidityBytecodeJsonObjectV1Request,
       );
     } catch (e) {
       t2.equal(
@@ -224,7 +224,7 @@ test(testCase, async (t: Test) => {
         fake: 4,
       };
       await apiClient.deployContractSolBytecodeJsonObjectV1(
-        (parameters as any) as DeployContractSolidityBytecodeJsonObjectV1Request,
+        parameters as any as DeployContractSolidityBytecodeJsonObjectV1Request,
       );
     } catch (e) {
       t2.equal(
@@ -260,7 +260,7 @@ test(testCase, async (t: Test) => {
         nonce: 2,
       };
       await apiClient.invokeContractV1NoKeychain(
-        (parameters as any) as InvokeContractJsonObjectV1Request,
+        parameters as any as InvokeContractJsonObjectV1Request,
       );
     } catch (e) {
       t2.equal(
@@ -299,7 +299,7 @@ test(testCase, async (t: Test) => {
         fake: 4,
       };
       await apiClient.invokeContractV1NoKeychain(
-        (parameters as any) as InvokeContractJsonObjectV1Request,
+        parameters as any as InvokeContractJsonObjectV1Request,
       );
     } catch (e) {
       t2.equal(

@@ -40,7 +40,8 @@ export interface IPluginHtlcEthBesuErc20Options extends ICactusPluginOptions {
   pluginRegistry: PluginRegistry;
 }
 export class PluginHtlcEthBesuErc20
-  implements ICactusPlugin, IPluginWebService {
+  implements ICactusPlugin, IPluginWebService
+{
   public static readonly CLASS_NAME = "PluginHtlcEthBesuErc20";
   private readonly instanceId: string;
   private readonly keychainId: Optional<string>;

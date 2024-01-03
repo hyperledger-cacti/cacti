@@ -26,7 +26,8 @@ export interface IRunTransactionEndpointV1Options {
 }
 
 export class GetTransactionReceiptByTxIDEndpointV1
-  implements IWebServiceEndpoint {
+  implements IWebServiceEndpoint
+{
   private readonly log: Logger;
 
   constructor(public readonly opts: IRunTransactionEndpointV1Options) {
@@ -55,7 +56,7 @@ export class GetTransactionReceiptByTxIDEndpointV1
     return this.handleRequest.bind(this);
   }
 
-  public getOasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-transaction-receipt-by-txid"] {
+  public getOasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-transaction-receipt-by-txid"] {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-transaction-receipt-by-txid"
     ];
@@ -63,12 +64,12 @@ export class GetTransactionReceiptByTxIDEndpointV1
 
   public getPath(): string {
     const apiPath = this.getOasPath();
-    return apiPath.post["x-hyperledger-cactus"].http.path;
+    return apiPath.post["x-hyperledger-cacti"].http.path;
   }
 
   public getVerbLowerCase(): string {
     const apiPath = this.getOasPath();
-    return apiPath.post["x-hyperledger-cactus"].http.verbLowerCase;
+    return apiPath.post["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getOperationId(): string {
@@ -88,9 +89,8 @@ export class GetTransactionReceiptByTxIDEndpointV1
 
     try {
       const reqBody = req.body as RunTransactionRequest;
-      const resBody = await this.opts.connector.getTransactionReceiptByTxID(
-        reqBody,
-      );
+      const resBody =
+        await this.opts.connector.getTransactionReceiptByTxID(reqBody);
       res.status(200);
       res.json(resBody);
     } catch (ex) {

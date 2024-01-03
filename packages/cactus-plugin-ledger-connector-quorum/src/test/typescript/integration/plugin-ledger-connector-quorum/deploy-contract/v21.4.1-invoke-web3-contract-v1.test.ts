@@ -63,7 +63,8 @@ describe("invokeRawWeb3EthContract Tests", () => {
     await quorumTestLedger.start();
 
     log.info("Get highNetWorthAccounts...");
-    const quorumGenesisOptions: IQuorumGenesisOptions = await quorumTestLedger.getGenesisJsObject();
+    const quorumGenesisOptions: IQuorumGenesisOptions =
+      await quorumTestLedger.getGenesisJsObject();
     expect(quorumGenesisOptions).toBeTruthy();
     expect(quorumGenesisOptions.alloc).toBeTruthy();
 
@@ -147,9 +148,8 @@ describe("invokeRawWeb3EthContract Tests", () => {
       contractMethodArgs: [newName],
     };
 
-    const resultsSend = await connector.invokeRawWeb3EthContract(
-      sendInvokeArgs,
-    );
+    const resultsSend =
+      await connector.invokeRawWeb3EthContract(sendInvokeArgs);
     expect(resultsSend).toBeTruthy();
     expect(resultsSend.status).toBeTrue();
 
@@ -161,9 +161,8 @@ describe("invokeRawWeb3EthContract Tests", () => {
       contractMethod: "getName",
     };
 
-    const resultsCall = await connector.invokeRawWeb3EthContract(
-      callInvokeArgs,
-    );
+    const resultsCall =
+      await connector.invokeRawWeb3EthContract(callInvokeArgs);
     expect(resultsCall).toBeTruthy();
     expect(resultsCall).toEqual(newName);
   });

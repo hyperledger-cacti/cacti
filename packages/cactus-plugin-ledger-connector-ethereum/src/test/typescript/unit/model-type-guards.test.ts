@@ -1,9 +1,15 @@
 import "jest-extended";
 import {
+  isContractJsonDefinition,
+  isContractKeychainDefinition,
+  isDeployedContractJsonDefinition,
+  isGasTransactionConfigEIP1559,
+  isGasTransactionConfigLegacy,
+  isWeb3Error,
   isWeb3SigningCredentialGethKeychainPassword,
   isWeb3SigningCredentialNone,
   isWeb3SigningCredentialPrivateKeyHex,
-} from "../../../main/typescript/model-type-guards";
+} from "../../../main/typescript/types/model-type-guards";
 import {
   Web3SigningCredentialGethKeychainPassword,
   Web3SigningCredentialType,
@@ -41,5 +47,164 @@ describe("Type guards for OpenAPI spec model type definitions", () => {
 
     expect(isWeb3SigningCredentialNone(valid)).toBe(true);
     expect(isWeb3SigningCredentialNone({})).not.toBe(true);
+  });
+
+  test("isGasTransactionConfigLegacy()", () => {
+    expect(
+      isGasTransactionConfigLegacy({
+        gas: "1234",
+      }),
+    ).toBe(true);
+    expect(
+      isGasTransactionConfigLegacy({
+        gasPrice: "1234",
+      }),
+    ).toBe(true);
+
+    expect(
+      isGasTransactionConfigLegacy({
+        gasLimit: "1234",
+      }),
+    ).toBe(false);
+    expect(
+      isGasTransactionConfigLegacy({
+        maxFeePerGas: "1234",
+      }),
+    ).toBe(false);
+    expect(
+      isGasTransactionConfigLegacy({
+        maxPriorityFeePerGas: "1234",
+      }),
+    ).toBe(false);
+    expect(isGasTransactionConfigLegacy({})).toBe(false);
+  });
+
+  test("isGasTransactionConfigEIP1559()", () => {
+    expect(
+      isGasTransactionConfigEIP1559({
+        gasLimit: "1234",
+      }),
+    ).toBe(true);
+    expect(
+      isGasTransactionConfigEIP1559({
+        maxFeePerGas: "1234",
+      }),
+    ).toBe(true);
+    expect(
+      isGasTransactionConfigEIP1559({
+        maxPriorityFeePerGas: "1234",
+      }),
+    ).toBe(true);
+
+    expect(
+      isGasTransactionConfigEIP1559({
+        gas: "1234",
+      }),
+    ).toBe(false);
+    expect(
+      isGasTransactionConfigEIP1559({
+        gasPrice: "1234",
+      }),
+    ).toBe(false);
+    expect(isGasTransactionConfigEIP1559({})).toBe(false);
+  });
+
+  test("isContractJsonDefinition()", () => {
+    expect(
+      isContractJsonDefinition({
+        contractJSON: {
+          abi: "test",
+        },
+      }),
+    ).toBe(true);
+
+    expect(
+      isContractJsonDefinition({
+        foo: "1234",
+      }),
+    ).toBe(false);
+    expect(isContractJsonDefinition({})).toBe(false);
+  });
+
+  test("isDeployedContractJsonDefinition()", () => {
+    expect(
+      isDeployedContractJsonDefinition({
+        contractJSON: {
+          abi: "test",
+        },
+        contractAddress: "asd",
+      }),
+    ).toBe(true);
+
+    expect(
+      isDeployedContractJsonDefinition({
+        contractJSON: {
+          abi: "test",
+        },
+      }),
+    ).toBe(false);
+    expect(
+      isDeployedContractJsonDefinition({
+        contractAddress: "asd",
+      }),
+    ).toBe(false);
+    expect(
+      isDeployedContractJsonDefinition({
+        foo: "1234",
+      }),
+    ).toBe(false);
+    expect(isDeployedContractJsonDefinition({})).toBe(false);
+  });
+
+  test("isContractKeychainDefinition()", () => {
+    expect(
+      isContractKeychainDefinition({
+        contractName: "foo",
+        keychainId: "bar",
+      }),
+    ).toBe(true);
+
+    expect(
+      isContractKeychainDefinition({
+        contractName: "foo",
+      }),
+    ).toBe(false);
+    expect(
+      isContractKeychainDefinition({
+        keychainId: "foo",
+      }),
+    ).toBe(false);
+    expect(
+      isContractKeychainDefinition({
+        foo: "bar",
+      }),
+    ).toBe(false);
+    expect(isContractKeychainDefinition({})).toBe(false);
+  });
+
+  test("isWeb3Error()", () => {
+    expect(
+      isWeb3Error({
+        name: "Test",
+        code: 123,
+      }),
+    ).toBe(true);
+
+    expect(
+      isWeb3Error({
+        name: "Test",
+      }),
+    ).toBe(false);
+    expect(
+      isWeb3Error({
+        code: 123,
+      }),
+    ).toBe(false);
+    expect(
+      isWeb3Error({
+        foo: "bar",
+      }),
+    ).toBe(false);
+    expect(isWeb3Error({})).toBe(false);
   });
 });

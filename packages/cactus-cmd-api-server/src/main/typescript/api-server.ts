@@ -9,7 +9,7 @@ import path from "path";
 import tls from "tls";
 import { Server, createServer } from "http";
 import { createServer as createSecureServer } from "https";
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 import { gte } from "semver";
 import lmify from "lmify";
 import fs from "fs-extra";
@@ -22,7 +22,6 @@ import compression from "compression";
 import bodyParser from "body-parser";
 import cors, { CorsOptionsDelegate, CorsRequest } from "cors";
 
-import rateLimit from "express-rate-limit";
 import { Server as SocketIoServer } from "socket.io";
 import { authorize as authorizeSocket } from "@thream/socketio-jwt";
 
@@ -46,6 +45,7 @@ import { installOpenapiValidationMiddleware } from "@hyperledger/cactus-core";
 
 import {
   Bools,
+  isExpressHttpVerbMethodName,
   Logger,
   LoggerProvider,
   newRex,
@@ -415,7 +415,8 @@ export class ApiServer {
       ]);
       this.log.debug("%o install result: %o", pkgName, out);
       if (out?.exitCode && out.exitCode !== 0) {
-        const eMsg = "Non-zero exit code returned by lmify.install() indicating that the underlying npm install OS process had encountered a problem:";
+        const eMsg =
+          "Non-zero exit code returned by lmify.install() indicating that the underlying npm install OS process had encountered a problem:";
         throw newRex(eMsg, out);
       }
       this.log.info(`Installed ${pkgName} OK`);
@@ -438,6 +439,12 @@ export class ApiServer {
         return (pluginInstance as IPluginWebService).shutdown();
       });
 
+    if (this.wsApi) {
+      this.log.info(`Disconnecting SocketIO connections...`);
+      this.wsApi.disconnectSockets(true);
+      this.log.info(`SocketIO connections disconnect OK`);
+    }
+
     this.log.info(`Stopping ${webServicesShutdown.length} WS plugin(s)...`);
     await Promise.all(webServicesShutdown);
     this.log.info(`Stopped ${webServicesShutdown.length} WS plugin(s) OK`);
@@ -459,7 +466,8 @@ export class ApiServer {
       await new Promise<void>((resolve, reject) => {
         this.grpcServer.tryShutdown((ex?: Error) => {
           if (ex) {
-            const eMsg = "Failed to shut down gRPC server of the Cacti API server.";
+            const eMsg =
+              "Failed to shut down gRPC server of the Cacti API server.";
             this.log.debug(eMsg, ex);
             reject(newRex(eMsg, ex));
           } else {
@@ -512,6 +520,7 @@ export class ApiServer {
       },
     });
 
+    const { rateLimit } = await import("express-rate-limit");
     const rateLimiterIndexHtml = rateLimit({
       windowMs: 15 * 60 * 1000, // 15 minutes
       max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
@@ -522,8 +531,8 @@ export class ApiServer {
     const middlewareIndexHtml: RequestHandler = (_, res) =>
       res.sendFile(resolvedIndexHtml);
 
-    app.use("/api/v*", apiProxyMiddleware);
-    app.use(compression());
+    app.use("/api/v*", apiProxyMiddleware as RequestHandler);
+    app.use(compression() as RequestHandler);
     app.use(corsMiddleware);
     app.use(express.static(resolvedWwwRoot));
     app.get("/*", rateLimiterIndexHtml, middlewareIndexHtml);
@@ -555,6 +564,7 @@ export class ApiServer {
    * @param app
    */
   async getOrCreateWebServices(app: express.Express): Promise<void> {
+    const fnTag = `${this.className}#getOrCreateWebServices()}`;
     const { log } = this;
     const { logLevel } = this.options.config;
     const pluginRegistry = await this.getOrInitPluginRegistry();
@@ -567,9 +577,9 @@ export class ApiServer {
         oas: OAS,
         oasPath,
         operationId,
-        path: oasPath.get["x-hyperledger-cactus"].http.path,
+        path: oasPath.get["x-hyperledger-cacti"].http.path,
         pluginRegistry,
-        verbLowerCase: oasPath.get["x-hyperledger-cactus"].http.verbLowerCase,
+        verbLowerCase: oasPath.get["x-hyperledger-cacti"].http.verbLowerCase,
         logLevel,
       };
       const endpoint = new GetOpenApiSpecV1Endpoint(opts);
@@ -585,9 +595,13 @@ export class ApiServer {
     };
 
     const { "/api/v1/api-server/healthcheck": oasPath } = OAS.paths;
-    const { http } = oasPath.get["x-hyperledger-cactus"];
+    const { http } = oasPath.get["x-hyperledger-cacti"];
     const { path: httpPath, verbLowerCase: httpVerb } = http;
-    (app as any)[httpVerb](httpPath, healthcheckHandler);
+    if (!isExpressHttpVerbMethodName(httpVerb)) {
+      const eMsg = `${fnTag} Invalid HTTP verb "${httpVerb}" in cmd-api-server OpenAPI specification for HTTP path: "${httpPath}"`;
+      throw new RuntimeError(eMsg);
+    }
+    app[httpVerb](httpPath, healthcheckHandler);
 
     this.wsApi.on("connection", (socket: SocketIoSocket) => {
       const { id } = socket;
@@ -618,14 +632,19 @@ export class ApiServer {
     const {
       "/api/v1/api-server/get-prometheus-exporter-metrics": oasPathPrometheus,
     } = OAS.paths;
+
     const { http: httpPrometheus } =
-      oasPathPrometheus.get["x-hyperledger-cactus"];
+      oasPathPrometheus.get["x-hyperledger-cacti"];
+
     const { path: httpPathPrometheus, verbLowerCase: httpVerbPrometheus } =
       httpPrometheus;
-    (app as any)[httpVerbPrometheus](
-      httpPathPrometheus,
-      prometheusExporterHandler,
-    );
+
+    if (!isExpressHttpVerbMethodName(httpVerbPrometheus)) {
+      const eMsg = `${fnTag} Invalid HTTP verb "${httpVerbPrometheus}" in cmd-api-server OpenAPI specification for HTTP path: "${httpPathPrometheus}"`;
+      throw new RuntimeError(eMsg);
+    }
+
+    app[httpVerbPrometheus](httpPathPrometheus, prometheusExporterHandler);
   }
 
   async startGrpcServer(): Promise<AddressInfo> {
@@ -681,13 +700,15 @@ export class ApiServer {
 
     const pluginRegistry = await this.getOrInitPluginRegistry();
 
-    app.use(compression());
+    app.use(compression() as RequestHandler);
 
     const apiCorsDomainCsv = this.options.config.apiCorsDomainCsv;
     const allowedDomains = apiCorsDomainCsv.split(",");
     const corsMiddleware = this.createCorsMiddleware(allowedDomains);
     app.use(corsMiddleware);
     app.use(bodyParser.json({ limit: "50mb" }));
+    // Add custom replacer to handle bigint responses correctly
+    app.set("json replacer", this.stringifyBigIntReplacer);
 
     const authzFactoryOptions = { apiServerOptions, pluginRegistry, logLevel };
     const authzFactory = new AuthorizerFactory(authzFactoryOptions);
@@ -775,7 +796,7 @@ export class ApiServer {
         !unprotectedEndpointExemptions.some((pt) => nse.getPath().match(pt)),
     );
     if (nonExempts.length > 0) {
-      const csv = nonExempts.join(", ");
+      const csv = nonExempts.map((ep) => ep.getPath()).join(", ");
       const { E_NON_EXEMPT_UNPROTECTED_ENDPOINTS } = ApiServer;
       throw new Error(`${E_NON_EXEMPT_UNPROTECTED_ENDPOINTS} ${csv}`);
     }
@@ -803,5 +824,19 @@ export class ApiServer {
       callback(null, corsOptions); // callback expects two parameters: error and options
     };
     return cors(corsOptionsDelegate);
+  }
+
+  /**
+   * `JSON.stringify` replacer function to handle BigInt.
+   * See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt#use_within_json
+   */
+  private stringifyBigIntReplacer(
+    _key: string,
+    value: bigint | unknown,
+  ): string | unknown {
+    if (typeof value === "bigint") {
+      return value.toString();
+    }
+    return value;
   }
 }

@@ -1,4 +1,4 @@
-import { Express, Request, Response } from "express";
+import type { Express, Request, Response } from "express";
 
 import {
   IWebServiceEndpoint,
@@ -47,7 +47,7 @@ export class CommitFinalRequestEndpointV1 implements IWebServiceEndpoint {
       OAS.paths[
         "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase3/commitfinalrequest"
       ];
-    return apiPath.post["x-hyperledger-cactus"].http.path;
+    return apiPath.post["x-hyperledger-cacti"].http.path;
   }
 
   public getVerbLowerCase(): string {
@@ -55,7 +55,7 @@ export class CommitFinalRequestEndpointV1 implements IWebServiceEndpoint {
       OAS.paths[
         "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase3/commitfinalrequest"
       ];
-    return apiPath.post["x-hyperledger-cactus"].http.verbLowerCase;
+    return apiPath.post["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getOperationId(): string {

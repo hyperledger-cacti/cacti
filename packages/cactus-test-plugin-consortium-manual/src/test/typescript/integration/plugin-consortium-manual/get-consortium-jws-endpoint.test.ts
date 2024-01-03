@@ -218,9 +218,8 @@ describe(testCase, () => {
       apiServerOptions.cockpitPort = 0;
       apiServerOptions.grpcPort = 0;
       apiServerOptions.apiTlsEnabled = false;
-      const config = await configService.newExampleConfigConvict(
-        apiServerOptions,
-      );
+      const config =
+        await configService.newExampleConfigConvict(apiServerOptions);
 
       pluginRegistry.add(pluginConsortiumManual);
 
@@ -267,9 +266,8 @@ describe(testCase, () => {
       apiServerOptions.grpcPort = 0;
       apiServerOptions.apiTlsEnabled = false;
       apiServerOptions.plugins = [];
-      const config = await configService.newExampleConfigConvict(
-        apiServerOptions,
-      );
+      const config =
+        await configService.newExampleConfigConvict(apiServerOptions);
 
       pluginRegistry.add(pluginConsortiumManual);
 
@@ -319,9 +317,8 @@ describe(testCase, () => {
       apiServerOptions.grpcPort = 0;
       apiServerOptions.apiTlsEnabled = false;
       apiServerOptions.plugins = [];
-      const config = await configService.newExampleConfigConvict(
-        apiServerOptions,
-      );
+      const config =
+        await configService.newExampleConfigConvict(apiServerOptions);
       pluginRegistry.add(pluginConsortiumManual);
 
       apiServer3 = new ApiServer({

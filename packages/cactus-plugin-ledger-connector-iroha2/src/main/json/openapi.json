@@ -3,10 +3,9 @@
   "info": {
     "title": "Hyperledger Cactus Plugin - Connector Iroha V2",
     "description": "Can perform basic tasks on a Iroha V2 ledger",
-    "version": "1.0.0",
+    "version": "v2.0.0-alpha.2",
     "license": {
       "name": "Apache-2.0",
-
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     }
   },
@@ -538,7 +537,7 @@
   "paths": {
     "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/transact": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/transact"
@@ -582,7 +581,7 @@
     },
     "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/generate-transaction": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/generate-transaction"
@@ -626,7 +625,7 @@
     },
     "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/query": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/query"

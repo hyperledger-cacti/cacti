@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-cmd-socketio-server",
-  "version": "2.0.0-alpha.1",
+  "version": "2.0.0-alpha.2",
   "description": "Allows Cactus nodes to interact with HTLC ETH contracts",
   "keywords": [
     "Hyperledger",
@@ -42,46 +42,50 @@
     "build:dev:backend:postbuild": "cp -f ../../yarn.lock ./dist/"
   },
   "dependencies": {
-    "@hyperledger/cactus-common": "2.0.0-alpha.1",
-    "@hyperledger/cactus-core-api": "2.0.0-alpha.1",
+    "@hyperledger/cactus-common": "2.0.0-alpha.2",
+    "@hyperledger/cactus-core-api": "2.0.0-alpha.2",
     "@types/node": "14.18.54",
-    "body-parser": "1.19.2",
+    "body-parser": "1.20.2",
     "config": "3.3.7",
     "cookie-parser": "1.4.5",
     "debug": "3.1.0",
     "escape-html": "1.0.3",
     "ethereumjs-common": "1.5.2",
     "ethereumjs-tx": "2.1.2",
-    "express": "4.16.4",
-    "fabric-ca-client": "1.4.19",
-    "fabric-network": "1.4.19",
+    "express": "4.18.2",
+    "fabric-network": "2.2.19",
     "http-errors": "1.6.3",
     "js-yaml": "3.14.1",
     "jsonwebtoken": "9.0.0",
-    "jsrsasign": "10.5.25",
     "log4js": "6.4.1",
     "morgan": "1.10.0",
     "shelljs": "0.8.5",
     "socket.io": "4.5.4",
-    "socket.io-client": "4.5.4",
+    "socket.io-client-fixed-types": "4.5.4",
     "web3": "1.6.1",
     "xmlhttprequest": "1.8.0"
   },
   "devDependencies": {
-    "@hyperledger/cactus-test-tooling": "2.0.0-alpha.1",
+    "@hyperledger/cactus-test-tooling": "2.0.0-alpha.2",
     "@types/config": "3.3.0",
-    "@types/cookie-parser": "1.4.2",
+    "@types/cookie-parser": "1.4.5",
     "@types/debug": "4.1.8",
     "@types/escape-html": "1.0.1",
+    "@types/express": "4.17.19",
     "@types/http-errors": "1.6.3",
     "@types/js-yaml": "4.0.5",
     "@types/jsonwebtoken": "9.0.0",
     "@types/lodash": "4.14.195",
     "@types/morgan": "1.9.1",
+    "@types/node": "14.18.54",
     "@types/shelljs": "0.8.11",
     "http-terminator": "3.2.0",
     "lodash": "4.17.21",
     "ts-node": "8.9.1"
+  },
+  "engines": {
+    "node": ">=18",
+    "npm": ">=8"
   },
   "publishConfig": {
     "access": "public"

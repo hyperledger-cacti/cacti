@@ -3,10 +3,9 @@
   "info": {
     "title": "Hyperledger Cactus Plugin - Connector Iroha",
     "description": "Can perform basic tasks on a Iroha ledger",
-    "version": "0.0.1",
+    "version": "v2.0.0-alpha.2",
     "license": {
       "name": "Apache-2.0",
-
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     }
   },
@@ -967,7 +966,7 @@
   "paths": {
     "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha/run-transaction": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha/run-transaction"
@@ -996,8 +995,8 @@
               }
             }
           },
-          "405": {
-            "description": "Method Not Allowed error.",
+          "400": {
+            "description": "Bad Request error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1006,8 +1005,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request error.",
+          "405": {
+            "description": "Method Not Allowed error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1031,7 +1030,7 @@
     },
     "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha/generate-transaction": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha/generate-transaction"
@@ -1085,7 +1084,7 @@
     },
     "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha/get-prometheus-exporter-metrics": {
       "get": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha/get-prometheus-exporter-metrics"

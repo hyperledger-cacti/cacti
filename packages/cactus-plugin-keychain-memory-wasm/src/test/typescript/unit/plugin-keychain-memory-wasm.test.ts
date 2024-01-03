@@ -32,7 +32,7 @@ test("PluginKeychainMemory", (t1: Test) => {
     t.throws(
       () =>
         new PluginKeychainMemoryWasm({
-          instanceId: (null as unknown) as string,
+          instanceId: null as unknown as string,
           keychainId: "valid-value",
           wasmPlugin: {} as PluginKeychainMemoryWasm,
         }),
@@ -53,7 +53,7 @@ test("PluginKeychainMemory", (t1: Test) => {
       () =>
         new PluginKeychainMemoryWasm({
           instanceId: "valid-value",
-          keychainId: (null as unknown) as string,
+          keychainId: null as unknown as string,
           wasmPlugin: {} as PluginKeychainMemoryWasm,
         }),
     );
@@ -87,7 +87,7 @@ test("PluginKeychainMemory", (t1: Test) => {
     expressApp.use(bodyParser.json({ limit: "250mb" }));
     const server = http.createServer(expressApp);
     const listenOptions: IListenOptions = {
-      hostname: "localhost",
+      hostname: "127.0.0.1",
       port: 0,
       server,
     };

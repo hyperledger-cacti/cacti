@@ -4,6 +4,7 @@ export {
   IPluginOdapGatewayConstructorOptions,
   PluginOdapGateway,
   OdapMessageType,
+  IOdapPluginKeyPair,
 } from "./gateway/plugin-odap-gateway";
 
 import { IPluginFactoryOptions } from "@hyperledger/cactus-core-api";
@@ -23,3 +24,4 @@ export async function createBesuPluginFactory(
 }
 
 export { ServerGatewayHelper } from "./gateway/server/server-helper";
+export { ClientGatewayHelper } from "./gateway/client/client-helper";

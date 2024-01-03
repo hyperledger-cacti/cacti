@@ -23,7 +23,7 @@ describe(testcase, () => {
   expressApp.use(bodyParser.json({ limit: "250mb" }));
   const server = http.createServer(expressApp);
   const listenOptions: IListenOptions = {
-    hostname: "localhost",
+    hostname: "127.0.0.1",
     port: 0,
     server,
   };
@@ -80,7 +80,8 @@ describe(testcase, () => {
     const config = new Configuration({ basePath: apiHost });
     const apiClient = new KeychainMemoryApi(config);
 
-    await plugin.getOrCreateWebServices(expressApp);
+    await plugin.getOrCreateWebServices();
+    await plugin.registerWebServices(expressApp);
 
     expect(plugin.getKeychainId()).toBe(options.keychainId);
     expect(plugin.getInstanceId()).toBe(options.instanceId);

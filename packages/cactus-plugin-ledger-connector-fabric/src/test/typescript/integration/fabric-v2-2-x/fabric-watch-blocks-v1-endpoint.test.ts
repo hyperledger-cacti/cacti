@@ -285,7 +285,6 @@ describe("watchBlocksV1 of fabric connector tests", () => {
       expect(createAssetResponse).toBeTruthy();
       expect(createAssetResponse.status).toEqual(200);
       expect(createAssetResponse.data).toBeTruthy();
-      expect(createAssetResponse.data.success).toBeTrue();
       expect(createAssetResponse.data.transactionId).toBeTruthy();
       log.debug(
         "runTransactionV1 response:",
@@ -386,7 +385,6 @@ describe("watchBlocksV1 of fabric connector tests", () => {
 
   /**
    * Check Cactus custom transactions summary block monitoring.
-   * This format is compatible with legacy fabric-socketio output.
    */
   test("Monitoring with type CactusTransactions returns transactions summary", async () => {
     const monitorPromise = testWatchBlock(

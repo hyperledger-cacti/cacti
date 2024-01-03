@@ -4,7 +4,7 @@ import path from "path";
 import JSON5 from "json5";
 import fs from "fs-extra";
 import { globby, Options as GlobbyOptions } from "globby";
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 import { readFile } from "fs/promises";
 
 const __filename = fileURLToPath(import.meta.url);

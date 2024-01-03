@@ -5,7 +5,6 @@ import { Server as SocketIoServer } from "socket.io";
 import { AddressInfo } from "net";
 import { v4 as uuidv4 } from "uuid";
 import { PluginObjectStoreIpfs } from "@hyperledger/cactus-plugin-object-store-ipfs";
-import { create } from "ipfs-http-client";
 import bodyParser from "body-parser";
 import express from "express";
 import { DefaultApi as ObjectStoreIpfsApi } from "@hyperledger/cactus-plugin-object-store-ipfs";
@@ -142,7 +141,7 @@ beforeAll(async () => {
     expressApp.use(bodyParser.json({ limit: "250mb" }));
     ipfsServer = http.createServer(expressApp);
     const listenOptions: IListenOptions = {
-      hostname: "localhost",
+      hostname: "127.0.0.1",
       port: 0,
       server: ipfsServer,
     };
@@ -158,7 +157,8 @@ beforeAll(async () => {
 
     const ipfsApiUrl = await ipfsContainer.getApiUrl();
 
-    const ipfsClientOrOptions = create({
+    const kuboRpcModule = await import("kubo-rpc-client");
+    const ipfsClientOrOptions = kuboRpcModule.create({
       url: ipfsApiUrl,
     });
 
@@ -279,7 +279,7 @@ beforeAll(async () => {
     expressApp.use(bodyParser.json({ limit: "250mb" }));
     fabricServer = http.createServer(expressApp);
     const listenOptions: IListenOptions = {
-      hostname: "localhost",
+      hostname: "127.0.0.1",
       port: 3000,
       server: fabricServer,
     };
@@ -490,7 +490,7 @@ beforeAll(async () => {
     expressApp.use(bodyParser.json({ limit: "250mb" }));
     besuServer = http.createServer(expressApp);
     const listenOptions: IListenOptions = {
-      hostname: "localhost",
+      hostname: "127.0.0.1",
       port: 4000,
       server: besuServer,
     };
@@ -608,7 +608,7 @@ beforeAll(async () => {
     expressApp.use(bodyParser.json({ limit: "250mb" }));
     recipientGatewayServer = http.createServer(expressApp);
     const listenOptions: IListenOptions = {
-      hostname: "localhost",
+      hostname: "127.0.0.1",
       port: 5000,
       server: recipientGatewayServer,
     };
@@ -627,7 +627,7 @@ beforeAll(async () => {
     expressApp.use(bodyParser.json({ limit: "250mb" }));
     sourceGatewayServer = http.createServer(expressApp);
     const listenOptions: IListenOptions = {
-      hostname: "localhost",
+      hostname: "127.0.0.1",
       port: 3001,
       server: sourceGatewayServer,
     };
@@ -680,11 +680,12 @@ test("client gateway crashes after lock fabric asset", async () => {
 
   const sessionID = pluginSourceGateway.configureOdapSession(odapClientRequest);
 
-  const transferInitializationRequest = await pluginSourceGateway.clientHelper.sendTransferInitializationRequest(
-    sessionID,
-    pluginSourceGateway,
-    false,
-  );
+  const transferInitializationRequest =
+    await pluginSourceGateway.clientHelper.sendTransferInitializationRequest(
+      sessionID,
+      pluginSourceGateway,
+      false,
+    );
 
   if (transferInitializationRequest == void 0) {
     expect(false);
@@ -696,11 +697,12 @@ test("client gateway crashes after lock fabric asset", async () => {
     pluginRecipientGateway,
   );
 
-  const transferInitializationResponse = await pluginRecipientGateway.serverHelper.sendTransferInitializationResponse(
-    transferInitializationRequest.sessionID,
-    pluginRecipientGateway,
-    false,
-  );
+  const transferInitializationResponse =
+    await pluginRecipientGateway.serverHelper.sendTransferInitializationResponse(
+      transferInitializationRequest.sessionID,
+      pluginRecipientGateway,
+      false,
+    );
 
   if (transferInitializationResponse == void 0) {
     expect(false);
@@ -712,11 +714,12 @@ test("client gateway crashes after lock fabric asset", async () => {
     pluginSourceGateway,
   );
 
-  const transferCommenceRequest = await pluginSourceGateway.clientHelper.sendTransferCommenceRequest(
-    sessionID,
-    pluginSourceGateway,
-    false,
-  );
+  const transferCommenceRequest =
+    await pluginSourceGateway.clientHelper.sendTransferCommenceRequest(
+      sessionID,
+      pluginSourceGateway,
+      false,
+    );
 
   if (transferCommenceRequest == void 0) {
     expect(false);
@@ -728,11 +731,12 @@ test("client gateway crashes after lock fabric asset", async () => {
     pluginRecipientGateway,
   );
 
-  const transferCommenceResponse = await pluginRecipientGateway.serverHelper.sendTransferCommenceResponse(
-    transferCommenceRequest.sessionID,
-    pluginRecipientGateway,
-    false,
-  );
+  const transferCommenceResponse =
+    await pluginRecipientGateway.serverHelper.sendTransferCommenceResponse(
+      transferCommenceRequest.sessionID,
+      pluginRecipientGateway,
+      false,
+    );
 
   if (transferCommenceResponse == void 0) {
     expect(false);
@@ -759,7 +763,7 @@ test("client gateway crashes after lock fabric asset", async () => {
   expressApp.use(bodyParser.json({ limit: "250mb" }));
   sourceGatewayServer = http.createServer(expressApp);
   const listenOptions: IListenOptions = {
-    hostname: "localhost",
+    hostname: "127.0.0.1",
     port: 3001,
     server: sourceGatewayServer,
   };

@@ -194,8 +194,9 @@ export class PluginHtlcEthBesu implements ICactusPlugin, IPluginWebService {
       "newContractV1() args to hash for ID: ",
       JSON.stringify(
         [
-          (newContractRequest.web3SigningCredential as Web3SigningCredentialPrivateKeyHex)
-            .ethAccount,
+          (
+            newContractRequest.web3SigningCredential as Web3SigningCredentialPrivateKeyHex
+          ).ethAccount,
           newContractRequest.receiver,
           newContractRequest.inputAmount,
           newContractRequest.hashLock,

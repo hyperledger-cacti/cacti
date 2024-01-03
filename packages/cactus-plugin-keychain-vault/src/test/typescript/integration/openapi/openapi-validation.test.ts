@@ -21,11 +21,11 @@ import {
 import {
   Configuration,
   DeleteKeychainEntryRequestV1,
-  GetKeychainEntryRequest,
+  GetKeychainEntryRequestV1,
   HasKeychainEntryRequestV1,
   IPluginKeychainVaultOptions,
   PluginKeychainVault,
-  SetKeychainEntryRequest,
+  SetKeychainEntryRequestV1,
 } from "../../../../main/typescript/public-api";
 
 import { DefaultApi as KeychainVaultApi } from "../../../../main/typescript/public-api";
@@ -68,7 +68,7 @@ test(`${testCase}`, async (t: Test) => {
   expressApp.use(bodyParser.json({ limit: "250mb" }));
   const server = http.createServer(expressApp);
   const listenOptions: IListenOptions = {
-    hostname: "localhost",
+    hostname: "127.0.0.1",
     port: 0,
     server,
   };
@@ -138,7 +138,7 @@ test(`${testCase}`, async (t: Test) => {
     try {
       await apiClient.setKeychainEntryV1({
         value: value1,
-      } as SetKeychainEntryRequest);
+      } as SetKeychainEntryRequestV1);
     } catch (err) {
       const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
@@ -174,7 +174,7 @@ test(`${testCase}`, async (t: Test) => {
 
   test(`${testCase} - ${fGet} - ${cWithoutParams}`, async (t2: Test) => {
     try {
-      await apiClient.getKeychainEntryV1({} as GetKeychainEntryRequest);
+      await apiClient.getKeychainEntryV1({} as GetKeychainEntryRequestV1);
     } catch (err) {
       const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
@@ -214,7 +214,7 @@ test(`${testCase}`, async (t: Test) => {
         key: key1,
         value: value1,
         fake: 4,
-      } as SetKeychainEntryRequest);
+      } as SetKeychainEntryRequestV1);
     } catch (err) {
       const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
@@ -262,7 +262,7 @@ test(`${testCase}`, async (t: Test) => {
       await apiClient.getKeychainEntryV1({
         key: key1,
         fake: 4,
-      } as GetKeychainEntryRequest);
+      } as GetKeychainEntryRequestV1);
     } catch (err) {
       const e = err as AxiosError<{ path: string }[]>;
       t2.equal(
@@ -286,7 +286,7 @@ test(`${testCase}`, async (t: Test) => {
       await apiClient.deleteKeychainEntryV1({
         key: key1,
         fake: 4,
-      } as GetKeychainEntryRequest);
+      } as GetKeychainEntryRequestV1);
     } catch (err) {
       const e = err as AxiosError;
       t2.equal(
@@ -294,7 +294,7 @@ test(`${testCase}`, async (t: Test) => {
         400,
         `Endpoint ${fDelete} with fake=4: response.status === 400 OK`,
       );
-      const fields = e?.response?.data.map((param: { path: string }) =>
+      const fields = (e?.response?.data as []).map((param: { path: string }) =>
         param.path.replace("/body/", ""),
       );
       t2.ok(

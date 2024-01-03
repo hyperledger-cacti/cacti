@@ -100,7 +100,7 @@ The `npm run watch` script in action:
     nvm use 16.14.2
     ```
   * Yarn
-    * `npm run install-yarn` (from within the project directory)
+    * `npm run enable-corepack` (from within the project directory)
   * [Docker Engine](https://docs.docker.com/engine/install/ubuntu/). Make sure that Docker is working and running, for example, running ``docker ps -aq``
   * Docker Compose
   * OpenJDK (Corda support Java 8 JDK but do not currently support Java 9 or higher)

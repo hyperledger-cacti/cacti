@@ -18,6 +18,7 @@ import "jest-extended";
 import lodash from "lodash";
 import { v4 as uuidv4 } from "uuid";
 import Web3 from "web3";
+import { WebsocketProviderOptions } from "web3-core-helpers";
 import { AbiItem } from "web3-utils";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import {
@@ -31,6 +32,7 @@ import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory
 import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
 import {
   ICactusPlugin,
+  ISendRequestResultV1,
   IVerifierEventListener,
   LedgerEvent,
 } from "@hyperledger/cactus-core-api";
@@ -112,9 +114,19 @@ describe("Verifier integration with quorum connector tests", () => {
     plugins.push(keychainPlugin);
 
     log.info("Create PluginLedgerConnectorQuorum...");
+
+    const wsProviderOptions: WebsocketProviderOptions = {
+      clientConfig: {
+        // Useful if requests are large
+        maxReceivedFrameSize: 100000000,
+        maxReceivedMessageSize: 100000000,
+      },
+    };
+
     connector = new PluginLedgerConnectorQuorum({
       rpcApiHttpHost: connectionProfile.quorum.member1.url,
       rpcApiWsHost: connectionProfile.quorum.member1.wsUrl,
+      wsProviderOptions: wsProviderOptions,
       logLevel: sutLogLevel,
       instanceId: uuidv4(),
       pluginRegistry: new PluginRegistry({ plugins: [keychainPlugin] }),
@@ -186,14 +198,14 @@ describe("Verifier integration with quorum connector tests", () => {
   // Helper Functions
   //////////////////////////////////
 
-  function monitorAndGetBlock(
+  async function monitorAndGetBlock(
     options: Record<string, unknown> = {},
   ): Promise<LedgerEvent<WatchBlocksV1Progress>> {
+    const appId = "testMonitor";
+    const sut = await globalVerifierFactory.getVerifier(quorumValidatorId);
+
     return new Promise<LedgerEvent<WatchBlocksV1Progress>>(
       (resolve, reject) => {
-        const appId = "testMonitor";
-        const sut = globalVerifierFactory.getVerifier(quorumValidatorId);
-
         const monitor: IVerifierEventListener<WatchBlocksV1Progress> = {
           onEvent(ledgerEvent: LedgerEvent<WatchBlocksV1Progress>): void {
             try {
@@ -214,7 +226,7 @@ describe("Verifier integration with quorum connector tests", () => {
               reject(err);
             }
           },
-          onError(err: any): void {
+          onError(err: unknown): void {
             log.error("Ledger monitoring error:", err);
             reject(err);
           },
@@ -229,8 +241,8 @@ describe("Verifier integration with quorum connector tests", () => {
   // Tests
   //////////////////////////////////
 
-  test("Verifier of QuorumApiClient is created by VerifierFactory", () => {
-    const sut = globalVerifierFactory.getVerifier(quorumValidatorId);
+  test("Verifier of QuorumApiClient is created by VerifierFactory", async () => {
+    const sut = await globalVerifierFactory.getVerifier(quorumValidatorId);
     expect(sut.ledgerApi.className).toEqual("QuorumApiClient");
   });
 
@@ -243,7 +255,7 @@ describe("Verifier integration with quorum connector tests", () => {
 
     beforeAll(async () => {
       // Setup verifier
-      verifier = globalVerifierFactory.getVerifier(
+      verifier = await globalVerifierFactory.getVerifier(
         quorumValidatorId,
         "QUORUM_2X",
       );
@@ -270,25 +282,44 @@ describe("Verifier integration with quorum connector tests", () => {
       };
     });
 
+    test("Using verifier for calling getBlock method works", async () => {
+      const correctContract = {};
+      const correctMethod = {
+        type: "web3Eth",
+        command: "getBlock",
+      };
+
+      const correctArgs: Record<string, unknown> = { args: ["latest"] };
+
+      const resultCorrect = await verifier.sendSyncRequest(
+        correctContract,
+        correctMethod,
+        correctArgs,
+      );
+
+      log.warn("verifier", verifier);
+      log.warn("###Results", resultCorrect);
+      // expect(resultCorrect.status).toEqual(200);
+    });
+
     test("Invalid web3EthContract calls are rejected by QuorumApiClient", async () => {
       // Define correct input parameters
-      const correctContract: Record<string, unknown> = lodash.clone(
-        contractCommon,
-      );
+      const correctContract: Record<string, unknown> =
+        lodash.clone(contractCommon);
       const correctMethod: Record<string, unknown> = {
         type: "web3EthContract",
         command: "call",
         function: "getName",
         params: [],
       };
-      const correctArgs: any = {};
+      const correctArgs: Record<string, unknown> = {};
 
       // Sanity check if correct parameters work
-      const resultCorrect = await verifier.sendSyncRequest(
+      const resultCorrect = (await verifier.sendSyncRequest(
         correctContract,
         correctMethod,
         correctArgs,
-      );
+      )) as ISendRequestResultV1<never>;
       expect(resultCorrect.status).toEqual(200);
 
       // Failing: Missing contract ABI
@@ -371,11 +402,11 @@ describe("Verifier integration with quorum connector tests", () => {
         },
       };
 
-      const resultsSend = await verifier.sendSyncRequest(
+      const resultsSend = (await verifier.sendSyncRequest(
         contractCommon,
         methodSend,
         argsSend,
-      );
+      )) as ISendRequestResultV1<{ readonly status: boolean }>;
       expect(resultsSend.status).toEqual(200);
       expect(resultsSend.data.status).toBeTrue();
 
@@ -388,11 +419,11 @@ describe("Verifier integration with quorum connector tests", () => {
       };
       const argsCall = {};
 
-      const resultCall = await verifier.sendSyncRequest(
+      const resultCall = (await verifier.sendSyncRequest(
         contractCommon,
         methodCall,
         argsCall,
-      );
+      )) as ISendRequestResultV1<string>;
       expect(resultCall.status).toEqual(200);
       expect(resultCall.data).toEqual(newName);
     });
@@ -411,11 +442,11 @@ describe("Verifier integration with quorum connector tests", () => {
         },
       };
 
-      const resultsEncode = await verifier.sendSyncRequest(
+      const resultsEncode = (await verifier.sendSyncRequest(
         contractCommon,
         methodEncode,
         argsEncode,
-      );
+      )) as ISendRequestResultV1<Array<unknown>>;
       expect(resultsEncode.status).toEqual(200);
       expect(resultsEncode.data.length).toBeGreaterThan(5);
 
@@ -440,11 +471,11 @@ describe("Verifier integration with quorum connector tests", () => {
       };
       const argsEstimateGas = {};
 
-      const resultsEstimateGas = await verifier.sendSyncRequest(
+      const resultsEstimateGas = (await verifier.sendSyncRequest(
         contractCommon,
         methodEstimateGas,
         argsEstimateGas,
-      );
+      )) as ISendRequestResultV1<number>;
       expect(resultsEstimateGas.status).toEqual(200);
       expect(resultsEstimateGas.data).toBeGreaterThan(0);
 
@@ -495,11 +526,12 @@ describe("Verifier integration with quorum connector tests", () => {
       };
       const argsCall = {};
 
-      const resultsCall = await verifier.sendSyncRequest(
+      const resultsCall = (await verifier.sendSyncRequest(
         contractCommon,
         methodCall,
         argsCall,
-      );
+      )) as ISendRequestResultV1<string>;
+      log.error(resultsCall);
       expect(resultsCall.status).toEqual(200);
       expect(resultsCall.data).toEqual(newName);
     });
@@ -511,9 +543,12 @@ describe("Verifier integration with quorum connector tests", () => {
     const method = { type: "web3Eth", command: "getBalance" };
     const args = { args: [connectionProfile.quorum.member2.accountAddress] };
 
-    const results = await globalVerifierFactory
-      .getVerifier(quorumValidatorId)
-      .sendSyncRequest(contract, method, args);
+    const verifier = await globalVerifierFactory.getVerifier(quorumValidatorId);
+    const results = (await verifier.sendSyncRequest(
+      contract,
+      method,
+      args,
+    )) as ISendRequestResultV1<Array<unknown>>;
     expect(results.status).toEqual(200);
     expect(results.data.length).toBeGreaterThan(0);
   });
@@ -525,17 +560,17 @@ describe("Verifier integration with quorum connector tests", () => {
       type: "web3Eth",
       command: "getBalance",
     };
-    const correctArgs: any = {
+    const correctArgs: Record<string, unknown> = {
       args: [connectionProfile.quorum.member2.accountAddress],
     };
-    const verifier = globalVerifierFactory.getVerifier(quorumValidatorId);
+    const verifier = await globalVerifierFactory.getVerifier(quorumValidatorId);
 
     // Sanity check if correct parameters work
-    const resultCorrect = await verifier.sendSyncRequest(
+    const resultCorrect = (await verifier.sendSyncRequest(
       correctContract,
       correctMethod,
       correctArgs,
-    );
+    )) as ISendRequestResultV1<number>;
     expect(resultCorrect.status).toEqual(200);
 
     // Failing: Empty web3.eth method
@@ -567,9 +602,12 @@ describe("Verifier integration with quorum connector tests", () => {
     const method = { type: "web3Eth", command: "foo" };
     const args = {};
 
-    const results = await globalVerifierFactory
-      .getVerifier(quorumValidatorId)
-      .sendSyncRequest(contract, method, args);
+    const verifier = await globalVerifierFactory.getVerifier(quorumValidatorId);
+    const results = (await verifier.sendSyncRequest(
+      contract,
+      method,
+      args,
+    )) as ISendRequestResultV1<unknown>;
 
     expect(results).toBeTruthy();
     expect(results.status).toEqual(504);

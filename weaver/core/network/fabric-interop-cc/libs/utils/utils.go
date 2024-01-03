@@ -459,10 +459,13 @@ func GetAssetPledgeStatus(ctx contractapi.TransactionContextInterface, pledgeId,
 	if err != nil {
 		return nil, pledgeBytes64, pledgeBytes64, err
 	}
-
-	// Match pledge with request parameters
-	if lookupPledge.Recipient != recipientCert || lookupPledge.RemoteNetworkID != recipientNetworkId {
-		return nil, pledgeBytes64, pledgeBytes64, nil      // Return blank
+	
+	// Match claim with request parameters
+	if lookupPledge.RemoteNetworkID != recipientNetworkId {
+		return nil, pledgeBytes64, pledgeBytes64, fmt.Errorf("No Pledge exists for recipient network id: %s", recipientNetworkId)      // Return blank
+	}
+	if  lookupPledge.Recipient != recipientCert {
+		return nil, pledgeBytes64, pledgeBytes64, fmt.Errorf("No Pledge exists for recipient: %s", recipientCert) 
 	}
 
 	lookupPledgeBytes64, err := marshalAssetPledge(lookupPledge)
@@ -500,7 +503,7 @@ func GetAssetPledgeDetails(ctx contractapi.TransactionContextInterface, pledgeId
 }
 
 // GetAssetClaimStatus returns the asset claim status and present time (of invocation).
-func GetAssetClaimStatus(ctx contractapi.TransactionContextInterface, pledgeId, recipientCert, pledger, pledgerNetworkId string, pledgeExpiryTimeSecs uint64, blankAssetJSON []byte) ([]byte, string, string, error) {
+func GetAssetClaimStatus(ctx contractapi.TransactionContextInterface, pledgeId, recipientCert, pledgerNetworkId string, pledgeExpiryTimeSecs uint64, blankAssetJSON []byte) ([]byte, string, string, error) {
 	// (Optional) Ensure that this function is being called by the relay via the Fabric Interop CC
 
 	claimStatus := &common.AssetClaimStatus{
@@ -533,8 +536,11 @@ func GetAssetClaimStatus(ctx contractapi.TransactionContextInterface, pledgeId, 
 	}
 
 	// Match claim with request parameters
-	if lookupClaim.RemoteNetworkID != pledgerNetworkId || lookupClaim.Recipient != recipientCert {
-		return nil, claimStatusBytes64, claimStatusBytes64, nil      // Return blank
+	if lookupClaim.RemoteNetworkID != pledgerNetworkId {
+		return nil, claimStatusBytes64, claimStatusBytes64, fmt.Errorf("No claim exists for pledger network id: %s", pledgerNetworkId)      // Return blank
+	}
+	if  lookupClaim.Recipient != recipientCert {
+		return nil, claimStatusBytes64, claimStatusBytes64, fmt.Errorf("No claim exists for recipient: %s", recipientCert) 
 	}
 	lookupClaim.ExpiryTimeSecs = claimStatus.ExpiryTimeSecs
 	lookupClaim.ExpirationStatus = claimStatus.ExpirationStatus

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 Hyperledger Cactus Contributors
+ * Copyright 2020-2023 Hyperledger Cactus Contributors
  * SPDX-License-Identifier: Apache-2.0
  *
  * verifier-factory.ts
@@ -133,10 +133,10 @@ export class VerifierFactory {
    * @param type: optional parameter, will determine the return type.
    * @returns Verifier<type> or Verifier<any> if type argument was not provided.
    */
-  getVerifier<K extends keyof ClientApiConfig>(
+  async getVerifier<K extends keyof ClientApiConfig>(
     validatorId: string,
     type?: K,
-  ): Verifier<ClientApiConfig[K]["out"]> {
+  ): Promise<Verifier<ClientApiConfig[K]["out"]>> {
     const validatorConfig = this.getValidatorConfigEntryOrThrow(validatorId);
 
     // Assert ClientApi types
@@ -156,9 +156,9 @@ export class VerifierFactory {
     } else {
       this.log.info(`No Verifier for Validator ${validatorId} - create new.`);
 
-      const clientApi = getValidatorApiClient(
+      const clientApi = await getValidatorApiClient(
         validatorConfig.validatorType,
-        (validatorConfig as unknown) as ClientApiConfig[K]["in"],
+        validatorConfig as unknown as ClientApiConfig[K]["in"],
       );
 
       const verifier = new Verifier(validatorId, clientApi, this.loglevel);

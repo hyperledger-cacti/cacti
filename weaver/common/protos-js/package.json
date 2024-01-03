@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cacti-weaver-protos-js",
-  "version": "2.0.0-alpha.1",
+  "version": "2.0.0-alpha.2",
   "description": "Interop protos for Node JS (Weaver)",
   "keywords": [
     "hyperledger",
@@ -38,14 +38,17 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@grpc/grpc-js": "1.9.0",
+    "@grpc/grpc-js": "1.9.5",
     "@grpc/proto-loader": "0.7.8",
     "google-protobuf": "3.21.2",
-    "grpc": "1.24.11",
     "grpc-tools": "1.12.4"
   },
   "devDependencies": {
     "grpc_tools_node_protoc_ts": "5.3.3"
+  },
+  "engines": {
+    "node": ">=18",
+    "npm": ">=8"
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/hyperledger"

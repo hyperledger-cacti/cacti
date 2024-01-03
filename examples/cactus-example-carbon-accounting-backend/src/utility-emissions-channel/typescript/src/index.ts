@@ -34,8 +34,8 @@ export class EmissionsChaincode {
     getEmissionsData: this.getEmissionsData,
     getAllEmissionsData: this.getAllEmissionsData,
     getAllEmissionsDataByDateRange: this.getAllEmissionsDataByDateRange,
-    getAllEmissionsDataByDateRangeAndParty: this
-      .getAllEmissionsDataByDateRangeAndParty,
+    getAllEmissionsDataByDateRangeAndParty:
+      this.getAllEmissionsDataByDateRangeAndParty,
   };
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async Init(stub: ChaincodeStub): Promise<ChaincodeResponse> {

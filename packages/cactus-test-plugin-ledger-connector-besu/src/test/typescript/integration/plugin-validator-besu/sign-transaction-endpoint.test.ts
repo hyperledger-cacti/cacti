@@ -113,9 +113,8 @@ describe(testCase, () => {
     apiServerOptions.cockpitPort = 0;
     apiServerOptions.grpcPort = 0;
     apiServerOptions.apiTlsEnabled = false;
-    const config = await configService.newExampleConfigConvict(
-      apiServerOptions,
-    );
+    const config =
+      await configService.newExampleConfigConvict(apiServerOptions);
 
     pluginRegistry.add(pluginValidatorBesu);
 
@@ -150,9 +149,8 @@ describe(testCase, () => {
       privateKey: besuPrivateKey,
     };
 
-    const transactionHash = await web3JsQuorum.priv.generateAndSendRawTransaction(
-      contractOptions,
-    );
+    const transactionHash =
+      await web3JsQuorum.priv.generateAndSendRawTransaction(contractOptions);
 
     const transaction = await web3.eth.getTransaction(transactionHash);
     const singData = jsObjectSigner.sign(transaction.input);

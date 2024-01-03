@@ -72,7 +72,6 @@ test("BEFORE " + testCase, async (t: Test) => {
 });
 
 test(testCase, async (t: Test) => {
-
   const secretEthAbiEncoded = encodeParameter("uint256", secret);
   const hashLock = keccak256(secretEthAbiEncoded);
 
@@ -150,7 +149,7 @@ test(testCase, async (t: Test) => {
   expressApp.use(bodyParser.json({ limit: "250mb" }));
   const server = http.createServer(expressApp);
   const listenOptions: IListenOptions = {
-    hostname: "localhost",
+    hostname: "127.0.0.1",
     port: 0,
     server,
   };
@@ -314,9 +313,8 @@ test(testCase, async (t: Test) => {
     gas: estimatedGas,
   };
 
-  const response3 = await htlcCoordinatorBesuApi.withdrawCounterpartyV1(
-    withdrawCounterparty,
-  );
+  const response3 =
+    await htlcCoordinatorBesuApi.withdrawCounterpartyV1(withdrawCounterparty);
   t.equal(response3.status, 200, "response status is 200 OK");
   t.equal(response3.data.success, true, "response success is true");
 

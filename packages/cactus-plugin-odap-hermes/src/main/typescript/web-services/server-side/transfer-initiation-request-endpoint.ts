@@ -1,4 +1,4 @@
-import { Express, Request, Response } from "express";
+import type { Express, Request, Response } from "express";
 
 import {
   IWebServiceEndpoint,
@@ -24,7 +24,8 @@ export interface ITransferInitiationRequestEndpointOptions {
 }
 
 export class TransferInitiationRequestEndpointV1
-  implements IWebServiceEndpoint {
+  implements IWebServiceEndpoint
+{
   public static readonly CLASS_NAME = "TransferInitiationRequestEndpointV1";
 
   private readonly log: Logger;
@@ -50,7 +51,7 @@ export class TransferInitiationRequestEndpointV1
       OAS.paths[
         "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase1/transferinitiationrequest"
       ];
-    return apiPath.post["x-hyperledger-cactus"].http.path;
+    return apiPath.post["x-hyperledger-cacti"].http.path;
   }
 
   public getVerbLowerCase(): string {
@@ -58,7 +59,7 @@ export class TransferInitiationRequestEndpointV1
       OAS.paths[
         "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase1/transferinitiationrequest"
       ];
-    return apiPath.post["x-hyperledger-cactus"].http.verbLowerCase;
+    return apiPath.post["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getOperationId(): string {

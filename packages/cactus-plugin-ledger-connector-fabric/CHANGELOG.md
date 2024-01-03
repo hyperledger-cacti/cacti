@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0-alpha.2](https://github.com/hyperledger/cacti/compare/v2.0.0-alpha.1...v2.0.0-alpha.2) (2023-09-27)
+
+### Bug Fixes
+
+* **connector-fabric:** runTransactionV1 Open API validation crash ([516dd49](https://github.com/hyperledger/cacti/commit/516dd49fd443fc2d50b003104301b8060327b35a))
+* **security:** crash in HeaderParser in dicer ([77fb559](https://github.com/hyperledger/cacti/commit/77fb559532448aae45cfe704da2637119bf93c27))
+* **security:** upgrade fabric 2.x deps to 2.2.18 ([36988a5](https://github.com/hyperledger/cacti/commit/36988a5edbf9856a1bcc960a3b9afe443536733e)), closes [#2610](https://github.com/hyperledger/cacti/issues/2610)
+* use common conventions: tsconfig.json, package.json ([50f5c02](https://github.com/hyperledger/cacti/commit/50f5c02190ba28b77492c09e81f5d5ba6578e862)), closes [#2216](https://github.com/hyperledger/cacti/issues/2216)
+
+### Features
+
+* **fabric-test-ledger:** add support to enrolling users in different Orgs ([b910681](https://github.com/hyperledger/cacti/commit/b9106810db11a2af19c8c06d6be39d2648f96fba)), closes [#2248](https://github.com/hyperledger/cacti/issues/2248)
+* **plugin-persistence-fabric:** add new fabric persistence plugin ([47a64ee](https://github.com/hyperledger/cacti/commit/47a64ee17446db8102e2ca95f16b26f8778175a4)), closes [#2259](https://github.com/hyperledger/cacti/issues/2259) [#2265](https://github.com/hyperledger/cacti/issues/2265)
+
 # [2.0.0-alpha.1](https://github.com/hyperledger/cacti/compare/v2.0.0-alpha-prerelease...v2.0.0-alpha.1) (2023-05-19)
 
 **Note:** Version bump only for package @hyperledger/cactus-plugin-ledger-connector-fabric

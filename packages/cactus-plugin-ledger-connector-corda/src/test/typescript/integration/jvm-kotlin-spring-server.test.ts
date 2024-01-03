@@ -153,7 +153,7 @@ describe(testCase, () => {
     );
     const partyBPublicKey = partyB?.legalIdentities[0].owningKey;
 
-    const req: InvokeContractV1Request = ({
+    const req: InvokeContractV1Request = {
       flowFullClassName: "net.corda.samples.obligation.flows.IOUIssueFlow",
       flowInvocationType: FlowInvocationType.TrackedFlowDynamic,
       params: [
@@ -390,7 +390,7 @@ describe(testCase, () => {
         },
       ],
       timeoutMs: 60000,
-    } as unknown) as InvokeContractV1Request;
+    } as unknown as InvokeContractV1Request;
 
     const res = await apiClient.invokeContractV1(req);
     expect(res).toBeTruthy();

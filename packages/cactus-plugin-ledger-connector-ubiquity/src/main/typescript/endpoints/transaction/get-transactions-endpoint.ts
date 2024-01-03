@@ -1,4 +1,4 @@
-import { Express, Request, Response } from "express";
+import type { Express, Request, Response } from "express";
 
 import {
   IWebServiceEndpoint,
@@ -50,7 +50,7 @@ export class GetTransactionsByAddressEndpoint implements IWebServiceEndpoint {
       OAS.paths[
         "/api/v1/@hyperledger/cactus-plugin-ledger-connector-ubiquity/GetTransactionByAddress"
       ];
-    return apiPath.post["x-hyperledger-cactus"].http.path;
+    return apiPath.post["x-hyperledger-cacti"].http.path;
   }
 
   public getVerbLowerCase(): string {
@@ -58,7 +58,7 @@ export class GetTransactionsByAddressEndpoint implements IWebServiceEndpoint {
       OAS.paths[
         "/api/v1/@hyperledger/cactus-plugin-ledger-connector-ubiquity/GetTransactionByAddress"
       ];
-    return apiPath.post["x-hyperledger-cactus"].http.verbLowerCase;
+    return apiPath.post["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getOperationId(): string {

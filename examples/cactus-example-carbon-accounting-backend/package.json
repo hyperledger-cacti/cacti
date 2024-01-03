@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-example-carbon-accounting-backend",
-  "version": "2.0.0-alpha.1",
+  "version": "2.0.0-alpha.2",
   "description": "An example application showing how to use Cactus when implementing a Carbon Accounting Application where two or more blockchains are sharing data with each other to achieve a certain business outcome beneficial to multiple parties (business organizations).",
   "keywords": [
     "Hyperledger",
@@ -52,20 +52,20 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
-    "@hyperledger/cactus-api-client": "2.0.0-alpha.1",
-    "@hyperledger/cactus-cmd-api-server": "2.0.0-alpha.1",
-    "@hyperledger/cactus-common": "2.0.0-alpha.1",
-    "@hyperledger/cactus-core": "2.0.0-alpha.1",
-    "@hyperledger/cactus-core-api": "2.0.0-alpha.1",
-    "@hyperledger/cactus-example-carbon-accounting-business-logic-plugin": "2.0.0-alpha.1",
-    "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-alpha.1",
-    "@hyperledger/cactus-plugin-ledger-connector-fabric": "2.0.0-alpha.1",
-    "@hyperledger/cactus-plugin-ledger-connector-xdai": "2.0.0-alpha.1",
-    "@hyperledger/cactus-test-tooling": "2.0.0-alpha.1",
+    "@hyperledger/cactus-api-client": "2.0.0-alpha.2",
+    "@hyperledger/cactus-cmd-api-server": "2.0.0-alpha.2",
+    "@hyperledger/cactus-common": "2.0.0-alpha.2",
+    "@hyperledger/cactus-core": "2.0.0-alpha.2",
+    "@hyperledger/cactus-core-api": "2.0.0-alpha.2",
+    "@hyperledger/cactus-example-carbon-accounting-business-logic-plugin": "2.0.0-alpha.2",
+    "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-alpha.2",
+    "@hyperledger/cactus-plugin-ledger-connector-fabric": "2.0.0-alpha.2",
+    "@hyperledger/cactus-plugin-ledger-connector-xdai": "2.0.0-alpha.2",
+    "@hyperledger/cactus-test-tooling": "2.0.0-alpha.2",
     "@openzeppelin/contracts": "4.9.3",
     "@openzeppelin/contracts-upgradeable": "4.9.3",
     "async-exit-hook": "2.0.1",
-    "fabric-network": "2.2.18",
+    "fabric-network": "2.2.19",
     "fs-extra": "10.1.0",
     "openapi-types": "9.1.0",
     "typescript-optional": "2.0.1",
@@ -74,7 +74,7 @@
     "web3-utils": "1.6.1"
   },
   "devDependencies": {
-    "@types/express": "4.17.13",
+    "@types/express": "4.17.19",
     "@types/fs-extra": "9.0.13",
     "@types/json-stable-stringify": "1.0.34",
     "@types/uuid": "8.3.4",
@@ -85,8 +85,8 @@
     "json-stable-stringify": "1.0.2"
   },
   "engines": {
-    "node": ">=10",
-    "npm": ">=6"
+    "node": ">=18",
+    "npm": ">=8"
   },
   "publishConfig": {
     "access": "public"

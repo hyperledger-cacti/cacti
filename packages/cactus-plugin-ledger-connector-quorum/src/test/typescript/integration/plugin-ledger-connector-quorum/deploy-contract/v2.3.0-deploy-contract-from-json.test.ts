@@ -76,7 +76,8 @@ describe(testCase, () => {
     ledger = new QuorumTestLedger(ledgerOptions);
     await ledger.start();
 
-    const quorumGenesisOptions: IQuorumGenesisOptions = await ledger.getGenesisJsObject();
+    const quorumGenesisOptions: IQuorumGenesisOptions =
+      await ledger.getGenesisJsObject();
 
     expect(quorumGenesisOptions).toBeTruthy();
     expect(quorumGenesisOptions.alloc).toBeTruthy();
@@ -106,7 +107,7 @@ describe(testCase, () => {
     await ledger.start();
 
     const listenOptions: IListenOptions = {
-      hostname: "0.0.0.0",
+      hostname: "127.0.0.1",
       port: 0,
       server,
     };

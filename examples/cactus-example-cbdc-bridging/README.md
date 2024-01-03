@@ -13,10 +13,18 @@ Wait for the output to show the message `CbdcBridgingApp running...`
 
 ## Running the frontend
 
-The source code of the frontend is not yet available, however, we provide a Docker image.
+### Using a pre-built Docker image
 
 In a second terminal run:
 
 `docker run -p 2000:2000 aaugusto11/cactus-example-cbdc-bridging-frontend`
 
-Visit `localhost:2000` and interact with the application. Do not change the port in your local machine, otherwise, the api servers might reject the requests.
+### Running manually in live-reload mode
+
+In a second terminal run (in the project root):
+
+1. `cd examples/cactus-example-cbdc-bridging-frontend`
+2. `npm i`
+3. `npm start`
+
+Visit `localhost:2000` and interact with the application. Do not change the port in your local machine, otherwise, the API servers might reject the requests.

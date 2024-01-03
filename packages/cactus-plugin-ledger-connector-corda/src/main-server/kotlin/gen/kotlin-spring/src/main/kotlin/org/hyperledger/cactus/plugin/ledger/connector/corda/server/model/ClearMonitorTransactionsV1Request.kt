@@ -11,7 +11,6 @@ import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
 import javax.validation.Valid
-import io.swagger.v3.oas.annotations.media.Schema
 
 /**
  * 
@@ -22,16 +21,12 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class ClearMonitorTransactionsV1Request(
 
     @get:Size(min=1,max=1024)
-    @Schema(example = "frond_v1_x_7Hdg6s", required = true, description = "ID of a client application that wants to monitor the state changes")
     @get:JsonProperty("clientAppId", required = true) val clientAppId: kotlin.String,
 
     @get:Size(min=1,max=1024)
-    @Schema(example = "net.corda.samples.example.states.IOUState", required = true, description = "The fully qualified name of the Corda state to monitor")
     @get:JsonProperty("stateFullClassName", required = true) val stateFullClassName: kotlin.String,
 
-    @Schema(example = "null", required = true, description = "")
     @get:JsonProperty("txIndexes", required = true) val txIndexes: kotlin.collections.List<kotlin.String> = arrayListOf()
 ) {
 
 }
-

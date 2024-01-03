@@ -56,7 +56,7 @@ export class ListBambooHarvestEndpoint implements IWebServiceEndpoint {
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public getOasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-bamboo-harvest"] {
+  public getOasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-bamboo-harvest"] {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-bamboo-harvest"
     ];
@@ -81,12 +81,12 @@ export class ListBambooHarvestEndpoint implements IWebServiceEndpoint {
 
   public getVerbLowerCase(): string {
     const apiPath = this.getOasPath();
-    return apiPath.get["x-hyperledger-cactus"].http.verbLowerCase;
+    return apiPath.get["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getPath(): string {
     const apiPath = this.getOasPath();
-    return apiPath.get["x-hyperledger-cactus"].http.path;
+    return apiPath.get["x-hyperledger-cacti"].http.path;
   }
 
   public getExpressRequestHandler(): IExpressRequestHandler {

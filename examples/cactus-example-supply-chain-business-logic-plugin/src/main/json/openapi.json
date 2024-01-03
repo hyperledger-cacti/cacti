@@ -3,10 +3,9 @@
   "info": {
     "title": "Hyperledger Cactus Example - Supply Chain App",
     "description": "Demonstrates how a business use case can be satisfied with Cactus when multiple distinct ledgers are involved.",
-    "version": "0.2.0",
+    "version": "v2.0.0-alpha.2",
     "license": {
       "name": "Apache-2.0",
-
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     }
   },
@@ -216,7 +215,7 @@
     "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-bookshelf": {
       "post": {
         "operationId": "insertBookshelfV1",
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-bookshelf"
@@ -250,7 +249,7 @@
     "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-bookshelf": {
       "get": {
         "operationId": "listBookshelfV1",
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
             "path": "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-bookshelf"
@@ -274,7 +273,7 @@
     },
     "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-shipment": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-shipment"
@@ -308,7 +307,7 @@
     },
     "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-shipment": {
       "get": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
             "path": "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-shipment"
@@ -334,7 +333,7 @@
     "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-bamboo-harvest": {
       "post": {
         "operationId": "insertBambooHarvestV1",
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-bamboo-harvest"
@@ -368,7 +367,7 @@
     "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-bamboo-harvest": {
       "get": {
         "operationId": "listBambooHarvestV1",
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
             "path": "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-bamboo-harvest"

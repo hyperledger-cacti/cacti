@@ -6,6 +6,7 @@
     "declarationDir": "dist/lib",
     "rootDir": "./src",
     "skipLibCheck": true,
+    "resolveJsonModule": true,
     "tsBuildInfoFile": "../../.build-cache/cactus-cmd-api-server.tsbuildinfo"
   },
   "include": [

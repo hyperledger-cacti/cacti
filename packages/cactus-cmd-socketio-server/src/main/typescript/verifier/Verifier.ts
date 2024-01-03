@@ -18,7 +18,7 @@ import { ConfigUtil } from "../routing-interface/util/ConfigUtil";
 import { VerifierAuthentication } from "./VerifierAuthentication";
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
-import { Socket, io } from "socket.io-client";
+import { Socket, io } from "socket.io-client-fixed-types";
 
 const fs = require("fs");
 const path = require("path");

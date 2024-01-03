@@ -7,11 +7,27 @@
 
 name: Unit Test Weaver Node Packages
 
+env:
+  NODEJS_LTS_VERSION: v18.18.2
+  NODEJS_NEXT_LTS_VERSION: v20.9.0
+
 on:
   push:
     branches: [ main ]
+    paths:
+        - '.github/workflows/test_weaver-**'
+        - 'weaver/common/protos-js/**'
+        - 'weaver/sdks/fabric/interoperation-node-sdk/**'
+        - 'weaver/core/identity-management/**'
+        - 'weaver/docs/**'
   pull_request:
     branches: [ main ]
+    paths:
+        - '.github/workflows/test_weaver-**'
+        - 'weaver/common/protos-js/**'
+        - 'weaver/sdks/fabric/interoperation-node-sdk/**'
+        - 'weaver/core/identity-management/**'
+        - 'weaver/docs/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -24,7 +40,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [14.x, 16.x]
+        node-version: [v18.18.2, v20.9.0]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
@@ -55,7 +71,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [16.x]
+        node-version: [v18.18.2]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
@@ -88,16 +104,16 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3.5.2
-      
-      - name: Use Node.js 16.x
+
+      - name: Use Node.js ${{ env.NODEJS_LTS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: 16.x
+          node-version: ${{ env.NODEJS_LTS_VERSION }}
 
       - name: NPM INSTALL
         run: npm install
         working-directory: weaver/docs
-        
+
       - name: Build
         run: npm run build
         working-directory: weaver/docs

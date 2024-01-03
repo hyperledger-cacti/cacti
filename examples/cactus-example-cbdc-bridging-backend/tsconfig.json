@@ -5,6 +5,7 @@
     "outDir": "./dist/lib/",
     "declarationDir": "dist/lib",
     "rootDir": "./src",
+    "moduleResolution": "Node16",
     "tsBuildInfoFile": "../../.build-cache/cactus-example-cbdc-bridging-backend.tsbuildinfo",
   },
   "references": [

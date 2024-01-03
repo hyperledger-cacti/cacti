@@ -147,9 +147,8 @@ test(testCase, async (t: Test) => {
     privateKey: besuPrivateKey,
   };
 
-  const transactionHash = await Web3Quorum.priv.generateAndSendRawTransaction(
-    contractOptions,
-  );
+  const transactionHash =
+    await Web3Quorum.priv.generateAndSendRawTransaction(contractOptions);
   await web3.eth.getTransaction(transactionHash);
 
   /*

@@ -52,7 +52,8 @@ export interface IPluginConsortiumManualOptions extends ICactusPluginOptions {
 }
 
 export class PluginConsortiumManual
-  implements ICactusPlugin, IPluginWebService {
+  implements ICactusPlugin, IPluginWebService
+{
   public static readonly CLASS_NAME = "PluginConsortiumManual";
   public prometheusExporter: PrometheusExporter;
   private readonly log: Logger;

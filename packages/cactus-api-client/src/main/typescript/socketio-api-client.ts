@@ -16,7 +16,12 @@ import {
 } from "@hyperledger/cactus-common";
 import { ISocketApiClient } from "@hyperledger/cactus-core-api";
 
-import { Socket, SocketOptions, ManagerOptions, io } from "socket.io-client";
+import {
+  Socket,
+  SocketOptions,
+  ManagerOptions,
+  io,
+} from "socket.io-client-fixed-types";
 import { readFileSync } from "fs";
 import { resolve as resolvePath } from "path";
 import {
@@ -110,10 +115,8 @@ export class SocketIOApiClient implements ISocketApiClient<SocketLedgerEvent> {
 
   readonly className: string;
   counterReqID = 1;
-  checkValidator: (
-    publicKey: string,
-    data: string,
-  ) => Promise<JwtPayload> = verifyValidatorJwt;
+  checkValidator: (publicKey: string, data: string) => Promise<JwtPayload> =
+    verifyValidatorJwt;
 
   /**
    * @param validatorID - (required) ID of validator.

@@ -3,16 +3,8 @@ import { existsSync, readFileSync } from "fs";
 import convict, { Schema, Config, SchemaObj } from "convict";
 import { ipaddress } from "convict-format-with-validator";
 import { v4 as uuidV4 } from "uuid";
-import {
-  generateKeyPair,
-  exportPKCS8,
-  exportSPKI,
-  importPKCS8,
-  GeneralSign,
-  generalVerify,
-} from "jose";
+import { generateKeyPair, exportPKCS8, exportSPKI } from "jose";
 import type { Params as ExpressJwtOptions } from "express-jwt";
-import jsonStableStringify from "json-stable-stringify";
 import {
   LoggerProvider,
   Logger,
@@ -39,8 +31,6 @@ export interface ICactusApiServerOptions {
   authorizationProtocol: AuthorizationProtocol;
   authorizationConfigJson: IAuthorizationConfig;
   configFile: string;
-  cactusNodeId: string;
-  consortiumId: string;
   logLevel: LogLevelDesc;
   tlsDefaultMaxVersion: SecureVersion;
   cockpitEnabled: boolean;
@@ -65,8 +55,6 @@ export interface ICactusApiServerOptions {
   grpcPort: number;
   grpcMtlsEnabled: boolean;
   plugins: PluginImport[];
-  keyPairPem: string;
-  keychainSuffixKeyPairPem: string;
   minNodeVersion: string;
   enableShutdownHook: boolean;
 }
@@ -177,24 +165,6 @@ export class ConfigService {
         default: "",
         env: "CONFIG_FILE",
         arg: "config-file",
-      },
-      consortiumId: {
-        doc:
-          "Identifier of the consortium your node is part of. " +
-          " Can be any string of characters such as a UUID",
-        format: ConfigService.formatNonBlankString,
-        default: null as string | null,
-        env: "CONSORTIUM_ID",
-        arg: "consortium-id",
-      },
-      cactusNodeId: {
-        doc:
-          "Identifier of this particular Cactus node. Must be unique among the total set of Cactus nodes running in any " +
-          "given Cactus deployment. Can be any string of characters such as a UUID or an Int64",
-        format: ConfigService.formatNonBlankString,
-        default: null as string | null,
-        env: "CACTUS_NODE_ID",
-        arg: "cactus-node-id",
       },
       logLevel: {
         doc:
@@ -412,27 +382,7 @@ export class ConfigService {
         arg: "grpc-tls-enabled",
         default: true,
       },
-      keyPairPem: {
-        sensitive: true,
-        doc:
-          "Key pair (private+public) of this Cactus node in the standard " +
-          " PEM format.",
-        env: "KEY_PAIR_PEM",
-        arg: "key-pair-pem",
-        format: ConfigService.formatNonBlankString,
-        default: null as string | null,
-      },
-      keychainSuffixKeyPairPem: {
-        doc:
-          "The key under which to store/retrieve the key pair PEM from the " +
-          " keychain of this Cactus node (API server) The complete lookup key" +
-          " is constructed from the ${CACTUS_NODE_ID}" +
-          "${KEYCHAIN_SUFFIX_KEY_PAIR_PEM} template.",
-        env: "KEYCHAIN_SUFFIX_KEY_PAIR_PEM",
-        arg: "keychain-suffix-key-pair-pem",
-        format: "*",
-        default: "CACTUS_NODE_KEY_PAIR_PEM",
-      },
+
       enableShutdownHook: {
         doc:
           "It will cause the API server to listen to OS process signals and will attempt " +
@@ -561,7 +511,7 @@ export class ConfigService {
     const cockpitPort = (schema.cockpitPort as SchemaObj).default;
 
     const pkiGenerator = new SelfSignedPkiGenerator();
-    const pkiServer: IPki = pkiGenerator.create("localhost");
+    const pkiServer: IPki = pkiGenerator.create("127.0.0.1");
 
     const plugins: PluginImport[] = [
       {
@@ -608,8 +558,6 @@ export class ConfigService {
       authorizationProtocol: AuthorizationProtocol.JSON_WEB_TOKEN,
       authorizationConfigJson,
       configFile: ".config.json",
-      cactusNodeId: uuidV4(),
-      consortiumId: uuidV4(),
       logLevel: "debug",
       minNodeVersion: (schema.minNodeVersion as SchemaObj).default,
       tlsDefaultMaxVersion: "TLSv1.3",
@@ -634,9 +582,6 @@ export class ConfigService {
       cockpitTlsCertPem: pkiServer.certificatePem,
       cockpitTlsKeyPem: pkiServer.privateKeyPem,
       cockpitTlsClientCaPem: "-", // Cockpit mTLS is off so this will not crash the server
-      keyPairPem,
-      keychainSuffixKeyPairPem: (schema.keychainSuffixKeyPairPem as SchemaObj)
-        .default,
       plugins,
       enableShutdownHook,
     };
@@ -675,30 +620,5 @@ export class ConfigService {
     });
     logger.info("Configuration validation OK.");
     return ConfigService.config;
-  }
-
-  /**
-   * Validation that prevents operators from mistakenly deploying a key pair
-   * that they may not be operational for whatever reason.
-   *
-   * @throws If a dummy sign+verification operation fails for any reason.
-   */
-  async validateKeyPairMatch(): Promise<void> {
-    const fnTag = "ConfigService#validateKeyPairMatch()";
-    // FIXME most of this lowever level crypto code should be in a commons package that's universal
-    const keyPairPem = ConfigService.config.get("keyPairPem");
-    const keyPair = await importPKCS8(keyPairPem, "ES256K");
-
-    const payloadJson = jsonStableStringify({ hello: "world" });
-    const encoder = new TextEncoder();
-    const sign = new GeneralSign(encoder.encode(payloadJson));
-    sign.addSignature(keyPair).setProtectedHeader({ alg: "ES256K" });
-    const jws = await sign.sign();
-
-    try {
-      await generalVerify(jws, keyPair);
-    } catch (ex) {
-      throw new Error(`${fnTag} Invalid key pair PEM: ${ex && ex.stack}`);
-    }
   }
 }

@@ -3,7 +3,6 @@ import type { AddressInfo } from "net";
 import { v4 as uuidv4 } from "uuid";
 import "jest-extended";
 import { PluginObjectStoreIpfs } from "@hyperledger/cactus-plugin-object-store-ipfs";
-import { create } from "ipfs-http-client";
 import bodyParser from "body-parser";
 import express, { Express } from "express";
 import { DefaultApi as ObjectStoreIpfsApi } from "@hyperledger/cactus-plugin-object-store-ipfs";
@@ -15,6 +14,7 @@ import {
 } from "@hyperledger/cactus-common";
 import { Configuration } from "@hyperledger/cactus-core-api";
 import { GoIpfsTestContainer } from "@hyperledger/cactus-test-tooling";
+
 import {
   AssetProfile,
   ClientV1Request,
@@ -77,7 +77,7 @@ beforeAll(async () => {
     expressApp.use(bodyParser.json({ limit: "250mb" }));
     ipfsServer = http.createServer(expressApp);
     const listenOptions: IListenOptions = {
-      hostname: "localhost",
+      hostname: "127.0.0.1",
       port: 0,
       server: ipfsServer,
     };
@@ -93,7 +93,8 @@ beforeAll(async () => {
 
     const ipfsApiUrl = await ipfsContainer.getApiUrl();
 
-    const ipfsClientOrOptions = create({
+    const kuboRpcModule = await import("kubo-rpc-client");
+    const ipfsClientOrOptions = kuboRpcModule.create({
       url: ipfsApiUrl,
     });
 
@@ -124,7 +125,7 @@ beforeAll(async () => {
     serverExpressApp.use(bodyParser.json({ limit: "250mb" }));
     recipientGatewayserver = http.createServer(serverExpressApp);
     serverListenOptions = {
-      hostname: "localhost",
+      hostname: "127.0.0.1",
       port: 3000,
       server: recipientGatewayserver,
     };
@@ -164,7 +165,7 @@ beforeAll(async () => {
     clientExpressApp.use(bodyParser.json({ limit: "250mb" }));
     sourceGatewayServer = http.createServer(clientExpressApp);
     clientListenOptions = {
-      hostname: "localhost",
+      hostname: "127.0.0.1",
       port: 2000,
       server: sourceGatewayServer,
     };
@@ -227,11 +228,12 @@ beforeAll(async () => {
 test("server gateway crashes after transfer initiation flow", async () => {
   const sessionID = pluginSourceGateway.configureOdapSession(odapClientRequest);
 
-  const transferInitializationRequest = await pluginSourceGateway.clientHelper.sendTransferInitializationRequest(
-    sessionID,
-    pluginSourceGateway,
-    false,
-  );
+  const transferInitializationRequest =
+    await pluginSourceGateway.clientHelper.sendTransferInitializationRequest(
+      sessionID,
+      pluginSourceGateway,
+      false,
+    );
 
   if (transferInitializationRequest == void 0) {
     expect(false);
@@ -251,7 +253,7 @@ test("server gateway crashes after transfer initiation flow", async () => {
   serverExpressApp.use(bodyParser.json({ limit: "250mb" }));
   recipientGatewayserver = http.createServer(serverExpressApp);
   const listenOptions: IListenOptions = {
-    hostname: "localhost",
+    hostname: "127.0.0.1",
     port: 3000,
     server: recipientGatewayserver,
   };

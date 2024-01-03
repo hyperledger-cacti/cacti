@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0-alpha.2](https://github.com/hyperledger/cacti/compare/v2.0.0-alpha.1...v2.0.0-alpha.2) (2023-09-27)
+
+### Features
+
+* **cacti-cmd-gui-app:** add GUI to visualize Fabric, Ethereum blocks ([15d9e9d](https://github.com/hyperledger/cacti/commit/15d9e9dcdc072ac0f6be2bf5146102b1328faaaf))
+
 # [2.0.0-alpha.1](https://github.com/hyperledger/cacti/compare/v2.0.0-alpha-prerelease...v2.0.0-alpha.1) (2023-05-19)
 
 **Note:** Version bump only for package @hyperledger/cactus-example-supply-chain-frontend

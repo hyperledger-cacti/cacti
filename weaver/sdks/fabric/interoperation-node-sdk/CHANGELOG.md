@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0-alpha.2](https://github.com/hyperledger/cacti/compare/v2.0.0-alpha.1...v2.0.0-alpha.2) (2023-09-27)
+
+### Features
+
+* corda asset transfer test workflow added and bug fixes ([4b5ee09](https://github.com/hyperledger/cacti/commit/4b5ee095b07f7c6a4290cfb85280d825672ce394))
+
 # [2.0.0-alpha.1](https://github.com/hyperledger/cacti/compare/v2.0.0-alpha-prerelease...v2.0.0-alpha.1) (2023-05-19)
 
 **Note:** Version bump only for package @hyperledger/cacti-weaver-sdk-fabric

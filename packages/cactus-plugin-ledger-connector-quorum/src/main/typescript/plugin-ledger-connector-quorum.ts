@@ -12,6 +12,10 @@ import Web3JsQuorum, {
   ISendRawTransaction,
   IPrivateTransactionReceipt,
 } from "web3js-quorum";
+import {
+  WebsocketProviderOptions,
+  HttpProviderOptions,
+} from "web3-core-helpers";
 import { AbiItem } from "web3-utils";
 import { Contract } from "web3-eth-contract";
 import { ContractSendMethod } from "web3-eth-contract";
@@ -74,7 +78,7 @@ import { InvokeRawWeb3EthContractEndpoint } from "./web-services/invoke-raw-web3
 
 import { isWeb3SigningCredentialNone } from "./model-type-guards";
 import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 
 export interface IPluginLedgerConnectorQuorumOptions
   extends ICactusPluginOptions {
@@ -84,6 +88,8 @@ export interface IPluginLedgerConnectorQuorumOptions
   prometheusExporter?: PrometheusExporter;
   pluginRegistry: PluginRegistry;
   privateUrl?: string;
+  wsProviderOptions?: WebsocketProviderOptions;
+  httpProviderOptions?: HttpProviderOptions;
 }
 
 export class PluginLedgerConnectorQuorum
@@ -95,7 +101,8 @@ export class PluginLedgerConnectorQuorum
       RunTransactionResponse
     >,
     ICactusPlugin,
-    IPluginWebService {
+    IPluginWebService
+{
   private readonly pluginRegistry: PluginRegistry;
   public prometheusExporter: PrometheusExporter;
   private readonly instanceId: string;
@@ -113,9 +120,20 @@ export class PluginLedgerConnectorQuorum
 
   private getWeb3Provider() {
     if (!this.options.rpcApiWsHost) {
-      return new Web3.providers.HttpProvider(this.options.rpcApiHttpHost);
+      return this.options.httpProviderOptions
+        ? new Web3.providers.HttpProvider(
+            this.options.rpcApiHttpHost,
+            this.options.httpProviderOptions,
+          )
+        : new Web3.providers.HttpProvider(this.options.rpcApiHttpHost);
     }
-    return new Web3.providers.WebsocketProvider(this.options.rpcApiWsHost);
+
+    return this.options.wsProviderOptions
+      ? new Web3.providers.WebsocketProvider(
+          this.options.rpcApiWsHost,
+          this.options.wsProviderOptions,
+        )
+      : new Web3.providers.WebsocketProvider(this.options.rpcApiWsHost);
   }
 
   constructor(public readonly options: IPluginLedgerConnectorQuorumOptions) {
@@ -274,13 +292,12 @@ export class PluginLedgerConnectorQuorum
     return `@hyperledger/cactus-plugin-ledger-connector-quorum`;
   }
 
-  public async getConsensusAlgorithmFamily(): Promise<
-    ConsensusAlgorithmFamily
-  > {
+  public async getConsensusAlgorithmFamily(): Promise<ConsensusAlgorithmFamily> {
     return ConsensusAlgorithmFamily.Authority;
   }
   public async hasTransactionFinality(): Promise<boolean> {
-    const currentConsensusAlgorithmFamily = await this.getConsensusAlgorithmFamily();
+    const currentConsensusAlgorithmFamily =
+      await this.getConsensusAlgorithmFamily();
 
     return consensusHasTransactionFinality(currentConsensusAlgorithmFamily);
   }
@@ -425,10 +442,8 @@ export class PluginLedgerConnectorQuorum
       throw new Error(`${fnTag} Contract ABI is necessary`);
     }
 
-    const contractInstance: InstanceType<typeof Contract> = new this.web3.eth.Contract(
-      abi,
-      contractAddress,
-    );
+    const contractInstance: InstanceType<typeof Contract> =
+      new this.web3.eth.Contract(abi, contractAddress);
 
     const isSafeToCall = await this.isSafeToCallContractMethod(
       contractInstance,
@@ -526,9 +541,8 @@ export class PluginLedgerConnectorQuorum
   ): Promise<RunTransactionResponse> {
     const fnTag = `${this.className}#transactSigned()`;
 
-    const receipt = await this.web3Quorum.eth.sendSignedTransaction(
-      rawTransaction,
-    );
+    const receipt =
+      await this.web3Quorum.eth.sendSignedTransaction(rawTransaction);
 
     if (receipt instanceof Error) {
       this.log.debug(`${fnTag} Web3 sendSignedTransaction failed`, receipt);
@@ -545,9 +559,8 @@ export class PluginLedgerConnectorQuorum
     const fnTag = `${this.className}#transactGethKeychain()`;
     const { sendTransaction } = this.web3Quorum.eth.personal;
     const { transactionConfig, web3SigningCredential } = txIn;
-    const {
-      secret,
-    } = web3SigningCredential as Web3SigningCredentialGethKeychainPassword;
+    const { secret } =
+      web3SigningCredential as Web3SigningCredentialGethKeychainPassword;
 
     if (txIn.privateTransactionConfig) {
       return this.transactPrivate(txIn);
@@ -570,9 +583,8 @@ export class PluginLedgerConnectorQuorum
   ): Promise<RunTransactionResponse> {
     const fnTag = `${this.className}#transactPrivateKey()`;
     const { transactionConfig, web3SigningCredential } = req;
-    const {
-      secret,
-    } = web3SigningCredential as Web3SigningCredentialPrivateKeyHex;
+    const { secret } =
+      web3SigningCredential as Web3SigningCredentialPrivateKeyHex;
 
     if (req.privateTransactionConfig) {
       return this.transactPrivate(req);
@@ -597,13 +609,11 @@ export class PluginLedgerConnectorQuorum
     req: RunTransactionRequest,
   ): Promise<RunTransactionResponse> {
     const { web3SigningCredential } = req;
-    const {
-      secret,
-    } = web3SigningCredential as Web3SigningCredentialPrivateKeyHex;
+    const { secret } =
+      web3SigningCredential as Web3SigningCredentialPrivateKeyHex;
 
-    const signingAccount = this.web3Quorum.eth.accounts.privateKeyToAccount(
-      secret,
-    );
+    const signingAccount =
+      this.web3Quorum.eth.accounts.privateKeyToAccount(secret);
     const txCount = await this.web3Quorum.eth.getTransactionCount(
       signingAccount.address,
     );
@@ -626,9 +636,8 @@ export class PluginLedgerConnectorQuorum
 
     const { transactionHash } = block as IPrivateTransactionReceipt;
 
-    const transactionReceipt = await this.web3Quorum.priv.waitForTransactionReceipt(
-      transactionHash,
-    );
+    const transactionReceipt =
+      await this.web3Quorum.priv.waitForTransactionReceipt(transactionHash);
 
     return { transactionReceipt: transactionReceipt };
   }
@@ -654,11 +663,8 @@ export class PluginLedgerConnectorQuorum
       web3SigningCredential,
       privateTransactionConfig,
     } = req;
-    const {
-      ethAccount,
-      keychainEntryKey,
-      keychainId,
-    } = web3SigningCredential as Web3SigningCredentialCactusKeychainRef;
+    const { ethAccount, keychainEntryKey, keychainId } =
+      web3SigningCredential as Web3SigningCredentialCactusKeychainRef;
 
     // locate the keychain plugin that has access to the keychain backend
     // denoted by the keychainID from the request.
@@ -676,9 +682,8 @@ export class PluginLedgerConnectorQuorum
       this.log.debug(
         `${fnTag} Gas not specified in the transaction values. Using the estimate from web3`,
       );
-      transactionConfig.gas = await this.web3Quorum.eth.estimateGas(
-        transactionConfig,
-      );
+      transactionConfig.gas =
+        await this.web3Quorum.eth.estimateGas(transactionConfig);
       this.log.debug(
         `${fnTag} Gas estimated from web3 is: `,
         transactionConfig.gas,

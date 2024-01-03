@@ -79,8 +79,8 @@ export const IROHA_TEST_LEDGER_DEFAULT_OPTIONS = Object.freeze({
 /*
  * Provides validations for Iroha container's options
  */
-export const IROHA_TEST_LEDGER_OPTIONS_JOI_SCHEMA: Joi.Schema = Joi.object().keys(
-  {
+export const IROHA_TEST_LEDGER_OPTIONS_JOI_SCHEMA: Joi.Schema =
+  Joi.object().keys({
     adminPriv: Joi.string().min(1).max(64).required(),
     adminPub: Joi.string().min(1).max(64).required(),
     nodePriv: Joi.string().min(1).max(64).required(),
@@ -97,8 +97,7 @@ export const IROHA_TEST_LEDGER_OPTIONS_JOI_SCHEMA: Joi.Schema = Joi.object().key
     imageName: Joi.string().min(1).required(),
     rpcToriiPort: Joi.number().port().required(),
     envVars: Joi.array().allow(null).required(),
-  },
-);
+  });
 
 export class IrohaTestLedger implements ITestLedger {
   public readonly imageVersion: string;
@@ -443,7 +442,7 @@ export class IrohaTestLedger implements ITestLedger {
       if (!mapping.PublicPort) {
         throw new Error(`${fnTag} port ${thePort} mapped but not public`);
       } else if (mapping.IP !== "0.0.0.0") {
-        throw new Error(`${fnTag} port ${thePort} mapped to localhost`);
+        throw new Error(`${fnTag} port ${thePort} mapped to 127.0.0.1`);
       } else {
         return mapping.PublicPort;
       }

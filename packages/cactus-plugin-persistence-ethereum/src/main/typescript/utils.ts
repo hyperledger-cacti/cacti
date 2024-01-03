@@ -2,8 +2,9 @@
  * Helper methods
  */
 
-import web3Utils from "web3-utils";
-import { RuntimeError } from "run-time-error";
+import { toChecksumAddress } from "web3-utils";
+import { isAddress } from "web3-validator";
+import { RuntimeError } from "run-time-error-cjs";
 
 /**
  * Get error cause for RuntimeError (instance of `Error`, string or undefined)
@@ -30,9 +31,8 @@ export function normalizeAddress(address?: string): string {
     return "";
   }
 
-  const checksumAddress = web3Utils.toChecksumAddress(address);
-
-  if (!web3Utils.isAddress(checksumAddress)) {
+  const checksumAddress = toChecksumAddress(address);
+  if (!isAddress(checksumAddress)) {
     throw new RuntimeError(
       `Provided address ${address} is not a valid ethereum address!`,
     );

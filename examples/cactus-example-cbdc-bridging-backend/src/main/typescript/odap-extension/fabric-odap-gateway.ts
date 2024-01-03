@@ -10,8 +10,8 @@ import {
 import {
   IOdapPluginKeyPair,
   PluginOdapGateway,
-} from "@hyperledger/cactus-plugin-odap-hermes/src/main/typescript/gateway/plugin-odap-gateway";
-import { SessionDataRollbackActionsPerformedEnum } from "@hyperledger/cactus-plugin-odap-hermes/src/main/typescript";
+} from "@hyperledger/cactus-plugin-odap-hermes";
+import { SessionDataRollbackActionsPerformedEnum } from "@hyperledger/cactus-plugin-odap-hermes";
 import { ClientHelper } from "./client-helper";
 import { ServerHelper } from "./server-helper";
 
@@ -284,8 +284,10 @@ export class FabricOdapGateway extends PluginOdapGateway {
 
     if (this.fabricApi != undefined) {
       const amount = sessionData.assetProfile.keyInformationLink[0].toString();
-      const fabricClientID = sessionData.assetProfile.keyInformationLink[1].toString();
-      const userEthAddress = sessionData.assetProfile.keyInformationLink[2].toString();
+      const fabricClientID =
+        sessionData.assetProfile.keyInformationLink[1].toString();
+      const userEthAddress =
+        sessionData.assetProfile.keyInformationLink[2].toString();
 
       const response = await this.fabricApi.runTransactionV1({
         contractName: this.fabricContractName,
@@ -296,16 +298,15 @@ export class FabricOdapGateway extends PluginOdapGateway {
         signingCredential: this.fabricSigningCredential,
       } as FabricRunTransactionRequest);
 
-      const receiptCreateRes = await this.fabricApi.getTransactionReceiptByTxIDV1(
-        {
+      const receiptCreateRes =
+        await this.fabricApi.getTransactionReceiptByTxIDV1({
           signingCredential: this.fabricSigningCredential,
           channelName: this.fabricChannelName,
           contractName: "qscc",
           invocationType: FabricContractInvocationType.Call,
           methodName: "GetBlockByTxID",
           params: [this.fabricChannelName, response.data.transactionId],
-        } as FabricRunTransactionRequest,
-      );
+        } as FabricRunTransactionRequest);
 
       this.log.warn(receiptCreateRes.data);
       fabricCreateAssetProof = JSON.stringify(receiptCreateRes.data);
@@ -368,16 +369,15 @@ export class FabricOdapGateway extends PluginOdapGateway {
         params: [assetId],
       } as FabricRunTransactionRequest);
 
-      const receiptDeleteRes = await this.fabricApi.getTransactionReceiptByTxIDV1(
-        {
+      const receiptDeleteRes =
+        await this.fabricApi.getTransactionReceiptByTxIDV1({
           signingCredential: this.fabricSigningCredential,
           channelName: this.fabricChannelName,
           contractName: "qscc",
           invocationType: FabricContractInvocationType.Call,
           methodName: "GetBlockByTxID",
           params: [this.fabricChannelName, deleteRes.data.transactionId],
-        } as FabricRunTransactionRequest,
-      );
+        } as FabricRunTransactionRequest);
 
       this.log.warn(receiptDeleteRes.data);
       fabricDeleteAssetProof = JSON.stringify(receiptDeleteRes.data);
@@ -445,7 +445,8 @@ export class FabricOdapGateway extends PluginOdapGateway {
 
     if (this.fabricApi != undefined) {
       const amount = sessionData.assetProfile.keyInformationLink[0].toString();
-      const userEthAddress = sessionData.assetProfile.keyInformationLink[2].toString();
+      const userEthAddress =
+        sessionData.assetProfile.keyInformationLink[2].toString();
 
       const response = await this.fabricApi.runTransactionV1({
         contractName: this.fabricContractName,

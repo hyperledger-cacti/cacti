@@ -92,6 +92,7 @@ impl DriverCommunication for DriverCommunicationService {
             let client = DataTransferClient::new(channel);
             send_driver_mock_state_helper(client, request_id.to_string());
         } else {
+            let client_addr = format!("http://{}:{}", relay_hostname, relay_port);
             let client_result = DataTransferClient::connect(client_addr).await;
             match client_result {
                 Ok(client) => {
@@ -143,9 +144,9 @@ impl DriverCommunication for DriverCommunicationService {
         let relay_hostname = uri.hostname.to_string();
         let use_tls = uri.tls;
         let tlsca_cert_path = uri.tlsca_cert_path.to_string();
-        let client_addr = format!("http://{}:{}", relay_hostname, relay_port);
-        println!("Remote relay... {:?}", client_addr.clone());
         if use_tls {
+            let client_addr = format!("https://{}:{}", relay_hostname, relay_port);
+            println!("Remote relay... {:?}", client_addr.clone());
             let pem = tokio::fs::read(tlsca_cert_path).await.unwrap();
             let ca = Certificate::from_pem(pem);
 
@@ -167,6 +168,8 @@ impl DriverCommunication for DriverCommunicationService {
             let client = EventSubscribeClient::new(channel);
             send_driver_mock_subscription_state_helper(client, request_id.to_string());
         } else {
+            let client_addr = format!("http://{}:{}", relay_hostname, relay_port);
+            println!("Remote relay... {:?}", client_addr.clone());
             let client_result = EventSubscribeClient::connect(client_addr).await;
             match client_result {
                 Ok(client) => {

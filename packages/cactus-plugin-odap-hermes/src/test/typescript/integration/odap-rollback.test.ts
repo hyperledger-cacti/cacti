@@ -5,7 +5,6 @@ import { Server as SocketIoServer } from "socket.io";
 import { AddressInfo } from "net";
 import { v4 as uuidv4 } from "uuid";
 import { PluginObjectStoreIpfs } from "@hyperledger/cactus-plugin-object-store-ipfs";
-import { create } from "ipfs-http-client";
 import bodyParser from "body-parser";
 import express from "express";
 import { DefaultApi as ObjectStoreIpfsApi } from "@hyperledger/cactus-plugin-object-store-ipfs";
@@ -24,6 +23,9 @@ import {
   pruneDockerAllIfGithubAction,
   GoIpfsTestContainer,
   BesuTestLedger,
+  DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
+  DEFAULT_FABRIC_2_AIO_IMAGE_VERSION,
+  DEFAULT_FABRIC_2_AIO_FABRIC_VERSION,
 } from "@hyperledger/cactus-test-tooling";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import { ClientV1Request } from "../../../main/typescript/public-api";
@@ -139,7 +141,7 @@ beforeAll(async () => {
     expressApp.use(bodyParser.json({ limit: "250mb" }));
     ipfsServer = http.createServer(expressApp);
     const listenOptions: IListenOptions = {
-      hostname: "localhost",
+      hostname: "127.0.0.1",
       port: 0,
       server: ipfsServer,
     };
@@ -155,7 +157,8 @@ beforeAll(async () => {
 
     const ipfsApiUrl = await ipfsContainer.getApiUrl();
 
-    const ipfsClientOrOptions = create({
+    const kuboRpcModule = await import("kubo-rpc-client");
+    const ipfsClientOrOptions = kuboRpcModule.create({
       url: ipfsApiUrl,
     });
 
@@ -179,8 +182,11 @@ beforeAll(async () => {
     fabricLedger = new FabricTestLedgerV1({
       emitContainerLogs: true,
       publishAllPorts: true,
-      imageName: "ghcr.io/hyperledger/cactus-fabric2-all-in-one",
-      envVars: new Map([["FABRIC_VERSION", "2.2.0"]]),
+      imageName: DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
+      imageVersion: DEFAULT_FABRIC_2_AIO_IMAGE_VERSION,
+      envVars: new Map([
+        ["FABRIC_VERSION", DEFAULT_FABRIC_2_AIO_FABRIC_VERSION],
+      ]),
       logLevel,
     });
 
@@ -276,7 +282,7 @@ beforeAll(async () => {
     expressApp.use(bodyParser.json({ limit: "250mb" }));
     fabricServer = http.createServer(expressApp);
     const listenOptions: IListenOptions = {
-      hostname: "localhost",
+      hostname: "127.0.0.1",
       port: 3000,
       server: fabricServer,
     };
@@ -486,7 +492,7 @@ beforeAll(async () => {
     expressApp.use(bodyParser.json({ limit: "250mb" }));
     besuServer = http.createServer(expressApp);
     const listenOptions: IListenOptions = {
-      hostname: "localhost",
+      hostname: "127.0.0.1",
       port: 4000,
       server: besuServer,
     };
@@ -602,7 +608,7 @@ beforeAll(async () => {
     expressApp.use(bodyParser.json({ limit: "250mb" }));
     recipientGatewayServer = http.createServer(expressApp);
     const listenOptions: IListenOptions = {
-      hostname: "localhost",
+      hostname: "127.0.0.1",
       port: 5000,
       server: recipientGatewayServer,
     };
@@ -621,7 +627,7 @@ beforeAll(async () => {
     expressApp.use(bodyParser.json({ limit: "250mb" }));
     sourceGatewayServer = http.createServer(expressApp);
     const listenOptions: IListenOptions = {
-      hostname: "localhost",
+      hostname: "127.0.0.1",
       port: 3001,
       server: sourceGatewayServer,
     };
@@ -674,11 +680,12 @@ test("client sends rollback message at the end of the protocol", async () => {
 
   const sessionID = pluginSourceGateway.configureOdapSession(odapClientRequest);
 
-  const transferInitializationRequest = await pluginSourceGateway.clientHelper.sendTransferInitializationRequest(
-    sessionID,
-    pluginSourceGateway,
-    false,
-  );
+  const transferInitializationRequest =
+    await pluginSourceGateway.clientHelper.sendTransferInitializationRequest(
+      sessionID,
+      pluginSourceGateway,
+      false,
+    );
 
   if (transferInitializationRequest == void 0) {
     expect(false);
@@ -690,11 +697,12 @@ test("client sends rollback message at the end of the protocol", async () => {
     pluginRecipientGateway,
   );
 
-  const transferInitializationResponse = await pluginRecipientGateway.serverHelper.sendTransferInitializationResponse(
-    transferInitializationRequest.sessionID,
-    pluginRecipientGateway,
-    false,
-  );
+  const transferInitializationResponse =
+    await pluginRecipientGateway.serverHelper.sendTransferInitializationResponse(
+      transferInitializationRequest.sessionID,
+      pluginRecipientGateway,
+      false,
+    );
 
   if (transferInitializationResponse == void 0) {
     expect(false);
@@ -706,11 +714,12 @@ test("client sends rollback message at the end of the protocol", async () => {
     pluginSourceGateway,
   );
 
-  const transferCommenceRequest = await pluginSourceGateway.clientHelper.sendTransferCommenceRequest(
-    sessionID,
-    pluginSourceGateway,
-    false,
-  );
+  const transferCommenceRequest =
+    await pluginSourceGateway.clientHelper.sendTransferCommenceRequest(
+      sessionID,
+      pluginSourceGateway,
+      false,
+    );
 
   if (transferCommenceRequest == void 0) {
     expect(false);
@@ -722,11 +731,12 @@ test("client sends rollback message at the end of the protocol", async () => {
     pluginRecipientGateway,
   );
 
-  const transferCommenceResponse = await pluginRecipientGateway.serverHelper.sendTransferCommenceResponse(
-    transferCommenceRequest.sessionID,
-    pluginRecipientGateway,
-    false,
-  );
+  const transferCommenceResponse =
+    await pluginRecipientGateway.serverHelper.sendTransferCommenceResponse(
+      transferCommenceRequest.sessionID,
+      pluginRecipientGateway,
+      false,
+    );
 
   if (transferCommenceResponse == void 0) {
     expect(false);
@@ -740,11 +750,12 @@ test("client sends rollback message at the end of the protocol", async () => {
 
   await pluginSourceGateway.lockAsset(sessionID);
 
-  const lockEvidenceRequest = await pluginSourceGateway.clientHelper.sendLockEvidenceRequest(
-    sessionID,
-    pluginSourceGateway,
-    false,
-  );
+  const lockEvidenceRequest =
+    await pluginSourceGateway.clientHelper.sendLockEvidenceRequest(
+      sessionID,
+      pluginSourceGateway,
+      false,
+    );
 
   if (lockEvidenceRequest == void 0) {
     expect(false);
@@ -756,11 +767,12 @@ test("client sends rollback message at the end of the protocol", async () => {
     pluginRecipientGateway,
   );
 
-  const lockEvidenceResponse = await pluginRecipientGateway.serverHelper.sendLockEvidenceResponse(
-    lockEvidenceRequest.sessionID,
-    pluginRecipientGateway,
-    false,
-  );
+  const lockEvidenceResponse =
+    await pluginRecipientGateway.serverHelper.sendLockEvidenceResponse(
+      lockEvidenceRequest.sessionID,
+      pluginRecipientGateway,
+      false,
+    );
 
   if (lockEvidenceResponse == void 0) {
     expect(false);
@@ -772,11 +784,12 @@ test("client sends rollback message at the end of the protocol", async () => {
     pluginSourceGateway,
   );
 
-  const commitPreparationRequest = await pluginSourceGateway.clientHelper.sendCommitPreparationRequest(
-    sessionID,
-    pluginSourceGateway,
-    false,
-  );
+  const commitPreparationRequest =
+    await pluginSourceGateway.clientHelper.sendCommitPreparationRequest(
+      sessionID,
+      pluginSourceGateway,
+      false,
+    );
 
   if (commitPreparationRequest == void 0) {
     expect(false);
@@ -788,11 +801,12 @@ test("client sends rollback message at the end of the protocol", async () => {
     pluginRecipientGateway,
   );
 
-  const commitPreparationResponse = await pluginRecipientGateway.serverHelper.sendCommitPreparationResponse(
-    lockEvidenceRequest.sessionID,
-    pluginRecipientGateway,
-    false,
-  );
+  const commitPreparationResponse =
+    await pluginRecipientGateway.serverHelper.sendCommitPreparationResponse(
+      lockEvidenceRequest.sessionID,
+      pluginRecipientGateway,
+      false,
+    );
 
   if (commitPreparationResponse == void 0) {
     expect(false);
@@ -806,11 +820,12 @@ test("client sends rollback message at the end of the protocol", async () => {
 
   await pluginSourceGateway.deleteAsset(sessionID);
 
-  const commitFinalRequest = await pluginSourceGateway.clientHelper.sendCommitFinalRequest(
-    sessionID,
-    pluginSourceGateway,
-    false,
-  );
+  const commitFinalRequest =
+    await pluginSourceGateway.clientHelper.sendCommitFinalRequest(
+      sessionID,
+      pluginSourceGateway,
+      false,
+    );
 
   if (commitFinalRequest == void 0) {
     expect(false);
@@ -847,7 +862,7 @@ test("client sends rollback message at the end of the protocol", async () => {
   expressApp.use(bodyParser.json({ limit: "250mb" }));
   sourceGatewayServer = http.createServer(expressApp);
   const listenOptions: IListenOptions = {
-    hostname: "localhost",
+    hostname: "127.0.0.1",
     port: 3001,
     server: sourceGatewayServer,
   };

@@ -3,7 +3,6 @@ import type { AddressInfo } from "net";
 import { v4 as uuidv4 } from "uuid";
 import "jest-extended";
 import { PluginObjectStoreIpfs } from "@hyperledger/cactus-plugin-object-store-ipfs";
-import { create } from "ipfs-http-client";
 import bodyParser from "body-parser";
 import express, { Express } from "express";
 import { DefaultApi as ObjectStoreIpfsApi } from "@hyperledger/cactus-plugin-object-store-ipfs";
@@ -77,7 +76,7 @@ beforeAll(async () => {
     expressApp.use(bodyParser.json({ limit: "250mb" }));
     ipfsServer = http.createServer(expressApp);
     const listenOptions: IListenOptions = {
-      hostname: "localhost",
+      hostname: "127.0.0.1",
       port: 0,
       server: ipfsServer,
     };
@@ -93,7 +92,8 @@ beforeAll(async () => {
 
     const ipfsApiUrl = await ipfsContainer.getApiUrl();
 
-    const ipfsClientOrOptions = create({
+    const kuboRpcModule = await import("kubo-rpc-client");
+    const ipfsClientOrOptions = kuboRpcModule.create({
       url: ipfsApiUrl,
     });
 
@@ -125,7 +125,7 @@ beforeAll(async () => {
     serverExpressApp.use(bodyParser.json({ limit: "250mb" }));
     recipientGatewayserver = http.createServer(serverExpressApp);
     serverListenOptions = {
-      hostname: "localhost",
+      hostname: "127.0.0.1",
       port: 3000,
       server: recipientGatewayserver,
     };
@@ -165,7 +165,7 @@ beforeAll(async () => {
     clientExpressApp.use(bodyParser.json({ limit: "250mb" }));
     sourceGatewayServer = http.createServer(clientExpressApp);
     clientListenOptions = {
-      hostname: "localhost",
+      hostname: "127.0.0.1",
       port: 2000,
       server: sourceGatewayServer,
     };
@@ -247,11 +247,12 @@ afterEach(() => {
 test("successful run ODAP after client gateway crashed after after receiving transfer initiation response", async () => {
   const sessionID = pluginSourceGateway.configureOdapSession(odapClientRequest);
 
-  const transferInitializationRequest = await pluginSourceGateway.clientHelper.sendTransferInitializationRequest(
-    sessionID,
-    pluginSourceGateway,
-    false,
-  );
+  const transferInitializationRequest =
+    await pluginSourceGateway.clientHelper.sendTransferInitializationRequest(
+      sessionID,
+      pluginSourceGateway,
+      false,
+    );
 
   if (transferInitializationRequest == void 0) {
     expect(false);
@@ -263,11 +264,12 @@ test("successful run ODAP after client gateway crashed after after receiving tra
     pluginRecipientGateway,
   );
 
-  const transferInitializationResponse = await pluginRecipientGateway.serverHelper.sendTransferInitializationResponse(
-    transferInitializationRequest.sessionID,
-    pluginRecipientGateway,
-    false,
-  );
+  const transferInitializationResponse =
+    await pluginRecipientGateway.serverHelper.sendTransferInitializationResponse(
+      transferInitializationRequest.sessionID,
+      pluginRecipientGateway,
+      false,
+    );
 
   if (transferInitializationResponse == void 0) {
     expect(false);
@@ -287,7 +289,7 @@ test("successful run ODAP after client gateway crashed after after receiving tra
   clientExpressApp.use(bodyParser.json({ limit: "250mb" }));
   sourceGatewayServer = http.createServer(clientExpressApp);
   const listenOptions: IListenOptions = {
-    hostname: "localhost",
+    hostname: "127.0.0.1",
     port: 2000,
     server: sourceGatewayServer,
   };

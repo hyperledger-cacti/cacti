@@ -54,9 +54,8 @@ test("can instantiate plugins at runtime without install them", async (t: Test) 
 
     apiServerOptions.plugins = [plugin];
 
-    const config = await configService.newExampleConfigConvict(
-      apiServerOptions,
-    );
+    const config =
+      await configService.newExampleConfigConvict(apiServerOptions);
 
     const apiServer = new ApiServer({
       config: config.getProperties(),

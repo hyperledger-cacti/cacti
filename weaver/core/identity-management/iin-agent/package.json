@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cacti-weaver-iin-agent",
-  "version": "2.0.0-alpha.1",
+  "version": "2.0.0-alpha.2",
   "description": "",
   "repository": {
     "type": "git",
@@ -20,22 +20,26 @@
   },
   "dependencies": {
     "@fidm/x509": "1.2.1",
-    "@grpc/grpc-js": "1.9.0",
-    "@hyperledger/cacti-weaver-protos-js": "2.0.0-alpha.1",
-    "@hyperledger/cacti-weaver-sdk-fabric": "2.0.0-alpha.1",
+    "@grpc/grpc-js": "1.9.5",
+    "@hyperledger/cacti-weaver-protos-js": "2.0.0-alpha.2",
+    "@hyperledger/cacti-weaver-sdk-fabric": "2.0.0-alpha.2",
     "@typescript-eslint/eslint-plugin": "3.10.1",
     "@typescript-eslint/parser": "3.10.1",
     "dotenv": "8.6.0",
     "eslint-config-prettier": "6.15.0",
-    "eslint-plugin-prettier": "3.4.1",
-    "fabric-ca-client": "2.2.18",
-    "fabric-common": "2.2.18",
-    "fabric-network": "2.2.18"
+    "eslint-plugin-prettier": "5.0.0",
+    "fabric-ca-client": "2.2.19",
+    "fabric-common": "2.2.19",
+    "fabric-network": "2.2.19",
+    "uuid": "9.0.1"
   },
   "devDependencies": {
+    "@types/jsrsasign": "10.5.11",
     "@types/node": "16.18.41",
+    "@types/uuid": "9.0.6",
     "chai": "4.3.7",
     "chai-as-promised": "7.1.1",
+    "jsrsasign": "10.8.6",
     "mocha": "5.2.0",
     "nodemon": "2.0.22",
     "nyc": "12.0.2",
@@ -47,5 +51,9 @@
     "ts-node": "10.9.1",
     "typedoc": "0.24.8",
     "typescript": "4.9.5"
+  },
+  "engines": {
+    "node": ">=18",
+    "npm": ">=8"
   }
 }

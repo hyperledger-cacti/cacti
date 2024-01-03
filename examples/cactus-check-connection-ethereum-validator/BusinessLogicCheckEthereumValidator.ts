@@ -1,4 +1,4 @@
-import { Request } from "express";
+import type { Request } from "express";
 import { getLogger } from "log4js";
 import { RequestInfo } from "./RequestInfo";
 

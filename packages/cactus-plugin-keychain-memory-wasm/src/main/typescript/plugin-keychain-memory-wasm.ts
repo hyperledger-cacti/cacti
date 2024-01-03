@@ -24,7 +24,8 @@ export interface IPluginKeychainMemoryWasmOptions extends ICactusPluginOptions {
 }
 
 export class PluginKeychainMemoryWasm
-  implements IPluginKeychain, IPluginWebService {
+  implements IPluginKeychain, IPluginWebService
+{
   public static readonly CLASS_NAME = "PluginKeychainMemoryWasm";
 
   private readonly wasm: IPluginKeychain;

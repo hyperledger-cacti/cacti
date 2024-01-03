@@ -272,9 +272,9 @@ pub async fn get_driver_client(
     let hostname = driver_info.hostname.to_string();
     let use_tls = driver_info.tls;
     let tlsca_cert_path = driver_info.tlsca_cert_path.to_string();
-    let driver_address = format!("http://{}:{}", hostname, port);
     let client;
     if use_tls {
+        let driver_address = format!("https://{}:{}", hostname, port);
         let pem = tokio::fs::read(tlsca_cert_path).await?;
         let ca = Certificate::from_pem(pem);
 
@@ -291,6 +291,7 @@ pub async fn get_driver_client(
 
         client = DriverCommunicationClient::new(channel);
     } else {
+        let driver_address = format!("http://{}:{}", hostname, port);
         client = DriverCommunicationClient::connect(driver_address).await?;
     }
     return Ok(client);

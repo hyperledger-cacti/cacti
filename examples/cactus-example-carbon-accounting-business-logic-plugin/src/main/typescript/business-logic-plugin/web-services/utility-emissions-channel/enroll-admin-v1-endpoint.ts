@@ -48,20 +48,20 @@ export class EnrollAdminV1Endpoint implements IWebServiceEndpoint {
 
   getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {
     return {
-      get: async () => this.oasPath.post["x-hyperledger-cactus"].authz,
+      get: async () => this.oasPath.post["x-hyperledger-cacti"].authz,
     };
   }
 
-  public get oasPath(): typeof OAS.paths["/api/v1/utilityemissionchannel/registerEnroll/admin"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/utilityemissionchannel/registerEnroll/admin"] {
     return OAS.paths["/api/v1/utilityemissionchannel/registerEnroll/admin"];
   }
 
   public getVerbLowerCase(): string {
-    return this.oasPath.post["x-hyperledger-cactus"].http.verbLowerCase;
+    return this.oasPath.post["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getPath(): string {
-    return this.oasPath.post["x-hyperledger-cactus"].http.path;
+    return this.oasPath.post["x-hyperledger-cacti"].http.path;
   }
 
   public getExpressRequestHandler(): IExpressRequestHandler {

@@ -100,8 +100,8 @@ test(testCase, async (t: Test) => {
   const web3QuorumMember3 = Web3JsQuorum(web3Member3);
   t.ok(web3QuorumMember3, "web3QuorumMember3 truthy OK");
 
-  const commitmentHash = await web3QuorumMember1.priv.generateAndSendRawTransaction(
-    {
+  const commitmentHash =
+    await web3QuorumMember1.priv.generateAndSendRawTransaction({
       data: "0x" + HelloWorldContractJson.bytecode,
       privateFrom: keys.tessera.member1.publicKey,
       privateFor: [
@@ -109,15 +109,15 @@ test(testCase, async (t: Test) => {
         keys.tessera.member2.publicKey,
       ],
       privateKey: keys.besu.member1.privateKey,
-      gasLimit: "3000000",
-    },
-  );
+      gasLimit: "0x2DC6C0",
+    });
 
   t.ok(commitmentHash, "commitmentHash truthy OK");
 
-  const contractDeployReceipt = (await web3QuorumMember1.priv.waitForTransactionReceipt(
-    commitmentHash,
-  )) as IPrivateTransactionReceipt;
+  const contractDeployReceipt =
+    (await web3QuorumMember1.priv.waitForTransactionReceipt(
+      commitmentHash,
+    )) as IPrivateTransactionReceipt;
 
   t.ok(contractDeployReceipt, "contractDeployReceipt truthy OK");
   const receipt = contractDeployReceipt as IPrivateTransactionReceipt;
@@ -128,9 +128,8 @@ test(testCase, async (t: Test) => {
 
   // Check that the third node does not see the transaction of the contract
   // deployment that was sent to node 1 and 2 only, not 3.
-  const txReceiptNever = await web3QuorumMember3.priv.waitForTransactionReceipt(
-    commitmentHash,
-  );
+  const txReceiptNever =
+    await web3QuorumMember3.priv.waitForTransactionReceipt(commitmentHash);
   t.notok(txReceiptNever, "txReceiptNever falsy OK");
 
   // Check that node 1 and 2 can indeed see the transaction for the contract
@@ -141,14 +140,12 @@ test(testCase, async (t: Test) => {
   // which is instantiated with a single web3+web3 Quorum client.
   // What I will try next is to have 3 connectors each with a web3 Quorum client
   // that points to one of the 3 nodes and see if that makes it work.
-  const txReceiptAlways1 = await web3QuorumMember1.priv.waitForTransactionReceipt(
-    commitmentHash,
-  );
+  const txReceiptAlways1 =
+    await web3QuorumMember1.priv.waitForTransactionReceipt(commitmentHash);
   t.ok(txReceiptAlways1, "txReceiptAlways1 truthy OK");
 
-  const txReceiptAlways2 = await web3QuorumMember2.priv.waitForTransactionReceipt(
-    commitmentHash,
-  );
+  const txReceiptAlways2 =
+    await web3QuorumMember2.priv.waitForTransactionReceipt(commitmentHash);
   t.ok(txReceiptAlways2, "txReceiptAlways2 truthy OK");
 
   const contract = new web3Member1.eth.Contract(
@@ -180,15 +177,15 @@ test(testCase, async (t: Test) => {
       privateFor: [keys.tessera.member2.publicKey],
       privateKey: keys.besu.member1.privateKey,
     };
-    const transactionHash = await web3QuorumMember1.priv.generateAndSendRawTransaction(
-      functionParams,
-    );
+    const transactionHash =
+      await web3QuorumMember1.priv.generateAndSendRawTransaction(
+        functionParams,
+      );
     t.comment(`Transaction hash: ${transactionHash}`);
     t.ok(transactionHash, "transactionHash truthy OK");
 
-    const result = await web3QuorumMember1.priv.waitForTransactionReceipt(
-      transactionHash,
-    );
+    const result =
+      await web3QuorumMember1.priv.waitForTransactionReceipt(transactionHash);
     t.comment(`Transaction receipt for set() call: ${JSON.stringify(result)}`);
     t.ok(result, "set() result member 1 truthy OK");
   }
@@ -207,9 +204,8 @@ test(testCase, async (t: Test) => {
       privateKey: keys.besu.member1.privateKey,
     };
 
-    const privacyGroupId = web3QuorumMember1.utils.generatePrivacyGroup(
-      fnParams,
-    );
+    const privacyGroupId =
+      web3QuorumMember1.utils.generatePrivacyGroup(fnParams);
     const callOutput = await web3QuorumMember1.priv.call(privacyGroupId, {
       to: contractDeployReceipt.contractAddress,
       data: contract.methods.getName().encodeABI(),
@@ -232,9 +228,8 @@ test(testCase, async (t: Test) => {
       privateKey: keys.besu.member3.privateKey,
     };
 
-    const privacyGroupId = web3QuorumMember3.utils.generatePrivacyGroup(
-      fnParams,
-    );
+    const privacyGroupId =
+      web3QuorumMember3.utils.generatePrivacyGroup(fnParams);
     const callOutput = await web3QuorumMember3.priv.call(privacyGroupId, {
       to: contractDeployReceipt.contractAddress,
       data: getNameAbi.signature,
@@ -255,15 +250,15 @@ test(testCase, async (t: Test) => {
       privateFor: [keys.tessera.member2.publicKey],
       privateKey: keys.besu.member2.privateKey,
     };
-    const transactionHash = await web3QuorumMember2.priv.generateAndSendRawTransaction(
-      functionParams,
-    );
+    const transactionHash =
+      await web3QuorumMember2.priv.generateAndSendRawTransaction(
+        functionParams,
+      );
     t.comment(`Transaction hash: ${transactionHash}`);
     t.ok(transactionHash, "transactionHash truthy OK");
 
-    const result = await web3QuorumMember2.priv.waitForTransactionReceipt(
-      transactionHash,
-    );
+    const result =
+      await web3QuorumMember2.priv.waitForTransactionReceipt(transactionHash);
     t.comment(`Transaction receipt for set() call: ${JSON.stringify(result)}`);
     t.ok(result, "set() result member 2 truthy OK");
   }
@@ -280,15 +275,15 @@ test(testCase, async (t: Test) => {
       privateKey: keys.besu.member3.privateKey,
       privateFor: [keys.tessera.member2.publicKey],
     };
-    const transactionHash = await web3QuorumMember3.priv.generateAndSendRawTransaction(
-      functionParams,
-    );
+    const transactionHash =
+      await web3QuorumMember3.priv.generateAndSendRawTransaction(
+        functionParams,
+      );
     t.comment(`setName tx hash for member 3: ${transactionHash}`);
     t.ok(transactionHash, "setName tx hash for member 3 truthy OK");
 
-    const result = await web3QuorumMember3.priv.waitForTransactionReceipt(
-      transactionHash,
-    );
+    const result =
+      await web3QuorumMember3.priv.waitForTransactionReceipt(transactionHash);
     t.comment(`Transaction receipt for set() call: ${JSON.stringify(result)}`);
     t.ok(result, "set() result for member 3 truthy OK");
   }

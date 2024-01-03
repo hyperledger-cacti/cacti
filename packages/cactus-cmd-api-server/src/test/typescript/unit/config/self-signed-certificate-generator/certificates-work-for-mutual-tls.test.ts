@@ -25,7 +25,7 @@ test("works with HTTPS NodeJS module", async (t: Test) => {
   const generator = new SelfSignedPkiGenerator();
   t.ok(generator, "Instantiated SelfSignedCertificateGenerator OK.");
 
-  const serverCert: IPki = generator.create("localhost");
+  const serverCert: IPki = generator.create("127.0.0.1");
   t.ok(serverCert, "serverCert truthy");
   t.ok(serverCert.certificatePem, "serverCert.certificatePem truthy");
   t.ok(serverCert.privateKeyPem, "serverCert.privateKeyPem truthy");
@@ -33,7 +33,7 @@ test("works with HTTPS NodeJS module", async (t: Test) => {
   t.ok(serverCert.keyPair, "serverCert.keyPair truthy");
 
   // make sure the client cert has a different common name otherwise they collide and everything breaks in this test
-  const clientCert: IPki = generator.create("client.localhost", serverCert);
+  const clientCert: IPki = generator.create("client.127.0.0.1", serverCert);
   t.ok(clientCert, "clientCert truthy");
   t.ok(clientCert.certificatePem, "clientCert.certificatePem truthy");
   t.ok(clientCert.privateKeyPem, "clientCert.privateKeyPem truthy");
@@ -81,7 +81,7 @@ test("works with HTTPS NodeJS module", async (t: Test) => {
 
     aServer.once("tlsClientError", (err: Error) => reject(err));
     aServer.once("listening", () => resolve(aServer));
-    aServer.listen(0, "localhost");
+    aServer.listen(0, "127.0.0.1");
     test.onFinish(() => aServer.close());
   });
 

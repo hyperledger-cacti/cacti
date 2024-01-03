@@ -26,7 +26,7 @@ const command: GluegunCommand = {
       commandHelp(
         print,
         toolbox,
-        'fabric-cli configure network --local-network=network1 --target-network=network2 --iin-agent-endpoint=localhost:9500',
+        'fabric-cli configure network --local-network=network1 --target-network=network2 --iin-agent-endpoint=127.0.0.1:9500',
         'fabric-cli configure network --local-network=<network1|network2 --target-network=<network1|network2>>',
         [
           {
@@ -76,7 +76,7 @@ const command: GluegunCommand = {
       print.error('IIN Agent endpoint does not contain port number.')
       return
     }
-    
+
 
     // Create wallet credentials
     const [response, error] = await handlePromise(MembershipManager.syncMembershipFromIINAgent(

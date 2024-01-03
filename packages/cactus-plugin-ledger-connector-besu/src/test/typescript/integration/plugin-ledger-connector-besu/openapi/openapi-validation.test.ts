@@ -119,7 +119,7 @@ test(testCase, async (t: Test) => {
   });
 
   const listenOptions: IListenOptions = {
-    hostname: "localhost",
+    hostname: "127.0.0.1",
     port: 0,
     server,
   };
@@ -198,7 +198,7 @@ test(testCase, async (t: Test) => {
         },
       };
       await apiClient.deployContractSolBytecodeV1(
-        (parameters as any) as DeployContractSolidityBytecodeV1Request,
+        parameters as any as DeployContractSolidityBytecodeV1Request,
       );
     } catch (e) {
       t2.equal(
@@ -301,7 +301,7 @@ test(testCase, async (t: Test) => {
         },
       };
       await apiClient.invokeContractV1(
-        (parameters as any) as InvokeContractV1Request,
+        parameters as any as InvokeContractV1Request,
       );
     } catch (e) {
       t2.equal(

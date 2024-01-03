@@ -17,7 +17,6 @@ export interface IServerHelperOptions {
 }
 
 export class ServerHelper extends ServerGatewayHelper {
-
   public static readonly CLASS_NAME: string = "ServerHelper";
 
   constructor(readonly opts: IServerHelperOptions) {
@@ -120,7 +119,8 @@ export class ServerHelper extends ServerGatewayHelper {
 
     sessionData.clientSignatureInitializationRequestMessage = request.signature;
 
-    sessionData.initializationRequestMessageProcessedTimeStamp = Date.now().toString();
+    sessionData.initializationRequestMessageProcessedTimeStamp =
+      Date.now().toString();
 
     odap.sessions.set(request.sessionID, sessionData);
 

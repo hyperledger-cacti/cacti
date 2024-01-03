@@ -10,8 +10,8 @@ import {
 import {
   IOdapPluginKeyPair,
   PluginOdapGateway,
-} from "@hyperledger/cactus-plugin-odap-hermes/src/main/typescript/gateway/plugin-odap-gateway";
-import { SessionDataRollbackActionsPerformedEnum } from "@hyperledger/cactus-plugin-odap-hermes/src/main/typescript";
+} from "@hyperledger/cactus-plugin-odap-hermes";
+import { SessionDataRollbackActionsPerformedEnum } from "@hyperledger/cactus-plugin-odap-hermes";
 import { ClientHelper } from "./client-helper";
 import { ServerHelper } from "./server-helper";
 
@@ -133,7 +133,8 @@ export class BesuOdapGateway extends PluginOdapGateway {
 
     if (this.besuApi != undefined) {
       const amount = sessionData.assetProfile.keyInformationLink[0].toString();
-      const userEthAddress = sessionData.assetProfile.keyInformationLink[2].toString();
+      const userEthAddress =
+        sessionData.assetProfile.keyInformationLink[2].toString();
 
       const besuCreateRes = await this.besuApi.invokeContractV1({
         contractName: this.besuContractName,
@@ -458,7 +459,8 @@ export class BesuOdapGateway extends PluginOdapGateway {
 
     if (this.besuApi != undefined) {
       const amount = sessionData.assetProfile.keyInformationLink[0].toString();
-      const userEthAddress = sessionData.assetProfile.keyInformationLink[2].toString();
+      const userEthAddress =
+        sessionData.assetProfile.keyInformationLink[2].toString();
 
       const assetCreateResponse = await this.besuApi.invokeContractV1({
         contractName: this.besuContractName,

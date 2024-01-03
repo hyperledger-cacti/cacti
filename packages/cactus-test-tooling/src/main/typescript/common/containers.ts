@@ -8,7 +8,7 @@ import execa from "execa";
 import tar from "tar-stream";
 import fs from "fs-extra";
 import pRetry from "p-retry";
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 import { Streams } from "../common/streams";
 import {
   Checks,
@@ -380,7 +380,7 @@ export class Containers {
       if (!mapping.PublicPort) {
         throw new Error(`${fnTag} port ${privatePort} mapped but not public`);
       } else if (mapping.IP !== "0.0.0.0") {
-        throw new Error(`${fnTag} port ${privatePort} mapped to localhost`);
+        throw new Error(`${fnTag} port ${privatePort} mapped to 127.0.0.1`);
       } else {
         return mapping.PublicPort;
       }

@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-common",
-  "version": "2.0.0-alpha.1",
+  "version": "2.0.0-alpha.2",
   "description": "Universal library used by both front end and back end components of Cactus. Aims to be a developer swiss army knife.",
   "keywords": [
     "Hyperledger",
@@ -60,6 +60,7 @@
     "key-encoder": "2.0.3",
     "loglevel": "1.7.1",
     "loglevel-plugin-prefix": "0.8.4",
+    "run-time-error-cjs": "1.4.0",
     "sanitize-html": "2.7.0",
     "secp256k1": "4.0.3",
     "sha3": "2.1.4"
@@ -72,8 +73,8 @@
     "uuid": "8.3.2"
   },
   "engines": {
-    "node": ">=10",
-    "npm": ">=6"
+    "node": ">=18",
+    "npm": ">=8"
   },
   "publishConfig": {
     "access": "public"

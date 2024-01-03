@@ -7,8 +7,16 @@ name: Unit Test Relay
 on:
   push:
     branches: [ main ]
+    paths:
+        - '.github/workflows/test_weaver-**'
+        - 'weaver/common/protos-rs/**'
+        - 'weaver/core/relay/**'
   pull_request:
     branches: [ main ]
+    paths:
+        - '.github/workflows/test_weaver-**'
+        - 'weaver/common/protos-rs/**'
+        - 'weaver/core/relay/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}

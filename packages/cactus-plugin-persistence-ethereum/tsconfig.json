@@ -6,7 +6,7 @@
     "declarationDir": "./dist/lib",
     "resolveJsonModule": true,
     "rootDir": "./src",
-    "tsBuildInfoFile": "../../.build-cache/cactus-plugin-persistence-ethereum.tsbuildinfo",
+    "tsBuildInfoFile": "../../.build-cache/cactus-plugin-persistence-ethereum.tsbuildinfo"
   },
   "include": ["./src", "./src/**/*.json", "./src/**/*.sql"],
   "references": [
@@ -20,10 +20,16 @@
       "path": "../cactus-core-api/tsconfig.json"
     },
     {
-      "path": "../cactus-api-client/tsconfig.json"
+      "path": "../cactus-test-tooling/tsconfig.json"
     },
     {
-      "path": "../cactus-test-tooling/tsconfig.json"
+      "path": "../cactus-plugin-ledger-connector-ethereum/tsconfig.json"
+    },
+    {
+      "path": "../cactus-plugin-keychain-memory/tsconfig.json"
+    },
+    {
+      "path": "../cactus-test-geth-ledger/tsconfig.json"
     }
   ]
 }

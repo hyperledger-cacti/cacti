@@ -3,10 +3,9 @@
   "info": {
     "title": "Hyperledger Cactus Plugin - Object Store - IPFS ",
     "description": "Contains/describes the Hyperledger Cactus Object Store IPFS plugin.",
-    "version": "0.2.0",
+    "version": "v2.0.0-alpha.2",
     "license": {
       "name": "Apache-2.0",
-
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     }
   },
@@ -38,7 +37,7 @@
   "paths": {
     "/api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/get-object": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/get-object"
@@ -59,7 +58,7 @@
     },
     "/api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/set-object": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/set-object"
@@ -80,7 +79,7 @@
     },
     "/api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/has-object": {
       "post": {
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/has-object"

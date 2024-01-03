@@ -58,7 +58,7 @@ test("NodeJS API server + Rust plugin work together", async (t: Test) => {
   t.comment(`CactusKeychainVaultServer (Port=${hostPort}) started OK`);
 
   const configuration = new Configuration({
-    basePath: `http://localhost:${hostPort}`,
+    basePath: `http://127.0.0.1:${hostPort}`,
   });
   const apiClient = new DefaultApi(configuration);
 

@@ -1,6 +1,6 @@
 import { Observable, ReplaySubject } from "rxjs";
 import { finalize } from "rxjs/operators";
-import { io } from "socket.io-client";
+import { io } from "socket.io-client-fixed-types";
 import { Logger, Checks } from "@hyperledger/cactus-common";
 import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
 import { Constants, ISocketApiClient } from "@hyperledger/cactus-core-api";
@@ -49,7 +49,8 @@ export type QuorumRequestInputArgs = {
 
 export class QuorumApiClient
   extends DefaultApi
-  implements ISocketApiClient<WatchBlocksV1Progress> {
+  implements ISocketApiClient<WatchBlocksV1Progress>
+{
   public static readonly CLASS_NAME = "QuorumApiClient";
 
   private readonly log: Logger;

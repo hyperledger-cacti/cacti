@@ -99,7 +99,7 @@ describe(testCase, () => {
     await ledger.start({ omitPull: false });
 
     const listenOptions: IListenOptions = {
-      hostname: "localhost",
+      hostname: "127.0.0.1",
       port: 0,
       server,
     };
@@ -265,7 +265,7 @@ describe(testCase, () => {
         contractName,
         methodName: "CreateAsset",
         params: ["asset388", "green", "111", assetOwner, "299"],
-        endorsingPeers: ["org1.example.com", "Org2MSP"],
+        endorsingOrgs: ["org1.example.com", "Org2MSP"],
       };
 
       const res = await apiClient.runTransactionV1(req);

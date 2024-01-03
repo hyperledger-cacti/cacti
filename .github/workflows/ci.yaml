@@ -1,4 +1,6 @@
 ---
+env:
+  NODEJS_VERSION: v18.18.2
 jobs:
   ActionLint:
     uses: ./.github/workflows/actionlint.yaml
@@ -26,10 +28,10 @@ jobs:
       CHECK_WORK_TREE_STATUS_DISABLED: true
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -57,10 +59,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
       - id: yarn-cache
         name: Restore Yarn Cache
@@ -85,10 +87,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -134,11 +136,11 @@ jobs:
         uses: actions/github-script@v6.4.1
         with:
           script: |
-            const failMsg = "yarn codegen script produced version control " + 
-              "side-effects: source files have been changed by it that are " + 
-              "otherwise are under version control. " + 
-              "This means (99% of the time) that you need to run the " + 
-              "yarn codegen script locally and then include the changes it " + 
+            const failMsg = "yarn codegen script produced version control " +
+              "side-effects: source files have been changed by it that are " +
+              "otherwise are under version control. " +
+              "This means (99% of the time) that you need to run the " +
+              "yarn codegen script locally and then include the changes it " +
               "makes in your own commit when submitting your pull request.";
             core.setFailed(failMsg)
 
@@ -156,10 +158,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
       - id: yarn-cache
         name: Restore Yarn Cache
@@ -183,10 +185,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
       - id: yarn-cache
         name: Restore Yarn Cache
@@ -209,10 +211,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -238,10 +240,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -264,10 +266,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -293,10 +295,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -319,10 +321,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -344,10 +346,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -370,10 +372,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -395,10 +397,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -421,10 +423,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -447,10 +449,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -472,10 +474,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -498,10 +500,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -523,10 +525,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -550,10 +552,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -575,10 +577,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -600,10 +602,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -626,10 +628,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -652,10 +654,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -678,10 +680,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -703,10 +705,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -729,10 +731,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -755,10 +757,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -777,15 +779,15 @@ jobs:
       JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-besu/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_RUNNER_DISABLED: false
       TAPE_TEST_PATTERN: >-
-        --files={./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/deploy-contract-from-json.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/get-block.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/get-past-logs.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/get-record-locator.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/private-deploy-contract-from-json-cactus.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/private-deploy-contract-from-json-web3-eea.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/v21-deploy-contract-from-json.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/v21-get-balance.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/v21-get-block.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/v21-get-past-logs.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/v21-get-record-locator.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/v21-invoke-contract.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/lock-contract.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/openapi/openapi-validation.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/v21-besu-get-transaction.test.ts}
+        --files={./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/deploy-contract-from-json.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/get-block.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/get-past-logs.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/get-record-locator.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/private-deploy-contract-from-json-cactus.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/private-deploy-contract-from-json-web3-eea.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/v21-deploy-contract-from-json.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/v21-get-balance.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/v21-get-block.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/v21-get-past-logs.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/v21-get-record-locator.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/openapi/openapi-validation.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/v21-besu-get-transaction.test.ts}
       TAPE_TEST_RUNNER_DISABLED: false
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -809,10 +811,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -831,6 +833,7 @@ jobs:
       CACTI_NPM_PACKAGE_NAME: "@hyperledger/cactus-plugin-ledger-connector-fabric"
       HFC_LOGGING: '{"debug":"console","info":"console","warn": "console","error":"console"}'
       FULL_BUILD_DISABLED: true
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
       JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_RUNNER_DISABLED: false
       TAPE_TEST_PATTERN: ""
@@ -838,10 +841,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -867,10 +870,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -897,10 +900,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -927,10 +930,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -957,10 +960,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -987,10 +990,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1017,10 +1020,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1047,10 +1050,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1077,10 +1080,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1107,10 +1110,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1137,10 +1140,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1167,10 +1170,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1197,10 +1200,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1214,33 +1217,6 @@ jobs:
       - run: npm run configure
       - run: yarn ts-node ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/run-transaction-with-ws-ids.test.ts
 
-  cactus-plugin-ledger-connector-fabric-socketio:
-    continue-on-error: false
-    env:
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-fabric-socketio/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: false
-      TAPE_TEST_RUNNER_DISABLED: true
-    needs: build-dev
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Use Node.js v16.14.2
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: v16.14.2
-      - uses: actions/checkout@v3.5.2
-
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@v3.3.1
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
-          path: ./.yarn/
-          restore-keys: |
-            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
-      - run: yarn --version
-      - run: yarn install
-      - run: ./tools/ci.sh
   cactus-plugin-ledger-connector-go-ethereum-socketio:
     continue-on-error: false
     env:
@@ -1252,10 +1228,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1279,10 +1255,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1304,10 +1280,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1325,28 +1301,23 @@ jobs:
       FULL_BUILD_DISABLED: true
       JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_RUNNER_DISABLED: false
-      TAPE_TEST_PATTERN: >-
-        --files={./packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/integration/plugin-ledger-connector-ethereum/deploy-contract/openapi/openapi-validation-no-keychain.test.ts,./packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/integration/plugin-ledger-connector-ethereum/deploy-contract/openapi/openapi-validation.test.ts,./packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/integration/plugin-ledger-connector-ethereum/deploy-contract/v2.3.0-deploy-contract-from-json-json-object-endpoints.test.ts,./packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/integration/plugin-ledger-connector-ethereum/deploy-contract/v2.3.0-deploy-contract-from-json-json-object.test.ts,./packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/integration/plugin-ledger-connector-ethereum/deploy-contract/v2.3.0-invoke-contract-json-object-endpoints.test.ts,./packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/integration/plugin-ledger-connector-ethereum/deploy-contract/v2.3.0-invoke-contract-json-object.test.ts,./packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/integration/plugin-ledger-connector-ethereum/deploy-contract/v21.4.1-deploy-contract-from-json-json-object-endpoints.test.ts,./packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/integration/plugin-ledger-connector-ethereum/deploy-contract/v21.4.1-deploy-contract-from-json-json-object.test.ts,./packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/integration/plugin-ledger-connector-ethereum/deploy-contract/v21.4.1-invoke-contract-json-object-endpoints.test.ts,./packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/integration/plugin-ledger-connector-ethereum/deploy-contract/v21.4.1-invoke-contract-json-object.test.ts}
-      TAPE_TEST_RUNNER_DISABLED: false
+      TAPE_TEST_RUNNER_DISABLED: true
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
-      - id: yarn-cache-dir-path
-        name: Get yarn cache directory path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.3.1
         with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
   cactus-plugin-ledger-connector-quorum:
     continue-on-error: false
@@ -1360,10 +1331,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1375,23 +1346,21 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-  cactus-plugin-ledger-connector-sawtooth-socketio:
+  cactus-plugin-ledger-connector-sawtooth:
     continue-on-error: false
     env:
-      DEV_BUILD_DISABLED: false
       FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-sawtooth-socketio/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: true
+      JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-sawtooth/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_RUNNER_DISABLED: false
       TAPE_TEST_RUNNER_DISABLED: true
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
-
       - id: yarn-cache
         name: Restore Yarn Cache
         uses: actions/cache@v3.3.1
@@ -1413,10 +1382,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1438,10 +1407,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1464,10 +1433,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1489,10 +1458,10 @@ jobs:
   #   needs: build-dev
   #   runs-on: ubuntu-20.04
   #   steps:
-  #     - name: Use Node.js v16.14.2
+  #     - name: Use Node.js ${{ env.NODEJS_VERSION }}
   #       uses: actions/setup-node@v3.6.0
   #       with:
-  #         node-version: v16.14.2
+  #         node-version: ${{ env.NODEJS_VERSION }}
   #     - uses: actions/checkout@v3.5.2
   #     - id: yarn-cache-dir-path
   #       name: Get yarn cache directory path
@@ -1517,10 +1486,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1544,10 +1513,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1570,10 +1539,35 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
+      - uses: actions/checkout@v3.5.2
+
+      - id: yarn-cache
+        name: Restore Yarn Cache
+        uses: actions/cache@v3.3.1
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
+          restore-keys: |
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+      - run: ./tools/ci.sh
+  cactus-test-geth-ledger:
+    continue-on-error: false
+    env:
+      FULL_BUILD_DISABLED: true
+      JEST_TEST_PATTERN: packages/cactus-test-geth-ledger/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_RUNNER_DISABLED: false
+      TAPE_TEST_RUNNER_DISABLED: true
+    needs: build-dev
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1596,10 +1590,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1622,10 +1616,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1637,13 +1631,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
       - run: ./tools/ci.sh
-      
+
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
 
       - name: Run solidity tests
         run: cd packages/cactus-plugin-htlc-eth-besu && forge test -vvvvv
-              
+
   cactus-test-plugin-htlc-eth-besu-erc20:
     continue-on-error: false
     env:
@@ -1656,10 +1650,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1683,10 +1677,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1708,10 +1702,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1733,10 +1727,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
       - id: yarn-cache-dir-path
         name: Get yarn cache directory path
@@ -1762,10 +1756,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1787,10 +1781,10 @@ jobs:
     needs: build-dev
     runs-on: ubuntu-20.04
     steps:
-      - name: Use Node.js v16.14.2
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v16.14.2
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
 
       - id: yarn-cache
@@ -1918,10 +1912,10 @@ jobs:
     env:
       IMAGE_NAME: cacti-dev-container-vscode
     steps:
-      - name: Use Node.js v20.3.0
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: v20.3.0
+          node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v3.5.2
       - name: npm_install_@devcontainers/cli@0.44.0
         run: npm install -g @devcontainers/cli@0.44.0

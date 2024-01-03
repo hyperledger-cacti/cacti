@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cacti-weaver-driver-fabric",
-  "version": "2.0.0-alpha.1",
+  "version": "2.0.0-alpha.2",
   "description": "",
   "repository": {
     "type": "git",
@@ -20,16 +20,18 @@
   },
   "dependencies": {
     "@fidm/x509": "1.2.1",
-    "@grpc/grpc-js": "1.9.0",
-    "@hyperledger/cacti-weaver-protos-js": "2.0.0-alpha.1",
-    "@hyperledger/cacti-weaver-sdk-fabric": "2.0.0-alpha.1",
+    "@grpc/grpc-js": "1.9.5",
+    "@hyperledger/cacti-weaver-protos-js": "2.0.0-alpha.2",
+    "@hyperledger/cacti-weaver-sdk-fabric": "2.0.0-alpha.2",
     "@typescript-eslint/eslint-plugin": "5.62.0",
     "@typescript-eslint/parser": "5.62.0",
     "dotenv": "8.6.0",
     "eslint-config-prettier": "8.9.0",
-    "eslint-plugin-prettier": "3.4.1",
-    "fabric-ca-client": "2.2.18",
-    "fabric-network": "2.2.18",
+    "eslint-plugin-prettier": "5.0.0",
+    "fabric-ca-client": "2.2.19",
+    "fabric-common": "2.2.19",
+    "fabric-network": "2.2.19",
+    "fabric-protos": "2.2.19",
     "level": "8.0.0",
     "winston": "3.10.0"
   },
@@ -39,5 +41,9 @@
     "patch-package": "6.5.1",
     "typedoc": "0.24.8",
     "typescript": "4.9.5"
+  },
+  "engines": {
+    "node": ">=18",
+    "npm": ">=8"
   }
 }

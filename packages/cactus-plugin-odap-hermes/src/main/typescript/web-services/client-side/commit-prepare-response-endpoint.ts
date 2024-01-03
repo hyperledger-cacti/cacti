@@ -1,4 +1,4 @@
-import { Express, Request, Response } from "express";
+import type { Express, Request, Response } from "express";
 
 import {
   IWebServiceEndpoint,
@@ -25,7 +25,8 @@ export interface ICommitPreparationResponseEndpointOptions {
 }
 
 export class CommitPreparationResponseEndpointV1
-  implements IWebServiceEndpoint {
+  implements IWebServiceEndpoint
+{
   public static readonly CLASS_NAME = "CommitPrepareResponseEndpointV1";
 
   private readonly log: Logger;
@@ -51,7 +52,7 @@ export class CommitPreparationResponseEndpointV1
       OAS.paths[
         "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase3/commitpreparationresponse"
       ];
-    return apiPath.post["x-hyperledger-cactus"].http.path;
+    return apiPath.post["x-hyperledger-cacti"].http.path;
   }
 
   public getVerbLowerCase(): string {
@@ -59,7 +60,7 @@ export class CommitPreparationResponseEndpointV1
       OAS.paths[
         "/api/v1/@hyperledger/cactus-plugin-odap-hermes/phase3/commitpreparationresponse"
       ];
-    return apiPath.post["x-hyperledger-cactus"].http.verbLowerCase;
+    return apiPath.post["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getOperationId(): string {

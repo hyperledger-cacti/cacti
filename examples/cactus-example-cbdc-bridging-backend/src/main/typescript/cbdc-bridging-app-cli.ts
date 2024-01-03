@@ -17,14 +17,13 @@ export async function launchApp(
   const configService = new ConfigService();
   const exampleConfig = await configService.newExampleConfig();
   exampleConfig.configFile = "";
-  exampleConfig.authorizationConfigJson = (JSON.stringify(
+  exampleConfig.authorizationConfigJson = JSON.stringify(
     exampleConfig.authorizationConfigJson,
-  ) as unknown) as IAuthorizationConfig;
+  ) as unknown as IAuthorizationConfig;
   exampleConfig.authorizationProtocol = AuthorizationProtocol.NONE;
 
-  const convictConfig = await configService.newExampleConfigConvict(
-    exampleConfig,
-  );
+  const convictConfig =
+    await configService.newExampleConfigConvict(exampleConfig);
 
   env = await configService.newExampleConfigEnv(convictConfig.getProperties());
 

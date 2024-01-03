@@ -2,9 +2,9 @@ import { SHA256 } from "crypto-js";
 import {
   PluginOdapGateway,
   TransferInitializationV1Request,
-} from "@hyperledger/cactus-plugin-odap-hermes/src/main/typescript";
-import { ClientGatewayHelper } from "@hyperledger/cactus-plugin-odap-hermes/src/main/typescript/gateway/client/client-helper";
-import { OdapMessageType } from "@hyperledger/cactus-plugin-odap-hermes/src/main/typescript/gateway/plugin-odap-gateway";
+  ClientGatewayHelper,
+} from "@hyperledger/cactus-plugin-odap-hermes";
+import { OdapMessageType } from "@hyperledger/cactus-plugin-odap-hermes";
 import { FabricOdapGateway } from "./fabric-odap-gateway";
 import { BesuOdapGateway } from "./besu-odap-gateway";
 

@@ -18,6 +18,7 @@ package org.openapitools.client.models
 import org.openapitools.client.models.FabricContractInvocationType
 import org.openapitools.client.models.FabricSigningCredential
 import org.openapitools.client.models.GatewayOptions
+import org.openapitools.client.models.RunTransactionResponseType
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -31,10 +32,10 @@ import com.squareup.moshi.JsonClass
  * @param invocationType 
  * @param methodName 
  * @param params 
- * @param endorsingPeers An array of MSP IDs to set as the list of endorsing peers for the transaction.
+ * @param endorsingPeers An array of endorsing peers (name or url) for the transaction.
+ * @param endorsingOrgs An array of endorsing organizations (by mspID or issuer org name on certificate) for the transaction.
  * @param transientData 
  * @param gatewayOptions 
- * @param endorsingParties 
  * @param responseType 
  */
 
@@ -59,9 +60,13 @@ data class RunTransactionRequest (
     @Json(name = "params")
     val params: kotlin.collections.List<kotlin.String> = arrayListOf(),
 
-    /* An array of MSP IDs to set as the list of endorsing peers for the transaction. */
+    /* An array of endorsing peers (name or url) for the transaction. */
     @Json(name = "endorsingPeers")
     val endorsingPeers: kotlin.collections.List<kotlin.String>? = null,
+
+    /* An array of endorsing organizations (by mspID or issuer org name on certificate) for the transaction. */
+    @Json(name = "endorsingOrgs")
+    val endorsingOrgs: kotlin.collections.List<kotlin.String>? = null,
 
     @Json(name = "transientData")
     val transientData: kotlin.Any? = null,
@@ -69,11 +74,8 @@ data class RunTransactionRequest (
     @Json(name = "gatewayOptions")
     val gatewayOptions: GatewayOptions? = null,
 
-    @Json(name = "endorsingParties")
-    val endorsingParties: kotlin.collections.List<kotlin.String>? = arrayListOf(),
-
     @Json(name = "responseType")
-    val responseType: kotlin.String? = null
+    val responseType: RunTransactionResponseType? = null
 
 )
 

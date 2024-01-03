@@ -15,7 +15,8 @@
     "./src/main/typescript/common/core/bin/*.ts",
     "./src/main/typescript/common/core/config/*.ts",
     "./src/main/typescript/connector/*.ts",
-    "./src/main/typescript/*.ts"
+    "./src/main/typescript/*.ts",
+    "./src/test/typescript/integration/*.ts"
   ],
   "references": [
     {

@@ -205,12 +205,12 @@ export class CordaConnectorContainer {
 
   public async getSupervisorDLocalhostUrl(): Promise<string> {
     const port = await this.getSupervisorDPublicPort();
-    return `http://localhost:${port}`;
+    return `http://127.0.0.1:${port}`;
   }
 
   public async getApiLocalhostUrl(): Promise<string> {
     const port = await this.getApiPublicPort();
-    return `http://localhost:${port}`;
+    return `http://127.0.0.1:${port}`;
   }
 
   public getContainer(): Container {

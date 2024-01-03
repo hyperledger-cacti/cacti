@@ -79,8 +79,8 @@ Below, we list the template functions with sample code that you, as a developer,
   ```go
   require(
       ...
-      github.com/hyperledger/cacti/weaver/common/protos-go/v2 v2.0.0-alpha.1
-      github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/assetexchange/v2 v2.0.0-alpha.1
+      github.com/hyperledger/cacti/weaver/common/protos-go/v2 v2.0.0-alpha.2
+      github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/libs/assetexchange/v2 v2.0.0-alpha.2
       ...
   )
   ```
@@ -172,8 +172,8 @@ Below, we list the template functions with sample code that you, as a developer,
   ```go
   require(
       ...
-      github.com/hyperledger/cacti/weaver/common/protos-go/v2 v2.0.0-alpha.1
-      github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt/v2 v2.0.0-alpha.1
+      github.com/hyperledger/cacti/weaver/common/protos-go/v2 v2.0.0-alpha.2
+      github.com/hyperledger/cacti/weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt/v2 v2.0.0-alpha.2
       ...
   )
   ```
@@ -304,13 +304,12 @@ A Fabric network channel must share its security domain (or membership) configur
       const response = await MembershipManager.createLocalMembership(
           gateway,
           members,        // list of all organization MSPIDs that are part of the channel
-          securityDomain, // name of the local network's security domain
           channelName,    // Channel Name
           contractName    // Fabric Interoperation Chaincode installation ID on the channel
       )
   } catch (e) {
       // On error try updating local membership
-      const response = await MembershipManager.updateLocalMembership(gateway, members, securityDomain, channelName, contractName)
+      const response = await MembershipManager.updateLocalMembership(gateway, members, channelName, contractName)
   }
   ```
   - `<get-fabric-network-gateway-instance>` should be replaced with standard (boilerplate) code to get a handle to your network's gateway. This requires a special wallet identity, namely one with a `network-admin` attribute indicating that the caller is a trusted network administrator who is authorized to record local memberships on the `channelName` channel.
@@ -322,7 +321,7 @@ Consider a scenario inspired by the [global trade use case](../../user-stories/g
       
 (In preparation, a suitable access control policy must be recorded on `tradelogisticschannel` in `trade-logistics-network`, and a suitable verification policy must be recorded on `tradefinancechannel` in `trade-finance-network`. We will see how to do this in the "Startup and Boostrap" section later.)
 
-You will need to insert some code in the Layer-2 application that accepts a B/L and submits a `RecordBillOfLading` transaction in `trade-finance-network`. (No code changes need to be made in any application in the other network.) The logic to accept a B/L should be replaced (or you can simply add an alternative) by a call to the `interopFlow` function offered by the [cacti-weaver-sdk-fabric](https://github.com/hyperledger/cacti/pkgs/npm/cacti-weaver-sdk-fabric) library (there's an [equivalent library in Golang](https://github.com/hyperledger/cacti/releases/tag/weaver%2Fsdks%2Ffabric%2Fgo-sdk%2Fv2.0.0-alpha.1) too). The following code sample illustrates this (the Golang equivalent is left to the reader):
+You will need to insert some code in the Layer-2 application that accepts a B/L and submits a `RecordBillOfLading` transaction in `trade-finance-network`. (No code changes need to be made in any application in the other network.) The logic to accept a B/L should be replaced (or you can simply add an alternative) by a call to the `interopFlow` function offered by the [cacti-weaver-sdk-fabric](https://github.com/hyperledger/cacti/pkgs/npm/cacti-weaver-sdk-fabric) library (there's an [equivalent library in Golang](https://github.com/hyperledger/cacti/releases/tag/weaver%2Fsdks%2Ffabric%2Fgo-sdk%2Fv2.0.0-alpha.2) too). The following code sample illustrates this (the Golang equivalent is left to the reader):
 ```js showLineNumbers
 const ihelper = require('@hyperledger/cacti-weaver-sdk-fabric').InteroperableHelper;
 const interopcc = <handle-to-fabric-interop-chaincode>;   // Use Fabric SDK functions: (new Gateway()).getNetwork(...).getContract(<fabric-interop-chaincode-id>)
@@ -528,13 +527,13 @@ Weaver provides a [pre-built image](https://github.com/hyperledger/cacti/pkgs/co
   RELAY_PORT=<relay-server-port/"port" in config.toml>
   EXTERNAL_NETWORK=<docker-bridge-network>
   DOCKER_IMAGE_NAME=ghcr.io/hyperledger/cacti-weaver-relay-server
-  DOCKER_TAG=2.0.0-alpha.1
+  DOCKER_TAG=2.0.0-alpha.2
   ```
   - The `PATH_TO_CONFIG` variable should point to the properties file typically named `config.toml` (you can name this whatever you wish). See further below for instructions to write this file.
   - The `RELAY_NAME` variable specifies a unique name for this relay. It should match what's specified in the `config.toml` (more on that below).
   - The `RELAY_PORT` variable specifies the port this relay server will listen on. It should match what's specified in the `config.toml` (more on that below).
   - The `EXTERNAL_NETWORK` variable should be set to the [name](https://docs.docker.com/compose/networking/) of your Fabric network.
-  - The `DOCKER_*` variables are used to specify the image on which the container will be built. Make sure you set `DOCKER_TAG` to the latest version you see on [GitHub](ility/pkgs/container/weaver-relay-server).
+  - The `DOCKER_*` variables are used to specify the image on which the container will be built. Make sure you set `DOCKER_TAG` to the latest version you see on [GitHub](https://github.com/hyperledger/cacti/pkgs/container/cacti-weaver-relay-server).
 
   For more details, see the [Relay Docker README](https://github.com/hyperledger/cacti/blob/main/weaver/core/relay/relay-docker.md) ("Relay Server Image" and "Running With Docker Compose" sections).
 
@@ -621,7 +620,7 @@ Weaver provides a [pre-built image](https://github.com/hyperledger/cacti/pkgs/co
   EXTERNAL_NETWORK=<docker-bridge-network>
   TLS_CREDENTIALS_DIR=<dir-with-tls-cert-and-key>
   DOCKER_IMAGE_NAME=ghcr.io/hyperledger/cacti-weaver-driver-fabric
-  DOCKER_TAG=2.0.0-alpha.1
+  DOCKER_TAG=2.0.0-alpha.2
   DRIVER_TLS=<true|false>
   DRIVER_TLS_CERT_PATH=path_to_tls_cert_pem_for_driver
   DRIVER_TLS_KEY_PATH=path_to_tls_key_pem_for_driver

@@ -29,7 +29,8 @@ export interface IGenerateTransactionOptions {
 }
 
 export class Iroha2GenerateTransactionEndpointV1
-  implements IWebServiceEndpoint {
+  implements IWebServiceEndpoint
+{
   public static readonly CLASS_NAME = "GenerateTransaction";
 
   private readonly log: Logger;
@@ -56,12 +57,12 @@ export class Iroha2GenerateTransactionEndpointV1
 
   public getPath(): string {
     const apiPath = this.getOasPath();
-    return apiPath.post["x-hyperledger-cactus"].http.path;
+    return apiPath.post["x-hyperledger-cacti"].http.path;
   }
 
   public getVerbLowerCase(): string {
     const apiPath = this.getOasPath();
-    return apiPath.post["x-hyperledger-cactus"].http.verbLowerCase;
+    return apiPath.post["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getOperationId(): string {

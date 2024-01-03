@@ -32,7 +32,7 @@ describe(testCase, () => {
   expressApp.use(bodyParser.json({ limit: "250mb" }));
   const server = http.createServer(expressApp);
   const listenOptions: IListenOptions = {
-    hostname: "localhost",
+    hostname: "127.0.0.1",
     port: 0,
     server,
   };
@@ -59,9 +59,7 @@ describe(testCase, () => {
       consortiumDatabase: db,
     };
 
-    const pluginConsortiumManual: PluginConsortiumManual = new PluginConsortiumManual(
-      options,
-    );
+    const pluginConsortiumManual = new PluginConsortiumManual(options);
 
     // Setting up of the api-server for hosting the endpoints defined in the openapi specs
     // of the plugin

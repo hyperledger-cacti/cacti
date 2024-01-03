@@ -7,8 +7,20 @@ name: Unit Test Fabric Interop CC and Sample Chaincode
 on:
   push:
     branches: [ main ]
+    paths:
+        - '.github/workflows/test_weaver-**'
+        - 'weaver/common/protos-go/**'
+        - 'weaver/core/network/fabric-interop-cc/**'
+        - 'weaver/samples/fabric/**'
+        - '!weaver/samples/fabric/fabric-cli/**'
   pull_request:
     branches: [ main ]
+    paths:
+        - '.github/workflows/test_weaver-**'
+        - 'weaver/common/protos-go/**'
+        - 'weaver/core/network/fabric-interop-cc/**'
+        - 'weaver/samples/fabric/**'
+        - '!weaver/samples/fabric/fabric-cli/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -24,11 +36,11 @@ jobs:
       uses: actions/setup-go@v4.0.0
       with:
         go-version: '1.20.2'
-        
+
     - name: Vendor
       run: make run-vendor
       working-directory: weaver/core/network/fabric-interop-cc/contracts/interop
-      
+
     - name: Build
       run: go build -v ./...
       working-directory: weaver/core/network/fabric-interop-cc/contracts/interop
@@ -47,7 +59,7 @@ jobs:
       uses: actions/setup-go@v4.0.0
       with:
         go-version: '1.20.2'
-        
+
     - name: Vendor
       run: make run-vendor
       working-directory: weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt
@@ -81,7 +93,7 @@ jobs:
     - name: Test
       run: go test -v ./...
       working-directory: weaver/samples/fabric/simplestate
- 
+
   unit_test_simpleasset:
     runs-on: ubuntu-latest
     steps:

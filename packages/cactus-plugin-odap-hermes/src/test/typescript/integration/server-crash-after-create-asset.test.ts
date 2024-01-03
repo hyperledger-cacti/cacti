@@ -5,7 +5,6 @@ import { Server as SocketIoServer } from "socket.io";
 import { AddressInfo } from "net";
 import { v4 as uuidv4 } from "uuid";
 import { PluginObjectStoreIpfs } from "@hyperledger/cactus-plugin-object-store-ipfs";
-import { create } from "ipfs-http-client";
 import bodyParser from "body-parser";
 import express from "express";
 import { DefaultApi as ObjectStoreIpfsApi } from "@hyperledger/cactus-plugin-object-store-ipfs";
@@ -52,6 +51,7 @@ import {
   ReceiptType,
   Web3SigningCredential,
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
+
 import Web3 from "web3";
 
 import { makeSessionDataChecks } from "../make-checks";
@@ -141,7 +141,7 @@ beforeAll(async () => {
     expressApp.use(bodyParser.json({ limit: "250mb" }));
     ipfsServer = http.createServer(expressApp);
     const listenOptions: IListenOptions = {
-      hostname: "localhost",
+      hostname: "127.0.0.1",
       port: 0,
       server: ipfsServer,
     };
@@ -157,7 +157,8 @@ beforeAll(async () => {
 
     const ipfsApiUrl = await ipfsContainer.getApiUrl();
 
-    const ipfsClientOrOptions = create({
+    const kuboRpcModule = await import("kubo-rpc-client");
+    const ipfsClientOrOptions = kuboRpcModule.create({
       url: ipfsApiUrl,
     });
 
@@ -277,7 +278,7 @@ beforeAll(async () => {
     expressApp.use(bodyParser.json({ limit: "250mb" }));
     fabricServer = http.createServer(expressApp);
     const listenOptions: IListenOptions = {
-      hostname: "localhost",
+      hostname: "127.0.0.1",
       port: 3000,
       server: fabricServer,
     };
@@ -487,7 +488,7 @@ beforeAll(async () => {
     expressApp.use(bodyParser.json({ limit: "250mb" }));
     besuServer = http.createServer(expressApp);
     const listenOptions: IListenOptions = {
-      hostname: "localhost",
+      hostname: "127.0.0.1",
       port: 4000,
       server: besuServer,
     };
@@ -559,20 +560,21 @@ beforeAll(async () => {
 beforeEach(async () => {
   {
     // Gateways configuration
-    const odapClientGatewayPluginOptions: IFabricOdapGatewayConstructorOptions = {
-      name: "cactus-plugin#odapGateway",
-      dltIDs: ["DLT2"],
-      instanceId: uuidv4(),
-      keyPair: Secp256k1Keys.generateKeyPairsBuffer(),
-      ipfsPath: ipfsApiHost,
-      fabricPath: fabricPath,
-      fabricSigningCredential: fabricSigningCredential,
-      fabricChannelName: fabricChannelName,
-      fabricContractName: fabricContractName,
-      clientHelper: new ClientGatewayHelper(),
-      serverHelper: new ServerGatewayHelper(),
-      knexConfig: knexClientConnection,
-    };
+    const odapClientGatewayPluginOptions: IFabricOdapGatewayConstructorOptions =
+      {
+        name: "cactus-plugin#odapGateway",
+        dltIDs: ["DLT2"],
+        instanceId: uuidv4(),
+        keyPair: Secp256k1Keys.generateKeyPairsBuffer(),
+        ipfsPath: ipfsApiHost,
+        fabricPath: fabricPath,
+        fabricSigningCredential: fabricSigningCredential,
+        fabricChannelName: fabricChannelName,
+        fabricContractName: fabricContractName,
+        clientHelper: new ClientGatewayHelper(),
+        serverHelper: new ServerGatewayHelper(),
+        knexConfig: knexClientConnection,
+      };
 
     odapServerGatewayPluginOptions = {
       name: "cactus-plugin#odapGateway",
@@ -608,7 +610,7 @@ beforeEach(async () => {
     expressApp.use(bodyParser.json({ limit: "250mb" }));
     recipientGatewayServer = http.createServer(expressApp);
     const listenOptions: IListenOptions = {
-      hostname: "localhost",
+      hostname: "127.0.0.1",
       port: 5000,
       server: recipientGatewayServer,
     };
@@ -627,7 +629,7 @@ beforeEach(async () => {
     expressApp.use(bodyParser.json({ limit: "250mb" }));
     sourceGatewayServer = http.createServer(expressApp);
     const listenOptions: IListenOptions = {
-      hostname: "localhost",
+      hostname: "127.0.0.1",
       port: 3001,
       server: sourceGatewayServer,
     };
@@ -680,11 +682,12 @@ test("server gateway crashes after creating besu asset", async () => {
 
   const sessionID = pluginSourceGateway.configureOdapSession(odapClientRequest);
 
-  const transferInitializationRequest = await pluginSourceGateway.clientHelper.sendTransferInitializationRequest(
-    sessionID,
-    pluginSourceGateway,
-    false,
-  );
+  const transferInitializationRequest =
+    await pluginSourceGateway.clientHelper.sendTransferInitializationRequest(
+      sessionID,
+      pluginSourceGateway,
+      false,
+    );
 
   if (transferInitializationRequest == void 0) {
     expect(false);
@@ -696,11 +699,12 @@ test("server gateway crashes after creating besu asset", async () => {
     pluginRecipientGateway,
   );
 
-  const transferInitializationResponse = await pluginRecipientGateway.serverHelper.sendTransferInitializationResponse(
-    transferInitializationRequest.sessionID,
-    pluginRecipientGateway,
-    false,
-  );
+  const transferInitializationResponse =
+    await pluginRecipientGateway.serverHelper.sendTransferInitializationResponse(
+      transferInitializationRequest.sessionID,
+      pluginRecipientGateway,
+      false,
+    );
 
   if (transferInitializationResponse == void 0) {
     expect(false);
@@ -712,11 +716,12 @@ test("server gateway crashes after creating besu asset", async () => {
     pluginSourceGateway,
   );
 
-  const transferCommenceRequest = await pluginSourceGateway.clientHelper.sendTransferCommenceRequest(
-    sessionID,
-    pluginSourceGateway,
-    false,
-  );
+  const transferCommenceRequest =
+    await pluginSourceGateway.clientHelper.sendTransferCommenceRequest(
+      sessionID,
+      pluginSourceGateway,
+      false,
+    );
 
   if (transferCommenceRequest == void 0) {
     expect(false);
@@ -728,11 +733,12 @@ test("server gateway crashes after creating besu asset", async () => {
     pluginRecipientGateway,
   );
 
-  const transferCommenceResponse = await pluginRecipientGateway.serverHelper.sendTransferCommenceResponse(
-    transferCommenceRequest.sessionID,
-    pluginRecipientGateway,
-    false,
-  );
+  const transferCommenceResponse =
+    await pluginRecipientGateway.serverHelper.sendTransferCommenceResponse(
+      transferCommenceRequest.sessionID,
+      pluginRecipientGateway,
+      false,
+    );
 
   if (transferCommenceResponse == void 0) {
     expect(false);
@@ -746,11 +752,12 @@ test("server gateway crashes after creating besu asset", async () => {
 
   await pluginSourceGateway.lockAsset(sessionID);
 
-  const lockEvidenceRequest = await pluginSourceGateway.clientHelper.sendLockEvidenceRequest(
-    sessionID,
-    pluginSourceGateway,
-    false,
-  );
+  const lockEvidenceRequest =
+    await pluginSourceGateway.clientHelper.sendLockEvidenceRequest(
+      sessionID,
+      pluginSourceGateway,
+      false,
+    );
 
   if (lockEvidenceRequest == void 0) {
     expect(false);
@@ -762,11 +769,12 @@ test("server gateway crashes after creating besu asset", async () => {
     pluginRecipientGateway,
   );
 
-  const lockEvidenceResponse = await pluginRecipientGateway.serverHelper.sendLockEvidenceResponse(
-    lockEvidenceRequest.sessionID,
-    pluginRecipientGateway,
-    false,
-  );
+  const lockEvidenceResponse =
+    await pluginRecipientGateway.serverHelper.sendLockEvidenceResponse(
+      lockEvidenceRequest.sessionID,
+      pluginRecipientGateway,
+      false,
+    );
 
   if (lockEvidenceResponse == void 0) {
     expect(false);
@@ -778,11 +786,12 @@ test("server gateway crashes after creating besu asset", async () => {
     pluginSourceGateway,
   );
 
-  const commitPreparationRequest = await pluginSourceGateway.clientHelper.sendCommitPreparationRequest(
-    sessionID,
-    pluginSourceGateway,
-    false,
-  );
+  const commitPreparationRequest =
+    await pluginSourceGateway.clientHelper.sendCommitPreparationRequest(
+      sessionID,
+      pluginSourceGateway,
+      false,
+    );
 
   if (commitPreparationRequest == void 0) {
     expect(false);
@@ -794,11 +803,12 @@ test("server gateway crashes after creating besu asset", async () => {
     pluginRecipientGateway,
   );
 
-  const commitPreparationResponse = await pluginRecipientGateway.serverHelper.sendCommitPreparationResponse(
-    lockEvidenceRequest.sessionID,
-    pluginRecipientGateway,
-    false,
-  );
+  const commitPreparationResponse =
+    await pluginRecipientGateway.serverHelper.sendCommitPreparationResponse(
+      lockEvidenceRequest.sessionID,
+      pluginRecipientGateway,
+      false,
+    );
 
   if (commitPreparationResponse == void 0) {
     expect(false);
@@ -812,11 +822,12 @@ test("server gateway crashes after creating besu asset", async () => {
 
   await pluginSourceGateway.deleteAsset(sessionID);
 
-  const commitFinalRequest = await pluginSourceGateway.clientHelper.sendCommitFinalRequest(
-    sessionID,
-    pluginSourceGateway,
-    false,
-  );
+  const commitFinalRequest =
+    await pluginSourceGateway.clientHelper.sendCommitFinalRequest(
+      sessionID,
+      pluginSourceGateway,
+      false,
+    );
 
   if (commitFinalRequest == void 0) {
     expect(false);
@@ -838,7 +849,7 @@ test("server gateway crashes after creating besu asset", async () => {
   expressApp.use(bodyParser.json({ limit: "250mb" }));
   recipientGatewayServer = http.createServer(expressApp);
   const listenOptions: IListenOptions = {
-    hostname: "localhost",
+    hostname: "127.0.0.1",
     port: 5000,
     server: recipientGatewayServer,
   };

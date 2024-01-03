@@ -3,10 +3,9 @@
   "info": {
     "title": "Hyperledger Cactus Example - Carbon Accounting App",
     "description": "Demonstrates how a business use case can be satisfied with Cactus when multiple distinct ledgers are involved.",
-    "version": "0.2.0",
+    "version": "v2.0.0-alpha.2",
     "license": {
       "name": "Apache-2.0",
-
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     }
   },
@@ -156,7 +155,7 @@
       "post": {
         "operationId": "enrollAdminV1",
         "summary": "Registers an admin account within the Fabric organization specified.",
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "authz": {
             "isProtected": true,
             "requiredRoles": ["group:admin"]
@@ -193,7 +192,7 @@
       "post": {
         "operationId": "daoTokenGetAllowanceV1",
         "summary": "Get the number of tokens `spender` is approved to spend on behalf of `account`",
-        "x-hyperledger-cactus": {
+        "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
             "path": "/api/v1/plugins/@hyperledger/cactus-example-carbon-accounting-backend/dao-token/get-allowance"
@@ -209,22 +208,22 @@
           }
         },
         "responses": {
-          "404": {
-            "description": "NOT_FOUND",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DaoTokenGetAllowanceNotFoundResponse"
-                }
-              }
-            }
-          },
           "200": {
             "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/DaoTokenGetAllowanceResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NOT_FOUND",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DaoTokenGetAllowanceNotFoundResponse"
                 }
               }
             }

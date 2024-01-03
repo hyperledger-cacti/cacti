@@ -6,7 +6,7 @@
 import { Observable, ReplaySubject } from "rxjs";
 import { finalize } from "rxjs/operators";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const io = require("socket.io-client");
+const io = require("socket.io-client-fixed-types");
 import { Logger, Checks } from "@hyperledger/cactus-common";
 import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
 import { Constants, ISocketApiClient } from "@hyperledger/cactus-core-api";
@@ -32,7 +32,8 @@ export class Iroha2ApiClientOptions extends Configuration {
  */
 export class Iroha2ApiClient
   extends DefaultApi
-  implements ISocketApiClient<WatchBlocksResponseV1> {
+  implements ISocketApiClient<WatchBlocksResponseV1>
+{
   public readonly className = "Iroha2ApiClient";
 
   private readonly log: Logger;

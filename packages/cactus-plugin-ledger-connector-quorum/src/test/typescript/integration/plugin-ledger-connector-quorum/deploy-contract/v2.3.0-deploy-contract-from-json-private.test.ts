@@ -234,9 +234,8 @@ describe("PluginLedgerConnectorQuorum", () => {
   it("Can run private transactions", async () => {
     const signingAddr = keys.quorum.member1.accountAddress;
 
-    const txCount = await web3JsQuorumMember1.eth.getTransactionCount(
-      signingAddr,
-    );
+    const txCount =
+      await web3JsQuorumMember1.eth.getTransactionCount(signingAddr);
 
     const deployRes = await connector1.deployContract({
       bytecode: HelloWorldContractJson.bytecode,

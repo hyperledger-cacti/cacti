@@ -21,7 +21,7 @@ import {
   LogLevelDesc,
   Servers,
 } from "@hyperledger/cactus-common";
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 import {
   PluginLedgerConnectorIroha,
   DefaultApi as IrohaApi,
@@ -114,7 +114,7 @@ test(testCase, async (t: Test) => {
   });
 
   const listenOptions: IListenOptions = {
-    hostname: "localhost",
+    hostname: "127.0.0.1",
     port: 0,
     server,
   };
@@ -181,7 +181,7 @@ test(testCase, async (t: Test) => {
         // params: [user, domain, userPub],
       };
       await apiClient.runTransactionV1(
-        (parameters as any) as RunTransactionRequestV1,
+        parameters as any as RunTransactionRequestV1,
       );
     } catch (e) {
       t2.equal(
@@ -214,7 +214,7 @@ test(testCase, async (t: Test) => {
         fake: 4,
       };
       await apiClient.runTransactionV1(
-        (parameters as any) as RunTransactionRequestV1,
+        parameters as any as RunTransactionRequestV1,
       );
     } catch (e) {
       t2.equal(

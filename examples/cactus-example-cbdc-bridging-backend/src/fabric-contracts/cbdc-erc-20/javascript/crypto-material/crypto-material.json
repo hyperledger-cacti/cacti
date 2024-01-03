@@ -6,17 +6,17 @@
     "userA": {
       "ethAddress": "0x1A86D6f4b5D30A07D1a94bb232eF916AFe5DbDbc",
       "privateKey": "0xb47c3ba5a816dbbb2271db721e76e6c80e58fe54972d26a42f00bc97a92a2535",
-      "fabricID": "x509::/OU=client/OU=org1/OU=department1/CN=userA::/C=US/ST=North Carolina/L=Durham/O=org1.example.com/CN=ca.org1.example.com"
+      "fabricID": "x509::/OU=org1/OU=client/OU=department1/CN=userA::/C=US/ST=North Carolina/L=Durham/O=org1.example.com/CN=ca.org1.example.com"
     },
     "bridge": {
       "ethAddress": "0xf28d5769171bfbD2B3628d722e58129a6aE15022",
       "privateKey": "0x2917bd3b0dced512d3555f171a0979fedd37bb0593883089396d9b893aa0505d",
-      "fabricID": "x509::/OU=client/OU=org2/OU=department1/CN=bridge::/C=UK/ST=Hampshire/L=Hursley/O=org2.example.com/CN=ca.org2.example.com"
+      "fabricID": "x509::/OU=org2/OU=client/OU=department1/CN=bridge::/C=UK/ST=Hampshire/L=Hursley/O=org2.example.com/CN=ca.org2.example.com"
     },
     "userB": {
       "ethAddress": "0xB264c626D7D09789AbfD2a431A28a054366e7b63",
       "privateKey": "0xfe95d40663e60e9a8a2e1f4153c9e207ac26d928e8a5631647735d91e93be402",
-      "fabricID": "x509::/OU=client/OU=org1/OU=department1/CN=userB::/C=US/ST=North Carolina/L=Durham/O=org1.example.com/CN=ca.org1.example.com"
+      "fabricID": "x509::/OU=org1/OU=client/OU=department1/CN=userB::/C=US/ST=North Carolina/L=Durham/O=org1.example.com/CN=ca.org1.example.com"
     }
   }
 }

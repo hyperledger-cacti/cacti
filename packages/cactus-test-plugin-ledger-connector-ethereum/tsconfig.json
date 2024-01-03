@@ -8,10 +8,7 @@
     "rootDir": "./src",
     "tsBuildInfoFile": "../../.build-cache/cactus-test-plugin-ledger-connector-ethereum.tsbuildinfo"
   },
-  "include": [
-    "./src",
-    "src/**/*.json"
-  ],
+  "include": ["./src", "src/**/*.json"],
   "references": [
     {
       "path": "../cactus-cmd-api-server/tsconfig.json"
@@ -33,6 +30,9 @@
     },
     {
       "path": "../cactus-test-tooling/tsconfig.json"
+    },
+    {
+      "path": "../cactus-test-geth-ledger/tsconfig.json"
     }
   ]
 }

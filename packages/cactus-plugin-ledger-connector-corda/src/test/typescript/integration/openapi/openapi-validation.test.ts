@@ -181,7 +181,7 @@ test(testCase, async (t: Test) => {
   });
 
   test(`${testCase} - ${fInvoke} - ${cOk}`, async (t2: Test) => {
-    const req: InvokeContractV1Request = ({
+    const req: InvokeContractV1Request = {
       flowFullClassName: "net.corda.samples.obligation.flows.IOUIssueFlow",
       flowInvocationType: FlowInvocationType.TrackedFlowDynamic,
       params: [
@@ -418,7 +418,7 @@ test(testCase, async (t: Test) => {
         },
       ],
       timeoutMs: 60000,
-    } as unknown) as InvokeContractV1Request;
+    } as unknown as InvokeContractV1Request;
 
     const res = await apiClient.invokeContractV1(req);
     t2.ok(res, "InvokeContractV1Request truthy OK");
@@ -428,9 +428,9 @@ test(testCase, async (t: Test) => {
 
   test(`${testCase} - ${fDeploy} - ${cWithoutParams}`, async (t2: Test) => {
     try {
-      const depReq = ({
+      const depReq = {
         jarFiles,
-      } as unknown) as DeployContractJarsV1Request;
+      } as unknown as DeployContractJarsV1Request;
       await apiClient.deployContractJarsV1(depReq);
       t2.fail(`${fDeploy} - ${cWithoutParams}: should fail`);
     } catch (e) {
@@ -445,11 +445,11 @@ test(testCase, async (t: Test) => {
 
   test(`${testCase} - ${fInvoke} - ${cWithoutParams}`, async (t2: Test) => {
     try {
-      const req = ({
+      const req = {
         flowFullClassName: "net.corda.samples.obligation.flows.IOUIssueFlow",
         flowInvocationType: FlowInvocationType.TrackedFlowDynamic,
         timeoutMs: 60000,
-      } as unknown) as InvokeContractV1Request;
+      } as unknown as InvokeContractV1Request;
       await apiClient.invokeContractV1(req);
       t2.fail(`${fInvoke} - ${cWithoutParams}: should fail`);
     } catch (e) {
@@ -498,7 +498,7 @@ test(testCase, async (t: Test) => {
 
   test(`${testCase} - ${fDiagnose} - ${cInvalidParams}`, async (t2: Test) => {
     try {
-      const req = ({ fake: 4 } as unknown) as DiagnoseNodeV1Request;
+      const req = { fake: 4 } as unknown as DiagnoseNodeV1Request;
       await apiClient.diagnoseNodeV1(req);
       t2.fail(`${fDiagnose} - ${cInvalidParams}: should fail`);
     } catch (e) {
@@ -512,7 +512,7 @@ test(testCase, async (t: Test) => {
   });
 
   test(`${testCase} - ${fInvoke} - ${cInvalidParams}`, async (t2: Test) => {
-    const req: InvokeContractV1Request = ({
+    const req: InvokeContractV1Request = {
       flowFullClassName: "net.corda.samples.obligation.flows.IOUIssueFlow",
       flowInvocationType: FlowInvocationType.TrackedFlowDynamic,
       params: [
@@ -750,7 +750,7 @@ test(testCase, async (t: Test) => {
       ],
       timeoutMs: 60000,
       fake: 4,
-    } as unknown) as InvokeContractV1Request;
+    } as unknown as InvokeContractV1Request;
 
     try {
       await apiClient.invokeContractV1(req);

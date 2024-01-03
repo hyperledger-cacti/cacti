@@ -16,11 +16,6 @@ In this example, we use the Sawtooth intkey transaction processor as an applicat
 
 ## Prerequisites
 
-- Available ports:
-  - `5034`: the port of `cactus-cmd-socketio-server`
-  - `5050`: the port of `cactus-plugin-ledger-connector-go-ethereum-socketio`
-  - `5140`: the port of `cactus-plugin-ledger-connector-sawtooth-socketio`
-  - You can modify port exported to the host in `./docker-compose.yml`
 - Available directory (This directory must be empty):
   - `./etc/cactus`: the directory for storing the config files of `cactus-cmd-socketio-server`, will be mounted by the containers.
 
@@ -60,16 +55,6 @@ In this example, we use the Sawtooth intkey transaction processor as an applicat
    ```
    cmd-socketio-base-dummy    | OK - Exit
    cmd-socketio-base-dummy exited with code 0
-   cactus-example-electricity-trade-ethereum-validator |
-   cactus-example-electricity-trade-ethereum-validator | > @hyperledger/cactus-plugin-ledger-connector-go-ethereum-socketio@1.0.0-rc.3 start /root/cactus
-   cactus-example-electricity-trade-ethereum-validator | > cd ./dist && node common/core/bin/www.js
-   cactus-example-electricity-trade-ethereum-validator |
-   cactus-example-electricity-trade-ethereum-validator | listening on *:5050
-   cactus-example-electricity-trade-sawtooth-validator |
-   cactus-example-electricity-trade-sawtooth-validator | > @hyperledger/cactus-plugin-ledger-connector-sawtooth-socketio@1.0.0-rc.3 start /root/cactus
-   cactus-example-electricity-trade-sawtooth-validator | > cd ./dist && node common/core/bin/www.js
-   cactus-example-electricity-trade-sawtooth-validator |
-   cactus-example-electricity-trade-sawtooth-validator | listening on *:5140
    cactus-example-electricity-trade-blp      | [2022-02-14T15:47:47.312] [INFO] www - Using BLP with id = h40Q9eMD
    cactus-example-electricity-trade-blp      | start Dynamic loading.
    cactus-example-electricity-trade-blp      | path: /api/v1/bl/cactus-example-electricity-trade/, routerJs: /root/cactus/dist/cactus-example-electricity-trade.js
@@ -83,9 +68,6 @@ For development purposes, it might be useful to run the sample application outsi
 
 1. Configure cactus and start the ledgers as described above.
 1. Run `./script-dockerless-config-patch.sh` from `cactus-example-electricity-trade/` directory. This will patch the configs and copy it to global location.
-1. Start validators (each in separate cmd window).
-   1. `cd packages/cactus-plugin-ledger-connector-go-ethereum-socketio/ && npm run start`
-   1. `cd packages/cactus-plugin-ledger-connector-sawtooth-socketio/ && npm run start`
 1. Start electricity-trade: `npm run start-dockerless`
 
 ## How to use this application
@@ -103,10 +85,10 @@ For development purposes, it might be useful to run the sample application outsi
 
    ```
    # Source Eth balance:
-   {"status":200,"amount":100000}
+   100000
 
    # Destination Eth balance:
-   {"status":200,"amount":0}
+   0
 
    # Electricity usage
    ```
@@ -155,7 +137,7 @@ For development purposes, it might be useful to run the sample application outsi
    }
    ```
 
-1. (Optional) Check the balance on Ethereum accounts using the following script
+1. (Optional) Check the balance on Ethereum accounts using the following script (after `##remittanceTransaction sendAsyncRequest finish` is printed)
 
    - `./script-get-app.sh`
 
@@ -163,10 +145,10 @@ For development purposes, it might be useful to run the sample application outsi
 
    ```
    # Source Eth balance:
-   {"status":200,"amount":99976}
+   99976
 
    # Destination Eth balance:
-   {"status":200,"amount":24}
+   24
 
    # Electricity usage
    MI000001: 74

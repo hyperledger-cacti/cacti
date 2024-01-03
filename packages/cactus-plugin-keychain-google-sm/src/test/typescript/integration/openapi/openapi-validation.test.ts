@@ -45,7 +45,7 @@ test(testCase, async (t: Test) => {
   expressApp.use(bodyParser.json({ limit: "250mb" }));
   const server = http.createServer(expressApp);
   const listenOptions: IListenOptions = {
-    hostname: "localhost",
+    hostname: "127.0.0.1",
     port: 0,
     server,
   };
@@ -109,9 +109,9 @@ test(testCase, async (t: Test) => {
 
   test(`${testCase} - ${fSet} - ${cWithoutParams}`, async (t2: Test) => {
     try {
-      await apiClient.setKeychainEntryV1(({
+      await apiClient.setKeychainEntryV1({
         value,
-      } as any) as SetKeychainEntryRequestV1);
+      } as any as SetKeychainEntryRequestV1);
     } catch (e) {
       t2.equal(
         e.response.status,
@@ -129,7 +129,7 @@ test(testCase, async (t: Test) => {
   test(`${testCase} - ${fGet} - ${cWithoutParams}`, async (t2: Test) => {
     try {
       await apiClient.getKeychainEntryV1(
-        ({} as any) as GetKeychainEntryRequestV1,
+        {} as any as GetKeychainEntryRequestV1,
       );
     } catch (e) {
       t2.equal(
@@ -148,7 +148,7 @@ test(testCase, async (t: Test) => {
   test(`${testCase} - ${fHas} - ${cWithoutParams}`, async (t2: Test) => {
     try {
       await apiClient.hasKeychainEntryV1(
-        ({} as any) as HasKeychainEntryRequestV1,
+        {} as any as HasKeychainEntryRequestV1,
       );
     } catch (e) {
       t2.equal(
@@ -167,7 +167,7 @@ test(testCase, async (t: Test) => {
   test(`${testCase} - ${fDelete} - ${cWithoutParams}`, async (t2: Test) => {
     try {
       await apiClient.deleteKeychainEntryV1(
-        ({} as any) as DeleteKeychainEntryRequestV1,
+        {} as any as DeleteKeychainEntryRequestV1,
       );
     } catch (e) {
       t2.equal(
@@ -185,11 +185,11 @@ test(testCase, async (t: Test) => {
 
   test(`${testCase} - ${fSet} - ${cInvalidParams}`, async (t2: Test) => {
     try {
-      await apiClient.setKeychainEntryV1(({
+      await apiClient.setKeychainEntryV1({
         key,
         value,
         fake: 4,
-      } as any) as SetKeychainEntryRequestV1);
+      } as any as SetKeychainEntryRequestV1);
     } catch (e) {
       t2.equal(
         e.response.status,
@@ -209,10 +209,10 @@ test(testCase, async (t: Test) => {
 
   test(`${testCase} - ${fGet} - ${cInvalidParams}`, async (t2: Test) => {
     try {
-      await apiClient.getKeychainEntryV1(({
+      await apiClient.getKeychainEntryV1({
         key,
         fake: 4,
-      } as any) as GetKeychainEntryRequestV1);
+      } as any as GetKeychainEntryRequestV1);
     } catch (e) {
       t2.equal(
         e.response.status,
@@ -232,10 +232,10 @@ test(testCase, async (t: Test) => {
 
   test(`${testCase} - ${fHas} - ${cInvalidParams}`, async (t2: Test) => {
     try {
-      await apiClient.hasKeychainEntryV1(({
+      await apiClient.hasKeychainEntryV1({
         key,
         fake: 4,
-      } as any) as HasKeychainEntryRequestV1);
+      } as any as HasKeychainEntryRequestV1);
     } catch (e) {
       t2.equal(
         e.response.status,
@@ -255,10 +255,10 @@ test(testCase, async (t: Test) => {
 
   test(`${testCase} - ${fDelete} - ${cInvalidParams}`, async (t2: Test) => {
     try {
-      await apiClient.deleteKeychainEntryV1(({
+      await apiClient.deleteKeychainEntryV1({
         key,
         fake: 4,
-      } as any) as DeleteKeychainEntryRequestV1);
+      } as any as DeleteKeychainEntryRequestV1);
     } catch (e) {
       t2.equal(
         e.response.status,

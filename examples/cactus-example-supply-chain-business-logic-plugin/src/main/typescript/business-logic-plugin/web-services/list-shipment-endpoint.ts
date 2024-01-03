@@ -38,7 +38,7 @@ export class ListShipmentEndpoint implements IWebServiceEndpoint {
     return ListShipmentEndpoint.CLASS_NAME;
   }
 
-  public getOasPath(): typeof OAS.paths["/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-shipment"] {
+  public getOasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-shipment"] {
     return OAS.paths[
       "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-shipment"
     ];
@@ -46,12 +46,12 @@ export class ListShipmentEndpoint implements IWebServiceEndpoint {
 
   getPath(): string {
     const apiPath = this.getOasPath();
-    return apiPath.get["x-hyperledger-cactus"].http.path;
+    return apiPath.get["x-hyperledger-cacti"].http.path;
   }
 
   getVerbLowerCase(): string {
     const apiPath = this.getOasPath();
-    return apiPath.get["x-hyperledger-cactus"].http.verbLowerCase;
+    return apiPath.get["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getOperationId(): string {

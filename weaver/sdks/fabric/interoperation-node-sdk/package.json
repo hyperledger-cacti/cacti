@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cacti-weaver-sdk-fabric",
-  "version": "2.0.0-alpha.1",
+  "version": "2.0.0-alpha.2",
   "description": "Supplemental library to 'fabric-client' with functions for relay-based cross-network interactions",
   "keywords": [
     "hyperledger",
@@ -38,13 +38,13 @@
     ]
   },
   "dependencies": {
-    "@grpc/grpc-js": "1.9.0",
+    "@grpc/grpc-js": "1.9.5",
     "@grpc/proto-loader": "0.7.8",
-    "@hyperledger/cacti-weaver-protos-js": "2.0.0-alpha.1",
+    "@hyperledger/cacti-weaver-protos-js": "2.0.0-alpha.2",
     "elliptic": "6.5.4",
-    "fabric-common": "2.2.18",
-    "fabric-network": "2.2.18",
-    "fabric-protos": "2.2.18",
+    "fabric-common": "2.2.19",
+    "fabric-network": "2.2.19",
+    "fabric-protos": "2.2.19",
     "js-sha3": "0.8.0",
     "jsrsasign": "10.8.6",
     "log4js": "6.9.1",
@@ -63,7 +63,7 @@
     "eslint-config-airbnb-base": "14.2.1",
     "eslint-config-prettier": "8.10.0",
     "eslint-plugin-import": "2.28.1",
-    "eslint-plugin-prettier": "3.4.1",
+    "eslint-plugin-prettier": "5.0.0",
     "mocha": "5.2.0",
     "nyc": "12.0.2",
     "prettier": "2.8.8",
@@ -76,8 +76,8 @@
     "typescript": "4.9.5"
   },
   "engines": {
-    "node": ">=10.15.3 <=16.17.1",
-    "npm": ">=6.0.0 <=8.15.0"
+    "node": ">=18",
+    "npm": ">=8"
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/hyperledger"

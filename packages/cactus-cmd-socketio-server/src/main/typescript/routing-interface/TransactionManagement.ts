@@ -5,7 +5,7 @@
  * TransactionManagement.ts
  */
 
-import { Request } from "express";
+import type { Request } from "express";
 import { BusinessLogicPlugin } from "../business-logic-plugin/BusinessLogicPlugin";
 import { BLPRegistry } from "./util/BLPRegistry";
 import { IVerifierEventListener, LedgerEvent } from "../verifier/LedgerPlugin";

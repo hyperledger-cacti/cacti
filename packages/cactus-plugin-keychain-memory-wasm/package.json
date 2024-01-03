@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-plugin-keychain-memory-wasm",
-  "version": "2.0.0-alpha.1",
+  "version": "2.0.0-alpha.2",
   "description": "Dummy keychain implementation doing NO encryption and storing everything in-memory. Only suitable for development and testing. Same as the non-wasm version but this one has the backing implementation written in Rust and compiled down to WebAssembly.",
   "keywords": [
     "Hyperledger",
@@ -49,8 +49,8 @@
     "del-wasm-pack-project-files": "del-cli src/main/typescript/generated/wasm-pack/{package.json,README.md,.gitignore}",
     "generate-rust-server": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g rust-server -o ./src/main/rust/generated/openapi/rust-server",
     "generate-sdk": "run-p 'generate-sdk:*'",
-    "generate-sdk:kotlin": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g kotlin -o ./src/main/kotlin/generated/openapi/kotlin-client/ --reserved-words-mappings protected=protected",
-    "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected",
+    "generate-sdk:kotlin": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g kotlin -o ./src/main/kotlin/generated/openapi/kotlin-client/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
+    "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
     "wasm-pack": "CARGO_TARGET_DIR=${PWD}/dist/target-rustc/ wasm-pack build src/main/rust/cactus-plugin-keychain-memory-wasm/ --release --scope=hyperledger --target=nodejs --out-dir=../../../../src/main/typescript/generated/wasm-pack/",
     "postwasm-pack": "run-s del-wasm-pack-project-files copy-wasm-bg",
     "watch": "npm-watch",
@@ -60,22 +60,24 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
-    "@hyperledger/cactus-common": "2.0.0-alpha.1",
-    "@hyperledger/cactus-core": "2.0.0-alpha.1",
-    "@hyperledger/cactus-core-api": "2.0.0-alpha.1",
-    "axios": "0.21.4",
-    "express": "4.17.1",
+    "@hyperledger/cactus-common": "2.0.0-alpha.2",
+    "@hyperledger/cactus-core": "2.0.0-alpha.2",
+    "@hyperledger/cactus-core-api": "2.0.0-alpha.2",
+    "axios": "1.6.0",
+    "express": "4.18.2",
     "prom-client": "13.2.0",
     "uuid": "8.3.2"
   },
   "devDependencies": {
-    "@types/express": "4.17.13",
+    "@types/body-parser": "1.19.4",
+    "@types/express": "4.17.19",
+    "body-parser": "1.20.2",
     "cpy-cli": "4.2.0",
     "del-cli": "4.0.1"
   },
   "engines": {
-    "node": ">=10",
-    "npm": ">=6"
+    "node": ">=18",
+    "npm": ">=8"
   },
   "publishConfig": {
     "access": "public"

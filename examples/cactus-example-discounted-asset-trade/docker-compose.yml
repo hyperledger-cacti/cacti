@@ -12,40 +12,6 @@ services:
       context: ../../packages/cactus-cmd-socketio-server/
     command: ["echo", "OK - Exit"]
 
-  fabric-socketio-validator:
-    container_name: cactus-example-discounted-asset-trade-fabric-socketio-validator
-    image: cactus-plugin-ledger-connector-fabric-socketio
-    build:
-      context: ../../packages/cactus-plugin-ledger-connector-fabric-socketio/
-    ports:
-      - "5040:5040"
-    depends_on:
-      - cmd-socketio-base-image
-    volumes:
-        - type: bind
-          source: ./etc/cactus
-          target: /etc/cactus
-    networks:
-      - fabric-all-in-one_testnet-2x
-      - cactus-example-discounted-asset-trade-net
-
-  ethereum-validator:
-    container_name: cactus-example-discounted-asset-trade-ethereum-validator
-    image: cactus-plugin-ledger-connector-go-ethereum-socketio
-    build:
-      context: ../../packages/cactus-plugin-ledger-connector-go-ethereum-socketio/
-    ports:
-      - "5050:5050"
-    depends_on:
-      - cmd-socketio-base-image
-    volumes:
-        - type: bind
-          source: ./etc/cactus
-          target: /etc/cactus
-    networks:
-     - geth1net
-     - cactus-example-discounted-asset-trade-net
-
   indy-sdk-cli-base-image:
     # Build base image and immediately exit
     container_name: indy-sdk-cli-base-dummy
@@ -55,10 +21,10 @@ services:
     command: ["echo", "OK - Exit"]
 
   indy-validator:
-    container_name:  cactus-example-discounted-asset-trade-indy-validator
+    container_name: cactus-example-discounted-asset-trade-indy-validator
     image: cactus_validator_socketio_indy
     environment:
-    - TEST_POOL_IP=172.16.0.2
+      - TEST_POOL_IP=172.16.0.2
     depends_on:
       - indy-sdk-cli-base-image
     build:
@@ -67,9 +33,9 @@ services:
     ports:
       - "8000:8000"
     volumes:
-        - type: bind
-          source: ./etc/cactus
-          target: /etc/cactus
+      - type: bind
+        source: ./etc/cactus
+        target: /etc/cactus
     networks:
       - indy-testnet_indy_net
 
@@ -96,23 +62,21 @@ services:
     ports:
       - "5034:5034"
     networks:
-     - cactus-example-discounted-asset-trade-net
+      - cactus-example-discounted-asset-trade-net
     depends_on:
-      - fabric-socketio-validator
-      - ethereum-validator
       - indy-validator-nginx
       - cmd-socketio-base-image
       - indy-sdk-cli-base-image
     volumes:
-        - type: bind
-          source: ./etc/cactus
-          target: /etc/cactus
+      - type: bind
+        source: ./etc/cactus
+        target: /etc/cactus
 
   register-indy-data:
     container_name: register-indy-data
     image: register-indy-data
     environment:
-    - TEST_POOL_IP=172.16.0.2
+      - TEST_POOL_IP=172.16.0.2
     build:
       context: ../register-indy-data
     networks:
@@ -120,16 +84,14 @@ services:
     depends_on:
       - cactus-example-discounted-asset-trade-blp
     volumes:
-        - type: bind
-          source: ./etc/cactus
-          target: /etc/cactus
+      - type: bind
+        source: ./etc/cactus
+        target: /etc/cactus
     # One-off command executed in container that will store a proof in /etc/cactus
-    command: [ "--proof_only" ]
+    command: ["--proof_only"]
 
 networks:
   fabric-all-in-one_testnet-2x:
-    external: true
-  geth1net:
     external: true
   indy-testnet_indy_net:
     external: true

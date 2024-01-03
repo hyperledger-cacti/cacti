@@ -11,7 +11,6 @@ import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
 import javax.validation.Valid
-import io.swagger.v3.oas.annotations.media.Schema
 
 /**
  * 
@@ -19,9 +18,7 @@ import io.swagger.v3.oas.annotations.media.Schema
  */
 data class ListFlowsV1Request(
 
-    @Schema(example = "null", description = "")
     @get:JsonProperty("filter") val filter: kotlin.String? = null
 ) {
 
 }
-

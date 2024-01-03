@@ -37,22 +37,6 @@ yarn run configure
 
 Instantiate a new `PluginPersistenceFabrickBlock` instance:
 
-There is few ways to use this plugin:
-
-1.  Using Watch block might cause infinite loop
-    and function migrateBlockNrWithTransactions
-2.  Individually using migrateBlockNrWithTransactions
-    if you know which exactly which blocks you want to analyze
-3.  Using plugin function continueBlocksSynchronization in some periodical calls
-4.  Using plugin function continuousBlocksSynchronization in some reasonable time with changeSynchronization - which should break flow
-    this function might continue work for long period
-
-5) Best to start synchronization with initialBlocksSynchronization , which will transfer and parse into database number of blocks equal to edgeOfLedger
-
-6) If there were some issues in network connection or you think that your database might be corrupted and lost some data you might use whichBlocksAreMissingInDdSimple
-   and then showHowManyBlocksMissing if more than 0
-   then use synchronizeOnlyMissedBlocks
-
 ```typescript
 import { PluginPersistenceFabric } from "../../../main/typescript/plugin-fabric-persistence-block";
 import { v4 as uuidv4 } from "uuid";

@@ -20,7 +20,7 @@ import {
   LogLevelDesc,
   Servers,
 } from "@hyperledger/cactus-common";
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 import {
   PluginLedgerConnectorIroha,
   DefaultApi as IrohaApi,
@@ -107,7 +107,7 @@ test(testCase, async (t: Test) => {
   expressApp.use(bodyParser.json({ limit: "250mb" }));
   const server = http.createServer(expressApp);
   const listenOptions: IListenOptions = {
-    hostname: "localhost",
+    hostname: "127.0.0.1",
     port: 0,
     server,
   };

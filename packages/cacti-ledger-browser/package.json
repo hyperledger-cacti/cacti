@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cacti-ledger-browser",
-  "version": "2.0.0-alpha.1",
+  "version": "2.0.0-alpha.2",
   "description": "Cacti GUI for visualizing ledger data.",
   "keywords": [
     "Hyperledger",
@@ -61,14 +61,15 @@
   },
   "devDependencies": {
     "autoprefixer": "10.4.8",
-    "postcss": "8.4.16",
+    "postcss": "8.4.31",
     "supabase": "1.28.4",
-    "typescript-plugin-css-modules": "4.1.1",
+    "typescript-plugin-css-modules": "4.2.3",
     "vite": "3.0.0",
     "vite-plugin-solid": "2.3.0"
   },
   "engines": {
-    "npm": ">=6"
+    "node": ">=18",
+    "npm": ">=8"
   },
   "publishConfig": {
     "access": "public"

@@ -9,7 +9,7 @@ import { AuthorizationProtocol } from "../../../main/typescript/public-api";
 import { default_service } from "../../../main/typescript/public-api";
 import { health_check_response_pb } from "../../../main/typescript/public-api";
 import { empty } from "../../../main/typescript/public-api";
-import { RuntimeError } from "run-time-error";
+import { RuntimeError } from "run-time-error-cjs";
 
 const testCase = "API server: runs gRPC TS-proto web services";
 const logLevel: LogLevelDesc = "TRACE";
@@ -45,31 +45,33 @@ test(testCase, async (t: Test) => {
   const { address, port } = addressInfoGrpc;
   const grpcHostAndPort = `${address}:${port}`;
 
-  const apiClient = new default_service.org.hyperledger.cactus.cmd_api_server.DefaultServiceClient(
-    grpcHostAndPort,
-    grpc.credentials.createInsecure(),
-  );
+  const apiClient =
+    new default_service.org.hyperledger.cactus.cmd_api_server.DefaultServiceClient(
+      grpcHostAndPort,
+      grpc.credentials.createInsecure(),
+    );
   t.ok(apiClient, "apiClient truthy OK");
 
-  const responsePromise = new Promise<
-    health_check_response_pb.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB
-  >((resolve, reject) => {
-    apiClient.GetHealthCheckV1(
-      new empty.google.protobuf.Empty(),
-      (
-        error: grpc.ServiceError | null,
-        response?: health_check_response_pb.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB,
-      ) => {
-        if (error) {
-          reject(error);
-        } else if (response) {
-          resolve(response);
-        } else {
-          throw new RuntimeError("No error, nor response received.");
-        }
+  const responsePromise =
+    new Promise<health_check_response_pb.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB>(
+      (resolve, reject) => {
+        apiClient.GetHealthCheckV1(
+          new empty.google.protobuf.Empty(),
+          (
+            error: grpc.ServiceError | null,
+            response?: health_check_response_pb.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB,
+          ) => {
+            if (error) {
+              reject(error);
+            } else if (response) {
+              resolve(response);
+            } else {
+              throw new RuntimeError("No error, nor response received.");
+            }
+          },
+        );
       },
     );
-  });
 
   await t.doesNotReject(responsePromise, "No error in healthcheck OK");
   const res = await responsePromise;

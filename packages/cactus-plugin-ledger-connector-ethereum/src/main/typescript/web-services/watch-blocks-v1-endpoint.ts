@@ -1,17 +1,24 @@
+import Web3, { BlockHeaderOutput, FMT_BYTES, FMT_NUMBER } from "web3";
+import { NewHeadsSubscription } from "web3-eth";
+import { Socket as SocketIoSocket } from "socket.io";
+
 import {
   Logger,
   LogLevelDesc,
   LoggerProvider,
   Checks,
+  safeStringifyException,
 } from "@hyperledger/cactus-common";
 import {
   WatchBlocksV1Options,
   WatchBlocksV1Progress,
   WatchBlocksV1,
-  WatchBlocksV1BlockData,
+  Web3Transaction,
 } from "../generated/openapi/typescript-axios";
-import { Socket as SocketIoSocket } from "socket.io";
-import Web3 from "web3";
+import {
+  ConvertWeb3ReturnToString,
+  Web3StringReturnFormat,
+} from "../types/util-types";
 
 export interface IWatchBlocksV1EndpointConfiguration {
   logLevel?: LogLevelDesc;
@@ -50,54 +57,75 @@ export class WatchBlocksV1Endpoint {
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public async subscribe(): Promise<void> {
+  public async subscribe(): Promise<NewHeadsSubscription> {
     const { socket, log, web3, isGetBlockData } = this;
-    log.debug(`${WatchBlocksV1.Subscribe} => ${socket.id}`);
+    log.info(`${WatchBlocksV1.Subscribe} => ${socket.id}`);
 
-    const sub = web3.eth.subscribe(
+    const newBlocksSubscription = await web3.eth.subscribe(
       "newBlockHeaders",
-      async (ex, blockHeader) => {
-        log.debug("newBlockHeaders: Error=%o BlockHeader=%o", ex, blockHeader);
-
-        if (ex) {
-          socket.emit(WatchBlocksV1.Error, ex.message);
-          sub.unsubscribe();
-        } else if (blockHeader) {
-          let next: WatchBlocksV1Progress;
-
-          if (isGetBlockData) {
-            const web3BlockData = await web3.eth.getBlock(
-              blockHeader.hash,
-              true,
-            );
-
-            next = {
-              // difficulty and totalDifficulty returned from the ledger are string, forcing typecast
-              blockData: (web3BlockData as unknown) as WatchBlocksV1BlockData,
-            };
-          } else {
-            next = { blockHeader };
-          }
-
-          socket.emit(WatchBlocksV1.Next, next);
-        }
-      },
+      undefined,
+      Web3StringReturnFormat,
     );
+
+    newBlocksSubscription.on("data", async (blockHeader) => {
+      log.debug("newBlockHeaders: BlockHeader=%o", blockHeader);
+      let next: WatchBlocksV1Progress;
+
+      if (isGetBlockData) {
+        const web3BlockData = await web3.eth.getBlock(
+          blockHeader.number,
+          true,
+          {
+            number: FMT_NUMBER.STR,
+            bytes: FMT_BYTES.HEX,
+          },
+        );
+        next = {
+          blockData: {
+            ...web3BlockData,
+            // Return with full tx objects is not detected, must manually force correct type
+            transactions: (web3BlockData.transactions ??
+              []) as unknown as Web3Transaction[],
+          },
+        };
+      } else {
+        // Force fix type of sha3Uncles
+        let sha3Uncles: string = blockHeader.sha3Uncles as unknown as string;
+        if (Array.isArray(blockHeader.sha3Uncles)) {
+          sha3Uncles = blockHeader.sha3Uncles.toString();
+        }
+
+        next = {
+          blockHeader: {
+            ...(blockHeader as ConvertWeb3ReturnToString<BlockHeaderOutput>),
+            sha3Uncles,
+          },
+        };
+      }
+
+      socket.emit(WatchBlocksV1.Next, next);
+    });
+
+    newBlocksSubscription.on("error", async (error) => {
+      console.log("Error when subscribing to New block header: ", error);
+      socket.emit(WatchBlocksV1.Error, safeStringifyException(error));
+      newBlocksSubscription.unsubscribe();
+    });
 
     log.debug("Subscribing to Web3 new block headers event...");
 
     socket.on("disconnect", async (reason: string) => {
-      log.debug("WebSocket:disconnect reason=%o", reason);
-      sub.unsubscribe((ex: Error, success: boolean) => {
-        log.debug("Web3 unsubscribe success=%o, ex=%", success, ex);
-      });
+      log.info("WebSocket:disconnect reason=%o", reason);
+      await newBlocksSubscription.unsubscribe();
     });
 
-    socket.on(WatchBlocksV1.Unsubscribe, () => {
+    socket.on(WatchBlocksV1.Unsubscribe, async () => {
       log.debug(`${WatchBlocksV1.Unsubscribe}: unsubscribing Web3...`);
-      sub.unsubscribe((ex: Error, success: boolean) => {
-        log.debug("Web3 unsubscribe error=%o, success=%", ex, success);
-      });
+      await newBlocksSubscription.unsubscribe();
+      log.debug("Web3 unsubscribe done.");
     });
+
+    log.debug("Subscribing to Web3 new block headers event...");
+    return newBlocksSubscription as NewHeadsSubscription;
   }
 }

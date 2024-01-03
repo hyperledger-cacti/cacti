@@ -5,7 +5,6 @@ import { Server as SocketIoServer } from "socket.io";
 import { AddressInfo } from "net";
 import { v4 as uuidv4 } from "uuid";
 import { PluginObjectStoreIpfs } from "@hyperledger/cactus-plugin-object-store-ipfs";
-import { create } from "ipfs-http-client";
 import bodyParser from "body-parser";
 import express from "express";
 import { DefaultApi as ObjectStoreIpfsApi } from "@hyperledger/cactus-plugin-object-store-ipfs";
@@ -65,6 +64,7 @@ import {
 } from "../../../main/typescript/gateway/besu-odap-gateway";
 import { ClientGatewayHelper } from "../../../main/typescript/gateway/client/client-helper";
 import { ServerGatewayHelper } from "../../../main/typescript/gateway/server/server-helper";
+
 /**
  * Use this to debug issues with the fabric node SDK
  * ```sh
@@ -136,7 +136,7 @@ beforeAll(async () => {
     expressApp.use(bodyParser.json({ limit: "250mb" }));
     ipfsServer = http.createServer(expressApp);
     const listenOptions: IListenOptions = {
-      hostname: "localhost",
+      hostname: "127.0.0.1",
       port: 0,
       server: ipfsServer,
     };
@@ -152,7 +152,8 @@ beforeAll(async () => {
 
     const ipfsApiUrl = await ipfsContainer.getApiUrl();
 
-    const ipfsClientOrOptions = create({
+    const kuboRpcModule = await import("kubo-rpc-client");
+    const ipfsClientOrOptions = kuboRpcModule.create({
       url: ipfsApiUrl,
     });
 
@@ -273,7 +274,7 @@ beforeAll(async () => {
     expressApp.use(bodyParser.json({ limit: "250mb" }));
     fabricServer = http.createServer(expressApp);
     const listenOptions: IListenOptions = {
-      hostname: "localhost",
+      hostname: "127.0.0.1",
       port: 3000,
       server: fabricServer,
     };
@@ -479,7 +480,7 @@ beforeAll(async () => {
     expressApp.use(bodyParser.json({ limit: "250mb" }));
     besuServer = http.createServer(expressApp);
     const listenOptions: IListenOptions = {
-      hostname: "localhost",
+      hostname: "127.0.0.1",
       port: 4000,
       server: besuServer,
     };
@@ -527,18 +528,19 @@ beforeAll(async () => {
 
   {
     // Gateways configuration
-    const odapClientGatewayPluginOptions: IFabricOdapGatewayConstructorOptions = {
-      name: "cactus-plugin#odapGateway",
-      dltIDs: ["DLT2"],
-      instanceId: uuidv4(),
-      ipfsPath: ipfsApiHost,
-      fabricPath: fabricPath,
-      fabricSigningCredential: fabricSigningCredential,
-      fabricChannelName: fabricChannelName,
-      fabricContractName: fabricContractName,
-      clientHelper: new ClientGatewayHelper(),
-      serverHelper: new ServerGatewayHelper(),
-    };
+    const odapClientGatewayPluginOptions: IFabricOdapGatewayConstructorOptions =
+      {
+        name: "cactus-plugin#odapGateway",
+        dltIDs: ["DLT2"],
+        instanceId: uuidv4(),
+        ipfsPath: ipfsApiHost,
+        fabricPath: fabricPath,
+        fabricSigningCredential: fabricSigningCredential,
+        fabricChannelName: fabricChannelName,
+        fabricContractName: fabricContractName,
+        clientHelper: new ClientGatewayHelper(),
+        serverHelper: new ServerGatewayHelper(),
+      };
 
     const odapServerGatewayPluginOptions: IBesuOdapGatewayConstructorOptions = {
       name: "cactus-plugin#odapGateway",
@@ -572,7 +574,7 @@ beforeAll(async () => {
     expressApp.use(bodyParser.json({ limit: "250mb" }));
     recipientGatewayServer = http.createServer(expressApp);
     const listenOptions: IListenOptions = {
-      hostname: "localhost",
+      hostname: "127.0.0.1",
       port: 5000,
       server: recipientGatewayServer,
     };
@@ -591,7 +593,7 @@ beforeAll(async () => {
     expressApp.use(bodyParser.json({ limit: "250mb" }));
     sourceGatewayServer = http.createServer(expressApp);
     const listenOptions: IListenOptions = {
-      hostname: "localhost",
+      hostname: "127.0.0.1",
       port: 3001,
       server: sourceGatewayServer,
     };

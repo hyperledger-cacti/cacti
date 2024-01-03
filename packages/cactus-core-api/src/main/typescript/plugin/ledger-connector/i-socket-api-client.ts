@@ -10,18 +10,18 @@ export interface ISocketApiClient<BlockType> {
   sendAsyncRequest?(
     contract?: Record<string, unknown>,
     method?: Record<string, unknown>,
-    args?: any,
-    baseConfig?: any,
+    args?: unknown,
+    baseConfig?: unknown,
   ): void;
 
   sendSyncRequest?(
     contract?: Record<string, unknown>,
     method?: Record<string, unknown>,
-    args?: any,
-    baseConfig?: any,
-  ): Promise<any>;
+    args?: unknown,
+    baseConfig?: unknown,
+  ): Promise<unknown>;
 
-  watchBlocksV1?(monitorOptions?: any): Observable<BlockType>;
+  watchBlocksV1?(monitorOptions?: unknown): Observable<BlockType>;
 
-  watchBlocksAsyncV1?(monitorOptions?: any): Promise<Observable<BlockType>>;
+  watchBlocksAsyncV1?(monitorOptions?: unknown): Promise<Observable<BlockType>>;
 }

@@ -27,9 +27,12 @@ export class IrohaV2PrerequisitesProvider {
   /**
    * IrohaV2 isomorphic fetch adapter
    */
-  public fetchAdapter = (undiciFetch as any) as typeof fetch;
+  public fetchAdapter = undiciFetch as any as typeof fetch;
 
-  constructor(public apiURL?: string, public telemetryURL?: string) {}
+  constructor(
+    public apiURL?: string,
+    public telemetryURL?: string,
+  ) {}
 
   /**
    * Get requirements for executing API calls on web socket protocol.

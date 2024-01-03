@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-example-cbdc-bridging-backend",
-  "version": "2.0.0-alpha.1",
+  "version": "2.0.0-alpha.2",
   "description": "An example application showing how to use Cacti when implementing a CBDC bridging application between Hyperledger Fabric and Hyperledger Besu.",
   "keywords": [
     "Hyperledger",
@@ -46,7 +46,7 @@
   "scripts": {
     "build:dev:backend:postbuild": "mkdir -p ./dist/lib/fabric-contracts && cp -r ./src/fabric-contracts/* ./dist/lib/fabric-contracts/",
     "solidity": "hardhat compile",
-    "start": "CONFIG_FILE=./example-config.json node dist/lib/main/typescript/cbdc-bridging-app-cli.js",
+    "start": "node dist/lib/main/typescript/cbdc-bridging-app-cli.js dotenv_config_path=./process.env",
     "test": "nyc cucumber-js ./src/test/typescript/cucumber/features/*.feature --require-module ts-node/register --require './src/test/typescript/cucumber/*/*.ts'",
     "watch": "npm-watch",
     "webpack": "npm-run-all webpack:dev",
@@ -55,28 +55,28 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
-    "@hyperledger/cactus-api-client": "2.0.0-alpha.1",
-    "@hyperledger/cactus-cmd-api-server": "2.0.0-alpha.1",
-    "@hyperledger/cactus-common": "2.0.0-alpha.1",
-    "@hyperledger/cactus-core": "2.0.0-alpha.1",
-    "@hyperledger/cactus-core-api": "2.0.0-alpha.1",
-    "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-alpha.1",
-    "@hyperledger/cactus-plugin-ledger-connector-besu": "2.0.0-alpha.1",
-    "@hyperledger/cactus-plugin-ledger-connector-fabric": "2.0.0-alpha.1",
-    "@hyperledger/cactus-plugin-ledger-connector-xdai": "2.0.0-alpha.1",
-    "@hyperledger/cactus-plugin-object-store-ipfs": "2.0.0-alpha.1",
-    "@hyperledger/cactus-plugin-odap-hermes": "2.0.0-alpha.1",
-    "@hyperledger/cactus-test-tooling": "2.0.0-alpha.1",
+    "@hyperledger/cactus-api-client": "2.0.0-alpha.2",
+    "@hyperledger/cactus-cmd-api-server": "2.0.0-alpha.2",
+    "@hyperledger/cactus-common": "2.0.0-alpha.2",
+    "@hyperledger/cactus-core": "2.0.0-alpha.2",
+    "@hyperledger/cactus-core-api": "2.0.0-alpha.2",
+    "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-alpha.2",
+    "@hyperledger/cactus-plugin-ledger-connector-besu": "2.0.0-alpha.2",
+    "@hyperledger/cactus-plugin-ledger-connector-fabric": "2.0.0-alpha.2",
+    "@hyperledger/cactus-plugin-ledger-connector-xdai": "2.0.0-alpha.2",
+    "@hyperledger/cactus-plugin-object-store-ipfs": "2.0.0-alpha.2",
+    "@hyperledger/cactus-plugin-odap-hermes": "2.0.0-alpha.2",
+    "@hyperledger/cactus-test-tooling": "2.0.0-alpha.2",
     "@openzeppelin/contracts": "4.9.3",
     "@openzeppelin/contracts-upgradeable": "4.9.3",
     "async-exit-hook": "2.0.1",
-    "axios": "^0.27.2",
-    "crypto-js": "4.1.1",
+    "axios": "1.6.0",
+    "crypto-js": "4.2.0",
     "dotenv": "^16.0.1",
-    "fabric-network": "2.2.10",
+    "fabric-network": "2.2.19",
     "fs-extra": "10.1.0",
-    "ipfs-http-client": "51.0.1",
     "knex": "2.5.1",
+    "kubo-rpc-client": "3.0.1",
     "nyc": "^13.1.0",
     "openapi-types": "9.1.0",
     "sqlite3": "^5.0.8",
@@ -89,7 +89,7 @@
     "@types/chai": "^4.3.1",
     "@types/crypto-js": "4.1.1",
     "@types/cucumber": "^4.0.4",
-    "@types/express": "4.17.13",
+    "@types/express": "4.17.19",
     "@types/express-jwt": "6.0.2",
     "@types/fs-extra": "9.0.13",
     "@types/node": "^10.17.60",
@@ -103,8 +103,8 @@
     "ts-node": "^7.0.1"
   },
   "engines": {
-    "node": ">=10",
-    "npm": ">=6"
+    "node": ">=18",
+    "npm": ">=8"
   },
   "publishConfig": {
     "access": "public"

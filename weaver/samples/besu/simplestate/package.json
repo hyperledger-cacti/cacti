@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cacti-weaver-besu-simplestate",
-  "version": "2.0.0-alpha.1",
+  "version": "2.0.0-alpha.2",
   "description": "Sample Besu Application for Storing Key Value Pairs",
   "keywords": [
     "ethereum",
@@ -35,9 +35,14 @@
     "chai": "4.3.7",
     "dotenv": "16.3.1",
     "ganache-cli": "6.12.2",
-    "solc": "0.8.21"
+    "solc": "0.8.21",
+    "web3": "1.10.0"
   },
   "devDependencies": {
     "truffle": "5.11.2"
+  },
+  "engines": {
+    "node": ">=18",
+    "npm": ">=8"
   }
 }

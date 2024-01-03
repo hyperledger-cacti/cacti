@@ -247,16 +247,15 @@ export class FabricOdapGateway extends PluginOdapGateway {
         params: [assetId],
       } as FabricRunTransactionRequest);
 
-      const receiptDeleteRes = await this.fabricApi.getTransactionReceiptByTxIDV1(
-        {
+      const receiptDeleteRes =
+        await this.fabricApi.getTransactionReceiptByTxIDV1({
           signingCredential: this.fabricSigningCredential,
           channelName: this.fabricChannelName,
           contractName: "qscc",
           invocationType: FabricContractInvocationType.Call,
           methodName: "GetBlockByTxID",
           params: [this.fabricChannelName, deleteRes.data.transactionId],
-        } as FabricRunTransactionRequest,
-      );
+        } as FabricRunTransactionRequest);
 
       this.log.warn(receiptDeleteRes.data);
       fabricDeleteAssetProof = JSON.stringify(receiptDeleteRes.data);

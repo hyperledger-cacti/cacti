@@ -1,6 +1,6 @@
 /**
  * Manual tests for CDL connector.
- * Must be exectued on Azure environment with access to CDL service.
+ * Must be exectued with access to CDL service.
  * Check out CDL connector readme for instructions on how to run these tests.
  */
 
@@ -8,9 +8,22 @@
 // Constants
 //////////////////////////////////
 
-const ACCESS_TOKEN = "_____FILL_TOKEN_HERE_____"
-const TOKEN_AGENT_ID = "_____FILL_AGENT_ID_HERE_____"
-const VALIDATOR_KEY_PATH = "_____FILL_KEY_PATH_HERE_____"
+// Setup: Start validator first and store it's crt under this path
+const VALIDATOR_KEY_PATH =
+  "/etc/cactus/connector-cdl-socketio/CA/connector.crt";
+
+// Setup: Obtain eitehr accessToken or subscription key and fill matching authInfo structure below.
+// const authInfo = {
+//   accessToken: "_____accessToken_____"
+//   trustAgentId: "_____trustAgentId_____",
+// };
+const authInfo = {
+  subscriptionKey: "_____subscriptionKey_____",
+  trustAgentId: "_____trustAgentId_____",
+  trustAgentRole: "_____trustAgentRole_____",
+  trustUserId: "_____trustUserId_____",
+  trustUserRole: "_____trustUserRole_____",
+};
 
 const testLogLevel: LogLevelDesc = "info";
 const sutLogLevel: LogLevelDesc = "info";
@@ -51,8 +64,7 @@ describe("CDL Connector manual tests", () => {
       {},
       {
         type: "registerHistoryData",
-        accessToken: ACCESS_TOKEN,
-        trustAgentId: TOKEN_AGENT_ID,
+        authInfo,
       },
       args,
     );
@@ -76,8 +88,7 @@ describe("CDL Connector manual tests", () => {
       {},
       {
         type: "getLineage",
-        accessToken: ACCESS_TOKEN,
-        trustAgentId: TOKEN_AGENT_ID,
+        authInfo,
       },
       args,
     );
@@ -97,8 +108,7 @@ describe("CDL Connector manual tests", () => {
       {},
       {
         type: "searchByHeader",
-        accessToken: ACCESS_TOKEN,
-        trustAgentId: TOKEN_AGENT_ID,
+        authInfo,
       },
       args,
     );
@@ -117,8 +127,7 @@ describe("CDL Connector manual tests", () => {
       {},
       {
         type: "searchByGlobalData",
-        accessToken: ACCESS_TOKEN,
-        trustAgentId: TOKEN_AGENT_ID,
+        authInfo,
       },
       args,
     );
@@ -152,7 +161,7 @@ describe("CDL Connector manual tests", () => {
     // Create ApiClient instance
     const apiConfigOptions = {
       validatorID: "cdl-connector-manual.test",
-      validatorURL: `https://localhost:${connectorAddress.port}`,
+      validatorURL: `https://127.0.0.1:${connectorAddress.port}`,
       validatorKeyPath: VALIDATOR_KEY_PATH,
       logLevel: sutLogLevel,
       maxCounterRequestID: 1000,
@@ -211,6 +220,60 @@ describe("CDL Connector manual tests", () => {
     expect(response.status).toEqual(200);
     expect(response.data.status).toEqual("OK.");
   });
+
+  test(
+    "Request fails when authInfo is missing",
+    async () => {
+      const response = await apiClient.sendSyncRequest(
+        {},
+        {
+          type: "registerHistoryData",
+        },
+        {
+          eventId: "",
+          lineageId: "",
+          tags: {},
+          properties: {
+            prop1: "shouldFail",
+            prop2: "shouldFail",
+          },
+        },
+      );
+      expect(response.status).toEqual(504);
+    },
+    syncReqTimeout * 2,
+  );
+
+  test(
+    "Request fails when mixed authInfo is used",
+    async () => {
+      const response = await apiClient.sendSyncRequest(
+        {},
+        {
+          type: "registerHistoryData",
+          authInfo: {
+            accessToken: "foo-accessToken",
+            subscriptionKey: "foo-subscriptionKey",
+            trustAgentId: "foo-trustAgentId",
+            trustAgentRole: "foo-trustAgentRole",
+            trustUserId: "foo-trustUserId",
+            trustUserRole: "foo-trustUserRole",
+          },
+        },
+        {
+          eventId: "",
+          lineageId: "",
+          tags: {},
+          properties: {
+            prop1: "shouldFail",
+            prop2: "shouldFail",
+          },
+        },
+      );
+      expect(response.status).toEqual(504);
+    },
+    syncReqTimeout * 2,
+  );
 
   test("Register single history data", async () => {
     const newEvent = await registerHistoryDataOnCDL({

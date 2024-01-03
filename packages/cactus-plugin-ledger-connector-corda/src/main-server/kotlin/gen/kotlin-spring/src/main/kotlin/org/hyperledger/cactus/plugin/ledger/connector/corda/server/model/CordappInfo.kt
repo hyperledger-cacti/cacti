@@ -12,7 +12,6 @@ import javax.validation.constraints.NotNull
 import javax.validation.constraints.Pattern
 import javax.validation.constraints.Size
 import javax.validation.Valid
-import io.swagger.v3.oas.annotations.media.Schema
 
 /**
  * A CordappInfo describes a single CorDapp currently installed on the node
@@ -29,33 +28,23 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class CordappInfo(
 
     @field:Valid
-    @Schema(example = "null", required = true, description = "")
     @get:JsonProperty("jarHash", required = true) val jarHash: SHA256,
 
-    @Schema(example = "null", required = true, description = "The name of the licence this CorDapp is released under")
     @get:JsonProperty("licence", required = true) val licence: kotlin.String,
 
-    @Schema(example = "null", required = true, description = "The minimum platform version the node must be at for the CorDapp to run")
     @get:JsonProperty("minimumPlatformVersion", required = true) val minimumPlatformVersion: kotlin.Int,
 
-    @Schema(example = "null", required = true, description = "The name of the JAR file that defines the CorDapp")
     @get:JsonProperty("name", required = true) val name: kotlin.String,
 
-    @Schema(example = "null", required = true, description = "The name of the CorDapp")
     @get:JsonProperty("shortName", required = true) val shortName: kotlin.String,
 
-    @Schema(example = "null", required = true, description = "The target platform version this CorDapp has been tested against")
     @get:JsonProperty("targetPlatformVersion", required = true) val targetPlatformVersion: kotlin.Int,
 
-    @Schema(example = "null", required = true, description = "A description of what sort of CorDapp this is - either a contract, workflow, or a combination.")
     @get:JsonProperty("type", required = true) val type: kotlin.String,
 
-    @Schema(example = "null", required = true, description = "The vendor of this CorDapp")
     @get:JsonProperty("vendor", required = true) val vendor: kotlin.String,
 
-    @Schema(example = "null", required = true, description = "The version of this CorDapp")
     @get:JsonProperty("version", required = true) val version: kotlin.String
 ) {
 
 }
-

@@ -834,9 +834,9 @@ async fn data_transfer_call(
     use_tls: bool,
     tlsca_cert_path: String,
 ) -> Result<Response<Ack>, Box<dyn std::error::Error>> {
-    let client_addr = format!("http://{}:{}", relay_host, relay_port);
     let mut client;
     if use_tls {
+        let client_addr = format!("https://{}:{}", relay_host, relay_port);
         let pem = tokio::fs::read(tlsca_cert_path).await?;
         let ca = Certificate::from_pem(pem);
 
@@ -851,6 +851,7 @@ async fn data_transfer_call(
 
         client = DataTransferClient::new(channel);
     } else {
+        let client_addr = format!("http://{}:{}", relay_host, relay_port);
         client = DataTransferClient::connect(client_addr).await?;
     }
     let query_request = tonic::Request::new(Query {
@@ -955,9 +956,9 @@ async fn suscribe_event_call(
     use_tls: bool,
     tlsca_cert_path: String,
 ) -> Result<Response<Ack>, Box<dyn std::error::Error>> {
-    let client_addr = format!("http://{}:{}", relay_host, relay_port);
     let mut client;
     if use_tls {
+        let client_addr = format!("https://{}:{}", relay_host, relay_port);
         let pem = tokio::fs::read(tlsca_cert_path).await?;
         let ca = Certificate::from_pem(pem);
 
@@ -972,6 +973,7 @@ async fn suscribe_event_call(
 
         client = EventSubscribeClient::new(channel);
     } else {
+        let client_addr = format!("http://{}:{}", relay_host, relay_port);
         client = EventSubscribeClient::connect(client_addr).await?;
     }
 
