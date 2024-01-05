@@ -3,7 +3,7 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
- 
+
 import { Gateway, Network } from 'fabric-network';
 import { Channel } from 'fabric-common';
 import * as path from 'path';
@@ -91,10 +91,10 @@ function getMembershipUnit(channel: Channel, mspId: string): membership_pb.Membe
     member.setType("certificate");
     member.setValue("");
     member.setChainList(certs);
-    
+
     return member;
 }
- 
+
 function getMSPConfigurations(
     network: Network,
     memberMspIds: Array<string>
@@ -144,14 +144,14 @@ async function syncMembershipFromIINAgent(
     try {
         const foreignSecurityDomain = new agent_pb.SecurityDomainMemberIdentity();
         foreignSecurityDomain.setSecurityDomain(securityDomain);
-        
+
         const iinAgentClient = getIINAgentClient(iinAgentEndpoint, useTls, tlsCACertPath)
         const {
             syncExternalState,
         }: {
             syncExternalState: (request: agent_pb.SecurityDomainMemberIdentity) => Promise<common_ack_pb.Ack>;
         } = promisifyAll(iinAgentClient);
-        
+
         if (typeof syncExternalState === "function") {
             const [resp, error] = await handlePromise(syncExternalState(foreignSecurityDomain));
             if (error) {
@@ -205,6 +205,7 @@ export {
     deleteLocalMembership,
     readMembership,
     getMembershipUnit,
+    getMSPConfigurations,
     getAllMSPConfigurations,
     syncMembershipFromIINAgent
 }
