@@ -39,8 +39,8 @@
     "@types/node": "16.18.41",
     "nodemon": "2.0.22",
     "patch-package": "6.5.1",
-    "typedoc": "0.24.8",
-    "typescript": "4.9.5"
+    "typedoc": "0.25.6",
+    "typescript": "5.3.3"
   },
   "engines": {
     "node": ">=18",
