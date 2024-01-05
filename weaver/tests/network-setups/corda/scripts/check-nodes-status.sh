@@ -1,8 +1,7 @@
+#!/usr/bin/env bash
 # Copyright IBM Corp. All Rights Reserved.
 #
 # SPDX-License-Identifier: Apache-2.0
-
-#!/bin/bash
 
 MAX_SLEEP_COUNT=40
 PROFILE=$1
@@ -61,7 +60,7 @@ if [ "$NW" = "Corda_Network" ]; then
         done
         echo "PartyC node services started for network "$NW
     fi
-    
+
     # Wait for Notary services in container to start
     while [[ $(docker logs corda_notary_1 | tail -n 1) != "Running P2PMessaging loop" ]]
     do
@@ -75,9 +74,9 @@ if [ "$NW" = "Corda_Network" ]; then
         fi
     done
     echo "Notary node services started for network "$NW
-    
+
 elif [ "$NW" = "Corda_Network2" ]; then
-    
+
     echo "Waiting for network $NW node services to start"
 
     if [ "$PROFILE" = "1-node" ] || [ "$PROFILE" = "2-nodes" ] || [ "$PROFILE" = "3-nodes" ]; then
@@ -130,7 +129,7 @@ elif [ "$NW" = "Corda_Network2" ]; then
         done
         echo "PartyC node services started for network "$NW
     fi
-    
+
     # Wait for Notary services in container to start
     while [[ $(docker logs corda_network2_notary_1 | tail -n 1) != "Running P2PMessaging loop" ]]
     do
@@ -144,7 +143,7 @@ elif [ "$NW" = "Corda_Network2" ]; then
         fi
     done
     echo "Notary node services started for network "$NW
-  
+
 else
     echo "Network $NW not found."
 fi

@@ -1,24 +1,11 @@
 {
   "name": "@hyperledger/cacti-weaver-besu-cli",
-  "version": "0.0.1",
+  "version": "2.0.0-alpha.2",
   "description": "besu-cli CLI",
-  "private": true,
+  "license": "Apache-2.0",
   "types": "build/types/types.d.ts",
   "bin": {
     "besu-cli": "bin/besu-cli"
-  },
-  "scripts": {
-    "format": "prettier --write **/*.{js,ts,tsx,json}",
-    "lint": "tslint -p .",
-    "clean-build": "rm -rf ./build",
-    "compile": "tsc -p .",
-    "copy-templates": "if [ -e ./src/templates ]; then cp -a ./src/templates ./build/; fi",
-    "build": "yarn format && yarn lint && yarn clean-build && yarn compile && yarn copy-templates",
-    "prepublishOnly": "yarn build",
-    "test": "jest",
-    "watch": "jest --watch",
-    "snapupdate": "jest --updateSnapshot",
-    "coverage": "jest --coverage"
   },
   "files": [
     "tsconfig.json",
@@ -29,13 +16,34 @@
     "docs",
     "bin"
   ],
-  "license": "Apache-2.0",
+  "scripts": {
+    "build": "yarn format && yarn lint && yarn clean-build && yarn compile && yarn copy-templates",
+    "clean-build": "rm -rf ./build",
+    "compile": "tsc -p .",
+    "copy-templates": "if [ -e ./src/templates ]; then cp -a ./src/templates ./build/; fi",
+    "coverage": "jest --coverage",
+    "format": "prettier --write **/*.{js,ts,tsx,json}",
+    "lint": "tslint -p .",
+    "prepublishOnly": "yarn build",
+    "snapupdate": "jest --updateSnapshot",
+    "test": "jest",
+    "watch": "jest --watch"
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node"
+  },
   "dependencies": {
     "@hyperledger/cacti-weaver-sdk-besu": "file:../../../sdks/besu/node",
     "@hyperledger/cacti-weaver-protos-js": "file:../../../common/protos-js",
-    "@truffle/contract": "4.2.14",
+    "@truffle/contract": "4.6.28",
     "gluegun": "5.1.6",
-    "winston": "3.3.3"
+    "web3": "1.10.0",
+    "winston": "3.10.0"
   },
   "devDependencies": {
     "@types/jest": "29.5.3",
@@ -44,17 +52,13 @@
     "prettier": "1.19.1",
     "ts-jest": "29.1.1",
     "ts-node": "10.9.1",
-    "tslint": "5.12.0",
-    "tslint-config-prettier": "1.17.0",
+    "tslint": "5.20.1",
+    "tslint-config-prettier": "1.18.0",
     "tslint-config-standard": "8.0.1",
     "typescript": "4.9.5"
   },
-  "jest": {
-    "preset": "ts-jest",
-    "testEnvironment": "node"
-  },
-  "prettier": {
-    "semi": false,
-    "singleQuote": true
+  "engines": {
+    "node": ">=18",
+    "npm": ">=8"
   }
 }

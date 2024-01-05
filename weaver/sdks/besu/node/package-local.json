@@ -1,23 +1,23 @@
 {
   "name": "@hyperledger/cacti-weaver-sdk-besu",
-  "description": "Supplemental library for Web3JS based Besu client applications to enable interoperability using Weaver",
   "version": "2.0.0-alpha.2",
-  "main": "build/index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc"
-  },
-  "author": "",
-  "tag": "latest",
+  "description": "Supplemental library for Web3JS based Besu client applications to enable interoperability using Weaver",
   "repository": {
     "type": "git",
     "url": "https://github.com/hyperledger/cacti.git"
   },
   "license": "Apache-2.0",
+  "author": "",
+  "main": "build/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "dependencies": {
     "@hyperledger/cacti-weaver-protos-js": "file:./protos-js",
     "log4js": "6.9.1",
-    "web3": "1.10.0"
+    "web3": "1.10.0",
+    "web3-utils": "1.10.0"
   },
   "devDependencies": {
     "@types/node": "16.18.41",
@@ -41,7 +41,12 @@
     "typedoc": "0.24.8",
     "typescript": "4.9.5"
   },
+  "engines": {
+    "node": ">=18",
+    "npm": ">=8"
+  },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com/hyperledger-labs"
-  }
+    "registry": "https://npm.pkg.github.com/hyperledger"
+  },
+  "tag": "latest"
 }

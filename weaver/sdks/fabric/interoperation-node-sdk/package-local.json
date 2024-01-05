@@ -1,30 +1,41 @@
 {
   "name": "@hyperledger/cacti-weaver-sdk-fabric",
+  "version": "2.0.0-alpha.2",
   "description": "Supplemental library to 'fabric-client' with functions for relay-based cross-network interactions",
   "keywords": [
     "hyperledger",
     "blockchain",
     "interoperability"
   ],
-  "version": "2.0.0-alpha.2",
-  "author": "V. Ramakrishna",
-  "tag": "latest",
-  "main": "build/index.js",
-  "types": "./types/index.d.ts",
-  "scripts": {
-    "test": "nyc mocha -r ts-node/register --exclude 'test/data/**/*.js' --recursive  -t 10000",
-    "build": "tsc",
-    "prepublishOnly": "npm test",
-    "lint": "eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
-    "docs": "typedoc --out docs/ src/"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/hyperledger/cacti.git"
   },
-  "engines": {
-    "node": ">=10.15.3 <=16.17.1",
-    "npm": ">=6.0.0 <=8.15.0"
+  "license": "Apache-2.0",
+  "author": "V. Ramakrishna",
+  "main": "build/index.js",
+  "types": "./types/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "docs": "typedoc --out docs/ src/",
+    "lint": "eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
+    "prepublishOnly": "npm test",
+    "test": "nyc mocha -r ts-node/register --exclude 'test/data/**/*.js' --recursive  -t 10000"
+  },
+  "nyc": {
+    "all": true,
+    "exclude": [
+      "index.js",
+      "coverage/**",
+      "lib/impl",
+      "lib/msp",
+      "lib/protos",
+      "test/**"
+    ],
+    "reporter": [
+      "text-summary",
+      "html"
+    ]
   },
   "dependencies": {
     "@grpc/grpc-js": "1.9.5",
@@ -64,29 +75,18 @@
     "typedoc": "0.24.8",
     "typescript": "4.9.5"
   },
-  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=18",
+    "npm": ">=8"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/hyperledger"
+  },
   "licenses": [
     {
       "type": "Apache-2.0",
       "url": "https://github.com/hyperledger/cacti/blob/main/weaver/LICENSE"
     }
   ],
-  "nyc": {
-    "exclude": [
-      "index.js",
-      "coverage/**",
-      "lib/impl",
-      "lib/msp",
-      "lib/protos",
-      "test/**"
-    ],
-    "reporter": [
-      "text-summary",
-      "html"
-    ],
-    "all": true
-  },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/hyperledger"
-  }
+  "tag": "latest"
 }
