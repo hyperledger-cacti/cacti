@@ -19,7 +19,7 @@
     "web3": "1.7.0"
   },
   "devDependencies": {
-    "typescript": "4.9.5",
+    "typescript": "5.3.3",
     "@types/shelljs": "^0.8.12"
   }
 }

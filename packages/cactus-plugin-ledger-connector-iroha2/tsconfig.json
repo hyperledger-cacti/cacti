@@ -5,7 +5,8 @@
     "outDir": "./dist/lib/",
     "declarationDir": "dist/types",
     "resolveJsonModule": true,
-    "moduleResolution": "nodenext",
+    "module": "Node16",
+    "moduleResolution": "Node16",
     "rootDir": "./src",
     "tsBuildInfoFile": "../../.build-cache/cactus-plugin-ledger-connector-iroha2.tsbuildinfo"
   },
