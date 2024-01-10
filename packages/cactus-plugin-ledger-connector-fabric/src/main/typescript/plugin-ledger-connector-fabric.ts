@@ -747,14 +747,14 @@ export class PluginLedgerConnectorFabric
       log.debug(`Copy to CLI Container CMD: ${copyToCliCmd}`);
       const copyToCliRes = await ssh.execCommand(copyToCliCmd, sshCmdOptions);
       log.debug(`Copy to CLI Container CMD Response: %o`, copyToCliRes);
-      Checks.truthy(copyToCliRes.code === null, `copyToCliRes.code === null`);
+      Checks.truthy(copyToCliRes.code === 0, `copyToCliRes.code === 0`);
 
       {
         const goModInitCmd = `${dockerBuildCmd} go mod init ${ccName}`;
         log.debug(`go mod init CMD: ${goModInitCmd}`);
         const goModInitRes = await ssh.execCommand(goModInitCmd, sshCmdOptions);
         log.debug(`go mod init CMD Response: %o`, goModInitRes);
-        Checks.truthy(goModInitRes.code === null, `goModInitRes.code === null`);
+        Checks.truthy(goModInitRes.code === 0, `goModInitRes.code === 0`);
       }
 
       const pinnedDeps = req.pinnedDeps || [];
@@ -763,7 +763,7 @@ export class PluginLedgerConnectorFabric
         log.debug(`go get CMD: ${goGetCmd}`);
         const goGetRes = await ssh.execCommand(goGetCmd, sshCmdOptions);
         log.debug(`go get CMD Response: %o`, goGetRes);
-        Checks.truthy(goGetRes.code === null, `goGetRes.code === null`);
+        Checks.truthy(goGetRes.code === 0, `goGetRes.code === 0`);
       }
 
       {
@@ -771,7 +771,7 @@ export class PluginLedgerConnectorFabric
         log.debug(`go mod tidy CMD: ${goModTidyCmd}`);
         const goModTidyRes = await ssh.execCommand(goModTidyCmd, sshCmdOptions);
         log.debug(`go mod tidy CMD Response: %o`, goModTidyRes);
-        Checks.truthy(goModTidyRes.code === null, `goModTidyRes.code === null`);
+        Checks.truthy(goModTidyRes.code === 0, `goModTidyRes.code === 0`);
       }
 
       {
@@ -779,7 +779,7 @@ export class PluginLedgerConnectorFabric
         log.debug(`go mod vendor CMD: ${goVendorCmd}`);
         const goVendorRes = await ssh.execCommand(goVendorCmd, sshCmdOptions);
         log.debug(`go mod vendor CMD Response: %o`, goVendorRes);
-        Checks.truthy(goVendorRes.code === null, `goVendorRes.code === null`);
+        Checks.truthy(goVendorRes.code === 0, `goVendorRes.code === 0`);
       }
 
       {
@@ -787,7 +787,7 @@ export class PluginLedgerConnectorFabric
         log.debug(`go build CMD: ${goBuildCmd}`);
         const goBuildRes = await ssh.execCommand(goBuildCmd, sshCmdOptions);
         log.debug(`go build CMD Response: %o`, goBuildRes);
-        Checks.truthy(goBuildRes.code === null, `goBuildRes.code === null`);
+        Checks.truthy(goBuildRes.code === 0, `goBuildRes.code === 0`);
       }
 
       const installationCommandResponses: SSHExecCommandResponse[] = [];

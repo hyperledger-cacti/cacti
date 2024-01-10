@@ -28,7 +28,7 @@
 # Change directories to the project root
 
 # Build the docker image and tag it as "scaeb" for supply chain app example backend
-DOCKER_BUILDKIT=1 docker build -f ./examples/supply-chain-app/Dockerfile . -t scaeb
+DOCKER_BUILDKIT=1 docker build -f ./examples/cactus-example-supply-chain-backend/Dockerfile . -t scaeb
 
 # Run the built image with ports mapped to the host machine as you see fit
 # The --privileged flag is required because we use Docker-in-Docker for pulling
@@ -43,7 +43,7 @@ Building the image with a specific npm package version:
 ```sh
 DOCKER_BUILDKIT=1 docker build \
   --build-arg NPM_PKG_VERSION=jwt-supply-chain \
-  --file ./examples/supply-chain-app/Dockerfile \
+  --file ./examples/cactus-example-supply-chain-backend/Dockerfile \
   --tag scaeb \
   ./
 ```
@@ -63,10 +63,10 @@ On the terminal, issue the following commands:
 On the terminal, issue the following commands (steps 1 to 6) and then perform the rest of the steps manually.
 
 1. `npm run enable-corepack`
-2. `npm run configure`
+2. `yarn run configure`
 3. `yarn build:dev`
-4. `cd ./examples/supply-chain-app/`
-5. `yarn --no-lockfile`
+4. `cd ./examples/cactus-example-supply-chain-backend/`
+5. `yarn install`
 6. `cd ../../`
 7. Locate the `.vscode/template.launch.json` file
 8. Within that file locate the entry named `"Example: Supply Chain App"`

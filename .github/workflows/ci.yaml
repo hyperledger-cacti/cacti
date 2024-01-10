@@ -2187,7 +2187,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3.5.2
       - name: ghcr.io/hyperledger/cactus-example-supply-chain-app
-        run: DOCKER_BUILDKIT=1 docker build . -f ./examples/supply-chain-app/Dockerfile -t cactus-example-supply-chain-app
+        run: DOCKER_BUILDKIT=1 docker build . -f ./examples/cactus-example-supply-chain-backend/Dockerfile -t cactus-example-supply-chain-app
       - name: Run Trivy vulnerability scan for cactus-example-supply-chain-app
         uses: aquasecurity/trivy-action@0.11.2
         with:

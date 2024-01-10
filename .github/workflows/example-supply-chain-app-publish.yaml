@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-20.04
     env:
       DOCKER_BUILDKIT: 1
-      DOCKERFILE_PATH: ./examples/supply-chain-app/Dockerfile
+      DOCKERFILE_PATH: ./examples/cactus-example-supply-chain-backend/Dockerfile
       DOCKER_BUILD_DIR: ./
     permissions:
       packages: write
