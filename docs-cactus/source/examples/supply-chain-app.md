@@ -1,3 +1,3 @@
-```{include} ../../../examples/supply-chain-app/README.md
+```{include} ../../../examples/cactus-example-supply-chain-backend/README.md
 :relative-images:
 ```

@@ -495,7 +495,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
     const cInfo = await this.getContainerInfo();
     const container = this.getContainer();
     const CCP_JSON_PATH_FABRIC_V1 =
-      "/fabric-samples/first-network/connection-org" + orgName + ".json";
+      "/fabric-samples/first-network/connection-" + orgName + ".json";
     const CCP_JSON_PATH_FABRIC_V2 = connectionProfilePath;
     const ccpJsonPath = compareVersions.compare(
       this.getFabricVersion(),

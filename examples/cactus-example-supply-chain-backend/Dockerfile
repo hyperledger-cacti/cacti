@@ -43,7 +43,7 @@ RUN source ~/.bashrc && \
 SHELL ["/bin/bash", "--login", "-c"]
 
 
-COPY --chown=${APP_USER}:${APP_USER} ./examples/supply-chain-app/healthcheck.sh /
+COPY --chown=${APP_USER}:${APP_USER} ./examples/cactus-example-supply-chain-backend/healthcheck.sh /
 
 ENV AUTHORIZATION_CONFIG_JSON="{}"
 ENV AUTHORIZATION_PROTOCOL=NONE
@@ -67,7 +67,7 @@ ENV API_PORT=4000
 ENV GRPC_TLS_ENABLED=false
 ENV LOG_LEVEL=TRACE
 
-COPY examples/supply-chain-app/supervisord.conf /etc/supervisord.conf
+COPY examples/cactus-example-supply-chain-backend/supervisord.conf /etc/supervisord.conf
 
 # supervisord web ui/dashboard
 EXPOSE 9001
@@ -91,4 +91,4 @@ USER root
 ENTRYPOINT ["/usr/bin/supervisord"]
 CMD ["--configuration", "/etc/supervisord.conf", "--nodaemon"]
 HEALTHCHECK --interval=1s --timeout=5s --start-period=20s --retries=250 \
-    CMD /usr/src/app/examples/supply-chain-app/healthcheck.sh
+    CMD /usr/src/app/examples/cactus-example-supply-chain-backend/healthcheck.sh

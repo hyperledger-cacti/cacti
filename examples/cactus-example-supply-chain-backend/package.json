@@ -43,6 +43,8 @@
     "dist/*"
   ],
   "scripts": {
+    "start": "node -r dotenv/config dist/lib/main/typescript/supply-chain-app-cli.js dotenv_config_path=process.env",
+    "start-direct": "node ./node_modules/@hyperledger/cactus-example-supply-chain-backend/dist/lib/main/typescript/supply-chain-app-cli.js",
     "watch": "npm-watch",
     "webpack": "npm-run-all webpack:dev",
     "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",

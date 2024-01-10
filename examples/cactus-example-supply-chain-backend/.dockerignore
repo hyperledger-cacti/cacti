@@ -39,7 +39,7 @@ coverage/
 # Introperability App specifics
 examples/simple-asset-transfer/fabric/**/hfc-key-store/
 
-examples/supply-chain-app/Dockerfile
+examples/cactus-example-supply-chain-backend/Dockerfile
 
 bin/
 .tmp/
