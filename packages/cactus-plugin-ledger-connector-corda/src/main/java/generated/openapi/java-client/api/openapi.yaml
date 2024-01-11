@@ -1,0 +1,1404 @@
+openapi: 3.0.3
+info:
+  description: Can perform basic tasks on a Corda ledger
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  title: Hyperledger Cactus Plugin - Connector Corda
+  version: v2.0.0-alpha.2
+servers:
+- url: /
+paths:
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/deploy-contract-jars:
+    post:
+      operationId: deployContractJarsV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeployContractJarsV1Request'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeployContractJarsSuccessV1Response'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeployContractJarsBadRequestV1Response'
+          description: Bad Request
+      summary: "Deploys a set of jar files (Cordapps, e.g. the contracts in Corda\
+        \ speak)."
+      x-hyperledger-cacti:
+        http:
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/deploy-contract-jars
+          verbLowerCase: post
+      x-content-type: application/json
+      x-accepts: application/json
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/invoke-contract:
+    post:
+      operationId: invokeContractV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvokeContractV1Request'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvokeContractV1Response'
+          description: OK
+      summary: Invokes a contract on a Corda ledger (e.g. a flow)
+      x-hyperledger-cacti:
+        http:
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/invoke-contract
+          verbLowerCase: post
+      x-content-type: application/json
+      x-accepts: application/json
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/start-monitor:
+    post:
+      operationId: startMonitorV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StartMonitorV1Request'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StartMonitorV1Response'
+          description: OK
+      summary: Start monitoring corda changes (transactions) of given state class
+      x-hyperledger-cacti:
+        http:
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/start-monitor
+          verbLowerCase: post
+      x-content-type: application/json
+      x-accepts: application/json
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-monitor-transactions:
+    get:
+      operationId: GetMonitorTransactionsV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetMonitorTransactionsV1Request'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetMonitorTransactionsV1Response'
+          description: OK
+      summary: Get transactions for monitored state classes.
+      x-hyperledger-cacti:
+        http:
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-monitor-transactions
+          verbLowerCase: get
+      x-content-type: application/json
+      x-accepts: application/json
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/clear-monitor-transactions:
+    delete:
+      operationId: ClearMonitorTransactionsV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClearMonitorTransactionsV1Request'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClearMonitorTransactionsV1Response'
+          description: OK
+      summary: Clear transactions from internal store so they'll not be available
+        by GetMonitorTransactionsV1 anymore.
+      x-hyperledger-cacti:
+        http:
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/clear-monitor-transactions
+          verbLowerCase: delete
+      x-content-type: application/json
+      x-accepts: application/json
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/stop-monitor:
+    delete:
+      operationId: stopMonitorV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StopMonitorV1Request'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StopMonitorV1Response'
+          description: OK
+      summary: Stop monitoring corda changes (transactions) of given state class
+      x-hyperledger-cacti:
+        http:
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/stop-monitor
+          verbLowerCase: delete
+      x-content-type: application/json
+      x-accepts: application/json
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/network-map:
+    post:
+      description: "Responds with a snapshot of the network map as provided by the\
+        \ Corda RPC call: net.corda.core.messaging.CordaRPCOps public abstract fun\
+        \ networkMapSnapshot(): List<NodeInfo>"
+      operationId: networkMapV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NetworkMapV1Request'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NetworkMapV1Response'
+          description: OK
+      x-hyperledger-cacti:
+        http:
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/network-map
+          verbLowerCase: post
+      x-content-type: application/json
+      x-accepts: application/json
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-flows:
+    post:
+      description: Responds with a list of the flows on the Corda node.
+      operationId: listFlowsV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ListFlowsV1Request'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListFlowsV1Response'
+          description: OK
+      x-hyperledger-cacti:
+        http:
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-flows
+          verbLowerCase: post
+      x-content-type: application/json
+      x-accepts: application/json
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/diagnose-node:
+    post:
+      description: Responds with diagnostic information about the Corda node
+      operationId: diagnoseNodeV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiagnoseNodeV1Request'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiagnoseNodeV1Response'
+          description: OK
+      x-hyperledger-cacti:
+        http:
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/diagnose-node
+          verbLowerCase: post
+      x-content-type: application/json
+      x-accepts: application/json
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-prometheus-exporter-metrics:
+    get:
+      operationId: getPrometheusMetricsV1
+      parameters: []
+      responses:
+        "200":
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/PrometheusExporterMetricsResponse'
+          description: OK
+      summary: Get the Prometheus Metrics
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: get
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-prometheus-exporter-metrics
+      x-accepts: text/plain
+components:
+  schemas:
+    SHA256:
+      description: "SHA-256 is part of the SHA-2 hash function family. Generated hash\
+        \ is fixed size, 256-bits (32-bytes)."
+      example:
+        offset: 0
+        size: 32
+        bytes: Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc=
+      externalDocs:
+        description: Official Corda documentation of the SHA256 class.
+        url: https://api.corda.net/api/corda-os/4.6/html/api/kotlin/corda/net.corda.core.crypto/-secure-hash/-s-h-a256/index.html
+      properties:
+        bytes:
+          example: Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc=
+          type: string
+        offset:
+          example: 0
+          type: integer
+        size:
+          example: 32
+          type: integer
+      required:
+      - bytes
+      - offset
+      - size
+      type: object
+    CordappInfo:
+      description: A CordappInfo describes a single CorDapp currently installed on
+        the node
+      example:
+        licence: licence
+        targetPlatformVersion: 6
+        vendor: vendor
+        name: name
+        jarHash:
+          offset: 0
+          size: 32
+          bytes: Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc=
+        shortName: shortName
+        type: type
+        version: version
+        minimumPlatformVersion: 0
+      externalDocs:
+        description: Official Corda Documentation of the class CordappInfo
+        url: https://api.corda.net/api/corda-os/4.6/html/api/kotlin/corda/net.corda.core.cordapp/-cordapp-info/index.html
+      properties:
+        jarHash:
+          $ref: '#/components/schemas/SHA256'
+        licence:
+          description: The name of the licence this CorDapp is released under
+          type: string
+        minimumPlatformVersion:
+          description: The minimum platform version the node must be at for the CorDapp
+            to run
+          type: integer
+        name:
+          description: The name of the JAR file that defines the CorDapp
+          type: string
+        shortName:
+          description: The name of the CorDapp
+          type: string
+        targetPlatformVersion:
+          description: The target platform version this CorDapp has been tested against
+          type: integer
+        type:
+          description: "A description of what sort of CorDapp this is - either a contract,\
+            \ workflow, or a combination."
+          type: string
+        vendor:
+          description: The vendor of this CorDapp
+          type: string
+        version:
+          description: The version of this CorDapp
+          type: string
+      required:
+      - jarHash
+      - licence
+      - minimumPlatformVersion
+      - name
+      - shortName
+      - targetPlatformVersion
+      - type
+      - vendor
+      - version
+      type: object
+    NodeDiagnosticInfo:
+      description: A NodeDiagnosticInfo holds information about the current node version.
+      example:
+        vendor: vendor
+        platformVersion: 1
+        version: version
+        cordapps:
+        - licence: licence
+          targetPlatformVersion: 6
+          vendor: vendor
+          name: name
+          jarHash:
+            offset: 0
+            size: 32
+            bytes: Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc=
+          shortName: shortName
+          type: type
+          version: version
+          minimumPlatformVersion: 0
+        - licence: licence
+          targetPlatformVersion: 6
+          vendor: vendor
+          name: name
+          jarHash:
+            offset: 0
+            size: 32
+            bytes: Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc=
+          shortName: shortName
+          type: type
+          version: version
+          minimumPlatformVersion: 0
+        - licence: licence
+          targetPlatformVersion: 6
+          vendor: vendor
+          name: name
+          jarHash:
+            offset: 0
+            size: 32
+            bytes: Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc=
+          shortName: shortName
+          type: type
+          version: version
+          minimumPlatformVersion: 0
+        - licence: licence
+          targetPlatformVersion: 6
+          vendor: vendor
+          name: name
+          jarHash:
+            offset: 0
+            size: 32
+            bytes: Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc=
+          shortName: shortName
+          type: type
+          version: version
+          minimumPlatformVersion: 0
+        - licence: licence
+          targetPlatformVersion: 6
+          vendor: vendor
+          name: name
+          jarHash:
+            offset: 0
+            size: 32
+            bytes: Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc=
+          shortName: shortName
+          type: type
+          version: version
+          minimumPlatformVersion: 0
+        revision: revision
+      externalDocs:
+        description: Official Corda Documentation of the class NodeDiagnosticInfo
+        url: https://api.corda.net/api/corda-os/4.6/html/api/kotlin/corda/net.corda.core.node/-node-diagnostic-info/index.html
+      properties:
+        cordapps:
+          description: A list of CorDapps currently installed on this node
+          items:
+            $ref: '#/components/schemas/CordappInfo'
+          maxItems: 4096
+          minItems: 0
+          type: array
+        platformVersion:
+          description: "The platform version of this node. This number represents\
+            \ a released API version, and should be used to make functionality decisions\
+            \ (e.g. enabling an app feature only if an underlying platform feature\
+            \ exists)"
+          type: integer
+        revision:
+          description: The git commit hash this node was built from
+          type: string
+        vendor:
+          description: The vendor of this node
+          type: string
+        version:
+          description: "The current node version string, e.g. 4.3, 4.4-SNAPSHOT. Note\
+            \ that this string is effectively freeform, and so should only be used\
+            \ for providing diagnostic information. It should not be used to make\
+            \ functionality decisions (the platformVersion is a better fit for this)."
+          type: string
+      required:
+      - cordapps
+      - platformVersion
+      - revision
+      - vendor
+      - version
+      type: object
+    FlowInvocationType:
+      description: Determines which flow starting method will be used on the back-end
+        when invoking the flow. Based on the value here the plugin back-end might
+        invoke the rpc.startFlowDynamic() method or the rpc.startTrackedFlowDynamic()
+        method. Streamed responses are aggregated and returned in a single response
+        to HTTP callers who are not equipped to handle streams like WebSocket/gRPC/etc.
+        do.
+      enum:
+      - TRACKED_FLOW_DYNAMIC
+      - FLOW_DYNAMIC
+      nullable: false
+      type: string
+    JarFile:
+      additionalProperties: true
+      example:
+        filename: filename
+        contentBase64: contentBase64
+        hasDbMigrations: true
+      properties:
+        filename:
+          maxLength: 255
+          minLength: 1
+          nullable: false
+          type: string
+        hasDbMigrations:
+          description: Indicates whether the cordapp jar in question contains any
+            embedded migrations that Cactus can/should execute between copying the
+            jar into the cordapp directory and starting the node back up.
+          nullable: false
+          type: boolean
+        contentBase64:
+          format: base64
+          maxLength: 1073741824
+          minLength: 1
+          nullable: false
+          type: string
+      required:
+      - contentBase64
+      - filename
+      - hasDbMigrations
+      type: object
+    JvmType:
+      description: Represents a reference to a JVM type (such as a Java class)
+      example:
+        constructorName: constructorName
+        invocationTarget: null
+        fqClassName: fqClassName
+      properties:
+        fqClassName:
+          maxLength: 65535
+          minLength: 1
+          nullable: false
+          type: string
+        constructorName:
+          description: This parameter is used to specify that the function used to
+            construct this JvmType is not a constructor function but instead is a
+            factory function. Setting this parameter will cause the plugin to look
+            up methods of the class denoted by fqClassName instead of its constructors.
+          maxLength: 65535
+          minLength: 1
+          nullable: false
+          type: string
+        invocationTarget:
+          $ref: '#/components/schemas/JvmObject'
+      required:
+      - fqClassName
+      type: object
+    JvmTypeKind:
+      enum:
+      - PRIMITIVE
+      - REFERENCE
+      nullable: false
+      type: string
+    JvmObject:
+      description: "Can represent JVM primitive and reference types as well. The jvmTypeKind\
+        \ field indicates which one is being stored. If the jvmTypeKind field is set\
+        \ to REFERENCE then the jvmCtorArgs array is expected to be filled, otherwise\
+        \ (e.g. PRIMITIVE jvmTypeKind) it is expected that the primitiveValue property\
+        \ is filled with a primitive data type supported by the JSON standard such\
+        \ as strings, booleans, numbers, etc."
+      example:
+        jvmCtorArgs:
+        - null
+        - null
+        jvmType:
+          constructorName: constructorName
+          invocationTarget: null
+          fqClassName: fqClassName
+        primitiveValue: "{}"
+        jvmTypeKind: null
+      properties:
+        jvmTypeKind:
+          $ref: '#/components/schemas/JvmTypeKind'
+        primitiveValue:
+          type: object
+        jvmCtorArgs:
+          default: []
+          items:
+            $ref: '#/components/schemas/JvmObject'
+          maxLength: 1024
+          minLength: 0
+          nullable: false
+          type: array
+        jvmType:
+          $ref: '#/components/schemas/JvmType'
+      required:
+      - jvmType
+      - jvmTypeKind
+      type: object
+    CordappDeploymentConfig:
+      example:
+        cordaJarPath: cordaJarPath
+        cordaNodeStartCmd: ./build/nodes/runNodes
+        cordappDir: cordappDir
+        nodeBaseDirPath: nodeBaseDirPath
+        rpcCredentials:
+          hostname: hostname
+          password: password
+          port: 39501
+          username: username
+        sshCredentials:
+          password: password
+          hostname: hostname
+          port: 5249
+          hostKeyEntry: localhost ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPmhSBtMctNa4hsZt8QGlsYSE5/gMkjeand69Vj4ir13
+          username: username
+      properties:
+        sshCredentials:
+          $ref: '#/components/schemas/CordaNodeSshCredentials'
+        rpcCredentials:
+          $ref: '#/components/schemas/CordaRpcCredentials'
+        cordaNodeStartCmd:
+          description: The shell command to execute in order to start back up a Corda
+            node after having placed new jars in the cordapp directory of said node.
+          example: ./build/nodes/runNodes
+          maxLength: 65535
+          minLength: 1
+          nullable: false
+          type: string
+        cordappDir:
+          description: The absolute file system path where the Corda Node is expecting
+            deployed Cordapp jar files to be placed.
+          maxLength: 2048
+          minLength: 1
+          nullable: false
+          type: string
+        cordaJarPath:
+          description: The absolute file system path where the corda.jar file of the
+            node can be found. This is used to execute database schema migrations
+            where applicable (H2 database in use in development environments).
+          maxLength: 2048
+          minLength: 1
+          nullable: false
+          type: string
+        nodeBaseDirPath:
+          description: The absolute file system path where the base directory of the
+            Corda node can be found. This is used to pass in to corda.jar when being
+            invoked for certain tasks such as executing database schema migrations
+            for a deployed contract.
+          maxLength: 2048
+          minLength: 1
+          nullable: false
+          type: string
+      required:
+      - cordaJarPath
+      - cordaNodeStartCmd
+      - cordappDir
+      - nodeBaseDirPath
+      - rpcCredentials
+      - sshCredentials
+      type: object
+    CordaRpcCredentials:
+      example:
+        hostname: hostname
+        password: password
+        port: 39501
+        username: username
+      properties:
+        hostname:
+          maxLength: 65535
+          minLength: 1
+          nullable: false
+          type: string
+        port:
+          maximum: 65535
+          minimum: 1
+          nullable: false
+          type: integer
+        username:
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+        password:
+          maxLength: 65535
+          minLength: 1
+          nullable: false
+          type: string
+      required:
+      - hostname
+      - password
+      - port
+      - username
+      type: object
+    CordaNodeSshCredentials:
+      example:
+        password: password
+        hostname: hostname
+        port: 5249
+        hostKeyEntry: localhost ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPmhSBtMctNa4hsZt8QGlsYSE5/gMkjeand69Vj4ir13
+        username: username
+      properties:
+        hostKeyEntry:
+          example: localhost ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPmhSBtMctNa4hsZt8QGlsYSE5/gMkjeand69Vj4ir13
+          maxLength: 65535
+          minLength: 1
+          nullable: false
+          type: string
+        username:
+          maxLength: 32
+          minLength: 1
+          nullable: false
+          type: string
+        password:
+          maxLength: 4096
+          minLength: 1
+          nullable: false
+          type: string
+        hostname:
+          maxLength: 4096
+          minLength: 1
+          nullable: false
+          type: string
+        port:
+          maximum: 65535
+          minimum: 1
+          nullable: false
+          type: integer
+      required:
+      - hostKeyEntry
+      - hostname
+      - password
+      - port
+      - username
+      type: object
+    DeployContractJarsV1Request:
+      additionalProperties: false
+      example:
+        jarFiles:
+        - filename: filename
+          contentBase64: contentBase64
+          hasDbMigrations: true
+        - filename: filename
+          contentBase64: contentBase64
+          hasDbMigrations: true
+        cordappDeploymentConfigs:
+        - cordaJarPath: cordaJarPath
+          cordaNodeStartCmd: ./build/nodes/runNodes
+          cordappDir: cordappDir
+          nodeBaseDirPath: nodeBaseDirPath
+          rpcCredentials:
+            hostname: hostname
+            password: password
+            port: 39501
+            username: username
+          sshCredentials:
+            password: password
+            hostname: hostname
+            port: 5249
+            hostKeyEntry: localhost ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPmhSBtMctNa4hsZt8QGlsYSE5/gMkjeand69Vj4ir13
+            username: username
+        - cordaJarPath: cordaJarPath
+          cordaNodeStartCmd: ./build/nodes/runNodes
+          cordappDir: cordappDir
+          nodeBaseDirPath: nodeBaseDirPath
+          rpcCredentials:
+            hostname: hostname
+            password: password
+            port: 39501
+            username: username
+          sshCredentials:
+            password: password
+            hostname: hostname
+            port: 5249
+            hostKeyEntry: localhost ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPmhSBtMctNa4hsZt8QGlsYSE5/gMkjeand69Vj4ir13
+            username: username
+      properties:
+        cordappDeploymentConfigs:
+          default: []
+          description: The list of deployment configurations pointing to the nodes
+            where the provided cordapp jar files are to be deployed .
+          items:
+            $ref: '#/components/schemas/CordappDeploymentConfig'
+          maxLength: 1024
+          minLength: 0
+          type: array
+        jarFiles:
+          items:
+            $ref: '#/components/schemas/JarFile'
+          nullable: false
+          type: array
+      required:
+      - cordappDeploymentConfigs
+      - jarFiles
+      type: object
+    DeployContractJarsSuccessV1Response:
+      example:
+        deployedJarFiles:
+        - deployedJarFiles
+        - deployedJarFiles
+      properties:
+        deployedJarFiles:
+          items:
+            minItems: 1
+            nullable: false
+            type: string
+          type: array
+      required:
+      - deployedJarFiles
+      type: object
+    DeployContractJarsBadRequestV1Response:
+      properties:
+        errors:
+          items:
+            maxItems: 2048
+            maxLength: 65535
+            minItems: 1
+            minLength: 1
+            type: string
+          type: array
+      required:
+      - errors
+      type: object
+    InvokeContractV1Request:
+      additionalProperties: false
+      example:
+        flowInvocationType: null
+        timeoutMs: 0
+        flowFullClassName: net.corda.samples.obligation.flows.IOUIssueFlow
+        params:
+        - jvmCtorArgs:
+          - null
+          - null
+          jvmType:
+            constructorName: constructorName
+            invocationTarget: null
+            fqClassName: fqClassName
+          primitiveValue: "{}"
+          jvmTypeKind: null
+        - jvmCtorArgs:
+          - null
+          - null
+          jvmType:
+            constructorName: constructorName
+            invocationTarget: null
+            fqClassName: fqClassName
+          primitiveValue: "{}"
+          jvmTypeKind: null
+      properties:
+        flowFullClassName:
+          description: The fully qualified name of the Corda flow to invoke
+          example: net.corda.samples.obligation.flows.IOUIssueFlow
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+        flowInvocationType:
+          $ref: '#/components/schemas/FlowInvocationType'
+        params:
+          default: []
+          description: The list of arguments to pass in to the contract method being
+            invoked.
+          items:
+            $ref: '#/components/schemas/JvmObject'
+          nullable: false
+          type: array
+        timeoutMs:
+          default: 60000
+          description: The amount of milliseconds to wait for a transaction receipt
+            beforegiving up and crashing.
+          minimum: 0
+          nullable: false
+          type: integer
+      required:
+      - flowFullClassName
+      - flowInvocationType
+      - params
+      - signingCredential
+      type: object
+    InvokeContractV1Response:
+      example:
+        callOutput: "{}"
+        success: true
+        progress:
+        - progress
+        - progress
+        flowId: flowId
+        transactionId: transactionId
+      properties:
+        success:
+          nullable: false
+          type: boolean
+        callOutput:
+          description: Data returned from the JVM when no transaction is running
+          type: object
+        transactionId:
+          description: The net.corda.core.flows.StateMachineRunId value returned by
+            the flow execution.
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+        progress:
+          default: []
+          description: "An array of strings representing the aggregated stream of\
+            \ progress updates provided by a *tracked* flow invocation. If the flow\
+            \ invocation was not tracked, this array is still returned, but as empty."
+          items:
+            maxItems: 10000000
+            minItems: 0
+            type: string
+          type: array
+        flowId:
+          description: The id for the flow handle
+          type: string
+      required:
+      - callOutput
+      - flowId
+      - success
+      type: object
+    StartMonitorV1Request:
+      additionalProperties: false
+      example:
+        stateFullClassName: net.corda.samples.example.states.IOUState
+        clientAppId: frond_v1_x_7Hdg6s
+      properties:
+        clientAppId:
+          description: ID of a client application that wants to monitor the state
+            changes
+          example: frond_v1_x_7Hdg6s
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+        stateFullClassName:
+          description: The fully qualified name of the Corda state to monitor
+          example: net.corda.samples.example.states.IOUState
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+      required:
+      - clientAppId
+      - stateFullClassName
+      type: object
+    StartMonitorV1Response:
+      example:
+        msg: msg
+        success: true
+      properties:
+        success:
+          description: Flag set to true if monitoring started correctly.
+          nullable: false
+          type: boolean
+        msg:
+          description: Message describing operation status or any errors that occurred.
+          nullable: false
+          type: string
+      required:
+      - msg
+      - success
+      type: object
+    GetMonitorTransactionsV1Request:
+      additionalProperties: false
+      example:
+        stateFullClassName: net.corda.samples.example.states.IOUState
+        clientAppId: frond_v1_x_7Hdg6s
+      properties:
+        clientAppId:
+          description: ID of a client application that wants to monitor the state
+            changes
+          example: frond_v1_x_7Hdg6s
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+        stateFullClassName:
+          description: The fully qualified name of the Corda state to monitor
+          example: net.corda.samples.example.states.IOUState
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+      required:
+      - clientAppId
+      - stateFullClassName
+      type: object
+    GetMonitorTransactionsV1Response:
+      example:
+        msg: msg
+        tx:
+        - data: data
+          index: index
+        - data: data
+          index: index
+        success: true
+        stateFullClassName: net.corda.samples.example.states.IOUState
+      properties:
+        success:
+          description: Flag set to true if operation completed correctly.
+          nullable: false
+          type: boolean
+        msg:
+          description: Message describing operation status or any errors that occurred.
+          nullable: false
+          type: string
+        stateFullClassName:
+          description: The fully qualified name of the Corda state to monitor
+          example: net.corda.samples.example.states.IOUState
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+        tx:
+          default: []
+          items:
+            $ref: '#/components/schemas/GetMonitorTransactionsV1Response_tx_inner'
+          type: array
+      required:
+      - msg
+      - success
+      type: object
+    ClearMonitorTransactionsV1Request:
+      additionalProperties: false
+      example:
+        txIndexes:
+        - txIndexes
+        - txIndexes
+        stateFullClassName: net.corda.samples.example.states.IOUState
+        clientAppId: frond_v1_x_7Hdg6s
+      properties:
+        clientAppId:
+          description: ID of a client application that wants to monitor the state
+            changes
+          example: frond_v1_x_7Hdg6s
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+        stateFullClassName:
+          description: The fully qualified name of the Corda state to monitor
+          example: net.corda.samples.example.states.IOUState
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+        txIndexes:
+          default: []
+          items:
+            type: string
+          type: array
+      required:
+      - clientAppId
+      - stateFullClassName
+      - txIndexes
+      type: object
+    ClearMonitorTransactionsV1Response:
+      additionalProperties: false
+      example:
+        msg: msg
+        success: true
+      properties:
+        success:
+          description: Flag set to true if operation completed correctly.
+          nullable: false
+          type: boolean
+        msg:
+          description: Message describing operation status or any errors that occurred.
+          nullable: false
+          type: string
+      required:
+      - msg
+      - success
+      type: object
+    StopMonitorV1Request:
+      additionalProperties: false
+      example:
+        stateFullClassName: net.corda.samples.example.states.IOUState
+        clientAppId: frond_v1_x_7Hdg6s
+      properties:
+        clientAppId:
+          description: ID of a client application that wants to monitor the state
+            changes
+          example: frond_v1_x_7Hdg6s
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+        stateFullClassName:
+          description: The fully qualified name of the Corda state to monitor
+          example: net.corda.samples.example.states.IOUState
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+      required:
+      - clientAppId
+      - stateFullClassName
+      type: object
+    StopMonitorV1Response:
+      example:
+        msg: msg
+        success: true
+      properties:
+        success:
+          description: Flag set to true if operation completed correctly.
+          nullable: false
+          type: boolean
+        msg:
+          description: Message describing operation status or any errors that occurred.
+          nullable: false
+          type: string
+      required:
+      - msg
+      - success
+      type: object
+    ListFlowsV1Request:
+      additionalProperties: false
+      example:
+        filter: filter
+      properties:
+        filter:
+          type: string
+      type: object
+    ListFlowsV1Response:
+      example:
+        flowNames:
+        - net.corda.finance.flows.CashExitFlow
+        - net.corda.finance.flows.CashIssueAndPaymentFlow
+        - net.corda.finance.flows.CashIssueFlow
+        - net.corda.finance.flows.CashPaymentFlow
+        - net.corda.finance.internal.CashConfigDataFlow
+        - net.corda.samples.obligation.flows.IOUIssueFlow
+        - net.corda.samples.obligation.flows.IOUSettleFlow
+        - net.corda.samples.obligation.flows.IOUTransferFlow
+        - net.corda.samples.obligation.flows.SelfIssueCashFlow
+      properties:
+        flowNames:
+          default: []
+          description: An array of strings storing the names of the flows as returned
+            by the flowList Corda RPC.
+          example:
+          - net.corda.finance.flows.CashExitFlow
+          - net.corda.finance.flows.CashIssueAndPaymentFlow
+          - net.corda.finance.flows.CashIssueFlow
+          - net.corda.finance.flows.CashPaymentFlow
+          - net.corda.finance.internal.CashConfigDataFlow
+          - net.corda.samples.obligation.flows.IOUIssueFlow
+          - net.corda.samples.obligation.flows.IOUSettleFlow
+          - net.corda.samples.obligation.flows.IOUTransferFlow
+          - net.corda.samples.obligation.flows.SelfIssueCashFlow
+          items:
+            maxItems: 10000000
+            minItems: 0
+            type: string
+          type: array
+      required:
+      - flowNames
+      type: object
+    NetworkHostAndPort:
+      example:
+        port: 0.8008281904610115
+        host: host
+      properties:
+        host:
+          type: string
+        port:
+          type: number
+      required:
+      - host
+      - port
+      type: object
+    PartyAndCertificate:
+      type: object
+    PublicKey:
+      description: An instance of a java.security.PublicKey (which is an interface)
+        implementation such as org.hyperledger.cactus.plugin.ledger.connector.corda.server.impl.PublicKeyImpl
+      example:
+        format: X.509
+        algorithm: EdDSA
+        encoded: MCowBQYDK2VwAyEAac1p4wLsAh70VJOcudQppu7NnKxyoKxVN0DbfTxF+54=
+      properties:
+        algorithm:
+          example: EdDSA
+          type: string
+        format:
+          example: X.509
+          type: string
+        encoded:
+          example: MCowBQYDK2VwAyEAac1p4wLsAh70VJOcudQppu7NnKxyoKxVN0DbfTxF+54=
+          type: string
+      required:
+      - algorithm
+      - encoded
+      - format
+      type: object
+    X500Principal:
+      example:
+        name: "O=PartyA,L=London,C=GB"
+        encoded: MC8xCzAJBgNVBAYTAkdCMQ8wDQYDVQQHDAZMb25kb24xDzANBgNVBAoMBlBhcnR5QQ==
+      properties:
+        name:
+          example: "O=PartyA,L=London,C=GB"
+          type: string
+        encoded:
+          description: Base64 encoded public key
+          example: MC8xCzAJBgNVBAYTAkdCMQ8wDQYDVQQHDAZMb25kb24xDzANBgNVBAoMBlBhcnR5QQ==
+          type: string
+      required:
+      - encoded
+      - name
+      type: object
+    CordaX500Name:
+      example:
+        commonName: commonName
+        country: GB
+        organisationUnit: organisationUnit
+        locality: London
+        x500Principal:
+          name: "O=PartyA,L=London,C=GB"
+          encoded: MC8xCzAJBgNVBAYTAkdCMQ8wDQYDVQQHDAZMb25kb24xDzANBgNVBAoMBlBhcnR5QQ==
+        organisation: PartyA
+        state: state
+      properties:
+        commonName:
+          type: string
+        organisationUnit:
+          type: string
+        organisation:
+          example: PartyA
+          type: string
+        locality:
+          example: London
+          type: string
+        state:
+          type: string
+        country:
+          example: GB
+          type: string
+        x500Principal:
+          $ref: '#/components/schemas/X500Principal'
+      required:
+      - country
+      - locality
+      - organisation
+      - x500Principal
+      type: object
+    Party:
+      example:
+        owningKey:
+          format: X.509
+          algorithm: EdDSA
+          encoded: MCowBQYDK2VwAyEAac1p4wLsAh70VJOcudQppu7NnKxyoKxVN0DbfTxF+54=
+        name:
+          commonName: commonName
+          country: GB
+          organisationUnit: organisationUnit
+          locality: London
+          x500Principal:
+            name: "O=PartyA,L=London,C=GB"
+            encoded: MC8xCzAJBgNVBAYTAkdCMQ8wDQYDVQQHDAZMb25kb24xDzANBgNVBAoMBlBhcnR5QQ==
+          organisation: PartyA
+          state: state
+      properties:
+        name:
+          $ref: '#/components/schemas/CordaX500Name'
+        owningKey:
+          $ref: '#/components/schemas/PublicKey'
+      required:
+      - name
+      - owningKey
+      type: object
+    NodeInfo:
+      example:
+        legalIdentities:
+        - owningKey:
+            format: X.509
+            algorithm: EdDSA
+            encoded: MCowBQYDK2VwAyEAac1p4wLsAh70VJOcudQppu7NnKxyoKxVN0DbfTxF+54=
+          name:
+            commonName: commonName
+            country: GB
+            organisationUnit: organisationUnit
+            locality: London
+            x500Principal:
+              name: "O=PartyA,L=London,C=GB"
+              encoded: MC8xCzAJBgNVBAYTAkdCMQ8wDQYDVQQHDAZMb25kb24xDzANBgNVBAoMBlBhcnR5QQ==
+            organisation: PartyA
+            state: state
+        - owningKey:
+            format: X.509
+            algorithm: EdDSA
+            encoded: MCowBQYDK2VwAyEAac1p4wLsAh70VJOcudQppu7NnKxyoKxVN0DbfTxF+54=
+          name:
+            commonName: commonName
+            country: GB
+            organisationUnit: organisationUnit
+            locality: London
+            x500Principal:
+              name: "O=PartyA,L=London,C=GB"
+              encoded: MC8xCzAJBgNVBAYTAkdCMQ8wDQYDVQQHDAZMb25kb24xDzANBgNVBAoMBlBhcnR5QQ==
+            organisation: PartyA
+            state: state
+        addresses:
+        - port: 0.8008281904610115
+          host: host
+        - port: 0.8008281904610115
+          host: host
+        serial: 1.4658129805029452
+        platformVersion: 6
+        legalIdentitiesAndCerts:
+        - null
+        - null
+      properties:
+        addresses:
+          items:
+            $ref: '#/components/schemas/NetworkHostAndPort'
+          type: array
+        platformVersion:
+          type: integer
+        serial:
+          type: number
+        legalIdentities:
+          items:
+            $ref: '#/components/schemas/Party'
+          type: array
+        legalIdentitiesAndCerts:
+          items:
+            $ref: '#/components/schemas/PartyAndCertificate'
+          type: array
+      required:
+      - addresses
+      - legalIdentities
+      - legalIdentitiesAndCerts
+      - platformVersion
+      - serial
+      type: object
+    NetworkMapV1Request:
+      type: object
+    NetworkMapV1Response:
+      items:
+        $ref: '#/components/schemas/NodeInfo'
+      maxItems: 2048
+      minItems: 1
+      nullable: false
+      type: array
+    DiagnoseNodeV1Request:
+      additionalProperties: false
+      example:
+        nodeIds:
+        - nodeIds
+        - nodeIds
+        - nodeIds
+        - nodeIds
+        - nodeIds
+      properties:
+        nodeIds:
+          default: []
+          description: "Optional property specifying which Corda Node should be the\
+            \ one being diagnosed in case the Connector has multiple connections established\
+            \ for different nodes (which is not yet a supported feature, but we want\
+            \ to keep this possibility open for the future)."
+          items:
+            nullable: false
+            type: string
+          maxItems: 1024
+          minItems: 0
+          type: array
+      type: object
+    DiagnoseNodeV1Response:
+      example:
+        nodeDiagnosticInfo:
+          vendor: vendor
+          platformVersion: 1
+          version: version
+          cordapps:
+          - licence: licence
+            targetPlatformVersion: 6
+            vendor: vendor
+            name: name
+            jarHash:
+              offset: 0
+              size: 32
+              bytes: Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc=
+            shortName: shortName
+            type: type
+            version: version
+            minimumPlatformVersion: 0
+          - licence: licence
+            targetPlatformVersion: 6
+            vendor: vendor
+            name: name
+            jarHash:
+              offset: 0
+              size: 32
+              bytes: Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc=
+            shortName: shortName
+            type: type
+            version: version
+            minimumPlatformVersion: 0
+          - licence: licence
+            targetPlatformVersion: 6
+            vendor: vendor
+            name: name
+            jarHash:
+              offset: 0
+              size: 32
+              bytes: Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc=
+            shortName: shortName
+            type: type
+            version: version
+            minimumPlatformVersion: 0
+          - licence: licence
+            targetPlatformVersion: 6
+            vendor: vendor
+            name: name
+            jarHash:
+              offset: 0
+              size: 32
+              bytes: Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc=
+            shortName: shortName
+            type: type
+            version: version
+            minimumPlatformVersion: 0
+          - licence: licence
+            targetPlatformVersion: 6
+            vendor: vendor
+            name: name
+            jarHash:
+              offset: 0
+              size: 32
+              bytes: Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc=
+            shortName: shortName
+            type: type
+            version: version
+            minimumPlatformVersion: 0
+          revision: revision
+      properties:
+        nodeDiagnosticInfo:
+          $ref: '#/components/schemas/NodeDiagnosticInfo'
+      required:
+      - nodeDiagnosticInfo
+      type: object
+    PrometheusExporterMetricsResponse:
+      nullable: false
+      type: string
+    GetMonitorTransactionsV1Response_tx_inner:
+      example:
+        data: data
+        index: index
+      properties:
+        index:
+          type: string
+        data:
+          maxItems: 10000000
+          minItems: 0
+          type: string
+      type: object
+

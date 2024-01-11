@@ -1,0 +1,713 @@
+openapi: 3.0.3
+info:
+  description: "Contains/describes the core API types for Cactus. Does not describe\
+    \ actual endpoints on its own as this is left to the implementing plugins who\
+    \ can import and re-use commonly needed type definitions from this specification.\
+    \ One example of said commonly used type definitions would be the types related\
+    \ to consortium management, cactus nodes, ledgers, etc.."
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  title: Hyperledger Core API
+  version: v2.0.0-alpha.2
+servers:
+- url: /
+paths: {}
+components:
+  requestBodies:
+    object_store_get_object_v1_request_body:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GetObjectRequestV1'
+      description: Request body to obtain an object via its key.
+      required: true
+    object_store_set_object_v1_request_body:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SetObjectRequestV1'
+      description: Request body to set an object under a key.
+      required: true
+    object_store_has_object_v1_request_body:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/HasObjectRequestV1'
+      description: Request body to check presence of an object under a key.
+      required: true
+    keychain_get_entry_request_body:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GetKeychainEntryRequestV1'
+      description: Request body to obtain a keychain entry via its key
+      required: true
+    keychain_set_entry_request_body:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SetKeychainEntryRequestV1'
+      description: Request body to write/update a keychain entry via its key
+      required: true
+    keychain_has_entry_request_body:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/HasKeychainEntryRequestV1'
+      description: Request body for checking a keychain entry via its key
+      required: true
+    keychain_delete_entry_request_body:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DeleteKeychainEntryRequestV1'
+      description: Request body to delete a keychain entry via its key
+      required: true
+  responses:
+    object_store_get_object_v1_response_body:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GetObjectResponseV1'
+      description: OK
+    object_store_set_object_v1_response_body:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SetObjectResponseV1'
+      description: OK
+    object_store_has_object_v1_response_body:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/HasObjectResponseV1'
+      description: OK
+    keychain_get_entry_200:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GetKeychainEntryResponseV1'
+      description: OK
+    keychain_get_entry_400:
+      description: "Bad request. Key must be a string and longer than 0, shorter than\
+        \ 1024 characters."
+    keychain_get_entry_401:
+      description: Authorization information is missing or invalid.
+    keychain_get_entry_404:
+      description: A keychain item with the specified key was not found.
+    keychain_get_entry_500:
+      description: Unexpected error.
+    keychain_set_entry_200:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SetKeychainEntryResponseV1'
+      description: OK
+    keychain_set_entry_400:
+      description: "Bad request. Key must be a string and longer than 0, shorter than\
+        \ 1024 characters."
+    keychain_set_entry_401:
+      description: Authorization information is missing or invalid.
+    keychain_set_entry_500:
+      description: Unexpected error.
+    keychain_has_entry_200:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/HasKeychainEntryResponseV1'
+      description: OK
+    keychain_has_entry_400:
+      description: "Bad request. Key must be a string and longer than 0, shorter than\
+        \ 1024 characters."
+    keychain_has_entry_401:
+      description: Authorization information is missing or invalid.
+    keychain_has_entry_500:
+      description: Unexpected error.
+    keychain_delete_entry_200:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DeleteKeychainEntryResponseV1'
+      description: OK
+    keychain_delete_entry_400:
+      description: "Bad request. Key must be a string and longer than 0, shorter than\
+        \ 1024 characters."
+    keychain_delete_entry_401:
+      description: Authorization information is missing or invalid.
+    keychain_delete_entry_500:
+      description: Unexpected error.
+  schemas:
+    Constants:
+      enum:
+      - /api/v1/async/socket-io/connect
+      type: string
+      x-enum-varnames:
+      - SocketIoConnectionPathV1
+    PluginImport:
+      properties:
+        packageName:
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+        type:
+          $ref: '#/components/schemas/PluginImportType'
+        action:
+          $ref: '#/components/schemas/PluginImportAction'
+        options: {}
+      required:
+      - action
+      - packageName
+      - type
+      type: object
+    PluginImportType:
+      enum:
+      - org.hyperledger.cactus.plugin_import_type.LOCAL
+      - org.hyperledger.cactus.plugin_import_type.REMOTE
+      type: string
+    PluginImportAction:
+      enum:
+      - org.hyperledger.cactus.plugin_import_action.INSTANTIATE
+      - org.hyperledger.cactus.plugin_import_action.INSTALL
+      type: string
+    ConsensusAlgorithmFamily:
+      description: "Enumerates a list of consensus algorithm families in existence.\
+        \ Does not intend to be an exhaustive list, just a practical one, meaning\
+        \ that we only include items here that are relevant to Hyperledger Cactus\
+        \ in fulfilling its own duties. This can be extended later as more sophisticated\
+        \ features of Cactus get implemented. This enum is meant to be first and foremost\
+        \ a useful abstraction for achieving practical tasks, not an encyclopedia\
+        \ and therefore we ask of everyone that this to be extended only in ways that\
+        \ serve a practical purpose for the runtime behavior of Cactus or Cactus plugins\
+        \ in general. The bottom line is that we can accept this enum being not 100%\
+        \ accurate as long as it 100% satisfies what it was designed to do."
+      enum:
+      - org.hyperledger.cactus.consensusalgorithm.PROOF_OF_AUTHORITY
+      - org.hyperledger.cactus.consensusalgorithm.PROOF_OF_STAKE
+      - org.hyperledger.cactus.consensusalgorithm.PROOF_OF_WORK
+      type: string
+    ConsensusAlgorithmFamiliesWithTxFinality:
+      description: Enumerates a list of consensus algorithm families that provide
+        immediate finality
+      enum:
+      - org.hyperledger.cactus.consensusalgorithm.PROOF_OF_AUTHORITY
+      - org.hyperledger.cactus.consensusalgorithm.PROOF_OF_STAKE
+      type: string
+    ConsensusAlgorithmFamiliesWithOutTxFinality:
+      description: Enumerates a list of consensus algorithm families that do not provide
+        immediate finality
+      enum:
+      - org.hyperledger.cactus.consensusalgorithm.PROOF_OF_WORK
+      type: string
+      x-enum-varnames:
+      - WORK
+    PrimaryKey:
+      maxLength: 128
+      minLength: 1
+      nullable: false
+      type: string
+    ConsortiumMemberId:
+      $ref: '#/components/schemas/PrimaryKey'
+    CactusNodeId:
+      $ref: '#/components/schemas/PrimaryKey'
+    ConsortiumId:
+      $ref: '#/components/schemas/PrimaryKey'
+    LedgerId:
+      $ref: '#/components/schemas/PrimaryKey'
+    PluginInstanceId:
+      $ref: '#/components/schemas/PrimaryKey'
+    ConsortiumDatabase:
+      properties:
+        consortium:
+          default: []
+          description: "A collection of Consortium entities. In practice this should\
+            \ only ever contain a single consortium, but we defined it as an array\
+            \ to keep the convention up with the rest of the collections defined in\
+            \ the Consortium data in general. Also, if we ever decide to somehow have\
+            \ some sort of consortium to consortium integration (which does not make\
+            \ much sense in the current frame of mind of the author in the year 2020)\
+            \ then having this as an array will have proven itself to be an excellent\
+            \ long term compatibility/extensibility decision indeed."
+          items:
+            $ref: '#/components/schemas/Consortium'
+          maxItems: 2048
+          minItems: 0
+          type: array
+        ledger:
+          default: []
+          description: The complete collection of all ledger entities in existence
+            within the consortium.
+          items:
+            $ref: '#/components/schemas/Ledger'
+          maxItems: 2048
+          minItems: 0
+          type: array
+        consortiumMember:
+          default: []
+          description: The complete collection of all consortium member entities in
+            existence within the consortium.
+          items:
+            $ref: '#/components/schemas/ConsortiumMember'
+          maxItems: 2048
+          minItems: 0
+          type: array
+        cactusNode:
+          default: []
+          description: The complete collection of all cactus nodes entities in existence
+            within the consortium.
+          items:
+            $ref: '#/components/schemas/CactusNode'
+          maxItems: 2048
+          minItems: 0
+          type: array
+        pluginInstance:
+          default: []
+          description: The complete collection of all plugin instance entities in
+            existence within the consortium.
+          items:
+            $ref: '#/components/schemas/PluginInstance'
+          maxItems: 2048
+          minItems: 0
+          type: array
+      required:
+      - cactusNode
+      - consortium
+      - consortiumMember
+      - ledger
+      - pluginInstance
+    Ledger:
+      properties:
+        id:
+          maxLength: 128
+          minLength: 1
+          nullable: false
+          type: string
+        ledgerType:
+          $ref: '#/components/schemas/LedgerType'
+        consortiumMemberId:
+          maxLength: 128
+          minLength: 1
+          nullable: false
+          type: string
+      required:
+      - id
+      - ledgerType
+      type: object
+    LedgerType:
+      description: "Enumerates the different ledger vendors and their major versions\
+        \ encoded within the name of the LedgerType. For example \"BESU_1X\" involves\
+        \ all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until,\
+        \ but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further\
+        \ explanation."
+      enum:
+      - BESU_1X
+      - BESU_2X
+      - BURROW_0X
+      - CORDA_4X
+      - FABRIC_14X
+      - FABRIC_2
+      - QUORUM_2X
+      - SAWTOOTH_1X
+      type: string
+    Consortium:
+      properties:
+        id:
+          maxLength: 128
+          minLength: 1
+          nullable: false
+          type: string
+        name:
+          type: string
+        mainApiHost:
+          type: string
+        memberIds:
+          default: []
+          description: The collection (array) of primary keys of consortium member
+            entities that belong to this Consortium.
+          items:
+            $ref: '#/components/schemas/ConsortiumMemberId'
+          maxItems: 2048
+          minItems: 1
+          nullable: false
+          type: array
+      required:
+      - id
+      - mainApiHost
+      - memberIds
+      - name
+      type: object
+    ConsortiumMember:
+      properties:
+        id:
+          maxLength: 128
+          minLength: 1
+          nullable: false
+          type: string
+        name:
+          description: The human readable name a Consortium member can be referred
+            to while making it easy for humans to distinguish this particular consortium
+            member entity from any other ones.
+          maxLength: 2048
+          minLength: 1
+          nullable: false
+          type: string
+        nodeIds:
+          default: []
+          items:
+            $ref: '#/components/schemas/CactusNodeId'
+          maxItems: 2048
+          minItems: 1
+          nullable: false
+          type: array
+      required:
+      - id
+      - name
+      - nodeIds
+      type: object
+    CactusNodeMeta:
+      description: A Cactus node meta information
+      properties:
+        nodeApiHost:
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+        publicKeyPem:
+          description: The PEM encoded public key that was used to generate the JWS
+            included in the response (the jws property)
+          format: "Must only contain the public key, never include here  the PEM that\
+            \ also contains a private key. See PEM format: https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail"
+          maxLength: 65535
+          minLength: 1
+          nullable: false
+          type: string
+      required:
+      - nodeApiHost
+      - publicKeyPem
+      type: object
+    CactusNode:
+      allOf:
+      - $ref: '#/components/schemas/CactusNodeMeta'
+      - $ref: '#/components/schemas/CactusNode_allOf'
+      description: "A Cactus node can be a single server, or a set of servers behind\
+        \ a load balancer acting as one."
+      type: object
+    PluginInstance:
+      properties:
+        id:
+          maxLength: 128
+          minLength: 1
+          nullable: false
+          type: string
+        packageName:
+          maxLength: 4096
+          minLength: 1
+          nullable: false
+          type: string
+      required:
+      - id
+      - packageName
+      type: object
+    JWSCompact:
+      description: "A JSON Web Signature. See: https://tools.ietf.org/html/rfc7515\
+        \ for info about standard."
+      example: eyJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE1MTYyMzkwMjJ9.DOCNCqEMN7CQ_z-RMndiyldljXOk6WFIZxRzNF5Ylg4
+      maxLength: 65535
+      minLength: 5
+      pattern: "/^[a-zA-Z0-9-_]+?.[a-zA-Z0-9-_]+?.([a-zA-Z0-9-_]+)?$/"
+      type: string
+    JWSRecipient:
+      description: "A JSON Web Signature. See: https://tools.ietf.org/html/rfc7515\
+        \ for info about standard."
+      properties:
+        signature:
+          type: string
+        protected:
+          type: string
+        header:
+          additionalProperties: true
+          type: object
+      required:
+      - signature
+      type: object
+    JWSGeneral:
+      properties:
+        payload:
+          maxLength: 65535
+          minLength: 1
+          type: string
+        signatures:
+          items:
+            $ref: '#/components/schemas/JWSRecipient'
+          type: array
+      required:
+      - payload
+      - signatures
+      type: object
+    GetObjectRequestV1:
+      additionalProperties: false
+      properties:
+        key:
+          description: The key for the entry to get from the object store.
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+      required:
+      - key
+      type: object
+    GetObjectResponseV1:
+      properties:
+        key:
+          description: The key that was used to retrieve the value from the object
+            store.
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+        value:
+          description: The value associated with the requested key in the object store
+            as a string.
+          maxLength: 10485760
+          minLength: 0
+          nullable: false
+          type: string
+      required:
+      - key
+      - value
+      type: object
+    HasObjectRequestV1:
+      additionalProperties: false
+      properties:
+        key:
+          description: The key to check for presence in the object store.
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+      required:
+      - key
+      type: object
+    HasObjectResponseV1:
+      properties:
+        key:
+          description: The key that was used to check the presence of the value in
+            the object store.
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+        checkedAt:
+          description: Date and time encoded as JSON when the presence check was performed
+            by the plugin backend.
+          nullable: false
+          type: string
+        isPresent:
+          description: The boolean true or false indicating the presence or absence
+            of an object under 'key'.
+          nullable: false
+          type: boolean
+      required:
+      - checkedAt
+      - isPresent
+      - key
+      type: object
+    SetObjectRequestV1:
+      additionalProperties: false
+      properties:
+        key:
+          description: The key for the entry to set in the object store.
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+        value:
+          description: The value that will be associated with the key in the object
+            store.
+          maxLength: 10485760
+          minLength: 0
+          nullable: false
+          type: string
+      required:
+      - key
+      - value
+      type: object
+    SetObjectResponseV1:
+      properties:
+        key:
+          description: The key that was used to set the value in the object store.
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+      required:
+      - key
+      type: object
+    GetKeychainEntryRequestV1:
+      additionalProperties: false
+      properties:
+        key:
+          description: The key for the entry to get from the keychain.
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+      required:
+      - key
+      type: object
+    GetKeychainEntryResponseV1:
+      properties:
+        key:
+          description: The key that was used to retrieve the value from the keychain.
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+        value:
+          description: The value associated with the requested key on the keychain.
+          maxLength: 10485760
+          minLength: 0
+          nullable: false
+          type: string
+      required:
+      - key
+      - value
+      type: object
+    SetKeychainEntryRequestV1:
+      additionalProperties: false
+      properties:
+        key:
+          description: The key for the entry to set on the keychain.
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+        value:
+          description: The value that will be associated with the key on the keychain.
+          maxLength: 10485760
+          minLength: 0
+          nullable: false
+          type: string
+      required:
+      - key
+      - value
+      type: object
+    SetKeychainEntryResponseV1:
+      properties:
+        key:
+          description: The key that was used to set the value on the keychain.
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+      required:
+      - key
+      type: object
+    DeleteKeychainEntryRequestV1:
+      additionalProperties: false
+      properties:
+        key:
+          description: The key for the entry to check the presence of on the keychain.
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+      required:
+      - key
+      type: object
+    DeleteKeychainEntryResponseV1:
+      properties:
+        key:
+          description: The key that was deleted from the keychain.
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+      required:
+      - key
+      type: object
+    HasKeychainEntryRequestV1:
+      additionalProperties: false
+      properties:
+        key:
+          description: The key to check for presence in the keychain.
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+      required:
+      - key
+      type: object
+    HasKeychainEntryResponseV1:
+      properties:
+        key:
+          description: The key that was used to check the presence of the value in
+            the entry store.
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+        checkedAt:
+          description: Date and time encoded as JSON when the presence check was performed
+            by the plugin backend.
+          nullable: false
+          type: string
+        isPresent:
+          description: The boolean true or false indicating the presence or absence
+            of an entry under 'key'.
+          nullable: false
+          type: boolean
+      required:
+      - checkedAt
+      - isPresent
+      - key
+      type: object
+    CactusNode_allOf:
+      properties:
+        id:
+          maxLength: 128
+          minLength: 1
+          nullable: false
+          type: string
+        consortiumId:
+          maxLength: 128
+          minLength: 1
+          nullable: false
+          type: string
+        memberId:
+          maxLength: 128
+          minLength: 1
+          nullable: false
+          type: string
+        ledgerIds:
+          default: []
+          description: Stores an array of Ledger entity IDs that are reachable (routable)
+            via this Cactus Node. This information is used by the client side SDK
+            API client to figure out at runtime where to send API requests that are
+            specific to a certain ledger such as requests to execute transactions.
+          items:
+            $ref: '#/components/schemas/LedgerId'
+          maxItems: 2048
+          minItems: 0
+          nullable: false
+          type: array
+        pluginInstanceIds:
+          default: []
+          items:
+            $ref: '#/components/schemas/PluginInstanceId'
+          maxItems: 2048
+          minItems: 0
+          nullable: false
+          type: array
+      required:
+      - consortiumId
+      - id
+      - ledgerIds
+      - memberId
+      - nodeApiHost
+      - pluginInstanceIds
+      - publicKeyPem
+      type: object
+      example: null
+

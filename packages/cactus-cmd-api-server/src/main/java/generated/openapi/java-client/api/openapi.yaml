@@ -1,0 +1,133 @@
+openapi: 3.0.3
+info:
+  description: Interact with a Cactus deployment through HTTP.
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  title: Hyperledger Cactus API
+  version: v2.0.0-alpha.2
+servers:
+- url: /
+paths:
+  /api/v1/api-server/healthcheck:
+    get:
+      description: Returns the current timestamp of the API server as proof of health/liveness
+      operationId: getHealthCheckV1
+      parameters: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthCheckResponse'
+          description: OK
+      summary: Can be used to verify liveness of an API server instance
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: get
+          path: /api/v1/api-server/healthcheck
+      x-accepts: application/json
+  /api/v1/api-server/get-prometheus-exporter-metrics:
+    get:
+      operationId: getPrometheusMetricsV1
+      parameters: []
+      responses:
+        "200":
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/PrometheusExporterMetricsResponse'
+          description: OK
+      summary: Get the Prometheus Metrics
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: get
+          path: /api/v1/api-server/get-prometheus-exporter-metrics
+      x-accepts: text/plain
+  /api/v1/api-server/get-open-api-spec:
+    get:
+      description: Returns the openapi.json document of specific plugin.
+      operationId: getOpenApiSpecV1
+      parameters: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetOpenApiSpecV1EndpointResponse'
+          description: OK
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: get
+          path: /api/v1/api-server/get-open-api-spec
+      x-accepts: application/json
+components:
+  schemas:
+    WatchHealthcheckV1:
+      enum:
+      - org.hyperledger.cactus.api.async.besu.WatchHealthcheckV1.Subscribe
+      - org.hyperledger.cactus.api.async.besu.WatchHealthcheckV1.Next
+      - org.hyperledger.cactus.api.async.besu.WatchHealthcheckV1.Unsubscribe
+      - org.hyperledger.cactus.api.async.besu.WatchHealthcheckV1.Error
+      - org.hyperledger.cactus.api.async.besu.WatchHealthcheckV1.Complete
+      type: string
+      x-enum-varnames:
+      - Subscribe
+      - Next
+      - Unsubscribe
+      - Error
+      - Complete
+    MemoryUsage:
+      example:
+        heapUsed: 1.4658129805029452
+        external: 5.962133916683182
+        rss: 0.8008281904610115
+        heapTotal: 6.027456183070403
+        arrayBuffers: 5.637376656633329
+      properties:
+        rss:
+          title: Resident Set Size
+          type: number
+        heapTotal:
+          title: V8 memory usage - heap total
+          type: number
+        heapUsed:
+          title: V8 memory usage - heap used
+          type: number
+        external:
+          title: Memory usage of C++ objects bound to JavaScript objects managed by
+            V8
+          type: number
+        arrayBuffers:
+          title: "Memory allocated for ArrayBuffers and SharedArrayBuffers, including\
+            \ all Node.js Buffers"
+          type: number
+      type: object
+    HealthCheckResponse:
+      example:
+        createdAt: createdAt
+        memoryUsage:
+          heapUsed: 1.4658129805029452
+          external: 5.962133916683182
+          rss: 0.8008281904610115
+          heapTotal: 6.027456183070403
+          arrayBuffers: 5.637376656633329
+        success: true
+      properties:
+        success:
+          type: boolean
+        createdAt:
+          type: string
+        memoryUsage:
+          $ref: '#/components/schemas/MemoryUsage'
+      required:
+      - createdAt
+      - memoryUsage
+      type: object
+    PrometheusExporterMetricsResponse:
+      nullable: false
+      type: string
+    GetOpenApiSpecV1EndpointResponse:
+      nullable: false
+      type: string
+

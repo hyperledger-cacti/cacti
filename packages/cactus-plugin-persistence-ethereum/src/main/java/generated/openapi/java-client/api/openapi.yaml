@@ -1,0 +1,150 @@
+openapi: 3.0.3
+info:
+  description: Synchronizes state of an ethereum ledger into a DB that can later be
+    viewed in GUI
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  title: Hyperledger Cactus Plugin - Persistence Ethereum
+  version: v2.0.0-alpha.2
+servers:
+- url: /
+paths:
+  /api/v1/plugins/@hyperledger/cactus-plugin-persistence-ethereum/status:
+    get:
+      operationId: getStatusV1
+      parameters: []
+      responses:
+        "200":
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/StatusResponseV1'
+          description: OK
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorExceptionResponseV1'
+          description: Internal Server Error
+      summary: Get the status of persistence plugin for ethereum
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: get
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-persistence-ethereum/status
+      x-accepts: application/json
+components:
+  schemas:
+    TokenTypeV1:
+      enum:
+      - erc20
+      - erc721
+      type: string
+      x-enum-descriptions:
+      - "EIP-20: Token Standard"
+      - "EIP-721: Non-Fungible Token Standard"
+      x-enum-varnames:
+      - ERC20
+      - ERC721
+    MonitoredToken:
+      description: Ethereum tokens that are being monitored by the persistence plugin.
+      properties:
+        type:
+          $ref: '#/components/schemas/TokenTypeV1'
+        name:
+          description: Token name
+          nullable: false
+          type: string
+        symbol:
+          description: Token symbol
+          nullable: false
+          type: string
+      required:
+      - name
+      - symbol
+      - type
+      type: object
+    TrackedOperationV1:
+      description: Persistence plugin operation that is tracked and returned in status
+        report.
+      example:
+        operation: operation
+        startAt: startAt
+      properties:
+        startAt:
+          description: Start time of the operation.
+          nullable: false
+          type: string
+        operation:
+          description: Operation name.
+          nullable: false
+          type: string
+      required:
+      - operation
+      - startAt
+      type: object
+    StatusResponseV1:
+      description: Response with plugin status report.
+      example:
+        connected: true
+        monitoredTokensCount: 0.8008281904610115
+        instanceId: instanceId
+        lastSeenBlock: 6.027456183070403
+        monitorRunning: true
+        webServicesRegistered: true
+        operationsRunning:
+        - operation: operation
+          startAt: startAt
+        - operation: operation
+          startAt: startAt
+      properties:
+        instanceId:
+          description: Plugin instance id.
+          nullable: false
+          type: string
+        connected:
+          description: "True if successfully connected to the database, false otherwise."
+          nullable: false
+          type: boolean
+        webServicesRegistered:
+          description: True if web services were correctly exported.
+          nullable: false
+          type: boolean
+        monitoredTokensCount:
+          description: Total number of tokens being monitored by the plugin.
+          nullable: false
+          type: number
+        operationsRunning:
+          items:
+            $ref: '#/components/schemas/TrackedOperationV1'
+          type: array
+        monitorRunning:
+          description: "True if block monitoring is running, false otherwise."
+          nullable: false
+          type: boolean
+        lastSeenBlock:
+          description: Number of the last block seen by the block monitor.
+          nullable: false
+          type: number
+      required:
+      - connected
+      - instanceId
+      - lastSeenBlock
+      - monitorRunning
+      - monitoredTokensCount
+      - operationsRunning
+      - webServicesRegistered
+      type: object
+    ErrorExceptionResponseV1:
+      properties:
+        message:
+          nullable: false
+          type: string
+        error:
+          nullable: false
+          type: string
+      required:
+      - error
+      - message
+      type: object
+

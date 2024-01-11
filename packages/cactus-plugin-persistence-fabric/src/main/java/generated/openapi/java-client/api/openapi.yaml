@@ -1,0 +1,14 @@
+openapi: 3.0.3
+info:
+  description: Scrap fabric ledger into database. Needs administrative privileges.
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  title: Hyperledger Cactus Plugin - Block Fabrick PErsistance
+  version: v2.0.0-alpha.2
+servers:
+- url: /
+paths: {}
+components:
+  schemas: {}
+

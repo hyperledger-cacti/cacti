@@ -1,0 +1,281 @@
+openapi: 3.0.3
+info:
+  description: Can perform basic tasks on a Sawtooth ledger
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  title: Hyperledger Cacti Plugin - Connector Sawtooth
+  version: v2.0.0-alpha.2
+servers:
+- url: /
+paths:
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-sawtooth/status:
+    get:
+      operationId: getStatusV1
+      parameters: []
+      responses:
+        "200":
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/StatusResponseV1'
+          description: OK
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorExceptionResponseV1'
+          description: Internal Server Error
+      summary: Get the status of the connector and the sawtooth validator
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: get
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-sawtooth/status
+      x-accepts: application/json
+components:
+  schemas:
+    SawtoothTransactionHeaderV1:
+      properties:
+        batcher_public_key:
+          example: 02d260a46457a064733153e09840c322bee1dff34445d7d49e19e60abd18fd0758
+          type: string
+        dependencies:
+          items:
+            example: 1baee350bdb60bcee60e3d325d43283cf830b4c23b2cb17d3bb43935bd7af3761c2bee79847c72a9e396a9ae58f48add4e43f94eb83f84442c6085c1dd5d4dbe
+            type: string
+          type: array
+        family_name:
+          example: intkey
+          type: string
+        family_version:
+          example: "1.0"
+          type: string
+        inputs:
+          items:
+            example: 1cf12650d858e0985ecc7f60418aaf0cc5ab587f42c2570a884095a9e8ccacd0f6545c
+            type: string
+          type: array
+        nonce:
+          example: QAApS4L
+          type: string
+        outputs:
+          items:
+            example: 1cf12650d858e0985ecc7f60418aaf0cc5ab587f42c2570a884095a9e8ccacd0f6545c
+            type: string
+          type: array
+        payload_sha512:
+          example: fb6135ef73f4fe77367f9384b3bbbb158f4b8603c9d612157108e5c271868fce2242ee4abd7a29397ba63780c3ccab13783dfd4d9f0167beda03cdb0e37b87f4
+          type: string
+        signer_public_key:
+          example: 038bba5708acc262464c9fe30d3de9e905a9a5fa30cedd151dd9cd09ea26d46d00
+          type: string
+      required:
+      - batcher_public_key
+      - dependencies
+      - family_name
+      - family_version
+      - inputs
+      - nonce
+      - outputs
+      - payload_sha512
+      - signer_public_key
+    SawtoothTransactionV1:
+      properties:
+        header:
+          $ref: '#/components/schemas/SawtoothTransactionHeaderV1'
+        header_signature:
+          example: 540a6803971d1880ec73a96cb97815a95d374cbad5d865925e5aa0432fcf1931539afe10310c122c5eaae15df61236079abbf4f258889359c4d175516934484a
+          type: string
+        payload:
+          type: string
+      required:
+      - header
+      - header_signature
+      - payload
+    SawtoothBatchHeaderV1:
+      properties:
+        signer_public_key:
+          example: 038bba5708acc262464c9fe30d3de9e905a9a5fa30cedd151dd9cd09ea26d46d00
+          type: string
+        transaction_ids:
+          items:
+            example: 540a6803971d1880ec73a96cb97815a95d374cbad5d865925e5aa0432fcf1931539afe10310c122c5eaae15df61236079abbf4f258889359c4d175516934484a
+            type: string
+          type: array
+      required:
+      - signer_public_key
+      - transaction_ids
+    SawtoothBatchV1:
+      properties:
+        header:
+          $ref: '#/components/schemas/SawtoothBatchHeaderV1'
+        header_signature:
+          example: 89807bfc9089e37e00d87d97357de14cfbc455cd608438d426a625a30a0da9a31c406983803c4aa27e1f32a3ff61709e8ec4b56abbc553d7d330635b5d27029c
+          type: string
+        transactions:
+          items:
+            $ref: '#/components/schemas/SawtoothTransactionV1'
+          type: array
+      required:
+      - header
+      - header_signature
+      - transactions
+    SawtoothBlockHeaderV1:
+      properties:
+        block_num:
+          example: 12345
+          type: integer
+        previous_block_id:
+          example: 65cd3a3ce088b265b626f704b7f3db97b6f12e848dccb35d7806f3d0324c71b709ed360d602b8b658b94695374717e3bdb4b76f77886953777d5d008558247dd
+          type: string
+        signer_public_key:
+          example: 02d260a46457a064733153e09840c322bee1dff34445d7d49e19e60abd18fd0758
+          type: string
+        batch_ids:
+          items:
+            example: 89807bfc9089e37e00d87d97357de14cfbc455cd608438d426a625a30a0da9a31c406983803c4aa27e1f32a3ff61709e8ec4b56abbc553d7d330635b5d27029c
+            type: string
+          type: array
+        consensus:
+          type: string
+        state_root_hash:
+          example: 708ca7fbb701799bb387f2e50deaca402e8502abe229f705693d2d4f350e1ad6
+          type: string
+      required:
+      - batch_ids
+      - block_num
+      - consensus
+      - previous_block_id
+      - signer_public_key
+      - state_root_hash
+    SawtoothBlockV1:
+      properties:
+        header:
+          $ref: '#/components/schemas/SawtoothBlockHeaderV1'
+        header_signature:
+          example: 65cd3a3ce088b265b626f704b7f3db97b6f12e848dccb35d7806f3d0324c71b709ed360d602b8b658b94695374717e3bdb4b76f77886953777d5d008558247dd
+          type: string
+        batches:
+          items:
+            $ref: '#/components/schemas/SawtoothBatchV1'
+          type: array
+      required:
+      - batches
+      - header
+      - header_signature
+    CactiTransactionV1:
+      allOf:
+      - $ref: '#/components/schemas/SawtoothTransactionV1'
+      - $ref: '#/components/schemas/CactiTransactionV1_allOf'
+      description: Sawtooth transaction with additional fields filled by Cacti connector.
+      type: object
+    WatchBlocksV1:
+      enum:
+      - org.hyperledger.cacti.api.async.sawtooth.WatchBlocksV1.Subscribe
+      - org.hyperledger.cacti.api.async.sawtooth.WatchBlocksV1.Next
+      - org.hyperledger.cacti.api.async.sawtooth.WatchBlocksV1.Unsubscribe
+      - org.hyperledger.cacti.api.async.sawtooth.WatchBlocksV1.Error
+      - org.hyperledger.cacti.api.async.sawtooth.WatchBlocksV1.Complete
+      type: string
+      x-enum-varnames:
+      - Subscribe
+      - Next
+      - Unsubscribe
+      - Error
+      - Complete
+    WatchBlocksV1ListenerType:
+      description: "Response type from WatchBlocks. 'Cacti*' are custom views, others\
+        \ correspond to plain sawtooth data."
+      enum:
+      - full
+      - cacti:transactions
+      type: string
+      x-enum-varnames:
+      - Full
+      - CactiTransactions
+    WatchBlocksV1TransactionFilter:
+      properties:
+        family_name:
+          type: string
+      type: object
+    WatchBlocksV1Options:
+      properties:
+        type:
+          $ref: '#/components/schemas/WatchBlocksV1ListenerType'
+        txFilterBy:
+          $ref: '#/components/schemas/WatchBlocksV1TransactionFilter'
+      type: object
+    WatchBlocksV1CactiTransactionsResponse:
+      description: Custom response containing block transactions summary.
+      properties:
+        cactiTransactionsEvents:
+          description: List of sawtooth transactions matching specifid (optional)
+            filter
+          items:
+            $ref: '#/components/schemas/CactiTransactionV1'
+          type: array
+      required:
+      - cactiTransactionsEvents
+      type: object
+    WatchBlocksV1FullResponse:
+      description: Response that returns entire sawtooth block.
+      properties:
+        fullBlock:
+          $ref: '#/components/schemas/SawtoothBlockV1'
+      required:
+      - fullBlock
+      type: object
+    WatchBlocksV1Progress:
+      description: Response block from WatchBlocks endpoint. Depends on 'type' passed
+        in subscription options.
+      oneOf:
+      - $ref: '#/components/schemas/WatchBlocksV1CactiTransactionsResponse'
+      - $ref: '#/components/schemas/WatchBlocksV1FullResponse'
+    StatusResponseV1:
+      description: Response with plugin and validator status report.
+      example:
+        openApiSpecVersion: openApiSpecVersion
+        sawtoothStatus: ""
+        instanceId: instanceId
+        initialized: true
+      properties:
+        instanceId:
+          description: Plugin instance id.
+          nullable: false
+          type: string
+        openApiSpecVersion:
+          description: Version of connectors Open API Spec.
+          nullable: false
+          type: string
+        initialized:
+          description: "True if endpoints were created, false otherwise"
+          nullable: false
+          type: boolean
+        sawtoothStatus:
+          description: Response from sawtooth Rest API status endpoint
+          nullable: false
+      required:
+      - instanceId
+      type: object
+    ErrorExceptionResponseV1:
+      properties:
+        message:
+          nullable: false
+          type: string
+        error:
+          nullable: false
+          type: string
+      required:
+      - error
+      - message
+      type: object
+    CactiTransactionV1_allOf:
+      properties:
+        payload_decoded:
+          description: Decoded payload of sawtooth transaction.
+          example: "[{'Verb':'inc','Name':'monitorTest3','Value':11}]}]"
+      required:
+      - payload_decoded
+      type: object
+      example: null
+

@@ -3,4 +3,7 @@
 **/.gitignore
 **/generated/openapi/kotlin-client/docs/**
 **/generated/openapi/kotlin-client/gradle/**
+**/generated/openapi/java-client/docs/**
+**/generated/openapi/java-client/gradle/**
+**/generated/openapi/go-client/docs/**
 **/generated/**/.openapi-generator-ignore

@@ -1,0 +1,1822 @@
+openapi: 3.0.3
+info:
+  description: Can perform basic tasks on a fabric ledger
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  title: Hyperledger Cactus Plugin - Connector Fabric
+  version: v2.0.0-alpha.2
+servers:
+- url: /
+paths:
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction:
+    post:
+      description: ""
+      operationId: runTransactionV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RunTransactionRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RunTransactionResponse'
+          description: OK
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorExceptionResponseV1'
+          description: Internal Server Error
+      summary: Runs a transaction on a Fabric ledger.
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction
+      x-content-type: application/json
+      x-accepts: application/json
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-delegated-sign-transaction:
+    post:
+      description: ""
+      operationId: runDelegatedSignTransactionV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RunDelegatedSignTransactionRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RunTransactionResponse'
+          description: OK
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorExceptionResponseV1'
+          description: Internal Server Error
+      summary: Runs a transaction on a Fabric ledger using user-provided signing callback.
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-delegated-sign-transaction
+      x-content-type: application/json
+      x-accepts: application/json
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-transaction-receipt-by-txid:
+    post:
+      description: ""
+      operationId: getTransactionReceiptByTxIDV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RunTransactionRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetTransactionReceiptResponse'
+          description: OK
+        "404":
+          description: ""
+      summary: get a transaction receipt by tx id on a Fabric ledger.
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-transaction-receipt-by-txid
+      x-content-type: application/json
+      x-accepts: application/json
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract-go-source:
+    post:
+      operationId: deployContractGoSourceV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeployContractGoSourceV1Request'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeployContractGoSourceV1Response'
+          description: OK
+        "501":
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/deployContractGoSourceV1_501_response'
+          description: Not implemented
+      summary: Deploys a chaincode contract in the form of a go sources.
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract-go-source
+      x-content-type: application/json
+      x-accepts: application/json
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract:
+    post:
+      operationId: deployContractV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeployContractV1Request'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeployContractV1Response'
+          description: OK
+        "501":
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/deployContractGoSourceV1_501_response'
+          description: Not implemented
+      summary: "Deploys a chaincode contract from a set of source files. Note: This\
+        \ endpoint only supports Fabric 2.x. The 'v1' suffix in the method name refers\
+        \ to the Cactus API version, not the supported Fabric ledger version."
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract
+      x-content-type: application/json
+      x-accepts: application/json
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-block:
+    post:
+      operationId: getBlockV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetBlockRequestV1'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetBlockResponseV1'
+          description: OK
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorExceptionResponseV1'
+          description: Internal Server Error
+      summary: Get block from the channel using one of selectors from the input. Works
+        only on Fabric 2.x.
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-block
+      x-content-type: application/json
+      x-accepts: application/json
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-prometheus-exporter-metrics:
+    get:
+      operationId: getPrometheusMetricsV1
+      parameters: []
+      responses:
+        "200":
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/PrometheusExporterMetricsResponse'
+          description: OK
+      summary: Get the Prometheus Metrics
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: get
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-prometheus-exporter-metrics
+      x-accepts: text/plain
+components:
+  schemas:
+    TransactReceiptTransactionEndorsement:
+      example:
+        mspid: mspid
+        signature: signature
+        endorserID: endorserID
+      properties:
+        mspid:
+          type: string
+        endorserID:
+          type: string
+        signature:
+          type: string
+      type: object
+    TransactReceiptTransactionCreator:
+      example:
+        mspid: mspid
+        creatorID: creatorID
+      properties:
+        mspid:
+          type: string
+        creatorID:
+          type: string
+      type: object
+    TransactReceiptBlockMetaData:
+      example:
+        mspid: mspid
+        blockCreatorID: blockCreatorID
+        signature: signature
+      properties:
+        mspid:
+          type: string
+        blockCreatorID:
+          type: string
+        signature:
+          type: string
+      type: object
+    VaultTransitKey:
+      description: vault key details for signing fabric message with private key stored
+        with transit engine.
+      example:
+        keyName: keyName
+        token: token
+      nullable: false
+      properties:
+        keyName:
+          description: label of private key
+          maxLength: 100
+          minLength: 1
+          nullable: false
+          type: string
+        token:
+          description: token for accessing private key
+          maxLength: 100
+          minLength: 1
+          nullable: false
+          type: string
+      required:
+      - keyName
+      - token
+      type: object
+    WebSocketKey:
+      description: web-socket key details for signing fabric message with private
+        key stored with external client
+      example:
+        signature: signature
+        sessionId: sessionId
+      nullable: false
+      properties:
+        sessionId:
+          description: session Id to access client
+          maxLength: 100
+          minLength: 1
+          nullable: false
+          type: string
+        signature:
+          description: signature of the session ID
+          maxLength: 100
+          minLength: 1
+          nullable: false
+          type: string
+      required:
+      - sessionId
+      - signature
+      type: object
+    FabricSigningCredentialType:
+      description: different type of identity provider for singing fabric messages
+        supported by this package
+      enum:
+      - X.509
+      - Vault-X.509
+      - WS-X.509
+      nullable: false
+      type: string
+    FabricSigningCredential:
+      example:
+        vaultTransitKey:
+          keyName: keyName
+          token: token
+        keychainId: keychainId
+        keychainRef: keychainRef
+        webSocketKey:
+          signature: signature
+          sessionId: sessionId
+        type: null
+      properties:
+        keychainId:
+          maxLength: 100
+          minLength: 1
+          nullable: false
+          type: string
+        keychainRef:
+          maxLength: 100
+          minLength: 1
+          nullable: false
+          type: string
+        type:
+          $ref: '#/components/schemas/FabricSigningCredentialType'
+        vaultTransitKey:
+          $ref: '#/components/schemas/VaultTransitKey'
+        webSocketKey:
+          $ref: '#/components/schemas/WebSocketKey'
+      required:
+      - keychainId
+      - keychainRef
+      type: object
+    ChainCodeLifeCycleCommandResponses:
+      example:
+        init:
+          code: 0
+          stdout: stdout
+          stderr: stderr
+          signal: signal
+        commit:
+          code: 0
+          stdout: stdout
+          stderr: stderr
+          signal: signal
+        installList:
+        - code: 0
+          stdout: stdout
+          stderr: stderr
+          signal: signal
+        - code: 0
+          stdout: stdout
+          stderr: stderr
+          signal: signal
+        queryCommitted:
+          code: 0
+          stdout: stdout
+          stderr: stderr
+          signal: signal
+        packaging:
+          code: 0
+          stdout: stdout
+          stderr: stderr
+          signal: signal
+        approveForMyOrgList:
+        - code: 0
+          stdout: stdout
+          stderr: stderr
+          signal: signal
+        - code: 0
+          stdout: stdout
+          stderr: stderr
+          signal: signal
+        queryInstalledList:
+        - code: 0
+          stdout: stdout
+          stderr: stderr
+          signal: signal
+        - code: 0
+          stdout: stdout
+          stderr: stderr
+          signal: signal
+      properties:
+        packaging:
+          $ref: '#/components/schemas/SSHExecCommandResponse'
+        installList:
+          items:
+            $ref: '#/components/schemas/SSHExecCommandResponse'
+          minItems: 1
+          type: array
+        queryInstalledList:
+          items:
+            $ref: '#/components/schemas/SSHExecCommandResponse'
+          minItems: 1
+          type: array
+        approveForMyOrgList:
+          items:
+            $ref: '#/components/schemas/SSHExecCommandResponse'
+          minItems: 1
+          type: array
+        commit:
+          $ref: '#/components/schemas/SSHExecCommandResponse'
+        queryCommitted:
+          $ref: '#/components/schemas/SSHExecCommandResponse'
+        init:
+          $ref: '#/components/schemas/SSHExecCommandResponse'
+      required:
+      - approveForMyOrgList
+      - installList
+      - queryInstalledList
+      type: object
+    ChainCodeProgrammingLanguage:
+      description: Enumerates the supported source code programming languages of Hyperledger
+        Fabric
+      enum:
+      - golang
+      - javascript
+      - typescript
+      - java
+      type: string
+    ChainCodeLanguageRuntime:
+      description: Enumerates the supported programming language runtimes of Hyperledger
+        Fabric
+      enum:
+      - golang
+      - node
+      - java
+      type: string
+    ConnectionProfile:
+      additionalProperties: true
+      example:
+        channels:
+          key: ""
+        certificateAuthorities:
+          key: ""
+        name: basic-network
+        organizations:
+          key: ""
+        peers:
+          key: ""
+        x-type: hlfv1
+        description: The basic network
+        client:
+          organization: Org1
+        orderers:
+          key: ""
+        version: "1.0"
+      properties:
+        name:
+          example: basic-network
+          maxLength: 1024
+          minLength: 1
+          type: string
+        x-type:
+          example: hlfv1
+          minLength: 1
+          type: string
+        description:
+          example: The basic network
+          type: string
+        version:
+          example: "1.0"
+          type: string
+        client:
+          $ref: '#/components/schemas/ConnectionProfile_client'
+        channels:
+          additionalProperties: true
+          type: object
+        organizations:
+          additionalProperties: true
+          type: object
+        orderers:
+          additionalProperties: true
+          type: object
+        peers:
+          additionalProperties: true
+          type: object
+        certificateAuthorities:
+          additionalProperties: true
+          type: object
+      required:
+      - name
+      - organizations
+      - peers
+      - version
+      type: object
+    GatewayDiscoveryOptions:
+      additionalProperties: false
+      example:
+        asLocalhost: true
+        enabled: true
+      properties:
+        asLocalhost:
+          nullable: false
+          type: boolean
+        enabled:
+          nullable: false
+          type: boolean
+      type: object
+    GatewayOptions:
+      example:
+        wallet:
+          keychain:
+            vaultTransitKey:
+              keyName: keyName
+              token: token
+            keychainId: keychainId
+            keychainRef: keychainRef
+            webSocketKey:
+              signature: signature
+              sessionId: sessionId
+            type: null
+          json: json
+        connectionProfile:
+          channels:
+            key: ""
+          certificateAuthorities:
+            key: ""
+          name: basic-network
+          organizations:
+            key: ""
+          peers:
+            key: ""
+          x-type: hlfv1
+          description: The basic network
+          client:
+            organization: Org1
+          orderers:
+            key: ""
+          version: "1.0"
+        discovery:
+          asLocalhost: true
+          enabled: true
+        identity: identity
+        eventHandlerOptions:
+          commitTimeout: 0.8008281904610115
+          strategy: null
+          endorseTimeout: 6.027456183070403
+      properties:
+        connectionProfile:
+          $ref: '#/components/schemas/ConnectionProfile'
+        discovery:
+          $ref: '#/components/schemas/GatewayDiscoveryOptions'
+        eventHandlerOptions:
+          $ref: '#/components/schemas/GatewayEventHandlerOptions'
+        identity:
+          type: string
+        wallet:
+          $ref: '#/components/schemas/GatewayOptions_wallet'
+      required:
+      - identity
+      - wallet
+      type: object
+    DefaultEventHandlerStrategy:
+      enum:
+      - MSPID_SCOPE_ALLFORTX
+      - MSPID_SCOPE_ANYFORTX
+      - NETWORK_SCOPE_ALLFORTX
+      - NETWORK_SCOPE_ANYFORTX
+      type: string
+    GatewayEventHandlerOptions:
+      additionalProperties: false
+      example:
+        commitTimeout: 0.8008281904610115
+        strategy: null
+        endorseTimeout: 6.027456183070403
+      properties:
+        commitTimeout:
+          nullable: false
+          type: number
+        endorseTimeout:
+          nullable: false
+          type: number
+        strategy:
+          $ref: '#/components/schemas/DefaultEventHandlerStrategy'
+      required:
+      - strategy
+      type: object
+    FileBase64:
+      description: Represents a file-system file that has a name and a body which
+        holds the file contents as a Base64 encoded string
+      example:
+        filename: my-cool-file-full-of-wonders-and-fun-stuff.go
+        filepath: ./my/sub-folder/structure/
+        body: body
+      properties:
+        body:
+          description: The file's contents encoded as a Base64 string.
+          maxLength: 104857600
+          minLength: 1
+          nullable: false
+          type: string
+        filename:
+          description: The name as referred to on a file system
+          example: my-cool-file-full-of-wonders-and-fun-stuff.go
+          maxLength: 255
+          minLength: 1
+          nullable: false
+          type: string
+        filepath:
+          description: "The relative path of the file, if it should be placed in a\
+            \ sub-directory"
+          example: ./my/sub-folder/structure/
+          maxLength: 512
+          minLength: 1
+          nullable: false
+          type: string
+      required:
+      - body
+      - filename
+      type: object
+    FabricContractInvocationType:
+      enum:
+      - FabricContractInvocationType.SEND
+      - FabricContractInvocationType.CALL
+      - FabricContractInvocationType.SENDPRIVATE
+      type: string
+    SSHExecCommandResponse:
+      example:
+        code: 0
+        stdout: stdout
+        stderr: stderr
+        signal: signal
+      properties:
+        stdout:
+          nullable: false
+          type: string
+        stderr:
+          nullable: false
+          type: string
+        code:
+          nullable: true
+          type: integer
+        signal:
+          nullable: true
+          type: string
+      required:
+      - code
+      - signal
+      - stderr
+      - stdout
+      type: object
+    RunTransactionResponseType:
+      description: Response format from transaction / query execution
+      enum:
+      - org.hyperledger.cacti.api.hlfabric.RunTransactionResponseType.JSON
+      - org.hyperledger.cacti.api.hlfabric.RunTransactionResponseType.UTF8
+      type: string
+      x-enum-varnames:
+      - JSON
+      - UTF8
+    RunTransactionRequest:
+      additionalProperties: false
+      example:
+        gatewayOptions:
+          wallet:
+            keychain:
+              vaultTransitKey:
+                keyName: keyName
+                token: token
+              keychainId: keychainId
+              keychainRef: keychainRef
+              webSocketKey:
+                signature: signature
+                sessionId: sessionId
+              type: null
+            json: json
+          connectionProfile:
+            channels:
+              key: ""
+            certificateAuthorities:
+              key: ""
+            name: basic-network
+            organizations:
+              key: ""
+            peers:
+              key: ""
+            x-type: hlfv1
+            description: The basic network
+            client:
+              organization: Org1
+            orderers:
+              key: ""
+            version: "1.0"
+          discovery:
+            asLocalhost: true
+            enabled: true
+          identity: identity
+          eventHandlerOptions:
+            commitTimeout: 0.8008281904610115
+            strategy: null
+            endorseTimeout: 6.027456183070403
+        invocationType: null
+        responseType: null
+        transientData: "{}"
+        endorsingPeers:
+        - endorsingPeers
+        - endorsingPeers
+        endorsingOrgs:
+        - endorsingOrgs
+        - endorsingOrgs
+        methodName: methodName
+        channelName: channelName
+        contractName: contractName
+        params:
+        - params
+        - params
+        signingCredential:
+          vaultTransitKey:
+            keyName: keyName
+            token: token
+          keychainId: keychainId
+          keychainRef: keychainRef
+          webSocketKey:
+            signature: signature
+            sessionId: sessionId
+          type: null
+      properties:
+        endorsingPeers:
+          description: An array of endorsing peers (name or url) for the transaction.
+          items:
+            maxLength: 4096
+            minLength: 1
+            nullable: false
+            type: string
+          type: array
+        endorsingOrgs:
+          description: An array of endorsing organizations (by mspID or issuer org
+            name on certificate) for the transaction.
+          items:
+            maxLength: 4096
+            minLength: 1
+            nullable: false
+            type: string
+          type: array
+        transientData:
+          nullable: true
+          type: object
+        gatewayOptions:
+          $ref: '#/components/schemas/GatewayOptions'
+        signingCredential:
+          $ref: '#/components/schemas/FabricSigningCredential'
+        channelName:
+          maxLength: 100
+          minLength: 1
+          nullable: false
+          type: string
+        contractName:
+          maxLength: 100
+          minLength: 1
+          nullable: false
+          type: string
+        invocationType:
+          $ref: '#/components/schemas/FabricContractInvocationType'
+        methodName:
+          maxLength: 100
+          minLength: 1
+          nullable: false
+          type: string
+        params:
+          default: []
+          items:
+            nullable: true
+            type: string
+          nullable: false
+          type: array
+        responseType:
+          $ref: '#/components/schemas/RunTransactionResponseType'
+      required:
+      - channelName
+      - contractName
+      - invocationType
+      - methodName
+      - params
+      - signingCredential
+      type: object
+    RunTransactionResponse:
+      example:
+        functionOutput: functionOutput
+        transactionId: transactionId
+      properties:
+        functionOutput:
+          nullable: false
+          type: string
+        transactionId:
+          nullable: false
+          type: string
+      required:
+      - functionOutput
+      - transactionId
+      type: object
+    RunDelegatedSignTransactionRequest:
+      additionalProperties: false
+      example:
+        signerCertificate: signerCertificate
+        invocationType: null
+        responseType: null
+        transientData: "{}"
+        endorsingPeers:
+        - endorsingPeers
+        - endorsingPeers
+        endorsingOrgs:
+        - endorsingOrgs
+        - endorsingOrgs
+        methodName: methodName
+        channelName: channelName
+        contractName: contractName
+        uniqueTransactionData: ""
+        params:
+        - params
+        - params
+        signerMspID: signerMspID
+      properties:
+        endorsingPeers:
+          description: An array of endorsing peers (name or url) for the transaction.
+          items:
+            maxLength: 4096
+            minLength: 1
+            nullable: false
+            type: string
+          type: array
+        endorsingOrgs:
+          description: An array of endorsing organizations (by mspID or issuer org
+            name on certificate) for the transaction.
+          items:
+            maxLength: 4096
+            minLength: 1
+            nullable: false
+            type: string
+          type: array
+        transientData:
+          nullable: true
+          type: object
+        signerCertificate:
+          nullable: false
+          type: string
+        signerMspID:
+          nullable: false
+          type: string
+        uniqueTransactionData:
+          description: Can be used to uniquely identify and authorize signing request
+          nullable: false
+        channelName:
+          maxLength: 100
+          minLength: 1
+          nullable: false
+          type: string
+        contractName:
+          maxLength: 100
+          minLength: 1
+          nullable: false
+          type: string
+        invocationType:
+          $ref: '#/components/schemas/FabricContractInvocationType'
+        methodName:
+          maxLength: 100
+          minLength: 1
+          nullable: false
+          type: string
+        params:
+          default: []
+          items:
+            nullable: true
+            type: string
+          nullable: false
+          type: array
+        responseType:
+          $ref: '#/components/schemas/RunTransactionResponseType'
+      required:
+      - channelName
+      - contractName
+      - invocationType
+      - methodName
+      - params
+      - signerCertificate
+      - signerMspID
+      type: object
+    GetTransactionReceiptResponse:
+      example:
+        chainCodeVersion: chainCodeVersion
+        blockMetaData:
+          mspid: mspid
+          blockCreatorID: blockCreatorID
+          signature: signature
+        transactionCreator:
+          mspid: mspid
+          creatorID: creatorID
+        blockNumber: blockNumber
+        chainCodeName: chainCodeName
+        transactionEndorsement:
+        - mspid: mspid
+          signature: signature
+          endorserID: endorserID
+        - mspid: mspid
+          signature: signature
+          endorserID: endorserID
+        responseStatus: responseStatus
+        channelID: channelID
+        rwsetWriteData: rwsetWriteData
+        rwsetKey: rwsetKey
+      properties:
+        blockNumber:
+          type: string
+        channelID:
+          type: string
+        transactionCreator:
+          $ref: '#/components/schemas/TransactReceiptTransactionCreator'
+        transactionEndorsement:
+          items:
+            $ref: '#/components/schemas/TransactReceiptTransactionEndorsement'
+          type: array
+        blockMetaData:
+          $ref: '#/components/schemas/TransactReceiptBlockMetaData'
+        chainCodeName:
+          type: string
+        chainCodeVersion:
+          type: string
+        responseStatus:
+          type: string
+        rwsetKey:
+          type: string
+        rwsetWriteData:
+          type: string
+      type: object
+    DeploymentTargetOrganization:
+      example:
+        CORE_PEER_LOCALMSPID: Org1MSP
+        CORE_PEER_MSPCONFIGPATH: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
+        ORDERER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+        CORE_PEER_ADDRESS: peer0.org1.example.com:7051
+        CORE_PEER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
+      properties:
+        CORE_PEER_LOCALMSPID:
+          description: Mapped to environment variables of the Fabric CLI container.
+          example: Org1MSP
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+        CORE_PEER_ADDRESS:
+          description: Mapped to environment variables of the Fabric CLI container.
+          example: peer0.org1.example.com:7051
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+        CORE_PEER_MSPCONFIGPATH:
+          description: Mapped to environment variables of the Fabric CLI container.
+          example: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+        CORE_PEER_TLS_ROOTCERT_FILE:
+          description: Mapped to environment variables of the Fabric CLI container.
+          example: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+        ORDERER_TLS_ROOTCERT_FILE:
+          description: Mapped to environment variables of the Fabric CLI container.
+          example: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+      required:
+      - CORE_PEER_ADDRESS
+      - CORE_PEER_LOCALMSPID
+      - CORE_PEER_MSPCONFIGPATH
+      - CORE_PEER_TLS_ROOTCERT_FILE
+      - ORDERER_TLS_ROOTCERT_FILE
+      type: object
+    DeploymentTargetOrgFabric2x:
+      properties:
+        transient:
+          description: Transient map of arguments in JSON encoding
+          example: orderer.example.com:7050
+          maxLength: 1073741824
+          minLength: 1
+          type: string
+        CORE_PEER_LOCALMSPID:
+          description: Mapped to environment variables of the Fabric CLI container.
+          example: Org1MSP
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+        CORE_PEER_ADDRESS:
+          description: Mapped to environment variables of the Fabric CLI container.
+          example: peer0.org1.example.com:7051
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+        CORE_PEER_MSPCONFIGPATH:
+          description: Mapped to environment variables of the Fabric CLI container.
+          example: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+        CORE_PEER_TLS_ROOTCERT_FILE:
+          description: Mapped to environment variables of the Fabric CLI container.
+          example: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+        ORDERER_TLS_ROOTCERT_FILE:
+          description: Mapped to environment variables of the Fabric CLI container.
+          example: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+      required:
+      - CORE_PEER_ADDRESS
+      - CORE_PEER_LOCALMSPID
+      - CORE_PEER_MSPCONFIGPATH
+      - CORE_PEER_TLS_ROOTCERT_FILE
+      - ORDERER_TLS_ROOTCERT_FILE
+      type: object
+    DeployContractGoSourceV1Request:
+      additionalProperties: false
+      example:
+        chainCodeVersion: 1.0.0
+        pinnedDeps:
+        - github.com/hyperledger/fabric@v1.4.8
+        - github.com/hyperledger/fabric@v1.4.8
+        - github.com/hyperledger/fabric@v1.4.8
+        - github.com/hyperledger/fabric@v1.4.8
+        - github.com/hyperledger/fabric@v1.4.8
+        goSource:
+          filename: my-cool-file-full-of-wonders-and-fun-stuff.go
+          filepath: ./my/sub-folder/structure/
+          body: body
+        targetPeerAddresses:
+        - peer0.org1.example.com:7051
+        goMod:
+          filename: my-cool-file-full-of-wonders-and-fun-stuff.go
+          filepath: ./my/sub-folder/structure/
+          body: body
+        constructorArgs: "{} - An empty object literal can be sufficient if your contract\
+          \ does not have parameters."
+        targetOrganizations:
+        - CORE_PEER_LOCALMSPID: Org1MSP
+          CORE_PEER_MSPCONFIGPATH: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
+          ORDERER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+          CORE_PEER_ADDRESS: peer0.org1.example.com:7051
+          CORE_PEER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
+        - CORE_PEER_LOCALMSPID: Org1MSP
+          CORE_PEER_MSPCONFIGPATH: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
+          ORDERER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+          CORE_PEER_ADDRESS: peer0.org1.example.com:7051
+          CORE_PEER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
+        - CORE_PEER_LOCALMSPID: Org1MSP
+          CORE_PEER_MSPCONFIGPATH: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
+          ORDERER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+          CORE_PEER_ADDRESS: peer0.org1.example.com:7051
+          CORE_PEER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
+        - CORE_PEER_LOCALMSPID: Org1MSP
+          CORE_PEER_MSPCONFIGPATH: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
+          ORDERER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+          CORE_PEER_ADDRESS: peer0.org1.example.com:7051
+          CORE_PEER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
+        - CORE_PEER_LOCALMSPID: Org1MSP
+          CORE_PEER_MSPCONFIGPATH: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
+          ORDERER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+          CORE_PEER_ADDRESS: peer0.org1.example.com:7051
+          CORE_PEER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
+        tlsRootCertFiles: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
+        moduleName: hello-world-contract
+        policyDslSource: "AND('Org1MSP.member','Org2MSP.member')"
+        channelId: mychannel
+        modTidyOnly: true
+      properties:
+        policyDslSource:
+          example: "AND('Org1MSP.member','Org2MSP.member')"
+          maxLength: 65535
+          minLength: 1
+          nullable: false
+          type: string
+        tlsRootCertFiles:
+          description: The TLS root cert files that will be passed to the chaincode
+            instantiation command.
+          example: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
+          maxLength: 65535
+          minLength: 1
+          nullable: false
+          type: string
+        channelId:
+          description: The name of the Fabric channel where the contract will get
+            instantiated.
+          example: mychannel
+          maxLength: 2048
+          minLength: 1
+          nullable: false
+          type: string
+        targetOrganizations:
+          items:
+            $ref: '#/components/schemas/DeploymentTargetOrganization'
+          maxItems: 1024
+          minItems: 1
+          nullable: false
+          type: array
+        targetPeerAddresses:
+          description: An array of peer addresses where the contract will be instantiated.
+            Note that at present only the first item from this array will be used
+            which is the behavior taken from the official Fabric samples repository
+            and therefore it is assumed to be correct usage.
+          example:
+          - peer0.org1.example.com:7051
+          items:
+            maxLength: 4096
+            minLength: 1
+            type: string
+          maxItems: 2048
+          minItems: 1
+          type: array
+        constructorArgs:
+          $ref: '#/components/schemas/DeployContractGoSourceV1Request_constructorArgs'
+        chainCodeVersion:
+          example: 1.0.0
+          maxLength: 128
+          minLength: 1
+          nullable: false
+          type: string
+        goSource:
+          $ref: '#/components/schemas/FileBase64'
+        goMod:
+          $ref: '#/components/schemas/FileBase64'
+        moduleName:
+          description: The go module name that will be used for the go compilation
+            process.
+          example: hello-world-contract
+          maxLength: 255
+          minLength: 1
+          nullable: false
+          type: string
+        pinnedDeps:
+          items:
+            example: github.com/hyperledger/fabric@v1.4.8
+            nullable: false
+            type: string
+          maxItems: 1024
+          minItems: 0
+          type: array
+        modTidyOnly:
+          description: Indicates to the go chaincode compiler of Cactus if it should
+            do an actual go compilation with the contact source or if it should just
+            execute the go mod tidy command.
+          nullable: true
+          type: boolean
+      required:
+      - chainCodeVersion
+      - channelId
+      - goSource
+      - policyDslSource
+      - targetOrganizations
+      - targetPeerAddresses
+      - tlsRootCertFiles
+      type: object
+    DeployContractGoSourceV1Response:
+      example:
+        success: true
+        instantiationCommandResponse:
+          code: 0
+          stdout: stdout
+          stderr: stderr
+          signal: signal
+        installationCommandResponses:
+        - code: 0
+          stdout: stdout
+          stderr: stderr
+          signal: signal
+        - code: 0
+          stdout: stdout
+          stderr: stderr
+          signal: signal
+      properties:
+        success:
+          type: boolean
+        installationCommandResponses:
+          items:
+            $ref: '#/components/schemas/SSHExecCommandResponse'
+          type: array
+        instantiationCommandResponse:
+          $ref: '#/components/schemas/SSHExecCommandResponse'
+      required:
+      - installationCommandResponses
+      - instantiationCommandResponse
+      - success
+      type: object
+    DeployContractV1Request:
+      additionalProperties: false
+      example:
+        ccVersion: 1.0.0
+        ccLabel: hello-world-contract
+        constructorArgs: "{} - An empty object literal can be sufficient if your contract\
+          \ does not have parameters."
+        ccLang: null
+        ccSequence: 1
+        ccName: my-hello-world-contract
+        connTimeout: 0
+        caFile: "${orgCfgDir}ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem"
+        signaturePolicy: "AND('Org1MSP.member','Org2MSP.member')"
+        sourceFiles:
+        - filename: my-cool-file-full-of-wonders-and-fun-stuff.go
+          filepath: ./my/sub-folder/structure/
+          body: body
+        - filename: my-cool-file-full-of-wonders-and-fun-stuff.go
+          filepath: ./my/sub-folder/structure/
+          body: body
+        - filename: my-cool-file-full-of-wonders-and-fun-stuff.go
+          filepath: ./my/sub-folder/structure/
+          body: body
+        - filename: my-cool-file-full-of-wonders-and-fun-stuff.go
+          filepath: ./my/sub-folder/structure/
+          body: body
+        - filename: my-cool-file-full-of-wonders-and-fun-stuff.go
+          filepath: ./my/sub-folder/structure/
+          body: body
+        ordererTLSHostnameOverride: orderer.example.com:7050
+        orderer: orderer.example.com:7050
+        targetOrganizations:
+        - CORE_PEER_LOCALMSPID: Org1MSP
+          CORE_PEER_MSPCONFIGPATH: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
+          ORDERER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+          CORE_PEER_ADDRESS: peer0.org1.example.com:7051
+          CORE_PEER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
+        - CORE_PEER_LOCALMSPID: Org1MSP
+          CORE_PEER_MSPCONFIGPATH: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
+          ORDERER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+          CORE_PEER_ADDRESS: peer0.org1.example.com:7051
+          CORE_PEER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
+        - CORE_PEER_LOCALMSPID: Org1MSP
+          CORE_PEER_MSPCONFIGPATH: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
+          ORDERER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+          CORE_PEER_ADDRESS: peer0.org1.example.com:7051
+          CORE_PEER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
+        - CORE_PEER_LOCALMSPID: Org1MSP
+          CORE_PEER_MSPCONFIGPATH: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
+          ORDERER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+          CORE_PEER_ADDRESS: peer0.org1.example.com:7051
+          CORE_PEER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
+        - CORE_PEER_LOCALMSPID: Org1MSP
+          CORE_PEER_MSPCONFIGPATH: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
+          ORDERER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+          CORE_PEER_ADDRESS: peer0.org1.example.com:7051
+          CORE_PEER_TLS_ROOTCERT_FILE: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
+        collectionsConfigFile: collectionsConfigFile
+        channelId: mychannel
+      properties:
+        ccLang:
+          $ref: '#/components/schemas/ChainCodeProgrammingLanguage'
+        caFile:
+          description: File-system path pointing at the CA file.
+          example: "${orgCfgDir}ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem"
+          maxLength: 4096
+          minLength: 1
+          type: string
+        orderer:
+          description: Ordering service endpoint specified as <hostname or IP address>:<port>
+          example: orderer.example.com:7050
+          maxLength: 65535
+          minLength: 1
+          type: string
+        ordererTLSHostnameOverride:
+          description: The hostname override to use when validating the TLS connection
+            to the orderer
+          example: orderer.example.com:7050
+          maxLength: 65535
+          minLength: 1
+          type: string
+        connTimeout:
+          description: Timeout for client to connect (default 3s)
+          nullable: false
+          type: integer
+        signaturePolicy:
+          description: "Passed in to the peer via the --signature-policy argument\
+            \ on the command line. See also: https://hyperledger-fabric.readthedocs.io/en/release-2.2/endorsement-policies.html#setting-chaincode-level-endorsement-policies"
+          example: "AND('Org1MSP.member','Org2MSP.member')"
+          maxLength: 65535
+          minLength: 1
+          nullable: false
+          type: string
+        collectionsConfigFile:
+          description: Name of the collections config file as present in the sourceFiles
+            array of the request.
+          maxLength: 255
+          minLength: 1
+          nullable: false
+          type: string
+        channelId:
+          description: The name of the Fabric channel where the contract will get
+            instantiated.
+          example: mychannel
+          maxLength: 2048
+          minLength: 1
+          nullable: false
+          type: string
+        targetOrganizations:
+          items:
+            $ref: '#/components/schemas/DeploymentTargetOrganization'
+          maxItems: 1024
+          minItems: 1
+          nullable: false
+          type: array
+        constructorArgs:
+          $ref: '#/components/schemas/DeployContractGoSourceV1Request_constructorArgs'
+        ccSequence:
+          example: 1
+          nullable: false
+          type: number
+        ccVersion:
+          example: 1.0.0
+          maxLength: 128
+          minLength: 1
+          nullable: false
+          type: string
+        ccName:
+          example: my-hello-world-contract
+          maxLength: 128
+          minLength: 1
+          nullable: false
+          type: string
+        ccLabel:
+          description: Human readable label to uniquely identify the contract. Recommended
+            to include in this at least the contract name and the exact version in
+            order to make it easily distinguishable from other deployments of the
+            same contract.
+          example: hello-world-contract
+          maxLength: 255
+          minLength: 1
+          nullable: false
+          type: string
+        sourceFiles:
+          description: The your-smart-contract.go file where the functionality of
+            your contract is implemented.
+          items:
+            $ref: '#/components/schemas/FileBase64'
+          maxItems: 65535
+          minItems: 1
+          nullable: false
+          type: array
+      required:
+      - caFile
+      - ccLabel
+      - ccLang
+      - ccName
+      - ccSequence
+      - ccVersion
+      - channelId
+      - orderer
+      - ordererTLSHostnameOverride
+      - sourceFiles
+      - targetOrganizations
+      type: object
+    DeployContractV1Response:
+      example:
+        lifecycle:
+          init:
+            code: 0
+            stdout: stdout
+            stderr: stderr
+            signal: signal
+          commit:
+            code: 0
+            stdout: stdout
+            stderr: stderr
+            signal: signal
+          installList:
+          - code: 0
+            stdout: stdout
+            stderr: stderr
+            signal: signal
+          - code: 0
+            stdout: stdout
+            stderr: stderr
+            signal: signal
+          queryCommitted:
+            code: 0
+            stdout: stdout
+            stderr: stderr
+            signal: signal
+          packaging:
+            code: 0
+            stdout: stdout
+            stderr: stderr
+            signal: signal
+          approveForMyOrgList:
+          - code: 0
+            stdout: stdout
+            stderr: stderr
+            signal: signal
+          - code: 0
+            stdout: stdout
+            stderr: stderr
+            signal: signal
+          queryInstalledList:
+          - code: 0
+            stdout: stdout
+            stderr: stderr
+            signal: signal
+          - code: 0
+            stdout: stdout
+            stderr: stderr
+            signal: signal
+        success: true
+        packageIds:
+        - f8c8e06bfc27771028c4bbc3564341887881e29b92a844c66c30bac0ff83966e
+        - f8c8e06bfc27771028c4bbc3564341887881e29b92a844c66c30bac0ff83966e
+      properties:
+        success:
+          type: boolean
+        packageIds:
+          items:
+            example: f8c8e06bfc27771028c4bbc3564341887881e29b92a844c66c30bac0ff83966e
+            maxLength: 4096
+            minLength: 1
+            nullable: false
+            type: string
+          type: array
+        lifecycle:
+          $ref: '#/components/schemas/ChainCodeLifeCycleCommandResponses'
+      required:
+      - lifecycle
+      - packageIds
+      - success
+      type: object
+    GetBlockRequestV1:
+      description: Request for GetBlock endpoint.
+      example:
+        gatewayOptions:
+          wallet:
+            keychain:
+              vaultTransitKey:
+                keyName: keyName
+                token: token
+              keychainId: keychainId
+              keychainRef: keychainRef
+              webSocketKey:
+                signature: signature
+                sessionId: sessionId
+              type: null
+            json: json
+          connectionProfile:
+            channels:
+              key: ""
+            certificateAuthorities:
+              key: ""
+            name: basic-network
+            organizations:
+              key: ""
+            peers:
+              key: ""
+            x-type: hlfv1
+            description: The basic network
+            client:
+              organization: Org1
+            orderers:
+              key: ""
+            version: "1.0"
+          discovery:
+            asLocalhost: true
+            enabled: true
+          identity: identity
+          eventHandlerOptions:
+            commitTimeout: 0.8008281904610115
+            strategy: null
+            endorseTimeout: 6.027456183070403
+        query:
+          blockHash:
+            buffer: buffer
+            encoding: encoding
+          blockNumber: blockNumber
+          transactionId: transactionId
+        skipDecode: false
+        channelName: channelName
+        connectionChannelName: connectionChannelName
+      properties:
+        channelName:
+          description: Fabric channel which we want to query.
+          maxLength: 100
+          minLength: 1
+          nullable: false
+          type: string
+        connectionChannelName:
+          description: "Fabric channel we want to connect to. If not provided, then\
+            \ one from channelName parameter will be used"
+          maxLength: 100
+          minLength: 1
+          nullable: false
+          type: string
+        gatewayOptions:
+          $ref: '#/components/schemas/GatewayOptions'
+        query:
+          $ref: '#/components/schemas/GetBlockRequestV1_query'
+        skipDecode:
+          default: false
+          description: "If true, encoded buffer will be returned. Otherwise, entire\
+            \ block object is returned."
+          nullable: false
+          type: boolean
+      required:
+      - channelName
+      - gatewayOptions
+      - query
+      type: object
+    FabricFullBlockDataV1:
+      description: Full hyperledger fabric block data.
+    GetBlockResponseDecodedV1:
+      description: When skipDecode is false (default) then decoded block object is
+        returned.
+      properties:
+        decodedBlock:
+          description: Full hyperledger fabric block data.
+      required:
+      - decodedBlock
+      type: object
+    GetBlockResponseEncodedV1:
+      description: When skipDecode is true then encoded block Buffer is returned.
+      properties:
+        encodedBlock:
+          type: string
+      required:
+      - encodedBlock
+      type: object
+    GetBlockResponseV1:
+      description: Response from GetBlock endpoint.
+      oneOf:
+      - $ref: '#/components/schemas/GetBlockResponseDecodedV1'
+      - $ref: '#/components/schemas/GetBlockResponseEncodedV1'
+    ErrorExceptionResponseV1:
+      properties:
+        message:
+          nullable: false
+          type: string
+        error:
+          nullable: false
+          type: string
+      required:
+      - error
+      - message
+      type: object
+    PrometheusExporterMetricsResponse:
+      nullable: false
+      type: string
+    WatchBlocksV1:
+      description: Websocket requests for monitoring new blocks.
+      enum:
+      - org.hyperledger.cactus.api.async.hlfabric.WatchBlocksV1.Subscribe
+      - org.hyperledger.cactus.api.async.hlfabric.WatchBlocksV1.SubscribeDelegatedSign
+      - org.hyperledger.cactus.api.async.hlfabric.WatchBlocksV1.Next
+      - org.hyperledger.cactus.api.async.hlfabric.WatchBlocksV1.Unsubscribe
+      - org.hyperledger.cactus.api.async.hlfabric.WatchBlocksV1.Error
+      - org.hyperledger.cactus.api.async.hlfabric.WatchBlocksV1.Complete
+      type: string
+      x-enum-varnames:
+      - Subscribe
+      - SubscribeDelegatedSign
+      - Next
+      - Unsubscribe
+      - Error
+      - Complete
+    WatchBlocksListenerTypeV1:
+      description: "Response type from WatchBlocks. 'Cactus*' are custom views, others\
+        \ correspond to fabric SDK call."
+      enum:
+      - filtered
+      - full
+      - private
+      - cactus:transactions
+      type: string
+      x-enum-varnames:
+      - Filtered
+      - Full
+      - Private
+      - CactusTransactions
+    WatchBlocksOptionsV1:
+      description: Options passed when subscribing to block monitoring.
+      properties:
+        channelName:
+          description: Hyperledger Fabric channel to connect to.
+          maxLength: 100
+          minLength: 1
+          nullable: false
+          type: string
+        gatewayOptions:
+          $ref: '#/components/schemas/GatewayOptions'
+        type:
+          $ref: '#/components/schemas/WatchBlocksListenerTypeV1'
+        startBlock:
+          description: From which block start monitoring. Defaults to latest.
+          maxLength: 100
+          minLength: 1
+          nullable: false
+          type: string
+      required:
+      - channelName
+      - gatewayOptions
+      - type
+      type: object
+    WatchBlocksDelegatedSignOptionsV1:
+      description: Options passed when subscribing to block monitoring with delegated
+        signing.
+      properties:
+        type:
+          $ref: '#/components/schemas/WatchBlocksListenerTypeV1'
+        startBlock:
+          description: From which block start monitoring. Defaults to latest.
+          maxLength: 100
+          minLength: 1
+          nullable: false
+          type: string
+        channelName:
+          maxLength: 100
+          minLength: 1
+          nullable: false
+          type: string
+        signerCertificate:
+          nullable: false
+          type: string
+        signerMspID:
+          nullable: false
+          type: string
+        uniqueTransactionData:
+          description: Can be used to uniquely identify and authorize signing request
+          nullable: false
+      required:
+      - channelName
+      - signerCertificate
+      - signerMspID
+      - type
+      type: object
+    WatchBlocksCactusTransactionsEventV1:
+      description: Transaction summary from commited block.
+      properties:
+        chaincodeId:
+          description: ChainCode containing function that was executed.
+          nullable: false
+          type: string
+        transactionId:
+          description: Transaction identifier.
+          nullable: false
+          type: string
+        functionName:
+          description: Function name that was executed.
+          nullable: false
+          type: string
+        functionArgs:
+          description: List of function arguments.
+          items:
+            minLength: 0
+            nullable: false
+            type: string
+          type: array
+      required:
+      - chaincodeId
+      - functionArgs
+      - functionName
+      - transactionId
+      type: object
+    WatchBlocksCactusTransactionsResponseV1:
+      description: Custom response containing block transactions summary. Compatible
+        with legacy fabric-socketio connector monitoring.
+      properties:
+        cactusTransactionsEvents:
+          description: List of transactions summary
+          items:
+            $ref: '#/components/schemas/WatchBlocksCactusTransactionsEventV1'
+          type: array
+      required:
+      - cactusTransactionsEvents
+      type: object
+    WatchBlocksFullResponseV1:
+      description: Response that corresponds to Fabric SDK 'full' EventType.
+      properties:
+        fullBlock:
+          description: Full commited block.
+          nullable: false
+      required:
+      - fullBlock
+      type: object
+    WatchBlocksFilteredResponseV1:
+      description: Response that corresponds to Fabric SDK 'filtered' EventType.
+      properties:
+        filteredBlock:
+          description: Filtered commited block.
+          nullable: false
+      required:
+      - filteredBlock
+      type: object
+    WatchBlocksPrivateResponseV1:
+      description: Response that corresponds to Fabric SDK 'private' EventType.
+      properties:
+        privateBlock:
+          description: Private commited block.
+          nullable: false
+      required:
+      - privateBlock
+      type: object
+    WatchBlocksCactusErrorResponseV1:
+      description: Error response from WatchBlocks operation.
+      properties:
+        code:
+          description: Error code.
+          type: number
+        errorMessage:
+          description: Description of the error.
+          type: string
+      required:
+      - code
+      - errorMessage
+      type: object
+    WatchBlocksResponseV1:
+      description: Response block from WatchBlocks endpoint. Depends on 'type' passed
+        in subscription options.
+      oneOf:
+      - $ref: '#/components/schemas/WatchBlocksCactusTransactionsResponseV1'
+      - $ref: '#/components/schemas/WatchBlocksFullResponseV1'
+      - $ref: '#/components/schemas/WatchBlocksFilteredResponseV1'
+      - $ref: '#/components/schemas/WatchBlocksPrivateResponseV1'
+      - $ref: '#/components/schemas/WatchBlocksCactusErrorResponseV1'
+    deployContractGoSourceV1_501_response:
+      properties:
+        message:
+          maxLength: 2048
+          minLength: 1
+          nullable: false
+          type: string
+      type: object
+    ConnectionProfile_client:
+      example:
+        organization: Org1
+      properties:
+        organization:
+          example: Org1
+          type: string
+      type: object
+    GatewayOptions_wallet:
+      example:
+        keychain:
+          vaultTransitKey:
+            keyName: keyName
+            token: token
+          keychainId: keychainId
+          keychainRef: keychainRef
+          webSocketKey:
+            signature: signature
+            sessionId: sessionId
+          type: null
+        json: json
+      maxProperties: 1
+      minProperties: 1
+      properties:
+        keychain:
+          $ref: '#/components/schemas/FabricSigningCredential'
+        json:
+          maxLength: 65535
+          minLength: 1
+          nullable: false
+          type: string
+      type: object
+    DeployContractGoSourceV1Request_constructorArgs:
+      example: "{} - An empty object literal can be sufficient if your contract does\
+        \ not have parameters."
+      nullable: false
+      properties:
+        Args:
+          items: {}
+          maxLength: 2048
+          minLength: 0
+          type: array
+      type: object
+    GetBlockRequestV1_query_blockHash:
+      description: Select block by it's hash.
+      example:
+        buffer: buffer
+        encoding: encoding
+      nullable: false
+      properties:
+        encoding:
+          description: "NodeJS Buffer encoding (utf-8, hex, binary, base64, etc...).\
+            \ Passed directly to `Buffer.from()` call on hashBuffer. If not provided\
+            \ then JSON buffer format is assumed."
+          nullable: false
+          type: string
+        buffer:
+          description: Buffer of blockHash. It's encoding should be described in `encoding`
+            parameter.
+          nullable: false
+          type: string
+      required:
+      - buffer
+      type: object
+    GetBlockRequestV1_query:
+      description: "Query selector, caller must provide at least one of them. First\
+        \ found will be used, rest will be ignored, so it's recommended to pass single\
+        \ selector."
+      example:
+        blockHash:
+          buffer: buffer
+          encoding: encoding
+        blockNumber: blockNumber
+        transactionId: transactionId
+      properties:
+        blockNumber:
+          description: Select block by it's number.
+          nullable: false
+          type: string
+        blockHash:
+          $ref: '#/components/schemas/GetBlockRequestV1_query_blockHash'
+        transactionId:
+          description: Select block by id of transaction that it contains.
+          nullable: false
+          type: string
+      type: object
+

@@ -1,0 +1,1304 @@
+openapi: 3.0.3
+info:
+  description: Can perform basic tasks on a Quorum ledger
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  title: Hyperledger Cactus Plugin - Connector Quorum
+  version: v2.0.0-alpha.2
+servers:
+- url: /
+paths:
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/deploy-contract-solidity-bytecode:
+    post:
+      operationId: deployContractSolBytecodeV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeployContractSolidityBytecodeV1Request'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeployContractSolidityBytecodeV1Response'
+          description: OK
+      summary: Deploys the bytecode of a Solidity contract.
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/deploy-contract-solidity-bytecode
+      x-content-type: application/json
+      x-accepts: application/json
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/deploy-contract-solidity-bytecode-json-object:
+    post:
+      operationId: deployContractSolBytecodeJsonObjectV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeployContractSolidityBytecodeJsonObjectV1Request'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeployContractSolidityBytecodeV1Response'
+          description: OK
+      summary: Deploys the bytecode of a Solidity contract.
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/deploy-contract-solidity-bytecode-json-object
+      x-content-type: application/json
+      x-accepts: application/json
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/run-transaction:
+    post:
+      operationId: runTransactionV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RunTransactionRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RunTransactionResponse'
+          description: OK
+      summary: Executes a transaction on a quorum ledger
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/run-transaction
+      x-content-type: application/json
+      x-accepts: application/json
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/invoke-contract:
+    post:
+      operationId: invokeContractV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvokeContractV1Request'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvokeContractV1Response'
+          description: OK
+      summary: Invokes a contract on a besu ledger
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/invoke-contract
+      x-content-type: application/json
+      x-accepts: application/json
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/invoke-contract-json-object:
+    post:
+      operationId: invokeContractV1NoKeychain
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvokeContractJsonObjectV1Request'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvokeContractV1Response'
+          description: OK
+      summary: Invokes a contract on a besu ledger
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/invoke-contract-json-object
+      x-content-type: application/json
+      x-accepts: application/json
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/get-prometheus-exporter-metrics:
+    get:
+      operationId: getPrometheusMetricsV1
+      parameters: []
+      responses:
+        "200":
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/PrometheusExporterMetricsResponse'
+          description: OK
+      summary: Get the Prometheus Metrics
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: get
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/get-prometheus-exporter-metrics
+      x-accepts: text/plain
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/invoke-raw-web3eth-method:
+    post:
+      operationId: invokeWeb3EthMethodV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvokeRawWeb3EthMethodV1Request'
+      responses:
+        "200":
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/InvokeRawWeb3EthMethodV1Response'
+          description: OK
+      summary: Invoke any method from web3.eth (low-level)
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/invoke-raw-web3eth-method
+      x-content-type: application/json
+      x-accepts: text/plain
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/invoke-raw-web3eth-contract:
+    post:
+      operationId: invokeRawWeb3EthContractV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvokeRawWeb3EthContractV1Request'
+      responses:
+        "200":
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/InvokeRawWeb3EthContractV1Response'
+          description: OK
+      summary: Low-level endpoint to invoke a method on deployed contract.
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-quorum/invoke-raw-web3eth-contract
+      x-content-type: application/json
+      x-accepts: text/plain
+components:
+  schemas:
+    Web3SigningCredential:
+      discriminator:
+        propertyName: type
+      example:
+        type: null
+      oneOf:
+      - $ref: '#/components/schemas/Web3SigningCredentialGethKeychainPassword'
+      - $ref: '#/components/schemas/Web3SigningCredentialCactusKeychainRef'
+      - $ref: '#/components/schemas/Web3SigningCredentialPrivateKeyHex'
+      - $ref: '#/components/schemas/Web3SigningCredentialNone'
+      properties:
+        type:
+          $ref: '#/components/schemas/Web3SigningCredentialType'
+      required:
+      - type
+      type: object
+    Web3SigningCredentialGethKeychainPassword:
+      properties:
+        type:
+          $ref: '#/components/schemas/Web3SigningCredentialType'
+        ethAccount:
+          description: The ethereum account (public key) that the credential  belongs
+            to. Basically the username in the traditional terminology of authentication.
+          maxLength: 66
+          minLength: 66
+          nullable: false
+          type: string
+        secret:
+          description: A geth keychain unlock password.
+          maxLength: 65535
+          minLength: 0
+          type: string
+      required:
+      - ethAccount
+      - secret
+      - type
+      type: object
+    Web3SigningCredentialCactusKeychainRef:
+      properties:
+        type:
+          $ref: '#/components/schemas/Web3SigningCredentialType'
+        ethAccount:
+          description: The ethereum account (public key) that the credential  belongs
+            to. Basically the username in the traditional  terminology of authentication.
+          maxLength: 66
+          minLength: 66
+          nullable: false
+          type: string
+        keychainEntryKey:
+          description: The key to use when looking up the the keychain entry holding
+            the secret pointed to by the  keychainEntryKey parameter.
+          maxLength: 1024
+          minLength: 0
+          type: string
+        keychainId:
+          description: The keychain ID to use when looking up the the keychain plugin
+            instance that will be used to retrieve the secret pointed to by the keychainEntryKey
+            parameter.
+          maxLength: 1024
+          minLength: 0
+          type: string
+      required:
+      - ethAccount
+      - keychainEntryKey
+      - type
+      type: object
+    Web3SigningCredentialPrivateKeyHex:
+      properties:
+        type:
+          $ref: '#/components/schemas/Web3SigningCredentialType'
+        ethAccount:
+          description: The ethereum account (public key) that the credential belongs
+            to. Basically the username in the traditional terminology of authentication.
+          maxLength: 66
+          minLength: 66
+          nullable: false
+          type: string
+        secret:
+          description: The HEX encoded private key of an eth account.
+          maxLength: 65535
+          minLength: 0
+          type: string
+      required:
+      - ethAccount
+      - secret
+      - type
+      type: object
+    Web3SigningCredentialNone:
+      description: Using this denotes that there is no signing required because the
+        transaction is pre-signed.
+      properties:
+        type:
+          $ref: '#/components/schemas/Web3SigningCredentialType'
+      required:
+      - type
+      type: object
+    Web3SigningCredentialType:
+      enum:
+      - CACTUS_KEYCHAIN_REF
+      - GETH_KEYCHAIN_PASSWORD
+      - PRIVATE_KEY_HEX
+      - NONE
+      type: string
+    EthContractInvocationType:
+      enum:
+      - SEND
+      - CALL
+      type: string
+    EthContractInvocationWeb3Method:
+      enum:
+      - send
+      - call
+      - encodeABI
+      - estimateGas
+      type: string
+    SolidityContractJsonArtifact:
+      properties:
+        contractName:
+          nullable: false
+          type: string
+        metadata:
+          nullable: false
+          type: string
+        bytecode:
+          nullable: false
+          type: string
+        deployedBytecode:
+          nullable: false
+          type: string
+        sourceMap:
+          nullable: false
+          type: string
+        deployedSourceMap:
+          nullable: false
+          type: string
+        sourcePath:
+          type: string
+        compiler:
+          $ref: '#/components/schemas/SolidityContractJsonArtifact_compiler'
+        functionHashes:
+          additionalProperties: true
+          type: object
+        gasEstimates:
+          $ref: '#/components/schemas/SolidityContractJsonArtifact_gasEstimates'
+      required:
+      - contractName
+      type: object
+    QuorumTransactionConfig:
+      additionalProperties: true
+      example:
+        rawTransaction: rawTransaction
+        data: null
+        gas: null
+        from: null
+        to: null
+        value: null
+        nonce: 0.8008281904610115
+        gasPrice: null
+      properties:
+        rawTransaction:
+          nullable: false
+          type: string
+        from:
+          $ref: '#/components/schemas/QuorumTransactionConfig_from'
+        to:
+          $ref: '#/components/schemas/QuorumTransactionConfig_to'
+        value:
+          $ref: '#/components/schemas/QuorumTransactionConfig_from'
+        gas:
+          $ref: '#/components/schemas/QuorumTransactionConfig_from'
+        gasPrice:
+          $ref: '#/components/schemas/QuorumTransactionConfig_from'
+        nonce:
+          type: number
+        data:
+          $ref: '#/components/schemas/QuorumTransactionConfig_to'
+      type: object
+    QuorumPrivateTransactionConfig:
+      example:
+        gasLimit: 7.061401241503109
+        privateKey: privateKey
+        privateFrom: privateFrom
+        privacyGroupId: privacyGroupId
+        privateFor:
+        - ""
+        - ""
+        isPrivate: false
+        gasPrice: 2.3021358869347655
+      properties:
+        privateFrom:
+          nullable: false
+          type: string
+        privateFor:
+          default: []
+          items: {}
+          nullable: false
+          type: array
+        isPrivate:
+          default: false
+          nullable: false
+          type: boolean
+        gasPrice:
+          nullable: false
+          type: number
+        gasLimit:
+          nullable: false
+          type: number
+        privateKey:
+          nullable: false
+          type: string
+        privacyGroupId:
+          nullable: false
+          type: string
+      required:
+      - privateFor
+      type: object
+    Web3TransactionReceipt:
+      additionalProperties: true
+      example:
+        blockHash: blockHash
+        logsBloom: logsBloom
+        contractAddress: contractAddress
+        transactionIndex: 0.8008281904610115
+        commitmentHash: commitmentHash
+        transactionHash: transactionHash
+        output: output
+        gasUsed: 1.4658129805029452
+        blockNumber: 6.027456183070403
+        cumulativeGasUSed: 5.962133916683182
+        from: from
+        to: to
+        revertReason: revertReason
+        logs:
+        - ""
+        - ""
+        status: true
+      properties:
+        status:
+          nullable: false
+          type: boolean
+        transactionHash:
+          maxLength: 66
+          minLength: 66
+          pattern: "^0x([A-Fa-f0-9]{64})$"
+          type: string
+        transactionIndex:
+          nullable: false
+          type: number
+        blockHash:
+          maxLength: 66
+          minLength: 66
+          pattern: "^0x([A-Fa-f0-9]{64})$"
+          type: string
+        blockNumber:
+          nullable: false
+          type: number
+        gasUsed:
+          nullable: false
+          type: number
+        contractAddress:
+          nullable: true
+          type: string
+        from:
+          nullable: false
+          type: string
+        to:
+          nullable: false
+          type: string
+        logs:
+          default: []
+          items: {}
+          nullable: false
+          type: array
+        logsBloom:
+          nullable: false
+          type: string
+        revertReason:
+          nullable: false
+          type: string
+        output:
+          nullable: false
+          type: string
+        commitmentHash:
+          nullable: false
+          type: string
+        cumulativeGasUSed:
+          nullable: false
+          type: number
+      required:
+      - blockHash
+      - blockNumber
+      - from
+      - gasUsed
+      - status
+      - to
+      - transactionHash
+      - transactionIndex
+      type: object
+    ContractJSON:
+      additionalProperties: true
+      example:
+        bytecode: bytecode
+        metadata: metadata
+        ast: "{}"
+        deployedBytecode: deployedBytecode
+        sourceMap: sourceMap
+        deployedSourceMap: deployedSourceMap
+        abi:
+        - ""
+        - ""
+        networks: "{}"
+        functionHashes: "{}"
+        gasEstimates: "{}"
+        contractName: contractName
+        compiler: "{}"
+        sourcePath: sourcePath
+      properties:
+        contractName:
+          nullable: false
+          type: string
+        bytecode:
+          description: See https://ethereum.stackexchange.com/a/47556 regarding the
+            maximum length of the bytecode
+          maxLength: 24576
+          minLength: 1
+          nullable: false
+          type: string
+        abi:
+          description: "The application binary interface of the solidity contract,\
+            \ optional parameter"
+          items: {}
+          nullable: false
+          type: array
+        metadata:
+          type: string
+        deployedBytecode:
+          type: string
+        sourceMap:
+          type: string
+        deployedSourceMap:
+          type: string
+        sourcePath:
+          type: string
+        compiler:
+          type: object
+        networks:
+          type: object
+        ast:
+          type: object
+        functionHashes:
+          type: object
+        gasEstimates:
+          type: object
+      required:
+      - bytecode
+      - contractName
+      type: object
+    RunTransactionRequest:
+      additionalProperties: false
+      example:
+        privateTransactionConfig:
+          gasLimit: 7.061401241503109
+          privateKey: privateKey
+          privateFrom: privateFrom
+          privacyGroupId: privacyGroupId
+          privateFor:
+          - ""
+          - ""
+          isPrivate: false
+          gasPrice: 2.3021358869347655
+        timeoutMs: 0.6027456183070403
+        transactionConfig:
+          rawTransaction: rawTransaction
+          data: null
+          gas: null
+          from: null
+          to: null
+          value: null
+          nonce: 0.8008281904610115
+          gasPrice: null
+        web3SigningCredential:
+          type: null
+      properties:
+        web3SigningCredential:
+          $ref: '#/components/schemas/Web3SigningCredential'
+        transactionConfig:
+          $ref: '#/components/schemas/QuorumTransactionConfig'
+        timeoutMs:
+          default: 60000
+          description: The amount of milliseconds to wait for a transaction receipt
+            with thehash of the transaction(which indicates successful execution)
+            beforegiving up and crashing.
+          minimum: 0
+          nullable: false
+          type: number
+        privateTransactionConfig:
+          $ref: '#/components/schemas/QuorumPrivateTransactionConfig'
+      required:
+      - transactionConfig
+      - web3SigningCredential
+      type: object
+    RunTransactionResponse:
+      example:
+        transactionReceipt:
+          blockHash: blockHash
+          logsBloom: logsBloom
+          contractAddress: contractAddress
+          transactionIndex: 0.8008281904610115
+          commitmentHash: commitmentHash
+          transactionHash: transactionHash
+          output: output
+          gasUsed: 1.4658129805029452
+          blockNumber: 6.027456183070403
+          cumulativeGasUSed: 5.962133916683182
+          from: from
+          to: to
+          revertReason: revertReason
+          logs:
+          - ""
+          - ""
+          status: true
+      properties:
+        transactionReceipt:
+          $ref: '#/components/schemas/Web3TransactionReceipt'
+      required:
+      - transactionReceipt
+      type: object
+    DeployContractSolidityBytecodeV1Request:
+      additionalProperties: false
+      example:
+        bytecode: bytecode
+        privateTransactionConfig:
+          gasLimit: 7.061401241503109
+          privateKey: privateKey
+          privateFrom: privateFrom
+          privacyGroupId: privacyGroupId
+          privateFor:
+          - ""
+          - ""
+          isPrivate: false
+          gasPrice: 2.3021358869347655
+        constructorArgs:
+        - ""
+        - ""
+        nonce: 1.4658129805029452
+        keychainId: keychainId
+        timeoutMs: 0.5637376656633328
+        contractAbi:
+        - ""
+        - ""
+        gas: 0.8008281904610115
+        web3SigningCredential:
+          type: null
+        contractName: contractName
+        value: 5.962133916683182
+        gasPrice: 6.027456183070403
+        contractJSON: "{}"
+      properties:
+        contractName:
+          description: The contract name for retrieve the contracts json on the keychain.
+          maxLength: 100
+          minLength: 1
+          nullable: false
+          type: string
+        contractAbi:
+          description: The application binary interface of the solidity contract
+          items: {}
+          nullable: false
+          type: array
+        web3SigningCredential:
+          $ref: '#/components/schemas/Web3SigningCredential'
+        bytecode:
+          description: See https://ethereum.stackexchange.com/a/47556 regarding the
+            maximum length of the bytecode
+          maxLength: 24576
+          minLength: 1
+          nullable: false
+          type: string
+        keychainId:
+          description: The keychainId for retrieve the contracts json.
+          maxLength: 100
+          minLength: 1
+          nullable: false
+          type: string
+        gas:
+          nullable: false
+          type: number
+        gasPrice:
+          nullable: false
+          type: number
+        nonce:
+          nullable: false
+          type: number
+        value:
+          nullable: false
+          type: number
+        timeoutMs:
+          default: 60000
+          description: The amount of milliseconds to wait for a transaction receipt
+            with theaddress of the contract(which indicates successful deployment)
+            beforegiving up and crashing.
+          minimum: 0
+          nullable: false
+          type: number
+        contractJSON:
+          description: "For use when not using keychain, pass the contract in as this\
+            \ variable"
+          nullable: false
+          type: object
+        constructorArgs:
+          default: []
+          description: The list of arguments to pass in to the constructor of the
+            contract being deployed.
+          items: {}
+          type: array
+        privateTransactionConfig:
+          $ref: '#/components/schemas/QuorumPrivateTransactionConfig'
+      required:
+      - contractName
+      - keychainId
+      - web3SigningCredential
+      type: object
+    DeployContractSolidityBytecodeV1Response:
+      example:
+        transactionReceipt:
+          blockHash: blockHash
+          logsBloom: logsBloom
+          contractAddress: contractAddress
+          transactionIndex: 0.8008281904610115
+          commitmentHash: commitmentHash
+          transactionHash: transactionHash
+          output: output
+          gasUsed: 1.4658129805029452
+          blockNumber: 6.027456183070403
+          cumulativeGasUSed: 5.962133916683182
+          from: from
+          to: to
+          revertReason: revertReason
+          logs:
+          - ""
+          - ""
+          status: true
+      properties:
+        transactionReceipt:
+          $ref: '#/components/schemas/Web3TransactionReceipt'
+      required:
+      - transactionReceipt
+      type: object
+    DeployContractSolidityBytecodeJsonObjectV1Request:
+      additionalProperties: false
+      example:
+        timeoutMs: 0.6027456183070403
+        constructorArgs:
+        - ""
+        - ""
+        gas: 0.8008281904610115
+        web3SigningCredential:
+          type: null
+        gasPrice: gasPrice
+        contractJSON:
+          bytecode: bytecode
+          metadata: metadata
+          ast: "{}"
+          deployedBytecode: deployedBytecode
+          sourceMap: sourceMap
+          deployedSourceMap: deployedSourceMap
+          abi:
+          - ""
+          - ""
+          networks: "{}"
+          functionHashes: "{}"
+          gasEstimates: "{}"
+          contractName: contractName
+          compiler: "{}"
+          sourcePath: sourcePath
+      properties:
+        web3SigningCredential:
+          $ref: '#/components/schemas/Web3SigningCredential'
+        gas:
+          nullable: false
+          type: number
+        gasPrice:
+          nullable: false
+          type: string
+        timeoutMs:
+          default: 60000
+          description: The amount of milliseconds to wait for a transaction receipt
+            with theaddress of the contract(which indicates successful deployment)
+            beforegiving up and crashing.
+          minimum: 0
+          nullable: false
+          type: number
+        contractJSON:
+          $ref: '#/components/schemas/ContractJSON'
+        constructorArgs:
+          default: []
+          description: The list of arguments to pass in to the constructor of the
+            contract being deployed.
+          items: {}
+          type: array
+      required:
+      - contractJSON
+      - web3SigningCredential
+      type: object
+    InvokeContractV1Request:
+      additionalProperties: false
+      example:
+        invocationType: null
+        keychainId: keychainId
+        timeoutMs: 0.6027456183070403
+        gas: null
+        web3SigningCredential:
+          type: null
+        methodName: methodName
+        contractName: contractName
+        params:
+        - ""
+        - ""
+        value: null
+        nonce: 0.8008281904610115
+        gasPrice: null
+      properties:
+        contractName:
+          description: The contract name to find it in the keychain plugin
+          nullable: false
+          type: string
+        web3SigningCredential:
+          $ref: '#/components/schemas/Web3SigningCredential'
+        invocationType:
+          $ref: '#/components/schemas/EthContractInvocationType'
+        methodName:
+          description: The name of the contract method to invoke.
+          maxLength: 2048
+          minLength: 1
+          nullable: false
+          type: string
+        params:
+          default: []
+          description: The list of arguments to pass in to the contract method being
+            invoked.
+          items: {}
+          type: array
+        value:
+          $ref: '#/components/schemas/QuorumTransactionConfig_from'
+        gas:
+          $ref: '#/components/schemas/QuorumTransactionConfig_from'
+        gasPrice:
+          $ref: '#/components/schemas/QuorumTransactionConfig_from'
+        nonce:
+          type: number
+        timeoutMs:
+          default: 60000
+          description: The amount of milliseconds to wait for a transaction receipt
+            beforegiving up and crashing. Only has any effect if the invocation type
+            is SEND
+          minimum: 0
+          nullable: false
+          type: number
+        keychainId:
+          description: The keychainId for retrieve the contracts json.
+          maxLength: 100
+          minLength: 1
+          type: string
+      required:
+      - contractName
+      - invocationType
+      - keychainId
+      - methodName
+      - params
+      - web3SigningCredential
+      type: object
+    InvokeContractJsonObjectV1Request:
+      additionalProperties: false
+      example:
+        invocationType: null
+        privateTransactionConfig:
+          gasLimit: 7.061401241503109
+          privateKey: privateKey
+          privateFrom: privateFrom
+          privacyGroupId: privacyGroupId
+          privateFor:
+          - ""
+          - ""
+          isPrivate: false
+          gasPrice: 2.3021358869347655
+        timeoutMs: 0.6027456183070403
+        gas: null
+        web3SigningCredential:
+          type: null
+        methodName: methodName
+        contractAddress: contractAddress
+        params:
+        - ""
+        - ""
+        value: null
+        nonce: 0.8008281904610115
+        gasPrice: null
+        contractJSON:
+          bytecode: bytecode
+          metadata: metadata
+          ast: "{}"
+          deployedBytecode: deployedBytecode
+          sourceMap: sourceMap
+          deployedSourceMap: deployedSourceMap
+          abi:
+          - ""
+          - ""
+          networks: "{}"
+          functionHashes: "{}"
+          gasEstimates: "{}"
+          contractName: contractName
+          compiler: "{}"
+          sourcePath: sourcePath
+      properties:
+        web3SigningCredential:
+          $ref: '#/components/schemas/Web3SigningCredential'
+        invocationType:
+          $ref: '#/components/schemas/EthContractInvocationType'
+        methodName:
+          description: The name of the contract method to invoke.
+          maxLength: 2048
+          minLength: 1
+          nullable: false
+          type: string
+        params:
+          default: []
+          description: The list of arguments to pass in to the contract method being
+            invoked.
+          items: {}
+          type: array
+        contractAddress:
+          description: Address of the solidity contract
+          nullable: false
+          type: string
+        value:
+          $ref: '#/components/schemas/QuorumTransactionConfig_from'
+        gas:
+          $ref: '#/components/schemas/QuorumTransactionConfig_from'
+        gasPrice:
+          $ref: '#/components/schemas/QuorumTransactionConfig_from'
+        nonce:
+          type: number
+        timeoutMs:
+          default: 60000
+          description: The amount of milliseconds to wait for a transaction receipt
+            beforegiving up and crashing. Only has any effect if the invocation type
+            is SEND
+          minimum: 0
+          nullable: false
+          type: number
+        contractJSON:
+          $ref: '#/components/schemas/ContractJSON'
+        privateTransactionConfig:
+          $ref: '#/components/schemas/QuorumPrivateTransactionConfig'
+      required:
+      - contractAddress
+      - contractJSON
+      - invocationType
+      - methodName
+      - params
+      - web3SigningCredential
+      type: object
+    InvokeContractV1Response:
+      example:
+        transactionReceipt:
+          blockHash: blockHash
+          logsBloom: logsBloom
+          contractAddress: contractAddress
+          transactionIndex: 0.8008281904610115
+          commitmentHash: commitmentHash
+          transactionHash: transactionHash
+          output: output
+          gasUsed: 1.4658129805029452
+          blockNumber: 6.027456183070403
+          cumulativeGasUSed: 5.962133916683182
+          from: from
+          to: to
+          revertReason: revertReason
+          logs:
+          - ""
+          - ""
+          status: true
+        callOutput: ""
+        success: true
+      properties:
+        transactionReceipt:
+          $ref: '#/components/schemas/Web3TransactionReceipt'
+        callOutput: {}
+        success:
+          nullable: false
+          type: boolean
+      required:
+      - success
+      type: object
+    InvokeRawWeb3EthMethodV1Request:
+      additionalProperties: false
+      example:
+        methodName: methodName
+        params:
+        - ""
+        - ""
+      properties:
+        methodName:
+          description: The name of the web3.eth method to invoke
+          maxLength: 2048
+          minLength: 1
+          nullable: false
+          type: string
+        params:
+          default: []
+          description: The list of arguments to pass to web3.eth method specified
+            in methodName
+          items: {}
+          type: array
+      required:
+      - methodName
+      type: object
+    InvokeRawWeb3EthMethodV1Response:
+      additionalProperties: false
+      properties:
+        status:
+          description: Status code of the operation
+          nullable: false
+          type: number
+        data:
+          description: Output of requested web3.eth method
+        errorDetail:
+          description: Error details
+          nullable: false
+          type: string
+      required:
+      - status
+      type: object
+    InvokeRawWeb3EthContractV1Request:
+      additionalProperties: false
+      example:
+        invocationType: null
+        address: address
+        abi:
+        - ""
+        - ""
+        contractMethodArgs:
+        - ""
+        - ""
+        contractMethod: contractMethod
+        invocationParams: "{}"
+      properties:
+        abi:
+          description: The application binary interface of the solidity contract
+          items: {}
+          type: array
+        address:
+          description: Deployed solidity contract address
+          type: string
+        invocationType:
+          $ref: '#/components/schemas/EthContractInvocationWeb3Method'
+        invocationParams:
+          default: {}
+          description: "The list of arguments for contract invocation method (send,\
+            \ call, etc...)"
+          type: object
+        contractMethod:
+          description: Method of deployed solidity contract to execute
+          type: string
+        contractMethodArgs:
+          default: []
+          description: The list of arguments for deployed solidity contract method
+          items: {}
+          type: array
+      required:
+      - abi
+      - address
+      - contractMethod
+      - invocationType
+      type: object
+    InvokeRawWeb3EthContractV1Response:
+      additionalProperties: false
+      properties:
+        status:
+          description: Status code of the operation
+          type: number
+        data:
+          description: Output of contract invocation method
+        errorDetail:
+          description: Error details
+          type: string
+      required:
+      - status
+      type: object
+    PrometheusExporterMetricsResponse:
+      nullable: false
+      type: string
+    WatchBlocksV1:
+      enum:
+      - org.hyperledger.cactus.api.async.quorum.WatchBlocksV1.Subscribe
+      - org.hyperledger.cactus.api.async.quorum.WatchBlocksV1.Next
+      - org.hyperledger.cactus.api.async.quorum.WatchBlocksV1.Unsubscribe
+      - org.hyperledger.cactus.api.async.quorum.WatchBlocksV1.Error
+      - org.hyperledger.cactus.api.async.quorum.WatchBlocksV1.Complete
+      type: string
+      x-enum-varnames:
+      - Subscribe
+      - Next
+      - Unsubscribe
+      - Error
+      - Complete
+    WatchBlocksV1Options:
+      properties:
+        getBlockData:
+          type: boolean
+      type: object
+    Web3BlockHeader:
+      properties:
+        number:
+          type: number
+        hash:
+          type: string
+        parentHash:
+          type: string
+        nonce:
+          type: string
+        sha3Uncles:
+          type: string
+        logsBloom:
+          type: string
+        transactionsRoot:
+          type: string
+        stateRoot:
+          type: string
+        receiptsRoot:
+          type: string
+        difficulty:
+          type: string
+        mixHash:
+          type: string
+        miner:
+          type: string
+        extraData:
+          type: string
+        gasLimit:
+          type: integer
+        gasUsed:
+          type: integer
+        timestamp:
+          $ref: '#/components/schemas/QuorumTransactionConfig_from'
+      required:
+      - extraData
+      - gasLimit
+      - gasUsed
+      - hash
+      - logsBloom
+      - miner
+      - nonce
+      - number
+      - parentHash
+      - receiptRoot
+      - sha3Uncles
+      - stateRoot
+      - timestamp
+      - transactionRoot
+      type: object
+    Web3Transaction:
+      properties:
+        hash:
+          type: string
+        nonce:
+          type: number
+        blockHash:
+          nullable: true
+          type: string
+        blockNumber:
+          nullable: true
+          type: number
+        transactionIndex:
+          nullable: true
+          type: number
+        from:
+          type: string
+        to:
+          nullable: true
+          type: string
+        value:
+          type: string
+        gasPrice:
+          type: string
+        gas:
+          type: number
+        input:
+          type: string
+        v:
+          type: string
+        r:
+          type: string
+        s:
+          type: string
+      required:
+      - blockHash
+      - blockNumber
+      - from
+      - gas
+      - gasPrice
+      - hash
+      - input
+      - nonce
+      - to
+      - transactionIndex
+      - value
+      type: object
+    WatchBlocksV1BlockData:
+      properties:
+        number:
+          type: number
+        hash:
+          type: string
+        parentHash:
+          type: string
+        nonce:
+          type: string
+        sha3Uncles:
+          type: string
+        logsBloom:
+          type: string
+        transactionsRoot:
+          type: string
+        stateRoot:
+          type: string
+        receiptsRoot:
+          type: string
+        difficulty:
+          type: string
+        mixHash:
+          type: string
+        miner:
+          type: string
+        extraData:
+          type: string
+        gasLimit:
+          type: integer
+        gasUsed:
+          type: integer
+        timestamp:
+          $ref: '#/components/schemas/QuorumTransactionConfig_from'
+        size:
+          type: number
+        totalDifficulty:
+          type: string
+        uncles:
+          items:
+            type: string
+          type: array
+        transactions:
+          items:
+            $ref: '#/components/schemas/Web3Transaction'
+          type: array
+      required:
+      - extraData
+      - gasLimit
+      - gasUsed
+      - hash
+      - logsBloom
+      - miner
+      - nonce
+      - number
+      - parentHash
+      - receiptRoot
+      - sha3Uncles
+      - size
+      - stateRoot
+      - timestamp
+      - totalDifficulty
+      - transactionRoot
+      - transactions
+      - uncles
+      type: object
+    WatchBlocksV1Progress:
+      properties:
+        blockHeader:
+          $ref: '#/components/schemas/Web3BlockHeader'
+        blockData:
+          $ref: '#/components/schemas/WatchBlocksV1BlockData'
+      type: object
+    SolidityContractJsonArtifact_compiler:
+      additionalProperties: true
+      properties:
+        name:
+          type: string
+        version:
+          type: string
+      type: object
+    SolidityContractJsonArtifact_gasEstimates_creation:
+      properties:
+        codeDepositCost:
+          type: string
+        executionCost:
+          type: string
+        totalCost:
+          type: string
+      type: object
+    SolidityContractJsonArtifact_gasEstimates:
+      properties:
+        creation:
+          $ref: '#/components/schemas/SolidityContractJsonArtifact_gasEstimates_creation'
+        external:
+          additionalProperties: true
+          type: object
+    QuorumTransactionConfig_from:
+      oneOf:
+      - type: string
+      - type: number
+    QuorumTransactionConfig_to:
+      oneOf:
+      - type: string
+

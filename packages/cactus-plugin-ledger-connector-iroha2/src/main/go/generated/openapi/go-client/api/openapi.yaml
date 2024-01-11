@@ -1,0 +1,585 @@
+openapi: 3.0.3
+info:
+  description: Can perform basic tasks on a Iroha V2 ledger
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  title: Hyperledger Cactus Plugin - Connector Iroha V2
+  version: v2.0.0-alpha.2
+servers:
+- url: /
+paths:
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/transact:
+    post:
+      operationId: TransactV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactRequestV1'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactResponseV1'
+          description: OK
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorExceptionResponseV1'
+          description: Internal Server Error.
+      summary: Executes a transaction on a Iroha V2 ledger (by sending some instructions)
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/transact
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/generate-transaction:
+    post:
+      operationId: generateTransactionV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateTransactionRequestV1'
+      responses:
+        "200":
+          content:
+            text/plain:
+              schema:
+                type: string
+          description: OK
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorExceptionResponseV1'
+          description: Internal Server Error
+      summary: Generate transaction that can be signed locally.
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/generate-transaction
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/query:
+    post:
+      operationId: QueryV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QueryRequestV1'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueryResponseV1'
+          description: OK
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorExceptionResponseV1'
+          description: Internal Server Error.
+      summary: Executes a query on a Iroha V2 ledger and returns it's results.
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/query
+components:
+  schemas:
+    IrohaInstruction:
+      description: Command names that correspond to Iroha Special Instructions (https://hyperledger.github.io/iroha-2-docs/guide/advanced/isi.html)
+      enum:
+      - registerDomain
+      - registerAssetDefinition
+      - registerAsset
+      - mintAsset
+      - burnAsset
+      - transferAsset
+      - registerAccount
+      type: string
+      x-enum-descriptions:
+      - Register new domain
+      - Register new asset definition
+      - Register new asset
+      - Mint asset value
+      - Burn asset value
+      - Transfer asset between accounts
+      - Register new account
+      x-enum-varnames:
+      - RegisterDomain
+      - RegisterAssetDefinition
+      - RegisterAsset
+      - MintAsset
+      - BurnAsset
+      - TransferAsset
+      - RegisterAccount
+    IrohaQuery:
+      description: Command names that correspond to Iroha queries (https://hyperledger.github.io/iroha-2-docs/guide/advanced/queries.html)
+      enum:
+      - findAllDomains
+      - findDomainById
+      - findAssetDefinitionById
+      - findAllAssetsDefinitions
+      - findAssetById
+      - findAllAssets
+      - findAllPeers
+      - findAllBlocks
+      - findAccountById
+      - findAllAccounts
+      - findAllTransactions
+      - findTransactionByHash
+      type: string
+      x-enum-descriptions:
+      - Get list of all registered domains
+      - Get domain with specified ID
+      - Get asset definition with specified ID
+      - Get list of all registered asset definition
+      - Get asset with specified ID
+      - Get list of all registered assets
+      - Get list of all ledger peers
+      - Get list of all ledger blocks
+      - Get account with specified ID
+      - Get list of all registered accounts
+      - Get list of all transactions
+      - Get transaction with specified hash
+      x-enum-varnames:
+      - FindAllDomains
+      - FindDomainById
+      - FindAssetDefinitionById
+      - FindAllAssetsDefinitions
+      - FindAssetById
+      - FindAllAssets
+      - FindAllPeers
+      - FindAllBlocks
+      - FindAccountById
+      - FindAllAccounts
+      - FindAllTransactions
+      - FindTransactionByHash
+    WatchBlocksV1:
+      description: Websocket requests for monitoring new blocks.
+      enum:
+      - org.hyperledger.cactus.api.async.hliroha2.WatchBlocksV1.Subscribe
+      - org.hyperledger.cactus.api.async.hliroha2.WatchBlocksV1.Next
+      - org.hyperledger.cactus.api.async.hliroha2.WatchBlocksV1.Unsubscribe
+      - org.hyperledger.cactus.api.async.hliroha2.WatchBlocksV1.Error
+      - org.hyperledger.cactus.api.async.hliroha2.WatchBlocksV1.Complete
+      type: string
+      x-enum-varnames:
+      - Subscribe
+      - Next
+      - Unsubscribe
+      - Error
+      - Complete
+    BlockTypeV1:
+      description: Iroha V2 block response type.
+      enum:
+      - raw
+      - binary
+      type: string
+      x-enum-descriptions:
+      - Default JSON-encoded string full block data.
+      - Encoded format that must be decoded with Iroha SDK on client side before use
+      x-enum-varnames:
+      - Raw
+      - Binary
+    TransactionStatusV1:
+      description: Status of Iroha V2 transaction.
+      enum:
+      - submitted
+      - committed
+      - rejected
+      type: string
+      x-enum-descriptions:
+      - Transaction was submitted to the ledger - use other tools to check if it was
+        accepted and committed.
+      - Transaction was committed to the ledger.
+      - Transaction was rejected.
+      x-enum-varnames:
+      - Submitted
+      - Committed
+      - Rejected
+    WatchBlocksOptionsV1:
+      description: Options passed when subscribing to block monitoring.
+      properties:
+        type:
+          $ref: '#/components/schemas/BlockTypeV1'
+        startBlock:
+          description: Number of block to start monitoring from.
+          minLength: 1
+          nullable: false
+          type: string
+        baseConfig:
+          $ref: '#/components/schemas/Iroha2BaseConfig'
+      type: object
+    WatchBlocksRawResponseV1:
+      description: Default JSON-encoded string full block data.
+      properties:
+        blockData:
+          nullable: false
+          type: string
+      required:
+      - blockData
+      type: object
+    WatchBlocksBinaryResponseV1:
+      description: Binary encoded response of block data.
+      properties:
+        binaryBlock:
+          nullable: false
+          type: string
+      required:
+      - binaryBlock
+      type: object
+    WatchBlocksResponseV1:
+      oneOf:
+      - $ref: '#/components/schemas/WatchBlocksRawResponseV1'
+      - $ref: '#/components/schemas/WatchBlocksBinaryResponseV1'
+      - $ref: '#/components/schemas/ErrorExceptionResponseV1'
+    Iroha2AccountId:
+      additionalProperties: false
+      description: Iroha V2 account ID.
+      example:
+        name: name
+        domainId: domainId
+      nullable: false
+      properties:
+        name:
+          nullable: false
+          type: string
+        domainId:
+          nullable: false
+          type: string
+      required:
+      - domainId
+      - name
+      type: object
+    Iroha2KeyJson:
+      additionalProperties: false
+      description: Private/Public key JSON containing payload and digest function.
+      nullable: false
+      properties:
+        digestFunction:
+          nullable: false
+          type: string
+        payload:
+          nullable: false
+          type: string
+      required:
+      - digestFunction
+      - payload
+      type: object
+    KeychainReference:
+      description: Reference to entry stored in Cactus keychain plugin.
+      properties:
+        keychainId:
+          description: Keychain plugin ID.
+          maxLength: 100
+          minLength: 1
+          nullable: false
+          type: string
+        keychainRef:
+          description: Key reference name.
+          maxLength: 100
+          minLength: 1
+          nullable: false
+          type: string
+      required:
+      - keychainId
+      - keychainRef
+      type: object
+    Iroha2KeyPair:
+      description: Pair of Iroha account private and public keys.
+      properties:
+        privateKey:
+          $ref: '#/components/schemas/Iroha2KeyJson'
+        publicKey:
+          nullable: false
+          type: string
+      required:
+      - privateKey
+      - publicKey
+      type: object
+    Iroha2BaseConfigTorii:
+      additionalProperties: false
+      description: Iroha V2 peer connection information.
+      example:
+        apiURL: apiURL
+        telemetryURL: telemetryURL
+      nullable: false
+      properties:
+        apiURL:
+          nullable: false
+          type: string
+        telemetryURL:
+          nullable: false
+          type: string
+      type: object
+    Iroha2BaseConfig:
+      additionalProperties: false
+      description: Iroha V2 connection configuration.
+      example:
+        torii:
+          apiURL: apiURL
+          telemetryURL: telemetryURL
+        accountId:
+          name: name
+          domainId: domainId
+        signingCredential: null
+      properties:
+        torii:
+          $ref: '#/components/schemas/Iroha2BaseConfigTorii'
+        accountId:
+          $ref: '#/components/schemas/Iroha2AccountId'
+        signingCredential:
+          $ref: '#/components/schemas/Iroha2BaseConfig_signingCredential'
+      required:
+      - torii
+      type: object
+    IrohaInstructionRequestV1:
+      additionalProperties: false
+      description: Single Iroha V2 instruction to be executed request.
+      properties:
+        name:
+          description: Iroha V2 instruction name.
+          nullable: false
+          type: IrohaInstruction
+        params:
+          description: The list of arguments to pass with specified instruction.
+          items: {}
+          type: array
+      required:
+      - name
+      - params
+      type: object
+    IrohaTransactionParametersV1:
+      additionalProperties: true
+      description: Iroha V2 transaction payload parameters
+      example:
+        creationTime: creationTime
+        ttl: ttl
+        nonce: 0.8008281904610115
+      properties:
+        ttl:
+          description: BigInt time to live.
+          nullable: false
+          type: string
+        creationTime:
+          description: BigInt creation time
+          nullable: false
+          type: string
+        nonce:
+          description: Transaction nonce
+          nullable: false
+          type: number
+      type: object
+    IrohaTransactionDefinitionV1:
+      additionalProperties: false
+      description: Iroha V2 transaction definition
+      example:
+        instruction: null
+        params:
+          creationTime: creationTime
+          ttl: ttl
+          nonce: 0.8008281904610115
+      properties:
+        instruction:
+          $ref: '#/components/schemas/IrohaTransactionDefinitionV1_instruction'
+        params:
+          $ref: '#/components/schemas/IrohaTransactionParametersV1'
+      required:
+      - instruction
+      type: object
+    IrohaQueryDefinitionV1:
+      additionalProperties: false
+      description: Iroha V2 query definition.
+      example:
+        query: ""
+        params:
+        - ""
+        - ""
+      properties:
+        query:
+          description: Name of the query to be executed.
+          nullable: false
+          type: IrohaQuery
+        params:
+          description: The list of arguments to pass with the query.
+          items: {}
+          type: array
+      required:
+      - query
+      type: object
+    IrohaSignedQueryDefinitionV1:
+      additionalProperties: false
+      description: Iroha V2 signed query definition
+      example:
+        payload: payload
+        query: ""
+      properties:
+        query:
+          description: Name of the query to be executed.
+          nullable: false
+          type: IrohaQuery
+        payload:
+          description: Signed query transaction binary data received from generate-transaction
+            endpoint.
+          nullable: false
+          type: string
+      required:
+      - payload
+      - query
+      type: object
+    TransactRequestV1:
+      additionalProperties: false
+      description: Request to transact endpoint.
+      example:
+        waitForCommit: false
+        signedTransaction: signedTransaction
+        transaction:
+          instruction: null
+          params:
+            creationTime: creationTime
+            ttl: ttl
+            nonce: 0.8008281904610115
+        baseConfig:
+          torii:
+            apiURL: apiURL
+            telemetryURL: telemetryURL
+          accountId:
+            name: name
+            domainId: domainId
+          signingCredential: null
+      properties:
+        signedTransaction:
+          description: Signed transaction binary data received from generate-transaction
+            endpoint.
+          nullable: false
+          type: string
+        transaction:
+          $ref: '#/components/schemas/IrohaTransactionDefinitionV1'
+        waitForCommit:
+          default: false
+          description: Wait unitl transaction is sent and return the final status
+            (committed / rejected)
+          nullable: false
+          type: boolean
+        baseConfig:
+          $ref: '#/components/schemas/Iroha2BaseConfig'
+      type: object
+    TransactResponseV1:
+      description: Response from transaction endpoint with operation status.
+      example:
+        rejectReason: rejectReason
+        hash: hash
+        status: null
+      properties:
+        hash:
+          description: Hexadecimal hash of the transaction sent to the ledger.
+          nullable: false
+          type: string
+        status:
+          $ref: '#/components/schemas/TransactionStatusV1'
+        rejectReason:
+          description: "When waitForCommit was suplied and the transaction was rejected,\
+            \ contains the reason of the rejection."
+          nullable: false
+          type: string
+      required:
+      - hash
+      - status
+      type: object
+    QueryRequestV1:
+      additionalProperties: false
+      description: Request to query endpoint.
+      example:
+        query:
+          query: ""
+          params:
+          - ""
+          - ""
+        signedQuery:
+          payload: payload
+          query: ""
+        baseConfig:
+          torii:
+            apiURL: apiURL
+            telemetryURL: telemetryURL
+          accountId:
+            name: name
+            domainId: domainId
+          signingCredential: null
+      properties:
+        query:
+          $ref: '#/components/schemas/IrohaQueryDefinitionV1'
+        signedQuery:
+          $ref: '#/components/schemas/IrohaSignedQueryDefinitionV1'
+        baseConfig:
+          $ref: '#/components/schemas/Iroha2BaseConfig'
+      type: object
+    QueryResponseV1:
+      description: Response with the query results.
+      example:
+        response: ""
+      properties:
+        response:
+          description: Query response data that varies between different queries.
+          nullable: false
+      required:
+      - response
+      type: object
+    GenerateTransactionRequestV1:
+      additionalProperties: false
+      description: Request for generating transaction or query payload that can be
+        signed on the client side.
+      example:
+        request: null
+        baseConfig:
+          torii:
+            apiURL: apiURL
+            telemetryURL: telemetryURL
+          accountId:
+            name: name
+            domainId: domainId
+          signingCredential: null
+      properties:
+        request:
+          $ref: '#/components/schemas/GenerateTransactionRequestV1_request'
+        baseConfig:
+          $ref: '#/components/schemas/Iroha2BaseConfig'
+      required:
+      - request
+      type: object
+    ErrorExceptionResponseV1:
+      description: Error response from the connector.
+      properties:
+        message:
+          description: Short error description message.
+          nullable: false
+          type: string
+        error:
+          description: Detailed error information.
+          nullable: false
+          type: string
+      required:
+      - error
+      - message
+      type: object
+    Iroha2BaseConfig_signingCredential:
+      oneOf:
+      - $ref: '#/components/schemas/Iroha2KeyPair'
+      - $ref: '#/components/schemas/KeychainReference'
+    IrohaTransactionDefinitionV1_instruction:
+      oneOf:
+      - $ref: '#/components/schemas/IrohaInstructionRequestV1'
+      - items:
+          $ref: '#/components/schemas/IrohaInstructionRequestV1'
+        type: array
+    GenerateTransactionRequestV1_request:
+      oneOf:
+      - $ref: '#/components/schemas/IrohaTransactionDefinitionV1'
+      - $ref: '#/components/schemas/IrohaQueryDefinitionV1'

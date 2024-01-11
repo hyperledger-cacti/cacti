@@ -1,0 +1,342 @@
+openapi: 3.0.3
+info:
+  description: Can exchange assets between networks
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  title: Hyperledger Cactus Plugin - HTLC Coordinator
+  version: v2.0.0-alpha.2
+servers:
+- description: Public test instance
+  url: "https://www.cactus.stream/{basePath}"
+  variables:
+    basePath:
+      default: ""
+- description: Local test instance
+  url: "http://localhost:4000/{basePath}"
+  variables:
+    basePath:
+      default: ""
+paths:
+  /api/v1/plugins/@hyperledger/cactus-plugin-htlc-coordinator-besu/own-htlc:
+    post:
+      operationId: ownHtlcV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OwnHTLCRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: {}
+          description: OK
+      summary: Create an instance to interact with the own HTLC.
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-htlc-coordinator-besu/own-htlc
+      x-content-type: application/json
+      x-accepts: application/json
+  /api/v1/plugins/@hyperledger/cactus-plugin-htlc-coordinator-besu/counterparty-htlc:
+    post:
+      operationId: counterpartyHtlcV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CounterpartyHTLCRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: {}
+          description: OK
+      summary: Create an instance to interact with the counterparty HTLC
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-htlc-coordinator-besu/counterparty-htlc
+      x-content-type: application/json
+      x-accepts: application/json
+  /api/v1/plugins/@hyperledger/cactus-plugin-htlc-coordinator-besu/withdraw-counterparty:
+    post:
+      operationId: withdrawCounterpartyV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WithdrawCounterpartyRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: {}
+          description: OK
+      summary: Withdraw funds of the counterparty HTLC
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-htlc-coordinator-besu/withdraw-counterparty
+      x-content-type: application/json
+      x-accepts: application/json
+components:
+  schemas:
+    OwnHTLCRequest:
+      example:
+        htlcPackage: null
+        receiver: receiver
+        connectorInstanceId: connectorInstanceId
+        constructorArgs:
+        - ""
+        - ""
+        outputAmount: 6.027456183070403
+        outputNetwork: outputNetwork
+        hashLock: hashLock
+        inputAmount: 0.8008281904610115
+        tokenAddress: tokenAddress
+        outputAddress: outputAddress
+        keychainId: keychainId
+        gas: 5.962133916683182
+        web3SigningCredential:
+          type: null
+        expiration: 1.4658129805029452
+      properties:
+        htlcPackage:
+          $ref: '#/components/schemas/HtlcPackage'
+        connectorInstanceId:
+          description: connector Instance Id for the connector plugin
+          nullable: false
+          type: string
+        keychainId:
+          description: keychainId for the keychain plugin
+          nullable: false
+          type: string
+        constructorArgs:
+          default: []
+          items: {}
+          type: array
+        web3SigningCredential:
+          $ref: '#/components/schemas/Web3SigningCredential'
+        inputAmount:
+          description: Input amount to lock
+          nullable: false
+          type: number
+        outputAmount:
+          description: Output amount to lock
+          nullable: false
+          type: number
+        expiration:
+          description: Timestamp to expire the contract
+          nullable: false
+          type: number
+        hashLock:
+          description: Hashlock needed to refund the amount
+          nullable: false
+          type: string
+        tokenAddress:
+          description: The token address
+          nullable: false
+          type: string
+        receiver:
+          description: The receiver address
+          nullable: false
+          type: string
+        outputNetwork:
+          description: The output network id
+          nullable: false
+          type: string
+        outputAddress:
+          description: The output addreess to receive the tokens
+          nullable: false
+          type: string
+        gas:
+          type: number
+      required:
+      - connectorInstanceId
+      - constructorArgs
+      - expiration
+      - hashLock
+      - htlcPackage
+      - inputAmount
+      - keychainId
+      - outputAddress
+      - outputAmount
+      - outputNetwork
+      - receiver
+      - tokenAddress
+      - web3SigningCredential
+      type: object
+    CounterpartyHTLCRequest:
+      example:
+        htlcPackage: null
+        htlcId: htlcId
+        keychainId: keychainId
+        connectorInstanceId: connectorInstanceId
+        gas: 0.8008281904610115
+        web3SigningCredential:
+          type: null
+      properties:
+        htlcPackage:
+          $ref: '#/components/schemas/HtlcPackage'
+        connectorInstanceId:
+          description: connector Instance Id for the connector plugin
+          nullable: false
+          type: string
+        keychainId:
+          description: keychainId for the keychain plugin
+          nullable: false
+          type: string
+        htlcId:
+          description: Id for the HTLC
+          nullable: false
+          type: string
+        web3SigningCredential:
+          $ref: '#/components/schemas/Web3SigningCredential'
+        gas:
+          type: number
+      required:
+      - connectorInstanceId
+      - htlcId
+      - htlcPackage
+      - keychainId
+      - web3SigningCredential
+      type: object
+    WithdrawCounterpartyRequest:
+      example:
+        htlcPackage: null
+        htlcId: htlcId
+        keychainId: keychainId
+        connectorInstanceId: connectorInstanceId
+        contractId: contractId
+        gas: 0.8008281904610115
+        web3SigningCredential:
+          type: null
+        secret: secret
+      properties:
+        htlcPackage:
+          $ref: '#/components/schemas/HtlcPackage'
+        connectorInstanceId:
+          description: connector Instance Id for the connector plugin
+          nullable: false
+          type: string
+        keychainId:
+          description: keychainId for the keychain plugin
+          nullable: false
+          type: string
+        contractId:
+          description: contractId for the contract
+          nullable: false
+          type: string
+        web3SigningCredential:
+          $ref: '#/components/schemas/Web3SigningCredential'
+        htlcId:
+          description: Id for the HTLC
+          nullable: false
+          type: string
+        secret:
+          description: Counterparty HTLC secret
+          nullable: false
+          type: string
+        gas:
+          type: number
+      required:
+      - connectorInstanceId
+      - htlcId
+      - htlcPackage
+      - keychainId
+      - secret
+      - web3SigningCredential
+      type: object
+    HtlcPackage:
+      enum:
+      - BESU
+      - BESU_ERC20
+      type: string
+    Web3SigningCredential:
+      discriminator:
+        propertyName: type
+      example:
+        type: null
+      oneOf:
+      - $ref: '#/components/schemas/Web3SigningCredentialCactusKeychainRef'
+      - $ref: '#/components/schemas/Web3SigningCredentialPrivateKeyHex'
+      - $ref: '#/components/schemas/Web3SigningCredentialNone'
+      properties:
+        type:
+          $ref: '#/components/schemas/Web3SigningCredentialType'
+      required:
+      - type
+      type: object
+    Web3SigningCredentialCactusKeychainRef:
+      properties:
+        type:
+          $ref: '#/components/schemas/Web3SigningCredentialType'
+        ethAccount:
+          description: The ethereum account (public key) that the credential  belongs
+            to. Basically the username in the traditional  terminology of authentication.
+          maxLength: 64
+          minLength: 64
+          nullable: false
+          type: string
+        keychainEntryKey:
+          description: The key to use when looking up the the keychain entry holding
+            the secret pointed to by the  keychainEntryKey parameter.
+          maxLength: 1024
+          minLength: 0
+          type: string
+        keychainId:
+          description: The keychain ID to use when looking up the the keychain plugin
+            instance that will be used to retrieve the secret pointed to by the keychainEntryKey
+            parameter.
+          maxLength: 1024
+          minLength: 0
+          type: string
+      required:
+      - ethAccount
+      - keychainEntryKey
+      - keychainId
+      - type
+      type: object
+    Web3SigningCredentialType:
+      enum:
+      - CACTUS_KEYCHAIN_REF
+      - GETH_KEYCHAIN_PASSWORD
+      - PRIVATE_KEY_HEX
+      - NONE
+      type: string
+    Web3SigningCredentialPrivateKeyHex:
+      properties:
+        type:
+          $ref: '#/components/schemas/Web3SigningCredentialType'
+        ethAccount:
+          description: The ethereum account (public key) that the credential belongs
+            to. Basically the username in the traditional terminology of authentication.
+          maxLength: 64
+          minLength: 64
+          nullable: false
+          type: string
+        secret:
+          description: The HEX encoded private key of an eth account.
+          maxLength: 65535
+          minLength: 0
+          type: string
+      required:
+      - ethAccount
+      - secret
+      - type
+      type: object
+    Web3SigningCredentialNone:
+      description: Using this denotes that there is no signing required because the
+        transaction is pre-signed.
+      properties:
+        type:
+          $ref: '#/components/schemas/Web3SigningCredentialType'
+      required:
+      - type
+      type: object
+

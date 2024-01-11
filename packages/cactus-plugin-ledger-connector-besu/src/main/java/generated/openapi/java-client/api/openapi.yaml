@@ -1,0 +1,1249 @@
+openapi: 3.0.3
+info:
+  description: Can perform basic tasks on a Besu ledger
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  title: Hyperledger Cactus Plugin - Connector Besu
+  version: v2.0.0-alpha.2
+servers:
+- url: /
+paths:
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-open-api-spec:
+    get:
+      operationId: getOpenApiSpecV1
+      parameters: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Retrieves the .json file that contains the OpenAPI specification for
+        the plugin.
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: get
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-open-api-spec
+      x-accepts: application/json
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/deploy-contract-solidity-bytecode:
+    post:
+      operationId: deployContractSolBytecodeV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeployContractSolidityBytecodeV1Request'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeployContractSolidityBytecodeV1Response'
+          description: OK
+      summary: Deploys the bytecode of a Solidity contract.
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/deploy-contract-solidity-bytecode
+      x-content-type: application/json
+      x-accepts: application/json
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-balance:
+    post:
+      operationId: getBalanceV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetBalanceV1Request'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetBalanceV1Response'
+          description: OK
+      summary: Return balance of an address of a given block
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-balance
+      x-content-type: application/json
+      x-accepts: application/json
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-block:
+    post:
+      operationId: getBlockV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetBlockV1Request'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetBlockV1Response'
+          description: OK
+      summary: Returns a block matching the block
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-block
+      x-content-type: application/json
+      x-accepts: application/json
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/run-transaction:
+    post:
+      operationId: runTransactionV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RunTransactionRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RunTransactionResponse'
+          description: OK
+      summary: Executes a transaction on a besu ledger
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/run-transaction
+      x-content-type: application/json
+      x-accepts: application/json
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-transaction:
+    post:
+      operationId: getTransactionV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetTransactionV1Request'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetTransactionV1Response'
+          description: OK
+      summary: Executes a transaction on a besu ledger
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-transaction
+      x-content-type: application/json
+      x-accepts: application/json
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-past-logs:
+    post:
+      operationId: getPastLogsV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetPastLogsV1Request'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPastLogsV1Response'
+          description: OK
+      summary: "Gets past logs, matching the given options."
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-past-logs
+      x-content-type: application/json
+      x-accepts: application/json
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract:
+    post:
+      operationId: invokeContractV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvokeContractV1Request'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvokeContractV1Response'
+          description: OK
+      summary: Invokes a contract on a besu ledger
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract
+      x-content-type: application/json
+      x-accepts: application/json
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/sign-transaction:
+    post:
+      description: Obtain signatures of ledger from the corresponding transaction
+        hash.
+      operationId: signTransactionV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignTransactionRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignTransactionResponse'
+          description: OK
+        "404":
+          description: Not able to find the corresponding tranaction from the transaction
+            hash
+      summary: Obtain signatures of ledger from the corresponding transaction hash.
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/sign-transaction
+      x-content-type: application/json
+      x-accepts: application/json
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-prometheus-exporter-metrics:
+    get:
+      operationId: getPrometheusMetricsV1
+      parameters: []
+      responses:
+        "200":
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/PrometheusExporterMetricsResponse'
+          description: OK
+      summary: Get the Prometheus Metrics
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: get
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-prometheus-exporter-metrics
+      x-accepts: text/plain
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-besu-record:
+    post:
+      operationId: getBesuRecordV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetBesuRecordV1Request'
+      responses:
+        "200":
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/GetBesuRecordV1Response'
+          description: OK
+      summary: "Retrieves an arbitrary record (any piece of information) from the\
+        \ ledger. Ledger records can be call outputs, transaction input, etc."
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-besu-record
+      x-content-type: application/json
+      x-accepts: text/plain
+components:
+  schemas:
+    GetBalanceV1Response:
+      example:
+        balance: balance
+      properties:
+        balance:
+          type: string
+      required:
+      - balance
+      type: object
+    GetBalanceV1Request:
+      additionalProperties: false
+      example:
+        address: address
+        defaultBlock: ""
+      properties:
+        address:
+          type: string
+        defaultBlock: {}
+      required:
+      - address
+      type: object
+    EvmBlock:
+      example:
+        logsBloom: logsBloom
+        totalDifficulty: 1.4658129805029452
+        extraData: extraData
+        transactions:
+        - ""
+        - ""
+        nonce: nonce
+        miner: miner
+        difficulty: 6.027456183070403
+        number: 0.8008281904610115
+        gasLimit: 5.637376656633329
+        gasUsed: 2.3021358869347655
+        uncles:
+        - ""
+        - ""
+        sha3Uncles: sha3Uncles
+        size: 5.962133916683182
+        transactionsRoot: transactionsRoot
+        stateRoot: stateRoot
+        parentHash: parentHash
+        hash: hash
+        timestamp: ""
+      properties:
+        number:
+          type: number
+        hash:
+          type: string
+        parentHash:
+          type: string
+        nonce:
+          type: string
+        sha3Uncles:
+          type: string
+        logsBloom:
+          type: string
+        transactionsRoot:
+          type: string
+        stateRoot:
+          type: string
+        miner:
+          type: string
+        difficulty:
+          type: number
+        totalDifficulty:
+          type: number
+        extraData:
+          type: string
+        size:
+          type: number
+        gasLimit:
+          type: number
+        gasUsed:
+          type: number
+        timestamp: {}
+        transactions:
+          items: {}
+          type: array
+        uncles:
+          items: {}
+          type: array
+      type: object
+    GetBlockV1Response:
+      example:
+        block:
+          logsBloom: logsBloom
+          totalDifficulty: 1.4658129805029452
+          extraData: extraData
+          transactions:
+          - ""
+          - ""
+          nonce: nonce
+          miner: miner
+          difficulty: 6.027456183070403
+          number: 0.8008281904610115
+          gasLimit: 5.637376656633329
+          gasUsed: 2.3021358869347655
+          uncles:
+          - ""
+          - ""
+          sha3Uncles: sha3Uncles
+          size: 5.962133916683182
+          transactionsRoot: transactionsRoot
+          stateRoot: stateRoot
+          parentHash: parentHash
+          hash: hash
+          timestamp: ""
+      properties:
+        block:
+          $ref: '#/components/schemas/EvmBlock'
+      required:
+      - block
+      type: object
+    EvmTransaction:
+      example:
+        blockHash: ""
+        input: input
+        blockNumber: ""
+        gas: 6.027456183070403
+        transactionIndex: ""
+        from: from
+        to: ""
+        nonce: 0.8008281904610115
+        value: value
+        hash: hash
+        gasPrice: gasPrice
+      properties:
+        hash:
+          type: string
+        nonce:
+          type: number
+        blockHash: {}
+        blockNumber: {}
+        transactionIndex: {}
+        from:
+          type: string
+        to: {}
+        value:
+          type: string
+        gasPrice:
+          type: string
+        gas:
+          type: number
+        input:
+          type: string
+      type: object
+    GetTransactionV1Response:
+      example:
+        transaction:
+          blockHash: ""
+          input: input
+          blockNumber: ""
+          gas: 6.027456183070403
+          transactionIndex: ""
+          from: from
+          to: ""
+          nonce: 0.8008281904610115
+          value: value
+          hash: hash
+          gasPrice: gasPrice
+      properties:
+        transaction:
+          $ref: '#/components/schemas/EvmTransaction'
+      required:
+      - transaction
+      type: object
+    GetTransactionV1Request:
+      additionalProperties: false
+      example:
+        transactionHash: transactionHash
+      properties:
+        transactionHash:
+          type: string
+      required:
+      - transactionHash
+      type: object
+    GetPastLogsV1Response:
+      example:
+        logs:
+        - blockHash: blockHash
+          address: address
+          logIndex: 0.8008281904610115
+          data: data
+          topics:
+          - topics
+          - topics
+          blockNumber: 1.4658129805029452
+          transactionIndex: 6.027456183070403
+          transactionHash: transactionHash
+        - blockHash: blockHash
+          address: address
+          logIndex: 0.8008281904610115
+          data: data
+          topics:
+          - topics
+          - topics
+          blockNumber: 1.4658129805029452
+          transactionIndex: 6.027456183070403
+          transactionHash: transactionHash
+      properties:
+        logs:
+          items:
+            $ref: '#/components/schemas/EvmLog'
+          type: array
+      required:
+      - logs
+      type: object
+    GetPastLogsV1Request:
+      additionalProperties: false
+      example:
+        fromBlock: ""
+        toBlock: ""
+        address: ""
+        topics:
+        - ""
+        - ""
+      properties:
+        toBlock: {}
+        fromBlock: {}
+        address: {}
+        topics:
+          items: {}
+          type: array
+      type: object
+    EvmLog:
+      example:
+        blockHash: blockHash
+        address: address
+        logIndex: 0.8008281904610115
+        data: data
+        topics:
+        - topics
+        - topics
+        blockNumber: 1.4658129805029452
+        transactionIndex: 6.027456183070403
+        transactionHash: transactionHash
+      properties:
+        address:
+          type: string
+        data:
+          type: string
+        blockHash:
+          type: string
+        transactionHash:
+          type: string
+        topics:
+          items:
+            type: string
+          type: array
+        logIndex:
+          type: number
+        transactionIndex:
+          type: number
+        blockNumber:
+          type: number
+      required:
+      - address
+      - blockHash
+      - blockNumber
+      - data
+      - logIndex
+      - topics
+      - transactionHash
+      - transactionIndex
+      type: object
+    GetBlockV1Request:
+      additionalProperties: false
+      example:
+        blockHashOrBlockNumber: ""
+      properties:
+        blockHashOrBlockNumber: {}
+      required:
+      - blockHashOrBlockNumber
+      type: object
+    WatchBlocksV1:
+      enum:
+      - org.hyperledger.cactus.api.async.besu.WatchBlocksV1.Subscribe
+      - org.hyperledger.cactus.api.async.besu.WatchBlocksV1.Next
+      - org.hyperledger.cactus.api.async.besu.WatchBlocksV1.Unsubscribe
+      - org.hyperledger.cactus.api.async.besu.WatchBlocksV1.Error
+      - org.hyperledger.cactus.api.async.besu.WatchBlocksV1.Complete
+      type: string
+      x-enum-varnames:
+      - Subscribe
+      - Next
+      - Unsubscribe
+      - Error
+      - Complete
+    Web3BlockHeader:
+      properties:
+        number:
+          type: number
+        hash:
+          type: string
+        parentHash:
+          type: string
+        nonce:
+          type: string
+        sha3Uncles:
+          type: string
+        logsBloom:
+          type: string
+        transactionRoot:
+          type: string
+        stateRoot:
+          type: string
+        receiptRoot:
+          type: string
+        miner:
+          type: string
+        extraData:
+          type: string
+        gasLimit:
+          type: integer
+        gasUsed:
+          type: integer
+        timestamp:
+          $ref: '#/components/schemas/Web3BlockHeader_timestamp'
+      required:
+      - extraData
+      - gasLimit
+      - gasUsed
+      - hash
+      - logsBloom
+      - miner
+      - nonce
+      - number
+      - parentHash
+      - receiptRoot
+      - sha3Uncles
+      - stateRoot
+      - timestamp
+      - transactionRoot
+      type: object
+    WatchBlocksV1Progress:
+      properties:
+        blockHeader:
+          $ref: '#/components/schemas/Web3BlockHeader'
+      required:
+      - blockHeader
+      type: object
+    ReceiptType:
+      description: Enumerates the possible types of receipts that can be waited for
+        by someone or something that has requested the execution of a transaction
+        on a ledger.
+      enum:
+      - NODE_TX_POOL_ACK
+      - LEDGER_BLOCK_ACK
+      type: string
+    ConsistencyStrategy:
+      example:
+        blockConfirmations: 2931
+        receiptType: null
+        timeoutMs: 0
+      properties:
+        receiptType:
+          $ref: '#/components/schemas/ReceiptType'
+        timeoutMs:
+          description: "The amount of milliseconds to wait for the receipt to arrive\
+            \ to the connector. Defaults to 0 which means to wait for an unlimited\
+            \ amount of time. Note that this wait may be interrupted still by other\
+            \ parts of the infrastructure such as load balancers cutting of HTTP requests\
+            \ after some time even if they are the type that is supposed to be kept\
+            \ alive. The question of re-entrance is a broader topic not in scope to\
+            \ discuss here, but it is important to mention it."
+          minimum: 0
+          type: integer
+        blockConfirmations:
+          description: "The number of blocks to wait to be confirmed in addition to\
+            \ the block containing the transaction in question. Note that if the receipt\
+            \ type is set to only wait for node transaction pool ACK and this parameter\
+            \ is set to anything, but zero then the API will not accept the request\
+            \ due to conflicting parameters."
+          maximum: 20000
+          minimum: 0
+          type: integer
+      required:
+      - blockConfirmations
+      - receiptType
+      type: object
+    Web3SigningCredential:
+      discriminator:
+        propertyName: type
+      example:
+        type: null
+      oneOf:
+      - $ref: '#/components/schemas/Web3SigningCredentialCactusKeychainRef'
+      - $ref: '#/components/schemas/Web3SigningCredentialPrivateKeyHex'
+      - $ref: '#/components/schemas/Web3SigningCredentialNone'
+      properties:
+        type:
+          $ref: '#/components/schemas/Web3SigningCredentialType'
+      required:
+      - type
+      type: object
+    Web3SigningCredentialCactusKeychainRef:
+      properties:
+        type:
+          $ref: '#/components/schemas/Web3SigningCredentialType'
+        ethAccount:
+          description: The ethereum account (public key) that the credential  belongs
+            to. Basically the username in the traditional  terminology of authentication.
+          maxLength: 64
+          minLength: 64
+          nullable: false
+          type: string
+        keychainEntryKey:
+          description: The key to use when looking up the the keychain entry holding
+            the secret pointed to by the  keychainEntryKey parameter.
+          maxLength: 1024
+          minLength: 0
+          type: string
+        keychainId:
+          description: The keychain ID to use when looking up the the keychain plugin
+            instance that will be used to retrieve the secret pointed to by the keychainEntryKey
+            parameter.
+          maxLength: 1024
+          minLength: 0
+          type: string
+      required:
+      - ethAccount
+      - keychainEntryKey
+      - keychainId
+      - type
+      type: object
+    Web3SigningCredentialPrivateKeyHex:
+      properties:
+        type:
+          $ref: '#/components/schemas/Web3SigningCredentialType'
+        ethAccount:
+          description: The ethereum account (public key) that the credential belongs
+            to. Basically the username in the traditional terminology of authentication.
+          maxLength: 64
+          minLength: 64
+          nullable: false
+          type: string
+        secret:
+          description: The HEX encoded private key of an eth account.
+          maxLength: 65535
+          minLength: 0
+          type: string
+      required:
+      - ethAccount
+      - secret
+      - type
+      type: object
+    Web3SigningCredentialNone:
+      description: Using this denotes that there is no signing required because the
+        transaction is pre-signed.
+      properties:
+        type:
+          $ref: '#/components/schemas/Web3SigningCredentialType'
+      required:
+      - type
+      type: object
+    Web3SigningCredentialType:
+      enum:
+      - CACTUS_KEYCHAIN_REF
+      - GETH_KEYCHAIN_PASSWORD
+      - PRIVATE_KEY_HEX
+      - NONE
+      type: string
+    EthContractInvocationType:
+      enum:
+      - SEND
+      - CALL
+      type: string
+    SolidityContractJsonArtifact:
+      properties:
+        contractName:
+          nullable: false
+          type: string
+        metadata:
+          nullable: false
+          type: string
+        bytecode:
+          nullable: false
+          type: string
+        deployedBytecode:
+          nullable: false
+          type: string
+        sourceMap:
+          nullable: false
+          type: string
+        deployedSourceMap:
+          nullable: false
+          type: string
+        sourcePath:
+          type: string
+        compiler:
+          $ref: '#/components/schemas/SolidityContractJsonArtifact_compiler'
+        functionHashes:
+          additionalProperties: true
+          type: object
+        gasEstimates:
+          $ref: '#/components/schemas/SolidityContractJsonArtifact_gasEstimates'
+      required:
+      - contractName
+      type: object
+    BesuTransactionConfig:
+      additionalProperties: true
+      example:
+        rawTransaction: rawTransaction
+        data: null
+        gas: null
+        from: null
+        to: null
+        value: null
+        nonce: 0.8008281904610115
+        gasPrice: null
+      properties:
+        rawTransaction:
+          nullable: false
+          type: string
+        from:
+          $ref: '#/components/schemas/Web3BlockHeader_timestamp'
+        to:
+          $ref: '#/components/schemas/BesuTransactionConfig_to'
+        value:
+          $ref: '#/components/schemas/Web3BlockHeader_timestamp'
+        gas:
+          $ref: '#/components/schemas/Web3BlockHeader_timestamp'
+        gasPrice:
+          $ref: '#/components/schemas/Web3BlockHeader_timestamp'
+        nonce:
+          type: number
+        data:
+          $ref: '#/components/schemas/BesuTransactionConfig_to'
+      type: object
+    BesuPrivateTransactionConfig:
+      example:
+        privateFrom: privateFrom
+        privateFor:
+        - ""
+        - ""
+      properties:
+        privateFrom:
+          nullable: false
+          type: string
+        privateFor:
+          default: []
+          items: {}
+          nullable: false
+          type: array
+      required:
+      - privateFor
+      - privateFrom
+      type: object
+    Web3TransactionReceipt:
+      additionalProperties: true
+      example:
+        blockHash: blockHash
+        gasUsed: 1.4658129805029452
+        blockNumber: 6.027456183070403
+        contractAddress: contractAddress
+        transactionIndex: 0.8008281904610115
+        from: from
+        to: to
+        transactionHash: transactionHash
+        status: true
+      properties:
+        status:
+          nullable: false
+          type: boolean
+        transactionHash:
+          maxLength: 66
+          minLength: 66
+          pattern: "^0x([A-Fa-f0-9]{64})$"
+          type: string
+        transactionIndex:
+          nullable: false
+          type: number
+        blockHash:
+          maxLength: 66
+          minLength: 66
+          pattern: "^0x([A-Fa-f0-9]{64})$"
+          type: string
+        blockNumber:
+          nullable: false
+          type: number
+        gasUsed:
+          nullable: false
+          type: number
+        contractAddress:
+          nullable: true
+          type: string
+        from:
+          nullable: false
+          type: string
+        to:
+          nullable: false
+          type: string
+      required:
+      - blockHash
+      - blockNumber
+      - from
+      - gasUsed
+      - status
+      - to
+      - transactionHash
+      - transactionIndex
+      type: object
+    RunTransactionRequest:
+      additionalProperties: false
+      example:
+        privateTransactionConfig:
+          privateFrom: privateFrom
+          privateFor:
+          - ""
+          - ""
+        transactionConfig:
+          rawTransaction: rawTransaction
+          data: null
+          gas: null
+          from: null
+          to: null
+          value: null
+          nonce: 0.8008281904610115
+          gasPrice: null
+        consistencyStrategy:
+          blockConfirmations: 2931
+          receiptType: null
+          timeoutMs: 0
+        web3SigningCredential:
+          type: null
+      properties:
+        web3SigningCredential:
+          $ref: '#/components/schemas/Web3SigningCredential'
+        transactionConfig:
+          $ref: '#/components/schemas/BesuTransactionConfig'
+        consistencyStrategy:
+          $ref: '#/components/schemas/ConsistencyStrategy'
+        privateTransactionConfig:
+          $ref: '#/components/schemas/BesuPrivateTransactionConfig'
+      required:
+      - consistencyStrategy
+      - transactionConfig
+      - web3SigningCredential
+      type: object
+    RunTransactionResponse:
+      example:
+        transactionReceipt:
+          blockHash: blockHash
+          gasUsed: 1.4658129805029452
+          blockNumber: 6.027456183070403
+          contractAddress: contractAddress
+          transactionIndex: 0.8008281904610115
+          from: from
+          to: to
+          transactionHash: transactionHash
+          status: true
+      properties:
+        transactionReceipt:
+          $ref: '#/components/schemas/Web3TransactionReceipt'
+      required:
+      - transactionReceipt
+      type: object
+    DeployContractSolidityBytecodeV1Request:
+      additionalProperties: false
+      example:
+        bytecode: bytecode
+        privateTransactionConfig:
+          privateFrom: privateFrom
+          privateFor:
+          - ""
+          - ""
+        keychainId: keychainId
+        constructorArgs:
+        - ""
+        - ""
+        timeoutMs: 0.6027456183070403
+        contractAbi:
+        - ""
+        - ""
+        gas: 0.8008281904610115
+        web3SigningCredential:
+          type: null
+        contractName: contractName
+        gasPrice: gasPrice
+      properties:
+        contractName:
+          description: The contract name for retrieve the contracts json on the keychain.
+          maxLength: 100
+          minLength: 1
+          nullable: false
+          type: string
+        contractAbi:
+          description: The application binary interface of the solidity contract
+          items: {}
+          nullable: false
+          type: array
+        constructorArgs:
+          default: []
+          items: {}
+          type: array
+        web3SigningCredential:
+          $ref: '#/components/schemas/Web3SigningCredential'
+        bytecode:
+          description: See https://ethereum.stackexchange.com/a/47556 regarding the
+            maximum length of the bytecode
+          maxLength: 24576
+          minLength: 1
+          nullable: false
+          type: string
+        keychainId:
+          description: The keychainId for retrieve the contracts json.
+          maxLength: 100
+          minLength: 1
+          nullable: false
+          type: string
+        gas:
+          nullable: false
+          type: number
+        gasPrice:
+          nullable: false
+          type: string
+        timeoutMs:
+          default: 60000
+          description: The amount of milliseconds to wait for a transaction receipt
+            with theaddress of the contract(which indicates successful deployment)
+            beforegiving up and crashing.
+          minimum: 0
+          nullable: false
+          type: number
+        privateTransactionConfig:
+          $ref: '#/components/schemas/BesuPrivateTransactionConfig'
+      required:
+      - bytecode
+      - constructorArgs
+      - contractAbi
+      - contractName
+      - keychainId
+      - web3SigningCredential
+      type: object
+    DeployContractSolidityBytecodeV1Response:
+      example:
+        transactionReceipt:
+          blockHash: blockHash
+          gasUsed: 1.4658129805029452
+          blockNumber: 6.027456183070403
+          contractAddress: contractAddress
+          transactionIndex: 0.8008281904610115
+          from: from
+          to: to
+          transactionHash: transactionHash
+          status: true
+      properties:
+        transactionReceipt:
+          $ref: '#/components/schemas/Web3TransactionReceipt'
+      required:
+      - transactionReceipt
+      type: object
+    InvokeContractV1Request:
+      additionalProperties: false
+      example:
+        privateTransactionConfig:
+          privateFrom: privateFrom
+          privateFor:
+          - ""
+          - ""
+        methodName: methodName
+        contractAddress: contractAddress
+        params:
+        - ""
+        - ""
+        nonce: 0.8008281904610115
+        invocationType: null
+        keychainId: keychainId
+        timeoutMs: 0.6027456183070403
+        contractAbi:
+        - ""
+        - ""
+        gas: null
+        contractName: contractName
+        value: null
+        signingCredential:
+          type: null
+        gasPrice: null
+      properties:
+        contractName:
+          nullable: false
+          type: string
+        signingCredential:
+          $ref: '#/components/schemas/Web3SigningCredential'
+        invocationType:
+          $ref: '#/components/schemas/EthContractInvocationType'
+        methodName:
+          description: The name of the contract method to invoke.
+          maxLength: 2048
+          minLength: 1
+          nullable: false
+          type: string
+        params:
+          default: []
+          description: The list of arguments to pass in to the contract method being
+            invoked.
+          items: {}
+          type: array
+        contractAbi:
+          description: "The application binary interface of the solidity contract,\
+            \ optional parameter"
+          items: {}
+          nullable: false
+          type: array
+        contractAddress:
+          description: "Address of the solidity contract, optional parameter"
+          nullable: false
+          type: string
+        value:
+          $ref: '#/components/schemas/Web3BlockHeader_timestamp'
+        gas:
+          $ref: '#/components/schemas/Web3BlockHeader_timestamp'
+        gasPrice:
+          $ref: '#/components/schemas/Web3BlockHeader_timestamp'
+        nonce:
+          type: number
+        timeoutMs:
+          default: 60000
+          description: The amount of milliseconds to wait for a transaction receipt
+            beforegiving up and crashing. Only has any effect if the invocation type
+            is SEND
+          minimum: 0
+          nullable: false
+          type: number
+        keychainId:
+          description: The keychainId for retrieve the contracts json.
+          maxLength: 100
+          minLength: 1
+          type: string
+        privateTransactionConfig:
+          $ref: '#/components/schemas/BesuPrivateTransactionConfig'
+      required:
+      - contractName
+      - invocationType
+      - methodName
+      - params
+      - signingCredential
+      type: object
+    InvokeContractV1Response:
+      example:
+        transactionReceipt:
+          blockHash: blockHash
+          gasUsed: 1.4658129805029452
+          blockNumber: 6.027456183070403
+          contractAddress: contractAddress
+          transactionIndex: 0.8008281904610115
+          from: from
+          to: to
+          transactionHash: transactionHash
+          status: true
+        callOutput: ""
+        success: true
+      properties:
+        transactionReceipt:
+          $ref: '#/components/schemas/Web3TransactionReceipt'
+        callOutput: {}
+        success:
+          nullable: false
+          type: boolean
+      required:
+      - success
+      type: object
+    SignTransactionRequest:
+      additionalProperties: false
+      example:
+        keychainId: keychainId
+        keychainRef: keychainRef
+        transactionHash: transactionHash
+      properties:
+        keychainId:
+          maxLength: 100
+          minLength: 1
+          nullable: false
+          type: string
+        keychainRef:
+          maxLength: 100
+          minLength: 1
+          nullable: false
+          type: string
+        transactionHash:
+          description: The transaction hash of ledger will be used to fetch the contain.
+          maxLength: 2048
+          minLength: 0
+          nullable: false
+          type: string
+      required:
+      - keychainId
+      - keychainRef
+      - transactionHash
+      type: object
+    SignTransactionResponse:
+      example:
+        signature: signature
+      properties:
+        signature:
+          description: The signatures of ledger from the corresponding transaction
+            hash.
+          maxLength: 2048
+          minLength: 0
+          nullable: false
+          type: string
+      required:
+      - signature
+      type: object
+    PrometheusExporterMetricsResponse:
+      nullable: false
+      type: string
+    GetBesuRecordV1Request:
+      additionalProperties: false
+      example:
+        invokeCall:
+          privateTransactionConfig:
+            privateFrom: privateFrom
+            privateFor:
+            - ""
+            - ""
+          methodName: methodName
+          contractAddress: contractAddress
+          params:
+          - ""
+          - ""
+          nonce: 0.8008281904610115
+          invocationType: null
+          keychainId: keychainId
+          timeoutMs: 0.6027456183070403
+          contractAbi:
+          - ""
+          - ""
+          gas: null
+          contractName: contractName
+          value: null
+          signingCredential:
+            type: null
+          gasPrice: null
+        transactionHash: transactionHash
+      properties:
+        invokeCall:
+          $ref: '#/components/schemas/InvokeContractV1Request'
+        transactionHash:
+          maxLength: 66
+          minLength: 66
+          pattern: "^0x([A-Fa-f0-9]{64})$"
+          type: string
+      type: object
+    GetBesuRecordV1Response:
+      properties:
+        ledgerId:
+          type: string
+        stateContract:
+          type: string
+        transactionInputData: {}
+        callOutput: {}
+      type: object
+    Web3BlockHeader_timestamp:
+      oneOf:
+      - type: string
+      - type: number
+    SolidityContractJsonArtifact_compiler:
+      additionalProperties: true
+      properties:
+        name:
+          type: string
+        version:
+          type: string
+      type: object
+    SolidityContractJsonArtifact_gasEstimates_creation:
+      properties:
+        codeDepositCost:
+          type: string
+        executionCost:
+          type: string
+        totalCost:
+          type: string
+      type: object
+    SolidityContractJsonArtifact_gasEstimates:
+      properties:
+        creation:
+          $ref: '#/components/schemas/SolidityContractJsonArtifact_gasEstimates_creation'
+        external:
+          additionalProperties: true
+          type: object
+    BesuTransactionConfig_to:
+      oneOf:
+      - type: string
+

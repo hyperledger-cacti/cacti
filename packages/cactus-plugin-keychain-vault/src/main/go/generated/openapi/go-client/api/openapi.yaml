@@ -1,0 +1,310 @@
+openapi: 3.0.3
+info:
+  description: Contains/describes the Keychain API types/paths for Hyperledger Cactus.
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  title: Hyperledger Cactus - Keychain API
+  version: v2.0.0-alpha.2
+servers:
+- url: /
+paths:
+  /api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/get-keychain-entry:
+    post:
+      operationId: getKeychainEntryV1
+      parameters: []
+      requestBody:
+        $ref: '#/components/requestBodies/keychain_get_entry_request_body'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetKeychainEntryResponseV1'
+          description: OK
+        "400":
+          description: "Bad request. Key must be a string and longer than 0, shorter\
+            \ than 1024 characters."
+        "401":
+          description: Authorization information is missing or invalid.
+        "404":
+          description: A keychain item with the specified key was not found.
+        "500":
+          description: Unexpected error.
+      summary: Retrieves the contents of a keychain entry from the backend.
+      x-hyperledger-cacti:
+        http:
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/get-keychain-entry
+          verbLowerCase: post
+  /api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/delete-keychain-entry:
+    post:
+      operationId: deleteKeychainEntryV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteKeychainEntryRequestV1'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteKeychainEntryResponseV1'
+          description: OK
+      summary: Deletes an entry from the keychain stored under the provided key.
+      x-hyperledger-cacti:
+        http:
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/delete-keychain-entry
+          verbLowerCase: post
+  /api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/has-keychain-entry:
+    post:
+      operationId: hasKeychainEntryV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HasKeychainEntryRequestV1'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HasKeychainEntryResponseV1'
+          description: OK
+      summary: Retrieves the information regarding a key being present on the keychain
+        or not.
+      x-hyperledger-cacti:
+        http:
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/has-keychain-entry
+          verbLowerCase: post
+  /api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/set-keychain-entry:
+    post:
+      operationId: setKeychainEntryV1
+      parameters: []
+      requestBody:
+        $ref: '#/components/requestBodies/keychain_set_entry_request_body'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SetKeychainEntryResponseV1'
+          description: OK
+        "400":
+          description: "Bad request. Key must be a string and longer than 0, shorter\
+            \ than 1024 characters."
+        "401":
+          description: Authorization information is missing or invalid.
+        "500":
+          description: Unexpected error.
+      summary: Sets a value under a key on the keychain backend.
+      x-hyperledger-cacti:
+        http:
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/set-keychain-entry
+          verbLowerCase: post
+  /api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/get-prometheus-exporter-metrics:
+    get:
+      operationId: getPrometheusMetricsV1
+      parameters: []
+      responses:
+        "200":
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/PrometheusExporterMetricsResponse'
+          description: OK
+      summary: Get the Prometheus Metrics
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: get
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/get-prometheus-exporter-metrics
+components:
+  requestBodies:
+    keychain_get_entry_request_body:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GetKeychainEntryRequestV1'
+      description: Request body to obtain a keychain entry via its key
+      required: true
+    keychain_set_entry_request_body:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SetKeychainEntryRequestV1'
+      description: Request body to write/update a keychain entry via its key
+      required: true
+  responses:
+    keychain_get_entry_200:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GetKeychainEntryResponseV1'
+      description: OK
+    keychain_get_entry_400:
+      description: "Bad request. Key must be a string and longer than 0, shorter than\
+        \ 1024 characters."
+    keychain_get_entry_401:
+      description: Authorization information is missing or invalid.
+    keychain_get_entry_404:
+      description: A keychain item with the specified key was not found.
+    keychain_get_entry_500:
+      description: Unexpected error.
+    keychain_set_entry_200:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SetKeychainEntryResponseV1'
+      description: OK
+    keychain_set_entry_400:
+      description: "Bad request. Key must be a string and longer than 0, shorter than\
+        \ 1024 characters."
+    keychain_set_entry_401:
+      description: Authorization information is missing or invalid.
+    keychain_set_entry_500:
+      description: Unexpected error.
+  schemas:
+    PrometheusExporterMetricsResponse:
+      nullable: false
+      type: string
+    HasKeychainEntryRequestV1:
+      additionalProperties: false
+      example:
+        key: key
+      properties:
+        key:
+          description: The key to check for presence in the keychain.
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+      required:
+      - key
+      type: object
+    HasKeychainEntryResponseV1:
+      example:
+        checkedAt: checkedAt
+        isPresent: true
+        key: key
+      properties:
+        key:
+          description: The key that was used to check the presence of the value in
+            the keychain.
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+        checkedAt:
+          description: Date and time encoded as JSON when the presence check was performed
+            by the plugin backend.
+          nullable: false
+          type: string
+        isPresent:
+          description: The boolean true or false indicating the presence or absence
+            of an entry under 'key'.
+          nullable: false
+          type: boolean
+      required:
+      - checkedAt
+      - isPresent
+      - key
+      type: object
+    DeleteKeychainEntryRequestV1:
+      additionalProperties: false
+      example:
+        key: key
+      properties:
+        key:
+          description: The key of the entry to delete from the keychain.
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+      required:
+      - key
+      type: object
+    DeleteKeychainEntryResponseV1:
+      example:
+        key: key
+      properties:
+        key:
+          description: The key of the entry that was deleted from the keychain.
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+      required:
+      - key
+      type: object
+    GetKeychainEntryRequestV1:
+      additionalProperties: false
+      example:
+        key: key
+      properties:
+        key:
+          description: The key for the entry to get from the keychain.
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+      required:
+      - key
+      type: object
+    GetKeychainEntryResponseV1:
+      example:
+        value: value
+        key: key
+      properties:
+        key:
+          description: The key that was used to retrieve the value from the keychain.
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+        value:
+          description: The value associated with the requested key on the keychain.
+          maxLength: 10485760
+          minLength: 0
+          nullable: false
+          type: string
+      required:
+      - key
+      - value
+      type: object
+    SetKeychainEntryRequestV1:
+      additionalProperties: false
+      example:
+        value: value
+        key: key
+      properties:
+        key:
+          description: The key for the entry to set on the keychain.
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+        value:
+          description: The value that will be associated with the key on the keychain.
+          maxLength: 10485760
+          minLength: 0
+          nullable: false
+          type: string
+      required:
+      - key
+      - value
+      type: object
+    SetKeychainEntryResponseV1:
+      example:
+        key: key
+      properties:
+        key:
+          description: The key that was used to set the value on the keychain.
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+      required:
+      - key
+      type: object

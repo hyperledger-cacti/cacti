@@ -1,0 +1,9 @@
+.travis.yml
+README.md
+api/openapi.yaml
+client.go
+configuration.go
+go.mod
+go.sum
+response.go
+utils.go

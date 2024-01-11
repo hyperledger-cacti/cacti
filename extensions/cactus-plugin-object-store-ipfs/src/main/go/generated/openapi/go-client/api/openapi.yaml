@@ -1,0 +1,229 @@
+openapi: 3.0.3
+info:
+  description: Contains/describes the Hyperledger Cactus Object Store IPFS plugin.
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  title: 'Hyperledger Cactus Plugin - Object Store - IPFS '
+  version: v2.0.0-alpha.2
+servers:
+- description: Public test instance
+  url: "https://www.cactus.stream/{basePath}"
+  variables:
+    basePath:
+      default: ""
+- description: Local test instance
+  url: "http://localhost:4000/{basePath}"
+  variables:
+    basePath:
+      default: ""
+paths:
+  /api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/get-object:
+    post:
+      operationId: getObjectV1
+      parameters: []
+      requestBody:
+        $ref: '#/components/requestBodies/object_store_get_object_v1_request_body'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetObjectResponseV1'
+          description: OK
+      summary: Retrieves an object from the object store.
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/get-object
+  /api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/set-object:
+    post:
+      operationId: setObjectV1
+      parameters: []
+      requestBody:
+        $ref: '#/components/requestBodies/object_store_set_object_v1_request_body'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SetObjectResponseV1'
+          description: OK
+      summary: Sets an object in the object store under the specified key.
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/set-object
+  /api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/has-object:
+    post:
+      operationId: hasObjectV1
+      parameters: []
+      requestBody:
+        $ref: '#/components/requestBodies/object_store_has_object_v1_request_body'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HasObjectResponseV1'
+          description: OK
+      summary: Checks the presence of an object in the object store.
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/has-object
+components:
+  requestBodies:
+    object_store_get_object_v1_request_body:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GetObjectRequestV1'
+      description: Request body to obtain an object via its key.
+      required: true
+    object_store_set_object_v1_request_body:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SetObjectRequestV1'
+      description: Request body to set an object under a key.
+      required: true
+    object_store_has_object_v1_request_body:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/HasObjectRequestV1'
+      description: Request body to check presence of an object under a key.
+      required: true
+  responses:
+    object_store_get_object_v1_response_body:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GetObjectResponseV1'
+      description: OK
+    object_store_set_object_v1_response_body:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SetObjectResponseV1'
+      description: OK
+    object_store_has_object_v1_response_body:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/HasObjectResponseV1'
+      description: OK
+  schemas:
+    GetObjectRequestV1:
+      example:
+        key: key
+      properties:
+        key:
+          description: The key for the entry to get from the object store.
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+      required:
+      - key
+      type: object
+    GetObjectResponseV1:
+      example:
+        value: value
+        key: key
+      properties:
+        key:
+          description: The key that was used to retrieve the value from the object
+            store.
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+        value:
+          description: The value associated with the requested key in the object store
+            as a string.
+          maxLength: 10485760
+          minLength: 0
+          nullable: false
+          type: string
+      required:
+      - key
+      - value
+      type: object
+    SetObjectRequestV1:
+      example:
+        value: value
+        key: key
+      properties:
+        key:
+          description: The key for the entry to set in the object store.
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+        value:
+          description: The value that will be associated with the key in the object
+            store.
+          maxLength: 10485760
+          minLength: 0
+          nullable: false
+          type: string
+      required:
+      - key
+      - value
+      type: object
+    SetObjectResponseV1:
+      example:
+        key: key
+      properties:
+        key:
+          description: The key that was used to set the value in the object store.
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+      required:
+      - key
+      type: object
+    HasObjectRequestV1:
+      example:
+        key: key
+      properties:
+        key:
+          description: The key to check for presence in the object store.
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+      required:
+      - key
+      type: object
+    HasObjectResponseV1:
+      example:
+        checkedAt: checkedAt
+        isPresent: true
+        key: key
+      properties:
+        key:
+          description: The key that was used to check the presence of the value in
+            the object store.
+          maxLength: 1024
+          minLength: 1
+          nullable: false
+          type: string
+        checkedAt:
+          description: Date and time encoded as JSON when the presence check was performed
+            by the plugin backend.
+          nullable: false
+          type: string
+        isPresent:
+          description: The boolean true or false indicating the presence or absence
+            of an object under 'key'.
+          nullable: false
+          type: boolean
+      required:
+      - checkedAt
+      - isPresent
+      - key
+      type: object

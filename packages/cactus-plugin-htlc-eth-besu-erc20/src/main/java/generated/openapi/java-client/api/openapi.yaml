@@ -1,0 +1,588 @@
+openapi: 3.0.3
+info:
+  description: Allows Cactus nodes to interact with HTLC contracts with ERC-20 Tokens
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  title: Hyperledger Cactus Plugin - HTLC ETH BESU ERC20
+  version: v2.0.0-alpha.2
+servers:
+- url: /
+paths:
+  /api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/initialize:
+    post:
+      operationId: initializeV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InitializeRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RunTransactionResponse'
+          description: OK
+      summary: Initialize contract
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/initialize
+      x-content-type: application/json
+      x-accepts: application/json
+  /api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/withdraw:
+    post:
+      operationId: withdrawV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WithdrawRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvokeContractV1Response'
+          description: OK
+      summary: Withdraw a hashtimelock contract
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/withdraw
+      x-content-type: application/json
+      x-accepts: application/json
+  /api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/get-status:
+    post:
+      operationId: getStatusV1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetStatusRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  format: uint256
+                  type: integer
+                type: array
+          description: Array of status
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/get-status
+      x-content-type: application/json
+      x-accepts: application/json
+  /api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/get-single-status:
+    post:
+      operationId: getSingleStatusV1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetSingleStatusRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                format: uint256
+                type: integer
+          description: Status
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/get-single-status
+      x-content-type: application/json
+      x-accepts: application/json
+  /api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/refund:
+    post:
+      operationId: refundV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefundRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvokeContractV1Response'
+          description: OK
+      summary: Refund a hashtimelock contract
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/refund
+      x-content-type: application/json
+      x-accepts: application/json
+  /api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/new-contract:
+    post:
+      operationId: newContractV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewContractRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvokeContractV1Response'
+          description: OK
+      summary: Create a new hashtimelock contract
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/new-contract
+      x-content-type: application/json
+      x-accepts: application/json
+components:
+  responses:
+    GetStatusResponse:
+      content:
+        application/json:
+          schema:
+            items:
+              format: uint256
+              type: integer
+            type: array
+      description: Array of status
+    GetSingleStatusResponse:
+      content:
+        application/json:
+          schema:
+            format: uint256
+            type: integer
+      description: Status
+  schemas:
+    NewContractRequest:
+      additionalProperties: false
+      example:
+        receiver: receiver
+        outputAmount: 6.027456183070403
+        outputNetwork: outputNetwork
+        connectorId: connectorId
+        hashLock: hashLock
+        contractAddress: contractAddress
+        inputAmount: 0.8008281904610115
+        tokenAddress: tokenAddress
+        outputAddress: outputAddress
+        keychainId: keychainId
+        gas: null
+        web3SigningCredential:
+          type: null
+        expiration: 1.4658129805029452
+      properties:
+        contractAddress:
+          description: Contract address
+          nullable: false
+          type: string
+        inputAmount:
+          description: Input amount to lock
+          nullable: false
+          type: number
+        outputAmount:
+          description: Output amount to lock
+          nullable: false
+          type: number
+        expiration:
+          description: Timestamp to expire the contract
+          nullable: false
+          type: number
+        hashLock:
+          description: Hashlock needed to refund the amount
+          nullable: false
+          type: string
+        tokenAddress:
+          description: The token address
+          nullable: false
+          type: string
+        receiver:
+          description: The receiver address
+          nullable: false
+          type: string
+        outputNetwork:
+          description: The output network id
+          nullable: false
+          type: string
+        outputAddress:
+          description: The output address to receive the tokens
+          nullable: false
+          type: string
+        web3SigningCredential:
+          $ref: '#/components/schemas/Web3SigningCredential'
+        connectorId:
+          description: connectorId for the connector besu plugin
+          nullable: false
+          type: string
+        keychainId:
+          description: keychainId for the keychian plugin
+          nullable: false
+          type: string
+        gas:
+          $ref: '#/components/schemas/NewContractRequest_gas'
+      required:
+      - connectorId
+      - contractAddress
+      - expiration
+      - hashLock
+      - inputAmount
+      - keychainId
+      - outputAddress
+      - outputAmount
+      - outputNetwork
+      - receiver
+      - tokenAddress
+      - web3SigningCredential
+      type: object
+    RefundRequest:
+      additionalProperties: false
+      example:
+        keychainId: keychainId
+        connectorId: connectorId
+        gas: null
+        web3SigningCredential:
+          type: null
+        id: id
+      properties:
+        id:
+          description: Contract htlc id for refund
+          nullable: false
+          type: string
+        web3SigningCredential:
+          $ref: '#/components/schemas/Web3SigningCredential'
+        connectorId:
+          description: connectorId for the connector besu plugin
+          nullable: false
+          type: string
+        keychainId:
+          description: keychainId for the keychain plugin
+          nullable: false
+          type: string
+        gas:
+          $ref: '#/components/schemas/NewContractRequest_gas'
+      required:
+      - connectorId
+      - id
+      - keychainId
+      - web3SigningCredential
+      type: object
+    WithdrawRequest:
+      additionalProperties: false
+      example:
+        keychainId: keychainId
+        connectorId: connectorId
+        gas: null
+        web3SigningCredential:
+          type: null
+        id: id
+        secret: secret
+      properties:
+        id:
+          description: Contract locked id
+          nullable: false
+          type: string
+        secret:
+          description: Secret need to unlock the contract
+          nullable: false
+          type: string
+        web3SigningCredential:
+          $ref: '#/components/schemas/Web3SigningCredential'
+        connectorId:
+          description: connectorId for the connector besu plugin
+          nullable: false
+          type: string
+        keychainId:
+          description: keychainId for the keychain plugin
+          nullable: false
+          type: string
+        gas:
+          $ref: '#/components/schemas/NewContractRequest_gas'
+      required:
+      - connectorId
+      - id
+      - keychainId
+      - secret
+      - web3SigningCredential
+      type: object
+    GetStatusRequest:
+      additionalProperties: false
+      description: Defines the parameters for retrieving the status of the HTLC swap.
+      example:
+        keychainId: keychainId
+        connectorId: connectorId
+        ids:
+        - ids
+        - ids
+        web3SigningCredential:
+          type: null
+      properties:
+        ids:
+          items:
+            type: string
+          type: array
+        web3SigningCredential:
+          $ref: '#/components/schemas/Web3SigningCredential'
+        connectorId:
+          type: string
+        keychainId:
+          type: string
+      required:
+      - connectorId
+      - ids
+      - keychainId
+      - web3SigningCredential
+      type: object
+    GetSingleStatusRequest:
+      additionalProperties: false
+      description: Defines the parameters for retrieving the single status of the
+        HTLC swap.
+      example:
+        keychainId: keychainId
+        connectorId: connectorId
+        web3SigningCredential:
+          type: null
+        id: id
+      properties:
+        id:
+          type: string
+        web3SigningCredential:
+          $ref: '#/components/schemas/Web3SigningCredential'
+        connectorId:
+          type: string
+        keychainId:
+          type: string
+      required:
+      - connectorId
+      - id
+      - keychainId
+      - web3SigningCredential
+      type: object
+    InitializeRequest:
+      additionalProperties: false
+      example:
+        keychainId: keychainId
+        connectorId: connectorId
+        constructorArgs:
+        - ""
+        - ""
+        gas: 0.8008281904610115
+        web3SigningCredential:
+          type: null
+      properties:
+        connectorId:
+          description: connectorId for the connector besu plugin
+          nullable: false
+          type: string
+        keychainId:
+          description: keychainId for the keychain plugin
+          nullable: false
+          type: string
+        constructorArgs:
+          default: []
+          items: {}
+          type: array
+        web3SigningCredential:
+          $ref: '#/components/schemas/Web3SigningCredential'
+        gas:
+          type: number
+      required:
+      - connectorId
+      - constructorArgs
+      - keychainId
+      - web3SigningCredential
+      type: object
+    RunTransactionResponse:
+      example:
+        transactionReceipt:
+          blockHash: blockHash
+          gasUsed: 1.4658129805029452
+          blockNumber: 6.027456183070403
+          contractAddress: contractAddress
+          transactionIndex: 0.8008281904610115
+          from: from
+          to: to
+          transactionHash: transactionHash
+          status: true
+      properties:
+        transactionReceipt:
+          $ref: '#/components/schemas/Web3TransactionReceipt'
+      required:
+      - transactionReceipt
+      type: object
+    Web3TransactionReceipt:
+      additionalProperties: true
+      example:
+        blockHash: blockHash
+        gasUsed: 1.4658129805029452
+        blockNumber: 6.027456183070403
+        contractAddress: contractAddress
+        transactionIndex: 0.8008281904610115
+        from: from
+        to: to
+        transactionHash: transactionHash
+        status: true
+      properties:
+        status:
+          nullable: false
+          type: boolean
+        transactionHash:
+          maxLength: 66
+          minLength: 66
+          pattern: "^0x([A-Fa-f0-9]{64})$"
+          type: string
+        transactionIndex:
+          nullable: false
+          type: number
+        blockHash:
+          maxLength: 66
+          minLength: 66
+          pattern: "^0x([A-Fa-f0-9]{64})$"
+          type: string
+        blockNumber:
+          nullable: false
+          type: number
+        gasUsed:
+          nullable: false
+          type: number
+        contractAddress:
+          nullable: true
+          type: string
+        from:
+          nullable: false
+          type: string
+        to:
+          nullable: false
+          type: string
+      required:
+      - blockHash
+      - blockNumber
+      - from
+      - gasUsed
+      - status
+      - to
+      - transactionHash
+      - transactionIndex
+      type: object
+    InvokeContractV1Response:
+      example:
+        transactionReceipt:
+          blockHash: blockHash
+          gasUsed: 1.4658129805029452
+          blockNumber: 6.027456183070403
+          contractAddress: contractAddress
+          transactionIndex: 0.8008281904610115
+          from: from
+          to: to
+          transactionHash: transactionHash
+          status: true
+        callOutput: ""
+        success: true
+      properties:
+        transactionReceipt:
+          $ref: '#/components/schemas/Web3TransactionReceipt'
+        callOutput: {}
+        success:
+          nullable: false
+          type: boolean
+      required:
+      - success
+      type: object
+    Web3SigningCredential:
+      discriminator:
+        propertyName: type
+      example:
+        type: null
+      oneOf:
+      - $ref: '#/components/schemas/Web3SigningCredentialCactusKeychainRef'
+      - $ref: '#/components/schemas/Web3SigningCredentialPrivateKeyHex'
+      - $ref: '#/components/schemas/Web3SigningCredentialNone'
+      properties:
+        type:
+          $ref: '#/components/schemas/Web3SigningCredentialType'
+      required:
+      - type
+      type: object
+    Web3SigningCredentialCactusKeychainRef:
+      properties:
+        type:
+          $ref: '#/components/schemas/Web3SigningCredentialType'
+        ethAccount:
+          description: The ethereum account (public key) that the credential  belongs
+            to. Basically the username in the traditional  terminology of authentication.
+          maxLength: 64
+          minLength: 64
+          nullable: false
+          type: string
+        keychainEntryKey:
+          description: The key to use when looking up the the keychain entry holding
+            the secret pointed to by the  keychainEntryKey parameter.
+          maxLength: 1024
+          minLength: 0
+          type: string
+        keychainId:
+          description: The keychain ID to use when looking up the the keychain plugin
+            instance that will be used to retrieve the secret pointed to by the keychainEntryKey
+            parameter.
+          maxLength: 1024
+          minLength: 0
+          type: string
+      required:
+      - ethAccount
+      - keychainEntryKey
+      - keychainId
+      - type
+      type: object
+    Web3SigningCredentialType:
+      enum:
+      - CACTUS_KEYCHAIN_REF
+      - GETH_KEYCHAIN_PASSWORD
+      - PRIVATE_KEY_HEX
+      - NONE
+      type: string
+    Web3SigningCredentialPrivateKeyHex:
+      properties:
+        type:
+          $ref: '#/components/schemas/Web3SigningCredentialType'
+        ethAccount:
+          description: The ethereum account (public key) that the credential belongs
+            to. Basically the username in the traditional terminology of authentication.
+          maxLength: 64
+          minLength: 64
+          nullable: false
+          type: string
+        secret:
+          description: The HEX encoded private key of an eth account.
+          maxLength: 65535
+          minLength: 0
+          type: string
+      required:
+      - ethAccount
+      - secret
+      - type
+      type: object
+    Web3SigningCredentialNone:
+      description: Using this denotes that there is no signing required because the
+        transaction is pre-signed.
+      properties:
+        type:
+          $ref: '#/components/schemas/Web3SigningCredentialType'
+      required:
+      - type
+      type: object
+    NewContractRequest_gas:
+      oneOf:
+      - type: string
+      - type: number
+

@@ -1,0 +1,1003 @@
+openapi: 3.0.3
+info:
+  description: Can perform basic tasks on a Ethereum ledger
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  title: Hyperledger Cacti Plugin - Connector Ethereum
+  version: v2.0.0-alpha.2
+servers:
+- url: /
+paths:
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/deploy-contract:
+    post:
+      operationId: deployContract
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeployContractV1Request'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RunTransactionResponse'
+          description: OK
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorExceptionResponseV1'
+          description: Internal Server Error
+      summary: Deploys the contract to ethereum ledger.
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/deploy-contract
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/run-transaction:
+    post:
+      operationId: runTransactionV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RunTransactionRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RunTransactionResponse'
+          description: OK
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorExceptionResponseV1'
+          description: Internal Server Error
+      summary: Executes a transaction on a ethereum ledger
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/run-transaction
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/invoke-contract:
+    post:
+      operationId: invokeContractV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvokeContractV1Request'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvokeContractV1Response'
+          description: OK
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorExceptionResponseV1'
+          description: Internal Server Error
+      summary: Invokes a contract on an ethereum ledger
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/invoke-contract
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/get-prometheus-exporter-metrics:
+    get:
+      operationId: getPrometheusMetricsV1
+      parameters: []
+      responses:
+        "200":
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/PrometheusExporterMetricsResponse'
+          description: OK
+      summary: Get the Prometheus Metrics
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: get
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/get-prometheus-exporter-metrics
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/invoke-raw-web3eth-method:
+    post:
+      operationId: invokeWeb3EthMethodV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvokeRawWeb3EthMethodV1Request'
+      responses:
+        "200":
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/InvokeRawWeb3EthMethodV1Response'
+          description: OK
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorExceptionResponseV1'
+          description: Internal Server Error
+      summary: Invoke any method from web3.eth (low-level)
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/invoke-raw-web3eth-method
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/invoke-raw-web3eth-contract:
+    post:
+      operationId: invokeRawWeb3EthContractV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvokeRawWeb3EthContractV1Request'
+      responses:
+        "200":
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/InvokeRawWeb3EthContractV1Response'
+          description: OK
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorExceptionResponseV1'
+          description: Internal Server Error
+      summary: Low-level endpoint to invoke a method on deployed contract.
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/invoke-raw-web3eth-contract
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/json-rpc:
+    summary: Proxy endpoint to pass JSON-RPC requests to remote ethereum node.
+components:
+  schemas:
+    Web3SigningCredential:
+      discriminator:
+        propertyName: type
+      example:
+        type: null
+      oneOf:
+      - $ref: '#/components/schemas/Web3SigningCredentialGethKeychainPassword'
+      - $ref: '#/components/schemas/Web3SigningCredentialCactiKeychainRef'
+      - $ref: '#/components/schemas/Web3SigningCredentialPrivateKeyHex'
+      - $ref: '#/components/schemas/Web3SigningCredentialNone'
+      properties:
+        type:
+          $ref: '#/components/schemas/Web3SigningCredentialType'
+      required:
+      - type
+      type: object
+    Web3SigningCredentialGethKeychainPassword:
+      properties:
+        type:
+          $ref: '#/components/schemas/Web3SigningCredentialType'
+        ethAccount:
+          description: The ethereum account (public key) that the credential  belongs
+            to. Basically the username in the traditional terminology of authentication.
+          maxLength: 66
+          minLength: 66
+          nullable: false
+          type: string
+        secret:
+          description: A geth keychain unlock password.
+          maxLength: 65535
+          minLength: 0
+          type: string
+      required:
+      - ethAccount
+      - secret
+      - type
+      type: object
+    Web3SigningCredentialCactiKeychainRef:
+      properties:
+        type:
+          $ref: '#/components/schemas/Web3SigningCredentialType'
+        ethAccount:
+          description: The ethereum account (public key) that the credential  belongs
+            to. Basically the username in the traditional  terminology of authentication.
+          maxLength: 66
+          minLength: 66
+          nullable: false
+          type: string
+        keychainEntryKey:
+          description: The key to use when looking up the the keychain entry holding
+            the secret pointed to by the  keychainEntryKey parameter.
+          maxLength: 1024
+          minLength: 0
+          type: string
+        keychainId:
+          description: The keychain ID to use when looking up the the keychain plugin
+            instance that will be used to retrieve the secret pointed to by the keychainEntryKey
+            parameter.
+          maxLength: 1024
+          minLength: 0
+          type: string
+      required:
+      - ethAccount
+      - keychainEntryKey
+      - type
+      type: object
+    Web3SigningCredentialPrivateKeyHex:
+      properties:
+        type:
+          $ref: '#/components/schemas/Web3SigningCredentialType'
+        ethAccount:
+          description: The ethereum account (public key) that the credential belongs
+            to. Basically the username in the traditional terminology of authentication.
+          maxLength: 66
+          minLength: 66
+          nullable: false
+          type: string
+        secret:
+          description: The HEX encoded private key of an eth account.
+          maxLength: 65535
+          minLength: 0
+          type: string
+      required:
+      - ethAccount
+      - secret
+      - type
+      type: object
+    Web3SigningCredentialNone:
+      description: Using this denotes that there is no signing required because the
+        transaction is pre-signed.
+      properties:
+        type:
+          $ref: '#/components/schemas/Web3SigningCredentialType'
+      required:
+      - type
+      type: object
+    Web3SigningCredentialType:
+      enum:
+      - CACTI_KEYCHAIN_REF
+      - GETH_KEYCHAIN_PASSWORD
+      - PRIVATE_KEY_HEX
+      - NONE
+      type: string
+    EthContractInvocationType:
+      enum:
+      - SEND
+      - CALL
+      type: string
+    EthContractInvocationWeb3Method:
+      enum:
+      - send
+      - call
+      - encodeABI
+      - estimateGas
+      type: string
+    GasTransactionConfigLegacy:
+      description: Transaction gas settings in networks before EIP-1559 (London fork).
+      properties:
+        gas:
+          description: A maximum amount of gas a user is willing to provide for the
+            execution of the transaction. (gasLimit)
+          type: string
+        gasPrice:
+          description: "A price (in Wei) a user is willing to pay for each unit of\
+            \ gas used during the execution of the transaction. In EIP-1559 (London\
+            \ fork) networks, it will be set as both maxFeePerGas and maxPriorityFeePerGas."
+          type: string
+      type: object
+    GasTransactionConfigEIP1559:
+      description: Transaction gas settings in networks after EIP-1559 (London fork).
+      properties:
+        gasLimit:
+          description: A maximum amount of gas a user is willing to provide for the
+            execution of the transaction.
+          nullable: false
+          type: string
+        maxFeePerGas:
+          description: A maximum fee (including the base fee and the tip) a user is
+            willing to pay per unit of gas.
+          nullable: false
+          type: string
+        maxPriorityFeePerGas:
+          description: A maximum tip amount a user is willing to pay per unit of gas.
+          nullable: false
+          type: string
+      type: object
+    GasTransactionConfig:
+      description: Transaction gas settings.
+      oneOf:
+      - $ref: '#/components/schemas/GasTransactionConfigLegacy'
+      - $ref: '#/components/schemas/GasTransactionConfigEIP1559'
+      type: object
+    EthereumTransactionConfig:
+      example:
+        gasConfig: null
+        rawTransaction: rawTransaction
+        data: data
+        from: from
+        to: to
+        value: value
+        nonce: nonce
+      properties:
+        rawTransaction:
+          nullable: false
+          type: string
+        from:
+          type: string
+        to:
+          type: string
+        value:
+          type: string
+        nonce:
+          type: string
+        data:
+          type: string
+        gasConfig:
+          $ref: '#/components/schemas/GasTransactionConfig'
+      type: object
+    Web3TransactionReceipt:
+      additionalProperties: true
+      example:
+        blockHash: blockHash
+        logsBloom: logsBloom
+        contractAddress: contractAddress
+        transactionIndex: transactionIndex
+        commitmentHash: commitmentHash
+        type: type
+        transactionHash: transactionHash
+        output: output
+        gasUsed: gasUsed
+        blockNumber: blockNumber
+        cumulativeGasUsed: cumulativeGasUsed
+        from: from
+        to: to
+        revertReason: revertReason
+        effectiveGasPrice: effectiveGasPrice
+        logs:
+        - ""
+        - ""
+        status: true
+      properties:
+        status:
+          nullable: false
+          type: boolean
+        transactionHash:
+          maxLength: 66
+          minLength: 66
+          pattern: "^0x([A-Fa-f0-9]{64})$"
+          type: string
+        transactionIndex:
+          nullable: false
+          type: string
+        blockHash:
+          maxLength: 66
+          minLength: 66
+          pattern: "^0x([A-Fa-f0-9]{64})$"
+          type: string
+        blockNumber:
+          nullable: false
+          type: string
+        gasUsed:
+          nullable: false
+          type: string
+        effectiveGasPrice:
+          nullable: false
+          type: string
+        contractAddress:
+          nullable: true
+          type: string
+        from:
+          nullable: false
+          type: string
+        to:
+          nullable: false
+          type: string
+        logs:
+          default: []
+          items: {}
+          nullable: false
+          type: array
+        logsBloom:
+          nullable: false
+          type: string
+        revertReason:
+          nullable: false
+          type: string
+        output:
+          nullable: false
+          type: string
+        commitmentHash:
+          nullable: false
+          type: string
+        cumulativeGasUsed:
+          nullable: false
+          type: string
+        type:
+          nullable: false
+          type: string
+      required:
+      - blockHash
+      - blockNumber
+      - from
+      - gasUsed
+      - status
+      - to
+      - transactionHash
+      - transactionIndex
+      type: object
+    ContractJSON:
+      additionalProperties: true
+      properties:
+        contractName:
+          nullable: false
+          type: string
+        bytecode:
+          description: See https://ethereum.stackexchange.com/a/47556 regarding the
+            maximum length of the bytecode
+          maxLength: 24576
+          minLength: 1
+          nullable: false
+          type: string
+        abi:
+          description: "The application binary interface of the solidity contract,\
+            \ optional parameter"
+          items: {}
+          nullable: false
+          type: array
+        metadata:
+          type: string
+        deployedBytecode:
+          type: string
+        sourceMap:
+          type: string
+        deployedSourceMap:
+          type: string
+        sourcePath:
+          type: string
+        compiler:
+          type: object
+        networks:
+          type: object
+        ast:
+          type: object
+        functionHashes:
+          type: object
+        gasEstimates:
+          type: object
+      required:
+      - abi
+      - bytecode
+      - contractName
+      type: object
+    ContractJsonDefinition:
+      additionalProperties: false
+      properties:
+        contractJSON:
+          $ref: '#/components/schemas/ContractJSON'
+      required:
+      - contractJSON
+      type: object
+    DeployedContractJsonDefinition:
+      additionalProperties: false
+      properties:
+        contractJSON:
+          $ref: '#/components/schemas/ContractJSON'
+        contractAddress:
+          nullable: false
+          type: string
+      required:
+      - contractAddress
+      - contractJSON
+      type: object
+    ContractKeychainDefinition:
+      additionalProperties: false
+      properties:
+        contractName:
+          description: The contract name for retrieve the contracts json on the keychain.
+          maxLength: 100
+          minLength: 1
+          nullable: false
+          type: string
+        keychainId:
+          description: The keychainId for retrieve the contracts json.
+          maxLength: 100
+          minLength: 1
+          nullable: false
+          type: string
+      required:
+      - contractName
+      - keychainId
+      type: object
+    RunTransactionRequest:
+      additionalProperties: false
+      example:
+        timeoutMs: 0.08008281904610115
+        transactionConfig:
+          gasConfig: null
+          rawTransaction: rawTransaction
+          data: data
+          from: from
+          to: to
+          value: value
+          nonce: nonce
+        web3SigningCredential:
+          type: null
+      properties:
+        web3SigningCredential:
+          $ref: '#/components/schemas/Web3SigningCredential'
+        transactionConfig:
+          $ref: '#/components/schemas/EthereumTransactionConfig'
+        timeoutMs:
+          default: 60000
+          description: The amount of milliseconds to wait for a transaction receipt
+            with thehash of the transaction(which indicates successful execution)
+            beforegiving up and crashing.
+          minimum: 0
+          nullable: false
+          type: number
+      required:
+      - transactionConfig
+      - web3SigningCredential
+      type: object
+    RunTransactionResponse:
+      example:
+        transactionReceipt:
+          blockHash: blockHash
+          logsBloom: logsBloom
+          contractAddress: contractAddress
+          transactionIndex: transactionIndex
+          commitmentHash: commitmentHash
+          type: type
+          transactionHash: transactionHash
+          output: output
+          gasUsed: gasUsed
+          blockNumber: blockNumber
+          cumulativeGasUsed: cumulativeGasUsed
+          from: from
+          to: to
+          revertReason: revertReason
+          effectiveGasPrice: effectiveGasPrice
+          logs:
+          - ""
+          - ""
+          status: true
+      properties:
+        transactionReceipt:
+          $ref: '#/components/schemas/Web3TransactionReceipt'
+      required:
+      - transactionReceipt
+      type: object
+    DeployContractV1Request:
+      additionalProperties: false
+      example:
+        gasConfig: null
+        constructorArgs:
+        - ""
+        - ""
+        contract: null
+        web3SigningCredential:
+          type: null
+        value: value
+      properties:
+        web3SigningCredential:
+          $ref: '#/components/schemas/Web3SigningCredential'
+        contract:
+          $ref: '#/components/schemas/DeployContractV1Request_contract'
+        constructorArgs:
+          default: []
+          description: The list of arguments to pass in to the constructor of the
+            contract being deployed.
+          items: {}
+          type: array
+        gasConfig:
+          $ref: '#/components/schemas/GasTransactionConfig'
+        value:
+          description: Ether balance to send on deployment.
+          nullable: false
+          type: string
+      required:
+      - contract
+      - web3SigningCredential
+      type: object
+    InvokeContractV1Request:
+      additionalProperties: false
+      example:
+        gasConfig: null
+        invocationType: null
+        timeoutMs: 0.08008281904610115
+        contract: null
+        methodName: methodName
+        web3SigningCredential:
+          type: null
+        params:
+        - ""
+        - ""
+        value: value
+      properties:
+        contract:
+          $ref: '#/components/schemas/InvokeContractV1Request_contract'
+        methodName:
+          description: The name of the contract method to invoke.
+          maxLength: 2048
+          minLength: 1
+          nullable: false
+          type: string
+        params:
+          default: []
+          description: The list of arguments to pass in to the contract method being
+            invoked.
+          items: {}
+          type: array
+        invocationType:
+          $ref: '#/components/schemas/EthContractInvocationType'
+        web3SigningCredential:
+          $ref: '#/components/schemas/Web3SigningCredential'
+        gasConfig:
+          $ref: '#/components/schemas/GasTransactionConfig'
+        value:
+          type: string
+        timeoutMs:
+          default: 60000
+          description: The amount of milliseconds to wait for a transaction receipt
+            before returning an error. Only has any effect if the invocation type
+            is SEND
+          minimum: 0
+          nullable: false
+          type: number
+      required:
+      - contract
+      - invocationType
+      - methodName
+      - params
+      type: object
+    InvokeContractV1Response:
+      example:
+        transactionReceipt:
+          blockHash: blockHash
+          logsBloom: logsBloom
+          contractAddress: contractAddress
+          transactionIndex: transactionIndex
+          commitmentHash: commitmentHash
+          type: type
+          transactionHash: transactionHash
+          output: output
+          gasUsed: gasUsed
+          blockNumber: blockNumber
+          cumulativeGasUsed: cumulativeGasUsed
+          from: from
+          to: to
+          revertReason: revertReason
+          effectiveGasPrice: effectiveGasPrice
+          logs:
+          - ""
+          - ""
+          status: true
+        callOutput: ""
+        success: true
+      properties:
+        transactionReceipt:
+          $ref: '#/components/schemas/Web3TransactionReceipt'
+        callOutput: {}
+        success:
+          nullable: false
+          type: boolean
+      required:
+      - success
+      type: object
+    InvokeRawWeb3EthMethodV1Request:
+      additionalProperties: false
+      example:
+        methodName: methodName
+        params:
+        - ""
+        - ""
+      properties:
+        methodName:
+          description: The name of the web3.eth method to invoke
+          maxLength: 2048
+          minLength: 1
+          nullable: false
+          type: string
+        params:
+          default: []
+          description: The list of arguments to pass to web3.eth method specified
+            in methodName
+          items: {}
+          type: array
+      required:
+      - methodName
+      type: object
+    InvokeRawWeb3EthMethodV1Response:
+      additionalProperties: false
+      example:
+        data: ""
+        errorDetail: errorDetail
+        status: 0.8008281904610115
+      properties:
+        status:
+          description: Status code of the operation
+          nullable: false
+          type: number
+        data:
+          description: Output of requested web3.eth method
+        errorDetail:
+          description: Error details
+          nullable: false
+          type: string
+      required:
+      - status
+      type: object
+    InvokeRawWeb3EthContractV1Request:
+      additionalProperties: false
+      example:
+        invocationType: null
+        address: address
+        abi: ""
+        contractMethodArgs:
+        - ""
+        - ""
+        contractMethod: contractMethod
+        invocationParams: "{}"
+      properties:
+        abi:
+          description: The application binary interface of the solidity contract
+        address:
+          description: Deployed solidity contract address
+          type: string
+        invocationType:
+          $ref: '#/components/schemas/EthContractInvocationWeb3Method'
+        invocationParams:
+          default: {}
+          description: "The list of arguments for contract invocation method (send,\
+            \ call, etc...)"
+          type: object
+        contractMethod:
+          description: Method of deployed solidity contract to execute
+          type: string
+        contractMethodArgs:
+          default: []
+          description: The list of arguments for deployed solidity contract method
+          items: {}
+          type: array
+      required:
+      - abi
+      - address
+      - contractMethod
+      - invocationType
+      type: object
+    InvokeRawWeb3EthContractV1Response:
+      additionalProperties: false
+      example:
+        data: ""
+        errorDetail: errorDetail
+        status: 0.8008281904610115
+      properties:
+        status:
+          description: Status code of the operation
+          type: number
+        data:
+          description: Output of contract invocation method
+        errorDetail:
+          description: Error details
+          type: string
+      required:
+      - status
+      type: object
+    PrometheusExporterMetricsResponse:
+      nullable: false
+      type: string
+    WatchBlocksV1:
+      enum:
+      - org.hyperledger.cacti.api.async.ethereum.WatchBlocksV1.Subscribe
+      - org.hyperledger.cacti.api.async.ethereum.WatchBlocksV1.Next
+      - org.hyperledger.cacti.api.async.ethereum.WatchBlocksV1.Unsubscribe
+      - org.hyperledger.cacti.api.async.ethereum.WatchBlocksV1.Error
+      - org.hyperledger.cacti.api.async.ethereum.WatchBlocksV1.Complete
+      type: string
+      x-enum-varnames:
+      - Subscribe
+      - Next
+      - Unsubscribe
+      - Error
+      - Complete
+    WatchBlocksV1Options:
+      properties:
+        getBlockData:
+          type: boolean
+      type: object
+    Web3BlockHeader:
+      properties:
+        number:
+          type: string
+        parentHash:
+          type: string
+        sha3Uncles:
+          type: string
+        transactionsRoot:
+          type: string
+        receiptsRoot:
+          type: string
+        difficulty:
+          type: string
+        mixHash:
+          type: string
+        miner:
+          type: string
+        gasLimit:
+          type: string
+        gasUsed:
+          type: string
+        stateRoot:
+          type: string
+        logsBloom:
+          type: string
+        extraData:
+          type: string
+        nonce:
+          type: string
+        timestamp:
+          type: string
+      required:
+      - gasLimit
+      - gasUsed
+      - sha3Uncles
+      - transactionRoot
+      type: object
+    Web3Transaction:
+      properties:
+        hash:
+          type: string
+        nonce:
+          type: string
+        blockHash:
+          type: string
+        blockNumber:
+          type: string
+        transactionIndex:
+          type: string
+        from:
+          type: string
+        to:
+          type: string
+        value:
+          type: string
+        gasPrice:
+          type: string
+        gas:
+          type: string
+        input:
+          type: string
+        type:
+          type: string
+        chainId:
+          type: string
+        v:
+          type: string
+        r:
+          type: string
+        s:
+          type: string
+      required:
+      - blockHash
+      - blockNumber
+      - chainId
+      - from
+      - gas
+      - gasPrice
+      - hash
+      - input
+      - nonce
+      - to
+      - transactionIndex
+      - type
+      - value
+      type: object
+    WatchBlocksV1BlockData:
+      properties:
+        number:
+          type: string
+        hash:
+          type: string
+        parentHash:
+          type: string
+        nonce:
+          type: string
+        sha3Uncles:
+          type: string
+        logsBloom:
+          type: string
+        transactionsRoot:
+          type: string
+        stateRoot:
+          type: string
+        receiptsRoot:
+          type: string
+        difficulty:
+          type: string
+        mixHash:
+          type: string
+        miner:
+          type: string
+        extraData:
+          type: string
+        gasLimit:
+          type: string
+        gasUsed:
+          type: string
+        timestamp:
+          $ref: '#/components/schemas/WatchBlocksV1BlockData_timestamp'
+        size:
+          type: string
+        totalDifficulty:
+          type: string
+        uncles:
+          items:
+            type: string
+          type: array
+        baseFeePerGas:
+          type: string
+        transactions:
+          items:
+            $ref: '#/components/schemas/Web3Transaction'
+          type: array
+      required:
+      - extraData
+      - gasLimit
+      - gasUsed
+      - miner
+      - nonce
+      - number
+      - parentHash
+      - receiptRoot
+      - sha3Uncles
+      - size
+      - stateRoot
+      - timestamp
+      - totalDifficulty
+      - transactionRoot
+      - transactions
+      - uncles
+      type: object
+    WatchBlocksV1Progress:
+      properties:
+        blockHeader:
+          $ref: '#/components/schemas/Web3BlockHeader'
+        blockData:
+          $ref: '#/components/schemas/WatchBlocksV1BlockData'
+      type: object
+    ErrorExceptionResponseV1:
+      description: Error response from the connector.
+      properties:
+        message:
+          description: Short error description message.
+          nullable: false
+          type: string
+        error:
+          description: Detailed error information.
+          nullable: false
+          type: string
+      required:
+      - error
+      - message
+      type: object
+    DeployContractV1Request_contract:
+      nullable: false
+      oneOf:
+      - $ref: '#/components/schemas/ContractJsonDefinition'
+      - $ref: '#/components/schemas/ContractKeychainDefinition'
+    InvokeContractV1Request_contract:
+      nullable: false
+      oneOf:
+      - $ref: '#/components/schemas/DeployedContractJsonDefinition'
+      - $ref: '#/components/schemas/ContractKeychainDefinition'
+    WatchBlocksV1BlockData_timestamp:
+      oneOf:
+      - type: string
+      - type: number

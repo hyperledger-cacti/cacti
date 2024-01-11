@@ -1,0 +1,172 @@
+openapi: 3.0.3
+info:
+  description: Manage a Cactus consortium through the APIs. Needs administrative privileges.
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  title: Hyperledger Cactus Plugin - Consortium Web Service
+  version: v2.0.0-alpha.2
+servers:
+- url: /
+paths:
+  /api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/consortium/jws:
+    post:
+      description: The JWS asserting the consortium metadata (pub keys and hosts of
+        nodes)
+      operationId: getConsortiumJwsV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetConsortiumJwsRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetConsortiumJwsResponse'
+          description: OK
+      summary: Retrieves a consortium JWS
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/consortium/jws
+      x-content-type: application/json
+      x-accepts: application/json
+  /api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/node/jws:
+    post:
+      operationId: getNodeJwsV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetNodeJwsRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetNodeJwsResponse'
+          description: OK
+      summary: Retrieves the JWT of a Cactus Node
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/node/jws
+      x-content-type: application/json
+      x-accepts: application/json
+  /api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/get-prometheus-exporter-metrics:
+    get:
+      operationId: getPrometheusMetricsV1
+      parameters: []
+      responses:
+        "200":
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/PrometheusExporterMetricsResponse'
+          description: OK
+      summary: Get the Prometheus Metrics
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: get
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/get-prometheus-exporter-metrics
+      x-accepts: text/plain
+components:
+  schemas:
+    GetNodeJwsResponse:
+      example:
+        jws:
+          payload: payload
+          signatures:
+          - protected: protected
+            signature: signature
+            header:
+              key: ""
+          - protected: protected
+            signature: signature
+            header:
+              key: ""
+      properties:
+        jws:
+          $ref: '#/components/schemas/JWSGeneral'
+      required:
+      - jws
+      type: object
+    GetConsortiumJwsResponse:
+      example:
+        jws:
+          payload: payload
+          signatures:
+          - protected: protected
+            signature: signature
+            header:
+              key: ""
+          - protected: protected
+            signature: signature
+            header:
+              key: ""
+      properties:
+        jws:
+          $ref: '#/components/schemas/JWSGeneral'
+      required:
+      - jws
+      type: object
+    PrometheusExporterMetricsResponse:
+      nullable: false
+      type: string
+    GetNodeJwsRequest:
+      additionalProperties: false
+      properties: {}
+      type: object
+    GetConsortiumJwsRequest:
+      additionalProperties: false
+      properties: {}
+      type: object
+    JWSGeneral:
+      example:
+        payload: payload
+        signatures:
+        - protected: protected
+          signature: signature
+          header:
+            key: ""
+        - protected: protected
+          signature: signature
+          header:
+            key: ""
+      properties:
+        payload:
+          maxLength: 65535
+          minLength: 1
+          type: string
+        signatures:
+          items:
+            $ref: '#/components/schemas/JWSRecipient'
+          type: array
+      required:
+      - payload
+      - signatures
+      type: object
+    JWSRecipient:
+      description: "A JSON Web Signature. See: https://tools.ietf.org/html/rfc7515\
+        \ for info about standard."
+      example:
+        protected: protected
+        signature: signature
+        header:
+          key: ""
+      properties:
+        signature:
+          type: string
+        protected:
+          type: string
+        header:
+          additionalProperties: true
+          type: object
+      required:
+      - signature
+      type: object
+

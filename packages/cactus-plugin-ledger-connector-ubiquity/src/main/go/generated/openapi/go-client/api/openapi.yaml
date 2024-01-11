@@ -1,0 +1,48 @@
+openapi: 3.0.3
+info:
+  description: Ubiquity wrapper for Hyperledger Cactus
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  title: Hyperledger Cactus Plugin - Ubiquity
+  version: v2.0.0-alpha.2
+servers:
+- url: /
+paths:
+  /api/v1/@hyperledger/cactus-plugin-ledger-connector-ubiquity/GetTransactionByAddress:
+    post:
+      description: ""
+      operationId: GetTransactionByAddressV1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetTransactionsByAddressEndpoint'
+      responses:
+        "200":
+          description: OK
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-plugin-ledger-connector-ubiquity/GetTransactionByAddress
+components:
+  schemas:
+    GetTransactionsByAddressEndpoint:
+      description: "Gets transactions that an address was involved with, from newest\
+        \ to oldest. This call uses pagination. Source: https://ubiquity.docs.blockdaemon.com/swagger-ui/#/Accounts/GetTxsByAddress"
+      example:
+        protocol: protocol
+        address: address
+        network: network
+      properties:
+        protocol:
+          type: string
+        network:
+          type: string
+        address:
+          type: string
+      required:
+      - address
+      - network
+      - protocol
+      type: object

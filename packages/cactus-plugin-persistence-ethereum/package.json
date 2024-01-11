@@ -54,7 +54,10 @@
     "codegen:openapi": "npm run generate-sdk",
     "copy-sql": "cp -raf ./src/main/sql ./dist/lib/main/",
     "copy-yarn-lock": "cp -af ../../yarn.lock ./dist/yarn.lock",
-    "generate-sdk": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore"
+    "generate-sdk": "run-p 'generate-sdk:*'",
+    "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
+    "generate-sdk:go": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g go -o ./src/main/go/generated/openapi/go-client/ --git-user-id hyperledger --git-repo-id $(echo $npm_package_name | replace @hyperledger/ \"\" -z)/src/main/go/generated/openapi/go-client --package-name $(echo $npm_package_name | replace @hyperledger/ \"\" -z)  --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
+    "generate-sdk:java": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g java -o ./src/main/java/generated/openapi/java-client/ --reserved-words-mappings protected=protected --additional-properties hideGenerationTimestamp=true,artifactVersion=1 --ignore-file-override ../../openapi-generator-ignore"
   },
   "dependencies": {
     "@ethersproject/abi": "5.7.0",

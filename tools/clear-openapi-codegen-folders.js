@@ -13,6 +13,8 @@ const PROJECT_DIR = path.join(SCRIPT_DIR, "../");
 const OPENAPI_CODEGEN_PATHS = [
   "src/main/kotlin/generated/openapi/**",
   "src/main/typescript/generated/openapi/typescript-axios/**",
+  "src/main/go/generated/openapi/go-client/**",
+  "src/main/java/generated/openapi/java-client/**",
 ];
 const lernaJsonStr = await readFile(PROJECT_DIR + LERNA_JSON, "utf-8");
 const lernaJson = JSON.parse(lernaJsonStr);
