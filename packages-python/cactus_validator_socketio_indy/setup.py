@@ -73,7 +73,7 @@ setup(
         'greenlet==2.0.2',
         'importlib-metadata==6.8.0',
         'itsdangerous==2.1.2',
-        'Jinja2==3.1.2',
+        'Jinja2==3.1.3',
         'MarkupSafe==2.1.3',
         'pycparser==2.21',
         'PyJWT==2.4.0',
