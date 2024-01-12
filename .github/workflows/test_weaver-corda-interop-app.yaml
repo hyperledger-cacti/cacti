@@ -10,16 +10,8 @@ name: Unit Test Corda Interop App
 on:
   push:
     branches: [ main ]
-    paths:
-        - '.github/workflows/test_weaver-**'
-        - 'weaver/common/protos-java-kt/**'
-        - 'weaver/core/network/corda-interop-app/**'
   pull_request:
     branches: [ main ]
-    paths:
-        - '.github/workflows/test_weaver-**'
-        - 'weaver/common/protos-java-kt/**'
-        - 'weaver/core/network/corda-interop-app/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -30,21 +22,34 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3.5.2
-    
-    - name: Set up JDK 8
+
+    - uses: dorny/paths-filter@v2.11.1
+      id: changes
+      with:
+        filters: |
+          weaver_code_changed:
+            - './weaver/common/protos-java-kt/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+            - './weaver/core/network/corda-interop-app/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+            - '.github/workflows/test_weaver-corda-interop-app.yaml'
+
+    - if: steps.changes.outputs.weaver_code_changed == 'true'
+      name: Set up JDK 8
       uses: actions/setup-java@v3.11.0
       with:
         java-version: '8'
         distribution: 'adopt'
-        
-    - name: Build Protos (Local)
+  
+    - if: steps.changes.outputs.weaver_code_changed == 'true'
+      name: Build Protos (Local)
       run: make build
       working-directory: weaver/common/protos-java-kt
       
-    - name: Build Corda Interop App (Local)
+    - if: steps.changes.outputs.weaver_code_changed == 'true'
+      name: Build Corda Interop App (Local)
       run: make build-local
       working-directory: weaver/core/network/corda-interop-app
       
-    - name: Run Tests (Local)
+    - if: steps.changes.outputs.weaver_code_changed == 'true'
+      name: Run Tests (Local)
       run: make test
       working-directory: weaver/core/network/corda-interop-app

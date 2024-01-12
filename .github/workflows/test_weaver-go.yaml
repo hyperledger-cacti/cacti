@@ -7,20 +7,8 @@ name: Unit Test Fabric Interop CC and Sample Chaincode
 on:
   push:
     branches: [ main ]
-    paths:
-        - '.github/workflows/test_weaver-**'
-        - 'weaver/common/protos-go/**'
-        - 'weaver/core/network/fabric-interop-cc/**'
-        - 'weaver/samples/fabric/**'
-        - '!weaver/samples/fabric/fabric-cli/**'
   pull_request:
     branches: [ main ]
-    paths:
-        - '.github/workflows/test_weaver-**'
-        - 'weaver/common/protos-go/**'
-        - 'weaver/core/network/fabric-interop-cc/**'
-        - 'weaver/samples/fabric/**'
-        - '!weaver/samples/fabric/fabric-cli/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -32,20 +20,33 @@ jobs:
     steps:
     - uses: actions/checkout@v3.5.2
 
-    - name: Set up Go
+    - uses: dorny/paths-filter@v2.11.1
+      id: changes
+      with:
+        filters: |
+          weaver_code_changed:
+            - 'weaver/common/protos-go/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+            - 'weaver/core/network/fabric-interop-cc/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+            - '.github/workflows/test_weaver-go.yaml'
+
+    - if: steps.changes.outputs.weaver_code_changed == 'true'
+      name: Set up Go
       uses: actions/setup-go@v4.0.0
       with:
         go-version: '1.20.2'
 
-    - name: Vendor
+    - if: steps.changes.outputs.weaver_code_changed == 'true'
+      name: Vendor
       run: make run-vendor
       working-directory: weaver/core/network/fabric-interop-cc/contracts/interop
 
-    - name: Build
+    - if: steps.changes.outputs.weaver_code_changed == 'true'
+      name: Build
       run: go build -v ./...
       working-directory: weaver/core/network/fabric-interop-cc/contracts/interop
 
-    - name: Test
+    - if: steps.changes.outputs.weaver_code_changed == 'true'
+      name: Test
       run: go test -v ./...
       working-directory: weaver/core/network/fabric-interop-cc/contracts/interop
 
@@ -55,20 +56,33 @@ jobs:
     steps:
     - uses: actions/checkout@v3.5.2
 
-    - name: Set up Go
+    - uses: dorny/paths-filter@v2.11.1
+      id: changes
+      with:
+        filters: |
+          weaver_code_changed:
+            - 'weaver/common/protos-go/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+            - 'weaver/core/network/fabric-interop-cc/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+            - '.github/workflows/test_weaver-go.yaml'
+
+    - if: steps.changes.outputs.weaver_code_changed == 'true'
+      name: Set up Go
       uses: actions/setup-go@v4.0.0
       with:
         go-version: '1.20.2'
 
-    - name: Vendor
+    - if: steps.changes.outputs.weaver_code_changed == 'true'
+      name: Vendor
       run: make run-vendor
       working-directory: weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt
 
-    - name: Build
+    - if: steps.changes.outputs.weaver_code_changed == 'true'
+      name: Build
       run: go build -v ./...
       working-directory: weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt
 
-    - name: Test
+    - if: steps.changes.outputs.weaver_code_changed == 'true'
+      name: Test
       run: go test -v ./...
       working-directory: weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt
 
@@ -77,20 +91,34 @@ jobs:
     steps:
     - uses: actions/checkout@v3.5.2
 
-    - name: Set up Go
+    - uses: dorny/paths-filter@v2.11.1
+      id: changes
+      with:
+        filters: |
+          weaver_code_changed:
+            - 'weaver/common/protos-go/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+            - 'weaver/core/network/fabric-interop-cc/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+            - 'weaver/samples/fabric/simplestate/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+            - '.github/workflows/test_weaver-go.yaml'
+
+    - if: steps.changes.outputs.weaver_code_changed == 'true'
+      name: Set up Go
       uses: actions/setup-go@v4.0.0
       with:
         go-version: '1.20.2'
 
-    - name: Vendor
+    - if: steps.changes.outputs.weaver_code_changed == 'true'
+      name: Vendor
       run: make run-vendor
       working-directory: weaver/samples/fabric/simplestate
 
-    - name: Build
+    - if: steps.changes.outputs.weaver_code_changed == 'true'
+      name: Build
       run: go build -v ./...
       working-directory: weaver/samples/fabric/simplestate
 
-    - name: Test
+    - if: steps.changes.outputs.weaver_code_changed == 'true'
+      name: Test
       run: go test -v ./...
       working-directory: weaver/samples/fabric/simplestate
 
@@ -99,20 +127,34 @@ jobs:
     steps:
     - uses: actions/checkout@v3.5.2
 
-    - name: Set up Go
+    - uses: dorny/paths-filter@v2.11.1
+      id: changes
+      with:
+        filters: |
+          weaver_code_changed:
+            - 'weaver/common/protos-go/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+            - 'weaver/core/network/fabric-interop-cc/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+            - 'weaver/samples/fabric/simpleasset/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+            - '.github/workflows/test_weaver-go.yaml'
+
+    - if: steps.changes.outputs.weaver_code_changed == 'true'
+      name: Set up Go
       uses: actions/setup-go@v4.0.0
       with:
         go-version: '1.20.2'
 
-    - name: Vendor
+    - if: steps.changes.outputs.weaver_code_changed == 'true'
+      name: Vendor
       run: make run-vendor
       working-directory: weaver/samples/fabric/simpleasset
 
-    - name: Build
+    - if: steps.changes.outputs.weaver_code_changed == 'true'
+      name: Build
       run: go build -v ./...
       working-directory: weaver/samples/fabric/simpleasset
 
-    - name: Test
+    - if: steps.changes.outputs.weaver_code_changed == 'true'
+      name: Test
       run: go test -v ./...
       working-directory: weaver/samples/fabric/simpleasset
 
@@ -121,20 +163,34 @@ jobs:
     steps:
     - uses: actions/checkout@v3.5.2
 
-    - name: Set up Go
+    - uses: dorny/paths-filter@v2.11.1
+      id: changes
+      with:
+        filters: |
+          weaver_code_changed:
+            - 'weaver/common/protos-go/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+            - 'weaver/core/network/fabric-interop-cc/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+            - 'weaver/samples/fabric/simpleassetandinterop/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+            - '.github/workflows/test_weaver-go.yaml'
+
+    - if: steps.changes.outputs.weaver_code_changed == 'true'
+      name: Set up Go
       uses: actions/setup-go@v4.0.0
       with:
         go-version: '1.20.2'
 
-    - name: Vendor
+    - if: steps.changes.outputs.weaver_code_changed == 'true'
+      name: Vendor
       run: make run-vendor
       working-directory: weaver/samples/fabric/simpleassetandinterop
 
-    - name: Build
+    - if: steps.changes.outputs.weaver_code_changed == 'true'
+      name: Build
       run: go build -v ./...
       working-directory: weaver/samples/fabric/simpleassetandinterop
 
-    - name: Test
+    - if: steps.changes.outputs.weaver_code_changed == 'true'
+      name: Test
       run: go test -v ./...
       working-directory: weaver/samples/fabric/simpleassetandinterop
 
@@ -143,19 +199,33 @@ jobs:
     steps:
     - uses: actions/checkout@v3.5.2
 
-    - name: Set up Go
+    - uses: dorny/paths-filter@v2.11.1
+      id: changes
+      with:
+        filters: |
+          weaver_code_changed:
+            - 'weaver/common/protos-go/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+            - 'weaver/core/network/fabric-interop-cc/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+            - 'weaver/samples/fabric/simpleassettransfer/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+            - '.github/workflows/test_weaver-go.yaml'
+
+    - if: steps.changes.outputs.weaver_code_changed == 'true'
+      name: Set up Go
       uses: actions/setup-go@v4.0.0
       with:
         go-version: '1.20.2'
 
-    - name: Vendor
+    - if: steps.changes.outputs.weaver_code_changed == 'true'
+      name: Vendor
       run: make run-vendor
       working-directory: weaver/samples/fabric/simpleassettransfer
 
-    - name: Build
+    - if: steps.changes.outputs.weaver_code_changed == 'true'
+      name: Build
       run: go build -v ./...
       working-directory: weaver/samples/fabric/simpleassettransfer
 
-    - name: Test
+    - if: steps.changes.outputs.weaver_code_changed == 'true'
+      name: Test
       run: go test -v ./...
       working-directory: weaver/samples/fabric/simpleassettransfer
