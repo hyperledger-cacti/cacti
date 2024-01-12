@@ -10,20 +10,8 @@ env:
 on:
   push:
     branches: [ main ]
-    paths:
-        - '.github/workflows/test_weaver-**'
-        - 'weaver/**'
-        - '!weaver/docs/**'
-        - '!weaver/rfcs/**'
-        - '!weaver/resources/**'
   pull_request:
     branches: [ main ]
-    paths:
-        - '.github/workflows/test_weaver-**'
-        - 'weaver/**'
-        - '!weaver/docs/**'
-        - '!weaver/rfcs/**'
-        - '!weaver/resources/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -37,7 +25,17 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3.5.2
 
-      - name: Build Image
+      - uses: dorny/paths-filter@v2.11.1
+        id: changes
+        with:
+          filters: |
+            weaver_code_changed:
+              - './weaver/common/protos-rs/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './weaver/core/relay/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - '.github/workflows/test_weaver-docker-build.yaml'
+
+      - if: steps.changes.outputs.weaver_code_changed == 'true'
+        name: Build Image
         run: make build-server-local
         working-directory: weaver/core/relay
 
@@ -47,27 +45,44 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3.5.2
-      - name: Use Node.js ${{ env.NODEJS_VERSION }}
+
+      - uses: dorny/paths-filter@v2.11.1
+        id: changes
+        with:
+          filters: |
+            weaver_code_changed:
+              - './weaver/common/protos/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './weaver/common/protos-js/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './weaver/sdks/fabric/interoperation-node-sdk/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './weaver/weaver/core/drivers/fabric-driver/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - '.github/workflows/test_weaver-docker-build.yaml'
+
+      - if: steps.changes.outputs.weaver_code_changed == 'true'
+        name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
           node-version: ${{ env.NODEJS_VERSION }}
 
-      - name: Use Protoc 3.15
+      - if: steps.changes.outputs.weaver_code_changed == 'true'
+        name: Use Protoc 3.15
         run: |
           curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.15.6/protoc-3.15.6-linux-x86_64.zip
           unzip protoc-3.15.6-linux-x86_64.zip -d protoc
 
-      - name: Build JS Protos (Local)
+      - if: steps.changes.outputs.weaver_code_changed == 'true'
+        name: Build JS Protos (Local)
         run: |
           export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
           make build
         working-directory: weaver/common/protos-js
 
-      - name: Build Fabric Interop Node SDK (Local)
+      - if: steps.changes.outputs.weaver_code_changed == 'true'
+        name: Build Fabric Interop Node SDK (Local)
         run: make build-local
         working-directory: weaver/sdks/fabric/interoperation-node-sdk
 
-      - name: Build Image (Local)
+      - if: steps.changes.outputs.weaver_code_changed == 'true'
+        name: Build Image (Local)
         run: make build-image-local
         working-directory: weaver/core/drivers/fabric-driver
 
@@ -78,14 +93,24 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3.5.2
 
-      - name: Setup .npmrc
+      - uses: dorny/paths-filter@v2.11.1
+        id: changes
+        with:
+          filters: |
+            weaver_code_changed:
+              - './weaver/weaver/core/drivers/fabric-driver/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - '.github/workflows/test_weaver-docker-build.yaml'
+
+      - if: steps.changes.outputs.weaver_code_changed == 'true'
+        name: Setup .npmrc
         run: |
           cp .npmrc.template .npmrc
           sed -i "s/<personal-access-token>/${{ secrets.GITHUB_TOKEN }}/g" .npmrc
           cat .npmrc
         working-directory: weaver/core/drivers/fabric-driver
 
-      - name: Build Image
+      - if: steps.changes.outputs.weaver_code_changed == 'true'
+        name: Build Image
         run: make build-image
         working-directory: weaver/core/drivers/fabric-driver
 
@@ -95,25 +120,42 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3.5.2
 
-      - name: Set up JDK 8
+      - uses: dorny/paths-filter@v2.11.1
+        id: changes
+        with:
+          filters: |
+            weaver_code_changed:
+              - './weaver/common/protos/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './weaver/common/protos-java-kt/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './weaver/core/network/corda-interop-app/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './weaver/sdks/corda/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './weaver/core/drivers/corda-driver/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - '.github/workflows/test_weaver-docker-build.yaml'
+
+      - if: steps.changes.outputs.weaver_code_changed == 'true'
+        name: Set up JDK 8
         uses: actions/setup-java@v3.11.0
         with:
           java-version: '8'
           distribution: 'adopt'
 
-      - name: Build Protos (Local)
+      - if: steps.changes.outputs.weaver_code_changed == 'true'
+        name: Build Protos (Local)
         run: make build
         working-directory: weaver/common/protos-java-kt
 
-      - name: Build Corda Interop App (Local)
+      - if: steps.changes.outputs.weaver_code_changed == 'true'
+        name: Build Corda Interop App (Local)
         run: make build-local
         working-directory: weaver/core/network/corda-interop-app
 
-      - name: Build Corda Interop SDK (Local)
+      - if: steps.changes.outputs.weaver_code_changed == 'true'
+        name: Build Corda Interop SDK (Local)
         run: make build
         working-directory: weaver/sdks/corda
 
-      - name: Build Image (Local)
+      - if: steps.changes.outputs.weaver_code_changed == 'true'
+        name: Build Image (Local)
         run: make image-local
         working-directory: weaver/core/drivers/corda-driver
 
@@ -124,7 +166,16 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3.5.2
 
-      - name: Generate github.properties
+      - uses: dorny/paths-filter@v2.11.1
+        id: changes
+        with:
+          filters: |
+            weaver_code_changed:
+              - './weaver/core/drivers/corda-driver/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - '.github/workflows/test_weaver-docker-build.yaml'
+
+      - if: steps.changes.outputs.weaver_code_changed == 'true'
+        name: Generate github.properties
         run: |
           echo "Using ${GITHUB_ACTOR} user."
           echo "username=${GITHUB_ACTOR}" >> github.properties
@@ -142,7 +193,8 @@ jobs:
           cat github.properties
         working-directory: weaver/core/drivers/corda-driver
 
-      - name: Build Image
+      - if: steps.changes.outputs.weaver_code_changed == 'true'
+        name: Build Image
         run: make image
         working-directory: weaver/core/drivers/corda-driver
 
@@ -151,26 +203,43 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3.5.2
-      - name: Use Node.js ${{ env.NODEJS_VERSION }}
+
+      - uses: dorny/paths-filter@v2.11.1
+        id: changes
+        with:
+          filters: |
+            weaver_code_changed:
+              - './weaver/common/protos/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './weaver/common/protos-js/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './weaver/sdks/fabric/interoperation-node-sdk/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './weaver/core/identity-management/iin-agent/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - '.github/workflows/test_weaver-docker-build.yaml'
+
+      - if: steps.changes.outputs.weaver_code_changed == 'true'
+        name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
           node-version: ${{ env.NODEJS_VERSION }}
 
-      - name: Use Protoc 3.15
+      - if: steps.changes.outputs.weaver_code_changed == 'true'
+        name: Use Protoc 3.15
         run: |
           curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.15.6/protoc-3.15.6-linux-x86_64.zip
           unzip protoc-3.15.6-linux-x86_64.zip -d protoc
 
-      - name: Build JS Protos (Local)
+      - if: steps.changes.outputs.weaver_code_changed == 'true'
+        name: Build JS Protos (Local)
         run: |
           export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
           make build
         working-directory: weaver/common/protos-js
 
-      - name: Build Fabric Interop Node SDK (Local)
+      - if: steps.changes.outputs.weaver_code_changed == 'true'
+        name: Build Fabric Interop Node SDK (Local)
         run: make build-local
         working-directory: weaver/sdks/fabric/interoperation-node-sdk
 
-      - name: Build Image
+      - if: steps.changes.outputs.weaver_code_changed == 'true'
+        name: Build Image
         run: make build-image-local
         working-directory: weaver/core/identity-management/iin-agent

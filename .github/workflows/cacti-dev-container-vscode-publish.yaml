@@ -2,6 +2,7 @@ name: connector-fabric-publish
 
 env:
   NODEJS_VERSION: v20.3.0
+  IMAGE_NAME: cacti-dev-container-vscode
 
 on:
   push:
@@ -12,9 +13,6 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
-
-env:
-  IMAGE_NAME: cacti-dev-container-vscode
 
 jobs:
   # Push image to GitHub Packages.

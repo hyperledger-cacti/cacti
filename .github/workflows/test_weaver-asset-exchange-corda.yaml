@@ -11,20 +11,8 @@ on:
   # Triggers the workflow on push or pull request events but only for the main branch
   push:
     branches: [ main ]
-    paths:
-        - '.github/workflows/test_weaver-**'
-        - 'weaver/**'
-        - '!weaver/docs/**'
-        - '!weaver/rfcs/**'
-        - '!weaver/resources/**'
   pull_request:
     branches: [ main ]
-    paths:
-        - '.github/workflows/test_weaver-**'
-        - 'weaver/**'
-        - '!weaver/docs/**'
-        - '!weaver/rfcs/**'
-        - '!weaver/resources/**'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -35,9 +23,24 @@ concurrency:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
+  check_code_changed:
+    outputs:
+      status: ${{ steps.changes.outputs.weaver_code_changed }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3.5.2
+
+      - uses: dorny/paths-filter@v2.11.1
+        id: changes
+        with:
+          filters: |
+            weaver_code_changed:
+              - './weaver/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - '.github/workflows/test_weaver-asset-exchange-corda.yaml'
 
   asset-exchange-corda:
-    if: ${{ false }}
+    needs: check_code_changed
+    if: ${{ false && needs.check_code_changed.outputs.status == 'true' }}
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
@@ -133,6 +136,8 @@ jobs:
         working-directory: weaver/samples/corda/corda-simple-application
 
   asset-exchange-corda-local:
+    needs: check_code_changed
+    if: needs.check_code_changed.outputs.status == 'true'
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
@@ -227,7 +232,8 @@ jobs:
         working-directory: weaver/samples/corda/corda-simple-application
 
   house-token-exchange-corda:
-    if: ${{ false }}
+    needs: check_code_changed
+    if: ${{ false && needs.check_code_changed.outputs.status == 'true' }}
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
@@ -235,6 +241,14 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3.5.2
+
+      - uses: dorny/paths-filter@v2.11.1
+        id: changes
+        with:
+          filters: |
+            weaver_code_changed:
+              - './weaver/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - '.github/workflows/test_weaver-asset-exchange-corda.yaml'
 
       - name: Set up JDK 8
         uses: actions/setup-java@v3.11.0
