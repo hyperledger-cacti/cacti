@@ -8,7 +8,7 @@
 - RFC: 
 - Authors: Zakwan Jaroucheh, Venkatraman Ramakrishna, Sandeep Nishad, Rafael Belchior
 - Status: Proposed
-- Since: 
+- Since: 04-Sep-2023
 
 ## Summary
 This document specifies the data formats used in the [secure asset transfer protocol (SATP)](../../protocols/satp/asset-transfer/generic.md). The structures defined in this document are generic and the operations on them are generic (see the protocol specification for details.) These structures are oblivious to the specifications and semantics of any digital asset maintained by any DLT application (e.g., any application chaincode in Fabric or any CorDapp in Corda).

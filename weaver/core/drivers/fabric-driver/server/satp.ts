@@ -3,13 +3,13 @@ import satp_grpc_pb from '@hyperledger/cacti-weaver-protos-js/relay/satp_grpc_pb
 import driverPb from '@hyperledger/cacti-weaver-protos-js/driver/driver_pb';
 import logger from './logger';
 import { credentials } from '@grpc/grpc-js';
-
-import { getNetworkConfig } from '../../../../samples/fabric/fabric-cli/src/helpers/helpers'
 import { SatpAssetManager, HashFunctions } from '@hyperledger/cacti-weaver-sdk-fabric'
-
 import fs from 'fs';
 import path from 'path';
-import { fabricHelper } from '../../../../samples/fabric/fabric-cli/src/helpers/fabric-functions';
+import { fabricHelper, getKeyAndCertForRemoteRequestbyUserName } from '@hyperledger/cacti-weaver-fabric-cli/helpers/fabric-functions';
+import { Gateway, Network, Wallets, Contract, X509Identity } from 'fabric-network'
+import { getNetworkGateway } from "./fabric-code";
+import { getDriverKeyCert } from './walletSetup';
 
 const DB_NAME: string = "driverdb";
 const DRIVER_ERROR_CONSTANTS = JSON.parse(
@@ -17,6 +17,10 @@ const DRIVER_ERROR_CONSTANTS = JSON.parse(
         path.resolve(__dirname, '../constants/driver-error-constants.json'),
     ).toString(),
 );
+
+const getWallet = (walletPath: string) => {
+    return Wallets.newFileSystemWallet(walletPath);
+};
 
 async function performLockHelper(
     performLockRequest: driverPb.PerformLockRequest,
@@ -30,14 +34,22 @@ async function performLockHelper(
     performLockRequest2['timeout-duration'] = parseInt('3600');
     performLockRequest2['locker'] = 'alice';
     performLockRequest2['recipient'] = 'bob';
+    performLockRequest2['lockerWalletPath'] = '../wallet-network1/alice.id';
+    performLockRequest2['recipientWalletPath'] = '../wallet-network1/bob.id';
     performLockRequest2['param'] = 'bond01:a05';
+    performLockRequest2['channel'] = 'mychannel';
+    performLockRequest2['chaincode-id'] = 'satpsimpleasset';
 
     // Locker and recipient
     const locker = performLockRequest2['locker'];
     const recipient = performLockRequest2['recipient'];
+    const lockerWalletPath = performLockRequest2['lockerWalletPath'];
+    const recipientWalletPath = performLockRequest2['recipientWalletPath'];
     let hashFn = performLockRequest2['hash_fn'];
     let hashBase64 = performLockRequest2['hashBase64'];
     const targetNetwork = performLockRequest2['target-network'];
+    const channel = performLockRequest2['channel'];
+    const chaincodeId = performLockRequest2['chaincode-id'];
 
     // Hash
     let hash: HashFunctions.Hash
@@ -67,29 +79,13 @@ async function performLockHelper(
         timeout2 = currTime + 2 * performLockRequest2['timeout-duration']
     }
 
+    let gateway: Gateway = await getNetworkGateway(networkName);
+    const network: Network = await gateway.getNetwork(channel);
+    const contract = network.getContract(chaincodeId);
+
     const params = performLockRequest2['param'].split(':')
-    const netConfig = getNetworkConfig(targetNetwork)
-
-    if (!netConfig.connProfilePath || !netConfig.channelName || !netConfig.chaincode) {
-        console.error(
-            `Please use a valid --target-network. No valid environment found for ${targetNetwork} `
-        )
-        return
-    }
-
-    const network = await fabricHelper({
-        channel: netConfig.channelName,
-        contractName: netConfig.chaincode,
-        connProfilePath: netConfig.connProfilePath,
-        networkName: targetNetwork,
-        mspId: netConfig.mspId,
-        userString: locker
-    })
-
-    const lockerId = await network.wallet.get(locker)
-    const lockerCert = Buffer.from((lockerId).credentials.certificate).toString('base64')
-    const recipientId = await network.wallet.get(recipient)
-    const recipientCert = Buffer.from((recipientId).credentials.certificate).toString('base64')
+    const lockerCert = Buffer.from(lockerWalletPath).toString('base64')
+    const recipientCert = Buffer.from(recipientWalletPath).toString('base64')
 
     var funcToCall, asset
 
@@ -104,7 +100,7 @@ async function performLockHelper(
     console.info(`Asset Lock: Lock ${asset}:\n`);
     try {
         console.info(`Trying ${asset} Lock: ${params[0]}, ${params[1]} by ${locker} for ${recipient}`)
-        const res = await funcToCall(network.contract,
+        const res = await funcToCall(contract,
             params[0],
             params[1],
             recipientCert,
@@ -121,7 +117,7 @@ async function performLockHelper(
         console.error(`Could not Lock ${asset} in ${targetNetwork}`)
     }
 
-    await network.gateway.disconnect()
+    await gateway.disconnect()
     logger.info('Gateways disconnected.')
 
     const client = getRelayClientForAssetStatusResponse();
@@ -148,6 +144,8 @@ async function createAssetHelper(
     createAssetRequest2['issuer'] = 'admin';
     createAssetRequest2['facevalue'] = '300';
     createAssetRequest2['maturitydate'] = '05 May 48 00:00 MST';
+    createAssetRequest2['channel'] = 'mychannel';
+    createAssetRequest2['chaincode-id'] = 'satpsimpleasset';
 
     const targetNetwork = createAssetRequest2['target-network'];
     const owner = createAssetRequest2['owner'];
@@ -159,42 +157,28 @@ async function createAssetHelper(
     const maturitydate = createAssetRequest2['maturitydate'];
     const tokenassettype = createAssetRequest2['tokenassettype'];
     const numunits = createAssetRequest2['numunits'];
+    const channel = createAssetRequest2['channel'];
+    const chaincodeId = createAssetRequest2['chaincode-id'];
 
-    const netConfig = getNetworkConfig(targetNetwork)
-    console.info(netConfig)
-    if (!netConfig.connProfilePath || !netConfig.channelName || !netConfig.chaincode) {
-        console.error(
-            `Please use a valid --target-network. No valid environment found for ${targetNetwork} `
-        )
-        return
-    }
-
+    let gateway: Gateway = await getNetworkGateway(networkName);
+    const network: Network = await gateway.getNetwork(channel);
+    const contract = network.getContract(chaincodeId);
     const currentQuery = {
-        channel: netConfig.channelName,
-        contractName: netConfig.chaincode,
+        channel: channel,
+        contractName: chaincodeId,
         ccFunc: '',
         args: []
     }
 
-    const network = await fabricHelper({
-        channel: netConfig.channelName,
-        contractName: netConfig.chaincode,
-        connProfilePath: netConfig.connProfilePath,
-        networkName: targetNetwork,
-        mspId: netConfig.mspId,
-        userString: owner,
-        registerUser: false
-    })
-
-    const userId = await network.wallet.get(owner)
-    const userCert = Buffer.from((userId).credentials.certificate).toString('base64')
+    const driverkeyCert = await getDriverKeyCert();
+    const certificate = Buffer.from(driverkeyCert.cert).toString('base64')
 
     if (ccType == 'bond') {
         currentQuery.ccFunc = 'CreateAsset'
-        currentQuery.args = [...currentQuery.args, assetType, id, userCert, issuer, facevalue, maturitydate]
+        currentQuery.args = [...currentQuery.args, assetType, id, certificate, issuer, facevalue, maturitydate]
     } else if (ccType == 'token') {
         currentQuery.ccFunc = 'IssueTokenAssets'
-        currentQuery.args = [...currentQuery.args, tokenassettype, numunits, userCert]
+        currentQuery.args = [...currentQuery.args, tokenassettype, numunits, certificate]
     } else {
         throw new Error(`Unrecognized asset category: ${ccType}`)
     }
@@ -202,7 +186,7 @@ async function createAssetHelper(
 
     try {
         console.info(`Trying creating the asset: type: ${ccType}, id: ${id}, by: ${owner}, facevalue: ${facevalue}, maturitydate: ${maturitydate}`)
-        const read = await network.contract.submitTransaction(currentQuery.ccFunc, ...currentQuery.args)
+        const read = await contract.submitTransaction(currentQuery.ccFunc, ...currentQuery.args)
         const state = Buffer.from(read).toString()
         if (state) {
             logger.debug(`Response From Network: ${state}`)
@@ -215,7 +199,7 @@ async function createAssetHelper(
         throw new Error(error)
     }
 
-    await network.gateway.disconnect()
+    await gateway.disconnect()
     logger.info('Gateways disconnected.')
 
     const client = getRelayClientForAssetStatusResponse();
@@ -255,6 +239,8 @@ async function assignAssetHelper(
     assignAssetRequest2['hash_fn'] = '';
     assignAssetRequest2['secret'] = 'secrettext';
     assignAssetRequest2['param'] = 'bond01:a0demo';
+    assignAssetRequest2['channel'] = 'mychannel';
+    assignAssetRequest2['chaincode-id'] = 'satpsimpleasset';
 
     const targetNetwork = assignAssetRequest2['target-network'];
     const locker = assignAssetRequest2['locker'];
@@ -262,6 +248,12 @@ async function assignAssetHelper(
     const fungible = assignAssetRequest2['fungible'];
     const hashFn = assignAssetRequest2['hash_fn'];
     const secret = assignAssetRequest2['secret'];
+    const channel = assignAssetRequest2['channel'];
+    const chaincodeId = assignAssetRequest2['chaincode-id'];
+
+    let gateway: Gateway = await getNetworkGateway(networkName);
+    const network: Network = await gateway.getNetwork(channel);
+    const contract = network.getContract(chaincodeId);
 
     // Hash
     let hash: HashFunctions.Hash
@@ -278,23 +270,6 @@ async function assignAssetHelper(
     }
 
     params = assignAssetRequest2['param'].split(':')
-
-    const netConfig = getNetworkConfig(targetNetwork)
-    if (!netConfig.connProfilePath || !netConfig.channelName || !netConfig.chaincode) {
-        console.error(
-            `Please use a valid --target-network. No valid environment found for ${targetNetwork} `
-        )
-        return
-    }
-
-    const network = await fabricHelper({
-        channel: netConfig.channelName,
-        contractName: netConfig.chaincode,
-        connProfilePath: netConfig.connProfilePath,
-        networkName: targetNetwork,
-        mspId: netConfig.mspId,
-        userString: recipient
-    })
 
     var funcToCall = SatpAssetManager.assignAsset
     var asset = assignAssetRequest2['param']
@@ -315,14 +290,14 @@ async function assignAssetHelper(
         }
     } else {
         try {
-            const lockerId = await network.wallet.get(locker)
-            const lockerCert = Buffer.from((lockerId).credentials.certificate).toString('base64')
+            const driverkeyCert = await getDriverKeyCert();
+            const certificate = Buffer.from(driverkeyCert.cert).toString('base64')
 
             console.info(`Trying assign asset with params: ${params[0]}, ${params[1]} locked by ${locker} for ${recipient}`)
-            const res = await funcToCall(network.contract,
+            const res = await funcToCall(contract,
                 params[0],
                 params[1],
-                lockerCert,
+                certificate,
                 hash)
             if (!res) {
                 throw new Error()
@@ -334,7 +309,7 @@ async function assignAssetHelper(
             throw new Error(`Could not assign non-fungible ${asset} in ${targetNetwork}: ${error}`)
         }
 
-        await network.gateway.disconnect()
+        await gateway.disconnect()
         logger.info('Gateways disconnected.')
 
         const client = getRelayClientForAssetStatusResponse();
