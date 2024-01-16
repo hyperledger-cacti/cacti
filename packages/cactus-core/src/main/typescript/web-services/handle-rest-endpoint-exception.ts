@@ -42,7 +42,7 @@ export async function handleRestEndpointException(
   const errorAsSanitizedJson = safeStringifyException(ctx.error);
 
   const { identifierByCodes, INTERNAL_SERVER_ERROR } = await import(
-    "http-errors-enhanced"
+    "http-errors-enhanced-cjs"
   );
 
   if (createHttpError.isHttpError(ctx.error)) {
