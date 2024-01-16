@@ -4,9 +4,21 @@ import {
   ConsensusAlgorithmFamiliesWithOutTxFinality,
 } from "@hyperledger/cactus-core-api";
 
+import { BadRequestError } from "http-errors-enhanced-cjs";
+
 export function consensusHasTransactionFinality(
   consensusAlgorithmFamily: ConsensusAlgorithmFamily,
 ): boolean {
+  const woTxFinalityValues = Object.values(
+    ConsensusAlgorithmFamiliesWithOutTxFinality,
+  );
+  const withTxFinalityValues = Object.values(
+    ConsensusAlgorithmFamiliesWithTxFinality,
+  );
+
+  const acceptedValues = [...woTxFinalityValues, ...withTxFinalityValues];
+  const acceptedValuesCsv = acceptedValues.join(",");
+
   const isInConsensusAlgorithmFamiliesWithTxFinality = (
     Object.values(ConsensusAlgorithmFamiliesWithTxFinality) as string[]
   ).includes(consensusAlgorithmFamily.toString());
@@ -19,10 +31,13 @@ export function consensusHasTransactionFinality(
     !isInConsensusAlgorithmFamiliesWithTxFinality &&
     !isInConsensusAlgorithmFamiliesWithOutTxFinality;
 
-  if (unrecognizedConsensusAlgorithmFamily) {
-    throw new Error(
-      `Unrecognized consensus algorithm family: ${consensusAlgorithmFamily}`,
-    );
-  }
-  return isInConsensusAlgorithmFamiliesWithTxFinality;
+    if (unrecognizedConsensusAlgorithmFamily) {
+      throw new BadRequestError(
+        `Unrecognized consensus algorithm family: ${consensusAlgorithmFamily}`,
+        {
+          acceptedValuesCsv,
+        },
+      );
+    }
+    return isInConsensusAlgorithmFamiliesWithTxFinality;
 }

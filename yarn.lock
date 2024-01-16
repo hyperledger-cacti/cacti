@@ -7118,7 +7118,7 @@ __metadata:
     express-jwt-authz: 2.4.1
     express-openapi-validator: 5.0.4
     http-errors: 2.0.0
-    http-errors-enhanced: 1.1.2
+    http-errors-enhanced-cjs: 2.0.1
     node-mocks-http: 1.14.0
     run-time-error-cjs: 1.4.0
     safe-stable-stringify: 2.4.3
@@ -28885,10 +28885,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"http-errors-enhanced@npm:1.1.2":
-  version: 1.1.2
-  resolution: "http-errors-enhanced@npm:1.1.2"
-  checksum: 1bc38968cc4a0dcb6a2d25e557d0321f3fa17da2f1a6b898158fa3b9bb103fd5374b38e60d87926e5adf9310fd7b6136023754b0db1489a6e80d6d242375ba0f
+"http-errors-enhanced-cjs@npm:2.0.1":
+  version: 2.0.1
+  resolution: "http-errors-enhanced-cjs@npm:2.0.1"
+  checksum: b339f934c37c352a12ac3d2e0d5a07e74f1346322bafd11ea9ff21805c62208815f258ce92dc85d8ebb151339e7fcd006dbfbc98af07eca76acae7310c92cfd2
   languageName: node
   linkType: hard
 
