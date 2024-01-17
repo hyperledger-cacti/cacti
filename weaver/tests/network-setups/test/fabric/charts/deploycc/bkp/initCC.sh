@@ -1,8 +1,8 @@
+#!/bin/bash
+
 # Copyright IBM Corp. All Rights Reserved.
 #
 # SPDX-License-Identifier: Apache-2.0
-
-#!/bin/bash
 
 INIT_REQUIRED="--init-required"
 if [ "$CC_INIT_FCN" = "NA" ]; then

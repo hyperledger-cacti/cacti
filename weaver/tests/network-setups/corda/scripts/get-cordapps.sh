@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+
 directory=$(dirname $0)
 app=${1:-simple}
 local=$2

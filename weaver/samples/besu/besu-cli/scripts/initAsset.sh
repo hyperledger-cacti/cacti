@@ -1,8 +1,8 @@
+#!/bin/bash
+
 # Copyright IBM Corp. All Rights Reserved.
 #
 # SPDX-License-Identifier: Apache-2.0
-
-#!/bin/bash
 
 echo "Issuing 100 BobERC20 Tokens to Alice in network2"
 ./bin/besu-cli asset issue --network=network2 --account=1 --amount=100 --asset_type=ERC20
