@@ -15,69 +15,70 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  unit_test_relay_local:
-    # if: ${{ false }}
+  check_code_changed:
+    outputs:
+      relay_changed: ${{ steps.changes.outputs.relay_changed }}
     runs-on: ubuntu-latest
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3.5.2
 
       - uses: dorny/paths-filter@v2.11.1
         id: changes
         with:
           filters: |
-            weaver_code_changed:
+            relay_changed:
               - '.weaver/common/protos/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
               - '.weaver/common/protos-rs/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
               - '.weaver/core/relay/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
               - .github/workflows/test_weaver-relay.yaml'
 
-      - if: steps.changes.outputs.weaver_code_changed == 'true'
-        name: Install RUST Toolchain minimal stable with clippy and rustfmt
+  unit_test_relay_local:
+    needs: check_code_changed
+    if: needs.check_code_changed.outputs.relay_changed == 'true'
+    # if: ${{ false }}
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3.5.2
+
+      - name: Install RUST Toolchain minimal stable with clippy and rustfmt
         uses: actions-rs/toolchain@v1.0.6
         with:
           profile: minimal
           toolchain: stable
           components: rustfmt, clippy
 
-      - if: steps.changes.outputs.weaver_code_changed == 'true'
-        name: Use Protoc 3.15
+      - name: Use Protoc 3.15
         run: |
           curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.15.6/protoc-3.15.6-linux-x86_64.zip
           unzip protoc-3.15.6-linux-x86_64.zip -d protoc
 
-      - if: steps.changes.outputs.weaver_code_changed == 'true'
-        name: Build Protos RS
+      - name: Build Protos RS
         run: |
           export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
           make build
         working-directory: weaver/common/protos-rs
 
-      - if: steps.changes.outputs.weaver_code_changed == 'true'
-        name: Get Latest Relay Dependencies
+      - name: Get Latest Relay Dependencies
         run: |
           make protos-local
           cargo update -p nom
           cargo update -p lexical-core
         working-directory: weaver/core/relay
 
-      - if: steps.changes.outputs.weaver_code_changed == 'true'
-        name: Build Image
+      - name: Build Image
         run: make
         working-directory: weaver/core/relay
 
-      - if: steps.changes.outputs.weaver_code_changed == 'true'
-        name: Run Dummy Relay
+      - name: Run Dummy Relay
         run: RELAY_CONFIG=config/Dummy_Relay.toml  cargo run --bin server &> relay-dummy.out &
         working-directory: weaver/core/relay
 
-      - if: steps.changes.outputs.weaver_code_changed == 'true'
-        name: Run Dummy Driver
+      - name: Run Dummy Driver
         run: RELAY_CONFIG=config/Dummy_Relay.toml  cargo run --bin dummy-driver &> driver-dummy.out &
         working-directory: weaver/core/relay
 
-      - if: steps.changes.outputs.weaver_code_changed == 'true'
-        name: Mock Client Test
+      - name: Mock Client Test
         run: |
             echo "Waiting for Dummy Relay and Driver to come up"
             sleep 30
@@ -85,68 +86,52 @@ jobs:
         working-directory: weaver/core/relay
 
   unit_test_relay_tls_local:
+    needs: check_code_changed
+    if: needs.check_code_changed.outputs.relay_changed == 'true'
     # if: ${{ false }}
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3.5.2
 
-      - uses: dorny/paths-filter@v2.11.1
-        id: changes
-        with:
-          filters: |
-            weaver_code_changed:
-              - '.weaver/common/protos/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
-              - '.weaver/common/protos-rs/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
-              - '.weaver/core/relay/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
-              - .github/workflows/test_weaver-relay.yaml'
-
-      - if: steps.changes.outputs.weaver_code_changed == 'true'
-        name: Install RUST Toolchain minimal stable with clippy and rustfmt
+      - name: Install RUST Toolchain minimal stable with clippy and rustfmt
         uses: actions-rs/toolchain@v1.0.6
         with:
           profile: minimal
           toolchain: stable
           components: rustfmt, clippy
 
-      - if: steps.changes.outputs.weaver_code_changed == 'true'
-        name: Use Protoc 3.15
+      - name: Use Protoc 3.15
         run: |
           curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.15.6/protoc-3.15.6-linux-x86_64.zip
           unzip protoc-3.15.6-linux-x86_64.zip -d protoc
 
-      - if: steps.changes.outputs.weaver_code_changed == 'true'
-        name: Build Protos RS
+      - name: Build Protos RS
         run: |
           export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
           make build
         working-directory: weaver/common/protos-rs
 
-      - if: steps.changes.outputs.weaver_code_changed == 'true'
-        name: Get Latest Relay Dependencies
+      - name: Get Latest Relay Dependencies
         run: |
           make protos-local
           cargo update -p nom
           cargo update -p lexical-core
         working-directory: weaver/core/relay
 
-      - if: steps.changes.outputs.weaver_code_changed == 'true'
-        name: Build Image
+      - name: Build Image
         run: make
         working-directory: weaver/core/relay
 
-      - if: steps.changes.outputs.weaver_code_changed == 'true'
-        name: Run Dummy Relay
+      - name: Run Dummy Relay
         run: RELAY_CONFIG=config/Dummy_Relay_tls.toml cargo run --bin server &> relay-dummy.out &
         working-directory: weaver/core/relay
 
-      - if: steps.changes.outputs.weaver_code_changed == 'true'
-        name: Run Dummy Driver
+      - name: Run Dummy Driver
         run: RELAY_CONFIG=config/Dummy_Relay_tls.toml cargo run --bin dummy-driver &> driver-dummy.out &
         working-directory: weaver/core/relay
 
-      - if: steps.changes.outputs.weaver_code_changed == 'true'
-        name: Mock Client Test
+      - name: Mock Client Test
         run: |
             echo "Waiting for Dummy Relay and Driver to come up"
             sleep 30
@@ -154,53 +139,39 @@ jobs:
         working-directory: weaver/core/relay
 
   unit_test_relay:
-    if: ${{ false }}
+    needs: check_code_changed
+    if: ${{ false && needs.check_code_changed.outputs.relay_changed == 'true' }}
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3.5.2
 
-      - uses: dorny/paths-filter@v2.11.1
-        id: changes
-        with:
-          filters: |
-            weaver_code_changed:
-              - '.weaver/common/protos-rs/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
-              - '.weaver/core/relay/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
-              - .github/workflows/test_weaver-relay.yaml'
-
-      - if: steps.changes.outputs.weaver_code_changed == 'true'
-        name: Install RUST Toolchain minimal stable with clippy and rustfmt
+      - name: Install RUST Toolchain minimal stable with clippy and rustfmt
         uses: actions-rs/toolchain@v1.0.6
         with:
           profile: minimal
           toolchain: stable
           components: rustfmt, clippy
 
-      - if: steps.changes.outputs.weaver_code_changed == 'true'
-        name: Get Latest Relay Dependencies
+      - name: Get Latest Relay Dependencies
         run: |
           cargo update -p nom
           cargo update -p lexical-core
         working-directory: weaver/core/relay
 
-      - if: steps.changes.outputs.weaver_code_changed == 'true'
-        name: Build Image
+      - name: Build Image
         run: make build
         working-directory: weaver/core/relay
 
-      - if: steps.changes.outputs.weaver_code_changed == 'true'
-        name: Run Dummy Relay
+      - name: Run Dummy Relay
         run: RELAY_CONFIG=config/Dummy_Relay.toml  cargo run --bin server &> relay-dummy.out &
         working-directory: weaver/core/relay
 
-      - if: steps.changes.outputs.weaver_code_changed == 'true'
-        name: Run Dummy Driver
+      - name: Run Dummy Driver
         run: RELAY_CONFIG=config/Dummy_Relay.toml  cargo run --bin dummy-driver &> driver-dummy.out &
         working-directory: weaver/core/relay
 
-      - if: steps.changes.outputs.weaver_code_changed == 'true'
-        name: Mock Client Test
+      - name: Mock Client Test
         run: |
             echo "Waiting for Dummy Relay and Driver to come up"
             sleep 30
@@ -208,53 +179,39 @@ jobs:
         working-directory: weaver/core/relay
 
   unit_test_relay_tls:
-    if: ${{ false }}
+    needs: check_code_changed
+    if: ${{ false && needs.check_code_changed.outputs.relay_changed == 'true' }}
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3.5.2
 
-      - uses: dorny/paths-filter@v2.11.1
-        id: changes
-        with:
-          filters: |
-            weaver_code_changed:
-              - '.weaver/common/protos-rs/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
-              - '.weaver/core/relay/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
-              - .github/workflows/test_weaver-relay.yaml'
-
-      - if: steps.changes.outputs.weaver_code_changed == 'true'
-        name: Install RUST Toolchain minimal stable with clippy and rustfmt
+      - name: Install RUST Toolchain minimal stable with clippy and rustfmt
         uses: actions-rs/toolchain@v1.0.6
         with:
           profile: minimal
           toolchain: stable
           components: rustfmt, clippy
 
-      - if: steps.changes.outputs.weaver_code_changed == 'true'
-        name: Get Latest Relay Dependencies
+      - name: Get Latest Relay Dependencies
         run: |
           cargo update -p nom
           cargo update -p lexical-core
         working-directory: weaver/core/relay
 
-      - if: steps.changes.outputs.weaver_code_changed == 'true'
-        name: Build Image
+      - name: Build Image
         run: make build
         working-directory: weaver/core/relay
 
-      - if: steps.changes.outputs.weaver_code_changed == 'true'
-        name: Run Dummy Relay
+      - name: Run Dummy Relay
         run: RELAY_CONFIG=config/Dummy_Relay_tls.toml cargo run --bin server &> relay-dummy.out &
         working-directory: weaver/core/relay
 
-      - if: steps.changes.outputs.weaver_code_changed == 'true'
-        name: Run Dummy Driver
+      - name: Run Dummy Driver
         run: RELAY_CONFIG=config/Dummy_Relay_tls.toml cargo run --bin dummy-driver &> driver-dummy.out &
         working-directory: weaver/core/relay
 
-      - if: steps.changes.outputs.weaver_code_changed == 'true'
-        name: Mock Client Test
+      - name: Mock Client Test
         run: |
             echo "Waiting for Dummy Relay and Driver to come up"
             sleep 30
