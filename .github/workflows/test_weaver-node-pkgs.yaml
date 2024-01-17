@@ -22,140 +22,133 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  unit_test_weaver_node_sdk_local:
-
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [v18.18.2, v20.9.0]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
-    steps:
-    - uses: actions/checkout@v3.5.2
-
-    - uses: dorny/paths-filter@v2.11.1
-      id: changes
-      with:
-        filters: |
-          weaver_code_changed:
-            - '.github/workflows/test_weaver-node-pkgs.yaml'
-            - 'weaver/common/protos/**'
-            - 'weaver/common/protos-js/**'
-            - 'weaver/sdks/fabric/interoperation-node-sdk/**'
-
-    - if: steps.changes.outputs.weaver_code_changed == 'true'
-      name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3.6.0
-      with:
-        node-version: ${{ matrix.node-version }}
-  
-    - if: steps.changes.outputs.weaver_code_changed == 'true'
-      name: Use Protoc 3.15
-      run: |
-        curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.15.6/protoc-3.15.6-linux-x86_64.zip
-        unzip protoc-3.15.6-linux-x86_64.zip -d protoc
-  
-    - if: steps.changes.outputs.weaver_code_changed == 'true'
-      name: Build JS Protos
-      run: |
-        export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
-        make build
-      working-directory: weaver/common/protos-js
-
-    - if: steps.changes.outputs.weaver_code_changed == 'true'
-      name: Build
-      run: make build-local
-      working-directory: weaver/sdks/fabric/interoperation-node-sdk
-
-    - if: steps.changes.outputs.weaver_code_changed == 'true'
-      name: Tests
-      run: npm run test
-      working-directory: weaver/sdks/fabric/interoperation-node-sdk
-
-  unit_test_iin_agent_local:
-
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [v18.18.2]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
-    steps:
-    - uses: actions/checkout@v3.5.2
-
-    - uses: dorny/paths-filter@v2.11.1
-      id: changes
-      with:
-        filters: |
-          weaver_code_changed:
-            - '.github/workflows/test_weaver-node-pkgs.yaml'
-            - 'weaver/common/protos/**'
-            - 'weaver/common/protos-js/**'
-            - 'weaver/sdks/fabric/interoperation-node-sdk/**'
-            - 'weaver/core/identity-management/**'
-
-    - if: steps.changes.outputs.weaver_code_changed == 'true'
-      name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3.6.0
-      with:
-        node-version: ${{ matrix.node-version }}
-
-    - if: steps.changes.outputs.weaver_code_changed == 'true'
-      name: Use Protoc 3.15
-      run: |
-        curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.15.6/protoc-3.15.6-linux-x86_64.zip
-        unzip protoc-3.15.6-linux-x86_64.zip -d protoc
-
-    - if: steps.changes.outputs.weaver_code_changed == 'true'
-      name: Build JS Protos
-      run: |
-        export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
-        make build
-      working-directory: weaver/common/protos-js
-
-    - if: steps.changes.outputs.weaver_code_changed == 'true'
-      name: Build
-      run: make build-local
-      working-directory: weaver/sdks/fabric/interoperation-node-sdk
-
-    - if: steps.changes.outputs.weaver_code_changed == 'true'
-      name: Build IIN Agent
-      run: make build-local
-      working-directory: weaver/core/identity-management/iin-agent
-
-    - if: steps.changes.outputs.weaver_code_changed == 'true'
-      name: Tests
-      run: npm run test
-      working-directory: weaver/core/identity-management/iin-agent
-
-  build_docs:
+  check_code_changed:
+    outputs:
+      fabric_sdk_changed: ${{ steps.changes.outputs.fabric_sdk_changed }}
+      iin_agent_changed: ${{ steps.changes.outputs.iin_agent_changed }}
+      docs_changed: ${{ steps.changes.outputs.docs_changed }}
     runs-on: ubuntu-latest
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3.5.2
 
       - uses: dorny/paths-filter@v2.11.1
         id: changes
         with:
           filters: |
-            weaver_code_changed:
+            fabric_sdk_changed:
+              - '.github/workflows/test_weaver-node-pkgs.yaml'
+              - 'weaver/common/protos/**'
+              - 'weaver/common/protos-js/**'
+              - 'weaver/sdks/fabric/interoperation-node-sdk/**'
+
+            iin_agent_changed:
+              - '.github/workflows/test_weaver-node-pkgs.yaml'
+              - 'weaver/common/protos/**'
+              - 'weaver/common/protos-js/**'
+              - 'weaver/sdks/fabric/interoperation-node-sdk/**'
+              - 'weaver/core/identity-management/**'
+
+            docs_changed:
               - '.github/workflows/test_weaver-node-pkgs.yaml'
               - 'weaver/docs/**'
 
-      - if: steps.changes.outputs.weaver_code_changed == 'true'
-        name: Use Node.js ${{ env.NODEJS_LTS_VERSION }}
+  unit_test_weaver_node_sdk_local:
+    needs: check_code_changed
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [v18.18.2, v20.9.0]
+        exclude:
+          - node-version: ${{ needs.check_code_changed.outputs.fabric_sdk_changed != 'true' }}
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+    - uses: actions/checkout@v3.5.2
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3.6.0
+      with:
+        node-version: ${{ matrix.node-version }}
+  
+    - name: Use Protoc 3.15
+      run: |
+        curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.15.6/protoc-3.15.6-linux-x86_64.zip
+        unzip protoc-3.15.6-linux-x86_64.zip -d protoc
+  
+    - name: Build JS Protos
+      run: |
+        export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
+        make build
+      working-directory: weaver/common/protos-js
+
+    - name: Build
+      run: make build-local
+      working-directory: weaver/sdks/fabric/interoperation-node-sdk
+
+    - name: Tests
+      run: npm run test
+      working-directory: weaver/sdks/fabric/interoperation-node-sdk
+
+  unit_test_iin_agent_local:
+    needs: check_code_changed
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [v18.18.2, v20.9.0]
+        exclude:
+          - node-version: ${{ needs.check_code_changed.outputs.iin_agent_changed != 'true' }}
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+    - uses: actions/checkout@v3.5.2
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3.6.0
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Use Protoc 3.15
+      run: |
+        curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.15.6/protoc-3.15.6-linux-x86_64.zip
+        unzip protoc-3.15.6-linux-x86_64.zip -d protoc
+
+    - name: Build JS Protos
+      run: |
+        export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
+        make build
+      working-directory: weaver/common/protos-js
+
+    - name: Build
+      run: make build-local
+      working-directory: weaver/sdks/fabric/interoperation-node-sdk
+
+    - name: Build IIN Agent
+      run: make build-local
+      working-directory: weaver/core/identity-management/iin-agent
+
+    - name: Tests
+      run: npm run test
+      working-directory: weaver/core/identity-management/iin-agent
+
+  build_docs:
+    needs: check_code_changed
+    if: needs.check_code_changed.outputs.docs_changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3.5.2
+
+      - name: Use Node.js ${{ env.NODEJS_LTS_VERSION }}
         uses: actions/setup-node@v3.6.0
         with:
           node-version: ${{ env.NODEJS_LTS_VERSION }}
 
-      - if: steps.changes.outputs.weaver_code_changed == 'true'
-        name: NPM INSTALL
+      - name: NPM INSTALL
         run: npm install
         working-directory: weaver/docs
 
-      - if: steps.changes.outputs.weaver_code_changed == 'true'
-        name: Build
+      - name: Build
         run: npm run build
         working-directory: weaver/docs

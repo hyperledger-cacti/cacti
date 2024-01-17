@@ -39,7 +39,7 @@ jobs:
 
   asset-exchange-besu:
     needs: check_code_changed
-    if: ${{ false && needs.check_code_changed.outputs.status == 'true' }}
+    if: ${{ false }}
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
@@ -47,6 +47,8 @@ jobs:
       fail-fast: false
       matrix:
         app_contract: ["AliceERC1155", "AliceERC20", "AliceERC721"]
+        exclude:
+          - app_contract: ${{ needs.check_code_changed.outputs.status != 'true' }}
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
