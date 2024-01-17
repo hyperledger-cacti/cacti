@@ -1,8 +1,8 @@
+#!/bin/sh
+
 # Copyright IBM Corp. All Rights Reserved.
 #
 # SPDX-License-Identifier: Apache-2.0
-
-#!/bin/sh
 
 comment () {
     sed -i'.scriptbak' -e "$1"' s/    - /    # - /' "$2"

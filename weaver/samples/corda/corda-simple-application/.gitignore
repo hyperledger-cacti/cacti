@@ -16,6 +16,7 @@ clients/src/main/resources/config/remote-network-config.json
 **/build/*
 !docs/build/*
 **/bin/*
+clients/libs
 
 # proto files
 clients/src/main/proto/*
