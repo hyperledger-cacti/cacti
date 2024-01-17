@@ -15,6 +15,124 @@ jobs:
           lint-git-repo-request: '{"cloneUrl": "${{ github.server_url }}/${{ github.repository }}.git", "fetchArgs": ["--update-head-ok", "--no-tags", "--prune", "--progress", "--no-recurse-submodules", "--depth=1", "origin" ,"+${{ github.sha }}:${{ github.ref }}"], "checkoutArgs": [ "${{ github.ref }}"], "targetPhrasePatterns": [], "configDefaultsUrl": "https://inclusivenaming.org/json/dci-lint-config-recommended-v1.json" }'
       - name: Get the output response
         run: echo "${{ steps.lint-git-repo.outputs.lint-git-repo-response }}"
+
+  compute_changed_packages:
+    outputs:
+      cmd-api-server-changed: ${{ steps.changes.outputs.cmd-api-server-changed }}
+      plugin-ledger-connector-besu-changed: ${{ steps.changes.outputs.plugin-ledger-connector-besu-changed }}
+      plugin-ledger-connector-corda-changed: ${{ steps.changes.outputs.plugin-ledger-connector-corda-changed }}
+      plugin-ledger-connector-fabric-changed: ${{ steps.changes.outputs.plugin-ledger-connector-fabric-changed }}
+      plugin-ledger-connector-ethereum-changed: ${{ steps.changes.outputs.plugin-ledger-connector-ethereum-changed }}
+      plugin-ledger-connector-iroha2-changed: ${{ steps.changes.outputs.plugin-ledger-connector-iroha2-changed }}
+      plugin-ledger-connector-quorum-changed: ${{ steps.changes.outputs.plugin-ledger-connector-quorum-changed }}
+      plugin-htlc-coordinator-besu-changed: ${{ steps.changes.outputs.plugin-htlc-coordinator-besu-changed }}
+      test-tooling-changed: ${{ steps.changes.outputs.test-tooling-changed }}
+      ghcr-corda-all-in-one-obligation-changed: ${{ steps.changes.outputs.ghcr-corda-all-in-one-obligation-changed }}
+      ghcr-corda-all-in-one-changed: ${{ steps.changes.outputs.ghcr-corda-all-in-one-changed }}
+      ghcr-dev-container-vscode-changed: ${{ steps.changes.outputs.ghcr-dev-container-vscode-changed }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3.5.2
+
+      - uses: dorny/paths-filter@v2.11.1
+        id: changes
+        with:
+          filters: |
+            cmd-api-server-changed:
+              - './packages/cactus-cmd-api-server/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-test-cmd-api-server/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-common/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-core/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-core-api/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-test-tooling/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-plugin-keychain-vault/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              # - './.github/workflows/ci.yaml'
+
+            plugin-ledger-connector-besu-changed:
+              - './packages/cactus-plugin-ledger-connector-besu/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-test-plugin-ledger-connector-besu/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-common/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-core/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-core-api/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-test-tooling/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-plugin-keychain-memory/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              # - './.github/workflows/ci.yaml''
+  
+            plugin-ledger-connector-corda-changed:
+              - './packages/cactus-plugin-ledger-connector-corda/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-common/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-core/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-core-api/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-test-tooling/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              # - './.github/workflows/ci.yaml'
+
+            plugin-ledger-connector-fabric-changed:
+              - './packages/cactus-plugin-ledger-connector-fabric/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-common/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-core/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-core-api/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-test-tooling/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-plugin-keychain-memory/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              # - './.github/workflows/ci.yaml'
+
+            plugin-ledger-connector-ethereum-changed:
+              - './packages/cactus-plugin-ledger-connector-ethereum/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-common/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-core/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-core-api/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-test-tooling/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-test-geth-ledger/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-plugin-keychain-memory/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              # - './.github/workflows/ci.yaml'
+     
+            plugin-ledger-connector-iroha2-changed:
+              - './packages/cactus-plugin-ledger-connector-iroha2/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-common/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-core/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-core-api/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-test-tooling/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-plugin-keychain-memory/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              # - './.github/workflows/ci.yaml'
+
+            plugin-ledger-connector-quorum-changed:
+              - './packages/cactus-plugin-ledger-connector-quorum/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-test-plugin-ledger-connector-quorum/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-common/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-core/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-core-api/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-test-tooling/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-plugin-keychain-memory/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              # - './.github/workflows/ci.yaml'
+
+            test-tooling-changed:
+              - './packages/cactus-test-tooling/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-common/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              # - './.github/workflows/ci.yaml'
+
+            ghcr-corda-all-in-one-obligation-changed:
+              - './tools/docker/corda-all-in-one/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              # - './.github/workflows/ci.yaml'
+
+            ghcr-corda-all-in-one-changed:
+            - './tools/docker/corda-all-in-one/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+            # - './.github/workflows/ci.yaml'
+
+            ghcr-dev-container-vscode-changed:
+              - './.devcontainer/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+
+            plugin-htlc-coordinator-besu-changed:
+              - './extensions/cactus-plugin-htlc-coordinator-besu/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-plugin-htlc-eth-besu/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-plugin-htlc-eth-besu-erc20/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-plugin-ledger-connector-besu/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-test-plugin-htlc-eth-besu-erc20/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-common/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-core/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-core-api/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-test-tooling/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-plugin-keychain-memory/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              # - './.github/workflows/ci.yaml'
+
   build-dev:
     continue-on-error: false
     env:
@@ -229,6 +347,10 @@ jobs:
       - run: ./tools/ci.sh
   cactus-cmd-api-server:
     continue-on-error: false
+    needs: 
+      - build-dev
+      - compute_changed_packages
+    if: needs.compute_changed_packages.outputs.cmd-api-server-changed == 'true'
     env:
       DEV_BUILD_DISABLED: false
       FULL_BUILD_DISABLED: true
@@ -237,7 +359,6 @@ jobs:
       TAPE_TEST_PATTERN: >-
         --files={./packages/cactus-cmd-api-server/src/test/typescript/integration/plugin-import-from-github.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/integration/plugin-import-without-install.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/integration/remote-plugin-imports.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/config/self-signed-certificate-generator/certificates-work-for-mutual-tls.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/config/self-signed-certificate-generator/generates-working-certificates.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/grpc-js-proto-loader-client-healthcheck.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/grpc-proto-gen-ts-client-healthcheck.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/grpc-proto-gen-ts-client-m-tls-enabled.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/plugins/install-basic-plugin-consortium-manual.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/plugins/install-basic-plugin-keychain-memory.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/plugins/install-basic-plugin-ledger-connector-fabric-0-7-0.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/plugins/install-basic-plugin-ledger-connector-quorum-0-7-0.test.ts}
       TAPE_TEST_RUNNER_DISABLED: false
-    needs: build-dev
     runs-on: ubuntu-20.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
@@ -774,6 +895,10 @@ jobs:
       - run: ./tools/ci.sh
   cactus-plugin-ledger-connector-besu:
     continue-on-error: false
+    needs: 
+      - build-dev
+      - compute_changed_packages
+    if: needs.compute_changed_packages.outputs.plugin-ledger-connector-besu-changed == 'true'
     env:
       FULL_BUILD_DISABLED: true
       JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-besu/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
@@ -781,7 +906,6 @@ jobs:
       TAPE_TEST_PATTERN: >-
         --files={./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/deploy-contract-from-json.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/get-block.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/get-past-logs.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/get-record-locator.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/private-deploy-contract-from-json-cactus.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/private-deploy-contract-from-json-web3-eea.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/v21-deploy-contract-from-json.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/v21-get-balance.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/v21-get-block.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/v21-get-past-logs.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/v21-get-record-locator.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/openapi/openapi-validation.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/v21-besu-get-transaction.test.ts}
       TAPE_TEST_RUNNER_DISABLED: false
-    needs: build-dev
     runs-on: ubuntu-20.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
@@ -801,6 +925,10 @@ jobs:
       - run: ./tools/ci.sh
   cactus-plugin-ledger-connector-corda:
     continue-on-error: false
+    needs: 
+      - build-dev
+      - compute_changed_packages
+    if: needs.compute_changed_packages.outputs.plugin-ledger-connector-corda-changed == 'true'
     env:
       FULL_BUILD_DISABLED: true
       JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-corda/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
@@ -808,7 +936,6 @@ jobs:
       TAPE_TEST_PATTERN: >-
         --files={./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/deploy-cordapp-jars-to-nodes-v4.7.test.ts,./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/deploy-cordapp-jars-to-nodes-v4.8-express.test.ts,./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/deploy-cordapp-jars-to-nodes-v4.8.test.ts,./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/deploy-cordapp-jars-to-nodes.test.ts,./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/flow-database-access-v4.8.test.ts,./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/jvm-kotlin-spring-server-v4.7.test.ts,./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/jvm-kotlin-spring-server-v4.8.test.ts,./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/openapi/openapi-validation.test.ts}
       TAPE_TEST_RUNNER_DISABLED: false
-    needs: build-dev
     runs-on: ubuntu-20.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
@@ -828,6 +955,10 @@ jobs:
       - run: ./tools/ci.sh
 
   plugin-ledger-connector-fabric-0:
+    needs: 
+      - build-dev
+      - compute_changed_packages
+    if: needs.compute_changed_packages.outputs.plugin-ledger-connector-fabric-changed == 'true'
     continue-on-error: false
     env:
       CACTI_NPM_PACKAGE_NAME: "@hyperledger/cactus-plugin-ledger-connector-fabric"
@@ -838,7 +969,6 @@ jobs:
       JEST_TEST_RUNNER_DISABLED: false
       TAPE_TEST_PATTERN: ""
       TAPE_TEST_RUNNER_DISABLED: true
-    needs: build-dev
     runs-on: ubuntu-20.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
@@ -858,6 +988,10 @@ jobs:
       - run: ./tools/ci.sh
 
   plugin-ledger-connector-fabric-1:
+    needs: 
+      - build-dev
+      - compute_changed_packages
+    if: needs.compute_changed_packages.outputs.plugin-ledger-connector-fabric-changed == 'true'
     continue-on-error: false
     env:
       CACTI_NPM_PACKAGE_NAME: "@hyperledger/cactus-plugin-ledger-connector-fabric"
@@ -867,7 +1001,6 @@ jobs:
       JEST_TEST_RUNNER_DISABLED: true
       TAPE_TEST_PATTERN: ""
       TAPE_TEST_RUNNER_DISABLED: true
-    needs: build-dev
     runs-on: ubuntu-20.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
@@ -889,6 +1022,10 @@ jobs:
 
   plugin-ledger-connector-fabric-2:
     continue-on-error: false
+    needs: 
+      - build-dev
+      - compute_changed_packages
+    if: needs.compute_changed_packages.outputs.plugin-ledger-connector-fabric-changed == 'true'
     env:
       CACTI_NPM_PACKAGE_NAME: "@hyperledger/cactus-plugin-ledger-connector-fabric"
       HFC_LOGGING: '{"debug":"console","info":"console","warn": "console","error":"console"}'
@@ -897,7 +1034,6 @@ jobs:
       JEST_TEST_RUNNER_DISABLED: true
       TAPE_TEST_PATTERN: ""
       TAPE_TEST_RUNNER_DISABLED: true
-    needs: build-dev
     runs-on: ubuntu-20.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
@@ -918,6 +1054,10 @@ jobs:
       - run: yarn ts-node ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/deploy-cc-from-typescript-source.test.ts
 
   plugin-ledger-connector-fabric-3:
+    needs: 
+      - build-dev
+      - compute_changed_packages
+    if: needs.compute_changed_packages.outputs.plugin-ledger-connector-fabric-changed == 'true'
     continue-on-error: false
     env:
       CACTI_NPM_PACKAGE_NAME: "@hyperledger/cactus-plugin-ledger-connector-fabric"
@@ -927,7 +1067,6 @@ jobs:
       JEST_TEST_RUNNER_DISABLED: true
       TAPE_TEST_PATTERN: ""
       TAPE_TEST_RUNNER_DISABLED: true
-    needs: build-dev
     runs-on: ubuntu-20.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
@@ -949,6 +1088,10 @@ jobs:
 
   plugin-ledger-connector-fabric-4:
     continue-on-error: false
+    needs: 
+      - build-dev
+      - compute_changed_packages
+    if: needs.compute_changed_packages.outputs.plugin-ledger-connector-fabric-changed == 'true'
     env:
       CACTI_NPM_PACKAGE_NAME: "@hyperledger/cactus-plugin-ledger-connector-fabric"
       HFC_LOGGING: '{"debug":"console","info":"console","warn": "console","error":"console"}'
@@ -957,7 +1100,6 @@ jobs:
       JEST_TEST_RUNNER_DISABLED: true
       TAPE_TEST_PATTERN: ""
       TAPE_TEST_RUNNER_DISABLED: true
-    needs: build-dev
     runs-on: ubuntu-20.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
@@ -979,6 +1121,10 @@ jobs:
 
   plugin-ledger-connector-fabric-5:
     continue-on-error: false
+    needs: 
+      - build-dev
+      - compute_changed_packages
+    if: needs.compute_changed_packages.outputs.plugin-ledger-connector-fabric-changed == 'true'
     env:
       CACTI_NPM_PACKAGE_NAME: "@hyperledger/cactus-plugin-ledger-connector-fabric"
       HFC_LOGGING: '{"debug":"console","info":"console","warn": "console","error":"console"}'
@@ -987,7 +1133,6 @@ jobs:
       JEST_TEST_RUNNER_DISABLED: true
       TAPE_TEST_PATTERN: ""
       TAPE_TEST_RUNNER_DISABLED: true
-    needs: build-dev
     runs-on: ubuntu-20.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
@@ -1009,6 +1154,10 @@ jobs:
 
   plugin-ledger-connector-fabric-6:
     continue-on-error: false
+    needs: 
+      - build-dev
+      - compute_changed_packages
+    if: needs.compute_changed_packages.outputs.plugin-ledger-connector-fabric-changed == 'true'
     env:
       CACTI_NPM_PACKAGE_NAME: "@hyperledger/cactus-plugin-ledger-connector-fabric"
       HFC_LOGGING: '{"debug":"console","info":"console","warn": "console","error":"console"}'
@@ -1017,7 +1166,6 @@ jobs:
       JEST_TEST_RUNNER_DISABLED: true
       TAPE_TEST_PATTERN: ""
       TAPE_TEST_RUNNER_DISABLED: true
-    needs: build-dev
     runs-on: ubuntu-20.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
@@ -1039,6 +1187,10 @@ jobs:
 
   plugin-ledger-connector-fabric-7:
     continue-on-error: false
+    needs: 
+      - build-dev
+      - compute_changed_packages
+    if: needs.compute_changed_packages.outputs.plugin-ledger-connector-fabric-changed == 'true'
     env:
       CACTI_NPM_PACKAGE_NAME: "@hyperledger/cactus-plugin-ledger-connector-fabric"
       HFC_LOGGING: '{"debug":"console","info":"console","warn": "console","error":"console"}'
@@ -1047,7 +1199,6 @@ jobs:
       JEST_TEST_RUNNER_DISABLED: true
       TAPE_TEST_PATTERN: ""
       TAPE_TEST_RUNNER_DISABLED: true
-    needs: build-dev
     runs-on: ubuntu-20.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
@@ -1069,6 +1220,10 @@ jobs:
 
   plugin-ledger-connector-fabric-8:
     continue-on-error: false
+    needs: 
+      - build-dev
+      - compute_changed_packages
+    if: needs.compute_changed_packages.outputs.plugin-ledger-connector-fabric-changed == 'true'
     env:
       CACTI_NPM_PACKAGE_NAME: "@hyperledger/cactus-plugin-ledger-connector-fabric"
       HFC_LOGGING: '{"debug":"console","info":"console","warn": "console","error":"console"}'
@@ -1077,7 +1232,6 @@ jobs:
       JEST_TEST_RUNNER_DISABLED: true
       TAPE_TEST_PATTERN: ""
       TAPE_TEST_RUNNER_DISABLED: true
-    needs: build-dev
     runs-on: ubuntu-20.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
@@ -1099,6 +1253,10 @@ jobs:
 
   plugin-ledger-connector-fabric-9:
     continue-on-error: false
+    needs: 
+      - build-dev
+      - compute_changed_packages
+    if: needs.compute_changed_packages.outputs.plugin-ledger-connector-fabric-changed == 'true'
     env:
       CACTI_NPM_PACKAGE_NAME: "@hyperledger/cactus-plugin-ledger-connector-fabric"
       HFC_LOGGING: '{"debug":"console","info":"console","warn": "console","error":"console"}'
@@ -1107,7 +1265,6 @@ jobs:
       JEST_TEST_RUNNER_DISABLED: true
       TAPE_TEST_PATTERN: ""
       TAPE_TEST_RUNNER_DISABLED: true
-    needs: build-dev
     runs-on: ubuntu-20.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
@@ -1128,6 +1285,10 @@ jobs:
       - run: yarn ts-node ./packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/obtain-profiles.test.ts
 
   plugin-ledger-connector-fabric-10:
+    needs: 
+      - build-dev
+      - compute_changed_packages
+    if: needs.compute_changed_packages.outputs.plugin-ledger-connector-fabric-changed == 'true'
     continue-on-error: false
     env:
       CACTI_NPM_PACKAGE_NAME: "@hyperledger/cactus-plugin-ledger-connector-fabric"
@@ -1137,7 +1298,6 @@ jobs:
       JEST_TEST_RUNNER_DISABLED: true
       TAPE_TEST_PATTERN: ""
       TAPE_TEST_RUNNER_DISABLED: true
-    needs: build-dev
     runs-on: ubuntu-20.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
@@ -1159,6 +1319,10 @@ jobs:
 
   plugin-ledger-connector-fabric-11:
     continue-on-error: false
+    needs: 
+      - build-dev
+      - compute_changed_packages
+    if: needs.compute_changed_packages.outputs.plugin-ledger-connector-fabric-changed == 'true'
     env:
       CACTI_NPM_PACKAGE_NAME: "@hyperledger/cactus-plugin-ledger-connector-fabric"
       HFC_LOGGING: '{"debug":"console","info":"console","warn": "console","error":"console"}'
@@ -1167,7 +1331,6 @@ jobs:
       JEST_TEST_RUNNER_DISABLED: true
       TAPE_TEST_PATTERN: ""
       TAPE_TEST_RUNNER_DISABLED: true
-    needs: build-dev
     runs-on: ubuntu-20.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
@@ -1189,6 +1352,10 @@ jobs:
 
   plugin-ledger-connector-fabric-12:
     continue-on-error: false
+    needs: 
+      - build-dev
+      - compute_changed_packages
+    if: needs.compute_changed_packages.outputs.plugin-ledger-connector-fabric-changed == 'true'
     env:
       CACTI_NPM_PACKAGE_NAME: "@hyperledger/cactus-plugin-ledger-connector-fabric"
       HFC_LOGGING: '{"debug":"console","info":"console","warn": "console","error":"console"}'
@@ -1197,7 +1364,6 @@ jobs:
       JEST_TEST_RUNNER_DISABLED: true
       TAPE_TEST_PATTERN: ""
       TAPE_TEST_RUNNER_DISABLED: true
-    needs: build-dev
     runs-on: ubuntu-20.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
@@ -1272,12 +1438,15 @@ jobs:
       - run: ./tools/ci.sh
   cactus-plugin-ledger-connector-iroha2:
     continue-on-error: false
+    needs: 
+      - build-dev
+      - compute_changed_packages
+    if: needs.compute_changed_packages.outputs.plugin-ledger-connector-iroha2-changed == 'true'
     env:
       FULL_BUILD_DISABLED: true
       JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-iroha2/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_RUNNER_DISABLED: false
       TAPE_TEST_RUNNER_DISABLED: true
-    needs: build-dev
     runs-on: ubuntu-20.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
@@ -1297,12 +1466,15 @@ jobs:
       - run: ./tools/ci.sh
   cactus-plugin-ledger-connector-ethereum:
     continue-on-error: false
+    needs: 
+      - build-dev
+      - compute_changed_packages
+    if: needs.compute_changed_packages.outputs.plugin-ledger-connector-ethereum-changed == 'true'
     env:
       FULL_BUILD_DISABLED: true
       JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_RUNNER_DISABLED: false
       TAPE_TEST_RUNNER_DISABLED: true
-    needs: build-dev
     runs-on: ubuntu-20.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
@@ -1321,6 +1493,10 @@ jobs:
       - run: ./tools/ci.sh
   cactus-plugin-ledger-connector-quorum:
     continue-on-error: false
+    needs: 
+      - build-dev
+      - compute_changed_packages
+    if: needs.compute_changed_packages.outputs.plugin-ledger-connector-quorum-changed == 'true'
     env:
       FULL_BUILD_DISABLED: true
       JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-quorum/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
@@ -1328,7 +1504,6 @@ jobs:
       TAPE_TEST_PATTERN: >-
         --files={./packages/cactus-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/openapi/openapi-validation-no-keychain.test.ts,./packages/cactus-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/openapi/openapi-validation.test.ts,./packages/cactus-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/v2.3.0-deploy-contract-from-json-json-object-endpoints.test.ts,./packages/cactus-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/v2.3.0-deploy-contract-from-json-json-object.test.ts,./packages/cactus-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/v2.3.0-invoke-contract-json-object-endpoints.test.ts,./packages/cactus-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/v2.3.0-invoke-contract-json-object.test.ts,./packages/cactus-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/v21.4.1-deploy-contract-from-json-json-object-endpoints.test.ts,./packages/cactus-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/v21.4.1-deploy-contract-from-json-json-object.test.ts,./packages/cactus-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/v21.4.1-invoke-contract-json-object-endpoints.test.ts,./packages/cactus-plugin-ledger-connector-quorum/src/test/typescript/integration/plugin-ledger-connector-quorum/deploy-contract/v21.4.1-invoke-contract-json-object.test.ts}
       TAPE_TEST_RUNNER_DISABLED: false
-    needs: build-dev
     runs-on: ubuntu-20.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
@@ -1530,13 +1705,16 @@ jobs:
       - run: ./tools/ci.sh
   cactus-test-cmd-api-server:
     continue-on-error: false
+    needs: 
+      - build-dev
+      - compute_changed_packages
+    if: needs.compute_changed_packages.outputs.cmd-api-server-changed == 'true'
     env:
       FULL_BUILD_DISABLED: true
       JEST_TEST_PATTERN: packages/cactus-test-cmd-api-server/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_RUNNER_DISABLED: false
       TAPE_TEST_PATTERN: ./packages/cactus-test-cmd-api-server/src/test/typescript/integration/plugin-import-with-npm-install-version-selection.test.ts
       TAPE_TEST_RUNNER_DISABLED: false
-    needs: build-dev
     runs-on: ubuntu-20.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
@@ -1667,6 +1845,10 @@ jobs:
       - run: ./tools/ci.sh
   cactus-test-plugin-ledger-connector-besu:
     continue-on-error: false
+    needs: 
+      - build-dev
+      - compute_changed_packages
+    if: needs.compute_changed_packages.outputs.plugin-ledger-connector-fabric-changed == 'true'
     env:
       FULL_BUILD_DISABLED: true
       JEST_TEST_PATTERN: packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
@@ -1674,7 +1856,6 @@ jobs:
       TAPE_TEST_PATTERN: >-
         --files={./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/get-balance-endpoint.test.ts,./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/get-block-endpoint.test.ts,./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/get-past-logs-endpoint.test.ts,./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/get-transaction-endpoint.test.ts,./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/v21-get-balance-endpoint.test.ts,./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/v21-get-block-endpoint.test.ts,./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/v21-get-past-logs-endpoint.test.ts,./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/v21-get-transaction-endpoint.test.ts,./packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-validator-besu/v21-sign-transaction-endpoint.test.ts}
       TAPE_TEST_RUNNER_DISABLED: false
-    needs: build-dev
     runs-on: ubuntu-20.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
@@ -1694,12 +1875,15 @@ jobs:
       - run: ./tools/ci.sh
   cactus-test-plugin-ledger-connector-quorum:
     continue-on-error: false
+    needs: 
+      - build-dev
+      - compute_changed_packages
+    if: needs.compute_changed_packages.outputs.plugin-ledger-connector-quorum-changed == 'true'
     env:
       FULL_BUILD_DISABLED: true
       JEST_TEST_PATTERN: packages/cactus-test-plugin-ledger-connector-quorum/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_RUNNER_DISABLED: false
       TAPE_TEST_RUNNER_DISABLED: true
-    needs: build-dev
     runs-on: ubuntu-20.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
@@ -1746,6 +1930,10 @@ jobs:
       - run: ./tools/ci.sh
   cactus-test-tooling:
     continue-on-error: false
+    needs: 
+      - build-dev
+      - compute_changed_packages
+    if: needs.compute_changed_packages.outputs.test-tooling-changed == 'true'
     env:
       FULL_BUILD_DISABLED: true
       JEST_TEST_PATTERN: packages/cactus-test-tooling/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
@@ -1753,7 +1941,6 @@ jobs:
       TAPE_TEST_PATTERN: >-
         --files={./packages/cactus-test-tooling/src/test/typescript/integration/besu/besu-test-ledger/constructor-validates-options.test.ts,./packages/cactus-test-tooling/src/test/typescript/integration/fabric/fabric-test-ledger-v1/constructor-validates-options.test.ts,./packages/cactus-test-tooling/src/test/typescript/integration/iroha/iroha-test-ledger/constructor-validates-options.test.ts,./packages/cactus-test-tooling/src/test/typescript/integration/postgres/postgres-test-container/constructor-validates-options.test.ts,./packages/cactus-test-tooling/src/test/typescript/integration/quorum/quorum-test-ledger/constructor-validates-options.test.ts,./packages/cactus-test-tooling/src/test/typescript/integration/rustc-container/rustc-container-target-bundler.test.ts,./packages/cactus-test-tooling/src/test/typescript/integration/substrate/substrate-test-ledger-constructor.test.ts,./packages/cactus-test-tooling/src/test/typescript/integration/substrate/substrate-test-ledger-multiple-concurrent.test.ts}
       TAPE_TEST_RUNNER_DISABLED: false
-    needs: build-dev
     runs-on: ubuntu-20.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
@@ -1813,6 +2000,9 @@ jobs:
           severity: 'CRITICAL,HIGH'
   ghcr-cmd-api-server:
     runs-on: ubuntu-20.04
+    needs: 
+      - compute_changed_packages
+    if: needs.compute_changed_packages.outputs.cmd-api-server-changed == 'true'
     steps:
       - uses: actions/checkout@v3.5.2
       - name: ghcr.io/hyperledger/cactus-cmd-api-server
@@ -1827,6 +2017,9 @@ jobs:
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
   ghcr-connector-besu:
+    needs: 
+      - compute_changed_packages
+    if: needs.compute_changed_packages.outputs.plugin-ledger-connector-besu-changed == 'true'
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3.5.2
@@ -1843,6 +2036,10 @@ jobs:
           severity: 'CRITICAL,HIGH'
   ghcr-connector-corda-server:
     runs-on: ubuntu-20.04
+    needs: 
+      - compute_changed_packages
+    if: needs.compute_changed_packages.outputs.plugin-ledger-connector-corda-changed == 'true'
+
     steps:
       - uses: actions/checkout@v3.5.2
       - name: ghcr.io/hyperledger/cactus-connector-corda-server
@@ -1858,6 +2055,10 @@ jobs:
           severity: 'CRITICAL,HIGH'
   ghcr-connector-fabric:
     runs-on: ubuntu-20.04
+    needs: 
+      - compute_changed_packages
+    if: needs.compute_changed_packages.outputs.plugin-ledger-connector-fabric-changed == 'true'
+
     steps:
       - uses: actions/checkout@v3.5.2
       - name: ghcr.io/hyperledger/cactus-connector-fabric
@@ -1873,6 +2074,9 @@ jobs:
           severity: 'CRITICAL,HIGH'
   ghcr-corda-all-in-one:
     runs-on: ubuntu-20.04
+    needs: 
+      - compute_changed_packages
+    if: needs.compute_changed_packages.outputs.ghcr-corda-all-in-one-changed == 'true'
     steps:
       - uses: actions/checkout@v3.5.2
       - name: ghcr.io/hyperledger/cactus-corda-all-in-one
@@ -1894,6 +2098,9 @@ jobs:
         run: DOCKER_BUILDKIT=1 docker build ./tools/docker/corda-all-in-one/corda-v4_8-flowdb/
   ghcr-corda-all-in-one-obligation:
     runs-on: ubuntu-20.04
+    needs: 
+      - compute_changed_packages
+    if: needs.compute_changed_packages.outputs.ghcr-corda-all-in-one-obligation-changed == 'true'
     steps:
       - uses: actions/checkout@v3.5.2
       - name: ghcr.io/hyperledger/cactus-corda-all-in-one-obligation
@@ -1909,6 +2116,9 @@ jobs:
           severity: 'CRITICAL,HIGH'
   ghcr-dev-container-vscode:
     runs-on: ubuntu-20.04
+    needs: 
+      - compute_changed_packages
+    if: needs.compute_changed_packages.outputs.ghcr-dev-container-vscode-changed == 'true'
     env:
       IMAGE_NAME: cacti-dev-container-vscode
     steps:
