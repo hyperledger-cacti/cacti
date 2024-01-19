@@ -7335,7 +7335,7 @@ __metadata:
     http-errors: 1.6.3
     indy-sdk: 1.16.0-dev-1655
     jsonwebtoken: 9.0.0
-    jsrsasign: 10.5.25
+    jsrsasign: 11.0.0
     log4js: 6.4.0
     morgan: 1.9.1
     run-time-error-cjs: 1.4.0
@@ -32931,6 +32931,13 @@ __metadata:
   version: 10.8.6
   resolution: "jsrsasign@npm:10.8.6"
   checksum: 726e6a46af802a17845348962261924b6b2c1138858cfd1a56c5e2918c8c7ebc50e7ae794bfabe12e47edec661a794fd0631ad8c78b83de4fb4d6aea53c144cf
+  languageName: node
+  linkType: hard
+
+"jsrsasign@npm:11.0.0":
+  version: 11.0.0
+  resolution: "jsrsasign@npm:11.0.0"
+  checksum: 9bbcbb9d2609e279fb015eec259490053be0afd9a6a98743ce0bf42f825e8415b377bfb1aef1d988d3d9ece0bce34bec5bc64f71e99406d0743c37cbbb2f89a5
   languageName: node
   linkType: hard
 
