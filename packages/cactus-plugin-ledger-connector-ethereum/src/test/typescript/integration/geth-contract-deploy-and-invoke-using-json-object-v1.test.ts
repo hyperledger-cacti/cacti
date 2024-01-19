@@ -55,7 +55,7 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
       address: HexString;
       privateKey: HexString;
     },
-    web3: Web3,
+    web3: InstanceType<typeof Web3>,
     addressInfo,
     address: string,
     port: number,

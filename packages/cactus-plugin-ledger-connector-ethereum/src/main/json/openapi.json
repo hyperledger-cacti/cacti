@@ -662,7 +662,19 @@
         "type": "object",
         "properties": {
           "getBlockData": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Include entire block data if flag is true, otherwise just a header is returned (default)",
+            "default": "false"
+          },
+          "lastSeenBlock": {
+            "type": "number",
+            "description": "Block from which we want to start the monitoring process.",
+            "default": "latest"
+          },
+          "httpPollInterval": {
+            "type": "number",
+            "description": "How often to poll ethereum node for new blocks. Not used if the node supports subscription based monitoring (i.e. WebSocket).",
+            "default": "5 seconds"
           }
         }
       },

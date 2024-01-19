@@ -181,36 +181,27 @@ await apiClient.runTransactionV1({
 });
 ```
 
-### Offline signing utils
-- Use `signTransaction` from this package to sign transactions payload locally (outside of connector process).
-- Offline signed transaction can be send with `Web3SigningCredentialType.None` signing credetnial type in runTransactionV1 endpoint.
+### watchBlocksV1
+- ApiClient can be used to monitor for new blocks from the ledger with `watchBlocksV1` method.
+- When etherum node supports subscription (e.g. websocket protocol is used), then blocks connector will subscribe to new block header event (recommended).
+- If ethereum node supports HTTP access only, then polling method will be used.
+
+#### Example
 
 ``` typescript
-// Offline sign transaction
-const { serializedTransactionHex } = signTransaction(
-  {
-    to: anotherAccount,
-    value: 10e6,
-    maxPriorityFeePerGas: 0,
-    maxFeePerGas: 0x40000000,
-    gasLimit: 21000,
-    type: 2
-  },
-  myPrivateKey,
-  {
-    networkId: 10,
-    chainId: 10,
-    defaultHardfork: "london",
-  },
-);
+const watchObservable = apiClient.watchBlocksV1({
+  getBlockData, // true - return transactions, false - return header only (default)
+  lastSeenBlock, // connector will push all blocks since lastSeenBlock (default - latest)
+  httpPollInterval // how often to poll the node (only for http-polling method)
+});
 
-// Send transaction payload to connector
-await apiClient.runTransactionV1({
-  web3SigningCredential: {
-    type: Web3SigningCredentialType.None,
+const subscription = watchObservable.subscribe({
+  next(event) {
+    // process block data
   },
-  transactionConfig: {
-    rawTransaction: serializedTransactionHex,
+  error(err) {
+    // handle error
+    subscription.unsubscribe();
   },
 });
 ```

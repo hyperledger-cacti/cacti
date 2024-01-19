@@ -756,11 +756,23 @@ export type WatchBlocksV1BlockDataTimestamp = number | string;
  */
 export interface WatchBlocksV1Options {
     /**
-     * 
+     * Include entire block data if flag is true, otherwise just a header is returned (default)
      * @type {boolean}
      * @memberof WatchBlocksV1Options
      */
     'getBlockData'?: boolean;
+    /**
+     * Block from which we want to start the monitoring process.
+     * @type {number}
+     * @memberof WatchBlocksV1Options
+     */
+    'lastSeenBlock'?: number;
+    /**
+     * How often to poll ethereum node for new blocks. Not used if the node supports subscription based monitoring (i.e. WebSocket).
+     * @type {number}
+     * @memberof WatchBlocksV1Options
+     */
+    'httpPollInterval'?: number;
 }
 /**
  * 
