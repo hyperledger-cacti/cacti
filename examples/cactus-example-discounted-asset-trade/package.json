@@ -38,7 +38,7 @@
     "http-errors": "1.6.3",
     "indy-sdk": "1.16.0-dev-1655",
     "jsonwebtoken": "9.0.0",
-    "jsrsasign": "10.5.25",
+    "jsrsasign": "11.0.0",
     "log4js": "6.4.0",
     "morgan": "1.9.1",
     "run-time-error-cjs": "1.4.0",
