@@ -71,7 +71,7 @@
     "fast-safe-stringify": "2.1.1",
     "form-data": "4.0.0",
     "http-status-codes": "2.1.4",
-    "jsrsasign": "10.5.25",
+    "jsrsasign": "11.0.0",
     "multer": "1.4.5-lts.1",
     "ngo": "2.7.0",
     "node-ssh": "13.1.0",
