@@ -6822,7 +6822,7 @@ __metadata:
     fabric-ca-client: 2.2.19
     fabric-common: 2.2.19
     fabric-network: 2.2.19
-    jsrsasign: 10.8.6
+    jsrsasign: 11.0.0
     mocha: 5.2.0
     nodemon: 2.0.22
     nyc: 12.0.2
