@@ -80,9 +80,9 @@
     "sanitize-html": "2.7.0",
     "socket.io-client-fixed-types": "4.5.4",
     "typescript-optional": "2.0.1",
-    "web3": "4.1.2",
-    "web3-eth": "4.2.0",
-    "web3-eth-contract": "4.1.0"
+    "web3": "4.4.0",
+    "web3-eth": "4.4.0",
+    "web3-eth-contract": "4.2.0"
   },
   "devDependencies": {
     "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-alpha.2",
@@ -99,7 +99,7 @@
     "js-yaml": "4.1.0",
     "socket.io": "4.5.4",
     "uuid": "9.0.1",
-    "web3-eth-accounts": "4.0.6"
+    "web3-eth-accounts": "4.1.1"
   },
   "engines": {
     "node": ">=18",

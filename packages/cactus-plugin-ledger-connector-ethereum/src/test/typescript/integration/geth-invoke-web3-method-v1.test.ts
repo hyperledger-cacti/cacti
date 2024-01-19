@@ -48,7 +48,7 @@ const containerImageVersion = "2023-07-27-2a8c48ed6";
 describe("invokeRawWeb3EthMethod Tests", () => {
   let ethereumTestLedger: GethTestLedger;
   let connector: PluginLedgerConnectorEthereum;
-  let web3: Web3;
+  let web3: InstanceType<typeof Web3>;
   let apiHost: string;
   const expressApp = express();
   expressApp.use(bodyParser.json({ limit: "250mb" }));

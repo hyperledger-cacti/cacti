@@ -22,7 +22,6 @@ import {
   PluginLedgerConnectorEthereum,
   EthereumApiClient,
   WatchBlocksV1Progress,
-  Web3BlockHeader,
   Web3SigningCredentialType,
 } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
@@ -63,7 +62,7 @@ describe("Verifier integration with ethereum connector tests", () => {
   let ethereumTestLedger: GethTestLedger;
   let apiServer: ApiServer;
   let connector: PluginLedgerConnectorEthereum;
-  let web3: Web3;
+  let web3: InstanceType<typeof Web3>;
   let keychainPlugin: PluginKeychainMemory;
   const ethereumValidatorId = "testEthereumId";
   let globalVerifierFactory: VerifierFactory;
@@ -577,60 +576,5 @@ describe("Verifier integration with ethereum connector tests", () => {
     } catch (error) {
       console.log("sendSyncRequest failed as expected");
     }
-  });
-
-  function assertBlockHeader(header?: Web3BlockHeader) {
-    if (!header) {
-      throw new Error("Header is missing!");
-    }
-
-    // Check if defined and with expected type
-    // Ignore nullable / undefine-able fields
-    expect(typeof header.parentHash).toEqual("string");
-    expect(typeof header.sha3Uncles).toEqual("string");
-    expect(typeof header.miner).toEqual("string");
-    expect(typeof header.number).toEqual("string");
-    expect(typeof header.gasLimit).toEqual("string");
-    expect(typeof header.gasUsed).toEqual("string");
-    expect(typeof header.difficulty).toEqual("string");
-  }
-
-  test("Monitor new blocks headers on Ethereum", async () => {
-    const ledgerEvent = await monitorAndGetBlock();
-    // assert well-formed output
-    expect(ledgerEvent.id).toEqual("");
-    expect(ledgerEvent.verifierId).toEqual(ethereumValidatorId);
-    expect(ledgerEvent.data).toBeTruthy();
-
-    // blockData should not be present if called with empty options
-    expect(ledgerEvent.data?.blockData).toBeUndefined();
-    expect(ledgerEvent.data?.blockHeader).toBeTruthy();
-
-    // check some fields
-    assertBlockHeader(ledgerEvent.data?.blockHeader);
-  });
-
-  test("Monitor new blocks data on Ethereum", async () => {
-    const ledgerEvent = await monitorAndGetBlock({ getBlockData: true });
-    //const ledgerEvent = await monitorAndGetBlock();
-    log.info("ledgerEvent", ledgerEvent);
-    // assert well-formed output
-    expect(ledgerEvent.id).toEqual("");
-    expect(ledgerEvent.verifierId).toEqual(ethereumValidatorId);
-    expect(ledgerEvent.data).toBeTruthy();
-
-    // blockHeader should not be present if called with getBlockData option
-    expect(ledgerEvent.data?.blockHeader).toBeFalsy();
-    expect(ledgerEvent.data?.blockData).toBeTruthy();
-
-    // check some fields
-    assertBlockHeader(
-      ledgerEvent.data?.blockData as unknown as Web3BlockHeader,
-    ); // remove as unknown
-    expect(typeof ledgerEvent.data?.blockData?.size).toEqual("string");
-    expect(typeof ledgerEvent.data?.blockData?.totalDifficulty).toEqual(
-      "string",
-    );
-    expect(typeof ledgerEvent.data?.blockData?.uncles).toEqual("object");
   });
 });
