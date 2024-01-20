@@ -51,10 +51,6 @@ func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, a
 	if err != nil {
 		return "", err
 	}
-	err = s.BondAssetSpecificChecks(ctx, assetAgreement.AssetType, assetAgreement.Id, lockInfoSerializedProto64)
-	if err != nil {
-		return "", logThenErrorf(err.Error())
-	}
 
 	contractId, err := s.amc.LockAsset(ctx, assetExchangeAgreementSerializedProto64, lockInfoSerializedProto64)
 	if err != nil {
