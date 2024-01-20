@@ -20,8 +20,8 @@ COPY . /opt/relay
 
 # Build OpenSSL
 
-ENV SSL_VERSION=1.1.1f
-    
+ENV SSL_VERSION=1.1.1w
+    # https://www.openssl.org/source/openssl-1.1.1w.tar.gz
 RUN ln -s /usr/include/x86_64-linux-gnu/asm /usr/include/x86_64-linux-musl/asm && \
     ln -s /usr/include/asm-generic /usr/include/x86_64-linux-musl/asm-generic && \
     ln -s /usr/include/linux /usr/include/x86_64-linux-musl/linux
