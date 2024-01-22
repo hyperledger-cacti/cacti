@@ -5,6 +5,7 @@ hostname="localhost"
 db_path="db/Corda_Relay2/requests"
 # This will be replaced by the task queue.
 remote_db_path="db/Corda_Relay2/remote_request"
+db_satp_path="db/Corda_Relay2/satp"
 # max retries opening sled db if it is locked
 db_open_max_retries=500
 # retry back off time in ms if sled db is locked
