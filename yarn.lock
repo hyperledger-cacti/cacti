@@ -6903,7 +6903,7 @@ __metadata:
     fabric-network: 2.2.19
     fabric-protos: 2.2.19
     js-sha3: 0.8.0
-    jsrsasign: 10.8.6
+    jsrsasign: 11.0.0
     log4js: 6.9.1
     mocha: 5.2.0
     nyc: 12.0.2
@@ -32917,13 +32917,6 @@ __metadata:
     json-schema: 0.4.0
     verror: 1.10.0
   checksum: 2ad1b9fdcccae8b3d580fa6ced25de930eaa1ad154db21bbf8478a4d30bbbec7925b5f5ff29b933fba9412b16a17bd484a8da4fdb3663b5e27af95dd693bab2a
-  languageName: node
-  linkType: hard
-
-"jsrsasign@npm:10.8.6":
-  version: 10.8.6
-  resolution: "jsrsasign@npm:10.8.6"
-  checksum: 726e6a46af802a17845348962261924b6b2c1138858cfd1a56c5e2918c8c7ebc50e7ae794bfabe12e47edec661a794fd0631ad8c78b83de4fb4d6aea53c144cf
   languageName: node
   linkType: hard
 
