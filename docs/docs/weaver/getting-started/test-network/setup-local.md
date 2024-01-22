@@ -51,6 +51,11 @@ Before starting, make sure you have the following software installed on your hos
       go install google.golang.org/protobuf/cmd/protoc-gen-go
       go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
       ```
+- SQLite3 Library:
+    * Sample instruction for Ubuntu:
+      ```
+      apt-get install sqlite3 libsqlite3-dev
+      ```
 
       | Notes |
       |:------|
