@@ -70,6 +70,29 @@ pub struct NetworkEventUnsubscription {
     #[prost(string, tag = "2")]
     pub request_id: ::prost::alloc::string::String,
 }
+#[derive(serde::Serialize, serde::Deserialize)]
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct NetworkAssetTransfer {
+    #[prost(string, repeated, tag = "1")]
+    pub policy: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    #[prost(string, tag = "2")]
+    pub address: ::prost::alloc::string::String,
+    #[prost(string, tag = "3")]
+    pub requesting_relay: ::prost::alloc::string::String,
+    #[prost(string, tag = "4")]
+    pub requesting_network: ::prost::alloc::string::String,
+    #[prost(string, tag = "5")]
+    pub certificate: ::prost::alloc::string::String,
+    #[prost(string, tag = "6")]
+    pub requestor_signature: ::prost::alloc::string::String,
+    #[prost(string, tag = "7")]
+    pub nonce: ::prost::alloc::string::String,
+    #[prost(string, tag = "8")]
+    pub requesting_org: ::prost::alloc::string::String,
+    #[prost(bool, tag = "9")]
+    pub confidential: bool,
+}
 /// Generated client implementations.
 pub mod network_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
@@ -233,6 +256,30 @@ pub mod network_client {
                 .insert(GrpcMethod::new("networks.networks.Network", "RequestDatabase"));
             self.inner.unary(req, path, codec).await
         }
+        /// SATP endpoints
+        /// endpoint for a network to request asset transfer to a receiving gateway via local gateway
+        pub async fn request_asset_transfer(
+            &mut self,
+            request: impl tonic::IntoRequest<super::NetworkAssetTransfer>,
+        ) -> Result<
+            tonic::Response<super::super::super::common::ack::Ack>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/networks.networks.Network/RequestAssetTransfer",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
         /// Event endpoints
         /// endpoint for a client to subscribe to event via local relay initiating subscription flow.
         pub async fn subscribe_event(
@@ -376,7 +423,16 @@ pub mod network_server {
         async fn request_database(
             &self,
             request: tonic::Request<super::DbName>,
-        ) -> std::result::Result<tonic::Response<super::RelayDatabase>, tonic::Status>;
+        ) -> Result<tonic::Response<super::RelayDatabase>, tonic::Status>;
+        /// SATP endpoints
+        /// endpoint for a network to request asset transfer to a receiving gateway via local gateway
+        async fn request_asset_transfer(
+            &self,
+            request: tonic::Request<super::NetworkAssetTransfer>,
+        ) -> Result<
+            tonic::Response<super::super::super::common::ack::Ack>,
+            tonic::Status,
+        >;
         /// Event endpoints
         /// endpoint for a client to subscribe to event via local relay initiating subscription flow.
         async fn subscribe_event(
@@ -619,6 +675,46 @@ pub mod network_server {
                             .apply_max_message_size_config(
                                 max_decoding_message_size,
                                 max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/networks.networks.Network/RequestAssetTransfer" => {
+                    #[allow(non_camel_case_types)]
+                    struct RequestAssetTransferSvc<T: Network>(pub Arc<T>);
+                    impl<
+                        T: Network,
+                    > tonic::server::UnaryService<super::NetworkAssetTransfer>
+                    for RequestAssetTransferSvc<T> {
+                        type Response = super::super::super::common::ack::Ack;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::NetworkAssetTransfer>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).request_asset_transfer(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = RequestAssetTransferSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)

@@ -1,0 +1,217 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: CC-BY-4.0
+
+name: Secure Test Asset Transfer
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check_code_changed:
+    outputs:
+      status: ${{ steps.changes.outputs.weaver_code_changed }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3.5.2
+
+      - uses: dorny/paths-filter@v2.11.1
+        id: changes
+        with:
+          filters: |
+            weaver_code_changed:
+              - './weaver/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - '.github/workflows/test_weaver-fabric-fabric-satp.yaml'
+              
+  fabric-fabric-satp-local:
+    needs: check_code_changed
+    if: ${{ false && needs.check_code_changed.outputs.status == 'true' }}
+    # if: ${{ false }}
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3.5.2
+
+      - name: Set up Docker Compose
+        run: |
+          curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+          docker-compose --version
+
+      - name: Install Yarn
+        run: npm install -g yarn
+
+      - name: Install Envsubst
+        run: apt-get update && apt-get install gettext-base
+
+      - name: Set up JDK 8
+        uses: actions/setup-java@v3.11.0
+        with:
+          java-version: '8'
+          distribution: 'adopt'
+  
+      - name: Set up Go
+        uses: actions/setup-go@v4.0.0
+        with:
+          go-version: '1.20.2'
+
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: 16.x
+
+      - name: Install RUST Toolchain minimal stable with clippy and rustfmt
+        uses: actions-rs/toolchain@v1.0.6
+        with:
+          profile: minimal
+          toolchain: stable
+          components: rustfmt, clippy
+      
+      - name: Get Latest Relay Dependencies
+        run: |
+          make protos-local
+          cargo update -p nom
+          cargo update -p lexical-core
+        working-directory: weaver/core/relay
+
+      - name: Use Protoc 3.15
+        run: |
+          curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.15.6/protoc-3.15.6-linux-x86_64.zip
+          unzip protoc-3.15.6-linux-x86_64.zip -d protoc
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+
+      # FABRIC NETWORK
+      - name: Start Fabric Network
+        run: make start-interop-local CHAINCODE_NAME=satpsimpleasset
+        working-directory: weaver/tests/network-setups/fabric/dev
+
+      # PROTOS GO
+      - name: Build GO Protos
+        run: |
+          export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
+          make build
+        working-directory: weaver/common/protos-go
+
+      # PROTOS JS
+      - name: Build JS Protos
+        run: |
+          export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
+          make build
+        working-directory: weaver/common/protos-js
+
+      # Build Dependencies
+      - name: Build Fabric Interop SDK
+        run: make build-local
+        working-directory: weaver/sdks/fabric/interoperation-node-sdk
+
+      - name: Build Fabric CLI
+        run: make build-local
+        working-directory: weaver/samples/fabric/fabric-cli
+
+      - name: Build Relay
+        run: make
+        working-directory: weaver/core/relay
+
+      - name: Build Fabric Driver
+        run: make build-local
+        working-directory: weaver/core/drivers/fabric-driver
+
+      # GATEWAY
+      - name: Start Relay for network1 and network2
+        run: RELAY_CONFIG=config/Dummy_Relay.toml cargo run --bin server &> gateway.out &
+        working-directory: weaver/core/relay
+
+      # FABRIC DRIVER
+      - name: Setup Fabric Driver .env
+        run: |
+          cp .env.satp.template .env
+          sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}/weaver#g" .env
+        working-directory: weaver/core/drivers/fabric-driver
+
+      - name: Start Fabric Driver for network1 and network2
+        run: npm run dev &> fdriver.out &
+        working-directory: weaver/core/drivers/fabric-driver
+
+      # FABRIC CLI
+      - name: Setup Fabric CLI ENV
+        run: |
+          echo ${GITHUB_WORKSPACE}
+          cp .env.template .env
+          ./bin/fabric-cli env set-file ./.env
+          ./bin/fabric-cli env set MEMBER_CREDENTIAL_FOLDER ${GITHUB_WORKSPACE}/weaver/samples/fabric/fabric-cli/src/data/credentials
+          ./bin/fabric-cli env set CONFIG_PATH ${GITHUB_WORKSPACE}/weaver/samples/fabric/fabric-cli/config.json
+          ./bin/fabric-cli env set DEFAULT_APPLICATION_CHAINCODE satpsimpleasset
+          ./bin/fabric-cli env set REMOTE_CONFIG_PATH ${GITHUB_WORKSPACE}/weaver/samples/fabric/fabric-cli/remote-network-config.json
+          ./bin/fabric-cli env set CHAINCODE_PATH ${GITHUB_WORKSPACE}/weaver/samples/fabric/fabric-cli/chaincode.json
+          cat .env
+        working-directory: weaver/samples/fabric/fabric-cli
+
+      - name: Setup Fabric CLI Config
+        run: |
+          echo ${GITHUB_WORKSPACE}
+          cp config.satp.template.json config.json
+          sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}/weaver#g" config.json
+          ###### Change line number in following commands if config is modified #####
+          ./bin/fabric-cli config set network2 aclPolicyPrincipalType ca
+          ./bin/fabric-cli config set network1 chaincode satpsimpleasset
+          ./bin/fabric-cli config set network2 chaincode satpsimpleasset
+          cp chaincode.json.template chaincode.json
+          cp remote-network-config.json.template remote-network-config.json
+        working-directory: weaver/samples/fabric/fabric-cli
+
+      - name: Fabric CLI Init
+        run: |
+          ./bin/fabric-cli configure create all --local-network=network1
+          ./bin/fabric-cli configure create all --local-network=network2
+          ./bin/fabric-cli configure network --local-network=network1
+          ./bin/fabric-cli configure network --local-network=network2
+          ./scripts/initAsset.sh
+        working-directory: weaver/samples/fabric/fabric-cli
+
+      # CLIENT
+      - name: Start the client to initiate the satp protocol
+        run: cargo run --bin satp_client "9085" "localhost:9085/Dummy_Network/abc:abc:abc:abc" &> client.out &
+        working-directory: weaver/core/relay
+
+      # Test SATP
+      - name: Test SATP
+        run: |
+          COUNT=0
+          TOTAL=1
+
+          ./bin/fabric-cli chaincode query --user=bob mychannel satpsimpleasset ReadAsset '["bond01","a04"]' --local-network=network1 &> tmp.out
+          cat tmp.out | tr '\n' ' ' | grep "Result from network query: {     \"type\": \"bond01\",     \"id\": \"a04\"" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          # RESULT
+          echo "Passed $COUNT/$TOTAL Tests."
+
+          if [ $COUNT == $TOTAL ]; then
+              exit 0
+          else
+              exit 1
+          fi
+        working-directory: weaver/samples/fabric/fabric-cli
+
+      - name: DEBUG Logs - fabric n1 and n2 gateway
+        if: failure()
+        run: cat weaver/core/relay/gateway.out
+        
+      - name: DEBUG Logs - fabric n1 and n2 driver
+        if: failure()
+        run: cat weaver/core/drivers/fabric-driver/fdriver.out

@@ -11,6 +11,11 @@ path = "src/main.rs"
 [[bin]]
 name = "client"
 path = "src/client.rs"
+
+[[bin]]
+name = "satp_client"
+path = "src/satp_client.rs"
+
 [[bin]]
 name = "client-tls"
 path = "src/client_tls.rs"
@@ -18,8 +23,6 @@ path = "src/client_tls.rs"
 [[bin]]
 name = "dummy-driver"
 path = "driver/driver.rs"
-
-
 
 [dependencies]
 tonic = { version="0.10.2",  features = ["tls"] }
@@ -36,10 +39,15 @@ reqwest = { version = "0.11.16", features = ["json"] }
 serde_json = "1.0.108"
 cacti_weaver_protos_rs = { path = "./protos-rs" }
 # cacti_weaver_protos_rs = "2.0.0-alpha.2"
+colored = {version="2.0.4"}
+rusqlite = "0.29.0"
+chrono = "0.4"
+dotenv = "0.15"
+log = "0.4.20"
+r2d2 = "0.8.10"
+r2d2_sqlite = "0.22.0"
+lazy_static = "1.4"
+env_logger = "0.10.0"
 
 [build-dependencies]
 tonic-build = "0.10.2"
-
-
-
-

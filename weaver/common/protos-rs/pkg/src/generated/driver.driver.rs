@@ -8,6 +8,34 @@ pub struct WriteExternalStateMessage {
     #[prost(message, optional, tag = "2")]
     pub ctx: ::core::option::Option<super::super::common::events::ContractTransaction>,
 }
+#[derive(serde::Serialize, serde::Deserialize)]
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct PerformLockRequest {
+    #[prost(string, tag = "1")]
+    pub session_id: ::prost::alloc::string::String,
+}
+#[derive(serde::Serialize, serde::Deserialize)]
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CreateAssetRequest {
+    #[prost(string, tag = "1")]
+    pub session_id: ::prost::alloc::string::String,
+}
+#[derive(serde::Serialize, serde::Deserialize)]
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ExtinguishRequest {
+    #[prost(string, tag = "1")]
+    pub session_id: ::prost::alloc::string::String,
+}
+#[derive(serde::Serialize, serde::Deserialize)]
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct AssignAssetRequest {
+    #[prost(string, tag = "1")]
+    pub session_id: ::prost::alloc::string::String,
+}
 /// Generated client implementations.
 pub mod driver_communication_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
@@ -227,6 +255,102 @@ pub mod driver_communication_client {
                 );
             self.inner.unary(req, path, codec).await
         }
+        /// As part of SATP, the source reply (sender gateway) sends a PerformLock request to its driver
+        /// to lock a specific asset
+        pub async fn perform_lock(
+            &mut self,
+            request: impl tonic::IntoRequest<super::PerformLockRequest>,
+        ) -> Result<
+            tonic::Response<super::super::super::common::ack::Ack>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/driver.driver.DriverCommunication/PerformLock",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        /// As part of SATP, the destination reply (receiver gateway) sends a CreateAsset request to its driver
+        /// to create a specific asset
+        pub async fn create_asset(
+            &mut self,
+            request: impl tonic::IntoRequest<super::CreateAssetRequest>,
+        ) -> Result<
+            tonic::Response<super::super::super::common::ack::Ack>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/driver.driver.DriverCommunication/CreateAsset",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        /// As part of SATP, the source reply (sender gateway) sends a Extinguish request to its driver
+        /// to extinguish a specific asset
+        pub async fn extinguish(
+            &mut self,
+            request: impl tonic::IntoRequest<super::ExtinguishRequest>,
+        ) -> Result<
+            tonic::Response<super::super::super::common::ack::Ack>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/driver.driver.DriverCommunication/Extinguish",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
+        /// As part of SATP, the destination reply (receiver gateway) sends a AssignAsset request to its driver
+        /// to assign a specific asset
+        pub async fn assign_asset(
+            &mut self,
+            request: impl tonic::IntoRequest<super::AssignAssetRequest>,
+        ) -> Result<
+            tonic::Response<super::super::super::common::ack::Ack>,
+            tonic::Status,
+        > {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/driver.driver.DriverCommunication/AssignAsset",
+            );
+            self.inner.unary(request.into_request(), path, codec).await
+        }
     }
 }
 /// Generated server implementations.
@@ -275,6 +399,42 @@ pub mod driver_communication_server {
             &self,
             request: tonic::Request<super::WriteExternalStateMessage>,
         ) -> std::result::Result<
+            tonic::Response<super::super::super::common::ack::Ack>,
+            tonic::Status,
+        >;
+        /// As part of SATP, the source reply (sender gateway) sends a PerformLock request to its driver
+        /// to lock a specific asset
+        async fn perform_lock(
+            &self,
+            request: tonic::Request<super::PerformLockRequest>,
+        ) -> Result<
+            tonic::Response<super::super::super::common::ack::Ack>,
+            tonic::Status,
+        >;
+        /// As part of SATP, the destination reply (receiver gateway) sends a CreateAsset request to its driver
+        /// to create a specific asset
+        async fn create_asset(
+            &self,
+            request: tonic::Request<super::CreateAssetRequest>,
+        ) -> Result<
+            tonic::Response<super::super::super::common::ack::Ack>,
+            tonic::Status,
+        >;
+        /// As part of SATP, the source reply (sender gateway) sends a Extinguish request to its driver
+        /// to extinguish a specific asset
+        async fn extinguish(
+            &self,
+            request: tonic::Request<super::ExtinguishRequest>,
+        ) -> Result<
+            tonic::Response<super::super::super::common::ack::Ack>,
+            tonic::Status,
+        >;
+        /// As part of SATP, the destination reply (receiver gateway) sends a AssignAsset request to its driver
+        /// to assign a specific asset
+        async fn assign_asset(
+            &self,
+            request: tonic::Request<super::AssignAssetRequest>,
+        ) -> Result<
             tonic::Response<super::super::super::common::ack::Ack>,
             tonic::Status,
         >;
@@ -562,6 +722,164 @@ pub mod driver_communication_server {
                             .apply_max_message_size_config(
                                 max_decoding_message_size,
                                 max_encoding_message_size,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/driver.driver.DriverCommunication/PerformLock" => {
+                    #[allow(non_camel_case_types)]
+                    struct PerformLockSvc<T: DriverCommunication>(pub Arc<T>);
+                    impl<
+                        T: DriverCommunication,
+                    > tonic::server::UnaryService<super::PerformLockRequest>
+                    for PerformLockSvc<T> {
+                        type Response = super::super::super::common::ack::Ack;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::PerformLockRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).perform_lock(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = PerformLockSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/driver.driver.DriverCommunication/CreateAsset" => {
+                    #[allow(non_camel_case_types)]
+                    struct CreateAssetSvc<T: DriverCommunication>(pub Arc<T>);
+                    impl<
+                        T: DriverCommunication,
+                    > tonic::server::UnaryService<super::CreateAssetRequest>
+                    for CreateAssetSvc<T> {
+                        type Response = super::super::super::common::ack::Ack;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::CreateAssetRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).create_asset(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = CreateAssetSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/driver.driver.DriverCommunication/Extinguish" => {
+                    #[allow(non_camel_case_types)]
+                    struct ExtinguishSvc<T: DriverCommunication>(pub Arc<T>);
+                    impl<
+                        T: DriverCommunication,
+                    > tonic::server::UnaryService<super::ExtinguishRequest>
+                    for ExtinguishSvc<T> {
+                        type Response = super::super::super::common::ack::Ack;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::ExtinguishRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move { (*inner).extinguish(request).await };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = ExtinguishSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/driver.driver.DriverCommunication/AssignAsset" => {
+                    #[allow(non_camel_case_types)]
+                    struct AssignAssetSvc<T: DriverCommunication>(pub Arc<T>);
+                    impl<
+                        T: DriverCommunication,
+                    > tonic::server::UnaryService<super::AssignAssetRequest>
+                    for AssignAssetSvc<T> {
+                        type Response = super::super::super::common::ack::Ack;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<super::AssignAssetRequest>,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move {
+                                (*inner).assign_asset(request).await
+                            };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = AssignAssetSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
                             );
                         let res = grpc.unary(method, req).await;
                         Ok(res)

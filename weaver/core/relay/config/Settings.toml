@@ -4,6 +4,7 @@ hostname="localhost"
 db_path="db/requests"
 # This will be replaced by the task queue.
 remote_db_path="db/remote_requests"
+db_satp_path="db/satp"
 # max retries opening sled db if it is locked
 db_open_max_retries=500
 # retry back off time in ms if sled db is locked
