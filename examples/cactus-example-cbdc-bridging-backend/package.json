@@ -73,7 +73,7 @@
     "axios": "1.6.0",
     "crypto-js": "4.2.0",
     "dotenv": "^16.0.1",
-    "fabric-network": "2.2.19",
+    "fabric-network": "2.2.20",
     "fs-extra": "10.1.0",
     "knex": "2.5.1",
     "kubo-rpc-client": "3.0.1",
