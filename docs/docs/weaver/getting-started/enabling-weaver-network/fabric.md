@@ -308,12 +308,13 @@ A Fabric network channel must share its security domain (or membership) configur
       const response = await MembershipManager.createLocalMembership(
           gateway,
           members,        // list of all organization MSPIDs that are part of the channel
+	  securityDomain, // name of the local network's security domain
           channelName,    // Channel Name
           contractName    // Fabric Interoperation Chaincode installation ID on the channel
       )
   } catch (e) {
       // On error try updating local membership
-      const response = await MembershipManager.updateLocalMembership(gateway, members, channelName, contractName)
+      const response = await MembershipManager.updateLocalMembership(gateway, members, securityDomain, channelName, contractName)
   }
   ```
 
