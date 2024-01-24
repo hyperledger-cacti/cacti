@@ -7166,10 +7166,10 @@ __metadata:
     dotenv: 8.6.0
     eslint-config-prettier: 8.9.0
     eslint-plugin-prettier: 5.0.0
-    fabric-ca-client: 2.2.19
-    fabric-common: 2.2.19
-    fabric-network: 2.2.19
-    fabric-protos: 2.2.19
+    fabric-ca-client: 2.2.20
+    fabric-common: 2.2.20
+    fabric-network: 2.2.20
+    fabric-protos: 2.2.20
     level: 8.0.0
     nodemon: 2.0.22
     patch-package: 6.5.1
@@ -7201,9 +7201,9 @@ __metadata:
     eslint-config-prettier: 8.10.0
     eslint-plugin-prettier: 5.0.0
     express: 4.18.2
-    fabric-ca-client: 2.2.19
-    fabric-common: 2.2.19
-    fabric-network: 2.2.19
+    fabric-ca-client: 2.2.20
+    fabric-common: 2.2.20
+    fabric-network: 2.2.20
     gluegun: 5.1.6
     google-protobuf: 3.21.2
     grpc-tools: 1.12.4
@@ -7242,9 +7242,9 @@ __metadata:
     dotenv: 8.6.0
     eslint-config-prettier: 6.15.0
     eslint-plugin-prettier: 5.0.0
-    fabric-ca-client: 2.2.19
-    fabric-common: 2.2.19
-    fabric-network: 2.2.19
+    fabric-ca-client: 2.2.20
+    fabric-common: 2.2.20
+    fabric-network: 2.2.20
     jsrsasign: 11.0.0
     mocha: 5.2.0
     nodemon: 2.0.22
@@ -7322,9 +7322,9 @@ __metadata:
     eslint-config-prettier: 8.10.0
     eslint-plugin-import: 2.28.1
     eslint-plugin-prettier: 5.0.0
-    fabric-common: 2.2.19
-    fabric-network: 2.2.19
-    fabric-protos: 2.2.19
+    fabric-common: 2.2.20
+    fabric-network: 2.2.20
+    fabric-protos: 2.2.20
     js-sha3: 0.8.0
     jsrsasign: 11.0.0
     log4js: 6.9.1
@@ -7459,7 +7459,7 @@ __metadata:
     ethereumjs-common: 1.5.2
     ethereumjs-tx: 2.1.2
     express: 4.18.2
-    fabric-network: 2.2.19
+    fabric-network: 2.2.20
     http-errors: 1.6.3
     http-terminator: 3.2.0
     js-yaml: 3.14.1
@@ -7575,7 +7575,7 @@ __metadata:
     "@types/uuid": 8.3.4
     async-exit-hook: 2.0.1
     express-jwt: 8.4.1
-    fabric-network: 2.2.19
+    fabric-network: 2.2.20
     fs-extra: 10.1.0
     hardhat: 2.17.2
     http-status-codes: 2.1.4
@@ -7685,7 +7685,7 @@ __metadata:
     crypto-js: 4.2.0
     cucumber: ^5.0.3
     dotenv: ^16.0.1
-    fabric-network: 2.2.19
+    fabric-network: 2.2.20
     fs-extra: 10.1.0
     hardhat: 2.17.2
     http-status-codes: 2.1.4
@@ -7756,8 +7756,8 @@ __metadata:
     ethereumjs-common: 1.5.2
     ethereumjs-tx: 2.1.2
     express: 4.18.2
-    fabric-ca-client: 2.2.19
-    fabric-network: 2.2.19
+    fabric-ca-client: 2.2.20
+    fabric-network: 2.2.20
     http-errors: 1.6.3
     indy-sdk: 1.16.0-dev-1655
     jsonwebtoken: 9.0.0
@@ -7800,8 +7800,8 @@ __metadata:
     ethereumjs-common: 1.5.2
     ethereumjs-tx: 2.1.2
     express: 4.18.2
-    fabric-ca-client: 2.2.19
-    fabric-network: 2.2.19
+    fabric-ca-client: 2.2.20
+    fabric-network: 2.2.20
     http-errors: 1.6.3
     js-yaml: 3.14.1
     jsonwebtoken: 9.0.0
@@ -7841,7 +7841,7 @@ __metadata:
     dotenv: 16.0.0
     express: 4.18.2
     express-jwt: 8.4.1
-    fabric-network: 2.2.19
+    fabric-network: 2.2.20
     jose: 4.9.2
     openapi-types: 9.1.0
     solc: 0.8.6
@@ -7946,8 +7946,8 @@ __metadata:
     ethereumjs-common: 1.5.2
     ethereumjs-tx: 2.1.2
     express: 4.18.2
-    fabric-ca-client: 2.2.19
-    fabric-network: 2.2.19
+    fabric-ca-client: 2.2.20
+    fabric-network: 2.2.20
     http-errors: 1.6.3
     js-yaml: 3.14.1
     jsonwebtoken: 8.5.1
@@ -8724,8 +8724,8 @@ __metadata:
     axios: 1.6.0
     body-parser: 1.20.2
     express: 4.18.2
-    fabric-network: 2.2.19
-    fabric-protos: 2.2.19
+    fabric-network: 2.2.20
+    fabric-protos: 2.2.20
     js-sha256: 0.9.0
     pg: 8.8.0
     safe-stable-stringify: 2.4.3
@@ -8757,7 +8757,7 @@ __metadata:
     body-parser: 1.20.2
     crypto-js: 4.2.0
     express: 4.18.2
-    fabric-network: 2.2.19
+    fabric-network: 2.2.20
     fs-extra: 11.1.1
     knex: 2.4.0
     kubo-rpc-client: 3.0.1
@@ -26246,15 +26246,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fabric-ca-client@npm:2.2.19":
-  version: 2.2.19
-  resolution: "fabric-ca-client@npm:2.2.19"
+"fabric-ca-client@npm:2.2.20":
+  version: 2.2.20
+  resolution: "fabric-ca-client@npm:2.2.20"
   dependencies:
-    fabric-common: 2.2.19
+    fabric-common: 2.2.20
     jsrsasign: ^10.5.25
     url: ^0.11.0
     winston: ^2.4.5
-  checksum: fa957d2c0ad0e7642aff94a7f04d04fc28cc95bb6cf0e18c785362e0a48e34fdce6d5d94c61427887a89a9db9f3616c02f144f7197a49e2ff3fd1927521226b9
+  checksum: 888fd3865975e053eeceab47f2c233152d985938c8d56db722424806bd38e36285ef5a44610ffbf9a1a88413224ccb0cd79e855ba5428b37cb2b1a2014e56edb
   languageName: node
   linkType: hard
 
@@ -26270,14 +26270,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fabric-common@npm:2.2.19":
-  version: 2.2.19
-  resolution: "fabric-common@npm:2.2.19"
+"fabric-common@npm:2.2.20":
+  version: 2.2.20
+  resolution: "fabric-common@npm:2.2.20"
   dependencies:
     callsite: ^1.0.0
     elliptic: ^6.5.4
-    fabric-protos: 2.2.19
-    js-sha3: ^0.8.0
+    fabric-protos: 2.2.20
+    js-sha3: ^0.9.2
     jsrsasign: ^10.5.25
     long: ^5.2.3
     nconf: ^0.12.0
@@ -26289,7 +26289,7 @@ __metadata:
   dependenciesMeta:
     pkcs11js:
       optional: true
-  checksum: 91c6dd404d9ea451d0825395902c4e8fa71a8de4ee0f34327cffe8c11ff0b3de6a79be0bc923572c465fa7a8b9918d785e808f927f8f7acfab6e6ac34b480383
+  checksum: 5eb06683d514ef1efc418dd40c985fb91c03920a02b447c83cd3c6584b3f43e137ae65b585d477cdb06fb3b246f3eb766676cc59d3bf8646fb9eab39d11e188b
   languageName: node
   linkType: hard
 
@@ -26315,15 +26315,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fabric-network@npm:2.2.19":
-  version: 2.2.19
-  resolution: "fabric-network@npm:2.2.19"
+"fabric-network@npm:2.2.20":
+  version: 2.2.20
+  resolution: "fabric-network@npm:2.2.20"
   dependencies:
-    fabric-common: 2.2.19
-    fabric-protos: 2.2.19
+    fabric-common: 2.2.20
+    fabric-protos: 2.2.20
     long: ^5.2.3
-    nano: ^9.0.5
-  checksum: 0bbd9414587c72291b1f0d491e45030dacf38ff52132c0721a08e89aaf76c4d8dfe51e1abfe0150663e5595daae55bc289a8f7b6de5e30387db73bb0d7e2392f
+    nano: ^10.1.2
+  checksum: 95bd304df883dd32f6aa445495358531b5ac2c716596aa87c9a9212c6b29f3741fb92f8f84895dfe43779600f23f736ab79c2d114ceb4e584d1ea2bf80c936f0
   languageName: node
   linkType: hard
 
@@ -26338,15 +26338,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fabric-protos@npm:2.2.19":
-  version: 2.2.19
-  resolution: "fabric-protos@npm:2.2.19"
+"fabric-protos@npm:2.2.20":
+  version: 2.2.20
+  resolution: "fabric-protos@npm:2.2.20"
   dependencies:
     "@grpc/grpc-js": ~1.9.0
     "@grpc/proto-loader": ^0.7.0
     long: ^5.2.3
     protobufjs: ^7.2.0
-  checksum: 80e295d8041063eb8c5a723c88732923cfd18c6cd7520e189985f33a2c308bf2afc2dee76cf82a3bedf046958ae2f642462a20fe8c6505729f8cdecc04b37faf
+  checksum: 2961e7d6bcd7c583a79166d13ffb161536f9ee2a70f9bff497185f0247f2562558659e661e5200ec27ab38c95cc4ac418bac1f1a44be0be5c9f8e12b6456920a
   languageName: node
   linkType: hard
 
@@ -33005,6 +33005,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"js-sha3@npm:^0.9.2":
+  version: 0.9.3
+  resolution: "js-sha3@npm:0.9.3"
+  checksum: cfab12cdb3aa9c0c8e8466761d89cb9770653880910b920682fa676dd102868a827709c857cb089bdc0d6120542137f92a7c1699ab428c0f4057c823aef24601
+  languageName: node
+  linkType: hard
+
 "js-tokens@npm:^3.0.0 || ^4.0.0, js-tokens@npm:^4.0.0":
   version: 4.0.0
   resolution: "js-tokens@npm:4.0.0"
@@ -33381,24 +33388,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jsrsasign@npm:11.0.0":
+"jsrsasign@npm:>=11.0.0":
   version: 11.0.0
   resolution: "jsrsasign@npm:11.0.0"
   checksum: 9bbcbb9d2609e279fb015eec259490053be0afd9a6a98743ce0bf42f825e8415b377bfb1aef1d988d3d9ece0bce34bec5bc64f71e99406d0743c37cbbb2f89a5
-  languageName: node
-  linkType: hard
-
-"jsrsasign@npm:^10.4.0":
-  version: 10.5.25
-  resolution: "jsrsasign@npm:10.5.25"
-  checksum: e789cd6d5e6e236edebe91936279cdef886aafaab8d4ebc7d40b8ba0c7b7cd0d6d3c53fba26ea96eb33cc77a05368b369ef31fc9182662bce2344143ad50ea0f
-  languageName: node
-  linkType: hard
-
-"jsrsasign@npm:^10.5.25":
-  version: 10.5.26
-  resolution: "jsrsasign@npm:10.5.26"
-  checksum: 1d717c7a0d2e4e745f4c819b0291a2f7a3c200001fce00c112fb9566d8f7bce108a86721a6eba804ca56f67885cfbf23167e592df1e568ca6f9855ca1f050682
   languageName: node
   linkType: hard
 

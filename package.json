@@ -87,6 +87,7 @@
     "glob-parent": ">=5.1.2",
     "http-cache-semantics": ">=4.1.1",
     "jsonwebtoken": ">=9.0.0",
+    "jsrsasign": ">=11.0.0",
     "lodash": ">=4.17.21",
     "minimist": ">=1.2.6",
     "nano": ">=10.0.0",
