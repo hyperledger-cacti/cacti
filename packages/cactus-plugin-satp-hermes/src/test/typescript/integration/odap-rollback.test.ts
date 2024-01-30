@@ -54,15 +54,15 @@ import {
 import Web3 from "web3";
 
 import {
-  IFabricSatpGatewayConstructorOptions,
-  FabricSatpGateway,
-} from "../../../main/typescript/gateway/fabric-satp-gateway";
+  IFabricSATPGatewayConstructorOptions,
+  FabricSATPGateway,
+} from "../../../main/typescript/core/fabric-satp-gateway";
 import {
-  IBesuSatpGatewayConstructorOptions,
-  BesuSatpGateway,
-} from "../../../main/typescript/gateway/besu-satp-gateway";
-import { ClientGatewayHelper } from "../../../main/typescript/gateway/client/client-helper";
-import { ServerGatewayHelper } from "../../../main/typescript/gateway/server/server-helper";
+  IBesuSATPGatewayConstructorOptions,
+  BesuSATPGateway,
+} from "../../../main/typescript/core/besu-satp-gateway";
+import { ClientGatewayHelper } from "../../../main/typescript/core/client-helper";
+import { ServerGatewayHelper } from "../../../main/typescript/core/server-helper";
 import { knexRemoteConnection } from "../knex.config";
 
 /**
@@ -97,10 +97,10 @@ let besuConnector: PluginLedgerConnectorBesu;
 let clientGatewayApiHost: string;
 let serverGatewayApiHost: string;
 
-let clientGatewayPluginOptions: IFabricSatpGatewayConstructorOptions;
-let serverGatewayPluginOptions: IBesuSatpGatewayConstructorOptions;
-let pluginSourceGateway: FabricSatpGateway;
-let pluginRecipientGateway: BesuSatpGateway;
+let clientGatewayPluginOptions: IFabricSATPGatewayConstructorOptions;
+let serverGatewayPluginOptions: IBesuSATPGatewayConstructorOptions;
+let pluginSourceGateway: FabricSATPGateway;
+let pluginRecipientGateway: BesuSATPGateway;
 
 const MAX_RETRIES = 5;
 const MAX_TIMEOUT = 5000;
@@ -538,8 +538,8 @@ beforeAll(async () => {
       knexRemoteConfig: knexRemoteConnection,
     };
 
-    pluginSourceGateway = new FabricSatpGateway(clientGatewayPluginOptions);
-    pluginRecipientGateway = new BesuSatpGateway(serverGatewayPluginOptions);
+    pluginSourceGateway = new FabricSATPGateway(clientGatewayPluginOptions);
+    pluginRecipientGateway = new BesuSATPGateway(serverGatewayPluginOptions);
 
     expect(pluginSourceGateway.localRepository?.database).not.toBeUndefined();
     expect(
@@ -817,7 +817,7 @@ test("client sends rollback message at the end of the protocol", async () => {
 
   await Servers.listen(listenOptions);
 
-  pluginSourceGateway = new FabricSatpGateway(clientGatewayPluginOptions);
+  pluginSourceGateway = new FabricSATPGateway(clientGatewayPluginOptions);
   await pluginSourceGateway.registerWebServices(expressApp);
 
   await pluginSourceGateway.recoverOpenSessions(true);

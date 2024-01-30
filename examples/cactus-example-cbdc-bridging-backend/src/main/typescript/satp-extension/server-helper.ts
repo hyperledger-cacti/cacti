@@ -5,11 +5,11 @@ import {
 } from "@hyperledger/cactus-plugin-satp-hermes";
 import {
   SatpMessageType,
-  PluginSatpGateway,
+  PluginSATPGateway,
   ServerGatewayHelper,
 } from "@hyperledger/cactus-plugin-satp-hermes";
 
-import { FabricSatpGateway } from "./fabric-satp-gateway";
+import { FabricSATPGateway } from "./fabric-satp-gateway";
 import { LogLevelDesc } from "@hyperledger/cactus-common";
 
 export interface IServerHelperOptions {
@@ -30,7 +30,7 @@ export class ServerHelper extends ServerGatewayHelper {
 
   async checkValidInitializationRequest(
     request: TransferInitializationV1Request,
-    gateway: PluginSatpGateway,
+    gateway: PluginSATPGateway,
   ): Promise<void> {
     const fnTag = `${gateway.className}#checkValidInitializationRequest()`;
 
@@ -124,7 +124,7 @@ export class ServerHelper extends ServerGatewayHelper {
 
     gateway.sessions.set(request.sessionID, sessionData);
 
-    if (gateway instanceof FabricSatpGateway) {
+    if (gateway instanceof FabricSATPGateway) {
       await gateway
         .isValidBridgeBackCBDC(
           request.payloadProfile.assetProfile.keyInformationLink[1].toString(), // FabricID
