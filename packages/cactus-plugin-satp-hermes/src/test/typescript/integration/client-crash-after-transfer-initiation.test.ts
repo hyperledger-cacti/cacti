@@ -11,18 +11,18 @@ import {
 } from "@hyperledger/cactus-common";
 import {
   IPluginSatpGatewayConstructorOptions,
-  PluginSatpGateway,
-} from "../../../main/typescript/gateway/plugin-satp-gateway";
+  PluginSATPGateway,
+} from "../../../main/typescript/plugin-satp-gateway";
 import {
   AssetProfile,
   ClientV1Request,
 } from "../../../main/typescript/public-api";
 import { makeSessionDataChecks } from "../make-checks";
 
-import { BesuSatpGateway } from "../../../main/typescript/gateway/besu-satp-gateway";
-import { FabricSatpGateway } from "../../../main/typescript/gateway/fabric-satp-gateway";
-import { ServerGatewayHelper } from "../../../main/typescript/gateway/server/server-helper";
-import { ClientGatewayHelper } from "../../../main/typescript/gateway/client/client-helper";
+import { BesuSATPGateway } from "../../../main/typescript/core/besu-satp-gateway";
+import { FabricSATPGateway } from "../../../main/typescript/core/fabric-satp-gateway";
+import { ServerGatewayHelper } from "../../../main/typescript/core/server-helper";
+import { ClientGatewayHelper } from "../../../main/typescript/core/client-helper";
 
 import {
   knexClientConnection,
@@ -39,8 +39,8 @@ const BESU_ASSET_ID = uuidv4();
 let serverGatewayPluginOptions: IPluginSatpGatewayConstructorOptions;
 let clientGatewayPluginOptions: IPluginSatpGatewayConstructorOptions;
 
-let pluginSourceGateway: PluginSatpGateway;
-let pluginRecipientGateway: PluginSatpGateway;
+let pluginSourceGateway: PluginSATPGateway;
+let pluginRecipientGateway: PluginSATPGateway;
 
 let sourceGatewayServer: Server;
 let recipientGatewayserver: Server;
@@ -86,7 +86,7 @@ beforeAll(async () => {
     const { address, port } = addressInfo;
     serverGatewayApiHost = `http://${address}:${port}`;
 
-    pluginRecipientGateway = new BesuSatpGateway(serverGatewayPluginOptions);
+    pluginRecipientGateway = new BesuSATPGateway(serverGatewayPluginOptions);
 
     expect(
       pluginRecipientGateway.localRepository?.database,
@@ -125,7 +125,7 @@ beforeAll(async () => {
     const { address, port } = addressInfo;
     clientGatewayApiHost = `http://${address}:${port}`;
 
-    pluginSourceGateway = new FabricSatpGateway(clientGatewayPluginOptions);
+    pluginSourceGateway = new FabricSATPGateway(clientGatewayPluginOptions);
 
     if (pluginSourceGateway.localRepository?.database == undefined) {
       throw new Error("Database is not correctly initialized");
@@ -225,7 +225,7 @@ test("successful run ODAP after client gateway crashed after after receiving tra
 
   await Servers.listen(listenOptions);
 
-  pluginSourceGateway = new FabricSatpGateway(clientGatewayPluginOptions);
+  pluginSourceGateway = new FabricSATPGateway(clientGatewayPluginOptions);
   await pluginSourceGateway.registerWebServices(clientExpressApp);
 
   // client gateway self-healed and is back online

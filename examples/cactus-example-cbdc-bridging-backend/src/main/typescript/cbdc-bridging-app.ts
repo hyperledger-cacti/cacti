@@ -24,8 +24,8 @@ import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory
 import { CbdcBridgingAppDummyInfrastructure } from "./infrastructure/cbdc-bridging-app-dummy-infrastructure";
 import { DefaultApi as FabricApi } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
 import { DefaultApi as BesuApi } from "@hyperledger/cactus-plugin-ledger-connector-besu";
-import { FabricSatpGateway } from "./satp-extension/fabric-satp-gateway";
-import { BesuSatpGateway } from "./satp-extension/besu-satp-gateway";
+import { FabricSATPGateway } from "./satp-extension/fabric-satp-gateway";
+import { BesuSATPGateway } from "./satp-extension/besu-satp-gateway";
 import CryptoMaterial from "../../crypto-material/crypto-material.json";
 
 export interface ICbdcBridgingApp {
@@ -97,12 +97,12 @@ export class CbdcBridgingApp {
     const addressInfoB = httpApiB.address() as AddressInfo;
     const nodeApiHostB = `http://${this.options.apiHost}:${addressInfoB.port}`;
 
-    const fabricSatpGateway = await this.infrastructure.createClientGateway(
+    const FabricSATPGateway = await this.infrastructure.createClientGateway(
       nodeApiHostA,
       this.options.clientGatewayKeyPair,
     );
 
-    const besuSatpGateway = await this.infrastructure.createServerGateway(
+    const BesuSATPGateway = await this.infrastructure.createServerGateway(
       nodeApiHostB,
       this.options.serverGatewayKeyPair,
     );
@@ -127,10 +127,10 @@ export class CbdcBridgingApp {
     });
 
     clientPluginRegistry.add(fabricPlugin);
-    clientPluginRegistry.add(fabricSatpGateway);
+    clientPluginRegistry.add(FabricSATPGateway);
 
     serverPluginRegistry.add(besuPlugin);
-    serverPluginRegistry.add(besuSatpGateway);
+    serverPluginRegistry.add(BesuSATPGateway);
 
     const apiServer1 = await this.startNode(httpApiA, clientPluginRegistry);
     const apiServer2 = await this.startNode(httpApiB, serverPluginRegistry);
@@ -166,8 +166,8 @@ export class CbdcBridgingApp {
       ),
       fabricApiClient,
       besuApiClient,
-      fabricSatpGateway,
-      besuSatpGateway,
+      FabricSATPGateway,
+      BesuSATPGateway,
     };
   }
 
@@ -227,6 +227,6 @@ export interface IStartInfo {
   readonly besuGatewayApi: SatpApi;
   readonly besuApiClient: BesuApi;
   readonly fabricApiClient: FabricApi;
-  readonly fabricSatpGateway: FabricSatpGateway;
-  readonly besuSatpGateway: BesuSatpGateway;
+  readonly FabricSATPGateway: FabricSATPGateway;
+  readonly BesuSATPGateway: BesuSATPGateway;
 }
