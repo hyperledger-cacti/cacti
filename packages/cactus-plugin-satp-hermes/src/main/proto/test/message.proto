@@ -1,0 +1,27 @@
+
+syntax = "proto3";
+package test.message;
+
+import "google/protobuf/empty.proto";
+
+message Message {
+    string content = 1;
+}
+message ModifyMessageResponse {
+    string content = 1;
+}
+  
+message ModifyMessageRequest {
+    string content = 1;
+}
+  
+
+service TestService   {
+    rpc GetMessage(google.protobuf.Empty) returns (Message) {}
+    rpc SendMessage(Message) returns (google.protobuf.Empty)   {}
+    rpc ModifyMessage(ModifyMessageRequest) returns (ModifyMessageResponse)   {}
+}
+
+service TestService2   {
+    rpc GetMessage(google.protobuf.Empty) returns (Message) {}
+}

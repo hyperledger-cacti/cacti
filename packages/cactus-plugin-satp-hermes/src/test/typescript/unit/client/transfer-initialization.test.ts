@@ -3,17 +3,17 @@ import { SHA256 } from "crypto-js";
 import { v4 as uuidV4 } from "uuid";
 import {
   SatpMessageType,
-  PluginSatpGateway,
-} from "../../../../main/typescript/gateway/plugin-satp-gateway";
+  PluginSATPGateway,
+} from "../../../../main/typescript/plugin-satp-gateway";
 import {
   TransferInitializationV1Response,
   SessionData,
   AssetProfile,
 } from "../../../../main/typescript/public-api";
-import { BesuSatpGateway } from "../../../../main/typescript/gateway/besu-satp-gateway";
-import { FabricSatpGateway } from "../../../../main/typescript/gateway/fabric-satp-gateway";
-import { ClientGatewayHelper } from "../../../../main/typescript/gateway/client/client-helper";
-import { ServerGatewayHelper } from "../../../../main/typescript/gateway/server/server-helper";
+import { BesuSATPGateway } from "../../../../main/typescript/core/besu-satp-gateway";
+import { FabricSATPGateway } from "../../../../main/typescript/core/fabric-satp-gateway";
+import { ClientGatewayHelper } from "../../../../main/typescript/core/client-helper";
+import { ServerGatewayHelper } from "../../../../main/typescript/core/server-helper";
 
 const MAX_RETRIES = 5;
 const MAX_TIMEOUT = 5000;
@@ -23,8 +23,8 @@ const INITIALIZATION_REQUEST_MESSAGE_HASH =
 
 let sourceGatewayConstructor;
 let recipientGatewayConstructor;
-let pluginSourceGateway: PluginSatpGateway;
-let pluginRecipientGateway: PluginSatpGateway;
+let pluginSourceGateway: PluginSATPGateway;
+let pluginRecipientGateway: PluginSATPGateway;
 let sequenceNumber: number;
 let sessionID: string;
 let step: number;
@@ -45,8 +45,8 @@ beforeEach(async () => {
     serverHelper: new ServerGatewayHelper(),
   };
 
-  pluginSourceGateway = new FabricSatpGateway(sourceGatewayConstructor);
-  pluginRecipientGateway = new BesuSatpGateway(recipientGatewayConstructor);
+  pluginSourceGateway = new FabricSATPGateway(sourceGatewayConstructor);
+  pluginRecipientGateway = new BesuSATPGateway(recipientGatewayConstructor);
 
   if (
     pluginSourceGateway.localRepository?.database == undefined ||
@@ -93,7 +93,7 @@ test("valid transfer initiation response", async () => {
     backupGatewaysAllowed: [],
   };
 
-  initializationResponseMessage.signature = PluginSatpGateway.bufArray2HexStr(
+  initializationResponseMessage.signature = PluginSATPGateway.bufArray2HexStr(
     await pluginRecipientGateway.sign(
       JSON.stringify(initializationResponseMessage),
     ),
@@ -140,7 +140,7 @@ test("transfer initiation response invalid because of wrong previous message has
     backupGatewaysAllowed: [],
   };
 
-  initializationResponseMessage.signature = PluginSatpGateway.bufArray2HexStr(
+  initializationResponseMessage.signature = PluginSATPGateway.bufArray2HexStr(
     await pluginSourceGateway.sign(
       JSON.stringify(initializationResponseMessage),
     ),
@@ -174,7 +174,7 @@ test("transfer initiation response invalid because it does not match transfer in
     backupGatewaysAllowed: [],
   };
 
-  initializationResponseMessage.signature = PluginSatpGateway.bufArray2HexStr(
+  initializationResponseMessage.signature = PluginSATPGateway.bufArray2HexStr(
     await pluginSourceGateway.sign(
       JSON.stringify(initializationResponseMessage),
     ),
