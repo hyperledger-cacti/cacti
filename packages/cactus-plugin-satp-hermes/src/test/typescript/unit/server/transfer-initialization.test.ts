@@ -3,23 +3,23 @@ import { SHA256 } from "crypto-js";
 import { v4 as uuidV4 } from "uuid";
 import {
   SatpMessageType,
-  PluginSatpGateway,
-} from "../../../../main/typescript/gateway/plugin-satp-gateway";
+  PluginSATPGateway,
+} from "../../../../main/typescript/plugin-satp-gateway";
 import {
   TransferInitializationV1Request,
   AssetProfile,
   SessionData,
 } from "../../../../main/typescript/public-api";
-import { BesuSatpGateway } from "../../../../main/typescript/gateway/besu-satp-gateway";
-import { FabricSatpGateway } from "../../../../main/typescript/gateway/fabric-satp-gateway";
-import { ClientGatewayHelper } from "../../../../main/typescript/gateway/client/client-helper";
-import { ServerGatewayHelper } from "../../../../main/typescript/gateway/server/server-helper";
+import { BesuSATPGateway } from "../../../../main/typescript/core/besu-satp-gateway";
+import { FabricSATPGateway } from "../../../../main/typescript/core/fabric-satp-gateway";
+import { ClientGatewayHelper } from "../../../../main/typescript/core/client-helper";
+import { ServerGatewayHelper } from "../../../../main/typescript/core/server-helper";
 
 const MAX_RETRIES = 5;
 const MAX_TIMEOUT = 5000;
 
-let pluginSourceGateway: PluginSatpGateway;
-let pluginRecipientGateway: PluginSatpGateway;
+let pluginSourceGateway: PluginSATPGateway;
+let pluginRecipientGateway: PluginSATPGateway;
 let expiryDate: string;
 let assetProfile: AssetProfile;
 let sequenceNumber: number;
@@ -41,8 +41,8 @@ beforeEach(async () => {
     serverHelper: new ServerGatewayHelper(),
   };
 
-  pluginSourceGateway = new FabricSatpGateway(sourceGatewayConstructor);
-  pluginRecipientGateway = new BesuSatpGateway(recipientGatewayConstructor);
+  pluginSourceGateway = new FabricSATPGateway(sourceGatewayConstructor);
+  pluginRecipientGateway = new BesuSATPGateway(recipientGatewayConstructor);
 
   if (
     pluginSourceGateway.localRepository?.database == undefined ||
@@ -88,7 +88,7 @@ test("valid transfer initiation request", async () => {
     sourceLedgerAssetID: "",
   };
 
-  initializationRequestMessage.signature = PluginSatpGateway.bufArray2HexStr(
+  initializationRequestMessage.signature = PluginSATPGateway.bufArray2HexStr(
     await pluginSourceGateway.sign(
       JSON.stringify(initializationRequestMessage),
     ),
@@ -156,7 +156,7 @@ test("transfer initiation request invalid because of incompatible DLTs", async (
     sourceLedgerAssetID: "",
   };
 
-  initializationRequestMessage.signature = PluginSatpGateway.bufArray2HexStr(
+  initializationRequestMessage.signature = PluginSATPGateway.bufArray2HexStr(
     await pluginSourceGateway.sign(
       JSON.stringify(initializationRequestMessage),
     ),
@@ -207,7 +207,7 @@ test("transfer initiation request invalid because of asset expired", async () =>
     sourceLedgerAssetID: "",
   };
 
-  initializationRequestMessage.signature = PluginSatpGateway.bufArray2HexStr(
+  initializationRequestMessage.signature = PluginSATPGateway.bufArray2HexStr(
     pluginSourceGateway.sign(JSON.stringify(initializationRequestMessage)),
   );
 
