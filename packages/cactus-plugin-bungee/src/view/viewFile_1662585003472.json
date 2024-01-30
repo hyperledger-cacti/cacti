@@ -1,0 +1,207 @@
+{
+  "View": {
+    "tI": "1662584992",
+    "tF": "1662584994",
+    "snapshot": {
+      "id": "fd606f9a-f3fb-478e-8e7d-e186f253752c",
+      "participant": "Org1MSP",
+      "version": 1,
+      "stateBins": [
+        {
+          "id": "ASSET0",
+          "version": 0,
+          "values": [],
+          "transactions": []
+        },
+        {
+          "id": "ASSET1",
+          "version": 1,
+          "values": [
+            "0"
+          ],
+          "transactions": [
+            {
+              "id": "6015d94565c8fe5616b22d2d92a50f6db397b925cbe406f86f91956e67d3e1ef",
+              "timeStamp": "1662584992",
+              "proofs": [
+                {
+                  "mspid": "Org1MSP",
+                  "endorserID": "-----BEGIN CERTIFICATE-----\nMIICqjCCAlCgAwIBAgIUVoESHZlmIZF85OoYJHN7jogame4wCgYIKoZIzj0EAwIw\ncDELMAkGA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMQ8wDQYDVQQH\nEwZEdXJoYW0xGTAXBgNVBAoTEG9yZzEuZXhhbXBsZS5jb20xHDAaBgNVBAMTE2Nh\nLm9yZzEuZXhhbXBsZS5jb20wHhcNMjIwOTA3MjEwMzAwWhcNMjMwOTA3MjEwODAw\nWjBbMQswCQYDVQQGEwJVUzEXMBUGA1UECBMOTm9ydGggQ2Fyb2xpbmExFDASBgNV\nBAoTC0h5cGVybGVkZ2VyMQ0wCwYDVQQLEwRwZWVyMQ4wDAYDVQQDEwVwZWVyMDBZ\nMBMGByqGSM49AgEGCCqGSM49AwEHA0IABObS6tG4AeEGgE3NQYUt+J/61d3ix/Q0\n1pRn3+eIfQTgCM8mO9mxn5Fz4Y46RnZqOZvh6LiT2sfiPbkq9U14Wkejgdwwgdkw\nDgYDVR0PAQH/BAQDAgeAMAwGA1UdEwEB/wQCMAAwHQYDVR0OBBYEFM7iTvw7Lo+H\nQGGqzZ2KwrVaRGZXMB8GA1UdIwQYMBaAFDYHrN6g4gmyT+pXKI1x5Nbs6MdsMCEG\nA1UdEQQaMBiCFnBlZXIwLm9yZzEuZXhhbXBsZS5jb20wVgYIKgMEBQYHCAEESnsi\nYXR0cnMiOnsiaGYuQWZmaWxpYXRpb24iOiIiLCJoZi5FbnJvbGxtZW50SUQiOiJw\nZWVyMCIsImhmLlR5cGUiOiJwZWVyIn19MAoGCCqGSM49BAMCA0gAMEUCIQCl48nl\nQvU7/+41EAB/4Zd+mI1UfueqGlZNiCUXWpZJKAIgdZ70uChB576Jz5HiMbgo2XXy\n9q0xW7ndJi2+mHqD3n4=\n-----END CERTIFICATE-----\n",
+                  "signature": "MEQCIBBIwpXCncKjcsOGeMK3RMOCw7d+w659w5TDt8O3OMKjwqDCgU7CkV7Cg8OTHRvCmg/DrgIgIsOPw4/Dhkc8WMOgGMOvw6XCscKVw7MnwoXDr8Kdw6/Dm2hwwpVkw6hDYSUmw5TDkEI="
+                },
+                {
+                  "mspid": "Org2MSP",
+                  "endorserID": "-----BEGIN CERTIFICATE-----\nMIICpjCCAkygAwIBAgIUV1dkjvoBEUI9mcbn3HOzLRL/Hb0wCgYIKoZIzj0EAwIw\nbDELMAkGA1UEBhMCVUsxEjAQBgNVBAgTCUhhbXBzaGlyZTEQMA4GA1UEBxMHSHVy\nc2xleTEZMBcGA1UEChMQb3JnMi5leGFtcGxlLmNvbTEcMBoGA1UEAxMTY2Eub3Jn\nMi5leGFtcGxlLmNvbTAeFw0yMjA5MDcyMTAzMDBaFw0yMzA5MDcyMTA4MDBaMFsx\nCzAJBgNVBAYTAlVTMRcwFQYDVQQIEw5Ob3J0aCBDYXJvbGluYTEUMBIGA1UEChML\nSHlwZXJsZWRnZXIxDTALBgNVBAsTBHBlZXIxDjAMBgNVBAMTBXBlZXIwMFkwEwYH\nKoZIzj0CAQYIKoZIzj0DAQcDQgAEZpwDKqgX6g/Zlv6ACpHXJw4R9HyXNva9E/A8\nVPRSDYtTpOioJKkWDmXnA8GaXRUbrOGrNoz3Llyx9AbSFz8MoaOB3DCB2TAOBgNV\nHQ8BAf8EBAMCB4AwDAYDVR0TAQH/BAIwADAdBgNVHQ4EFgQU6ZQi8//wxoFlCKZ9\nisDqdOXX1PEwHwYDVR0jBBgwFoAUE6/Xn7RDJOmWNN/UZ0zg1PU+KIMwIQYDVR0R\nBBowGIIWcGVlcjAub3JnMi5leGFtcGxlLmNvbTBWBggqAwQFBgcIAQRKeyJhdHRy\ncyI6eyJoZi5BZmZpbGlhdGlvbiI6IiIsImhmLkVucm9sbG1lbnRJRCI6InBlZXIw\nIiwiaGYuVHlwZSI6InBlZXIifX0wCgYIKoZIzj0EAwIDSAAwRQIhAPyl3dxZStgu\nej+M5D743wniIOHeszFKj1f+8uDWM3C4AiA8YnX2H2PwKYPU+1bha+2lH0vQh1ZE\nQE2AWRpk1t5ktw==\n-----END CERTIFICATE-----\n",
+                  "signature": "MEQCIA3CkMKowonDjsOJeilHw7QdeMKTXEEZDsKWwofCnyQJwrvDvMKkw6ErGU7Ci8OSwoUCICrDo8K+DMOOw4LDqsOAdlpww4xTRgzDtRvDgEvCkMOeY3c+w4Jzw5tKw5rCjMKYSg=="
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ASSET2",
+          "version": 1,
+          "values": [
+            "0"
+          ],
+          "transactions": [
+            {
+              "id": "2bcff469dbaa7ac33d1bfe6b8183482639b784d2e85bc3f679f7a50776464997",
+              "timeStamp": "1662584992",
+              "proofs": [
+                {
+                  "mspid": "Org1MSP",
+                  "endorserID": "-----BEGIN CERTIFICATE-----\nMIICqjCCAlCgAwIBAgIUVoESHZlmIZF85OoYJHN7jogame4wCgYIKoZIzj0EAwIw\ncDELMAkGA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMQ8wDQYDVQQH\nEwZEdXJoYW0xGTAXBgNVBAoTEG9yZzEuZXhhbXBsZS5jb20xHDAaBgNVBAMTE2Nh\nLm9yZzEuZXhhbXBsZS5jb20wHhcNMjIwOTA3MjEwMzAwWhcNMjMwOTA3MjEwODAw\nWjBbMQswCQYDVQQGEwJVUzEXMBUGA1UECBMOTm9ydGggQ2Fyb2xpbmExFDASBgNV\nBAoTC0h5cGVybGVkZ2VyMQ0wCwYDVQQLEwRwZWVyMQ4wDAYDVQQDEwVwZWVyMDBZ\nMBMGByqGSM49AgEGCCqGSM49AwEHA0IABObS6tG4AeEGgE3NQYUt+J/61d3ix/Q0\n1pRn3+eIfQTgCM8mO9mxn5Fz4Y46RnZqOZvh6LiT2sfiPbkq9U14Wkejgdwwgdkw\nDgYDVR0PAQH/BAQDAgeAMAwGA1UdEwEB/wQCMAAwHQYDVR0OBBYEFM7iTvw7Lo+H\nQGGqzZ2KwrVaRGZXMB8GA1UdIwQYMBaAFDYHrN6g4gmyT+pXKI1x5Nbs6MdsMCEG\nA1UdEQQaMBiCFnBlZXIwLm9yZzEuZXhhbXBsZS5jb20wVgYIKgMEBQYHCAEESnsi\nYXR0cnMiOnsiaGYuQWZmaWxpYXRpb24iOiIiLCJoZi5FbnJvbGxtZW50SUQiOiJw\nZWVyMCIsImhmLlR5cGUiOiJwZWVyIn19MAoGCCqGSM49BAMCA0gAMEUCIQCl48nl\nQvU7/+41EAB/4Zd+mI1UfueqGlZNiCUXWpZJKAIgdZ70uChB576Jz5HiMbgo2XXy\n9q0xW7ndJi2+mHqD3n4=\n-----END CERTIFICATE-----\n",
+                  "signature": "MEUCIQDDvQrCuUU6fiYvYMOFw4BqVsKcwp3DucKowrJxwqrDgMKBwpg+w6DDmcK6M8OMwoPCvsKlAiAlwpjDp8KEwrwiYErCqcKXNcOwPR3DlEg1HMKvw5rCnBxSwrjDt8Opw7jDuw4nwqwt"
+                },
+                {
+                  "mspid": "Org2MSP",
+                  "endorserID": "-----BEGIN CERTIFICATE-----\nMIICpjCCAkygAwIBAgIUV1dkjvoBEUI9mcbn3HOzLRL/Hb0wCgYIKoZIzj0EAwIw\nbDELMAkGA1UEBhMCVUsxEjAQBgNVBAgTCUhhbXBzaGlyZTEQMA4GA1UEBxMHSHVy\nc2xleTEZMBcGA1UEChMQb3JnMi5leGFtcGxlLmNvbTEcMBoGA1UEAxMTY2Eub3Jn\nMi5leGFtcGxlLmNvbTAeFw0yMjA5MDcyMTAzMDBaFw0yMzA5MDcyMTA4MDBaMFsx\nCzAJBgNVBAYTAlVTMRcwFQYDVQQIEw5Ob3J0aCBDYXJvbGluYTEUMBIGA1UEChML\nSHlwZXJsZWRnZXIxDTALBgNVBAsTBHBlZXIxDjAMBgNVBAMTBXBlZXIwMFkwEwYH\nKoZIzj0CAQYIKoZIzj0DAQcDQgAEZpwDKqgX6g/Zlv6ACpHXJw4R9HyXNva9E/A8\nVPRSDYtTpOioJKkWDmXnA8GaXRUbrOGrNoz3Llyx9AbSFz8MoaOB3DCB2TAOBgNV\nHQ8BAf8EBAMCB4AwDAYDVR0TAQH/BAIwADAdBgNVHQ4EFgQU6ZQi8//wxoFlCKZ9\nisDqdOXX1PEwHwYDVR0jBBgwFoAUE6/Xn7RDJOmWNN/UZ0zg1PU+KIMwIQYDVR0R\nBBowGIIWcGVlcjAub3JnMi5leGFtcGxlLmNvbTBWBggqAwQFBgcIAQRKeyJhdHRy\ncyI6eyJoZi5BZmZpbGlhdGlvbiI6IiIsImhmLkVucm9sbG1lbnRJRCI6InBlZXIw\nIiwiaGYuVHlwZSI6InBlZXIifX0wCgYIKoZIzj0EAwIDSAAwRQIhAPyl3dxZStgu\nej+M5D743wniIOHeszFKj1f+8uDWM3C4AiA8YnX2H2PwKYPU+1bha+2lH0vQh1ZE\nQE2AWRpk1t5ktw==\n-----END CERTIFICATE-----\n",
+                  "signature": "MEUCIQDDs8K3L8Krw6PDrknCpMOBSlxZZxjCsDEsByNFRW8vX8Kiw4PDkSjCp8OPw6kiAiAIwqPDg8ORw7w9KcKrwqIOwoglTHjDgF/CmiLCvcOcMMOPCcOjQsO7wrzDtxo5dMKZ"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ASSET3",
+          "version": 1,
+          "values": [
+            "0"
+          ],
+          "transactions": [
+            {
+              "id": "e46d37d47304753e42cf5b1ad6cb67222f20e2d7a6d8512494cb074c34255c03",
+              "timeStamp": "1662584992",
+              "proofs": [
+                {
+                  "mspid": "Org1MSP",
+                  "endorserID": "-----BEGIN CERTIFICATE-----\nMIICqjCCAlCgAwIBAgIUVoESHZlmIZF85OoYJHN7jogame4wCgYIKoZIzj0EAwIw\ncDELMAkGA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMQ8wDQYDVQQH\nEwZEdXJoYW0xGTAXBgNVBAoTEG9yZzEuZXhhbXBsZS5jb20xHDAaBgNVBAMTE2Nh\nLm9yZzEuZXhhbXBsZS5jb20wHhcNMjIwOTA3MjEwMzAwWhcNMjMwOTA3MjEwODAw\nWjBbMQswCQYDVQQGEwJVUzEXMBUGA1UECBMOTm9ydGggQ2Fyb2xpbmExFDASBgNV\nBAoTC0h5cGVybGVkZ2VyMQ0wCwYDVQQLEwRwZWVyMQ4wDAYDVQQDEwVwZWVyMDBZ\nMBMGByqGSM49AgEGCCqGSM49AwEHA0IABObS6tG4AeEGgE3NQYUt+J/61d3ix/Q0\n1pRn3+eIfQTgCM8mO9mxn5Fz4Y46RnZqOZvh6LiT2sfiPbkq9U14Wkejgdwwgdkw\nDgYDVR0PAQH/BAQDAgeAMAwGA1UdEwEB/wQCMAAwHQYDVR0OBBYEFM7iTvw7Lo+H\nQGGqzZ2KwrVaRGZXMB8GA1UdIwQYMBaAFDYHrN6g4gmyT+pXKI1x5Nbs6MdsMCEG\nA1UdEQQaMBiCFnBlZXIwLm9yZzEuZXhhbXBsZS5jb20wVgYIKgMEBQYHCAEESnsi\nYXR0cnMiOnsiaGYuQWZmaWxpYXRpb24iOiIiLCJoZi5FbnJvbGxtZW50SUQiOiJw\nZWVyMCIsImhmLlR5cGUiOiJwZWVyIn19MAoGCCqGSM49BAMCA0gAMEUCIQCl48nl\nQvU7/+41EAB/4Zd+mI1UfueqGlZNiCUXWpZJKAIgdZ70uChB576Jz5HiMbgo2XXy\n9q0xW7ndJi2+mHqD3n4=\n-----END CERTIFICATE-----\n",
+                  "signature": "MEQCICkjwqHDulzDi8OxBsKlc09Bw6gYbcOuw6A2C8OAwqnDmMKaAAHDnBRfw79eHUwCIAzCrVvDvsK4Nl3CiMKsCsKNwoxXfALCmsK+NDDCvsKQw4FHw6Q8w5zDvC4KNFJb"
+                },
+                {
+                  "mspid": "Org2MSP",
+                  "endorserID": "-----BEGIN CERTIFICATE-----\nMIICpjCCAkygAwIBAgIUV1dkjvoBEUI9mcbn3HOzLRL/Hb0wCgYIKoZIzj0EAwIw\nbDELMAkGA1UEBhMCVUsxEjAQBgNVBAgTCUhhbXBzaGlyZTEQMA4GA1UEBxMHSHVy\nc2xleTEZMBcGA1UEChMQb3JnMi5leGFtcGxlLmNvbTEcMBoGA1UEAxMTY2Eub3Jn\nMi5leGFtcGxlLmNvbTAeFw0yMjA5MDcyMTAzMDBaFw0yMzA5MDcyMTA4MDBaMFsx\nCzAJBgNVBAYTAlVTMRcwFQYDVQQIEw5Ob3J0aCBDYXJvbGluYTEUMBIGA1UEChML\nSHlwZXJsZWRnZXIxDTALBgNVBAsTBHBlZXIxDjAMBgNVBAMTBXBlZXIwMFkwEwYH\nKoZIzj0CAQYIKoZIzj0DAQcDQgAEZpwDKqgX6g/Zlv6ACpHXJw4R9HyXNva9E/A8\nVPRSDYtTpOioJKkWDmXnA8GaXRUbrOGrNoz3Llyx9AbSFz8MoaOB3DCB2TAOBgNV\nHQ8BAf8EBAMCB4AwDAYDVR0TAQH/BAIwADAdBgNVHQ4EFgQU6ZQi8//wxoFlCKZ9\nisDqdOXX1PEwHwYDVR0jBBgwFoAUE6/Xn7RDJOmWNN/UZ0zg1PU+KIMwIQYDVR0R\nBBowGIIWcGVlcjAub3JnMi5leGFtcGxlLmNvbTBWBggqAwQFBgcIAQRKeyJhdHRy\ncyI6eyJoZi5BZmZpbGlhdGlvbiI6IiIsImhmLkVucm9sbG1lbnRJRCI6InBlZXIw\nIiwiaGYuVHlwZSI6InBlZXIifX0wCgYIKoZIzj0EAwIDSAAwRQIhAPyl3dxZStgu\nej+M5D743wniIOHeszFKj1f+8uDWM3C4AiA8YnX2H2PwKYPU+1bha+2lH0vQh1ZE\nQE2AWRpk1t5ktw==\n-----END CERTIFICATE-----\n",
+                  "signature": "MEUCIQDCpcO4wo5RWRR5w5t6ViQJwqwGw7LCn8Kiwqddw7ovRMOgwoXCr1nCgWUKw7zDiGcCIFXCikkWwpcMw5bDkMOIwo7CqnjCnBR5w7Vtw6jCnMKPLB/Cl2LDpEfCo8Kyw7g3HwU="
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ASSET4",
+          "version": 0,
+          "values": [],
+          "transactions": []
+        },
+        {
+          "id": "ASSET5",
+          "version": 0,
+          "values": [],
+          "transactions": []
+        },
+        {
+          "id": "ASSET6",
+          "version": 1,
+          "values": [
+            "0"
+          ],
+          "transactions": [
+            {
+              "id": "cc90fdf215148e2d08ec272737bc88a0fea4366cce0af94e236d9c37faf6ca29",
+              "timeStamp": "1662584993",
+              "proofs": [
+                {
+                  "mspid": "Org1MSP",
+                  "endorserID": "-----BEGIN CERTIFICATE-----\nMIICqjCCAlCgAwIBAgIUVoESHZlmIZF85OoYJHN7jogame4wCgYIKoZIzj0EAwIw\ncDELMAkGA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMQ8wDQYDVQQH\nEwZEdXJoYW0xGTAXBgNVBAoTEG9yZzEuZXhhbXBsZS5jb20xHDAaBgNVBAMTE2Nh\nLm9yZzEuZXhhbXBsZS5jb20wHhcNMjIwOTA3MjEwMzAwWhcNMjMwOTA3MjEwODAw\nWjBbMQswCQYDVQQGEwJVUzEXMBUGA1UECBMOTm9ydGggQ2Fyb2xpbmExFDASBgNV\nBAoTC0h5cGVybGVkZ2VyMQ0wCwYDVQQLEwRwZWVyMQ4wDAYDVQQDEwVwZWVyMDBZ\nMBMGByqGSM49AgEGCCqGSM49AwEHA0IABObS6tG4AeEGgE3NQYUt+J/61d3ix/Q0\n1pRn3+eIfQTgCM8mO9mxn5Fz4Y46RnZqOZvh6LiT2sfiPbkq9U14Wkejgdwwgdkw\nDgYDVR0PAQH/BAQDAgeAMAwGA1UdEwEB/wQCMAAwHQYDVR0OBBYEFM7iTvw7Lo+H\nQGGqzZ2KwrVaRGZXMB8GA1UdIwQYMBaAFDYHrN6g4gmyT+pXKI1x5Nbs6MdsMCEG\nA1UdEQQaMBiCFnBlZXIwLm9yZzEuZXhhbXBsZS5jb20wVgYIKgMEBQYHCAEESnsi\nYXR0cnMiOnsiaGYuQWZmaWxpYXRpb24iOiIiLCJoZi5FbnJvbGxtZW50SUQiOiJw\nZWVyMCIsImhmLlR5cGUiOiJwZWVyIn19MAoGCCqGSM49BAMCA0gAMEUCIQCl48nl\nQvU7/+41EAB/4Zd+mI1UfueqGlZNiCUXWpZJKAIgdZ70uChB576Jz5HiMbgo2XXy\n9q0xW7ndJi2+mHqD3n4=\n-----END CERTIFICATE-----\n",
+                  "signature": "MEQCIHB/w6/DpFjChMKuw7zCpVfDgUtcQ8Kqw6AJwofChWPClzPDlsOUw65uLljDqMKhfAYCICd9wpnCl8K3wppyw5YowqU0TMK7O1nCoMKywrdmwrDDvnzDnwtfBzN0wr5xw5wQ"
+                },
+                {
+                  "mspid": "Org2MSP",
+                  "endorserID": "-----BEGIN CERTIFICATE-----\nMIICpjCCAkygAwIBAgIUV1dkjvoBEUI9mcbn3HOzLRL/Hb0wCgYIKoZIzj0EAwIw\nbDELMAkGA1UEBhMCVUsxEjAQBgNVBAgTCUhhbXBzaGlyZTEQMA4GA1UEBxMHSHVy\nc2xleTEZMBcGA1UEChMQb3JnMi5leGFtcGxlLmNvbTEcMBoGA1UEAxMTY2Eub3Jn\nMi5leGFtcGxlLmNvbTAeFw0yMjA5MDcyMTAzMDBaFw0yMzA5MDcyMTA4MDBaMFsx\nCzAJBgNVBAYTAlVTMRcwFQYDVQQIEw5Ob3J0aCBDYXJvbGluYTEUMBIGA1UEChML\nSHlwZXJsZWRnZXIxDTALBgNVBAsTBHBlZXIxDjAMBgNVBAMTBXBlZXIwMFkwEwYH\nKoZIzj0CAQYIKoZIzj0DAQcDQgAEZpwDKqgX6g/Zlv6ACpHXJw4R9HyXNva9E/A8\nVPRSDYtTpOioJKkWDmXnA8GaXRUbrOGrNoz3Llyx9AbSFz8MoaOB3DCB2TAOBgNV\nHQ8BAf8EBAMCB4AwDAYDVR0TAQH/BAIwADAdBgNVHQ4EFgQU6ZQi8//wxoFlCKZ9\nisDqdOXX1PEwHwYDVR0jBBgwFoAUE6/Xn7RDJOmWNN/UZ0zg1PU+KIMwIQYDVR0R\nBBowGIIWcGVlcjAub3JnMi5leGFtcGxlLmNvbTBWBggqAwQFBgcIAQRKeyJhdHRy\ncyI6eyJoZi5BZmZpbGlhdGlvbiI6IiIsImhmLkVucm9sbG1lbnRJRCI6InBlZXIw\nIiwiaGYuVHlwZSI6InBlZXIifX0wCgYIKoZIzj0EAwIDSAAwRQIhAPyl3dxZStgu\nej+M5D743wniIOHeszFKj1f+8uDWM3C4AiA8YnX2H2PwKYPU+1bha+2lH0vQh1ZE\nQE2AWRpk1t5ktw==\n-----END CERTIFICATE-----\n",
+                  "signature": "MEUCIQDCnWDCtcOycRoUbMK6w5U0wqpGTx7CjcKLLsKNwpwjw596wpLCpmQaADrCmTjDqAIgeCdSJWYZdlbCgcOgDMOHLQ/DngN8wpcYHhFywo9oRMKwwrfDg2VGwp7Drg=="
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ASSET7",
+          "version": 1,
+          "values": [
+            "0"
+          ],
+          "transactions": [
+            {
+              "id": "1a980495b592309dd6c1a7797e378e2bd4e9fd8d7bac99124dc94670b17be15a",
+              "timeStamp": "1662584993",
+              "proofs": [
+                {
+                  "mspid": "Org1MSP",
+                  "endorserID": "-----BEGIN CERTIFICATE-----\nMIICqjCCAlCgAwIBAgIUVoESHZlmIZF85OoYJHN7jogame4wCgYIKoZIzj0EAwIw\ncDELMAkGA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMQ8wDQYDVQQH\nEwZEdXJoYW0xGTAXBgNVBAoTEG9yZzEuZXhhbXBsZS5jb20xHDAaBgNVBAMTE2Nh\nLm9yZzEuZXhhbXBsZS5jb20wHhcNMjIwOTA3MjEwMzAwWhcNMjMwOTA3MjEwODAw\nWjBbMQswCQYDVQQGEwJVUzEXMBUGA1UECBMOTm9ydGggQ2Fyb2xpbmExFDASBgNV\nBAoTC0h5cGVybGVkZ2VyMQ0wCwYDVQQLEwRwZWVyMQ4wDAYDVQQDEwVwZWVyMDBZ\nMBMGByqGSM49AgEGCCqGSM49AwEHA0IABObS6tG4AeEGgE3NQYUt+J/61d3ix/Q0\n1pRn3+eIfQTgCM8mO9mxn5Fz4Y46RnZqOZvh6LiT2sfiPbkq9U14Wkejgdwwgdkw\nDgYDVR0PAQH/BAQDAgeAMAwGA1UdEwEB/wQCMAAwHQYDVR0OBBYEFM7iTvw7Lo+H\nQGGqzZ2KwrVaRGZXMB8GA1UdIwQYMBaAFDYHrN6g4gmyT+pXKI1x5Nbs6MdsMCEG\nA1UdEQQaMBiCFnBlZXIwLm9yZzEuZXhhbXBsZS5jb20wVgYIKgMEBQYHCAEESnsi\nYXR0cnMiOnsiaGYuQWZmaWxpYXRpb24iOiIiLCJoZi5FbnJvbGxtZW50SUQiOiJw\nZWVyMCIsImhmLlR5cGUiOiJwZWVyIn19MAoGCCqGSM49BAMCA0gAMEUCIQCl48nl\nQvU7/+41EAB/4Zd+mI1UfueqGlZNiCUXWpZJKAIgdZ70uChB576Jz5HiMbgo2XXy\n9q0xW7ndJi2+mHqD3n4=\n-----END CERTIFICATE-----\n",
+                  "signature": "MEQCIH1cDEvCpsKGPsODaQLDv8KOwrslL23Ct8Kqw77DnsO7w7wXw5ULKnrDv8Kjw73DrwYCICzDscKOOsKdw7gXQMKmUgbDuMKUJUdIw57DsQpmTDDDijVDwqZ7w4rDpsK3wq5E"
+                },
+                {
+                  "mspid": "Org2MSP",
+                  "endorserID": "-----BEGIN CERTIFICATE-----\nMIICpjCCAkygAwIBAgIUV1dkjvoBEUI9mcbn3HOzLRL/Hb0wCgYIKoZIzj0EAwIw\nbDELMAkGA1UEBhMCVUsxEjAQBgNVBAgTCUhhbXBzaGlyZTEQMA4GA1UEBxMHSHVy\nc2xleTEZMBcGA1UEChMQb3JnMi5leGFtcGxlLmNvbTEcMBoGA1UEAxMTY2Eub3Jn\nMi5leGFtcGxlLmNvbTAeFw0yMjA5MDcyMTAzMDBaFw0yMzA5MDcyMTA4MDBaMFsx\nCzAJBgNVBAYTAlVTMRcwFQYDVQQIEw5Ob3J0aCBDYXJvbGluYTEUMBIGA1UEChML\nSHlwZXJsZWRnZXIxDTALBgNVBAsTBHBlZXIxDjAMBgNVBAMTBXBlZXIwMFkwEwYH\nKoZIzj0CAQYIKoZIzj0DAQcDQgAEZpwDKqgX6g/Zlv6ACpHXJw4R9HyXNva9E/A8\nVPRSDYtTpOioJKkWDmXnA8GaXRUbrOGrNoz3Llyx9AbSFz8MoaOB3DCB2TAOBgNV\nHQ8BAf8EBAMCB4AwDAYDVR0TAQH/BAIwADAdBgNVHQ4EFgQU6ZQi8//wxoFlCKZ9\nisDqdOXX1PEwHwYDVR0jBBgwFoAUE6/Xn7RDJOmWNN/UZ0zg1PU+KIMwIQYDVR0R\nBBowGIIWcGVlcjAub3JnMi5leGFtcGxlLmNvbTBWBggqAwQFBgcIAQRKeyJhdHRy\ncyI6eyJoZi5BZmZpbGlhdGlvbiI6IiIsImhmLkVucm9sbG1lbnRJRCI6InBlZXIw\nIiwiaGYuVHlwZSI6InBlZXIifX0wCgYIKoZIzj0EAwIDSAAwRQIhAPyl3dxZStgu\nej+M5D743wniIOHeszFKj1f+8uDWM3C4AiA8YnX2H2PwKYPU+1bha+2lH0vQh1ZE\nQE2AWRpk1t5ktw==\n-----END CERTIFICATE-----\n",
+                  "signature": "MEUCIQDDk2nDvcK+wrEtw4jCngHCu8KSGsK2R8KMJkcrwrHCmG8Nb8OCw7HCvXPDisOjwosbPwIgXsOqA8OuX8KBw6V2w7RHSGNAU8K4w5lMLcO+A1M2Y8OnwrzDqcOoXi/CjEA4"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ASSET8",
+          "version": 1,
+          "values": [
+            "0"
+          ],
+          "transactions": [
+            {
+              "id": "a7f0799a33d8326e36810fa919ba2116c8896a0aed9eaae316e30fa0b062295f",
+              "timeStamp": "1662584994",
+              "proofs": [
+                {
+                  "mspid": "Org1MSP",
+                  "endorserID": "-----BEGIN CERTIFICATE-----\nMIICqjCCAlCgAwIBAgIUVoESHZlmIZF85OoYJHN7jogame4wCgYIKoZIzj0EAwIw\ncDELMAkGA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMQ8wDQYDVQQH\nEwZEdXJoYW0xGTAXBgNVBAoTEG9yZzEuZXhhbXBsZS5jb20xHDAaBgNVBAMTE2Nh\nLm9yZzEuZXhhbXBsZS5jb20wHhcNMjIwOTA3MjEwMzAwWhcNMjMwOTA3MjEwODAw\nWjBbMQswCQYDVQQGEwJVUzEXMBUGA1UECBMOTm9ydGggQ2Fyb2xpbmExFDASBgNV\nBAoTC0h5cGVybGVkZ2VyMQ0wCwYDVQQLEwRwZWVyMQ4wDAYDVQQDEwVwZWVyMDBZ\nMBMGByqGSM49AgEGCCqGSM49AwEHA0IABObS6tG4AeEGgE3NQYUt+J/61d3ix/Q0\n1pRn3+eIfQTgCM8mO9mxn5Fz4Y46RnZqOZvh6LiT2sfiPbkq9U14Wkejgdwwgdkw\nDgYDVR0PAQH/BAQDAgeAMAwGA1UdEwEB/wQCMAAwHQYDVR0OBBYEFM7iTvw7Lo+H\nQGGqzZ2KwrVaRGZXMB8GA1UdIwQYMBaAFDYHrN6g4gmyT+pXKI1x5Nbs6MdsMCEG\nA1UdEQQaMBiCFnBlZXIwLm9yZzEuZXhhbXBsZS5jb20wVgYIKgMEBQYHCAEESnsi\nYXR0cnMiOnsiaGYuQWZmaWxpYXRpb24iOiIiLCJoZi5FbnJvbGxtZW50SUQiOiJw\nZWVyMCIsImhmLlR5cGUiOiJwZWVyIn19MAoGCCqGSM49BAMCA0gAMEUCIQCl48nl\nQvU7/+41EAB/4Zd+mI1UfueqGlZNiCUXWpZJKAIgdZ70uChB576Jz5HiMbgo2XXy\n9q0xW7ndJi2+mHqD3n4=\n-----END CERTIFICATE-----\n",
+                  "signature": "MEQCIHvDrWU4woI8worCjMO5ASl9A8OUw41PwoTDrG7CjSXCo8K+w6bCiz9ww71IKcKqwroCIGjDgcOIwrHDncKKwozDsw7CpyhdSMKfJ04XXsKywqXCun3CnyQsw7DCh8KlC8Oywp7DjA=="
+                },
+                {
+                  "mspid": "Org2MSP",
+                  "endorserID": "-----BEGIN CERTIFICATE-----\nMIICpjCCAkygAwIBAgIUV1dkjvoBEUI9mcbn3HOzLRL/Hb0wCgYIKoZIzj0EAwIw\nbDELMAkGA1UEBhMCVUsxEjAQBgNVBAgTCUhhbXBzaGlyZTEQMA4GA1UEBxMHSHVy\nc2xleTEZMBcGA1UEChMQb3JnMi5leGFtcGxlLmNvbTEcMBoGA1UEAxMTY2Eub3Jn\nMi5leGFtcGxlLmNvbTAeFw0yMjA5MDcyMTAzMDBaFw0yMzA5MDcyMTA4MDBaMFsx\nCzAJBgNVBAYTAlVTMRcwFQYDVQQIEw5Ob3J0aCBDYXJvbGluYTEUMBIGA1UEChML\nSHlwZXJsZWRnZXIxDTALBgNVBAsTBHBlZXIxDjAMBgNVBAMTBXBlZXIwMFkwEwYH\nKoZIzj0CAQYIKoZIzj0DAQcDQgAEZpwDKqgX6g/Zlv6ACpHXJw4R9HyXNva9E/A8\nVPRSDYtTpOioJKkWDmXnA8GaXRUbrOGrNoz3Llyx9AbSFz8MoaOB3DCB2TAOBgNV\nHQ8BAf8EBAMCB4AwDAYDVR0TAQH/BAIwADAdBgNVHQ4EFgQU6ZQi8//wxoFlCKZ9\nisDqdOXX1PEwHwYDVR0jBBgwFoAUE6/Xn7RDJOmWNN/UZ0zg1PU+KIMwIQYDVR0R\nBBowGIIWcGVlcjAub3JnMi5leGFtcGxlLmNvbTBWBggqAwQFBgcIAQRKeyJhdHRy\ncyI6eyJoZi5BZmZpbGlhdGlvbiI6IiIsImhmLkVucm9sbG1lbnRJRCI6InBlZXIw\nIiwiaGYuVHlwZSI6InBlZXIifX0wCgYIKoZIzj0EAwIDSAAwRQIhAPyl3dxZStgu\nej+M5D743wniIOHeszFKj1f+8uDWM3C4AiA8YnX2H2PwKYPU+1bha+2lH0vQh1ZE\nQE2AWRpk1t5ktw==\n-----END CERTIFICATE-----\n",
+                  "signature": "MEQCIHg6wqlHZXgOCMOtAE0Cw5fDuMKeIsKvwq45BMKKwoLChsKOw4h4w5wfw7/DrG4uAiB1wqRcwo4zwph5WCfDmBvDnsORw65sw580YMKfwpvDhkfDn8KHwq9WCMKhWB3Di8Oh"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ASSET9",
+          "version": 1,
+          "values": [
+            "0"
+          ],
+          "transactions": [
+            {
+              "id": "1236548337734204de8d415c64a075f61f66d1bb6adf0934eccac59f57c4453e",
+              "timeStamp": "1662584994",
+              "proofs": [
+                {
+                  "mspid": "Org1MSP",
+                  "endorserID": "-----BEGIN CERTIFICATE-----\nMIICqjCCAlCgAwIBAgIUVoESHZlmIZF85OoYJHN7jogame4wCgYIKoZIzj0EAwIw\ncDELMAkGA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMQ8wDQYDVQQH\nEwZEdXJoYW0xGTAXBgNVBAoTEG9yZzEuZXhhbXBsZS5jb20xHDAaBgNVBAMTE2Nh\nLm9yZzEuZXhhbXBsZS5jb20wHhcNMjIwOTA3MjEwMzAwWhcNMjMwOTA3MjEwODAw\nWjBbMQswCQYDVQQGEwJVUzEXMBUGA1UECBMOTm9ydGggQ2Fyb2xpbmExFDASBgNV\nBAoTC0h5cGVybGVkZ2VyMQ0wCwYDVQQLEwRwZWVyMQ4wDAYDVQQDEwVwZWVyMDBZ\nMBMGByqGSM49AgEGCCqGSM49AwEHA0IABObS6tG4AeEGgE3NQYUt+J/61d3ix/Q0\n1pRn3+eIfQTgCM8mO9mxn5Fz4Y46RnZqOZvh6LiT2sfiPbkq9U14Wkejgdwwgdkw\nDgYDVR0PAQH/BAQDAgeAMAwGA1UdEwEB/wQCMAAwHQYDVR0OBBYEFM7iTvw7Lo+H\nQGGqzZ2KwrVaRGZXMB8GA1UdIwQYMBaAFDYHrN6g4gmyT+pXKI1x5Nbs6MdsMCEG\nA1UdEQQaMBiCFnBlZXIwLm9yZzEuZXhhbXBsZS5jb20wVgYIKgMEBQYHCAEESnsi\nYXR0cnMiOnsiaGYuQWZmaWxpYXRpb24iOiIiLCJoZi5FbnJvbGxtZW50SUQiOiJw\nZWVyMCIsImhmLlR5cGUiOiJwZWVyIn19MAoGCCqGSM49BAMCA0gAMEUCIQCl48nl\nQvU7/+41EAB/4Zd+mI1UfueqGlZNiCUXWpZJKAIgdZ70uChB576Jz5HiMbgo2XXy\n9q0xW7ndJi2+mHqD3n4=\n-----END CERTIFICATE-----\n",
+                  "signature": "MEUCIQDDr8K9w4bCkhvDjsO1D8OpP8KLZcONwrPDgsKLwobCoMK7Vh/CiMKcw5zDncO6w4HCpx0QCMOQAiB8w6vDlD3DqsOFK8KoIMORW1h+PcKRQcOLw5fDqzgAYlfDnMOiw7vCvcKUWTzDmMKe"
+                },
+                {
+                  "mspid": "Org2MSP",
+                  "endorserID": "-----BEGIN CERTIFICATE-----\nMIICpjCCAkygAwIBAgIUV1dkjvoBEUI9mcbn3HOzLRL/Hb0wCgYIKoZIzj0EAwIw\nbDELMAkGA1UEBhMCVUsxEjAQBgNVBAgTCUhhbXBzaGlyZTEQMA4GA1UEBxMHSHVy\nc2xleTEZMBcGA1UEChMQb3JnMi5leGFtcGxlLmNvbTEcMBoGA1UEAxMTY2Eub3Jn\nMi5leGFtcGxlLmNvbTAeFw0yMjA5MDcyMTAzMDBaFw0yMzA5MDcyMTA4MDBaMFsx\nCzAJBgNVBAYTAlVTMRcwFQYDVQQIEw5Ob3J0aCBDYXJvbGluYTEUMBIGA1UEChML\nSHlwZXJsZWRnZXIxDTALBgNVBAsTBHBlZXIxDjAMBgNVBAMTBXBlZXIwMFkwEwYH\nKoZIzj0CAQYIKoZIzj0DAQcDQgAEZpwDKqgX6g/Zlv6ACpHXJw4R9HyXNva9E/A8\nVPRSDYtTpOioJKkWDmXnA8GaXRUbrOGrNoz3Llyx9AbSFz8MoaOB3DCB2TAOBgNV\nHQ8BAf8EBAMCB4AwDAYDVR0TAQH/BAIwADAdBgNVHQ4EFgQU6ZQi8//wxoFlCKZ9\nisDqdOXX1PEwHwYDVR0jBBgwFoAUE6/Xn7RDJOmWNN/UZ0zg1PU+KIMwIQYDVR0R\nBBowGIIWcGVlcjAub3JnMi5leGFtcGxlLmNvbTBWBggqAwQFBgcIAQRKeyJhdHRy\ncyI6eyJoZi5BZmZpbGlhdGlvbiI6IiIsImhmLkVucm9sbG1lbnRJRCI6InBlZXIw\nIiwiaGYuVHlwZSI6InBlZXIifX0wCgYIKoZIzj0EAwIDSAAwRQIhAPyl3dxZStgu\nej+M5D743wniIOHeszFKj1f+8uDWM3C4AiA8YnX2H2PwKYPU+1bha+2lH0vQh1ZE\nQE2AWRpk1t5ktw==\n-----END CERTIFICATE-----\n",
+                  "signature": "MEUCIQDCisKDwpgOw51adHdWw5NGwo3Cpg3CskYQQRDCncOLMR5Ww7tcacKlwqnCucO/RQIgZcOBHsKjw6/CtVfDswIBw6zCq1XDkh9eb04bw5B1C8OZw7PDrsOdGibDqsOCw4fCjQ=="
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "Signature": "N3mD4Gatv1m16DJHSLKN1DB2wi3fQ//UupDsvNjeQriYnq2OBuR+vFARoM+ZLFgoyKPvrwcFNb37Vb8kBPDaWOCPbBQY90DAAnuos1fCdyDvwD3btWeLOxZ1GIwquNW7uCoaV2Mf/0vDLUlHbMCVShYj1/9Om/Y1f2YfePUAAdAfT+WNYOCzcisgUGFjSwyAM+v1YjxzTXdFjvKgWLTdwBrZEGyXaCgmqL84WER5aN+JxXUOo6klXMVbwQl1RPgFQetp/Qs6J3Z5A9wKgwWr1sqZOxTcYgC4/JuB9r6UYEltBrn1+F0RVQqDZzSFdnQV0C7hvrTdPpf2h/DuFTKRJp5JBRGRiicBFwhLAwNKVMmKsV2H4NBbonjtTLNK++7DA/tENKJQh5kiq18Wm6vNGexY4f6HZKBnzpDQASyLhXfNAJlgSg4M0ceNWSiIlARBrxV55xnSpBy8K3g9e0j9rmRlTA7kNj3S1hJ186jQWrCssTLVUUhU5pI/1eWYerFpZC7T9kJHcJ00o1pUT9L7wRdg+Bv9oBj8jMW5ZxZsC5+sOKGftjsBPAGC8XlTG1m/Huv19LQbDRSQvX8BZhlfZbigkB8E77sdtfKUdUGW+Jk/N2pBQGhTohttWfD5VYsYT1v5SnMC48ATpxkdaLHQi7lvKAmIEUhDVNH40QHfaiI="
+}

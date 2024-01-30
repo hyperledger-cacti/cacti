@@ -1,0 +1,19 @@
+{
+  "tIgetAllAssetsKey": 676916.3033309989,
+  "tFgetAllAssetsKey": 678638.7855750024,
+  "tIgetAllTxByKey": 842997.5304520018,
+  "tFgetAllTxByKey": 844710.8069510013,
+  "tIfabricGetTxReceiptByTxIDV1": 859515.8936589994,
+  "numberOfTransactions": 100,
+  "tFfabricGetTxReceiptByTxIDV1": 861157.3159720004,
+  "tIgenerateLedgerStates": 676915.3176660016,
+  "tFgenerateLedgerStates": 861338.2410399988,
+  "tIgenerateSnapshot": 861339.1607629992,
+  "tFgenerateSnapshot": 861339.2764950022,
+  "tIgenerateView": 861340.0791519992,
+  "tFgenerateView": 861459.1003339998,
+  "tItotalTime": 12340.61959400028,
+  "tFtotalTime": 861555.6978779994,
+  "tItransactionsTime": 200109.30410899967,
+  "tFtransactionsTime": 676907.3711050004
+}
