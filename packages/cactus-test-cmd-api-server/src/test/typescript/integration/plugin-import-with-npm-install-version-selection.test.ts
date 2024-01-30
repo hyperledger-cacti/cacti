@@ -1,6 +1,8 @@
 import path from "path";
 import test, { Test } from "tape-promise/tape";
 import { v4 as uuidv4 } from "uuid";
+import { readFile } from "fs/promises";
+
 import { LogLevelDesc } from "@hyperledger/cactus-common";
 import {
   PluginImportAction,
@@ -67,7 +69,9 @@ test("can install plugins at runtime with specified version based on imports", a
     `${apiServerOptions.plugins[0].packageName}`,
     "package.json",
   );
-  const { version } = await import(packageFilePath);
+  const pkgJsonStr = await readFile(packageFilePath, "utf-8");
+  const { version } = JSON.parse(pkgJsonStr);
+
   t.strictEquals(
     version,
     apiServerOptions.plugins[0].options.version,

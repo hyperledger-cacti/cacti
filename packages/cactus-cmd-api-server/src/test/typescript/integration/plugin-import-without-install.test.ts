@@ -13,6 +13,7 @@ import {
 } from "../../../main/typescript/public-api";
 import lmify from "lmify";
 import fs from "fs-extra";
+import { readFile } from "fs/promises";
 
 const logLevel: LogLevelDesc = "TRACE";
 
@@ -143,7 +144,8 @@ test("can instantiate plugins at runtime without install them", async (t: Test) 
       "package.json",
     );
 
-    const { version } = await import(packageFilePath);
+    const pkgJsonStr = await readFile(packageFilePath, "utf-8");
+    const { version } = JSON.parse(pkgJsonStr);
 
     t2.strictEquals(
       version,
@@ -219,7 +221,8 @@ test("can instantiate plugins at runtime without install them", async (t: Test) 
       "package.json",
     );
 
-    const { version } = await import(packageFilePath);
+    const pkgJsonStr = await readFile(packageFilePath, "utf-8");
+    const { version } = JSON.parse(pkgJsonStr);
 
     t2.strictEquals(
       version,
