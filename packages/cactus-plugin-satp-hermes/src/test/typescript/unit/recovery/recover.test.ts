@@ -1,16 +1,16 @@
 import "jest-extended";
 import { Secp256k1Keys } from "@hyperledger/cactus-common";
 import { v4 as uuidV4 } from "uuid";
-import { PluginSatpGateway } from "../../../../main/typescript/gateway/plugin-satp-gateway";
+import { PluginSATPGateway } from "../../../../main/typescript/plugin-satp-gateway";
 
 import { RecoverV1Message } from "../../../../main/typescript/public-api";
 import { randomInt } from "crypto";
-import { checkValidRecoverMessage } from "../../../../main/typescript/gateway/recovery/recover";
+import { checkValidRecoverMessage } from "../../../../main/typescript/recovery/recover";
 
-import { BesuSatpGateway } from "../../../../main/typescript/gateway/besu-satp-gateway";
-import { FabricSatpGateway } from "../../../../main/typescript/gateway/fabric-satp-gateway";
-import { ClientGatewayHelper } from "../../../../main/typescript/gateway/client/client-helper";
-import { ServerGatewayHelper } from "../../../../main/typescript/gateway/server/server-helper";
+import { BesuSATPGateway } from "../../../../main/typescript/core/besu-satp-gateway";
+import { FabricSATPGateway } from "../../../../main/typescript/core/fabric-satp-gateway";
+import { ClientGatewayHelper } from "../../../../main/typescript/core/client-helper";
+import { ServerGatewayHelper } from "../../../../main/typescript/core/server-helper";
 
 import {
   knexClientConnection,
@@ -18,8 +18,8 @@ import {
   knexServerConnection,
 } from "../../knex.config";
 
-let pluginSourceGateway: PluginSatpGateway;
-let pluginRecipientGateway: PluginSatpGateway;
+let pluginSourceGateway: PluginSATPGateway;
+let pluginRecipientGateway: PluginSATPGateway;
 let sessionID: string;
 
 let sequenceNumber: number;
@@ -49,8 +49,8 @@ beforeEach(async () => {
     knexRemoteConfig: knexRemoteConnection,
   };
 
-  pluginSourceGateway = new FabricSatpGateway(sourceGatewayConstructor);
-  pluginRecipientGateway = new BesuSatpGateway(recipientGatewayConstructor);
+  pluginSourceGateway = new FabricSATPGateway(sourceGatewayConstructor);
+  pluginRecipientGateway = new BesuSATPGateway(recipientGatewayConstructor);
 
   const sessionData = {
     lastSequenceNumber: sequenceNumber,
@@ -90,7 +90,7 @@ test("valid recover message request from client", async () => {
     newBasePath: "",
   };
 
-  recoverMessage.signature = PluginSatpGateway.bufArray2HexStr(
+  recoverMessage.signature = PluginSATPGateway.bufArray2HexStr(
     pluginSourceGateway.sign(JSON.stringify(recoverMessage)),
   );
 
@@ -108,7 +108,7 @@ test("valid recover message request from server", async () => {
     newBasePath: "",
   };
 
-  recoverMessage.signature = PluginSatpGateway.bufArray2HexStr(
+  recoverMessage.signature = PluginSATPGateway.bufArray2HexStr(
     pluginRecipientGateway.sign(JSON.stringify(recoverMessage)),
   );
 
@@ -130,7 +130,7 @@ test("recover message request from client with wrong signature", async () => {
     newBasePath: "",
   };
 
-  recoverMessage.signature = PluginSatpGateway.bufArray2HexStr(
+  recoverMessage.signature = PluginSATPGateway.bufArray2HexStr(
     pluginRecipientGateway.sign(JSON.stringify("wrongRecoverMessage")),
   );
 

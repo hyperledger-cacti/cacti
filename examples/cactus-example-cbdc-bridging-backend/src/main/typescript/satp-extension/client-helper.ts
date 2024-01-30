@@ -1,17 +1,17 @@
 import { SHA256 } from "crypto-js";
 import {
-  PluginSatpGateway,
+  PluginSATPGateway,
   TransferInitializationV1Request,
   ClientGatewayHelper,
 } from "@hyperledger/cactus-plugin-satp-hermes";
 import { SatpMessageType } from "@hyperledger/cactus-plugin-satp-hermes";
-import { FabricSatpGateway } from "./fabric-satp-gateway";
-import { BesuSatpGateway } from "./besu-satp-gateway";
+import { FabricSATPGateway } from "./fabric-satp-gateway";
+import { BesuSATPGateway } from "./besu-satp-gateway";
 
 export class ClientHelper extends ClientGatewayHelper {
   async sendTransferInitializationRequest(
     sessionID: string,
-    gateway: PluginSatpGateway,
+    gateway: PluginSATPGateway,
     remote: boolean,
   ): Promise<void | TransferInitializationV1Request> {
     const fnTag = `${this.className}#sendTransferInitializationRequest()`;
@@ -82,7 +82,7 @@ export class ClientHelper extends ClientGatewayHelper {
       sourceLedgerAssetID: sessionData.sourceLedgerAssetID,
     };
 
-    const messageSignature = PluginSatpGateway.bufArray2HexStr(
+    const messageSignature = PluginSATPGateway.bufArray2HexStr(
       gateway.sign(JSON.stringify(initializationRequestMessage)),
     );
 
@@ -103,7 +103,7 @@ export class ClientHelper extends ClientGatewayHelper {
       data: JSON.stringify(sessionData),
     });
 
-    if (gateway instanceof FabricSatpGateway) {
+    if (gateway instanceof FabricSATPGateway) {
       await gateway
         .isValidBridgeOutCBDC(
           sessionData.sourceLedgerAssetID,
@@ -114,7 +114,7 @@ export class ClientHelper extends ClientGatewayHelper {
         .catch((err) => {
           throw new Error(`${err.response.data.error}`);
         });
-    } else if (gateway instanceof BesuSatpGateway) {
+    } else if (gateway instanceof BesuSATPGateway) {
       await gateway
         .isValidBridgeBackCBDC(
           sessionData.sourceLedgerAssetID,
@@ -134,7 +134,7 @@ export class ClientHelper extends ClientGatewayHelper {
 
     await gateway.makeRequest(
       sessionID,
-      PluginSatpGateway.getSatpAPI(
+      PluginSATPGateway.getSatpAPI(
         sessionData.recipientBasePath,
       ).phase1TransferInitiationRequestV1(initializationRequestMessage),
       "TransferInitializationRequest",
