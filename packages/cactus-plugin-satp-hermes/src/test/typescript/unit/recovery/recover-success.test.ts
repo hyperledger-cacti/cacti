@@ -1,18 +1,18 @@
 import { v4 as uuidv4 } from "uuid";
 import "jest-extended";
 import { v4 as uuidV4 } from "uuid";
-import { PluginSatpGateway } from "../../../../main/typescript/gateway/plugin-satp-gateway";
+import { PluginSATPGateway } from "../../../../main/typescript/plugin-satp-gateway";
 
 import {
   RecoverSuccessV1Message,
   SessionData,
 } from "../../../../main/typescript/public-api";
 import { randomInt } from "crypto";
-import { checkValidRecoverSuccessMessage } from "../../../../main/typescript/gateway/recovery/recover-success";
-import { BesuSatpGateway } from "../../../../main/typescript/gateway/besu-satp-gateway";
-import { FabricSatpGateway } from "../../../../main/typescript/gateway/fabric-satp-gateway";
-import { ClientGatewayHelper } from "../../../../main/typescript/gateway/client/client-helper";
-import { ServerGatewayHelper } from "../../../../main/typescript/gateway/server/server-helper";
+import { checkValidRecoverSuccessMessage } from "../../../../main/typescript/recovery/recover-success";
+import { BesuSATPGateway } from "../../../../main/typescript/core/besu-satp-gateway";
+import { FabricSATPGateway } from "../../../../main/typescript/core/fabric-satp-gateway";
+import { ClientGatewayHelper } from "../../../../main/typescript/core/client-helper";
+import { ServerGatewayHelper } from "../../../../main/typescript/core/server-helper";
 
 import {
   knexClientConnection,
@@ -20,8 +20,8 @@ import {
   knexServerConnection,
 } from "../../knex.config";
 
-let pluginSourceGateway: PluginSatpGateway;
-let pluginRecipientGateway: PluginSatpGateway;
+let pluginSourceGateway: PluginSATPGateway;
+let pluginRecipientGateway: PluginSATPGateway;
 let sessionID: string;
 let sessionData: SessionData;
 
@@ -47,8 +47,8 @@ beforeEach(async () => {
     knexRemoteConfig: knexRemoteConnection,
   };
 
-  pluginSourceGateway = new FabricSatpGateway(sourceGatewayConstructor);
-  pluginRecipientGateway = new BesuSatpGateway(recipientGatewayConstructor);
+  pluginSourceGateway = new FabricSATPGateway(sourceGatewayConstructor);
+  pluginRecipientGateway = new BesuSATPGateway(recipientGatewayConstructor);
 
   if (
     pluginSourceGateway.localRepository?.database == undefined ||
@@ -80,7 +80,7 @@ test("valid recover success message from client", async () => {
     success: true,
   };
 
-  recoverSuccessMessage.signature = PluginSatpGateway.bufArray2HexStr(
+  recoverSuccessMessage.signature = PluginSATPGateway.bufArray2HexStr(
     pluginSourceGateway.sign(JSON.stringify(recoverSuccessMessage)),
   );
 
@@ -97,7 +97,7 @@ test("valid recover success message from server", async () => {
     success: true,
   };
 
-  recoverSuccessMessage.signature = PluginSatpGateway.bufArray2HexStr(
+  recoverSuccessMessage.signature = PluginSATPGateway.bufArray2HexStr(
     pluginRecipientGateway.sign(JSON.stringify(recoverSuccessMessage)),
   );
 
