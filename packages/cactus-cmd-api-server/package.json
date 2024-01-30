@@ -43,6 +43,7 @@
     "dist/*"
   ],
   "scripts": {
+    "benchmark": "tsx ./src/test/typescript/benchmark/run-cmd-api-server-benchmark.ts .tmp/benchmark-results/cmd-api-server/run-cmd-api-server-benchmark.ts.log",
     "codegen": "run-p 'codegen:*'",
     "codegen:openapi": "npm run generate-sdk",
     "codegen:proto": "run-s proto:openapi proto:protoc-gen-ts",
@@ -97,6 +98,7 @@
     "@hyperledger/cactus-plugin-keychain-vault": "2.0.0-alpha.2",
     "@hyperledger/cactus-test-tooling": "2.0.0-alpha.2",
     "@openapitools/openapi-generator-cli": "2.7.0",
+    "@types/benchmark": "2.1.5",
     "@types/compression": "1.7.4",
     "@types/convict": "6.1.1",
     "@types/cors": "2.8.12",
@@ -114,11 +116,13 @@
     "@types/semver": "7.3.8",
     "@types/uuid": "8.3.4",
     "@types/xml2js": "0.4.9",
+    "benchmark": "2.1.4",
     "google-protobuf": "3.18.0-rc.2",
     "grpc-tools": "1.12.4",
     "grpc_tools_node_protoc_ts": "5.3.3",
     "http-status-codes": "2.1.4",
-    "protobufjs": "7.2.5"
+    "protobufjs": "7.2.5",
+    "tsx": "4.7.0"
   },
   "engines": {
     "node": ">=18",
