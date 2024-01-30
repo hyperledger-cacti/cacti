@@ -66,3 +66,4 @@ tools/docker/geth-testnet/data-geth1/
 
 .history/
 .manual-geth-artillery-config.yaml
+packages/cactus-plugin-satp-hermes/.config

@@ -8989,6 +8989,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger/cactus-plugin-satp-hermes@workspace:packages/cactus-plugin-satp-hermes"
   dependencies:
+    "@bufbuild/buf": "npm:1.29.0"
+    "@bufbuild/protobuf": "npm:1.7.2"
+    "@bufbuild/protoc-gen-es": "npm:1.7.2"
+    "@connectrpc/connect": "npm:1.3.0"
+    "@connectrpc/connect-express": "npm:1.3.0"
+    "@connectrpc/connect-node": "npm:1.3.0"
+    "@connectrpc/protoc-gen-connect-es": "npm:1.3.0"
     "@hyperledger/cactus-cmd-api-server": "npm:2.0.0-alpha.2"
     "@hyperledger/cactus-common": "npm:2.0.0-alpha.2"
     "@hyperledger/cactus-core": "npm:2.0.0-alpha.2"
@@ -9000,12 +9007,16 @@ __metadata:
     "@hyperledger/cactus-test-tooling": "npm:2.0.0-alpha.2"
     "@types/body-parser": "npm:1.19.4"
     "@types/crypto-js": "npm:4.0.1"
-    "@types/express": "npm:4.17.19"
+    "@types/express": "npm:4.17.21"
     "@types/fs-extra": "npm:11.0.3"
+    "@types/node": "npm:18.18.2"
+    "@types/swagger-ui-express": "npm:4.1.6"
     "@types/tape": "npm:4.13.4"
     "@types/uuid": "npm:9.0.8"
     axios: "npm:1.6.0"
     body-parser: "npm:1.20.2"
+    class-transformer: "npm:0.5.1"
+    class-validator: "npm:0.14.1"
     crypto-js: "npm:4.2.0"
     express: "npm:4.19.2"
     fabric-network: "npm:2.2.20"
@@ -9015,6 +9026,7 @@ __metadata:
     secp256k1: "npm:4.0.3"
     socket.io: "npm:4.5.4"
     sqlite3: "npm:5.1.5"
+    swagger-ui-express: "npm:5.0.0"
     typescript: "npm:5.3.3"
     typescript-optional: "npm:2.0.1"
     uuid: "npm:9.0.1"
@@ -14788,6 +14800,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/express@npm:4.17.21, @types/express@npm:^4.17.18":
+  version: 4.17.21
+  resolution: "@types/express@npm:4.17.21"
+  dependencies:
+    "@types/body-parser": "npm:*"
+    "@types/express-serve-static-core": "npm:^4.17.33"
+    "@types/qs": "npm:*"
+    "@types/serve-static": "npm:*"
+  checksum: 10/7a6d26cf6f43d3151caf4fec66ea11c9d23166e4f3102edfe45a94170654a54ea08cf3103d26b3928d7ebcc24162c90488e33986b7e3a5f8941225edd5eb18c7
+  languageName: node
+  linkType: hard
+
 "@types/express@npm:^4.17.13":
   version: 4.17.17
   resolution: "@types/express@npm:4.17.17"
@@ -15318,6 +15342,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/node@npm:18.18.2":
+  version: 18.18.2
+  resolution: "@types/node@npm:18.18.2"
+  checksum: 10/7585ed0c8ff6f6e8e78564c3b2def30d8c3a2c88fb63fb04b832b3b96497ff2609081154348cbb8906d81e3434c54ac61bf3aba4be66b4aeccc0c63aa4dca6be
+  languageName: node
+  linkType: hard
+
 "@types/node@npm:20.4.7":
   version: 20.4.7
   resolution: "@types/node@npm:20.4.7"
@@ -15825,6 +15856,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/swagger-ui-express@npm:4.1.6":
+  version: 4.1.6
+  resolution: "@types/swagger-ui-express@npm:4.1.6"
+  dependencies:
+    "@types/express": "npm:*"
+    "@types/serve-static": "npm:*"
+  checksum: 10/c1c4b58b12f9261af70b6a7e6420649b4f0a0343071ae8b98483c5885cd596f4c25015991f91f3f7c7a0baa461e2d76029d64de79108a89d03f3f83abbe6bc58
+  languageName: node
+  linkType: hard
+
 "@types/tape-promise@npm:4.0.1":
   version: 4.0.1
   resolution: "@types/tape-promise@npm:4.0.1"
@@ -15923,6 +15964,13 @@ __metadata:
   version: 9.0.8
   resolution: "@types/uuid@npm:9.0.8"
   checksum: 10/b8c60b7ba8250356b5088302583d1704a4e1a13558d143c549c408bf8920535602ffc12394ede77f8a8083511b023704bc66d1345792714002bfa261b17c5275
+  languageName: node
+  linkType: hard
+
+"@types/validator@npm:^13.11.8":
+  version: 13.11.9
+  resolution: "@types/validator@npm:13.11.9"
+  checksum: 10/2d397c69293cc726e0cf1b4c74c563ca4e459b00f216f3ff0ac184c9648103be27169e8c67f85be9c6e7a3fcbb149c6add66a2547b185a1b25aa79e4b61261bd
   languageName: node
   linkType: hard
 
@@ -20531,6 +20579,17 @@ __metadata:
     libphonenumber-js: "npm:^1.10.14"
     validator: "npm:^13.7.0"
   checksum: 10/bf550a4ab7b424467737c75e7e6171a45fe010ccab6af50793539d9d2e1f5cce1a35fbc8b11f9a5de4f049852f768232acca16f05cf80993a36369b494560f44
+  languageName: node
+  linkType: hard
+
+"class-validator@npm:0.14.1":
+  version: 0.14.1
+  resolution: "class-validator@npm:0.14.1"
+  dependencies:
+    "@types/validator": "npm:^13.11.8"
+    libphonenumber-js: "npm:^1.10.53"
+    validator: "npm:^13.9.0"
+  checksum: 10/0c34592a1cbdd5e9c35cd02f4babd94120339e875fc7627aa2bf5dffb45ecc373275e854389c6ff3d39781cddb85a18193b4e9e8f4d77d6d90e445fd0b8b8e11
   languageName: node
   linkType: hard
 
@@ -34900,6 +34959,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"libphonenumber-js@npm:^1.10.53":
+  version: 1.10.57
+  resolution: "libphonenumber-js@npm:1.10.57"
+  checksum: 10/7344dd7e8f35b0bd19c5a4fecfd5f252ba3e1f2fa938e552662a34fbc0bc3bf02d3c0a7ce5adf369280a741c7c7d54940232092e997890b71cb3cb1114e9184b
+  languageName: node
+  linkType: hard
+
 "libtap@npm:^1.4.0":
   version: 1.4.1
   resolution: "libtap@npm:1.4.1"
@@ -47128,6 +47194,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"swagger-ui-dist@npm:>=5.0.0":
+  version: 5.11.9
+  resolution: "swagger-ui-dist@npm:5.11.9"
+  checksum: 10/6446adfda2b5dd3fe0272fc8ba0ff030e726d842a6776ceb2d963077fa200defd3d21f4523142272c6a98e5eaaf8d1131467bf1ae971106730f39450b6a9880f
+  languageName: node
+  linkType: hard
+
+"swagger-ui-express@npm:5.0.0":
+  version: 5.0.0
+  resolution: "swagger-ui-express@npm:5.0.0"
+  dependencies:
+    swagger-ui-dist: "npm:>=5.0.0"
+  peerDependencies:
+    express: ">=4.0.0 || >=5.0.0-beta"
+  checksum: 10/e970d99cb33b8db235feb23d24b79d680cfbb8f9e920863990df5549ae56a35b12dfa761bbdde22cd8cbec2823b7d1078710b4a1970c9441b541917b56d197cc
+  languageName: node
+  linkType: hard
+
 "swap-case@npm:^1.1.0":
   version: 1.1.2
   resolution: "swap-case@npm:1.1.2"
@@ -49709,7 +49793,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"validator@npm:^13.7.0":
+"validator@npm:^13.7.0, validator@npm:^13.9.0":
   version: 13.11.0
   resolution: "validator@npm:13.11.0"
   checksum: 10/4bf094641eb71729c06a42d669840e7189597ba655a8264adabac9bf03f95cd6fde5fbc894b0a13ee861bd4a852f56d2afdc9391aeaeb3fc0f9633a974140e12

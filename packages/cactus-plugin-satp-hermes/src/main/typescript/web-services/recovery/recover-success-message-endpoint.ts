@@ -15,13 +15,13 @@ import {
 
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
-import { PluginSatpGateway } from "../../gateway/plugin-satp-gateway";
+import { PluginSATPGateway } from "../../plugin-satp-gateway";
 
 import OAS from "../../../json/openapi.json";
 
 export interface IRecoverSuccessMessageEndpointOptions {
   logLevel?: LogLevelDesc;
-  gateway: PluginSatpGateway;
+  gateway: PluginSATPGateway;
 }
 
 export class RecoverSuccessMessageEndpointV1 implements IWebServiceEndpoint {
