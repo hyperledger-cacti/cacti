@@ -11,19 +11,19 @@ import { IListenOptions, Servers } from "@hyperledger/cactus-common";
 import { Configuration } from "@hyperledger/cactus-core-api";
 
 import {
-  PluginSatpGateway,
+  PluginSATPGateway,
   IPluginSatpGatewayConstructorOptions,
-} from "../../../main/typescript/gateway/plugin-satp-gateway";
+} from "../../../main/typescript/plugin-satp-gateway";
 import {
   AssetProfile,
   ClientV1Request,
 } from "../../../main/typescript/public-api";
 import { makeSessionDataChecks } from "../make-checks";
 
-import { BesuSatpGateway } from "../../../main/typescript/gateway/besu-satp-gateway";
-import { FabricSatpGateway } from "../../../main/typescript/gateway/fabric-satp-gateway";
-import { ClientGatewayHelper } from "../../../main/typescript/gateway/client/client-helper";
-import { ServerGatewayHelper } from "../../../main/typescript/gateway/server/server-helper";
+import { BesuSATPGateway } from "../../../main/typescript/core/besu-satp-gateway";
+import { FabricSATPGateway } from "../../../main/typescript/core/fabric-satp-gateway";
+import { ClientGatewayHelper } from "../../../main/typescript/core/client-helper";
+import { ServerGatewayHelper } from "../../../main/typescript/core/server-helper";
 import { knexRemoteConnection } from "../knex.config";
 
 const MAX_RETRIES = 5;
@@ -35,8 +35,8 @@ const BESU_ASSET_ID = uuidv4();
 let sourceGatewayServer: Server;
 let recipientGatewayserver: Server;
 
-let pluginSourceGateway: PluginSatpGateway;
-let pluginRecipientGateway: PluginSatpGateway;
+let pluginSourceGateway: PluginSATPGateway;
+let pluginRecipientGateway: PluginSATPGateway;
 
 test("runs ODAP between two gateways via openApi", async () => {
   const clientGatewayPluginOptions: IPluginSatpGatewayConstructorOptions = {
@@ -57,8 +57,8 @@ test("runs ODAP between two gateways via openApi", async () => {
     knexRemoteConfig: knexRemoteConnection,
   };
 
-  pluginSourceGateway = new FabricSatpGateway(clientGatewayPluginOptions);
-  pluginRecipientGateway = new BesuSatpGateway(serverGatewayPluginOptions);
+  pluginSourceGateway = new FabricSATPGateway(clientGatewayPluginOptions);
+  pluginRecipientGateway = new BesuSATPGateway(serverGatewayPluginOptions);
 
   expect(pluginSourceGateway.localRepository?.database).not.toBeUndefined();
   expect(pluginRecipientGateway.localRepository?.database).not.toBeUndefined();
