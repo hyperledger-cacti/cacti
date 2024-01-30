@@ -1,8 +1,9 @@
 # @hyperledger/cactus-plugin-satp-hermes
-The package provides `Cactus` a way to standardize cross-chain transactions between two ledgers (Fabric and Besu in this implementation). Using this we can perform:
+The package provides `Hyperledger Cacti` a way to standardize cross-chain transactions between ledgers. Using this we can perform:
 - A unidirectional atomic asset transfer between 2 parties in different ledgers.
 - Lock of the asset in the source ledger and proof is sent to the counterparty.
 - Extinguishment of the asset in the source blockchain and regeneration of the asset in the recipient blockchain.
+- This package implements [Hermes as defined in the paper](https://www.sciencedirect.com/science/article/abs/pii/S0167739X21004337), namely the gateway paradigm and crash recovery.
 
 At the moment, we assume a crash-fault environment under some assumptions detailed in section [Assumptions](#assumptions)
 ## Summary
@@ -22,6 +23,8 @@ Regarding the crash recovery procedure in place, at the moment we only support c
   - Gateways never loose their long term keys
   - Gateways do not have byzantine behavior
   - Gateways are assumed to always recover from a crash
+
+We will be working on reducing these assumptions and making the system more resilient to faults.
 
 ## Getting Started
 
@@ -50,13 +53,16 @@ Firstly let us identify the different entities involved in the protocol and what
 - SQLite3 database: persistent log and proofs storage in each gateway.
 - IPFS connector: is exposed the API so that both gateways have access to the same structure. This is used to store the hashes and signatures of the logs and proofs, so that accountability is guaranteed.
 
-The sequence diagram of ODAP is pictured below.
+The sequence diagram of SATP is pictured below.
 
-![odap-sequence-diagram](https://i.imgur.com/SOdXFEt.png)
+![satp-sequence-diagram](https://i.imgur.com/SOdXFEt.png)
 
-### API Endpoints
+### Application-to-Gateway API (API Type 1)
+We
+
+### Gateway-to-Gateway API (API Type 2)
 This plugin uses OpenAPI to generate the API paths.
-There are Client and Server Endpoints for each type of message detailed in the ODAP protocol:
+There are Client and Server Endpoints for each type of message detailed in the SATP protocol:
 
   - TransferInitializationV1Request
   - TransferInitializationV1Response
@@ -79,31 +85,31 @@ There are also defined the endpoints for the crash recovery procedure (there is 
   - RollbackV1Message
 
 ## Use case
-Alice and Bob, in blockchains A and B, respectively, want to make a transfer of an asset from one to the other. Gateway A represents the gateway connected to Alice's blockchain. Gateway B represents the gateway connected to Bob's blockchain. Alice and Bob will run ODAP, which will execute the transfer of the asset from blockchain A to blockchain B. The above endpoints will be called in sequence. Notice that the asset will first be locked on blockchain A and a proof is sent to the server-side. Afterward, the asset on the original blockchain is extinguished, followed by its regeneration on blockchain B.
+Alice and Bob, in blockchains A and B, respectively, want to make a transfer of an asset from one to the other. Gateway A represents the gateway connected to Alice's blockchain. Gateway B represents the gateway connected to Bob's blockchain. Alice and Bob will run SATP, which will execute the transfer of the asset from blockchain A to blockchain B. The above endpoints will be called in sequence. Notice that the asset will first be locked on blockchain A and a proof is sent to the server-side. Afterward, the asset on the original blockchain is extinguished, followed by its regeneration on blockchain B.
 
 ## Running the tests
 
-[A test of the entire protocol with manual calls to the methods, i.e. without ledger connectors and Open API.](https://github.com/hyperledger/cactus/blob/2e94ef8d3b34449c7b4d48e37d81245851477a3e/packages/cactus-plugin-odap-hermes/src/test/typescript/integration/odap.test.ts)
+[A test of the entire protocol with manual calls to the methods, i.e. without ledger connectors and Open API.](https://github.com/hyperledger/cactus/blob/2e94ef8d3b34449c7b4d48e37d81245851477a3e/packages/cactus-plugin-satp-hermes/src/test/typescript/integration/satp.test.ts)
 
-[A test of the entire protocol using Open API but with no ledger connectors.](https://github.com/hyperledger/cactus/blob/2e94ef8d3b34449c7b4d48e37d81245851477a3e/packages/cactus-plugin-odap-hermes/src/test/typescript/integration/odap-api-call.test.ts)
+[A test of the entire protocol using Open API but with no ledger connectors.](https://github.com/hyperledger/cactus/blob/2e94ef8d3b34449c7b4d48e37d81245851477a3e/packages/cactus-plugin-satp-hermes/src/test/typescript/integration/satp-api-call.test.ts)
 
-[A test of the entire protocol with ledger connectors (Fabric and Besu) and Open API.](https://github.com/hyperledger/cactus/blob/2e94ef8d3b34449c7b4d48e37d81245851477a3e/packages/cactus-plugin-odap-hermes/src/test/typescript/integration/odap-api-call-with-ledger-connector.test.ts)
+[A test of the entire protocol with ledger connectors (Fabric and Besu) and Open API.](https://github.com/hyperledger/cactus/blob/2e94ef8d3b34449c7b4d48e37d81245851477a3e/packages/cactus-plugin-satp-hermes/src/test/typescript/integration/satp-api-call-with-ledger-connector.test.ts)
 
-[A test with a simulated crash of the client gateway after the transfer initiation flow.](https://github.com/hyperledger/cactus/blob/2e94ef8d3b34449c7b4d48e37d81245851477a3e/packages/cactus-plugin-odap-hermes/src/test/typescript/integration/client-crash-after-transfer-initiation.test.ts)
+[A test with a simulated crash of the client gateway after the transfer initiation flow.](https://github.com/hyperledger/cactus/blob/2e94ef8d3b34449c7b4d48e37d81245851477a3e/packages/cactus-plugin-satp-hermes/src/test/typescript/integration/client-crash-after-transfer-initiation.test.ts)
 
-[A test with a simulated crash of the client gateway after the lock of the asset in the source blockchain (Fabric).](https://github.com/hyperledger/cactus/blob/2e94ef8d3b34449c7b4d48e37d81245851477a3e/packages/cactus-plugin-odap-hermes/src/test/typescript/integration/client-crash-after-lock-asset.test.ts)
+[A test with a simulated crash of the client gateway after the lock of the asset in the source blockchain (Fabric).](https://github.com/hyperledger/cactus/blob/2e94ef8d3b34449c7b4d48e37d81245851477a3e/packages/cactus-plugin-satp-hermes/src/test/typescript/integration/client-crash-after-lock-asset.test.ts)
 
-[A test with a simulated crash of the client gateway after the deletion of the asset in the source blockchain (Fabric).](https://github.com/hyperledger/cactus/blob/2e94ef8d3b34449c7b4d48e37d81245851477a3e/packages/cactus-plugin-odap-hermes/src/test/typescript/integration/client-crash-after-delete-asset.test.ts)
+[A test with a simulated crash of the client gateway after the deletion of the asset in the source blockchain (Fabric).](https://github.com/hyperledger/cactus/blob/2e94ef8d3b34449c7b4d48e37d81245851477a3e/packages/cactus-plugin-satp-hermes/src/test/typescript/integration/client-crash-after-delete-asset.test.ts)
 
-[A test with a simulated crash of the server gateway after the creation of the the asset in the recipient blockchain (Besu).](https://github.com/hyperledger/cactus/blob/2e94ef8d3b34449c7b4d48e37d81245851477a3e/packages/cactus-plugin-odap-hermes/src/test/typescript/integration/server-crash-after-create-asset.test.ts)
+[A test with a simulated crash of the server gateway after the creation of the the asset in the recipient blockchain (Besu).](https://github.com/hyperledger/cactus/blob/2e94ef8d3b34449c7b4d48e37d81245851477a3e/packages/cactus-plugin-satp-hermes/src/test/typescript/integration/server-crash-after-create-asset.test.ts)
 
-[A test with a simulated crash of the server gateway after the transfer initiation flow.](https://github.com/hyperledger/cactus/blob/2e94ef8d3b34449c7b4d48e37d81245851477a3e/packages/cactus-plugin-odap-hermes/src/test/typescript/integration/server-crash-after-transfer-initiation.test.ts)
+[A test with a simulated crash of the server gateway after the transfer initiation flow.](https://github.com/hyperledger/cactus/blob/2e94ef8d3b34449c7b4d48e37d81245851477a3e/packages/cactus-plugin-satp-hermes/src/test/typescript/integration/server-crash-after-transfer-initiation.test.ts)
 
-[A test with a rollback after a timeout (client crashed).](https://github.com/hyperledger/cactus/blob/2e94ef8d3b34449c7b4d48e37d81245851477a3e/packages/cactus-plugin-odap-hermes/src/test/typescript/integration/odap-rollback.test.ts)
+[A test with a rollback after a timeout (client crashed).](https://github.com/hyperledger/cactus/blob/2e94ef8d3b34449c7b4d48e37d81245851477a3e/packages/cactus-plugin-satp-hermes/src/test/typescript/integration/satp-rollback.test.ts)
 
-[A test with a backup gateway resuming the protocol after the client gateway crashed.](https://github.com/hyperledger/cactus/tree/main/packages/cactus-plugin-odap-hermes/src/test/typescript/integration/backup-gateway-after-client-crash.test.ts)
+[A test with a backup gateway resuming the protocol after the client gateway crashed.](https://github.com/hyperledger/cactus/tree/main/packages/cactus-plugin-satp-hermes/src/test/typescript/integration/backup-gateway-after-client-crash.test.ts)
 
-For developers that want to test separate steps/phases of the ODAP protocol, please refer to [these](https://github.com/hyperledger/cactus/blob/2e94ef8d3b34449c7b4d48e37d81245851477a3e/packages/cactus-plugin-odap-hermes/src/test/typescript/unit/) test files (client and server side along with the recovery procedure).
+For developers that want to test separate steps/phases of the SATP protocol, please refer to [these](https://github.com/hyperledger/cactus/blob/2e94ef8d3b34449c7b4d48e37d81245851477a3e/packages/cactus-plugin-satp-hermes/src/test/typescript/unit/) test files (client and server side along with the recovery procedure).
 
 ## Usage
 
@@ -112,12 +118,12 @@ Let us consider two gateways. The client gateway connected to Hyperledger Fabric
   - A Hyperledger Fabric API client on URL: http://localhost:8045
   - A Hyperledger Besu API client on URL: http://localhost:8046
   - An IPFS API client on URL: http://localhost:8047
-  - The local databases configuration provided in the file [knex.config.ts](https://github.com/hyperledger/cactus/blob/main/packages/cactus-plugin-odap-hermes/src/test/typescript/knex.config.ts)
+  - The local databases configuration provided in the file [knex.config.ts](https://github.com/hyperledger/cactus/blob/main/packages/cactus-plugin-satp-hermes/src/test/typescript/knex.config.ts)
 
-Then the ODAP gateways should be created as follows:
+Then the SATP gateways should be created as follows:
 
 ```typescript
-const clientGatewayOptions: IFabricSatpGatewayConstructorOptions = {
+const clientGatewayOptions: IFabricSATPGatewayConstructorOptions = {
   name: "cactus-plugin#clientOdapGateway",
   dltIDs: ["DLT2"],
   instanceId: uuidv4(),
@@ -130,7 +136,7 @@ const clientGatewayOptions: IFabricSatpGatewayConstructorOptions = {
   serverHelper: new ServerGatewayHelper(),
 };
 
-const serverGatewayOptions: IBesuSatpGatewayConstructorOptions = {
+const serverGatewayOptions: IBesuSATPGatewayConstructorOptions = {
   name: "cactus-plugin#serverOdapGateway",
   dltIDs: ["DLT1"],
   instanceId: uuidv4(),
@@ -143,11 +149,11 @@ const serverGatewayOptions: IBesuSatpGatewayConstructorOptions = {
   serverHelper: new ServerGatewayHelper(),
 };
    
-  const clientGateway = new FabricSatpGateway(clientGatewayOptions);
-  const serverGateway = new BesuSatpGateway(serverGatewayOptions);
+  const clientGateway = new FabricSATPGateway(clientGatewayOptions);
+  const serverGateway = new BesuSATPGateway(serverGatewayOptions);
 ```
 
-Note that these gateways are extensions of the [default ODAP Gateway class](https://github.com/hyperledger/cactus/blob/main/packages/cactus-plugin-odap-hermes/src/main/typescript/gateway/plugin-satp-gateway.ts), that implements the gateway functionality. Each of these extensions implements ledger-specific operations.
+Note that these gateways are extensions of the [default SATP Gateway class](https://github.com/hyperledger/cactus/blob/main/packages/cactus-plugin-satp-hermes/src/main/typescript/gateway/plugin-satp-gateway.ts), that implements the gateway functionality. Each of these extensions implements ledger-specific operations.
 
 ## Contributing
 We welcome contributions to Hyperledger Cactus in many forms, and there’s always plenty to do!
