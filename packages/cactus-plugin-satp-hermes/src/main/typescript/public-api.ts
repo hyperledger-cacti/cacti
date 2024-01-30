@@ -2,26 +2,28 @@ export * from "./generated/openapi/typescript-axios/index";
 
 export {
   IPluginSatpGatewayConstructorOptions,
-  PluginSatpGateway,
+  PluginSATPGateway,
   SatpMessageType,
   IKeyPair,
-} from "./gateway/plugin-satp-gateway";
+} from "./plugin-satp-gateway";
 
 import { IPluginFactoryOptions } from "@hyperledger/cactus-core-api";
-import { PluginFactoryFabricSatpGateway } from "./gateway/plugin-factory-fabric-satp-gateway";
-import { PluginFactoryBesuSatpGateway } from "./gateway/plugin-factory-besu-satp-gateway";
+import { PluginFactoryFabricSATPGateway } from "./factory/plugin-factory-fabric-satp-gateway";
+import { PluginFactoryBesuSATPGateway } from "./factory/plugin-factory-besu-satp-gateway";
+import { fileURLToPath } from "url";
 
 export async function createFabricPluginFactory(
   pluginFactoryOptions: IPluginFactoryOptions,
-): Promise<PluginFactoryFabricSatpGateway> {
-  return new PluginFactoryFabricSatpGateway(pluginFactoryOptions);
+): Promise<PluginFactoryFabricSATPGateway> {
+  return new PluginFactoryFabricSATPGateway(pluginFactoryOptions);
 }
 
 export async function createBesuPluginFactory(
   pluginFactoryOptions: IPluginFactoryOptions,
-): Promise<PluginFactoryBesuSatpGateway> {
-  return new PluginFactoryBesuSatpGateway(pluginFactoryOptions);
+): Promise<PluginFactoryBesuSATPGateway> {
+  return new PluginFactoryBesuSATPGateway(pluginFactoryOptions);
 }
 
-export { ServerGatewayHelper } from "./gateway/server/server-helper";
-export { ClientGatewayHelper } from "./gateway/client/client-helper";
+export { ServerGatewayHelper } from "./core/server-helper";
+export { ClientGatewayHelper } from "./core/client-helper";
+// TODO! export new gateway
