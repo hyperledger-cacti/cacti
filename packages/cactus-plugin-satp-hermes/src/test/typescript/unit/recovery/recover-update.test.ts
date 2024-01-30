@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import "jest-extended";
 import { Secp256k1Keys } from "@hyperledger/cactus-common";
 import { v4 as uuidV4 } from "uuid";
-import { PluginSatpGateway } from "../../../../main/typescript/gateway/plugin-satp-gateway";
+import { PluginSATPGateway } from "../../../../main/typescript/plugin-satp-gateway";
 
 import {
   RecoverUpdateV1Message,
@@ -13,13 +13,13 @@ import { randomInt } from "crypto";
 import {
   checkValidRecoverUpdateMessage,
   sendRecoverUpdateMessage,
-} from "../../../../main/typescript/gateway/recovery/recover-update";
+} from "../../../../main/typescript/recovery/recover-update";
 
-import { checkValidRecoverMessage } from "../../../../main/typescript/gateway/recovery/recover";
-import { BesuSatpGateway } from "../../../../main/typescript/gateway/besu-satp-gateway";
-import { FabricSatpGateway } from "../../../../main/typescript/gateway/fabric-satp-gateway";
-import { ClientGatewayHelper } from "../../../../main/typescript/gateway/client/client-helper";
-import { ServerGatewayHelper } from "../../../../main/typescript/gateway/server/server-helper";
+import { checkValidRecoverMessage } from "../../../../main/typescript/recovery/recover";
+import { BesuSATPGateway } from "../../../../main/typescript/core/besu-satp-gateway";
+import { FabricSATPGateway } from "../../../../main/typescript/core/fabric-satp-gateway";
+import { ClientGatewayHelper } from "../../../../main/typescript/core/client-helper";
+import { ServerGatewayHelper } from "../../../../main/typescript/core/server-helper";
 
 import {
   knexClientConnection,
@@ -30,8 +30,8 @@ import {
 const MAX_RETRIES = 5;
 const MAX_TIMEOUT = 5000;
 
-let pluginSourceGateway: PluginSatpGateway;
-let pluginRecipientGateway: PluginSatpGateway;
+let pluginSourceGateway: PluginSATPGateway;
+let pluginRecipientGateway: PluginSATPGateway;
 let sessionID: string;
 let sessionData: SessionData;
 
@@ -59,8 +59,8 @@ beforeEach(async () => {
     knexRemoteConfig: knexRemoteConnection,
   };
 
-  pluginSourceGateway = new FabricSatpGateway(sourceGatewayConstructor);
-  pluginRecipientGateway = new BesuSatpGateway(recipientGatewayConstructor);
+  pluginSourceGateway = new FabricSATPGateway(sourceGatewayConstructor);
+  pluginRecipientGateway = new BesuSATPGateway(recipientGatewayConstructor);
 
   if (
     pluginSourceGateway.localRepository?.database == undefined ||
@@ -92,7 +92,7 @@ test("valid recover update message from server", async () => {
     signature: "",
   };
 
-  recoverUpdateMessage.signature = PluginSatpGateway.bufArray2HexStr(
+  recoverUpdateMessage.signature = PluginSATPGateway.bufArray2HexStr(
     pluginRecipientGateway.sign(JSON.stringify(recoverUpdateMessage)),
   );
 
@@ -172,7 +172,7 @@ test("check valid build of recover update message", async () => {
     newBasePath: "",
   };
 
-  recoverMessage.signature = PluginSatpGateway.bufArray2HexStr(
+  recoverMessage.signature = PluginSATPGateway.bufArray2HexStr(
     pluginSourceGateway.sign(JSON.stringify(recoverMessage)),
   );
 

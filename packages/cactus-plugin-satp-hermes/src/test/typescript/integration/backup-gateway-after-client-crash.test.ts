@@ -30,7 +30,7 @@ import {
   PluginImportType,
   Constants,
 } from "@hyperledger/cactus-core-api";
-import { PluginSatpGateway } from "../../../main/typescript/gateway/plugin-satp-gateway";
+import { PluginSATPGateway } from "../../../main/typescript/plugin-satp-gateway";
 import {
   ChainCodeProgrammingLanguage,
   DefaultEventHandlerStrategy,
@@ -53,15 +53,15 @@ import Web3 from "web3";
 
 import { makeSessionDataChecks } from "../make-checks";
 import {
-  FabricSatpGateway,
-  IFabricSatpGatewayConstructorOptions,
-} from "../../../main/typescript/gateway/fabric-satp-gateway";
+  FabricSATPGateway,
+  IFabricSATPGatewayConstructorOptions,
+} from "../../../main/typescript/core/fabric-satp-gateway";
 import {
-  BesuSatpGateway,
-  IBesuSatpGatewayConstructorOptions,
-} from "../../../main/typescript/gateway/besu-satp-gateway";
-import { ClientGatewayHelper } from "../../../main/typescript/gateway/client/client-helper";
-import { ServerGatewayHelper } from "../../../main/typescript/gateway/server/server-helper";
+  BesuSATPGateway,
+  IBesuSATPGatewayConstructorOptions,
+} from "../../../main/typescript/core/besu-satp-gateway";
+import { ClientGatewayHelper } from "../../../main/typescript/core/client-helper";
+import { ServerGatewayHelper } from "../../../main/typescript/core/server-helper";
 
 import {
   knexClientConnection,
@@ -91,10 +91,10 @@ let besuKeychainId: string;
 let fabricConnector: PluginLedgerConnectorFabric;
 let besuConnector: PluginLedgerConnectorBesu;
 
-let clientGatewayPluginOptions: IFabricSatpGatewayConstructorOptions;
-let serverGatewayPluginOptions: IBesuSatpGatewayConstructorOptions;
-let pluginSourceGateway: FabricSatpGateway;
-let pluginRecipientGateway: BesuSatpGateway;
+let clientGatewayPluginOptions: IFabricSATPGatewayConstructorOptions;
+let serverGatewayPluginOptions: IBesuSATPGatewayConstructorOptions;
+let pluginSourceGateway: FabricSATPGateway;
+let pluginRecipientGateway: BesuSATPGateway;
 
 let clientGatewayApiHost: string;
 let serverGatewayApiHost: string;
@@ -509,7 +509,7 @@ beforeAll(async () => {
     // Gateways configuration
     const allowedGateways = [];
     allowedGateways.push(
-      PluginSatpGateway.bufArray2HexStr(backupGatewayKeys.publicKey),
+      PluginSATPGateway.bufArray2HexStr(backupGatewayKeys.publicKey),
     );
 
     clientGatewayPluginOptions = {
@@ -543,8 +543,8 @@ beforeAll(async () => {
       knexRemoteConfig: knexRemoteConnection,
     };
 
-    pluginSourceGateway = new FabricSatpGateway(clientGatewayPluginOptions);
-    pluginRecipientGateway = new BesuSatpGateway(serverGatewayPluginOptions);
+    pluginSourceGateway = new FabricSATPGateway(clientGatewayPluginOptions);
+    pluginRecipientGateway = new BesuSATPGateway(serverGatewayPluginOptions);
 
     expect(pluginSourceGateway.localRepository?.database).not.toBeUndefined();
     expect(
@@ -767,7 +767,7 @@ test("client gateway crashes after lock fabric asset", async () => {
     knexRemoteConfig: knexRemoteConnection,
   };
 
-  pluginSourceGateway = new FabricSatpGateway(clientGatewayPluginOptions);
+  pluginSourceGateway = new FabricSATPGateway(clientGatewayPluginOptions);
   await pluginSourceGateway.getOrCreateWebServices();
   await pluginSourceGateway.registerWebServices(expressApp);
 

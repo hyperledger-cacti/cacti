@@ -53,15 +53,15 @@ import Web3 from "web3";
 
 import { makeSessionDataChecks } from "../make-checks";
 import {
-  BesuSatpGateway,
-  IBesuSatpGatewayConstructorOptions,
-} from "../../../main/typescript/gateway/besu-satp-gateway";
+  BesuSATPGateway,
+  IBesuSATPGatewayConstructorOptions,
+} from "../../../main/typescript/core/besu-satp-gateway";
 import {
-  FabricSatpGateway,
-  IFabricSatpGatewayConstructorOptions,
-} from "../../../main/typescript/gateway/fabric-satp-gateway";
-import { ClientGatewayHelper } from "../../../main/typescript/gateway/client/client-helper";
-import { ServerGatewayHelper } from "../../../main/typescript/gateway/server/server-helper";
+  FabricSATPGateway,
+  IFabricSATPGatewayConstructorOptions,
+} from "../../../main/typescript/core/fabric-satp-gateway";
+import { ClientGatewayHelper } from "../../../main/typescript/core/client-helper";
+import { ServerGatewayHelper } from "../../../main/typescript/core/server-helper";
 
 import {
   knexClientConnection,
@@ -98,9 +98,9 @@ let besuKeychainId: string;
 let fabricConnector: PluginLedgerConnectorFabric;
 let besuConnector: PluginLedgerConnectorBesu;
 
-let serverGatewayPluginOptions: IBesuSatpGatewayConstructorOptions;
-let pluginSourceGateway: FabricSatpGateway;
-let pluginRecipientGateway: BesuSatpGateway;
+let serverGatewayPluginOptions: IBesuSATPGatewayConstructorOptions;
+let pluginSourceGateway: FabricSATPGateway;
+let pluginRecipientGateway: BesuSATPGateway;
 
 let clientGatewayApiHost: string;
 let serverGatewayApiHost: string;
@@ -513,7 +513,7 @@ beforeAll(async () => {
 beforeEach(async () => {
   {
     // Gateways configuration
-    const clientGatewayPluginOptions: IFabricSatpGatewayConstructorOptions = {
+    const clientGatewayPluginOptions: IFabricSATPGatewayConstructorOptions = {
       name: "cactus-plugin#satpGateway",
       dltIDs: ["DLT2"],
       instanceId: uuidv4(),
@@ -543,8 +543,8 @@ beforeEach(async () => {
       knexRemoteConfig: knexRemoteConnection,
     };
 
-    pluginSourceGateway = new FabricSatpGateway(clientGatewayPluginOptions);
-    pluginRecipientGateway = new BesuSatpGateway(serverGatewayPluginOptions);
+    pluginSourceGateway = new FabricSATPGateway(clientGatewayPluginOptions);
+    pluginRecipientGateway = new BesuSATPGateway(serverGatewayPluginOptions);
 
     expect(pluginSourceGateway.localRepository?.database).not.toBeUndefined();
     expect(
@@ -807,7 +807,7 @@ test("server gateway crashes after creating besu asset", async () => {
 
   await Servers.listen(listenOptions);
 
-  pluginRecipientGateway = new BesuSatpGateway(serverGatewayPluginOptions);
+  pluginRecipientGateway = new BesuSATPGateway(serverGatewayPluginOptions);
   await pluginRecipientGateway.registerWebServices(expressApp);
 
   // client gateway self-healed and is back online

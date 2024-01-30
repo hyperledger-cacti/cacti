@@ -52,15 +52,15 @@ import {
 
 import { makeSessionDataChecks } from "../make-checks";
 import {
-  FabricSatpGateway,
-  IFabricSatpGatewayConstructorOptions,
-} from "../../../main/typescript/gateway/fabric-satp-gateway";
+  FabricSATPGateway,
+  IFabricSATPGatewayConstructorOptions,
+} from "../../../main/typescript/core/fabric-satp-gateway";
 import {
-  BesuSatpGateway,
-  IBesuSatpGatewayConstructorOptions,
-} from "../../../main/typescript/gateway/besu-satp-gateway";
-import { ClientGatewayHelper } from "../../../main/typescript/gateway/client/client-helper";
-import { ServerGatewayHelper } from "../../../main/typescript/gateway/server/server-helper";
+  BesuSATPGateway,
+  IBesuSATPGatewayConstructorOptions,
+} from "../../../main/typescript/core/besu-satp-gateway";
+import { ClientGatewayHelper } from "../../../main/typescript/core/client-helper";
+import { ServerGatewayHelper } from "../../../main/typescript/core/server-helper";
 import { knexRemoteConnection } from "../knex.config";
 
 /**
@@ -91,8 +91,8 @@ let besuKeychainId: string;
 
 let fabricConnector: PluginLedgerConnectorFabric;
 let besuConnector: PluginLedgerConnectorBesu;
-let pluginSourceGateway: FabricSatpGateway;
-let pluginRecipientGateway: BesuSatpGateway;
+let pluginSourceGateway: FabricSATPGateway;
+let pluginRecipientGateway: BesuSATPGateway;
 
 let clientGatewayApiHost: string;
 let serverGatewayApiHost: string;
@@ -477,7 +477,7 @@ beforeAll(async () => {
 
   {
     // Gateways configuration
-    const clientGatewayPluginOptions: IFabricSatpGatewayConstructorOptions = {
+    const clientGatewayPluginOptions: IFabricSATPGatewayConstructorOptions = {
       name: "cactus-plugin#satpGateway",
       dltIDs: ["DLT2"],
       instanceId: uuidv4(),
@@ -490,7 +490,7 @@ beforeAll(async () => {
       knexRemoteConfig: knexRemoteConnection,
     };
 
-    const serverGatewayPluginOptions: IBesuSatpGatewayConstructorOptions = {
+    const serverGatewayPluginOptions: IBesuSATPGatewayConstructorOptions = {
       name: "cactus-plugin#satpGateway",
       dltIDs: ["DLT1"],
       instanceId: uuidv4(),
@@ -503,8 +503,8 @@ beforeAll(async () => {
       knexRemoteConfig: knexRemoteConnection,
     };
 
-    pluginSourceGateway = new FabricSatpGateway(clientGatewayPluginOptions);
-    pluginRecipientGateway = new BesuSatpGateway(serverGatewayPluginOptions);
+    pluginSourceGateway = new FabricSATPGateway(clientGatewayPluginOptions);
+    pluginRecipientGateway = new BesuSATPGateway(serverGatewayPluginOptions);
 
     expect(pluginSourceGateway.localRepository?.database).not.toBeUndefined();
     expect(

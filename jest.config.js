@@ -7,6 +7,9 @@ module.exports = {
   maxConcurrency: 1,
   setupFilesAfterEnv: ["jest-extended/all", "./jest.setup.console.logs.js"],
   testTimeout: 60 * 60 * 1000,
+  moduleNameMapper: {
+    "^(.+)/(.+)_pb\\.js$": "$1/$2_pb"
+    },
   testMatch: [
     `**/cactus-*/src/test/typescript/{unit,integration,benchmark}/**/*.test.ts`,
     `**/cacti-*/src/test/typescript/{unit,integration,benchmark}/**/*.test.ts`,
