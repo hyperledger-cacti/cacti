@@ -1,8 +1,8 @@
 import { randomInt } from "crypto";
 import {
   SatpMessageType,
-  PluginSatpGateway,
-} from "../../../../main/typescript/gateway/plugin-satp-gateway";
+  PluginSATPGateway,
+} from "../../../../main/typescript/plugin-satp-gateway";
 import {
   TransferCommenceV1Request,
   AssetProfile,
@@ -10,16 +10,16 @@ import {
 } from "../../../../main/typescript/generated/openapi/typescript-axios/api";
 import { v4 as uuidV4 } from "uuid";
 import { SHA256 } from "crypto-js";
-import { FabricSatpGateway } from "../../../../main/typescript/gateway/fabric-satp-gateway";
-import { BesuSatpGateway } from "../../../../main/typescript/gateway/besu-satp-gateway";
-import { ClientGatewayHelper } from "../../../../main/typescript/gateway/client/client-helper";
-import { ServerGatewayHelper } from "../../../../main/typescript/gateway/server/server-helper";
+import { FabricSATPGateway } from "../../../../main/typescript/core/fabric-satp-gateway";
+import { BesuSATPGateway } from "../../../../main/typescript/core/besu-satp-gateway";
+import { ClientGatewayHelper } from "../../../../main/typescript/core/client-helper";
+import { ServerGatewayHelper } from "../../../../main/typescript/core/server-helper";
 
 const MAX_RETRIES = 5;
 const MAX_TIMEOUT = 5000;
 
-let pluginSourceGateway: PluginSatpGateway;
-let pluginRecipientGateway: PluginSatpGateway;
+let pluginSourceGateway: PluginSATPGateway;
+let pluginRecipientGateway: PluginSATPGateway;
 let dummyInitializationResponseMessageHash: string;
 let expiryDate: string;
 let assetProfile: AssetProfile;
@@ -44,8 +44,8 @@ beforeEach(async () => {
     serverHelper: new ServerGatewayHelper(),
   };
 
-  pluginSourceGateway = new FabricSatpGateway(sourceGatewayConstructor);
-  pluginRecipientGateway = new BesuSatpGateway(recipientGatewayConstructor);
+  pluginSourceGateway = new FabricSATPGateway(sourceGatewayConstructor);
+  pluginRecipientGateway = new BesuSATPGateway(recipientGatewayConstructor);
 
   if (
     pluginSourceGateway.localRepository?.database == undefined ||
@@ -109,7 +109,7 @@ test("valid transfer commence request", async () => {
     sequenceNumber: sequenceNumber + 1,
   };
 
-  transferCommenceRequest.signature = PluginSatpGateway.bufArray2HexStr(
+  transferCommenceRequest.signature = PluginSATPGateway.bufArray2HexStr(
     pluginSourceGateway.sign(JSON.stringify(transferCommenceRequest)),
   );
 
@@ -154,7 +154,7 @@ test("transfer commence request with wrong sessionId", async () => {
     sequenceNumber: sequenceNumber + 1,
   };
 
-  transferCommenceRequest.signature = PluginSatpGateway.bufArray2HexStr(
+  transferCommenceRequest.signature = PluginSATPGateway.bufArray2HexStr(
     pluginSourceGateway.sign(JSON.stringify(transferCommenceRequest)),
   );
 
@@ -189,7 +189,7 @@ test("transfer commence request with wrong message type", async () => {
     sequenceNumber: sequenceNumber + 1,
   };
 
-  transferCommenceRequest.signature = PluginSatpGateway.bufArray2HexStr(
+  transferCommenceRequest.signature = PluginSATPGateway.bufArray2HexStr(
     pluginSourceGateway.sign(JSON.stringify(transferCommenceRequest)),
   );
 
@@ -224,7 +224,7 @@ test("transfer commence request with wrong signature", async () => {
     sequenceNumber: sequenceNumber + 1,
   };
 
-  transferCommenceRequest.signature = PluginSatpGateway.bufArray2HexStr(
+  transferCommenceRequest.signature = PluginSATPGateway.bufArray2HexStr(
     pluginSourceGateway.sign(JSON.stringify("wrongData")),
   );
 
@@ -259,7 +259,7 @@ test("transfer commence request with wrong previous message hash", async () => {
     sequenceNumber: sequenceNumber + 1,
   };
 
-  transferCommenceRequest.signature = PluginSatpGateway.bufArray2HexStr(
+  transferCommenceRequest.signature = PluginSATPGateway.bufArray2HexStr(
     pluginSourceGateway.sign(JSON.stringify(transferCommenceRequest)),
   );
 
@@ -294,7 +294,7 @@ test("transfer commence request with wrong asset profile hash", async () => {
     sequenceNumber: sequenceNumber + 1,
   };
 
-  transferCommenceRequest.signature = PluginSatpGateway.bufArray2HexStr(
+  transferCommenceRequest.signature = PluginSATPGateway.bufArray2HexStr(
     pluginSourceGateway.sign(JSON.stringify(transferCommenceRequest)),
   );
 
