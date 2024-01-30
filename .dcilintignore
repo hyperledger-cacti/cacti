@@ -26,3 +26,6 @@ weaver/tests/network-setups/corda/shared
 
 # Commit messages snuck disallowed terminology into the changelog files.
 CHANGELOG.md
+
+# Ignore the Gradle Wrapper scripts because they are vendored dependencies that we cannot alter
+**/gradlew
