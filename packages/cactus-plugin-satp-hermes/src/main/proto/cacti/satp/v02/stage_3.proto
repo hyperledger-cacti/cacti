@@ -1,0 +1,12 @@
+
+syntax = "proto3";
+package cacti.satp.v02.stage_3;
+
+import "google/protobuf/empty.proto";
+  
+service SATPStage3   {
+  // util RPCs
+
+  // step RPCs
+
+}

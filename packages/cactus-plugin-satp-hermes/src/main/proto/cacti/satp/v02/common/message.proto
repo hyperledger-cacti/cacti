@@ -1,0 +1,22 @@
+syntax = "proto3";
+package cacti.satp.v02.common;
+
+// TODO: define the common parameters to every protocol message
+message MessageCore {
+    string message = 1;
+}
+
+// TODO: define the common parameters to every rollback message
+message RollbackMessageCore {
+    string message = 1;
+}
+
+enum STATUS {
+  STATUS_UNSPECIFIED = 0;
+  STATUS_OK = 1;
+  STATUS_ERROR = 2;
+};
+
+message Ack {
+    STATUS status = 1;
+}
