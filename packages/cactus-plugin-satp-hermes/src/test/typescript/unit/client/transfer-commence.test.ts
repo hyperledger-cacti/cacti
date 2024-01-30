@@ -3,17 +3,17 @@ import { SHA256 } from "crypto-js";
 import { v4 as uuidV4 } from "uuid";
 import {
   SatpMessageType,
-  PluginSatpGateway,
-} from "../../../../main/typescript/gateway/plugin-satp-gateway";
+  PluginSATPGateway,
+} from "../../../../main/typescript/plugin-satp-gateway";
 import {
   AssetProfile,
   SessionData,
   TransferCommenceV1Response,
 } from "../../../../main/typescript/public-api";
-import { BesuSatpGateway } from "../../../../main/typescript/gateway/besu-satp-gateway";
-import { FabricSatpGateway } from "../../../../main/typescript/gateway/fabric-satp-gateway";
-import { ClientGatewayHelper } from "../../../../main/typescript/gateway/client/client-helper";
-import { ServerGatewayHelper } from "../../../../main/typescript/gateway/server/server-helper";
+import { BesuSATPGateway } from "../../../../main/typescript/core/besu-satp-gateway";
+import { FabricSATPGateway } from "../../../../main/typescript/core/fabric-satp-gateway";
+import { ClientGatewayHelper } from "../../../../main/typescript/core/client-helper";
+import { ServerGatewayHelper } from "../../../../main/typescript/core/server-helper";
 
 const MAX_RETRIES = 5;
 const MAX_TIMEOUT = 5000;
@@ -22,8 +22,8 @@ const COMMENCE_REQUEST_MESSAGE_HASH = "dummyCommenceRequestMessageHash";
 
 let sourceGatewayConstructor;
 let recipientGatewayConstructor;
-let pluginSourceGateway: PluginSatpGateway;
-let pluginRecipientGateway: PluginSatpGateway;
+let pluginSourceGateway: PluginSATPGateway;
+let pluginRecipientGateway: PluginSATPGateway;
 let sequenceNumber: number;
 let sessionID: string;
 let step: number;
@@ -44,8 +44,8 @@ beforeEach(async () => {
     serverHelper: new ServerGatewayHelper(),
   };
 
-  pluginSourceGateway = new FabricSatpGateway(sourceGatewayConstructor);
-  pluginRecipientGateway = new BesuSatpGateway(recipientGatewayConstructor);
+  pluginSourceGateway = new FabricSATPGateway(sourceGatewayConstructor);
+  pluginRecipientGateway = new BesuSATPGateway(recipientGatewayConstructor);
 
   if (
     pluginSourceGateway.localRepository?.database == undefined ||
@@ -90,7 +90,7 @@ test("valid transfer commence response", async () => {
     sequenceNumber: sequenceNumber,
   };
 
-  transferCommenceResponse.signature = PluginSatpGateway.bufArray2HexStr(
+  transferCommenceResponse.signature = PluginSATPGateway.bufArray2HexStr(
     await pluginRecipientGateway.sign(JSON.stringify(transferCommenceResponse)),
   );
 
@@ -127,7 +127,7 @@ test("transfer commence response invalid because of wrong previous message hash"
     sequenceNumber: sequenceNumber,
   };
 
-  transferCommenceResponse.signature = PluginSatpGateway.bufArray2HexStr(
+  transferCommenceResponse.signature = PluginSATPGateway.bufArray2HexStr(
     await pluginRecipientGateway.sign(JSON.stringify(transferCommenceResponse)),
   );
 
@@ -157,7 +157,7 @@ test("transfer commence response invalid because of wrong signature", async () =
     sequenceNumber: sequenceNumber,
   };
 
-  transferCommenceResponse.signature = PluginSatpGateway.bufArray2HexStr(
+  transferCommenceResponse.signature = PluginSATPGateway.bufArray2HexStr(
     await pluginRecipientGateway.sign("somethingWrong"),
   );
 
