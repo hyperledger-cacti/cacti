@@ -1,0 +1,104 @@
+{
+  "name": "@hyperledger/cactus-plugin-bungee",
+  "version": "1.0.0",
+  "description": "Proof of concept of bungee",
+  "keywords": [
+    "Hyperledger",
+    "Cactus",
+    "Integration",
+    "Blockchain",
+    "Distributed Ledger Technology",
+    "View"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger/cacti.git"
+  },
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Hyperledger Cactus Contributors",
+    "email": "cactus@lists.hyperledger.org",
+    "url": "https://www.hyperledger.org/use/cacti"
+  },
+  "contributors": [
+    {
+      "name": "Afonso Marques",
+      "email": "Afonso.m.marques@tecnico.ulisboa.pt",
+      "url": "https://github.com/WAfonsoMarques"
+    },
+    {
+      "name": "Rafael Belchior",
+      "email": "rafael.belchior@tecnico.ulisboa.pt",
+      "url": "https://rafaelapb.github.io/"
+    },
+    {
+      "name": "André Augusto",
+      "email": "andre.augusto@tecnico.ulisboa.pt",
+      "url": "https://github.com/AndreAugusto11"
+    }
+  ],
+  "main": "dist/lib/main/typescript/index.js",
+  "module": "dist/lib/main/typescript/index.js",
+  "types": "dist/lib/main/typescript/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "scripts": {
+    "codegen": "run-p 'codegen:*'",
+    "codegen:openapi": "npm run generate-sdk",
+    "generate-sdk": "run-p 'generate-sdk:*'",
+    "generate-sdk:kotlin": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g kotlin -o ./src/main/kotlin/generated/openapi/kotlin-client/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
+    "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
+    "pretsc": "npm run generate-sdk",
+    "tsc": "tsc --project ./tsconfig.json",
+    "watch": "npm-watch"
+  },
+  "dependencies": {
+    "@hyperledger/cactus-cmd-api-server": "2.0.0-alpha.2",
+    "@hyperledger/cactus-common": "2.0.0-alpha.2",
+    "@hyperledger/cactus-core": "2.0.0-alpha.2",
+    "@hyperledger/cactus-core-api": "2.0.0-alpha.2",
+    "@hyperledger/cactus-plugin-keychain-memory": "2.0.0-alpha.2",
+    "@hyperledger/cactus-plugin-ledger-connector-besu": "2.0.0-alpha.2",
+    "@hyperledger/cactus-plugin-ledger-connector-fabric": "2.0.0-alpha.2",
+    "@hyperledger/cactus-plugin-object-store-ipfs": "2.0.0-alpha.2",
+    "@hyperledger/cactus-test-tooling": "2.0.0-alpha.2",
+    "axios": "1.6.0",
+    "typescript-optional": "2.0.1",
+    "uuid": "9.0.1"
+  },
+  "devDependencies": {
+    "@types/body-parser": "1.19.4",
+    "@types/crypto-js": "4.0.1",
+    "@types/express": "4.17.19",
+    "@types/fs-extra": "11.0.3",
+    "@types/tape": "4.13.4",
+    "@types/uuid": "9.0.6",
+    "express": "4.18.2"
+  },
+  "engines": {
+    "node": ">=18",
+    "npm": ">=8"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "watch": {
+    "tsc": {
+      "patterns": [
+        "src/",
+        "src/*/json/**/openapi*"
+      ],
+      "ignore": [
+        "src/**/generated/*"
+      ],
+      "extensions": [
+        "ts",
+        "json"
+      ],
+      "quiet": true,
+      "verbose": false,
+      "runOnChangeOnly": true
+    }
+  }
+}

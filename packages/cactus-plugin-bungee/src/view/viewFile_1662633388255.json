@@ -1,0 +1,20 @@
+{
+  "View": {
+    "tI": "",
+    "tF": "",
+    "snapshot": {
+      "id": "6c6063a0-5782-467e-b264-9bcfa5b8d58b",
+      "participant": "Org1MSP",
+      "version": 1,
+      "stateBins": [
+        {
+          "id": "",
+          "version": 0,
+          "values": [],
+          "transactions": []
+        }
+      ]
+    }
+  },
+  "Signature": "FC562243WflrfOqQtFQ3u2XL5tA7iGsCHj2SlPGb07HJv5Ia0i/GUeNh5Odluji57kaPqeZIAK5mDOvrstG6zJ9XIasdeeA37ao5mgOD16AtZGIMNo5XjjR+La2XwRP+oph9MlEzTjc29UyfzZpuAMMF8WeqzQ9tcSL2ieyJh3EWSHlWz24y7ZkxR7+IABsA3XHaMev6/69KpPYuygLEVglOWbUVQc096n2aSeBCIlUq4TCk/9mMcEMT1YCbdedxHmB6tRJRDmqGdSUoI3UXXOTrOgdr01kVESffrOodjUDupHC8182fmKOLrJ+VEABwgIuHvo0XbylM1QwnUb4g9rmT/ElaCOvi2fTLHGN6M0ZrEFEFydAxsoVEbUCRxiSGqxIl+i5ZxziwGcMxC6xNIsZ/Ls2Ktcis7Ti3cLizqan1yu53027iEKidnrwOGrhtvJjvrs5FC3u+VUfUJHiDLLQCocaPXwe49R7FMIotQpywjUXD3HLyM7vx8wJzTKC2Sd064uo5pGiKFmPWVdQEECbtkGWL/sdsQEg4fvKdENlzuAieoPQDiMbZIoQgJd4eG7ekZCzrtcu1oTDg9c35fAtAHYx3FmXaGIn5xyXz31/YzxzxPTCoNjBfAbxmNdI6Xpt3U30jt67sKblVC4eNKaBZb6vMwOXxuEDWi/5Urcg="
+}
