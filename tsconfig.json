@@ -225,6 +225,8 @@
     "esModuleInterop": true,
     "inlineSourceMap": true,
     "forceConsistentCasingInFileNames": true,
-    "useUnknownInCatchVariables": false
+    "useUnknownInCatchVariables": false,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,  
   }
 }
