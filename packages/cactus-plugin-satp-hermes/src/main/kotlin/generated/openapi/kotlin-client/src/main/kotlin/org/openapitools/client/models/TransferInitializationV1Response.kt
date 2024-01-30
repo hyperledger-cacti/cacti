@@ -65,8 +65,13 @@ data class TransferInitializationV1Response (
     @Json(name = "backupGatewaysAllowed")
     val backupGatewaysAllowed: kotlin.collections.List<kotlin.String>,
 
+<<<<<<< HEAD:packages/cactus-plugin-odap-hermes/src/main/kotlin/generated/openapi/kotlin-client/src/main/kotlin/org/openapitools/client/models/TransferInitializationV1Response.kt
     @Json(name = "odapPhase")
     val odapPhase: TransferInitializationV1Response.OdapPhase? = null,
+=======
+    @Json(name = "satpPhase")
+    val satpPhase: TransferInitializationV1Response.SatpPhase? = null,
+>>>>>>> 0c7d5dd87... feat(bungee): Add skeleton for BUNGEE:packages/cactus-plugin-satp-hermes/src/main/kotlin/generated/openapi/kotlin-client/src/main/kotlin/org/openapitools/client/models/TransferInitializationV1Response.kt
 
     @Json(name = "destination")
     val destination: kotlin.String? = null
@@ -79,7 +84,7 @@ data class TransferInitializationV1Response (
      * Values: transferInitialization,lockEvidenceVerification,commitmentEstablishment
      */
     @JsonClass(generateAdapter = false)
-    enum class OdapPhase(val value: kotlin.String) {
+    enum class SatpPhase(val value: kotlin.String) {
         @Json(name = "TransferInitialization") transferInitialization("TransferInitialization"),
         @Json(name = "LockEvidenceVerification") lockEvidenceVerification("LockEvidenceVerification"),
         @Json(name = "CommitmentEstablishment") commitmentEstablishment("CommitmentEstablishment");

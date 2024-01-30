@@ -160,6 +160,37 @@ export const K_DEFAULT_CLI_CONTAINER_GO_PATH = "/opt/gopath/";
  */
 export const K_DEFAULT_DOCKER_BINARY = "docker";
 
+export type getSnapshotRequest = {
+  privateData: boolean;
+  channelName: string;
+  snapshotHeight?: string;
+  tlsRootCertFile?: string;
+  peerAddress?: string;
+  snapshotPath?: string;
+};
+
+export type getSnapshotResponse = {
+  version: string;
+};
+
+export type FabricV2Snapshot = {
+  version: string;
+  publicState: any;
+  privateDataHashes: any;
+  transactionIds: any;
+  collectionConfig: any;
+  metadata: [
+    channel_name: any,
+    last_block_number: any,
+    last_block_hash: any,
+    previous_block_hash: any,
+    state_db_type: any,
+    snapshot_files_raw_hashes: any,
+    snapshot_hash: any,
+    last_block_commit_hash: any,
+  ];
+};
+
 export type SignPayloadCallback = (
   payload: Buffer,
   txData: unknown,
@@ -630,6 +661,77 @@ export class PluginLedgerConnectorFabric
         lifecycle,
       };
       return res;
+    } finally {
+      try {
+        ssh.dispose();
+      } finally {
+        temp.cleanup();
+      }
+    }
+  }
+
+  public async getSnapshot(req: getSnapshotRequest): Promise<any | void> {
+    // Promise<FabricV2Snapshot | getSnapshotResponse | void>
+    const fnTag = `${this.className}#getSnapshot()`;
+    const { log, opts } = this;
+
+    const ssh = new NodeSSH();
+    await ssh.connect(opts.sshConfig);
+    const remoteDirPath = path.join(this.cliContainerGoPath, "src/");
+
+    try {
+      const { privateData, channelName, peerAddress, tlsRootCertFile } = req;
+      let response: SSHExecCommandResponse;
+      let { snapshotHeight } = req;
+      if (privateData) {
+        throw new Error("snapshots with private data not yet supported");
+      }
+
+      const sshCmdOptions: SSHExecCommandOptions = {
+        execOptions: {
+          pty: true, // FIXME do we need this? probably not... same for env
+          env: {
+            // just in case go modules would be otherwise disabled
+            GO111MODULE: "on",
+            FABRIC_LOGGING_SPEC: "DEBUG",
+          },
+        },
+        cwd: remoteDirPath,
+      };
+      const dockerExecEnv = Object.entries(this.opts.cliContainerEnv)
+        .map(([key, value]) => `--env ${key}=${value}`)
+        .join(" ");
+
+      const { dockerBinary } = this;
+      const dockerBuildCmd =
+        `${dockerBinary} exec ` +
+        dockerExecEnv +
+        ` --env GO111MODULE=on` +
+        ` --workdir=${remoteDirPath}` +
+        ` cli `;
+
+      {
+        if (!snapshotHeight) {
+          const cmd = `${dockerBuildCmd} peer channel getinfo -c ${channelName}`;
+          const label = "obtain channel name";
+          response = await this.sshExec(cmd, label, ssh, sshCmdOptions);
+          snapshotHeight = JSON.parse(response.stdout).height;
+        }
+      }
+      {
+        const cmd = `${dockerBuildCmd} peer snapshot submitrequest -c ${channelName} -b ${snapshotHeight} --peerAddress ${peerAddress} --tlsRootCertFile ${tlsRootCertFile}`;
+        const label = "create snapshot";
+        response = await this.sshExec(cmd, label, ssh, sshCmdOptions);
+        log.debug(response);
+      }
+      // Obtain snapshot
+
+      log.debug(`EXIT getSnapshot()`);
+
+      return response;
+    } catch (error) {
+      log.error(fnTag);
+      throw new Error(error as string);
     } finally {
       try {
         ssh.dispose();

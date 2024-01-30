@@ -1,0 +1,73 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Hyperledger Cactus Plugin - BUNGEE",
+        "description": "Can create blockchain views of a fabric ledger",
+        "version": "0.0.1",
+        "license": {
+            "name": "Apache 2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "components": {
+        "schemas": {
+            "CreateViewRequest":{
+                "type":"object",
+                "properties": {
+                    "x":{
+                        "type":"string"
+                    }
+                }
+            },
+            "CreateViewResponse":{
+                "type":"object",
+                "properties": {
+                    "y":{
+                        "type":"string"
+                    }
+                }
+            }
+        }
+    },
+    "paths": {
+        "/api/v1/plugins/@hyperledger/cactus-plugin-bungee/create-view": {
+            "post": {
+                "x-hyperledger-cacti": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-bungee/create-view"
+                    }
+                },
+                "operationId": "createViewV1",
+                "summary": "Creates a Blockchain View.",
+                "description": "",
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateViewRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CreateViewResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": ""
+                    }
+                }
+            }
+        }
+    }
+}

@@ -46,6 +46,14 @@ type TransferAgreement struct {
 	BuyerID string `json:"buyerID"`
 }
 
+type assetTransientInput struct {
+	Type           string `json:"objectType"` //Type is used to distinguish the various types of objects in state database
+	ID             string `json:"assetID"`
+	Color          string `json:"color"`
+	Size           int    `json:"size"`
+	AppraisedValue int    `json:"appraisedValue"`
+}
+
 // CreateAsset creates a new asset by placing the main asset details in the assetCollection
 // that can be read by both organizations. The appraisal value is stored in the owners org specific collection.
 func (s *SmartContract) CreateAsset(ctx contractapi.TransactionContextInterface) error {
