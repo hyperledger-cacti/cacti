@@ -3,9 +3,9 @@
     "info": {
         "title": "Hyperledger Cactus Plugin - BUNGEE",
         "description": "Can create blockchain views of a fabric ledger",
-        "version": "0.0.1",
+        "version": "2.0.0-alpha.2",
         "license": {
-            "name": "Apache 2.0",
+            "name": "Apache-2.0",
             "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
         }
     },
