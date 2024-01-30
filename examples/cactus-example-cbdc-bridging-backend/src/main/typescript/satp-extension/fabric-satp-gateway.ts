@@ -8,11 +8,11 @@ import {
 } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
 import {
   IPluginSatpGatewayConstructorOptions,
-  PluginSatpGateway,
+  PluginSATPGateway,
 } from "@hyperledger/cactus-plugin-satp-hermes";
 import { SessionDataRollbackActionsPerformedEnum } from "@hyperledger/cactus-plugin-satp-hermes";
 
-export interface IFabricSatpGatewayConstructorOptions
+export interface IFabricSATPGatewayConstructorOptions
   extends IPluginSatpGatewayConstructorOptions {
   fabricPath?: string;
   fabricSigningCredential?: FabricSigningCredential;
@@ -20,13 +20,13 @@ export interface IFabricSatpGatewayConstructorOptions
   fabricContractName?: string;
 }
 
-export class FabricSatpGateway extends PluginSatpGateway {
+export class FabricSATPGateway extends PluginSATPGateway {
   public fabricApi?: FabricApi;
   public fabricSigningCredential?: FabricSigningCredential;
   public fabricChannelName?: string;
   public fabricContractName?: string;
 
-  public constructor(options: IFabricSatpGatewayConstructorOptions) {
+  public constructor(options: IFabricSATPGatewayConstructorOptions) {
     super({
       name: options.name,
       dltIDs: options.dltIDs,
@@ -44,7 +44,7 @@ export class FabricSatpGateway extends PluginSatpGateway {
   }
 
   private defineFabricConnection(
-    options: IFabricSatpGatewayConstructorOptions,
+    options: IFabricSATPGatewayConstructorOptions,
   ): void {
     const fnTag = `${this.className}#defineFabricConnection()`;
 
