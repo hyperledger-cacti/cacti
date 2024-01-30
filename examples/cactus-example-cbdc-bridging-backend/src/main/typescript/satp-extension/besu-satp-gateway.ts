@@ -8,11 +8,11 @@ import {
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 import {
   IPluginSatpGatewayConstructorOptions,
-  PluginSatpGateway,
+  PluginSATPGateway,
 } from "@hyperledger/cactus-plugin-satp-hermes";
 import { SessionDataRollbackActionsPerformedEnum } from "@hyperledger/cactus-plugin-satp-hermes";
 
-export interface IBesuSatpGatewayConstructorOptions
+export interface IBesuSATPGatewayConstructorOptions
   extends IPluginSatpGatewayConstructorOptions {
   besuContractName?: string;
   besuWeb3SigningCredential?: Web3SigningCredential;
@@ -21,13 +21,13 @@ export interface IBesuSatpGatewayConstructorOptions
   besuPath?: string;
 }
 
-export class BesuSatpGateway extends PluginSatpGateway {
+export class BesuSATPGateway extends PluginSATPGateway {
   public besuApi?: BesuApi;
   public besuContractName?: string;
   public besuWeb3SigningCredential?: Web3SigningCredential;
   public besuKeychainId?: string;
 
-  public constructor(options: IBesuSatpGatewayConstructorOptions) {
+  public constructor(options: IBesuSATPGatewayConstructorOptions) {
     super({
       name: options.name,
       dltIDs: options.dltIDs,
@@ -45,7 +45,7 @@ export class BesuSatpGateway extends PluginSatpGateway {
   }
 
   private defineBesuConnection(
-    options: IBesuSatpGatewayConstructorOptions,
+    options: IBesuSATPGatewayConstructorOptions,
   ): void {
     const fnTag = `${this.className}#defineBesuConnection()`;
 
