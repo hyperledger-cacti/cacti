@@ -1,0 +1,34 @@
+
+syntax = "proto3";
+package cacti.satp.v02.stage_0;
+
+import "google/protobuf/empty.proto";
+
+service SATPStage0   {
+  // util RPCs
+
+  // step RPCs
+  rpc TransferProposalClaims(TransferProposalClaimsRequest) returns (TransferProposalClaimsResponse) {};
+  // todo other rpcs
+}
+
+message TransferProposalClaimsRequest {
+  string message_type = 1;
+  string asset_asset_id = 2;
+  string asset_profile_id = 3;
+  string verified_originator_entity_id = 4;
+  string verified_beneficiary_entity_id = 5;
+  string originator_pubkey = 6;
+  string beneficiary_pubkey = 7;
+  string sender_gateway_network_id = 8;
+  string recipient_gateway_network_id = 9;
+  string client_identity_pubkey = 10;
+  string server_identity_pubkey = 11;
+  string sender_gateway_owner_id = 12;
+  string receiver_gateway_owner_id = 13;
+}
+
+// TODO
+message TransferProposalClaimsResponse {
+  string message_type = 1;
+}
