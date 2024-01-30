@@ -18,7 +18,7 @@
       
       
       <link rel="icon" href="../../../images/HL_Cacti_Logo_Colorreverse.svg">
-      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.5">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.6">
     
     
       
@@ -3930,7 +3930,7 @@
 <h2 id="building-and-running-the-container-locally">Building and running the container locally<a class="headerlink" href="#building-and-running-the-container-locally" title="Permanent link">&para;</a></h2>
 <p># Change directories to the project root</p>
 <p># Build the docker image and tag it as "scaeb" for supply chain app example backend
-DOCKER_BUILDKIT=1 docker build -f ./examples/supply-chain-app/Dockerfile . -t scaeb</p>
+DOCKER_BUILDKIT=1 docker build -f ./examples/cactus-example-supply-chain-backend/Dockerfile . -t scaeb</p>
 <p># Run the built image with ports mapped to the host machine as you see fit
 # The --privileged flag is required because we use Docker-in-Docker for pulling
 # up ledger containers from within the container in order to have the example
@@ -3940,7 +3940,7 @@ docker run --rm -it --privileged -p 3000:3000 -p 3100:3100 -p 3200:3200 -p 4000:
 <p>Building the image with a specific npm package version:</p>
 <p>DOCKER_BUILDKIT=1 docker build \
   --build-arg NPM_PKG_VERSION=jwt-supply-chain \
-  --file ./examples/supply-chain-app/Dockerfile \
+  --file ./examples/cactus-example-supply-chain-backend/Dockerfile \
   --tag scaeb \
   ./</p>
 <h2 id="running-the-example-application-locally">Running the Example Application Locally<a class="headerlink" href="#running-the-example-application-locally" title="Permanent link">&para;</a></h2>
@@ -3950,10 +3950,10 @@ docker run --rm -it --privileged -p 3000:3000 -p 3100:3100 -p 3200:3200 -p 4000:
 <p>On the terminal, issue the following commands:</p>
 <ol>
 <li>
-<p><code>npm run install-yarn</code></p>
+<p><code>npm run enable-corepack</code></p>
 </li>
 <li>
-<p><code>yarn configure</code></p>
+<p><code>yarn run configure</code></p>
 </li>
 <li>
 <p><code>yarn start:example-supply-chain</code></p>
@@ -3963,7 +3963,7 @@ docker run --rm -it --privileged -p 3000:3000 -p 3100:3100 -p 3200:3200 -p 4000:
 <p>On the terminal, issue the following commands (steps 1 to 6) and then perform the rest of the steps manually.</p>
 <ol>
 <li>
-<p><code>npm run install-yarn</code></p>
+<p><code>npm run enable-corepack</code></p>
 </li>
 <li>
 <p><code>yarn configure</code></p>
@@ -3972,10 +3972,10 @@ docker run --rm -it --privileged -p 3000:3000 -p 3100:3100 -p 3200:3200 -p 4000:
 <p><code>yarn build:dev</code></p>
 </li>
 <li>
-<p><code>cd ./examples/supply-chain-app/</code></p>
+<p><code>cd ./examples/cactus-example-supply-chain-backend/</code></p>
 </li>
 <li>
-<p><code>yarn --no-lockfile</code></p>
+<p><code>yarn install</code></p>
 </li>
 <li>
 <p><code>cd ../../</code></p>
@@ -4002,7 +4002,7 @@ docker run --rm -it --privileged -p 3000:3000 -p 3100:3100 -p 3200:3200 -p 4000:
 <h2 id="live-reloading-the-gui-application">Live Reloading the GUI Application<a class="headerlink" href="#live-reloading-the-gui-application" title="Permanent link">&para;</a></h2>
 <ol>
 <li>
-<p><code>npm run install-yarn</code></p>
+<p><code>npm run enable-corepack</code></p>
 </li>
 <li>
 <p><code>yarn configure</code></p>
@@ -4141,7 +4141,7 @@ docker run --rm -it --privileged -p 3000:3000 -p 3100:3100 -p 3200:3200 -p 4000:
     <script id="__config" type="application/json">{"base": "../../..", "features": ["content.code.copy", "navigation.expand", "navigation.footer", "navigation.instant", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "toc.follow", "toc.integrate"], "search": "../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.c18c5fb9.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.e1c3ead8.min.js"></script>
       
     
   </body>
