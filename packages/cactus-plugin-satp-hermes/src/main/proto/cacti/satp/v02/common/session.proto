@@ -1,0 +1,30 @@
+syntax = "proto3";
+package cacti.satp.v02.common;
+
+import "google/protobuf/empty.proto";
+
+// TODO: requires fully qualified path from buf.gen.yaml
+import "cacti/satp/v02/common/message.proto";
+
+message SendStatusRequest {
+    string status = 1;
+    bool hasBackup = 2;
+}
+
+message SendStatusResponse {
+    string status = 1;
+    bool hasBackup = 2;
+}
+
+
+service SessionStatusService {
+    rpc GetStatus(google.protobuf.Empty) returns (SendStatusResponse) {}
+    rpc SendStatus(SendStatusRequest) returns (google.protobuf.Empty) {}
+}
+
+// TODO: define common RPC methods for each step. This is a draft
+service CommonService {
+    rpc Ping(google.protobuf.Empty) returns (cacti.satp.v02.common.MessageCore) {}
+    rpc Rollback(google.protobuf.Empty) returns (cacti.satp.v02.common.RollbackMessageCore) {}
+    rpc GetStageVersion(google.protobuf.Empty) returns (cacti.satp.v02.common.Ack) {};
+}
