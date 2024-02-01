@@ -7501,7 +7501,7 @@ __metadata:
     "@hyperledger/cactus-plugin-ledger-connector-fabric": 2.0.0-alpha.2
     "@hyperledger/cactus-plugin-ledger-connector-xdai": 2.0.0-alpha.2
     "@hyperledger/cactus-plugin-object-store-ipfs": 2.0.0-alpha.2
-    "@hyperledger/cactus-plugin-odap-hermes": 2.0.0-alpha.2
+    "@hyperledger/cactus-plugin-satp-hermes": 2.0.0-alpha.2
     "@hyperledger/cactus-test-tooling": 2.0.0-alpha.2
     "@openzeppelin/contracts": 4.9.3
     "@openzeppelin/contracts-upgradeable": 4.9.3
@@ -8509,44 +8509,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger/cactus-plugin-odap-hermes@2.0.0-alpha.2, @hyperledger/cactus-plugin-odap-hermes@workspace:packages/cactus-plugin-odap-hermes":
-  version: 0.0.0-use.local
-  resolution: "@hyperledger/cactus-plugin-odap-hermes@workspace:packages/cactus-plugin-odap-hermes"
-  dependencies:
-    "@hyperledger/cactus-cmd-api-server": 2.0.0-alpha.2
-    "@hyperledger/cactus-common": 2.0.0-alpha.2
-    "@hyperledger/cactus-core": 2.0.0-alpha.2
-    "@hyperledger/cactus-core-api": 2.0.0-alpha.2
-    "@hyperledger/cactus-plugin-keychain-memory": 2.0.0-alpha.2
-    "@hyperledger/cactus-plugin-ledger-connector-besu": 2.0.0-alpha.2
-    "@hyperledger/cactus-plugin-ledger-connector-fabric": 2.0.0-alpha.2
-    "@hyperledger/cactus-plugin-object-store-ipfs": 2.0.0-alpha.2
-    "@hyperledger/cactus-test-tooling": 2.0.0-alpha.2
-    "@types/body-parser": 1.19.4
-    "@types/crypto-js": 4.0.1
-    "@types/express": 4.17.19
-    "@types/fs-extra": 11.0.3
-    "@types/tape": 4.13.4
-    "@types/uuid": 9.0.6
-    axios: 1.6.0
-    body-parser: 1.20.2
-    crypto-js: 4.2.0
-    express: 4.18.2
-    fabric-network: 2.2.19
-    fs-extra: 11.1.1
-    knex: 2.4.0
-    kubo-rpc-client: 3.0.1
-    secp256k1: 4.0.3
-    socket.io: 4.5.4
-    sqlite3: 5.1.5
-    typescript: 5.3.3
-    typescript-optional: 2.0.1
-    uuid: 9.0.1
-    web3: 1.6.1
-    web3-utils: 1.6.1
-  languageName: unknown
-  linkType: soft
-
 "@hyperledger/cactus-plugin-persistence-ethereum@workspace:packages/cactus-plugin-persistence-ethereum":
   version: 0.0.0-use.local
   resolution: "@hyperledger/cactus-plugin-persistence-ethereum@workspace:packages/cactus-plugin-persistence-ethereum"
@@ -8603,6 +8565,44 @@ __metadata:
     safe-stable-stringify: 2.4.3
     socket.io: 4.5.4
     uuid: 8.3.2
+  languageName: unknown
+  linkType: soft
+
+"@hyperledger/cactus-plugin-satp-hermes@2.0.0-alpha.2, @hyperledger/cactus-plugin-satp-hermes@workspace:packages/cactus-plugin-satp-hermes":
+  version: 0.0.0-use.local
+  resolution: "@hyperledger/cactus-plugin-satp-hermes@workspace:packages/cactus-plugin-satp-hermes"
+  dependencies:
+    "@hyperledger/cactus-cmd-api-server": 2.0.0-alpha.2
+    "@hyperledger/cactus-common": 2.0.0-alpha.2
+    "@hyperledger/cactus-core": 2.0.0-alpha.2
+    "@hyperledger/cactus-core-api": 2.0.0-alpha.2
+    "@hyperledger/cactus-plugin-keychain-memory": 2.0.0-alpha.2
+    "@hyperledger/cactus-plugin-ledger-connector-besu": 2.0.0-alpha.2
+    "@hyperledger/cactus-plugin-ledger-connector-fabric": 2.0.0-alpha.2
+    "@hyperledger/cactus-plugin-object-store-ipfs": 2.0.0-alpha.2
+    "@hyperledger/cactus-test-tooling": 2.0.0-alpha.2
+    "@types/body-parser": 1.19.4
+    "@types/crypto-js": 4.0.1
+    "@types/express": 4.17.19
+    "@types/fs-extra": 11.0.3
+    "@types/tape": 4.13.4
+    "@types/uuid": 9.0.6
+    axios: 1.6.0
+    body-parser: 1.20.2
+    crypto-js: 4.2.0
+    express: 4.18.2
+    fabric-network: 2.2.19
+    fs-extra: 11.1.1
+    knex: 2.4.0
+    kubo-rpc-client: 3.0.1
+    secp256k1: 4.0.3
+    socket.io: 4.5.4
+    sqlite3: 5.1.5
+    typescript: 5.3.3
+    typescript-optional: 2.0.1
+    uuid: 9.0.1
+    web3: 1.6.1
+    web3-utils: 1.6.1
   languageName: unknown
   linkType: soft
 

@@ -206,19 +206,19 @@ jobs:
         name: cactus-plugin-keychain-memory-wasm-kotlin-client-${{ env.GITVERSION }}.jar
         path: packages/cactus-plugin-keychain-memory-wasm/src/main/kotlin/generated/openapi/kotlin-client/build/libs/kotlin-client-1.0.0.jar
 
-    - name: build-cactus-plugin-odap-hermes-kotlin-client
+    - name: build-cactus-plugin-satp-hermes-kotlin-client
       run: |
         WDIR=`pwd`
-        cd ${WDIR}/packages/cactus-plugin-odap-hermes/src/main/kotlin/generated/openapi/kotlin-client
+        cd ${WDIR}/packages/cactus-plugin-satp-hermes/src/main/kotlin/generated/openapi/kotlin-client
         chmod +x gradlew
         ./gradlew clean
         ./gradlew build
 
-    - name: publish-cactus-plugin-odap-hermes-kotlin-client
+    - name: publish-cactus-plugin-satp-hermes-kotlin-client
       uses: actions/upload-artifact@v3.0.0
       with:
-        name: cactus-plugin-odap-hermes-kotlin-client-${{ env.GITVERSION }}.jar
-        path: packages/cactus-plugin-odap-hermes/src/main/kotlin/generated/openapi/kotlin-client/build/libs/kotlin-client-1.0.0.jar
+        name: cactus-plugin-satp-hermes-kotlin-client-${{ env.GITVERSION }}.jar
+        path: packages/cactus-plugin-satp-hermes/src/main/kotlin/generated/openapi/kotlin-client/build/libs/kotlin-client-1.0.0.jar
 
     - name: build-cactus-example-supply-chain-business-logic-plugin-kotlin-client
       run: |

@@ -65,7 +65,7 @@
     "@hyperledger/cactus-plugin-ledger-connector-fabric": "2.0.0-alpha.2",
     "@hyperledger/cactus-plugin-ledger-connector-xdai": "2.0.0-alpha.2",
     "@hyperledger/cactus-plugin-object-store-ipfs": "2.0.0-alpha.2",
-    "@hyperledger/cactus-plugin-odap-hermes": "2.0.0-alpha.2",
+    "@hyperledger/cactus-plugin-satp-hermes": "2.0.0-alpha.2",
     "@hyperledger/cactus-test-tooling": "2.0.0-alpha.2",
     "@openzeppelin/contracts": "4.9.3",
     "@openzeppelin/contracts-upgradeable": "4.9.3",

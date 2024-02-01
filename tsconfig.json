@@ -146,7 +146,7 @@
       "path": "./examples/cactus-example-tcs-huawei/tsconfig.json"
     },
     {
-      "path": "./packages/cactus-plugin-odap-hermes/tsconfig.json"
+      "path": "./packages/cactus-plugin-satp-hermes/tsconfig.json"
     },
     {
       "path": "./examples/cactus-example-electricity-trade/tsconfig.json"
