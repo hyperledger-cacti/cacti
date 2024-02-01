@@ -33,7 +33,7 @@ paths:
           description: Bad Request
       summary: "Deploys a set of jar files (Cordapps, e.g. the contracts in Corda\
         \ speak)."
-      x-hyperledger-cactus:
+      x-hyperledger-cacti:
         http:
           path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/deploy-contract-jars
           verbLowerCase: post
@@ -54,7 +54,7 @@ paths:
                 $ref: '#/components/schemas/InvokeContractV1Response'
           description: OK
       summary: Invokes a contract on a Corda ledger (e.g. a flow)
-      x-hyperledger-cactus:
+      x-hyperledger-cacti:
         http:
           path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/invoke-contract
           verbLowerCase: post
@@ -75,7 +75,7 @@ paths:
                 $ref: '#/components/schemas/StartMonitorV1Response'
           description: OK
       summary: Start monitoring corda changes (transactions) of given state class
-      x-hyperledger-cactus:
+      x-hyperledger-cacti:
         http:
           path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/start-monitor
           verbLowerCase: post
@@ -96,7 +96,7 @@ paths:
                 $ref: '#/components/schemas/GetMonitorTransactionsV1Response'
           description: OK
       summary: Get transactions for monitored state classes.
-      x-hyperledger-cactus:
+      x-hyperledger-cacti:
         http:
           path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-monitor-transactions
           verbLowerCase: get
@@ -118,7 +118,7 @@ paths:
           description: OK
       summary: Clear transactions from internal store so they'll not be available
         by GetMonitorTransactionsV1 anymore.
-      x-hyperledger-cactus:
+      x-hyperledger-cacti:
         http:
           path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/clear-monitor-transactions
           verbLowerCase: delete
@@ -139,7 +139,7 @@ paths:
                 $ref: '#/components/schemas/StopMonitorV1Response'
           description: OK
       summary: Stop monitoring corda changes (transactions) of given state class
-      x-hyperledger-cactus:
+      x-hyperledger-cacti:
         http:
           path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/stop-monitor
           verbLowerCase: delete
@@ -162,7 +162,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/NetworkMapV1Response'
           description: OK
-      x-hyperledger-cactus:
+      x-hyperledger-cacti:
         http:
           path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/network-map
           verbLowerCase: post
@@ -183,7 +183,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ListFlowsV1Response'
           description: OK
-      x-hyperledger-cactus:
+      x-hyperledger-cacti:
         http:
           path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-flows
           verbLowerCase: post
@@ -204,7 +204,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/DiagnoseNodeV1Response'
           description: OK
-      x-hyperledger-cactus:
+      x-hyperledger-cacti:
         http:
           path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/diagnose-node
           verbLowerCase: post
@@ -220,7 +220,7 @@ paths:
                 $ref: '#/components/schemas/PrometheusExporterMetricsResponse'
           description: OK
       summary: Get the Prometheus Metrics
-      x-hyperledger-cactus:
+      x-hyperledger-cacti:
         http:
           verbLowerCase: get
           path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-prometheus-exporter-metrics
