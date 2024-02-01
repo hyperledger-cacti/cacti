@@ -38,9 +38,9 @@ import { PluginRegistry } from "@hyperledger/cactus-core";
 import { PluginObjectStoreIpfs } from "@hyperledger/cactus-plugin-object-store-ipfs";
 import AssetReferenceContractJson from "../../../solidity/asset-reference-contract/AssetReferenceContract.json";
 import CBDCcontractJson from "../../../solidity/cbdc-erc-20/CBDCcontract.json";
-import { IOdapPluginKeyPair } from "@hyperledger/cactus-plugin-odap-hermes";
-import { FabricOdapGateway } from "../odap-extension/fabric-odap-gateway";
-import { BesuOdapGateway } from "../odap-extension/besu-odap-gateway";
+import { IKeyPair } from "@hyperledger/cactus-plugin-satp-hermes";
+import { FabricSatpGateway } from "../satp-extension/fabric-satp-gateway";
+import { BesuSatpGateway } from "../satp-extension/besu-satp-gateway";
 import { PluginImportType } from "@hyperledger/cactus-core-api";
 import CryptoMaterial from "../../../crypto-material/crypto-material.json";
 
@@ -303,12 +303,12 @@ export class CbdcBridgingAppDummyInfrastructure {
 
   public async createClientGateway(
     nodeApiHost: string,
-    keyPair: IOdapPluginKeyPair,
+    keyPair: IKeyPair,
     ipfsPath: string,
-  ): Promise<FabricOdapGateway> {
+  ): Promise<FabricSatpGateway> {
     this.log.info(`Creating Source Gateway...`);
-    const pluginSourceGateway = new FabricOdapGateway({
-      name: "cactus-plugin-source#odapGateway",
+    const pluginSourceGateway = new FabricSatpGateway({
+      name: "cactus-plugin-source#satpGateway",
       dltIDs: ["DLT2"],
       instanceId: uuidv4(),
       keyPair: keyPair,
@@ -330,12 +330,12 @@ export class CbdcBridgingAppDummyInfrastructure {
 
   public async createServerGateway(
     nodeApiHost: string,
-    keyPair: IOdapPluginKeyPair,
+    keyPair: IKeyPair,
     ipfsPath: string,
-  ): Promise<BesuOdapGateway> {
+  ): Promise<BesuSatpGateway> {
     this.log.info(`Creating Recipient Gateway...`);
-    const pluginRecipientGateway = new BesuOdapGateway({
-      name: "cactus-plugin-recipient#odapGateway",
+    const pluginRecipientGateway = new BesuSatpGateway({
+      name: "cactus-plugin-recipient#satpGateway",
       dltIDs: ["DLT1"],
       instanceId: uuidv4(),
       keyPair: keyPair,

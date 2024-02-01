@@ -138,6 +138,8 @@
         "recoverupdateackmessage",
         "RUSTC",
         "Rwset",
+        "satp",
+        "Satp",
         "sbjpubkey",
         "Secp",
         "shrn",

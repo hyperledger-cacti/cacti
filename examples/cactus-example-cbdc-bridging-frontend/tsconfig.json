@@ -34,7 +34,7 @@
       "path": "../../packages/cactus-plugin-ledger-connector-fabric/tsconfig.json"
     },
     {
-      "path": "../../packages/cactus-plugin-odap-hermes/tsconfig.json"
+      "path": "../../packages/cactus-plugin-satp-hermes/tsconfig.json"
     }
   ]
 }

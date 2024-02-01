@@ -18,23 +18,23 @@ import {
 import {
   Configuration,
   DefaultApi as OdapApi,
-  IOdapPluginKeyPair,
-} from "@hyperledger/cactus-plugin-odap-hermes";
+  IKeyPair,
+} from "@hyperledger/cactus-plugin-satp-hermes";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import { CbdcBridgingAppDummyInfrastructure } from "./infrastructure/cbdc-bridging-app-dummy-infrastructure";
 import { DefaultApi as FabricApi } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
 import { DefaultApi as BesuApi } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 import { DefaultApi as IpfsApi } from "@hyperledger/cactus-plugin-object-store-ipfs";
-import { FabricOdapGateway } from "./odap-extension/fabric-odap-gateway";
-import { BesuOdapGateway } from "./odap-extension/besu-odap-gateway";
+import { FabricSatpGateway } from "./satp-extension/fabric-satp-gateway";
+import { BesuSatpGateway } from "./satp-extension/besu-satp-gateway";
 import CryptoMaterial from "../../crypto-material/crypto-material.json";
 
 export interface ICbdcBridgingApp {
   apiHost: string;
   apiServer1Port: number;
   apiServer2Port: number;
-  clientGatewayKeyPair: IOdapPluginKeyPair;
-  serverGatewayKeyPair: IOdapPluginKeyPair;
+  clientGatewayKeyPair: IKeyPair;
+  serverGatewayKeyPair: IKeyPair;
   logLevel?: LogLevelDesc;
   apiServerOptions?: ICactusApiServerOptions;
   disableSignalHandlers?: true;
@@ -236,6 +236,6 @@ export interface IStartInfo {
   readonly ipfsApiClient: IpfsApi;
   readonly besuApiClient: BesuApi;
   readonly fabricApiClient: FabricApi;
-  readonly fabricOdapGateway: FabricOdapGateway;
-  readonly besuOdapGateway: BesuOdapGateway;
+  readonly fabricOdapGateway: FabricSatpGateway;
+  readonly besuOdapGateway: BesuSatpGateway;
 }
