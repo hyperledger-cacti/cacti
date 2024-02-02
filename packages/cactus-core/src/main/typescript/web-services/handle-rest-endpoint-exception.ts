@@ -1,10 +1,16 @@
+import type { Response } from "express";
+import createHttpError from "http-errors";
+
+import {
+  identifierByCodes,
+  INTERNAL_SERVER_ERROR,
+} from "http-errors-enhanced-cjs";
+
 import {
   Logger,
   createRuntimeErrorWithCause,
   safeStringifyException,
 } from "@hyperledger/cactus-common";
-import type { Response } from "express";
-import createHttpError from "http-errors";
 
 /**
  * An interface describing the object containing the contextual information needed by the
@@ -40,10 +46,6 @@ export async function handleRestEndpointException(
   ctx: Readonly<IHandleRestEndpointExceptionOptions>,
 ): Promise<void> {
   const errorAsSanitizedJson = safeStringifyException(ctx.error);
-
-  const { identifierByCodes, INTERNAL_SERVER_ERROR } = await import(
-    "http-errors-enhanced-cjs"
-  );
 
   if (createHttpError.isHttpError(ctx.error)) {
     ctx.res.status(ctx.error.statusCode);
