@@ -170,6 +170,7 @@
         "vscc",
         "vuln",
         "wasm",
+        "WSPROVIDER",
         "Xdai"
     ],
     "dictionaries": [

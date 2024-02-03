@@ -17,15 +17,10 @@ test(testCase, async (t: Test) => {
     publishAllPorts: true,
     logLevel: logLevel,
     emitContainerLogs: true,
-    imageName: "ghcr.io/hyperledger/cactus-substrate-all-in-one",
-    imageTag: "2022-03-29--1496",
     envVars: new Map([
-      ["WORKING_DIR", "/var/www/node-template"],
-      ["CONTAINER_NAME", "contracts-node-template-cactus"],
       ["WS_PORT", "9945"],
       ["PORT", "9944"],
       ["DOCKER_PORT", "9945"],
-      ["CARGO_HOME", "/var/www/node-template/.cargo"],
     ]),
   };
 
@@ -35,15 +30,10 @@ test(testCase, async (t: Test) => {
     publishAllPorts: true,
     logLevel: logLevel,
     emitContainerLogs: true,
-    imageName: "ghcr.io/hyperledger/cactus-substrate-all-in-one",
-    imageTag: "2022-03-29--1496",
     envVars: new Map([
-      ["WORKING_DIR", "/var/www/node-template"],
-      ["CONTAINER_NAME", "contracts-node-template-cactus"],
       ["WS_PORT", "9947"],
       ["PORT", "9946"],
       ["DOCKER_PORT", "9947"],
-      ["CARGO_HOME", "/var/www/node-template/.cargo"],
     ]),
   };
 
