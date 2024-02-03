@@ -58,7 +58,7 @@ export class SubstrateTestLedger {
     this._containerId = Optional.empty();
     this.imageName =
       opts.imageName || "ghcr.io/hyperledger/cactus-substrate-all-in-one";
-    this.imageTag = opts.imageTag || "2021-09-24---feat-1274";
+    this.imageTag = opts.imageTag || "2024-01-16-pr-2877";
     this.imageFqn = `${this.imageName}:${this.imageTag}`;
     this.envVars = opts.envVars || new Map();
     this.emitContainerLogs = Bools.isBooleanStrict(opts.emitContainerLogs)
@@ -104,7 +104,7 @@ export class SubstrateTestLedger {
       Healthcheck: {
         Test: [
           "CMD-SHELL",
-          `rustup --version && rustc --version && cargo --version`,
+          `(echo '{"id":1,"jsonrpc":"2.0","method":"system_health","params":[]}' | websocat -n1  ws://127.0.0.1:9944) > /dev/null; echo $?`,
         ],
         Interval: 1000000000, // 1 second
         Timeout: 3000000000, // 3 seconds

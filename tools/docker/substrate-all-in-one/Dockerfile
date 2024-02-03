@@ -1,48 +1,31 @@
-FROM paritytech/ci-linux:production
-LABEL AUTHORS="Rafael Belchior, Catarina Pedreira"
-LABEL VERSION="2021-11-01"
-LABEL org.opencontainers.image.source=https://github.com/hyperledger/cactus
+FROM paritytech/ci-linux:production as builder
 
-WORKDIR /
-ENV WORKING_DIR=/var/www/node-template
-ENV CONTAINER_NAME=contracts-node-template-cactus
-# Specify p2p protocol TCP port
-ENV PORT=9614
+RUN cargo install contracts-node
 
-# Specify HTTP RPC server TCP port
-ENV RPC_PORT=9618
+## second stage
+FROM ubuntu:20.04
 
-#Specify WebSockets RPC server TCP port
-ENV WS_PORT=9944
+COPY --from=builder /usr/local/cargo/bin/substrate-contracts-node /usr/local/bin/
 
-ENV DOCKER_PORT=9944
-ENV CARGO_HOME=/var/www/node-template/.cargo
-ENV CACTUS_CFG_PATH=/etc/hyperledger/cactus
+RUN apt-get update && apt-get install -y supervisor \
+    && apt-get install wget -y \
+    && wget -qO /usr/local/bin/websocat https://github.com/vi/websocat/releases/download/v1.11.0/websocat.x86_64-unknown-linux-musl \
+    && chmod a+x /usr/local/bin/websocat
 
-VOLUME .:/var/www/node-template
+COPY ./healthcheck.sh /usr/bin/
 
-RUN apt update
+RUN chmod a+x /usr/bin/healthcheck.sh
 
-# Get ubuntu and rust packages
-RUN apt install -y build-essential pkg-config git clang curl libssl-dev llvm libudev-dev
+HEALTHCHECK --interval=10s --timeout=10s --start-period=30s --retries=10 \
+    CMD ["/usr/bin/healthcheck.sh"]
 
-ENV CACTUS_CFG_PATH=/etc/hyperledger/cactus
-RUN mkdir -p $CACTUS_CFG_PATH
+# for substrate node
+EXPOSE 9944
+# for supervisord
+EXPOSE 9001
 
-RUN set -e
+COPY supervisord.conf /etc/supervisord.conf
 
-RUN echo "*** Instaling Rust environment ***"
-RUN curl https://sh.rustup.rs -y -sSf | sh
-RUN echo 'source $HOME/.cargo/env' >> $HOME/.bashrc
-RUN rustup default nightly
+ENTRYPOINT ["/usr/bin/supervisord"]
 
-RUN echo "*** Initializing WASM build environment"
-RUN rustup target add wasm32-unknown-unknown --toolchain nightly
-
-RUN echo "*** Installing Substrate node environment ***"
-RUN cargo install contracts-node --git https://github.com/paritytech/substrate-contracts-node.git --force --locked
-
-COPY start.sh /
-
-RUN echo "*** Start Substrate node template ***"
-CMD /start.sh
+CMD ["--configuration", "/etc/supervisord.conf", "--nodaemon"]

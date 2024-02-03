@@ -19,6 +19,7 @@ jobs:
   compute_changed_packages:
     outputs:
       cmd-api-server-changed: ${{ steps.changes.outputs.cmd-api-server-changed }}
+      plugin-ledger-connector-polkadot-changed: ${{ steps.changes.outputs.plugin-ledger-connector-polkadot-changed }}
       plugin-ledger-connector-aries-changed: ${{ steps.changes.outputs.plugin-ledger-connector-aries-changed }}
       plugin-ledger-connector-besu-changed: ${{ steps.changes.outputs.plugin-ledger-connector-besu-changed }}
       plugin-ledger-connector-corda-changed: ${{ steps.changes.outputs.plugin-ledger-connector-corda-changed }}
@@ -49,6 +50,14 @@ jobs:
               - './packages/cactus-plugin-keychain-vault/**'
               # - './.github/workflows/ci.yaml'
 
+            plugin-ledger-connector-polkadot-changed:
+              - './packages/cactus-plugin-ledger-connector-polkadot/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-common/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-core/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-core-api/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              - './packages/cactus-test-tooling/**!(*.md|*.css|*.html|*.jpg|*.jpeg|*.png)'
+              # - './.github/workflows/ci.yaml'
+            
             plugin-ledger-connector-aries-changed:
               - './packages/cactus-plugin-ledger-connector-aries/**'
               - './packages/cactus-common/**'
@@ -974,6 +983,34 @@ jobs:
       TAPE_TEST_PATTERN: >-
         --files={./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/deploy-contract-from-json.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/get-block.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/get-past-logs.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/get-record-locator.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/private-deploy-contract-from-json-cactus.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/private-deploy-contract-from-json-web3-eea.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/v21-deploy-contract-from-json.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/v21-get-balance.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/v21-get-past-logs.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/v21-get-record-locator.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/openapi/openapi-validation.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/v21-besu-get-transaction.test.ts}
       TAPE_TEST_RUNNER_DISABLED: false
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: ${{ env.NODEJS_VERSION }}
+      - uses: actions/checkout@v3.5.2
+
+      - id: yarn-cache
+        name: Restore Yarn Cache
+        uses: actions/cache@v3.3.1
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
+          restore-keys: |
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+      - run: ./tools/ci.sh
+  cactus-plugin-ledger-connector-polkadot:
+    continue-on-error: false
+    env:
+      FULL_BUILD_DISABLED: true
+      JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-polkadot/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_RUNNER_DISABLED: false
+      TAPE_TEST_RUNNER_DISABLED: true
+    needs:
+      - build-dev
+      - compute_changed_packages
+    if: needs.compute_changed_packages.outputs.plugin-ledger-connector-polkadot-changed == 'true'
     runs-on: ubuntu-20.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}

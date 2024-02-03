@@ -1,0 +1,24 @@
+@startuml
+title Hyperledger Cactus\nSequence Diagram\nRun Transaction Endpoint\ntransactSigned() method
+
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 20
+skinparam maxmessagesize 120
+skinparam sequenceParticipant underline
+
+actor "Caller" as caller
+participant "transactSigned()" as ts
+participant "api.rpc.author.submitAndWatchExtrinsic()" as aras
+
+caller -> ts: req
+activate caller
+group #e6e632 if web3SigningCredential == NONE
+    activate ts
+    ts -> aras: deserializedTransaction
+    activate aras
+    aras --> ts: success, txHash, blockHash
+    deactivate aras
+ts --> caller: returns [success, txHash, blockHash] as resBody
+end
+deactivate caller
+@enduml

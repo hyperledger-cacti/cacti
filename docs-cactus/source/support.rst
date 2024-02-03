@@ -11,6 +11,6 @@ This section contains the ledger supported versions for connectors in Hyperledge
    Fabric <support/fabric.md>
    Iroha <support/iroha.md>
    Quorum <support/quorum.md>
-   xDai <support/xdai.md>
-   
+   xDai <support/xdai.md>  
+   Substrate <support/substrate.md>  
 

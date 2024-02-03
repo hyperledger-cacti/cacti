@@ -1,0 +1,23 @@
+@startuml
+title Hyperledger Cactus\nSequence Diagram\nRun Transaction Endpoint\ntransactMnemonicString() method
+
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 20
+skinparam maxmessagesize 120
+skinparam sequenceParticipant underline
+
+actor "Caller" as caller
+participant "transactMnemonicString()" as tms
+participant ".signAndSend()" as sas
+
+caller -> tms: req
+activate caller
+alt #LightGreen web3SigningCredential == MNEMONICSTRING
+        activate tms
+        tms -> sas: [transactionConfig, mnemonicString]
+        activate sas
+        sas --> tms: return [success, txHash, blockHash]
+        deactivate sas
+        tms --> caller: return [success, txHash, blockHash] as resBody
+end
+@enduml
