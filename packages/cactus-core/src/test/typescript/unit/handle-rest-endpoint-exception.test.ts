@@ -10,10 +10,17 @@ import {
 } from "../../../main/typescript/public-api"; // replace with the correct path to your module
 
 import { LoggerProvider } from "@hyperledger/cactus-common";
+import {
+  identifierByCodes,
+  INTERNAL_SERVER_ERROR,
+} from "http-errors-enhanced-cjs";
 
+// Since we are testing error handling, lots of false positive error logs appear
+// that are hard to untangle/confusing when reading the test log output.
+// The SILENT level suppresses these.
 const log = LoggerProvider.getOrCreate({
   label: "handle-rest-endpoint-exception.test.ts",
-  level: "DEBUG",
+  level: "SILENT",
 });
 
 describe("handleRestEndpointException", () => {
@@ -21,63 +28,80 @@ describe("handleRestEndpointException", () => {
     jest.clearAllMocks();
   });
 
-  it("should handle HttpError with statusCode >= 500", async () => {
+  it("should handle HttpError with statusCode gte 500", async () => {
     const mockResponse = createResponse();
 
-    const mockOptions: IHandleRestEndpointExceptionOptions = {
-      errorMsg: "Test error message",
+    const rootCauseErrorMsg = "Root Cause Exception that should cause gte 500";
+    const rootError = new Error(rootCauseErrorMsg);
+
+    const reThrowErrorMsg =
+      "Message of the Re-thrown Exception that should have some context for debugging on top of the information already available in the rootCauseErrorMsg.";
+
+    const ctx: IHandleRestEndpointExceptionOptions = {
+      errorMsg: reThrowErrorMsg,
       log: jest.mocked(log), // Provide a mock logger if needed
-      error: new Error("Test error"), // Provide appropriate error objects for testing
+      error: rootError, // Provide appropriate error objects for testing
       res: mockResponse,
     };
 
-    const mockHttpError = createHttpError(500, "Test HTTP error", {
-      expose: true,
-    });
-
-    const errorAsSanitizedJson = safeStringifyException(mockHttpError);
-    const spyLogDebug = jest.spyOn(mockOptions.log, "debug");
+    const spyLog = jest.spyOn(ctx.log, "error");
     const spyStatus = jest.spyOn(mockResponse, "status");
     const spyJson = jest.spyOn(mockResponse, "json");
 
-    await handleRestEndpointException({ ...mockOptions, error: mockHttpError });
+    await handleRestEndpointException(ctx);
 
     expect(spyStatus).toHaveBeenCalledWith(500);
 
-    expect(spyLogDebug).toHaveBeenCalledWith(
-      mockOptions.errorMsg,
-      errorAsSanitizedJson,
+    expect(spyLog).toHaveBeenCalledWith(
+      ctx.errorMsg,
+      safeStringifyException(rootError),
     );
 
-    expect(spyJson).toHaveBeenCalledWith({
-      message: "InternalServerError",
-      error: errorAsSanitizedJson,
-    });
+    expect(spyJson).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringMatching(
+          identifierByCodes[INTERNAL_SERVER_ERROR],
+        ),
+        error: expect.stringContaining(reThrowErrorMsg),
+      }),
+    );
+
+    expect(spyJson).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringMatching(
+          identifierByCodes[INTERNAL_SERVER_ERROR],
+        ),
+        error: expect.stringContaining(rootCauseErrorMsg),
+      }),
+    );
   });
 
   it("should handle HttpError with statusCode < 500", async () => {
     const mockResponse = createResponse();
 
-    const mockOptions: IHandleRestEndpointExceptionOptions = {
-      errorMsg: "Test error message",
-      log: jest.mocked(log), // Provide a mock logger if needed
-      error: new Error("Test error"), // Provide appropriate error objects for testing
-      res: mockResponse,
-    };
-
-    const mockHttpError = createHttpError(404, "Test HTTP error", {
+    const rootErrorStr = "Test HTTP 404 error";
+    const mockHttpError = createHttpError(404, rootErrorStr, {
       expose: true,
     });
 
+    const ctx: IHandleRestEndpointExceptionOptions = {
+      errorMsg: "Test error message",
+      log: jest.mocked(log), // Provide a mock logger if needed
+      error: mockHttpError, // Provide appropriate error objects for testing
+      res: mockResponse,
+    };
+
     const errorAsSanitizedJson = safeStringifyException(mockHttpError);
-    const spyLogError = jest.spyOn(mockOptions.log, "error");
+    const spyLogError = jest.spyOn(ctx.log, "error");
     const spyStatus = jest.spyOn(mockResponse, "status");
     const spyJson = jest.spyOn(mockResponse, "json");
-    await handleRestEndpointException({ ...mockOptions, error: mockHttpError });
+
+    await handleRestEndpointException(ctx);
 
     expect(spyStatus).toHaveBeenCalledWith(404);
+
     expect(spyLogError).toHaveBeenCalledWith(
-      mockOptions.errorMsg,
+      ctx.errorMsg,
       errorAsSanitizedJson,
     );
 
@@ -89,10 +113,9 @@ describe("handleRestEndpointException", () => {
 
   it("should handle non-HttpError", async () => {
     const mockResponse = createResponse();
-
     const mockError = new Error("An unexpected exception. Ha!");
 
-    const mockOptions: IHandleRestEndpointExceptionOptions = {
+    const ctx: IHandleRestEndpointExceptionOptions = {
       errorMsg: "Test error message",
       log: jest.mocked(log), // Provide a mock logger if needed
       error: mockError,
@@ -100,19 +123,14 @@ describe("handleRestEndpointException", () => {
     };
 
     const mockErrorJson = safeStringifyException(mockError);
-    const spyLoggerFn = jest.spyOn(mockOptions.log, "error");
+    const spyLoggerFn = jest.spyOn(ctx.log, "error");
     const spyStatus = jest.spyOn(mockResponse, "status");
     const spyJson = jest.spyOn(mockResponse, "json");
 
-    await handleRestEndpointException({ ...mockOptions, error: mockError });
+    await handleRestEndpointException(ctx);
 
     expect(spyStatus).toHaveBeenCalledWith(500);
-
-    expect(spyLoggerFn).toHaveBeenCalledWith(
-      mockOptions.errorMsg,
-      mockErrorJson,
-    );
-
+    expect(spyLoggerFn).toHaveBeenCalledWith(ctx.errorMsg, mockErrorJson);
     expect(spyJson).toHaveBeenCalledOnce();
 
     const mostRecentCall = spyJson.mock.lastCall;
@@ -131,7 +149,7 @@ describe("handleRestEndpointException", () => {
     const dummyXssPayload = `<script>stealAndUploadPrivateKeys();</script>`;
     const mockError = new Error(dummyXssPayload);
 
-    const mockOptions: IHandleRestEndpointExceptionOptions = {
+    const ctx: IHandleRestEndpointExceptionOptions = {
       errorMsg: "Test error message",
       log: jest.mocked(log), // Provide a mock logger if needed
       error: mockError,
@@ -139,18 +157,15 @@ describe("handleRestEndpointException", () => {
     };
 
     const mockErrorJson = safeStringifyException(mockError);
-    const spyLoggerFn = jest.spyOn(mockOptions.log, "error");
+    const spyLoggerFn = jest.spyOn(ctx.log, "error");
     const spyStatus = jest.spyOn(mockResponse, "status");
     const spyJson = jest.spyOn(mockResponse, "json");
 
-    await handleRestEndpointException({ ...mockOptions, error: mockError });
+    await handleRestEndpointException(ctx);
 
     expect(spyStatus).toHaveBeenCalledWith(500);
 
-    expect(spyLoggerFn).toHaveBeenCalledWith(
-      mockOptions.errorMsg,
-      mockErrorJson,
-    );
+    expect(spyLoggerFn).toHaveBeenCalledWith(ctx.errorMsg, mockErrorJson);
 
     expect(spyJson).toHaveBeenCalledOnce();
 
@@ -173,7 +188,7 @@ describe("handleRestEndpointException", () => {
     const dummyXssPayload = `<script>stealAndUploadPrivateKeys();</script>`;
     const mockError = dummyXssPayload;
 
-    const mockOptions: IHandleRestEndpointExceptionOptions = {
+    const ctx: IHandleRestEndpointExceptionOptions = {
       errorMsg: "Test error message",
       log: jest.mocked(log), // Provide a mock logger if needed
       error: mockError,
@@ -181,19 +196,14 @@ describe("handleRestEndpointException", () => {
     };
 
     const mockErrorJson = safeStringifyException(mockError);
-    const spyLoggerFn = jest.spyOn(mockOptions.log, "error");
+    const spyLoggerFn = jest.spyOn(ctx.log, "error");
     const spyStatus = jest.spyOn(mockResponse, "status");
     const spyJson = jest.spyOn(mockResponse, "json");
 
-    await handleRestEndpointException({ ...mockOptions, error: mockError });
+    await handleRestEndpointException(ctx);
 
     expect(spyStatus).toHaveBeenCalledWith(500);
-
-    expect(spyLoggerFn).toHaveBeenCalledWith(
-      mockOptions.errorMsg,
-      mockErrorJson,
-    );
-
+    expect(spyLoggerFn).toHaveBeenCalledWith(ctx.errorMsg, mockErrorJson);
     expect(spyJson).toHaveBeenCalledOnce();
 
     const mostRecentCall = spyJson.mock.lastCall;
