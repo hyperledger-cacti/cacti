@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-import { Knex } from "knex";
 import { Configuration } from "@hyperledger/cactus-core-api";
 import {
   DefaultApi as FabricApi,
@@ -7,25 +6,18 @@ import {
   FabricSigningCredential,
   RunTransactionRequest as FabricRunTransactionRequest,
 } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
-import { IKeyPair, PluginSatpGateway } from "./plugin-satp-gateway";
+import {
+  IPluginSatpGatewayConstructorOptions,
+  PluginSatpGateway,
+} from "./plugin-satp-gateway";
 import { SessionDataRollbackActionsPerformedEnum } from "../generated/openapi/typescript-axios";
-import { ClientGatewayHelper } from "./client/client-helper";
-import { ServerGatewayHelper } from "./server/server-helper";
 
-export interface IFabricSatpGatewayConstructorOptions {
-  name: string;
-  dltIDs: string[];
-  instanceId: string;
-  keyPair?: IKeyPair;
-  backupGatewaysAllowed?: string[];
-  ipfsPath?: string;
+export interface IFabricSatpGatewayConstructorOptions
+  extends IPluginSatpGatewayConstructorOptions {
   fabricPath?: string;
   fabricSigningCredential?: FabricSigningCredential;
   fabricChannelName?: string;
   fabricContractName?: string;
-  knexConfig?: Knex.Config;
-  clientHelper: ClientGatewayHelper;
-  serverHelper: ServerGatewayHelper;
 }
 
 export class FabricSatpGateway extends PluginSatpGateway {
@@ -44,7 +36,8 @@ export class FabricSatpGateway extends PluginSatpGateway {
       ipfsPath: options.ipfsPath,
       clientHelper: options.clientHelper,
       serverHelper: options.serverHelper,
-      knexConfig: options.knexConfig,
+      knexLocalConfig: options.knexLocalConfig,
+      knexRemoteConfig: options.knexRemoteConfig,
     });
 
     if (options.fabricPath != undefined) this.defineFabricConnection(options);

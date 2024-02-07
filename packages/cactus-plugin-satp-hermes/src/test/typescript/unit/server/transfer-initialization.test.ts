@@ -2,7 +2,7 @@ import { randomInt } from "crypto";
 import { SHA256 } from "crypto-js";
 import { v4 as uuidV4 } from "uuid";
 import {
-  OdapMessageType,
+  SatpMessageType,
   PluginSatpGateway,
 } from "../../../../main/typescript/gateway/plugin-satp-gateway";
 import {
@@ -18,8 +18,6 @@ import { ServerGatewayHelper } from "../../../../main/typescript/gateway/server/
 const MAX_RETRIES = 5;
 const MAX_TIMEOUT = 5000;
 
-let sourceGatewayConstructor;
-let recipientGatewayConstructor;
 let pluginSourceGateway: PluginSatpGateway;
 let pluginRecipientGateway: PluginSatpGateway;
 let expiryDate: string;
@@ -28,14 +26,14 @@ let sequenceNumber: number;
 let sessionID: string;
 
 beforeEach(async () => {
-  sourceGatewayConstructor = {
+  const sourceGatewayConstructor = {
     name: "plugin-satp-gateway#sourceGateway",
     dltIDs: ["DLT2"],
     instanceId: uuidV4(),
     clientHelper: new ClientGatewayHelper(),
     serverHelper: new ServerGatewayHelper(),
   };
-  recipientGatewayConstructor = {
+  const recipientGatewayConstructor = {
     name: "plugin-satp-gateway#recipientGateway",
     dltIDs: ["DLT1"],
     instanceId: uuidV4(),
@@ -47,16 +45,14 @@ beforeEach(async () => {
   pluginRecipientGateway = new BesuSatpGateway(recipientGatewayConstructor);
 
   if (
-    pluginSourceGateway.database == undefined ||
-    pluginRecipientGateway.database == undefined
+    pluginSourceGateway.localRepository?.database == undefined ||
+    pluginRecipientGateway.localRepository?.database == undefined
   ) {
     throw new Error("Database is not correctly initialized");
   }
 
-  await pluginSourceGateway.database.migrate.rollback();
-  await pluginSourceGateway.database.migrate.latest();
-  await pluginRecipientGateway.database.migrate.rollback();
-  await pluginRecipientGateway.database.migrate.latest();
+  await pluginSourceGateway.localRepository?.reset();
+  await pluginRecipientGateway.localRepository?.reset();
 
   expiryDate = new Date(2060, 11, 24).toString();
   assetProfile = { expirationDate: expiryDate };
@@ -69,7 +65,7 @@ test("valid transfer initiation request", async () => {
   const initializationRequestMessage: TransferInitializationV1Request = {
     maxRetries: MAX_RETRIES,
     maxTimeout: MAX_TIMEOUT,
-    messageType: OdapMessageType.InitializationRequest,
+    messageType: SatpMessageType.InitializationRequest,
     sessionID: sessionID,
     version: "0.0.0",
     loggingProfile: "dummyLoggingProfile",
@@ -137,7 +133,7 @@ test("transfer initiation request invalid because of incompatible DLTs", async (
   const initializationRequestMessage: TransferInitializationV1Request = {
     maxRetries: MAX_RETRIES,
     maxTimeout: MAX_TIMEOUT,
-    messageType: OdapMessageType.InitializationRequest,
+    messageType: SatpMessageType.InitializationRequest,
     sessionID: sessionID,
     version: "0.0.0",
     loggingProfile: "dummy",
@@ -188,7 +184,7 @@ test("transfer initiation request invalid because of asset expired", async () =>
   const initializationRequestMessage: TransferInitializationV1Request = {
     maxRetries: MAX_RETRIES,
     maxTimeout: MAX_TIMEOUT,
-    messageType: OdapMessageType.InitializationRequest,
+    messageType: SatpMessageType.InitializationRequest,
     sessionID: sessionID,
     version: "0.0.0",
     loggingProfile: "dummy",
@@ -259,6 +255,8 @@ test("timeout in commit final response because no client gateway is connected", 
 });
 
 afterEach(() => {
-  pluginSourceGateway.database?.destroy();
-  pluginRecipientGateway.database?.destroy();
+  pluginSourceGateway.localRepository?.destroy();
+  pluginRecipientGateway.localRepository?.destroy();
+  pluginSourceGateway.remoteRepository?.destroy();
+  pluginRecipientGateway.remoteRepository?.destroy();
 });

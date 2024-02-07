@@ -742,128 +742,6 @@ export interface LockEvidenceV1Response {
 /**
  * 
  * @export
- * @interface OdapMessage
- */
-export interface OdapMessage {
-    /**
-     * 
-     * @type {number}
-     * @memberof OdapMessage
-     */
-    'SequenceNumber'?: number;
-    /**
-     * 
-     * @type {string}
-     * @memberof OdapMessage
-     */
-    'Phase'?: OdapMessagePhaseEnum;
-    /**
-     * 
-     * @type {string}
-     * @memberof OdapMessage
-     */
-    'ResourceURL'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof OdapMessage
-     */
-    'DeveloperURN'?: string;
-    /**
-     * 
-     * @type {OdapMessageActionResponse}
-     * @memberof OdapMessage
-     */
-    'ActionResponse'?: OdapMessageActionResponse;
-    /**
-     * 
-     * @type {string}
-     * @memberof OdapMessage
-     */
-    'CredentialProfile'?: OdapMessageCredentialProfileEnum;
-    /**
-     * 
-     * @type {Array<any>}
-     * @memberof OdapMessage
-     */
-    'CredentialBlock'?: Array<any>;
-    /**
-     * 
-     * @type {PayloadProfile}
-     * @memberof OdapMessage
-     */
-    'CredentialsProfile'?: PayloadProfile;
-    /**
-     * 
-     * @type {object}
-     * @memberof OdapMessage
-     */
-    'ApplicationProfile'?: object;
-    /**
-     * 
-     * @type {object}
-     * @memberof OdapMessage
-     */
-    'Payload'?: object;
-    /**
-     * 
-     * @type {string}
-     * @memberof OdapMessage
-     */
-    'PayloadHash'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof OdapMessage
-     */
-    'MessageSignature'?: string;
-}
-
-export const OdapMessagePhaseEnum = {
-    TransferInitialization: 'TransferInitialization',
-    LockEvidenceVerification: 'LockEvidenceVerification',
-    CommitmentEstablishment: 'CommitmentEstablishment'
-} as const;
-
-export type OdapMessagePhaseEnum = typeof OdapMessagePhaseEnum[keyof typeof OdapMessagePhaseEnum];
-export const OdapMessageCredentialProfileEnum = {
-    Saml: 'SAML',
-    OAuth: 'OAuth',
-    X509: 'X509'
-} as const;
-
-export type OdapMessageCredentialProfileEnum = typeof OdapMessageCredentialProfileEnum[keyof typeof OdapMessageCredentialProfileEnum];
-
-/**
- * 
- * @export
- * @interface OdapMessageActionResponse
- */
-export interface OdapMessageActionResponse {
-    /**
-     * 
-     * @type {string}
-     * @memberof OdapMessageActionResponse
-     */
-    'ResponseCode'?: OdapMessageActionResponseResponseCodeEnum;
-    /**
-     * 
-     * @type {Array<any>}
-     * @memberof OdapMessageActionResponse
-     */
-    'Arguments'?: Array<any>;
-}
-
-export const OdapMessageActionResponseResponseCodeEnum = {
-    OK: '200',
-    RESOURCE_NOT_FOUND: '404'
-} as const;
-
-export type OdapMessageActionResponseResponseCodeEnum = typeof OdapMessageActionResponseResponseCodeEnum[keyof typeof OdapMessageActionResponseResponseCodeEnum];
-
-/**
- * 
- * @export
  * @interface PayloadProfile
  */
 export interface PayloadProfile {
@@ -1078,6 +956,128 @@ export interface RollbackV1Message {
      */
     'signature': string;
 }
+/**
+ * 
+ * @export
+ * @interface SatpMessage
+ */
+export interface SatpMessage {
+    /**
+     * 
+     * @type {number}
+     * @memberof SatpMessage
+     */
+    'SequenceNumber'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof SatpMessage
+     */
+    'Phase'?: SatpMessagePhaseEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof SatpMessage
+     */
+    'ResourceURL'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SatpMessage
+     */
+    'DeveloperURN'?: string;
+    /**
+     * 
+     * @type {SatpMessageActionResponse}
+     * @memberof SatpMessage
+     */
+    'ActionResponse'?: SatpMessageActionResponse;
+    /**
+     * 
+     * @type {string}
+     * @memberof SatpMessage
+     */
+    'CredentialProfile'?: SatpMessageCredentialProfileEnum;
+    /**
+     * 
+     * @type {Array<any>}
+     * @memberof SatpMessage
+     */
+    'CredentialBlock'?: Array<any>;
+    /**
+     * 
+     * @type {PayloadProfile}
+     * @memberof SatpMessage
+     */
+    'CredentialsProfile'?: PayloadProfile;
+    /**
+     * 
+     * @type {object}
+     * @memberof SatpMessage
+     */
+    'ApplicationProfile'?: object;
+    /**
+     * 
+     * @type {object}
+     * @memberof SatpMessage
+     */
+    'Payload'?: object;
+    /**
+     * 
+     * @type {string}
+     * @memberof SatpMessage
+     */
+    'PayloadHash'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SatpMessage
+     */
+    'MessageSignature'?: string;
+}
+
+export const SatpMessagePhaseEnum = {
+    TransferInitialization: 'TransferInitialization',
+    LockEvidenceVerification: 'LockEvidenceVerification',
+    CommitmentEstablishment: 'CommitmentEstablishment'
+} as const;
+
+export type SatpMessagePhaseEnum = typeof SatpMessagePhaseEnum[keyof typeof SatpMessagePhaseEnum];
+export const SatpMessageCredentialProfileEnum = {
+    Saml: 'SAML',
+    OAuth: 'OAuth',
+    X509: 'X509'
+} as const;
+
+export type SatpMessageCredentialProfileEnum = typeof SatpMessageCredentialProfileEnum[keyof typeof SatpMessageCredentialProfileEnum];
+
+/**
+ * 
+ * @export
+ * @interface SatpMessageActionResponse
+ */
+export interface SatpMessageActionResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof SatpMessageActionResponse
+     */
+    'ResponseCode'?: SatpMessageActionResponseResponseCodeEnum;
+    /**
+     * 
+     * @type {Array<any>}
+     * @memberof SatpMessageActionResponse
+     */
+    'Arguments'?: Array<any>;
+}
+
+export const SatpMessageActionResponseResponseCodeEnum = {
+    OK: '200',
+    RESOURCE_NOT_FOUND: '404'
+} as const;
+
+export type SatpMessageActionResponseResponseCodeEnum = typeof SatpMessageActionResponseResponseCodeEnum[keyof typeof SatpMessageActionResponseResponseCodeEnum];
+
 /**
  * 
  * @export

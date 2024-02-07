@@ -13,7 +13,6 @@ import {
   DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
   DEFAULT_FABRIC_2_AIO_IMAGE_VERSION,
   FabricTestLedgerV1,
-  GoIpfsTestContainer,
 } from "@hyperledger/cactus-test-tooling";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import {
@@ -35,7 +34,6 @@ import {
   InvokeContractV1Request as BesuInvokeContractV1Request,
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 import { PluginRegistry } from "@hyperledger/cactus-core";
-import { PluginObjectStoreIpfs } from "@hyperledger/cactus-plugin-object-store-ipfs";
 import AssetReferenceContractJson from "../../../solidity/asset-reference-contract/AssetReferenceContract.json";
 import CBDCcontractJson from "../../../solidity/cbdc-erc-20/CBDCcontract.json";
 import { IKeyPair } from "@hyperledger/cactus-plugin-satp-hermes";
@@ -43,6 +41,8 @@ import { FabricSatpGateway } from "../satp-extension/fabric-satp-gateway";
 import { BesuSatpGateway } from "../satp-extension/besu-satp-gateway";
 import { PluginImportType } from "@hyperledger/cactus-core-api";
 import CryptoMaterial from "../../../crypto-material/crypto-material.json";
+import { ClientHelper } from "../satp-extension/client-helper";
+import { ServerHelper } from "../satp-extension/server-helper";
 
 export interface ICbdcBridgingAppDummyInfrastructureOptions {
   logLevel?: LogLevelDesc;
@@ -56,9 +56,6 @@ export class CbdcBridgingAppDummyInfrastructure {
 
   private readonly besu: BesuTestLedger;
   private readonly fabric: FabricTestLedgerV1;
-  private readonly ipfs: GoIpfsTestContainer;
-  private readonly ipfsParentPath: string;
-
   private readonly log: Logger;
 
   public get className(): string {
@@ -78,8 +75,6 @@ export class CbdcBridgingAppDummyInfrastructure {
     const level = this.options.logLevel || "INFO";
     const label = this.className;
 
-    this.ipfsParentPath = `/${uuidv4()}/${uuidv4()}/`;
-
     this.log = LoggerProvider.getOrCreate({ level, label });
 
     this.besu = new BesuTestLedger({
@@ -95,10 +90,6 @@ export class CbdcBridgingAppDummyInfrastructure {
       envVars: new Map([
         ["FABRIC_VERSION", DEFAULT_FABRIC_2_AIO_FABRIC_VERSION],
       ]),
-      logLevel: level || "DEBUG",
-    });
-
-    this.ipfs = new GoIpfsTestContainer({
       logLevel: level || "DEBUG",
     });
   }
@@ -140,11 +131,7 @@ export class CbdcBridgingAppDummyInfrastructure {
   public async start(): Promise<void> {
     try {
       this.log.info(`Starting dummy infrastructure...`);
-      await Promise.all([
-        this.besu.start(),
-        this.fabric.start(),
-        this.ipfs.start(),
-      ]);
+      await Promise.all([this.besu.start(), this.fabric.start()]);
       this.log.info(`Started dummy infrastructure OK`);
     } catch (ex) {
       this.log.error(`Starting of dummy infrastructure crashed: `, ex);
@@ -158,7 +145,6 @@ export class CbdcBridgingAppDummyInfrastructure {
       await Promise.all([
         this.besu.stop().then(() => this.besu.destroy()),
         this.fabric.stop().then(() => this.fabric.destroy()),
-        this.ipfs.stop().then(() => this.ipfs.destroy()),
       ]);
       this.log.info(`Stopped OK`);
     } catch (ex) {
@@ -285,26 +271,9 @@ export class CbdcBridgingAppDummyInfrastructure {
     return besuConnector;
   }
 
-  public async createIPFSConnector(): Promise<PluginObjectStoreIpfs> {
-    this.log.info(`Creating Besu Connector...`);
-
-    const kuboRpcClientModule = await import("kubo-rpc-client");
-    const ipfsClientOrOptions = kuboRpcClientModule.create({
-      url: await this.ipfs.getApiUrl(),
-    });
-
-    return new PluginObjectStoreIpfs({
-      parentDir: this.ipfsParentPath,
-      logLevel: this.options.logLevel,
-      instanceId: uuidv4(),
-      ipfsClientOrOptions,
-    });
-  }
-
   public async createClientGateway(
     nodeApiHost: string,
     keyPair: IKeyPair,
-    ipfsPath: string,
   ): Promise<FabricSatpGateway> {
     this.log.info(`Creating Source Gateway...`);
     const pluginSourceGateway = new FabricSatpGateway({
@@ -312,7 +281,6 @@ export class CbdcBridgingAppDummyInfrastructure {
       dltIDs: ["DLT2"],
       instanceId: uuidv4(),
       keyPair: keyPair,
-      ipfsPath: ipfsPath,
       fabricPath: nodeApiHost,
       fabricSigningCredential: {
         keychainId: CryptoMaterial.keychains.keychain1.id,
@@ -320,10 +288,12 @@ export class CbdcBridgingAppDummyInfrastructure {
       },
       fabricChannelName: "mychannel",
       fabricContractName: "asset-reference-contract",
+      clientHelper: new ClientHelper(),
+      serverHelper: new ServerHelper({}),
     });
 
-    await pluginSourceGateway.database?.migrate.rollback();
-    await pluginSourceGateway.database?.migrate.latest();
+    await pluginSourceGateway.localRepository?.reset();
+    await pluginSourceGateway.remoteRepository?.reset();
 
     return pluginSourceGateway;
   }
@@ -331,7 +301,6 @@ export class CbdcBridgingAppDummyInfrastructure {
   public async createServerGateway(
     nodeApiHost: string,
     keyPair: IKeyPair,
-    ipfsPath: string,
   ): Promise<BesuSatpGateway> {
     this.log.info(`Creating Recipient Gateway...`);
     const pluginRecipientGateway = new BesuSatpGateway({
@@ -339,7 +308,6 @@ export class CbdcBridgingAppDummyInfrastructure {
       dltIDs: ["DLT1"],
       instanceId: uuidv4(),
       keyPair: keyPair,
-      ipfsPath: ipfsPath,
       besuPath: nodeApiHost,
       besuWeb3SigningCredential: {
         ethAccount: CryptoMaterial.accounts["bridge"].ethAddress,
@@ -348,10 +316,12 @@ export class CbdcBridgingAppDummyInfrastructure {
       },
       besuContractName: AssetReferenceContractJson.contractName,
       besuKeychainId: CryptoMaterial.keychains.keychain2.id,
+      clientHelper: new ClientHelper(),
+      serverHelper: new ServerHelper({}),
     });
 
-    await pluginRecipientGateway.database?.migrate.rollback();
-    await pluginRecipientGateway.database?.migrate.latest();
+    await pluginRecipientGateway.localRepository?.reset();
+    await pluginRecipientGateway.remoteRepository?.reset();
 
     return pluginRecipientGateway;
   }
@@ -624,19 +594,28 @@ export class CbdcBridgingAppDummyInfrastructure {
           // does the same thing, it just waits 10 seconds for good measure so there
           // might not be a way for us to avoid doing this, but if there is a way we
           // absolutely should not have timeouts like this, anywhere...
-          await new Promise((resolve) => setTimeout(resolve, 10000));
+          let retries_2 = 0;
+          while (retries_2 <= 5) {
+            await new Promise((resolve) => setTimeout(resolve, 10000));
 
-          await fabricApiClient.runTransactionV1({
-            contractName,
-            channelName,
-            params: ["name1", "symbol1", "8"],
-            methodName: "Initialize",
-            invocationType: FabricContractInvocationType.Send,
-            signingCredential: {
-              keychainId: CryptoMaterial.keychains.keychain1.id,
-              keychainRef: "userA",
-            },
-          });
+            await fabricApiClient
+              .runTransactionV1({
+                contractName,
+                channelName,
+                params: ["name1", "symbol1", "8"],
+                methodName: "Initialize",
+                invocationType: FabricContractInvocationType.Send,
+                signingCredential: {
+                  keychainId: CryptoMaterial.keychains.keychain1.id,
+                  keychainRef: "userA",
+                },
+              })
+              .then(() => (retries_2 = 6))
+              .catch(() =>
+                console.log("trying to Initialize fabric contract again"),
+              );
+            retries_2++;
+          }
         })
         .catch(() => console.log("trying to deploy fabric contract again"));
       retries++;

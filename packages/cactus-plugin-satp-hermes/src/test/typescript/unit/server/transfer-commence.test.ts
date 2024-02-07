@@ -1,7 +1,6 @@
 import { randomInt } from "crypto";
 import {
-  IPluginSatpGatewayConstructorOptions,
-  OdapMessageType,
+  SatpMessageType,
   PluginSatpGateway,
 } from "../../../../main/typescript/gateway/plugin-satp-gateway";
 import {
@@ -19,8 +18,6 @@ import { ServerGatewayHelper } from "../../../../main/typescript/gateway/server/
 const MAX_RETRIES = 5;
 const MAX_TIMEOUT = 5000;
 
-let sourceGatewayConstructor: IPluginSatpGatewayConstructorOptions;
-let recipientGatewayConstructor: IPluginSatpGatewayConstructorOptions;
 let pluginSourceGateway: PluginSatpGateway;
 let pluginRecipientGateway: PluginSatpGateway;
 let dummyInitializationResponseMessageHash: string;
@@ -32,14 +29,14 @@ let sessionID: string;
 let sequenceNumber: number;
 
 beforeEach(async () => {
-  sourceGatewayConstructor = {
+  const sourceGatewayConstructor = {
     name: "plugin-satp-gateway#sourceGateway",
     dltIDs: ["DLT2"],
     instanceId: uuidV4(),
     clientHelper: new ClientGatewayHelper(),
     serverHelper: new ServerGatewayHelper(),
   };
-  recipientGatewayConstructor = {
+  const recipientGatewayConstructor = {
     name: "plugin-satp-gateway#recipientGateway",
     dltIDs: ["DLT1"],
     instanceId: uuidV4(),
@@ -51,16 +48,14 @@ beforeEach(async () => {
   pluginRecipientGateway = new BesuSatpGateway(recipientGatewayConstructor);
 
   if (
-    pluginSourceGateway.database == undefined ||
-    pluginRecipientGateway.database == undefined
+    pluginSourceGateway.localRepository?.database == undefined ||
+    pluginRecipientGateway.localRepository?.database == undefined
   ) {
     throw new Error("Database is not correctly initialized");
   }
 
-  await pluginSourceGateway.database.migrate.rollback();
-  await pluginSourceGateway.database.migrate.latest();
-  await pluginRecipientGateway.database.migrate.rollback();
-  await pluginRecipientGateway.database.migrate.latest();
+  await pluginSourceGateway.localRepository?.reset();
+  await pluginRecipientGateway.localRepository?.reset();
 
   dummyInitializationResponseMessageHash = SHA256(
     "initializationResponseMessageData",
@@ -101,7 +96,7 @@ beforeEach(async () => {
 test("valid transfer commence request", async () => {
   const transferCommenceRequest: TransferCommenceV1Request = {
     sessionID: sessionID,
-    messageType: OdapMessageType.TransferCommenceRequest,
+    messageType: SatpMessageType.TransferCommenceRequest,
     originatorPubkey: "originatorDummyPubKey",
     beneficiaryPubkey: "beneficiaryDummyPubKey",
     clientIdentityPubkey: pluginSourceGateway.pubKey,
@@ -146,7 +141,7 @@ test("transfer commence request with wrong sessionId", async () => {
   const wrongSessionId = uuidV4();
   const transferCommenceRequest: TransferCommenceV1Request = {
     sessionID: wrongSessionId,
-    messageType: OdapMessageType.TransferCommenceRequest,
+    messageType: SatpMessageType.TransferCommenceRequest,
     originatorPubkey: "dummyPubKey",
     beneficiaryPubkey: "dummyPubKey",
     clientIdentityPubkey: pluginSourceGateway.pubKey,
@@ -181,7 +176,7 @@ test("transfer commence request with wrong sessionId", async () => {
 test("transfer commence request with wrong message type", async () => {
   const transferCommenceRequest: TransferCommenceV1Request = {
     sessionID: sessionID,
-    messageType: OdapMessageType.TransferCommenceResponse,
+    messageType: SatpMessageType.TransferCommenceResponse,
     originatorPubkey: "dummyPubKey",
     beneficiaryPubkey: "dummyPubKey",
     clientIdentityPubkey: pluginSourceGateway.pubKey,
@@ -216,7 +211,7 @@ test("transfer commence request with wrong message type", async () => {
 test("transfer commence request with wrong signature", async () => {
   const transferCommenceRequest: TransferCommenceV1Request = {
     sessionID: sessionID,
-    messageType: OdapMessageType.TransferCommenceRequest,
+    messageType: SatpMessageType.TransferCommenceRequest,
     originatorPubkey: "dummyPubKey",
     beneficiaryPubkey: "dummyPubKey",
     clientIdentityPubkey: pluginSourceGateway.pubKey,
@@ -251,7 +246,7 @@ test("transfer commence request with wrong signature", async () => {
 test("transfer commence request with wrong previous message hash", async () => {
   const transferCommenceRequest: TransferCommenceV1Request = {
     sessionID: sessionID,
-    messageType: OdapMessageType.TransferCommenceRequest,
+    messageType: SatpMessageType.TransferCommenceRequest,
     originatorPubkey: "dummyPubKey",
     beneficiaryPubkey: "dummyPubKey",
     clientIdentityPubkey: pluginSourceGateway.pubKey,
@@ -286,7 +281,7 @@ test("transfer commence request with wrong previous message hash", async () => {
 test("transfer commence request with wrong asset profile hash", async () => {
   const transferCommenceRequest: TransferCommenceV1Request = {
     sessionID: sessionID,
-    messageType: OdapMessageType.TransferCommenceRequest,
+    messageType: SatpMessageType.TransferCommenceRequest,
     originatorPubkey: "dummyPubKey",
     beneficiaryPubkey: "dummyPubKey",
     clientIdentityPubkey: pluginSourceGateway.pubKey,
@@ -347,6 +342,8 @@ test("timeout in transfer commence response because no client gateway is connect
 });
 
 afterEach(() => {
-  pluginSourceGateway.database?.destroy();
-  pluginRecipientGateway.database?.destroy();
+  pluginSourceGateway.localRepository?.destroy();
+  pluginRecipientGateway.localRepository?.destroy();
+  pluginSourceGateway.remoteRepository?.destroy();
+  pluginRecipientGateway.remoteRepository?.destroy();
 });

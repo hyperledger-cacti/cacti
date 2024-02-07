@@ -2,7 +2,8 @@ import { randomInt } from "crypto";
 import { SHA256 } from "crypto-js";
 import { v4 as uuidV4 } from "uuid";
 import {
-  OdapMessageType,
+  IPluginSatpGatewayConstructorOptions,
+  SatpMessageType,
   PluginSatpGateway,
 } from "../../../../main/typescript/gateway/plugin-satp-gateway";
 import {
@@ -20,8 +21,8 @@ const MAX_TIMEOUT = 5000;
 const COMMIT_PREPARATION_REQUEST_MESSAGE_HASH =
   "dummyCommitPreparationRequestMessageHash";
 
-let sourceGatewayConstructor;
-let recipientGatewayConstructor;
+let sourceGatewayConstructor: IPluginSatpGatewayConstructorOptions;
+let recipientGatewayConstructor: IPluginSatpGatewayConstructorOptions;
 let pluginSourceGateway: PluginSatpGateway;
 let pluginRecipientGateway: PluginSatpGateway;
 let sequenceNumber: number;
@@ -48,16 +49,14 @@ beforeEach(async () => {
   pluginRecipientGateway = new BesuSatpGateway(recipientGatewayConstructor);
 
   if (
-    pluginSourceGateway.database == undefined ||
-    pluginRecipientGateway.database == undefined
+    pluginSourceGateway.localRepository?.database == undefined ||
+    pluginRecipientGateway.localRepository?.database == undefined
   ) {
     throw new Error("Database is not correctly initialized");
   }
 
-  await pluginSourceGateway.database.migrate.rollback();
-  await pluginSourceGateway.database.migrate.latest();
-  await pluginRecipientGateway.database.migrate.rollback();
-  await pluginRecipientGateway.database.migrate.latest();
+  await pluginSourceGateway.localRepository?.reset();
+  await pluginRecipientGateway.localRepository?.reset();
 
   sequenceNumber = randomInt(100);
   sessionID = uuidV4();
@@ -83,7 +82,7 @@ beforeEach(async () => {
 
 test("valid commit preparation response", async () => {
   const commitPreparationResponse: CommitPreparationV1Response = {
-    messageType: OdapMessageType.CommitFinalResponse,
+    messageType: SatpMessageType.CommitPreparationResponse,
     sessionID: sessionID,
     serverIdentityPubkey: pluginRecipientGateway.pubKey,
     clientIdentityPubkey: pluginSourceGateway.pubKey,
@@ -122,7 +121,7 @@ test("valid commit preparation response", async () => {
 
 test("commit preparation response invalid because of wrong previous message hash", async () => {
   const commitPreparationResponse: CommitPreparationV1Response = {
-    messageType: OdapMessageType.CommitFinalResponse,
+    messageType: SatpMessageType.CommitPreparationResponse,
     sessionID: sessionID,
     serverIdentityPubkey: pluginRecipientGateway.pubKey,
     clientIdentityPubkey: pluginSourceGateway.pubKey,
@@ -154,7 +153,7 @@ test("commit preparation response invalid because of wrong previous message hash
 
 test("commit preparation response invalid because of wrong signature", async () => {
   const commitPreparationResponse: CommitPreparationV1Response = {
-    messageType: OdapMessageType.CommitFinalResponse,
+    messageType: SatpMessageType.CommitPreparationResponse,
     sessionID: sessionID,
     serverIdentityPubkey: pluginRecipientGateway.pubKey,
     clientIdentityPubkey: pluginSourceGateway.pubKey,
@@ -210,6 +209,8 @@ test("timeout in commit preparation request because no server gateway is connect
 });
 
 afterEach(() => {
-  pluginSourceGateway.database?.destroy();
-  pluginRecipientGateway.database?.destroy();
+  pluginSourceGateway.localRepository?.destroy();
+  pluginRecipientGateway.localRepository?.destroy();
+  pluginSourceGateway.remoteRepository?.destroy();
+  pluginRecipientGateway.remoteRepository?.destroy();
 });

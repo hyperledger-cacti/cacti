@@ -1,38 +1,23 @@
 import { randomInt } from "crypto";
 import { SHA256 } from "crypto-js";
-import bodyParser from "body-parser";
 import { v4 as uuidv4 } from "uuid";
-import http, { Server } from "http";
 import {
-  OdapMessageType,
+  SatpMessageType,
   PluginSatpGateway,
 } from "../../../../main/typescript/gateway/plugin-satp-gateway";
-import { DefaultApi as ObjectStoreIpfsApi } from "@hyperledger/cactus-plugin-object-store-ipfs";
 import {
   CommitFinalV1Response,
   SessionData,
 } from "../../../../main/typescript/public-api";
-import {
-  LogLevelDesc,
-  IListenOptions,
-  Servers,
-} from "@hyperledger/cactus-common";
-import { Configuration } from "@hyperledger/cactus-core-api";
-import { PluginObjectStoreIpfs } from "@hyperledger/cactus-plugin-object-store-ipfs";
-import { GoIpfsTestContainer } from "@hyperledger/cactus-test-tooling";
-
-import express from "express";
-import { AddressInfo } from "net";
 
 import { FabricSatpGateway } from "../../../../main/typescript/gateway/fabric-satp-gateway";
 import { BesuSatpGateway } from "../../../../main/typescript/gateway/besu-satp-gateway";
 import { ServerGatewayHelper } from "../../../../main/typescript/gateway/server/server-helper";
 import { ClientGatewayHelper } from "../../../../main/typescript/gateway/client/client-helper";
+import { knexRemoteConnection } from "../../knex.config";
 
 const MAX_RETRIES = 5;
 const MAX_TIMEOUT = 5000;
-
-const logLevel: LogLevelDesc = "TRACE";
 
 const COMMIT_FINAL_REQUEST_MESSAGE_HASH = "dummyCommitFinalRequestMessageHash";
 const COMMIT_ACK_CLAIM = "dummyCommitAckClaim";
@@ -45,86 +30,36 @@ let sequenceNumber: number;
 let sessionID: string;
 let step: number;
 
-let ipfsContainer: GoIpfsTestContainer;
-let ipfsServer: Server;
-let ipfsApiHost: string;
-
-beforeAll(async () => {
-  ipfsContainer = new GoIpfsTestContainer({ logLevel });
-  expect(ipfsContainer).not.toBeUndefined();
-
-  const container = await ipfsContainer.start();
-  expect(container).not.toBeUndefined();
-
-  const expressApp = express();
-  expressApp.use(bodyParser.json({ limit: "250mb" }));
-  ipfsServer = http.createServer(expressApp);
-  const listenOptions: IListenOptions = {
-    hostname: "127.0.0.1",
-    port: 0,
-    server: ipfsServer,
-  };
-
-  const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
-  const { address, port } = addressInfo;
-  ipfsApiHost = `http://${address}:${port}`;
-
-  const config = new Configuration({ basePath: ipfsApiHost });
-  const apiClient = new ObjectStoreIpfsApi(config);
-
-  expect(apiClient).not.toBeUndefined();
-
-  const ipfsApiUrl = await ipfsContainer.getApiUrl();
-
-  const kuboRpcModule = await import("kubo-rpc-client");
-  const ipfsClientOrOptions = kuboRpcModule.create({
-    url: ipfsApiUrl,
-  });
-
-  const instanceId = uuidv4();
-  const pluginIpfs = new PluginObjectStoreIpfs({
-    parentDir: `/${uuidv4()}/${uuidv4()}/`,
-    logLevel,
-    instanceId,
-    ipfsClientOrOptions,
-  });
-
-  await pluginIpfs.getOrCreateWebServices();
-  await pluginIpfs.registerWebServices(expressApp);
-});
-
 beforeEach(async () => {
   sourceGatewayConstructor = {
     name: "plugin-satp-gateway#sourceGateway",
     dltIDs: ["DLT2"],
     instanceId: uuidv4(),
-    ipfsPath: ipfsApiHost,
     clientHelper: new ClientGatewayHelper(),
     serverHelper: new ServerGatewayHelper(),
+    knexRemoteConfig: knexRemoteConnection,
   };
   recipientGatewayConstructor = {
     name: "plugin-satp-gateway#recipientGateway",
     dltIDs: ["DLT1"],
     instanceId: uuidv4(),
-    ipfsPath: ipfsApiHost,
     clientHelper: new ClientGatewayHelper(),
     serverHelper: new ServerGatewayHelper(),
+    knexRemoteConfig: knexRemoteConnection,
   };
 
   pluginSourceGateway = new FabricSatpGateway(sourceGatewayConstructor);
   pluginRecipientGateway = new BesuSatpGateway(recipientGatewayConstructor);
 
   if (
-    pluginSourceGateway.database == undefined ||
-    pluginRecipientGateway.database == undefined
+    pluginSourceGateway.localRepository?.database == undefined ||
+    pluginRecipientGateway.localRepository?.database == undefined
   ) {
     throw new Error("Database is not correctly initialized");
   }
 
-  await pluginSourceGateway.database.migrate.rollback();
-  await pluginSourceGateway.database.migrate.latest();
-  await pluginRecipientGateway.database.migrate.rollback();
-  await pluginRecipientGateway.database.migrate.latest();
+  await pluginSourceGateway.localRepository?.reset();
+  await pluginRecipientGateway.localRepository?.reset();
 
   sequenceNumber = randomInt(100);
   sessionID = uuidv4();
@@ -155,26 +90,24 @@ beforeEach(async () => {
   });
 
   if (
-    pluginSourceGateway.database == undefined ||
-    pluginRecipientGateway.database == undefined
+    pluginSourceGateway.localRepository?.database == undefined ||
+    pluginRecipientGateway.localRepository?.database == undefined
   ) {
     throw new Error("Database is not correctly initialized");
   }
 
-  await pluginSourceGateway.database.migrate.rollback();
-  await pluginSourceGateway.database.migrate.latest();
-  await pluginRecipientGateway.database.migrate.rollback();
-  await pluginRecipientGateway.database.migrate.latest();
+  await pluginSourceGateway.localRepository?.reset();
+  await pluginRecipientGateway.localRepository?.reset();
 });
 
 afterEach(async () => {
-  await pluginSourceGateway.database?.destroy();
-  await pluginRecipientGateway.database?.destroy();
+  await pluginSourceGateway.localRepository?.destroy();
+  await pluginRecipientGateway.localRepository?.destroy();
 });
 
 test("valid commit final response", async () => {
   const commitFinalResponse: CommitFinalV1Response = {
-    messageType: OdapMessageType.CommitFinalResponse,
+    messageType: SatpMessageType.CommitFinalResponse,
     sessionID: sessionID,
     serverIdentityPubkey: pluginRecipientGateway.pubKey,
     clientIdentityPubkey: pluginSourceGateway.pubKey,
@@ -211,7 +144,7 @@ test("valid commit final response", async () => {
 
 test("commit final response invalid because of wrong previous message hash", async () => {
   const commitFinalResponse: CommitFinalV1Response = {
-    messageType: OdapMessageType.CommitFinalResponse,
+    messageType: SatpMessageType.CommitFinalResponse,
     sessionID: sessionID,
     serverIdentityPubkey: pluginRecipientGateway.pubKey,
     clientIdentityPubkey: pluginSourceGateway.pubKey,
@@ -239,7 +172,7 @@ test("commit final response invalid because of wrong previous message hash", asy
 
 test("commit final response invalid because of wrong signature", async () => {
   const commitFinalResponse: CommitFinalV1Response = {
-    messageType: OdapMessageType.CommitFinalResponse,
+    messageType: SatpMessageType.CommitFinalResponse,
     sessionID: sessionID,
     serverIdentityPubkey: pluginRecipientGateway.pubKey,
     clientIdentityPubkey: pluginSourceGateway.pubKey,
@@ -293,15 +226,9 @@ test("timeout in commit final request because no server gateway is connected", a
     });
 });
 
-afterAll(async () => {
-  await ipfsContainer.stop();
-  await ipfsContainer.destroy();
-  await Servers.shutdown(ipfsServer);
-  await pluginSourceGateway.database?.destroy();
-  await pluginRecipientGateway.database?.destroy();
-});
-
 afterEach(() => {
-  pluginSourceGateway.database?.destroy();
-  pluginRecipientGateway.database?.destroy();
+  pluginSourceGateway.localRepository?.destroy();
+  pluginRecipientGateway.localRepository?.destroy();
+  pluginSourceGateway.remoteRepository?.destroy();
+  pluginRecipientGateway.remoteRepository?.destroy();
 });

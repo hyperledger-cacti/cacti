@@ -4,10 +4,10 @@ import {
   TransferInitializationV1Request,
 } from "@hyperledger/cactus-plugin-satp-hermes";
 import {
-  OdapMessageType,
+  SatpMessageType,
   PluginSatpGateway,
+  ServerGatewayHelper,
 } from "@hyperledger/cactus-plugin-satp-hermes";
-import { ServerGatewayHelper } from "@hyperledger/cactus-plugin-satp-hermes";
 
 import { FabricSatpGateway } from "./fabric-satp-gateway";
 import { LogLevelDesc } from "@hyperledger/cactus-common";
@@ -51,7 +51,7 @@ export class ServerHelper extends ServerGatewayHelper {
       data: JSON.stringify(sessionData),
     });
 
-    if (request.messageType != OdapMessageType.InitializationRequest) {
+    if (request.messageType != SatpMessageType.InitializationRequest) {
       throw new Error(
         `${fnTag}, wrong message type for TransferInitializationRequest`,
       );

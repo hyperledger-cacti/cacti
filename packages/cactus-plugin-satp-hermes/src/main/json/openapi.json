@@ -1226,7 +1226,7 @@
         },
         "required": ["sessionID", "type", "operation"]
       },
-      "OdapMessage": {
+      "SatpMessage": {
         "type": "object",
         "properties": {
           "SequenceNumber": {

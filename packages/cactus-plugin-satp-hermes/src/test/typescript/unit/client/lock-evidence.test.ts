@@ -2,7 +2,7 @@ import { randomInt } from "crypto";
 import { SHA256 } from "crypto-js";
 import { v4 as uuidV4 } from "uuid";
 import {
-  OdapMessageType,
+  SatpMessageType,
   PluginSatpGateway,
 } from "../../../../main/typescript/gateway/plugin-satp-gateway";
 import {
@@ -48,16 +48,14 @@ beforeEach(async () => {
   pluginRecipientGateway = new BesuSatpGateway(recipientGatewayConstructor);
 
   if (
-    pluginSourceGateway.database == undefined ||
-    pluginRecipientGateway.database == undefined
+    pluginSourceGateway.localRepository?.database == undefined ||
+    pluginRecipientGateway.localRepository?.database == undefined
   ) {
     throw new Error("Database is not correctly initialized");
   }
 
-  await pluginSourceGateway.database.migrate.rollback();
-  await pluginSourceGateway.database.migrate.latest();
-  await pluginRecipientGateway.database.migrate.rollback();
-  await pluginRecipientGateway.database.migrate.latest();
+  await pluginSourceGateway.localRepository?.reset();
+  await pluginRecipientGateway.localRepository?.reset();
 
   sequenceNumber = randomInt(100);
   sessionID = uuidV4();
@@ -83,7 +81,7 @@ beforeEach(async () => {
 
 test("valid lock evidence response", async () => {
   const lockEvidenceResponse: LockEvidenceV1Response = {
-    messageType: OdapMessageType.LockEvidenceResponse,
+    messageType: SatpMessageType.LockEvidenceResponse,
     sessionID: sessionID,
     serverIdentityPubkey: pluginRecipientGateway.pubKey,
     clientIdentityPubkey: pluginSourceGateway.pubKey,
@@ -118,7 +116,7 @@ test("valid lock evidence response", async () => {
 
 test("lock evidence response invalid because of wrong previous message hash", async () => {
   const lockEvidenceResponse: LockEvidenceV1Response = {
-    messageType: OdapMessageType.LockEvidenceResponse,
+    messageType: SatpMessageType.LockEvidenceResponse,
     sessionID: sessionID,
     serverIdentityPubkey: pluginRecipientGateway.pubKey,
     clientIdentityPubkey: pluginSourceGateway.pubKey,
@@ -145,7 +143,7 @@ test("lock evidence response invalid because of wrong previous message hash", as
 
 test("lock evidence response invalid because of wrong signature", async () => {
   const lockEvidenceResponse: LockEvidenceV1Response = {
-    messageType: OdapMessageType.LockEvidenceResponse,
+    messageType: SatpMessageType.LockEvidenceResponse,
     sessionID: sessionID,
     serverIdentityPubkey: pluginRecipientGateway.pubKey,
     clientIdentityPubkey: pluginSourceGateway.pubKey,
@@ -201,6 +199,8 @@ test("timeout in lock evidence request because no server gateway is connected", 
 });
 
 afterEach(() => {
-  pluginSourceGateway.database?.destroy();
-  pluginRecipientGateway.database?.destroy();
+  pluginSourceGateway.localRepository?.destroy();
+  pluginRecipientGateway.localRepository?.destroy();
+  pluginSourceGateway.remoteRepository?.destroy();
+  pluginRecipientGateway.remoteRepository?.destroy();
 });

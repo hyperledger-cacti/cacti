@@ -5,7 +5,6 @@ import {
 import { LoggerProvider } from "@hyperledger/cactus-common";
 import { PluginSatpGateway } from "../plugin-satp-gateway";
 import { SHA256 } from "crypto-js";
-// import { SHA256 } from "crypto-js";
 
 const log = LoggerProvider.getOrCreate({
   level: "INFO",
@@ -58,7 +57,7 @@ export async function sendRecoverUpdateMessage(
 
   await gateway.makeRequest(
     sessionID,
-    PluginSatpGateway.getOdapAPI(
+    PluginSatpGateway.getSatpAPI(
       gateway.isClientGateway(sessionID)
         ? sessionData.recipientBasePath
         : sessionData.sourceBasePath,
@@ -87,7 +86,7 @@ export async function checkValidRecoverUpdateMessage(
     throw new Error(`${fnTag}, session data is undefined`);
   }
 
-  // if (response.messageType != OdapMessageType.CommitFinalResponse) {
+  // if (response.messageType != SatpMessageType.CommitFinalResponse) {
   //   throw new Error(`${fnTag}, wrong message type for CommitFinalResponse`);
   // }
 
@@ -110,7 +109,7 @@ export async function checkValidRecoverUpdateMessage(
 
     log.info(`${fnTag}, received log: ${JSON.stringify(recLog)}`);
 
-    const ipfsLog = await gateway.getLogFromIPFS(recLog.key);
+    const ipfsLog = await gateway.getLogFromRemote(recLog.key);
 
     const hash = SHA256(JSON.stringify(recLog)).toString();
 

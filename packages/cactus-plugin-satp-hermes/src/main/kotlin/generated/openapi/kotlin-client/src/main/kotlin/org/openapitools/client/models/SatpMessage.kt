@@ -15,8 +15,8 @@
 
 package org.openapitools.client.models
 
-import org.openapitools.client.models.OdapMessageActionResponse
 import org.openapitools.client.models.PayloadProfile
+import org.openapitools.client.models.SatpMessageActionResponse
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -39,13 +39,13 @@ import com.squareup.moshi.JsonClass
  */
 
 
-data class OdapMessage (
+data class SatpMessage (
 
     @Json(name = "SequenceNumber")
     val sequenceNumber: java.math.BigDecimal? = null,
 
     @Json(name = "Phase")
-    val phase: OdapMessage.Phase? = null,
+    val phase: SatpMessage.Phase? = null,
 
     @Json(name = "ResourceURL")
     val resourceURL: kotlin.String? = null,
@@ -54,10 +54,10 @@ data class OdapMessage (
     val developerURN: kotlin.String? = null,
 
     @Json(name = "ActionResponse")
-    val actionResponse: OdapMessageActionResponse? = null,
+    val actionResponse: SatpMessageActionResponse? = null,
 
     @Json(name = "CredentialProfile")
-    val credentialProfile: OdapMessage.CredentialProfile? = null,
+    val credentialProfile: SatpMessage.CredentialProfile? = null,
 
     @Json(name = "CredentialBlock")
     val credentialBlock: kotlin.collections.List<kotlin.Any>? = null,

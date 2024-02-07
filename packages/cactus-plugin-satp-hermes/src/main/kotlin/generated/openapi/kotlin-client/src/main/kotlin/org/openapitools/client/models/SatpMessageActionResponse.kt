@@ -27,10 +27,10 @@ import com.squareup.moshi.JsonClass
  */
 
 
-data class OdapMessageActionResponse (
+data class SatpMessageActionResponse (
 
     @Json(name = "ResponseCode")
-    val responseCode: OdapMessageActionResponse.ResponseCode? = null,
+    val responseCode: SatpMessageActionResponse.ResponseCode? = null,
 
     @Json(name = "Arguments")
     val arguments: kotlin.collections.List<kotlin.Any>? = null

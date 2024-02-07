@@ -1,20 +1,6 @@
-import http, { Server } from "http";
-import type { AddressInfo } from "net";
-import { v4 as uuidv4 } from "uuid";
 import "jest-extended";
-import { PluginObjectStoreIpfs } from "@hyperledger/cactus-plugin-object-store-ipfs";
-import bodyParser from "body-parser";
-import express from "express";
-import { DefaultApi as ObjectStoreIpfsApi } from "@hyperledger/cactus-plugin-object-store-ipfs";
-import {
-  IListenOptions,
-  LogLevelDesc,
-  Servers,
-} from "@hyperledger/cactus-common";
 import { v4 as uuidV4 } from "uuid";
-import { Configuration } from "@hyperledger/cactus-core-api";
 import { PluginSatpGateway } from "../../../main/typescript/gateway/plugin-satp-gateway";
-import { GoIpfsTestContainer } from "@hyperledger/cactus-test-tooling";
 
 import {
   AssetProfile,
@@ -26,91 +12,40 @@ import { BesuSatpGateway } from "../../../main/typescript/gateway/besu-satp-gate
 import { FabricSatpGateway } from "../../../main/typescript/gateway/fabric-satp-gateway";
 import { ClientGatewayHelper } from "../../../main/typescript/gateway/client/client-helper";
 import { ServerGatewayHelper } from "../../../main/typescript/gateway/server/server-helper";
+import { knexRemoteConnection } from "../knex.config";
 
 const MAX_RETRIES = 5;
 const MAX_TIMEOUT = 5000;
 
-const logLevel: LogLevelDesc = "INFO";
-
 let pluginSourceGateway: PluginSatpGateway;
 let pluginRecipientGateway: PluginSatpGateway;
-
-let ipfsContainer: GoIpfsTestContainer;
-let ipfsServer: Server;
-let ipfsApiHost: string;
-
-beforeAll(async () => {
-  ipfsContainer = new GoIpfsTestContainer({ logLevel });
-  expect(ipfsContainer).not.toBeUndefined();
-
-  const container = await ipfsContainer.start();
-  expect(container).not.toBeUndefined();
-
-  const expressApp = express();
-  expressApp.use(bodyParser.json({ limit: "250mb" }));
-  ipfsServer = http.createServer(expressApp);
-  const listenOptions: IListenOptions = {
-    hostname: "127.0.0.1",
-    port: 0,
-    server: ipfsServer,
-  };
-
-  const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
-  const { address, port } = addressInfo;
-  ipfsApiHost = `http://${address}:${port}`;
-
-  const config = new Configuration({ basePath: ipfsApiHost });
-  const apiClient = new ObjectStoreIpfsApi(config);
-
-  expect(apiClient).not.toBeUndefined();
-
-  const ipfsApiUrl = await ipfsContainer.getApiUrl();
-
-  const kuboRpcModule = await import("kubo-rpc-client");
-  const ipfsClientOrOptions = kuboRpcModule.create({
-    url: ipfsApiUrl,
-  });
-
-  const instanceId = uuidv4();
-  const pluginIpfs = new PluginObjectStoreIpfs({
-    parentDir: `/${uuidv4()}/${uuidv4()}/`,
-    logLevel,
-    instanceId,
-    ipfsClientOrOptions,
-  });
-
-  await pluginIpfs.getOrCreateWebServices();
-  await pluginIpfs.registerWebServices(expressApp);
-});
 
 test("successful run ODAP instance", async () => {
   const sourceGatewayConstructor = {
     name: "plugin-satp-gateway#sourceGateway",
     dltIDs: ["DLT2"],
     instanceId: uuidV4(),
-    ipfsPath: ipfsApiHost,
     clientHelper: new ClientGatewayHelper(),
     serverHelper: new ServerGatewayHelper(),
+    knexRemoteConfig: knexRemoteConnection,
   };
   const recipientGatewayConstructor = {
     name: "plugin-satp-gateway#recipientGateway",
     dltIDs: ["DLT1"],
     instanceId: uuidV4(),
-    ipfsPath: ipfsApiHost,
     clientHelper: new ClientGatewayHelper(),
     serverHelper: new ServerGatewayHelper(),
+    knexRemoteConfig: knexRemoteConnection,
   };
 
   pluginSourceGateway = new FabricSatpGateway(sourceGatewayConstructor);
   pluginRecipientGateway = new BesuSatpGateway(recipientGatewayConstructor);
 
-  expect(pluginSourceGateway.database).not.toBeUndefined();
-  expect(pluginRecipientGateway.database).not.toBeUndefined();
+  expect(pluginSourceGateway.localRepository?.database).not.toBeUndefined();
+  expect(pluginRecipientGateway.localRepository?.database).not.toBeUndefined();
 
-  await pluginSourceGateway.database?.migrate.rollback();
-  await pluginSourceGateway.database?.migrate.latest();
-  await pluginRecipientGateway.database?.migrate.rollback();
-  await pluginRecipientGateway.database?.migrate.latest();
+  await pluginSourceGateway.localRepository?.reset();
+  await pluginRecipientGateway.localRepository?.reset();
 
   const dummyPath = { apiHost: "dummyPath" };
 
@@ -353,9 +288,8 @@ test("successful run ODAP instance", async () => {
 });
 
 afterAll(async () => {
-  await ipfsContainer.stop();
-  await ipfsContainer.destroy();
-  await Servers.shutdown(ipfsServer);
-  pluginSourceGateway.database?.destroy();
-  pluginRecipientGateway.database?.destroy();
+  pluginSourceGateway.localRepository?.destroy();
+  pluginRecipientGateway.localRepository?.destroy();
+  pluginSourceGateway.remoteRepository?.destroy();
+  pluginRecipientGateway.remoteRepository?.destroy();
 });
