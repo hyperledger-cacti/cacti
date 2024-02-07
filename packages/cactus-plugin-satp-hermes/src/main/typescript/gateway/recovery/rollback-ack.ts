@@ -49,7 +49,7 @@ export async function sendRollbackAckMessage(
 
   await gateway.makeRequest(
     sessionID,
-    PluginSatpGateway.getOdapAPI(
+    PluginSatpGateway.getSatpAPI(
       gateway.isClientGateway(sessionID)
         ? sessionData.recipientBasePath
         : sessionData.sourceBasePath,
@@ -78,7 +78,7 @@ export async function checkValidRollbackAckMessage(
     throw new Error(`${fnTag}, session data is undefined`);
   }
 
-  // if (response.messageType != OdapMessageType.CommitFinalResponse) {
+  // if (response.messageType != SatpMessageType.CommitFinalResponse) {
   //   throw new Error(`${fnTag}, wrong message type for CommitFinalResponse`);
   // }
 

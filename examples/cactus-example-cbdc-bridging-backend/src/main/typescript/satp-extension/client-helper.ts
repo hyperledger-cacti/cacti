@@ -4,7 +4,7 @@ import {
   TransferInitializationV1Request,
   ClientGatewayHelper,
 } from "@hyperledger/cactus-plugin-satp-hermes";
-import { OdapMessageType } from "@hyperledger/cactus-plugin-satp-hermes";
+import { SatpMessageType } from "@hyperledger/cactus-plugin-satp-hermes";
 import { FabricSatpGateway } from "./fabric-satp-gateway";
 import { BesuSatpGateway } from "./besu-satp-gateway";
 
@@ -44,14 +44,16 @@ export class ClientHelper extends ClientGatewayHelper {
       throw new Error(`${fnTag}, session data is not correctly initialized`);
     }
 
-    if (!gateway.supportedDltIDs.includes(sessionData.recipientGatewayDltSystem)) {
+    if (
+      !gateway.supportedDltIDs.includes(sessionData.recipientGatewayDltSystem)
+    ) {
       throw new Error(
         `${fnTag}, recipient gateway dlt system is not supported by this gateway`,
       );
     }
 
     const initializationRequestMessage: TransferInitializationV1Request = {
-      messageType: OdapMessageType.InitializationRequest,
+      messageType: SatpMessageType.InitializationRequest,
       sessionID: sessionData.id,
       version: sessionData.version,
       // developer urn
@@ -132,7 +134,7 @@ export class ClientHelper extends ClientGatewayHelper {
 
     await gateway.makeRequest(
       sessionID,
-      PluginSatpGateway.getOdapAPI(
+      PluginSatpGateway.getSatpAPI(
         sessionData.recipientBasePath,
       ).phase1TransferInitiationRequestV1(initializationRequestMessage),
       "TransferInitializationRequest",

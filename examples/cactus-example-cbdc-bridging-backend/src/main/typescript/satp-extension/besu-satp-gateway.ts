@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-import { Knex } from "knex";
 import { Configuration } from "@hyperledger/cactus-core-api";
 import {
   DefaultApi as BesuApi,
@@ -8,32 +7,18 @@ import {
   InvokeContractV1Request as BesuInvokeContractV1Request,
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 import {
-  IKeyPair,
+  IPluginSatpGatewayConstructorOptions,
   PluginSatpGateway,
 } from "@hyperledger/cactus-plugin-satp-hermes";
 import { SessionDataRollbackActionsPerformedEnum } from "@hyperledger/cactus-plugin-satp-hermes";
-import { ClientHelper } from "./client-helper";
-import { ServerHelper } from "./server-helper";
 
-export interface IBesuSatpGatewayConstructorOptions {
-  name: string;
-  dltIDs: string[];
-  instanceId: string;
-  keyPair?: IKeyPair;
-  backupGatewaysAllowed?: string[];
-
-  ipfsPath?: string;
-
-  besuPath?: string;
-
+export interface IBesuSatpGatewayConstructorOptions
+  extends IPluginSatpGatewayConstructorOptions {
   besuContractName?: string;
   besuWeb3SigningCredential?: Web3SigningCredential;
   besuKeychainId?: string;
-  fabricAssetID?: string;
-  fabricAssetSize?: string;
   besuAssetID?: string;
-
-  knexConfig?: Knex.Config;
+  besuPath?: string;
 }
 
 export class BesuSatpGateway extends PluginSatpGateway {
@@ -50,8 +35,10 @@ export class BesuSatpGateway extends PluginSatpGateway {
       keyPair: options.keyPair,
       backupGatewaysAllowed: options.backupGatewaysAllowed,
       ipfsPath: options.ipfsPath,
-      clientHelper: new ClientHelper(),
-      serverHelper: new ServerHelper({}),
+      clientHelper: options.clientHelper,
+      serverHelper: options.serverHelper,
+      knexLocalConfig: options.knexLocalConfig,
+      knexRemoteConfig: options.knexRemoteConfig,
     });
 
     if (options.besuPath != undefined) this.defineBesuConnection(options);

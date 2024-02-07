@@ -13,7 +13,7 @@ import {
   CommitFinalV1Response,
   TransferCompleteV1Request,
 } from "../../public-api";
-import { OdapMessageType, PluginSatpGateway } from "../plugin-satp-gateway";
+import { SatpMessageType, PluginSatpGateway } from "../plugin-satp-gateway";
 
 export class ClientGatewayHelper {
   public static readonly CLASS_NAME = "ClientGatewayHelper";
@@ -66,14 +66,16 @@ export class ClientGatewayHelper {
       throw new Error(`${fnTag}, session data is not correctly initialized`);
     }
 
-    if (!gateway.supportedDltIDs.includes(sessionData.recipientGatewayDltSystem)) {
+    if (
+      !gateway.supportedDltIDs.includes(sessionData.recipientGatewayDltSystem)
+    ) {
       throw new Error(
         `${fnTag}, recipient gateway dlt system is not supported by this gateway`,
       );
     }
 
     const initializationRequestMessage: TransferInitializationV1Request = {
-      messageType: OdapMessageType.InitializationRequest,
+      messageType: SatpMessageType.InitializationRequest,
       sessionID: sessionData.id,
       version: sessionData.version,
       // developer urn
@@ -131,7 +133,7 @@ export class ClientGatewayHelper {
 
     await gateway.makeRequest(
       sessionID,
-      PluginSatpGateway.getOdapAPI(
+      PluginSatpGateway.getSatpAPI(
         sessionData.recipientBasePath,
       ).phase1TransferInitiationRequestV1(initializationRequestMessage),
       "TransferInitializationRequest",
@@ -150,7 +152,7 @@ export class ClientGatewayHelper {
       throw new Error(`${fnTag}, session data is undefined`);
     }
 
-    if (response.messageType != OdapMessageType.InitializationResponse) {
+    if (response.messageType != SatpMessageType.InitializationResponse) {
       throw new Error(
         `${fnTag}, wrong message type for TransferInitializationResponse`,
       );
@@ -177,7 +179,9 @@ export class ClientGatewayHelper {
       );
     }
 
-    if (!gateway.verifySignature(response, sessionData.recipientGatewayPubkey)) {
+    if (
+      !gateway.verifySignature(response, sessionData.recipientGatewayPubkey)
+    ) {
       throw new Error(
         `${fnTag}, TransferInitializationResponse message signature verification failed`,
       );
@@ -235,7 +239,7 @@ export class ClientGatewayHelper {
     ).toString();
 
     const transferCommenceRequestMessage: TransferCommenceV1Request = {
-      messageType: OdapMessageType.TransferCommenceRequest,
+      messageType: SatpMessageType.TransferCommenceRequest,
       // originatorPubkey: sessionData.originatorPubkey,
       // beneficiaryPubkey: sessionData.beneficiaryPubkey,
       originatorPubkey: "sessionData.originatorPubkey",
@@ -282,7 +286,7 @@ export class ClientGatewayHelper {
 
     await gateway.makeRequest(
       sessionID,
-      PluginSatpGateway.getOdapAPI(
+      PluginSatpGateway.getSatpAPI(
         sessionData.recipientBasePath,
       ).phase2TransferCommenceRequestV1(transferCommenceRequestMessage),
       "TransferCommenceRequest",
@@ -301,7 +305,7 @@ export class ClientGatewayHelper {
       throw new Error(`${fnTag}, session data is undefined`);
     }
 
-    if (response.messageType != OdapMessageType.TransferCommenceResponse) {
+    if (response.messageType != SatpMessageType.TransferCommenceResponse) {
       throw new Error(
         `${fnTag}, wrong message type for TransferCommenceResponse`,
       );
@@ -334,7 +338,9 @@ export class ClientGatewayHelper {
       );
     }
 
-    if (!gateway.verifySignature(response, sessionData.recipientGatewayPubkey)) {
+    if (
+      !gateway.verifySignature(response, sessionData.recipientGatewayPubkey)
+    ) {
       throw new Error(
         `${fnTag}, TransferCommenceResponse message signature verification failed`,
       );
@@ -380,7 +386,7 @@ export class ClientGatewayHelper {
 
     const lockEvidenceRequestMessage: LockEvidenceV1Request = {
       sessionID: sessionID,
-      messageType: OdapMessageType.LockEvidenceRequest,
+      messageType: SatpMessageType.LockEvidenceRequest,
       clientIdentityPubkey: sessionData.sourceGatewayPubkey,
       serverIdentityPubkey: sessionData.recipientGatewayPubkey,
       lockEvidenceClaim: sessionData.lockEvidenceClaim,
@@ -422,7 +428,7 @@ export class ClientGatewayHelper {
 
     await gateway.makeRequest(
       sessionID,
-      PluginSatpGateway.getOdapAPI(
+      PluginSatpGateway.getSatpAPI(
         sessionData.recipientBasePath,
       ).phase2LockEvidenceRequestV1(lockEvidenceRequestMessage),
       "LockEvidenceRequest",
@@ -443,7 +449,7 @@ export class ClientGatewayHelper {
       );
     }
 
-    if (response.messageType != OdapMessageType.LockEvidenceResponse) {
+    if (response.messageType != SatpMessageType.LockEvidenceResponse) {
       throw new Error(`${fnTag}, wrong message type for LockEvidenceResponse`);
     }
 
@@ -474,7 +480,9 @@ export class ClientGatewayHelper {
       );
     }
 
-    if (!gateway.verifySignature(response, sessionData.recipientGatewayPubkey)) {
+    if (
+      !gateway.verifySignature(response, sessionData.recipientGatewayPubkey)
+    ) {
       throw new Error(
         `${fnTag}, LockEvidenceResponse message signature verification failed`,
       );
@@ -518,7 +526,7 @@ export class ClientGatewayHelper {
 
     const commitPrepareRequestMessage: CommitPreparationV1Request = {
       sessionID: sessionID,
-      messageType: OdapMessageType.CommitPreparationRequest,
+      messageType: SatpMessageType.CommitPreparationRequest,
       clientIdentityPubkey: sessionData.sourceGatewayPubkey,
       serverIdentityPubkey: sessionData.recipientGatewayPubkey,
       hashLockEvidenceAck: sessionData.lockEvidenceResponseMessageHash,
@@ -556,7 +564,7 @@ export class ClientGatewayHelper {
 
     await gateway.makeRequest(
       sessionID,
-      PluginSatpGateway.getOdapAPI(
+      PluginSatpGateway.getSatpAPI(
         sessionData.recipientBasePath,
       ).phase3CommitPreparationRequestV1(commitPrepareRequestMessage),
       "CommitPreparationRequest",
@@ -577,7 +585,7 @@ export class ClientGatewayHelper {
       );
     }
 
-    if (response.messageType != OdapMessageType.CommitPreparationResponse) {
+    if (response.messageType != SatpMessageType.CommitPreparationResponse) {
       throw new Error(
         `${fnTag}, wrong message type for CommitPreparationResponse`,
       );
@@ -609,7 +617,9 @@ export class ClientGatewayHelper {
       );
     }
 
-    if (!gateway.verifySignature(response, sessionData.recipientGatewayPubkey)) {
+    if (
+      !gateway.verifySignature(response, sessionData.recipientGatewayPubkey)
+    ) {
       throw new Error(
         `${fnTag}, CommitPreparationResponse message signature verification failed`,
       );
@@ -655,7 +665,7 @@ export class ClientGatewayHelper {
 
     const commitFinalRequestMessage: CommitFinalV1Request = {
       sessionID: sessionID,
-      messageType: OdapMessageType.CommitFinalRequest,
+      messageType: SatpMessageType.CommitFinalRequest,
       clientIdentityPubkey: sessionData.sourceGatewayPubkey,
       serverIdentityPubkey: sessionData.recipientGatewayPubkey,
       commitFinalClaim: sessionData.commitFinalClaim,
@@ -694,7 +704,7 @@ export class ClientGatewayHelper {
 
     await gateway.makeRequest(
       sessionID,
-      PluginSatpGateway.getOdapAPI(
+      PluginSatpGateway.getSatpAPI(
         sessionData.recipientBasePath,
       ).phase3CommitFinalRequestV1(commitFinalRequestMessage),
       "CommitFinalRequest",
@@ -715,7 +725,7 @@ export class ClientGatewayHelper {
       );
     }
 
-    if (response.messageType != OdapMessageType.CommitFinalResponse) {
+    if (response.messageType != SatpMessageType.CommitFinalResponse) {
       throw new Error(`${fnTag}, wrong message type for CommitFinalResponse`);
     }
 
@@ -747,15 +757,17 @@ export class ClientGatewayHelper {
       );
     }
 
-    if (!gateway.verifySignature(response, sessionData.recipientGatewayPubkey)) {
+    if (
+      !gateway.verifySignature(response, sessionData.recipientGatewayPubkey)
+    ) {
       throw new Error(
         `${fnTag}, CommitFinalResponse message signature verification failed`,
       );
     }
 
     const claimHash = SHA256(response.commitAcknowledgementClaim).toString();
-    const retrievedClaim = await gateway.getLogFromIPFS(
-      PluginSatpGateway.getOdapLogKey(sessionID, "proof", "create"),
+    const retrievedClaim = await gateway.getLogFromRemote(
+      PluginSatpGateway.getSatpLogKey(sessionID, "proof", "create"),
     );
 
     if (claimHash != retrievedClaim.hash) {
@@ -764,7 +776,9 @@ export class ClientGatewayHelper {
       );
     }
 
-    if (!gateway.verifySignature(retrievedClaim, response.serverIdentityPubkey)) {
+    if (
+      !gateway.verifySignature(retrievedClaim, response.serverIdentityPubkey)
+    ) {
       throw new Error(
         `${fnTag}, Commit Acknowledgement Claim signature verification failed`,
       );
@@ -812,7 +826,7 @@ export class ClientGatewayHelper {
 
     const transferCompleteRequestMessage: TransferCompleteV1Request = {
       sessionID: sessionID,
-      messageType: OdapMessageType.TransferCompleteRequest,
+      messageType: SatpMessageType.TransferCompleteRequest,
       clientIdentityPubkey: sessionData.sourceGatewayPubkey,
       serverIdentityPubkey: sessionData.recipientGatewayPubkey,
       hashCommitFinalAck: sessionData.commitFinalResponseMessageHash,
@@ -850,7 +864,7 @@ export class ClientGatewayHelper {
 
     await gateway.makeRequest(
       sessionID,
-      PluginSatpGateway.getOdapAPI(
+      PluginSatpGateway.getSatpAPI(
         sessionData.recipientBasePath,
       ).phase3TransferCompleteRequestV1(transferCompleteRequestMessage),
       "TransferCompleteRequest",

@@ -17,14 +17,13 @@ import {
 } from "@hyperledger/cactus-cmd-api-server";
 import {
   Configuration,
-  DefaultApi as OdapApi,
   IKeyPair,
-} from "@hyperledger/cactus-plugin-satp-hermes";
+  DefaultApi as SatpApi,
+} from "@hyperledger/cactus-plugin-satp-hermes/";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import { CbdcBridgingAppDummyInfrastructure } from "./infrastructure/cbdc-bridging-app-dummy-infrastructure";
 import { DefaultApi as FabricApi } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
 import { DefaultApi as BesuApi } from "@hyperledger/cactus-plugin-ledger-connector-besu";
-import { DefaultApi as IpfsApi } from "@hyperledger/cactus-plugin-object-store-ipfs";
 import { FabricSatpGateway } from "./satp-extension/fabric-satp-gateway";
 import { BesuSatpGateway } from "./satp-extension/besu-satp-gateway";
 import CryptoMaterial from "../../crypto-material/crypto-material.json";
@@ -81,8 +80,6 @@ export class CbdcBridgingApp {
     const fabricPlugin =
       await this.infrastructure.createFabricLedgerConnector();
     const besuPlugin = await this.infrastructure.createBesuLedgerConnector();
-    const clientIpfsPlugin = await this.infrastructure.createIPFSConnector();
-    const serverIpfsPlugin = await this.infrastructure.createIPFSConnector();
 
     // Reserve the ports where the API Servers will run
     const httpApiA = await Servers.startOnPort(
@@ -100,16 +97,14 @@ export class CbdcBridgingApp {
     const addressInfoB = httpApiB.address() as AddressInfo;
     const nodeApiHostB = `http://${this.options.apiHost}:${addressInfoB.port}`;
 
-    const fabricOdapGateway = await this.infrastructure.createClientGateway(
+    const fabricSatpGateway = await this.infrastructure.createClientGateway(
       nodeApiHostA,
       this.options.clientGatewayKeyPair,
-      `http://${this.options.apiHost}:${addressInfoA.port}`,
     );
 
-    const besuOdapGateway = await this.infrastructure.createServerGateway(
+    const besuSatpGateway = await this.infrastructure.createServerGateway(
       nodeApiHostB,
       this.options.serverGatewayKeyPair,
-      `http://${this.options.apiHost}:${addressInfoB.port}`,
     );
 
     const clientPluginRegistry = new PluginRegistry({
@@ -132,12 +127,10 @@ export class CbdcBridgingApp {
     });
 
     clientPluginRegistry.add(fabricPlugin);
-    clientPluginRegistry.add(fabricOdapGateway);
-    clientPluginRegistry.add(clientIpfsPlugin);
+    clientPluginRegistry.add(fabricSatpGateway);
 
     serverPluginRegistry.add(besuPlugin);
-    serverPluginRegistry.add(serverIpfsPlugin);
-    serverPluginRegistry.add(besuOdapGateway);
+    serverPluginRegistry.add(besuSatpGateway);
 
     const apiServer1 = await this.startNode(httpApiA, clientPluginRegistry);
     const apiServer2 = await this.startNode(httpApiB, serverPluginRegistry);
@@ -165,17 +158,16 @@ export class CbdcBridgingApp {
     return {
       apiServer1,
       apiServer2,
-      fabricGatewayApi: new OdapApi(
+      fabricGatewayApi: new SatpApi(
         new Configuration({ basePath: nodeApiHostA }),
       ),
-      besuGatewayApi: new OdapApi(
+      besuGatewayApi: new SatpApi(
         new Configuration({ basePath: nodeApiHostB }),
       ),
-      ipfsApiClient: new IpfsApi(new Configuration({ basePath: nodeApiHostA })),
       fabricApiClient,
       besuApiClient,
-      fabricOdapGateway,
-      besuOdapGateway,
+      fabricSatpGateway,
+      besuSatpGateway,
     };
   }
 
@@ -231,11 +223,10 @@ export class CbdcBridgingApp {
 export interface IStartInfo {
   readonly apiServer1: ApiServer;
   readonly apiServer2: ApiServer;
-  readonly fabricGatewayApi: OdapApi;
-  readonly besuGatewayApi: OdapApi;
-  readonly ipfsApiClient: IpfsApi;
+  readonly fabricGatewayApi: SatpApi;
+  readonly besuGatewayApi: SatpApi;
   readonly besuApiClient: BesuApi;
   readonly fabricApiClient: FabricApi;
-  readonly fabricOdapGateway: FabricSatpGateway;
-  readonly besuOdapGateway: BesuSatpGateway;
+  readonly fabricSatpGateway: FabricSatpGateway;
+  readonly besuSatpGateway: BesuSatpGateway;
 }

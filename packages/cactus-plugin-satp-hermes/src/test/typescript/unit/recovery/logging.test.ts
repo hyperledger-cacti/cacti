@@ -1,31 +1,15 @@
-import http, { Server } from "http";
-import type { AddressInfo } from "net";
 import { v4 as uuidv4 } from "uuid";
 import "jest-extended";
-import { PluginObjectStoreIpfs } from "@hyperledger/cactus-plugin-object-store-ipfs";
-import bodyParser from "body-parser";
-import express from "express";
-import { DefaultApi as ObjectStoreIpfsApi } from "@hyperledger/cactus-plugin-object-store-ipfs";
-import {
-  IListenOptions,
-  LogLevelDesc,
-  Secp256k1Keys,
-  Servers,
-} from "@hyperledger/cactus-common";
+import { Secp256k1Keys } from "@hyperledger/cactus-common";
 import { v4 as uuidV4 } from "uuid";
-import { Configuration } from "@hyperledger/cactus-core-api";
-import { PluginSatpGateway } from "../../../../main/typescript/gateway/plugin-satp-gateway";
-import { GoIpfsTestContainer } from "@hyperledger/cactus-test-tooling";
+import {
+  ILocalLog,
+  PluginSatpGateway,
+} from "../../../../main/typescript/gateway/plugin-satp-gateway";
 
-import {
-  LocalLog,
-  SessionData,
-} from "../../../../main/typescript/public-api";
+import { SessionData } from "../../../../main/typescript/public-api";
 import { SHA256 } from "crypto-js";
-import {
-  BesuSatpGateway,
-  IBesuSatpGatewayConstructorOptions,
-} from "../../../../main/typescript/gateway/besu-satp-gateway";
+import { BesuSatpGateway } from "../../../../main/typescript/gateway/besu-satp-gateway";
 import {
   FabricSatpGateway,
   IFabricSatpGatewayConstructorOptions,
@@ -33,12 +17,13 @@ import {
 import { ClientGatewayHelper } from "../../../../main/typescript/gateway/client/client-helper";
 import { ServerGatewayHelper } from "../../../../main/typescript/gateway/server/server-helper";
 
-import { knexClientConnection, knexServerConnection } from "../../knex.config";
-
-const logLevel: LogLevelDesc = "TRACE";
+import {
+  knexClientConnection,
+  knexRemoteConnection,
+  knexServerConnection,
+} from "../../knex.config";
 
 let sourceGatewayConstructor: IFabricSatpGatewayConstructorOptions;
-let recipientGatewayConstructor: IBesuSatpGatewayConstructorOptions;
 
 let pluginSourceGateway: PluginSatpGateway;
 let pluginRecipientGateway: PluginSatpGateway;
@@ -49,85 +34,37 @@ let type2: string;
 let type3: string;
 let type4: string;
 let operation: string;
-let odapLog: LocalLog;
-let odapLog2: LocalLog;
-let odapLog3: LocalLog;
-let odapLog4: LocalLog;
+let satpLog: ILocalLog;
+let satpLog2: ILocalLog;
+let satpLog3: ILocalLog;
+let satpLog4: ILocalLog;
 let sessionData: SessionData;
-
-let ipfsContainer: GoIpfsTestContainer;
-let ipfsServer: Server;
-let ipfsApiHost: string;
-
-beforeAll(async () => {
-  ipfsContainer = new GoIpfsTestContainer({ logLevel });
-  expect(ipfsContainer).not.toBeUndefined();
-
-  const container = await ipfsContainer.start();
-  expect(container).not.toBeUndefined();
-
-  const expressApp = express();
-  expressApp.use(bodyParser.json({ limit: "250mb" }));
-  ipfsServer = http.createServer(expressApp);
-  const listenOptions: IListenOptions = {
-    hostname: "127.0.0.1",
-    port: 0,
-    server: ipfsServer,
-  };
-
-  const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
-  const { address, port } = addressInfo;
-  ipfsApiHost = `http://${address}:${port}`;
-
-  const config = new Configuration({ basePath: ipfsApiHost });
-  const apiClient = new ObjectStoreIpfsApi(config);
-
-  expect(apiClient).not.toBeUndefined();
-
-  const ipfsApiUrl = await ipfsContainer.getApiUrl();
-
-  const kuboRpcModule = await import("kubo-rpc-client");
-  const ipfsClientOrOptions = kuboRpcModule.create({
-    url: ipfsApiUrl,
-  });
-
-  const instanceId = uuidv4();
-  const pluginIpfs = new PluginObjectStoreIpfs({
-    parentDir: `/${uuidv4()}/${uuidv4()}/`,
-    logLevel,
-    instanceId,
-    ipfsClientOrOptions,
-  });
-
-  await pluginIpfs.getOrCreateWebServices();
-  await pluginIpfs.registerWebServices(expressApp);
-
-  sourceGatewayConstructor = {
-    name: "plugin-satp-gateway#sourceGateway",
-    dltIDs: ["DLT2"],
-    instanceId: uuidV4(),
-    ipfsPath: ipfsApiHost,
-    keyPair: Secp256k1Keys.generateKeyPairsBuffer(),
-    clientHelper: new ClientGatewayHelper(),
-    serverHelper: new ServerGatewayHelper(),
-    knexConfig: knexClientConnection,
-  };
-  recipientGatewayConstructor = {
-    name: "plugin-satp-gateway#recipientGateway",
-    dltIDs: ["DLT1"],
-    instanceId: uuidV4(),
-    ipfsPath: ipfsApiHost,
-    clientHelper: new ClientGatewayHelper(),
-    serverHelper: new ServerGatewayHelper(),
-    knexConfig: knexServerConnection,
-  };
-});
 
 beforeEach(async () => {
   sessionID = uuidv4();
   step = 3;
   type = "type1";
   operation = "operation1";
+
+  sourceGatewayConstructor = {
+    name: "plugin-satp-gateway#sourceGateway",
+    dltIDs: ["DLT2"],
+    instanceId: uuidV4(),
+    keyPair: Secp256k1Keys.generateKeyPairsBuffer(),
+    clientHelper: new ClientGatewayHelper(),
+    serverHelper: new ServerGatewayHelper(),
+    knexLocalConfig: knexClientConnection,
+    knexRemoteConfig: knexRemoteConnection,
+  };
+  const recipientGatewayConstructor = {
+    name: "plugin-satp-gateway#recipientGateway",
+    dltIDs: ["DLT1"],
+    instanceId: uuidV4(),
+    clientHelper: new ClientGatewayHelper(),
+    serverHelper: new ServerGatewayHelper(),
+    knexLocalConfig: knexServerConnection,
+    knexRemoteConfig: knexRemoteConnection,
+  };
 
   pluginSourceGateway = new FabricSatpGateway(sourceGatewayConstructor);
   pluginRecipientGateway = new BesuSatpGateway(recipientGatewayConstructor);
@@ -139,7 +76,7 @@ beforeEach(async () => {
     recipientGatewayPubkey: pluginRecipientGateway.pubKey,
   };
 
-  odapLog = {
+  satpLog = {
     sessionID: sessionID,
     type: type,
     operation: operation,
@@ -150,32 +87,25 @@ beforeEach(async () => {
   pluginRecipientGateway.sessions.set(sessionID, sessionData);
 
   if (
-    pluginSourceGateway.database == undefined ||
-    pluginRecipientGateway.database == undefined
+    pluginSourceGateway.localRepository?.database == undefined ||
+    pluginRecipientGateway.localRepository?.database == undefined
   ) {
     throw new Error("Database is not correctly initialized");
   }
 
-  await pluginSourceGateway.database.migrate.rollback();
-  await pluginSourceGateway.database.migrate.latest();
-  await pluginRecipientGateway.database.migrate.rollback();
-  await pluginRecipientGateway.database.migrate.latest();
-});
-
-afterEach(() => {
-  pluginSourceGateway.database?.destroy();
-  pluginRecipientGateway.database?.destroy();
+  await pluginSourceGateway.localRepository?.reset();
+  await pluginRecipientGateway.localRepository?.reset();
 });
 
 test("successful translation of log keys", async () => {
-  expect(PluginSatpGateway.getOdapLogKey(sessionID, type, operation)).toBe(
+  expect(PluginSatpGateway.getSatpLogKey(sessionID, type, operation)).toBe(
     `${sessionID}-${type}-${operation}`,
   );
 });
 
 test("successful logging of proof to ipfs and sqlite", async () => {
   const claim = "claim";
-  const odapLogKey = PluginSatpGateway.getOdapLogKey(
+  const satpLogKey = PluginSatpGateway.getSatpLogKey(
     sessionID,
     "proof",
     "lock",
@@ -188,20 +118,21 @@ test("successful logging of proof to ipfs and sqlite", async () => {
     data: claim,
   });
 
-  const retrievedLogIPFS = await pluginSourceGateway.getLogFromIPFS(odapLogKey);
+  const retrievedLogRemote =
+    await pluginSourceGateway.getLogFromRemote(satpLogKey);
   const retrievedLogDB =
-    await pluginSourceGateway.getLogFromDatabase(odapLogKey);
+    await pluginSourceGateway.getLogFromDatabase(satpLogKey);
 
-  if (retrievedLogDB == undefined || retrievedLogIPFS == undefined) {
+  if (retrievedLogDB == undefined || retrievedLogRemote == undefined) {
     throw new Error("Test Failed");
   }
 
-  expect(retrievedLogIPFS.key).toBe(odapLogKey);
-  expect(retrievedLogDB.key).toBe(odapLogKey);
-  expect(retrievedLogIPFS.hash).toBe(SHA256(claim).toString());
+  expect(retrievedLogRemote.key).toBe(satpLogKey);
+  expect(retrievedLogDB.key).toBe(satpLogKey);
+  expect(retrievedLogRemote.hash).toBe(SHA256(claim).toString());
   expect(
     pluginRecipientGateway.verifySignature(
-      retrievedLogIPFS,
+      retrievedLogRemote,
       pluginSourceGateway.pubKey,
     ),
   ).toBe(true);
@@ -210,31 +141,32 @@ test("successful logging of proof to ipfs and sqlite", async () => {
 });
 
 test("successful logging to ipfs and sqlite", async () => {
-  const odapLogKey = PluginSatpGateway.getOdapLogKey(
+  const satpLogKey = PluginSatpGateway.getSatpLogKey(
     sessionID,
     type,
     operation,
   );
 
-  await pluginSourceGateway.storeLog(odapLog);
+  await pluginSourceGateway.storeLog(satpLog);
 
-  const retrievedLogIPFS = await pluginSourceGateway.getLogFromIPFS(odapLogKey);
+  const retrievedLogRemote =
+    await pluginSourceGateway.getLogFromRemote(satpLogKey);
   const retrievedLogDB =
-    await pluginSourceGateway.getLogFromDatabase(odapLogKey);
+    await pluginSourceGateway.getLogFromDatabase(satpLogKey);
 
   if (
-    retrievedLogIPFS == undefined ||
+    retrievedLogRemote == undefined ||
     retrievedLogDB == undefined ||
     retrievedLogDB.data == undefined ||
-    odapLog.data == undefined
+    satpLog.data == undefined
   ) {
     throw new Error("Test failed");
   }
 
-  expect(retrievedLogIPFS.signerPubKey).toBe(pluginSourceGateway.pubKey);
-  expect(retrievedLogIPFS.hash).toBe(
+  expect(retrievedLogRemote.signerPubKey).toBe(pluginSourceGateway.pubKey);
+  expect(retrievedLogRemote.hash).toBe(
     SHA256(
-      JSON.stringify(odapLog, [
+      JSON.stringify(satpLog, [
         "sessionID",
         "type",
         "key",
@@ -244,61 +176,61 @@ test("successful logging to ipfs and sqlite", async () => {
       ]),
     ).toString(),
   );
-  expect(retrievedLogIPFS.key).toBe(odapLogKey);
+  expect(retrievedLogRemote.key).toBe(satpLogKey);
 
-  expect(retrievedLogDB.type).toBe(odapLog.type);
-  expect(retrievedLogDB.operation).toBe(odapLog.operation);
-  expect(retrievedLogDB.data).toBe(odapLog.data);
+  expect(retrievedLogDB.type).toBe(satpLog.type);
+  expect(retrievedLogDB.operation).toBe(satpLog.operation);
+  expect(retrievedLogDB.data).toBe(satpLog.data);
 
-  expect(retrievedLogDB.timestamp).toBe(odapLog.timestamp);
-  expect(retrievedLogDB.type).toBe(odapLog.type);
-  expect(retrievedLogDB.operation).toBe(odapLog.operation);
-  expect(retrievedLogDB.sessionID).toBe(odapLog.sessionID);
-  expect(retrievedLogDB.key).toBe(odapLogKey);
+  expect(retrievedLogDB.timestamp).toBe(satpLog.timestamp);
+  expect(retrievedLogDB.type).toBe(satpLog.type);
+  expect(retrievedLogDB.operation).toBe(satpLog.operation);
+  expect(retrievedLogDB.sessionID).toBe(satpLog.sessionID);
+  expect(retrievedLogDB.key).toBe(satpLogKey);
 });
 
 test("successful retrieval of last log", async () => {
   type2 = type + "2";
   type3 = type + "3";
 
-  odapLog2 = {
+  satpLog2 = {
     sessionID: sessionID,
     type: type2,
     operation: operation,
     data: JSON.stringify(sessionData),
   };
 
-  odapLog3 = {
+  satpLog3 = {
     sessionID: sessionID,
     type: type3,
     operation: operation,
     data: JSON.stringify(sessionData),
   };
 
-  await pluginSourceGateway.storeLog(odapLog2);
-  await pluginSourceGateway.storeLog(odapLog3);
+  await pluginSourceGateway.storeLog(satpLog2);
+  await pluginSourceGateway.storeLog(satpLog3);
 
   const lastLog = await pluginSourceGateway.getLastLogFromDatabase(sessionID);
 
   if (
     lastLog == undefined ||
-    odapLog3 == undefined ||
+    satpLog3 == undefined ||
     lastLog.data == undefined ||
-    odapLog3.data == undefined
+    satpLog3.data == undefined
   ) {
     throw new Error("Test failed");
   }
 
-  expect(lastLog.type).toBe(odapLog3.type);
-  expect(lastLog.operation).toBe(odapLog3.operation);
-  expect(lastLog.data).toBe(odapLog3.data);
+  expect(lastLog.type).toBe(satpLog3.type);
+  expect(lastLog.operation).toBe(satpLog3.operation);
+  expect(lastLog.data).toBe(satpLog3.data);
 
-  expect(lastLog.timestamp).toBe(odapLog3.timestamp);
-  expect(lastLog.type).toBe(odapLog3.type);
-  expect(lastLog.operation).toBe(odapLog3.operation);
-  expect(lastLog.sessionID).toBe(odapLog3.sessionID);
+  expect(lastLog.timestamp).toBe(satpLog3.timestamp);
+  expect(lastLog.type).toBe(satpLog3.type);
+  expect(lastLog.operation).toBe(satpLog3.operation);
+  expect(lastLog.sessionID).toBe(satpLog3.sessionID);
   expect(lastLog.key).toBe(
-    PluginSatpGateway.getOdapLogKey(sessionID, type3, operation),
+    PluginSatpGateway.getSatpLogKey(sessionID, type3, operation),
   );
 });
 
@@ -306,27 +238,27 @@ test("successful retrieval of logs more recent than another log", async () => {
   type2 = type + "2";
   type3 = type + "3";
 
-  odapLog2 = {
+  satpLog2 = {
     sessionID: sessionID,
     type: type2,
     operation: operation,
     data: JSON.stringify(sessionData),
   };
 
-  odapLog3 = {
+  satpLog3 = {
     sessionID: sessionID,
     type: type3,
     operation: operation,
     data: JSON.stringify(sessionData),
   };
 
-  await pluginSourceGateway.storeLog(odapLog2);
+  await pluginSourceGateway.storeLog(satpLog2);
 
   const referenceTimestamp = Date.now().toString();
   await new Promise((resolve) => setTimeout(resolve, 1000));
 
-  await pluginSourceGateway.storeLog(odapLog);
-  await pluginSourceGateway.storeLog(odapLog3);
+  await pluginSourceGateway.storeLog(satpLog);
+  await pluginSourceGateway.storeLog(satpLog3);
 
   const moreRecentLogs =
     await pluginSourceGateway.getLogsMoreRecentThanTimestamp(
@@ -338,34 +270,34 @@ test("successful retrieval of logs more recent than another log", async () => {
     moreRecentLogs.length != 2 ||
     moreRecentLogs[0].data == undefined ||
     moreRecentLogs[1].data == undefined ||
-    odapLog.data == undefined ||
-    odapLog3.data == undefined
+    satpLog.data == undefined ||
+    satpLog3.data == undefined
   ) {
     throw new Error("Test failed");
   }
 
-  expect(moreRecentLogs[0].type).toBe(odapLog.type);
-  expect(moreRecentLogs[0].operation).toBe(odapLog.operation);
-  expect(moreRecentLogs[0].data).toBe(odapLog.data);
+  expect(moreRecentLogs[0].type).toBe(satpLog.type);
+  expect(moreRecentLogs[0].operation).toBe(satpLog.operation);
+  expect(moreRecentLogs[0].data).toBe(satpLog.data);
 
-  expect(moreRecentLogs[0].timestamp).toBe(odapLog.timestamp);
-  expect(moreRecentLogs[0].type).toBe(odapLog.type);
-  expect(moreRecentLogs[0].operation).toBe(odapLog.operation);
-  expect(moreRecentLogs[0].sessionID).toBe(odapLog.sessionID);
+  expect(moreRecentLogs[0].timestamp).toBe(satpLog.timestamp);
+  expect(moreRecentLogs[0].type).toBe(satpLog.type);
+  expect(moreRecentLogs[0].operation).toBe(satpLog.operation);
+  expect(moreRecentLogs[0].sessionID).toBe(satpLog.sessionID);
   expect(moreRecentLogs[0].key).toBe(
-    PluginSatpGateway.getOdapLogKey(sessionID, type, operation),
+    PluginSatpGateway.getSatpLogKey(sessionID, type, operation),
   );
 
-  expect(moreRecentLogs[1].type).toBe(odapLog3.type);
-  expect(moreRecentLogs[1].operation).toBe(odapLog3.operation);
-  expect(moreRecentLogs[1].data).toBe(odapLog3.data);
+  expect(moreRecentLogs[1].type).toBe(satpLog3.type);
+  expect(moreRecentLogs[1].operation).toBe(satpLog3.operation);
+  expect(moreRecentLogs[1].data).toBe(satpLog3.data);
 
-  expect(moreRecentLogs[1].timestamp).toBe(odapLog3.timestamp);
-  expect(moreRecentLogs[1].type).toBe(odapLog3.type);
-  expect(moreRecentLogs[1].operation).toBe(odapLog3.operation);
-  expect(moreRecentLogs[1].sessionID).toBe(odapLog3.sessionID);
+  expect(moreRecentLogs[1].timestamp).toBe(satpLog3.timestamp);
+  expect(moreRecentLogs[1].type).toBe(satpLog3.type);
+  expect(moreRecentLogs[1].operation).toBe(satpLog3.operation);
+  expect(moreRecentLogs[1].sessionID).toBe(satpLog3.sessionID);
   expect(moreRecentLogs[1].key).toBe(
-    PluginSatpGateway.getOdapLogKey(sessionID, type3, operation),
+    PluginSatpGateway.getSatpLogKey(sessionID, type3, operation),
   );
 });
 
@@ -394,21 +326,21 @@ test("successful recover of sessions after crash", async () => {
     recipientGatewayPubkey: pluginRecipientGateway.pubKey,
   };
 
-  odapLog2 = {
+  satpLog2 = {
     sessionID: sessionID,
     type: type2,
     operation: operation,
     data: JSON.stringify(sessionData),
   };
 
-  odapLog3 = {
+  satpLog3 = {
     sessionID: sessionID,
     type: type3,
     operation: operation,
     data: JSON.stringify(sessionData),
   };
 
-  odapLog4 = {
+  satpLog4 = {
     sessionID: newSessionID,
     type: type4,
     operation: operation,
@@ -417,13 +349,13 @@ test("successful recover of sessions after crash", async () => {
 
   pluginSourceGateway.sessions.set(newSessionID, data);
 
-  await pluginSourceGateway.storeLog(odapLog);
-  await pluginSourceGateway.storeLog(odapLog3);
-  await pluginSourceGateway.storeLog(odapLog2);
-  await pluginSourceGateway.storeLog(odapLog4);
+  await pluginSourceGateway.storeLog(satpLog);
+  await pluginSourceGateway.storeLog(satpLog3);
+  await pluginSourceGateway.storeLog(satpLog2);
+  await pluginSourceGateway.storeLog(satpLog4);
 
   // simulate the crash of one gateway
-  pluginSourceGateway.database?.destroy();
+  pluginSourceGateway.localRepository?.destroy();
   const newPluginSourceGateway = new FabricSatpGateway(
     sourceGatewayConstructor,
   );
@@ -447,13 +379,12 @@ test("successful recover of sessions after crash", async () => {
     expect(data.recipientGatewayPubkey).toBe(pluginRecipientGateway.pubKey);
   }
 
-  newPluginSourceGateway.database?.destroy();
+  newPluginSourceGateway.localRepository?.destroy();
 });
 
-afterAll(async () => {
-  await ipfsContainer.stop();
-  await ipfsContainer.destroy();
-  await Servers.shutdown(ipfsServer);
-  pluginSourceGateway.database?.destroy();
-  pluginRecipientGateway.database?.destroy();
+afterEach(async () => {
+  pluginSourceGateway.localRepository?.destroy();
+  pluginRecipientGateway.localRepository?.destroy();
+  pluginSourceGateway.remoteRepository?.destroy();
+  pluginRecipientGateway.remoteRepository?.destroy();
 });

@@ -14,7 +14,7 @@ import {
   CommitFinalV1Request,
   TransferCompleteV1Request,
 } from "../../public-api";
-import { OdapMessageType, PluginSatpGateway } from "../plugin-satp-gateway";
+import { SatpMessageType, PluginSatpGateway } from "../plugin-satp-gateway";
 
 export class ServerGatewayHelper {
   public static readonly CLASS_NAME: string = "ServerGatewayHelper";
@@ -57,7 +57,7 @@ export class ServerGatewayHelper {
     }
 
     const transferInitializationResponse: TransferInitializationV1Response = {
-      messageType: OdapMessageType.InitializationResponse,
+      messageType: SatpMessageType.InitializationResponse,
       sessionID: sessionID,
       initialRequestMessageHash: sessionData.initializationRequestMessageHash,
       timeStamp: sessionData.initializationRequestMessageRcvTimeStamp,
@@ -98,7 +98,7 @@ export class ServerGatewayHelper {
 
     await gateway.makeRequest(
       sessionID,
-      PluginSatpGateway.getOdapAPI(
+      PluginSatpGateway.getSatpAPI(
         sessionData.sourceBasePath,
       ).phase1TransferInitiationResponseV1(transferInitializationResponse),
       "TransferInitializationResponse",
@@ -128,7 +128,7 @@ export class ServerGatewayHelper {
       data: JSON.stringify(sessionData),
     });
 
-    if (request.messageType != OdapMessageType.InitializationRequest) {
+    if (request.messageType != SatpMessageType.InitializationRequest) {
       throw new Error(
         `${fnTag}, wrong message type for TransferInitializationRequest`,
       );
@@ -224,7 +224,7 @@ export class ServerGatewayHelper {
 
     const transferCommenceResponse: TransferCommenceV1Response = {
       sessionID: sessionID,
-      messageType: OdapMessageType.TransferCommenceResponse,
+      messageType: SatpMessageType.TransferCommenceResponse,
       clientIdentityPubkey: sessionData.sourceGatewayPubkey,
       serverIdentityPubkey: sessionData.recipientGatewayPubkey,
       hashCommenceRequest: sessionData.transferCommenceMessageRequestHash,
@@ -259,7 +259,7 @@ export class ServerGatewayHelper {
 
     await gateway.makeRequest(
       sessionID,
-      PluginSatpGateway.getOdapAPI(
+      PluginSatpGateway.getSatpAPI(
         sessionData.sourceBasePath,
       ).phase2TransferCommenceResponseV1(transferCommenceResponse),
       "TransferCommenceResponse",
@@ -290,7 +290,7 @@ export class ServerGatewayHelper {
       data: JSON.stringify(sessionData),
     });
 
-    if (request.messageType != OdapMessageType.TransferCommenceRequest) {
+    if (request.messageType != SatpMessageType.TransferCommenceRequest) {
       throw new Error(
         `${fnTag}, wrong message type for TransferCommenceRequest`,
       );
@@ -385,7 +385,7 @@ export class ServerGatewayHelper {
 
     const lockEvidenceResponseMessage: LockEvidenceV1Response = {
       sessionID: sessionID,
-      messageType: OdapMessageType.LockEvidenceResponse,
+      messageType: SatpMessageType.LockEvidenceResponse,
       clientIdentityPubkey: sessionData.sourceGatewayPubkey,
       serverIdentityPubkey: sessionData.recipientGatewayPubkey,
       hashLockEvidenceRequest: sessionData.lockEvidenceRequestMessageHash,
@@ -420,7 +420,7 @@ export class ServerGatewayHelper {
 
     await gateway.makeRequest(
       sessionID,
-      PluginSatpGateway.getOdapAPI(
+      PluginSatpGateway.getSatpAPI(
         sessionData.sourceBasePath,
       ).phase2LockEvidenceResponseV1(lockEvidenceResponseMessage),
       "LockEvidenceResponse",
@@ -452,7 +452,7 @@ export class ServerGatewayHelper {
       data: JSON.stringify(sessionData),
     });
 
-    if (request.messageType != OdapMessageType.LockEvidenceRequest) {
+    if (request.messageType != SatpMessageType.LockEvidenceRequest) {
       throw new Error(`${fnTag}, wrong message type for LockEvidenceRequest`);
     }
 
@@ -497,8 +497,8 @@ export class ServerGatewayHelper {
     }
 
     const claimHash = SHA256(request.lockEvidenceClaim).toString();
-    const retrievedClaim = await gateway.getLogFromIPFS(
-      PluginSatpGateway.getOdapLogKey(sessionID, "proof", "lock"),
+    const retrievedClaim = await gateway.getLogFromRemote(
+      PluginSatpGateway.getSatpLogKey(sessionID, "proof", "lock"),
     );
 
     if (claimHash != retrievedClaim.hash) {
@@ -507,7 +507,9 @@ export class ServerGatewayHelper {
       );
     }
 
-    if (!gateway.verifySignature(retrievedClaim, request.clientIdentityPubkey)) {
+    if (
+      !gateway.verifySignature(retrievedClaim, request.clientIdentityPubkey)
+    ) {
       throw new Error(
         `${fnTag}, LockEvidence Claim message signature verification failed`,
       );
@@ -561,7 +563,7 @@ export class ServerGatewayHelper {
 
     const commitPreparationResponseMessage: CommitPreparationV1Response = {
       sessionID: sessionID,
-      messageType: OdapMessageType.CommitPreparationResponse,
+      messageType: SatpMessageType.CommitPreparationResponse,
       clientIdentityPubkey: sessionData.sourceGatewayPubkey,
       serverIdentityPubkey: sessionData.recipientGatewayPubkey,
       hashCommitPrep: sessionData.commitPrepareRequestMessageHash,
@@ -596,7 +598,7 @@ export class ServerGatewayHelper {
 
     await gateway.makeRequest(
       sessionID,
-      PluginSatpGateway.getOdapAPI(
+      PluginSatpGateway.getSatpAPI(
         sessionData.sourceBasePath,
       ).phase3CommitPreparationResponseV1(commitPreparationResponseMessage),
       "CommitPreparationResponse",
@@ -623,7 +625,7 @@ export class ServerGatewayHelper {
 
     // We need to check somewhere if this phase is completed within the asset-lock duration.
 
-    if (request.messageType != OdapMessageType.CommitPreparationRequest) {
+    if (request.messageType != SatpMessageType.CommitPreparationRequest) {
       throw new Error(
         `${fnTag}, wrong message type for CommitPreparationRequest`,
       );
@@ -713,7 +715,7 @@ export class ServerGatewayHelper {
 
     const commitFinalResponseMessage: CommitFinalV1Response = {
       sessionID: sessionID,
-      messageType: OdapMessageType.CommitFinalResponse,
+      messageType: SatpMessageType.CommitFinalResponse,
       clientIdentityPubkey: sessionData.sourceGatewayPubkey,
       serverIdentityPubkey: sessionData.recipientGatewayPubkey,
       commitAcknowledgementClaim: sessionData.commitAcknowledgementClaim,
@@ -750,7 +752,7 @@ export class ServerGatewayHelper {
 
     await gateway.makeRequest(
       sessionID,
-      PluginSatpGateway.getOdapAPI(
+      PluginSatpGateway.getSatpAPI(
         sessionData.sourceBasePath,
       ).phase3CommitFinalResponseV1(commitFinalResponseMessage),
       "CommitFinalResponse",
@@ -783,7 +785,7 @@ export class ServerGatewayHelper {
       data: JSON.stringify(sessionData),
     });
 
-    if (request.messageType != OdapMessageType.CommitFinalRequest) {
+    if (request.messageType != SatpMessageType.CommitFinalRequest) {
       throw new Error(`${fnTag}, wrong message type for CommitFinalRequest`);
     }
 
@@ -822,8 +824,9 @@ export class ServerGatewayHelper {
 
     // We need to check somewhere if this phase is completed within the asset-lock duration.
     const claimHash = SHA256(request.commitFinalClaim).toString();
-    const retrievedClaim = await gateway.getLogFromIPFS(
-      PluginSatpGateway.getOdapLogKey(sessionID, "proof", "delete"),
+
+    const retrievedClaim = await gateway.getLogFromRemote(
+      PluginSatpGateway.getSatpLogKey(sessionID, "proof", "delete"),
     );
 
     if (claimHash != retrievedClaim.hash) {
@@ -832,7 +835,9 @@ export class ServerGatewayHelper {
       );
     }
 
-    if (!gateway.verifySignature(retrievedClaim, request.clientIdentityPubkey)) {
+    if (
+      !gateway.verifySignature(retrievedClaim, request.clientIdentityPubkey)
+    ) {
       throw new Error(
         `${fnTag}, Commit Final Claim signature verification failed`,
       );
@@ -885,7 +890,7 @@ export class ServerGatewayHelper {
       data: JSON.stringify(sessionData),
     });
 
-    if (request.messageType != OdapMessageType.TransferCompleteRequest) {
+    if (request.messageType != SatpMessageType.TransferCompleteRequest) {
       throw new Error(
         `${fnTag}, wrong message type for TransferCompleteRequest`,
       );

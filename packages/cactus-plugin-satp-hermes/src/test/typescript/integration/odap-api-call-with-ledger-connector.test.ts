@@ -4,10 +4,8 @@ import http, { Server } from "http";
 import { Server as SocketIoServer } from "socket.io";
 import { AddressInfo } from "net";
 import { v4 as uuidv4 } from "uuid";
-import { PluginObjectStoreIpfs } from "@hyperledger/cactus-plugin-object-store-ipfs";
 import bodyParser from "body-parser";
 import express from "express";
-import { DefaultApi as ObjectStoreIpfsApi } from "@hyperledger/cactus-plugin-object-store-ipfs";
 import { AssetProfile } from "../../../main/typescript/generated/openapi/typescript-axios";
 import {
   IListenOptions,
@@ -20,13 +18,12 @@ import {
   Containers,
   FabricTestLedgerV1,
   pruneDockerAllIfGithubAction,
-  GoIpfsTestContainer,
   BesuTestLedger,
 } from "@hyperledger/cactus-test-tooling";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import {
   ClientV1Request,
-  DefaultApi as OdapApi,
+  DefaultApi as SatpApi,
 } from "../../../main/typescript/public-api";
 import LockAssetContractJson from "../../solidity/lock-asset-contract/LockAsset.json";
 import { PluginRegistry } from "@hyperledger/cactus-core";
@@ -64,6 +61,7 @@ import {
 } from "../../../main/typescript/gateway/besu-satp-gateway";
 import { ClientGatewayHelper } from "../../../main/typescript/gateway/client/client-helper";
 import { ServerGatewayHelper } from "../../../main/typescript/gateway/server/server-helper";
+import { knexRemoteConnection } from "../knex.config";
 
 /**
  * Use this to debug issues with the fabric node SDK
@@ -71,18 +69,14 @@ import { ServerGatewayHelper } from "../../../main/typescript/gateway/server/ser
  * export HFC_LOGGING='{"debug":"console","info":"console"}'
  * ```
  */
-let ipfsApiHost: string;
 
 let fabricSigningCredential: FabricSigningCredential;
 const logLevel: LogLevelDesc = "INFO";
 
-let ipfsServer: Server;
 let sourceGatewayServer: Server;
 let recipientGatewayServer: Server;
 let besuServer: Server;
 let fabricServer: Server;
-
-let ipfsContainer: GoIpfsTestContainer;
 
 let fabricLedger: FabricTestLedgerV1;
 let fabricContractName: string;
@@ -123,51 +117,6 @@ beforeAll(async () => {
       await Containers.logDiagnostics({ logLevel });
       fail("Pruning didn't throw OK");
     });
-
-  {
-    // IPFS configuration
-    ipfsContainer = new GoIpfsTestContainer({ logLevel });
-    expect(ipfsContainer).not.toBeUndefined();
-
-    const container = await ipfsContainer.start();
-    expect(container).not.toBeUndefined();
-
-    const expressApp = express();
-    expressApp.use(bodyParser.json({ limit: "250mb" }));
-    ipfsServer = http.createServer(expressApp);
-    const listenOptions: IListenOptions = {
-      hostname: "127.0.0.1",
-      port: 0,
-      server: ipfsServer,
-    };
-
-    const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
-    const { address, port } = addressInfo;
-    ipfsApiHost = `http://${address}:${port}`;
-
-    const config = new Configuration({ basePath: ipfsApiHost });
-    const apiClient = new ObjectStoreIpfsApi(config);
-
-    expect(apiClient).not.toBeUndefined();
-
-    const ipfsApiUrl = await ipfsContainer.getApiUrl();
-
-    const kuboRpcModule = await import("kubo-rpc-client");
-    const ipfsClientOrOptions = kuboRpcModule.create({
-      url: ipfsApiUrl,
-    });
-
-    const instanceId = uuidv4();
-    const pluginIpfs = new PluginObjectStoreIpfs({
-      parentDir: `/${uuidv4()}/${uuidv4()}/`,
-      logLevel,
-      instanceId,
-      ipfsClientOrOptions,
-    });
-
-    await pluginIpfs.getOrCreateWebServices();
-    await pluginIpfs.registerWebServices(expressApp);
-  }
 
   {
     // Fabric ledger connection
@@ -408,7 +357,7 @@ beforeAll(async () => {
     // does the same thing, it just waits 10 seconds for good measure so there
     // might not be a way for us to avoid doing this, but if there is a way we
     // absolutely should not have timeouts like this, anywhere...
-    await new Promise((resolve) => setTimeout(resolve, 10000));
+    await new Promise((resolve) => setTimeout(resolve, 15000));
 
     fabricSigningCredential = {
       keychainId,
@@ -528,45 +477,42 @@ beforeAll(async () => {
 
   {
     // Gateways configuration
-    const clientGatewayPluginOptions: IFabricSatpGatewayConstructorOptions =
-      {
-        name: "cactus-plugin#satpGateway",
-        dltIDs: ["DLT2"],
-        instanceId: uuidv4(),
-        ipfsPath: ipfsApiHost,
-        fabricPath: fabricPath,
-        fabricSigningCredential: fabricSigningCredential,
-        fabricChannelName: fabricChannelName,
-        fabricContractName: fabricContractName,
-        clientHelper: new ClientGatewayHelper(),
-        serverHelper: new ServerGatewayHelper(),
-      };
+    const clientGatewayPluginOptions: IFabricSatpGatewayConstructorOptions = {
+      name: "cactus-plugin#satpGateway",
+      dltIDs: ["DLT2"],
+      instanceId: uuidv4(),
+      fabricPath: fabricPath,
+      fabricSigningCredential: fabricSigningCredential,
+      fabricChannelName: fabricChannelName,
+      fabricContractName: fabricContractName,
+      clientHelper: new ClientGatewayHelper(),
+      serverHelper: new ServerGatewayHelper(),
+      knexRemoteConfig: knexRemoteConnection,
+    };
 
     const serverGatewayPluginOptions: IBesuSatpGatewayConstructorOptions = {
       name: "cactus-plugin#satpGateway",
       dltIDs: ["DLT1"],
       instanceId: uuidv4(),
-      ipfsPath: ipfsApiHost,
       besuPath: besuPath,
       besuWeb3SigningCredential: besuWeb3SigningCredential,
       besuContractName: besuContractName,
       besuKeychainId: besuKeychainId,
       clientHelper: new ClientGatewayHelper(),
       serverHelper: new ServerGatewayHelper(),
+      knexRemoteConfig: knexRemoteConnection,
     };
 
     pluginSourceGateway = new FabricSatpGateway(clientGatewayPluginOptions);
-    pluginRecipientGateway = new BesuSatpGateway(
-      serverGatewayPluginOptions,
-    );
+    pluginRecipientGateway = new BesuSatpGateway(serverGatewayPluginOptions);
 
-    expect(pluginSourceGateway.database).not.toBeUndefined();
-    expect(pluginRecipientGateway.database).not.toBeUndefined();
+    expect(pluginSourceGateway.localRepository?.database).not.toBeUndefined();
+    expect(
+      pluginRecipientGateway.localRepository?.database,
+    ).not.toBeUndefined();
 
-    await pluginSourceGateway.database?.migrate.rollback();
-    await pluginSourceGateway.database?.migrate.latest();
-    await pluginRecipientGateway.database?.migrate.rollback();
-    await pluginRecipientGateway.database?.migrate.latest();
+    await pluginSourceGateway.localRepository?.reset();
+    await pluginRecipientGateway.localRepository?.reset();
   }
   {
     // Server Gateway configuration
@@ -609,10 +555,10 @@ beforeAll(async () => {
 });
 
 test("runs ODAP between two gateways via openApi", async () => {
-  const odapApiConfig = new Configuration({
+  const satpApiConfig = new Configuration({
     basePath: clientGatewayApiHost,
   });
-  const apiClient = new OdapApi(odapApiConfig);
+  const apiClient = new SatpApi(satpApiConfig);
 
   const expiryDate = new Date(2060, 11, 24).toString();
   const assetProfile: AssetProfile = { expirationDate: expiryDate };
@@ -672,17 +618,16 @@ test("runs ODAP between two gateways via openApi", async () => {
 });
 
 afterAll(async () => {
-  await ipfsContainer.stop();
-  await ipfsContainer.destroy();
   await fabricLedger.stop();
   await fabricLedger.destroy();
   await besuTestLedger.stop();
   await besuTestLedger.destroy();
 
-  pluginSourceGateway.database?.destroy();
-  pluginRecipientGateway.database?.destroy();
+  pluginSourceGateway.localRepository?.destroy();
+  pluginRecipientGateway.localRepository?.destroy();
+  pluginSourceGateway.remoteRepository?.destroy();
+  pluginRecipientGateway.remoteRepository?.destroy();
 
-  await Servers.shutdown(ipfsServer);
   await Servers.shutdown(besuServer);
   await Servers.shutdown(fabricServer);
   await Servers.shutdown(sourceGatewayServer);

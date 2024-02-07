@@ -4,10 +4,8 @@ import http, { Server } from "http";
 import { Server as SocketIoServer } from "socket.io";
 import { AddressInfo } from "net";
 import { v4 as uuidv4 } from "uuid";
-import { PluginObjectStoreIpfs } from "@hyperledger/cactus-plugin-object-store-ipfs";
 import bodyParser from "body-parser";
 import express from "express";
-import { DefaultApi as ObjectStoreIpfsApi } from "@hyperledger/cactus-plugin-object-store-ipfs";
 import { AssetProfile } from "../../../main/typescript/generated/openapi/typescript-axios";
 import {
   IListenOptions,
@@ -21,7 +19,6 @@ import {
   Containers,
   FabricTestLedgerV1,
   pruneDockerAllIfGithubAction,
-  GoIpfsTestContainer,
   BesuTestLedger,
 } from "@hyperledger/cactus-test-tooling";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
@@ -65,7 +62,11 @@ import {
 import { ClientGatewayHelper } from "../../../main/typescript/gateway/client/client-helper";
 import { ServerGatewayHelper } from "../../../main/typescript/gateway/server/server-helper";
 
-import { knexClientConnection, knexServerConnection } from "../knex.config";
+import {
+  knexClientConnection,
+  knexRemoteConnection,
+  knexServerConnection,
+} from "../knex.config";
 
 /**
  * Use this to debug issues with the fabric node SDK
@@ -73,18 +74,14 @@ import { knexClientConnection, knexServerConnection } from "../knex.config";
  * export HFC_LOGGING='{"debug":"console","info":"console"}'
  * ```
  */
-let ipfsApiHost: string;
 
 let fabricSigningCredential: FabricSigningCredential;
 const logLevel: LogLevelDesc = "INFO";
 
-let ipfsServer: Server;
 let sourceGatewayServer: Server;
 let recipientGatewayServer: Server;
 let besuServer: Server;
 let fabricServer: Server;
-
-let ipfsContainer: GoIpfsTestContainer;
 
 let fabricLedger: FabricTestLedgerV1;
 let fabricContractName: string;
@@ -128,51 +125,6 @@ beforeAll(async () => {
       await Containers.logDiagnostics({ logLevel });
       fail("Pruning didn't throw OK");
     });
-
-  {
-    // IPFS configuration
-    ipfsContainer = new GoIpfsTestContainer({ logLevel });
-    expect(ipfsContainer).not.toBeUndefined();
-
-    const container = await ipfsContainer.start();
-    expect(container).not.toBeUndefined();
-
-    const expressApp = express();
-    expressApp.use(bodyParser.json({ limit: "250mb" }));
-    ipfsServer = http.createServer(expressApp);
-    const listenOptions: IListenOptions = {
-      hostname: "127.0.0.1",
-      port: 0,
-      server: ipfsServer,
-    };
-
-    const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
-    const { address, port } = addressInfo;
-    ipfsApiHost = `http://${address}:${port}`;
-
-    const config = new Configuration({ basePath: ipfsApiHost });
-    const apiClient = new ObjectStoreIpfsApi(config);
-
-    expect(apiClient).not.toBeUndefined();
-
-    const ipfsApiUrl = await ipfsContainer.getApiUrl();
-
-    const kuboRpcModule = await import("kubo-rpc-client");
-    const ipfsClientOrOptions = kuboRpcModule.create({
-      url: ipfsApiUrl,
-    });
-
-    const instanceId = uuidv4();
-    const pluginIpfs = new PluginObjectStoreIpfs({
-      parentDir: `/${uuidv4()}/${uuidv4()}/`,
-      logLevel,
-      instanceId,
-      ipfsClientOrOptions,
-    });
-
-    await pluginIpfs.getOrCreateWebServices();
-    await pluginIpfs.registerWebServices(expressApp);
-  }
 
   {
     // Fabric ledger connection
@@ -563,14 +515,14 @@ beforeAll(async () => {
       dltIDs: ["DLT2"],
       instanceId: uuidv4(),
       keyPair: Secp256k1Keys.generateKeyPairsBuffer(),
-      ipfsPath: ipfsApiHost,
       fabricPath: fabricPath,
       fabricSigningCredential: fabricSigningCredential,
       fabricChannelName: fabricChannelName,
       fabricContractName: fabricContractName,
       clientHelper: new ClientGatewayHelper(),
       serverHelper: new ServerGatewayHelper(),
-      knexConfig: knexServerConnection,
+      knexLocalConfig: knexServerConnection,
+      knexRemoteConfig: knexRemoteConnection,
     };
 
     serverGatewayPluginOptions = {
@@ -578,28 +530,26 @@ beforeAll(async () => {
       dltIDs: ["DLT1"],
       instanceId: uuidv4(),
       keyPair: Secp256k1Keys.generateKeyPairsBuffer(),
-      ipfsPath: ipfsApiHost,
       besuPath: besuPath,
       besuWeb3SigningCredential: besuWeb3SigningCredential,
       besuContractName: besuContractName,
       besuKeychainId: besuKeychainId,
       clientHelper: new ClientGatewayHelper(),
       serverHelper: new ServerGatewayHelper(),
-      knexConfig: knexClientConnection,
+      knexLocalConfig: knexClientConnection,
+      knexRemoteConfig: knexRemoteConnection,
     };
 
     pluginSourceGateway = new FabricSatpGateway(clientGatewayPluginOptions);
-    pluginRecipientGateway = new BesuSatpGateway(
-      serverGatewayPluginOptions,
-    );
+    pluginRecipientGateway = new BesuSatpGateway(serverGatewayPluginOptions);
 
-    expect(pluginSourceGateway.database).not.toBeUndefined();
-    expect(pluginRecipientGateway.database).not.toBeUndefined();
+    expect(pluginSourceGateway.localRepository?.database).not.toBeUndefined();
+    expect(
+      pluginRecipientGateway.localRepository?.database,
+    ).not.toBeUndefined();
 
-    await pluginSourceGateway.database?.migrate.rollback();
-    await pluginSourceGateway.database?.migrate.latest();
-    await pluginRecipientGateway.database?.migrate.rollback();
-    await pluginRecipientGateway.database?.migrate.latest();
+    await pluginSourceGateway.localRepository?.reset();
+    await pluginRecipientGateway.localRepository?.reset();
   }
   {
     // Server Gateway configuration
@@ -820,7 +770,7 @@ test("client gateway crashes after deleting fabric asset", async () => {
   await pluginSourceGateway.deleteAsset(sessionID);
 
   // now we simulate the crash of the client gateway
-  pluginSourceGateway.database?.destroy();
+  pluginSourceGateway.localRepository?.destroy();
   await Servers.shutdown(sourceGatewayServer);
 
   const expressApp = express();
@@ -856,17 +806,16 @@ test("client gateway crashes after deleting fabric asset", async () => {
 });
 
 afterAll(async () => {
-  await ipfsContainer.stop();
-  await ipfsContainer.destroy();
   await fabricLedger.stop();
   await fabricLedger.destroy();
   await besuTestLedger.stop();
   await besuTestLedger.destroy();
 
-  pluginSourceGateway.database?.destroy();
-  pluginRecipientGateway.database?.destroy();
+  pluginSourceGateway.localRepository?.destroy();
+  pluginRecipientGateway.localRepository?.destroy();
+  pluginSourceGateway.remoteRepository?.destroy();
+  pluginRecipientGateway.remoteRepository?.destroy();
 
-  await Servers.shutdown(ipfsServer);
   await Servers.shutdown(besuServer);
   await Servers.shutdown(fabricServer);
   await Servers.shutdown(sourceGatewayServer);

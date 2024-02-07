@@ -1,6 +1,5 @@
 import {
-  IPluginSatpGatewayConstructorOptions,
-  OdapMessageType,
+  SatpMessageType,
   PluginSatpGateway,
 } from "../../../../main/typescript/gateway/plugin-satp-gateway";
 import {
@@ -14,9 +13,8 @@ import { BesuSatpGateway } from "../../../../main/typescript/gateway/besu-satp-g
 import { FabricSatpGateway } from "../../../../main/typescript/gateway/fabric-satp-gateway";
 import { ClientGatewayHelper } from "../../../../main/typescript/gateway/client/client-helper";
 import { ServerGatewayHelper } from "../../../../main/typescript/gateway/server/server-helper";
+import { knexRemoteConnection } from "../../knex.config";
 
-let sourceGatewayConstructor: IPluginSatpGatewayConstructorOptions;
-let recipientGatewayConstructor: IPluginSatpGatewayConstructorOptions;
 let pluginSourceGateway: PluginSatpGateway;
 let pluginRecipientGateway: PluginSatpGateway;
 let dummyCommitFinalResponseMessageHash: string;
@@ -26,35 +24,35 @@ let sessionID: string;
 let sequenceNumber: number;
 
 beforeEach(async () => {
-  sourceGatewayConstructor = {
+  const sourceGatewayConstructor = {
     name: "plugin-satp-gateway#sourceGateway",
     dltIDs: ["DLT2"],
     instanceId: uuidV4(),
     clientHelper: new ClientGatewayHelper(),
     serverHelper: new ServerGatewayHelper(),
+    knexRemoteConfig: knexRemoteConnection,
   };
-  recipientGatewayConstructor = {
+  const recipientGatewayConstructor = {
     name: "plugin-satp-gateway#recipientGateway",
     dltIDs: ["DLT1"],
     instanceId: uuidV4(),
     clientHelper: new ClientGatewayHelper(),
     serverHelper: new ServerGatewayHelper(),
+    knexRemoteConfig: knexRemoteConnection,
   };
 
   pluginSourceGateway = new FabricSatpGateway(sourceGatewayConstructor);
   pluginRecipientGateway = new BesuSatpGateway(recipientGatewayConstructor);
 
   if (
-    pluginSourceGateway.database == undefined ||
-    pluginRecipientGateway.database == undefined
+    pluginSourceGateway.localRepository?.database == undefined ||
+    pluginRecipientGateway.localRepository?.database == undefined
   ) {
     throw new Error("Database is not correctly initialized");
   }
 
-  await pluginSourceGateway.database.migrate.rollback();
-  await pluginSourceGateway.database.migrate.latest();
-  await pluginRecipientGateway.database.migrate.rollback();
-  await pluginRecipientGateway.database.migrate.latest();
+  await pluginSourceGateway.localRepository?.reset();
+  await pluginRecipientGateway.localRepository?.reset();
 
   dummyCommitFinalResponseMessageHash = SHA256(
     "commitFinalResponseMessageData",
@@ -91,7 +89,7 @@ beforeEach(async () => {
 test("dummy test for transfer complete flow", async () => {
   const transferCompleteRequestMessage: TransferCompleteV1Request = {
     sessionID: sessionID,
-    messageType: OdapMessageType.TransferCompleteRequest,
+    messageType: SatpMessageType.TransferCompleteRequest,
     clientIdentityPubkey: pluginSourceGateway.pubKey,
     serverIdentityPubkey: pluginRecipientGateway.pubKey,
     signature: "",
@@ -104,17 +102,15 @@ test("dummy test for transfer complete flow", async () => {
     pluginSourceGateway.sign(JSON.stringify(transferCompleteRequestMessage)),
   );
 
-  pluginRecipientGateway.serverHelper
-    .checkValidTransferCompleteRequest(
-      transferCompleteRequestMessage,
-      pluginRecipientGateway,
-    )
-    .catch(() => {
-      throw new Error("Test failed");
-    });
+  await pluginRecipientGateway.serverHelper.checkValidTransferCompleteRequest(
+    transferCompleteRequestMessage,
+    pluginRecipientGateway,
+  );
 });
 
 afterEach(() => {
-  pluginSourceGateway.database?.destroy();
-  pluginRecipientGateway.database?.destroy();
+  pluginSourceGateway.localRepository?.destroy();
+  pluginRecipientGateway.localRepository?.destroy();
+  pluginSourceGateway.remoteRepository?.destroy();
+  pluginRecipientGateway.remoteRepository?.destroy();
 });

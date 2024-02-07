@@ -1,7 +1,6 @@
 import { randomInt } from "crypto";
 import {
-  IPluginSatpGatewayConstructorOptions,
-  OdapMessageType,
+  SatpMessageType,
   PluginSatpGateway,
 } from "../../../../main/typescript/gateway/plugin-satp-gateway";
 import {
@@ -18,8 +17,6 @@ import { ServerGatewayHelper } from "../../../../main/typescript/gateway/server/
 const MAX_RETRIES = 5;
 const MAX_TIMEOUT = 5000;
 
-let sourceGatewayConstructor: IPluginSatpGatewayConstructorOptions;
-let recipientGatewayConstructor: IPluginSatpGatewayConstructorOptions;
 let pluginSourceGateway: PluginSatpGateway;
 let pluginRecipientGateway: PluginSatpGateway;
 let dummyLockEvidenceResponseMessageHash: string;
@@ -28,14 +25,14 @@ let sessionID: string;
 let sequenceNumber: number;
 
 beforeEach(async () => {
-  sourceGatewayConstructor = {
+  const sourceGatewayConstructor = {
     name: "plugin-satp-gateway#sourceGateway",
     dltIDs: ["DLT2"],
     instanceId: uuidV4(),
     clientHelper: new ClientGatewayHelper(),
     serverHelper: new ServerGatewayHelper(),
   };
-  recipientGatewayConstructor = {
+  const recipientGatewayConstructor = {
     name: "plugin-satp-gateway#recipientGateway",
     dltIDs: ["DLT1"],
     instanceId: uuidV4(),
@@ -47,16 +44,14 @@ beforeEach(async () => {
   pluginRecipientGateway = new BesuSatpGateway(recipientGatewayConstructor);
 
   if (
-    pluginSourceGateway.database == undefined ||
-    pluginRecipientGateway.database == undefined
+    pluginSourceGateway.localRepository?.database == undefined ||
+    pluginRecipientGateway.localRepository?.database == undefined
   ) {
     throw new Error("Database is not correctly initialized");
   }
 
-  await pluginSourceGateway.database.migrate.rollback();
-  await pluginSourceGateway.database.migrate.latest();
-  await pluginRecipientGateway.database.migrate.rollback();
-  await pluginRecipientGateway.database.migrate.latest();
+  await pluginSourceGateway.localRepository?.reset();
+  await pluginRecipientGateway.localRepository?.reset();
 
   dummyLockEvidenceResponseMessageHash = SHA256(
     "lockEvidenceResponseMessageData",
@@ -87,7 +82,7 @@ beforeEach(async () => {
 test("valid commit prepare request", async () => {
   const commitPrepareRequestMessage: CommitPreparationV1Request = {
     sessionID: sessionID,
-    messageType: OdapMessageType.CommitPreparationRequest,
+    messageType: SatpMessageType.CommitPreparationRequest,
     clientIdentityPubkey: pluginSourceGateway.pubKey,
     serverIdentityPubkey: pluginRecipientGateway.pubKey,
     signature: "",
@@ -124,7 +119,7 @@ test("commit prepare request with wrong sessionId", async () => {
 
   const commitPrepareRequestMessage: CommitPreparationV1Request = {
     sessionID: wrongSessionId,
-    messageType: OdapMessageType.CommitPreparationRequest,
+    messageType: SatpMessageType.CommitPreparationRequest,
     clientIdentityPubkey: pluginSourceGateway.pubKey,
     serverIdentityPubkey: pluginRecipientGateway.pubKey,
     signature: "",
@@ -154,7 +149,7 @@ test("commit prepare request with wrong sessionId", async () => {
 test("commit prepare request with wrong message type", async () => {
   const commitPrepareRequestMessage: CommitPreparationV1Request = {
     sessionID: sessionID,
-    messageType: OdapMessageType.CommitFinalResponse,
+    messageType: SatpMessageType.CommitFinalResponse,
     clientIdentityPubkey: pluginSourceGateway.pubKey,
     serverIdentityPubkey: pluginRecipientGateway.pubKey,
     signature: "",
@@ -184,7 +179,7 @@ test("commit prepare request with wrong message type", async () => {
 test("commit prepare request with wrong previous message hash", async () => {
   const commitPrepareRequestMessage: CommitPreparationV1Request = {
     sessionID: sessionID,
-    messageType: OdapMessageType.CommitPreparationRequest,
+    messageType: SatpMessageType.CommitPreparationRequest,
     clientIdentityPubkey: pluginSourceGateway.pubKey,
     serverIdentityPubkey: pluginRecipientGateway.pubKey,
     signature: "",
@@ -239,6 +234,8 @@ test("timeout in commit preparation response because no client gateway is connec
 });
 
 afterEach(() => {
-  pluginSourceGateway.database?.destroy();
-  pluginRecipientGateway.database?.destroy();
+  pluginSourceGateway.localRepository?.destroy();
+  pluginRecipientGateway.localRepository?.destroy();
+  pluginSourceGateway.remoteRepository?.destroy();
+  pluginRecipientGateway.remoteRepository?.destroy();
 });

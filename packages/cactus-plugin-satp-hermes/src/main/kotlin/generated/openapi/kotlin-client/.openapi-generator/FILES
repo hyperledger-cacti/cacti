@@ -33,8 +33,6 @@ src/main/kotlin/org/openapitools/client/models/History.kt
 src/main/kotlin/org/openapitools/client/models/LocalLog.kt
 src/main/kotlin/org/openapitools/client/models/LockEvidenceV1Request.kt
 src/main/kotlin/org/openapitools/client/models/LockEvidenceV1Response.kt
-src/main/kotlin/org/openapitools/client/models/OdapMessage.kt
-src/main/kotlin/org/openapitools/client/models/OdapMessageActionResponse.kt
 src/main/kotlin/org/openapitools/client/models/PayloadProfile.kt
 src/main/kotlin/org/openapitools/client/models/RecoverSuccessV1Message.kt
 src/main/kotlin/org/openapitools/client/models/RecoverUpdateAckV1Message.kt
@@ -42,6 +40,8 @@ src/main/kotlin/org/openapitools/client/models/RecoverUpdateV1Message.kt
 src/main/kotlin/org/openapitools/client/models/RecoverV1Message.kt
 src/main/kotlin/org/openapitools/client/models/RollbackAckV1Message.kt
 src/main/kotlin/org/openapitools/client/models/RollbackV1Message.kt
+src/main/kotlin/org/openapitools/client/models/SatpMessage.kt
+src/main/kotlin/org/openapitools/client/models/SatpMessageActionResponse.kt
 src/main/kotlin/org/openapitools/client/models/SessionData.kt
 src/main/kotlin/org/openapitools/client/models/TransferCommenceV1Request.kt
 src/main/kotlin/org/openapitools/client/models/TransferCommenceV1Response.kt

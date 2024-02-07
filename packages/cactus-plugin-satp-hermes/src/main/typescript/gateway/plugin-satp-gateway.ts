@@ -4,7 +4,7 @@ import type { Server as SecureServer } from "https";
 import { Optional } from "typescript-optional";
 import type { Express } from "express";
 import { v4 as uuidV4 } from "uuid";
-import knex, { Knex } from "knex";
+import { Knex } from "knex";
 import OAS from "../../json/openapi.json";
 import {
   Secp256k1Keys,
@@ -14,7 +14,6 @@ import {
   JsObjectSigner,
   IJsObjectSignerOptions,
 } from "@hyperledger/cactus-common";
-import { DefaultApi as ObjectStoreIpfsApi } from "@hyperledger/cactus-plugin-object-store-ipfs";
 import {
   ICactusPlugin,
   IPluginWebService,
@@ -23,7 +22,7 @@ import {
 } from "@hyperledger/cactus-core-api";
 import {
   TransferInitializationV1Response,
-  DefaultApi as OdapApi,
+  DefaultApi as SatpApi,
   SessionData,
   ClientV1Request,
   TransferCommenceV1Request,
@@ -90,8 +89,15 @@ import {
 } from "./recovery/rollback-ack";
 import { ClientRequestEndpointV1 } from "../web-services/client-side/client-request-endpoint";
 import { RollbackAckMessageEndpointV1 } from "../web-services/recovery/rollback-ack-message-endpoint";
+import { KnexLocalLogRepository as LocalLogRepository } from "./repository/knex-local-log-repository";
+import { IPFSRemoteLogRepository } from "./repository/ipfs-remote-log-repository";
+import { KnexRemoteLogRepository } from "./repository/knex-remote-log-repository";
+import {
+  ILocalLogRepository,
+  IRemoteLogRepository,
+} from "./repository/interfaces/repository";
 
-export enum OdapMessageType {
+export enum SatpMessageType {
   InitializationRequest = "urn:ietf:satp:msgtype:init-transfer-msg",
   InitializationResponse = "urn:ietf:satp:msgtype:init-transfer-ack-msg",
   TransferCommenceRequest = "urn:ietf:satp:msgtype:transfer-commence-msg",
@@ -111,10 +117,14 @@ export interface IPluginSatpGatewayConstructorOptions {
   instanceId: string;
   keyPair?: IKeyPair;
   backupGatewaysAllowed?: string[];
-  ipfsPath?: string;
   clientHelper: ClientGatewayHelper;
   serverHelper: ServerGatewayHelper;
-  knexConfig?: Knex.Config;
+  knexLocalConfig?: Knex.Config;
+
+  // below are the two options to store remote logs. Either using a DB simulating a remote DB or using
+  // IPFS which ensures a different notion of accountability. If both are set, the IPFS will be used
+  knexRemoteConfig?: Knex.Config;
+  ipfsPath?: string;
 }
 export interface IKeyPair {
   publicKey: Uint8Array;
@@ -128,10 +138,19 @@ export interface IRemoteLog {
   signerPubKey: string;
 }
 
+export interface ILocalLog {
+  key?: string;
+  sessionID: string;
+  data?: string;
+  type: string;
+  operation: string;
+  timestamp?: string;
+}
+
 export abstract class PluginSatpGateway
   implements ICactusPlugin, IPluginWebService
 {
-  public static readonly CLASS_NAME = "OdapGateway";
+  public static readonly CLASS_NAME = "SatpGateway";
   private readonly instanceId: string;
   private readonly _log: Logger;
 
@@ -139,13 +158,11 @@ export abstract class PluginSatpGateway
   private _pubKey: string;
   private _privKey: string;
 
-  public ipfsApi?: ObjectStoreIpfsApi;
-
-  public database?: Knex;
+  public localRepository?: ILocalLogRepository;
+  public remoteRepository?: IRemoteLogRepository;
 
   private endpoints: IWebServiceEndpoint[] | undefined;
-  //map[]object, object refer to a state
-  //of a specific comminications
+
   private _supportedDltIDs: string[];
   private _backupGatewaysAllowed: string[];
 
@@ -185,26 +202,13 @@ export abstract class PluginSatpGateway
     this._clientHelper = options.clientHelper;
     this._serverHelper = options.serverHelper;
 
-    if (options.ipfsPath != undefined) this.defineIpfsConnection(options);
+    this.remoteRepository = new KnexRemoteLogRepository(
+      options.knexRemoteConfig,
+    );
+    if (options.ipfsPath != undefined)
+      this.remoteRepository = new IPFSRemoteLogRepository(options.ipfsPath);
 
-    this.defineKnexConnection(options.knexConfig);
-  }
-
-  public defineKnexConnection(config: Knex.Config | undefined): void {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const configFile = require("../../../../knex/knexfile.ts")[
-      process.env.ENVIRONMENT || "development"
-    ];
-
-    this.database = knex(config || configFile);
-  }
-
-  private defineIpfsConnection(
-    options: IPluginSatpGatewayConstructorOptions,
-  ): void {
-    const config = new Configuration({ basePath: options.ipfsPath });
-    const apiClient = new ObjectStoreIpfsApi(config);
-    this.ipfsApi = apiClient;
+    this.localRepository = new LocalLogRepository(options.knexLocalConfig);
   }
 
   public get className(): string {
@@ -377,16 +381,6 @@ export abstract class PluginSatpGateway
     return this._log;
   }
 
-  getDatabaseInstance(): Knex.QueryBuilder {
-    const fnTag = `${this.className}#getDatabaseInstance()`;
-
-    if (this.database == undefined) {
-      throw new Error(`${fnTag}, database is undefined`);
-    }
-
-    return this.database("logs");
-  }
-
   isClientGateway(sessionID: string): boolean {
     const fnTag = `${this.className}#isClientGateway()`;
 
@@ -428,7 +422,7 @@ export abstract class PluginSatpGateway
     return Buffer.from(array).toString("hex");
   }
 
-  static getOdapLogKey(
+  static getSatpLogKey(
     sessionID: string,
     type: string,
     operation: string,
@@ -441,18 +435,11 @@ export abstract class PluginSatpGateway
 
     this.log.info(`${fnTag}, recovering open sessions...`);
 
-    if (this.database == undefined) {
+    if (this.localRepository?.database == undefined) {
       throw new Error(`${fnTag}, database is undefined`);
     }
 
-    const logs: LocalLog[] = await this.getDatabaseInstance()
-      .select(
-        this.database.raw(
-          "sessionId, key, data, type, operation, MAX(timestamp) as timestamp",
-        ),
-      )
-      .whereNot({ type: "proof" })
-      .groupBy("sessionID");
+    const logs: LocalLog[] = await this.localRepository.readLogsNotProofs();
 
     for (const log of logs) {
       const sessionID = log.sessionID;
@@ -481,49 +468,40 @@ export abstract class PluginSatpGateway
     }
   }
 
-  async storeInDatabase(localLog: LocalLog) {
+  async storeInDatabase(LocalLog: ILocalLog) {
     const fnTag = `${this.className}#storeInDatabase()`;
-    this.log.info(
-      `${fnTag}, Storing locally log: ${JSON.stringify(localLog)}`,
-    );
+    this.log.info(`${fnTag}, Storing locally log: ${JSON.stringify(LocalLog)}`);
 
-    await this.getDatabaseInstance().insert(localLog);
+    await this.localRepository?.create(LocalLog);
   }
 
-  async storeInIPFS(key: string, hash: string) {
-    const fnTag = `${this.className}#storeInIPFS()`;
+  async storeRemoteLog(key: string, hash: string) {
+    const fnTag = `${this.className}#storeRemoteLog()`;
 
-    if (this.ipfsApi == undefined) return;
-
-    const ipfsLog: IRemoteLog = {
+    const remoteLog: IRemoteLog = {
       key: key,
       hash: hash,
       signature: "",
       signerPubKey: this.pubKey,
     };
 
-    ipfsLog.signature = PluginSatpGateway.bufArray2HexStr(
-      await this.sign(JSON.stringify(ipfsLog)),
+    remoteLog.signature = PluginSatpGateway.bufArray2HexStr(
+      this.sign(JSON.stringify(remoteLog)),
     );
 
-    const logBase64 = Buffer.from(JSON.stringify(ipfsLog)).toString("base64");
+    this.log.info(`${fnTag}, Storing remote log: ${JSON.stringify(remoteLog)}`);
 
-    this.log.info(`${fnTag}, Storing in ipfs log: ${JSON.stringify(ipfsLog)}`);
-
-    const response = await this.ipfsApi.setObjectV1({
-      key: key,
-      value: logBase64,
-    });
+    const response = await this.remoteRepository?.create(remoteLog);
 
     if (response.status < 200 && response.status > 299) {
-      throw new Error(`${fnTag}, error when logging to ipfs`);
+      throw new Error(
+        `${fnTag}, got response ${response.status} when logging to remote`,
+      );
     }
   }
 
   async storeLog(localLog: LocalLog): Promise<void> {
-    if (this.ipfsApi == undefined) return;
-
-    localLog.key = PluginSatpGateway.getOdapLogKey(
+    localLog.key = PluginSatpGateway.getSatpLogKey(
       localLog.sessionID,
       localLog.type,
       localLog.operation,
@@ -545,13 +523,13 @@ export abstract class PluginSatpGateway
       ]),
     ).toString();
 
-    await this.storeInIPFS(localLog.key, hash);
+    await this.storeRemoteLog(localLog.key, hash);
   }
 
-  async storeProof(localLog: LocalLog): Promise<void> {
-    if (this.ipfsApi == undefined || localLog.data == undefined) return;
+  async storeProof(localLog: ILocalLog): Promise<void> {
+    if (localLog.data == undefined) return;
 
-    localLog.key = PluginSatpGateway.getOdapLogKey(
+    localLog.key = PluginSatpGateway.getSatpLogKey(
       localLog.sessionID,
       localLog.type,
       localLog.operation,
@@ -562,21 +540,17 @@ export abstract class PluginSatpGateway
 
     const hash = SHA256(localLog.data).toString();
 
-    await this.storeInIPFS(localLog.key, hash);
+    await this.storeRemoteLog(localLog.key, hash);
   }
 
-  async getLogFromDatabase(logKey: string): Promise<LocalLog | undefined> {
+  async getLogFromDatabase(logKey: string): Promise<ILocalLog | undefined> {
     const fnTag = `${this.className}#getLogFromDatabase()`;
     this.log.info(`${fnTag}, retrieving log with key ${logKey}`);
 
-    return await this.getDatabaseInstance()
-      .where({ key: logKey })
-      .first()
-      .then((row) => {
-        this.log.info(`${fnTag}, retrieved log ${JSON.stringify(row)}`);
-
-        return row;
-      });
+    return await this.localRepository?.readById(logKey).then((row) => {
+      this.log.info(`${fnTag}, retrieved log ${JSON.stringify(row)}`);
+      return row;
+    });
   }
 
   async getLastLogFromDatabase(
@@ -585,26 +559,20 @@ export abstract class PluginSatpGateway
     const fnTag = `${this.className}#getLastLog()`;
     this.log.info(`${fnTag}, retrieving last log from sessionID ${sessionID}`);
 
-    return await this.getDatabaseInstance()
-      .orderBy("timestamp", "desc")
-      .where({ sessionID: sessionID })
-      .first()
-      .then((row) => {
-        this.log.info(`${fnTag}, retrieved log ${JSON.stringify(row)}`);
-
-        return row;
-      });
+    return await this.localRepository?.readLastestLog(sessionID).then((row) => {
+      this.log.info(`${fnTag}, retrieved log ${JSON.stringify(row)}`);
+      return row;
+    });
   }
 
   async getLogsMoreRecentThanTimestamp(
     timestamp: string,
-  ): Promise<LocalLog[]> {
+  ): Promise<ILocalLog[]> {
     const fnTag = `${this.className}#getLogsMoreRecentThanTimestamp()`;
     this.log.info(`${fnTag}, retrieving logs more recent than ${timestamp}`);
 
-    const logs: LocalLog[] = await this.getDatabaseInstance()
-      .where("timestamp", ">", timestamp)
-      .whereNot("type", "like", "%proof%");
+    const logs: ILocalLog[] | undefined =
+      await this.localRepository?.readLogsMoreRecentThanTimestamp(timestamp);
 
     if (logs == undefined) {
       throw new Error(`${fnTag}, error when retrieving log from database`);
@@ -615,43 +583,33 @@ export abstract class PluginSatpGateway
     return logs;
   }
 
-  async getLogFromIPFS(logKey: string): Promise<IRemoteLog> {
-    const fnTag = `${this.className}#getOdapLogFromIPFS()`;
+  async getLogFromRemote(logKey: string): Promise<IRemoteLog> {
+    const fnTag = `${this.className}#getSatpLogFromIPFS()`;
     this.log.info(`Retrieving log with key: <${logKey}>`);
 
-    if (this.ipfsApi == undefined) {
-      throw new Error(`${fnTag}, ipfs is not defined`);
+    try {
+      const log = await this.remoteRepository?.readById(logKey);
+
+      if (log == undefined || log?.signature == undefined) {
+        throw new Error(`${fnTag}, the log or its signature is not defined`);
+      }
+
+      if (!this.verifySignature(log, log.signerPubKey)) {
+        throw new Error(`${fnTag}, received log with invalid signature`);
+      }
+
+      return log;
+    } catch {
+      throw new Error(`${fnTag}, error reading from remote log`);
     }
-
-    const response = await this.ipfsApi.getObjectV1({
-      key: logKey,
-    });
-
-    if (response.status < 200 && response.status > 299) {
-      throw new Error(`${fnTag}, error when logging to ipfs`);
-    }
-
-    const log: IRemoteLog = JSON.parse(
-      Buffer.from(response.data.value, "base64").toString(),
-    );
-
-    if (log == undefined || log.signature == undefined) {
-      throw new Error(`${fnTag}, the log or its signature is not defined`);
-    }
-
-    if (!this.verifySignature(log, log.signerPubKey)) {
-      throw new Error(`${fnTag}, received log with invalid signature`);
-    }
-
-    return log;
   }
 
-  static getOdapAPI(basePath: string): OdapApi {
-    const config = new Configuration({
+  static getSatpAPI(basePath: string): SatpApi {
+    const satpServerApiConfig = new Configuration({
       basePath: basePath,
     });
 
-    return new OdapApi(config);
+    return new SatpApi(satpServerApiConfig);
   }
 
   async deleteDatabaseEntries(sessionID: string) {
@@ -659,11 +617,11 @@ export abstract class PluginSatpGateway
       `deleting logs from database associated with sessionID: ${sessionID}`,
     );
 
-    await this.getDatabaseInstance().where({ sessionID: sessionID }).del();
+    await this.localRepository?.deleteBySessionId(sessionID);
   }
 
-  async resumeOdapSession(sessionID: string, remote: boolean) {
-    const fnTag = `${this.className}#continueOdapSession()`;
+  async resumeSatpSession(sessionID: string, remote: boolean) {
+    const fnTag = `${this.className}#continueSatpSession()`;
     const sessionData = this.sessions.get(sessionID);
 
     if (
@@ -1061,7 +1019,7 @@ export abstract class PluginSatpGateway
 
     this.updateLastMessageReceivedTimestamp(request.sessionID);
     await checkValidRecoverSuccessMessage(request, this);
-    await this.resumeOdapSession(request.sessionID, true);
+    await this.resumeSatpSession(request.sessionID, true);
   }
 
   async onRollbackMessageReceived(request: RollbackV1Message): Promise<void> {
@@ -1091,8 +1049,8 @@ export abstract class PluginSatpGateway
     //this.deleteDatabaseEntries(request.sessionID);
   }
 
-  async runOdap(request: ClientV1Request): Promise<void> {
-    const fnTag = `${this.className}#runOdap()`;
+  async runSatp(request: ClientV1Request): Promise<void> {
+    const fnTag = `${this.className}#runSatp()`;
     this.log.info(`${fnTag}, start processing, time: ${Date.now()}`);
     this.log.info(
       `client gateway received ClientRequest: ${JSON.stringify(request)}`,

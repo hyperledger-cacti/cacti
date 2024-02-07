@@ -38,6 +38,7 @@
     "dist/*"
   ],
   "scripts": {
+    "build:dev:backend:postbuild": "mkdir -p ./dist/lib/main/knex && cp -r ./knex/* ./dist/lib/main/knex",
     "codegen": "run-p 'codegen:*'",
     "codegen:openapi": "npm run generate-sdk",
     "generate-sdk": "run-p 'generate-sdk:*'",

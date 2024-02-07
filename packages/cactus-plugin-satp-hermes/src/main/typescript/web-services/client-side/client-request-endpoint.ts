@@ -86,7 +86,7 @@ export class ClientRequestEndpointV1 implements IWebServiceEndpoint {
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(reqTag);
     try {
-      await this.options.gateway.runOdap(req.body);
+      await this.options.gateway.runSatp(req.body);
       res.status(200).json("OK");
     } catch (ex) {
       this.log.error(`Crash while serving ${reqTag}`, ex);

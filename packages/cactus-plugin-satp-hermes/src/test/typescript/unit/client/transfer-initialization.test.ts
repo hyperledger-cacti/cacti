@@ -2,7 +2,7 @@ import { randomInt } from "crypto";
 import { SHA256 } from "crypto-js";
 import { v4 as uuidV4 } from "uuid";
 import {
-  OdapMessageType,
+  SatpMessageType,
   PluginSatpGateway,
 } from "../../../../main/typescript/gateway/plugin-satp-gateway";
 import {
@@ -49,16 +49,14 @@ beforeEach(async () => {
   pluginRecipientGateway = new BesuSatpGateway(recipientGatewayConstructor);
 
   if (
-    pluginSourceGateway.database == undefined ||
-    pluginRecipientGateway.database == undefined
+    pluginSourceGateway.localRepository?.database == undefined ||
+    pluginRecipientGateway.localRepository?.database == undefined
   ) {
     throw new Error("Database is not correctly initialized");
   }
 
-  await pluginSourceGateway.database.migrate.rollback();
-  await pluginSourceGateway.database.migrate.latest();
-  await pluginRecipientGateway.database.migrate.rollback();
-  await pluginRecipientGateway.database.migrate.latest();
+  await pluginSourceGateway.localRepository?.reset();
+  await pluginRecipientGateway.localRepository?.reset();
 
   sequenceNumber = randomInt(100);
   sessionID = uuidV4();
@@ -84,7 +82,7 @@ beforeEach(async () => {
 
 test("valid transfer initiation response", async () => {
   const initializationResponseMessage: TransferInitializationV1Response = {
-    messageType: OdapMessageType.InitializationResponse,
+    messageType: SatpMessageType.InitializationResponse,
     sessionID: sessionID,
     initialRequestMessageHash: INITIALIZATION_REQUEST_MESSAGE_HASH,
     timeStamp: Date.now().toString(),
@@ -131,7 +129,7 @@ test("valid transfer initiation response", async () => {
 
 test("transfer initiation response invalid because of wrong previous message hash", async () => {
   const initializationResponseMessage: TransferInitializationV1Response = {
-    messageType: OdapMessageType.InitializationResponse,
+    messageType: SatpMessageType.InitializationResponse,
     sessionID: sessionID,
     initialRequestMessageHash: "wrongMessageHash",
     timeStamp: Date.now().toString(),
@@ -165,7 +163,7 @@ test("transfer initiation response invalid because of wrong previous message has
 
 test("transfer initiation response invalid because it does not match transfer initialization request sessionID", async () => {
   const initializationResponseMessage: TransferInitializationV1Response = {
-    messageType: OdapMessageType.InitializationResponse,
+    messageType: SatpMessageType.InitializationResponse,
     sessionID: uuidV4(),
     initialRequestMessageHash: "wrongMessageHash",
     timeStamp: Date.now().toString(),
@@ -239,6 +237,8 @@ test("timeout in transfer initiation request because no server gateway is connec
 });
 
 afterEach(() => {
-  pluginSourceGateway.database?.destroy();
-  pluginRecipientGateway.database?.destroy();
+  pluginSourceGateway.localRepository?.destroy();
+  pluginRecipientGateway.localRepository?.destroy();
+  pluginSourceGateway.remoteRepository?.destroy();
+  pluginRecipientGateway.remoteRepository?.destroy();
 });

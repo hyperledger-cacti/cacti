@@ -160,122 +160,122 @@ export async function makeSessionDataChecks(
 
   await expect(
     pluginSourceGateway.getLogFromDatabase(
-      PluginSatpGateway.getOdapLogKey(sessionId, "init", "validate"),
+      PluginSatpGateway.getSatpLogKey(sessionId, "init", "validate"),
     ),
   ).resolves.not.toBeUndefined();
   await expect(
     pluginRecipientGateway.getLogFromDatabase(
-      PluginSatpGateway.getOdapLogKey(sessionId, "exec", "validate"),
+      PluginSatpGateway.getSatpLogKey(sessionId, "exec", "validate"),
     ),
   ).resolves.not.toBeUndefined();
   await expect(
     pluginRecipientGateway.getLogFromDatabase(
-      PluginSatpGateway.getOdapLogKey(sessionId, "done", "validate"),
+      PluginSatpGateway.getSatpLogKey(sessionId, "done", "validate"),
     ),
   ).resolves.not.toBeUndefined();
   await expect(
     pluginRecipientGateway.getLogFromDatabase(
-      PluginSatpGateway.getOdapLogKey(sessionId, "ack", "validate"),
+      PluginSatpGateway.getSatpLogKey(sessionId, "ack", "validate"),
     ),
   ).resolves.not.toBeUndefined();
 
   await expect(
     pluginSourceGateway.getLogFromDatabase(
-      PluginSatpGateway.getOdapLogKey(sessionId, "init", "commence"),
+      PluginSatpGateway.getSatpLogKey(sessionId, "init", "commence"),
     ),
   ).resolves.not.toBeUndefined();
   await expect(
     pluginRecipientGateway.getLogFromDatabase(
-      PluginSatpGateway.getOdapLogKey(sessionId, "exec", "commence"),
+      PluginSatpGateway.getSatpLogKey(sessionId, "exec", "commence"),
     ),
   ).resolves.not.toBeUndefined();
   await expect(
     pluginRecipientGateway.getLogFromDatabase(
-      PluginSatpGateway.getOdapLogKey(sessionId, "done", "commence"),
+      PluginSatpGateway.getSatpLogKey(sessionId, "done", "commence"),
     ),
   ).resolves.not.toBeUndefined();
   await expect(
     pluginRecipientGateway.getLogFromDatabase(
-      PluginSatpGateway.getOdapLogKey(sessionId, "ack", "commence"),
+      PluginSatpGateway.getSatpLogKey(sessionId, "ack", "commence"),
     ),
   ).resolves.not.toBeUndefined();
 
   await expect(
     pluginSourceGateway.getLogFromDatabase(
-      PluginSatpGateway.getOdapLogKey(sessionId, "init", "lock"),
+      PluginSatpGateway.getSatpLogKey(sessionId, "init", "lock"),
     ),
   ).resolves.not.toBeUndefined();
   await expect(
     pluginRecipientGateway.getLogFromDatabase(
-      PluginSatpGateway.getOdapLogKey(sessionId, "exec", "lock"),
+      PluginSatpGateway.getSatpLogKey(sessionId, "exec", "lock"),
     ),
   ).resolves.not.toBeUndefined();
   await expect(
     pluginRecipientGateway.getLogFromDatabase(
-      PluginSatpGateway.getOdapLogKey(sessionId, "done", "lock"),
+      PluginSatpGateway.getSatpLogKey(sessionId, "done", "lock"),
     ),
   ).resolves.not.toBeUndefined();
   await expect(
     pluginRecipientGateway.getLogFromDatabase(
-      PluginSatpGateway.getOdapLogKey(sessionId, "ack", "lock"),
+      PluginSatpGateway.getSatpLogKey(sessionId, "ack", "lock"),
     ),
   ).resolves.not.toBeUndefined();
 
   await expect(
     pluginSourceGateway.getLogFromDatabase(
-      PluginSatpGateway.getOdapLogKey(sessionId, "init", "prepare"),
+      PluginSatpGateway.getSatpLogKey(sessionId, "init", "prepare"),
     ),
   ).resolves.not.toBeUndefined();
   await expect(
     pluginRecipientGateway.getLogFromDatabase(
-      PluginSatpGateway.getOdapLogKey(sessionId, "exec", "prepare"),
+      PluginSatpGateway.getSatpLogKey(sessionId, "exec", "prepare"),
     ),
   ).resolves.not.toBeUndefined();
   await expect(
     pluginRecipientGateway.getLogFromDatabase(
-      PluginSatpGateway.getOdapLogKey(sessionId, "done", "prepare"),
+      PluginSatpGateway.getSatpLogKey(sessionId, "done", "prepare"),
     ),
   ).resolves.not.toBeUndefined();
   await expect(
     pluginRecipientGateway.getLogFromDatabase(
-      PluginSatpGateway.getOdapLogKey(sessionId, "ack", "prepare"),
+      PluginSatpGateway.getSatpLogKey(sessionId, "ack", "prepare"),
     ),
   ).resolves.not.toBeUndefined();
 
   await expect(
     pluginSourceGateway.getLogFromDatabase(
-      PluginSatpGateway.getOdapLogKey(sessionId, "init", "final"),
+      PluginSatpGateway.getSatpLogKey(sessionId, "init", "final"),
     ),
   ).resolves.not.toBeUndefined();
   await expect(
     pluginRecipientGateway.getLogFromDatabase(
-      PluginSatpGateway.getOdapLogKey(sessionId, "exec", "final"),
+      PluginSatpGateway.getSatpLogKey(sessionId, "exec", "final"),
     ),
   ).resolves.not.toBeUndefined();
   await expect(
     pluginRecipientGateway.getLogFromDatabase(
-      PluginSatpGateway.getOdapLogKey(sessionId, "done", "final"),
+      PluginSatpGateway.getSatpLogKey(sessionId, "done", "final"),
     ),
   ).resolves.not.toBeUndefined();
   await expect(
     pluginRecipientGateway.getLogFromDatabase(
-      PluginSatpGateway.getOdapLogKey(sessionId, "ack", "final"),
+      PluginSatpGateway.getSatpLogKey(sessionId, "ack", "final"),
     ),
   ).resolves.not.toBeUndefined();
 
   await expect(
     pluginSourceGateway.getLogFromDatabase(
-      PluginSatpGateway.getOdapLogKey(sessionId, "init", "complete"),
+      PluginSatpGateway.getSatpLogKey(sessionId, "init", "complete"),
     ),
   ).resolves.not.toBeUndefined();
   await expect(
     pluginRecipientGateway.getLogFromDatabase(
-      PluginSatpGateway.getOdapLogKey(sessionId, "exec", "complete"),
+      PluginSatpGateway.getSatpLogKey(sessionId, "exec", "complete"),
     ),
   ).resolves.not.toBeUndefined();
   await expect(
     pluginRecipientGateway.getLogFromDatabase(
-      PluginSatpGateway.getOdapLogKey(sessionId, "done", "complete"),
+      PluginSatpGateway.getSatpLogKey(sessionId, "done", "complete"),
     ),
   ).resolves.not.toBeUndefined();
 }
