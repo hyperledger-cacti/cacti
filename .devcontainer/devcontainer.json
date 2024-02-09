@@ -14,7 +14,7 @@
 		},
 		"ghcr.io/devcontainers/features/git:1": {
 			"ppa": true,
-			"version": "2.40.1"
+			"version": "lts"
 		},
 		"ghcr.io/devcontainers/features/go:1": {
 			"version": "1.20.6"
