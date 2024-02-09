@@ -5,7 +5,7 @@ import {
 import {
   IPluginPersistenceFabricOptions,
   PluginPersistenceFabric,
-} from "./plugin-persistence-fabric";
+} from "./plugin-persistence-fabric.js";
 
 export class PluginFactoryPersistanceFabric extends PluginFactory<
   PluginPersistenceFabric,

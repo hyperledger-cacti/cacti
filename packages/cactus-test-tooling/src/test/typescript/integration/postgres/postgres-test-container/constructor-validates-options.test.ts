@@ -1,7 +1,7 @@
 import test, { Test } from "tape-promise/tape";
 import isPortReachable from "is-port-reachable";
 import { Container } from "dockerode";
-import { PostgresTestContainer } from "../../../../../main/typescript/public-api";
+import { PostgresTestContainer } from "../../../../../main/typescript/public-api.js";
 import { LogLevelDesc } from "@hyperledger/cactus-common";
 
 const logLevel: LogLevelDesc = "TRACE";

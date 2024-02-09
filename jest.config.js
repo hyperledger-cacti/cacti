@@ -1,6 +1,9 @@
 /** @type {import('ts-jest/dist/types').JestConfigWithTsJest} */
 module.exports = {
   preset: "ts-jest",
+  moduleNameMapper: {
+    "^(\\.{1,2}/.*)\\.js$": "$1",
+  },
   logHeapUsage: true,
   testEnvironment: "node",
   maxWorkers: 1,

@@ -3,7 +3,7 @@ import { promisify } from "util";
 
 import fastSafeStringify from "fast-safe-stringify";
 import { RuntimeError } from "run-time-error-cjs";
-import { hasKey } from "./has-key";
+import { hasKey } from "./has-key.js";
 
 const execAsync = promisify(exec);
 

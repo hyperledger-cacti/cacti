@@ -4,7 +4,7 @@ import { PluginFactory } from "@hyperledger/cactus-core-api";
 import {
   IPluginObjectStoreIpfsOptions,
   PluginObjectStoreIpfs,
-} from "./plugin-object-store-ipfs";
+} from "./plugin-object-store-ipfs.js";
 
 export class PluginFactoryObjectStore extends PluginFactory<
   PluginObjectStoreIpfs,

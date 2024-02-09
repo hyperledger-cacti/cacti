@@ -16,8 +16,8 @@ import {
 
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
-import { PluginLedgerConnectorFabric } from "../plugin-ledger-connector-fabric";
-import { RunTransactionRequest } from "../generated/openapi/typescript-axios";
+import { PluginLedgerConnectorFabric } from "../plugin-ledger-connector-fabric.js";
+import { RunTransactionRequest } from "./../generated/openapi/typescript-axios/index.js";
 import OAS from "../../json/openapi.json";
 
 export interface IRunTransactionEndpointV1Options {

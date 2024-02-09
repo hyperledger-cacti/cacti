@@ -11,7 +11,7 @@ import {
   BesuApiClientOptions,
   BesuApiClient,
   GetBesuRecordV1Request,
-} from "../../../../../main/typescript/public-api";
+} from "../../../../../main/typescript/public-api.js";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import {
   BesuTestLedger,

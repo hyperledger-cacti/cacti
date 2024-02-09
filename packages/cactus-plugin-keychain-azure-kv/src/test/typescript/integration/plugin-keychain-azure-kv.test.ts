@@ -15,9 +15,9 @@ import {
   DefaultApi as KeychainAzureKvApi,
   IPluginKeychainAzureKvOptions,
   PluginKeychainAzureKv,
-} from "../../../main/typescript/public-api";
+} from "../../../main/typescript/public-api.js";
 
-import { SecretClientMock } from "../mock/plugin-keychain-azure-kv-mock";
+import { SecretClientMock } from "../mock/plugin-keychain-azure-kv-mock.js";
 
 const logLevel: LogLevelDesc = "TRACE";
 

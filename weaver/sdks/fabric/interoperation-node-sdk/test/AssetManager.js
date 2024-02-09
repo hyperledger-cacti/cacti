@@ -22,7 +22,6 @@ const { NetworkImpl } = require("fabric-network/lib/network");
 const { Transaction } = require("fabric-network/lib/transaction");
 const assetManager = require("../src/AssetManager");
 const hashFunctions = require("../src/HashFunctions");
-import assetLocksPb from "@hyperledger/cacti-weaver-protos-js/common/asset_locks_pb";
 
 describe("AssetManager", () => {
     const mspId = "mspId";
@@ -138,7 +137,7 @@ describe("AssetManager", () => {
             expect(assetLockInvocation.hash.getSerializedHashBase64().length).to.be.above(0);
             expect(assetLockInvocation.result).to.be.a('boolean');
             expect(assetLockInvocation.result).to.equal(true);
-            
+
             const hashPreimage = "some-preimage";
             const hash2 = new hashFunctions.SHA256()
             hash2.setPreimage("some-preimage")
@@ -149,7 +148,7 @@ describe("AssetManager", () => {
             expect(assetLockInvocation.hash.getSerializedHashBase64().length).to.be.above(0);
             expect(assetLockInvocation.result).to.be.a('boolean');
             expect(assetLockInvocation.result).to.equal(true);
-            
+
             const testAttr = assetType + ':' + assetID + ':' + recipientECert + ':' + hash2.getPreimage() + ':' + hash2.getSerializedHashBase64();
             const timeoutCb = function(c, t, i, r, h) {
                 console.log('Asset lock TIMEOUT at', Date());
@@ -230,7 +229,7 @@ describe("AssetManager", () => {
             expect(assetLockInvocation.hash.getSerializedHashBase64().length).to.be.above(0);
             expect(assetLockInvocation.result).to.be.a('string');
             expect(assetLockInvocation.result).to.equal(contractId);
-            
+
             const hashPreimage = "some-preimage";
             const hash2 = new hashFunctions.SHA256()
             hash2.setPreimage(hashPreimage)

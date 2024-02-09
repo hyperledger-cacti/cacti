@@ -10,12 +10,12 @@ import {
   ApiInfo,
   LedgerEvent,
   IVerifierEventListener,
-} from "./LedgerPlugin";
-import { json2str } from "./DriverCommon";
-import { LedgerOperation } from "../business-logic-plugin/LedgerOperation";
-import { LedgerPluginInfo } from "./validator-registry";
-import { ConfigUtil } from "../routing-interface/util/ConfigUtil";
-import { VerifierAuthentication } from "./VerifierAuthentication";
+} from "./LedgerPlugin.js";
+import { json2str } from "./DriverCommon.js";
+import { LedgerOperation } from "../business-logic-plugin/LedgerOperation.js";
+import { LedgerPluginInfo } from "./validator-registry.js";
+import { ConfigUtil } from "../routing-interface/util/ConfigUtil.js";
+import { VerifierAuthentication } from "./VerifierAuthentication.js";
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
 import { Socket, io } from "socket.io-client-fixed-types";

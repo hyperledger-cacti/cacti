@@ -1,5 +1,5 @@
-import { ICactusPlugin } from "../i-cactus-plugin";
-import { ConsensusAlgorithmFamily } from "../../generated/openapi/typescript-axios/api";
+import { ICactusPlugin } from "../i-cactus-plugin.js";
+import { ConsensusAlgorithmFamily } from "../../generated/openapi/typescript-axios/api.js";
 
 /**
  * Common interface to be implemented by plugins which are implementing the connection to ledgers.

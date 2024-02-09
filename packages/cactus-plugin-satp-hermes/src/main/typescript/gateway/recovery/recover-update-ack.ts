@@ -1,6 +1,6 @@
-import { RecoverUpdateAckV1Message } from "../../generated/openapi/typescript-axios";
+import { RecoverUpdateAckV1Message } from "./../../generated/openapi/typescript-axios/index.js";
 import { LoggerProvider } from "@hyperledger/cactus-common";
-import { PluginSatpGateway } from "../plugin-satp-gateway";
+import { PluginSatpGateway } from "../plugin-satp-gateway.js";
 // import { SHA256 } from "crypto-js";
 
 const log = LoggerProvider.getOrCreate({

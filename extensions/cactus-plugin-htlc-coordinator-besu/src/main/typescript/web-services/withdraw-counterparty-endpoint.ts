@@ -18,9 +18,9 @@ import {
   registerWebServiceEndpoint,
   PluginRegistry,
 } from "@hyperledger/cactus-core";
-import { WithdrawCounterpartyRequest } from "../generated/openapi/typescript-axios";
-import { PluginHTLCCoordinatorBesu } from "../plugin-htlc-coordinator-besu";
-import { WithdrawCounterpartyTxReverted } from "../plugin-htlc-coordinator-besu";
+import { WithdrawCounterpartyRequest } from "./../generated/openapi/typescript-axios/index.js";
+import { PluginHTLCCoordinatorBesu } from "../plugin-htlc-coordinator-besu.js";
+import { WithdrawCounterpartyTxReverted } from "../plugin-htlc-coordinator-besu.js";
 import OAS from "../../json/openapi.json";
 
 export interface IWithdrawCounterpartyOptions {

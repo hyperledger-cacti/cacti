@@ -22,12 +22,12 @@ import {
   WatchBlocksOptionsV1,
   WatchBlocksResponseV1,
   TransactionStatusV1,
-} from "../../../main/typescript/public-api";
+} from "../../../main/typescript/public-api.js";
 import {
   IrohaV2TestEnv,
   waitForCommit,
-} from "../test-helpers/iroha2-env-setup";
-import { addRandomSuffix } from "../test-helpers/utils";
+} from "../test-helpers/iroha2-env-setup.js";
+import { addRandomSuffix } from "../test-helpers/utils.js";
 
 import { VersionedCommittedBlock } from "@iroha2/data-model";
 import "jest-extended";

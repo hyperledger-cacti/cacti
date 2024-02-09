@@ -2,30 +2,30 @@ import { v4 as uuidv4 } from "uuid";
 import "jest-extended";
 import { Secp256k1Keys } from "@hyperledger/cactus-common";
 import { v4 as uuidV4 } from "uuid";
-import { PluginSatpGateway } from "../../../../main/typescript/gateway/plugin-satp-gateway";
+import { PluginSatpGateway } from "../../../../main/typescript/gateway/plugin-satp-gateway.js";
 
 import {
   RecoverUpdateV1Message,
   RecoverV1Message,
   SessionData,
-} from "../../../../main/typescript/public-api";
+} from "../../../../main/typescript/public-api.js";
 import { randomInt } from "crypto";
 import {
   checkValidRecoverUpdateMessage,
   sendRecoverUpdateMessage,
-} from "../../../../main/typescript/gateway/recovery/recover-update";
+} from "../../../../main/typescript/gateway/recovery/recover-update.js";
 
-import { checkValidRecoverMessage } from "../../../../main/typescript/gateway/recovery/recover";
-import { BesuSatpGateway } from "../../../../main/typescript/gateway/besu-satp-gateway";
-import { FabricSatpGateway } from "../../../../main/typescript/gateway/fabric-satp-gateway";
-import { ClientGatewayHelper } from "../../../../main/typescript/gateway/client/client-helper";
-import { ServerGatewayHelper } from "../../../../main/typescript/gateway/server/server-helper";
+import { checkValidRecoverMessage } from "../../../../main/typescript/gateway/recovery/recover.js";
+import { BesuSatpGateway } from "../../../../main/typescript/gateway/besu-satp-gateway.js";
+import { FabricSatpGateway } from "../../../../main/typescript/gateway/fabric-satp-gateway.js";
+import { ClientGatewayHelper } from "../../../../main/typescript/gateway/client/client-helper.js";
+import { ServerGatewayHelper } from "../../../../main/typescript/gateway/server/server-helper.js";
 
 import {
   knexClientConnection,
   knexRemoteConnection,
   knexServerConnection,
-} from "../../knex.config";
+} from "../../knex.config.js";
 
 const MAX_RETRIES = 5;
 const MAX_TIMEOUT = 5000;

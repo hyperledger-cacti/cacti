@@ -21,11 +21,11 @@ import {
   DefaultApi as SatpApi,
 } from "@hyperledger/cactus-plugin-satp-hermes/";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
-import { CbdcBridgingAppDummyInfrastructure } from "./infrastructure/cbdc-bridging-app-dummy-infrastructure";
+import { CbdcBridgingAppDummyInfrastructure } from "./infrastructure/cbdc-bridging-app-dummy-infrastructure.js";
 import { DefaultApi as FabricApi } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
 import { DefaultApi as BesuApi } from "@hyperledger/cactus-plugin-ledger-connector-besu";
-import { FabricSatpGateway } from "./satp-extension/fabric-satp-gateway";
-import { BesuSatpGateway } from "./satp-extension/besu-satp-gateway";
+import { FabricSatpGateway } from "./satp-extension/fabric-satp-gateway.js";
+import { BesuSatpGateway } from "./satp-extension/besu-satp-gateway.js";
 import CryptoMaterial from "../../crypto-material/crypto-material.json";
 
 export interface ICbdcBridgingApp {

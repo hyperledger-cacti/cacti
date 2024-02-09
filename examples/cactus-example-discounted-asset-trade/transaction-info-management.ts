@@ -5,11 +5,11 @@
  * transaction-info-management.ts
  */
 
-import { TransactionInfo } from "./transaction-info";
-import { TransactionData } from "./transaction-data";
-import { TxInfoData } from "./tx-info-data";
+import { TransactionInfo } from "./transaction-info.js";
+import { TransactionData } from "./transaction-data.js";
+import { TxInfoData } from "./tx-info-data.js";
 import { TradeInfo, ConfigUtil } from "@hyperledger/cactus-cmd-socketio-server";
-import { AssetTradeStatus } from "./define";
+import { AssetTradeStatus } from "./define.js";
 
 const fs = require("fs");
 const config: any = ConfigUtil.getConfig();

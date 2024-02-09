@@ -21,7 +21,7 @@ import {
 } from "@hyperledger/cactus-plugin-ledger-connector-quorum";
 
 import OAS from "../../../json/openapi.json";
-import { BambooHarvestConverter } from "../../model/converter/bamboo-harvest-converter";
+import { BambooHarvestConverter } from "../../model/converter/bamboo-harvest-converter.js";
 
 export interface IListBambooHarvestEndpointOptions {
   logLevel?: LogLevelDesc;

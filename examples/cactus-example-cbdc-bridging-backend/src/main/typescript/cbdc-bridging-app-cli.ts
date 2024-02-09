@@ -6,7 +6,7 @@ import {
   IAuthorizationConfig,
 } from "@hyperledger/cactus-cmd-api-server";
 import { LoggerProvider } from "@hyperledger/cactus-common";
-import { ICbdcBridgingApp, CbdcBridgingApp } from "./cbdc-bridging-app";
+import { ICbdcBridgingApp, CbdcBridgingApp } from "./cbdc-bridging-app.js";
 import CryptoMaterial from "../../crypto-material/crypto-material.json";
 import "dotenv/config";
 

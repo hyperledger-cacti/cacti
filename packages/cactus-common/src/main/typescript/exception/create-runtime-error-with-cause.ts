@@ -1,5 +1,5 @@
 import { RuntimeError } from "run-time-error-cjs";
-import { coerceUnknownToError } from "./coerce-unknown-to-error";
+import { coerceUnknownToError } from "./coerce-unknown-to-error.js";
 
 /**
  * ### STANDARD EXCEPTION HANDLING - EXAMPLE WITH RE-THROW:

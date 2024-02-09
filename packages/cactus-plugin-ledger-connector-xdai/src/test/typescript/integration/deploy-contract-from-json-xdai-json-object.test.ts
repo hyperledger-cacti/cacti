@@ -8,7 +8,7 @@ import {
   PluginFactoryLedgerConnector,
   ReceiptType,
   DefaultApi as XdaiApi,
-} from "../../../main/typescript/public-api";
+} from "../../../main/typescript/public-api.js";
 import {
   Containers,
   K_DEV_WHALE_ACCOUNT_PRIVATE_KEY,
@@ -28,7 +28,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import http from "http";
 import { AddressInfo } from "net";
-import { K_CACTUS_XDAI_TOTAL_TX_COUNT } from "../../../main/typescript/prometheus-exporter/metrics";
+import { K_CACTUS_XDAI_TOTAL_TX_COUNT } from "../../../main/typescript/prometheus-exporter/metrics.js";
 
 const testCase = "deploys contract via .json file";
 const logLevel: LogLevelDesc = "TRACE";

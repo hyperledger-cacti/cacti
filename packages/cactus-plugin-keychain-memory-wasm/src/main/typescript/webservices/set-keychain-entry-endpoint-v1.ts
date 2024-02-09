@@ -15,7 +15,7 @@ import {
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
 import OAS from "../../json/openapi.json";
-import { PluginKeychainMemoryWasm } from "../plugin-keychain-memory-wasm";
+import { PluginKeychainMemoryWasm } from "../plugin-keychain-memory-wasm.js";
 import { SetKeychainEntryRequestV1 } from "@hyperledger/cactus-core-api";
 
 export interface ISetKeychainEntryEndpointOptions {

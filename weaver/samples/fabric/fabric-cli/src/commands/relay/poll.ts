@@ -11,11 +11,11 @@ import {
   getNetworkConfig,
   signMessage,
   handlePromise
-} from '../../helpers/helpers'
+} from "../../helpers/helpers.js"
 import {
   fabricHelper,
   getKeyAndCertForRemoteRequestbyUserName
-} from '../../helpers/fabric-functions'
+} from "../../helpers/fabric-functions.js"
 import { RelayHelper } from '@hyperledger/cacti-weaver-sdk-fabric'
 import * as path from 'path'
 import * as dotenv from 'dotenv'

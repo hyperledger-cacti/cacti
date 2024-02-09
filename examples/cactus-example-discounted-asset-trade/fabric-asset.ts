@@ -8,7 +8,7 @@
 import { Router, NextFunction, Request, Response } from "express";
 import { ConfigUtil } from "@hyperledger/cactus-cmd-socketio-server";
 import { RIFError } from "@hyperledger/cactus-cmd-socketio-server";
-import { queryAsset, queryAllAssets } from "./transaction-fabric";
+import { queryAsset, queryAllAssets } from "./transaction-fabric.js";
 
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";

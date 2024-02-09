@@ -5,8 +5,8 @@
  * DriverCommon.ts
  */
 
-import { ApiInfo, RequestedData } from "./LedgerPlugin";
-import { ConfigUtil } from "../routing-interface/util/ConfigUtil";
+import { ApiInfo, RequestedData } from "./LedgerPlugin.js";
+import { ConfigUtil } from "../routing-interface/util/ConfigUtil.js";
 
 const fs = require("fs");
 const path = require("path");

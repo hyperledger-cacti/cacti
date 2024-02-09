@@ -9,6 +9,7 @@ logs/
 jspm_packages/
 generated-sources/
 coverage/
+.tap/
 
 # Optional npm cache directory
 .npm

@@ -12,8 +12,8 @@ import {
   CommitFinalV1Request,
   CommitFinalV1Response,
   TransferCompleteV1Request,
-} from "../../public-api";
-import { SatpMessageType, PluginSatpGateway } from "../plugin-satp-gateway";
+} from "../../public-api.js";
+import { SatpMessageType, PluginSatpGateway } from "../plugin-satp-gateway.js";
 
 export class ClientGatewayHelper {
   public static readonly CLASS_NAME = "ClientGatewayHelper";

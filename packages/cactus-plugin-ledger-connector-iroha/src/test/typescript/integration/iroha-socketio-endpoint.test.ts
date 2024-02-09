@@ -34,14 +34,14 @@ import {
   IrohaBlockResponse,
   IrohaCommand,
   KeyPair,
-} from "../../../main/typescript/generated/openapi/typescript-axios";
+} from "./../../../main/typescript/generated/openapi/typescript-axios/index.js";
 
 import {
   IPluginLedgerConnectorIrohaOptions,
   IrohaApiClient,
   IrohaApiClientOptions,
   PluginFactoryLedgerConnector,
-} from "../../../main/typescript";
+} from "./../../../main/typescript/index.js";
 
 import { Constants, PluginImportType } from "@hyperledger/cactus-core-api";
 

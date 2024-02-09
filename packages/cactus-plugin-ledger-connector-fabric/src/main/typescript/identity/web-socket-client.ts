@@ -4,8 +4,11 @@ import {
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
 import { KJUR, KEYUTIL } from "jsrsasign";
-import { InternalIdentityClient, ISignatureResponse } from "./internal/client";
-import { ECCurveType } from "./internal/crypto-util";
+import {
+  InternalIdentityClient,
+  ISignatureResponse,
+} from "./internal/client.js";
+import { ECCurveType } from "./internal/crypto-util.js";
 import { WsIdentityClient } from "ws-identity-client";
 
 export interface WSClientOptions {

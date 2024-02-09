@@ -9,8 +9,8 @@ import {
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
 
-//   import { Database as DatabaseSchemaType } from "./database.types";
-//   import { getRuntimeErrorCause } from "../utils";
+//   import { Database as DatabaseSchemaType } from "./database.types.js";
+//   import { getRuntimeErrorCause } from "../utils.js";
 
 import fs from "fs";
 import path from "path";
@@ -20,7 +20,7 @@ import {
   InsertBlockDetailsInterface,
   InsertBlockTransactionEntryInterface,
   InsertDetailedTransactionEntryInterface,
-} from "../types";
+} from "../types.js";
 // import { RuntimeError } from "run-time-error-cjs";
 
 export interface PostgresDatabaseClientOptions {

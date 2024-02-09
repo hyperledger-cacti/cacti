@@ -16,7 +16,7 @@ import agent_grpc_pb from '@hyperledger/cacti-weaver-protos-js/identity/agent_gr
 import agent_pb from '@hyperledger/cacti-weaver-protos-js/identity/agent_pb';
 import common_ack_pb from "@hyperledger/cacti-weaver-protos-js/common/ack_pb";
 
-import { handlePromise, promisifyAll } from './helpers'
+import { handlePromise, promisifyAll } from "./helpers.js"
 
 // Only Admin can create, update and delete local memberships
 async function createLocalMembership(

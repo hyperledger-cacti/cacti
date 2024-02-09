@@ -17,7 +17,7 @@ import {
   PluginLedgerConnectorBesu,
   PluginFactoryLedgerConnector,
   ReceiptType,
-} from "../../../../main/typescript/public-api";
+} from "../../../../main/typescript/public-api.js";
 
 const logLevel: LogLevelDesc = "INFO";
 

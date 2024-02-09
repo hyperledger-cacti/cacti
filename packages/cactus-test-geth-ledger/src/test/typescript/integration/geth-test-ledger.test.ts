@@ -9,7 +9,7 @@
 // Log settings
 const testLogLevel: LogLevelDesc = "info";
 
-import { GethTestLedger } from "../../../main/typescript/index";
+import { GethTestLedger } from "../../../main/typescript/index.js";
 import contractData from "../../solidity/hello-world-contract/HelloWorld.json";
 
 import {

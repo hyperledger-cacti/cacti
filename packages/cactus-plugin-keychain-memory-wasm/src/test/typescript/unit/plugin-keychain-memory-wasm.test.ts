@@ -13,10 +13,10 @@ import { Configuration } from "@hyperledger/cactus-core-api";
 import {
   IPluginKeychainMemoryWasmOptions,
   PluginKeychainMemoryWasm,
-} from "../../../main/typescript";
+} from "./../../../main/typescript/index.js";
 
-import { DefaultApi as KeychainMemoryApi } from "../../../main/typescript/public-api";
-import { wasm } from "../../../main/typescript/public-api";
+import { DefaultApi as KeychainMemoryApi } from "../../../main/typescript/public-api.js";
+import { wasm } from "../../../main/typescript/public-api.js";
 
 test("PluginKeychainMemory", (t1: Test) => {
   t1.doesNotThrow(

@@ -10,7 +10,7 @@ import Docker from "dockerode";
 import { Logger, Checks, Bools } from "@hyperledger/cactus-common";
 import type { LogLevelDesc } from "@hyperledger/cactus-common";
 import { LoggerProvider } from "@hyperledger/cactus-common";
-import { Containers } from "../common/containers";
+import { Containers } from "../common/containers.js";
 
 export interface ISubstrateTestLedgerOptions {
   readonly publishAllPorts: boolean;

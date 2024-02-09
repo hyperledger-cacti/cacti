@@ -7,11 +7,11 @@ import {
   DefaultApi as SupplyChainApi,
 } from "@hyperledger/cactus-example-supply-chain-business-logic-plugin";
 
-import { QUORUM_DEMO_LEDGER_ID } from "../../../constants";
-import { BambooHarvestDetailPage } from "../bamboo-harvest-detail/bamboo-harvest-detail.page";
+import { QUORUM_DEMO_LEDGER_ID } from "../../../constants.js";
+import { BambooHarvestDetailPage } from "../bamboo-harvest-detail/bamboo-harvest-detail.page.js";
 import { ModalController } from "@ionic/angular";
 
-import { AuthConfig } from "../../common/auth-config";
+import { AuthConfig } from "../../common/auth-config.js";
 
 @Component({
   selector: "app-bamboo-harvest-list",

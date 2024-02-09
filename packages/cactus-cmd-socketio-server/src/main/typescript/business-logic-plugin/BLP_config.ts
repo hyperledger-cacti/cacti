@@ -5,7 +5,7 @@
  * BLP_config.ts
  */
 
-import { BusinessLogicPlugin } from "./BusinessLogicPlugin";
+import { BusinessLogicPlugin } from "./BusinessLogicPlugin.js";
 
 // Singleton of BLPs
 let _blpMapping = new Map<string, BusinessLogicPlugin>();

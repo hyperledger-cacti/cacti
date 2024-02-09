@@ -1,6 +1,6 @@
-import { IPluginFactoryOptions } from "./i-plugin-factory-options";
-import { ICactusPlugin } from "./plugin/i-cactus-plugin";
-import { PluginFactory } from "./plugin/plugin-factory";
+import { IPluginFactoryOptions } from "./i-plugin-factory-options.js";
+import { ICactusPlugin } from "./plugin/i-cactus-plugin.js";
+import { PluginFactory } from "./plugin/plugin-factory.js";
 
 /**
  * This is the function that each plugin npm package must export under the name

@@ -18,8 +18,8 @@ import { Identity } from "fabric-common";
 import fabproto6 from "fabric-protos";
 import crypto from "crypto";
 import eciesCrypto from "./eciesCrypto.js";
-import * as helpers from "./helpers";
-import { deserializeRemoteProposalResponseBase64, serializeRemoteProposalResponse } from "./decoders";
+import * as helpers from "./helpers.js";
+import { deserializeRemoteProposalResponseBase64, serializeRemoteProposalResponse } from "./decoders.js";
 import statePb from "@hyperledger/cacti-weaver-protos-js/common/state_pb";
 import fabricViewPb from "@hyperledger/cacti-weaver-protos-js/fabric/view_data_pb";
 import cordaViewPb from "@hyperledger/cacti-weaver-protos-js/corda/view_data_pb";
@@ -27,11 +27,11 @@ import interopPayloadPb from "@hyperledger/cacti-weaver-protos-js/common/interop
 import proposalPb from "@hyperledger/cacti-weaver-protos-js/peer/proposal_pb";
 import proposalResponsePb from "@hyperledger/cacti-weaver-protos-js/peer/proposal_response_pb";
 import identitiesPb from "@hyperledger/cacti-weaver-protos-js/msp/identities_pb";
-import { Relay } from "./Relay";
+import { Relay } from "./Relay.js";
 import { Gateway, Contract } from "fabric-network";
 import { v4 as uuidv4 } from "uuid";
 import { ICryptoKey } from "fabric-common";
-import { InteropJSON, InvocationSpec, Flow, RemoteJSON } from "./types";
+import { InteropJSON, InvocationSpec, Flow, RemoteJSON } from "./types.js";
 const logger = log4js.getLogger("InteroperableHelper");
 const contractApi = require("fabric-network/lib/contract.js");
 

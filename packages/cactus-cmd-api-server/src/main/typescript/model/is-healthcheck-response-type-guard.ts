@@ -1,5 +1,5 @@
 import { Bools } from "@hyperledger/cactus-common";
-import { HealthCheckResponse } from "../generated/openapi/typescript-axios/api";
+import { HealthCheckResponse } from "../generated/openapi/typescript-axios/api.js";
 
 export function isHealthcheckResponse(x: unknown): x is HealthCheckResponse {
   return (

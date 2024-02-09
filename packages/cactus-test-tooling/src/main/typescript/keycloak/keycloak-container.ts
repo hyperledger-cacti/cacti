@@ -12,7 +12,7 @@ import {
   LoggerProvider,
 } from "@hyperledger/cactus-common";
 
-import { Containers } from "../common/containers";
+import { Containers } from "../common/containers.js";
 import RealmRepresentation from "keycloak-admin/lib/defs/realmRepresentation";
 
 export interface IKeycloakContainerOptions {

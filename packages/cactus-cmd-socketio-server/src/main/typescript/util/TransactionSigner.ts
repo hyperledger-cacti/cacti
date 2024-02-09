@@ -9,8 +9,8 @@ import path from "path";
 import ethJsCommon from "ethereumjs-common";
 import { Transaction as EthTransaction } from "ethereumjs-tx";
 import { getLogger } from "log4js";
-import { ConfigUtil } from "../routing-interface/util/ConfigUtil";
-import { ValidatorRegistry } from "../verifier/validator-registry";
+import { ConfigUtil } from "../routing-interface/util/ConfigUtil.js";
+import { ValidatorRegistry } from "../verifier/validator-registry.js";
 
 const config: any = ConfigUtil.getConfig();
 const configVerifier: ValidatorRegistry = new ValidatorRegistry(

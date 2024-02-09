@@ -28,7 +28,7 @@ import {
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
 
-import { DeployContractSolidityBytecodeEndpoint } from "./web-services/deploy-contract-solidity-bytecode-endpoint";
+import { DeployContractSolidityBytecodeEndpoint } from "./web-services/deploy-contract-solidity-bytecode-endpoint.js";
 
 import {
   ConsistencyStrategy,
@@ -47,18 +47,18 @@ import {
   Web3SigningCredentialCactusKeychainRef,
   Web3SigningCredentialPrivateKeyHex,
   Web3SigningCredentialType,
-} from "./generated/openapi/typescript-axios";
+} from "./generated/openapi/typescript-axios/index.js";
 
-import { RunTransactionEndpoint } from "./web-services/run-transaction-endpoint";
-import { InvokeContractEndpoint } from "./web-services/invoke-contract-endpoint";
-import { isWeb3SigningCredentialNone } from "./model-type-guards";
-import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
+import { RunTransactionEndpoint } from "./web-services/run-transaction-endpoint.js";
+import { InvokeContractEndpoint } from "./web-services/invoke-contract-endpoint.js";
+import { isWeb3SigningCredentialNone } from "./model-type-guards.js";
+import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter.js";
 import {
   GetPrometheusExporterMetricsEndpointV1,
   IGetPrometheusExporterMetricsEndpointV1Options,
-} from "./web-services/get-prometheus-exporter-metrics-endpoint-v1";
-import { DeployContractSolidityBytecodeJsonObjectEndpoint } from "./web-services/deploy-contract-solidity-bytecode-json-object-endpoint";
-import { InvokeContractJsonObjectEndpoint } from "./web-services/invoke-contract-json-object-endpoint";
+} from "./web-services/get-prometheus-exporter-metrics-endpoint-v1.js";
+import { DeployContractSolidityBytecodeJsonObjectEndpoint } from "./web-services/deploy-contract-solidity-bytecode-json-object-endpoint.js";
+import { InvokeContractJsonObjectEndpoint } from "./web-services/invoke-contract-json-object-endpoint.js";
 import { RuntimeError } from "run-time-error-cjs";
 
 export const E_KEYCHAIN_NOT_FOUND = "cactus.connector.xdai.keychain_not_found";

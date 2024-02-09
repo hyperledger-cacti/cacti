@@ -3,19 +3,19 @@ import {
   EmissionRecordState,
   EmissionsRecord,
   EmissionsRecordInterface,
-} from "./emissions";
-import { getCO2EmissionFactor } from "./emissions-calc";
+} from "./emissions.js";
+import { getCO2EmissionFactor } from "./emissions-calc.js";
 import {
   UtilityEmissionsFactor,
   UtilityEmissionsFactorInterface,
   UtilityEmissionsFactorState,
-} from "./utilityEmissionsFactor";
+} from "./utilityEmissionsFactor.js";
 import { MD5, SHA256 } from "crypto-js";
 import {
   UtilityLookupItemInterface,
   UtilityLookupItemState,
   UtilityLookupItem,
-} from "./utilityLookupItem";
+} from "./utilityLookupItem.js";
 
 // EmissionsRecordContract : core bushiness logic of emissions record chaincode
 export class EmissionsRecordContract {

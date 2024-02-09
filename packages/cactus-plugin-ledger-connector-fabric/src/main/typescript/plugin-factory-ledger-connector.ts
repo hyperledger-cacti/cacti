@@ -5,7 +5,7 @@ import {
 import {
   IPluginLedgerConnectorFabricOptions,
   PluginLedgerConnectorFabric,
-} from "./plugin-ledger-connector-fabric";
+} from "./plugin-ledger-connector-fabric.js";
 
 export class PluginFactoryLedgerConnector extends PluginFactory<
   PluginLedgerConnectorFabric,

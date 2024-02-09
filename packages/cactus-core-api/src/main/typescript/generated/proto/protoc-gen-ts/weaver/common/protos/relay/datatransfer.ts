@@ -3,9 +3,9 @@
  * compiler version: 3.19.1
  * source: relay/datatransfer.proto
  * git: https://github.com/thesayyn/protoc-gen-ts */
-import * as dependency_1 from "./../common/ack";
-import * as dependency_2 from "./../common/state";
-import * as dependency_3 from "./../common/query";
+import * as dependency_1 from "./../common/ack.js";
+import * as dependency_2 from "./../common/state.js";
+import * as dependency_3 from "./../common/query.js";
 import * as grpc_1 from "@grpc/grpc-js";
 export namespace relay.datatransfer {
     interface GrpcUnaryServiceInterface<P, R> {

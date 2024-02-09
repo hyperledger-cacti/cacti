@@ -26,7 +26,7 @@ import {
   DefaultApi,
   DeployContractJarsSuccessV1Response,
   DeployContractJarsV1Request,
-} from "../generated/openapi/typescript-axios/api";
+} from "../generated/openapi/typescript-axios/api.js";
 
 import OAS from "../../json/openapi.json";
 

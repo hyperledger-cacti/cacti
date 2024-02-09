@@ -4,8 +4,8 @@ import {
   PluginImportType,
 } from "@hyperledger/cactus-core-api";
 import test, { Test } from "tape-promise/tape";
-import { PluginFactoryKeychain } from "../../../main/typescript/plugin-factory-keychain";
-import { PluginKeychainGoogleSm } from "../../../main/typescript/plugin-keychain-google-sm";
+import { PluginFactoryKeychain } from "../../../main/typescript/plugin-factory-keychain.js";
+import { PluginKeychainGoogleSm } from "../../../main/typescript/plugin-keychain-google-sm.js";
 import { v4 as uuidv4 } from "uuid";
 
 test("get,set,has,delete alters state as expected", async (t: Test) => {

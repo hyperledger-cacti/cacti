@@ -13,9 +13,12 @@ import {
   IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
-import { PluginLedgerConnectorEthereum } from "../plugin-ledger-connector-ethereum";
+import { PluginLedgerConnectorEthereum } from "../plugin-ledger-connector-ethereum.js";
 import OAS from "../../json/openapi.json";
-import { InvokeRawWeb3EthMethodV1Response, isWeb3Error } from "../public-api";
+import {
+  InvokeRawWeb3EthMethodV1Response,
+  isWeb3Error,
+} from "../public-api.js";
 import { ERR_INVALID_RESPONSE } from "web3";
 
 export interface IInvokeRawWeb3EthMethodEndpointOptions {

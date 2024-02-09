@@ -18,7 +18,7 @@ import OAS from "../../json/openapi.json";
 
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
-import { PluginKeychainMemory } from "../plugin-keychain-memory";
+import { PluginKeychainMemory } from "../plugin-keychain-memory.js";
 
 export interface IGetPrometheusExporterMetricsEndpointV1Options {
   logLevel?: LogLevelDesc;

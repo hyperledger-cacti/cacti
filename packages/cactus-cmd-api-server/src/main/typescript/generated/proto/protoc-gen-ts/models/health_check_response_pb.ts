@@ -3,7 +3,7 @@
  * compiler version: 3.19.1
  * source: models/health_check_response_pb.proto
  * git: https://github.com/thesayyn/protoc-gen-ts */
-import * as dependency_1 from "./memory_usage_pb";
+import * as dependency_1 from "./memory_usage_pb.js";
 import * as pb_1 from "google-protobuf";
 export namespace org.hyperledger.cactus.cmd_api_server {
     export class HealthCheckResponsePB extends pb_1.Message {

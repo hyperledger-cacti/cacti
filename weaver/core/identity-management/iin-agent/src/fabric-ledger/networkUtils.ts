@@ -12,8 +12,8 @@ import * as fs from 'fs';
 import membershipPb from '@hyperledger/cacti-weaver-protos-js/common/membership_pb';
 import { MembershipManager } from '@hyperledger/cacti-weaver-sdk-fabric'
 
-import { getWallet } from './walletUtils';
-import * as utils from "../common/utils";
+import { getWallet } from "./walletUtils.js";
+import * as utils from "../common/utils.js";
 
 // Get a handle to a network gateway using existing wallet credentials
 const getNetworkGateway = async (

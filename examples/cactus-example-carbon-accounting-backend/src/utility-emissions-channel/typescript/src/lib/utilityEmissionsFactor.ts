@@ -9,11 +9,11 @@
 
 /* tslint:disable:max-classes-per-file */
 import { ChaincodeStub } from "fabric-shim";
-import { ErrStateNotFound } from "../util/const";
-import { State } from "../util/state";
-import { QueryResult, WorldState } from "../util/worldstate";
-import { getYearFromDate } from "./emissions-calc";
-import { UtilityLookupItemInterface } from "./utilityLookupItem";
+import { ErrStateNotFound } from "../util/const.js";
+import { State } from "../util/state.js";
+import { QueryResult, WorldState } from "../util/worldstate.js";
+import { getYearFromDate } from "./emissions-calc.js";
+import { UtilityLookupItemInterface } from "./utilityLookupItem.js";
 
 const UTILITY_EMISSIONS_FACTOR_CLASS_IDENTIFIER =
   "org.hyperledger.blockchain-carbon-accounting.utilityemissionsfactoritem";

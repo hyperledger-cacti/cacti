@@ -13,7 +13,7 @@ import {
   PluginLedgerConnectorQuorum,
   Web3SigningCredentialCactusKeychainRef,
   Web3SigningCredentialType,
-} from "../../../../../main/typescript/public-api";
+} from "../../../../../main/typescript/public-api.js";
 
 import {
   QuorumTestLedger,

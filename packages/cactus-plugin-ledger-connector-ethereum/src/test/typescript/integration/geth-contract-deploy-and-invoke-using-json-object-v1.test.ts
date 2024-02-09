@@ -44,7 +44,7 @@ import {
   ContractJsonDefinition,
   DeployContractV1Request,
   InvokeContractV1Request,
-} from "../../../main/typescript/public-api";
+} from "../../../main/typescript/public-api.js";
 
 const containerImageName = "ghcr.io/hyperledger/cacti-geth-all-in-one";
 const containerImageVersion = "2023-07-27-2a8c48ed6";

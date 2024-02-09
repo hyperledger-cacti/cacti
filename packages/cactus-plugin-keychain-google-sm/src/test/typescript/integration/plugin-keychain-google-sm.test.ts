@@ -14,14 +14,14 @@ import { LogLevelDesc } from "@hyperledger/cactus-common";
 import {
   IPluginKeychainGoogleSmOptions,
   PluginKeychainGoogleSm,
-} from "../../../main/typescript/public-api";
+} from "../../../main/typescript/public-api.js";
 
 import {
   DefaultApi as KeychainGoogleSmApi,
   Configuration,
-} from "../../../main/typescript/generated/openapi/typescript-axios/index";
+} from "../../../main/typescript/generated/openapi/typescript-axios/index.js";
 
-import { SecretManagerServiceClientMock } from "../mock/plugin-keychain-google-sm-mock";
+import { SecretManagerServiceClientMock } from "../mock/plugin-keychain-google-sm-mock.js";
 
 const logLevel: LogLevelDesc = "TRACE";
 

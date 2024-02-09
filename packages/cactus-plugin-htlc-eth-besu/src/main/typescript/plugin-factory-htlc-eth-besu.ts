@@ -5,7 +5,7 @@ import {
 import {
   IPluginHtlcEthBesuOptions,
   PluginHtlcEthBesu,
-} from "./plugin-htlc-eth-besu";
+} from "./plugin-htlc-eth-besu.js";
 
 export class PluginFactoryHtlcEthBesu extends PluginFactory<
   PluginHtlcEthBesu,

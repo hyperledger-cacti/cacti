@@ -14,7 +14,7 @@ import {
 } from "@hyperledger/cactus-core-api";
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
-import { PluginLedgerConnectorStub } from "../plugin-ledger-connector-stub";
+import { PluginLedgerConnectorStub } from "../plugin-ledger-connector-stub.js";
 
 export interface IRunTransactionEndpointOptions {
   logLevel?: LogLevelDesc;

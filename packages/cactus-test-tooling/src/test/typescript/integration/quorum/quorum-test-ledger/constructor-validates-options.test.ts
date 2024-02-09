@@ -5,7 +5,7 @@ import {
   QuorumTestLedger,
   IKeyPair,
   isIKeyPair,
-} from "../../../../../main/typescript/public-api";
+} from "../../../../../main/typescript/public-api.js";
 
 tap.test("constructor throws if invalid input is provided", (assert: any) => {
   assert.ok(QuorumTestLedger);

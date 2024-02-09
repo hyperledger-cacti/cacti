@@ -5,9 +5,9 @@
  * business-logic-inquire-asset-trade-status.ts
  */
 
-import { TransactionInfo } from "./transaction-info";
-import { TransactionStatus } from "./transaction-status";
-import { ResultTransactionStatusData } from "./result-transactions-status-data";
+import { TransactionInfo } from "./transaction-info.js";
+import { TransactionStatus } from "./transaction-status.js";
+import { ResultTransactionStatusData } from "./result-transactions-status-data.js";
 import { BusinessLogicBase } from "@hyperledger/cactus-cmd-socketio-server";
 import fs = require("fs");
 

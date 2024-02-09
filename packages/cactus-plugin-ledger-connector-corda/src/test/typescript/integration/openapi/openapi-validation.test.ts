@@ -22,7 +22,7 @@ import {
   JvmTypeKind,
   ListFlowsV1Request,
   PublicKey,
-} from "../../../../main/typescript/generated/openapi/typescript-axios/index";
+} from "../../../../main/typescript/generated/openapi/typescript-axios/index.js";
 import { Configuration } from "@hyperledger/cactus-core-api";
 
 const testCase = "openapi validation on corda JVM implementation";

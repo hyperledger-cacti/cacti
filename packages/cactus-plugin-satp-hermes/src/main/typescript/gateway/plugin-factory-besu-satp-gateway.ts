@@ -5,7 +5,7 @@ import {
 import {
   IBesuSatpGatewayConstructorOptions,
   BesuSatpGateway,
-} from "./besu-satp-gateway";
+} from "./besu-satp-gateway.js";
 
 export class PluginFactoryBesuSatpGateway extends PluginFactory<
   BesuSatpGateway,

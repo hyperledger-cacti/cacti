@@ -5,7 +5,7 @@ import {
 import {
   IPluginLedgerConnectorCDLOptions,
   PluginLedgerConnectorCDL,
-} from "./plugin-ledger-connector-cdl";
+} from "./plugin-ledger-connector-cdl.js";
 
 export class PluginFactoryLedgerConnector extends PluginFactory<
   PluginLedgerConnectorCDL,

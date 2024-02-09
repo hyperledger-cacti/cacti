@@ -16,9 +16,9 @@ import {
   IAsyncProvider,
 } from "@hyperledger/cactus-common";
 
-import { SignTransactionRequest } from "../generated/openapi/typescript-axios/api";
+import { SignTransactionRequest } from "../generated/openapi/typescript-axios/api.js";
 
-import { PluginLedgerConnectorBesu } from "../plugin-ledger-connector-besu";
+import { PluginLedgerConnectorBesu } from "../plugin-ledger-connector-besu.js";
 import OAS from "../../json/openapi.json";
 
 export interface IBesuSignTransactionEndpointOptions {

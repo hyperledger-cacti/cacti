@@ -10,7 +10,7 @@
 import "jest-extended";
 
 jest.mock("../../../main/typescript/routing-interface/util/ConfigUtil");
-import * as DriverCommon from "../../../main/typescript/verifier/DriverCommon";
+import * as DriverCommon from "../../../main/typescript/verifier/DriverCommon.js";
 
 //////////////////////////
 // UNIT TESTS

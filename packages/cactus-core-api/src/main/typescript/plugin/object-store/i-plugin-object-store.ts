@@ -1,11 +1,11 @@
-import type { GetObjectRequestV1 } from "../../generated/openapi/typescript-axios";
-import type { GetObjectResponseV1 } from "../../generated/openapi/typescript-axios";
-import type { HasObjectRequestV1 } from "../../generated/openapi/typescript-axios";
-import type { SetObjectRequestV1 } from "../../generated/openapi/typescript-axios";
-import type { SetObjectResponseV1 } from "../../generated/openapi/typescript-axios";
-import type { HasObjectResponseV1 } from "../../generated/openapi/typescript-axios";
-import type { ICactusPlugin } from "../i-cactus-plugin";
-import type { IPluginWebService } from "../web-service/i-plugin-web-service";
+import type { GetObjectRequestV1 } from "./../../generated/openapi/typescript-axios/index.js";
+import type { GetObjectResponseV1 } from "./../../generated/openapi/typescript-axios/index.js";
+import type { HasObjectRequestV1 } from "./../../generated/openapi/typescript-axios/index.js";
+import type { SetObjectRequestV1 } from "./../../generated/openapi/typescript-axios/index.js";
+import type { SetObjectResponseV1 } from "./../../generated/openapi/typescript-axios/index.js";
+import type { HasObjectResponseV1 } from "./../../generated/openapi/typescript-axios/index.js";
+import type { ICactusPlugin } from "../i-cactus-plugin.js";
+import type { IPluginWebService } from "../web-service/i-plugin-web-service.js";
 
 /**
  * Common interface to be implemented by classes that act as plugins behind

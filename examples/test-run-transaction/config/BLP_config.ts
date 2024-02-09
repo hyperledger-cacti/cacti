@@ -5,8 +5,8 @@
  * BLP_config.ts
  */
 
-import { BusinessLogicPlugin } from "../../../packages/cactus-cmd-socketio-server/src/main/typescript/business-logic-plugin/BusinessLogicPlugin";
-import { BusinessLogicRunTransaction } from "../BusinessLogicRunTransaction";
+import { BusinessLogicPlugin } from "../../../packages/cactus-cmd-socketio-server/src/main/typescript/business-logic-plugin/BusinessLogicPlugin.js";
+import { BusinessLogicRunTransaction } from "../BusinessLogicRunTransaction.js";
 
 export function getTargetBLPInstance(
   businessLogicID: string

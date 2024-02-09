@@ -33,11 +33,11 @@ import {
   FabricContractInvocationType,
   DefaultEventHandlerStrategy,
   FabricSigningCredential,
-} from "../../../../main/typescript/public-api";
+} from "../../../../main/typescript/public-api.js";
 
-import { K_CACTUS_FABRIC_TOTAL_TX_COUNT } from "../../../../main/typescript/prometheus-exporter/metrics";
+import { K_CACTUS_FABRIC_TOTAL_TX_COUNT } from "../../../../main/typescript/prometheus-exporter/metrics.js";
 
-import { IPluginLedgerConnectorFabricOptions } from "../../../../main/typescript/plugin-ledger-connector-fabric";
+import { IPluginLedgerConnectorFabricOptions } from "../../../../main/typescript/plugin-ledger-connector-fabric.js";
 import { DiscoveryOptions } from "fabric-network";
 import { Configuration } from "@hyperledger/cactus-core-api";
 

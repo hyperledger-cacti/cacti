@@ -13,11 +13,11 @@ import {
   LoggerProvider,
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
-import { ITestLedger } from "../i-test-ledger";
-import { Streams } from "../common/streams";
-import { IKeyPair } from "../i-key-pair";
-import { IQuorumGenesisOptions } from "./i-quorum-genesis-options";
-import { Containers } from "../common/containers";
+import { ITestLedger } from "../i-test-ledger.js";
+import { Streams } from "../common/streams.js";
+import { IKeyPair } from "../i-key-pair.js";
+import { IQuorumGenesisOptions } from "./i-quorum-genesis-options.js";
+import { Containers } from "../common/containers.js";
 
 export interface IQuorumTestLedgerConstructorOptions {
   containerImageVersion?: string;

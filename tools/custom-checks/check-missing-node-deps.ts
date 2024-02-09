@@ -3,7 +3,7 @@ import { fileURLToPath } from "url";
 import { RuntimeError } from "run-time-error";
 import fs from "fs-extra";
 import depcheck from "depcheck";
-import { getAllPkgDirs } from "./get-all-pkg-dirs";
+import { getAllPkgDirs } from "./get-all-pkg-dirs.js";
 
 export interface ICheckMissingNodeDepsRequest {
   readonly pkgDirsToCheck: Readonly<Array<string>>;

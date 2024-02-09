@@ -4,4 +4,4 @@ export {
   WHALE_ACCOUNT_PRIVATE_KEY,
   WHALE_ACCOUNT_ADDRESS,
   GethTestLedger,
-} from "./geth-test-ledger";
+} from "./geth-test-ledger.js";

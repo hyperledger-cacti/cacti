@@ -6,8 +6,8 @@
  */
 
 import { Router, NextFunction, Request, Response } from "express";
-import { TransactionManagement } from "../TransactionManagement";
-import { VerifierFactory } from "../../verifier/VerifierFactory";
+import { TransactionManagement } from "../TransactionManagement.js";
+import { VerifierFactory } from "../../verifier/VerifierFactory.js";
 import escapeHtml from "escape-html";
 
 const router: Router = Router();

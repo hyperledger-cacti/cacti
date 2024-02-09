@@ -1,6 +1,6 @@
 import "jest-extended";
 
-import { Bools } from "../../../main/typescript/public-api";
+import { Bools } from "../../../main/typescript/public-api.js";
 
 describe("Bools", () => {
   test("Checks#isBooleanStrict()", () => {

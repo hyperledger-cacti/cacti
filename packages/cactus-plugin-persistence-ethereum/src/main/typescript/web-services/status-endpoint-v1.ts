@@ -17,7 +17,7 @@ import type {
 } from "@hyperledger/cactus-core-api";
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
-import { PluginPersistenceEthereum } from "../plugin-persistence-ethereum";
+import { PluginPersistenceEthereum } from "../plugin-persistence-ethereum.js";
 import OAS from "../../json/openapi.json";
 
 import type { Express, Request, Response } from "express";

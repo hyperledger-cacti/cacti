@@ -1,6 +1,6 @@
 import { ICryptoSuite, ICryptoKey } from "fabric-common";
 import { createHash } from "crypto";
-import { Key } from "./key";
+import { Key } from "./key.js";
 import { Utils } from "fabric-common";
 
 // InternalCryptoSuite : a class which will be implemented by identity provider

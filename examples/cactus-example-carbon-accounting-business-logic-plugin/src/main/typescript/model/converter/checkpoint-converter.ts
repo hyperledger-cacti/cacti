@@ -1,4 +1,4 @@
-import { Checkpoint } from "../../generated/openapi/typescript-axios";
+import { Checkpoint } from "./../../generated/openapi/typescript-axios/index.js";
 
 /**
  * Responsible for converting model entities such as the `Checkpoint` to and

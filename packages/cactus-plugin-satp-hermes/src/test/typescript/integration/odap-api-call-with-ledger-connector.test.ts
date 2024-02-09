@@ -6,7 +6,7 @@ import { AddressInfo } from "net";
 import { v4 as uuidv4 } from "uuid";
 import bodyParser from "body-parser";
 import express from "express";
-import { AssetProfile } from "../../../main/typescript/generated/openapi/typescript-axios";
+import { AssetProfile } from "./../../../main/typescript/generated/openapi/typescript-axios/index.js";
 import {
   IListenOptions,
   LoggerProvider,
@@ -24,7 +24,7 @@ import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory
 import {
   ClientV1Request,
   DefaultApi as SatpApi,
-} from "../../../main/typescript/public-api";
+} from "../../../main/typescript/public-api.js";
 import LockAssetContractJson from "../../solidity/lock-asset-contract/LockAsset.json";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import {
@@ -50,18 +50,18 @@ import {
   Web3SigningCredential,
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 
-import { makeSessionDataChecks } from "../make-checks";
+import { makeSessionDataChecks } from "../make-checks.js";
 import {
   FabricSatpGateway,
   IFabricSatpGatewayConstructorOptions,
-} from "../../../main/typescript/gateway/fabric-satp-gateway";
+} from "../../../main/typescript/gateway/fabric-satp-gateway.js";
 import {
   BesuSatpGateway,
   IBesuSatpGatewayConstructorOptions,
-} from "../../../main/typescript/gateway/besu-satp-gateway";
-import { ClientGatewayHelper } from "../../../main/typescript/gateway/client/client-helper";
-import { ServerGatewayHelper } from "../../../main/typescript/gateway/server/server-helper";
-import { knexRemoteConnection } from "../knex.config";
+} from "../../../main/typescript/gateway/besu-satp-gateway.js";
+import { ClientGatewayHelper } from "../../../main/typescript/gateway/client/client-helper.js";
+import { ServerGatewayHelper } from "../../../main/typescript/gateway/server/server-helper.js";
+import { knexRemoteConnection } from "../knex.config.js";
 
 /**
  * Use this to debug issues with the fabric node SDK

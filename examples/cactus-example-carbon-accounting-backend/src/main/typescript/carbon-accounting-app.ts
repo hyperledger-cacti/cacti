@@ -37,7 +37,7 @@ import {
   Web3SigningCredentialType,
 } from "@hyperledger/cactus-plugin-ledger-connector-xdai";
 
-import { CarbonAccountingAppDummyInfrastructure } from "./infrastructure/carbon-accounting-app-dummy-infrastructure";
+import { CarbonAccountingAppDummyInfrastructure } from "./infrastructure/carbon-accounting-app-dummy-infrastructure.js";
 
 export interface ICarbonAccountingAppOptions {
   logLevel?: LogLevelDesc;

@@ -14,8 +14,8 @@ import {
 import {
   WatchConnectionStateProgressV1,
   WatchConnectionStateV1,
-} from "../generated/openapi/typescript-axios";
-import { AnoncredAgent } from "../aries-types";
+} from "./../generated/openapi/typescript-axios/index.js";
+import { AnoncredAgent } from "../aries-types.js";
 
 export interface IWatchConnectionStateV1EndpointConfiguration {
   logLevel?: LogLevelDesc;

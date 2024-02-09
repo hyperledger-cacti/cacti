@@ -1,4 +1,4 @@
-import { IPluginKeychain } from "./i-plugin-keychain";
+import { IPluginKeychain } from "./i-plugin-keychain.js";
 
 export function isIPluginKeychain(x: unknown): x is IPluginKeychain {
   return (

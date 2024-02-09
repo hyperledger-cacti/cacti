@@ -5,7 +5,7 @@
  */
 
 import { GluegunCommand } from 'gluegun'
-import { commandHelp } from '../helper/helper'
+import { commandHelp } from "../helper/helper.js"
 
 const command: GluegunCommand = {
   name: 'state',

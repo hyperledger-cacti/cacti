@@ -59,7 +59,7 @@ import {
   PluginFactoryLedgerConnector,
   PluginLedgerConnectorQuorum,
   Web3SigningCredentialType,
-} from "../../../../../main/typescript/public-api";
+} from "../../../../../main/typescript/public-api.js";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { PluginImportType } from "@hyperledger/cactus-core-api";
 import { EnclaveOptions } from "web3js-quorum";

@@ -3,8 +3,8 @@
  * compiler version: 3.19.1
  * source: driver/driver.proto
  * git: https://github.com/thesayyn/protoc-gen-ts */
-import * as dependency_1 from "./../common/ack";
-import * as dependency_2 from "./../common/query";
+import * as dependency_1 from "./../common/ack.js";
+import * as dependency_2 from "./../common/query.js";
 import * as grpc_1 from "@grpc/grpc-js";
 export namespace driver.driver {
     interface GrpcUnaryServiceInterface<P, R> {

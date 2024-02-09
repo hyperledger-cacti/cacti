@@ -7,7 +7,7 @@ import {
   Containers,
   RustcBuildCmd,
   RustcContainer,
-} from "../../../../main/typescript/public-api";
+} from "../../../../main/typescript/public-api.js";
 const testCase = "compiles Rust code to NodeJS targeted .wasm";
 describe(testCase, () => {
   type HelloWorldExports = {

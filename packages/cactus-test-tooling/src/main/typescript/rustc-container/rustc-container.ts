@@ -7,8 +7,8 @@ import Docker from "dockerode";
 import { Logger, Checks, Bools } from "@hyperledger/cactus-common";
 import type { LogLevelDesc } from "@hyperledger/cactus-common";
 import { LoggerProvider } from "@hyperledger/cactus-common";
-import { Containers } from "../common/containers";
-import { RustcBuildCmd } from "./rustc-build-cmd";
+import { Containers } from "../common/containers.js";
+import { RustcBuildCmd } from "./rustc-build-cmd.js";
 
 export const K_DEFAULT_RUSTC_CONTAINER_WORKDIR = "/usr/src/host-sources-dir/";
 

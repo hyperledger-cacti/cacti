@@ -4,7 +4,7 @@ import { ConsortiumDatabase, Ledger } from "@hyperledger/cactus-core-api";
 
 import { ConsortiumRepository } from "@hyperledger/cactus-core";
 import { DefaultApi as ApiConsortium } from "@hyperledger/cactus-plugin-consortium-manual";
-import { DefaultConsortiumProvider } from "./default-consortium-provider";
+import { DefaultConsortiumProvider } from "./default-consortium-provider.js";
 
 import { Configuration, BaseAPI } from "@hyperledger/cactus-core-api";
 

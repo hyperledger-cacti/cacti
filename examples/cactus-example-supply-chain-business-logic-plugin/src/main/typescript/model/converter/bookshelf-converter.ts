@@ -1,4 +1,4 @@
-import { Bookshelf } from "../../generated/openapi/typescript-axios/index";
+import { Bookshelf } from "../../generated/openapi/typescript-axios/index.js";
 import { RuntimeError } from "run-time-error-cjs";
 
 /**

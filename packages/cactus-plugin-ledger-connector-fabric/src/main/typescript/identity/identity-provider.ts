@@ -1,5 +1,5 @@
 import { IdentityProvider, IdentityData, Identity } from "fabric-network";
-import { FabricSigningCredentialType } from "../generated/openapi/typescript-axios/api";
+import { FabricSigningCredentialType } from "../generated/openapi/typescript-axios/api.js";
 import { ICryptoSuite, User, Utils, ICryptoKey } from "fabric-common";
 import {
   Checks,
@@ -7,10 +7,10 @@ import {
   Logger,
   LoggerProvider,
 } from "@hyperledger/cactus-common";
-import { Key } from "./internal/key";
-import { InternalCryptoSuite } from "./internal/crypto-suite";
-import { VaultTransitClient } from "./vault-client";
-import { WebSocketClient } from "./web-socket-client";
+import { Key } from "./internal/key.js";
+import { InternalCryptoSuite } from "./internal/crypto-suite.js";
+import { VaultTransitClient } from "./vault-client.js";
+import { WebSocketClient } from "./web-socket-client.js";
 
 export interface IVaultConfig {
   endpoint: string;

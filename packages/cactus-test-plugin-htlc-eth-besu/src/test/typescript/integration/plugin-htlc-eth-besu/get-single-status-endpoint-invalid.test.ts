@@ -32,7 +32,7 @@ import {
   BesuTestLedger,
   pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
-import { DataTest } from "../data-test";
+import { DataTest } from "../data-test.js";
 import DemoHelperJSON from "../../../solidity/contracts/DemoHelpers.json";
 
 const connectorId = uuidv4();

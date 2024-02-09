@@ -10,11 +10,11 @@ import {
   IrohaSocketIOTransactV1,
   IrohaBlockProgress,
   IrohaBaseConfig,
-} from "../generated/openapi/typescript-axios";
+} from "./../generated/openapi/typescript-axios/index.js";
 import {
   Configuration,
   ConfigurationParameters,
-} from "../generated/openapi/typescript-axios/configuration";
+} from "../generated/openapi/typescript-axios/configuration.js";
 import { RuntimeError } from "run-time-error-cjs";
 
 export interface IrohaApiClientParameters extends ConfigurationParameters {

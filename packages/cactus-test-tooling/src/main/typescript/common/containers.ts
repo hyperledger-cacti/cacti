@@ -9,7 +9,7 @@ import tar from "tar-stream";
 import fs from "fs-extra";
 import pRetry from "p-retry";
 import { RuntimeError } from "run-time-error-cjs";
-import { Streams } from "../common/streams";
+import { Streams } from "../common/streams.js";
 import {
   Checks,
   LogLevelDesc,
@@ -18,7 +18,7 @@ import {
   ILoggerOptions,
   Logger,
 } from "@hyperledger/cactus-common";
-import { IDockerPullProgress } from "./i-docker-pull-progress";
+import { IDockerPullProgress } from "./i-docker-pull-progress.js";
 
 export interface IPruneDockerResourcesRequest {
   logLevel?: LogLevelDesc;

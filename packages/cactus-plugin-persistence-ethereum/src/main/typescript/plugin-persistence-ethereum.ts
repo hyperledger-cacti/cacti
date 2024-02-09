@@ -20,22 +20,22 @@ import {
 } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
 
 import ERC20 from "../json/contract-abi/ERC20.json";
-import TokenClientERC20 from "./token-client/token-client-erc20";
+import TokenClientERC20 from "./token-client/token-client-erc20.js";
 import ERC721 from "../json/contract-abi/ERC721.json";
-import TokenClientERC721 from "./token-client/token-client-erc721";
+import TokenClientERC721 from "./token-client/token-client-erc721.js";
 import OAS from "../json/openapi.json";
-import { getRuntimeErrorCause, normalizeAddress } from "./utils";
-import { StatusEndpointV1 } from "./web-services/status-endpoint-v1";
+import { getRuntimeErrorCause, normalizeAddress } from "./utils.js";
+import { StatusEndpointV1 } from "./web-services/status-endpoint-v1.js";
 import PostgresDatabaseClient, {
   BlockDataTransferInput,
   BlockDataTransactionInput,
-} from "./db-client/db-client";
+} from "./db-client/db-client.js";
 import {
   MonitoredToken,
   StatusResponseV1,
   TokenTypeV1,
   TrackedOperationV1,
-} from "./generated/openapi/typescript-axios";
+} from "./generated/openapi/typescript-axios/index.js";
 import { RuntimeError } from "run-time-error-cjs";
 import { Interface as EthersInterface } from "@ethersproject/abi";
 import { Mutex } from "async-mutex";

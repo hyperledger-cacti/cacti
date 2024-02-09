@@ -26,7 +26,7 @@ import {
 } from "@hyperledger/cactus-plugin-ledger-connector-quorum";
 
 import OAS from "../../../json/openapi.json";
-import { InsertBambooHarvestRequest } from "../../generated/openapi/typescript-axios";
+import { InsertBambooHarvestRequest } from "./../../generated/openapi/typescript-axios/index.js";
 
 export interface IInsertBambooHarvestEndpointOptions {
   logLevel?: LogLevelDesc;

@@ -1,6 +1,6 @@
 import { getLogger } from "log4js";
 import { ConfigUtil } from "@hyperledger/cactus-cmd-socketio-server";
-import { getAriesApiClient, getBlpAgentName } from "./aries-connector";
+import { getAriesApiClient, getBlpAgentName } from "./aries-connector.js";
 
 const config: any = ConfigUtil.getConfig();
 const moduleName = "transaction-indy";

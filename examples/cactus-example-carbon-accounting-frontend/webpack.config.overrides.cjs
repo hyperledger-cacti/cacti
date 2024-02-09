@@ -5,6 +5,12 @@ module.exports = {
     "prom-client": "prom-client",
   },
   resolve: {
+    extensions: [".ts", ".js"],
+    extensionAlias: {
+      ".js": [".js", ".ts"],
+      ".cjs": [".cjs", ".cts"],
+      ".mjs": [".mjs", ".mts"],
+    },
     fallback: {
       crypto: require.resolve("crypto-browserify"),
       buffer: require.resolve("buffer/"),

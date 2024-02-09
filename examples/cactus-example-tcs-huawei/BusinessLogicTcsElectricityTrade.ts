@@ -6,9 +6,9 @@
  */
 
 import { Request } from "express";
-import { RequestInfo } from "./RequestInfo";
-import { MeterManagement } from "./MeterManagement";
-import { MeterInfo } from "./MeterInfo";
+import { RequestInfo } from "./RequestInfo.js";
+import { MeterManagement } from "./MeterManagement.js";
+import { MeterInfo } from "./MeterInfo.js";
 import {
   TradeInfo,
   routesTransactionManagement,
@@ -18,7 +18,7 @@ import {
   ConfigUtil,
   LPInfoHolder,
 } from "@hyperledger/cactus-cmd-socketio-server";
-import { makeRawTransaction } from "./TransactionEthereum";
+import { makeRawTransaction } from "./TransactionEthereum.js";
 
 //const config: any = JSON.parse(fs.readFileSync("/etc/cactus/default.json", 'utf8'));
 const config: any = ConfigUtil.getConfig();

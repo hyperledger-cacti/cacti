@@ -2,7 +2,7 @@ import { Then } from "cucumber";
 import { expect } from "chai";
 import axios from "axios";
 import CryptoMaterial from "../../../../crypto-material/crypto-material.json";
-import { getFabricId, getEthAddress } from "./common";
+import { getFabricId, getEthAddress } from "./common.js";
 
 const MAX_RETRIES = 5;
 const MAX_TIMEOUT = 5000;

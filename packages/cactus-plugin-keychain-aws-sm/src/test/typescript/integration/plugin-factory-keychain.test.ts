@@ -4,11 +4,11 @@ import {
   PluginImportType,
 } from "@hyperledger/cactus-core-api";
 import test, { Test } from "tape-promise/tape";
-import { PluginFactoryKeychain } from "../../../main/typescript/plugin-factory-keychain";
+import { PluginFactoryKeychain } from "../../../main/typescript/plugin-factory-keychain.js";
 import {
   AwsCredentialType,
   PluginKeychainAwsSm,
-} from "../../../main/typescript/plugin-keychain-aws-sm";
+} from "../../../main/typescript/plugin-keychain-aws-sm.js";
 import { v4 as uuidv4 } from "uuid";
 
 test("get,set,has,delete alters state as expected", async (t: Test) => {

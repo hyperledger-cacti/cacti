@@ -5,7 +5,7 @@
  */
 
 import { GluegunCommand } from 'gluegun'
-import { commandHelp, validKeys } from '../../helpers/helpers'
+import { commandHelp, validKeys } from "../../helpers/helpers.js"
 import * as fs from 'fs'
 import * as path from 'path'
 

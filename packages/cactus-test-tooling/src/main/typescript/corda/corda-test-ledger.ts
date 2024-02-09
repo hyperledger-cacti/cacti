@@ -5,8 +5,8 @@ import { NodeSSH, Config as SshConfig } from "node-ssh";
 import Docker, { Container, ContainerInfo } from "dockerode";
 import Joi from "joi";
 
-import { ITestLedger } from "../i-test-ledger";
-import { Containers } from "../common/containers";
+import { ITestLedger } from "../i-test-ledger.js";
+import { Containers } from "../common/containers.js";
 
 import {
   LogLevelDesc,
@@ -16,8 +16,11 @@ import {
   Bools,
 } from "@hyperledger/cactus-common";
 
-import { SampleCordappEnum, SAMPLE_CORDAPP_DATA } from "./sample-cordapp-enum";
-import { ICordappJarFile } from "./cordapp-jar-file";
+import {
+  SampleCordappEnum,
+  SAMPLE_CORDAPP_DATA,
+} from "./sample-cordapp-enum.js";
+import { ICordappJarFile } from "./cordapp-jar-file.js";
 
 /*
  * Contains options for Corda container

@@ -18,10 +18,10 @@ import {
   ConfigService,
   ICactusApiServerOptions,
   isHealthcheckResponse,
-} from "../../../main/typescript/public-api";
-import { DefaultApi as ApiServerApi } from "../../../main/typescript/public-api";
-import { AuthorizationProtocol } from "../../../main/typescript/config/authorization-protocol";
-import { IAuthorizationConfig } from "../../../main/typescript/authzn/i-authorization-config";
+} from "../../../main/typescript/public-api.js";
+import { DefaultApi as ApiServerApi } from "../../../main/typescript/public-api.js";
+import { AuthorizationProtocol } from "../../../main/typescript/config/authorization-protocol.js";
+import { IAuthorizationConfig } from "../../../main/typescript/authzn/i-authorization-config.js";
 
 const testCase = "API server enforces authorization rules when configured";
 const logLevel: LogLevelDesc = "TRACE";

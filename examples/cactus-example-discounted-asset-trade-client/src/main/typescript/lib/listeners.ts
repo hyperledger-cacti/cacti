@@ -14,7 +14,7 @@ import {
   ProofExchangeRecord,
 } from "@aries-framework/core";
 
-import { AnoncredAgent } from "../public-api";
+import { AnoncredAgent } from "../public-api.js";
 
 /**
  * Method to accept credential or decline it when error occurred.

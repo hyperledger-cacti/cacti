@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { Configuration } from "@hyperledger/cactus-core-api";
-import { SessionDataRollbackActionsPerformedEnum } from "../generated/openapi/typescript-axios";
+import { SessionDataRollbackActionsPerformedEnum } from "./../generated/openapi/typescript-axios/index.js";
 import {
   DefaultApi as BesuApi,
   Web3SigningCredential,
@@ -10,7 +10,7 @@ import {
 import {
   IPluginSatpGatewayConstructorOptions,
   PluginSatpGateway,
-} from "./plugin-satp-gateway";
+} from "./plugin-satp-gateway.js";
 
 export interface IBesuSatpGatewayConstructorOptions
   extends IPluginSatpGatewayConstructorOptions {

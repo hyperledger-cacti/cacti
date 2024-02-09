@@ -19,7 +19,7 @@ logger.level = config.logLevel;
 
 const mapFromAddressNonce: Map<string, number> = new Map();
 
-import { getEthereumConnector } from "./ethereum-connector";
+import { getEthereumConnector } from "./ethereum-connector.js";
 
 export async function sendEthereumTransaction(
   transaction: any,

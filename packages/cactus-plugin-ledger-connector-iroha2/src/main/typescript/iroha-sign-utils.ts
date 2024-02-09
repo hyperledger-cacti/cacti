@@ -18,9 +18,9 @@ import {
   VersionedSignedTransaction,
 } from "@iroha2/data-model";
 
-import { generateIrohaV2KeyPair } from "./cactus-iroha-sdk-wrapper/client";
-import { createAccountId } from "./cactus-iroha-sdk-wrapper/data-factories";
-import { Iroha2KeyPair } from "./public-api";
+import { generateIrohaV2KeyPair } from "./cactus-iroha-sdk-wrapper/client.js";
+import { createAccountId } from "./cactus-iroha-sdk-wrapper/data-factories.js";
+import { Iroha2KeyPair } from "./public-api.js";
 
 /**
  * Create IrohaV2 SDK Signer object.

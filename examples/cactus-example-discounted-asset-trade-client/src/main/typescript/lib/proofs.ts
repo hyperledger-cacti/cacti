@@ -9,7 +9,7 @@ import {
   ProofState,
   ProofExchangeRecord,
 } from "@aries-framework/core";
-import { AnoncredAgent } from "./agent-setup";
+import { AnoncredAgent } from "./agent-setup.js";
 
 // Constants
 const WAIT_FOR_PROOF_TIMEOUT = 60 * 1000;

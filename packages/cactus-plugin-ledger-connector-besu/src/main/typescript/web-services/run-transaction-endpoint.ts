@@ -14,10 +14,10 @@ import {
 } from "@hyperledger/cactus-core-api";
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
-import { PluginLedgerConnectorBesu } from "../plugin-ledger-connector-besu";
+import { PluginLedgerConnectorBesu } from "../plugin-ledger-connector-besu.js";
 
 import OAS from "../../json/openapi.json";
-import { RunTransactionRequest } from "../generated/openapi/typescript-axios";
+import { RunTransactionRequest } from "./../generated/openapi/typescript-axios/index.js";
 
 export interface IRunTransactionEndpointOptions {
   logLevel?: LogLevelDesc;

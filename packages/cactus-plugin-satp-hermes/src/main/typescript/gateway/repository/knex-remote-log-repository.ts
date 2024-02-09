@@ -1,5 +1,5 @@
-import { IRemoteLogRepository } from "./interfaces/repository";
-import { IRemoteLog } from "../plugin-satp-gateway";
+import { IRemoteLogRepository } from "./interfaces/repository.js";
+import { IRemoteLog } from "../plugin-satp-gateway.js";
 import knex, { Knex } from "knex";
 
 export class KnexRemoteLogRepository implements IRemoteLogRepository {

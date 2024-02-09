@@ -5,7 +5,7 @@ import {
 import {
   IPluginLedgerConnectorEthereumOptions,
   PluginLedgerConnectorEthereum,
-} from "./plugin-ledger-connector-ethereum";
+} from "./plugin-ledger-connector-ethereum.js";
 
 export class PluginFactoryLedgerConnector extends PluginFactory<
   PluginLedgerConnectorEthereum,

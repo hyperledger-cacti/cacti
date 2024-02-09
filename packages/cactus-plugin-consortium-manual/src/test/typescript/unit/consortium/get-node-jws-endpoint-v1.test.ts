@@ -16,15 +16,15 @@ import {
 import {
   PluginConsortiumManual,
   IPluginConsortiumManualOptions,
-} from "../../../../main/typescript/public-api";
+} from "../../../../main/typescript/public-api.js";
 
-import { GetNodeJwsEndpoint } from "../../../../main/typescript/public-api";
+import { GetNodeJwsEndpoint } from "../../../../main/typescript/public-api.js";
 
 import { v4 as uuidv4 } from "uuid";
 
-import { DefaultApi as ConsortiumManualApi } from "../../../../main/typescript/public-api";
+import { DefaultApi as ConsortiumManualApi } from "../../../../main/typescript/public-api.js";
 
-import { K_CACTUS_CONSORTIUM_MANUAL_TOTAL_NODE_COUNT } from "../../../../main/typescript/prometheus-exporter/metrics";
+import { K_CACTUS_CONSORTIUM_MANUAL_TOTAL_NODE_COUNT } from "../../../../main/typescript/prometheus-exporter/metrics.js";
 
 const testCase = "Can provide JWS";
 describe(testCase, () => {

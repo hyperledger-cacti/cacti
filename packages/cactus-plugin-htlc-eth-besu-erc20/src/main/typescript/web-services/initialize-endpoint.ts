@@ -15,8 +15,8 @@ import {
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 import OAS from "../../json/openapi.json";
 
-import { InitializeRequest } from "../generated/openapi/typescript-axios";
-import { PluginHtlcEthBesuErc20 } from "../plugin-htlc-eth-besu-erc20";
+import { InitializeRequest } from "./../generated/openapi/typescript-axios/index.js";
+import { PluginHtlcEthBesuErc20 } from "../plugin-htlc-eth-besu-erc20.js";
 
 export interface IInitializeEndpointOptions {
   logLevel?: LogLevelDesc;

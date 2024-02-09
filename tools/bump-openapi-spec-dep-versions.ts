@@ -11,8 +11,8 @@ import { OpenAPIV3_1 } from "openapi-types";
 import { isValidSemVer } from "semver-parser";
 import fastSafeStringify from "fast-safe-stringify";
 
-import { hasKey } from "./has-key";
-import { getLatestSemVerGitTagV1 } from "./get-latest-sem-ver-git-tag";
+import { hasKey } from "./has-key.js";
+import { getLatestSemVerGitTagV1 } from "./get-latest-sem-ver-git-tag.js";
 
 const TAG = "[tools/bump-openapi-spec-dep-versions.ts]";
 export interface IBumpOpenAPISpecDepVersionsV1Request {

@@ -12,7 +12,7 @@ import {
   BesuApiClient,
   WatchBlocksV1Progress,
   Web3BlockHeader,
-} from "../../../../../main/typescript/public-api";
+} from "../../../../../main/typescript/public-api.js";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import {
   BesuTestLedger,
@@ -30,8 +30,8 @@ import express from "express";
 import bodyParser from "body-parser";
 import http from "http";
 import { AddressInfo } from "net";
-import { K_CACTUS_BESU_TOTAL_TX_COUNT } from "../../../../../main/typescript/prometheus-exporter/metrics";
-import { BesuApiClientOptions } from "../../../../../main/typescript/api-client/besu-api-client";
+import { K_CACTUS_BESU_TOTAL_TX_COUNT } from "../../../../../main/typescript/prometheus-exporter/metrics.js";
+import { BesuApiClientOptions } from "../../../../../main/typescript/api-client/besu-api-client.js";
 
 const testCase = "deploys contract via .json file";
 const logLevel: LogLevelDesc = "TRACE";

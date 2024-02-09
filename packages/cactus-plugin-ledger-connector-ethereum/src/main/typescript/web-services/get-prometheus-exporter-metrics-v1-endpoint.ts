@@ -19,7 +19,7 @@ import {
   safeStringifyException,
 } from "@hyperledger/cactus-common";
 
-import { PluginLedgerConnectorEthereum } from "../plugin-ledger-connector-ethereum";
+import { PluginLedgerConnectorEthereum } from "../plugin-ledger-connector-ethereum.js";
 
 export interface IGetPrometheusExporterMetricsEndpointV1Options {
   connector: PluginLedgerConnectorEthereum;

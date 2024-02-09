@@ -9,11 +9,11 @@ import { BlockDecoder } from 'fabric-common/index';
 import { Gateway, Network, Contract, ContractEvent, BlockListener, ContractListener, BlockEvent, ListenerOptions } from 'fabric-network';
 import query_pb from '@hyperledger/cacti-weaver-protos-js/common/query_pb';
 import events_pb from '@hyperledger/cacti-weaver-protos-js/common/events_pb';
-import { lookupEventSubscriptions, readAllEventMatchers } from './events';
-import { invoke, getNetworkGateway, packageFabricView } from './fabric-code';
-import { handlePromise, relayCallback, getRelayClientForEventPublish, delay } from './utils';
-import { DBConnector, LevelDBConnector, DBLockedError, DBKeyNotFoundError } from './dbConnector';
-import logger from './logger';
+import { lookupEventSubscriptions, readAllEventMatchers } from "./events.js";
+import { invoke, getNetworkGateway, packageFabricView } from "./fabric-code.js";
+import { handlePromise, relayCallback, getRelayClientForEventPublish, delay } from "./utils.js";
+import { DBConnector, LevelDBConnector, DBLockedError, DBKeyNotFoundError } from "./dbConnector.js";
+import logger from "./logger.js";
 
 let networkGatewayMap = new Map<string, Gateway>();
 let networkChannelMap = new Map<string, Network>();

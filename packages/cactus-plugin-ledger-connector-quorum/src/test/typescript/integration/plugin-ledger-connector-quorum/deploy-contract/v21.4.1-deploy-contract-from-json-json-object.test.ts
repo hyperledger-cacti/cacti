@@ -10,14 +10,14 @@ import {
 
 import HelloWorldContractJson from "../../../../solidity/hello-world-contract/HelloWorld.json";
 
-import { K_CACTUS_QUORUM_TOTAL_TX_COUNT } from "../../../../../main/typescript/prometheus-exporter/metrics";
+import { K_CACTUS_QUORUM_TOTAL_TX_COUNT } from "../../../../../main/typescript/prometheus-exporter/metrics.js";
 
 import {
   EthContractInvocationType,
   PluginLedgerConnectorQuorum,
   Web3SigningCredentialType,
   DefaultApi as QuorumApi,
-} from "../../../../../main/typescript/public-api";
+} from "../../../../../main/typescript/public-api.js";
 
 import {
   QuorumTestLedger,

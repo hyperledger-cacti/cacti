@@ -5,8 +5,8 @@
 /* eslint-disable */
 
 import * as jspb from "google-protobuf";
-import * as common_ack_pb from "../common/ack_pb";
-import * as common_state_pb from "../common/state_pb";
+import * as common_ack_pb from "../common/ack_pb.js";
+import * as common_state_pb from "../common/state_pb.js";
 
 export class DbName extends jspb.Message { 
     getName(): string;

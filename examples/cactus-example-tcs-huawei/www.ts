@@ -1,4 +1,4 @@
-import { BusinessLogicElectricityTrade } from "./BusinessLogicTcsElectricityTrade";
+import { BusinessLogicElectricityTrade } from "./BusinessLogicTcsElectricityTrade.js";
 import { startCactusSocketIOServer } from "@hyperledger/cactus-cmd-socketio-server";
 
 startCactusSocketIOServer({

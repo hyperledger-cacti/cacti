@@ -2,7 +2,7 @@ import {
   AuthInfoAccessTokenV1,
   AuthInfoSubscriptionKeyV1,
   AuthInfoV1,
-} from "./public-api";
+} from "./public-api.js";
 
 // CDL specific header names
 export const HTTP_HEADER_SUBSCRIPTION_KEY = "Ocp-Apim-Subscription-Key";

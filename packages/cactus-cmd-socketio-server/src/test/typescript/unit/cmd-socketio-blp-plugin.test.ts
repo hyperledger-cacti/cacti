@@ -37,16 +37,16 @@ const mockAppConfig = {
 };
 
 // Must be mocked before loading cactus-cmd-socketio-server
-import * as ConfigUtil from "../../../main/typescript/routing-interface/util/ConfigUtil";
+import * as ConfigUtil from "../../../main/typescript/routing-interface/util/ConfigUtil.js";
 jest.mock("../../../main/typescript/routing-interface/util/ConfigUtil");
 (ConfigUtil as any)["__configMock"] = mockAppConfig;
 
 jest.mock("fs");
 
-import { BusinessLogicBase } from "../../../main/typescript/business-logic-plugin/BusinessLogicBase";
-import { LedgerEvent } from "../../../main/typescript/verifier/LedgerPlugin";
-import { TransactionManagement } from "../../../main/typescript/routing-interface/TransactionManagement";
-import { startCactusSocketIOServer } from "../../../main/typescript/routing-interface/CactusSocketIOServer";
+import { BusinessLogicBase } from "../../../main/typescript/business-logic-plugin/BusinessLogicBase.js";
+import { LedgerEvent } from "../../../main/typescript/verifier/LedgerPlugin.js";
+import { TransactionManagement } from "../../../main/typescript/routing-interface/TransactionManagement.js";
+import { startCactusSocketIOServer } from "../../../main/typescript/routing-interface/CactusSocketIOServer.js";
 
 import {
   Logger,

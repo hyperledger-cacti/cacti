@@ -18,7 +18,7 @@ import {
 } from "@hyperledger/cactus-core";
 
 import OAS from "../../json/openapi.json";
-import { PluginKeychainMemory } from "../plugin-keychain-memory";
+import { PluginKeychainMemory } from "../plugin-keychain-memory.js";
 import { SetKeychainEntryRequestV1 } from "@hyperledger/cactus-core-api";
 
 export interface ISetKeychainEntryEndpointOptions {

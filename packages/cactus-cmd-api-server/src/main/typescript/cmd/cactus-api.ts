@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-import { ApiServer } from "../api-server";
-import { ConfigService } from "../config/config-service";
+import { ApiServer } from "../api-server.js";
+import { ConfigService } from "../config/config-service.js";
 import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
 
 const log: Logger = LoggerProvider.getOrCreate({

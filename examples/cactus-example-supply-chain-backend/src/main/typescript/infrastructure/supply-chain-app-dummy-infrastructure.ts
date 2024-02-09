@@ -32,7 +32,7 @@ import {
   DefaultEventHandlerStrategy,
 } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
 import { DiscoveryOptions } from "fabric-network";
-import { SHIPMENT_CONTRACT_GO_SOURCE } from "../../go/shipment";
+import { SHIPMENT_CONTRACT_GO_SOURCE } from "../../go/shipment.js";
 import { IPluginKeychain } from "@hyperledger/cactus-core-api";
 
 export const org1Env = {

@@ -25,7 +25,7 @@ import {
   GetKeychainEntryRequestV1,
   HasKeychainEntryRequestV1,
   DeleteKeychainEntryRequestV1,
-} from "../../../../main/typescript/public-api";
+} from "../../../../main/typescript/public-api.js";
 
 import fs from "fs";
 import path from "path";

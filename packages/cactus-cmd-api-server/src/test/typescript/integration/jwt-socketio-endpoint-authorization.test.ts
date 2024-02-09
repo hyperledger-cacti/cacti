@@ -12,12 +12,12 @@ import {
   ConfigService,
   HealthCheckResponse,
   isHealthcheckResponse,
-} from "../../../main/typescript/public-api";
-import { ApiServerApiClient } from "../../../main/typescript/public-api";
-import { ApiServerApiClientConfiguration } from "../../../main/typescript/public-api";
+} from "../../../main/typescript/public-api.js";
+import { ApiServerApiClient } from "../../../main/typescript/public-api.js";
+import { ApiServerApiClientConfiguration } from "../../../main/typescript/public-api.js";
 import { LogLevelDesc } from "@hyperledger/cactus-common";
-import { AuthorizationProtocol } from "../../../main/typescript/config/authorization-protocol";
-import { IAuthorizationConfig } from "../../../main/typescript/authzn/i-authorization-config";
+import { AuthorizationProtocol } from "../../../main/typescript/config/authorization-protocol.js";
+import { IAuthorizationConfig } from "../../../main/typescript/authzn/i-authorization-config.js";
 import { lastValueFrom } from "rxjs";
 
 const testCase = "API server enforces authorization for SocketIO endpoints";

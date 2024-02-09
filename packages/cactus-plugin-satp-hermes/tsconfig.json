@@ -9,7 +9,6 @@
     "skipLibCheck": true,
     "rootDir": "./src/",
     "tsBuildInfoFile": "../../.build-cache/cactus-plugin-satp-hermes.tsbuildinfo",
-    "moduleResolution": "Node16"
   },
   "ts-node": {
     "files": true

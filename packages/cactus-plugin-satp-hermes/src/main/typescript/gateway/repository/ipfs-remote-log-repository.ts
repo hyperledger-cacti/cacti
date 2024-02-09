@@ -1,7 +1,7 @@
 import { DefaultApi as ObjectStoreIpfsApi } from "@hyperledger/cactus-plugin-object-store-ipfs";
 import { Configuration } from "@hyperledger/cactus-core-api";
-import { IRemoteLogRepository } from "./interfaces/repository";
-import { IRemoteLog } from "../plugin-satp-gateway";
+import { IRemoteLogRepository } from "./interfaces/repository.js";
+import { IRemoteLog } from "../plugin-satp-gateway.js";
 
 export class IPFSRemoteLogRepository implements IRemoteLogRepository {
   public static readonly CLASS_NAME = "IPFSRemoteLogRepository";

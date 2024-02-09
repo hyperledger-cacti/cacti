@@ -17,7 +17,7 @@ import {
   getDefaultArtilleryConfigPath,
   getDefaultArtilleryFunctionsPath,
   setupBenchmarkEnvironment,
-} from "../setup/geth-benchmark-env";
+} from "../setup/geth-benchmark-env.js";
 
 /**
  * Function with main logic, will start the environment in current window and freeze until Ctrl + C or other method is used.

@@ -5,13 +5,13 @@
  * VerifierFactory.ts
  */
 
-import { Verifier } from "./Verifier";
-import { LPInfoHolder } from "../routing-interface/util/LPInfoHolder";
-import { ConfigUtil } from "../routing-interface/util/ConfigUtil";
+import { Verifier } from "./Verifier.js";
+import { LPInfoHolder } from "../routing-interface/util/LPInfoHolder.js";
+import { ConfigUtil } from "../routing-interface/util/ConfigUtil.js";
 
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
-import { IVerifierEventListener } from "./LedgerPlugin";
+import { IVerifierEventListener } from "./LedgerPlugin.js";
 const moduleName = "VerifierFactory";
 const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;

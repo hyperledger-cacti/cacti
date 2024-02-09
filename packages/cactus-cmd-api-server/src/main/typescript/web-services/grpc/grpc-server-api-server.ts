@@ -1,9 +1,9 @@
 import { ServerUnaryCall, requestCallback } from "@grpc/grpc-js";
 import { Empty } from "google-protobuf/google/protobuf/empty_pb";
 
-import * as health_check_response_pb from "../../generated/proto/protoc-gen-ts/models/health_check_response_pb";
-import * as memory_usage_pb from "../../generated/proto/protoc-gen-ts/models/memory_usage_pb";
-import * as default_service from "../../generated/proto/protoc-gen-ts/services/default_service";
+import * as health_check_response_pb from "../../generated/proto/protoc-gen-ts/models/health_check_response_pb.js";
+import * as memory_usage_pb from "../../generated/proto/protoc-gen-ts/models/memory_usage_pb.js";
+import * as default_service from "../../generated/proto/protoc-gen-ts/services/default_service.js";
 
 import OAS from "../../../json/openapi.json";
 import { stringify } from "safe-stable-stringify";

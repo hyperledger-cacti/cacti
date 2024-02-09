@@ -1,5 +1,5 @@
-import { ILocalLog } from "../plugin-satp-gateway";
-import { ILocalLogRepository } from "./interfaces/repository";
+import { ILocalLog } from "../plugin-satp-gateway.js";
+import { ILocalLogRepository } from "./interfaces/repository.js";
 import knex, { Knex } from "knex";
 
 export class KnexLocalLogRepository implements ILocalLogRepository {

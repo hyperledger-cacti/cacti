@@ -7,12 +7,12 @@ import {
   LoggerProvider,
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
-import { getAuthorizationHeaders } from "./type-defs";
+import { getAuthorizationHeaders } from "./type-defs.js";
 import {
   AuthInfoV1,
   CDLCommonResponseV1,
   GatewayConfigurationV1,
-} from "./public-api";
+} from "./public-api.js";
 
 const DEFAULT_USER_AGENT = "CactiCDLConnector";
 

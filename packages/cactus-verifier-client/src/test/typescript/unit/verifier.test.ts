@@ -23,7 +23,7 @@ import {
   Verifier,
   IVerifierEventListener,
   LedgerEvent,
-} from "../../../main/typescript/verifier";
+} from "../../../main/typescript/verifier.js";
 
 //////////////////////////////////
 // Test Timeout

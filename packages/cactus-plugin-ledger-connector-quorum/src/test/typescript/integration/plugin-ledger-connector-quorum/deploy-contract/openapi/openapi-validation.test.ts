@@ -10,7 +10,7 @@ import {
   DeployContractSolidityBytecodeV1Request,
   InvokeContractV1Request,
   RunTransactionRequest,
-} from "../../../../../../main/typescript/public-api";
+} from "../../../../../../main/typescript/public-api.js";
 import {
   QuorumTestLedger,
   IQuorumGenesisOptions,

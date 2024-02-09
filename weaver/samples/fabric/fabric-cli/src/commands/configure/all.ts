@@ -6,16 +6,16 @@
 
 import { GluegunCommand } from 'gluegun'
 import * as path from 'path'
-import { commandHelp, addData, getNetworkConfig } from '../../helpers/helpers'
-import { enrollAndRecordWalletIdentity } from '../../helpers/fabric-functions'
+import { commandHelp, addData, getNetworkConfig } from "../../helpers/helpers.js"
+import { enrollAndRecordWalletIdentity } from "../../helpers/fabric-functions.js"
 import {
   generateMembership,
   generateAccessControl,
   generateVerificationPolicy
-} from '../../helpers/fabric-functions'
+} from "../../helpers/fabric-functions.js"
 
-import { configureNetwork } from '../../helpers/interop-setup/configure-network'
-import logger from '../../helpers/logger'
+import { configureNetwork } from "../../helpers/interop-setup/configure-network.js"
+import logger from "../../helpers/logger.js"
 import * as dotenv from 'dotenv'
 dotenv.config({ path: path.resolve(__dirname, '../../.env') })
 

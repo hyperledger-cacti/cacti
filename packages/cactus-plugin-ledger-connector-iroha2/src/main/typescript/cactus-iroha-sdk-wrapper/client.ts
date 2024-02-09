@@ -63,19 +63,19 @@ import {
 
 import { bytesToHex, hexToBytes } from "hada";
 
-import { CactusIrohaV2QueryClient } from "./query";
+import { CactusIrohaV2QueryClient } from "./query.js";
 import {
   createAccountId,
   createAssetId,
   createAssetValue,
   createIrohaValue,
-} from "./data-factories";
+} from "./data-factories.js";
 import {
   TransactResponseV1,
   TransactionStatusV1,
   Iroha2BaseConfigTorii,
-} from "../generated/openapi/typescript-axios";
-import { IrohaV2PrerequisitesProvider } from "./prerequisites-provider";
+} from "./../generated/openapi/typescript-axios/index.js";
+import { IrohaV2PrerequisitesProvider } from "./prerequisites-provider.js";
 
 setCrypto(crypto);
 

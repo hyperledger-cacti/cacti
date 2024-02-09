@@ -12,9 +12,9 @@ import iin_agent_pb_grpc from '@hyperledger/cacti-weaver-protos-js/identity/agen
 import 'dotenv/config';
 import { Certificate } from '@fidm/x509';
 import * as path from 'path';
-import { syncExternalStateFromIINAgent, requestIdentityConfiguration, sendIdentityConfiguration } from './protocols/externalOperations';
-import { requestAttestation, sendAttestation } from './protocols/localOperations';
-import { getLedgerBase, delay, getAllRemoteSecurityDomainDNS } from './common/utils'
+import { syncExternalStateFromIINAgent, requestIdentityConfiguration, sendIdentityConfiguration } from "./protocols/externalOperations.js";
+import { requestAttestation, sendAttestation } from "./protocols/localOperations.js";
+import { getLedgerBase, delay, getAllRemoteSecurityDomainDNS } from "./common/utils.js"
 
 
 const iinAgentServer = new Server();

@@ -5,8 +5,8 @@
 /* tslint:disable:max-classes-per-file */
 
 import { ChaincodeStub } from "fabric-shim";
-import { State } from "../util/state";
-import { QueryResult, WorldState } from "../util/worldstate";
+import { State } from "../util/state.js";
+import { QueryResult, WorldState } from "../util/worldstate.js";
 
 // EMISSION_CLASS_IDENTIFIER : identifier for emissions record inside HL Fabric
 const EMISSION_CLASS_IDENTIFIER =

@@ -4,17 +4,17 @@ import { v4 as uuidv4 } from "uuid";
 import {
   SatpMessageType,
   PluginSatpGateway,
-} from "../../../../main/typescript/gateway/plugin-satp-gateway";
+} from "../../../../main/typescript/gateway/plugin-satp-gateway.js";
 import {
   CommitFinalV1Response,
   SessionData,
-} from "../../../../main/typescript/public-api";
+} from "../../../../main/typescript/public-api.js";
 
-import { FabricSatpGateway } from "../../../../main/typescript/gateway/fabric-satp-gateway";
-import { BesuSatpGateway } from "../../../../main/typescript/gateway/besu-satp-gateway";
-import { ServerGatewayHelper } from "../../../../main/typescript/gateway/server/server-helper";
-import { ClientGatewayHelper } from "../../../../main/typescript/gateway/client/client-helper";
-import { knexRemoteConnection } from "../../knex.config";
+import { FabricSatpGateway } from "../../../../main/typescript/gateway/fabric-satp-gateway.js";
+import { BesuSatpGateway } from "../../../../main/typescript/gateway/besu-satp-gateway.js";
+import { ServerGatewayHelper } from "../../../../main/typescript/gateway/server/server-helper.js";
+import { ClientGatewayHelper } from "../../../../main/typescript/gateway/client/client-helper.js";
+import { knexRemoteConnection } from "../../knex.config.js";
 
 const MAX_RETRIES = 5;
 const MAX_TIMEOUT = 5000;

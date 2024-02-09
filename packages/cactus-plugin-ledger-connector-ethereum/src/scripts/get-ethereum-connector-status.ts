@@ -17,7 +17,7 @@
 import {
   EthereumApiClient,
   EthereumApiClientOptions,
-} from "../main/typescript/public-api";
+} from "../main/typescript/public-api.js";
 
 import minimist from "minimist";
 import path from "path";

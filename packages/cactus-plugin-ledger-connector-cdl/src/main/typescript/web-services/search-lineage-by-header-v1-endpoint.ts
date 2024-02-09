@@ -16,7 +16,7 @@ import {
 } from "@hyperledger/cactus-common";
 
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
-import { PluginLedgerConnectorCDL } from "../plugin-ledger-connector-cdl";
+import { PluginLedgerConnectorCDL } from "../plugin-ledger-connector-cdl.js";
 import OAS from "../../json/openapi.json";
 
 export interface ISearchLineageByHeaderOptions {

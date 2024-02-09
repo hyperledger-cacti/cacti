@@ -13,12 +13,12 @@ import {
   handlePromise,
   getNetworkConfig,
   signMessage
-} from '../../helpers/helpers'
-import logger from '../../helpers/logger'
+} from "../../helpers/helpers.js"
+import logger from "../../helpers/logger.js"
 import {
   fabricHelper,
   getKeyAndCertForRemoteRequestbyUserName
-} from '../../helpers/fabric-functions'
+} from "../../helpers/fabric-functions.js"
 dotenv.config({ path: path.resolve(__dirname, '../../.env') })
 
 import { RelayHelper } from '@hyperledger/cacti-weaver-sdk-fabric'

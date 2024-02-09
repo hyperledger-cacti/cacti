@@ -1,6 +1,6 @@
 import promClient, { Registry } from "prom-client";
-import { Transactions } from "./response.type";
-import { totalTxCount, K_CACTUS_FABRIC_TOTAL_TX_COUNT } from "./metrics";
+import { Transactions } from "./response.type.js";
+import { totalTxCount, K_CACTUS_FABRIC_TOTAL_TX_COUNT } from "./metrics.js";
 
 export interface IPrometheusExporterOptions {
   pollingIntervalInMin?: number;

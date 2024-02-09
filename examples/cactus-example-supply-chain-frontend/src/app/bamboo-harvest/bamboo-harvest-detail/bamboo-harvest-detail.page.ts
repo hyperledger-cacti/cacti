@@ -13,8 +13,8 @@ import { ApiClient } from "@hyperledger/cactus-api-client";
 import { BambooHarvest } from "@hyperledger/cactus-example-supply-chain-business-logic-plugin";
 import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
 
-import { QUORUM_DEMO_LEDGER_ID } from "../../../constants";
-import { isBambooHarvest } from "../is-bamboo-harvest";
+import { QUORUM_DEMO_LEDGER_ID } from "../../../constants.js";
+import { isBambooHarvest } from "../is-bamboo-harvest.js";
 
 @Component({
   selector: "app-bamboo-harvest-detail",

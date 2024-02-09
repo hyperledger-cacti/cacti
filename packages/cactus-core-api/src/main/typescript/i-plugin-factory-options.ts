@@ -1,4 +1,4 @@
-import { PluginImportType } from "./generated/openapi/typescript-axios/index";
+import { PluginImportType } from "./generated/openapi/typescript-axios/index.js";
 
 /**
  * The base interface for describing the object that is to be passed in to all

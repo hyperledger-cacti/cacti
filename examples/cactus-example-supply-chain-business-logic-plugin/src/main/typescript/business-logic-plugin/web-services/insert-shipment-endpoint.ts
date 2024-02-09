@@ -14,7 +14,7 @@ import {
   IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
-import { InsertShipmentRequest } from "../../generated/openapi/typescript-axios/index";
+import { InsertShipmentRequest } from "../../generated/openapi/typescript-axios/index.js";
 import {
   DefaultApi as FabricApi,
   FabricContractInvocationType,

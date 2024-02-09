@@ -1,4 +1,4 @@
-import { BambooHarvest } from "../../generated/openapi/typescript-axios";
+import { BambooHarvest } from "./../../generated/openapi/typescript-axios/index.js";
 import { RuntimeError } from "run-time-error-cjs";
 
 /**

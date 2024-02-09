@@ -18,7 +18,7 @@ import {
   IAsyncProvider,
 } from "@hyperledger/cactus-common";
 
-import { PluginLedgerConnectorIroha } from "../plugin-ledger-connector-iroha";
+import { PluginLedgerConnectorIroha } from "../plugin-ledger-connector-iroha.js";
 
 export interface IGetPrometheusExporterMetricsEndpointV1Options {
   connector: PluginLedgerConnectorIroha;

@@ -13,7 +13,7 @@ import {
   OwnHTLCRequest,
   CounterpartyHTLCRequest,
   Configuration,
-} from "../../../../main/typescript/public-api";
+} from "../../../../main/typescript/public-api.js";
 import {
   IPluginHtlcEthBesuErc20Options,
   PluginFactoryHtlcEthBesuErc20,

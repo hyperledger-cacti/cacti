@@ -6,10 +6,10 @@
 
 import { GluegunCommand } from 'gluegun'
 import * as path from 'path'
-import { commandHelp, pledgeAsset, getNetworkConfig } from '../../../helpers/helpers'
-import { fabricHelper } from '../../../helpers/fabric-functions'
+import { commandHelp, pledgeAsset, getNetworkConfig } from "../../../helpers/helpers.js"
+import { fabricHelper } from "../../../helpers/fabric-functions.js"
 
-import logger from '../../../helpers/logger'
+import logger from "../../../helpers/logger.js"
 import * as dotenv from 'dotenv'
 dotenv.config({ path: path.resolve(__dirname, '../../../.env') })
 

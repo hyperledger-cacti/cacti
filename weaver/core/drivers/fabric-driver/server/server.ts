@@ -14,16 +14,16 @@ import driver_pb_grpc from '@hyperledger/cacti-weaver-protos-js/driver/driver_gr
 import datatransfer_grpc_pb from '@hyperledger/cacti-weaver-protos-js/relay/datatransfer_grpc_pb';
 import events_grpc_pb from '@hyperledger/cacti-weaver-protos-js/relay/events_grpc_pb';
 import state_pb from '@hyperledger/cacti-weaver-protos-js/common/state_pb';
-import { invoke, packageFabricView } from './fabric-code';
+import { invoke, packageFabricView } from "./fabric-code.js";
 import 'dotenv/config';
-import { loadEventSubscriptionsFromStorage, monitorBlockForMissedEvents } from './listener'
-import { walletSetup } from './walletSetup';
-import { subscribeEventHelper, unsubscribeEventHelper, signEventSubscriptionQuery, writeExternalStateHelper } from "./events"
+import { loadEventSubscriptionsFromStorage, monitorBlockForMissedEvents } from "./listener.js"
+import { walletSetup } from "./walletSetup.js";
+import { subscribeEventHelper, unsubscribeEventHelper, signEventSubscriptionQuery, writeExternalStateHelper } from "./events.js"
 import * as path from 'path';
-import { handlePromise, relayCallback, getRelayClientForQueryResponse, getRelayClientForEventSubscription, delay } from './utils';
-import { dbConnectionTest, eventSubscriptionTest } from "./tests"
+import { handlePromise, relayCallback, getRelayClientForQueryResponse, getRelayClientForEventSubscription, delay } from "./utils.js";
+import { dbConnectionTest, eventSubscriptionTest } from "./tests.js"
 import driverPb from '@hyperledger/cacti-weaver-protos-js/driver/driver_pb';
-import logger from './logger';
+import logger from "./logger.js";
 
 if (process.env.DEBUG === 'true') {
     logger.level = 'debug'

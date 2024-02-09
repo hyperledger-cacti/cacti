@@ -1,14 +1,14 @@
 import esMain from "es-main";
-import { checkOpenApiJsonSpecs } from "./check-open-api-json-specs";
-import { checkPackageJsonSort } from "./check-package-json-sort";
-import { checkPkgLicenses } from "./check-pkg-licenses";
-import { checkSiblingDepVersionConsistency } from "./check-sibling-dep-version-consistency";
-import { checkPkgNpmScope } from "./check-pkg-npm-scope";
+import { checkOpenApiJsonSpecs } from "./check-open-api-json-specs.js";
+import { checkPackageJsonSort } from "./check-package-json-sort.js";
+import { checkPkgLicenses } from "./check-pkg-licenses.js";
+import { checkSiblingDepVersionConsistency } from "./check-sibling-dep-version-consistency.js";
+import { checkPkgNpmScope } from "./check-pkg-npm-scope.js";
 import {
   ICheckMissingNodeDepsRequest,
   checkMissingNodeDeps,
-} from "./check-missing-node-deps";
-import { getAllPkgDirs } from "./get-all-pkg-dirs";
+} from "./check-missing-node-deps.js";
+import { getAllPkgDirs } from "./get-all-pkg-dirs.js";
 
 export async function runCustomChecks(
   argv: string[],

@@ -2,18 +2,18 @@ import { randomInt } from "crypto";
 import {
   SatpMessageType,
   PluginSatpGateway,
-} from "../../../../main/typescript/gateway/plugin-satp-gateway";
+} from "../../../../main/typescript/gateway/plugin-satp-gateway.js";
 import {
   TransferCommenceV1Request,
   AssetProfile,
   SessionData,
-} from "../../../../main/typescript/generated/openapi/typescript-axios/api";
+} from "../../../../main/typescript/generated/openapi/typescript-axios/api.js";
 import { v4 as uuidV4 } from "uuid";
 import { SHA256 } from "crypto-js";
-import { FabricSatpGateway } from "../../../../main/typescript/gateway/fabric-satp-gateway";
-import { BesuSatpGateway } from "../../../../main/typescript/gateway/besu-satp-gateway";
-import { ClientGatewayHelper } from "../../../../main/typescript/gateway/client/client-helper";
-import { ServerGatewayHelper } from "../../../../main/typescript/gateway/server/server-helper";
+import { FabricSatpGateway } from "../../../../main/typescript/gateway/fabric-satp-gateway.js";
+import { BesuSatpGateway } from "../../../../main/typescript/gateway/besu-satp-gateway.js";
+import { ClientGatewayHelper } from "../../../../main/typescript/gateway/client/client-helper.js";
+import { ServerGatewayHelper } from "../../../../main/typescript/gateway/server/server-helper.js";
 
 const MAX_RETRIES = 5;
 const MAX_TIMEOUT = 5000;

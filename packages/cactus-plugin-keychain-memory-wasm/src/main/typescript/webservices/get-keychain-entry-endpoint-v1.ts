@@ -16,7 +16,7 @@ import {
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
 import OAS from "../../json/openapi.json";
-import { PluginKeychainMemoryWasm } from "../plugin-keychain-memory-wasm";
+import { PluginKeychainMemoryWasm } from "../plugin-keychain-memory-wasm.js";
 
 export interface IGetKeychainEntryEndpointOptions {
   logLevel?: LogLevelDesc;

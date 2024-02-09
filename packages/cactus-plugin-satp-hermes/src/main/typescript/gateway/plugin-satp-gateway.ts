@@ -41,61 +41,61 @@ import {
   RecoverUpdateAckV1Message,
   RollbackV1Message,
   RollbackAckV1Message,
-} from "../generated/openapi/typescript-axios";
-import { CommitFinalRequestEndpointV1 } from "../web-services/server-side/commit-final-request-endpoint";
-import { CommitFinalResponseEndpointV1 } from "../web-services/client-side/commit-final-response-endpoint";
-import { CommitPreparationResponseEndpointV1 } from "../web-services/client-side/commit-prepare-response-endpoint";
-import { LockEvidenceResponseEndpointV1 } from "../web-services/client-side/lock-evidence-response-endpoint";
-import { TransferCommenceResponseEndpointV1 } from "../web-services/client-side/transfer-commence-response-endpoint";
-import { TransferInitiationResponseEndpointV1 } from "../web-services/client-side/transfer-initiation-response-endpoint";
-import { LockEvidenceRequestEndpointV1 } from "../web-services/server-side/lock-evidence-request-endpoint";
-import { TransferCommenceRequestEndpointV1 } from "../web-services/server-side/transfer-commence-request-endpoint";
-import { TransferCompleteRequestEndpointV1 } from "../web-services/server-side/transfer-complete-request-endpoint";
-import { TransferInitiationRequestEndpointV1 } from "../web-services/server-side/transfer-initiation-request-endpoint";
-import { CommitPreparationRequestEndpointV1 } from "../web-services/server-side/commite-prepare-request-endpoint";
+} from "./../generated/openapi/typescript-axios/index.js";
+import { CommitFinalRequestEndpointV1 } from "../web-services/server-side/commit-final-request-endpoint.js";
+import { CommitFinalResponseEndpointV1 } from "../web-services/client-side/commit-final-response-endpoint.js";
+import { CommitPreparationResponseEndpointV1 } from "../web-services/client-side/commit-prepare-response-endpoint.js";
+import { LockEvidenceResponseEndpointV1 } from "../web-services/client-side/lock-evidence-response-endpoint.js";
+import { TransferCommenceResponseEndpointV1 } from "../web-services/client-side/transfer-commence-response-endpoint.js";
+import { TransferInitiationResponseEndpointV1 } from "../web-services/client-side/transfer-initiation-response-endpoint.js";
+import { LockEvidenceRequestEndpointV1 } from "../web-services/server-side/lock-evidence-request-endpoint.js";
+import { TransferCommenceRequestEndpointV1 } from "../web-services/server-side/transfer-commence-request-endpoint.js";
+import { TransferCompleteRequestEndpointV1 } from "../web-services/server-side/transfer-complete-request-endpoint.js";
+import { TransferInitiationRequestEndpointV1 } from "../web-services/server-side/transfer-initiation-request-endpoint.js";
+import { CommitPreparationRequestEndpointV1 } from "../web-services/server-side/commite-prepare-request-endpoint.js";
 import { randomInt } from "crypto";
-import { ClientGatewayHelper } from "./client/client-helper";
-import { ServerGatewayHelper } from "./server/server-helper";
+import { ClientGatewayHelper } from "./client/client-helper.js";
+import { ServerGatewayHelper } from "./server/server-helper.js";
 import {
   checkValidRecoverMessage,
   sendRecoverMessage,
-} from "./recovery/recover";
+} from "./recovery/recover.js";
 import {
   checkValidRecoverUpdateMessage,
   sendRecoverUpdateMessage,
-} from "./recovery/recover-update";
+} from "./recovery/recover-update.js";
 import {
   checkValidRecoverUpdateAckMessage,
   sendRecoverUpdateAckMessage,
-} from "./recovery/recover-update-ack";
+} from "./recovery/recover-update-ack.js";
 import {
   checkValidRecoverSuccessMessage,
   sendRecoverSuccessMessage,
-} from "./recovery/recover-success";
+} from "./recovery/recover-success.js";
 import { SHA256 } from "crypto-js";
-import { RecoverMessageEndpointV1 } from "../web-services/recovery/recover-message-endpoint";
-import { RecoverUpdateMessageEndpointV1 } from "../web-services/recovery/recover-update-message-endpoint";
-import { RecoverUpdateAckMessageEndpointV1 } from "../web-services/recovery/recover-update-ack-message-endpoint";
-import { RecoverSuccessMessageEndpointV1 } from "../web-services/recovery/recover-success-message-endpoint";
-import { RollbackMessageEndpointV1 } from "../web-services/recovery/rollback-message-endpoint";
+import { RecoverMessageEndpointV1 } from "../web-services/recovery/recover-message-endpoint.js";
+import { RecoverUpdateMessageEndpointV1 } from "../web-services/recovery/recover-update-message-endpoint.js";
+import { RecoverUpdateAckMessageEndpointV1 } from "../web-services/recovery/recover-update-ack-message-endpoint.js";
+import { RecoverSuccessMessageEndpointV1 } from "../web-services/recovery/recover-success-message-endpoint.js";
+import { RollbackMessageEndpointV1 } from "../web-services/recovery/rollback-message-endpoint.js";
 import {
   checkValidRollbackMessage,
   sendRollbackMessage,
-} from "./recovery/rollback";
+} from "./recovery/rollback.js";
 import { AxiosResponse } from "axios";
 import {
   checkValidRollbackAckMessage,
   sendRollbackAckMessage,
-} from "./recovery/rollback-ack";
-import { ClientRequestEndpointV1 } from "../web-services/client-side/client-request-endpoint";
-import { RollbackAckMessageEndpointV1 } from "../web-services/recovery/rollback-ack-message-endpoint";
-import { KnexLocalLogRepository as LocalLogRepository } from "./repository/knex-local-log-repository";
-import { IPFSRemoteLogRepository } from "./repository/ipfs-remote-log-repository";
-import { KnexRemoteLogRepository } from "./repository/knex-remote-log-repository";
+} from "./recovery/rollback-ack.js";
+import { ClientRequestEndpointV1 } from "../web-services/client-side/client-request-endpoint.js";
+import { RollbackAckMessageEndpointV1 } from "../web-services/recovery/rollback-ack-message-endpoint.js";
+import { KnexLocalLogRepository as LocalLogRepository } from "./repository/knex-local-log-repository.js";
+import { IPFSRemoteLogRepository } from "./repository/ipfs-remote-log-repository.js";
+import { KnexRemoteLogRepository } from "./repository/knex-remote-log-repository.js";
 import {
   ILocalLogRepository,
   IRemoteLogRepository,
-} from "./repository/interfaces/repository";
+} from "./repository/interfaces/repository.js";
 
 export enum SatpMessageType {
   InitializationRequest = "urn:ietf:satp:msgtype:init-transfer-msg",

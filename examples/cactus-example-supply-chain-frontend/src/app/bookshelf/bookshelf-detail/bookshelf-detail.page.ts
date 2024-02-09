@@ -17,9 +17,9 @@ import {
 } from "@hyperledger/cactus-example-supply-chain-business-logic-plugin";
 
 import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
-import { QUORUM_DEMO_LEDGER_ID } from "../../../constants";
+import { QUORUM_DEMO_LEDGER_ID } from "../../../constants.js";
 
-import { AuthConfig } from "../../common/auth-config";
+import { AuthConfig } from "../../common/auth-config.js";
 
 @Component({
   selector: "app-bookshelf-detail",

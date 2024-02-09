@@ -3,8 +3,8 @@
  * compiler version: 3.19.1
  * source: networks/networks.proto
  * git: https://github.com/thesayyn/protoc-gen-ts */
-import * as dependency_1 from "./../common/ack";
-import * as dependency_2 from "./../common/state";
+import * as dependency_1 from "./../common/ack.js";
+import * as dependency_2 from "./../common/state.js";
 import * as pb_1 from "google-protobuf";
 import * as grpc_1 from "@grpc/grpc-js";
 export namespace networks.networks {

@@ -5,10 +5,10 @@
  */
 
 import { GluegunCommand } from 'gluegun'
-import { commandHelp } from '../../helpers/helpers'
+import { commandHelp } from "../../helpers/helpers.js"
 import * as fs from 'fs'
 import * as path from 'path'
-import { enrollAndRecordWalletIdentity } from '../../helpers/fabric-functions'
+import { enrollAndRecordWalletIdentity } from "../../helpers/fabric-functions.js"
 
 const command: GluegunCommand = {
   name: 'add',

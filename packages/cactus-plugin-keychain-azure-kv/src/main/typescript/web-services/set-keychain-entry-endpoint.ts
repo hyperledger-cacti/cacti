@@ -14,10 +14,10 @@ import {
 } from "@hyperledger/cactus-core-api";
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
-import { PluginKeychainAzureKv } from "../plugin-keychain-azure-kv";
+import { PluginKeychainAzureKv } from "../plugin-keychain-azure-kv.js";
 
 import OAS from "../../json/openapi.json";
-import { SetKeychainEntryRequestV1 } from "../generated/openapi/typescript-axios";
+import { SetKeychainEntryRequestV1 } from "./../generated/openapi/typescript-axios/index.js";
 
 export interface ISetKeychainEntryEndpointOptions {
   logLevel?: LogLevelDesc;

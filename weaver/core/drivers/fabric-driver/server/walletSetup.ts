@@ -6,11 +6,11 @@
 
 import { Wallets } from 'fabric-network';
 import FabricCAServices from 'fabric-ca-client';
-import { handlePromise } from './utils';
+import { handlePromise } from "./utils.js";
 import { InteroperableHelper } from '@hyperledger/cacti-weaver-sdk-fabric'
 import * as path from 'path';
 import * as fs from 'fs';
-import logger from './logger';
+import logger from "./logger.js";
 
 const getConfig = () => {
     const config = JSON.parse(

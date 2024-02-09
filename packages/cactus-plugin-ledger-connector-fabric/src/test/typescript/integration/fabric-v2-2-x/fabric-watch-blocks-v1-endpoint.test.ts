@@ -37,7 +37,7 @@ import {
   FabricApiClient,
   WatchBlocksListenerTypeV1,
   WatchBlocksResponseV1,
-} from "../../../../main/typescript/public-api";
+} from "../../../../main/typescript/public-api.js";
 
 /**
  * Functional test of WatchBlocksV1Endpoint on connector-fabric (packages/cactus-plugin-ledger-connector-fabric)

@@ -5,7 +5,7 @@
  * rif-util.test.ts
  */
 
-import { RIFUtil } from "../../../main/typescript/routing-interface/util/RIFUtil";
+import { RIFUtil } from "../../../main/typescript/routing-interface/util/RIFUtil.js";
 
 test("test", () => {
   const objJson = { aaa: "abc", bbb: "def" };

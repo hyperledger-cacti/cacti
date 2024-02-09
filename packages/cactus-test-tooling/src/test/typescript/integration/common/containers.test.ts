@@ -8,7 +8,7 @@ import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
 import {
   HttpEchoContainer,
   Containers,
-} from "../../../../main/typescript/public-api";
+} from "../../../../main/typescript/public-api.js";
 
 LoggerProvider.setLogLevel("DEBUG");
 const log: Logger = LoggerProvider.getOrCreate({ label: "containers-test" });

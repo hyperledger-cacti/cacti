@@ -9,7 +9,7 @@ import {
   EthContractInvocationType,
   PluginFactoryLedgerConnector,
   Web3SigningCredentialType,
-} from "../../../../../main/typescript";
+} from "./../../../../../main/typescript/index.js";
 import { PluginImportType } from "@hyperledger/cactus-core-api";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";

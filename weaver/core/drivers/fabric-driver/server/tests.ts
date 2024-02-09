@@ -6,9 +6,9 @@
 
 import eventsPb from "@hyperledger/cacti-weaver-protos-js/common/events_pb";
 import queryPb from '@hyperledger/cacti-weaver-protos-js/common/query_pb';
-import { addEventSubscription, deleteEventSubscription, lookupEventSubscriptions } from "./events"
-import { LevelDBConnector, DBConnector, DBNotOpenError, DBKeyNotFoundError, DBLockedError } from "./dbConnector"
-import logger from './logger';
+import { addEventSubscription, deleteEventSubscription, lookupEventSubscriptions } from "./events.js"
+import { LevelDBConnector, DBConnector, DBNotOpenError, DBKeyNotFoundError, DBLockedError } from "./dbConnector.js"
+import logger from "./logger.js";
 
 // test the LevelDB basic operations
 async function dbConnectionTest(

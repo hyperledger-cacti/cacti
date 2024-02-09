@@ -5,7 +5,7 @@ import {
 import {
   IPluginLedgerConnectorXdaiOptions,
   PluginLedgerConnectorXdai,
-} from "./plugin-ledger-connector-xdai";
+} from "./plugin-ledger-connector-xdai.js";
 
 export class PluginFactoryLedgerConnector extends PluginFactory<
   PluginLedgerConnectorXdai,

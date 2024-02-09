@@ -18,8 +18,8 @@ import membership_pb from '@hyperledger/cacti-weaver-protos-js/common/membership
 import { InteroperableHelper } from '@hyperledger/cacti-weaver-sdk-fabric'
 
 // Local modules
-import { LedgerBase } from './ledgerBase';
-import { FabricConnector } from '../fabric-ledger/connector';
+import { LedgerBase } from "./ledgerBase.js";
+import { FabricConnector } from "../fabric-ledger/connector.js";
 
 // A better way to handle errors for promises
 export function handlePromise<T>(promise: Promise<T>): Promise<[T?, Error?]> {

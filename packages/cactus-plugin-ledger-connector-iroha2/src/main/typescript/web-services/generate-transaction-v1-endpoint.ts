@@ -18,8 +18,8 @@ import {
 } from "@hyperledger/cactus-core-api";
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
-import { PluginLedgerConnectorIroha2 } from "../plugin-ledger-connector-iroha2";
-import { safeStringifyException } from "../utils";
+import { PluginLedgerConnectorIroha2 } from "../plugin-ledger-connector-iroha2.js";
+import { safeStringifyException } from "../utils.js";
 
 import OAS from "../../json/openapi.json";
 

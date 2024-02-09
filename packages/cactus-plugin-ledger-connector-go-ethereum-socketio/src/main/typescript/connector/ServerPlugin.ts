@@ -21,7 +21,7 @@ import { getLogger } from "log4js";
 const logger = getLogger("ServerPlugin[" + process.pid + "]");
 logger.level = configRead("logLevel", "info");
 // utility
-import * as SplugUtil from "./PluginUtil";
+import * as SplugUtil from "./PluginUtil.js";
 // Load libraries, SDKs, etc. according to specifications of endchains as needed
 import Web3 from "web3";
 import { AbiItem } from "web3-utils";

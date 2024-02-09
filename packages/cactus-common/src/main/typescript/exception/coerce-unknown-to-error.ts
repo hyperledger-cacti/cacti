@@ -1,7 +1,7 @@
 import stringify from "fast-safe-stringify";
 import sanitizeHtml from "sanitize-html";
-import { ErrorFromUnknownThrowable } from "./error-from-unknown-throwable";
-import { ErrorFromSymbol } from "./error-from-symbol";
+import { ErrorFromUnknownThrowable } from "./error-from-unknown-throwable.js";
+import { ErrorFromSymbol } from "./error-from-symbol.js";
 
 /**
  * Safely converts `unknown` to an `Error` with doing a best effort to ensure

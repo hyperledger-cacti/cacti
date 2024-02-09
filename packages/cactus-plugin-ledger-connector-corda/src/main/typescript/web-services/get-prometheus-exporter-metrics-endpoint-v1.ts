@@ -18,7 +18,7 @@ import OAS from "../../json/openapi.json";
 
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
-import { PluginLedgerConnectorCorda } from "../plugin-ledger-connector-corda";
+import { PluginLedgerConnectorCorda } from "../plugin-ledger-connector-corda.js";
 
 export interface IGetPrometheusExporterMetricsEndpointV1Options {
   logLevel?: LogLevelDesc;

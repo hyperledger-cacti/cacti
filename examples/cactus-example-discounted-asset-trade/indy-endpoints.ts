@@ -6,7 +6,7 @@ import { Router, NextFunction, Request, Response } from "express";
 import escapeHtml from "escape-html";
 import { getLogger } from "log4js";
 import { ConfigUtil } from "@hyperledger/cactus-cmd-socketio-server";
-import { connectToClientAgent } from "./transaction-indy";
+import { connectToClientAgent } from "./transaction-indy.js";
 
 const config: any = ConfigUtil.getConfig();
 const moduleName = "indy-endpoints";

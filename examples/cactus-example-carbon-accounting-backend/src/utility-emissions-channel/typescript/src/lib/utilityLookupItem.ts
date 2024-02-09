@@ -3,8 +3,8 @@
 */
 
 import { ChaincodeStub } from "fabric-shim";
-import { State } from "../util/state";
-import { QueryResult, WorldState } from "../util/worldstate";
+import { State } from "../util/state.js";
+import { QueryResult, WorldState } from "../util/worldstate.js";
 
 /* tslint:disable:max-classes-per-file */
 

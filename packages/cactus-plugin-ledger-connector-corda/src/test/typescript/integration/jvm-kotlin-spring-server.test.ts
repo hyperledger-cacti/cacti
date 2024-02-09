@@ -19,7 +19,7 @@ import {
   FlowInvocationType,
   InvokeContractV1Request,
   JvmTypeKind,
-} from "../../../main/typescript/generated/openapi/typescript-axios/index";
+} from "../../../main/typescript/generated/openapi/typescript-axios/index.js";
 import { Configuration } from "@hyperledger/cactus-core-api";
 
 const testCase = "Tests are passing on the JVM side";

@@ -1,4 +1,4 @@
-import { IPluginObjectStore } from "./i-plugin-object-store";
+import { IPluginObjectStore } from "./i-plugin-object-store.js";
 
 export function isIPluginObjectStore(x: unknown): x is IPluginObjectStore {
   return (

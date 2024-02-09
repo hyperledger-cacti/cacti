@@ -18,7 +18,7 @@ import {
   IAsyncProvider,
 } from "@hyperledger/cactus-common";
 
-import { PluginLedgerConnectorXdai } from "../plugin-ledger-connector-xdai";
+import { PluginLedgerConnectorXdai } from "../plugin-ledger-connector-xdai.js";
 
 export interface IGetPrometheusExporterMetricsEndpointV1Options {
   connector: PluginLedgerConnectorXdai;

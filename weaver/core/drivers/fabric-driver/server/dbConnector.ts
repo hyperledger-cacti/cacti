@@ -6,8 +6,8 @@
 
 import { Level } from 'level';
 import * as path from 'path';
-import logger from './logger';
-import { delay } from './utils';
+import logger from "./logger.js";
+import { delay } from "./utils.js";
 
 /*
  * Interfaces for all database connectors to be used for event subscriptions 

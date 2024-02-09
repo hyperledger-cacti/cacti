@@ -5,10 +5,10 @@
  */
 
 import iin_agent_pb from '@hyperledger/cacti-weaver-protos-js/identity/agent_pb';
-import * as utils from '../common/utils';
-import { localAgentResponseCount, counterAttestationsMap, getSecurityDomainMapKey, securityDomainMap,  foreignAgentResponseCount} from './externalOperations';
-// import { handlePromise, getLedgerBase, getIINAgentClient, getSecurityDomainDNS, defaultCallback, delay } from '../common/utils';
-import { LedgerBase } from '../common/ledgerBase';
+import * as utils from "../common/utils.js";
+import { localAgentResponseCount, counterAttestationsMap, getSecurityDomainMapKey, securityDomainMap,  foreignAgentResponseCount} from "./externalOperations.js";
+// import { handlePromise, getLedgerBase, getIINAgentClient, getSecurityDomainDNS, defaultCallback, delay } from "../common/utils.js";
+import { LedgerBase } from "../common/ledgerBase.js";
 import { v4 as uuidv4 } from "uuid";
 
 

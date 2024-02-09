@@ -18,7 +18,7 @@ import {
   Iroha2TestLedger,
   pruneDockerAllIfGithubAction,
   IROHA2_TEST_LEDGER_DEFAULT_OPTIONS,
-} from "../../../../../main/typescript/index";
+} from "../../../../../main/typescript/index.js";
 
 import {
   LogLevelDesc,

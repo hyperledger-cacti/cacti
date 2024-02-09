@@ -27,7 +27,7 @@ const log: Logger = LoggerProvider.getOrCreate({
 
 // Mock ledger data
 jest.mock("fs");
-import { LPInfoHolder } from "../../../main/typescript/routing-interface/util/LPInfoHolder";
+import { LPInfoHolder } from "../../../main/typescript/routing-interface/util/LPInfoHolder.js";
 jest.mock("../../../main/typescript/routing-interface/util/LPInfoHolder");
 const mockLedgerData = "{mockLedgerData}"
 const mockGetLegerPluginInfo = jest.fn().mockReturnValue(mockLedgerData);
@@ -38,11 +38,11 @@ const mockGetLegerPluginInfo = jest.fn().mockReturnValue(mockLedgerData);
 });
 
 // Mock Verifier
-import { Verifier } from "../../../main/typescript/verifier/Verifier";
+import { Verifier } from "../../../main/typescript/verifier/Verifier.js";
 jest.mock("../../../main/typescript/verifier/Verifier");
 
-import { VerifierFactory } from "../../../main/typescript/verifier/VerifierFactory";
-import { IVerifierEventListener } from "../../../main/typescript/verifier/LedgerPlugin";
+import { VerifierFactory } from "../../../main/typescript/verifier/VerifierFactory.js";
+import { IVerifierEventListener } from "../../../main/typescript/verifier/LedgerPlugin.js";
 
 //////////////////////////
 // UNIT TESTS

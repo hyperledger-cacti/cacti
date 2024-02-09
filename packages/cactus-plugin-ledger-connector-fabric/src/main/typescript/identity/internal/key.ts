@@ -1,6 +1,6 @@
 import { ICryptoKey } from "fabric-common";
-import { InternalIdentityClient } from "./client";
-import { CryptoUtil } from "./crypto-util";
+import { InternalIdentityClient } from "./client.js";
+import { CryptoUtil } from "./crypto-util.js";
 
 // internal class used by cryptoSuite, this is just to support interface provided by
 // fabric-sdk-node

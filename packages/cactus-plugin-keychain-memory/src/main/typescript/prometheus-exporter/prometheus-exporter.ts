@@ -1,8 +1,8 @@
 import promClient, { Registry } from "prom-client";
-import { KeyCount } from "./response.type";
-import { collectMetrics } from "./data-fetcher";
-import { K_CACTUS_KEYCHAIN_MEMORY_TOTAL_KEY_COUNT } from "./metrics";
-import { totalKeyCount } from "./metrics";
+import { KeyCount } from "./response.type.js";
+import { collectMetrics } from "./data-fetcher.js";
+import { K_CACTUS_KEYCHAIN_MEMORY_TOTAL_KEY_COUNT } from "./metrics.js";
+import { totalKeyCount } from "./metrics.js";
 
 export interface IPrometheusExporterOptions {
   pollingIntervalInMin?: number;

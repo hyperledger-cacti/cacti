@@ -1,6 +1,6 @@
-import { Transactions } from "./response.type";
+import { Transactions } from "./response.type.js";
 
-import { totalTxCount, K_CACTUS_IROHA_TOTAL_TX_COUNT } from "./metrics";
+import { totalTxCount, K_CACTUS_IROHA_TOTAL_TX_COUNT } from "./metrics.js";
 
 export async function collectMetrics(
   transactions: Transactions,

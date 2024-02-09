@@ -9,7 +9,7 @@ import {
   WatchBlocksV1Progress,
   WatchBlocksV1,
   WatchBlocksV1BlockData,
-} from "../generated/openapi/typescript-axios";
+} from "./../generated/openapi/typescript-axios/index.js";
 import { Socket as SocketIoSocket } from "socket.io";
 import Web3 from "web3";
 

@@ -1,4 +1,4 @@
-import { ICactusPlugin } from "../i-cactus-plugin";
+import { ICactusPlugin } from "../i-cactus-plugin.js";
 
 /**
  * Common interface to be implemented by classes that act as plugins behind

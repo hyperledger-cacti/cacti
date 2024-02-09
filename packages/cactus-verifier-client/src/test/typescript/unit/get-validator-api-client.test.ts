@@ -2,7 +2,7 @@
 
 import "jest-extended";
 
-import { getValidatorApiClient } from "../../../main/typescript/get-validator-api-client";
+import { getValidatorApiClient } from "../../../main/typescript/get-validator-api-client.js";
 
 import { SocketIOApiClientOptions } from "@hyperledger/cactus-api-client";
 import { BesuApiClientOptions } from "@hyperledger/cactus-plugin-ledger-connector-besu";

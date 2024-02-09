@@ -9,7 +9,7 @@ import {
   PluginFactoryLedgerConnector,
   Web3SigningCredentialCactusKeychainRef,
   ReceiptType,
-} from "../../../../../main/typescript/public-api";
+} from "../../../../../main/typescript/public-api.js";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import { BesuTestLedger } from "@hyperledger/cactus-test-tooling";
 import { LogLevelDesc } from "@hyperledger/cactus-common";

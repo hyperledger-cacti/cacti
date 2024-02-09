@@ -5,7 +5,7 @@ import {
   LogLevelDesc,
   LoggerProvider,
 } from "@hyperledger/cactus-common";
-import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
+import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter.js";
 import { v4 as uuidV4 } from "uuid";
 import type { AxiosResponse } from "axios";
 import fetch from "node-fetch";
@@ -15,7 +15,7 @@ import path from "path";
 import type { Response } from "node-fetch";
 import OAS from "../json/openapi.json";
 
-import { NETWORK_TYPE, PROTOCOL_TYPE } from "./helpers/api-parameters";
+import { NETWORK_TYPE, PROTOCOL_TYPE } from "./helpers/api-parameters.js";
 import {
   ConsensusAlgorithmFamily,
   ICactusPlugin,
@@ -23,7 +23,7 @@ import {
   IPluginWebService,
   IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
-import { GetTransactionsByAddressEndpoint } from "./endpoints/transaction/get-transactions-endpoint";
+import { GetTransactionsByAddressEndpoint } from "./endpoints/transaction/get-transactions-endpoint.js";
 import {
   UbiquityClient,
   TxPage,

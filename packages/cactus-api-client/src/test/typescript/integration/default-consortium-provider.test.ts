@@ -4,7 +4,7 @@ import test, { Test } from "tape";
 
 import { DefaultApi as ConsortiumManualApi } from "@hyperledger/cactus-plugin-consortium-manual";
 import { LogLevelDesc, Servers } from "@hyperledger/cactus-common";
-import { DefaultConsortiumProvider } from "../../../main/typescript";
+import { DefaultConsortiumProvider } from "./../../../main/typescript/index.js";
 import { Configuration } from "@hyperledger/cactus-core-api";
 
 test("Reports failures with meaningful information", async (t: Test) => {

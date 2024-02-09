@@ -1,24 +1,24 @@
 import { v4 as uuidv4 } from "uuid";
 import "jest-extended";
 import { v4 as uuidV4 } from "uuid";
-import { PluginSatpGateway } from "../../../../main/typescript/gateway/plugin-satp-gateway";
+import { PluginSatpGateway } from "../../../../main/typescript/gateway/plugin-satp-gateway.js";
 
 import {
   RecoverUpdateAckV1Message,
   SessionData,
-} from "../../../../main/typescript/public-api";
+} from "../../../../main/typescript/public-api.js";
 import { randomInt } from "crypto";
-import { checkValidRecoverUpdateAckMessage } from "../../../../main/typescript/gateway/recovery/recover-update-ack";
-import { BesuSatpGateway } from "../../../../main/typescript/gateway/besu-satp-gateway";
-import { FabricSatpGateway } from "../../../../main/typescript/gateway/fabric-satp-gateway";
-import { ClientGatewayHelper } from "../../../../main/typescript/gateway/client/client-helper";
-import { ServerGatewayHelper } from "../../../../main/typescript/gateway/server/server-helper";
+import { checkValidRecoverUpdateAckMessage } from "../../../../main/typescript/gateway/recovery/recover-update-ack.js";
+import { BesuSatpGateway } from "../../../../main/typescript/gateway/besu-satp-gateway.js";
+import { FabricSatpGateway } from "../../../../main/typescript/gateway/fabric-satp-gateway.js";
+import { ClientGatewayHelper } from "../../../../main/typescript/gateway/client/client-helper.js";
+import { ServerGatewayHelper } from "../../../../main/typescript/gateway/server/server-helper.js";
 
 import {
   knexClientConnection,
   knexRemoteConnection,
   knexServerConnection,
-} from "../../knex.config";
+} from "../../knex.config.js";
 
 let pluginSourceGateway: PluginSatpGateway;
 let pluginRecipientGateway: PluginSatpGateway;

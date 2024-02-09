@@ -5,7 +5,7 @@ import {
 import {
   IPluginLedgerConnectorSawtoothOptions,
   PluginLedgerConnectorSawtooth,
-} from "./plugin-ledger-connector-sawtooth";
+} from "./plugin-ledger-connector-sawtooth.js";
 
 export class PluginFactoryLedgerConnector extends PluginFactory<
   PluginLedgerConnectorSawtooth,

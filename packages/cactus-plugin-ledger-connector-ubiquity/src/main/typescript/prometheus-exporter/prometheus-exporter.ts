@@ -1,6 +1,9 @@
 import promClient, { Registry } from "prom-client";
-import { Calls } from "./response.type";
-import { totalTxCount, K_CACTUS_UBIQUITY_TOTAL_METHOD_CALLS } from "./metrics";
+import { Calls } from "./response.type.js";
+import {
+  totalTxCount,
+  K_CACTUS_UBIQUITY_TOTAL_METHOD_CALLS,
+} from "./metrics.js";
 
 export interface IPrometheusExporterOptions {
   pollingIntervalInMin?: number;

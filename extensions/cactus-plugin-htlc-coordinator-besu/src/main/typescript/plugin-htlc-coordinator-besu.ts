@@ -36,15 +36,15 @@ import {
   WithdrawReq,
 } from "@hyperledger/cactus-plugin-htlc-eth-besu";
 import { PluginLedgerConnectorBesu } from "@hyperledger/cactus-plugin-ledger-connector-besu";
-import { OwnHTLCEndpoint } from "./web-services/own-htlc-endpoint";
-import { CounterpartyHTLCEndpoint } from "./web-services/counterparty-htlc-endpoint";
-import { WithdrawCounterpartyEndpoint } from "./web-services/withdraw-counterparty-endpoint";
+import { OwnHTLCEndpoint } from "./web-services/own-htlc-endpoint.js";
+import { CounterpartyHTLCEndpoint } from "./web-services/counterparty-htlc-endpoint.js";
+import { WithdrawCounterpartyEndpoint } from "./web-services/withdraw-counterparty-endpoint.js";
 import {
   OwnHTLCRequest,
   CounterpartyHTLCRequest,
   WithdrawCounterpartyRequest,
   HtlcPackage,
-} from "./generated/openapi/typescript-axios";
+} from "./generated/openapi/typescript-axios/index.js";
 
 export interface IPluginHTLCCoordinatorBesuOptions
   extends ICactusPluginOptions {

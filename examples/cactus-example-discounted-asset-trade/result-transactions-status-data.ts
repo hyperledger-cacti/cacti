@@ -5,7 +5,7 @@
  * result-transactions-status-data.ts
  */
 
-import { TransactionStatus } from "./transaction-status";
+import { TransactionStatus } from "./transaction-status.js";
 
 export class ResultTransactionStatusData {
   stateInfo: number | undefined;

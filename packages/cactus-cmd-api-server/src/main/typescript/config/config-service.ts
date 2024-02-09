@@ -18,10 +18,10 @@ import {
   PluginImportAction,
 } from "@hyperledger/cactus-core-api";
 
-import { FORMAT_PLUGIN_ARRAY } from "./convict-plugin-array-format";
-import { SelfSignedPkiGenerator, IPki } from "./self-signed-pki-generator";
-import { AuthorizationProtocol } from "./authorization-protocol";
-import { IAuthorizationConfig } from "../authzn/i-authorization-config";
+import { FORMAT_PLUGIN_ARRAY } from "./convict-plugin-array-format.js";
+import { SelfSignedPkiGenerator, IPki } from "./self-signed-pki-generator.js";
+import { AuthorizationProtocol } from "./authorization-protocol.js";
+import { IAuthorizationConfig } from "../authzn/i-authorization-config.js";
 
 convict.addFormat(FORMAT_PLUGIN_ARRAY);
 convict.addFormat(ipaddress);

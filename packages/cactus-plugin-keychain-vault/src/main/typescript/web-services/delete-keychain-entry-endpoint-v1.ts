@@ -15,8 +15,8 @@ import {
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
 import OAS from "../../json/openapi.json";
-import { PluginKeychainVault } from "../plugin-keychain-vault";
-import { DeleteKeychainEntryResponseV1 } from "../generated/openapi/typescript-axios";
+import { PluginKeychainVault } from "../plugin-keychain-vault.js";
+import { DeleteKeychainEntryResponseV1 } from "./../generated/openapi/typescript-axios/index.js";
 
 export interface IDeleteKeychainEntryEndpointV1Options {
   logLevel?: LogLevelDesc;

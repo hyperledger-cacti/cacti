@@ -5,8 +5,8 @@
  */
 
 import { GluegunCommand } from 'gluegun'
-import { getNetworkConfig, commandHelp } from '../../helper/helper'
-import { getContractInstance } from '../../helper/besu-functions'
+import { getNetworkConfig, commandHelp } from "../../helper/helper.js"
+import { getContractInstance } from "../../helper/besu-functions.js"
 const Web3 = require ("web3")
 
 const command: GluegunCommand = {

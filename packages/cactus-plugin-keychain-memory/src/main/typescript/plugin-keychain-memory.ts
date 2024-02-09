@@ -13,14 +13,14 @@ import {
 
 import OAS from "../json/openapi.json";
 
-import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
+import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter.js";
 import { Express } from "express";
 
-import { GetPrometheusExporterMetricsEndpointV1 } from "./get-prometheus-exporter-metrics/get-prometheus-exporter-metrics-endpoint-v1";
-import { SetKeychainEntryV1Endpoint } from "./web-services/set-keychain-entry-endpoint-v1";
-import { GetKeychainEntryV1Endpoint } from "./web-services/get-keychain-entry-endpoint-v1";
-import { DeleteKeychainEntryV1Endpoint } from "./web-services/delete-keychain-entry-endpoint-v1";
-import { HasKeychainEntryV1Endpoint } from "./web-services/has-keychain-entry-endpoint-v1";
+import { GetPrometheusExporterMetricsEndpointV1 } from "./get-prometheus-exporter-metrics/get-prometheus-exporter-metrics-endpoint-v1.js";
+import { SetKeychainEntryV1Endpoint } from "./web-services/set-keychain-entry-endpoint-v1.js";
+import { GetKeychainEntryV1Endpoint } from "./web-services/get-keychain-entry-endpoint-v1.js";
+import { DeleteKeychainEntryV1Endpoint } from "./web-services/delete-keychain-entry-endpoint-v1.js";
+import { HasKeychainEntryV1Endpoint } from "./web-services/has-keychain-entry-endpoint-v1.js";
 
 export interface IPluginKeychainMemoryOptions extends ICactusPluginOptions {
   logLevel?: LogLevelDesc;

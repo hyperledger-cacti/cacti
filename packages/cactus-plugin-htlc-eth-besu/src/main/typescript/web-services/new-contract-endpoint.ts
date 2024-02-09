@@ -12,8 +12,8 @@ import {
   IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
-import { NewContractObj } from "../generated/openapi/typescript-axios/api";
-import { PluginHtlcEthBesu } from "../plugin-htlc-eth-besu";
+import { NewContractObj } from "../generated/openapi/typescript-axios/api.js";
+import { PluginHtlcEthBesu } from "../plugin-htlc-eth-besu.js";
 import OAS from "../../json/openapi.json";
 export interface INewContractEndpointOptions {
   logLevel?: LogLevelDesc;

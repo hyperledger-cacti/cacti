@@ -5,7 +5,7 @@ import {
 import {
   IPluginLedgerConnectorIrohaOptions,
   PluginLedgerConnectorIroha,
-} from "./plugin-ledger-connector-iroha";
+} from "./plugin-ledger-connector-iroha.js";
 
 export class PluginFactoryLedgerConnector extends PluginFactory<
   PluginLedgerConnectorIroha,

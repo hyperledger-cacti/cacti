@@ -7,10 +7,10 @@ import {
   isBesuAssetReference,
   lockBesuAssetReference,
   resetBesu,
-} from "../besu-helper";
+} from "../besu-helper.js";
 import AssetReferenceContractJson from "../../../../solidity/asset-reference-contract/AssetReferenceContract.json";
 import CBDCcontractJson from "../../../../solidity/cbdc-erc-20/CBDCcontract.json";
-import { getEthAddress, getPrvKey } from "./common";
+import { getEthAddress, getPrvKey } from "./common.js";
 
 const BESU_CONTRACT_CBDC_ERC20_NAME = CBDCcontractJson.contractName;
 const BESU_CONTRACT_ASSET_REF_NAME = AssetReferenceContractJson.contractName;

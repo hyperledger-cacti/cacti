@@ -10,8 +10,8 @@ import {
   LoggerProvider,
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
-import { ITestLedger } from "../i-test-ledger";
-import { Containers } from "../common/containers";
+import { ITestLedger } from "../i-test-ledger.js";
+import { Containers } from "../common/containers.js";
 import { v4 as internalIpV4 } from "internal-ip";
 
 /**

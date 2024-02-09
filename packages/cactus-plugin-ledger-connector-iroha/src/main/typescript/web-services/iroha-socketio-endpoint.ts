@@ -6,16 +6,16 @@ import {
   RunTransactionRequestV1,
   IrohaCommand,
   IrohaBaseConfig,
-} from "../generated/openapi/typescript-axios";
+} from "./../generated/openapi/typescript-axios/index.js";
 import {
   WatchBlocksV1,
   IrohaQuery,
-} from "../generated/openapi/typescript-axios";
+} from "./../generated/openapi/typescript-axios/index.js";
 
 import {
   IrohaTransactionWrapper,
   IIrohaTransactionWrapperOptions,
-} from "../iroha-transaction-wrapper";
+} from "../iroha-transaction-wrapper.js";
 export interface IIrohaSocketIOEndpoint {
   logLevel?: LogLevelDesc;
   socket: SocketIoSocket;

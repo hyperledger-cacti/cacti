@@ -1,1 +1,1 @@
-export { runStressTest } from "./verifier-with-go-eth-stress-check";
+export { runStressTest } from "./verifier-with-go-eth-stress-check.js";

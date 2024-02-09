@@ -59,10 +59,10 @@ import Web3, {
 import { Web3Account } from "web3-eth-accounts";
 import { checkAddressCheckSum } from "web3-validator";
 
-import DatabaseClient from "../../../main/typescript/db-client/db-client";
+import DatabaseClient from "../../../main/typescript/db-client/db-client.js";
 jest.mock("../../../main/typescript/db-client/db-client");
 const DatabaseClientMock = DatabaseClient as unknown as jest.Mock;
-import { PluginPersistenceEthereum } from "../../../main/typescript";
+import { PluginPersistenceEthereum } from "./../../../main/typescript/index.js";
 import TestERC20ContractJson from "../../solidity/TestERC20.json";
 import TestERC721ContractJson from "../../solidity/TestERC721.json";
 

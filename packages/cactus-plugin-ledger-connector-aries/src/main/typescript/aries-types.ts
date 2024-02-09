@@ -31,7 +31,7 @@ import {
   AgentConnectionsFilterV1,
   CactiAcceptPolicyV1,
   CactiProofRequestAttributeV1,
-} from "./public-api";
+} from "./public-api.js";
 
 /**
  * Aries JS Agent with Anoncreds/Indy/Askar modules configured.

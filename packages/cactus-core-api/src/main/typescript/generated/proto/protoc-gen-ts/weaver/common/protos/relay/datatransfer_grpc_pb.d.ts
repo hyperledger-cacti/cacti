@@ -5,10 +5,10 @@
 /* eslint-disable */
 
 import * as grpc from "@grpc/grpc-js";
-import * as relay_datatransfer_pb from "../relay/datatransfer_pb";
-import * as common_ack_pb from "../common/ack_pb";
-import * as common_state_pb from "../common/state_pb";
-import * as common_query_pb from "../common/query_pb";
+import * as relay_datatransfer_pb from "../relay/datatransfer_pb.js";
+import * as common_ack_pb from "../common/ack_pb.js";
+import * as common_state_pb from "../common/state_pb.js";
+import * as common_query_pb from "../common/query_pb.js";
 
 interface IDataTransferService extends grpc.ServiceDefinition<grpc.UntypedServiceImplementation> {
     requestState: IDataTransferService_IRequestState;

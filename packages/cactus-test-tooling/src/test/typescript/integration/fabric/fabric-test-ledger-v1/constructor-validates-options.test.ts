@@ -1,5 +1,5 @@
 import test, { Test } from "tape";
-import { FabricTestLedgerV1 } from "../../../../../main/typescript/public-api";
+import { FabricTestLedgerV1 } from "../../../../../main/typescript/public-api.js";
 
 test("FabricTestLedgerV1#constructor()", (t: Test) => {
   t.ok(FabricTestLedgerV1, "Importing FabricTestLedgerV1 class OK");

@@ -1,4 +1,4 @@
-import { IRemoteLog, ILocalLog } from "../../plugin-satp-gateway";
+import { IRemoteLog, ILocalLog } from "../../plugin-satp-gateway.js";
 
 export interface IRepository<T, K> {
   readById(id: K): Promise<T>;

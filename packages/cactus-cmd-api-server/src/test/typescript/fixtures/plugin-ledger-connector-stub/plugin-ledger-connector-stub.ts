@@ -21,9 +21,9 @@ import {
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
 
-import { DeployContractEndpoint } from "./web-services/deploy-contract-endpoint";
-import { RunTransactionEndpoint } from "./web-services/run-transaction-endpoint";
-import { UnprotectedActionEndpoint } from "./web-services/unprotected-action-endpoint";
+import { DeployContractEndpoint } from "./web-services/deploy-contract-endpoint.js";
+import { RunTransactionEndpoint } from "./web-services/run-transaction-endpoint.js";
+import { UnprotectedActionEndpoint } from "./web-services/unprotected-action-endpoint.js";
 
 export interface IPluginLedgerConnectorStubOptions
   extends ICactusPluginOptions {

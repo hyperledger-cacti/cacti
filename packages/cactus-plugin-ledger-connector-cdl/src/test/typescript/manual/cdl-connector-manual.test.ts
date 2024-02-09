@@ -61,7 +61,7 @@ import {
   SearchLineageRequestV1,
   SearchLineageTypeV1,
   TrailEventDetailsV1,
-} from "../../../main/typescript/index";
+} from "../../../main/typescript/index.js";
 
 // Logger setup
 const log: Logger = LoggerProvider.getOrCreate({

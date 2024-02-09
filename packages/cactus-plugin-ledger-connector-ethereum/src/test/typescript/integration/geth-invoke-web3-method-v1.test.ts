@@ -33,7 +33,7 @@ import {
   WHALE_ACCOUNT_ADDRESS,
 } from "@hyperledger/cactus-test-geth-ledger";
 
-import { PluginLedgerConnectorEthereum } from "../../../main/typescript/index";
+import { PluginLedgerConnectorEthereum } from "../../../main/typescript/index.js";
 
 // Unit Test logger setup
 const log: Logger = LoggerProvider.getOrCreate({

@@ -5,7 +5,7 @@
  * VerifierAuthentication.ts
  */
 
-import { ConfigUtil } from "../routing-interface/util/ConfigUtil";
+import { ConfigUtil } from "../routing-interface/util/ConfigUtil.js";
 const fs = require("fs");
 const path = require("path");
 const config: any = ConfigUtil.getConfig();

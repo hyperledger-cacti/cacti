@@ -10,7 +10,7 @@ import {
   IrohaQuery,
   RunTransactionRequestV1,
   RunTransactionResponse,
-} from "./generated/openapi/typescript-axios";
+} from "./generated/openapi/typescript-axios/index.js";
 
 import { RuntimeError } from "run-time-error-cjs";
 import * as grpc from "@grpc/grpc-js";

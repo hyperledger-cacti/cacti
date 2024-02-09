@@ -5,7 +5,7 @@ import {
 import {
   IPluginLedgerConnectorQuorumOptions,
   PluginLedgerConnectorQuorum,
-} from "./plugin-ledger-connector-quorum";
+} from "./plugin-ledger-connector-quorum.js";
 
 export class PluginFactoryLedgerConnector extends PluginFactory<
   PluginLedgerConnectorQuorum,

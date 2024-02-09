@@ -37,12 +37,12 @@ import { PluginRegistry } from "@hyperledger/cactus-core";
 import AssetReferenceContractJson from "../../../solidity/asset-reference-contract/AssetReferenceContract.json";
 import CBDCcontractJson from "../../../solidity/cbdc-erc-20/CBDCcontract.json";
 import { IKeyPair } from "@hyperledger/cactus-plugin-satp-hermes";
-import { FabricSatpGateway } from "../satp-extension/fabric-satp-gateway";
-import { BesuSatpGateway } from "../satp-extension/besu-satp-gateway";
+import { FabricSatpGateway } from "../satp-extension/fabric-satp-gateway.js";
+import { BesuSatpGateway } from "../satp-extension/besu-satp-gateway.js";
 import { PluginImportType } from "@hyperledger/cactus-core-api";
 import CryptoMaterial from "../../../crypto-material/crypto-material.json";
-import { ClientHelper } from "../satp-extension/client-helper";
-import { ServerHelper } from "../satp-extension/server-helper";
+import { ClientHelper } from "../satp-extension/client-helper.js";
+import { ServerHelper } from "../satp-extension/server-helper.js";
 
 export interface ICbdcBridgingAppDummyInfrastructureOptions {
   logLevel?: LogLevelDesc;

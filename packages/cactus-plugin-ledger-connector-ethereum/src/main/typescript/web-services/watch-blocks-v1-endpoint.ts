@@ -20,11 +20,11 @@ import {
   WatchBlocksV1Progress,
   WatchBlocksV1,
   Web3Transaction,
-} from "../generated/openapi/typescript-axios";
+} from "./../generated/openapi/typescript-axios/index.js";
 import {
   ConvertWeb3ReturnToString,
   Web3StringReturnFormat,
-} from "../types/util-types";
+} from "../types/util-types.js";
 
 const DEFAULT_HTTP_POLL_INTERVAL = 1000 * 5; // 5 seconds
 const LAST_SEEN_LATEST_BLOCK = -1; // must be negative number, will be replaced with latest block in code

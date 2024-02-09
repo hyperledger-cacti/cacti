@@ -18,7 +18,7 @@ import OAS from "../../json/openapi.json";
 
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
-import { PluginKeychainVault } from "../plugin-keychain-vault";
+import { PluginKeychainVault } from "../plugin-keychain-vault.js";
 
 export interface IGetPrometheusExporterMetricsEndpointV1Options {
   logLevel?: LogLevelDesc;

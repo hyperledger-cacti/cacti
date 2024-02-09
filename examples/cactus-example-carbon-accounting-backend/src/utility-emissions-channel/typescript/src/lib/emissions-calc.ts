@@ -2,8 +2,8 @@
     SPDX-License-Identifier: Apache-2.0
 */
 
-import { ErrInvalidDateFormat, ErrUnknownUOM } from "../util/const";
-import { UtilityEmissionsFactorInterface } from "./utilityEmissionsFactor";
+import { ErrInvalidDateFormat, ErrUnknownUOM } from "../util/const.js";
+import { UtilityEmissionsFactorInterface } from "./utilityEmissionsFactor.js";
 
 //
 const UOM_FACTORS: { [key: string]: number } = {

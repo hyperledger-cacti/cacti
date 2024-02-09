@@ -1,7 +1,7 @@
 import { NgModule } from "@angular/core";
 import { Routes, RouterModule } from "@angular/router";
 
-import { BambooHarvestListPage } from "./bamboo-harvest-list/bamboo-harvest-list.page";
+import { BambooHarvestListPage } from "./bamboo-harvest-list/bamboo-harvest-list.page.js";
 
 const routes: Routes = [
   {

@@ -25,7 +25,7 @@ import {
   RunTransactionResponseType,
 } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
 
-import PostgresDatabaseClient from "./db-client/db-client";
+import PostgresDatabaseClient from "./db-client/db-client.js";
 
 import OAS from "../json/openapi.json";
 
@@ -36,7 +36,7 @@ import {
   getStatusReturn,
   InsertBlockDataEntryInterface,
   InsertDetailedTransactionEntryInterface,
-} from "./types";
+} from "./types.js";
 
 export interface IPluginPersistenceFabricOptions extends ICactusPluginOptions {
   gatewayOptions: GatewayOptions;

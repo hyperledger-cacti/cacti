@@ -1,19 +1,19 @@
 import { ChaincodeResponse, ChaincodeStub, Shim } from "fabric-shim";
-import { EmissionsRecordInterface } from "./lib/emissions";
+import { EmissionsRecordInterface } from "./lib/emissions.js";
 
-import { EmissionsRecordContract } from "./lib/emissionsRecordContract";
-import { UtilityEmissionsFactorInterface } from "./lib/utilityEmissionsFactor";
+import { EmissionsRecordContract } from "./lib/emissionsRecordContract.js";
+import { UtilityEmissionsFactorInterface } from "./lib/utilityEmissionsFactor.js";
 import {
   DivisionsInterface,
   UtilityLookupItemInterface,
-} from "./lib/utilityLookupItem";
+} from "./lib/utilityLookupItem.js";
 import {
   ErrInvalidArgument,
   ErrInvalidNumberOfArgument,
   ErrMethodNotSupported,
   MsgSuccess,
-} from "./util/const";
-import { logger, stringToBytes } from "./util/util";
+} from "./util/const.js";
+import { logger, stringToBytes } from "./util/util.js";
 
 export class EmissionsChaincode {
   private methods: {

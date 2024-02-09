@@ -18,7 +18,7 @@ import {
   IAsyncProvider,
 } from "@hyperledger/cactus-common";
 
-import { PluginLedgerConnectorBesu } from "../plugin-ledger-connector-besu";
+import { PluginLedgerConnectorBesu } from "../plugin-ledger-connector-besu.js";
 
 export interface IGetPrometheusExporterMetricsEndpointV1Options {
   connector: PluginLedgerConnectorBesu;

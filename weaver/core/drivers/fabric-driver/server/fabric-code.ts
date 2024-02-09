@@ -14,8 +14,8 @@ import proposalResponse from '@hyperledger/cacti-weaver-protos-js/peer/proposal_
 import interopPayload from '@hyperledger/cacti-weaver-protos-js/common/interop_payload_pb';
 import state_pb from '@hyperledger/cacti-weaver-protos-js/common/state_pb';
 import { Certificate } from '@fidm/x509';
-import { getConfig } from './walletSetup';
-import logger from './logger';
+import { getConfig } from "./walletSetup.js";
+import logger from "./logger.js";
 
 const parseAddress = (address: string) => {
     const addressList = address.split('/');

@@ -9,7 +9,10 @@ import {
   VaultTestServer,
 } from "@hyperledger/cactus-test-tooling";
 
-import { Configuration, DefaultApi } from "../../../main/typescript/public-api";
+import {
+  Configuration,
+  DefaultApi,
+} from "../../../main/typescript/public-api.js";
 
 test("NodeJS API client + Rust plugin works together", async (tMain: Test) => {
   const vaultTestContainer = new VaultTestServer({});

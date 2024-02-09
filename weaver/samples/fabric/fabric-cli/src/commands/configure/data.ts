@@ -5,7 +5,7 @@
  */
 
 import { GluegunCommand } from 'gluegun'
-import { commandHelp, addData, getNetworkConfig } from '../../helpers/helpers'
+import { commandHelp, addData, getNetworkConfig } from "../../helpers/helpers.js"
 
 const command: GluegunCommand = {
   name: 'data',

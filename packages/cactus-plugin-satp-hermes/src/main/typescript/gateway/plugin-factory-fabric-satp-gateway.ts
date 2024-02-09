@@ -5,7 +5,7 @@ import {
 import {
   IFabricSatpGatewayConstructorOptions,
   FabricSatpGateway,
-} from "./fabric-satp-gateway";
+} from "./fabric-satp-gateway.js";
 
 export class PluginFactoryFabricSatpGateway extends PluginFactory<
   FabricSatpGateway,

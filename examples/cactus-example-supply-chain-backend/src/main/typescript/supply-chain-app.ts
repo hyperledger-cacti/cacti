@@ -63,7 +63,7 @@ import {
 import {
   SupplyChainAppDummyInfrastructure,
   org1Env,
-} from "./infrastructure/supply-chain-app-dummy-infrastructure";
+} from "./infrastructure/supply-chain-app-dummy-infrastructure.js";
 import {
   Configuration,
   DefaultApi as SupplyChainApi,

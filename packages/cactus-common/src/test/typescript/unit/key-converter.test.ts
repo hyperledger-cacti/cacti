@@ -5,12 +5,12 @@ import KeyEncoder from "key-encoder";
 import {
   JsObjectSigner,
   Secp256k1Keys,
-} from "../../../main/typescript/public-api";
+} from "../../../main/typescript/public-api.js";
 
 import {
   KeyConverter,
   KeyFormat,
-} from "../../../main/typescript/key-converter";
+} from "../../../main/typescript/key-converter.js";
 
 test.skip("Test Public Raw key conversion", async (assert: Test) => {
   const keyConverter = new KeyConverter();

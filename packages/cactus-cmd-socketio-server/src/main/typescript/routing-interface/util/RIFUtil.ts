@@ -5,7 +5,7 @@
  * RIFUtil.ts
  */
 
-import { ConfigUtil } from "./ConfigUtil";
+import { ConfigUtil } from "./ConfigUtil.js";
 
 const fs = require("fs");
 const path = require("path");

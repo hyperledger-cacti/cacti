@@ -5,10 +5,10 @@
  */
 
 import { GluegunCommand } from 'gluegun'
-import { fabricHelper, getKeyAndCertForRemoteRequestbyUserName } from '../../helpers/fabric-functions'
-import logger from '../../helpers/logger'
+import { fabricHelper, getKeyAndCertForRemoteRequestbyUserName } from "../../helpers/fabric-functions.js"
+import logger from "../../helpers/logger.js"
 import { Utils, ICryptoKey } from 'fabric-common'
-import { commandHelp, getNetworkConfig, handlePromise } from '../../helpers/helpers'
+import { commandHelp, getNetworkConfig, handlePromise } from "../../helpers/helpers.js"
 import { EventsManager } from '@hyperledger/cacti-weaver-sdk-fabric'
 import { EventSubscriptionState, EventType } from "@hyperledger/cacti-weaver-protos-js/common/events_pb";
 import * as fs from 'fs'

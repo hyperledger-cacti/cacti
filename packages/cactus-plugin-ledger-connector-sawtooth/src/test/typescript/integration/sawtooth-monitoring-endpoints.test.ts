@@ -31,7 +31,7 @@ import {
   SawtoothApiClient,
   WatchBlocksV1ListenerType,
   WatchBlocksV1Progress,
-} from "../../../main/typescript/public-api";
+} from "../../../main/typescript/public-api.js";
 
 //////////////////////////////////
 // Constants

@@ -5,7 +5,7 @@ import {
   AuthorizationProtocol,
   ConfigService,
   IAuthorizationConfig,
-} from "../../../main/typescript/public-api";
+} from "../../../main/typescript/public-api.js";
 import {
   IJoseFittingJwtParams,
   LogLevelDesc,
@@ -19,9 +19,9 @@ import { SignJWT, exportSPKI, generateKeyPair } from "jose";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
 
-import { default_service, empty } from "../../../main/typescript/public-api";
+import { default_service, empty } from "../../../main/typescript/public-api.js";
 import * as grpc from "@grpc/grpc-js";
-import { GrpcServerApiServer } from "../../../main/typescript/web-services/grpc/grpc-server-api-server";
+import { GrpcServerApiServer } from "../../../main/typescript/web-services/grpc/grpc-server-api-server.js";
 import { RuntimeError } from "run-time-error-cjs";
 
 describe("cmd-api-server:getOpenApiSpecV1Endpoint", () => {

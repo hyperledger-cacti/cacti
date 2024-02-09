@@ -15,7 +15,7 @@ import {
 import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 
 import OAS from "../../json/openapi.json";
-import { PluginKeychainGoogleSm } from "../plugin-keychain-google-sm";
+import { PluginKeychainGoogleSm } from "../plugin-keychain-google-sm.js";
 
 export interface IHasKeychainEntryEndpointOptions {
   logLevel?: LogLevelDesc;

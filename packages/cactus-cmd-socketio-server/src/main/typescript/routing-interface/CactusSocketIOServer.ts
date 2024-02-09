@@ -11,15 +11,15 @@
  * Module dependencies.
  */
 
-import { app, runExpressApp } from "../business-logic-plugin/app";
+import { app, runExpressApp } from "../business-logic-plugin/app.js";
 import debugModule = require("debug");
 import http = require("http");
-import { ConfigUtil } from "./util/ConfigUtil";
+import { ConfigUtil } from "./util/ConfigUtil.js";
 
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
-import { BusinessLogicPlugin } from "../business-logic-plugin/BusinessLogicPlugin";
-import { setTargetBLPInstance } from "../business-logic-plugin/BLP_config";
+import { BusinessLogicPlugin } from "../business-logic-plugin/BusinessLogicPlugin.js";
+import { setTargetBLPInstance } from "../business-logic-plugin/BLP_config.js";
 const moduleName = "www";
 const logger = getLogger(`${moduleName}`);
 logger.level = config.logLevel;

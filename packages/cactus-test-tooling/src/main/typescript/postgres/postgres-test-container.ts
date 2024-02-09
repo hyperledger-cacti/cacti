@@ -8,9 +8,9 @@ import {
   LoggerProvider,
   Bools,
 } from "@hyperledger/cactus-common";
-import { ITestLedger } from "../i-test-ledger";
-import { Streams } from "../common/streams";
-import { Containers } from "../common/containers";
+import { ITestLedger } from "../i-test-ledger.js";
+import { Streams } from "../common/streams.js";
+import { Containers } from "../common/containers.js";
 import { Stream } from "stream";
 
 /*

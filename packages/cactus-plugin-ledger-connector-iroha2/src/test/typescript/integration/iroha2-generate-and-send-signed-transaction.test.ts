@@ -21,16 +21,16 @@ import {
   IrohaQuery,
   signIrohaV2Transaction,
   TransactionStatusV1,
-} from "../../../main/typescript/public-api";
+} from "../../../main/typescript/public-api.js";
 import {
   generateTestIrohaCredentials,
   IrohaV2TestEnv,
-} from "../test-helpers/iroha2-env-setup";
-import { addRandomSuffix } from "../test-helpers/utils";
+} from "../test-helpers/iroha2-env-setup.js";
+import { addRandomSuffix } from "../test-helpers/utils.js";
 
 import "jest-extended";
 import { TransactionPayload } from "@iroha2/data-model";
-import { signIrohaV2Query } from "../../../main/typescript/iroha-sign-utils";
+import { signIrohaV2Query } from "../../../main/typescript/iroha-sign-utils.js";
 
 // Logger setup
 const log: Logger = LoggerProvider.getOrCreate({

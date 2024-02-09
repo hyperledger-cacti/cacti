@@ -15,7 +15,7 @@ import {
   IWebServiceEndpoint,
 } from "@hyperledger/cactus-core-api";
 
-import { DefaultApi } from "./generated/openapi/typescript-axios";
+import { DefaultApi } from "./generated/openapi/typescript-axios/index.js";
 
 export interface IPluginKeychainVaultRemoteAdapterOptions
   extends ICactusPluginOptions {

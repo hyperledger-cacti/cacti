@@ -14,7 +14,7 @@ import { readFileSync } from "fs";
 jest.mock("fs");
 
 jest.mock("../../../main/typescript/routing-interface/util/ConfigUtil");
-import { ValidatorRegistry } from "../../../main/typescript/verifier/validator-registry";
+import { ValidatorRegistry } from "../../../main/typescript/verifier/validator-registry.js";
 
 //////////////////////////
 // UNIT TESTS
